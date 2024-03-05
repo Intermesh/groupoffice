@@ -98,10 +98,9 @@ Ext.ux.form.XCheckbox = Ext.extend(Ext.form.Checkbox, {
 	
 	markInvalid: function (msg) {
 		//don't set the error icon if we're not rendered or marking is prevented
-		
         if (this.rendered && !this.preventMark) {
             msg = msg || this.invalidText;
-							if(this.msgTarget){
+			if(this.msgTarget){
                 this.el.parent().addClass(this.invalidClass);
                 var t = Ext.getDom(this.msgTarget);
                 if(t){
@@ -119,7 +118,7 @@ Ext.ux.form.XCheckbox = Ext.extend(Ext.form.Checkbox, {
         if (this.rendered && !this.preventMark) {
             this.el.removeClass(this.invalidClass);
             
-							if(this.msgTarget){
+			if(this.msgTarget){
                 this.el.parent().removeClass(this.invalidClass);
                 var t = Ext.getDom(this.msgTarget);
                 if(t){

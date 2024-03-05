@@ -182,12 +182,20 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 						itemId: "delete",
 						iconCls: 'ic-delete',
 						text: t("Delete"),
-						handler: function () {
-							Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
+						handler:  function () {
+							Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), async function (btn) {
 								if (btn !== "yes") {
 									return;
 								}
-								go.Db.store("AddressBook").set({destroy: [this.addressBookMoreMenu.data.id]});
+
+
+								try {
+									Ext.getBody().mask(t("Loading..."));
+									await go.Db.store("AddressBook").set({destroy: [this.addressBookMoreMenu.data.id]});
+								} finally {
+									Ext.getBody().unmask();
+								}
+
 							}, this);
 						},
 						scope: this

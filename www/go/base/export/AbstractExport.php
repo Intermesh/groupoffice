@@ -126,9 +126,11 @@ abstract class AbstractExport {
 		
 		foreach($c as $key){
             if(is_array($record[$key])) {
-                $frecord[$key] = html_entity_decode(implode(', ',$record[$key]));
+				$v = implode(', ',$record[$key]);
+                $frecord[$key] = html_entity_decode($v );
             } else {
-                $frecord[$key] = html_entity_decode($record[$key]);
+				$v = $record[$key] ?? "";
+                $frecord[$key] = html_entity_decode($v);
             }
 		}
 

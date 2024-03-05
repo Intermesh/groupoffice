@@ -21,10 +21,15 @@
 
 namespace GO\Base\Fs;
 
-
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Writer\Exception;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
-class XlsFile extends File{
+class XlsFile extends File
+{
 		
 	/**
 	 * Full path to file.
@@ -39,20 +44,20 @@ class XlsFile extends File{
 	protected $filetype;
 	
 	/**
-	 * PHPExcel object.
-	 * @var \PHPExcel
+	 * Spreadsheet object.
+	 * @var Spreadsheet
 	 */
 	protected $phpExcelObj;
 
 	/**
-	 * @var Boolean
+	 * @var boolean
 	 */
 	protected $readOnly;
 
 	/**
 	 * 2D-array of cell values. This is created by the constructor, and read from
 	 * in getRecord()
-	 * @var Array
+	 * @var array
 	 */
 	protected $rowsBuffer;
 	
@@ -96,9 +101,14 @@ class XlsFile extends File{
 	
 	/**
 	 * Array of column width integers.
-	 * @var Array $columnWidths
+	 * @var array $columnWidths
 	 */
 	protected $columnWidths;
+
+	/**
+	 * @var int
+	 */
+	protected $rightEndOfFileColNr;
 	
 	/**
 	 * Constructor.
@@ -124,22 +134,23 @@ class XlsFile extends File{
 		$this->nextRowNr = 1;
 		
 	}
-	
+
+	/**
+	 * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+	 */
 	protected function init($readSheetNr=0) {
 
 		if (is_file($this->path)) {
-			$this->filetype = \PHPExcel_IOFactory::identify($this->path);
-			$xlsReader = \PHPExcel_IOFactory::createReader($this->filetype);
+			$this->filetype = IOFactory::identify($this->path);
+			$xlsReader = IOFactory::createReader($this->filetype);
 			$xlsReader->setReadDataOnly($this->readOnly);
 			$this->phpExcelObj = $xlsReader->load($this->path);
-//			$this->phpExcelSheet = $xlsReader->load($this->path)->getSheet($readSheetNr);
 		} else {
-			$this->phpExcelObj = new \PHPExcel();
+			$this->phpExcelObj = new Spreadsheet();
 			$this->phpExcelObj->getProperties()->setCreator(\GO::config()->product_name);
 			$this->phpExcelObj->getProperties()->setLastModifiedBy(\GO::config()->product_name);
 			$this->phpExcelObj->getProperties()->setTitle("Office 2007 XLSX Document");
 			$this->phpExcelObj->getProperties()->setSubject("Office 2007 XLSX Document");
-//			$this->phpExcelObj->getProperties()->setDescription("Test document for Office 2007 XLSX, generated using PHP classes.");
 		}
 	}
 	
@@ -168,22 +179,13 @@ class XlsFile extends File{
 			}
 		}
 
-		// Create rows buffer
-//		for ($row=1;$row<=$HIGHEST_ROW_WITH_VALUE;$row++) {
-//			$rowRecord = array();
-//			for ($col=0;$col<=$HIGHEST_COLUMN_WITH_VALUE;$col++) {
-//				$rowRecord[] = $this->phpExcelSheet->getCellByColumnAndRow($col,$row)->getCalculatedValue();
-//				\GO::debug($this->phpExcelSheet->getCellByColumnAndRow($col,$row)->getCalculatedValue());
-//			}
-//			$this->rowsBuffer[$row] = $rowRecord;
-//		}
-		
 		$this->rightEndOfFileColNr = $HIGHEST_COLUMN_WITH_VALUE;
 		$this->bottomOfFileRowNr = $HIGHEST_ROW_WITH_VALUE;
 		
 	}
 	
-	protected function _maxEmptyCellsNotExceeded($cellNr,$highestCellWithValue) {
+	protected function _maxEmptyCellsNotExceeded($cellNr,$highestCellWithValue): bool
+	{
 		return $cellNr-$highestCellWithValue<=$this->nAllowedEmptyCells;
 	}
 	
@@ -193,14 +195,14 @@ class XlsFile extends File{
 		
 	/**
 	 * Retrieves the contents of the next row in the XLS file.
-	 * @return Array An array of elements read from the XLS line. Or false when there is no next record;
+	 * @return array An array of elements read from the XLS line. Or false when there is no next record;
 	 */
-	public function getRecord(){
+	public function getRecord(): array|false
+	{
 
 		if ($this->nextRowNr>$this->bottomOfFileRowNr)
 			return false;
 				
-//		$rowRecord = $this->rowsBuffer[$this->nextRowNr];
 		$rowRecord = array();
 		for ($col=0;$col<=$this->rightEndOfFileColNr;$col++) {
 			$rowRecord[] = $this->phpExcelObj->getSheet($this->sheetNr)->getCellByColumnAndRow($col,$this->nextRowNr)->getCalculatedValue();
@@ -212,10 +214,12 @@ class XlsFile extends File{
 
 	/**
 	 * TODO: Write record to XLS.
-	 * @param Array $fields The elements of this array will be written into a line
+	 * @param array $fields The elements of this array will be written into a line
 	 * of the current XLS file.
+	 * @throws \PhpOffice\PhpSpreadsheet\Exception
 	 */
-	public function putRecord($fields){		
+	public function putRecord(array $fields): void
+	{
 		
 		foreach ($fields as $colNr=>$field) {
 			if (empty($this->columnWidths[$colNr]) || $this->columnWidths[$colNr]<strlen($field)) {
@@ -235,27 +239,30 @@ class XlsFile extends File{
 		$this->nextRowNr++;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function writeToFile() {
 		
-		$objWriter = new \PHPExcel_Writer_Excel2007($this->phpExcelObj);
+		$objWriter = new Xlsx($this->phpExcelObj);
 		$objWriter->setPreCalculateFormulas(false);
 		$objWriter->save($this->path);
 				
 	}
 
 	/**
-	 * @return \PHPExcel
+	 * @return Spreadsheet
 	 */
-	public function getExcelObject(): \PHPExcel
+	public function getExcelObject(): Spreadsheet
 	{
 		return $this->phpExcelObj;
 	}
 
 	/**
-	 * @return \PHPExcel_Worksheet
-	 * @throws \PHPExcel_Exception
+	 * @return Worksheet
+	 * @throws \PhpOffice\PhpSpreadsheet\Exception
 	 */
-	public function getCurrentSheet(): \PHPExcel_Worksheet
+	public function getCurrentSheet(): Worksheet
 	{
 		return $this->phpExcelObj->getSheet($this->sheetNr);
 	}
@@ -265,13 +272,13 @@ class XlsFile extends File{
 	 *
 	 * @param int $i
 	 * @return $this
-	 * @throws \PHPExcel_Exception
+	 * @throws Exception
 	 */
-	public function setSheetNumber(int $i)
+	public function setSheetNumber(int $i): self
 	{
 		$numSheets = $this->phpExcelObj->getSheetCount();
 		if( $i < 0 || $i > $numSheets) {
-			throw new \PHPExcel_Exception(
+			throw new Exception(
 				"Your requested sheet index: {$i} is out of bounds. The actual number of sheets is {$numSheets}."
 			);
 		}

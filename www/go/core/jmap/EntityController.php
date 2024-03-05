@@ -21,6 +21,8 @@ use go\core\model\ImportMapping;
 use go\core\orm\EntityType;
 use go\core\orm\Query;
 use go\core\util\ArrayObject;
+use go\core\util\BackgroundProcess;
+use go\core\util\JSON;
 use go\core\util\Lock;
 use InvalidArgumentException;
 use PDO;
@@ -103,26 +105,7 @@ abstract class EntityController extends Controller {
 		$cls = $this->entityClass();
 		return lcfirst(substr($cls, strrpos($cls, '\\') + 1));
 	}
-	
-//	/**
-//	 * Creates a short plural name
-//	 *
-//	 * @see getShortName()
-//	 *
-//	 * @return string
-//	 */
-//	protected function getShortPluralName(): string
-//	{
-//
-//		$shortName = $this->getShortName();
-//
-//		if(substr($shortName, -1) == 'y') {
-//			return substr($shortName, 0, -1) . 'ies';
-//		} else
-//		{
-//			return $shortName . 's';
-//		}
-//	}
+
 
 	/**
 	 * Querying readonly has a slight performance benefit
@@ -148,29 +131,11 @@ abstract class EntityController extends Controller {
 						->limit($params['limit'])
 						->offset($params['position']);
 
-//		if($params['calculateTotal']) {
-//			$query->calcFoundRows();
-//		}
-		
 		/* @var $query Query */
 
 		$sort = $this->transformSort($params['sort']);
 		
 		$cls::sort($query, $sort);
-
-		// MS: this messes up sort for invoices by date. Can't remember
-		// why this was needed before. I expect somthing to break with this removed!
-//		if(!empty($query->getGroupBy())) {
-//			//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)
-//			$keys = $cls::getPrimaryKey();
-//			$pkSort = [];
-//			foreach($keys as $key) {
-//				if(!isset($sort[$key])) {
-//					$pkSort[$key] = 'ASC';
-//				}
-//			}
-//			$query->orderBy($pkSort, true);
-//		}
 
 		$this->selectColumnsForQueryQuery($query);
 
@@ -228,9 +193,7 @@ abstract class EntityController extends Controller {
 		if ($params['limit'] < 0) {
 			throw new InvalidArguments("Limit MUST be positive");
 		}
-		//cap at max of 50
-		//$params['limit'] = min([$params['limit'], Capabilities::get()->maxObjectsInGet]);
-		
+
 		if(!isset($params['position'])) {
 			$params['position'] = 0;
 		}
@@ -572,38 +535,6 @@ abstract class EntityController extends Controller {
 		return $result;
 	}
 
-//	private function getEntityArray($id, $properties) {
-//		$e = $this->getEntity($id, $properties);
-//		if(!$e) {
-//			return false;
-//		}
-//
-//		return $e->toArray($properties);
-//	}
-
-	// Caching doesn't work because entities can contain user specific props like user tables and getPermissionLevel()
-//	private function getEntityArrayFromCache($id, $properties) {
-//		$key = $this->entityClass() . '-toArray-' . $id;
-//		$arr = go()->getCache()->get($key);
-//
-//		if(!$arr) {
-//			$e = $this->getEntity($id);
-//			if(!$e) {
-//				return false;
-//			} else {
-//				$arr = $e->toArray();
-//				$arr['id'] = $e->id();
-//				go()->getCache()->set($key, $arr);
-//			}
-//		}
-//
-//		if(!empty($properties)) {
-//			$arr = array_intersect_key($arr, array_flip($properties));
-//		}
-//
-//		return $arr;
-//	}
-	
 	/**
 	 * Takes the request arguments, validates them and fills it with defaults.
 	 * 
@@ -655,9 +586,6 @@ abstract class EntityController extends Controller {
 	public static $updatedEntitities = [];
 
 	public static function onEntitySave(Entity $entity) {
-
-		//$mod = array_map(function($mod) { return $mod[0];}, $entity->getModified()); //Get only modified values
-
 		//Server should sent modified only but it's hard to check with getters and setters. So we just send all.
 		if($entity->isNew()) {
 			static::$createdEntitities[$entity->id()] = $entity->toArray();
@@ -1077,35 +1005,46 @@ abstract class EntityController extends Controller {
 	protected function defaultImport(array $params): ArrayObject
 	{
 
-		ini_set('max_execution_time', 10 * 60);
-		
-		$params = $this->paramsImport($params);
-		
-		$blob = Blob::findById($params['blobId']);	
+		$params = ['importParams' => JSON::encode($params)];
+		$params['userId'] = go()->getUserId();
+		$params['entityCls'] = $this->entityClass();
 
-		$extension = (new File($blob->name))->getExtension();
-		$converter = $this->findConverter($extension);
+		$p = new BackgroundProcess("core/System/import", $params);
+		$pid = $p->run();
 
-		if($extension == 'csv') {
-			$file = $blob->getFile()->copy(File::tempFile($extension));
-			$file->convertToUtf8();
-		} else{
-			$file = $blob->getFile();
-		}
-
-		$response = $converter->importFile($file, $params->getArray());
+		return new ArrayObject(['pid' => $pid, 'output' => $p->getOutput()]);
 		
-		if(!$response) {
-			throw new Exception("Invalid response from import converter");
-		}
-		
-		return new ArrayObject($response);
+//		$params = $this->paramsImport($params);
+//
+//		$blob = Blob::findById($params['blobId']);
+//
+//		$cls = $this->entityClass();
+//
+//		$extension = (new File($blob->name))->getExtension();
+//		$converter = $cls::findConverter($extension);
+//
+//		if($extension == 'csv') {
+//			$file = $blob->getFile()->copy(File::tempFile($extension));
+//			$file->convertToUtf8();
+//		} else{
+//			$file = $blob->getFile();
+//		}
+//
+//		$response = $converter->importFile($file, $params->getArray());
+//
+//		if(!$response) {
+//			throw new Exception("Invalid response from import converter");
+//		}
+//
+//		return new ArrayObject($response);
 	}
 
 
 	protected function defaultExportColumns($params): ArrayObject
 	{
-		$converter = $this->findConverter($params['extension']);
+		$cls = $this->entityClass();
+
+		$converter = $cls::findConverter($params['extension']);
 
 		$mapping = $converter->getEntityMapping();
 		if(isset($mapping['customFields'])) {
@@ -1143,12 +1082,16 @@ abstract class EntityController extends Controller {
 				$file = $blob->getFile();
 			}
 
-			$converter = $this->findConverter($extension);
+			$cls = $this->entityClass();
+
+			$converter = $cls::findConverter($extension);
 
 			$response['goHeaders'] = $converter->getEntityMapping();
 			$response['csvHeaders'] = $converter->getCsvHeaders($file);
 
-			$checkSum = md5(implode(',', array_map("trim", $response['csvHeaders'])));
+			$checkSum = md5(implode(',', array_map(function($v) {
+				return $v ? trim($v) : "";
+			}, $response['csvHeaders'])));
 			$entityClass = $this->entityClass();
 			$mapping = ImportMapping::findByChecksum($entityClass::entityType()->getId(), $checkSum);
 		} else if(!empty($params['id'])) {
@@ -1168,24 +1111,6 @@ abstract class EntityController extends Controller {
 		return new ArrayObject($response);
 	}
 
-	/**
-	 * Find a convertor for exporting or importing
-	 *
-	 * @param string $extension
-	 * @return AbstractConverter
-	 */
-	private function findConverter(string $extension): AbstractConverter
-	{
-		
-		$cls = $this->entityClass();		
-		foreach($cls::converters() as $converter) {
-			if($converter::supportsExtension($extension)) {
-				return new $converter($extension, $this->entityClass());
-			}
-		}
-		
-		throw new InvalidArgumentException("Converter for file extension '" . $extension .'" is not found');
-	}
 
   /**
    * Standard export function
@@ -1207,8 +1132,10 @@ abstract class EntityController extends Controller {
 		}
 		
 		$params = $this->paramsExport($params);
+
+		$cls = $this->entityClass();
 		
-		$convertor = $this->findConverter($params['extension']);
+		$convertor = $cls::findConverter($params['extension']);
 				
 		$entities = $this->getGetQuery($params);
 

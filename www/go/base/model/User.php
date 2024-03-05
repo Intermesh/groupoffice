@@ -90,7 +90,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	private $password;
 
 	public function getLastlogin() {
-		return strtotime($this->getAttribute("lastLogin"));
+		return strtotime($this->getAttribute("lastLogin") ?? "");
 	}
 
 	public function getCtime() {

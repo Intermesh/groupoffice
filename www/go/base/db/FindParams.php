@@ -316,14 +316,6 @@ class FindParams{
 		return isset($this->_params['joinedTables'][$tableName]) ? $this->_params['joinedTables'][$tableName] : false;
 	}
 	
-	
-//	public function joinRelation($relationName){
-//		if(!isset($this->_params['joinRelations']))
-//			$this->_params['joinRelations']=array();
-//		
-//		$this->_params['joinRelations'][]=$relationName;
-//	}
-	
 	/**
 	 * Add a find criteria object to add where conditions
 	 * 
@@ -522,20 +514,7 @@ class FindParams{
 
 		return $this->join($joinModel->tableName(), $params['criteria'], $params['tableAlias'],$params['type']);
 	}
-	
-//	/**
-//	 * Join a relation in the query. The fields will be selected as RelationName@AttributeName.
-//	 * 
-//	 * @param string $relationName 
-//	 */
-//	public function joinRelation($relationName, $type='INNER'){
-//		if($type!='INNER' && $type!='LEFT' && $type!='RIGHT')
-//			throw new \Exception("Must be INNER, LEFT or RIGHT");
-//		
-//		$this->_params['joinRelations'][$relationName] = $type;
-//	}
-	
-	
+
 	/**
 	 * Skip this number of items
 	 * 

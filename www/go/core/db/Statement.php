@@ -268,15 +268,37 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, Iter
 
 	/**
 	 * Fetches the next row from a result set
+   *
+	 * @param int $mode [optional] <p>
+	 * Controls how the next row will be returned to the caller. This value
+	 * must be one of the PDO::FETCH_* constants,
+	 * defaulting to value of PDO::ATTR_DEFAULT_FETCH_MODE
+	 * (which defaults to PDO::FETCH_BOTH).
+	 * </p>
+	 * <p>
+	 * PDO::FETCH_ASSOC: returns an array indexed by column
+	 * name as returned in your result set
+	 * </p>
+	 * @param int $cursorOrientation [optional] <p>
+	 * For a PDOStatement object representing a scrollable cursor, this
+	 * value determines which row will be returned to the caller. This value
+	 * must be one of the PDO::FETCH_ORI_* constants,
+	 * defaulting to PDO::FETCH_ORI_NEXT. To request a
+	 * scrollable cursor for your PDOStatement object, you must set the
+	 * PDO::ATTR_CURSOR attribute to
+	 * PDO::CURSOR_SCROLL when you prepare the SQL
+	 * statement with <b>PDO::prepare</b>.
+	 * </p>
+	 * @param int $cursorOffset [optional]
 	 *
 	 * @return T
 	 */
 
-	public function fetch(): mixed {
+	public function fetch(...$args): mixed {
 		if(!isset($this->modelClassName)) {
-			return $this->pdoStmt->fetch();
+			return $this->pdoStmt->fetch(...$args);
 		} else{
-			$arr = $this->pdoStmt->fetch();
+			$arr = $this->pdoStmt->fetch(...$args);
 
 			if(!$arr) {
 				return false;
@@ -365,8 +387,33 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, Iter
 	}
 
 	/**
-
-	 * Returns an array containing all of the result set rows
+ * Returns an array containing all of the result set rows
+	 * @param int $mode [optional] <p>
+	 *  Controls the contents of the returned array as documented in
+	 *  <b>PDOStatement::fetch</b>.
+	 *  Defaults to value of <b>PDO::ATTR_DEFAULT_FETCH_MODE</b>
+	 *  (which defaults to <b>PDO::FETCH_BOTH</b>)
+	 *  </p>
+	 *  <p>
+	 *  To return an array consisting of all values of a single column from
+	 *  the result set, specify <b>PDO::FETCH_COLUMN</b>. You
+	 *  can specify which column you want with the
+	 *  <i>column-index</i> parameter.
+	 *  </p>
+	 *  <p>
+	 *  To fetch only the unique values of a single column from the result set,
+	 *  bitwise-OR <b>PDO::FETCH_COLUMN</b> with
+	 *  <b>PDO::FETCH_UNIQUE</b>.
+	 *  </p>
+	 *  <p>
+	 *  To return an associative array grouped by the values of a specified
+	 *  column, bitwise-OR <b>PDO::FETCH_COLUMN</b> with
+	 *  <b>PDO::FETCH_GROUP</b>.
+	 *  </p>
+	 * @param mixed ...$args <p>
+	 *  Arguments of custom class constructor when the <i>fetch_style</i>
+	 *  parameter is <b>PDO::FETCH_CLASS</b>.
+	 *  </p>
 	 * @return T[]|false <b>PDOStatement::fetchAll</b> returns an array containing
 	 * all of the remaining rows in the result set. The array represents each
 	 * row as either an array of column values or an object with properties
@@ -380,15 +427,32 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, Iter
 	 * server to manipulate the result sets. For example, use the WHERE and
 	 * ORDER BY clauses in SQL to restrict results before retrieving and
 	 * processing them with PHP.
+	 *
+	 *
+	 * @return array|false <b>PDOStatement::fetchAll</b> returns an array containing
+	 *  all of the remaining rows in the result set. The array represents each
+	 *  row as either an array of column values or an object with properties
+	 *  corresponding to each column name.
+	 *  An empty array is returned if there are zero results to fetch, or false on failure.
+	 *  </p>
+	 *  <p>
+	 *  Using this method to fetch large result sets will result in a heavy
+	 *  demand on system and possibly network resources. Rather than retrieving
+	 *  all of the data and manipulating it in PHP, consider using the database
+	 *  server to manipulate the result sets. For example, use the WHERE and
+	 *  ORDER BY clauses in SQL to restrict results before retrieving and
+	 *  processing them with PHP.
+	 * @link https://php.net/manual/en/pdostatement.fetchall.php
 	 */
 
-	public function fetchAll(
-	): array {
+
+
+	public function fetchAll(...$args): array {
 		if(!isset($this->modelClassName)) {
-			return $this->pdoStmt->fetchAll();
+			return $this->pdoStmt->fetchAll(...$args);
 		} else {
 			$arr = [];
-			while($r = $this->fetch()) {
+			while($r = $this->fetch(...$args)) {
 				$arr[] = $r;
 			}
 			return $arr;

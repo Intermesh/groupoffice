@@ -22,6 +22,7 @@
 namespace GO\Files;
 
 use Faker\Generator;
+use go\core\model\Acl;
 use go\core\model\Group;
 use go\core\model\User;
 use go\core\util\ClassFinder;
@@ -72,7 +73,7 @@ class FilesModule extends \GO\Base\Module{
 		}
 		
 		$folder = Model\Folder::model()->findByPath("log", true);
-		if(!$folder->acl){
+		if(!$folder->acl || $folder->acl_id == Acl::getReadOnlyAclId()){
 			$folder->setNewAcl();
 			$folder->readonly=1;
 			$folder->save();

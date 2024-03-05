@@ -13,13 +13,13 @@
 go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 
 	initComponent: function () {
-		
-		var panels = GO.moduleManager.getAllPanels(), data = [];
-		
+		const panels = GO.moduleManager.getAllPanelConfigs();
+		let data = [];
+
 		panels.forEach(function(p){
 			data.push([p.moduleName, p.title]);
 		});
-		var moduleStore = new Ext.data.ArrayStore({
+		const moduleStore = new Ext.data.ArrayStore({
 			fields: ['id', 'name'],
 			idField: 'id',
 			data: data
@@ -47,6 +47,10 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 						document.body.classList.add(me.value);
 						if(me.value === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
 							document.body.classList.add('dark');
+						}
+
+						if(document.body.classList.contains("dark")) {
+							document.getElementsByTagName("meta")["theme-color"].content = "#202020";
 						}
 					}
 					}},

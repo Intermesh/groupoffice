@@ -413,7 +413,7 @@ GO.email.EmailComposer = function(config) {
 				id: 'id',
 				fields: ['id', 'name', 'group', 'text','template_id','checked','group_name', 'group_id'],
 			}),
-			groupField:'group_id',
+			groupField:'group_name',
 			remoteSort : false,
 			remoteGroup:true
 		});

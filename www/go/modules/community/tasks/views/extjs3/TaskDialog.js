@@ -31,7 +31,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 			this.on("submit", () => {
 				if(this.commentComposer.editor.getValue() != "")
-					this.commentComposer.save(this.support ? "SupportTicket" : "Task", this.currentId);
+					this.commentComposer.save(this.role == "support" ? "SupportTicket" : "Task", this.currentId);
 			}, {single:true})
 		} else
 		{

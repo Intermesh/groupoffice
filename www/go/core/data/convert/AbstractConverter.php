@@ -6,9 +6,13 @@ use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\jmap\EntityController;
+use go\core\model\Alert;
 use go\core\orm\Entity;
 use go\core\orm\EntityType;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Query;
+use go\core\util\DateTime;
+use go\modules\business\support\Module;
 
 /**
  * Abstract converter class
@@ -92,6 +96,8 @@ abstract class AbstractConverter {
 	 */
 	protected $extension;
 
+	protected Alert $alert;
+
 	/**
 	 * AbstractConverter constructor.
 	 * @param string $extension eg. "csv"
@@ -146,6 +152,69 @@ abstract class AbstractConverter {
 		return $this->extension;
 	}
 
+	private function notifyStart() {
+		$this->alert = new Alert();
+
+		$cls = $this->entityClass;
+
+		$module = \go\core\model\Module::findByClass($this->entityClass, ['id', 'name', 'package']);
+
+		$this->alert->setEntity($module);
+		$this->alert->userId = go()->getUserId();
+		$this->alert->triggerAt = new DateTime();
+		$this->alert->setData([
+				'title' => go()->t("Importing"),
+				'body' => go()->t("The import has started in the background")
+			]
+		);
+
+		if (!$this->alert->save()) {
+			throw new SaveException($this->alert);
+		}
+	}
+
+	private function notifyEnd(int $count, int $errorCount) {
+		$this->alert->setData([
+				'title' => go()->t("Import finished"),
+				'body' => go()->t("Imported") . ": ". $count ."\n". go()->t("Errors"). ": ".$errorCount
+			]
+		);
+		if (!$this->alert->save()) {
+			throw new SaveException($this->alert);
+		}
+	}
+
+	private function notifyCount(int $count, int $errorCount) {
+		$this->alert->setData([
+				'title' => go()->t("Import in progress"),
+				'body' => go()->t("Imported") . ": ". $count ."\n". go()->t("Errors"). ": ".$errorCount
+			]
+		);
+		if (!$this->alert->save()) {
+			throw new SaveException($this->alert);
+		}
+	}
+
+	private function notifyError(string $error) {
+		$this->alert = new Alert();
+
+
+		$module = \go\core\model\Module::findByClass($this->entityClass, ['id', 'name', 'package']);
+
+		$this->alert->setEntity($module);
+		$this->alert->userId = go()->getUserId();
+		$this->alert->triggerAt = new DateTime();
+		$this->alert->setData([
+				'title' => go()->t("Import error"),
+				'body' => $error
+			]
+		);
+
+		if (!$this->alert->save()) {
+			throw new SaveException($this->alert);
+		}
+	}
+
 
   /**
    * Read file and import them into Group-Office
@@ -177,11 +246,17 @@ abstract class AbstractConverter {
 
 		$this->initImport($file);
 
+		$this->notifyStart();
+
 		$this->index = 0;
 		
 		while($this->nextImportRecord()) {
 
 			try {
+
+
+				echo $this->index ."\n";
+
 
 				$entity = $this->importEntity();
 				
@@ -197,12 +272,22 @@ abstract class AbstractConverter {
 				EntityType::push(100);
 
 				if($entity->hasValidationErrors()) {
-					$response['errors'][] = "Item ". $this->index . ": ". var_export($entity->getValidationErrors(), true);
+					$msg = "Item ". $this->index . ": ". var_export($entity->getValidationErrors(), true);
+					$this->notifyError($msg);
+
+					$response['errors'][] = $msg;
 				} elseif($this->afterSave($entity)) {
 					$response['count']++;
 				} else{
-					$response['errors'][] = "Item ". $this->index . ": Import afterSave returned false";
-				}				
+					$msg = "Item ". $this->index . ": Import afterSave returned false";
+					$response['errors'][] = $msg;
+
+					$this->notifyError($msg);
+				}
+
+				EntityType::push();
+
+				$this->notifyCount($response['count'], count($response['errors']));
 			}
 			catch(Exception $e) {
 				ErrorHandler::logException($e);
@@ -213,6 +298,8 @@ abstract class AbstractConverter {
 		}
 
 		$this->finishImport();
+
+		$this->notifyEnd($response['count'], count($response['errors']));
 		
 		return $response;
 	}

@@ -844,13 +844,17 @@ class Task extends AclItemEntity {
 			$commenters[] = $this->responsibleUserId;
 		}
 
+		$isPrivate = $comment->section == "private";
+
 		//add creator too
-		if(!in_array($this->createdBy, $commenters)) {
+		if(!$isPrivate && !in_array($this->createdBy, $commenters)) {
 			$commenters[] = $this->createdBy;
 		}
 
 		//remove creator of this comment
-		$commenters = array_filter($commenters, function($c) use($comment) {return $c != $comment->createdBy;});
+		$commenters = array_filter($commenters, function($c) use($comment, $isPrivate) {
+			return $c != $comment->createdBy && (!$isPrivate || $c != $this->createdBy);
+		});
 
 		// Remove alert for creator of this comment. Other users will get a replaced alert below.
 		CoreAlert::deleteByEntity($this, "comment", $comment->createdBy);

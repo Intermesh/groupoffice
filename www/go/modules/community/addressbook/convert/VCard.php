@@ -112,10 +112,10 @@ class VCard extends AbstractConverter {
 		$vcard->TITLE = (string) $contact->jobTitle;
 
 		foreach ($contact->emailAddresses as $emailAddr) {
-			$vcard->add('EMAIL', $emailAddr->email, ['TYPE' => [$emailAddr->type]]);
+			$vcard->add('EMAIL', $emailAddr->email, ['TYPE' => [$emailAddr->type ?? ""]]);
 		}
 		foreach ($contact->phoneNumbers as $phoneNb) {
-			$vcard->add('TEL', $phoneNb->number, ['TYPE' => [$phoneNb->type]]);
+			$vcard->add('TEL', $phoneNb->number, ['TYPE' => [$phoneNb->type ?? ""]]);
 		}
 		$bdayAdded = false;
 		$anniversaryAdded = false;
@@ -142,7 +142,7 @@ class VCard extends AbstractConverter {
 		foreach ($contact->addresses as $address) {
 			//ADR: [post-office-box, apartment, street, locality, region, postal, country]
 			$vcard->add(
-							'ADR', ['', '', $address->address, $address->city, $address->state, $address->zipCode, $address->country], ['TYPE' => [$address->type]]
+							'ADR', ['', '', $address->address, $address->city, $address->state, $address->zipCode, $address->country], ['TYPE' => [$address->type ?? ""]]
 			);
 		}
 		if (!$contact->isOrganization) {

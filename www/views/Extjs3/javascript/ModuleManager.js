@@ -177,24 +177,12 @@ GO.ModuleManager = Ext.extend(function(){
 			return false;
 		}
 	},
-	
-	getAllPanels : function(){
-		const p = Object.values(this.modulePanels);
-
-		p.sort((a, b) => {
-			return (a.sort_order ?? 0) - (b.sort_order ?? 0)
-		})
-
-		return p;
-
-	},
 
 	getAllPanelConfigs : function(){
 
 		let p = Object.values(this.panelConfigs);
 
 		p.sort((a, b) => {
-			// debugger;
 			const sortA = go.Modules.get(a.package, a.moduleName, ).sort_order;
 			const sortB = go.Modules.get(b.package, b.moduleName, ).sort_order;
 

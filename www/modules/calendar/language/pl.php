@@ -159,7 +159,7 @@ return array (
   'Status' => 'Status',
   'Start' => 'Początek',
   'Enable reminder for this event' => 'Włącz przypomnienia dla tego zdarzenia',
-  'Show holidays' => 'Pokaż święta',
+  'Show holidays' => 'Pokaż urlopy',
   'Tasklist' => 'Lista zadań',
   'Direct URL' => 'Bezpośredni adres URL',
   'Remove duplicates' => 'Usuń duplikaty',

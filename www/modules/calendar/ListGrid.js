@@ -328,7 +328,11 @@ Ext.extend(GO.calendar.ListGrid, Ext.grid.GridPanel, {
 	},
 
 	showContextMenu : function(e, event)
-	{			
+	{
+		if(!event.event_id) {
+			e.stopEvent();
+			return;
+		}
 		if(!this.contextMenu)
 		{
 			this.contextMenu = new GO.calendar.ContextMenu();

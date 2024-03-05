@@ -441,21 +441,6 @@ namespace go\core {
 				return $this->config;
 			}
 
-			//If acpu is supported we can use it to cache the config object.
-			// if(cache\Apcu::isSupported() && ($token = State::getClientAccessToken())) {
-			// 	$cacheKey = 'go_conf_' . $token;
-
-			// 	$this->config = apcu_fetch($cacheKey);
-			// 	if($this->config && $this->config['cacheTime'] > filemtime($this->config['configPath']) && (!file_exists('/etc/groupoffice/globalconfig.inc.php') || $this->config['cacheTime'] > filemtime('/etc/groupoffice/globalconfig.inc.php'))) {
-			// 		if(Request::get()->getHeader('X-Debug') == "1") {
-			// 			$this->config['core']['general']['debug'] = true;
-			// 		}
-			// 		return $this->config;
-			// 	}
-			// }
-			
-			//$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
-
 			//defaults
 			$config = new ArrayObject([
 				"frameAncestors" => "",
@@ -465,6 +450,7 @@ namespace go\core {
 				"tmpdir" => sys_get_temp_dir() . '/groupoffice',
 				"debug" => false,
 				"debugEmail" => false,
+				"mailerDebugLevel" => 0,
 				"servermanager" => false,
 				"sseEnabled" => true,
 				"max_users" => 0,

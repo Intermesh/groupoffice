@@ -43,5 +43,13 @@ if(array_key_exists('debugSql', $args)) {
 	go()->getDbConnection()->debug = !empty($args['debugSql']);
 }
 
-$router = new Router();
-$router->run();
+try {
+	$router = new Router();
+	$router->run();
+} catch(Throwable $e) {
+    echo $e->getMessage() ."\n";
+
+       \go\core\ErrorHandler::logException($e);
+
+    exit(1);
+}
