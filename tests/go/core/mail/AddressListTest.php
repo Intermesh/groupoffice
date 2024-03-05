@@ -18,11 +18,13 @@ class AddressListTest extends \PHPUnit\Framework\TestCase {
 	<tulio.bar@test.org.br>,
 	<rodolfo.foo@test.org.br>';
 
-//		$str = '"\'\'natalie typo\'\'" <natalie.typo@test.org.br>';
 
 		$list = new AddressList($str);
+		$this->assertCount(7, $list);
+		$this->assertEquals($list[1]->getName(), "''natalie typo''");
 
-		var_dump($list->toArray());
+		$this->assertEquals($list[0]->getName(), "");
+		$this->assertEquals($list[0]->getEmail(), "test@test.org.br");
 	}
 
 }
