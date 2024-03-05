@@ -1,3 +1,4 @@
+- Email: Resize folder subscribtion dialog to current theme
 - Core: Fix bug in module selection in user profile
 - Files: minor bugfix copy / paste with keypresses
 - Zpushadmin: Available for admins only by default
@@ -301,6 +302,20 @@
 
 -- 6.8 --
 
+04-03-2024: 6.7.72
+- Timeregistration2: display of employee combo must depend on module rights instead of vestigial older permission level
+- Billing: fix numeric queries for e.g. products or order numbers
+- Core: fix PHP compatibility error in legacy user class
+- Addressbook: Street filter used old column and returned unexpected results
+- Core: Fixed parsing address list with lots of quotes. Issue #1073.
+
+27-02-2024: 6.7.71
+- Core: Bugfix in layout renderer
+
+27-02-2024: 6.7.70
+- Email: typo in templates controller
+
+26-02-2024: 6.7.69
 - Core: Render label YesNo filter
 - LDAPAuthenticator: bugfix in synchronization
 - Core: Updated PL translations. Thank you Piotr!
@@ -684,10 +699,13 @@
 
 
 --- 6.7
+04-03-2024: 6.6.183
+- Email: Fixed render issue
+- Leavedays: fix issue with disapproval reason not being sent
+- Core: Fixed parsing address list with lots of quotes. Issue #1073.
+
 22-01-2023: 6.6.182
-
 - Core: Exclude User and Search from SSE Push because it caused performance problems
-
 
 11-12-2023: 6.6.181
 - Core: Better license check
