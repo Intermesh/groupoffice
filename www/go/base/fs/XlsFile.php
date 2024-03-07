@@ -230,9 +230,9 @@ class XlsFile extends File
 
 			if(is_string($field) && isset($field[0]) && $field[0] == '=') {
 				//prevent formula detection
-				$this->phpExcelObj->getSheet($this->sheetNr)->setCellValueExplicitByColumnAndRow($colNr, $this->nextRowNr, $field, DataType::TYPE_STRING);
+				$this->phpExcelObj->getSheet($this->sheetNr)->setCellValueExplicit([$colNr, $this->nextRowNr], $field, DataType::TYPE_STRING);
 			} else {
-				$this->phpExcelObj->getSheet($this->sheetNr)->setCellValueByColumnAndRow($colNr, $this->nextRowNr, $field);
+				$this->phpExcelObj->getSheet($this->sheetNr)->setCellValue([$colNr, $this->nextRowNr], $field);
 			}
 			
 		}

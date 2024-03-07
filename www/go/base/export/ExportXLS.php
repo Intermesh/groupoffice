@@ -54,7 +54,7 @@ class ExportXLS extends AbstractExport
 	private function _write($data) {
 		$col = 0;
 		foreach ($data as $key => $val) {
-			$this->_sheet->setCellValueByColumnAndRow($col, $this->excel_row, $val);
+			$this->_sheet->setCellValue([$col, $this->excel_row], $val);
 			$col++;
 		}
 		$this->excel_row++;
