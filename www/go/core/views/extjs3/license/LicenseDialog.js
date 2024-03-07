@@ -71,7 +71,11 @@ go.license.LicenseDialog = Ext.extend(go.Window, {
 					}, coreModule.id).then(() => {
 						this.close();
 						go.reload();
-					}).finally(() => {
+					})
+						.catch((e) => {
+							GO.errorDialog.show(e);
+						})
+						.finally(() => {
 						this.getEl().unmask();
 					});
 				},
@@ -100,7 +104,11 @@ go.license.LicenseDialog = Ext.extend(go.Window, {
 							go.reload();
 						// })
 
-					}).finally(() => {
+					})
+						.catch((e) => {
+							GO.errorDialog.show(e);
+						})
+						.finally(() => {
 						this.getEl().unmask();
 					});
 				},

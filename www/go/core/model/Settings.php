@@ -707,6 +707,10 @@ class Settings extends core\Settings {
 	{
 		if($this->isModified('license')) {
 			if(isset($this->license)) {
+				if(!go()->getEnvironment()->hasIoncube()) {
+					throw new Exception("Please install SourceGuardian to use a license.");
+				}
+
 				$data = License::getLicenseData();
 				if (!$data) {
 					throw new Exception("License data was corrupted");
