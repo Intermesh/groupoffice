@@ -180,9 +180,9 @@ th {
 			//add 1 to index for headers
 			if(is_string($v) && isset($v[0]) && $v[0] == '=') {
 				//prevent formula detection
-				$this->spreadsheet->getActiveSheet()->setCellValueExplicitByColumnAndRow($colIndex + 1, $index, $v, DataType::TYPE_STRING);
+				$this->spreadsheet->getActiveSheet()->setCellValueExplicit([$colIndex + 1, $index], $v, DataType::TYPE_STRING);
 			} else {
-				$this->spreadsheet->getActiveSheet()->setCellValueByColumnAndRow($colIndex + 1, $index, $v);
+				$this->spreadsheet->getActiveSheet()->setCellValue([$colIndex + 1, $index], $v);
 			}
 		}
 	}
