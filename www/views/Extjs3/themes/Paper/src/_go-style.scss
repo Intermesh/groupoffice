@@ -101,9 +101,9 @@ $hue: (
 	.#{$name} { color: var(--hue-#{$name}) !important;}
 	.#{$name}-fill { background-color: var(--hue-#{$name}) !important; fill: var(--hue-#{$name}) }
 }
+.fg-main {color: var(--fg-main) !important; }
 .c-primary {color: var(--c-primary) !important; }
 .c-secondary {color: var(--c-secondary) !important; }
-.c-tertiary {color: var(--c-tertiary) !important; }
 .info {
 	background-color: $cPrimaryTp;
 	color: $cPrimary;
@@ -325,7 +325,7 @@ a {
 		text-align:right;
 		color:white;
 		padding-top: dp(4);
-		@include var(background-color, c-primary);
+		@include var(background-color, fg-main);
 	}
 	input {
 		background-color: inherit;
@@ -369,7 +369,7 @@ a {
 	@extend %font-title;
 	//margin-right: dp(56);
 	//width: 245px;
-	@include var(color, c-primary);
+	@include var(color, fg-main);
 }
 .go-item-wrap {
 	cursor:pointer;
@@ -382,7 +382,7 @@ a {
 	}
 	&.go-view-selected {
 		background-color: $cSelected;
-		@include var(color, c-primary);
+		@include var(color, fg-main);
 	}
 	span {
 		padding: 0 0 0 dp(40) !important;
@@ -415,7 +415,7 @@ a {
 	width: dp(272);
 	border: 1px solid var(--fg-border);
 
-	@include var(background-color, c-primary);
+	@include var(background-color, fg-main);
 }
 
 //, .go-border-center:not(.x-panel-noborder)
@@ -446,7 +446,7 @@ a {
 		// margin:0;
 		cursor:pointer;
 		&.x-view-selected i {
-			@include var(color, c-primary);
+			@include var(color, fg-main);
 		}
 		> i {
 			color: var(--fg-secondary-text);
@@ -464,7 +464,7 @@ a {
 		&.x-view{
 
 			&-selected {
-				@include var(color, c-primary);
+				@include var(color, fg-main);
 				background-color: $cSelected;
 			}
 		}
@@ -498,7 +498,7 @@ a {
 		.x-tab-strip {
 			
 			&-active {
-				@include var(border-color, c-tertiary);
+				@include var(border-color, c-secondary);
 				color:white;
 				.x-tab-strip-text{ color:white;}
 			}
@@ -744,7 +744,7 @@ a {
 	margin-right: dp(8);
 	border-radius: dp(16);
 	> * {
-		color: var(--c-tertiary);
+		color: var(--c-secondary);
 		@extend %icon;
 		&.unseen {
 			animation: blink .3s 30 alternate;
@@ -961,7 +961,7 @@ hr {
 	.x-panel-header-text & {
 		margin-left: dp(8);
 		color: var(--fg-text);
-		@include var(background-color, c-primary-tp);
+		@include var(background-color, fg-main-tp);
 		display: none;
 
 		.x-panel-collapsed & {
@@ -1941,7 +1941,7 @@ table[id^="comments-ext"] b {
 		}
 		.x-btn-text {
 			font-weight: normal;
-			@include var(color, c-primary);
+			@include var(color, fg-main);
 		}
 	}
 
@@ -2281,7 +2281,7 @@ table[id^="comments-ext"] b {
 		right:0;
 		background-color: var(--bg-background);
 		&:hover {
-			@include var(color, c-primary);
+			@include var(color, fg-main);
 		}
 		&::after {
 			//margin-left:dp(4);
@@ -2404,10 +2404,10 @@ table[id^="comments-ext"] b {
 		z-index:1;
 		pointer-events : none;
 		position:absolute;
-		@include var(background-color, c-primary-tp);
+		@include var(background-color, fg-main-tp);
 		top:dp(8);bottom:dp(8);left:dp(8);right:dp(8);
 		outline: 8px solid transparent;
-		@include var(outline-color, c-primary-tp);
+		@include var(outline-color, fg-main-tp);
 		border: 2px dashed white;
 	}
 }
@@ -2435,7 +2435,7 @@ table[id^="comments-ext"] b {
 	background: var(--bg-layer);
 	header {
 		text-align: center;
-		@include var(background-color, c-primary);
+		@include var(background-color, fg-main);
 		padding: dp(24);
 		color: white;
 	}
@@ -2731,7 +2731,7 @@ table[id^="comments-ext"] b {
 .go-modules {
 	h3 {
 		margin: dp(24) dp(16) dp(16);
-		@include var(color, c-primary);
+		@include var(color, fg-main);
 	}
 }
 
@@ -2751,7 +2751,7 @@ table[id^="comments-ext"] b {
 		border-top: 0;
 
 		.x-btn-text {
-			@include var(color, c-primary);
+			@include var(color, fg-main);
 			font-style: italic;
 		}
 	}
@@ -2820,7 +2820,7 @@ table[id^="comments-ext"] b {
 			> tbody {
 				background-color: transparent;
 			}
-			box-shadow: 0 0 0 2px var(--c-primary);
+			box-shadow: 0 0 0 2px var(--fg-main);
 		}
 		&.mode-light { background-position:100% 0; }
 		&.mode-dark { background-position: 0 0; }

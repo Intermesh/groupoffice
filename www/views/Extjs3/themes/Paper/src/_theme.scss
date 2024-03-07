@@ -13,14 +13,14 @@ $resourcePath: './' !default;
 	--fg-textfield-box:  rgba(255, 255, 255, 0.8);
 	--fg-textbox-line: 	#{rgba(black, 0.42)};
 	--fg-outline: 			#{rgba(#444444, 0.26)};
-	--fg-tick: 		var(--c-primary);
+	--fg-tick: 		var(--fg-main);
 	--fg-text:           #{rgba(black, 0.87)};
 	--fg-secondary-text: #{rgba(black, 0.64)};
 	--fg-unfocused:		#{rgba(black, 0.54)};
 	--fg-alt:				#f5f5f5;
 	--fg-selected: var(--fg-text);
 
-	--bg-body: 			var(--c-primary); // same as primary
+	--bg-body: 			var(--fg-main); // same as primary
 	--bg-button:	  	transparent;
 	--bg-layer: 		#f5f5f5;
 	--bg-side-bar:		#eeeeee;
@@ -41,11 +41,11 @@ $resourcePath: './' !default;
 ;
 	--bg-alt: 			#212121;
 
-	--c-primary: 		rgb(22, 82, 161);
-	--c-primary-tp:	rgba(22, 82, 161, 0.16);
-	--c-header-bg: 	var(--c-primary);
-	--c-secondary: 	rgb(0, 176, 173);
-	--c-tertiary: 		rgb(243,219,0);
+	--fg-main: 		rgb(22, 82, 161);
+	--fg-main-tp:	rgba(22, 82, 161, 0.16);
+	--c-header-bg: 	var(--fg-main);
+	--c-primary: 	rgb(0, 176, 173);
+	--c-secondary: 		rgb(243,219,0);
 	--c-accent: 		rgb(255, 114, 0);
 	--c-accent-tp: 	rgba(255,114,0, 0.16);
 
@@ -83,8 +83,8 @@ $resourcePath: './' !default;
 	--bg-card:       #202020;
 	--bg-alt: 			#888;
 
-	--c-primary: #009BC9;
-	--c-primary-tp: #0277BD;
+	--fg-main: #009BC9;
+	--fg-main-tp: #0277BD;
 	--c-header-bg: #272727;
 
 

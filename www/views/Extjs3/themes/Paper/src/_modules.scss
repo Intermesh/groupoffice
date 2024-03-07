@@ -148,7 +148,7 @@ i.icon.em-low_priority {
 }
 
 .ml-unseen-dot {
-	@include var(background-color, c-primary);
+	@include var(background-color, fg-main);
 	width: 9px;
 	height: 9px;
 	margin: dp(2);

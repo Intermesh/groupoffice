@@ -12,12 +12,12 @@
 	 .x-btn-text{color:inherit;}
 	}
 	&.x-btn-focus {
-	 @include var(background-color, c-primary-tp);
+	 @include var(background-color, fg-main-tp);
 	}
 	&.primary, &.raised {
 		color: white;
-		background-color: var(--c-secondary);
-		@include var('background-color', c-secondary);
+		background-color: var(--c-primary);
+		@include var('background-color', c-primary);
 	}
 	&.accent {
 	  background-color: var(--c-accent);

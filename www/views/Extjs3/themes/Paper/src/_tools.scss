@@ -45,7 +45,7 @@
 		.x-btn {
 			
 			background-color: transparent;
-			@include var(color, c-primary);
+			@include var(color, fg-main);
 			margin: 0 auto;
 			border: 0;
 		}

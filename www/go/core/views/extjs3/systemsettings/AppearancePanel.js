@@ -49,9 +49,9 @@ go.systemsettings.AppearancePanel = Ext.extend(go.systemsettings.Panel, {
 							resetLogoButton
 						]
 					},
-					this.createColorField('primaryColor', "Primary color", '--c-primary', "1652A1"),
-					this.createColorField('secondaryColor', "Secondary color", '--c-secondary', "00B0AD"),
-					this.createColorField('tertiaryColor', "Tertiary color", '--c-tertiary', "F3DB00"),
+					this.createColorField('primaryColor', "Primary color", '--fg-main', "1652A1"),
+					this.createColorField('secondaryColor', "Secondary color", '--c-primary', "00B0AD"),
+					this.createColorField('tertiaryColor', "Tertiary color", '--c-secondary', "F3DB00"),
 					this.createColorField('accentColor', "Accent color", '--c-accent', "FF7200")
 				]
 			},{
@@ -87,9 +87,9 @@ go.systemsettings.AppearancePanel = Ext.extend(go.systemsettings.Panel, {
 							resetLogoButtonD
 						]
 					},
-					this.createColorField('primaryDark', "Primary color", '--c-primary', "1652A1"),
-					this.createColorField('secondaryDark', "Secondary color", '--c-secondary', "00B0AD"),
-					this.createColorField('tertiaryDark', "Tertiary color", '--c-tertiary', "F3DB00"),
+					this.createColorField('primaryDark', "Primary color", '--fg-main', "1652A1"),
+					this.createColorField('secondaryDark', "Secondary color", '--c-primary', "00B0AD"),
+					this.createColorField('tertiaryDark', "Tertiary color", '--c-secondary', "F3DB00"),
 					this.createColorField('accentDark', "Accent color", '--c-accent', "FF7200")
 				]
 			}]

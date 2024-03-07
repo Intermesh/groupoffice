@@ -40,7 +40,7 @@
 	height: dp(32);
 	width: dp(32);
 	animation: rotate 0.8s infinite $curve-deceleration;
-	border: dp(8) solid var(--c-primary);
+	border: dp(8) solid var(--fg-main);
 	border-right-color: transparent;
 	border-radius: 50%;
 }
@@ -180,11 +180,11 @@
 
 	&-top{
 		height: dp(48);
-		@include var(color, c-primary);
+		@include var(color, fg-main);
 	}
 	&-bottom{
 		height: dp(48);
-		@include var(color, c-primary);
+		@include var(color, fg-main);
 		> li {
 			border-top: dp(4) solid transparent;
 			border-bottom: 0;
@@ -195,7 +195,7 @@
 		border-bottom: 1px solid var(--fg-line);
 	}
 	>li.x-tab-strip-active {
-		@include var(border-color, c-tertiary);
+		@include var(border-color, c-secondary);
 		span.x-tab-strip-text {
 			color: var(--fg-text);
 			font-weight: bold;
@@ -217,7 +217,7 @@
 		}
 	}
 	&-over span.x-tab-strip-text {
-		@include var(color, c-primary);
+		@include var(color, fg-main);
 		&.primary {
 			color: white;
 		}
@@ -230,7 +230,7 @@
 			color: var(--fg-icon);
 		}
 		&:hover:before{
-			@include var(color, c-primary);
+			@include var(color, fg-main);
 		}
 	}
 }
@@ -313,7 +313,7 @@
 		transform: scale(1);
 	}
 	&:focus {
-		@include var(border-color, c-primary);
+		@include var(border-color, fg-main);
 		box-shadow: 0 0 0 1px $cPrimary;
 	}
 	&[style]:checked:before {
@@ -570,7 +570,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 		}
 
 		label.x-form-focus-label {
-			@include var(color, c-primary);
+			@include var(color, fg-main);
 		}
 
 		label.x-form-invalid-label {
@@ -594,7 +594,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 	
 	&-focus, textarea.x-form-focus {
 		@extend .z2;
-		@include var(border-color, c-primary);
+		@include var(border-color, fg-main);
 	}
 
 	&-invalid, textarea.x-form-invalid {
@@ -691,7 +691,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 	}
 }
 .x-trigger-wrap-focus .x-form-trigger {
-	@include var(color, c-primary);
+	@include var(color, fg-main);
 }
 .x-form-invalid + .x-form-trigger {
 	border-color: $cDanger;
@@ -821,7 +821,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 	 
 	&.raised {
 		@extend .z2;
-		@include var(background-color, c-primary);
+		@include var(background-color, fg-main);
 		button.x-btn-text {
 			color:white;
 		}
@@ -833,7 +833,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 		}
 
 		&.accent {
-			@include var(background-color, c-secondary);
+			@include var(background-color, c-primary);
 		}
 	}
 	.x-toolbar & {
@@ -853,7 +853,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
    }	 
 
 	&.primary {
-		@include var('background-color', c-secondary);
+		@include var('background-color', c-primary);
 		color: white;
 	}
 
@@ -863,12 +863,12 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 
 		&:focus, &:hover {
 			transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
-			@include var(background-color, c-primary);
+			@include var(background-color, fg-main);
 		}
 	}
 
 	&.primary-icon {
-		@include var('color', c-secondary);
+		@include var('color', c-primary);
 	}
 
 	&.accent-icon {
@@ -877,7 +877,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 
 	&.danger {
 		&:focus, &:hover{
-			@include var(background-color, c-primary-tp);
+			@include var(background-color, fg-main-tp);
 		}
 		//.x-btn-text {
 			color: $cDanger;
@@ -886,7 +886,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 
 	&:focus, &-focus,  &:hover {
 		//transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
-		@include var(background-color, c-primary-tp);
+		@include var(background-color, fg-main-tp);
 		//filter: brightness(120%);
 	}
 
@@ -909,10 +909,10 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
    }
    &-click {
 		background-color: var(--bg-pressed) !important;
-		.x-btn-text { @include var(color, c-primary); }
+		.x-btn-text { @include var(color, fg-main); }
    }
 	&-click.primary {
-		.x-btn-text { @include var(color, c-secondary); }
+		.x-btn-text { @include var(color, c-primary); }
 	}
    &-icon {
 		i {
@@ -1119,7 +1119,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 		height: dp(48);
 	}*/
 	&.primary {
-		@include var(background-color, c-primary);
+		@include var(background-color, fg-main);
 	}
 	&.header {
 		border-bottom: 0;
@@ -1284,7 +1284,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 			//}
 			&.x-grid3-hd-over.x-grid3-sortable { 
 				cursor:pointer; 
-				@include var(color, c-primary); 
+				@include var(color, fg-main);
 			}
 		}
 		 
@@ -1580,7 +1580,7 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 
 	div.x-grid-group-title {
 		@extend %font-caption;
-		/*@include var(color, c-primary);*/
+		/*@include var(color, fg-main);*/
 		padding: dp(8);
 		&::before {
 			@extend %icon;
@@ -1664,7 +1664,7 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 	@extend %icon;
 	.x-dd-drop-ok-add & {
 		content: 'add';
-		@include var(color, c-primary);
+		@include var(color, fg-main);
 	}
 	.x-dd-drop-nodrop & {
 		content: 'block';
@@ -1911,10 +1911,10 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 			border: 1px solid currentColor;
 			padding:0;
 			font-weight: 700;
-			@include var(color, c-primary);
+			@include var(color, fg-main);
 		}
 		.x-date-selected a {
-			@include var(background-color, c-primary);
+			@include var(background-color, fg-main);
 			color:white;
 			border:0;
 			padding:0;
@@ -1994,7 +1994,7 @@ td.x-date-mp-month a:hover,td.x-date-mp-year a:hover {
 
 td.x-date-mp-sel a {
 	border-radius: $borderRadius;
-	@include var(background-color, c-primary);
+	@include var(background-color, fg-main);
 	color:white;
 	//background-image: url(../images/default/shared/glass-bg.gif);
 	border:0;
@@ -2009,7 +2009,7 @@ td.x-date-mp-sel a {
 		content: 'chevron_right';
 	}
 	&:hover {
-		@include var(color, c-primary);
+		@include var(color, fg-main);
 	}
 }
 
@@ -2173,7 +2173,7 @@ a.x-menu-item {
 
 .x-combo-list-group {
 	@extend %font-caption;
-	@include var(color, c-primary);
+	@include var(color, fg-main);
 	padding: dp(16) dp(8) dp(8) dp(8);
 }
 
@@ -2347,7 +2347,7 @@ $menuScrollerSize : dp(4);
 	border-radius: $borderRadius;
 
 	&.primary {
-		@include var('background-color', c-secondary);
+		@include var('background-color', c-primary);
 		color: white;
 
 		&:hover {
@@ -2362,12 +2362,12 @@ $menuScrollerSize : dp(4);
 
 		&:hover {
 			transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
-			@include var(background-color, c-primary);
+			@include var(background-color, fg-main);
 		}
 	}
 
 	&.primary-icon {
-		@include var('color', c-secondary);
+		@include var('color', c-primary);
 	}
 
 	&.accent-icon {
@@ -2376,7 +2376,7 @@ $menuScrollerSize : dp(4);
 
 	&:hover {
 		transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
-		@include var(background-color, c-primary-tp);
+		@include var(background-color, fg-main-tp);
 	}
 	&::before{
 		position: absolute;
@@ -2426,7 +2426,7 @@ $menuScrollerSize : dp(4);
 .x-panel-fbar td,.x-panel-fbar span,.x-panel-fbar input,.x-panel-fbar div,.x-panel-fbar select,.x-panel-fbar label{
 	@extend %font-data;
 	button {
-		//@include var(color, c-primary);
+		//@include var(color, fg-main);
 	}
 }
 
@@ -2676,10 +2676,10 @@ $resizerSize : dp(3);
 	}
 	&-inner {
 		height: dp(32);
-		@include var(background-color, c-primary-tp);
+		@include var(background-color, fg-main-tp);
 	}
 	&-bar {
-		@include var(background-color, c-primary);
+		@include var(background-color, fg-main);
 		border:0;
 	}
 	&-text {
@@ -2744,18 +2744,18 @@ $resizerSize : dp(3);
 		height: dp(2);
 		transform-origin: 0 0;
 		width:100%;
-		background-color: var(--c-primary);
+		background-color: var(--fg-main);
 	}
 	.x-slider-thumb {
 		cursor: grab;
 		top: dp(-9);
-		border: 3px solid var(--c-primary);
+		border: 3px solid var(--fg-main);
 		width:dp(20);
 		height: dp(20);
 		transform: scale(.7);
 		transform: .4s $curve-sharper,background-color .4s $curve-sharper, border-color .4s $curve-sharper;
 		border-radius: 50%;
-		background-color:var(--c-primary);
+		background-color:var(--fg-main);
 		&.x-slider-thumb-drag {
 			cursor: grabbing;
 			transform: scale(1);
@@ -2804,7 +2804,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 	@extend %icon;
 	content: 'info';
 	font-size:2.2em;
-	@include var(color, c-primary);
+	@include var(color, fg-main);
 }
 
 .x-window-dlg .ext-mb-warning:after {
@@ -2818,7 +2818,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 	@extend %icon;
 	content: 'help';
 	font-size:2.2em;
-	@include var(color, c-primary);
+	@include var(color, fg-main);
 }
 
 //.x-window-dlg .ext-mb-error {
@@ -2878,11 +2878,11 @@ input[value="0"] + .x-slider .x-slider-thumb {
 		&:checked {
 			~ .thumb {
 				transform: translate(dp(24), 0);
-				&::after { @include var(background-color, c-primary);}
-				&::before {@include var(border-color, c-primary);}
+				&::after { @include var(background-color, fg-main);}
+				&::before {@include var(border-color, fg-main);}
 			}
 			~ .track {
-				@include var(background-color, c-primary-tp);
+				@include var(background-color, fg-main-tp);
 			}
 		}
 		&:focus {
@@ -2964,7 +2964,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 	&-item {
 		position: relative; 
 		border-radius: $borderRadius;
-		@include var(background-color, c-primary-tp);
+		@include var(background-color, fg-main-tp);
 		padding: 0px dp(32) 0px dp(8); 
 		&-hover { background-color: $cHover; }
 		&-focus {background-color: $cSelected; color: white;}

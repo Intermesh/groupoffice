@@ -242,7 +242,7 @@ border-collapse:collapse;
 
 .x-calGrid-indicator{
 	position:absolute;
-	border-top:2px solid var(--c-primary); /* #dd4b39; */
+	border-top:2px solid var(--fg-main); /* #dd4b39; */
 	z-index:3001;
 }
 .x-calGrid-table{
@@ -421,7 +421,7 @@ border-collapse:collapse;
 	left: 7px;
 	top: 4px;
 	cursor: pointer;
-	color: var(--c-secondary, rgb(0, 176, 173));
+	color: var(--c-primary, rgb(0, 176, 173));
 }
 
 .cal-monthgrid-week-no .x-monthGrid-cell-day-text {

@@ -571,7 +571,7 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 		}
 
 		return unseen + icons.map(function(i) {
-			return '<i class="icon '+(i!=='flag'?'c-secondary':'red')+'">' + i + '</i>';
+			return '<i class="icon '+(i!=='flag'?'c-primary':'red')+'">' + i + '</i>';
 		}).join("");
 		
 	},

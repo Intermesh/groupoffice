@@ -8,11 +8,11 @@ $bg: bg;
 	#{$property}: var(--#{$varName});
 }
 
-$cPrimary:		var(--c-primary);
-$cPrimaryTp:	var(--c-primary-tp);
+$cPrimary:		var(--fg-main);
+$cPrimaryTp:	var(--fg-main-tp);
 $cHeaderBg: 	var(--c-header-bg);
-$cSecondary: 	var(--c-secondary);
-$cTertiary: 	var(--c-tertiary);
+$cSecondary: 	var(--c-primary);
+$cTertiary: 	var(--c-secondary);
 $cAccent: 		var(--c-accent);
 $cAccentTp:		var(--c-accent-tp);
 
