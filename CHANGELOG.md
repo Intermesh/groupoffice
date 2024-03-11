@@ -2,6 +2,7 @@
 - Caldav: Fixed creating exceptions in recurring series with participants
 - CalDAV: CalDAV-Event creates duplicate events in web-GUI #1132
 - Core: Updated German translations. Danke, Daniel.
+- Oauth: fixed error:   Class 'go\\core\\oauth\\server\\responsetypes\\AuthorizationServer' not found
 
 04-03-2024: 6.7.72
 - Timeregistration2: display of employee combo must depend on module rights instead of vestigial older permission level
