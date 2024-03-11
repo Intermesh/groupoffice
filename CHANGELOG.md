@@ -1,3 +1,4 @@
+11-03-2024: 6.7.73
 - Core: Make add button more visible in link browser
 - Caldav: Fixed creating exceptions in recurring series with participants
 - CalDAV: CalDAV-Event creates duplicate events in web-GUI #1132
