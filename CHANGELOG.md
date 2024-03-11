@@ -1,3 +1,4 @@
+11-03-2024: 6.8.38
 - Core: Report if sourceguardian is not installed when setting license key
 - Billing: handle double click submit in DuplicateDialog.js
 - Caldav: Fixed creating exceptions in recurring series with participants
