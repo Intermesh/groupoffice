@@ -1,6 +1,6 @@
 <?php
 return array (
-  'Get the code from the OTP Authenticator app on your mobile device and fill it in below' => 'Holen Sie sich den Code aus der Google Authentifizierungs App auf Ihr Mobilgerät und füllen Sie ihn unten aus',
+  'Get the code from the OTP Authenticator app on your mobile device and fill it in below' => 'Holen Sie sich den Code aus der Google Authentifizierungs-App auf Ihr Mobilgerät und füllen Sie ihn unten aus',
   'Code is required' => 'Code ist erforderlich',
   'Not found' => 'Nicht gefunden',
   'Invalid code' => 'Ungültiger Code',
