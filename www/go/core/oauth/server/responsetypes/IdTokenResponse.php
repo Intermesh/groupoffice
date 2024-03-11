@@ -36,16 +36,11 @@ class IdTokenResponse extends BaseIdTokenResponse
 	    $builder = new Builder(new JoseEncoder(), $claimsFormatter);
 
 	    $expiresAt = $accessToken->getExpiryDateTime();
-//	    if ($expiresAt instanceof \DateTime) {
-//		    $expiresAt = DateTimeImmutable::createFromMutable($expiresAt);
-//	    }
-
-	    $url = parse_url(go()->getSettings()->URL);
 
 	    // Add required id_token claims
 	    return $builder
 		    ->permittedFor($accessToken->getClient()->getIdentifier())
-		    ->issuedBy($url['scheme'] . '://' . $url['host']) //issuer has to match
+		    ->issuedBy(AuthorizationServer::getIssuer()) //issuer has to match
 		    ->issuedAt(new DateTimeImmutable())
 		    ->expiresAt($expiresAt)
 		    ->relatedTo($userEntity->getIdentifier())
