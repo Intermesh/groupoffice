@@ -34,7 +34,7 @@ return array (
   'Content' => 'Inhalt',
   'Options' => 'Optionen',
   'Module' => 'Modul',
-  'Menu item' => 'Menueintrag',
+  'Menu item' => 'Menüeintrag',
   'Link to a content item within this site. Doubleclick on an item to select it.' => 'Verknüpfung mit einem Inhaltselement auf dieser Website Doppelklicken Sie auf ein Objekt, um es auszuwählen.',
   'Link to a file that you have uploaded within this site.' => 'Verlinken Sie mit einer Datei, die Sie auf diese Seite hochgeladen haben.',
   'You can also type in your own url, please make sure you add http(s):// to it to make the url work.' => 'Sie können auch Ihre eigene URL eingeben. Bitte stellen Sie sicher, dass Sie http (s): // hinzufügen, damit die URL funktioniert.',
@@ -57,4 +57,5 @@ return array (
   'Site Multifile' => 'Site Multidatei',
   'Base path' => 'Basispfad',
   'Medium' => 'Mittel',
+  'Info' => 'Änderungsverlauf',
 );

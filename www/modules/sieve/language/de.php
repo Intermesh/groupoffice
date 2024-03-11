@@ -54,7 +54,7 @@ return array (
   'Sender contains' => 'Absender enthält',
   'Recipient contains' => 'Empfänger enthält',
   'Subject doesn\'t exist' => 'Betreff nicht vorhanden',
-  'Sender doesn\'t exist' => 'Ansender nicht vorhanden',
+  'Sender doesn\'t exist' => 'Absender nicht vorhanden',
   'Recipient doesn\'t exist' => 'Empfänger vorhanden',
   'Subject exists' => 'Betreff vorhanden',
   'Sender exists' => 'Absender vorhanden',
