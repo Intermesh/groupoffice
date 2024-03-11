@@ -4,6 +4,7 @@
 - Core: Updated German translations. Danke, Daniel.
 - Email: Larger email template selection window.
 - Email: fix sorting / grouping with large numbers of templates
+- Oauth: fixed error:   Class 'go\\core\\oauth\\server\\responsetypes\\AuthorizationServer' not found
 
 04-03-2024: 6.7.72
 - Timeregistration2: display of employee combo must depend on module rights instead of vestigial older permission level
