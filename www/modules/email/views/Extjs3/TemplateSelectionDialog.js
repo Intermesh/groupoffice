@@ -3,7 +3,7 @@
 GO.email.TemplateSelectionDialog = Ext.extend(GO.Window,{
 	closeAction: 'hide',
 	height: dp(600),
-	width: dp(660),
+	width: dp(800),
 	modal: true,
 	initComponent : function(){
 		

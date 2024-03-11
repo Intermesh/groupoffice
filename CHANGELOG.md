@@ -2,6 +2,8 @@
 - Caldav: Fixed creating exceptions in recurring series with participants
 - CalDAV: CalDAV-Event creates duplicate events in web-GUI #1132
 - Core: Updated German translations. Danke, Daniel.
+- Email: Larger email template selection window.
+- Email: fix sorting / grouping with large numbers of templates
 
 04-03-2024: 6.7.72
 - Timeregistration2: display of employee combo must depend on module rights instead of vestigial older permission level
