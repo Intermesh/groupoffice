@@ -104,6 +104,7 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 				{
 					iconCls: 'ic-add',
 					tooltip: t("Add"),
+					cls: "primary",
 					handler: function () {
 						var linkWindow = new go.links.CreateLinkWindow({
 							entityId: this.entityId,

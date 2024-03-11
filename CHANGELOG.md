@@ -1,3 +1,9 @@
+
+
+
+
+
+
 - Core: Report if sourceguardian is not installed when setting license key
 - Billing: handle double click submit in DuplicateDialog.js
 
@@ -12,7 +18,7 @@
 - Support: Customer got notification of private comment
 - Tasks: fix date render bug in tasks grid
 - Core: Sabre dav upgrade to 4.5.1
-- CalDAV: CalDAV-Event creates duplicate events in web-GUI #1132
+
 - Caldav: Fixed creating exceptions in recurring series with participants
 
 26-02-2024: 6.8.36
@@ -305,6 +311,13 @@
 
 
 -- 6.8 --
+
+- Core: Make add button more visible in link browser
+- Caldav: Fixed creating exceptions in recurring series with participants
+- CalDAV: CalDAV-Event creates duplicate events in web-GUI #1132
+- Core: Updated German translations. Danke, Daniel.
+- Oauth: fixed error:   Class 'go\\core\\oauth\\server\\responsetypes\\AuthorizationServer' not found
+
 
 04-03-2024: 6.7.72
 - Timeregistration2: display of employee combo must depend on module rights instead of vestigial older permission level
