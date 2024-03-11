@@ -47,7 +47,7 @@ class IdTokenResponse extends BaseIdTokenResponse
 	    // Add required id_token claims
 	    return $builder
 		    ->permittedFor($accessToken->getClient()->getIdentifier())
-		    ->issuedBy(AuthorizationServer::getIssuer())
+		    ->issuedBy(rtrim(\go()->getSettings()->URL, '/') . '/') //issuer has to match
 		    ->issuedAt(new DateTimeImmutable())
 		    ->expiresAt($expiresAt)
 		    ->relatedTo($userEntity->getIdentifier())
