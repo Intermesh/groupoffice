@@ -120,8 +120,9 @@ go.Router = (function () {
 				return;// this.goto('login');
 			}
 
+
 			for (var n = 0, l = match.length; n < l; n++) {
-				match[n] = decodeURIComponent(match[n]);
+				match[n] = match[n] ? decodeURIComponent(match[n]) : match[n];
 			}
 			this.routing = true;
 			route.handler.apply({}, match);
