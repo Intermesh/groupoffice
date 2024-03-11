@@ -1,3 +1,5 @@
+- Core: Make add button more visible in link browser
+
 04-03-2024: 6.7.72
 - Timeregistration2: display of employee combo must depend on module rights instead of vestigial older permission level
 - Billing: fix numeric queries for e.g. products or order numbers
