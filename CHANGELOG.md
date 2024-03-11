@@ -1,9 +1,3 @@
-
-
-
-
-
-
 - Core: Report if sourceguardian is not installed when setting license key
 - Billing: handle double click submit in DuplicateDialog.js
 
