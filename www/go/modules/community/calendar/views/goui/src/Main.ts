@@ -109,7 +109,6 @@ export class Main extends Component {
 					cls:'not-medium-device',
 					showWeekNbs: false, // Wk nbs in datepicker are broken // client.user.calendarPreferences.showWeekNumbers,
 					enableRangeSelect: true,
-					withoutFooter: true,
 					listeners: {
 						'select': (_dp, date) => {
 							this.date = date!;
