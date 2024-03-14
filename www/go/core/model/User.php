@@ -1397,8 +1397,9 @@ class User extends AclItemEntity {
 		];
 	}
 
-	protected function isPrincipalModified() {
-		return $this->isModified(['displayName', 'email', 'username', 'timezone', 'avatarId']);
+	protected function isPrincipalModified(): bool
+	{
+		return $this->isModified(['displayName', 'email', 'username', 'timezone', 'avatarId']) !== false;
 	}
 
 	protected function principalType(): string

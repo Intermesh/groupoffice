@@ -1411,7 +1411,7 @@ class Contact extends AclItemEntity {
 		];
 	}
 
-	protected function isPrincipalModified() {
+	protected function isPrincipalModified(): bool {
 		return $this->isModified(['name', 'emailAddresses', 'photoBlobId','jobTitle', 'department','isOrganization','addressBookId']); // addressBookId for ACL
 	}
 

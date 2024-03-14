@@ -24,12 +24,14 @@ trait PrincipalTrait {
 	abstract protected function principalAttrs(): array;
 	abstract protected function principalType(): string;
 
-	protected function isPrincipalModified() {
+	protected function isPrincipalModified(): bool
+	{
 		// override this method to only change the principal when a used property is modified
-		return $this->isModified();
+		return $this->isModified() !== false;
 	}
 
-	protected function isPrincipal() {
+	protected function isPrincipal(): bool
+	{
 		return true;
 	}
 
@@ -42,7 +44,7 @@ trait PrincipalTrait {
 	 */
 	public function savePrincipal(bool $checkExisting = true): bool
 	{
-		if(!$this->isPrincipal()) {
+		if(!$this->isPrincipal() || !$this->isFetchedComplete()) {
 			return true;
 		}
 		$principal = $checkExisting ?

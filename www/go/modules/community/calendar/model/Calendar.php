@@ -171,7 +171,7 @@ class Calendar extends AclOwnerEntity {
 		return self::traitMissingPrincipals($offset)->andWhere('groupId', 'IS NOT', NULL);
 	}
 
-	protected function isPrincipalModified()
+	protected function isPrincipalModified() : bool
 	{
 		return $this->isModified(['name', 'description', 'timeZone', 'ownerId','groupId']);
 	}

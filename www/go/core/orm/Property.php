@@ -128,6 +128,8 @@ abstract class Property extends Model {
 	 */
 	protected $owner = null;
 
+
+
 	/**
 	 * Constructor
 	 *
@@ -166,6 +168,14 @@ abstract class Property extends Model {
 			$this->init();
 		}
 
+	}
+
+	/**
+	 * True if the model was fetched with all of it's properties.
+	 * @return bool
+	 */
+	public function isFetchedComplete() :bool {
+		return count($this->fetchProperties) == count(static::getDefaultFetchProperties());
 	}
 
 	/**
@@ -1187,9 +1197,10 @@ abstract class Property extends Model {
 	 * Only database columns and relations are tracked. Not the getters and setters.
 	 *
 	 * @param array|string $properties If empty then all properties are checked.
-	 * @return boolean
+	 * @return boolean|array
 	 */
-	public function isModified($properties = []) {
+	public function isModified(array|string $properties = []): bool|array
+	{
 		return $this->internalGetModified($properties, true);
 	}
 
@@ -1439,9 +1450,6 @@ abstract class Property extends Model {
    */
 	private function saveRelatedArray(Relation $relation): bool
 	{
-
-
-
 		$modified = $this->getModified([$relation->name]);
 		if(empty($modified)) {
 			return true;
