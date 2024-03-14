@@ -175,7 +175,7 @@ class Scheduler {
 		//$existingEvent = CalendarEvent::find()->where(['uid' => (string)$vevent->uid,'calendarId'=>$calendar->id])->single();
 		switch($vcalendar->method->getValue()){
 			case 'REQUEST': return self::processRequest($vcalendar,$receiver,$existingEvent);
-			case 'CANCEL': return self::precessCancel($vcalendar,$existingEvent);
+			case 'CANCEL': return self::processCancel($vcalendar,$existingEvent);
 			case 'REPLY': return self::processReply($vcalendar,$existingEvent, $sender);
 		}
 		return "invalid method ".$vcalendar->method;
@@ -187,13 +187,14 @@ class Scheduler {
 			$existingEvent->isOrigin = false;
 			$existingEvent->replyTo = str_replace('mailto:', '',(string)$vcalendar->VEVENT[0]->{'ORGANIZER'});
 		}
-		return CalendarEvent::grabInto(
+		$cal = Calendar::fetchDefault($receiver);
+		return Calendar::addEvent(
 			ICalendarHelper::parseVObject($vcalendar, $existingEvent),
-			$receiver
+			$cal->id
 		);
 	}
 
-	private static function precessCancel(VCalendar $vcalendar, ?CalendarEvent $existingEvent) {
+	private static function processCancel(VCalendar $vcalendar, ?CalendarEvent $existingEvent) {
 		if($existingEvent) {
 			if ($existingEvent->isRecurring()) {
 				foreach($vcalendar->VEVENT as $vevent) {

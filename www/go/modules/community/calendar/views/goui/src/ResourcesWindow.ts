@@ -1,12 +1,12 @@
 import {
 	btn, checkbox,
-	column, combobox,
+	column,
 	comp,
-	Component, DataSourceStore,
-	datasourcestore, DefaultEntity,
+	DataSourceStore,
+	datasourcestore,
 	h3,
 	hr,
-	menu, router,
+	menu,
 	searchbtn, select, splitter,
 	t,
 	Table,
@@ -14,7 +14,6 @@ import {
 	tbar, textarea, textfield, Window
 } from "@intermesh/goui";
 import {FormWindow, jmapds} from "@intermesh/groupoffice-core";
-import {calendarStore} from "./Index.js";
 
 class ResourceGroupWindow extends FormWindow {
 	constructor() {
@@ -61,7 +60,7 @@ export class ResourcesWindow extends Window {
 
 	constructor() {
 		super();
-		this.title = t('Manage');
+		this.title = t('Manage resources');
 		this.width = 800;
 		this.height = 600;
 
@@ -98,7 +97,7 @@ export class ResourcesWindow extends Window {
 									btn({
 										icon: "edit",
 										text: t("Edit"),
-										handler: async (btn) => {
+										handler: async (_btn) => {
 											const g = table.store.get(rowIndex)!;
 											const d = new ResourceGroupWindow();
 											await d.load(g.id);
@@ -109,7 +108,7 @@ export class ResourcesWindow extends Window {
 									btn({
 										icon: "delete",
 										text: t("Delete"),
-										handler: async (btn) => {
+										handler: async (_btn) => {
 											jmapds("ResourceGroup").confirmDestroy(table.store.get(rowIndex)!.id);
 										}
 									})
@@ -138,8 +137,8 @@ export class ResourcesWindow extends Window {
 							}
 						}),
 						btn({
-							title: "Add",
-							text: t("Add"),
+							title: t("Add"),
+							//text: t("Add"),
 							cls: "filled primary",
 							icon: "add",
 							handler: () => {
@@ -159,13 +158,13 @@ export class ResourcesWindow extends Window {
 							column({header: t("Needs approval"), id: "needsApproval"}),
 						],
 						listeners: {
-							rowdblclick:(list, storeIndex, row, ev) => {
+							rowdblclick:(list, storeIndex) => {
 								const d = new ResourceWindow();
 								d.show();
 								void d.load(list.store.get(storeIndex)!.id!);
 							},
 
-							delete: async (tbl) => {
+							delete: async (_tbl) => {
 								const ids = this.resourceTable!.rowSelection!.selected.map(index => this.resourceTable!.store.get(index)!.id!);
 								await jmapds("Resources")
 									.confirmDestroy(ids);

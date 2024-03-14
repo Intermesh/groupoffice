@@ -3,9 +3,29 @@ CREATE TABLE IF NOT EXISTS `calendar_resource_group`
 	id          int UNSIGNED NOT NULL auto_increment,
 	name        varchar(200) null,
 	description mediumtext   null,
+	`createdBy` INT NULL,
 	constraint calendar_resource_group_pk
-		primary key (id)
+		primary key (id),
+	CONSTRAINT `fk_calendar_resource_group_core_user_creator`
+		FOREIGN KEY (`createdBy`)
+			REFERENCES `core_user` (`id`)
+			ON DELETE SET NULL
 ) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `calendar_resource_group_admins` (
+	`groupId` int UNSIGNED NOT NULL,
+	`userId` int(11) NOT NULL,
+	PRIMARY KEY (`groupId`,`userId`),
+	CONSTRAINT `fk_calendar_resource_group_admins_resource_group1`
+		FOREIGN KEY (`groupId`)
+			REFERENCES `calendar_resource_group` (`id`)
+			ON DELETE CASCADE
+			ON UPDATE NO ACTION,
+	CONSTRAINT `fk_calendar_resource_group_admins_core_user`
+		FOREIGN KEY (`userId`)
+			REFERENCES `core_user` (`id`)
+			ON DELETE CASCADE
+) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `calendar_calendar` (
    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -106,9 +126,9 @@ CREATE TABLE IF NOT EXISTS `calendar_default_alert_with_time` (
 CREATE TABLE IF NOT EXISTS `calendar_event` (
     `eventId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `prodId` VARCHAR(100) NOT NULL DEFAULT 'GroupOffice',
-    `uid` VARCHAR(45) NOT NULL,
+    `uid` VARCHAR(255) NOT NULL,
     `sequence` INT UNSIGNED NOT NULL DEFAULT 1,
-    `title` VARCHAR(45) NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
     `description` TEXT NULL,
     `location` VARCHAR(255) NOT NULL DEFAULT '',
     `locale` VARCHAR(6) NULL,
@@ -166,10 +186,10 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_event` (
 -- Table `calendar_participant`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `calendar_participant` (
-      `id` VARCHAR(60) NOT NULL,
+      `id` VARCHAR(128) NOT NULL,
       `eventId` INT UNSIGNED NOT NULL,
-      `name` VARCHAR(45) NULL,
-    `email` VARCHAR(45) NOT NULL,
+      `name` VARCHAR(100) NULL,
+    `email` VARCHAR(128) NOT NULL,
     `kind` ENUM('individual', 'group', 'location', 'resource') NOT NULL,
     `rolesMask` INT NOT NULL DEFAULT 0,
 	  `language` VARCHAR(20),
@@ -329,7 +349,7 @@ CREATE TABLE IF NOT EXISTS `calendar_category` (
 	INDEX `user_id` (`ownerId` ASC),
 	constraint calendar_category_ibfk_1
 		foreign key (ownerId) references core_user (id)
-			on delete cascade,
+			on delete set null,
 	constraint calendar_category_calendar_ibfk_9
 		foreign key (calendarId) references calendar_calendar (id)
 			on delete cascade)
@@ -355,11 +375,6 @@ CREATE TABLE IF NOT EXISTS `calendar_event_category` (
 	DEFAULT CHARACTER SET = utf8mb4
 	COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `calendar_event_custom_fields` (
-    `id` INT UNSIGNED NOT NULL,
-    PRIMARY KEY (`id`),
-    CONSTRAINT `fk_event_calendar_event_cf1` FOREIGN KEY (`id`) REFERENCES `calendar_event` (`eventId`) ON DELETE CASCADE
-) ENGINE = InnoDB;
 
 CREATE TABLE calendar_preferences (
 	userId                INT NOT NULL PRIMARY KEY,
@@ -377,3 +392,16 @@ CREATE TABLE calendar_preferences (
 	CONSTRAINT calendar_preferences_core_user_id_fk FOREIGN KEY (userId)
 		REFERENCES core_user (id) ON DELETE CASCADE
 ) COLLATE = utf8mb4_unicode_ci;
+
+
+CREATE TABLE IF NOT EXISTS `calendar_event_custom_fields` (
+	`id` INT UNSIGNED NOT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `fk_calendar_event_cf1` FOREIGN KEY (`id`) REFERENCES `calendar_event` (`eventId`) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE `calendar_calendar_custom_fields` (
+	`id` INT UNSIGNED NOT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `fk_calendar_cf1` FOREIGN KEY (`id`) REFERENCES `calendar_calendar` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;

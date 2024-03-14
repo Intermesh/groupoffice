@@ -11,7 +11,6 @@ import {
 	DateTime,
 	Format, MapField, mapfield, Notifier, numberfield,
 	radio,
-	recurrencefield,
 	select,
 	store,
 	t,
@@ -21,7 +20,7 @@ import {
 	TextField,
 	win,
 } from "@intermesh/goui";
-import {client, FormWindow, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
+import {client, FormWindow, JmapDataSource, recurrencefield} from "@intermesh/groupoffice-core";
 import {calendarStore, categoryStore} from "./Index.js";
 import {participantfield} from "./ParticipantField.js";
 import {alertfield} from "./AlertField.js";
@@ -48,6 +47,7 @@ export class EventWindow extends FormWindow {
 
 	attachments:MapField
 	btnFreeBusy: Button
+	private locationField: TextField
 
 	private titleField: TextField
 	constructor() {
@@ -66,7 +66,7 @@ export class EventWindow extends FormWindow {
 			this.form.value.useDefaultAlert = newValue === 'default';
 		});
 
-		const exceptionsBtn = btn({text:t('Exceptions'),width: 100, handler: b => {
+		const exceptionsBtn = btn({text:t('Exceptions'),width: 100, handler: _b => {
 			this.openExceptionsWindow();
 		}});
 
@@ -107,12 +107,12 @@ export class EventWindow extends FormWindow {
 					}
 				}
 			}),
-			textfield({name: 'location',flex:1, label:t('Location'), style:{minWidth:'80%'},
+			this.locationField = textfield({name: 'location',flex:1, label:t('Location'), style:{minWidth:'80%'},
 				listeners: {'setvalue': (me,v) => { me.buttons![0].hidden = !/^https?:\/\//.test(v); }},
-				buttons:[btn({hidden:true,icon: 'open_in_browser', handler: (me)=>{window.open(me.parent!.parent!.value)}})]
+				buttons:[btn({hidden:true,icon: 'open_in_browser', handler:(_b)=>{window.open(this.locationField.value as string)}})]
 			}),
-			btn({icon:'video_call', hidden: !m.settings.videoUri, cls:'filled', width:50, handler: async (btn) => {
-					(btn.previousSibling() as TextField)!.value = await this.createVideoLink(m.settings);
+			btn({icon:'video_call', hidden: !m?.settings?.videoUri, cls:'filled', width:50, handler: async (btn) => {
+					(btn.previousSibling() as TextField)!.value = await this.createVideoLink(m?.settings);
 			}}),
 			this.withoutTimeToggle = checkbox({type:'switch',name: 'showWithoutTime', label: t('All day'), style:{width:'auto'},
 				listeners: {'setvalue':(_, checked) => {
@@ -128,7 +128,7 @@ export class EventWindow extends FormWindow {
 			}),
 			comp({}),
 			this.startDate = datefield({label: t('Start'), name:'start', flex:1, defaultTime: now.format('H')+':00',
-				listeners:{'setvalue': (me,v) => {
+				listeners:{'setvalue': (me,_v) => {
 					const date = me.getValueAsDateTime();
 					if(date){
 						// if(this.endDate.changed) {

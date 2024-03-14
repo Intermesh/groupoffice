@@ -16,19 +16,9 @@ class RecurrenceOverride extends Property
 
 	private $props; // decoded patch object
 
-	protected function init()
-	{
-		$this->initProps();
-		//$this->props = new \stdClass();
-	}
 
-	protected function initProps()
-	{
-		if(isset($this->patch) && is_string($this->patch)) {
-			$this->props = json_decode($this->patch);
-		} else {
-			$this->props = new \stdClass();
-		}
+	public function init(){
+		$this->props = json_decode($this->patch ?? '{}');
 	}
 
 	protected static function defineMapping(): Mapping
@@ -44,9 +34,9 @@ class RecurrenceOverride extends Property
 		return $this;
 	}
 
-	public function __set($name, $val) {
+	public function __set($name, $value) {
 		//$this->initProps();
-		$this->props->$name = $val;
+		$this->props->$name = $value;
 		$this->patch = json_encode($this->props);
 	}
 

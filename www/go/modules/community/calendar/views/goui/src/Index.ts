@@ -1,10 +1,10 @@
 import {client, jmapds, modules} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {router} from "@intermesh/groupoffice-core";
-import {datasourcestore, t, E, translate, DateTime} from "@intermesh/goui";
+import {datasourcestore, t, E, translate, DateTime, Window} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {EventWindow} from "./EventWindow.js";
-import {EventDetail} from "./EventDetail.js";
+import {EventDetail, EventDetailWindow} from "./EventDetail.js";
 
 export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list';
 export const calendarStore = datasourcestore({
@@ -19,7 +19,31 @@ export const categoryStore = datasourcestore({
 })
 
 function addEmailAction() {
-	if(GO.email) {
+	if(go) {
+		go.openIcs = (p: any) => {
+			const params = p.id ? {
+				fileId:p.id
+			} : {
+				account_id: p.accountId,
+				mailbox: p.mailbox,
+				uid: p.uid,
+				number: p.partId,
+				encoding: p.encoding
+			}
+			go.Jmap.request({
+				method: "CalendarEvent/loadICS",
+				params,
+				callback (options:any, success:boolean, response:any) {
+					if (!success) {
+						Window.alert(response.errors.join("<br />"), t("Error"));
+					} else {
+						const dlg = new EventDetailWindow();
+						dlg.loadEvent(new CalendarItem({data:response.data,key:response.data.id}));
+						dlg.show();
+					}
+				}
+			});
+		}
 
 		GO.email.handleITIP = (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent|string, feedback?:string}} ) => {
 			if(msg.itip) {

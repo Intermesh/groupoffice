@@ -1,5 +1,5 @@
 import {CalendarView} from "./CalendarView.js";
-import {DateTime, E, t} from "@intermesh/goui";
+import {DateTime, E} from "@intermesh/goui";
 import {calendarStore} from "./Index.js";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
@@ -41,7 +41,7 @@ export class SplitView extends CalendarView {
 
 	protected populateViewModel() {
 		this.clear()
-		const viewEnd = this.start.clone().addDays(this.days);
+		//const viewEnd = this.start.clone().addDays(this.days);
 		for (let calendar of calendarStore) {
 			this.calViewModel[calendar.id] = [];
 		}
@@ -58,7 +58,7 @@ export class SplitView extends CalendarView {
 
 	renderView() {
 		this.el.innerHTML = ''; //clear
-		let i = 0,
+		let i,
 			now = new DateTime(),
 			day = this.start.clone(); // toDateString removes time
 
@@ -85,7 +85,7 @@ export class SplitView extends CalendarView {
 				row.append(E('li').attr('data-date', day.format('Y-m-d'))
 					.cls('today', day.format('Ymd') === now.format('Ymd'))
 					.cls('past', day.format('Ymd') < now.format('Ymd'))
-					.cls('other', day.format('Ym') !== this.day.format('Ym')))
+					.cls('other', day.getDay()%6==0))
 
 				day.addDays(1);
 				//it++;
@@ -107,10 +107,9 @@ export class SplitView extends CalendarView {
 
 	private drawCal(calId: string) {
 		const wstart = this.start.clone();
-		let end = this.start.clone().addDays(this.days),
-			e: any;
+		let end = this.start.clone().addDays(this.days);
 		let eventEls = [];
-		this.slots = {0:{},1:{},2:{},3:{},4:{},5:{},6:{}};
+		this.slots = Array.from({length: this.days}, _ => ({}) )
 
 		while(true) {
 			const e = this.calViewModel[calId] && this.calViewModel[calId][this.iterator];

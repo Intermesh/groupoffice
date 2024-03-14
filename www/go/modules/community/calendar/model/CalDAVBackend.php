@@ -249,9 +249,8 @@ class CalDAVBackend extends AbstractBackend implements
 		$uid = pathinfo($objectUri, PATHINFO_FILENAME);
 		$event = new CalendarEvent();
 		$event->uid = $uid;
-		$event->calendarId = $calendarId;
-		$event = ICalendarHelper::fromICal($calendarData, $event);
-		if(!$event->save()) {
+		$event = Calendar::addEvent(ICalendarHelper::fromICal($calendarData, $event), $calendarId);
+		if($event === null) {
 			throw new \Exception('Could not create calendar event');
 		}
 
@@ -263,7 +262,8 @@ class CalDAVBackend extends AbstractBackend implements
 		//$extraData = $this->getDenormalizedData($calendarData);
 		$uid = pathinfo($objectUri, PATHINFO_FILENAME);
 		/** @var CalendarEvent $event */
-		$event = CalendarEvent::find()->where(['uid'=>$uid, 'calendarId'=>$calendarId])->single();if(!$event){
+		$event = CalendarEvent::find()->where(['uid'=>$uid, 'calendarId'=>$calendarId])->single();
+		if(!$event){
 			go()->log("Event $objectUri not found in calendar $calendarId!");
 			return false;
 		}
@@ -280,8 +280,8 @@ class CalDAVBackend extends AbstractBackend implements
 	{
 		// objectUri = uid + '.ics' ?
 		$uid = pathinfo($objectUri, PATHINFO_FILENAME);
-		$query = (new Query())->select('id')->from('calendar_calendar_event','t')
-			->join('calendar_event', 'ev', 'ev.id = eventId')
+		$query = (new Query())->select('id')->from('calendar_calendar_event','cce')
+			->join('calendar_event', 'ev', 'ev.eventId = cce.eventId')
 			->where(['calendarId' => $calendarId, 'ev.uid'=> $uid]);
 		CalendarEvent::delete($query);
 	}

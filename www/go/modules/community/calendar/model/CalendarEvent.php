@@ -10,8 +10,10 @@ namespace go\modules\community\calendar\model;
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
+use go\core\model\Alert as CoreAlert;
 use go\core\model\User;
 use go\core\orm\CustomFieldsTrait;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
@@ -19,12 +21,6 @@ use go\core\orm\SearchableTrait;
 use go\core\util\UUID;
 use go\core\util\DateTime;
 
-/**
- * This serves as an in between record for the event that is in a calendar.
- * It merged Attendee with Event
- * @property Event $event Event object for this calendar event
- * @property Calendar $calendar The calendar this is in
- */
 class CalendarEvent extends AclItemEntity {
 
 	use CustomFieldsTrait;
@@ -203,43 +199,6 @@ class CalendarEvent extends AclItemEntity {
 			//->addMap('locations', Location::class, ['id' => 'eventId']);
 	}
 
-	/**
-	 * If the UID of the event already exists in the system. Grab its ID and add the event to the given calendar.
-	 * Then select it again and return the selected event.
-	 * If it doesn't exists just set the calendarId and save() once to behave
-	 * @param $event CalendarEvent
-	 * @param $cal Calendar
-	 * @return CalendarEvent this one is saved in the provided calendar
-	 */
-	static function grabInto($event, $receiver) {
-		$cal = Calendar::fetchDefault($receiver);
-
-		$eventData = go()->getDbConnection()
-			->select(['t.eventId, GROUP_CONCAT(calendarId) as calendarIds'])
-			->from('calendar_event', 't')
-			->join('calendar_calendar_event', 'c', 'c.eventId = t.eventId', 'LEFT')
-			->where(['uid'=>$event->uid])
-			->single();
-		$calendarIds = explode(',', $eventData['calendarIds']);
-		if(!empty($eventData) || !empty($eventData['eventId'])) {
-			if(in_array($cal->id, $calendarIds)) {
-				// found and already in calendar
-				return CalendarEvent::find()->where(['calendarId'=>$cal->id, 'uid' => $event->uid])->single();
-			}
-			// found but not in calendar (insert)
-			go()->getDbConnection()->insert('calendar_calendar_event', [
-				'calendarId' => $cal->id,
-				'eventId' => $eventData['eventId']
-			])->execute();
-			$id = go()->getDbConnection()->getPDO()->lastInsertId();
-
-			return CalendarEvent::findById($id);
-		}
-		//not found, set calendarId save and return
-		$event->calendarId = $cal->id;
-		return $event->save() ? $event : null;
-	}
-
 	static function findByUID($scheduleId, $uid) {
 		return self::find()->join('calendar_calendar', 'cal', 'cal.id = cce.calendarId', 'LEFT')
 			->join('core_user', 'u', 'u.id = cal.ownerId')
@@ -398,7 +357,8 @@ class CalendarEvent extends AclItemEntity {
 	public function end($withoutTime = false) {
 
 		$end = new DateTime($this->start->format("Y-m-d". ($withoutTime?'':" H:i:s")),$this->timeZone()) ;
-		$end->add(new \DateInterval($this->duration));
+		if(!empty($this->duration))
+			$end->add(new \DateInterval($this->duration));
 		return $end;
 	}
 
@@ -428,6 +388,14 @@ class CalendarEvent extends AclItemEntity {
 		return [$line1,$line2];
 	}
 
+	private function incrementCalendarModSeq() {
+		Calendar::updateHighestModSeq($this->calendarId);
+		if($this->isModified('calendarId')) {
+			// Event is put in a different calendar so update both modseqs
+			Calendar::updateHighestModSeq($this->getOldValue('calendarId'));
+		}
+	}
+
 	protected function internalSave() : bool {
 
 		if(empty($this->uid)) {
@@ -445,6 +413,10 @@ class CalendarEvent extends AclItemEntity {
 			if(!$this->isModified('sequence') || $this->sequence <= $this->getOldValue('sequence'))
 				$this->sequence += 1;
 		}
+		if ($this->isModified('status') && $this->status == self::Cancelled) {
+			// Remove alert when event is cancelled
+			CoreAlert::deleteByEntity($this);
+		}
 
 		if(self::$sendSchedulingMessages) {
 			Scheduler::handle($this);
@@ -453,15 +425,39 @@ class CalendarEvent extends AclItemEntity {
 		$success = parent::internalSave();
 
 		if($success) {
+			$this->createSystemAlerts();
 			$this->changeEventsWithSameUID();
-
-			Calendar::updateHighestModSeq($this->calendarId);
-			if($this->isModified('calendarId')) {
-				// Event is put in a different calendar so update both modseqs
-				Calendar::updateHighestModSeq($this->getOldValue('calendarId'));
-			}
+			$this->incrementCalendarModSeq();
 		}
 		return $success;
+	}
+	private function createSystemAlerts() {
+		if(!CoreAlert::$enabled) {
+			return;
+		}
+
+		if($this->isModified(['alerts'])) {
+
+		}
+		if($this->isNew()) {
+
+			// create an alert if someone else created a task in your default list
+			$calendar = Calendar::findById($this->calendarId, ['id', 'createdBy']);
+
+			$alert = $this->createAlert(new \DateTime(), 'createdforyou', $calendar->createdBy)
+				->setData([
+					'type' => 'assigned',
+					'createdBy' => $this->createdBy
+				]);
+
+			if (!$alert->save()) {
+				throw new SaveException($alert);
+			}
+
+
+		} else if($this->modifiedBy != $this->createdBy){
+			$this->deleteAlert('createdforyou', $this->modifiedBy);
+		}
 	}
 
 	private function changeEventsWithSameUID() {

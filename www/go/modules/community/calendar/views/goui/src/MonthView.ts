@@ -1,5 +1,5 @@
 import {CalendarView} from "./CalendarView.js";
-import {ComponentEventMap, createComponent, DateInterval, DateTime, ObservableListenerOpts} from "@intermesh/goui";
+import {ComponentEventMap, DateInterval, DateTime, ObservableListenerOpts} from "@intermesh/goui";
 import {E} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {client} from "@intermesh/groupoffice-core";
@@ -92,7 +92,7 @@ export class MonthView extends CalendarView {
 				this.updateItems();
 			}
 		},
-		mouseUp = (e: MouseEvent) => {
+		mouseUp = (_e: MouseEvent) => {
 			el.un('mousemove', mouseMove);
 			window.removeEventListener('mouseup', mouseUp);
 
@@ -175,7 +175,7 @@ export class MonthView extends CalendarView {
 			for (i = 0; i < 7; i++) {
 				row.append(E('li',
 					(i==0 && client.user.calendarPreferences.showWeekNumbers) ? E('sub','W '+day.getWeekOfYear()).cls('weeknb').cls('not-small-device')
-						.on('click',e => this.fire('selectweek', this, weekStart))
+						.on('click',_e => this.fire('selectweek', this, weekStart))
 						.on('mousedown',e=>e.stopPropagation()):'',
 					E('em',day.format(day.getDate() === 1 ? 'j M' : 'j'))
 				).attr('data-date', day.format('Y-m-d'))
@@ -210,7 +210,7 @@ export class MonthView extends CalendarView {
 		let end = wstart.clone().addDays(7),
 			e: any;
 		let eventEls = [];
-		this.slots = {0:{},1:{},2:{},3:{},4:{},5:{},6:{}};
+		this.slots = [{},{},{},{},{},{},{}];
 		let stillContinueing = [];
 		while(e = this.continues.shift()) {
 			eventEls.push(this.drawEvent(e, wstart));

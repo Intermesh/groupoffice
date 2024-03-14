@@ -4,12 +4,11 @@ import {
 	DateTime,
 	E,
 	menu,
-	Recurrence,
 	t
 } from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
-import {client} from "@intermesh/groupoffice-core";
+import {client,Recurrence} from "@intermesh/groupoffice-core";
 
 export abstract class CalendarView extends Component {
 
@@ -44,7 +43,7 @@ export abstract class CalendarView extends Component {
 		this.adapter = adapter
 	}
 
-	update = (data?: any) => {
+	update = (_data?: any) => {
 		if(this.rendered) {
 			this.renderView();
 			this.populateViewModel();
@@ -76,7 +75,7 @@ export abstract class CalendarView extends Component {
 			.cls('declined', item.isDeclined)
 			.cls('multiday', !e.showWithoutTime && item.dayLength > 1)
 			.attr('tabIndex', 0)
-			.on('click',(ev)=> {
+			.on('click',(_ev)=> {
 				// if not holding ctrl or shift, deselect
 				while(this.selected.length) {
 					Object.values(this.selected.shift()!.divs).forEach(el => el.cls('-selected'));
@@ -91,7 +90,7 @@ export abstract class CalendarView extends Component {
 				this.current = item;
 				this.contextMenu.showAt(ev);
 				ev.preventDefault();
-			}).on('dblclick', ev => {
+			}).on('dblclick', _ev => {
 				item.open();
 			});
 	}
@@ -105,7 +104,8 @@ export abstract class CalendarView extends Component {
 
 	protected slots: any;
 	protected calcRow(start: number, days: number) {
-		let row = 0, end = Math.min(start+days, 7);
+		let row = 0,
+			end = Math.min(start+days, this.slots.length);
 		while(row < 10) {
 			for(let i = start; i < end; i++) {
 				if(this.slots[i][row]){ // used
@@ -133,8 +133,8 @@ export abstract class CalendarView extends Component {
 
 		row = row ?? this.calcRow(pos, e.dayLength);
 
-		const width = Math.min(14, e.dayLength) * (100 / Math.min(this.days,7)),
-			left = pos * (100 / Math.min(this.days,7)),
+		const width = Math.min(21, e.dayLength) * (100 / this.slots.length),
+			left = pos * (100 / this.slots.length),
 			top = row * this.ROWHEIGHT;
 		return {
 			width: (width-.3).toFixed(2)+'%',

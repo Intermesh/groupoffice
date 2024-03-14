@@ -3,8 +3,10 @@ namespace go\modules\community\calendar;
 
 use GO\Base\Exception\AccessDenied;
 use go\core;
+use go\core\cron\GarbageCollection;
 use go\core\model\User;
 use go\core\orm\Property;
+use go\core\orm\Query;
 use go\modules\community\calendar\model\Calendar;
 use go\modules\community\calendar\model\Preferences;
 use go\modules\community\calendar\model\BusyPeriod;
@@ -46,6 +48,21 @@ class Module extends core\Module
 	{
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 		//User::on(User::EVENT_BEFORE_DELETE, static::class, 'onUserDelete');
+		GarbageCollection::on(GarbageCollection::EVENT_RUN, static::class, 'onGarbageCollection');
+	}
+
+	public static function onGarbageCollection() {
+
+		// Delete event_data that is not in any calendar anymore.
+		$stmt = go()->getDbConnection()->delete('calendar_event',
+			(new Query)
+				->tableAlias('e')
+				->join("calendar_calendar_event", "ce", 'e.eventId = ce.eventId')
+				->where('ce.eventId', 'IS', null
+			)
+		);
+		// echo $stmt;
+		$stmt->execute();
 	}
 	public static function onMap(core\orm\Mapping $mapping)
 	{
