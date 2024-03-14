@@ -18,7 +18,7 @@ class RecurrenceOverride extends Property
 
 
 	public function init(){
-		$this->props = json_decode($this->patch ?? '{}');
+		$this->props = json_decode(trim($this->patch,"'") ?? '{}');
 	}
 
 	protected static function defineMapping(): Mapping
