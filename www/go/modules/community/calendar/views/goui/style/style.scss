@@ -195,7 +195,7 @@
 	.now { // the nowbar
 		position: absolute;
 		pointer-events: none;
-		left: dp(64);
+		left: dp(72);
 		right: 0;
 		z-index: 10;
 
@@ -219,7 +219,7 @@
 		}
 
 		> span { // time display
-			margin-left: dp(-64);
+			margin-left: dp(-72);
 			background-color: $colorPrimary;
 			color: white;
 			height: dp(22);
@@ -229,8 +229,8 @@
 			display: inline-block;
 			text-align: right;
 			padding-right: dp(16);
-			width: dp(64);
-			transform: translateY(-50%);
+			width: dp(72);
+			transform: translateY(-54%);
 			clip-path: polygon(0 0, 80% 0, 100% 50%, 80% 100%, 0 100%);
 		}
 	}
@@ -457,6 +457,7 @@ $timeMargin: dp(72);
 	}
 	dl dd > div {
 		position: absolute;
+		min-height: dp(24); // big enough to click on it
 		border-left: dp(6) solid currentColor;
 		> em, > span, > i {
 			color: color-mix(in srgb, currentColor 36%, var(--fg-text));

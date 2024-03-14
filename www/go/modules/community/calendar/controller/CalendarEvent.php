@@ -2,7 +2,12 @@
 
 namespace go\modules\community\calendar\controller;
 
+use go\core\fs\Blob;
 use go\core\jmap\EntityController;
+use go\core\util\StringUtil;
+use go\core\util\UUID;
+use GO\Email\Model\Account;
+use go\modules\community\addressbook\convert\VCard;
 use go\modules\community\calendar\model;
 
 
@@ -79,6 +84,56 @@ class CalendarEvent extends EntityController {
 	 */
 	public function parse($params) {
 
+	}
+
+	public function loadICS( array $params) :array
+	{
+		if(!empty($params['fileId'])) {
+			$file = \GO\Files\Model\File::model()->findByPk($params['fileId']);
+			$data = $file->fsFile->getContents();
+		} else {
+			$account = Account::model()->findByPk($params['account_id']);
+			$imap = $account->openImapConnection($params['mailbox']);
+			$data = $imap->get_message_part_decoded($params['uid'], $params['number'], $params['encoding'], false, true, false);
+		}
+
+		$event = new model\CalendarEvent();
+		$event->calendarId = go()->getAuthState()->getUser(['calendarPreferences'])->calendarPreferences->defaultCalendarId;
+		$event = model\ICalendarHelper::fromICal($data, $event);
+		return ['success' => true, 'data' => $event];
+
+	}
+
+	/**
+	 * @param $params array 'blobIds' and 'calendarId', 'ignoreUid' are required
+	 * @throws \Exception
+	 */
+	public function import($params) {
+		$r = (object)[
+			'saved'=>0,
+			'failed'=>0,
+			'skipped'=>0,
+			'failureReasons'=>[]
+		];
+		foreach($params['blobIds'] as $blobId) {
+			foreach(model\ICalendarHelper::calendarEventFromFile($blobId) as $ev) {
+				$ev->calendarId = $params['calendarId'];
+				if(!empty($params['ignoreUid'])) {
+					$ev->uid = UUID::v4();
+				} else if(model\CalendarEvent::find()->selectSingleValue('id')->where(['uid'=>$ev->uid])->single() !== null) {
+					$r->skipped++;
+					continue;
+					// check if exists
+				}
+				if($ev->save()){ // will fail if UID exists. We dont want to modify existing events like this
+					$r->saved++;
+				} else {
+					$r->failureReaons[$ev->uid] = $ev->getValidationErrors();
+					$r->failed++;
+				}
+			}
+		}
+		return $r;
 	}
 
 //	public function processInvite($params) {

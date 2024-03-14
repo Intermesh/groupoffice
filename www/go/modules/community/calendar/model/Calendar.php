@@ -76,6 +76,42 @@ class Calendar extends AclOwnerEntity {
 			->single();
 	}
 
+	/**
+	 * If the UID of the event already exists in the system. Grab its ID and add the event to the given calendar.
+	 * Then select it again and return the selected event.
+	 * If it doesn't exists just set the calendarId and save() once to behave
+	 * @param $event CalendarEvent
+	 * @param $cal Calendar
+	 * @return CalendarEvent this one is saved in the provided calendar
+	 */
+	static function addEvent($event, $calendarId) {
+		$eventData = go()->getDbConnection()
+			->select(['t.eventId, GROUP_CONCAT(calendarId) as calendarIds'])
+			->from('calendar_event', 't')
+			->join('calendar_calendar_event', 'c', 'c.eventId = t.eventId', 'LEFT')
+			->where(['uid'=>$event->uid])
+			->single();
+
+		if(!empty($eventData) && !empty($eventData['eventId'])) {
+			$calendarIds = explode(',', $eventData['calendarIds']??'');
+			if(in_array($calendarId, $calendarIds)) {
+				// found and already in calendar
+				return CalendarEvent::find()->where(['calendarId'=>$calendarId, 'uid' => $event->uid])->single();
+			}
+			// found but not in calendar (insert)
+			go()->getDbConnection()->insert('calendar_calendar_event', [
+				'calendarId' => $calendarId,
+				'eventId' => $eventData['eventId']
+			])->execute();
+			$id = go()->getDbConnection()->getPDO()->lastInsertId();
+			Calendar::updateHighestModSeq($calendarId);
+			return CalendarEvent::findById($id);
+		}
+		//not found, set calendarId save and return
+		$event->calendarId = $calendarId;
+		return $event->save() ? $event : null;
+	}
+
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()->add('isSubscribed', function(Criteria $criteria, $value, Query $query) {

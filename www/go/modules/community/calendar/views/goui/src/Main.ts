@@ -8,13 +8,13 @@ import {
 	Component,
 	DatePicker,
 	datepicker,
-	DateTime,
-	FunctionUtil, List,
+	DateTime, fieldset, Format,
+	FunctionUtil, hr, List,
 	list,
-	menu, router,
+	menu, router, select,
 	splitter,
 	t,
-	tbar
+	tbar, win
 } from "@intermesh/goui";
 import {EventWindow} from "./EventWindow.js";
 import {MonthView} from "./MonthView.js";
@@ -100,7 +100,7 @@ export class Main extends Component {
 					btn({
 						title: t("Close"),
 						icon: "close",
-						handler: (button, ev) => {
+						handler: () => {
 							this.west.el.cls('-active');
 						}
 					})
@@ -131,7 +131,7 @@ export class Main extends Component {
 				}),
 				comp({cls:'scroll'},
 					tbar({cls: 'dense'},
-						comp({tagName: 'h3', html: 'Calendars'}),
+						comp({tagName: 'h3', html: t('Calendars')}),
 						btn({icon: 'done_all', handler: () => { this.calendarList.rowSelection!.selectAll();}}),
 						btn({
 							icon: 'more_vert', menu: menu({},
@@ -159,7 +159,7 @@ export class Main extends Component {
 						comp({tagName:'li'},this.holidayCb),
 					),
 					tbar({cls: 'dense'},
-						comp({tagName: 'h3', html: 'Categories'}),
+						comp({tagName: 'h3', html: t('Categories')}),
 						btn({
 							icon: 'add', menu: menu({},
 								btn({
@@ -198,32 +198,32 @@ export class Main extends Component {
 					this.currentText = comp({tagName: 'h3', text: t('Today'), flex: '1 1 50%', style: {minWidth: '100px', fontSize: '1.8em'}}),
 					//'->',
 					this.cardMenu = comp({cls: 'group not-medium-device', flex:'0 0 auto'},
-						btn({icon: 'view_day', text: t('Day'), handler: b => this.routeTo('day', this.date)}),
-						btn({icon: 'view_week', text: t('Week'), handler: b => this.routeTo('week', this.date)}),
-						btn({icon: 'view_module', text: t('Month'), handler: b => this.routeTo('month', this.date)}),
-						btn({icon: 'view_module', text: t('Year'), handler: b => this.routeTo('year', this.date)}),
-						btn({icon: 'call_split', text: t('Split'), handler: b => this.routeTo('split-5', this.date)}),
-						btn({icon: 'list', text: t('List'), handler: b => this.routeTo('list', this.date)}),
+						btn({icon: 'view_day', text: t('Day'), handler: _b => this.routeTo('day', this.date)}),
+						btn({icon: 'view_week', text: t('Week'), handler: _b => this.routeTo('week', this.date)}),
+						btn({icon: 'view_module', text: t('Month'), handler: _b => this.routeTo('month', this.date)}),
+						btn({icon: 'view_module', text: t('Year'), handler: _b => this.routeTo('year', this.date)}),
+						btn({icon: 'call_split', text: t('Split'), handler: _b => this.routeTo('split-5', this.date)}),
+						btn({icon: 'list', text: t('List'), handler: _b => this.routeTo('list', this.date)}),
 					),
 					btn({icon:'view_agenda',cls: 'for-medium-device', flex:'0 0 auto', menu:menu({},
-						btn({icon: 'view_day', text: t('Day'), handler: b => this.routeTo('day', this.date)}),
-						btn({icon: 'view_week', text: t('Week'), handler: b => this.routeTo('week', this.date)}),
-						btn({icon: 'view_module', text: t('Month'), handler: b => this.routeTo('month', this.date)}),
-						btn({icon: 'view_module', text: t('Year'), handler: b => this.routeTo('year', this.date)}),
-						btn({icon: 'call_split', text: t('Split'), handler: b => this.routeTo('split-5', this.date)}),
-						btn({icon: 'list', text: t('List'), handler: b => this.routeTo('list', this.date)}),
+						btn({icon: 'view_day', text: t('Day'), handler: _b => this.routeTo('day', this.date)}),
+						btn({icon: 'view_week', text: t('Week'), handler: _b => this.routeTo('week', this.date)}),
+						btn({icon: 'view_module', text: t('Month'), handler: _b => this.routeTo('month', this.date)}),
+						btn({icon: 'view_module', text: t('Year'), handler: _b => this.routeTo('year', this.date)}),
+						btn({icon: 'call_split', text: t('Split'), handler: _b => this.routeTo('split-5', this.date)}),
+						btn({icon: 'list', text: t('List'), handler: _b => this.routeTo('list', this.date)}),
 					)}),
 					comp({cls: 'group', flex: '1 1 50%', style:{justifyContent: 'end'}},
 						btn({icon: 'keyboard_arrow_left', title: t('Previous'), allowFastClick:true, handler: b => this.backward()}),
 						btn({
-							text: t('Today'), handler: b => {
+							text: t('Today'), handler: _b => {
 								this.goto().updateView()
 							}
 						}),
 						btn({icon: 'keyboard_arrow_right', title: t('Next'), allowFastClick:true, handler: b => this.forward()}),
 					),
 					btn({icon:'more_vert',cls: 'not-small-device', menu:menu({expandLeft: true},
-						btn({icon:'video_call',text:'Video meeting', handler: _ => {(new Settings()).openLoad()}}),
+						btn({icon:'video_call',text:t('Video meeting'), handler: _ => {(new Settings()).openLoad()}}),
 						btn({
 							icon: 'print', text:t('Print'), menu: menu({expandLeft: true},
 								this.printCurrentBtn = btn({icon: 'print', text: t('Current view'), handler:() => {
@@ -234,7 +234,7 @@ export class Main extends Component {
 								}}),
 								//'-',
 								btn({icon: 'view_day', text: t('Day'), handler:() => { this.openPDF('day'); }}),
-								btn({icon: 'view_week', text: t('5 days'), handler:() => { this.openPDF('days'); }}),
+								btn({icon: 'view_week', text: t('Workweek'), handler:() => { this.openPDF('days'); }}),
 								btn({icon: 'view_week', text: t('Week'), handler:() => { this.openPDF('week'); }}),
 								btn({icon: 'view_module', text: t('Month'), handler:() => { this.openPDF('month'); }})
 							)
@@ -301,14 +301,6 @@ export class Main extends Component {
 		this.updateView();
 	}
 
-	private saveAdapterVisbility = FunctionUtil.buffer(2000, () => {
-		//save isVisible
-		for(const id in this.visibleChanges) {
-			calendarStore.dataSource.update(id, {isVisible:this.visibleChanges[id]});
-		}
-		this.visibleChanges = {};
-	})
-
 	private inCalendars: {[key:string]:boolean} = {}
 	private buildCalendarFilter() {
 		return list({
@@ -334,7 +326,7 @@ export class Main extends Component {
 
 				me.store.load();
 			}},
-			renderer: (data, row, list, storeIndex) => {
+			renderer: (data, _row, _list, _storeIndex) => {
 				// if(data.isVisible) {
 				// 	this.inCalendars[storeIndex] = true;
 				// }
@@ -369,23 +361,46 @@ export class Main extends Component {
 					},
 					buttons: [btn({
 						icon: 'more_horiz', menu: menu({},
-							btn({icon:'edit', text: t('Edit'), disabled:!data.myRights.mayAdmin, handler: async _ => {
-									const dlg = new CalendarWindow();
-									await dlg.load(data.id);
-									dlg.show();
+							btn({icon:'edit', text: t('Edit')+'…', disabled:!data.myRights.mayAdmin, handler: async _ => {
+								const dlg = new CalendarWindow();
+								await dlg.load(data.id);
+								dlg.show();
+							}}),
+							btn({icon:'delete', text: t('Delete')+'…', disabled:!data.myRights.mayAdmin, handler: async _ => {
+								jmapds("Calendar").confirmDestroy([data.id]);
 								}}),
+							hr(),
 							btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
-									calendarStore.dataSource.update(data.id, {isSubscribed: false});
-								}}),
-							btn({icon:'import_export', text:t('Import'), handler: async ()=> {
-									const files = await browser.pickLocalFiles();
-									const blob = await client.upload(files[0]);
-									client.jmap("CalendarEvent/parse", {blobIds:[blob.id]}, 'pIcs').then(r => {
-										// bult events.
-										// set calendarId op alle / flikker uid eruit
-										// call /set create met events
-									});
-								}})
+								calendarStore.dataSource.update(data.id, {isSubscribed: false});
+							}}),
+							btn({icon:'import_export', text:t('Import')+'…', handler: async ()=> {
+								const files = await browser.pickLocalFiles(false,false,'text/calendar');
+								const blob = await client.upload(files[0]);
+								const calendarSelect = select({
+										label: t('Calendar'), name: 'calendarId', required: true, flex: '1 30%',value:data.id,
+										store: calendarStore, valueField: 'id', textRenderer: (r: any) => r.name,
+									}),
+									uidCheckbox = checkbox({name:'ignoreUID', label: t('Import events as new (Ignore UID)')});
+								const w = win({title:'Import ICS file'},
+									fieldset({cls:'pad flow'},
+										comp({cls:'pad',html:t('Import {name} into').replace('{name}', blob.name + ' ('+Format.fileSize(blob.size)+')')}),
+										calendarSelect, uidCheckbox
+									),
+									tbar({},'->',btn({text:t('Start'), handler: () => {
+											client.jmap("CalendarEvent/import", {
+												blobIds:[blob.id],
+												calendarId:calendarSelect.value,
+												ignoreUid: uidCheckbox.value
+											}, 'pIcs').then(r => {
+												// bult events.
+												// set calendarId op alle / flikker uid eruit
+												// call /set create met events
+											});
+									}}))
+								);
+								w.show();
+
+							}})
 						)
 					})]
 				})];
@@ -412,7 +427,7 @@ export class Main extends Component {
 			store: categoryStore,
 			cls: 'check-list',
 			listeners: {'render': me => { me.store.load() }},
-			renderer: (data, row) => {
+			renderer: (data) => {
 				// if(data.isVisible && list.rowSelection) {
 				// 	list.rowSelection.add(storeIndex);
 				// }

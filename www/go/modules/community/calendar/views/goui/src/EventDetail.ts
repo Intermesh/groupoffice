@@ -1,19 +1,19 @@
 import {
 	btn,
-	comp, containerfield,
+	comp, Component, containerfield,
 	DataSourceForm,
 	datasourceform, DateInterval,
-	DateTime, DisplayField, displayfield, Format, hr, mapfield, Notifier, RecurrenceField,
+	DateTime, DisplayField, displayfield, Format, hr, mapfield, Notifier,
 	t,
 	tbar, Toolbar,
 	Window
 } from "@intermesh/goui";
-import {client, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
+import {client, JmapDataSource, jmapds, RecurrenceField} from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
 import {CalendarItem} from "./CalendarItem.js";
 
 
-export class EventDetail extends Window {
+export class EventDetail extends Component {
 
 	// title = t('New Event')
 	// width = 800
@@ -65,10 +65,10 @@ export class EventDetail extends Window {
 							this.toolBar.show();
 							this.pressButton(this.item!.currentParticipant.participationStatus);
 						}
-					},
-					'save' : () => {this.close();}
+					}
 				}
 			},
+			displayfield({name: 'title', label:t('Title')}),
 			comp({cls:'hbox'},
 				displayfield({label: t('Start'), name:'start',renderer:d=>Format.dateTime(d), flex:1}),
 				displayfield({label:t('End'), name: 'end',renderer:d=>Format.dateTime(d), flex:1})
@@ -116,7 +116,6 @@ export class EventDetail extends Window {
 
 	loadEvent(ev: CalendarItem) {
 		this.item = ev;
-		this.title = t(!ev.key ? 'New event' : 'Edit event');
 		if (!ev.key) {
 			this.form.create(ev.data);
 		} else {
@@ -129,4 +128,21 @@ export class EventDetail extends Window {
 		}
 	}
 
+}
+
+export class EventDetailWindow extends Window {
+
+	view: EventDetail
+	constructor() {
+		super();
+		this.title = t('View Event');
+		this.width = 440;
+		this.items.add(this.view = new EventDetail());
+		this.view.form.on('save', () => {this.close();})
+	}
+
+	loadEvent(ev: CalendarItem) {
+		this.title = t(!ev.key ? 'New event' : 'Edit event');
+		this.view.loadEvent(ev);
+	}
 }

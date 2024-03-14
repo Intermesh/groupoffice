@@ -1,6 +1,6 @@
 import {CalendarView} from "./CalendarView.js";
 import {DateTime, E, t} from "@intermesh/goui";
-import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
+import {CalendarItem} from "./CalendarItem.js";
 import {client} from "@intermesh/groupoffice-core";
 
 class CalendarDayItem extends CalendarItem {
@@ -117,7 +117,7 @@ export class WeekView extends CalendarView {
 			}
 
 		},
-		mouseUp = (e:MouseEvent) => {
+		mouseUp = (_e:MouseEvent) => {
 			this.el.cls('-resizing');
 			this.el.un('mousemove', mouseMove);
 			changed && ev.save(() => {
@@ -243,7 +243,8 @@ export class WeekView extends CalendarView {
 			day.addDays(1);
 		}
 		if(showNowBar) {
-			const top = 7 / 60 * now.getMinuteOfDay(), // 1296 = TOTAL HEIGHT of DAY
+			// an hour is 8vh
+			const top = 8 / 60 * now.getMinuteOfDay(), // 1296 = TOTAL HEIGHT of DAY
 				left = 100 / this.days * (now.getWeekDay() - this.day.getWeekDay());
 			nowbar = E('div', E('hr'),
 				E('b').attr('style', `left: ${left}%;`),
@@ -253,8 +254,8 @@ export class WeekView extends CalendarView {
 		let ol: HTMLElement;
 
 		this.el.append(
-			E('ul',E('li','Wk '+this.day.getWeekOfYear()), ...heads),
-			E('ul',E('li', t('All-day')), this.alldayCtr = E('li').cls('all-days'), ...fullDays),
+			E('ul',E('li',t('Wk')+' '+this.day.getWeekOfYear()), ...heads),
+			E('ul',E('li', t('All day')), this.alldayCtr = E('li').cls('all-days'), ...fullDays),
 			ol = E('dl',E('dt', nowbar || '', E('em'), ...hours), ...days)
 		);
 		setTimeout(() => ol.scrollTop = oldScrollTop || (ol.scrollHeight / 4)); // = scroll 6hours down (1/4 of day)
@@ -262,11 +263,11 @@ export class WeekView extends CalendarView {
 
 	private updateFullDayItems() {
 
-		this.slots = {0:{},1:{},2:{},3:{},4:{},5:{},6:{}};
+		this.slots = Array.from({length: this.days}, _ => ({}) )
 		this.alldayCtr.prepend(...this.viewModel.map(e =>
 			super.eventHtml(e).css(this.makestyle(e, this.day))
 		));
-		var lengths = Object.values(this.slots).map((i: any) => Object.keys(i).length);
+		var lengths = this.slots.map((i: any) => Object.keys(i).length);
 		this.alldayCtr.parentElement!.style.height = ((Math.max(...lengths,1) * this.ROWHEIGHT)/10)+'rem';
 	}
 

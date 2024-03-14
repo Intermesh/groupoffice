@@ -10,6 +10,7 @@ use go\core\fs\Blob;
 use go\core\mail\Address;
 use go\core\mail\Attachment;
 use go\core\model\Acl;
+use go\core\model\Principal;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use Sabre\VObject;
@@ -34,7 +35,7 @@ class ICalendarHelper {
 
 	/**
 	 * Parse an Event object to a VObject
-	 * @param Event $event
+	 * @param CalendarEvent $event
 	 * @param VCalendar $vcalendar The original vcalendar to sync to
 	 */
 	static function toVObject(CalendarEvent $event, $vcalendar = null) {
@@ -203,11 +204,19 @@ class ICalendarHelper {
 		return implode(';',$rule);
 	}
 
+	static function calendarEventFromFile(string $blobId) {
+		$data = file_get_contents(Blob::buildPath($blobId));
+		$splitter = new VObject\Splitter\ICalendar(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING + VObject\Reader::OPTION_IGNORE_INVALID_LINES);
+		while($vevent = $splitter->getNext()) {
+			yield self::parseVObject($vevent, new CalendarEvent());
+		}
+	}
+
 	static function fromICal(string $data, $event = null) {
 	//	$vCalendar = VObject\Reader::read(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING);
 		$splitter = new VObject\Splitter\ICalendar(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING + VObject\Reader::OPTION_IGNORE_INVALID_LINES);
 		if($vevent = $splitter->getNext())
-			return self::parseVObject($vevent, $event);
+			return self::parseVObject($vevent, $event ?? new CalendarEvent());
 		return false;
 	}
 
@@ -222,11 +231,12 @@ class ICalendarHelper {
 
 		$exceptions = [];
 		$baseEvents = [];
+		$prodId = $vcalendar->PRODID;
 
 		foreach($vcalendar->VEVENT as $vevent) {
 			if(!empty($vevent->{'RECURRENCE-ID'})) {
 				$exceptions[] = self::parseOccurrence($vevent, (object)[
-					'recurrenceId' => $vevent->{'RECURRENCE-ID'},
+					'recurrenceId' => $vevent->{'RECURRENCE-ID'}->getJsonValue()[0],
 					'uid' => (string)$vevent->UID // unset after merge
 				]);
 				continue;
@@ -235,6 +245,7 @@ class ICalendarHelper {
 			// if(!$event->isNew && $event->blobId) // merge vevent into current blob
 
 			$event = self::parseOccurrence($vevent, $event); // title, description, start, duration, location, status, privacy
+			$event->prodId = $prodId;
 			$event->uid = (string)$vevent->UID;
 			$baseEvents[$event->uid] = $event;
 			if(!$vevent->DTSTART->isFloating())
@@ -246,25 +257,27 @@ class ICalendarHelper {
 			$event->showWithoutTime = !$vevent->DTSTART->hasTime();
 			if(isset($vevent->SEQUENCE))
 				$event->sequence = (int)$vevent->SEQUENCE->getValue();
-			$event->privacy = array_flip(self::$privacyMap)[$vevent->CLASS] ?? 'public';
+			$event->privacy = array_flip(self::$privacyMap)[(string)$vevent->CLASS] ?? 'public';
 			//$event->organizerEmail = str_replace('mailto:', '',(string)$vevent->ORGANIZER);
-			if(isset($vevent->ORGANIZER)) {
-				$organizer = self::parseAttendee(new Participant($event), $vevent->ORGANIZER);
-				$event->replyTo = str_replace('mailto:', '',(string)$vevent->ORGANIZER);
-				$organizer->setRoles(['owner' => true]);
-				$event->participants[] = $organizer;
-			}
+
 			if(isset($vevent->attendee)) {
 				foreach ($vevent->ATTENDEE as $vattendee) {
-					$event->participants[] = self::parseAttendee(new Participant($event), $vattendee);
+					list($key,$attendee) = self::parseAttendee(new Participant($event), $vattendee);
+					$event->participants[$key] = $attendee;
 				}
+			}
+			if(isset($vevent->ORGANIZER)) {
+				list($key,$organizer) = self::parseAttendee(new Participant($event), $vevent->ORGANIZER);
+				$event->replyTo = str_replace('mailto:', '',(string)$vevent->ORGANIZER);
+				$organizer->setRoles(['owner' => true]);
+				$event->participants[$key] = $organizer;
 			}
 
 			if(!empty((string)$vevent->RRULE)) {
 				$event->setRecurrenceRule(self::parseRrule($vevent->RRULE, $event));
 				if(!empty($vevent->EXDATE)) {
 					foreach ($vevent->EXDATE as $exdate) {
-						$event->recurrenceOverrides[$exdate->getJsonValue()] = null;
+						$event->recurrenceOverrides[$exdate->getJsonValue()[0]] = null;
 					}
 				}
 			}
@@ -289,10 +302,10 @@ class ICalendarHelper {
 		//Attach exceptions found in VCALENDAR
 		foreach($exceptions as $props) {
 			$uid = $props->uid;
-			if(isset($baseEvents[$uid]) && $baseEvents[$uid]->getIsRecurring()) {
-				$recurrenceId = $props['recurrenceId'];
-				unset($props['recurrenceId'], $props['uid']);
-				$baseEvents[$uid]->recurrenceOverrides[$recurrenceId] = (new RecurrenceOverride($event))->setValues($props);
+			if(isset($baseEvents[$uid]) && $baseEvents[$uid]->isRecurring()) {
+				$recurrenceId = $props->recurrenceId;
+				unset($props->recurrenceId, $props->uid);
+				$baseEvents[$uid]->recurrenceOverrides[$recurrenceId] = (new RecurrenceOverride($event))->setValues((array)$props);
 			}
 		}
 		// All exceptions that do not have the recurrence ID are ignored here
@@ -316,38 +329,51 @@ class ICalendarHelper {
 	}
 
 	static private function parseAttendee(Participant $p, $vattendee) {
+		$key = str_replace('mailto:', '',(string)$vattendee);
+		$principalId = Principal::find()->selectSingleValue('id')->where('email','=',$key)->orderBy(['entityTypeId'=>'ASC'])->single();
 		$p->setValues([
-			'email'=>str_replace('mailto:', '',(string)$vattendee)
+			'email'=>$key
 		]);
-		if(!empty($vattendee['EMAIL'])) $p->email = $vattendee['EMAIL'];
+		if(!empty($vattendee['EMAIL'])) $p->email = (string)$vattendee['EMAIL'];
 		$p->kind = !empty($vattendee['CUTYPE']) ? strtolower($vattendee['CUTYPE']) : 'individual';
-		if(!empty($vattendee['CN'])) $p->name = $vattendee['CN'];
-		if(!empty($vattendee['ROLE'])) $p->roles[] = $vattendee['ROLE'];
+		if(!empty($vattendee['CN'])) $p->name = (string)$vattendee['CN'];
 		if(!empty($vattendee['RSVP'])) $p->expectReply = $vattendee['RSVP']->getValue() ? 1: 0; // bool
 		$p->participationStatus = !empty($vattendee['PARTSTAT']) ? strtolower($vattendee['PARTSTAT']) : 'needs-action';
-		$map = array_flip(self::$roleMap);
-		if(in_array((string)$vattendee['ROLE'], $map)) {
-			$p->setRoles([$map[(string)$vattendee['ROLE']] => true]);
+		if(!empty($vattendee['ROLE'])) {
+			$map = array_flip(self::$roleMap);
+			if (in_array((string)$vattendee['ROLE'], $map)) {
+				$p->setRoles([$map[(string)$vattendee['ROLE']] => true]);
+			}
 		}
-		return $p;
+		return [$principalId ?? $key,$p];
 	}
 
 	static private function parseOccurrence($vevent, $props) {
 
 		if(isset($vevent->DTSTART)) {
 			$props->start = $vevent->DTSTART->getDateTime();
+			if($vevent->DTSTART->hasTime()) {
+				$props->timeZone = !empty($vevent->DTSTART['TZID']) ? $vevent->DTSTART['TZID'] : 'Etc/UTC';
+			}
 		}
 		//empty($vevent->DTSTART) ?: $props->start = $vevent->DTSTART->getDateTime()->format(DateTime::FORMAT_API_LOCAL);
 		if(!empty($vevent->SUMMARY)) $props->title = (string)$vevent->SUMMARY;
 		if(!empty($vevent->DESCRIPTION)) $props->description = (string)$vevent->DESCRIPTION;
 		if(!empty($vevent->LOCATION)) $props->location = (string)$vevent->LOCATION;
-		if(!empty($vevent->STATUS)) $props->status = strtolower($vevent->STATUS);
-		if(!empty($vevent->CLASS)) $props->privacy = array_flip(self::$privacyMap)[$vevent->CLASS] ?? 'public';
+		if(!empty($vevent->STATUS)) {
+			$status = strtolower($vevent->STATUS);
+			if(in_array($status, ['confirmed', 'cancelled', 'tentative'])) {
+				$props->status = $status;
+			}
+		}
+		if(!empty($vevent->CLASS)) $props->privacy = array_flip(self::$privacyMap)[(string)$vevent->CLASS] ?? 'public';
 		if(!empty($vevent->COLOR)) $props->color = (string)$vevent->COLOR;
 		if(!empty($vevent->DURATION)) {
 			$props->duration = (string)$vevent->DURATION;
 		} else if (!empty($vevent->DTEND) && !empty($props->start)) {
 			$props->duration = DateTime::intervalToISO($vevent->DTEND->getDateTime()->diff($props->start));
+		} else {
+			$props->duration = 'PT0S'; // Import events with no DTEND or DURATION anyway
 		}
 		return $props;
 	}
@@ -376,7 +402,7 @@ class ICalendarHelper {
 				$values->byDay[] = $bd;
 			}
 		}
-		if(isset($parts['BYMONTHDAY'])) $values->byMonthDay = array_map('intval',explode(',', $parts['BYDAY']));
+		if(isset($parts['BYMONTHDAY'])) $values->byMonthDay = array_map('intval',explode(',', $parts['BYMONTHDAY']));
 		if(isset($patrs['BYMONTH'])) $values->byMonth = explode(',', $parts['BYMONTH']); // is string, could have L suffix
 		if(isset($patrs['BYYEARDAY'])) $values->byYearDay = array_map('intval',explode(',', $parts['BYYEARDAY']));
 		if(isset($patrs['BYWEEKNO'])) $values->byWeekNo = array_map('intval',explode(',', $parts['BYWEEKNO']));

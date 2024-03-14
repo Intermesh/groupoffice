@@ -1,17 +1,27 @@
 import {CalendarView} from "./CalendarView.js";
-import {DateTime, E, t} from "@intermesh/goui";
+import {DateTime, E, splitter, t} from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
+import {EventDetail} from "./EventDetail.js";
 
 export class ListView extends CalendarView {
 
 	start!: DateTime
 	continues?: CalendarItem[]
 	iterator?:number
+	listEl: HTMLUListElement
+
+	detail: EventDetail
 
 	constructor(adapter: CalendarAdapter) {
 		super(adapter);
-		Object.assign(this, {tagName: 'ul'}); // because tagName is read-only??
+		this.cls = 'hbox';
+		this.el.append(this.listEl = E('ul'));
+		this.detail = new EventDetail();
+		this.items.add(
+			splitter({resizeComponentPredicate: this.detail}),
+			this.detail
+		);
 	}
 
 	goto(date: DateTime, days: number): void {
@@ -38,10 +48,9 @@ export class ListView extends CalendarView {
 
 	renderView(): void {
 		this.viewModel = [];
-		this.el.innerHTML = ''; //clear
+		this.listEl.innerHTML = ''; //clear
 
-		this.el.cls(['+cal','+list']);
-
+		this.listEl.cls(['+cal','+list']).css({flex:'1'});
 
 	}
 
@@ -68,7 +77,7 @@ export class ListView extends CalendarView {
 				this.iterator++;
 			}
 			row.cls('empty', row.children.length === 1)
-			this.el.append(row);
+			this.listEl.append(row);
 
 			day.addDays(1);
 			if (day.format('Ym') > this.day.format('Ym')) {
@@ -92,7 +101,9 @@ export class ListView extends CalendarView {
 			E('i','fiber_manual_record').cls('icon'),
 			time,
 			title
-		).css({color: '#'+e.color}));
+		).css({color: '#'+e.color})).on('click', () => {
+			this.detail.loadEvent(e);
+		});
 		container.append(e.divs[0]);
 
 		if(e.end.date > day.date) {

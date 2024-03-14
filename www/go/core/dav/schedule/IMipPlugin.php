@@ -3,6 +3,7 @@
 namespace go\core\dav\schedule;
 
 use go\core\ErrorHandler;
+use go\core\mail\Address;
 use go\core\model\Module;
 
 class IMipPlugin extends \Sabre\CalDAV\Schedule\IMipPlugin{
@@ -12,6 +13,7 @@ class IMipPlugin extends \Sabre\CalDAV\Schedule\IMipPlugin{
 //			$senderEmail = \GO::config()->webmaster_email;
 //		parent::__construct($senderEmail);
 //	}
+	private $itipMessage;
 
 	function schedule(\Sabre\VObject\ITip\Message $iTipMessage) {
 		$this->itipMessage = $iTipMessage;
@@ -33,8 +35,8 @@ class IMipPlugin extends \Sabre\CalDAV\Schedule\IMipPlugin{
 			$mailer->compose()
 				->setSubject($subject)
 				->setFrom(\GO::user()->email, \GO::user()->name)
-				->addReplyTo(\GO::user()->email)
-				->addTo($to['email'], $to['personal'])
+				->setReplyTo(\GO::user()->email)
+				->addTo(new Address($to['email'], $to['personal']))
 				->setSender($mailer->getSender())// Set sender to local address to avoid SPF issues. See also issue: Calendar event invite mail From address #924
 				->setBody($body, "text/calendar; method=" . (string)$this->itipMessage->method, "utf-8")
 				->send();

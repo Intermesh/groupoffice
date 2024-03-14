@@ -122,7 +122,7 @@ class Participant extends Property
 				$roles[$item] = true;
 			}
 		}
-		return $roles;
+		return (object)$roles;
 	}
 
 	/**

@@ -10,15 +10,6 @@ import {
 	table
 } from "@intermesh/goui";
 import {jmapds, validateEmail} from "@intermesh/groupoffice-core";
-import {AvailabilityWindow} from "./AvailabilityWindow.js";
-
-interface Participant {
-	email:string
-	name?:string
-	picture?:string
-	roles:string[]
-	kind:string
-}
 
 export const participantfield = (config?: Config<ParticipantField, FieldEventMap<ParticipantField>>) => createComponent(new ParticipantField(), config);
 
@@ -94,7 +85,8 @@ export class ParticipantField extends Component {
 						me.el.on('keydown' , ev => {
 							if(ev.key === 'Enter') {
 								if(validateEmail(me.input!.value)) {
-									this.addParticipant({email:me.input!.value});
+									const email = me.input!.value;
+									this.addParticipant({id:email,email});
 									me.menu.hide();
 									me.value = null;
 								}

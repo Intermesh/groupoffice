@@ -1,14 +1,14 @@
 import {checkbox, containerfield, h3, t, textfield} from "@intermesh/goui";
-import {FormWindow, modules} from "@intermesh/groupoffice-core";
+import {FormWindow} from "@intermesh/groupoffice-core";
 
 export class Settings extends FormWindow {
 
 	constructor() {
 		super('Module');
-		this.title = "Settings";
+		this.title = t("Settings");
 
 		this.form.items.insert(0,containerfield({cls:'pad flow', name:'settings'},
-			h3({html:'Video meeting'}),
+			h3({html:t('Video meeting')}),
 			textfield({label: t('Server URL'), name: 'videoUri',}),
 			checkbox({label: t("Enable JWT authentification"), name: "videoJwtEnabled", listeners: {
 

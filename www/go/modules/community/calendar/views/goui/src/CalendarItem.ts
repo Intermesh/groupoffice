@@ -4,17 +4,15 @@ import {
 	comp,
 	DateInterval,
 	DateTime,
-	DefaultEntity,
-	E, EntityID, MaterialIcon, menu,
-	Recurrence,
+	E, EntityID, MaterialIcon,
 	t,
-	tbar,
+	tbar, Timezone,
 	win
 } from "@intermesh/goui";
 import {calendarStore} from "./Index.js";
-import {client, jmapds} from "@intermesh/groupoffice-core";
+import {client, jmapds, Recurrence} from "@intermesh/groupoffice-core";
 import {EventWindow} from "./EventWindow.js";
-import {EventDetail} from "./EventDetail.js";
+import {EventDetailWindow} from "./EventDetail.js";
 
 export interface CalendarEvent extends BaseEntity {
 	id: EntityID
@@ -25,6 +23,7 @@ export interface CalendarEvent extends BaseEntity {
 	showWithoutTime?: boolean // isAllDay
 	duration: string
 	start: string
+	timeZone:Timezone
 	title: string
 	color?: string
 	isOrigin: boolean
@@ -74,6 +73,10 @@ export class CalendarItem {
 		if(!obj.start) {
 			this.start = new DateTime(obj.data.start);
 		}
+		if(obj.data.timeZone) {
+			this.start.timezone = obj.data.timeZone;
+			this.start = this.start.toTimezone(client.user.timezone as Timezone);
+		}
 		if(!obj.end) {
 			this.end = this.start.clone().add(new DateInterval(obj.data.duration!));
 		}
@@ -102,17 +105,20 @@ export class CalendarItem {
 			end = start.clone().add(new DateInterval(e.duration));
 
 		if(e.recurrenceRule) {
-			const r = new Recurrence({dtstart: new Date(e.start), rule: e.recurrenceRule, ff: from.date});
-			let rEnd = r.current.clone().add(new DateInterval(e.duration));
-			while(r.current.date < until.date && rEnd.date > from.date) {
 
-				const recurrenceId = r.current.format('Y-m-d\Th:i:s');
+			const r = new Recurrence({dtstart: new Date(e.start), rule: e.recurrenceRule});
+			//let rEnd = r.current.clone().add(new DateInterval(e.duration));
+			for(const date of r.loop(from, until)){
+			//while(r.current.date < until.date && rEnd.date > from.date) {
+				let rEnd = date.clone().add(new DateInterval(e.duration));
+
+				const recurrenceId = date.format('Y-m-d\Th:i:s');
 				if (e.recurrenceOverrides && recurrenceId in e.recurrenceOverrides) {
 					const o = e.recurrenceOverrides[recurrenceId];
 					if(o.excluded) {
 						// excluded
 					} else {
-						const overideStart = o.start ? new DateTime(o.start) : r.current.clone();
+						const overideStart = o.start ? new DateTime(o.start) : date.clone();
 						yield new CalendarItem({
 							key: e.id + '/' + recurrenceId,
 							recurrenceId: recurrenceId,
@@ -127,15 +133,15 @@ export class CalendarItem {
 					yield new CalendarItem({
 						key: e.id + '/' + recurrenceId,
 						recurrenceId: recurrenceId,
-						start: r.current.clone(),
+						start: date.clone(),
 						end: rEnd,
 						data: e
 					});
 				}
-				if(!r.next()) {
-					break;
-				}
-				rEnd = r.current.clone().add(new DateInterval(e.duration));
+				// if(!r.next()) {
+				// 	break;
+				// }
+				// rEnd = r.current.clone().add(new DateInterval(e.duration));
 				//}
 				//} while(r.current.date < until.date && r.next())
 			}
@@ -234,7 +240,7 @@ export class CalendarItem {
 	open(onCancel?: Function) {
 		//if (!ev.data.id) {
 
-		const dlg = !this.isOwner ? new EventDetail() : new EventWindow();
+		const dlg = !this.isOwner ? new EventDetailWindow() : new EventWindow();
 		if(dlg instanceof EventWindow) {
 			dlg.on('close', () => {
 				// cancel ?

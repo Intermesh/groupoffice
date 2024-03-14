@@ -3,9 +3,29 @@ CREATE TABLE IF NOT EXISTS `calendar_resource_group`
 	id          int UNSIGNED NOT NULL auto_increment,
 	name        varchar(200) null,
 	description mediumtext   null,
+	`createdBy` INT NULL,
 	constraint calendar_resource_group_pk
-		primary key (id)
+		primary key (id),
+	CONSTRAINT `fk_calendar_resource_group_core_user_creator`
+		FOREIGN KEY (`createdBy`)
+			REFERENCES `core_user` (`id`)
+			ON DELETE SET NULL
 ) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `calendar_resource_group_admins` (
+	`groupId` int UNSIGNED NOT NULL,
+	`userId` int(11) NOT NULL,
+	PRIMARY KEY (`groupId`,`userId`),
+	CONSTRAINT `fk_calendar_resource_group_admins_resource_group1`
+		FOREIGN KEY (`groupId`)
+			REFERENCES `calendar_resource_group` (`id`)
+			ON DELETE CASCADE
+			ON UPDATE NO ACTION,
+	CONSTRAINT `fk_calendar_resource_group_admins_core_user`
+		FOREIGN KEY (`userId`)
+			REFERENCES `core_user` (`id`)
+			ON DELETE CASCADE
+) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `calendar_calendar` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -106,9 +126,9 @@ CREATE TABLE IF NOT EXISTS `calendar_default_alert_with_time` (
 CREATE TABLE IF NOT EXISTS `calendar_event` (
 	`eventId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`prodId` VARCHAR(100) NOT NULL DEFAULT 'GroupOffice',
-	`uid` VARCHAR(45) NOT NULL,
+	`uid` VARCHAR(255) NOT NULL,
 	`sequence` INT UNSIGNED NOT NULL DEFAULT 1,
-	`title` VARCHAR(45) NOT NULL,
+	`title` VARCHAR(255) NOT NULL,
 	`description` TEXT NULL,
 	`location` VARCHAR(255) NOT NULL DEFAULT '',
 	`locale` VARCHAR(6) NULL,
@@ -166,10 +186,10 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_event` (
 -- Table `calendar_participant`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `calendar_participant` (
-	`id` VARCHAR(60) NOT NULL,
+	`id` VARCHAR(128) NOT NULL,
 	`eventId` INT UNSIGNED NOT NULL,
-	`name` VARCHAR(45) NULL,
-	`email` VARCHAR(45) NOT NULL,
+	`name` VARCHAR(100) NULL,
+	`email` VARCHAR(128) NOT NULL,
 	`kind` ENUM('individual', 'group', 'location', 'resource') NOT NULL,
 	`rolesMask` INT NOT NULL DEFAULT 0,
 	`language` VARCHAR(20),
@@ -329,7 +349,7 @@ CREATE TABLE IF NOT EXISTS `calendar_category` (
 	INDEX `user_id` (`ownerId` ASC),
 	constraint calendar_category_ibfk_1
 		foreign key (ownerId) references core_user (id)
-			on delete cascade,
+			on delete set null,
 	constraint calendar_category_calendar_ibfk_9
 		foreign key (calendarId) references calendar_calendar (id)
 			on delete cascade)
@@ -355,13 +375,8 @@ CREATE TABLE IF NOT EXISTS `calendar_event_category` (
 	DEFAULT CHARACTER SET = utf8mb4
 	COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `calendar_event_custom_fields` (
-	`id` INT UNSIGNED NOT NULL,
-	PRIMARY KEY (`id`),
-	CONSTRAINT `fk_event_calendar_event_cf1` FOREIGN KEY (`id`) REFERENCES `calendar_event` (`eventId`) ON DELETE CASCADE
-) ENGINE = InnoDB;
 
-CREATE TABLE calendar_preferences (
+CREATE TABLE IF NOT EXISTS calendar_preferences (
 	userId                INT NOT NULL PRIMARY KEY,
 	weekViewGridSnap      INT NULL,
 	defaultDuration       VARCHAR(32) NULL,
@@ -378,37 +393,70 @@ CREATE TABLE calendar_preferences (
 		REFERENCES core_user (id) ON DELETE CASCADE
 ) COLLATE = utf8mb4_unicode_ci;
 
--- TODO: group_admins (user_id, fields, show_not_as_busy)
+
+CREATE TABLE IF NOT EXISTS `calendar_event_custom_fields` (
+	`id` INT UNSIGNED NOT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `fk_calendar_event_cf1` FOREIGN KEY (`id`) REFERENCES `calendar_event` (`eventId`) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `calendar_calendar_custom_fields` (
+	`id` INT UNSIGNED NOT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `fk_calendar_cf1` FOREIGN KEY (`id`) REFERENCES `calendar_calendar` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+-- missing: (fields, show_not_as_busy)
 INSERT INTO calendar_resource_group
-	(id, name,description) SELECT
-   id, name, '' FROM cal_groups;
+	(id, name,description, createdBy) SELECT
+   id, name, '', user_id FROM cal_groups;
+
+INSERT INTO calendar_resource_group_admins
+	(groupId, userId) SELECT
+	group_id, user_id FROM cal_group_admins;
 
 -- TODO: AVG(color) ?
 INSERT INTO calendar_calendar
 	(id,		name, description, color, timeZone, groupId, aclId,createdBy,ownerId) SELECT
-   cal.id, name, comment,cu.color, null, 		group_id, acl_id, 1,			cal.user_id FROM
-  cal_calendars cal JOIN cal_calendar_user_colors cu ON cal.id = cu.calendar_id GROUP BY cal.id;
+   cal.id, name, comment,IFNULL(cu.color, '1652a1'), null, 	IF(group_id=1,null,group_id), acl_id, 1,	cal.user_id FROM
+  cal_calendars cal LEFT JOIN cal_calendar_user_colors cu ON cal.id = cu.calendar_id GROUP BY cal.id;
 
-INSERT INTO calendar_calendar_user
+-- subscribe to own calendar
+INSERT IGNORE INTO calendar_calendar_user
+(id, userId, isSubscribed, isVisible, color, sortOrder, timeZone, includeInAvailability, modSeq) SELECT
+	cal.id, user_id, 1, 1, IFNULL(background,'1652a1'), 0, null, 'all', 1 FROM cal_calendars cal JOIN core_user u ON cal.user_id = u.id where group_id=1 ;
+
+-- subscribe every user who added a color to 1 of the visible calendars
+INSERT IGNORE INTO calendar_calendar_user
 	(id, userId, isSubscribed, isVisible, color, sortOrder, timeZone, includeInAvailability, modSeq) SELECT
- 	 id, cu.user_id, 1, 0, color, 0, null, IF(cal.user_id=0, 'attending', 'all'), 1 FROM
+ 	 id, cu.user_id, 1, 0, color, 1, null, IF(cal.user_id=0, 'attending', 'all'), 1 FROM
  	cal_calendar_user_colors cu JOIN cal_calendars cal ON cal.id = cu.calendar_id;
 
--- TODO: default_alerts from user settings.
 
--- TODO: derive ownerId from acl_id
+
+INSERT IGNORE INTO calendar_default_alert_with_time
+  (offset, relativeTo, `when`, calendarId, userId) SELECT
+  CONCAT('PT',reminder,'S'), 'start', null, calendar_id, user_id FROM cal_settings WHERE calendar_id != '0';
+
 INSERT INTO calendar_category
-	(id, name, ownerId, calendarId) SELECT
-	 id, name, 1, calendar_id FROM cal_categories;
+	(id, name, color, ownerId, calendarId) SELECT
+	 id, name, color, null, calendar_id FROM cal_categories;
 
--- TODO: we need the instance belonging to the organizer if that doesn't exist any other will do.
--- TODO: correct locale, duration, rrule, repeat_end_time (for recurring events)
+-- insert instance that belongs to the organizer
 INSERT INTO calendar_event
 	(eventId, prodId, uid, sequence, title, description, location, showWithoutTime, start, timeZone, duration, priority,
 	 privacy,status,recurrenceRule,lastOccurrence,createdAt,modifiedAt, createdBy, modifiedBy, isOrigin, replyTo, requestStatus) SELECT
-	id, 'Group-Office', uuid, 1, name, description, location, all_day_event, FROM_UNIXTIME(start_time), timezone, 'P1H', 0,
-	IF(private=1, 'private', 'public'), LOWER(status), rrule, FROM_UNIXTIME(end_time), FROM_UNIXTIME(ctime), FROM_UNIXTIME(mtime), user_id, muser_id, MAX(is_organizer), '',''
-FROM cal_events WHERE exception_for_event_id = 0 GROUP BY uuid;
+	id, 'Group-Office', uuid, 1, name, description, location, all_day_event, FROM_UNIXTIME(start_time), timezone, CONCAT('PT',end_time-start_time,'S'), 0,
+	IF(private=1, 'private', 'public'), LOWER(status), IF(rrule='',null,rrule), FROM_UNIXTIME(end_time), FROM_UNIXTIME(ctime), FROM_UNIXTIME(mtime), user_id, muser_id, 1, '',''
+FROM cal_events WHERE exception_for_event_id = 0 AND is_organizer = 1 GROUP BY uuid;
+
+-- insert the events that have no organizer
+INSERT INTO calendar_event
+(eventId, prodId, uid, sequence, title, description, location, showWithoutTime, start, timeZone, duration, priority,
+ privacy,status,recurrenceRule,lastOccurrence,createdAt,modifiedAt, createdBy, modifiedBy, isOrigin, replyTo, requestStatus) SELECT
+ id, 'Group-Office', uuid, 1, name, description, location, all_day_event, FROM_UNIXTIME(start_time), timezone, CONCAT('PT',end_time-start_time,'S'), 0,
+ IF(private=1, 'private', 'public'), LOWER(status), IF(rrule='',null,rrule), FROM_UNIXTIME(end_time), FROM_UNIXTIME(ctime), FROM_UNIXTIME(mtime), user_id, muser_id, 0, '',''
+FROM cal_events WHERE exception_for_event_id = 0 GROUP BY uuid HAVING SUM(is_organizer) = 0;
 
 INSERT INTO calendar_calendar_event
 (id, eventId, calendarId) SELECT null, id, calendar_id FROM cal_events WHERE exception_for_event_id = 0;
@@ -424,24 +472,21 @@ INSERT INTO calendar_event_category
 
 INSERT INTO calendar_event_custom_fields SELECT * FROM cal_events_custom_fields;
 
--- TODO: use script to generated blobIds where files_folder_id and attach (recursive but files only)
-INSERT INTO calendar_event_link
-	(id, eventId, href, title, contentType, size, rel, blobId)
-
--- calendar_event_location and calendar_Event_realted are unused for now.
+-- calendar_event_location and calendar_event_related are unused for now.
 
 INSERT INTO calendar_event_user
 	(eventId, userId, freeBusyStatus, color, useDefaultAlerts, veventBlobId, modSeq) SELECT
-	id, user_id, if(busy=1,'busy', 'free'), background, IF(reminder=0, 1, 0), null, 1 FROM cal_events WHERE exception_for_event_id = 0;
+	e.id, e.user_id, if(e.busy=1,'busy', 'free'), e.background, IF(e.reminder=0, 1, 0), null, 1 FROM cal_events e
+		JOIN calendar_event ce ON ce.eventId = e.id JOIN core_user u ON e.user_id = u.id  WHERE e.exception_for_event_id = 0;
+-- skip per-user properties of events without organizer
 
--- TODO: solve bitwise_magic()
 INSERT INTO calendar_participant
 	(id, eventId, name, email, kind, rolesMask, participationStatus, scheduleAgent, expectReply, scheduleUpdated) SELECT
-	id, event_id, name, email, 'individual', BITWISE_MAGIC(is_organizer, role), LOWER(status),'server',1,FROM_UNIXTIME(last_modified) FROM cal_participants;
+	id, event_id, name, email, 'individual', IF(role='REQ-PARTICIPANT',2,0)+is_organizer, LOWER(p.status),'server',1,FROM_UNIXTIME(IF(last_modified='',0, last_modified)) FROM cal_participants p JOIN calendar_event ce ON ce.eventId = event_id;
 
--- TODO: insert overrides with exceptons using script
-INSERT INTO calendar_recurrence_override
+
+INSERT IGNORE INTO calendar_recurrence_override
 	(fk, recurrenceId, patch) SELECT
-	event_id,FROM_UNIXTIME(time), '{"excluded":true}' FROM cal_exceptions WHERE exception_event_id=0;
+	event_id,FROM_UNIXTIME(time), '{"excluded":true}' FROM cal_exceptions e JOIN calendar_event ce ON ce.eventId = e.event_id WHERE exception_event_id=0;
 
-INSERT INTO calendar_preferences SELECT * FROM cal_settings;
+INSERT INTO calendar_preferences (userId, weekViewGridSnap, defaultCalendarId) SELECT user_id, 15, calendar_id FROM cal_settings s JOIN core_user u ON u.id = s.user_id;
