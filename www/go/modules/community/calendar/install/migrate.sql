@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_user` (
 -- Table `calendar_default_alert`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `calendar_default_alert` (
-	`id` INT UNSIGNED NOT NULL,
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`offset` VARCHAR(20) NULL,
 	`relativeTo` ENUM('start', 'end') NOT NULL DEFAULT 'start',
 	`when` DATE NULL,
@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS `calendar_default_alert` (
 -- Table `calendar_default_alert_with_time`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `calendar_default_alert_with_time` (
-	`id` INT UNSIGNED NOT NULL,
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`offset` VARCHAR(20) NULL,
 	`relativeTo` ENUM('start', 'end') NOT NULL DEFAULT 'start',
 	`when` DATETIME NULL,
@@ -435,8 +435,8 @@ INSERT IGNORE INTO calendar_calendar_user
 
 
 INSERT IGNORE INTO calendar_default_alert_with_time
-  (offset, relativeTo, `when`, calendarId, userId) SELECT
-  CONCAT('PT',reminder,'S'), 'start', null, calendar_id, user_id FROM cal_settings WHERE calendar_id != '0';
+  (`offset`, relativeTo, calendarId, userId) SELECT
+  CONCAT('PT',reminder,'S'), 'start', calendar_id, user_id FROM cal_settings WHERE calendar_id != '0';
 
 INSERT INTO calendar_category
 	(id, name, color, ownerId, calendarId) SELECT
@@ -463,8 +463,8 @@ INSERT INTO calendar_calendar_event
 
 -- TODO: should we bother with past events?
 INSERT INTO calendar_event_alert
-	(id, offset, relativeTo, `when`, eventId, userId) SELECT
-	1, CONCAT('PT',reminder,'S'), 'start', null, id, user_id FROM cal_events WHERE exception_for_event_id = 0;
+	(id, `offset`, relativeTo, eventId, userId) SELECT
+	1, CONCAT('PT',reminder,'S'), 'start', id, user_id FROM cal_events WHERE exception_for_event_id = 0;
 
 INSERT INTO calendar_event_category
 	(eventId, categoryId) SELECT

@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_user` (
 -- Table `calendar_default_alert`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `calendar_default_alert` (
-    `id` INT UNSIGNED NOT NULL,
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `offset` VARCHAR(20) NULL,
     `relativeTo` ENUM('start', 'end') NOT NULL DEFAULT 'start',
     `when` DATE NULL,
@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS `calendar_default_alert` (
 -- Table `calendar_default_alert_with_time`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `calendar_default_alert_with_time` (
-  `id` INT UNSIGNED NOT NULL,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `offset` VARCHAR(20) NULL,
     `relativeTo` ENUM('start', 'end') NOT NULL DEFAULT 'start',
     `when` DATETIME NULL,
