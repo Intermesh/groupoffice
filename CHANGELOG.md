@@ -1,3 +1,5 @@
+- Support / Core: GOUI was incompatible with 6.8 due to changes for 6.9+.
+
 11-03-2024: 6.8.38
 - Core: Report if sourceguardian is not installed when setting license key
 - Billing: handle double click submit in DuplicateDialog.js
