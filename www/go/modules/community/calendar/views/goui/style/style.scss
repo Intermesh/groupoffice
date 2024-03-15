@@ -690,16 +690,16 @@ $timeMargin: dp(72);
 	}
 }
 
-.participant-field {
-	.goui-pit {
-		border-bottom: 0;
-		border-bottom-left-radius: 0;
-		border-bottom-right-radius: 0;
-		padding-bottom: dp(8);
-	}
-	.goui-form-field .wrap {
-	}
-}
+//.participant-field {
+//	.goui-pit {
+//		border-bottom: 0;
+//		border-bottom-left-radius: 0;
+//		border-bottom-right-radius: 0;
+//		padding-bottom: dp(8);
+//	}
+//	.goui-form-field .wrap {
+//	}
+//}
 
 @media only screen and (max-width: 845px) {
 	.cal.week > ul:first-child em {
