@@ -35,6 +35,8 @@ trait PrincipalTrait {
 		return true;
 	}
 
+	public bool $savePrincipal = true;
+
 	/**
 	 * Save entity to search cache
 	 *
@@ -44,7 +46,7 @@ trait PrincipalTrait {
 	 */
 	public function savePrincipal(bool $checkExisting = true): bool
 	{
-		if(!$this->isPrincipal() || !$this->isFetchedComplete()) {
+		if(!$this->savePrincipal || !$this->isPrincipal() || !$this->isFetchedComplete()) {
 			return true;
 		}
 		$principal = $checkExisting ?
