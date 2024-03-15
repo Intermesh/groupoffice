@@ -1250,7 +1250,7 @@ Ext.override(Ext.form.Field, {
 	isModified: function() {
 		return this.isDirty();
 	},
-
+//For GOUI compat
 	trackReset: function() {
 		this.dirty = false;
 		this.originalValue = this.getValue();

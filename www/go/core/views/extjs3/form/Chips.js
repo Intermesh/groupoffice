@@ -177,6 +177,19 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	isDirty: function () {
 		return this._isDirty;
 	},
+
+	//For GOUI compat
+	isModified: function() {
+		return this.isDirty();
+	},
+//For GOUI compat
+	trackReset: function() {
+		this.dirty = false;
+		this.originalValue = this.getValue();
+		if(this.setNotDirty) {
+			this.setNotDirty();
+		}
+	},
 	
 	setValue: function (values) {
 
