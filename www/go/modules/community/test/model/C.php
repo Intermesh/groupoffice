@@ -6,9 +6,9 @@ use go\core\orm\Mapping;
 
 class C extends Entity {
 	
-	public $id;
+	public ?int $id;
 	
-	public $name;
+	public string $name;
 	
 	protected static function defineMapping(): Mapping
 	{

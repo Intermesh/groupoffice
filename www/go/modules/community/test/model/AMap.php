@@ -6,11 +6,11 @@ use go\core\orm\Mapping;
 
 class AMap extends \go\core\orm\Property {
 	
-	public $aId;
+	public ?int $aId;
 	
-	public $anotherAId;
+	public ?int $anotherAId;
 	
-	public $description;
+	public string $description;
 	
 	protected static function defineMapping(): Mapping
 	{

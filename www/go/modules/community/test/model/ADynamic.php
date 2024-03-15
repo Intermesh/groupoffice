@@ -6,13 +6,13 @@ use go\core\orm\Mapping;
 
 class ADynamic extends \go\core\orm\Property {
 	
-	protected $id;
+	protected ?int $id;
 	
-	protected $aId;
+	protected ?int $aId;
 	
-	public $propA;
+	public string $propA;
 	
-	public $propC = "dynamic!";
+	public string $propC = "dynamic!";
 	
 	protected static function defineMapping(): Mapping
 	{
