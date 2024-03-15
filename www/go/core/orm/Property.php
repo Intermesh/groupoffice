@@ -2114,35 +2114,10 @@ abstract class Property extends Model {
 			return true;
 		}
 
-		switch ($column->dbType) {
-
-			case 'int':
-			case 'tinyint':
-			case 'smallint':
-			case 'bigint':
-
-			case 'float':
-			case 'double':
-			case 'decimal':
-
-			case 'localdatetime':
-			case 'datetime':
-			case 'date':
-
-			case 'binary':
-				if (!isset($this->{$column->name})) {
-					$this->setValidationError($column->name, ErrorCode::REQUIRED);
-					return false;
-				}
-				break;
-			default:
-				if (empty($this->{$column->name})) {
-					$this->setValidationError($column->name, ErrorCode::REQUIRED);
-					return false;
-				}
-				break;
+		if (!isset($this->{$column->name})) {
+			$this->setValidationError($column->name, ErrorCode::REQUIRED);
+			return false;
 		}
-
 
 		return true;
 	}
