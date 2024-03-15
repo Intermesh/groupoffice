@@ -22,6 +22,8 @@ class B extends A {
 	public string $propB;
 
 	public string $propC;
+
+	public string $propE;
 	
 	public ?int $cId;
 	

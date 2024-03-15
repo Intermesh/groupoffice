@@ -46,7 +46,8 @@ CREATE TABLE `test_a_has_one` (
 CREATE TABLE `test_b` (
   `id` int(11) NOT NULL,
   `propB` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `propC` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT "test",
+  `propC` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'test',
+  `propE` MEDIUMTEXT NOT NULL DEFAULT '{}',
   `cId` int(11) DEFAULT NULL,
   `userId` int(11) NOT NULL
 ) ENGINE=InnoDB;

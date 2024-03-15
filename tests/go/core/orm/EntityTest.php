@@ -24,6 +24,13 @@ class EntityTest extends TestCase {
 		$this->assertEquals(0, $stmt->rowCount());
 	}
 
+	public function testDefaultValueFromDB() {
+		$entity = new B();
+
+		$this->assertEquals("test", $entity->propC);
+		$this->assertEquals("{}", $entity->propE);
+	}
+
 	public function testCreate() {
 
 		$entity = new B();

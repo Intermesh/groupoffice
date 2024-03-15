@@ -230,19 +230,31 @@ class Table {
 				break;
 			
 			case 'text':
+				if(isset($c->default)) {
+					$c->default = trim($c->default, "'\"");
+				}
 				$c->length = 65535;
 				$c->trimInput = true;
 				break;
 			case 'longtext':
+				if(isset($c->default)) {
+					$c->default = trim($c->default, "'\"");
+				}
 				$c->length = 4294967295;
 				$c->trimInput = true;
 				break;
 			case 'mediumtext':
+				if(isset($c->default)) {
+					$c->default = trim($c->default, "'\"");
+				}
 				$c->length = 16777215;
 				$c->trimInput = true;
 				break;
 
 			case 'tinytext':
+				if(isset($c->default)) {
+					$c->default = trim($c->default, "'\"");
+				}
 				$c->length = 255;
 				$c->trimInput = true;
 				break;
