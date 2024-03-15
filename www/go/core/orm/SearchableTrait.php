@@ -294,7 +294,7 @@ trait SearchableTrait {
 					$m->saveSearch();
 					echo ".";
 
-				} catch (Exception $e) {
+				} catch (\Throwable $e) {
 					echo "Error: " . $m->id() . ' '. $m->title() ." : " . $e->getMessage() ."\n";
 					ErrorHandler::logException($e);
 
