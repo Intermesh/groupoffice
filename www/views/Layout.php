@@ -64,8 +64,8 @@ $lang = go()->getLanguage()->getIsoCode();
 <?php endif;?>
 
 <?php if($loadGoui): ?>
-    <link rel="stylesheet" media="screen,print" href="<?= $webclient->getBaseUrl();?>views/goui/dist/goui/style/<?= $gouiStyleSheet ?>" />
-    <link rel="stylesheet" media="screen" href="<?= $webclient->getBaseUrl();?>views/goui/dist/groupoffice-core/style/style.css" />
+<!--    <link rel="stylesheet" media="screen,print" href="--><?php //= $webclient->getBaseUrl();?><!--views/goui/dist/goui/style/--><?php //= $gouiStyleSheet ?><!--" />-->
+    <link rel="stylesheet" media="screen" href="<?= $webclient->getBaseUrl();?>views/goui/dist/groupoffice-core/style/<?= $gouiStyleSheet ?>" />
 <?php endif; ?>
 
 <?php if(!empty(GO()->getConfig()['custom_css_url'])): ?>
