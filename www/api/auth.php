@@ -129,7 +129,14 @@ try {
 
 			break;
 		case 'forgotten':
+			$start = (int) (microtime(true) * 1000);
+
 			$auth->sendRecoveryMail($data['email']);
+
+			//always take 4s to prevent timing attacks
+			$wait = 4000 + $start - ((int) (microtime(true) * 1000));
+			if($wait > 0)
+				usleep($wait * 1000);
 			//Don't show if user was found or not for security
 			output([], 200, "Recovery mail sent");
 			break;
