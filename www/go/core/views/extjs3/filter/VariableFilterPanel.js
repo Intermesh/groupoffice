@@ -36,27 +36,31 @@ go.filter.VariableFilterPanel = Ext.extend(Ext.Panel, {
 			return entityStore.get(response.ids);
 		}).then(function(result) {
 			result.entities.forEach(function(f) {
-				var filterConfig = go.Entities.get(me.entity).filters[f.name];
+				const filterConfig = go.Entities.get(me.entity).filters[f.name];
 				if(!filterConfig) {
 					console.warn('No such filter: ' + f.name);
 					return;
 				}
-				var cfg = me.getFilterCmp(filterConfig);
+				const cfg = me.getFilterCmp(filterConfig);
 				if(!cfg) {
 					return;
 				}
-				var cmp = Ext.create(cfg);
+				const cmp = Ext.create(cfg);
 				cmp.serverId = f.id;
 
-				var chipView = new go.form.ChipsView();
+				const chipView = new go.form.ChipsView();
 				chipView.filter = f;
 				chipView.store.on('add', me.load, me);
 				chipView.store.on('remove', me.load, me);
-				var event = cmp.events.select ? 'select' : 'change';
+				const event = cmp.events.select ? 'select' : 'change';
 				cmp.on(event, function(cmp) {
-					var v = cmp.getValue();
+					let v = cmp.getValue();
 
 					if(!v) {
+						if(event === "select") {
+							chipView.store.removeAll();
+							me.load();
+						}
 						return;
 					}
 

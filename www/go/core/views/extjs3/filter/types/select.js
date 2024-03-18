@@ -33,8 +33,7 @@ go.filter.types.select = Ext.extend(go.form.ComboBox, {
 	filter: null,
 	hiddenName: 'value',
 	initComponent: function () {
-		
-		Ext.apply(this, {				
+		Ext.apply(this, {
 				hideLabel: false,
 				store: new Ext.data.JsonStore({
 					fields: ['value', 'title'],		
@@ -47,7 +46,7 @@ go.filter.types.select = Ext.extend(go.form.ComboBox, {
 				triggerAction: 'all',
 				editable: false,
 				selectOnFocus: true,
-				forceSelection: true				
+				forceSelection: true
 			});			
 			
 		go.filter.types.select.superclass.initComponent.call(this);

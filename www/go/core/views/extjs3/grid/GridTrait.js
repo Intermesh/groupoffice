@@ -1,13 +1,5 @@
 go.grid.GridTrait = {
-//	/**
-//	 * If the end of the list is within this number of pixels it will request the next page	
-//	 */
-//	scrollBoundary: 300,
-//	
-//	pageSize: 20,
-	
-	//scrollUp: false,  // set to true when you need to loadMore when scrolling up
-	
+
 	/**
 	 * Init scrollloader for loading more records when scrolling
 	 */
@@ -60,14 +52,6 @@ go.grid.GridTrait = {
 		if(this.getView().actionConfig) {
 
 			this.on('viewready', function(){
-				// this.getView().actionBtn.on('click', function(btn) {
-				// 	//this.getSelectionModel().selectRow(btn.rowIndex);
-				// }, this);
-
-				// this.on('rowclick', (grid, rowIndex, e) => {
-				// 	this.getView().showActionButton(rowIndex);
-				// });
-
 				this.on('rowcontextmenu', (grid, rowIndex, e) => {
 					e.preventDefault();
 					this.getSelectionModel().selectRow(rowIndex);
@@ -323,8 +307,9 @@ go.grid.GridTrait = {
 
 		function onDeleteKey(key, e){
 			//sometimes there's a search input in the grid, so dont delete when focus is on an input
-			if(e.target.tagName!='INPUT')
+			if(e.target.tagName!='INPUT') {
 				this.deleteSelected();
+			}
 		}
 
 		this.keys.push({
