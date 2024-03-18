@@ -170,6 +170,12 @@ class Authenticate {
 
 		if(!$authenticator) {
 
+			// If we get here then the given username doesn't exist.
+			// Do a password_verify for timing attacks as this would be done for a
+			// valid user.
+
+			password_verify("randomboguspasswordstring", '$2y$10$wkP8uDjY/tt5GNrfJJO9SOknqStW0POBn5Z4zpctuQkMP7pibTz2m');
+
 			User::fireEvent(User::EVENT_BADLOGIN, $username, null);
 
 			return false;
