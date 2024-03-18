@@ -73,15 +73,15 @@ abstract class AclEntity extends Entity {
 		if(!$acls) {
 			return $result;
 		}
-		$oldAclIds = Acl::wereGranted(go()->getUserId(), $states[2]['modSeq'], $acls)->all();
-		$currentAclIds = Acl::areGranted(go()->getUserId(), $acls)->all();
-		$changedAcls = array_merge(array_diff($oldAclIds, $currentAclIds), array_diff($currentAclIds, $oldAclIds));
 
-		//add AclItemEntity changes based on permissions		
-		if(empty($changedAcls)) {
+		$changes = Acl::changeLog(go()->getUserId(), $states[2]['modSeq'], $acls);
 
+		//add AclItemEntity changes based on permissions
+		if(empty($changes)) {
 			return $result;
 		}
+
+		$changedAcls = array_keys($changes);
 
 		$isAclItem = is_a(static::class, AclItemEntity::class, true);			
 
@@ -116,7 +116,7 @@ abstract class AclEntity extends Entity {
 				continue;
 			}
 
-			if(in_array($aclId, $currentAclIds)) {
+			if($changes[$aclId]) {
 				$result['changed'][] = $id;
 			} else
 			{
@@ -128,8 +128,6 @@ abstract class AclEntity extends Entity {
 			if($i == $maxChanges) {
 				break;
 			}
-			
-			
 		}
 		
 		if($stmt->rowCount() > $maxChanges) {

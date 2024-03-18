@@ -1533,3 +1533,12 @@ $updates['202310301526'][] = "alter table core_search
 
 $updates['202310301526'][] = "create index core_search_filter_index
     on core_search (filter);";
+
+
+$updates['202310301526'][] = "delete from core_acl_group_changes;";
+
+$updates['202310301526'][] = "alter table core_acl_group_changes change grantModSeq modSeq int not null;";
+
+$updates['202310301526'][] = "alter table core_acl_group_changes  add granted boolean not null;";
+
+$updates['202310301526'][] = "alter table core_acl_group_changes drop column revokeModSeq;";

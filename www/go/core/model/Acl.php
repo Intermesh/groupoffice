@@ -137,8 +137,8 @@ class Acl extends Entity {
 											[
 													'aclId' => $this->id, 
 													'groupId' => $groupId, 
-													'grantModSeq' => $modSeq,
-													'revokeModSeq' => null
+													'modSeq' => $modSeq,
+													'granted' => true
 											]
 											)->execute();
 			if(!$success) {
@@ -148,16 +148,14 @@ class Acl extends Entity {
 		
 		foreach ($removedGroupIds as $groupId) {
 			$success = App::get()->getDbConnection()
-						->update('core_acl_group_changes', 
-										[												
-											'revokeModSeq' => $modSeq											
-										],
-										[
-											'aclId' => $this->id, 
-											'groupId' => $groupId,
-											'revokeModSeq' => null
-										]
-										)->execute();
+				->insert('core_acl_group_changes',
+					[
+						'aclId' => $this->id,
+						'groupId' => $groupId,
+						'modSeq' => $modSeq,
+						'granted' => false
+					]
+				)->execute();
 			if(!$success) {
 				return false;
 			}
@@ -389,108 +387,37 @@ class Acl extends Entity {
 			->where('ag.aclId', '=', $this->id);
 	}
 
-	/**
-	 * Get all ACL id's that have been granted since a given state
-	 * 
-	 * @param int $userId 
-	 * @param int $sinceState	 
-	 * @return Query
-	 */
-	public static function findGrantedSince(int $userId, $sinceState, Query $acls = null): Query
-	{
-		
-		//select ag.aclId from core_acl_group ag 
-		//inner join core_user_group ug on ag.groupId = ug.groupId
-		//where ug.userId = 4
-		//
-		//and ag.aclId not in (
-		//	select agc.aclId from core_acl_group_changes agc 
-		//	inner join core_user_group ugc on agc.groupId = ugc.groupId
-		//	where ugc.userId = 4 and agc.grantModSeq <= 3  AND (agc.revokeModSeq IS null or agc.revokeModSeq > 3)
-		//
-		//)
 
-		
-		return self::areGranted($userId, $acls)
-						->andWhere('ag.aclId', 'NOT IN', self::wereGranted($userId, $sinceState, $acls));		
-	}
-	
 	/**
-	 * Get all ACL id's that have been revoked since a given state
-	 * 
+	 * Get ACL changes
+	 *
 	 * @param int $userId
-	 * @param int $sinceState
-	 * @return Query
+	 * @param string $sinceState
+	 * @param Query|null $acls
+	 * @return array<boolean> AclId as key and granted as value.
 	 */
-	public static function findRevokedSince($userId, $sinceState, Query $acls = null) {
-		
-		//select agc.aclId from core_acl_group_changes agc 
-		//inner join core_user_group ugc on agc.groupId = ugc.groupId
-		//where ugc.userId = 4 and agc.grantModSeq <= 3  AND (agc.revokeModSeq IS null or agc.revokeModSeq > 3)
-		//
-		//and agc.aclId not in (
-		//	select ag.aclId from core_acl_group ag 
-		//	inner join core_user_group ug on ag.groupId = ug.groupId
-		//	where ug.userId = 4
-		//)
-		
-		return self::wereGranted($userId, $sinceState, $acls)
-						->andWhere('agc.aclId', 'NOT IN', self::areGranted($userId, $acls));		
-	}
-	
+	public static function changeLog(int $userId, string $sinceState, Query $acls = null): array {
+		$query = (new Query())
+			->select('agc.aclId, granted')
+			->from('core_acl_group_changes', 'agc')
+			->join('core_user_group', 'ugc', 'agc.groupId = ugc.groupId')
+			->where('ugc.userId', '=', $userId)
+			->andWhere('agc.modSeq', '>', $sinceState);
 
-	
-	/**
-	 * Get all the Acl IDs that currently include read permissions for the given user.
-	 * 
-	 * @param int $userId
-	 * @param Query $acls Only check the given ACL's. This query should select a single column returning ACL ids.
-	 * @return Query
-	 */
-	public static function areGranted($userId, Query $acls = null) {
-		$query = (new Query())
-						->distinct()
-						->selectSingleValue('ag.aclId')
-						->from('core_acl_group', 'ag')
-						->join('core_user_group', 'ug', 'ag.groupId = ug.groupId')
-						->where('ug.userId', '=', $userId);
-		
-		if(isset($acls)) {
-			$query->andWhere('ag.aclId', 'IN', $acls);
-		}
-		
-		return $query;
-	}
-	
-	/**
-	 * Get all the Acl IDs that include read permissions for the given user at a given state in the past.
-	 * 
-	 * @param int $userId
-	 * @param string $sinceState The state
-	 * @param Query $acls Only check the given ACL's. This query should select a single column returning ACL ids.
-	 * @return Query
-	 */
-	public static function wereGranted($userId, $sinceState, Query $acls = null) {
-		$query = (new Query())
-						->selectSingleValue('agc.aclId')
-						->distinct()
-						->from('core_acl_group_changes', 'agc')
-						->join('core_user_group', 'ugc', 'agc.groupId = ugc.groupId')
-						->where('ugc.userId', '=', $userId)
-						->andWhere('agc.grantModSeq', '<=', $sinceState)
-						->andWhere(
-										(new Criteria())
-										->where('agc.revokeModSeq', 'IS', NULL)
-										->orWhere('agc.revokeModSeq', '>', $sinceState)
-										);
-		
 		if(isset($acls)) {
 			$query->andWhere('agc.aclId', 'IN', $acls);
 		}
-		
-		return $query;
-	}
 
+		go()->debug($query);
+
+		$map = [];
+		foreach($query as $rec) {
+			$map[$rec['aclId']] = $rec['granted'];
+		}
+
+		go()->debug($map);
+		return $map;
+	}
 
 	/**
 	 * Get the ACL that can be used to make things read only for everyone.
