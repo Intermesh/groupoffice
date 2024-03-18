@@ -1,4 +1,6 @@
 - Support / Core: GOUI was incompatible with 6.8 due to changes for 6.9+.
+- Core: prevent timing attack on password recovery
+- Core: prevent timing attack on login
 
 11-03-2024: 6.8.38
 - Core: Report if sourceguardian is not installed when setting license key
