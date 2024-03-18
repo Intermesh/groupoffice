@@ -1535,10 +1535,17 @@ $updates['202310301526'][] = "create index core_search_filter_index
     on core_search (filter);";
 
 
-$updates['202310301526'][] = "delete from core_acl_group_changes;";
+$updates['202403181539'][] = "delete from core_acl_group_changes;";
 
-$updates['202310301526'][] = "alter table core_acl_group_changes change grantModSeq modSeq int not null;";
+$updates['202403181539'][] = "alter table core_acl_group_changes change grantModSeq modSeq int not null;";
 
-$updates['202310301526'][] = "alter table core_acl_group_changes  add granted boolean not null;";
+$updates['202403181539'][] = "alter table core_acl_group_changes  add granted boolean not null;";
 
-$updates['202310301526'][] = "alter table core_acl_group_changes drop column revokeModSeq;";
+$updates['202403181539'][] = "alter table core_acl_group_changes drop column revokeModSeq;";
+
+$updates['202403181539'][] = "create index if not exists aclId2
+    on core_acl_group_changes (aclId, groupId, modSeq);";
+
+$updates['202403181539'][] = "drop index aclId on core_acl_group_changes;";
+
+$updates['202403181539'][] = "drop index `group` on core_acl_group_changes;";
