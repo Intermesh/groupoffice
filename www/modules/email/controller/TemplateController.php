@@ -113,6 +113,11 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 
 		
 		$this->_defaultTemplate = !empty($params['account_id']) && $defTempForAccount->template_id ? $defTempForAccount : $defTempForUser;
+
+		if (!isset($params['sort'])) {
+			$params['sort'] = 'name';
+			$params['dir'] = 'ASC';
+		}
 		
 		if(isset($params['default_template_id']))
 		{

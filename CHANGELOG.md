@@ -1,5 +1,6 @@
 - Core: fix searching for partial email addresses in global search
 - Core: fix boolean select filters in custom filters
+- Email: sort templates explicitly by name as a default
 
 11-03-2024: 6.7.73
 - Core: Make add button more visible in link browser
