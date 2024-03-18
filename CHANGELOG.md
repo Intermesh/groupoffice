@@ -1,3 +1,5 @@
+- Core: fix searching for partial email addresses in global search
+
 11-03-2024: 6.7.73
 - Core: Make add button more visible in link browser
 - Caldav: Fixed creating exceptions in recurring series with participants
