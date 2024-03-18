@@ -1,3 +1,4 @@
+18-03-2023: 6.7.74
 - Core: fix searching for partial email addresses in global search
 - Core: fix boolean select filters in custom filters
 - Email: sort templates explicitly by name as a default
