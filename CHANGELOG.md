@@ -5,6 +5,8 @@
 - Core: Prevent old framework from starting a session. This also prevents the automatic
   change of the "Expires" header. This caused a security issue where the expires header
   would be different on lost password requests when a valid email address was used.
+- Core: Fixed bug in XSS detection
+- Core: Disallow modification of modifiedAt, createdAt, modifiedBy and createdBy via API.
 
 11-03-2024: 6.8.38
 - Core: Report if sourceguardian is not installed when setting license key
