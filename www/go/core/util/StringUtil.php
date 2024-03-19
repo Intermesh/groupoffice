@@ -616,14 +616,10 @@ END;
 // Keep a copy of the original string before cleaning up
 		$orig = $string;
 
-
-
-
 // URL decode
 		$string = urldecode($string);
 
 // Convert Hexadecimals
-//		$string = preg_replace('!(&#|\\\)[xX]([0-9a-fA-F]+);?!e', 'chr(hexdec("$2"))', $string);		
 		$string = preg_replace_callback('!(&#|\\\)[xX]([0-9a-fA-F]+);?!', function ($matches) {
 			return chr(hexdec($matches[2]));
 		}, $string);
@@ -632,7 +628,7 @@ END;
 		$string = preg_replace('!(&#0+[0-9]+)!', '$1;', $string);
 
 // Decode entities not needed because they won't be decoded for display.
-//		$string = html_entity_decode($string, ENT_NOQUOTES, 'UTF-8');
+		$string = html_entity_decode($string, ENT_QUOTES|ENT_HTML5, 'UTF-8');
 
 // Strip whitespace characters
 		$string = preg_replace('!\s!', '', $string);
