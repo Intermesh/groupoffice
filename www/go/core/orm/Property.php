@@ -653,6 +653,15 @@ abstract class Property extends Model {
 		return count($keys) > 1 ? implode("-", array_values($keys)) : array_values($keys)[0];
 	}
 
+	/**
+	 * List of properties that may not be set through the API. Like modifiedAt, createdAt etc.
+	 * @return array
+	 */
+	public static function readOnlyProps(): array
+	{
+		return ["modifiedBy", "createdAt", "createdBy", "modifiedAt"];
+	}
+
   /**
    * @inheritDoc
    */

@@ -4,6 +4,7 @@ namespace go\core\data;
 
 use Exception;
 use go\core\App;
+use go\core\exception\Forbidden;
 use go\core\util\DateTime;
 use InvalidArgumentException;
 use JsonSerializable;
@@ -27,6 +28,9 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	const PROP_PROTECTED = 1;
 
 	const PROP_PUBLIC = 2;
+
+
+	const PROP_PUBLIC_READONLY = 3;
 
 	/**
 	 * Get all properties exposed to the API
@@ -111,7 +115,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 				}
 
 				if($prop->isPublic()) {	
-					$arr[$propName]['access'] = self::PROP_PUBLIC;					
+					$arr[$propName]['access'] = in_array($propName, static::readOnlyProps()) ? self::PROP_PUBLIC_READONLY : self::PROP_PUBLIC;
 					$arr[$propName]['setter'] = false;
 					$arr[$propName]['getter'] = false;
 				}				
@@ -124,6 +128,15 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 		App::get()->getCache()->set($cacheKey, $arr);
 
 		return $arr;
+	}
+
+	/**
+	 * List of properties that may not be set through the API. Like modifiedAt, createdAt etc.
+	 * @return array
+	 */
+	public static function readOnlyProps(): array
+	{
+		return [];
 	}
 
 
@@ -182,7 +195,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	public static function getReadableProperties(): array
 	{
 		return array_keys(array_filter(static::getApiProperties(), function($props){
-			return $props['getter'] || $props['access'] == self::PROP_PUBLIC;
+			return $props['getter'] || $props['access'] == self::PROP_PUBLIC || $props['access'] == self::PROP_PUBLIC_READONLY;
 		}));
 	}
 
@@ -321,7 +334,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 			$this->$setter($value);
 		} else if($props[$propName]['access'] == self::PROP_PUBLIC){
 			$this->{$propName} = $this->normalizeValue($propName, $value);
-		}	else if($props[$propName]['getter']) {
+		}	else if($props[$propName]['access'] == self::PROP_PUBLIC_READONLY || $props[$propName]['getter']) {
 			go()->warn("Ignoring setting of read only property ". $propName ." for " . static::class);
 		} else{
 			throw new InvalidArgumentException("Invalid property ". $propName ." for " . static::class);
@@ -359,7 +372,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 		if($props[$propName]['getter']) {
 			$getter = 'get' . $propName;	
 			return $this->$getter();
-		} elseif($props[$propName]['access'] === self::PROP_PUBLIC){
+		} elseif($props[$propName]['access'] === self::PROP_PUBLIC || $props[$propName]['access'] === self::PROP_PUBLIC_READONLY){
 			return $this->{$propName} ?? null;
 		}	else{
 			throw new InvalidArgumentException("Can't get write only property ". $propName . " in " . static::class);
