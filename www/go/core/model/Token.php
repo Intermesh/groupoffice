@@ -561,6 +561,7 @@ class Token extends Entity {
 			if($token) {
 				$q->andWhere('loginToken', '!=', $token->loginToken);
 			}
+			$q->andWhere('accessToken', '!=', null);
 		}
 
 		return self::delete($q);

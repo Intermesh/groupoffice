@@ -1,6 +1,7 @@
 <?php
 
 use go\core\App;
+use go\core\auth\ForcePasswordChange;
 use go\core\db\Table;
 use go\core\util\ClassFinder;
 use go\core\acl\model\AclOwnerEntity;
@@ -1562,4 +1563,8 @@ $updates['202403181539'][] = "alter table core_user
 
 $updates['202403181539'][] = "alter table core_user
     add forcePasswordChange boolean default false not null;";
+
+$updates['202403181539'][] = function() {
+	ForcePasswordChange::register();
+};
 

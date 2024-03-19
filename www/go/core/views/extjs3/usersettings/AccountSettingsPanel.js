@@ -237,6 +237,13 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				boxLabel: t("Login enabled"),
 				name: "enabled"
 			});
+
+			this.passwordFieldset.insert(1, {
+				xtype:"checkbox",
+				hideLabel: true,
+				boxLabel: t("Force password change"),
+				name: "forcePasswordChange"
+			});
 		}
 	
 		Ext.apply(this,{

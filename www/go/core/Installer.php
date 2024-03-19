@@ -8,6 +8,7 @@ use GO\Base\Db\ActiveRecord;
 use GO\Base\Exception\AccessDenied;
 use GO\Base\Mail\Message;
 use GO\Base\Model\Template;
+use go\core\auth\ForcePasswordChange;
 use go\core\auth\Password;
 use go\core\auth\TemporaryState;
 use go\core\cache\None;
@@ -246,6 +247,10 @@ class Installer {
 		$this->createGarbageCollection();
 
 		if(!Password::register()) {
+			throw new Exception("Failed to register Password authenticator");
+		}
+
+		if(!ForcePasswordChange::register()) {
 			throw new Exception("Failed to register Password authenticator");
 		}
 	}
