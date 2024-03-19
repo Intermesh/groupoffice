@@ -54,17 +54,7 @@ GO.email.TemplatesGrid = function(config)
 	});
 
 	config.store.setDefaultSort('name', 'ASC');
-//	if (GO.util.empty(config.noDocumentTemplates)) {
-//		config.store.on('load', function(){
-//			if(go.Modules.isAvailable("legacy", "email"))
-//				GO.email.ooTemplatesStore.load();
-//		}, this);
-//	} else {
-//		config.store.on('beforeload',function(store,options){
-//			store.baseParams['type']=0;
-//		}, this);
-//	}
-	
+
 	var tbarItems = [];
 	
 		tbarItems.push({

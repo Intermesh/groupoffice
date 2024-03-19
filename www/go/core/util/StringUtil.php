@@ -862,16 +862,14 @@ END;
 				// handle email differently. We want info@group-office.com split in
 				// info and group-office.com. With names like Jansen-Pietersen we want
 				// Jansen and Pietersen.
-				$split = explode('@', $keyword);
-				if(count($split) != 2) {
-					//also split domains on . and words on -,\,/ for searching
-					$split = mb_split('[_\-\\\\\/.]', $keyword);
+				$emailParts = explode('@', $keyword);
+				if (count($emailParts) === 2) {
+					foreach ($emailParts as $emailPart) {
+						//also split domains on . and words on -,\,/ for searching
+						$split = mb_split('[_\-\\\\\/.]', $emailPart);
+						$secondPassKeywords = array_merge($secondPassKeywords, $split);
+					}
 				}
-
-				if (count($split) > 1) {
-					$secondPassKeywords = array_merge($secondPassKeywords, $split);
-				}
-
 			}
 
 			$keywords = array_merge($keywords, $secondPassKeywords);

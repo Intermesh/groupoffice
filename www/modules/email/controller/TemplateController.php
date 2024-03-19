@@ -109,6 +109,11 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 
 		
 		$this->_defaultTemplate = !empty($params['account_id']) && $defTempForAccount->template_id ? $defTempForAccount : $defTempForUser;
+
+		if (!isset($params['sort'])) {
+			$params['sort'] = 'name';
+			$params['dir'] = 'ASC';
+		}
 		
 		if(isset($params['default_template_id']))
 		{
@@ -128,7 +133,7 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 		$store->addRecord(array(
 			'group' => 'templates',
 			'checked'=>isset($this->_defaultTemplate->template_id) && $this->_defaultTemplate->template_id==0,
-			'text' => \GO::t("None", "legacy", "email"),
+			'name' => \GO::t("None", "legacy", "email"),
 			'template_id'=>0
 		));
 
