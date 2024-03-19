@@ -2,8 +2,7 @@
 - Core: prevent timing attack on password recovery
 - Core: prevent timing attack on login
 - Core: Require admin rights for sending a system test message
-- Core: Prevent old framework from starting a session. This also prevents the automatic
-  change of the "Expires" header. This caused a security issue where the expires header
+- Core: Prevent automatic change of the "Expires" header. This caused a security issue where the expires header
   would be different on lost password requests when a valid email address was used.
 - Core: Fixed bug in XSS detection
 - Core: Disallow modification of modifiedAt, createdAt, modifiedBy and createdBy via API.
