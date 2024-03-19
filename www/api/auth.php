@@ -208,6 +208,8 @@ try {
 					], 401, "Bad username or password");
 				}
 
+				User::fireEvent(User::EVENT_PASSWORD_VERIFIED, $user, $data['password']);
+
 				$token = new Token();
 				$token->userId = $user->id;
 				$token->addPassedAuthenticator($auth->getUsedPasswordAuthenticator());

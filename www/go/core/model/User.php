@@ -60,6 +60,14 @@ class User extends AclItemEntity {
 	const ID_SUPER_ADMIN = 1;
 
 	/**
+	 * Fires when the password is verified during login. Login might not be complete.
+	 *
+	 * @param User $user
+	 * @param string $password
+	 */
+	const EVENT_PASSWORD_VERIFIED = 'passwordverified';
+
+	/**
 	 * Fires on login
 	 *
 	 * @param User $user
@@ -852,6 +860,9 @@ public function getHistoryLog(): bool|array
 
 	protected function internalGetModified(array|string &$properties = [], bool $forIsModified = false): bool|array
 	{
+		if(!is_array($properties)) {
+			$properties = [$properties];
+		}
 		// check if it's empty because the parent method will fill it with all props
 		$allProps = empty($properties);
 
