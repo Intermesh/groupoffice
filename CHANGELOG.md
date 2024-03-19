@@ -12,6 +12,7 @@
 - Core: Create permissions for IP restrictions and SMTP accounts for admins only
 - Core: Module management permissions enforced on server
 - Core: destroy user sessions when admin changes password
+- Core: Show less details in error messages
 
 11-03-2024: 6.8.38
 - Core: Report if sourceguardian is not installed when setting license key
