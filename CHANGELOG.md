@@ -2,6 +2,9 @@
 - Core: prevent timing attack on password recovery
 - Core: prevent timing attack on login
 - Core: Require admin rights for sending a system test message
+- Core: Prevent old framework from starting a session. This also prevents the automatic
+  change of the "Expires" header. This caused a security issue where the expires header
+  would be different on lost password requests when a valid email address was used.
 
 11-03-2024: 6.8.38
 - Core: Report if sourceguardian is not installed when setting license key
