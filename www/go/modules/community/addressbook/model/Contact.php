@@ -1196,8 +1196,6 @@ class Contact extends AclItemEntity {
 			$from->saveSearch();
 			Contact::entityType()->change($from);
 		}
-
-		
 	}
 
 
@@ -1322,52 +1320,6 @@ class Contact extends AclItemEntity {
 		$message->setTo(new MailAddress($this->emailAddresses[0]->email, $this->name));
 		return true;
 	}
-
-//
-//	private static $colors =  [
-//    'C62828',
-//    'AD1457',
-//    '6A1B9A',
-//    '4527A0',
-//    '283593',
-//    '1565C0',
-//    '0277BD',
-//    '00838F',
-//    '00695C',
-//    '2E7D32',
-//    '558B2F',
-//    '9E9D24',
-//    'F9A825',
-//    'FF8F00',
-//    'EF6C00',
-//    '424242'
-//  ];
-//
-//	public function getColor() {
-//    if(isset($this->color)) {
-//      return $this->color;
-//    }
-//
-//    $index = Settings::get()->lastContactColorIndex;
-//
-//    if(!isset(self::$colors[$index])) {
-//      $index = 0;
-//    }
-//
-//    $this->color = self::$colors[$index];
-//    $index++;
-//    Settings::get()->lastContactColorIndex = $index;
-//    Settings::get()->save();
-//
-//    go()->getDbConnection()->update(self::getMapping()->getPrimaryTable()->getName(), ['color' => $this->color], ['id' => $this->id])->execute();
-//
-//    return $this->color;
-//  }
-//
-//  public function setColor($v) {
-//	  $this->color = $v;
-//  }
-
 
 	/**
 	 * @param Contact $entity
