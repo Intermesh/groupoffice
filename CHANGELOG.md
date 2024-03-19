@@ -14,6 +14,7 @@
 - Core: destroy user sessions when admin changes password
 - Core: Show less details in error messages
 - Core: Admin password is required to change other users' passwords
+- History: Remove sensitive hashes from log
 
 11-03-2024: 6.8.38
 - Core: Report if sourceguardian is not installed when setting license key
