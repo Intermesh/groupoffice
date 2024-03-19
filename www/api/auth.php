@@ -283,7 +283,7 @@ try {
 	output([], 403, $e->getMessage());
 } catch (Unavailable $e) {
 	output([], 503, $e->getMessage());
-} catch (Exception $e) {
+} catch (Throwable $e) {
 	ErrorHandler::logException($e);
 
 	// make sure there's no newline in the status text

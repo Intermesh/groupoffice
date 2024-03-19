@@ -175,7 +175,7 @@ class CronJobSchedule extends Entity
 		} catch (\Throwable $ex) {
 			$errorString = ErrorHandler::logException($ex);
 			echo $errorString . "\n";
-			$this->lastError = $errorString;
+			$this->lastError = $ex->getMessage();
 		}
 
 		$output = ob_get_contents();

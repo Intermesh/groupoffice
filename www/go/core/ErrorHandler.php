@@ -114,7 +114,7 @@ class ErrorHandler {
 	public function exceptionHandler(Throwable $e) {
 		go()->debug("ErrorHandler::exceptionHandler() called with " . get_class($e));
 
-		$errorString = self::logException($e);
+		self::logException($e);
 		
 		if(!headers_sent()) {
 			if($e instanceof http\Exception) {
@@ -125,7 +125,7 @@ class ErrorHandler {
 			header('Content-Type: text/plain');
 		}
 		
-		echo "Uncaught exception: " . $errorString . " at ".date(DateTime::FORMAT_API)."\n\n";
+		echo "Uncaught exception: " . $e->getMessage() . " at ".date(DateTime::FORMAT_API)."\n\n";
 			
 		if(go()->getDebugger()->enabled) {
 
