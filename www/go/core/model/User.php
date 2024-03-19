@@ -398,10 +398,19 @@ class User extends AclItemEntity {
    */
 	public function setCurrentPassword($currentPassword){
 		$this->currentPassword = $currentPassword;
-		
-		if(!$this->checkPassword($currentPassword)) {
-			$this->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
-		} 
+
+		if(go()->getAuthState() && go()->getAuthState()->isAdmin()) {
+			if(!go()->getAuthState()->getUser()->checkPassword($currentPassword)) {
+				$this->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
+			}else {
+				$this->passwordVerified = true;
+			}
+		} else {
+
+			if (!$this->checkPassword($currentPassword)) {
+				$this->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
+			}
+		}
 	}
 
   /**
@@ -501,17 +510,9 @@ class User extends AclItemEntity {
 		
 		if(App::get()->getInstaller()->isInProgress()) {
 			return true;
-		} 
-		
-		$authState = App::get()->getAuthState();
-		if(!$authState) {
-			return false;
 		}
-		if(!$authState->isAuthenticated()) {
-			return false;
-		}						
-		
-		return go()->getModel()->getUserRights()->mayChangeUsers;
+
+		return false;
 	}
 	
 	protected function internalValidate() {

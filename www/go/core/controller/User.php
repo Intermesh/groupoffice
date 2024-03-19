@@ -102,9 +102,6 @@ class User extends EntityController {
    * @see https://jmap.io/spec-core.html#/get
    */
 	public function get($params) {
-
-		go()->getDbConnection()->select("piet")->from("core_iser")->all();
-
 		return $this->defaultGet($params);
 	}
 
