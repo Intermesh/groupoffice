@@ -1549,3 +1549,17 @@ $updates['202403181539'][] = "create index if not exists aclId2
 $updates['202403181539'][] = "drop index aclId on core_acl_group_changes;";
 
 $updates['202403181539'][] = "drop index `group` on core_acl_group_changes;";
+
+
+$updates['202403181539'][] = "alter table core_user
+    drop column last_password_change;";
+
+$updates['202403181539'][] = "alter table core_user
+    drop column force_password_change;";
+
+$updates['202403181539'][] = "alter table core_user
+    add passwordModifiedAt datetime null;";
+
+$updates['202403181539'][] = "alter table core_user
+    add forcePasswordChange boolean default false not null;";
+

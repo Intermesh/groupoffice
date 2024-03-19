@@ -273,8 +273,8 @@ class User extends AclItemEntity {
 	public $sort_email_Addresses_by_time;
 	public $no_reminders;
 	
-	protected $last_password_change;
-	public $force_password_change;
+	protected ?DateTime $passwordModifiedAt;
+	public bool $forcePasswordChange = false;
 
 	public function getDateTimeFormat(): string
 	{
@@ -807,6 +807,10 @@ public function getHistoryLog(): bool|array
 					return false;
 				}
 			}
+		}
+
+		if($this->isModified(['password'])) {
+			$this->passwordModifiedAt = new DateTime();
 		}
 		
 		if(!parent::internalSave()) {
