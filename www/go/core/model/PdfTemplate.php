@@ -191,6 +191,11 @@ class PdfTemplate extends Entity {
 		return Module::findById($this->moduleId)->getPermissionLevel();
 	}
 
+	protected function canCreate(): bool
+	{
+		return Module::findById($this->moduleId)->getPermissionLevel();
+	}
+
 	/**
 	 *
 	 */

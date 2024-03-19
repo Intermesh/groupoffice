@@ -64,6 +64,11 @@ class Category extends Entity {
 		}
 	}
 
+	protected function canCreate(): bool
+	{
+		return $this->internalGetPermissionLevel() > Acl::LEVEL_READ;
+	}
+
 
 	public static function getClientName(): string
 	{

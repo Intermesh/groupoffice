@@ -614,7 +614,7 @@ abstract class Entity extends Property {
 	 */
 	protected function canCreate(): bool
 	{
-		return true;
+		return go()->getAuthState() && go()->getAuthState()->isAdmin();
 	}
 
 	/**

@@ -39,7 +39,7 @@ class AuthAllowGroup extends Entity
       ->addTable('core_auth_allow_group', 'ag');
   }
 
-  /**
+	/**
    * Check if a user is allowed for a given IP address
    *
    * @param User $user

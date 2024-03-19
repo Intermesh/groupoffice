@@ -26,6 +26,11 @@ class ImportMapping extends Entity {
 			->addTable("core_import_mapping");
 	}
 
+	protected function canCreate(): bool
+	{
+		return true;
+	}
+
 	public function setMap(array $mapping) {
 		$this->mapping = JSON::encode($mapping);
 	}

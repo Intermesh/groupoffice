@@ -3,7 +3,6 @@ namespace go\core\model;
 
 use DateInterval;
 use Exception;
-use go\core\Environment;
 use go\core\ErrorHandler;
 use go\core\exception\RememberMeTheft;
 use go\core\http\Request;
