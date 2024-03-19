@@ -2,6 +2,7 @@
 
 namespace go\core\fs;
 
+use go\core\db\DbException;
 use PDOException;
 
 class GarbageCollector {
@@ -19,7 +20,7 @@ class GarbageCollector {
 				if($blob->delete()) {
 					echo 'Removed '. $blob->name ."<br>";
 				}
-			} catch(PDOException $e) {
+			} catch(DbException $e) {
 				// wont remove blobs that are referenced
 			}
 		}

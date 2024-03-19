@@ -662,8 +662,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 			} catch(PDOException $e2) {
 				go()->error("SQL FAILED AND FAILED TO BUILD STRING " . $e2->getMessage());
 			}
-			
-			throw $e;
+
+			throw new DbException($e);
 		}
 		return $stmt;
 	}

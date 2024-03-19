@@ -113,6 +113,8 @@ class Router {
 			
 		} catch (Throwable $e) {
 
+			$debugMessage = ErrorHandler::logException($e);
+
 			if($e instanceof Exception) {
 				switch($e->getCode()) {
 					case 401:
@@ -137,7 +139,7 @@ class Router {
 			
 			if(go()->getDebugger()->enabled) {
 				//only in debug mode, may contain sensitive information
-				$error["debugMessage"] = ErrorHandler::logException($e);
+				$error["debugMessage"] = $debugMessage;
 				$previous = $e->getPrevious();
 				if($previous) {
 					$error['previous'] = $previous->getMessage();

@@ -172,6 +172,7 @@ class Connection {
 	 * 
 	 * @param string $sql
 	 * @return PDOStatement
+	 * @throws DbException
 	 */
 	public function query(string $sql): PDOStatement
 	{
@@ -183,7 +184,7 @@ class Connection {
 		}
 		catch(PDOException $e) {
 			go()->error("SQL FAILED: " . $sql);
-			throw $e;
+			throw new DbException($e);
 		}
 	}
 
@@ -194,7 +195,7 @@ class Connection {
 	 * @return int <p><b>PDO::exec()</b> returns the number of rows that were modified or deleted by the SQL statement you issued. If no rows were affected, <b>PDO::exec()</b> returns <i>0</i>.</p><p><b>Warning</b></p><p>This function may return Boolean <b><code>FALSE</code></b>, but may also return a non-Boolean value which evaluates to <b><code>FALSE</code></b>. Please read the section on Booleans for more information. Use the === operator for testing the return value of this function.</p><p>The following example incorrectly relies on the return value of <b>PDO::exec()</b>, wherein a statement that affected 0 rows results in a call to <code>die()</code>:</p> <code> &lt;&#63;php<br>$db-&gt;exec()&nbsp;or&nbsp;die(print_r($db-&gt;errorInfo(),&nbsp;true));&nbsp;//&nbsp;incorrect<br>&#63;&gt;  </code>
 	 * @link http://php.net/manual/en/pdo.exec.php
 	 *
-	 * @throws PDOException
+	 * @throws DbException
 	 */
 	public function exec(string $sql): int
 	{
@@ -206,7 +207,7 @@ class Connection {
 		}
 		catch(PDOException $e) {
 			go()->error("SQL FAILED: " . $sql);
-			throw $e;
+			throw new DbException($e);
 		}
 	}
 	
@@ -608,15 +609,15 @@ class Connection {
 		return $query->setDbConnection($this)->selectSingleValue($select);
 	}
 
-  /**
-   * Create a statement from a QueryBuilder result.
-   *
-   * For internal use of the API.
-   *
-   * @param array $build
-   * @return Statement
-   * @throws PDOException
-   */
+	/**
+	 * Create a statement from a QueryBuilder result.
+	 *
+	 * For internal use of the API.
+	 *
+	 * @param array $build
+	 * @return Statement
+	 * @throws DbException
+	 */
 	public function createStatement(array &$build): Statement
 	{
 		try {
@@ -638,7 +639,7 @@ class Connection {
 			go()->error("Failed SQL: ". QueryBuilder::debugBuild($build));
             go()->error($e->getMessage());
             go()->error($e->getTraceAsString());
-			throw $e;
+			throw new DbException($e);
 		}
 	}
 

@@ -2,6 +2,7 @@
 namespace go\core\db;
 
 use PDO;
+use PDOException;
 
 class Database {
 		
@@ -28,12 +29,13 @@ class Database {
 	public function __construct(Connection $conn = null) {
 		$this->conn = $conn ?? go()->getDbConnection();
 	}
-	
+
 	/**
 	 * Check if the current database has a table
-	 * 
+	 *
 	 * @param string $name
 	 * @return bool
+	 * @throws DbException
 	 */
 	public function hasTable(string $name): bool
 	{
@@ -64,13 +66,19 @@ class Database {
 			return $this->queryVersion();
 		}
 	}
-	
-	
-	private function getTableNames() {
+
+
+	/**
+	 * @throws DbException
+	 */
+	private function getTableNames(): bool|array
+	{
 		if(!isset($this->tableNames)) {
+
 			$stmt = $this->conn->query('SHOW TABLES');
 			$stmt->setFetchMode(PDO::FETCH_COLUMN, 0);
 			$this->tableNames = $stmt->fetchAll();
+
 		}
 		
 		return $this->tableNames;
@@ -80,11 +88,12 @@ class Database {
 		$this->tableNames = null;
 		Table::destroyInstances();
 	}
-	
+
 	/**
 	 * Get all tables
-	 * 
+	 *
 	 * @return Table[]
+	 * @throws DbException
 	 */
 	public function getTables(): array
 	{

@@ -8,6 +8,7 @@ use GO\Base\Db\ActiveRecord;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\App;
 use go\core\data\ArrayableInterface;
+use go\core\db\DbException;
 use go\core\db\Query;
 use go\core\ErrorHandler;
 use go\core\model\Module;
@@ -140,7 +141,7 @@ class EntityType implements ArrayableInterface {
 			$record['clientName'] = $clientName;
 			try {
 				go()->getDbConnection()->insert('core_entity', $record)->execute();
-			} catch(PDOException $e) {
+			} catch(DbException $e) {
 				ErrorHandler::log("Failed to register new entity type for class '$className'.");
 				go()->debug($c);
 				throw $e;
