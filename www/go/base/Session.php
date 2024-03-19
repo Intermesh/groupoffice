@@ -81,6 +81,9 @@ class Session extends Observable{
 	
 			session_name('groupoffice');
 
+			// prevents altering headers. This caused a security issue where the expires header would be different on lost
+			// password requests when a valid email address was used.
+			session_cache_limiter("");
 			session_start();				
 		}
 	

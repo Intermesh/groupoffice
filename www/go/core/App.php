@@ -243,11 +243,6 @@ namespace go\core {
 
 		private function initCompatibility() {
 
-			// Prevents old framework from starting a session. This also prevents the automatic change of the
-			// "Expires" header. This caused a security issue where the expires header would be different on lost
-			// password requests when a valid email address was used.
-			define("GO_NO_SESSION", true);
-
 			/** @noinspection PhpIncludeInspection */
 			require(Environment::get()->getInstallPath() . "/go/GO.php");
 			spl_autoload_register(array('GO', 'autoload'));
