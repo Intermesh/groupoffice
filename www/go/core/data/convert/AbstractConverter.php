@@ -6,6 +6,7 @@ use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\jmap\EntityController;
+use go\core\model\Acl;
 use go\core\orm\Entity;
 use go\core\orm\EntityType;
 use go\core\orm\Query;
@@ -182,6 +183,7 @@ abstract class AbstractConverter {
 		while($this->nextImportRecord()) {
 
 			try {
+				echo $this->index ."\n";
 
 				$entity = $this->importEntity();
 				
@@ -189,9 +191,17 @@ abstract class AbstractConverter {
 				if($entity === false) {
 					$this->index++;
 					continue;
-				}			
+				}
 
-				$entity->save();
+				if($entity->hasPermissionLevel(Acl::LEVEL_CREATE)) {
+					$entity->save();
+				} else {
+					$msg = "Item ". $this->index . ": access denied";
+					$this->notifyError($msg);
+
+					$response['errors'][] = $msg;
+					continue;
+				}
 
 				//push changes after each 100 imports
 				EntityType::push(100);
@@ -202,7 +212,7 @@ abstract class AbstractConverter {
 					$response['count']++;
 				} else{
 					$response['errors'][] = "Item ". $this->index . ": Import afterSave returned false";
-				}				
+				}
 			}
 			catch(Exception $e) {
 				ErrorHandler::logException($e);
