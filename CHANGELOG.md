@@ -14,6 +14,7 @@
 - Core: Show less details in error messages
 - Core: Admin password is required to change other users' passwords
 - History: Remove sensitive hashes from log
+- Core: Use status 202 on lost password so we can setup fail2ban rules for it
 
 11-03-2024: 6.8.38
 - Core: Report if sourceguardian is not installed when setting license key
