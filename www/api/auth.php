@@ -212,7 +212,7 @@ try {
 				$token->addPassedAuthenticator($auth->getUsedPasswordAuthenticator());
 
 				if (!$token->save()) {
-					throw new Exception("Could not save token");
+					throw new SaveException($token);
 				}
 			}
 
