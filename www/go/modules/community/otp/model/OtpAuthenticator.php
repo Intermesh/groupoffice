@@ -3,7 +3,10 @@
 namespace go\modules\community\otp\model;
 
 use Exception;
+use go\core\exception\Forbidden;
 use go\core\fs\Blob;
+use go\core\model\Acl;
+use go\core\model\User;
 use go\core\orm\Mapping;
 use go\core\fs\File;
 use go\core\orm\Property;
@@ -11,6 +14,9 @@ use go\core\util\QRcode;
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'core'.DIRECTORY_SEPARATOR.'util'.DIRECTORY_SEPARATOR.'QRcode.php';
 
+/**
+ * @property User $owner
+ */
 class OtpAuthenticator extends Property {
 		
 	public $userId;
@@ -20,14 +26,8 @@ class OtpAuthenticator extends Property {
 	protected $verified = false;
 	
 	private $verify = false;
-	private $requestSecret = false;
+	public static bool $requestSecret = false;
 
-	/**
-	 * We only publish the secret when it was just created
-	 * @var bool 
-	 */
-	private $publish = false;
-	
 	protected $codeLength = 6;
 	
 	protected static function defineMapping(): Mapping
@@ -36,11 +36,28 @@ class OtpAuthenticator extends Property {
 	}
 
 	public function getSecret() {
+
+		if(!self::$requestSecret) {
+			return null;
+		}
+
+		if(!$this->owner->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+			throw new Forbidden();
+		}
+
 		return $this->secret;
 	}
 	
 	public function setRequestSecret($value){
-		$this->requestSecret = $value;
+		if(!$value) {
+			return;
+		}
+		if(!$this->owner->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+			throw new Forbidden();
+		}
+		self::$requestSecret = true;
+		$this->secret = $this->createSecret();
+
 	}
 	
 	public function setVerify($code){
@@ -84,7 +101,6 @@ class OtpAuthenticator extends Property {
 	 * @return string
 	 */
 	private function createSecret($secretLength = 16) {
-		$this->publish = true;
 		$validChars = $this->_getBase32LookupTable();
 
 		// Valid secret lengths are 80 to 640 bits
@@ -125,11 +141,6 @@ class OtpAuthenticator extends Property {
 	 * @return string
 	 */
 	public function getCode($secret, $timeSlice = null) {
-		
-		if(!$this->publish) {
-			return null;
-		}
-		
 		return $this->internalGetCode($secret, $timeSlice);
 		
 	}
