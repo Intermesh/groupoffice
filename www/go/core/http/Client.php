@@ -1,6 +1,7 @@
 <?php
 namespace go\core\http;
 
+use CurlHandle;
 use Exception as CoreException;
 use go\core\fs\File;
 use go\core\util\JSON;
@@ -14,14 +15,14 @@ use go\core\util\JSON;
  */
 class Client {
 
-  private $curl;
+  private CurlHandle|false $curl;
 
-  public $baseParams = [];
+  public array $baseParams = [];
 
-  private $lastHeaders = [];
+  private array $lastHeaders = [];
 
 	/**
-	 * @return false|resource
+	 * @return false|CurlHandle
 	 * @noinspection PhpMissingReturnTypeInspection
 	 */
   private function getCurl() {
@@ -85,7 +86,7 @@ class Client {
 	/**
 	 * Perform GET request
 	 *
-	 * @return array ['status' => 200, 'body' => string, 'headers' => []]
+	 * @return array{status: int, body:string, headers: array, requestHeaders: array, info:array}
 	 * @throws CoreException
 	 */
   public function get(string $url): array
@@ -116,7 +117,7 @@ class Client {
 	 *
 	 * @param string $url
 	 * @param array $data
-	 * @return array
+	 * @return array{status: int, body:array, headers: array, requestHeaders: array, info:array}
 	 * @throws CoreException
 	 */
   public function postJson(string $url, array $data): array
@@ -142,7 +143,7 @@ class Client {
 	 *
 	 * @param string $url
 	 * @param array|string $data Array of HTTP post fields or string for RAW body.
-	 * @return array
+	 * @return array{status: int, body:string, headers: array, requestHeaders: array, info:array}
 	 * @throws CoreException
 	 */
   public function post(string $url, $data): array
@@ -221,7 +222,7 @@ class Client {
 	 *
 	 * @return void
 	 */
-  public function close() 
+  public function close(): void
   {
      curl_close($this->curl);
   }
