@@ -545,11 +545,11 @@ class Token extends Entity {
 	 * Used on password change.
 	 * @throws Exception
 	 */
-	public static function destroyOtherSessons() : bool {
+	public static function destroyOtherSessons(int $userId = null) : bool {
 
 		$q = (new Query)
 			->where('expiresAt', '!=', null)
-			->where('userId', '=', go()->getUserId()
+			->where('userId', '=', $userId ?? go()->getUserId()
 			);
 
 		if(!RememberMe::delete($q)) {

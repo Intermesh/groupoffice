@@ -820,7 +820,7 @@ class User extends AclItemEntity {
 		}
 
 		if($this->isModified(['password'])) {
-			Token::destroyOtherSessons();
+			Token::destroyOtherSessons($this->id);
 		}
 
 		return true;
