@@ -1,3 +1,7 @@
+- Core: Fixed bug in XSS detection
+- Core: Disallow modification of modifiedAt, createdAt, modifiedBy and createdBy via API.
+- Core: Create permissions were not checked on import
+
 18-03-2023: 6.7.74
 - Core: fix searching for partial email addresses in global search
 - Core: fix boolean select filters in custom filters
