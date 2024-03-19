@@ -311,6 +311,23 @@ class User extends AclItemEntity {
 			->addScalar('groups', 'core_user_group', ['id' => 'userId']);
 	}
 
+public function getHistoryLog(): bool|array
+{
+	$log = parent::getHistoryLog();
+
+	if(isset($log['password'])) {
+		if(isset($log['password'][0])) {
+			$log['password'][0] = "MASKED";
+		}
+
+		if(isset($log['password'][1])) {
+			$log['password'][1] = "MASKED";
+		}
+	}
+
+	return $log;
+}
+
 
 	/**
 	 * @var Group

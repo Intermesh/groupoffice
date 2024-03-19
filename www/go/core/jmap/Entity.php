@@ -52,6 +52,16 @@ abstract class Entity  extends OrmEntity {
 		return true;
 	}
 
+	/**
+	 * Used by the history module to log changes. Override to hide sensitive details for example.
+	 *
+	 * @return bool|array
+	 */
+	public function getHistoryLog(): bool|array
+	{
+		return $this->getModified();
+	}
+
 
 	/**
 	 * Get the current state of this entity
