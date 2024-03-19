@@ -13,6 +13,7 @@ use go\core\model\User;
 use go\core\jmap\Request;
 use go\core\util\DateTime;
 use go\core\jmap\State as JmapState;
+use go\modules\community\addressbook\model\Contact;
 
 /**
  * Class Authenticate
@@ -229,7 +230,14 @@ class Authenticate {
 	{
 		$email = trim($email);
 
-		$user = User::find()->where(['email' => $email])->orWhere(['recoveryEmail' => $email])->single();
+		$user = User::find([
+			'id',
+			'username',
+			'email'
+		])
+			->where(['email' => $email])
+			->orWhere(['recoveryEmail' => $email])
+			->single();
 		if (empty($user)) {
 			go()->debug("User not found");
 			return false;

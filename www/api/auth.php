@@ -134,9 +134,12 @@ try {
 			$auth->sendRecoveryMail($data['email']);
 
 			//always take 4s to prevent timing attacks
-			$wait = 4000 + $start - ((int) (microtime(true) * 1000));
-			if($wait > 0)
+			$wait = 1000 + $start - ((int) (microtime(true) * 1000));
+			if($wait > 0) {
 				usleep($wait * 1000);
+			} else {
+				ErrorHandler::log("Warning: sending lost password message took longer than 4s. Timing attack possible because of this. Make sure your SMTP is faster.");
+			}
 			//Don't show if user was found or not for security
 			output([], 200, "Recovery mail sent");
 			break;
