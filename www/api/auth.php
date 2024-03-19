@@ -134,7 +134,7 @@ try {
 			$auth->sendRecoveryMail($data['email']);
 
 			//always take 4s to prevent timing attacks
-			$wait = 1000 + $start - ((int) (microtime(true) * 1000));
+			$wait = 4000 + $start - ((int) (microtime(true) * 1000));
 			if($wait > 0) {
 				usleep($wait * 1000);
 			} else {
