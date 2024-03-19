@@ -7,6 +7,11 @@
   would be different on lost password requests when a valid email address was used.
 - Core: Fixed bug in XSS detection
 - Core: Disallow modification of modifiedAt, createdAt, modifiedBy and createdBy via API.
+- Core: Create permissions were not checked on import
+- OTP Authenticator: Hide secret. Only show it when just created
+- Core: Create permissions for IP restrictions and SMTP accounts for admins only
+- Core: Module management permissions enforced on server
+- Core: destroy user sessions when admin changes password
 
 11-03-2024: 6.8.38
 - Core: Report if sourceguardian is not installed when setting license key
