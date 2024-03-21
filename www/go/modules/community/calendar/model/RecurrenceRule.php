@@ -65,7 +65,7 @@ class RecurrenceRule {
 			$recurrenceId = $it->current();
 			$instance = clone $p;
 			$instance->utcStart = $recurrenceId;
-			$o = @$p->recurrenceOverrides[$recurrenceId];
+			$o = @$p->recurrenceOverrides[$recurrenceId->format('Y-m-d\TH:i:s')];
 			$duration = $p->duration;
 			if(isset($o)) {
 				if($o->excluded) {
