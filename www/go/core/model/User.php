@@ -62,6 +62,15 @@ class User extends AclItemEntity {
 	const ID_SUPER_ADMIN = 1;
 
 	/**
+	 * Fires when the password is verified during login via the web only.
+	 * Login might not be complete.
+	 *
+	 * @param User $user
+	 * @param string $password
+	 */
+	const EVENT_PASSWORD_VERIFIED = 'passwordverified';
+
+	/**
 	 * Fires on login
 	 *
 	 * @param User $user
@@ -275,8 +284,8 @@ class User extends AclItemEntity {
 	public $sort_email_Addresses_by_time;
 	public $no_reminders;
 	
-	protected $last_password_change;
-	public $force_password_change;
+	protected ?DateTime $passwordModifiedAt;
+	public bool $forcePasswordChange = false;
 
 	public function getDateTimeFormat(): string
 	{
@@ -312,6 +321,23 @@ class User extends AclItemEntity {
 			->addMap('clients', Client::class, ['id' => 'userId'])
 			->addScalar('groups', 'core_user_group', ['id' => 'userId']);
 	}
+
+public function getHistoryLog(): bool|array
+{
+	$log = parent::getHistoryLog();
+
+	if(isset($log['password'])) {
+		if(isset($log['password'][0])) {
+			$log['password'][0] = "MASKED";
+		}
+
+		if(isset($log['password'][1])) {
+			$log['password'][1] = "MASKED";
+		}
+	}
+
+	return $log;
+}
 
 
 	/**
@@ -400,10 +426,19 @@ class User extends AclItemEntity {
    */
 	public function setCurrentPassword($currentPassword){
 		$this->currentPassword = $currentPassword;
-		
-		if(!$this->checkPassword($currentPassword)) {
-			$this->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
-		} 
+
+		if(go()->getAuthState() && go()->getAuthState()->isAdmin()) {
+			if(!go()->getAuthState()->getUser()->checkPassword($currentPassword)) {
+				$this->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
+			}else {
+				$this->passwordVerified = true;
+			}
+		} else {
+
+			if (!$this->checkPassword($currentPassword)) {
+				$this->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
+			}
+		}
 	}
 
   /**
@@ -503,17 +538,9 @@ class User extends AclItemEntity {
 		
 		if(App::get()->getInstaller()->isInProgress()) {
 			return true;
-		} 
-		
-		$authState = App::get()->getAuthState();
-		if(!$authState) {
-			return false;
 		}
-		if(!$authState->isAuthenticated()) {
-			return false;
-		}						
-		
-		return go()->getModel()->getUserRights()->mayChangeUsers;
+
+		return false;
 	}
 	
 	protected function internalValidate() {
@@ -718,6 +745,23 @@ class User extends AclItemEntity {
 
 
 	/**
+	 * Check if this user is in a group
+	 *
+	 * @param int $groupId
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function isInGroup(int $groupId): bool
+	{
+		if(!$this->isFetched("groups")) {
+			$this->fetchRelation("groups");
+		}
+
+		return in_array($groupId, $this->groups);
+	}
+
+
+	/**
 	 * Get available authentication methods
 	 * 
 	 * @return BaseAuthenticator[]
@@ -783,6 +827,7 @@ class User extends AclItemEntity {
 		
 		if(isset($this->plainPassword)) {
 			$this->password = $this->passwordHash($this->plainPassword);
+			$this->forcePasswordChange = false;
 
 			if(!$this->isNew()) {
 
@@ -791,6 +836,10 @@ class User extends AclItemEntity {
 					return false;
 				}
 			}
+		}
+
+		if($this->isModified(['password'])) {
+			$this->passwordModifiedAt = new DateTime();
 		}
 		
 		if(!parent::internalSave()) {
@@ -818,7 +867,7 @@ class User extends AclItemEntity {
 		$this->changeHomeDir();
 
 		if($this->isModified(['password'])) {
-			Token::destroyOtherSessons();
+			Token::destroyOtherSessons($this->id);
 		}
 
 		return true;
@@ -827,6 +876,9 @@ class User extends AclItemEntity {
 
 	protected function internalGetModified(array|string &$properties = [], bool $forIsModified = false): bool|array
 	{
+		if(!is_array($properties)) {
+			$properties = [$properties];
+		}
 		// check if it's empty because the parent method will fill it with all props
 		$allProps = empty($properties);
 

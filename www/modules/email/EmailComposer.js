@@ -403,9 +403,9 @@ GO.email.EmailComposer = function(config) {
 		
 		this.templatesStore = new GO.data.GroupingStore({
 			url : GO.url("email/template/emailSelection"),
-			sortInfo:{field: 'name',direction: "ASC"},
+			sortInfo:{field: "name", direction: "ASC"},
 			baseParams : {
-				'type':"0"
+				type: "0"
 			},
 			reader: new Ext.data.JsonReader({
 				root: 'results',
@@ -413,9 +413,9 @@ GO.email.EmailComposer = function(config) {
 				id: 'id',
 				fields: ['id', 'name', 'group', 'text','template_id','checked','group_name', 'group_id'],
 			}),
-			groupField:'group_name',
-			remoteSort : false,
-			remoteGroup:true
+			groupField: "group_name",
+			remoteSort : true,
+			remoteGroup: true
 		});
 		
 		tbar.push(this.templatesBtn = new Ext.Button({

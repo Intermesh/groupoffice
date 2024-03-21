@@ -2,6 +2,7 @@
 
 namespace go\core\controller;
 
+use go\core\exception\Forbidden;
 use go\core\exception\NotFound;
 use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
@@ -105,6 +106,10 @@ class Module extends EntityController {
 	}
 	
 	public function install($params) {
+
+		if(!go()->getAuthState()->isAdmin()) {
+			throw new Forbidden();
+		}
 		
 		if(empty($params['package']))
 		{
@@ -132,6 +137,10 @@ class Module extends EntityController {
 	}
 	
 	public function uninstall($params) {
+		if(!go()->getAuthState()->isAdmin()) {
+			throw new Forbidden();
+		}
+
 		if(empty($params['package']))
 		{
 			throw new InvalidArguments("'package' param is required");

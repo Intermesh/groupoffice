@@ -16,8 +16,8 @@ class SmimeMessage extends Message
    * @param string $charset
    * @return SmimeMessage
    */
-  public static function newInstance($subject = null, $body = null,
-    $contentType = null, $charset = null)
+  public static function newInstance($subject = '', $body = '',
+    $contentType = 'text/plain', $charset = null)
   {
     return new static($subject, $body, $contentType, $charset);
   }

@@ -225,7 +225,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 							go.util.importFile(
 								'Note',
 								'.csv, .xlsx, .json',
-								{},
+								{noteBookId: this.addNoteBookId},
 								{}
 							);
 						},

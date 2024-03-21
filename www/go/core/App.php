@@ -10,6 +10,7 @@ namespace go\core {
 	use go\core\cache\CacheInterface;
 	use go\core\db\Connection;
 	use go\core\db\Database;
+	use go\core\db\DbException;
 	use go\core\db\Table;
 	use go\core\event\EventEmitterTrait;
 	use go\core\event\Listeners;
@@ -241,6 +242,7 @@ namespace go\core {
 		}
 
 		private function initCompatibility() {
+
 			/** @noinspection PhpIncludeInspection */
 			require(Environment::get()->getInstallPath() . "/go/GO.php");
 			spl_autoload_register(array('GO', 'autoload'));
@@ -569,11 +571,12 @@ namespace go\core {
 		{
 			try {
 				return go()->getDatabase()->hasTable('core_module');
-			} catch(PDOException $e) {
+			} catch(DbException $e) {
 
 				go()->debug("Check isInstalled failed with : " . $e->getMessage());
 
-				if(strpos($e->getMessage(), '1049') !== false || strpos($e->getMessage(), '1146') !== false) {
+				$pdoMessage = $e->getPrevious()->getMessage();
+				if(strpos($pdoMessage, '1049') !== false || strpos($pdoMessage,  '1146') !== false) {
 					// database does not exists or table does not exist
 
 					return false;

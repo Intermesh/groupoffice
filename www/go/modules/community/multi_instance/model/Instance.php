@@ -88,6 +88,11 @@ class Instance extends Entity {
 		return ['hostname', 'adminEmail', 'adminDisplayName'];
 	}
 
+	protected function canCreate(): bool
+	{
+		return \go\modules\community\multi_instance\Module::get()->getModel()->getUserRights()->mayRead;
+	}
+
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()

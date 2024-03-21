@@ -49,7 +49,14 @@ use go\core\util\ArrayObject;
  *
  */
 abstract class Entity extends Property {
-	
+
+	/**
+	 * Fires on validation
+	 *
+	 * @param Entity $entity The entity that will be saved
+	 */
+	const EVENT_VALIDATE = 'validate';
+
 	/**
 	 * Fires just before the entity will be saved
 	 * 
@@ -394,6 +401,8 @@ abstract class Entity extends Property {
 				return;
 			}
 		}
+
+		static::fireEvent(static::EVENT_VALIDATE, $this);
 		parent::internalValidate();
 	}
 
@@ -644,7 +653,7 @@ abstract class Entity extends Property {
 	 */
 	protected function canCreate(): bool
 	{
-		return true;
+		return go()->getAuthState() && go()->getAuthState()->isAdmin();
 	}
 
 	/**

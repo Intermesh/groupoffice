@@ -1,6 +1,7 @@
 <?php
 namespace go\core\install;
 
+use go\core\db\DbException;
 use go\core\db\Query;
 use go\core\db\Table;
 use go\core\db\Utils;
@@ -154,7 +155,7 @@ class MigrateCustomFields63to64 {
 		
 		try {			
 			$field->getDataType()->addConstraint();
-		} catch(PDOException $e) {			
+		} catch(DbException $e) {
 			//ignore duplicates
 		}
 	}
@@ -215,7 +216,7 @@ class MigrateCustomFields63to64 {
 		$this->nullifyInvalidOptions($field);
 		try {			
 			$field->getDataType()->addConstraint();
-		} catch(PDOException $e) {			
+		} catch(DbException $e) {
 			//ignore duplicates
 		}
 	}
@@ -441,7 +442,7 @@ class MigrateCustomFields63to64 {
 		$this->nullifyInvalidOptions($field);
 		try {
 			$field->getDataType()->addConstraint();
-		} catch(PDOException $e) {			
+		} catch(DbException $e) {
 			//ignore duplicates
 		}
 		

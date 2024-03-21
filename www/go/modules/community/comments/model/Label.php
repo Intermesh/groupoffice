@@ -17,7 +17,12 @@ class Label extends Entity {
 		return parent::defineMapping()
 						->addTable("comments_label");
 	}
-	
+
+	protected function canCreate(): bool
+	{
+		return true;
+	}
+
 	public static function getClientName(): string
 	{
 		return "CommentLabel";

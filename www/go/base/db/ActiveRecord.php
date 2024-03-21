@@ -43,6 +43,7 @@ namespace GO\Base\Db;
 use GO\Base\Db\PDO;
 use GO;
 use go\core\customfield\Html;
+use go\core\db\DbException;
 use go\core\db\Query;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
@@ -1912,7 +1913,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 			$models =  $result->fetchAll();
 			$model = isset($models[0]) ? $models[0] : false;
-		}catch(PDOException $e){
+		}catch(DbException $e){
 			$msg = $e->getMessage()."\n\nFull SQL Query: ".$sql;
 
 			throw new \Exception($msg);

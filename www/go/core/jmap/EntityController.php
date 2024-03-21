@@ -3,6 +3,7 @@
 namespace go\core\jmap;
 
 use Exception;
+use go\core\db\DbException;
 use go\core\ErrorHandler;
 use go\core\event\EventEmitterTrait;
 use go\core\exception\NotFound;
@@ -321,11 +322,11 @@ abstract class EntityController extends Controller {
 					}
 				}
 			}
-		}catch(PDOException $e) {
+		}catch(DbException $e) {
 
 			//Check if the PDOException is due to an invalid sort
 			//SQLSTATE[42S22]: Column not found: 1054 Unknown column 'customFields.A_checkbox' in 'order clause'
-			$msg = $e->getMessage();
+			$msg = $e->getPrevious()->getMessage();
 			if(strpos($msg, '42S22') !== false && strpos($msg, 'order clause') !== false) {
 				throw new UnsupportedSort();
 			} else{

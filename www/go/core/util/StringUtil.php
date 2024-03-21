@@ -616,14 +616,10 @@ END;
 // Keep a copy of the original string before cleaning up
 		$orig = $string;
 
-
-
-
 // URL decode
 		$string = urldecode($string);
 
 // Convert Hexadecimals
-//		$string = preg_replace('!(&#|\\\)[xX]([0-9a-fA-F]+);?!e', 'chr(hexdec("$2"))', $string);		
 		$string = preg_replace_callback('!(&#|\\\)[xX]([0-9a-fA-F]+);?!', function ($matches) {
 			return chr(hexdec($matches[2]));
 		}, $string);
@@ -632,7 +628,7 @@ END;
 		$string = preg_replace('!(&#0+[0-9]+)!', '$1;', $string);
 
 // Decode entities not needed because they won't be decoded for display.
-//		$string = html_entity_decode($string, ENT_NOQUOTES, 'UTF-8');
+		$string = html_entity_decode($string, ENT_QUOTES|ENT_HTML5, 'UTF-8');
 
 // Strip whitespace characters
 		$string = preg_replace('!\s!', '', $string);
@@ -862,16 +858,14 @@ END;
 				// handle email differently. We want info@group-office.com split in
 				// info and group-office.com. With names like Jansen-Pietersen we want
 				// Jansen and Pietersen.
-				$split = explode('@', $keyword);
-				if(count($split) != 2) {
-					//also split domains on . and words on -,\,/ for searching
-					$split = mb_split('[_\-\\\\\/.]', $keyword);
+				$emailParts = explode('@', $keyword);
+				if (count($emailParts) === 2) {
+					foreach ($emailParts as $emailPart) {
+						//also split domains on . and words on -,\,/ for searching
+						$split = mb_split('[_\-\\\\\/.]', $emailPart);
+						$secondPassKeywords = array_merge($secondPassKeywords, $split);
+					}
 				}
-
-				if (count($split) > 1) {
-					$secondPassKeywords = array_merge($secondPassKeywords, $split);
-				}
-
 			}
 
 			$keywords = array_merge($keywords, $secondPassKeywords);

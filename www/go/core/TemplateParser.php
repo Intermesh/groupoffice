@@ -329,7 +329,14 @@ class TemplateParser {
 		return $cls::findById($id, !empty($properties) ? explode(",", $properties) : []);
 	}
 
-	private function filterLinks(Entity $entity, $entityName, $properties = null) {
+	/**
+	 * @param Entity|GO\Base\Db\ActiveRecord $entity
+	 * @param $entityName
+	 * @param $properties
+	 * @return mixed
+	 * @throws Exception
+	 */
+	private function filterLinks($entity, $entityName, $properties = null) {
 
 		$entityType = EntityType::findByName($entityName);
 		if(!$entityType) {

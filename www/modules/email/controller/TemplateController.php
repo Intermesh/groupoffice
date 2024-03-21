@@ -77,7 +77,8 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 	protected function formatColumns(\GO\Base\Data\ColumnModel $columnModel) {
 		$columnModel->formatColumn('user_name', '$model->user->name');
 		$columnModel->formatColumn('group_name', function($model) {
-			return $model->group->name;
+//			return $model->group->name ?? '';
+			return $model->getGroupName();
 		},[], ['group.name']);
 		return parent::formatColumns($columnModel);
 	}
@@ -108,6 +109,11 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 
 		
 		$this->_defaultTemplate = !empty($params['account_id']) && $defTempForAccount->template_id ? $defTempForAccount : $defTempForUser;
+
+		if (!isset($params['sort'])) {
+			$params['sort'] = 'name';
+			$params['dir'] = 'ASC';
+		}
 		
 		if(isset($params['default_template_id']))
 		{
@@ -123,11 +129,11 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 		$store = new \GO\Base\Data\DbStore('GO\Base\Model\Template',new \GO\Base\Data\ColumnModel('GO\Base\Model\Template'),$params);
 
 		$store->getColumnModel()->setFormatRecordFunction(array($this, 'formatEmailSelectionRecord'));
-		$store->getColumnModel()->formatColumn('group_name', '$model->group->name', [], 'group.name');
+		$store->getColumnModel()->formatColumn('group_name', '$model->getGroupName()', [], 'group.name');
 		$store->addRecord(array(
 			'group' => 'templates',
 			'checked'=>isset($this->_defaultTemplate->template_id) && $this->_defaultTemplate->template_id==0,
-			'text' => \GO::t("None", "legacy", "email"),
+			'name' => \GO::t("None", "legacy", "email"),
 			'template_id'=>0
 		));
 
@@ -162,7 +168,7 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 		$formattedRecord['group'] = 'templates';
 		$formattedRecord['checked']=$this->_defaultTemplate->template_id==$model->id;
 		$formattedRecord['text']=  \GO\Base\Util\StringHelper::encodeHtml($model->name);
-		$formattedRecord['group_name'] = $model->group->name;
+		$formattedRecord['group_name'] = $model->getGroupName();
 		$formattedRecord['template_id']=$model->id;
 		unset($formattedRecord['id']);
 		return $formattedRecord;

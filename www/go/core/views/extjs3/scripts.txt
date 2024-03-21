@@ -89,6 +89,7 @@ login/LoginDialog.js
 login/BaseLoginPanel.js
 login/ForgotDialog.js
 login/UsernamePanel.js
+login/ForcePasswordChangePanel.js
 login/LoginPanel.js
 login/RecoveryDialog.js
 

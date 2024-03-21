@@ -13,13 +13,18 @@ CREATE TABLE `core_acl_group` (
   `level` tinyint(4) NOT NULL DEFAULT 10
 ) ENGINE=InnoDB;
 
-CREATE TABLE `core_acl_group_changes` (
-  `id` int(11) NOT NULL,
-  `aclId` int(11) NOT NULL,
-  `groupId` int(11) NOT NULL,
-  `grantModSeq` int(11) NOT NULL,
-  `revokeModSeq` int(11) DEFAULT NULL
-) ENGINE=InnoDB;
+-- auto-generated definition
+create table core_acl_group_changes
+(
+    id      int auto_increment
+        primary key,
+    aclId   int        not null,
+    groupId int        not null,
+    modSeq  int        not null,
+    granted tinyint(1) not null
+);
+
+
 
 CREATE TABLE `core_auth_method` (
   `id` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -244,10 +249,10 @@ CREATE TABLE `core_user` (
   `holidayset` varchar(10) DEFAULT NULL,
   `sort_email_addresses_by_time` tinyint(1) NOT NULL DEFAULT 0,
   `no_reminders` tinyint(1) NOT NULL DEFAULT 0,
-  `last_password_change` int(11) NOT NULL DEFAULT 0,
-  `force_password_change` tinyint(1) NOT NULL DEFAULT 0,
   `homeDir` varchar (190) not null,
   `confirmOnMove` TINYINT(1) NOT NULL DEFAULT 0,
+  `passwordModifiedAt` datetime null,
+  `forcePasswordChange` boolean default false not null,
     PRIMARY KEY (`id`)
 )
   ENGINE=InnoDB;
@@ -505,7 +510,7 @@ ALTER TABLE `core_acl_group`
 
 ALTER TABLE `core_acl_group_changes`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `aclId` (`aclId`,`groupId`),
+  ADD KEY `aclId` (`aclId`,`groupId`,`modSeq`),
   ADD KEY `group` (`groupId`);
 
 ALTER TABLE `core_auth_method`

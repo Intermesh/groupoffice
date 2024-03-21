@@ -156,7 +156,7 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, Iter
 	 * Binding more values than specified is not possible; if more keys exist in input_parameters than in the SQL specified in the PDO::prepare(), then the statement will fail and an error is emitted.
 	 *
 	 * @return bool Always returns true but must be compatible with PHP function
-	 * @throws PDOException
+	 * @throws DbException
 	 */
 	public function execute(array $params = null): bool
 	{
@@ -186,7 +186,7 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, Iter
 		}
 		catch(PDOException $e) {
 			go()->error("SQL FAILURE: " . $this);
-			throw $e;
+			throw new DbException($e);
 		}
 	}
 

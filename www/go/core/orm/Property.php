@@ -289,89 +289,126 @@ abstract class Property extends Model {
 	private function initRelations(): void
 	{
 		foreach ($this->getFetchedRelations() as $relation) {
-			$cls = $relation->propertyName;
+			$this->internalFetchRelation($relation);
+		}
+	}
 
-			$where = $this->buildRelationWhere($relation);
+	/**
+	 * Check if a property was fetched in the {@see Entity::find()} method.
+	 *
+	 * @param string $propName
+	 * @return bool
+	 */
+	public function isFetched(string $propName): bool
+	{
+		return in_array($propName, $this->fetchProperties);
+	}
 
-			// Should query when property is not new but also when there's an empty where.
-			// this means there is no foreign key and all records can be shown.
-			// this is used in {@see \go\modules\business\support\model\Settings} for example.
-			$shouldQuery = !$this->isNew() || !count($where);
+	/**
+	 * Manually fetch a relation if it was not fetched in the {@see Entity::find()} method.
+	 *
+	 * @param string $name
+	 * @return void
+	 * @throws Exception
+	 */
+	public function fetchRelation(string $name): void
+	{
+		if($this->isFetched($name)) {
+			return;
+		}
 
-			switch($relation->type) {
+		$relation = static::getMapping()->getRelation($name);
+		if(!$relation) {
+			throw new LogicException("Relation $name doesn't exist");
+		}
 
-				case Relation::TYPE_HAS_ONE:
-					if(!$shouldQuery) {
+		$this->internalFetchRelation($relation);
+	}
+
+	protected function internalFetchRelation(Relation $relation): void
+	{
+		$cls = $relation->propertyName;
+
+		$where = $this->buildRelationWhere($relation);
+
+		// Should query when property is not new but also when there's an empty where.
+		// this means there is no foreign key and all records can be shown.
+		// this is used in {@see \go\modules\business\support\model\Settings} for example.
+		$shouldQuery = !$this->isNew() || !count($where);
+
+		switch($relation->type) {
+
+			case Relation::TYPE_HAS_ONE:
+				if(!$shouldQuery) {
+					$prop = null;
+				} else
+				{
+					$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly, $this);
+					$prop = $stmt->fetch();
+					$stmt->closeCursor();
+					if(!$prop) {
 						$prop = null;
-					} else
-					{
-						$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly, $this);
-						$prop = $stmt->fetch();
-						$stmt->closeCursor();
-						if(!$prop) {
-							$prop = null;
+					}
+				}
+
+				if(!$prop && $relation->autoCreate) {
+					$prop = new $cls($this, true, [], $this->readOnly);
+
+					$this->applyRelationKeys($relation, $prop);
+				}
+				$this->{$relation->name} = $prop;
+				break;
+
+			case Relation::TYPE_ARRAY:
+
+				if(!$shouldQuery) {
+					$prop = [];
+				} else
+				{
+					$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly, $this);
+
+					$prop = $stmt->fetchAll();
+					$stmt->closeCursor();
+				}
+
+				$this->{$relation->name} = $prop;
+				break;
+
+			case Relation::TYPE_MAP:
+
+				if(!$shouldQuery) {
+					$prop = null;
+				} else
+				{
+					$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly, $this);
+					$prop = $stmt->fetchAll();
+					$stmt->closeCursor();
+					if(empty($prop)) {
+						$prop = null; //Set to null. Otherwise JSON will be serialized as [] instead of {}
+					}	else{
+						$o = [];
+						foreach($prop as $v) {
+							$key = $this->buildMapKey($v, $relation);
+							$o[$key] = $v;
 						}
+						$prop = $o;
 					}
+				}
 
-					if(!$prop && $relation->autoCreate) {
-						$prop = new $cls($this, true, [], $this->readOnly);
-
-						$this->applyRelationKeys($relation, $prop);
-					}
-					$this->{$relation->name} = $prop;
+				$this->{$relation->name} = $prop;
 				break;
 
-				case Relation::TYPE_ARRAY:
+			case Relation::TYPE_SCALAR:
 
-					if(!$shouldQuery) {
-						$prop = [];
-					} else
-					{
-						$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly, $this);
-
-						$prop = $stmt->fetchAll();
-						$stmt->closeCursor();
-					}
-
-					$this->{$relation->name} = $prop;
+				if(!$shouldQuery) {
+					$scalar = [];
+				} else {
+					$stmt = $this->queryScalar($where, $relation);
+					$scalar = $stmt->fetchAll();
+					$stmt->closeCursor();
+				}
+				$this->{$relation->name} = $scalar;
 				break;
-
-				case Relation::TYPE_MAP:
-
-					if(!$shouldQuery) {
-						$prop = null;
-					} else
-					{
-						$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly, $this);
-						$prop = $stmt->fetchAll();
-						$stmt->closeCursor();
-						if(empty($prop)) {
-							$prop = null; //Set to null. Otherwise JSON will be serialized as [] instead of {}
-						}	else{
-							$o = [];
-							foreach($prop as $v) {
-								$key = $this->buildMapKey($v, $relation);
-								$o[$key] = $v;
-							}
-							$prop = $o;
-						}
-					}
-
-					$this->{$relation->name} = $prop;
-				break;
-
-				case Relation::TYPE_SCALAR:
-
-					if(!$shouldQuery) {
-						$scalar = [];
-					} else {
-						$stmt = $this->queryScalar($where, $relation);
-						$scalar = $stmt->fetchAll();
-						$stmt->closeCursor();
-					}
-					$this->{$relation->name} = $scalar;
-				break;
-			}
 		}
 	}
 
@@ -662,6 +699,15 @@ abstract class Property extends Model {
 			return "";
 		}
 		return count($keys) > 1 ? implode("-", array_values($keys)) : array_values($keys)[0];
+	}
+
+	/**
+	 * List of properties that may not be set through the API. Like modifiedAt, createdAt etc.
+	 * @return array
+	 */
+	public static function readOnlyProps(): array
+	{
+		return ["modifiedBy", "createdAt", "createdBy", "modifiedAt"];
 	}
 
   /**

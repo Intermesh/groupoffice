@@ -26,6 +26,19 @@ class Server extends Entity {
 	 * @var string
 	 */
 	protected $smtpPassword = null;
+
+
+	public function getHistoryLog(): bool|array
+	{
+		$log = parent::getHistoryLog();
+
+		if(isset($log['smtpPassword'])) {
+			$log['smtpPassword'][0] = "MASKED";
+			$log['smtpPassword'][1] = "MASKED";
+		}
+
+		return $log;
+	}
 	
 	
 	public function getSmtpPassword() {

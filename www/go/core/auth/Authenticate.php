@@ -13,6 +13,7 @@ use go\core\model\User;
 use go\core\jmap\Request;
 use go\core\util\DateTime;
 use go\core\jmap\State as JmapState;
+use go\modules\community\addressbook\model\Contact;
 
 /**
  * Class Authenticate
@@ -170,6 +171,12 @@ class Authenticate {
 
 		if(!$authenticator) {
 
+			// If we get here then the given username doesn't exist.
+			// Do a password_verify for timing attacks as this would be done for a
+			// valid user.
+
+			password_verify("randomboguspasswordstring", '$2y$10$wkP8uDjY/tt5GNrfJJO9SOknqStW0POBn5Z4zpctuQkMP7pibTz2m');
+
 			User::fireEvent(User::EVENT_BADLOGIN, $username, null);
 
 			return false;
@@ -223,7 +230,14 @@ class Authenticate {
 	{
 		$email = trim($email);
 
-		$user = User::find()->where(['email' => $email])->orWhere(['recoveryEmail' => $email])->single();
+		$user = User::find([
+			'id',
+			'username',
+			'email'
+		])
+			->where(['email' => $email])
+			->orWhere(['recoveryEmail' => $email])
+			->single();
 		if (empty($user)) {
 			go()->debug("User not found");
 			return false;
