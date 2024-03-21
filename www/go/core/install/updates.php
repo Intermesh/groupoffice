@@ -1568,3 +1568,14 @@ $updates['202403181539'][] = function() {
 	ForcePasswordChange::register();
 };
 
+
+$updates['202403181539'][] = function() {
+	try {
+		echo "Installing `;-- Have I been Pwned module";
+		\go\modules\community\pwned\Module::get()->install();
+
+	} catch(Throwable $e) {
+		echo "ERROR: " . $e->getMessage();
+	}
+};
+

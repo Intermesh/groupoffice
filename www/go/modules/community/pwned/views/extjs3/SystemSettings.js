@@ -11,7 +11,7 @@ Ext.onReady(function () {
 
 go.modules.community.pwned.AuthenticatorSystemSettingsFieldset = Ext.extend(Ext.form.FieldSet, {
 	labelWidth: dp(152),
-	title: t('`;-- Have I been Pwnd'),
+	title: t('`;-- Have I been Pwned'),
 
 	initComponent: function() {
 
