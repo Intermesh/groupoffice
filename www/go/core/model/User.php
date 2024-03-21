@@ -60,7 +60,8 @@ class User extends AclItemEntity {
 	const ID_SUPER_ADMIN = 1;
 
 	/**
-	 * Fires when the password is verified during login. Login might not be complete.
+	 * Fires when the password is verified during login via the web only.
+	 * Login might not be complete.
 	 *
 	 * @param User $user
 	 * @param string $password
