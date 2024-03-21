@@ -743,6 +743,23 @@ public function getHistoryLog(): bool|array
 
 
 	/**
+	 * Check if this user is in a group
+	 *
+	 * @param int $groupId
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function isInGroup(int $groupId): bool
+	{
+		if(!$this->isFetched("groups")) {
+			$this->fetchRelation("groups");
+		}
+
+		return in_array($groupId, $this->groups);
+	}
+
+
+	/**
 	 * Get available authentication methods
 	 * 
 	 * @return BaseAuthenticator[]

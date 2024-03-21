@@ -24,7 +24,7 @@ class ForcePasswordChange extends SecondaryAuthenticator {
 
 		if($user->hasValidationErrors()) {
 			foreach($user->getValidationErrors() as $key => $e) {
-				$this->setValidationError($key, $e);
+				$this->setValidationError($key, $e['code'], $e['description']);
 			}
 			return false;
 		}

@@ -10,6 +10,7 @@ use go\core\orm\Property;
 use go\modules\community\otp\model;
 use go\modules\community\otp\OtpAuthenticator;
 use go\modules\community\pwned\model\Pwned;
+use go\modules\community\pwned\model\Settings;
 
 class Module extends core\Module {
 	/**
@@ -38,6 +39,11 @@ class Module extends core\Module {
 	public static function onUserValidate(User $user) {
 		$plain = $user->plainPassword(); // dV5(
 		if(isset($plain)) {
+
+			if(Settings::get()->enableForGroupId == Group::ID_EVERYONE || !$user->isInGroup(Settings::get()->enableForGroupId)) {
+				return;
+			}
+
 			$pwnd = new Pwned();
 			if($pwnd->hasBeenPwned($plain)) {
 				$user->setValidationError("password", core\validate\ErrorCode::INVALID_INPUT, "The new password is invalid because it has been breached.");
@@ -51,6 +57,10 @@ class Module extends core\Module {
 			return;
 		}
 
+		if(Settings::get()->enableForGroupId == Group::ID_EVERYONE || !$user->isInGroup(Settings::get()->enableForGroupId)) {
+			return;
+		}
+
 		$pwnd = new Pwned();
 		if($pwnd->hasBeenPwned($password)) {
 			$user->forcePasswordChange = true;
@@ -61,6 +71,11 @@ class Module extends core\Module {
 			$writable->save();
 		}
 
+	}
+
+	public function getSettings()
+	{
+		return Settings::get();
 	}
 
 }

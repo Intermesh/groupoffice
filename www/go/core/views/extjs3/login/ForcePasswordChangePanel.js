@@ -74,7 +74,7 @@ go.login.ForcePasswordChangePanel = Ext.extend(go.login.BaseLoginPanel, {
 						break;
 					case 10:
 					default:
-						this.passwordField.markInvalid(t('Invalid password'));
+						this.passwordField.markInvalid(errors[key].description ?? t('Invalid password'));
 						break;
 				}
 

@@ -45,6 +45,11 @@ go.login.BaseLoginPanel = Ext.extend(Ext.FormPanel, {
 			//prevent double submit
 			return;
 		}
+
+		if(!this.getForm().isValid()) {
+			return;
+		}
+
 		this.submitting = true;
 		this.getEl().mask(t("loading..."));
 		go.AuthenticationManager.doAuthentication(this.getPostData(),function(authMan, success, result){
