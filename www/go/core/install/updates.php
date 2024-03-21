@@ -3,6 +3,7 @@
 use go\core\App;
 use go\core\auth\ForcePasswordChange;
 use go\core\db\Table;
+use go\core\orm\PrincipalTrait;
 use go\core\util\ClassFinder;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Expression;
@@ -1582,7 +1583,7 @@ $updates['202403181539'][] = function() {
 
 # ------ 6.9 ---------------
 
-$updates['202401091045'][] = "CREATE TABLE `core_principal`(
+$updates['202403181539'][] = "CREATE TABLE `core_principal`(
    `id` VARCHAR(60) NOT NULL,
 	`name` VARCHAR(100) NOT NULL,
 	`email` VARCHAR(255) NULL,
@@ -1608,3 +1609,15 @@ $updates['202401091045'][] = "CREATE TABLE `core_principal`(
 		ON DELETE Restrict
 		ON UPDATE No Action
 ) ENGINE = InnoDB;";
+
+$updates['202403181539'][] = function() {
+	echo "Building principals\n";
+
+	$classFinder = new ClassFinder();
+	$entities = $classFinder->findByTrait(PrincipalTrait::class);
+
+	foreach ($entities as $cls) {
+		$cls::rebuildPrincipalForEntity();
+		echo "\nDone\n\n";
+	}
+};
