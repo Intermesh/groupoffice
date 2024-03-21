@@ -11,6 +11,7 @@ import {
 import {client, JmapDataSource, jmapds, RecurrenceField} from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
 import {CalendarItem} from "./CalendarItem.js";
+import {calendarStore} from "./Index.js";
 
 
 export class EventDetail extends Component {
@@ -68,7 +69,14 @@ export class EventDetail extends Component {
 					}
 				}
 			},
-			displayfield({name: 'title', label:t('Title')}),
+			comp({cls:'hbox'},
+				displayfield({name: 'title', label:t('Title')}),
+				comp({flex:1}),
+				displayfield({name: 'calendarId', label:t('Calendar'), renderer: async (v) => {
+					const c = await calendarStore.dataSource.single(v);
+					return c ? c.name : t('Unknown');
+					}  }),
+			),
 			comp({cls:'hbox'},
 				displayfield({label: t('Start'), name:'start',renderer:d=>Format.dateTime(d), flex:1}),
 				displayfield({label:t('End'), name: 'end',renderer:d=>Format.dateTime(d), flex:1})
@@ -79,7 +87,25 @@ export class EventDetail extends Component {
 			mapfield({name: 'participants',
 				buildField: (v: any) => displayfield({
 					icon: (v.roles.owner ? 'person_3' : 'person'),
-					renderer: v => v.name ? v.name + '<br>' + v.email : v.email
+					renderer: (v) => {
+						let r = v.email;
+						// type can be You or Organizer
+						let type = '';
+						if(v.email == this.item?.currentParticipant?.email) {
+							type = t('You');
+						}
+						if(v.roles.owner)
+							type = t('Organizer');
+
+						if(type) type = ' ('+type+')';
+
+						if(v.name) {
+							r = v.name + type+'<br>' + r;
+						} else if(type) {
+							r += type
+						}
+						return r;
+					}
 				})
 			}),
 			hr(),

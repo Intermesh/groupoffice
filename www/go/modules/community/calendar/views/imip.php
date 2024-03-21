@@ -24,7 +24,7 @@
         line-height:28px;
         margin-left:13px;
     }
-    a.bord:hover,a.bord.active { background-color:#DBE3F0;}
+    a.bord:hover,a.bord.active {color:white; background-color:#1652a1;}
     span { color: #70757a; }
     p { margin-bottom: 24px;}
     h1 { display: inline-block; overflow-wrap: break-word;
@@ -51,6 +51,10 @@
         line-height: 18px;
     }
     .center { margin-left: 112px; width: 456px;}
+    .accepted {color:green;}
+    .declined {color: red;}
+    .tentative {color: blue;}
+
     @media only screen and (max-width: 628px) {
         .card {
             width: 360px !important;
@@ -111,6 +115,13 @@ $icon = [
             <?php endforeach; endif; ?>
         </div>
     </div>
+    <?php if($method==='PAGE' && isset($_GET['reply'])): ?>
+    <div class="center <?=$_GET['reply']?>"><br>
+       <?php $msg = go()->t('replyPageMessage', 'community', 'calendar');
+       if(array_key_exists($_GET['reply'], $msg)) echo $msg[$_GET['reply']];
+       ?>
+    </div>
+    <?php endif; ?>
     <div class="foot"><?php if($method!=='CANCEL'): ?>
         <a class="bord <?=$status['accepted']??''?>"  target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=accepted" style="margin-left:112px; margin-top:0;" ><?=go()->t('Akkoord')?></a>
         <a class="bord <?=$status['tentative']??''?>" target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=tentative"><?=go()->t('Misschien')?></a>

@@ -78,15 +78,18 @@ class ICalendarHelper {
 						if($event->showWithoutTime)
 							$exdate['VALUE'] = 'DATE';
 					} else {
-						$props = self::toVEvent((new CalendarEvent())->setValues($patch->toArray()), true);
-						$props['UID'] = $event->uid;
-						$props['RECURRENCE-ID'] = new DateTime($recurrenceId, $event->timeZone());
-						$vcalendar->add('VEVENT', $props);
-						if($event->showWithoutTime) {
-							$vevent->{'RECURRENCE-ID'}['VALUE'] = 'DATE';
-							if(isset($props['DTSTART'])) $vevent->DTSTART['VALUE'] = 'DATE';
-							if(isset($props['DTEND'])) $vevent->DTEND['VALUE'] = 'DATE';
-						}
+						self::addExceptionVEvent($vcalendar, $event, $patch, $recurrenceId);
+
+//						$props = self::toVEvent((new CalendarEvent())->setValues($patch->toArray()), true);
+//						$props['UID'] = $event->uid;
+//						//$props['RECURRENCE-ID'] = new DateTime($recurrenceId, $event->timeZone());
+//						$exVEvent = $vcalendar->add('VEVENT', $props);
+//						$rId = $exVEvent->add('RECURRENCE-ID', new DateTime($recurrenceId, $event->timeZone()));
+//						if($event->showWithoutTime) {
+//							$rId['VALUE'] = 'DATE';
+//							if(isset($props['DTSTART'])) $vevent->DTSTART['VALUE'] = 'DATE';
+//							if(isset($props['DTEND'])) $vevent->DTEND['VALUE'] = 'DATE';
+//						}
 					}
 				}
 			}
@@ -126,9 +129,36 @@ class ICalendarHelper {
 		if(!empty($event->location)) $props['LOCATION'] = $event->location;
 		if(!empty($event->color)) $props['COLOR'] = $event->color;
 		if(!empty($event->categoryIds)) $props['CATEGORIES'] = implode(',',$event->categoryNames());
-
-
 		return $props;
+	}
+	static function addExceptionVEvent(&$vcalendar, $event, $patch, $recurrenceId) {
+		$props = ['UID' => $event->uid];
+		if(isset($patch->title)) $props['SUMMARY'] = $patch->title;
+		if(isset($patch->start)) $props['DTSTART'] = new DateTime($patch->start, $event->timeZone());
+		if(isset($patch->duration)) {
+			$end = new DateTime($patch->start,$event->timeZone());
+			$end->add(new \DateInterval($event->duration));
+			$props['DTEND'] = $end;
+		}
+		if(isset($patch->description)) $props['DESCRIPTION'] = $patch->description;
+		if(isset($patch->location)) $props['LOCATION'] = $patch->location;
+		if(isset($patch->color)) $props['COLOR'] = $patch->color;
+		//if(isset($patch->categoryIds)) $props['CATEGORIES'] = implode(',',$patch->categoryNames());
+
+		$exVEvent = $vcalendar->add('VEVENT', $props);
+		$rId = $exVEvent->add('RECURRENCE-ID', new DateTime($recurrenceId, $event->timeZone()));
+		if($event->showWithoutTime) {
+			$rId['VALUE'] = 'DATE';
+			if(isset($props['DTSTART'])) $exVEvent->DTSTART['VALUE'] = 'DATE';
+			if(isset($props['DTEND'])) $exVEvent->DTEND['VALUE'] = 'DATE';
+		}
+		if(isset($patch->participants)) {
+			foreach($patch->participants as $p) {
+				$exVEvent->add(...self::toAttendee((new Participant($event))->setValues((array)$p)));
+			}
+		}
+		//loop attendees
+		return $exVEvent;
 	}
 
 	static function toAttendee(Participant $participant) {

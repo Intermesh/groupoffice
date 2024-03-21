@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar` (
    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
    `name` VARCHAR(80) NOT NULL,
    `description` TEXT NULL,
-    `color` VARCHAR(21) NOT NULL, # lightgoldenrodyellow
+    `defaultColor` VARCHAR(21) NOT NULL, # lightgoldenrodyellow
     `timeZone` VARCHAR(45) NULL,
 	 `groupId` INT UNSIGNED NULL,
     `aclId` INT NOT NULL,

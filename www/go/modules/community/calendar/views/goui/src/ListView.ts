@@ -16,6 +16,7 @@ export class ListView extends CalendarView {
 	constructor(adapter: CalendarAdapter) {
 		super(adapter);
 		this.cls = 'hbox';
+		this.style = {height:'100%'};
 		this.el.append(this.listEl = E('ul'));
 		this.detail = new EventDetail();
 		this.items.add(

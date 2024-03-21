@@ -137,13 +137,14 @@ export class WeekView extends CalendarView {
 			pxPerSnap = li.offsetHeight / (1440 / SNAP); // 96 quarter-hours in a day
 			offset = li.getBoundingClientRect().top;
 			currDayEl = target.up('[data-day]')!;
-			this.el.cls('+resizing');
 			const event = target.up('div[data-key]');
 			if (event) { // MOVE
 				offset += e.offsetY;
 				ev = this.dayItems.find(m => m.key == event.dataset.key)!;
-				if(!ev) return;
+
+				if(!ev || !ev.isOwner) return;
 				action = resize;
+				this.el.cls('+resizing');
 				// 4 pixels for the resize handle on top and bottom of event
 				if (e.offsetY <= 4) {
 					anchor = ev.end.getMinuteOfDay();
@@ -160,7 +161,7 @@ export class WeekView extends CalendarView {
 				anchor = Math.round(e.offsetY / pxPerSnap) * SNAP;
 				const data = {
 						start: (new DateTime(target.dataset.day!)).setHours(0, anchor).format('c'),
-						title: 'New event',
+						title: t('New event'),
 						duration: client.user.calendarPreferences.defaultDuration ?? "P1H",
 						calendarId: CalendarView.selectedCalendarId,
 						showWithoutTime: false
@@ -268,7 +269,7 @@ export class WeekView extends CalendarView {
 			super.eventHtml(e).css(this.makestyle(e, this.day))
 		));
 		var lengths = this.slots.map((i: any) => Object.keys(i).length);
-		this.alldayCtr.parentElement!.style.height = ((Math.max(...lengths,1) * this.ROWHEIGHT)/10)+'rem';
+		this.alldayCtr.parentElement!.style.height = (Math.max(...lengths,1) * this.ROWHEIGHT)+'rem';
 	}
 
 	private updateItems(day?: DateTime) {

@@ -48,8 +48,31 @@ function addEmailAction() {
 		GO.email.handleITIP = (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent|string, feedback?:string}} ) => {
 			if(msg.itip) {
 				const event = msg.itip.event,
-					btns = E('div').cls('btns');
-
+					btns = E('div').cls('btns'),
+					names: any = {accepted: t("Accept"), tentative: t("Maybe"), declined: t("Decline")},
+					updateBtns = (item: CalendarItem) => {
+						btns.innerHTML = '';
+						if(!item.currentParticipant){
+							btns.append(t('You ('+go.User.email+') are not an invited to this event'));
+						} else {
+							btns.append(
+								E('div',
+									...['accepted', 'tentative', 'declined'].map(s => E('button', names[s])
+										.cls('goui-button')
+										.cls('pressed', item.currentParticipant?.participationStatus == s)
+										.on('click', _ => {
+											item.updateParticipation(s as 'accepted'|'declined'|'tentative').then(() => {
+												updateBtns(item);
+											});
+										})
+									)
+								).cls('goui group'),
+								E('button', t("Open Calendar")).cls('goui-button').on('click', _ => {
+									router.goto("calendar/day/" + item.start.format('Y-m-d'));
+								})
+							);
+						}
+					};
 				let text = msg.itip.feedback || {
 					CANCEL: t("Cancellation"),
 					REQUEST: t("Invitation")
@@ -57,16 +80,7 @@ function addEmailAction() {
 
 				if(msg.itip.method === 'REQUEST' && typeof event !== 'string') {
 					const item = new CalendarItem({data:event, key:event.id!});
-					btns.append(
-						E('div',
-							E('button', t("Accept")).cls('goui-button').on('click', _ => {item.updateParticipation('accepted');}),
-							E('button', t("Maybe")).cls('goui-button').on('click', _ => {item.updateParticipation('tentative');}),
-							E('button', t("Decline")).cls('goui-button').on('click', _ => {item.updateParticipation('declined');})
-						).cls('goui group'),
-						E('button', t("Open Calendar")).cls('goui-button').on('click', _ => {
-							alert('todo: show day schedule for event start till end time');
-						})
-					);
+					updateBtns(item);
 				}
 
 				if(event) {
@@ -85,8 +99,6 @@ function addEmailAction() {
 
 	}
 }
-
-
 
 modules.register(  {
 	package: "community",

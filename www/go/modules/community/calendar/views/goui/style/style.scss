@@ -15,7 +15,7 @@
 	overflow: hidden;
 	box-sizing: border-box;
 	border-radius: $borderRadius;
-	height:dp(28);
+	height:dp(24);
 	padding: dp(2) dp(6);
 	text-align: left;
 	user-select: none;
@@ -25,13 +25,14 @@
 	> em {
 		text-overflow:ellipsis;
 		overflow:hidden;
-		flex: 1 0 auto;
+		flex: 1 1 auto;
 	}
 	> span {
 		text-align:right;
 		white-space: nowrap;
 		font-weight: 300;
-		font-size: .9em;
+		font-size: .85em;
+		color:$colorTextSecondary;
 	}
 	&::first-letter {
 		text-transform: capitalize;

@@ -1,5 +1,5 @@
 import {CalendarView} from "./CalendarView.js";
-import {ComponentEventMap, DateInterval, DateTime, ObservableListenerOpts} from "@intermesh/goui";
+import {ComponentEventMap, DateInterval, DateTime, ObservableListenerOpts, t} from "@intermesh/goui";
 import {E} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {client} from "@intermesh/groupoffice-core";
@@ -111,7 +111,7 @@ export class MonthView extends CalendarView {
 					startStr = day.dataset.date! + (dd ? (new DateTime).format(' H:00:00.000') : ' 00:00:00.000');
 				const data = {
 						start: startStr,
-						title: 'New event',
+						title: t('New event'),
 						duration: dd ?? 'P1D',
 						calendarId: CalendarView.selectedCalendarId,
 						showWithoutTime: !dd
@@ -130,6 +130,7 @@ export class MonthView extends CalendarView {
 			const event = e.target.up('div[data-key]');
 			if(event) {
 				ev = this.viewModel.find(m => m.key == event.dataset.key)!;
+				if(!ev || !ev.isOwner) return;
 				action = move;
 				el.on('mousemove', mouseMove);
 				window.addEventListener('mouseup', mouseUp);

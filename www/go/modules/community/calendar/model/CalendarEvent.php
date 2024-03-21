@@ -166,6 +166,9 @@ class CalendarEvent extends AclItemEntity {
 	protected $veventBlobId;
 
 	public $participants = [];
+	/**
+	 * @var RecurrenceOverride[]
+	 */
 	public $recurrenceOverrides = [];
 	public $alerts = [];
 
@@ -396,6 +399,13 @@ class CalendarEvent extends AclItemEntity {
 		}
 	}
 
+	private function getFirstOwner() {
+		foreach($this->participants as $p) {
+			if($p->isOwner()) return $p;
+		}
+		return null;
+	}
+
 	protected function internalSave() : bool {
 
 		if(empty($this->uid)) {
@@ -416,6 +426,12 @@ class CalendarEvent extends AclItemEntity {
 		if ($this->isModified('status') && $this->status == self::Cancelled) {
 			// Remove alert when event is cancelled
 			CoreAlert::deleteByEntity($this);
+		}
+		if(!empty($this->participants) && empty($this->replyTo)) {
+			$owner = $this->getFirstOwner();
+			if(!empty($owner)) {
+				$this->replyTo = $owner->email;
+			}
 		}
 
 		if(self::$sendSchedulingMessages) {
@@ -471,20 +487,6 @@ class CalendarEvent extends AclItemEntity {
 			CalendarEvent::entityType()->changes($changes);
 	}
 
-	/**
-	 * Only send updates it deemed “essential” to avoid flooding the recipient’s email with changes they do not care about.
-	 * @return boolean
-	 */
-//	private function changeWasEssential() {
-//		if(
-//			($this->lastOccurrence < new DateTime()) ||
-//			(!$this->isOrigin && (!$this->calendarParticipant() || !$this->calendarParticipant->isModified('participantionStatus')))
-//		) {
-//			return false; // dont send schedule messages
-//		}
-//		return true;
-//	}
-
 	private $calendarParticipant = null;
 
 	/**
@@ -522,16 +524,6 @@ class CalendarEvent extends AclItemEntity {
 		}
 		return false;
 	}
-
-//	public function currentUserParticipant(): Participant {
-//		foreach($this->participants as $k => $participant) {
-//			if($k == 'u'.go()->getUserId()) {
-//				$me = $participant;
-//				break;
-//			}
-//		}
-//		return $me;
-//	}
 
 	public function organizer() {
 		foreach($this->participants as $participant) {

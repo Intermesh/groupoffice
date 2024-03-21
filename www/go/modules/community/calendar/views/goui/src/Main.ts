@@ -16,7 +16,6 @@ import {
 	t,
 	tbar, win
 } from "@intermesh/goui";
-import {EventWindow} from "./EventWindow.js";
 import {MonthView} from "./MonthView.js";
 import {WeekView} from "./WeekView.js";
 import {calendarStore, categoryStore, ValidTimeSpan} from "./Index.js";
@@ -32,6 +31,7 @@ import {ResourcesWindow} from "./ResourcesWindow.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 import {ListView} from "./ListView.js";
 import {PreferencesWindow} from "./PreferencesWindow.js";
+import {CalendarItem} from "./CalendarItem.js";
 
 export class Main extends Component {
 
@@ -62,15 +62,6 @@ export class Main extends Component {
 	constructor() {
 		super();
 		this.cls = 'hbox fit tablet-cards';
-
-		// jmapds('CalendarEvent');
-		// this.eventStore = datasourcestore({
-		// 	dataSource:jmapds('CalendarEvent'),
-		// 	listeners: {
-		// 		'load': () => { (this.cards.items.get(this.cards.activeItem) as CalendarView)!.update() }
-		// 	}
-		// 	//properties: ['title', 'start','duration','calendarId','showWithoutTime','alerts','recurrenceRule','id'],
-		// });
 
 		this.adapter.onLoad = () => { (this.cards.items.get(this.cards.activeItem) as CalendarView)!.update() };
 
@@ -136,6 +127,7 @@ export class Main extends Component {
 						btn({
 							icon: 'more_vert', menu: menu({},
 								btn({
+									icon: 'calendar_add_on',
 									text: t('Create calendar') + '…', handler: () => {
 										const dlg = new CalendarWindow();
 										dlg.form.create({});
@@ -143,21 +135,18 @@ export class Main extends Component {
 									}
 								}),
 								btn({
+									icon: 'bookmark_added',
 									text: t('Subscribe to calendar') + '…', handler: () => {
 										const d = new SubscribeWindow();
 										d.show();
 									}
 								}),
-								btn({text: t('Add calendar from link') + '…'})
+								btn({icon: 'travel_explore',text: t('Add calendar from link') + '…'})
 							)
 						})
 					),
 					this.calendarList = this.buildCalendarFilter(),
-					comp({tagName:'ul', cls:'goui check-list'},
-						comp({tagName:'li'},this.birthdayCb),
-						comp({tagName:'li'},this.tasksCb),
-						comp({tagName:'li'},this.holidayCb),
-					),
+					comp({tagName:'ul', cls:'goui check-list'}, ...this.renderAdapterBoxes()),
 					tbar({cls: 'dense'},
 						comp({tagName: 'h3', html: t('Categories')}),
 						btn({
@@ -193,7 +182,12 @@ export class Main extends Component {
 						cls: 'not-medium-device',
 						icon: 'add',
 						title: t('New event'),
-						handler: _ => (new EventWindow()).show()
+						handler: _ => (new CalendarItem({key:'',data:{
+							start:(new DateTime).format('Y-m-d\TH:00:00.000'),
+							title: t('New event'),
+							duration: client.user.calendarPreferences.defaultDuration ?? "P1H",
+							calendarId: CalendarView.selectedCalendarId
+						}})).save()
 					}),
 					this.currentText = comp({tagName: 'h3', text: t('Today'), flex: '1 1 50%', style: {minWidth: '100px', fontSize: '1.8em'}}),
 					//'->',
@@ -222,10 +216,10 @@ export class Main extends Component {
 						}),
 						btn({icon: 'keyboard_arrow_right', title: t('Next'), allowFastClick:true, handler: b => this.forward()}),
 					),
-					btn({icon:'more_vert',cls: 'not-small-device', menu:menu({expandLeft: true},
+					btn({icon:'more_vert',cls: 'not-small-device', menu:menu({},
 						btn({icon:'video_call',text:t('Video meeting'), handler: _ => {(new Settings()).openLoad()}}),
 						btn({
-							icon: 'print', text:t('Print'), menu: menu({expandLeft: true},
+							icon: 'print', text:t('Print'), menu: menu({},
 								this.printCurrentBtn = btn({icon: 'print', text: t('Current view'), handler:() => {
 									let view = this.timeSpan;
 									if(['day', 'week', 'month'].includes(view)) {
@@ -265,40 +259,22 @@ export class Main extends Component {
 		window.open(client.pageUrl('community/calendar/print/'+type+'/'+this.date.format('Y-m-d')));
 	}
 
-	private birthdayCb = checkbox({
-		color: '#ff0000', label: t('Birthdays'),
-		value: this.adapter.byType('birthday').enabled,
-		listeners: {
-			'change': (_p, newValue) => {
-				this.adapterVisible('birthday', newValue);
+	private renderAdapterBoxes() {
+		const boxes: any = {
+			birthday:['#ff0000', t('Birthdays')],
+			task: 	['#0000ff',	t('Tasks')],
+			holiday: ['#009900', t('Holidays')]
+		};
+		return Object.keys(boxes).map(key => comp({tagName:'li'}, checkbox({
+			color: boxes[key][0], label: boxes[key][1], value: this.adapter.byType(key).enabled,
+			listeners: {
+				'change': (_p, enabled) => {
+					this.adapter.byType(key).enabled = enabled;
+					jmapds('User').update(client.user.id, {calendarPreferences: {[key+'sAreVisible']: enabled}});
+					this.updateView();
+				}
 			}
-		}
-	})
-
-	private tasksCb = checkbox({
-		color: '#0000ff', label: t('Tasks'),
-		value: this.adapter.byType('task').enabled,
-		listeners: {
-			'change': (_p, newValue) => {
-				this.adapterVisible('task', newValue);
-			}
-		}
-	})
-
-	private holidayCb = checkbox({
-		color: '#009900', label: t('Holidays'),
-		value: this.adapter.byType('holiday').enabled,
-		listeners: {
-			'change': (_p, newValue) => {
-				this.adapterVisible('holiday', newValue);
-			}
-		}
-	})
-
-	private adapterVisible(name:string,enabled:boolean) {
-		this.adapter.byType(name).enabled = enabled;
-		jmapds('User').update(client.user.id, {calendarPreferences: {[name+'sAreVisible']: enabled}});
-		this.updateView();
+		})));
 	}
 
 	private inCalendars: {[key:string]:boolean} = {}
@@ -428,20 +404,10 @@ export class Main extends Component {
 			cls: 'check-list',
 			listeners: {'render': me => { me.store.load() }},
 			renderer: (data) => {
-				// if(data.isVisible && list.rowSelection) {
-				// 	list.rowSelection.add(storeIndex);
-				// }
 				return [checkbox({
 					color: '#' + data.color,
-					//style: 'padding: 0 8px',
-					//value: data.isVisible,
 					label: data.name,
 					listeners: {
-						// 'render': (field) => {
-						// 	field.el.addEventListener("mousedown", (ev) => {
-						// 		ev.stopPropagation(); // stop lists row selector event
-						// 	});
-						// },
 						'change': (p, newValue) => {
 							if (newValue) {
 								selected[data.id] = true;

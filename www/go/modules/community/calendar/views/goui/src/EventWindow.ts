@@ -54,7 +54,7 @@ export class EventWindow extends FormWindow {
 		super("CalendarEvent");
 
 		const m = go.Modules.get('community','calendar');
-		this.title = t('New Event');
+		this.title = t('Event');
 		this.width = 440;
 		this.height = 820;
 		this.store = this.form.dataSource as JmapDataSource; //jmapds("CalendarEvent");
@@ -66,7 +66,7 @@ export class EventWindow extends FormWindow {
 			this.form.value.useDefaultAlert = newValue === 'default';
 		});
 
-		const exceptionsBtn = btn({text:t('Exceptions'),width: 100, handler: _b => {
+		const exceptionsBtn = btn({text:t('Exceptions'), handler: _b => {
 			this.openExceptionsWindow();
 		}});
 
@@ -128,18 +128,34 @@ export class EventWindow extends FormWindow {
 			}),
 			comp({}),
 			this.startDate = datefield({label: t('Start'), name:'start', flex:1, defaultTime: now.format('H')+':00',
-				listeners:{'setvalue': (me,_v) => {
-					const date = me.getValueAsDateTime();
-					if(date){
-						// if(this.endDate.changed) {
-						// 	this.endDate.value = start.addDuration(this.item!.data.duration || 'P1H').format(this.outputFormat+'TH:i');
-						// }
-						recurrenceField.setStartDate(date);
-						this.endDate.min = date.format('Y-m-d H:i');
+				listeners:{'setvalue': (me,_v, oldV) => {
+					const start = me.getValueAsDateTime(),
+						end = this.endDate.getValueAsDateTime(),
+						format= me.withTime ? "Y-m-dTH:i" : 'Y-m-d';
+					if(start){
+						recurrenceField.setStartDate(start);
+					}
+
+					if (end && start && start.date > end.date) {
+						const oldStart = DateTime.createFromFormat(oldV, format)!,
+							duration = oldStart.diff(end);
+						this.endDate.value = start.add(duration).format(format);
 					}
 				}}
 			}),
-			this.endDate = datefield({label:t('End'), name: 'end', flex:1, defaultTime: (now.getHours()+1 )+':00'}),
+			this.endDate = datefield({label:t('End'), name: 'end', flex:1, defaultTime: (now.getHours()+1 )+':00',
+				listeners: {'setvalue': (me,_v,oldV) => {
+					const eV = me.getValueAsDateTime(),
+						sV =this.startDate.getValueAsDateTime(),
+						format=me.withTime ? "Y-m-dTH:i" : 'Y-m-d';
+
+					if (eV && sV && eV.date < sV.date) {
+						const oldEnd = DateTime.createFromFormat(oldV, format)!,
+							duration = oldEnd.diff(sV);
+						this.startDate.value = eV.add(duration).format(format);
+					}
+				}}
+			}),
 			comp({cls:'hbox'},
 				recurrenceField,
 				exceptionsBtn,
@@ -284,14 +300,14 @@ export class EventWindow extends FormWindow {
 
 	loadEvent(ev: CalendarItem) {
 		this.item = ev;
-		this.title = t(!ev.key ? 'New event' : 'Edit event');
+		//this.title = t(!ev.key ? 'New event' : 'Edit event');
 		if (!ev.key) {
 			this.form.create(ev.data);
 		} else {
 			this.form.load(ev.data.id!).then(() => {
 				if(ev.recurrenceId) {
 					this.startDate.value = ev.start.format('Y-m-d\TH:i');
-					this.endDate.value = ev.end.clone().addDays(ev.data.showWithoutTime? -1 : 0).format(ev.data.showWithoutTime ? 'Y-m-d' : 'c');
+					this.endDate.value = ev.end.clone().addDays(ev.data.showWithoutTime? -1 : 0).format(ev.data.showWithoutTime ? 'Y-m-d' : 'Y-m-d\TH:i');
 				}
 			});
 		}

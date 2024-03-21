@@ -1,5 +1,5 @@
 import {
-	autocomplete, btn, Button, checkbox,
+	autocomplete, avatar, btn, Button, checkbox,
 	column,
 	comp,
 	Component, Config, containerfield, createComponent, datasourcestore, FieldEventMap,
@@ -9,7 +9,7 @@ import {
 	t,
 	table
 } from "@intermesh/goui";
-import {jmapds, validateEmail} from "@intermesh/groupoffice-core";
+import {client, jmapds, validateEmail} from "@intermesh/groupoffice-core";
 
 export const participantfield = (config?: Config<ParticipantField, FieldEventMap<ParticipantField>>) => createComponent(new ParticipantField(), config);
 
@@ -109,9 +109,23 @@ export class ParticipantField extends Component {
 						//properties: ['id', 'displayName', 'email']
 					}),
 					columns: [
+						column({id:'type',width:50, renderer: (v, r) => {
+								if(r.avatarId) {
+									return avatar({backgroundImage: client.downloadUrl(r.avatarId)});
+								}
+								return '<i class="icon">' + (v=='resource' ? 'meeting_rrom' : 'person') + '</i>'
+
+							} }),
 						column({
 							id: "name",
-							renderer: (v, record) => v + `<br><small>${record.email || record.description}</small>`
+							renderer: (v, record) => {
+								let name = v;
+								if(!isNaN(record.id)) {
+									name = '<b>'+name+'</b>';
+								}
+								return name + `<br><small>${record.email || record.description}</small>`
+
+							}
 						})
 					]
 				})

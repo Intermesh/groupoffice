@@ -1,4 +1,4 @@
-import {btn, column, datasourcestore, t, Table, table, Window} from "@intermesh/goui";
+import {btn, column, comp, datasourcestore, t, Table, table, Window} from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
 
 export class SubscribeWindow extends Window {
@@ -9,7 +9,10 @@ export class SubscribeWindow extends Window {
 		this.title = t('Subscribe to calendar');
 		this.height = 800;
 		const store = datasourcestore({
-			queryParams:{filter:{isSubscribed: false}},
+			queryParams:{
+				filter:{isSubscribed: false},
+			},
+			sort:[{property:'name',isAscending:true}],
 			dataSource:jmapds('Calendar')
 		});
 
@@ -17,7 +20,7 @@ export class SubscribeWindow extends Window {
 			store.load();
 		} )
 
-		this.items.add(this.grid = table({
+		this.items.add(comp({cls:'scroll', flex:1},this.grid = table({
 			//fitParent:true,
 			style:{width:'100%'},
 			headers: false,
@@ -31,6 +34,6 @@ export class SubscribeWindow extends Window {
 					})
 				})
 			]
-		}));
+		})));
 	}
 }

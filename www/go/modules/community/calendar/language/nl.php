@@ -19,7 +19,7 @@ return [
 	'Categories' => 'Categorieën',
 	'Calendars' => 'Agenda\'s',
 	'New event' => 'Nieuwe afspraak',
-	'Edit event' => 'Bewerk afspraak',
+	'Event' => 'Afspraak',
 	'All day' => 'Hele dag',
 	'Unsubscribe' => 'Afmelden',
 	'Subscribe' => 'Aanmelden',
@@ -31,7 +31,7 @@ return [
 
 	'Create calendar' => 'Nieuwe agenda maken',
 	'Subscribe to calendar' => 'Aanmelden bij agenda',
-	'Add calendar from link' => 'Agende toevoegen via link',
+	'Add calendar from link' => 'Agenda toevoegen via link',
 
 	'Birthdays'=>'Verjaardagen',
 	'Tasks' => 'Taken',
@@ -95,14 +95,24 @@ return [
 	// schedule massages
 	'newScheduleTitle' => 'Wil je de deelnemers uitnodigen?',
 	'newScheduleText' => 'Je maakt een activiteit met deelnemers. Wanneer je deze opslaat zal een uitnodiging worden verstuurd om hen hiervan op de hoogte te brengen.',
+
 	'updateScheduleTitle' => 'Wil je een update naar de deelnemers sturen?',
 	'updateScheduleText' => 'Je hebt wijzigingen aangebracht aan een activiteit met deelnemers. Wanneer je deze opslaat zal een update worden verstuurd om te melden dat de activiteit is gewijzigd.',
+
 	'cancelScheduleTitle' => 'Wil je de activiteit verwijderen en de deelnemers op de hoogte stellen?',
 	'cancelScheduleText' => 'Als je deze activiteit verwijdert, worden de deelnemers op de hoogte gesteld dat de activiteit is geannuleerd',
+
+	'deleteScheduleTitle' => 'Wil je de activiteit verwijderen en de organisator op de hoogte stellen?',
+	'deleteScheduleText' => 'Als je deze activiteit verwijdert, word de organisator op de hoogte gesteld dat je niet deelneemt',
 
 	'replyImipBody' => [
 		'accepted' => '{name} heeft afspraak {title} {date} geaccepteerd',
 		'declined' => '{name} heeft de afspraak {title} {date} geweigerd',
 		'tentative' => '{name} weet nog niet of hij/zij afspraak {title} {date} accepteert',
+	],
+	'replyPageMessage' => [
+		'accepted' => 'U heeft de afspraak geaccepteerd',
+		'declined' => 'U heeft de afspraak geweigerd',
+		'tentative' => 'U weet nog niet of u de afspraak accepteert',
 	],
 ];

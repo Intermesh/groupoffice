@@ -106,7 +106,7 @@ export class CalendarItem {
 
 		if(e.recurrenceRule) {
 
-			const r = new Recurrence({dtstart: new Date(e.start), rule: e.recurrenceRule});
+			const r = new Recurrence({dtstart: new Date(e.start), timeZone:e.timeZone, rule: e.recurrenceRule});
 			//let rEnd = r.current.clone().add(new DateInterval(e.duration));
 			for(const date of r.loop(from, until)){
 			//while(r.current.date < until.date && rEnd.date > from.date) {
@@ -221,7 +221,7 @@ export class CalendarItem {
 		return icons.map(i=>E('i',i).cls('icon'));
 	}
 
-	save(onCancel: () => void) {
+	save(onCancel?: () => void) {
 		const f = this.data.showWithoutTime ? 'Y-m-d' : 'Y-m-dTH:i:s';
 		const start = this.start.format(f),
 			duration = this.start.diff(this.end).toIso8601();
@@ -297,13 +297,24 @@ export class CalendarItem {
 	}
 
 	get currentParticipant() {
-		if(!this.data.participants)
+
+		if(!this.data.participants || !this.participantId)
 			return
+		// for(const p in this.data.participants) {
+		// 	if(this.scheduleId == this.data.participants[p].email)
+		// 		return this.data.participants[p];
+		// }
 		return this.data.participants[this.participantId];
 	}
 
 	private get isInPast() {
 		return this.end.date < new Date();
+	}
+	private get scheduleId() {
+		// The "view-user" is either the owner if the calendar the event is in or the current user if no owner (shared calendar)
+		const p = (this.cal && this.cal.ownerId) ? jmapds('Principal').single(this.cal.ownerId) : go.User;
+		return p?.email;
+		//return (this.cal && this.cal.ownerId) ? this.cal.ownerId+'' : go.User.id+''
 	}
 
 	private get participantId() {
@@ -311,19 +322,22 @@ export class CalendarItem {
 	}
 
 	updateParticipation(status: "accepted"|"tentative"|"declined") {
-		if(!this.data.participants || !this.data.participants[this.participantId])
+		if(!this.currentParticipant)
 			throw new Error('Not a participant');
-		this.data.participants[this.participantId].participationStatus = status;
+		this.currentParticipant.participationStatus = status;
 
 		eventDS.setParams.sendSchedulingMessages = true;
-		eventDS.update(this.data.id, {participants: this.data.participants});
+		return eventDS.update(this.data.id, {participants: this.data.participants});
 	}
 
 	shouldSchedule(modified: Partial<CalendarEvent>|false) {
 		if((!this.data.isOrigin && this.key) || this.isInPast)
 			return;
 		if(modified === false) {
-			return this.data.participants ? 'cancel' : undefined;
+			if(this.data.participants) {
+				return this.isOwner ? 'cancel' : 'delete';
+			}
+			return undefined;
 		}
 		 if(modified.participants || this.data.participants) {
 			if(!this.key) {
