@@ -230,6 +230,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 							xtype:'button',
 							cls: isInstalled ? 'primary' : '',
 							isInstalled : isInstalled,
+							enableToggle: true,
+							pressed: r.data.enabled,
 							text: r.data.enabled ? t('Disable') : (isInstalled ? t('Enable') : t('Install')),
 							disabled: r.data.not_installable,
 							record: r,
