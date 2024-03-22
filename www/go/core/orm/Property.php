@@ -10,6 +10,7 @@ use go\core\App;
 use go\core\data\Model;
 use go\core\db\Column;
 use go\core\db\Criteria;
+use go\core\db\DbException;
 use go\core\db\Statement;
 use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
@@ -1769,13 +1770,11 @@ abstract class Property extends Model {
 	 *
 	 * @param Table $table
 	 * @param array $record
-	 * @throws Exception
+	 * @throws DbException
 	 */
 	protected function insertTableRecord(Table $table, array $record) {
 		$stmt = go()->getDbConnection()->insert($table->getName(), $record);
-		if (!$stmt->execute()) {
-			throw new Exception("Could not execute insert query");
-		}
+		$stmt->execute();
 	}
 
 	/**
@@ -1784,13 +1783,11 @@ abstract class Property extends Model {
 	 * @param Table $table
 	 * @param array $record
 	 * @param Query $query
-	 * @throws Exception
+	 * @throws DbException
 	 */
 	protected function updateTableRecord(Table $table, array $record, Query $query) {
 		$stmt = go()->getDbConnection()->update($table->getName(), $record, $query);
-		if (!$stmt->execute()) {
-			throw new Exception("Could not execute update query");
-		}
+		$stmt->execute();
 	}
 
 	/**
@@ -1875,9 +1872,9 @@ abstract class Property extends Model {
 
 				$this->updateTableRecord($table, $modifiedForTable, $query);
 			}
-		} catch (PDOException $e) {
+		} catch (DbException $e) {
 			ErrorHandler::logException($e);
-			$uniqueKey = Utils::isUniqueKeyException($e);
+			$uniqueKey = $e->isUniqueKeyException();
 
 			if ($uniqueKey) {
 				$index = $table->getIndex($uniqueKey);
