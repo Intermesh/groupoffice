@@ -163,7 +163,7 @@ export class EventWindow extends FormWindow {
 			participantfield({
 				listeners: {'change': (_,v) => {
 					const count = (v && Object.keys(v).length);
-					this.submitBtn.text = t(count ? 'Send' : 'Save');
+					this.submitBtn.text = t(count && (this.endDate.getValueAsDateTime()!.date > new Date()) ? 'Send' : 'Save');
 					this.btnFreeBusy.hidden = !count;
 
 				}}
