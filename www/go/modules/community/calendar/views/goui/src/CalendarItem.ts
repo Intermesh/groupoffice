@@ -266,11 +266,11 @@ export class CalendarItem {
 					width: 550,
 					modal: true,
 					closable: false,
-					title: t(type+'ScheduleTitle'),
+					title: t(type+'ScheduleTitle', "community", "calendar"),
 				},
 				comp({cls: 'pad flow'},
 					comp({tagName:'i',cls:'icon',html:'email', width:100, style:{fontSize:'3em'}}),
-					comp({html: t(type+'ScheduleText'), flex:1}),
+					comp({html: t(type+'ScheduleText', "community", "calendar"), flex:1}),
 				),
 				tbar({},
 					btn({
