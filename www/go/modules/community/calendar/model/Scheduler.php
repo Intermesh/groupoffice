@@ -29,9 +29,6 @@ class Scheduler {
 		}
 
 		if ($current->isOwner()) {
-			if($event->isRecurring()) {
-				throw new \Exception('Need to implement scheduling recurring instances');
-			}
 			$newOnly = !$willDelete && $event->isModified('participants') && !$event->isModified(self::EssentialScheduleProps);
 
 			self::organizeImip($event, $willDelete ? 'CANCEL': 'REQUEST', $newOnly);
