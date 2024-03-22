@@ -586,10 +586,15 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	}
 
 	public function __toString() {
-		$queryBuilder = new QueryBuilder($this->getDbConnection());
-		$build = $queryBuilder->buildSelect($this);
-		
-		return $queryBuilder->debugBuild($build);
+		try {
+			$queryBuilder = new QueryBuilder($this->getDbConnection());
+			$build = $queryBuilder->buildSelect($this);
+
+			return $queryBuilder->debugBuild($build);
+
+		} catch(\Throwable $e2) {
+			return "QUERY FAILED TO BUILD STRING: " . $e2->getMessage();
+		}
 	}
 	
 	/**
@@ -627,9 +632,11 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 		return $this->dbConn;
 	}
 
+	/**
+	 * @throws DbException
+	 */
 	public function createStatement(): Statement
 	{
-
 		$queryBuilder = new QueryBuilder($this->getDbConnection());
 		$build = $queryBuilder->buildSelect($this);
 
@@ -648,7 +655,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    * Executes the query and returns the statement
    *
    * @return Statement<T> Returns false on failure.
-   * @throws PDOException
+   * @throws DbException
    */
 	public function execute(): Statement
 	{
@@ -657,13 +664,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 			$stmt = $this->createStatement();
 			$stmt->execute();
 		} catch(PDOException $e) {
-			try {
-				go()->error("SQL FAILED: " . $this->__toString());
-			} catch(PDOException $e2) {
-				go()->error("SQL FAILED AND FAILED TO BUILD STRING " . $e2->getMessage());
-			}
-
-			throw new DbException($e);
+			throw new DbException($e, $this);
 		}
 		return $stmt;
 	}

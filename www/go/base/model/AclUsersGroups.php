@@ -80,18 +80,16 @@ class AclUsersGroups extends ActiveRecord {
 		if(!Entity::$trackChanges){
 			return true;
 		}
-		
+
 		$success = App::get()->getDbConnection()
-							->update('core_acl_group_changes', 
-											[
-													'revokeModSeq' => \go\core\model\Acl::entityType()->nextModSeq()
-											],
-											[
-													'aclId' => $this->aclId, 
-													'groupId' => $this->groupId,
-													'revokeModSeq' => null
-											]
-											)->execute();
+			->insert('core_acl_group_changes',
+				[
+					'aclId' => $this->aclId,
+					'groupId' => $this->groupId,
+					'modSeq' => \go\core\model\Acl::entityType()->nextModSeq(),
+					'granted' => false
+				]
+			)->execute();
 		
 		if(!$success) {
 			return false;
@@ -110,13 +108,14 @@ class AclUsersGroups extends ActiveRecord {
 		if(!Entity::$trackChanges){
 			return true;
 		}
-		
+
 		$success = App::get()->getDbConnection()
-							->insert('core_acl_group_changes', 
+							->insert('core_acl_group_changes',
 											[
-													'aclId' => $this->aclId, 
-													'groupId' => $this->groupId, 
-													'grantModSeq' => \go\core\model\Acl::entityType()->nextModSeq()
+												'aclId' => $this->aclId,
+												'groupId' => $this->groupId,
+												'modSeq' => \go\core\model\Acl::entityType()->nextModSeq(),
+												'granted' => true
 											]
 											)->execute();
 		if(!$success) {

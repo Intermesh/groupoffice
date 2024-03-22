@@ -2,7 +2,6 @@
 
 use go\core\App;
 use go\core\auth\ForcePasswordChange;
-use go\core\db\Table;
 use go\core\orm\PrincipalTrait;
 use go\core\util\ClassFinder;
 use go\core\acl\model\AclOwnerEntity;
@@ -1579,6 +1578,14 @@ $updates['202403181539'][] = function() {
 		echo "ERROR: " . $e->getMessage();
 	}
 };
+
+$updates['202403181539'][] = "alter table core_acl_group_changes
+    drop foreign key `group`;";
+
+$updates['202403181539'][] = "alter table core_acl_group_changes
+    add constraint `group`
+        foreign key (groupId) references core_group (id)
+            on delete cascade on update cascade";
 
 
 # ------ 6.9 ---------------

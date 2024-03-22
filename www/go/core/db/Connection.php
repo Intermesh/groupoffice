@@ -183,8 +183,7 @@ class Connection {
 			return $this->getPdo()->query($sql);
 		}
 		catch(PDOException $e) {
-			go()->error("SQL FAILED: " . $sql);
-			throw new DbException($e);
+			throw new DbException($e, $sql);
 		}
 	}
 
@@ -206,8 +205,7 @@ class Connection {
 			return $this->getPdo()->exec($sql);
 		}
 		catch(PDOException $e) {
-			go()->error("SQL FAILED: " . $sql);
-			throw new DbException($e);
+			throw new DbException($e, $sql);
 		}
 	}
 	
@@ -636,10 +634,7 @@ class Connection {
 
 			return $stmt;
 		} catch(PDOException $e) {
-			go()->error("Failed SQL: ". QueryBuilder::debugBuild($build));
-            go()->error($e->getMessage());
-            go()->error($e->getTraceAsString());
-			throw new DbException($e);
+			throw new DbException($e, go()->getDebugger()->enabled ? QueryBuilder::debugBuild($build) : null);
 		}
 	}
 

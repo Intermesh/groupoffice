@@ -1913,10 +1913,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 			$models =  $result->fetchAll();
 			$model = isset($models[0]) ? $models[0] : false;
-		}catch(DbException $e){
-			$msg = $e->getMessage()."\n\nFull SQL Query: ".$sql;
-
-			throw new \Exception($msg);
+		}catch(\PDOException $e){
+			throw new DbException($e, $sql);
 		}
 
 		if($model && !$ignoreAcl && !$model->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)){
