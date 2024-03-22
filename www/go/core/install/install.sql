@@ -16,8 +16,7 @@ CREATE TABLE `core_acl_group` (
 -- auto-generated definition
 create table core_acl_group_changes
 (
-    id      int auto_increment
-        primary key,
+    id      int not null auto_increment primary key ,
     aclId   int        not null,
     groupId int        not null,
     modSeq  int        not null,
@@ -509,7 +508,7 @@ ALTER TABLE `core_acl_group`
   ADD KEY `groupId` (`groupId`);
 
 ALTER TABLE `core_acl_group_changes`
-  ADD PRIMARY KEY (`id`),
+#   ADD PRIMARY KEY (`id`),
   ADD KEY `aclId` (`aclId`,`groupId`,`modSeq`),
   ADD KEY `group` (`groupId`);
 
@@ -680,8 +679,8 @@ ALTER TABLE `go_working_weeks`
 ALTER TABLE `core_acl`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `core_acl_group_changes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+# ALTER TABLE `core_acl_group_changes`
+#   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `core_change`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
