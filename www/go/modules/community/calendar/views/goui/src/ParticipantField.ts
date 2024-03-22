@@ -44,7 +44,7 @@ export class ParticipantField extends Component {
 					}
 				},
 				buildField: (v: any) => {
-					const userIcon = v.name?'person':'email',
+					const userIcon = v.roles.owner ? 'manage_accounts' : (v.name?'person':'contact_mail'),
 						statusIcon = ParticipantField.statusIcons[v.participationStatus] || v.participationStatus;
 					const f = containerfield({cls:'hbox', style: {alignItems: 'center', cursor:'default'}},
 						comp({tagName:'i',cls:'icon',html:userIcon, style:{margin:'0 8px'}}),
