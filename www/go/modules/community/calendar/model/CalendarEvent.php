@@ -573,6 +573,8 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	public function isInPast() {
+		if($this->lastOccurrence === null)
+			return false;
 		return $this->lastOccurrence <= new DateTime();
 	}
 
