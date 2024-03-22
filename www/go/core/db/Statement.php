@@ -185,8 +185,7 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, Iter
 			return true;
 		}
 		catch(PDOException $e) {
-			go()->error("SQL FAILURE: " . $this);
-			throw new DbException($e);
+			throw new DbException($e, $this);
 		}
 	}
 

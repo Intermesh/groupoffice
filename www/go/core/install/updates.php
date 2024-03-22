@@ -1579,3 +1579,11 @@ $updates['202403181539'][] = function() {
 	}
 };
 
+$updates['202403181539'][] = "alter table core_acl_group_changes
+    drop foreign key `group`;";
+
+$updates['202403181539'][] = "alter table core_acl_group_changes
+    add constraint `group`
+        foreign key (groupId) references core_group (id)
+            on delete cascade on update cascade";
+

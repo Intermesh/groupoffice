@@ -7,6 +7,7 @@ use go\core\auth\Authenticate;
 use go\core\model\Token;
 use go\core\model\User;
 use go\core\util\ClassFinder;
+use go\core\validate\ErrorCode;
 
 class UserTest extends \PHPUnit\Framework\TestCase
 {
@@ -47,12 +48,19 @@ class UserTest extends \PHPUnit\Framework\TestCase
 		$user->username = 'test2';
 		$user->setPassword('test1test1');
 		$user->displayName = 'Test user 2';
-		$user->email = $user->recoveryEmail = 'test2@intermesh.localhost';
+		$user->email = $user->recoveryEmail = 'test2unique@intermesh.localhost';
 
 		$success = $user->save();
 
 		$this->assertEquals(false, $success);
+
+		$validationError = $user->getValidationError('username');
+
+		$this->assertIsArray($validationError);
+
+		$this->assertEquals(ErrorCode::UNIQUE, $validationError['code']);
 	}
+
 
 	public function testAdminToArray() {
 		$admin = User::findById(1);

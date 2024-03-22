@@ -33,7 +33,7 @@ trait ValidationTrait {
 	/**
 	 * Return all validation errors of this model
 	 * 
-	 * @return array eg. [['code' => $code, 'description' => $description, 'data' => $data]]
+	 * @return array{code:string, description:string, data:array}[]
 	 */
 	public function getValidationErrors(): array
 	{
@@ -61,7 +61,7 @@ trait ValidationTrait {
 	 * If the attribute has no error then fals will be returned
 	 * 
 	 * @param string $key
-	 * @return array|false eg. array('code'=>'maxLength','info'=>array('length'=>10))
+	 * @return array{code:int, description:string, data:array}|false eg. array('code'=>'maxLength','info'=>array('length'=>10))
 	 */
 	public function getValidationError($key) {
 		$validationErrors = $this->getValidationErrors();

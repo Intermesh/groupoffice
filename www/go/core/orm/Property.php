@@ -2017,19 +2017,14 @@ abstract class Property extends Model {
 	 *
 	 * self::find()->mergeWith($query);
 	 *
+	 * @throws DbException
 	 */
 	protected static function internalDelete(Query $query): bool
 	{
 		$primaryTable = static::getMapping()->getPrimaryTable();
 
 		self::$lastDeleteStmt = go()->getDbConnection()->delete($primaryTable->getName(), $query);
-		if(!self::$lastDeleteStmt->execute()) {
-			return false;
-		}
-//		if(go()->getDebugger()->enabled) {
-//			go()->debug("Deleted " . self::$lastDeleteStmt->rowCount() . " models of type " . static::class);
-//		}
-		return true;
+		return self::$lastDeleteStmt->execute();
 	}
 
 	private function validateTable(MappedTable $table) {

@@ -8,7 +8,7 @@ use InvalidArgumentException;
 /**
  * QueryBuilder
  *
- * Builds or executes an SQL string with a {@see Query} object anmd {@see AbstractRecord}
+ * Builds or executes an SQL string with a {@see Query} object
  *
  * @copyright (c) 2015, Intermesh BV http://www.intermesh.nl
  * @author Merijn Schering <mschering@intermesh.nl>
