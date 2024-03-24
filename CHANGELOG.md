@@ -1,3 +1,4 @@
+??-03-2024: 6.8.39
 - Support / Core: GOUI was incompatible with 6.8 due to changes for 6.9+.
 - Core: prevent timing attack on password recovery
 - Core: prevent timing attack on login
