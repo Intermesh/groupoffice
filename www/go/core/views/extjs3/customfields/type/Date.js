@@ -58,10 +58,6 @@ go.customfields.type.Date = Ext.extend(go.customfields.type.Text, {
 		return def;
 	},
 
-	/**
-	 * See https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.grid.Column-cfg-xtype
-	 * @returns {String}
-	 */
 	getColumnXType : function() {
 		return "datecolumn";
 	},
