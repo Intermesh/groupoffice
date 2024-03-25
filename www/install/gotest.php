@@ -597,13 +597,10 @@ function output_system_test() :bool
 </tr>
 
 <tr>
-	<td valign="top">Server name:</td>
+	<td valign="top">Server hostname:</td>
 	<td>'.getHost().'</td>
 </tr>
-<tr>
-	<td valign="top">Server IP:</td>
-	<td>'.gethostbyname($_SERVER['SERVER_NAME']).'</td>
-</tr></table>';
+</table>';
 	
 	return !$fatal;
 	
