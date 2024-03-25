@@ -84,6 +84,9 @@ class Session extends Observable{
 			// prevents altering headers. This caused a security issue where the expires header would be different on lost
 			// password requests when a valid email address was used.
 			session_cache_limiter("");
+			header('Cache-Control: no-cache, no-store, must-revalidate');
+			header('Pragma: no-cache');
+			header('Expires: 01-07-2003 12:00:00 GMT');
 			session_start();				
 		}
 	

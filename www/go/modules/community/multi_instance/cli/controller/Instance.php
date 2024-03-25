@@ -44,4 +44,13 @@ class Instance extends Controller {
 
 		echo "$name is restored!\n";
 	}
+
+	public function allowModuleForAll(array $params): void
+	{
+		$this->checkParams($params, ['name', 'package']);
+
+		foreach(\go\modules\community\multi_instance\model\Instance::find() as $instance) {
+			$instance->addAllowedModule($params['package'], $params['name']);
+		}
+	}
 }

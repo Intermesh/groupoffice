@@ -10,7 +10,7 @@ use go\core\jmap\State;
 use go\core\model\RememberMe;
 use go\core\model\Token;
 use go\core\jmap\Request;
-use go\core\http\Response;
+use go\core\jmap\Response;
 use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\util\StringUtil;

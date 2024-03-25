@@ -2,9 +2,8 @@
 use go\core\App;
 use go\core\jmap\State;
 use go\core\fs\Blob;
-use go\core\http\Client;
-use go\core\http\Response;
-use go\core\http\Request;
+use go\core\jmap\Response;
+use go\core\jmap\Request;
 
 require("../vendor/autoload.php");
 

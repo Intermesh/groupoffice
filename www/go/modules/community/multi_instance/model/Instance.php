@@ -543,8 +543,18 @@ class Instance extends Entity {
 	/**
 	 * @throws Exception
 	 */
-	private function writeConfig() {
-		if(!$this->getConfigFile()->putContents("<?php\n\$config = " . var_export($this->getInstanceConfig(), true) . ";\n")) {
+	private function writeConfig(): void
+	{
+		$file = $this->getConfigFile();
+		$tmpFile = $file->getFolder()->getFile('config.tmp');
+		// Write to temp file first because when we had a full disk it happened that the config.php files were empty.
+		$data = "<?php\n\$config = " . var_export($this->getInstanceConfig(), true) . ";\n";
+
+		if(!$tmpFile->putContents($data)){
+			throw new Exception("Could not write to temporary file");
+		}
+
+		if(!$file->delete() || !$tmpFile->move($file)) {
 			throw new Exception("Could not write to config.php file");
 		}
 
@@ -555,7 +565,6 @@ class Instance extends Entity {
 	
 	private function getGlobalConfig(): array
 	{
-		
 		if(!isset($this->globalConfig)) {
 			$globalConfigFile = "/etc/groupoffice/globalconfig.inc.php";
 			if(file_exists($globalConfigFile)) {
@@ -957,6 +966,30 @@ class Instance extends Entity {
 		$config['allowed_modules'][] = $this->getStudioPackage() . "/*";
 		$this->setInstanceConfig($config);
 		$this->writeConfig();
+
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function addAllowedModule(string $package, string $name): void
+	{
+		$instanceConfig = $this->getInstanceConfig();
+		$mergedConfig = array_merge($this->getGlobalConfig(), $instanceConfig);
+		if (!array_key_exists('allowed_modules', $mergedConfig)) {
+			// all modules are allowed
+			return;
+		}
+
+		if(ModuleCollection::isAllowed($name, $package, $mergedConfig['allowed_modules'])) {
+			return;
+		}
+
+		$instanceConfig['allowed_modules'] =  $mergedConfig['allowed_modules'];
+		$instanceConfig['allowed_modules'][] = $package .'/' .$name;
+		$this->setInstanceConfig($instanceConfig);
+		$this->writeConfig();
+
 
 	}
 

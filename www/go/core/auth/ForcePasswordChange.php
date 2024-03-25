@@ -18,6 +18,12 @@ class ForcePasswordChange extends SecondaryAuthenticator {
 		}
 
 		$user = $token->getUser();
+
+		if($user->checkPassword($data['password'])) {
+			$this->setValidationError('password', ErrorCode::INVALID_INPUT, go()->t("You must choose a different password"));
+			return false;
+		}
+
 		$user->setPassword($data['password']);
 
 		$user->save();
