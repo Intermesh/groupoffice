@@ -19,10 +19,7 @@ GO.email.MessagesGrid = function(config){
 	config.paging=true;
 
 	config.hideMode='offsets';
-
-
-		
-		config.cm =  new Ext.grid.ColumnModel({
+	config.cm =  new Ext.grid.ColumnModel({
 		defaults:{
 			sortable:true,
 			groupable:false
@@ -206,13 +203,7 @@ GO.email.MessagesGrid = function(config){
 				iconCls: 'ic-more',
 				text: t("Advanced", "email"),
 				handler: function(){
-					// var first = !this.searchDialog.dialog;
 					this.searchDialog.show();
-					// if(first) {
-					// 	this.searchDialog.dialog.on('hide', function() {
-					// 		this.searchField.updateView();
-					// 	}, this);
-					// }
 				},
 				scope: this
 			}]
@@ -260,23 +251,15 @@ GO.email.MessagesGrid = function(config){
 				this.emailClient.showAccountsDialog();
 			},
 			scope: this
-		}
-//		,{
-//			iconCls:'ic-view-compact',
-//			text: t("Toggle message window position", "email"),
-//			handler: function(){
-//				this.emailClient.moveGrid();
-//			},
-//			scope: this
-//		}
-,
+		},
 		this.showFlaggedButton
 		]
 	});
 
 
-	if(!config.hideSearch)
+	if(!config.hideSearch) {
 		config.tbar = [];
+	}
 	
 	GO.email.MessagesGrid.superclass.constructor.call(this, config);
 
@@ -372,6 +355,7 @@ GO.email.MessagesGrid = function(config){
 
 	//stop/start drag and drop when store loads when account is readOnly
 	this.store.on('load', function(store, records, options) {
+		console.log(store.baseParams);
 		if(this.getView().dragZone){
 			if(store.reader.jsonData.permission_level <= GO.permissionLevels.read) {
 				this.getView().dragZone.lock();
