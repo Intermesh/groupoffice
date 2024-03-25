@@ -13,7 +13,6 @@ use go\core\model\User;
 use go\core\jmap\Request;
 use go\core\util\DateTime;
 use go\core\jmap\State as JmapState;
-use go\modules\community\addressbook\model\Contact;
 
 /**
  * Class Authenticate
