@@ -10,7 +10,7 @@ use go\core\jmap\State;
 use go\core\model\RememberMe;
 use go\core\model\Token;
 use go\core\jmap\Request;
-use go\core\jmap\Response;
+use go\core\http\Response;
 use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\util\StringUtil;
@@ -24,8 +24,10 @@ use go\core\util\JSON;
  */
 function output(array $data = [], int $status = 200, string $statusMsg = null) {
 
+	Response::get()->setHeader('Content-Type', 'application/json;charset=utf-8');
 	Response::get()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 	Response::get()->setHeader('Pragma', 'no-cache');
+	Response::get()->setHeader('Expires', '01-07-2003 12:00:00 GMT');
 
 	Response::get()->setStatus($status, $statusMsg ? str_replace("\n", " - " , $statusMsg) : null);
 	Response::get()->sendHeaders();
