@@ -385,6 +385,10 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 							GO.errorDialog.show(t("Permission denied"));
 							break;
 
+						case "invalidProperties":
+							//tabs should handle this
+							break;
+
 						default:
 							GO.errorDialog.show(t("Sorry, an error occurred") +": " + response.notUpdated[id].type);
 							break;
