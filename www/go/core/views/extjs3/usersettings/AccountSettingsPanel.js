@@ -185,11 +185,8 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 					},
 					layout: "hbox",
 					items: [
-						{html: "IP"},
-						{html: t("Platform")},
-						{html: t("Name")},
-						{html: t("Last seen")},
-						{html: t("Status")},
+						{html: "Client"},
+						{html: t("Status"), width: dp(140)},
 						{width: dp(34)}
 					]
 				},
@@ -204,23 +201,42 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						anchor: "100%",
 						layout: "hbox",
 						defaults: {
+							xtype: "hidden"
+						},
+						items: [
+							{
+								name: "lastSeen"
+							},
+							{
+								name: "platform"
+							},{
+								name: "name"
+							},
+							{
 							flex: 1,
 							xtype: "plainfield",
-							submit: true
-						},
-						items: [{
-							name: "ip"
+							submit: true,
+							name: "ip",
+								height: dp(80),
+							renderer: (v, field) => {
+
+
+								const record = field.ownerCt.getValue();
+
+								let str = "";
+
+								str += record.ip || "?";
+								str += " <br />";
+								str += record.platform || "?";
+								str += " ";
+								str += record.name || "?";
+								str += "<br />";
+								str += record.lastSeen ? (new Date(record.lastSeen)).format(go.User.dateFormat + " " + go.User.timeFormat) : "?"
+
+								return str;
+							}
 						},{
-							name: "platform",
-							renderer: v => v || t("Unknown")
-						},{
-							name: "name",
-							renderer: v => v || t("Unknown")
-						},{
-							submit: false,
-							name: "lastSeen",
-							renderer: v => (new Date(v)).format(go.User.dateFormat+" " + go.User.timeFormat)
-						},{
+							width: dp(140),
 							xtype:'selectfield',
 							name:'status',
 							options: [

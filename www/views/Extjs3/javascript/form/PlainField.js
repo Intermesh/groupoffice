@@ -98,13 +98,13 @@ GO.form.PlainField = Ext.extend(Ext.form.Field, {
 		
 		this.value = v;
 		if(this.rendered){
-			this.el.update(this.renderer(v));
+			this.el.update(this.renderer(v, this));
 		}
 
 		this.fireEvent("setvalue", this, v);
 	},
 
-	renderer : function(v) {
+	renderer : function(v, field) {
 		return v;
 	}
 
