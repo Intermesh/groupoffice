@@ -3,6 +3,7 @@
 - Core: Disallow modification of modifiedAt, createdAt, modifiedBy and createdBy via API.
 - Core: Create permissions were not checked on import
 - Email: make drafts editable in a mobile screen
+- Core: Added auth and lost password logs for fail2ban
 
 18-03-2023: 6.7.74
 - Core: fix searching for partial email addresses in global search
