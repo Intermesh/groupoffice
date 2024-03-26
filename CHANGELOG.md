@@ -1,4 +1,5 @@
 - Core: Added auth and lost password logs for fail2ban
+- Core: Made change password play nice with password managers
 
 25-03-2024: 6.8.39
 - Support / Core: GOUI was incompatible with 6.8 due to changes for 6.9+.
