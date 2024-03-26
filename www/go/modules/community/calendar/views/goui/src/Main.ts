@@ -17,7 +17,7 @@ import {
 } from "@intermesh/goui";
 import {MonthView} from "./MonthView.js";
 import {WeekView} from "./WeekView.js";
-import {calendarStore, categoryStore, ValidTimeSpan,t} from "./Index.js";
+import {calendarStore, categoryStore, t, ValidTimeSpan} from "./Index.js";
 import {CalendarWindow} from "./CalendarWindow.js";
 import {YearView} from "./YearView.js";
 import {SplitView} from "./SpltView.js";

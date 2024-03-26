@@ -8,8 +8,8 @@ import {
 	mapfield, menu, ObservableListenerOpts,
 	table
 } from "@intermesh/goui";
-import {client, jmapds, validateEmail} from "@intermesh/groupoffice-core";
 import {t} from "./Index.js";
+import {client, jmapds, validateEmail} from "@intermesh/groupoffice-core";
 
 export const participantfield = (config?: Config<ParticipantField, FieldEventMap<ParticipantField>>) => createComponent(new ParticipantField(), config);
 
@@ -21,10 +21,10 @@ export interface ParticipantField extends Component {
 export class ParticipantField extends Component {
 
 	private static statusIcons : {[status:string]: string[]} = {
-		'accepted':		['check_circle', t('Accepted')],
-		'tentative':	['help', t('Maybe')],
-		'declined':		['block', t('Declined')],
-		'needs-action':['schedule', t('Awaiting reply')]
+		'accepted':		['check_circle', ('Accepted')],
+		'tentative':	['help', ('Maybe')],
+		'declined':		['block', ('Declined')],
+		'needs-action':['schedule', ('Awaiting reply')]
 	}
 
 	list!: MapField

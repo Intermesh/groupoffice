@@ -3,12 +3,12 @@ import {
 	Component,
 	DateTime,
 	E,
-	menu,
-	t
+	menu
 } from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 import {client,Recurrence} from "@intermesh/groupoffice-core";
+import {t} from "./Index.js";
 
 export abstract class CalendarView extends Component {
 

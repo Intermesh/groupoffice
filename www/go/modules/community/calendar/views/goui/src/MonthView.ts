@@ -1,8 +1,9 @@
 import {CalendarView} from "./CalendarView.js";
-import {ComponentEventMap, DateInterval, DateTime, ObservableListenerOpts, t} from "@intermesh/goui";
+import {ComponentEventMap, DateInterval, DateTime, ObservableListenerOpts} from "@intermesh/goui";
 import {E} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {client} from "@intermesh/groupoffice-core";
+import {t} from "./Index.js";
 
 // add selectweek event
 

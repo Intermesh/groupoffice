@@ -1,7 +1,8 @@
 import {CalendarView} from "./CalendarView.js";
-import {DateTime, E, t} from "@intermesh/goui";
+import {DateTime, E} from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {client} from "@intermesh/groupoffice-core";
+import {t} from "./Index.js";
 
 class CalendarDayItem extends CalendarItem {
 	pos!: number

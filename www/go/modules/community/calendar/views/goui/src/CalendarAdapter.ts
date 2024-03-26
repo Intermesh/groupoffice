@@ -33,7 +33,6 @@ export class CalendarAdapter {
 			}
 			promises.push(promise);
 		}
-		console.error('goto called');
 		Promise.all(promises).then(this.onLoad);
 	}
 

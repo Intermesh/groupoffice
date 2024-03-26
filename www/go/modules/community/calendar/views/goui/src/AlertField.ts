@@ -36,12 +36,12 @@ export class AlertField extends SelectField {
 		this.options.unshift({value: null, name: t('None')})
 		super.drawOptions();
 	}
-
+	/** @ts-ignore */
 	get value() {
 		const v = super.value;
 		return (v && v !== 'default') ? {1:{trigger:{offset:v}}} : {};
 	}
-
+	/** @ts-ignore */
 	set value(v: {[id:string]:Alert}) {
 		if(!v) {
 			super.value = v;
