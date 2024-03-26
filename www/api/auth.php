@@ -131,7 +131,6 @@ try {
 
 			break;
 		case 'forgotten':
-
 			$start = (int) (microtime(true) * 1000);
 
 			$auth->sendRecoveryMail($data['email']);
@@ -144,7 +143,7 @@ try {
 				ErrorHandler::log("Warning: sending lost password message took longer than 4s. Timing attack possible because of this. Make sure your SMTP is faster.");
 			}
 			//Don't show if user was found or not for security
-			output([], 202, "Recovery mail sent");
+			output([], 200, "Recovery mail sent");
 			break;
 
 		case 'recover':
