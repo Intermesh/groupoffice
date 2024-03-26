@@ -131,6 +131,10 @@ try {
 
 			break;
 		case 'forgotten':
+
+			// Don't change log message as fail2ban relies on it
+			ErrorHandler::log("Lost password request from IP: '" . Request::get()->getRemoteIpAddress() . "'");
+
 			$start = (int) (microtime(true) * 1000);
 
 			$auth->sendRecoveryMail($data['email']);
