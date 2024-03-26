@@ -109,8 +109,8 @@ $icon = [
             <?php foreach($event->participants as $part):  ?>
                 <div><?=$method==="PAGE"?'<i class="icon">'.$icon[$part->participationStatus].'</i> ':''; ?><?=$part->name ? '<a href="mailto:'.htmlentities($part->email).'" target="_blank" rel="noopener noreferrer">'.htmlentities($part->name).'</a>' :
                       '<a href="mailto:'.htmlentities($part->email).'" target="_blank" rel="noopener noreferrer">'.htmlentities($part->email).'</a>'?>
-                    <?php if($part->isOwner()) echo '&bull; <span>'.go()->t('Organizer').'</span>'; ?>
-                    <?php if($part->email == $participant->email) echo '&bull; <span>'.go()->t('You').'</span>'; ?>
+                    <?php if($part->isOwner()) echo '&bull; <span>'.go()->t('Organizer', 'community', 'calendar').'</span>'; ?>
+                    <?php if($part->email == $participant->email) echo '&bull; <span>'.go()->t('You', 'community', 'calendar').'</span>'; ?>
                 </div>
             <?php endforeach; endif; ?>
         </div>

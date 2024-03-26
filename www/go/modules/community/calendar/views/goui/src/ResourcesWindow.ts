@@ -8,12 +8,12 @@ import {
 	hr,
 	menu,
 	searchbtn, select, splitter,
-	t,
 	Table,
 	table,
 	tbar, textarea, textfield, Window
 } from "@intermesh/goui";
 import {FormWindow, jmapds} from "@intermesh/groupoffice-core";
+import {t} from "./Index.js";
 
 class ResourceGroupWindow extends FormWindow {
 	constructor() {

@@ -1,4 +1,5 @@
-import {t, SelectField, Config, createComponent, FieldEventMap} from "@intermesh/goui";
+import {SelectField, Config, createComponent, FieldEventMap} from "@intermesh/goui";
+import {t} from "./Index.js";
 
 interface Alert {
 	trigger:any // {offset, relativeTo} | {when}
@@ -18,14 +19,14 @@ export class AlertField extends SelectField {
 
 	drawOptions() {
 		this.options = this.fullDay ? [
-			{value: '-P1D', name: t('1 day before')},
-			{value: '-P2D', name: t('2 days before')}
+			{value: '-P1D', name: '1 '+ t('day')+' '+t('before')},
+			{value: '-P2D', name: '2 '+ t('days')+' '+t('before')}
 		] : [
-			{value: '-PT5M', name: t('5 minutes before')},
-			{value: '-PT10M', name: t('10 minutes before')},
-			{value: '-PT15M', name: t('15 minutes before')},
-			{value: '-PT1H', name: t('1 hour before')},
-			{value: '-PT2H', name: t('2 hours before')},
+			{value: '-PT5M', name: '5 '+ t('minutes')+' '+t('before')},
+			{value: '-PT10M', name: '10 '+ t('minutes')+' '+t('before')},
+			{value: '-PT15M', name: '15 '+ t('minutes')+' '+t('before')},
+			{value: '-PT1H', name: '1 '+ t('hour')+' '+t('before')},
+			{value: '-PT2H', name: '2 '+ t('hours')+' '+t('before')},
 			{value: 'P0D', name: t('At the start')},
 		];
 		if(!this.isForDefault) {

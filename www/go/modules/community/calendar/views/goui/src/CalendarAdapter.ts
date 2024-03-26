@@ -18,12 +18,22 @@ export class CalendarAdapter {
 	goto(start:DateTime,end:DateTime) {
 		this.start = start;
 		this.end = end;
-		const promises = [];
+		const promises =  [];
 		for(const type in this.providers) {
 			const p = this.providers[type];
 			if(!p.enabled) continue;
-			promises.push(p.load(start,end));
+			const promise = p.load(start,end);
+			if(p.watch) {
+				promise.then(_evs => {
+					p.store.on('load', () => {
+						this.onLoad()
+					});
+					p.watch = false;
+				})
+			}
+			promises.push(promise);
 		}
+		console.error('goto called');
 		Promise.all(promises).then(this.onLoad);
 	}
 
@@ -48,7 +58,8 @@ export class CalendarAdapter {
 	private providers: {[type:string] : CalendarProvider} = {
 		'event': {
 			enabled: true,
-			store:datasourcestore({dataSource:jmapds('CalendarEvent'), listeners:{'load':()=>this.onLoad()}}),
+			watch:true,
+			store:datasourcestore({dataSource:jmapds('CalendarEvent')}),
 			*items(start:DateTime,end:DateTime) {
 				for (const e of this.store!.items) {
 					for(const item of CalendarItem.expand(e as CalendarEvent, start, end))

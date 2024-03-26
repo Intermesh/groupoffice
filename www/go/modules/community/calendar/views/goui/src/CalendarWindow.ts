@@ -1,11 +1,12 @@
 import {
 	colorfield, combobox,
 	comp,
-	t, textarea,
+	textarea,
 	textfield,
 } from "@intermesh/goui";
 import {FormWindow, jmapds} from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
+import {t} from "./Index.js";
 
 export class CalendarWindow extends FormWindow {
 

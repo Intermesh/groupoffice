@@ -5,11 +5,10 @@ import {
 	DateInterval,
 	DateTime,
 	E, EntityID, MaterialIcon,
-	t,
 	tbar, Timezone,
 	win
 } from "@intermesh/goui";
-import {calendarStore} from "./Index.js";
+import {calendarStore, t} from "./Index.js";
 import {client, jmapds, Recurrence} from "@intermesh/groupoffice-core";
 import {EventWindow} from "./EventWindow.js";
 import {EventDetailWindow} from "./EventDetail.js";
@@ -107,43 +106,35 @@ export class CalendarItem {
 		if(e.recurrenceRule) {
 
 			const r = new Recurrence({dtstart: new Date(e.start), timeZone:e.timeZone, rule: e.recurrenceRule});
-			//let rEnd = r.current.clone().add(new DateInterval(e.duration));
 			for(const date of r.loop(from, until)){
-			//while(r.current.date < until.date && rEnd.date > from.date) {
-				let rEnd = date.clone().add(new DateInterval(e.duration));
 
-				const recurrenceId = date.format('Y-m-d\Th:i:s');
+				let rEnd = date.clone().add(new DateInterval(e.duration));
+				const recurrenceId = date.format('Y-m-d\TH:i:s');
+
 				if (e.recurrenceOverrides && recurrenceId in e.recurrenceOverrides) {
 					const o = e.recurrenceOverrides[recurrenceId];
 					if(o.excluded) {
 						// excluded
 					} else {
-						const overideStart = o.start ? new DateTime(o.start) : date.clone();
+						const overideStart = o.start ? new DateTime(o.start+(e.showWithoutTime?' 00:00:00.000':'')) : date.clone();
 						yield new CalendarItem({
 							key: e.id + '/' + recurrenceId,
-							recurrenceId: recurrenceId,
+							recurrenceId,
 							start: overideStart,
 							title: o.title || e.title,
 							end: (o.duration || o.start) ? overideStart.clone().add(new DateInterval(o.duration || e.duration)) : rEnd,
 							data: e
-							//color: o.color??null
 						});
 					}
 				} else {
 					yield new CalendarItem({
 						key: e.id + '/' + recurrenceId,
-						recurrenceId: recurrenceId,
+						recurrenceId,
 						start: date.clone(),
 						end: rEnd,
 						data: e
 					});
 				}
-				// if(!r.next()) {
-				// 	break;
-				// }
-				// rEnd = r.current.clone().add(new DateInterval(e.duration));
-				//}
-				//} while(r.current.date < until.date && r.next())
 			}
 		} else if (end.date > from.date && start.date < until.date) {
 			yield new CalendarItem({
@@ -266,11 +257,11 @@ export class CalendarItem {
 					width: 550,
 					modal: true,
 					closable: false,
-					title: t(type+'ScheduleTitle', "community", "calendar"),
+					title: t(type+'ScheduleTitle'),
 				},
 				comp({cls: 'pad flow'},
 					comp({tagName:'i',cls:'icon',html:'email', width:100, style:{fontSize:'3em'}}),
-					comp({html: t(type+'ScheduleText', "community", "calendar"), flex:1}),
+					comp({html: t(type+'ScheduleText'), flex:1}),
 				),
 				tbar({},
 					btn({
@@ -360,20 +351,30 @@ export class CalendarItem {
 		} else if(this.isOverride) {
 			this.patchOccurrence(modified, onFinish);
 		} else {
+			// if(modified.recurrenceRule) {
+			// 	eventDS.update(this.data.id, {recurrenceRule:modified.recurrenceRule});
+			// 	delete modified.recurrenceRule;
+			// }
+			// if(Object.keys(modified).length === 0)
+			// 	return
+			// TODO: test this and future patch with new rrule
 			const isFirstInSerie = this.data.start === this.recurrenceId,
 				w = win({
 					title: t('Do you want to edit a recurring event?'),
 					width:550,
 					modal: true,
-					listeners: {userclosed: () => { if(onCancel) onCancel();  }}
+					listeners: {'close': (_me,byUser) => { if(byUser && onCancel) onCancel();  }}
 				},comp({cls: 'pad flow'},
 					comp({tagName:'i',cls:'icon',html:'event_repeat', width:100, style:{fontSize:'3em'}}),
 					comp({html: t('You will be editing a recurring event. Do you want to edit this occurrence only or all future occurrences?'), flex:1}),
-				),tbar({},'->',btn({
+				),tbar({},'->',
+					btn({
 						text: t('This event'),
+						hidden: modified.recurrenceRule, // user must change future if rrule is modified
 						cls:'primary',
 						handler: _b => { this.patchOccurrence(modified, onFinish); w.close(); }
-					}),btn({
+					}),
+					btn({
 						text: t(isFirstInSerie ? 'All events' : 'This and future events'), // save to series
 						handler: _b => {
 							const p = isFirstInSerie ?
@@ -420,7 +421,7 @@ export class CalendarItem {
 		//if(!ev.data.participants) { // is not scheduled ( split event)
 		// todo: add first and next relation in relatedTo property as per https://www.ietf.org/archive/id/draft-ietf-jmap-calendars-11.html#name-splitting-an-event
 		const rule = structuredClone(this.data.recurrenceRule);
-		rule.until = this.start.addDays(-1).format('Y-m-d'); // close current series yesterday
+		rule.until = this.start.clone().setHours(0,0,0,0).addDays(-1).format('Y-m-d'); // close current series yesterday
 		eventDS.update(this.data.id, {recurrenceRule: rule}); // set until on original
 
 		const next = Object.assign({},

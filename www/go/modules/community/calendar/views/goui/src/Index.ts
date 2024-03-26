@@ -1,7 +1,7 @@
 import {client, jmapds, modules} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {router} from "@intermesh/groupoffice-core";
-import {datasourcestore, t, E, translate, DateTime, Window} from "@intermesh/goui";
+import {datasourcestore, t as coreT, E, translate, DateTime, Window} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {EventWindow} from "./EventWindow.js";
 import {EventDetail, EventDetailWindow} from "./EventDetail.js";
@@ -10,13 +10,15 @@ export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year'
 export const calendarStore = datasourcestore({
 	dataSource:jmapds('Calendar'),
 	queryParams:{filter:{isSubscribed: true}},
-	sort: [{property:'sortOrder'}]
+	sort: [{property:'sortOrder'},{property:'name'}]
 });
 
 export const categoryStore = datasourcestore({
 	dataSource:jmapds('CalendarCategory'),
 	sort: [{property:'name'}]
 })
+
+export const t = (key:string) => coreT(key, 'community', 'calendar');
 
 function addEmailAction() {
 	if(go) {
@@ -62,6 +64,7 @@ function addEmailAction() {
 										.cls('pressed', item.currentParticipant?.participationStatus == s)
 										.on('click', _ => {
 											item.updateParticipation(s as 'accepted'|'declined'|'tentative').then(() => {
+												debugger;
 												updateBtns(item);
 											});
 										})
@@ -87,7 +90,7 @@ function addEmailAction() {
 					if(typeof event === "string") {
 						text += ', '+ event;
 					} else if(msg.itip.method !== 'REPLY') {
-						text += ' "' + event.title + '" ' + t('at', 'community', 'calendar') + ' ' + DateTime.createFromFormat(event.start.replace('T', ' '), 'Y-m-d H:i')!.format('D j M H:i')
+						text += ' "' + event.title + '" ' + t('at') + ' ' + DateTime.createFromFormat(event.start.replace('T', ' '), 'Y-m-d H:i')!.format('D j M H:i')
 					}
 				}
 
@@ -134,7 +137,7 @@ modules.register(  {
 					}, multiple: true, title: t("Calendars")}
 			],
 			links: [{
-				iconCls: 'entity ic-event yellow',
+				iconCls: 'entity ic-event red',
 				linkWindow:(entity:string, entityId) => new EventWindow(),
 				linkDetail:() =>  new EventDetail()
 			}]
@@ -156,10 +159,7 @@ modules.register(  {
 					modules.openMainPanel("calendar");
 					ui.goto(new DateTime(ymd)).setSpan(span, amount);
 				};
-			router.add(/^calendar$/, () => {
-					nav(client.user.calendarPreferences.startView || 'month', 0);
-				}) // default
-				.add(/^calendar\/(month|list|week|day|year)\/(\d{4}-\d{2}-\d{2})$/, (span, ymd) => {
+			router.add(/^calendar\/(month|list|week|day|year)\/(\d{4}-\d{2}-\d{2})$/, (span, ymd) => {
 					nav(span as ValidTimeSpan, 0, ymd);
 				})
 				.add(/^calendar\/(days|weeks|split)-(\d+)\/(\d{4}-\d{2}-\d{2})$/, (span, amount, ymd) => {

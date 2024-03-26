@@ -1,5 +1,4 @@
 import {
-	t,
 	E,
 	btn,
 	tbar,
@@ -13,6 +12,7 @@ import {
 } from "@intermesh/goui";
 import {client, jmapds} from '@intermesh/groupoffice-core';
 import {CalendarItem} from "./CalendarItem.js";
+import {t} from "./Index.js";
 
 export interface AvailabilityWindowEventMap<Type> extends WindowEventMap<Type> {
 	changetime: (me: Type, start: DateTime, end:DateTime) => void

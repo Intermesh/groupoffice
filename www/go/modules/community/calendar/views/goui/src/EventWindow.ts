@@ -13,7 +13,6 @@ import {
 	radio,
 	select,
 	store,
-	t,
 	table,
 	textarea,
 	textfield,
@@ -21,7 +20,7 @@ import {
 	win,
 } from "@intermesh/goui";
 import {client, FormWindow, JmapDataSource, recurrencefield} from "@intermesh/groupoffice-core";
-import {calendarStore, categoryStore} from "./Index.js";
+import {calendarStore, categoryStore,t} from "./Index.js";
 import {participantfield} from "./ParticipantField.js";
 import {alertfield} from "./AlertField.js";
 import {CalendarItem} from "./CalendarItem.js";
@@ -154,6 +153,7 @@ export class EventWindow extends FormWindow {
 							duration = oldEnd.diff(sV);
 						this.startDate.value = eV.add(duration).format(format);
 					}
+					this.item!.end = eV!; // for isInPast
 				}}
 			}),
 			comp({cls:'hbox'},
@@ -307,7 +307,9 @@ export class EventWindow extends FormWindow {
 			this.form.load(ev.data.id!).then(() => {
 				if(ev.recurrenceId) {
 					this.startDate.value = ev.start.format('Y-m-d\TH:i');
+					this.startDate.trackReset();
 					this.endDate.value = ev.end.clone().addDays(ev.data.showWithoutTime? -1 : 0).format(ev.data.showWithoutTime ? 'Y-m-d' : 'Y-m-d\TH:i');
+					this.endDate.trackReset();
 				}
 			});
 		}
@@ -317,6 +319,7 @@ export class EventWindow extends FormWindow {
 
 	submit() {
 		if(this.item!.isRecurring) {
+
 			this.item!.patch(this.parseSavedData(this.form.modified), () => {
 				this.close();
 			});

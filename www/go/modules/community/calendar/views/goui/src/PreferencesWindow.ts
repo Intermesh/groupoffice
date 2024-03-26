@@ -36,7 +36,7 @@ export class PreferencesWindow extends FormWindow {
 				{value:'PT30M', name: '30 '+t('minutes')},
 				{value:'PT1H',name:  '1 '+t('hour')},
 				{value:'PT2H',name:  '2 '+t('hours')},
-				{value:null,name:  t('All day')}
+				{value:null, name:  t('All day')}
 			]})
 		));
 	}

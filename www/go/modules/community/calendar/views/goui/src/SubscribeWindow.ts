@@ -1,5 +1,6 @@
-import {btn, column, comp, datasourcestore, t, Table, table, Window} from "@intermesh/goui";
+import {btn, column, comp, datasourcestore, Table, table, Window} from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
+import {t} from "./Index.js";
 
 export class SubscribeWindow extends Window {
 

@@ -1,5 +1,10 @@
 <?php
 return [
+	'name' => 'Calendar',
+	'description' => 'Calendar module; Every user can add, edit or delete appointments Also appointments from other users can be viewed and if necessary it can be changed.',
+	'CalendarEvent' => 'Event',
+
+
 	'mayChangeCalendars'=> 'Change Calendars',
 	'mayChangeCategories' => 'Change Categories',
 	'mayChangeResources' => 'Change Resource',

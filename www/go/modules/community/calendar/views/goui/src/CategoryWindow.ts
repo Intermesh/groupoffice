@@ -1,5 +1,6 @@
 import {client, FormWindow, jmapds} from "@intermesh/groupoffice-core";
-import {checkbox, colorfield, combobox, comp, t, textfield} from "@intermesh/goui";
+import {checkbox, colorfield, combobox, comp, textfield} from "@intermesh/goui";
+import {t} from "./Index.js";
 
 export class CategoryWindow extends FormWindow {
 

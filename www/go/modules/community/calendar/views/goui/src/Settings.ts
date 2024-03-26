@@ -1,5 +1,6 @@
-import {checkbox, containerfield, h3, t, textfield} from "@intermesh/goui";
+import {checkbox, containerfield, h3, textfield} from "@intermesh/goui";
 import {FormWindow} from "@intermesh/groupoffice-core";
+import {t} from "./Index.js";
 
 export class Settings extends FormWindow {
 

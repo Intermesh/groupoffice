@@ -4,14 +4,13 @@ import {
 	DataSourceForm,
 	datasourceform, DateInterval,
 	DateTime, DisplayField, displayfield, Format, hr, mapfield, Notifier,
-	t,
 	tbar, Toolbar,
 	Window
 } from "@intermesh/goui";
 import {client, JmapDataSource, jmapds, RecurrenceField} from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
 import {CalendarItem} from "./CalendarItem.js";
-import {calendarStore} from "./Index.js";
+import {calendarStore,t} from "./Index.js";
 
 
 export class EventDetail extends Component {

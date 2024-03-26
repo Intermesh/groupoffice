@@ -1,5 +1,10 @@
 <?php
 return [
+	'CalendarEvent' => 'Afspraak',
+	'name' => 'Agenda',
+	'description' => 'Agenda module; Iedere gebruiker kan afspraken toevoegen, bewerken of verwijderen. Ook kunnen afspraken van andere gebruikers worden ingezien en als het nodig is aangepast worden.',
+
+
 	'mayChangeCalendars'=> 'Wijzig Agenda\'s',
 	'mayChangeCategories' => 'Wijzig Categorieën',
 	'mayChangeResources' => 'Wijzig Faciliteiten',
@@ -18,13 +23,14 @@ return [
 	'Organizer' => 'Organisator',
 	'Categories' => 'Categorieën',
 	'Calendars' => 'Agenda\'s',
+	'Calendar' => 'Agenda',
 	'New event' => 'Nieuwe afspraak',
 	'Event' => 'Afspraak',
 	'All day' => 'Hele dag',
 	'Unsubscribe' => 'Afmelden',
 	'Subscribe' => 'Aanmelden',
 	'Events with time' => 'Afspraken met tijd',
-	'Events wihtout time (All day)' => 'AFspraken zonder tijd (Hele dag)',
+	'Events wihtout time (All day)' => 'Afspraken zonder tijd (Hele dag)',
 	'Default notifications' => 'Standaard meldingen',
 	'Exceptions' => 'Uitzonderingen',
 	'Override' => 'Overschreven',
@@ -49,7 +55,6 @@ return [
 	'Workweek' =>'Werkweek',
 
 	'Title'=> 'Onderwerp',
-	'Alerts' => 'Meldingen',
 	'Start' => 'Start',
 	'End' => 'Einde',
 	'Invite people'=>'Gasten toevoegen',
@@ -80,9 +85,6 @@ return [
 	'Whenever an update to an event already in your calendar is received, update the event, or delete it if the event is cancelled' => 'Wanneer een update voor een afspraak die al in je kalender staat wordt ontvangen, werk de afspraak bij of verwijder het als deze is geannuleerd',
 	'Raster size for day/week view' => 'Rastergrootte voor dag-/weekweergave',
 	'The duration adjustment when resizing the event' => 'De duur aanpasing bij het slepen van de gebeurtenis',
-	'minutes' => 'minuten',
-	'hour' => 'uur',
-	'hours' => 'uur',
 	'Default view when opening the calendar' => 'Standaard weergave bij het openen van de kalender',
 	'Default duration' => 'Standaard duur',
 	'Duration for a new event when no range is selected' => 'Duur voor een nieuwe afspraak wanneer geen tijd is geselecteerd',
@@ -91,6 +93,22 @@ return [
 	'Enable JWT authentification' => 'Schakel JWT-authenticatie in',
 	'App secret' => 'App geheim',
 	'App ID' => 'App ID',
+	'Event page' => 'Afspraak pagina',
+
+	//alerts
+	'Alerts'=>'Meldingen',
+	'At the start'=>'Aan het begin',
+	'Default' => 'Standaard',
+	'day' => 'dag',
+	'days' => 'dagen',
+	'hour' => 'uur',
+	'hours' => 'uur',
+	'minute' => 'minuut',
+	'minutes' => 'minuten',
+	'before' => 'van te voren',
+	'after' => 'erna',
+	'None' => 'Geen',
+
 
 	// schedule massages
 	'newScheduleTitle' => 'Wil je de deelnemers uitnodigen?',

@@ -67,7 +67,8 @@ export class MonthView extends CalendarView {
 
 		const create = (day: HTMLElement) => {
 			[from, till] = (anchor.compareDocumentPosition(day) & 0x02) ? [day,anchor] : [anchor,day];
-			ev.data.showWithoutTime = from !== till;
+
+			ev.data.showWithoutTime = from !== till || !client.user.calendarPreferences.defaultDuration;
 			if(ev.data.showWithoutTime) {
 				ev.start = new DateTime(from.dataset.date!+' 00:00:00.000');
 				ev.end = new DateTime(till.dataset.date!+' 00:00:00.000').addDays(1);

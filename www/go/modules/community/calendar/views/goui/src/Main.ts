@@ -13,12 +13,11 @@ import {
 	list,
 	menu, router, select,
 	splitter,
-	t,
 	tbar, win
 } from "@intermesh/goui";
 import {MonthView} from "./MonthView.js";
 import {WeekView} from "./WeekView.js";
-import {calendarStore, categoryStore, ValidTimeSpan} from "./Index.js";
+import {calendarStore, categoryStore, ValidTimeSpan,t} from "./Index.js";
 import {CalendarWindow} from "./CalendarWindow.js";
 import {YearView} from "./YearView.js";
 import {SplitView} from "./SpltView.js";
@@ -63,7 +62,10 @@ export class Main extends Component {
 		super();
 		this.cls = 'hbox fit tablet-cards';
 
-		this.adapter.onLoad = () => { (this.cards.items.get(this.cards.activeItem) as CalendarView)!.update() };
+		this.adapter.onLoad = () => {
+			console.log('view update');
+			this.view.update();
+		};
 
 		const weekView= new WeekView(this.adapter),
 			monthView = new MonthView(this.adapter),
@@ -252,11 +254,17 @@ export class Main extends Component {
 		);
 		this.timeSpan = client.user.calendarPreferences.startView || 'month';
 		this.date = new DateTime();
-		this.on('render', () => {this.updateView();});
+		// NOPE:router will call setSpan and render
+		// calendar store load will call first view update
+		//this.on('render', () => { this.updateView(); });
 	}
 
 	private openPDF(type:string) {
 		window.open(client.pageUrl('community/calendar/print/'+type+'/'+this.date.format('Y-m-d')));
+	}
+
+	private get view() : CalendarView {
+		return this.cards.items.get(this.cards.activeItem) as CalendarView;
 	}
 
 	private renderAdapterBoxes() {
@@ -299,8 +307,17 @@ export class Main extends Component {
 					me.rowSelection!.selected = [index>0 ? index : 0];
 					this.inCalendars = items.reduce((obj, item) => ({ ...obj, [item.id!]: item.isVisible }), {} as any);
 				});
+				me.store.load().then(_c => {
+					// after initial load. check for changed
+					console.log('calendars loaded');
+				 	me.store.on('load', () => {
+						console.error(Date.now());
+						this.view.update();
+					});
+					this.applyInCalendarFilter();
+					this.updateView();
 
-				me.store.load();
+				});
 			}},
 			renderer: (data, _row, _list, _storeIndex) => {
 				// if(data.isVisible) {
@@ -318,16 +335,8 @@ export class Main extends Component {
 							});
 						},
 						'change': (p, newValue) => {
-							const store = this.adapter.byType('event').store;
 							this.inCalendars[data.id] = newValue;
-							const calendarIds = Object.keys(this.inCalendars).filter(key => this.inCalendars[key])
-							if(calendarIds.length) {
-								Object.assign(store.queryParams.filter ||= {}, {
-									inCalendars: calendarIds
-								});
-							} else {
-								delete store.queryParams.filter?.inCalendars;
-							}
+							this.applyInCalendarFilter();
 							// FunctionUtil.buffer(1,() => {
 							 	this.updateView();
 							// })();
@@ -382,6 +391,19 @@ export class Main extends Component {
 				})];
 			}
 		});
+	}
+
+	private applyInCalendarFilter() {
+		const store = this.adapter.byType('event').store;
+
+		const calendarIds = Object.keys(this.inCalendars).filter(key => this.inCalendars[key])
+		if(calendarIds.length) {
+			Object.assign(store.queryParams.filter ||= {}, {
+				inCalendars: calendarIds
+			});
+		} else {
+			delete store.queryParams.filter?.inCalendars;
+		}
 	}
 
 	private buildCategoryFilter() {
@@ -549,11 +571,11 @@ export class Main extends Component {
 			// for the fast previous/forward clickers
 			this.bufferedUpdate(start);
 		} else {
-			(this.cards.items.get(this.cards.activeItem) as CalendarView)!.goto(start, this.spanAmount!);
+			this.view.goto(start, this.spanAmount!);
 		}
 	}
 
 	private bufferedUpdate = FunctionUtil.buffer(200, (start: DateTime)=> {
-		(this.cards.items.get(this.cards.activeItem) as CalendarView)!.goto(start, this.spanAmount!);
+		this.view.goto(start, this.spanAmount!);
 	})
 }

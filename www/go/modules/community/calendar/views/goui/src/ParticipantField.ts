@@ -6,10 +6,10 @@ import {
 	hr,
 	MapField,
 	mapfield, menu, ObservableListenerOpts,
-	t,
 	table
 } from "@intermesh/goui";
 import {client, jmapds, validateEmail} from "@intermesh/groupoffice-core";
+import {t} from "./Index.js";
 
 export const participantfield = (config?: Config<ParticipantField, FieldEventMap<ParticipantField>>) => createComponent(new ParticipantField(), config);
 

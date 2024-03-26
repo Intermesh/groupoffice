@@ -170,7 +170,7 @@ class Module extends core\Module
 		if(!$event) {
 			throw new AccessDenied();
 		}
-		$title = go()->t('Event page');
+		$title = go()->t('Event page', 'community', 'calendar');
 		$method = 'PAGE'; // will show participation statusses or other participants
 		$url = '';
 		foreach($event->participants as $p) {
