@@ -386,7 +386,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 							break;
 
 						case "invalidProperties":
-							//tabs should handle this
+							//Handled by validation errors above
 							break;
 
 						default:
