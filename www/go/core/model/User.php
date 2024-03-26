@@ -307,9 +307,14 @@ class User extends AclItemEntity {
 	 * Changed to false in setValues() so when the the jmap api is used it needs to be verified
 	 * @var bool 
 	 */
-	private $passwordVerified = true;
+	private ?bool $passwordVerified = null;
 
 	public $clients;
+
+
+	public function isPasswordVerified() : ?bool {
+		return $this->passwordVerified;
+	}
 
 	protected static function defineMapping(): Mapping
 	{
@@ -427,14 +432,16 @@ public function getHistoryLog(): bool|array
 
 		if(go()->getAuthState() && go()->getAuthState()->isAdmin()) {
 			if(!go()->getAuthState()->getUser()->checkPassword($currentPassword)) {
-				$this->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
+				$this->passwordVerified = false;
 			}else {
 				$this->passwordVerified = true;
 			}
 		} else {
 
 			if (!$this->checkPassword($currentPassword)) {
-				$this->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
+				$this->passwordVerified = false;
+			} else {
+				$this->passwordVerified = true;
 			}
 		}
 	}
@@ -577,7 +584,7 @@ public function getHistoryLog(): bool|array
 		}
 		
 		if(!$this->validatePasswordChange()) {
-			if(!$this->hasValidationErrors('currentPassword')) {
+			if($this->passwordVerified === null) {
 				$this->setValidationError('currentPassword', ErrorCode::REQUIRED);
 			}
 		}

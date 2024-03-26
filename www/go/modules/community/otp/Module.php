@@ -8,6 +8,7 @@ use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\Settings;
 use go\core\util\QRcode;
+use go\core\validate\ErrorCode;
 use go\modules\community\otp\model;
 use go\core\model\Group;
 use go\core\model\Module as ModuleModel;
@@ -34,8 +35,22 @@ class Module extends core\Module {
 	
 	public function defineListeners() {
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
+		User::on(core\jmap\Entity::EVENT_VALIDATE, static::class, 'onUserValidate');
 	}
-	
+
+	public static function onUserValidate(User $user) {
+		if($user->isModified(['otp']) && !$user->otp) {
+
+			$v = $user->isPasswordVerified();
+			if($v) {
+				return;
+			} else if($v === null) {
+				$user->setValidationError("currentPassword", ErrorCode::REQUIRED);
+			} else {
+				$user->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
+			}
+		}
+	}
 
 	public static function onMap(Mapping $mapping) {		
 		$mapping->addHasOne("otp", model\OtpAuthenticator::class, ['id' => 'userId'], false);
