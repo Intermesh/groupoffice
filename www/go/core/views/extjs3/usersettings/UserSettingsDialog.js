@@ -27,6 +27,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		this.saveButton = new Ext.Button({
 			text: t('Save'),
 			handler: this.submit,
+			type: "submit",
 			scope:this,
 			cls: "primary"
 		});
@@ -50,25 +51,26 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		}
 		
 		//Add a hidden submit button so the form will submit on enter
-		this.formPanel.add(new Ext.Button({
-					hidden: true,
-					hideMode: "offsets",
-					type: "submit",
-					handler: function() {
-						this.submit();
-					},
-					scope: this
-				}));
+		// this.formPanel.add(new Ext.Button({
+		// 			hidden: true,
+		// 			hideMode: "offsets",
+		// 			type: "submit",
+		// 			handler: function() {
+		// 				this.submit();
+		// 			},
+		// 			scope: this
+		// 		}));
 		
-		this.formPanel.bodyCfg.autocomplete = "off";
+		// this.formPanel.bodyCfg.autocomplete = "off";
 		
 		this.tabPanel = new Ext.TabPanel({
 			headerCfg: {cls:'x-hide-display'},
-			anchor: '100% 100%',
+			anchor: '100% -' + dp(64),
 			items: []
 		});
 		
 		this.formPanel.add(this.tabPanel);
+		this.formPanel.add(new Ext.Toolbar({items: ["->",this.saveButton]}));
 		
 		
 		this.tabStore = new Ext.data.ArrayStore({
@@ -103,10 +105,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			items: [
 				this.navMenu,
 				this.formPanel
-			],
-			buttons:[
-				this.saveButton
 			]
+
 		});
 		
 		this.addEvents({
@@ -297,6 +297,26 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			this.internalSubmit();
 		}
 	},
+
+	promptForPassword: function() {
+		if(!this.checkCurrentPasswordSet() && this.needCurrentPassword()){
+
+			var passwordPrompt = new go.PasswordPrompt({
+				text: t('Provide your current password to save your user settings.'),
+				title: t('Current password required'),
+				listeners:{
+					'ok': function(value){
+						//this.internalSubmit(value);
+						this.formPanel.getForm().baseParams.currentPassword = value;
+					},
+					scope:this
+				}
+			});
+
+			passwordPrompt.show();
+
+		}
+	},
 	
 	internalSubmit : function(currentPassword){
 		this.actionStart();
@@ -342,11 +362,11 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		}
 
 		go.Db.store("User").set(params, function(options, success, response){
-			if(response.notUpdated && response.notUpdated[id] && response.notUpdated[id].validationErrors && response.notUpdated[id].validationErrors.currentPassword){
-				// Current password is incorrect.
-				this.submit();
-				return;
-			}
+			// if(response.notUpdated && response.notUpdated[id] && response.notUpdated[id].validationErrors && response.notUpdated[id].validationErrors.currentPassword){
+			// 	// Current password is incorrect.
+			// 	this.submit();
+			// 	return;
+			// }
 						
 			if(response.updated && id in response.updated){
 				this.submitComplete(response);
@@ -628,6 +648,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	}
 
 });
+
+Ext.reg("usersettingsdialog", go.usersettings.UserSettingsDialog);
 
 
 

@@ -374,7 +374,7 @@ public function getHistoryLog(): bool|array
 	
 	public function setValues(array $values) : Model
 	{
-		$this->passwordVerified = false;
+		$this->passwordVerified = null;
 		return parent::setValues($values);
 	}
 
@@ -586,6 +586,8 @@ public function getHistoryLog(): bool|array
 		if(!$this->validatePasswordChange()) {
 			if($this->passwordVerified === null) {
 				$this->setValidationError('currentPassword', ErrorCode::REQUIRED);
+			} else {
+				$this->setValidationError('currentPassword', ErrorCode::INVALID_INPUT);
 			}
 		}
 		
