@@ -758,6 +758,8 @@ public function getHistoryLog(): bool|array
 		return in_array($groupId, $this->groups);
 	}
 
+	private array $authenticators;
+
 
 	/**
 	 * Get available authentication methods
@@ -766,22 +768,25 @@ public function getHistoryLog(): bool|array
 	 */
 	public function getAuthenticators(): array
 	{
-		$authenticators = [];
+
+		if(isset($this->authenticators)) {
+			return $this->authenticators;
+		}
+
+		$this->authenticators = [];
 
 		$auth = new Authenticate();
 		$primary = $auth->getPrimaryAuthenticatorForUser($this->username);
 
 		if($primary) {
-			$authenticators[] = $primary;
+			$this->authenticators[] = $primary;
 		}
 
 		foreach ($auth->getSecondaryAuthenticatorsForUser($this->username) as $authenticator) {
-			if ($authenticator::isAvailableFor($this->username)) {
-				$authenticators[] = $authenticator;
-			}
+			$this->authenticators[] = $authenticator;
 		}
 
-		return $authenticators;
+		return $this->authenticators;
 	}
 
   /**
