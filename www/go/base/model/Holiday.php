@@ -71,9 +71,9 @@ class Holiday extends \GO\Base\Db\ActiveRecord {
 	 * If $force is set to true then the current holidays in the given period and 
 	 * locale will be deleted and recreated from the holidays file.
 	 * 
-	 * @param StringHelper $startDate
-	 * @param StringHelper $endDate
-	 * @param StringHelper $locale
+	 * @param string $startDate
+	 * @param string $endDate
+	 * @param string $locale
 	 * @param boolean $check
 	 * @param boolean $force
 	 * @return \GO\Base\Db\ActiveStatement 
@@ -112,8 +112,8 @@ class Holiday extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Check if the requested holidays are available in the database.
 	 * 
-	 * @param StringHelper $year
-	 * @param StringHelper $locale
+	 * @param string $year
+	 * @param string $locale
 	 * @return int
 	 * @throws Exception 
 	 */

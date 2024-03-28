@@ -183,15 +183,6 @@ function test_system() :array
 
 	$tests[]=$test;
 
-
-	$test['name']='Magic quotes setting';
-	$test['showSuccessFeedback'] = false;
-	$test['pass']= version_compare( phpversion(), "7.4", ">=") || !get_magic_quotes_gpc();
-	$test['feedback']='Warning: magic_quotes_gpc is enabled. You will get better performance if you disable this setting.';
-	$test['fatal']=false;
-
-	$tests[]=$test;
-
 	
 	$test['name']='PDO support';
 	$test['showSuccessFeedback'] = false;
