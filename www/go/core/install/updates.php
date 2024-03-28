@@ -1544,7 +1544,7 @@ $updates['202403181539'][] = "alter table core_acl_group_changes  add granted bo
 
 $updates['202403181539'][] = "alter table core_acl_group_changes drop column revokeModSeq;";
 
-$updates['202403181539'][] = "create index if not exists aclId2
+$updates['202403181539'][] = "create index aclId2
     on core_acl_group_changes (aclId, groupId, modSeq);";
 
 $updates['202403181539'][] = "drop index aclId on core_acl_group_changes;";
