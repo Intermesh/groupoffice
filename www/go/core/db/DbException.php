@@ -36,7 +36,11 @@ class DbException extends \Exception {
 		//App::get()->debug($msg);
 
 		if(preg_match("/key '(.*)'/", $msg, $matches)) {
-			return $matches[1];
+
+			//mysql 8 prepends table name,  mariadb does not. We don't need it here so we just return col name
+			$col = Utils::splitTableAndColumn($matches[1]);
+
+			return $col->name;
 		}
 
 		return false;
