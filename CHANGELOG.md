@@ -1,3 +1,4 @@
+28-03-2024: 6.8.40
 - Core: Added auth and lost password logs for fail2ban
 - Core: Made change password play nice with password managers
 - Core: Fixed upgrade SQL for MySQL 8
