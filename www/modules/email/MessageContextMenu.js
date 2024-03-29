@@ -42,6 +42,26 @@ GO.email.MessageContextMenu = Ext.extend(Ext.menu.Menu, {
 		}
 
 		var contextItems = [
+			this.contextMenuEditDraft = new Ext.menu.Item({
+				iconCls: "ic-edit",
+				text: t("Edit"),
+				handler: function() {
+					const record = this.main.messagesGrid.selModel.getSelected();
+					if (record) {
+						GO.email.showComposer({
+							uid: record.data.uid,
+							task: 'opendraft',
+							template_id: 0,
+							mailbox: record.data.mailbox,
+							account_id: record.data.account_id
+						});
+					}
+				},
+				hidden: true,
+				disabled: true,
+				scope: this,
+				multiple: false
+			}),
 			this.contextMenuMarkAsRead = new Ext.menu.Item({
 				iconCls: 'ic-markunread',
 				text: t("Mark as read", "email"),
@@ -319,11 +339,13 @@ GO.email.MessageContextMenu = Ext.extend(Ext.menu.Menu, {
 			})
 		);
 
-this.items = contextItems;
+		this.items = contextItems;
 
 		this.on("show", function(){
-
-			var record = this.main.messagesGrid.selModel.getSelected();
+			const record = this.main.messagesGrid.selModel.getSelected();
+			const bDoDisplayEditDraft = GO.util.isMobileOrTablet() && record.data.mailbox === "Drafts";
+			this.contextMenuEditDraft.setVisible(bDoDisplayEditDraft);
+			this.contextMenuEditDraft.setDisabled(!bDoDisplayEditDraft);
 
 			this.contextMenuMarkAsUnread.setVisible(record.data.seen);
 			this.contextMenuMarkAsRead.setVisible(!record.data.seen);

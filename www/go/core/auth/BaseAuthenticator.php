@@ -43,10 +43,17 @@ abstract class BaseAuthenticator implements JsonSerializable {
 	 */
 	public static function register(): bool
 	{
+		$module = Module::findByClass(static::class);
+		$id = static::id();
+
+		$method = Method::find()->where('moduleId','=', $module->id)->where('id', '=', $id)->single();
+		if($method) {
+			return true;
+		}
 		$method = new Method();
-		$module = Module::findByClass(static::class);		
+
 		$method->moduleId = $module->id;
-		$method->id = static::id();
+		$method->id = $id;
 		$method->sortOrder = (new Query)->selectSingleValue("max(sortOrder)")->from('core_auth_method')->single() + 1;
 		if(!$method->save()) {
 			throw new Exception("Could not register authenticator!". var_export($method->getValidationErrors(), true));

@@ -223,6 +223,10 @@ class Utils {
 		return self::quoteTableName($name);
 	}
 
+	/**
+	 * @param string $tableAndCol
+	 * @return Col
+	 */
 	public static function splitTableAndColumn(string $tableAndCol) : Col {
 		$dot = strpos($tableAndCol, '.');
 

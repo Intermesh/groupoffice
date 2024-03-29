@@ -582,85 +582,6 @@ class StringHelper {
 	}
 
 
-
-
-
-	/**
-	 * Convert an enriched formated string to HTML format
-	 *
-	 * @param	StringHelper $enriched Enriched formatted string
-	 * @access public
-	 * @return StringHelper HTML formated string
-	 */
-	public static function enriched_to_html($enriched, $convert_links=true) {
-
-		// We add space at the beginning and end of the string as it will
-		// make some regular expression checks later much easier (so we
-		// don't have to worry about start/end of line characters)
-		$enriched = ' '.$enriched.' ';
-
-		// Get color parameters into a more useable format.
-		$enriched = preg_replace('/<color><param>([\da-fA-F]+),([\da-fA-F]+),([\da-fA-F]+)<\/param>/Uis', '<color r=\1 g=\2 b=\3>', $enriched);
-		$enriched = preg_replace('/<color><param>(red|blue|green|yellow|cyan|magenta|black|white)<\/param>/Uis', '<color n=\1>', $enriched);
-
-		// Get font family parameters into a more useable format.
-		$enriched = preg_replace('/<fontfamily><param>(\w+)<\/param>/Uis', '<fontfamily f=\1>', $enriched);
-
-		// Single line breaks become spaces, double line breaks are a
-		// real break. This needs to do <nofill> tracking to be
-		// compliant but we don't want to deal with state at this
-		// time, so we fake it some day we should rewrite this to
-		// handle <nofill> correctly.
-		$enriched = preg_replace('/([^\n])\r\n([^\r])/', '\1 \2', $enriched);
-		$enriched = preg_replace('/(\r\n)\r\n/', '\1', $enriched);
-
-		// We try to protect against bad stuff here.
-		$enriched = @ htmlspecialchars($enriched, ENT_QUOTES);
-
-		// Now convert the known tags to html. Try to remove any tag
-		// parameters to stop people from trying to pull a fast one
-		$enriched = preg_replace('/(?<!&lt;)&lt;bold.*&gt;(.*)&lt;\/bold&gt;/Uis', '<span style="font-weight: bold">\1</span>', $enriched);
-		$enriched = preg_replace('/(?<!&lt;)&lt;italic.*&gt;(.*)&lt;\/italic&gt;/Uis', '<span style="font-style: italic">\1</span>', $enriched);
-		$enriched = preg_replace('/(?<!&lt;)&lt;underline.*&gt;(.*)&lt;\/underline&gt;/Uis', '<span style="text-decoration: underline">\1</span>', $enriched);
-		$enriched = preg_replace_callback('/(?<!&lt;)&lt;color r=([\da-fA-F]+) g=([\da-fA-F]+) b=([\da-fA-F]+)&gt;(.*)&lt;\/color&gt;/Uis', create_function('$colors',
-		'for ($i = 1; $i < 4; $i ++) {
-			$colors[$i] = sprintf(\'%02X\', round(hexdec($colors[$i]) / 255));
-		}
-		return \'<span style="color: #\'.$colors[1].$colors[2].$colors[3].\'">\'.$colors[4].\'</span>\';'), $enriched);
-		$enriched = preg_replace('/(?<!&lt;)&lt;color n=(red|blue|green|yellow|cyan|magenta|black|white)&gt;(.*)&lt;\/color&gt;/Uis', '<span style="color: \1">\2</span>', $enriched);
-		$enriched = preg_replace('/(?<!&lt;)&lt;fontfamily&gt;(.*)&lt;\/fontfamily&gt;/Uis', '\1', $enriched);
-		$enriched = preg_replace('/(?<!&lt;)&lt;fontfamily f=(\w+)&gt;(.*)&lt;\/fontfamily&gt;/Uis', '<span style="font-family: \1">\2</span>', $enriched);
-		$enriched = preg_replace('/(?<!&lt;)&lt;smaller.*&gt;/Uis', '<span style="font-size: smaller">', $enriched);
-		$enriched = preg_replace('/(?<!&lt;)&lt;\/smaller&gt;/Uis', '</span>', $enriched);
-		$enriched = preg_replace('/(?<!&lt;)&lt;bigger.*&gt;/Uis', '<span style="font-size: larger">', $enriched);
-		$enriched = preg_replace('/(?<!&lt;)&lt;\/bigger&gt;/Uis', '</span>', $enriched);
-		$enriched = preg_replace('/(?<!&lt;)&lt;fixed.*&gt;(.*)&lt;\/fixed&gt;/Uis', '<font face="fixed">\1</font>', $enriched);
-		$enriched = preg_replace('/(?<!&lt;)&lt;center.*&gt;(.*)&lt;\/center&gt;/Uis', '<div align="center">\1</div>', $enriched);
-		$enriched = preg_replace('/(?<!&lt;)&lt;flushleft.*&gt;(.*)&lt;\/flushleft&gt;/Uis', '<div align="left">\1</div>', $enriched);
-		$enriched = preg_replace('/(?<!&lt;)&lt;flushright.*&gt;(.*)&lt;\/flushright&gt;/Uis', '<div align="right">\1</div>', $enriched);
-		$enriched = preg_replace('/(?<!&lt;)&lt;flushboth.*&gt;(.*)&lt;\/flushboth&gt;/Uis', '<div align="justify">\1</div>', $enriched);
-		$enriched = preg_replace('/(?<!&lt;)&lt;paraindent.*&gt;(.*)&lt;\/paraindent&gt;/Uis', '<blockquote>\1</blockquote>', $enriched);
-		$enriched = preg_replace('/(?<!&lt;)&lt;excerpt.*&gt;(.*)&lt;\/excerpt&gt;/Uis', '<blockquote>\1</blockquote>', $enriched);
-
-		// Now we remove the leading/trailing space we added at the
-		// start.
-		$enriched = preg_replace('/^ (.*) $/s', '\1', $enriched);
-
-		if($convert_links)
-		{
-			$enriched = preg_replace("/(?:^|\b)(((http(s?):\/\/)|(www\.-))([\w\.-]+)([,:;%#&\/?=\w+\.\-@]+))(?:\b|$)/is", "<a href=\"http$4://$5$6$7\" target=\"_blank\" class=\"blue\">$1</a>", $enriched);
-			$enriched = preg_replace("/(\A|\s)([\w\.\-]+)(@)([\w\.-]+)([A-Za-z]{2,4})\b/i", "\\1<a href=\"mailto:\\2\\3\\4\\5\" class=\"blue\">\\2\\3\\4\\5</a>", $enriched);
-		}
-
-		$enriched = nl2br($enriched);
-		$enriched = str_replace("\r", "", $enriched);
-		$enriched = str_replace("\n", "", $enriched);
-
-		return $enriched;
-
-	}
-
-
 	/**
 	 * Convert plain text to HTML
 	 *
@@ -1142,19 +1063,6 @@ class StringHelper {
 		}
 
 		return $html;
-	}
-
-
-	/**
-	 * Quotes a string with >
-	 *
-	 * @param	StringHelper $text
-	 * @access public
-	 * @return StringHelper A string quoted with >
-	 */
-	public static function quote($text) {
-		$text = "> ".ereg_replace("\n", "\n> ", trim($text));
-		return ($text);
 	}
 
 	/**
