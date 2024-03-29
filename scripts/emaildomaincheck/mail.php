@@ -25,7 +25,7 @@ are not optimal. To ensure the best delivery of your mail please make these DNS 
 	}
 
 	if(!$record['dkim']) {
-		$msg .= "You don't have a DKIM record. Please contact us if you like to setup DKIM for your domain.\n\n";
+		$msg .= "You don't have a DKIM record. Please contact us if you like to setup DKIM for your domain. It's not strictly required but highly recommended to setup.\n\n";
 	}
 
 	foreach($record['mxTargets'] as $t) {
