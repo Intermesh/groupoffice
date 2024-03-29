@@ -27,6 +27,12 @@ are not optimal. To ensure the best delivery of your mail please make these DNS 
 		$msg .= "You don't have a DKIM record. Please contact us if you like to setup DKIM for your domain.\n\n";
 	}
 
+	foreach($record['mxTargets'] as $t) {
+		if($t == 'mx1.imfoss.nl') {
+			$msg .= "Your MX is set to an old domain mx1.imfoss.nl that we are phasing out. Please set the MX record to: smtp.group-office.com.\n\n";
+		}
+	}
+
 	$msg .= "If you need help configuring the DNS please contact your domain administrator for support.
 	
 Best regards,
