@@ -406,14 +406,9 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_custom_fields` (
 
 -- missing: (fields, show_not_as_busy)
 INSERT INTO calendar_resource_group
-	(id, name,description, createdBy) SELECT
-   id, name, '', user_id FROM cal_groups;
-
-INSERT INTO calendar_resource_group_admins
-	(groupId, userId) SELECT
-	group_id, user_id FROM cal_group_admins;
-
-id MOD 18
+	(id, name,description, defaultOwnerId, createdBy) SELECT
+   id, name, '',ga.user_id, g.user_id FROM cal_groups g JOIN cal_group_admins ga ON ga.group_id = g.id
+GROUP by g.id;
 
 -- concat 18  random hex colors and select 1 with calendar.id % 18 * hexlength if null
 INSERT INTO calendar_calendar
@@ -431,7 +426,6 @@ INSERT IGNORE INTO calendar_calendar_user
 	(id, userId, isSubscribed, isVisible, color, sortOrder, timeZone, includeInAvailability, modSeq) SELECT
  	 id, cu.user_id, 1, 0, color, 1, null, IF(cal.user_id=0, 'attending', 'all'), 1 FROM
  	cal_calendar_user_colors cu JOIN cal_calendars cal ON cal.id = cu.calendar_id;
-
 
 
 INSERT IGNORE INTO calendar_default_alert_with_time
