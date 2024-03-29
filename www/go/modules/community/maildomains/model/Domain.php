@@ -4,6 +4,7 @@ namespace go\modules\community\maildomains\model;
 
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
+use go\core\model\User;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\util\DateTime;
@@ -54,6 +55,10 @@ class Domain extends AclOwnerEntity
 
 	/** @var boolean */
 	public $active = true;
+
+	public $aliases;
+
+	public $mailboxes;
 
 	/**
 	 * @inheritDoc

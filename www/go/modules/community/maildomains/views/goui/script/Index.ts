@@ -6,9 +6,7 @@ modules.register(  {
 	package: "community",
 	name: "maildomains",
 	async init () {
-		debugger;
 		client.on("authenticated",  (client, session) => {
-			debugger;
 			if(!session.capabilities["go:community:maildomains"]) {
 				// User has no access to this module
 				return;

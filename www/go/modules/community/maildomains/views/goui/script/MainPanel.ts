@@ -1,35 +1,12 @@
-import {
-	avatar,
-	browser,
-	btn,
-	checkbox,
-	checkboxselectcolumn,
-	column,
-	comp,
-	Component,
-	DataSourceStore,
-	form,
-	Form,
-	mstbar,
-	Notifier,
-	paginator,
-	router,
-	searchbtn,
-	splitter,
-	t,
-	Table,
-	tbar
-} from "@intermesh/goui";
-import {authManager, client, FilterCondition, img, JmapDataSource, jmapds, User} from "@intermesh/groupoffice-core";
-
+import {btn, comp, Component, Notifier, paginator, searchbtn, t, tbar} from "@intermesh/goui";
+import {authManager, User} from "@intermesh/groupoffice-core";
+import {DomainTable} from "./DomainTable";
+import {DomainDialog} from "./DomainDialog";
 
 export class MainPanel extends Component {
-
-
-	private user?: User;
-	// private west: Component;
+	private tbl: DomainTable;
 	private center: Component;
-	// private east: Component;
+	private user: User | undefined;
 
 	constructor() {
 		super("section");
@@ -43,153 +20,67 @@ export class MainPanel extends Component {
 				console.warn(e);
 				Notifier.error(t("Login is required on this page"));
 			}
-
+			await this.tbl.store.load();
 		});
-		// this.west = this.createWest();
+		this.tbl = new DomainTable();
 
 		this.items.add(
-				comp({
-						flex: 1, cls: "hbox mobile-cards"
+			comp({
+					cls: "hbox mobile-cards"
+				},
+				this.center = comp({
+						cls: 'active vbox fit',
+						itemId: 'table-container',
 					},
-					// this.west,
 
-					// splitter({
-					// 	stateId: "support-splitter-west",
-					// 	resizeComponentPredicate: this.west
-					// }),
+					tbar({},
 
-					this.center = comp({
-							cls: 'active vbox',
-							itemId: 'table-container',
-							// style: {
-							// 	minWidth: "365px", //for the resizer's boundaries
-							// 	maxWidth: "850px"
-							// }
+						'->',
+
+						searchbtn({
+							listeners: {
+								input: (sender, text) => {
+									this.tbl!.store.setFilter("search", {text: text});
+									this.tbl!.store.load(false);
+								}
+							}
+						}),
+
+						btn({
+							itemId: "add",
+							icon: "add",
+							text: t("Add"),
+							cls: "filled primary",
+							handler: async () => {
+								const dlg = new DomainDialog();
+								dlg.show();
+								dlg.form.value = {userId: this.user!.id, active: 1};
+							}
+						}),
+						btn({
+							itemId: "delete",
+							icon: "delete",
+							text: t("Delete"),
+							handler: async () => {
+								// TODO
+							}
+						})
+					),
+
+					comp({
+							flex: 1,
+							stateId: "maildomains",
+							cls: "scroll border-top main fit"
 						},
-
-						tbar({},
-							// btn({
-							// 	cls: "for-small-device",
-							// 	title: t("Menu"),
-							// 	icon: "menu",
-							// 	handler: (button, ev) => {
-							// 		this.activatePanel(this.west);
-							// 	}
-							// }),
-
-							'->',
-
-							searchbtn({
-								listeners: {
-									input: (sender, text) => {
-
-										// (this.taskTable.store.queryParams.filter as FilterCondition).text = text;
-										// this.taskTable.store.load();
-
-									}
-								}
-							}),
-
-							// mstbar({table: this.taskTable}),
-
-							btn({
-								itemId: "add",
-								icon: "add",
-								text: t("New request"),
-								cls: "filled primary",
-								handler: async () => {
-
-								}
-							})
-						),
-
-						comp({
-								flex: 1,
-								stateId: "support",
-								cls: "scroll border-top main"
-							},
-						),
-
-
-						// paginator({
-						// 	store: this.taskTable.store
-						// })
+						this.tbl
 					),
 
 
-					// splitter({
-					// 	stateId: "support-splitter",
-					// 	resizeComponentPredicate: "table-container"
-					// }),
-					//
-					// this.east = comp({
-					// 		itemId: 'scroll-component',
-					// 		tabIndex: -1,
-					// 		flex: 1,
-					// 		cls: 'scroll'
-					// 	},
-					// 	tbar({},
-					// 		btn({
-					// 			itemId: "back",
-					// 			cls: "for-small-device",
-					// 			icon: "chevron_left",
-					// 			text: t("Back"),
-					// 			handler: () => {
-					// 				router.goto("supportclient");
-					// 			}
-					// 		})
-					// 	),
-					// )
-				)
-			);
+					paginator({
+						store: this.tbl.store
+					})
+				),
+			)
+		);
 	}
-
-	// private activatePanel(active:Component) {
-	// 	this.center.el.classList.remove("active");
-	// 	this.east.el.classList.remove("active");
-	// 	this.west.el.classList.remove("active");
-	//
-	// 	active.el.classList.add("active");
-	// }
-
-
-	// private createWest() {
-	//
-	//
-	// 	return comp({
-	// 			cls: "vbox scroll",
-	// 			width: 300
-	// 		},
-	// 		tbar({
-	//
-	// 			},
-	// 			comp({
-	// 				tagName: "h3",
-	// 				text: t("Help"),
-	// 				flex: 1
-	// 			}),
-	// 			'->',
-	// 			btn({
-	// 				cls: "for-small-device",
-	// 				title: t("Close"),
-	// 				icon: "close",
-	// 				handler: (button, ev) => {
-	// 					this.activatePanel(this.center);
-	// 				}
-	// 			})
-	// 		),
-	// 		tbar({},
-	// 			checkbox({
-	// 				type: "switch",
-	// 				label: t("Show completed"),
-	// 				listeners: {
-	//
-	// 				}
-	// 			})
-	// 		),
-	//
-	// 		comp({tagName: "hr"}),
-	// 	);
-
-
 }
