@@ -8,24 +8,20 @@ import {
 	mapfield, menu, ObservableListenerOpts,
 	table
 } from "@intermesh/goui";
-import {t} from "./Index.js";
+import {statusIcons, t} from "./Index.js";
 import {client, jmapds, validateEmail} from "@intermesh/groupoffice-core";
 
-export const participantfield = (config?: Config<ParticipantField, FieldEventMap<ParticipantField>>) => createComponent(new ParticipantField(), config);
+interface ParticipantFieldEventMap<Type> extends FieldEventMap<Type> {
+	beforeadd: (me:Type, principal: any) => void
+}
+export const participantfield = (config?: Config<ParticipantField, ParticipantFieldEventMap<ParticipantField>>) => createComponent(new ParticipantField(), config);
 
 export interface ParticipantField extends Component {
-	on<K extends keyof FieldEventMap<this>, L extends Function>(eventName: K, listener: Partial<FieldEventMap<this>>[K], options?: ObservableListenerOpts): L;
-	un<K extends keyof FieldEventMap<this>>(eventName: K, listener: Partial<FieldEventMap<this>>[K]): boolean;
-	fire<K extends keyof FieldEventMap<this>>(eventName: K, ...args: Parameters<FieldEventMap<any>[K]>): boolean;
+	on<K extends keyof ParticipantFieldEventMap<this>, L extends Function>(eventName: K, listener: Partial<ParticipantFieldEventMap<this>>[K], options?: ObservableListenerOpts): L;
+	un<K extends keyof ParticipantFieldEventMap<this>>(eventName: K, listener: Partial<ParticipantFieldEventMap<this>>[K]): boolean;
+	fire<K extends keyof ParticipantFieldEventMap<this>>(eventName: K, ...args: Parameters<ParticipantFieldEventMap<any>[K]>): boolean;
 }
 export class ParticipantField extends Component {
-
-	private static statusIcons : {[status:string]: string[]} = {
-		'accepted':		['check_circle', ('Accepted')],
-		'tentative':	['help', ('Maybe')],
-		'declined':		['block', ('Declined')],
-		'needs-action':['schedule', ('Awaiting reply')]
-	}
 
 	list!: MapField
 	btnFreeBusy!: Button
@@ -44,19 +40,29 @@ export class ParticipantField extends Component {
 					}
 				},
 				buildField: (v: any) => {
-					const userIcon = v.roles.owner ? 'manage_accounts' : (v.name?'person':'contact_mail'),
-						statusIcon = ParticipantField.statusIcons[v.participationStatus] || v.participationStatus;
+					const userIcon = v.roles.owner ?
+							'manage_accounts' : (v.kind=='resource' ?
+								'meeting_room' : (v.name ?
+									'person' : 'contact_mail')
+							) ,
+						statusIcon = statusIcons[v.participationStatus] || v.participationStatus;
 					const f = containerfield({cls:'hbox', style: {alignItems: 'center', cursor:'default'}},
 						comp({tagName:'i',cls:'icon',html:userIcon, style:{margin:'0 8px'}}),
 						comp({
 							flex: '1 0 60%',
-							html: v.name ? v.name + '<br>' + v.email : v.email
+							html: v.name ? v.name + (v.email ? '<br>' + v.email :'') : v.email
 						}),
 						comp({tagName:'i',cls:'icon',html:statusIcon[0],title:statusIcon[1], style:{margin:'0 8px'}}),
 						btn({icon:'more_vert', menu: menu({},
 								btn({text: v.email, disabled: true}),
 								hr(),
-								checkbox({label:'Optioneel',/* enableToggle: true*/}),
+								checkbox({label:'Optioneel',listeners: {'change': (cb) => {
+									if(cb.value) {
+										delete v.roles.attendee; // make optional (non-required)
+									} else {
+										v.roles.attendee = true;
+									}
+								} }}),
 								btn({icon:'delete',text:t('Delete'), handler: _ => {
 										f.remove();
 										this.fire('change', this, this.list.value, null);
@@ -113,7 +119,7 @@ export class ParticipantField extends Component {
 								if(r.avatarId) {
 									return avatar({backgroundImage: client.downloadUrl(r.avatarId)});
 								}
-								return '<i class="icon">' + (v=='resource' ? 'meeting_rrom' : 'person') + '</i>'
+								return '<i class="icon">' + (v=='resource' ? 'meeting_room' : 'person') + '</i>'
 
 							} }),
 						column({
@@ -136,21 +142,24 @@ export class ParticipantField extends Component {
 		return super.internalRender();
 	}
 
-	private addSelfAsOrganiser() {
-		this.list.add({
-			email: go.User.email,
-			name: go.User.displayName,
+	private organizerId?: string;
+	addOrganiser(p:any) {
+		if(this.organizerId) this.list.items.removeAt(0);
+		this.organizerId = p.id;
+
+		this.list.insert(0,{
+			email: p.email,
+			name: p.name,
 			roles: {attendee:true, owner:true},
-			kind: 'individual',
+			kind: p.type,
 			participationStatus:"accepted",
 			expectReply:false
-		},go.User.id);
+		},p.id);
 	}
 
 	addParticipant(principal: any) {
-		if(this.list.isEmpty()) {
-			this.addSelfAsOrganiser();
-		}
+		this.fire('beforeadd', this, principal);
+
 		this.list.add({
 			email:principal.email,
 			name: principal.name || principal.email,

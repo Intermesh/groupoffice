@@ -63,7 +63,7 @@ export class CalendarItem {
 	private initStart: string
 	private initEnd: string
 
-	private cal: any
+	cal: any
 
 	divs: {[week: string] :HTMLElement}
 
@@ -186,7 +186,7 @@ export class CalendarItem {
 	}
 
 	get isDeclined() {
-		return this.currentParticipant?.participationStatus === 'declined';
+		return this.calendarPrincipal?.participationStatus === 'declined';
 	}
 
 	get color() {
@@ -284,18 +284,15 @@ export class CalendarItem {
 	}
 
 	get isOwner() {
-		return !this.data.participants || this.currentParticipant?.roles?.owner || false;
+		return !this.data.participants || this.calendarPrincipal?.roles?.owner || false;
 	}
 
-	get currentParticipant() {
-
-		if(!this.data.participants || !this.participantId)
-			return
-		// for(const p in this.data.participants) {
-		// 	if(this.scheduleId == this.data.participants[p].email)
-		// 		return this.data.participants[p];
-		// }
-		return this.data.participants[this.participantId];
+	get calendarPrincipal() {
+		if(this.data.participants && this.principalId)
+			return this.data.participants[this.principalId];
+	}
+	get principalId() {
+		return (this.cal && this.cal.ownerId) ? this.cal.ownerId+'' : go.User.id+''
 	}
 
 	private get isInPast() {
@@ -308,14 +305,12 @@ export class CalendarItem {
 		//return (this.cal && this.cal.ownerId) ? this.cal.ownerId+'' : go.User.id+''
 	}
 
-	private get participantId() {
-		return (this.cal && this.cal.ownerId) ? this.cal.ownerId+'' : go.User.id+''
-	}
+
 
 	updateParticipation(status: "accepted"|"tentative"|"declined") {
-		if(!this.currentParticipant)
+		if(!this.calendarPrincipal)
 			throw new Error('Not a participant');
-		this.currentParticipant.participationStatus = status;
+		this.calendarPrincipal.participationStatus = status;
 
 		eventDS.setParams.sendSchedulingMessages = true;
 		return eventDS.update(this.data.id, {participants: this.data.participants});

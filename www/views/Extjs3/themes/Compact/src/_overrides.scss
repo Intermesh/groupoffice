@@ -1,4 +1,4 @@
-.x-btn, .x-toolbar .x-btn, .x-small-editor .x-btn {
+*:not(.goui) .x-btn, .x-toolbar .x-btn, .x-small-editor .x-btn {
 	background-color: var(--bg-bright);
 	.x-btn-group & {
 	 border-radius: 0;
@@ -33,7 +33,7 @@
 	margin-left: dp(16);
 	margin-right: dp(16);
 }
-.x-menu-item-text, .go-sidenav *, .go-nav * {
+.x-menu-item-text, .go-sidenav *, .go-nav *, aside *, {
 	@extend %font-menu;
 }
 .x-toolbar .xtb-sep{
@@ -111,3 +111,6 @@
 	border-top: 0;
 }
 .x-portlet { overflow:hidden;}
+
+// for filter panel in goui
+.goui .x-btn { background-color:transparent;}

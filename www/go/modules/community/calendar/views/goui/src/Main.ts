@@ -26,7 +26,7 @@ import {client, filterpanel, jmapds} from "@intermesh/groupoffice-core";
 import {CalendarView} from "./CalendarView.js";
 import {CategoryWindow} from "./CategoryWindow.js";
 import {Settings} from "./Settings.js";
-import {ResourcesWindow} from "./ResourcesWindow.js";
+import {ResourcesWindow, ResourceWindow} from "./ResourcesWindow.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 import {ListView} from "./ListView.js";
 import {PreferencesWindow} from "./PreferencesWindow.js";
@@ -148,6 +148,7 @@ export class Main extends Component {
 						})
 					),
 					this.calendarList = this.buildCalendarFilter(),
+					tbar({cls: 'dense'},comp({tagName: 'h3', html: t('Other')})),
 					comp({tagName:'ul', cls:'goui check-list'}, ...this.renderAdapterBoxes()),
 					tbar({cls: 'dense'},
 						comp({tagName: 'h3', html: t('Categories')}),
@@ -347,7 +348,7 @@ export class Main extends Component {
 					buttons: [btn({
 						icon: 'more_horiz', menu: menu({},
 							btn({icon:'edit', text: t('Edit')+'…', disabled:!data.myRights.mayAdmin, handler: async _ => {
-								const dlg = new CalendarWindow();
+								const dlg = data.groupId ? new ResourceWindow() : new CalendarWindow();
 								await dlg.load(data.id);
 								dlg.show();
 							}}),
@@ -358,7 +359,7 @@ export class Main extends Component {
 							btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
 								calendarStore.dataSource.update(data.id, {isSubscribed: false});
 							}}),
-							btn({icon:'import_export', text:t('Import')+'…', handler: async ()=> {
+							btn({icon:'import_export',hidden:data.groupId, text:t('Import')+'…', handler: async ()=> {
 								const files = await browser.pickLocalFiles(false,false,'text/calendar');
 								const blob = await client.upload(files[0]);
 								const calendarSelect = select({

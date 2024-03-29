@@ -3,14 +3,15 @@ import {
 	comp, Component, containerfield,
 	DataSourceForm,
 	datasourceform, DateInterval,
-	DateTime, DisplayField, displayfield, Format, hr, mapfield, Notifier,
+	DateTime, DisplayField, displayfield, Format, hr, mapfield, MaterialIcon, Notifier,
 	tbar, Toolbar,
 	Window
 } from "@intermesh/goui";
 import {client, JmapDataSource, jmapds, RecurrenceField} from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
 import {CalendarItem} from "./CalendarItem.js";
-import {calendarStore,t} from "./Index.js";
+import {calendarStore, statusIcons, t} from "./Index.js";
+import {ParticipantField} from "./ParticipantField.js";
 
 
 export class EventDetail extends Component {
@@ -28,7 +29,7 @@ export class EventDetail extends Component {
 
 	constructor() {
 		super();
-		this.title = t('View Event');
+		this.title = t('Event');
 		this.width = 440;
 		//this.height = 620;
 
@@ -61,21 +62,18 @@ export class EventDetail extends Component {
 						else
 							recurrenceField.dataSet.start = start;
 
-						if(data.participants && this.item!.currentParticipant) {
+						if(data.participants && this.item!.calendarPrincipal) {
 							this.toolBar.show();
-							this.pressButton(this.item!.currentParticipant.participationStatus);
+							this.pressButton(this.item!.calendarPrincipal.participationStatus);
 						}
 					}
 				}
 			},
-			comp({cls:'hbox'},
-				displayfield({name: 'title', label:t('Title')}),
-				comp({flex:1}),
-				displayfield({name: 'calendarId', label:t('Calendar'), renderer: async (v) => {
-					const c = await calendarStore.dataSource.single(v);
-					return c ? c.name : t('Unknown');
-					}  }),
-			),
+			displayfield({name: 'title',flex:1, label:t('Title')}),
+			displayfield({name: 'calendarId', width:160, label:t('Calendar'), renderer: async (v) => {
+				const c = await calendarStore.dataSource.single(v);
+				return c ? c.name : t('Unknown');
+			}  }),
 			comp({cls:'hbox'},
 				displayfield({label: t('Start'), name:'start',renderer:d=>Format.dateTime(d), flex:1}),
 				displayfield({label:t('End'), name: 'end',renderer:d=>Format.dateTime(d), flex:1})
@@ -85,13 +83,16 @@ export class EventDetail extends Component {
 			displayfield({name:'description'}),
 			mapfield({name: 'participants',
 				buildField: (v: any) => displayfield({
-					icon: (v.roles.owner ? 'person_3' : 'person'),
+					//label: v.roles.owner?'Organizer': 'Participant',
+					icon: statusIcons[v.participationStatus][0] as MaterialIcon,
+					//icon: v.roles.owner ? 'manage_accounts' : (v.name?'person':'contact_mail'),
 					renderer: (v) => {
+						//const statusIcon = statusIcons[v.participationStatus] || v.participationStatus;
 						let r = v.email;
 						// type can be You or Organizer
 						let type = '';
-						if(v.email == this.item?.currentParticipant?.email) {
-							type = t('You');
+						if(v.email == this.item?.calendarPrincipal?.email) {
+							type = this.item!.principalId === client.user.id ? t('You') : t('This');
 						}
 						if(v.roles.owner)
 							type = t('Organizer');
@@ -99,11 +100,11 @@ export class EventDetail extends Component {
 						if(type) type = ' ('+type+')';
 
 						if(v.name) {
-							r = v.name + type+'<br>' + r;
+							r = v.name + '<br>' + type;
 						} else if(type) {
-							r += type
+							r += '<br>' + type
 						}
-						return r;
+						return r; //+`<i class="icon" title="${statusIcon[1]}">${statusIcon[0]}</i>`;
 					}
 				})
 			}),
@@ -160,14 +161,13 @@ export class EventDetailWindow extends Window {
 	view: EventDetail
 	constructor() {
 		super();
-		this.title = t('View Event');
+		this.title = t('Event');
 		this.width = 440;
 		this.items.add(this.view = new EventDetail());
 		this.view.form.on('save', () => {this.close();})
 	}
 
 	loadEvent(ev: CalendarItem) {
-		this.title = t(!ev.key ? 'New event' : 'Edit event');
 		this.view.loadEvent(ev);
 	}
 }

@@ -19,6 +19,12 @@ export const categoryStore = datasourcestore({
 })
 
 export const t = (key:string) => coreT(key, 'community', 'calendar');
+export const statusIcons = {
+	'accepted':		['check_circle', t('Accepted')],
+	'tentative':	['help', t('Maybe')],
+	'declined':		['block', t('Declined')],
+	'needs-action':['schedule', t('Awaiting reply')]
+} as {[status:string]: string[]}
 
 function addEmailAction() {
 	if(go) {
@@ -54,14 +60,14 @@ function addEmailAction() {
 					names: any = {accepted: t("Accept"), tentative: t("Maybe"), declined: t("Decline")},
 					updateBtns = (item: CalendarItem) => {
 						btns.innerHTML = '';
-						if(!item.currentParticipant){
-							btns.append(t('You ('+go.User.email+') are not an invited to this event'));
+						if(!item.calendarPrincipal){
+							btns.append(t('You are not an invited to this event'));
 						} else {
 							btns.append(
 								E('div',
 									...['accepted', 'tentative', 'declined'].map(s => E('button', names[s])
 										.cls('goui-button')
-										.cls('pressed', item.currentParticipant?.participationStatus == s)
+										.cls('pressed', item.calendarPrincipal?.participationStatus == s)
 										.on('click', _ => {
 											item.updateParticipation(s as 'accepted'|'declined'|'tentative').then(() => {
 												debugger;

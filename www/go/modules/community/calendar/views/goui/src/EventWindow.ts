@@ -19,9 +19,9 @@ import {
 	TextField,
 	win,
 } from "@intermesh/goui";
-import {client, FormWindow, JmapDataSource, recurrencefield} from "@intermesh/groupoffice-core";
+import {client, FormWindow, JmapDataSource, jmapds, recurrencefield} from "@intermesh/groupoffice-core";
 import {calendarStore, categoryStore,t} from "./Index.js";
-import {participantfield} from "./ParticipantField.js";
+import {ParticipantField, participantfield} from "./ParticipantField.js";
 import {alertfield} from "./AlertField.js";
 import {CalendarItem} from "./CalendarItem.js";
 import {AvailabilityWindow} from "./AvailabilityWindow.js";
@@ -29,24 +29,18 @@ import {AvailabilityWindow} from "./AvailabilityWindow.js";
 
 export class EventWindow extends FormWindow {
 
-	// title = t('New Event')
-	// width = 800
-	// height = 650
-	// startTime: TextField
-	// endTime: TextField
+	private item?: CalendarItem
 
-	item?: CalendarItem
-	recurrenceId?: string
+	private store: JmapDataSource
+	private submitBtn:Button
+	private endDate: DateField
+	private startDate: DateField
+	private withoutTimeToggle: CheckboxField
 
-	store: JmapDataSource
-	submitBtn:Button
-	endDate: DateField
-	startDate: DateField
-	withoutTimeToggle: CheckboxField
-
-	attachments:MapField
-	btnFreeBusy: Button
+	private attachments:MapField
+	private btnFreeBusy: Button
 	private locationField: TextField
+	private participantFld: ParticipantField
 
 	private titleField: TextField
 	constructor() {
@@ -99,8 +93,16 @@ export class EventWindow extends FormWindow {
 						if(v)
 						calendarStore.dataSource.single(v).then(r => {
 							if(!r) return;
+							this.item!.cal = r;
 							const d = this.form.value.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
-								alertField.setDefaultLabel(d)
+							alertField.setDefaultLabel(d)
+							if(!this.item?.key && !this.participantFld.list.isEmpty()) {
+								// calendar changed and event is new, check if organizer needs to change as well
+								jmapds('Principal').single(this.item!.principalId).then(p=>{
+									if(p)
+										this.participantFld.addOrganiser(p);
+								});
+							}
 						});
 
 					}
@@ -160,13 +162,23 @@ export class EventWindow extends FormWindow {
 				recurrenceField,
 				exceptionsBtn,
 			),
-			participantfield({
-				listeners: {'change': (_,v) => {
-					const count = (v && Object.keys(v).length);
-					this.submitBtn.text = t(count && (this.endDate.getValueAsDateTime()!.date > new Date()) ? 'Send' : 'Save');
-					this.btnFreeBusy.hidden = !count;
+			this.participantFld = participantfield({
+				listeners: {
+					'change': (_,v) => {
+						const count = (v && Object.keys(v).length);
+						this.submitBtn.text = t(count && (this.endDate.getValueAsDateTime()!.date > new Date()) ? 'Send' : 'Save');
+						this.btnFreeBusy.hidden = !count;
 
-				}}
+					},
+					'beforeadd': (field, v) => {
+						if(field.list.isEmpty()) {
+							jmapds('Principal').single(this.item!.principalId).then(p=>{
+								if(p)
+									field.addOrganiser(p);
+							});
+						}
+					}
+				}
 			}),
 			this.btnFreeBusy = btn({hidden: true,text:t('Check availability'), handler: () => {
 				const dlg = new AvailabilityWindow();
@@ -209,8 +221,6 @@ export class EventWindow extends FormWindow {
 			]}),
 			this.attachments = mapfield({name: 'links', cls:'goui-pit',
 				buildField: (v: any) => {
-					// const userIcon = v.name?'person':'email',
-					// 	statusIcon = ParticipantField.statusIcons[v.participationStatus] || v.participationStatus;
 					return containerfield({flex:'1 0 100%',cls: 'flow'},
 						textfield({hidden:true,name:'title'}),
 						numberfield({hidden:true,name:'size'}),
@@ -230,7 +240,7 @@ export class EventWindow extends FormWindow {
 		this.bbar.items.clear().add(
 			btn({icon:'attach_file', handler: _ => this.attachFile() }),
 			comp({flex:1}),
-			this.submitBtn = btn({text:t('Save'), cls:'primary',handler: _ => this.submit()})
+			this.submitBtn = btn({text:t('Save'), cls:'primary filled',handler: _ => this.submit()})
 		);
 
 		this.addCustomFields();

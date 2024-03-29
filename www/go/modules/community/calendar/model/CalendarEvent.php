@@ -331,27 +331,27 @@ class CalendarEvent extends AclItemEntity {
 		$this->recurrenceRule = empty($rule) ? null : json_encode($rule);
 	}
 
-	public function getTitle() {
-		return $this->title;
-	}
+//	public function getTitle() {
+//		return $this->title;
+//	}
 	/**
 	 * Set the tag property when the title contains a certain word
 	 * @todo function is not called when the attributes of events are set relational
 	 * @param string $value Title of event
 	 */
-	public function setTitle($value) {
-		$tags = require(dirname(__FILE__) . '/../tags/nl.php'); //<-- @todo: use users language
-		$this->tag = null;
-		foreach($tags as $tag => $possibleMatches) {
-			foreach($possibleMatches as $possibleMatch) {
-				if (stripos($value, $possibleMatch) !== false) {
-					$this->keywords[] = $tag;
-					break 2;
-				}
-			}
-		}
-		$this->title = $value;
-	}
+//	public function setTitle($value) {
+//		$tags = require(dirname(__FILE__) . '/../tags/nl.php'); //<-- @todo: use users language
+//		$this->tag = null;
+//		foreach($tags as $tag => $possibleMatches) {
+//			foreach($possibleMatches as $possibleMatch) {
+//				if (stripos($value, $possibleMatch) !== false) {
+//					$this->keywords[] = $tag;
+//					break 2;
+//				}
+//			}
+//		}
+//		$this->title = $value;
+//	}
 
 	public function start($withoutTime = false) {
 		return new \DateTime($this->start->format("Y-m-d". ($withoutTime?'':" H:i:s")), $this->timeZone());
@@ -365,6 +365,11 @@ class CalendarEvent extends AclItemEntity {
 		return $end;
 	}
 
+	/**
+	 * Used in iMip mails for display
+	 * Would be 2 datetimes, 1 date and 2 times if same day, or just 1 or 2 dates when full-day(s)
+	 * @return string[] 2 lines of human readable text
+	 */
 	public function humanReadableDate() {
 		$start = $this->start;
 		$end = $this->end();
@@ -432,7 +437,9 @@ class CalendarEvent extends AclItemEntity {
 			if(!empty($owner)) {
 				$this->replyTo = $owner->email;
 			}
+
 		}
+
 
 		if(self::$sendSchedulingMessages) {
 			Scheduler::handle($this);
@@ -441,11 +448,24 @@ class CalendarEvent extends AclItemEntity {
 		$success = parent::internalSave();
 
 		if($success) {
+			$this->addToResourceCalendars();
 			$this->createSystemAlerts();
 			$this->changeEventsWithSameUID();
 			$this->incrementCalendarModSeq();
 		}
 		return $success;
+	}
+
+	private function addToResourceCalendars() {
+		if(empty($this->participants)) return;
+		foreach($this->participants as $pid => $participant) {
+			if($participant->kind == 'resource') {
+				$resourceCalendar = Calendar::findById(str_replace('Calendar:'. '', $pid));
+				if(!empty($resourceCalendar)) {
+					Calendar::addEvent($this,$resourceCalendar->id);
+				}
+			}
+		}
 	}
 	private function createSystemAlerts() {
 		if(!CoreAlert::$enabled) {
@@ -476,6 +496,9 @@ class CalendarEvent extends AclItemEntity {
 		}
 	}
 
+	/**
+	 * Update the modseq for every calendar this event is in.
+	 */
 	private function changeEventsWithSameUID() {
 		$changes = CalendarEvent::find()
 			->select("cce.id, cal.aclId, '0'")
@@ -499,15 +522,16 @@ class CalendarEvent extends AclItemEntity {
 				->join('core_user', 'u', 'calendar_calendar.ownerId = u.id')
 				->where(['id' => $this->calendarId])
 				->selectSingleValue('u.email')->single();
-			foreach ($this->participants as $p) {
-				if ($scheduleId == $p->email) { // todo Use scheduleId when ParticipantIdentity is implemented
-					$this->calendarParticipant = $p;
-					break;
-				}
-			}
-			if (!isset($this->calendarParticipant)) {
-				$this->calendarParticipant = false;
-			}
+			$this->calendarParticipant = $this->participantByScheduleId($scheduleId);
+//			foreach ($this->participants as $p) {
+//				if ($scheduleId == $p->email) {
+//					$this->calendarParticipant = $p;
+//					break;
+//				}
+//			}
+//			if (!isset($this->calendarParticipant)) {
+//				$this->calendarParticipant = false;
+//			}
 		}
 		return $this->calendarParticipant;
 	}
@@ -518,7 +542,7 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	public function participantByScheduleId($email) {
 		foreach($this->participants as $participant) {
-			if($participant->email === $email) {
+			if($participant->email === $email) { // todo Use scheduleId when ParticipantIdentity is implemented
 				return $participant;
 			}
 		}

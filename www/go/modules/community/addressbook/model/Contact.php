@@ -1349,18 +1349,17 @@ class Contact extends AclItemEntity {
 	  parent::check();
   }
 
-	protected function principalAttrs(): array
-	{
-		$email = null;
-		if(isset($this->emailAddresses[0])) {
-			$email = $this->emailAddresses[0]->email;
-		}
+	protected function principalAttrs(): array {
 		return [
 			'name' => $this->name,
-			'email' => $email,
+			'email' => $this->emailAddresses[0]->email,
 			'avatarId' =>$this->photoBlobId,
 			'description' => go()->t($this->isOrganization?'Organization': 'Contact'). ' '. implode(' ', array_filter([$this->department,$this->jobTitle])),
 		];
+	}
+
+	protected function isPrincipal(): bool {
+		return isset($this->emailAddresses[0]); // must at least have 1 email
 	}
 
 	protected function isPrincipalModified(): bool {

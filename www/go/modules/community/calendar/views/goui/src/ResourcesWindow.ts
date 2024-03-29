@@ -1,30 +1,35 @@
 import {
-	btn, checkbox,
-	column,
-	comp,
+	arrayfield,
+	btn, checkbox, colorfield,
+	column, combobox,
+	comp, containerfield,
 	DataSourceStore,
-	datasourcestore,
+	datasourcestore, displayfield, durationfield,
 	h3,
-	hr,
-	menu,
+	hr, mapfield,
+	menu, numberfield,
 	searchbtn, select, splitter,
 	Table,
 	table,
 	tbar, textarea, textfield, Window
 } from "@intermesh/goui";
-import {FormWindow, jmapds} from "@intermesh/groupoffice-core";
+import {FormWindow, jmapds, principalcombo} from "@intermesh/groupoffice-core";
 import {t} from "./Index.js";
 
 class ResourceGroupWindow extends FormWindow {
+
 	constructor() {
 		super('ResourceGroup');
 		this.title = t('Resource group');
 		this.width = 500
-		this.height = 316;
 		this.generalTab.cls = 'flow pad';
 		this.generalTab.items.add(
 			textfield({name:'name', label: t('Name')}),
-			textarea({name:'description', label: t('Description')})
+			textarea({name:'description', label: t('Description')}),
+			combobox({
+				dataSource: jmapds("Principal"), displayProperty: 'name', filter: {entity: 'User'},
+				label: t("Default admin"), name: "defaultOwnerId", filterName: "text", flex:'1 0', required:true
+			})
 		);
 	}
 }
@@ -39,18 +44,31 @@ const resourceGroupStore = datasourcestore({
 	dataSource: jmapds("ResourceGroup")
 });
 
-class ResourceWindow extends FormWindow {
+export class ResourceWindow extends FormWindow {
 	constructor() {
 		super('Calendar');
 		this.title = t('Resource');
 		this.generalTab.cls = 'flow pad';
 		this.generalTab.items.add(
 			select({name:'groupId', label:t('Group'), 	store: resourceGroupStore, valueField: 'id', textRenderer: (r: any) => r.name}),
-			textfield({name:'name', label: t('Name')}),
-			textfield({name:'color', hidden:true, value: '69554f'}),
-			textarea({name:'description', label: t('Description')}),
-			checkbox({disabled:true, name:'needsApproval', label: t('Needs approval')})
-		)
+			textfield({name:'name', flex:1,label: t('Name')}),
+			colorfield({name:'color',width:100, value: '69554f'}),
+			textarea({name:'description', label: t('Description')})
+			//checkbox({disabled:true, name:'needsApproval', label: t('Needs approval')})
+		);
+
+		this.addCustomFields();
+
+		this.addSharePanel([
+			{value: "",name: ""},
+			{value: 5, name: t("Read free/busy")},
+			{value: 10,name: t("Read items")},
+			//{value: 20,name: t("Update private")},
+			{value: 25,name: t("Approve / Disapprove")}, // RSVP
+			//{value: 30,name: t("Write own")},
+			//{value: 35,name: t("Write all")},
+			{value: 50,name: t("Manage")}
+		]);
 	}
 }
 export class ResourcesWindow extends Window {

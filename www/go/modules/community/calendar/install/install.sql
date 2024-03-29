@@ -1,31 +1,15 @@
-CREATE TABLE IF NOT EXISTS `calendar_resource_group`
-(
-	id          int UNSIGNED NOT NULL auto_increment,
-	name        varchar(200) null,
-	description mediumtext   null,
+CREATE TABLE calendar_resource_group (
+	id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+	name           VARCHAR(200) NULL,
+	description    MEDIUMTEXT NULL,
+	defaultOwnerId INT NOT NULL,
 	`createdBy` INT NULL,
-	constraint calendar_resource_group_pk
-		primary key (id),
-	CONSTRAINT `fk_calendar_resource_group_core_user_creator`
-		FOREIGN KEY (`createdBy`)
-			REFERENCES `core_user` (`id`)
-			ON DELETE SET NULL
+	CONSTRAINT calendar_resource_group_core_user_id_fk FOREIGN KEY (defaultOwnerId)
+		REFERENCES core_user (id),
+	CONSTRAINT `fk_calendar_resource_group_core_user_creator` FOREIGN KEY (`createdBy`)
+		REFERENCES `core_user` (`id`) ON DELETE SET NULL
 ) ENGINE = InnoDB;
 
-CREATE TABLE IF NOT EXISTS `calendar_resource_group_admins` (
-	`groupId` int UNSIGNED NOT NULL,
-	`userId` int(11) NOT NULL,
-	PRIMARY KEY (`groupId`,`userId`),
-	CONSTRAINT `fk_calendar_resource_group_admins_resource_group1`
-		FOREIGN KEY (`groupId`)
-			REFERENCES `calendar_resource_group` (`id`)
-			ON DELETE CASCADE
-			ON UPDATE NO ACTION,
-	CONSTRAINT `fk_calendar_resource_group_admins_core_user`
-		FOREIGN KEY (`userId`)
-			REFERENCES `core_user` (`id`)
-			ON DELETE CASCADE
-) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `calendar_calendar` (
    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,

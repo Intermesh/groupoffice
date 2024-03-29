@@ -47,8 +47,21 @@ class Module extends core\Module
 	public function defineListeners()
 	{
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
-		//User::on(User::EVENT_BEFORE_DELETE, static::class, 'onUserDelete');
+		User::on(User::EVENT_SAVE, static::class, 'onUserSave');
 		GarbageCollection::on(GarbageCollection::EVENT_RUN, static::class, 'onGarbageCollection');
+	}
+
+	static function onUserSave(User $user) {
+		if (!$user->isNew() && $user->isModified('email')) {
+			$pIds = go()->getDbConnection()->selectSingleValue('CONCAT("Calendar:",id)')->from('calendar_calendar')
+				->where('groupId', 'IS NOT', null)
+				->andWhere('ownerId', '=', $user->id)->all();
+
+			go()->getDbConnection()
+				->update('core_principal', ['email'=>$user->email], ['id' => $pIds])
+				->execute();
+
+		}
 	}
 
 	public static function onGarbageCollection() {
