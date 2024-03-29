@@ -15,7 +15,7 @@ class BusyPeriod {
 	private $includeInAvailability;
 
 	public function __construct($event) {
-		$this->debug = $event->title;
+		//$this->debug = $event->title;
 		$this->utcStart = $event->start; // todo to utc
 		$this->utcEnd = $event->lastOccurrence; // todo to utc
 		$this->busyStatus = $event->busyStatus;
@@ -38,41 +38,59 @@ class BusyPeriod {
 //		$query = CalendarEvent::find();
 //		$aclAlias = CalendarEvent::joinAclEntity($query); // if has ACL should have mayReadFreeBusy?
 		$query = go()->getDbConnection()->select(['cce.eventId', 'start','duration','lastOccurrence','recurrenceRule','e.timeZone',
-			'par.participationStatus as busyStatus', 'calu.includeInAvailability as includeInAvailability', 'title', 'cal.ownerId', 'par.id as participantId'])
+			'par.participationStatus as busyStatus', 'title', 'cal.ownerId','cal.groupId', 'cce.calendarId', 'par.id as participantId'])
 			->from('calendar_calendar_event', 'cce')
 			->join('calendar_event', 'e', 'cce.eventId = e.eventId')
-			->join('calendar_event_user', 'eu', 'eu.eventId = e.eventId AND eu.userId = '.(int)$id, 'LEFT')
-			->join('calendar_calendar', 'cal', 'cal.id = cce.calendarId')
-			->join('calendar_calendar_user', 'calu', 'cal.id = calu.id AND calu.userId = '.(int)$id) // if not found, p not subscribed
-			->join('calendar_participant', 'par', 'par.eventId = cce.eventId AND par.id = '.(int)$id, 'LEFT')
-			->where('cal.ownerId', '=', [$id, null])
+			->join('calendar_calendar', 'cal', 'cal.id = cce.calendarId');
+
+		if(substr($id, 0, 9) == 'Calendar:') {
+			$calendarId = str_replace('Calendar:', '', $id);
+			$ownerId = 0;
+		} else {
+			$ownerId = $id;
+			$calendarId = 0;
+			$query->join('calendar_calendar_user', 'calu', 'cal.id = calu.id AND calu.userId = '.(int)$ownerId) // if not found, p not subscribed
+				->andWhere('calu.isSubscribed', '=', 1)
+				->select(['calu.includeInAvailability as includeInAvailability'], true);
+		}
+
+		$query
+			->join('calendar_event_user', 'evu', 'evu.eventId = e.eventId AND evu.userId = '.(int)$ownerId, 'LEFT')
+			->join('calendar_participant', 'par', 'par.eventId = cce.eventId AND par.id = '.(int)$ownerId, 'LEFT')
+			->where((new Criteria())
+				->where('cal.ownerId', '=', [$ownerId, null])
+				->orWhere('cal.id', '=',$calendarId)
+			)
 			->andWhere((new Criteria())
 				->where('lastOccurrence', '>', new DateTime($start))
 				->orWhere('lastOccurrence', 'IS',null)
 			)
-			->andWhere('calu.isSubscribed', '=', 1)
 			->andWhere('start', '<', new DateTime($end))
 			->andWhere('privacy', '!=', 'secret')
 			->andWhere('freeBusyStatus', '=', ['busy',null])
-			->andWhere('status', '!=', 'cancelled')
+			->andWhere('e.status', '!=', 'cancelled')
 			->fetchMode(\PDO::FETCH_OBJ);
 
 		$stmt = $query->execute();
 		$list = [];
 		foreach($stmt as $period) {
-			if(!empty($period->recurrenceRule)) {
-				foreach(self::expand($period, $start, $end) as $rId => $instance) {
-					$list[$period->eventId.'/'.$rId] = $instance;
+			if((!empty($period->ownerId) && $period->ownerId == $ownerId && empty($period->groupId)) || // my calendar
+				!empty($event->participantId) || // participating
+				$calendarId == $period->calendarId // resource
+			) {
+				if(!empty($period->recurrenceRule)) {
+					foreach(self::expand($period, $start, $end) as $rId => $instance) {
+						$list[$period->eventId.'/'.$rId] = $instance;
+					}
+				} else {
+					$list[$period->eventId] = new self($period);
 				}
-
-			} else if(!empty($period->ownerId) || !empty($event->participantId)) {
-				$list[$period->eventId] = new self($period);
 			}
 		}
 		//ksort($list);
 
 		return [
-			'sql' => (string)$stmt,
+			//'sql' => (string)$stmt,
 			'list' => array_values($list)
 		];
 	}
