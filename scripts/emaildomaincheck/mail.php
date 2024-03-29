@@ -52,6 +52,7 @@ Intermesh
 		->compose()
 		->setSubject("Optimise your email deliverability")
 		->setFrom("mschering@intermesh.nl", "Merijn Schering (Intermesh)")
+		->setBcc("mschering@intermesh.nl")
 		->setBody($msg, "text/plain")
 		->setTo("info@" . $record['mailDomain'])
 		->send();
