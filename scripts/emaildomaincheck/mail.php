@@ -1,4 +1,5 @@
 <?php
+define("GO_CONFIG_FILE", '/etc/groupoffice/multi_instance/intermesh.group-office.com/config.php');
 require ('../../www/GO.php');
 
 $records = json_decode(file_get_contents("result.json"), true);
