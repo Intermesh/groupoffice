@@ -9,6 +9,24 @@ $updates['202402221543'][] = function() {
 	\go\core\db\Utils::runSQLFile(\GO()->getEnvironment()->getInstallFolder()->getFile("go/modules/community/calendar/install/migrate.sql"));
 };
 
+$updates['202402221543'][] = function() {
+	// fix timezones
+	$stmt = go()->getDbConnection()->query("SELECT eventId, `start`,`timeZone`,`lastOccurrence` FROM calendar_event WHERE calendar_event.showWithoutTime=0 AND timeZone IS NOT null");
+	function tz_convert($input, $tz) {
+		$datetime = new DateTime($input); // tz during upgrade is UTC
+		$datetime->setTimezone(new DateTimeZone($tz));
+		return $datetime->format('Y-m-d H:i:s');
+	}
+	while($row = $stmt->fetch()) {
+
+		$data = [
+			'start' => tz_convert($row['start'], $row['timeZone']),
+			'lastOccurrence' => tz_convert($row['lastOccurrence'], $row['timeZone'])
+		];
+		go()->getDbConnection()->updateIgnore('calendar_event', $data, ['eventId' => $row['eventId']])->execute();
+	}
+};
+
 $updates['202402221543'][] = function(){ // migrate recurrence rules and fix lastOccurrence
 
 	$stmt = go()->getDbConnection()->query("SELECT eventId, recurrenceRule,`start`,`timeZone`,`duration` FROM calendar_event WHERE recurrenceRule IS NOT NULL AND recurrenceRule != ''");

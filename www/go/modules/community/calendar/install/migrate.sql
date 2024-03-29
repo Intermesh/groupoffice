@@ -408,6 +408,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_custom_fields` (
 INSERT INTO calendar_resource_group
 	(id, name,description, defaultOwnerId, createdBy) SELECT
    id, name, '',ga.user_id, g.user_id FROM cal_groups g JOIN cal_group_admins ga ON ga.group_id = g.id
+   WHERE g.id != 1
 GROUP by g.id;
 
 -- concat 18  random hex colors and select 1 with calendar.id % 18 * hexlength if null
@@ -478,6 +479,13 @@ INSERT INTO calendar_participant
 	(id, eventId, name, email, kind, rolesMask, participationStatus, scheduleAgent, expectReply, scheduleUpdated) SELECT
 	id, event_id, name, email, 'individual', IF(role='REQ-PARTICIPANT',2,0)+is_organizer, LOWER(p.status),'server',1,FROM_UNIXTIME(IF(last_modified='',0, last_modified)) FROM cal_participants p JOIN calendar_event ce ON ce.eventId = event_id;
 
+INSERT INTO calendar_participant
+(id, eventId, name, email, kind, rolesMask, participationStatus, scheduleAgent, expectReply, scheduleUpdated) SELECT
+CONCAT('Calendar:',c.id), r.id as eventId, c.name,u.email ,IF(e.status = 'CONFIRMED', 'accepted', LOWER(e.status)), 'server',1,FROM_UNIXTIME(IF(e.mtime='',0, e.mtime))FROM cal_events e
+	 JOIN cal_calendars c ON e.calendar_id = c.id
+	 JOIN core_user u ON c.user_id = u.id
+	 JOIN cal_events r ON e.resource_event_id = r.id
+WHERE c.group_id != 1 AND e.resource_event_id IS NOT NULL;
 
 INSERT IGNORE INTO calendar_recurrence_override
 	(fk, recurrenceId, patch) SELECT

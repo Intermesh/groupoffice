@@ -14,6 +14,7 @@ return [
 	'Decline' => 'Afwijzen',
 	'updated' => 'bijgewerkt',
 	'Invitation' => 'Uitnodiging',
+	'Resource request' => 'Faciliteit aanvraag',
 	'Cancellation' => 'Annulering',
 	'Reply' => 'Antwoord',
 	'Participants' => 'Deelnemers',

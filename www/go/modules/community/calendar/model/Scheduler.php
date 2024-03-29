@@ -115,7 +115,7 @@ class Scheduler {
 				$old = go()->getLanguage()->setLanguage($participant->language);
 			}
 
-			$subject = go()->t($method=='REQUEST' ? 'Invitation' : 'Cancellation', 'community', 'calendar');
+			$subject = go()->t($method=='REQUEST' ? ($participant->kind == 'resource' ? 'Resource request' : 'Invitation') : 'Cancellation', 'community', 'calendar');
 			if($method==='REQUEST' && $participant->participationStatus !== Participant::NeedsAction) {
 				$subject .= ' ('.go()->t('updated', 'community', 'calendar').')';
 			}
@@ -185,10 +185,13 @@ class Scheduler {
 			$existingEvent->replyTo = str_replace('mailto:', '',(string)$vcalendar->VEVENT[0]->{'ORGANIZER'});
 		}
 		$cal = Calendar::fetchDefault($receiver);
-		return Calendar::addEvent(
-			ICalendarHelper::parseVObject($vcalendar, $existingEvent),
-			$cal->id
-		);
+		$event = ICalendarHelper::parseVObject($vcalendar, $existingEvent);
+		foreach($event->participants as $p) {
+			if($p->email == $receiver && $p->kind == 'resource') {
+				return $event; // Do not put the event in the resource admin its calendar
+			}
+		}
+		return Calendar::addEvent($event, $cal->id);
 	}
 
 	private static function processCancel(VCalendar $vcalendar, ?CalendarEvent $existingEvent) {

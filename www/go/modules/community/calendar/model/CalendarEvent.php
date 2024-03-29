@@ -460,7 +460,7 @@ class CalendarEvent extends AclItemEntity {
 		if(empty($this->participants)) return;
 		foreach($this->participants as $pid => $participant) {
 			if($participant->kind == 'resource') {
-				$resourceCalendar = Calendar::findById(str_replace('Calendar:'. '', $pid));
+				$resourceCalendar = Calendar::findById(str_replace('Calendar:', '', $pid));
 				if(!empty($resourceCalendar)) {
 					Calendar::addEvent($this,$resourceCalendar->id);
 				}
