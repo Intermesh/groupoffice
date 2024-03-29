@@ -1,3 +1,6 @@
+29-03-2024: 6.8.41
+- Core: User creation was broken. Renamed function so it's not an API property.
+
 28-03-2024: 6.8.40
 - Core: Added auth and lost password logs for fail2ban
 - Core: Made change password play nice with password managers
