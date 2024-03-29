@@ -1,5 +1,5 @@
 <?php
-require ('../www/GO.php');
+require ('../../www/GO.php');
 
 $records = json_decode(file_get_contents("result.json"), true);
 
