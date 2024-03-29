@@ -1,0 +1,7 @@
+{
+  "name": "intermesh/emaildomaincheck",
+  "description": "Group-Office",
+  "require": {
+    "mlocati/spf-lib": "^3.1"
+  }
+}

@@ -1,0 +1,66 @@
+{
+    "name": "mlocati/spf-lib",
+    "description": "Parse, build and validate SPF (Sender Policy Framework) DNS records",
+    "type": "library",
+    "keywords": [
+        "spf",
+        "Sender Policy Framework",
+        "email",
+        "mail",
+        "smtp",
+        "dns",
+        "mx"
+    ],
+    "homepage": "https://github.com/mlocati/spf-lib",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Michele Locati",
+            "email": "michele@locati.com",
+            "homepage": "https://mlocati.github.io",
+            "role": "author"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/mlocati/spf-lib/issues",
+        "source": "https://github.com/mlocati/spf-lib"
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/mlocati"
+        },
+        {
+            "type": "other",
+            "url": "https://paypal.me/mlocati"
+        }
+    ],
+    "require": {
+        "php": ">=7.1.0",
+        "mlocati/idna": "^1",
+        "mlocati/ip-lib": "^1.11"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "phpunit/phpunit": "^7.5 || ^8.5 || ^9.4",
+        "symfony/yaml": "^4.4 || ^5.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "SPFLib\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SPFLib\\Test\\": "test/src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "scripts": {
+        "test": "phpunit",
+        "phpcs": "php-cs-fixer fix --path-mode=intersection --config=./.php_cs.dist"
+    }
+}
