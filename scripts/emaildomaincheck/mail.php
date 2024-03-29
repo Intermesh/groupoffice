@@ -17,11 +17,11 @@ are not optimal. To ensure the best delivery of your mail please make these DNS 
 ";
 
 	if(!$record['dmarc']) {
-		$msg .= "Add a DMARC record with type TXT for _dmarc.".$record['mailDomain']." with the value:\n\nv=DMARC1; p=quarantine;\n\n";
+		$msg .= "Add a DMARC DNS record of type TXT for _dmarc.".$record['mailDomain']." with the value:\n\nv=DMARC1; p=quarantine;\n\n";
 	}
 
 	if(!$record['spf']) {
-		$msg .= "Add an SPF record with value:\n\nv=spf1 a:smtp.groupoffice.net a:smtp.group-office.com ip4:149.210.188.96 ip4:149.210.243.200 -all\n\n";
+		$msg .= "Add an SPF DNS record of type TXT for ".$record['mailDomain']." with value:\n\nv=spf1 a:smtp.groupoffice.net a:smtp.group-office.com ip4:149.210.188.96 ip4:149.210.243.200 -all\n\n";
 	}
 
 	if(!$record['dkim']) {
