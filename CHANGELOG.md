@@ -1,4 +1,5 @@
 26-03-2024: 6.7.75
+- Email: Save and Send button will be disabled while attachment upload is in progress.
 - Core: Fixed bug in XSS detection
 - Core: Disallow modification of modifiedAt, createdAt, modifiedBy and createdBy via API.
 - Core: Create permissions were not checked on import
@@ -54,6 +55,8 @@
 - Newsletters: test message didn't work with e-mail account
 - Email: Sometimes tree could collapse without reason
 - Email: Fixed sorting and collapsing of e-mail template groups
+- Core: fixed datepicker menu being too small when language = polish, month = december and theme = compact.
+- Newsletter: fix the email template wouldn't show the profile fields of the current user
 
 12-02-2024: 6.7.67
 - Core: fix $config['debug_usernames'] functionality

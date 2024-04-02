@@ -393,7 +393,7 @@ GO.email.EmailComposer = function(config) {
 		})
 	];
 
-	tbar.push(this.emailEditor.getAttachmentsButton(), 
+	tbar.push(this.emailEditor.getAttachmentsButton([this.sendButton,this.saveButton]),
 			this.showMenuButton = new Ext.Button({
 				tooltip : t("Add recipients", "email"),
 				// iconCls : 'ic-contact-mail',
