@@ -1,3 +1,4 @@
+- Tickets: note messages will no longer be sent to the CC-address of the ticket.
 - Email: Save and Send button will be disabled while attachment upload is in progress.
 
 26-03-2024: 6.7.75
