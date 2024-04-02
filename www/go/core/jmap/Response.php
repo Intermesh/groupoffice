@@ -23,6 +23,7 @@ class Response extends HttpResponse
 		$this->setHeader('Content-Type', 'application/json;charset=utf-8');
 		$this->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 		$this->setHeader('Pragma', 'no-cache');
+		$this->setHeader('Expires', '01-07-2003 12:00:00 GMT');
 	}
 
 //	protected function sendSecurityHeaders()

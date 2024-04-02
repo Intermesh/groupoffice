@@ -183,15 +183,6 @@ function test_system() :array
 
 	$tests[]=$test;
 
-
-	$test['name']='Magic quotes setting';
-	$test['showSuccessFeedback'] = false;
-	$test['pass']= version_compare( phpversion(), "7.4", ">=") || !get_magic_quotes_gpc();
-	$test['feedback']='Warning: magic_quotes_gpc is enabled. You will get better performance if you disable this setting.';
-	$test['fatal']=false;
-
-	$tests[]=$test;
-
 	
 	$test['name']='PDO support';
 	$test['showSuccessFeedback'] = false;
@@ -597,13 +588,10 @@ function output_system_test() :bool
 </tr>
 
 <tr>
-	<td valign="top">Server name:</td>
+	<td valign="top">Server hostname:</td>
 	<td>'.getHost().'</td>
 </tr>
-<tr>
-	<td valign="top">Server IP:</td>
-	<td>'.gethostbyname($_SERVER['SERVER_NAME']).'</td>
-</tr></table>';
+</table>';
 	
 	return !$fatal;
 	

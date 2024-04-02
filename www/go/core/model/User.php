@@ -309,9 +309,14 @@ class User extends AclItemEntity {
 	 * Changed to false in setValues() so when the the jmap api is used it needs to be verified
 	 * @var bool 
 	 */
-	private $passwordVerified = true;
+	private ?bool $passwordVerified = null;
 
 	public $clients;
+
+
+	public function isPasswordVerified() : ?bool {
+		return $this->passwordVerified;
+	}
 
 	protected static function defineMapping(): Mapping
 	{
@@ -322,9 +327,9 @@ class User extends AclItemEntity {
 			->addScalar('groups', 'core_user_group', ['id' => 'userId']);
 	}
 
-public function getHistoryLog(): bool|array
+public function historyLog(): bool|array
 {
-	$log = parent::getHistoryLog();
+	$log = parent::historyLog();
 
 	if(isset($log['password'])) {
 		if(isset($log['password'][0])) {
@@ -371,7 +376,7 @@ public function getHistoryLog(): bool|array
 	
 	public function setValues(array $values) : Model
 	{
-		$this->passwordVerified = false;
+		$this->passwordVerified = null;
 		return parent::setValues($values);
 	}
 
@@ -429,14 +434,16 @@ public function getHistoryLog(): bool|array
 
 		if(go()->getAuthState() && go()->getAuthState()->isAdmin()) {
 			if(!go()->getAuthState()->getUser()->checkPassword($currentPassword)) {
-				$this->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
+				$this->passwordVerified = false;
 			}else {
 				$this->passwordVerified = true;
 			}
 		} else {
 
 			if (!$this->checkPassword($currentPassword)) {
-				$this->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
+				$this->passwordVerified = false;
+			} else {
+				$this->passwordVerified = true;
 			}
 		}
 	}
@@ -579,8 +586,10 @@ public function getHistoryLog(): bool|array
 		}
 		
 		if(!$this->validatePasswordChange()) {
-			if(!$this->hasValidationErrors('currentPassword')) {
+			if($this->passwordVerified === null) {
 				$this->setValidationError('currentPassword', ErrorCode::REQUIRED);
+			} else {
+				$this->setValidationError('currentPassword', ErrorCode::INVALID_INPUT);
 			}
 		}
 		
@@ -760,6 +769,8 @@ public function getHistoryLog(): bool|array
 		return in_array($groupId, $this->groups);
 	}
 
+	private array $authenticators;
+
 
 	/**
 	 * Get available authentication methods
@@ -768,22 +779,25 @@ public function getHistoryLog(): bool|array
 	 */
 	public function getAuthenticators(): array
 	{
-		$authenticators = [];
+
+		if(isset($this->authenticators)) {
+			return $this->authenticators;
+		}
+
+		$this->authenticators = [];
 
 		$auth = new Authenticate();
 		$primary = $auth->getPrimaryAuthenticatorForUser($this->username);
 
 		if($primary) {
-			$authenticators[] = $primary;
+			$this->authenticators[] = $primary;
 		}
 
 		foreach ($auth->getSecondaryAuthenticatorsForUser($this->username) as $authenticator) {
-			if ($authenticator::isAvailableFor($this->username)) {
-				$authenticators[] = $authenticator;
-			}
+			$this->authenticators[] = $authenticator;
 		}
 
-		return $authenticators;
+		return $this->authenticators;
 	}
 
   /**
@@ -827,7 +841,10 @@ public function getHistoryLog(): bool|array
 		
 		if(isset($this->plainPassword)) {
 			$this->password = $this->passwordHash($this->plainPassword);
-			$this->forcePasswordChange = false;
+
+			if(!$this->isModified(['forcePasswordChange'])) {
+				$this->forcePasswordChange = false;
+			}
 
 			if(!$this->isNew()) {
 

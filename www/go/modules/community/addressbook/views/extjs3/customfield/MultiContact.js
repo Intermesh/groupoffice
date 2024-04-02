@@ -106,7 +106,6 @@ go.modules.community.addressbook.customfield.MultiContact = Ext.extend(go.custom
 	 *
 	 * Also the customFieldType (this) and customField (Entity Field) are added
 	 *
-	 * @see https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.data.Field
 	 * @returns {Object}
 	 */
 	getFieldDefinition : function(field) {

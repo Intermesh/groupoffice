@@ -40,7 +40,7 @@ class Module extends core\Module {
 		$plain = $user->plainPassword(); // dV5(
 		if(isset($plain)) {
 
-			if(Settings::get()->enableForGroupId == Group::ID_EVERYONE || !$user->isInGroup(Settings::get()->enableForGroupId)) {
+			if(Settings::get()->enableForGroupId != Group::ID_EVERYONE && !$user->isInGroup(Settings::get()->enableForGroupId)) {
 				return;
 			}
 
@@ -57,7 +57,7 @@ class Module extends core\Module {
 			return;
 		}
 
-		if(Settings::get()->enableForGroupId == Group::ID_EVERYONE || !$user->isInGroup(Settings::get()->enableForGroupId)) {
+		if(Settings::get()->enableForGroupId != Group::ID_EVERYONE && !$user->isInGroup(Settings::get()->enableForGroupId)) {
 			return;
 		}
 

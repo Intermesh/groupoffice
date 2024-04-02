@@ -15,7 +15,7 @@ require("../vendor/autoload.php");
 use go\core\App;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
-use go\core\http\Response;
+use go\core\jmap\Response;
 use go\core\jmap\State;
 use go\core\http\Request;
 

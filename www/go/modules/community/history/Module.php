@@ -156,7 +156,7 @@ class Module extends core\Module
 		$log->setAction($action);
 
 		if($action !== 'delete') {
-			$changes = $entity->getHistoryLog();
+			$changes = $entity->historyLog();
 			unset($changes['modifiedAt']);
 			unset($changes['acl']);
 			unset($changes['aclId']);

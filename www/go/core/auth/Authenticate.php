@@ -4,6 +4,7 @@ namespace go\core\auth;
 
 use Exception;
 use go\core\db\Column;
+use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
 use go\core\exception\Unavailable;
 use go\core\model\AuthAllowGroup;
@@ -137,6 +138,13 @@ class Authenticate {
 		return $token;
 	}
 
+
+	private function logFailure(string $username): void
+	{
+		// Don't change log message as fail2ban relies on it
+		ErrorHandler::log("Password authentication failed for '" . $username . "' from IP: '" . Request::get()->getRemoteIpAddress() . "'");
+	}
+
 	/**
 	 * Does the password authentication.
 	 *
@@ -179,6 +187,8 @@ class Authenticate {
 
 			User::fireEvent(User::EVENT_BADLOGIN, $username, null);
 
+			$this->logFailure($username);
+
 			return false;
 		}
 
@@ -189,7 +199,7 @@ class Authenticate {
 		if (!($user = $authenticator->authenticate($username, $password))) {
 
 			User::fireEvent(User::EVENT_BADLOGIN, $username, null);
-
+			$this->logFailure($username);
 			return false;
 		}
 

@@ -294,7 +294,7 @@ IMG;
 	 * Display the XML content of the file from odt document
 	 * as it is at the moment
 	 *
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function __toString() {
 		return $this->contentXml;

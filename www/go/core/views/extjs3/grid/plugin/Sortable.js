@@ -11,7 +11,7 @@
  * For an example see www/go/modules/core/customfields/views/extjs3/SystemSettingsPanel.js
  * 
  * @param {object} scope
- * @parab {object} dropTargetConfig Config options for https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.dd.DropTarget
+ * @parab {object} dropTargetConfig Config options
  * @returns {go.grid.plugin.Sortable}
  */
 go.grid.plugin.Sortable = function (callback, scope, isDropAllowed) {

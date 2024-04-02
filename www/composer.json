@@ -2,7 +2,7 @@
   "name": "intermesh/groupoffice",
   "description": "Group-Office",
   "require": {
-    "php": ">=8.1.0",
+    "php": ">=8.1",
     "ext-pcre": "*",
     "ext-mbstring": "*",
     "ext-ctype": "*",
@@ -63,7 +63,7 @@
   "config": {
     "optimize-autoloader": true,
     "platform": {
-      "php": "8.1"
+      "php": "8.3"
     }
   }
 }

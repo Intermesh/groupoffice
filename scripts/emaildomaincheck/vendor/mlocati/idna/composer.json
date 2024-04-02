@@ -1,0 +1,76 @@
+{
+    "name": "mlocati/idna",
+    "description": "Library for International Domain Names (IDNA) 2008",
+    "keywords": [
+        "idn",
+        "idna",
+        "idna2008",
+        "idna2003",
+        "punycode",
+        "International",
+        "internationalization",
+        "internationalized",
+        "domain",
+        "domains",
+        "name",
+        "names",
+        "domain name",
+        "domain names",
+        "international domain",
+        "international domains",
+        "international name",
+        "international names",
+        "international domain name",
+        "international domain names",
+        "internationalized domain",
+        "internationalized domains",
+        "internationalized name",
+        "internationalized names",
+        "internationalized domain name",
+        "internationalized domain names",
+        "unicode",
+        "ascii",
+        "ansi",
+        "i18n",
+        "l10n"
+    ],
+    "homepage": "https://github.com/mlocati/idna",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Michele Locati",
+            "email": "mlocati@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/mlocati/idna/issues",
+        "source": "https://github.com/mlocati/idna"
+    },
+    "require": {
+        "php": ">=5.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.8 || ^5.7 || ^6.5 || ^7.5 || ^8.5 || ^9.6 || ^10"
+    },
+    "autoload": {
+        "psr-4": {
+            "MLocati\\IDNA\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MLocati\\IDNA\\Test\\": "test/src/",
+            "MLocati\\IDNA\\Tests\\": "test/tests/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "bin": [
+        "bin/create-idnamap"
+    ]
+}

@@ -19,23 +19,43 @@ class UserTest extends \PHPUnit\Framework\TestCase
 		$this->assertArrayHasKey('username', $props);
 	}
 
-	public function testCreate()
-	{
+
+	public function testCreateFail() {
 		$user = new User();
 		$user->username = 'test1';
+		//pass should not be valid by haveibeenpwnd
 		$user->setPassword('test1test1');
 		$user->displayName = 'Test user 1';
 		$user->email = $user->recoveryEmail = 'test1@intermesh.localhost';
 
 		$success = $user->save();
 
+		$this->assertNotEmpty($user->getValidationErrors());
+		$this->assertEquals(false, $success);
+
+		$e = $user->getValidationError('password');
+
+		$this->assertEquals(ErrorCode::INVALID_INPUT, $e['code']);
+	}
+
+	public function testCreate()
+	{
+		$user = new User();
+		$user->username = 'test1';
+		$user->setPassword('sdfTgs-Dfgg-$#ddg');
+		$user->displayName = 'Test user 1';
+		$user->email = $user->recoveryEmail = 'test1@intermesh.localhost';
+
+		$success = $user->save();
+
+		$this->assertEmpty($user->getValidationErrors());
 		$this->assertEquals(true, $success);
 
 
 
 		$user = new User();
 		$user->username = 'test2';
-		$user->setPassword('test1test1');
+		$user->setPassword('sdfTgs-Dfgg-$#ddg');
 		$user->displayName = 'Test user 2';
 		$user->email = $user->recoveryEmail = 'test2@intermesh.localhost';
 
@@ -46,13 +66,14 @@ class UserTest extends \PHPUnit\Framework\TestCase
 
 		$user = new User();
 		$user->username = 'test2';
-		$user->setPassword('test1test1');
+		$user->setPassword('sdfTgs-Dfgg-$#ddg');
 		$user->displayName = 'Test user 2';
 		$user->email = $user->recoveryEmail = 'test2unique@intermesh.localhost';
 
 		$success = $user->save();
 
 		$this->assertEquals(false, $success);
+
 
 		$validationError = $user->getValidationError('username');
 
@@ -81,7 +102,7 @@ class UserTest extends \PHPUnit\Framework\TestCase
 
 	public function testAuth() {
 		$auth = new Authenticate();
-		$user = $auth->passwordLogin("test1", "test1test1");
+		$user = $auth->passwordLogin("test1", 'sdfTgs-Dfgg-$#ddg');
 
 		$this->assertEquals(false, !$user);
 

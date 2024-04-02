@@ -425,6 +425,11 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 		} catch(DbException $e) {
 			$uniqueKey = $e->isUniqueKeyException();
 			if ($uniqueKey) {
+				$table = Table::getInstance($this->customFieldsTableName());
+				$index = $table->getIndex($uniqueKey);
+				if ($index) {
+					$uniqueKey =$index['Column_name'];
+				}
 				$this->entity->setValidationError('customFields.' . $uniqueKey, ErrorCode::UNIQUE);
 				return false;
 			} else {

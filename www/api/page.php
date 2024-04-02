@@ -15,7 +15,6 @@ use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\http\Request;
 use go\core\http\Response;
-use go\core\util\StringUtil;
 
 require("../vendor/autoload.php");
 App::get();

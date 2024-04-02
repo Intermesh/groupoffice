@@ -2,13 +2,17 @@
 use go\core\App;
 use go\core\jmap\State;
 use go\core\fs\Blob;
-use go\core\http\Client;
 use go\core\http\Response;
 use go\core\http\Request;
 
 require("../vendor/autoload.php");
 
 App::get();
+
+Response::get()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+Response::get()->setHeader('Pragma', 'no-cache');
+Response::get()->setHeader('Expires', '01-07-2003 12:00:00 GMT');
+
 if(Request::get()->getMethod() == 'OPTIONS') {
 	Response::get()->output();
 	exit();

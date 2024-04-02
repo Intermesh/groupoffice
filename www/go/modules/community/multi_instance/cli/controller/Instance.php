@@ -7,7 +7,7 @@ use go\core\fs\Folder;
 
 class Instance extends Controller {
 	/**
-	 * docker-compose exec --user www-data groupoffice php ./www/cli.php community/multi_instance/Instance/restore --name=test.example.com
+	 * docker compose exec --user www-data groupoffice php ./www/cli.php community/multi_instance/Instance/restore --name=test.example.com
 	 *
 	 * @param $name
 	 * @param null $trashPath
@@ -43,5 +43,24 @@ class Instance extends Controller {
 		$trashFolder->move($dest);
 
 		echo "$name is restored!\n";
+	}
+
+	/**
+	 * docker compose exec --user www-data groupoffice php ./www/cli.php community/multi_instance/Instance/allowModuleForAll --package=community --name=pwned
+	 *
+	 * @param array $params
+	 * @return void
+	 * @throws \Exception
+	 */
+	public function allowModuleForAll(array $params): void
+	{
+		$this->checkParams($params, ['name', 'package']);
+
+		foreach(\go\modules\community\multi_instance\model\Instance::find() as $instance) {
+			echo "Allow for ". $instance->hostname ."\n";
+			$instance->addAllowedModule($params['package'], $params['name']);
+		}
+
+		echo "All done\n";
 	}
 }

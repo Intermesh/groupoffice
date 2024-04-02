@@ -1,3 +1,23 @@
+02-04-2024: 6.8.42
+- Support: Deleting lists was impossible
+- Newsletters: Update list counter when deleting contacts.
+- Newsletters: Reset counter on database check
+- Haveibeenpwned: Only activate for local authentication. Not for IMAP and LDAP.
+- Haveibeenpwned: Continue auth if API is not reachable
+- E-mail: Remove "undisclosed-recipients:" from to when opening draft
+- supportclient: Remove attachments
+- Support: ticket counter updates fixed
+- Core: Force password change didn't work anymore
+
+29-03-2024: 6.8.41
+- Core: User creation was broken. Renamed function so it's not an API property.
+
+28-03-2024: 6.8.40
+- Core: Added auth and lost password logs for fail2ban
+- Core: Made change password play nice with password managers
+- Core: Fixed upgrade SQL for MySQL 8
+
+25-03-2024: 6.8.39
 - Support / Core: GOUI was incompatible with 6.8 due to changes for 6.9+.
 - Core: prevent timing attack on password recovery
 - Core: prevent timing attack on login
@@ -328,6 +348,8 @@
 - Core: Fixed bug in XSS detection
 - Core: Disallow modification of modifiedAt, createdAt, modifiedBy and createdBy via API.
 - Core: Create permissions were not checked on import
+- Email: make drafts editable in a mobile screen
+- Core: Added auth and lost password logs for fail2ban
 
 18-03-2023: 6.7.74
 - Core: fix searching for partial email addresses in global search

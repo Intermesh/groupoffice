@@ -24,8 +24,10 @@ use go\core\util\JSON;
  */
 function output(array $data = [], int $status = 200, string $statusMsg = null) {
 
+	Response::get()->setHeader('Content-Type', 'application/json;charset=utf-8');
 	Response::get()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 	Response::get()->setHeader('Pragma', 'no-cache');
+	Response::get()->setHeader('Expires', '01-07-2003 12:00:00 GMT');
 
 	Response::get()->setStatus($status, $statusMsg ? str_replace("\n", " - " , $statusMsg) : null);
 	Response::get()->sendHeaders();
@@ -130,6 +132,9 @@ try {
 			break;
 		case 'forgotten':
 
+			// Don't change log message as fail2ban relies on it
+			ErrorHandler::log("Lost password request from IP: '" . Request::get()->getRemoteIpAddress() . "'");
+
 			$start = (int) (microtime(true) * 1000);
 
 			$auth->sendRecoveryMail($data['email']);
@@ -142,7 +147,7 @@ try {
 				ErrorHandler::log("Warning: sending lost password message took longer than 4s. Timing attack possible because of this. Make sure your SMTP is faster.");
 			}
 			//Don't show if user was found or not for security
-			output([], 202, "Recovery mail sent");
+			output([], 200, "Recovery mail sent");
 			break;
 
 		case 'recover':
@@ -208,7 +213,7 @@ try {
 					], 401, "Bad username or password");
 				}
 
-				User::fireEvent(User::EVENT_PASSWORD_VERIFIED, $user, $data['password']);
+
 
 				$token = new Token();
 				$token->userId = $user->id;

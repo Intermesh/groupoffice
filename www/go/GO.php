@@ -558,33 +558,6 @@ class GO{
 		GO::config()->fireEvent('init');
 		
 	}
-	
-	/**
-	 * undo magic quotes if magic_quotes_gpc is enabled. It should be disabled!
-	 */
-	private static function _undoMagicQuotes(){
-		
-		if (get_magic_quotes_gpc()) {
-
-			function stripslashes_array($data) {
-				if (is_array($data)) {
-					foreach ($data as $key => $value) {
-						$data[$key] = stripslashes_array($value);
-					}
-					return $data;
-				} else {
-					return stripslashes($data);
-				}
-			}
-
-			$_REQUEST = stripslashes_array($_REQUEST);
-			$_GET = stripslashes_array($_GET);
-			$_POST = stripslashes_array($_POST);
-			$_COOKIE = stripslashes_array($_COOKIE);
-			if(isset($_FILES))
-				$_FILES = stripslashes_array($_FILES);
-		}
-	}
 
 	/**
 	 * Called when PHP exits.

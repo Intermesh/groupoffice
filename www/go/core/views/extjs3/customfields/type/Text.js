@@ -315,8 +315,7 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	 * Get the field definition for creating Ext.data.Store's
 	 * 
 	 * Also the customFieldType (this) and customField (Entity Field) are added
-	 * 
-	 * @see https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.data.Field
+	 *
 	 * @returns {Object}
 	 */
 	getFieldDefinition : function(field) {

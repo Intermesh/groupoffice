@@ -6,14 +6,14 @@
 
 Ext = {
     /**
-     * The version of the framework
+     * The version of the framework.
      * @type String
      */
-    version : '3.4.3',
+    version : '10.0.0',
     versionDetail : {
-        major : 3,
-        minor : 4,
-        patch : 3
+        major : 10,
+        minor : 0,
+        patch : 0
     }
 };
 

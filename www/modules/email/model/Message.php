@@ -355,6 +355,11 @@ abstract class Message extends \GO\Base\Model
 		$response['from'] = $from ? $from['personal'] : "";
 		$response['sender'] = $from ? $from['email']: "";
 		$response['to'] = $recipientsAsString ? (string) $this->to : $this->_convertRecipientArray($this->to->getAddresses());
+
+		if($response['to'] == 'undisclosed-recipients:') {
+			$response['to'] = "";
+		}
+
 		$response['cc'] = $recipientsAsString ? (string) $this->cc : $this->_convertRecipientArray($this->cc->getAddresses());
 		$response['bcc'] = $recipientsAsString ? (string) $this->bcc :  $this->_convertRecipientArray($this->bcc->getAddresses());
 		$response['reply_to'] = (string) $this->reply_to;

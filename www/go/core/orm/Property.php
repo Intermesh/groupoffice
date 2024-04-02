@@ -1896,8 +1896,11 @@ abstract class Property extends Model {
 
 			if ($uniqueKey) {
 				$index = $table->getIndex($uniqueKey);
+				if($index) {
+					$uniqueKey = $index['Column_name'];
+				}
 
-				$this->setValidationError($index ? $index['Column_name'] : $uniqueKey, ErrorCode::UNIQUE);
+				$this->setValidationError($uniqueKey, ErrorCode::UNIQUE);
 				return false;
 			} else {
 				if(isset($stmt)) {
