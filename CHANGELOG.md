@@ -1,3 +1,7 @@
+- Support: Deleting lists was impossible
+- Newsletters: Update list counter when deleting contacts.
+- Newsletters: Reset counter on database check
+
 29-03-2024: 6.8.41
 - Core: User creation was broken. Renamed function so it's not an API property.
 
