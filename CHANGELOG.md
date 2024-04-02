@@ -1,3 +1,4 @@
+02-04-2024: 6.8.42
 - Support: Deleting lists was impossible
 - Newsletters: Update list counter when deleting contacts.
 - Newsletters: Reset counter on database check
