@@ -142,7 +142,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			items:[
 				this.currentPasswordField = new Ext.form.TextField(
 					{
-						fieldLabel: t("Current password"),
+						fieldLabel: t("Your current password"),
 						name: 'currentPassword',
 						inputType: 'password',
 						autocomplete: 'current-password',
