@@ -5,6 +5,8 @@
 - Haveibeenpwned: Continue auth if API is not reachable
 - E-mail: Remove "undisclosed-recipients:" from to when opening draft
 - supportclient: Remove attachments
+- Support: ticket counter updates fixed
+- Core: Force password change didn't work anymore
 
 29-03-2024: 6.8.41
 - Core: User creation was broken. Renamed function so it's not an API property.
