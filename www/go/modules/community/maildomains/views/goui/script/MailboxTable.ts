@@ -1,16 +1,17 @@
 import {
 	column,
-	DataSourceStore,
-	datasourcestore,
-	datecolumn,
+	datecolumn, DefaultEntity,
 	Format,
-	Notifier, Store, store,
+	Notifier, store,
 	t,
 	Table
 } from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
+import {MailboxDialog} from "./MailboxDialog";
 
 export class MailboxTable extends Table {
+
+	public entity : DefaultEntity|undefined;
 	constructor() {
 		const mbstore = store({data: []});
 
@@ -109,10 +110,12 @@ export class MailboxTable extends Table {
 			multiSelect: true
 		};
 		this.on("rowdblclick", async (table, rowIndex, ev) => {
-			Notifier.notice("TODO")
-			// const dlg = new DomainDialog();
-			// dlg.show();
-			// await dlg.load(table.store.get(rowIndex)!.id);
+			debugger;
+			const dlg = new MailboxDialog();
+			dlg.show();
+			dlg.domain = this.entity!.domain;
+			const record = table.store.get(rowIndex)!.id;
+			await dlg.load(record);
 		});
 
 	}

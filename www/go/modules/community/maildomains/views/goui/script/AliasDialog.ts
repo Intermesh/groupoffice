@@ -9,13 +9,14 @@ import {
 	numberfield,
 	searchbtn,
 	t, tbar,
-	textfield
+	textfield,
+	Window
 } from "@intermesh/goui";
 import {FormWindow, jmapds, userdisplaycombo} from "@intermesh/groupoffice-core";
 import {AliasTable} from "./AliasTable";
 import {MailboxTable} from "./MailboxTable";
 
-export class DomainDialog extends FormWindow {
+export class AliasDialog extends Window {
 
 	private mailboxesTab: Component | undefined;
 	private mailboxGrid: MailboxTable | undefined;
@@ -28,7 +29,7 @@ export class DomainDialog extends FormWindow {
 	constructor() {
 		super("MailDomain");
 
-		this.title = t("Domain");
+		this.title = t("Alias");
 
 		this.stateId = "maildomain-dialog";
 		this.maximizable = true;
@@ -118,8 +119,6 @@ export class DomainDialog extends FormWindow {
 				this.mailboxGrid!.store.loadData(d!.mailboxes, false);
 				this.aliasGrid!.store.loadData(d!.aliases,false);
 				this.entity = d;
-				this.mailboxGrid.entity = d;
-				this.aliasGrid.entity = d;
 
 				this.mailboxesTab!.disabled = false;
 				this.aliasesTab!.disabled = false;
