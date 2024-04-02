@@ -2,7 +2,9 @@
 namespace go\modules\community\pwned\model;
 
 use Exception;
+use go\core\ErrorHandler;
 use go\core\http\Client;
+use Throwable;
 
 /**
  * Util to check if a password has been breached
@@ -44,7 +46,13 @@ class Pwned {
 
 		$client = new Client();
 
-		$response = $client->get($this->endPoint . $range);
+		try {
+			$response = $client->get($this->endPoint . $range);
+		} catch(Throwable $e) {
+			// We don't want to block login if the API is down or whatsoever.
+			ErrorHandler::logException($e, "Have I Been Pwned check failed");
+			return 0;
+		}
 
 		if (empty($response['body'])) {
 			return 0;

@@ -1,6 +1,8 @@
 - Support: Deleting lists was impossible
 - Newsletters: Update list counter when deleting contacts.
 - Newsletters: Reset counter on database check
+- Haveibeenpwned: Only activate for local authentication. Not for IMAP and LDAP.
+- Haveibeenpwned: Continue auth if API is not reachable
 
 29-03-2024: 6.8.41
 - Core: User creation was broken. Renamed function so it's not an API property.

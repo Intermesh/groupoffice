@@ -25,6 +25,8 @@ class Password extends PrimaryAuthenticator {
 		if(!$user->passwordVerify($password)) {
 			return false;
 		}
+
+		User::fireEvent(User::EVENT_PASSWORD_VERIFIED, $user, $password);
 	
 		return $user;
 	}
