@@ -21,6 +21,10 @@ go.login.ForcePasswordChangePanel = Ext.extend(go.login.BaseLoginPanel, {
 				html: t("A password change is required. Please enter a new password."),
 				cls: 'login-text-comp'
 			}),
+			this.currentPasswordField = new Ext.form.Hidden({
+				value: go.AuthenticationManager.password,
+				name: "currentPassword"
+			}),
 			this.passwordField,
 			this.confirmPasswordField = new Ext.form.TextField({
 				xtype:'textfield',
@@ -59,6 +63,10 @@ go.login.ForcePasswordChangePanel = Ext.extend(go.login.BaseLoginPanel, {
 		this.items = [panel];
 
 		go.login.UsernamePanel.superclass.initComponent.call(this);
+
+		this.on("show", () => {
+			this.currentPasswordField.setValue(go.AuthenticationManager.password);
+		})
 	},
 
 	setErrors: function (errors) {

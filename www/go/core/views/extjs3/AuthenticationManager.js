@@ -17,6 +17,11 @@ go.AuthenticationManager = (function () {
 		username: null,
 
 		/**
+		 * Only during login, this contains the password of the user logging in. Needed for force password change.
+		 */
+		password: null,
+
+		/**
 		 * The authenticators of the user
 		 * 
 		 * @type {Array} string
@@ -80,6 +85,8 @@ go.AuthenticationManager = (function () {
           this.userAuthenticators = result.authenticators || [];
 					this.loginToken = result.loginToken;
 					this.username = result.username;
+
+					this.password = password;
 					
 					cb.call(scope || this, this, success, result);
 					
@@ -105,6 +112,7 @@ go.AuthenticationManager = (function () {
 						
 						return;
 					}
+
 
 					if (result.accessToken) {
 						this.onAuthenticated(result, username, password);
@@ -199,6 +207,8 @@ go.AuthenticationManager = (function () {
 				}
 
 				GO.mainLayout.onAuthentication(password).then(() => {
+					debugger;
+					this.password = null;
 					this.fireEvent("authenticated", this, result, username, password);
 				})
 			});		

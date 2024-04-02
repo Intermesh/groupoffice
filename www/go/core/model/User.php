@@ -839,7 +839,10 @@ public function historyLog(): bool|array
 		
 		if(isset($this->plainPassword)) {
 			$this->password = $this->passwordHash($this->plainPassword);
-			$this->forcePasswordChange = false;
+
+			if(!$this->isModified(['forcePasswordChange'])) {
+				$this->forcePasswordChange = false;
+			}
 
 			if(!$this->isNew()) {
 
