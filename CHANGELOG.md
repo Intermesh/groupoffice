@@ -1,5 +1,6 @@
-26-03-2024: 6.7.75
 - Email: Save and Send button will be disabled while attachment upload is in progress.
+
+26-03-2024: 6.7.75
 - Core: Fixed bug in XSS detection
 - Core: Disallow modification of modifiedAt, createdAt, modifiedBy and createdBy via API.
 - Core: Create permissions were not checked on import
