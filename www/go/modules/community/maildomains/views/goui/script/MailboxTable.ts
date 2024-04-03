@@ -44,7 +44,8 @@ export class MailboxTable extends Table {
 				resizable: true,
 				sortable: true,
 				width: 120,
-				renderer: (v) => {
+				renderer: (v: number) => {
+					v *= 1024;
 					return Format.fileSize(v);
 				}
 			}),
@@ -53,7 +54,8 @@ export class MailboxTable extends Table {
 				id: "usage",
 				sortable: false,
 				width: 120,
-				renderer: (v) => {
+				renderer: (v: number) => {
+					v *= 1024;
 					return Format.fileSize(v);
 				}
 			}),
@@ -109,14 +111,5 @@ export class MailboxTable extends Table {
 		this.rowSelectionConfig =  {
 			multiSelect: true
 		};
-		this.on("rowdblclick", async (table, rowIndex, ev) => {
-			debugger;
-			const dlg = new MailboxDialog();
-			dlg.show();
-			dlg.domain = this.entity!.domain;
-			const record = table.store.get(rowIndex)!.id;
-			await dlg.load(record);
-		});
-
 	}
 }

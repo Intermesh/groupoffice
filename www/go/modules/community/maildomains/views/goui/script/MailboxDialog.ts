@@ -4,7 +4,7 @@ import {
 	comp, DefaultEntity, EntityID,
 	fieldset, Form, form,
 	numberfield,
-	t, tbar,
+	t, tbar, TextField,
 	textfield,
 	Window
 } from "@intermesh/goui";
@@ -13,15 +13,17 @@ import {jmapds, userdisplaycombo} from "@intermesh/groupoffice-core";
 export class MailboxDialog extends Window {
 	public currentId: EntityID|undefined;
 
-	public entity: DefaultEntity | undefined;
-
-	public domain: string | undefined;
+	public entity: DefaultEntity;
 
 	private form: Form;
 
-	constructor() {
-		super();
+	private usernameFld: TextField;
+	private passwordFld: TextField;
+	private passwordConfirmFld: TextField;
 
+	constructor(entity: DefaultEntity) {
+		super();
+		this.entity = entity;
 		this.title = t("Alias");
 
 		this.maximizable = false;
@@ -30,44 +32,75 @@ export class MailboxDialog extends Window {
 		this.width = 800;
 		this.height = 600;
 
-		this.form = form({},
+		this.form = form({
+			handler: (f) => {
+				debugger;
+				// TODO: Validate password & passwordConfirmation
+				const values = f.value;
+				delete values.passwordConfirm;
+				if(values.password.length === 0 && this.currentId) {
+					delete values.password;
+				}
+				let mb = values;
+				if(this.currentId) {
+					mb = this.entity.mailboxes.find((m: any) => {return m.id == this.currentId});
+					Object.assign(mb, values);
+				}
+				mb.quota *= 1024;
+				mb.username += "@"+this.entity.domain;
+				// TODO: test adding new mailbox!
+				if(!this.currentId) {
+					this.entity.mailboxes.push(mb);
+				}
+				jmapds("MailDomain").update(this.entity.id, {
+					mailboxes: this.entity.mailboxes
+				} );
+				this.close();
+			}
+			},
 			fieldset({flex: 1},
 				comp({cls: "row"},
-					textfield({
+					this.usernameFld = textfield({
 						name: "username",
 						id: "username",
 						label: t("Username"),
 						required: true,
-						readOnly: !!this.currentId,
 						flex: 0.5
 					}),
 					textfield({
+						icon: "alternate_email",
 						disabled: true,
 						name: "domain",
 						id: "domain",
 						flex: 0.5,
-						value: this.domain
+						value: this.entity.domain
 					})
 				),
 				textfield({
-					name: "password",
-					id: "password",
-					label: t("Password"),
-					type: "password",
-					required: !this.currentId
+					name: "name",
+					id: "name",
+					required: true,
 				}),
 				textfield({
 					name: "domainId",
 					id: "domainId",
 					readOnly: true,
+					required: true,
+					hidden: true
+				}),
+				this.passwordFld = textfield({
+					name: "password",
+					id: "password",
+					label: t("Password"),
+					type: "password",
 					required: true
 				}),
-				textfield({
+				this.passwordConfirmFld = textfield({
 					name: "passwordConfirm",
 					id: "passwordConfirm",
 					label: t("Confirm password"),
 					type: "password",
-					required: !this.currentId
+					required: true
 				}),
 				numberfield({
 					name: "quota",
@@ -84,14 +117,17 @@ export class MailboxDialog extends Window {
 				}),
 				checkbox({
 					label: t("Allow external SMTP usage"),
-					name: "allowSmtp",
-					id: "allowSmtp",
+					name: "smtpAllowed",
+					id: "smtpAllowed",
 					type: "switch"
 				})
 			)
 		);
 
-		this.items.add(this.form, tbar({}, "->", btn({text: t("Save"), handler: (btn) => {console.log("TODO")}}))
+		this.items.add(this.form,
+			tbar({},
+				"->",
+				btn({cls: "filled primary", text: t("Save"), handler: (btn) => {this.form.submit();}}))
 		);
 
 		this.on("render", async  () => {
@@ -99,11 +135,19 @@ export class MailboxDialog extends Window {
 	}
 
 	public load(record: any) {
-		debugger;
-		this.form.value = record;
-		console.log(record);
 		if(record.id) {
 			this.currentId = record.id;
+			record.password = "";
+			this.usernameFld.readOnly = true;
+			this.passwordFld.required = false;
+			this.passwordConfirmFld.required = false;
+			if(record.username.indexOf("@") > -1) {
+				record.username = record.username.split("@")[0];
+			}
+			record.quota /= 1024;
 		}
+		this.form.value = record;
+
 	}
+
 }

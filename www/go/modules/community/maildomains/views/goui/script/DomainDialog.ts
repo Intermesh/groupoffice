@@ -14,6 +14,7 @@ import {
 import {FormWindow, jmapds, userdisplaycombo} from "@intermesh/groupoffice-core";
 import {AliasTable} from "./AliasTable";
 import {MailboxTable} from "./MailboxTable";
+import {MailboxDialog} from "./MailboxDialog";
 
 export class DomainDialog extends FormWindow {
 
@@ -118,8 +119,8 @@ export class DomainDialog extends FormWindow {
 				this.mailboxGrid!.store.loadData(d!.mailboxes, false);
 				this.aliasGrid!.store.loadData(d!.aliases,false);
 				this.entity = d;
-				this.mailboxGrid.entity = d;
-				this.aliasGrid.entity = d;
+				this.mailboxGrid!.entity = d;
+				this.aliasGrid!.entity = d;
 
 				this.mailboxesTab!.disabled = false;
 				this.aliasesTab!.disabled = false;
@@ -135,12 +136,33 @@ export class DomainDialog extends FormWindow {
 				disabled: true
 			}
 		);
+		this.mailboxGrid.on("rowdblclick", async (table, rowIndex, ev) => {
+			this.openMailboxDlg(table.store.get(rowIndex)!);
+		});
 		this.mailboxesTab.items.add(tbar({},
-			btn({cls: "primary filled", icon: "add", text: t("Add"), handler: (btn) => {
-					Notifier.notice(t("Work in progress."))
+			btn({cls: "primary filled", icon: "add", text: t("Add"), handler: (_btn) => {
+				this.openMailboxDlg({domainId: this.entity!.id, active: true})
 				}}),
 			btn({
-				icon: "delete", text: t("Delete"), handler: (btn) => {Notifier.notice("Work in progress")}
+				icon: "delete", text: t("Delete"), handler: (_btn) => {
+					debugger;
+					const selectedRows = this.mailboxGrid?.rowSelection?.selected;
+					if(!selectedRows?.length) {
+						return;
+					}
+					let selectedIds: number[] = [];
+					for(const kenny of selectedRows) {
+						selectedIds.push(this.mailboxGrid!.store.get(kenny)!.id);
+					}
+					const mbs = this.entity!.mailboxes.filter((mb: any) => {
+						return selectedIds.indexOf(mb.id) === -1;
+					});
+					// console.log(mbs);
+					jmapds("MailDomain").update(this.currentId!, {mailboxes: mbs}).then( () => {
+						this.mailboxGrid!.store.loadData(mbs, false);
+					});
+
+				}
 			}),
 			"->",
 			searchbtn({
@@ -189,4 +211,17 @@ export class DomainDialog extends FormWindow {
 
 	}
 
+	private async openMailboxDlg(record: any)
+	{
+		const dlg = new MailboxDialog(this.entity!);
+		dlg.show();
+		dlg.on("close", () => {
+			return this.load(this.currentId!).then((_value) => {
+				this.mailboxGrid!.store.loadData(this.entity!.mailboxes, false);
+			});
+		});
+
+		await dlg.load(record);
+
+	}
 }
