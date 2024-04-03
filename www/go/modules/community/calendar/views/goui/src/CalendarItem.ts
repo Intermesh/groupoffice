@@ -107,7 +107,6 @@ export class CalendarItem {
 
 			const r = new Recurrence({dtstart: new Date(e.start), timeZone:e.timeZone, rule: e.recurrenceRule});
 			for(const date of r.loop(from, until)){
-
 				let rEnd = date.clone().add(new DateInterval(e.duration));
 				const recurrenceId = date.format('Y-m-d\TH:i:s');
 
@@ -178,7 +177,7 @@ export class CalendarItem {
 	}
 
 	get isRecurring() {
-		return this.key.includes('/');
+		return this.key.includes('/') || (!this.key && 'recurrenceRule' in this.data);
 	}
 
 	get isOverride() {
@@ -201,7 +200,7 @@ export class CalendarItem {
 
 	get icons() {
 		const e = this.data;
-		const icons = this.extraIcons;
+		const icons = [...this.extraIcons];
 		if(e.recurrenceRule) icons.push('refresh');
 		if(e.links) icons.push('attachment');
 		if(e.alerts) icons.push('notifications');
@@ -251,6 +250,7 @@ export class CalendarItem {
 	}
 
 	confirmScheduleMessage(modified: Partial<CalendarEvent>|false, onAccept: ()=>void) {
+		Object.assign(this.data, modified);
 		const type = this.shouldSchedule(modified);
 		if(type) {
 			const askScheduleWin = win({
@@ -296,7 +296,26 @@ export class CalendarItem {
 	}
 
 	private get isInPast() {
-		return this.end.date < new Date();
+		// TODO: recurring event might still be only in the past
+		// its possible
+		let lastOccurrence = this.end;
+		debugger;
+		if(this.isRecurring) {
+			debugger;
+			const e = this.data;
+			if(e.recurrenceRule.count) {
+				const r = new Recurrence({dtstart: new Date(e.start), timeZone:e.timeZone, rule: e.recurrenceRule});
+				for(const date of r.loop(new DateTime(), new DateTime('2058-01-01'))){
+					lastOccurrence = date.clone().add(new DateInterval(e.duration));
+					break; // just stop after the first one because we only want to know if there are more events in the future
+				}
+			} else if(e.recurrenceRule.until) {
+				lastOccurrence = (new DateTime(e.recurrenceRule.until)).add(new DateInterval(e.duration));
+			} else {
+				return false; // never in this past when never ending recurrence
+			}
+		}
+		return lastOccurrence.date < new Date();
 	}
 	private get scheduleId() {
 		// The "view-user" is either the owner if the calendar the event is in or the current user if no owner (shared calendar)
@@ -329,7 +348,7 @@ export class CalendarItem {
 			if(!this.key) {
 				return 'new';
 			} else {
-				if(['start','duration','end','description','title','showWithoutTime','isAllDay', 'location','participants']
+				if(['start','duration','end','description','title','showWithoutTime', 'location','participants']
 					.some(k => modified.hasOwnProperty(k)))
 				{
 					return 'update';
@@ -416,7 +435,8 @@ export class CalendarItem {
 		//if(!ev.data.participants) { // is not scheduled ( split event)
 		// todo: add first and next relation in relatedTo property as per https://www.ietf.org/archive/id/draft-ietf-jmap-calendars-11.html#name-splitting-an-event
 		const rule = structuredClone(this.data.recurrenceRule);
-		rule.until = this.start.clone().setHours(0,0,0,0).addDays(-1).format('Y-m-d'); // close current series yesterday
+		// we might have changed start so we'll take the actual recurrenceId
+		rule.until = new DateTime(this.recurrenceId).addDays(-1).format('Y-m-d'); // close current series yesterday
 		eventDS.update(this.data.id, {recurrenceRule: rule}); // set until on original
 
 		const next = Object.assign({},
