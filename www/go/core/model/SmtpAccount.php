@@ -39,9 +39,9 @@ class SmtpAccount extends AclOwnerEntity
 			->addTable('core_smtp_account', 'account');
 	}
 
-	public function getHistoryLog(): bool|array
+	public function historyLog(): bool|array
 	{
-		$log = parent::getHistoryLog();
+		$log = parent::historyLog();
 
 		if(isset($log['password'])) {
 			$log['password'][0] = "MASKED";

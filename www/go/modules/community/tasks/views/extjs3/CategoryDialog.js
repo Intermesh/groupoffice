@@ -27,7 +27,9 @@ go.modules.community.tasks.CategoryDialog = Ext.extend(go.form.Dialog, {
 			}
 		];
 
-		if(go.Modules.get("community", "tasks").userRights.mayChangeCategories)
+		const mod = this.role === "support" ? go.Modules.get("business", "support") : go.Modules.get("community", "tasks");
+
+		if(mod.userRights.mayChangeCategories)
 		{
 			this.ownerIdField = new Ext.form.Hidden({name:'ownerId',value:go.User.id});
 
@@ -51,7 +53,9 @@ go.modules.community.tasks.CategoryDialog = Ext.extend(go.form.Dialog, {
 	onLoad: function() {
 		this.supr().onLoad.call(this);
 
-		if (go.Modules.get("community", "tasks").userRights.mayChangeCategories) {
+		const mod = this.role === "support" ? go.Modules.get("business", "support") : go.Modules.get("community", "tasks");
+
+		if (mod.userRights.mayChangeCategories) {
 			this.checkbox.setValue(!this.tasklistCombo.getValue() && !this.ownerIdField.getValue());
 		}
 

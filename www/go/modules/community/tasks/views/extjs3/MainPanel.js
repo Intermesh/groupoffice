@@ -482,7 +482,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	canEditTaskLists: function() {
 		if(this.support) {
 			const modRights = go.Modules.get("business", "support").userRights;
-			return modRights.mayManage;
+			return modRights.mayChangeTasklists;
 		} else {
 			return go.Modules.get("community", 'tasks') && go.Modules.get("community", 'tasks').userRights.mayChangeTasklists;
 		}

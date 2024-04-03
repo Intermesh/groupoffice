@@ -57,7 +57,7 @@ abstract class Entity  extends OrmEntity {
 	 *
 	 * @return bool|array
 	 */
-	public function getHistoryLog(): bool|array
+	public function historyLog(): bool|array
 	{
 		return $this->getModified();
 	}

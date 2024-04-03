@@ -94,9 +94,9 @@ class Server extends Entity {
 	protected $password;
 
 
-	public function getHistoryLog(): bool|array
+	public function historyLog(): bool|array
 	{
-		$log = parent::getHistoryLog();
+		$log = parent::historyLog();
 
 		if(isset($log['password'])) {
 			$log['password'][0] = "MASKED";
