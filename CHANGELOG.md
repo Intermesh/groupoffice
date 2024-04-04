@@ -1,3 +1,5 @@
+- ActiveSync: Some email messages that were out of the date range specified could be sent
+
 02-04-2024: 6.8.42
 - Support: Deleting lists was impossible
 - Newsletters: Update list counter when deleting contacts.
