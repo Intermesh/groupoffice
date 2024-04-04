@@ -3,8 +3,8 @@ import {
 	checkbox,
 	comp,
 	Component,
-	DefaultEntity,
-	fieldset,
+	DefaultEntity, EntityID,
+	fieldset, form,Form,
 	Notifier,
 	numberfield,
 	searchbtn,
@@ -12,89 +12,75 @@ import {
 	textfield,
 	Window
 } from "@intermesh/goui";
-import {FormWindow, jmapds, userdisplaycombo} from "@intermesh/groupoffice-core";
-import {AliasTable} from "./AliasTable";
-import {MailboxTable} from "./MailboxTable";
+import {jmapds} from "@intermesh/groupoffice-core";
 
 export class AliasDialog extends Window {
+	public currentId: EntityID|undefined;
 
-	private mailboxesTab: Component | undefined;
-	private mailboxGrid: MailboxTable | undefined;
+	private form: Form;
 
-	private aliasesTab: Component | undefined;
-	private aliasGrid: AliasTable | undefined;
+	public entity: DefaultEntity;
 
-	private entity: DefaultEntity | undefined;
-
-	constructor() {
-		super("MailDomain");
+	constructor(entity: DefaultEntity) {
+		super();
 
 		this.title = t("Alias");
-
-		this.stateId = "maildomain-dialog";
-		this.maximizable = true;
+		this.entity = entity;
+		this.maximizable = false;
 		this.resizable = true;
 		this.closable = true;
-		this.width = 1024;
-		this.height = 800;
+		this.width = 800;
 
-		this.createMailboxesTab();
-		this.createAliasTab();
-
-		this.generalTab.items.add(
+		this.form = form({
+				cls: "vbox",
+				flex: 1,
+				handler: (f) => {
+					const values = f.value;
+					values.address = values.address+"@"+values.domain;
+					delete values.domain;
+					let a = this.entity.aliases;
+					if(this.currentId) {
+						const ca = a.find((m: any) => {return m.id == this.currentId});
+						Object.assign(ca, values);
+					} else {
+						a.push(values);
+					}
+					jmapds("MailDomain").update(this.entity.id, {
+						aliases: a
+					}).then( () => {debugger;this.close();});
+				}
+			},
 			fieldset({flex: 1},
-				userdisplaycombo({
-					name: "userId",
-					id: "userId",
-					label: t("User"),
-					required: true
-				}),
+				comp({cls: "row"},
+					textfield({
+						name: "address",
+						id: "address",
+						label: t("Address"),
+						required: true,
+						hint: t("Use '*' for a catch all alias (not recommended)."),
+					}),
+					textfield({
+						name: "domain",
+						id: "domain",
+						label: t("Domain"),
+						required: true,
+						readOnly: true,
+						value: this.entity.domain,
+						icon: "alternate_email"
+					}),
+				),
 				textfield({
-					name: "domain",
-					id: "domain",
-					label: t("Domain"),
+					name: "domainId",
+					id: "domainId",
+					readOnly: true,
 					required: true,
-					readOnly: !!this.currentId,
+					hidden: true
 				}),
 				textfield({
-					name: "description",
-					id: "description",
-					label: t("Description")
-				}),
-				textfield({
-					name: "transport",
-					id: "transport",
-					value: "virtual",
-					hidden: true,
-					readOnly: true
-				}),
-				numberfield({
-					name: "maxAliases",
-					id: "maxAliases",
-					label: t("Max aliases"),
-					decimals: 0,
-					flex: 0.5
-				}),
-				numberfield({
-					name: "maxMailboxes",
-					id: "maxMailboxes",
-					label: t("Max mailboxes"),
-					decimals: 0,
-					flex: 0.5
-				}),
-				numberfield({
-					name: "maxQuota",
-					id: "maxQuota",
-					label: t("Max quota (MB)"),
-					decimals: 2,
-					flex: 0.5
-				}),
-				numberfield({
-					name: "defaultQuota",
-					id: "defaultQuota",
-					label: t("Default quota (MB)"),
-					decimals: 2,
-					flex: 0.5
+					name: "goto",
+					id: "goto",
+					label: t("Goto"),
+					hint: t("For multiple recipients use a comma separated list eg. alias1@domain.com,alias2@domain.com")
 				}),
 				checkbox({
 					label: t("Active"),
@@ -102,90 +88,28 @@ export class AliasDialog extends Window {
 					id: "active",
 					type: "switch"
 				}),
-				checkbox({
-					label: t("Backup MX"),
-					name: "backupMx",
-					id: "backupMx",
-					type: "switch"
-				})
 			)
 		);
-		this.cards.items.add(this.mailboxesTab!, this.aliasesTab!)
-		this.addSharePanel();
 
-		this.on("ready", async  () => {
-			if(this.currentId) {
-				const d = await jmapds("MailDomain").single(this.currentId);
-				this.mailboxGrid!.store.loadData(d!.mailboxes, false);
-				this.aliasGrid!.store.loadData(d!.aliases,false);
-				this.entity = d;
-
-				this.mailboxesTab!.disabled = false;
-				this.aliasesTab!.disabled = false;
-			}
-		});
-	}
-
-	private createMailboxesTab() {
-		this.mailboxGrid = new MailboxTable();
-		this.mailboxesTab = comp({
-				cls: "scroll fit",
-				title: t("Mailboxes"),
-				disabled: true
-			}
-		);
-		this.mailboxesTab.items.add(tbar({},
-			btn({cls: "primary filled", icon: "add", text: t("Add"), handler: (btn) => {
-					Notifier.notice(t("Work in progress."))
-				}}),
-			btn({
-				icon: "delete", text: t("Delete"), handler: (btn) => {Notifier.notice("Work in progress")}
-			}),
-			"->",
-			searchbtn({
-				listeners: {
-					input: (_sender, text) => {
-						const records = this.entity!.mailboxes;
-						const filtered = records.filter((r: { username: string; name: string}) => {
-							return !text || r.username.toLowerCase().indexOf(text.toLowerCase()) > -1 || r.name.toLowerCase().indexOf(text.toLowerCase()) > -1;
-						});
-						this.mailboxGrid!.store.loadData(filtered, false)
-					}
-				}
-			}),
-		),this.mailboxGrid);
-	}
-
-	private createAliasTab() {
-		this.aliasesTab = comp({
-				cls: "scroll fit",
-				title: t("Aliases"),
-				disabled: true
-			}
+		this.items.add(comp({cls: "scroll fit"},
+			this.form,
+			tbar({cls: "border-top"},
+				"->",
+				btn({cls: "filled primary", text: t("Save"), handler: (_btn) => {this.form.submit();}})
+			)
+			)
 		);
 
-		this.aliasGrid = new AliasTable();
-		this.aliasesTab.items.add(tbar({},
-			btn({cls: "primary filled", icon: "add", text: t("Add"), handler: (btn) => {
-					Notifier.notice(t("Work in progress."))
-				}}),
-			btn({
-				icon: "delete", text: t("Delete"), handler: (btn) => {Notifier.notice("Work in progress")}
-			}),
-			"->",
-			searchbtn({
-				listeners: {
-					input: (sender, text) => {
-						const records = this.entity!.aliases;
-						const filtered = records.filter((r: { address: string; goto: string}) => {
-							return !text || r.address.toLowerCase().indexOf(text.toLowerCase()) > -1 || r.goto.toLowerCase().indexOf(text.toLowerCase()) > -1;
-						});
-						this.aliasGrid!.store.loadData(filtered, false)
-					}
-				}
-			}),
-		),this.aliasGrid);
-
+	}
+	public load(record: any) {
+		record.domainId = this.entity!.id;
+		if(record.id) {
+			if(record.address.indexOf("@") > -1) {
+				record.address = record.address.split("@")[0];
+			}
+			this.currentId = record.id;
+		}
+		this.form.value = record;
 	}
 
 }

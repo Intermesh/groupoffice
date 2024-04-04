@@ -5,16 +5,17 @@ import {
 	Component,
 	DefaultEntity,
 	fieldset,
-	Notifier,
 	numberfield,
 	searchbtn,
-	t, tbar,
+	t,
+	tbar,
 	textfield
 } from "@intermesh/goui";
 import {FormWindow, jmapds, userdisplaycombo} from "@intermesh/groupoffice-core";
 import {AliasTable} from "./AliasTable";
 import {MailboxTable} from "./MailboxTable";
 import {MailboxDialog} from "./MailboxDialog";
+import {AliasDialog} from "./AliasDialog";
 
 export class DomainDialog extends FormWindow {
 
@@ -113,11 +114,11 @@ export class DomainDialog extends FormWindow {
 		this.cards.items.add(this.mailboxesTab!, this.aliasesTab!)
 		this.addSharePanel();
 
-		this.on("ready", async  () => {
-			if(this.currentId) {
+		this.on("ready", async () => {
+			if (this.currentId) {
 				const d = await jmapds("MailDomain").single(this.currentId);
 				this.mailboxGrid!.store.loadData(d!.mailboxes, false);
-				this.aliasGrid!.store.loadData(d!.aliases,false);
+				this.aliasGrid!.store.loadData(d!.aliases, false);
 				this.entity = d;
 				this.mailboxGrid!.entity = d;
 				this.aliasGrid!.entity = d;
@@ -139,26 +140,26 @@ export class DomainDialog extends FormWindow {
 		this.mailboxGrid.on("rowdblclick", async (table, rowIndex, ev) => {
 			this.openMailboxDlg(table.store.get(rowIndex)!);
 		});
-		this.mailboxesTab.items.add(tbar({},
-			btn({cls: "primary filled", icon: "add", text: t("Add"), handler: (_btn) => {
-				this.openMailboxDlg({domainId: this.entity!.id, active: true})
-				}}),
+		this.mailboxesTab.items.add(tbar({cls: "border-bottom"},
+			btn({
+				cls: "primary filled", icon: "add", text: t("Add"), handler: (_btn) => {
+					this.openMailboxDlg({domainId: this.entity!.id, active: true})
+				}
+			}),
 			btn({
 				icon: "delete", text: t("Delete"), handler: (_btn) => {
-					debugger;
 					const selectedRows = this.mailboxGrid?.rowSelection?.selected;
-					if(!selectedRows?.length) {
+					if (!selectedRows?.length) {
 						return;
 					}
 					let selectedIds: number[] = [];
-					for(const kenny of selectedRows) {
+					for (const kenny of selectedRows) {
 						selectedIds.push(this.mailboxGrid!.store.get(kenny)!.id);
 					}
 					const mbs = this.entity!.mailboxes.filter((mb: any) => {
 						return selectedIds.indexOf(mb.id) === -1;
 					});
-					// console.log(mbs);
-					jmapds("MailDomain").update(this.currentId!, {mailboxes: mbs}).then( () => {
+					jmapds("MailDomain").update(this.currentId!, {mailboxes: mbs}).then(() => {
 						this.mailboxGrid!.store.loadData(mbs, false);
 					});
 
@@ -169,14 +170,14 @@ export class DomainDialog extends FormWindow {
 				listeners: {
 					input: (_sender, text) => {
 						const records = this.entity!.mailboxes;
-						const filtered = records.filter((r: { username: string; name: string}) => {
+						const filtered = records.filter((r: { username: string; name: string }) => {
 							return !text || r.username.toLowerCase().indexOf(text.toLowerCase()) > -1 || r.name.toLowerCase().indexOf(text.toLowerCase()) > -1;
 						});
 						this.mailboxGrid!.store.loadData(filtered, false)
 					}
 				}
 			}),
-		),this.mailboxGrid);
+		), this.mailboxGrid);
 	}
 
 	private createAliasTab() {
@@ -188,36 +189,69 @@ export class DomainDialog extends FormWindow {
 		);
 
 		this.aliasGrid = new AliasTable();
-		this.aliasesTab.items.add(tbar({},
-			btn({cls: "primary filled", icon: "add", text: t("Add"), handler: (btn) => {
-					Notifier.notice(t("Work in progress."))
-				}}),
+		this.aliasGrid.on("rowdblclick", async (table, rowIndex, ev) => {
+			await this.openAliasDlg(table.store.get(rowIndex)!);
+		});
+
+		this.aliasesTab.items.add(tbar({cls: "border-bottom"},
 			btn({
-				icon: "delete", text: t("Delete"), handler: (btn) => {Notifier.notice("Work in progress")}
+				cls: "primary filled", icon: "add", text: t("Add"), handler: async (_btn) => {
+					await this.openAliasDlg({active: true});
+				}
+			}),
+			btn({
+				icon: "delete", text: t("Delete"), handler: (btn) => {
+					const selectedRows = this.aliasGrid?.rowSelection?.selected;
+					if (!selectedRows?.length) {
+						return;
+					}
+					let selectedIds: number[] = [];
+					for (const kenny of selectedRows) {
+						selectedIds.push(this.aliasGrid!.store.get(kenny)!.id);
+					}
+					const aa = this.entity!.aliases.filter((a: any) => {
+						return selectedIds.indexOf(a.id) === -1;
+					});
+					jmapds("MailDomain").update(this.currentId!, {aliases: aa}).then(() => {
+						this.aliasGrid!.store.loadData(aa, false);
+					});
+				}
 			}),
 			"->",
 			searchbtn({
 				listeners: {
 					input: (sender, text) => {
 						const records = this.entity!.aliases;
-						const filtered = records.filter((r: { address: string; goto: string}) => {
+						const filtered = records.filter((r: { address: string; goto: string }) => {
 							return !text || r.address.toLowerCase().indexOf(text.toLowerCase()) > -1 || r.goto.toLowerCase().indexOf(text.toLowerCase()) > -1;
 						});
 						this.aliasGrid!.store.loadData(filtered, false)
 					}
 				}
 			}),
-		),this.aliasGrid);
+		), this.aliasGrid);
 
 	}
 
-	private async openMailboxDlg(record: any)
-	{
+	private async openMailboxDlg(record: any): Promise<void> {
 		const dlg = new MailboxDialog(this.entity!);
 		dlg.show();
 		dlg.on("close", () => {
 			return this.load(this.currentId!).then((_value) => {
 				this.mailboxGrid!.store.loadData(this.entity!.mailboxes, false);
+			});
+		});
+
+		await dlg.load(record);
+
+	}
+
+	private async openAliasDlg(record: any): Promise<void> {
+		const dlg = new AliasDialog(this.entity!);
+		dlg.show();
+		dlg.on("close", () => {
+			return this.load(this.currentId!).then((_value) => {
+				this.aliasGrid!.store.loadData(this.entity!.aliases, false);
 			});
 		});
 

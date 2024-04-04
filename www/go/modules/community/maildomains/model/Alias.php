@@ -9,6 +9,9 @@ use go\core\util\DateTime;
 final class Alias extends Property
 {
 	/** @var int */
+	public $id;
+
+	/** @var int */
 	public $domainId;
 
 	/** @var string */

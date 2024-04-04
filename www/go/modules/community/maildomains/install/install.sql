@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `community_maildomains_alias`
     `createdAt`  DATETIME         NOT NULL,
     `modifiedBy` int(11)          NOT NULL,
     `modifiedAt` DATETIME                  DEFAULT NULL,
-    `active`     enum ('0','1')   NOT NULL default '1',
+    `active`     tinyint(1)        NOT NULL default '1',
     PRIMARY KEY (`id`),
     UNIQUE `address` (`address`),
     KEY `domainId` (`domainId`),

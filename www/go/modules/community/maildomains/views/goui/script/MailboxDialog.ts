@@ -24,18 +24,19 @@ export class MailboxDialog extends Window {
 	constructor(entity: DefaultEntity) {
 		super();
 		this.entity = entity;
-		this.title = t("Alias");
+		this.title = t("Mailbox");
 
 		this.maximizable = false;
 		this.resizable = true;
 		this.closable = true;
 		this.width = 800;
-		this.height = 600;
 
 		this.form = form({
+			cls: "vbox",
+			flex: 1,
 			handler: (f) => {
-				debugger;
 				// TODO: Validate password & passwordConfirmation
+				// TODO: Refactor. This code is a bit messy
 				const values = f.value;
 				delete values.passwordConfirm;
 				if(values.password.length === 0 && this.currentId) {
@@ -48,7 +49,6 @@ export class MailboxDialog extends Window {
 				}
 				mb.quota *= 1024;
 				mb.username += "@"+this.entity.domain;
-				// TODO: test adding new mailbox!
 				if(!this.currentId) {
 					this.entity.mailboxes.push(mb);
 				}
@@ -125,9 +125,9 @@ export class MailboxDialog extends Window {
 		);
 
 		this.items.add(this.form,
-			tbar({},
+			tbar({cls: "border-top"},
 				"->",
-				btn({cls: "filled primary", text: t("Save"), handler: (btn) => {this.form.submit();}}))
+				btn({cls: "filled primary", text: t("Save"), handler: (_btn) => {this.form.submit();}}))
 		);
 
 		this.on("render", async  () => {

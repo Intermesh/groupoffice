@@ -1,12 +1,15 @@
 import {
 	column,
-	datecolumn,
+	datecolumn, DefaultEntity,
 	Notifier, store,
 	t,
 	Table
 } from "@intermesh/goui";
 
 export class AliasTable extends Table {
+
+	public entity : DefaultEntity|undefined;
+
 	constructor() {
 		const mbstore = store({data: []});
 
@@ -61,9 +64,5 @@ export class AliasTable extends Table {
 		this.rowSelectionConfig =  {
 			multiSelect: true
 		};
-		this.on("rowdblclick", async (table, rowIndex, ev) => {
-			Notifier.notice("TODO")
-		});
-
 	}
 }
