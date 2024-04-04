@@ -708,9 +708,9 @@ class MailStore extends Store implements ISearchProvider {
 						if (empty($uids)) {
 							return [];
 						}
-						$uidRange = min($uids) . ':*';
-						ZLog::Write(LOGLEVEL_DEBUG, 'GET UID RANGE: ' . $uidRange. ', count: '. count($uids));
-						$headers = $imap->get_flags(min($uids) . ':*');
+//						$uidRange = min($uids) . ':*';
+//						ZLog::Write(LOGLEVEL_DEBUG, 'GET UID RANGE: ' . $uidRange. ', count: '. count($uids));
+						$headers = $imap->get_flags($uids);
 					}
 
 					if ($headers === false) {

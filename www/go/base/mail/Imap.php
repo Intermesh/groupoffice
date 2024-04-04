@@ -1652,6 +1652,21 @@ class Imap extends ImapBodyStruct
 	 */
 	public function get_flags($uidRange = '1:*')
 	{
+		if(is_array($uidRange)) {
+			$chunks = array_chunk($uidRange, 1000);
+
+			$flags = array();
+			while($subset = array_shift($chunks)){
+
+				$uidStr = implode(',', $subset);
+				$this->clean($uidStr, 'uid_list');
+
+				$flags = array_merge($flags, $this->get_flags($uidStr));
+			}
+
+			return $flags;
+		}
+
 		$command = 'UID FETCH '.$uidRange.' (FLAGS INTERNALDATE)'."\r\n";
 		
 		$this->send_command($command);
