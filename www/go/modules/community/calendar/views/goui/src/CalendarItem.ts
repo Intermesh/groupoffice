@@ -155,7 +155,7 @@ export class CalendarItem {
 			const w = win({
 					title: t('Do you want to delete a recurring event?'),
 					modal: true,
-					width: 500,
+					width: 540,
 				},comp({
 					cls:'pad',
 					html: t('You will be deleting a recurring event. Do you want to delete this occurrence only or all future occurrences?'),
@@ -296,21 +296,19 @@ export class CalendarItem {
 	}
 
 	private get isInPast() {
-		// TODO: recurring event might still be only in the past
-		// its possible
 		let lastOccurrence = this.end;
-		debugger;
 		if(this.isRecurring) {
-			debugger;
 			const e = this.data;
 			if(e.recurrenceRule.count) {
 				const r = new Recurrence({dtstart: new Date(e.start), timeZone:e.timeZone, rule: e.recurrenceRule});
-				for(const date of r.loop(new DateTime(), new DateTime('2058-01-01'))){
+				for(const date of r.loop(new DateTime(), new DateTime('2058-01-01'), (_d,i) => i < 1)){
 					lastOccurrence = date.clone().add(new DateInterval(e.duration));
-					break; // just stop after the first one because we only want to know if there are more events in the future
 				}
 			} else if(e.recurrenceRule.until) {
-				lastOccurrence = (new DateTime(e.recurrenceRule.until)).add(new DateInterval(e.duration));
+				lastOccurrence = (new DateTime(e.recurrenceRule.until))
+				if(e.recurrenceRule.until.length === 10)
+					lastOccurrence.addDays(1); // if date-only date is inclusive
+				lastOccurrence.add(new DateInterval(e.duration));
 			} else {
 				return false; // never in this past when never ending recurrence
 			}
