@@ -703,16 +703,18 @@ class MailStore extends Store implements ISearchProvider {
 						ZLog::Write(LOGLEVEL_DEBUG, "empty cutoff");
 						$headers = $imap->get_flags();
 					} else {
-						ZLog::Write(LOGLEVEL_DEBUG, 'Client sent cutoff date for calendar: ' . date("j-M-Y", $cutoffdate));
+						ZLog::Write(LOGLEVEL_DEBUG, 'Client sent cutoff date for email: ' . date("j-M-Y", $cutoffdate));
 						$uids = $imap->search('SINCE ' . date("j-M-Y", $cutoffdate));
 						if (empty($uids)) {
 							return [];
 						}
+						$uidRange = min($uids) . ':*';
+						ZLog::Write(LOGLEVEL_DEBUG, 'GET UID RANGE: ' . $uidRange);
 						$headers = $imap->get_flags(min($uids) . ':*');
 					}
 
 					if ($headers === false) {
-						ZLog::Write(LOGLEVEL_ERROR, "IMAP returned error reponse" . $imap->last_error());
+						ZLog::Write(LOGLEVEL_ERROR, "IMAP returned error response" . $imap->last_error());
 						return [];
 					}
 
