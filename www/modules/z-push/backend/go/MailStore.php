@@ -709,7 +709,7 @@ class MailStore extends Store implements ISearchProvider {
 							return [];
 						}
 						$uidRange = min($uids) . ':*';
-						ZLog::Write(LOGLEVEL_DEBUG, 'GET UID RANGE: ' . $uidRange);
+						ZLog::Write(LOGLEVEL_DEBUG, 'GET UID RANGE: ' . $uidRange. ', count: '. count($uids));
 						$headers = $imap->get_flags(min($uids) . ':*');
 					}
 
