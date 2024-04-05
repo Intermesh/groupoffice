@@ -26,7 +26,7 @@ export class SplitView extends CalendarView {
 		this.day = day.setHours(0,0,0,0);
 		this.start = this.day.clone().setWeekDay(0);
 		const end = this.start.clone().addDays(amount);
-
+		this.renderView();
 		this.adapter.goto(this.start, end);
 	}
 

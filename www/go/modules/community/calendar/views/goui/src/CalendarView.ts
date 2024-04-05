@@ -45,7 +45,7 @@ export abstract class CalendarView extends Component {
 
 	update = (_data?: any) => {
 		if(this.rendered) {
-			this.renderView();
+			//this.renderView();
 			this.populateViewModel();
 		}
 	}

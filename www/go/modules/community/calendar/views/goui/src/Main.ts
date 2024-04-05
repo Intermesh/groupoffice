@@ -63,7 +63,7 @@ export class Main extends Component {
 		this.cls = 'hbox fit tablet-cards';
 
 		this.adapter.onLoad = () => {
-			console.log('view update');
+			console.error('view update');
 			this.view.update();
 		};
 
@@ -314,9 +314,8 @@ export class Main extends Component {
 				});
 				me.store.load().then(_c => {
 					// after initial load. check for changed
-					console.log('calendars loaded');
+					//console.log('calendars loaded');
 				 	me.store.on('load', () => {
-						console.error(Date.now());
 						this.view.update();
 					});
 					this.applyInCalendarFilter();

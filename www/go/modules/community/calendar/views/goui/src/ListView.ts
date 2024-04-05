@@ -33,7 +33,7 @@ export class ListView extends CalendarView {
 		this.start.setDate(1);
 		endMonth.setDate(1).addMonths(1);
 		this.days = this.start.diff(endMonth).getTotalDays()!;
-
+		this.renderView();
 		this.adapter.goto(this.start, endMonth);
 	}
 
@@ -49,13 +49,13 @@ export class ListView extends CalendarView {
 
 	renderView(): void {
 		this.viewModel = [];
-		this.listEl.innerHTML = ''; //clear
 
 		this.listEl.cls(['+cal','+list']).css({flex:'1'});
 
 	}
 
 	private updateItems() {
+		this.listEl.innerHTML = ''; //clear
 		this.continues = [];
 		this.iterator = 0;
 		this.viewModel.sort((a, b) => a.start.date < b.start.date ? -1 : 1);

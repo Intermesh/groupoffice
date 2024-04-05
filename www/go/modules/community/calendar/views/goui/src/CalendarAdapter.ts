@@ -23,10 +23,15 @@ export class CalendarAdapter {
 			const p = this.providers[type];
 			if(!p.enabled) continue;
 			const promise = p.load(start,end);
+			if(p.store) {
+				p.store.skipNextEvent = true;
+			}
 			if(p.watch) {
 				promise.then(_evs => {
-					p.store.on('load', () => {
-						this.onLoad()
+					p.store.on('load', (me: & {skipNextEvent:boolean}) => {
+						if(!me.skipNextEvent)
+							this.onLoad();
+						me.skipNextEvent = false;
 					});
 					p.watch = false;
 				})

@@ -52,7 +52,7 @@ export class WeekView extends CalendarView {
 		this.day = day.setHours(0,0,0,0);
 		// const startWeek = this.day.setWeekDay(0),
 		// 	endWeek = startWeek.clone().addDays(7);
-
+		this.renderView();
 		this.adapter.goto(day, day.clone().addDays(amount));
 
 		// Object.assign(this.store.queryParams.filter ||= {}, {

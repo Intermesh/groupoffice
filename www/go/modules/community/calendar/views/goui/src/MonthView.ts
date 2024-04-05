@@ -53,7 +53,7 @@ export class MonthView extends CalendarView {
 			endMonth.setDate(1).setWeekDay(0).addDays(6*7);
 			this.days = this.start.diff(endMonth).getTotalDays()!;
 		}
-
+		this.renderView();
 		this.adapter.goto(this.start, endMonth);
 	}
 
