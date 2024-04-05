@@ -145,37 +145,6 @@ export class CalendarItem {
 		}
 	}
 
-	remove() {
-		if(!this.isRecurring) {
-			this.confirmScheduleMessage(false, () => {
-				eventDS.destroy(this.data.id);
-				Object.values(this.divs).forEach(d => d.remove())
-			});
-		} else {
-			const w = win({
-					title: t('Do you want to delete a recurring event?'),
-					modal: true,
-					width: 540,
-				},comp({
-					cls:'pad',
-					html: t('You will be deleting a recurring event. Do you want to delete this occurrence only or all future occurrences?'),
-				}),tbar({},btn({
-						text: t('This event'),
-						cls:'primary',
-						handler: _b => { this.removeOccurrence(); w.close(); }
-					}),btn({
-						text: t('This and future events'),
-						handler: _b => { this.removeFutureEvents(); w.close(); }
-					}),'->',btn({
-						text: t('All events'), // the series
-						handler: _b => { eventDS.destroy(this.data.id); w.close(); }
-					})
-				)
-			)
-			w.show();
-		}
-	}
-
 	get isRecurring() {
 		return this.key.includes('/') || (!this.key && 'recurrenceRule' in this.data);
 	}
@@ -384,15 +353,16 @@ export class CalendarItem {
 						text: t('This event'),
 						hidden: modified.recurrenceRule, // user must change future if rrule is modified
 						cls:'primary',
-						handler: _b => { this.patchOccurrence(modified, onFinish); w.close(); }
+						handler: _b => {
+							this.patchOccurrence(modified, onFinish); w.close();
+						}
 					}),
 					btn({
 						text: t(isFirstInSerie ? 'All events' : 'This and future events'), // save to series
 						handler: _b => {
 							const p = isFirstInSerie ?
-								eventDS.update(this.data.id, modified) :
+								this.patchSeries(modified) :
 								this.patchThisAndFuture(modified);
-							if(onFinish) p.then(onFinish);
 							w.close();
 						}
 					})
@@ -400,6 +370,13 @@ export class CalendarItem {
 			)
 			w.show();
 		}
+	}
+
+	private patchSeries(modified: any, onFinish?: () => void) {
+		this.confirmScheduleMessage(modified, () => {
+			const p = eventDS.update(this.data.id, modified);
+			if(onFinish) p.then(onFinish);
+		})
 	}
 
 	private static overridableProperties = ['start', 'duration', 'title', 'freeBusyStatus', 'participants','location','alerts', 'description']
@@ -429,30 +406,61 @@ export class CalendarItem {
 	/**
 	 * @see  https://www.ietf.org/archive/id/draft-ietf-jmap-calendars-10.html#section-5.5
 	 */
-	private patchThisAndFuture(modified: any) {
+	private patchThisAndFuture(modified: any, onFinish?: () => void) {
 		//if(!ev.data.participants) { // is not scheduled ( split event)
 		// todo: add first and next relation in relatedTo property as per https://www.ietf.org/archive/id/draft-ietf-jmap-calendars-11.html#name-splitting-an-event
 		const rule = structuredClone(this.data.recurrenceRule);
 		// we might have changed start so we'll take the actual recurrenceId
 		rule.until = new DateTime(this.recurrenceId).addDays(-1).format('Y-m-d'); // close current series yesterday
-		eventDS.update(this.data.id, {recurrenceRule: rule}); // set until on original
+		this.confirmScheduleMessage(modified, () => {
+			eventDS.update(this.data.id, {recurrenceRule: rule}); // set until on original
 
-		const next = Object.assign({},
-			this.data,
-			{start: this.recurrenceId!, id:null, uid:null},
-			modified
-		);
-		return eventDS.create(next); // create duplicate
+			const next = Object.assign({},
+				this.data,
+				{start: this.recurrenceId!, id: null, uid: null},
+				modified
+			);
+			const p = eventDS.create(next); // create duplicate
+			if (onFinish) p.then(onFinish);
+		});
+	}
+
+	remove() {
+		if(!this.isRecurring) {
+			this.confirmScheduleMessage(false, () => {
+				eventDS.destroy(this.data.id);
+				Object.values(this.divs).forEach(d => d.remove())
+			});
+		} else {
+			const w = win({
+					title: t('Do you want to delete a recurring event?'),
+					modal: true,
+					width: 540,
+				},comp({
+					cls:'pad',
+					html: t('You will be deleting a recurring event. Do you want to delete this occurrence only or all future occurrences?'),
+				}),tbar({},btn({
+						text: t('This event'),
+						cls:'primary',
+						handler: _b => { this.removeOccurrence(); w.close(); }
+					}),btn({
+						text: t('This and future events'),
+						handler: _b => { this.removeFutureEvents(); w.close(); }
+					}),'->',btn({
+						text: t('All events'), // the series
+						handler: _b => { eventDS.destroy(this.data.id); w.close(); }
+					})
+				)
+			)
+			w.show();
+		}
 	}
 
 	private removeFutureEvents() {
-		this.data.recurrenceRule.until = (new DateTime(this.recurrenceId)).addDays(-1).format('Y-m-d'); // could be minus 1 seconds but we don't recur within day
-		eventDS.update(this.data.id,{recurrenceRule: this.data.recurrenceRule});
-	}
-
-	undoException(recurrenceId: string) {
-		delete this.data.recurrenceOverrides[recurrenceId];
-		return eventDS.update(this.data.id, {recurrenceOverrides:this.data.recurrenceOverrides});
+		this.confirmScheduleMessage(false, () => {
+			this.data.recurrenceRule.until = (new DateTime(this.recurrenceId)).addDays(-1).format('Y-m-d'); // could be minus 1 seconds but we don't recur within day
+			eventDS.update(this.data.id,{recurrenceRule: this.data.recurrenceRule});
+		});
 	}
 
 	private removeOccurrence() {
@@ -461,5 +469,10 @@ export class CalendarItem {
 			this.data.recurrenceOverrides[this.recurrenceId!] = {excluded: true};
 			eventDS.update(this.data.id, {recurrenceOverrides: this.data.recurrenceOverrides});
 		});
+	}
+
+	undoException(recurrenceId: string) {
+		delete this.data.recurrenceOverrides[recurrenceId];
+		return eventDS.update(this.data.id, {recurrenceOverrides:this.data.recurrenceOverrides});
 	}
 }
