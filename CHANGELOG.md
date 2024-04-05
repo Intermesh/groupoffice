@@ -1,3 +1,5 @@
+- ActiveSync: Some email messages that were out of the date range specified could be sent
+
 04-03-2024: 6.6.183
 - Email: Fixed render issue
 - Leavedays: fix issue with disapproval reason not being sent
