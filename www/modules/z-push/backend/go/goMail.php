@@ -766,7 +766,7 @@ class goMail extends GoBaseBackendDiff {
 						if (empty($uids)) {
 							return [];
 						}
-						$headers = $imap->get_flags(min($uids) . ':*');
+						$headers = $imap->get_flags($uids);
 					}
 
 					if ($headers === false) {
