@@ -63,10 +63,14 @@ export class AliasDialog extends FormWindow {
 			if (!this.currentId) {
 				this.form.findField("active")!.value = true
 			} else {
-				const address = this.form.findField("address")!.value as String;
+				let address = this.form.findField("address")!.value as String;
 				if (address.indexOf("@") > -1) {
-					this.form.findField("address")!.value = address.split("@")[0];
+					address = address.split("@")[0];
+					if(address.length === 0) {
+						address = "*";
+					}
 				}
+				this.form.findField("address")!.value = address;
 			}
 			this.form.findField("domain")!.value = this.entity!.domain;
 		});

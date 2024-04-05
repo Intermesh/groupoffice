@@ -34,7 +34,13 @@ export class AliasTable extends Table<DataSourceStore> {
 				id: "address",
 				resizable: true,
 				header: t("Address"),
-				sortable: true
+				sortable: true,
+				renderer: (v, _record) => {
+					if(v.charAt(0) === "@") {
+						v = "*"+v;
+					}
+					return v;
+				}
 			}),
 			column({
 				id: "goto",

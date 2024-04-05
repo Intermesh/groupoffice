@@ -62,15 +62,32 @@ class Domain extends AclOwnerEntity
 
 	public $mailboxes;
 
+	public $sumAliases;
+
+	public $sumMailboxes;
+
+	public $sumUsedQuota;
+
+	/*
+	// TODO: default attributes!
+	public function defaultAttributes()
+	{
+		$attr = parent::defaultAttributes();
+		$attr['total_quota']=1024*1024*10;//10 GB of quota per domain by default.
+		$attr['default_quota']=1024*512; //512 MB of default quota
+		return $attr;
+	}
+	*/
+
 	/**
 	 * @inheritDoc
 	 */
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
-			->addTable('community_maildomains_domain', 'cmd')
-			->addScalar('aliases', 'community_maildomains_alias', ['id' => 'domainId'])
-			->addScalar('mailboxes', 'community_maildomains_mailbox', ['id' => 'domainId']);
+			->addTable('community_maildomains_domain', 'cmd');
+//			->addScalar('aliases', 'community_maildomains_alias', ['id' => 'domainId'])
+//			->addScalar('mailboxes', 'community_maildomains_mailbox', ['id' => 'domainId']);
 	}
 
 	/**
@@ -128,4 +145,79 @@ class Domain extends AclOwnerEntity
 	{
 		return $this->domain;
 	}
+
+	/**
+	 * @throws \Exception
+	 */
+	public function getSumUsedQuota(): int
+	{
+		$q = 0;
+		foreach(Mailbox::findByIds($this->mailboxes) as $m) {
+			$q += $m->quota;
+		}
+		return $q;
+	}
+
+
+	public function getSumAliases(): int
+	{
+		$q = 0;
+		foreach(Alias::find()->where(['domainId' => $this->id]) as $a) {
+			$q++;
+		}
+		return $q;
+//		$aliases = Alias::find()->where(['domainId' => $this->id])->select("count(id)")->single();
+		return 42;
+//		return count($this->aliases);
+	}
+
+	public function getSumMailboxes(): int
+	{
+//		return Mailbox::find(['domainId' => $this->id])->foundRows();
+		return count($this->mailboxes);
+	}
+
+	// TODO? Import / Export?
+
+	/*
+	 * 	public function import($data) {
+		$mailboxes = $data['mailboxes'];
+		$aliases = $data['aliases'];
+
+		unset($data['mailboxes']);
+		unset($data['aliases']);
+
+		$data['total_quota']=$data['max_mailboxes']=$data['max_aliases']=0;
+
+		$this->setAttributes($data, false);
+
+		if(!$this->save()){
+			throw new \Exception("couldnt save domain");
+		}
+
+		foreach($mailboxes as $mailboxAttr){
+			$mailbox = new Mailbox();
+			$mailbox->setAttributes($mailboxAttr, false);
+			$mailbox->domain_id = $this->id;
+			$mailbox->skipPasswordEncryption = true;
+			if(!$mailbox->save()) {
+				echo "Failed to save mailbox: ".var_export($mailbox->getValidationErrors(), true)."\n\n";
+			}
+		}
+
+
+		foreach($aliases as $aliasAttr){
+			$alias = new Alias();
+			$alias->setAttributes($aliasAttr, false);
+			$alias->domain_id = $this->id;
+
+
+			if(!$alias->save()) {
+				echo "Failed to save alias: ".var_export($alias->getValidationErrors(), true)."\n\n";
+			}
+		}
+
+		return true;
+	}
+	 */
 }

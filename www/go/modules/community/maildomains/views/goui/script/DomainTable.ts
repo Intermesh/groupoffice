@@ -20,7 +20,16 @@ export class DomainTable extends Table<DataSourceStore> {
 				modifier: {
 					path: "modifiedBy",
 					dataSource: jmapds("UserDisplay")
+				},
+				mailaccounts: {
+					dataSource: jmapds("MailBox"),
+					path: "mailboxes"
+				},
+				mailaliases: {
+					dataSource: jmapds("MailAlias"),
+					path: "aliases"
 				}
+
 			}
 		});
 
@@ -65,7 +74,7 @@ export class DomainTable extends Table<DataSourceStore> {
 				sortable: false,
 				width: 120,
 				renderer: (v, record) => {
-					return record.aliases.length + "/" + v
+					return record.sumAliases + "/" + v
 				}
 			}),
 			column({
@@ -74,7 +83,7 @@ export class DomainTable extends Table<DataSourceStore> {
 				sortable: false,
 				width: 120,
 				renderer: (v, record) => {
-					return record.mailboxes.length + "/" + v
+					return record.sumMailboxes + "/" + v
 				}
 			}),
 			column({
@@ -90,17 +99,19 @@ export class DomainTable extends Table<DataSourceStore> {
 			}),
 			column({
 				header: t("Used quota"),
-				id: "usedQuota",
+				id: "sumUsedQuota",
 				resizable: true,
 				width: 100,
 				sortable: false,
-				renderer: (_v, record) => {
-					let q= 0;
-					for(const mb of record.mailboxes) {
-						q += mb.quota;
-					}
-					q *= 1024;
-					return Format.fileSize(q);
+				renderer: (v, _record) => {
+					// debugger;
+					// let q= 0;
+					// for(const mb of record.mailboxes) {
+					// 	q += mb.quota;
+					// }
+					// q *= 1024;
+					v *= 1024;
+					return Format.fileSize(v);
 				}
 
 			}),

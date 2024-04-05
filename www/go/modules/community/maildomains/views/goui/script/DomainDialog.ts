@@ -202,7 +202,7 @@ export class DomainDialog extends FormWindow {
 						return;
 					}
 					for (const kenny of selectedRows) {
-						jmapds('MailAlias').destroy(this.mailboxGrid!.store.get(kenny)!.id);
+						jmapds('MailAlias').destroy(this.aliasGrid!.store.get(kenny)!.id);
 					}
 				}
 			}),

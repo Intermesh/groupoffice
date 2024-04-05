@@ -40,6 +40,8 @@ final class Alias extends AclItemEntity
 	/** @var bool */
 	public $active = true;
 
+	private $domain = null;
+
 	/**
 	 * @inheritDoc
 	 */
@@ -67,7 +69,7 @@ final class Alias extends AclItemEntity
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()
-			->add("domainId", function(Criteria $criteria, $value) {
+			->add("domainId", function (Criteria $criteria, $value) {
 				$criteria->andWhere('domainId', '=', $value);
 			});
 	}
@@ -83,7 +85,7 @@ final class Alias extends AclItemEntity
 	/**
 	 * @inheritDoc
 	 */
-	protected function getSearchDescription() : string
+	protected function getSearchDescription(): string
 	{
 		return $this->address;
 	}
@@ -104,5 +106,56 @@ final class Alias extends AclItemEntity
 		return $this->address;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
+	public function internalValidate()
+	{
+		$d = $this->getDomain();
+		$domainParts = explode('@', $this->address);
 
+		if (isset($domainParts[1]) && ($domainParts[1] !== $d->domain)) {
+			$this->setValidationError('address', "The domain part of the address must match with the main domain");
+		}
+		parent::internalValidate();
+	}
+
+	/**
+	 *
+	 * @iinheritDoc
+	 * @return bool
+	 * @throws \Exception
+	 */
+	protected function internalSave(): bool
+	{
+		$d = $this->getDomain();
+		if ($this->isNew() && !empty($d->maxAliases)) {
+			if ($d->getSumAliases() >= $d->maxAliases) {
+				throw new \Exception('The maximum number of aliases for this domain has been reached.');
+			}
+		}
+
+		//chop off wildcard because in db it must be @domain.com but we use *@domain.com
+		if(substr($this->address, 0,2) == '*@') {
+			$this->address = substr($this->address, 1);
+		}
+
+		return parent::internalSave();
+	}
+
+
+	/**
+	 * Retrieve the domain
+	 *
+	 * As the ORM does currently not support retrieving its owner entity through a relation, we simply retrieve the
+	 * entity by ID
+	 * @return Domain|null
+	 */
+	private function getDomain(): Domain|null
+	{
+		if (is_null($this->domain) && isset($this->domainId)) {
+			$this->domain = Domain::findById($this->domainId);
+		}
+		return $this->domain;
+	}
 }
