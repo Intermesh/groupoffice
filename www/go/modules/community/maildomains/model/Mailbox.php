@@ -2,12 +2,17 @@
 
 namespace go\modules\community\maildomains\model;
 
+use go\core\acl\model\AclItemEntity;
+use go\core\db\Criteria;
+use go\core\orm\Filters;
 use go\core\orm\Mapping;
-use go\core\orm\Property;
+use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
 
-final class Mailbox extends Property
+final class Mailbox extends AclItemEntity
 {
+	use SearchableTrait;
+
 	/** @var int */
 	public $id;
 
@@ -60,6 +65,63 @@ final class Mailbox extends Property
 	{
 		return parent::defineMapping()
 			->addTable("community_maildomains_mailbox");
+	}
+	protected static function aclEntityClass(): string
+	{
+		return Domain::class;
+	}
+
+	protected static function aclEntityKeys(): array
+	{
+		return ['domainId' => 'id'];
+	}
+
+	public static function getClientName(): string
+	{
+		return "MailBox";
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	protected static function defineFilters(): Filters
+	{
+		return parent::defineFilters()
+			->add("domainId", function(Criteria $criteria, $value) {
+				$criteria->andWhere('domainId', '=', $value);
+			});
+	}
+
+	/**
+	 * @return array|null
+	 */
+	protected function getSearchKeywords(): ?array
+	{
+		return [$this->name, $this->username];
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	protected function getSearchDescription() : string
+	{
+		return $this->name;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	protected static function textFilterColumns(): array
+	{
+		return ['name', 'username'];
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function title(): string
+	{
+		return $this->name;
 	}
 
 }

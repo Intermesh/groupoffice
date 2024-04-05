@@ -1,55 +1,24 @@
 import {
-	btn,
 	checkbox,
 	comp,
-	Component,
-	DefaultEntity, EntityID,
-	fieldset, form,Form,
-	Notifier,
-	numberfield,
-	searchbtn,
-	t, tbar,
-	textfield,
-	Window
+	DefaultEntity, fieldset,
+	t,
+	textfield
 } from "@intermesh/goui";
-import {jmapds} from "@intermesh/groupoffice-core";
+import {FormWindow} from "@intermesh/groupoffice-core";
 
-export class AliasDialog extends Window {
-	public currentId: EntityID|undefined;
-
-	private form: Form;
-
-	public entity: DefaultEntity;
-
-	constructor(entity: DefaultEntity) {
-		super();
+export class AliasDialog extends FormWindow {
+	public entity: DefaultEntity|undefined;
+	constructor() {
+		super("MailAlias");
 
 		this.title = t("Alias");
-		this.entity = entity;
 		this.maximizable = false;
 		this.resizable = true;
 		this.closable = true;
 		this.width = 800;
 
-		this.form = form({
-				cls: "vbox",
-				flex: 1,
-				handler: (f) => {
-					const values = f.value;
-					values.address = values.address+"@"+values.domain;
-					delete values.domain;
-					let a = this.entity.aliases;
-					if(this.currentId) {
-						const ca = a.find((m: any) => {return m.id == this.currentId});
-						Object.assign(ca, values);
-					} else {
-						a.push(values);
-					}
-					jmapds("MailDomain").update(this.entity.id, {
-						aliases: a
-					}).then( () => {debugger;this.close();});
-				}
-			},
+		this.generalTab.items.add(
 			fieldset({flex: 1},
 				comp({cls: "row"},
 					textfield({
@@ -63,9 +32,7 @@ export class AliasDialog extends Window {
 						name: "domain",
 						id: "domain",
 						label: t("Domain"),
-						required: true,
-						readOnly: true,
-						value: this.entity.domain,
+						disabled: true,
 						icon: "alternate_email"
 					}),
 				),
@@ -91,25 +58,23 @@ export class AliasDialog extends Window {
 			)
 		);
 
-		this.items.add(comp({cls: "scroll fit"},
-			this.form,
-			tbar({cls: "border-top"},
-				"->",
-				btn({cls: "filled primary", text: t("Save"), handler: (_btn) => {this.form.submit();}})
-			)
-			)
-		);
-
-	}
-	public load(record: any) {
-		record.domainId = this.entity!.id;
-		if(record.id) {
-			if(record.address.indexOf("@") > -1) {
-				record.address = record.address.split("@")[0];
+		this.on("ready", async () => {
+			this.form.findField("domainId")!.value = this.entity!.id;
+			if (!this.currentId) {
+				this.form.findField("active")!.value = true
+			} else {
+				const address = this.form.findField("address")!.value as String;
+				if (address.indexOf("@") > -1) {
+					this.form.findField("address")!.value = address.split("@")[0];
+				}
 			}
-			this.currentId = record.id;
-		}
-		this.form.value = record;
+			this.form.findField("domain")!.value = this.entity!.domain;
+		});
+
+		this.form.on("beforesave", (f, v) => {
+			v.address = v.address+"@"+this.entity!.domain;
+		});
 	}
 
 }
+

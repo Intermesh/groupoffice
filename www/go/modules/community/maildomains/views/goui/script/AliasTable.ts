@@ -1,17 +1,24 @@
 import {
-	column,
+	column, DataSourceStore, datasourcestore,
 	datecolumn, DefaultEntity,
 	Notifier, store,
 	t,
 	Table
 } from "@intermesh/goui";
+import {jmapds} from "@intermesh/groupoffice-core";
 
-export class AliasTable extends Table {
-
-	public entity : DefaultEntity|undefined;
+export class AliasTable extends Table<DataSourceStore> {
 
 	constructor() {
-		const mbstore = store({data: []});
+		const store = datasourcestore({
+			dataSource: jmapds("MailAlias"),
+			queryParams: {
+				limit: 50,
+				filter: {
+				}
+			},
+			sort: [{property: "address", isAscending: true}]
+		});
 
 		const columns = [
 			column({
@@ -59,7 +66,7 @@ export class AliasTable extends Table {
 			}),
 		];
 
-		super(mbstore, columns );
+		super(store, columns );
 		this.fitParent = true;
 		this.rowSelectionConfig =  {
 			multiSelect: true

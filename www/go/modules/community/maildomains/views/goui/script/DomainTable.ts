@@ -84,6 +84,7 @@ export class DomainTable extends Table<DataSourceStore> {
 				width: 100,
 				sortable: false,
 				renderer: (v) => {
+					v *= 1024;
 					return Format.fileSize(v);
 				}
 			}),
@@ -98,6 +99,7 @@ export class DomainTable extends Table<DataSourceStore> {
 					for(const mb of record.mailboxes) {
 						q += mb.quota;
 					}
+					q *= 1024;
 					return Format.fileSize(q);
 				}
 

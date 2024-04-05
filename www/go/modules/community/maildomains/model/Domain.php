@@ -4,13 +4,15 @@ namespace go\modules\community\maildomains\model;
 
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
-use go\core\model\User;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
+use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
 
 class Domain extends AclOwnerEntity
 {
+	use SearchableTrait;
+
 	/** @var int */
 	public $id;
 
@@ -67,8 +69,8 @@ class Domain extends AclOwnerEntity
 	{
 		return parent::defineMapping()
 			->addTable('community_maildomains_domain', 'cmd')
-			->addArray('aliases', Alias::class, ['id' => 'domainId'])
-			->addArray('mailboxes', Mailbox::class, ['id' => 'domainId']);
+			->addScalar('aliases', 'community_maildomains_alias', ['id' => 'domainId'])
+			->addScalar('mailboxes', 'community_maildomains_mailbox', ['id' => 'domainId']);
 	}
 
 	/**

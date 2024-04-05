@@ -1,20 +1,23 @@
 import {
-	column,
+	column, datasourcestore, DataSourceStore,
 	datecolumn, DefaultEntity,
 	Format,
-	Notifier, store,
 	t,
 	Table
 } from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
-import {MailboxDialog} from "./MailboxDialog";
 
-export class MailboxTable extends Table {
-
-	public entity : DefaultEntity|undefined;
+export class MailboxTable extends Table<DataSourceStore> {
 	constructor() {
-		const mbstore = store({data: []});
-
+		const store = datasourcestore({
+			dataSource: jmapds("MailBox"),
+			queryParams: {
+				limit: 50,
+				filter: {
+				}
+			},
+			sort: [{property: "name", isAscending: true}]
+		});
 		const columns = [
 			column({
 				header: "ID",
@@ -106,7 +109,7 @@ export class MailboxTable extends Table {
 
 		];
 
-		super(mbstore, columns );
+		super(store, columns );
 		this.fitParent = true;
 		this.rowSelectionConfig =  {
 			multiSelect: true

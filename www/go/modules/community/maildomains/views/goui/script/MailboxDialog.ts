@@ -1,29 +1,22 @@
 import {
-	btn,
 	checkbox,
-	comp, DefaultEntity, EntityID,
-	fieldset, Form, form,
+	comp, DefaultEntity,
+	fieldset,
 	numberfield,
-	t, tbar, TextField,
+	t, TextField,
 	textfield,
-	Window
 } from "@intermesh/goui";
-import {jmapds, userdisplaycombo} from "@intermesh/groupoffice-core";
+import {FormWindow} from "@intermesh/groupoffice-core";
 
-export class MailboxDialog extends Window {
-	public currentId: EntityID|undefined;
-
-	public entity: DefaultEntity;
-
-	private form: Form;
+export class MailboxDialog extends FormWindow {
+	public entity: DefaultEntity|undefined;
 
 	private usernameFld: TextField;
 	private passwordFld: TextField;
 	private passwordConfirmFld: TextField;
 
-	constructor(entity: DefaultEntity) {
-		super();
-		this.entity = entity;
+	constructor() {
+		super("MailBox");
 		this.title = t("Mailbox");
 
 		this.maximizable = false;
@@ -31,33 +24,7 @@ export class MailboxDialog extends Window {
 		this.closable = true;
 		this.width = 800;
 
-		this.form = form({
-			cls: "vbox",
-			flex: 1,
-			handler: (f) => {
-				// TODO: Validate password & passwordConfirmation
-				// TODO: Refactor. This code is a bit messy
-				const values = f.value;
-				delete values.passwordConfirm;
-				if(values.password.length === 0 && this.currentId) {
-					delete values.password;
-				}
-				let mb = values;
-				if(this.currentId) {
-					mb = this.entity.mailboxes.find((m: any) => {return m.id == this.currentId});
-					Object.assign(mb, values);
-				}
-				mb.quota *= 1024;
-				mb.username += "@"+this.entity.domain;
-				if(!this.currentId) {
-					this.entity.mailboxes.push(mb);
-				}
-				jmapds("MailDomain").update(this.entity.id, {
-					mailboxes: this.entity.mailboxes
-				} );
-				this.close();
-			}
-			},
+		this.generalTab.items.add(
 			fieldset({flex: 1},
 				comp({cls: "row"},
 					this.usernameFld = textfield({
@@ -72,8 +39,7 @@ export class MailboxDialog extends Window {
 						disabled: true,
 						name: "domain",
 						id: "domain",
-						flex: 0.5,
-						value: this.entity.domain
+						flex: 0.5
 					})
 				),
 				textfield({
@@ -124,30 +90,33 @@ export class MailboxDialog extends Window {
 			)
 		);
 
-		this.items.add(this.form,
-			tbar({cls: "border-top"},
-				"->",
-				btn({cls: "filled primary", text: t("Save"), handler: (_btn) => {this.form.submit();}}))
-		);
-
-		this.on("render", async  () => {
-		});
-	}
-
-	public load(record: any) {
-		if(record.id) {
-			this.currentId = record.id;
-			record.password = "";
-			this.usernameFld.readOnly = true;
-			this.passwordFld.required = false;
-			this.passwordConfirmFld.required = false;
-			if(record.username.indexOf("@") > -1) {
-				record.username = record.username.split("@")[0];
+		this.on("ready", async  () => {
+			this.form.findField("domain")!.value = this.entity!.domain;
+			if (this.currentId) {
+				this.usernameFld.readOnly = true;
+				const username = String(this.usernameFld.value);
+				if (username.indexOf("@") >-1) {
+					this.usernameFld.value = username.split("@")[0];
+				}
+				this.passwordFld.required = false;
+				this.passwordConfirmFld.required = false;
+				this.passwordFld.value = "";
+			} else {
+				this.form.findField("domainId")!.value = this.entity!.id;
+				this.form.findField("active")!.value = true;
 			}
-			record.quota /= 1024;
-		}
-		this.form.value = record;
+		});
 
+		this.form.on("beforesave", (f, v) => {
+			if(this.currentId) {
+				if(v.password.length === 0) {
+					delete v.password;
+				}
+				delete v.username; // This may never change!
+			} else {
+				v.username += "@" + this.entity!.domain;
+			}
+			delete v.passwordConfirm;
+		})
 	}
-
 }
