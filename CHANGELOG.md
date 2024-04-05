@@ -1,3 +1,8 @@
+- ActiveSync: Some email messages that were out of the date range specified could be sent
+- Tasks/Support: Index e-mail of creator for tasks and tickets
+- Support: Allow changing of createdBy / customer for tickets
+- Support: Fixed Client Help portal got error you don't have access to business/support
+
 02-04-2024: 6.8.42
 - Support: Deleting lists was impossible
 - Newsletters: Update list counter when deleting contacts.

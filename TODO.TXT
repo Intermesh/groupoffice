@@ -48,8 +48,10 @@ x Billing module refactor
         - Perhaps black list check?
 
      - sender acl https://beechy.de/postfix-sender_login_maps/
+     - flush cache on password change: doveadm auth cache flush <USER>
      - https://github.com/Intermesh/groupoffice/issues/762#issuecomment-1997097362
 
+- unbound or bind9?
 
 - Rocket chat
     - Live chat on sites feed back into GO

@@ -312,6 +312,7 @@ class Task extends AclItemEntity {
 			$creator = Principal::findById($this->createdBy);
 			if($creator) {
 				$keywords[] = $creator->name;
+				$keywords[] = $creator->email;
 			}
 		}
 		return $keywords;
