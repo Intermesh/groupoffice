@@ -1,6 +1,6 @@
 <?php
 define("ZPUSH_VERSION", "2.6.1");
-define("ZPUSH_DIR", __DIR__ . "/vendor/z-push/");
+define("ZPUSH_DIR", dirname(__DIR__, 2) . "/go/modules/community/activesync/Z-Push/src/");
 
 require(ZPUSH_DIR . 'vendor/autoload.php');
 require("backend/go/autoload.php");
