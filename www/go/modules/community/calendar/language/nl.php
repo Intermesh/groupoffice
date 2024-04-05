@@ -110,6 +110,11 @@ return [
 	'after' => 'erna',
 	'None' => 'Geen',
 
+	'Imported %s events successful.' => 'Importeren van %s afspraken is geslaagd.',
+	'Skipped %s event(s) because UID already existed.' => '%s afspraken zijn overgeslagen omdat het UID al bestaat',
+	'%s events were not imported.' => '%s afspraken zijn niet geimporteerd.',
+	'Reasons' => 'Redenen',
+	'ICS file could not be imported, error: '=> 'ICS bestand kon niet geimporteerd worden, fout: ',
 
 	// schedule massages
 	'newScheduleTitle' => 'Wil je de deelnemers uitnodigen?',

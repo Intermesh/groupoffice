@@ -239,7 +239,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event_alert` (
     CONSTRAINT `fk_calendar_event_alert_calendar_event_user1`
     FOREIGN KEY (`eventId` , `userId`)
     REFERENCES `calendar_event_user` (`eventId` , `userId`)
-    ON DELETE NO ACTION
+    ON DELETE cascade
     ON UPDATE NO ACTION)
     ENGINE = InnoDB;
 -- -----------------------------------------------------

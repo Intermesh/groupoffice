@@ -13,6 +13,7 @@ use go\modules\community\calendar\model\BusyPeriod;
 use go\modules\community\calendar\model\CalendarEvent;
 use go\modules\community\calendar\model\ICalendarHelper;
 use go\modules\community\calendar\model\Settings;
+use Sabre\VObject\Component\VCalendar;
 
 class Module extends core\Module
 {
@@ -67,19 +68,36 @@ class Module extends core\Module
 	public static function onGarbageCollection() {
 
 		// Delete event_data that is not in any calendar anymore.
-		$stmt = go()->getDbConnection()->delete('calendar_event',
-			(new Query)
-				->tableAlias('e')
-				->join("calendar_calendar_event", "ce", 'e.eventId = ce.eventId')
-				->where('ce.eventId', 'IS', null
-			)
+		$stmt = go()->getDbConnection()->delete('calendar_event', (new Query)
+			->tableAlias('e')
+			->join("calendar_calendar_event", "ce", 'e.eventId = ce.eventId', 'LEFT')
+			->where('ce.eventId', 'IS', null)
 		);
-		// echo $stmt;
-		$stmt->execute();
+		 echo $stmt;
+		//$stmt->execute();
 	}
 	public static function onMap(core\orm\Mapping $mapping)
 	{
 		$mapping->addHasOne('calendarPreferences', Preferences::class, ['id' => 'userId'], true);
+	}
+	public function downloadCalendar($id) {
+		$calendar = Calendar::findById($id);
+		if($calendar->getPermissionLevel() < 50) {
+			throw new core\exception\Forbidden('You need manage permission to export this calendar');
+		}
+		$events = CalendarEvent::find()->where(['calendarId' => $id]);
+		header('Content-Type: text/calendar; charset=UTF-8; component=vcalendar');
+		header('Content-Disposition: attachment; filename="'.$calendar->name.'export_'.$calendar->id.'_'.date('Y-m-d').'.ics"');
+		$vcalendar = new VCalendar([
+			'PRODID' => ICalendarHelper::PROD,
+			'METHOD' => 'PUBLISH'
+		]);
+		if($calendar->timeZone) $vcalendar->add("X-WR-TIMEZONE", $calendar->timeZone);
+		if($calendar->description) $vcalendar->add("X-WR-CALDESC", $calendar->description);
+		foreach($events as $ev) {
+			ICalendarHelper::toVObject($ev, $vcalendar);
+		}
+		echo $vcalendar->serialize();
 	}
 
 	public function downloadIcs($key) {

@@ -8,7 +8,7 @@ import {
 	Component,
 	DatePicker,
 	datepicker,
-	DateTime, fieldset, Format,
+	DateTime, displayfield, fieldset, Format,
 	FunctionUtil, hr, List,
 	list,
 	menu, router, select,
@@ -260,6 +260,10 @@ export class Main extends Component {
 		//this.on('render', () => { this.updateView(); });
 	}
 
+	private export(calId: number) {
+
+	}
+
 	private openPDF(type:string) {
 		window.open(client.pageUrl('community/calendar/print/'+type+'/'+this.date.format('Y-m-d')));
 	}
@@ -352,46 +356,78 @@ export class Main extends Component {
 								await dlg.load(data.id);
 								dlg.show();
 							}}),
-							btn({icon:'delete', text: t('Delete')+'…', disabled:!data.myRights.mayAdmin, handler: async _ => {
+							btn({icon:'delete', text: t('Delete','core','core')+'…', disabled:!data.myRights.mayAdmin, handler: async _ => {
 								jmapds("Calendar").confirmDestroy([data.id]);
 								}}),
 							hr(),
 							btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
 								calendarStore.dataSource.update(data.id, {isSubscribed: false});
 							}}),
-							btn({icon:'import_export',hidden:data.groupId, text:t('Import')+'…', handler: async ()=> {
+							hr(),
+							btn({icon:'file_save',hidden:data.groupId, text: t('Export','core','core'), handler: _ => { client.getBlobURL('community/calendar/calendar/'+data.id).then(window.open) }}),
+							btn({icon:'upload_file',hidden:data.groupId, text:t('Import','core','core')+'…', handler: async ()=> {
 								const files = await browser.pickLocalFiles(false,false,'text/calendar');
 								const blob = await client.upload(files[0]);
-								const calendarSelect = select({
-										label: t('Calendar'), name: 'calendarId', required: true, flex: '1 30%',value:data.id,
-										store: calendarStore, valueField: 'id', textRenderer: (r: any) => r.name,
-									}),
-									uidCheckbox = checkbox({name:'ignoreUID', label: t('Import events as new (Ignore UID)')});
-								const w = win({title:'Import ICS file'},
-									fieldset({cls:'pad flow'},
-										comp({cls:'pad',html:t('Import {name} into').replace('{name}', blob.name + ' ('+Format.fileSize(blob.size)+')')}),
-										calendarSelect, uidCheckbox
-									),
-									tbar({},'->',btn({text:t('Start'), handler: () => {
-											client.jmap("CalendarEvent/import", {
-												blobIds:[blob.id],
-												calendarId:calendarSelect.value,
-												ignoreUid: uidCheckbox.value
-											}, 'pIcs').then(r => {
-												// bult events.
-												// set calendarId op alle / flikker uid eruit
-												// call /set create met events
-											});
-									}}))
-								);
-								w.show();
 
+								this.importIcs(blob, data);
 							}})
 						)
 					})]
 				})];
 			}
 		});
+	}
+
+	private importIcs(blob: any, data:any) {
+		const calendarSelect = select({
+				label: t('Calendar'), name: 'calendarId', required: true, flex: '1 30%',value:data.id,
+				store: calendarStore, valueField: 'id', textRenderer: (r: any) => r.name,
+			}),
+			uidCheckbox = checkbox({name:'ignoreUID', label: t('Import events as new (Ignore UID)')}),
+			statusReport = comp({hidden:true}),
+			bbar = tbar({},'->',btn({text:t('Start'), handler: (b) => {
+				w.mask();
+				b.disabled = true;
+				client.jmap("CalendarEvent/import", {
+					blobIds:[blob.id],
+					calendarId:calendarSelect.value,
+					ignoreUid: uidCheckbox.value
+				}, 'pIcs').then(r => {
+					w.unmask();
+					this.adapter.byType('event').store!.load();
+					let statuses = [];
+					if(r.saved) {
+						statuses.push(displayfield({icon: 'done', cls:'green',value: t('Imported %s events successful.').replace('%s', r.saved)}));
+					}
+					if(r.skipped > 0) {
+						statuses.push(displayfield({icon: 'remove_done', cls:'orange',value: t('Skipped %s event(s) because UID already existed.').replace('%s', r.skipped)}));
+					}
+					if(r.failed > 0) {
+						statuses.push(
+							displayfield({icon: 'cancel', cls:'red',value: t('%s events were not imported.').replace('%s', r.failed)}),
+							displayfield({label:t('Reasons'), html: '<ul><li>'+r.failureReasons.join('<li>')+'</ul>'})
+						);
+					}
+					calendarSelect.hidden = true;
+					statusReport.hidden = false;
+					statusReport.items.add(...statuses);
+					bbar.hidden = true;
+					uidCheckbox.hidden = true;
+				}).catch(e => {
+					alert(t('ICS file could not be imported, error: ') + e.message);
+					w.close();
+				});
+			}}));
+			const w = win({title:'Import ICS file', width: 500},
+				fieldset({cls:'pad flow'},
+					comp({cls:'pad',html:t('Import')+ ' '+blob.name + ' ('+Format.fileSize(blob.size)+')'}),
+					calendarSelect, uidCheckbox,statusReport
+				),
+				bbar
+			);
+			w.show();
+
+
 	}
 
 	private applyInCalendarFilter() {

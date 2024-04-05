@@ -18,7 +18,7 @@ export const categoryStore = datasourcestore({
 	sort: [{property:'name'}]
 })
 
-export const t = (key:string) => coreT(key, 'community', 'calendar');
+export const t = (key:string,p='community',m='calendar') => coreT(key, p,m);
 export const statusIcons = {
 	'accepted':		['check_circle', t('Accepted')],
 	'tentative':	['help', t('Maybe')],

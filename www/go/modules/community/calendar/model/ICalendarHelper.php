@@ -238,7 +238,11 @@ class ICalendarHelper {
 		$data = file_get_contents(Blob::buildPath($blobId));
 		$splitter = new VObject\Splitter\ICalendar(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING + VObject\Reader::OPTION_IGNORE_INVALID_LINES);
 		while($vevent = $splitter->getNext()) {
-			yield self::parseVObject($vevent, new CalendarEvent());
+			try {
+				yield self::parseVObject($vevent, new CalendarEvent());
+			} catch(\Throwable $e) {
+				yield ['error'=>$e, 'vevent'=>$vevent];
+			}
 		}
 	}
 

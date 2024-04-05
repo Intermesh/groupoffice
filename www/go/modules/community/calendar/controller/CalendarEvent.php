@@ -117,6 +117,11 @@ class CalendarEvent extends EntityController {
 		];
 		foreach($params['blobIds'] as $blobId) {
 			foreach(model\ICalendarHelper::calendarEventFromFile($blobId) as $ev) {
+				if(is_array($ev)){
+					$r->failureReasons[$r->failed] = 'Parse error '.$ev['vevent']->VEVENT[0]->UID. ': '. $ev['error']->getMessage();
+					$r->failed++;
+					continue;
+				}
 				$ev->calendarId = $params['calendarId'];
 				if(!empty($params['ignoreUid'])) {
 					$ev->uid = UUID::v4();
@@ -128,7 +133,7 @@ class CalendarEvent extends EntityController {
 				if($ev->save()){ // will fail if UID exists. We dont want to modify existing events like this
 					$r->saved++;
 				} else {
-					$r->failureReaons[$ev->uid] = $ev->getValidationErrors();
+					$r->failureReasons[$r->failed] = 'Validate error '.$ev->uid. ': '. var_export($ev->getValidationErrors(),true);
 					$r->failed++;
 				}
 			}

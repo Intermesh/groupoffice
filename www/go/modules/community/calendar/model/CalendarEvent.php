@@ -358,8 +358,11 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	public function end($withoutTime = false) {
-
-		$end = new DateTime($this->start->format("Y-m-d". ($withoutTime?'':" H:i:s")),$this->timeZone()) ;
+		if(empty($this->start)) {
+			$end = new DateTime();
+		} else {
+			$end = new DateTime($this->start->format("Y-m-d" . ($withoutTime ? '' : " H:i:s")), $this->timeZone());
+		}
 		if(!empty($this->duration))
 			$end->add(new \DateInterval($this->duration));
 		return $end;
