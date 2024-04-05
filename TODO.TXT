@@ -48,6 +48,7 @@ x Billing module refactor
         - Perhaps black list check?
 
      - sender acl https://beechy.de/postfix-sender_login_maps/
+     - flush cache on password change: doveadm auth cache flush <USER>
 
 - unbound or bind9?
 

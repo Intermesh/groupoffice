@@ -1,4 +1,6 @@
 - ActiveSync: Some email messages that were out of the date range specified could be sent
+- Tasks/Support: Index e-mail of creator for tasks and tickets
+- Support: Allow changing of createdBy / customer for tickets
 
 02-04-2024: 6.8.42
 - Support: Deleting lists was impossible
