@@ -3,8 +3,10 @@ import {
 	checkbox,
 	comp,
 	Component,
-	DefaultEntity, EntityID,
+	DefaultEntity,
+	EntityID,
 	fieldset,
+	NumberField,
 	numberfield,
 	searchbtn,
 	t,
@@ -25,6 +27,9 @@ export class DomainDialog extends FormWindow {
 	private aliasesTab: Component | undefined;
 	private aliasGrid: AliasTable | undefined;
 
+	private totalQuotaFld: NumberField;
+	private defaultQuotaFld: NumberField;
+
 	private entity: DefaultEntity | undefined;
 
 	constructor() {
@@ -37,7 +42,6 @@ export class DomainDialog extends FormWindow {
 		this.resizable = true;
 		this.closable = true;
 		this.width = 1024;
-		this.height = 800;
 
 		this.createMailboxesTab();
 		this.createAliasTab();
@@ -74,28 +78,30 @@ export class DomainDialog extends FormWindow {
 					id: "maxAliases",
 					label: t("Max aliases"),
 					decimals: 0,
-					flex: 0.5
 				}),
 				numberfield({
 					name: "maxMailboxes",
 					id: "maxMailboxes",
 					label: t("Max mailboxes"),
 					decimals: 0,
-					flex: 0.5
 				}),
-				numberfield({
-					name: "totalQuota",
-					id: "totalQuota",
-					label: t("Max quota (MB)"),
-					decimals: 2,
-					flex: 0.5
-				}),
-				numberfield({
+
+				this.defaultQuotaFld = numberfield({
 					name: "defaultQuota",
 					id: "defaultQuota",
 					label: t("Default quota (MB)"),
-					decimals: 2,
-					flex: 0.5
+					decimals: 0,
+					required: true,
+					value: 0
+				}),
+
+				this.totalQuotaFld = numberfield({
+					name: "totalQuota",
+					id: "totalQuota",
+					label: t("Max quota (MB)"),
+					decimals: 0,
+					required: true,
+					value: 0
 				}),
 				checkbox({
 					label: t("Active"),
@@ -111,6 +117,7 @@ export class DomainDialog extends FormWindow {
 				})
 			)
 		);
+
 		this.cards.items.add(this.mailboxesTab!, this.aliasesTab!)
 		this.addSharePanel();
 
@@ -131,8 +138,16 @@ export class DomainDialog extends FormWindow {
 					this.aliasesTab!.disabled = false;
 				});
 
+				this.defaultQuotaFld.value! /= 1024;
+				this.totalQuotaFld.value! /= 1024;
+
 				this.entity = d;
 			}
+		});
+
+		this.form.on("beforesave", (_f, v) => {
+			v.defaultQuota *= 1024;
+			v.totalQuota *= 1024;
 		});
 	}
 
@@ -144,24 +159,20 @@ export class DomainDialog extends FormWindow {
 				disabled: true
 			}
 		);
-		this.mailboxGrid.on("rowdblclick", async (table, rowIndex, ev) => {
-			this.openMailboxDlg(table.store.get(rowIndex)!.id);
+		this.mailboxGrid.on("rowdblclick", async (table, rowIndex, _ev) => {
+			await this.openMailboxDlg(table.store.get(rowIndex)!.id);
 		});
 		this.mailboxesTab.items.add(tbar({cls: "border-bottom"},
 			btn({
-				cls: "primary filled", icon: "add", text: t("Add"), handler: (_btn) => {
-					this.openMailboxDlg();
+				cls: "primary filled", icon: "add", text: t("Add"), handler: async (_btn) => {
+					await this.openMailboxDlg();
 				}
 			}),
 			btn({
-				icon: "delete", text: t("Delete"), handler: async(_btn) => {
-					const selectedRows = this.mailboxGrid?.rowSelection?.selected;
-					if (!selectedRows?.length) {
-						return;
-					}
-					for (const kenny of selectedRows) {
-						jmapds('MailBox').destroy(this.mailboxGrid!.store.get(kenny)!.id);
-					}
+				icon: "delete", text: t("Delete"), handler: async (_btn) => {
+					const ids = this.mailboxGrid!.rowSelection!.selected.map(index => this.mailboxGrid!.store.get(index)!.id);
+					await jmapds("MailBox")
+						.confirmDestroy(ids);
 				}
 			}),
 			"->",
@@ -185,7 +196,7 @@ export class DomainDialog extends FormWindow {
 		);
 
 		this.aliasGrid = new AliasTable();
-		this.aliasGrid.on("rowdblclick", async (table, rowIndex, ev) => {
+		this.aliasGrid.on("rowdblclick", async (table, rowIndex, _ev) => {
 			await this.openAliasDlg(table.store.get(rowIndex)!.id);
 		});
 
@@ -196,20 +207,17 @@ export class DomainDialog extends FormWindow {
 				}
 			}),
 			btn({
-				icon: "delete", text: t("Delete"), handler: (btn) => {
-					const selectedRows = this.aliasGrid?.rowSelection?.selected;
-					if (!selectedRows?.length) {
-						return;
-					}
-					for (const kenny of selectedRows) {
-						jmapds('MailAlias').destroy(this.aliasGrid!.store.get(kenny)!.id);
-					}
+				icon: "delete", text: t("Delete"), handler: async (_btn) => {
+					const ids = this.aliasGrid!.rowSelection!.selected.map(index => this.aliasGrid!.store.get(index)!.id);
+					await jmapds("MailAlias")
+						.confirmDestroy(ids);
+
 				}
 			}),
 			"->",
 			searchbtn({
 				listeners: {
-					input: (sender, text) => {
+					input: (_sender, text) => {
 						(this.aliasGrid!.store.queryParams.filter as FilterCondition).text = text;
 						this.aliasGrid!.store.load();
 					}
@@ -232,7 +240,7 @@ export class DomainDialog extends FormWindow {
 		const dlg = new AliasDialog();
 		dlg.entity = this.entity;
 		dlg.show();
-		if(id) {
+		if (id) {
 			await dlg.load(id);
 		}
 	}

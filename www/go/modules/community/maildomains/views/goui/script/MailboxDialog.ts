@@ -1,7 +1,7 @@
 import {
 	checkbox,
 	comp, DefaultEntity,
-	fieldset,
+	fieldset, NumberField,
 	numberfield,
 	t, TextField,
 	textfield,
@@ -14,6 +14,7 @@ export class MailboxDialog extends FormWindow {
 	private usernameFld: TextField;
 	private passwordFld: TextField;
 	private passwordConfirmFld: TextField;
+	private quotaFld: NumberField;
 
 	constructor() {
 		super("MailBox");
@@ -68,18 +69,20 @@ export class MailboxDialog extends FormWindow {
 					type: "password",
 					required: true
 				}),
-				numberfield({
+				this.quotaFld = numberfield({
 					name: "quota",
 					id: "quota",
 					label: t("Quota (MB)"),
 					decimals: 0,
+					value: 0,
 					required: true
 				}),
 				checkbox({
 					label: t("Active"),
 					name: "active",
 					id: "active",
-					type: "switch"
+					type: "switch",
+					value: true
 				}),
 				checkbox({
 					label: t("Allow external SMTP usage"),
@@ -101,13 +104,17 @@ export class MailboxDialog extends FormWindow {
 				this.passwordFld.required = false;
 				this.passwordConfirmFld.required = false;
 				this.passwordFld.value = "";
+				this.quotaFld.value! /= 1024;
 			} else {
 				this.form.findField("domainId")!.value = this.entity!.id;
-				this.form.findField("active")!.value = true;
+				this.quotaFld.value = this.entity!.defaultQuota / 1024;
 			}
 		});
 
-		this.form.on("beforesave", (f, v) => {
+		this.form.on("beforesave", (_f, v) => {
+			if(v.quota) {
+				v.quota *= 1024;
+			}
 			if(this.currentId) {
 				if(v.password.length === 0) {
 					delete v.password;

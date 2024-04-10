@@ -1,5 +1,5 @@
 import {btn, comp, Component, Notifier, paginator, searchbtn, t, tbar} from "@intermesh/goui";
-import {authManager, User} from "@intermesh/groupoffice-core";
+import {authManager, jmapds, User} from "@intermesh/groupoffice-core";
 import {DomainTable} from "./DomainTable";
 import {DomainDialog} from "./DomainDialog";
 
@@ -62,7 +62,9 @@ export class MainPanel extends Component {
 							icon: "delete",
 							text: t("Delete"),
 							handler: async () => {
-								// TODO
+								const ids = this.tbl!.rowSelection!.selected.map(index => this.tbl!.store.get(index)!.id);
+								await jmapds("MailDomain")
+									.confirmDestroy(ids);
 							}
 						})
 					),

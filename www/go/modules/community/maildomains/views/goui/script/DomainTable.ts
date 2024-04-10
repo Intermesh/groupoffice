@@ -74,7 +74,7 @@ export class DomainTable extends Table<DataSourceStore> {
 				sortable: false,
 				width: 120,
 				renderer: (v, record) => {
-					return record.sumAliases + "/" + v
+					return record.aliases.length + "/" + (v > 0 ? v : t("Unlimited"));
 				}
 			}),
 			column({
@@ -83,7 +83,7 @@ export class DomainTable extends Table<DataSourceStore> {
 				sortable: false,
 				width: 120,
 				renderer: (v, record) => {
-					return record.sumMailboxes + "/" + v
+					return record.mailboxes.length + "/" + (v > 0 ? v : t("Unlimited"));
 				}
 			}),
 			column({
@@ -93,6 +93,9 @@ export class DomainTable extends Table<DataSourceStore> {
 				width: 100,
 				sortable: false,
 				renderer: (v) => {
+					if(v === 0) {
+						return t("Unlimited");
+					}
 					v *= 1024;
 					return Format.fileSize(v);
 				}
@@ -104,29 +107,22 @@ export class DomainTable extends Table<DataSourceStore> {
 				width: 100,
 				sortable: false,
 				renderer: (v, _record) => {
-					// debugger;
-					// let q= 0;
-					// for(const mb of record.mailboxes) {
-					// 	q += mb.quota;
-					// }
-					// q *= 1024;
+					v = parseInt(v);
 					v *= 1024;
-					return Format.fileSize(v);
+					return (v > 0) ? Format.fileSize(v) : "0B";
 				}
 
 			}),
 			column({
 				header: t("Usage"),
-				id: "usage",
+				id: "sumUsage",
 				resizable: true,
 				width: 100,
 				sortable: false,
-				renderer: (_v, record) => {
-					let q = 0;
-					for(const mb of record.mailboxes) {
-						q += mb.usage;
-					}
-					return Format.fileSize(q);
+				renderer: (v, _record) => {
+					v = parseInt(v);
+					v *= 1024;
+					return (v > 0) ? Format.fileSize(v) : "0B";
 				}
 
 			}),

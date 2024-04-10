@@ -158,17 +158,31 @@ final class Mailbox extends AclItemEntity
 			$this->password = $this->crypt($this->password);
 		}
 
-		if($this->isModified('quota') && $this->quota > 0) {
-			$this->quota *= 1024;
-		}
-
 		if ($this->isNew() || empty($this->homedir)) {
 			$d = $this->getDomain();
 			$parts = explode('@', $this->username);
 			$this->homedir = $d->domain . '/' . $parts[0] . '/';
 			$this->maildir = $d->domain . '/' . $parts[0] . '/Maildir/';
 		}
+		$domain = $this->getDomain();
+		Domain::entityType()->changes([$this->domainId, $domain->findAclId(), false]);
 		return parent::internalSave();
+	}
+
+
+	/**
+	 * Trigger a change on the domain upon deleting a mailbox
+	 *
+	 * @param \go\core\orm\Query $query
+	 * @return bool
+	 * @throws \Exception
+	 */
+	protected static function internalDelete(\go\core\orm\Query $query): bool
+	{
+		$deleteQuery = clone $query;
+		$deleteQuery->selectSingleValue('domainId');
+		Domain::entityType()->changes($deleteQuery->all());
+		return parent::internalDelete($query);
 	}
 
 

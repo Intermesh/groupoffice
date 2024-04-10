@@ -6,10 +6,11 @@ use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
+use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
 
-class Domain extends AclOwnerEntity
+final class Domain extends AclOwnerEntity
 {
 	use SearchableTrait;
 
@@ -62,11 +63,17 @@ class Domain extends AclOwnerEntity
 
 	public $mailboxes;
 
-	public $sumAliases;
+	/** @var int */
+	public $numAliases;
 
-	public $sumMailboxes;
+	/** @var int */
+	public $numMailboxes;
 
+	/** @var int */
 	public $sumUsedQuota;
+
+	/** @var int */
+	public $sumUsage;
 
 	/*
 	// TODO: default attributes!
@@ -85,9 +92,12 @@ class Domain extends AclOwnerEntity
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
-			->addTable('community_maildomains_domain', 'cmd');
-//			->addScalar('aliases', 'community_maildomains_alias', ['id' => 'domainId'])
-//			->addScalar('mailboxes', 'community_maildomains_mailbox', ['id' => 'domainId']);
+			->addTable('community_maildomains_domain', 'cmd')
+			->addQuery((new Query())->select('SUM(COALESCE(`cmm`.`quota`,0)) as `sumUsedQuota`, SUM(COALESCE(`cmm`.`usage`,0)) as `sumUsage`')
+				->join('community_maildomains_mailbox', 'cmm', '`cmd`.`id`=`cmm`.`domainId`', 'LEFT')
+				->groupBy(['`cmm`.`domainId`']))
+			->addScalar('aliases', 'community_maildomains_alias', ['id' => 'domainId'])
+			->addScalar('mailboxes', 'community_maildomains_mailbox', ['id' => 'domainId']);
 	}
 
 	/**
@@ -146,34 +156,25 @@ class Domain extends AclOwnerEntity
 		return $this->domain;
 	}
 
-	/**
-	 * @throws \Exception
-	 */
 	public function getSumUsedQuota(): int
 	{
-		$q = 0;
-		foreach(Mailbox::findByIds($this->mailboxes) as $m) {
-			$q += $m->quota;
-		}
-		return $q;
+		return $this->sumUsedQuota;
+	}
+
+	public function getSumUsage(): int
+	{
+		return $this->sumUsage;
 	}
 
 
-	public function getSumAliases(): int
+	public function getNumAliases(): int
 	{
-		$q = 0;
-		foreach(Alias::find()->where(['domainId' => $this->id]) as $a) {
-			$q++;
-		}
-		return $q;
-//		$aliases = Alias::find()->where(['domainId' => $this->id])->select("count(id)")->single();
-		return 42;
-//		return count($this->aliases);
+		return count($this->aliases);
+
 	}
 
-	public function getSumMailboxes(): int
+	public function getNumMailboxes(): int
 	{
-//		return Mailbox::find(['domainId' => $this->id])->foundRows();
 		return count($this->mailboxes);
 	}
 
