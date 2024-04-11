@@ -63,7 +63,7 @@ class UserSettings extends Property {
 		$tasklist = TaskList::find()->where('createdBy', '=', $this->userId)->single();
 		if(!$tasklist) {
 			$user = User::findById($this->userId, ['displayName', 'enabled']);
-			if(!$user->enabled) {
+			if(!$user || !$user->enabled) {
 				return null;
 			}
 
