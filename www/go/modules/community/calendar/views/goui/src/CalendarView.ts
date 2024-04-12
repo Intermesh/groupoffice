@@ -39,7 +39,7 @@ export abstract class CalendarView extends Component {
 
 	constructor(adapter: CalendarAdapter) {
 		super();
-		CalendarView.selectedCalendarId = client.user.calendarPreferences.defaultCalendarId; // default
+		CalendarView.selectedCalendarId = client.user.calendarPreferences?.defaultCalendarId; // default
 		this.adapter = adapter
 	}
 
@@ -73,9 +73,11 @@ export abstract class CalendarView extends Component {
 		}
 		return div.cls('allday',e.showWithoutTime)
 			.cls('declined', item.isDeclined)
+			.cls('undecided', item.needsAction)
 			.cls('multiday', !e.showWithoutTime && item.dayLength > 1)
 			.attr('tabIndex', 0)
 			.on('click',(_ev)=> {
+				this.focus(); // for catching keydown event
 				// if not holding ctrl or shift, deselect
 				while(this.selected.length) {
 					Object.values(this.selected.shift()!.divs).forEach(el => el.cls('-selected'));

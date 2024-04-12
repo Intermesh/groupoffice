@@ -64,7 +64,8 @@ export class MonthView extends CalendarView {
 			anchor: HTMLElement,
 			currentH = (new DateTime).format('H'),
 			ev: CalendarItem,
-			action: (day:HTMLElement) => void;
+			action: (day:HTMLElement) => void,
+			hasMoved= false;
 
 		const create = (day: HTMLElement) => {
 			[from, till] = (anchor.compareDocumentPosition(day) & 0x02) ? [day,anchor] : [anchor,day];
@@ -84,9 +85,11 @@ export class MonthView extends CalendarView {
 			ev.start.setYear(y).setMonth(m).setDate(d);
 			ev.end = ev.start.clone().add(new DateInterval(ev.data.duration));
 		},
-		mouseMove = ({target}: MouseEvent & {target: HTMLElement}) => {
-			const day = target.up('li[data-date]');
+		mouseMove = (e: MouseEvent & {target: HTMLElement}) => {
+
+			const day = e.target.up('li[data-date]');
 			if(day && day != last) {
+				hasMoved = true;
 				last = day;
 				action(day)
 				Object.values(ev.divs).forEach(d => d.remove());
@@ -96,17 +99,22 @@ export class MonthView extends CalendarView {
 		},
 		mouseUp = (_e: MouseEvent) => {
 			el.un('mousemove', mouseMove);
-			window.removeEventListener('mouseup', mouseUp);
-
-			ev.save( () => {
+			(hasMoved || action === create) && ev.save( () => {
 				//clean
-				const i = this.viewModel.indexOf(ev)
-				this.viewModel.splice(i, 1);
+				//debugger;
+				//if(!ev.data.id) {
+				//	const i = this.viewModel.indexOf(ev)
+				//	this.viewModel.splice(i, 1);
+				//} else {
+					this.populateViewModel();
+				//}
+
 				this.updateItems();
 			});
 		};
 		el.on('mousedown', (e) => {
 			if(e.button !== 0) return;
+			e.preventDefault(); // no text selection
 			const day = e.target.up('li[data-date]');
 			if(day) {
 				const dd = client.user.calendarPreferences.defaultDuration,
@@ -127,7 +135,7 @@ export class MonthView extends CalendarView {
 				anchor = from = till = day;
 				action = create;
 				el.on('mousemove', mouseMove);
-				window.addEventListener('mouseup', mouseUp);
+				window.addEventListener('mouseup', mouseUp, {once:true});
 			}
 			const event = e.target.up('div[data-key]');
 			if(event) {
@@ -135,7 +143,7 @@ export class MonthView extends CalendarView {
 				if(!ev || !ev.isOwner) return;
 				action = move;
 				el.on('mousemove', mouseMove);
-				window.addEventListener('mouseup', mouseUp);
+				window.addEventListener('mouseup', mouseUp, {once:true});
 			}
 		});
 	}
@@ -153,7 +161,6 @@ export class MonthView extends CalendarView {
 		for(const item of this.adapter.items) {
 			this.viewModel.push(item);
 		}
-
 		this.updateItems()
 	}
 

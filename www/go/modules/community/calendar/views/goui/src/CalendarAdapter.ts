@@ -24,14 +24,15 @@ export class CalendarAdapter {
 			if(!p.enabled) continue;
 			const promise = p.load(start,end);
 			if(p.store) {
-				p.store.skipNextEvent = true;
+				//p.store.skipNextEvent = true;
 			}
 			if(p.watch) {
 				promise.then(_evs => {
 					p.store.on('load', (me: & {skipNextEvent:boolean}) => {
-						if(!me.skipNextEvent)
+						//debugger;
+						//if(!me.skipNextEvent)
 							this.onLoad();
-						me.skipNextEvent = false;
+						//me.skipNextEvent = false;
 					});
 					p.watch = false;
 				})
@@ -80,7 +81,7 @@ export class CalendarAdapter {
 			}
 		},
 		'holiday': {
-			enabled: client.user.calendarPreferences.holidaysAreVisible,
+			enabled: client.user.calendarPreferences?.holidaysAreVisible,
 			list:[],
 			load(start:DateTime,end:DateTime) {
 				return client.jmap("community/calendar/Holiday/fetch",{
@@ -106,7 +107,7 @@ export class CalendarAdapter {
 			}
 		},
 		'task': {
-			enabled: client.user.calendarPreferences.tasksAreVisible,
+			enabled: client.user.calendarPreferences?.tasksAreVisible,
 			store: datasourcestore({dataSource: jmapds('Task')}),
 			*items(start:DateTime,end:DateTime) {
 				for(const t of this.store!.items) {
@@ -135,7 +136,7 @@ export class CalendarAdapter {
 			}
 		},
 		'birthday': {
-			enabled: client.user.calendarPreferences.birthdaysAreVisible,
+			enabled: client.user.calendarPreferences?.birthdaysAreVisible,
 			store: datasourcestore({dataSource: jmapds('Contact')}),
 			*items(from:DateTime,end:DateTime) {
 				const sy= from.getYear();

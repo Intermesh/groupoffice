@@ -80,7 +80,7 @@
 			if(triggerDate > now) return;
 
 			go.Db.store(alert.entity).single(alert.entityId).then((entity) => {
-
+				if(!entity) return;
 				const iconCls = go.Entities.getLinkIcon(alert.entity);
 
 				const c = {

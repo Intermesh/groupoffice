@@ -160,6 +160,77 @@ class Scheduler {
 		return ob_get_clean();
 	}
 
+	static function handleIMIP($imapMessage, $ifMethod=null) {
+		$vcalendar = $imapMessage->getInvitationVcalendar();
+		if(!$vcalendar) {
+			return false;
+		}
+		$method = $vcalendar->method->getValue();
+		if($ifMethod !== null && $ifMethod != $method) {
+			return false;
+		}
+		$vevent = $vcalendar->vevent[0];
+
+		$aliases = \GO\Email\Model\Alias::model()->find(
+			\GO\Base\Db\FindParams::newInstance()
+				->select('email')
+				->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('account_id', $imapMessage->account->id))
+		)->fetchAll(\PDO::FETCH_COLUMN, 0);
+
+		// for case insensitive match
+		$aliases = array_map('strtolower', $aliases);
+
+		$accountEmail = false;
+		if($method ==='REPLY') {
+			if (isset($vevent->organizer)) {
+				$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vevent->organizer));
+				if (in_array($attendeeEmail, $aliases)) {
+					$accountEmail = $attendeeEmail;
+				}
+			}
+		} else {
+			if (isset($vevent->attendee)) {
+				foreach ($vevent->attendee as $vattendee) {
+					$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vattendee));
+					if (in_array($attendeeEmail, $aliases)) {
+						$accountEmail = $attendeeEmail;
+					}
+				}
+			}
+		}
+
+		if (!$accountEmail) {
+			$response['itip']['feedback'] = go()->t("None of the participants match your e-mail aliases for this e-mail account.", "email");
+			return $response;
+		}
+		$from = $imapMessage->from->getAddress();
+		$event = Scheduler::processMessage($vcalendar, $accountEmail, (object)[
+			'email'=>$from['email'],
+			'name'=>$from['personal']
+		]);
+
+
+		$itip = [
+			'method' => $method,
+			'scheduleId' => $accountEmail,
+			'event' => $event
+		];
+		if($method ==='REPLY' && !is_string($event)) {
+			$p = $event->participantByScheduleId($from['email']);
+			if($p) {
+				$lang = go()->t('replyImipBody', 'community', 'calendar');
+
+				$itip['feedback'] = strtr($lang[$p->participationStatus], [
+					'{name}' => $p->name ?? '',
+					'{title}' => $event->title,
+					'{date}' => implode(' ', $event->humanReadableDate()),
+				]);
+			}
+		}
+
+		return $itip;
+
+	}
 
 	static function processMessage($vcalendar, $receiver, $sender) {
 

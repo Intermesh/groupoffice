@@ -54,7 +54,7 @@ class Preferences extends Property
 	 * the email as read and file in the folder specified by *autoAddFileIn*.
 	 * @var bool
 	 */
-	//public $markReadAndFileAutoAdd;
+	public $markReadAndFileAutoAdd;
 
 	/** @var int The id of the mailbox to file event invitations in; should default to the Archive folder. */
 	//public $autoAddFileIn;
@@ -72,7 +72,12 @@ class Preferences extends Property
 	 * as read and file in the folder specified by *autoUpdateFileIn*.
 	 * @var boolean
 	 */
-	//public $markReadAndFileAutoUpdate;
+	public $markReadAndFileAutoUpdate;
+
+	/** @var string date last scan was performed in internal_date format eg: "1-Mar-2019" */
+	public $lastProcessed;
+	/** @var int UID of the last processed email */
+	public $lastProcessedUid;
 
 	/**
 	 * @var int The id of the mailbox to file event updates in; should default to the Archive folder.

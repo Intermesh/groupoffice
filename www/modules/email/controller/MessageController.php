@@ -1415,77 +1415,15 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 	private function _handleInvitations(ImapMessage $imapMessage, $params, $response)
 	{
-		if(!Module::isInstalled('community', 'calendar', true)) {
-			return $response;
-		}
-
-		$vcalendar = $imapMessage->getInvitationVcalendar();
-		if($vcalendar) {
-			$method = $vcalendar->method->getValue();
-			$vevent = $vcalendar->vevent[0];
-
-			$aliases = Alias::model()->find(
-				GO\Base\Db\FindParams::newInstance()
-					->select('email')
-					->criteria(GO\Base\Db\FindCriteria::newInstance()->addCondition('account_id', $imapMessage->account->id))
-			)->fetchAll(\PDO::FETCH_COLUMN, 0);
-
-			// for case insensitive match
-			$aliases = array_map('strtolower', $aliases);
-
-			//$participants = array_merge($vevent->attendee, [$vevent->organizer]);
-			$accountEmail = false;
-			if($method ==='REPLY') {
-				if (isset($vevent->organizer)) {
-					$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vevent->organizer));
-					if (in_array($attendeeEmail, $aliases)) {
-						$accountEmail = $attendeeEmail;
-					}
-				}
-			} else {
-				if (isset($vevent->attendee)) {
-					foreach ($vevent->attendee as $vattendee) {
-						$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vattendee));
-						if (in_array($attendeeEmail, $aliases)) {
-							$accountEmail = $attendeeEmail;
-						}
-					}
-				}
+		if(Module::isInstalled('community', 'calendar', true)) {
+			$itip = Scheduler::handleIMIP($imapMessage);
+			if($itip) {
+				$response['itip'] = $itip;
+//				filter out invites
+//				$response['attachments'] = array_values(array_filter($response['attachments'], function($a) {
+//					return $a['isInvite'] == false;
+//				}));
 			}
-
-			if (!$accountEmail) {
-				$response['itip']['feedback'] = GO::t("None of the participants match your e-mail aliases for this e-mail account.", "email");
-				return $response;
-			}
-			$from = $imapMessage->from->getAddress();
-			$event = Scheduler::processMessage($vcalendar, $accountEmail, (object)[
-				'email'=>$from['email'],
-				'name'=>$from['personal']
-			]);
-
-
-			$response['itip'] = [
-				'method' => $method,
-				'scheduleId' => $accountEmail,
-				'event' => $event
-			];
-			if($method ==='REPLY' && !is_string($event)) {
-				$p = $event->participantByScheduleId($from['email']);
-				if($p) {
-					$lang = go()->t('replyImipBody', 'community', 'calendar');
-
-					$response['itip']['feedback'] = strtr($lang[$p->participationStatus], [
-						'{name}' => $p->name ?? '',
-						'{title}' => $event->title,
-						'{date}' => implode(' ', $event->humanReadableDate()),
-					]);
-				}
-			}
-
-			//filter out invites
-//			$response['attachments'] = array_values(array_filter($response['attachments'], function($a) {
-//				return $a['isInvite'] == false;
-//			}));
 		}
 
 		return $response;

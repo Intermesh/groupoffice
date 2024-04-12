@@ -20,10 +20,10 @@ export const categoryStore = datasourcestore({
 
 export const t = (key:string,p='community',m='calendar') => coreT(key, p,m);
 export const statusIcons = {
-	'accepted':		['check_circle', t('Accepted')],
-	'tentative':	['help', t('Maybe')],
-	'declined':		['block', t('Declined')],
-	'needs-action':['schedule', t('Awaiting reply')]
+	'accepted':		['check_circle', t('Accepted'), 'green'],
+	'tentative':	['help', t('Maybe'), 'orange'],
+	'declined':		['block', t('Declined'), 'red'],
+	'needs-action':['schedule', t('Awaiting reply'), 'orange']
 } as {[status:string]: string[]}
 
 function addEmailAction() {
@@ -109,6 +109,7 @@ function addEmailAction() {
 	}
 }
 
+
 modules.register(  {
 	package: "community",
 	name: "calendar",
@@ -157,6 +158,17 @@ modules.register(  {
 
 		client.on("authenticated",  (client, session) => {
 
+			// OLD CODE
+			async function showBadge() {
+				const count = await go.Jmap.request({method: "CalendarEvent/countMine"});
+				GO.mainLayout.setNotification('calendar', count, 'orange');
+			}
+			go.Db.store("CalendarEvent").on("changes", () => {
+				showBadge();
+			});
+			showBadge();
+			// END OLD CODE
+			client.user.calendarPreferences ||= {};
 			if(!session.capabilities["go:community:calendar"]) {
 				return; // User has no access to this module
 			}

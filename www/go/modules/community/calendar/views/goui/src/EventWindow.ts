@@ -133,6 +133,8 @@ export class EventWindow extends FormWindow {
 					const start = me.getValueAsDateTime(),
 						end = this.endDate.getValueAsDateTime(),
 						format= me.withTime ? "Y-m-dTH:i" : 'Y-m-d';
+					//debugger;
+					console.log(start);
 					if(start){
 						recurrenceField.setStartDate(start);
 					}
@@ -155,7 +157,8 @@ export class EventWindow extends FormWindow {
 							duration = oldEnd.diff(sV);
 						this.startDate.value = eV.add(duration).format(format);
 					}
-					this.item!.end = eV!; // for isInPast
+					if(this.item)
+						this.item.end = eV!; // for isInPast
 				}}
 			}),
 			comp({cls:'hbox'},
@@ -309,9 +312,10 @@ export class EventWindow extends FormWindow {
 	}
 
 	loadEvent(ev: CalendarItem) {
-		this.item = ev;
+
 		//this.title = t(!ev.key ? 'New event' : 'Edit event');
 		if (!ev.key) {
+			this.item = ev;
 			this.form.create(ev.data);
 		} else {
 			this.form.load(ev.data.id!).then(() => {
@@ -321,6 +325,8 @@ export class EventWindow extends FormWindow {
 					this.endDate.value = ev.end.clone().addDays(ev.data.showWithoutTime? -1 : 0).format(ev.data.showWithoutTime ? 'Y-m-d' : 'Y-m-d\TH:i');
 					this.endDate.trackReset();
 				}
+				// set item here because 'setvalue' of end field will change the item.end value
+				this.item = ev;
 			});
 		}
 		this.titleField.focus();

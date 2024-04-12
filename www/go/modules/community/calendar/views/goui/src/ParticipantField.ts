@@ -52,7 +52,7 @@ export class ParticipantField extends Component {
 							flex: '1 0 60%',
 							html: v.name ? v.name + (v.email ? '<br>' + v.email :'') : v.email
 						}),
-						comp({tagName:'i',cls:'icon',html:statusIcon[0],title:statusIcon[1], style:{margin:'0 8px'}}),
+						comp({tagName:'i',cls:'icon '+statusIcon[2],html:statusIcon[0],title:statusIcon[1], style:{margin:'0 8px'}}),
 						btn({icon:'more_vert', menu: menu({},
 								btn({text: v.email, disabled: true}),
 								hr(),

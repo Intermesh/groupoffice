@@ -101,6 +101,9 @@ $icon = [
             <?php $timeLines = $event->humanReadableDate();?>
             <h3><?=$timeLines[0];?></h3>
             <h3><?=$timeLines[1]; ?><span style="margin-left: 16px; font-size: .7em;"><?=!$event->showWithoutTime ? $event->timeZone:''?></span></h3>
+           <?php if($event->isRecurring()): ?>
+            <h3><?=\go\modules\community\calendar\model\RecurrenceRule::humanReadable($event);?></h3>
+           <?php endif; ?>
 
             <?= !empty($event->description) ? '<p>'.htmlentities($event->description).'</p>':''?>
 

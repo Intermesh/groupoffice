@@ -239,6 +239,13 @@ class CalendarEvent extends AclItemEntity {
 			})
 			->addDate('before', function(Criteria $crit, $comparator, $value) {
 				$crit->where('start', '<', $value);
+			})->add('inbox', function(Criteria $crit, $value, Query $query) {
+				// value must be true
+				$query->join('calendar_calendar','cal', 'cal.id = cce.calendarId')
+					->join('calendar_participant', 'p', 'p.eventId = eventdata.eventId AND p.id = cal.ownerId');
+				$crit->where('p.id', '=', go()->getUserId())
+					->andWhere('p.rolesMask & 1 = 0') // !isOwner
+					->andWhere('p.participationStatus', '=', 'needs-action');
 			});
 	}
 
@@ -373,30 +380,31 @@ class CalendarEvent extends AclItemEntity {
 	 * Would be 2 datetimes, 1 date and 2 times if same day, or just 1 or 2 dates when full-day(s)
 	 * @return string[] 2 lines of human readable text
 	 */
-	public function humanReadableDate() {
+	public function humanReadableDate()
+	{
 		$start = $this->start;
 		$end = $this->end();
 		$oneDay = $start->format('Ymd') === $end->format('Ymd');
-		$line1 = go()->t($oneDay ? 'At' : 'From') .' '.
-			go()->t($start->format('l')).
-			$start->format(' j ') . go()->t('full_months')[$start->format('n')].
+		$line1 = go()->t($oneDay ? 'At' : 'From') . ' ' .
+			go()->t($start->format('l')) .
+			$start->format(' j ') . go()->t('full_months')[$start->format('n')] .
 			$start->format(' Y');
-		if(!$oneDay) {
-			if(!$this->showWithoutTime)
-				$line1.= ', '.$start->format('H:i');
+		if (!$oneDay) {
+			if (!$this->showWithoutTime)
+				$line1 .= ', ' . $start->format('H:i');
 			$line1 .= ' ' . go()->t('until');
 		}
-		if($oneDay) {
-			$line2 = $start->format('H:i').' - '.$end->format('H:i');
+		if ($oneDay) {
+			$line2 = $start->format('H:i') . ' - ' . $end->format('H:i');
 		} else {
-			$line2 = go()->t($end->format('l')).
-				$end->format(' j ') . go()->t('full_months')[$end->format('n')].
+			$line2 = go()->t($end->format('l')) .
+				$end->format(' j ') . go()->t('full_months')[$end->format('n')] .
 				$end->format(' Y');
-			if(!$this->showWithoutTime) {
-				$line2.= ', '.$end->format('H:i');
+			if (!$this->showWithoutTime) {
+				$line2 .= ', ' . $end->format('H:i');
 			}
 		}
-		return [$line1,$line2];
+		return [$line1, $line2];
 	}
 
 	private function incrementCalendarModSeq() {

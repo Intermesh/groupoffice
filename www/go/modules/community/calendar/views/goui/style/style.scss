@@ -14,7 +14,7 @@
 	word-wrap: break-word;
 	overflow: hidden;
 	box-sizing: border-box;
-	border-radius: $borderRadius;
+	border-radius: dp(4);
 	height:dp(24);
 	padding: dp(2) dp(6);
 	text-align: left;
@@ -59,6 +59,12 @@
 	}
 	&.declined {
 		text-decoration: line-through white;
+	}
+
+	&.undecided {
+		border: 1px dashed $colorText;
+		color: $colorText;
+		background-color:transparent;
 	}
 
 	&.tentative {

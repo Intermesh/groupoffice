@@ -30,7 +30,7 @@ class RecurrenceRule {
 	public $byDay;
 
 	/** @var int[]  */
-	public $byMonthday;
+	public $byMonthDay;
 
 	/** @var string[] */
 	public $byMonth;
@@ -87,5 +87,65 @@ class RecurrenceRule {
 			yield $recurrenceId->format('Y-m-d\TH:i:s') => $instance;
 			$it->next();
 		}
+	}
+
+	static function humanReadable(CalendarEvent $event) {
+
+		$t = fn($str) => go()->t($str,'community','calendar');
+		$frequencies = [
+			'daily' => [$t("day"), $t('days'), $t('Daily')],
+			'weekly' => [$t("week"), $t('weeks'), $t('Weekly')],
+			'monthly' => [$t("month"), $t('months'), $t('Monthly')],
+			'yearly' => [$t("year"), $t('years'), $t('Annually')]
+		];
+		$suffix = [$t("first"),$t("second"),$t("third"),$t("fourth")];
+		$dayNumbers = ['su'=>0,'mo'=>1,'tu'=>2,'we'=>3,'th'=>4,'fr'=>5,'sa'=>6];
+
+		$rr = $event->getRecurrenceRule();
+		$start = $event->start();
+
+		if (!$rr || !isset($rr->frequency)) {
+			return $t('Not recurring');
+		}
+		$record = $frequencies[$rr->frequency];
+		if (!$record) {
+			return "Unsupported frequency: " . $rr->frequency;
+		}
+		$str = $record[2];
+		if ($rr->interval && $rr->interval !== 1) {
+			$str = strtolower($t('Every')) . ' ' . $rr->interval . ' ' . $record[$rr->interval > 1 ? 1 : 0];
+		}
+		if ($rr->byDay) {
+			$days = [];
+			$workdays = (count($rr->byDay) === 5);
+			foreach ($rr->byDay as $day) {
+				if ($day->day == 'sa' || $day->day == 'su') {
+					$workdays = false;
+				}
+				$nthDay = '';
+				if (isset($day->nthOfPeriod)) {
+					$nthDay = $t('the') . ' ' . ($suffix[$day->nthOfPeriod] || $t('last')) . ' ';
+				}
+				$days[] = $nthDay . $t('full_days')[$dayNumbers[$day->day]];
+			}
+			if ($workdays) {
+				$days = [$t('Workdays')];
+			}
+			$str .= (' ' . $t('at ') . implode(', ', $days));
+		} elseif ($rr->frequency == 'weekly') {
+			$str .= (' ' . $t('at ') . $start->format('l'));
+		}
+		if (isset($rr->byMonthDay)) {
+			$str .= (' ' . $t('at day') . ' ' . implode(', ', $rr->byMonthDay));
+		}
+
+		if (!empty($rr->count)) {
+			$str .= ', ' . $rr->count . ' ' . $t('times');
+		}
+		if (!empty($rr->until)) {
+			$str .= ', ' . $t('until') . ' ' . (new DateTime($rr->until))->format("d-m-Y");
+		}
+
+		return $t('Repeats'). ' '.$str;
 	}
 }

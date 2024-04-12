@@ -427,7 +427,7 @@ class ICalendarHelper {
 		if(isset($parts['WKST'])) $values->firstDayOfWeek = strtolower(isset($parts['WKST']));
 		if(isset($parts['BYDAY'])) {
 			$values->byDay = [];
-			$days = explode(',', $parts['BYDAY']);
+			$days = $parts['BYDAY'];
 			foreach($days as $day) {
 				$bd = (object)['day' => strtolower(substr($day, -2))];
 				if(strlen($day) > 2) {

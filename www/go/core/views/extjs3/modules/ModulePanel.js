@@ -3,6 +3,7 @@ go.modules.ModulePanel = Ext.extend(Ext.Container, {
 	title: '',
 	setTitle(title, _iconCls){
 		this.title = title;
+		this.fireEvent('titlechange', this, title);
 		return this;
 	},
 	/**

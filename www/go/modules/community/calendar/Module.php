@@ -7,6 +7,8 @@ use go\core\cron\GarbageCollection;
 use go\core\model\User;
 use go\core\orm\Property;
 use go\core\orm\Query;
+use go\core\model;
+use go\modules\community\calendar\cron;
 use go\modules\community\calendar\model\Calendar;
 use go\modules\community\calendar\model\Preferences;
 use go\modules\community\calendar\model\BusyPeriod;
@@ -223,6 +225,11 @@ class Module extends core\Module
 		include __DIR__.'/views/imip.php'; // use same html as email because why not
 		require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageFooter.php');
 
+	}
+
+	protected function afterInstall(model\Module $model): bool {
+		cron\ScanEmailForInvites::install("*/5 * * * *");
+		return parent::afterInstall($model);
 	}
 
 //	protected function rights(): array

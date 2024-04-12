@@ -5,11 +5,11 @@ import {
 	cards,
 	checkbox,
 	comp,
-	Component,
+	Component, datasourcestore,
 	DatePicker,
 	datepicker,
 	DateTime, displayfield, fieldset, Format,
-	FunctionUtil, hr, List,
+	FunctionUtil, h3, hr, List,
 	list,
 	menu, router, select,
 	splitter,
@@ -63,9 +63,14 @@ export class Main extends Component {
 		this.cls = 'hbox fit tablet-cards';
 
 		this.adapter.onLoad = () => {
-			console.error('view update');
 			this.view.update();
 		};
+
+		const inviteStore = datasourcestore({
+			dataSource: jmapds('CalendarEvent'),
+			filters: {'invites': {inbox:true}},
+			sort: [{property: 'start'}]
+		});
 
 		const weekView= new WeekView(this.adapter),
 			monthView = new MonthView(this.adapter),
@@ -188,9 +193,39 @@ export class Main extends Component {
 						handler: _ => (new CalendarItem({key:'',data:{
 							start:(new DateTime).format('Y-m-d\TH:00:00.000'),
 							title: t('New event'),
-							duration: client.user.calendarPreferences.defaultDuration ?? "P1H",
+							duration: client.user.calendarPreferences?.defaultDuration ?? "P1H",
 							calendarId: CalendarView.selectedCalendarId
 						}})).save()
+					}),
+					btn({
+						icon: 'inbox',
+						title: t('Invitations'),
+						hidden: !client.user.calendarPreferences?.autoAddInvitations,
+						menu: menu({}, list({
+							store:inviteStore,
+							renderer: (r, row) => {
+								const item = new CalendarItem({key:r.id, data:r}),
+									owner = item.owner,
+									press = function(b:Button,s:'accepted'|'tentative'|'declined') {
+										b.el.cls('+pressed');
+										item.updateParticipation(s).then(() => {
+											inviteStore.reload();
+										});
+
+									};
+								return [
+									comp({html:'<i style="color:#'+item.color+'">&bull;</i> <strong>'+r.title+'</strong><br><small>'+(owner?.name ?? owner?.email ?? t('Unknown owner'))+'</small>' }),
+									h3({html: item.start.format('D j M')+' '+t('at')+' '+item.start.format('H:i')}),
+									comp({cls:'group'},
+										btn({itemId: 'accepted', text:t('Accept'), handler:b=>press(b,'accepted')}),
+										btn({itemId: 'tentative', text:t('Maybe'), handler:b=>press(b,'tentative')}),
+										btn({itemId: 'declined', text:t('Decline'), handler:b=>press(b,'declined')})
+									),
+									hr()
+								];
+							}
+						}))
+
 					}),
 					this.currentText = comp({tagName: 'h3', text: t('Today'), flex: '1 1 50%', style: {minWidth: '100px', fontSize: '1.8em'}}),
 					//'->',
@@ -198,7 +233,7 @@ export class Main extends Component {
 						btn({icon: 'view_day', text: t('Day'), handler: _b => this.routeTo('day', this.date)}),
 						btn({icon: 'view_week', text: t('Week'), handler: _b => this.routeTo('week', this.date)}),
 						btn({icon: 'view_module', text: t('Month'), handler: _b => this.routeTo('month', this.date)}),
-						btn({icon: 'view_module', text: t('Year'), handler: _b => this.routeTo('year', this.date)}),
+						btn({icon: 'view_compact', text: t('Year'), handler: _b => this.routeTo('year', this.date)}),
 						btn({icon: 'call_split', text: t('Split'), handler: _b => this.routeTo('split-5', this.date)}),
 						btn({icon: 'list', text: t('List'), handler: _b => this.routeTo('list', this.date)}),
 					),
@@ -206,7 +241,7 @@ export class Main extends Component {
 						btn({icon: 'view_day', text: t('Day'), handler: _b => this.routeTo('day', this.date)}),
 						btn({icon: 'view_week', text: t('Week'), handler: _b => this.routeTo('week', this.date)}),
 						btn({icon: 'view_module', text: t('Month'), handler: _b => this.routeTo('month', this.date)}),
-						btn({icon: 'view_module', text: t('Year'), handler: _b => this.routeTo('year', this.date)}),
+						btn({icon: 'view_compact', text: t('Year'), handler: _b => this.routeTo('year', this.date)}),
 						btn({icon: 'call_split', text: t('Split'), handler: _b => this.routeTo('split-5', this.date)}),
 						btn({icon: 'list', text: t('List'), handler: _b => this.routeTo('list', this.date)}),
 					)}),
@@ -253,11 +288,11 @@ export class Main extends Component {
 				)
 			)
 		);
-		this.timeSpan = client.user.calendarPreferences.startView || 'month';
+		this.timeSpan = client.user.calendarPreferences?.startView || 'month';
 		this.date = new DateTime();
 		// NOPE:router will call setSpan and render
 		// calendar store load will call first view update
-		//this.on('render', () => { this.updateView(); });
+		this.on('render', () => { inviteStore.load(); });
 	}
 
 	private export(calId: number) {

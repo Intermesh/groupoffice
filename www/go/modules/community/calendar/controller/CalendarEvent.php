@@ -141,6 +141,22 @@ class CalendarEvent extends EntityController {
 		return $r;
 	}
 
+	public function countMine(): int
+	{
+
+		//$defaultListId = go()->getAuthState()->getUser(['tasksSettings'])->tasksSettings->getDefaultTasklistId();
+
+		$query = model\CalendarEvent::find(['id'])
+			->selectSingleValue("IFNULL(count(*), 0)")
+			->filter(["inbox" => true,]);
+
+//		$query->removeJoin("tasks_task_user");
+//		$query->removeJoin("pr2_hours");
+		//$query->groupBy([]);
+
+		return $query->single();
+	}
+
 //	public function processInvite($params) {
 //		$account = \GO\Email\Model\Account::model()->findByPk($params['accountId']);
 //		$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $params['mailbox'],$params['uid']);

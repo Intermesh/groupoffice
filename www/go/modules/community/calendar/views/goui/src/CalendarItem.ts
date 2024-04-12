@@ -35,6 +35,7 @@ const eventDS = jmapds('CalendarEvent');
 interface CalendarItemConfig {
 	key: string // id/recurrenceId
 	recurrenceId?:string
+	isFirstInSerie?: boolean
 	extraIcons?: MaterialIcon[]
 	data: Partial<CalendarEvent>
 	title?: string
@@ -62,6 +63,7 @@ export class CalendarItem {
 
 	private initStart: string
 	private initEnd: string
+	private isFirstInSerie?: boolean
 
 	cal: any
 
@@ -106,8 +108,8 @@ export class CalendarItem {
 		if(e.recurrenceRule) {
 
 			const r = new Recurrence({dtstart: new Date(e.start), timeZone:e.timeZone, rule: e.recurrenceRule});
+			let first = true;
 			for(const date of r.loop(from, until)){
-				let rEnd = date.clone().add(new DateInterval(e.duration));
 				const recurrenceId = date.format('Y-m-d\TH:i:s');
 
 				if (e.recurrenceOverrides && recurrenceId in e.recurrenceOverrides) {
@@ -121,8 +123,9 @@ export class CalendarItem {
 							recurrenceId,
 							start: overideStart,
 							title: o.title || e.title,
-							end: (o.duration || o.start) ? overideStart.clone().add(new DateInterval(o.duration || e.duration)) : rEnd,
-							data: e
+							end: overideStart.clone().add(new DateInterval(o.duration || e.duration)),
+							data: e,
+							isFirstInSerie: first
 						});
 					}
 				} else {
@@ -130,10 +133,13 @@ export class CalendarItem {
 						key: e.id + '/' + recurrenceId,
 						recurrenceId,
 						start: date.clone(),
-						end: rEnd,
-						data: e
+						end: date.clone().add(new DateInterval(e.duration)),
+						data: e,
+						isFirstInSerie: first
 					});
+
 				}
+				first = false;
 			}
 		} else if (end.date > from.date && start.date < until.date) {
 			yield new CalendarItem({
@@ -157,8 +163,24 @@ export class CalendarItem {
 		return this.calendarPrincipal?.participationStatus === 'declined';
 	}
 
+	get isTentative() {
+		return  this.calendarPrincipal?.participationStatus === 'tentative';
+	}
+
+	get needsAction() {
+		return this.calendarPrincipal?.participationStatus === 'needs-action' && !this.isOwner;
+	}
+
 	get color() {
 		return this.data.color || this.cal?.color || '356772';
+	}
+
+	get owner() {
+		for(const p in this.data.participants) {
+			if (this.data.participants[p].roles.owner) {
+				return this.data.participants[p];
+			}
+		}
 	}
 
 	/** amount of days this event is spanning */
@@ -173,6 +195,7 @@ export class CalendarItem {
 		if(e.recurrenceRule) icons.push('refresh');
 		if(e.links) icons.push('attachment');
 		if(e.alerts) icons.push('notifications');
+		if(this.isTentative) icons.push('question_mark');
 		if(!!e.participants) icons.push('group');
 		if(!icons.length && !e.showWithoutTime) {
 			icons.push('fiber_manual_record') // the dot
@@ -198,7 +221,6 @@ export class CalendarItem {
 
 	open(onCancel?: Function) {
 		//if (!ev.data.id) {
-
 		const dlg = !this.isOwner ? new EventDetailWindow() : new EventWindow();
 		if(dlg instanceof EventWindow) {
 			dlg.on('close', () => {
@@ -339,8 +361,7 @@ export class CalendarItem {
 			// if(Object.keys(modified).length === 0)
 			// 	return
 			// TODO: test this and future patch with new rrule
-			const isFirstInSerie = this.data.start === this.recurrenceId,
-				w = win({
+			const w = win({
 					title: t('Do you want to edit a recurring event?'),
 					width:550,
 					modal: true,
@@ -358,9 +379,9 @@ export class CalendarItem {
 						}
 					}),
 					btn({
-						text: t(isFirstInSerie ? 'All events' : 'This and future events'), // save to series
+						text: t(this.isFirstInSerie ? 'All events' : 'This and future events'), // save to series
 						handler: _b => {
-							const p = isFirstInSerie ?
+							const p = this.isFirstInSerie ?
 								this.patchSeries(modified) :
 								this.patchThisAndFuture(modified);
 							w.close();
