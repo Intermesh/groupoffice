@@ -15,9 +15,10 @@ class QuoteStripper {
 		return this.quote;
 	}
 	split() {
-		let quoteIndex = this.findByBlockQuote();
-		if (quoteIndex < 1) {
-			quoteIndex = this.findQuoteByHeaderBlock();
+		const blockQuoteIndex = this.findByBlockQuote(), headerBlockIndex = this.findQuoteByHeaderBlock();
+		let quoteIndex = blockQuoteIndex;
+		if (blockQuoteIndex < 1 || headerBlockIndex < blockQuoteIndex) {
+			quoteIndex = headerBlockIndex;
 		}
 		if (quoteIndex > 0) {
 			this.bodyWithoutQuote = this.body.substring(0, quoteIndex);
@@ -56,8 +57,8 @@ class QuoteStripper {
 	findQuoteByHeaderBlock() {
 		const lines = this.splitLines();
 		const greaterThan = /^&gt;(\s|&nbsp;)/;
-		const header = /^[a-z]+:(\s|&nbsp;)+.*&lt;[a-z0-9._\-+&]+@[a-z0-9.\-_]+&gt;/i;
-		const maybeHeader = /^[a-z]+:(\s|&nbsp;)+.*/i;
+		const header = /[a-z]+:.*[a-z0-9._\-+&]+@[a-z0-9.\-_]+/i;
+		const maybeHeader = /[a-z]+:.*/i;
 		let pos = 0, maybePos = 0;
 		for (let i = 0, c = lines.length; i < c; i++) {
 			const plain = lines[i].replace(/(<([^>]+)>)/ig, ""); //strip html tags
