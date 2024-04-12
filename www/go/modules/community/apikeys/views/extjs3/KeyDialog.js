@@ -12,6 +12,11 @@ go.modules.community.apikeys.KeyDialog = Ext.extend(go.form.Dialog, {
 						fieldLabel: t("Name"),
 						anchor: '100%',						
 						allowBlank: false
+					},{
+						xtype: 'usercombo',
+						name: 'userId',
+						fieldLabel: t("User"),
+						allowBlank: false
 					}]
 			}
 		];
