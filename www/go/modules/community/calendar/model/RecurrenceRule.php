@@ -115,7 +115,7 @@ class RecurrenceRule {
 		if (isset($rr->interval) && $rr->interval !== 1) {
 			$str = strtolower($t('Every')) . ' ' . $rr->interval . ' ' . $record[$rr->interval > 1 ? 1 : 0];
 		}
-		if ($rr->byDay) {
+		if (!empty($rr->byDay)) {
 			$days = [];
 			$workdays = (count($rr->byDay) === 5);
 			foreach ($rr->byDay as $day) {
