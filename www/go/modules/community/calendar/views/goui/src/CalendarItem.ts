@@ -35,7 +35,6 @@ const eventDS = jmapds('CalendarEvent');
 interface CalendarItemConfig {
 	key: string // id/recurrenceId
 	recurrenceId?:string
-	isFirstInSerie?: boolean
 	extraIcons?: MaterialIcon[]
 	data: Partial<CalendarEvent>
 	title?: string
@@ -63,7 +62,6 @@ export class CalendarItem {
 
 	private initStart: string
 	private initEnd: string
-	private isFirstInSerie?: boolean
 
 	cal: any
 
@@ -108,7 +106,6 @@ export class CalendarItem {
 		if(e.recurrenceRule) {
 
 			const r = new Recurrence({dtstart: new Date(e.start), timeZone:e.timeZone, rule: e.recurrenceRule});
-			let first = true;
 			for(const date of r.loop(from, until)){
 				const recurrenceId = date.format('Y-m-d\TH:i:s');
 
@@ -124,8 +121,7 @@ export class CalendarItem {
 							start: overideStart,
 							title: o.title || e.title,
 							end: overideStart.clone().add(new DateInterval(o.duration || e.duration)),
-							data: e,
-							isFirstInSerie: first
+							data: e
 						});
 					}
 				} else {
@@ -134,12 +130,10 @@ export class CalendarItem {
 						recurrenceId,
 						start: date.clone(),
 						end: date.clone().add(new DateInterval(e.duration)),
-						data: e,
-						isFirstInSerie: first
+						data: e
 					});
 
 				}
-				first = false;
 			}
 		} else if (end.date > from.date && start.date < until.date) {
 			yield new CalendarItem({
@@ -361,6 +355,7 @@ export class CalendarItem {
 			// if(Object.keys(modified).length === 0)
 			// 	return
 			// TODO: test this and future patch with new rrule
+			const isFirstInSeries = this.data.start == this.recurrenceId
 			const w = win({
 					title: t('Do you want to edit a recurring event?'),
 					width:550,
@@ -379,9 +374,9 @@ export class CalendarItem {
 						}
 					}),
 					btn({
-						text: t(this.isFirstInSerie ? 'All events' : 'This and future events'), // save to series
+						text: t(isFirstInSeries ? 'All events' : 'This and future events'), // save to series
 						handler: _b => {
-							const p = this.isFirstInSerie ?
+							const p = isFirstInSeries ?
 								this.patchSeries(modified) :
 								this.patchThisAndFuture(modified);
 							w.close();
