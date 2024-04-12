@@ -25,6 +25,8 @@ export class MailboxDialog extends FormWindow {
 		this.closable = true;
 		this.width = 800;
 
+		const minPasswordLength =  go.Modules.get("core","core").settings.passwordMinLength;
+
 		this.generalTab.items.add(
 			fieldset({flex: 1},
 				comp({cls: "row"},
@@ -60,14 +62,46 @@ export class MailboxDialog extends FormWindow {
 					id: "password",
 					label: t("Password"),
 					type: "password",
-					required: true
+					attr: {
+						minlength: minPasswordLength,
+					},
+					required: true,
+					listeners: {
+						validate: (fld) => {
+							const v = fld.value as string, l = v.length,
+								minValidationLength = fld.required ? 0 : 1;
+							if (l >= minValidationLength && l < minPasswordLength) {
+								fld.setInvalid(t("The minimum length for this field is {max}").replace("{max}", minPasswordLength));
+							}
+							const vc = this.passwordConfirmFld.value as string;
+							if (vc && vc.length > 0 && v !== vc) {
+								fld.setInvalid(t("The passwords do not match"));
+							}
+						}
+					}
 				}),
 				this.passwordConfirmFld = textfield({
 					name: "passwordConfirm",
 					id: "passwordConfirm",
 					label: t("Confirm password"),
 					type: "password",
-					required: true
+					required: true,
+					attr: {
+						minlength: minPasswordLength,
+					},
+					listeners: {
+						validate: (fld) => {
+							const v = fld.value as string, l = v.length,
+								minValidationLength = fld.required ? 0 : 1;
+							if (l >= minValidationLength && l < minPasswordLength) {
+								fld.setInvalid(t("The minimum length for this field is {max}").replace("{max}", minPasswordLength));
+							}
+							const vc = this.passwordFld.value as string;
+							if (vc && vc.length > 0 && v !== vc) {
+								this.passwordFld.setInvalid(t("The passwords do not match"));
+							}
+						}
+					}
 				}),
 				this.quotaFld = numberfield({
 					name: "quota",
@@ -75,7 +109,7 @@ export class MailboxDialog extends FormWindow {
 					label: t("Quota (MB)"),
 					decimals: 0,
 					value: 0,
-					required: true
+					required: true,
 				}),
 				checkbox({
 					label: t("Active"),
@@ -115,8 +149,9 @@ export class MailboxDialog extends FormWindow {
 			if(v.quota) {
 				v.quota *= 1024;
 			}
+
 			if(this.currentId) {
-				if(v.password.length === 0) {
+				if(v.password && v.password.length === 0) {
 					delete v.password;
 				}
 				delete v.username; // This may never change!

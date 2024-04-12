@@ -18,6 +18,8 @@ final class Mailbox extends AclItemEntity
 {
 	use SearchableTrait;
 
+	const EVENT_PASSWORD_VERIFIED = 'passwordverified';
+
 	/** @var int */
 	public $id;
 
@@ -63,6 +65,8 @@ final class Mailbox extends AclItemEntity
 	/** @var int */
 	public $usage;
 	private $domain = null;
+
+	private $plainPassword = null;
 
 	/**
 	 * @inheritDoc
@@ -155,6 +159,7 @@ final class Mailbox extends AclItemEntity
 	protected function internalSave(): bool
 	{
 		if ($this->isModified('password') && strlen($this->password)) {
+			$this->setPassword($this->password);
 			$this->password = $this->crypt($this->password);
 		}
 
@@ -254,7 +259,8 @@ final class Mailbox extends AclItemEntity
 
 
 	/**
-	 * @todo: Do we still need this?
+	 * Save mailbox usage from dovecot input
+	 *
 	 * @return bool
 	 * @throws \Exception
 	 */
@@ -274,7 +280,6 @@ final class Mailbox extends AclItemEntity
 	/**
 	 * See function name. Speaks for itself
 	 *
-	 * @todo: see above: do we still need this?
 	 * @return false|int
 	 */
 	private function getUsageFromDovecot() :false|int
@@ -350,4 +355,15 @@ final class Mailbox extends AclItemEntity
 		}
 		return $this->domain;
 	}
+
+	public function plainPassword(): string
+	{
+		return $this->plainPassword;
+	}
+
+	public function setPassword($password): void
+	{
+		$this->plainPassword = $password;
+	}
+
 }

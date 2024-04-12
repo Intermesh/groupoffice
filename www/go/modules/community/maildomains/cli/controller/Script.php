@@ -5,6 +5,7 @@ namespace go\modules\community\maildomains\cli\controller;
 use go\core\Controller;
 use go\core\db\Query;
 use go\core\fs\Folder;
+use go\modules\community\maildomains\model;
 
 final class Script extends Controller
 {
@@ -33,11 +34,11 @@ final class Script extends Controller
 
 		foreach ($root->getFolders() as $domainFolder) {
 
-			if($domainFolder->getName() == "_trash_") {
+			if ($domainFolder->getName() == "_trash_") {
 				continue;
 			}
 
-			foreach($domainFolder->getFolders() as $homeFolder) {
+			foreach ($domainFolder->getFolders() as $homeFolder) {
 				$homedir = $homeFolder->getRelativePath($root) . "/";
 				$existsInDatabase = (new Query())
 					->selectSingleValue("id")
@@ -45,18 +46,18 @@ final class Script extends Controller
 					->where(['homedir' => $homedir])
 					->single();
 
-				if($existsInDatabase) {
-					echo "EXISTS: " . $homedir ."\n";
+				if ($existsInDatabase) {
+					echo "EXISTS: " . $homedir . "\n";
 				} else {
 
 					$mailboxTrashFolder = $trashFolder->getFolder($homedir);
 
-					if($mailboxTrashFolder->exists()) {
+					if ($mailboxTrashFolder->exists()) {
 						$mailboxTrashFolder = $trashFolder->getFolder($homedir . "-" . date("Y-m-d h:i:sa"));
 					}
 
-					if(!$dryRun) {
-						echo "TRASH: " . $homedir ." -> " . $mailboxTrashFolder . "\n";
+					if (!$dryRun) {
+						echo "TRASH: " . $homedir . " -> " . $mailboxTrashFolder . "\n";
 						$homeFolder->move($mailboxTrashFolder);
 					} else {
 						echo "TRASH (Dry run): " . $homedir . " -> " . $mailboxTrashFolder . "\n";
@@ -64,9 +65,9 @@ final class Script extends Controller
 				}
 			}
 
-			if($domainFolder->isEmpty()) {
-				echo "TRASH: " . $domainFolder->getRelativePath($root) ."\n";
-				if(!$dryRun) {
+			if ($domainFolder->isEmpty()) {
+				echo "TRASH: " . $domainFolder->getRelativePath($root) . "\n";
+				if (!$dryRun) {
 					$domainFolder->delete();
 				}
 			}
@@ -74,5 +75,30 @@ final class Script extends Controller
 		}
 
 
+	}
+
+	/**
+	 * Clean up removed mail boxes
+	 *
+	 * ./cli.php community/maildomains/Script/mailboxUsage  --quiet=[0|1]
+	 */
+	public function mailboxUsage(array $params)
+	{
+		extract($this->checkParams($params, ['q' => 1]));
+
+		$q = (boolean) $q;
+
+		$mbs = model\Mailbox::find()->where(['active' => 1])->select(["maildir", "username", "domainId"])->all();
+
+		foreach ($mbs as $mb) {
+			if (!$q) {
+				echo 'Calculating size of ' . $mb->getMaildirFolder()->getPath() . PHP_EOL;
+			}
+			$mb->cacheUsage();
+
+			if (!$q) {
+				echo \GO\Base\Util\Number::formatSize($mb->usage) . PHP_EOL;
+			}
+		}
 	}
 }

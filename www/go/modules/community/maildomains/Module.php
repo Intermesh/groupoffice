@@ -4,6 +4,8 @@ namespace go\modules\community\maildomains;
 
 use go\core;
 use go\core\model\Module as ModuleModel;
+use go\modules\community\maildomains\model\Mailbox;
+use go\modules\community\pwned\model\Pwned;
 
 final class Module extends core\Module
 {
@@ -15,4 +17,24 @@ final class Module extends core\Module
 		return "Intermesh BV";
 	}
 
+	public function defineListeners()
+	{
+		Mailbox::on(Mailbox::EVENT_VALIDATE, static::class, 'onMailboxValidate');
+	}
+
+	public static function onMailboxValidate(Mailbox $mb)
+	{
+		if (!go()->getModule("community", "pwned")) {
+			return;
+		}
+		$plain = $mb->plainPassword();
+		if(isset($plain)) {
+
+			$pwnd = new Pwned();
+			if($pwnd->hasBeenPwned($plain)) {
+				$mb->setValidationError("password", core\validate\ErrorCode::INVALID_INPUT, "The new password is invalid because it has been breached.");
+			}
+		}
+
+	}
 }
