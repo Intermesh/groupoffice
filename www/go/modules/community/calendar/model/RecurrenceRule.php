@@ -26,7 +26,7 @@ class RecurrenceRule {
 	/** @var string ""mo"|"tu"|"we"|"th"|"fr"|"sa"|"su"" */
 	public $firstDayOfWeek = 'mo';
 
-	/** @var NDay[] {day, nthOfPeriod} */
+	/** @var object[] {day, nthOfPeriod} */
 	public $byDay;
 
 	/** @var int[]  */
@@ -112,7 +112,7 @@ class RecurrenceRule {
 			return "Unsupported frequency: " . $rr->frequency;
 		}
 		$str = $record[2];
-		if ($rr->interval && $rr->interval !== 1) {
+		if (isset($rr->interval) && $rr->interval !== 1) {
 			$str = strtolower($t('Every')) . ' ' . $rr->interval . ' ' . $record[$rr->interval > 1 ? 1 : 0];
 		}
 		if ($rr->byDay) {
