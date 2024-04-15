@@ -17,7 +17,7 @@ class QuoteStripper {
 	split() {
 		const blockQuoteIndex = this.findByBlockQuote(), headerBlockIndex = this.findQuoteByHeaderBlock();
 		let quoteIndex = blockQuoteIndex;
-		if (blockQuoteIndex < 1 || headerBlockIndex < blockQuoteIndex) {
+		if (blockQuoteIndex < 1 || (headerBlockIndex > 0 && headerBlockIndex < blockQuoteIndex)) {
 			quoteIndex = headerBlockIndex;
 		}
 		if (quoteIndex > 0) {
