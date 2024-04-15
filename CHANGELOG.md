@@ -6,6 +6,9 @@
 - Support: Allow changing of createdBy / customer for tickets
 - Support: Fixed Client Help portal got error you don't have access to business/support
 - Studio: New feature to generate a module with two models. Collection and items.
+- Studio: new default canCreate() function for ACL models
+- OTP: Fix validation error when admin disables OTP for non-admin users
+- Core: Display numeric values of Custom Fields with correct number of decimals in grid
 
 02-04-2024: 6.8.42
 - Support: Deleting lists was impossible
