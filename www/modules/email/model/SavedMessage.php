@@ -184,7 +184,7 @@ class SavedMessage extends ComposerMessage
 					$body = \GO\Base\Util\StringHelper::clean_utf8($part->body, $charset);
 					
 					if (stripos($part->ctype_secondary, 'plain') !== false) {
-						$body = $preserveHtmlStyle ? '<div class="msg">' . nl2br($body) . '</div>' : nl2br($body);
+						$body = nl2br($body);
 					} else {
 						$body = \GO\Base\Util\StringHelper::convertLinks($body);
 						$body = \GO\Base\Util\StringHelper::sanitizeHtml($body, $preserveHtmlStyle);
@@ -252,7 +252,7 @@ class SavedMessage extends ComposerMessage
 			//convert text to html
 			if (stripos($structure->ctype_secondary, 'plain') !== false) {
 				$this->extractUuencodedAttachments($text_part);
-				$text_part = $preserveHtmlStyle ? '<div class="msg">' . nl2br($text_part) . '</div>' : nl2br($text_part);
+				$text_part = nl2br($text_part);
 			}else{
 				$text_part = \GO\Base\Util\StringHelper::convertLinks($text_part);
 				$text_part = \GO\Base\Util\StringHelper::sanitizeHtml($text_part, $preserveHtmlStyle);
