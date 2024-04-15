@@ -1,3 +1,4 @@
+- E-mail: Fixed increasing padding when saving drafts multiple times
 - Activesync: Use new community Z-push repo with version 2.7.1 and our pull request: https://github.com/Z-Hub/Z-Push/pull/57
 - Apikeys: Select user for API key to limit permissions
 - ActiveSync: Some email messages that were out of the date range specified could be sent
