@@ -312,6 +312,7 @@ class Task extends AclItemEntity {
 			$creator = UserDisplay::findById($this->createdBy);
 			if($creator) {
 				$keywords[] = $creator->displayName;
+				$keywords[] = $creator->email;
 			}
 		}
 		return $keywords;

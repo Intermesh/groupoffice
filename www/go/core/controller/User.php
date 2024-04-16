@@ -10,7 +10,7 @@ use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\Response;
 use go\core\jmap\Entity;
 use go\core\model;
-
+use go\core\util\ArrayObject;
 
 
 class User extends EntityController {
@@ -84,24 +84,22 @@ class User extends EntityController {
   /**
    * Handles the Foo entity's Foo/query command
    *
-   * @param array $params
-   * @return array
-   * @throws InvalidArguments
+   * @inheritDoc
    * @see https://jmap.io/spec-core.html#/query
    */
-	public function query($params) {
+	public function query(array $params): ArrayObject
+	{
 		return $this->defaultQuery($params);
 	}
 
   /**
    * Handles the Foo entity's Foo/get command
    *
-   * @param array $params
-   * @return array
-   * @throws InvalidArguments
+   * @inheritDoc
    * @see https://jmap.io/spec-core.html#/get
    */
-	public function get($params) {
+	public function get(array $params): ArrayObject
+	{
 		return $this->defaultGet($params);
 	}
 
@@ -109,12 +107,10 @@ class User extends EntityController {
    * Handles the Foo entity's Foo/set command
    *
    * @see https://jmap.io/spec-core.html#/set
-   * @param array $params
-   * @return array
-   * @throws InvalidArguments
-   * @throws \go\core\jmap\exception\StateMismatch
+   * @inheritDoc
    */
-	public function set($params) {
+	public function set(array $params): ArrayObject
+	{
 		return $this->defaultSet($params);
 	}
 
@@ -122,31 +118,34 @@ class User extends EntityController {
   /**
    * Handles the Foo entity's Foo/changes command
    *
-   * @param array $params
-   * @return array
-   * @throws InvalidArguments
+   * @inheritDoc
    * @see https://jmap.io/spec-core.html#/changes
    */
-	public function changes($params) {
+	public function changes(array $params): ArrayObject
+	{
 		return $this->defaultChanges($params);
 	}
 
-	public function export($params) {
+	public function export(array $params)
+	{
 		return $this->defaultExport($params);
 	}
 
-	public function import($params) {
+	public function import(array $params)
+	{
 		return $this->defaultImport($params);
 	}
 
-	public function importCsvMapping($params) {
+	public function importCsvMapping(array $params)
+	{
 		return $this->defaultImportCSVMapping($params);
 	}
 	/**
-	 * @param $params
-	 * @return array
+	 * @param array $params
+	 * @return ArrayObject
 	 */
-	public function exportColumns($params) {
+	public function exportColumns(array $params)
+	{
 		return $this->defaultExportColumns($params);
 	}
 }
