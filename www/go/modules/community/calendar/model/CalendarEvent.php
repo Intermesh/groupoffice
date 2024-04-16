@@ -511,14 +511,24 @@ class CalendarEvent extends AclItemEntity {
 	 * Update the modseq for every calendar this event is in.
 	 */
 	private function changeEventsWithSameUID() {
+//		$changes = CalendarEvent::find()
+//			->select("cce.id, cal.aclId, '0'")
+//			->fetchMode(\PDO::FETCH_ASSOC)
+//			->join("calendar_calendar", "cal", "cal.id = cce.calendarId")
+//			->where('cce.eventId', '=', $this->eventId)
+//			->all();
+//		if(!empty($changes))
+//			CalendarEvent::entityType()->changes($changes);
+
 		$changes = CalendarEvent::find()
-			->select("cce.id, cal.aclId, '0'")
-			->fetchMode(\PDO::FETCH_ASSOC)
-			->join("calendar_calendar", "cal", "cal.id = cce.calendarId")
-			->where('cce.eventId', '=', $this->eventId)
-			->all();
-		if(!empty($changes))
-			CalendarEvent::entityType()->changes($changes);
+			->where('cce.eventId', '=', $this->eventId);
+
+		foreach($changes as $change) {
+			if($change->getPermissionLevel()) {
+				\go\modules\community\calendar\controller\CalendarEvent::onEntitySave($change);
+			}
+			CalendarEvent::entityType()->change($change);
+		}
 	}
 
 	private $calendarParticipant = null;
