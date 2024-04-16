@@ -68,14 +68,13 @@ final class Mailbox extends EntityController
 	}
 
 	/**
-	 * @param $params
-	 * @return ArrayObject
-	 * @throws InvalidArguments
+	 * @inheritDoc
 	 */
 	public function export($params): ArrayObject
 	{
 		return $this->defaultExport($params);
 	}
+
 
 	/**
 	 * @param $params

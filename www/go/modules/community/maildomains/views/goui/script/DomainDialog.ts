@@ -16,6 +16,7 @@ import {
 import {FilterCondition, FormWindow, jmapds, userdisplaycombo} from "@intermesh/groupoffice-core";
 import {AliasTable} from "./AliasTable";
 import {MailboxTable} from "./MailboxTable";
+import {MailboxExportDialog} from "./MailboxExportDialog";
 import {MailboxDialog} from "./MailboxDialog";
 import {AliasDialog} from "./AliasDialog";
 
@@ -142,6 +143,15 @@ export class DomainDialog extends FormWindow {
 				this.totalQuotaFld.value! /= 1024;
 
 				this.entity = d;
+
+				if(d) {
+					const toolbar = this.form.items.last();
+					toolbar!.items.insert(0, btn({
+						text: t("Export"),
+						handler: (_btn) => {
+							this.openExportDlg(d);
+						}}));
+				}
 			}
 		});
 
@@ -244,4 +254,12 @@ export class DomainDialog extends FormWindow {
 			await dlg.load(id);
 		}
 	}
+
+	private async openExportDlg(entity: DefaultEntity): Promise<void> {
+		const ids = Array.from(this.mailboxGrid!.store.data, (m: DefaultEntity) => m.id);
+		const w = new MailboxExportDialog();
+		w.load(entity, ids);
+		w.show();
+	}
+
 }
