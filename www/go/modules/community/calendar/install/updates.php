@@ -1,6 +1,7 @@
 <?php
 
 use go\core\fs\File;
+use go\modules\community\calendar\cron\ScanEmailForInvites;
 use go\modules\community\calendar\model\ICalendarHelper;
 
 // TODO: Remove extension module for old calendar: categoryfilter, 2weekview, caltimetracking, jitsi, defaultcalendaracl, external calendar poll,
@@ -168,4 +169,7 @@ $updates['202403121146'][] = function(){ // migrate files to blob and add as cal
 	}
 };
 
+$updates['202404121640'][] = function(){
+	ScanEmailForInvites::install("*/5 * * * *");
+};
 // TODO: calendar views -> custom filters
