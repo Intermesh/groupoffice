@@ -1,15 +1,17 @@
 <?php
 namespace go\modules\community\apikeys\model;
 
+use go\core\jmap\Entity;
 use go\core\model\Token;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
+use go\core\util\DateTime;
 
-class Key extends \go\core\jmap\Entity {
-	public $id;
-	public $name;	
-	public $accessToken;
-	public $createdAt;
+class Key extends Entity {
+	public ?int $id;
+	public ?string $name;
+	public ?string $accessToken;
+	public ?DateTime $createdAt;
 	
 	protected static function defineMapping(): Mapping
 	{
@@ -22,7 +24,7 @@ class Key extends \go\core\jmap\Entity {
 		
 		if($this->isNew()) {
 			$token = new Token();
-			$token->userId = 1; //TODO make configurable
+			$token->userId = $this->getUserId();
 			$token->expiresAt = null;
 			if(!$token->refresh()) {
 				$this->setValidationError('accessToken', \go\core\validate\ErrorCode::RELATIONAL, 'Could not save token');
@@ -49,6 +51,27 @@ class Key extends \go\core\jmap\Entity {
     }
 
     return true;
+	}
+
+	private int $userId;
+
+	public function setUserId(int $userId): void
+	{
+		$this->userId = $userId;
+	}
+
+	public function getUserId() :int {
+		if(isset($this->userId)) {
+			return $this->userId;
+		}
+
+		if(isset($this->accessToken)) {
+			$token = Token::find(['userId'])->where('accessToken', '=', $this->accessToken)->single();
+			$this->userId = $token->userId;
+			return $this->userId;
+		}
+
+		return go()->getUserId();
 	}
 }
 

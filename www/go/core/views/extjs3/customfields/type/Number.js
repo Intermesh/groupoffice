@@ -26,7 +26,7 @@ go.customfields.type.Number = Ext.extend(go.customfields.type.Text, {
 	 * @returns {unresolved}
 	 */
 	renderDetailView: function (value, data, customfield) {
-		return value !== null ? GO.util.numberFormat(value, customfield.options.numberDecimals) : null;
+		return value !== null ? go.util.Format.number(value, customfield.options.numberDecimals) : null;
 	},
 
 	/**
@@ -54,7 +54,16 @@ go.customfields.type.Number = Ext.extend(go.customfields.type.Text, {
 	getColumnXType : function() {
 		return "numbercolumn";
 	},
-	
+
+	getColumn : function(field) {
+		const c = go.customfields.type.Number.superclass.getColumn.call(this, field);
+		c.renderer = function(v) {
+			return v ? go.util.Format.number(v, field.options.numberDecimals) : "";
+		};
+		return c;
+	},
+
+
 	getFilter : function(field) {
 		return {
 			name: field.databaseName,

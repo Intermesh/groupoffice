@@ -207,17 +207,19 @@ i.icon.em-low_priority {
 		font-size:11.0pt;
 	}
 
-	.msg {
+	color-scheme: light;
+	* {
 		color-scheme: light;
-		* {
-			color-scheme: light;
-		}
-		padding: dp(16);
+	}
+	padding: dp(16);
 
-		img {
-			// no horizontal scrolling in email
-			max-width: 100% !important;
-		}
+	img {
+		// no horizontal scrolling in email
+		max-width: 100% !important;
+	}
+
+	.msg {
+
 	}
 }
 

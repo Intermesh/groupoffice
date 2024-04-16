@@ -12,7 +12,7 @@ require_once ("backend/go/autoload.php");
 const TIMEZONE = '';
 
 // Defines the base path on the server
-define('BASE_PATH', \GO::config()->root_path. 'modules/z-push/vendor/z-push/');
+define('BASE_PATH', \GO::config()->root_path. 'go/modules/community/activesync/Z-Push/src/');
 
 // Try to set 3600 timeout. The max ping life time is set to 3540 below in  PING_HIGHER_BOUND_LIFETIME
 const SCRIPT_TIMEOUT = 3600;
@@ -99,7 +99,7 @@ if(!isset(\GO::config()->zpush2_loglevel)){
 }
 
 		define('LOGBACKEND', 'filelog');
-		define('LOGLEVEL', \GO::config()->zpush2_loglevel);
+		define('LOGLEVEL', LOGLEVEL_WBXML);//\GO::config()->zpush2_loglevel);
 		define('LOGAUTHFAIL', false);
 
 // To save e.g. WBXML data only for selected users, add the usernames to the array

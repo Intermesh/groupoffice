@@ -55,7 +55,7 @@ class UserSettings extends Property {
 		$noteBook = NoteBook::find()->where('createdBy', '=', $this->userId)->single();
 		if(!$noteBook) {
 			$user = User::findById($this->userId, ['displayName', 'enabled']);
-			if(!$user->enabled) {
+			if(!$user || !$user->enabled) {
 				return null;
 			}
 			$noteBook = new NoteBook();

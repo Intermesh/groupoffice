@@ -628,16 +628,27 @@ class StringHelper {
 
 	private static function extractStyles($html, $prefix) {
 
+		$previouslyExtracted = "";
+
 		preg_match_all("'<style[^>]*>(.*?)</style>'usi", $html, $matches);
 		$css = "";
 		for($i = 0, $l = count($matches[0]); $i < $l; $i++) {
 
 			//don't add the style added by group-office inline because it will double up.
-			if(!strstr($matches[0][$i], 'groupoffice-email-style')) {
-				$tmpCss = $matches[1][$i];
-				$tmpCss = preg_replace(["'<!--'", "'-->'"], "", $tmpCss);
-				$css .= $tmpCss. "\n\n"; // $matches[1][$i]
+			if(strstr($matches[0][$i], 'groupoffice-email-style')) {
+				continue;
 			}
+
+			if(strstr($matches[0][$i], 'groupoffice-extracted-style')) {
+				$previouslyExtracted .= $matches[1][$i] . "\n\n";
+				continue;
+			}
+
+
+			$tmpCss = $matches[1][$i];
+			$tmpCss = preg_replace(["'<!--'", "'-->'"], "", $tmpCss);
+			$css .= $tmpCss. "\n\n"; // $matches[1][$i]
+
 		}
 
 		$style = self::prefixCSSSelectors($css, '.'.$prefix);
@@ -648,7 +659,7 @@ class StringHelper {
 			$style = '.'.$prefix . ' {' . $bodyStyle . "};\n";
 		}
 
-		return $style;
+		return $style . $previouslyExtracted;
 	}
 
 	private static function prefixCSSSelectors(string $css, string $prefix = '.go-html-formatted')
@@ -849,12 +860,18 @@ class StringHelper {
 			$html = StringHelper::replaceEmoticons($html,true);
 
 		if(!empty($styles)) {
-			$html = '<style id="groupoffice-extracted-style">' . $styles . '</style><div class="msg '.$prefix.'">'. $html .'</div>';
-		} else if($preserveHtmlStyle) {
-			$html = trim($html);
-			if(substr($html,0, 17) !== '<div class="msg">') {
-				$html = '<div class="msg">'. $html .'</div>';
+
+
+			if(str_contains($styles, $prefix)) {
+				$html = '<style id="groupoffice-extracted-style">' . $styles . '</style><div class="' . $prefix . '">' . $html . '</div>';
+			} else {
+				$html = '<style id="groupoffice-extracted-style">' . $styles . '</style>' . $html;
 			}
+		} else if($preserveHtmlStyle) {
+//			$html = trim($html);
+//			if(substr($html,0, 17) !== '<div class="msg">') {
+//				$html = '<div class="msg">'. $html .'</div>';
+//			}
 		}
 
 		return $html;

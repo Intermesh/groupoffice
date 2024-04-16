@@ -38,8 +38,13 @@ class Module extends core\Module {
 		User::on(core\jmap\Entity::EVENT_VALIDATE, static::class, 'onUserValidate');
 	}
 
-	public static function onUserValidate(User $user) {
+	public static function onUserValidate(User $user)
+	{
 		if($user->isModified(['otp']) && !$user->otp) {
+			// Prevent validation errors when admin tries to disable OTP for non-admin users
+			if (go()->getAuthState()->isAdmin() && go()->getUserId() !== $user->id) {
+				return;
+			}
 
 			$v = $user->isPasswordVerified();
 			if($v) {

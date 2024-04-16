@@ -4,3 +4,6 @@
 [submodule "www/views/goui/goui"]
 	path = www/views/goui/goui
 	url = git@github.com:Intermesh/goui.git
+[submodule "www/go/modules/community/activesync/Z-Push"]
+	path = www/go/modules/community/activesync/Z-Push
+	url = git@github.com:Intermesh/Z-Push.git

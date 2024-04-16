@@ -92,7 +92,7 @@ class UserSettings extends Property {
 
 
 	public function getSortBy() {
-		return User::findById($this->userId, ['sort_name'])->sort_name == 'first_name' ? 'name' : 'lastName';
+		return isset($this->userId) ? (User::findById($this->userId, ['sort_name'])->sort_name == 'first_name' ? 'name' : 'lastName') : 'name';
 	}
 
 	

@@ -3604,10 +3604,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 		
 		if(isset($attr['mtime'])) {
-			$attr['modifiedAt'] = \DateTime::createFromFormat("U", $attr['mtime']);
+			$search->modifiedAt = \DateTime::createFromFormat("U", $attr['mtime']);
 
 		} else {
-			$attr['modifiedAt'] = \DateTime::createFromFormat("U", $this->mtime);
+			$search->modifiedAt = \DateTime::createFromFormat("U", $this->mtime);
 		}
 		unset($attr['mtime']);
 
@@ -3619,7 +3619,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$attr['description'] = '';
 		}		
 		$search->setValues($attr);
-		unset($attr['modifiedAt']);
 		
 		$search->entityId = $this->id;
 		$search->setAclId(!empty($attr['aclId']) ? $attr['aclId'] : $this->findAclId());
