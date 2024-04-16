@@ -47,7 +47,7 @@ interface CalendarItemConfig {
 /**
  * This is the ViewModel for items displaying in the calendar.
  * For now, they can be generated from the CalendarEvent model.
- * Because if recurrence (and overrided) 1 CalendarEvent may return multiple items
+ * Because if recurrence (and overridden) 1 CalendarEvent may return multiple items
  */
 export class CalendarItem {
 
@@ -300,14 +300,6 @@ export class CalendarItem {
 		}
 		return lastOccurrence.date < new Date();
 	}
-	private get scheduleId() {
-		// The "view-user" is either the owner if the calendar the event is in or the current user if no owner (shared calendar)
-		const p = (this.cal && this.cal.ownerId) ? jmapds('Principal').single(this.cal.ownerId) : go.User;
-		return p?.email;
-		//return (this.cal && this.cal.ownerId) ? this.cal.ownerId+'' : go.User.id+''
-	}
-
-
 
 	updateParticipation(status: "accepted"|"tentative"|"declined") {
 		if(!this.calendarPrincipal)
@@ -354,7 +346,6 @@ export class CalendarItem {
 			// }
 			// if(Object.keys(modified).length === 0)
 			// 	return
-			// TODO: test this and future patch with new rrule
 			const isFirstInSeries = this.data.start == this.recurrenceId
 			const w = win({
 					title: t('Do you want to edit a recurring event?'),
@@ -376,9 +367,9 @@ export class CalendarItem {
 					btn({
 						text: t(isFirstInSeries ? 'All events' : 'This and future events'), // save to series
 						handler: _b => {
-							const p = isFirstInSeries ?
-								this.patchSeries(modified) :
-								this.patchThisAndFuture(modified);
+							isFirstInSeries ?
+								this.patchSeries(modified, onFinish) :
+								this.patchThisAndFuture(modified, onFinish);
 							w.close();
 						}
 					})
@@ -448,6 +439,7 @@ export class CalendarItem {
 				Object.values(this.divs).forEach(d => d.remove())
 			});
 		} else {
+			const isFirstInSeries = this.data.start == this.recurrenceId;
 			const w = win({
 					title: t('Do you want to delete a recurring event?'),
 					modal: true,
@@ -460,6 +452,7 @@ export class CalendarItem {
 						cls:'primary',
 						handler: _b => { this.removeOccurrence(); w.close(); }
 					}),btn({
+						hidden: isFirstInSeries,
 						text: t('This and future events'),
 						handler: _b => { this.removeFutureEvents(); w.close(); }
 					}),'->',btn({

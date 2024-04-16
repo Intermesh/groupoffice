@@ -168,8 +168,4 @@ $updates['202403121146'][] = function(){ // migrate files to blob and add as cal
 		$insertFolder($row, $row['files_folder_id'], $path);
 	}
 };
-
-$updates['202404121640'][] = function(){
-	ScanEmailForInvites::install("*/5 * * * *");
-};
 // TODO: calendar views -> custom filters

@@ -133,8 +133,6 @@ export class EventWindow extends FormWindow {
 					const start = me.getValueAsDateTime(),
 						end = this.endDate.getValueAsDateTime(),
 						format= me.withTime ? "Y-m-dTH:i" : 'Y-m-d';
-					//debugger;
-					console.log(start);
 					if(start){
 						recurrenceField.setStartDate(start);
 					}

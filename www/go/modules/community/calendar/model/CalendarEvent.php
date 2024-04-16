@@ -434,7 +434,7 @@ class CalendarEvent extends AclItemEntity {
 
 		$this->resetICalBlob();
 
-		// is modiified, but not calendarId, isDraft or modifiedAt, per-user prop, participants
+		// is modified, but not calendarId, isDraft or modifiedAt, per-user prop, participants
 		if($this->isModified(self::EventProperties) && $this->isOrigin) {
 			if(!$this->isModified('sequence') || $this->sequence <= $this->getOldValue('sequence'))
 				$this->sequence += 1;
