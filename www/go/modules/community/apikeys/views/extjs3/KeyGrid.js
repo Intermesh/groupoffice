@@ -61,7 +61,7 @@ go.modules.community.apikeys.KeyGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: false,
 					dataIndex: 'user',
 					renderer: function (user, meta, record) {
-						return user.username;
+						return user.name;
 					}
 
 				},
