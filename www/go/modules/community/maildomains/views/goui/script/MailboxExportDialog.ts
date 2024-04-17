@@ -4,13 +4,13 @@ import {
 	comp,
 	DefaultEntity, EntityID,
 	fieldset, Form,
-	form,
+	form, Notifier,
 	t,
 	tbar,
 	textfield,
 	Window
 } from "@intermesh/goui";
-import {jmapds} from "@intermesh/groupoffice-core";
+import {client, jmapds} from "@intermesh/groupoffice-core";
 
 export class MailboxExportDialog extends Window {
 	private entity: DefaultEntity|undefined;
@@ -36,14 +36,19 @@ export class MailboxExportDialog extends Window {
 					cols.push("password");
 				}
 				let params = {
-					ids: v.ids,
+					ids: v.ids.split(","),
 					extension: "csv",
 					columns: cols
 				};
-
-				Window.alert("<code>"+JSON.stringify(params)+"</code>");
-				// TODO: kick off the export JMAP call
-				// jmapds("MailDomain").export(params);
+				client.jmap("MailBox/export", params).then(async (response) => {
+					debugger;
+					if(response.blobId) {
+						await client.downloadBlobId(response.blobId, response.blob.name);
+					} else {
+						Notifier.error(t("Error exporting mailboxes"), 5000);
+					}
+					this.close();
+				});
 			}
 		},
 			fieldset({flex: 1, cls: "border-top"},
