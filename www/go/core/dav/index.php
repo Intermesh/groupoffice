@@ -42,8 +42,12 @@ $server = new Server([
 	new CardDAV\AddressBookRoot($principalBackend, new CardDAVBackend()),
 	new CalDAV\CalendarRoot($principalBackend, new CalDAVBackend())
 ]);
+
+//guess the base uri
+$parts = explode("/", ltrim($_SERVER['REQUEST_URI'], "/"));
+
 // Alias /dav/ /path/to/dav/index.php
-$server->setBaseUri(stripos($_SERVER['REQUEST_URI'], basename(__FILE__)) ? __FILE__ : '/dav/');
+$server->setBaseUri("/" . $parts[0] ."/");
 $server->debugExceptions = go()->getDebugger()->enabled;
 $server->on('exception', function($e){
 	if(!($e instanceof NotAuthenticated)) {
