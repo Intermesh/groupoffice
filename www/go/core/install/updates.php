@@ -1628,3 +1628,11 @@ $updates['202403181539'][] = function() {
 		echo "\nDone\n\n";
 	}
 };
+
+
+$updates['202404191216'][] = "alter table core_module
+    drop key name;";
+
+$updates['202404191216'][] = "alter table core_module
+    add constraint name
+        unique (name, package);";
