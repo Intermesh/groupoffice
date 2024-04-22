@@ -2,7 +2,6 @@
 - DAV core: DAV principals didn't apply user permissions
 - Core: Don't re-open tabs on badge notification change
 - Core: close tab with menu and not directly with right click
-- Core: prevent 'password required' validation error if admin resets other user's password
 - Email: Allow full message search by default
 
 16-04-2024: 6.8.43
