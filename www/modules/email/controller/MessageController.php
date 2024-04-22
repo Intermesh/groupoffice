@@ -288,6 +288,15 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if(isset($params['searchIn']) && in_array($params['searchIn'], array('all', 'recursive'))) {
 			$searchIn = $params['searchIn'];
 			$response['multipleFolders'] = true;
+
+			if($searchIn == 'all') {
+
+				$allFolder = go()->getConfig()['community']['email']['allFolder'][$account->host] ?? "virtual/All";
+				if($account->justConnect()->select_mailbox($allFolder)) {
+					$params['mailbox'] = $allFolder;
+					$searchIn = 'current';
+				}
+			}
 		}
 
 		$messages = ImapMessage::model()->find(
