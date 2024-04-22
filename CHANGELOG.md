@@ -1,5 +1,7 @@
 - Studio: fix dependency and minor deprecation errors
 - DAV core: DAV principals didn't apply user permissions
+- Core: Don't re-opn tabs on badge notification change
+- Core: close tab with menu and not directly with right click
 
 
 16-04-2024: 6.8.43
