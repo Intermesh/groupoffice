@@ -64,7 +64,7 @@ class SavedMessage extends ComposerMessage
 	 * @param StringHelper $mimeData The MIME data string.
 	 * @return SavedMessage 
 	 */
-	public function setMimeData($mimeData, $preserveHtmlStyle = true)
+	public function setMimeData($mimeData="", $preserveHtmlStyle = true)
 	{
 		$decoder = new \GO\Base\Mail\MimeDecode($mimeData);
 		$structure = $decoder->decode(array(

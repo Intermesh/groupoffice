@@ -18,6 +18,7 @@
 This folder will be available in the group-office mailserver by default.
 
 - Core: Hint admins to enter their admin password when changing a user password
+- Email: minor bugfix in saved message
 
 16-04-2024: 6.8.43
 - E-mail: Fixed increasing padding when saving drafts multiple times
