@@ -646,7 +646,7 @@ class StringHelper {
 
 
 			$tmpCss = $matches[1][$i];
-//			$tmpCss = preg_replace(["'<!--'", "'-->'"], "", $tmpCss);
+			$tmpCss = preg_replace(["'<!--'", "'-->'"], "", $tmpCss);
 			$css .= $tmpCss. "\n\n"; // $matches[1][$i]
 
 		}
