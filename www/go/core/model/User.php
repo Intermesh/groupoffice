@@ -540,7 +540,11 @@ public function historyLog(): bool|array
 		if(!$this->isModified(['password']) || $this->getOldValue('password') == null) {
 			return true;
 		}
-		
+
+		if (go()->getAuthState()->isAdmin() && go()->getUserId() !== $this->id) {
+			return true;
+		}
+
 		if(App::get()->getInstaller()->isInProgress()) {
 			return true;
 		}
