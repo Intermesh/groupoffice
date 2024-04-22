@@ -1,3 +1,4 @@
+22-04-2024: 6.7.76
 - Tickets: note messages will no longer be sent to the CC-address of the ticket.
 - Email: Save and Send button will be disabled while attachment upload is in progress.
 - ActiveSync: Some email messages that were out of the date range specified could be sent
