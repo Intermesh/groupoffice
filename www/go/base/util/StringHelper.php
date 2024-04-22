@@ -16,6 +16,7 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  * @package GO.base.util
  * @since Group-Office 3.0
+ */
 
 
 namespace GO\Base\Util;

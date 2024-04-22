@@ -146,7 +146,8 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						name: 'currentPassword',
 						inputType: 'password',
 						autocomplete: 'current-password',
-						validateOnBlur: false
+						validateOnBlur: false,
+						hint: GO.user.isAdmin ? t("Enter your administrator password") : undefined
 					}
 				),
 				this.passwordField1 = new go.form.PasswordGeneratorField({
