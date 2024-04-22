@@ -1,6 +1,6 @@
 - Studio: fix dependency and minor deprecation errors
 - DAV core: DAV principals didn't apply user permissions
-
+- Core: prevent 'password required' validation error if admin resets other user's password
 
 16-04-2024: 6.8.43
 - E-mail: Fixed increasing padding when saving drafts multiple times
