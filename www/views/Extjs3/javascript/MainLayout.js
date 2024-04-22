@@ -197,9 +197,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		}, this);
 	},
 
-	getModulePanel: function (moduleName) {
+	getModulePanel: function (moduleName, unhide = true) {
 
-		this.initModule(moduleName);
+		this.initModule(moduleName, unhide);
 		var panelId = 'go-module-panel-' + moduleName;
 		if (this.tabPanel.items.map[panelId]) {
 			return this.tabPanel.items.map[panelId];
@@ -625,7 +625,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 			var panel = GO.moduleManager.getPanel(allPanels[i].moduleName);			
 
-			if (this.state && this.state.indexOf(allPanels[i].moduleName) > -1) {
+			if (this.panelIsVisible(allPanels[i].moduleName)) {
 				items.push(panel);
 			}
 				
@@ -989,7 +989,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		}
 	},
 
-	initModule: function (moduleName) {
+	initModule: function (moduleName, unhide = true) {
 			if(!this.tabPanel) {
 				return false;
 			}
@@ -1011,21 +1011,30 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			if (panel) {
 				panel.id = panelId;
 				panel = this.tabPanel.insert(order, panel);
-				this.saveState();
+
+				if(unhide) {
+					this.saveState();
+				} else {
+					if (!this.panelIsVisible(panel.moduleName)) {
+						this.tabPanel.hideTabStripItem(panel);
+					}
+				}
 			} else {
 				return false;
 			}
 
 		} else {
 			panel = this.tabPanel.items.map[panelId];
-			this.tabPanel.unhideTabStripItem(panel);
+			if(unhide) {
+				this.tabPanel.unhideTabStripItem(panel);
+			}
 		}
 
 		return panel;
 	},
 
 	setNotification: function (moduleName, number, color) {
-		var panel = this.getModulePanel(moduleName);
+		var panel = this.getModulePanel(moduleName, false);
 		if (panel) {
 
 			if (!panel.origTitle) {
@@ -1039,6 +1048,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			panel.setTitle(newTitle);
 		}
 
+	},
+
+	panelIsVisible : function(panelId) {
+		return !this.state || this.state.indexOf(panelId) > -1;
 	},
 
 	openModule: function (moduleName) {
