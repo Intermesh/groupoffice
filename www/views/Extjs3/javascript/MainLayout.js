@@ -168,32 +168,47 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				}
 		}, this);
 
+		const me = this, closeMenu = new Ext.menu.Menu({
+			items: [{
+				iconCls: "ic-close",
+				text: t("Close"),
+				handler: function() {
+					var openModules = me.getOpenModules();
+
+					const panel = this.ownerCt.panel,tp = me.tabPanel;
+
+					//don't hide last tab
+					if (openModules.length > 1) {
+
+						tp.hideTabStripItem(panel);
+						panel.hide();
+
+						if (panel == tp.activeTab) {
+							var next = tp.stack.next();
+							if (next) {
+								tp.setActiveTab(next);
+							} else if (tp.items.getCount() > 0) {
+								tp.setActiveTab(0);
+							} else {
+								tp.activeTab = null;
+							}
+						}
+						me.saveState();
+					}
+				}
+			}]
+		})
+
 		this.tabPanel.on('contextmenu', function (tp, panel, e) {
 
 			if (panel.closable) {
 				return false;
 			}
 
-			var openModules = this.getOpenModules();
+			closeMenu.panel = panel;
+			closeMenu.showAt(e.getXY());
 
-			//don't hide last tab
-			if (openModules.length > 1) {
 
-				tp.hideTabStripItem(panel);
-				panel.hide();
-
-				if (panel == tp.activeTab) {
-					var next = tp.stack.next();
-					if (next) {
-						tp.setActiveTab(next);
-					} else if (tp.items.getCount() > 0) {
-						tp.setActiveTab(0);
-					} else {
-						tp.activeTab = null;
-					}
-				}
-				this.saveState();
-			}
 		}, this);
 	},
 
