@@ -17,6 +17,8 @@
 
 This folder will be available in the group-office mailserver by default.
 
+- Core: Hint admins to enter their admin password when changing a user password
+
 16-04-2024: 6.8.43
 - E-mail: Fixed increasing padding when saving drafts multiple times
 - Activesync: Use new community Z-push repo with version 2.7.1 and our pull request: https://github.com/Z-Hub/Z-Push/pull/57
