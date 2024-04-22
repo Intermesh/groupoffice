@@ -16,7 +16,6 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  * @package GO.base.util
  * @since Group-Office 3.0
- */
 
 
 namespace GO\Base\Util;
@@ -646,7 +645,7 @@ class StringHelper {
 
 
 			$tmpCss = $matches[1][$i];
-			$tmpCss = preg_replace(["'<!--'", "'-->'"], "", $tmpCss);
+//			$tmpCss = preg_replace(["'<!--'", "'-->'"], "", $tmpCss);
 			$css .= $tmpCss. "\n\n"; // $matches[1][$i]
 
 		}
