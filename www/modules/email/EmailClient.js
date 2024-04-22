@@ -160,6 +160,10 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				query = search_type.toUpperCase() + ' "' + GO.email.search_query + '"';
 			}
 			store.baseParams['query'] = query;
+
+			if(GO.email.search_in) {
+				store.baseParams.searchIn = GO.email.search_in;
+			}
 			
 		} else if(!this.searchDialog.hasSearch && store.baseParams['query']) {
 			this.resetSearch();

@@ -3,6 +3,19 @@
 - Core: Don't re-open tabs on badge notification change
 - Core: close tab with menu and not directly with right click
 - Email: Allow full message search by default
+- Email: Select current or all folders from menu
+- Email: New config option to define a hidden folder that shows all:
+
+'community' => [
+	'email' => [
+		'allFolder' => [
+			'mailserver' => 'virtual/All'
+			]
+		]
+	]
+];
+
+This folder will be available in the group-office mailserver by default.
 
 16-04-2024: 6.8.43
 - E-mail: Fixed increasing padding when saving drafts multiple times
