@@ -960,16 +960,18 @@ GO.mainLayout.onReady(function(){
 		//go.Notifier.toggleIcon('email',data.email_status.total_unseen > 0);
 		GO.mainLayout.setNotification('email',data.email_status.total_unseen,'green');
 
-		var ep = GO.mainLayout.getModulePanel('email');
+		if(GO.mainLayout.panelIsVisible('email')) {
+			var ep = GO.mainLayout.getModulePanel('email', false);
 
-		if(ep) {
-			for(var i=0;i<data.email_status.unseen.length;i++) {
-				var s = data.email_status.unseen[i];
-				var changed = ep.updateFolderStatus(s.mailbox, s.unseen,s.account_id);
-				if(changed && ep.messagesGrid.store.baseParams.mailbox==s.mailbox && ep.messagesGrid.store.baseParams.account_id==s.account_id) {
-					ep.messagesGrid.store.reload({
-						keepScrollPosition: true
-					});
+			if (ep) {
+				for (var i = 0; i < data.email_status.unseen.length; i++) {
+					var s = data.email_status.unseen[i];
+					var changed = ep.updateFolderStatus(s.mailbox, s.unseen, s.account_id);
+					if (changed && ep.messagesGrid.store.baseParams.mailbox == s.mailbox && ep.messagesGrid.store.baseParams.account_id == s.account_id) {
+						ep.messagesGrid.store.reload({
+							keepScrollPosition: true
+						});
+					}
 				}
 			}
 		}
