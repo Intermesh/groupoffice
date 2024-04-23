@@ -919,7 +919,6 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 				},
 				success: function(options, response, result)
 				{
-					debugger;
 					this.fromCombo.store.loadData(result.aliases);
 
 					if(this.templatesStore)
