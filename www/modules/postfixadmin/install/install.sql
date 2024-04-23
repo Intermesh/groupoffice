@@ -71,6 +71,7 @@ CREATE TABLE IF NOT EXISTS `pa_mailboxes` (
   `username` varchar(190) NOT NULL DEFAULT '',
   `password` varchar(255) NOT NULL DEFAULT '',
     smtpAllowed bool default false not null,
+    fts boolean default false not null,
   `name` varchar(255) NOT NULL DEFAULT '',
   `maildir` varchar(255) default NULL,
 	`homedir` VARCHAR(255) default NULL,

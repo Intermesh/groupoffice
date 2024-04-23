@@ -122,7 +122,7 @@ class ImapMessage extends ComposerMessage {
 			$message = ImapMessage::model()->createFromHeaders($account, $mailbox, $headers);
 			$results[] = $message;
 		}
-		\GO::debug($mailbox);
+
 		//find recursive in subfolders
 		if($searchIn==='recursive') {
 			

@@ -125,7 +125,7 @@ GO.email.MessagesGrid = function(config){
 
 	this.updateSearchTypeChecks = function() {
 		this.searchTypeButton.menu.items.each(function(i) {
-			if(i.value) {
+			if(i.value && i.group == "radio") {
 				i.setChecked(this.searchType.getValue() == i.value);
 				if (i.checked) {
 					this.searchTypeButton.setIconClass('ic-' + i.icon);
@@ -147,12 +147,6 @@ GO.email.MessagesGrid = function(config){
 			defaults: {
 				checked: false,
 				listeners: {
-					beforecheckchange: function(item, checked) {
-
-						if (!item.value) {
-							return false;
-						}
-					},
 					checkchange: function(item, checked) {
 
 
@@ -179,7 +173,8 @@ GO.email.MessagesGrid = function(config){
 				},
 				group:"radio"
 			},
-			items: [{
+			items: [
+				{
 				value: 'any',
 				text:  t("Any field", "email"),
 				icon: 'select-all'
@@ -206,18 +201,51 @@ GO.email.MessagesGrid = function(config){
 				handler: function(){
 					this.searchDialog.show();
 				},
+				listeners: {},
 				scope: this
-			}]
+			}, "-",
+				{
+					group: "searchIn",
+					value: 'current',
+					text:  t("Current folder", "email"),
+					iconCls: 'ic-folder',
+					checked: true,
+					listeners: {
+						scope: this,
+						checkchange: function(cb, checked) {
+							if(checked) {
+								GO.email.search_in = "current";
+
+								if(this.searchField && this.searchField.getValue()) {
+									this.searchField.search();
+								}
+							}
+						}
+					}
+				},
+				{
+					group: "searchIn",
+					value: 'all',
+					text:  t("All folders", "email"),
+					iconCls: 'ic-folder',
+					listeners: {
+						scope: this,
+						checkchange: function(cb, checked) {
+							if(checked) {
+								GO.email.search_in = "all";
+
+								if(this.searchField && this.searchField.getValue()) {
+									this.searchField.search();
+								}
+							}
+						}
+					}
+				}
+
+
+			]
 		})
 	});
-
-	if(GO.settings.config.email_allow_body_search) {
-		this.searchTypeButton.menu.insert(5,{
-			value: 'fts',
-			text:  t("Full message", "email"),
-			icon: 'email'
-		});
-	}
 
 
 	this.updateSearchTypeChecks();

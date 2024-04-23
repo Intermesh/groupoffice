@@ -313,8 +313,9 @@ class Imap extends ImapBodyStruct
 	public function get_capability() :string
 	{
 		//Cache capability in the session so this command is not used repeatedly
-		if (isset(\GO::session()->values['GO_IMAP'][$this->server]['imap_capability'])) {
-			$this->capability=\GO::session()->values['GO_IMAP'][$this->server]['imap_capability'];
+		$key = $this->server.':'.$this->username;
+		if (isset(\GO::session()->values['GO_IMAP'][$key]['imap_capability'])) {
+			$this->capability=\GO::session()->values['GO_IMAP'][$key]['imap_capability'];
 		}else {
 			if(!isset($this->capability)){
 				$command = "CAPABILITY\r\n";
@@ -322,7 +323,7 @@ class Imap extends ImapBodyStruct
 				$response = $this->get_response();
 				$this->capability = implode(' ', $response);
 			}
-			$this->capability = \GO::session()->values['GO_IMAP'][$this->server]['imap_capability'] = implode(' ', $response);			
+			$this->capability = \GO::session()->values['GO_IMAP'][$key]['imap_capability'] = implode(' ', $response);
 		}
 		return $this->capability;
 	}

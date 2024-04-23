@@ -906,9 +906,10 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 				aliases:{r:'email/alias/store','limit':0}
 			};
 			
-				requests.templates={r:'email/template/emailSelection', 'groupBy':'group_id'};
-				if (!GO.util.empty(config.account_id))
-					requests.templates['account_id'] = config.account_id;
+			requests.templates={r:'email/template/emailSelection', 'groupBy':'group_id'};
+			if (!GO.util.empty(config.account_id)) {
+				requests.templates['account_id'] = config.account_id;
+			}
 			
 				
 			GO.request({

@@ -11,11 +11,11 @@ GO.email.SearchDialog = function(config){
 				
 				this.formPanel = new Ext.FormPanel({
 					defaults: {
-						anchor: '100%'
+						anchor: '-20'
 					},
 					defaultType: 'textfield',
 					cls: 'go-form-panel',
-					autoHeight:true,
+					autoScroll: true,
 					labelWidth:125,
 			        
 					items: [{
@@ -170,8 +170,9 @@ GO.email.SearchDialog = function(config){
 					layout: 'fit',
 					title: t("Search"),
 					modal:false,
-					autoHeight:true,
-					width:500,
+
+					height: dp(800),
+					width:dp(600),
 					closeAction:'hide',				
 					items: this.formPanel,
 					buttons:[{
