@@ -231,7 +231,6 @@ GO.email.MessagesGrid = function(config){
 					listeners: {
 						scope: this,
 						checkchange: function(cb, checked) {
-							debugger;
 							if(checked) {
 								GO.email.search_in = "all";
 
