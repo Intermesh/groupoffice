@@ -299,6 +299,10 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 		}
 
+		if(preg_match('/TEXT "(.*)"/', $query, $matches) && !$this->allowFTS($imap)) {
+			$query = 'OR OR OR FROM "' .$matches[1] . '" SUBJECT "' .$matches[1] . '" TO "' .$matches[1] . '" CC "' .$matches[1] . '"';
+		}
+
 		$messages = ImapMessage::model()->find(
 						$account,
 						$params['mailbox'],
@@ -370,9 +374,16 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		//deletes must be confirmed if no trash folder is used or when we are in the trash folder to delete permanently
 		$response['deleteConfirm'] = empty($account->trash) || $account->trash==$params['mailbox'];
 
+
+		//$response['allowFTS'] =
+
 		return $response;
 	}
-	
+
+
+	private function allowFTS ($imap) :bool{
+		return !empty(go()->getConfig()['email_allow_body_search']) || $imap->has_capability("XFTS");
+	}
 
 
 	/**

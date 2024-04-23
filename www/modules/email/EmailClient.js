@@ -152,9 +152,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 			var query;
 
-			if(search_type == 'any'){
-				query = 'OR OR OR FROM "' + GO.email.search_query + '" SUBJECT "' + GO.email.search_query + '" TO "' + GO.email.search_query + '" CC "' + GO.email.search_query + '"';
-			} else if(search_type=='fts') {
+			if(search_type == 'any' || search_type == 'fts'){
+				// if the server does not support FTS it will be converted into a search for subject, from, to, cc
 				query = 'TEXT "' + GO.email.search_query + '"';
 			} else {
 				query = search_type.toUpperCase() + ' "' + GO.email.search_query + '"';

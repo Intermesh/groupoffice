@@ -173,7 +173,8 @@ GO.email.MessagesGrid = function(config){
 				},
 				group:"radio"
 			},
-			items: [{
+			items: [
+				{
 				value: 'any',
 				text:  t("Any field", "email"),
 				icon: 'select-all'
@@ -246,14 +247,6 @@ GO.email.MessagesGrid = function(config){
 			]
 		})
 	});
-
-	if(GO.settings.config.email_allow_body_search) {
-		this.searchTypeButton.menu.insert(5,{
-			value: 'fts',
-			text:  t("Full message", "email"),
-			icon: 'email'
-		});
-	}
 
 
 	this.updateSearchTypeChecks();
