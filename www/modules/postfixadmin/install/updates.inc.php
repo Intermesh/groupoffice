@@ -74,3 +74,7 @@ $updates['202104301055'][] = "create unique index domain
 
 $updates['202212051053'][] = "alter table pa_mailboxes
     add smtpAllowed bool default false not null after password;";
+
+
+$updates['202404231045'][] = "alter table pa_mailboxes
+    add fts boolean default false not null after smtpAllowed;";
