@@ -1,3 +1,5 @@
+- Postfixadmin: Added "fts" option to enable full text search
+
 23-04-2024: 6.8.44
 - Studio: fix dependency and minor deprecation errors
 - DAV core: DAV principals didn't apply user permissions
