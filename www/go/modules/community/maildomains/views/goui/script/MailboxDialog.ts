@@ -106,22 +106,28 @@ export class MailboxDialog extends FormWindow {
 				this.quotaFld = numberfield({
 					name: "quota",
 					id: "quota",
-					label: t("Quota (MB)"),
+					label: t("Quota (MB)", "community", "maildomains"),
 					decimals: 0,
 					value: 0,
 					required: true,
 				}),
 				checkbox({
-					label: t("Active"),
+					label: t("Active", "community", "maildomains"),
 					name: "active",
 					id: "active",
 					type: "switch",
 					value: true
 				}),
 				checkbox({
-					label: t("Allow external SMTP usage"),
+					label: t("Allow external SMTP usage", "community", "maildomains"),
 					name: "smtpAllowed",
 					id: "smtpAllowed",
+					type: "switch"
+				}),
+				checkbox({
+					label: t("Enable Full Text Search", "community", "maildomains"),
+					name: "fts",
+					id: "fts",
 					type: "switch"
 				})
 			)

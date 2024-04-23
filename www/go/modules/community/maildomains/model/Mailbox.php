@@ -35,6 +35,9 @@ final class Mailbox extends AclItemEntity
 	/** @var bool */
 	public $smtpAllowed;
 
+	/** @var bool */
+	public $fts;
+
 	/** @var string */
 	public $name;
 
