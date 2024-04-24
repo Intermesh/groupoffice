@@ -7,6 +7,8 @@ use Exception;
 use GO;
 use GO\Base\Exception\AccessDenied;
 use GO\Base\Exception\NotFound;
+use GO\Base\Mail\Exception\ImapAuthenticationFailedException;
+use GO\Base\Mail\Exception\MailboxNotFound;
 use GO\Base\Mail\Imap;
 use GO\Base\Mail\Mailer;
 use GO\Base\Mail\SmimeMessage;
@@ -173,6 +175,12 @@ class MessageController extends \GO\Base\Controller\AbstractController
 		return $response;
 	}
 
+	/**
+	 * @throws ImapAuthenticationFailedException
+	 * @throws AccessDenied
+	 * @throws MailboxNotFound
+	 * @throws NotFound
+	 */
 	protected function actionStore(array $params)
 	{
 

@@ -430,18 +430,12 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		]});
 
 	if(!GO.util.isMobileOrTablet()) {
-
-
 		this.messageTbar.insert(-2,{
 			hidden: !GO.email.saveAsItems || !GO.email.saveAsItems.length,
 			iconCls: 'ic-save',
 			text:t("Save as"),
 			menu:this.gridContextMenu.saveAsMenu
 		});
-
-
-
-
 	}
 
 		this.messageTbar.insert(-1, {
@@ -769,7 +763,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			this.treePanel.loader.baseParams.refresh = true;
 		}
 		this.treePanel.root.reload();
-		// this.messagesStore.removeAll();
 
 		if(refresh) {
 			delete this.treePanel.loader.baseParams.refresh;
@@ -891,19 +884,18 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	},
 
 	addSendersToAddresslist : function(data) {
-		var records = this.messagesGrid.getSelectionModel().getSelections();
+		const records = this.messagesGrid.getSelectionModel().getSelections();
 
-		var emails=[];
-		var from =[];
-		for(var i=0;i<records.length;i++) {
+		let emails=[], from =[];
+		for(let i=0; i<records.length; i++) {
 			from.push(records[i].get('from'));
 			emails.push(records[i].get('sender'));
 		}
-		var dialog = new GO.email.AddressListDialog({
-			email:emails[0],
+		const dialog = new GO.email.AddressListDialog({
+			email: emails[0],
 			from: from[0],
 			delete: false,
-			title: t("Add to address list","email")
+			title: t("Add to address list", "email")
 		});
 		dialog.show();
 	},
