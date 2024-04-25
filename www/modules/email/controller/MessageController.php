@@ -382,7 +382,10 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 
 	private function allowFTS ($imap) :bool{
-		return !empty(go()->getConfig()['email_allow_body_search']) || $imap->has_capability("XFTS");
+
+		$forceFTS = go()->getConfig()['community']['email']['forceFTS'][$account->host] ?? false;
+
+		return $forceFTS || $imap->has_capability("XFTS");
 	}
 
 
