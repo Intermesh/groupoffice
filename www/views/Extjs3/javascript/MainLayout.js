@@ -171,38 +171,53 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				}
 		}, this);
 
+		const me = this, closeMenu = new Ext.menu.Menu({
+			items: [{
+				iconCls: "ic-close",
+				text: t("Close"),
+				handler: function() {
+					var openModules = me.getOpenModules();
+
+					const panel = this.ownerCt.panel,tp = me.tabPanel;
+
+					//don't hide last tab
+					if (openModules.length > 1) {
+
+						tp.hideTabStripItem(panel);
+						panel.hide();
+
+						if (panel == tp.activeTab) {
+							var next = tp.stack.next();
+							if (next) {
+								tp.setActiveTab(next);
+							} else if (tp.items.getCount() > 0) {
+								tp.setActiveTab(0);
+							} else {
+								tp.activeTab = null;
+							}
+						}
+						me.saveState();
+					}
+				}
+			}]
+		})
+
 		this.tabPanel.on('contextmenu', function (tp, panel, e) {
 
 			if (panel.closable) {
 				return false;
 			}
 
-			var openModules = this.getOpenModules();
+			closeMenu.panel = panel;
+			closeMenu.showAt(e.getXY());
 
-			//don't hide last tab
-			if (openModules.length > 1) {
 
-				tp.hideTabStripItem(panel);
-				panel.hide();
-
-				if (panel == tp.activeTab) {
-					var next = tp.stack.next();
-					if (next) {
-						tp.setActiveTab(next);
-					} else if (tp.items.getCount() > 0) {
-						tp.setActiveTab(0);
-					} else {
-						tp.activeTab = null;
-					}
-				}
-				this.saveState();
-			}
 		}, this);
 	},
 
-	getModulePanel: function (moduleName) {
+	getModulePanel: function (moduleName, unhide = true) {
 
-		this.initModule(moduleName);
+		this.initModule(moduleName, unhide);
 		var panelId = 'go-module-panel-' + moduleName;
 		if (this.tabPanel.items.map[panelId]) {
 			return this.tabPanel.items.map[panelId];
@@ -628,7 +643,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 			var panel = GO.moduleManager.getPanel(allPanels[i].moduleName);			
 
-			if (this.state && this.state.indexOf(allPanels[i].moduleName) > -1) {
+			if (this.panelIsVisible(allPanels[i].moduleName)) {
 				items.push(panel);
 			}
 				
@@ -998,7 +1013,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		}
 	},
 
-	initModule: function (moduleName) {
+	initModule: function (moduleName, unhide = true) {
 			if(!this.tabPanel) {
 				return false;
 			}
@@ -1020,21 +1035,30 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			if (panel) {
 				panel.id = panelId;
 				panel = this.tabPanel.insert(order, panel);
-				this.saveState();
+
+				if(unhide) {
+					this.saveState();
+				} else {
+					if (!this.panelIsVisible(panel.moduleName)) {
+						this.tabPanel.hideTabStripItem(panel);
+					}
+				}
 			} else {
 				return false;
 			}
 
 		} else {
 			panel = this.tabPanel.items.map[panelId];
-			this.tabPanel.unhideTabStripItem(panel);
+			if(unhide) {
+				this.tabPanel.unhideTabStripItem(panel);
+			}
 		}
 
 		return panel;
 	},
 
 	setNotification: function (moduleName, number, color) {
-		var panel = this.getModulePanel(moduleName);
+		var panel = this.getModulePanel(moduleName, false);
 		if (panel) {
 
 			if (!panel.origTitle) {
@@ -1048,6 +1072,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			panel.setTitle(newTitle);
 		}
 
+	},
+
+	panelIsVisible : function(panelId) {
+		return !this.state || this.state.indexOf(panelId) > -1;
 	},
 
 	openModule: function (moduleName) {

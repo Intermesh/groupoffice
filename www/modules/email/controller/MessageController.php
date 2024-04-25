@@ -290,6 +290,19 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if(isset($params['searchIn']) && in_array($params['searchIn'], array('all', 'recursive'))) {
 			$searchIn = $params['searchIn'];
 			$response['multipleFolders'] = true;
+
+			if($searchIn == 'all') {
+
+				$allFolder = go()->getConfig()['community']['email']['allFolder'][$account->host] ?? "virtual/All";
+				if($account->justConnect()->select_mailbox($allFolder)) {
+					$params['mailbox'] = $allFolder;
+					$searchIn = 'current';
+				}
+			}
+		}
+
+		if(preg_match('/TEXT "(.*)"/', $query, $matches) && !$this->allowFTS($account, $imap)) {
+			$query = 'OR OR OR FROM "' .$matches[1] . '" SUBJECT "' .$matches[1] . '" TO "' .$matches[1] . '" CC "' .$matches[1] . '"';
 		}
 
 		$messages = ImapMessage::model()->find(
@@ -363,9 +376,20 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		//deletes must be confirmed if no trash folder is used or when we are in the trash folder to delete permanently
 		$response['deleteConfirm'] = empty($account->trash) || $account->trash==$params['mailbox'];
 
+
+		//$response['allowFTS'] =
+
 		return $response;
 	}
-	
+
+
+	private function allowFTS (Account $account, $imap) :bool{
+
+		$forceFTS = go()->getConfig()['community']['email']['forceFTS'][$account->host] ?? false;
+
+
+		return $forceFTS || $imap->has_capability("XFTS");
+	}
 
 
 	/**

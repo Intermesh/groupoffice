@@ -239,6 +239,13 @@ GO.postfixadmin.MailboxDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 				boxLabel: t("Allow external SMTP usage", "postfixadmin"),
 				hideLabel: true,
 				checked:false
+			},{
+				xtype: 'xcheckbox',
+				name: 'fts',
+				anchor: '-20',
+				boxLabel: t("Enable Full Text Search", "postfixadmin"),
+				hideLabel: true,
+				checked:false
 			}]
 		});
 
