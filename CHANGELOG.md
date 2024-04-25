@@ -1,3 +1,4 @@
+- Core: Added Slovenian / Slovenščina translation
 - Postfixadmin: Added "fts" option to enable full text search
 - Email: Full text search is enabled if the mailserver returns XFTS as capability (custom capability used in Group-office mailserver) or
   when this config option is set:
