@@ -1,4 +1,5 @@
 - Email: fix message filters for read/unread and flagged
+- Core: Double module loading bug causing problems like in e-mail search in current folder
 
 22-04-2024: 6.7.76
 - Tickets: note messages will no longer be sent to the CC-address of the ticket.
