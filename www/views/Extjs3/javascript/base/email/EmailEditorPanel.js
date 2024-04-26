@@ -408,8 +408,8 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	},	
 
 	
-	getAttachmentsButton : function(){
-
+	getAttachmentsButton : function(disableWhileUpload){
+		disableWhileUpload ||= [];
 		var uploadHandle = function() {
 			go.util.openFileDialog({
 				multiple: true,
@@ -417,10 +417,14 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 				autoUpload: true,
 				maxSize: this.maxAttachmentsSize, // todo
 				listeners: {
+					'select': () => {
+						disableWhileUpload.forEach(b => b.disable());
+					},
 					uploadComplete: function (blobs) {
 						for (var i = 0; i < blobs.length; i++) {
 							this.attachmentsView.addBlob(blobs[i]);
 						}
+						disableWhileUpload.forEach(b => b.enable())
 					},
 					scope: this
 				}
@@ -430,7 +434,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 
 		if(!go.Modules.isAvailable("legacy", "files")) {
 			return new Ext.Button({
-				iconCls:'ic-attach-file',
+				iconCls: 'ic-attach-file',
 				tooltip: t("Attach files"),
 				handler:uploadHandle,
 				scope:this
