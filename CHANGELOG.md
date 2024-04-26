@@ -1,3 +1,4 @@
+- Core: Double module loading bug causing problems like in e-mail search in current folder
 - Core: Added Slovenian / Slovenščina translation
 - Postfixadmin: Added "fts" option to enable full text search
 - Email: Full text search is enabled if the mailserver returns XFTS as capability (custom capability used in Group-office mailserver) or
