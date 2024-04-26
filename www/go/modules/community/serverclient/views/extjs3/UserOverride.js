@@ -1,13 +1,10 @@
 Ext.onReady(function(){
 	Ext.override(go.users.CreateUserAccountPanel, {
 		initComponent : go.users.CreateUserAccountPanel.prototype.initComponent.createSequence(function(){
-			if(GO.serverclient && GO.serverclient.domains) {				
-				
-
-				for(var i=0;i<GO.serverclient.domains.length;i++)
-				{
+			if(GO.serverclient && GO.serverclient.domains) {
+				for(let i= 0; i < GO.serverclient.domains.length; i++) {
 					this.serverclientDomainCheckboxes[i]=new Ext.form.Checkbox({						
-						checked:(i==0),
+						checked:(i===0),
 						name: 'serverDomains',
 						value: GO.serverclient.domains[i],				
 						hideLabel:true,
@@ -16,12 +13,9 @@ Ext.onReady(function(){
 
 					this.serverclientDomainCheckboxes[i].on('check', this.setDefaultEmail, this);
 				}
-				
-				var items = this.serverclientDomainCheckboxes;
-//				items.shift(new GO.form.HtmlComponent({
-//					html:'<p class="go-form-text">'+t('Create a mailbox for domain')+':</p>'
-//				}));
-//				
+
+				const items = this.serverclientDomainCheckboxes;
+
 				this.serverclientFieldSet = new Ext.form.FieldSet({
 					title: t('Mailboxes'), 
 					autoHeight:true,
@@ -40,13 +34,11 @@ Ext.onReady(function(){
 				this.on('render',function(){
 					this.form.findField('username').on('change', this.setDefaultEmail, this);
 				},this);
-			
-
 			}
 		}),
 		
 		onSubmitStart : function(values) {
-			//remove the domainvlaue from user
+			//remove the domain value from user
 			this.serverDomains = values.serverDomains;
 			if(!Ext.isArray(this.serverDomains)) {
 				this.serverDomains = [this.serverDomains];
@@ -56,8 +48,9 @@ Ext.onReady(function(){
 		},
 		
 		onSubmitComplete : function(user, result) {
-			// post domein value data removed in onsubmitstart
+			// post domain value data removed in onsubmitstart
 			if(this.serverDomains) {
+				debugger;
 				go.Jmap.request({
 					method: 'community/serverclient/Serverclient/setMailbox',
 					params: {
@@ -81,17 +74,14 @@ Ext.onReady(function(){
 
 		setDefaultEmail : function(){
 
-			if(this.rendered)
-			{
+			if(this.rendered) {
 				var username = this.form.findField('username').getValue();
 				var emailField = this.form.findField('email');
 
-				for(var i=0;i<this.serverclientDomainCheckboxes.length;i++)
-				{
-					if(this.serverclientDomainCheckboxes[i].getValue())
-					{
+				for(let i=0; i<this.serverclientDomainCheckboxes.length; i++) {
+					if(this.serverclientDomainCheckboxes[i].getValue()) {
 						if(emailField) {
-							var email = username.indexOf('@') > -1 ? username : username + '@' + GO.serverclient.domains[i];
+							const email = username.indexOf('@') > -1 ? username : username + '@' + GO.serverclient.domains[i];
 
 							this.form.findField('email').setValue(email);
 							this.form.findField('recoveryEmail').setValue(email);

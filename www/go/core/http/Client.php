@@ -146,39 +146,39 @@ class Client {
 	 * @return array{status: int, body:string, headers: array, requestHeaders: array, info:array}
 	 * @throws CoreException
 	 */
-  public function post(string $url, $data): array
-  {
-  	if(is_array($data)) {
-		  $data = array_merge($this->baseParams, $data);
-		  $this->setOption(CURLOPT_CUSTOMREQUEST, "POST");
-	  } else{
-		  $this->setOption(CURLOPT_POST, true);
-	  }
-    
-    $this->initRequest($url);
+	public function post(string $url, $data): array
+	{
+		if (is_array($data)) {
+			$data = array_merge($this->baseParams, $data);
+			$this->setOption(CURLOPT_CUSTOMREQUEST, "POST");
+		} else {
+			$this->setOption(CURLOPT_POST, true);
+		}
+
+		$this->initRequest($url);
 		$this->setOption(CURLOPT_POSTFIELDS, $data);
-		
-    $body = curl_exec($this->getCurl());
+
+		$body = curl_exec($this->getCurl());
 
 		$status = curl_getinfo($this->getCurl(), CURLINFO_HTTP_CODE);
-		
+
 		$error = curl_error($this->getCurl());
-		if(!empty($error)) {
-      throw new CoreException($error .', HTTP Status: ' . $status);
-    }
+		if (!empty($error)) {
+			throw new CoreException($error . ', HTTP Status: ' . $status);
+		}
 
-	  $info = curl_getinfo($this->getCurl());
+		$info = curl_getinfo($this->getCurl());
 
-	  $this->setOption(CURLOPT_POSTFIELDS, "");
+		$this->setOption(CURLOPT_POSTFIELDS, "");
 
-	  return [
+		return [
 			"requestHeaders" => $this->headers,
-		  'status' => $info['http_code'],
-		  'info' => $info,
-      'headers' => $this->lastHeaders,
-      'body' => $body
-    ];
-  }
+			'status' => $info['http_code'],
+			'info' => $info,
+			'headers' => $this->lastHeaders,
+			'body' => $body
+		];
+	}
 
 	/**
 	 * Download a URL to a file
