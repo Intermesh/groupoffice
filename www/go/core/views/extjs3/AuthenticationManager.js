@@ -207,7 +207,6 @@ go.AuthenticationManager = (function () {
 				}
 
 				GO.mainLayout.onAuthentication(password).then(() => {
-					debugger;
 					this.password = null;
 					this.fireEvent("authenticated", this, result, username, password);
 				})
