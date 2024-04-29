@@ -35,6 +35,7 @@ $languages['pt_br']='Português - Brazil';
 $languages['ru']='Русский';
 $languages['ro']='Romanian';
 $languages['fi']='Suomi - Finland';
+$languages['sl']='Slovenščina';
 $languages['sv']='Svenska';
 $languages['tr']='Türkçe';
 $languages['th']='ไทย';

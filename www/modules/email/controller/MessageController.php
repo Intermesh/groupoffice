@@ -299,7 +299,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 		}
 
-		if(preg_match('/TEXT "(.*)"/', $query, $matches) && !$this->allowFTS($imap)) {
+		if(preg_match('/TEXT "(.*)"/', $query, $matches) && !$this->allowFTS($account, $imap)) {
 			$query = 'OR OR OR FROM "' .$matches[1] . '" SUBJECT "' .$matches[1] . '" TO "' .$matches[1] . '" CC "' .$matches[1] . '"';
 		}
 
@@ -381,8 +381,12 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	}
 
 
-	private function allowFTS ($imap) :bool{
-		return !empty(go()->getConfig()['email_allow_body_search']) || $imap->has_capability("XFTS");
+	private function allowFTS (Account $account, $imap) :bool{
+
+		$forceFTS = go()->getConfig()['community']['email']['forceFTS'][$account->host] ?? false;
+
+
+		return $forceFTS || $imap->has_capability("XFTS");
 	}
 
 

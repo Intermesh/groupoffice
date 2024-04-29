@@ -1,4 +1,17 @@
+- Core: Double module loading bug causing problems like in e-mail search in current folder
+- Core: Added Slovenian / Slovenščina translation
 - Postfixadmin: Added "fts" option to enable full text search
+- Email: Full text search is enabled if the mailserver returns XFTS as capability (custom capability used in Group-office mailserver) or
+  when this config option is set:
+
+'community' => [
+	'email' => [
+		'forceFTS' => [
+			'<HOSTNAME>' => true
+			]
+		]
+	]
+];
 
 23-04-2024: 6.8.44
 - Studio: fix dependency and minor deprecation errors
@@ -12,7 +25,7 @@
 'community' => [
 	'email' => [
 		'allFolder' => [
-			'mailserver' => 'virtual/All'
+			'<HOSTNAME>' => 'virtual/All'
 			]
 		]
 	]
