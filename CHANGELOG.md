@@ -14,6 +14,7 @@
 		]
 	]
 ];
+- Email: Fix 'toggle unread' function in messeges list
 
 23-04-2024: 6.8.44
 - Studio: fix dependency and minor deprecation errors
