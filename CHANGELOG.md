@@ -1,3 +1,4 @@
+29-04-2024: 6.8.45
 - Studio: better handling of non-default package name
 - Support: Fix migration from old tickets module
 - Core: Double module loading bug causing problems like in e-mail search in current folder
