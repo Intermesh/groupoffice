@@ -1,3 +1,4 @@
+29-04-2023: 6.7.77
 - Email: fix message filters for read/unread and flagged
 - Core: Double module loading bug causing problems like in e-mail search in current folder
 
