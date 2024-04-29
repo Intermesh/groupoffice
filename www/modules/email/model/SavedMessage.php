@@ -64,7 +64,7 @@ class SavedMessage extends ComposerMessage
 	 * @param StringHelper $mimeData The MIME data string.
 	 * @return SavedMessage 
 	 */
-	public function setMimeData($mimeData="", $preserveHtmlStyle = true)
+	public function setMimeData($mimeData = "", $preserveHtmlStyle = true)
 	{
 		$decoder = new \GO\Base\Mail\MimeDecode($mimeData);
 		$structure = $decoder->decode(array(
@@ -74,8 +74,9 @@ class SavedMessage extends ComposerMessage
 			'rfc_822bodies' => true
 		));
 		
-		if (!$structure)
+		if (!$structure) {
 			throw new \Exception("Could not decode mime data:\n\n $mimeData");
+		}
 
 		$attributes=array();
 		
