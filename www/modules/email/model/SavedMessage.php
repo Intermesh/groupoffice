@@ -26,12 +26,15 @@ class SavedMessage extends ComposerMessage
 
 	/**
 	 * Get a model instance loaded from  MIME data string.
-	 * 
-	 * @param StringHelper $mimeData MIME data string
-	 * @return SavedMessage 
+	 *
+	 * @param ?string $mimeData MIME data string
+	 * @param bool $preserveHtmlStyle
+	 * @return SavedMessage
+	 * @throws \Exception
 	 */
-	public function createFromMimeData($mimeData, $preserveHtmlStyle = true)
+	public function createFromMimeData(?string $mimeData = "", bool $preserveHtmlStyle = true): SavedMessage
 	{
+		$mimeData = $mimeData ?? '';
 		$m = new SavedMessage();		
 		$m->setMimeData($mimeData, $preserveHtmlStyle);
 		return $m;
@@ -58,13 +61,15 @@ class SavedMessage extends ComposerMessage
 		
 		return $this->createFromMimeData($mimeData, $preserveHtmlStyle);
 	}
-	
+
 	/**
 	 * Reads MIME data and creates a SavedMessage model from it.
-	 * @param StringHelper $mimeData The MIME data string.
-	 * @return SavedMessage 
+	 * @param string $mimeData The MIME data string.
+	 * @param bool $preserveHtmlStyle
+	 * @return void
+	 * @throws \Exception
 	 */
-	public function setMimeData($mimeData = "", $preserveHtmlStyle = true)
+	public function setMimeData(string $mimeData = "", bool $preserveHtmlStyle = true): void
 	{
 		$decoder = new \GO\Base\Mail\MimeDecode($mimeData);
 		$structure = $decoder->decode(array(

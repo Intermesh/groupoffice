@@ -15,6 +15,7 @@
 	]
 ];
 - Email: Fix 'toggle unread' function in messeges list
+- Billing: fix errors when generating emails from empty translated order statuses
 
 23-04-2024: 6.8.44
 - Studio: fix dependency and minor deprecation errors
