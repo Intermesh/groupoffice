@@ -1,3 +1,4 @@
+- Studio: better handling of non-default package name
 - Core: Double module loading bug causing problems like in e-mail search in current folder
 - Core: Added Slovenian / Slovenščina translation
 - Postfixadmin: Added "fts" option to enable full text search
