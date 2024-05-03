@@ -21,6 +21,9 @@ class MailDomain
 	{
 		$this->password = $password;
 		$this->http = new Client();
+		if (go()->getConfig()['debug']) {
+			$this->http->setOption(CURLOPT_SSL_VERIFYPEER, false); // AAAUUUGGGHHH!!!
+		}
 	}
 
 	/**
@@ -44,25 +47,6 @@ class MailDomain
 	}
 
 	/**
-	 * Base URL for the current JMAP API call
-	 *
-	 * This is just your regular link to jmap.php, but the main difference is that the GO servers may differ
-	 *
-	 * @return string
-	 * @throws Exception
-	 */
-	private function getBaseUrl(): string
-	{
-		if (empty(go()->getConfig()['serverclient_server_url'])) {
-			go()->getConfig()['serverclient_server_url'] = go()->getSettings()->URL;
-		}
-		if (empty(go()->getConfig()['serverclient_token'])) {
-			throw new Exception("Could not connect to mailserver. Please set a strong password in /etc/groupoffice/globalconfig.inc.php.\n\nPlease remove serverclient_username and serverclient_password.\n\nPlease add:\n\n \$config['serverclient_token']='aStrongPasswordOfYourChoice';");
-		}
-		return go()->getConfig()['serverclient_server_url'] . "/api/jmap.php";
-	}
-
-	/**
 	 * Create a user mailbox
 	 *
 	 * @param Entity $user
@@ -76,7 +60,8 @@ class MailDomain
 		$username = str_replace('@' . $domain, '', $user->username);
 		$alias = strpos($user->email, '@' . $domain) ? $user->email : '';
 
-		if (!go()->getModule('community', 'maildomains')) {
+		// For backwards compatibility
+		if (go()->getModule(null, 'postfixadmin')) {
 			$this->legacyAddMailbox(array(
 				'name' => $user->displayName,
 				'username' => $username,
@@ -85,38 +70,38 @@ class MailDomain
 				'password2' => $this->password,
 				'domain' => $domain
 			));
-			$d = Domain::find()->where(['domain' => $domain])->single();
-			$data[] =
-				['MailBox/set',
-					[
-						'create' => [
-							'active' => true,
-							'fts' => false,
-							'name' => $user->displayName,
-							'username' => $username,
-							'password' => $this->password,
-							'domainId' => $d->id,
-							'quota' => $d->defaultQuota
-						]
-					],
-					'clientCallId-1'
-				];
-			if (strlen($alias)) {
-				$data[] = [
-					["MailAlias/set",
-						"create" => [
-							'active' => true,
-							'address' => $user->email,
-							'domainId' => $d->id,
-							'goto' => $user->email
-						]
-					],
-					'clientCallId-2'
-				];
-			}
-			$responses = $this->jmapCall($data);
-			return;
 		}
+
+
+		$d = Domain::find()->where(['domain' => $domain])->single();
+		$data[] = [
+			'MailBox/set',
+			['create' => [
+				'mb' => [
+					'active' => true,
+					'fts' => false,
+					'name' => $user->displayName,
+					'username' => $username . '@' . $domain,
+					'password' => $this->password,
+					'domainId' => $d->id,
+					'quota' => $d->defaultQuota
+				]]],
+			'clientCallId-1'
+		];
+		if (strlen($alias)) {
+			$data[] = [
+				"MailAlias/set",
+				["create" => [
+					'ma' => [
+						'active' => true,
+						'address' => $user->email,
+						'domainId' => $d->id,
+						'goto' => $user->email
+					]]],
+				'clientCallId-2'
+			];
+		}
+		$this->jmapCall($data);
 	}
 
 	/**
@@ -125,6 +110,7 @@ class MailDomain
 	 * This method is here for backwards compatibility purposes. Please remove after the old module
 	 * has been fully replaced.
 	 *
+	 * @depcreated
 	 * @param array $params
 	 * @return void
 	 * @throws Exception
@@ -155,36 +141,42 @@ class MailDomain
 	 * @param string $domain
 	 * @return void
 	 * @throws GO\Base\Exception\AccessDenied
-	 * @todo: refactor to new maildomains JMAP module
+	 * @throws Exception
 	 */
 	public function setMailboxPassword(User $user, string $domain)
 	{
 		$username = explode('@', $user->username)[0];
 		$username .= '@' . $domain;
 
-		if (!go()->getModule("community", "maildomains")) {
+		// Backwards compatibility
+		if (go()->getModule(null, "postfixadmin")) {
 			$this->legacySetMailboxPassword($username);
 		}
 
-
-		if (!GO::modules()->isInstalled('email')) {
+		if (!go()->getModule(null, "email")) {
 			return;
 		}
 
-		$mb = Mailbox::find(['id'])->where(['username' => $username])->single();
+		$mb = Mailbox::find(['id', 'username', 'homedir'])->where(['username' => $username])->single();
 
-		$data = ['MailBox/set',
-			[
-				'update' => [
-					$mb->id => [
-						'username' => $username,
-						'password' => $this->password
+		if ($this->onSameServer()) {
+			$mb->password = $this->password;
+			$mb->save();
+		} else {
+			$data = [['MailBox/set',
+				[
+					'update' => [
+						$mb->id => [
+							'username' => $username,
+							'password' => $this->password
+						]
 					]
-				]
-			],
-			'clientCallId-1'
-		];
-		$response = $this->jmapCall($data);
+				],
+				'clientCallId-1'
+			]];
+			$response = $this->jmapCall($data);
+		}
+
 
 		$stmt = Account::model()->findByAttributes(['username' => $username]);
 
@@ -194,6 +186,14 @@ class MailDomain
 		}
 	}
 
+	/**
+	 * Set mailbox password for the deprecated postfixadmin module
+	 *
+	 * @param string $username
+	 * @depcreated
+	 * @return void
+	 * @throws Exception
+	 */
 	private function legacySetMailboxPassword(string $username): void
 	{
 		$url = $this->getLegacyBaseUrl("postfixadmin/mailbox/setPassword");
@@ -238,7 +238,14 @@ class MailDomain
 		return $i;
 	}
 
-
+	/**
+	 * Set mail usage for the deprecated postfixadmin module
+	 *
+	 * @param array $domains
+	 * @depcreated
+	 * @return int
+	 * @throws Exception
+	 */
 	private function legacyGetUsage(array $domains): int
 	{
 		$url = $this->getLegacyBaseUrl("postfixadmin/domain/getUsage");
@@ -324,44 +331,70 @@ class MailDomain
 
 		$apiUrl = $this->getBaseUrl();
 
-		$apiKey = go()->getConfig()['serverclient_api_token']; // For development purposes
-
-		// Make POST request with curl
-		$ch = curl_init($apiUrl);
-		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $dataStr);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-				"Content-Type: application/json; charset=utf-8",
-				"Authorization: Bearer " . $apiKey,
-				"Content-Length: " . strlen($dataStr),
+		$apiKey = go()->getConfig()['serverclient_api_token'];
+		$this->http->setOption(CURLOPT_HTTPHEADER, array(
+			"Content-Type: application/json; charset=utf-8",
+			"Content-Length: " . strlen($dataStr),
+			"Authorization: Bearer " . $apiKey,
+//			"X-CSRF-Token" . go()->getAuthState()->getToken(),
 //			"COOKIE: XDEBUG_SESSION=PHPSTORM" // Uncomment to use XDebug to debug the API call
-			)
-		);
+		));
 
-		$result = curl_exec($ch);
-
-		if (!$result) {
-			throw new Exception("Failed to send request!" . curl_error($ch));
+		$result = $this->http->post($apiUrl, $dataStr);
+		if ($result['status'] != 200) {
+			throw new Exception("Unexpected HTTP status " . $result['status'] . " from " . $apiKey);
 		}
 
-		$responses = json_decode($result, true);
+		$responses = json_decode($result['body'], true);
 		$error = null;
-		//check for API error. More details on https://jmap.io
-		if (isset($responses[0][1][0]) && $responses[0][1][0] == "error") {
-			$error = "Error: " . $responses[0][1][1]['message'];
-		} else if (!empty($responses[0][1]['notCreated'])) {
-			$error = "Error: " . var_export($responses[0][1]['notCreated']['contact-1']['validationErrors'], true);
-		} else if (empty($responses[0][1]['created'])) {
-			$error = "Error: " . var_export($responses, true);
-		}
 
-		if ($error) {
-			throw new Exception($error);
+		foreach($responses as $key => $response) {
+			$callId = $data[$key][2];
+			if (isset($response[0]) && $response[0]== 'error') {
+				$error = 'Error: ' . $response[1]['debugMessage'] ?? $response[1]['message'];
+			} else if (!empty($response[1]['notCreated'])) {
+				$error = 'Error: ' . var_export($response[1]['notCreated'][$callId]['validationErrors'], true);
+			} else if (!empty($response[1]['notUpdated'])) {
+				$error = 'Error: ' . var_export($response[1]['notUpdated'][$callId]['validationErrors'], true);
+			} else if (!empty($response[1]['notDestroyed'])) {
+				$error = 'Error: ' . var_export($response[1]['notDestroyed'][$callId]['validationErrors'], true);
+			}
+			if ($error) {
+				throw new Exception($error);
+			}
 		}
 
 		return $responses;
 	}
 
+	/**
+	 * Base URL for the current JMAP API call
+	 *
+	 * This is just your regular link to jmap.php, but the main difference is that the GO servers may differ
+	 *
+	 * @return string
+	 * @throws Exception
+	 */
+	private function getBaseUrl(): string
+	{
+		if (empty(go()->getConfig()['serverclient_server_url'])) {
+			go()->getConfig()['serverclient_server_url'] = go()->getSettings()->URL;
+		}
+		if (empty(go()->getConfig()['serverclient_token'])) {
+			throw new Exception("Could not connect to mailserver. Please set a strong password in /etc/groupoffice/globalconfig.inc.php.\n\nPlease remove serverclient_username and serverclient_password.\n\nPlease add:\n\n \$config['serverclient_token']='aStrongPasswordOfYourChoice';");
+		}
+		return rtrim(go()->getConfig()['serverclient_server_url'], "/") . "/api/jmap.php";
+	}
+
+	/**
+	 * Is the mail server the same one as the Group-Office application server?
+	 *
+	 * @return bool
+	 */
+	private function onSameServer(): bool
+	{
+		$settingsUrl = rtrim(go()->getSettings()->URL,'/');
+		$configUrl = rtrim(go()->getConfig()['serverclient_server_url'], '/');
+		return $settingsUrl === $configUrl;
+	}
 }

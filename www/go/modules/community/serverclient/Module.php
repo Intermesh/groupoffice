@@ -36,13 +36,14 @@ class Module extends core\Module
 	 */
 	public static function getDomains(): array
 	{
-		if (empty(\GO::config()->serverclient_domains)) {
+		$c = go()->getConfig();
+		if (!isset($c['serverclient_domains'])) {
 			return array();
 		}
-		if (is_array(\GO::config()->serverclient_domains)) {
-			return \GO::config()->serverclient_domains;
+		if (is_array($c['serverclient_domains'])) {
+			return $c['serverclient_domains'];
 		}
-		return array_map('trim', explode(",", \GO::config()->serverclient_domains));
+		return array_map('trim', explode(",", $c['serverclient_domains']));
 	}
 
 	public static function onLoad(): void

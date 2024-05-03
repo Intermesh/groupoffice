@@ -50,7 +50,6 @@ Ext.onReady(function(){
 		onSubmitComplete : function(user, result) {
 			// post domain value data removed in onsubmitstart
 			if(this.serverDomains) {
-				debugger;
 				go.Jmap.request({
 					method: 'community/serverclient/Serverclient/setMailbox',
 					params: {
