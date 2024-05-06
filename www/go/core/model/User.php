@@ -45,6 +45,7 @@ use go\modules\community\notes\model\UserSettings as NotesUserSettings;
 use go\modules\community\tasks\model\Task;
 use go\modules\community\tasks\model\TaskList;
 use go\modules\community\tasks\model\UserSettings as TasksUserSettings;
+use http\Exception\InvalidArgumentException;
 
 
 /**
@@ -472,6 +473,10 @@ public function historyLog(): bool|array
 	 */
 	public function passwordVerify(string $password): bool
 	{
+		$passwordLen = strlen($password);
+		if($passwordLen > go()->getSettings()->passwordMaxLength) {
+			return false;
+		}
 		return password_verify($password, $this->password);
 	}
 
@@ -592,8 +597,13 @@ public function historyLog(): bool|array
 		}
 		
 		if(isset($this->plainPassword) && $this->validatePassword) {
-			if(strlen($this->plainPassword) < go()->getSettings()->passwordMinLength) {
+			$passwordLen = strlen($this->plainPassword);
+			if($passwordLen < go()->getSettings()->passwordMinLength) {
 				$this->setValidationError('password', ErrorCode::INVALID_INPUT, "Minimum password length is ".go()->getSettings()->passwordMinLength." chars");
+			}
+
+			if($passwordLen > go()->getSettings()->passwordMaxLength) {
+				$this->setValidationError('password', ErrorCode::INVALID_INPUT, "Maximum password length is ".go()->getSettings()->passwordMaxLength." chars");
 			}
 		}
 		
@@ -961,6 +971,11 @@ public function historyLog(): bool|array
 	 */
 	public static function passwordHash(string $password): string
 	{
+		$passwordLen = strlen($password);
+
+		if($passwordLen > go()->getSettings()->passwordMaxLength) {
+			throw new \InvalidArgumentException("Maximum password length is ".go()->getSettings()->passwordMaxLength." chars");
+		}
 		return password_hash($password, PASSWORD_DEFAULT);
 	}
 
