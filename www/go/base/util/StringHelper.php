@@ -774,7 +774,7 @@ class StringHelper {
 	 */
 	public static function sanitizeHtml($html, $preserveHtmlStyle = true) {
 		//needed for very large strings when data is embedded in the html with an img tag
-		ini_set('pcre.backtrack_limit',  2000000 );
+		ini_set('pcre.backtrack_limit',  3000000 );
 
 
 		//remove strange white spaces in tags first

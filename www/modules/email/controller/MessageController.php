@@ -1568,6 +1568,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if (empty($params['unblock'])){// && !\GO\Addressbook\Model\Contact::model()->findSingleByEmail($response['sender'])) {
 			$blockUrl = 'about:blank';
 			$response['htmlbody'] = preg_replace("/<([^a]{1})([^>]*)(https?:[^>'\"]*)/iu", "<$1$2" . $blockUrl, $response['htmlbody'], -1, $response['blocked_images']);
+			if($response['htmlbody'] === null) {
+				throw new \Exception("Could not block images: ". preg_last_error_msg());
+			}
 		}
 
 		return $response;
