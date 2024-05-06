@@ -156,7 +156,7 @@ try {
 				output(['success' => false]);
 			}
 			if (!empty($data['newPassword'])) {
-				$user->setPassword($data['newPassword']);
+				$user->setPassword($data['newPassword'], true);
 				//$user->checkRecoveryHash($data['hash']); // already checked by recovery()
 				output(['passwordChanged' => $user->save(), 'validationErrors' => $user->getValidationErrors()]);
 			}

@@ -481,10 +481,13 @@ public function historyLog(): bool|array
 		return $this->plainPassword;
 	}
 
-	public function setPassword($password) {
+	public function setPassword($password, $recoveryHashChecked = false) {
 		$this->recoveryHash = null;
 		$this->recoverySendAt = null;
 		$this->plainPassword = $password;
+		if ($recoveryHashChecked) {
+			$this->passwordVerified = true;
+		}
 	}
 
 	/**
