@@ -176,7 +176,7 @@ class MimeDecode
 	 * @param string $input The input to decode
 	 * @access public
 	 */
-	public function __construct(string $input)
+	public function __construct(string $input = "")
 	{
 
 		$this->coreDecode = new \go\core\mail\MimeDecode($input);

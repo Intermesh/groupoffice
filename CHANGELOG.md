@@ -1,3 +1,6 @@
+29-04-2024: 6.8.45
+- Studio: better handling of non-default package name
+- Support: Fix migration from old tickets module
 - Core: Double module loading bug causing problems like in e-mail search in current folder
 - Core: Added Slovenian / Slovenščina translation
 - Postfixadmin: Added "fts" option to enable full text search
@@ -12,6 +15,8 @@
 		]
 	]
 ];
+- Email: Fix 'toggle unread' function in messeges list
+- Billing: fix errors when generating emails from empty translated order statuses
 
 23-04-2024: 6.8.44
 - Studio: fix dependency and minor deprecation errors

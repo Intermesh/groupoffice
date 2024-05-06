@@ -479,50 +479,16 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 	},
 	toggleUnread : function(item, pressed)
 	{
-		this.setIconClass(pressed ? 'ic-email' : 'ic-mark-as-unread');
-		this.setTooltip(pressed ? t("Show all", "email") : t("Show unread", "email"));
+		item.setIconClass(pressed ? 'ic-email' : 'ic-mark-as-unread');
+		item.setTooltip(pressed ? t("Show all", "email") : t("Show unread", "email"));
 		GO.email.messagesGrid.store.baseParams['unread']=pressed ? 1 : 0;
-
 		GO.email.messagesGrid.store.load();
 	},
 	toggleFlagged : function(item, pressed)
 	{
 		GO.email.messagesGrid.store.baseParams['flagged']=pressed ? 1 : 0;
-		
 		GO.email.messagesGrid.store.load();
 	},
-
-	/* @deprecated
-	renderNorthMessageRow : function(value, metaData, record){
-
-		if( this.isSpoofed(record)) {
-			metaData.css = 'danger';
-
-			value += " &lt;" + record.data.sender + "&gt;";
-		}
-
-		if(record.data['seen']=='0')
-			return String.format('<div id="sbj_'+record.data['uid']+'" '+this.createQtipTemplate(record)+' class="ml-unseen-mail">{0}</div>', value);
-		else
-			return String.format('<div id="sbj_'+record.data['uid']+'" '+this.createQtipTemplate(record)+' class="ml-seen-mail">{0}</div>', value);
-	},
-	*/
-	/* @deprecated
-	renderMessageSmallRes : function(value, metaData, record){
-
-		if( this.isSpoofed(record)) {
-			metaData.css = 'danger';
-			value += " &lt;" + record.data.sender + "&gt;";
-		}
-
-		if(record.data['seen']=='0')
-		{
-			return String.format('<div id="sbj_'+record.data['uid']+'" '+this.createQtipTemplate(record)+' class="ml-unseen-from">{0}</div><div class="ml-unseen-subject">{1}</div>', value, record.data['subject']);
-		}else
-		{
-			return String.format('<div id="sbj_'+record.data['uid']+'" '+this.createQtipTemplate(record)+' class="ml-seen-from">{0}</div><div class="ml-seen-subject">{1}</div>', value, record.data['subject']);
-		}
-	},*/
 
 	createQtipTemplate: function(record){
 		var qtipTemplate = '';
@@ -560,8 +526,8 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 	},
 
 	renderIcon : function(src, p, record){
-		var icons = [];
-		var unseen = '';
+		let icons = [];
+		let unseen = '';
 		if(record.data.answered) {
 			icons.push('reply');
 		}
@@ -569,7 +535,7 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 			icons.push('forward');
 		}
 		if(!record.data.seen) {
-			var unseen = '<div class="ml-unseen-dot"></div>';
+			unseen = '<div class="ml-unseen-dot"></div>';
 		}
 		if(record.data['has_attachments']=='1') {
 			icons.push('attachment');
