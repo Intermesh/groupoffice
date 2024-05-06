@@ -15,7 +15,8 @@ class Util {
 	 * @param string $email
 	 * @return boolean
 	 */
-	public static function validateEmail($email) {
+	public static function validateEmail($email): bool
+	{
 		return preg_match(self::EMAIL_REGEX, $email);
 	}
 
@@ -26,7 +27,7 @@ class Util {
 	 *
 	 * @param ?string $string
 	 * @param string $defaultCharset
-	 * @return array|string|string[]
+	 * @return string
 	 */
 	public static function mimeHeaderDecode(?string $string, string $defaultCharset = 'UTF-8'): string
 	{
