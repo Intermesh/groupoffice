@@ -37,18 +37,16 @@ x Billing module refactor
 - Mailserver
     - Quota warning: https://doc.dovecot.org/configuration_manual/quota/#quota-warning-scripts
     x limit access per service and filter remote ip address (global and per domain) to stop hacks. https://doc.dovecot.org/configuration_manual/config_file/config_variables/
-    - permissions per account?
-    - Auto clean spam and trash
-    - DKIM generator and implementation: https://github.com/trusteddomainproject/OpenDKIM/blob/master/opendkim/README.SQL
-    - Cronb job that checks every hour:
+    x Auto clean spam and trash
+    - DKIM generator and implementation. Zie project doc.
+    - Cron job that checks every hour:
         - SPF record is correct
-        - DKIM record is set and valid. Automatically configure opendkim if right key is found.
+        - DKIM record is set and valid. Automatically configure rspamd.
         - MX record points to the server
         - PTR record for server IP is set
         - Perhaps black list check?
-     - flush cache on password change: doveadm auth cache flush <USER>
-
-- unbound or bind9?
+     x flush cache on password change: doveadm auth cache flush <USER> (NIET NODIG!)
+    - unbound or bind9?
 
 - Rocket chat
     - Live chat on sites feed back into GO

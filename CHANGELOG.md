@@ -1,3 +1,7 @@
+- Core: Set maximum password length to 255 to prevent brute force attacks
+- Tasks/Support: Set to needs action if responsible user changes
+- Email: Fixed unnamed attachment problem
+
 29-04-2024: 6.8.45
 - Studio: better handling of non-default package name
 - Support: Fix migration from old tickets module

@@ -362,11 +362,6 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		}
 
 		go.Db.store("User").set(params, function(options, success, response){
-			// if(response.notUpdated && response.notUpdated[id] && response.notUpdated[id].validationErrors && response.notUpdated[id].validationErrors.currentPassword){
-			// 	// Current password is incorrect.
-			// 	this.submit();
-			// 	return;
-			// }
 						
 			if(response.updated && id in response.updated){
 				this.submitComplete(response);
@@ -393,6 +388,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 							GO.errorDialog.show(t("Sorry, an error occurred") +": " + response.notUpdated[id].type);
 							break;
 					}
+				} else if(!success) {
+					GO.errorDialog.show(t("Sorry, an error occurred") +": " + response.message);
 				}
 				
 				this.actionComplete();
