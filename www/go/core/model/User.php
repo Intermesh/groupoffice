@@ -527,7 +527,7 @@ public function historyLog(): bool|array
    * Make sure to call this when changing the password with a recovery hash
    * @param string $hash
    * @return bool
-   */
+   * @depcreated Please remove after some time as the recovery hash check was refactored in the API auth script
 	public function checkRecoveryHash(string $hash): bool
 	{
 		if($hash === $this->recoveryHash) {
@@ -537,25 +537,26 @@ public function historyLog(): bool|array
 		}
 		return false;
 	}
+  */
 
 	private function validatePasswordChange(): bool
 	{
-		
+
 		if($this->passwordVerified) {
 			return true;
 		}
-		
+
 		if(!$this->isModified(['password']) || $this->getOldValue('password') == null) {
 			return true;
 		}
-		
+
 		if(App::get()->getInstaller()->isInProgress()) {
 			return true;
 		}
 
 		return false;
 	}
-	
+
 	protected function internalValidate() {
 
 		if(!isset($this->homeDir) && in_array("homeDir", $this->selectedProperties)) {
@@ -579,7 +580,7 @@ public function historyLog(): bool|array
 				$this->groups[] = Group::ID_EVERYONE;
 				// $this->setValidationError('groups', ErrorCode::INVALID_INPUT, go()->t("You can't remove group everyone"));
 			}
-			
+
 			if(!$this->isNew()) {
 				if(!in_array($this->getPersonalGroup()->id, $this->groups)) {
 					$this->setValidationError('groups', ErrorCode::INVALID_INPUT, go()->t("You can't remove the user's personal group"));
@@ -590,7 +591,7 @@ public function historyLog(): bool|array
 				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, go()->t("You can't remove group Admins from the primary admin user"));
 			}
 		}
-		
+
 		if(!$this->validatePasswordChange()) {
 			if($this->passwordVerified === null) {
 				$this->setValidationError('currentPassword', ErrorCode::REQUIRED);
@@ -598,7 +599,7 @@ public function historyLog(): bool|array
 				$this->setValidationError('currentPassword', ErrorCode::INVALID_INPUT);
 			}
 		}
-		
+
 		if(isset($this->plainPassword) && $this->validatePassword) {
 			$passwordLen = strlen($this->plainPassword);
 			if($passwordLen < go()->getSettings()->passwordMinLength) {
@@ -609,10 +610,10 @@ public function historyLog(): bool|array
 				$this->setValidationError('password', ErrorCode::INVALID_INPUT, "Maximum password length is ".go()->getSettings()->passwordMaxLength." chars");
 			}
 		}
-		
+
 		if($this->isNew()) {
 			$config = go()->getConfig();
-			
+
 			if(!empty($config['limits']['userCount']) && $config['limits']['userCount'] <= self::count()) {
 				throw new Forbidden("The maximum number of users have been reached");
 			}
@@ -641,7 +642,7 @@ public function historyLog(): bool|array
 				$this->setValidationError('timezone', ErrorCode::INVALID_INPUT, go()->t("Invalid timezone"));
 			}
 		}
-		
+
 		parent::internalValidate();
 	}
 
@@ -685,7 +686,7 @@ public function historyLog(): bool|array
 
 		return parent::internalGetPermissionLevel();
 	}
-	
+
 	protected static function textFilterColumns(): array
 	{
 		return ['username', 'displayName', 'email'];
