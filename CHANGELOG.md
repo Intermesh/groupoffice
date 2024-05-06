@@ -1,7 +1,9 @@
+06-05-2024: 6.7.78
+- Email: Fixed unnamed attachment problem
+
 29-04-2023: 6.7.77
 - Email: fix message filters for read/unread and flagged
 - Core: Double module loading bug causing problems like in e-mail search in current folder
-- Email: Fixed unnamed attachment problem
 
 22-04-2024: 6.7.76
 - Tickets: note messages will no longer be sent to the CC-address of the ticket.
@@ -430,6 +432,10 @@
 
 
 --- 6.7
+06-05-2024: 6.6.184
+- ActiveSync: Some email messages that were out of the date range specified could be sent
+- Projects2: Hide 'finance' button if user has no finance permission
+
 04-03-2024: 6.6.183
 - Email: Fixed render issue
 - Leavedays: fix issue with disapproval reason not being sent
