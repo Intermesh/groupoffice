@@ -19,8 +19,7 @@ GO.email.MessagesGrid = function(config){
 	config.paging=true;
 
 	config.hideMode='offsets';
-
-		config.cm =  new Ext.grid.ColumnModel({
+	config.cm =  new Ext.grid.ColumnModel({
 		defaults:{
 			sortable:true,
 			groupable:false
@@ -161,10 +160,6 @@ GO.email.MessagesGrid = function(config){
 							}
 
 							if(this.searchField && this.searchField.getValue()) {
-								// GO.email.messagesGrid.store.baseParams['search'] = this.searchField.getValue();
-								// this.searchField.hasSearch = true;
-
-								// GO.email.messagesGrid.store.reload();
 								this.searchField.search();
 							}
 						}
@@ -294,8 +289,6 @@ GO.email.MessagesGrid = function(config){
 
 	var me = this;
 
-
-
 	if(!config.hideSearch) {
 		this.getTopToolbar().enableOverflow = true;
 
@@ -418,7 +411,6 @@ GO.email.MessagesGrid = function(config){
 		);
 	}
 
-
 	var origRefreshHandler = this.getBottomToolbar().refresh.handler;
 
 	this.getBottomToolbar().refresh.handler=function(){
@@ -429,7 +421,7 @@ GO.email.MessagesGrid = function(config){
 
 	//stop/start drag and drop when store loads when account is readOnly
 	this.store.on('load', function(store, records, options) {
-		console.log(store.baseParams);
+		// console.log(store.baseParams);
 		if(this.getView().dragZone){
 			if(store.reader.jsonData.permission_level <= GO.permissionLevels.read) {
 				this.getView().dragZone.lock();
@@ -438,8 +430,6 @@ GO.email.MessagesGrid = function(config){
 			}
 		}
 	}, this);
-
-
 
 }
 
