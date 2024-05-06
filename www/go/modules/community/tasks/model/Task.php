@@ -451,7 +451,8 @@ class Task extends AclItemEntity {
 			}
 		}
 
-		if($this->isModified('assignedTo') && !$this->isModified('progress')) {
+		if($this->isModified('responsibleUserId') && !$this->isModified('progress')) {
+			// when assigned to someone else it's progress should be needs action
 			$this->progress = Progress::NeedsAction;
 		}
 
@@ -477,10 +478,6 @@ class Task extends AclItemEntity {
 		if($this->isModified('responsibleUserId')) {
 
 			if (isset($this->responsibleUserId)) {
-
-				// when assigned to someone else it's progress should be needs action
-				$this->progress = Progress::NeedsAction;
-
 				if($this->responsibleUserId != go()->getUserId()) {
 					$alert = $this->createAlert(new \DateTime(), 'assigned', $this->responsibleUserId)
 						->setData([
