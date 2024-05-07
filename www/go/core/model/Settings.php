@@ -282,6 +282,14 @@ class Settings extends core\Settings {
 
 
 	/**
+	 * Maximum password length to prevent brute force attacks with large data.
+	 *
+	 * @var int
+	 */
+	public $passwordMaxLength = 255;
+
+
+	/**
 	 * Number of seconds to auto logout the user if inactive.
 	 * Also disables the "remember login" feature as it would make no sense.
 	 * @var int

@@ -1,3 +1,15 @@
+- Email: Fixed CSS bleeding issue
+
+06-05-2024: 6.8.46
+- Core: Set maximum password length to 255 to prevent brute force attacks
+- Tasks/Support: Set to needs action if responsible user changes
+- Email: Fixed unnamed attachment problem
+- Core: fix validation for user password reset through reset token
+
+29-04-2024: 6.8.45
+- Studio: better handling of non-default package name
+- Support: Fix migration from old tickets module
+- Core: Double module loading bug causing problems like in e-mail search in current folder
 - Core: Added Slovenian / Slovenščina translation
 - Postfixadmin: Added "fts" option to enable full text search
 - Email: Full text search is enabled if the mailserver returns XFTS as capability (custom capability used in Group-office mailserver) or
@@ -11,6 +23,8 @@
 		]
 	]
 ];
+- Email: Fix 'toggle unread' function in messeges list
+- Billing: fix errors when generating emails from empty translated order statuses
 
 23-04-2024: 6.8.44
 - Studio: fix dependency and minor deprecation errors

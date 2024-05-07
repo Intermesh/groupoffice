@@ -658,17 +658,11 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				scope: this
 			};
 
-			if (!allPanels[i].admin) {
-				if (!this.state)
-					items.push(GO.moduleManager.getPanel(allPanels[i].moduleName));
-
-				// Check the subMenu property, if it is a submenu then don't add this item to the start menu
-				if (!allPanels[i].inSubmenu) {
-					this.startMenuItems.push(menuItemConfig);
-				}
-			} else {
-				adminMenuItems.push(menuItemConfig);
+			// Check the subMenu property, if it is a submenu then don't add this item to the start menu
+			if (!allPanels[i].inSubmenu) {
+				this.startMenuItems.push(menuItemConfig);
 			}
+
 		}
 		
 		var subMenus = GO.moduleManager.getAllSubmenus();
@@ -708,14 +702,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			Ext.apply(subitemConfig, subMenus[key].subMenuConfig);
 
 			this.startMenuItems.push(subitemConfig);
-		}
-
-		if (adminMenuItems.length) {
-
-			for (var i = 0; i < adminMenuItems.length; i++) {
-				//this.startMenu.add(adminMenuItems[i]);
-				this.startMenuItems.push(adminMenuItems[i]);
-			}
 		}
 
 		this.startMenu.store.loadData({root: this.startMenuItems});

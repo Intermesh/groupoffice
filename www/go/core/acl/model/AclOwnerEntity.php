@@ -183,7 +183,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * @param Query $query
 	 * @param int $level
 	 * @param int|null $userId
-	 * @param int[]|null $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
+	 * @param int[]|null $groups Supply user groups to check. $userId must be null when using this. Leave to null for the current user
 	 * @return Query
 	 * @throws Exception
 	 */
