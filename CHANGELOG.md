@@ -1,3 +1,5 @@
+- Email: Fixed CSS bleeding issue
+
 06-05-2024: 6.8.46
 - Core: Set maximum password length to 255 to prevent brute force attacks
 - Tasks/Support: Set to needs action if responsible user changes
