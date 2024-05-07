@@ -626,9 +626,7 @@ class StringHelper {
 		return $htmlToText->get_text($link_list);
 	}
 
-	private static function extractStyles($html, $prefix) {
-
-		$previouslyExtracted = "";
+	private static function extractStyles($html, $prefixId) {
 
 		preg_match_all("'<style[^>]*>(.*?)</style>'usi", $html, $matches);
 		$css = "";
@@ -639,30 +637,24 @@ class StringHelper {
 				continue;
 			}
 
-			if(strstr($matches[0][$i], 'groupoffice-extracted-style')) {
-				$previouslyExtracted .= $matches[1][$i] . "\n\n";
-				continue;
-			}
-
-
 			$tmpCss = $matches[1][$i];
 			$tmpCss = preg_replace(["'<!--'", "'-->'"], "", $tmpCss);
 			$css .= $tmpCss. "\n\n"; // $matches[1][$i]
 
 		}
 
-		$style = self::prefixCSSSelectors($css, '.'.$prefix);
+		$style = self::prefixCSSSelectors($css, '.groupoffice-msg-'.$prefixId);
 
 		//apply body style on root element
 		$bodyStyle = self::extractBodyStyle($html);
 		if(!empty($bodyStyle)) {
-			$style = '.'.$prefix . ' {' . $bodyStyle . "};\n";
+			$style = '.groupoffice-msg-'.$prefixId . ' {' . $bodyStyle . "};\n";
 		}
 
-		return $style . $previouslyExtracted;
+		return $style;
 	}
 
-	private static function prefixCSSSelectors(string $css, string $prefix = '.go-html-formatted')
+	private static function prefixCSSSelectors(string $css, string $prefix)
 	{
 		# Wipe all block comments
 		$css = preg_replace('!/\*.*?\*/!s', '', $css);
@@ -672,7 +664,7 @@ class StringHelper {
 		$mediaQueryStarted = false;
 
 		foreach($parts as $key => &$part) {
-			$part = trim($part); # Wht not trim immediately .. ?
+			$part = trim($part);
 			if(empty($part)) {
 				$keyframeStarted = false;
 				continue;
@@ -699,7 +691,10 @@ class StringHelper {
 					if(trim($subPart)==="@font-face") {
 						continue;
 					} else {
-						$subPart = $prefix . ' ' . trim($subPart);
+						// check if not prefixed already when saving drafts multiple times for example.
+						if(!str_contains($subPart, 'groupoffice-msg')) {
+							$subPart = $prefix . ' ' . trim($subPart);
+						}
 					}
 				}
 
@@ -784,7 +779,7 @@ class StringHelper {
 		// extract style before removing comments because sometimes style is wrapped in a comment
 		// <style><!-- body{} --></style>
 		if($preserveHtmlStyle) {
-			$prefix = 'groupoffice-msg-' . uniqid();
+			$prefix =  uniqid();
 			$styles = self::extractStyles($html, $prefix);
 		}
 
@@ -863,7 +858,7 @@ class StringHelper {
 
 
 			if(str_contains($styles, $prefix)) {
-				$html = '<style id="groupoffice-extracted-style">' . $styles . '</style><div class="' . $prefix . '">' . $html . '</div>';
+				$html = '<style id="groupoffice-extracted-style">' . $styles . '</style><div class="groupoffice-msg-' . $prefix . '">' . $html . '</div>';
 			} else {
 				$html = '<style id="groupoffice-extracted-style">' . $styles . '</style>' . $html;
 			}
