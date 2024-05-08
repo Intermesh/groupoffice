@@ -7,6 +7,8 @@ use Exception;
 use GO;
 use GO\Base\Exception\AccessDenied;
 use GO\Base\Exception\NotFound;
+use GO\Base\Mail\Exception\ImapAuthenticationFailedException;
+use GO\Base\Mail\Exception\MailboxNotFound;
 use GO\Base\Mail\Imap;
 use GO\Base\Mail\Mailer;
 use GO\Base\Mail\SmimeMessage;
@@ -172,6 +174,12 @@ class MessageController extends \GO\Base\Controller\AbstractController
 		return $response;
 	}
 
+	/**
+	 * @throws ImapAuthenticationFailedException
+	 * @throws AccessDenied
+	 * @throws MailboxNotFound
+	 * @throws NotFound
+	 */
 	protected function actionStore(array $params)
 	{
 
@@ -299,7 +307,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 		}
 
-		if(preg_match('/TEXT "(.*)"/', $query, $matches) && !$this->allowFTS($imap)) {
+		if(preg_match('/TEXT "(.*)"/', $query, $matches) && !$this->allowFTS($account, $imap)) {
 			$query = 'OR OR OR FROM "' .$matches[1] . '" SUBJECT "' .$matches[1] . '" TO "' .$matches[1] . '" CC "' .$matches[1] . '"';
 		}
 
@@ -381,8 +389,12 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	}
 
 
-	private function allowFTS ($imap) :bool{
-		return !empty(go()->getConfig()['email_allow_body_search']) || $imap->has_capability("XFTS");
+	private function allowFTS (Account $account, $imap) :bool{
+
+		$forceFTS = go()->getConfig()['community']['email']['forceFTS'][$account->host] ?? false;
+
+
+		return $forceFTS || $imap->has_capability("XFTS");
 	}
 
 
@@ -1564,6 +1576,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if (empty($params['unblock'])){// && !\GO\Addressbook\Model\Contact::model()->findSingleByEmail($response['sender'])) {
 			$blockUrl = 'about:blank';
 			$response['htmlbody'] = preg_replace("/<([^a]{1})([^>]*)(https?:[^>'\"]*)/iu", "<$1$2" . $blockUrl, $response['htmlbody'], -1, $response['blocked_images']);
+			if($response['htmlbody'] === null) {
+				throw new \Exception("Could not block images: ". preg_last_error_msg());
+			}
 		}
 
 		return $response;

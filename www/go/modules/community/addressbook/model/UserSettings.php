@@ -58,7 +58,7 @@ class UserSettings extends Property {
 			$addressBook = AddressBook::find()->where('createdBy', '=', $this->userId)->single();
 			if(!$addressBook) {
 				$user = User::findById($this->userId, ['displayName', 'enabled']);
-				if(!$user->enabled) {
+				if(!$user || !$user->enabled) {
 					return null;
 				}
 				$addressBook = new AddressBook();

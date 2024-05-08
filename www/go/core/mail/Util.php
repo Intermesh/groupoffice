@@ -15,7 +15,8 @@ class Util {
 	 * @param string $email
 	 * @return boolean
 	 */
-	public static function validateEmail($email) {
+	public static function validateEmail($email): bool
+	{
 		return preg_match(self::EMAIL_REGEX, $email);
 	}
 
@@ -26,7 +27,7 @@ class Util {
 	 *
 	 * @param ?string $string
 	 * @param string $defaultCharset
-	 * @return array|string|string[]
+	 * @return string
 	 */
 	public static function mimeHeaderDecode(?string $string, string $defaultCharset = 'UTF-8'): string
 	{
@@ -55,7 +56,7 @@ class Util {
 
 				$string = str_replace($v, $fld, $string);
 			}
-		} elseif (preg_match('/([a-bA-B0-9\-]+)\'\'([^\s\'"]+)/', $string, $matches)) { //check pos for not being to great
+		} elseif (preg_match('/([a-zA-Z0-9\-]+)\'\'([^\s\'"]+)/', $string, $matches)) { //check pos for not being to great
 			//eg. iso-8859-1''%66%6F%73%73%2D%69%74%2D%73%6D%61%6C%6C%2E%67%69%66
 			$charset = $matches[1];
 			$string = rawurldecode($matches[2]);

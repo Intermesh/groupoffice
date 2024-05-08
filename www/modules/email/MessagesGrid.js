@@ -19,8 +19,7 @@ GO.email.MessagesGrid = function(config){
 	config.paging=true;
 
 	config.hideMode='offsets';
-
-		config.cm =  new Ext.grid.ColumnModel({
+	config.cm =  new Ext.grid.ColumnModel({
 		defaults:{
 			sortable:true,
 			groupable:false
@@ -161,10 +160,6 @@ GO.email.MessagesGrid = function(config){
 							}
 
 							if(this.searchField && this.searchField.getValue()) {
-								// GO.email.messagesGrid.store.baseParams['search'] = this.searchField.getValue();
-								// this.searchField.hasSearch = true;
-
-								// GO.email.messagesGrid.store.reload();
 								this.searchField.search();
 							}
 						}
@@ -294,8 +289,6 @@ GO.email.MessagesGrid = function(config){
 
 	var me = this;
 
-
-
 	if(!config.hideSearch) {
 		this.getTopToolbar().enableOverflow = true;
 
@@ -418,7 +411,6 @@ GO.email.MessagesGrid = function(config){
 		);
 	}
 
-
 	var origRefreshHandler = this.getBottomToolbar().refresh.handler;
 
 	this.getBottomToolbar().refresh.handler=function(){
@@ -429,7 +421,7 @@ GO.email.MessagesGrid = function(config){
 
 	//stop/start drag and drop when store loads when account is readOnly
 	this.store.on('load', function(store, records, options) {
-		console.log(store.baseParams);
+		// console.log(store.baseParams);
 		if(this.getView().dragZone){
 			if(store.reader.jsonData.permission_level <= GO.permissionLevels.read) {
 				this.getView().dragZone.lock();
@@ -438,8 +430,6 @@ GO.email.MessagesGrid = function(config){
 			}
 		}
 	}, this);
-
-
 
 }
 
@@ -479,50 +469,16 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 	},
 	toggleUnread : function(item, pressed)
 	{
-		this.setIconClass(pressed ? 'ic-email' : 'ic-mark-as-unread');
-		this.setTooltip(pressed ? t("Show all", "email") : t("Show unread", "email"));
+		item.setIconClass(pressed ? 'ic-email' : 'ic-mark-as-unread');
+		item.setTooltip(pressed ? t("Show all", "email") : t("Show unread", "email"));
 		GO.email.messagesGrid.store.baseParams['unread']=pressed ? 1 : 0;
-
 		GO.email.messagesGrid.store.load();
 	},
 	toggleFlagged : function(item, pressed)
 	{
 		GO.email.messagesGrid.store.baseParams['flagged']=pressed ? 1 : 0;
-		
 		GO.email.messagesGrid.store.load();
 	},
-
-	/* @deprecated
-	renderNorthMessageRow : function(value, metaData, record){
-
-		if( this.isSpoofed(record)) {
-			metaData.css = 'danger';
-
-			value += " &lt;" + record.data.sender + "&gt;";
-		}
-
-		if(record.data['seen']=='0')
-			return String.format('<div id="sbj_'+record.data['uid']+'" '+this.createQtipTemplate(record)+' class="ml-unseen-mail">{0}</div>', value);
-		else
-			return String.format('<div id="sbj_'+record.data['uid']+'" '+this.createQtipTemplate(record)+' class="ml-seen-mail">{0}</div>', value);
-	},
-	*/
-	/* @deprecated
-	renderMessageSmallRes : function(value, metaData, record){
-
-		if( this.isSpoofed(record)) {
-			metaData.css = 'danger';
-			value += " &lt;" + record.data.sender + "&gt;";
-		}
-
-		if(record.data['seen']=='0')
-		{
-			return String.format('<div id="sbj_'+record.data['uid']+'" '+this.createQtipTemplate(record)+' class="ml-unseen-from">{0}</div><div class="ml-unseen-subject">{1}</div>', value, record.data['subject']);
-		}else
-		{
-			return String.format('<div id="sbj_'+record.data['uid']+'" '+this.createQtipTemplate(record)+' class="ml-seen-from">{0}</div><div class="ml-seen-subject">{1}</div>', value, record.data['subject']);
-		}
-	},*/
 
 	createQtipTemplate: function(record){
 		var qtipTemplate = '';
@@ -560,8 +516,8 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 	},
 
 	renderIcon : function(src, p, record){
-		var icons = [];
-		var unseen = '';
+		let icons = [];
+		let unseen = '';
 		if(record.data.answered) {
 			icons.push('reply');
 		}
@@ -569,7 +525,7 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 			icons.push('forward');
 		}
 		if(!record.data.seen) {
-			var unseen = '<div class="ml-unseen-dot"></div>';
+			unseen = '<div class="ml-unseen-dot"></div>';
 		}
 		if(record.data['has_attachments']=='1') {
 			icons.push('attachment');
