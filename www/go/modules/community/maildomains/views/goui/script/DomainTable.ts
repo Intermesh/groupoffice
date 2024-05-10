@@ -1,4 +1,16 @@
-import {column, DataSourceStore, datasourcestore, datecolumn, datetimecolumn, Format, t, Table} from "@intermesh/goui";
+import {
+	btn,
+	column,
+	comp,
+	DataSourceStore,
+	datasourcestore,
+	datecolumn,
+	datetimecolumn, DefaultEntity,
+	Format,
+	t,
+	Table,
+	Window
+} from "@intermesh/goui";
 import {JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
 import {DomainDialog} from "./DomainDialog";
 
@@ -179,7 +191,26 @@ export class DomainTable extends Table<DataSourceStore> {
 					return v.displayName;
 				}
 			}),
+			column({
+				header: t("Status"),
+				id: "mxStatus",
+				resizable: false,
+				width: 80,
+				renderer: (v, record) => {
+					let allIsWell = record.mxStatus && record.dmarcStatus && record.spfStatus;
 
+					for (const k of record.dkimRecords) {
+						allIsWell = allIsWell && k.status;
+					}
+					let iconCls = "icon";
+					if (!allIsWell) {
+						iconCls += " accent";
+					}
+					return btn({icon: (allIsWell ? "check_circle" : "warning"), cls: iconCls,
+						handler:(_btn, _ev) => { this.onStatusBtnClick(allIsWell, record)}});
+
+				}
+			})
 		];
 
 		super(store, columns );
@@ -193,5 +224,33 @@ export class DomainTable extends Table<DataSourceStore> {
 			await dlg.load(table.store.get(rowIndex)!.id);
 		});
 
+	}
+
+	private onStatusBtnClick(allIsWell: bool, record: DefaultEntity) {
+		let msg = "";
+		if(allIsWell) {
+			msg += t("No DNS problems found!", "community", "maildomains");
+		} else {
+			if (record.dkimRecords.length === 0) {
+				msg += "&bull;&nbsp;" + t("No DKIM records found.") + "<br/>";
+			} else {
+				for (const k of record.dkimRecords) {
+					if (!k.status) {
+						msg += t("Missing or invalid DKIM record for ", "community", "maildomains") +
+							k.selector + ".<br/>";
+					}
+				}
+			}
+			if (!record.spfStatus) {
+				msg += "&bull;&nbsp;" + t("Missing or invalid SPF TXT record", "community","maildomains") + ".<br>";
+			}
+			if (!record.dmarcStatus) {
+				msg += "&bull;&nbsp;" + t("Missing or invalid DMARC TXT record", "community","maildomains") + ".<br>";
+			}
+			if (!record.mxStatus) {
+				msg += "&bull;&nbsp;" + t("Missing or invalid MX TXT record", "community","maildomains") + ".<br>";
+			}
+		}
+		void Window.alert(msg, t("DNS Status"));
 	}
 }

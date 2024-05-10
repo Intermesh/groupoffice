@@ -8,6 +8,7 @@ use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
+use go\core\util\ArrayObject;
 use go\core\util\DateTime;
 
 final class Domain extends AclOwnerEntity
@@ -63,6 +64,19 @@ final class Domain extends AclOwnerEntity
 
 	public $mailboxes;
 
+	public $spf;
+
+	public $spfStatus;
+
+	public $mx;
+
+	public $mxStatus;
+
+	public $dmarc;
+
+	public $dmarcStatus;
+	public $dkimRecords;
+
 	/** @var int */
 	public $numAliases;
 
@@ -75,17 +89,6 @@ final class Domain extends AclOwnerEntity
 	/** @var int */
 	public $sumUsage;
 
-	/*
-	// TODO: default attributes!
-	public function defaultAttributes()
-	{
-		$attr = parent::defaultAttributes();
-		$attr['total_quota']=1024*1024*10;//10 GB of quota per domain by default.
-		$attr['default_quota']=1024*512; //512 MB of default quota
-		return $attr;
-	}
-	*/
-
 	/**
 	 * @inheritDoc
 	 */
@@ -97,7 +100,8 @@ final class Domain extends AclOwnerEntity
 				->join('community_maildomains_mailbox', 'cmm', '`cmd`.`id`=`cmm`.`domainId`', 'LEFT')
 				->groupBy(['`cmm`.`domainId`']))
 			->addScalar('aliases', 'community_maildomains_alias', ['id' => 'domainId'])
-			->addScalar('mailboxes', 'community_maildomains_mailbox', ['id' => 'domainId']);
+			->addScalar('mailboxes', 'community_maildomains_mailbox', ['id' => 'domainId'])
+			->addArray('dkimRecords', DkimKey::class, ['id' => 'domainId']);
 	}
 
 	/**
@@ -125,8 +129,8 @@ final class Domain extends AclOwnerEntity
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()
-			->add('id', function(Criteria $criteria, $value) {
-				if(!empty($value)) {
+			->add('id', function (Criteria $criteria, $value) {
+				if (!empty($value)) {
 					$criteria->where(['id' => $value]);
 				}
 			});
@@ -135,7 +139,7 @@ final class Domain extends AclOwnerEntity
 	/**
 	 * @inheritDoc
 	 */
-	protected function getSearchDescription() : string
+	protected function getSearchDescription(): string
 	{
 		return $this->domain;
 	}
@@ -178,47 +182,37 @@ final class Domain extends AclOwnerEntity
 		return count($this->mailboxes);
 	}
 
-	// TODO? Import / Export?
 
-	/*
-	 * 	public function import($data) {
-		$mailboxes = $data['mailboxes'];
-		$aliases = $data['aliases'];
-
-		unset($data['mailboxes']);
-		unset($data['aliases']);
-
-		$data['total_quota']=$data['max_mailboxes']=$data['max_aliases']=0;
-
-		$this->setAttributes($data, false);
-
-		if(!$this->save()){
-			throw new \Exception("couldnt save domain");
-		}
-
-		foreach($mailboxes as $mailboxAttr){
-			$mailbox = new Mailbox();
-			$mailbox->setAttributes($mailboxAttr, false);
-			$mailbox->domain_id = $this->id;
-			$mailbox->skipPasswordEncryption = true;
-			if(!$mailbox->save()) {
-				echo "Failed to save mailbox: ".var_export($mailbox->getValidationErrors(), true)."\n\n";
-			}
-		}
-
-
-		foreach($aliases as $aliasAttr){
-			$alias = new Alias();
-			$alias->setAttributes($aliasAttr, false);
-			$alias->domain_id = $this->id;
-
-
-			if(!$alias->save()) {
-				echo "Failed to save alias: ".var_export($alias->getValidationErrors(), true)."\n\n";
-			}
-		}
-
-		return true;
-	}
+	/**
+	 * Upon manually checking DNS settings, update the domain record and DkimKey records as per DNS checks
+	 *
+	 * @param ArrayObject $record
+	 * @throws \Exception
 	 */
+	public function updateDns(ArrayObject $record)
+	{
+		$this->mxStatus = $record['mx'];
+		$this->mx = implode(", ", $record['mxTargets']);
+		$this->spf = $record['spf']; // TODO
+		$this->spfStatus = !empty($record['spf']);
+		$this->dmarc = $record['dmarc'];
+		$this->dmarcStatus = !empty($record['dmarc']);
+
+		if (!count($this->dkimRecords)) {
+			$dkimRecord= new DkimKey($this);
+			$dkimRecord->domainId = $this->id;
+			$dkimRecord->selector = "mail1"; // TODO: make this configurable?
+			$dkimRecord->txt = $record['dkim'] ?? "";
+			$dkimRecord->status = !empty($record['dkim']);
+			$this->dkimRecords[] = $dkimRecord;
+		} else {
+			// TODO: Dkim should be returned as an array. Therefore, this iteration below will have to be rewritten
+			foreach ($this->dkimRecords as $k => $dkimRecord) {
+				$dkimRecord->selector = "mail".($k+1);
+				$dkimRecord->txt = $record['dkim'] ?? "";;
+				$dkimRecord->status = !empty($record['dkim']);
+			}
+		}
+		$this->save();
+	}
 }

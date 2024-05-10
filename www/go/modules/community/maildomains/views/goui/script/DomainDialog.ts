@@ -13,12 +13,13 @@ import {
 	tbar,
 	textfield
 } from "@intermesh/goui";
-import {FilterCondition, FormWindow, jmapds, userdisplaycombo} from "@intermesh/groupoffice-core";
+import {client, FilterCondition, FormWindow, jmapds, userdisplaycombo} from "@intermesh/groupoffice-core";
 import {AliasTable} from "./AliasTable";
 import {MailboxTable} from "./MailboxTable";
 import {MailboxExportDialog} from "./MailboxExportDialog";
 import {MailboxDialog} from "./MailboxDialog";
 import {AliasDialog} from "./AliasDialog";
+import {DnsSettingsForm} from "./DnsSettingsForm";
 
 export class DomainDialog extends FormWindow {
 
@@ -27,6 +28,9 @@ export class DomainDialog extends FormWindow {
 
 	private aliasesTab: Component | undefined;
 	private aliasGrid: AliasTable | undefined;
+
+	private dnsSettingsTab: Component | undefined;
+	private dnsSettingsForm: Component | undefined;
 
 	private totalQuotaFld: NumberField;
 	private defaultQuotaFld: NumberField;
@@ -46,6 +50,7 @@ export class DomainDialog extends FormWindow {
 
 		this.createMailboxesTab();
 		this.createAliasTab();
+		this.createDnsSettingsTab();
 
 		this.generalTab.items.add(
 			fieldset({flex: 1},
@@ -119,7 +124,7 @@ export class DomainDialog extends FormWindow {
 			)
 		);
 
-		this.cards.items.add(this.mailboxesTab!, this.aliasesTab!)
+		this.cards.items.add(this.mailboxesTab!, this.aliasesTab!, this.dnsSettingsTab!)
 		this.addSharePanel();
 
 		this.on("ready", async () => {
@@ -138,6 +143,8 @@ export class DomainDialog extends FormWindow {
 				this.aliasGrid!.store.load().then(() => {
 					this.aliasesTab!.disabled = false;
 				});
+
+				this.dnsSettingsTab!.disabled = false;
 
 				this.defaultQuotaFld.value! /= 1024;
 				this.totalQuotaFld.value! /= 1024;
@@ -235,6 +242,40 @@ export class DomainDialog extends FormWindow {
 			}),
 		), this.aliasGrid);
 
+	}
+
+	private createDnsSettingsTab(): void {
+		this.dnsSettingsTab = comp({
+				cls: "scroll fit",
+				title: t("DNS Settings"),
+				disabled: true
+			}
+		);
+
+		this.dnsSettingsForm = new DnsSettingsForm();
+
+		this.dnsSettingsTab.items.add(
+			tbar({cls: "border-bottom"},
+				"->",
+				btn({
+					text: t("Refresh DNS", "community", "maildomoins"),
+					handler: async (_btn, _ev) => {
+						if(!this.currentId) {
+							return;
+						}
+						const r = await client.jmap( "MailDomain/checkDns", {
+							id: this.currentId
+						});
+						this.load(this.currentId).then(() => {this.render();});
+					}
+				})),
+			this.dnsSettingsForm!
+		);
+		this.dnsSettingsTab.on("show", () => {
+			if (this.currentId) {
+				this.dnsSettingsForm.load(this.entity);
+			}
+		});
 	}
 
 	private async openMailboxDlg(id?: EntityID): Promise<void> {

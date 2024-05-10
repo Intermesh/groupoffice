@@ -7,6 +7,7 @@ use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\StateMismatch;
 use go\core\util\ArrayObject;
 use go\modules\community\maildomains\model;
+use go\modules\community\maildomains\util;
 
 final class Domain extends EntityController
 {
@@ -50,7 +51,7 @@ final class Domain extends EntityController
 	 * @throws StateMismatch
 	 * @throws InvalidArguments
 	 */
-	public function set($params) : ArrayObject
+	public function set($params): ArrayObject
 	{
 		return $this->defaultSet($params);
 	}
@@ -62,7 +63,7 @@ final class Domain extends EntityController
 	 * @throws InvalidArguments
 	 * @see https://jmap.io/spec-core.html#/changes
 	 */
-	public function changes($params) : ArrayObject
+	public function changes($params): ArrayObject
 	{
 		return $this->defaultChanges($params);
 	}
@@ -72,7 +73,7 @@ final class Domain extends EntityController
 	 * @return ArrayObject
 	 * @throws InvalidArguments
 	 */
-	public function export($params) : ArrayObject
+	public function export($params): ArrayObject
 	{
 		return $this->defaultExport($params);
 	}
@@ -82,7 +83,7 @@ final class Domain extends EntityController
 	 * @return ArrayObject
 	 * @throws Exception
 	 */
-	public function import($params) : ArrayObject
+	public function import($params): ArrayObject
 	{
 		return $this->defaultImport($params);
 	}
@@ -92,7 +93,7 @@ final class Domain extends EntityController
 	 * @return ArrayObject
 	 * @throws Exception
 	 */
-	public function importCSVMapping($params) : ArrayObject
+	public function importCSVMapping($params): ArrayObject
 	{
 		return $this->defaultImportCSVMapping($params);
 	}
@@ -101,8 +102,24 @@ final class Domain extends EntityController
 	 * @param $params
 	 * @return ArrayObject
 	 */
-	public function exportColumns($params) : ArrayObject {
+	public function exportColumns($params): ArrayObject
+	{
 		return $this->defaultExportColumns($params);
 	}
 
+
+	public function checkDns(array $params): ArrayObject
+	{
+		if (!isset($params['id'])) {
+			throw new InvalidArguments("Missing 'id' parameter");
+		}
+		$d = model\Domain::findById($params['id']);
+		$ip = go()->getConfig()['serverclient_server_ip'] ?? '127.0.0.1';
+
+		$dnsChecker = new Util\DnsCheck($d, $ip, true);
+		$r = $dnsChecker->checkAll();
+		$d->updateDns($r);
+
+		return $r;
+	}
 }
