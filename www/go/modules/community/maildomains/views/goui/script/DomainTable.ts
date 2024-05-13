@@ -236,8 +236,8 @@ export class DomainTable extends Table<DataSourceStore> {
 			} else {
 				for (const k of record.dkimRecords) {
 					if (!k.status) {
-						msg += t("Missing or invalid DKIM record for ", "community", "maildomains") +
-							k.selector + ".<br/>";
+						msg += "&bull;$nbsp;" + t("Missing or invalid DKIM record for ", "community", "maildomains") +
+							" " + k.selector + ".<br/>";
 					}
 				}
 			}

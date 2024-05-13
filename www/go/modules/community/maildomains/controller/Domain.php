@@ -116,7 +116,7 @@ final class Domain extends EntityController
 		$d = model\Domain::findById($params['id']);
 		$ip = go()->getConfig()['serverclient_server_ip'] ?? '127.0.0.1';
 
-		$dnsChecker = new Util\DnsCheck($d, $ip, true);
+		$dnsChecker = new util\DnsCheck($d, $ip, true);
 		$r = $dnsChecker->checkAll();
 		$d->updateDns($r);
 
