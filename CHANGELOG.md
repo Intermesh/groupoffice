@@ -1,5 +1,6 @@
 - Email: Fixed CSS bleeding issue
 - ldap: LDAP - Synchronize users checkbox #1144
+- Core: Do not check module availability on listeners rebuild so it always rebuilds even if license fails
 
 06-05-2024: 6.8.46
 - Core: Set maximum password length to 255 to prevent brute force attacks
