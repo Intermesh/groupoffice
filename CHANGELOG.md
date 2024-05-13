@@ -1,3 +1,4 @@
+13-05-2024: 6.7.79
 - Core: Do not check module availability on listeners rebuild so it always rebuilds even if license fails
 
 06-05-2024: 6.7.78
