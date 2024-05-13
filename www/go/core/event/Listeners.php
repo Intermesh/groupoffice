@@ -82,10 +82,6 @@ class Listeners extends Singleton {
 
 		foreach (Module::find(['id', 'name', 'package', 'version', 'enabled'], true)->where(['enabled' => true]) as $module) { /* @var $module Module */
 
-			if(!$module->isAvailable()) {
-				continue;
-			}
-
 			if(!isset($module->package)) {//backwards compatibility hack. Remove once refactored.
 				
 				$cls = "GO\\" . ucfirst($module->name) . "\\" . ucfirst($module->name).'Module';
