@@ -157,21 +157,17 @@ final class Oauth2Client extends EntityController
 			if($wasNew) {
 				$account->addAlias($user->email, $user->displayName);
 			}
-
-			go()->getDbConnection()->replace('oauth2client_account', [
-				'accountId' => $account->id,
-				'oauth2ClientId' => $client->id,
-				'token' => $token->getToken(),
-				'refreshToken' => $token->getRefreshToken(),
-				'expires' => $token->getExpires()
-			])->execute();
-
-			$this->auth($account->id);
-		} else {
-			unset($_SESSION['oauth2clientId']);
-			header("Location: " . go()->getSettings()->URL);
 		}
 
+		go()->getDbConnection()->replace('oauth2client_account', [
+			'accountId' => $account->id,
+			'oauth2ClientId' => $client->id,
+			'token' => $token->getToken(),
+			'refreshToken' => $token->getRefreshToken(),
+			'expires' => $token->getExpires()
+		])->execute();
+
+		$this->auth($account->id);
 
 	}
 
@@ -248,6 +244,8 @@ final class Oauth2Client extends EntityController
 		//todo, perhaps add login_hint=username to url here?
 
 		$_SESSION['oauth2state'] = $provider->getState();
+
+
 		\GO::session()->closeWriting();
 		$r = \go\core\http\Response::get();
 		$r->setHeader('Location', $authUrl);
