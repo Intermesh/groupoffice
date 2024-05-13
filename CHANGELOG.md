@@ -1,4 +1,5 @@
 - Email: Fixed CSS bleeding issue
+- ldap: LDAP - Synchronize users checkbox #1144
 
 06-05-2024: 6.8.46
 - Core: Set maximum password length to 255 to prevent brute force attacks
