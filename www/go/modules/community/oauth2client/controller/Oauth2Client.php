@@ -145,6 +145,11 @@ final class Oauth2Client extends EntityController
 			$account->smtp_port = $default->smtpPort;
 			$account->smtp_encryption = $default->smtpEncryption;
 
+			if($default->name == "Azure") {
+				// Disable sent folder for Azure as it automatically saves sent items.
+				$account->sent = "";
+			}
+
 			//$account->mbroot = ??
 
 			$wasNew = $account->getIsNew();
