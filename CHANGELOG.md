@@ -1,4 +1,6 @@
 - Notes / Comments: Use StringUtil to remove style from notes and comments as old way could remove text unexpectedly
+- Oauth: RefreshToken for Google was not obtained when using openid
+- Oauth: Possible now to use a different smtp user for IMAP accounts.
 
 13-05-2024: 6.8.47
 - Email: Fixed CSS bleeding issue
