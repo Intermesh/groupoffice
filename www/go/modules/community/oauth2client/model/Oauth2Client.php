@@ -78,15 +78,19 @@ final class Oauth2Client extends Entity
 		];
 		switch ($defaultClient->name) {
 			case 'Google':
+				// see https://developers.google.com/identity/protocols/oauth2/web-server
 				$params['accessType'] = 'offline';
-				$params['scopes'] = $scopes ?? ['https://mail.google.com/'];
+				$params['scopes'] = $scopes ?? ['openid', 'profile', 'email','https://mail.google.com/'];
 
 				return new Google($params);
 
 			case 'Azure':
 				// https://docs.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth
 				// https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow
-				$prvVendorName = 'TheNetworg';
+
+				// unfortunately the "profile" scope can't be mixed with the outlook scopes :(
+				// https://stackoverflow.com/questions/61597263/office-365-xoauth2-for-imap-and-smtp-authentication-fails/61678485#61678485
+				// so we need two tokens
 				$params['tenant'] = $this->projectId;
 				$params['scopes'] = $scopes ?? [
 					'openid',
