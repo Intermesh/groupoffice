@@ -1,3 +1,5 @@
+- Notes / Comments: Use StringUtil to remove style from notes and comments as old way could remove text unexpectedly
+
 13-05-2024: 6.8.47
 - Email: Fixed CSS bleeding issue
 - ldap: LDAP - Synchronize users checkbox #1144
