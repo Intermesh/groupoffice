@@ -7,6 +7,7 @@ namespace go\core\util;
 
 use Exception;
 use go\core\App;
+use go\core\ErrorHandler;
 use Html2Text\Html2Text;
 use Normalizer;
 use Throwable;
@@ -963,13 +964,13 @@ END;
 	 * This also removes everything outside the body and replaces mailto links
 	 *
 	 * @todo do this all client side in the next email module. Using DomParser api?
-	 * @param string $text Plain text string
+	 * @param	string $html Plain text string
 	 * @access public
 	 * @return string HTML formatted string
 	 */
-	public static function sanitizeHtml($html) {
+	public static function sanitizeHtml($html, $preserveHtmlStyle = true) {
 		//needed for very large strings when data is embedded in the html with an img tag
-		ini_set('pcre.backtrack_limit', (int)ini_get( 'pcre.backtrack_limit' )+ 1000000 );
+		ini_set('pcre.backtrack_limit',  3000000 );
 
 
 		//remove strange white spaces in tags first
@@ -978,26 +979,63 @@ END;
 
 		// extract style before removing comments because sometimes style is wrapped in a comment
 		// <style><!-- body{} --></style>
-
+		if($preserveHtmlStyle) {
+			$prefix =  uniqid();
+			$styles = self::extractStyles($html, $prefix);
+		}
 
 		// remove comments because they might interfere. Some commands  in style tags may be improperly formatted
 		// because the user appears to paste from Word
+		$html = preg_replace(["'<style>[\s]*<!--'u", "'-->[\s*]</style>'u"], ['<style>','</style>'], $html);
 		$html = preg_replace("'<!--.*-->'Uusi", "", $html);
 		$html = preg_replace('!/\*.*?\*/!s', '', $html);
 
 		$to_removed_array = array (
+			"'<!DOCTYPE[^>]*>'usi",
+			"'<html[^>]*>'usi",
+			"'</html>'usi",
+			"'<body[^>]*>'usi",
+			"'</body>'usi",
+			"'<meta[^>]*>'usi",
+			"'<link[^>]*>'usi",
+			"'<title[^>]*>.*?</title>'usi",
+//		"'<head[^>]*>.*?</head>'usi", //Amazon had body inside the head !?
+			"'<head[^>]*>'usi",
+			"'</head[^>]*>'usi",
+			"'<base[^>]*>'usi",
+			"'<meta[^>]*>'usi",
 			"'<bgsound[^>]*>'usi",
+
+			/* MS Word junk */
+			"'<xml[^>]*>.*?</xml>'usi",
+			"'<\/?o:[^>]*>'usi",
+			"'<\/?v:[^>]*>'usi",
+			"'<\/?st1:[^>]*>'usi",
+			"'<\?xml[^>]*>'usi",
+
+			"'<style[^>]*>.*?</style>'usi",
 			"'<script[^>]*>.*?</script>'usi",
 			"'<iframe[^>]*>.*?</iframe>'usi",
 			"'<object[^>]*>.*?</object>'usi",
 			"'<embed[^>]*>.*?</embed>'usi",
 			"'<applet[^>]*>.*?</applet>'usi",
+			"'<form[^>]*>'usi",
+			//"'<input[^>]*>'usi",
+			//"'<select[^>]*>.*?</select>'usi",
+			//"'<textarea[^>]*>.*?</textarea>'usi",
+			"'</form>'usi",
+
 		);
 
 //		 $html = "<div onclick=\"yo\" online='1' test='onclick' onclick=\"yo\"></div>\n\n\n" . $html;
 
 		$html = preg_replace($to_removed_array, '', $html);
+		//Remove any attribute starting with "on" or xmlns. Had to do this always because many mails contain weird tags like online="1".
+		//These were detected as xss attacks by detectXSS().
 
+//		$regex = '#(<[^>\s]*)\s(?:on|xmlns)[^>\s]+#iu';
+//		preg_match_all($regex, $html, $matched_tags, PREG_SET_ORDER);
+//		preg_replace($regex, '$1', $html);
 
 		$html = preg_replace_callback('#<([^>]+)>#u', function($matches) {
 			return "<" . preg_replace('#\s(?:on|xmlns)[^\s]+#iu', "", $matches[1]) . ">";
@@ -1013,8 +1051,159 @@ END;
 			}
 		}
 
+
+
+		if(!empty($styles)) {
+
+
+			if(str_contains($styles, $prefix)) {
+				$html = '<style id="groupoffice-extracted-style">' . $styles . '</style><div class="groupoffice-msg-' . $prefix . '">' . $html . '</div>';
+			} else {
+				$html = '<style id="groupoffice-extracted-style">' . $styles . '</style>' . $html;
+			}
+		} else if($preserveHtmlStyle) {
+//			$html = trim($html);
+//			if(substr($html,0, 17) !== '<div class="msg">') {
+//				$html = '<div class="msg">'. $html .'</div>';
+//			}
+		}
+
 		return $html;
 	}
+
+	private static function extractStyles(string $html, string $prefixId): string
+	{
+
+		preg_match_all("'<style[^>]*>(.*?)</style>'usi", $html, $matches);
+		$css = "";
+		for($i = 0, $l = count($matches[0]); $i < $l; $i++) {
+
+			//don't add the style added by group-office inline because it will double up.
+			if(strstr($matches[0][$i], 'groupoffice-email-style')) {
+				continue;
+			}
+
+			$tmpCss = $matches[1][$i];
+			$tmpCss = preg_replace(["'<!--'", "'-->'"], "", $tmpCss);
+			$css .= $tmpCss. "\n\n"; // $matches[1][$i]
+
+		}
+
+		$style = self::prefixCSSSelectors($css, '.groupoffice-msg-'.$prefixId);
+
+		//apply body style on root element
+		$bodyStyle = self::extractBodyStyle($html);
+		if(!empty($bodyStyle)) {
+			$style = '.groupoffice-msg-'.$prefixId . ' {' . $bodyStyle . "};\n";
+		}
+
+		return $style;
+	}
+
+	private static function prefixCSSSelectors(string $css, string $prefix): string
+	{
+		# Wipe all block comments
+		$css = preg_replace('!/\*.*?\*/!s', '', $css);
+
+		$parts = explode('}', $css);
+		$keyframeStarted = false;
+		$mediaQueryStarted = false;
+
+		foreach($parts as $key => &$part) {
+			$part = trim($part);
+			if(empty($part)) {
+				$keyframeStarted = false;
+				continue;
+			} else { # This else is also required
+				$partDetails = explode('{', $part);
+
+				if (strpos($part, 'keyframes') !== false) {
+					$keyframeStarted = true;
+					continue;
+				}
+
+				if($keyframeStarted) {
+					continue;
+				}
+
+				if(substr_count($part, "{")==2) {
+					$mediaQuery = $partDetails[0]."{";
+					$partDetails[0] = $partDetails[1];
+					$mediaQueryStarted = true;
+				}
+
+				$subParts = explode(',', $partDetails[0]);
+				foreach($subParts as &$subPart) {
+					if(trim($subPart)==="@font-face") {
+						continue;
+					} else {
+						// check if not prefixed already when saving drafts multiple times for example.
+						if(!str_contains($subPart, 'groupoffice-msg')) {
+							$subPart = $prefix . ' ' . trim($subPart);
+						}
+					}
+				}
+
+				if(substr_count($part,"{")==2) {
+					$part = $mediaQuery."\n".implode(', ', $subParts)."{".$partDetails[2];
+				} elseif(empty($part[0]) && $mediaQueryStarted) {
+					$mediaQueryStarted = false;
+					// Shitty CSS. Looking at you, Outlook...
+					if(count($partDetails) < 3) {
+						continue;
+					}
+
+					$part = implode(', ', $subParts)."{".$partDetails[2]."}\n"; //finish media query
+				} else {
+					if(isset($partDetails[1])) {
+						# Sometimes, without this check,
+						# there is an error-notice, we don't need that..
+						$part = implode(', ', $subParts)."{".$partDetails[1];
+					}
+				}
+
+				unset($partDetails, $mediaQuery, $subParts); # Kill those three ..
+			}
+			unset($part); # Kill this one as well
+		}
+
+		# Finish with the whole new prefixed string/file in one line
+		return(preg_replace('/\s+/',' ',implode("} ", $parts)));
+
+	}
+
+	private static function extractBodyStyle(string $html): string
+	{
+		$style = "";
+
+		if(!preg_match("'<body [^>]*>'usi", $html, $matches)) {
+			return $style;
+		}
+
+		try {
+			$d = new \DOMDocument();
+			$d->loadHTML("<html>" . $matches[0] . '</body></html>');
+			$bodyEls = $d->getElementsByTagName('body');
+			if(!$bodyEls->length) {
+				return $style;
+			}
+			$bodyEl = $bodyEls->item(0);
+		} catch (\Throwable $e) {
+			ErrorHandler::logException($e);
+			return $style;
+		}
+
+		if($bodyEl->hasAttribute("bgcolor")) {
+			$style .= "background-color: " . $bodyEl->getAttribute("bgcolor").";";
+		}
+
+		if($bodyEl->hasAttribute("style")) {
+			$style .= $bodyEl->getAttribute("style");
+		}
+
+		return $style;
+	}
+
 
 	/**
 	 * Format a number by using the user preferences
