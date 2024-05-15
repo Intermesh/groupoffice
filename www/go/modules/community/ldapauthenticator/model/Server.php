@@ -194,7 +194,7 @@ class Server extends Entity {
 		}
 
 
-		if($this->syncUsers) {
+		if($this->syncGroups) {
 			try {
 				Record::find($connection, $this->groupsDN, $this->syncGroupsQuery)->fetch();
 			} catch (Exception $e) {

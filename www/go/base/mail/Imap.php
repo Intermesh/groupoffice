@@ -964,7 +964,7 @@ class Imap extends ImapBodyStruct
 	 * @return <type>
 	 */
 
-	private $_unseen;
+	private $_unseen = [];
 
 	/**
 	 * @param false|string $mailbox

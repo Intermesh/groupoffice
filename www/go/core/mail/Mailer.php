@@ -241,7 +241,7 @@ class Mailer {
 					'clientId' => $client->clientId,
 					'clientSecret' => $client->clientSecret,
 					'refreshToken' => $cltAcct['refreshToken'],
-					'userName' => $this->emailAccount->username,
+					'userName' => !empty($this->emailAccount->smtp_username) ? $this->emailAccount->smtp_username : $this->emailAccount->username,
 				]));
 
 			} else if (!empty($this->emailAccount->force_smtp_login)){

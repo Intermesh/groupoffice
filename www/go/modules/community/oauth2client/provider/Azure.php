@@ -8,4 +8,5 @@ class Azure extends \TheNetworg\OAuth2\Client\Provider\Azure {
 		return $openIdConfiguration['userinfo_endpoint'];
 	}
 
+
 }

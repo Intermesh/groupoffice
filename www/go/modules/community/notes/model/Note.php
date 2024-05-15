@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\notes\model;
 
+use GO\Base\Util\StringHelper;
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
@@ -112,13 +113,14 @@ class Note extends AclItemEntity {
 	protected function internalValidate()
 	{
 		if($this->isModified(['content'])) {
-			$this->content = preg_replace("/<style>.*<\/style>/usi", '', $this->content);
+			$this->content = StringHelper::sanitizeHtml($this->content, false);
 
 			if(StringUtil::detectXSS($this->content, false)) {
 				$this->setValidationError('content', ErrorCode::INVALID_INPUT, "You're not allowed to use scripts in the content");
 			}
 		}
-		return parent::internalValidate();
+
+		parent::internalValidate();
 	}
 
 
