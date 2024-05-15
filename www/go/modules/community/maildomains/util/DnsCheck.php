@@ -12,6 +12,8 @@ use SPFLib\Check\Result;
 final class DnsCheck
 {
 	private Domain $domainEntity;
+	
+	private string $domainName;
 	private string $ipAddress;
 
 	private bool $rawOutput;
@@ -24,6 +26,7 @@ final class DnsCheck
 	public function __construct(Domain $domain, string $ipAddress, ?bool $rawOutput=false)
 	{
 		$this->domainEntity = $domain;
+		$this->domainName = $domain->domain;
 		$this->ipAddress = $ipAddress;
 		$this->rawOutput = $rawOutput;
 	}
@@ -52,7 +55,7 @@ final class DnsCheck
 		require_once __DIR__ . '/../vendor/autoload.php';
 		$decoder = new Decoder();
 		try {
-			$record = $decoder->getRecordFromDomain($this->domainEntity->domain);
+			$record = $decoder->getRecordFromDomain($this->domainName);
 		} catch(\SPFLib\Exception $e) {
 			return null;
 		}
@@ -71,7 +74,7 @@ final class DnsCheck
 	{
 		require_once __DIR__ . '/../vendor/autoload.php';
 
-		$environment = new Environment($this->ipAddress, $this->domainEntity->domain);
+		$environment = new Environment($this->ipAddress, $this->domainName);
 
 		$checker = new Checker();
 		$checkResult = $checker->check($environment);
@@ -92,7 +95,7 @@ final class DnsCheck
 	 */
 	public function checkDMARC(): null|array|string
 	{
-		$records = dns_get_record("_dmarc." . $this->domainEntity->domain, DNS_TXT);
+		$records = dns_get_record("_dmarc." . $this->domainName, DNS_TXT);
 		if(empty($records) || empty($records[0]['txt'])) {
 			return null;
 		}
@@ -109,7 +112,7 @@ final class DnsCheck
 	 */
 	public function checkDKIM(string $selector = "mail._domainkey"): null|array|string
 	{
-		$records = dns_get_record($selector."." . $this->domainEntity->domain, DNS_TXT);
+		$records = dns_get_record($selector."." . $this->domainName, DNS_TXT);
 
 		if(empty($records) || empty($records[0]['txt'])) {
 			return null;
@@ -124,7 +127,7 @@ final class DnsCheck
 	 */
 	public function getMX() : array
 	{
-		$records = dns_get_record( $this->domainEntity->domain, DNS_MX);
+		$records = dns_get_record( $this->domainName, DNS_MX);
 
 		$mxs = [];
 		foreach($records as $record) {
@@ -161,7 +164,7 @@ final class DnsCheck
 	public function checkAll() : ArrayObject
 	{
 		$record =  [
-			'mailDomain' => $this->domainEntity->domain,
+			'mailDomain' => $this->domainName,
 			'mxIP' => $this->ipAddress,
 			'spf' => $this->getSpf(),
 			'spfStatus' => $this->checkSPF(),

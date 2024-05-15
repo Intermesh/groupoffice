@@ -122,4 +122,18 @@ final class Domain extends EntityController
 
 		return $r;
 	}
+
+	/**
+	 * Perform an automated PTR check
+	 *
+	 *
+	 *
+	 * @param array $params
+	 * @return ArrayObject
+	 * @throws \go\core\http\Exception
+	 */
+	public function checkPtr(array $params): ArrayObject
+	{
+		return util\Ptr::check($params);
+	}
 }

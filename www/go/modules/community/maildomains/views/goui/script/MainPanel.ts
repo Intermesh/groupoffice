@@ -1,11 +1,12 @@
 import {btn, comp, Component, Notifier, paginator, searchbtn, t, tbar} from "@intermesh/goui";
-import {authManager, jmapds, User} from "@intermesh/groupoffice-core";
+import {authManager, client, jmapds, User} from "@intermesh/groupoffice-core";
 import {DomainTable} from "./DomainTable";
 import {DomainDialog} from "./DomainDialog";
 
 export class MainPanel extends Component {
 	private tbl: DomainTable;
 	private center: Component;
+	private ptrStatus: Component
 	private user: User | undefined;
 
 	constructor() {
@@ -21,6 +22,17 @@ export class MainPanel extends Component {
 				Notifier.error(t("Login is required on this page"));
 			}
 			await this.tbl.store.load();
+			client.jmap( "MailDomain/checkPtr", {}).then((result) => {
+				let ptrOk = true;
+				for(const rr of result) {
+					ptrOk = ptrOk && rr.status === "SUCCESS";
+				}
+				if (ptrOk) {
+					this.ptrStatus.html = '<i class="icon success">check</i>&nbsp;' +t("PTR OK")
+				} else {
+					this.ptrStatus.html = '<i class="icon warning">warning</i>&nbsp;' + t("PTR error");
+				}
+			});
 		});
 		this.tbl = new DomainTable();
 
@@ -34,9 +46,8 @@ export class MainPanel extends Component {
 					},
 
 					tbar({},
-
 						'->',
-
+						this.ptrStatus = comp({html: ""}),
 						searchbtn({
 							listeners: {
 								input: (sender, text) => {
@@ -45,7 +56,6 @@ export class MainPanel extends Component {
 								}
 							}
 						}),
-
 						btn({
 							itemId: "add",
 							icon: "add",

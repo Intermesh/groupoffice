@@ -258,6 +258,7 @@ export class DomainDialog extends FormWindow {
 			tbar({cls: "border-bottom"},
 				"->",
 				btn({
+					icon: "dns",
 					text: t("Refresh DNS", "community", "maildomoins"),
 					handler: async (_btn, _ev) => {
 						if(!this.currentId) {
