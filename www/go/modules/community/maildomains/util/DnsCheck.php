@@ -4,6 +4,10 @@ namespace go\modules\community\maildomains\util;
 
 use go\core\util\ArrayObject;
 use go\modules\community\maildomains\model\Domain;
+use SPFLib\{Checker,Decoder};
+use SPFLib\Check\Environment;
+use SPFLib\Check\Result;
+
 
 final class DnsCheck
 {
@@ -15,6 +19,7 @@ final class DnsCheck
 	/**
 	 * @param Domain $domain
 	 * @param string $ipAddress
+	 * @param bool|null $rawOutput
 	 */
 	public function __construct(Domain $domain, string $ipAddress, ?bool $rawOutput=false)
 	{
@@ -42,6 +47,18 @@ final class DnsCheck
 		return $record;
 	}
 
+	public function getSpf()
+	{
+		require_once __DIR__ . '/../vendor/autoload.php';
+		$decoder = new Decoder();
+		try {
+			$record = $decoder->getRecordFromDomain($this->domainEntity->domain);
+		} catch(\SPFLib\Exception $e) {
+			return null;
+		}
+		$s = (string) $record;
+		return $s;
+	}
 	/**
 	 * Check the SPF record.
 	 *
@@ -52,12 +69,14 @@ final class DnsCheck
 	 */
 	public function checkSPF(): ?bool
 	{
-		$environment = new \SPFLib\Check\Environment($this->ipAddress, $this->domainEntity->domain);
+		require_once __DIR__ . '/../vendor/autoload.php';
 
-		$checker = new \SPFLib\Checker();
+		$environment = new Environment($this->ipAddress, $this->domainEntity->domain);
+
+		$checker = new Checker();
 		$checkResult = $checker->check($environment);
 
-		if($checkResult->getCode() == \SPFLib\Check\Result::CODE_NONE) {
+		if($checkResult->getCode() == Result::CODE_NONE) {
 			return null;
 		}
 
@@ -144,8 +163,8 @@ final class DnsCheck
 		$record =  [
 			'mailDomain' => $this->domainEntity->domain,
 			'mxIP' => $this->ipAddress,
-//			'spf' => $this->checkSPF($this->ipAddress),
-			'spf' => true,
+			'spf' => $this->getSpf(),
+			'spfStatus' => $this->checkSPF(),
 			'dmarc' => $this->checkDMARC(),
 			'dkim' => $this->checkDKIM(),
 			'mxTargets' => $this->getMX(),
@@ -153,7 +172,7 @@ final class DnsCheck
 
 		$record['mx'] = $this->checkMX($record['mxTargets'], $this->ipAddress);
 
-		$record['allPassed'] = $record['spf'] && $record['dmarc'] && $record['dkim'] && $record['mx'];
+		$record['allPassed'] = $record['spfStatus'] && $record['dmarc'] && $record['dkim'] && $record['mx'];
 
 		return new ArrayObject($record);
 	}

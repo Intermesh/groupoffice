@@ -193,8 +193,8 @@ final class Domain extends AclOwnerEntity
 	{
 		$this->mxStatus = $record['mx'];
 		$this->mx = implode(", ", $record['mxTargets']);
-		$this->spf = $record['spf']; // TODO
-		$this->spfStatus = !empty($record['spf']);
+		$this->spf = $record['spf'];
+		$this->spfStatus = $record['spfStatus'];
 		$this->dmarc = $record['dmarc'];
 		$this->dmarcStatus = !empty($record['dmarc']);
 
