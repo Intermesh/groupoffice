@@ -661,9 +661,16 @@ class Module extends Entity {
 		$acl->ownedBy = 1;
 		$acl->entityTypeId = self::entityType()->getId();
 		$acl->entityId = $this->id;
-		foreach ($this->permissions as $groupId => $p) {
-			$acl->addGroup($groupId, !empty($p->getRights()->mayManage) ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ);
+
+
+		$this->fetchRelation("permissions");
+
+		if(isset($this->permissions)) {
+			foreach ($this->permissions as $groupId => $p) {
+				$acl->addGroup($groupId, !empty($p->getRights()->mayManage) ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ);
+			}
 		}
+
 
 		if(!$acl->save()) {
 			throw new SaveException($acl);
@@ -686,9 +693,12 @@ class Module extends Entity {
 
 		$acl = $this->getShadowAcl();
 		$acl->groups = [];
-		foreach ($this->permissions as $groupId => $p) {
-			$acl->addGroup($groupId, !empty($p->getRights()->mayManage) ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ);
+		if(isset($this->permissions)) {
+			foreach ($this->permissions as $groupId => $p) {
+				$acl->addGroup($groupId, !empty($p->getRights()->mayManage) ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ);
+			}
 		}
+
 		if(!$acl->save()) {
 			throw new SaveException($acl);
 		}
