@@ -1,6 +1,9 @@
 - Notes / Comments: Use StringUtil to remove style from notes and comments as old way could remove text unexpectedly
 - Oauth: RefreshToken for Google was not obtained when using openid
 - Oauth: Possible now to use a different smtp user for IMAP accounts.
+- Oauth: disable saving to sent folder for Azure as they save sent items automatically.
+- E-mail: Client side sorting in chunks to avoid error when sorting a large search result for Microsoft Exchange server that does not support server side sort.
+- E-mail: New account option to disable saving of sent mail for Microsoft Exchange Servers because they do that on the server already.
 
 13-05-2024: 6.8.47
 - Email: Fixed CSS bleeding issue
