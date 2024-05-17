@@ -183,7 +183,8 @@ CREATE TABLE `core_module` (
   `enabled` tinyint(1) NOT NULL DEFAULT 1,
   `modifiedAt` datetime DEFAULT NULL,
   `modSeq` int(11) DEFAULT NULL,
-  `deletedAt` datetime DEFAULT NULL
+  `deletedAt` datetime DEFAULT NULL,
+  shadowAclId int null
 ) ENGINE=InnoDB;
 
 CREATE TABLE `core_search` (
@@ -1251,3 +1252,8 @@ create table core_import_mapping
 
 create index core_search_filter_index
     on core_search (filter);
+
+
+alter table core_module
+    add constraint core_module_core_acl_id_fk
+        foreign key (shadowAclId) references core_acl (id);

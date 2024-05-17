@@ -101,6 +101,10 @@ class Module extends Entity {
 		if($this->isNew() || $this->sort_order < 1) {
 			$this->sort_order = $this->nextSortOrder();			
 		}
+
+		if($this->isModified(['permissions'])) {
+			$this->updateShadowAcl();
+		}
 		
 		if(!parent::internalSave()) {
 			return false;
@@ -631,5 +635,62 @@ class Module extends Entity {
 	public function setSettings($value) {
 		$this->getSettings()->setValues($value);
 		$this->change(true);
+	}
+
+	protected ?int $shadowAclId;
+
+	public function hasShadowAcl() : bool {
+		return isset($this->shadowAclId);
+	}
+
+	public function getShadowAclId() : int {
+		if(isset($this->shadowAclId)) {
+			return $this->shadowAclId;
+		}
+
+		return $this->getShadowAcl()->id;
+	}
+
+	public function getShadowAcl() : Acl {
+		if(isset($this->shadowAclId)) {
+			return Acl::findById($this->shadowAclId);
+		}
+
+		$acl = new Acl();
+		$acl->usedIn = "core_module.shadowAclId";
+		$acl->ownedBy = 1;
+		$acl->entityTypeId = self::entityType()->getId();
+		$acl->entityId = $this->id;
+		foreach ($this->permissions as $groupId => $p) {
+			$acl->addGroup($groupId, !empty($p->getRights()->mayManage) ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ);
+		}
+
+		if(!$acl->save()) {
+			throw new SaveException($acl);
+		}
+
+		$this->shadowAclId = $acl->id();
+
+		if(!$this->isSaving()) {
+			go()->getDbConnection()->update('core_module', ['shadowAclId' => $acl->id], ['id' => $this->id])->execute();
+		}
+
+
+		return $acl;
+	}
+
+	protected function updateShadowAcl() : void {
+		if(!$this->hasShadowAcl()) {
+			return;
+		}
+
+		$acl = $this->getShadowAcl();
+		$acl->groups = [];
+		foreach ($this->permissions as $groupId => $p) {
+			$acl->addGroup($groupId, !empty($p->getRights()->mayManage) ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ);
+		}
+		if(!$acl->save()) {
+			throw new SaveException($acl);
+		}
 	}
 }
