@@ -147,7 +147,7 @@ final class Oauth2Client extends EntityController
 
 			if($default->name == "Azure") {
 				// Disable sent folder for Azure as it automatically saves sent items.
-				$account->sent = "";
+				$account->save_sent = false;
 			}
 
 			//$account->mbroot = ??
