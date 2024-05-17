@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS `em_accounts` (
   `smtp_password` varchar(512) NOT NULL DEFAULT '',
   `password_encrypted` tinyint(4) NOT NULL DEFAULT '0',
   `ignore_sent_folder` tinyint(1) NOT NULL DEFAULT '0',
+    save_sent BOOL default true not null,
   `sieve_port` int(11) NOT NULL,
   `sieve_usetls` tinyint(1) NOT NULL DEFAULT '1',
   `check_mailboxes` text,
