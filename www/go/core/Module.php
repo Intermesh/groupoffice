@@ -259,7 +259,7 @@ abstract class Module extends Singleton {
 			$ret = $this->beforeUninstall();
 		} finally {
 			if(empty($ret)) {
-				core\jmap\Entity::$trackChanges = $oldTC;
+				Entity::$trackChanges = $oldTC;
 				\go\modules\community\history\Module::$enabled = $oldHist;
 			}
 		}
