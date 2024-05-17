@@ -38,6 +38,7 @@ use go\core\orm\EntityType;
 use GO\Email\Model\Account;
 use GO\Leavedays\Model\Leaveday;
 use go\modules\community\tasks\model\Task;
+use go\modules\udo\forms\model\RoofReport;
 
 class EventController extends \GO\Base\Controller\AbstractModelController {
 
@@ -1082,7 +1083,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			$response['results'][$this->_getIndex($response['results'], 'R'.$report->id)] = [
 				'id' => 'R'.$report->id,
 				//'link_count' => $task->countLinks(),
-				'name' =>  $report->description .' ('.($report->companyName ?? $report->contactName).')',
+				'name' =>  ($report->type == RoofReport::TYPE_LEAKAGE ? "Lekkage: " : "Dakwerk: ") . $report->reference(),
 				'description' => $report->contactName,
 				'time' => $report->date->format('H:i'),
 				'start_time' => $report->date->format('Y-m-d H:i'),
