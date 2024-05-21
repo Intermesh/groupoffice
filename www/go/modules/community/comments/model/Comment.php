@@ -177,12 +177,22 @@ class Comment extends AclItemEntity {
 	}
 
 	/**
-	 * @param Entity|ActiveRecord $entity
+	 * Find comments for a given entity
+	 *
+	 * Note: this method finds all comments regardless of the {@see $section}
+	 *
+	 *
+	 * @example To filter by section:
+	 * ```
+	 * $comments = Comment::findFor($entity)->where('section', '=', 'foo');
+	 * ```
+	 *
+	 * @param ActiveRecord|Entity $entity
 	 * @param array $properties
-	 * @return Query|Comment[]
+	 * @return Query<Comment>
 	 * @throws Exception
 	 */
-	public static function findFor($entity, array $properties = []) {
+	public static function findFor(ActiveRecord|Entity $entity, array $properties = []) : Query {
 		$entityTypeId = $entity->entityType()->getId();
 		$entityId = $entity->id;
 
