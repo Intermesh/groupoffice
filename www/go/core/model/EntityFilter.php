@@ -45,7 +45,12 @@ class EntityFilter extends AclOwnerEntity {
 		return parent::defineMapping()
 						->addTable("core_entity_filter", 'f');
 	}
-	
+
+	protected function canCreate(): bool
+	{
+		return self::entityType()->getModule()->getUserRights()->mayRead;
+	}
+
 	public function getFilter() {
 		return empty($this->filter) ? [] : json_decode($this->filter, true);
 	}
