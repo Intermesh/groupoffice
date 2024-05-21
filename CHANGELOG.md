@@ -1,3 +1,4 @@
+21-05-2024: 6.8.48
 - Email: Fixed: Feature request: icons up top in inbox (search, accounts, etc.) #947. Set minWidth for email panel
 - Notes / Comments: Use StringUtil to remove style from notes and comments as old way could remove text unexpectedly
 - Oauth: RefreshToken for Google was not obtained when using openid
