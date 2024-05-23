@@ -117,6 +117,7 @@ class Installer {
 		go()->clearCache();
 		$cacheCls = get_class(go()->getCache());
 		go()->setCache(new None());
+		go()->disableEvents();
 
 
 		self::$isInstalling = true;
@@ -184,6 +185,8 @@ class Installer {
 		jmap\Entity::$trackChanges = true;
 		go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
 		self::$isInstalling = false;
+
+		go()->enableEvents();
 	}
 
 	/**
@@ -470,6 +473,8 @@ class Installer {
 		go()->setAuthState((new TemporaryState())->setUserId(1));
 		GO::session()->runAsRoot();
 		GO::$ignoreAclPermissions = true;
+
+		go()->disableEvents();
 		
 
 		$this->isValidDb();
@@ -481,6 +486,7 @@ class Installer {
 //		if(!empty($unavailable)) {
 //			throw new \Exception("There are unavailable modules: " . var_export($unavailable, true));
 //		}
+
 
 		$this->disableUnavailableModules();
 
@@ -557,7 +563,10 @@ class Installer {
 		self::$isUpgrading = false;
 
 		$this->enableGarbageCollection();
-        $this->enableDiskUsage();;
+		$this->enableDiskUsage();
+
+		go()->enableEvents();
+
 		echo "Done!\n";
 
 		ob_flush();
