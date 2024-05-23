@@ -1,3 +1,5 @@
+- Files: Fixed permissions error for admins
+
 13-05-2024: 6.7.79
 - Core: Do not check module availability on listeners rebuild so it always rebuilds even if license fails
 
