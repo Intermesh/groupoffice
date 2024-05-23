@@ -2,6 +2,7 @@
 - Core: Create entity filters by users without admin privileges possible
 - Files: Fixed permissions error for admins
 - Zpushadmin: fixed error loading files
+- Core: Disable events during upgrade and install to prevent problems with modules that are not available.
 
 21-05-2024: 6.8.48
 - Email: Fixed: Feature request: icons up top in inbox (search, accounts, etc.) #947. Set minWidth for email panel
