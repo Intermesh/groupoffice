@@ -184,7 +184,8 @@ class Module extends core\Module
 			return false;
 		}
 
-		$roAclId = Acl::getReadOnlyAclId();
+		$roAclId = core\model\Module::findByName("community", "addressbook")->getShadowAclId();
+
 		$folder = Folder::model()->findByPath('addressbook', true, ['acl_id' => $roAclId]);
 		if ($folder->acl_id != $roAclId) {
 			$folder->acl_id = $roAclId;

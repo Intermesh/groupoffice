@@ -193,7 +193,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	
 	/**
 	 * For compatibility with new framework
-	 * @return type
+	 * @return \go\core\orm\EntityType
 	 */
 	public static function entityType() {
 		return \go\core\orm\EntityType::findByClassName(static::class);
@@ -866,10 +866,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	public function findAclId() {
 		if (!$this->aclField()) {
-			//TODO: Is this right?
-			return Acl::getReadOnlyAclId();
-//			$moduleName = $this->getModule();
-//			return \GO::modules()->{$moduleName}->aclId;
+			$moduleName = $this->getModule();
+			$module = Module::findByName(null, $moduleName);
+			if($module) {
+				return $module->getShadowAclId();
+			} else {
+				return null;
+			}
 		}
 
 		//removed caching of _acl_id because the relation is cached already and when the relation changes the wrong acl_id is returned,

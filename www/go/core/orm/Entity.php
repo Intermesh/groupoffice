@@ -685,15 +685,18 @@ abstract class Entity extends Property {
 		return null;
 	}
 
-  /**
-   * Finds the ACL id that holds this models permissions.
-   * Defaults to the module permissions it belongs to.
-   *
-   * @return int
-   */
+	/**
+	 * Finds the ACL id that holds this models permissions.
+	 * Defaults to the entity types' default ACL
+	 *
+	 * @return ?int
+	 * @throws Exception
+	 */
 	public function findAclId(): ?int
 	{
-		return null;
+		$mod = Module::findByName(static::getModulePackageName(), static::getModuleName());
+
+		return $mod->getShadowAclId();
 	}
 
 

@@ -133,8 +133,9 @@ class Builder
 		cd(dirname(__DIR__));
 
 		run("git fetch");
-		//run("git checkout " . $this->gitBranch);
-		run("git pull --recurse-submodules");
+
+		run("git pull");
+        run("git submodule update --init");
 
 		cd($this->sourceDir);
 

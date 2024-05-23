@@ -73,7 +73,7 @@ class FilesModule extends \GO\Base\Module{
 		}
 		
 		$folder = Model\Folder::model()->findByPath("log", true);
-		if(!$folder->acl || $folder->acl_id == Acl::getReadOnlyAclId()){
+		if(!$folder->acl){
 			$folder->setNewAcl();
 			$folder->readonly=1;
 			$folder->save();

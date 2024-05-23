@@ -809,7 +809,7 @@ class EntityType implements ArrayableInterface {
 		foreach($all as $type) {
 
 			if($type->isAclOwner()) {
-				$defaultAclId = $type->getDefaultAclId();
+				$defaultAclId = $type->AclId();
 				if (!$defaultAclId) {
 					return;
 				}

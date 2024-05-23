@@ -145,6 +145,11 @@ final class Oauth2Client extends EntityController
 			$account->smtp_port = $default->smtpPort;
 			$account->smtp_encryption = $default->smtpEncryption;
 
+			if($default->name == "Azure") {
+				// Disable sent folder for Azure as it automatically saves sent items.
+				$account->save_sent = false;
+			}
+
 			//$account->mbroot = ??
 
 			$wasNew = $account->getIsNew();
@@ -157,21 +162,26 @@ final class Oauth2Client extends EntityController
 			if($wasNew) {
 				$account->addAlias($user->email, $user->displayName);
 			}
-
-			go()->getDbConnection()->replace('oauth2client_account', [
-				'accountId' => $account->id,
-				'oauth2ClientId' => $client->id,
-				'token' => $token->getToken(),
-				'refreshToken' => $token->getRefreshToken(),
-				'expires' => $token->getExpires()
-			])->execute();
-
-			$this->auth($account->id);
-		} else {
-			unset($_SESSION['oauth2clientId']);
-			header("Location: " . go()->getSettings()->URL);
 		}
 
+		$acct = Account::findById($account->id);
+		if(empty($acct->oauth2_account)) {
+			$acct->oauth2_account = new model\Oauth2Account($acct);
+			$acct->oauth2_account->oauth2ClientId = $client->id;
+		}
+		$acct->oauth2_account->token = $token->getToken();
+		$acct->oauth2_account->expires = $token->getExpires();
+
+		if ($refreshToken = $token->getRefreshToken()) {
+			$acct->oauth2_account->refreshToken = $refreshToken;
+		}
+
+		if(!$acct->save()) {
+			throw new Exception(500, "Unable to save token");
+		}
+
+		$this->auth($account->id);
+//		header("Location: " . go()->getSettings()->URL);
 
 	}
 
@@ -200,6 +210,10 @@ final class Oauth2Client extends EntityController
 
 			$account = \GO\Email\Model\Account::model()->findByPk($accountId);
 			$account->createDefaultFolders();
+			if(method_exists($token, "getIdTokenClaims") && isset($token->getIdTokenClaims()['email']) && $account->smtp_username != $token->getIdTokenClaims()['email']) {
+				$account->smtp_username = $token->getIdTokenClaims()['email'];
+				$account->save();
+			}
 			//$ownerDetails = $provider->getResourceOwner($token);
 		} catch (\Exception $e) {
 			// Failed to get user details
@@ -234,7 +248,16 @@ final class Oauth2Client extends EntityController
 	public function auth(int $accountId)
 	{
 		$_SESSION['accountId'] = $accountId;
-		if (!$provider = $this->getProvider($accountId)) {
+
+		$provider = false;
+		$acct = Account::findById($accountId);
+		if ($acctSettings = $acct->oauth2_account) {
+			$client = model\Oauth2Client::findById($acctSettings->oauth2ClientId);
+
+			$provider = $client->getProvider();
+		}
+
+		if (!$provider) {
 			throw new Exception(412, 'No OAuth2 client settings found for current email account.');
 		}
 
@@ -242,12 +265,20 @@ final class Oauth2Client extends EntityController
 			throw new Exception(500, 'Got error: ' . htmlspecialchars($_GET['error'], ENT_QUOTES));
 		}
 
-		// If we don't have an authorization code then get one
-		$authUrl = $provider->getAuthorizationUrl();
+		$authOpts = [
+			"login_hint" => $acct->username
+		];
 
-		//todo, perhaps add login_hint=username to url here?
+		if(!empty($_GET['prompt'])) {
+			$authOpts['prompt'] = $_GET['prompt'];
+		}
+
+		// If we don't have an authorization code then get one
+		$authUrl = $provider->getAuthorizationUrl($authOpts);
 
 		$_SESSION['oauth2state'] = $provider->getState();
+
+
 		\GO::session()->closeWriting();
 		$r = \go\core\http\Response::get();
 		$r->setHeader('Location', $authUrl);
@@ -289,8 +320,13 @@ final class Oauth2Client extends EntityController
 
 		$client = model\Oauth2Client::findById($_SESSION['oauth2clientId']);
 
+		// MS needs two tokens :( one for login and one for accessing mail:
+		// https://stackoverflow.com/questions/61597263/office-365-xoauth2-for-imap-and-smtp-authentication-fails/61678485#61678485
+		// Google can do it in one.
 		$provider = $client->getProvider(['openid', 'profile', 'email']);
-		$url = $provider->getAuthorizationUrl();
+		$url = $provider->getAuthorizationUrl([
+//			"prompt" => "consent"
+		]);
 
 		//$url .= '&login_hint=MSchering@txg8h.onmicrosoft.com';
 

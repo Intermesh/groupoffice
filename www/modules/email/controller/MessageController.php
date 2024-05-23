@@ -672,6 +672,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		 * if you want ignore default sent folder message will be store in
 		 * folder wherefrom user sent it
 		 */
+
 		if ($account->ignore_sent_folder && !empty($params['reply_mailbox'])) {
 			$account->sent = $params['reply_mailbox'];
 		}
@@ -679,12 +680,13 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if ($success) {
 			//if a sent items folder is set in the account then save it to the imap folder
 			// auto linking will happen on save to sent items
-			if(!$account->saveToSentItems($message, $params)){
+			if (!$account->saveToSentItems($message, $params)) {
 				//$imap->append_message($account->sent, $message, "\Seen");
-				$response['success']=false;
-				$response['feedback'].='Failed to save sent item to '.$account->sent;
+				$response['success'] = false;
+				$response['feedback'] .= 'Failed to save sent item to ' . $account->sent;
 			}
-		}		
+		}
+
 
 		if (!empty($params['draft_uid'])) {
 			//remove drafts on send

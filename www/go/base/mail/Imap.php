@@ -964,7 +964,7 @@ class Imap extends ImapBodyStruct
 	 * @return <type>
 	 */
 
-	private $_unseen;
+	private $_unseen = [];
 
 	/**
 	 * @param false|string $mailbox
@@ -1066,7 +1066,7 @@ class Imap extends ImapBodyStruct
 					return $uids;
 				}
 			}
-		} elseif (stristr($this->capability, 'SORT')) {
+		} elseif (false && stristr($this->capability, 'SORT')) {
 			$uids=$this->server_side_sort($sort, $reverse, $filter);
 			if($uids === false) {
 				throw new \Exception("Sort error: " . $this->last_error());
@@ -1185,53 +1185,43 @@ class Imap extends ImapBodyStruct
 				return array();
 			}else
 			{
-				$uid_string=implode(',', $uids);
+				$res = [];
+				$chunks = array_chunk($uids, 1000);
+				foreach($chunks as $chunk) {
+					$uid_string=implode(',', $chunk);
+					$res = array_merge($res, $this->client_side_sort_chunk($uid_string, $sort, $reverse, $filter));
+					if(!$res) {
+						return false;
+					}
+				}
+			}
+		} else {
+			$res = $this->client_side_sort_chunk($uid_string, $sort, $reverse, $filter);
+			if(!$res) {
+				return false;
 			}
 		}
 
-		$this->clean($sort, 'keyword');
-		$command1 = 'UID FETCH '.$uid_string.' ';
 		switch ($sort) {
 //		Doesn't work on some servers. Use internal date for these.
 //		Enabled because we have added GO::config()->imap_sort_on_date functionality
 			case 'DATE':
+			case 'R_FROM':
+			case 'FROM':
+			case 'R_SUBJECT':
+			case 'SUBJECT':
 			case 'R_DATE':
-				$command2 = "BODY.PEEK[HEADER.FIELDS (DATE)]";
 				$key = "BODY[HEADER.FIELDS";
 				break;
 			case 'SIZE':
 			case 'R_SIZE':
-				$command2 = "RFC822.SIZE";
 				$key = "RFC822.SIZE";
 				break;
-			case 'ARRIVAL':
-				$command2 = "INTERNALDATE";
-				$key = "INTERNALDATE";
-				break;
-			case 'R_ARRIVAL':
-				$command2 = "INTERNALDATE";
-				$key = "INTERNALDATE";
-				break;
-			case 'FROM':
-			case 'R_FROM':
-				$command2 = "BODY.PEEK[HEADER.FIELDS (FROM)]";
-				$key = "BODY[HEADER.FIELDS";
-				break;
-			case 'SUBJECT':
-			case 'R_SUBJECT':
-				$command2 = "BODY.PEEK[HEADER.FIELDS (SUBJECT)]";
-				$key = "BODY[HEADER.FIELDS";
-				break;
 			default:
-				$command2 = "INTERNALDATE";
 				$key = "INTERNALDATE";
 				break;
 		}
-		$command = $command1.'('.$command2.")\r\n";
 
-		$this->send_command($command);
-		$res = $this->get_response(false, true);
-		$status = $this->check_response($res, true);
 		$uids = array();
 		$sort_keys = array();
 		foreach ($res as $vals) {
@@ -1244,7 +1234,7 @@ class Imap extends ImapBodyStruct
 			foreach ($vals as $i => $v) {
 				if ($body) {
 					if ($v == ']' && isset($vals[$i + 1])) {
-						if ($command2 == "BODY.PEEK[HEADER.FIELDS (DATE)]") {
+						if ($sort == "DATE" || $sort == "R_DATE") {
 							$sort_key = strtotime(trim(substr($vals[$i + 1], 5)));
 						}
 						else {
@@ -1284,7 +1274,49 @@ class Imap extends ImapBodyStruct
 		if ($reverse) {
 			$uids = array_reverse($uids);
 		}
-		return $status ? $uids : false;
+		return $uids;
+
+
+	}
+
+
+	private function client_side_sort_chunk($uid_string, $sort, $reverse, $filter) {
+		$this->clean($sort, 'keyword');
+		$command1 = 'UID FETCH '.$uid_string.' ';
+		switch ($sort) {
+//		Doesn't work on some servers. Use internal date for these.
+//		Enabled because we have added GO::config()->imap_sort_on_date functionality
+			case 'DATE':
+			case 'R_DATE':
+				$command2 = "BODY.PEEK[HEADER.FIELDS (DATE)]";
+				break;
+			case 'SIZE':
+			case 'R_SIZE':
+				$command2 = "RFC822.SIZE";
+				break;
+			case 'FROM':
+			case 'R_FROM':
+				$command2 = "BODY.PEEK[HEADER.FIELDS (FROM)]";
+				break;
+			case 'SUBJECT':
+			case 'R_SUBJECT':
+				$command2 = "BODY.PEEK[HEADER.FIELDS (SUBJECT)]";
+				break;
+			default:
+				$command2 = "INTERNALDATE";
+				break;
+		}
+		$command = $command1.'('.$command2.")\r\n";
+
+		$this->send_command($command);
+		$res = $this->get_response(false, true);
+		$status = $this->check_response($res, true);
+		if(!$status) {
+			return false;
+		}
+
+		return $res;
+
 	}
 
 	/**

@@ -1588,6 +1588,15 @@ $updates['202403181539'][] = "alter table core_acl_group_changes
             on delete cascade on update cascade";
 
 
+
+$updates['202405171539'][] = "alter table core_module
+    add shadowAclId int null;";
+
+$updates['202405171539'][] = "alter table core_module
+    add constraint core_module_core_acl_id_fk
+        foreign key (shadowAclId) references core_acl (id);";
+
+
 # ------ 6.9 ---------------
 
 $updates['202403181539'][] = "CREATE TABLE `core_principal`(

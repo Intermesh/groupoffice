@@ -85,6 +85,17 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 	setWideLayout: function (ct, target) {
 
 		if (this.mode != 'wide') {
+
+			if(!this.narrowMinWidth) {
+				this.narrowMinWidth = this.minWidth;
+			}
+
+			if(!this.wideMinWidth) {
+				this.wideMinWidth = this.minWidth;
+			} else {
+				this.minWidth = this.wideMinWidth;
+			}
+
 			this.mode = 'wide';
 			ct.removeClass('go-narrow');
 			ct.addClass('go-wide');
@@ -118,6 +129,16 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 
 		if (this.mode != 'narrow') {
 			this.mode = 'narrow';
+
+			if(!this.wideMinWidth) {
+				this.wideMinWidth = this.minWidth;
+			}
+
+			if(!this.narrowMinWidth) {
+				this.narrowMinWidth = this.minWidth;
+			} else {
+				this.minWidth = this.narrowMinWidth;
+			}
 
 			ct.cascade(function(i) {
 				i.origStateFul = i.stateful;

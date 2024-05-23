@@ -128,12 +128,18 @@ class Router {
 
 		require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageHeader.php');
 
-		echo '<h1>' . get_class($e) .'</h1><p>'.$e->getMessage().'</p>';
+		echo '<h1>' . get_class($e) .'</h1><p>'.$e->getMessage();
 
 		if(go()->getDebugger()->enabled) {
+
+			echo " in file " . $e->getFile() .' at line '. $e->getLine();
+
+			echo '</p>';
 			echo '<pre>';
 			echo $e->getTraceAsString();
 			echo '</pre>';
+		} else{
+			echo '</p>';
 		}
 
 		require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageFooter.php');

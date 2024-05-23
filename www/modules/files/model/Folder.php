@@ -20,6 +20,7 @@ use GO;
 use go\core\fs\FileSystemObject;
 use go\core\fs\Folder as GoFolder;
 use go\core\model\Acl;
+use go\core\model\Module;
 
 /**
  * The Folder model
@@ -97,8 +98,10 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			return false;
 		}
 
+
+
 		// Don't search these folders because it may show too much
-		if($this->findAclId() == Acl::getReadOnlyAclId()) {
+		if($this->parent_id == 0) {
 			return false;
 		}
 
@@ -300,7 +303,10 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		if($this->parent_id==0 && $this->acl_id==0){
 			//top level folders are readonly to everyone.
 			$this->readonly=1;
-			$this->acl_id = Acl::getReadOnlyAclId();
+
+			$mod = Module::findByName(null, "files");
+
+			$this->acl_id = $mod->getShadowAclId();
 		}
 		return parent::validate();
 	}

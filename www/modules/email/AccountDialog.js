@@ -85,7 +85,7 @@ GO.email.AccountDialog = function(config) {
 			anchor: '20%',
 			tooltip: t('Request or update a refresh token in a separate window.','oauth2client','community'),
 			handler : function() {
-				window.open(window.location.pathname + 'go/modules/community/oauth2client/gauth.php/authenticate/' + this.account_id, 'do_da_auth_thingy');
+				window.open(window.location.pathname + 'go/modules/community/oauth2client/gauth.php/authenticate/' + this.account_id + "?prompt=consent", 'do_da_auth_thingy');
 				this.refreshNeeded = true;
 			},
 			scope : this
@@ -473,6 +473,10 @@ GO.email.AccountDialog = function(config) {
 						labelWidth : 75,
 						defaults: {hideLabel : true, checked:false},
 						items : [
+							new Ext.ux.form.XCheckbox({
+								boxLabel : t("Save sent mail to the sent folder", "email"),
+								name : 'save_sent'
+							}),
 							new Ext.ux.form.XCheckbox({
 								boxLabel : t("Store replies in the same folder as the original message", "email"),
 								name : 'ignore_sent_folder'

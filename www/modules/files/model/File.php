@@ -142,6 +142,10 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		if(!\GO::user())
 			return false;
 
+		if(GO::user()->isAdmin()) {
+			return \GO\Base\Model\Acl::MANAGE_PERMISSION;
+		}
+
 		//if($this->isNew && !$this->joinAclField){
 		if(empty($this->{$this->aclField()}) && !$this->getIsJoinedAclField()){
 			//the new model has it's own ACL but it's not created yet.
