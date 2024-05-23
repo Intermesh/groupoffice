@@ -135,7 +135,7 @@ class Builder
 		run("git fetch");
 
 		run("git pull");
-        run("git submodule init --update");
+        run("git submodule update --init");
 
 		cd($this->sourceDir);
 
