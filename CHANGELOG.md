@@ -1,4 +1,5 @@
 - Core: Create entity filters by users without admin privileges possible
+- Files: Fixed permissions error for admins
 
 21-05-2024: 6.8.48
 - Email: Fixed: Feature request: icons up top in inbox (search, accounts, etc.) #947. Set minWidth for email panel
