@@ -172,7 +172,8 @@ Ext.extend(GO.calendar.SelectDateDialog, Ext.Window, {
 		this.datePicker = new Ext.DatePicker({
 	    		xtype:'datepicker',
 	    		format: GO.settings.date_format,
-	    		fieldLabel:t("Date")
+	    		fieldLabel:' ',
+				style:'margin:auto;'
 	    	});
 		
 		this.formPanel = new Ext.form.FormPanel({
@@ -183,11 +184,7 @@ Ext.extend(GO.calendar.SelectDateDialog, Ext.Window, {
 			waitMsgTarget:true,
 			autoHeight:true,
 			items:[
-			{
-				items:this.datePicker,
-				width:220,
-				style:'margin:auto;'
-			},
+			this.datePicker,
 			new GO.form.HtmlComponent({html:'<br />'}),
 			this.selectCalendar = new GO.calendar.SelectCalendar({fieldLabel: t("Calendar", "calendar"), anchor:'100%'})
 			]

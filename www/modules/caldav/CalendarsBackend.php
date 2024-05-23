@@ -590,7 +590,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 						$event = new \GO\Calendar\Model\Event();
 
 					$event->setUri($objectUri);
-					$event->importVObject($vevent, array('calendar_id'=>$calendarId,'uuid'=>$uuid));
+					$event->importVObject($vevent, array('calendar_id' => $calendarId, 'uuid' => $uuid));
 
 					if(!$recurrenceDate) {
 						CaldavModule::saveEvent($event, false, $vcalendar->serialize());
@@ -617,7 +617,10 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				}
 			}
 		}catch(\GO\Base\Exception\AccessDenied $e){
-			throw new Sabre\DAV\Exception\Forbidden;
+			// when inviting local principal. DAV tries local delivery
+			// which only succeeds if the user may write in the invite's calendar
+			return false;
+			//throw new Sabre\DAV\Exception\Forbidden;
 		}catch (\Exception $e) {
 			\go\core\ErrorHandler::logException($e);
 		}
