@@ -57,7 +57,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 
 		this.getEl().mask(t("Loading..."));
 
-		this.entityStore.single(id).then((entity) => {
+		return this.entityStore.single(id).then((entity) => {
 
 			this.onBeforeLoad(entity).then((entity) => {
 				this.entity = entity;
@@ -76,7 +76,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 			this.getEl().unmask();
 		})
 	},
-	
+
 	getValues : function (dirtyOnly) {
 		var v = {};
 		for(var name in this.values) {
