@@ -361,7 +361,7 @@ abstract class Entity  extends OrmEntity {
 		$primaryKeys = $cls::getPrimaryKey();
 
 		if(count($primaryKeys) == 1) {
-			$pkSelect = $query->getTableAlias() . '.id';
+			$pkSelect = $query->getTableAlias() . '.'.$primaryKeys[0];
 		} else{
 
 			//PK Logic consistent with {@see Property::id()};
