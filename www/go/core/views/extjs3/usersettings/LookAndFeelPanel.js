@@ -185,21 +185,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			defaults: { anchor: "100%" },
 			title: t('Regional','users','core'),
 			items:[
-				this.languageCombo = new Ext.form.ComboBox({
-					fieldLabel: t('Language','users','core'),
-					name: 'language_id',
-					store:  new Ext.data.SimpleStore({
-						fields: ['id', 'language'],
-						data : GO.Languages
-					}),
-					displayField:'language',
-					valueField: 'id',
-					hiddenName:'language',
-					mode:'local',
-					triggerAction:'all',
-					editable: false,
-					selectOnFocus:true,
-					forceSelection: true
+				this.languageCombo = new go.form.LanguageCombo({
 				}),
 				
 				this.timezoneCombo = new Ext.form.ComboBox({
