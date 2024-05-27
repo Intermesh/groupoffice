@@ -5,7 +5,7 @@
 - Billing: Fixed MT940 import
 - Support: fix permission issue when creating support lists
 - Core: Fixed support module uninstall
-- Core: Fixe db check
+- Core: Fixed db check
 - Studio: fix drag & drop ACL item between collections
 - Core: Set custom select field to "undefined"
 - Email / Core: Use "Enter" in recipient list combo
