@@ -10,6 +10,7 @@
 - Core: Set custom select field to "undefined"
 - Email / Core: Use "Enter" in recipient list combo
 - Core: Editable language combo
+- Core: fix sending mail with $config['debugEmail'] configuration option
 
 23-05-2024: 6.8.49
 - Core: Create entity filters by users without admin privileges possible
