@@ -1,3 +1,6 @@
+- Sieve: Added "Mailing List" option
+- Sieve: Fixed bug in custom filter where exists showed as "doesn't exist"
+
 23-05-2024: 6.8.49
 - Core: Create entity filters by users without admin privileges possible
 - Files: Fixed permissions error for admins
