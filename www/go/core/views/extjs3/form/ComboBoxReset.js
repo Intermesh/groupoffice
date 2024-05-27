@@ -36,3 +36,4 @@ go.form.ComboBoxReset = Ext.extend(go.form.ComboBox, {
 	}
 
 });
+Ext.reg('gocomboreset', go.form.ComboBoxReset);
