@@ -8,6 +8,8 @@
 - Files: Fixed permissions error for admins
 - Zpushadmin: fixed error loading files
 - Core: Disable events during upgrade and install to prevent problems with modules that are not available.
+- AddressBook: suppress display of default country in address if none is filled in
+- Billing: Fixed MT940 import
 
 21-05-2024: 6.8.48
 - Email: Fixed: Feature request: icons up top in inbox (search, accounts, etc.) #947. Set minWidth for email panel
