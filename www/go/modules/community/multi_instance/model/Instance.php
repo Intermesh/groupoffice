@@ -823,7 +823,7 @@ class Instance extends Entity {
 				//load instance config just before moving the config file. Moving the config file disables
 				// the installation and prevents further changes.
 				$instance->getInstanceConfig();
-				$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php'));
+				$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php')->appendNumberToNameIfExists());
 
 				try {
 					$instance->getTempFolder()->delete();

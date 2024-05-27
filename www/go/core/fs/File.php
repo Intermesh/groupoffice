@@ -126,9 +126,9 @@ class File extends FileSystemObject {
   /**
    * Checks if a filename exists and renames it.
    *
-   * @return string  New filepath
+   * @return self
    */
-	public function appendNumberToNameIfExists(): string
+	public function appendNumberToNameIfExists(): self
 	{
 		$dir = $this->getFolder()->getPath();
 		$origName = $this->getNameWithoutExtension();
@@ -138,7 +138,7 @@ class File extends FileSystemObject {
 			$this->path = $dir . '/' . $origName . ' (' . $x . ').' . $extension;
 			$x++;
 		}
-		return $this->path;
+		return $this;
 	}
 
 	/**
