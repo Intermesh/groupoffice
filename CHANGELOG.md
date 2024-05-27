@@ -8,6 +8,8 @@
 - Core: Fixe db check
 - Studio: fix drag & drop ACL item between collections
 - Core: Set custom select field to "undefined"
+- Email / Core: Use "Enter" in recipient list combo
+- Core: Editable language combo
 
 23-05-2024: 6.8.49
 - Core: Create entity filters by users without admin privileges possible
