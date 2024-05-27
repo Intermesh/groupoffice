@@ -17,7 +17,13 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 
 		this.addEvents('select');
 
-		first = this.createCombo(this.customfield.dataType.options);
+		const options = structuredClone(this.customfield.dataType.options);
+
+		options.unshift({
+			id: null, fieldId: this.customfield.id, text: "--", options: [], parentId: null, enabled: true
+		});
+
+		first = this.createCombo(options);
 		first.allowBlank = this.allowBlank;
 		first.conditionallyHidden = this.conditionallyHidden;
 		first.conditionallyRequired = this.conditionallyRequired;

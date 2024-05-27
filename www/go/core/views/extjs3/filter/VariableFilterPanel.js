@@ -55,14 +55,14 @@ go.filter.VariableFilterPanel = Ext.extend(Ext.Panel, {
 				const event = cmp.events.select ? 'select' : 'change';
 				cmp.on(event, function(cmp) {
 					let v = cmp.getValue();
-
-					if(!v) {
-						if(event === "select") {
-							chipView.store.removeAll();
-							me.load();
-						}
-						return;
-					}
+// debugger;
+// 					if(!v) {
+// 						if(event === "select") {
+// 							chipView.store.removeAll();
+// 							me.load();
+// 						}
+// 						return;
+// 					}
 
 					if(v instanceof Date) {
 						v = v.serialize();

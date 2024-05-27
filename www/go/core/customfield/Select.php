@@ -214,6 +214,7 @@ class Select extends Base {
 					$alias, $alias . '.id = customFields.' .
 					$this->field->databaseName,
 				'left');
+
 				$criteria->where($alias . '.text', $comparator, $value);
 			}
 		});
