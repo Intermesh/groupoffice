@@ -110,7 +110,7 @@ Ext.extend(GO.sieve.CriteriumCreatorDialog, GO.Window,{
 					// This record can be of one of the following kinds of criteria:
 					// Custom, Subject, Recipient (To), Sender (From)
 					var kind = record.get('arg');
-					if (kind=='Subject'||kind=='From'||kind=='To'||kind=='X-Spam-Flag')
+					if (kind=='Subject'||kind=='From'||kind=='To'||kind=='X-Spam-Flag'||kind=='List-Unsubscribe')
 						this.cmbField.setValue(kind);
 					else
 						this.cmbField.setValue('custom');
@@ -121,7 +121,7 @@ Ext.extend(GO.sieve.CriteriumCreatorDialog, GO.Window,{
 					// This record can be of one of the following kinds of criteria:
 					// Custom, Subject, Recipient (To), Sender (From), X-Spam-Flag
 					var kind = record.get('arg1');
-					if (kind=='Subject'||kind=='From'||kind=='To'||kind=='X-Spam-Flag')
+					if (kind=='Subject'||kind=='From'||kind=='To'||kind=='X-Spam-Flag'||kind=='List-Unsubscribe')
 						this.cmbField.setValue(kind);
 					else
 						this.cmbField.setValue('custom');
@@ -213,6 +213,7 @@ Ext.extend(GO.sieve.CriteriumCreatorDialog, GO.Window,{
 				this._toggleFieldUse(this.cmbDateOperator,false);
 				this._toggleFieldUse(this.dateCriterium,false);
 				break;
+			case 'List-Unsubscribe':
 			case 'X-Spam-Flag':
 				this._toggleFieldUse(this.txtCustom,false);
 				this._toggleFieldUse(this.cmbOperator,false);
@@ -285,7 +286,7 @@ Ext.extend(GO.sieve.CriteriumCreatorDialog, GO.Window,{
 		var _part = '';
 
 		// Workaround for _arg2 check
-		if(this.cmbOperator.getValue() == 'exists' || this.cmbOperator.getValue() == 'notexists' || this.cmbField.getValue() == 'X-Spam-Flag')
+		if(this.cmbOperator.getValue() == 'exists' || this.cmbOperator.getValue() == 'notexists' || this.cmbField.getValue() == 'X-Spam-Flag'|| this.cmbField.getValue() == 'List-Unsubscribe')
 			_arg2 = 'sometext';
 
 		// Check the input value of the txtBox
@@ -306,6 +307,16 @@ Ext.extend(GO.sieve.CriteriumCreatorDialog, GO.Window,{
 					}
 					_not = this._evaluateIfNotFields();
 					_type = this._evaluateTypeFields();
+					break;
+				case 'List-Unsubscribe':
+					_test = 'exists';
+
+					_not = false;
+					_type = this.cmbOperator.getValue();
+
+					_arg = 'List-Unsubscribe';
+					_arg1 = '';
+					_arg2 = '';
 					break;
 				case 'X-Spam-Flag':
 					_test = 'header';
