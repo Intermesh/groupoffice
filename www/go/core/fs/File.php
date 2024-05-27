@@ -2,6 +2,7 @@
 namespace go\core\fs;
 
 use Exception;
+use go\core\ErrorHandler;
 use go\core\http\Response;
 use go\core\util\StringUtil;
 
