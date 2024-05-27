@@ -1,3 +1,4 @@
+27-05-2024: 6.8.50
 - Sieve: Added "Mailing List" option
 - Sieve: Fixed bug in custom filter where exists showed as "doesn't exist"
 - Core: update Japanese holidays file. Arigato 2g@rdis.net .
