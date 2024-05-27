@@ -813,6 +813,9 @@ class Instance extends Entity {
 	protected static function internalDelete(Query $query): bool
 	{
 
+		// dropping databases / users will auto commit transactions. So we pause and resume.
+		go()->getDbConnection()->pauseTransactions();
+
 		$instances = Instance::find()->mergeWith($query);
 
 		foreach($instances as $instance) {
@@ -857,6 +860,8 @@ class Instance extends Entity {
 					->send();
 			}
 		}
+
+		go()->getDbConnection()->resumeTransactions();
 		
 		return parent::internalDelete($query);
 	}
