@@ -1,6 +1,7 @@
 - Files: Fixed permissions error for admins
 - Core: Disable events during upgrade and install to prevent problems with modules that are not available.
 - AddressBook: suppress display of default country in address if none is filled in
+- Billing: Fixed MT940 import
 
 13-05-2024: 6.7.79
 - Core: Do not check module availability on listeners rebuild so it always rebuilds even if license fails
