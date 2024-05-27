@@ -1,5 +1,5 @@
 <?php
-// 2G RDIS
+// 2G RDIS v1.02 2g@rdis.net
 
 $input_holidays['fix']['01-01'] = '元日';
 $input_holidays['fix']['02-11'] = '建国記念の日';
@@ -19,12 +19,10 @@ function getAutumnHoliDay($year) {
 	return floor(23.2488 + 0.242194 * ($year - 1980) - floor(($year - 1980) / 4));
 }
 
-$spDay = '3-'.getSpringHoliDay($year);
-$amDay = '9-'.getAutumnHoliDay($year);
+$spDay = '03-'.getSpringHoliDay($year);
+$amDay = '09-'.getAutumnHoliDay($year);
 $input_holidays['fix'][$spDay] = '春分の日';
 $input_holidays['fix'][$amDay] = '秋分の日';
-$yspDay = $year.'-'.$spDay;
-$yamDay = $year.'-'.$amDay;
 
 $agD = (new DateTime('third mon of September '.$year))->format('d');
 $amD = getAutumnHoliDay($year);
@@ -111,11 +109,15 @@ if (!class_exists('GOHolidaysJP')) {
 			$date = new DateTime($year . '-11-23');
 			return self::substitute($date);
 		}
-		public static function springDay($yspDay) {
+		public static function springDay($year) {
+			$spDay = '03-'.getSpringHoliDay($year);
+			$yspDay = $year.'-'.$spDay;
 			$date = new DateTime($yspDay);
 			return self::substitute($date);
 		}
-		public static function autumnDay($yamDay) {
+		public static function autumnDay($year) {
+			$amDay = '09-'.getAutumnHoliDay($year);
+			$yamDay = $year.'-'.$amDay;
 			$date = new DateTime($yamDay);
 			return self::substitute($date);
 		}

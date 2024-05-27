@@ -1,3 +1,5 @@
+- Core: update Japanese holidays file. Arigato 2g@rdis.net .
+
 23-05-2024: 6.8.49
 - Core: Create entity filters by users without admin privileges possible
 - Files: Fixed permissions error for admins
