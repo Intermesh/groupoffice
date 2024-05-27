@@ -4,6 +4,8 @@
 - Multi instance: Pause transactions during instance deletion
 - Billing: Fixed MT940 import
 - Support: fix permission issue when creating support lists
+- Core: Fixed support module uninstall
+- Core: Fixe db check
 
 23-05-2024: 6.8.49
 - Core: Create entity filters by users without admin privileges possible
