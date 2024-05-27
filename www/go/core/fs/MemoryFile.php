@@ -143,8 +143,8 @@ class MemoryFile extends File {
 		$this->path = $name;
 	}
 	
-	public function appendNumberToNameIfExists():string {
-		return $this->path;
+	public function appendNumberToNameIfExists():self {
+		return $this;
 	}
 	
 	public function output(bool $sendHeaders = true, bool $useCache = true, array $headers = [], bool $inline = true) {
