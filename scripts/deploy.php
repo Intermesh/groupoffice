@@ -14,7 +14,7 @@ echo "Running: " . $rsyncCmd . "\n";
 system($rsyncCmd);
 
 chdir($target);
-$upgradeCmd = "sudo -u www-data php cli.php core/System/upgrade -c=".$manageConfig;
+$upgradeCmd = "sudo -u www-data php www/cli.php core/System/upgrade -c=".$manageConfig;
 echo "Running: " . $upgradeCmd . "\n";
 system($upgradeCmd);
 
