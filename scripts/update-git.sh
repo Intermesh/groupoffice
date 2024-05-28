@@ -83,7 +83,7 @@ npm ci
 cd ..
 npm ci
 npm run build
-npm prune --production
+
 cd $DIR;
 echo "DONE";
 
