@@ -18,7 +18,7 @@ try {
 	App::get();
 
 	if(!empty($_GET['onlyIfNeeded']) && go()->getSettings()->databaseVersion == go()->getVersion()) {
-		echo "Already up to date";
+		echo '<div id="success">Already up to date</div>';
 		exit(0);
 	}
 
