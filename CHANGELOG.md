@@ -1,3 +1,5 @@
+- Core: Permissions were not editable for admins
+
 27-05-2024: 6.8.50
 - Sieve: Added "Mailing List" option
 - Sieve: Fixed bug in custom filter where exists showed as "doesn't exist"
