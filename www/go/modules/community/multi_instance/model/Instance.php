@@ -885,7 +885,7 @@ class Instance extends Entity {
 		$http->setOption(CURLOPT_SSL_VERIFYHOST, false);
 		$http->setOption(CURLOPT_SSL_VERIFYPEER, false);
 
-		$response = $http->get($proto . $this->hostname . '/install/upgrade.php?confirmed=1&ignore=modules');
+		$response = $http->get($proto . $this->hostname . '/install/upgrade.php?confirmed=1&ignore=modules&onlyIfNeeded=1');
 
 		//echo $response['body'];
 
