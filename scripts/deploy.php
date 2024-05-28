@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 chdir(__DIR__);
 $version = require "../www/version.php";
