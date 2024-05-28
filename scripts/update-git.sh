@@ -43,7 +43,8 @@ cd $DIR/www;
 
 echo "Pulling main repository"
 
-git pull --recurse-submodules
+git pull 
+git submodule update --init
 
 for line in $(find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*' | sort -r );
 do
