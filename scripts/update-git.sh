@@ -6,8 +6,6 @@ set -e
 
 CONFIG=$1
 
-
-
 SASS="sass --no-source-map"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd $DIR/../;
