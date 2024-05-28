@@ -14,9 +14,9 @@ $rsyncCmd = "rsync -av --delete --exclude=.git ../ " . $target;
 echo "Running: " . $rsyncCmd . "\n";
 system($rsyncCmd);
 
-//chdir($target);
-//$upgradeCmd = "sudo -u www-data php cli.php core/System/upgrade -c=".$manageConfig;
-//echo "Running: " . $upgradeCmd . "\n";
-//system($upgradeCmd);
+chdir("/usr/local/share/groupoffice-6.8/www/");
+$upgradeCmd = "sudo -u www-data php cli.php core/System/upgrade -c=".$manageConfig;
+echo "Running: " . $upgradeCmd . "\n";
+system($upgradeCmd);
 
 echo "Done\n\n";
