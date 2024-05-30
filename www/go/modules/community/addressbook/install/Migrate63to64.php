@@ -190,7 +190,7 @@ class Migrate63to64 {
 
     if($oldContactCount + $oldCompanyCount != $newCount) {
       echo "Companies in old ab: " . $oldCompanyCount ."\n";
-      echo "Companies in old ab: " . $oldContactCount ."\n";
+      echo "Contacts in old ab: " . $oldContactCount ."\n";
 
       echo "Number of contacts is not equal to old contacts after migration. This might happen if there are some orphan contacts. You can identify them with:<br />
        <br />
