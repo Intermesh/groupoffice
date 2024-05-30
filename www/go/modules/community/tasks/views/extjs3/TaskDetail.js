@@ -188,8 +188,10 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 							return;
 						}
 
-						var dlg = new go.modules.business.contracts.ContractDialog();
-						dlg.load(record.id).show();
+						go.Entities.get("Contract").goto(record.id);
+
+						// var dlg = new go.modules.business.contracts.ContractDialog();
+						// dlg.load(record.id).show();
 					}
 				}
 			});
