@@ -57,17 +57,18 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 			GO.form.ComboBoxMulti.superclass.initComponent.call(this);
 
 			this.on("specialkey", function(field, e) {
-				// e.HOME, e.END, e.PAGE_UP, e.PAGE_DOWN,
-				// e.TAB, e.ESC, arrow keys: e.LEFT, e.RIGHT, e.UP, e.DOWN
-				if (e.getKey() == e.ENTER) {
-					const v = this.getValue().trim(), lastChar = v.charAt(v.length -1);
-					console.log(lastChar);
-					if(lastChar != this.sep) {
-						this.setValue(v + this.sep + " ");
-					}
-					e.preventDefault();
-				}
+				this.onSpecialKey(field, e);
 			}, this);
+		},
+
+		onSpecialKey: function(field, e) {
+			if (e.getKey() === e.ENTER) {
+				const v = this.getValue().trim(), lastChar = v.charAt(v.length -1);
+				if(lastChar !== this.sep) {
+					this.setValue(v + this.sep + " ");
+				}
+				e.preventDefault();
+			}
 		},
 
 		getParams: function (q) {
