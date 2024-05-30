@@ -256,7 +256,7 @@ customfields/type/Notes.js
 customfields/type/EncryptedText.js
 customfields/type/TemplateFieldDialog.js
 customfields/type/TemplateField.js
-
+customfields/EditFieldSetDialog.js
 
 search/Panel.js
 search/SearchEmailCombo.js

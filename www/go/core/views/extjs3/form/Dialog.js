@@ -166,7 +166,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		var items = this.initFormItems() || [];
 		
 		if(this.showCustomfields){
-			this.addCustomFields(items);
+			items = this.addCustomFields(items);
 		}
 		
 		var count = this.panels.length;
@@ -190,31 +190,38 @@ go.form.Dialog = Ext.extend(go.Window, {
 			autoScroll: false
 		});
 	},
+
+
+	getCustomFieldSets : function() {
+
+		const items = [];
+		var fieldsets = go.customfields.CustomFields.getFormFieldSets(this.entityStore);
+		fieldsets.forEach(function(fs) {
+			if(fs.fieldSet.permissionLevel <= 10) {
+				return;
+			}
+			if(fs.fieldSet.isTab) {
+				fs.title = null;
+				fs.collapsible = false;
+				var pnl = new Ext.Panel({
+					autoScroll: true,
+					hideMode: 'offsets', //Other wise some form elements like date pickers render incorrectly.
+					title: fs.fieldSet.name,
+					items: [fs]
+				});
+				this.addPanel(pnl);
+			} else {
+				//in case formPanelLayout is set to column
+				fs.columnWidth = 1;
+				items.push(fs);
+			}
+		}, this);
+
+		return items;
+	},
 	
-	addCustomFields : function(items, parentFieldSetId) {
-		// if(go.Entities.get(this.entityStore).customFields) {
-			var fieldsets = go.customfields.CustomFields.getFormFieldSets(this.entityStore);
-			fieldsets.forEach(function(fs) {
-				if(fs.fieldSet.permissionLevel <= 10) {
-					return;
-				}
-				if(fs.fieldSet.isTab) {
-					fs.title = null;
-					fs.collapsible = false;
-					var pnl = new Ext.Panel({
-						autoScroll: true,
-						hideMode: 'offsets', //Other wise some form elements like date pickers render incorrectly.
-						title: fs.fieldSet.name,
-						items: [fs]
-					});
-					this.addPanel(pnl);
-				} else {
-					//in case formPanelLayout is set to column
-					fs.columnWidth = 1;
-					items.push(fs);
-				}
-			}, this);
-		// }
+	addCustomFields : function(items) {
+		return items.concat(this.getCustomFieldSets());
 	},
 
 	movePermissionsPanelToEnd : function() {
