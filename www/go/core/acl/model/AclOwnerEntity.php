@@ -135,7 +135,7 @@ abstract class AclOwnerEntity extends AclEntity {
 
 		$tableAlias = $query->getTableAlias();
 
-		$records = $changes->select($tableAlias.'.id as entityId, '.$tableAlias.'.aclId, "1" as destroyed');
+		$records = $changes->select(static::buildPrimaryKeySelect($query, static::class) .' as entityId, '.$tableAlias.'.aclId, "1" as destroyed');
 		return static::entityType()->changes($records);
 	}
 
