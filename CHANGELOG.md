@@ -1,4 +1,5 @@
 - Core: Permissions were not editable for admins
+- Wopi: Fixed missing acl's that were cleaned up by garbage collection because foreign key was missing
 
 27-05-2024: 6.8.50
 - Sieve: Added "Mailing List" option
