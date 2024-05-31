@@ -87,11 +87,6 @@ try {
 
 } catch (Throwable $e) {
 
-	Response::get()->setStatus(500);
-	Response::get()->sendHeaders();
-
-	require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageHeader.php');
-
 	ErrorHandler::logException($e);
 
 	echo"<h1>" . $e->getMessage() ."</h1>";
@@ -101,6 +96,4 @@ try {
 		go()->getDebugger()->printEntries();
 		echo "</pre>";
 	}
-
-	require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageFooter.php');
 }
