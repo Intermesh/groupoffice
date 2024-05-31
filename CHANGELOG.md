@@ -1,3 +1,5 @@
+- Wopi: Fixed missing acl's that were cleaned up by garbage collection because foreign key was missing
+
 27-05-2024: 6.7.80
 - Files: Fixed permissions error for admins
 - Core: Disable events during upgrade and install to prevent problems with modules that are not available.
