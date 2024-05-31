@@ -450,7 +450,7 @@ abstract class Entity  extends OrmEntity {
 	{
 		$idsQuery = clone $query;
 		$records = $idsQuery
-			->select(self::buildPrimaryKeySelect($query, self::class) . 'as entityId, null as aclId, "1" as destroyed')
+			->select(static::buildPrimaryKeySelect($query, static::class) . ' as entityId, null as aclId, "1" as destroyed')
 			->fetchMode(PDO::FETCH_ASSOC);
 		return static::entityType()->changes($records);
 	}
@@ -481,10 +481,11 @@ abstract class Entity  extends OrmEntity {
   /**
    * This function finds all entities that might change because of this delete.
    * This happens when they have a foreign key constraint with SET NULL
-   * @param array|Query $ids
+   * @param Query $ids
    * @throws Exception
    */
-	private static function changeReferencedEntities($ids) {
+	private static function changeReferencedEntities(Query $ids): void
+	{
 		foreach(static::getEntityReferences() as $r) {
 			$cls = $r['cls'];
 
@@ -493,7 +494,7 @@ abstract class Entity  extends OrmEntity {
 				$query = $cls::find();
 
 				if(!empty($path)) {
-					//TODO joinProperites only joins the first table.
+					//TODO joinProperties only joins the first table.
 					$query->joinProperties($path);
 					$query->where(array_pop($path) . '.' .$r['column'], 'IN', $ids);
 				} else{

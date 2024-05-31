@@ -19,7 +19,6 @@ class UserTest extends \PHPUnit\Framework\TestCase
 		$this->assertArrayHasKey('username', $props);
 	}
 
-
 	public function testCreateFail() {
 		$user = new User();
 		$user->username = 'test1';
@@ -51,8 +50,6 @@ class UserTest extends \PHPUnit\Framework\TestCase
 		$this->assertEmpty($user->getValidationErrors());
 		$this->assertEquals(true, $success);
 
-
-
 		$user = new User();
 		$user->username = 'test2';
 		$user->setPassword('sdfTgs-Dfgg-$#ddg');
@@ -62,7 +59,6 @@ class UserTest extends \PHPUnit\Framework\TestCase
 		$success = $user->save();
 
 		$this->assertEquals(true, $success);
-
 
 		$user = new User();
 		$user->username = 'test2';
@@ -81,7 +77,6 @@ class UserTest extends \PHPUnit\Framework\TestCase
 
 		$this->assertEquals(ErrorCode::UNIQUE, $validationError['code']);
 	}
-
 
 	public function testAdminToArray() {
 		$admin = User::findById(1);
@@ -122,16 +117,10 @@ class UserTest extends \PHPUnit\Framework\TestCase
 		$this->assertEquals(true, $success);
 
 		$this->assertEquals($loginCount + 1, $token->getUser()->loginCount);
-
-
 	}
-
 
 	public function testDelete() {
 		$success  = User::delete(['username' => ['test1', 'test2']]);
 		$this->assertEquals(true, $success);
 	}
-
-
-
 }
