@@ -85,12 +85,16 @@ try {
 
 	call_user_func_array([$c, $method], $parts);
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
+
+	Response::get()->setStatus(500);
+	Response::get()->sendHeaders();
+
 	require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageHeader.php');
 
 	ErrorHandler::logException($e);
-	Response::get()->setStatus(500);
-	Response::get()->output($e->getMessage());
+
+	echo"<h1>" . $e->getMessage() ."</h1>";
 
 	if(go()->getDebugger()->enabled) {
 		echo "<pre>";
