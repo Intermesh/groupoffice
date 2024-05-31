@@ -43,6 +43,10 @@ trait AclSetterTrait {
 
 		$a = $this->findAcl();
 
+		if(!$a) {
+			throw new \Exception("There's no ACL set for this entity");
+		}
+
 		foreach($this->setAcl as $groupId => $level) {
 			$a->addGroup($groupId, $level);
 		}
