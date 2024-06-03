@@ -109,26 +109,7 @@ class Address extends Property {
 	
 	public function getFormatted()
 	{
-		return go()->getLanguage()->formatAddress($this->toArray(['address', 'city', 'zipCode', 'state']), $this->countryCode, false);
+		return go()->getLanguage()->formatAddress($this->toArray(['address', 'city', 'zipCode', 'state']), $this->countryCode, null);
 	}
-	
-//	public function getCombinedStreet() {
-//		return trim($this->street . ' ' . $this->street2);
-//	}
-	
-//	public function setCombinedStreet($v) {
-//		$lastSpace = strrpos($v, ' ');
-//		if($lastSpace === false) {
-//			$lastSpace = strrpos($v, "\n");
-//		}
-//		if($lastSpace === false) {
-//			$this->street = $v;
-//			$this->street2 = null;
-//		} else
-//		{
-//			$this->street = substr($v, 0, $lastSpace);
-//			$this->street2 = substr($v, $lastSpace + 1);
-//		}
-//	}
 
 }
