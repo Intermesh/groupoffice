@@ -1,3 +1,4 @@
+03-06-2024: 6.7.81
 - Wopi: Fixed missing acl's that were cleaned up by garbage collection because foreign key was missing
 - Addressbook: make display of default country explicity ternary
 
