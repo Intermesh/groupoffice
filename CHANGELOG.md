@@ -1,3 +1,5 @@
+- Newsletters: Make 'Attachements' menu in composer more visible
+
 31-05-2024: 6.8.51
 - Core: Permissions were not editable for admins
 - Wopi: Fixed missing acl's that were cleaned up by garbage collection because foreign key was missing
