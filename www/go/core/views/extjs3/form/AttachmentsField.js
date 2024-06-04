@@ -10,11 +10,6 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 
 		this.store = new go.data.Store({
 			fields: [
-				// {
-				//   name: "id",
-				//   type: "int",
-				//   useNull: true
-				// },
 				"blobId",
 				"name",
 				{
@@ -44,8 +39,8 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 				'<div class="x-clear"></div>',
 				{
 					getExtension: function (name) {
-						var dotPos = name.lastIndexOf(".");
-						if (dotPos == -1) {
+						const dotPos = name.lastIndexOf(".");
+						if (dotPos === -1) {
 							return "unknown";
 						}
 
@@ -62,7 +57,7 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 		this.items = [
 			this.dataView,
 			{
-				width: dp(48),
+				width: dp(64),
 				region: "east",
 				xtype: "container",
 				items: [this.createAttachBtn()]
@@ -201,7 +196,7 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 
 	createAttachBtn: function () {
 
-		var uploadItems = [
+		const uploadItems = [
 			{
 				text: t("Upload"),
 				iconCls: 'ic-computer',
@@ -260,7 +255,7 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 		}
 
 		return new Ext.Button({
-			iconCls: 'ic-attach',
+			iconCls: 'ic-attach-file',
 			tooltip: t("Attach files"),
 			menu: {
 				items: uploadItems
@@ -269,17 +264,6 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 
 	}
 
-	// focus: function () {
-	// 	var fields = this.getAllFormFields();
-	// 	var firstFormField = fields.length ? fields[0] : false;
-
-	// 	if (firstFormField) {
-	// 		firstFormField.focus();
-	// 	} else
-	// 	{
-	// 		go.form.FormContainer.superclass.focus.call(this);
-	// 	}
-	// }
 });
 
 Ext.reg('attachmentfield', go.form.AttachmentsField);
