@@ -1,3 +1,5 @@
+- ActiveSync: Z-push logging was always set to debug
+
 03-06-2024: 6.8.52
 - Newsletters: Make 'Attachements' menu in composer more visible
 - Newsletters: Fix permission error when adding address list
