@@ -1072,6 +1072,16 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		if($calendar->name !== 'Dakmeldingen')
 			return $response;
 
+
+		$background = "ffed9e";
+		// If you are showing more than one calendar, then change the display
+		// color of the current event to the color of the calendar it belongs to.
+		if($response['calendar_count'] > 1 && $this->overrideColors){
+			$background = $calendar->getColor(\GO::user()->id);
+			if(empty($background))
+				$background = $calendar->displayColor;
+		}
+
 		$dakStmt = \go\modules\udo\forms\model\RoofReport::find()
 				->where('date', "IS NOT", null)
 			->andWhere('date', ">=", new \DateTime($startTime))
@@ -1091,7 +1101,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				'all_day_event' => 0,
 				'model_name' => 'go\modules\udo\forms\model\RoofReport', // compat for UI
 				'calendar_id' => $calendar->id, // Must be present to be able to show tasks in the calendar Views
-				'background'=>'FE5000',
+				'background'=>$background,
 				//'day' => $dayValue,
 				'read_only' => true,
 				'report_id' => $report->id
