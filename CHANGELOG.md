@@ -1,3 +1,4 @@
+04-06-2024: 6.7.82
 - Wopi: Added "allow-downloads" permission to iframe to fix downloading copies
 
 03-06-2024: 6.7.81
