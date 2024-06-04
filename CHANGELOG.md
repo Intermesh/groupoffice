@@ -1,4 +1,5 @@
 - ActiveSync: Z-push logging was always set to debug
+- Wopi: Added "allow-downloads" permission to iframe to fix downloading copies
 
 03-06-2024: 6.8.52
 - Newsletters: Make 'Attachements' menu in composer more visible
