@@ -184,7 +184,7 @@ class Language {
 	 * @param boolean|null $showCountry When null it will be false if the country is the system default
 	 * @return string
 	 */
-	public function formatAddress(array $address, ?string $countryCode, ?bool $showCountry) : string
+	public function formatAddress(array $address, ?string $countryCode, ?bool $showCountry = null) : string
 	{
 		if(empty($countryCode)) {
 			$countryCode = self::defaultCountry();
