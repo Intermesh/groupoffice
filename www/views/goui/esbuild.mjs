@@ -18,8 +18,7 @@ const opts = {
 	target: "es2020",
 	outdir: "dist",
 	plugins: [importPathPlugin],
-	logLevel: "info",
-	allowOverwrite: true
+	logLevel: "info"
 }
 
 if(process.argv.length > 2 && process.argv[2] == "watch") {
