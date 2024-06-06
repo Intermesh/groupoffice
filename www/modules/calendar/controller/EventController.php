@@ -1093,7 +1093,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			$response['results'][$this->_getIndex($response['results'], 'R'.$report->id)] = [
 				'id' => 'R'.$report->id,
 				//'link_count' => $task->countLinks(),
-				'name' =>  ($report->type == RoofReport::TYPE_LEAKAGE ? "Lekkage: " : "Dakwerk: ") . $report->reference(),
+				'name' =>  ($report->type == RoofReport::TYPE_LEAKAGE ? "Lekkage: " : "Dakwerk: ") . $report->reference() . ' ' . $report->title,
 				'description' => $report->contactName,
 				'time' => $report->date->format('H:i'),
 				'start_time' => $report->date->format('Y-m-d H:i'),
