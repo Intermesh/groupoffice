@@ -170,7 +170,7 @@ abstract class AclItemEntity extends AclEntity {
 	{
 		$table = self::getMapping()->getPrimaryTable();
 		$changes = clone $query;
-		$changes->select($table->getAlias() . '.id as entityId');
+		$changes->select(static::buildPrimaryKeySelect($query, static::class) . ' as entityId');
 
 		$alias = static::joinAclEntity($changes);
 

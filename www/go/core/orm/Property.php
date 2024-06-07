@@ -2106,6 +2106,9 @@ abstract class Property extends Model {
 				}
 				break;
 
+			case "json":
+				break;
+
 			default:
 				$this->validateColumnString($column, $value);
 		}

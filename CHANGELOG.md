@@ -1,8 +1,37 @@
+04-06-2024: 6.8.53
+- ActiveSync: Z-push logging was always set to debug
+- Wopi: Added "allow-downloads" permission to iframe to fix downloading copies
+
+03-06-2024: 6.8.52
+- Newsletters: Make 'Attachements' menu in composer more visible
+- Newsletters: Fix permission error when adding address list
+
+31-05-2024: 6.8.51
+- Core: Permissions were not editable for admins
+- Wopi: Fixed missing acl's that were cleaned up by garbage collection because foreign key was missing
+
+27-05-2024: 6.8.50
+- Sieve: Added "Mailing List" option
+- Sieve: Fixed bug in custom filter where exists showed as "doesn't exist"
+- Core: update Japanese holidays file. Arigato 2g@rdis.net .
+- Multi instance: Pause transactions during instance deletion
+- Billing: Fixed MT940 import
+- Support: fix permission issue when creating support lists
+- Core: Fixed support module uninstall
+- Core: Fixed db check
+- Studio: fix drag & drop ACL item between collections
+- Core: Set custom select field to "undefined"
+- Email / Core: Use "Enter" in recipient list combo
+- Core: Editable language combo
+- Core: fix sending mail with $config['debugEmail'] configuration option
+
 23-05-2024: 6.8.49
 - Core: Create entity filters by users without admin privileges possible
 - Files: Fixed permissions error for admins
 - Zpushadmin: fixed error loading files
 - Core: Disable events during upgrade and install to prevent problems with modules that are not available.
+- AddressBook: suppress display of default country in address if none is filled in
+- Billing: Fixed MT940 import
 
 21-05-2024: 6.8.48
 - Email: Fixed: Feature request: icons up top in inbox (search, accounts, etc.) #947. Set minWidth for email panel

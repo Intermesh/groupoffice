@@ -7,6 +7,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
 use go\core\util\DateTime as GoDateTime;
+use go\core\util\JSON;
 use LogicException;
 
 /**
@@ -248,6 +249,9 @@ class Column {
 					$dt->hasTime = false;
 					return $dt;
 				}
+
+			case 'json':
+				return $value;
 				
 			default:
 				if ($this->trimInput) {
@@ -275,6 +279,9 @@ class Column {
 
 			case 'date':
 				return $value->format(self::DATE_FORMAT);
+
+			case 'json':
+				return empty($value) ? null : JSON::encode($value);
 				
 			default:
 				return $value;
@@ -334,6 +341,9 @@ class Column {
 				$value->hasTime = $this->dbType != 'date';
 
 				return $value;
+
+			case 'json':
+				return empty($value) ? null : JSON::decode($value, true);
 
 			default:
 				return $value;

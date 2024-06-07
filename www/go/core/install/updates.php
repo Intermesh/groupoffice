@@ -1597,6 +1597,14 @@ $updates['202405171539'][] = "alter table core_module
         foreign key (shadowAclId) references core_acl (id);";
 
 
+$updates['202405171539'][] = "alter table core_acl
+    drop foreign key core_acl_ibfk_1;";
+
+$updates['202405171539'][] = "alter table core_acl
+    add constraint core_acl_ibfk_1
+        foreign key (entityTypeId) references core_entity (id) on delete set null;";
+
+
 # ------ 6.9 ---------------
 
 $updates['202403181539'][] = "CREATE TABLE `core_principal`(

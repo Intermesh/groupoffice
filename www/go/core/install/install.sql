@@ -814,7 +814,7 @@ ALTER TABLE `core_user_group`
 
 
 ALTER TABLE `core_acl`
-  ADD CONSTRAINT `core_acl_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `core_acl_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE set null ;
 
 CREATE TABLE `go_template_group` (
    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,

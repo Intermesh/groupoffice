@@ -551,6 +551,8 @@ class Installer {
 			$module->save();
 		}
 
+		go()->enableEvents();
+
 		$this->fireEvent(static::EVENT_UPGRADE);
 
 		//phpunit tests will use change tracking after install
@@ -561,7 +563,7 @@ class Installer {
 		$this->enableGarbageCollection();
 		$this->enableDiskUsage();
 
-		go()->enableEvents();
+
 
 		echo "Done!\n";
 

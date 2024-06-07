@@ -485,7 +485,7 @@ abstract class Entity extends Property {
 		//Set select for overrides.
 		$primaryTable = static::getMapping()->getPrimaryTable();
 
-		$query->selectSingleValue( '`' . $primaryTable->getAlias() . '`.`id`')
+		$query->select( static::getPrimaryKey(true))
 			->from($primaryTable->getName(), $primaryTable->getAlias());
 
 		return $query;

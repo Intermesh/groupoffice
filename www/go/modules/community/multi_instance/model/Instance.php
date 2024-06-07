@@ -813,6 +813,9 @@ class Instance extends Entity {
 	protected static function internalDelete(Query $query): bool
 	{
 
+		// dropping databases / users will auto commit transactions. So we pause and resume.
+		go()->getDbConnection()->pauseTransactions();
+
 		$instances = Instance::find()->mergeWith($query);
 
 		foreach($instances as $instance) {
@@ -820,7 +823,7 @@ class Instance extends Entity {
 				//load instance config just before moving the config file. Moving the config file disables
 				// the installation and prevents further changes.
 				$instance->getInstanceConfig();
-				$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php'));
+				$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php')->appendNumberToNameIfExists());
 
 				try {
 					$instance->getTempFolder()->delete();
@@ -857,6 +860,8 @@ class Instance extends Entity {
 					->send();
 			}
 		}
+
+		go()->getDbConnection()->resumeTransactions();
 		
 		return parent::internalDelete($query);
 	}
@@ -880,7 +885,7 @@ class Instance extends Entity {
 		$http->setOption(CURLOPT_SSL_VERIFYHOST, false);
 		$http->setOption(CURLOPT_SSL_VERIFYPEER, false);
 
-		$response = $http->get($proto . $this->hostname . '/install/upgrade.php?confirmed=1&ignore=modules');
+		$response = $http->get($proto . $this->hostname . '/install/upgrade.php?confirmed=1&ignore=modules&onlyIfNeeded=1');
 
 		//echo $response['body'];
 

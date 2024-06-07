@@ -20,6 +20,9 @@ go.smtp.GridPanel = Ext.extend(go.grid.GridPanel, {
 				},
 				'->',
 				{
+					xtype: "tbsearch"
+				},
+				{
 					iconCls: 'ic-add',
 					handler: function() {
 						var dlg = new go.smtp.AccountDialog();

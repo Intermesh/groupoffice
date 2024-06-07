@@ -55,6 +55,20 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 			});
 
 			GO.form.ComboBoxMulti.superclass.initComponent.call(this);
+
+			this.on("specialkey", function(field, e) {
+				this.onSpecialKey(field, e);
+			}, this);
+		},
+
+		onSpecialKey: function(field, e) {
+			if (e.getKey() === e.ENTER) {
+				const v = this.getValue().trim(), lastChar = v.charAt(v.length -1);
+				if(lastChar !== this.sep) {
+					this.setValue(v + this.sep + " ");
+				}
+				e.preventDefault();
+			}
 		},
 
 		getParams: function (q) {

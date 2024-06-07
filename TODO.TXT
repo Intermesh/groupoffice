@@ -50,6 +50,8 @@ x Billing module refactor
      x fts: https://github.com/Intermesh/groupoffice/issues/762#issuecomment-1997097362
 
 - unbound or bind9?
+    x unbound or bind9?
+    - master user: https://doc.dovecot.org/configuration_manual/authentication/master_users/
 
 - Rocket chat
     - Live chat on sites feed back into GO

@@ -189,8 +189,10 @@ GO.sieve.CriteriumGrid = function(config){
 								txtToDisplay = t("Sender exists", "sieve");
 							else if(record.data.arg == 'To')
 								txtToDisplay = t("Recipient exists", "sieve");
+							else if(record.data.arg == 'List-Unsubscribe')
+								txtToDisplay = t("Is from mailing list", "sieve");
 							else
-								txtToDisplay = t("Mailheader:", "sieve")+" "+record.data.arg+" "+t("doesn't exist", "sieve");
+								txtToDisplay = t("Mailheader:", "sieve")+" "+record.data.arg+" "+t("exist", "sieve");
 						}
 						break;
 

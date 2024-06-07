@@ -1207,24 +1207,21 @@ public function historyLog(): bool|array
 		return true;
 	}
 
-
 	public static function legacyOnDelete(Query $query): bool
 	{
+		foreach($query as $pk) {
+			/** @noinspection PhpUnhandledExceptionInspection */
+			$user = LegacyUser::model()->findByPk($pk['id'], false, true);
+			LegacyUser::model()->fireEvent("beforedelete", [$user, true]);
+			//delete all acl records
+			$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
 
-			foreach($query as $id) {
-				/** @noinspection PhpUnhandledExceptionInspection */
-				$user = LegacyUser::model()->findByPk($id, false, true);
-				LegacyUser::model()->fireEvent("beforedelete", [$user, true]);
-				//delete all acl records		
-				$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
-
-				foreach($defaultModels as $model){
-					$model->deleteByAttribute('user_id',$id);
-				}
-
-				LegacyUser::model()->fireEvent("delete", [$user, true]);
+			foreach($defaultModels as $model){
+				$model->deleteByAttribute('user_id',$pk['id']);
 			}
-	
+
+			LegacyUser::model()->fireEvent("delete", [$user, true]);
+		}
 
 		return true;
 	}

@@ -72,6 +72,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	
 	constructor: function (config) {
 		config = config || {};
+
 		go.toolbar.SearchButton.superclass.constructor.call(this, config);
 			
 		//this.filters = go.util.Filters.normalize(config.filters || ['text']);
@@ -103,27 +104,25 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 				fields: ['display', 'value'],
 				id: 'value'
 			}),
-			listeners: {				
-				specialkey: function (field, e) {					
-					if (e.getKey() == Ext.EventObject.ENTER) {
-						e.preventDefault(); //to prevent form submission
-						this.search();
-					}
-
-					if(e.getKey() == Ext.EventObject.ESC) {
-						e.preventDefault();
-						this.back();
-
-					}
-				},
-				scope: this
-			},
 			onTriggerClick: function () {
 				me.search();
+			},
+			onSpecialKey: (field, e) => {
+				if (e.getKey() === Ext.EventObject.ENTER) {
+					e.preventDefault(); //to prevent form submission
+					this.search();
+				}
+
+				if(e.getKey() === Ext.EventObject.ESC) {
+					e.preventDefault();
+					this.back();
+				}
 			},
 			flex: 1
 		});
 	},
+
+
 	
 
 	lookupStore : function() {

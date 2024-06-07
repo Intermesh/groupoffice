@@ -97,8 +97,8 @@ class Mailer {
 	{
 		if(!empty(go()->getConfig()['debugEmail'])){
 			$message->setTo(go()->getConfig()['debugEmail']);
-			$message->setBcc(array());
-			$message->setCc(array());
+			$message->setBcc('');
+			$message->setCc('');
 			go()->warn("E-mail debugging is enabled in the Group-Office configuration. All emails are send to: ".go()->getConfig()['debugEmail']);
 		}
 
