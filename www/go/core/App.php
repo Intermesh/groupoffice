@@ -843,15 +843,15 @@ namespace go\core {
 		/**
 		 * Translates a language variable name into the local language.
 		 * 
-		 * @param String $str String to translate
-		 * @param String $module Name of the module to find the translation
-		 * @param String $package Only applies if module is set to 'base'
+		 * @param string $str String to translate
+		 * @param ?string $package The module package name. Defaults to {@see Language::$defaultPackage}
+		 * @param ?string $module Name of the module. Defaults to {@see Language::$defaultModule}
 		 */
-		public function t(string $str, string $package = 'core', string $module = 'core') {
+		public function t(string $str, string $package = null, string $module = null) : string {
 			return $this->getLanguage()->t($str, $package, $module);
 		}
 		
-		private $language;
+		private Language $language;
 		
 		/**
 		 * 
