@@ -1297,6 +1297,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$response = $imapMessage->toOutputArray(!$plaintext,false,$params['no_max_body_size']);
 		$response['uid'] = intval($params['uid']);
 		$response['mailbox'] = $params['mailbox'];
+		$response['isDraft'] = $params['mailbox'] == $account->drafts;
 		$response['account_id'] = intval($params['account_id']);
 		$response['do_not_mark_as_read'] = $account->do_not_mark_as_read;
 		$response = $this->_getContactInfo($imapMessage, $params, $response, $account);
@@ -1313,7 +1314,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			
 		}
 		
-		$response['isInSpamFolder']=$this->_getSpamMoveMailboxName($params['uid'],$params['mailbox'],$account->id);
+		$response['isInSpamFolder']=$response['mailbox'] == $account->spam;
 
 		// START Handle the links div in the email display panel		
 		if(!$plaintext){
@@ -1343,19 +1344,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		return $response;
 	}
-	
-	
-	protected function _getSpamMoveMailboxName($mailUid,$mailboxName,$accountId)
-	{
-		$pattern = "/^(junk|spam)$/";
-		if (preg_match($pattern, strtolower($mailboxName))) {
-			return 1;
-		} else {
-			return 0;
-		}
-		
-	}
-	
+
 	
 	protected function actionGet($account_id, $mailbox, $uid, $query="")
 	{

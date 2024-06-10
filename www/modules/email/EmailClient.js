@@ -344,6 +344,21 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			},
 			scope: this
 		},
+			this.editButton=new Ext.Button({
+				hidden:true,
+				iconCls: 'ic-edit',
+				text: GO.util.isMobileOrTablet() ? "" : t("Edit", "email"),
+				handler: function(){
+					GO.email.showComposer({
+						uid: this.messagePanel.uid,
+						task: 'opendraft',
+						template_id: 0,
+						mailbox: this.messagePanel.mailbox,
+						account_id: this.account_id
+					});
+				},
+				scope: this
+			}),
 			this.replyButton=new Ext.Button({
 				disabled:true,
 				iconCls: 'ic-reply',
@@ -497,10 +512,13 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			if(!GO.util.empty(data.do_not_mark_as_read)) {
 				this.messagePanel.do_not_mark_as_read = data.do_not_mark_as_read;
 			}
+			this.editButton.setVisible(data.isDraft);
+
+			this.replyAllButton.setVisible(!data.isDraft);
+			this.replyButton.setVisible(!data.isDraft);
+
 			this.replyAllButton.setDisabled(this.readOnly && !this._permissionDelegated);
 			this.replyButton.setDisabled(this.readOnly && !this._permissionDelegated);
-			this.forwardButton.setDisabled(this.readOnly && !this._permissionDelegated);
-			// this.printButton.setDisabled(false);//this.readOnly && !this._permissionDelegated);
 
 			var record = this.messagesGrid.store.getById(this.messagePanel.uid);
 
