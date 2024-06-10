@@ -4,6 +4,7 @@
 - Tasks / Support: Added "List" to export and import
 - Finance: Don't send docs without number
 - E-mail: Show edit button on drafts
+- Contacts: Remove contacts from group with multi select
 
 04-06-2024: 6.8.53
 - ActiveSync: Z-push logging was always set to debug
