@@ -206,8 +206,6 @@ class EntityType implements ArrayableInterface {
 		return $this->highestModSeq ?? 0;
 	}
 
-
-
 	/**
 	 * Clear cached modseqs.
 	 *

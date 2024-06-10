@@ -35,8 +35,10 @@ class PushDispatcher
 	 */
 	const CHECK_INTERVAL = 30;
 
-	private $map = [];
-	private $entityTypes = [];
+	/**
+	 * @var EntityType[]
+	 */
+	private array $map = [];
 
 	public function __construct(array $types = [])
 	{
@@ -60,8 +62,7 @@ class PushDispatcher
 		$entities = EntityType::findAll($query);
 		foreach($entities as $e) {
 			if(is_a($e->getClassName(), Entity::class, true)) {
-				$this->map[$e->getName()] = $e->getClassName();
-				$this->entityTypes[$e->getId()] = $e->getName();
+				$this->map[$e->getName()] = $e;
 			}
 		}
 	}
@@ -71,7 +72,8 @@ class PushDispatcher
 	 * @param string $type string type of SSE event
 	 * @param mixed $data mixed a jsonSerializable object
 	 */
-	public function sendMessage(string $type, $data) {
+	public function sendMessage(string $type, mixed $data): void
+	{
 		echo "event: $type\n";
 		echo 'data: ' . json_encode($data). "\n\n";
 
@@ -85,9 +87,10 @@ class PushDispatcher
 	private function checkChanges(): array
 	{
 		$state = [];
-		foreach ($this->map as $name => $cls) {
+		foreach ($this->map as $name => $entityType) {
 			/** @var Entity $cls */
-			$cls::entityType()->clearCache();
+			$entityType->clearCache();
+			$cls = $entityType->getClassName();
 			$state[$name] = $cls::getState();
 		}
 
@@ -95,7 +98,7 @@ class PushDispatcher
 	}
 
 
-	private function diff($old, $new): array
+	private function diff(array $old, array $new): array
 	{
 		$diff = [];
 
@@ -108,8 +111,8 @@ class PushDispatcher
 		return $diff;
 	}
 
-	public function start(int $ping = 10) {
-
+	public function start(int $ping = 10): void
+	{
 		$sleeping = 0;
 		$changes = $this->checkChanges();
 		// send states on start so client can compare immediately
@@ -139,6 +142,8 @@ class PushDispatcher
 			//disconnect and free up memory
 			go()->getDebugger()->debug("Closing DB connection: " . go()->getDbConnection()->getId());
 			go()->getDbConnection()->disconnect();
+
+			// because there are always many sse requests simultaneously we must keep memory as low as possible.
 			go()->getCache()->disableMemory();
 			Table::destroyInstances();
 			gc_collect_cycles();

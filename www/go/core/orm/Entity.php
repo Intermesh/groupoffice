@@ -128,6 +128,7 @@ abstract class Entity extends Property {
 	 *
 	 */
 	const EVENT_FILTER_PERMISSION_LEVEL = "filterpermissionlevel";
+	private static array $entityType = [];
 
 	/**
 	 * Constructor
@@ -678,6 +679,14 @@ abstract class Entity extends Property {
 	}
 
 
+	public static function clearCache() : void
+	{
+		parent::clearCache();
+
+		static::$entityType = [];
+	}
+
+
 	/**
 	 * Gets an ID from the database for this class used in database relations and
 	 * routing short routes like "Note/get"
@@ -687,18 +696,17 @@ abstract class Entity extends Property {
 	 */
 	public static function entityType(): EntityType
 	{
+		// We don't use go()->getCache() here because in SSE / PushDispatcher we want to disable cache in memory to keep
+		// memory as low as possible. But we must still cache these as it will lead to many overhead if we do not reuse it.
 		$cls = static::class;
-		$cacheKey = 'entity-type-' . $cls;
 
-		$t = go()->getCache()->get($cacheKey);
-		if($t !== null) {
-			return $t;
+		if(isset(self::$entityType[$cls])) {
+			return self::$entityType[$cls];
 		}
 
-		$t = EntityType::findByClassName($cls);
-		go()->getCache()->set($cacheKey, $t, false);			
-		
-		return $t;
+		self::$entityType[$cls] = EntityType::findByClassName(static::class);
+
+		return self::$entityType[$cls];
 	}
   
   /**
