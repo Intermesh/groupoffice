@@ -639,11 +639,8 @@ abstract class Property extends Model {
 		return new Mapping(static::class);
 	}
 
-	public static function clearCache() {
-//		self::$_mapping = [];
-//		self::$requiredProps = [];
+	public static function clearCache() : void {
 		self::$cachedRelationStmts = [];
-//		self::$apiProperties = [];
 	}
 
 	/**
