@@ -24,29 +24,18 @@ GO.email.TemplatesGrid = function(config)
 		singleSelect:false
 	});
 	config.title= t("Templates");
-	
-	// config.store = new GO.data.JsonStore({
-	// 	url: GO.url('email/template/store'),
-	// 	baseParams: {
-	// 		permissionLevel: GO.permissionLevels.write
-	// 	},
-	// 	root: 'results',
-	// 	id: 'id',
-	// 	fields: ['id', 'user_id', 'owner', 'name', 'type', 'acl_id','extension','group_id'],
-	// 	remoteSort: true
-	// });
-
 	config.store = new Ext.data.GroupingStore({
 		url:GO.url("email/template/store"),
 		sortInfo:{field: 'name',direction: "ASC"},
 		baseParams: {
-			permissionLevel: GO.permissionLevels.write
+			// permissionLevel: GO.permissionLevels.write
+			permissionLevel: GO.permissionLevels.read
 		},
 		reader: new Ext.data.JsonReader({
 			root: 'results',
 			totalProperty: 'total',
 			id: 'id',
-			fields: ['id', 'user_id', 'owner', 'name', 'type', 'acl_id','extension','group_name', 'group_id'],
+			fields: ['id', 'user_id', 'owner', 'name', 'type', 'acl_id','extension','group_name', 'group_id', 'permissionLevel'],
 		}),
 		groupField:'group_name',
 		remoteSort:true,
@@ -60,7 +49,6 @@ GO.email.TemplatesGrid = function(config)
 		tbarItems.push({
 			iconCls: 'ic-add',
 			text: t("Add", "email"),
-//			disabled:!GO.settings.modules.email.write_permission,
 			handler: function(){
 				this.showEmailTemplateDialog();
 			},
@@ -71,7 +59,6 @@ GO.email.TemplatesGrid = function(config)
 	tbarItems.push({
 		iconCls: 'ic-delete',
 		text: t("Delete"),
-//		disabled:!GO.settings.modules.email.write_permission,
 		handler: function(){
 			this.deleteSelected();
 		},
@@ -118,8 +105,22 @@ GO.email.TemplatesGrid = function(config)
 			header: t("Owner"),
 			dataIndex: 'owner' ,
 			width: 200,
-			sortable: false
-		}
+			sortable: false,
+				renderer: (value,elem,record) => {
+					return record.json.user_name || "";
+				}
+		},{
+			header: "",
+				dataIndex: 'permissionLevel',
+				width: 30,
+				sortable: false,
+				renderer: (value) => {
+					if(value < GO.permissionLevels.write) {
+						return '<i class="icon ic-lock"></i>';
+					}
+					return "";
+				}
+			}
 		]
 	});
 
@@ -149,13 +150,14 @@ GO.email.TemplatesGrid = function(config)
 	GO.email.TemplatesGrid.superclass.constructor.call(this, config);
 	
 	this.on('rowdblclick', function(grid, rowIndex){
-		var record = grid.getStore().getAt(rowIndex);
-		
-		if(record.data.type=='0')
-		{
+		const record = grid.getStore().getAt(rowIndex);
+		if(record.data.permissionLevel < GO.permissionLevels.write) {
+			return;
+		}
+
+		if (parseInt(record.data.type) === 0) {
 			this.showEmailTemplateDialog(record.data.id);
-		}else
-		{
+		} else {
 			this.showOOTemplateDialog(record.data.id);
 		}		
 	}, this);	

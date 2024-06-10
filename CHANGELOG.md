@@ -1,4 +1,5 @@
 - Core: Core: Fixed inefficiency in SSE causing a huge amount of calls to the ACPU cache.
+- Core: display read-only email templates in grid
 
 04-06-2024: 6.7.82
 - Wopi: Added "allow-downloads" permission to iframe to fix downloading copies
