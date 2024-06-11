@@ -3,6 +3,7 @@
 namespace go\core\model;
 
 use go\core\Environment;
+use go\core\jmap\Request;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\orm\Query;
@@ -59,10 +60,10 @@ class Client extends Property
 		if ($this->isNew()) {
 			$this->userId = go()->getUserId();
 
-			if (isset($_SERVER['REMOTE_ADDR'])) {
-				$this->ip = $_SERVER['REMOTE_ADDR'];
-			} else if(Environment::get()->isCli()) {
+			if(Environment::get()->isCli()) {
 				$this->ip = 'CLI';
+			} else {
+				$this->ip = Request::get()->getRemoteIpAddress();
 			}
 
 			if(isset($_SERVER['HTTP_USER_AGENT'])) {

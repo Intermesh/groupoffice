@@ -748,13 +748,14 @@ abstract class Module extends Singleton {
 	 */
 	public static function getIcon(): string
 	{
-		$icon = static::getFolder()->getFile('icon.png');
-		
-		if(!$icon->exists()) {
-			$icon = Environment::get()->getInstallFolder()->getFile('views/Extjs3/themes/Paper/img/default-avatar.svg');
-		}
-		
-		return 'data:'.$icon->getContentType().';base64,'. base64_encode($icon->getContents());
+		return go()->getAuthState()->getDownloadUrl('core/moduleIcon/'. static::getPackage() . '/' . static::getName().'&mtime='.go()->getSettings()->cacheClearedAt);
+//		$icon = static::getFolder()->getFile('icon.png');
+//
+//		if(!$icon->exists()) {
+//			$icon = Environment::get()->getInstallFolder()->getFile('views/Extjs3/themes/Paper/img/default-avatar.svg');
+//		}
+//
+//		return 'data:'.$icon->getContentType().';base64,'. base64_encode($icon->getContents());
 	}
 
 	private $model;

@@ -266,6 +266,7 @@ search/SearchField.js
 
 modules/SystemSettingsModuleGrid.js
 modules/GroupRights.js
+modules/ModuleSortWindow.js
 
 
 filter/Conditions.js

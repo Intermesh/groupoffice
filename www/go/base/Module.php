@@ -130,22 +130,26 @@ class Module extends Observable {
 		
 		return go()->t("name", $pkg, $name);	
 	}
+
+	public function getTitle() {
+		return $this->localizedName();
+	}
+
+	public function getLocalizedPackage() {
+		return $this->package();
+	}
+
+	public function getIcon() {
+		return $this->icon();
+	}
 	
 	/**
 	 * Get URL to module icon
 	 * 
-	 * @return StringHelper 
+	 * @return string
 	 */
 	public function icon(){
-		
-		$icon = $this->_findIconByTheme(\GO::user()->theme);
-		if(!$icon)
-			$icon = $this->_findIconByTheme("Default");
-		
-		if(!$icon)
-			$icon = \GO::config()->host.'views/Extjs3/themes/Paper/img/default-avatar.svg';
-		
-		return $icon;
+		return go()->getAuthState()->getDownloadUrl('core/moduleIcon/'. $this->getPackage() . '/' . $this->getName().'&mtime='.go()->getSettings()->cacheClearedAt);
 	}
 	
 	public function package(){

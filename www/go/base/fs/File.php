@@ -413,7 +413,7 @@ class File extends Base{
 				$success = rename($this->path, $newPath);
 			} catch(\Exception $e) {
 				//renaming across partitions doesn't work
-				$success = $this->copy($destination, $newFileName) != false;
+				$success = file_exists($newPath) || $this->copy($destination, $newFileName) != false;
 				if($success) {
 					$this->delete();
 				}

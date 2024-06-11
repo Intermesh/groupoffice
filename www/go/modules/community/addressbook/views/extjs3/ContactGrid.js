@@ -381,7 +381,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 	//when filtering on a group then offer to delete contacts from a group when delting.
 	deleteSelected: function () {
 
-		var filter = this.store.getFilter('addressbooks');
+		var filter = this.store.getFilter('groups');
 		if (!filter || !filter.groupId) {
 			return go.grid.GridTrait.deleteSelected.call(this);
 		}

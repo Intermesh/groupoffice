@@ -16,7 +16,8 @@ use go\core\model\PushDispatcher;
 
 require("../vendor/autoload.php");
 
-
+//for legacy session object
+define("GO_NO_SESSION", true);
 
 //Create the app with the database connection
 App::get()->setAuthState(new State());

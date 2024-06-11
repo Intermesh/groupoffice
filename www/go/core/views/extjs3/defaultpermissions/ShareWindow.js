@@ -13,11 +13,11 @@ go.defaultpermissions.ShareWindow = Ext.extend(go.form.Dialog, {
 	forEntityStore: null,
 
 	initFormItems : function() {
-		return new go.permissions.SharePanel({
+		return [new go.permissions.SharePanel({
 			title: null,
 			hideLabel: true,
 			name: 'entities.' + this.forEntityStore + '.defaultAcl'
-		});
+		})];
 	},
 
 	initComponent: function () {

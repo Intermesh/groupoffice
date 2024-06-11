@@ -1,3 +1,13 @@
+11-06-2024: 6.8.54
+- Core: Sort modules in GUI
+- Core: Core: Fixed inefficiency in SSE causing a huge amount of calls to the ACPU cache.
+- Core: Fixed: Proxy headers (X-FORWARDED-FOR) are ignored for "Authorized clients" #1150
+- Core: Default group permissions were no longer editable from system settings.
+- Tasks / Support: Added "List" to export and import
+- Finance: Don't send docs without number
+- E-mail: Show edit button on drafts
+- Contacts: Remove contacts from group with multi select
+
 04-06-2024: 6.8.53
 - ActiveSync: Z-push logging was always set to debug
 - Wopi: Added "allow-downloads" permission to iframe to fix downloading copies

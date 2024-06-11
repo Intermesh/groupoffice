@@ -76,6 +76,7 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 	
 	protected function formatColumns(\GO\Base\Data\ColumnModel $columnModel) {
 		$columnModel->formatColumn('user_name', '$model->user->name');
+		$columnModel->formatColumn('permissionLevel', '$model->permissionLevel');
 		$columnModel->formatColumn('group_name', function($model) {
 //			return $model->group->name ?? '';
 			return $model->getGroupName();

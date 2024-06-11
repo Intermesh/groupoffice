@@ -26,7 +26,6 @@ class Module extends Entity {
 	public $name;
 	public $package;
 	public $sort_order;
-	public $admin_menu;
 	public $version;
 	public $enabled;
 
@@ -79,7 +78,6 @@ class Module extends Entity {
 
 	protected function internalSave(): bool
 	{
-
 		if($this->isModified(['enabled']) || $this->isNew()) {
 			if($this->enabled && $this->isAvailable()) {
 				if($this->checkDepencencies) {
@@ -277,6 +275,18 @@ class Module extends Entity {
 		}
 		
 		return $this->module;
+	}
+
+	public function getTitle() : string {
+		return static::module()->getTitle();
+	}
+
+	public function getLocalizedPackage() : string {
+		return static::module()->getLocalizedPackage();
+	}
+
+	public function getIcon() : string{
+		return static::module()->getIcon();
 	}
 
 	/**
