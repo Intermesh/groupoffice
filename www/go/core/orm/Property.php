@@ -356,7 +356,8 @@ abstract class Property extends Model {
 	 *
 	 * @return void
 	 */
-	public static function clearCachedRelationStmts() {
+	public static function clearCachedRelationStmts(): void
+	{
 		self::$cachedRelationStmts = [];
 	}
 
@@ -543,7 +544,7 @@ abstract class Property extends Model {
 	}
 
 	public static function clearCache() : void {
-		self::$cachedRelationStmts = [];
+		self::clearCachedRelationStmts();
 	}
 
 	/**

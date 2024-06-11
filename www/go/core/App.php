@@ -19,6 +19,7 @@ namespace go\core {
 	use go\core\mail\Mailer;
 	use go\core\model\Group;
 	use go\core\model\Module as ModuleModel;
+	use go\core\orm\Entity;
 	use go\core\orm\EntityType;
 	use go\core\orm\exception\SaveException;
 	use go\core\orm\Property;
@@ -688,7 +689,8 @@ namespace go\core {
 		 * @param boolean $onDestruct
 		 * @noinspection PhpDocMissingThrowsInspection
 		 */
-		public function rebuildCache(bool $onDestruct = false) {
+		public function rebuildCache(bool $onDestruct = false): void
+		{
 			
 			if($onDestruct) {				
 				$this->rebuildCacheOnDestruct = $onDestruct;
@@ -720,8 +722,7 @@ namespace go\core {
 			App::get()->getCache()->flush( false);
 			go()->getDatabase()->clearCache();
 			Settings::flushCache();
-			Property::clearCache();
-			Property::clearCachedRelationStmts();
+			Entity::clearCache();
 			GO::clearCache();
 			Listeners::get()->clear();
 			Observable::$listeners = [];
