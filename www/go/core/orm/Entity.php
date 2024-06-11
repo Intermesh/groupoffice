@@ -679,6 +679,14 @@ abstract class Entity extends Property {
 	}
 
 
+	public static function clearCache() : void
+	{
+		parent::clearCache();
+
+		static::$entityType = [];
+	}
+
+
 	/**
 	 * Gets an ID from the database for this class used in database relations and
 	 * routing short routes like "Note/get"
