@@ -234,8 +234,8 @@ class Language {
 			$package = $this->defaultPackage;
 		}
 
-		if($package == null) {
-			$package = $this->defaultModule;
+		if($module == null) {
+			$module = $this->defaultModule;
 		}
 
 		$this->loadSection($package, $module);
