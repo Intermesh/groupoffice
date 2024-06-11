@@ -1,3 +1,4 @@
+- Core: Sort modules in GUI
 - Core: Core: Fixed inefficiency in SSE causing a huge amount of calls to the ACPU cache.
 - Core: Fixed: Proxy headers (X-FORWARDED-FOR) are ignored for "Authorized clients" #1150
 - Core: Default group permissions were no longer editable from system settings.
