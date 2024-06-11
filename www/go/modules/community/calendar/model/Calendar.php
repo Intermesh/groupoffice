@@ -77,7 +77,7 @@ class Calendar extends AclOwnerEntity {
 			return $pref->defaultCalendarId;
 		}
 		// If default preference is empty use the first owned calendar
-		return self::find()->selectSingleValue('id')
+		return self::find()->selectSingleValue('calendar_calendar.id')
 			->join('core_user', 'u', 'u.id = calendar_calendar.ownerId')
 			->where(['u.email' => $scheduleId])
 			->andWhere(['groupId'=>null])
