@@ -23,7 +23,7 @@ import {client, FormWindow, JmapDataSource, jmapds, recurrencefield} from "@inte
 import {calendarStore, categoryStore,t} from "./Index.js";
 import {ParticipantField, participantfield} from "./ParticipantField.js";
 import {alertfield} from "./AlertField.js";
-import {CalendarItem} from "./CalendarItem.js";
+import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {AvailabilityWindow} from "./AvailabilityWindow.js";
 
 
@@ -54,9 +54,20 @@ export class EventWindow extends FormWindow {
 		// this.startTime = textfield({type:'time',value: '12:00', width: 128})
 		// this.endTime = textfield({type:'time',value: '13:00', width: 128})
 		var recurrenceField = recurrencefield({name: 'recurrenceRule',flex:1});
-		var alertField = alertfield();
-		alertField.on('change', (_, newValue) => {
-			this.form.value.useDefaultAlert = newValue === 'default';
+		var alertField = alertfield(),
+			alertUseDefault = checkbox({hidden:true, name:'useDefaultAlerts', listeners: {
+				'setvalue': (_, newV) => {
+					if(newV) {alertField.useDefault = true;}
+				}
+			}});
+		alertField.on('change', (me, newValue) => {
+			if(newValue === null) {
+				alertUseDefault.value = me.useDefault = false;
+			} else {
+				const isDefault = (newValue === 'default' || Object.keys(newValue).length === 0);
+				me.useDefault = isDefault;
+				alertUseDefault.value = isDefault;
+			}
 		});
 
 		const exceptionsBtn = btn({text:t('Exceptions'), handler: _b => {
@@ -67,6 +78,7 @@ export class EventWindow extends FormWindow {
 
 		this.form.on('beforesave', (frm,data) => {
 			this.parseSavedData(data);
+			console.log(data);
 		});
 		this.form.on('load', (_, data) => {
 			const start = new DateTime(data.start);
@@ -189,7 +201,7 @@ export class EventWindow extends FormWindow {
 				});
 				dlg.show(this.item, this.form.modified);
 			} }),
-			alertField,
+			alertField,alertUseDefault,
 			textarea({name:'description', label: t('Description'), autoHeight: true}),
 			autocompletechips({
 				list: table({fitParent: true, headers: false, store: datasourcestore({dataSource:categoryStore.dataSource}),
@@ -296,7 +308,7 @@ export class EventWindow extends FormWindow {
 	parseSavedData(data: any) {
 		const end = this.endDate.getValueAsDateTime()!,// DateTime.createFromFormat(data.end, 'Y-m-dTh:i'),
 			start = this.startDate.getValueAsDateTime()!;
-		if(this.form.value.showWithoutTime) {
+		if(this.form.value.showWithoutTime && data.start) {
 			end.setHours(0,0,0).addDays(1);
 			start.setHours(0,0,0);
 			data.start = start.format('Y-m-d');// remove time
@@ -318,10 +330,16 @@ export class EventWindow extends FormWindow {
 		} else {
 			this.form.load(ev.data.id!).then(() => {
 				if(ev.recurrenceId) {
-					this.startDate.value = ev.start.format('Y-m-d\TH:i');
+					this.startDate.value = ev.start.format(ev.data.showWithoutTime ? 'Y-m-d' : 'Y-m-d\TH:i');
 					this.startDate.trackReset();
 					this.endDate.value = ev.end.clone().addDays(ev.data.showWithoutTime? -1 : 0).format(ev.data.showWithoutTime ? 'Y-m-d' : 'Y-m-d\TH:i');
 					this.endDate.trackReset();
+				}
+				if(ev.override) {
+					for(const k in ev.override) {
+						const f = this.form.findField(k)
+						if(f) f.value = ev.override[k as keyof CalendarEvent];
+					}
 				}
 				// set item here because 'setvalue' of end field will change the item.end value
 				this.item = ev;

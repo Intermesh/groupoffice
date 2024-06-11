@@ -63,8 +63,8 @@ export abstract class CalendarView extends Component {
 				}
 			}
 			div = E('div',
-				...item.icons,
 				E('em', item.title || '('+t('Nameless')+')'),
+				...item.icons,
 				time
 			)
 		}
@@ -72,7 +72,7 @@ export abstract class CalendarView extends Component {
 			div.dataset.key = item.key;
 		}
 		return div.cls('allday',e.showWithoutTime)
-			.cls('declined', item.isDeclined)
+			.cls('declined', item.isDeclined || item.isCancelled)
 			.cls('undecided', item.needsAction)
 			.cls('multiday', !e.showWithoutTime && item.dayLength > 1)
 			.attr('tabIndex', 0)
@@ -93,6 +93,7 @@ export abstract class CalendarView extends Component {
 				this.contextMenu.showAt(ev);
 				ev.preventDefault();
 			}).on('dblclick', _ev => {
+				if(!item.key) return;
 				item.open();
 			});
 	}
@@ -131,16 +132,17 @@ export abstract class CalendarView extends Component {
 	// for full day view
 	protected makestyle(e: CalendarItem, weekstart: DateTime, row?: number): Partial<CSSStyleDeclaration> {
 		const day = weekstart.diff(e.start).getTotalDays()!,
-			pos = Math.max(0,day);
+			pos = Math.max(0,day),
+		dwidth = e.dayLength + (day < 0 ? day : 0);
 
-		row = row ?? this.calcRow(pos, e.dayLength);
+		row = row ?? this.calcRow(pos,dwidth);
 
-		const width = Math.min(21, e.dayLength) * (100 / this.slots.length),
+		const width = Math.min(21, dwidth) * (100 / this.slots.length),
 			left = pos * (100 / this.slots.length),
 			top = row * this.ROWHEIGHT;
 		return {
-			width: (width-.3).toFixed(2)+'%',
-			left : left.toFixed(2)+'%',
+			width: (width-.6).toFixed(2)+'%',
+			left : (left+(day<0?0:.3)).toFixed(2)+'%',
 			top: top.toFixed(2)+'rem',
 			color: '#'+e.color
 		};

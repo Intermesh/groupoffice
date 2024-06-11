@@ -59,14 +59,15 @@ export class ListView extends CalendarView {
 		this.continues = [];
 		this.iterator = 0;
 		this.viewModel.sort((a, b) => a.start.date < b.start.date ? -1 : 1);
-
+		const now = new DateTime();
 		const day = this.start.clone();
 		const continues = this.continues;
 		this.continues = [];
 		let row, e,
 			ce;
 		for (let i = 0; i < 42; i++) {
-			row = E('li', E('h3',E('em', day.format('j')), day.format('M, D')));
+			const today = day.format('Ymd') === now.format('Ymd')
+			row = E('li', E('h3',E('em', day.format('j')), day.format('M, D'))).cls('today', today);
 
 			while (ce = continues.shift()) {
 				this.drawItem(ce, row, day);

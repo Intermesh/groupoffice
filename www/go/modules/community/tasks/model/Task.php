@@ -543,7 +543,7 @@ class Task extends AclItemEntity {
 			return;
 		}
 		foreach($this->alerts as $alert) {
-			$coreAlert = $this->createAlert($alert->at($this), $alert->id);
+			$coreAlert = $this->createAlert($alert->at(), $alert->id);
 			if(!$coreAlert->save()) {
 				throw new Exception(var_export($coreAlert->getValidationErrors(),true));
 			}

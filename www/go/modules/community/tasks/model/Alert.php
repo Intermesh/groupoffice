@@ -94,21 +94,20 @@ class Alert extends UserProperty
 	/**
 	 * Returns the time this alert occuurs
 	 *
-	 * @param Task $task
 	 * @return DateTime|null
 	 */
-	public function at(Task $task)
+	public function at()
 	{
-		if (isset($this->offset) && $task) {
+		if (isset($this->offset)) {
 			$offset = $this->offset;
-			$date = ($this->relativeTo == 'due') ? clone $task->due : clone $task->start;
+			$date = ($this->relativeTo == 'due') ? clone $this->owner->due : clone $this->owner->start;
 			if ($offset[0] == '-') {
-				$date->sub(new DateInterval(substr(1, $offset)));
+				$date->sub(new \DateInterval(substr($offset, 1)));
 				return $date;
 			} else if ($offset[0] == '+') {
-				$offset = substr(1, $offset);
+				$offset = substr($offset, 1);
 			}
-			$date->add(new DateInterval($offset));
+			$date->add(new \DateInterval($offset));
 			return $date;
 		}
 		if (isset($this->when)) {

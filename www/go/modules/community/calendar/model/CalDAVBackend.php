@@ -222,9 +222,7 @@ class CalDAVBackend extends AbstractBackend implements
 			//->join('core_blob', 'b','b.id = veventBlobId', 'LEFT')
 			//->join('calendar_event_user', 'u', 'u.eventId = eventdata.id')
 			->where(['cce.calendarId'=> $calendarId, 'eventdata.uid'=>$uid])->single();
-//if($event->uid === '0a3b1bbb-dcbc-42d2-8762-6ad7493eef34') {
-//	$e=0;
-//}
+
 		if (!$event) {
 			go()->log("Event $objectUri not found in calendar $calendarId!");
 			return false;
@@ -249,8 +247,10 @@ class CalDAVBackend extends AbstractBackend implements
 		$uid = pathinfo($objectUri, PATHINFO_FILENAME);
 		$event = new CalendarEvent();
 		$event->uid = $uid;
-		$event = Calendar::addEvent(ICalendarHelper::fromICal($calendarData, $event), $calendarId);
-		if($event === null) {
+
+		$event = ICalendarHelper::parseVObject($calendarData, $event);
+		$savedEvent = Calendar::addEvent($event, $calendarId);
+		if($savedEvent === null) {
 			throw new \Exception('Could not create calendar event');
 		}
 
@@ -267,7 +267,7 @@ class CalDAVBackend extends AbstractBackend implements
 			go()->log("Event $objectUri not found in calendar $calendarId!");
 			return false;
 		}
-		$event = ICalendarHelper::fromICal($calendarData, $event);
+		$event = ICalendarHelper::parseVObject($calendarData, $event);
 		if(!$event->save()) {
 			go()->log("Failed to update event at ".$objectUri);
 			return false;

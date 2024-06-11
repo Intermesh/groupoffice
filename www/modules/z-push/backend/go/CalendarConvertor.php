@@ -42,50 +42,89 @@ class CalendarConvertor
 	/**
 	 * SERVER -> PHONE
 	 * @param CalendarEvent $event
-	 * @param SyncAppointment|SyncAppointmentException $appointment
+	 * @param SyncAppointment|SyncAppointmentException $exception
 	 * @return SyncAppointment
 	 */
-	static function toSyncAppointment($event, $appointment = null, $params) {
-		$message = $appointment ?? new SyncAppointment();
-		if(!empty($event->timeZone))
+	static function toSyncAppointment($event, $exception, $params) {
+		$message = $exception ?? new SyncAppointment();
+		if(!$exception && !empty($event->timeZone))
 			$message->timezone =  self::mstzFromTZID($event->timeZone);
+		$message->alldayevent = empty($event->showWithoutTime) ? 0 : 1;
+		if(!empty($event->createdAt))
+			$message->dtstamp = $event->createdAt->getTimestamp();
 		$message->starttime = $event->start()->getTimestamp();
 		$message->subject = $event->title;
 		$message->uid = $event->uid;
 		$message->location = $event->location;
+		if(!empty($event->duration))
 		$message->endtime = $event->end()->getTimeStamp();
+		if(!empty($event->privacy))
+		$message->sensitivity = ['public'=> '0', 'private' => '2', 'secret'=> '3'][$event->privacy];
+		if(!empty($event->freeBusyStatus))
 		$message->busystatus = $event->freeBusyStatus == 'busy' ? "2" : "0";
-		$message->asbody = GoSyncUtils::createASBody($event->description, $params);
-		$calPart = $event->calendarParticipant();
-		if($calPart && !$calPart->isOwner()) {
-			//iphone uses busy status for events.
-			$stat = array_search($calPart->participationStatus, self::$meetingResponseMap);
-			if($stat !== false) {
-				$message->busystatus = $stat;
-			}
-		}
-		$message->dtstamp = $event->createdAt->getTimestamp();
-		if($event->showWithoutTime)
-			$message->alldayevent = 1;
-		if($event->isRecurring()) {
-			$message->recurrence = self::toSyncRecurrence($event);
-			if(!empty($event->recurrenceOverrides)) {
-				$message->exceptions = [];
-				foreach ($event->recurrenceOverrides as $recurrenceId => $patch) {
-					$xcp = new SyncAppointmentException();
-					if ($patch->excluded) {
-						$xcp->deleted = 1;
-					} else {
-						$xcp = self::toSyncAppointment($patch, $xcp, $params);
-					}
-					$xcp->exceptionstarttime = $recurrenceId;
-					$message->exceptions[] = $xcp;
+		$message->meetingstatus = 0;
+		if (!empty($event->participants)) {
+			$calPart = $event->calendarParticipant();
+			$message->meetingstatus = $event->status == CalendarEvent::Cancelled ? 5 : 1;
+			self::toSyncAttendee($event, $message, $calPart);
+			// check if user is not organizer but attendee to detect received meeting
+			if($calPart && !$calPart->isOwner()) {
+				// apply received flag
+				$message->meetingstatus |= 0x2; // IS NOT ORANIZER
+				//iphone uses busy status for events.
+				$stat = array_search($calPart->participationStatus, self::$meetingResponseMap);
+				if($stat !== false) {
+					$message->busystatus = $stat;
 				}
 			}
 		}
 
-		self::toSyncAttendee($event, $message, $calPart);
 
+		$message->asbody = GoSyncUtils::createASBody($event->description, $params);
+
+
+		if($event->isRecurring()) {
+			$message->recurrence = self::toSyncRecurrence($event);
+			if(!empty($event->recurrenceOverrides)) {
+				$message->exceptions = [];
+				foreach ($event->recurrenceOverrides as $recurrenceId => $override) {
+					$msgException = new SyncAppointmentException();
+					if ($override->excluded) {
+						$msgException->deleted = 1;
+					} else {
+						$exEvent = (new CalendarEvent())->setValues($override->toArray());
+						$exEvent->uid = $event->uid; // required
+						$exEvent->timeZone = $event->timeZone;
+						if(empty($exEvent->start)) {
+							$exEvent->start = $override->recurrenceId;
+						}
+						if(empty($exEvent->duration)) {
+							$exEvent->duration = $event->duration; // z-push needs this for its compare to endtime check to pass.
+						}
+						$msgException = self::toSyncAppointment($exEvent, $msgException, $params);
+					}
+					$msgException->exceptionstarttime = (new DateTime($recurrenceId, new \DateTimeZone($event->timeZone)))->getTimestamp();
+					$message->exceptions[] = $msgException;
+				}
+			}
+		}
+
+
+		if (empty($exception) && $message->meetingstatus > 0) {
+			// set meetingstatus if not already set
+			$message->meetingstatus = isset($message->meetingstatus) ? $message->meetingstatus : 1;
+			// check if meeting has an organizer set, otherwise fallback to current user
+			if (!isset($message->organizeremail)) {
+				ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendCalDAV->toSyncAppointment(): No organizeremail defined, using user details"));
+				$u = go()->getAuthState()->getUser(['displayName', 'email']);
+				$message->organizeremail = $u->email;
+				$message->organizername = $u->displayName;
+			}
+			// Ensure the organizer name is set
+			if (!isset($message->organizername)) {
+				$message->organizername = Utils::GetLocalPartFromEmail($message->organizeremail);
+			}
+		}
 		//$message->reminder = 0; // timestamp or 0
 //		if(!empty($event->alerts)) {
 //			foreach($event->alerts as $alert) {
@@ -101,10 +140,11 @@ class CalendarConvertor
 		return base64_encode(TimezoneUtil::GetSyncBlobFromTZ($tz));
 	}
 
-	private static function toSyncAttendee($event, &$message, $me = null) {
-		$message->meetingstatus = 0;
-		if(empty($event->participants))
-			return;
+	private static function toSyncAttendee(CalendarEvent $event, &$message, $me = null) {
+
+		$message->organizername = '';
+		if(!empty($event->replyTo))
+			$message->organizeremail = $event->replyTo;
 
 		if($me)
 			$message->responsetype = self::$participationStatusMap[$me->participationStatus] ?? 0;
@@ -143,32 +183,30 @@ class CalendarConvertor
 		if(isset($rule->interval))
 			$recur->interval = $rule->interval;
 		if(!empty($rule->until))
-			$recur->until = (new DateTime($rule->until))->getTimestamp();
+			$recur->until = strtotime($rule->until);
 		if(!empty($rule->count))
 			$recur->occurrences = $rule->count;
 
 		switch ($rule->frequency) {
 			case 'daily':
-				$recur->type = 0;
+				$recur->type = "0";
 				break;
 			case 'weekly':
-				$recur->type = 1;
-				if(isset($rule->byDay))
-					$recur->dayofweek = self::nDayToAS($rule->byDay);
+				$recur->type = "1";
+				$recur->dayofweek = self::nDayToAS($rule->byDay??[], $event->start());
 				break;
 			case 'monthly':
 				if (isset($rule->byDay[0])) {
-					$recur->type = 3;
+					$recur->type = "3";
 					$recur->weekofmonth = $rule->bySetPosition;
-					if(isset($rule->byDay))
-						$recur->dayofweek = self::nDayToAS($rule->byDay);
+					$recur->dayofweek = self::nDayToAS($rule->byDay??[], $event->start());
 				} else {
 					$recur->dayofmonth = $event->start()->format('j');
-					$recur->type = 2;
+					$recur->type = "2";
 				}
 				break;
 			case 'yearly':
-				$recur->type = 5;
+				$recur->type = "5";
 				$recur->monthofyear = $event->start()->format('n');
 				$recur->dayofmonth = $event->start()->format('j');
 				break;
@@ -177,12 +215,13 @@ class CalendarConvertor
 		return $recur;
 	}
 
-	private static function nDayToAS($ndays) {
-		static $v = ['su'=>1,'mo'=>2,'tu'=>4,'we'=>8,'th'=>16,'fr'=>32,'sa'=>64];
-		$r = 0;
+	private static function nDayToAS($ndays, \DateTime $start) {
+		static $dayOfWeekBits = ['su'=>0x01,'mo'=>0x02,'tu'=>0x04,'we'=>0x08,'th'=>0x10,'fr'=>0x20,'sa'=>0x40];
+		// add the start day os this is required
+		$r = $dayOfWeekBits[strtolower(substr($start->format('l'),0,2))];
 		if($ndays) {
-			foreach ($ndays as $nday) {
-				$r += $v[$nday->day];
+			foreach ((array)$ndays as $nday) {
+				$r |= $dayOfWeekBits[$nday->day];
 			}
 		}
 		return $r;
@@ -202,19 +241,22 @@ class CalendarConvertor
 	{
 		if (isset($message->uid))
 			$event->uid = $message->uid;
-		if (!empty($message->timezone))
-			$event->timeZone = self::tzid();
+		//if (!empty($message->timezone))
+			$event->timeZone = self::tzid(); // ActiveSync timezone is guessable but for now we expect it to be the same as in GroupOffice
 		if ($event->isNew())
 			$event->createdAt = new DateTime('@'.$message->dtstamp);
 		$event->showWithoutTime = $message->alldayevent;
 		$event->title = $message->subject ?? "No subject";
 		$event->description = GoSyncUtils::getBodyFromMessage($message);
-		$dtstart = new DateTime('@'.(isset($message->starttime) ? $message->starttime : $message->dtstamp));
+		$dtstart = new DateTime('@'.(isset($message->starttime) ? $message->starttime : $message->dtstamp), new \DateTimeZone('etc/UTC'));
 		if (isset($message->endtime)) {
-			$dtend = new DateTime('@' . $message->endtime);
+			$dtend = new DateTime('@' . $message->endtime, new \DateTimeZone('etc/UTC'));
 			$event->duration = DateTime::intervalToISO($dtend->diff($dtstart));
 		}
-		$event->start = $dtstart->setTimezone($event->timeZone());
+		if($event->timeZone) {
+			$dtstart->setTimezone($event->timeZone());
+		}
+		$event->start = $dtstart;
 		if (isset($message->location))
 			$event->location = $message->location;
 		if (isset($message->busystatus))
@@ -222,15 +264,31 @@ class CalendarConvertor
 		if (isset($message->sensitivity))
 			$event->privacy = self::$privacyMap[$message->sensitivity];
 
-		$calPart = $event->calendarParticipant();
-		//don't update existing participants because it is unreliable data from the phone
-		if ($calPart && $calPart->isOwner()) {
-			if (isset($message->attendees)) {
-				self::toParticipants($message, $event, $calPart);
+		$principal = \go\core\model\Principal::currentUser();
+
+		if (isset($message->attendees)) {
+			if($event->isNew() && ($message->busystatus == 1 || $message->busystatus == 2)) {  // busy or tentative (iPhone sends busy status for tentative)
+				$organizer = $event->generatedOrganizer($principal);
+				if(!empty($message->organizeremail) && go\core\mail\Util::validateEmail($message->organizeremail)) $organizer->email = $message->organizeremail;
+				if(!empty($message->organizername)) $organizer->name = $message->organizername;
 			}
-		//} elseif ($message->busystatus == 1 || $message->busystatus == 2) { //tentative or busy
-			// iPhone sends busy status for tentative
-			//self::MeetingResponse($event->id, 'a/GroupOfficeCalendar', $message->busystatus == 1 ? 2 : 3);
+			foreach ($message->attendees as $attendee) {
+				$key = $attendee->email;
+				if(!go\core\mail\Util::validateEmail($key))
+					continue; // do not att attendee if client does not send a valid email address (TBSync uses login name)
+				$principalId = \go\core\model\Principal::find()->selectSingleValue('id')->where('email','=',$key)->orderBy(['entityTypeId'=>'ASC'])->single();
+				if(!isset($event->participants[$principalId ?? $key])) {
+					$p = new Participant($event);
+					$p->email = $attendee->email;
+					$p->name = $attendee->name;
+					$p->expectReply = true;
+					$p->kind = Participant::Individual; // todo: read from $attendee->attendeetype
+					$event->participants[$principalId ?? $key] = $p;
+				} else {
+					$p = &$event->participants[$principalId ?? $key];
+				}
+				$p->participationStatus = array_search($attendee->attendeestatus, self::$participationStatusMap) ?? Participant::NeedsAction;
+			}
 		}
 
 		if (isset($message->recurrence)) {
@@ -239,7 +297,9 @@ class CalendarConvertor
 		if (isset($message->exceptions)) {
 			$event->recurrenceOverrides = []; // empty first to delete what is not present
 			foreach ($message->exceptions as $v) {
-				$recurrenceId = $v->exceptionstarttime->format('Y-m-d\Th:i:s');
+				$rDT = new DateTime('@'.$v->exceptionstarttime, new \DateTimeZone('etc/UTC'));
+				if($event->timeZone) $rDT->setTimezone($event->timeZone());
+				$recurrenceId = $rDT->format('Y-m-d\TH:i:s');
 				$event->recurrenceOverrides[$recurrenceId] = (new RecurrenceOverride($event))
 					->setValues(self::toOverride($v));
 			}
@@ -248,7 +308,7 @@ class CalendarConvertor
 		if (isset($message->reminder)){
 			$event->alerts = [(new Alert($event))->setValues([
 				'action' => 'display',
-				'offset' => $message->reminder
+				'trigger' => ['offset' => '-PT'.$message->reminder.'M', 'relativeTo' => 'start']
 			])];
 		}
 
@@ -265,11 +325,16 @@ class CalendarConvertor
 	static private function toRecurrenceRule(SyncRecurrence $recur) {
 		static $recurType = [0=>'daily',1=>'weekly',2=>'monthy',3=>'montly',4=>'yearly',5=>'yearly'];
 		$r = (object)['frequency'=>$recurType[$recur->type]];
-		if(!empty($recur->interval))
-			$r->interval = $recur->interval;
-		if (!empty($recur->until))
-			$r->until = $recur->until;
-		$r->byday = self::aSync2Nday($recur->dayofweek);
+		if(!empty($recur->interval) && $recur->interval !== '1') // 1 = default
+			$r->interval = (int)$recur->interval;
+		if (!empty($recur->until)) {
+
+			$untilDT = new DateTime('@'.$recur->until, new \DateTimeZone('etc/UTC'));
+			$untilDT->setTimezone(new DateTimeZone(self::tzid()));
+			$r->until = $untilDT->format('Y-m-d\TH:i:s');
+		}
+		if(!empty($recur->dayofweek))
+			$r->byDay = self::aSync2Nday($recur->dayofweek);
 
 		if (!empty($recur->weekofmonth))
 			$r->bysetpos = $recur->weekofmonth;
@@ -301,39 +366,23 @@ class CalendarConvertor
 		if(!empty($description))
 			$ex->description = $description;
 		if(isset($values->starttime))
-			$ex->start = $values->starttime;
-		if (isset($values->endtime))
-			$ex->duration = \go\core\util\DateTime::intervalToISO($values->endtime->getDateTime()
-				->diff($ex->start ?? $values->exceptionstarttime));
+			$ex->start = new DateTime('@'.$values->starttime, new \DateTimeZone('etc/UTC'));
+		if (isset($values->endtime)) {
+			// timezone needs to be the same for correct duration of exception
+			$ex->duration = \go\core\util\DateTime::intervalToISO((new DateTime('@' . $values->endtime, new \DateTimeZone('etc/UTC')))
+				->diff($ex->start ?? new DateTime('@' . $values->exceptionstarttime, new \DateTimeZone('etc/UTC'))));
+		}
 		if (isset($values->location))
 			$ex->location = $values->location;
 		if (isset($values->busystatus))
 			$ex->freeBusyStatus = empty($values->busystatus) ? 'free' : 'busy';
 		if (isset($values->sensitivity))
 			$ex->privacy = self::$privacyMap[$values->sensitivity];
-
+		if(isset($ex->start)) {
+			$ex->start->setTimezone(new DateTimeZone(self::tzid()));
+			$ex->start = $ex->start->format('Y-m-d\TH:i:s');
+		}
 		return (array)$ex;
-	}
-
-	private static function toParticipants(SyncAppointment $message, $event, $me) {
-
-		if(isset($message->organizeremail) && !$event->isOrigin) {
-			// todo?
-		}
-
-		$participant = new Participant($event);
-		$participant->email = $message->organizeremail;
-		$participant->name = $message->organizername;
-		//$participant->participationStatus =
-
-		foreach ($message->attendees as $attendee) {
-
-			$participant = new Participant($event);
-			$participant->email = $attendee->email;
-			$participant->name = $attendee->name;
-			$participant->participationStatus = array_search($attendee->attendeestatus, self::$participationStatusMap) ?? Participant::NeedsAction;
-		}
-
 	}
 
 }

@@ -54,9 +54,9 @@ class CalendarStore extends Store {
 			->where(['calendarId' => $folderid]);
 
 		if (!empty($cutoffdate)) {
-			$query->andWhere('lastOccurrence > ' . date('Y-m-d H:i:s', $cutoffdate));
+			$query->andWhere('start > "' . date('Y-m-d H:i:s', $cutoffdate).'"');
 		}
-
+		ZLog::Write(LOGLEVEL_INFO, "GetMessageList ".$folderid. ' '. $cutoffdate);
 		if(Calendar::findById($folderid)->ownerId != go()->getUserId()) {
 			$query->andWhere('privacy', '=', 'public');
 		}
@@ -67,10 +67,11 @@ class CalendarStore extends Store {
 	public function StatMessage($folderid, $id)
 	{
 		$event = CalendarEvent::find()
-			->select('id', 'modifiedAt')
-			->where(['id'=>$id,'calendarId'=>$folderid])
+			->select(['cce.id', 'modifiedAt'])
+			->where(['cce.id'=>$id,'cce.calendarId'=>$folderid])
 			->single();
-		ZLog::Write(LOGLEVEL_DEBUG, "StatMessage ".$event->id . ' - '.$event->modifiedAt->format('Y-m-d H:i:s'));
+		if($event)
+			ZLog::Write(LOGLEVEL_DEBUG, "StatMessage ".$event->id . ' - '.$event->modifiedAt->format('Y-m-d H:i:s'));
 		return $event ? [
 			'id' => $event->id,
 			'flags' => 1,
@@ -91,7 +92,7 @@ class CalendarStore extends Store {
 
 		if (!$event) {
 			$event = new CalendarEvent();
-			$event->prodId = 'Group-Office (EAS)';
+			$event->prodId = 'GroupOffice (EAS)';
 		} else if (!$event->hasPermissionLevel(Acl::LEVEL_WRITE)) {
 			ZLog::Write(LOGLEVEL_DEBUG, "Skipping update of read-only event " . $event->title);
 			return $this->StatMessage($folderid, $id);
@@ -151,6 +152,17 @@ class CalendarStore extends Store {
 
 		$event->calendarId = $newfolderid;
 		return !$event->save() ? false : $event->id;
+	}
+
+	public function getNotification($folder=null) {
+
+		$newstate = CalendarEvent::find()
+			->selectSingleValue('CONCAT("M",IFNULL(UNIX_TIMESTAMP(MAX(modifiedAt)),0),":C",COUNT(*))')
+			->where('calendarId', '=', $folder)->single();
+
+		ZLog::Write(LOGLEVEL_DEBUG,'CalendarStore->getNotification('.$folder.') State: '.$newstate);
+
+		return $newstate;
 	}
 
 }

@@ -31,7 +31,7 @@ return [
 	'Unsubscribe' => 'Afmelden',
 	'Subscribe' => 'Aanmelden',
 	'Events with time' => 'Afspraken met tijd',
-	'Events wihtout time (All day)' => 'Afspraken zonder tijd (Hele dag)',
+	'Events without time (Full-day)' => 'Afspraken zonder tijd (Hele dag)',
 	'Default notifications' => 'Standaard meldingen',
 	'Exceptions' => 'Uitzonderingen',
 	'Override' => 'Overschreven',
@@ -129,6 +129,7 @@ return [
 
 	//alerts
 	'Alerts'=>'Meldingen',
+	'Reminder' => 'Herinnering',
 	'At the start'=>'Aan het begin',
 	'Default' => 'Standaard',
 	'day' => 'dag',
@@ -140,6 +141,12 @@ return [
 	'before' => 'van te voren',
 	'after' => 'erna',
 	'None' => 'Geen',
+
+	//notifications
+	'New invitation from {organizer}' => 'Nieuwe uitnodiging van {organizer}',
+	'Invitation updated by {organizer}' => 'Uitnodiging aangepast door {organizer}',
+	'Event cancelled by {organizer}' => 'Afspraak geannuleerd door {organizer}',
+	'New event created by {creator}' => 'Nieuwe afspraak gemaakt door {creator}',
 
 	'Imported %s events successful.' => 'Importeren van %s afspraken is geslaagd.',
 	'Skipped %s event(s) because UID already existed.' => '%s afspraken zijn overgeslagen omdat het UID al bestaat',

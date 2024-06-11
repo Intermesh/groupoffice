@@ -37,7 +37,7 @@ class Alert extends UserProperty {
 	/** @var string 'start' | 'end' of the startdate of the event */
 	protected $relatedTo = self::Start;
 
-	/** @var DateTime when to user has dismissed the alert or when the server has carried out sending the email */
+	/** @var \DateTime when to user has dismissed the alert or when the server has carried out sending the email */
 	public $acknowledged;
 
 	/** @var string 'email' | 'display'  */
@@ -61,6 +61,28 @@ class Alert extends UserProperty {
 		] : [
 			'when' => $this->when
 		];
+	}
+
+	public function at()
+	{
+		$event = $this->owner;
+		if (isset($this->offset)) {
+			$offset = $this->offset;
+			$date = clone ($this->relatedTo == self::End ? $event->end() : $event->start());
+			if ($offset[0] == '-') {
+				$date->sub(new \DateInterval(substr($offset, 1)));
+				return $date;
+			}
+			if ($offset[0] == '+') {
+				$offset = substr($offset, 1);
+			}
+			$date->add(new \DateInterval($offset));
+			return $date;
+		}
+		if (isset($this->when)) {
+			return $this->when;
+		}
+		return null;
 	}
 
 	public function setTrigger($v) {

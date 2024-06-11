@@ -9,7 +9,7 @@ use Sabre\VObject\Component\VCalendar;
 
 class Scheduler {
 
-	const EssentialScheduleProps = ['start', 'duration', 'location', 'title', 'description', 'showWithoutTime'];
+	const EssentialScheduleProps = ['start', 'duration', 'location', 'title', 'description', 'showWithoutTime', 'recurrenceRule'];
 
 	/**
 	 * Send all the needed imip schedule messages
@@ -54,7 +54,7 @@ class Scheduler {
 		$event->createdAt = new DateTime();
 		$event->modifiedAt = new DateTime();
 		$ics = ICalendarHelper::toVObject($event, new VCalendar([
-			'PRODID' => ICalendarHelper::PROD,
+			'PRODID' => $event->prodId,
 			'METHOD'=>'REPLY'
 		]));
 
@@ -121,24 +121,27 @@ class Scheduler {
 			}
 
 			$ics = ICalendarHelper::toVObject($event, new VCalendar([
-				'PRODID' => ICalendarHelper::PROD,
+				'PRODID' => $event->prodId,
 				'METHOD'=>$method
 			]));
 
-
-			$success = go()->getMailer()->compose()
-					->setSubject($subject .': '.$event->title)
-					->setFrom(go()->getSettings()->systemEmail, $organizer->name)
-					->setReplyTo($organizer->email)
-					->setTo(new Address($participant->email, $participant->name))
-					->attach(Attachment::fromString($ics->serialize(),
-						'invite.ics',
-						'text/calendar;method='.$method.';charset=utf-8',Attachment::ENCODING_8BIT)
-						->setInline(true)
-					)
-					->setBody(self::mailBody($event,$method,$participant,$subject), 'text/html')
-					->send() && $success;
-
+			try {
+				$success = go()->getMailer()->compose()
+						->setSubject($subject . ': ' . $event->title)
+						->setFrom(go()->getSettings()->systemEmail, $organizer->name)
+						->setReplyTo($organizer->email)
+						->setTo(new Address($participant->email, $participant->name))
+						->attach(Attachment::fromString($ics->serialize(),
+							'invite.ics',
+							'text/calendar;method=' . $method . ';charset=utf-8', Attachment::ENCODING_8BIT)
+							->setInline(true)
+						)
+						->setBody(self::mailBody($event, $method, $participant, $subject), 'text/html')
+						->send() && $success;
+			} catch(\Exception $e) {
+				go()->log($e->getMessage());
+				$success=false;
+			}
 			if(isset($old)) {
 				go()->getLanguage()->setLanguage($old);
 				unset($old);
@@ -159,6 +162,7 @@ class Scheduler {
 		include __DIR__.'/../views/imip.php';
 		return ob_get_clean();
 	}
+
 
 	static function handleIMIP($imapMessage, $ifMethod=null) {
 		$vcalendar = $imapMessage->getInvitationVcalendar();
@@ -255,14 +259,14 @@ class Scheduler {
 			$existingEvent->isOrigin = false;
 			$existingEvent->replyTo = str_replace('mailto:', '',(string)$vcalendar->VEVENT[0]->{'ORGANIZER'});
 		}
-		$cal = Calendar::fetchDefault($receiver);
+		$calId = Calendar::fetchDefault($receiver);
 		$event = ICalendarHelper::parseVObject($vcalendar, $existingEvent);
 		foreach($event->participants as $p) {
 			if($p->email == $receiver && $p->kind == 'resource') {
 				return $event; // Do not put the event in the resource admin its calendar
 			}
 		}
-		return Calendar::addEvent($event, $cal->id);
+		return Calendar::addEvent($event, $calId);
 	}
 
 	private static function processCancel(VCalendar $vcalendar, ?CalendarEvent $existingEvent) {
@@ -270,16 +274,21 @@ class Scheduler {
 			if ($existingEvent->isRecurring()) {
 				foreach($vcalendar->VEVENT as $vevent) {
 					if(!empty($vevent->{'RECURRENCE-ID'})) {
-						$recurId = $vevent->{'RECURRENCE-ID'}->getValue();
-						$existingEvent->recurrenceOverrides[$recurId] = (new RecurrenceOverride($existingEvent))
-							->setValues(['status' => CalendarEvent::Cancelled]);
+						$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
+						if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
+							$existingEvent->recurrenceOverrides[$recurId] = (new RecurrenceOverride($existingEvent));
+						}
+						$existingEvent->recurrenceOverrides[$recurId]->setValues(['status' => CalendarEvent::Cancelled]);
+					} else {
+						$existingEvent->status = CalendarEvent::Cancelled;
 					}
 				}
 			} else {
 				$existingEvent->status = CalendarEvent::Cancelled;
 			}
 			$existingEvent->sequence = $vcalendar->SEQUENCE;
-			$existingEvent->save();
+			$success = $existingEvent->save();
+
 		}
 		return $existingEvent;
 	}

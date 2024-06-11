@@ -3,6 +3,7 @@
 namespace go\modules\community\calendar\controller;
 
 use go\core\db\Query;
+use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
 use go\modules\community\calendar\model;
 
@@ -38,5 +39,10 @@ class Calendar extends EntityController {
 
 	public function changes($params) {
 		return $this->defaultChanges($params);
+	}
+
+	protected function canCreate(Entity $entity): bool
+	{
+		return $this->rights->mayChangeCalendars;
 	}
 }

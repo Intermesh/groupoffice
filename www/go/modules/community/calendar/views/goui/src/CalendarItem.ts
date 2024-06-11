@@ -16,7 +16,7 @@ import {EventDetailWindow} from "./EventDetail.js";
 export interface CalendarEvent extends BaseEntity {
 	id: EntityID
 	recurrenceRule?: any
-	recurrenceOverrides?: any
+	recurrenceOverrides?: {[recurrenceId:string]: (Partial<CalendarEvent> & {excluded?:boolean})}
 	links?: any
 	alerts?: any
 	showWithoutTime?: boolean // isAllDay
@@ -25,6 +25,7 @@ export interface CalendarEvent extends BaseEntity {
 	timeZone:Timezone
 	title: string
 	color?: string
+	status?: string
 	isOrigin: boolean
 	participants?: {[key:string]: any}
 	calendarId: string
@@ -37,6 +38,7 @@ interface CalendarItemConfig {
 	recurrenceId?:string
 	extraIcons?: MaterialIcon[]
 	data: Partial<CalendarEvent>
+	override?: Partial<CalendarEvent>
 	title?: string
 	start?: DateTime
 	end?: DateTime
@@ -54,14 +56,15 @@ export class CalendarItem {
 	key!: string // id/recurrenceId
 	recurrenceId?:string
 	data!: CalendarEvent
+	override?: Partial<CalendarEvent>
 	title!: string
 	start!: DateTime
 	end!: DateTime
-	private extraIcons;
+	readonly extraIcons;
 	//color!: string
 
-	private initStart: string
-	private initEnd: string
+	readonly initStart: string
+	readonly initEnd: string
 
 	cal: any
 
@@ -121,7 +124,8 @@ export class CalendarItem {
 							start: overideStart,
 							title: o.title || e.title,
 							end: overideStart.clone().add(new DateInterval(o.duration || e.duration)),
-							data: e
+							data: e,
+							override: o,
 						});
 					}
 				} else {
@@ -157,6 +161,10 @@ export class CalendarItem {
 		return this.calendarPrincipal?.participationStatus === 'declined';
 	}
 
+	get isCancelled() {
+		return (this.override?.status || this.data.status) === 'cancelled';
+	}
+
 	get isTentative() {
 		return  this.calendarPrincipal?.participationStatus === 'tentative';
 	}
@@ -169,10 +177,14 @@ export class CalendarItem {
 		return this.data.color || this.cal?.color || '356772';
 	}
 
+	get participants() {
+		return this.override?.participants || this.data.participants;
+	}
+
 	get owner() {
-		for(const p in this.data.participants) {
-			if (this.data.participants[p].roles.owner) {
-				return this.data.participants[p];
+		for(const p in this.participants) {
+			if (this.participants[p].roles.owner) {
+				return this.participants[p];
 			}
 		}
 	}
@@ -180,6 +192,7 @@ export class CalendarItem {
 	/** amount of days this event is spanning */
 	get dayLength() {
 		// 1 day + the distance in days between start and end. - 1 second of end = 00:00:00
+		console.log(this.title, this.start.diff(this.end.clone().addSeconds(-1)));
 		return 1 + this.start.diff(this.end.clone().addSeconds(-1)).getTotalDays()!;
 	}
 
@@ -191,9 +204,7 @@ export class CalendarItem {
 		if(e.alerts) icons.push('notifications');
 		if(this.isTentative) icons.push('question_mark');
 		if(!!e.participants) icons.push('group');
-		if(!icons.length && !e.showWithoutTime) {
-			icons.push('fiber_manual_record') // the dot
-		}
+
 		return icons.map(i=>E('i',i).cls('icon'));
 	}
 
@@ -269,12 +280,12 @@ export class CalendarItem {
 	}
 
 	get isOwner() {
-		return !this.data.participants || this.calendarPrincipal?.roles?.owner || false;
+		return !this.participants || this.calendarPrincipal?.roles?.owner || false;
 	}
 
 	get calendarPrincipal() {
-		if(this.data.participants && this.principalId)
-			return this.data.participants[this.principalId];
+		if(this.participants && this.principalId)
+			return this.participants[this.principalId];
 	}
 	get principalId() {
 		return (this.cal && this.cal.ownerId) ? this.cal.ownerId+'' : go.User.id+''
@@ -282,7 +293,7 @@ export class CalendarItem {
 
 	private get isInPast() {
 		let lastOccurrence = this.end;
-		if(this.isRecurring) {
+		if(this.isRecurring && this.data.recurrenceRule) {
 			const e = this.data;
 			if(e.recurrenceRule.count) {
 				const r = new Recurrence({dtstart: new Date(e.start), timeZone:e.timeZone, rule: e.recurrenceRule});
@@ -307,23 +318,24 @@ export class CalendarItem {
 		this.calendarPrincipal.participationStatus = status;
 
 		eventDS.setParams.sendSchedulingMessages = true;
-		return eventDS.update(this.data.id, {participants: this.data.participants});
+		return eventDS.update(this.data.id, {participants: this.participants});
 	}
 
 	shouldSchedule(modified: Partial<CalendarEvent>|false) {
 		if((!this.data.isOrigin && this.key) || this.isInPast)
 			return;
 		if(modified === false) {
-			if(this.data.participants) {
+			if(this.participants && !this.isCancelled) {
 				return this.isOwner ? 'cancel' : 'delete';
 			}
 			return undefined;
 		}
-		 if(modified.participants || this.data.participants) {
+		 if(modified.participants || this.participants) {
 			if(!this.key) {
 				return 'new';
 			} else {
-				if(['start','duration','end','description','title','showWithoutTime', 'location','participants']
+				console.log(modified);
+				if(['start','duration','end','description','title','showWithoutTime', 'location','participants', 'recurrenceRule']
 					.some(k => modified.hasOwnProperty(k)))
 				{
 					return 'update';
@@ -367,10 +379,11 @@ export class CalendarItem {
 					btn({
 						text: t(isFirstInSeries ? 'All events' : 'This and future events'), // save to series
 						handler: _b => {
+							w.close();
 							isFirstInSeries ?
 								this.patchSeries(modified, onFinish) :
 								this.patchThisAndFuture(modified, onFinish);
-							w.close();
+
 						}
 					})
 				)
@@ -386,7 +399,8 @@ export class CalendarItem {
 		})
 	}
 
-	private static overridableProperties = ['start', 'duration', 'title', 'freeBusyStatus', 'participants','location','alerts', 'description']
+	// todo: per-user -per-override properties ['alert','participants'[n].participationStatus]
+	private static overridableProperties = ['start', 'duration', 'title', 'freeBusyStatus', 'participants','location','status', 'description']
 
 	private patchOccurrence(modified: any, onFinish?: () => void) {
 		this.data.recurrenceOverrides ??= {};
@@ -403,7 +417,7 @@ export class CalendarItem {
 				for(const name of CalendarItem.overridableProperties) {
 					if(o[name] == original[name]) delete o[name]; // remove properties that are the same as original TODO alerts and participants cannot be compared like this
 				}
-				this.data.recurrenceOverrides[this.recurrenceId!] = o;
+				this.data.recurrenceOverrides![this.recurrenceId!] = o;
 				const p = eventDS.update(this.data.id, {recurrenceOverrides:this.data.recurrenceOverrides});
 				if(onFinish) p.then(onFinish);
 			});
@@ -417,7 +431,7 @@ export class CalendarItem {
 		//if(!ev.data.participants) { // is not scheduled ( split event)
 		// todo: add first and next relation in relatedTo property as per https://www.ietf.org/archive/id/draft-ietf-jmap-calendars-11.html#name-splitting-an-event
 		const rule = structuredClone(this.data.recurrenceRule);
-		// we might have changed start so we'll take the actual recurrenceId
+		// we might have changed start, so we'll take the actual recurrenceId
 		rule.until = new DateTime(this.recurrenceId).addDays(-1).format('Y-m-d'); // close current series yesterday
 		this.confirmScheduleMessage(modified, () => {
 			eventDS.update(this.data.id, {recurrenceRule: rule}); // set until on original
@@ -457,7 +471,7 @@ export class CalendarItem {
 						handler: _b => { this.removeFutureEvents(); w.close(); }
 					}),'->',btn({
 						text: t('All events'), // the series
-						handler: _b => { eventDS.destroy(this.data.id); w.close(); }
+						handler: _b => { this.removeSeries(); w.close(); }
 					})
 				)
 			)
@@ -467,7 +481,7 @@ export class CalendarItem {
 
 	private removeFutureEvents() {
 		this.confirmScheduleMessage(false, () => {
-			this.data.recurrenceRule.until = (new DateTime(this.recurrenceId)).addDays(-1).format('Y-m-d'); // could be minus 1 seconds but we don't recur within day
+			this.data.recurrenceRule.until = (new DateTime(this.recurrenceId)).addDays(-1).format('Y-m-d'); // could be minus 1 seconds, but we don't recur within day
 			eventDS.update(this.data.id,{recurrenceRule: this.data.recurrenceRule});
 		});
 	}
@@ -480,8 +494,14 @@ export class CalendarItem {
 		});
 	}
 
+	private removeSeries() {
+		this.confirmScheduleMessage(false, () => {
+			eventDS.destroy(this.data.id);
+		});
+	}
+
 	undoException(recurrenceId: string) {
-		delete this.data.recurrenceOverrides[recurrenceId];
+		delete this.data.recurrenceOverrides![recurrenceId];
 		return eventDS.update(this.data.id, {recurrenceOverrides:this.data.recurrenceOverrides});
 	}
 }

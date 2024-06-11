@@ -45,7 +45,7 @@
 	&.allday,&.multiday, dd > & {
 		background-color: color-mix(in srgb, currentColor 56%, transparent);
 		//background-color:currentcolor;
-		> i, > em {color:$colorTextSecondary;}
+		> i {color:$colorTextSecondary;}
 
 	}
 	//&.multiday {
@@ -58,7 +58,7 @@
 		> *, &:not(.allday)::before {color:white; }
 	}
 	&.declined {
-		text-decoration: line-through white;
+		text-decoration: line-through;
 	}
 
 	&.undecided {
@@ -181,13 +181,20 @@
 	li {
 
 		&.today {
-			color: $colorPrimary;
-			> em {
+			 em {
 				font-weight: 600;
-				color:$colorPrimary;
+				border-radius: 999px;
+				display:inline-block;
+				margin-left:dp(8);
+				 min-width: dp(36);
+				//float: right;
+				line-height: dp(18);
+				background-color:$colorPrimary !important;
 			}
 		}
-
+		&.current {
+			color: $colorPrimary !important;
+		}
 		&.past, &.other {
 			color: $colorTextSecondary;
 		}
@@ -257,9 +264,6 @@
 		> li { //weekdays
 			text-align: right;
 			padding:0 dp(8);
-			&.today {
-				color: $colorPrimary;
-			}
 		}
 		+ ol {border-top:0;}
 	}
@@ -288,16 +292,24 @@
 			background-color: $surfaceHighest;
 			border-radius: 99px;
 		}
-		> em { // date number
-			// position:absolute;
-			font-weight: 500;
-			font-style: normal;
-			text-align: right;
-			//font-size:1.1em;
-			display: block;
-			height: dp(32);
+		> span { // date
+
+			margin-top:dp(2);
+			height: dp(30);
 			margin-right: dp(8);
-			line-height: dp(32);
+			float:right;
+			line-height: dp(30);
+			> em { // date number
+				// position:absolute;
+				font-weight: 500;
+				line-height: dp(30);
+				height:dp(30);
+				min-width: dp(30);
+				text-align:center;
+				font-style: normal;
+				//font-size:1.1em;
+				//display: block;
+			}
 		}
 	}
 }
@@ -318,7 +330,7 @@
 			&.events {
 				position: absolute;
 				//	margin-left: dp(24); // week numbers
-				margin-top: dp(32); // day numbers
+				margin-top: dp(34); // day numbers
 				width: 100%;
 				overflow: hidden;
 				bottom: 0;
@@ -329,6 +341,18 @@
 					display:flex;
 					align-items: center;
 					pointer-events: all;
+					padding-left:dp(16);
+					&:not(.allday) {
+						padding-left: 0;
+						padding-right: 0;
+						&::before {
+							content: '•';
+							font-size: 2em;
+							height: .8em;
+							text-align: center;
+							width: dp(16);
+						}
+					}
 					&.continues {
 						border-bottom-left-radius: 0;
 						border-top-left-radius: 0;
@@ -359,10 +383,10 @@ $timeMargin: dp(72);
 		//padding: dp(4);
 		> em { // date number
 			font-style: normal;
-			margin: 0 auto;
+			display: inline-block;
+			margin-left: dp(8);
 			padding: dp(8);
-			display: block; // not on mobile.
-			font-size: 1.3em;
+			font-size: 1.1em;
 			color: $colorText;
 			//border: 1px solid currentColor;
 		}
@@ -384,6 +408,15 @@ $timeMargin: dp(72);
 		position:absolute;
 		left: $timeMargin;
 		right:0;
+		> div {
+			display: flex;
+			align-items: center;
+			pointer-events: all;
+			padding-left: dp(8);
+			> em {
+				white-space: nowrap;
+			}
+		}
 		~ li {
 			border-right: 1px solid var(--fg-divider);
 		}
@@ -536,6 +569,10 @@ $timeMargin: dp(72);
 		&.empty {
 			padding:0 dp(16);
 			//height: dp(26);
+		}
+		&.today {
+			em {
+				line-height: dp(32); }
 		}
 		> h3 {
 			float:left;
@@ -712,9 +749,9 @@ $timeMargin: dp(72);
 //}
 
 @media only screen and (max-width: 845px) {
-	.cal.week > ul:first-child em {
-		display:inline-block !important;
-	}
+	//.cal.week > ul:first-child em {
+	//	display:inline-block !important;
+	//}
 	.goui.hbox.tablet-cards > aside.active {
 		position:absolute;
 		inset:0;

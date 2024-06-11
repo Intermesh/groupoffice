@@ -26,6 +26,8 @@ class CalendarEvent extends AclItemEntity {
 	use CustomFieldsTrait;
 	use SearchableTrait;
 
+	const PROD = '-//Intermesh//Group Office {VERSION}//EN';
+
 	/* Status */
 	const Confirmed = 'confirmed'; // default
 	const Cancelled = 'cancelled';
@@ -105,7 +107,6 @@ class CalendarEvent extends AclItemEntity {
 	 * @var DateTime
 	 */
 	public $start;
-	protected $end; // cached to query later
 
 	public $utcStart;
 	public $utcEnd;
@@ -182,6 +183,7 @@ class CalendarEvent extends AclItemEntity {
 
 	/** The end time of the last occurrence in the series. or end time if not recurring */
 	protected $lastOccurrence;
+	protected $ownerId; // find calendar owner to see if Private events needs to be altered
 
 	public static function customFieldsTableName(): string
 	{
@@ -192,7 +194,8 @@ class CalendarEvent extends AclItemEntity {
 		return parent::defineMapping()
 			->addTable('calendar_calendar_event', 'cce', ['eventId' => 'eventId'], ['id', 'calendarId'])
 			->addTable('calendar_event', "eventdata", ['eventId' => 'eventId'], self::EventProperties)
-			->addUserTable('calendar_event_user', 'eventuser', ['eventId' => 'eventId'],self::UserProperties)
+			//->addTable('calendar_calendar','cal',['cce.calendarId' => 'id'], ['ownerId']) // fetch calendar ownerId
+			->addUserTable('calendar_event_user', 'eventuser', ['cce.eventId' => 'eventId'],self::UserProperties)
 			//->addHasOne('recurrenceRule', RecurrenceRule::class, ['id' => 'eventId'])
 			->addMap('participants', Participant::class, ['eventId' => 'eventId'])
 			->addMap('recurrenceOverrides', RecurrenceOverride::class, ['eventId'=>'fk'])
@@ -245,7 +248,9 @@ class CalendarEvent extends AclItemEntity {
 					->join('calendar_participant', 'p', 'p.eventId = eventdata.eventId AND p.id = cal.ownerId');
 				$crit->where('p.id', '=', go()->getUserId())
 					->andWhere('p.rolesMask & 1 = 0') // !isOwner
-					->andWhere('p.participationStatus', '=', 'needs-action');
+					->andWhere('p.participationStatus', '=', 'needs-action')
+					->andWhere('eventdata.status', '=', 'confirmed')
+					->andWhere('eventdata.start', '>=', new DateTime());
 			});
 	}
 
@@ -278,6 +283,13 @@ class CalendarEvent extends AclItemEntity {
 				$this->categoryIds[] = $id;
 			}
 		}
+	}
+
+	public function copyPatched($patch) {
+		$e = $this->copy()->setValues($patch->toArray());
+		unset($e->recurrenceRule, $e->recurrenceOverrides, $e->replyTo); // , $e->sentBy, $e->relatedTo,
+		return $e;
+		//return (new self())->setValues(array_merge($this->toArray(), $patch->toArray()));
 	}
 
 	public function attachBlob($blobId) {
@@ -448,7 +460,10 @@ class CalendarEvent extends AclItemEntity {
 			if(!empty($owner)) {
 				$this->replyTo = $owner->email;
 			}
+		}
 
+		if(empty($this->prodId)) {
+			$this->prodId = str_replace('{VERSION}', go()->getVersion(),self::PROD);
 		}
 
 
@@ -460,7 +475,7 @@ class CalendarEvent extends AclItemEntity {
 
 		if($success) {
 			$this->addToResourceCalendars();
-			$this->createSystemAlerts();
+			$this->updateAlerts();
 			$this->changeEventsWithSameUID();
 			$this->incrementCalendarModSeq();
 		}
@@ -478,31 +493,43 @@ class CalendarEvent extends AclItemEntity {
 			}
 		}
 	}
-	private function createSystemAlerts() {
+	private function updateAlerts() {
 		if(!CoreAlert::$enabled) {
 			return;
 		}
 
-		if($this->isModified(['alerts'])) {
+		$modified = $this->isModified(['alerts']);
+		if(!empty($modified)) {
+			if (isset($modified[1])) {
+				foreach ($modified[1] as $model) {
+					if (!isset($modified[0]) || !in_array($model, $modified[0])) {
+						$this->deleteAlert($model->id);
+					}
+				}
+			}
 
+			if (isset($this->alerts)) {
+				foreach ($this->alerts as $alert) {
+					$coreAlert = $this->createAlert($alert->at(), $alert->id);
+					if (!$coreAlert->save()) {
+						throw new \Exception(var_export($coreAlert->getValidationErrors(), true));
+					}
+				}
+			}
 		}
+
+		$calendar = Calendar::findById($this->calendarId, ['id', 'ownerId']);
+		// create an alert if someone else created a task in your default list
 		if($this->isNew()) {
-
-			// create an alert if someone else created a task in your default list
-			$calendar = Calendar::findById($this->calendarId, ['id', 'createdBy']);
-
-			$alert = $this->createAlert(new \DateTime(), 'createdforyou', $calendar->createdBy)
-				->setData([
-					'type' => 'assigned',
-					'createdBy' => $this->createdBy
-				]);
+			$alert = $this->createAlert(new \DateTime(), 'createdforyou', $calendar->ownerId)
+				->setData(['type' => 'assigned', 'creator' => $this->createdBy]);
 
 			if (!$alert->save()) {
 				throw new SaveException($alert);
 			}
 
 
-		} else if($this->modifiedBy != $this->createdBy){
+		} else if($this->modifiedBy != $calendar->ownerId){
 			$this->deleteAlert('createdforyou', $this->modifiedBy);
 		}
 	}
@@ -568,6 +595,20 @@ class CalendarEvent extends AclItemEntity {
 			}
 		}
 		return false;
+	}
+
+	public function generatedOrganizer($principal = null) {
+		$principal = $principal ?? \go\core\model\Principal::currentUser();
+		$p = (new Participant($this))->setValues([
+			'email' => $principal->email,
+			'name' => $principal->name,
+			'participationStatus' => Participant::Accepted,
+			'expectReply' => false,
+			'roles' => ['attendee'=>true, 'owner'=>true],
+			'kind' => Participant::Individual
+		]);
+		$this->participants[$principal->id] = $p;
+		return $p;
 	}
 
 	public function organizer() {

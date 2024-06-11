@@ -130,11 +130,11 @@ export class Main extends Component {
 				comp({cls:'scroll'},
 					tbar({cls: 'dense'},
 						comp({tagName: 'h3', html: t('Calendars')}),
-						btn({icon: 'done_all', handler: () => { this.calendarList.rowSelection!.selectAll();}}),
+						//btn({icon: 'done_all', handler: () => { this.calendarList.rowSelection!.selectAll();}}),
 						btn({
 							icon: 'more_vert', menu: menu({},
 								btn({
-									icon: 'calendar_add_on',
+									icon: 'add',
 									text: t('Create calendar') + '…', handler: () => {
 										const dlg = new CalendarWindow();
 										dlg.form.create({});
@@ -214,13 +214,16 @@ export class Main extends Component {
 
 									};
 								return [
-									comp({html:'<i style="color:#'+item.color+'">&bull;</i> <strong>'+r.title+'</strong><br><small>'+(owner?.name ?? owner?.email ?? t('Unknown owner'))+'</small>' }),
-									h3({html: item.start.format('D j M')+' '+t('at')+' '+item.start.format('H:i')}),
+									comp({cls:'pad'},
+										comp({html:'<i style="color:#'+item.color+'">&bull;</i> <strong>'+r.title+'</strong><br><small>'+(owner?.name ?? owner?.email ?? t('Unknown owner'))+'</small>' }),
+										h3({html: item.start.format('D j M')+' '+t('at')+' '+item.start.format('H:i')}),
 									comp({cls:'group'},
 										btn({itemId: 'accepted', text:t('Accept'), handler:b=>press(b,'accepted')}),
 										btn({itemId: 'tentative', text:t('Maybe'), handler:b=>press(b,'tentative')}),
 										btn({itemId: 'declined', text:t('Decline'), handler:b=>press(b,'declined')})
 									),
+									),
+
 									hr()
 								];
 							}
@@ -309,9 +312,9 @@ export class Main extends Component {
 
 	private renderAdapterBoxes() {
 		const boxes: any = {
-			birthday:['#ff0000', t('Birthdays')],
-			task: 	['#0000ff',	t('Tasks')],
-			holiday: ['#009900', t('Holidays')]
+			birthday:['#C06B02', t('Birthdays')],
+			task: 	['#7e472a',	t('Tasks')],
+			holiday: ['#025d7b', t('Holidays')]
 		};
 		return Object.keys(boxes).map(key => comp({tagName:'li'}, checkbox({
 			color: boxes[key][0], label: boxes[key][1], value: this.adapter.byType(key).enabled,

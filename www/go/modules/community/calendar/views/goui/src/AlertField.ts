@@ -1,4 +1,4 @@
-import {SelectField, Config, createComponent, FieldEventMap} from "@intermesh/goui";
+import {SelectField, Config, createComponent, FieldEventMap, DateInterval} from "@intermesh/goui";
 import {t} from "./Index.js";
 
 interface Alert {
@@ -11,10 +11,12 @@ export class AlertField extends SelectField {
 
 	fullDay = false
 	isForDefault = false
+	useDefault = false
 	constructor() {
 		super();
 		this.name = 'alerts';
-		this.label = t('Alerts');
+		this.label = t('Reminder');
+		this.drawOptions();
 	}
 
 	drawOptions() {
@@ -39,11 +41,14 @@ export class AlertField extends SelectField {
 	/** @ts-ignore */
 	get value() {
 		const v = super.value;
-		return (v && v !== 'default') ? {1:{trigger:{offset:v}}} : {};
+		if(v && v !== 'default')
+			this.addOptionIfNotExist(v as string);
+		return (v && v !== 'default') ? {1:{trigger:{offset:v}}} : (v === 'default' ? {} : null);
 	}
 	/** @ts-ignore */
-	set value(v: {[id:string]:Alert}) {
-		if(!v) {
+	set value(v: {[id:string]:Alert}|'default'|null) {
+		if(this.useDefault) return;
+		if(!v || typeof v === 'string') {
 			super.value = v;
 			return;
 		}
@@ -53,8 +58,30 @@ export class AlertField extends SelectField {
 		}
 	}
 
+
+	private addOptionIfNotExist(offset: string) {
+		for (const [key, value] of Object.entries(this.options)) {
+			if(value.value == offset) {
+				return; // found, exit
+			}
+		}
+		// not found, add
+		this.options.push({value: offset, name: this.nameFromOffset(offset)});
+	}
+
+	private nameFromOffset(offset: string) {
+		const d = new DateInterval(offset);
+		let time = [];
+		debugger;
+		if(d.days) time.push(d.days + ' ' + t(d.days > 1 ? 'hours' : 'hour'));
+		if(d.hours) time.push(d.hours + ' ' + t(d.hours > 1 ? 'hours' : 'hour'));
+		if(d.minutes) time.push(d.minutes + ' ' + t(d.minutes > 1 ? 'minutes' : 'minute'));
+		time.push(t(d.invert ? 'before' : 'after'));
+		return time.join(' ');
+	}
+
 	setDefaultLabel(alerts?: {[id:string]:Alert}) {
-		var txt = t('None');
+		let txt = t('None');
 		if (alerts) {
 			const firstKey = Object.keys(alerts)[0];
 			if(alerts[firstKey]) {
@@ -84,7 +111,7 @@ export class AlertField extends SelectField {
 	}
 
 	private parseDuration(val: string) {
-		var value: any = {negative:false},
+		const value: any = {negative:false},
 			p = val.split('');
 		if(p[0] == '-') {
 			value.negative = true;

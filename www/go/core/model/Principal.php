@@ -53,6 +53,9 @@ class Principal extends AclOwnerEntity
 			->addTable('core_principal', 'principal');
 	}
 
+	static function currentUser() {
+		return self::find()->where('id','=',go()->getUserId())->single();
+	}
 
 //	public function getCapabilities() {
 //		return [

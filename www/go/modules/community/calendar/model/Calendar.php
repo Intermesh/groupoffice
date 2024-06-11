@@ -69,11 +69,18 @@ class Calendar extends AclOwnerEntity {
 			->addMap('defaultAlertsWithoutTime', DefaultAlertWT::class,  ['id'=>'calendarId']);
 	}
 
-	/** @return Calendar */
+	/** @return int */
 	public static function fetchDefault($scheduleId) {
-		return self::find()
+		/** @var Preferences $pref */
+		$pref = go()->getAuthState()->getUser(['calendarPreferences'])->calendarPreferences;
+		if(!empty($pref->defaultCalendarId)) {
+			return $pref->defaultCalendarId;
+		}
+		// If default preference is empty use the first owned calendar
+		return self::find()->selectSingleValue('id')
 			->join('core_user', 'u', 'u.id = calendar_calendar.ownerId')
 			->where(['u.email' => $scheduleId])
+			->andWhere(['groupId'=>null])
 			->orderBy(['sortOrder'=>'ASC'])
 			->single();
 	}
@@ -114,11 +121,19 @@ class Calendar extends AclOwnerEntity {
 			])->execute();
 			$id = go()->getDbConnection()->getPDO()->lastInsertId();
 			Calendar::updateHighestModSeq($calendarId);
-			return CalendarEvent::findById($id);
+			$found = CalendarEvent::findById($id);
+			$found->useDefaultAlerts = true;
+			$found->save();
+			return $found;
 		}
 		//not found, set calendarId save and return
 		$event->calendarId = $calendarId;
-		return $event->save() ? $event : null;
+		$event->useDefaultAlerts = true;
+		if(!$event->save()) {
+			go()->log('failed to create event object' . var_export($event->getValidationErrors(), true));
+			return null;
+		}
+		return $event;
 	}
 
 	protected static function defineFilters(): Filters

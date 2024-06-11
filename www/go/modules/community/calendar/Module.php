@@ -7,7 +7,7 @@ use go\core\cron\GarbageCollection;
 use go\core\model\User;
 use go\core\orm\Property;
 use go\core\orm\Query;
-use go\core\model;
+use go\core\model\Module as CoreModule;
 use go\modules\community\calendar\cron;
 use go\modules\community\calendar\model\Calendar;
 use go\modules\community\calendar\model\Preferences;
@@ -140,7 +140,7 @@ class Module extends core\Module
 
 			$report->setEvents($events);
 			$report->render();
-			$report->calendarName = model\Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
+			$report->calendarName = Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
 		}
 		$report->Output('day.pdf');
 	}
@@ -164,7 +164,7 @@ class Module extends core\Module
 
 			$report->setEvents($events);
 			$report->render();
-			$report->calendarName = model\Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
+			$report->calendarName = Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
 		}
 		$report->Output('week.pdf');
 	}
@@ -187,7 +187,7 @@ class Module extends core\Module
 
 			$report->setEvents($events);
 			$report->render();
-			$report->calendarName = model\Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
+			$report->calendarName = Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
 		}
 		$report->Output('month.pdf');
 	}
@@ -227,7 +227,7 @@ class Module extends core\Module
 
 	}
 
-	protected function afterInstall(model\Module $model): bool {
+	protected function afterInstall(CoreModule $model): bool {
 		cron\ScanEmailForInvites::install("*/5 * * * *");
 		return parent::afterInstall($model);
 	}

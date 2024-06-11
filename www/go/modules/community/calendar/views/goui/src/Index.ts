@@ -70,7 +70,6 @@ function addEmailAction() {
 										.cls('pressed', item.calendarPrincipal?.participationStatus == s)
 										.on('click', _ => {
 											item.updateParticipation(s as 'accepted'|'declined'|'tentative').then(() => {
-												debugger;
 												updateBtns(item);
 											});
 										})
@@ -182,11 +181,51 @@ modules.register(  {
 				})
 				.add(/^calendar\/(days|weeks|split)-(\d+)\/(\d{4}-\d{2}-\d{2})$/, (span, amount, ymd) => {
 					nav(span as ValidTimeSpan, Math.min(parseInt(amount),373), ymd); // it fits on my machine
+				}).add(/^calendarevent\/(\d+)$/, async (id) => {
+					// for notification clicks
+					const event = await jmapds('CalendarEvent').single(id);
+					if(event)
+						(new CalendarItem({data: event, key: id})).open();
+
 				});
 
-			modules.addMainPanel("calendar", "Calendar", 'calendar', t('Calendar'), () => {
-				return ui;
+			modules.addMainPanel("calendar", "Calendar", 'calendar', t('Calendar'), () => ui);
+
+			go.Alerts.on("beforeshow", function(alerts: any, alertConfig: any) {
+				const alert = alertConfig.alert,
+					msgs: {[key:string]: string} = {
+						request: t('New invitation from {organizer}'),
+						update: t("Invitation updated by {organizer}"),
+						created: t("New event created by {creator}")
+					};
+				//debugger;
+				if(alert.entity == "CalendarEvent" || alert.entity == "Calendar") {
+
+					alertConfig.panelPromise = alertConfig.panelPromise.then(async (panelCfg: any) => {
+
+						const msg: string = msgs[alert.tag] || '',
+							time = go.util.Format.shortDateTime(alert.triggerAt);
+
+						if(alert.tag === 'created'){
+							msg.replace('{creator}', alert.data.creator);
+						}
+						if(alert.tag === 'update' || alert.tag === 'request') {
+							msg.replace('{organizer}', alert.data.organizer);
+							panelCfg.buttons = [
+								{text:t('Accept')},
+								{text:t('Maybe')},
+								{text:t('Decline')}
+							];
+						}
+
+						panelCfg.items = [{html: msg+'<br>'+time }];
+						panelCfg.notificationBody = msg+"\n"+time; // for desktop notifications (no html)
+						return panelCfg;
+					});
+
+				}
 			});
+
 		});
 	}
 });

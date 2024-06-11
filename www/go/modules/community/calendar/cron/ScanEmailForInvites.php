@@ -2,6 +2,7 @@
 
 namespace go\modules\community\calendar\cron;
 
+use go\core\orm\exception\SaveException;
 use GO\Email\Model\Account;
 use go\core\model\CronJob;
 use go\core\model\CronJobSchedule;
@@ -66,6 +67,7 @@ class ScanEmailForInvites extends CronJob {
 				$itip = Scheduler::handleIMIP($message, $ifMethod);
 				if(!empty($itip['event'])) {
 					go()->log('invite processed: '.$itip['event']->title);
+					$this->updateAlerts($itip, $setting->userId, $message->from->getAddress());
 				}
 				if($itip && !empty($itip['event']) &&
 					(($setting->markReadAndFileAutoAdd && $itip['method'] === 'REQUEST') ||
@@ -90,5 +92,13 @@ class ScanEmailForInvites extends CronJob {
 		$conn->set_message_flag([$message->uid], '\Seen'); // mark seen
 		$conn->move([$message->uid], 'trash'); // move to trash
 		go()->log('invite archived: '.$message->uid);
+	}
+
+	private function updateAlerts($itip, $userId, $from) {
+		$alert = $itip['event']->createAlert(new \DateTime(), strtolower($itip['method']), $userId)
+			->setData(['type' => 'assigned', 'from' => $from]);
+		if (!$alert->save()) {
+			throw new SaveException($alert);
+		}
 	}
 }

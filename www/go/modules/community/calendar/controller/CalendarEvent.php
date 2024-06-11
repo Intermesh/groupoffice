@@ -9,6 +9,7 @@ use go\core\util\UUID;
 use GO\Email\Model\Account;
 use go\modules\community\addressbook\convert\VCard;
 use go\modules\community\calendar\model;
+use go\modules\community\calendar\model\ICalendarHelper;
 
 
 /**
@@ -99,7 +100,8 @@ class CalendarEvent extends EntityController {
 
 		$event = new model\CalendarEvent();
 		$event->calendarId = go()->getAuthState()->getUser(['calendarPreferences'])->calendarPreferences->defaultCalendarId;
-		$event = model\ICalendarHelper::fromICal($data, $event);
+		//$event = model\ICalendarHelper::fromICal($data, $event);
+		$event = ICalendarHelper::parseVObject($data, $event);
 		return ['success' => true, 'data' => $event];
 
 	}

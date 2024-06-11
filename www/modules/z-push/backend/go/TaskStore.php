@@ -117,7 +117,7 @@ class TaskStore extends Store {
 			$message->reminderset = empty($task->alerts) ? 0 : 1;
 			if($message->reminderset) {
 				$firstAlert = reset($task->alerts);
-				$message->remindertime = $firstAlert->at($task)->format("U");
+				$message->remindertime = $firstAlert->at()->format("U");
 			}
 
 			$message->subject = $task->title;

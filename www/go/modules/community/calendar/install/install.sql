@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS `calendar_default_alert_with_time` (
 
 CREATE TABLE IF NOT EXISTS `calendar_event` (
     `eventId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `prodId` VARCHAR(100) NOT NULL DEFAULT 'GroupOffice',
+    `prodId` VARCHAR(100) NOT NULL DEFAULT 'Unknown',
     `uid` VARCHAR(255) NOT NULL,
     `sequence` INT UNSIGNED NOT NULL DEFAULT 1,
     `title` VARCHAR(255) NOT NULL,

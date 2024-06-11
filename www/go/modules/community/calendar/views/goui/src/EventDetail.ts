@@ -1,5 +1,5 @@
 import {
-	btn,
+	btn, checkbox,
 	comp, Component, containerfield,
 	DataSourceForm,
 	datasourceform, DateInterval,
@@ -11,7 +11,6 @@ import {client, JmapDataSource, jmapds, RecurrenceField} from "@intermesh/groupo
 import {alertfield} from "./AlertField.js";
 import {CalendarItem} from "./CalendarItem.js";
 import {calendarStore, statusIcons, t} from "./Index.js";
-import {ParticipantField} from "./ParticipantField.js";
 
 
 export class EventDetail extends Component {
@@ -48,6 +47,29 @@ export class EventDetail extends Component {
 			btn({itemId: 'declined', text:t('Decline'), handler:()=>this.updateStatus('declined')})
 		);
 
+		const alertField = alertfield({
+			hidden:true,
+			listeners:{
+			'change': (me, newValue) => {
+				if(this.item?.data.id) {
+					if(newValue === null) {
+						alertUseDefault.value = me.useDefault = false;
+					} else {
+						const isDefault = (newValue === 'default' || Object.keys(newValue).length === 0);
+						me.useDefault = isDefault;
+						alertUseDefault.value = isDefault;
+					}
+					this.form.value.useDefaultAlerts = newValue === 'default';
+					this.form.submit(); // hoppakee
+				}
+			}
+		}}),
+		alertUseDefault = checkbox({hidden:true, name:'useDefaultAlerts', listeners: {
+				'setvalue': (_, newV) => {
+					if(newV) {alertField.useDefault = true;}
+				}
+			}})
+
 		this.items.add(this.form = datasourceform({
 				cls: 'scroll flow pad',
 				flex:1,
@@ -66,6 +88,12 @@ export class EventDetail extends Component {
 							this.toolBar.show();
 							this.pressButton(this.item!.calendarPrincipal.participationStatus);
 						}
+					},
+					'beforesave':(_, data) => {
+						if(alertField.isModified()) {
+							//@ts-ignore
+							data.useDefaultAlerts = alertField.value === 'default'; // ?
+						}
 					}
 				}
 			},
@@ -73,6 +101,16 @@ export class EventDetail extends Component {
 			displayfield({name: 'calendarId', width:160, label:t('Calendar'), renderer: async (v) => {
 				const c = await calendarStore.dataSource.single(v);
 				return c ? c.name : t('Unknown');
+			},listeners: {
+				'setvalue': (me, v) => {
+					if(v)
+						calendarStore.dataSource.single(v).then(r => {
+							if(!r) return;
+							this.item!.cal = r;
+							const d = this.item!.data.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
+							alertField.setDefaultLabel(d)
+						});
+				}
 			}  }),
 			comp({cls:'hbox'},
 				displayfield({label: t('Start'), name:'start',renderer:d=>Format.dateTime(d), flex:1}),
@@ -109,11 +147,7 @@ export class EventDetail extends Component {
 				})
 			}),
 			hr(),
-			alertfield({listeners:{
-				'change': (_, newValue) => {
-					this.form.value.useDefaultAlert = newValue === 'default';
-				}
-			}}),
+			alertField, alertUseDefault,
 			mapfield({name: 'links', cls:'goui-pit',
 				buildField: (v: any) => containerfield({flex:'1 0 100%',cls: 'flow'},
 					btn({icon: "description", text: v.title, flex:'1', style:{textAlign:'left'}, handler() {
@@ -145,6 +179,7 @@ export class EventDetail extends Component {
 		if (!ev.key) {
 			this.form.create(ev.data);
 		} else {
+			this.form.findField('alerts')!.hidden = false;
 			this.form.load(ev.data.id).then(() => {
 				if(ev.recurrenceId) {
 					this.form.findField('start')!.value = ev.start.format('Y-m-d\TH:i');
@@ -164,7 +199,7 @@ export class EventDetailWindow extends Window {
 		this.title = t('Event');
 		this.width = 440;
 		this.items.add(this.view = new EventDetail());
-		this.view.form.on('save', () => {this.close();})
+		//this.view.form.on('save', () => {this.close();})
 	}
 
 	loadEvent(ev: CalendarItem) {

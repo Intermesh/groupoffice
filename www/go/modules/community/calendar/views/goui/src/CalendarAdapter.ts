@@ -96,9 +96,10 @@ export class CalendarAdapter {
 					yield new CalendarItem({
 						key: '',
 						start,
+						extraIcons: ['family_star'],
 						data: {
 							title: o.title,
-							color: '00dd00',
+							color: '025d7b',
 							duration: o.duration,
 							showWithoutTime: true,
 						}
@@ -118,7 +119,7 @@ export class CalendarAdapter {
 						extraIcons:['task_alt'],
 						data: {
 							title: t.title,
-							color: '0000ff',
+							color: '7e472a',
 							duration: 'P1D',
 							showWithoutTime: true,
 						}
@@ -153,7 +154,7 @@ export class CalendarAdapter {
 						extraIcons: ['cake'],
 						data:{
 							title: b.name+'\'s Birthday',
-							color: 'ff0000',
+							color: 'C06B02',
 							duration: 'P1D',
 							showWithoutTime:true,
 						}

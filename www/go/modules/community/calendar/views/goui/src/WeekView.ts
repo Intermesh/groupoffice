@@ -138,6 +138,7 @@ export class WeekView extends CalendarView {
 			pxPerSnap = li.offsetHeight / (1440 / SNAP); // 96 quarter-hours in a day
 			offset = li.getBoundingClientRect().top;
 			currDayEl = target.up('[data-day]')!;
+			console.log(pxPerSnap, li.offsetHeight, SNAP);
 			const event = target.up('div[data-key]');
 			if (event) { // MOVE
 				offset += e.offsetY;
@@ -163,7 +164,7 @@ export class WeekView extends CalendarView {
 				const data = {
 						start: (new DateTime(target.dataset.day!)).setHours(0, anchor).format('c'),
 						title: t('New event'),
-						duration: client.user.calendarPreferences.defaultDuration ?? "P1H",
+						duration: client.user.calendarPreferences.defaultDuration ?? "PT1H",
 						calendarId: CalendarView.selectedCalendarId,
 						showWithoutTime: false
 					},
@@ -223,7 +224,7 @@ export class WeekView extends CalendarView {
 			hour, day = this.day.clone();
 		//day.setWeekDay(0);
 
-		let heads = [], days = [],fullDays = [], hours = [], showNowBar ,nowbar;
+		let heads = [], days = [],fullDays = [], hours = [], showNowBar=false ,nowbar;
 		for (hour = 1; hour < 24; hour++) {
 			hours.push(E('em', hour+':00'));
 		}
@@ -256,7 +257,7 @@ export class WeekView extends CalendarView {
 		let ol: HTMLElement;
 
 		this.el.append(
-			E('ul',E('li',t('Wk')+' '+this.day.getWeekOfYear()), ...heads),
+			E('ul',E('li',t('Wk')+' '+this.day.getWeekOfYear()).cls('current',showNowBar), ...heads),
 			E('ul',E('li', t('All day')), this.alldayCtr = E('li').cls('all-days'), ...fullDays),
 			ol = E('dl',E('dt', nowbar || '', E('em'), ...hours), ...days)
 		);
@@ -265,10 +266,13 @@ export class WeekView extends CalendarView {
 
 	private updateFullDayItems() {
 
-		this.slots = Array.from({length: this.days}, _ => ({}) )
+		this.slots = Array.from({length: this.days}, _ => ({}) );
+
+		this.alldayCtr.innerHTML = '';
 		this.alldayCtr.prepend(...this.viewModel.map(e =>
 			super.eventHtml(e).css(this.makestyle(e, this.day))
 		));
+
 		var lengths = this.slots.map((i: any) => Object.keys(i).length);
 		this.alldayCtr.parentElement!.style.height = (Math.max(...lengths,1) * this.ROWHEIGHT)+'rem';
 	}
