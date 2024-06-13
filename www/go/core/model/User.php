@@ -22,6 +22,7 @@ use go\core\Environment;
 use go\core\exception\ConfigurationException;
 use go\core\exception\NotFound;
 use go\core\Installer;
+use go\core\jmap\Request;
 use go\core\mail\Address;
 use go\core\mail\Message;
 use go\core\mail\Util;
@@ -1110,7 +1111,7 @@ public function historyLog(): bool|array
             $ua_info = \donatj\UserAgent\parse_user_agent();
             $where = [
                 'userId' => $this->id,
-                'ip' => $_SERVER['REMOTE_ADDR'] ?? 'CLI',
+                'ip' => Request::get()->getRemoteIpAddress() ?? 'CLI',
                 'platform' => $ua_info['platform'],
                 'name' => $ua_info['browser']
             ];
