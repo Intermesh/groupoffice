@@ -38,7 +38,7 @@ class PushDispatcher
 	/**
 	 * @var EntityType[]
 	 */
-	private array $map = [];
+	private $map = [];
 
 	public function __construct(array $types = [])
 	{
@@ -72,7 +72,7 @@ class PushDispatcher
 	 * @param string $type string type of SSE event
 	 * @param mixed $data mixed a jsonSerializable object
 	 */
-	public function sendMessage(string $type, mixed $data): void
+	public function sendMessage(string $type, $data): void
 	{
 		echo "event: $type\n";
 		echo 'data: ' . json_encode($data). "\n\n";
