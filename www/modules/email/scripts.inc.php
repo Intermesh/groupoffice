@@ -1,4 +1,5 @@
 <?php
+/** @var string $GO_SCRIPTS_JS */
 $GO_SCRIPTS_JS .='GO.email.defaultSmtpHost="'.\GO::config()->smtp_server.'";
 GO.email.useHtmlMarkup=';
 

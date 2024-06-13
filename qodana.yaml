@@ -33,8 +33,12 @@ linter: jetbrains/qodana-php:latest
 exclude:
   - name: All
     paths:
-      - www/go/modules/community/activesync/Z-Push/src/include/rtfclass.php
+      - www/go/modules/community/activesync
       - www/go/vendor/pear
-      - www/go/modules/community/activesync/Z-Push/src/backend/imap
-      - www/go/modules/community/activesync/Z-Push/src/backend/kopano
-      - www/go/modules/community/activesync/Z-Push/src
+      - www/go/modules/intermesh/tools/phpbb
+      - www/go/modules/udo/forms/model/vendor
+      - www/go/modules/community/activesync/Z-Push
+      - www/go/modules/community/dokuwiki/lib/plugins/authgroupoffice
+      - www/modules/defaultsite/views/site
+      - www/modules/manualsite/views/site
+      - www/modules/site/controller

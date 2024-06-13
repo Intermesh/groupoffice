@@ -168,7 +168,7 @@ class ImapSearchQuery {
 	 * @param boolean $useAnd TODO: THIS WILL PROBABLY NOT WORK CORRECTLY YET
 	 * @return null
 	 */
-	public function addSearchWord($word, $section=self::ALL, $useAnd=false){
+	public function addSearchWord($word, $section="", $useAnd=false){
 		if(empty($word))
 			return;
 		

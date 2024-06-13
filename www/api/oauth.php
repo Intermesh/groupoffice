@@ -136,7 +136,7 @@ class OAuthController {
 			return $exception->generateHttpResponse($response);
 		} catch (Exception $exception) {
 			
-			ErrorHandler::logException($e);
+			ErrorHandler::logException($exception);
 
 			$body = new StreamAlias(fopen('php://temp', 'rb+'));
 			$body->write($exception->getMessage());

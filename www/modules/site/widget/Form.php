@@ -211,7 +211,7 @@ class Form extends \GO\Site\Components\Widget {
 		{
 			// add a hidden field so that if the radio button is not selected, it still submits a value
 			if(isset($htmlOptions['id']) && $htmlOptions['id']!==false)
-				$uncheckOptions=array('id'=>self::ID_PREFIX.$htmlOptions['id']);
+				$uncheckOptions=array('id'=>$htmlOptions['id']);
 			else
 				$uncheckOptions=array('id'=>false);
 			$hidden=$this->staticHiddenField($name,$uncheck,$uncheckOptions);

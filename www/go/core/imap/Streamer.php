@@ -36,6 +36,8 @@ class Streamer {
 	 */
 	public function put($data) {
 
+		$str = "";
+
 		switch ($this->encoding) {
 			case 'base64':
 				$data = $this->leftOver . $data;
@@ -83,6 +85,8 @@ class Streamer {
 				}
 				break;
 		}
+
+		return $str;
 	}
 	
 	public function finish(){

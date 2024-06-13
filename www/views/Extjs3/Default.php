@@ -1,4 +1,5 @@
 <?php
+/** @var mixed $data */
 //Breaks forms with file inputs :(
 //header('Content-Type: application/json;charset=utf-8');
 $string = \go\core\util\JSON::encode($data);

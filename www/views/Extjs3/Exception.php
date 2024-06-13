@@ -1,5 +1,5 @@
 <?php
-
+/** @var mixed $data */
 use GO\Base\Util\Http;
 use GO\Base\Util\StringHelper;
 use go\core\App;

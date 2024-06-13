@@ -1,4 +1,5 @@
 <?php
+/** @var string $GO_SCRIPTS_JS */
 $calendar = \GO\Calendar\Model\Calendar::model()->getDefault(\GO::user());
 
 $settings = \GO\Calendar\Model\Settings::model()->getDefault(\GO::user());

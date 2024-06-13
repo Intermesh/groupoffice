@@ -79,7 +79,8 @@ class Common {
 	 * @return string 
 	 */
 	public static function formatAddress($isoCountry, $address, $address_no,$zip,$city, $state) {
-		
+
+
 		if(empty($address) && empty($city) && empty($state)){
 			return "";
 		}
@@ -88,6 +89,8 @@ class Common {
 		$strCountry = isset($countries[$isoCountry]) ? $countries[$isoCountry] : $isoCountry;
 
 		require(GO::config()->root_path . 'language/addressformats.php');
+
+		/** @var array $af */
 
 		$format = isset($af[$isoCountry]) ? $af[$isoCountry] : $af['default'];
 
