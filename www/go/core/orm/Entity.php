@@ -133,7 +133,7 @@ abstract class Entity extends Property {
 	 *
 	 */
 	const EVENT_FILTER_PERMISSION_LEVEL = "filterpermissionlevel";
-	private static $entityType = [];
+	private static array $entityType = [];
 
 	/**
 	 * Constructor
