@@ -47,9 +47,9 @@ class Grouped extends \GO\Base\Model {
 	 * Execute a grouped query and return the statement. This class may be extended
 	 * so you can document loaded properties or implement additional functions.
 	 * 
-	 * @param StringHelper $modelName
+	 * @param string $modelName
 	 * @param array $groupBy eg array('t.name')
-	 * @param StringHelper $selectFields
+	 * @param string $selectFields
 	 * @param \GO\Base\Db\FindParams $findParams
 	 * @return \GO\Base\Db\ActiveStatement
 	 */

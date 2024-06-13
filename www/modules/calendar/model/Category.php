@@ -95,7 +95,7 @@ class Category extends \GO\Base\Db\ActiveRecord{
 	  * Find a category by name. It searches the global and calendar categories
 	  * 
 	  * @param int $calendar_id
-	  * @param StringHelper $name
+	  * @param string $name
 	  * @return Category
 	  */
 	 public function findByName($calendar_id, $name){

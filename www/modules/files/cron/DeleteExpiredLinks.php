@@ -25,7 +25,7 @@ class DeleteExpiredLinks extends AbstractCron {
     /**
      * Get the unique name of the Cronjob
      *
-     * @return StringHelper
+     * @return string
      */
     public function getLabel()
     {
@@ -35,7 +35,7 @@ class DeleteExpiredLinks extends AbstractCron {
     /**
      * Get the unique name of the Cronjob
      *
-     * @return StringHelper
+     * @return string
      */
     public function getDescription()
     {

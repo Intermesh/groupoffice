@@ -486,7 +486,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 	/**
 	 * Find an account by e-mail address.
 	 *
-	 * @param StringHelper $email
+	 * @param string $email
 	 * @return Account
 	 */
 	public function findByEmail($email)

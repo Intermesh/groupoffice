@@ -6,7 +6,7 @@ namespace GO\Site\Components;
 class Router{
 
 	/**
-	 * @return StringHelper the route of the default controller, action or module. Defaults to 'sites/site'.
+	 * @return string the route of the default controller, action or module. Defaults to 'sites/site'.
 	 */
 	public $defaultController = 'site/site';
 	
@@ -21,7 +21,7 @@ class Router{
 	 * The route should contain the controller ID and the action ID.
 	 * It may also contain additional GET variables. All these must be concatenated together with slashes.
 	 *
-	 * @param StringHelper $route the route of the request.
+	 * @param string $route the route of the request.
 	 * @return array the controller instance and the action ID. Null if the controller class does not exist or the route is invalid.
 	 */
 	public function runController() {
@@ -74,8 +74,8 @@ class Router{
 	
 	/**
 	 * Parses a path info into an action ID and GET variables.
-	 * @param StringHelper $pathInfo path info
-	 * @return StringHelper action ID
+	 * @param string $pathInfo path info
+	 * @return string action ID
 	 */
 	protected function getControllerAction($pathInfo) {
 		if (($pos = strpos($pathInfo, '/')) !== false) {

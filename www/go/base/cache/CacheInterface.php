@@ -26,7 +26,7 @@ namespace GO\Base\Cache;
 interface CacheInterface{
 	/**
 	 * Store any value in the cache
-	 * @param StringHelper $key
+	 * @param string $key
 	 * @param mixed $value Will be serialized
 	 * @param int $ttl Seconds to live
 	 */
@@ -35,7 +35,7 @@ interface CacheInterface{
 	/**
 	 * Get a value from the cache
 	 * 
-	 * @param StringHelper $key
+	 * @param string $key
 	 * @return boolean 
 	 */
 	public function get($key);
@@ -43,7 +43,7 @@ interface CacheInterface{
 	/**
 	 * Delete a value from the cache
 	 * 
-	 * @param StringHelper $key 
+	 * @param string $key 
 	 */
 	public function delete($key);
 	

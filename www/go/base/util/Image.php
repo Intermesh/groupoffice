@@ -47,7 +47,7 @@ class Image {
 	/**
 	 * Load an image file
 	 * 
-	 * @param StringHelper $filename
+	 * @param string $filename
 	 * @return boolean
 	 */
 	public function load($filename) {
@@ -142,7 +142,7 @@ class Image {
 	/**
 	 * Save the imaage to a file
 	 * 
-	 * @param StringHelper $filename
+	 * @param string $filename
 	 * @param int $image_type
 	 * @param int $compression
 	 * @param oct $permissions file permissions

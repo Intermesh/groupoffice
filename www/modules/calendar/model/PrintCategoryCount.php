@@ -22,8 +22,8 @@ class PrintCategoryCount extends \GO\Base\Model {
 	/**
 	 * Constructor
 	 *  
-	 * @param StringHelper $startDate
-	 * @param StringHelper $endDate
+	 * @param string $startDate
+	 * @param string $endDate
 	 */
 	public function __construct($startDate,$endDate) {
 		

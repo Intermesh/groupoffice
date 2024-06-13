@@ -58,11 +58,11 @@ class Sieve {
 	/**
 	 * Object constructor
 	 *
-	 * @param StringHelper  Username (for managesieve login)
-	 * @param StringHelper  Password (for managesieve login)
-	 * @param StringHelper  Managesieve server hostname/address
-	 * @param StringHelper  Managesieve server port number
-	 * @param StringHelper  Managesieve authentication method
+	 * @param string  Username (for managesieve login)
+	 * @param string  Password (for managesieve login)
+	 * @param string  Managesieve server hostname/address
+	 * @param string  Managesieve server port number
+	 * @param string  Managesieve authentication method
 	 * @param boolean Enable/disable TLS use
 	 * @param array   Disabled extensions
 	 * @param boolean Enable/disable debugging
@@ -130,7 +130,7 @@ class Sieve {
 	/**
 	 * Check if an extension is available on the server
 	 * 
-	 * @param StringHelper $extension
+	 * @param string $extension
 	 * @return boolean
 	 */
 	public function hasExtension($extension){
@@ -665,7 +665,7 @@ class go_sieve_script
     /**
      * Adds rule to the script (at the end)
      *
-     * @param StringHelper Rule name
+     * @param string Rule name
      * @param array  Rule content (as array)
      *
      * @return int The index of the new rule
@@ -709,8 +709,8 @@ class go_sieve_script
     /**
      * Sets "global" variable
      *
-     * @param StringHelper $name  Variable name
-     * @param StringHelper $value Variable value
+     * @param string $name  Variable name
+     * @param string $value Variable value
      * @param array  $mods  Variable modifiers
      */
     public function set_var($name, $value, $mods = array())
@@ -729,7 +729,7 @@ class go_sieve_script
     /**
      * Unsets "global" variable
      *
-     * @param StringHelper $name  Variable name
+     * @param string $name  Variable name
      */
     public function unset_var($name)
     {
@@ -745,9 +745,9 @@ class go_sieve_script
     /**
      * Gets the value of  "global" variable
      *
-     * @param StringHelper $name  Variable name
+     * @param string $name  Variable name
      *
-     * @return StringHelper Variable value
+     * @return string Variable value
      */
     public function get_var($name)
     {
@@ -762,7 +762,7 @@ class go_sieve_script
     /**
      * Sets script header content
      *
-     * @param StringHelper $text  Header content
+     * @param string $text  Header content
      */
     public function set_prefix($text)
     {
@@ -1133,7 +1133,7 @@ class go_sieve_script
     /**
      * Converts text script to rules array
      *
-     * @param StringHelper Text script
+     * @param string Text script
      */
     private function _parse_text($script)
     {
@@ -1216,7 +1216,7 @@ class go_sieve_script
     /**
      * Convert text script fragment to rule object
      *
-     * @param StringHelper Text rule
+     * @param string Text rule
      *
      * @return array Rule data
      */
@@ -1384,8 +1384,8 @@ class go_sieve_script
     /**
      * Parse body of actions section
      *
-     * @param StringHelper $content  Text body
-     * @param StringHelper $end      End of text separator
+     * @param string $content  Text body
+     * @param string $end      End of text separator
      *
      * @return array Array of parsed action type/target pairs
      */
@@ -1622,9 +1622,9 @@ class go_sieve_script
      * Escape special chars into quoted string value or multi-line string
      * or list of strings
      *
-     * @param StringHelper $str Text or array (list) of strings
+     * @param string $str Text or array (list) of strings
      *
-     * @return StringHelper Result text
+     * @return string Result text
      */
     static function escape_string($str)
     {
@@ -1651,9 +1651,9 @@ class go_sieve_script
     /**
      * Escape special chars in multi-line string value
      *
-     * @param StringHelper $str Text
+     * @param string $str Text
      *
-     * @return StringHelper Text
+     * @return string Text
      */
     static function escape_multiline_string($str)
     {
@@ -1672,7 +1672,7 @@ class go_sieve_script
     /**
      * Splits script into string tokens
      *
-     * @param StringHelper &$str    The script
+     * @param string &$str    The script
      * @param mixed  $num     Number of tokens to return, 0 for all
      *                        or True for all tokens until separator is found.
      *                        Separator will be returned as last token.

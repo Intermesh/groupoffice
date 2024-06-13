@@ -34,10 +34,10 @@ class HtmlReplacer {
 	/**
 	 * Replace or highlight text in an HTML document and leave HTML tags alone.
 	 * 
-	 * @param StringHelper $text
-	 * @param StringHelper $keyword
-	 * @param StringHelper $replacement Can contain the tag {keyword} for a backreference
-	 * @return StringHelper 
+	 * @param string $text
+	 * @param string $keyword
+	 * @param string $replacement Can contain the tag {keyword} for a backreference
+	 * @return string 
 	 */
 	public static function replace($keyword, $replacement, $text) {
 

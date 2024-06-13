@@ -76,7 +76,7 @@ class Query {
 	 *    return $query->andWhere(array('is_invoiceable'=>true));
 	 * }
 	 * ~~~
-	 * @param StringHelper $name the method name to be called
+	 * @param string $name the method name to be called
 	 * @param array $args the parameters passed to the method
 	 * @return mixed the method return result
 	 */
@@ -157,8 +157,8 @@ class Query {
 	 * - `['ctime != mtime AND ctime < :time', 'time' => time()]`
 	 * - `[''(ctime > :time || mtime < :time) AND delete=1', 'time'=>time()]`
 	 * 
-     * @param StringHelper|array $condition the conditions that should be put in the WHERE part.
-     * @param StringHelper|boolean $merge 'AND'|'OR'|true add condition to previously added criteria
+     * @param string|array $condition the conditions that should be put in the WHERE part.
+     * @param string|boolean $merge 'AND'|'OR'|true add condition to previously added criteria
      * @return static the query object itself
      * @see andWhere()
      * @see orWhere()
@@ -210,7 +210,7 @@ class Query {
 	/**
      * Adds an additional WHERE condition to the existing one.
      * The new condition and the existing one will be joined using the 'AND' operator.
-     * @param StringHelper|array $condition the new WHERE condition. Please refer to [[where()]]
+     * @param string|array $condition the new WHERE condition. Please refer to [[where()]]
      * on how to specify this parameter.
      * @param array $params the parameters (name => value) to be bound to the query.
      * @return static the query object itself
@@ -224,7 +224,7 @@ class Query {
     /**
      * Adds an additional WHERE condition to the existing one.
      * The new condition and the existing one will be joined using the 'OR' operator.
-     * @param StringHelper|array $condition the new WHERE condition. Please refer to [[where()]]
+     * @param string|array $condition the new WHERE condition. Please refer to [[where()]]
      * on how to specify this parameter.
      * @param array $params the parameters (name => value) to be bound to the query.
      * @return static the query object itself
@@ -237,7 +237,7 @@ class Query {
 	
 	/**
 	 * Join by table (eg. `join(array('core_user', 'core_user.id = user_id'))
-	 * @param StringHelper $tableName
+	 * @param string $tableName
 	 * @param array $condition key value pair of primary_key => foreign_key
 	 * @see where() for conditions
 	 * @return \GO\Base\Db\Query
@@ -277,7 +277,7 @@ class Query {
 	
 	/**
 	 * HAVING part of the query
-	 * @param StringHelper $rawSQL the raw SQL the paste in the having part
+	 * @param string $rawSQL the raw SQL the paste in the having part
 	 * @return \GO\Base\Db\Query
 	 */
 	public function having($rawSQL) {
@@ -287,7 +287,7 @@ class Query {
 	
 	/**
 	 * ORDER BY part of the query
-	 * @param StringHelper|array $columns the columns (and the directions) to be ordered by.
+	 * @param string|array $columns the columns (and the directions) to be ordered by.
      * Columns can be specified in either a string (e.g. "id ASC, name DESC") or an array
      * (e.g. `array('is ASC', 'name DESC')`)
 	 * @return \GO\Base\Db\Query

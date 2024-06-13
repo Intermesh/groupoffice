@@ -217,7 +217,7 @@ protected function formatColumns(\GO\Base\Data\ColumnModel $columnModel)
 	 * Get the tree result from the given mailboxes
 	 * 
 	 * @param array $mailboxes
-	 * @return StringHelper
+	 * @return string
 	 */
 	private function _getMailboxTreeNodes($mailboxes) {
 		$nodes = array();
@@ -309,7 +309,7 @@ protected function formatColumns(\GO\Base\Data\ColumnModel $columnModel)
 	/**
 	 * Check if the mailbox is enabled to show in the email portlet
 	 * 
-	 * @param StringHelper $mailboxName
+	 * @param string $mailboxName
 	 * @return boolean
 	 */
 	private function _showInPortlet($accountId,$mailboxName){

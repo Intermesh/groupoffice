@@ -78,7 +78,7 @@ class MemoryFile extends File{
 		
 	/**
 	 * Change owner
-	 * @param StringHelper $user
+	 * @param string $user
 	 * @return boolean 
 	 */
 	public function chown($user){
@@ -88,7 +88,7 @@ class MemoryFile extends File{
 	/**
 	 * Change group
 	 * 
-	 * @param StringHelper $group
+	 * @param string $group
 	 * @return boolean 
 	 */
 	public function chgrp($group){

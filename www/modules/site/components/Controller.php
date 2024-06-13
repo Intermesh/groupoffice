@@ -95,10 +95,10 @@ abstract class Controller extends \GO\Base\Controller\AbstractController {
 	/**
 	 * Render a view file with layout wrapped
 	 * 
-	 * @param StringHelper $view name of the view to be rendered
+	 * @param string $view name of the view to be rendered
 	 * @param array $data data tp be extracted om PHP variables
 	 * @param boolean $return return rendering result if true
-	 * @return StringHelper the redering result if $return is true 
+	 * @return string the redering result if $return is true 
 	 */
 	public function render($view, $data = null) {
 		$output = $this->renderPartial($view, $data);
@@ -112,7 +112,7 @@ abstract class Controller extends \GO\Base\Controller\AbstractController {
 
 	/**
 	 * Renders a view file.
-	 * @param StringHelper $view name of the view to be rendered
+	 * @param string $view name of the view to be rendered
 	 * @param array $data data to be extracted info PHP variables and made available to the view
 	 * @return type
 	 * @throws CException 
@@ -129,10 +129,10 @@ abstract class Controller extends \GO\Base\Controller\AbstractController {
 	/**
 	 * This extracts the content of $_data_ the be used into the view file
 	 * 
-	 * @param StringHelper $_viewFile_ the path to the viewfile to be rendered
+	 * @param string $_viewFile_ the path to the viewfile to be rendered
 	 * @param array $_data_ contains the data to be used into the view
 	 * @param boolean $_return_ true if the rendered contect should be returned
-	 * @return StringHelper the rendered page 
+	 * @return string the rendered page 
 	 */
 	public function renderFile($_viewFile_, $_data_ = null, $_return_ = false)
 	{
@@ -156,8 +156,8 @@ abstract class Controller extends \GO\Base\Controller\AbstractController {
 	 * Returns the path to the viewfile based on the used template and module
 	 * It will search for a template first if not found look in the views/site/ folder
 	 * the default viewfile provided by the module
-	 * @param StringHelper $viewName name to the viewfile
-	 * @return StringHelper path of the viewfile
+	 * @param string $viewName name to the viewfile
+	 * @return string path of the viewfile
 	 */
 	public function getViewFile($viewName)
 	{	
@@ -178,8 +178,8 @@ abstract class Controller extends \GO\Base\Controller\AbstractController {
 
 	/**
 	 * Returns the path to the layoutfile based on the used template and module
-	 * @param StringHelper $layoutName name to the layoutfile
-	 * @return StringHelper path of the layoutName
+	 * @param string $layoutName name to the layoutfile
+	 * @return string path of the layoutName
 	 */
 	public function getLayoutFile($layoutName)
 	{
@@ -222,7 +222,7 @@ abstract class Controller extends \GO\Base\Controller\AbstractController {
 
 	/**
 	 * Get the url to return to from session when login failed. This is usually called after login in
-	 * @return StringHelper the url
+	 * @return string the url
 	 */
 	public function getReturnUrl()
 	{
@@ -250,7 +250,7 @@ abstract class Controller extends \GO\Base\Controller\AbstractController {
 	/**
 	 * Checks if a user is logged in, if the user has permission to the module and if the user has access to a specific action.
 	 * 
-	 * @param StringHelper $action
+	 * @param string $action
 	 * @return boolean boolean
 	 */
 	protected function _checkPermission($action){

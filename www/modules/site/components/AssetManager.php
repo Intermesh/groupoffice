@@ -81,7 +81,7 @@ class AssetManager
 	private $_published=array();
 
 	/**
-	 * @return StringHelper the root directory storing the published asset files. Defaults to 'WebRoot/assets'.
+	 * @return string the root directory storing the published asset files. Defaults to 'WebRoot/assets'.
 	 */
 	public function getBasePath()
 	{
@@ -97,7 +97,7 @@ class AssetManager
 
 
 	/**
-	 * @return StringHelper the base url that the published asset files can be accessed.
+	 * @return string the base url that the published asset files can be accessed.
 	 * Note, the ending slashes are stripped off. Defaults to '/AppBaseUrl/assets'.
 	 */
 	public function getBaseUrl()
@@ -122,12 +122,12 @@ class AssetManager
 	 * existence of the target directory to avoid repetitive copying.</li>
 	 * </ul>
 	 *
-	 * @param StringHelper $path the asset (file or directory) to be published
+	 * @param string $path the asset (file or directory) to be published
 	 * @param boolean $hashByName whether the published directory should be named as the hashed basename.
 	 * If false, the name will be the hash taken from dirname of the path being published and path mtime.
 	 * Defaults to false. Set true if the path being published is shared among
 	 * different extensions.
-	 * @return StringHelper an absolute URL to the published asset
+	 * @return string an absolute URL to the published asset
 	 * @throws Exception if the asset to be published does not exist.
 	 */
 	public function publish($path,$hashByName=false)
@@ -196,12 +196,12 @@ class AssetManager
 	 * Returns the published path of a file path.
 	 * This method does not perform any publishing. It merely tells you
 	 * if the file or directory is published, where it will go.
-	 * @param StringHelper $path directory or file path being published
+	 * @param string $path directory or file path being published
 	 * @param boolean $hashByName whether the published directory should be named as the hashed basename.
 	 * If false, the name will be the hash taken from dirname of the path being published and path mtime.
 	 * Defaults to false. Set true if the path being published is shared among
 	 * different extensions.
-	 * @return StringHelper the published file path. False if the file or directory does not exist
+	 * @return string the published file path. False if the file or directory does not exist
 	 */
 	public function getPublishedPath($path,$hashByName=false)
 	{
@@ -221,12 +221,12 @@ class AssetManager
 	 * Returns the URL of a published file path.
 	 * This method does not perform any publishing. It merely tells you
 	 * if the file path is published, what the URL will be to access it.
-	 * @param StringHelper $path directory or file path being published
+	 * @param string $path directory or file path being published
 	 * @param boolean $hashByName whether the published directory should be named as the hashed basename.
 	 * If false, the name will be the hash taken from dirname of the path being published and path mtime.
 	 * Defaults to false. Set true if the path being published is shared among
 	 * different extensions.
-	 * @return StringHelper the published URL for the file or directory. False if the file or directory does not exist.
+	 * @return string the published URL for the file or directory. False if the file or directory does not exist.
 	 */
 	public function getPublishedUrl($path,$hashByName=false)
 	{
@@ -246,8 +246,8 @@ class AssetManager
 	/**
 	 * Generate a CRC32 hash for the directory path. Collisions are higher
 	 * than MD5 but generates a much smaller hash string.
-	 * @param StringHelper $path string to be hashed.
-	 * @return StringHelper hashed string.
+	 * @param string $path string to be hashed.
+	 * @return string hashed string.
 	 */
 	protected function hash($path)
 	{

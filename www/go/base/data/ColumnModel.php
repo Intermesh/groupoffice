@@ -73,7 +73,7 @@ class ColumnModel {
 	 * The public parameters and the customfield parameters are also set.
 	 * The $excludeColumns are meant to give up the column names that need to be excluded in the columnModel.
 	 * 
-	 * @param StringHelper $modelName The models where to get the columns from.
+	 * @param string $modelName The models where to get the columns from.
 	 * @param Array $excludeColumns 
 	 * @param Array $includeColumns
 	 */
@@ -138,7 +138,7 @@ class ColumnModel {
 	 * @param String|callable $format
 	 * @param Array $extraVars Optional key value array with extra params that are needed for the $format.
 	 * @param String $sortAlias A string or array of columns to sort on if this column is sorted on.
-	 * @param StringHelper $label Label to use on exports.
+	 * @param string $label Label to use on exports.
 	 * 
 	 * @return ColumnModel
 	 */
@@ -164,9 +164,9 @@ class ColumnModel {
 	 * Add a summary to the store
 	 * formatColumn will format the summary the same way as the rest of the column
 	 * 
-	 * @param StringHelper $fieldName the database field you want to sum
-	 * @param StringHelper $type constant of self::SUMMARY_*
-	 * @param StringHelper $as columnName
+	 * @param string $fieldName the database field you want to sum
+	 * @param string $type constant of self::SUMMARY_*
+	 * @param string $as columnName
 	 */
 	public function summarizeColumn($fieldName, $type, $as=null) {
 		
@@ -240,7 +240,7 @@ class ColumnModel {
 	/**
 	 * Get a column by data index
 	 * 
-	 * @param StringHelper $dataindex
+	 * @param string $dataindex
 	 * @return Column 
 	 */
 	public function getColumn($dataindex)
@@ -303,7 +303,7 @@ class ColumnModel {
 	/**
 	 * Turn a sort alias into the real column name. 
 	 * 
-	 * @param StringHelper $alias
+	 * @param string $alias
 	 * @return mixed String or array of columns 
 	 */
 	public function getSortColumn($alias) {		
@@ -409,7 +409,7 @@ class ColumnModel {
 
 	/**
 	 * Set the format type used in the \GO\Base\Db\ActiveRecord
-	 * @param StringHelper $type @see \GO\Base\Db\ActiveRecord::getAttributes()
+	 * @param string $type @see \GO\Base\Db\ActiveRecord::getAttributes()
 	 */
 	public function setModelFormatType($type) {
 		$this->_modelFormatType = $type;

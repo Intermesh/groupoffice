@@ -53,7 +53,7 @@ class Router{
 	/**
 	 * Get the controller route. eg. email/message/view
 	 * 
-	 * @return StringHelper 
+	 * @return string
 	 */
 	public function getControllerRoute(){
 		return $this->_r;
@@ -72,7 +72,7 @@ class Router{
 	 * Get the currently processing controller action in lowercase and without the
 	 * action prefix.
 	 * 
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getControllerAction(){
 		return $this->_action;

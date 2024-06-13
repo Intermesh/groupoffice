@@ -33,7 +33,7 @@ class Input {
 	/**
 	 *
 	 * @param type $inputName
-	 * @return StringHelper 
+	 * @return string 
 	 */
 	public static function getErrorMsg($inputName){
 		return isset(\GO::session()->values['formErrors'][$inputName]) ? \GO::session()->values['formErrors'][$inputName] : false;

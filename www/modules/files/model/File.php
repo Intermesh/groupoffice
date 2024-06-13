@@ -513,7 +513,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	/**
 	 * The link that can be send in an e-mail as download link.
 	 *
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getEmailDownloadURL($html=true, $newExpireTime=false, $deleteWhenExpired=false) {
 
@@ -536,7 +536,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	 * The link to download the file.
 	 * This function does not check the file download expire time and the random code
 	 *
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getDownloadURL($downloadAttachment=true, $relative=false) {
 		return \GO::url('files/file/download', array('id'=>$this->id, 'inline'=>$downloadAttachment?'false':'true'), $relative);
@@ -585,7 +585,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 
 //	/**
 //	 * Adds some extra info to the loggin of files
-//	 * @param StringHelper $action the action to log
+//	 * @param string $action the action to log
 //	 * @param boolean $save unused
 //	 * @return boolean if save was successful
 //	 */
@@ -614,7 +614,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	 * Copy a file to another folder.
 	 *
 	 * @param Folder $destinationFolder
-	 * @param StringHelper $newFileName. Leave blank to use the same name.
+	 * @param string $newFileName. Leave blank to use the same name.
 	 * @return File
 	 */
 	public function copy($destinationFolder, $newFileName=false, $appendNumberToNameIfExists=false){
@@ -712,7 +712,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	/**
 	 * Find the file model by relative path.
 	 *
-	 * @param StringHelper $relpath Relative path from \GO::config()->file_storage_path
+	 * @param string $relpath Relative path from \GO::config()->file_storage_path
 	 * @return File
 	 */
 	public function findByPath($relpath){
@@ -754,7 +754,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	 *
 	 * @param	StringHelper $filepath The complete path to the file
 	 * @access public
-	 * @return StringHelper  New filename
+	 * @return string  New filename
 	 */
 	public function appendNumberToNameIfExists()
 	{

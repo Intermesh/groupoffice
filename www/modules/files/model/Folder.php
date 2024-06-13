@@ -183,7 +183,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 	/**
 	 * This getter recursively builds the folder path.
-	 * @return StringHelper
+	 * @return string
 	 */
 	protected function getPath($forceResolve=false) {
 
@@ -254,7 +254,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Get a URL to show the folder directy in the files module.
 	 *
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getExternalURL(){
 		return \GO::createExternalUrl("files", "showFolder", array($this->id));
@@ -1081,7 +1081,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * Checks if a filename exists and renames it.
 	 *
 	 * @access public
-	 * @return StringHelper  New filename
+	 * @return string  New filename
 	 */
 	public function appendNumberToNameIfExists()
 	{
@@ -1405,7 +1405,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 	/**
 	 *
-	 * @param StringHelper $name
+	 * @param string $name
 	 * @return Folder
 	 */
 	public function getTopLevelShare($folderName){

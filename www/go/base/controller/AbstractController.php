@@ -225,7 +225,7 @@ abstract class AbstractController extends Observable {
 	
 	/**
 	 * Returns the currenly callen action name;
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getAction(){
 		return $this->_action;
@@ -234,7 +234,7 @@ abstract class AbstractController extends Observable {
 	/**
 	 * Includes the file from the views folder
 	 * 
-	 * @param StringHelper $viewName 
+	 * @param string $viewName 
 	 * The view will be searched in modules/<moduleid>/views/<view>/<viewName>.php
 	 * of /views/<view>/<viewName>.php
 	 * 
@@ -258,7 +258,7 @@ abstract class AbstractController extends Observable {
 	 * 
 	 * @param int $aclId
 	 * @param int $requiredPermissionLevel See GO_SECURITY constants
-	 * @param StringHelper $action By default it applies to all actions but you may specify a specific action here.
+	 * @param string $action By default it applies to all actions but you may specify a specific action here.
 	 */
 	protected function addPermissionCheck($aclId, $requiredPermissionLevel, $action='*'){
 		if(!is_array($action))
@@ -274,7 +274,7 @@ abstract class AbstractController extends Observable {
 	/**
 	 * Checks if a user is logged in, if the user has permission to the module and if the user has access to a specific action.
 	 * 
-	 * @param StringHelper $action
+	 * @param string $action
 	 * @return boolean boolean
 	 */
 	protected function _checkPermission($action){
@@ -307,7 +307,7 @@ abstract class AbstractController extends Observable {
 	/**
 	 * Check the ACL permission levels manually added by addRequiredPermissionLevel();
 	 * 
-	 * @param StringHelper $action
+	 * @param string $action
 	 * @return boolean 
 	 */
 	private function _checkRequiredPermissionLevels($action){
@@ -334,7 +334,7 @@ abstract class AbstractController extends Observable {
 	 * Runs a method of this controller. If $action is save then it will run
 	 * actionSave of your extended class.
 	 * 
-	 * @param StringHelper $action Without "action" prefix.
+	 * @param string $action Without "action" prefix.
 	 * @param array $params Key value array of action parameters eg. $params['id']=1;
 	 * @param boolean $render Render output automatically. Set to false if you run 
 	 *	a controller manually in another controller and want to capture the output.
@@ -473,7 +473,7 @@ abstract class AbstractController extends Observable {
 	 * If you declare it as actionMethod($test1, $test2, $hasDefault=true) then
 	 * the named parameters will be taken from the $_REQUEST args.
 	 * 
-	 * @param StringHelper $methodName
+	 * @param string $methodName
 	 * @param array $params
 	 * @return mixed Action method return value
 	 * @throws Exception If a required parameter is missing from the $_REQUEST args
@@ -508,7 +508,7 @@ abstract class AbstractController extends Observable {
 	/**
 	 * Redirect the browser.
 	 * 
-	 * @param StringHelper $path 
+	 * @param string $path 
 	 */
 	protected function redirect($path='', $params=array()){		
 		header('Location: ' .GO::url($path, $params));
@@ -520,7 +520,7 @@ abstract class AbstractController extends Observable {
 	 * 
 	 * route = addressbook/contact
 	 * 
-	 * @return StringHelper 
+	 * @return string 
 	 */
 	public function getRoute($action=''){
 		$arr = explode('\\',get_class($this));

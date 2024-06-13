@@ -166,10 +166,10 @@ class TemplateParser
 	 * 
 	 * Tags are formatted like this: {attribute_name} or {contact:name}.
 	 * 
-	 * @param StringHelper $content
+	 * @param string $content
 	 * @param array $attributes eg. array('attributeName'=>'value')
 	 * @param boolean $leaveEmptyTags Leave other tags in the document or keep them for further processing.
-	 * @return StringHelper 
+	 * @return string 
 	 */
 	public function parse($content, $attributes, $leaveEmptyTags=false)
 	{

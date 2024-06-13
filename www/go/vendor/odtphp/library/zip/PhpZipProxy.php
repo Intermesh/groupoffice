@@ -37,7 +37,7 @@ class PhpZipProxy implements ZipInterface
 	/**
 	 * Open a Zip archive
 	 * 
-	 * @param StringHelper $filename the name of the archive to open
+	 * @param string $filename the name of the archive to open
 	 * @return true if openning has succeeded
 	 */		
 	public function open($filename)
@@ -48,7 +48,7 @@ class PhpZipProxy implements ZipInterface
 	/**
 	 * Retrieve the content of a file within the archive from its name
 	 * 
-	 * @param StringHelper $name the name of the file to extract
+	 * @param string $name the name of the file to extract
 	 * @return the content of the file in a string
 	 */	
 	public function getFromName($name)
@@ -58,8 +58,8 @@ class PhpZipProxy implements ZipInterface
 	/**
 	 * Add a file within the archive from a string
 	 * 
-	 * @param StringHelper $localname the local path to the file in the archive
-	 * @param StringHelper $contents the content of the file
+	 * @param string $localname the local path to the file in the archive
+	 * @param string $contents the content of the file
 	 * @return true if the file has been successful added
 	 */		
 	public function addFromString($localname, $contents)
@@ -72,8 +72,8 @@ class PhpZipProxy implements ZipInterface
 	/**
 	 * Add a file within the archive from a file
 	 * 
-	 * @param StringHelper $filename the path to the file we want to add
-	 * @param StringHelper $localname the local path to the file in the archive
+	 * @param string $filename the path to the file we want to add
+	 * @param string $localname the local path to the file in the archive
 	 * @return true if the file has been successful added
 	 */
 	public function addFile($filename, $localname = null)

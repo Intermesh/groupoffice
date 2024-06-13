@@ -53,7 +53,7 @@ class Statement implements \IteratorAggregate
 	}
 	
 	/**
-		* @return StringHelper the SQL statement to be executed
+		* @return string the SQL statement to be executed
 		*/
 	public function getText()
 	{
@@ -65,7 +65,7 @@ class Statement implements \IteratorAggregate
 	/**
 	 * Specifies the SQL statement to be executed.
 	 * The previous statement will be set to null
-	 * @param StringHelper $value the SQL statement
+	 * @param string $value the SQL statement
 	 * @return Statement Myself for chaining 
 	 */
 	protected function setText($value)
@@ -177,7 +177,7 @@ class Statement implements \IteratorAggregate
 	/**
 	 * executes the query on the PDOStatement
 	 * TODO: Log executes queries in debug mode, cache query results in later releases
-	 * @param StringHelper $method method of PDOStatement to be called (fetch, fetchAll)
+	 * @param string $method method of PDOStatement to be called (fetch, fetchAll)
 	 * @param mixed $mode parameters to be passed to the method
 	 * @param array $params input parameters (name=>value) for the SQL execution.
 	 * @return mixed the method execution result
@@ -218,7 +218,7 @@ class Statement implements \IteratorAggregate
 	
 	/**
 		* Builds a SQL SELECT statement from the given query specification.
-		* @return StringHelper the SQL statement
+		* @return string the SQL statement
 		*/
 	public function buildQuery($query)
 	{
@@ -333,7 +333,7 @@ class Statement implements \IteratorAggregate
 	 * 
 	 * 
 	 * 
-	 * @param StringHelper $conditions the conditions that should be put in the WHERE part. (eg.: 'id=:id')
+	 * @param string $conditions the conditions that should be put in the WHERE part. (eg.: 'id=:id')
 	 * @param array $params the paremeters (name=>value) to be bound to the query
 	 * @return Statement mysql for chaining
 	 */
@@ -360,8 +360,8 @@ class Statement implements \IteratorAggregate
 	}
 	/**
 	 * Appends an JOIN part to the query.
-	 * @param StringHelper $type the join type ('join', 'left join', 'right join', 'cross join', 'natural join')
-	 * @param StringHelper $table the table to be joined.
+	 * @param string $type the join type ('join', 'left join', 'right join', 'cross join', 'natural join')
+	 * @param string $table the table to be joined.
 	 * Table name can contain schema prefix (e.g. 'public.tbl_user') and/or table alias (e.g. 'tbl_user u').
 	 * The method will automatically quote the table name unless it contains some parenthesis
 	 * (which means the table is given as a sub-query or DB expression).
@@ -453,7 +453,7 @@ class Statement implements \IteratorAggregate
 	/**
 		* Creates and executes an INSERT SQL statement.
 		* The method will properly escape the column names, and bind the values to be inserted.
-		* @param StringHelper $table the table that new rows will be inserted into.
+		* @param string $table the table that new rows will be inserted into.
 		* @param array $columns the column data (name=>value) to be inserted into the table.
 		* @return integer number of rows affected by the execution.
 		*/
@@ -476,7 +476,7 @@ class Statement implements \IteratorAggregate
 	
 	/**
 	 * Creates and executes in INSERT SQL statement for inserting multiple rows.
-	 * @param StringHelper $table the table to insert to rows into
+	 * @param string $table the table to insert to rows into
 	 * @param array $data an array of insertable rows
 	 * @return integet number of rows affected by the execution 
 	 */
@@ -511,7 +511,7 @@ class Statement implements \IteratorAggregate
 
 	/**
 	 * Creates and executes an UPDATE sql statement
-	 * @param StringHelper $table the table to update
+	 * @param string $table the table to update
 	 * @param array $columns the column data (name=>value) to be updated
 	 * @param mixed $conditions the condition that will be put in the WHERE part.
 	 * @param array $params the params to be bound to the query
@@ -534,7 +534,7 @@ class Statement implements \IteratorAggregate
 	
 	/**
 		* Creates and executes a DELETE SQL statement.
-		* @param StringHelper $table the table where the data will be deleted from.
+		* @param string $table the table where the data will be deleted from.
 		* @param mixed $conditions the conditions that will be put in the WHERE part.
 		* @param array $params the parameters to be bound to the query.
 		* @return integer number of rows affected by the execution.
@@ -550,7 +550,7 @@ class Statement implements \IteratorAggregate
 	/**
 		* Generates the condition string that will be put in the WHERE part
 		* @param mixed $conditions the conditions that will be put in the WHERE part.
-		* @return StringHelper the condition string to put in the WHERE part
+		* @return string the condition string to put in the WHERE part
 		*/
   private function processConditions($conditions)
 	{
@@ -562,7 +562,7 @@ class Statement implements \IteratorAggregate
 
 	/**
 	 * Builds and executes a SQL statement for truncating a DB table.
-	 * @param StringHelper $table the table to be truncated. The name will be properly quoted by the method.
+	 * @param string $table the table to be truncated. The name will be properly quoted by the method.
 	 * @return integer number of rows affected by the execution.
 	 */
 	public function truncateTable($table)

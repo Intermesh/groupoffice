@@ -72,7 +72,7 @@ class Scripts
 
 	/**
 	 * Inserts the scripts in the head section.
-	 * @param StringHelper $output the output to be inserted with scripts.
+	 * @param string $output the output to be inserted with scripts.
 	 */
 	public function renderHead(&$output)
 	{
@@ -113,7 +113,7 @@ class Scripts
 
 	/**
 	 * Inserts the scripts at the beginning of the body section.
-	 * @param StringHelper $output the output to be inserted with scripts.
+	 * @param string $output the output to be inserted with scripts.
 	 */
 	public function renderBodyBegin(&$output)
 	{
@@ -139,7 +139,7 @@ class Scripts
 
 	/**
 	 * Inserts the scripts at the end of the body section.
-	 * @param StringHelper $output the output to be inserted with scripts.
+	 * @param string $output the output to be inserted with scripts.
 	 */
 	public function renderBodyEnd(&$output)
 	{
@@ -174,8 +174,8 @@ class Scripts
 
 	/**
 	 * Registers a CSS file
-	 * @param StringHelper $url Url to the CSS file
-	 * @param StringHelper $media media that the CSS file should be applied to. If empty, it means all media types.
+	 * @param string $url Url to the CSS file
+	 * @param string $media media that the CSS file should be applied to. If empty, it means all media types.
 	 * @return Scripts myself for chaining.
 	 */
 	public function registerCssFile($url, $media = '')
@@ -189,7 +189,7 @@ class Scripts
 
 	/**
 	 * Register a javascript file
-	 * @param StringHelper $url url to the javascript file
+	 * @param string $url url to the javascript file
 	 * @param integer $position (HEAD, BEGIN, END)
 	 * @return Scripts myself for chaining
 	 */
@@ -204,7 +204,7 @@ class Scripts
 	
 	/**
 	 * Register a google api script
-	 * @param StringHelper $package can be jquery or jquery-ui
+	 * @param string $package can be jquery or jquery-ui
 	 * @param integer $position where to add the scriptfile
 	 * @return Scripts myself for chaining
 	 */
@@ -229,8 +229,8 @@ class Scripts
 	/**
 	 * Register a javascript string.
 	 * 
-	 * @param StringHelper $id unique identifier for the piece of code
-	 * @param StringHelper $script the javascript code
+	 * @param string $id unique identifier for the piece of code
+	 * @param string $script the javascript code
 	 * @param int $position position code shoudl be inserted (HEAD, BEGIN, END, READY)
 	 * @return Scripts myself for chaining
 	 */
@@ -245,9 +245,9 @@ class Scripts
 	}
 /**
 	 * Registers a piece of CSS code.
-	 * @param StringHelper $id ID that uniquely identifies this piece of CSS code
-	 * @param StringHelper $css the CSS code
-	 * @param StringHelper $media media that the CSS code should be applied to. If empty, it means all media types.
+	 * @param string $id ID that uniquely identifies this piece of CSS code
+	 * @param string $css the CSS code
+	 * @param string $media media that the CSS code should be applied to. If empty, it means all media types.
 	 * @return CClientScript the CClientScript object itself (to support method chaining, available since version 1.1.5).
 	 */
 	public function registerCss($id,$css,$media='')
@@ -260,9 +260,9 @@ class Scripts
 	 * Registers a meta tag that will be inserted in the head section before title element
 	 * $this->registerMetaTag('example', 'description', null, array('lang' => 'en'))
 	 * 
-	 * @param StringHelper $content content attribute of metatag
-	 * @param StringHelper $name name attribute of metatag
-	 * @param StringHelper $httpEquiv httpequiv attribute of metatage
+	 * @param string $content content attribute of metatag
+	 * @param string $name name attribute of metatag
+	 * @param string $httpEquiv httpequiv attribute of metatage
 	 * @param array $options other option in name-value pair for metatag
 	 * @return Scripts mysql for chaining
 	 */
@@ -295,9 +295,9 @@ class Scripts
 	
 	/**
 	 * Encloses the given CSS content with a CSS tag.
-	 * @param StringHelper $text the CSS content
-	 * @param StringHelper $media the media that this CSS should apply to.
-	 * @return StringHelper the CSS properly enclosed
+	 * @param string $text the CSS content
+	 * @param string $media the media that this CSS should apply to.
+	 * @return string the CSS properly enclosed
 	 */
 	public static function css($text,$media='')
 	{

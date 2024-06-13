@@ -506,11 +506,11 @@ class DbStore extends AbstractStore {
 	/**
 	 * Select Items that belong to one of the selected Models
 	 * Call this in the grids that get filterable by other selectable stores
-	 * @param StringHelper $requestParamName That key that will hold the seleted item in go_setting table
-	 * @param StringHelper $selectClassName Name of the related model (eg. \GO\Notes\Model\Category)
-	 * @param StringHelper $foreignKey column name to match the related models PK (eg. category_id)
+	 * @param string $requestParamName That key that will hold the seleted item in go_setting table
+	 * @param string $selectClassName Name of the related model (eg. \GO\Notes\Model\Category)
+	 * @param string $foreignKey column name to match the related models PK (eg. category_id)
 	 * @param boolean $checkPermissions check Permission for item defaults to true
-	 * @param StringHelper $prefix a prefix for the request param that can change every store load
+	 * @param string $prefix a prefix for the request param that can change every store load
 	 * @param array $extraPks valid pks of models not in the database
 	 * 
 	 * @return \GO\Base\Component\MultiSelectGrid
@@ -536,9 +536,9 @@ class DbStore extends AbstractStore {
 
 	/**
 	 * Call this in the selectable stores that effect other grids by selecting values
-	 * @param StringHelper $requestParamName
+	 * @param string $requestParamName
 	 * @param boolean $checkPermissions check Permission for item defaults to true
-	 * @param StringHelper $prefix a prefix for the request param that can change every store load
+	 * @param string $prefix a prefix for the request param that can change every store load
 	 * @param array $extraPks valid pks of models not in the database
 	 * @param boolean $defaultSelect Set  to false if you do not when to select the first item when nothing is selected
 	 * @return \GO\Base\Component\MultiSelectGrid

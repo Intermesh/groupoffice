@@ -95,8 +95,8 @@ class UrlRule
 
 	/**
 	 * Constructor.
-	 * @param StringHelper $route the route of the URL (controller/action)
-	 * @param StringHelper $pattern the pattern for matching the URL
+	 * @param string $route the route of the URL (controller/action)
+	 * @param string $pattern the pattern for matching the URL
 	 */
 	public function __construct($route, $pattern)
 	{
@@ -146,9 +146,9 @@ class UrlRule
 	/**
 	 * Creates a URL based on this rule.
 	 * @param CUrlManager $manager the manager
-	 * @param StringHelper $route the route
+	 * @param string $route the route
 	 * @param array $params list of parameters
-	 * @param StringHelper $ampersand the token separating name-value pairs in the URL.
+	 * @param string $ampersand the token separating name-value pairs in the URL.
 	 * @return mixed the constructed URL or false on error
 	 */
 	public function createUrl($manager, $route, $params, $ampersand)
@@ -233,8 +233,8 @@ class UrlRule
 	 * Parses a URL based on this rule.
 	 * @param UrlManager $manager the URL manager
 	 * @param HttpRequest $request the request object
-	 * @param StringHelper $pathInfo path info part of the URL
-	 * @param StringHelper $rawPathInfo path info that contains the potential URL suffix
+	 * @param string $pathInfo path info part of the URL
+	 * @param string $rawPathInfo path info that contains the potential URL suffix
 	 * @return mixed the route that consists of the controller ID and action ID or false on error
 	 */
 	public function parseUrl($manager, $request, $pathInfo, $rawPathInfo)

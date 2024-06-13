@@ -88,8 +88,8 @@ abstract class AbstractExport {
 	 * Grab the label for the given attribute.
 	 * This also checks for the labels inside the relational fields
 	 * 
-	 * @param StringHelper $column
-	 * @return StringHelper
+	 * @param string $column
+	 * @return string
 	 */
 	public function getLabel($column){
 		
@@ -183,7 +183,7 @@ abstract class AbstractExport {
 	/**
 	 * Get the name for the exported file
 	 * 
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getName(){
 		return GO::session()->values[$this->queryKey]['name'];
@@ -305,7 +305,7 @@ abstract class AbstractExport {
 	/**
 	 * Check if the current columnname is a columnname for a related column
 	 * 
-	 * @param StringHelper $name
+	 * @param string $name
 	 * @param array $relatedColumns
 	 * @return boolean
 	 */

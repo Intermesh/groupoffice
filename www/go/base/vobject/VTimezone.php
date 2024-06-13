@@ -22,7 +22,7 @@ class VTimezone extends Sabre\VObject\Document {
 	 * By default this object will iterate over its own children, but this can 
 	 * be overridden with the iterator argument
 	 * 
-	 * @param StringHelper $name 
+	 * @param string $name 
 	 * @param Sabre\VObject\ElementList $iterator
 	 */
 	public function __construct() {

@@ -8,8 +8,8 @@ class TagParser{
 	/**
 	 * Parse as string for tags. Tags must be closed.
 	 * 
-	 * @param StringHelper $tagName eg. img
-	 * @param StringHelper $text The text to parse
+	 * @param string $tagName eg. img
+	 * @param string $text The text to parse
 	 * 
 	 * @return array Example of $tag array:
 	 * 

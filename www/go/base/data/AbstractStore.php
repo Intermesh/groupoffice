@@ -141,7 +141,7 @@ abstract class AbstractStore {
 	}
 	/**
 	 * Return title from response
-	 * @return StringHelper Title of store's response
+	 * @return string Title of store's response
 	 */
 	public function getTitle(){
 	  if(isset($this->response['title']))

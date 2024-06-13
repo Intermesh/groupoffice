@@ -92,7 +92,7 @@ class Pager extends \GO\Site\Components\Widget {
 	/**
 	 * The link for the page with the given number
 	 * @param int $pageNum number of page
-	 * @return StringHelper URL to page
+	 * @return string URL to page
 	 */
 	private function getPageUrl($pageNum){
 		$params = array_merge($_GET,array($this->requestPrefix.$this->pageParam=>$pageNum));

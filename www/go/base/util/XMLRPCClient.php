@@ -156,8 +156,8 @@ class XMLRPCClient {
 	/**
 	 * Set HTTP Basic Authorization credentials for Curl option CURLOPT_USERPWD
 	 * 
-	 * @param StringHelper $user
-	 * @param StringHelper $pass
+	 * @param string $user
+	 * @param string $pass
 	 */
 	public function setAuthentication($user, $pass) {
 		$this->_user = $user;

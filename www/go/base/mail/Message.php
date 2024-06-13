@@ -57,7 +57,7 @@ class Message extends \go\core\mail\Message {
 	/**
 	 * Get the tmp directory in where the temporary attachments are stored
 	 * 
-	 * @return StringHelper The path to the tmp directory
+	 * @return string The path to the tmp directory
 	 */
 	public function getTmpDir(){
 		return $this->_tmpDir;
@@ -65,10 +65,10 @@ class Message extends \go\core\mail\Message {
 	
 	/**
    * Create a new Message.
-   * @param StringHelper $subject
-   * @param StringHelper $body
-   * @param StringHelper $contentType
-   * @param StringHelper $charset
+   * @param string $subject
+   * @param string $body
+   * @param string $contentType
+   * @param string $charset
    * @return Message
    */
   public static function newInstance($subject = "", $body = "",

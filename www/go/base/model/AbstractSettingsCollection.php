@@ -66,7 +66,7 @@ abstract class AbstractSettingsCollection extends \GO\Base\Model {
 	
 	/**
 	 * All settings of this model will have this prefix.
-	 * @return StringHelper
+	 * @return string
 	 */
 	protected function myPrefix() {		
 		return $this->getModule().'_';

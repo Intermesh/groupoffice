@@ -158,7 +158,7 @@ class Folder extends Base {
 	 * Move the folder to another folder.
 	 * 
 	 * @param Folder $destinationFolder 
-	 * @param StringHelper $newFolderName Optionally rename the folder too.
+	 * @param string $newFolderName Optionally rename the folder too.
 	 * @param boolean $appendNumberToNameIfDestinationExists Rename the folder like "folder (1)" if it already exists.	 * 
 	 * @return Folder $destinationFolder
 	 */
@@ -299,7 +299,7 @@ class Folder extends Base {
 	 * Create a symbolic link in this folder
 	 * 
 	 * @param Folder $target
-	 * @param StringHelper $linkName optional link name. If omitted the name will be the same as the target folder name
+	 * @param string $linkName optional link name. If omitted the name will be the same as the target folder name
 	 * @return File
 	 * @throws Exception
 	 */
@@ -333,7 +333,7 @@ class Folder extends Base {
 	 *
 	 * @param	StringHelper $filepath The complete path to the file
 	 * @access public
-	 * @return StringHelper  New filepath
+	 * @return string  New filepath
 	 */
 	public function appendNumberToNameIfExists()
 	{

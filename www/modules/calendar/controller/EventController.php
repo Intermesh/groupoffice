@@ -1245,8 +1245,8 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 	 * 
 	 * @param array $response
 	 * @param \GO\Calendar\Model\Calendar $calendar
-	 * @param StringHelper $startTime
-	 * @param StringHelper $endTime
+	 * @param string $startTime
+	 * @param string $endTime
 	 * @return array 
 	 */
 	private function _getHolidayResponseForPeriod($response,$calendar,$startTime,$endTime){
@@ -1287,8 +1287,8 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 	 * 
 	 * @param array $response
 	 * @param \GO\Calendar\Model\Calendar $calendar
-	 * @param StringHelper $startTime
-	 * @param StringHelper $endTime
+	 * @param string $startTime
+	 * @param string $endTime
 	 * @return array 
 	 */
 	private function _getLeavedaysResponseForPeriod($response,$calendar,$startTime,$endTime){
@@ -1332,8 +1332,8 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 	 * 
 	 * @param array $response
 	 * @param \GO\Calendar\Model\Calendar $calendar
-	 * @param StringHelper $startTime
-	 * @param StringHelper $endTime
+	 * @param string $startTime
+	 * @param string $endTime
 	 * @return array 
 	 */
 	private function _getBirthdayResponseForPeriod($response,$calendar,$startTime,$endTime){
@@ -1419,8 +1419,8 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 	 * 
 	 * @param array $response
 	 * @param \GO\Calendar\Model\Calendar $calendar
-	 * @param StringHelper $startTime
-	 * @param StringHelper $endTime
+	 * @param string $startTime
+	 * @param string $endTime
 	 * @return array 
 	 */
 	private function _getEventResponseForPeriod($response,$calendar,$startTime,$endTime, $categories){	

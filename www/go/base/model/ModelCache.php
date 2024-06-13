@@ -69,7 +69,7 @@ class ModelCache{
 	/**
 	 * Remove an item from the cache. 
 	 * 
-	 * @param StringHelper $modelClassName
+	 * @param string $modelClassName
 	 */
 	public function remove($modelClassName){		
 		unset($this->_models[$modelClassName]);

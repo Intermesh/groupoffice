@@ -59,7 +59,7 @@ class SharedDirectory extends \Sabre\DAV\FS\Directory {
 	 *
 	 * data is a readable stream resource
 	 *
-	 * @param StringHelper $name Name of the file
+	 * @param string $name Name of the file
 	 * @param resource $data Initial payload
 	 * @return void
 	 */
@@ -71,7 +71,7 @@ class SharedDirectory extends \Sabre\DAV\FS\Directory {
 	/**
 	 * Creates a new subdirectory
 	 *
-	 * @param StringHelper $name
+	 * @param string $name
 	 * @return void
 	 */
 	public function createDirectory($name) {

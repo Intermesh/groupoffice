@@ -130,7 +130,7 @@ class Session extends Observable{
 	 * 
 	 * eg. index.php?r=test&security_token=token
 	 * 
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function securityToken(){
 		return $this->values['security_token'];
@@ -139,7 +139,7 @@ class Session extends Observable{
 	/**
 	 * Return session ID
 	 * 
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function id(){
 		return session_id();
@@ -298,8 +298,8 @@ class Session extends Observable{
 	/**
 	 * Logs a user in.
 	 * 
-	 * @param StringHelper $username
-	 * @param StringHelper $password
+	 * @param string $username
+	 * @param string $password
 	 * @param Boolean $countLogin
 	 * 
 	 * @return Model\User or false on failure.
