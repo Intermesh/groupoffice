@@ -762,7 +762,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		$extension = $this->fsFile->extension();
 		$x=1;
 		$newName=$this->name;
-		while($this->folder->hasFile($newName))
+		while($this->folder->hasFile($newName) || $this->folder->fsFolder->createChild($newName)->exists())
 		{
 			$newName=$origName.' ('.$x.').'.$extension;
 			$x++;
