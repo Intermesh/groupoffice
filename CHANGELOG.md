@@ -1,3 +1,4 @@
+11-06-2024: 6.7.83
 - Core: Core: Fixed inefficiency in SSE causing a huge amount of calls to the ACPU cache.
 - Core: display read-only email templates in grid
 
