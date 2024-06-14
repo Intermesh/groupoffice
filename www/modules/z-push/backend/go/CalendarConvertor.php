@@ -1,5 +1,7 @@
 <?php
 
+use go\core\mail\Util;
+use go\core\model\Principal;
 use go\modules\community\calendar\model\Alert;
 use go\modules\community\calendar\model\CalendarEvent;
 use go\modules\community\calendar\model\Participant;
@@ -253,7 +255,7 @@ class CalendarConvertor
 			$dtend = new DateTime('@' . $message->endtime, new \DateTimeZone('etc/UTC'));
 			$event->duration = DateTime::intervalToISO($dtend->diff($dtstart));
 		}
-		if($event->timeZone) {
+		if($event->timeZone && !$event->showWithoutTime) {
 			$dtstart->setTimezone($event->timeZone());
 		}
 		$event->start = $dtstart;
@@ -264,19 +266,19 @@ class CalendarConvertor
 		if (isset($message->sensitivity))
 			$event->privacy = self::$privacyMap[$message->sensitivity];
 
-		$principal = \go\core\model\Principal::currentUser();
+		$principal = Principal::currentUser();
 
 		if (isset($message->attendees)) {
 			if($event->isNew() && ($message->busystatus == 1 || $message->busystatus == 2)) {  // busy or tentative (iPhone sends busy status for tentative)
 				$organizer = $event->generatedOrganizer($principal);
-				if(!empty($message->organizeremail) && go\core\mail\Util::validateEmail($message->organizeremail)) $organizer->email = $message->organizeremail;
+				if(!empty($message->organizeremail) && Util::validateEmail($message->organizeremail)) $organizer->email = $message->organizeremail;
 				if(!empty($message->organizername)) $organizer->name = $message->organizername;
 			}
 			foreach ($message->attendees as $attendee) {
 				$key = $attendee->email;
-				if(!go\core\mail\Util::validateEmail($key))
+				if(!Util::validateEmail($key))
 					continue; // do not att attendee if client does not send a valid email address (TBSync uses login name)
-				$principalId = \go\core\model\Principal::find()->selectSingleValue('id')->where('email','=',$key)->orderBy(['entityTypeId'=>'ASC'])->single();
+				$principalId = Principal::find()->selectSingleValue('id')->where('email','=',$key)->orderBy(['entityTypeId'=>'ASC'])->single();
 				if(!isset($event->participants[$principalId ?? $key])) {
 					$p = new Participant($event);
 					$p->email = $attendee->email;
@@ -298,12 +300,14 @@ class CalendarConvertor
 			$event->recurrenceOverrides = []; // empty first to delete what is not present
 			foreach ($message->exceptions as $v) {
 				$rDT = new DateTime('@'.$v->exceptionstarttime, new \DateTimeZone('etc/UTC'));
-				if($event->timeZone) $rDT->setTimezone($event->timeZone());
+				if($event->timeZone && !$event->showWithoutTime) {
+					$rDT->setTimezone($event->timeZone());
+				}
 				$recurrenceId = $rDT->format('Y-m-d\TH:i:s');
 				if(!isset($event->recurrenceOverrides[$recurrenceId])) {
 					$event->recurrenceOverrides[$recurrenceId] = (new RecurrenceOverride($event));
 				}
-				$event->recurrenceOverrides[$recurrenceId]->setValues(self::toOverride($v));
+				$event->recurrenceOverrides[$recurrenceId]->setValues(self::toOverride($v, $event));
 			}
 		}
 
@@ -314,18 +318,16 @@ class CalendarConvertor
 			])];
 		}
 
-//		$event->exceptions()->callOnEach('delete');
-//		$event->exceptionEvents()->callOnEach('delete');
-
 		return $event;
 	}
 
-	private static function tzid() {
+	private static function tzid(): string
+	{
 		return go()->getAuthState()->getUser(['timezone'])->timezone;
 	}
 
 	static private function toRecurrenceRule(SyncRecurrence $recur) {
-		static $recurType = [0=>'daily',1=>'weekly',2=>'monthy',3=>'montly',4=>'yearly',5=>'yearly'];
+		static $recurType = [0=>'daily',1=>'weekly',2=>'monthly',3=>'monthly',4=>'yearly',5=>'yearly'];
 		$r = (object)['frequency'=>$recurType[$recur->type]];
 		if(!empty($recur->interval) && $recur->interval !== '1') // 1 = default
 			$r->interval = (int)$recur->interval;
@@ -358,7 +360,8 @@ class CalendarConvertor
 	 * @param $values
 	 * @return array
 	 */
-	private static function toOverride(SyncAppointmentException $values) {
+	private static function toOverride(SyncAppointmentException $values, CalendarEvent $event): array
+	{
 		if($values->deleted)
 			return ['excluded' => true];
 		$ex = new \stdClass;
@@ -381,10 +384,10 @@ class CalendarConvertor
 		if (isset($values->sensitivity))
 			$ex->privacy = self::$privacyMap[$values->sensitivity];
 		if(isset($ex->start)) {
-			$ex->start->setTimezone(new DateTimeZone(self::tzid()));
-			$ex->start = $ex->start->format('Y-m-d\TH:i:s');
+			$ex->start->setTimezone($event->timeZone());
+			$ex->start = $ex->start->format($event->showWithoutTime ? 'Y-m-d' : 'Y-m-d\TH:i:s');
 		}
-		return (array)$ex;
+		return (array) $ex;
 	}
 
 }
