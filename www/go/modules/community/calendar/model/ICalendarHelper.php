@@ -328,7 +328,7 @@ class ICalendarHelper {
 				}
 				// datetime to text
 				if(!empty($props->start)) {
-					$props->start = $props->start->format('Y-m-d\TH:i:s');
+					$props->start = $props->start->format($event->showWithoutTime ? 'Y-m-d' : 'Y-m-d\TH:i:s');
 				}
 				$baseEvents[$uid]->recurrenceOverrides[$recurrenceId] = (new RecurrenceOverride($event))->setValues((array)$props);
 			} else {
