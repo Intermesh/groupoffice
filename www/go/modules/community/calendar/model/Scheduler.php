@@ -58,8 +58,8 @@ class Scheduler {
 			'METHOD'=>'REPLY'
 		]));
 
-		$attachment = Attachment::fromString($ics->serialize(),'reply.ics', 'text/calendar;method=REPLY;charset=utf-8',Attachment::ENCODING_8BIT)
-			->setInline(true);
+		$attachment = Attachment::fromString($ics->serialize(),'reply.ics', 'text/calendar;method=REPLY;charset=utf-8',Attachment::ENCODING_8BIT);
+			//->setInline(true);
 		$subject = go()->t('Reply').': '.$event->title;
 		$lang = go()->t('replyImipBody', 'community', 'calendar');
 
@@ -134,7 +134,7 @@ class Scheduler {
 						->attach(Attachment::fromString($ics->serialize(),
 							'invite.ics',
 							'text/calendar;method=' . $method . ';charset=utf-8', Attachment::ENCODING_8BIT)
-							->setInline(true)
+							//->setInline(true)
 						)
 						->setBody(self::mailBody($event, $method, $participant, $subject), 'text/html')
 						->send() && $success;
