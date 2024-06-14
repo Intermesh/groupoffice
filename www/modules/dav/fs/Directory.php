@@ -56,7 +56,7 @@ class Directory extends \Sabre\DAV\FS\Directory{
 	 *
 	 * data is a readable stream resource
 	 *
-	 * @param StringHelper $name Name of the file
+	 * @param string $name Name of the file
 	 * @param resource $data Initial payload
 	 * @return void
 	 */
@@ -94,7 +94,7 @@ class Directory extends \Sabre\DAV\FS\Directory{
 	/**
 	 * Renames the node
 	 *
-	 * @param StringHelper $name The new name
+	 * @param string $name The new name
 	 * @return void
 	 */
 	public function setName($name) {
@@ -118,7 +118,7 @@ class Directory extends \Sabre\DAV\FS\Directory{
 	/**
 	 * Moves the node
 	 *
-	 * @param StringHelper $name The new name
+	 * @param string $name The new name
 	 * @return void
 	 */
 	public function move($newPath) {
@@ -153,7 +153,7 @@ class Directory extends \Sabre\DAV\FS\Directory{
 	/**
 	 * Creates a new subdirectory
 	 *
-	 * @param StringHelper $name
+	 * @param string $name
 	 * @return void
 	 */
 	public function createDirectory($name) {
@@ -171,7 +171,7 @@ class Directory extends \Sabre\DAV\FS\Directory{
 	/**
 	 * Returns a specific child node, referenced by its name
 	 *
-	 * @param StringHelper $name
+	 * @param string $name
 	 * @throws Sabre\DAV\Exception\NotFound
 	 * @return Sabre\DAV\INode
 	 */
@@ -195,7 +195,7 @@ class Directory extends \Sabre\DAV\FS\Directory{
 	 *
 	 * It is generally a good idea to try and override this. Usually it can be optimized.
 	 *
-	 * @param StringHelper $name
+	 * @param string $name
 	 * @return bool
 	 */
 	public function childExists($name) {

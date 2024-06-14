@@ -186,7 +186,7 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 	 * 
 	 * 
 	 * @var StringHelper $field
-	 * @return StringHelper The regular expression
+	 * @return string The regular expression
 	 */
 	private function _getValidationRegex($field){
 		$regex = '/';
@@ -249,7 +249,7 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
    * +------------------------- min (0 - 59)
 	 *	
 	 * 
-	 * @return StringHelper The complete expression 
+	 * @return string The complete expression 
 	 */
 	public function _buildExpression(){
 		$expression = '';

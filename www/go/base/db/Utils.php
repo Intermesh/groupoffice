@@ -32,7 +32,7 @@ class Utils{
 	/**
 	 * Check if a database exists
 	 * 
-	 * @param StringHelper $tableName
+	 * @param string $tableName
 	 * @return boolean 
 	 */
 	public static function databaseExists($databaseName){
@@ -49,7 +49,7 @@ class Utils{
 	/**
 	 * Check if a table exists in the Group-Office database.
 	 * 
-	 * @param StringHelper $tableName
+	 * @param string $tableName
 	 * @return boolean 
 	 */
 	public static function tableExists($tableName){

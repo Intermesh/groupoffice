@@ -304,7 +304,7 @@ class Module extends Observable {
 	/**
 	 * Find the module manager class by id.
 	 * 
-	 * @param StringHelper $name eg. "addressbook"
+	 * @param string $name eg. "addressbook"
 	 * @return \Module|boolean 
 	 */
 	public static function findByModuleName($name){
@@ -678,7 +678,7 @@ class Module extends Observable {
 	/**
 	 * Find all classes in a folder.
 	 * 
-	 * @param StringHelper $subfolder
+	 * @param string $subfolder
 	 * @return \ReflectionClass array
 	 */
 	public function findClasses($subfolder){

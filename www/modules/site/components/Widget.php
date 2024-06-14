@@ -47,7 +47,7 @@ abstract class Widget extends \GO\Base\Model {
 	/**
 	 * Returns the ID of the widget or generates a new one if requested.
 	 * @param boolean $autoGenerate whether to generate an ID if it is not set previously
-	 * @return StringHelper id of the widget.
+	 * @return string id of the widget.
 	 */
 	public function getId()
 	{
@@ -58,7 +58,7 @@ abstract class Widget extends \GO\Base\Model {
 	
 	/**
 	 * Sets the ID of the widget.
-	 * @param StringHelper $value id of the widget.
+	 * @param string $value id of the widget.
 	 */
 	public function setId($value)
 	{
@@ -68,7 +68,7 @@ abstract class Widget extends \GO\Base\Model {
 	/**
 	 * PHP magic method that returns the string representation of this object.
 	 * __toString cannot throw exception use trigger_error to bypass this limitation
-	 * @return StringHelper the string representation of this object.
+	 * @return string the string representation of this object.
 	 */
 	public function __toString() {
 		try {

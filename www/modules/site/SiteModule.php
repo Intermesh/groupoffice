@@ -25,7 +25,7 @@ class SiteModule extends \GO\Base\Module{
 	/**
 	 * Extract a treenode ID to an array
 	 * 
-	 * @param StringHelper $nodeId Examples "1_content_2" or "1_menu_4" or "1_content"
+	 * @param string $nodeId Examples "1_content_2" or "1_menu_4" or "1_content"
 	 * @return mixed array/false
 	 */
 	public static function extractTreeNode($nodeId){

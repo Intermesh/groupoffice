@@ -85,13 +85,13 @@ class ImapMessage extends ComposerMessage {
 	 * Find's messages in a given mailbox
 	 * 
 	 * @param Account $account
-	 * @param StringHelper $mailbox
+	 * @param string $mailbox
 	 * @param int $start
 	 * @param int $limit
 	 * @param sring $sortField See constants in \GO\Base\Mail\Imap::SORT_*
 	 * @param boolean $descending Sort descending
-	 * @param StringHelper $query
-	 * @param StringHelper $searchIn In what folder(s) are we searching ('current', 'all', 'recursive')
+	 * @param string $query
+	 * @param string $searchIn In what folder(s) are we searching ('current', 'all', 'recursive')
 	 * @return array
 	 */
 	public function find(Account $account, $mailbox="INBOX", $start=0, $limit=50, $sortField=\GO\Base\Mail\Imap::SORT_DATE , $descending=true, $query='ALL', $searchIn='current'){
@@ -148,7 +148,7 @@ class ImapMessage extends ComposerMessage {
 	 *
 	 * @param \GO\Email\Model\ImapMessage $imapMessage
 	 * @param type $params
-	 * @param StringHelper $response
+	 * @param string $response
 	 */
 	public function autoLink()
 	{
@@ -220,7 +220,7 @@ class ImapMessage extends ComposerMessage {
 	/**
 	 * Get an unique messageID
 	 * 
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getUniqueID(){
 		if(empty($this->message_id)){
@@ -313,7 +313,7 @@ class ImapMessage extends ComposerMessage {
 	/**
 	 * Save the message source to a file.
 	 * 
-	 * @param StringHelper $path
+	 * @param string $path
 	 * @return boolean 
 	 */
 	public function saveToFile($path) {

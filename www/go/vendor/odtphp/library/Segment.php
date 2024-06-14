@@ -29,8 +29,8 @@ class Segment implements IteratorAggregate, Countable
     /**
      * Constructor
      *
-     * @param StringHelper $name name of the segment to construct
-     * @param StringHelper $xml XML tree of the segment
+     * @param string $name name of the segment to construct
+     * @param string $xml XML tree of the segment
      */
     public function __construct($name, $xml, $odf)
     {
@@ -44,7 +44,7 @@ class Segment implements IteratorAggregate, Countable
     /**
      * Returns the name of the segment
      *
-     * @return StringHelper
+     * @return string
      */
     public function getName()
     {
@@ -85,7 +85,7 @@ class Segment implements IteratorAggregate, Countable
      * Replace variables of the template in the XML code
      * All the children are also called
      *
-     * @return StringHelper
+     * @return string
      */
     public function merge()
     {
@@ -176,7 +176,7 @@ class Segment implements IteratorAggregate, Countable
     /**
      * Analyse the XML code in order to find children
      *
-     * @param StringHelper $xml
+     * @param string $xml
      * @return Segment
      */
     protected function _analyseChildren($xml)
@@ -196,8 +196,8 @@ class Segment implements IteratorAggregate, Countable
     /**
      * Assign a template variable to replace
      *
-     * @param StringHelper $key
-     * @param StringHelper $value
+     * @param string $key
+     * @param string $value
      * @throws SegmentException
      * @return Segment
      */
@@ -215,8 +215,8 @@ class Segment implements IteratorAggregate, Countable
     /**
      * Assign a template variable as a picture
      *
-     * @param StringHelper $key name of the variable within the template
-     * @param StringHelper $value path to the picture
+     * @param string $key name of the variable within the template
+     * @param string $value path to the picture
      * @throws OdfException
      * @return Segment
      */
@@ -241,7 +241,7 @@ IMG;
     /**
      * Shortcut to retrieve a child
      *
-     * @param StringHelper $prop
+     * @param string $prop
      * @return Segment
      * @throws SegmentException
      */
@@ -256,7 +256,7 @@ IMG;
     /**
      * Proxy for setVars
      *
-     * @param StringHelper $meth
+     * @param string $meth
      * @param array $args
      * @return Segment
      */
@@ -271,7 +271,7 @@ IMG;
     /**
      * Returns the parsed XML
      *
-     * @return StringHelper
+     * @return string
      */
     public function getXmlParsed()
     {

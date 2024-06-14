@@ -7,7 +7,7 @@ interface FilehandlerInterface{
 	//public function supportedExtensions();
 	
 	/**
-	 * @return StringHelper Name of the handler
+	 * @return string Name of the handler
 	 */
 	public function getName();
 	
@@ -31,7 +31,7 @@ interface FilehandlerInterface{
 	 * Return javascript that will be eval'd by the view to open a file.
 	 * 
 	 * @param \GO\Files\Model\File $file
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getHandler(\GO\Files\Model\File $file);
 }

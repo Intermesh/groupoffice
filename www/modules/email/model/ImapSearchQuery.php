@@ -163,12 +163,12 @@ class ImapSearchQuery {
 	 *	UNKEYWORD : ImapSearchQuery::UNKEYWORD
 	 *	SUBJECT		: ImapSearchQuery::SUBJECT		*default value
 	 *  
-	 * @param StringHelper $word
-	 * @param StringHelper $section
+	 * @param string $word
+	 * @param string $section
 	 * @param boolean $useAnd TODO: THIS WILL PROBABLY NOT WORK CORRECTLY YET
 	 * @return null
 	 */
-	public function addSearchWord($word, $section=self::ALL, $useAnd=false){
+	public function addSearchWord($word, $section="", $useAnd=false){
 		if(empty($word))
 			return;
 		
@@ -345,8 +345,8 @@ class ImapSearchQuery {
 	 * Create a part of the query
 	 * 
 	 * @param array $searchwords
-	 * @param StringHelper $section
-	 * @return StringHelper
+	 * @param string $section
+	 * @return string
 	 */
 	private function _prepareQueryPart($searchwords,$section){
 		
@@ -365,7 +365,7 @@ class ImapSearchQuery {
 	/**
 	 * Get the full query for the IMAP server command
 	 * 
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getImapSearchQuery(){
 

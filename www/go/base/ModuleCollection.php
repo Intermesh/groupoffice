@@ -98,7 +98,7 @@ class ModuleCollection extends Model\ModelCollection{
 	/**
 	 * Check if a module is available
 	 * 
-	 * @param StringHelper $moduleId
+	 * @param string $moduleId
 	 * @param boolean Check the module manager class isAvailable function too. (Used in pro modules to check license for example).
 	 * @return boolean
 	 */
@@ -138,7 +138,7 @@ class ModuleCollection extends Model\ModelCollection{
 	 * Call a method of a module class. eg. \GO\Notes\NotesModule::firstRun
 	 * 
 	 * @deprecated Preferrably use events with listeners because it has better performance
-	 * @param StringHelper $method
+	 * @param string $method
 	 * @param array $params 
 	 */
 	public function callModuleMethod($method, $params=array(), $ignoreAclPermissions=true){
@@ -256,7 +256,7 @@ class ModuleCollection extends Model\ModelCollection{
 	 * 
 	 * For example findClassses("model") finds all models.
 	 * 
-	 * @param StringHelper $subfolder
+	 * @param string $subfolder
 	 * @return ReflectionClass array
 	 */
 	public function findClasses($subfolder){

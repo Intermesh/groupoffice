@@ -197,16 +197,16 @@ class Net_Sieve
      * generated error in $this->_error, which can be retrieved using the
      * getError() method.
      *
-     * @param StringHelper  $user       Login username.
-     * @param StringHelper  $pass       Login password.
-     * @param StringHelper  $host       Hostname of server.
-     * @param StringHelper  $port       Port of server.
-     * @param StringHelper  $logintype  Type of login to perform (see
+     * @param string  $user       Login username.
+     * @param string  $pass       Login password.
+     * @param string  $host       Hostname of server.
+     * @param string  $port       Port of server.
+     * @param string  $logintype  Type of login to perform (see
      *                            $supportedAuthMethods).
-     * @param StringHelper  $euser      Effective user. If authenticating as an
+     * @param string  $euser      Effective user. If authenticating as an
      *                            administrator, login as this user.
      * @param boolean $debug      Whether to enable debugging (@see setDebug()).
-     * @param StringHelper  $bypassAuth Skip the authentication phase. Useful if the
+     * @param string  $bypassAuth Skip the authentication phase. Useful if the
      *                            socket is already open.
      * @param boolean $useTLS     Use TLS if available.
      * @param array   $options    Additional options for
@@ -262,7 +262,7 @@ class Net_Sieve
      * Sets the debug state and handler function.
      *
      * @param boolean $debug   Whether to enable debugging.
-     * @param StringHelper  $handler A custom debug handler. Must be a valid callback.
+     * @param string  $handler A custom debug handler. Must be a valid callback.
      *
      * @return void
      */
@@ -293,8 +293,8 @@ class Net_Sieve
     /**
      * Handles connecting to the server and checks the response validity.
      *
-     * @param StringHelper  $host    Hostname of server.
-     * @param StringHelper  $port    Port of server.
+     * @param string  $host    Hostname of server.
+     * @param string  $port    Port of server.
      * @param array   $options List of options to pass to
      *                         stream_context_create().
      * @param boolean $useTLS  Use TLS if available.
@@ -364,10 +364,10 @@ class Net_Sieve
     /**
      * Logs into server.
      *
-     * @param StringHelper  $user       Login username.
-     * @param StringHelper  $pass       Login password.
-     * @param StringHelper  $logintype  Type of login method to use.
-     * @param StringHelper  $euser      Effective UID (perform on behalf of $euser).
+     * @param string  $user       Login username.
+     * @param string  $pass       Login password.
+     * @param string  $logintype  Type of login method to use.
+     * @param string  $euser      Effective UID (perform on behalf of $euser).
      * @param boolean $bypassAuth Do not perform authentication.
      *
      * @return boolean  True on success, PEAR_Error otherwise.
@@ -412,7 +412,7 @@ class Net_Sieve
     /**
      * Returns the active script.
      *
-     * @return StringHelper  The active scriptname.
+     * @return string  The active scriptname.
      */
     function getActive()
     {
@@ -428,7 +428,7 @@ class Net_Sieve
     /**
      * Sets the active script.
      *
-     * @param StringHelper $scriptname The name of the script to be set as active.
+     * @param string $scriptname The name of the script to be set as active.
      *
      * @return boolean  True on success, PEAR_Error on failure.
      */
@@ -440,9 +440,9 @@ class Net_Sieve
     /**
      * Retrieves a script.
      *
-     * @param StringHelper $scriptname The name of the script to be retrieved.
+     * @param string $scriptname The name of the script to be retrieved.
      *
-     * @return StringHelper  The script on success, PEAR_Error on failure.
+     * @return string  The script on success, PEAR_Error on failure.
     */
     function getScript($scriptname)
     {
@@ -452,8 +452,8 @@ class Net_Sieve
     /**
      * Adds a script to the server.
      *
-     * @param StringHelper  $scriptname Name of the script.
-     * @param StringHelper  $script     The script content.
+     * @param string  $scriptname Name of the script.
+     * @param string  $script     The script content.
      * @param boolean $makeactive Whether to make this the active script.
      *
      * @return boolean  True on success, PEAR_Error on failure.
@@ -472,7 +472,7 @@ class Net_Sieve
     /**
      * Removes a script from the server.
      *
-     * @param StringHelper $scriptname Name of the script.
+     * @param string $scriptname Name of the script.
      *
      * @return boolean  True on success, PEAR_Error on failure.
      */
@@ -484,7 +484,7 @@ class Net_Sieve
     /**
      * Checks if the server has space to store the script by the server.
      *
-     * @param StringHelper  $scriptname The name of the script to mark as active.
+     * @param string  $scriptname The name of the script to mark as active.
      * @param integer $size       The size of the script.
      *
      * @return boolean|PEAR_Error  True if there is space, PEAR_Error otherwise.
@@ -519,7 +519,7 @@ class Net_Sieve
     /**
      * Returns whether the server supports an extension.
      *
-     * @param StringHelper $extension The extension to check.
+     * @param string $extension The extension to check.
      *
      * @return boolean  Whether the extension is supported or PEAR_Error on
      *                  failure.
@@ -558,7 +558,7 @@ class Net_Sieve
     /**
      * Returns whether the server supports an authentication method.
      *
-     * @param StringHelper $method The method to check.
+     * @param string $method The method to check.
      *
      * @return boolean  Whether the method is supported or PEAR_Error on
      *                  failure.
@@ -584,11 +584,11 @@ class Net_Sieve
     /**
      * Handles the authentication using any known method.
      *
-     * @param StringHelper $uid        The userid to authenticate as.
-     * @param StringHelper $pwd        The password to authenticate with.
-     * @param StringHelper $userMethod The method to use. If empty, the class chooses
+     * @param string $uid        The userid to authenticate as.
+     * @param string $pwd        The password to authenticate with.
+     * @param string $userMethod The method to use. If empty, the class chooses
      *                           the best (strongest) available method.
-     * @param StringHelper $euser      The effective uid to authenticate as.
+     * @param string $euser      The effective uid to authenticate as.
      *
      * @return void
      */
@@ -636,9 +636,9 @@ class Net_Sieve
     /**
      * Authenticates the user using the PLAIN method.
      *
-     * @param StringHelper $user  The userid to authenticate as.
-     * @param StringHelper $pass  The password to authenticate with.
-     * @param StringHelper $euser The effective uid to authenticate as.
+     * @param string $user  The userid to authenticate as.
+     * @param string $pass  The password to authenticate with.
+     * @param string $euser The effective uid to authenticate as.
      *
      * @return void
      */
@@ -655,9 +655,9 @@ class Net_Sieve
     /**
      * Authenticates the user using the LOGIN method.
      *
-     * @param StringHelper $user  The userid to authenticate as.
-     * @param StringHelper $pass  The password to authenticate with.
-     * @param StringHelper $euser The effective uid to authenticate as.
+     * @param string $user  The userid to authenticate as.
+     * @param string $pass  The password to authenticate with.
+     * @param string $euser The effective uid to authenticate as.
      *
      * @return void
      */
@@ -675,9 +675,9 @@ class Net_Sieve
     /**
      * Authenticates the user using the CRAM-MD5 method.
      *
-     * @param StringHelper $user  The userid to authenticate as.
-     * @param StringHelper $pass  The password to authenticate with.
-     * @param StringHelper $euser The effective uid to authenticate as.
+     * @param string $user  The userid to authenticate as.
+     * @param string $pass  The password to authenticate with.
+     * @param string $euser The effective uid to authenticate as.
      *
      * @return void
      */
@@ -699,9 +699,9 @@ class Net_Sieve
     /**
      * Authenticates the user using the DIGEST-MD5 method.
      *
-     * @param StringHelper $user  The userid to authenticate as.
-     * @param StringHelper $pass  The password to authenticate with.
-     * @param StringHelper $euser The effective uid to authenticate as.
+     * @param string $user  The userid to authenticate as.
+     * @param string $pass  The password to authenticate with.
+     * @param string $euser The effective uid to authenticate as.
      *
      * @return void
      */
@@ -740,9 +740,9 @@ class Net_Sieve
     /**
      * Authenticates the user using the EXTERNAL method.
      *
-     * @param StringHelper $user  The userid to authenticate as.
-     * @param StringHelper $pass  The password to authenticate with.
-     * @param StringHelper $euser The effective uid to authenticate as.
+     * @param string $user  The userid to authenticate as.
+     * @param string $pass  The password to authenticate with.
+     * @param string $euser The effective uid to authenticate as.
      *
      * @return void
      *
@@ -760,7 +760,7 @@ class Net_Sieve
     /**
      * Removes a script from the server.
      *
-     * @param StringHelper $scriptname Name of the script to delete.
+     * @param string $scriptname Name of the script to delete.
      *
      * @return boolean  True on success, PEAR_Error otherwise.
      */
@@ -779,9 +779,9 @@ class Net_Sieve
     /**
      * Retrieves the contents of the named script.
      *
-     * @param StringHelper $scriptname Name of the script to retrieve.
+     * @param string $scriptname Name of the script to retrieve.
      *
-     * @return StringHelper  The script if successful, PEAR_Error otherwise.
+     * @return string  The script if successful, PEAR_Error otherwise.
      */
     function _cmdGetScript($scriptname)
     {
@@ -800,7 +800,7 @@ class Net_Sieve
      * Sets the active script, i.e. the one that gets run on new mail by the
      * server.
      *
-     * @param StringHelper $scriptname The name of the script to mark as active.
+     * @param string $scriptname The name of the script to mark as active.
      *
      * @return boolean  True on success, PEAR_Error otherwise.
     */
@@ -854,8 +854,8 @@ class Net_Sieve
     /**
      * Adds a script to the server.
      *
-     * @param StringHelper $scriptname Name of the new script.
-     * @param StringHelper $scriptdata The new script.
+     * @param string $scriptname Name of the new script.
+     * @param string $scriptdata The new script.
      *
      * @return boolean  True on success, PEAR_Error otherwise.
      */
@@ -924,7 +924,7 @@ class Net_Sieve
      * Parses the response from the CAPABILITY command and stores the result
      * in $_capability.
      *
-     * @param StringHelper $data The response from the capability command.
+     * @param string $data The response from the capability command.
      *
      * @return void
      */
@@ -963,7 +963,7 @@ class Net_Sieve
     /**
      * Sends a command to the server
      *
-     * @param StringHelper $cmd The command to send.
+     * @param string $cmd The command to send.
      *
      * @return void
      */
@@ -984,7 +984,7 @@ class Net_Sieve
     /**
      * Sends a string response to the server.
      *
-     * @param StringHelper $str The string to send.
+     * @param string $str The string to send.
      *
      * @return void
      */
@@ -996,7 +996,7 @@ class Net_Sieve
     /**
      * Receives a single line from the server.
      *
-     * @return StringHelper  The server response line.
+     * @return string  The server response line.
      */
     function _recvLn()
     {
@@ -1021,7 +1021,7 @@ class Net_Sieve
      *
      * @param integer $length  Number of bytes to read.
      *
-     * @return StringHelper  The server response.
+     * @return string  The server response.
      */
     function _recvBytes($length)
     {
@@ -1038,10 +1038,10 @@ class Net_Sieve
     /**
      * Send a command and retrieves a response from the server.
      *
-     * @param StringHelper $cmd   The command to send.
+     * @param string $cmd   The command to send.
      * @param boolean $auth Whether this is an authentication command.
      *
-     * @return StringHelper|PEAR_Error  Reponse string if an OK response, PEAR_Error
+     * @return string|PEAR_Error  Reponse string if an OK response, PEAR_Error
      *                            if a NO response.
      */
     function _doCmd($cmd = '', $auth = false)
@@ -1138,9 +1138,9 @@ class Net_Sieve
      * Returns the name of the best authentication method that the server
      * has advertised.
      *
-     * @param StringHelper $userMethod Only consider this method as available.
+     * @param string $userMethod Only consider this method as available.
      *
-     * @return StringHelper  The name of the best supported authentication method or
+     * @return string  The name of the best supported authentication method or
      *                 a PEAR_Error object on failure.
      */
     function _getBestAuthMethod($userMethod = null)
@@ -1226,7 +1226,7 @@ class Net_Sieve
     /**
      * Returns the length of a string.
      *
-     * @param StringHelper $string A string.
+     * @param string $string A string.
      *
      * @return integer  The length of the string.
      */
@@ -1242,9 +1242,9 @@ class Net_Sieve
     /**
      * Locale independant strtoupper() implementation.
      *
-     * @param StringHelper $string The string to convert to lowercase.
+     * @param string $string The string to convert to lowercase.
      *
-     * @return StringHelper  The lowercased string, based on ASCII encoding.
+     * @return string  The lowercased string, based on ASCII encoding.
      */
     function _toUpper($string)
     {
@@ -1258,9 +1258,9 @@ class Net_Sieve
     /**
      * Converts strings into RFC's quoted-string or literal-c2s form.
      *
-     * @param StringHelper $string  The string to convert.
+     * @param string $string  The string to convert.
      *
-     * @return StringHelper  Result string.
+     * @return string  Result string.
      */
     function _escape($string)
     {

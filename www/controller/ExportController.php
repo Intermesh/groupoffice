@@ -44,12 +44,12 @@ class ExportController extends AbstractController {
 	
 	/**
 	 * 
-	 * @param StringHelper $class_name
-	 * @param StringHelper $export_columns
+	 * @param string $class_name
+	 * @param string $export_columns
 	 * @param boolean $include_column_names
-	 * @param StringHelper $orientation
+	 * @param string $orientation
 	 * @param boolean $use_db_column_names
-	 * @param StringHelper $view
+	 * @param string $view
 	 * @param int $id
 	 * @throws Exception
 	 */

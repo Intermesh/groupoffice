@@ -55,8 +55,8 @@ abstract class MultilingualActiveRecord extends ActiveRecord {
 	 * Get the value of the attribute in the default language 
 	 * (First language in the table)
 	 * 
-	 * @param StringHelper $attr
-	 * @return StringHelper The attribute value 
+	 * @param string $attr
+	 * @return string The attribute value 
 	 */
 	public function getDefaultLanguageAttribute($attr) {
 		$relationName = $this->languageRelationName;
@@ -101,7 +101,7 @@ abstract class MultilingualActiveRecord extends ActiveRecord {
 	/**
 	 * Extracts the attribute to attribute name and language id
 	 * 
-	 * @param StringHelper $name The attribute to extract (like: name_1 or description_1)
+	 * @param string $name The attribute to extract (like: name_1 or description_1)
 	 * @return array $attr The array with the extracted attributes 
 	 */
 	private function _extractMultilingualAttribute($name){
@@ -134,7 +134,7 @@ abstract class MultilingualActiveRecord extends ActiveRecord {
 	/**
 	 * Check if an attribute is a multilangualattribute or not.
 	 * 
-	 * @param StringHelper $name
+	 * @param string $name
 	 * @return boolean 
 	 */
 	private function _isMultilingualAttribute($name){
@@ -149,7 +149,7 @@ abstract class MultilingualActiveRecord extends ActiveRecord {
 	/**
 	 * PHP getter magic method.
 	 * This method is overridden so that AR attributes can be accessed like properties.
-	 * @param StringHelper $name property name
+	 * @param string $name property name
 	 * @return mixed property value
 	 * @see getAttribute
 	 */
@@ -165,7 +165,7 @@ abstract class MultilingualActiveRecord extends ActiveRecord {
 	/**
 	 * Sets the named attribute value.
 	 * You may also use $this->AttributeName to set the attribute value.
-	 * @param StringHelper $name the attribute name
+	 * @param string $name the attribute name
 	 * @param mixed $value the attribute value.
 	 * @return boolean whether the attribute exists and the assignment is conducted successfully
 	 * @see hasAttribute
@@ -199,7 +199,7 @@ abstract class MultilingualActiveRecord extends ActiveRecord {
 	/**
 	 * Returns all column attribute values.
 	 * Note, related objects are not returned.
-	 * @param StringHelper $outputType Can be 
+	 * @param string $outputType Can be 
 	 * 
 	 * raw: return values as they are stored in the db
 	 * formatted: return the values formatted for an input form

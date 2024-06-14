@@ -89,7 +89,7 @@ class DateTime extends \DateTime {
 	/**
 	 * Format the DateTime object in a \GO::user respected date format
 	 * @param DateTimeZone $timezone
-	 * @return StringHelper The formatted time
+	 * @return string The formatted time
 	 */
 	public function formatDate() {
 	  $dateFormat = \GO::user() ? \GO::user()->completeDateFormat : \GO::config()->getCompleteDateFormat();
@@ -244,7 +244,7 @@ class DateTime extends \DateTime {
 	 * Convert a diff array to a readable string
 	 * 
 	 * @param array $diff
-	 * @return StringHelper
+	 * @return string
 	 */
 	public static function diffToString($diff) {
 		$string = '';

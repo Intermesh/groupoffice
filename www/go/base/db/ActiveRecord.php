@@ -299,7 +299,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * The name of the column that has the foreignkey the the ACL record
 	 * If column 'acl_id' exists it default to this
 	 * You can use field of a relation separated by a dot (eg: 'category.acl_id')
-	 * @return StringHelper ACL to check for permissions.
+	 * @return string ACL to check for permissions.
 	 */
 	public function aclField(){
 		return false; //return isset($this->columns['acl_id']) ? 'acl_id' : false;
@@ -957,7 +957,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * total on each pagination page when limit 0,n is used.
 	 *
 	 * @param array $params
-	 * @return StringHelper
+	 * @return string
 	 */
 	private function _getFindQueryUid($params){
 		//create unique query id
@@ -1107,7 +1107,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 *
 	 * @param boolean $single
 	 * @param string $tableAlias
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getDefaultFindSelectFields($single=false, $tableAlias='t'){
 
@@ -2815,7 +2815,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * Useful in combination with \GO\Base\Controller\AbstractModelController::actionSubmitMultiple().
 	 * Drag and drop actions will save the sort order in that action.
 	 *
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getSortOrderColumn(){
 		return false;
@@ -2945,7 +2945,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * Get the URL to download a file column
 	 *
 	 * @param string $column
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getFileColumnUrl($column){
 
@@ -3242,7 +3242,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	/**
 	 * Get the message for the log module. Returns the contents of the first text column by default.
 	 *
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getLogMessage($action){
 

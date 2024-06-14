@@ -406,8 +406,8 @@ class RecurrencePattern{
 	 * 
 	 * @param int $startTime Unixtime of start time
 	 * @param int $interval Number of days, months or years
-	 * @param StringHelper $type days=days, m=months, y= years 
-	 * @param StringHelper ceil or floor the difference.  For weekly we need to floor it because the time can fall in the week where a recurrence may take place in. 
+	 * @param string $type days=days, m=months, y= years 
+	 * @param string ceil or floor the difference.  For weekly we need to floor it because the time can fall in the week where a recurrence may take place in. 
 	 * @return int Number of periods that fall between event start and start time
 	 */
 	protected function _findNumberOfDays($startTime, $interval=1, $ceil=true){

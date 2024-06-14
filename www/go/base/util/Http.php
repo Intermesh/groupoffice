@@ -318,7 +318,7 @@ class Http {
 	/**
 	 * Unset a cookie
 	 * 
-	 * @param StringHelper $name 
+	 * @param string $name 
 	 */
 	public static function unsetCookie($name){
 		SetCookie($name,"",time()-3600,\GO::config()->host,"",!empty($_SERVER['HTTPS']),true);
@@ -328,9 +328,9 @@ class Http {
 	/**
 	 * Set a cookie
 	 * 
-	 * @param StringHelper $name
-	 * @param StringHelper $value
-	 * @param StringHelper $expireTime Defaults to one month
+	 * @param string $name
+	 * @param string $value
+	 * @param string $expireTime Defaults to one month
 	 */
 	public static function setCookie($name, $value, $expireTime=2592000){
 		$_COOKIE[$name] = $value;
@@ -350,10 +350,10 @@ class Http {
 	/**
 	 * Add GET parameters to a URL
 	 *
-	 * @param StringHelper $url
+	 * @param string $url
 	 * @param array $params
 	 * @param boolean $htmlspecialchars
-	 * @return StringHelper 
+	 * @return string 
 	 */
 	public static function addParamsToUrl($url,array $params, $htmlspecialchars=true) {
 		$amp = $htmlspecialchars ? '&amp;' : '&';

@@ -514,7 +514,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 * When the password was just modified. You can call this function to get the
 	 * plain text password.
 	 * 
-	 * @return StringHelper 
+	 * @return string
 	 */
 	public function getUnencryptedPassword(){
 		return isset($this->_unencryptedPassword) ? $this->_unencryptedPassword : false;
@@ -700,7 +700,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Get the user's permission level for a given module.
 	 * 
-	 * @param StringHelper $moduleId
+	 * @param string $moduleId
 	 * @return int 
 	 */
 	public function getModulePermissionLevel($moduleId) {
@@ -719,7 +719,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Check if the password is correct for this user.
 	 * 
-	 * @param StringHelper $password
+	 * @param string $password
 	 * @return boolean 
 	 */
 	public function checkPassword($password){
@@ -799,7 +799,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Add the user to user groups.
 	 * 
-	 * @param StringHelper[] $groupNames
+	 * @param string[] $groupNames
 	 * @param boolean $autoCreate 
 	 */
 	public function addToGroups(array $groupNames, $autoCreate=false){		
@@ -862,9 +862,9 @@ class User extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Send an email to the newly registrated user when he just created an account.
 	 * The mail should contain a welcome message and a username and password
-	 * @param StringHelper $view path to a template for the email. If the view is not set or
+	 * @param string $view path to a template for the email. If the view is not set or
 	 * not found the default email body will be loaded from groupoffice
-	 * @param StringHelper $title title of email
+	 * @param string $title title of email
 	 * @param array $_data this array will be explode to the view. if the view template
 	 * is not found it will be ignored
 	 * @return boolean true when email was send
@@ -923,7 +923,7 @@ Password: {password}", "users");
 	 * reset password function. The token will change when the user's password or
 	 * email address changes and when the user logs in.
 	 * 
-	 * @return StringHelper 
+	 * @return string
 	 */
 	public function getSecurityToken(){
 		return md5($this->getAttribute('password').$this->email.$this->ctime.$this->lastlogin);

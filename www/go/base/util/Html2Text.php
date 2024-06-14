@@ -308,7 +308,7 @@ class Html2Text
 	 *  will instantiate with that source propagated, all that has
 	 *  to be done it to call get_text().
 	 *
-	 *  @param StringHelper $source HTML content
+	 *  @param string $source HTML content
 	 *  @param boolean $from_file Indicates $source is a file to pull content from
 	 *  @access public
 	 *  @return void
@@ -322,7 +322,7 @@ class Html2Text
 	/**
 	 *  Loads source HTML into memory, either from $source string or a file.
 	 *
-	 *  @param StringHelper $source HTML content
+	 *  @param string $source HTML content
 	 *  @param boolean $from_file Indicates $source is a file to pull content from
 	 *  @access public
 	 *  @return void
@@ -344,7 +344,7 @@ class Html2Text
 	 *  Returns the text, converted from HTML.
 	 *
 	 *  @access public
-	 *  @return StringHelper
+	 *  @return string
 	 */
 	public function get_text($link_list=true)
 	{
@@ -482,10 +482,10 @@ class Html2Text
 	 *  appeared. Also makes an effort at identifying and handling absolute
 	 *  and relative links.
 	 *
-	 *  @param StringHelper $link URL of the link
-	 *  @param StringHelper $display Part of the text to associate number with
+	 *  @param string $link URL of the link
+	 *  @param string $display Part of the text to associate number with
 	 *  @access private
-	 *  @return StringHelper
+	 *  @return string
 	 */
 	private function _build_link_list( $matches )
 	{

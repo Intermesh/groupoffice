@@ -77,8 +77,8 @@ class Column {
 	/**
 	 * Returns a new instance of a column with the given values
 	 * 
-	 * @param StringHelper $dataindex
-	 * @param StringHelper $label
+	 * @param string $dataindex
+	 * @param string $label
 	 * @param int $sortIndex
 	 * @return Column 
 	 */
@@ -89,8 +89,8 @@ class Column {
 	/**
 	 * Constructor for this class
 	 * 
-	 * @param StringHelper $dataindex
-	 * @param StringHelper $label
+	 * @param string $dataindex
+	 * @param string $label
 	 * @param int $sortIndex 
 	 */
 	public function __construct($dataindex, $label='', $sortIndex=0, $sortAlias=false){
@@ -171,7 +171,7 @@ class Column {
 	/**
 	 * Get the current label for this column
 	 * 
-	 * @return StringHelper 
+	 * @return string 
 	 */
 	public function getLabel(){
 		return $this->_label;
@@ -180,7 +180,7 @@ class Column {
 	/**
 	 * Get the dataindex for this column
 	 * 
-	 * @return StringHelper 
+	 * @return string 
 	 */
 	public function getDataIndex(){
 		return $this->_dataindex;
@@ -190,7 +190,7 @@ class Column {
 	 * TODO: Create this description
 	 * 
 	 * @param type $model
-	 * @return StringHelper 
+	 * @return string 
 	 */
 	public function render($model) {
 

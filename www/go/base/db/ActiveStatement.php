@@ -130,6 +130,7 @@ class ActiveStatement implements \IteratorAggregate {
 
 		//for PHP 8 compat
 		if(!isset($fetch_style) && defined('PDO::FETCH_DEFAULT')) {
+			/** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
 			$fetch_style = PDO::FETCH_DEFAULT;
 		}
 		return $this->stmt->fetch($fetch_style);
@@ -143,6 +144,7 @@ class ActiveStatement implements \IteratorAggregate {
 	public function fetchAll($fetch_style=null){
 		//for PHP 8 compat
 		if(!isset($fetch_style) && defined('PDO::FETCH_DEFAULT')) {
+			/** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
 			$fetch_style = PDO::FETCH_DEFAULT;
 		}
 		return $this->stmt->fetchAll($fetch_style);

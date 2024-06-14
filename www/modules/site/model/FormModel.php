@@ -44,8 +44,8 @@ abstract class FormModel extends \GO\Base\Model {
 	 * This is done by replacing underscores or dashes with blanks and
 	 * changing the first letter of each word to upper case.
 	 * For example, 'department_name' or 'DepartmentName' becomes 'Department Name'.
-	 * @param StringHelper $name the column name
-	 * @return StringHelper the attribute label
+	 * @param string $name the column name
+	 * @return string the attribute label
 	 */
 	public function generateAttributeLabel($name) {
 		return ucwords(trim(strtolower(str_replace(array('-', '_', '.'), ' ', preg_replace('/(?<![A-Z])[A-Z]/', ' \0', $name)))));
@@ -53,8 +53,8 @@ abstract class FormModel extends \GO\Base\Model {
 
 	/**
 	 * Returns the text label for the specified attribute.
-	 * @param StringHelper $attribute the attribute name
-	 * @return StringHelper the attribute label
+	 * @param string $attribute the attribute name
+	 * @return string the attribute label
 	 * @see generateAttributeLabel
 	 * @see attributeLabels
 	 */
@@ -70,7 +70,7 @@ abstract class FormModel extends \GO\Base\Model {
 	 * Returns a value indicating whether the attribute is required.
 	 * This is determined by checking if the attribute is associated with a
 	 * {@link CRequiredValidator} validation rule in the current {@link scenario}.
-	 * @param StringHelper $attribute attribute name
+	 * @param string $attribute attribute name
 	 * @return boolean whether the attribute is required
 	 */
 	public function isAttributeRequired($attribute) {

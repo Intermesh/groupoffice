@@ -9,7 +9,7 @@ class Template{
 	/**
 	 * Get the path to the template folder
 	 * 
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getPath(){		
 		if(empty(\Site::model()->module))
@@ -22,7 +22,7 @@ class Template{
 	 * Get URL to template folder. This is a static alias defined in the apache
 	 * config
 	 * 
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getUrl(){
 		$this->_checkLink();

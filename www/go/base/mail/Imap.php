@@ -332,7 +332,7 @@ class Imap extends ImapBodyStruct
 	 * Check if the IMAP server has a particular capability.
 	 * eg. QUOTA, ACL, LIST-EXTENDED etc.
 	 *
-	 * @param StringHelper $str
+	 * @param string $str
 	 * @return boolean
 	 */
 	public function has_capability($str) :bool
@@ -2277,11 +2277,11 @@ class Imap extends ImapBodyStruct
 	 * Get's a message part and returned in binary form or UTF-8 charset.
 	 *
 	 * @param int $uid
-	 * @param StringHelper $part_no
+	 * @param string $part_no
 	 * @param stirng $encoding
-	 * @param StringHelper $charset
+	 * @param string $charset
 	 * @param boolean $peek
-	 * @return StringHelper
+	 * @return string
 	 */
 
 	public function get_message_part_decoded($uid, $part_no, $encoding, $charset=false, $peek=false, $cutofflength=false, $fp=false) {
@@ -2553,7 +2553,7 @@ class Imap extends ImapBodyStruct
 	/**
 	 * Runs $command multiple times, with $uids split up in chunks of 500 UIDs
 	 * for each run of $command.
-	 * @param StringHelper $command IMAP command
+	 * @param string $command IMAP command
 	 * @param array $uids Array of UIDs
 	 * @param boolean $trackErrors passed as third argument to $this->check_response()
 	 * @return boolean
@@ -2822,7 +2822,7 @@ class Imap extends ImapBodyStruct
 	/**
 	 * Get the next UID for the selected mailbox
 	 *
-	 * @return StringHelper the next UID on the IMAP server
+	 * @return string the next UID on the IMAP server
 	 */
 
 	public function get_uidnext(){
@@ -2850,7 +2850,7 @@ class Imap extends ImapBodyStruct
 	 *
 	 * array('messages'=>2, 'unseen'=>1);
 	 *
-	 * @param StringHelper $mailbox
+	 * @param string $mailbox
 	 * @return array|false
 	 */
 	public function get_status($mailbox)

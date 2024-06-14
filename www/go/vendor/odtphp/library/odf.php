@@ -45,7 +45,7 @@ class Odf {
 	/**
 	 * Class constructor
 	 *
-	 * @param StringHelper $filename the name of the odt file
+	 * @param string $filename the name of the odt file
 	 * @throws OdfException
 	 */
 	public function __construct($filename, $config = array()) {
@@ -95,8 +95,8 @@ class Odf {
 	/**
 	 * Assing a template variable
 	 *
-	 * @param StringHelper $key name of the variable within the template
-	 * @param StringHelper $value replacement value
+	 * @param string $key name of the variable within the template
+	 * @param string $value replacement value
 	 * @param bool $encode if true, special XML characters are encoded
 	 * @throws OdfException
 	 * @return odf
@@ -113,8 +113,8 @@ class Odf {
 	/**
 	 * Assign a template variable as a picture
 	 *
-	 * @param StringHelper $key name of the variable within the template
-	 * @param StringHelper $value path to the picture
+	 * @param string $key name of the variable within the template
+	 * @param string $value path to the picture
 	 * @throws OdfException
 	 * @return odf
 	 */
@@ -284,7 +284,7 @@ IMG;
 	/**
 	 * Display all the current template variables
 	 *
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function printVars() {
 		return print_r('<pre>' . print_r($this->vars, true) . '</pre>', true);
@@ -303,7 +303,7 @@ IMG;
 	/**
 	 * Display loop segments declared with setSegment()
 	 *
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function printDeclaredSegments() {
 		return '<pre>' . print_r(implode(' ', array_keys($this->segments)), true) . '</pre>';
@@ -312,7 +312,7 @@ IMG;
 	/**
 	 * Declare a segment in order to use it in a loop
 	 *
-	 * @param StringHelper $segment
+	 * @param string $segment
 	 * @throws OdfException
 	 * @return Segment
 	 */
@@ -332,7 +332,7 @@ IMG;
 	/**
 	 * Save the odt file on the disk
 	 *
-	 * @param StringHelper $file name of the desired file
+	 * @param string $file name of the desired file
 	 * @throws OdfException
 	 * @return void
 	 */
@@ -372,7 +372,7 @@ IMG;
 	/**
 	 * Export the file as attached file by HTTP
 	 *
-	 * @param StringHelper $name (optionnal)
+	 * @param string $name (optionnal)
 	 * @throws OdfException
 	 * @return void
 	 */
@@ -394,7 +394,7 @@ IMG;
 	/**
 	 * Returns a variable of configuration
 	 *
-	 * @return StringHelper The requested variable of configuration
+	 * @return string The requested variable of configuration
 	 */
 	public function getConfig($configKey) {
 		if (array_key_exists($configKey, $this->config)) {
@@ -406,7 +406,7 @@ IMG;
 	/**
 	 * Returns the temporary working file
 	 *
-	 * @return StringHelper le chemin vers le fichier temporaire de travail
+	 * @return string le chemin vers le fichier temporaire de travail
 	 */
 	public function gettmpfile() {
 		return $this->tmpfile;

@@ -100,7 +100,7 @@ class Net_Socket extends PEAR
      * Connect to the specified port. If called when the socket is
      * already connected, it disconnects and connects again.
      *
-     * @param StringHelper  $addr       IP address or host name.
+     * @param string  $addr       IP address or host name.
      * @param integer $port       TCP port number.
      * @param boolean $persistent (optional) Whether the connection is
      *                            persistent (kept open between requests
@@ -211,7 +211,7 @@ class Net_Socket extends PEAR
     /**
      * Set the newline character/sequence to use.
      *
-     * @param StringHelper $newline  Newline character(s)
+     * @param string $newline  Newline character(s)
      * @return boolean True
      */
     function setNewline($newline)
@@ -364,7 +364,7 @@ class Net_Socket extends PEAR
     /**
      * Write a specified amount of data.
      *
-     * @param StringHelper  $data      Data to write.
+     * @param string  $data      Data to write.
      * @param integer $blocksize Amount of data to write at once.
      *                           NULL means all at once.
      *
@@ -404,7 +404,7 @@ class Net_Socket extends PEAR
     /**
      * Write a line of data to the socket, followed by a trailing newline.
      *
-     * @param StringHelper $data Data to write
+     * @param string $data Data to write
      *
      * @access public
      * @return mixed fputs result, or an error
@@ -558,7 +558,7 @@ class Net_Socket extends PEAR
      *
      * @access public
      *
-     * @return StringHelper  All data until the socket closes, or a PEAR_Error if
+     * @return string  All data until the socket closes, or a PEAR_Error if
      *                 not connected.
      */
     function readAll()

@@ -45,7 +45,7 @@ abstract class Model extends Observable {
 	
 	/**
 	 * Returns the name of this class.
-	 * @return StringHelper the name of this class.
+	 * @return string the name of this class.
 	 */
 	public static function className() {
 		return get_called_class();
@@ -54,7 +54,7 @@ abstract class Model extends Observable {
 	/**
 	 * Magic getter that calls get<NAME> functions in objects
 
-	 * @param StringHelper $name property name
+	 * @param string $name property name
 	 * @return mixed property value
 	 * @throws Exception If the property setter does not exist
 	 */
@@ -87,7 +87,7 @@ abstract class Model extends Observable {
 	/**
 	 * Magic setter that calls set<NAME> functions in objects
 	 * 
-	 * @param StringHelper $name property name
+	 * @param string $name property name
 	 * @param mixed $value property value
 	 * @throws Exception If the property getter does not exist
 	 */
@@ -137,7 +137,7 @@ abstract class Model extends Observable {
 	 * 
 	 * returns 'base' if it belongs to the core library of Group-Office.
 	 * 
-	 * @return StringHelper 
+	 * @return string 
 	 */
 	public static function getModule(){
 		$arr = explode('\\', static::className());
@@ -162,8 +162,8 @@ abstract class Model extends Observable {
 	
 	/**
 	 * Returns the text label for the specified attribute.
-	 * @param StringHelper $attribute the attribute name
-	 * @return StringHelper the attribute label
+	 * @param string $attribute the attribute name
+	 * @return string the attribute label
 	 * @see attributeLabels
 	 */
 	public function getAttributeLabel($attribute)
@@ -182,7 +182,7 @@ abstract class Model extends Observable {
 	/**
 	 * Get the name of the model in short
 	 * eg. Model_User will return 'User'
-	 * @return StringHelper Model name
+	 * @return string Model name
 	 */
 	public function getModelName()
 	{
@@ -214,7 +214,7 @@ abstract class Model extends Observable {
 	 * Get the validationError for the given attribute
 	 * If the attribute has no error then fals will be returned
 	 * 
-	 * @param StringHelper $key
+	 * @param string $key
 	 * @return mixed 
 	 */
 
@@ -232,8 +232,8 @@ abstract class Model extends Observable {
 	 * an error on the associated form field.
 	 * The key for an error must be unique.
 	 * 
-	 * @param StringHelper $key 
-	 * @param StringHelper $message 
+	 * @param string $key 
+	 * @param string $message 
 	 */
 	public function setValidationError($key, $message) {
 		\GO::debug('Validation error in '.$this->className().' for attribute:'.$key.'. Message is: '.$message);
@@ -242,7 +242,7 @@ abstract class Model extends Observable {
 	
 	/**
 		* Returns a value indicating whether there is any validation error.
-		* @param StringHelper $key attribute name. Use null to check all attributes.
+		* @param string $key attribute name. Use null to check all attributes.
 		* @return boolean whether there is any error.
 		*/
 	public function hasValidationErrors($key=null)

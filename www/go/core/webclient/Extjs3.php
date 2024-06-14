@@ -154,6 +154,8 @@ class Extjs3 {
 			}
 
 			require(Environment::get()->getInstallFolder()->getFile('language/languages.php'));
+
+			/** @var array $languages */
 			$str .= "GO.Languages=[];\n";
 
 			foreach ($languages as $code => $name) {
