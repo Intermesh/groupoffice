@@ -3,46 +3,42 @@
 namespace go\core\dav\schedule;
 
 use go\core\ErrorHandler;
-use go\core\mail\Address;
+use go\core\mail\AddressList;
 use go\core\model\Module;
+use Sabre\VObject\ITip\Message;
+use Throwable;
 
 class IMipPlugin extends \Sabre\CalDAV\Schedule\IMipPlugin{
 
-//	public function __construct($senderEmail=null) {
-//		if($senderEmail === null)
-//			$senderEmail = \GO::config()->webmaster_email;
-//		parent::__construct($senderEmail);
-//	}
 	private $itipMessage;
 
-	function schedule(\Sabre\VObject\ITip\Message $iTipMessage) {
+	function schedule(Message $iTipMessage) {
 		$this->itipMessage = $iTipMessage;
 		parent::schedule($iTipMessage);
 	}
 	protected function mail($to, $subject, $body, array $headers) {
 
-		go()->debug("CalDAV IMip mail: " . $to ." : " . $subject);
+		go()->debug("CalDAV IMip mail: " . $to ." : " . $subject . ". ". var_export($headers, true));
+
+		$user = go()->getAuthState()->getUser(['email', 'displayName']);
 
 		if(empty($to)) {
 			return;
 		}
 
 		try {
-			$recipients = new \GO\Base\Mail\EmailRecipients($to);
-			$to = $recipients->getAddress();
-
 			$mailer = $this->getMailer();
 			$mailer->compose()
 				->setSubject($subject)
-				->setFrom(\GO::user()->email, \GO::user()->name)
-				->setReplyTo(\GO::user()->email)
-				->addTo(new Address($to['email'], $to['personal']))
+				->setFrom($user->email, $user->displayName)
+				->setReplyTo($user->email)
+				->addTo($to)
 				->setSender($mailer->getSender())// Set sender to local address to avoid SPF issues. See also issue: Calendar event invite mail From address #924
-				->setBody($body, "text/calendar; method=" . (string)$this->itipMessage->method, "utf-8")
+				->setBody($body, "text/calendar;method=" . $this->itipMessage->method)
 				->send();
 
-		} catch(\Throwable $e) {
-			ErrorHandler::log("Error sending CalDAV IMip mail to " . implode("," , $to));
+		} catch(Throwable $e) {
+			ErrorHandler::log("Error sending CalDAV IMip mail to " . var_export($to, true));
 			ErrorHandler::logException($e);
 		}
 	}
