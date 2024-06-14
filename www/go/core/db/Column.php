@@ -242,7 +242,8 @@ class Column {
 				//make sure date is formatted correctly
 				if ($value instanceof DateTime || $value instanceof DateTimeImmutable) {
 					if(!($value instanceof GoDateTime)) {
-						$value = new GoDateTime('@' . $value->getTimestamp(), $value->getTimezone());
+						// convert to GoDateTime with exact same time and timezone info. We need the isLocal property.
+						$value = new GoDateTime($value->format("Y-m-d"), $value->getTimezone());
 					}
 					return $value;
 				} else {
