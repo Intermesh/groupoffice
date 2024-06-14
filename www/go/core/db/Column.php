@@ -224,7 +224,8 @@ class Column {
 				$isLocal = $this->dbType ==='localdatetime';
 				if ($value instanceof DateTime || $value instanceof DateTimeImmutable) {
 					if(!($value instanceof GoDateTime)) {
-						$value = new GoDateTime('@' . $value->getTimestamp(), !$isLocal ? $value->getTimezone() : null);
+						// convert to GoDateTime with exact same time and timezone info. We need the isLocal property.
+						$value = new GoDateTime($value->format("Y-m-d H:i:s"), $value->getTimezone());
 					}
 					return $value;
 				} else {
