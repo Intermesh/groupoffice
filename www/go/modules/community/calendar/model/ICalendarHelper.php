@@ -261,7 +261,7 @@ class ICalendarHelper {
 			]);
 
 			if(!empty($vevent->{'RECURRENCE-ID'})) {
-				$obj->recurrenceId = $vevent->{'RECURRENCE-ID'}->getJsonValue()[0];
+				$obj->recurrenceId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
 				$exceptions[] = $obj;
 				continue;
 			}
@@ -313,6 +313,7 @@ class ICalendarHelper {
 		foreach($exceptions as $props) {
 			$uid = $props->uid;
 			$recurrenceId = $props->recurrenceId;
+
 			unset($props->recurrenceId, $props->uid);
 
 			if(isset($baseEvents[$uid]) && $baseEvents[$uid]->isRecurring()) {
@@ -330,7 +331,10 @@ class ICalendarHelper {
 				if(!empty($props->start)) {
 					$props->start = $props->start->format($event->showWithoutTime ? 'Y-m-d' : 'Y-m-d\TH:i:s');
 				}
-				$baseEvents[$uid]->recurrenceOverrides[$recurrenceId] = (new RecurrenceOverride($event))->setValues((array)$props);
+				if(!isset($baseEvents[$uid]->recurrenceOverrides[$recurrenceId])) {
+					$baseEvents[$uid]->recurrenceOverrides[$recurrenceId] = (new RecurrenceOverride($event));
+				}
+				$baseEvents[$uid]->recurrenceOverrides[$recurrenceId]->setValues((array)$props);
 			} else {
 				// ICS contains exception but no base event.
 				// You must be invites to a single occurrence
