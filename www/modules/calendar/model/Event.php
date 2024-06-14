@@ -2484,8 +2484,8 @@ The following is the error message:
 			//organizer is not a Group-Office user with event. We must send a message to him an ICS attachment
 		if($includeIcs){
 			$ics=$this->toICS("REPLY", $sendingParticipant, $recurrenceTime);				
-			$a = Attachment::fromString($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="REPLY;charset=utf-8"');
-			$a->setInline(true);
+			$a = Attachment::fromString($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar;method=REPLY;charset=utf-8');
+			$a->setInline(false);
 			$message->attach($a);
 			
 		}
@@ -2540,8 +2540,8 @@ The following is the error message:
 			$body = '<p>'.\GO::t("The following event has been cancelled by the organizer", "calendar").': </p>'.$this->toHtml();
 			
 				$ics=$this->toICS("CANCEL", $participant);
-				$a = Attachment::fromString($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="CANCEL; charset=utf8"');
-				$a->setInline(true);
+				$a = Attachment::fromString($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar;method=CANCEL;charset=utf8');
+				$a->setInline(false);
 				$message->attach($a);
 				
 			if($participantEvent){
@@ -2652,8 +2652,8 @@ The following is the error message:
 						$body .= '</div>';
 
 					$ics=$this->toICS("REQUEST");
-					$a = Attachment::fromString($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="REQUEST;charset=utf-8"');
-					$a->setInline(true);
+					$a = Attachment::fromString($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar;method=REQUEST;charset=utf-8');
+					$a->setInline(false);
 
 					$message->attach($a);
 
