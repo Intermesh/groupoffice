@@ -300,8 +300,10 @@ class CalendarConvertor
 				$rDT = new DateTime('@'.$v->exceptionstarttime, new \DateTimeZone('etc/UTC'));
 				if($event->timeZone) $rDT->setTimezone($event->timeZone());
 				$recurrenceId = $rDT->format('Y-m-d\TH:i:s');
-				$event->recurrenceOverrides[$recurrenceId] = (new RecurrenceOverride($event))
-					->setValues(self::toOverride($v));
+				if(!isset($event->recurrenceOverrides[$recurrenceId])) {
+					$event->recurrenceOverrides[$recurrenceId] = (new RecurrenceOverride($event));
+				}
+				$event->recurrenceOverrides[$recurrenceId]->setValues(self::toOverride($v));
 			}
 		}
 
