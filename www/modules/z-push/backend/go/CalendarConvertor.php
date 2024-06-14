@@ -269,11 +269,12 @@ class CalendarConvertor
 		$principal = Principal::currentUser();
 
 		if (isset($message->attendees)) {
-			if($event->isNew() && ($message->busystatus == 1 || $message->busystatus == 2)) {  // busy or tentative (iPhone sends busy status for tentative)
+			if($event->isNew() || !$event->organizer()) {
 				$organizer = $event->generatedOrganizer($principal);
-				if(!empty($message->organizeremail) && Util::validateEmail($message->organizeremail)) $organizer->email = $message->organizeremail;
-				if(!empty($message->organizername)) $organizer->name = $message->organizername;
+				if (!empty($message->organizeremail) && Util::validateEmail($message->organizeremail)) $organizer->email = $message->organizeremail;
+				if (!empty($message->organizername)) $organizer->name = $message->organizername;
 			}
+
 			foreach ($message->attendees as $attendee) {
 				$key = $attendee->email;
 				if(!Util::validateEmail($key))
@@ -289,7 +290,10 @@ class CalendarConvertor
 				} else {
 					$p = &$event->participants[$principalId ?? $key];
 				}
-				$p->participationStatus = array_search($attendee->attendeestatus, self::$participationStatusMap) ?? Participant::NeedsAction;
+				$p->participationStatus = array_search($attendee->attendeestatus, self::$participationStatusMap);
+				if($p->participationStatus === false) {
+					$p->participationStatus = Participant::NeedsAction;
+				}
 			}
 		}
 
@@ -374,7 +378,7 @@ class CalendarConvertor
 			$ex->start = new DateTime('@'.$values->starttime, new \DateTimeZone('etc/UTC'));
 		if (isset($values->endtime)) {
 			// timezone needs to be the same for correct duration of exception
-			$ex->duration = \go\core\util\DateTime::intervalToISO((new DateTime('@' . $values->endtime, new \DateTimeZone('etc/UTC')))
+			$ex->duration = DateTime::intervalToISO((new DateTime('@' . $values->endtime, new \DateTimeZone('etc/UTC')))
 				->diff($ex->start ?? new DateTime('@' . $values->exceptionstarttime, new \DateTimeZone('etc/UTC'))));
 		}
 		if (isset($values->location))
