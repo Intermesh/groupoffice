@@ -1,4 +1,5 @@
 - Core: Fix part 2. Proxy headers (X-FORWARDED-FOR) are ignored for "Authorized clients" #1150
+- Calendar: Fixed bug in invite mails
 
 11-06-2024: 6.8.54
 - Core: Sort modules in GUI
