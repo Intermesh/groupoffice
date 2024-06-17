@@ -1,6 +1,8 @@
 - Core: Fix part 2. Proxy headers (X-FORWARDED-FOR) are ignored for "Authorized clients" #1150
 - Calendar: Fixed bug in invite mails
 - Core: Added Polish holidays
+- Email: Show and sort on internal date by default. Fixed: Go Is using FROM header date, showing a message in the future
+       #1055
 
 11-06-2024: 6.8.54
 - Core: Sort modules in GUI
