@@ -3,6 +3,7 @@
 - Core: Added Polish holidays
 - Email: Show and sort on internal date by default. Fixed: Go Is using FROM header date, showing a message in the future
        #1055
+- Smime: Fixed error when both signing and encrypting
 
 11-06-2024: 6.8.54
 - Core: Sort modules in GUI
