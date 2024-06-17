@@ -968,7 +968,8 @@ END;
 	 * @access public
 	 * @return string HTML formatted string
 	 */
-	public static function sanitizeHtml($html, $preserveHtmlStyle = true) {
+	public static function sanitizeHtml(string $html, bool $preserveHtmlStyle = true): string
+	{
 		//needed for very large strings when data is embedded in the html with an img tag
 		ini_set('pcre.backtrack_limit',  3000000 );
 

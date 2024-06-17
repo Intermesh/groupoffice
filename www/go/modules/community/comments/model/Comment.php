@@ -240,7 +240,7 @@ class Comment extends AclItemEntity {
 
 	protected function internalValidate()
 	{
-		if($this->isModified(['text'])) {
+		if($this->isModified(['text']) && !empty($this->text)) {
 			$this->text = StringUtil::sanitizeHtml($this->text, false);
 
 			if ($this->validateXSS && StringUtil::detectXSS($this->text, false)) {
