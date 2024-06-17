@@ -102,7 +102,7 @@ class Record {
 
 	/**
 	 * Get the DN of this record.
-	 * @return StringHelper The distinguished name of an LDAP entity.
+	 * @return string The distinguished name of an LDAP entity.
 	 */
 	public function getDn() {
 		return ldap_get_dn($this->connection->getLink(), $this->entryId);

@@ -3,6 +3,7 @@ namespace go\core\util;
 
 use Exception;
 use go\core\App;
+use go\core\ErrorHandler;
 use go\core\http\Response;
 
 /**
@@ -118,9 +119,14 @@ class Image {
 	 */
 	public function fixOrientation() {
 		if(!function_exists("exif_read_data")) {
-			return false;
+			return;
 		}
-		$exif = exif_read_data($this->originalFilename);
+		try {
+			$exif = exif_read_data($this->originalFilename);
+		} catch(Exception $e) {
+			ErrorHandler::logException($e);
+			return;
+		}
 
 		if (!empty($exif['Orientation'])) {
 			switch ($exif['Orientation']) {

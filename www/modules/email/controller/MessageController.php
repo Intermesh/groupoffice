@@ -670,6 +670,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		 * if you want ignore default sent folder message will be store in
 		 * folder wherefrom user sent it
 		 */
+
 		if ($account->ignore_sent_folder && !empty($params['reply_mailbox'])) {
 			$account->sent = $params['reply_mailbox'];
 		}
@@ -677,12 +678,13 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if ($success) {
 			//if a sent items folder is set in the account then save it to the imap folder
 			// auto linking will happen on save to sent items
-			if(!$account->saveToSentItems($message, $params)){
+			if (!$account->saveToSentItems($message, $params)) {
 				//$imap->append_message($account->sent, $message, "\Seen");
-				$response['success']=false;
-				$response['feedback'].='Failed to save sent item to '.$account->sent;
+				$response['success'] = false;
+				$response['feedback'] .= 'Failed to save sent item to ' . $account->sent;
 			}
-		}		
+		}
+
 
 		if (!empty($params['draft_uid'])) {
 			//remove drafts on send
@@ -1295,6 +1297,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$response = $imapMessage->toOutputArray(!$plaintext,false,$params['no_max_body_size']);
 		$response['uid'] = intval($params['uid']);
 		$response['mailbox'] = $params['mailbox'];
+		$response['isDraft'] = $params['mailbox'] == $account->drafts;
 		$response['account_id'] = intval($params['account_id']);
 		$response['do_not_mark_as_read'] = $account->do_not_mark_as_read;
 		$response = $this->_getContactInfo($imapMessage, $params, $response, $account);
@@ -1311,7 +1314,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			
 		}
 		
-		$response['isInSpamFolder']=$this->_getSpamMoveMailboxName($params['uid'],$params['mailbox'],$account->id);
+		$response['isInSpamFolder']=$response['mailbox'] == $account->spam;
 
 		// START Handle the links div in the email display panel		
 		if(!$plaintext){
@@ -1341,19 +1344,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		return $response;
 	}
-	
-	
-	protected function _getSpamMoveMailboxName($mailUid,$mailboxName,$accountId)
-	{
-		$pattern = "/^(junk|spam)$/";
-		if (preg_match($pattern, strtolower($mailboxName))) {
-			return 1;
-		} else {
-			return 0;
-		}
-		
-	}
-	
+
 	
 	protected function actionGet($account_id, $mailbox, $uid, $query="")
 	{

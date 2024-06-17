@@ -1,6 +1,59 @@
+- Core: Fix part 2. Proxy headers (X-FORWARDED-FOR) are ignored for "Authorized clients" #1150
+- Calendar: Fixed bug in invite mails
+
+11-06-2024: 6.8.54
+- Core: Sort modules in GUI
+- Core: Core: Fixed inefficiency in SSE causing a huge amount of calls to the ACPU cache.
+- Core: Fixed: Proxy headers (X-FORWARDED-FOR) are ignored for "Authorized clients" #1150
+- Core: Default group permissions were no longer editable from system settings.
+- Tasks / Support: Added "List" to export and import
+- Finance: Don't send docs without number
+- E-mail: Show edit button on drafts
+- Contacts: Remove contacts from group with multi select
+
+04-06-2024: 6.8.53
+- ActiveSync: Z-push logging was always set to debug
+- Wopi: Added "allow-downloads" permission to iframe to fix downloading copies
+
+03-06-2024: 6.8.52
+- Newsletters: Make 'Attachements' menu in composer more visible
+- Newsletters: Fix permission error when adding address list
+
+31-05-2024: 6.8.51
+- Core: Permissions were not editable for admins
+- Wopi: Fixed missing acl's that were cleaned up by garbage collection because foreign key was missing
+
+27-05-2024: 6.8.50
+- Sieve: Added "Mailing List" option
+- Sieve: Fixed bug in custom filter where exists showed as "doesn't exist"
+- Core: update Japanese holidays file. Arigato 2g@rdis.net .
+- Multi instance: Pause transactions during instance deletion
+- Billing: Fixed MT940 import
+- Support: fix permission issue when creating support lists
+- Core: Fixed support module uninstall
+- Core: Fixed db check
+- Studio: fix drag & drop ACL item between collections
+- Core: Set custom select field to "undefined"
+- Email / Core: Use "Enter" in recipient list combo
+- Core: Editable language combo
+- Core: fix sending mail with $config['debugEmail'] configuration option
+
+23-05-2024: 6.8.49
+- Core: Create entity filters by users without admin privileges possible
+- Files: Fixed permissions error for admins
+- Zpushadmin: fixed error loading files
+- Core: Disable events during upgrade and install to prevent problems with modules that are not available.
+- AddressBook: suppress display of default country in address if none is filled in
+- Billing: Fixed MT940 import
+
+21-05-2024: 6.8.48
+- Email: Fixed: Feature request: icons up top in inbox (search, accounts, etc.) #947. Set minWidth for email panel
 - Notes / Comments: Use StringUtil to remove style from notes and comments as old way could remove text unexpectedly
 - Oauth: RefreshToken for Google was not obtained when using openid
 - Oauth: Possible now to use a different smtp user for IMAP accounts.
+- Oauth: disable saving to sent folder for Azure as they save sent items automatically.
+- E-mail: Client side sorting in chunks to avoid error when sorting a large search result for Microsoft Exchange server that does not support server side sort.
+- E-mail: New account option to disable saving of sent mail for Microsoft Exchange Servers because they do that on the server already.˚
 
 13-05-2024: 6.8.47
 - Email: Fixed CSS bleeding issue

@@ -19,8 +19,8 @@ class ObjectTree extends \Sabre\DAV\ObjectTree{
 	/**
      * Moves a file from one location to another
      *
-     * @param StringHelper $sourcePath The path to the file which should be moved
-     * @param StringHelper $destinationPath The full destination path, so not just the destination parent node
+     * @param string $sourcePath The path to the file which should be moved
+     * @param string $destinationPath The full destination path, so not just the destination parent node
      * @return int
      */
     public function move($sourcePath, $destinationPath) {

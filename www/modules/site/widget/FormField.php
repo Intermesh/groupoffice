@@ -72,7 +72,7 @@ class FormField extends \GO\Site\Components\Widget {
 
 	/**
 	 * Renders the open tag of the form field.
-	 * @return StringHelper the rendering result.
+	 * @return string the rendering result.
 	 */
 	public function begin() {
 		list($tag, $options) = $this->stripTag();
@@ -90,7 +90,7 @@ class FormField extends \GO\Site\Components\Widget {
 
 	/**
 	 * Renders the closing tag of the form field.
-	 * @return StringHelper the rendering result.
+	 * @return string the rendering result.
 	 */
 	public function end() {
 		list($tag, $options) = $this->stripTag();
@@ -99,7 +99,7 @@ class FormField extends \GO\Site\Components\Widget {
 
 	/**
 	 * Generates a label tag
-	 * @param StringHelper $label the label to use. If null, it will be generated with the models:getAttributeLabel().
+	 * @param string $label the label to use. If null, it will be generated with the models:getAttributeLabel().
 	 * @param array $options the tag options in terms of name-value pairs.
 	 * @return static the field object itself
 	 */
@@ -113,7 +113,7 @@ class FormField extends \GO\Site\Components\Widget {
 
 	/**
 	 * Renders the hint tag.
-	 * @param StringHelper $content the hint content. It will NOT be HTML-encoded.
+	 * @param string $content the hint content. It will NOT be HTML-encoded.
 	 * @param array $options the tag options in terms of name-value pairs.tag: 
 	 * the 'tag' option specifies the tag name. If not set, "div" will be used.
 	 *
@@ -132,7 +132,7 @@ class FormField extends \GO\Site\Components\Widget {
 
 	/**
 	 * Renders an input tag.
-	 * @param StringHelper $type the input type (e.g. 'text', 'password')
+	 * @param string $type the input type (e.g. 'text', 'password')
 	 * @param array $options the tag options in terms of name-value pairs.
 	 * @return static the field object itself
 	 */
@@ -155,7 +155,7 @@ class FormField extends \GO\Site\Components\Widget {
 	 * Hidden field is ntop chainable but only renders a field.
 	 * It is here for completion
 	 * @param extra html option in input field $options
-	 * @return StringHelper the rendered output
+	 * @return string the rendered output
 	 */
 	public function hidden($options = array()) {
 		return $this->form->hiddenField($this->model, $this->attribute, $options);

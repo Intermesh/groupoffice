@@ -80,8 +80,8 @@ class LocalEvent extends \GO\Base\Model {
 	 * Constructor
 	 * 
 	 * @param Event $event
-	 * @param StringHelper $periodStartTime
-	 * @param StringHelper $periodEndTime 
+	 * @param string $periodStartTime
+	 * @param string $periodEndTime 
 	 */
 	public function __construct(Event $event, $periodStartTime, $periodEndTime){
 		$this->_event = $event;
@@ -326,7 +326,7 @@ class LocalEvent extends \GO\Base\Model {
 	/**
 	 * Get the period start time
 	 * 
-	 * @return StringHelper 
+	 * @return string 
 	 */
 	public function getPeriodStartTime(){
 		return $this->_startTime;
@@ -335,7 +335,7 @@ class LocalEvent extends \GO\Base\Model {
 	/**
 	 * Get the period end time
 	 * 
-	 * @return StringHelper 
+	 * @return string 
 	 */
 	public function getPeriodEndTime(){
 		return $this->_endTime;
@@ -370,7 +370,7 @@ class LocalEvent extends \GO\Base\Model {
 	/**
 	 * Get the formatted starting date of this event
 	 * 
-	 * @return StringHelper 
+	 * @return string 
 	 */
 	public function getFormattedDate(){
 		return date(\GO::user()->date_format,$this->_event->start_time);
@@ -379,7 +379,7 @@ class LocalEvent extends \GO\Base\Model {
 	/**
 	 * Get the formatted starting date and time of this event
 	 * 
-	 * @return StringHelper 
+	 * @return string 
 	 */
 	public function getFormattedDateAndTime(){
 		return date(\GO::user()->date_format.' '.\GO::user()->time_format,$this->_event->start_time);
@@ -388,7 +388,7 @@ class LocalEvent extends \GO\Base\Model {
 	/**
 	 * Get the formatted starting time of this event
 	 * 
-	 * @return StringHelper 
+	 * @return string 
 	 */
 	public function getFormattedTime(){
 		return date(\GO::user()->time_format,$this->_event->start_time);
@@ -397,7 +397,7 @@ class LocalEvent extends \GO\Base\Model {
 	/**
 	 * Get the day this event starts on.
 	 * 
-	 * @return StringHelper 
+	 * @return string 
 	 */
 	public function getDay(){
 		$dayString = \GO::t("full_days", "common");

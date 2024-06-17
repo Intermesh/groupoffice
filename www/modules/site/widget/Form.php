@@ -32,7 +32,7 @@ class Form extends \GO\Site\Components\Widget {
 	 * Should not be used for rendering a form
 	 * Use beginForm() to render the starting tag instead
 	 * @deprecated use beginForm() instead
-	 * @return StringHelper with detailed error if used anyway
+	 * @return string with detailed error if used anyway
 	 */
 	public function render() { return "use beginForm() instead of render()"; }
 	
@@ -61,9 +61,9 @@ class Form extends \GO\Site\Components\Widget {
 	 * the input for the attribute (see {@link CModel::getAttributeLabel}.
 	 * If the attribute has input error, the label's CSS class will be appended with {@link errorCss}.
 	 * @param \GO\Base\Model $model the data model
-	 * @param StringHelper $attribute the attribute
+	 * @param string $attribute the attribute
 	 * @param array $htmlAttributes additional HTML attributes. The following special options are recognized:
-	 * @return StringHelper the generated label tag
+	 * @return string the generated label tag
 	 */
 	public function label($model,$attribute,$htmlAttributes=array())
 	{
@@ -119,7 +119,7 @@ class Form extends \GO\Site\Components\Widget {
 	/**
 	 * Render a list of radio buttons same as a dropdown list
 	 * @param \GO\Base\Model $model
-	 * @param StringHelper $attribute a propertyname of the model
+	 * @param string $attribute a propertyname of the model
 	 * @param array $data the keys en values of the button as key=>value of the array
 	 * @param array $htmlOptions extra html attributes
 	 * special values are 
@@ -127,7 +127,7 @@ class Form extends \GO\Site\Components\Widget {
 	 * separator: <br\n, 
 	 * uncheckValue  ''
 	 * labelOption array
-	 * @return StringHelper the rendered radio buttons
+	 * @return string the rendered radio buttons
 	 */
 	public function radioButtonList($model,$attribute,$data,$htmlOptions=array())
 	{
@@ -186,10 +186,10 @@ class Form extends \GO\Site\Components\Widget {
 	
 	/**
 	 * Render a static radio button field
-	 * @param StringHelper $name html name attribute
+	 * @param string $name html name attribute
 	 * @param boolean $checked html checked attribute
 	 * @param array $htmlOptions other ghtml attributes
-	 * @return StringHelper the rendered output
+	 * @return string the rendered output
 	 */
 	protected function staticRadioButton($name,$checked=false,$htmlOptions=array())
 	{
@@ -211,7 +211,7 @@ class Form extends \GO\Site\Components\Widget {
 		{
 			// add a hidden field so that if the radio button is not selected, it still submits a value
 			if(isset($htmlOptions['id']) && $htmlOptions['id']!==false)
-				$uncheckOptions=array('id'=>self::ID_PREFIX.$htmlOptions['id']);
+				$uncheckOptions=array('id'=>$htmlOptions['id']);
 			else
 				$uncheckOptions=array('id'=>false);
 			$hidden=$this->staticHiddenField($name,$uncheck,$uncheckOptions);
@@ -295,8 +295,8 @@ $(function() {
 	
 	/**
 	 * Generates a label tag.
-	 * @param StringHelper $label label text. Note, you should HTML-encode the text if needed.
-	 * @param StringHelper $for the ID of the HTML element that this label is associated with.
+	 * @param string $label label text. Note, you should HTML-encode the text if needed.
+	 * @param string $for the ID of the HTML element that this label is associated with.
 	 * If this is false, the 'for' attribute for the label tag will not be rendered.
 	 * @param array $htmlAttributes additional HTML attributes.
 	 * The following HTML option is recognized:
@@ -306,7 +306,7 @@ $(function() {
 	 * and be decorated with {@link CHtml::beforeRequiredLabel} and
 	 * {@link CHtml::afterRequiredLabel}.</li>
 	 * </ul>
-	 * @return StringHelper the generated label tag
+	 * @return string the generated label tag
 	 */
 	public function staticLabel($label,$for,$htmlAttributes=array())
 	{
@@ -332,10 +332,10 @@ $(function() {
 	
 	/**
 	 * Generates a submit button.
-	 * @param StringHelper $label the button label
+	 * @param string $label the button label
 	 * @param array $htmlAttributes additional HTML attributes. Besides normal HTML attributes, a few special
 	 * attributes are also recognized (see {@link clientChange} and {@link tag} for more details.)
-	 * @return StringHelper the generated button tag
+	 * @return string the generated button tag
 	 * @see clientChange
 	 */
 	public function submitButton($label='submit',$htmlAttributes=array())
@@ -354,9 +354,9 @@ $(function() {
 	/**
 	 * Displays the first validation error for a model attribute.
 	 * @param CModel $model the data model
-	 * @param StringHelper $attribute the attribute name
+	 * @param string $attribute the attribute name
 	 * @param array $htmlAttributes additional HTML attributes to be rendered in the container div tag.
-	 * @return StringHelper the error display. Empty if no errors are found.
+	 * @return string the error display. Empty if no errors are found.
 	 * @see CModel::getErrors
 	 * @see errorMessageCss
 	 */
@@ -425,7 +425,7 @@ $(function() {
 	 * If the attribute has input error, the input field's CSS class will
 	 * be appended with {@link errorCss}.
 	 * @param CModel $model the data model
-	 * @param StringHelper $attribute the attribute
+	 * @param string $attribute the attribute
 	 * @param array $data data for generating the list options (value=>display)
 	 * You may use {@link listData} to generate this data.
 	 * Please refer to {@link listOptions} on how this data is used to generate the list options.
@@ -450,7 +450,7 @@ $(function() {
 	 * </pre>
 	 * </li>
 	 * </ul>
-	 * @return StringHelper the generated drop down list
+	 * @return string the generated drop down list
 	 * @see clientChange
 	 * @see listData
 	 */
@@ -476,10 +476,10 @@ $(function() {
 	
 	/**
 	 * Generates a button.
-	 * @param StringHelper $label the button label
+	 * @param string $label the button label
 	 * @param array $htmlAttributes additional HTML attributes. Besides normal HTML attributes, a few special
 	 * attributes are also recognized (see {@link clientChange} and {@link tag} for more details.)
-	 * @return StringHelper the generated button tag
+	 * @return string the generated button tag
 	 * @see clientChange
 	 */
 	public function button($label='button',$htmlAttributes=array())
@@ -529,9 +529,9 @@ $(function() {
 	 * Note, only the open tag is generated. A close tag should be placed manually
 	 * at the end of the form.
 	 * @param mixed $action the form action URL (see {@link normalizeUrl} for details about this parameter.)
-	 * @param StringHelper $method form method (e.g. post, get)
+	 * @param string $method form method (e.g. post, get)
 	 * @param array $htmlAttributes additional HTML attributes (see {@link tag}).
-	 * @return StringHelper the generated form tag.
+	 * @return string the generated form tag.
 	 * @see endForm
 	 */
 	public function beginForm($action=false, $method=false, $htmlAttributes=false)
@@ -571,7 +571,7 @@ $(function() {
 	
 	/**
 	 * Generates a closing form tag.
-	 * @return StringHelper the generated tag
+	 * @return string the generated tag
 	 * @see beginForm
 	 */
 	public function endForm()
@@ -585,7 +585,7 @@ $(function() {
 	 * Resolve the name and the ID from 
 	 * 
 	 * @param \GO\Base\Model $model
-	 * @param StringHelper $attribute
+	 * @param string $attribute
 	 * @param array $htmlAttributes
 	 * 
 	 * @return array $htmlAttributes
@@ -640,11 +640,11 @@ $(function() {
 	
 	/**
 	 * Renders a static inputfield without a model
-	 * @param StringHelper $type html type attribute
-	 * @param StringHelper $name html name attribute
-	 * @param StringHelper $value html value attribute
+	 * @param string $type html type attribute
+	 * @param string $name html name attribute
+	 * @param string $value html value attribute
 	 * @param array $htmlOptions other html attributes
-	 * @return StringHelper the rendered output
+	 * @return string the rendered output
 	 */
 	protected function staticInputField($type,$name,$value,$htmlOptions)
 	{
@@ -663,8 +663,8 @@ $(function() {
 	 * Note, the attribute name may be modified after calling this method if the name
 	 * contains square brackets (mainly used in tabular input) before the real attribute name.
 	 * @param \GO\Base\Model $model the data model
-	 * @param StringHelper $attribute the attribute
-	 * @return StringHelper the input name
+	 * @param string $attribute the attribute
+	 * @return string the input name
 	 */
 	private function _resolveName($model,$attribute)
 	{
@@ -695,8 +695,8 @@ $(function() {
 	
 	/**
 	 * Generates a valid HTML ID based on name.
-	 * @param StringHelper $name name from which to generate HTML ID
-	 * @return StringHelper the ID generated based on name.
+	 * @param string $name name from which to generate HTML ID
+	 * @return string the ID generated based on name.
 	 */
 	private function _getIdByName($name)
 	{
@@ -708,7 +708,7 @@ $(function() {
 	 * This method can recognize the attribute name written in array format.
 	 * For example, if the attribute name is 'name[a][b]', the value "$model->name['a']['b']" will be returned.
 	 * @param \GO\Base\Model $model the data model
-	 * @param StringHelper $attribute the attribute name
+	 * @param string $attribute the attribute name
 	 * @return mixed the attribute value
 	 */
 	private function _resolveValue($model,$attribute)
@@ -759,7 +759,7 @@ $(function() {
 	
 	/**
 	 * Generates an HTML element.
-	 * @param StringHelper $tag the tag name
+	 * @param string $tag the tag name
 	 * @param array $htmlAttributes the element attributes. The values will be HTML-encoded using {@link encode()}.
 	 * If an 'encode' attribute is given and its value is false,
 	 * the rest of the attribute values will NOT be HTML-encoded.
@@ -767,7 +767,7 @@ $(function() {
 	 * @param mixed $content the content to be enclosed between open and close element tags. It will not be HTML-encoded.
 	 * If false, it means there is no body content.
 	 * @param boolean $closeTag whether to generate the close tag.
-	 * @return StringHelper the generated HTML element tag
+	 * @return string the generated HTML element tag
 	 */
 	private function _tag($tag,$htmlAttributes=array(),$content=false,$closeTag=true)
 	{
@@ -788,7 +788,7 @@ $(function() {
 	 * Special attributes, such as 'checked', 'disabled', 'readonly', will be rendered
 	 * properly based on their corresponding boolean value.
 	 * @param array $htmlAttributes attributes to be rendered
-	 * @return StringHelper the rendering result
+	 * @return string the rendering result
 	 */
 	private function _renderAttributes($htmlAttributes)
 	{
@@ -845,8 +845,8 @@ $(function() {
 	/**
 	 * Encodes special characters into HTML entities.
 	 * The {@link CApplication::charset application charset} will be used for encoding.
-	 * @param StringHelper $text data to be encoded
-	 * @return StringHelper the encoded data
+	 * @param string $text data to be encoded
+	 * @return string the encoded data
 	 * @see http://www.php.net/manual/en/function.htmlspecialchars.php
 	 */
 	private function _encode($text)
@@ -881,7 +881,7 @@ $(function() {
 	 * This option defaults to 'primaryKey', meaning using the 'primaryKey' property value of the objects in the selection.
 	 * This option has been available since version 1.1.3.</li>
 	 * </ul>
-	 * @return StringHelper the generated list options
+	 * @return string the generated list options
 	 */
 	private function _listOptions($selection,$listData,&$htmlAttributes)
 	{
@@ -958,9 +958,9 @@ $(function() {
 	 * Please refer to the {@link value} method on how to specify value field, text field and group field.
 	 * @param array $models a list of model objects. This parameter
 	 * can also be an array of associative arrays (e.g. results of {@link CDbCommand::queryAll}).
-	 * @param StringHelper $valueField the attribute name for list option values
-	 * @param StringHelper $textField the attribute name for list option texts
-	 * @param StringHelper $groupField the attribute name for list option group names. If empty, no group will be generated.
+	 * @param string $valueField the attribute name for list option values
+	 * @param string $textField the attribute name for list option texts
+	 * @param string $groupField the attribute name for list option group names. If empty, no group will be generated.
 	 * @return array the list data that can be used in {@link dropDownList}, {@link listBox}, etc.
 	 */
 	public function listData($models,$valueField,$textField,$groupField='')
@@ -991,7 +991,7 @@ $(function() {
 	/**
 	 * Used by listdata
 	 * @param mixed $model the model. This can be either an object or an array.
-	 * @param StringHelper $attribute the attribute name (use dot to concatenate multiple attributes)
+	 * @param string $attribute the attribute name (use dot to concatenate multiple attributes)
 	 * @param mixed $defaultValue the default value to return when the attribute does not exist
 	 * @return mixed the attribute value
 	 */

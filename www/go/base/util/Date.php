@@ -145,10 +145,10 @@ class Date {
 	 * Reformat a date string formatted by Group-Office user preference to a string
 	 * that can be read by strtotime related PHP functions
 	 *
-	 * @param StringHelper $date_string
-	 * @param StringHelper $date_separator
-	 * @param StringHelper $date_format
-	 * @return StringHelper
+	 * @param string $date_string
+	 * @param string $date_separator
+	 * @param string $date_format
+	 * @return string
 	 */
 	public static function to_input_format($date_string, $date_separator=null, $date_format=null)
 	{
@@ -182,7 +182,7 @@ class Date {
 	 * Takes a date string formatted by Group-Office user preference and turns it
 	 * into a unix timestamp.
 	 *
-	 * @param StringHelper $date_string
+	 * @param string $date_string
 	 * @return int Unix timestamp
 	 */
 	public static function to_unixtime($date_string) {
@@ -421,7 +421,7 @@ class Date {
 	/**
 	 * Convert a date formatted according to icalendar 2.0 specs to a unix timestamp.
 	 *
-	 * @param StringHelper $date
+	 * @param string $date
 	 * @param Icalendar\Timezone $icalendarTimezone
 	 * @return int Unix timestamp
 	 */

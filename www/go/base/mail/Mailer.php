@@ -60,8 +60,8 @@ class Mailer extends \go\core\mail\Mailer
 		
 		if(!empty(\GO::config()->debug_email)){
 			$message->setTo(\GO::config()->debug_email);
-			$message->setBcc(array());
-			$message->setCc(array());
+			$message->setBcc("");
+			$message->setCc("");
 			\GO::debug("E-mail debugging is enabled in the Group-Office config.php file. All emails are sent to: ".\GO::config()->debug_email);
 		}
 		$count = parent::send($message);

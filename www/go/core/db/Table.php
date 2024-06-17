@@ -109,6 +109,8 @@ class Table {
 		go()->getCache()->delete($this->getCacheKey());
 	}
 
+	private string $createTable;
+
 	private function init() {
 		
 		if (isset($this->columns)) {
@@ -123,7 +125,11 @@ class Table {
 			$this->indexes = $cache['indexes'] ?? null;
 			$this->conn = null;
 			return;
-		}	
+		}
+
+		$stmt = $this->conn->query("show create table `" . $this->name . "`;");
+		$stmt->setFetchMode(PDO::FETCH_COLUMN, 1);
+		$this->createTable = strtolower($stmt->fetch());
 		
 		$this->columns = [];
 
@@ -228,9 +234,18 @@ class Table {
 				$c->length = 65535;
 				$c->trimInput = true;
 				break;
+			case 'json':
+				$c->length = 4294967295;
+				break;
 			case 'longtext':
 				$c->length = 4294967295;
 				$c->trimInput = true;
+
+				//might be json in mariadb
+				if($this->isJSON($c)) {
+					$c->dbType = 'json';
+					$c->trimInput = false;
+				}
 				break;
 			case 'mediumtext':
 				$c->length = 16777215;
@@ -462,5 +477,9 @@ class Table {
 //		$this->pk = $data['pk'];
 //
 //	}
+	private function isJSON(Column $c)
+	{
+		return str_contains($this->createTable, "json_valid(`".strtolower($c->name)."`)");
+	}
 
 }

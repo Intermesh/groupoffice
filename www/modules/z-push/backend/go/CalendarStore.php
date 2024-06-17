@@ -46,7 +46,7 @@ class CalendarStore extends Store {
 	 * 
 	 * Direction: SERVER -> PHONE
 	 * 
-	 * @param StringHelper $folderid
+	 * @param string $folderid
 	 * @param int $id
 	 * @param SyncParameters $contentparameters
 	 * @return \SyncAppointment
@@ -547,7 +547,7 @@ class CalendarStore extends Store {
 	 * 
 	 * Direction: PHONE -> SERVER
 	 * 
-	 * @param StringHelper $folderid
+	 * @param string $folderid
 	 * @param int $id
 	 * @param \SyncAppointment $message
 	 * @return array
@@ -713,7 +713,7 @@ class CalendarStore extends Store {
 	/**
 	 * Get the list of the items that need to be synced
 	 * 
-	 * @param StringHelper $folderid
+	 * @param string $folderid
 	 * @param type $cutoffdate
 	 * @return array
 	 */
@@ -776,7 +776,7 @@ class CalendarStore extends Store {
 	/**
 	 * Get the syncFolder that is attached to the given id
 	 * 
-	 * @param StringHelper $id
+	 * @param string $id
 	 * @return \SyncFolder
 	 */
 	public function GetFolder($id) {

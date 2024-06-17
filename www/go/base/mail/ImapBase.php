@@ -262,7 +262,7 @@ abstract class ImapBase {
 			if ($line_cont) {
 				$last_line_cont = true;
 				$pres = $n - 1;
-				if ($chunks) {
+				if (isset($chunks)) {
 					$pchunk = $c;
 				}
 			}

@@ -109,7 +109,7 @@ class Address extends Property {
 	
 	public function getFormatted()
 	{
-		return go()->getLanguage()->formatAddress($this->toArray(['address', 'city', 'zipCode', 'state']), $this->countryCode);
+		return go()->getLanguage()->formatAddress($this->toArray(['address', 'city', 'zipCode', 'state']), $this->countryCode, null);
 	}
-	
+
 }

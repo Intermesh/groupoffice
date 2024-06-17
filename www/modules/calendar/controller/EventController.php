@@ -38,6 +38,7 @@ use go\core\orm\EntityType;
 use GO\Email\Model\Account;
 use GO\Leavedays\Model\Leaveday;
 use go\modules\community\tasks\model\Task;
+use go\modules\udo\forms\model\RoofReport;
 
 class EventController extends \GO\Base\Controller\AbstractModelController {
 
@@ -1071,6 +1072,16 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		if($calendar->name !== 'Dakmeldingen')
 			return $response;
 
+
+		$background = "ffed9e";
+		// If you are showing more than one calendar, then change the display
+		// color of the current event to the color of the calendar it belongs to.
+		if($response['calendar_count'] > 1 && $this->overrideColors){
+			$background = $calendar->getColor(\GO::user()->id);
+			if(empty($background))
+				$background = $calendar->displayColor;
+		}
+
 		$dakStmt = \go\modules\udo\forms\model\RoofReport::find()
 				->where('date', "IS NOT", null)
 			->andWhere('date', ">=", new \DateTime($startTime))
@@ -1082,7 +1093,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			$response['results'][$this->_getIndex($response['results'], 'R'.$report->id)] = [
 				'id' => 'R'.$report->id,
 				//'link_count' => $task->countLinks(),
-				'name' =>  $report->description .' ('.($report->companyName ?? $report->contactName).')',
+				'name' =>  ($report->type == RoofReport::TYPE_LEAKAGE ? "Lekkage: " : "Dakwerk: ") . $report->reference() . ' ' . $report->title,
 				'description' => $report->contactName,
 				'time' => $report->date->format('H:i'),
 				'start_time' => $report->date->format('Y-m-d H:i'),
@@ -1090,7 +1101,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				'all_day_event' => 0,
 				'model_name' => 'go\modules\udo\forms\model\RoofReport', // compat for UI
 				'calendar_id' => $calendar->id, // Must be present to be able to show tasks in the calendar Views
-				'background'=>'FE5000',
+				'background'=>$background,
 				//'day' => $dayValue,
 				'read_only' => true,
 				'report_id' => $report->id
@@ -1234,8 +1245,8 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 	 * 
 	 * @param array $response
 	 * @param \GO\Calendar\Model\Calendar $calendar
-	 * @param StringHelper $startTime
-	 * @param StringHelper $endTime
+	 * @param string $startTime
+	 * @param string $endTime
 	 * @return array 
 	 */
 	private function _getHolidayResponseForPeriod($response,$calendar,$startTime,$endTime){
@@ -1276,8 +1287,8 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 	 * 
 	 * @param array $response
 	 * @param \GO\Calendar\Model\Calendar $calendar
-	 * @param StringHelper $startTime
-	 * @param StringHelper $endTime
+	 * @param string $startTime
+	 * @param string $endTime
 	 * @return array 
 	 */
 	private function _getLeavedaysResponseForPeriod($response,$calendar,$startTime,$endTime){
@@ -1321,8 +1332,8 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 	 * 
 	 * @param array $response
 	 * @param \GO\Calendar\Model\Calendar $calendar
-	 * @param StringHelper $startTime
-	 * @param StringHelper $endTime
+	 * @param string $startTime
+	 * @param string $endTime
 	 * @return array 
 	 */
 	private function _getBirthdayResponseForPeriod($response,$calendar,$startTime,$endTime){
@@ -1408,8 +1419,8 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 	 * 
 	 * @param array $response
 	 * @param \GO\Calendar\Model\Calendar $calendar
-	 * @param StringHelper $startTime
-	 * @param StringHelper $endTime
+	 * @param string $startTime
+	 * @param string $endTime
 	 * @return array 
 	 */
 	private function _getEventResponseForPeriod($response,$calendar,$startTime,$endTime, $categories){	

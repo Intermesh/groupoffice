@@ -15,7 +15,7 @@ class EmailRecipients{
 	 * 
 	 * "Merijn Schering" <mschering@intermesh.nl>,someone@somedomain.com,Pete <pete@pete.com
 	 * 
-	 * @param StringHelper $emailRecipientList 
+	 * @param string $emailRecipientList
 	 */
 	public function __construct($emailRecipientList='', $strict=false){
 		$this->strict=$strict;
@@ -35,8 +35,8 @@ class EmailRecipients{
 	 * 
 	 * (string) EmailRecipients::createSingle("john@example.com", "John Smith");
 	 * 
-	 * @param StringHelper $email
-	 * @param StringHelper $personal
+	 * @param string $email
+	 * @param string $personal
 	 * @return EmailRecipients 
 	 */
 	public static function createSingle($email, $personal){
@@ -48,8 +48,8 @@ class EmailRecipients{
 	/**
 	 * Add a recipient to the list.
 	 * 
-	 * @param StringHelper $email
-	 * @param StringHelper $personal 
+	 * @param string $email
+	 * @param string $personal
 	 */
 	public function addRecipient($email, $personal=null){
 		//echo $email.' '.$personal.'<br />';
@@ -64,7 +64,7 @@ class EmailRecipients{
 	/**
 	 * Check if an e-mail address is in this list
 	 * 
-	 * @param StringHelper $email
+	 * @param string $email
 	 * @return boolean 
 	 */
 	public function hasRecipient($email){
@@ -85,7 +85,7 @@ class EmailRecipients{
 	/**
 	 * Remove a recipient from the list.
 	 * 
-	 * @param StringHelper $email 
+	 * @param string $email
 	 */
 	public function removeRecipient($email){
 		unset($this->_addresses[trim(strtolower($email))]);

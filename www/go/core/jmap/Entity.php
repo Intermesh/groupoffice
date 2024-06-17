@@ -358,18 +358,9 @@ abstract class Entity  extends OrmEntity {
    */
 	private static function changesQuery(Query $query, string $cls) {
 
-		$primaryKeys = $cls::getPrimaryKey();
+		$pkSelect = static::buildPrimaryKeySelect($query, $cls);
 
-		if(count($primaryKeys) == 1) {
-			$pkSelect = $query->getTableAlias() . '.id';
-		} else{
-
-			//PK Logic consistent with {@see Property::id()};
-			$alias = $query->getTableAlias();
-			$pkSelect = "CONCAT(" . $alias .'.' . implode( ', "-", '. $alias .'.', $primaryKeys) .')';
-		}
-
-    $query->select($pkSelect .' AS entityId');
+    $query->select($pkSelect . ' AS entityId');
 
     if(is_a($cls, AclItemEntity::class, true)) {
       $aclAlias = $cls::joinAclEntity($query);
@@ -459,18 +450,42 @@ abstract class Entity  extends OrmEntity {
 	{
 		$idsQuery = clone $query;
 		$records = $idsQuery
-			->select($query->getTableAlias() . '.id as entityId, null as aclId, "1" as destroyed')
+			->select(static::buildPrimaryKeySelect($query, static::class) . ' as entityId, null as aclId, "1" as destroyed')
 			->fetchMode(PDO::FETCH_ASSOC);
 		return static::entityType()->changes($records);
+	}
+
+
+	/**
+	 * Marks changes for query already prepared for selecting the right ID's
+	 *
+	 * @param Query $query
+	 * @param class-string<Entity> $cls
+	 * @return string
+	 */
+	protected static function buildPrimaryKeySelect(Query $query, string $cls) : string {
+		$primaryKeys = $cls::getPrimaryKey();
+
+		if(count($primaryKeys) == 1) {
+			$pkSelect = $query->getTableAlias() . '.'.$primaryKeys[0];
+		} else{
+
+			//PK Logic consistent with {@see Property::id()};
+			$alias = $query->getTableAlias();
+			$pkSelect = "CONCAT(" . $alias .'.' . implode( ', "-", '. $alias .'.', $primaryKeys) .')';
+		}
+
+		return $pkSelect;
 	}
 
   /**
    * This function finds all entities that might change because of this delete.
    * This happens when they have a foreign key constraint with SET NULL
-   * @param array|Query $ids
+   * @param Query $ids
    * @throws Exception
    */
-	private static function changeReferencedEntities($ids) {
+	private static function changeReferencedEntities(Query $ids): void
+	{
 		foreach(static::getEntityReferences() as $r) {
 			$cls = $r['cls'];
 
@@ -479,7 +494,7 @@ abstract class Entity  extends OrmEntity {
 				$query = $cls::find();
 
 				if(!empty($path)) {
-					//TODO joinProperites only joins the first table.
+					//TODO joinProperties only joins the first table.
 					$query->joinProperties($path);
 					$query->where(array_pop($path) . '.' .$r['column'], 'IN', $ids);
 				} else{

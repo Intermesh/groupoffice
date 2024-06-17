@@ -20,6 +20,7 @@ namespace go\core {
 	use go\core\mail\Mailer;
 	use go\core\model\Group;
 	use go\core\model\Module as ModuleModel;
+	use go\core\orm\Entity;
 	use go\core\orm\EntityType;
 	use go\core\orm\exception\SaveException;
 	use go\core\orm\Property;
@@ -677,7 +678,8 @@ namespace go\core {
 		 * @param boolean $onDestruct
 		 * @noinspection PhpDocMissingThrowsInspection
 		 */
-		public function rebuildCache(bool $onDestruct = false) {
+		public function rebuildCache(bool $onDestruct = false): void
+		{
 			
 			if($onDestruct) {				
 				$this->rebuildCacheOnDestruct = $onDestruct;
@@ -709,8 +711,7 @@ namespace go\core {
 			App::get()->getCache()->flush( false);
 			go()->getDatabase()->clearCache();
 			Settings::flushCache();
-			Property::clearCache();
-			Property::clearCachedRelationStmts();
+			Entity::clearCache();
 			GO::clearCache();
 			Listeners::get()->clear();
 			Observable::$listeners = [];
@@ -843,15 +844,15 @@ namespace go\core {
 		/**
 		 * Translates a language variable name into the local language.
 		 * 
-		 * @param String $str String to translate
-		 * @param String $module Name of the module to find the translation
-		 * @param String $package Only applies if module is set to 'base'
+		 * @param string $str String to translate
+		 * @param ?string $package The module package name. Defaults to {@see Language::$defaultPackage}
+		 * @param string|array|null $module Name of the module. Defaults to {@see Language::$defaultModule}
 		 */
-		public function t(string $str, string $package = 'core', string $module = 'core') {
+		public function t(string $str, string $package = null, string $module = null) {
 			return $this->getLanguage()->t($str, $package, $module);
 		}
 		
-		private $language;
+		private Language $language;
 		
 		/**
 		 * 

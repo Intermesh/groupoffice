@@ -242,8 +242,8 @@ class Site {
 	/**
 	 * Get URL to a public template file that is accessible with the browser.
 	 * 
-	 * @param StringHelper $relativePath
-	 * @return StringHelper
+	 * @param string $relativePath
+	 * @return string
 	 */
 	public static function file($relativePath, $template=true){
 
@@ -263,8 +263,8 @@ class Site {
 	/**
 	 * Check if a template or asset exists
 	 * 
-	 * @param StringHelper $relativePath
-	 * @return StringHelper
+	 * @param string $relativePath
+	 * @return string
 	 */
 	public static function fileExists($relativePath, $template=true){
 		return file_exists(self::filePath($relativePath, $template));
@@ -274,8 +274,8 @@ class Site {
 	/**
 	 * Get Path to a public template file that is accessible with the browser.
 	 * 
-	 * @param StringHelper $relativePath
-	 * @return StringHelper
+	 * @param string $relativePath
+	 * @return string
 	 */
 	public static function filePath($relativePath, $template=true){
 		if(!$template){
@@ -291,9 +291,9 @@ class Site {
 	 * Get a thumbnail URL for user uploaded files. This does not work for template
 	 * images.
 	 * 
-	 * @param StringHelper $relativePath
+	 * @param string $relativePath
 	 * @param array $thumbParams
-	 * @return StringHelper URL to thumbnail
+	 * @return string URL to thumbnail
 	 */
 	public static function thumb($relativePath, $thumbParams=array("lw"=>100, "ph"=>100, "zc"=>1)) {
 		

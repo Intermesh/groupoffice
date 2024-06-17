@@ -1100,6 +1100,10 @@ class Contact extends AclItemEntity {
 			$keywords[] = $this->notes;
 		}
 
+		if(!empty($this->vatNo)) {
+			$keywords[] = $this->vatNo;
+		}
+
 		return $keywords;
 	}
 

@@ -185,7 +185,7 @@ class FindCriteria {
 	/**
 	 * Add a custom bind parameter. Only useful in combination with addRawCondition.
 	 * 
-	 * @param StringHelper $paramTag eg. ":paramName"
+	 * @param string $paramTag eg. ":paramName"
 	 * @param mixed $value
 	 * @param int $pdoType
  	 * @return FindCriteria The complete FindCriteria object is given as a return value.
@@ -311,11 +311,11 @@ class FindCriteria {
 	/**
 	 * Add a fulltext search query
 	 * 
-	 * @param StringHelper $field
-	 * @param StringHelper $matchQuery
-	 * @param StringHelper $tableAlias
+	 * @param string $field
+	 * @param string $matchQuery
+	 * @param string $tableAlias
 	 * @param boolean $useAnd
-	 * @param StringHelper $mode
+	 * @param string $mode
 	 * @return FindCriteria 
 	 */
 	public function addMatchCondition($field, $matchQuery, $tableAlias='t', $useAnd=true, $mode='BOOLEAN'){

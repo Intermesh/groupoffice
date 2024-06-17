@@ -22,6 +22,7 @@ use go\core\Environment;
 use go\core\exception\ConfigurationException;
 use go\core\exception\NotFound;
 use go\core\Installer;
+use go\core\jmap\Request;
 use go\core\mail\Address;
 use go\core\mail\Message;
 use go\core\mail\Util;
@@ -1110,7 +1111,7 @@ public function historyLog(): bool|array
             $ua_info = \donatj\UserAgent\parse_user_agent();
             $where = [
                 'userId' => $this->id,
-                'ip' => $_SERVER['REMOTE_ADDR'] ?? 'CLI',
+                'ip' => Request::get()->getRemoteIpAddress() ?? 'CLI',
                 'platform' => $ua_info['platform'],
                 'name' => $ua_info['browser']
             ];
@@ -1209,24 +1210,21 @@ public function historyLog(): bool|array
 		return true;
 	}
 
-
 	public static function legacyOnDelete(Query $query): bool
 	{
+		foreach($query as $pk) {
+			/** @noinspection PhpUnhandledExceptionInspection */
+			$user = LegacyUser::model()->findByPk($pk['id'], false, true);
+			LegacyUser::model()->fireEvent("beforedelete", [$user, true]);
+			//delete all acl records
+			$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
 
-			foreach($query as $id) {
-				/** @noinspection PhpUnhandledExceptionInspection */
-				$user = LegacyUser::model()->findByPk($id, false, true);
-				LegacyUser::model()->fireEvent("beforedelete", [$user, true]);
-				//delete all acl records		
-				$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
-
-				foreach($defaultModels as $model){
-					$model->deleteByAttribute('user_id',$id);
-				}
-
-				LegacyUser::model()->fireEvent("delete", [$user, true]);
+			foreach($defaultModels as $model){
+				$model->deleteByAttribute('user_id',$pk['id']);
 			}
-	
+
+			LegacyUser::model()->fireEvent("delete", [$user, true]);
+		}
 
 		return true;
 	}

@@ -440,7 +440,8 @@ abstract class Property extends Model {
 	 *
 	 * @return void
 	 */
-	public static function clearCachedRelationStmts() {
+	public static function clearCachedRelationStmts(): void
+	{
 		self::$cachedRelationStmts = [];
 	}
 
@@ -639,11 +640,8 @@ abstract class Property extends Model {
 		return new Mapping(static::class);
 	}
 
-	public static function clearCache() {
-//		self::$_mapping = [];
-//		self::$requiredProps = [];
-		self::$cachedRelationStmts = [];
-//		self::$apiProperties = [];
+	public static function clearCache() : void {
+		self::clearCachedRelationStmts();
 	}
 
 	/**
@@ -2085,6 +2083,9 @@ abstract class Property extends Model {
 					$this->setValidationError($column->name, ErrorCode::MALFORMED, "Invalid value (".$value.") for " . $column->dataType);
 					return;
 				}
+				break;
+
+			case "json":
 				break;
 
 			default:

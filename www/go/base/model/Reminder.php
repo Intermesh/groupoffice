@@ -64,9 +64,9 @@ class Reminder extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Create a new reminder
 	 *
-	 * @param StringHelper $name The text that will appear in the reminder
+	 * @param string $name The text that will appear in the reminder
 	 * @param int $time Unix timestamp
-	 * @param StringHelper $model_name Optional model name and model id so that the reminder links to the dialog.
+	 * @param string $model_name Optional model name and model id so that the reminder links to the dialog.
 	 * @param int $model_id
 	 * @param int $vtime The time that will be displayed in the reminder
 	 * 

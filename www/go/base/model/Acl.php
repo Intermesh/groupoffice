@@ -119,9 +119,7 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 			return self::MANAGE_PERMISSION;
 
 		if( \GO::user() && \go\core\model\User::isAdminById($userId ? $userId : \GO::user()->id)) {
-
-			return $aclId == \go\core\model\Acl::getReadOnlyAclId() ? self::READ_PERMISSION : self::MANAGE_PERMISSION ;
-
+			return self::MANAGE_PERMISSION;
 		}
 
 		if($userId===false){

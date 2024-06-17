@@ -401,7 +401,7 @@ class Request extends Singleton{
   /**
    * Get the IP address of the user's client
    *
-   * @return string
+   * @return ?string
    */
 	public function getRemoteIpAddress(): ?string
 	{

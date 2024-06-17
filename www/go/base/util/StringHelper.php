@@ -302,7 +302,7 @@ class StringHelper {
 	 * @param string $replace
 	 * @param string $subject
 	 * @param bool $found Pass this to check if an occurence was replaced or not
-	 * @return StringHelper
+	 * @return string
 	 */
 
 	public static function replaceOnce($search, $replace, $subject, &$found=false) {
@@ -478,7 +478,7 @@ class StringHelper {
 	 *
 	 * @param	StringHelper $input Any string
 	 * @access public
-	 * @return StringHelper
+	 * @return string
 	 */
 	public static function empty_to_stripe($input) {
 		if ($input == "") {
@@ -534,7 +534,7 @@ class StringHelper {
 	 * @param	StringHelper $string The string to chop
 	 * @param	int $maxlength The maximum number of characters in the string
 	 * @access public
-	 * @return StringHelper
+	 * @return string
 	 */
 
 	public static function cut_string($string, $maxlength, $cut_whole_words = true, $append='...') {
@@ -568,7 +568,7 @@ class StringHelper {
 	 *
 	 * @param $string
 	 * @param $maxlines
-	 * @return StringHelper
+	 * @return string
 	 */
 	public static function limit_lines($string,$maxlines)
 	{
@@ -779,7 +779,7 @@ class StringHelper {
 	 * Filter possible XSS attacks
 	 * 
 	 * @param string $data;
-	 * @return StringHelper
+	 * @return string
 	 */
 	public static function filterXSS($data)
 	{
@@ -922,7 +922,7 @@ class StringHelper {
 	 * Encode an url but leave the forward slashes alone
 	 * 
 	 * @param string $str
-	 * @return StringHelper
+	 * @return string
 	 */
 	public static function rawurlencodeWithourSlash($str){
 		$parts = explode('/', $str);

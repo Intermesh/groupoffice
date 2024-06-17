@@ -66,7 +66,7 @@ class SummaryLog {
 	 * Add an element with error to the error array
 	 * 
 	 * @param mixed $itemIdentifier
-	 * @param StringHelper $message 
+	 * @param string $message
 	 */
 	public function addError($itemIdentifier, $message){
 		$this->_errors[]= array('name'=>$itemIdentifier,'message'=>$message);

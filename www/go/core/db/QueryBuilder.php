@@ -677,7 +677,7 @@ class QueryBuilder {
 		$tokens[] = $this->quoteTableName($columnParts[0]) . '.' . $this->quoteColumnName($columnParts[1]); //column name
 		
 		if (!isset($value)) {
-			if ($comparisonOperator == '=' || $comparisonOperator == 'IS') {
+			if ($comparisonOperator == '=' || $comparisonOperator == 'IS' || $comparisonOperator == 'LIKE') {
 				$tokens[] = "IS NULL";
 			} elseif ($comparisonOperator == '!=' || $comparisonOperator == 'IS NOT') {
 				$tokens[] = "IS NOT NULL";

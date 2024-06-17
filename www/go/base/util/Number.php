@@ -52,7 +52,7 @@ class Number {
 	 * @param	int $number The number
 	 * @param	int $decimals Number of decimals to display
 	 * @access public
-	 * @return StringHelper
+	 * @return string
  	 * @deprecated - use go\core\util\StringHelper\unlocalize
 	 */
 

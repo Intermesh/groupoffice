@@ -270,7 +270,7 @@ abstract class AbstractJsonController extends AbstractController {
 	 * Adds remoteComboTexts array to response
 	 * Will be called in renderLoad()
 	 * @param array $response the response data
-	 * @return StringHelper modified response data
+	 * @return string modified response data
 	 * @throws Exception if no valid key defined
 	 */
 	private function _loadComboTexts($model, $combofields, $response) {

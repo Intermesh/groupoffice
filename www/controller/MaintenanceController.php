@@ -510,7 +510,7 @@ class MaintenanceController extends AbstractController {
 	 * files, and echoes the fields that are in one file but not the other as Html.
 	 * @param String $lang1Path Full path to first language file.
 	 * @param String $lang2Path Full path to second language file.
-	 * @return StringHelper Html string containing useful information for the user.
+	 * @return string Html string containing useful information for the user.
 	 */
 	private function _compareLangFiles($lang1Path,$lang2Path) {
 		$outputHtml = '';
@@ -548,7 +548,7 @@ class MaintenanceController extends AbstractController {
 	 * into $contentArr.
 	 * @param String $filePath The full path to the file.
 	 * @param Array &$contentArr The array to put the language fields in.
-	 * @return StringHelper Output string, possibly containing warnings for the user.
+	 * @return string Output string, possibly containing warnings for the user.
 	 */
 	private function _langFieldsToArray($filePath,&$contentArr) {
 		$outputString = '';

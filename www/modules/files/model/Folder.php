@@ -20,6 +20,7 @@ use GO;
 use go\core\fs\FileSystemObject;
 use go\core\fs\Folder as GoFolder;
 use go\core\model\Acl;
+use go\core\model\Module;
 
 /**
  * The Folder model
@@ -97,8 +98,10 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			return false;
 		}
 
+
+
 		// Don't search these folders because it may show too much
-		if($this->findAclId() == Acl::getReadOnlyAclId()) {
+		if($this->parent_id == 0) {
 			return false;
 		}
 
@@ -180,7 +183,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 	/**
 	 * This getter recursively builds the folder path.
-	 * @return StringHelper
+	 * @return string
 	 */
 	protected function getPath($forceResolve=false) {
 
@@ -251,7 +254,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Get a URL to show the folder directy in the files module.
 	 *
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getExternalURL(){
 		return \GO::createExternalUrl("files", "showFolder", array($this->id));
@@ -300,7 +303,10 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		if($this->parent_id==0 && $this->acl_id==0){
 			//top level folders are readonly to everyone.
 			$this->readonly=1;
-			$this->acl_id = Acl::getReadOnlyAclId();
+
+			$mod = Module::findByName(null, "files");
+
+			$this->acl_id = $mod->getShadowAclId();
 		}
 		return parent::validate();
 	}
@@ -1075,7 +1081,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * Checks if a filename exists and renames it.
 	 *
 	 * @access public
-	 * @return StringHelper  New filename
+	 * @return string  New filename
 	 */
 	public function appendNumberToNameIfExists()
 	{
@@ -1399,7 +1405,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 	/**
 	 *
-	 * @param StringHelper $name
+	 * @param string $name
 	 * @return Folder
 	 */
 	public function getTopLevelShare($folderName){

@@ -197,12 +197,14 @@ class Connection {
 		if($this->authenticated){
 			
 			$lastLine = array_pop($response['data'][0]);
-		
-			if(($startpos = strpos($lastLine, 'CAPABILITY'))!==false){
-		
-				$endpos=  strpos($lastLine, ']', $startpos);
-				if($endpos){
-					$this->capability = substr($lastLine, $startpos, $endpos-$startpos);					
+
+			if(isset($lastLine)) {
+				if (($startpos = strpos($lastLine, 'CAPABILITY')) !== false) {
+
+					$endpos = strpos($lastLine, ']', $startpos);
+					if ($endpos) {
+						$this->capability = substr($lastLine, $startpos, $endpos - $startpos);
+					}
 				}
 			}
 		}		

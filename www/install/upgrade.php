@@ -16,6 +16,12 @@ try {
 
 	require('../vendor/autoload.php');
 	App::get();
+
+	if(!empty($_GET['onlyIfNeeded']) && go()->getSettings()->databaseVersion == go()->getVersion()) {
+		echo '<div id="success">Already up to date</div>';
+		exit(0);
+	}
+
 	go()->setCache(new \go\core\cache\None());
 
     // needed for invalid studio modules when upgrading for 6.5. They need to be patched before auto loaded by the event

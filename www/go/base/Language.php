@@ -50,7 +50,7 @@ class Language{
 	/**
 	 * Set the language to translate into. Clears the cached language strings too.
 	 * 
-	 * @param StringHelper $isoCode Leave empty to set the default user language.
+	 * @param string $isoCode Leave empty to set the default user language.
 	 * @return string|false Old ISO code that was set.
 	 */
 	public function setLanguage($isoCode = null){		
@@ -76,7 +76,7 @@ class Language{
 	/**
 	 * Check if language is supported
 	 * 
-	 * @param StringHelper $langIso
+	 * @param string $langIso
 	 * @return boolean 
 	 */
 	public function hasLanguage($langIso){

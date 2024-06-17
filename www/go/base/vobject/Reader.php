@@ -112,7 +112,7 @@ class Reader extends Sabre\VObject\Reader{
 	/**
 	 * Convert a vcalendar 2.0 duration into seconds.
 	 * 
-	 * @param StringHelper $duration
+	 * @param string $duration
 	 * @return int Seconds
 	 */
 	public static function parseDuration($duration){

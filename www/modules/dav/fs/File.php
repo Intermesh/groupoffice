@@ -68,7 +68,7 @@ class File extends \Sabre\DAV\FS\File {
 	/**
 	 * Renames the node
 	 *
-	 * @param StringHelper $name The new name
+	 * @param string $name The new name
 	 * @return void
 	 */
 	public function setName($name) {
@@ -93,7 +93,7 @@ class File extends \Sabre\DAV\FS\File {
 	/**
 	 * Movesthe node
 	 *
-	 * @param StringHelper $name The new name
+	 * @param string $name The new name
 	 * @return void
 	 */
 	public function move($newPath) {
@@ -116,7 +116,7 @@ class File extends \Sabre\DAV\FS\File {
 	/**
 	 * Returns the data
 	 *
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function get() {
 		$file = \GO\Files\Model\File::model()->findByPath($this->relpath);

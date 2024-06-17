@@ -58,7 +58,7 @@ class GO{
 	 * Check if a class can be used.
 	 * This function checks if the class exists and if the module for the class is installed (So the tables are available, when it's an active record)
 	 * 
-	 * @param StringHelper $className
+	 * @param string $className
 	 * @return boolean
 	 */
 	public static function classExists($className){
@@ -85,7 +85,7 @@ class GO{
 	 *
 	 * It returns the old value.
 	 *
-	 * @param StringHelper $ignore
+	 * @param string $ignore
 	 * @return boolean Old value
 	 */
 	public static function setIgnoreAclPermissions($ignore=true){
@@ -417,7 +417,7 @@ class GO{
 	/**
 	 * The automatic class loader for Group-Office.
 	 *
-	 * @param StringHelper $className
+	 * @param string $className
 	 */
 	public static function autoload($className) {
 		
@@ -583,7 +583,7 @@ class GO{
 	 * Register a callback function when an error occurs. It will be called with
 	 * the error message as string
 	 * 
-	 * @param StringHelper|array $func
+	 * @param string|array $func
 	 */
 	public static function registerErrorLogCallback($func){
 		self::$_errorLogCallbacks[]=$func;
@@ -593,8 +593,8 @@ class GO{
 	 * Custom error handler that logs to our own error log
 	 * 
 	 * @param int $errno
-	 * @param StringHelper $errstr
-	 * @param StringHelper $errfile
+	 * @param string $errstr
+	 * @param string $errfile
 	 * @param int $errline
 	 * @return boolean
 	 */
@@ -682,7 +682,7 @@ class GO{
 	/**
 	 * Writes a string to the Group-Office error log
 	 * 
-	 * @param StringHelper $errorMsg
+	 * @param string $errorMsg
 	 */
 	public static function logError($errorMsg){		
 		$logDir = \GO::config()->file_storage_path . 'log';
@@ -877,10 +877,10 @@ class GO{
 	 * 
 	 * Controller external/index will be execured.
 	 *
-	 * @param StringHelper $module
+	 * @param string $module
 	 * @param function $function
 	 * @param array $params
-	 * @return StringHelper
+	 * @return string
 	 */
 	public static function createExternalUrl($module, $function, $params,$toLoginDialog=false)
 	{
@@ -915,11 +915,11 @@ class GO{
 	/**
 	 * Generate a controller URL.
 	 *
-	 * @param StringHelper $path To controller. eg. addressbook/contact/submit
+	 * @param string $path To controller. eg. addressbook/contact/submit
 	 * @param array $params eg. array('id'=>1,'someVar'=>'someValue')
 	 * @param boolean $relative Defaults to true. Set to false to return an absolute URL.
 	 * @param boolean $htmlspecialchars Set to true to escape special html characters. eg. & becomes &amp.
-	 * @return StringHelper
+	 * @return string
 	 * @param boolean $appendSecurityToken add a SecurityToken to the url.
 	 * @return string
 	 */
@@ -962,7 +962,7 @@ class GO{
 	/**
 	 * Find classes in a folder
 	 *
-	 * @param StringHelper $path Relative from go/base
+	 * @param string $path Relative from go/base
 	 * @return \ReflectionClass[]
 	 */
 	public static function findClasses($subfolder){
@@ -988,7 +988,7 @@ class GO{
 	/**
 	 * Find classes in a folder
 	 *
-	 * @param StringHelper $path Relative from $config['file_storage_path'].'php/'
+	 * @param string $path Relative from $config['file_storage_path'].'php/'
 	 * @return \ReflectionClass[]
 	 */
 	public static function findFsClasses($subfolder, $subClassOf=null){

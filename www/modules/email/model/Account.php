@@ -35,23 +35,24 @@ use League\OAuth2\Client\Grant\RefreshToken;
  * @property boolean $imap_allow_self_signed Allow SSL/TLS and STARTTLS connection with self signed certificates. Enabling this will not check the identity of the server
  * @property string $imap_encryption 'ssl' or 'tls'
  * @property int $smtp_port
- * @property StringHelper $smtp_host
- * @property StringHelper $spam
- * @property StringHelper $trash
- * @property StringHelper $drafts
- * @property StringHelper $sent
- * @property StringHelper $mbroot
- * @property StringHelper $password
- * @property StringHelper $username
+ * @property string $smtp_host
+ * @property string $spam
+ * @property string $trash
+ * @property string $drafts
+ * @property string $sent
+ * @property bool $save_sent Save a copy to send items
+ * @property string $mbroot
+ * @property string $password
+ * @property string $username
  * @property boolean $novalidate_cert
  * @property boolean $deprecated_use_ssl
  * @property boolean $do_not_mark_as_read
  * @property int $port
- * @property StringHelper $host
+ * @property string $host
  * @property int $acl_id
  * @property int $user_id
  * @property int $id
- * @property StringHelper $check_mailboxes
+ * @property string $check_mailboxes
  * @property boolean $signature_below_reply
  * @property int $sieve_port
  * @property boolean $sieve_tls
@@ -485,7 +486,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 	/**
 	 * Find an account by e-mail address.
 	 *
-	 * @param StringHelper $email
+	 * @param string $email
 	 * @return Account
 	 */
 	public function findByEmail($email)
@@ -517,7 +518,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 
 	public function saveToSentItems(\GO\Base\Mail\Message $message, $params = []) {
 		//if a sent items folder is set in the account then save it to the imap folder
-		if(!$this->sent)
+		if(!$this->sent || !$this->save_sent)
 			return true;
 		GO::debug("Sent");
 		$imap = $this->openImapConnection($this->sent);

@@ -26,7 +26,6 @@ class Module extends Entity {
 	public $name;
 	public $package;
 	public $sort_order;
-	public $admin_menu;
 	public $version;
 	public $enabled;
 
@@ -79,7 +78,6 @@ class Module extends Entity {
 
 	protected function internalSave(): bool
 	{
-
 		if($this->isModified(['enabled']) || $this->isNew()) {
 			if($this->enabled && $this->isAvailable()) {
 				if($this->checkDepencencies) {
@@ -100,6 +98,10 @@ class Module extends Entity {
 		
 		if($this->isNew() || $this->sort_order < 1) {
 			$this->sort_order = $this->nextSortOrder();			
+		}
+
+		if($this->isModified(['permissions'])) {
+			$this->updateShadowAcl();
 		}
 		
 		if(!parent::internalSave()) {
@@ -273,6 +275,18 @@ class Module extends Entity {
 		}
 		
 		return $this->module;
+	}
+
+	public function getTitle() : string {
+		return static::module()->getTitle();
+	}
+
+	public function getLocalizedPackage() : string {
+		return static::module()->getLocalizedPackage();
+	}
+
+	public function getIcon() : string{
+		return static::module()->getIcon();
 	}
 
 	/**
@@ -631,5 +645,72 @@ class Module extends Entity {
 	public function setSettings($value) {
 		$this->getSettings()->setValues($value);
 		$this->change(true);
+	}
+
+	protected ?int $shadowAclId;
+
+	public function hasShadowAcl() : bool {
+		return isset($this->shadowAclId);
+	}
+
+	public function getShadowAclId() : int {
+		if(isset($this->shadowAclId)) {
+			return $this->shadowAclId;
+		}
+
+		return $this->getShadowAcl()->id;
+	}
+
+	public function getShadowAcl() : Acl {
+		if(isset($this->shadowAclId)) {
+			return Acl::findById($this->shadowAclId);
+		}
+
+		$acl = new Acl();
+		$acl->usedIn = "core_module.shadowAclId";
+		$acl->ownedBy = 1;
+		$acl->entityTypeId = self::entityType()->getId();
+		$acl->entityId = $this->id;
+
+
+		$this->fetchRelation("permissions");
+
+		if(isset($this->permissions)) {
+			foreach ($this->permissions as $groupId => $p) {
+				$acl->addGroup($groupId, !empty($p->getRights()->mayManage) ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ);
+			}
+		}
+
+
+		if(!$acl->save()) {
+			throw new SaveException($acl);
+		}
+
+		$this->shadowAclId = $acl->id();
+
+		if(!$this->isSaving()) {
+			go()->getDbConnection()->update('core_module', ['shadowAclId' => $acl->id], ['id' => $this->id])->execute();
+		}
+
+
+		return $acl;
+	}
+
+	protected function updateShadowAcl() : void {
+		if(!$this->hasShadowAcl()) {
+			return;
+		}
+
+		$acl = $this->getShadowAcl();
+		$acl->groups = [];
+		if(isset($this->permissions)) {
+			foreach ($this->permissions as $groupId => $p) {
+				$acl->addGroup($groupId, !empty($p->getRights()->mayManage) ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ);
+			}
+		}
+
+		if(!$acl->save()) {
+			throw new SaveException($acl);
+		}
 	}
 }

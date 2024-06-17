@@ -39,7 +39,7 @@ class ContactStore extends Store implements ISearchProvider {
 	 * 
 	 * Direction: SERVER -> PHONE
 	 * 
-	 * @param StringHelper $folderid
+	 * @param string $folderid
 	 * @param int $id
 	 * @param SyncParameters $contentParameters
 	 * @return SyncContact
@@ -76,7 +76,7 @@ class ContactStore extends Store implements ISearchProvider {
 	 *
 	 * Direction: PHONE -> SERVER
 	 *
-	 * @param StringHelper $folderid
+	 * @param string $folderid
 	 * @param int $id
 	 * @param SyncContact $message
 	 * @param SyncParameters $contentParameters
@@ -120,7 +120,7 @@ class ContactStore extends Store implements ISearchProvider {
 	/**
 	 * Get the status of an item
 	 * 
-	 * @param StringHelper $folderid
+	 * @param string $folderid
 	 * @param int $id
 	 * @return array
 	 */
@@ -147,7 +147,7 @@ class ContactStore extends Store implements ISearchProvider {
 	/**
 	 * Get the list of the items that need to be synced
 	 * 
-	 * @param StringHelper $folderid
+	 * @param string $folderid
 	 * @param type $cutoffdate
 	 * @return array
 	 */
@@ -172,7 +172,7 @@ class ContactStore extends Store implements ISearchProvider {
 	/**
 	 * Get the syncFolder that is attached to the given id
 	 * 
-	 * @param StringHelper $id
+	 * @param string $id
 	 * @return SyncFolder
 	 */
 	public function GetFolder($id) {

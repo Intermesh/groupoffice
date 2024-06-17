@@ -46,7 +46,8 @@ x Billing module refactor
         - PTR record for server IP is set
         - Perhaps black list check?
      x flush cache on password change: doveadm auth cache flush <USER> (NIET NODIG!)
-    - unbound or bind9?
+    x unbound or bind9?
+    - master user: https://doc.dovecot.org/configuration_manual/authentication/master_users/
 
 - Rocket chat
     - Live chat on sites feed back into GO

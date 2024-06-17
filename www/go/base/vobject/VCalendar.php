@@ -14,7 +14,7 @@ class VCalendar extends Sabre\VObject\Component\VCalendar {
 	 * By default this object will iterate over its own children, but this can 
 	 * be overridden with the iterator argument
 	 * 
-	 * @param StringHelper $name 
+	 * @param string $name 
 	 * @param Sabre_VObject_ElementList $iterator
 	 */
 	public function __construct() {

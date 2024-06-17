@@ -51,8 +51,8 @@ class File extends Base{
 	/**
 	 * Get a unique temporary file.
 	 * 
-	 * @param StringHelper $filename
-	 * @param StringHelper $extension
+	 * @param string $filename
+	 * @param string $extension
 	 * @return File 
 	 */
 	public static function tempFile($filename='',$extension='', $deleteIfExists = true){
@@ -79,7 +79,7 @@ class File extends Base{
 	 * Get the size formatted nicely like 1.5 MB
 	 * 
 	 * @param int $decimals
-	 * @return StringHelper 
+	 * @return string 
 	 */
 	public function humanSize($decimals = 1) {
 		$size = $this->size();
@@ -136,7 +136,7 @@ class File extends Base{
 	 * Returns the extension of a filename
 	 *
 	 * @access public
-	 * @return StringHelper  The extension of a filename
+	 * @return string  The extension of a filename
 	 */
 	public function extension() {
 		return self::getExtension($this->name());
@@ -162,8 +162,8 @@ class File extends Base{
 	/**
 	 * Get the extension of a filename
 	 * 
-	 * @param StringHelper $filename
-	 * @return StringHelper
+	 * @param string $filename
+	 * @return string
 	 */
 	public static function getExtension($filename) {
 		$extension = '';
@@ -195,7 +195,7 @@ class File extends Base{
 	 *
 	 * @param	StringHelper $filepath The complete path to the file
 	 * @access public
-	 * @return StringHelper  New filepath
+	 * @return string  New filepath
 	 */
 	public function appendNumberToNameIfExists()
 	{
@@ -251,8 +251,8 @@ class File extends Base{
 	/**
 	 * Get human friendly file type description. eg. Text document.
 	 * 
-	 * @param StringHelper $extension
-	 * @return StringHelper 
+	 * @param string $extension
+	 * @return string 
 	 */
 	public static function getFileTypeDescription($extension) {		
 		$lang = \GO::t($extension,'base','filetypes');
@@ -368,7 +368,7 @@ class File extends Base{
 	 * Move a file to another folder.
 	 * 
 	 * @param Folder|File $destination If a file is given it will be replaced.
-	 * @param StringHelper $newFileName Optionally rename the file too.
+	 * @param string $newFileName Optionally rename the file too.
 	 * @param boolean $isUploadedFile Check if this file was upload for security reasons.
 	 * @param boolean $appendNumberToNameIfDestinationExists Rename the file like "File (1)" if it already exists. 
 	 * @return boolean
@@ -413,7 +413,7 @@ class File extends Base{
 				$success = rename($this->path, $newPath);
 			} catch(\Exception $e) {
 				//renaming across partitions doesn't work
-				$success = $this->copy($destination, $newFileName) != false;
+				$success = file_exists($newPath) || $this->copy($destination, $newFileName) != false;
 				if($success) {
 					$this->delete();
 				}
@@ -530,7 +530,7 @@ class File extends Base{
 	/**
 	 * Try to detect the encoding. See PHP manual mb_detect_encoding
 	 * 
-	 * @return StringHelper 
+	 * @return string 
 	 */
 	public function detectEncoding($str){
 		$enc = false;
@@ -574,7 +574,7 @@ class File extends Base{
 	/**
 	 * Get the md5 hash from this file
 	 * 
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function md5Hash(){
 		return md5_file($this->path);
@@ -611,7 +611,7 @@ class File extends Base{
 	 * Get the end of a text file.
 	 * 
 	 * @param int $lines Number of lines
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function tail($lines=20) {
     //global $fsize;

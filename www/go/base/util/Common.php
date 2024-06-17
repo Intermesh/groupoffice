@@ -40,11 +40,11 @@ class Common {
 	/**
 	 * Get a link to Google maps for a given address
 	 * 
-	 * @param StringHelper $address
-	 * @param StringHelper $address_no
-	 * @param StringHelper $city
-	 * @param StringHelper $country
-	 * @return StringHelper 
+	 * @param string $address
+	 * @param string $address_no
+	 * @param string $city
+	 * @param string $country
+	 * @return string 
 	 */
 	public static function googleMapsLink($address, $address_no, $city, $country) {
 		$l = '';
@@ -70,16 +70,17 @@ class Common {
 	/**
 	 * Format an address in the format that belongs to the give country ISO code.
 	 * 
-	 * @param StringHelper $isoCountry
-	 * @param StringHelper $address
-	 * @param StringHelper $address_no
-	 * @param StringHelper $zip
-	 * @param StringHelper $city
-	 * @param StringHelper $state
-	 * @return StringHelper 
+	 * @param string $isoCountry
+	 * @param string $address
+	 * @param string $address_no
+	 * @param string $zip
+	 * @param string $city
+	 * @param string $state
+	 * @return string 
 	 */
 	public static function formatAddress($isoCountry, $address, $address_no,$zip,$city, $state) {
-		
+
+
 		if(empty($address) && empty($city) && empty($state)){
 			return "";
 		}
@@ -88,6 +89,8 @@ class Common {
 		$strCountry = isset($countries[$isoCountry]) ? $countries[$isoCountry] : $isoCountry;
 
 		require(GO::config()->root_path . 'language/addressformats.php');
+
+		/** @var array $af */
 
 		$format = isset($af[$isoCountry]) ? $af[$isoCountry] : $af['default'];
 

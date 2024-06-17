@@ -195,7 +195,7 @@ class Content extends \GO\Base\Db\ActiveRecord{
 	 /**
 	  * Find a content item by it's slug (and siteId)
 	  * 
-	  * @param StringHelper $slug
+	  * @param string $slug
 	  * @param int $siteId
 	  * @return Content
 	  * @throws \GO\Base\Exception\NotFound
@@ -220,9 +220,9 @@ class Content extends \GO\Base\Db\ActiveRecord{
 	 /**
 	  * Get the url to this content item.
 	  * 
-	  * @param StringHelper $route parameter can be set when you have "special" 
+	  * @param string $route parameter can be set when you have "special" 
 	  * controller actions to handle your content
-	  * @return StringHelper
+	  * @return string
 	  */
 	 public function getUrl($route='site/front/content'){
 		 
@@ -357,8 +357,8 @@ class Content extends \GO\Base\Db\ActiveRecord{
 	  * 
 	  * @param int $length
 	  * @param boolean $cutwords
-	  * @param StringHelper $append
-	  * @return StringHelper
+	  * @param string $append
+	  * @return string
 	  */
 	 public function getShortText($length=100,$cutwords=false,$append='...'){
 		 
@@ -649,7 +649,7 @@ class Content extends \GO\Base\Db\ActiveRecord{
 	 /**
 	  * Get the meta title of this content item.
 	  * 
-	  * @return StringHelper
+	  * @return string
 	  */
 	 public function getMetaTitle(){
 		 if(!empty($this->meta_title))

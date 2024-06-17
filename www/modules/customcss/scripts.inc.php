@@ -1,4 +1,5 @@
 <?php
+/** @var string $GO_SCRIPTS_JS */
 if(\GO::modules()->files){
 	
 	$folder = \GO\Files\Model\Folder::model()->findByPath ('public/customcss', true);

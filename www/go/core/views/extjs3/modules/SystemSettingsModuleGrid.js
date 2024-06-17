@@ -111,6 +111,13 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
 				this.store.baseParams['query'] = v;
 				this.store.load();
 			}
+		}, {
+			xtype: "button",
+			iconCls: "ic-sort",
+			handler: () => {
+				const win = new go.modules.ModuleSortWindow();
+				win.show();
+			}
 		}];
 
 		this.store.on('update', this.draw,this);

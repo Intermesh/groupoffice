@@ -6,8 +6,6 @@ set -e
 
 CONFIG=$1
 
-
-
 SASS="sass --no-source-map"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd $DIR/../;
@@ -45,7 +43,8 @@ cd $DIR/www;
 
 echo "Pulling main repository"
 
-git pull --recurse-submodules
+git pull 
+git submodule update --init
 
 for line in $(find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*' | sort -r );
 do
@@ -85,7 +84,7 @@ npm ci
 cd ..
 npm ci
 npm run build
-npm prune --production
+
 cd $DIR;
 echo "DONE";
 

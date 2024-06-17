@@ -85,18 +85,15 @@ try {
 
 	call_user_func_array([$c, $method], $parts);
 
-} catch (Exception $e) {
-	require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageHeader.php');
+} catch (Throwable $e) {
 
 	ErrorHandler::logException($e);
-	Response::get()->setStatus(500);
-	Response::get()->output($e->getMessage());
+
+	echo"<h1>" . $e->getMessage() ."</h1>";
 
 	if(go()->getDebugger()->enabled) {
 		echo "<pre>";
 		go()->getDebugger()->printEntries();
 		echo "</pre>";
 	}
-
-	require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageFooter.php');
 }

@@ -43,8 +43,8 @@ class Connection
 
 	/**
 	 * Returns the ID of the last inserted row or sequence value.
-	 * @param StringHelper $sequenceName name of the sequence object (required by some DBMS)
-	 * @return StringHelper the row ID of the last row inserted, or the last value retrieved from the sequence object
+	 * @param string $sequenceName name of the sequence object (required by some DBMS)
+	 * @return string the row ID of the last row inserted, or the last value retrieved from the sequence object
 	 */
 	public function getLastInsertID($sequenceName = '')
 	{
@@ -177,10 +177,10 @@ class Connection
 	/**
 		* Alters the SQL to apply LIMIT and OFFSET.
 		* Default implementation is applicable for PostgreSQL, MySQL and SQLite.
-		* @param StringHelper $sql SQL query string without LIMIT and OFFSET.
+		* @param string $sql SQL query string without LIMIT and OFFSET.
 		* @param integer $limit maximum number of rows, -1 to ignore limit.
 		* @param integer $offset row offset, -1 to ignore offset.
-		* @return StringHelper SQL with LIMIT and OFFSET
+		* @return string SQL with LIMIT and OFFSET
 		*/
 	public function applyLimit($sql,$limit,$offset)
 	{
@@ -205,8 +205,8 @@ class Connection
 
 	/**
 	 * Quotes a string value for use in a query.
-	 * @param StringHelper $str string to be quoted
-	 * @return StringHelper the properly quoted string
+	 * @param string $str string to be quoted
+	 * @return string the properly quoted string
 	 */
 	public function quoteValue($str)
 	{
@@ -223,8 +223,8 @@ class Connection
 	/**
 	 * Quotes a table name for use in a query.
 	 * If the table name contains schema prefix, the prefix will also be properly quoted.
-	 * @param StringHelper $name table name
-	 * @return StringHelper the properly quoted table name
+	 * @param string $name table name
+	 * @return string the properly quoted table name
 	 */
 	public function quoteTableName($name)
 	{
@@ -239,8 +239,8 @@ class Connection
 	/**
 	 * Quotes a column name for use in a query.
 	 * If the column name contains prefix, the prefix will also be properly quoted.
-	 * @param StringHelper $name column name
-	 * @return StringHelper the properly quoted column name
+	 * @param string $name column name
+	 * @return string the properly quoted column name
 	 */
 	public function quoteColumnName($name)
 	{

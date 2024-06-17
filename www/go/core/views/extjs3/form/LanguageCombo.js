@@ -13,6 +13,8 @@ go.form.LanguageCombo = Ext.extend(go.form.ComboBox, {
 			mode:'local',
 			triggerAction:'all',
 			forceSelection: true,
+			editable: true,
+			typeAhead: true,
 			value: GO.lang.iso
 		});
 		this.supr().initComponent.call(this);

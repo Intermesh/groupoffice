@@ -179,10 +179,10 @@ class Language {
 	 *
 	 * @param array $address array with street, street2, city, zipCode and state
 	 * @param string|null $countryCode
-	 * @param boolean|null $showCountry When null it will be false if the country isthe system default
+	 * @param boolean|null $showCountry When null it will be false if the country is the system default
 	 * @return string
 	 */
-	public function formatAddress(array $address, ?string $countryCode, bool $showCountry = true) : string
+	public function formatAddress(array $address, ?string $countryCode, ?bool $showCountry = null) : string
 	{
 		if(empty($countryCode)) {
 			$countryCode = self::defaultCountry();
@@ -200,7 +200,7 @@ class Language {
 		$format = str_replace('{zip}', $address['zipCode'] ?? "", $format);
 		$format = str_replace('{state}', $address['state'] ?? "", $format);
 
-		if(!isset($showCountry)) {
+		if (is_null($showCountry)) {
 			$showCountry = !self::isDefaultCountry($countryCode);
 		}
 
@@ -216,20 +216,33 @@ class Language {
 		return trim(preg_replace("/[\n]+/", "\n", $format));
 	}
 
+	public string $defaultPackage = "core";
+	public string $defaultModule = "core";
+
 	/**
 	 * Translates a language variable name into the local language.
-	 * 
-	 * @param String $str String to translate
-	 * @param String $module Name of the module to find the translation
-	 * @param String $package Only applies if module is set to 'base'
-	 */
-	public function t($str, $package = 'core', $module = 'core') {
+	 *
+	 * @see App::t() For shorter access
+	 *
+	 * @param string $str String to translate
+	 * @param ?string $package The module package name. Defaults to {@see Language::$defaultPackage}
+	 * @param string|array|null $module Name of the module. Defaults to {@see Language::$defaultModule}
+ */
+	public function t(string $str, ?string $package = null, ?string $module = null) {
+
+		if($package == null) {
+			$package = $this->defaultPackage;
+		}
+
+		if($module == null) {
+			$module = $this->defaultModule;
+		}
 
 		$this->loadSection($package, $module);
 		
 		//fallback on core lang
 		if(!isset($this->data[$package]) || !isset($this->data[$package][$module]) || ($package != "core" && $module != "core" && !isset($this->data[$package][$module][$str]))) {
-			return $this->t($str);
+			return $this->t($str, "core", "core");
 		}
 		
 		return $this->data[$package][$module][$str] ?? $this->replaceBrand($str);

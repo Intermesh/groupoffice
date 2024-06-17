@@ -10,7 +10,7 @@ class Theme{
 	/**
 	 * Get the name of the theme that is selected by the user.
 	 * 
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getName(){
 		if(!isset($this->name)) {
@@ -26,7 +26,7 @@ class Theme{
 	/**
 	 * Get the full path to the main theme folder with trailing slash.
 	 * 
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getPath(){
 		return \GO::view()->getPath().'themes/'.$this->getName().'/';
@@ -35,7 +35,7 @@ class Theme{
 	/**
 	 * Get the full path to the main theme folder with trailing slash.
 	 * 
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getUrl(){
 		return \GO::view()->getUrl().'themes/'.$this->getName().'/';

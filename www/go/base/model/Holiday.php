@@ -142,8 +142,8 @@ class Holiday extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Delete all the holidays of the given year and locale
 	 * 
-	 * @param StringHelper $year
-	 * @param StringHelper $locale
+	 * @param string $year
+	 * @param string $locale
 	 * @throws Exception 
 	 */
 	public function deleteHolidays($year,$locale='en'){
@@ -195,8 +195,8 @@ class Holiday extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Generate the holidays from the holidays file for the given year and locale.
 	 * 
-	 * @param StringHelper $year
-	 * @param StringHelper $locale
+	 * @param string $year
+	 * @param string $locale
 	 * @throws Exception 
 	 */
 	public function generateHolidays($year,$locale='en')
@@ -350,7 +350,7 @@ class Holiday extends \GO\Base\Db\ActiveRecord {
 	 * 
 	 * If no match can be found then the self::$systemDefaultLocale variable is used.
 	 * 
-	 * @param StringHelper $countryCode
+	 * @param string $countryCode
 	 * @return mixed the locale for the holidays or false when none found
 	 */
 	public static function localeFromCountry($countryCode){

@@ -83,8 +83,8 @@ class Connection{
 	/**
 	 * Bind to the LDAP directory
 	 * 
-	 * @param StringHelper $bindRdn eg . cn=admin,dc=intermesh,dc=dev
-	 * @param StringHelper $password
+	 * @param string $bindRdn eg . cn=admin,dc=intermesh,dc=dev
+	 * @param string $password
 	 * @return boolean 
 	 */
 	public function bind($bindRdn, $password){
@@ -98,8 +98,8 @@ class Connection{
 	/**
 	 * Search the LDAP directory
 	 * 
-	 * @param StringHelper $baseDN
-	 * @param StringHelper $query
+	 * @param string $baseDN
+	 * @param string $query
 	 * @param array $attributes
 	 * @return Result 
 	 */

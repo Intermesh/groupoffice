@@ -57,9 +57,9 @@ class CSSMin
 
     /**
      * Minify a string of CSS
-     * @param StringHelper $css
+     * @param string $css
      * @param int|bool $linebreak_pos
-     * @return StringHelper
+     * @return string
      */
     public function run($css = '', $linebreak_pos = FALSE)
     {
@@ -213,9 +213,9 @@ class CSSMin
 
     /**
      * Does bulk of the minification
-     * @param StringHelper $css
+     * @param string $css
      * @param int|bool $linebreak_pos
-     * @return StringHelper
+     * @return string
      */
     private function minify($css, $linebreak_pos)
     {
@@ -416,8 +416,8 @@ class CSSMin
      * compressing, to avoid performance issues running some of the subsequent
      * regexes against large strings chunks.
      *
-     * @param StringHelper $css
-     * @return StringHelper
+     * @param string $css
+     * @return string
      */
     private function extract_data_urls($css)
     {
@@ -494,8 +494,8 @@ class CSSMin
      * DOES NOT compress invalid hex values.
      * e.g. background-color: #aabbccdd
      *
-     * @param StringHelper $css
-     * @return StringHelper
+     * @param string $css
+     * @return string
      */
     private function compress_hex_colors($css)
     {
@@ -694,8 +694,8 @@ class CSSMin
      * PHP port of Javascript's "indexOf" function for strings only
      * Author: Tubal Martin http://blog.margenn.com
      *
-     * @param StringHelper $haystack
-     * @param StringHelper $needle
+     * @param string $haystack
+     * @param string $needle
      * @param int    $offset index (optional)
      * @return int
      */
@@ -711,10 +711,10 @@ class CSSMin
      * Author: Tubal Martin http://blog.margenn.com
      * Tests: http://margenn.com/tubal/str_slice/
      *
-     * @param StringHelper   $str
+     * @param string   $str
      * @param int      $start index
      * @param int|bool $end index (optional)
-     * @return StringHelper
+     * @return string
      */
     private function str_slice($str, $start = 0, $end = FALSE)
     {

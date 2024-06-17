@@ -192,7 +192,7 @@ Ext.extend(GO.sieve.SieveGrid, GO.grid.GridPanel,{
 			cindex=this.store.data.length-1;
 		}
 
-		for(i = 0; i < rows.length; i++)
+		for(var i = 0; i < rows.length; i++)
 		{
 			var rowData=this.store.getById(rows[i].id);
 

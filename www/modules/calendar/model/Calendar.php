@@ -124,7 +124,7 @@ class Calendar extends \GO\Base\Model\AbstractUserDefaultModel {
 	 * Get the color of this calendar from the Calendar_user_Color table.
 	 * 
 	 * @param int $userId
-	 * @return StringHelper The color or false if no color is found 
+	 * @return string The color or false if no color is found 
 	 */
 	public function getColor($userId){
 		$userColor = CalendarUserColor::model()->findByPk(array('calendar_id'=>$this->id,'user_id'=>$userId));
@@ -138,7 +138,7 @@ class Calendar extends \GO\Base\Model\AbstractUserDefaultModel {
 	/**
 	 * Get's a unique URI for the calendar. This is used by CalDAV
 	 * 
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getUri(){
 		return preg_replace('/[^\w-]*/', '', (strtolower(str_replace(' ', '-', $this->name)))).'-'.$this->id;
@@ -270,7 +270,7 @@ class Calendar extends \GO\Base\Model\AbstractUserDefaultModel {
 	/**
 	 * Get the Vobject of this calendar
 	 * 
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function toVObject(){
 
@@ -310,7 +310,7 @@ class Calendar extends \GO\Base\Model\AbstractUserDefaultModel {
 	
 	/**
 	 * Get the url to the published ICS file.
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getPublicIcsUrl(){
 		return \GO::config()->full_url.'public/calendar/'.$this->id.'/calendar.ics';
@@ -318,7 +318,7 @@ class Calendar extends \GO\Base\Model\AbstractUserDefaultModel {
 	
 	/**
 	 * Get the url to the published ICS file.
-	 * @return StringHelper
+	 * @return string
 	 */
 	public function getPublicIcsPath(){
 		return \GO::config()->file_storage_path.'public/calendar/'.$this->id.'/calendar.ics';

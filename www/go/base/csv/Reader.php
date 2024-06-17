@@ -167,7 +167,7 @@ class Reader{
 	
 	/**
 	 * Sets the current file handle's file pointer.
-	 * @param StringHelper $mode Mode to set the file at. Default: mode read 'r'. See
+	 * @param string $mode Mode to set the file at. Default: mode read 'r'. See
 	 * php's fopen documentation for possible modes.
 	 */
 	protected function setFP($mode='r'){

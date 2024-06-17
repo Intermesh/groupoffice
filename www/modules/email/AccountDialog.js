@@ -474,6 +474,10 @@ GO.email.AccountDialog = function(config) {
 						defaults: {hideLabel : true, checked:false},
 						items : [
 							new Ext.ux.form.XCheckbox({
+								boxLabel : t("Save sent mail to the sent folder", "email"),
+								name : 'save_sent'
+							}),
+							new Ext.ux.form.XCheckbox({
 								boxLabel : t("Store replies in the same folder as the original message", "email"),
 								name : 'ignore_sent_folder'
 							}),

@@ -168,7 +168,7 @@ class Record extends Model{
 	
 	/**
 	 * Get the DN of this record.
-	 * @return StringHelper The distinguished name of an LDAP entity.
+	 * @return string The distinguished name of an LDAP entity.
 	 */
 	public function getDn(){
 		return ldap_get_dn($this->_ldapConn->getLink(),$this->_entryId);

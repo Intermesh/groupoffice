@@ -60,7 +60,20 @@ go.customfields.DetailPanel = Ext.extend(Ext.Panel, {
 
     me.items.push(currentCol);
 
+		this.tools = [{
+			id: "edit",
+			handler: () => {
+				const win = new go.customfields.EditFieldSetDialog({
+					entityStore: this.fieldSet.entity ,
+					fieldSetId: this.fieldSet.id
+				});
+				win.load(this.entityId);
+				win.show();
+			}
+		}]
+
     this.supr().initComponent.call(this);
+
   },
 
   onLoad: function(dv) {
@@ -69,6 +82,8 @@ go.customfields.DetailPanel = Ext.extend(Ext.Panel, {
      this.setVisible(false);
      return''
     }
+
+		this.entityId = dv.data.id;
 
     var vis = false, panel = this, promisses = [];
     go.customfields.CustomFields.getFields(this.fieldSet.id).forEach(function (field) {

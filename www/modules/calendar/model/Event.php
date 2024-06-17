@@ -265,7 +265,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Get the color for the current status of this event
 	 * 
-	 * @return StringHelper 
+	 * @return string 
 	 */
 	public function getStatusColor(){
 		
@@ -1259,8 +1259,8 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	 * Create a localEvent model from this event model
 	 * 
 	 * @param Event $event
-	 * @param StringHelper $periodStartTime
-	 * @param StringHelper $periodEndTime
+	 * @param string $periodStartTime
+	 * @param string $periodEndTime
 	 * @return LocalEvent 
 	 */
 	public function getLocalEvent($event, $periodStartTime, $periodEndTime){
@@ -1275,7 +1275,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	 * 
 	 * Optionally exceptionDate can be specified to find a specific exception.
 	 * 
-	 * @param StringHelper $uuid
+	 * @param string $uuid
 	 * @param int $user_id
 	 * @param int $calendar_id
 	 * @param int $exceptionDate
@@ -1341,7 +1341,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	
 	/**
 	 * Get the status translated into the current language setting
-	 * @return StringHelper 
+	 * @return string 
 	 */
 	public function getLocalizedStatus(){
 		$statuses = \GO::t("statuses", "calendar");
@@ -1354,7 +1354,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	 * Get the event in HTML markup
 	 * 
 	 * @todo Add recurrence info
-	 * @return StringHelper 
+	 * @return string 
 	 */
 	public function toHtml() {
 		$html = '<table id="event-'.$this->uuid.'">' .
@@ -1455,7 +1455,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Get this event as a VObject. This can be turned into a vcalendar file data.
 	 * 
-	 * @param StringHelper $method REQUEST, REPLY or CANCEL
+	 * @param string $method REQUEST, REPLY or CANCEL
 	 * @param Participant $updateByParticipant The participant that is generating this ICS for a response.
 	 * @param int $recurrenceTime Export for a specific recurrence time for the recurrence-id. 
 	 * @param boolean $includeExdatesForMovedEvents Funambol need EXDATE lines even for appointments that have been moved. CalDAV doesn't need those lines.
@@ -1672,7 +1672,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Get vcalendar data for an *.ics file.
 	 * 
-	 * @param StringHelper $method REQUEST, REPLY or CANCEL
+	 * @param string $method REQUEST, REPLY or CANCEL
 	 * @param Participant $updateByParticipant The participant that is generating this ICS for a response.
 	 * @param int $recurrenceTime Export for a specific recurrence time for the recurrence-id. 
 	 * If this event is an occurence and has a exception_for_event_id it will automatically determine this value. 
@@ -2484,8 +2484,8 @@ The following is the error message:
 			//organizer is not a Group-Office user with event. We must send a message to him an ICS attachment
 		if($includeIcs){
 			$ics=$this->toICS("REPLY", $sendingParticipant, $recurrenceTime);				
-			$a = Attachment::fromString($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="REPLY;charset=utf-8"');
-			$a->setInline(true);
+			$a = Attachment::fromString($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar;method=REPLY;charset=utf-8');
+			$a->setInline(false);
 			$message->attach($a);
 			
 		}
@@ -2540,8 +2540,8 @@ The following is the error message:
 			$body = '<p>'.\GO::t("The following event has been cancelled by the organizer", "calendar").': </p>'.$this->toHtml();
 			
 				$ics=$this->toICS("CANCEL", $participant);
-				$a = Attachment::fromString($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="CANCEL; charset=utf8"');
-				$a->setInline(true);
+				$a = Attachment::fromString($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar;method=CANCEL;charset=utf8');
+				$a->setInline(false);
 				$message->attach($a);
 				
 			if($participantEvent){
@@ -2652,8 +2652,8 @@ The following is the error message:
 						$body .= '</div>';
 
 					$ics=$this->toICS("REQUEST");
-					$a = Attachment::fromString($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="REQUEST;charset=utf-8"');
-					$a->setInline(true);
+					$a = Attachment::fromString($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar;method=REQUEST;charset=utf-8');
+					$a->setInline(false);
 
 					$message->attach($a);
 

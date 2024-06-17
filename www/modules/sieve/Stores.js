@@ -21,6 +21,7 @@ GO.sieve.cmbFieldStore = new Ext.data.ArrayStore({
 	[t("size", "sieve"), 'size'],
 	[t("Body", "sieve"), 'body'],
 	[t("Spam flag", "sieve"), 'X-Spam-Flag'],
+	[t("Mailing list", "sieve"), 'List-Unsubscribe'],
 	[t("Current Date", "sieve"), 'currentdate'],
 	[t("Custom", "sieve"), 'custom']
 	]

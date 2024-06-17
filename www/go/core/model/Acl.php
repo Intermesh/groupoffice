@@ -420,38 +420,6 @@ class Acl extends Entity {
 	}
 
 	/**
-	 * Get the ACL that can be used to make things read only for everyone.
-	 *
-	 * @return int
-	 * @throws SaveException
-	 */
-	public static function getReadOnlyAclId() : int{
-
-		$id = go()->getCache()->get('readonlyaclid');
-
-		if($id) {
-			return $id;
-		}
-		
-		$acl = static::find()->where(['usedIn' => 'readonly'])->single();
-		
-		if(!$acl){
-			$acl = new static();
-			$acl->ownedBy = 1;
-			$acl->usedIn='readonly';
-			$acl->addGroup(Group::ID_EVERYONE);
-			if(!$acl->save()) {
-				throw new SaveException($acl);
-			}
-		}
-
-		go()->getCache()->set('readonlyaclid', $acl->id);
-
-		return $acl->id;
-	}
-
-
-	/**
 	 * Get all tables referencing the acl's
 	 *
 	 * New framework uses foreign keys to do this but for the old ActiveRecords
@@ -463,6 +431,11 @@ class Acl extends Entity {
 	public static function getReferences(): array
 	{
 		$refs = self::getMapping()->getPrimaryTable()->getReferences();
+
+		// remove child ref
+		$refs = array_filter($refs, function($r) {
+			return $r['table'] != 'core_acl_group';
+		});
 
 		// old framework does not have foreign keys
 		$entities = EntityType::findAll();
