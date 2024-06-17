@@ -14,6 +14,7 @@
 - Email: Show and sort on internal date by default. Fixed: Go Is using FROM header date, showing a message in the future #1055
 - Fixed: Changing user passwords in system settings changes imap/smtp password in users with the same name before @ #1103
 - Calendar: Fixed bug in invite mails Merijn Schering
+- Tasks: Export .ics via Tasks -> Export -> vCalendar: BEGIN:VCALENDAR/END:VCALENDAR around every BEGIN:VTODO/END:VTODO #950
 
 11-06-2024: 6.8.54
 - Core: Sort modules in GUI
