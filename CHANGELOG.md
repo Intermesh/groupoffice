@@ -16,6 +16,7 @@
 - Calendar: Fixed bug in invite mails Merijn Schering
 - Tasks: Export .ics via Tasks -> Export -> vCalendar: BEGIN:VCALENDAR/END:VCALENDAR around every BEGIN:VTODO/END:VTODO #950
 - Notes: Added notebook name to export and import
+- Fixed: Changes on failure #1044
 
 11-06-2024: 6.8.54
 - Core: Sort modules in GUI
