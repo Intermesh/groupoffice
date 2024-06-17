@@ -433,6 +433,7 @@ class Html2Text
 //			$this->replace[]='$this->_build_link_list("\\1", "\\2")';
 			
 			$text = preg_replace_callback('/<a [^>]*href="([^"]+)"[^>]*>(.*?)<\/a>/i',array($this, '_build_link_list'), $text);
+			$text = $text ?? "";
 		}
 
 		// Run our defined search-and-replace
