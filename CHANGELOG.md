@@ -4,6 +4,16 @@
 - Email: Show and sort on internal date by default. Fixed: Go Is using FROM header date, showing a message in the future
        #1055
 - Smime: Fixed error when both signing and encrypting
+- Core: Fixed: Everyone group and all contacts translatable #636
+- Core: save of install language to system settings
+- Fixed: Auto-complete and semi-colons #951
+- Core: Set html editor background color so it's always white in dark mode
+- Core: Replace old favicon.ico with current one
+- Email/Core: fixed: SanitizeHTML CSS comment fixup #1021
+- Smime: Fixed error when both signing and encrypting
+- Email: Show and sort on internal date by default. Fixed: Go Is using FROM header date, showing a message in the future #1055
+- Fixed: Changing user passwords in system settings changes imap/smtp password in users with the same name before @ #1103
+- Calendar: Fixed bug in invite mails Merijn Schering
 
 11-06-2024: 6.8.54
 - Core: Sort modules in GUI
