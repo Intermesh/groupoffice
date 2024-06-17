@@ -72,8 +72,15 @@ class MailDomain {
 	public function setMailboxPassword($user, $domain){
 		
 		go()->debug("SERVERCLIENT: Updating password for mailbox ".$user->username.'@'.$domain);
-		
-		$username = explode('@', $user->username) [0];
+
+		$usernameParts = explode('@', $user->username);
+		$username = $usernameParts[0];
+
+		// if username contains domain then only change it for that domain.
+		if(isset($usernameParts[1]) && $domain != $usernameParts[1]) {
+			return;
+		}
+
 		$username.='@'.$domain;
 		
 		$url = $this->getBaseUrl("postfixadmin/mailbox/setPassword");
