@@ -183,7 +183,6 @@ abstract class AbstractConverter {
 		while($this->nextImportRecord()) {
 
 			try {
-				echo $this->index ."\n";
 
 				$entity = $this->importEntity();
 				
