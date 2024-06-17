@@ -48,6 +48,7 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 		 */
 		sep: ',',
 		textarea: false,
+		enableKeyEvents: true,
 
 		initComponent: function() {
 			this.textSizeEl = Ext.DomHelper.append(document.body, {
@@ -56,13 +57,14 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 
 			GO.form.ComboBoxMulti.superclass.initComponent.call(this);
 
-			this.on("specialkey", function(field, e) {
+			this.on("keydown", function(field, e) {
 				this.onSpecialKey(field, e);
 			}, this);
 		},
 
 		onSpecialKey: function(field, e) {
-			if (e.getKey() === e.ENTER) {
+
+			if (e.getKey() === e.ENTER || e.getKey() == 186) {
 				const v = this.getValue().trim(), lastChar = v.charAt(v.length -1);
 				if(lastChar !== this.sep) {
 					this.setValue(v + this.sep + " ");
