@@ -97,7 +97,7 @@ class VCalendar extends AbstractConverter {
 				->from("tasks_category")
 				->where(['id' => $task->categories])
 				->fetchMode(\PDO::FETCH_COLUMN, 0)
-				->execute();
+				->all();
 		}
 
 		$vtodo->status = strtoupper($task->getProgress());
