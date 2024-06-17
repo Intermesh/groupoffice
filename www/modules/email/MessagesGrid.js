@@ -55,7 +55,6 @@ GO.email.MessagesGrid = function(config){
 			id:'arrival',
 			header: t("Date"),
 			dataIndex:'internal_udate',
-			hidden:true,
 			groupable:true,
 			align:'right',
 			width: dp(100),
@@ -68,6 +67,7 @@ GO.email.MessagesGrid = function(config){
 		},{
 			id:'date',
 			header: t("Date sent", "email"),
+			hidden:true,
 			dataIndex:'udate',
 			groupable:true,
 			align:'right',
