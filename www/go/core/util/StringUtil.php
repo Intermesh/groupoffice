@@ -986,7 +986,7 @@ END;
 
 		// remove comments because they might interfere. Some commands  in style tags may be improperly formatted
 		// because the user appears to paste from Word
-		$html = preg_replace(["'<style>[\s]*<!--'u", "'-->[\s*]</style>'u"], ['<style>','</style>'], $html);
+		$html = preg_replace(["'<style[^>]*>[\s]*<!--'u", "'-->[\s*]</style>'u"], ['<style>','</style>'], $html);
 		$html = preg_replace("'<!--.*-->'Uusi", "", $html);
 		$html = preg_replace('!/\*.*?\*/!s', '', $html);
 
