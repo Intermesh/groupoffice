@@ -136,13 +136,17 @@ class Installer {
 
 		Utils::runSQLFile(Environment::get()->getInstallFolder()->getFile("go/core/install/install.sql"));
 		go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
-		
+
+		if(isset($adminValues['language'])) {
+			go()->getSettings()->language = $adminValues['language'];
+			go()->getLanguage()->setLanguage($adminValues['language']);
+		}
+
 		$this->installGroups();
 
 		$admin = $this->installAdminUser($adminValues);
 
-		go()->getSettings()->language = $admin->language;
-		go()->getLanguage()->setLanguage($admin->language);
+
 
 		$this->installCoreModule();
 				
@@ -170,6 +174,8 @@ class Installer {
 			}
 		}
 
+		// set language again as the model above gets lost by clearing cache during install
+		go()->getSettings()->language = $admin->language;
 		go()->getSettings()->systemEmail = $admin->email;
 		go()->getSettings()->databaseVersion = go()->getVersion();
 		go()->getSettings()->setDefaultGroups([Group::ID_INTERNAL]);
@@ -295,7 +301,7 @@ class Installer {
 			$group = new Group();
 			//fixed ID for cluster setups. See https://github.com/Intermesh/groupoffice/issues/742
 			$group->id = $id++;
-			$group->name = $groupName;
+			$group->name = go()->t($groupName);
 			if (!$group->save()) {
 				throw new Exception("Could not create group: " . $group->getValidationErrorsAsString());
 			}

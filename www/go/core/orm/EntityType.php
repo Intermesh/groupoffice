@@ -502,7 +502,13 @@ class EntityType implements ArrayableInterface {
 		}
 	}
 
-	private static $changes = [];
+	private static array $changes = [];
+
+
+	public function undoChanges() : void {
+		$id = $this->getId();
+		self::$changes[$id] = [];
+	}
 
 
 	/**
@@ -549,6 +555,9 @@ class EntityType implements ArrayableInterface {
 		$now = new DateTime();
 		$allChanges = [];
 		foreach(self::$changes as $entityTypeId => $changes) {
+			if(empty($changes)) {
+				continue;
+			}
 			$type = self::findById($entityTypeId);
 
 			$modSeq = $type->nextModSeq();

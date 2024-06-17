@@ -768,6 +768,11 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 
 	this.cardPanel.on('afterrender', function() {
 		GO.files.DnDFileUpload(function (blobs, folder_id) {
+
+			if(this.permission_level < GO.permissionLevels.write) {
+				GO.errorDialog.show(t("Access denied"));
+				return
+			}
 			blobs = this.transformBlobs(blobs);
 			this.sendOverwrite({upload: true, blobs: Ext.encode(blobs), destination_folder_id: folder_id});
 		}.bind(this), this.cardPanel.body)(this);
@@ -1964,6 +1969,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 	setWritePermission : function(permissionLevel)
 	{
+		this.permission_level = permissionLevel;
+
 		var writePermission=permissionLevel>=GO.permissionLevels.write;
 		var deletePermission=permissionLevel>=GO.permissionLevels.writeAndDelete;
 		var createPermission=permissionLevel>=GO.permissionLevels.create;
@@ -1973,7 +1980,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		
 		this.cutButton.setDisabled(!deletePermission);
                 
-                this.copyButton.setDisabled(permissionLevel<=0);
+		this.copyButton.setDisabled(permissionLevel<=0);
                 
 		this.pasteButton.setDisabled(!writePermission || !GO.files.pasteSelections.length);
 

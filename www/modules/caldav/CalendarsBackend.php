@@ -51,7 +51,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			$task->modifiedAt = new DateTime('now', new \DateTimeZone('utc'));
 			// task to vtodo
 			$parser = new VCalendar();
-			$data = $parser->export($task);
+			$data = $parser->export($task)->serialize();
 
 			$blob = Blob::fromString($data);
 			$blob->type = 'text/vcalendar';
