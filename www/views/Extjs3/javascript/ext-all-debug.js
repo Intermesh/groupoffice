@@ -19313,7 +19313,9 @@ Ext.DatePicker = Ext.extend(Ext.BoxComponent, {
                 scope: this
             });
         }
-        this.mon(this.eventEl, 'mousewheel', this.handleMouseWheel, this, {passive: true});
+				if(!Ext.isMac) {
+					this.mon(this.eventEl, 'mousewheel', this.handleMouseWheel, this, {passive: true});
+				}
         this.mon(this.eventEl, 'click', this.handleDateClick,  this, {delegate: 'a.x-date-date'});
         this.mon(this.mbtn, 'click', this.showMonthPicker, this);
         this.onEnable(true);
