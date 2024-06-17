@@ -15,6 +15,7 @@
 - Fixed: Changing user passwords in system settings changes imap/smtp password in users with the same name before @ #1103
 - Calendar: Fixed bug in invite mails Merijn Schering
 - Tasks: Export .ics via Tasks -> Export -> vCalendar: BEGIN:VCALENDAR/END:VCALENDAR around every BEGIN:VTODO/END:VTODO #950
+- Notes: Added notebook name to export and import
 
 11-06-2024: 6.8.54
 - Core: Sort modules in GUI
