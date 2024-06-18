@@ -59,6 +59,8 @@ class ContactTest extends TestCase {
     
     $this->assertEquals(true, $success);
 
+		return $contact;
+
   }
 
   public function testDoubleSave() {

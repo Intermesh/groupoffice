@@ -628,6 +628,9 @@ abstract class EntityController extends Controller {
 		if(empty($result['created'])) {
 			$result['created'] = null;
 		}
+
+		static::$createdEntitities = [];
+		static::$updatedEntitities = [];
 	}
 
   /**
@@ -819,10 +822,11 @@ abstract class EntityController extends Controller {
 			}
 			
 			//create snapshot of props client should be aware of
-			$clientProps = array_merge($entity->toArray(), $properties);
+			$clientProps = JSON::patch($entity->toArray(), $properties);
 			
 			//apply new values before canUpdate so this function can check for modified properties too.
-			$entity->setValues($properties);
+			$entity = JSON::patch($entity, $properties);
+//			$entity->setValues($properties);
 			
 			
 			if(!$this->canUpdate($entity)) {
@@ -847,7 +851,7 @@ abstract class EntityController extends Controller {
 			$diff = $entityProps->diff($clientProps);
 
 			// In some rare cases like password values may be set but not retrieved. We must add "null" here for the client.
-			foreach($properties as $key => $value) {
+			foreach($clientProps as $key => $value) {
 				if(!$entityProps->hasKey($key)) {
 					$diff[$key] = null;
 				}

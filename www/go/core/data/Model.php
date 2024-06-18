@@ -2,9 +2,8 @@
 
 namespace go\core\data;
 
-use Exception;
+use ArrayAccess;
 use go\core\App;
-use go\core\exception\Forbidden;
 use go\core\util\DateTime;
 use InvalidArgumentException;
 use JsonSerializable;
@@ -23,7 +22,7 @@ use go\core\util\ArrayObject;
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
-abstract class Model implements ArrayableInterface, JsonSerializable {
+abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAccess {
 
 	const PROP_PROTECTED = 1;
 
@@ -373,7 +372,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 			$getter = 'get' . $propName;	
 			return $this->$getter();
 		} elseif($props[$propName]['access'] === self::PROP_PUBLIC || $props[$propName]['access'] === self::PROP_PUBLIC_READONLY){
-			return $this->{$propName} ?? null;
+			return $this->{$propName} ?? null; // ?? null for Error: Typed property go\modules\community\test\model\B::$cId must not be accessed before initialization
 		}	else{
 			throw new InvalidArgumentException("Can't get write only property ". $propName . " in " . static::class);
 		}
@@ -424,5 +423,27 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 		}
 
 		return explode("\\", static::class)[2];
+	}
+
+
+
+	public function offsetExists($offset): bool
+	{
+		$props = $this->getApiProperties();
+
+		return isset($props[$offset]);
+	}
+
+	public function offsetGet(mixed $offset): mixed
+	{
+		return $this->getValue($offset);
+	}
+	public function offsetSet(mixed $offset, mixed $value) : void{
+
+		$this->setValue($offset, $value);
+	}
+
+	public function offsetUnset(mixed $offset) : void {
+		$this->setValue($offset, null);
 	}
 }

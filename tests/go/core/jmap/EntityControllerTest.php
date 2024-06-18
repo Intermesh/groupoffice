@@ -2,6 +2,7 @@
 namespace go\core\jmap;
 
 use go\modules\community\test\controller\B as BController;
+use go\modules\community\test\model\B;
 use PHPUnit\Framework\TestCase;
 
 class EntityControllerTest extends TestCase {	
@@ -16,12 +17,17 @@ class EntityControllerTest extends TestCase {
           'propA' => 'testOtherA',
           'propB' => 'testOtherB',
           'testSaveOtherModel' => true //this will make it create a second model
-        ]
+        ],
+	      "client-id2" => [
+		      'propA' => 'testOtherA',
+		      'propB' => 'testOtherB',
+		      'testSaveOtherModel' => true //this will make it create a second model
+	      ]
       ]
     ]);
    
 
-    $this->assertEquals(2, count($result['created']));
+    $this->assertEquals(4, count($result['created']));
 
     $createdIds = array_map(function($mod){return $mod['id'];}, $result['created']);
     sort($createdIds);
@@ -32,8 +38,45 @@ class EntityControllerTest extends TestCase {
 
     sort($result['changed']);
 
-    $this->assertEquals(2, count($result['changed']));
+    $this->assertEquals(4, count($result['changed']));
     $this->assertEquals($createdIds, $result['changed']);
 
+
+	  $bController = new BController();
+
+		$id = $createdIds[0];
+	  $result = $bController->set([
+		  "update" => [
+			  "$id" => [
+				  'map' => [
+						$createdIds[1] => ['description' => 'link'],
+				    $createdIds[2] => ['description' => 'link']
+				  ]
+			  ]
+		  ]
+	  ]);
+
+		$this->assertArrayHasKey($id, $result['updated']);
+
+
+		// With JSON Patch object
+	  $result = $bController->set([
+		  "update" => [
+			  "$id" => [
+				  '/map/' .  $createdIds[2] . '/description' => 'patched link'
+				  ]
+			  ]
+	  ]);
+
+	  $this->assertArrayHasKey($id, $result['updated']);
+
+
+		$model = B::findById($id);
+
+		$this->assertEquals('patched link', $model->map[$createdIds[2]]->description);
+		$this->assertCount(2, $model->map);
+
+
   }
+
 }
