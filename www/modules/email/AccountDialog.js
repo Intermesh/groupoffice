@@ -276,7 +276,7 @@ GO.email.AccountDialog = function(config) {
 		autoHeight : true,
 		labelWidth : 120,
 		items : [this.SmtpHostField = new Ext.form.TextField({
-			fieldLabel : t("Host", "email"),
+			fieldLabel : "SMTP " + t("Host", "email"),
 			name : 'smtp_host',
 			allowBlank : false,
 			value : GO.email.defaultSmtpHost

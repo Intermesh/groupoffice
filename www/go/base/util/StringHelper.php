@@ -640,6 +640,10 @@ class StringHelper {
 	 * @return string HTML formatted string
 	 */
 	public static function sanitizeHtml($html, $preserveHtmlStyle = true) {
+
+		if(empty($html)) {
+			return "";
+		}
 		$html = StringUtil::sanitizeHtml($html, $preserveHtmlStyle);
 		// Check for smilies to be enabled by the user (settings->Look & feel-> Show Smilies)
 		if(go()->getUserId() && go()->getAuthState()->getUser(['show_smilies'])->show_smilies)

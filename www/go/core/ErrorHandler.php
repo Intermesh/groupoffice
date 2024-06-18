@@ -83,7 +83,7 @@ class ErrorHandler {
 	}
 
 	/**
-	 * Send a messaqe to the error log
+	 * Send a messag
 	 */
 	public static function log($str): bool
 	{

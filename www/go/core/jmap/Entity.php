@@ -392,15 +392,22 @@ abstract class Entity  extends OrmEntity {
 			static::logDeleteChanges($query);
 		}
 
-		if(static::supportsFiles()) {
-			if(!static::deleteFilesFolders($query)) {
+		try {
+			if (static::supportsFiles()) {
+				if (!static::deleteFilesFolders($query)) {
+					static::entityType()->undoChanges();
+					return false;
+				}
+			}
+
+			if (!parent::internalDelete($query)) {
+				static::entityType()->undoChanges();
 				return false;
 			}
+		} catch(Exception $e) {
+			static::entityType()->undoChanges();
+			throw $e;
 		}
-
-		if(!parent::internalDelete($query)) {
-			return false;
-		}		
 		return true;
 	}
 
