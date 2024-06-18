@@ -4,11 +4,13 @@ namespace go\core\jmap;
 
 use Exception as CoreException;
 use go\core\ErrorHandler;
+use go\core\exception\JsonPointerException;
 use go\core\fs\File;
 use go\core\http\Exception;
 use go\core\jmap\exception\InvalidResultReference;
 use go\core\orm\EntityType;
 use go\core\util\ArrayObject;
+use go\core\util\JSON;
 use InvalidArgumentException;
 use JsonException;
 use JsonSerializable;
@@ -57,7 +59,7 @@ class Router {
 	 * @throws JsonException
 	 * @throws Exception
 	 */
-	public function run(?array $requests = null) {
+	public function run(?array $requests = null, bool $output = true) {
 
 		if(!isset($requests)) {
 			$requests = Request::get()->getBody();
@@ -67,8 +69,9 @@ class Router {
 			$this->callMethod($method);
 		}
 
-		Response::get()->sendHeaders();
-		Response::get()->output();
+		if($output) {
+			Response::get()->output();
+		}
 	}
 
 	/**
@@ -271,8 +274,11 @@ class Router {
 	private function resolveResultReference($resultReference) {
 		$result = $this->findResultOf($resultReference['resultOf']);
 
-		return $this->resolvePath(explode('/', trim($resultReference['path'], ' /')), $result[1]);
-
+		try {
+			return JSON::get($result[1], $resultReference['path']);
+		}catch(JsonPointerException $e) {
+			throw new InvalidResultReference($e->getMessage());
+		}
 	}
 
 	/**
@@ -295,42 +301,6 @@ class Router {
 		throw new InvalidResultReference("Client call id ".$resultOf." does not exist.");
 	}
 
-	/**
-	 * @throws InvalidResultReference
-	 */
-	private function resolvePath($pathParts, $result) {
-
-		while ($part = array_shift($pathParts)) {
-			if ($part == '*') {
-				$ret = [];
-				foreach ($result as $val) {
-					$res = $this->resolvePath($pathParts, $val);
-					// According to JMAP spec:
-					// If the result of applying the rest of the pointer tokens to each item was itself an array, the contents of
-					// this array are added to the output rather than the array itself (i.e., the result is flattened from an
-					// array of arrays to a single array).
-					if(is_array($res)) {
-						$ret = array_merge($ret, $res);
-					} else {
-						$ret[] = $res;
-					}
-				}
-				return $ret;
-			}
-			
-			if(is_object($result)) {
-				$result = $result->jsonSerialize();
-			}
-			
-			if (!is_array($result) || !array_key_exists($part, $result)) {
-				throw new InvalidResultReference("Could not resolve path part " . $part);
-			}
-
-			$result = $result[$part];
-		}
-
-		return $result;
-	}
 
 	private function logAction(string $method)
 	{

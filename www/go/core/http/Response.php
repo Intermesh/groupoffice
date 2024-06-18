@@ -383,8 +383,9 @@ class Response extends Singleton{
 					$error = new ProblemDetails(SetError::ERROR_SERVER_FAIL, 500, $e->getMessage());
 					$data = JSON::encode($error, $this->jsonOptions);
 				}
-			} 
-			$this->sendHeaders();
+			}
+			if(!headers_sent())
+				$this->sendHeaders();
 			echo $data;
 		} else if(!headers_sent()){
 			$this->sendHeaders();

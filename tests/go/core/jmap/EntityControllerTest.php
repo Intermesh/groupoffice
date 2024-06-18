@@ -75,8 +75,21 @@ class EntityControllerTest extends TestCase {
 
 		$this->assertEquals('patched link', $model->map[$createdIds[2]]->description);
 		$this->assertCount(2, $model->map);
-
-
   }
+
+	public function testResultReference() {
+
+		$router = new Router();
+		$router->run([
+			['B/query', ["limit" => 3], "r1"],
+			['B/get', ["#ids" => ["resultOf"=> "r1", "path" => "/ids"]], "r2"]
+		], false);
+
+		$data = Response::get()->getData();
+
+		$this->assertEquals("B/get", $data[1][0]);
+		$this->assertIsArray($data[1][1]['list']);
+
+	}
 
 }
