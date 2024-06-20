@@ -199,7 +199,7 @@ class Blob extends orm\Entity {
 	 */
 	public static function fromFile(File $file, bool $hardLink = false): Blob
 	{
-		$hash = bin2hex(sha1_file($file->getPath(), true));
+		$hash = sha1_file($file->getPath());
 		$blob = self::findById($hash);
 		if (empty($blob)) {
 			$blob = new self();
