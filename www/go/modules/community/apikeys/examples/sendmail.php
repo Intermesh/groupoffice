@@ -1,5 +1,5 @@
 <?php
-//This example shows how to upload a file and obtain a blob ID
+//This example shows how to send an e-mail with attachments
 
 //Adjust these variables for your installation
 $apiKey = '6674038600355ab746804785d3d34bb6f7506d220e196';
@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		"cc" => "",
 		"bcc" => "",
 		"subject" => "Test API",
-		"alias_id" => 2, // Lookup in db "em_aliases"
+		"alias_id" => $_POST['from_alias_id'],
 		"content_type" => "text", // html or text
 		"attachments" => json_encode($attachments),
 		"inlineAttachments" => [],
@@ -110,6 +110,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $error = $result['feedback'];
     }
 
+
+
+
+
+}
+
+
+function getFromAliases()  {
+	global $baseUrl, $apiKey;
+	//obtain from aliases
+
+	$ch = curl_init($baseUrl . '/index.php?r=email/alias/store'); // Old framework! Will change to JMAP someday
+	curl_setopt($ch, CURLOPT_POST, true);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+			"Authorization: Bearer " . $apiKey
+		)
+	);
+
+	$result = curl_exec($ch);
+
+	if(!$result) {
+		die("Error: Could not get e-mail aliases");
+	}
+
+	$fromAliases = json_decode($result, true);
+
+	if(!$fromAliases['success']) {
+		die("Error: ".$fromAliases['feedback']);
+	}
+
+	return $fromAliases['results'];
 }
 ?>
 
@@ -159,6 +192,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <div class="row">
 		<div class="col-md-8 order-md-1">
+
+
+            <div class="row">
+
+                <div class="col-md-12">
+                    <label for="to">From</label>
+                    <?php $aliases = getFromAliases(); ?>
+                    <select class="form-control" id="to" name="from_alias_id" value="<?= $aliases[0]['id'] ?? "" ?>">
+                        <?php
+                        foreach($aliases as $alias) {
+                            ?>
+                            <option value="<?=$alias['id']; ?>"><?= $alias['name'] ?>: <?= $alias['email'] ?></option>
+                            <?php
+                        }
+                        ?>
+                    </select>
+                </div>
+            </div>
 
             <div class="row">
 
