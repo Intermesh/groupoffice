@@ -685,7 +685,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
   /**
    * Executes the query and returns a single object
    *
-   * @return T The queries record, column or object. Returns null
+   * @return ?T The queries record, column or object. Returns null
    *   when nothing is found
    * @throws PDOException
    */
