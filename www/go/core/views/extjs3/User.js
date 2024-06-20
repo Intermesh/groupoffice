@@ -15,6 +15,9 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		// we only want this in a httpOnly cookie for security
 		delete session.accessToken;
 
+		GO.settings.state = session.state;
+		delete session.state;
+
 		// Needed for every non-GET request when using the access token as cookie.
 		Ext.Ajax.defaultHeaders['X-CSRF-Token'] = session.CSRFToken;
 
@@ -30,8 +33,6 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		this.eventSourceUrl = session.eventSourceUrl;		
 		this.loaded = true;
 		this.apiVersion = session.version + "-" + session.cacheClearedAt;
-
-		GO.settings.state = session.state;
 
 		const prefersColorQuery = window.matchMedia('(prefers-color-scheme: dark)'),
 			changeTheme = e => {
