@@ -2,7 +2,7 @@
 //This example shows how to send an e-mail with attachments
 
 //Adjust these variables for your installation
-$apiKey = '6674038600355ab746804785d3d34bb6f7506d220e196';
+$apiKey = 'your-api-key';
 $baseUrl = 'http://host.docker.internal/';
 
 $uploadUrl = $baseUrl . '/api/upload.php';
