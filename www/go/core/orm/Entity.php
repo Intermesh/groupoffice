@@ -308,13 +308,14 @@ abstract class Entity extends Property {
 	/**
 	 * Find entities linked to the given entity
 	 *
-	 * @param self|ActiveRecord $entity
+	 * @param ActiveRecord|self $entity
 	 * @param array $properties
 	 * @param bool $readOnly
-	 * @return Query|static[]
+	 * @return Query<$this>
 	 * @throws Exception
 	 */
-	public static function findByLink($entity, array $properties = [], bool $readOnly = false) {
+	public static function findByLink(Entity|ActiveRecord $entity, array $properties = [], bool $readOnly = false): Query
+	{
 		$query = static::find($properties, $readOnly);
 		/** @noinspection PhpPossiblePolymorphicInvocationInspection */
 		$query->join(
