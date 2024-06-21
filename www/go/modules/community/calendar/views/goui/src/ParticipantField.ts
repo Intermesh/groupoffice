@@ -40,7 +40,7 @@ export class ParticipantField extends Component {
 					}
 				},
 				buildField: (v: any) => {
-					const userIcon = v.roles.owner ?
+					const userIcon = v.roles?.owner ?
 							'manage_accounts' : (v.kind=='resource' ?
 								'meeting_room' : (v.name ?
 									'person' : 'contact_mail')

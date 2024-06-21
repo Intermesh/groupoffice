@@ -312,7 +312,7 @@ export class Main extends Component {
 
 	private renderAdapterBoxes() {
 		const boxes: any = {
-			birthday:['#C06B02', t('Birthdays')],
+			birthday:['#009c63', t('Birthdays')],
 			task: 	['#7e472a',	t('Tasks')],
 			holiday: ['#025d7b', t('Holidays')]
 		};

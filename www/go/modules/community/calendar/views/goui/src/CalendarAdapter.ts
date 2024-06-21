@@ -83,9 +83,13 @@ export class CalendarAdapter {
 		'holiday': {
 			enabled: client.user.calendarPreferences?.holidaysAreVisible,
 			list:[],
+			open(){},
 			load(start:DateTime,end:DateTime) {
+				let [lang,country] = client.user.language.split('_');
+				if(!country) country = lang;
+				if(country=='uk') country ='gb';
 				return client.jmap("community/calendar/Holiday/fetch",{
-					set: 'NL', lang: 'nl',from:start.format('Y-m-d'),till:end.format('Y-m-d')
+					set: country.toUpperCase(), lang,from:start.format('Y-m-d'),till:end.format('Y-m-d')
 				}).then(r => {
 					this.list = r.list;
 				});
@@ -111,14 +115,26 @@ export class CalendarAdapter {
 			enabled: client.user.calendarPreferences?.tasksAreVisible,
 			store: datasourcestore({dataSource: jmapds('Task')}),
 			*items(start:DateTime,end:DateTime) {
-				for(const t of this.store!.items) {
-					const start = DateTime.createFromFormat(t.start, 'Y-m-d');
+				for(const task of this.store!.items) {
+					let date;
+					if(task.progress == 'completed') {
+						date = task.progressUpdated.substring(0,10); // slice date
+					} else {
+						date = task.due || task.start || (new DateTime()).format('Y-m-d');
+					}
+//if(task.title =='deze is af') debugger;
+					const start = DateTime.createFromFormat(date, 'Y-m-d');
 					yield new CalendarItem({
-						key: t.id,
+						key: '',
 						start,
-						extraIcons:['task_alt'],
+						open() {
+							const dlg = new go.modules.community.tasks.TaskDialog();
+							dlg.show();
+							dlg.load(task.id);
+						},
+						extraIcons:[task.progress == 'completed' ? 'task_alt' : 'radio_button_unchecked'],
 						data: {
-							title: t.title,
+							title: task.title,
 							color: '7e472a',
 							duration: 'P1D',
 							showWithoutTime: true,
@@ -127,12 +143,19 @@ export class CalendarAdapter {
 				}
 			},
 			load(start:DateTime,end:DateTime) {
-				this.store!.setFilter("todo", {
-					start: start.format('Y-m-d')+'..'+end.format('Y-m-d'),
-				}).setFilter('done', {
-					progressUpdated: start.format('Y-m-d')+'..'+end.format('Y-m-d'),
-					//progress: 'NOT needs-action OR in-progress'
-				});
+				// this.store!.setFilter("todo", {
+				// 	start: start.format('Y-m-d')+'..'+end.format('Y-m-d'),
+				// }).setFilter('done', {
+				// 	progressUpdated: start.format('Y-m-d')+'..'+end.format('Y-m-d'),
+				// 	//progress: 'NOT needs-action OR in-progress'
+				// });
+				this.store.baseParams = {filter : {
+					operator: "OR",
+					conditions: [
+						{start: start.format('Y-m-d')+'..'+end.format('Y-m-d')},
+						{progressUpdated: start.format('Y-m-d')+'..'+end.format('Y-m-d')},
+					]
+				}};
 				return this.store!.load();
 			}
 		},
@@ -148,13 +171,14 @@ export class CalendarAdapter {
 						key: "",
 						start,
 						open() {
-							const dlg = new go.modules.community.addressbook.ContactDetail();
-							dlg.open();
+							const dlg = new go.modules.community.addressbook.ContactDialog();
+							dlg.show();
+							dlg.load(b.id);
 						},
 						extraIcons: ['cake'],
 						data:{
 							title: b.name+'\'s Birthday',
-							color: 'C06B02',
+							color: '009c63',
 							duration: 'P1D',
 							showWithoutTime:true,
 						}

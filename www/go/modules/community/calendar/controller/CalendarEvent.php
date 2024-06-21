@@ -65,6 +65,7 @@ class CalendarEvent extends EntityController {
 		if(!empty($params['sendSchedulingMessages'])) {
 			model\CalendarEvent::$sendSchedulingMessages = true;
 		}
+		model\CalendarEvent::$fromClient = true;
 		return $this->defaultSet($params);
 	}
 	

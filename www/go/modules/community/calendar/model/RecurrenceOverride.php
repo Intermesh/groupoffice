@@ -9,7 +9,8 @@ use go\core\util\DateTime;
 
 class RecurrenceOverride extends Property
 {
-	const Overridable = ['start', 'duration', 'participants', 'title', 'location', 'status', 'description', 'priority'];
+	const OverridableScalar = ['duration','title', 'location', 'status', 'description', 'priority'];
+	const OverridableNonScalar = ['start', 'participants'];
 
 	const Ignored = ['method', 'privacy', 'prodId', 'recurrenceId', 'recurrenceOverrides', 'recurrenceRule',
 		'relatedTo','replyTo','sentBy', 'timeZone', 'uid'];
@@ -24,6 +25,43 @@ class RecurrenceOverride extends Property
 
 	public function init(){
 		$this->props = json_decode(trim($this->patch??'{}',"'"));
+	}
+
+	public function patchProps($props) {
+		$event = $this->owner;
+		$patch = [];
+		if(isset($props->start)) {
+			if(!is_string($props->start)) {
+				$props->start = $props->start->format('Y-m-d\TH:i:s');
+			}
+			if($event->start->format('Y-m-d\TH:i:s') !== $props->start) {
+				$patch['start'] = $props->start;
+			}
+		}
+		if(isset($props->participants)) {
+			//$patch['participants'] = $props->participants;
+			foreach($props->participants as $pid => $participant) {
+				if(isset($event->participants[$pid])) {
+					$orig = $event->participants[$pid];
+					foreach($participant as $property => $value) {
+						if(isset($orig->$property) && $value !== $orig->$property) { // roles??
+							$patch['participants/'.$pid.'/'.$property] = $value;
+						}
+					}
+					//unset($patch['participants'][$pid]);
+				} else {
+					$patch['participants'][$pid] = $participant;
+				}
+
+			}
+		}
+		foreach(self::OverridableScalar as $property) {
+			if(isset($props->$property) && $event->$property !== $props->$property) {
+				$patch[$property] = $props->$property;
+			}
+		}
+		$this->props = new \stdClass;
+		$this->setValues($patch);
 	}
 
 	protected static function defineMapping(): Mapping
@@ -64,6 +102,8 @@ class RecurrenceOverride extends Property
 
 	protected function internalSave(): bool
 	{
+		// TODO: validate what the current user can override
+		// TODO: create patch object based on what is changed instead of overiding ALL participants eg.
 		if(!empty($this->recurrenceId) && is_string($this->recurrenceId)) {
 			$this->recurrenceId = new DateTime(str_replace('T',' ',$this->recurrenceId));
 		}

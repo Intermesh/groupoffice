@@ -668,7 +668,10 @@ a {
 	> div { // message
 		@extend .z4;
 		border-radius: $borderRadius;
-		background-color: var(--bg-mid);
+		border: 1px solid var(--fg-divider);
+		background-color: var(--bg-layer);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
 		cursor: pointer;
 		pointer-events:auto;
 		//min-width: dp(400);
@@ -676,11 +679,11 @@ a {
 		min-height: dp(40);
 		//padding: 0 dp(24) dp(8);
 		//color: var(--fg-secondary-text);
-		margin: 0 auto dp(4);
+		margin: dp(8) auto 0;
 
 		.x-panel-header {
-			color: var(--fg-secondary-text);
-			>i, .x-tool {
+			color: var(--fg-text);
+			> i, .x-tool {
 				transform: scale(.8);
 				margin-top: dp(12);
 			}
@@ -696,12 +699,12 @@ a {
 			//line-height: dp(40);
 	    }
 		.x-panel-header-text {
-			color: var(--fg-secondary-text);
+			color: var(--fg-text);
 			font-size: dp(16);
 			line-height: dp(36);
 		}
 		.x-panel-body {
-			padding: 0 dp(16) dp(8);
+			padding: 0 dp(22) dp(8);
 		}
 	}
 }
@@ -715,14 +718,27 @@ a {
 	> div {animation: slide-top .2s ease-out;}
 }
 .notifications {
-	padding: dp(4);
-	background-color: var(--c-header-bg);
+	padding-right: dp(8);
+	overflow:visible;
+	margin-left:dp(6);
+	//background-color: var(--c-header-bg);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+
 	i.entity::before{margin-top: dp(-22);}
 }
 .notificationArea {
 	//higher than window 9003 and lower than menu's 15000
+	box-shadow:none;
 	z-index: 10000 !important;
-	background-color: var(--c-header-bg);
+	background-color: transparent;// var(--fg-border);
+	background-image: linear-gradient(90deg, transparent 0%, var(--bg-pressed) 80%, var(--bg-pressed) 100%);
+
+	> .x-panel-header {
+		height: dp(64);
+		padding-top:dp(8);
+		background-color:var(--c-header-bg);
+	}
 	.x-panel-header,.x-panel-header-text {
 		border-top:0; color:white;
 		.x-tool:hover {

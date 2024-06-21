@@ -124,6 +124,10 @@ class Participant extends Property
 		}
 		return (object)$roles;
 	}
+	public function pid() {
+		// scheduler needs this after finding participant by scheduleId
+		return $this->id;
+	}
 
 	/**
 	 * A client may set the property on a participant to true to request that the server send a scheduling message to

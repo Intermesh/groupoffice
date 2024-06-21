@@ -311,7 +311,7 @@ class CalendarConvertor
 				if(!isset($event->recurrenceOverrides[$recurrenceId])) {
 					$event->recurrenceOverrides[$recurrenceId] = (new RecurrenceOverride($event));
 				}
-				$event->recurrenceOverrides[$recurrenceId]->setValues(self::toOverride($v, $event));
+				$event->recurrenceOverrides[$recurrenceId]->patchProps(self::toOverride($v, $event));
 			}
 		}
 
@@ -389,7 +389,7 @@ class CalendarConvertor
 			$ex->privacy = self::$privacyMap[$values->sensitivity];
 		if(isset($ex->start)) {
 			$ex->start->setTimezone($event->timeZone());
-			$ex->start = $ex->start->format($event->showWithoutTime ? 'Y-m-d' : 'Y-m-d\TH:i:s');
+			$ex->start = $ex->start->format('Y-m-d\TH:i:s');
 		}
 		return (array) $ex;
 	}

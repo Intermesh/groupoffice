@@ -336,9 +336,12 @@ export class EventWindow extends FormWindow {
 					this.endDate.trackReset();
 				}
 				if(ev.override) {
-					for(const k in ev.override) {
+					for(const k in ev.patched) {
 						const f = this.form.findField(k)
-						if(f) f.value = ev.override[k as keyof CalendarEvent];
+						if(f) {
+							f.value = ev.patched[k as keyof CalendarEvent];
+							f.trackReset();
+						}
 					}
 				}
 				// set item here because 'setvalue' of end field will change the item.end value

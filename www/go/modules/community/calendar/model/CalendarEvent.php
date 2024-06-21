@@ -9,6 +9,7 @@ namespace go\modules\community\calendar\model;
 
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
+use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\model\Alert as CoreAlert;
 use go\core\model\User;
@@ -18,6 +19,7 @@ use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
+use go\core\util\JSON;
 use go\core\util\UUID;
 use go\core\util\DateTime;
 
@@ -55,6 +57,7 @@ class CalendarEvent extends AclItemEntity {
 
 
 	static $sendSchedulingMessages = false;
+	static $fromClient = false;
 
 	public $calendarId;
 	protected $eventId;
@@ -286,7 +289,7 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	public function copyPatched($patch) {
-		$e = $this->copy()->setValues($patch->toArray());
+		$e = JSON::patch($this->copy(), $patch->toArray());
 		unset($e->recurrenceRule, $e->recurrenceOverrides, $e->replyTo); // , $e->sentBy, $e->relatedTo,
 		return $e;
 		//return (new self())->setValues(array_merge($this->toArray(), $patch->toArray()));
@@ -420,7 +423,8 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	private function incrementCalendarModSeq() {
-		Calendar::updateHighestModSeq($this->calendarId);
+
+		Calendar::updateHighestModSeq(self::find()->select('calendarId')->where(['uid'=>$this->uid]));
 		if($this->isModified('calendarId')) {
 			// Event is put in a different calendar so update both modseqs
 			Calendar::updateHighestModSeq($this->getOldValue('calendarId'));
@@ -446,15 +450,35 @@ class CalendarEvent extends AclItemEntity {
 
 		$this->resetICalBlob();
 
-		// is modified, but not calendarId, isDraft or modifiedAt, per-user prop, participants
-		if($this->isModified(self::EventProperties) && $this->isOrigin) {
-			if(!$this->isModified('sequence') || $this->sequence <= $this->getOldValue('sequence'))
-				$this->sequence += 1;
+		if(!$this->isNew()) {
+			// is modified, but not calendarId, isDraft or modifiedAt, per-user prop, participants
+			if($this->isModified(self::EventProperties) && $this->isOrigin) {
+				if(!$this->isModified('sequence') || $this->sequence <= $this->getOldValue('sequence'))
+					$this->sequence += 1;
+			}
+			if(self::$fromClient) {
+				if (!$this->isOrigin && $this->isModified(self::EventProperties)) {
+					// properties may only change by ITip. client is not allowed to change properties of invites
+					throw new Forbidden('Not allowed to edit anything other than per-user properties when isOrigin is false');
+				}
+
+				$currPart = $this->calendarParticipant();
+				if ($currPart && !$currPart->isOwner()) { // not owner
+					if ($this->isModified(self::EventProperties)) {
+						throw new Forbidden('Trying to change properties but not the organizer');
+					} else if ($this->isModified(['participants'])) {
+						// we may only set our own participationStatus
+						// todo: loop participants, comparare modified to $currPart, check is participationStatus is the only modified property
+					}
+				}
+			}
+
+			if ($this->isModified('status') && $this->status == self::Cancelled) {
+				// Remove alert when event is cancelled
+				CoreAlert::deleteByEntity($this);
+			}
 		}
-		if ($this->isModified('status') && $this->status == self::Cancelled) {
-			// Remove alert when event is cancelled
-			CoreAlert::deleteByEntity($this);
-		}
+
 		if(!empty($this->participants) && empty($this->replyTo)) {
 			$owner = $this->getFirstOwner();
 			if(!empty($owner)) {

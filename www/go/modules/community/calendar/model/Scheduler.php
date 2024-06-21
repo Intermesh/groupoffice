@@ -30,7 +30,6 @@ class Scheduler {
 
 		if ($current->isOwner()) {
 			$newOnly = !$willDelete && $event->isModified('participants') && !$event->isModified(self::EssentialScheduleProps);
-
 			self::organizeImip($event, $willDelete ? 'CANCEL': 'REQUEST', $newOnly);
 		} else if(!empty($event->replyTo)) { // !$event->isOrigin
 
@@ -98,9 +97,11 @@ class Scheduler {
 	 * o  Reconfirm an existing event, without rescheduling it.
 	 * o  Forward a "VEVENT" to another uninvited CU.
 	 * o  For an existing "VEVENT" calendar component, delegate the role of "Attendee" to another CU.
-	 * o  For an existing "VEVENT" calendar component, change the role of
-	 * "Organizer" to another CU.
+	 * o  For an existing "VEVENT" calendar component, change the role of "Organizer" to another CU.
 	 *
+	 * @param $event CalendarEvent an instance that needs scheduling
+	 * @param $method string 'REQUEST' or 'CANCEL' depending on what is happing to the event
+	 * @param $newOnly boolean Only send if participant was added
 	 * @return boolean
 	 */
 	private static function organizeImip(CalendarEvent $event, $method, $newOnly = false) {
@@ -120,10 +121,8 @@ class Scheduler {
 				$subject .= ' ('.go()->t('updated', 'community', 'calendar').')';
 			}
 
-			$ics = ICalendarHelper::toVObject($event, new VCalendar([
-				'PRODID' => $event->prodId,
-				'METHOD'=>$method
-			]));
+			// Event could be patch for body presentation
+			$ics = ICalendarHelper::toInvite($method,$event);
 
 			try {
 				$success = go()->getMailer()->compose()
@@ -231,9 +230,7 @@ class Scheduler {
 				]);
 			}
 		}
-
 		return $itip;
-
 	}
 
 	static function processMessage($vcalendar, $receiver, $sender) {
@@ -241,10 +238,9 @@ class Scheduler {
 		$vevent = $vcalendar->VEVENT[0];
 
 		$existingEvent = CalendarEvent::findByUID($receiver, (string)$vevent->uid)->single();
-//		if(!$existingEvent) {
-//			return "You may not update this event";
-//		}
-		//$existingEvent = CalendarEvent::find()->where(['uid' => (string)$vevent->uid,'calendarId'=>$calendar->id])->single();
+		// If the existing event has isOrigin=true all below does is add new REQUESTS to the calendar.
+		// We might do that up front and skip all the below processing instead.
+
 		switch($vcalendar->method->getValue()){
 			case 'REQUEST': return self::processRequest($vcalendar,$receiver,$existingEvent);
 			case 'CANCEL': return self::processCancel($vcalendar,$existingEvent);
@@ -299,46 +295,48 @@ class Scheduler {
 	private static function processReply(VCalendar $vcalendar, ?CalendarEvent $existingEvent, $sender) {
 		if(!$existingEvent) return "You may not update this event";
 
-		$instances = [];
-		$requestStatus = '2.0'; // OK
-
 		foreach($vcalendar->VEVENT as $vevent) {
 			$status = strtolower($vevent->ATTENDEE['PARTSTAT']->getValue());
-			if (isset($vevent->{'REQUEST-STATUS'})) {
-				$responseStatus = strtok((string)$vevent->{'REQUEST-STATUS'}, ";");
-			}
-			$item = $existingEvent;
-			// occurrence
-			if(isset($vevent->{'RECURRENCE-ID'})) {
-				continue; // Implement processing replies for instances of recurrence overrides
-				$recurId = $vevent->{'RECURRENCE-ID'}->getValue();
-				if(!isset($item->recurrenceOverrides[$recurId])) {
-					// TODO: check if the given RECURRENCE-ID is valid for $existingEvent->recurrenceRule
-					$item->recurrenceOverrides[$recurId] = new RecurrenceOverride($item);
-				}
-				$item = $item->recurrenceOverrides[$recurId];
-
-			}
+//			if (isset($vevent->{'REQUEST-STATUS'})) {
+//				$responseStatus = strtok((string)$vevent->{'REQUEST-STATUS'}, ";");
+//			}
 
 			$replyStamp = $vevent->DTSTAMP->getDateTime();
-			// base event
-			$p = $item->participantByScheduleId($sender->email);
-			if($p) {
-				if(empty($p->scheduleUpdated) || $p->scheduleUpdated <= $replyStamp) {
-					$p->participationStatus = $status;
-					if(isset($responseStatus))
-						$p->scheduleStatus = $responseStatus;
-					$p->scheduleUpdated = new DateTime('@'.$replyStamp->getTimestamp());
+
+			// MAKE PATCH
+			if(isset($vevent->{'RECURRENCE-ID'})) {// occurrence
+				$recurId = $vevent->{'RECURRENCE-ID'}->getValue();
+				if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
+					// TODO: check if the given RECURRENCE-ID is valid for $existingEvent->recurrenceRule
+					// If it is not valid an extra instance would be created (RDATE in iCal) GroupOffice does not display these at the moment.
+					$existingEvent->recurrenceOverrides[$recurId] = new RecurrenceOverride($existingEvent);
+					$p = $existingEvent->participantByScheduleId($sender->email);
+				} else {
+					$exEvent = $existingEvent->copyPatched($existingEvent->recurrenceOverrides[$recurId]);
+					$p = $exEvent->participantByScheduleId($sender->email);
 				}
-			} else { // add party crasher
-				$item->participants[] = (new Participant($item))->setValues([
-					'email' => $sender->email,
-					'name' => $sender->name ?? $sender->email,
-					'participationStatus' => $status,
-					'scheduleUpdated' => $replyStamp,
-				]);
+				if(!$p) continue;
+				if (empty($p->scheduleUpdated) || $p->scheduleUpdated < $replyStamp) {
+					$k = 'participants/'.$p->pid();
+					$existingEvent->recurrenceOverrides[$recurId]->patchProps([
+						$k.'/participationStatus' => $status,
+						$k.'/scheduleUpdated' => $replyStamp->format("Y-m-d H:i:s"),
+					]);
+				}
+
+			} else {
+				// APPLY EVENT
+				$p = $existingEvent->participantByScheduleId($sender->email);
+				if (!$p) continue; // no party crashers
+				if (empty($p->scheduleUpdated) || $p->scheduleUpdated < $replyStamp) {
+					$p->participationStatus = $status;
+					$p->scheduleUpdated = new DateTime($replyStamp->format("Y-m-d H:i:s"), $replyStamp->getTimezone());
+//					if (isset($responseStatus))
+//						$p->scheduleStatus = $responseStatus;
+				}
 			}
 		}
+
 		$existingEvent->save();
 		return $existingEvent;
 	}

@@ -104,9 +104,6 @@ $updates['202402221543'][] = function(){ // insert event overrides (excludes are
 		if(!empty($diff['status'])) {
 			$patch->status = strtolower($diff['status']);
 		}
-		if(!empty($diff['private'])) {
-			$patch->privacy =  $diff['private']==1 ? 'private' : 'public';
-		}
 		$participantsStmt->execute([$row['id']]);
 		$exParticipants = $participantsStmt->fetchAll();
 		if(count($exParticipants) > 1) {

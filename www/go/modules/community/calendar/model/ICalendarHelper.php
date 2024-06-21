@@ -94,9 +94,22 @@ class ICalendarHelper {
 		return $vcalendar;
 	}
 
-	private static function toInvite($method, $event, $occurrence) {
+	static function toInvite(string $method, CalendarEvent &$event) {
 		$c = new VCalendar(['PRODID' => $event->prodId, 'METHOD' => $method]);
-		$c->add(self::toVEvent($c->createComponent('VEVENT'), $event));
+		$forBody = $event;
+		if($event->isModified(CalendarEvent::EventProperties)) {
+			// base event (won't check extra participants)
+			$c->add(self::toVEvent($c->createComponent('VEVENT'), $event));
+		}
+		foreach($event->recurrenceOverrides as $recurrenceId => $override) {
+			if($override->isModified()) {
+				$patch = $event->recurrenceOverrides[$recurrenceId];
+				$forBody = $event->copyPatched($patch);
+				$c->add(self::toVEvent($c->createComponent('VEVENT'), $forBody, $recurrenceId));
+			}
+		}
+		$event = $forBody;
+
 		return $c;
 	}
 
@@ -253,7 +266,9 @@ class ICalendarHelper {
 		$exceptions = [];
 		$baseEvents = [];
 		$prodId = $vcalendar->PRODID;
-
+		if(!empty($event->uid)) {
+			$baseEvents[$event->uid] = $event; // so we can attach exceptions if that all we got
+		}
 		foreach($vcalendar->VEVENT as $vevent) {
 
 			$obj = self::parseOccurrence($vevent, (object)[
@@ -285,7 +300,11 @@ class ICalendarHelper {
 				$event->setRecurrenceRule(self::parseRrule($vevent->RRULE, $event));
 				if(!empty($vevent->EXDATE)) {
 					foreach ($vevent->EXDATE as $exdate) {
-						$event->recurrenceOverrides[$exdate->getJsonValue()[0]] = (new RecurrenceOverride($event))->setValues(['excluded'=>true]);
+						$rId = $exdate->format('Y-m-d\TH:i:s');
+						if(!isset($event->recurrenceOverrides[$rId])) {
+							$event->recurrenceOverrides[$rId] = new RecurrenceOverride($event);
+						}
+						$event->recurrenceOverrides[$rId]->setValues(['excluded'=>true]);
 					}
 				}
 			}
@@ -313,31 +332,16 @@ class ICalendarHelper {
 		foreach($exceptions as $props) {
 			$uid = $props->uid;
 			$recurrenceId = $props->recurrenceId;
-
 			unset($props->recurrenceId, $props->uid);
 
 			if(isset($baseEvents[$uid]) && $baseEvents[$uid]->isRecurring()) {
-
-				// Do not save properties that are the same as base event as override patch
-				if($baseEvents[$uid]->start->format('Y-m-d\TH:i:s') === $props->start->format('Y-m-d\TH:i:s')) {
-					unset($props->start);
-				}
-				foreach(['start','timeZone', 'title', 'status', 'duration'] as $p) {
-					if(isset($props->$p) && $props->$p === $baseEvents[$uid]->$p){
-						unset($props->$p);
-					}
-				}
-				// datetime to text
-				if(!empty($props->start)) {
-					$props->start = $props->start->format($event->showWithoutTime ? 'Y-m-d' : 'Y-m-d\TH:i:s');
-				}
 				if(!isset($baseEvents[$uid]->recurrenceOverrides[$recurrenceId])) {
-					$baseEvents[$uid]->recurrenceOverrides[$recurrenceId] = (new RecurrenceOverride($event));
+					$baseEvents[$uid]->recurrenceOverrides[$recurrenceId] = new RecurrenceOverride($baseEvents[$uid]);
 				}
-				$baseEvents[$uid]->recurrenceOverrides[$recurrenceId]->setValues((array)$props);
+				$baseEvents[$uid]->recurrenceOverrides[$recurrenceId]->patchProps($props);
 			} else {
 				// ICS contains exception but no base event.
-				// You must be invites to a single occurrence
+				// You must be invited to a single occurrence
 				$event->setValues((array)$props); // title, description, start, duration, location, status, privacy
 				$event->prodId = $prodId;
 				$event->uid = $uid. '_' . $recurrenceId;
@@ -345,10 +349,10 @@ class ICalendarHelper {
 		}
 		// All exceptions that do not have the recurrence ID are ignored here
 
-		// $vcalendar could contain more data then is in event
+		// $vcalendar could contain more data than $event
 		$blob = self::makeBlob($event, $vcalendar->serialize());
 		$event->attachBlob($blob->id);
-		$vcalendar->destroy();
+		//$vcalendar->destroy(); // cant go yet.
 		return $event;
 	}
 

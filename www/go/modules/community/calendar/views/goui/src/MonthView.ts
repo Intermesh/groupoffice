@@ -191,8 +191,8 @@ export class MonthView extends CalendarView {
 				).attr('data-date', day.format('Y-m-d'))
 				 .cls('today', day.format('Ymd') === now.format('Ymd'))
 				 .cls('past', day.format('Ymd') < now.format('Ymd'))
-				 .cls('other', day.format('Ym') !== this.day.format('Ym')))
-
+				 .cls('other', day.format('Ym') !== this.day.format('Ym'))
+				 .cls('weekend',day.getDay()===0 || day.getDay()===6))
 				day.addDays(1);
 				it++;
 			}

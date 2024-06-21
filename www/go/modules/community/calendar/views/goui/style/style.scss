@@ -195,12 +195,15 @@
 		&.current {
 			color: $colorPrimary !important;
 		}
-		&.past, &.other {
-			color: $colorTextSecondary;
+		&.past {
+			//color: $colorTextSecondary;
 		}
-
-		&.other {
+		&.weekend {
 			background-color: $surfaceLow;
+		}
+		&.other {
+			color: $colorTextPlaceholder;
+
 		}
 
 		// another month

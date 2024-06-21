@@ -20,6 +20,8 @@ class Holiday {
 
 	public $start;
 
+	private $substitutes;
+
 	public $type = 'public';
 
 	public $duration = 'P1D';
@@ -44,12 +46,14 @@ class Holiday {
 		if(!$this->parseDateRule(explode(' ', $rule))){
 			throw new \Exception('unparsable rule '.$rule);
 		}
+		if($this->substitutes) {
+			$this->title ='(*)'.$this->title;
+		}
 	}
 
 
 	static function generate($set, $lang, $from, $till) {
 		$dir = __DIR__.'/../holidays/';
-		$year = $from->format('Y');
 		self::$lang = $lang;
 		self::$names = \json_decode(file_get_contents($dir.'names.json'))->names;
 		$file = $dir.'countries/'.strtolower($set).'.json';
@@ -58,6 +62,14 @@ class Holiday {
 		if(!$data || !$data->holidays || !$data->holidays->$set || !is_object($data->holidays->$set->days))
 			throw new \Exception('error processing file '.$file);
 
+		foreach(self::generateYear($set,$data,$from, $till, $from->format('Y')) as $item) yield $item;
+		if($from->format('Y') !== $till->format('Y')) {
+			foreach(self::generateYear($set,$data,$from, $till, $till->format('Y')) as $item) yield $item;
+		}
+
+	}
+
+	private static function generateYear($set, $data, $from, $till, $year) {
 		foreach((array)$data->holidays->{$set}->days as $rule => $entry) {
 			$holiday = new self($rule, $entry, $year);
 			if($holiday->start !== null && $holiday->start >= $from && $holiday->start <= $till) {
@@ -65,6 +77,7 @@ class Holiday {
 				yield $holiday;
 			}
 		}
+
 	}
 
 	/**
@@ -76,6 +89,10 @@ class Holiday {
 	private function parseDateRule($rule) {
 
 		$date = array_shift($rule);
+		if($date === 'substitutes') {
+			$this->substitutes = true;
+			$date = array_shift($rule);
+		}
 		if(preg_match('/\d{2}-\d{2}/', $date) || in_array($date, self::$months)) {
 			$this->parseFixed($date);
 		} else if($date === 'easter') {
@@ -101,10 +118,15 @@ class Holiday {
 	}
 
 	private function parseFixed($monthDay) {
+		$year = $this->year;
+		if(strlen($monthDay) === 10) { // has year
+			$year = max($this->year, intval(substr($monthDay,0,4)));
+			$monthDay = substr($monthDay, 5);
+		}
 		if($month = array_search($monthDay, self::$months)) {
 			$monthDay = str_pad($month, 2, '0', STR_PAD_LEFT).'-01';
 		}
-		$this->start = new \DateTime($this->year.'-'.$monthDay);
+		$this->start = new \DateTime($year.'-'.$monthDay);
 	}
 
 	private function parseEaster($nb) {
@@ -119,8 +141,10 @@ class Holiday {
 		array_shift($rule); // shift the word 'then' from the rule
 		$nextPrev = array_shift($rule); // next|previous
 		$weekday = array_shift($rule);
-		if($this->start->format('l') == $day) {
+		if(strtolower($this->start->format('l')) == strtolower($day)) {
 			$this->start->modify($nextPrev. ' '.$weekday);
+		} else if ($this->substitutes) {
+			$this->start = null; // only show when IF matches
 		}
 	}
 

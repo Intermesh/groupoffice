@@ -9,7 +9,7 @@ import {
 } from "@intermesh/goui";
 import {client, JmapDataSource, jmapds, RecurrenceField} from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
-import {CalendarItem} from "./CalendarItem.js";
+import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {calendarStore, statusIcons, t} from "./Index.js";
 
 
@@ -177,14 +177,29 @@ export class EventDetail extends Component {
 	loadEvent(ev: CalendarItem) {
 		this.item = ev;
 		if (!ev.key) {
+			this.item = ev;
 			this.form.create(ev.data);
 		} else {
 			this.form.findField('alerts')!.hidden = false;
 			this.form.load(ev.data.id).then(() => {
 				if(ev.recurrenceId) {
-					this.form.findField('start')!.value = ev.start.format('Y-m-d\TH:i');
-					this.form.findField('end')!.value = ev.end.format('Y-m-d\TH:i');
+					const start = this.form.findField('start')!,
+						end = this.form.findField('end')!;
+					start.value = ev.start.format('Y-m-d\TH:i');
+					start.trackReset();
+					end.value = ev.end.format('Y-m-d\TH:i');
+					end.trackReset();
 				}
+				if(ev.override) {
+					for(const k in ev.patched) {
+						const f = this.form.findField(k)
+						if(f) {
+							f.value = ev.patched[k as keyof CalendarEvent];
+							f.trackReset();
+						}
+					}
+				}
+				this.item = ev;
 			});
 		}
 	}
