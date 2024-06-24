@@ -63,6 +63,9 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 		},
 
 		onSpecialKey: function(field, e) {
+			if(this.isExpanded()) {
+				return;
+			}
 
 			if (e.getKey() === e.ENTER || e.getKey() == 186) {
 				const v = this.getValue().trim(), lastChar = v.charAt(v.length -1);
