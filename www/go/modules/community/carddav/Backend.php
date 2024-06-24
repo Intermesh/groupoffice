@@ -99,12 +99,17 @@ class Backend extends AbstractBackend {
 	 */
 	private function createBlob(Contact $contact, $cardData): Blob
 	{
-		
-		//Important to set exactly the same modifiedAt on both blob and contact. 
+
+		$blob = Blob::fromString($cardData);
+		if(!$blob->isNew() && $contact->vcardBlobId == $blob->id) {
+			// no changes needed
+			return $blob;
+		}
+
+		//Important to set exactly the same modifiedAt on both blob and contact.
 		//We compare these to check if vcards need to be updated.
 		$contact->modifiedAt = new DateTime();
-		
-		$blob = Blob::fromString($cardData);
+
 		$blob->type = 'text/vcard';
 		$blob->name = $contact->getUri();
 		if(empty($blob->name)) {
@@ -334,7 +339,7 @@ class Backend extends AbstractBackend {
 			throw new Forbidden();
 		}
 		
-		$blob = $this->createBlob($contact, $cardData);	
+		$this->createBlob($contact, $cardData);
 		
 		try {
 			go()->debug($cardData);
