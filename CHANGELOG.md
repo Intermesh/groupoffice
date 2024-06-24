@@ -1,5 +1,6 @@
 - E-mail: Fixed autocomplete bug where typed text would stick too
 - Core: Import responded with invalid JSON due to echo statement.
+- Core: improve verbosity for incorrectly parsed date in email message
 
 17-06-2024: 6.8.55
 - Core: Fix part 2. Proxy headers (X-FORWARDED-FOR) are ignored for "Authorized clients" #1150

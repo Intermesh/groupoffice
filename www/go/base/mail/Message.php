@@ -171,6 +171,8 @@ class Message extends \go\core\mail\Message {
 				$udate = new \DateTime($date);
 			} catch(\Exception $e) {
 				ErrorHandler::logException($e);
+				$msg = $this->getSubject() . isset($from) ? ' <'. $from->getEmail() . '>' : '';
+				ErrorHandler::log($msg);
 				$udate = new \DateTime();
 			}
 
