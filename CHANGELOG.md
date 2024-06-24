@@ -1,3 +1,5 @@
+- Core: Import responded with invalid JSON due to echo statement.
+
 17-06-2024: 6.7.84
 - Core: Fixed PHP 7.3 compatibility. GroupOffice 6.7.83 Installation Issue #1152
 
