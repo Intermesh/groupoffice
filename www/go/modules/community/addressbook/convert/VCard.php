@@ -324,6 +324,10 @@ class VCard extends AbstractConverter {
 			}
 		}
 
+		if(!empty($vcardComponent->title)) {
+			$entity->jobTitle = (string) $vcardComponent->title;
+		}
+
 		if (isset($vcardComponent->{"X-ABShowAs"})) {
 			$entity->isOrganization = $vcardComponent->{"X-ABShowAs"} == "COMPANY";
 		}

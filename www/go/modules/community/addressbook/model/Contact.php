@@ -748,6 +748,15 @@ class Contact extends AclItemEntity {
 										
 	}
 
+	public function historyLog(): bool|array
+	{
+		$log = parent::historyLog();
+
+		unset($log['vcardBlobId']);
+
+		return $log;
+	}
+
 	public static function sort(Query $query, ArrayObject $sort): Query
 	{
 		if(isset($sort['firstName'])) {
