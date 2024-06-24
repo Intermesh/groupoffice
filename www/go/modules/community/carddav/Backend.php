@@ -234,9 +234,12 @@ class Backend extends AbstractBackend {
 			$blob = $this->createBlob($contact, $cardData);
 			$contact->save();
 		}
+
+		$cardData = $blob->getFile()->getContents();
+		go()->debug($cardData);
 		
 		return [
-					'carddata' => $blob->getFile()->getContents(),
+					'carddata' => $cardData,
 					'uri' => $contact->getUri(),
 					'lastmodified' => $contact->modifiedAt->format("U"),
 					'etag' => '"' . $contact->vcardBlobId . '"',
@@ -264,7 +267,7 @@ class Backend extends AbstractBackend {
 		foreach($contacts as $contact) {
 			$cardData = $c->export($contact);
 			
-			$blob = $this->createBlob($contact, $cardData);
+			$this->createBlob($contact, $cardData);
 			
 			if(!$contact->save()) {
 				throw new Exception("Could not save contact");
