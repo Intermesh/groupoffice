@@ -1449,7 +1449,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		}
 
-		return $folder;
+		return $this->_folderCache['Shared/'.$folderName];
 	}
 
 	/**
