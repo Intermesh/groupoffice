@@ -4,6 +4,7 @@
 - Carddav: Import title
 - Carddav: Avoid some unnecessary saves
 - Address book: Ignore vcardBlobId in history log
+- Webdav: Fixed write access in shared folder
 
 17-06-2024: 6.8.55
 - Core: Fix part 2. Proxy headers (X-FORWARDED-FOR) are ignored for "Authorized clients" #1150
