@@ -9946,7 +9946,7 @@ Ext.extend(Ext.util.MixedCollection, Ext.util.Observable, {
             var er = Ext.escapeRe;
             value = String(value);
 
-            if (anyMatch === true) {
+            if (anyMatch === undefined || anyMatch === true) {
                 value = er(value);
             } else {
                 value = '^' + er(value);
