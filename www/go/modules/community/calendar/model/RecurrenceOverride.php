@@ -45,12 +45,12 @@ class RecurrenceOverride extends Property
 					$orig = $event->participants[$pid];
 					foreach($participant as $property => $value) {
 						if(isset($orig->$property) && $value !== $orig->$property) { // roles??
-							$patch['participants/'.$pid.'/'.$property] = $value;
+							$patch['/participants/'.$pid.'/'.$property] = $value;
 						}
 					}
 					//unset($patch['participants'][$pid]);
 				} else {
-					$patch['participants'][$pid] = $participant;
+					$patch['/participants/' . $pid] = $participant;
 				}
 
 			}

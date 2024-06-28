@@ -319,8 +319,8 @@ class Scheduler {
 				if (empty($p->scheduleUpdated) || $p->scheduleUpdated < $replyStamp) {
 					$k = 'participants/'.$p->pid();
 					$existingEvent->recurrenceOverrides[$recurId]->patchProps([
-						$k.'/participationStatus' => $status,
-						$k.'/scheduleUpdated' => $replyStamp->format("Y-m-d H:i:s"),
+						'/'. $k.'/participationStatus' => $status,
+						'/'. $k.'/scheduleUpdated' => $replyStamp->format("Y-m-d H:i:s"),
 					]);
 				}
 
