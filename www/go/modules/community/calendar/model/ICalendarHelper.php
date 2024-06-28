@@ -101,11 +101,13 @@ class ICalendarHelper {
 			// base event (won't check extra participants)
 			$c->add(self::toVEvent($c->createComponent('VEVENT'), $event));
 		}
-		foreach($event->recurrenceOverrides as $recurrenceId => $override) {
-			if($override->isModified()) {
-				$patch = $event->recurrenceOverrides[$recurrenceId];
-				$forBody = $event->copyPatched($patch);
-				$c->add(self::toVEvent($c->createComponent('VEVENT'), $forBody, $recurrenceId));
+		if(isset($event->recurrenceOverrides)) {
+			foreach ($event->recurrenceOverrides as $recurrenceId => $override) {
+				if ($override->isModified()) {
+					$patch = $event->recurrenceOverrides[$recurrenceId];
+					$forBody = $event->copyPatched($patch);
+					$c->add(self::toVEvent($c->createComponent('VEVENT'), $forBody, $recurrenceId));
+				}
 			}
 		}
 		$event = $forBody;
