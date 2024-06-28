@@ -294,8 +294,16 @@ class CalendarEvent extends AclItemEntity {
 	 * @throws JsonPointerException
 	 * @throws Exception
 	 */
-	public function copyPatched($patch) {
-		$e = JSON::patch($this->copy(), $patch->toArray());
+	public function copyPatched($patch, string $recurrenceId) {
+		$patchArray = $patch->toArray();
+
+		//if start is not patched then we must set the recurrence ID to set the right time
+		if(!isset($patchArray['start'])) {
+			$patchArray['start'] = new DateTime($recurrenceId);
+		}
+
+		$e = JSON::patch($this->copy(), $patchArray);
+
 		unset($e->recurrenceRule, $e->recurrenceOverrides, $e->replyTo); // , $e->sentBy, $e->relatedTo,
 		return $e;
 		//return (new self())->setValues(array_merge($this->toArray(), $patch->toArray()));

@@ -312,7 +312,7 @@ class Scheduler {
 					$existingEvent->recurrenceOverrides[$recurId] = new RecurrenceOverride($existingEvent);
 					$p = $existingEvent->participantByScheduleId($sender->email);
 				} else {
-					$exEvent = $existingEvent->copyPatched($existingEvent->recurrenceOverrides[$recurId]);
+					$exEvent = $existingEvent->copyPatched($existingEvent->recurrenceOverrides[$recurId], $recurId);
 					$p = $exEvent->participantByScheduleId($sender->email);
 				}
 				if(!$p) continue;

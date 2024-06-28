@@ -76,7 +76,7 @@ class ICalendarHelper {
 							$exdate['VALUE'] = 'DATE';
 					} else {
 						try {
-							$exEvent = $event->copyPatched($patch);
+							$exEvent = $event->copyPatched($patch, $recurrenceId);
 							$vcalendar->add(self::toVEvent($vcalendar->createComponent('VEVENT'), $exEvent, $recurrenceId));
 						}catch(JsonPointerException $e) {
 							// There was a case where /partipants/<NOTEXISTINGID>/participantStatus was incorrectly patched
@@ -101,7 +101,7 @@ class ICalendarHelper {
 			foreach ($event->recurrenceOverrides as $recurrenceId => $override) {
 				if ($override->isModified()) {
 					$patch = $event->recurrenceOverrides[$recurrenceId];
-					$forBody = $event->copyPatched($patch);
+					$forBody = $event->copyPatched($patch, $recurrenceId);
 					$c->add(self::toVEvent($c->createComponent('VEVENT'), $forBody, $recurrenceId));
 				}
 			}
