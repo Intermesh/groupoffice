@@ -1,3 +1,8 @@
+- Custom fields: Make sure fieldset is not collapsed. This may happen if it was a fieldset before and collapsed by the user.
+- Core: fix issue where open source version requires SourceGuardian
+- Finance: Create ZUGFeRD / Factur-X - Version 2.2.0 EN_16931 compliant PDF e-invoices
+- Finance: Create UBL invoices for Peppol
+
 24-06-2024: 6.8.56
 - E-mail: Fixed autocomplete bug where typed text would stick too
 - Core: Import responded with invalid JSON due to echo statement.

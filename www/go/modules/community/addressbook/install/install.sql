@@ -41,6 +41,7 @@ CREATE TABLE `addressbook_contact` (
   `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'name field for companies and contacts. It should be the display name of first, middle and last name',
   `IBAN` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `registrationNumber` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Company trade registration number',
+  icd varchar(4) null,
   `vatNo` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `vatReverseCharge` tinyint(1) NOT NULL DEFAULT 0,
   `debtorNumber` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
