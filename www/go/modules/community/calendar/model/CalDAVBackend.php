@@ -259,6 +259,10 @@ class CalDAVBackend extends AbstractBackend implements
 
 	public function updateCalendarObject($calendarId, $objectUri, $calendarData)
 	{
+		go()->debug("CalDAVBackend::updateCalendarObject($calendarId, $objectUri, ");
+		go()->debug($calendarData);
+		go()->debug(")");
+
 		//$extraData = $this->getDenormalizedData($calendarData);
 		$uid = pathinfo($objectUri, PATHINFO_FILENAME);
 		/** @var CalendarEvent $event */
