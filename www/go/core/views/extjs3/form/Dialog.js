@@ -163,14 +163,14 @@ go.form.Dialog = Ext.extend(go.Window, {
 	
 	createFormPanel : function() {
 
-		var items = this.initFormItems() || [];
-		
+		let items = this.initFormItems() || [];
+
 		if(this.showCustomfields){
 			items = this.addCustomFields(items);
 		}
-		
-		var count = this.panels.length;
-		
+
+		let count = this.panels.length;
+
 		//if items is defined then a panel will be inserted in createTabPanel()
 		if(items.length) {
 			count++;
@@ -193,9 +193,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 
 
 	getCustomFieldSets : function() {
-
 		const items = [];
-		var fieldsets = go.customfields.CustomFields.getFormFieldSets(this.entityStore);
+		const fieldsets = go.customfields.CustomFields.getFormFieldSets(this.entityStore);
 		fieldsets.forEach(function(fs) {
 			if(fs.fieldSet.permissionLevel <= 10) {
 				return;
@@ -203,7 +202,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 			if(fs.fieldSet.isTab) {
 				fs.title = null;
 				fs.collapsible = false;
-				var pnl = new Ext.Panel({
+				const pnl = new Ext.Panel({
 					autoScroll: true,
 					hideMode: 'offsets', //Other wise some form elements like date pickers render incorrectly.
 					title: fs.fieldSet.name,

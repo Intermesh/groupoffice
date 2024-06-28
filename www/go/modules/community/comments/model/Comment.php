@@ -262,10 +262,6 @@ class Comment extends AclItemEntity {
 			return false;
 		}
 
-//		if($this->isNew()) {
-//			$this->createAlerts();
-//		}
-
 		if($this->isNew()) {
 			$entity = $this->findEntity();
 			if(method_exists($entity, 'onCommentAdded')) {
@@ -291,40 +287,6 @@ class Comment extends AclItemEntity {
 
 		return true;
 	}
-//
-//	private function createAlerts() {
-//
-//		$entity = $this->findEntity();
-//		$aclId = $entity->findAclId();
-//		if(!$aclId) {
-//			return;
-//		}
-//
-//		$excerpt = StringUtil::cutString(strip_tags($this->text), 50);
-//
-//		$userIds = go()->getDbConnection()->selectSingleValue('userId')
-//			->from('core_user_group', 'ug')
-//			->join('core_acl_group', 'ag', 'ag.groupId = ug.groupId')
-//			->where('ag.aclId', '=', $aclId);
-//
-//		foreach($userIds as $userId) {
-//
-//			if($userId == go()->getAuthState()->getUserId()) {
-//				continue;
-//			}
-//
-//			$alert = $entity->createAlert(new DateTime(), 'comment', $userId)
-//				->setData([
-//					'type' => 'comment',
-//					'createdBy' => go()->getAuthState()->getUserId(),
-//					'excerpt' => $excerpt
-//				]);
-//
-//			if(!$alert->save()) {
-//				throw new SaveException($alert);
-//			}
-//		}
-//	}
 
 	public function title(): string
 	{
