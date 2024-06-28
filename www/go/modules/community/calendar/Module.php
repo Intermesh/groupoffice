@@ -91,7 +91,7 @@ class Module extends core\Module
 		header('Content-Type: text/calendar; charset=UTF-8; component=vcalendar');
 		header('Content-Disposition: attachment; filename="'.$calendar->name.'export_'.$calendar->id.'_'.date('Y-m-d').'.ics"');
 		$vcalendar = new VCalendar([
-			'PRODID' => ICalendarHelper::PROD,
+			'PRODID' => CalendarEvent::PROD,
 			'METHOD' => 'PUBLISH'
 		]);
 		if($calendar->timeZone) $vcalendar->add("X-WR-TIMEZONE", $calendar->timeZone);
