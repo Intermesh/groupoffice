@@ -192,7 +192,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	
 	/**
 	 * For compatibility with new framework
-	 * @return type
+	 * @return \go\core\orm\EntityType
 	 */
 	public static function entityType() {
 		return \go\core\orm\EntityType::findByClassName(static::class);
