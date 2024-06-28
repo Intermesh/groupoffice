@@ -230,13 +230,19 @@ class CalDAVBackend extends AbstractBackend implements
 
 		$blob = $event->icsBlob();
 
+		$calendarData = $blob->getFile()->getContents();
+
+		go()->debug("CalDAVBackend::getCalendarObject($calendarId, $objectUri, ");
+		go()->debug($calendarData);
+		go()->debug(")");
+
 		return [
 			'id' => $event->id,
 			'uri' => $objectUri,
 			'lastmodified' => strtotime($event->modifiedAt),
 			'etag' => '"' . $blob->id . '"',
 			'size' => $blob->size,
-			'calendardata' => $blob->getFile()->getContents(),
+			'calendardata' => $calendarData,
 			'component' => 'vevent',
 		];
 	}
