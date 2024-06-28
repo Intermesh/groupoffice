@@ -112,6 +112,10 @@ class ICalendarHelper {
 		}
 		$event = $forBody;
 
+		if(empty($c->vevent)) {
+			throw new \LogicException("Invite with no events in ICS!");
+		}
+
 		return $c;
 	}
 
