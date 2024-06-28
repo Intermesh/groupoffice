@@ -185,6 +185,15 @@ class Contact extends AclItemEntity {
 	public $registrationNumber = '';
 
 	/**
+	 * International Code Designator (ISO/IEC 6523)
+	 *
+	 * @link https://en.wikipedia.org/wiki/ISO/IEC_6523
+	 * @link https://docs.peppol.eu/edelivery/codelists/
+	 * @var string
+	 */
+	public ?string $icd;
+
+	/**
 	 * 
 	 * @var string
 	 */							
@@ -748,6 +757,15 @@ class Contact extends AclItemEntity {
 										});
 													
 										
+	}
+
+	public function historyLog(): bool|array
+	{
+		$log = parent::historyLog();
+
+		unset($log['vcardBlobId']);
+
+		return $log;
 	}
 
 	public static function sort(Query $query, ArrayObject $sort): Query

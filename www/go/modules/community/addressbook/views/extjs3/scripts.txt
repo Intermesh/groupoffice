@@ -31,3 +31,4 @@ LabelsDialog.js
 BirthdaysPortlet.js
 BirthdaysPortletSettingsDialog.js
 ContactContextMenu.js
+ICDCombo.js

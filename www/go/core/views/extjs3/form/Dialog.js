@@ -203,6 +203,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 			if(fs.fieldSet.isTab) {
 				fs.title = null;
 				fs.collapsible = false;
+				fs.collapsed = false;
 				var pnl = new Ext.Panel({
 					autoScroll: true,
 					hideMode: 'offsets', //Other wise some form elements like date pickers render incorrectly.

@@ -1,3 +1,18 @@
+- Custom fields: Make sure fieldset is not collapsed. This may happen if it was a fieldset before and collapsed by the user.
+- Core: fix issue where open source version requires SourceGuardian
+- Finance: Create ZUGFeRD / Factur-X - Version 2.2.0 EN_16931 compliant PDF e-invoices
+- Finance: Create UBL invoices for Peppol
+
+24-06-2024: 6.8.56
+- E-mail: Fixed autocomplete bug where typed text would stick too
+- Core: Import responded with invalid JSON due to echo statement.
+- Core: improve verbosity for incorrectly parsed date in email message
+- Supportclient: support larger number of support lists
+- Carddav: Import title
+- Carddav: Avoid some unnecessary saves
+- Address book: Ignore vcardBlobId in history log
+- Webdav: Fixed write access in shared folder
+
 17-06-2024: 6.8.55
 - Core: Fix part 2. Proxy headers (X-FORWARDED-FOR) are ignored for "Authorized clients" #1150
 - Calendar: Fixed bug in invite mails

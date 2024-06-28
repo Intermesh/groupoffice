@@ -310,6 +310,7 @@ class Builder
 
 		//needs to be open source as it's used by Module files
 		run('cp ' . $this->sourceDir . '/business/finance/model/PaymentProviderInterface.php ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/finance/model/PaymentProviderInterface.php');
+        run('cp ' . $this->sourceDir . '/business/finance/model/RecurringPaymentProviderInterface.php ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/finance/model/RecurringPaymentProviderInterface.php');
 
 
 	}

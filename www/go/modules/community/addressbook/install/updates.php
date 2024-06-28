@@ -206,3 +206,6 @@ $updates['202311271130'][] = "ALTER TABLE `addressbook_contact` CHANGE `name` `n
 
 $updates['202311271130'][] = "alter table addressbook_contact
     add newsletterAllowed boolean default true null;";
+
+$updates['202406271434'][] = "alter table addressbook_contact
+    add icd varchar(4) null after registrationNumber;";
