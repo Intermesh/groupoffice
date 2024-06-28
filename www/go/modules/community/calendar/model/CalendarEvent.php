@@ -7,9 +7,11 @@
 
 namespace go\modules\community\calendar\model;
 
+use Exception;
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
 use go\core\exception\Forbidden;
+use go\core\exception\JsonPointerException;
 use go\core\fs\Blob;
 use go\core\model\Alert as CoreAlert;
 use go\core\model\User;
@@ -288,6 +290,10 @@ class CalendarEvent extends AclItemEntity {
 		}
 	}
 
+	/**
+	 * @throws JsonPointerException
+	 * @throws Exception
+	 */
 	public function copyPatched($patch) {
 		$e = JSON::patch($this->copy(), $patch->toArray());
 		unset($e->recurrenceRule, $e->recurrenceOverrides, $e->replyTo); // , $e->sentBy, $e->relatedTo,
@@ -536,7 +542,7 @@ class CalendarEvent extends AclItemEntity {
 				foreach ($this->alerts as $alert) {
 					$coreAlert = $this->createAlert($alert->at(), $alert->id);
 					if (!$coreAlert->save()) {
-						throw new \Exception(var_export($coreAlert->getValidationErrors(), true));
+						throw new Exception(var_export($coreAlert->getValidationErrors(), true));
 					}
 				}
 			}
