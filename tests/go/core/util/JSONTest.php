@@ -3,6 +3,7 @@
 namespace go\core;
 
 use GO\Base\Model\Module;
+use go\core\exception\JsonPointerException;
 use go\core\model\User;
 use go\core\orm\EntityTest;
 use go\core\util\ClassFinder;
@@ -55,4 +56,20 @@ class JSONTest extends \PHPUnit\Framework\TestCase {
 		$val = JSON::get($doc, "/m~0n/0");
 		$this->assertEquals("apple", $val);
 	}
+
+	public function testPointerException()
+	{
+		$this->expectException(JsonPointerException::class);
+		$doc = [
+			"a/b" => [
+				"33" => "test"
+			],
+			"m~n" => ["foo", "bar"]
+		];
+
+		$doc = JSON::patch($doc, [
+			"/a~1b/34/test" => "test2"
+		]);
+	}
+
 }

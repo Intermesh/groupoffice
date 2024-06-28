@@ -180,29 +180,39 @@ class JSON {
 	 * @param array|ArrayAccess $doc
 	 * @param array $patch
 	 * @return ArrayAccess|array
+	 * @throws JsonPointerException
 	 */
 	public static function patch(array|ArrayAccess $doc, array $patch): mixed
 	{
 		foreach($patch as $pointer => $value) {
-			$doc = static::patchProp($doc, self::explodePointer($pointer), $value);
+			try {
+				$deepPatch = str_starts_with($pointer, "/");
+				$doc = static::patchProp($doc, $deepPatch ? self::explodePointer($pointer) : [$pointer], $value, $deepPatch);
+			} catch(JsonPointerException $e) {
+				throw new JsonPointerException("The path " . $pointer ." doesn't exist");
+			}
 		}
 
 		return $doc;
 	}
 
-	private static function patchProp(mixed $doc, array $pointer, mixed $value)
+	private static function patchProp(mixed $doc, array $pointer, mixed $value, bool $mustExist)
 	{
-		if(count($pointer) == 0) {
+		$count = count($pointer);
+		if($count == 0) {
 			// last part of the pointer must return new value
 			return $value;
 		}
 
 		$part = array_shift($pointer);
 		if(!isset($doc[$part])) {
+			if($mustExist) {
+				throw new JsonPointerException();
+			}
 			$doc[$part] = [];
 		}
 
-		$doc[$part] = self::patchProp($doc[$part], $pointer, $value);
+		$doc[$part] = self::patchProp($doc[$part], $pointer, $value, $count > 2);
 
 		return $doc;
 	}
