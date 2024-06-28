@@ -97,7 +97,7 @@ class ICalendarHelper {
 	static function toInvite(string $method, CalendarEvent &$event) {
 		$c = new VCalendar(['PRODID' => $event->prodId, 'METHOD' => $method]);
 		$forBody = $event;
-		if($event->isModified(CalendarEvent::EventProperties)) {
+		if($event->isModified(array_merge(CalendarEvent::EventProperties,['participants']))) {
 			// base event (won't check extra participants)
 			$c->add(self::toVEvent($c->createComponent('VEVENT'), $event));
 		}
