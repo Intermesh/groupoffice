@@ -847,6 +847,9 @@ namespace go\core {
 			return null;
 		}
 
+        /**
+         * @return \go\core\model\Settings
+         */
 		public function getSettings()
 		{
 			return Settings::get();

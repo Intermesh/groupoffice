@@ -434,7 +434,7 @@ th {
 	 *
 	 * @param string $entityCls
 	 * @param bool $forMapping
-	 * @return string[]
+	 * @return string[][]
 	 * @throws Exception
 	 */
 	protected function internalGetHeaders(bool $forMapping = false) {
