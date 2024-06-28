@@ -6,6 +6,8 @@
  */
 namespace go\modules\community\calendar\model;
 
+use go\core\ErrorHandler;
+use go\core\exception\JsonPointerException;
 use go\core\fs\Blob;
 use go\core\mail\Address;
 use go\core\mail\Attachment;
@@ -73,19 +75,13 @@ class ICalendarHelper {
 						if($event->showWithoutTime)
 							$exdate['VALUE'] = 'DATE';
 					} else {
-						$exEvent = $event->copyPatched($patch);
-						$vcalendar->add(self::toVEvent($vcalendar->createComponent('VEVENT'), $exEvent, $recurrenceId));
-
-//						$props = self::toVEvent((new CalendarEvent())->setValues($patch->toArray()), true);
-//						$props['UID'] = $event->uid;
-//						//$props['RECURRENCE-ID'] = new DateTime($recurrenceId, $event->timeZone());
-//						$exVEvent = $vcalendar->add('VEVENT', $props);
-//						$rId = $exVEvent->add('RECURRENCE-ID', new DateTime($recurrenceId, $event->timeZone()));
-//						if($event->showWithoutTime) {
-//							$rId['VALUE'] = 'DATE';
-//							if(isset($props['DTSTART'])) $vevent->DTSTART['VALUE'] = 'DATE';
-//							if(isset($props['DTEND'])) $vevent->DTEND['VALUE'] = 'DATE';
-//						}
+						try {
+							$exEvent = $event->copyPatched($patch);
+							$vcalendar->add(self::toVEvent($vcalendar->createComponent('VEVENT'), $exEvent, $recurrenceId));
+						}catch(JsonPointerException $e) {
+							// There was a case where /partipants/<NOTEXISTINGID>/participantStatus was incorrectly patched
+							ErrorHandler::logException($e, "Failed to patch event id: ". $event->id. " with patch " . $recurrenceId);
+						}
 					}
 				}
 			}
@@ -97,7 +93,7 @@ class ICalendarHelper {
 	static function toInvite(string $method, CalendarEvent &$event) {
 		$c = new VCalendar(['PRODID' => $event->prodId, 'METHOD' => $method]);
 		$forBody = $event;
-		if($event->isModified(array_merge(CalendarEvent::EventProperties,['participants']))) {
+		if($method == 'CANCEL' || $event->isModified(array_merge(CalendarEvent::EventProperties,['participants']))) {
 			// base event (won't check extra participants)
 			$c->add(self::toVEvent($c->createComponent('VEVENT'), $event));
 		}
