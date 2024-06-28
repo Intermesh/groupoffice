@@ -290,7 +290,7 @@ abstract class AbstractConverter {
 	 * @param array $params
 	 * @return Blob
 	 */
-	public final function exportToBlob(Query $entities, array $params = []): Blob
+	public function exportToBlob(Query $entities, array $params = []): Blob
 	{
 		$this->clientParams = $params;
 		$this->entitiesQuery = $entities;
@@ -310,7 +310,7 @@ abstract class AbstractConverter {
   /**
    * @var Query
    */
-  private $entitiesQuery;
+  protected $entitiesQuery;
 
   /**
    * The query used for exporting entities
