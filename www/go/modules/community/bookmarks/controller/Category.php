@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\bookmarks\controller;
 
+use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
 use go\modules\community\bookmarks\model;
 
@@ -63,5 +64,12 @@ class Category extends EntityController {
 	public function changes($params) {
 		return $this->defaultChanges($params);
 	}
+
+	protected function canCreate(Entity $entity): bool
+	{
+		$r = $this->rights;
+		return $this->rights->mayManage;
+	}
+
 }
 

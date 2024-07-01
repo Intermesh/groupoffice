@@ -5,6 +5,7 @@
 - Addressbook: Fixed contact sorting on last name
 - E-mail: Fixed option "Sort on last contact time"
 - Tasks / support: group task list combo by task list grouping.
+- Bookmarks: allow users with manage permissions to save bookmark categories
 
 24-06-2024: 6.8.56
 - E-mail: Fixed autocomplete bug where typed text would stick too
