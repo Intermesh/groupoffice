@@ -605,10 +605,11 @@ END;
 	 * Detect known XSS attacks.
 	 *
 	 * @param string $string
+	 * @param bool|null $withStyle
 	 * @return bool
 	 * @throws Exception 
 	 */
-	public static function detectXSS(string $string, $withStyle = false): bool
+	public static function detectXSS(string $string, ?bool $withStyle = false): bool
 	{
 		if($withStyle) {
 			// remove GO injected style

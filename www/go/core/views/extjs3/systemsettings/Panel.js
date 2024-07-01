@@ -17,17 +17,18 @@ go.systemsettings.Panel = Ext.extend(Ext.form.FormPanel, {
 	},
 
 	loadSettings: function() {
-		var module = go.Modules.get(this.package, this.module);
+		const module = go.Modules.get(this.package, this.module);
 
 		if(!module.settings){
 			console.debug("Module: "+this.package+"/"+this.module+" has no settings model.");
 			return;
 		}
 
-		var v = module.settings, f = this.getForm(), hasReadOnlyFields = false;
+		const v = module.settings, f = this.getForm();
+		let hasReadOnlyFields = false;
 
 		v.readOnlyKeys.forEach(function(key) {
-			var field = f.findField(key);
+			const field = f.findField(key);
 			if(field) {
 				field.setDisabled(true);
 				hasReadOnlyFields = true;
