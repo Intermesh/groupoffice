@@ -20,18 +20,36 @@
 			initComponent: function () {
 				this.supr().initComponent.call(this);
 
-				this.store = new go.data.Store(
+				this.store = new go.data.GroupingStore(
 					{
-						fields: ['id', 'name'],
+						fields: ['id', 'name', {
+							name: "group",
+							type: "relation",
+							fields: ["name"]
+						}],
 						entityStore: this.initialConfig.role && this.initialConfig.role == "support" ? "SupportList" : "TaskList",
 						filters: {
 							permissionLevel: {
 								permissionLevel: go.permissionLevels.create
 							}
-						}
+						},
+						sortInfo: {field: "name", direction: "ASC"},
+						groupField: 'group',
+						groupDir: "ASC",
 					}
-				)
-
+				);
+				this.tpl = new Ext.XTemplate(
+					'<tpl for=".">',
+					'<tpl if="this.group != values.group">',
+					'<tpl exec="this.group = values.group"></tpl>',
+					'<tpl if="this.group">',
+					'<div class="menu-title">{this.group.name}</div>',
+					'</tpl>',
+					'</tpl>',
+					'<div class="x-combo-list-item">{[Ext.util.Format.htmlDecode(values.name)]}</div>',
+					'</tpl>',
+					'<tpl exec="this.group = null"></tpl>'
+				);
 				if (this.initialConfig.role) {
 					this.store.setFilter('role', {role: this.initialConfig.role});
 				}
