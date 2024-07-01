@@ -49,6 +49,14 @@ use go\core\model\Module;
  * @property boolean $apply_state Apply the configured state of the column model to everybody.
  * @property \GO\Base\Fs\Folder $fsFolder
  * @property int $acl_write
+ *
+ * @property GO\Files\Model\Folder $parent
+ * @property GO\Base\Model\User $quotaUser
+ * @property GO\Files\Model\Folder[]|\GO\Base\Db\ActiveStatement $folders
+ * @property GO\Files\Model\File[]|\GO\Base\Db\ActiveStatement $files
+ * @property GO\Files\Model\FolderNotification[] $notifyUsers
+ * @property GO\Files\Model\FolderPreference[] $preferences
+ * @property GO\Files\Model\SharedRootFolder[] $sharedRootFolders
  */
 class Folder extends \GO\Base\Db\ActiveRecord {
 	
