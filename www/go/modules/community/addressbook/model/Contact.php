@@ -929,7 +929,10 @@ class Contact extends AclItemEntity {
 	protected function internalValidate() {
 
 		if($this->isOrganization) {
-			$this->firstName =  $this->middleName = $this->prefixes = $this->suffixes = $this->lastName = null;
+			$this->firstName =  $this->middleName = $this->prefixes = $this->suffixes = null;
+
+			// We set last name here because when users choose to sort on last name it will be easier.
+			$this->lastName = mb_substr($this->name, 0, 100);
 		} else if(empty($this->name) || (!$this->isModified(['name']) && $this->isModified(['firstName', 'middleName', 'lastName']))) {
 			$this->setNameFromParts();
 		}
