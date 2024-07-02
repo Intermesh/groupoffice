@@ -1154,7 +1154,7 @@ Ext.define('go.modules.community.addressbook.ICDCombo',{
 	editable: true,
 	selectOnFocus: true,
 	forceSelection: true,
-	allowBlank: false,
+	allowBlank: true,
 	mode: "local",
 	store: store
 });

@@ -1,7 +1,12 @@
+01-07-2024: 6.8.57
 - Custom fields: Make sure fieldset is not collapsed. This may happen if it was a fieldset before and collapsed by the user.
 - Core: fix issue where open source version requires SourceGuardian
 - Finance: Create ZUGFeRD / Factur-X - Version 2.2.0 EN_16931 compliant PDF e-invoices
 - Finance: Create UBL invoices for Peppol
+- Addressbook: Fixed contact sorting on last name
+- E-mail: Fixed option "Sort on last contact time"
+- Tasks / support: group task list combo by task list grouping.
+- Bookmarks: allow users with manage permissions to save bookmark categories
 
 24-06-2024: 6.8.56
 - E-mail: Fixed autocomplete bug where typed text would stick too

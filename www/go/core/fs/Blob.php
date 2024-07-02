@@ -70,7 +70,7 @@ class Blob extends orm\Entity {
 	/**
 	 * Modified at
 	 * 
-	 * @var DateTime
+	 * @var ?DateTime
 	 */
 	public $modifiedAt;
 	
@@ -86,7 +86,7 @@ class Blob extends orm\Entity {
 	/**
 	 * Blob can be deleted after this date
 	 * 
-	 * @var DateTime
+	 * @var ?DateTime
 	 */
 	public $staleAt;
 	

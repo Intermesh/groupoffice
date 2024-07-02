@@ -19,7 +19,7 @@ function exception_error_handler($severity, $message, $file, $line)
 
 set_error_handler("exception_error_handler");
 
-function run($cmd)
+function run(string $cmd): array
 {
 	echo "Running " . $cmd . "\n";
 	exec($cmd, $output, $return);
@@ -35,7 +35,7 @@ function run($cmd)
 	return $output;
 }
 
-function cd($dir)
+function cd(string $dir) : void
 {
 	$dir = realpath($dir);
 
@@ -232,16 +232,27 @@ class Builder
 		}
 	}
 
-	private function runEncoder($sourcePath, $targetPath)
+	private function runEncoder(string $sourcePath, string $targetPath, array $excludes = []) : void
 	{
-        	cd($this->sourceDir. dirname($sourcePath));
-		run($this->encoder . ' -r -f "*.php" -o ' . $this->buildDir . "/" . $this->packageName . $targetPath . " ".basename($sourcePath)."/*");
+        cd($this->sourceDir. dirname($sourcePath));
+
+        $cmd = $this->encoder . ' -r ';
+
+        if(!empty($excludes)) {
+	        $cmd .= "--exclude " . implode("--exclude ", array_map("escapeshellarg", $excludes));
+        }
+
+        $cmd .= ' -f "*.php" -o ' . $this->buildDir . "/" . $this->packageName . $targetPath . " ".basename($sourcePath)."/*";
+
+        echo "Running: " . $cmd . "\n";
+
+		run($cmd);
 	}
 
 	private function encode()
 	{
 		foreach ($this->proModules as $module) {
-			$this->runEncoder('/promodules/' . $module, '/modules');
+			$this->runEncoder('/promodules/' . $module, '/modules', ["vendor/*"]);
 		}
 
 		$this->runEncoder('/promodules/tickets/model', '/modules/tickets/');
@@ -270,7 +281,7 @@ class Builder
 
 
 		//business package
-		$this->runEncoder('/business', '/go/modules');
+		$this->runEncoder('/business', '/go/modules', ["*/vendor/*"]);
 
 		$businessDir = new DirectoryIterator($this->sourceDir . '/business');
 		foreach ($businessDir as $fileinfo) {

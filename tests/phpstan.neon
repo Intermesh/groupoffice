@@ -1,0 +1,32 @@
+parameters:
+
+    level: 3
+
+    parallel:
+        processTimeout: 100.00
+    fileExtensions:
+        - php
+
+    paths:
+        - %currentWorkingDirectory%/go
+
+    scanDirectories:
+        - %currentWorkingDirectory%/api
+        - %currentWorkingDirectory%/controller
+        - %currentWorkingDirectory%/go
+        - %currentWorkingDirectory%/modules
+
+    excludePaths:
+        analyse:
+            - */vendor/*
+
+    reportUnmatchedIgnoredErrors: false
+    treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        - identifier: missingType.iterableValue
+        - identifier: missingType.generics
+        - '#Class .* referenced with incorrect case: .*#'
+        - '#Variable .* in empty\(\) always exists and is always falsy.#'
+        - '#Variable .* in empty\(\) always exists and is not falsy.#'
+        - '#Variable .* in isset\(\) always exists and is always null.#'
+        - '#Unsafe usage of new static\(\).#'
