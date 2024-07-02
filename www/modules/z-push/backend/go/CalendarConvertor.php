@@ -11,8 +11,8 @@ use go\core\util\DateTime;
 class CalendarConvertor
 {
 	static $meetingResponseMap = [
-		1 => Participant::Tentative,
-		2 => Participant::Accepted,
+		1 => Participant::Accepted,
+		2 => Participant::Tentative,
 		3 => Participant::Declined,
 	];
 
