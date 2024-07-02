@@ -230,18 +230,39 @@ th {
 		$this->writeRecord($record);
 	}
 
-
-	protected function finishExport(): Blob
+	/**
+	 * @param \go\core\orm\Query $entities
+	 * @param array $params
+	 * @return \go\core\fs\Blob
+	 * @throws \go\core\orm\exception\SaveException
+	 */
+	public function exportToBlob(Query $entities, array $params = []): Blob
 	{
-		switch($this->extension) {
-			case 'html':
-				fputs($this->fp, "</table></body></html>");
-				break;
-			case 'csv':
+		$this->clientParams = $params;
+		$this->entitiesQuery = $entities;
+		$this->initExport();
 
+		$this->index = 0;
+		foreach($entities as $entity) {
+			$this->exportEntity($entity);
+			$this->index++;
+		}
+
+		$this->colorizeHeaders();
+
+		return $this->finishExport();
+	}
+
+	/**
+	 * @return void
+	 */
+	protected function colorizeHeaders(): void
+	{
+		switch ($this->extension) {
+			case 'html':
+			case 'csv':
 				break;
 			default:
-
 				$headerStyle = [
 					'font' => [
 						'bold' => true,
@@ -260,7 +281,25 @@ th {
 					$colDim = $this->spreadsheet->getActiveSheet()->getColumnDimension($col->getColumnIndex());
 					$colDim->setAutoSize(true);
 				}
+				break;
+		}
+	}
 
+	/**
+	 * @return \go\core\fs\Blob
+	 * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+	 * @throws \go\core\orm\exception\SaveException
+	 */
+	protected function finishExport(): Blob
+	{
+		switch($this->extension) {
+			case 'html':
+				fputs($this->fp, "</table></body></html>");
+				break;
+			case 'csv':
+
+				break;
+			default:
 				$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->spreadsheet);
 				$writer->setPreCalculateFormulas(false);
 				$writer->save($this->tempFile->getPath());
@@ -436,7 +475,7 @@ th {
 	 *
 	 * @param string $entityCls
 	 * @param bool $forMapping
-	 * @return string[]
+	 * @return string[][]
 	 * @throws Exception
 	 */
 	protected function internalGetHeaders(bool $forMapping = false) {
