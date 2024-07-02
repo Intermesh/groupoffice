@@ -240,7 +240,7 @@ class Builder
 
         $cmd .= implode("--exclude ", array_map("escapeshellarg", $excludes));
 
-        $cmd .= '-f "*.php" -o ' . $this->buildDir . "/" . $this->packageName . $targetPath . " ".basename($sourcePath)."/*";
+        $cmd .= ' -f "*.php" -o ' . $this->buildDir . "/" . $this->packageName . $targetPath . " ".basename($sourcePath)."/*";
 
         echo "Running: " . $cmd . "\n";
 
@@ -250,7 +250,7 @@ class Builder
 	private function encode()
 	{
 		foreach ($this->proModules as $module) {
-			$this->runEncoder('/promodules/' . $module, '/modules', ["*/vendor/*"]);
+			$this->runEncoder('/promodules/' . $module, '/modules', ["vendor/*"]);
 		}
 
 		$this->runEncoder('/promodules/tickets/model', '/modules/tickets/');
@@ -279,7 +279,7 @@ class Builder
 
 
 		//business package
-		$this->runEncoder('/business', '/go/modules', ["vendor/*"]);
+		$this->runEncoder('/business', '/go/modules', ["*/vendor/*"]);
 
 		$businessDir = new DirectoryIterator($this->sourceDir . '/business');
 		foreach ($businessDir as $fileinfo) {
