@@ -7,6 +7,7 @@
 - E-mail: Fixed option "Sort on last contact time"
 - Tasks / support: group task list combo by task list grouping.
 - Bookmarks: allow users with manage permissions to save bookmark categories
+- Support: auto-expire tickets
 
 24-06-2024: 6.8.56
 - E-mail: Fixed autocomplete bug where typed text would stick too
