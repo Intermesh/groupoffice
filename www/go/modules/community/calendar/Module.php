@@ -75,8 +75,10 @@ class Module extends core\Module
 			->join("calendar_calendar_event", "ce", 'e.eventId = ce.eventId', 'LEFT')
 			->where('ce.eventId', 'IS', null)
 		);
-		 echo $stmt;
-		//$stmt->execute();
+//		 echo $stmt;
+		$stmt->execute();
+
+		go()->debug("Cleaned up " . $stmt->rowCount() ." events without any calendar entries.");
 	}
 	public static function onMap(core\orm\Mapping $mapping)
 	{
