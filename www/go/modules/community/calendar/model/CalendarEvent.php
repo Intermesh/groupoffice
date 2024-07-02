@@ -210,11 +210,26 @@ class CalendarEvent extends AclItemEntity {
 			//->addMap('locations', Location::class, ['id' => 'eventId']);
 	}
 
-	static function findByUID($scheduleId, $uid) {
-		return self::find()->join('calendar_calendar', 'cal', 'cal.id = cce.calendarId', 'LEFT')
-			->join('core_user', 'u', 'u.id = cal.ownerId')
-			->where(['u.email' => $scheduleId, 'eventdata.uid'=>$uid])
+	/**
+	 * Find an event by UID
+	 *
+	 * @param string $uid
+	 * @param string|null $userEmail
+	 * @return Query<self>
+	 * @throws Exception
+	 */
+	static function findByUID(string $uid, ?string $userEmail = null) : Query {
+		$query =  self::find()
+			->where(['eventdata.uid'=>$uid])
 			->filter(['permissionLevel' => 25]); // rsvp
+
+		if(isset($userEmail)) {
+			$query->join('calendar_calendar', 'cal', 'cal.id = cce.calendarId', 'LEFT')
+				->join('core_user', 'u', 'u.id = cal.ownerId')
+				->where(['u.email' => $userEmail]);
+		}
+
+		return $query;
 
 	}
 
@@ -649,13 +664,13 @@ class CalendarEvent extends AclItemEntity {
 		return $p;
 	}
 
-	public function organizer() {
+	public function organizer() : ?Participant {
 		foreach($this->participants as $participant) {
 			if($participant->isOwner()) {
 				return $participant;
 			}
 		}
-		return false;
+		return null;
 	}
 
 	private function resetICalBlob() {
