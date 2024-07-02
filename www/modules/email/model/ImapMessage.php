@@ -751,7 +751,7 @@ class ImapMessage extends ComposerMessage {
 			
 		foreach($attachments as $attachment){			
 			if($attachment->isVcalendar()){
-				$data = $this->getImapConnection()->get_message_part_decoded($this->uid, $attachment->number, $attachment->encoding);
+				$data = $this->getImapConnection()->get_message_part_decoded($this->uid, $attachment->number, $attachment->encoding, $attachment->charset, true);
 				$data = trim(StringUtil::normalizeCrlf($data));
 				try {
 					$vcalendar = \GO\Base\VObject\Reader::read($data);
