@@ -168,6 +168,7 @@ return [
 	'deleteScheduleText' => 'Als je deze activiteit verwijdert, word de organisator op de hoogte gesteld dat je niet deelneemt',
 
 	'replyImipBody' => [
+		'needs-action' => '{name} heeft nog geen keuze gemaakt voor afspraak "{title}" {date}.',
 		'accepted' => '{name} heeft afspraak {title} {date} geaccepteerd',
 		'declined' => '{name} heeft de afspraak {title} {date} geweigerd',
 		'tentative' => '{name} weet nog niet of hij/zij afspraak {title} {date} accepteert',

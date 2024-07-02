@@ -22,6 +22,7 @@ return [
 	'deleteScheduleText' => 'If you delete this event, the organizer will be notified that you wont participate',
 
 	'replyImipBody' => [
+		'needs-action' => '{name} didn\'t decide for "{title}" {date} yet.',
 		'accepted' => '{name} accepted event "{title}" {date}',
 		'declined' => '{name} declined event "{title}" {date}',
 		'tentative' => '{name} is tentative about event "{title}" {date}',
