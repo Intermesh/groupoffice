@@ -13,10 +13,11 @@ import {applyPatch, client, jmapds, Recurrence} from "@intermesh/groupoffice-cor
 import {EventWindow} from "./EventWindow.js";
 import {EventDetailWindow} from "./EventDetail.js";
 
+export type RecurrenceOverride = {[recurrenceId:string]: (Partial<CalendarEvent> & {excluded?:boolean})};
 export interface CalendarEvent extends BaseEntity {
 	id: EntityID
 	recurrenceRule?: any
-	recurrenceOverrides?: {[recurrenceId:string]: (Partial<CalendarEvent> & {excluded?:boolean})}
+	recurrenceOverrides?: RecurrenceOverride
 	links?: any
 	alerts?: any
 	showWithoutTime?: boolean // isAllDay
@@ -408,6 +409,27 @@ export class CalendarItem {
 		});
 	}
 
+
+	/**
+	 * When "This and future" is used then we should remove all patches from the event that occur after the "This and future" date.
+	 * @param until
+	 * @private
+	 * @return The new "recurrenceOverrides" property
+	 */
+	private removeFutureOverrides(until: DateTime) {
+		const patchRecurrenceOverride: RecurrenceOverride = {};
+		if(this.data.recurrenceOverrides) {
+			// Copy recurrence overrides that occur before the until date
+			for(const recurrenceId in this.data.recurrenceOverrides) {
+				if((new DateTime(recurrenceId)).compare(until) == -1) {
+					patchRecurrenceOverride[recurrenceId] = this.data.recurrenceOverrides[recurrenceId];
+				}
+			}
+		}
+
+		return patchRecurrenceOverride;
+	}
+
 	/**
 	 * @see  https://www.ietf.org/archive/id/draft-ietf-jmap-calendars-10.html#section-5.5
 	 */
@@ -416,13 +438,23 @@ export class CalendarItem {
 		// todo: add first and next relation in relatedTo property as per https://www.ietf.org/archive/id/draft-ietf-jmap-calendars-11.html#name-splitting-an-event
 		const rule = structuredClone(this.data.recurrenceRule);
 		// we might have changed start, so we'll take the actual recurrenceId
-		rule.until = new DateTime(this.recurrenceId).addDays(-1).format('Y-m-d'); // close current series yesterday
+		const until = new DateTime(this.recurrenceId).addDays(-1);
+		rule.until = until.format('Y-m-d'); // close current series yesterday
 		this.confirmScheduleMessage(modified, () => {
-			eventDS.update(this.data.id, {recurrenceRule: rule}); // set until on original
+
+			const update : Partial<CalendarEvent> = {recurrenceRule: rule};
+
+			// remove patches that occur after the until
+			const patchRecurrenceOverrides = this.removeFutureOverrides(until);
+			if(Object.keys(patchRecurrenceOverrides).length != Object.keys(this.data.recurrenceOverrides ?? {}).length) {
+				update.recurrenceOverrides = patchRecurrenceOverrides;
+			}
+
+			eventDS.update(this.data.id, update); // set until on original
 
 			const next = Object.assign({},
 				this.data,
-				{start: this.recurrenceId!, id: null, uid: null},
+				{start: this.recurrenceId!, id: null, uid: null, recurrenceOverrides: null},
 				modified
 			);
 			const p = eventDS.create(next); // create duplicate
