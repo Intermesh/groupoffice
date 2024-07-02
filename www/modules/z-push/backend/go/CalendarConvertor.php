@@ -98,7 +98,7 @@ class CalendarConvertor
 						$exEvent->uid = $event->uid; // required
 						$exEvent->timeZone = $event->timeZone;
 						if(empty($exEvent->start)) {
-							$exEvent->start = $override->recurrenceId;
+							$exEvent->start = new DateTime($override->recurrenceId);
 						}
 						if(empty($exEvent->duration)) {
 							$exEvent->duration = $event->duration; // z-push needs this for its compare to endtime check to pass.
@@ -136,7 +136,7 @@ class CalendarConvertor
 		return $message;
 	}
 
-	private static function mstzFromTZID($timeZone) {
+	public static function mstzFromTZID($timeZone) {
 		$msId = str_replace('.','',intltz_get_windows_id($timeZone));
 		$tz = TimezoneUtil::GetFullTZFromTZName($msId);
 		return base64_encode(TimezoneUtil::GetSyncBlobFromTZ($tz));
