@@ -106,6 +106,9 @@ class Scheduler {
 	 */
 	private static function organizeImip(CalendarEvent $event, $method, $newOnly = false) {
 		$success=true;
+
+		// TODO: WHen adding a participant for a single occurrence, this participant does not get an invite becasue
+		// we only iterate the main events partipants without patching.
 		$organizer = $event->calendarParticipant(); // must be organizer at this point
 		foreach($event->participants as $participant) {
 			/** @var $participant Participant */
