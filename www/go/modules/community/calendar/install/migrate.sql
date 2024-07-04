@@ -460,10 +460,9 @@ FROM cal_events WHERE exception_for_event_id = 0 GROUP BY uuid HAVING SUM(is_org
 INSERT INTO calendar_calendar_event
 (id, eventId, calendarId) SELECT null, id, calendar_id FROM cal_events WHERE exception_for_event_id = 0;
 
--- TODO: should we bother with past events?
 INSERT INTO calendar_event_alert
 	(id, `offset`, relativeTo, eventId, userId) SELECT
-	1, CONCAT('PT',reminder,'S'), 'start', id, user_id FROM cal_events WHERE exception_for_event_id = 0 AND reminder IS NOT NULL;
+	1, CONCAT('PT',reminder,'S'), 'start', id, user_id FROM cal_events WHERE (start_time > unix_timestamp() or repeat_end_time > unix_timestamp()) exception_for_event_id = 0 AND reminder IS NOT NULL;
 
 INSERT INTO calendar_event_category
 	(eventId, categoryId) SELECT
