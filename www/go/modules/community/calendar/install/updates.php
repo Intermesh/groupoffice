@@ -16,7 +16,7 @@ $updates['202402221543'][] = function() {
 	function tz_convert($input, $tz) {
 		$datetime = new DateTime($input); // tz during upgrade is UTC
 		$datetime->setTimezone(new DateTimeZone($tz));
-		return $datetime->format('Y-m-d H:i:s');
+		return $datetime;
 	}
 	while($row = $stmt->fetch()) {
 
