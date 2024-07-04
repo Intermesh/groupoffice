@@ -483,9 +483,11 @@ INSERT INTO calendar_participant
 	(id, eventId, name, email, kind, rolesMask, participationStatus, scheduleAgent, expectReply, scheduleUpdated) SELECT
 	id, event_id, name, email, 'individual', IF(role='REQ-PARTICIPANT',2,0)+is_organizer, LOWER(p.status),'server',1,FROM_UNIXTIME(IF(last_modified='',0, last_modified)) FROM cal_participants p JOIN calendar_event ce ON ce.eventId = event_id;
 
+
+-- TODO: Is RolesMask right for resource participants?
 INSERT INTO calendar_participant
 (id, eventId, name, email, kind, rolesMask, participationStatus, scheduleAgent, expectReply, scheduleUpdated) SELECT
-CONCAT('Calendar:',c.id), r.id as eventId, c.name,u.email ,IF(e.status = 'CONFIRMED', 'accepted', LOWER(e.status)), 'server',1,FROM_UNIXTIME(IF(e.mtime='',0, e.mtime))FROM cal_events e
+CONCAT('Calendar:',c.id), r.id as eventId, c.name,u.email , 'individual', 0 ,IF(e.status = 'CONFIRMED', 'accepted', LOWER(e.status)), 'server',1,FROM_UNIXTIME(IF(e.mtime='',0, e.mtime))FROM cal_events e
 	 JOIN cal_calendars c ON e.calendar_id = c.id
 	 JOIN core_user u ON c.user_id = u.id
 	 JOIN cal_events r ON e.resource_event_id = r.id
