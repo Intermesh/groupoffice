@@ -249,12 +249,21 @@ class CalDAVBackend extends AbstractBackend implements
 
 	public function createCalendarObject($calendarId, $objectUri, $calendarData)
 	{
+
+		go()->debug("CalDAVBackend::createCalendarObject($calendarId, $objectUri, ");
+		go()->debug($calendarData);
+		go()->debug(")");
+
 		//$calendar = Calendar::findById($calendarId);
 		$uid = pathinfo($objectUri, PATHINFO_FILENAME);
 		$event = new CalendarEvent();
 		$event->uid = $uid;
 
 		$event = ICalendarHelper::parseVObject($calendarData, $event);
+
+		// The attached blob must be identical to the data used to create the event
+		$event->attachBlob(ICalendarHelper::makeBlob($event, $calendarData)->id);
+
 		$savedEvent = Calendar::addEvent($event, $calendarId);
 		if($savedEvent === null) {
 			throw new \Exception('Could not create calendar event');
@@ -278,6 +287,10 @@ class CalDAVBackend extends AbstractBackend implements
 			return false;
 		}
 		$event = ICalendarHelper::parseVObject($calendarData, $event);
+
+		// The attached blob must be identical to the data used to create the event
+		$event->attachBlob(ICalendarHelper::makeBlob($event, $calendarData)->id);
+
 		if(!$event->save()) {
 			go()->log("Failed to update event at ".$objectUri);
 			return false;

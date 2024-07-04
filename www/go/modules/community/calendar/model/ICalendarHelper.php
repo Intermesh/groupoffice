@@ -351,16 +351,15 @@ class ICalendarHelper {
 		}
 		// All exceptions that do not have the recurrence ID are ignored here
 
-		// $vcalendar could contain more data than $event
-		$blob = self::makeBlob($event, $vcalendar->serialize());
-		$event->attachBlob($blob->id);
-		//$vcalendar->destroy(); // cant go yet.
 		return $event;
 	}
 
-	static function makeBlob(CalendarEvent $event, string $data = null) {
+	static function makeBlob(CalendarEvent $event, string $data = null): Blob
+	{
 		$blob = Blob::fromString($data ?? ICalendarHelper::toVObject($event)->serialize());
 		$blob->type = 'text/calendar';
+		// these must stay in sync!
+		$blob->modifiedAt = $event->modifiedAt;
 		$blob->name = $event->uid . '.ics';
 		if(!$blob->save()) {
 			throw new \Exception('could not save blob');
@@ -370,7 +369,7 @@ class ICalendarHelper {
 	}
 
 	static private function parseAttendee($vattendee) {
-		$key = str_replace('mailto:', '',(string)$vattendee);
+		$key = str_ireplace('mailto:', '',(string)$vattendee);
 		$principalId = Principal::find()->selectSingleValue('id')->where('email','=',$key)->orderBy(['entityTypeId'=>'ASC'])->single();
 		$p = (object)['email' => $key];
 		if(!empty($vattendee['EMAIL'])) $p->email = (string)$vattendee['EMAIL'];
@@ -407,6 +406,8 @@ class ICalendarHelper {
 			if(in_array($status, ['confirmed', 'cancelled', 'tentative'])) {
 				$props->status = $status;
 			}
+		} else {
+			$props->status = 'confirmed';
 		}
 		if(!empty($vevent->CLASS)) $props->privacy = array_flip(self::$privacyMap)[(string)$vevent->CLASS] ?? 'public';
 		if(!empty($vevent->COLOR)) $props->color = (string)$vevent->COLOR;
@@ -425,11 +426,15 @@ class ICalendarHelper {
 			}
 		}
 		if(isset($vevent->ORGANIZER)) {
-			$props->replyTo = str_replace('mailto:', '',(string)$vevent->ORGANIZER);
+			$props->replyTo = str_ireplace('mailto:', '',(string)$vevent->ORGANIZER);
 
 			list($key,$organizer) = self::parseAttendee($vevent->ORGANIZER);
-			$organizer->roles['owner'] = true;
-			$props->participants[$key] = (array)$organizer;
+
+			if(!isset($props->participants[$key] )) {
+				// thunderbird sends organizer and participant but only the participants contains the correct "partstat".
+				$props->participants[$key] = (array)$organizer;
+			}
+			$props->participants[$key]['roles']['owner'] = true;
 		}
 
 		return $props;
