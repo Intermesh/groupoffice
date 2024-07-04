@@ -25,17 +25,18 @@ class RssFeed extends \GO\Base\Db\ActiveRecord {
 		return parent::model($className);
 	}
 	
-	public function tableName(){
+	public function tableName(): string
+	{
 		return 'su_rss_feeds';
 	}
 	
-	protected function init() {
-		
+	protected function init(): void
+	{
 		$this->columns['url']['gotype']='html';
-		return parent::init();
+		parent::init();
 	}
 
-	public function validate()
+	public function validate(): bool
 	{
 		$parsed = parse_url($this->url, PHP_URL_HOST);
 		$address = gethostbyname($parsed);
@@ -63,7 +64,8 @@ class RssFeed extends \GO\Base\Db\ActiveRecord {
 		return parent::validate();
 	}
 
-	public static function isRSS($string) {
+	public static function isRSS($string): bool
+	{
 		return preg_match('/<rss.*<\/rss>/i', str_replace(["\r","\n"],'', $string)) ||
 		preg_match('/<rdf:RDF.*<\/rdf:RDF>/i', str_replace(["\r","\n"],'', $string));
 	}
