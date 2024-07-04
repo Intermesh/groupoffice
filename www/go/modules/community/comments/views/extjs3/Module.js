@@ -47,6 +47,10 @@ go.Modules.register('community', 'comments', {
 					try {
 						creator = await go.Db.store("Principal").single(alert.data.createdBy);
 					} catch (e) {
+
+					}
+
+					if(!creator) {
 						creator = {name: t("Unknown user")};
 					}
 
