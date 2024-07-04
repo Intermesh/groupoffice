@@ -1156,26 +1156,26 @@ class MailStore extends Store implements ISearchProvider {
 		return $state;
 	}
 
-    public function SupportsType($searchtype)
-    {
-        return ($searchtype == ISearchProvider::SEARCH_MAILBOX);
-    }
+  public function SupportsType($searchtype)
+  {
+      return ($searchtype == ISearchProvider::SEARCH_MAILBOX);
+  }
 
-    public function GetGALSearchResults($searchquery, $searchrange, $searchpicture)
-    {
-        return false;
-    }
+  public function GetGALSearchResults($searchquery, $searchrange, $searchpicture)
+  {
+      return false;
+  }
 
-    public function TerminateSearch($pid)
-    {
-        return true;
-    }
+  public function TerminateSearch($pid)
+  {
+      return true;
+  }
 
-    public function Disconnect()
-    {
-        // Don't close the mailbox, we will need it open in the Backend methods
-        return true;
-    }
+  public function Disconnect()
+  {
+      // Don't close the mailbox, we will need it open in the Backend methods
+      return true;
+  }
 
 	private function processCalendarInvite(SyncMail $message, \GO\Email\Model\ImapMessage $imapMessage)
 	{
@@ -1184,13 +1184,14 @@ class MailStore extends Store implements ISearchProvider {
 			return;
 		}
 
-		$imip = Scheduler::handleIMIP($imapMessage);
+		Scheduler::handleIMIP($imapMessage);
 
-		if(!isset($imip['event'])) {
-			ZLog::Write(LOGLEVEL_DEBUG, "MailStore::processCalendarInvite(): " . ($imip['feedback'] ?? ""));
 
-			return;
-		}
+//		if(!isset($imip['event'])) {
+//			ZLog::Write(LOGLEVEL_DEBUG, "MailStore::processCalendarInvite(): " . ($imip['feedback'] ?? ""));
+//
+//			return;
+//		}
 		$message->meetingrequest = new SyncMeetingRequest();
 		$method = strtolower($vcalendar->method->getValue());
 		$vevent = $vcalendar->vevent[0];
@@ -1214,8 +1215,11 @@ class MailStore extends Store implements ISearchProvider {
 
 				ZLog::Write(LOGLEVEL_DEBUG, "MailStore::processCalendarInvite(): Reply received");
 
+				$attendee = $vevent->attendee;
+				$status = strtolower($attendee->partstat ?? "needs-action");
+
 				// Only set messageclass for replies changing my calendar object
-				switch ($imip['status']) {
+				switch ($status) {
 					case "accepted":
 						$message->messageclass = "IPM.Schedule.Meeting.Resp.Pos";
 						ZLog::Write(LOGLEVEL_DEBUG, "MailStore::processCalendarInvite(): Update attendee -> accepted");
@@ -1233,7 +1237,7 @@ class MailStore extends Store implements ISearchProvider {
 						ZLog::Write(LOGLEVEL_DEBUG, "MailStore::processCalendarInvite(): Update attendee -> declined");
 						break;
 					default:
-						ZLog::Write(LOGLEVEL_WARN, sprintf("MailStore::processCalendarInvite() - Unknown reply status <%s>, please report it to the developers", $status));
+						ZLog::Write(LOGLEVEL_WARN, sprintf("MailStore::processCalendarInvite() - Unknown reply status <%s>, please report it to the developers"));
 						$message->messageclass = "IPM.Appointment";
 						break;
 				}
@@ -1244,8 +1248,7 @@ class MailStore extends Store implements ISearchProvider {
 				$message->meetingrequest->meetingmessagetype = 1;
 				$message->messageclass = "IPM.Schedule.Meeting.Request";
 				ZLog::Write(LOGLEVEL_DEBUG, "MailStore::processCalendarInvite(): New request");
-				// New meeting, we don't create it now, because we need to confirm it first, but if we don't create it we won't see it in the calendar
-				break;
+					break;
 			case "add":
 				ZLog::Write(LOGLEVEL_DEBUG, "MailStore::processCalendarInvite(): Add method is not implemented.");
 				$message->messageclass = "IPM.Appointment";
@@ -1260,16 +1263,31 @@ class MailStore extends Store implements ISearchProvider {
 				break;
 		}
 
-		$message->meetingrequest->dtstamp = ($imip['event']->modifiedAt ?? new DateTime())->format("U");
-		$message->meetingrequest->globalobjid = base64_encode($imip['event']->uid);
-		$message->meetingrequest->starttime = $imip['event']->start()->format("U");
-		$message->meetingrequest->alldayevent = $imip['event']->showWithoutTime;
-		$message->meetingrequest->endtime = $imip['event']->end()->format("U");
+		if(isset($vevent->dtstamp)) {
+			$message->meetingrequest->dtstamp = $vevent->dtstamp->getDateTime()->format("U");
+		}
+		$message->meetingrequest->globalobjid = base64_encode($vevent->uid);
+		$message->meetingrequest->starttime = $vevent->dtstart->getDateTime()->format("U");
+		$message->meetingrequest->alldayevent = $vevent->dtstart->hasTime();
+		$message->meetingrequest->endtime = $vevent->dtend->getDateTime()->format("U");
 
-		$message->meetingrequest->organizer = $imip['event']->organizer()->email;
-		$message->meetingrequest->location = $imip['event']->location;
-		$message->meetingrequest->sensitivity = ['public'=> '0', 'private' => '2', 'secret'=> '3'][$imip['event']->privacy];
-		$message->meetingrequest->timezone = CalendarConvertor::mstzFromTZID($imip['event']->timeZone);
+		if(isset($vevent->organizer)) {
+			$message->meetingrequest->organizer = str_ireplace("MAILTO:", "",$vevent->organizer);
+		}
+
+		if(isset($vevent->location)) {
+			$message->meetingrequest->location = (string)$vevent->location;
+		}
+		if(!empty($vevent->CLASS)) {
+			$privacy = array_flip(\go\modules\community\calendar\model\ICalendarHelper::$privacyMap)[(string)$vevent->CLASS] ?? 'public';
+		}else {
+			$privacy = "public";
+		}
+
+		$message->meetingrequest->sensitivity = ['public'=> '0', 'private' => '2', 'secret'=> '3'][$privacy];
+
+		$timezone = !empty((string)$vevent->DTSTART['TZID']) ? (string)$vevent->DTSTART['TZID'] : 'Etc/UTC';
+		$message->meetingrequest->timezone = CalendarConvertor::mstzFromTZID($timezone);
 
 		$message->contentclass = "urn:content-classes:calendarmessage";
 
@@ -1354,4 +1372,3 @@ class MailStore extends Store implements ISearchProvider {
 	}
 
 }
-
