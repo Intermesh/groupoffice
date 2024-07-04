@@ -10,23 +10,6 @@ $updates['202402221543'][] = function() {
 	\go\core\db\Utils::runSQLFile(\GO()->getEnvironment()->getInstallFolder()->getFile("go/modules/community/calendar/install/migrate.sql"));
 };
 
-$updates['202402221543'][] = function() {
-	// fix timezones
-	$stmt = go()->getDbConnection()->query("SELECT eventId, `start`,`timeZone`,`lastOccurrence` FROM calendar_event WHERE calendar_event.showWithoutTime=0 AND timeZone IS NOT null");
-	function tz_convert($input, $tz) {
-		$datetime = new DateTime($input); // tz during upgrade is UTC
-		$datetime->setTimezone(new DateTimeZone($tz));
-		return $datetime;
-	}
-	while($row = $stmt->fetch()) {
-
-		$data = [
-			'start' => tz_convert($row['start'], $row['timeZone']),
-			'lastOccurrence' => tz_convert($row['lastOccurrence'], $row['timeZone'])
-		];
-		go()->getDbConnection()->updateIgnore('calendar_event', $data, ['eventId' => $row['eventId']])->execute();
-	}
-};
 
 $updates['202402221543'][] = function(){ // migrate recurrence rules and fix lastOccurrence
 
@@ -168,6 +151,36 @@ $updates['202403121146'][] = function(){ // migrate files to blob and add as cal
 
 
 $updates['202404071212'][] = "update core_entity set clientName = 'CalendarCategory' where name = 'Category' and moduleId = (select id from core_module where name ='calendar' and package='community')";
+
+
+
+$updates['202404071212'][] = function() {
+
+	// fix timezones
+	$stmt = go()->getDbConnection()->query("SELECT eventId, title, `start`,`timeZone`,`lastOccurrence` FROM calendar_event WHERE timeZone IS NOT null");
+	function tz_convert($input, $tz) {
+		if(!isset($input)) {
+			return $input;
+		}
+		$datetime = new DateTime($input, new DateTimeZone("UTC")); // tz during upgrade is UTC
+		$datetime->setTimezone(new DateTimeZone($tz));
+		return $datetime;
+	}
+	while($row = $stmt->fetch()) {
+
+		try {
+			$data = [
+				'start' => tz_convert($row['start'], $row['timeZone']),
+				'lastOccurrence' => tz_convert($row['lastOccurrence'], $row['timeZone'])
+			];
+
+			go()->getDbConnection()->updateIgnore('calendar_event', $data, ['eventId' => $row['eventId']])->execute();
+		}catch(Exception $e) {
+			echo "Exception: " . $e->getMessage() ."\n";
+		}
+	}
+//	exit();
+};
 
 
 // TODO: calendar views -> custom filters

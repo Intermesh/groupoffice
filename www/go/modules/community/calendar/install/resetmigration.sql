@@ -1,0 +1,9 @@
+delete from calendar_calendar;
+delete from calendar_event;
+delete from calendar_event_custom_fields;
+delete from calendar_event_alert;
+delete from calendar_preferences;
+delete from calendar_resource_group;
+delete from calendar_category;
+update core_module set version = 0 where name='calendar';
+

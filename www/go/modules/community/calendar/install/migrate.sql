@@ -1,4 +1,4 @@
-CREATE TABLE calendar_resource_group (
+CREATE TABLE IF NOT EXISTS  calendar_resource_group (
 	id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 	name           VARCHAR(200) NULL,
 	description    MEDIUMTEXT NULL,
@@ -467,7 +467,7 @@ INSERT INTO calendar_event_alert
 
 INSERT INTO calendar_event_category
 	(eventId, categoryId) SELECT
-	id, category_id FROM cal_events old JOIN calendar_event new ON new.eventId = old.id GROUP BY new.uid, old.category_id ;
+	id, category_id FROM cal_events old JOIN calendar_event new ON new.eventId = old.id where category_id > 0 GROUP BY new.uid, old.category_id ;
 
 INSERT INTO calendar_event_custom_fields SELECT * FROM cal_events_custom_fields;
 
