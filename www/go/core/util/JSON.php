@@ -199,11 +199,6 @@ class JSON {
 	private static function patchProp(mixed $doc, array $pointer, mixed $value, bool $mustExist)
 	{
 		$count = count($pointer);
-		if($count == 0) {
-			// last part of the pointer must return new value
-			return $value;
-		}
-
 		$part = array_shift($pointer);
 		if(!isset($doc[$part])) {
 			if($mustExist) {
@@ -212,7 +207,11 @@ class JSON {
 			$doc[$part] = [];
 		}
 
-		$doc[$part] = self::patchProp($doc[$part], $pointer, $value, $count > 2);
+		if(empty($pointer)) {
+			$doc[$part] = $value;
+		} else {
+			$doc[$part] = self::patchProp($doc[$part], $pointer, $value, $count > 2);
+		}
 
 		return $doc;
 	}
