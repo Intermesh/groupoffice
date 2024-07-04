@@ -141,34 +141,35 @@ export class EventWindow extends FormWindow {
 			}),
 			comp({}),
 			this.startDate = datefield({label: t('Start'), name:'start', flex:1, defaultTime: now.format('H')+':00',
-				listeners:{'setvalue': (me,_v, oldV) => {
-					const start = me.getValueAsDateTime(),
-						end = this.endDate.getValueAsDateTime(),
+				listeners:{'change': (me,_v, oldStartDate) => {
+					const newStartDate = me.getValueAsDateTime(),
+						endDate = this.endDate.getValueAsDateTime(),
 						format= me.withTime ? "Y-m-dTH:i" : 'Y-m-d';
-					if(start){
-						recurrenceField.setStartDate(start);
+					if(newStartDate){
+						recurrenceField.setStartDate(newStartDate);
 					}
 
-					if (end && start && start.date > end.date) {
-						const oldStart = DateTime.createFromFormat(oldV, format)!,
-							duration = oldStart.diff(end);
-						this.endDate.value = start.add(duration).format(format);
+					if (endDate && newStartDate && newStartDate.date > endDate.date) {
+						const oldStart = DateTime.createFromFormat(oldStartDate, format)!,
+							duration = oldStart.diff(endDate);
+						this.endDate.value = newStartDate.add(duration).format(format);
 					}
 				}}
 			}),
 			this.endDate = datefield({label:t('End'), name: 'end', flex:1, defaultTime: (now.getHours()+1 )+':00',
-				listeners: {'setvalue': (me,_v,oldV) => {
-					const eV = me.getValueAsDateTime(),
-						sV =this.startDate.getValueAsDateTime(),
-						format=me.withTime ? "Y-m-dTH:i" : 'Y-m-d';
+				listeners: {'change': (me,_v,oldEndDate) => {
+					const newEndDate = me.getValueAsDateTime(),
+						startDate = this.startDate.getValueAsDateTime(),
+						format= me.withTime ? "Y-m-dTH:i" : 'Y-m-d';
 
-					if (eV && sV && eV.date < sV.date) {
-						const oldEnd = DateTime.createFromFormat(oldV, format)!,
-							duration = oldEnd.diff(sV);
-						this.startDate.value = eV.add(duration).format(format);
+					if (newEndDate && startDate && newEndDate.date < startDate.date) {
+
+						const oldEnd = DateTime.createFromFormat(oldEndDate, format)!,
+							duration = oldEnd.diff(startDate);
+						this.startDate.value = newEndDate.add(duration).format(format);
 					}
 					if(this.item)
-						this.item.end = eV!; // for isInPast
+						this.item.end = newEndDate!; // for isInPast
 				}}
 			}),
 			comp({cls:'hbox'},
