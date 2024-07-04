@@ -58,6 +58,14 @@ export class Main extends Component {
 
 	private visibleChanges: {[id:number]:boolean} = {};
 
+	/**
+	 * Used to check if we're ready to populate the view. When initial render is done and a route is given the
+	 * view will be loaded twice if we don't have this check.
+	 *
+	 * @private
+	 */
+	private initialized: boolean = false;
+
 	constructor() {
 		super();
 		this.cls = 'hbox fit tablet-cards';
@@ -357,6 +365,8 @@ export class Main extends Component {
 						this.view.update();
 					});
 					this.applyInCalendarFilter();
+
+					this.initialized = true;
 					this.updateView();
 
 				});
@@ -584,7 +594,9 @@ export class Main extends Component {
 		this.timeSpan = value;
 		this.printCurrentBtn.disabled = !['day', 'week', 'month'].includes(value);
 		this.spanAmount = amount;
-		this.updateView();
+
+		if(this.initialized)
+			this.updateView();
 	}
 
 	updateView(buffered?:boolean) {
