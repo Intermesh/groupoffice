@@ -165,4 +165,9 @@ $updates['202403121146'][] = function(){ // migrate files to blob and add as cal
 		$insertFolder($row, $row['files_folder_id'], $path);
 	}
 };
+
+
+$updates['202404071212'][] = "update core_entity set clientName = 'CalendarCategory' where name = 'Category' and moduleId = (select id from core_module where name ='calendar' and package='community')";
+
+
 // TODO: calendar views -> custom filters
