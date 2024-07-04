@@ -24,17 +24,6 @@ GO.moduleManager.onModuleReady('calendar',function(){
 			this.on('show',function(){
 				this.freebusyPermissionsPanel.loadAcl();
 			});
-
-		//			this.items.push({
-		//				xtype:'button',
-		//				handler:function(){
-		//					//this.freebusyPermissionsPanel.setUserId(	);
-		//					this.freeBusyWindow.show();
-		//					//this.freebusyPermissionsPanel.loadAcl();
-		//				},
-		//				scope:this,
-		//				text:t("Accessrights for free busy info", "freebusypermissions")
-		//			});			
 		}),
 		
 		onLoadComplete : GO.calendar.SettingsPanel.prototype.onLoadComplete.createSequence(function(action){
