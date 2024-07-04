@@ -1,5 +1,7 @@
 <?php
 
+use go\modules\community\calendar\model\Scheduler;
+
 class MailStore extends Store implements ISearchProvider {
 
 	
@@ -264,9 +266,12 @@ class MailStore extends Store implements ISearchProvider {
 					$message->contentclass = "urn:content-classes:message";
 				}
 
+				if($imapMessage->mailbox != $imapAccount->sent) {
+					$this->processCalendarInvite($message, $imapMessage);
+				}
+
 				$imapMessage->autoLink();
-				//don't flag as read right IS ALREADY DEFAULT
-//			$imapMessage->peek = true;
+
 				unset($imapMessage);
 			}
 
@@ -344,6 +349,10 @@ class MailStore extends Store implements ISearchProvider {
 		$attachments = $imapMessage->getAttachments();
 		
 		foreach ($attachments as $attachment) {
+
+			if($attachment->isVcalendar()) {
+				continue; // handled by meeting response
+			}
 			
 			if($attachment->size>$this->_getMaxAttachmentSize()){
 				array_push($this->_tooBigAttachments, array('name'=>$attachment->name,'size'=>$attachment->size));
@@ -1167,5 +1176,182 @@ class MailStore extends Store implements ISearchProvider {
         // Don't close the mailbox, we will need it open in the Backend methods
         return true;
     }
+
+	private function processCalendarInvite(SyncMail $message, \GO\Email\Model\ImapMessage $imapMessage)
+	{
+		$vcalendar = $imapMessage->getInvitationVcalendar();
+		if(!$vcalendar) {
+			return;
+		}
+
+		$imip = Scheduler::handleIMIP($imapMessage);
+
+		if(!isset($imip['event'])) {
+			ZLog::Write(LOGLEVEL_DEBUG, "MailStore::processCalendarInvite(): " . ($imip['feedback'] ?? ""));
+
+			return;
+		}
+		$message->meetingrequest = new SyncMeetingRequest();
+		$method = strtolower($vcalendar->method->getValue());
+		$vevent = $vcalendar->vevent[0];
+
+		switch ($method) {
+			case "cancel":
+				$message->messageclass = "IPM.Schedule.Meeting.Canceled";
+				$message->meetingrequest->meetingmessagetype = 2;
+				ZLog::Write(LOGLEVEL_DEBUG, "MailStore::processCalendarInvite(): Event canceled, removing calendar object");
+
+				break;
+			case "declinecounter":
+				ZLog::Write(LOGLEVEL_DEBUG, "MailStore::processCalendarInvite(): Declining a counter is not implemented.");
+			case "counter":
+				ZLog::Write(LOGLEVEL_DEBUG, "MailStore::processCalendarInvite(): Counter received");
+				$message->messageclass = "IPM.Schedule.Meeting.Resp.Tent";
+				break;
+			case "reply":
+
+				$message->meetingrequest->meetingmessagetype = 2;
+
+				ZLog::Write(LOGLEVEL_DEBUG, "MailStore::processCalendarInvite(): Reply received");
+
+				// Only set messageclass for replies changing my calendar object
+				switch ($imip['status']) {
+					case "accepted":
+						$message->messageclass = "IPM.Schedule.Meeting.Resp.Pos";
+						ZLog::Write(LOGLEVEL_DEBUG, "MailStore::processCalendarInvite(): Update attendee -> accepted");
+						break;
+					case "needs-action":
+						$message->messageclass = "IPM.Schedule.Meeting.Resp.Tent";
+						ZLog::Write(LOGLEVEL_DEBUG, "MailStore::processCalendarInvite(): Update attendee -> needs-action");
+						break;
+					case "tentative":
+						$message->messageclass = "IPM.Schedule.Meeting.Resp.Tent";
+						ZLog::Write(LOGLEVEL_DEBUG, "MailStore::processCalendarInvite(): Update attendee -> tentative");
+						break;
+					case "declined":
+						$message->messageclass = "IPM.Schedule.Meeting.Resp.Neg";
+						ZLog::Write(LOGLEVEL_DEBUG, "MailStore::processCalendarInvite(): Update attendee -> declined");
+						break;
+					default:
+						ZLog::Write(LOGLEVEL_WARN, sprintf("MailStore::processCalendarInvite() - Unknown reply status <%s>, please report it to the developers", $status));
+						$message->messageclass = "IPM.Appointment";
+						break;
+				}
+
+				$message->meetingrequest->disallownewtimeproposal = "1";
+				break;
+			case "request":
+				$message->meetingrequest->meetingmessagetype = 1;
+				$message->messageclass = "IPM.Schedule.Meeting.Request";
+				ZLog::Write(LOGLEVEL_DEBUG, "MailStore::processCalendarInvite(): New request");
+				// New meeting, we don't create it now, because we need to confirm it first, but if we don't create it we won't see it in the calendar
+				break;
+			case "add":
+				ZLog::Write(LOGLEVEL_DEBUG, "MailStore::processCalendarInvite(): Add method is not implemented.");
+				$message->messageclass = "IPM.Appointment";
+				break;
+			case "publish":
+				ZLog::Write(LOGLEVEL_DEBUG, "MailStore::processCalendarInvite(): Publish method is not a meeting request.");
+				$message->messageclass = "IPM.Appointment";
+				break;
+			default:
+				ZLog::Write(LOGLEVEL_WARN, sprintf("MailStore::processCalendarInvite() - Unknown method <%s>, please report it to the developers", $method));
+				$message->messageclass = "IPM.Appointment";
+				break;
+		}
+
+		$message->meetingrequest->dtstamp = ($imip['event']->modifiedAt ?? new DateTime())->format("U");
+		$message->meetingrequest->globalobjid = base64_encode($imip['event']->uid);
+		$message->meetingrequest->starttime = $imip['event']->start()->format("U");
+		$message->meetingrequest->alldayevent = $imip['event']->showWithoutTime;
+		$message->meetingrequest->endtime = $imip['event']->end()->format("U");
+
+		$message->meetingrequest->organizer = $imip['event']->organizer()->email;
+		$message->meetingrequest->location = $imip['event']->location;
+		$message->meetingrequest->sensitivity = ['public'=> '0', 'private' => '2', 'secret'=> '3'][$imip['event']->privacy];
+		$message->meetingrequest->timezone = CalendarConvertor::mstzFromTZID($imip['event']->timeZone);
+
+		$message->contentclass = "urn:content-classes:calendarmessage";
+
+		// guess instancetype by checking for recurrence rules or ids
+		if (isset($vevent->RRULE)) {
+			$message->meetingrequest->instancetype = 1;
+		}
+		elseif (isset($vevent->{"RECURRENCE-ID"})) {
+			$message->meetingrequest->instancetype = 2;
+		}
+		else {
+			$message->meetingrequest->instancetype = 0;
+		}
+
+		$message->meetingrequest->responserequested = 1;
+
+		//busy
+		$message->meetingrequest->busystatus = "2";
+
+		$message->meetingrequest->disallownewtimeproposal = "1";
+
+// get intended busystatus
+//$props = $ical->GetPropertiesByPath('VEVENT/X-MICROSOFT-CDO-INTENDEDSTATUS');
+//if (count($props) == 1) {
+//	switch ($props[0]->Value()) {
+//		case "FREE":
+//			$output->meetingrequest->busystatus = "0";
+//			break;
+//		case "TENTATIVE":
+//			$output->meetingrequest->busystatus = "1";
+//			break;
+//		case "BUSY":
+//			$output->meetingrequest->busystatus = "2";
+//			break;
+//		case "OOF":
+//			$output->meetingrequest->busystatus = "3";
+//			break;
+//	}
+//}
+//elseif (count($props = $ical->GetPropertiesByPath('VEVENT/TRANSP')) == 1) {
+//	switch ($props[0]->Value()) {
+//		case "TRANSPARENT":
+//			$output->meetingrequest->busystatus = "0";
+//			break;
+//		case "OPAQUE":
+//			$output->meetingrequest->busystatus = "2";
+//			break;
+//	}
+//}
+//else {
+//	$output->meetingrequest->busystatus = 2;
+//}
+
+//// is counter allowed
+//$props = $ical->GetPropertiesByPath('VEVENT/X-MICROSOFT-DISALLOW-COUNTER');
+//if (count($props) > 0) {
+//	switch ($props[0]->Value()) {
+//		case "TRUE":
+//			$output->meetingrequest->disallownewtimeproposal = "1";
+//			break;
+//		case "FALSE":
+//			$output->meetingrequest->disallownewtimeproposal = "0";
+//			break;
+//	}
+//}
+//
+//// use reminder with smallest interval
+//$props = $ical->GetPropertiesByPath('VEVENT/VALARM/TRIGGER');
+//if (count($props) > 0) {
+//	foreach ($props as $vAlarmTrigger) {
+//		$vAlarmTriggerValue = $vAlarmTrigger->Value();
+//		if ($vAlarmTriggerValue[0] == "-") {
+//			$reminderSeconds = new DateInterval(substr($vAlarmTriggerValue, 1));
+//			$reminderSeconds = $reminderSeconds->format("%s") + $reminderSeconds->format("%i") * 60 + $reminderSeconds->format("%h") * 3600 + $reminderSeconds->format("%d") * 86400;
+//			if (!isset($output->meetingrequest->reminderSeconds) || $output->meetingrequest->reminder > $reminderSeconds) {
+//				$output->meetingrequest->reminder = $reminderSeconds;
+//			}
+//		}
+//	}
+//}
+
+	}
+
 }
 

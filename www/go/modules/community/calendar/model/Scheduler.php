@@ -2,9 +2,11 @@
 
 namespace go\modules\community\calendar\model;
 
+use Exception;
 use go\core\mail\Address;
 use go\core\mail\Attachment;
 use go\core\util\DateTime;
+use GO\Email\Model\ImapMessage;
 use Sabre\VObject\Component\VCalendar;
 
 class Scheduler {
@@ -166,7 +168,14 @@ class Scheduler {
 	}
 
 
-	static function handleIMIP($imapMessage, $ifMethod=null) {
+	/**
+	 * @param ImapMessage $imapMessage
+	 * @param $ifMethod
+	 * @return array{method:string, feedback:string, event:CalendarEvent, scheduleId: int, status:string}|false
+	 * @throws \go\core\http\Exception
+	 *
+	 */
+	static function handleIMIP(ImapMessage $imapMessage, $ifMethod=null) {
 		$vcalendar = $imapMessage->getInvitationVcalendar();
 		if(!$vcalendar) {
 			return false;
@@ -193,6 +202,12 @@ class Scheduler {
 				if (in_array($attendeeEmail, $aliases)) {
 					$accountEmail = $attendeeEmail;
 				}
+			} else {
+				// Microsoft ActiveSync does not (always?) send organizer
+				$existingEvent = CalendarEvent::findByUID((string) $vevent->uid)->single();
+				if ($existingEvent && in_array($existingEvent->organizer()->email, $aliases)) {
+					$accountEmail = $existingEvent->organizer()->email;
+				}
 			}
 		} else {
 			if (isset($vevent->attendee)) {
@@ -206,8 +221,7 @@ class Scheduler {
 		}
 
 		if (!$accountEmail) {
-			$response['itip']['feedback'] = go()->t("None of the participants match your e-mail aliases for this e-mail account.", "email");
-			return $response;
+			return ['method' => $method, 'feedback' => go()->t("None of the participants match your e-mail aliases for this e-mail account.", "email")];
 		}
 		$from = $imapMessage->from->getAddress();
 		$event = Scheduler::processMessage($vcalendar, $accountEmail, (object)[
@@ -221,11 +235,11 @@ class Scheduler {
 			'scheduleId' => $accountEmail,
 			'event' => $event
 		];
-		if($method ==='REPLY' && !is_string($event)) {
+		if($method ==='REPLY' && isset($event)) {
 			$p = $event->participantByScheduleId($from['email']);
 			if($p) {
 				$lang = go()->t('replyImipBody', 'community', 'calendar');
-
+				$itip['status'] = $p->participationStatus;
 				$itip['feedback'] = strtr($lang[$p->participationStatus], [
 					'{name}' => $p->name ?? '',
 					'{title}' => $event->title,
@@ -236,20 +250,23 @@ class Scheduler {
 		return $itip;
 	}
 
-	static function processMessage($vcalendar, $receiver, $sender) {
+	static function processMessage(VCalendar $vcalendar, string $receiver, object $sender) : ?CalendarEvent{
 
 		$vevent = $vcalendar->VEVENT[0];
 
-		$existingEvent = CalendarEvent::findByUID($receiver, (string)$vevent->uid)->single();
+		$existingEvent = CalendarEvent::findByUID((string)$vevent->uid, $receiver)->single();
 		// If the existing event has isOrigin=true all below does is add new REQUESTS to the calendar.
 		// We might do that up front and skip all the below processing instead.
 
+
+
 		switch($vcalendar->method->getValue()){
 			case 'REQUEST': return self::processRequest($vcalendar,$receiver,$existingEvent);
-			case 'CANCEL': return self::processCancel($vcalendar,$existingEvent);
-			case 'REPLY': return self::processReply($vcalendar,$existingEvent, $sender);
+			case 'CANCEL': return $existingEvent ? self::processCancel($vcalendar,$existingEvent) : null;
+			case 'REPLY': return $existingEvent ? self::processReply($vcalendar,$existingEvent, $sender) : null;
 		}
-		return "invalid method ".$vcalendar->method;
+		go()->debug("invalid method ".$vcalendar->method);
+		return null;
 	}
 
 	private static function processRequest(VCalendar $vcalendar, $receiver, ?CalendarEvent $existingEvent) {
@@ -268,37 +285,41 @@ class Scheduler {
 		return Calendar::addEvent($event, $calId);
 	}
 
-	private static function processCancel(VCalendar $vcalendar, ?CalendarEvent $existingEvent) {
-		if($existingEvent) {
-			if ($existingEvent->isRecurring()) {
-				foreach($vcalendar->VEVENT as $vevent) {
-					if(!empty($vevent->{'RECURRENCE-ID'})) {
-						$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
-						if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
-							$existingEvent->recurrenceOverrides[$recurId] = (new RecurrenceOverride($existingEvent));
-						}
-						$existingEvent->recurrenceOverrides[$recurId]->setValues(['status' => CalendarEvent::Cancelled]);
-					} else {
-						$existingEvent->status = CalendarEvent::Cancelled;
-					}
-				}
-			} else {
-				$existingEvent->status = CalendarEvent::Cancelled;
-			}
-			$existingEvent->sequence = $vcalendar->SEQUENCE;
-			$success = $existingEvent->save();
+	private static function processCancel(VCalendar $vcalendar, CalendarEvent $existingEvent) : CalendarEvent {
 
+		if ($existingEvent->isRecurring()) {
+			foreach($vcalendar->VEVENT as $vevent) {
+				if(!empty($vevent->{'RECURRENCE-ID'})) {
+					$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
+					if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
+						$existingEvent->recurrenceOverrides[$recurId] = (new RecurrenceOverride($existingEvent));
+					}
+					$existingEvent->recurrenceOverrides[$recurId]->setValues(['status' => CalendarEvent::Cancelled]);
+				} else {
+					$existingEvent->status = CalendarEvent::Cancelled;
+				}
+			}
+		} else {
+			$existingEvent->status = CalendarEvent::Cancelled;
 		}
+		if(isset($vcalendar->SEQUENCE)) {
+			$existingEvent->sequence = $vcalendar->SEQUENCE;
+		}
+		$success = $existingEvent->save();
+
+
 		return $existingEvent;
 	}
 
 	/**
 	 * The message is a reply. This is for example an attendee telling an organizer he accepted the invite, or declined it.
 	 */
-	private static function processReply(VCalendar $vcalendar, ?CalendarEvent $existingEvent, $sender) {
-		if(!$existingEvent) return "You may not update this event";
+	private static function processReply(VCalendar $vcalendar, CalendarEvent $existingEvent, $sender) : CalendarEvent {
 
 		foreach($vcalendar->VEVENT as $vevent) {
+			if(!isset($vevent->ATTENDEE['PARTSTAT'])) {
+				continue;
+			}
 			$status = strtolower($vevent->ATTENDEE['PARTSTAT']->getValue());
 //			if (isset($vevent->{'REQUEST-STATUS'})) {
 //				$responseStatus = strtok((string)$vevent->{'REQUEST-STATUS'}, ";");
