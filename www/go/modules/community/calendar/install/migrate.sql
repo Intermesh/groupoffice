@@ -447,7 +447,7 @@ INSERT INTO calendar_event
 	 privacy,status,recurrenceRule,lastOccurrence,createdAt,modifiedAt, createdBy, modifiedBy, isOrigin, replyTo, requestStatus) SELECT
 	id, 'Group-Office', uuid, 1, name, description, location, all_day_event, FROM_UNIXTIME(start_time), timezone, CONCAT('PT',end_time - IF(all_day_event, start_time - 60, start_time),'S'), 0,
 	IF(private=1, 'private', 'public'), LOWER(status), IF(rrule='',null,rrule), FROM_UNIXTIME(end_time), FROM_UNIXTIME(ctime), FROM_UNIXTIME(mtime), user_id, muser_id, 1, '',''
-FROM cal_events WHERE exception_for_event_id = 0 AND is_organizer = 1 GROUP BY uuid;
+FROM cal_events WHERE exception_for_event_id = 0 AND is_organizer = 1 GROUP BY uuid, start_time;
 
 -- insert the events that have no organizer
 INSERT INTO calendar_event
@@ -455,10 +455,14 @@ INSERT INTO calendar_event
  privacy,status,recurrenceRule,lastOccurrence,createdAt,modifiedAt, createdBy, modifiedBy, isOrigin, replyTo, requestStatus) SELECT
  id, 'Group-Office', uuid, 1, name, description, location, all_day_event, FROM_UNIXTIME(start_time), timezone, CONCAT('PT',end_time - IF(all_day_event, start_time - 60, start_time),'S'), 0,
  IF(private=1, 'private', 'public'), LOWER(status), IF(rrule='',null,rrule), FROM_UNIXTIME(end_time), FROM_UNIXTIME(ctime), FROM_UNIXTIME(mtime), user_id, muser_id, 0, '',''
-FROM cal_events WHERE exception_for_event_id = 0 GROUP BY uuid HAVING SUM(is_organizer) = 0;
+FROM cal_events WHERE exception_for_event_id = 0 GROUP BY uuid, start_time HAVING SUM(is_organizer) = 0;
 
 INSERT INTO calendar_calendar_event
-(id, eventId, calendarId) SELECT null, id, calendar_id FROM cal_events WHERE exception_for_event_id = 0;
+(id, eventId, calendarId)
+SELECT null, ce.eventId, e.calendar_id
+FROM cal_events e
+inner join calendar_event ce on ce.uid = e.uuid
+WHERE e.exception_for_event_id = 0;
 
 INSERT INTO calendar_event_alert
 	(id, `offset`, relativeTo, eventId, userId) SELECT
