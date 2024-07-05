@@ -79,7 +79,7 @@ class Recurrence extends RRuleIterator {
 			$data['bySetPosition'] = $this->bySetPos;
 		}
 		if(!empty($this->until)) {
-			$data['until'] = $this->until->format($allDay ? "Ymd" : "Ymd\THis\Z");
+			$data['until'] = $this->until->format($allDay ? "Y-m-d" : "Y-m-d\TH:i:s\Z");
 		}
 		if ($this->byDay) {
 			$data['byDay'] = [];
