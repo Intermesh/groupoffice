@@ -100,7 +100,7 @@ export class Main extends Component {
 		});
 
 		this.items.add(
-			this.west = comp({tagName: 'aside', width: 304, cls:'scroll',style: {paddingTop:'1.2rem'}},
+			this.west = comp({tagName: 'aside', width: 274, cls:'scroll',style: {paddingTop:'1.2rem', minWidth: '27.4rem'}},
 				tbar({cls: "for-medium-device"},
 					'->',
 					btn({

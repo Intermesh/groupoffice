@@ -350,10 +350,10 @@
 						padding-right: 0;
 						&::before {
 							content: '•';
-							font-size: 2em;
-							height: .8em;
+							font-size: 1em;
+							line-height: 1;
 							text-align: center;
-							width: dp(16);
+							min-width: dp(24);
 						}
 					}
 					&.continues {
@@ -764,5 +764,12 @@ $timeMargin: dp(72);
 		backdrop-filter: blur(20px);
 		-webkit-backdrop-filter: blur(20px);
 		width: dp(280) !important;
+	}
+}
+
+
+#go-module-panel-calendar {
+	.datepicker {
+		margin: 0 auto;
 	}
 }
