@@ -1635,15 +1635,20 @@ $updates['202403181539'][] = "CREATE TABLE `core_principal`(
 ) ENGINE = InnoDB;";
 
 $updates['202403181539'][] = function() {
-	echo "Building principals\n";
 
-	$classFinder = new ClassFinder();
-	$entities = $classFinder->findByTrait(PrincipalTrait::class);
+	go()->getDbConnection()->exec('replace into core_principal (id, name, email, type, description, timeZone, entityTypeId, avatarId, entityId, aclId)
+SELECT u.id, u.displayName, u.email, "individual", u.username, u.timezone, (select id from core_entity where name="User"), u.avatarId, u.id, g.aclId from core_user u
+inner join core_group g on g.isUserGroupFor = u.id;');
 
-	foreach ($entities as $cls) {
-		$cls::rebuildPrincipalForEntity();
-		echo "\nDone\n\n";
+
+	if(\go\core\model\Module::isInstalled("community", "addressbook")) {
+		go()->getDbConnection()->exec('replace into core_principal (id, name, email, type, description, timeZone, entityTypeId, avatarId, entityId, aclId)
+SELECT concat("contact:", u.id), u.name, e.email, "individual", if(u.isOrganization, "Organization", "Contact"), null, (select id from core_entity where name="Contact"), u.photoBlobId, u.id, a.aclId from addressbook_contact u
+inner join addressbook_addressbook a on a.id = u.addressBookId
+inner join addressbook_email_address e on e.contactId = u.id
+group by u.id;');
 	}
+
 };
 
 
