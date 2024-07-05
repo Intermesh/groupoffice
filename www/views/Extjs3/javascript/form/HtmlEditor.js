@@ -302,7 +302,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 					return;
 				}
 
-				if (item.type.match(/^image\//)) {
+				if (item.kind == "file" && item.type.match(/^image\//)) {
 					
 					e.preventDefault();
 					var reader = new FileReader();
