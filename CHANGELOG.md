@@ -1,4 +1,5 @@
 - Workflow: fix error when sending a file without a body.
+- Support: auto-expire tickets
 
 01-07-2024: 6.8.57
 - Custom fields: Make sure fieldset is not collapsed. This may happen if it was a fieldset before and collapsed by the user.
@@ -9,7 +10,6 @@
 - E-mail: Fixed option "Sort on last contact time"
 - Tasks / support: group task list combo by task list grouping.
 - Bookmarks: allow users with manage permissions to save bookmark categories
-- Support: auto-expire tickets
 
 24-06-2024: 6.8.56
 - E-mail: Fixed autocomplete bug where typed text would stick too
