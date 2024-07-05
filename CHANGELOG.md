@@ -1,3 +1,6 @@
+- Workflow: fix error when sending a file without a body.
+- Support: auto-expire tickets
+
 01-07-2024: 6.8.57
 - Custom fields: Make sure fieldset is not collapsed. This may happen if it was a fieldset before and collapsed by the user.
 - Core: fix issue where open source version requires SourceGuardian
