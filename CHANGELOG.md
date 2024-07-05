@@ -1,4 +1,5 @@
 - Core: Import responded with invalid JSON due to echo statement.
+- Core: fixed copy pasting images from a Microsoft Word Document in Windows
 
 17-06-2024: 6.7.84
 - Core: Fixed PHP 7.3 compatibility. GroupOffice 6.7.83 Installation Issue #1152
