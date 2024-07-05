@@ -316,7 +316,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 
 	initToolbar: function () {
 
-		var items = this.tbar || [];
+		let items = this.tbar || [];
 
 		items = items.concat([
 			'->',
