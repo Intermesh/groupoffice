@@ -159,7 +159,7 @@ export class CalendarItem {
 	}
 
 	get color() {
-		return this.patched.color || this.cal?.color || '356772';
+		return this.cal?.color || '356772';
 	}
 
 	get participants() {
