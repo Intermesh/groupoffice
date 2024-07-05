@@ -78,7 +78,6 @@ export class EventWindow extends FormWindow {
 
 		this.form.on('beforesave', (frm,data) => {
 			this.parseSavedData(data);
-			console.log(data);
 		});
 		this.form.on('load', (_, data) => {
 			const start = new DateTime(data.start);

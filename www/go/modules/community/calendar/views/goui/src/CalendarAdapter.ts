@@ -29,13 +29,7 @@ export class CalendarAdapter {
 			if(p.watch) {
 				promise.then(_evs => {
 					p.store.on('load', (me: & {skipNextEvent:boolean}) => {
-						//debugger;
-						//if(!me.skipNextEvent)
-						// Merijn: this.onLoad is called multiple times as when all promises are resolved it's called again
-						// below with: Promise.all(promises).then(this.onLoad);
-						
-						// 	this.onLoad();
-						//me.skipNextEvent = false;
+						this.onLoad();
 					});
 					p.watch = false;
 				})

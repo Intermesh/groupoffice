@@ -138,7 +138,6 @@ export class WeekView extends CalendarView {
 			pxPerSnap = li.offsetHeight / (1440 / SNAP); // 96 quarter-hours in a day
 			offset = li.getBoundingClientRect().top;
 			currDayEl = target.up('[data-day]')!;
-			console.log(pxPerSnap, li.offsetHeight, SNAP);
 			const event = target.up('div[data-key]');
 			if (event) { // MOVE
 				offset += e.offsetY;
