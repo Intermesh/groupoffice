@@ -5,7 +5,7 @@ import {
 	Component, Config, containerfield, createComponent, datasourcestore, FieldEventMap,
 	hr,
 	MapField,
-	mapfield, menu, ObservableListenerOpts,
+	mapfield, Menu, menu, ObservableListenerOpts,
 	table
 } from "@intermesh/goui";
 import {statusIcons, t} from "./Index.js";
@@ -81,7 +81,8 @@ export class ParticipantField extends Component {
 				//valueProperty: "id",
 				listeners: {
 					'autocomplete': async (field, input) => {
-						field.list.store.queryParams = {filter: {text: input}};
+						field.list.store.queryParams = {filter: {text: input}, limit: 20 };
+						field.list.store.sort = [{property: "name"}];
 						await field.list.store.load();
 						if(field.list.store.count() == 0) {
 							field.list.hide();
@@ -133,7 +134,16 @@ export class ParticipantField extends Component {
 
 							}
 						})
-					]
+					],
+					listeners: {
+						render: table => {
+
+							// register the parent element to load store on scroll down
+							table.store.addScrollLoader(table.findAncestorByType(Menu)!.el);
+
+
+						}
+					}
 				})
 				//	listeners: {'blur' : (_,v) => {/*check if valid email, if so add to _.previous.add(participant);*/}}
 			})
