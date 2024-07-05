@@ -184,9 +184,9 @@ export class CalendarItem {
 	get icons() {
 		const e = this.data;
 		const icons = [...this.extraIcons];
-		if(e.recurrenceRule) icons.push('refresh');
+		//if(e.recurrenceRule) icons.push('refresh');
 		if(e.links) icons.push('attachment');
-		if(e.alerts) icons.push('notifications');
+		//if(e.alerts) icons.push('notifications');
 		if(this.isTentative) icons.push('question_mark');
 		if(!!e.participants) icons.push('group');
 
