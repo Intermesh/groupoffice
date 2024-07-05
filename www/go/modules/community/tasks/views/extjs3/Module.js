@@ -150,6 +150,10 @@ go.Modules.register("community", "tasks", {
 							try {
 								assigner = await go.Db.store("Principal").single(alert.data.assignedBy);
 							} catch (e) {
+
+							}
+
+							if(!assigner) {
 								assigner = {name: t("Unknown user")};
 							}
 
