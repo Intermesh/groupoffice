@@ -101,7 +101,7 @@ class CalendarStore extends Store {
 		$event = CalendarConvertor::toCalendarEvent($message, $event);
 
 		if(!$event->save()){
-			ZLog::Write(LOGLEVEL_WARN, var_export($event->getValidationErrors(), true));
+			ZLog::Write(LOGLEVEL_WARN, "Failed to save event: " . var_export($event->getValidationErrors(), true));
 			return false;
 		} else {
 			return $this->StatMessage($folderid, $event->id);
