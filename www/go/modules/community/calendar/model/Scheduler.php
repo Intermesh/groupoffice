@@ -180,7 +180,7 @@ class Scheduler {
 		if(!$vcalendar) {
 			return false;
 		}
-		$method = $vcalendar->method->getValue();
+		$method = $vcalendar->method ? $vcalendar->method->getValue() : "REQUEST";
 		if($ifMethod !== null && $ifMethod != $method) {
 			return false;
 		}

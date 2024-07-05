@@ -70,8 +70,7 @@ class CalendarStore extends Store {
 			->select(['cce.id', 'modifiedAt'])
 			->where(['cce.id'=>$id,'cce.calendarId'=>$folderid])
 			->single();
-		if($event)
-			ZLog::Write(LOGLEVEL_DEBUG, "StatMessage ".$event->id . ' - '.$event->modifiedAt->format('Y-m-d H:i:s'));
+
 		return $event ? [
 			'id' => $event->id,
 			'flags' => 1,

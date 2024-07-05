@@ -1186,14 +1186,8 @@ class MailStore extends Store implements ISearchProvider {
 
 		Scheduler::handleIMIP($imapMessage);
 
-
-//		if(!isset($imip['event'])) {
-//			ZLog::Write(LOGLEVEL_DEBUG, "MailStore::processCalendarInvite(): " . ($imip['feedback'] ?? ""));
-//
-//			return;
-//		}
 		$message->meetingrequest = new SyncMeetingRequest();
-		$method = strtolower($vcalendar->method->getValue());
+		$method = $vcalendar->method ? strtolower($vcalendar->method->getValue()) : "request";
 		$vevent = $vcalendar->vevent[0];
 
 		switch ($method) {
