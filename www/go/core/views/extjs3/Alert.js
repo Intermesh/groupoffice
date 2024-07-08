@@ -79,8 +79,15 @@
 
 			if(triggerDate > now) return;
 
-			go.Db.store(alert.entity).single(alert.entityId).then((entity) => {
+			const store = go.Db.store(alert.entity);
 
+			if(!store) {
+				console.error("Alert for unknown entity " + alert.entity);
+				return;
+			}
+
+			store.single(alert.entityId).then((entity) => {
+				if(!entity) return;
 				const iconCls = go.Entities.getLinkIcon(alert.entity);
 
 				const c = {

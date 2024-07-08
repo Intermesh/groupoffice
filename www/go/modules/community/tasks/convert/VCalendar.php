@@ -48,7 +48,7 @@ class VCalendar extends AbstractConverter {
 			if($file->exists()) {
 				$calendar = Reader::read($file->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 				if($blob->modifiedAt >= $task->modifiedAt) {
-					return $calendar->serialize();
+					return $calendar;
 				}
 			}
 		}
@@ -97,7 +97,7 @@ class VCalendar extends AbstractConverter {
 				->from("tasks_category")
 				->where(['id' => $task->categories])
 				->fetchMode(\PDO::FETCH_COLUMN, 0)
-				->execute();
+				->all();
 		}
 
 		$vtodo->status = strtoupper($task->getProgress());
@@ -134,10 +134,7 @@ class VCalendar extends AbstractConverter {
 			}
 		}
 
-		//todo export needs one vcalendar but breaks caldav
-		return $calendar->serialize();
-//		$calendar->add($vtodo);
-//		return $calendar->serialize();
+		return $calendar;
 	}
 
 	private $tempFile;
@@ -170,7 +167,8 @@ class VCalendar extends AbstractConverter {
 
 	protected function exportEntity(Entity $entity): void
 	{
-		$data = $this->export($entity);
+		$vcalendar = $this->export($entity);
+		$data = $vcalendar->vtodo->serialize();
 		fputs($this->fp, $data);
 	}
 

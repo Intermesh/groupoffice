@@ -595,18 +595,8 @@ class Task extends AclItemEntity {
 	/**
 	 * @throws Exception
 	 */
-	protected function createNewTask(DateTimeInterface $next) {
-
-		$values = $this->toArray();
-//		unset($values['id']);
-//		unset($values['progress']);
-//		unset($values['responsibleUserId']);
-//		unset($values['percentComplete']);
-//		unset($values['progressUpdated']);
-//		unset($values['freeBusyStatus']);
-//		$nextTask = new Task();
-//		$nextTask->setValues($values);
-
+	protected function createNewTask(DateTimeInterface $next)
+	{
 		$nextTask = $this->copy();
 		$nextTask->progress = Progress::NeedsAction;
 		$nextTask->responsibleUserId = null;

@@ -47,7 +47,7 @@ class Folder extends Base {
 	 * 
 	 * @param boolean $getHidden
 	 * @param boolean|string $sort 'mtime','ctime' or 'name'
-	 * @return File or Folder
+	 * @return false|File[]|Folder[]
 	 */
 	public function ls($getHidden=false, $sort=false) {
 		if (!$dir = opendir($this->path))

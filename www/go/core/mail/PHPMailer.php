@@ -2,6 +2,7 @@
 namespace go\core\mail;
 
 
+use go\core\util\StringUtil;
 use PHPMailer\PHPMailer\Exception;
 
 /**
@@ -209,8 +210,11 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 		if ($sign) {
 			$body = file_get_contents($signed);
 			unlink($signed);
+
+			$body = StringUtil::normalizeCrlf($body, static::$LE);
+
 			//The message returned by openssl contains both headers and body, so need to split them up
-			$parts = explode("\n\n", $body, 2);
+			$parts = explode(static::$LE . static::$LE, $body, 2);
 
 			$this->MIMEHeader = $parts[0];
 			$this->MIMEBody = $parts[1];
@@ -246,7 +250,6 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 		$encrypted = tempnam(sys_get_temp_dir(), 'srcencrypt');
 		file_put_contents($file, $this->MIMEHeader . static::$LE . static::$LE . $this->MIMEBody);
 
-
 		$encrypt = openssl_pkcs7_encrypt(
 			$file,
 			$encrypted,
@@ -259,8 +262,11 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 		if ($encrypt) {
 			$body = file_get_contents($encrypted);
 			unlink($encrypted);
+
+			$body = StringUtil::normalizeCrlf($body, static::$LE);
+
 			//The message returned by openssl contains both headers and body, so need to split them up
-			$parts = explode("\n\n", $body, 2);
+			$parts = explode(static::$LE.static::$LE, $body, 2);
 			//fix header name bug in php
 			$this->MIMEHeader = str_replace('application/x-pkcs7','application/pkcs7', $parts[0]);
 			$this->MIMEBody = $parts[1];

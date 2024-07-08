@@ -1,5 +1,49 @@
+- caldav/carddav/webdav: Don't log not found as error
+- Workflow: fix error when sending a file without a body.
+- Support: auto-expire tickets
+- Core: fixed copy pasting images from a Microsoft Word Document in Windows
+- Core: Updated DE translations. Danke, Daniel!
+
+01-07-2024: 6.8.57
+- Custom fields: Make sure fieldset is not collapsed. This may happen if it was a fieldset before and collapsed by the user.
+- Core: fix issue where open source version requires SourceGuardian
+- Finance: Create ZUGFeRD / Factur-X - Version 2.2.0 EN_16931 compliant PDF e-invoices
+- Finance: Create UBL invoices for Peppol
+- Addressbook: Fixed contact sorting on last name
+- E-mail: Fixed option "Sort on last contact time"
+- Tasks / support: group task list combo by task list grouping.
+- Bookmarks: allow users with manage permissions to save bookmark categories
+
+24-06-2024: 6.8.56
+- E-mail: Fixed autocomplete bug where typed text would stick too
+- Core: Import responded with invalid JSON due to echo statement.
+- Core: improve verbosity for incorrectly parsed date in email message
+- Supportclient: support larger number of support lists
+- Carddav: Import title
+- Carddav: Avoid some unnecessary saves
+- Address book: Ignore vcardBlobId in history log
+- Webdav: Fixed write access in shared folder
+
+17-06-2024: 6.8.55
 - Core: Fix part 2. Proxy headers (X-FORWARDED-FOR) are ignored for "Authorized clients" #1150
 - Calendar: Fixed bug in invite mails
+- Core: Added Polish holidays
+- Email: Show and sort on internal date by default. Fixed: Go Is using FROM header date, showing a message in the future
+       #1055
+- Smime: Fixed error when both signing and encrypting
+- Core: Fixed: Everyone group and all contacts translatable #636
+- Core: save of install language to system settings
+- Fixed: Auto-complete and semi-colons #951
+- Core: Set html editor background color so it's always white in dark mode
+- Core: Replace old favicon.ico with current one
+- Email/Core: fixed: SanitizeHTML CSS comment fixup #1021
+- Smime: Fixed error when both signing and encrypting
+- Email: Show and sort on internal date by default. Fixed: Go Is using FROM header date, showing a message in the future #1055
+- Fixed: Changing user passwords in system settings changes imap/smtp password in users with the same name before @ #1103
+- Calendar: Fixed bug in invite mails Merijn Schering
+- Tasks: Export .ics via Tasks -> Export -> vCalendar: BEGIN:VCALENDAR/END:VCALENDAR around every BEGIN:VTODO/END:VTODO #950
+- Notes: Added notebook name to export and import
+- Fixed: Changes on failure #1044
 
 11-06-2024: 6.8.54
 - Core: Sort modules in GUI

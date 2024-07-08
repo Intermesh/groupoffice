@@ -75,10 +75,11 @@ try {
 
 	  echo "Running install\n";
 		$admin = [
-				'displayName' => "System Administrator",
-				'username' => "admin",
-				'password' => "adminsecret",
-				'email' => "admin@intermesh.mailserver"
+			'displayName' => "System Administrator",
+			'username' => "admin",
+			'password' => "adminsecret",
+			'email' => "admin@intermesh.mailserver",
+			'language' => 'nl'
 		];
 
 		$installer = go()->getInstaller();

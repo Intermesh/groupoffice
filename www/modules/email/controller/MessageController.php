@@ -18,6 +18,7 @@ use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\fs\FileSystemObject;
 use go\core\mail\AddressList;
+use go\core\model\Module;
 use go\core\model\User;
 use GO\Email\Model\Alias;
 use GO\Email\Model\Account;
@@ -622,7 +623,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 
 		// Update "last mailed" time of the emailed contacts.
-		if ($success && GO::modules()->addressbook) {
+		if ($success && Module::findByName("community", "addressbook")->getUserRights()->mayRead) {
 			$toAddresses = $message->getTo();
 			if (empty($toAddresses)) {
 				$toAddresses = array();
@@ -637,7 +638,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 			$emailAddresses = array_merge($toAddresses,$ccAddresses);
 			$emailAddresses = array_merge($emailAddresses,$bccAddresses);
-			$emailAddresses = array_keys($emailAddresses);
+			$emailAddresses = array_map(function($a) {return $a->getEmail();},$emailAddresses);
 
 			$contacts = Contact::findByEmail($emailAddresses)->filter(['permissionLevel' => Acl::READ_PERMISSION])->selectSingleValue('c.id');
 			foreach($contacts as $contactId) {

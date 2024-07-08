@@ -240,7 +240,7 @@ class Comment extends AclItemEntity {
 
 	protected function internalValidate()
 	{
-		if($this->isModified(['text'])) {
+		if($this->isModified(['text']) && !empty($this->text)) {
 			$this->text = StringUtil::sanitizeHtml($this->text, false);
 
 			if ($this->validateXSS && StringUtil::detectXSS($this->text, false)) {
@@ -261,10 +261,6 @@ class Comment extends AclItemEntity {
 		if(!parent::internalSave()) {
 			return false;
 		}
-
-//		if($this->isNew()) {
-//			$this->createAlerts();
-//		}
 
 		if($this->isNew()) {
 			$entity = $this->findEntity();
@@ -291,40 +287,6 @@ class Comment extends AclItemEntity {
 
 		return true;
 	}
-//
-//	private function createAlerts() {
-//
-//		$entity = $this->findEntity();
-//		$aclId = $entity->findAclId();
-//		if(!$aclId) {
-//			return;
-//		}
-//
-//		$excerpt = StringUtil::cutString(strip_tags($this->text), 50);
-//
-//		$userIds = go()->getDbConnection()->selectSingleValue('userId')
-//			->from('core_user_group', 'ug')
-//			->join('core_acl_group', 'ag', 'ag.groupId = ug.groupId')
-//			->where('ag.aclId', '=', $aclId);
-//
-//		foreach($userIds as $userId) {
-//
-//			if($userId == go()->getAuthState()->getUserId()) {
-//				continue;
-//			}
-//
-//			$alert = $entity->createAlert(new DateTime(), 'comment', $userId)
-//				->setData([
-//					'type' => 'comment',
-//					'createdBy' => go()->getAuthState()->getUserId(),
-//					'excerpt' => $excerpt
-//				]);
-//
-//			if(!$alert->save()) {
-//				throw new SaveException($alert);
-//			}
-//		}
-//	}
 
 	public function title(): string
 	{

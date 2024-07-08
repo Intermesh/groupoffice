@@ -25,4 +25,5 @@ return array (
   'Remember last selected note book' => 'Das zuletzt ausgewählte Notizbuch merken',
   'Content' => 'Inhalt',
   'Web page' => 'Webseite',
+  'Start in' => 'Beginnt in',
 );

@@ -13,6 +13,10 @@
  */
 
 //session writing doesn't make any sense because
+use go\core\ErrorHandler;
+use Sabre\DAV\Exception\NotAuthenticated;
+use Sabre\DAV\Exception\NotFound;
+
 define("GO_NO_SESSION", true);
 
 
@@ -42,7 +46,9 @@ $server->debugExceptions=\GO::config()->debug;
 go()->getDebugger()->setRequestId("WebDAV " . ($_SERVER['REQUEST_METHOD'] ?? ""));
 
 $server->on('exception', function($e){
-	go()->warn($e);
+	if(!($e instanceof NotAuthenticated) && !($e instanceof NotFound)) {
+		ErrorHandler::logException($e);
+	}
 });
 
 //baseUri can also be /webdav/ with:

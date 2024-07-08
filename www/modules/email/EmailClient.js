@@ -30,10 +30,10 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				id: 'uid'
 			}),
 			sortInfo: {
-				field: 'udate',
+				field: 'internal_udate',
 				direction: 'DESC'
 			},
-			groupField: 'udate'
+			groupField: 'internal_udate'
 		});
 
 		this.messagesStore.on('load', function(){

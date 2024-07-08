@@ -605,10 +605,11 @@ END;
 	 * Detect known XSS attacks.
 	 *
 	 * @param string $string
+	 * @param bool|null $withStyle
 	 * @return bool
 	 * @throws Exception 
 	 */
-	public static function detectXSS(string $string, $withStyle = false): bool
+	public static function detectXSS(string $string, ?bool $withStyle = false): bool
 	{
 		if($withStyle) {
 			// remove GO injected style
@@ -968,7 +969,8 @@ END;
 	 * @access public
 	 * @return string HTML formatted string
 	 */
-	public static function sanitizeHtml($html, $preserveHtmlStyle = true) {
+	public static function sanitizeHtml(string $html, bool $preserveHtmlStyle = true): string
+	{
 		//needed for very large strings when data is embedded in the html with an img tag
 		ini_set('pcre.backtrack_limit',  3000000 );
 
@@ -986,7 +988,7 @@ END;
 
 		// remove comments because they might interfere. Some commands  in style tags may be improperly formatted
 		// because the user appears to paste from Word
-		$html = preg_replace(["'<style>[\s]*<!--'u", "'-->[\s*]</style>'u"], ['<style>','</style>'], $html);
+		$html = preg_replace(["'<style[^>]*>[\s]*<!--'u", "'-->[\s*]</style>'u"], ['<style>','</style>'], $html);
 		$html = preg_replace("'<!--.*-->'Uusi", "", $html);
 		$html = preg_replace('!/\*.*?\*/!s', '', $html);
 

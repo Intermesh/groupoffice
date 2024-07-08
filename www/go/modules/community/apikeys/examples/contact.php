@@ -22,14 +22,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	if (isset($_FILES['attachments']) && count($_FILES['attachments'])) {
 
 		foreach ($_FILES['attachments']['name'] as $key => $attachment) {
-			$cFile = new CURLFile($_FILES['attachments']['tmp_name'][$key], $_FILES['attachments']['type'][$key], $_FILES['attachments']['name'][$key]);
 			$chf = curl_init($uploadUrl);
-			$data = ['test_file' => $cFile];
 			curl_setopt($chf, CURLOPT_POST, true);
-			curl_setopt($chf, CURLOPT_POSTFIELDS, $data);
+            curl_setopt($chf, CURLOPT_INFILE, fopen($_FILES['attachments']['tmp_name'][$key], 'r'));
+            curl_setopt($chf, CURLOPT_INFILESIZE, $_FILES['attachments']['size'][$key]);
 			curl_setopt($chf, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($chf, CURLOPT_HTTPHEADER, array(
-					"Content-Type: application/json; charset=utf-8",
+					"Content-Type: " .$_FILES['attachments']['type'][$key],
 					"Authorization: Bearer " . $apiKey,
 					"Content-Length: " . $_FILES['attachments']['size'][$key],
 					"X-File-Name: " . "UTF8''" . $_FILES['attachments']['name'][$key],
@@ -89,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	];
 
 	//Create custom field 'subscribe' to use this.
-	$contact['customFields']['newsletter'] = isset($_POST['subscribe']);
+	//$contact['customFields']['newsletter'] = isset($_POST['subscribe']);
 
 	// Finally attach the BLOBs
 	$contact['attachments'] = $attachments;

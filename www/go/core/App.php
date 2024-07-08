@@ -762,23 +762,23 @@ namespace go\core {
 		 * @param string|callable|array|object $msg
 		 */
 		public function debug($msg, $traceBackSteps = 0) {
-			$this->getDebugger()->log($msg, $traceBackSteps + 1);
+			$this->getDebugger()->log($msg, $traceBackSteps );
 		}
 		
 		public function log($msg, $traceBackSteps = 0) {
-			$this->getDebugger()->log($msg, $traceBackSteps + 1);
+			$this->getDebugger()->log($msg, $traceBackSteps );
 		}
 		
 		public function warn($msg, $traceBackSteps = 0) {
-			$this->getDebugger()->warn($msg, $traceBackSteps + 1);
+			$this->getDebugger()->warn($msg, $traceBackSteps );
 		}
 		
 		public function error($msg, $traceBackSteps = 0) {
-			$this->getDebugger()->error($msg, $traceBackSteps + 1);
+			$this->getDebugger()->error($msg, $traceBackSteps );
 		}
 		
 		public function info($msg, $traceBackSteps = 0) {
-			$this->getDebugger()->info($msg, $traceBackSteps + 1);
+			$this->getDebugger()->info($msg, $traceBackSteps);
 		}
 
 		private $authState;
@@ -836,6 +836,9 @@ namespace go\core {
 			return null;
 		}
 
+        /**
+         * @return \go\core\model\Settings
+         */
 		public function getSettings()
 		{
 			return Settings::get();

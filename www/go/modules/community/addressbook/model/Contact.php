@@ -181,6 +181,15 @@ class Contact extends AclItemEntity {
 	public $registrationNumber = '';
 
 	/**
+	 * International Code Designator (ISO/IEC 6523)
+	 *
+	 * @link https://en.wikipedia.org/wiki/ISO/IEC_6523
+	 * @link https://docs.peppol.eu/edelivery/codelists/
+	 * @var string
+	 */
+	public ?string $icd;
+
+	/**
 	 * 
 	 * @var string
 	 */							
@@ -748,6 +757,15 @@ class Contact extends AclItemEntity {
 										
 	}
 
+	public function historyLog(): bool|array
+	{
+		$log = parent::historyLog();
+
+		unset($log['vcardBlobId']);
+
+		return $log;
+	}
+
 	public static function sort(Query $query, ArrayObject $sort): Query
 	{
 		if(isset($sort['firstName'])) {
@@ -911,7 +929,10 @@ class Contact extends AclItemEntity {
 	protected function internalValidate() {
 
 		if($this->isOrganization) {
-			$this->firstName =  $this->middleName = $this->prefixes = $this->suffixes = $this->lastName = null;
+			$this->firstName =  $this->middleName = $this->prefixes = $this->suffixes = null;
+
+			// We set last name here because when users choose to sort on last name it will be easier.
+			$this->lastName = mb_substr($this->name, 0, 100);
 		} else if(empty($this->name) || (!$this->isModified(['name']) && $this->isModified(['firstName', 'middleName', 'lastName']))) {
 			$this->setNameFromParts();
 		}

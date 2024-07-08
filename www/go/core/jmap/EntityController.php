@@ -910,7 +910,7 @@ abstract class EntityController extends Controller {
 	 * Takes the request arguments, validates them and fills it with defaults.
 	 * 
 	 * @param array $params
-	 * @return array
+	 * @return ArrayObject
 	 * @throws InvalidArguments
 	 */
 	protected function paramsGetUpdates(array $params): ArrayObject
@@ -1000,7 +1000,7 @@ abstract class EntityController extends Controller {
 	 * Default handler for Foo/import method
 	 * 
 	 * @param array $params
-	 * @return array
+	 * @return ArrayObject
 	 * @throws Exception
 	 */
 	protected function defaultImport(array $params): ArrayObject
@@ -1060,7 +1060,7 @@ abstract class EntityController extends Controller {
 	 * Default handler for Foo/importCSVMapping method
 	 * 
 	 * @param array $params
-	 * @return array
+	 * @return ArrayObject
 	 * @throws Exception
 	 */
 	protected function defaultImportCSVMapping(array $params): ArrayObject
@@ -1120,7 +1120,7 @@ abstract class EntityController extends Controller {
    * Foo/export().
    *
    * @param array $params Identical to Foo/get. Additionally you MUST pass a 'extension'. It will find the converter class using the Entity::converter() method.
-   * @return array
+   * @return ArrayObject
    * @throws InvalidArguments
    * @throws Exception
    * @see AbstractConverter

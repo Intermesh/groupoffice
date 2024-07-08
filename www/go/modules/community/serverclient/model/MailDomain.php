@@ -146,6 +146,12 @@ class MailDomain
 	public function setMailboxPassword(User $user, string $domain)
 	{
 		$username = explode('@', $user->username)[0];
+
+		// if username contains domain then only change it for that domain.
+		if(isset($usernameParts[1]) && $domain != $usernameParts[1]) {
+			return;
+		}
+
 		$username .= '@' . $domain;
 
 		// Backwards compatibility

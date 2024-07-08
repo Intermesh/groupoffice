@@ -80,6 +80,9 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					},
 					title: t("Information"),
 					items: [
+						{
+							xtype: "icdcombo"
+						},
 						this.registrationNumberField = new Ext.form.TextField({
 							xtype: "textfield",
 							name: "registrationNumber",

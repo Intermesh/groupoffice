@@ -481,7 +481,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 			tooltip: t("Attach files"),
 			menu:[{
 				text: t('Upload'),
-				iconCls: 'ic-file-upload',
+				iconCls: 'ic-computer',
 				handler:uploadHandle,
 				scope:this
 			}, {
