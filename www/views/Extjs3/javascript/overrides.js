@@ -1232,7 +1232,7 @@ Ext.override(Ext.form.Field, {
 	
 	setFieldLabel: function(label){
 		if(this.rendered){
-			this.label.update(label+':');
+			this.label.update(label);
 		} else {
 			this.fieldLabel = label;
 		}
