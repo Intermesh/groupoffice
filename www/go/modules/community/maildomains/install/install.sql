@@ -83,8 +83,8 @@ CREATE TABLE IF NOT EXISTS `community_maildomains_dkim_key`
     `selector` VARCHAR(190) NOT NULL DEFAULT '',
     `txt` VARCHAR(255) NOT NULL DEFAULT '',
     `status` SMALLINT UNSIGNED DEFAULT '0',
-    PRIMARY KEY('id'),
-    UNIQUE `domainSelector` ('domainId', 'selector'),
+    PRIMARY KEY(`id`),
+    UNIQUE `domainSelector` (domainId, selector),
     CONSTRAINT `community_maildomains_dkim_key_ibfk_1` FOREIGN KEY (`domainId`)
         REFERENCES `community_maildomains_domain` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
