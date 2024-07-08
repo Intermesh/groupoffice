@@ -1,3 +1,4 @@
+- caldav/carddav/webdav: Don't log not found as error
 - Workflow: fix error when sending a file without a body.
 - Support: auto-expire tickets
 - Core: fixed copy pasting images from a Microsoft Word Document in Windows
