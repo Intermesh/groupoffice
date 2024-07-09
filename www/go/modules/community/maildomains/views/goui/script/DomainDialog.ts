@@ -13,7 +13,14 @@ import {
 	tbar,
 	textfield
 } from "@intermesh/goui";
-import {client, FilterCondition, FormWindow, jmapds, userdisplaycombo} from "@intermesh/groupoffice-core";
+import {
+	client,
+	FilterCondition,
+	FormWindow,
+	JmapDataSource,
+	jmapds,
+	userdisplaycombo
+} from "@intermesh/groupoffice-core";
 import {AliasTable} from "./AliasTable";
 import {MailboxTable} from "./MailboxTable";
 import {MailboxExportDialog} from "./MailboxExportDialog";
@@ -24,13 +31,13 @@ import {DnsSettingsForm} from "./DnsSettingsForm";
 export class DomainDialog extends FormWindow {
 
 	private mailboxesTab: Component | undefined;
-	private mailboxGrid: MailboxTable | undefined;
+	private mailboxGrid!: MailboxTable;
 
-	private aliasesTab: Component | undefined;
-	private aliasGrid: AliasTable | undefined;
+	private aliasesTab!: Component;
+	private aliasGrid!: AliasTable;
 
-	private dnsSettingsTab: Component | undefined;
-	private dnsSettingsForm: Component | undefined;
+	private dnsSettingsTab!: Component;
+	private dnsSettingsForm!: DnsSettingsForm;
 
 	private totalQuotaFld: NumberField;
 	private defaultQuotaFld: NumberField;
@@ -264,19 +271,15 @@ export class DomainDialog extends FormWindow {
 						if(!this.currentId) {
 							return;
 						}
-						const r = await client.jmap( "MailDomain/checkDns", {
-							id: this.currentId
-						});
-						this.load(this.currentId).then(() => {this.render();});
+
+						jmapds("MailDomain").update(this.currentId, {
+							checkDNS: true
+						})
 					}
 				})),
-			this.dnsSettingsForm!
+			this.dnsSettingsForm
 		);
-		this.dnsSettingsTab.on("show", () => {
-			if (this.currentId) {
-				this.dnsSettingsForm.load(this.entity);
-			}
-		});
+
 	}
 
 	private async openMailboxDlg(id?: EntityID): Promise<void> {

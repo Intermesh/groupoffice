@@ -107,17 +107,23 @@ final class DnsCheck
 	 *
 	 * If there's none, null is returned. Otherwise, it is being parsed and returned as as array
 	 *
-	 * @param string $selector
+	 * @param string[] $selectors
 	 * @return array|null|string
 	 */
-	public function checkDKIM(string $selector = "mail._domainkey"): null|array|string
+	public function checkDKIM(): null|array|string
 	{
-		$records = dns_get_record($selector."." . $this->domainName, DNS_TXT);
+		$r = [];
+		foreach(array_keys($this->domainEntity->dkim) as $selector) {
+			$records = dns_get_record($selector . "._domainkey." . $this->domainName, DNS_TXT);
 
-		if(empty($records) || empty($records[0]['txt'])) {
-			return null;
+			if (empty($records) || empty($records[0]['txt'])) {
+				$r[$selector] =  null;
+			} else {
+				$r[$selector] = $this->rawOutput ? $records[0]['txt'] : $this->parseRecord($records[0]['txt']);
+			}
 		}
-		return $this->rawOutput ? $records[0]['txt'] : $this->parseRecord($records[0]['txt']);
+
+		 return $r;
 	}
 
 	/**

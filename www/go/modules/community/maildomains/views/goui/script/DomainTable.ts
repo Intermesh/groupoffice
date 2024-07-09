@@ -199,8 +199,8 @@ export class DomainTable extends Table<DataSourceStore> {
 				renderer: (v, record) => {
 					let allIsWell = record.mxStatus && record.dmarcStatus && record.spfStatus;
 
-					for (const k of record.dkimRecords) {
-						allIsWell = allIsWell && k.status;
+					for (const selector in record.dkim) {
+						allIsWell = allIsWell && record.dkim[selector].status;
 					}
 					let iconCls = "icon";
 					if (!allIsWell) {
@@ -226,18 +226,18 @@ export class DomainTable extends Table<DataSourceStore> {
 
 	}
 
-	private onStatusBtnClick(allIsWell: bool, record: DefaultEntity) {
+	private onStatusBtnClick(allIsWell: boolean, record: DefaultEntity) {
 		let msg = "";
 		if(allIsWell) {
 			msg += t("No DNS problems found!", "community", "maildomains");
 		} else {
-			if (record.dkimRecords.length === 0) {
+			if (Object.keys(record.dkim).length === 0) {
 				msg += "&bull;&nbsp;" + t("No DKIM records found.") + "<br/>";
 			} else {
-				for (const k of record.dkimRecords) {
-					if (!k.status) {
+				for (const selector in record.dkim) {
+					if (!record.dkim[selector].status) {
 						msg += "&bull;$nbsp;" + t("Missing or invalid DKIM record for ", "community", "maildomains") +
-							" " + k.selector + ".<br/>";
+							" " + selector + ".<br/>";
 					}
 				}
 			}
