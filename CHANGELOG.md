@@ -1,9 +1,13 @@
+
+09-07-2024: 6.8.59
 - caldav/carddav/webdav: Don't log not found as error
 - Workflow: fix error when sending a file without a body.
-- Support: auto-expire tickets
 - Core: fixed copy pasting images from a Microsoft Word Document in Windows
 - Core: Updated DE translations. Danke, Daniel!
 - Core: bugfix base XLS class: prevent exception when adding numeric array as record
+
+05-07-2024: 6.8.58
+- Support: auto-expire tickets
 
 01-07-2024: 6.8.57
 - Custom fields: Make sure fieldset is not collapsed. This may happen if it was a fieldset before and collapsed by the user.
