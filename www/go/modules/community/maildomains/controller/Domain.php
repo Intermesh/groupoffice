@@ -107,22 +107,6 @@ final class Domain extends EntityController
 		return $this->defaultExportColumns($params);
 	}
 
-
-	public function checkDns(array $params): ArrayObject
-	{
-		if (!isset($params['id'])) {
-			throw new InvalidArguments("Missing 'id' parameter");
-		}
-		$d = model\Domain::findById($params['id']);
-		$ip = go()->getConfig()['serverclient_server_ip'] ?? '127.0.0.1';
-
-		$dnsChecker = new util\DnsCheck($d, $ip, true);
-		$r = $dnsChecker->checkAll();
-		$d->updateDns($r);
-
-		return $r;
-	}
-
 	/**
 	 * Perform an automated PTR check
 	 *
