@@ -2,7 +2,7 @@ import {
 	autocomplete, avatar, btn, Button, checkbox,
 	column,
 	comp,
-	Component, Config, containerfield, createComponent, datasourcestore, FieldEventMap,
+	Component, Config, containerfield, createComponent, datasourcestore, FieldEventMap, Format,
 	hr,
 	MapField,
 	mapfield, Menu, menu, ObservableListenerOpts,
@@ -126,11 +126,11 @@ export class ParticipantField extends Component {
 						column({
 							id: "name",
 							renderer: (v, record) => {
-								let name = v;
+								let name = Format.escapeHTML(v);
 								if(!isNaN(record.id)) {
 									name = '<b>'+name+'</b>';
 								}
-								return name + `<br><small>${record.email || record.description}</small>`
+								return name + `<br><small>${Format.escapeHTML(record.email || record.description)}</small>`
 
 							}
 						})
