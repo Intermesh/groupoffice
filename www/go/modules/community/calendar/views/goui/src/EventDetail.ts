@@ -120,7 +120,9 @@ export class EventDetail extends Component {
 			displayfield({name: 'location', label:t('Location')}),
 			displayfield({name:'description'}),
 			mapfield({name: 'participants',
+
 				buildField: (v: any) => displayfield({
+					escapeValue: false,
 					//label: v.roles.owner?'Organizer': 'Participant',
 					icon: statusIcons[v.participationStatus][0] as MaterialIcon,
 					//icon: v.roles.owner ? 'manage_accounts' : (v.name?'person':'contact_mail'),
@@ -138,7 +140,7 @@ export class EventDetail extends Component {
 						if(type) type = ' ('+type+')';
 
 						if(v.name) {
-							r = v.name + '<br>' + type;
+							r = Format.escapeHTML(v.name) + '<br>' + type;
 						} else if(type) {
 							r += '<br>' + type
 						}
