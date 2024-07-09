@@ -17,10 +17,8 @@ final class CheckDns extends CronJob
 		$ip = go()->getConfig()['serverclient_server_ip'] ?? '127.0.0.1';
 		$mailDomains = model\Domain::find()->where(['active' => 1])->all();
 		foreach($mailDomains as $d) {
-			$dnsChecker = new util\DnsCheck($d, $ip, true);
-			$r = $dnsChecker->checkAll();
-			$d->updateDns($r);
-			go()->debug('Updated DNS settings for  ' . $r->domain);
+			$d->checkDns();
+			$d->save();
 		}
 	}
 }

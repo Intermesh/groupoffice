@@ -11,11 +11,11 @@ CREATE TABLE IF NOT EXISTS `community_maildomains_domain`
     `transport`    VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'virtual',
     `backupMx`     tinyint(1)                                                    NOT NULL default '0',
     `spf`          VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `spfStatus` SMALLINT UNSIGNED DEFAULT '0',
+    `spfStatus` SMALLINT UNSIGNED NOT NULL DEFAULT '0',
     `dmarc`        VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `dmarcStatus` SMALLINT UNSIGNED DEFAULT '0',
+    `dmarcStatus` SMALLINT UNSIGNED NOT NULL DEFAULT '0',
     `mx`           VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `mxStatus` SMALLINT UNSIGNED DEFAULT '0',
+    `mxStatus` SMALLINT UNSIGNED NOT NULL DEFAULT '0',
     `createdBy`    INT(11)                                                       NOT NULL,
     `createdAt`    DATETIME                                                      NOT NULL,
     `modifiedBy`   int(11)                                                       NOT NULL,
@@ -76,16 +76,18 @@ CREATE TABLE IF NOT EXISTS `community_maildomains_mailbox`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `community_maildomains_dkim_key`
+create table community_maildomains_dkim_key
 (
-    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `domainId` INT(11) UNSIGNED NOT NULL,
-    `selector` VARCHAR(190) NOT NULL DEFAULT '',
-    `txt` VARCHAR(255) NOT NULL DEFAULT '',
-    `status` SMALLINT UNSIGNED DEFAULT '0',
-    PRIMARY KEY(`id`),
-    UNIQUE `domainSelector` (domainId, selector),
-    CONSTRAINT `community_maildomains_dkim_key_ibfk_1` FOREIGN KEY (`domainId`)
-        REFERENCES `community_maildomains_domain` (`id`) ON DELETE CASCADE
-) ENGINE = InnoDB
-DEFAULT CHARSET = utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    domainId int(11) unsigned             not null,
+    selector varchar(190)      default '' not null,
+    txt      text              default '' not null,
+    `key`    text                         null,
+    status   smallint unsigned default 0  null,
+    primary key (selector, domainId),
+    constraint domainSelector
+        unique (domainId, selector),
+    constraint community_maildomains_dkim_key_ibfk_1
+        foreign key (domainId) references community_maildomains_domain (id)
+            on delete cascade
+);
+
