@@ -19,6 +19,7 @@ parameters:
     excludePaths:
         analyse:
             - */vendor/*
+            - %currentWorkingDirectory%/go/core/util/QRcode.php
 
     reportUnmatchedIgnoredErrors: false
     treatPhpDocTypesAsCertain: false
