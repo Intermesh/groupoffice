@@ -34,7 +34,7 @@
  * @property String $localizedName The localized human friendly name of this model.
  * @property int $permissionLevel @see \GO\Base\Model\Acl for available levels. Returns -1 if no aclField() is set in the model.
  *
- * @property GO\Files\Model\Folder $filesFolder The folder model that belongs to this model if hasFiles is true.
+ * @property \GO\Files\Model\Folder $filesFolder The folder model that belongs to this model if hasFiles is true.
  */
 
 
@@ -59,6 +59,10 @@ use go\core\orm\SearchableTrait;
 use go\core\util\StringUtil;
 use go\modules\community\comments\model\Comment;
 
+/**
+ * @property int $ctime
+ * @property int $mtime
+ */
 abstract class ActiveRecord extends \GO\Base\Model{
 	const EVENT_URL = "url";
 
