@@ -72,7 +72,7 @@ class BackgroundProcess {
 			if( count(preg_split("/\n/", $result)) > 2){
 				return true;
 			}
-		}catch(Exception $e){}
+		}catch(\Exception $e){}
 
 		return false;
 	}
