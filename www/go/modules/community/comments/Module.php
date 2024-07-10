@@ -91,7 +91,7 @@ class Module extends core\Module
 		if(!isset(static::$demoTexts )) {
 			static::$demoTexts = [];
 			for($i = 0; $i < 20; $i++) {
-				static::$demoTexts [] = nl2br($faker->realtext);
+				static::$demoTexts [] = nl2br($faker->realText);
 			}
 		}
 
@@ -102,7 +102,7 @@ class Module extends core\Module
 	private static $demoUsers;
 
 	/**
-	 * @return User[]
+	 * @return \go\core\model\User[]
 	 */
 	private static function demoUsers(): array
 	{

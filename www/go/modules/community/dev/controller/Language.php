@@ -5,6 +5,7 @@ namespace go\modules\community\dev\controller;
 use go\core\cache\None;
 use go\core\Controller;
 use go\core\Environment;
+use go\core\exception\Unauthorized;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\jmap\Response;
@@ -20,10 +21,11 @@ class Language extends Controller {
 	const DELIMITER = ';';
 	const ENCLOSURE = '"';
 
-	protected function authenticate() {  
-    if (!go()->getAuthState()->isAuthenticated()) {			
-      throw new Exception(401, "Unauthorized");
-		}  	
+	protected function authenticate()
+	{
+		if (!go()->getAuthState()->isAuthenticated()) {
+			throw new Unauthorized();
+		}
 	}
 
 	public function export($params) {
