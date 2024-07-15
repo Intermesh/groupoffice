@@ -1,3 +1,4 @@
+15-07-2024: 6.8.60
 - Busisess: allow users with mayManageEmployees to update their agreements
 - Core: make conditionally required, required and conditionally hidden mutually exclusive
 
