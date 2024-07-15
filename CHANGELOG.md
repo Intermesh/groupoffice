@@ -1,4 +1,5 @@
 - Busisess: allow users with mayManageEmployees to update their agreements
+- Core: make conditionally required, required and conditionally hidden mutually exclusive
 
 09-07-2024: 6.8.59
 - caldav/carddav/webdav: Don't log not found as error
