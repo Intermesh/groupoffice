@@ -150,6 +150,7 @@ return array (
   'No calendars have been selected for this overview. Select at least one calendar in Administration.' => 'Für diese Übersicht wurden keine Kalender ausgewählt. Wählen Sie in der Administration zumindest einen Kalender aus.',
   'Right click to copy link location' => 'Rechts klicken um Link zu kopieren',
   'Invitation' => 'Einladung',
+  'Cancelled' => 'Abgesagt',
   'Updated invitation' => 'Aktualisierung',
   'Cancellation' => 'Absage',
   'in non-selected calendar' => 'nicht in ausgewähltem Kalendar',
