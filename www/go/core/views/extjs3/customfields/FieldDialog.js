@@ -9,6 +9,17 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 
 		this.formPanel.on("beforesubmit", function (form, values) {
 			values.forceAlterTable = true;
+			// Required and hidden should be mutually exclusive, also required and conditionally required
+			if(values.conditionallyRequired) {
+				values.conditionallyHidden = false;
+				values.required = false;
+			} else if(values.conditionallyHidden) {
+				values.conditionallyRequired = false;
+				values.required = false;
+			} else if (values.required) {
+				values.conditionallyRequired = false;
+				values.conditionallyHidden = false;
+			}
 		}, this);
 
 		this.formPanel.on("load", function (form, entity) {
@@ -129,10 +140,15 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 					hideLabel: true,
 					listeners: {
 						check: function (cb, value) {
-							var form = this.formPanel.getForm();
+							const form = this.formPanel.getForm();
 							form.findField('relatedFieldCondition').setDisabled(value);
 							form.findField('conditionallyRequired').setDisabled(value);
 							form.findField('conditionallyHidden').setDisabled(value);
+							if (value) {
+								form.findField('conditionallyRequired').setValue(false);
+								form.findField('conditionallyHidden').setValue(false);
+							}
+
 						},
 						scope: this
 					}
@@ -208,7 +224,8 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 						hideLabel: true,
 						listeners: {
 							check: function (cb, value) {
-								var form = this.formPanel.getForm(),
+								/*
+								const form = this.formPanel.getForm(),
 									requiredField = form.findField('required'),
 									conditionallyHidden = form.findField('conditionallyHidden');
 
@@ -218,6 +235,21 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 									}
 									requiredField.setDisabled(value);
 								}
+								*/
+								const form = this.formPanel.getForm(),
+									requiredField = form.findField('required'),
+									conditionalField = form.findField('conditionallyHidden');
+								if (conditionalField.getValue() || value) {
+									form.findField('relatedFieldCondition').setDisabled(false);
+								}
+								if (value) {
+									conditionalField.setValue(!value).setDisabled(value);
+									requiredField.setValue(!value).setDisabled(value);
+								} else {
+									requiredField.setDisabled(value);
+									conditionalField.setDisabled(value);
+								}
+								return false;
 							},
 							scope: this
 						}
@@ -229,6 +261,7 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 						hideLabel: true,
 						listeners: {
 							check: function (cb, value) {
+								/*
 								var form = this.formPanel.getForm(),
 									requiredField = form.findField('required'),
 									conditionallyRequired = form.findField('conditionallyRequired');
@@ -239,6 +272,21 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 									}
 									requiredField.setDisabled(value);
 								}
+								 */
+								const form = this.formPanel.getForm(),
+									requiredField = form.findField('required'),
+									conditionalField = form.findField('conditionallyRequired');
+								if (conditionalField.getValue() || value) {
+									form.findField('relatedFieldCondition').setDisabled(false);
+								}
+								if (value) {
+									conditionalField.setValue(!value).setDisabled(value);
+									requiredField.setValue(!value).setDisabled(value);
+								} else {
+									requiredField.setDisabled(value);
+									conditionalField.setDisabled(value);
+								}
+								return false;
 							},
 							scope: this
 						}
