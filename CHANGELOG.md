@@ -1,3 +1,6 @@
+- Email: Fix attachment problem with ampersands in file name.
+- Email: Display files with ampersands in file name correctly, fix download link.
+
 15-07-2024: 6.8.60
 - Busisess: allow users with mayManageEmployees to update their agreements
 - Core: make conditionally required, required and conditionally hidden mutually exclusive

@@ -483,8 +483,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		{
 			this.attachmentsEl = Ext.get(this.attachmentsId);
 			this.attachmentsEl.on('click', this.openAttachment, this);
-			if(this.attachmentContextMenu)
-			{
+			if(this.attachmentContextMenu) {
 				this.attachmentContextMenu.messagePanel = this;
 				this.attachmentsEl.on('contextmenu', this.onAttachmentContextMenu, this);
 			}
