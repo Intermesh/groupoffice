@@ -187,7 +187,7 @@ class JSON {
 		foreach($patch as $pointer => $value) {
 			try {
 				$deepPatch = str_starts_with($pointer, "/");
-				$doc = static::patchProp($doc, $deepPatch ? self::explodePointer($pointer) : [$pointer], $value, $deepPatch);
+				$doc = static::patchProp($doc, self::explodePointer($pointer), $value, $deepPatch);
 			} catch(JsonPointerException $e) {
 				throw new JsonPointerException("The path " . $pointer ." doesn't exist");
 			}
