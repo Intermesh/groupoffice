@@ -39,7 +39,7 @@ class CalDAVBackend extends AbstractBackend implements
 		$u = User::find(['id'])->where(['username'=>$username])->single();
 		foreach($calendars as $calendar) {
 
-			$uri = preg_replace('/[^\w-]*/', '', (strtolower(str_replace(' ', '-', $calendar->name)))).'-'.$calendar->id;
+			$uri = 'cal-'.$calendar->id;
 			$result[] = [
 				'id' => $calendar->id,
 				'uri' => $uri,
@@ -102,6 +102,9 @@ class CalDAVBackend extends AbstractBackend implements
 				$values[$dbName] = $properties[$xmlName];
 			}
 		}
+		if($values['color']) {
+			$values['color'] = substr($values['color'], 1); // remove #
+		}
 		$cal->setValues($values);
 		$cal->save();
 
@@ -119,6 +122,9 @@ class CalDAVBackend extends AbstractBackend implements
 				switch ($propertyName) {
 					case '{urn:ietf:params:xml:ns:caldav}schedule-calendar-transp':
 						$newValues['includeInAvailability'] = 'transparent' === $propertyValue->getValue() ? 'none' : 'all';
+						break;
+					case '{http://apple.com/ns/ical/}calendar-color':
+						$newValues['color'] = substr($propertyValue, 1);
 						break;
 					default:
 						$newValues[$this->propertyMap[$propertyName]] = $propertyValue;

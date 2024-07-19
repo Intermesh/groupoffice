@@ -460,13 +460,6 @@ class CalendarEvent extends AclItemEntity {
 		}
 	}
 
-	private function getFirstOwner() {
-		foreach($this->participants as $p) {
-			if($p->isOwner()) return $p;
-		}
-		return null;
-	}
-
 	protected function internalSave() : bool {
 
 		if(empty($this->uid)) {
@@ -509,7 +502,7 @@ class CalendarEvent extends AclItemEntity {
 		}
 
 		if(!empty($this->participants) && empty($this->replyTo)) {
-			$owner = $this->getFirstOwner();
+			$owner = $this->organizer();
 			if(!empty($owner)) {
 				$this->replyTo = $owner->email;
 			}

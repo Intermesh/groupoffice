@@ -111,7 +111,7 @@ export class ParticipantField extends Component {
 				list:table({
 					style:{minWidth:'100%'},
 					headers: false,
-					store: datasourcestore({ // TODO: use Search/email but store doesn't support this yet
+					store: datasourcestore({
 						dataSource: jmapds('Principal')
 						//properties: ['id', 'displayName', 'email']
 					}),
@@ -137,15 +137,11 @@ export class ParticipantField extends Component {
 					],
 					listeners: {
 						render: table => {
-
 							// register the parent element to load store on scroll down
 							table.store.addScrollLoader(table.findAncestorByType(Menu)!.el);
-
-
 						}
 					}
 				})
-				//	listeners: {'blur' : (_,v) => {/*check if valid email, if so add to _.previous.add(participant);*/}}
 			})
 		);
 

@@ -349,11 +349,12 @@
 						padding-left: 0;
 						padding-right: 0;
 						&::before {
-							content: '•';
-							font-size: 1em;
-							line-height: 1;
-							text-align: center;
-							min-width: dp(24);
+							content: '';
+							border-radius: 999px;
+							width:dp(6);
+							height:dp(6);
+							margin: dp(5); // same width as white-space in allday events
+							background-color: currentColor;
 						}
 					}
 					&.continues {

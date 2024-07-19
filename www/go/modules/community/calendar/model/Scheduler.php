@@ -184,7 +184,7 @@ class Scheduler {
 		if($ifMethod !== null && $ifMethod != $method) {
 			return false;
 		}
-		$vevent = $vcalendar->vevent[0];
+		$vevent = $vcalendar->VEVENT[0];
 
 		$aliases = \GO\Email\Model\Alias::model()->find(
 			\GO\Base\Db\FindParams::newInstance()
@@ -197,17 +197,21 @@ class Scheduler {
 
 		$accountEmail = false;
 		if($method ==='REPLY') {
-			if (isset($vevent->organizer)) {
-				$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vevent->organizer));
+			if (isset($vevent->ORGANIZER)) {
+				$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vevent->ORGANIZER));
 				if (in_array($attendeeEmail, $aliases)) {
 					$accountEmail = $attendeeEmail;
 				}
-			} else {
-				// Microsoft ActiveSync does not (always?) send organizer
-				$existingEvent = CalendarEvent::findByUID((string) $vevent->uid)->single();
-				if ($existingEvent && in_array($existingEvent->organizer()->email, $aliases)) {
-					$accountEmail = $existingEvent->organizer()->email;
+			} else { // Find event data's replyTo by UID when organizer is missing in VEVENT
+				$replyTo = go()->getDbConnection()->selectSingleValue('replyTo')->from('calendar_event')->where('uid', '=', (string) $vevent->UID)->single();
+				if(in_array($replyTo, $aliases)) {
+					$accountEmail = $replyTo;
 				}
+//				// Microsoft ActiveSync does not (always?) send organizer
+//				$existingEvent = CalendarEvent::findByUID((string) $vevent->uid)->single();
+//				if ($existingEvent && in_array($existingEvent->organizer()->email, $aliases)) {
+//					$accountEmail = $existingEvent->organizer()->email;
+//				}
 			}
 		} else {
 			if (isset($vevent->attendee)) {
@@ -221,7 +225,7 @@ class Scheduler {
 		}
 
 		if (!$accountEmail) {
-			return ['method' => $method, 'feedback' => go()->t("None of the participants match your e-mail aliases for this e-mail account.", "email")];
+			return ['method' => $method, 'event' => go()->t("None of the participants match your e-mail aliases for this e-mail account.", "email")];
 		}
 		$from = $imapMessage->from->getAddress();
 		$event = Scheduler::processMessage($vcalendar, $accountEmail, (object)[
@@ -343,8 +347,8 @@ class Scheduler {
 				if (empty($p->scheduleUpdated) || $p->scheduleUpdated < $replyStamp) {
 					$k = 'participants/'.$p->pid();
 					$existingEvent->recurrenceOverrides[$recurId]->patchProps([
-						'/'. $k.'/participationStatus' => $status,
-						'/'. $k.'/scheduleUpdated' => $replyStamp->format("Y-m-d H:i:s"),
+						$k.'/participationStatus' => $status,
+						$k.'/scheduleUpdated' => $replyStamp->format("Y-m-d\TH:i:s"),
 					]);
 				}
 

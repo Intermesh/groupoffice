@@ -45,12 +45,11 @@ class RecurrenceOverride extends Property
 					$orig = $event->participants[$pid];
 					foreach($participant as $property => $value) {
 						if(isset($orig->$property) && $value !== $orig->$property) { // roles??
-							$patch['/participants/'.$pid.'/'.$property] = $value;
+							$patch['participants/'.$pid.'/'.$property] = $value;
 						}
 					}
-					//unset($patch['participants'][$pid]);
 				} else {
-					$patch['/participants/' . $pid] = $participant;
+					$patch['participants/' . $pid] = $participant;
 				}
 
 			}
@@ -103,7 +102,6 @@ class RecurrenceOverride extends Property
 	protected function internalSave(): bool
 	{
 		// TODO: validate what the current user can override
-		// TODO: create patch object based on what is changed instead of overiding ALL participants eg.
 		if(!empty($this->recurrenceId) && is_string($this->recurrenceId)) {
 			$this->recurrenceId = new DateTime(str_replace('T',' ',$this->recurrenceId));
 		}

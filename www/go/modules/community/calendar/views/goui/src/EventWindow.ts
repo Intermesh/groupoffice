@@ -168,7 +168,7 @@ export class EventWindow extends FormWindow {
 						this.startDate.value = newEndDate.add(duration).format(format);
 					}
 					if(newEndDate && this.item) {
-						this.item.end = newEndDate!; // for isInPast
+						this.item.end = newEndDate; // for isInPast
 					}
 				}}
 			}),

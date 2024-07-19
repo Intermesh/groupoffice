@@ -38,7 +38,7 @@ class Module extends core\Module
 	{
 		return [
 			'mayChangeCalendars', // allows Calendar/set (hide ui elements that use this)
-			'mayChangeCategories', // allows creating global  categories for everyone. Personal cats can always be created.
+			'mayChangeCategories', // allows creating global categories for everyone. Personal cats can always be created.
 			'mayChangeResources',
 		];
 	}
@@ -93,7 +93,7 @@ class Module extends core\Module
 		header('Content-Type: text/calendar; charset=UTF-8; component=vcalendar');
 		header('Content-Disposition: attachment; filename="'.$calendar->name.'export_'.$calendar->id.'_'.date('Y-m-d').'.ics"');
 		$vcalendar = new VCalendar([
-			'PRODID' => CalendarEvent::PROD,
+			'PRODID' => str_replace('{VERSION}', go()->getVersion(),CalendarEvent::PROD),
 			'METHOD' => 'PUBLISH'
 		]);
 		if($calendar->timeZone) $vcalendar->add("X-WR-TIMEZONE", $calendar->timeZone);

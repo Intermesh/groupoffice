@@ -71,7 +71,6 @@ export class Main extends Component {
 		this.cls = 'hbox fit tablet-cards';
 
 		this.adapter.onLoad = () => {
-			console.log("onload");
 			this.view.update();
 		};
 

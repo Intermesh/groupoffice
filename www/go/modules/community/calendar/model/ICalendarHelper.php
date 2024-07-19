@@ -94,7 +94,7 @@ class ICalendarHelper {
 		$c = new VCalendar(['PRODID' => $event->prodId, 'METHOD' => $method]);
 		$forBody = $event;
 		if($method == 'CANCEL' || $event->isModified(array_merge(CalendarEvent::EventProperties,['participants']))) {
-			// base event (won't check extra participants)
+			// base event
 			$c->add(self::toVEvent($c->createComponent('VEVENT'), $event));
 		}
 		if(isset($event->recurrenceOverrides)) {
@@ -106,6 +106,7 @@ class ICalendarHelper {
 				}
 			}
 		}
+		// &$event is displayed in the email body
 		$event = $forBody;
 
 		if(empty($c->vevent)) {
@@ -302,7 +303,7 @@ class ICalendarHelper {
 				$event->setRecurrenceRule(self::parseRrule($vevent->RRULE, $event));
 				if(!empty($vevent->EXDATE)) {
 					foreach ($vevent->EXDATE as $exdate) {
-						$rId = $exdate->format('Y-m-d\TH:i:s');
+						$rId = $exdate->getDateTime()->format('Y-m-d\TH:i:s');
 						if(!isset($event->recurrenceOverrides[$rId])) {
 							$event->recurrenceOverrides[$rId] = new RecurrenceOverride($event);
 						}
@@ -406,8 +407,9 @@ class ICalendarHelper {
 			if(in_array($status, ['confirmed', 'cancelled', 'tentative'])) {
 				$props->status = $status;
 			}
-		} else {
-			$props->status = 'confirmed';
+		//} else {
+			// confirmed is already the db default and overrides do not always need to override the status.
+			//$props->status = 'confirmed';
 		}
 		if(!empty($vevent->CLASS)) $props->privacy = array_flip(self::$privacyMap)[(string)$vevent->CLASS] ?? 'public';
 		if(!empty($vevent->COLOR)) $props->color = (string)$vevent->COLOR;
