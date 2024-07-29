@@ -1,3 +1,6 @@
+29-07-2024: 6.8.62
+- ActiveSync: Restored correct ActiveSync Z-Push version
+
 19-07-2024: 6.8.61
 - Email: Fix attachment problem with ampersands in file name.
 - Email: Display files with ampersands in file name correctly, fix download link.
