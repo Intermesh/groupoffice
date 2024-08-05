@@ -308,10 +308,13 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 		return this.store.entityStore.single(value);
 	},
 	
-	setValue: function (value) {
+	setValue: async function (value) {
 
 		var me = this;
 
+		if(this.setValuePromise) {
+			await this.setValuePromise;
+		}
 		this.setValuePromise = new Promise(function(resolve, reject) {
 
 			//hack for old framework where relations are "0" instead of null.
