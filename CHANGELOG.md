@@ -1,6 +1,7 @@
 - Core: Don't require security token check in legacy API when not using cookies for authentication
 - Core: HTML field supports required
 - Tasks: Fixed grouping in combo and showing numeric value. Related to support ticket #32767
+- Email: Raised IMAP and SMTP username database length from 50 to 190
 
 29-07-2024: 6.8.62
 - ActiveSync: Restored correct ActiveSync Z-Push version
