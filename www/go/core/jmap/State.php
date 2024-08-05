@@ -55,6 +55,15 @@ class State extends AbstractState {
 
 	private static $cookieAccessTokenUsed = false;
 
+	/**
+	 * Check if cookies were used to authenticate
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function isAuthenticatedUsingCookie() : bool {
+		return $this->isAuthenticated() && self::$cookieAccessTokenUsed;
+	}
+
 
 	/**
 	 * Check CSRF token on each POST request.
