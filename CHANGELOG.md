@@ -1,3 +1,5 @@
+- Core: Don't require security token check in legacy API when not using cookies for authentication
+
 29-07-2024: 6.8.62
 - ActiveSync: Restored correct ActiveSync Z-Push version
 
