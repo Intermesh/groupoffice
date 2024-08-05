@@ -95,7 +95,6 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		value = Ext.util.Format.stripTags(value).trim().replace(/\u200B/g,'');
 
 		if (!this.allowBlank && value.length < 1) {
-			debugger;
 			errors.push(this.blankText);
 		}
 
