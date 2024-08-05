@@ -1,3 +1,5 @@
+- Core: Don't require security token check in legacy API when not using cookies for authentication
+
 06-05-2024: 6.6.184
 - ActiveSync: Some email messages that were out of the date range specified could be sent
 - Projects2: Hide 'finance' button if user has no finance permission
