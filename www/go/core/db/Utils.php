@@ -33,7 +33,7 @@ class Utils {
 					}
 				}
 			}
-		} catch (PDOException $e) {
+		} catch (DbException $e) {
 			//var_dump($queries);
 			throw new Exception($e->getMessage() . ' on query (' . $i . ') ' . $queries[$i]);
 		}
