@@ -97,7 +97,7 @@ class Table {
 		return $this->name;
 	}
 
-	private function getCacheKey(): string
+	protected function getCacheKey(): string
 	{
 		return 'dbColumns_' . $this->dsn . '_' . $this->name;
 	}
