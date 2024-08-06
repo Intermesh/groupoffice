@@ -539,29 +539,28 @@ class Message extends \go\core\mail\Message {
 			$htmlBottom = '</body></html>';
 			
 			$this->setHtmlAlternateBody($htmlTop.$params['htmlbody'].$htmlBottom);
-		}else
-		{
+		} else {
 			$this->setBody($params['plainbody'], 'text/plain');
-		}		
-		
+		}
+
 		if (!empty($params['attachments'])) {
 			$attachments = json_decode($params['attachments']);
 			foreach ($attachments as $att) {
-				if(!empty($att->blobId)) {
+				if (!empty($att->blobId)) {
 					$path = Blob::buildPath($att->blobId);
-				}else	if(!empty($att->tmp_file) && empty($att->from_file_storage)){
-					$path = \GO::config()->tmpdir.$att->tmp_file;
+				} else if (!empty($att->tmp_file) && empty($att->from_file_storage)) {
+					$path = \GO::config()->tmpdir . $att->tmp_file;
 				} else {
 					$path = \GO::config()->file_storage_path . $att->tmp_file;
 				}
+				$path = html_entity_decode($path);
 				$tmpFile = new \GO\Base\Fs\File($path);
 				if ($tmpFile->exists()) {
 					$file = Attachment::fromPath($tmpFile->path());
 					$file->setFilename($att->fileName);
 					$this->attach($file);
-				}else
-				{
-					throw new \Exception("Error: attachment missing on server: ".$tmpFile->stripTempPath().".\n\nThe temporary files folder is cleared on each login. Did you relogin?");
+				} else {
+					throw new \Exception("Error: attachment missing on server: " . $tmpFile->stripTempPath() . ".\n\nThe temporary files folder is cleared on each login. Did you relogin?");
 				}
 			}
 		}

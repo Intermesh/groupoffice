@@ -1131,11 +1131,9 @@ GO.email.saveAttachment = function(attachment,panel) {
 	}
 
 GO.email.openAttachment = function(attachment, panel, forceDownload) {
-		if(!panel)
+		if(!panel || !attachment) {
 			return false;
-
-		if(!attachment)
-			return false;
+		}
 
 		if(forceDownload) {
 			attachment.url += '&inline=0';
@@ -1143,7 +1141,7 @@ GO.email.openAttachment = function(attachment, panel, forceDownload) {
 			return;
 		}
 
-		if(!forceDownload && (attachment.mime=='message/rfc822' || attachment.mime=='application/eml')) {
+		if(!forceDownload && (attachment.mime==='message/rfc822' || attachment.mime==='application/eml')) {
 			GO.email.showMessageAttachment(0, {
 				action:'attachment',
 				account_id: panel.account_id,

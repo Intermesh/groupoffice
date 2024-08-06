@@ -95,9 +95,6 @@ if (isset(GO::session()->values['security_token'])) {
 	echo 'GO.securityToken="' . GO::session()->values['security_token'] . '";';
 }
 
-//if (isset($_GET['SET_LANGUAGE']) && preg_match('/[a-z_]/', $_GET['SET_LANGUAGE'])) {
-//	echo 'GO.loginSelectedLanguage = "' . $_GET['SET_LANGUAGE'] . '";';
-//} 
 echo 'window.name="' . GO::getId() . '";';
 
 if (isset(GO::session()->values['security_token']))
@@ -236,14 +233,7 @@ if ($cacheFile->exists()) {
 	if (!go()->getDebugger()->enabled) {
 		$minify->gzip($cacheFile->getPath());		
 		echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v= '. $cacheFile->getModifiedAt()->format("U") . '"></script>';
-	} else
-  {
-//    $fp = $cacheFile->open('w');
-//    fwrite($fp, $js);
-//    fclose($fp);
-  }
-//  echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime, 'lang' => \GO::language()->getLanguage()]) . '"></script>';
-
+	}
 
 	go()->getCache()->set("gouiScripts", $gouiScripts);
 }

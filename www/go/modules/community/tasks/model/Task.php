@@ -759,9 +759,9 @@ class Task extends AclItemEntity {
 			$c->andWhere('task.id', '!=', $this->id);
 		}
 		$tasks = self::find(['id','start', 'estimatedDuration','startTime'])
-			->join('tasks_tasklist','tl','task.tasklistId = tl.id')
+			->join('tasks_tasklist','tlhc','task.tasklistId = tlhc.id')
 			->andWhere($c)
-			->andWhere('tl.role = '. TaskList::Project)
+			->andWhere('tlhc.role = '. TaskList::Project)
 			->all();
 
 		// All day tasks are to be considered conflicting by definition

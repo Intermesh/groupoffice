@@ -84,6 +84,65 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	emptyTextTpl: '<span style="color:#ccc;">{0}</span>',
 	emptyText: '',
 
+	blankText : 'This field is required',
+
+	getErrors: function(value) {
+
+		var errors = Ext.form.HtmlEditor.superclass.getErrors.apply(this, arguments);
+
+		value = Ext.isDefined(value) ? value : this.getValue();
+
+		value = Ext.util.Format.stripTags(value).trim().replace(/\u200B/g,'');
+
+		if (!this.allowBlank && value.length < 1) {
+			errors.push(this.blankText);
+		}
+
+		return errors;
+	},
+
+	markInvalid : function(msg){
+
+		if (this.rendered && !this.preventMark) {
+			msg = msg || this.invalidText;
+
+			var mt = this.getMessageHandler();
+			if(mt){
+				mt.mark(this, msg);
+			}else if(this.msgTarget){
+				this.el.addClass(this.invalidClass);
+				var t = Ext.getDom(this.msgTarget);
+				if(t){
+					t.innerHTML = msg;
+					t.style.display = this.msgDisplay;
+				}
+			}
+		}
+
+		this.setActiveError(msg);
+	},
+
+	clearInvalid : function(){
+
+		if (this.rendered && !this.preventMark) {
+			this.el.removeClass(this.invalidClass);
+			var mt = this.getMessageHandler();
+			if(mt){
+				mt.clear(this);
+			}else if(this.msgTarget){
+				this.el.removeClass(this.invalidClass);
+				var t = Ext.getDom(this.msgTarget);
+				if(t){
+					t.innerHTML = '';
+					t.style.display = 'none';
+				}
+			}
+		}
+
+		this.unsetActiveError();
+	},
+
+
 	registerSubmitKey: function() {
 		var doc = this.getDoc();
 		if (Ext.isGecko){
@@ -302,7 +361,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 					return;
 				}
 
-				if (item.type.match(/^image\//)) {
+				if (item.kind == "file" && item.type.match(/^image\//)) {
 					
 					e.preventDefault();
 					var reader = new FileReader();

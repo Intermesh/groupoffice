@@ -1,4 +1,31 @@
+- Core: Don't require security token check in legacy API when not using cookies for authentication
+- Core: HTML field supports required
+- Tasks: Fixed grouping in combo and showing numeric value. Related to support ticket #32767
+- Email: Raised IMAP and SMTP username database length from 50 to 190
+- Caldav: Fixed sending IMIP email invitations to participants with a comma in them
+- Tasks: Added some indexes to speed up search query
+- Webdav: Removed tickets directory from webdav as it will cause permission issues
+
+29-07-2024: 6.8.62
+- ActiveSync: Restored correct ActiveSync Z-Push version
+
+19-07-2024: 6.8.61
+- Email: Fix attachment problem with ampersands in file name.
+- Email: Display files with ampersands in file name correctly, fix download link.
+
+15-07-2024: 6.8.60
+- Busisess: allow users with mayManageEmployees to update their agreements
+- Core: make conditionally required, required and conditionally hidden mutually exclusive
+
+09-07-2024: 6.8.59
+- caldav/carddav/webdav: Don't log not found as error
 - Workflow: fix error when sending a file without a body.
+- Core: fixed copy pasting images from a Microsoft Word Document in Windows
+- Core: Updated DE translations. Danke, Daniel!
+- Core: bugfix base XLS class: prevent exception when adding numeric array as record
+
+05-07-2024: 6.8.58
+- Support: auto-expire tickets
 
 01-07-2024: 6.8.57
 - Custom fields: Make sure fieldset is not collapsed. This may happen if it was a fieldset before and collapsed by the user.
@@ -9,7 +36,6 @@
 - E-mail: Fixed option "Sort on last contact time"
 - Tasks / support: group task list combo by task list grouping.
 - Bookmarks: allow users with manage permissions to save bookmark categories
-- Support: auto-expire tickets
 
 24-06-2024: 6.8.56
 - E-mail: Fixed autocomplete bug where typed text would stick too

@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
   `longitude` decimal(11,8) DEFAULT NULL,
   PRIMARY KEY (`id`),
   INDEX `list_id` (`tasklistId` ASC),
+    INDEX `groupId` (`groupId` ASC),
   INDEX `rrule` (`recurrenceRule`(191) ASC),
   INDEX `uuid` (`uid` ASC),
   INDEX `fkModifiedBy` (`modifiedBy` ASC),
@@ -232,6 +233,7 @@ CREATE TABLE IF NOT EXISTS `tasks_tasklist_group` (
   `tasklistId` INT(11) UNSIGNED NOT NULL,
   `progressChange` TINYINT(2) NULL,
   PRIMARY KEY (`id`, `tasklistId`),
+UNIQUE INDEX `fk_tasks_column_tasks_id_idx` (`id` ASC),
   INDEX `fk_tasks_column_tasks_tasklist1_idx` (`tasklistId` ASC),
   CONSTRAINT `fk_tasks_column_tasks_tasklist1`
     FOREIGN KEY (`tasklistId`)
@@ -329,3 +331,4 @@ alter table tasks_tasklist
     add constraint tasks_tasklist_tasks_tasklist_grouping_null_fk
         foreign key (groupingId) references tasks_tasklist_grouping (id)
             on delete set null;
+

@@ -438,7 +438,7 @@ abstract class Message extends \GO\Base\Model
 			$replaceCount = 0;
 
 			$a = $att->getAttributes();
-
+			$a['name'] = html_entity_decode($a['name']);
 			//add unique token for detecting precense of inline attachment when we submit the message in handleFormInput
 			if(isset($a['tmp_file']) && $a['tmp_file']) {
 				$a['token']=md5($a['tmp_file']);

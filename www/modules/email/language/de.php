@@ -198,7 +198,7 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Ihre Mailbox ist v
   'Subscribe to folders' => 'Ordner abonnieren',
   'Authentication failed for user "%username".' => 'Authentifikation für den Nutzer "%username" fehlgeschlagen.',
   'Please enter try with a different IMAP password.' => 'Versuchen Sie ein alternatives IMAP-Kennwort einzugeben.',
-  'Move to' => 'Verschiebe nach',
+  'Move to' => 'Verschieben nach',
   'Automatically check this folder for new messages' => 'Diesen Ordner automatisch auf neue Nachrichten prüfen',
   'Delete senders from...' => 'Entferne Absender von…',
   'Use account' => 'Verwende Account',
@@ -358,6 +358,11 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Ihre Mailbox ist v
   'Template group' => 'Vorlagen Gruppe',
   'Refresh token' => 'Token aktualisieren',
   'Your token has possibly expired. A new window will be opened in which you can renew your token.' => 'Ihr Token ist möglicherweise abgelaufen. Es wird ein neues Fenster geöffnet, in dem Sie Ihren Token erneuern können.',
-	'' => '',
-
+  '' => '',
+  'Move all' => 'Alle verschieben',
+  'Confirm move' => 'Verschieben bestätigen',
+  'Are you sure you want to move all the emails from the search result? (" + GO.email.messagesGrid.store.reader.jsonData.allUids.length + " emails)' => 'Sind Sie sicher, dass Sie alle Mails aus dem Suchergebnis verschieben möchten?  (" + GO.email.messagesGrid.store.reader.jsonData.allUids.length + " emails)',
+  'Delete all' => 'Alle löschen',
+  'Are you sure you want to delete all the emails from the search result? (" + GO.email.messagesGrid.store.reader.jsonData.allUids.length + " emails)' => 'Sind Sie sicher, dass Sie alle Mails aus dem Suchergebnis löschen möchten? (" + GO.email.messagesGrid.store.reader.jsonData.allUids.length + " emails)',
+  'Save sent mail to the sent folder' => 'Gesendete Mail im sent Ordner speichern',
 );

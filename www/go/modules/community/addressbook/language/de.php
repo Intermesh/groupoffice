@@ -30,7 +30,6 @@ return array (
     'home' => 'Privat',
     'mobile' => 'Mobil',
     'workmobile' => 'Arbeit Mobil',
-    'fax' => 'Fax',
     'workfax' => 'Arbeit Fax',
   ),
   'addressTypes' => 
@@ -151,4 +150,5 @@ return array (
   'Delete %d items' => '%d Objekte löschen',
   'Has phone numbers' => 'Hat Telefonnummern',
   'Has organizations' => 'Hat Organisationen',
+  'Start in' => 'Beginnt in',
 );

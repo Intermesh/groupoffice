@@ -22,7 +22,7 @@ URL=https://www.sourceguardian.com/loaders/download/loaders.linux-${ARCH}.tar.gz
 
 echo "Downloading ${URL}"
 # Download and extract
-mkdir /usr/local/sourceguardian
+mkdir -p /usr/local/sourceguardian
 curl "${URL}" | tar -xzf - -C /usr/local/sourceguardian
 # Find PHP version
 PHP_V=$(php -v)

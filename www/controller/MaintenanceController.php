@@ -11,6 +11,7 @@ use Exception;
 use GO;
 use GO\Base\Controller\AbstractController;
 use GO\Base\Db\PDO;
+use GO\Base\Exception\AccessDenied;
 use go\core\App;
 use go\core\auth\TemporaryState;
 use go\core\db\Table;
@@ -23,6 +24,7 @@ use PDOException;
 use ReflectionClass;
 use go\core\util\ClassFinder;
 use go\core\orm\Entity;
+use ReflectionMethod;
 
 class MaintenanceController extends AbstractController {
 	
@@ -251,20 +253,23 @@ class MaintenanceController extends AbstractController {
 			echo '</pre>';
 		}
 	}
-	
+
 	/**
 	 * Calls buildSearchIndex on each Module class.
-	 * 
+	 *
 	 * You can give a model classname to only build up the searchcache for that model type:
 	 * EG: ?r=maintenance/buildSearchCache&modelName=GO\Savemailas\Model\LinkedEmail
-	 * 
-	 * @return array 
+	 *
+	 * @param array $paramns
+	 * @throws AccessDenied
+	 * @throws Exception
 	 */
-	protected function actionBuildSearchCache($params) {
+	protected function actionBuildSearchCache(array $params) {
 		
-		if(!$this->isCli() && !GO::user()->isAdmin() && GO::router()->getControllerAction()!='upgrade')
+		if(!$this->isCli() && !GO::user()->isAdmin() && GO::router()->getControllerAction()!='upgrade') {
 			throw new \GO\Base\Exception\AccessDenied();
-		
+		}
+
 		GO::setIgnoreAclPermissions(true);
 		GO::session()->runAsRoot();
 
@@ -303,11 +308,15 @@ class MaintenanceController extends AbstractController {
 
 		
 		$response = array();
-				
-		if(!empty($params['modelName'])){;
 
-			if(is_a($params['modelName'], Entity::class, true)){
-				SearchableTrait::rebuildSearchForEntity($params['modelName']);
+		if(!empty($params['modelName'])){;
+			$m = $params['modelName'];
+
+			if(is_a($m, Entity::class, true)){
+				$cls = new ReflectionClass($m);
+				$mthd = $cls->getMethod('rebuildSearchForEntity');
+				$mthd->invoke($cls->newInstance(), $m);
+//				SearchableTrait::rebuildSearchForEntity($params['modelName']);
 			}else {
 				$models = array(new ReflectionClass($params['modelName']));
 
@@ -317,7 +326,7 @@ class MaintenanceController extends AbstractController {
 					}
 				}
 			}
-		}else {
+		} else {
 			GO::modules()->callModuleMethod('buildSearchCache', array(&$response));
 			go()->rebuildSearch();
 		}

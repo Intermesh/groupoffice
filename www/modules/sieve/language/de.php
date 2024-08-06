@@ -143,4 +143,7 @@ return array (
   'From matches' => 'Absender entspricht',
   'To matches' => 'Empfänger entspricht',
   'matches' => 'entspricht',
+  'Is from mailing list' => 'ist von der Mailingliste',
+  'exist' => 'existiert',
+  'Mailing list' => 'Mailingliste',
 );
