@@ -16,18 +16,20 @@ class EntityControllerTest extends TestCase {
         "client-id" => [
           'propA' => 'testOtherA',
           'propB' => 'testOtherB',
+	        'propE' => 'testOtherE',
           'testSaveOtherModel' => true //this will make it create a second model
         ],
 	      "client-id2" => [
 		      'propA' => 'testOtherA',
 		      'propB' => 'testOtherB',
+		      'propE' => 'testOtherE',
 		      'testSaveOtherModel' => true //this will make it create a second model
 	      ]
       ]
     ]);
-   
 
-    $this->assertEquals(4, count($result['created']));
+
+    $this->assertEquals(4, isset($result['created']) ? count($result['created']) : false);
 
     $createdIds = array_map(function($mod){return $mod['id'];}, $result['created']);
     sort($createdIds);
@@ -38,7 +40,7 @@ class EntityControllerTest extends TestCase {
 
     sort($result['changed']);
 
-    $this->assertEquals(4, count($result['changed']));
+    $this->assertEquals(4, isset($result['changed']) ? count($result['changed']) : false);
     $this->assertEquals($createdIds, $result['changed']);
 
 

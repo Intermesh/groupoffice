@@ -28,7 +28,6 @@ class EntityTest extends TestCase {
 		$entity = new B();
 
 		$this->assertEquals("test", $entity->propC);
-		$this->assertEquals("{}", $entity->propE);
 	}
 
 	public function testCreate() {

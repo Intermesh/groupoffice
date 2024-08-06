@@ -23,7 +23,7 @@ class B extends A {
 
 	public string $propC;
 
-	public string $propE;
+	public string $propE = "defaultE";
 	
 	public ?int $cId;
 	
@@ -89,6 +89,7 @@ class B extends A {
 			$other = new self;
 			$other->propA = 'other';
 			$other->propB = 'other';
+			$other->propE = 'other';
 			if(!$other->save()) {
 				$this->setValidationError('testSaveOtherModel', ErrorCode::GENERAL, 'Could not save other model: '. var_export($other->getValidationErrors(), true));
 			}
