@@ -329,3 +329,10 @@ alter table tasks_tasklist
     add constraint tasks_tasklist_tasks_tasklist_grouping_null_fk
         foreign key (groupingId) references tasks_tasklist_grouping (id)
             on delete set null;
+
+
+create index tasks_task_start_index
+    on tasks_task (start);
+
+create index tasks_tasklist_name_index
+    on tasks_tasklist (name);
