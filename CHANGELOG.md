@@ -3,6 +3,8 @@
 - Tasks: Fixed grouping in combo and showing numeric value. Related to support ticket #32767
 - Email: Raised IMAP and SMTP username database length from 50 to 190
 - Caldav: Fixed sending IMIP email invitations to participants with a comma in them
+- Tasks: Added some indexes to speed up search query
+- Webdav: Removed tickets direcory from webdav as it will cause permission issues
 
 29-07-2024: 6.8.62
 - ActiveSync: Restored correct ActiveSync Z-Push version
