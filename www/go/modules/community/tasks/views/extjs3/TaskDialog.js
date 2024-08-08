@@ -21,7 +21,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 		if(!this.currentId && this.commentComposer) {//} && this.role == "support") {
 			this.commentComposer.show();
-			this.commentComposer.allowBlank = false;
+			this.commentComposer.editor.allowBlank = false;
 			if(this.role == "support") {
 				this.descriptionFieldset.hide();
 			}
@@ -37,7 +37,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		} else
 		{
 			this.commentComposer.hide();
-			this.commentComposer.allowBlank = true;
+			this.commentComposer.editor.allowBlank = true;
 			this.descriptionFieldset.show();
 		}
 	},
