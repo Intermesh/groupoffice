@@ -15,11 +15,13 @@ use go\core\util\JSON;
  */
 class Client {
 
-  private CurlHandle|false $curl;
+  protected CurlHandle|false $curl;
 
   public array $baseParams = [];
 
   private array $lastHeaders = [];
+	protected $headers = [];
+
 
 	/**
 	 * @return false|CurlHandle
@@ -49,8 +51,6 @@ class Client {
   {
     return curl_setopt($this->getCurl(), $option, $value);
 	}
-
-	private $headers = [];
 
 	public function setHeader(string $name, string $value): Client
 	{
@@ -227,7 +227,7 @@ class Client {
      curl_close($this->curl);
   }
 
-	private function getHeadersForCurl(): array
+	protected function getHeadersForCurl(): array
 	{
 		$s = [];
 		foreach($this->headers as $key => $value) {
