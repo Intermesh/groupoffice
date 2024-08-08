@@ -265,6 +265,10 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 			}
 			return $value;
 		} else if($value instanceof ArrayObject) {
+			if(!$value->count()) {
+				// to support ArrayObject->serializeJsonAsObject
+				return $value;
+			}
 			$arr = $value->getArray();
 			foreach ($arr as $key => $v) {
 				$arr[$key] = static::convertValueToArray($v);

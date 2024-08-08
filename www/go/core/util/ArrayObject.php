@@ -116,7 +116,7 @@ class ArrayObject extends CoreArrayObject implements JsonSerializable {
 	#[\ReturnTypeWillChange]
 	public function jsonSerialize()
 	{
-		if($this->serializeJsonAsObject && empty($this)) 
+		if($this->serializeJsonAsObject && !$this->count())
 		{
 			return new stdClass;
 		} 
