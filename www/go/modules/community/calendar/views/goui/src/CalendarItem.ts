@@ -91,7 +91,7 @@ export class CalendarItem {
 		//if(!obj.end) {
 			this.end = this.start.clone().add(new DateInterval(this.patched.duration!));
 		//}
-		this.cal = calendarStore.items.find((c:any) => c.id == this.patched.calendarId);
+		this.cal = calendarStore.find((c:any) => c.id == this.patched.calendarId);
 
 		this.initStart = this.start.format('Y-m-d\TH:i:s');
 		this.initEnd = this.end.format('Y-m-d\TH:i:s');
@@ -186,7 +186,7 @@ export class CalendarItem {
 		const icons = [...this.extraIcons];
 		//if(e.recurrenceRule) icons.push('refresh');
 		if(e.links) icons.push('attachment');
-		//if(e.alerts) icons.push('notifications');
+		if(e.alerts) icons.push('notifications');
 		if(this.isTentative) icons.push('question_mark');
 		if(!!e.participants) icons.push('group');
 
