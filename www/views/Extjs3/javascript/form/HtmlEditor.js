@@ -86,6 +86,8 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 	blankText : 'This field is required',
 
+	allowBlank: true,
+
 	getErrors: function(value) {
 
 		var errors = Ext.form.HtmlEditor.superclass.getErrors.apply(this, arguments);
