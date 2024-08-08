@@ -262,7 +262,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event_alert` (
 CREATE TABLE IF NOT EXISTS `calendar_recurrence_override` (
 	`fk` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`recurrenceId` DATETIME NOT NULL COMMENT '@dbType=localdatetime',
-	`patch` MEDIUMTEXT NOT NULL DEFAULT '{}',
+	`patch` MEDIUMTEXT NOT NULL,
 	PRIMARY KEY (`fk`, `recurrenceId`),
 	INDEX `fk_recurrence_override_calendar_event1_idx` (`fk` ASC),
 	CONSTRAINT `fk_recurrence_override_calendar_event1`
@@ -396,17 +396,15 @@ CREATE TABLE IF NOT EXISTS calendar_preferences (
 ) COLLATE = utf8mb4_unicode_ci;
 
 
-CREATE TABLE IF NOT EXISTS `calendar_event_custom_fields` (
-	`id` INT UNSIGNED NOT NULL,
-	PRIMARY KEY (`id`),
-	CONSTRAINT `fk_calendar_event_cf1` FOREIGN KEY (`id`) REFERENCES `calendar_event` (`eventId`) ON DELETE CASCADE
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+CREATE TABLE calendar_event_custom_fields LIKE cal_events_custom_fields;
+ALTER TABLE calendar_event_custom_fields CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL;
+ALTER TABLE `calendar_event_custom_fields`
+	ADD CONSTRAINT `calendar_event_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `calendar_event` (`eventId`) ON DELETE CASCADE;
 
-CREATE TABLE IF NOT EXISTS `calendar_calendar_custom_fields` (
-	`id` INT UNSIGNED NOT NULL,
-	PRIMARY KEY (`id`),
-	CONSTRAINT `fk_calendar_cf1` FOREIGN KEY (`id`) REFERENCES `calendar_calendar` (`id`) ON DELETE CASCADE
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+CREATE TABLE calendar_calendar_custom_fields LIKE cal_calendars_custom_fields;
+ALTER TABLE calendar_calendar_custom_fields CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL;
+ALTER TABLE `calendar_calendar_custom_fields`
+	ADD CONSTRAINT `calendar_calendar_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `calendar_calendar` (`id`) ON DELETE CASCADE;
 
 -- missing: (fields, show_not_as_busy)
 INSERT INTO calendar_resource_group
@@ -447,7 +445,7 @@ INSERT INTO calendar_event
 	 privacy,status,recurrenceRule,lastOccurrence,createdAt,modifiedAt, createdBy, modifiedBy, isOrigin, replyTo, requestStatus) SELECT
 	id, 'Group-Office', uuid, 1, name, description, location, all_day_event, FROM_UNIXTIME(start_time), timezone, CONCAT('PT',end_time - IF(all_day_event, start_time - 60, start_time),'S'), 0,
 	IF(private=1, 'private', 'public'), LOWER(status), IF(rrule='',null,rrule), FROM_UNIXTIME(end_time), FROM_UNIXTIME(ctime), FROM_UNIXTIME(mtime), user_id, muser_id, 1, '',''
-FROM cal_events WHERE exception_for_event_id = 0 AND is_organizer = 1 GROUP BY uuid, start_time;
+FROM cal_events WHERE exception_for_event_id = 0 AND is_organizer = 1 GROUP BY uuid;
 
 -- insert the events that have no organizer
 INSERT INTO calendar_event
@@ -455,7 +453,7 @@ INSERT INTO calendar_event
  privacy,status,recurrenceRule,lastOccurrence,createdAt,modifiedAt, createdBy, modifiedBy, isOrigin, replyTo, requestStatus) SELECT
  id, 'Group-Office', uuid, 1, name, description, location, all_day_event, FROM_UNIXTIME(start_time), timezone, CONCAT('PT',end_time - IF(all_day_event, start_time - 60, start_time),'S'), 0,
  IF(private=1, 'private', 'public'), LOWER(status), IF(rrule='',null,rrule), FROM_UNIXTIME(end_time), FROM_UNIXTIME(ctime), FROM_UNIXTIME(mtime), user_id, muser_id, 0, '',''
-FROM cal_events WHERE exception_for_event_id = 0 GROUP BY uuid, start_time HAVING SUM(is_organizer) = 0;
+FROM cal_events WHERE exception_for_event_id = 0 GROUP BY uuid HAVING SUM(is_organizer) = 0;
 
 INSERT INTO calendar_calendar_event
 (id, eventId, calendarId)
@@ -472,7 +470,8 @@ INSERT INTO calendar_event_category
 	(eventId, categoryId) SELECT
 	id, category_id FROM cal_events old JOIN calendar_event new ON new.eventId = old.id where category_id > 0 GROUP BY new.uid, old.category_id ;
 
-INSERT INTO calendar_event_custom_fields SELECT * FROM cal_events_custom_fields;
+INSERT IGNORE INTO calendar_event_custom_fields SELECT * FROM cal_events_custom_fields;
+INSERT IGNORE INTO calendar_calendar_custom_fields SELECT * FROM cal_calendars_custom_fields;
 
 -- calendar_event_location and calendar_event_related are unused for now.
 
@@ -495,8 +494,5 @@ CONCAT('Calendar:',c.id), r.id as eventId, c.name,u.email , 'resource', 0 ,IF(e.
 	 JOIN cal_events r ON e.resource_event_id = r.id
 WHERE c.group_id != 1 AND e.resource_event_id IS NOT NULL;
 
-INSERT IGNORE INTO calendar_recurrence_override
-	(fk, recurrenceId, patch) SELECT
-	event_id,FROM_UNIXTIME(time), '{"excluded":true}' FROM cal_exceptions e JOIN calendar_event ce ON ce.eventId = e.event_id WHERE exception_event_id=0;
 
 INSERT INTO calendar_preferences (userId, weekViewGridSnap, defaultCalendarId) SELECT user_id, 15, calendar_id FROM cal_settings s JOIN core_user u ON u.id = s.user_id;
