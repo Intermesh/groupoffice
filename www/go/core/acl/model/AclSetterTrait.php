@@ -98,7 +98,7 @@ trait AclSetterTrait {
 	 * ]);
 	 * ```
 	 */
-	public function setAcl(?array $acl)
+	public function setAcl(array|ArrayObject|null $acl)
 	{
 		$this->setAcl = $acl;
 	}
