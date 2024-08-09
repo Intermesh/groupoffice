@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 		die("Failed to send request!" . curl_error($ch));
 	}
 
-	$responses = json_decode($result, true);
+	$responses = json_decode($result, true, 512, JSON_THROW_ON_ERROR);
 
     $success = $responses[0][1]['updated'][1]['settings']['maintenanceMode'] ??  false;
 

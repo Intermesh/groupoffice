@@ -196,7 +196,7 @@ class PdfTemplateRenderer extends PdfRenderer {
 	 *
 	 * $pdf->render()->Output($file->getPath(), "F");
 	 *
-	 * @return PdfTemplateRenderer
+	 * @return PdfRenderer
 	 * @throws Exception
 	 */
 	public function render() {

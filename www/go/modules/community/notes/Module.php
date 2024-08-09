@@ -113,7 +113,7 @@ class Module extends core\Module {
 		if(!isset(static::$demoTexts )) {
 			static::$demoTexts = [];
 			for($i = 0; $i < 20; $i++) {
-				static::$demoTexts [] = nl2br($faker->realtext);
+				static::$demoTexts [] = nl2br($faker->realText());
 			}
 		}
 

@@ -33,7 +33,8 @@ class ClassFinder {
 		
 		if($ns === null) {
 			$ns = ['go\\core'];		
-			
+
+			/** @var Module[] $modules */
 			$modules = Module::find()->where(['enabled' => true]);
 			foreach ($modules as $module) {
 				if(!isset($module->package) || $module->package == "core" ||  !$module->isAvailable()) {
@@ -79,7 +80,7 @@ class ClassFinder {
 	/**
 	 * Find all classes
 	 * 
-	 * @param string[] Full class name without leading "\" eg. ["IFW\App"]
+	 * @return string[] Full class name without leading "\" eg. ["IFW\App"]
 	 */
 	public function find(): array
 	{

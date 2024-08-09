@@ -40,6 +40,7 @@ class Module extends core\Module {
 
 	public static function onUserValidate(User $user)
 	{
+        /** @phpstan-ignore-next-line */
 		if($user->isModified(['otp']) && !$user->otp) {
 			// Prevent validation errors when admin tries to disable OTP for non-admin users
 			if (go()->getAuthState()->isAdmin() && go()->getUserId() !== $user->id) {
@@ -91,19 +92,14 @@ class Module extends core\Module {
 	/**
 	 * Get the blob id of the QR code image
 	 *
-	 * @param string $name
-	 * @param string $secret
-	 * @param string $title
-	 * @param array $params
-	 *
-	 * @return boolean/string
+	 * @return void
 	 */
 	public function downloadQr() {
 
 		$user = go()->getAuthState()->getUser();
 
 		header("Content-Type: image/png");
-
+        /** @phpstan-ignore-next-line */
 		$user->otp->outputQr();
 
 
