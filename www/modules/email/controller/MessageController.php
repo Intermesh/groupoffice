@@ -1300,6 +1300,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$imapMessage->createTempFilesForAttachments();
 		}
 
+		$imapMessage->autoLink();
+
 		$plaintext = !empty($params['plaintext']);
 
 		$response = $imapMessage->toOutputArray(!$plaintext,false,$params['no_max_body_size']);
@@ -1316,7 +1318,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 
 			$response = $this->_blockImages($params, $response);
-			$imapMessage->autoLink();
+
 
 			$response = $this->_handleInvitations($imapMessage, $params, $response);
 			
