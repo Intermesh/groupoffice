@@ -5,6 +5,8 @@
 - Caldav: Fixed sending IMIP email invitations to participants with a comma in them
 - Tasks: Added some indexes to speed up search query
 - Webdav: Removed tickets directory from webdav as it will cause permission issues
+- Email: Autolink checks didn't show when viewing for the first time
+- Caldav: Include sabre/dav iCalendar Export Plugin #1169
 
 29-07-2024: 6.8.62
 - ActiveSync: Restored correct ActiveSync Z-Push version
