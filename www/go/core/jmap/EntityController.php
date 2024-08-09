@@ -421,9 +421,11 @@ abstract class EntityController extends Controller {
 
 		if(!empty($params['ids'])) {
 			$params['ids'] = array_unique($params['ids']);
-//			$params['ids'] = array_filter($params['ids'], function($id) {
-//				return !empty($id);
-//			});
+
+			//ignore null as ID. Might happen with JMAP result references
+			$params['ids'] = array_filter($params['ids'], function($id) {
+				return !empty($id);
+			});
 		}
 
 		if(!isset($params['properties'])) {
