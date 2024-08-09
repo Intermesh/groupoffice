@@ -92,4 +92,17 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 		return date("L", mktime(0, 0, 0, 1, 1, $year)) ? 366 : 365;
 	}
 
+	/**
+	 * @param \DateTimeInterface $date
+	 * @return \go\core\util\DateTime
+	 * @throws \Exception
+	 */
+	public static function instance(\DateTimeInterface $date): DateTime
+	{
+		if ($date instanceof static) {
+			return clone $date;
+		}
+
+		return new static($date->format('Y-m-d H:i:s.u'), $date->getTimezone());
+	}
 }
