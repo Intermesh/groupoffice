@@ -236,3 +236,17 @@ $updates['202408061358'][] = "create index tasks_tasklist_name_index
 $updates['202401191150'][] = "UPDATE core_acl a join core_entity e on a.entityTypeId = e.id 
 SET a.entityTypeId = (SELECT id FROM core_entity WHERE clientName = 'Tasklist')
 WHERE e.clientName = 'TasklistCompat';";
+
+$updates['202408091228'][] = "ALTER TABLE `tasks_tasklist` 
+ADD COLUMN `defaultColor` VARCHAR(21) NOT NULL DEFAULT '' AFTER `createdBy`,
+ADD COLUMN `highestItemModSeq` VARCHAR(32) NOT NULL DEFAULT 0 AFTER `defaultColor`;";
+
+$updates['202408091228'][] = "ALTER TABLE `tasks_tasklist` DROP COLUMN `version`;";
+$updates['202408091228'][] = "ALTER TABLE `tasks_tasklist_user` CHANGE COLUMN `color` `color` VARCHAR(21) NULL DEFAULT NULL ;";
+$updates['202408091228'][] = "ALTER TABLE `tasks_tasklist_user` CHANGE COLUMN `modSeq` `modSeq` INT NOT NULL DEFAULT 0 ;";
+// set random default color for the color field
+$updates['202408091228'][] = "UPDATE tasks_tasklist SET defaultColor = SUBSTRING('#CDAD00#E74C3C#9B59B6#8E44AD#2980B9#3498DB#1ABC9C#16A085#27AE60#2ECC71#F1C40F#F39C12#E67E22#D35400#95A5A6#34495E#808B96#1652a1', (id MOD 18) * 7 + 2 ,6);";
+// subscribe to the tasklists the user owns
+$updates['202408091228'][] = "INSERT IGNORE INTO tasks_tasklist_user
+(tasklistId, userId, isSubscribed, isVisible, color, sortOrder, modSeq) SELECT
+	id, ownerId, 1, 1, defaultColor, 0, 1 FROM tasks_tasklist;";

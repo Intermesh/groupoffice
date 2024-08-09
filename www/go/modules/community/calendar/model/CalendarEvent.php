@@ -333,18 +333,9 @@ class CalendarEvent extends AclItemEntity {
 		$blob = isset($this->veventBlobId) ? Blob::findById($this->veventBlobId) : null;
 		if(!$blob || $blob->modifiedAt < $this->modifiedAt) {
 			$blob = ICalendarHelper::makeBlob($this);
-			$this->attachBlob($blob->id);
-
+			$this->veventBlobId = $blob->id;
 			if(!$this->isNew()) {
-				$this->veventBlobId = $blob->id;
 				$this->save();
-				// save the blobId without updating the state (this property is not part of the spec
-//				$stmt = go()->getDbConnection()->update('calendar_event_user',
-//					['veventBlobId'=>$blob->id, 'modifiedAt'=>$blob->modifiedAt],
-//					(new Query)
-//						->join('calendar_calendar_event', 'cce', 'cce.eventId = t.id')
-//						->where(['userId' => go()->getUserId(), 'cce.id' => $this->id]));
-//				$stmt->execute();
 			}
 		}
 		return $blob;
