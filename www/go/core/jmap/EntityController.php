@@ -503,9 +503,10 @@ abstract class EntityController extends Controller {
 			if($this->canRead($e)) {
 				try {
 					$arr = $e->toArray();
-					$id = $e->id();
-					$unsorted[$id] = $arr;
-					$foundIds[] = $id;
+					// make sure the entity result has an ID property. Otherwise it's difficult to identify objects in the "list" array.
+					$arr['id'] = $e->id();
+					$unsorted[$arr['id']] = $arr;
+					$foundIds[] = $arr['id'];
 				} catch(\Throwable $e) {
 					ErrorHandler::logException($e);
 				}
