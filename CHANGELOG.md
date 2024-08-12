@@ -7,6 +7,7 @@
 - Webdav: Removed tickets directory from webdav as it will cause permission issues
 - Email: Autolink checks didn't show when viewing for the first time
 - Caldav: Include sabre/dav iCalendar Export Plugin #1169
+- Studio: generate title() method properly in backend code. #1166
 
 29-07-2024: 6.8.62
 - ActiveSync: Restored correct ActiveSync Z-Push version
