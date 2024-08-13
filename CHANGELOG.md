@@ -1,3 +1,7 @@
+- Core: PHP 8.2 compatibility fix
+- Core: Fixed combobox not loading value in Account dialog causing DB error
+
+12-08-2024: 6.8.63
 - Core: Don't require security token check in legacy API when not using cookies for authentication
 - Core: HTML field supports required
 - Tasks: Fixed grouping in combo and showing numeric value. Related to support ticket #32767
@@ -5,6 +9,9 @@
 - Caldav: Fixed sending IMIP email invitations to participants with a comma in them
 - Tasks: Added some indexes to speed up search query
 - Webdav: Removed tickets directory from webdav as it will cause permission issues
+- Email: Autolink checks didn't show when viewing for the first time
+- Caldav: Include sabre/dav iCalendar Export Plugin #1169
+- Studio: generate title() method properly in backend code. #1166
 
 29-07-2024: 6.8.62
 - ActiveSync: Restored correct ActiveSync Z-Push version
