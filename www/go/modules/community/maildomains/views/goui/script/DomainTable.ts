@@ -32,14 +32,6 @@ export class DomainTable extends Table<DataSourceStore> {
 				modifier: {
 					path: "modifiedBy",
 					dataSource: jmapds("UserDisplay")
-				},
-				mailaccounts: {
-					dataSource: jmapds("MailBox"),
-					path: "mailboxes"
-				},
-				mailaliases: {
-					dataSource: jmapds("MailAlias"),
-					path: "aliases"
 				}
 
 			}
