@@ -312,9 +312,13 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 		var me = this;
 
+
+		me.value = value;
+
 		if(this.setValuePromise) {
 			await this.setValuePromise;
 		}
+
 		this.setValuePromise = new Promise(function(resolve, reject) {
 
 			//hack for old framework where relations are "0" instead of null.
@@ -332,8 +336,6 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 			//create record from entity store if not exists
 			if (me.store && me.store.entityStore && me.store.entityStore.entity && !me.findRecord(me.valueField, value)) {
-
-				me.value = value;
 
 				me.resolveEntity(value).then(function (entity) {
 					//this prevents the list to expand on loading the value
