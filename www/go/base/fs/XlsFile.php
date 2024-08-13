@@ -222,6 +222,9 @@ class XlsFile extends File
 	{
 		
 		foreach ($fields as $colNr=>$field) {
+			if(array_is_list($fields)) {
+				$colNr++;
+			}
 			if (empty($this->columnWidths[$colNr]) || $this->columnWidths[$colNr]<strlen($field)) {
 				$this->columnWidths[$colNr] = strlen($field);
 				$this->phpExcelObj->getSheet($this->sheetNr)->getColumnDimensionByColumn($colNr)->setWidth($this->columnWidths[$colNr]);

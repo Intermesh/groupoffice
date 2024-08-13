@@ -308,9 +308,16 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 		return this.store.entityStore.single(value);
 	},
 	
-	setValue: function (value) {
+	setValue: async function (value) {
 
 		var me = this;
+
+
+		me.value = value;
+
+		if(this.setValuePromise) {
+			await this.setValuePromise;
+		}
 
 		this.setValuePromise = new Promise(function(resolve, reject) {
 
@@ -329,8 +336,6 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 			//create record from entity store if not exists
 			if (me.store && me.store.entityStore && me.store.entityStore.entity && !me.findRecord(me.valueField, value)) {
-
-				me.value = value;
 
 				me.resolveEntity(value).then(function (entity) {
 					//this prevents the list to expand on loading the value

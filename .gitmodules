@@ -7,3 +7,4 @@
 [submodule "www/go/modules/community/activesync/Z-Push"]
 	path = www/go/modules/community/activesync/Z-Push
 	url = git@github.com:Intermesh/Z-Push.git
+	branch = develop
