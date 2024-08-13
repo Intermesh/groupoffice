@@ -18,6 +18,7 @@ use go\core\ErrorHandler;
 use go\core\model\Module;
 use go\modules\community\calendar\model\CalDAVBackend;
 use go\modules\community\carddav\Backend as CardDAVBackend;
+use Sabre\CalDAV\ICSExportPlugin;
 use Sabre\CardDAV;
 use Sabre\CalDAV;
 use Sabre\DAV\Auth;
@@ -63,7 +64,8 @@ $aclPlugin->allowUnauthenticatedAccess = false;
 $server->addPlugin($aclPlugin);
 $server->addPlugin(new CalDAV\Schedule\Plugin());
 $server->addPlugin(new go\core\dav\schedule\IMipPlugin(go()->getSettings()->systemEmail));
-$server->addPlugin(new Browser\Plugin(false)); // Support for html frontend
+$server->addPlugin(new Browser\Plugin(false)); // Support for html frontend// iCalendar Export Plugin
+$server->addPlugin( new ICSExportPlugin());
 
 // And off we go!
 $server->start();
