@@ -1,5 +1,7 @@
 /* global go */
 
+GO.systemSettingsPanels = [];
+
 /** 
  * Copyright Intermesh
  * 
@@ -148,7 +150,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	},
 	
 	loadModulePanels : function() {
-		var available = go.Modules.getAvailable(), config, pnl, i, i1, sepAdded = false;
+		var available = go.Modules.getAvailable(), config, pnl, i, i1, l2, sepAdded = false;
 
 		for(i = 0, l = available.length; i < l; i++) {
 
@@ -175,6 +177,19 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 				});
 			}
 		}
+
+		GO.systemSettingsPanels.forEach((pnl) => {
+
+			var menuRec = new Ext.data.Record({
+				itemId: pnl.itemId,
+				name: pnl.title,
+				iconCls: pnl.iconCls
+			});
+
+			this.tabStore.add(menuRec);
+
+			this.tabPanel.add(pnl);
+		})
 	},
 
 	setActiveItem: function(itemId) {
