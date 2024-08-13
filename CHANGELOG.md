@@ -1,3 +1,5 @@
+- Core: PHP 8.2 compatibility fix
+
 12-08-2024: 6.8.63
 - Core: Don't require security token check in legacy API when not using cookies for authentication
 - Core: HTML field supports required
