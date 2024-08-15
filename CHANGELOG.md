@@ -1,3 +1,4 @@
+13-08-2024: 6.8.64
 - Core: PHP 8.2 compatibility fix
 - Core: Fixed combobox not loading value in Account dialog causing DB error
 
