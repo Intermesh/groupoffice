@@ -42,8 +42,6 @@ export class DomainDialog extends FormWindow {
 	private totalQuotaFld: NumberField;
 	private defaultQuotaFld: NumberField;
 
-	private entity: DefaultEntity | undefined;
-
 	constructor() {
 		super("MailDomain");
 
@@ -71,8 +69,7 @@ export class DomainDialog extends FormWindow {
 					name: "domain",
 					id: "domain",
 					label: t("Domain"),
-					required: true,
-					readOnly: !!this.currentId,
+					required: true
 				}),
 				textfield({
 					name: "description",
@@ -103,6 +100,7 @@ export class DomainDialog extends FormWindow {
 					name: "defaultQuota",
 					id: "defaultQuota",
 					label: t("Default quota (MB)"),
+					multiplier: 1 / (1024 * 1024), // convert bytes to MB
 					decimals: 0,
 					required: true,
 					value: 0
@@ -112,6 +110,7 @@ export class DomainDialog extends FormWindow {
 					name: "totalQuota",
 					id: "totalQuota",
 					label: t("Max quota (MB)"),
+					multiplier: 1 / (1024 * 1024), // convert bytes to MB
 					decimals: 0,
 					required: true,
 					value: 0
@@ -136,7 +135,9 @@ export class DomainDialog extends FormWindow {
 
 		this.on("ready", async () => {
 			if (this.currentId) {
-				const d = await jmapds("MailDomain").single(this.currentId);
+
+				this.form.findField("domain")!.disabled = true;
+
 				this.mailboxGrid!.store.queryParams.filter = {
 					domainId: this.currentId
 				};
@@ -153,26 +154,17 @@ export class DomainDialog extends FormWindow {
 
 				this.dnsSettingsTab!.disabled = false;
 
-				this.defaultQuotaFld.value! /= 1024;
-				this.totalQuotaFld.value! /= 1024;
+				const toolbar = this.form.items.last();
 
-				this.entity = d;
+				toolbar!.items.insert(0, btn({
+					text: t("Export"),
+					handler: (_btn) => {
+						this.openExportDlg(this.form.value);
+					}}));
 
-				if(d) {
-					const toolbar = this.form.items.last();
-					toolbar!.items.insert(0, btn({
-						text: t("Export"),
-						handler: (_btn) => {
-							this.openExportDlg(d);
-						}}));
-				}
 			}
 		});
 
-		this.form.on("beforesave", (_f, v) => {
-			v.defaultQuota *= 1024;
-			v.totalQuota *= 1024;
-		});
 	}
 
 	private createMailboxesTab() {
@@ -284,7 +276,13 @@ export class DomainDialog extends FormWindow {
 
 	private async openMailboxDlg(id?: EntityID): Promise<void> {
 		const dlg = new MailboxDialog();
-		dlg.entity = this.entity;
+
+		const d = this.form.value;
+		dlg.form.value = {
+			domainId: d.id,
+			domain: this.form.findField("domain")!.value,
+			quota:  d.defaultQuota
+		};
 		dlg.show();
 		if (id) {
 			await dlg.load(id);
@@ -293,7 +291,12 @@ export class DomainDialog extends FormWindow {
 
 	private async openAliasDlg(id?: EntityID): Promise<void> {
 		const dlg = new AliasDialog();
-		dlg.entity = this.entity;
+
+		const d = this.form.value;
+		dlg.form.value = {
+			domainId: d.id,
+			domain: this.form.findField("domain")!.value
+		}
 		dlg.show();
 		if (id) {
 			await dlg.load(id);

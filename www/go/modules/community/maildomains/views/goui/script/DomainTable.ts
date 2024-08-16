@@ -72,24 +72,24 @@ export class DomainTable extends Table<DataSourceStore> {
 				resizable: true,
 				sortable: true
 			}),
-			column({
-				header: t("Aliases"),
-				id: "maxAliases",
-				sortable: false,
-				width: 120,
-				renderer: (v, record) => {
-					return record.aliases.length + "/" + (v > 0 ? v : t("Unlimited"));
-				}
-			}),
-			column({
-				header: t("Mailboxes"),
-				id: "maxMailboxes",
-				sortable: false,
-				width: 120,
-				renderer: (v, record) => {
-					return record.mailboxes.length + "/" + (v > 0 ? v : t("Unlimited"));
-				}
-			}),
+			// column({
+			// 	header: t("Aliases"),
+			// 	id: "maxAliases",
+			// 	sortable: false,
+			// 	width: 120,
+			// 	renderer: (v, record) => {
+			// 		return record.aliases.length + "/" + (v > 0 ? v : t("Unlimited"));
+			// 	}
+			// }),
+			// column({
+			// 	header: t("Mailboxes"),
+			// 	id: "maxMailboxes",
+			// 	sortable: false,
+			// 	width: 120,
+			// 	renderer: (v, record) => {
+			// 		return record.mailboxes.length + "/" + (v > 0 ? v : t("Unlimited"));
+			// 	}
+			// }),
 			column({
 				header: t("Quota"),
 				id: "totalQuota",

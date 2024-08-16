@@ -13,7 +13,7 @@ import {
 import {client, jmapds} from "@intermesh/groupoffice-core";
 
 export class MailboxExportDialog extends Window {
-	private entity: DefaultEntity|undefined;
+	private domainEntity: DefaultEntity|undefined;
 
 	private form: Form|undefined
 
@@ -75,8 +75,8 @@ export class MailboxExportDialog extends Window {
 	}
 
 	public load(domainEntity: DefaultEntity, ids: Array<EntityID>) {
-		this.entity = domainEntity;
-		this.title = t("Export domain:") + " " + this.entity!.domain;
+		this.domainEntity = domainEntity;
+		this.title = t("Export domain:") + " " + this.domainEntity!.domain;
 		this.form!.value = {ids: ids};
 	}
 }

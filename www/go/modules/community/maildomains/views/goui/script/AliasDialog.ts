@@ -8,7 +8,6 @@ import {
 import {FormWindow} from "@intermesh/groupoffice-core";
 
 export class AliasDialog extends FormWindow {
-	public entity: DefaultEntity|undefined;
 	constructor() {
 		super("MailAlias");
 
@@ -32,17 +31,10 @@ export class AliasDialog extends FormWindow {
 						name: "domain",
 						id: "domain",
 						label: t("Domain"),
-						disabled: true,
+						readOnly: true,
 						icon: "alternate_email"
 					}),
 				),
-				textfield({
-					name: "domainId",
-					id: "domainId",
-					readOnly: true,
-					required: true,
-					hidden: true
-				}),
 				textfield({
 					name: "goto",
 					id: "goto",
@@ -53,30 +45,35 @@ export class AliasDialog extends FormWindow {
 					label: t("Active"),
 					name: "active",
 					id: "active",
-					type: "switch"
+					type: "switch",
+					value: true
 				}),
 			)
 		);
 
 		this.on("ready", async () => {
-			this.form.findField("domainId")!.value = this.entity!.id;
-			if (!this.currentId) {
-				this.form.findField("active")!.value = true
-			} else {
-				let address = this.form.findField("address")!.value as String;
+
+			if (this.currentId) {
+				const idField = 	this.form.findField("address")!;
+				let address = idField.value as String;
 				if (address.indexOf("@") > -1) {
 					address = address.split("@")[0];
 					if(address.length === 0) {
 						address = "*";
 					}
 				}
-				this.form.findField("address")!.value = address;
+				idField.value = address;
+
+				idField.disabled = true;
+
+				this.form.trackReset();
 			}
-			this.form.findField("domain")!.value = this.entity!.domain;
 		});
 
 		this.form.on("beforesave", (f, v) => {
-			v.address = v.address+"@"+this.entity!.domain;
+			if(!this.currentId) {
+				v.address = v.address + "@" + this.form.findField("domain")!.value;
+			}
 		});
 	}
 

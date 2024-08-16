@@ -9,7 +9,7 @@ import {
 import {FormWindow} from "@intermesh/groupoffice-core";
 
 export class MailboxDialog extends FormWindow {
-	public entity: DefaultEntity|undefined;
+	public domainEntity: DefaultEntity|undefined;
 
 	private usernameFld: TextField;
 	private passwordFld: TextField;
@@ -50,13 +50,7 @@ export class MailboxDialog extends FormWindow {
 					id: "name",
 					required: true,
 				}),
-				textfield({
-					name: "domainId",
-					id: "domainId",
-					readOnly: true,
-					required: true,
-					hidden: true
-				}),
+
 				this.passwordFld = textfield({
 					name: "password",
 					id: "password",
@@ -110,6 +104,7 @@ export class MailboxDialog extends FormWindow {
 					decimals: 0,
 					value: 0,
 					required: true,
+					multiplier: 1 / (1024 * 1024) // convert bytes to MB
 				}),
 				checkbox({
 					label: t("Active", "community", "maildomains"),
@@ -134,35 +129,28 @@ export class MailboxDialog extends FormWindow {
 		);
 
 		this.on("ready", async  () => {
-			this.form.findField("domain")!.value = this.entity!.domain;
 			if (this.currentId) {
-				this.usernameFld.readOnly = true;
-				const username = String(this.usernameFld.value);
+				this.usernameFld.disabled = true;
+				const username = this.usernameFld.value as string;
 				if (username.indexOf("@") >-1) {
 					this.usernameFld.value = username.split("@")[0];
 				}
 				this.passwordFld.required = false;
 				this.passwordConfirmFld.required = false;
 				this.passwordFld.value = "";
-				this.quotaFld.value! /= 1024;
-			} else {
-				this.form.findField("domainId")!.value = this.entity!.id;
-				this.quotaFld.value = this.entity!.defaultQuota / 1024;
 			}
+
+			this.form.trackReset();
 		});
 
 		this.form.on("beforesave", (_f, v) => {
-			if(v.quota) {
-				v.quota *= 1024;
-			}
 
 			if(this.currentId) {
 				if(v.password && v.password.length === 0) {
 					delete v.password;
 				}
-				delete v.username; // This may never change!
 			} else {
-				v.username += "@" + this.entity!.domain;
+				v.username += "@" + this.form.findField("domain")!.value;
 			}
 			delete v.passwordConfirm;
 		})

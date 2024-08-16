@@ -17,7 +17,6 @@ use go\modules\community\maildomains\convert\Spreadsheet;
 
 final class Mailbox extends AclItemEntity
 {
-	use SearchableTrait;
 
 	const EVENT_PASSWORD_VERIFIED = 'passwordverified';
 
@@ -67,12 +66,13 @@ final class Mailbox extends AclItemEntity
 	public $active = true;
 
 	/** @var int */
-	public $usage;
+	public ?int $bytes;
 
-	public $messageCount;
-	private $domain = null;
+	public ?int $messages;
 
 	private $plainPassword = null;
+
+	private $domain;
 
 	/**
 	 * @inheritDoc
@@ -80,13 +80,7 @@ final class Mailbox extends AclItemEntity
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
-			->addTable("community_maildomains_mailbox", 'm')
-			->addQuery(
-				(new Query)
-					->join('community_maildomains_quota', 'q', 'q.username = m.username', 'LEFT')
-				->select('bytes AS `usage`, messages as messageCount')
-			);
-
+			->addTable("community_maildomains_mailbox", 'm');
 	}
 
 	protected static function aclEntityClass(): string
@@ -115,21 +109,6 @@ final class Mailbox extends AclItemEntity
 			});
 	}
 
-	/**
-	 * @return array|null
-	 */
-	protected function getSearchKeywords(): ?array
-	{
-		return [$this->name, $this->username];
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	protected function getSearchDescription(): string
-	{
-		return $this->name;
-	}
 
 	/**
 	 * @inheritDoc
@@ -182,8 +161,8 @@ final class Mailbox extends AclItemEntity
 			$this->homedir = $d->domain . '/' . $parts[0] . '/';
 			$this->maildir = $d->domain . '/' . $parts[0] . '/Maildir/';
 		}
-		$domain = $this->getDomain();
-		Domain::entityType()->changes([$this->domainId, $domain->findAclId(), false]);
+//		$domain = $this->getDomain();
+//		Domain::entityType()->changes([$this->domainId, $domain->findAclId(), false]);
 		return parent::internalSave();
 	}
 
@@ -291,39 +270,6 @@ final class Mailbox extends AclItemEntity
 
 
 	/**
-	 * See function name. Speaks for itself
-	 *
-	 * @return false|int
-	 */
-	private function getUsageFromDovecot(): false|int
-	{
-		exec("doveadm quota get -u " . escapeshellarg($this->username) . " 2>/dev/null", $output, $return);
-
-		/**
-		 * returns:
-		 * Quota name Type      Value    Limit                                                                     %
-		 * User quota STORAGE 9547844 10240000                                                                    93
-		 * User quota MESSAGE   81592        -                                                                     0
-		 */
-
-		if ($return != 0) {
-			return false;
-		}
-
-		if (!isset($output[0])) {
-			return false;
-		}
-		array_shift($output);
-		foreach ($output as $line) {
-			if (preg_match("/STORAGE\s+([0-9]*)/", $line, $matches)) {
-				return (int)$matches[1];
-			}
-		}
-
-		return false;
-	}
-
-	/**
 	 * Check current quota for mailbox and max quota for domain
 	 *
 	 * Refactored from old postfix module as per new PHP framework.
@@ -345,7 +291,7 @@ final class Mailbox extends AclItemEntity
 
 				$existingQuota = $this->isNew() ? 0 : $currentQuota;
 
-				$sumUsedQuotaOtherwise = $this->domain->getSumUsedQuota() - $existingQuota; // Domain's used quota w/o the current mailbox's quota.
+				$sumUsedQuotaOtherwise = $this->getDomain()->getSumUsedQuota() - $existingQuota; // Domain's used quota w/o the current mailbox's quota.
 				if ($sumUsedQuotaOtherwise + $this->quota > $totalQuota) {
 					$quotaLeft = $totalQuota - $sumUsedQuotaOtherwise;
 					throw new \Exception('The maximum quota has been reached. You have ' .

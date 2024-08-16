@@ -17,7 +17,7 @@ modules.register(  {
 
 			const mainPanel = new MainPanel();
 
-			// router.add(/^maildomains\/(\d+)$/, (domainId) => {
+			// router.add(/^maildomains\/(\d+)$/, (domain) => {
 			// 	modules.openMainPanel("maildomains");
 			// });
 

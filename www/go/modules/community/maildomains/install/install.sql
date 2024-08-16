@@ -68,6 +68,8 @@ CREATE TABLE IF NOT EXISTS `community_maildomains_mailbox`
     `modifiedBy`  int(11)             NOT NULL,
     `modifiedAt`  DATETIME                     DEFAULT NULL,
     `active`      BOOLEAN             NOT NULL DEFAULT '1',
+    bytes bigint not null default 0,
+    messages integer not null default 0,
     PRIMARY KEY (`id`),
     UNIQUE `username` (`username`),
     CONSTRAINT `community_maildomains_mailbox_ibfk1` FOREIGN KEY (`domainId`)

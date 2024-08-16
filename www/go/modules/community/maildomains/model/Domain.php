@@ -14,8 +14,6 @@ use go\modules\community\maildomains\util\DnsCheck;
 
 final class Domain extends AclOwnerEntity
 {
-	use SearchableTrait;
-
 	/** @var int */
 	public $id;
 
@@ -84,10 +82,10 @@ final class Domain extends AclOwnerEntity
 	/** @var int */
 	public $numMailboxes;
 
-	/** @var int */
+	/** @var int Used quota in bytes */
 	public $sumUsedQuota;
 
-	/** @var int */
+	/** @var int Disk usage in bytes */
 	public $sumUsage;
 	/**
 	 * @var mixed|null
@@ -103,12 +101,12 @@ final class Domain extends AclOwnerEntity
 			->addTable('community_maildomains_domain', 'cmd')
 			->addQuery(
 				(new Query())
-					->select('SUM(COALESCE(`cmm`.`quota`,0)) as `sumUsedQuota`, SUM(COALESCE(`cmq`.`bytes`,0)) as `sumUsage`')
+					->select('SUM(COALESCE(`cmm`.`quota`,0)) as `sumUsedQuota`, SUM(COALESCE(`cmm`.`bytes`,0)) as `sumUsage`')
 				->join('community_maildomains_mailbox', 'cmm', '`cmd`.`id`=`cmm`.`domainId`', 'LEFT')
-				->join('community_maildomains_quota', 'cmq', 'cmq.username = cmm.username', 'LEFT')
+//				->join('community_maildomains_quota', 'cmq', 'cmq.username = cmm.username', 'LEFT')
 				->groupBy(['`cmm`.`domainId`']))
-			->addScalar('aliases', 'community_maildomains_alias', ['id' => 'domainId'])
-			->addScalar('mailboxes', 'community_maildomains_mailbox', ['id' => 'domainId'])
+//			->addScalar('aliases', 'community_maildomains_alias', ['id' => 'domainId'])
+//			->addScalar('mailboxes', 'community_maildomains_mailbox', ['id' => 'domainId'])
 			->addMap('dkim', DkimKey::class, ['id' => 'domainId']);
 	}
 
@@ -120,15 +118,6 @@ final class Domain extends AclOwnerEntity
 	public static function getClientName(): string
 	{
 		return "MailDomain";
-	}
-
-
-	/**
-	 * @return array|null
-	 */
-	protected function getSearchKeywords(): ?array
-	{
-		return [$this->domain, $this->description];
 	}
 
 	/**
@@ -144,20 +133,13 @@ final class Domain extends AclOwnerEntity
 			});
 	}
 
-	/**
-	 * @inheritDoc
-	 */
-	protected function getSearchDescription(): string
-	{
-		return $this->domain;
-	}
 
 	/**
 	 * @inheritDoc
 	 */
 	protected static function textFilterColumns(): array
 	{
-		return ['domain', 'description'];
+		return ['id', 'description'];
 	}
 
 	/**
@@ -165,7 +147,7 @@ final class Domain extends AclOwnerEntity
 	 */
 	public function title(): string
 	{
-		return $this->domain;
+		return $this->id;
 	}
 
 	public function getSumUsedQuota(): int

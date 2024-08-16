@@ -8,10 +8,10 @@ use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
+use go\core\validate\ErrorCode;
 
 final class Alias extends AclItemEntity
 {
-	use SearchableTrait;
 
 	/** @var int */
 	public $id;
@@ -75,22 +75,6 @@ final class Alias extends AclItemEntity
 	}
 
 	/**
-	 * @return array|null
-	 */
-	protected function getSearchKeywords(): ?array
-	{
-		return [$this->address, $this->goto];
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	protected function getSearchDescription(): string
-	{
-		return $this->address;
-	}
-
-	/**
 	 * @inheritDoc
 	 */
 	protected static function textFilterColumns(): array
@@ -140,26 +124,10 @@ final class Alias extends AclItemEntity
 			$this->address = substr($this->address, 1);
 		}
 
-		$domain = $this->getDomain();
-		Domain::entityType()->changes([$this->domainId, $domain->findAclId(), false]);
 
 		return parent::internalSave();
 	}
 
-	/**
-	 * Trigger a change on the domain upon deleting a mailbox
-	 *
-	 * @param \go\core\orm\Query $query
-	 * @return bool
-	 * @throws \Exception
-	 */
-	protected static function internalDelete(\go\core\orm\Query $query): bool
-	{
-		$deleteQuery = clone $query;
-		$deleteQuery->selectSingleValue('domainId');
-		Domain::entityType()->changes($deleteQuery->all());
-		return parent::internalDelete($query);
-	}
 
 	/**
 	 * Retrieve the domain
