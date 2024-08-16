@@ -52,7 +52,7 @@ export class DnsSettingsForm extends Component {
 								textarea({
 									flex: 1,
 									readOnly: true,
-									name: "txt",
+									name: "publicKey",
 									label: t("Public key"),
 									autoHeight: true,
 									buttons: [btn({

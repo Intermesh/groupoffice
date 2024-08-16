@@ -11,11 +11,11 @@ final class DkimKey extends Property
 
 	public string $selector;
 
-	protected string $txt;
+	protected string $publicKey;
 
 	public bool $status;
 
-	protected string $key;
+	protected string $privateKey;
 
 	protected static function defineMapping(): Mapping
 	{
@@ -33,21 +33,23 @@ final class DkimKey extends Property
 	}
 
 	private function generate() : void {
+
+		// see https://the-art-of-web.com/php/dkim-key-pair-generation/
+
 		$pkey = openssl_pkey_new([
 			'private_key_bits' => 2048,
 			'private_key_type' => OPENSSL_KEYTYPE_RSA
 		]);
-
-		$this->key = "";
-		openssl_pkey_export($pkey, $this->key);
+		$this->privateKey = "";
+		openssl_pkey_export($pkey, $this->privateKey);
 
 		$details = openssl_pkey_get_details($pkey);
-		$this->txt = $details['key'];
+		$this->publicKey = $details['key'];
 	}
 
-	public function getTxt() : string {
+	public function getPublicKey() : string {
 
-		$key = explode(PHP_EOL, trim($this->txt));
+		$key = explode(PHP_EOL, trim($this->publicKey));
 		return implode("", array_filter($key, fn($val) => !preg_match("/^-+/", $val)));
 	}
 
