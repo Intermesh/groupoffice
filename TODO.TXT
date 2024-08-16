@@ -49,6 +49,12 @@ x Billing module refactor
     x unbound or bind9?
     - master user: https://doc.dovecot.org/configuration_manual/authentication/master_users/
 
+    - quota / usage in DB:
+    https://doc.dovecot.org/configuration_manual/quota/quota_count/#quota-backend-count
+    https://doc.dovecot.org/configuration_manual/quota/quota_dict/#quota-backend-dict
+
+    - Autoconfig: https://github.com/smartlyway/email-autoconfig-php/blob/master/README.md
+
 - Rocket chat
     - Live chat on sites feed back into GO
     - Notifications from GO to RC

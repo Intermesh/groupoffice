@@ -48,7 +48,6 @@ export class MailboxTable extends Table<DataSourceStore> {
 				sortable: true,
 				width: 120,
 				renderer: (v: number) => {
-					v *= 1024;
 					return Format.fileSize(v);
 				}
 			}),
@@ -58,7 +57,6 @@ export class MailboxTable extends Table<DataSourceStore> {
 				sortable: false,
 				width: 120,
 				renderer: (v: number) => {
-					v *= 1024;
 					return Format.fileSize(v);
 				}
 			}),

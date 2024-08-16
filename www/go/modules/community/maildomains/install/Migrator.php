@@ -60,8 +60,7 @@ final class Migrator
 				'createdAt' => DateTime::createFromFormat('U', $m['ctime'], new \DateTimeZone(go()->getSystemTimeZone())),
 				'modifiedBy' => 1,
 				'modifiedAt' => DateTime::createFromFormat('U', $m['mtime'], new \DateTimeZone(go()->getSystemTimeZone())),
-				'active' => $m['active'],
-				'usage' => $m['usage'] ?? '0'
+				'active' => $m['active']
 			];
 		}
 		go()->getDbConnection()->insert('community_maildomains_mailbox', $data)->execute();

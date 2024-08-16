@@ -125,7 +125,6 @@ export class DomainTable extends Table<DataSourceStore> {
 				sortable: false,
 				renderer: (v, _record) => {
 					v = parseInt(v);
-					v *= 1024;
 					return (v > 0) ? Format.fileSize(v) : "0B";
 				}
 

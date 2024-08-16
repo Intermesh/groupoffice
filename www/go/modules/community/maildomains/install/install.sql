@@ -68,7 +68,6 @@ CREATE TABLE IF NOT EXISTS `community_maildomains_mailbox`
     `modifiedBy`  int(11)             NOT NULL,
     `modifiedAt`  DATETIME                     DEFAULT NULL,
     `active`      BOOLEAN             NOT NULL DEFAULT '1',
-    `usage`       int(11) UNSIGNED    NOT NULL default '0',
     PRIMARY KEY (`id`),
     UNIQUE `username` (`username`),
     CONSTRAINT `community_maildomains_mailbox_ibfk1` FOREIGN KEY (`domainId`)
@@ -91,3 +90,14 @@ create table community_maildomains_dkim_key
             on delete cascade
 );
 
+CREATE TABLE community_maildomains_quota (
+   username varchar(190) not null,
+   bytes bigint not null default 0,
+   messages integer not null default 0,
+   primary key (username)
+);
+
+alter table community_maildomains_quota
+    add constraint community_maildomains_quota_mailbox_username_fk
+        foreign key (username) references community_maildomains_mailbox (username)
+            on delete cascade;

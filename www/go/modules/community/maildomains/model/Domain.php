@@ -101,8 +101,11 @@ final class Domain extends AclOwnerEntity
 	{
 		return parent::defineMapping()
 			->addTable('community_maildomains_domain', 'cmd')
-			->addQuery((new Query())->select('SUM(COALESCE(`cmm`.`quota`,0)) as `sumUsedQuota`, SUM(COALESCE(`cmm`.`usage`,0)) as `sumUsage`')
+			->addQuery(
+				(new Query())
+					->select('SUM(COALESCE(`cmm`.`quota`,0)) as `sumUsedQuota`, SUM(COALESCE(`cmq`.`bytes`,0)) as `sumUsage`')
 				->join('community_maildomains_mailbox', 'cmm', '`cmd`.`id`=`cmm`.`domainId`', 'LEFT')
+				->join('community_maildomains_quota', 'cmq', 'cmq.username = cmm.username', 'LEFT')
 				->groupBy(['`cmm`.`domainId`']))
 			->addScalar('aliases', 'community_maildomains_alias', ['id' => 'domainId'])
 			->addScalar('mailboxes', 'community_maildomains_mailbox', ['id' => 'domainId'])

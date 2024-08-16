@@ -4,6 +4,7 @@ namespace go\modules\community\maildomains\model;
 
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
+use go\core\db\Query;
 use go\core\exception\Forbidden;
 use go\core\fs\Folder;
 use go\core\orm\Filters;
@@ -67,6 +68,8 @@ final class Mailbox extends AclItemEntity
 
 	/** @var int */
 	public $usage;
+
+	public $messageCount;
 	private $domain = null;
 
 	private $plainPassword = null;
@@ -77,7 +80,13 @@ final class Mailbox extends AclItemEntity
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
-			->addTable("community_maildomains_mailbox");
+			->addTable("community_maildomains_mailbox", 'm')
+			->addQuery(
+				(new Query)
+					->join('community_maildomains_quota', 'q', 'q.username = m.username', 'LEFT')
+				->select('bytes AS `usage`, messages as messageCount')
+			);
+
 	}
 
 	protected static function aclEntityClass(): string
