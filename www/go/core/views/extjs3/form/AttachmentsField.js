@@ -18,8 +18,8 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 				}, {
 					name: "attachment",
 					type: "bool"
-				}
-
+				},
+				"description"
 			]
 		});
 
@@ -33,7 +33,8 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 			tpl: new Ext.XTemplate(
 				'<div style="overflow-x:hidden" tabindex="0" class="go-attachments">' +
 				'<tpl for=".">',
-				'<span class="filetype-link filetype-{[this.getExtension(values.name)]} x-unselectable" unselectable="on" style="float:left" id="{id}">{name}</span>' +
+				'<span class="filetype-link filetype-{[this.getExtension(values.name)]} x-unselectable" unselectable="on" style="float:left" id="{id}">{name}' +
+				'<tpl if="description"> - <span style="color: var(--c-secondary);">{description}</span></tpl></span>' +
 				'</tpl>' +
 				'</div>',
 				'<div class="x-clear"></div>',
@@ -87,16 +88,31 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 					text: t("Open"),
 					scope: this,
 					handler: function () {
-						var records = this.dataView.getSelectedRecords();
+						const records = this.dataView.getSelectedRecords();
 						window.open(go.Jmap.downloadUrl(records[0].data.blobId, true));
 					}
-				},
-					{
+				},{
+					iconCls: 'ic-edit',
+					text: t("Edit"),
+					scope: this,
+					handler: function() {
+						const records = this.dataView.getSelectedRecords(), curr = records[0];
+						let description = curr.data.description || "";
+						Ext.MessageBox.prompt(t("Description"), t("Please enter a description"),
+							(btn, value) => {
+							if(btn === "ok") {
+								curr.data.description = value || "";
+								this.dataView.refresh();
+								this.syncHeight();
+							}
+							},this, false, description);
+					}
+				},{
 						iconCls: 'ic-delete',
 						text: t("Delete"),
 						scope: this,
 						handler: function () {
-							var records = this.dataView.getSelectedRecords();
+							const records = this.dataView.getSelectedRecords();
 							this.store.remove(records);
 							this.syncHeight();
 						}
@@ -147,7 +163,7 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 	},
 
 	setValue: function (records) {
-		var data = {};
+		const data = {};
 		data[this.store.root] = records;
 
 		this.store.loadData(data);
