@@ -98,4 +98,10 @@ create table community_maildomains_mailbox
 
 
 create view community_maildomains_dkim as
-select d.domain,k.selector,k.`privateKey`,k.publicKey from community_maildomains_dkim_key k inner join community_maildomains_domain d on k.domainId = d.id;
+select
+    concat(d.domain,'-',k.selector) as id,
+    `d`.`domain`     AS `domain`,
+    `k`.`selector`   AS `selector`,
+    `k`.`privateKey` AS `privateKey`
+from (`groupoffice_68`.`community_maildomains_dkim_key` `k` join `groupoffice_68`.`community_maildomains_domain` `d`
+      on (`k`.`domainId` = `d`.`id`));
