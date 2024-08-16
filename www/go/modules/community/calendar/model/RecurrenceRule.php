@@ -80,7 +80,7 @@ class RecurrenceRule {
 				}
 			}
 
-			$end = new DateTime($instance->utcStart);
+			$end = clone $instance->utcStart;
 			$end->add(new \DateInterval($duration));
 			$instance->utcEnd = $end;
 

@@ -266,7 +266,7 @@ export class Main extends Component {
 						btn({icon: 'keyboard_arrow_right', title: t('Next'), allowFastClick:true, handler: b => this.forward()}),
 					),
 					btn({icon:'more_vert',cls: 'not-small-device', menu:menu({},
-						btn({icon:'video_call',text:t('Video meeting'), handler: _ => {(new Settings()).openLoad()}}),
+						btn({icon:'video_call',text:t('Video meeting')+'…', handler: _ => {(new Settings()).openLoad()}}),
 						btn({
 							icon: 'print', text:t('Print'), menu: menu({},
 								this.printCurrentBtn = btn({icon: 'print', text: t('Current view'), handler:() => {
@@ -282,8 +282,8 @@ export class Main extends Component {
 								btn({icon: 'view_module', text: t('Month'), handler:() => { this.openPDF('month'); }})
 							)
 						}),
-						btn({icon:'meeting_room', text:t('Resources'), handler: _ => { (new ResourcesWindow()).show()}}),
-						btn({icon: 'settings', text: t('Preferences'), handler: _ => {
+						btn({icon:'meeting_room', text:t('Resources')+'…', handler: _ => { (new ResourcesWindow()).show()}}),
+						btn({icon: 'settings', text: t('Preferences')+'…', handler: _ => {
 							const d=new PreferencesWindow();
 							d.show();
 							d.load(go.User.id);

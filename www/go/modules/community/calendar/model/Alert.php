@@ -43,8 +43,8 @@ class Alert extends UserProperty {
 	/** @var string 'email' | 'display'  */
 	public $action;
 
-	/** @var int PK of the evetn this alarm is set on */
-	protected $eventId;
+	/** @var int PK of the event this alarm is set on */
+	protected $fk;
 
 	/** @var int */
 	protected $userId;
@@ -63,28 +63,6 @@ class Alert extends UserProperty {
 		];
 	}
 
-	public function at()
-	{
-		$event = $this->owner;
-		if (isset($this->offset)) {
-			$offset = $this->offset;
-			$date = clone ($this->relatedTo == self::End ? $event->end() : $event->start());
-			if ($offset[0] == '-') {
-				$date->sub(new \DateInterval(substr($offset, 1)));
-				return $date;
-			}
-			if ($offset[0] == '+') {
-				$offset = substr($offset, 1);
-			}
-			$date->add(new \DateInterval($offset));
-			return $date;
-		}
-		if (isset($this->when)) {
-			return $this->when;
-		}
-		return null;
-	}
-
 	public function setTrigger($v) {
 		if(isset($v['offset'])) {
 			$this->offset = $v['offset'];
@@ -93,4 +71,59 @@ class Alert extends UserProperty {
 			$this->when = $v['when'];
 		}
 	}
+
+	public function schedule($item) {
+
+		$alert = new \go\core\model\Alert();
+		$alert->setEntity($item);
+		$alert->userId = go()->getUserId();
+		$alert->tag = $this->id;
+
+		$this->applyTime($alert, $item);
+
+		if (!$alert->save()) {
+			throw new \Exception(var_export($alert->getValidationErrors(), true));
+		}
+	}
+
+	/**
+	 * @param \go\core\model\Alert $coreAlert
+	 * @param CalendarEvent $event
+	 * @throws \Exception
+	 */
+	private function applyTime($coreAlert, $event)
+	{
+		if (isset($this->offset)) {
+			$offset = $this->offset;
+			if($event->isRecurring()) {
+				list($recurrenceId, $next) = $event->upcomingOccurrence();
+				$coreAlert->recurrenceId = $recurrenceId->format('Y-m-d\TH:i:s');
+				$date = clone $next;
+				$next->add(new \DateInterval($event->duration));
+				if($this->relatedTo === self::End){
+					$date = $next;
+				} else {
+					$coreAlert->staleAt = $next;
+				}
+			} else {
+				$date = clone ($this->relatedTo === self::End ? $event->end() : $event->start());
+				if($this->relatedTo === self::Start) // don't stale if event is set to trigger after the event
+					$coreAlert->staleAt = $event->end();
+			}
+
+			if ($offset[0] == '-') {
+				$date->sub(new \DateInterval(substr($offset, 1)));
+				$coreAlert->triggerAt = $date;
+				return;
+			}
+			if ($offset[0] == '+') {
+				$offset = substr($offset, 1);
+			}
+			$date->add(new \DateInterval($offset));
+			$coreAlert->triggerAt =  $date;
+		} else if (isset($this->when)) {
+			$coreAlert->triggerAt = $this->when;
+		}
+	}
+
 }

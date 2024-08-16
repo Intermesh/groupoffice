@@ -1056,6 +1056,7 @@ CREATE TABLE `core_alert` (
   `entityId` INT NOT NULL,
   `userId` INT NOT NULL,
   `triggerAt` DATETIME NOT NULL,
+  `staleAt` DATETIME NULL,
     tag varchar(50) null,
   `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
   `data` text null,

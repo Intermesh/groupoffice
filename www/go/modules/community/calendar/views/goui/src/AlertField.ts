@@ -8,15 +8,21 @@ interface Alert {
 }
 
 export class AlertField extends SelectField {
-
+	// is this a/for full day event
 	fullDay = false
+	// is this field use for the calendar its default alerts
 	isForDefault = false
+	// should the event use the default instead
 	useDefault = false
 	constructor() {
 		super();
 		this.name = 'alerts';
 		this.label = t('Reminder');
 		this.drawOptions();
+		this.on('change',(me,v) => {
+			/** @ts-ignore */
+			this.useDefault = me.control?.value === 'default';
+		})
 	}
 
 	drawOptions() {
@@ -32,7 +38,7 @@ export class AlertField extends SelectField {
 			{value: 'P0D', name: t('At the start')},
 		];
 		if(!this.isForDefault) {
-			super.value = 'default';
+			this.value = 'default';
 			this.options.unshift({value: 'default', name: t('Default')});
 		}
 		this.options.unshift({value: null, name: t('None')})
@@ -47,10 +53,12 @@ export class AlertField extends SelectField {
 	}
 	/** @ts-ignore */
 	set value(v: {[id:string]:Alert}|'default'|null) {
-		if(this.useDefault) return;
 		if(!v || typeof v === 'string') {
+			this.useDefault = v ==='default';
 			super.value = v;
 			return;
+		} else {
+			this.useDefault = false;
 		}
 		const firstKey = Object.keys(v)[0];
 		if(v[firstKey]) {

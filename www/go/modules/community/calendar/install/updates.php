@@ -18,48 +18,13 @@ $updates['202402221543'][] = function() {
 	\go\core\db\Utils::runSQLFile(\GO()->getEnvironment()->getInstallFolder()->getFile("go/modules/community/calendar/install/migrate.sql"));
 };
 
-
-$updates['202402221543'][] = function(){ // migrate recurrence rules and fix lastOccurrence
-
-	$stmt = go()->getDbConnection()->query("SELECT eventId, recurrenceRule,`start`,`timeZone`,`duration` FROM calendar_event WHERE recurrenceRule IS NOT NULL AND recurrenceRule != ''");
-
-	while($row = $stmt->fetch()) {
-
-			if($row['recurrenceRule'][0] == '{') continue; // already done
-			$start = new DateTime($row["start"]);
-			try {
-				$rrule = \go\core\util\Recurrence::fromString($row['recurrenceRule'], $start);
-			} catch(Exception $e) {
-				die("RRULE Exception: " . $e->getMessage() ."\n");
-			}
-			$recurrenceRule = json_encode($rrule->toArray());
-			$data = ['recurrenceRule' => $recurrenceRule];
-			if($rrule->isInfinite()) {
-				$data['lastOccurrence'] = null;
-			} else if(isset($rrule->until)) {
-				$data['lastOccurrence'] = $rrule->until->add(new \DateInterval($row['duration']));
-			} else if(isset($rrule->count)) {
-				$lastOccurrence = (clone $start)->add(new \DateInterval($row['duration']));
-				$it = new \Sabre\VObject\Recur\RRuleIterator($row['recurrenceRule'], $start);
-				$maxDate = new \DateTime('2058-01-01');
-				while ($it->valid() && $lastOccurrence < $maxDate) {
-					$lastOccurrence = $it->current(); // will clone :(
-					$it->next();
-				}
-				$lastOccurrence->add(new \DateInterval($row["duration"]));
-				$data['lastOccurrence'] = $lastOccurrence;
-			}
-			go()->getDbConnection()->updateIgnore('calendar_event', $data, ['eventId' => $row['eventId']])->execute();
-
-	}
-};
-
 $updates['202402221543'][] = function(){ // insert excluded event overrides
 	$stmt = go()->getDbConnection()->query("SELECT event_id, FROM_UNIXTIME(time) as recurrenceId, ce.timeZone FROM cal_exceptions e JOIN calendar_event ce ON ce.eventId = e.event_id WHERE exception_event_id=0");
 	$insertExcludeStmt = go()->getDbConnection()->getPDO()->prepare("INSERT IGNORE INTO calendar_recurrence_override (fk, recurrenceId, patch) VALUES (?,?,?)");
 
 	while($row = $stmt->fetch()) {
-		$insertExcludeStmt->execute([$row['event_id'],tz_convert($row['recurrenceId'],$row['timeZone'])->format('Y-m-d\TH:i:s'),'{"excluded":true}']);
+		$id = tz_convert($row['recurrenceId'],$row['timeZone'])->format('Y-m-d H:i:s');
+		$insertExcludeStmt->execute([$row['event_id'],$id,'{"excluded":true}']);
 	}
 };
 
@@ -71,17 +36,17 @@ $updates['202402221543'][] = function(){ // insert event overrides
 	$mainEventStmt = go()->getDbConnection()->getPDO()->prepare("SELECT id,FROM_UNIXTIME(start_time) as start_time, end_time, name, location, description, status, private, timezone FROM cal_events WHERE id = ?");
 	$insertPatchStmt = go()->getDbConnection()->getPDO()->prepare("INSERT IGNORE INTO calendar_recurrence_override (fk, recurrenceId, patch) VALUES (?,?,?)");
 
-	while($row = $stmt->fetch()) {
+	while($row = $stmt->fetch()) { // for each exception
 		$mainEventStmt->execute([$row['exception_for_event_id']]);
-		$event = $mainEventStmt->fetch();
+		$event = $mainEventStmt->fetch(); // grab main event
 		if(empty($event))
 			continue; // skip
 		$diff = array_diff_assoc($row, $event);
 		// props: start, end, name, description, location, busy, status, private
 		$patch = (object)[];
 		if(!empty($diff['start_time'])) {
-			$patch->start = tz_convert($diff['start_time'], $event['timezone'])->format('Y-m-d\TH:i:s');
-			//$patch->start = (new DateTime('@'.$diff['start_time']))->format('Y-m-d\TH:i:s');
+			$diffStart = tz_convert($diff['start_time'], $event['timezone']);
+			$patch->start = $diffStart->format('Y-m-d\TH:i:s');
 		}
 		if(!empty($diff['end_time'])) {
 			$end = new DateTime('@'.$diff['end_time']);
@@ -128,7 +93,64 @@ $updates['202402221543'][] = function(){ // insert event overrides
 		}
 
 		// add patch to calendar_recurrence_override
-		$insertPatchStmt->execute([$event['id'],tz_convert($row['recurrence_id'],$event['timezone'])->format('Y-m-d\TH:i:s'),json_encode($patch)]);
+		$recurrenceId = tz_convert($row['recurrence_id'],$event['timezone'])->format('Y-m-d H:i:s');
+		$insertPatchStmt->execute([$event['id'],$recurrenceId, json_encode($patch)]);
+	}
+};
+
+$updates['202402221543'][] = function(){ // migrate recurrence rules and fix lastOccurrence and firstOccurrence
+
+	$stmt = go()->getDbConnection()->query("SELECT eventId, recurrenceRule,`start`,`timeZone`,`duration` FROM calendar_event WHERE recurrenceRule IS NOT NULL AND recurrenceRule != ''");
+
+	while($row = $stmt->fetch()) {
+
+		if($row['recurrenceRule'][0] == '{')
+			continue; // already done
+		$start = new DateTime($row["start"]);
+		try {
+			$rrule = \go\core\util\Recurrence::fromString($row['recurrenceRule'], $start);
+		} catch(Exception $e) {
+			die("RRULE Exception: " . $e->getMessage() ."\n");
+		}
+		$recurrenceRule = json_encode($rrule->toArray());
+		$data = ['recurrenceRule' => $recurrenceRule];
+		if(isset($rrule->until)) {
+			$data['lastOccurrence'] = clone $rrule->until;
+		} else if(isset($rrule->count)) {
+			$lastOccurrence = clone $start;
+			$it = new \Sabre\VObject\Recur\RRuleIterator($row['recurrenceRule'], $start);
+			$maxDate = new \DateTime('2058-01-01');
+			while ($it->valid() && $lastOccurrence < $maxDate) {
+				$lastOccurrence = $it->current(); // will clone :(
+				$it->next();
+			}
+			$data['lastOccurrence'] = $lastOccurrence;
+		} else {
+			$data['lastOccurrence'] = null;
+		}
+		// check max exception vs currentEnd if not null
+		if($data['lastOccurrence'] !== null) {
+			$lastEx = go()->getDbConnection()->query("SELECT FROM_UNIXTIME(MAX(`start_time`)) FROM cal_events WHERE exception_for_event_id = " . $row['eventId'])->fetchColumn();
+			if(!empty($lastEx)) {
+				$dt = tz_convert($lastEx, $row['timeZone']);
+				if ($dt > $data['lastOccurrence']) {
+					$data['lastOccurrence'] = $dt;
+				}
+			}
+			$data['lastOccurrence']->add(new \DateInterval($row['duration']));
+		}
+		// check min exception vs start
+		$firstEx = go()->getDbConnection()->query("SELECT FROM_UNIXTIME(MIN(`start_time`)) FROM cal_events WHERE exception_for_event_id = ".$row['eventId'])->fetchColumn();
+		if(!empty($firstEx)) {
+			$dt = tz_convert($firstEx, $row['timeZone']);
+			if($dt < $start) {
+				$data['firstOccurrence'] = $dt;
+			}
+		}
+
+
+		go()->getDbConnection()->updateIgnore('calendar_event', $data, ['eventId' => $row['eventId']])->execute();
+
 	}
 };
 

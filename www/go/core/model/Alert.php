@@ -37,6 +37,7 @@ class Alert extends SingleOwnerEntity
 
 	public $userId;
 	public $triggerAt;
+	public $staleAt;
 
 	public $recurrenceId;
 	public $tag;

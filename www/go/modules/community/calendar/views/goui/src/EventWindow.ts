@@ -54,21 +54,21 @@ export class EventWindow extends FormWindow {
 		// this.startTime = textfield({type:'time',value: '12:00', width: 128})
 		// this.endTime = textfield({type:'time',value: '13:00', width: 128})
 		var recurrenceField = recurrencefield({name: 'recurrenceRule',flex:1});
-		var alertField = alertfield(),
-			alertUseDefault = checkbox({hidden:true, name:'useDefaultAlerts', listeners: {
-				'setvalue': (_, newV) => {
-					if(newV) {alertField.useDefault = true;}
-				}
-			}});
-		alertField.on('change', (me, newValue) => {
-			if(newValue === null) {
-				alertUseDefault.value = me.useDefault = false;
-			} else {
-				const isDefault = (newValue === 'default' || Object.keys(newValue).length === 0);
-				me.useDefault = isDefault;
-				alertUseDefault.value = isDefault;
-			}
-		});
+		var alertField = alertfield();
+			// alertUseDefault = checkbox({hidden:true, name:'useDefaultAlerts', listeners: {
+			// 	'setvalue': (_, newV) => {
+			// 		if(newV) {alertField.useDefault = true;}
+			// 	}
+			// }});
+		// alertField.on('change', (me, newValue) => {
+		// 	if(newValue === null) {
+		// 		alertUseDefault.value = me.useDefault = false;
+		// 	} else {
+		// 		const isDefault = (newValue === 'default' || Object.keys(newValue).length === 0);
+		// 		me.useDefault = isDefault;
+		// 		alertUseDefault.value = isDefault;
+		// 	}
+		// });
 
 		const exceptionsBtn = btn({text:t('Exceptions'), handler: _b => {
 			this.openExceptionsWindow();
@@ -77,6 +77,10 @@ export class EventWindow extends FormWindow {
 		const now = new DateTime();
 
 		this.form.on('beforesave', (frm,data) => {
+			if(alertField.isModified() || !this.item?.data.id) {
+				//@ts-ignore
+				data.useDefaultAlerts = alertField.useDefault; // ?
+			}
 			this.parseSavedData(data);
 		});
 		this.form.on('load', (_, data) => {
@@ -85,6 +89,10 @@ export class EventWindow extends FormWindow {
 				.addDays(data.showWithoutTime? -1 : 0)
 				.format(data.showWithoutTime ? 'Y-m-d' : 'Y-m-dTH:i:s');
 			exceptionsBtn.hidden = !data.recurrenceOverrides;
+			if(data.useDefaultAlerts) {
+				alertField.useDefault = true;
+				delete data.alerts;
+			}
 			//recurrenceField.setStartDate(start)
 		});
 		this.form.on('save', () => {this.close();});
@@ -202,7 +210,7 @@ export class EventWindow extends FormWindow {
 				});
 				dlg.show(this.item, this.form.modified);
 			} }),
-			alertField,alertUseDefault,
+			alertField,
 			textarea({name:'description', label: t('Description'), autoHeight: true}),
 			autocompletechips({
 				list: table({fitParent: true, headers: false, store: datasourcestore({dataSource:categoryStore.dataSource}),
