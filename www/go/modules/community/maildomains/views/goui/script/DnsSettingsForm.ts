@@ -1,7 +1,7 @@
 import {
 	ArrayField,
 	arrayfield, browser, BrowserStore,
-	btn,
+	btn, checkbox,
 	comp,
 	Component, ContainerField,
 	containerfield, ContainerFieldValue, DefaultEntity, displayfield, EntityID, Fieldset,
@@ -38,6 +38,13 @@ export class DnsSettingsForm extends Component {
 									name: "selector",
 									flex: 1,
 									label: t("Selector", "community", "maildomains"),
+								}),
+								checkbox({
+									width: 200,
+									name: "enabled",
+									type: "switch",
+									label: t("Enabled"),
+									value: true
 								}),
 								displayfield({
 									escapeValue: false,

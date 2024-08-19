@@ -113,6 +113,9 @@ final class DnsCheck
 	public function checkDKIM(): null|array|string
 	{
 		$r = [];
+		if (!isset($this->domainEntity->dkim)) {
+			return $r;
+		}
 		foreach(array_keys($this->domainEntity->dkim) as $selector) {
 			$records = dns_get_record($selector . "._domainkey." . $this->domainName, DNS_TXT);
 

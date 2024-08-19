@@ -60,6 +60,7 @@ create table community_maildomains_dkim_key
     publicKey      text              default '' not null,
     `privateKey`    text                         null,
     status   smallint unsigned default 0  null,
+    enabled bool default true not null,
     primary key (selector, domainId),
     constraint domainSelector
         unique (domainId, selector),
@@ -104,5 +105,6 @@ select
     `d`.`domain`     AS `domain`,
     `k`.`selector`   AS `selector`,
     `k`.`privateKey` AS `privateKey`
-from (`groupoffice_68`.`community_maildomains_dkim_key` `k` join `groupoffice_68`.`community_maildomains_domain` `d`
-      on (`k`.`domainId` = `d`.`id`));
+from (`community_maildomains_dkim_key` `k` join `community_maildomains_domain` `d`
+      on (`k`.`domainId` = `d`.`id`))
+where k.enabled = true

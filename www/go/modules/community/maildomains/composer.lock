@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b8a65fa8833eaec44296dc208742cdb7",
+    "content-hash": "96b6ac812a947570993893f01e245a33",
     "packages": [
         {
             "name": "mlocati/idna",
