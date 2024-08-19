@@ -1,3 +1,4 @@
+19-08-2024: 6.8.65
 - Core: Attachments Custom field now shows files grid when configured as pictures
 - Tasks / support: accent class for grouping separator
 - Business: allow users with mayManageEmployees to create or destroy agreements
