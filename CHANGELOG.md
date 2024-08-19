@@ -1,4 +1,5 @@
 - Core: Attachments Custom field now shows files grid when configured as pictures
+- Tasks / support: accent class for grouping separator
 
 13-08-2024: 6.8.64
 - Core: PHP 8.2 compatibility fix
