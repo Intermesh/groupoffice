@@ -1,8 +1,8 @@
 import {
 	checkbox,
-	comp, DefaultEntity,
+	comp, containerfield, DefaultEntity,
 	fieldset, NumberField,
-	numberfield,
+	numberfield, p, select,
 	t, TextField,
 	textfield,
 } from "@intermesh/goui";
@@ -27,8 +27,9 @@ export class MailboxDialog extends FormWindow {
 
 		const minPasswordLength =  go.Modules.get("core","core").settings.passwordMinLength;
 
+
 		this.generalTab.items.add(
-			fieldset({flex: 1},
+			fieldset({},
 				comp({cls: "row"},
 					this.usernameFld = textfield({
 						name: "username",
@@ -45,86 +46,160 @@ export class MailboxDialog extends FormWindow {
 						flex: 0.5
 					})
 				),
-				textfield({
-					name: "name",
-					id: "name",
-					required: true,
-				}),
+			),
 
-				this.passwordFld = textfield({
-					name: "password",
-					id: "password",
-					label: t("Password"),
-					type: "password",
-					attr: {
-						minlength: minPasswordLength,
-					},
-					required: true,
-					listeners: {
-						validate: (fld) => {
-							const v = fld.value as string, l = v.length,
-								minValidationLength = fld.required ? 0 : 1;
-							if (l >= minValidationLength && l < minPasswordLength) {
-								fld.setInvalid(t("The minimum length for this field is {max}").replace("{max}", minPasswordLength));
-							}
-							const vc = this.passwordConfirmFld.value as string;
-							if (vc && vc.length > 0 && v !== vc) {
-								fld.setInvalid(t("The passwords do not match"));
-							}
-						}
-					}
-				}),
-				this.passwordConfirmFld = textfield({
-					name: "passwordConfirm",
-					id: "passwordConfirm",
-					label: t("Confirm password"),
-					type: "password",
-					required: true,
-					attr: {
-						minlength: minPasswordLength,
-					},
-					listeners: {
-						validate: (fld) => {
-							const v = fld.value as string, l = v.length,
-								minValidationLength = fld.required ? 0 : 1;
-							if (l >= minValidationLength && l < minPasswordLength) {
-								fld.setInvalid(t("The minimum length for this field is {max}").replace("{max}", minPasswordLength));
-							}
-							const vc = this.passwordFld.value as string;
-							if (vc && vc.length > 0 && v !== vc) {
-								this.passwordFld.setInvalid(t("The passwords do not match"));
+			comp({cls: "hbox"},
+				fieldset({flex: 1},
+					checkbox({
+						label: t("Active", "community", "maildomains"),
+						name: "active",
+						id: "active",
+						type: "switch",
+						value: true
+					}),
+					this.passwordFld = textfield({
+						name: "password",
+						id: "password",
+						label: t("Password"),
+						type: "password",
+						attr: {
+							minlength: minPasswordLength,
+						},
+						required: true,
+						listeners: {
+							validate: (fld) => {
+								const v = fld.value as string, l = v.length,
+									minValidationLength = fld.required ? 0 : 1;
+								if (l >= minValidationLength && l < minPasswordLength) {
+									fld.setInvalid(t("The minimum length for this field is {max}").replace("{max}", minPasswordLength));
+								}
+								const vc = this.passwordConfirmFld.value as string;
+								if (vc && vc.length > 0 && v !== vc) {
+									fld.setInvalid(t("The passwords do not match"));
+								}
 							}
 						}
-					}
-				}),
-				this.quotaFld = numberfield({
-					name: "quota",
-					id: "quota",
-					label: t("Quota (MB)", "community", "maildomains"),
-					decimals: 0,
-					value: 0,
-					required: true,
-					multiplier: 1 / (1024 * 1024) // convert bytes to MB
-				}),
-				checkbox({
-					label: t("Active", "community", "maildomains"),
-					name: "active",
-					id: "active",
-					type: "switch",
-					value: true
-				}),
-				checkbox({
-					label: t("Allow external SMTP usage", "community", "maildomains"),
-					name: "smtpAllowed",
-					id: "smtpAllowed",
-					type: "switch"
-				}),
-				checkbox({
-					label: t("Enable Full Text Search", "community", "maildomains"),
-					name: "fts",
-					id: "fts",
-					type: "switch"
-				})
+					}),
+					this.passwordConfirmFld = textfield({
+						name: "passwordConfirm",
+						id: "passwordConfirm",
+						label: t("Confirm password"),
+						type: "password",
+						required: true,
+						attr: {
+							minlength: minPasswordLength,
+						},
+						listeners: {
+							validate: (fld) => {
+								const v = fld.value as string, l = v.length,
+									minValidationLength = fld.required ? 0 : 1;
+								if (l >= minValidationLength && l < minPasswordLength) {
+									fld.setInvalid(t("The minimum length for this field is {max}").replace("{max}", minPasswordLength));
+								}
+								const vc = this.passwordFld.value as string;
+								if (vc && vc.length > 0 && v !== vc) {
+									this.passwordFld.setInvalid(t("The passwords do not match"));
+								}
+							}
+						}
+					}),
+					this.quotaFld = numberfield({
+						name: "quota",
+						id: "quota",
+						label: t("Quota (MB)", "community", "maildomains"),
+						decimals: 0,
+						value: 0,
+						required: true,
+						multiplier: 1 / (1024 * 1024) // convert bytes to MB
+					}),
+
+
+
+
+					textfield({
+						label: t("Description"),
+						name: "description",
+						id: "description",
+						required: false,
+					}),
+				),
+
+				comp({flex: 1},
+
+					fieldset({},
+
+						checkbox({
+							label: t("Allow external SMTP usage", "community", "maildomains"),
+							name: "smtpAllowed",
+							id: "smtpAllowed",
+							type: "switch"
+						}),
+						checkbox({
+							label: t("Enable Full Text Search", "community", "maildomains"),
+							name: "fts",
+							id: "fts",
+							type: "switch"
+						}),
+
+					),
+
+					fieldset({},
+
+						checkbox({
+							label: t("Auto expunge"),
+							type: "switch",
+							value: true,
+							name: "enabled",
+							listeners: {
+								change:(field, newValue, oldValue) => {
+									const p = field.nextSibling()!
+									p.disabled = !newValue;
+									p.nextSibling()!.disabled = !newValue;
+								},
+							}
+						}),
+
+						p({text: t("Automatically delete mail from the Trash and Spam folder after a period of time.")}),
+
+						containerfield({
+								name: "autoExpunge",
+
+								listeners: {
+
+									beforesetvalue: (field,e) => {
+										if(e.value == "0") {
+											e.value = {enabled: false, days: 30}
+										} else {
+											e.value = {enabled: true, days: parseInt(e.value.substring(0, e.value.length-1))}
+										}
+										field.findField("days")!.disabled = !e.value.enabled;
+
+									},
+
+									beforegetvalue: (field, e) => {
+
+										if(!e.value.enabled) {
+											e.value = "0";
+										} else {
+											e.value = e.value.days + "d";
+										}
+									}
+								},
+							},
+
+
+
+
+							numberfield({
+								flex: 1,
+								name: "days",
+								decimals: 0,
+								label: t("Expunge after days"),
+								value: 30
+							})
+						)
+					),
+				)
 			)
 		);
 

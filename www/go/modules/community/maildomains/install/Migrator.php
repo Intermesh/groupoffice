@@ -52,7 +52,7 @@ final class Migrator
 				'username' => $m['username'],
 				'password' => $m['password'],
 				'smtpAllowed' => $m['smtpAllowed'],
-				'name' => $m['name'],
+				'description' => $m['name'],
 				'maildir' => $m['maildir'],
 				'homedir' => $m['homedir'],
 				'quota' => $m['quota'] * 1024 ?? '0',
@@ -60,7 +60,8 @@ final class Migrator
 				'createdAt' => DateTime::createFromFormat('U', $m['ctime'], new \DateTimeZone(go()->getSystemTimeZone())),
 				'modifiedBy' => 1,
 				'modifiedAt' => DateTime::createFromFormat('U', $m['mtime'], new \DateTimeZone(go()->getSystemTimeZone())),
-				'active' => $m['active']
+				'active' => $m['active'],
+				'autoExpunge' => '0'
 			];
 		}
 		go()->getDbConnection()->insert('community_maildomains_mailbox', $data)->execute();

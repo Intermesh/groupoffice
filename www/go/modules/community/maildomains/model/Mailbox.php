@@ -17,62 +17,38 @@ use go\modules\community\maildomains\convert\Spreadsheet;
 
 final class Mailbox extends AclItemEntity
 {
-
 	const EVENT_PASSWORD_VERIFIED = 'passwordverified';
 
-	/** @var int */
-	public $id;
+	public ?int $id;
+	public int $domainId;
+	public string $username;
+	public ?string $password;
+	public bool $smtpAllowed;
+	public bool $fts;
+	public ?string $description;
+	public string $maildir;
+	public string $homedir;
+	public int $quota;
 
-	/** @var int */
-	public $domainId;
-
-	/** @var string */
-	public $username;
-
-	/** @var string */
-	public $password;
-
-	/** @var bool */
-	public $smtpAllowed;
-
-	/** @var bool */
-	public $fts;
-
-	/** @var string */
-	public $name;
-
-	/** @var string */
-	public $maildir;
-
-	/** @var string */
-	public $homedir;
-
-	/** @var int */
-	public $quota;
-
-	/** @var int */
-	public $createdBy;
-
-	/** @var DateTime */
-	public $createdAt;
-
-	/** @var int */
-	public $modifiedBy;
-
-	/** @var DateTime */
-	public $modifiedAt;
-
-	/** @var bool */
-	public $active = true;
-
-	/** @var int */
+	/**
+	 * Auto expunge in this period.
+	 *
+	 * Use "0" to disable
+	 *
+	 * @link https://doc.dovecot.org/settings/types/#time
+	 * @var string
+	 */
+	public string $autoExpunge = "30d";
+	public int $createdBy;
+	public DateTime $createdAt;
+	public ?int $modifiedBy;
+	public ?DateTime $modifiedAt;
+	public bool $active = true;
 	public ?int $bytes;
-
 	public ?int $messages;
 
-	private $plainPassword = null;
-
-	private $domain;
+	private ?string $plainPassword = null;
+	private ?Domain $domain;
 
 	/**
 	 * @inheritDoc
@@ -123,7 +99,7 @@ final class Mailbox extends AclItemEntity
 	 */
 	public function title(): string
 	{
-		return $this->name;
+		return $this->username;
 	}
 
 	/**
@@ -308,7 +284,7 @@ final class Mailbox extends AclItemEntity
 	 */
 	private function getDomain(): Domain|null
 	{
-		if (is_null($this->domain) && isset($this->domainId)) {
+		if (!isset($this->domain) && isset($this->domainId)) {
 			$this->domain = Domain::findById($this->domainId);
 		}
 		return $this->domain;

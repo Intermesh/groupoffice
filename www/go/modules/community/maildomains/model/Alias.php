@@ -138,7 +138,7 @@ final class Alias extends AclItemEntity
 	 */
 	private function getDomain(): Domain|null
 	{
-		if (is_null($this->domain) && isset($this->domainId)) {
+		if (!isset($this->domain) && isset($this->domainId)) {
 			$this->domain = Domain::findById($this->domainId);
 		}
 		return $this->domain;

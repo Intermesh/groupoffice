@@ -278,6 +278,7 @@ export class DomainDialog extends FormWindow {
 		const dlg = new MailboxDialog();
 
 		const d = this.form.value;
+
 		dlg.form.value = {
 			domainId: d.id,
 			domain: this.form.findField("domain")!.value,

@@ -16,7 +16,7 @@ export class MailboxTable extends Table<DataSourceStore> {
 				filter: {
 				}
 			},
-			sort: [{property: "name", isAscending: true}]
+			sort: [{property: "username", isAscending: true}]
 		});
 		const columns = [
 			column({
@@ -35,8 +35,8 @@ export class MailboxTable extends Table<DataSourceStore> {
 				sortable: true
 			}),
 			column({
-				header: t("Name"),
-				id: "name",
+				header: t("Description"),
+				id: "description",
 				resizable: true,
 				sortable: true,
 				width: 200
