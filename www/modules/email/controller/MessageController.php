@@ -313,6 +313,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$query = 'OR OR OR FROM "' .$matches[1] . '" SUBJECT "' .$matches[1] . '" TO "' .$matches[1] . '" CC "' .$matches[1] . '"';
 		}
 
+		go()->debug("IMAP SEARCH: " . $query);
+
 		$messages = ImapMessage::model()->find(
 						$account,
 						$params['mailbox'],
@@ -395,6 +397,13 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$forceFTS = go()->getConfig()['community']['email']['forceFTS'][$account->host] ?? false;
 
+		if(go()->getDebugger()->enabled) {
+			go()->debug("Force FTS: ");
+			go()->debug($forceFTS);
+
+			go()->debug("Has XFTS capability: ");
+			go()->debug($imap->has_capability("XFTS"));
+		}
 
 		return $forceFTS || $imap->has_capability("XFTS");
 	}
