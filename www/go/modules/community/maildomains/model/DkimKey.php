@@ -17,7 +17,7 @@ final class DkimKey extends Property
 
 	protected string $privateKey;
 
-	public bool $enabled = true;
+	public bool $enabled = false;
 
 	protected static function defineMapping(): Mapping
 	{
