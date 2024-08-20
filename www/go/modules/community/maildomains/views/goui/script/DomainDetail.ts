@@ -38,6 +38,17 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 
 				comp({cls: "card "},
 					tbar({},
+						displayfield({
+							escapeValue: false,
+							name: "active",
+							value: false,
+							renderer: (v, field) => {
+								if(!this.entity) {
+									return "";
+								}
+								return mailDomainStatus(this.entity);
+							}
+						}),
 						comp({},
 							displayfield({
 								tagName: "h3",
@@ -49,18 +60,7 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 								name: "description"
 							}),
 						),
-						"->",
-						displayfield({
-							escapeValue: false,
-							name: "active",
-							value: false,
-							renderer: (v, field) => {
-								if(!this.entity) {
-									return "";
-								}
-								return mailDomainStatus(this.entity);
-							}
-						})
+
 					),
 
 					comp({cls: "pad flow"},
