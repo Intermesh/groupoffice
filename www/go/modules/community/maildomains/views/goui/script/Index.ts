@@ -1,6 +1,7 @@
 import {client, modules, router} from "@intermesh/groupoffice-core";
 import {MainPanel} from "./MainPanel.js";
-import {t, translate} from "@intermesh/goui";
+import {comp, t, translate} from "@intermesh/goui";
+import {SystemSettings} from "./SystemSettings";
 
 modules.register(  {
 	package: "community",
@@ -30,6 +31,10 @@ modules.register(  {
 			modules.addMainPanel( "community", "maildomains", "maildomains", t("Mail domains"), () => {
 				//this will lazy load Notes when module panel is opened.
 				return mainPanel;
+			});
+
+			modules.addSystemSettingsPanel("community", "maildomains", "maildomains", t("Mail domains"), "email", () => {
+				return new SystemSettings();
 			});
 		});
 	}

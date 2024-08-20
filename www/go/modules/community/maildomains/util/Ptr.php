@@ -5,6 +5,7 @@ namespace go\modules\community\maildomains\util;
 use go\core\http\Exception;
 use go\core\jmap\Request;
 use go\core\util\ArrayObject;
+use go\modules\community\maildomains\model\Settings;
 
 final class Ptr
 {
@@ -23,18 +24,8 @@ final class Ptr
 	 */
 	public static function check(array $params): ArrayObject
 	{
-		$cfg = go()->getConfig();
-		if(isset($cfg['serverclient_server_hostname'])) {
-			$myhostname = $cfg['serverclient_server_hostname'];
-		} else {
-//			exec("postconf -h myhostname", $output, $ret);
-//
-//			if($ret !== 0) {
-//				throw new Exception(500, "Could not get myhostname");
-//			}
 
-			$myhostname = Request::get()->getHost(true);
-		}
+		$myhostname = Settings::get()->getMailHost();
 
 		exec('nslookup '.escapeshellarg($myhostname), $output, $ret);
 		if($ret !== 0) {

@@ -5,6 +5,7 @@ namespace go\modules\community\maildomains;
 use go\core;
 use go\core\model\Module as ModuleModel;
 use go\modules\community\maildomains\model\Mailbox;
+use go\modules\community\maildomains\model\Settings;
 use go\modules\community\pwned\model\Pwned;
 
 final class Module extends core\Module
@@ -36,5 +37,10 @@ final class Module extends core\Module
 			}
 		}
 
+	}
+
+	public function getSettings()
+	{
+		return Settings::get();
 	}
 }

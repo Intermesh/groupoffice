@@ -186,7 +186,7 @@ final class Domain extends AclOwnerEntity
 
 	public function checkDns(): void
 	{
-		$ip = gethostbyname("smtp.group-office.com"); //Request::get()->getHost());
+		$ip = gethostbyname(Settings::get()->getMailHost()); //Request::get()->getHost());
 		$dnsChecker = new DnsCheck($this, $ip);
 		$r = $dnsChecker->checkAll();
 		$this->updateDns($r);
