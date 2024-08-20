@@ -4,6 +4,7 @@ namespace go\modules\community\maildomains\model;
 
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
+use go\core\jmap\Request;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
@@ -185,7 +186,8 @@ final class Domain extends AclOwnerEntity
 
 	public function checkDns(): void
 	{
-		$dnsChecker = new DnsCheck($this, "127.0.0.1", false);
+		$ip = gethostbyname(Request::get()->getHost());
+		$dnsChecker = new DnsCheck($this, $ip);
 		$r = $dnsChecker->checkAll();
 		$this->updateDns($r);
 	}
@@ -203,7 +205,7 @@ final class Domain extends AclOwnerEntity
 		$this->mx = implode(", ", $record['mxTargets']);
 		$this->spf = $record['spf'];
 		$this->spfStatus = $record['spfStatus'];
-		$this->dmarc = $record['dmarc'];
+		$this->dmarc = $record['dmarc']['raw'] ?? null;
 		$this->dmarcStatus = !empty($record['dmarc']);
 
 		foreach($record['dkim'] as $selector => $dnsKey) {

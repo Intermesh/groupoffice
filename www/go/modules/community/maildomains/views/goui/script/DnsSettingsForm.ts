@@ -33,7 +33,7 @@ export class DnsSettingsForm extends Component {
 						cls: "hbox",
 					},
 						comp({cls: "flow", flex: 1},
-							comp({cls: "hbox"},
+							comp({cls: "hbox gap"},
 								textfield({
 									name: "selector",
 									flex: 1,
@@ -44,11 +44,12 @@ export class DnsSettingsForm extends Component {
 									name: "enabled",
 									type: "switch",
 									label: t("Enabled"),
-									value: true
+									value: false
 								}),
 								displayfield({
 									escapeValue: false,
 									name: "status",
+									value: false,
 									renderer: (v, field) => {
 										return `<i class="icon ${v ? 'success' : 'danger'}">${v ? 'check_circle' : 'warning'}</i>`;
 									}

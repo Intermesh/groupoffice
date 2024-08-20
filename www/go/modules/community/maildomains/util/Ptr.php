@@ -3,6 +3,7 @@
 namespace go\modules\community\maildomains\util;
 
 use go\core\http\Exception;
+use go\core\jmap\Request;
 use go\core\util\ArrayObject;
 
 final class Ptr
@@ -26,18 +27,18 @@ final class Ptr
 		if(isset($cfg['serverclient_server_hostname'])) {
 			$myhostname = $cfg['serverclient_server_hostname'];
 		} else {
-			exec("postconf -h myhostname", $output, $ret);
+//			exec("postconf -h myhostname", $output, $ret);
+//
+//			if($ret !== 0) {
+//				throw new Exception(500, "Could not get myhostname");
+//			}
 
-			if($ret !== 0) {
-				throw new Exception(500, "Could not get myhostname");
-			}
-
-			$myhostname = $output[0];
+			$myhostname = Request::get()->getHost(true);
 		}
 
 		exec('nslookup '.escapeshellarg($myhostname), $output, $ret);
 		if($ret !== 0) {
-			throw new Exception(500, "Error running nslookup");
+			throw new Exception(500, "Could not check PTR record. Error running nslookup.");
 		}
 
 		$regex = '/^Name:\s+'.preg_quote($myhostname)."\s+Address:\s+([^\s]+)$/m";

@@ -1,4 +1,4 @@
-import {btn, comp, Component, Notifier, paginator, searchbtn, t, tbar} from "@intermesh/goui";
+import {btn, comp, Component, Notifier, paginator, searchbtn, t, tbar, Window} from "@intermesh/goui";
 import {authManager, client, jmapds, User} from "@intermesh/groupoffice-core";
 import {DomainTable} from "./DomainTable";
 import {DomainDialog} from "./DomainDialog";
@@ -32,7 +32,11 @@ export class MainPanel extends Component {
 				} else {
 					this.ptrStatus.html = '<i class="icon warning">warning</i>&nbsp;' + t("PTR error");
 				}
-			});
+			}).catch((e) => {
+				this.ptrStatus.html = '<i class="icon warning">warning</i>&nbsp;' + t("PTR error");
+
+				Window.error(e);
+			})
 		});
 		this.tbl = new DomainTable();
 
@@ -85,12 +89,7 @@ export class MainPanel extends Component {
 							cls: "scroll border-top main fit"
 						},
 						this.tbl
-					),
-
-
-					paginator({
-						store: this.tbl.store
-					})
+					)
 				),
 			)
 		);

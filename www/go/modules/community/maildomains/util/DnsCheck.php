@@ -16,19 +16,16 @@ final class DnsCheck
 	private string $domainName;
 	private string $ipAddress;
 
-	private bool $rawOutput;
 
 	/**
 	 * @param Domain $domain
 	 * @param string $ipAddress
-	 * @param bool|null $rawOutput
 	 */
-	public function __construct(Domain $domain, string $ipAddress, ?bool $rawOutput=false)
+	public function __construct(Domain $domain, string $ipAddress)
 	{
 		$this->domainEntity = $domain;
 		$this->domainName = $domain->domain;
 		$this->ipAddress = $ipAddress;
-		$this->rawOutput = $rawOutput;
 	}
 
 	/**
@@ -37,7 +34,7 @@ final class DnsCheck
 	 */
 	private function parseRecord(string $dnsTXT) : array
 	{
-		$record = [];
+		$record = ['raw' => $dnsTXT];
 		$parts = explode(';', $dnsTXT);
 		$parts = array_map('trim', $parts);
 		foreach($parts as $p) {
@@ -99,7 +96,7 @@ final class DnsCheck
 		if(empty($records) || empty($records[0]['txt'])) {
 			return null;
 		}
-		return $this->rawOutput ? $records[0]['txt'] : $this->parseRecord($records[0]['txt']);
+		return $this->parseRecord($records[0]['txt']);
 	}
 
 	/**
@@ -122,7 +119,7 @@ final class DnsCheck
 			if (empty($records) || empty($records[0]['txt'])) {
 				$r[$selector] =  null;
 			} else {
-				$r[$selector] = $this->rawOutput ? $records[0]['txt'] : $this->parseRecord($records[0]['txt']);
+				$r[$selector] = $this->parseRecord($records[0]['txt']);
 			}
 		}
 
