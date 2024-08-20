@@ -30,8 +30,11 @@ export class ImportDkimKeyDialog extends Window {
 					handler: async () => {
 						this.mask();
 						try {
-							const dkim = structuredClone(this.domain.dkim);
+							let dkim = structuredClone(this.domain.dkim);
 
+							if(!dkim) {
+								dkim = {};
+							}
 							const key = this.form.value;
 
 							dkim[key.selector] = key;
