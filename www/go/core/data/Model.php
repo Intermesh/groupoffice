@@ -89,7 +89,13 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 //					}
 //				}
 
-				$propName = lcfirst(substr($method->getName(), 3));
+				// Make first char lowercase if the second is not. So that getDNS() will become "DNS" and getFoo() will become "foo".
+				$propName = substr($method->getName(), 3);
+				$secondChar = substr($propName, 1, 1);
+				if($secondChar != strtoupper($secondChar)) {
+					$propName = lcfirst($propName);
+				}
+
 				if(!isset($arr[$propName])) {
 					$arr[$propName] = ["setter" => false, "getter" => false, "access" => null];
 				}
