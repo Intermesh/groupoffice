@@ -15,6 +15,7 @@ export class MailboxDialog extends FormWindow {
 	private passwordFld: TextField;
 	private passwordConfirmFld: TextField;
 	private quotaFld: NumberField;
+	private domainFld: TextField;
 
 	constructor() {
 		super("MailBox");
@@ -38,7 +39,7 @@ export class MailboxDialog extends FormWindow {
 						required: true,
 						flex: 0.5
 					}),
-					textfield({
+					this.domainFld = textfield({
 						icon: "alternate_email",
 						disabled: true,
 						name: "domain",
@@ -208,7 +209,10 @@ export class MailboxDialog extends FormWindow {
 				this.usernameFld.disabled = true;
 				const username = this.usernameFld.value as string;
 				if (username.indexOf("@") >-1) {
-					this.usernameFld.value = username.split("@")[0];
+					const parts = username.split("@")
+					this.usernameFld.value = parts[0];
+
+					this.domainFld.value = parts[1];
 				}
 				this.passwordFld.required = false;
 				this.passwordConfirmFld.required = false;

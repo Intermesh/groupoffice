@@ -13,7 +13,7 @@ import {
 } from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
 
-export class DnsSettingsForm extends Component {
+export class DnsSettingsPanel extends Component {
 
 	public dkimKeyFlds;
 	public spfFld!: TextField;
@@ -113,6 +113,7 @@ export class DnsSettingsForm extends Component {
 				displayfield({
 					escapeValue: false,
 					name: "spfStatus",
+					value: false,
 					renderer: (v, field) => {
 						return `<i class="icon ${v ? 'success' : 'danger'}">${v ? 'check_circle' : 'warning'}</i>`;
 					}

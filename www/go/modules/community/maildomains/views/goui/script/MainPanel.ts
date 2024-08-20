@@ -1,19 +1,85 @@
-import {btn, comp, Component, Notifier, paginator, searchbtn, t, tbar, Window} from "@intermesh/goui";
-import {authManager, client, jmapds, User} from "@intermesh/groupoffice-core";
+import {btn, comp, Component, EntityID, Notifier, paginator, router, searchbtn, t, tbar, Window} from "@intermesh/goui";
+import {authManager, client, jmapds, MainThreeColumnPanel, User} from "@intermesh/groupoffice-core";
 import {DomainTable} from "./DomainTable";
 import {DomainDialog} from "./DomainDialog";
+import {DomainDetail} from "./DomainDetail";
 
-export class MainPanel extends Component {
-	private tbl: DomainTable;
-	private center: Component;
-	private ptrStatus: Component
+export class MainPanel extends MainThreeColumnPanel {
+
+		protected center!: DomainDetail;
+    protected createEast(): Component {
+	    return comp({
+		    width: 260,
+		    itemId: "west",
+		    stateId: "maildomains-west",
+		    hidden: true
+	    })
+    }
+    protected createCenter(): Component {
+	    const detail = new DomainDetail();
+
+	    detail.itemId = "detail";
+	    detail.stateId = "maildomains-detail";
+			detail.flex = 1;
+
+	    detail.toolbar.items.insert(0,this.showCenterButton());
+	    return detail;
+    }
+    protected createWest(): Component {
+
+	    this.tbl = new DomainTable();
+
+			this.tbl.rowSelection!.on("rowselect", rowSelect => {
+			    if(rowSelect.selected.length) {
+				    router.goto("maildomains/" + rowSelect.list.store.get(rowSelect.selected[0])!.id);
+			    }
+	    })
+
+	    return comp({
+			    width: 300,
+			    cls: 'vbox active' //for mobile view this is active
+		    },
+
+		    tbar({},
+			    '->',
+			    this.ptrStatus = comp({html: ""}),
+			    searchbtn({
+				    listeners: {
+					    input: (sender, text) => {
+						    this.tbl!.store.setFilter("search", {text: text});
+						    this.tbl!.store.load(false);
+					    }
+				    }
+			    }),
+			    btn({
+				    itemId: "add",
+				    icon: "add",
+				    text: t("Add"),
+				    cls: "filled primary",
+				    handler: async () => {
+					    const dlg = new DomainDialog();
+					    dlg.show();
+					    dlg.form.value = {userId: this.user!.id, active: 1};
+				    }
+			    })
+		    ),
+
+		    comp({
+				    flex: 1,
+				    stateId: "maildomains",
+				    cls: "scroll border-top main fit"
+			    },
+			    this.tbl
+		    )
+	    )
+    }
+	private tbl!: DomainTable;
+	private ptrStatus!: Component
 	private user: User | undefined;
 
 	constructor() {
 		super("section");
 
-		this.id = "support";
-		this.cls = "vbox fit";
 		this.on("render", async () => {
 			try {
 				this.user = await authManager.requireLogin();
@@ -38,60 +104,13 @@ export class MainPanel extends Component {
 				Window.error(e);
 			})
 		});
-		this.tbl = new DomainTable();
 
-		this.items.add(
-			comp({
-					cls: "hbox mobile-cards"
-				},
-				this.center = comp({
-						cls: 'active vbox fit',
-						itemId: 'table-container',
-					},
 
-					tbar({},
-						'->',
-						this.ptrStatus = comp({html: ""}),
-						searchbtn({
-							listeners: {
-								input: (sender, text) => {
-									this.tbl!.store.setFilter("search", {text: text});
-									this.tbl!.store.load(false);
-								}
-							}
-						}),
-						btn({
-							itemId: "add",
-							icon: "add",
-							text: t("Add"),
-							cls: "filled primary",
-							handler: async () => {
-								const dlg = new DomainDialog();
-								dlg.show();
-								dlg.form.value = {userId: this.user!.id, active: 1};
-							}
-						}),
-						btn({
-							itemId: "delete",
-							icon: "delete",
-							text: t("Delete"),
-							handler: async () => {
-								const ids = this.tbl!.rowSelection!.selected.map(index => this.tbl!.store.get(index)!.id);
-								await jmapds("MailDomain")
-									.confirmDestroy(ids);
-							}
-						})
-					),
 
-					comp({
-							flex: 1,
-							stateId: "maildomains",
-							cls: "scroll border-top main fit"
-						},
-						this.tbl
-					)
-				),
-			)
-		);
+	}
+
+	setDomainId(domainId:EntityID) {
+		void this.center.load(domainId);
+		this.activatePanel(this.center);
 	}
 }

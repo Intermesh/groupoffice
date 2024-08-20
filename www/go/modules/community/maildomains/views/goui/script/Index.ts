@@ -17,9 +17,11 @@ modules.register(  {
 
 			const mainPanel = new MainPanel();
 
-			// router.add(/^maildomains\/(\d+)$/, (domain) => {
-			// 	modules.openMainPanel("maildomains");
-			// });
+			router.add(/^maildomains\/(\d+)$/, (domainId) => {
+				modules.openMainPanel("maildomains");
+
+				mainPanel.setDomainId(domainId);
+			});
 
 			router.add(/^maildomains$/, () => {
 				modules.openMainPanel("maildomains");

@@ -54,7 +54,6 @@ export class DomainTable extends Table<DataSourceStore> {
 				resizable: true,
 				header: t("Domain"),
 				sortable: true
-				// width: 200
 			}),
 			column({
 				header: t("Owner"),
@@ -65,12 +64,14 @@ export class DomainTable extends Table<DataSourceStore> {
 				renderer: (v, _record) => {
 					return v.displayName;
 				},
+				hidden: true
 			}),
 			column({
 				header: t("Description"),
 				id: "description",
 				resizable: true,
-				sortable: true
+				sortable: true,
+				hidden: true
 			}),
 			// column({
 			// 	header: t("Aliases"),
@@ -102,7 +103,8 @@ export class DomainTable extends Table<DataSourceStore> {
 					}
 					v *= 1024;
 					return Format.fileSize(v);
-				}
+				},
+				hidden: true
 			}),
 			column({
 				header: t("Used quota"),
@@ -114,7 +116,8 @@ export class DomainTable extends Table<DataSourceStore> {
 					v = parseInt(v);
 					v *= 1024;
 					return (v > 0) ? Format.fileSize(v) : "0B";
-				}
+				},
+				hidden: true
 
 			}),
 			column({
@@ -126,7 +129,8 @@ export class DomainTable extends Table<DataSourceStore> {
 				renderer: (v, _record) => {
 					v = parseInt(v);
 					return (v > 0) ? Format.fileSize(v) : "0B";
-				}
+				},
+				hidden: true
 
 			}),
 			column({
@@ -137,7 +141,8 @@ export class DomainTable extends Table<DataSourceStore> {
 				sortable: false,
 				renderer: (v, _record) => {
 					return v ? t("Yes"): t("No");
-				}
+				},
+				hidden: true
 
 			}),
 			column({
@@ -148,14 +153,16 @@ export class DomainTable extends Table<DataSourceStore> {
 				sortable: false,
 				renderer: (v, _record) => {
 					return v ? t("Yes"): t("No");
-				}
+				},
+				hidden: true
 
 			}),
 			datecolumn({
 				header: t("Created at"),
 				id: "createdAt",
 				width: 150,
-				sortable: true
+				sortable: true,
+				hidden: true
 			}),
 			column({
 				header: t("Created by"),
@@ -171,7 +178,8 @@ export class DomainTable extends Table<DataSourceStore> {
 				header: t("Modified at"),
 				id: "modifiedAt",
 				width: 150,
-				sortable: true
+				sortable: true,
+				hidden: true
 			}),
 			column({
 				header: t("Modified by"),

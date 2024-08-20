@@ -1,11 +1,13 @@
 import {
+	btn,
 	column, datasourcestore, DataSourceStore,
 	datecolumn, DefaultEntity,
-	Format,
+	Format, hr, menu,
 	t,
 	Table
 } from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
+import {MailboxDialog} from "./MailboxDialog";
 
 export class MailboxTable extends Table<DataSourceStore> {
 	constructor() {
@@ -53,7 +55,7 @@ export class MailboxTable extends Table<DataSourceStore> {
 			}),
 			column({
 				header: t("Usage"),
-				id: "usage",
+				id: "bytes",
 				sortable: false,
 				width: 120,
 				renderer: (v: number) => {
@@ -102,6 +104,41 @@ export class MailboxTable extends Table<DataSourceStore> {
 				resizable: true,
 				renderer: (v) => {
 					return v.displayName;
+				}
+			}),
+
+			column({
+				width: 48,
+				id: "btn",
+
+				renderer: (columnValue: any, record, td, table, rowIndex) => {
+
+
+					return btn({
+						icon: "more_vert",
+						menu: menu({},
+							btn({
+								icon: "edit",
+								text: t("Edit"),
+								handler: async (btn) => {
+									const book = table.store.get(rowIndex)!;
+									const d = new MailboxDialog();
+									await d.load(book.id);
+									d.show();
+								}
+							}),
+							hr(),
+							btn({
+								icon: "delete",
+								text: t("Delete"),
+								handler: async (btn) => {
+									const book = table.store.get(rowIndex)!;
+									jmapds("Mailbox").confirmDestroy([book.id]);
+								}
+							})
+
+						)
+					})
 				}
 			}),
 
