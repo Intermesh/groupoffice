@@ -60,7 +60,7 @@ create table community_maildomains_dkim_key
     publicKey      text              default '' not null,
     `privateKey`    text                         null,
     status   smallint unsigned default 0  null,
-    enabled bool default true not null,
+    enabled bool default false not null,
     primary key (selector, domainId),
     constraint domainSelector
         unique (domainId, selector),
