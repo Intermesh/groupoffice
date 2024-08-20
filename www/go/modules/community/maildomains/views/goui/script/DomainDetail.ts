@@ -7,9 +7,9 @@ import {
 	displayfield, EntityID, Format,
 	h2,
 	h3, hr,
-	menu, mstbar, searchbtn,
+	menu, mstbar, Notifier, searchbtn,
 	t,
-	tbar
+	tbar, Window
 } from "@intermesh/goui";
 import {DetailPanel, FilterCondition, jmapds} from "@intermesh/groupoffice-core";
 import {DnsSettingsPanel} from "./DnsSettingsPanel";
@@ -18,9 +18,11 @@ import {MailboxDialog} from "./MailboxDialog";
 import {AliasDialog} from "./AliasDialog";
 import {AliasTable} from "./AliasTable";
 import {MailboxExportDialog} from "./MailboxExportDialog";
+import {MailDomain, mailDomainStatus} from "./MailDomain";
+import {DomainDialog} from "./DomainDialog";
 
-export class DomainDetail extends DetailPanel {
-	private form: DataSourceForm;
+export class DomainDetail extends DetailPanel<MailDomain> {
+	private form: DataSourceForm<MailDomain>;
 	private dnsSettingsForm: DnsSettingsPanel;
 	private aliasTable!: AliasTable;
 	private mailboxTable!: MailboxTable;
@@ -53,7 +55,10 @@ export class DomainDetail extends DetailPanel {
 							name: "active",
 							value: false,
 							renderer: (v, field) => {
-								return `<i class="icon ${v ? 'success' : 'disabled'}">${v ? 'check_circle' : 'unpublished'}</i>`;
+								if(!this.entity) {
+									return "";
+								}
+								return mailDomainStatus(this.entity);
 							}
 						})
 					),
@@ -107,7 +112,29 @@ export class DomainDetail extends DetailPanel {
 				),
 
 				comp({cls: "card "},
-					tbar({}, h3("DNS Settings")),
+					tbar({},
+						h3("DNS Settings"),
+						"->",
+						btn({
+							icon: "refresh",
+							handler: async (btn) => {
+								const card = btn.parent!.parent!;
+								card.mask();
+
+								try {
+									await jmapds("MailDomain").update(this.entity!.id, {
+										checkDNS: true
+									})
+
+									Notifier.success(t("DNS check completed"));
+								} catch(e) {
+									Window.error(e);
+								} finally {
+									card.unmask();
+								}
+							}
+						})
+					),
 					this.dnsSettingsForm = new DnsSettingsPanel()
 				),
 
@@ -125,7 +152,9 @@ export class DomainDetail extends DetailPanel {
 				icon: "edit",
 				title: t("Edit"),
 				handler: (button, ev) => {
-
+					const win = new DomainDialog()
+					win.load(this.entity!.id);
+					win.show();
 				}
 			}),
 
@@ -158,6 +187,7 @@ export class DomainDetail extends DetailPanel {
 			void this.form.load(entity.id);
 			void this.mailboxTable.store.load();
 			void this.aliasTable.store.load();
+			this.dnsSettingsForm.domain = entity;
 		});
 
 		this.on("reset", () => {

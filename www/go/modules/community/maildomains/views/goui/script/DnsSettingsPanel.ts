@@ -9,9 +9,11 @@ import {
 	t,
 	tbar,
 	textarea, TextAreaField, TextField,
-	textfield
+	textfield, Window
 } from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
+import {MailDomain} from "./MailDomain";
+import {ImportDkimKeyDialog} from "./ImportDkimKeyDialog";
 
 export class DnsSettingsPanel extends Component {
 
@@ -20,7 +22,21 @@ export class DnsSettingsPanel extends Component {
 	public dmarcFld!: TextField;
 	public mxFld!: TextField;
 
-	private entity: DefaultEntity | undefined;
+	public domain?: MailDomain
+	private async save() {
+		this.mask();
+		try {
+			await jmapds("MailDomain").update(this.domain!.id, {dkim: this.dkimKeyFlds.value})
+			return true;
+		} catch(e) {
+			void Window.error(e);
+			return false;
+		} finally {
+			this.unmask();
+		}
+
+
+	}
 
 	constructor() {
 		super();
@@ -38,13 +54,23 @@ export class DnsSettingsPanel extends Component {
 									name: "selector",
 									flex: 1,
 									label: t("Selector", "community", "maildomains"),
+									listeners: {
+										change:field => {
+											this.save();
+										}
+									}
 								}),
 								checkbox({
 									width: 200,
 									name: "enabled",
 									type: "switch",
 									label: t("Enabled"),
-									value: false
+									value: false,
+									listeners: {
+										change:field => {
+											this.save();
+										}
+									}
 								}),
 								displayfield({
 									escapeValue: false,
@@ -60,8 +86,8 @@ export class DnsSettingsPanel extends Component {
 								textarea({
 									flex: 1,
 									readOnly: true,
-									name: "publicKey",
-									label: t("Public key"),
+									name: "DNS",
+									label: "DNS TXT record",
 									autoHeight: true,
 									buttons: [btn({
 										icon: "content_copy",
@@ -78,8 +104,13 @@ export class DnsSettingsPanel extends Component {
 								style: {alignSelf: "top"},
 								icon: "delete",
 								title: "Delete",
-								handler: (btn) => {
-									fld.remove();
+								handler: async (btn) => {
+
+									const confirmed = await Window.confirm(t("Are you sure you want to delete the selected item?"));
+									if(confirmed) {
+										fld.remove();
+										this.save();
+									}
 								}
 							})
 
@@ -88,13 +119,24 @@ export class DnsSettingsPanel extends Component {
 				}
 			}),
 			tbar({},
+				btn({
+					icon: "cloud_upload",
+					text: t("Import private key"),
+					handler: () => {
+						const d = new ImportDkimKeyDialog(this.domain!);
+						d.show();
+
+					}
+
+				}),
 				"->",
 				btn({
 					icon: "add",
-					cls: "outlined",
+					cls: "filled primary",
 					text: t("Add"),
-					handler: () => {
+					handler: async () => {
 						this.dkimKeyFlds.add({selector: "mail" + (Object.keys(this.dkimKeyFlds.value).length + 1)});
+						this.save();
 					}
 				}))
 		);
@@ -115,6 +157,17 @@ export class DnsSettingsPanel extends Component {
 					name: "spfStatus",
 					value: false,
 					renderer: (v, field) => {
+
+						if(!v) {
+							if(!this.spfFld.value) {
+								this.spfFld.setInvalid(t("Your SPF record is not set"));
+							} else {
+								this.spfFld.setInvalid(t("Your SPF record does not allow this server"));
+							}
+						} else {
+							this.spfFld.clearInvalid();
+						}
+
 						return `<i class="icon ${v ? 'success' : 'danger'}">${v ? 'check_circle' : 'warning'}</i>`;
 					}
 				})
@@ -132,6 +185,17 @@ export class DnsSettingsPanel extends Component {
 					escapeValue: false,
 					name: "dmarcStatus",
 					renderer: (v, field) => {
+
+						if(!v) {
+							if(!this.dmarcFld.value) {
+								this.dmarcFld.setInvalid(t("Your DMARC record is not set"));
+							} else {
+								this.dmarcFld.setInvalid(t("Your DMARC record is invalid"));
+							}
+						} else {
+							this.dmarcFld.clearInvalid();
+						}
+
 						return `<i class="icon ${v ? 'success' : 'danger'}">${v ? 'check_circle' : 'warning'}</i>`;
 					}
 				})
@@ -148,6 +212,17 @@ export class DnsSettingsPanel extends Component {
 					escapeValue: false,
 					name: "mxStatus",
 					renderer: (v, field) => {
+
+						if(!v) {
+							if(!this.mxFld.value) {
+								this.mxFld.setInvalid(t("Your MX record is not set"));
+							} else {
+								this.mxFld.setInvalid(t("Your MX record is not set to this mailserver"));
+							}
+						} else {
+							this.mxFld.clearInvalid();
+						}
+
 						return `<i class="icon ${v ? 'success' : 'danger'}">${v ? 'check_circle' : 'warning'}</i>`;
 					}
 				})

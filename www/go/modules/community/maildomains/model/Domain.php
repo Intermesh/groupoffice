@@ -186,7 +186,7 @@ final class Domain extends AclOwnerEntity
 
 	public function checkDns(): void
 	{
-		$ip = gethostbyname(Request::get()->getHost());
+		$ip = gethostbyname("smtp.group-office.com"); //Request::get()->getHost());
 		$dnsChecker = new DnsCheck($this, $ip);
 		$r = $dnsChecker->checkAll();
 		$this->updateDns($r);
@@ -209,8 +209,8 @@ final class Domain extends AclOwnerEntity
 		$this->dmarcStatus = !empty($record['dmarc']);
 
 		foreach($record['dkim'] as $selector => $dnsKey) {
-			$storedKey = $this->dkim[$selector]->getTxt();
-			$this->dkim[$selector]->status = ($storedKey == $dnsKey['p']);
+			$storedKey = $this->dkim[$selector]->parsePublicKey();
+			$this->dkim[$selector]->status = $dnsKey && ($storedKey == $dnsKey['p']);
 		}
 	}
 }

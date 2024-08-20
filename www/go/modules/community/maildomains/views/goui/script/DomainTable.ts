@@ -13,6 +13,7 @@ import {
 } from "@intermesh/goui";
 import {JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
 import {DomainDialog} from "./DomainDialog";
+import {mailDomainStatus} from "./MailDomain";
 
 export class DomainTable extends Table<DataSourceStore> {
 	constructor() {
@@ -196,17 +197,9 @@ export class DomainTable extends Table<DataSourceStore> {
 				resizable: false,
 				width: 80,
 				renderer: (v, record) => {
-					let allIsWell = record.mxStatus && record.dmarcStatus && record.spfStatus;
 
-					for (const selector in record.dkim) {
-						allIsWell = allIsWell && record.dkim[selector].status;
-					}
-					let iconCls = "icon";
-					if (!allIsWell) {
-						iconCls += " accent";
-					}
-					return btn({icon: (allIsWell ? "check_circle" : "warning"), cls: iconCls,
-						handler:(_btn, _ev) => { this.onStatusBtnClick(allIsWell, record)}});
+					return mailDomainStatus(record);
+
 
 				}
 			})
@@ -225,31 +218,31 @@ export class DomainTable extends Table<DataSourceStore> {
 
 	}
 
-	private onStatusBtnClick(allIsWell: boolean, record: DefaultEntity) {
-		let msg = "";
-		if(allIsWell) {
-			msg += t("No DNS problems found!", "community", "maildomains");
-		} else {
-			if (Object.keys(record.dkim).length === 0) {
-				msg += "&bull;&nbsp;" + t("No DKIM records found.") + "<br/>";
-			} else {
-				for (const selector in record.dkim) {
-					if (!record.dkim[selector].status) {
-						msg += "&bull;$nbsp;" + t("Missing or invalid DKIM record for ", "community", "maildomains") +
-							" " + selector + ".<br/>";
-					}
-				}
-			}
-			if (!record.spfStatus) {
-				msg += "&bull;&nbsp;" + t("Missing or invalid SPF TXT record", "community","maildomains") + ".<br>";
-			}
-			if (!record.dmarcStatus) {
-				msg += "&bull;&nbsp;" + t("Missing or invalid DMARC TXT record", "community","maildomains") + ".<br>";
-			}
-			if (!record.mxStatus) {
-				msg += "&bull;&nbsp;" + t("Missing or invalid MX TXT record", "community","maildomains") + ".<br>";
-			}
-		}
-		void Window.alert(msg, t("DNS Status"));
-	}
+	// private onStatusBtnClick(allIsWell: boolean, record: DefaultEntity) {
+	// 	let msg = "";
+	// 	if(allIsWell) {
+	// 		msg += t("No DNS problems found!", "community", "maildomains");
+	// 	} else {
+	// 		if (Object.keys(record.dkim).length === 0) {
+	// 			msg += "&bull;&nbsp;" + t("No DKIM records found.") + "<br/>";
+	// 		} else {
+	// 			for (const selector in record.dkim) {
+	// 				if (!record.dkim[selector].status) {
+	// 					msg += "&bull;$nbsp;" + t("Missing or invalid DKIM record for ", "community", "maildomains") +
+	// 						" " + selector + ".<br/>";
+	// 				}
+	// 			}
+	// 		}
+	// 		if (!record.spfStatus) {
+	// 			msg += "&bull;&nbsp;" + t("Missing or invalid SPF TXT record", "community","maildomains") + ".<br>";
+	// 		}
+	// 		if (!record.dmarcStatus) {
+	// 			msg += "&bull;&nbsp;" + t("Missing or invalid DMARC TXT record", "community","maildomains") + ".<br>";
+	// 		}
+	// 		if (!record.mxStatus) {
+	// 			msg += "&bull;&nbsp;" + t("Missing or invalid MX TXT record", "community","maildomains") + ".<br>";
+	// 		}
+	// 	}
+	// 	void Window.alert(msg, t("DNS Status"));
+	// }
 }

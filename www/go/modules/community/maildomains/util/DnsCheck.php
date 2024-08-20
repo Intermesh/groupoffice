@@ -76,9 +76,9 @@ final class DnsCheck
 		$checker = new Checker();
 		$checkResult = $checker->check($environment);
 
-		if($checkResult->getCode() == Result::CODE_NONE) {
-			return null;
-		}
+//		if($checkResult->getCode() == Result::CODE_NONE) {
+//			return null;
+//		}
 
 		return $checkResult->getCode() == "pass";
 	}
