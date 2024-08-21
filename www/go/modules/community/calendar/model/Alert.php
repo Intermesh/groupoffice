@@ -103,14 +103,14 @@ class Alert extends UserProperty {
 				if($this->relatedTo === self::End){
 					$date = $next;
 				} else {
-					$coreAlert->staleAt = $next;
+					$coreAlert->staleAt = (clone $next)->setTimezone(new \DateTimeZone("UTC"));
 				}
 			} else {
 				$date = clone ($this->relatedTo === self::End ? $event->end() : $event->start());
 				if($this->relatedTo === self::Start) // don't stale if event is set to trigger after the event
-					$coreAlert->staleAt = $event->end();
+					$coreAlert->staleAt = (clone $event->end())->setTimezone(new \DateTimeZone("UTC"));
 			}
-
+			$date->setTimezone(new \DateTimeZone("UTC"));
 			if ($offset[0] == '-') {
 				$date->sub(new \DateInterval(substr($offset, 1)));
 				$coreAlert->triggerAt = $date;

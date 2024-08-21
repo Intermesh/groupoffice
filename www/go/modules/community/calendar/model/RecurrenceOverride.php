@@ -9,6 +9,7 @@ use go\core\util\DateTime;
 
 /**
  * @property bool $excluded
+ * @property CalendarEvent $owner
  */
 class RecurrenceOverride extends Property
 {
@@ -19,6 +20,9 @@ class RecurrenceOverride extends Property
 		'relatedTo','replyTo','sentBy', 'timeZone', 'uid'];
 
 	protected $fk; // to event
+	/**
+	 * @var DateTime
+	 */
 	protected $recurrenceId; // datetime of occurrence and key of map
 
 	protected $_start; // indexed in db for finding the first occurrence start
@@ -38,11 +42,13 @@ class RecurrenceOverride extends Property
 	}
 
 	public function start() {
-		return isset($this->props->start) ? new \DateTime($this->props->start) : clone $this->recurrenceId;
+		$tz = $this->owner->timeZone();
+		$dateStr = isset($this->props->start) ? $this->props->start : $this->recurrenceId->format("Y-m-d H:i:s");
+		return new \DateTime($dateStr, $tz);
 	}
 
 	public function end() {
-		return $this->start()->add(new \DateInterval($this->props->duration ?? $this->owner->duration))->format('Y-m-d\TH:i:s');
+		return $this->start()->add(new \DateInterval($this->props->duration ?? $this->owner->duration));
 	}
 
 	public function patchProps($props) {

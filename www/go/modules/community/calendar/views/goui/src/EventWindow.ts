@@ -22,7 +22,7 @@ import {
 import {client, FormWindow, JmapDataSource, jmapds, recurrencefield} from "@intermesh/groupoffice-core";
 import {calendarStore, categoryStore,t} from "./Index.js";
 import {ParticipantField, participantfield} from "./ParticipantField.js";
-import {alertfield} from "./AlertField.js";
+import {AlertField, alertfield} from "./AlertField.js";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {AvailabilityWindow} from "./AvailabilityWindow.js";
 
@@ -43,6 +43,8 @@ export class EventWindow extends FormWindow {
 	private participantFld: ParticipantField
 
 	private titleField: TextField
+	private alertField: AlertField
+
 	constructor() {
 		super("CalendarEvent");
 
@@ -54,21 +56,7 @@ export class EventWindow extends FormWindow {
 		// this.startTime = textfield({type:'time',value: '12:00', width: 128})
 		// this.endTime = textfield({type:'time',value: '13:00', width: 128})
 		var recurrenceField = recurrencefield({name: 'recurrenceRule',flex:1});
-		var alertField = alertfield();
-			// alertUseDefault = checkbox({hidden:true, name:'useDefaultAlerts', listeners: {
-			// 	'setvalue': (_, newV) => {
-			// 		if(newV) {alertField.useDefault = true;}
-			// 	}
-			// }});
-		// alertField.on('change', (me, newValue) => {
-		// 	if(newValue === null) {
-		// 		alertUseDefault.value = me.useDefault = false;
-		// 	} else {
-		// 		const isDefault = (newValue === 'default' || Object.keys(newValue).length === 0);
-		// 		me.useDefault = isDefault;
-		// 		alertUseDefault.value = isDefault;
-		// 	}
-		// });
+		this.alertField = alertfield();
 
 		const exceptionsBtn = btn({text:t('Exceptions'), handler: _b => {
 			this.openExceptionsWindow();
@@ -77,10 +65,6 @@ export class EventWindow extends FormWindow {
 		const now = new DateTime();
 
 		this.form.on('beforesave', (frm,data) => {
-			if(alertField.isModified() || !this.item?.data.id) {
-				//@ts-ignore
-				data.useDefaultAlerts = alertField.useDefault; // ?
-			}
 			this.parseSavedData(data);
 		});
 		this.form.on('load', (_, data) => {
@@ -90,12 +74,12 @@ export class EventWindow extends FormWindow {
 				.format(data.showWithoutTime ? 'Y-m-d' : 'Y-m-dTH:i:s');
 			exceptionsBtn.hidden = !data.recurrenceOverrides;
 			if(data.useDefaultAlerts) {
-				alertField.useDefault = true;
+				this.alertField.useDefault = true;
 				delete data.alerts;
 			}
 			//recurrenceField.setStartDate(start)
 		});
-		this.form.on('save', () => {this.close();});
+		this.form.on('save', () => { this.close();});
 		this.generalTab.cls = 'flow fit scroll pad';
 
 		this.generalTab.items.add(
@@ -114,7 +98,7 @@ export class EventWindow extends FormWindow {
 							if(!r) return;
 							this.item!.cal = r;
 							const d = this.form.value.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
-							alertField.setDefaultLabel(d)
+							this.alertField.setDefaultLabel(d)
 							if(!this.item?.key && !this.participantFld.list.isEmpty()) {
 								// calendar changed and event is new, check if organizer needs to change as well
 								jmapds('Principal').single(this.item!.principalId).then(p=>{
@@ -136,12 +120,12 @@ export class EventWindow extends FormWindow {
 			}}),
 			this.withoutTimeToggle = checkbox({type:'switch',name: 'showWithoutTime', label: t('All day'), style:{width:'auto'},
 				listeners: {'setvalue':(_, checked) => {
-					alertField.fullDay = checked;
-					alertField.drawOptions();
+					this.alertField.fullDay = checked;
+					this.alertField.drawOptions();
 					calendarStore.dataSource.single(this.form.value.calendarId).then(r => {
 						if(!r) return;
 						const d = checked ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
-						alertField.setDefaultLabel(d)
+						this.alertField.setDefaultLabel(d)
 					});
 					this.startDate.withTime = this.endDate.withTime = !checked;
 				}}
@@ -210,7 +194,7 @@ export class EventWindow extends FormWindow {
 				});
 				dlg.show(this.item, this.form.modified);
 			} }),
-			alertField,
+			this.alertField,
 			textarea({name:'description', label: t('Description'), autoHeight: true}),
 			autocompletechips({
 				list: table({fitParent: true, headers: false, store: datasourcestore({dataSource:categoryStore.dataSource}),
@@ -321,6 +305,9 @@ export class EventWindow extends FormWindow {
 			end.setHours(0,0,0).addDays(1);
 			start.setHours(0,0,0);
 			data.start = start.format('Y-m-d');// remove time
+		}
+		if(this.alertField.isModified() || !this.item?.data.id) {
+			data.useDefaultAlerts = this.alertField.useDefault;
 		}
 		if(this.form.isNew)
 			data.timeZone = go.User.timezone; // enh: option to change in dialog?

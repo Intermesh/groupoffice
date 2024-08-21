@@ -170,6 +170,10 @@ class Alert extends SingleOwnerEntity
 		return $this->relatedEntity;
 	}
 
+	static function findStale() {
+		return static::find()->select('id')
+			->where('staleAt < now()');
+	}
 
 	/**
 	 * Set arbitrary notification data

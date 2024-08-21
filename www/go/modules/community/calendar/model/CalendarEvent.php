@@ -516,7 +516,7 @@ class CalendarEvent extends AclItemEntity {
 
 		if($success) {
 			$this->addToResourceCalendars();
-			$this->updateAlerts();
+			$this->updateAlerts(go()->getUserId());
 			$this->changeEventsWithSameUID();
 			$this->incrementCalendarModSeq();
 		}
@@ -534,31 +534,50 @@ class CalendarEvent extends AclItemEntity {
 			}
 		}
 	}
-	private function updateAlerts() {
+	private function updateAlerts($userId) {
 		if(!CoreAlert::$enabled) {
 			return;
 		}
 
-		if(!$this->isNew() && !$this->isModified(['alerts', 'useDefaultAlerts', 'calendarId', 'start','duration','recurrenceOverrides'])){
-			return; // no changes
-		}
-
-		if(!$this->useDefaultAlerts && $this->isModified(['useDefaultAlerts', 'alerts', 'start','duration','recurrenceOverrides'])) {
-			// update normal alerts
-			CoreAlert::deleteByEntity($this, '1', go()->getUserId());
-			$alerts = $this->alerts;
-		}
-
-		if($this->useDefaultAlerts && $this->isModified(['useDefaultAlerts', 'calendarId', 'start','duration','recurrenceOverrides'])) {
-			// update default alerts
-			CoreAlert::deleteByEntity($this, '1', go()->getUserId());
-			$calendar = Calendar::findById($this->calendarId, ['id', 'ownerId', $this->showWithoutTime?'defaultAlertsWithoutTime':'defaultAlertsWithTime']);
-			$alerts = $this->showWithoutTime ? $calendar->defaultAlertsWithoutTime : $calendar->defaultAlertsWithTime;
-		}
-
-		if(!empty($alerts)) {
-			foreach ($alerts as $alert) {
+		if($this->isNew() ||
+			$this->isModified(['useDefaultAlerts', 'alerts', 'start','duration','recurrenceOverrides']) ||
+			($this->useDefaultAlerts && $this->isModified('calendarId'))
+		) {
+			CoreAlert::deleteByEntity($this, '1', $userId); // this will reschedule if recurring and existing
+			foreach ($this->alerts() as $alert) {
 				$alert->schedule($this);
+			}
+		}
+
+	}
+
+	/**
+	 * @return Alert[]
+	 */
+	private function alerts() {
+		if($this->useDefaultAlerts) {
+			$calendar = Calendar::findById($this->calendarId, ['id', 'ownerId', $this->showWithoutTime?'defaultAlertsWithoutTime':'defaultAlertsWithTime']);
+			return ($this->showWithoutTime ? $calendar->defaultAlertsWithoutTime : $calendar->defaultAlertsWithTime) ?? [];
+		} else {
+			return $this->alerts ?? [];
+		}
+	}
+
+	/**
+	 * @param \go\core\model\Alert[] $alerts
+	 * @return void
+	 */
+	public static function dismissAlerts(array $coreAlerts) {
+		foreach($coreAlerts as $coreAlert) {
+			// create the next alert when dismissing a recurring alert. (if any)
+			if(!empty($coreAlert->recurrenceId)) {
+				//$alertId = $alert->tag;
+				$event = self::findById($coreAlert->entityId);
+				// we wont save $event but if the event isn't modified updateAlerts() wont work
+				//$event->recurrenceOverrides[$calert->recurrenceId]['alerts/'.$calert->tag.'/acknowledged'] = true;
+				foreach ($event->alerts() as $newAlert) {
+					$newAlert->schedule($event);
+				}
 			}
 		}
 	}
@@ -700,12 +719,14 @@ class CalendarEvent extends AclItemEntity {
 		$now = new \DateTime('now', $this->timeZone());
 		$recurrenceId = null;
 		$nextOccurrence = null;
-		foreach($this->recurrenceOverrides as $o) {
-			if(!empty($o->excluded)) continue;
-			$start = $o->start();
-			if($start >= $now) {
-				$nextOccurrence = empty($nextOccurrence) ? $start : min($nextOccurrence, $start);
-				$recurrenceId = $o->recurrenceId();
+		if(!empty($this->recurrenceOverrides)) {
+			foreach ($this->recurrenceOverrides as $o) {
+				if (!empty($o->excluded)) continue;
+				$start = $o->start();
+				if ($start >= $now) {
+					$nextOccurrence = empty($nextOccurrence) ? $start : min($nextOccurrence, $start);
+					$recurrenceId = $o->recurrenceId();
+				}
 			}
 		}
 		$it = ICalendarHelper::makeRecurrenceIterator($this);

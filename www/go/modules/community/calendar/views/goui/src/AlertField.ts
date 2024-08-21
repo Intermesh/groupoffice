@@ -80,8 +80,7 @@ export class AlertField extends SelectField {
 	private nameFromOffset(offset: string) {
 		const d = new DateInterval(offset);
 		let time = [];
-		debugger;
-		if(d.days) time.push(d.days + ' ' + t(d.days > 1 ? 'hours' : 'hour'));
+		if(d.days) time.push(d.days + ' ' + t(d.days > 1 ? 'days' : 'day'));
 		if(d.hours) time.push(d.hours + ' ' + t(d.hours > 1 ? 'hours' : 'hour'));
 		if(d.minutes) time.push(d.minutes + ' ' + t(d.minutes > 1 ? 'minutes' : 'minute'));
 		time.push(t(d.invert ? 'before' : 'after'));
@@ -109,10 +108,10 @@ export class AlertField extends SelectField {
 			str.push(duration.day + ' ' + (duration.day === 1 ? t('day') : t('days')));
 		}
 		if(duration.hour) {
-			str.push(duration.hour + ' ' + (duration.day === 1 ? t('hour') : t('hours')));
+			str.push(duration.hour + ' ' + (duration.hour === 1 ? t('hour') : t('hours')));
 		}
 		if(duration.minute) {
-			str.push(duration.minute + ' ' + (duration.day === 1 ? t('minute') : t('minutes')));
+			str.push(duration.minute + ' ' + (duration.minute === 1 ? t('minute') : t('minutes')));
 		}
 
 		return str.join(', ') + ' ' + (duration.negative ? t('before') : t('after'));
@@ -137,8 +136,8 @@ export class AlertField extends SelectField {
 					case 'M': time ? (value.minute = n) : (value.month = n); break;
 					case 'D': value.day = n; break;
 					case 'W': value.week = n; break;
-					case 'H': value.hours = n; break;
-					case 'S': value.seconds = n; break;
+					case 'H': value.hour = n; break;
+					case 'S': value.second = n; break;
 				}
 				num = '';
 			} else {

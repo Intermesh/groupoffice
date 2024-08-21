@@ -443,7 +443,7 @@ class ICalendarHelper {
 	}
 
 	static public function makeRecurrenceIterator($event) {
-		return new VObject\Recur\RRuleIterator(self::toRrule($event), $event->start);
+		return new VObject\Recur\RRuleIterator(self::toRrule($event), $event->start());
 	}
 
 	static private function parseRrule(VObject\Property\ICalendar\Recur $rule, $event) {
