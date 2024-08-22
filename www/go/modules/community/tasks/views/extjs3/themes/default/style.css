@@ -1,5 +1,5 @@
 .projects-late {
-    color: red;
+    color: var(--hue-red);
 }
 
 .tasks-task .status {
@@ -34,6 +34,10 @@
 
 .tasks-category {
 
+}
+
+.tasklists-category-separator {
+    color: var(--c-accent);
 }
 
 .tasks-category ~ .tasks-category::before {

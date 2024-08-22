@@ -1025,21 +1025,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				return 0;
 		}
 
-		//todo test this:
-//      if(!isset($model->acl_id) && empty($params['mustExist'])){
-//          //if this model is not a container like an addressbook but a contact
-//          //then delete the folder if it's empty.
-//          $ls = $folder->fsFolder->ls();
-//          if(!count($ls) && $folder->fsFolder->mtime()<time()-60){
-//              $folder->delete();
-//              $response['files_folder_id']=$model->files_folder_id=0;
-//              $model->save();
-//              return $response['files_folder_id'];
-//          }
-//      }
-
-
-
 		$currentPath = $folder->path;
 		$newPath = \go\core\util\StringUtil::normalize(rtrim($model->buildFilesPath(),'.'));
 		

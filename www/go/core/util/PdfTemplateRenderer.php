@@ -104,8 +104,10 @@ class PdfTemplateRenderer extends PdfRenderer {
 	/**
 	 * <tcpdf method="logo"></tcpdf>
 	 * @return void
+	 * @throws Exception
 	 */
-	protected function logo() {
+	protected function logo() :void
+	{
 		$blob = $this->template->getLogo();
 		if(!$blob) {
 			return;
@@ -296,6 +298,10 @@ class PdfTemplateRenderer extends PdfRenderer {
 		$this->setLastH($this->lh);
 
 	}
+
+	/**
+	 * @throws Exception
+	 */
 	private function renderBlockHtml(PdfBlock $block) {
 
 		if(isset($block->height)) {
