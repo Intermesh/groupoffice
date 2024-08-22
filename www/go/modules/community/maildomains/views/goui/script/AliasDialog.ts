@@ -2,7 +2,7 @@ import {
 	checkbox,
 	comp,
 	DefaultEntity, fieldset,
-	t,
+	t, textarea,
 	textfield
 } from "@intermesh/goui";
 import {FormWindow} from "@intermesh/groupoffice-core";
@@ -35,7 +35,8 @@ export class AliasDialog extends FormWindow {
 						icon: "alternate_email"
 					}),
 				),
-				textfield({
+				textarea({
+					autoHeight: true,
 					name: "goto",
 					id: "goto",
 					label: t("Goto"),

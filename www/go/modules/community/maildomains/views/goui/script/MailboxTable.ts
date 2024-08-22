@@ -133,7 +133,7 @@ export class MailboxTable extends Table<DataSourceStore> {
 								text: t("Delete"),
 								handler: async (btn) => {
 									const book = table.store.get(rowIndex)!;
-									jmapds("Mailbox").confirmDestroy([book.id]);
+									jmapds("MailBox").confirmDestroy([book.id]);
 								}
 							})
 

@@ -185,8 +185,13 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 
 		this.on("load",(detailPanel, entity) => {
 			void this.form.load(entity.id);
+
+			this.mailboxTable.store.setFilter("domainId", {domainId: entity.id})
 			void this.mailboxTable.store.load();
+
+			this.aliasTable.store.setFilter("domainId", {domainId: entity.id})
 			void this.aliasTable.store.load();
+
 			this.dnsSettingsForm.domain = entity;
 		});
 

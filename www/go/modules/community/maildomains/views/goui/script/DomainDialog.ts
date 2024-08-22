@@ -13,7 +13,8 @@ export class DomainDialog extends FormWindow {
 		this.maximizable = true;
 		this.resizable = true;
 		this.closable = true;
-		this.width = 1024;
+		this.height = 800;
+		this.width = 500;
 
 
 		this.generalTab.items.add(

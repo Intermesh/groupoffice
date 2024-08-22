@@ -76,6 +76,7 @@ create table community_maildomains_mailbox
     domainId    int(11) unsigned           null,
     username    varchar(190)    default '' not null,
     password    varchar(255)    default '' not null,
+    domainOwner bool default false not null,
     smtpAllowed tinyint(1)      default 0  not null,
     fts         tinyint(1)      default 0  not null,
     description        varchar(255)     null,

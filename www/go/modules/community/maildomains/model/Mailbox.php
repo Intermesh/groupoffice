@@ -23,6 +23,7 @@ final class Mailbox extends AclItemEntity
 	public int $domainId;
 	public string $username;
 	public ?string $password;
+	public bool $domainOwner = false;
 	public bool $smtpAllowed;
 	public bool $fts;
 	public ?string $description;

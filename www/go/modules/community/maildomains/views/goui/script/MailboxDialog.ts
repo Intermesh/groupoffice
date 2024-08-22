@@ -1,10 +1,10 @@
 import {
 	checkbox,
 	comp, containerfield, DefaultEntity,
-	fieldset, NumberField,
+	fieldset, br, NumberField,
 	numberfield, p, select,
 	t, TextField,
-	textfield,
+	textfield, hr,
 } from "@intermesh/goui";
 import {FormWindow} from "@intermesh/groupoffice-core";
 
@@ -25,6 +25,7 @@ export class MailboxDialog extends FormWindow {
 		this.resizable = true;
 		this.closable = true;
 		this.width = 800;
+		this.height = 800;
 
 		const minPasswordLength =  go.Modules.get("core","core").settings.passwordMinLength;
 
@@ -51,13 +52,19 @@ export class MailboxDialog extends FormWindow {
 
 			comp({cls: "hbox"},
 				fieldset({flex: 1},
-					checkbox({
-						label: t("Active", "community", "maildomains"),
-						name: "active",
-						id: "active",
-						type: "switch",
-						value: true
+
+					textfield({
+						label: t("Description"),
+						name: "description",
+						id: "description",
+						required: false,
 					}),
+
+					hr(),
+
+
+
+
 					this.passwordFld = textfield({
 						name: "password",
 						id: "password",
@@ -104,6 +111,9 @@ export class MailboxDialog extends FormWindow {
 							}
 						}
 					}),
+
+					hr(),
+
 					this.quotaFld = numberfield({
 						name: "quota",
 						id: "quota",
@@ -114,20 +124,27 @@ export class MailboxDialog extends FormWindow {
 						multiplier: 1 / (1024 * 1024) // convert bytes to MB
 					}),
 
-
-
-
-					textfield({
-						label: t("Description"),
-						name: "description",
-						id: "description",
-						required: false,
-					}),
 				),
 
 				comp({flex: 1},
 
 					fieldset({},
+
+						checkbox({
+							label: t("Active", "community", "maildomains"),
+							name: "active",
+							id: "active",
+							type: "switch",
+							value: true
+						}),
+
+						checkbox({
+							label: t("Domain owner"),
+							type: "switch",
+							value: false,
+							name: "domainOwner",
+							hint: t("When enabled this user can login to all mailboxes of the domain using user@example.com*thisuser@example.com")
+						}),
 
 						checkbox({
 							label: t("Allow external SMTP usage", "community", "maildomains"),
@@ -146,21 +163,7 @@ export class MailboxDialog extends FormWindow {
 
 					fieldset({},
 
-						checkbox({
-							label: t("Auto expunge"),
-							type: "switch",
-							value: true,
-							name: "enabled",
-							listeners: {
-								change:(field, newValue, oldValue) => {
-									const p = field.nextSibling()!
-									p.disabled = !newValue;
-									p.nextSibling()!.disabled = !newValue;
-								},
-							}
-						}),
 
-						p({text: t("Automatically delete mail from the Trash and Spam folder after a period of time.")}),
 
 						containerfield({
 								name: "autoExpunge",
@@ -187,7 +190,21 @@ export class MailboxDialog extends FormWindow {
 									}
 								},
 							},
+							checkbox({
+								label: t("Auto expunge"),
+								type: "switch",
+								value: true,
+								name: "enabled",
+								listeners: {
+									change:(field, newValue, oldValue) => {
+										const p = field.nextSibling()!
+										p.disabled = !newValue;
+										p.nextSibling()!.disabled = !newValue;
+									},
+								}
+							}),
 
+							p({text: t("Automatically delete mail from the Trash and Spam folder after a period of time.")}),
 
 
 
@@ -198,7 +215,10 @@ export class MailboxDialog extends FormWindow {
 								label: t("Expunge after days"),
 								value: 30
 							})
-						)
+						),
+
+
+
 					),
 				)
 			)
