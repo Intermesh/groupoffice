@@ -80,6 +80,19 @@ Alias /onlyoffice ${DOC_ROOT_{version}}/go/modules/business/onlyoffice/connector
 Redirect 301 /.well-known/carddav /carddav
 Redirect 301 /.well-known/caldav /caldav
 
+#openID service discovery
+Alias /.well-known/openid-configuration ${DOC_ROOT_{version}}/api/oauth.php/.well-known/openid-configuration
+
+#autoconfig
+Alias /mail/config-v1.1.xml ${DOC_ROOT_{version}}/go/modules/community/autoconfig/autoconfig.php
+Alias /v1.1/mail/config-v1.1.xml ${DOC_ROOT_{version}}/go/modules/community/autoconfig/autoconfig.php
+Alias /.well-known/autoconfig/mail/config-v1.1.xml ${DOC_ROOT_{version}}/go/modules/community/autoconfig/autoconfig.php
+
+#autodiscover
+Alias /autodiscover/autodiscover.json ${DOC_ROOT_{version}}/go/modules/community/autoconfig/autodiscover-json.php
+Alias /Autodiscover/Autodiscover.xml ${DOC_ROOT_{version}}/go/modules/community/autoconfig/autodiscover.php
+Alias /autodiscover/autodiscover.xml ${DOC_ROOT_{version}}/go/modules/community/autoconfig/autodiscover.php
+
 SSLEngine on
 SSLCertificateKeyFile /etc/letsencrypt/live/{tld}/privkey.pem
 SSLCertificateFile /etc/letsencrypt/live/{tld}/fullchain.pem

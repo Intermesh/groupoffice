@@ -583,33 +583,6 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 //		$this->log('open');
 	}
 
-//	/**
-//	 * Adds some extra info to the loggin of files
-//	 * @param string $action the action to log
-//	 * @param boolean $save unused
-//	 * @return boolean if save was successful
-//	 */
-//	protected function log($action, $save=true, $modifiedCustomfieldAttrs = false) {
-//		$log = parent::log($action, false, $modifiedCustomfieldAttrs);
-//		if(empty($log))
-//			return false;
-//
-//		if($log === true) {
-//			return true;
-//		}
-//
-//		if($log->action=='update') {
-//			$log->action = 'propedit';
-//			if($log->object->isModified('folder_id'))
-//				$log->action='moved';
-//			if($log->object->isModified('name')) {
-//				$log->action='renamed';
-//				$log->message = $log->object->getOldAttributeValue('name') . ' > ' . $log->message;
-//			}
-//		}
-//		return $save ? $log->save() : $log;
-//	}
-
 	/**
 	 * Copy a file to another folder.
 	 *
@@ -661,8 +634,6 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		if($this->isLocked())
 			throw new \GO\Files\Exception\FileLocked();
 //		for safety allow replace action
-//		if(!File::checkQuota($fsFile->size()-$this->size))
-//			throw new \GO\Base\Exception\InsufficientDiskSpace();
 		if(!$this->isNew)
 			$this->log("update");
 		$this->saveVersion();

@@ -97,12 +97,15 @@ final class Attachments extends MultiSelect
 			return [];
 		}
 
-		return (new Query())
+		$q = (new Query())
 			->select("blobId, name, description")
 			->from($this->getMultiSelectTableName())
 			->where(['modelId' => $entity->id])
-			->orderBy(['order'=>'ASC'])
-			->all();
+			->orderBy(['order'=>'ASC']);
+
+		$results = $q->all();
+
+		return $results;
 	}
 
 	public function dbToText($value, CustomFieldsModel $values, $entity)

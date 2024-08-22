@@ -6,12 +6,11 @@
 	content: "folder"
 }
 
-
 .fs-img-viewer{
-border:1px solid #d0d0d0;
-display:block;
-margin:auto;
-cursor:pointer;
+	border:1px solid var(--fg-border);
+	display:block;
+	margin:auto;
+	cursor:pointer;
 }
 
 .go-module-icon-files , .go-menu-icon-files {
@@ -28,10 +27,6 @@ cursor:pointer;
 .go-model-icon-GO_Files_Model_Folder {
 	background-image: url('images/folder.png') !important;
 }
-
-/*.btn-download {
-	background-image:url('images/download.png') !important;
-}*/
 
 .btn-download-gota {
 	background-image:url('images/gota.gif') !important;
@@ -52,13 +47,9 @@ cursor:pointer;
 	background-image:url('images/decompress.png') !important;
 }
 
-
-
 .go-files-location-panel .x-plain-body{
 	padding: 5px 5px 0px 6px;
-/*background:#D0DEF0 url(../../../../ext/resources/images/default/toolbar/bg.gif);*/
 }
-
 
 .x-tree-node img.folder-default, .x-tree-node-collapsed img.folder-default {
     background-image:  url("images/folder.png");
@@ -81,8 +72,6 @@ cursor:pointer;
     background-image:  url("images/folder_new.png");
 }
 
-
-
 .fs-thumb{
 	padding: 8px;
 	text-align:center;
@@ -101,6 +90,9 @@ cursor:pointer;
 	width:152px;
 	border-radius: 2px;
 	overflow:hidden;
+	&:hover {
+		background-color: var(--bg-hover);
+	}
 }
 .fs-thumb-wrap span{
 	display: block;
@@ -109,14 +101,11 @@ cursor:pointer;
 }
 
 .fs-view-over{
-  background-color: rgba(23,126,163, .16);
+  background-color: var(--bg-hover);
 }
 .fs-view-selected{
-	background-color: #eeeeee;
+	background-color: var(--bg-selected);
 }
-/*.fs-view-selected .fs-thumb{
-	background:transparent;
-}*/
 
 .fs-loading-indicator {
 	font-size:11px;
@@ -169,7 +158,7 @@ cursor:pointer;
 }
 
 .fs-dropzone {
-	border: 2px dashed grey;
+	border: 2px dashed var(--fg-border);
 	min-height: 100px;
 	margin: 14px 14px 0;
 	text-align:center;
@@ -177,5 +166,5 @@ cursor:pointer;
 }
 
 .content-expired {
-	color:red;
+	color: var(--hue-red);
 }

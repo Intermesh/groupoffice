@@ -1,3 +1,11 @@
+- Core: Add several filters to PDF template parser
+
+19-08-2024: 6.8.65
+- Core: Attachments Custom field now shows files grid when configured as pictures
+- Tasks / support: accent class for grouping separator
+- Business: allow users with mayManageEmployees to create or destroy agreements
+- Core: more helpful / less generic "Add link" button icon
+
 13-08-2024: 6.8.64
 - Core: PHP 8.2 compatibility fix
 - Core: Fixed combobox not loading value in Account dialog causing DB error
@@ -22,7 +30,7 @@
 - Email: Display files with ampersands in file name correctly, fix download link.
 
 15-07-2024: 6.8.60
-- Busisess: allow users with mayManageEmployees to update their agreements
+- Business: allow users with mayManageEmployees to update their agreements
 - Core: make conditionally required, required and conditionally hidden mutually exclusive
 
 09-07-2024: 6.8.59

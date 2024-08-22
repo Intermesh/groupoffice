@@ -159,11 +159,12 @@ class Field extends AclItemEntity {
 		return ['fieldSetId' => 'id'];
 	}
 	
-	protected function internalValidate() {
+	protected function internalValidate(): void
+	{
 		
 		$this->getDataType()->onFieldValidate();
 		
-		return parent::internalValidate();
+		parent::internalValidate();
 	}
 
 
