@@ -1,3 +1,5 @@
+- Core: Add several filters to PDF template parser
+
 19-08-2024: 6.8.65
 - Core: Attachments Custom field now shows files grid when configured as pictures
 - Tasks / support: accent class for grouping separator
