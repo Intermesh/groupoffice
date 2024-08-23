@@ -11,8 +11,8 @@
  * It will pass:
  * 
  * store: the entity store
- * added: Object Entity object mapped by ID
- * changed: Object Entity object mapped by ID
+ * added: int[]|string[] array of ids's
+ * changed: int[]|string[] array of ids's
  * destroyed: int[]|string[] array of ids's
  *
  * Do not instantiate directly use:
