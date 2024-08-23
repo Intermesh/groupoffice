@@ -13,6 +13,7 @@ use GO\Base\Mail\Imap;
 use GO\Base\Mail\Mailer;
 use GO\Base\Mail\SmimeMessage;
 use GO\Base\Model\Acl;
+use go\core\db\DbException;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\fs\File;
@@ -1270,12 +1271,18 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		return $lines;
 	}
 
-	public function actionView($params)
+	/**
+	 * View an email message
+	 *
+	 * @param array $params
+	 * @return array
+	 * @throws AccessDenied
+	 * @throws DbException
+	 * @throws NotFound
+	 */
+	public function actionView(array $params): array
 	{
-//		Do not close session writing because SMIME stores the password in the session
-//		GO::session()->closeWriting();
-
-		$params['no_max_body_size'] = !empty($params['no_max_body_size']) && $params['no_max_body_size']!=='false' ? true : false;
+		$params['no_max_body_size'] = !empty($params['no_max_body_size']) && $params['no_max_body_size']!=='false';
 
 		$account = Account::model()->findByPk($params['account_id']);
 		if(!$account) {
@@ -1294,6 +1301,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$imapMessage->createTempFilesForAttachments();
 		}
 
+		$imapMessage->autoLink();
+
 		$plaintext = !empty($params['plaintext']);
 
 		$response = $imapMessage->toOutputArray(!$plaintext,false,$params['no_max_body_size']);
@@ -1310,7 +1319,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 
 			$response = $this->_blockImages($params, $response);
-			$imapMessage->autoLink();
+
 
 			$response = $this->_handleInvitations($imapMessage, $params, $response);
 			

@@ -707,7 +707,10 @@ $timeMargin: dp(72);
 
 .check-list {
 	padding-bottom: dp(16);
-	.control { width: 100%;}
+	.control {
+		width: 100%;
+		.box-label { padding-top: dp(4) !important; padding-bottom: dp(4) !important; }
+	}
 	label {
 		pointer-events: none;
 		input, .goui-toolbar {pointer-events: all;}

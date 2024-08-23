@@ -3,6 +3,7 @@
 namespace go\core\dav\schedule;
 
 use go\core\ErrorHandler;
+use go\core\mail\Address;
 use go\core\mail\AddressList;
 use go\core\model\Module;
 use Sabre\VObject\ITip\Message;
@@ -24,6 +25,14 @@ class IMipPlugin extends \Sabre\CalDAV\Schedule\IMipPlugin{
 
 		if(empty($to)) {
 			return;
+		}
+
+		// Sabredav does not format the address correctly. When a , inside the name the parsing will go wrong. They shoukd
+		// use quotes: https://www.rfc-editor.org/rfc/rfc5322.html#section-3.2
+		// For example : John, Doe <johndoe@foo.com> should be  "John, Doe" <johndoe@foo.com>
+
+		if(preg_match("/(.*)\s<(.*)>/", $to, $toParts)) {
+			$to = new Address($toParts[2], $toParts[1]);
 		}
 
 		try {

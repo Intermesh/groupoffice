@@ -9,49 +9,49 @@ use JsonException;
 use function json_decode;
 
 class JSON {
-  /**
-   * Encode data to JSON
-   * 
-   * 
-   * @param mixed $value
-   * The value being encoded. Can be any type except a resource.
-   * 
-   * All string data must be UTF-8 encoded.
-   * 
-   * PHP implements a superset of JSON - it will also encode and decode scalar types and NULL. The JSON standard only supports these values when they are nested inside an array or an object.
-   * 
-   * @param int $options
-   * [optional]
-   * 
-   * Bitmask consisting of JSON_HEX_QUOT, JSON_HEX_TAG, JSON_HEX_AMP, JSON_HEX_APOS, JSON_NUMERIC_CHECK, JSON_PRETTY_PRINT, JSON_UNESCAPED_SLASHES, JSON_FORCE_OBJECT, JSON_UNESCAPED_UNICODE. JSON_THROW_ON_ERROR The behaviour of these constants is described on the JSON constants page.
-   * 
-   * @param int $depth
-   * [optional]
-   * 
-   * Set the maximum depth. Must be greater than zero.
-   * 
-   * @return string
-   * @throws InvalidArgumentException
-   */
-  public static function encode($value, int $options = 0, int $depth = 512): string
-  {
-    $string = json_encode($value, $options, $depth);
+	/**
+	 * Encode data to JSON
+	 *
+	 *
+	 * @param mixed $value
+	 * The value being encoded. Can be any type except a resource.
+	 *
+	 * All string data must be UTF-8 encoded.
+	 *
+	 * PHP implements a superset of JSON - it will also encode and decode scalar types and NULL. The JSON standard only supports these values when they are nested inside an array or an object.
+	 *
+	 * @param int $options
+	 * [optional]
+	 *
+	 * Bitmask consisting of JSON_HEX_QUOT, JSON_HEX_TAG, JSON_HEX_AMP, JSON_HEX_APOS, JSON_NUMERIC_CHECK, JSON_PRETTY_PRINT, JSON_UNESCAPED_SLASHES, JSON_FORCE_OBJECT, JSON_UNESCAPED_UNICODE. JSON_THROW_ON_ERROR The behaviour of these constants is described on the JSON constants page.
+	 *
+	 * @param int $depth
+	 * [optional]
+	 *
+	 * Set the maximum depth. Must be greater than zero.
+	 *
+	 * @return string
+	 * @throws InvalidArgumentException
+	 */
+	public static function encode($value, int $options = 0, int $depth = 512): string
+	{
+		$string = json_encode($value, $options, $depth);
 
-    if($string === false && json_last_error() == JSON_ERROR_UTF8) {
+		if($string === false && json_last_error() == JSON_ERROR_UTF8) {
 
 			ErrorHandler::log("JSON had invalid UTF8 characters. Trying to cleanup.");
-	    //try to clean up data
-	    $value = self::cleanup($value);
-	    $string = json_encode($value, $options, $depth);
-    }
+			//try to clean up data
+			$value = self::cleanup($value);
+			$string = json_encode($value, $options, $depth);
+		}
 
-	  if($string === false) {
-		   $error = "JSON encoding error: " . json_last_error_msg() .".";
-			 throw new InvalidArgumentException($error);
-    }
-    
-    return $string;
-  }
+		if($string === false) {
+			$error = "JSON encoding error: " . json_last_error_msg() .".";
+			throw new InvalidArgumentException($error);
+		}
+
+		return $string;
+	}
 
 	/**
 	 * In some cases there can be invalid characters inside the data
@@ -70,29 +70,29 @@ class JSON {
 		return $mixed;
 	}
 
-/**
- * Wrapper for json_decode that throws when an error occurs.
- *
- * @param string $json    JSON data to parse
- * @param bool $assoc     When true, returned objects will be converted
- *                        into associative arrays.
- * @param int $depth   User specified recursion depth.
- * @param int $options Bitmask of JSON decode options.
- *
- * @return mixed
- * @throws JsonException if the JSON cannot be decoded.
- * @link http://www.php.net/manual/en/function.json-decode.php
- */
-  public static function decode(string $json, bool $assoc = false, int $depth = 512, int $options = 0) {
-    $data = json_decode($json, $assoc, $depth, $options);
-    if (JSON_ERROR_NONE !== json_last_error()) {
-        throw new JsonException(
-            "JSON decoding error: '".json_last_error_msg()."'.\n\nJSON data given: \n\n".var_export($json, true)
-        );
-    }
+	/**
+	 * Wrapper for json_decode that throws when an error occurs.
+	 *
+	 * @param string $json    JSON data to parse
+	 * @param bool $assoc     When true, returned objects will be converted
+	 *                        into associative arrays.
+	 * @param int $depth   User specified recursion depth.
+	 * @param int $options Bitmask of JSON decode options.
+	 *
+	 * @return mixed
+	 * @throws JsonException if the JSON cannot be decoded.
+	 * @link http://www.php.net/manual/en/function.json-decode.php
+	 */
+	public static function decode(string $json, bool $assoc = false, int $depth = 512, int $options = 0) {
+		$data = json_decode($json, $assoc, $depth, $options);
+		if (JSON_ERROR_NONE !== json_last_error()) {
+			throw new JsonException(
+				"JSON decoding error: '".json_last_error_msg()."'.\n\nJSON data given: \n\n".var_export($json, true)
+			);
+		}
 
-    return $data;
-  }
+		return $data;
+	}
 
 
 	/**
@@ -186,8 +186,7 @@ class JSON {
 	{
 		foreach($patch as $pointer => $value) {
 			try {
-				$deepPatch = str_starts_with($pointer, "/");
-				$doc = static::patchProp($doc, self::explodePointer($pointer), $value, $deepPatch);
+				$doc = static::patchProp($doc, self::explodePointer($pointer), $value);
 			} catch(JsonPointerException $e) {
 				throw new JsonPointerException("The path " . $pointer ." doesn't exist");
 			}
@@ -196,21 +195,17 @@ class JSON {
 		return $doc;
 	}
 
-	private static function patchProp(mixed $doc, array $pointer, mixed $value, bool $mustExist)
+	private static function patchProp(mixed $doc, array $pointer, mixed $value)
 	{
-		$count = count($pointer);
 		$part = array_shift($pointer);
-		if(!isset($doc[$part])) {
-			if($mustExist) {
-				throw new JsonPointerException();
-			}
-			$doc[$part] = [];
+		if(!isset($doc[$part]) && !empty($pointer)) {
+			throw new JsonPointerException();
 		}
 
 		if(empty($pointer)) {
 			$doc[$part] = $value;
 		} else {
-			$doc[$part] = self::patchProp($doc[$part], $pointer, $value, $count > 2);
+			$doc[$part] = self::patchProp($doc[$part], $pointer, $value);
 		}
 
 		return $doc;

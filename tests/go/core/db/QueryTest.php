@@ -63,6 +63,7 @@ class QueryTest extends TestCase {
 		$data = [
 				"id" => 1,
 				"propB" => "string 2",
+				"propE" => "string 2",
 				"userId" => 1
 		];
 

@@ -91,7 +91,7 @@ export class CalendarItem {
 		//if(!obj.end) {
 			this.end = this.start.clone().add(new DateInterval(this.patched.duration!));
 		//}
-		this.cal = calendarStore.items.find((c:any) => c.id == this.patched.calendarId);
+		this.cal = calendarStore.find((c:any) => c.id == this.patched.calendarId);
 
 		this.initStart = this.start.format('Y-m-d\TH:i:s');
 		this.initEnd = this.end.format('Y-m-d\TH:i:s');
@@ -116,15 +116,28 @@ export class CalendarItem {
 			end = start.clone().add(new DateInterval(e.duration));
 
 		if(e.recurrenceRule) {
+			if(e.recurrenceOverrides) {
+				for(const recurrenceId in e.recurrenceOverrides) {
+					const o = e.recurrenceOverrides[recurrenceId];
+					if(o.excluded) continue;
+					const oStart = new DateTime(o.start ?? recurrenceId);
+					if(oStart.date > from.date) {
+						const oEnd = oStart.add(new DateInterval(o.duration ?? e.duration));
+						if(oEnd.date < until.date) {
+							yield new CalendarItem({key: e.id + '/' + recurrenceId, recurrenceId, override: o, data: e});
+						}
+					}
+				}
+			}
 			const r = new Recurrence({dtstart: new Date(e.start), timeZone:e.timeZone, rule: e.recurrenceRule});
 			for(const date of r.loop(from, until)){
 				const recurrenceId = date.format('Y-m-d\TH:i:s');
 
 				if (e.recurrenceOverrides && recurrenceId in e.recurrenceOverrides) {
-					const o = e.recurrenceOverrides[recurrenceId];
-					if(!o.excluded) {
-						yield new CalendarItem({key: e.id + '/' + recurrenceId, recurrenceId, override: o, data: e});
-					}
+					// const o = e.recurrenceOverrides[recurrenceId];
+					// if(!o.excluded) {
+					// 	yield new CalendarItem({key: e.id + '/' + recurrenceId, recurrenceId, override: o, data: e});
+					// }
 				} else {
 					yield new CalendarItem({key: e.id + '/' + recurrenceId, recurrenceId, data: e});
 				}
@@ -186,7 +199,7 @@ export class CalendarItem {
 		const icons = [...this.extraIcons];
 		//if(e.recurrenceRule) icons.push('refresh');
 		if(e.links) icons.push('attachment');
-		//if(e.alerts) icons.push('notifications');
+		if(e.alerts) icons.push('notifications');
 		if(this.isTentative) icons.push('question_mark');
 		if(!!e.participants) icons.push('group');
 

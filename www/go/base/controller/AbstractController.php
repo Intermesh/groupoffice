@@ -50,6 +50,7 @@ use GO\Base\Model\Module;
 use GO\Base\Observable;
 use GO\Base\Util\Number;
 use GO\Base\View\AbstractView;
+use go\core\auth\Authenticate;
 use go\core\jmap\State;
 use ReflectionMethod;
 
@@ -77,28 +78,22 @@ abstract class AbstractController extends Observable {
 	protected $defaultAction='Index';
 
 	/**
+	 * The currently running action in lowercase without the action prefix.
+	 * @var StringHelper
+	 */
+	private $_currentAction;
+
+	/**
 	 *
 	 * @var array See method addPermissionLevel
 	 */
-	protected $requiredPermissionLevels=array(
-			
-	);
-	
-	/**
-	 * The currently running action in lowercase without the action prefix.
-	 * @var StringHelper 
-	 */
-	private $_currentAction;
-	
-	private $_lockedActions=array();
-	
-	
-	
-	
-	
+	protected $requiredPermissionLevels = array();
+
+	private $_lockedActions = array();
+
 	/**
 	 * The view object that renders the response
-	 * If the value is a string the object will be create when the 
+	 * If the value is a string the object will be create when the
 	 * render function is called.
 	 * Valid strings: 'json', 'file'
 	 * @see render()
@@ -179,28 +174,31 @@ abstract class AbstractController extends Observable {
 	protected function ignoreAclPermissions(){
 		return array();
 	}
-	
+
 	/**
 	 * Checks a token that is generated for each session.
+	 *
+	 * only check token when we are:
+	 *  1. Not in debug mode
+	 *  2. There's a logged in user.
+	 *  3. A route to a controller has been given. Because we don't want to block the default page when entered manually.
+     *
+	 * @throws SecurityTokenMismatch
 	 */
-	protected function checkSecurityToken(){
-		
-		//only check token when we are:
-		// 1. Not in debug mode
-		// 2. There's a logged in user.
-		// 3. A route to a controller has been given. Because we don't want to block the default page when entered manually.
-		
-		if(
-						!GO::config()->debug && 
-						!GO::config()->disable_security_token_check && 
-//						\GO::user() && No longer needed. We only check token when action requires a logged in user
-						!empty($_REQUEST['r']) && 
-						(!isset($_REQUEST['security_token']) || $_REQUEST['security_token']!=GO::session()->values['security_token'])
-			){
-			//\GO::session()->logout();			
+	protected function checkSecurityToken()
+	{
+		// When using JMAP API requests without cookies don't check CSRF
+		$state = go()->getAuthState();
+		$usingCookies = (!($state instanceof State) || $state->isAuthenticatedUsingCookie());
+		if (
+      $usingCookies &&
+			!GO::config()->debug &&
+			!GO::config()->disable_security_token_check &&
+			!empty($_REQUEST['r']) &&
+			(!isset($_REQUEST['security_token']) || $_REQUEST['security_token'] != GO::session()->values['security_token'])
+		) {
 			throw new SecurityTokenMismatch();
-
-		} else{
+		} else {
 			State::$CSRFcheck = false;
 		}
 	}	
@@ -444,10 +442,11 @@ abstract class AbstractController extends Observable {
 					
 			$response['exceptionClass'] = get_class($e);
 
-			if($e instanceof SecurityTokenMismatch)
-				$response['redirectToLogin']=true;
+			if ($e instanceof SecurityTokenMismatch) {
+				$response['redirectToLogin'] = true;
+			}
 
-			if(GO::config()->debug){
+			if (GO::config()->debug){
 				$response['trace']=explode("\n", $e->getTraceAsString());
 				//$response['trace']= $e->getTrace();
 			}

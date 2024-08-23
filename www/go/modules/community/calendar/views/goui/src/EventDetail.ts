@@ -31,7 +31,6 @@ export class EventDetail extends Component {
 		this.title = t('Event');
 		this.width = 440;
 		//this.height = 620;
-
 		this.store = jmapds("CalendarEvent");
 
 		const recurrenceField = displayfield({
@@ -52,23 +51,18 @@ export class EventDetail extends Component {
 			listeners:{
 			'change': (me, newValue) => {
 				if(this.item?.data.id) {
-					if(newValue === null) {
-						alertUseDefault.value = me.useDefault = false;
-					} else {
-						const isDefault = (newValue === 'default' || Object.keys(newValue).length === 0);
-						me.useDefault = isDefault;
-						alertUseDefault.value = isDefault;
-					}
-					this.form.value.useDefaultAlerts = newValue === 'default';
 					this.form.submit(); // hoppakee
 				}
 			}
-		}}),
-		alertUseDefault = checkbox({hidden:true, name:'useDefaultAlerts', listeners: {
-				'setvalue': (_, newV) => {
-					if(newV) {alertField.useDefault = true;}
-				}
-			}})
+		}});
+		// alertUseDefault = checkbox({
+		// 	hidden:true,
+		// 	name:'useDefaultAlerts',
+		// 	listeners: {
+		// 		'setvalue': (_, newV) => {
+		// 			if(newV) {alertField.useDefault = true;}
+		// 		}
+		// 	}})
 
 		this.items.add(this.form = datasourceform({
 				cls: 'scroll flow pad',
@@ -88,11 +82,16 @@ export class EventDetail extends Component {
 							this.toolBar.show();
 							this.pressButton(this.item!.calendarPrincipal.participationStatus);
 						}
+						if(data.useDefaultAlerts) {
+							alertField.useDefault = true;
+							delete data.alerts;
+						}
 					},
 					'beforesave':(_, data) => {
-						if(alertField.isModified()) {
+						debugger;
+						if(alertField.isModified() || !this.item?.data.id) {
 							//@ts-ignore
-							data.useDefaultAlerts = alertField.value === 'default'; // ?
+							data.useDefaultAlerts = alertField.useDefault; // ?
 						}
 					}
 				}
@@ -149,7 +148,7 @@ export class EventDetail extends Component {
 				})
 			}),
 			hr(),
-			alertField, alertUseDefault,
+			alertField,
 			mapfield({name: 'links', cls:'goui-pit',
 				buildField: (v: any) => containerfield({flex:'1 0 100%',cls: 'flow'},
 					btn({icon: "description", text: v.title, flex:'1', style:{textAlign:'left'}, handler() {

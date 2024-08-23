@@ -1651,10 +1651,6 @@ group by u.id;');
 
 };
 
-
-$updates['202404191216'][] = "alter table core_module
-    drop key name;";
-
-$updates['202404191216'][] = "alter table core_module
-    add constraint name
-        unique (name, package);";
+$updates['202404191216'][] = "alter table core_module drop key name;";
+$updates['202404191216'][] = "alter table core_module add constraint name unique (name, package);";
+$updates['202408140936'][] = "ALTER TABLE `core_alert` ADD COLUMN `staleAt` DATETIME NULL AFTER `triggerAt`;";

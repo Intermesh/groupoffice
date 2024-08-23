@@ -350,10 +350,6 @@ $updates['202303140904'][] = "alter table cal_events
 $updates['202303140904'][] = "alter table cal_events
     drop column repeat_every;";
 
-$updates['202403130920'][] = function() {
-	$m = new \go\core\install\MigrateCustomFields63to64();
-	$m->migrateEntity("Calendar");
-	$m->migrateEntity("CalendarEvent");
-};
 //final server update for old module
+$updates['202403130920'][] = 'update core_entity set name=\'CalendarEvent\', clientName=\'CalendarEvent\' WHERE name=\'Event\';';
 $updates['202403130920'][] = 'update core_module set package=\'community\', version=0 where name=\'calendar\'';

@@ -37,6 +37,7 @@ class Alert extends SingleOwnerEntity
 
 	public $userId;
 	public $triggerAt;
+	public $staleAt;
 
 	public $recurrenceId;
 	public $tag;
@@ -169,6 +170,10 @@ class Alert extends SingleOwnerEntity
 		return $this->relatedEntity;
 	}
 
+	static function findStale() {
+		return static::find()->select('id')
+			->where('staleAt < now()');
+	}
 
 	/**
 	 * Set arbitrary notification data

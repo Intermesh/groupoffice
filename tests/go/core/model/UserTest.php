@@ -48,6 +48,11 @@ class UserTest extends \PHPUnit\Framework\TestCase
 		$success = $user->save();
 
 		$this->assertEmpty($user->getValidationErrors());
+
+		if(!empty($user->getValidationErrors())) {
+			var_dump($user->getValidationErrors());
+		}
+
 		$this->assertEquals(true, $success);
 
 		$user = new User();

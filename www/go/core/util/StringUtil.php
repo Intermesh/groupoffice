@@ -983,6 +983,7 @@ END;
 		// <style><!-- body{} --></style>
 		if($preserveHtmlStyle) {
 			$prefix =  uniqid();
+			$html = $html ?? "";
 			$styles = self::extractStyles($html, $prefix);
 		}
 

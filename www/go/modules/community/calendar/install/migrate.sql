@@ -90,12 +90,12 @@ CREATE TABLE IF NOT EXISTS `calendar_default_alert` (
 	`offset` VARCHAR(20) NULL,
 	`relativeTo` ENUM('start', 'end') NOT NULL DEFAULT 'start',
 	`when` DATE NULL,
-	`calendarId` INT UNSIGNED NOT NULL,
+	`fk` INT UNSIGNED NOT NULL,
 	`userId` INT NOT NULL,
-	PRIMARY KEY (`id`, `calendarId`, `userId`),
-	INDEX `fk_calendar_default_alert_calendar_calendar1_idx` (`calendarId` ASC, `userId` ASC),
+	PRIMARY KEY (`id`, `fk`, `userId`),
+	INDEX `fk_calendar_default_alert_calendar_calendar1_idx` (`fk` ASC, `userId` ASC),
 	CONSTRAINT `fk_calendar_default_alert_calendar_calendar1`
-		FOREIGN KEY (`calendarId`, `userId`)
+		FOREIGN KEY (`fk`, `userId`)
 			REFERENCES `calendar_calendar_user` (`id` , `userId`)
 			ON DELETE CASCADE
 			ON UPDATE CASCADE)
@@ -110,12 +110,12 @@ CREATE TABLE IF NOT EXISTS `calendar_default_alert_with_time` (
 	`offset` VARCHAR(20) NULL,
 	`relativeTo` ENUM('start', 'end') NOT NULL DEFAULT 'start',
 	`when` DATETIME NULL,
-	`calendarId` INT UNSIGNED NOT NULL,
+	`fk` INT UNSIGNED NOT NULL,
 	`userId` INT NOT NULL,
-	PRIMARY KEY (`id`, `calendarId`, `userId`),
-	INDEX `fk_calendar_default_alert_with_time_calendar_calendar1_idx` (`calendarId` ASC, `userId` ASC),
+	PRIMARY KEY (`id`, `fk`, `userId`),
+	INDEX `fk_calendar_default_alert_with_time_calendar_calendar1_idx` (`fk` ASC, `userId` ASC),
 	CONSTRAINT `fk_calendar_default_alert_with_time_calendar_calendar1`
-		FOREIGN KEY (`calendarId` , `userId`)
+		FOREIGN KEY (`fk` , `userId`)
 			REFERENCES `calendar_calendar_user` (`id` , `userId`)
 			ON DELETE CASCADE
 			ON UPDATE CASCADE)
@@ -138,17 +138,19 @@ CREATE TABLE IF NOT EXISTS `calendar_event` (
 	`privacy` ENUM('public', 'private', 'secret') NOT NULL DEFAULT 'public',
 	`status` ENUM('confirmed', 'cancelled', 'tentative') NOT NULL DEFAULT 'confirmed',
 	`recurrenceRule` TEXT NULL DEFAULT NULL,
+	`firstOccurrence` DATETIME NOT NULL COMMENT '@dbType=localdatetime',
 	`lastOccurrence` DATETIME NULL DEFAULT NULL COMMENT '@dbType=localdatetime',
 	`createdAt` DATETIME NULL,
 	`modifiedAt` DATETIME NULL,
 	`createdBy` INT NULL,
 	`modifiedBy` INT NULL,
 	`isOrigin` TINYINT(1) NOT NULL DEFAULT 1,
+	`etag` VARCHAR(100) NULL,
 	`replyTo` VARCHAR(100),
 	`requestStatus` varchar(255) DEFAULT NULL,
 	PRIMARY KEY (`eventId`),
+	INDEX `calendar_event_firstOccurrence_index` (`firstOccurrence` ASC),
 	INDEX `calendar_event_lastOccurrence_index` (`lastOccurrence` ASC),
-	INDEX `calendar_event_start_index` (`start` ASC),
 	INDEX `fk_calendar_event_core_user1_idx` (`createdBy` ASC),
 	INDEX `fk_calendar_event_core_user2_idx` (`modifiedBy` ASC),
 	CONSTRAINT `fk_calendar_event_core_user1`
@@ -246,12 +248,12 @@ CREATE TABLE IF NOT EXISTS `calendar_event_alert` (
 	`offset` VARCHAR(20) NULL,
 	`relativeTo` ENUM('start', 'end') NULL DEFAULT 'start',
 	`when` DATETIME NULL,
-	`eventId` INT UNSIGNED NOT NULL,
+	`fk` INT UNSIGNED NOT NULL,
 	`userId` INT NOT NULL,
-	PRIMARY KEY (`id`, `eventId`, `userId`),
-	INDEX `fk_calendar_event_alert_calendar_event_user1_idx` (`eventId` ASC, `userId` ASC),
+	PRIMARY KEY (`id`, `fk`, `userId`),
+	INDEX `fk_calendar_event_alert_calendar_event_user1_idx` (`fk` ASC, `userId` ASC),
 	CONSTRAINT `fk_calendar_event_alert_calendar_event_user1`
-		FOREIGN KEY (`eventId` , `userId`)
+		FOREIGN KEY (`fk` , `userId`)
 			REFERENCES `calendar_event_user` (`eventId` , `userId`)
 			ON DELETE cascade
 			ON UPDATE NO ACTION)
@@ -262,7 +264,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event_alert` (
 CREATE TABLE IF NOT EXISTS `calendar_recurrence_override` (
 	`fk` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`recurrenceId` DATETIME NOT NULL COMMENT '@dbType=localdatetime',
-	`patch` MEDIUMTEXT NOT NULL DEFAULT '{}',
+	`patch` MEDIUMTEXT NOT NULL,
 	PRIMARY KEY (`fk`, `recurrenceId`),
 	INDEX `fk_recurrence_override_calendar_event1_idx` (`fk` ASC),
 	CONSTRAINT `fk_recurrence_override_calendar_event1`
@@ -396,17 +398,15 @@ CREATE TABLE IF NOT EXISTS calendar_preferences (
 ) COLLATE = utf8mb4_unicode_ci;
 
 
-CREATE TABLE IF NOT EXISTS `calendar_event_custom_fields` (
-	`id` INT UNSIGNED NOT NULL,
-	PRIMARY KEY (`id`),
-	CONSTRAINT `fk_calendar_event_cf1` FOREIGN KEY (`id`) REFERENCES `calendar_event` (`eventId`) ON DELETE CASCADE
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+CREATE TABLE calendar_event_custom_fields LIKE cal_events_custom_fields;
+ALTER TABLE calendar_event_custom_fields CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL;
+ALTER TABLE `calendar_event_custom_fields`
+	ADD CONSTRAINT `calendar_event_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `calendar_event` (`eventId`) ON DELETE CASCADE;
 
-CREATE TABLE IF NOT EXISTS `calendar_calendar_custom_fields` (
-	`id` INT UNSIGNED NOT NULL,
-	PRIMARY KEY (`id`),
-	CONSTRAINT `fk_calendar_cf1` FOREIGN KEY (`id`) REFERENCES `calendar_calendar` (`id`) ON DELETE CASCADE
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+CREATE TABLE calendar_calendar_custom_fields LIKE cal_calendars_custom_fields;
+ALTER TABLE calendar_calendar_custom_fields CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL;
+ALTER TABLE `calendar_calendar_custom_fields`
+	ADD CONSTRAINT `calendar_calendar_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `calendar_calendar` (`id`) ON DELETE CASCADE;
 
 -- missing: (fields, show_not_as_busy)
 INSERT INTO calendar_resource_group
@@ -434,7 +434,7 @@ INSERT IGNORE INTO calendar_calendar_user
 
 
 INSERT IGNORE INTO calendar_default_alert_with_time
-  (`offset`, relativeTo, calendarId, userId) SELECT
+  (`offset`, relativeTo, fk, userId) SELECT
   CONCAT('PT',reminder,'S'), 'start', calendar_id, user_id FROM cal_settings WHERE calendar_id != '0' AND reminder IS NOT NULL;
 
 INSERT INTO calendar_category
@@ -443,19 +443,19 @@ INSERT INTO calendar_category
 
 -- insert instance that belongs to the organizer
 INSERT INTO calendar_event
-	(eventId, prodId, uid, sequence, title, description, location, showWithoutTime, start, timeZone, duration, priority,
+	(eventId, prodId, uid, sequence, title, description, location, showWithoutTime, start,firstOccurrence, timeZone, duration, priority,
 	 privacy,status,recurrenceRule,lastOccurrence,createdAt,modifiedAt, createdBy, modifiedBy, isOrigin, replyTo, requestStatus) SELECT
-	id, 'Group-Office', uuid, 1, name, description, location, all_day_event, FROM_UNIXTIME(start_time), timezone, CONCAT('PT',end_time - IF(all_day_event, start_time - 60, start_time),'S'), 0,
+	id, 'Group-Office', uuid, 1, name, description, location, all_day_event, FROM_UNIXTIME(start_time), FROM_UNIXTIME(start_time),timezone, CONCAT('PT',end_time - IF(all_day_event, start_time - 60, start_time),'S'), 0,
 	IF(private=1, 'private', 'public'), LOWER(status), IF(rrule='',null,rrule), FROM_UNIXTIME(end_time), FROM_UNIXTIME(ctime), FROM_UNIXTIME(mtime), user_id, muser_id, 1, '',''
-FROM cal_events WHERE exception_for_event_id = 0 AND is_organizer = 1 GROUP BY uuid, start_time;
+FROM cal_events WHERE exception_for_event_id = 0 AND is_organizer = 1 GROUP BY uuid;
 
 -- insert the events that have no organizer
 INSERT INTO calendar_event
-(eventId, prodId, uid, sequence, title, description, location, showWithoutTime, start, timeZone, duration, priority,
+(eventId, prodId, uid, sequence, title, description, location, showWithoutTime, start,firstOccurrence, timeZone, duration, priority,
  privacy,status,recurrenceRule,lastOccurrence,createdAt,modifiedAt, createdBy, modifiedBy, isOrigin, replyTo, requestStatus) SELECT
- id, 'Group-Office', uuid, 1, name, description, location, all_day_event, FROM_UNIXTIME(start_time), timezone, CONCAT('PT',end_time - IF(all_day_event, start_time - 60, start_time),'S'), 0,
+ id, 'Group-Office', uuid, 1, name, description, location, all_day_event, FROM_UNIXTIME(start_time), FROM_UNIXTIME(start_time),timezone, CONCAT('PT',end_time - IF(all_day_event, start_time - 60, start_time),'S'), 0,
  IF(private=1, 'private', 'public'), LOWER(status), IF(rrule='',null,rrule), FROM_UNIXTIME(end_time), FROM_UNIXTIME(ctime), FROM_UNIXTIME(mtime), user_id, muser_id, 0, '',''
-FROM cal_events WHERE exception_for_event_id = 0 GROUP BY uuid, start_time HAVING SUM(is_organizer) = 0;
+FROM cal_events WHERE exception_for_event_id = 0 GROUP BY uuid HAVING SUM(is_organizer) = 0;
 
 INSERT INTO calendar_calendar_event
 (id, eventId, calendarId)
@@ -465,14 +465,15 @@ inner join calendar_event ce on ce.uid = e.uuid
 WHERE e.exception_for_event_id = 0;
 
 INSERT INTO calendar_event_alert
-	(id, `offset`, relativeTo, eventId, userId) SELECT
+	(id, `offset`, relativeTo, fk, userId) SELECT
 	1, CONCAT('PT',reminder,'S'), 'start', id, user_id FROM cal_events WHERE (start_time > unix_timestamp() or repeat_end_time > unix_timestamp()) AND exception_for_event_id = 0 AND reminder IS NOT NULL;
 
 INSERT INTO calendar_event_category
 	(eventId, categoryId) SELECT
 	id, category_id FROM cal_events old JOIN calendar_event new ON new.eventId = old.id where category_id > 0 GROUP BY new.uid, old.category_id ;
 
-INSERT INTO calendar_event_custom_fields SELECT * FROM cal_events_custom_fields;
+INSERT IGNORE INTO calendar_event_custom_fields SELECT * FROM cal_events_custom_fields;
+INSERT IGNORE INTO calendar_calendar_custom_fields SELECT * FROM cal_calendars_custom_fields;
 
 -- calendar_event_location and calendar_event_related are unused for now.
 
@@ -495,8 +496,5 @@ CONCAT('Calendar:',c.id), r.id as eventId, c.name,u.email , 'resource', 0 ,IF(e.
 	 JOIN cal_events r ON e.resource_event_id = r.id
 WHERE c.group_id != 1 AND e.resource_event_id IS NOT NULL;
 
-INSERT IGNORE INTO calendar_recurrence_override
-	(fk, recurrenceId, patch) SELECT
-	event_id,FROM_UNIXTIME(time), '{"excluded":true}' FROM cal_exceptions e JOIN calendar_event ce ON ce.eventId = e.event_id WHERE exception_event_id=0;
 
 INSERT INTO calendar_preferences (userId, weekViewGridSnap, defaultCalendarId) SELECT user_id, 15, calendar_id FROM cal_settings s JOIN core_user u ON u.id = s.user_id;

@@ -35,7 +35,12 @@ go.modules.community.tasks.TasklistDialog = Ext.extend(go.form.Dialog, {
 				fieldLabel: t("Name"),
 				anchor: '100%',
 				allowBlank: false
-			}, new go.modules.community.tasks.TaskListGroupingCombo()]
+			},{
+				xtype:'colorfield',
+				name: 'color',
+				fieldLabel: t('Color')
+			}
+			, new go.modules.community.tasks.TaskListGroupingCombo()]
 		}];
 	}
 });

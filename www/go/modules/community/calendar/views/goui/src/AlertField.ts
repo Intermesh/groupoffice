@@ -8,15 +8,21 @@ interface Alert {
 }
 
 export class AlertField extends SelectField {
-
+	// is this a/for full day event
 	fullDay = false
+	// is this field use for the calendar its default alerts
 	isForDefault = false
+	// should the event use the default instead
 	useDefault = false
 	constructor() {
 		super();
 		this.name = 'alerts';
 		this.label = t('Reminder');
 		this.drawOptions();
+		this.on('change',(me,v) => {
+			/** @ts-ignore */
+			this.useDefault = me.control?.value === 'default';
+		})
 	}
 
 	drawOptions() {
@@ -32,7 +38,7 @@ export class AlertField extends SelectField {
 			{value: 'P0D', name: t('At the start')},
 		];
 		if(!this.isForDefault) {
-			super.value = 'default';
+			this.value = 'default';
 			this.options.unshift({value: 'default', name: t('Default')});
 		}
 		this.options.unshift({value: null, name: t('None')})
@@ -47,10 +53,12 @@ export class AlertField extends SelectField {
 	}
 	/** @ts-ignore */
 	set value(v: {[id:string]:Alert}|'default'|null) {
-		if(this.useDefault) return;
 		if(!v || typeof v === 'string') {
+			this.useDefault = v ==='default';
 			super.value = v;
 			return;
+		} else {
+			this.useDefault = false;
 		}
 		const firstKey = Object.keys(v)[0];
 		if(v[firstKey]) {
@@ -72,8 +80,7 @@ export class AlertField extends SelectField {
 	private nameFromOffset(offset: string) {
 		const d = new DateInterval(offset);
 		let time = [];
-		debugger;
-		if(d.days) time.push(d.days + ' ' + t(d.days > 1 ? 'hours' : 'hour'));
+		if(d.days) time.push(d.days + ' ' + t(d.days > 1 ? 'days' : 'day'));
 		if(d.hours) time.push(d.hours + ' ' + t(d.hours > 1 ? 'hours' : 'hour'));
 		if(d.minutes) time.push(d.minutes + ' ' + t(d.minutes > 1 ? 'minutes' : 'minute'));
 		time.push(t(d.invert ? 'before' : 'after'));
@@ -101,10 +108,10 @@ export class AlertField extends SelectField {
 			str.push(duration.day + ' ' + (duration.day === 1 ? t('day') : t('days')));
 		}
 		if(duration.hour) {
-			str.push(duration.hour + ' ' + (duration.day === 1 ? t('hour') : t('hours')));
+			str.push(duration.hour + ' ' + (duration.hour === 1 ? t('hour') : t('hours')));
 		}
 		if(duration.minute) {
-			str.push(duration.minute + ' ' + (duration.day === 1 ? t('minute') : t('minutes')));
+			str.push(duration.minute + ' ' + (duration.minute === 1 ? t('minute') : t('minutes')));
 		}
 
 		return str.join(', ') + ' ' + (duration.negative ? t('before') : t('after'));
@@ -129,8 +136,8 @@ export class AlertField extends SelectField {
 					case 'M': time ? (value.minute = n) : (value.month = n); break;
 					case 'D': value.day = n; break;
 					case 'W': value.week = n; break;
-					case 'H': value.hours = n; break;
-					case 'S': value.seconds = n; break;
+					case 'H': value.hour = n; break;
+					case 'S': value.second = n; break;
 				}
 				num = '';
 			} else {

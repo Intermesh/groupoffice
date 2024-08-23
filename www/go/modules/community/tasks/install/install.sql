@@ -8,8 +8,9 @@ CREATE TABLE IF NOT EXISTS `tasks_tasklist` (
   `name` VARCHAR(100) NOT NULL,
   `description` VARCHAR(255) NULL,
   `createdBy` INT(11) default NULL,
+	`defaultColor` VARCHAR(21) NOT NULL, # lightgoldenrodyellow
+	`highestItemModSeq` VARCHAR(32) NULL DEFAULT 0,
   `aclId` INT(11) NOT NULL,
-  `version` INT(10) UNSIGNED NOT NULL DEFAULT 1,
   `ownerId` INT(11) NOT NULL DEFAULT 1,
   `filesFolderId` INT(11) DEFAULT null,
   projectId int(11) null,
@@ -61,6 +62,7 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
   `longitude` decimal(11,8) DEFAULT NULL,
   PRIMARY KEY (`id`),
   INDEX `list_id` (`tasklistId` ASC),
+    INDEX `groupId` (`groupId` ASC),
   INDEX `rrule` (`recurrenceRule`(191) ASC),
   INDEX `uuid` (`uid` ASC),
   INDEX `fkModifiedBy` (`modifiedBy` ASC),
@@ -232,6 +234,7 @@ CREATE TABLE IF NOT EXISTS `tasks_tasklist_group` (
   `tasklistId` INT(11) UNSIGNED NOT NULL,
   `progressChange` TINYINT(2) NULL,
   PRIMARY KEY (`id`, `tasklistId`),
+UNIQUE INDEX `fk_tasks_column_tasks_id_idx` (`id` ASC),
   INDEX `fk_tasks_column_tasks_tasklist1_idx` (`tasklistId` ASC),
   CONSTRAINT `fk_tasks_column_tasks_tasklist1`
     FOREIGN KEY (`tasklistId`)
@@ -247,8 +250,8 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `tasks_tasklist_user` (
   `tasklistId` INT(11) UNSIGNED NOT NULL,
   `userId` INT NOT NULL,
-  `modSeq` INT NOT NULL,
-  `color` CHAR(6) NULL,
+  `modSeq` INT NOT NULL DEFAULT 0,
+  `color` VARCHAR(21) NULL,
   `sortOrder` INT NULL,
   `isVisible` TINYINT(1) NOT NULL DEFAULT 0,
   `isSubscribed` TINYINT(1) NOT NULL DEFAULT 0,
@@ -329,3 +332,4 @@ alter table tasks_tasklist
     add constraint tasks_tasklist_tasks_tasklist_grouping_null_fk
         foreign key (groupingId) references tasks_tasklist_grouping (id)
             on delete set null;
+

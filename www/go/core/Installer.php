@@ -544,7 +544,7 @@ class Installer {
 		echo "Registering all entities\n";		
 		$modules = model\Module::find(['id', 'name', 'package', 'version', 'enabled'])->where(['enabled' => true])->all();
 		foreach($modules as $module) {
-			if(isset($module->package) && $module->isAvailable()) {
+			if($module->isAvailable()) {
 				$module->module()->registerEntities();
 			}
 		}

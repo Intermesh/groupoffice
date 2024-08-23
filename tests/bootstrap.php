@@ -31,9 +31,16 @@ $config['tmpdir'] = $dataFolder->getFolder('tmp')->getPath();
 try {
 	//for autoload
 	App::get();
+
+	// debugger
+	//go()->getDebugger()->enabled = true;
+	//go()->getDebugger()->output = true;
+
 	$c = new core\util\ArrayObject(go()->getConfig());
 	$c->mergeRecursive($config);
 	go()->setConfig($c->getArray());
+	\GO::config()->file_storage_path = $config['file_storage_path'];
+	\GO::config()->tmpdir = $config['tmpdir'];
 
 	// Install new if db doesn't exist otherwise use existing
 	if(!isset($installDb)) {
@@ -158,8 +165,6 @@ try {
 	throw $e;
 }
 
-// debugger
-//go()->getDebugger()->enabled = true;
-//go()->getDebugger()->output = true;
+
 
 echo "Done\n\n\n";

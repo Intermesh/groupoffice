@@ -8,7 +8,7 @@ class DefaultAlertWT extends DefaultAlert {
 
 	protected static function defineMapping(): Mapping
 	{
-		return (new Mapping(static::class))->addTable('calendar_default_alert_with_time', "alertwt");
+		return (new Mapping(static::class))->addTable('calendar_default_alert_with_time', "dalertwt");
 	}
 
 }

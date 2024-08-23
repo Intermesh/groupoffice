@@ -288,7 +288,8 @@
 	min-height: dp(22);
 	width: dp(22);
 	height:dp(22);
-	background-color: var(--bg-input);
+	color: var(--bg-input);
+	background-color: currentColor;
 	border: 1px solid var(--fg-outline);
 	border-radius: dp(4);
 	&:before { // tick

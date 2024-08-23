@@ -24,7 +24,8 @@ class JSONTest extends \PHPUnit\Framework\TestCase {
 
 		$this->assertInstanceOf(AMap::class, $val);
 
-		JSON::patch($a, ["/map/" . $keys[0] . "/description" => "patched link to a3"]);
+		// should work with or without leading slash
+		JSON::patch($a, ["map/" . $keys[0] . "/description" => "patched link to a3"]);
 
 		$val = JSON::get($a, "/map/" . $keys[0] . "/description");
 

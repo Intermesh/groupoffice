@@ -44,21 +44,26 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 		if(!this.title){
 			this.title=t("Permissions");
 		}
-		
-		var levelData = [];
+
+		const levelData = [];
 
 		this.levelLabels = this.levelLabels || {};
 		
-		if(!this.levelLabels[GO.permissionLevels.read])
-			this.levelLabels[GO.permissionLevels.read] =t("Read only");
-		if(!this.levelLabels[GO.permissionLevels.create])
-			this.levelLabels[GO.permissionLevels.create] =t("Read and Create only");
-		if(!this.levelLabels[GO.permissionLevels.write])
-			this.levelLabels[GO.permissionLevels.write] =t("Write");
-		if(!this.levelLabels[GO.permissionLevels.writeAndDelete])
-			this.levelLabels[GO.permissionLevels.writeAndDelete] =t("Write and delete");
-		if(!this.levelLabels[GO.permissionLevels.manage])
-			this.levelLabels[GO.permissionLevels.manage] =t("Manage");
+		if(!this.levelLabels[GO.permissionLevels.read]) {
+			this.levelLabels[GO.permissionLevels.read] = t("Read only");
+		}
+		if(!this.levelLabels[GO.permissionLevels.create]) {
+			this.levelLabels[GO.permissionLevels.create] = t("Read and Create only");
+		}
+		if(!this.levelLabels[GO.permissionLevels.write]) {
+			this.levelLabels[GO.permissionLevels.write] = t("Write");
+		}
+		if(!this.levelLabels[GO.permissionLevels.writeAndDelete]) {
+			this.levelLabels[GO.permissionLevels.writeAndDelete] = t("Write and delete");
+		}
+		if(!this.levelLabels[GO.permissionLevels.manage]) {
+			this.levelLabels[GO.permissionLevels.manage] = t("Manage");
+		}
 		
 		if(!this.levels){
 			this.levels=[
@@ -70,62 +75,60 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 			];
 		}
 		
-		for(var i=0;i<this.levels.length;i++){			
+		for(let i=0, l=this.levels.length; i<l; i++){
 			if(!this.levelLabels[this.levels[i]]){
 				alert('Warning: you must define a label for permission level: '+this.levels[i]);
-			}else
-			{
+			} else {
 				levelData.push([this.levels[i],this.levelLabels[this.levels[i]]]);
 			}
 		}
 		
 
-		this.showLevel = (this.hideLevel) ? false : true;			
+		this.showLevel = (this.hideLevel) ? false : true;
 
-		var permissionLevelConfig ={
-					store : new Ext.data.SimpleStore({
-						id:0,
-						fields : ['value', 'text'],
-						data : levelData
-					}),
-					valueField : 'value',
-					displayField : 'text',
-					mode : 'local',
-					triggerAction : 'all',
-					editable : false,
-					selectOnFocus : true,
-					forceSelection : true
-				};
-				
-		
+		const permissionLevelConfig = {
+			store: new Ext.data.SimpleStore({
+				id: 0,
+				fields: ['value', 'text'],
+				data: levelData
+			}),
+			valueField: 'value',
+			displayField: 'text',
+			mode: 'local',
+			triggerAction: 'all',
+			editable: false,
+			selectOnFocus: true,
+			forceSelection: true
+		};
+
+
 		if(!this.addLevel)
 			this.addLevel = GO.permissionLevels.read;
 
 //		var selectUsersPermissionLevel = new GO.form.ComboBox(permissionLevelConfig);
-		var selectGroupsPermissionLevel = new GO.form.ComboBox(permissionLevelConfig);
+		const selectGroupsPermissionLevel = new GO.form.ComboBox(permissionLevelConfig);
 
 		this.header = false;
 		this.layout = 'fit';
 		this.border = false;
 		this.disabled = true;
 
-		var renderLevel = function(v){
-			var r = permissionLevelConfig.store.getById(v);
+		const renderLevel = function (v) {
+			const r = permissionLevelConfig.store.getById(v);
 			return r ? r.get('text') : v;
-		}
+		};
 
-		var groupColumns = [{
-			header : t("Name"),
-			dataIndex : 'name',
-			menuDisabled:true,
+		const groupColumns = [{
+			header: t("Name"),
+			dataIndex: 'name',
+			menuDisabled: true,
 			sortable: true,
-			renderer: function(name, meta, record) {
-				var icon = record.data.isUserGroupFor ? 'person' : 'people';
+			renderer: function (name, meta, record) {
+				const icon = record.data.isUserGroupFor ? 'person' : 'people';
 				return '<i class="icon">' + icon + '</i>&nbsp;&nbsp;' + name;
 			}
 		}];
-		if(this.showLevel)
-		{
+		if(this.showLevel) {
 			groupColumns.push({
 				header : t("Level"),
 				dataIndex : 'level',
@@ -136,12 +139,12 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 			});
 		}
 
-		var action = new Ext.ux.grid.RowActions({
-			header : '-',
-			autoWidth:true,
-			align : 'center',
-			actions : [{
-				iconCls : 'ic-group',
+		const action = new Ext.ux.grid.RowActions({
+			header: '-',
+			autoWidth: true,
+			align: 'center',
+			actions: [{
+				iconCls: 'ic-group',
 				qtip: t("Users")
 			}]
 		});
@@ -150,10 +153,7 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 
 
 		this.aclGroupsGrid = new GO.base.model.multiselect.panel({
-//			title:t("Authorized groups"),
 			plain:true,
-//			style:'margin:4px',
-//			anchor: '100% 50%',
 			region: "center",
 			forceLayout:true,
 			autoExpandColumn:'name',
@@ -180,8 +180,6 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 		this.aclGroupsGrid.store.on("load", function(){
 			this.managePermission = this.aclGroupsGrid.store.reader.jsonData.manage_permission;
 			this.aclGroupsGrid.setDisabled(!this.isEditable());
-			
-			
 			this.overWriteCheckBox.setDisabled(!this.managePermission);
 		}, this);
 
@@ -236,8 +234,9 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 	 *            The Group-Office acl ID.
 	 */
 	setAcl : function(acl_id) {
-		if(this.isOverwritable)
+		if(this.isOverwritable) {
 			this.isOverwritten = this.overWriteCheckBox.getValue();
+		}
 		this.acl_id = acl_id || 0;
 		this.aclGroupsGrid.setModelId(acl_id, this.isVisible());
 		this.setDisabled(GO.util.empty(acl_id));	
@@ -267,7 +266,7 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 
 		GO.grid.PermissionsPanel.superclass.afterRender.call(this);
 
-		var v = this.isVisible();
+		const v = this.isVisible();
 
 		if (v && !this.aclGroupsGrid.loaded) {
 			this.loadAcl();
@@ -276,12 +275,8 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 
 	// private
 	showUsersInGroupDialog : function(groupId) {
-
-
-				var win = new go.groups.GroupMemberWindow();
-				win.load(groupId).show();
-			
-
+		const win = new go.groups.GroupMemberWindow();
+		win.load(groupId).show();
 	}
 
 });

@@ -312,6 +312,12 @@ abstract class Module extends Singleton {
 	public function registerEntities(): bool
 	{
 		$entities = $this->getClassFinder()->findByParent(Entity::class);
+
+		if(static::class === App::class) {
+			$arModels = $this->findLegacyModels();
+			$entities = array_merge($entities, $arModels);
+		}
+
 		if(!count($entities)) {
 			return true;
 		}
@@ -337,6 +343,25 @@ abstract class Module extends Singleton {
 		}		
 		
 		return true;
+	}
+
+	private function findLegacyModels():array {
+//		$classFinder = new ClassFinder(false);
+//		$classFinder->addNamespace("GO\\Base\\Model", Environment::get()->getInstallFolder()->getFolder("go/base/model"));
+//		return array_filter($classFinder->findByParent(\GO\Base\Db\ActiveRecord::class), function($arCls) {
+//			if($arCls == "GO\\Base\\Model\\Module") {
+//				return false;
+//			}
+//
+//			if(!$arCls::model()->hasLinks() && (!$arCls::model()->aclField() || $arCls::model()->isJoinedAclField)) {
+//				return false;
+//			}
+//
+//			return true;
+//		});
+
+		return ["GO\\Base\\Model\\Template"];
+
 	}
 
 	/**

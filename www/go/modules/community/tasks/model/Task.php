@@ -13,6 +13,7 @@ use Exception;
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
 use go\core\db\Expression;
+use go\core\fs\Blob;
 use go\core\model\Acl;
 use go\core\model\Alert as CoreAlert;
 use go\core\model\Principal;
@@ -461,7 +462,7 @@ class Task extends AclItemEntity {
 		if(!parent::internalSave()) {
 			return false;
 		}
-
+		$this->incrementTasklistModSeq();
 		$this->createSystemAlerts();
 
 		// if alert can be based on start / due of task check those properties as well
@@ -689,6 +690,40 @@ class Task extends AclItemEntity {
 		return parent::sort($query, $sort);
 	}
 
+	public function icsBlob() {
+		$blob = isset($this->vcalendarBlobId) ? Blob::findById($this->vcalendarBlobId) : null;
+		if(!$blob || $blob->modifiedAt < $this->modifiedAt) {
+			$this->modifiedAt = new DateTime();
+			$blob = self::makeBlob($this);
+			$this->vcalendarBlobId = $blob->id;
+			if(!$this->isNew()) {
+				$this->save();
+			}
+		}
+		return $blob;
+	}
+
+	private static function makeBlob(Task $task) {
+		$parser = new VCalendar();
+		$blob = Blob::fromString($parser->export($task)->serialize());
+		$blob->type = 'text/vcalendar';
+		$blob->name = $task->uid.'.ics';
+		$blob->modifiedAt = $task->modifiedAt;
+		if(!$blob->save()) {
+			throw new \Exception("could not save VCalendar blob for task '" . $task->id() . "'. Validation error: " . $blob->getValidationErrorsAsString());
+		}
+		return $blob;
+	}
+
+	private function incrementTasklistModSeq() {
+		// all() is needed because tasklist might be joined and is also changed
+		TaskList::updateHighestModSeq(self::find()->select('tasklistId')->distinct()->where(['uid'=>$this->uid])->all());
+		if($this->isModified('tasklistId')) {
+			// Event is put in a different calendar so update both modseqs
+			TaskList::updateHighestModSeq($this->getOldValue('tasklistId'));
+		}
+	}
+
 	public function etag(): string
 	{
 		return '"' .$this->vcalendarBlobId . '"';
@@ -759,9 +794,9 @@ class Task extends AclItemEntity {
 			$c->andWhere('task.id', '!=', $this->id);
 		}
 		$tasks = self::find(['id','start', 'estimatedDuration','startTime'])
-			->join('tasks_tasklist','tl','task.tasklistId = tl.id')
+			->join('tasks_tasklist','tlhc','task.tasklistId = tlhc.id')
 			->andWhere($c)
-			->andWhere('tl.role = '. TaskList::Project)
+			->andWhere('tlhc.role = '. TaskList::Project)
 			->all();
 
 		// All day tasks are to be considered conflicting by definition

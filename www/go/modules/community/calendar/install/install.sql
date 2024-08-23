@@ -76,12 +76,12 @@ CREATE TABLE IF NOT EXISTS `calendar_default_alert` (
     `offset` VARCHAR(20) NULL,
     `relativeTo` ENUM('start', 'end') NOT NULL DEFAULT 'start',
     `when` DATE NULL,
-    `calendarId` INT UNSIGNED NOT NULL,
+    `fk` INT UNSIGNED NOT NULL,
     `userId` INT NOT NULL,
-    PRIMARY KEY (`id`, `calendarId`, `userId`),
-    INDEX `fk_calendar_default_alert_calendar_calendar1_idx` (`calendarId` ASC, `userId` ASC),
+    PRIMARY KEY (`id`, `fk`, `userId`),
+    INDEX `fk_calendar_default_alert_calendar_calendar1_idx` (`fk` ASC, `userId` ASC),
     CONSTRAINT `fk_calendar_default_alert_calendar_calendar1`
-        FOREIGN KEY (`calendarId`, `userId`)
+        FOREIGN KEY (`fk`, `userId`)
         REFERENCES `calendar_calendar_user` (`id` , `userId`)
         ON DELETE CASCADE
         ON UPDATE CASCADE)
@@ -96,12 +96,12 @@ CREATE TABLE IF NOT EXISTS `calendar_default_alert_with_time` (
   `offset` VARCHAR(20) NULL,
     `relativeTo` ENUM('start', 'end') NOT NULL DEFAULT 'start',
     `when` DATETIME NULL,
-    `calendarId` INT UNSIGNED NOT NULL,
+    `fk` INT UNSIGNED NOT NULL,
     `userId` INT NOT NULL,
-    PRIMARY KEY (`id`, `calendarId`, `userId`),
-  INDEX `fk_calendar_default_alert_with_time_calendar_calendar1_idx` (`calendarId` ASC, `userId` ASC),
+    PRIMARY KEY (`id`, `fk`, `userId`),
+  INDEX `fk_calendar_default_alert_with_time_calendar_calendar1_idx` (`fk` ASC, `userId` ASC),
   CONSTRAINT `fk_calendar_default_alert_with_time_calendar_calendar1`
-    FOREIGN KEY (`calendarId` , `userId`)
+    FOREIGN KEY (`fk` , `userId`)
     REFERENCES `calendar_calendar_user` (`id` , `userId`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
@@ -124,17 +124,19 @@ CREATE TABLE IF NOT EXISTS `calendar_event` (
     `privacy` ENUM('public', 'private', 'secret') NOT NULL DEFAULT 'public',
     `status` ENUM('confirmed', 'cancelled', 'tentative') NOT NULL DEFAULT 'confirmed',
     `recurrenceRule` TEXT NULL DEFAULT NULL,
+    `firstOccurrence` DATETIME NOT NULL COMMENT '@dbType=localdatetime',
     `lastOccurrence` DATETIME NULL DEFAULT NULL COMMENT '@dbType=localdatetime',
     `createdAt` DATETIME NULL,
     `modifiedAt` DATETIME NULL,
     `createdBy` INT NULL,
     `modifiedBy` INT NULL,
     `isOrigin` TINYINT(1) NOT NULL DEFAULT 1,
+		`etag` VARCHAR(100) NULL,
 	  `replyTo` VARCHAR(100),
 	  `requestStatus` varchar(255) DEFAULT NULL,
     PRIMARY KEY (`eventId`),
+		INDEX `calendar_event_firstOccurrence_index` (`firstOccurrence` ASC),
 		INDEX `calendar_event_lastOccurrence_index` (`lastOccurrence` ASC),
-		INDEX `calendar_event_start_index` (`start` ASC),
     INDEX `fk_calendar_event_core_user1_idx` (`createdBy` ASC),
     INDEX `fk_calendar_event_core_user2_idx` (`modifiedBy` ASC),
     CONSTRAINT `fk_calendar_event_core_user1`
@@ -232,12 +234,12 @@ CREATE TABLE IF NOT EXISTS `calendar_event_alert` (
     `offset` VARCHAR(20) NULL,
     `relativeTo` ENUM('start', 'end') NULL DEFAULT 'start',
     `when` DATETIME NULL,
-    `eventId` INT UNSIGNED NOT NULL,
+    `fk` INT UNSIGNED NOT NULL,
     `userId` INT NOT NULL,
-    PRIMARY KEY (`id`, `eventId`, `userId`),
-    INDEX `fk_calendar_event_alert_calendar_event_user1_idx` (`eventId` ASC, `userId` ASC),
+    PRIMARY KEY (`id`, `fk`, `userId`),
+    INDEX `fk_calendar_event_alert_calendar_event_user1_idx` (`fk` ASC, `userId` ASC),
     CONSTRAINT `fk_calendar_event_alert_calendar_event_user1`
-    FOREIGN KEY (`eventId` , `userId`)
+    FOREIGN KEY (`fk` , `userId`)
     REFERENCES `calendar_event_user` (`eventId` , `userId`)
     ON DELETE cascade
     ON UPDATE NO ACTION)
