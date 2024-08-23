@@ -19,7 +19,7 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 	saveSelection: false,
 	selectAllButton: true,
 	singleSelect: false,
-
+	nameRenderer: (value, metaData, record, rowIndex, colIndex, store) => v,
 	loadFilteredStoreWithoutSelection: true,
 
 
@@ -43,7 +43,8 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 					dataIndex: 'name',
 					hideable: false,
 					draggable: false,
-					menuDisabled: true
+					menuDisabled: true,
+					renderer: this.nameRenderer
 				},
 				actions
 			];
