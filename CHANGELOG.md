@@ -2,6 +2,7 @@
 - Core: Add several filters to PDF template parser
 - Finance: Fixed search in books
 - Finance: Refresh statuses after book update
+- Finance: Fixed Implicit conversion from float-string \"17.5000\" to int loses precision
 
 19-08-2024: 6.8.65
 - Core: Attachments Custom field now shows files grid when configured as pictures
