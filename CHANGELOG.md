@@ -1,4 +1,7 @@
+- Core: Fixed header Y coord not working on PDF templates
 - Core: Add several filters to PDF template parser
+- Finance: Fixed search in books
+- Finance: Refresh statuses after book update
 
 19-08-2024: 6.8.65
 - Core: Attachments Custom field now shows files grid when configured as pictures
