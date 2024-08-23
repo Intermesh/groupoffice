@@ -131,6 +131,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event` (
     `createdBy` INT NULL,
     `modifiedBy` INT NULL,
     `isOrigin` TINYINT(1) NOT NULL DEFAULT 1,
+		`etag` VARCHAR(100) NULL,
 	  `replyTo` VARCHAR(100),
 	  `requestStatus` varchar(255) DEFAULT NULL,
     PRIMARY KEY (`eventId`),

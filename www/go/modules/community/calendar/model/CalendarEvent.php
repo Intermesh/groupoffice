@@ -49,7 +49,7 @@ class CalendarEvent extends AclItemEntity {
 
 	const EventProperties = ['uid','isOrigin','replyTo', 'prodId', 'sequence','title','description','locale','location', 'showWithoutTime',
 		'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule','createdAt','modifiedAt',
-		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence', 'eventId'];
+		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag', 'eventId'];
 
 	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'alerts', 'veventBlobId'];
 
@@ -172,6 +172,8 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	protected $recurrenceRule;
 	protected $veventBlobId;
+
+	protected $etag;
 
 	public $participants = [];
 	/**
