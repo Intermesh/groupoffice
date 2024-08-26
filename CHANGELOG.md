@@ -3,6 +3,8 @@
 - Finance: Fixed search in books
 - Finance: Refresh statuses after book update
 - Finance: Fixed Implicit conversion from float-string \"17.5000\" to int loses precision
+- Finance: minor bugfix optional article description
+- Time registration: fix display issue task combo in dialog
 - Finance: Fixed additional PDF templates not working
 - Email: Remove starttls. tls does the job.
 
