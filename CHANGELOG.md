@@ -4,6 +4,7 @@
 - Finance: Refresh statuses after book update
 - Finance: Fixed Implicit conversion from float-string \"17.5000\" to int loses precision
 - Finance: Fixed additional PDF templates not working
+- Email: Remove starttls. tls does the job.
 
 19-08-2024: 6.8.65
 - Core: Attachments Custom field now shows files grid when configured as pictures
