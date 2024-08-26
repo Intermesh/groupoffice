@@ -149,10 +149,12 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		
 		this.isComplete = false;
 
+		window.indexedDB.deleteDatabase("goui") //quick hack to delete goui stores. This works well in develop.
+
 		return Promise.all([
 			this.metaStore.clear(),
 			this.stateStore.clear(),
-			window.indexedDB.deleteDatabase("goui") //quick hack to delete goui stores. This works well in develop.
+
 
 		]).then(() => {
 			return Promise.all([
