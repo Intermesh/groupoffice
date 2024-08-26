@@ -215,6 +215,10 @@ class Mailer {
 				$this->disableSSLVerification();
 			}
 
+			if($this->emailAccount->smtp_encryption == 'starttls') {
+				$this->emailAccount->smtp_encryption = 'tls';
+			}
+
 			$this->mail->SMTPSecure = $this->emailAccount->smtp_encryption;
 			$this->mail->Host = $this->emailAccount->smtp_host;
 			$this->mail->Port = $this->emailAccount->smtp_port;
