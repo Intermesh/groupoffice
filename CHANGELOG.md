@@ -1,3 +1,4 @@
+26-08-2024: 6.8.66
 - Core: Fixed header Y coord not working on PDF templates
 - Core: Add several filters to PDF template parser
 - Finance: Fixed search in books
