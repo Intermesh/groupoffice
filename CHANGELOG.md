@@ -1,3 +1,6 @@
+- Finance: Fixed additional PDF templates not working
+- Tasks: Message field was mandatory by mistake
+
 26-08-2024: 6.8.66
 - Core: Fixed header Y coord not working on PDF templates
 - Core: Add several filters to PDF template parser
@@ -6,7 +9,6 @@
 - Finance: Fixed Implicit conversion from float-string \"17.5000\" to int loses precision
 - Finance: minor bugfix optional article description
 - Time registration: fix display issue task combo in dialog
-- Finance: Fixed additional PDF templates not working
 - Email: Remove starttls. tls does the job.
 
 19-08-2024: 6.8.65
