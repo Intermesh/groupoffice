@@ -21,8 +21,8 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 		if(!this.currentId && this.commentComposer) {//} && this.role == "support") {
 			this.commentComposer.show();
-			this.commentComposer.editor.allowBlank = false;
-			if(this.role == "support") {
+			this.commentComposer.editor.allowBlank = this.role !== "support";
+			if(this.role === "support") {
 				this.descriptionFieldset.hide();
 			}
 
