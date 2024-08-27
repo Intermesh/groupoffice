@@ -54,9 +54,11 @@ use DateInterval;
 use DateTime;
 use DateTimeZone;
 use GO\Base\Db\FindParams;
+use GO\Base\Mail\Mailer;
 use GO\Calendar\Model\Exception;
 use GO;
 use GO\Base\Util\StringHelper;
+use go\core\ErrorHandler;
 use go\core\mail\Address;
 use go\core\mail\Attachment;
 use go\core\model\Module;
@@ -1993,10 +1995,14 @@ The following is the error message:
 
 						$message->setHtmlAlternateBody(nl2br($body));
 
-						if (\GO\Base\Mail\Mailer::newGoInstance()->send($message))
+						try {
+							Mailer::newGoInstance()->send($message);
+
 							throw new \GO\Base\Exception\Validation('DUE TO ERROR, CRON SENT MAIL TO: '.$this->calendar->user->email.'. THIS IS THE EMAIL MESSAGE:'."\r\n".$body);
-						else
+						}catch (\Exception $e) {
+							ErrorHandler::logException($e);
 							throw new \GO\Base\Exception\Validation('CRON COULD NOT SEND EMAIL WITH ERROR MESSAGE TO: '.$this->calendar->user->email.'. THIS IS THE EMAIL MESSAGE:'."\r\n".$body);
+						}
 					} else {
 						throw new \GO\Base\Exception\Validation(implode("\n", $this->getValidationErrors())."\n");
 					}
