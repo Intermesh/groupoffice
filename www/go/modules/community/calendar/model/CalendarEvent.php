@@ -49,7 +49,7 @@ class CalendarEvent extends AclItemEntity {
 
 	const EventProperties = ['uid','isOrigin','replyTo', 'prodId', 'sequence','title','description','locale','location', 'showWithoutTime',
 		'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule','createdAt','modifiedAt',
-		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag', 'eventId'];
+		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag','uri', 'eventId'];
 
 	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'alerts', 'veventBlobId'];
 
@@ -173,7 +173,14 @@ class CalendarEvent extends AclItemEntity {
 	protected $recurrenceRule;
 	protected $veventBlobId;
 
+	/**
+	 * @var string with CalDAV client the `etag` received from the server needs to be saved.
+	 */
 	protected $etag;
+	/**
+	 * @var string with CalDAV server the `uri` from the client needs to be persistent
+	 */
+	protected $uri;
 
 	public $participants = [];
 	/**
@@ -457,10 +464,19 @@ class CalendarEvent extends AclItemEntity {
 		}
 	}
 
+	public function uri($uri = null) {
+		if($uri === null)
+			return $this->uri;
+		$this->uri = $uri;
+	}
+
 	protected function internalSave() : bool {
 
 		if(empty($this->uid)) {
 			$this->uid = UUID::v4();
+		}
+		if(empty($this->uri)) {
+			$this->uri = strtr($this->uid, '+/=', '-_.') . '.ics';
 		}
 
 		if($this->isNew() || $this->isModified(['start','duration','recurrenceRule','recurrenceOverrides'])) {

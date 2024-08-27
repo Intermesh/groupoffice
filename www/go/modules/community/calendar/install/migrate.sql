@@ -444,17 +444,17 @@ INSERT INTO calendar_category
 
 -- insert instance that belongs to the organizer
 INSERT INTO calendar_event
-	(eventId, prodId, uid, sequence, title, description, location, showWithoutTime, start,firstOccurrence, timeZone, duration, priority,
+	(eventId, prodId, uid,uri, sequence, title, description, location, showWithoutTime, start,firstOccurrence, timeZone, duration, priority,
 	 privacy,status,recurrenceRule,lastOccurrence,createdAt,modifiedAt, createdBy, modifiedBy, isOrigin, replyTo, requestStatus) SELECT
-	id, 'Group-Office', uuid, 1, name, description, location, all_day_event, FROM_UNIXTIME(start_time), FROM_UNIXTIME(start_time),timezone, CONCAT('PT',end_time - IF(all_day_event, start_time - 60, start_time),'S'), 0,
+	id, 'Group-Office', uuid,CONCAT(uuid,'.ics'), 1, name, description, location, all_day_event, FROM_UNIXTIME(start_time), FROM_UNIXTIME(start_time),timezone, CONCAT('PT',end_time - IF(all_day_event, start_time - 60, start_time),'S'), 0,
 	IF(private=1, 'private', 'public'), LOWER(status), IF(rrule='',null,rrule), FROM_UNIXTIME(end_time), FROM_UNIXTIME(ctime), FROM_UNIXTIME(mtime), user_id, muser_id, 1, '',''
 FROM cal_events WHERE exception_for_event_id = 0 AND is_organizer = 1 GROUP BY uuid;
 
 -- insert the events that have no organizer
 INSERT INTO calendar_event
-(eventId, prodId, uid, sequence, title, description, location, showWithoutTime, start,firstOccurrence, timeZone, duration, priority,
+(eventId, prodId, uid,uri, sequence, title, description, location, showWithoutTime, start,firstOccurrence, timeZone, duration, priority,
  privacy,status,recurrenceRule,lastOccurrence,createdAt,modifiedAt, createdBy, modifiedBy, isOrigin, replyTo, requestStatus) SELECT
- id, 'Group-Office', uuid, 1, name, description, location, all_day_event, FROM_UNIXTIME(start_time), FROM_UNIXTIME(start_time),timezone, CONCAT('PT',end_time - IF(all_day_event, start_time - 60, start_time),'S'), 0,
+ id, 'Group-Office', uuid,CONCAT(uuid,'.ics'), 1, name, description, location, all_day_event, FROM_UNIXTIME(start_time), FROM_UNIXTIME(start_time),timezone, CONCAT('PT',end_time - IF(all_day_event, start_time - 60, start_time),'S'), 0,
  IF(private=1, 'private', 'public'), LOWER(status), IF(rrule='',null,rrule), FROM_UNIXTIME(end_time), FROM_UNIXTIME(ctime), FROM_UNIXTIME(mtime), user_id, muser_id, 0, '',''
 FROM cal_events WHERE exception_for_event_id = 0 GROUP BY uuid HAVING SUM(is_organizer) = 0;
 

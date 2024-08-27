@@ -211,14 +211,14 @@ class CalDAVBackend extends AbstractBackend implements
 		switch($type) {
 			case 'c': $component = 'vevent';
 				$stmt = CalendarEvent::find(['id', 'modifiedAt', 'uid'])
-					->select(['cce.id as id','uid','eventdata.modifiedAt as modified','veventBlobId as etag'])
+					->select(['cce.id as id','uid','eventdata.modifiedAt as modified','veventBlobId as etag, uri'])
 					->where(['calendarId' => $id])
 					->filter(['before'=> $end, 'after' => $start])
 					->fetchMode(\PDO::FETCH_OBJ);
 				break;
 			case 't' : $component = 'vtodo';
 				$stmt =  Task::find(['id', 'modifiedAt', 'uid'])
-					->select(['task.id as id','task.uid','task.modifiedAt as modified','vcalendarBlobId as etag'])
+					->select(['task.id as id','task.uid','task.modifiedAt as modified','vcalendarBlobId as etag, uri'])
 					->filter(['tasklistId' => $id])->fetchMode(\PDO::FETCH_OBJ);
 				break;
 			default: return $result;
@@ -228,7 +228,7 @@ class CalDAVBackend extends AbstractBackend implements
 			$result[] = [
 				'id' => $object->id,
 				'calendarid' => $type.'-'.$id, // needed for bug in local delivery scheduler
-				'uri' => str_replace('/', '+', $object->uid) . '.ics',
+				'uri' => $object->uri ?? (strtr($object->uid, '+/=', '-_.') . '.ics'),
 				'lastmodified' => strtotime($object->modified),
 				'etag' => '"' . $object->etag . '"',
 				'component' => $component
@@ -249,7 +249,7 @@ class CalDAVBackend extends AbstractBackend implements
 		switch($type) {
 			case 'c': // calendar
 				$component = 'vevent';
-				$object = CalendarEvent::find()->where(['cce.calendarId'=> $id, 'eventdata.uid'=>$uid])->single();
+				$object = CalendarEvent::find()->where(['cce.calendarId'=> $id, 'eventdata.uri'=>$objectUri])->single();
 				break;
 			case 't': // tasklist
 				$component = 'vtodo';
@@ -287,7 +287,6 @@ class CalDAVBackend extends AbstractBackend implements
 	public function createCalendarObject($calendarId, $objectUri, $calendarData)
 	{
 		list($type, $id) = explode('-', $calendarId,2);
-		$uid = pathinfo($objectUri, PATHINFO_FILENAME);
 
 		go()->debug("CalDAVBackend::createCalendarObject($calendarId, $objectUri, ");
 		go()->debug($calendarData);
@@ -296,8 +295,9 @@ class CalDAVBackend extends AbstractBackend implements
 		switch($type) {
 			case 'c': // calendar
 				$object = new CalendarEvent();
-				$object->uid = $uid;
+				//$object->uid = $uid;
 				$object = ICalendarHelper::parseVObject($calendarData, $object);
+				$object->uri($objectUri);
 				// The attached blob must be identical to the data used to create the event
 				$object->attachBlob(ICalendarHelper::makeBlob($object, $calendarData)->id);
 				if(Calendar::addEvent($object, $id) === null) {
@@ -331,10 +331,10 @@ class CalDAVBackend extends AbstractBackend implements
 
 		//$extraData = $this->getDenormalizedData($calendarData);
 		/** @var CalendarEvent $object */
-		$object = $type==='c' ? CalendarEvent::find()->where(['uid'=>$uid, 'calendarId'=>$calendarId])->single() :
+		$object = $type==='c' ? CalendarEvent::find()->where(['uri'=>$objectUri, 'calendarId'=>$id])->single() :
 			Task::find()->where(['task.tasklistId' => $id, 'task.uid' => $uid])->single();
 		if(!$object){
-			go()->log("Object $objectUri not found in calendar $calendarId!");
+			go()->log("Object $objectUri not found in calendar $calendarId");
 			return false;
 		}
 		switch($type) {
@@ -364,15 +364,16 @@ class CalDAVBackend extends AbstractBackend implements
 		list($type, $id) = explode('-', $calendarId,2);
 		$uid = pathinfo($objectUri, PATHINFO_FILENAME);
 
+		$query = (new Query())->select('id');
 		switch($type) {
 			case 'c' :
-				$query = (new Query())->select('id')->from('calendar_calendar_event','cce')
+				$query->from('calendar_calendar_event','cce')
 					->join('calendar_event', 'ev', 'ev.eventId = cce.eventId')
-					->where(['calendarId' => $id, 'ev.uid'=> $uid]);
+					->where(['calendarId' => $id, 'ev.uri'=> $objectUri]);
 				CalendarEvent::delete($query);
 				break;
 			case 't':
-				$query = (new Query())->select('id')->from('tasks_task','task')
+				$query->from('tasks_task','task')
 					->where(['task.tasklistId' => $id, 'task.uid'=> $uid]);
 				Task::delete($query);
 				break;
