@@ -69,7 +69,7 @@ function addEmailAction() {
 										.cls('goui-button')
 										.cls('pressed', item.calendarPrincipal?.participationStatus == s)
 										.on('click', _ => {
-											item.updateParticipation(s as 'accepted'|'declined'|'tentative').then(() => {
+											item.updateParticipation(s as 'accepted'|'declined'|'tentative',() => {
 												updateBtns(item);
 											});
 										})

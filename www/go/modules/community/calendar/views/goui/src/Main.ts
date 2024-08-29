@@ -216,7 +216,7 @@ export class Main extends Component {
 									owner = item.owner,
 									press = function(b:Button,s:'accepted'|'tentative'|'declined') {
 										b.el.cls('+pressed');
-										item.updateParticipation(s).then(() => {
+										item.updateParticipation(s,() => {
 											inviteStore.reload();
 										});
 

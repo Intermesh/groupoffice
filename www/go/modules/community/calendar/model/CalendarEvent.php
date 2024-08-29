@@ -332,7 +332,7 @@ class CalendarEvent extends AclItemEntity {
 
 		$e = JSON::patch($this->copy(), $patchArray);
 
-		unset($e->recurrenceRule, $e->recurrenceOverrides, $e->replyTo); // , $e->sentBy, $e->relatedTo,
+		unset($e->recurrenceRule, $e->recurrenceOverrides); // , $e->sentBy, $e->relatedTo,
 		return $e;
 		//return (new self())->setValues(array_merge($this->toArray(), $patch->toArray()));
 	}

@@ -54,13 +54,7 @@ class Scheduler {
 		// needed so organizer can find last response
 		$event->createdAt = new DateTime();
 		$event->modifiedAt = new DateTime();
-		$ics = ICalendarHelper::toVObject($event, new VCalendar([
-			'PRODID' => $event->prodId,
-			'METHOD'=>'REPLY'
-		]));
-
-		$attachment = Attachment::fromString($ics->serialize(),'reply.ics', 'text/calendar;method=REPLY;charset=utf-8',Attachment::ENCODING_8BIT);
-			//->setInline(true);
+		$ics = ICalendarHelper::toInvite('REPLY', $event);
 		$subject = go()->t('Reply').': '.$event->title;
 		$lang = go()->t('replyImipBody', 'community', 'calendar');
 
@@ -75,7 +69,7 @@ class Scheduler {
 			->setFrom($participant->email, $participant->name)
 			//->setReplyTo($participant->email)
 			->setTo(new Address($event->replyTo, !empty($organizer) ? $organizer->name : null))
-			->attach($attachment)
+			->attach(Attachment::fromString($ics->serialize(),'reply.ics', 'text/calendar;method=REPLY;charset=utf-8',Attachment::ENCODING_8BIT))
 			->setBody($body)
 			->send();
 

@@ -310,13 +310,15 @@ export class CalendarItem {
 		return lastOccurrence.date < new Date();
 	}
 
-	updateParticipation(status: "accepted"|"tentative"|"declined") {
+	updateParticipation(status: "accepted"|"tentative"|"declined", onFinish?: () => void) {
 		if(!this.calendarPrincipal)
 			throw new Error('Not a participant');
 		this.calendarPrincipal.participationStatus = status;
 
-		eventDS.setParams.sendSchedulingMessages = true;
-		return eventDS.update(this.data.id, {participants: this.participants});
+		eventDS.setParams.sendSchedulingMessages = true; //todo: use this.calendarPrincipal.expectReply ??
+		// should we notify a reply is sent?
+		this.patch({participants: this.participants}, onFinish,undefined,true);
+		//return eventDS.update(this.data.id, {participants: this.participants});
 	}
 
 	shouldSchedule(modified: Partial<CalendarEvent>|false) {
@@ -342,13 +344,16 @@ export class CalendarItem {
 		}
 	}
 
-	patch(modified: any, onFinish?: () => void, onCancel?: () => void) {
+	patch(modified: any, onFinish?: () => void, onCancel?: () => void, skipAsk = false) {
 		if(!this.isRecurring) {
 			this.confirmScheduleMessage(modified, () => {
 				eventDS.update(this.data.id, modified); // await?
 			});
 		} else if(this.isOverride) {
 			this.patchOccurrence(modified, onFinish);
+		} else if(skipAsk) {
+			// always patch series
+			this.patchSeries(modified, onFinish)
 		} else {
 			// if(modified.recurrenceRule) {
 			// 	eventDS.update(this.data.id, {recurrenceRule:modified.recurrenceRule});
