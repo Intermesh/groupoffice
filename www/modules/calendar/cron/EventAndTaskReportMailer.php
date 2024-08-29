@@ -4,6 +4,8 @@
 namespace GO\Calendar\Cron;
 
 
+use GO\Base\Mail\Mailer;
+use go\core\ErrorHandler;
 use go\core\mail\Attachment;
 
 class EventAndTaskReportMailer extends \GO\Base\Cron\AbstractCron {
@@ -101,7 +103,14 @@ class EventAndTaskReportMailer extends \GO\Base\Cron\AbstractCron {
 		$message->setHtmlAlternateBody(nl2br($body));
 		$message->attach(Attachment::fromString($pdf,$filename,'application/pdf'));
 		\GO::debug('CRON SEND MAIL TO: '.$user->email);
-		return \GO\Base\Mail\Mailer::newGoInstance()->send($message);
+
+		try {
+			Mailer::newGoInstance()->send($message);
+		}catch (\Exception $e) {
+			ErrorHandler::logException($e);
+			return false;
+		}
+		return true;
 	}
 }
 

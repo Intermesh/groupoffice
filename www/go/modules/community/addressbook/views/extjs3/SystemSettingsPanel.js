@@ -17,14 +17,6 @@ go.modules.community.addressbook.SystemSettingsPanel = Ext.extend(go.systemsetti
 					xtype: "checkbox",
 					boxLabel: t("Create personal address book for each user"),
 					name: "createPersonalAddressBooks"
-				// },
-				// {
-				// 	hideLabel: true,
-				// 	xtype: "checkbox",
-				// 	boxLabel: t("Automatically link e-mail to contacts"),
-				// 	name: "autoLinkEmail",
-				// 	disabled: !GO.savemailas,
-				// 	hint: t("Warning: this will copy e-mails to the Group-Office storage and will therefore increase disk space usage. The e-mail will be visible to all people that can view the contact too.")
 				},new (Ext.extend(go.form.RadioGroup, {
 					setValue(v) {
 						this.toggleSibling(v);

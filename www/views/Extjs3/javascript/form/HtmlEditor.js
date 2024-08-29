@@ -27,8 +27,8 @@ GO.form.HtmlEditor = function (config) {
 
 	config.plugins.unshift(
 					ioDentPlugin,
-					// rmFormatPlugin,
-					wordPastePlugin,
+					rmFormatPlugin,
+					// wordPastePlugin,
 					hrPlugin,
 					ssScriptPlugin
 					);

@@ -5,6 +5,7 @@ use GO;
 use GO\Base\Mail\Message;
 use GO\Base\Mail\Mailer;
 use go\core\db\Query;
+use go\core\ErrorHandler;
 use go\core\mail\Address;
 use go\modules\business\business\model\EmployeeAgreement;
 
@@ -914,8 +915,13 @@ Password: {password}", "users");
 		$message->setSubject($title)
 			->setBody($emailBody, $type)
 			->addTo(new Address($this->email,$this->getName()));
-
-		return Mailer::newGoInstance()->send($message);
+		try {
+			Mailer::newGoInstance()->send($message);
+		}catch (\Exception $e) {
+			ErrorHandler::logException($e);
+			return false;
+		}
+		return true;
 	}
 	
 	/**

@@ -111,7 +111,7 @@ class RRuleIterator implements Iterator {
 
 			case 'YEARLY':
 				if ($this->interval > 1) {
-					$html .= sprintf(\GO::t("Repeats every %s %s at %s"), $this->interval, \GO::t("years"));
+					$html .= sprintf(\GO::t("Repeats every %s"), $this->interval .' '.\GO::t("years"));
 				} else {
 					$html .= sprintf(\GO::t("Repeats every %s"), \GO::t("year"));
 				}

@@ -1,8 +1,17 @@
+- Finance: Fixed additional PDF templates not working
+- Tasks: Message field was mandatory by mistake
+- Calendar: fixed sprintf() problem with repeating every 2 years
+- Core: Use standard remove format button instead of word paste in html editor
+
+26-08-2024: 6.8.66
 - Core: Fixed header Y coord not working on PDF templates
 - Core: Add several filters to PDF template parser
 - Finance: Fixed search in books
 - Finance: Refresh statuses after book update
 - Finance: Fixed Implicit conversion from float-string \"17.5000\" to int loses precision
+- Finance: minor bugfix optional article description
+- Time registration: fix display issue task combo in dialog
+- Email: Remove starttls. tls does the job.
 
 19-08-2024: 6.8.65
 - Core: Attachments Custom field now shows files grid when configured as pictures
