@@ -187,7 +187,7 @@ class Calendar extends AclOwnerEntity {
 			$this->isSubscribed = true; // auto subscribe the creator.
 			$this->isVisible = true;
 			$this->defaultColor = $this->color;
-		} else if($this->ownerId === go()->getUserId()) {
+		} else if($this->ownerId === go()->getUserId() && !empty($this->color)) {
 			$this->defaultColor = $this->color;
 		}
 		if(empty($this->color)) {
