@@ -1,5 +1,7 @@
 - Finance: Fixed additional PDF templates not working
 - Tasks: Message field was mandatory by mistake
+- Calendar: fixed sprintf() problem with repeating every 2 years
+- Core: Use standard remove format button instead of word paste in html editor
 
 26-08-2024: 6.8.66
 - Core: Fixed header Y coord not working on PDF templates
