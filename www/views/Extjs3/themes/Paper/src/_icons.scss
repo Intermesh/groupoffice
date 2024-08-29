@@ -57,18 +57,6 @@ i.icon {
 		@extend %icon;
 	}
 }
-// in dropdown menus
-/*.x-btn-text-icon, a.x-menu-item  {
-  //img { display:none;}
-  > span:before {
-    @extend %icon;
-    padding-right: dp(8);
-    position:absolute;
-    left: dp(24);
-    top: dp(4);
-  }
-}*/
-
 
 .x-tree-node-icon:before { // default icons
 	.x-tree-node-expanded & {content: 'folder_open'}
@@ -138,13 +126,6 @@ i {
 	}
 }
 
-/*
-define icons with:
-
-.entity.Note::before {
-	content: "description"
-}
-*/
 
 .x-tool::before, .ux-row-action-item {
 	@extend %icon;
@@ -372,6 +353,7 @@ $material-icons : (
 	add_box,
 	add_circle,
 	add_circle_outline,
+	add_link,
 	add_location,
 	add_shopping_cart,
 	add_to_photos,
@@ -955,6 +937,7 @@ $material-icons : (
 	pause_circle_filled,
 	pause_circle_outline,
 	payment,
+	payments,
 	people,
 	people_outline,
 	perm_camera_mic,

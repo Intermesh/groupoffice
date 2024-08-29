@@ -19,8 +19,6 @@ GO.email.AddressContextMenu = function(config)
 	}
 	config['shadow']='frame';
 	config['minWidth']=180;
-	
-	
 				
 	this.composeButton = new Ext.menu.Item({
 		iconCls: 'btn-compose',

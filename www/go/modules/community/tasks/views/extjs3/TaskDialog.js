@@ -21,8 +21,8 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 		if(!this.currentId && this.commentComposer) {//} && this.role == "support") {
 			this.commentComposer.show();
-			this.commentComposer.editor.allowBlank = false;
-			if(this.role == "support") {
+			this.commentComposer.editor.allowBlank = this.role !== "support";
+			if(this.role === "support") {
 				this.descriptionFieldset.hide();
 			}
 
@@ -119,7 +119,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			this.title = t("Ticket", "support", "business");
 		}
 		this.supr().initComponent.call(this);
-		},
+	},
 
 	initFormItems: function () {
 		const start = {
@@ -332,8 +332,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 					},
 					{
 						xtype: "fieldset",
-						// collapsible: true,
-						// title: t("Assignment"),
 						items: [{
 							xtype: "container",
 							cls: "go-hbox",
@@ -388,8 +386,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 					this.descriptionFieldset = new Ext.form.FieldSet({
 						xtype: "fieldset",
-						// collapsible: true,
-						// title: t("Other"),
 						defaults: {
 							anchor: '100%'
 						},
@@ -398,7 +394,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 							{
 								xtype: 'textarea',
 								name: 'description',
-								//allowBlank : false,
 								fieldLabel: t("Description"),
 								grow: true
 
@@ -415,7 +410,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 					{
 						xtype: "fieldset",
-						// collapsible: true,
 						title: t("Alerts"),
 						items: [new go.modules.community.tasks.AlertFields()]
 					}

@@ -544,10 +544,13 @@ class Message {
 
 	/**
 	 * Send the message via the mailer
+	 *
+	 * Throws exception on failure.
+	 * @throws \PHPMailer\PHPMailer\Exception
 	 */
-	public function send(): bool
+	public function send() : void
 	{
-		return $this->getMailer()->send($this);
+		$this->getMailer()->send($this);
 	}
 
 	/**

@@ -129,17 +129,14 @@ class Mailer {
 	 * Recipient/sender data will be retrieved from the Message object.
 	 *
 	 *
+	 * @throws Exception
 	 */
-	public function send(Message $message): bool
+	public function send(Message $message) : void
 	{
 		$message->setMailer($this);
 		$this->prepareMessage($message);
-		$success = !!$this->mail->send();
-
-		if($success) {
-			$this->sent = true;
-		}
-		return $success;
+		$this->mail->send();
+		$this->sent = true;
 	}
 
 
@@ -221,6 +218,10 @@ class Mailer {
 
 			if($this->emailAccount->smtp_allow_self_signed) {
 				$this->disableSSLVerification();
+			}
+
+			if($this->emailAccount->smtp_encryption == 'starttls') {
+				$this->emailAccount->smtp_encryption = 'tls';
 			}
 
 			$this->mail->SMTPSecure = $this->emailAccount->smtp_encryption;

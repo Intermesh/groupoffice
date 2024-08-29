@@ -28,8 +28,7 @@
 							type: "relation",
 							fields: ["name"],
 							convert: (group) => {
-								console.log(group);
-								return group ? group.name : "";
+								return group ? `<span class="tasklists-category-separator">${group.name}</span>` : "";
 							}
 						}],
 						entityStore: this.initialConfig.role && this.initialConfig.role == "support" ? "SupportList" : "TaskList",

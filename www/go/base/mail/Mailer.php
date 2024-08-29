@@ -39,7 +39,7 @@ class Mailer extends \go\core\mail\Mailer
 		return new self();
 	}
 	
-	public function send(\go\core\mail\Message $message) : bool {
+	public function send(\go\core\mail\Message $message) : void {
 		
 		
 		if(!empty(\GO::config()->disable_mail)){
@@ -64,8 +64,7 @@ class Mailer extends \go\core\mail\Mailer
 			$message->setCc("");
 			\GO::debug("E-mail debugging is enabled in the Group-Office config.php file. All emails are sent to: ".\GO::config()->debug_email);
 		}
-		$count = parent::send($message);
+		parent::send($message);
 
-		return $count;
 	}
 }
