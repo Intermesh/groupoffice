@@ -9,6 +9,7 @@ forum
 /www/*-license.txt
 .idea
 /www/vendor
+/www/go/modules/community/maildomains/vendor
 /config.php
 /www/config.php
 /**/*.css
@@ -75,7 +76,6 @@ forum
 .DS_Store
 .sass-cache
 lang.csv
-.gitmodules
 /www/branding
 /.project
 .phpunit.result.cache
