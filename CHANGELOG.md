@@ -4,6 +4,8 @@
 - Core: Use standard remove format button instead of word paste in html editor
 - Email: Send charset for search as it didn't work without it when using utf8 with a large Polish provider
 - Calendar / core: fix page width when printing current view
+- Finance: Add articles from catalog dialog
+- Catalog: Organize articles in categories
 
 26-08-2024: 6.8.66
 - Core: Fixed header Y coord not working on PDF templates
