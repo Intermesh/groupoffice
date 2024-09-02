@@ -1,3 +1,4 @@
+02-09-2024: 6.8.67
 - Finance: Fixed additional PDF templates not working
 - Tasks: Message field was mandatory by mistake
 - Calendar: fixed sprintf() problem with repeating every 2 years
