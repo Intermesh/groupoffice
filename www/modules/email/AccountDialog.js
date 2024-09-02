@@ -736,6 +736,7 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 			this.propertiesPanel.form.findField('name').setValue(GO.settings['name']);
 			this.propertiesPanel.form.findField('email').setValue(GO.settings['email']);
 			this.propertiesPanel.form.findField('username').setValue(GO.settings['username']);
+			this.propertiesPanel.form.findField("save_sent").setValue(true);
 		}
 	},
 
