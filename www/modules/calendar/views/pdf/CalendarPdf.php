@@ -22,7 +22,6 @@ use GO\Base\Util\Pdf;
 
 
 final class CalendarPdf extends Pdf {
-	private $pageWidth;
 	private $_start_time = '';
 	private $_end_time = '';
 	private $_title = '';
@@ -44,8 +43,7 @@ final class CalendarPdf extends Pdf {
 		} else {
 			$responses = $response['results'];
 		}
-		
-		
+
 		$headers=true;
 		foreach($responses as $r){
 			$this->_view=$view;
@@ -63,7 +61,8 @@ final class CalendarPdf extends Pdf {
 		
 	}
 	
-	public function Header() {
+	public function Header()
+	{
 		$this->SetY(30);
 
 		$this->SetTextColor(50, 135, 172);
