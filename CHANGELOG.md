@@ -9,6 +9,7 @@
 - Email: check 'automatically save in Sent' checkbox by default as per install script
 - Tasks: In 'Continue task' dialog, make sure that all buttons are shown.
 - Finance: Add project billing for finance
+- Email: show next message in selected mailbox after moving current message
 
 26-08-2024: 6.8.66
 - Core: Fixed header Y coord not working on PDF templates
