@@ -1138,8 +1138,10 @@ class Imap extends ImapBodyStruct
 		/*
 		 * Sending charset along doesn't work on iMailserver.
 		 * Without seems to work on different servers.
+		 *
+		 * We had some other where it didn't work on a large Polish provider. We'll send it again.
 		 */
-		$charset = '';
+		$charset = 'CHARSET UTF-8 ';
 
 		$command = 'UID SEARCH '.$charset.trim($terms)."\r\n";
 		$this->send_command($command);
