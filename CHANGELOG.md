@@ -8,6 +8,7 @@
 - Catalog: Organize articles in categories
 - Email: check 'automatically save in Sent' checkbox by default as per install script
 - Tasks: In 'Continue task' dialog, make sure that all buttons are shown.
+- Finance: Add project billing for finance
 
 26-08-2024: 6.8.66
 - Core: Fixed header Y coord not working on PDF templates
