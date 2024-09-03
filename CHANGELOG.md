@@ -1,3 +1,5 @@
+- ActiveSync: Sending mail reported an error during sent even though it was actually sent
+
 03-09-2024: 6.8.68
 - Billing: Fixed Uncaught exception: Access level to GO\Billing\Pdf::$pageWidth must be protected (as in class GO\Base\Util\Pdf) or weaker at 2024-09-03T08:58:25+02:00
 
