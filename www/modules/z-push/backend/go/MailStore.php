@@ -987,15 +987,12 @@ class MailStore extends Store implements ISearchProvider {
 			$sendMessage->setFrom($alias->email, $alias->name);
 			$sendMessage->getMailer()->setEmailAccount($imapAccount);
 			ZLog::Write(LOGLEVEL_DEBUG, 'beforesend');
-			$success = $sendMessage->send();
+			$sendMessage->send();
 			ZLog::Write(LOGLEVEL_DEBUG, 'goMail->SendMail()~~SEND~~'.$success);
 			//if a sent items folder is set in the account then save it to the imap folder
-			if($success) {
-				$imapAccount->saveToSentItems($sendMessage);
-			} else{
-				ZLog::Write(LOGLEVEL_ERROR, 'goMail->SendMail()~~SENDERROR: '.$sendMessage->getMailer()->lastError());
-			}
-			
+
+			$imapAccount->saveToSentItems($sendMessage);
+
 			ZLog::Write(LOGLEVEL_DEBUG, 'MAIL IS SENT SUCCESSFULLY::::::::'.$success);
 		}
 		catch (Exception $e){
