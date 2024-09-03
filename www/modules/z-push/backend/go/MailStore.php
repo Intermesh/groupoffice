@@ -1000,11 +1000,7 @@ class MailStore extends Store implements ISearchProvider {
 			
 			throw new StatusException($e->getMessage(), SYNC_COMMONSTATUS_MAILSUBMISSIONFAILED);
 		}
-		
-		if(!$success){
-			throw new StatusException("Could not send mail. Please check the logs.", SYNC_COMMONSTATUS_MAILSUBMISSIONFAILED);
-		}
-		
+
 		ZLog::Write(LOGLEVEL_DEBUG, 'endsend: '.var_export($success, true));
 		
 		return true;
