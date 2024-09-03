@@ -198,14 +198,15 @@ GO.email.AccountsTree = function(config){
 			}
 
 			if(messages.length>0) {
-				
 				var firstDraggedMessage = s[0].data;
-			
+				const firstStoreIndex = this.mainPanel.messagesGrid.store.indexOfId(firstDraggedMessage.uid),
+					account_id = firstDraggedMessage["account_id"],
+					srcMailbox = firstDraggedMessage["mailbox"];
 				if(e.rawEvent.ctrlKey){
 					return this.copyDroppedNodes(e);
 				}
 				
-				if(firstDraggedMessage["account_id"] != e.target.attributes['account_id'])
+				if(account_id != e.target.attributes['account_id'])
 				{
 					var params = {
 						task:'move',
@@ -242,11 +243,20 @@ GO.email.AccountsTree = function(config){
 									this.mainPanel.messagesGrid.getView().holdPosition = true;
 									this.mainPanel.messagesGrid.store.reload({
 										callback:function(){
-
-											if(this.mainPanel.messagePanel.uid && !this.mainPanel.messagesGrid.store.getById(this.mainPanel.messagePanel.uid)) {
-												this.mainPanel.messagePanel.reset();
+											// if(this.mainPanel.messagePanel.uid && !this.mainPanel.messagesGrid.store.getById(this.mainPanel.messagePanel.uid)) {
+											// 	this.mainPanel.messagePanel.reset();
+											// }
+											const uid = parseInt(this.mainPanel.messagePanel.uid);
+											if (uid > 0 && !this.mainPanel.messagesGrid.store.getById(uid)) {
+												const r = this.mainPanel.messagesGrid.store.getAt(firstStoreIndex);
+												if (r) {
+													this.mainPanel.messagesGrid.selModel.selectRow(firstStoreIndex);
+													this.mainPanel.messagePanel.loadMessage(r.data.uid, srcMailbox, account_id);
+													this.mainPanel.messagePanel.show();
+												} else {
+													this.mainPanel.messagePanel.reset();
+												}
 											}
-
 											Ext.MessageBox.hide();
 										},
 										scope:this
@@ -258,7 +268,7 @@ GO.email.AccountsTree = function(config){
 					}
 					moveRequest.call(this);
 
-				}else if(firstDraggedMessage.mailbox == e.target.mailbox) {
+				}else if(srcMailbox == e.target.mailbox) {
 					return false;
 				} else {
 					this.mainPanel.messagesGrid.store.baseParams['action']='move';
@@ -267,9 +277,18 @@ GO.email.AccountsTree = function(config){
 
 					this.mainPanel.messagesGrid.getView().scrollToTopOnLoad = false;
 					this.mainPanel.messagesGrid.store.reload({
-						callback:function(){
-							if(this.mainPanel.messagePanel.uid && !this.mainPanel.messagesGrid.store.getById(this.mainPanel.messagePanel.uid)) {
-								this.mainPanel.messagePanel.reset();
+						callback: function(){
+							const uid = parseInt(this.mainPanel.messagePanel.uid);
+							if (uid > 0 && !this.mainPanel.messagesGrid.store.getById(uid)) {
+								// this.mainPanel.messagePanel.reset();
+								const r = this.mainPanel.messagesGrid.store.getAt(firstStoreIndex);
+								if(r) {
+									this.mainPanel.messagesGrid.selModel.selectRow(firstStoreIndex);
+									this.mainPanel.messagePanel.loadMessage(r.data.uid, srcMailbox, account_id);
+									this.mainPanel.messagePanel.show();
+								} else {
+									this.mainPanel.messagePanel.reset();
+								}
 							}
 						},
 						scope:this
@@ -285,6 +304,7 @@ GO.email.AccountsTree = function(config){
 	this);
 
 	this.on('nodedrop', function(e){
+		debugger;
 		if(e.dropNode) {
 			var dragId = GO.util.Base64.decode(e.source.dragData.node.id);
 			var targetId = GO.util.Base64.decode(e.target.id);

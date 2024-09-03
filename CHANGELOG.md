@@ -1,3 +1,7 @@
+03-09-2024: 6.8.68
+- Billing: Fixed Uncaught exception: Access level to GO\Billing\Pdf::$pageWidth must be protected (as in class GO\Base\Util\Pdf) or weaker at 2024-09-03T08:58:25+02:00
+
+02-09-2024: 6.8.67
 - Finance: Fixed additional PDF templates not working
 - Tasks: Message field was mandatory by mistake
 - Calendar: fixed sprintf() problem with repeating every 2 years
@@ -9,6 +13,7 @@
 - Email: check 'automatically save in Sent' checkbox by default as per install script
 - Tasks: In 'Continue task' dialog, make sure that all buttons are shown.
 - Finance: Add project billing for finance
+- Email: show next message in selected mailbox after moving current message
 
 26-08-2024: 6.8.66
 - Core: Fixed header Y coord not working on PDF templates
