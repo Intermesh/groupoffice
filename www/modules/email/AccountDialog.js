@@ -133,9 +133,6 @@ GO.email.AccountDialog = function(config) {
 		},
 		defaultType : 'textfield',
 		autoHeight : true,
-		// style: {
-		// 	padding: 'dp(8) dp(16) !important'
-		// },
 		waitMsgTarget : true,
 		labelWidth : 120,
 		items : [

@@ -1,3 +1,6 @@
+- Sieve: text label Out of Office more clear
+
+04-09-2024: 6.8.69
 - ActiveSync: Sending mail reported an error during sent even though it was actually sent
 
 03-09-2024: 6.8.68
