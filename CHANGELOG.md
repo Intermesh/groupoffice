@@ -1,4 +1,5 @@
 - Sieve: text label Out of Office more clear
+- Core: Mask hashes in history log
 
 04-09-2024: 6.8.69
 - ActiveSync: Sending mail reported an error during sent even though it was actually sent
