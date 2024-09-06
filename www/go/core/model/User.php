@@ -861,9 +861,8 @@ public function historyLog(): bool|array
 			->setSubject(go()->t('Lost password'))
 			->setBody($emailBody);
 		
-		if(!$message->send()) {
-			throw new Exception("Could not send mail. The notication system setttings may be incorrect.");
-		}
+		$message->send();
+
 	}
 	
 	protected function internalSave(): bool
