@@ -76,7 +76,7 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 		
 		this.activateCheck = new Ext.ux.form.XCheckbox({
 				hideLabel: true,
-				boxLabel: t("Activate filterset", "sieve"),
+				boxLabel: t("Activate", "sieve") + " " + t("Out of office"),
 				name: 'ooo_script_active'
 			});
 		
@@ -85,20 +85,6 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 			collapsed: false,
 			items:[this.activateText,this.activateCheck]
 		});
-		
-//		this.subjectText = new GO.form.HtmlComponent({
-//			html:t("Fill in the subject of the response in the field below.", "sieve"),
-//			style:'padding:5px 0px'
-//		});
-//		
-//		this.subjectField = new Ext.form.TextArea({
-//			name: 'ooo_subject',
-//			allowBlank:false,
-//			anchor:'100%',
-//			height:20,
-//			width: 300,
-//			hideLabel: true
-//		});
 		
 		this.messageText = new GO.form.HtmlComponent({
 			html:t("Fill in your message in the field below.", "sieve"),

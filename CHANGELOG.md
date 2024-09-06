@@ -1,7 +1,27 @@
+05-09-2024: 6.8.70
+- Sieve: text label Out of Office more clear
+- Core: Mask hashes in history log
+- Core: Fixed various invalid mail send() errors
+
+04-09-2024: 6.8.69
+- ActiveSync: Sending mail reported an error during sent even though it was actually sent
+
+03-09-2024: 6.8.68
+- Billing: Fixed Uncaught exception: Access level to GO\Billing\Pdf::$pageWidth must be protected (as in class GO\Base\Util\Pdf) or weaker at 2024-09-03T08:58:25+02:00
+
+02-09-2024: 6.8.67
 - Finance: Fixed additional PDF templates not working
 - Tasks: Message field was mandatory by mistake
 - Calendar: fixed sprintf() problem with repeating every 2 years
 - Core: Use standard remove format button instead of word paste in html editor
+- Email: Send charset for search as it didn't work without it when using utf8 with a large Polish provider
+- Calendar / core: fix page width when printing current view
+- Finance: Add articles from catalog dialog
+- Catalog: Organize articles in categories
+- Email: check 'automatically save in Sent' checkbox by default as per install script
+- Tasks: In 'Continue task' dialog, make sure that all buttons are shown.
+- Finance: Add project billing for finance
+- Email: show next message in selected mailbox after moving current message
 
 26-08-2024: 6.8.66
 - Core: Fixed header Y coord not working on PDF templates

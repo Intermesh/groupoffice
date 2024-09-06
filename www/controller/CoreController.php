@@ -1002,12 +1002,10 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 				}
 			}			
 		}
-				
-		$response['success'] = $systemMessage->send()?true:false;
-		
-		if(!$response['success']){
-			$response['feedback'] = GO::t('Could not send email');
-		}
+
+		$systemMessage->send();
+
+		$response['success'] = true;
 
 		echo new \GO\Base\Data\JsonResponse($response);
 	}

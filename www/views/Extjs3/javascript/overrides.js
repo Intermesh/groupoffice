@@ -30,7 +30,12 @@ Ext.override(Ext.form.TimeField, {
  */
 GO.util.density = GO.util.isMobileOrTablet() ? 160 : 140;
 function dp(size) {
-	return ((size * GO.util.density) / 160);
+	size = ((size * GO.util.density) / 160);
+	if(size > 20) {
+		return Math.ceil(size);
+	} else {
+		return size;
+	}
 }
 /*
  *When upgrading extjs don't forget to check htmleditor overrides in E-mail composer

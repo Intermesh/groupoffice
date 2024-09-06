@@ -133,9 +133,6 @@ GO.email.AccountDialog = function(config) {
 		},
 		defaultType : 'textfield',
 		autoHeight : true,
-		// style: {
-		// 	padding: 'dp(8) dp(16) !important'
-		// },
 		waitMsgTarget : true,
 		labelWidth : 120,
 		items : [
@@ -736,6 +733,7 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 			this.propertiesPanel.form.findField('name').setValue(GO.settings['name']);
 			this.propertiesPanel.form.findField('email').setValue(GO.settings['email']);
 			this.propertiesPanel.form.findField('username').setValue(GO.settings['username']);
+			this.propertiesPanel.form.findField("save_sent").setValue(true);
 		}
 	},
 

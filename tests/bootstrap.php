@@ -61,7 +61,7 @@ try {
 			echo "Dropping database 'groupoffice-phpunit'\n";
 			$pdo->query("DROP DATABASE groupoffice_phpunit");
 		}catch(\Exception $e) {
-
+			echo $e->getMessage() ."\n";
 		}
 
 		GO::clearCache(); //legacy
