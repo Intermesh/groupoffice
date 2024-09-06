@@ -347,7 +347,7 @@ export class CalendarItem {
 	patch(modified: any, onFinish?: () => void, onCancel?: () => void, skipAsk = false) {
 		if(!this.isRecurring) {
 			this.confirmScheduleMessage(modified, () => {
-				eventDS.update(this.data.id, modified); // await?
+				eventDS.update(this.data.id, modified).then(onFinish)
 			});
 		} else if(this.isOverride) {
 			this.patchOccurrence(modified, onFinish);

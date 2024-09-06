@@ -46,7 +46,7 @@ function addEmailAction() {
 						Window.alert(response.errors.join("<br />"), t("Error"));
 					} else {
 						const dlg = new EventDetailWindow();
-						dlg.loadEvent(new CalendarItem({data:response.data,key:response.data.id}));
+						dlg.loadEvent(new CalendarItem({data:response.data, key:response.data.id + ""}));
 						dlg.show();
 					}
 				}
@@ -59,6 +59,7 @@ function addEmailAction() {
 					btns = E('div').cls('btns'),
 					names: any = {accepted: t("Accept"), tentative: t("Maybe"), declined: t("Decline")},
 					updateBtns = (item: CalendarItem) => {
+
 						btns.innerHTML = '';
 						if(!item.calendarPrincipal){
 							btns.append(t('You are not an invited to this event'));
@@ -87,7 +88,7 @@ function addEmailAction() {
 				}[msg.itip.method] || "Unable to process appointment information.";
 
 				if(msg.itip.method === 'REQUEST' && typeof event !== 'string') {
-					const item = new CalendarItem({data:event, key:event.id!});
+					const item = new CalendarItem({data:event, key:event.id + ""});
 					updateBtns(item);
 				}
 
