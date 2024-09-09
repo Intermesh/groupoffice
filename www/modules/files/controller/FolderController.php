@@ -23,7 +23,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 	protected function allowGuests() {
 		if($this->isCli())
-			return array('syncfilesystem', 'removeempty');
+			return array('syncfilesystem', 'removeempty', 'cleanaddressbook');
 		else
 			return parent::allowGuests();
 	}
@@ -31,6 +31,33 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
   protected function allowWithoutModuleAccess() {
     return ['images'];
   }
+
+
+	public function cleanAddressBook($dryRun = 1) {
+		$this->requireCli();;
+		$folder = Folder::model()->findByPath('addressbook');
+
+		if(!$folder) {
+			exit("Root address book not found");
+		}
+
+		if(!$dryRun) {
+			$trash = Folder::model()->findByPath("users/admin/__ABTRASH__", true);
+			if (!$trash) {
+				exit("Couldn't create trash folder");
+			}
+		}
+
+		$subWithoutAcl = Folder::model()->findByAttributes(['parent_id'=> $folder->id, 'acl_id' => 0]);
+		foreach($subWithoutAcl as $f) {
+			echo "Moving " . $f->name ."\n";
+
+			if(!$dryRun) {
+				$f->parent_id = $trash->id;
+				$f->save();
+			}
+		}
+	}
 
 
 	public function actionRemoveEmpty() {
@@ -49,7 +76,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		}
 
 		echo "Removed " . $count ." empty folders\n";
-
 	}
 
 	private function removeEmpty() {
