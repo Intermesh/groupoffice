@@ -322,7 +322,7 @@ class CalendarEvent extends AclItemEntity {
 	 * @throws JsonPointerException
 	 * @throws Exception
 	 */
-	public function copyPatched($patch, string $recurrenceId) {
+	public function copyPatched(RecurrenceOverride $patch, string $recurrenceId) : CalendarEvent {
 		$patchArray = $patch->toArray();
 
 		//if start is not patched then we must set the recurrence ID to set the right time
