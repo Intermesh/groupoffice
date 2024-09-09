@@ -343,6 +343,8 @@ class CalDAVBackend extends AbstractBackend implements
 				// The attached blob must be identical to the data used to create the event
 				$object->attachBlob(ICalendarHelper::makeBlob($object, $calendarData)->id);
 				$etag = $object->icsBlobId();
+
+				go()->debug($object->getModified());
 				break;
 			case 't':
 				$object = (new VCalendar)->vtodoToTask(VObject\Reader::read($calendarData), $id, $object);
