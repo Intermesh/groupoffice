@@ -35,6 +35,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 	public function actionCleanAddressBook($dryRun = 1) {
 		$this->requireCli();;
+		GO::session()->runAsRoot();
 		$folder = Folder::model()->findByPath('addressbook');
 
 		if(!$folder) {
