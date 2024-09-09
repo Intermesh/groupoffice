@@ -89,14 +89,15 @@ class RecurrenceOverride extends Property
 			}
 		}
 		$this->props = new \stdClass;
-		$this->isModified = true;
+//		$this->isModified = true;
 		$this->setValues($patch);
 	}
 
-	private $isModified;
+	// removed this because of it caused it to be always modified. Not sure what this breaks.
+//	private $isModified;
 	public function isModified(array|string $properties = []): bool|array
 	{
-		return $this->isModified || parent::isModified($properties);
+		return  parent::isModified($properties);
 	}
 
 	/**
@@ -120,7 +121,7 @@ class RecurrenceOverride extends Property
 	{
 		$this->props->$name = $value;
 		$this->patch = json_encode($this->props);
-		$this->isModified = true;
+//		$this->isModified = true;
 		return $this;
 	}
 
