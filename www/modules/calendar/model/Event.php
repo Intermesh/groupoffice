@@ -2688,10 +2688,7 @@ The following is the error message:
 						$message->setSender(go()->getSettings()->systemEmail);
 					}
 
-					if(!$mailer->send($message)) {
-						throw new \Exception("Failed to send invite");
-					}
-					
+					$mailer->send($message);
 				}
 				
 			}
