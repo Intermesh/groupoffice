@@ -1,4 +1,5 @@
 - Files: Fix PHPMailer compatibility issue
+- Core / Studio: fix error when initially loading combobox value
 - Calendar: Fixed invalid error message when sending invites
 - E-mail: Errors were not shown correctly
 - Leavedays: Fixed rounding issue which lead to slightly off numbers in the decimals
