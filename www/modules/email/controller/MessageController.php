@@ -620,7 +620,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		try {
 			$mailer->send($message);
 		} catch(\Throwable $e) {
-			$msg = GO::t("Sorry, an error occurred") . ': '. mailer->lastError();
+			$msg = GO::t("Sorry, an error occurred") . ': '. $mailer->lastError();
 			throw new Exception($msg);
 		}
 
