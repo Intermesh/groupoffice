@@ -1,3 +1,4 @@
+09-09-2024: 6.8.71
 - Files: Fix PHPMailer compatibility issue
 - Core / Studio: fix error when initially loading combobox value
 - Calendar: Fixed invalid error message when sending invites
