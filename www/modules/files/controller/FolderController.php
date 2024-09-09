@@ -33,7 +33,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
   }
 
 
-	public function cleanAddressBook($dryRun = 1) {
+	public function actionCleanAddressBook($dryRun = 1) {
 		$this->requireCli();;
 		$folder = Folder::model()->findByPath('addressbook');
 
@@ -49,6 +49,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		}
 
 		$subWithoutAcl = Folder::model()->findByAttributes(['parent_id'=> $folder->id, 'acl_id' => 0]);
+		echo "Found " . $subWithoutAcl->rowCount() .' folders without ACL'."\n";
 		foreach($subWithoutAcl as $f) {
 			echo "Moving " . $f->name ."\n";
 
@@ -57,6 +58,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				$f->save();
 			}
 		}
+
+		echo "Done\n";
 	}
 
 
