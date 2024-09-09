@@ -1,3 +1,5 @@
+- Files: Fix PHPMailer compatibility issue
+
 05-09-2024: 6.8.70
 - Sieve: text label Out of Office more clear
 - Core: Mask hashes in history log
