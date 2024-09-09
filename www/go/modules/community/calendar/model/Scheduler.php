@@ -57,6 +57,19 @@ class Scheduler {
 		$event->createdAt = new DateTime();
 		$event->modifiedAt = new DateTime();
 		$ics = ICalendarHelper::toInvite('REPLY', $event);
+
+		// filter our other participants
+		foreach($ics->vevent as $vevent) {
+			if(isset($vevent->attendee)) {
+				$filtered = [];
+				foreach($vevent->attendee as $a) {
+					if('mailto:'.strtolower($participant->email) !== (string) $a) {
+						$vevent->remove($a);
+					}
+				}
+			}
+		}
+
 		$subject = go()->t('Reply').': '.$event->title;
 		$lang = go()->t('replyImipBody', 'community', 'calendar');
 
@@ -331,7 +344,8 @@ class Scheduler {
 
 			// MAKE PATCH
 			if(isset($vevent->{'RECURRENCE-ID'})) {// occurrence
-				$recurId = $vevent->{'RECURRENCE-ID'}->getValue();
+				$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
+
 				if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
 					// TODO: check if the given RECURRENCE-ID is valid for $existingEvent->recurrenceRule
 					// If it is not valid an extra instance would be created (RDATE in iCal) GroupOffice does not display these at the moment.
