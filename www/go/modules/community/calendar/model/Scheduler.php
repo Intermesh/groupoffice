@@ -28,7 +28,7 @@ class Scheduler {
 		$current = $event->calendarParticipant();
 
 		if(empty($current) ||
-			(!$event->isOrigin && !$current->isModified('participantionStatus'))) {
+			(!$event->isOrigin && !$current->isModified('participationStatus'))) {
 			return;
 		}
 
