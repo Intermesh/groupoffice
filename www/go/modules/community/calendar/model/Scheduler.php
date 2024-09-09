@@ -20,6 +20,8 @@ class Scheduler {
 	 * @parma bool $delete if the event is about to be deleted
 	 */
 	static public function handle(CalendarEvent $event, bool $willDelete = false) {
+
+		// TODO: Series has no participants but override does?!?
 		if(empty($event->participants) || $event->isInPast())
 			return;
 
@@ -64,7 +66,7 @@ class Scheduler {
 			'{date}' => implode(' ',$event->humanReadableDate()),
 		]);
 
-		$success = go()->getMailer()->compose()
+		go()->getMailer()->compose()
 			->setSubject($subject)
 			->setFrom($participant->email, $participant->name)
 			//->setReplyTo($participant->email)
@@ -78,7 +80,7 @@ class Scheduler {
 			unset($old);
 		}
 
-		return $success;
+		return true;
 	}
 
 	/**
@@ -103,8 +105,11 @@ class Scheduler {
 	private static function organizeImip(CalendarEvent $event, $method, $newOnly = false) {
 		$success=true;
 
-		// TODO: WHen adding a participant for a single occurrence, this participant does not get an invite becasue
-		// we only iterate the main events partipants without patching.
+
+		// This does not only build the ics file but also changes event to an occurence if an occurence was modified. A
+		// participant could have been added as well.
+		$ics = ICalendarHelper::toInvite($method,$event);
+
 		$organizer = $event->calendarParticipant(); // must be organizer at this point
 		foreach($event->participants as $participant) {
 			/** @var $participant Participant */
@@ -120,11 +125,10 @@ class Scheduler {
 				$subject .= ' ('.go()->t('updated', 'community', 'calendar').')';
 			}
 
-			// Event could be patch for body presentation
-			$ics = ICalendarHelper::toInvite($method,$event);
+
 
 			try {
-				$success = go()->getMailer()->compose()
+				go()->getMailer()->compose()
 						->setSubject($subject . ': ' . $event->title)
 						->setFrom(go()->getSettings()->systemEmail, $organizer->name)
 						->setReplyTo($organizer->email)
@@ -135,7 +139,7 @@ class Scheduler {
 							//->setInline(true)
 						)
 						->setBody(self::mailBody($event, $method, $participant, $subject), 'text/html')
-						->send() && $success;
+						->send();
 			} catch(\Exception $e) {
 				go()->log($e->getMessage());
 				$success=false;
