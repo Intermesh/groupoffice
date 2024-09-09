@@ -687,10 +687,6 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 				
 				var cls = "x-calGrid-month-event-container cal-event-partstatus-"+eventData.partstatus;
 
-				// if(!Ext.isEmpty(eventData.location)) {
-				// 	text += " @ " + eventData.location;
-				// }
-
 				if(eventData.link_count>0){
 					text +='<span class="cal-has-links"></span>';
 				}
