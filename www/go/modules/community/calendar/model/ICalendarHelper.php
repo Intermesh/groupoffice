@@ -90,7 +90,7 @@ class ICalendarHelper {
 		return $vcalendar;
 	}
 
-	static function toInvite(string $method, CalendarEvent &$event) {
+	static function toInvite(string $method, CalendarEvent &$event) : VCalendar {
 		$c = new VCalendar(['PRODID' => $event->prodId, 'METHOD' => $method]);
 		$forBody = $event;
 		if($method == 'CANCEL' || $event->isModified(array_merge(CalendarEvent::EventProperties,['participants']))) {
@@ -99,6 +99,9 @@ class ICalendarHelper {
 		}
 		if(isset($event->recurrenceOverrides)) {
 			foreach ($event->recurrenceOverrides as $recurrenceId => $override) {
+
+				// problem, isModified() is always true here. This is fixed now in recurrence override.
+
 				if ($override->isModified()) {
 					$patch = $event->recurrenceOverrides[$recurrenceId];
 					$forBody = $event->copyPatched($patch, $recurrenceId);
@@ -260,7 +263,8 @@ class ICalendarHelper {
 	 * @param CalendarEvent $event the event to insert the data into
 	 * @return CalendarEvent updated or new Event if not found
 	 */
-	static public function parseVObject($vcalendar, CalendarEvent $event) {
+	static public function parseVObject($vcalendar, CalendarEvent $event): CalendarEvent
+	{
 
 		if(is_string($vcalendar)) {
 			$vcalendar = VObject\Reader::read($vcalendar, VObject\Reader::OPTION_FORGIVING);
@@ -268,14 +272,14 @@ class ICalendarHelper {
 
 		$exceptions = [];
 		$baseEvents = [];
-		$prodId = $vcalendar->PRODID;
+		$prodId = (string) $vcalendar->PRODID;
 		if(!empty($event->uid)) {
 			$baseEvents[$event->uid] = $event; // so we can attach exceptions if that all we got
 		}
 		foreach($vcalendar->VEVENT as $vevent) {
 
 			$obj = self::parseOccurrence($vevent, (object)[
-				'uid' => (string)$vevent->UID // unset after merge
+				'uid' => (string) $vevent->UID // unset after merge
 			]);
 
 			if(!empty($vevent->{'RECURRENCE-ID'})) {
@@ -336,13 +340,19 @@ class ICalendarHelper {
 			$uid = $props->uid;
 			$recurrenceId = $props->recurrenceId;
 			unset($props->recurrenceId, $props->uid);
+			go()->debug("UID: " . $uid);
+			go()->debug("RecurrenceID: " . $recurrenceId);
 
 			if(isset($baseEvents[$uid]) && $baseEvents[$uid]->isRecurring()) {
 				if(!isset($baseEvents[$uid]->recurrenceOverrides[$recurrenceId])) {
 					$baseEvents[$uid]->recurrenceOverrides[$recurrenceId] = new RecurrenceOverride($baseEvents[$uid]);
 				}
 				$baseEvents[$uid]->recurrenceOverrides[$recurrenceId]->patchProps($props);
+
+				go()->debug($baseEvents[$uid]->recurrenceOverrides[$recurrenceId]->isModified());
 			} else {
+
+				go()->debug("No recurring event");
 				// ICS contains exception but no base event.
 				// You must be invited to a single occurrence
 				$event->setValues((array)$props); // title, description, start, duration, location, status, privacy
