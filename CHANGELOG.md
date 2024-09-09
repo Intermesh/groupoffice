@@ -1,4 +1,5 @@
 - Files: Fix PHPMailer compatibility issue
+- Core / Studio: fix error when initially loading combobox value
 
 05-09-2024: 6.8.70
 - Sieve: text label Out of Office more clear
