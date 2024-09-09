@@ -33,6 +33,18 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
   }
 
 
+	/**
+	 * After migration of the addressbook there where some left over folder. Clean them up with:
+	 *
+	 * sudo -u www-data groupofficecli.php -r=files/folder/cleanAddressbook -c=/etc/groupoffice/multi_instance/intermesh.group-office.com/config.php --dryRun=0
+	 *
+	 * @param $dryRun
+	 * @return void
+	 * @throws AccessDenied
+	 * @throws GO\Base\Exception\CliOnly
+	 * @throws \go\core\db\DbException
+	 */
+
 	public function actionCleanAddressBook($dryRun = 1) {
 		$this->requireCli();;
 		GO::session()->runAsRoot();
