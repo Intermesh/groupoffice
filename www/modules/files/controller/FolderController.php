@@ -42,8 +42,11 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			exit("Root address book not found");
 		}
 
+		$admin = GO\Base\Model\User::model()->findByPk(1);
+		$home = Folder::model()->findHomeFolder($admin);
+
 		if(!$dryRun) {
-			$trash = Folder::model()->findByPath("users/admin/__ABTRASH__", true);
+			$trash = Folder::model()->findByPath($home->getFullPath() . "/__ABTRASH__", true);
 			if (!$trash) {
 				exit("Couldn't create trash folder");
 			}
