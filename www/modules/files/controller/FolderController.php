@@ -44,9 +44,12 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		$admin = GO\Base\Model\User::model()->findByPk(1);
 		$home = Folder::model()->findHomeFolder($admin);
+		$trashPath = $home->getFullPath() . "/__ABTRASH__";
+
+		echo "Trash path: " . $trashPath ."\n";
 
 		if(!$dryRun) {
-			$trash = Folder::model()->findByPath($home->getFullPath() . "/__ABTRASH__", true);
+			$trash = Folder::model()->findByPath($trashPath, true);
 			if (!$trash) {
 				exit("Couldn't create trash folder");
 			}
