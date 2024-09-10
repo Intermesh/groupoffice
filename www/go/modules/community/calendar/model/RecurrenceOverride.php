@@ -13,11 +13,11 @@ use go\core\util\DateTime;
  */
 class RecurrenceOverride extends Property
 {
-	const OverridableScalar = ['duration','title', 'location', 'status', 'description', 'priority'];
+	const OverridableScalar = ['duration', 'title', 'location', 'status', 'description', 'priority'];
 	const OverridableNonScalar = ['start', 'participants'];
 
 	const Ignored = ['method', 'privacy', 'prodId', 'recurrenceId', 'recurrenceOverrides', 'recurrenceRule',
-		'relatedTo','replyTo','sentBy', 'timeZone', 'uid'];
+		'relatedTo', 'replyTo', 'sentBy', 'timeZone', 'uid'];
 
 	protected $fk; // to event
 	/**
@@ -33,43 +33,48 @@ class RecurrenceOverride extends Property
 	private $props; // decoded patch object
 
 
-	public function init(){
-		$this->props = json_decode(trim($this->patch??'{}',"'"));
+	public function init()
+	{
+		$this->props = json_decode(trim($this->patch ?? '{}', "'"));
 	}
 
-	public function recurrenceId() {
+	public function recurrenceId()
+	{
 		return $this->recurrenceId;
 	}
 
-	public function start() {
+	public function start()
+	{
 		$tz = $this->owner->timeZone();
 		$dateStr = isset($this->props->start) ? $this->props->start : $this->recurrenceId->format("Y-m-d H:i:s");
 		return new \DateTime($dateStr, $tz);
 	}
 
-	public function end() {
+	public function end()
+	{
 		return $this->start()->add(new \DateInterval($this->props->duration ?? $this->owner->duration));
 	}
 
-	public function patchProps($props) {
+	public function patchProps($props)
+	{
 		$event = $this->owner;
 		$patch = [];
-		if(isset($props->start)) {
-			if(!is_string($props->start)) {
+		if (isset($props->start)) {
+			if (!is_string($props->start)) {
 				$props->start = $props->start->format('Y-m-d\TH:i:s');
 			}
-			if($event->start->format('Y-m-d\TH:i:s') !== $props->start) {
+			if ($event->start->format('Y-m-d\TH:i:s') !== $props->start) {
 				$patch['start'] = $props->start;
 			}
 		}
-		if(isset($props->participants)) {
+		if (isset($props->participants)) {
 			//$patch['participants'] = $props->participants;
-			foreach($props->participants as $pid => $participant) {
-				if(isset($event->participants[$pid])) {
+			foreach ($props->participants as $pid => $participant) {
+				if (isset($event->participants[$pid])) {
 					$orig = $event->participants[$pid];
-					foreach($participant as $property => $value) {
-						if(isset($orig->$property) && $value !== $orig->$property) { // roles??
-							$patch['participants/'.$pid.'/'.$property] = $value;
+					foreach ($participant as $property => $value) {
+						if (isset($orig->$property) && $value !== $orig->$property) { // roles??
+							$patch['participants/' . $pid . '/' . $property] = $value;
 						}
 					}
 				} else {
@@ -78,14 +83,34 @@ class RecurrenceOverride extends Property
 
 			}
 		}
-		foreach(self::OverridableScalar as $property) {
-			if(isset($props->$property) && $event->$property !== $props->$property) {
+		foreach (self::OverridableScalar as $property) {
+			if (isset($props->$property) && $event->$property !== $props->$property) {
 				$patch[$property] = $props->$property;
 			}
 		}
 		$this->props = new \stdClass;
+//		$this->isModified = true;
 		$this->setValues($patch);
 	}
+
+	// removed this because of it caused it to be always modified. Not sure what this breaks.
+//	private $isModified;
+	public function isModified(array|string $properties = []): bool|array
+	{
+		return  parent::isModified($properties);
+	}
+
+	/**
+	 * Override to make sure that recurrenceId becomes a DateTime
+	 * even when its protected
+	 */
+	protected function normalizeValue(string $propName, $value): mixed {
+		if($propName === 'recurrenceId')
+			return static::getMapping()->getColumn($propName)->normalizeInput($value);
+		return $value;
+	}
+
+
 
 	protected static function defineMapping(): Mapping
 	{
@@ -96,6 +121,7 @@ class RecurrenceOverride extends Property
 	{
 		$this->props->$name = $value;
 		$this->patch = json_encode($this->props);
+//		$this->isModified = true;
 		return $this;
 	}
 

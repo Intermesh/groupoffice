@@ -87,7 +87,8 @@ class MessageController extends \GO\Base\Controller\AbstractController
 
 		$mailer = Mailer::newGoInstance();
 		$mailer->setEmailAccount($account);
-		$response['success'] = $mailer->send($message);
+		$mailer->send($message);
+		$response['success'] = true;
 
 		return $response;
 	}
@@ -314,6 +315,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$query = 'OR OR OR FROM "' .$matches[1] . '" SUBJECT "' .$matches[1] . '" TO "' .$matches[1] . '" CC "' .$matches[1] . '"';
 		}
 
+		go()->debug("IMAP SEARCH: " . $query);
+
 		$messages = ImapMessage::model()->find(
 						$account,
 						$params['mailbox'],
@@ -396,6 +399,13 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$forceFTS = go()->getConfig()['community']['email']['forceFTS'][$account->host] ?? false;
 
+		if(go()->getDebugger()->enabled) {
+			go()->debug("Force FTS: ");
+			go()->debug($forceFTS);
+
+			go()->debug("Has XFTS capability: ");
+			go()->debug($imap->has_capability("XFTS"));
+		}
 
 		return $forceFTS || $imap->has_capability("XFTS");
 	}
@@ -616,16 +626,18 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				$params
 		));
 
-		
-		$success = $mailer->send($message);
 
-		if(!$success) {
-			$msg = GO::t("Sorry, an error occurred") . ': '. $mailer->lastError();
+		try {
+			$mailer->send($message);
+		} catch(\Throwable $e) {
+			$msg = GO::t("Sorry, an error occurred") . ': '. mailer->lastError();
 			throw new Exception($msg);
 		}
 
+
+
 		// Update "last mailed" time of the emailed contacts.
-		if ($success && Module::findByName("community", "addressbook")->getUserRights()->mayRead) {
+		if (Module::findByName("community", "addressbook")->getUserRights()->mayRead) {
 			$toAddresses = $message->getTo();
 			if (empty($toAddresses)) {
 				$toAddresses = array();
@@ -678,15 +690,15 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$account->sent = $params['reply_mailbox'];
 		}
 
-		if ($success) {
-			//if a sent items folder is set in the account then save it to the imap folder
-			// auto linking will happen on save to sent items
-			if (!$account->saveToSentItems($message, $params)) {
-				//$imap->append_message($account->sent, $message, "\Seen");
-				$response['success'] = false;
-				$response['feedback'] .= 'Failed to save sent item to ' . $account->sent;
-			}
+
+		//if a sent items folder is set in the account then save it to the imap folder
+		// auto linking will happen on save to sent items
+		if (!$account->saveToSentItems($message, $params)) {
+			//$imap->append_message($account->sent, $message, "\Seen");
+			$response['success'] = false;
+			$response['feedback'] .= 'Failed to save sent item to ' . $account->sent;
 		}
+
 
 
 		if (!empty($params['draft_uid'])) {

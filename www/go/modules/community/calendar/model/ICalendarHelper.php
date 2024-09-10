@@ -90,7 +90,7 @@ class ICalendarHelper {
 		return $vcalendar;
 	}
 
-	static function toInvite(string $method, CalendarEvent &$event) {
+	static function toInvite(string $method, CalendarEvent &$event) : VCalendar {
 		$c = new VCalendar(['PRODID' => $event->prodId, 'METHOD' => $method]);
 		$forBody = $event;
 		if($method == 'CANCEL' || $event->isModified(array_merge(CalendarEvent::EventProperties,['participants']))) {
@@ -122,6 +122,10 @@ class ICalendarHelper {
 	 * @return array
 	 */
 	static function toVEvent($vevent, $event, $recurrenceId=false) {
+
+		if(!$recurrenceId) {
+			$recurrenceId = $event->recurrenceId;
+		}
 
 		if(!$recurrenceId) {
 			if(!empty($event->privacy) && $event->privacy !== 'public') $vevent->CLASS = self::$privacyMap[$event->privacy];
@@ -260,7 +264,8 @@ class ICalendarHelper {
 	 * @param CalendarEvent $event the event to insert the data into
 	 * @return CalendarEvent updated or new Event if not found
 	 */
-	static public function parseVObject($vcalendar, CalendarEvent $event) {
+	static public function parseVObject($vcalendar, CalendarEvent $event): CalendarEvent
+	{
 
 		if(is_string($vcalendar)) {
 			$vcalendar = VObject\Reader::read($vcalendar, VObject\Reader::OPTION_FORGIVING);
@@ -268,14 +273,21 @@ class ICalendarHelper {
 
 		$exceptions = [];
 		$baseEvents = [];
-		$prodId = (string)$vcalendar->PRODID;
+		$prodId = (string) $vcalendar->PRODID;
+
+
+		if(empty($event->uid)) {
+			$event->uid = ((string) $vcalendar->VEVENT[0]->uid) ?? null;
+		}
+
 		if(!empty($event->uid)) {
 			$baseEvents[$event->uid] = $event; // so we can attach exceptions if that all we got
 		}
+
 		foreach($vcalendar->VEVENT as $vevent) {
 
 			$obj = self::parseOccurrence($vevent, (object)[
-				'uid' => (string)$vevent->UID // unset after merge
+				'uid' => (string) $vevent->UID // unset after merge
 			]);
 
 			if(!empty($vevent->{'RECURRENCE-ID'})) {
@@ -347,7 +359,13 @@ class ICalendarHelper {
 				// You must be invited to a single occurrence
 				$event->setValues((array)$props); // title, description, start, duration, location, status, privacy
 				$event->prodId = $prodId;
-				$event->uid = $uid. '_' . $recurrenceId;
+
+				// this leads to issues as the UID must stay the same for caldav etc.
+				// But removing this leads to another issue. If a participant is invited for
+				// a single occurrence it's added tto the whole series. Because
+				//in Calendar::addEvent() the original base event is attached
+				$event->uid = $uid;
+				$event->recurrenceId = $recurrenceId;
 			}
 		}
 		// All exceptions that do not have the recurrence ID are ignored here

@@ -5,6 +5,7 @@ namespace go\modules\community\calendar\model;
 use Exception;
 use go\core\mail\Address;
 use go\core\mail\Attachment;
+use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
 use GO\Email\Model\ImapMessage;
 use Sabre\VObject\Component\VCalendar;
@@ -20,13 +21,15 @@ class Scheduler {
 	 * @parma bool $delete if the event is about to be deleted
 	 */
 	static public function handle(CalendarEvent $event, bool $willDelete = false) {
+
+		// TODO: Series has no participants but override does?!?
 		if(empty($event->participants) || $event->isInPast())
 			return;
 
 		$current = $event->calendarParticipant();
 
 		if(empty($current) ||
-			(!$event->isOrigin && !$current->isModified('participantionStatus'))) {
+			(!$event->isOrigin && !$current->isModified('participationStatus'))) {
 			return;
 		}
 
@@ -54,13 +57,20 @@ class Scheduler {
 		// needed so organizer can find last response
 		$event->createdAt = new DateTime();
 		$event->modifiedAt = new DateTime();
-		$ics = ICalendarHelper::toVObject($event, new VCalendar([
-			'PRODID' => $event->prodId,
-			'METHOD'=>'REPLY'
-		]));
+		$ics = ICalendarHelper::toInvite('REPLY', $event);
 
-		$attachment = Attachment::fromString($ics->serialize(),'reply.ics', 'text/calendar;method=REPLY;charset=utf-8',Attachment::ENCODING_8BIT);
-			//->setInline(true);
+		// filter our other participants
+		foreach($ics->vevent as $vevent) {
+			if(isset($vevent->attendee)) {
+				$filtered = [];
+				foreach($vevent->attendee as $a) {
+					if('mailto:'.strtolower($participant->email) !== (string) $a) {
+						$vevent->remove($a);
+					}
+				}
+			}
+		}
+
 		$subject = go()->t('Reply').': '.$event->title;
 		$lang = go()->t('replyImipBody', 'community', 'calendar');
 
@@ -70,12 +80,12 @@ class Scheduler {
 			'{date}' => implode(' ',$event->humanReadableDate()),
 		]);
 
-		$success = go()->getMailer()->compose()
+		go()->getMailer()->compose()
 			->setSubject($subject)
 			->setFrom($participant->email, $participant->name)
 			//->setReplyTo($participant->email)
 			->setTo(new Address($event->replyTo, !empty($organizer) ? $organizer->name : null))
-			->attach($attachment)
+			->attach(Attachment::fromString($ics->serialize(),'reply.ics', 'text/calendar;method=REPLY;charset=utf-8',Attachment::ENCODING_8BIT))
 			->setBody($body)
 			->send();
 
@@ -84,7 +94,7 @@ class Scheduler {
 			unset($old);
 		}
 
-		return $success;
+		return true;
 	}
 
 	/**
@@ -109,8 +119,11 @@ class Scheduler {
 	private static function organizeImip(CalendarEvent $event, $method, $newOnly = false) {
 		$success=true;
 
-		// TODO: WHen adding a participant for a single occurrence, this participant does not get an invite becasue
-		// we only iterate the main events partipants without patching.
+
+		// This does not only build the ics file but also changes event to an occurence if an occurence was modified. A
+		// participant could have been added as well.
+		$ics = ICalendarHelper::toInvite($method,$event);
+
 		$organizer = $event->calendarParticipant(); // must be organizer at this point
 		foreach($event->participants as $participant) {
 			/** @var $participant Participant */
@@ -126,11 +139,10 @@ class Scheduler {
 				$subject .= ' ('.go()->t('updated', 'community', 'calendar').')';
 			}
 
-			// Event could be patch for body presentation
-			$ics = ICalendarHelper::toInvite($method,$event);
+
 
 			try {
-				$success = go()->getMailer()->compose()
+				go()->getMailer()->compose()
 						->setSubject($subject . ': ' . $event->title)
 						->setFrom(go()->getSettings()->systemEmail, $organizer->name)
 						->setReplyTo($organizer->email)
@@ -141,7 +153,7 @@ class Scheduler {
 							//->setInline(true)
 						)
 						->setBody(self::mailBody($event, $method, $participant, $subject), 'text/html')
-						->send() && $success;
+						->send();
 			} catch(\Exception $e) {
 				go()->log($e->getMessage());
 				$success=false;
@@ -333,7 +345,8 @@ class Scheduler {
 
 			// MAKE PATCH
 			if(isset($vevent->{'RECURRENCE-ID'})) {// occurrence
-				$recurId = $vevent->{'RECURRENCE-ID'}->getValue();
+				$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
+
 				if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
 					// TODO: check if the given RECURRENCE-ID is valid for $existingEvent->recurrenceRule
 					// If it is not valid an extra instance would be created (RDATE in iCal) GroupOffice does not display these at the moment.
@@ -345,8 +358,10 @@ class Scheduler {
 				}
 				if(!$p) continue;
 				if (empty($p->scheduleUpdated) || $p->scheduleUpdated < $replyStamp) {
+
+					// had to use setValues instead of patchProps here?
 					$k = 'participants/'.$p->pid();
-					$existingEvent->recurrenceOverrides[$recurId]->patchProps([
+					$existingEvent->recurrenceOverrides[$recurId]->setValues([
 						$k.'/participationStatus' => $status,
 						$k.'/scheduleUpdated' => $replyStamp->format("Y-m-d\TH:i:s"),
 					]);
@@ -365,7 +380,9 @@ class Scheduler {
 			}
 		}
 
-		$existingEvent->save();
-		return $existingEvent;
+		if(!$existingEvent->save()) {
+			throw new SaveException($existingEvent);
+		}
+		return $exEvent ?? $existingEvent;
 	}
 }

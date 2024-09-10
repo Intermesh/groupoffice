@@ -333,6 +333,16 @@ public function historyLog(): bool|array
 {
 	$log = parent::historyLog();
 
+	if(isset($log['otp'])) {
+		if(isset($log['otp'][0])) {
+			$log['otp'][0] = "MASKED";
+		}
+
+		if(isset($log['otp'][1])) {
+			$log['otp'][1] = "MASKED";
+		}
+	}
+
 	if(isset($log['password'])) {
 		if(isset($log['password'][0])) {
 			$log['password'][0] = "MASKED";
@@ -340,6 +350,16 @@ public function historyLog(): bool|array
 
 		if(isset($log['password'][1])) {
 			$log['password'][1] = "MASKED";
+		}
+	}
+
+	if(isset($log['recoveryHash'])) {
+		if(isset($log['recoveryHash'][0])) {
+			$log['recoveryHash'][0] = "MASKED";
+		}
+
+		if(isset($log['password'][1])) {
+			$log['recoveryHash'][1] = "MASKED";
 		}
 	}
 
@@ -843,9 +863,8 @@ public function historyLog(): bool|array
 			->setSubject(go()->t('Lost password'))
 			->setBody($emailBody);
 		
-		if(!$message->send()) {
-			throw new Exception("Could not send mail. The notication system setttings may be incorrect.");
-		}
+		$message->send();
+
 	}
 	
 	protected function internalSave(): bool

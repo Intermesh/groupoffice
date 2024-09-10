@@ -29,7 +29,7 @@ go.modules.community.notes.NoteDialog = Ext.extend(go.form.Dialog, {
 						name: 'content',
 						grow: true,
 						growMinHeight: dp(100),
-						growMaxHeight: 0,
+						growMaxHeight: 600,
 
 						fieldLabel: "",
 						hideLabel: true,

@@ -1,3 +1,45 @@
+05-09-2024: 6.8.70
+- Sieve: text label Out of Office more clear
+- Core: Mask hashes in history log
+- Core: Fixed various invalid mail send() errors
+
+04-09-2024: 6.8.69
+- ActiveSync: Sending mail reported an error during sent even though it was actually sent
+
+03-09-2024: 6.8.68
+- Billing: Fixed Uncaught exception: Access level to GO\Billing\Pdf::$pageWidth must be protected (as in class GO\Base\Util\Pdf) or weaker at 2024-09-03T08:58:25+02:00
+
+02-09-2024: 6.8.67
+- Finance: Fixed additional PDF templates not working
+- Tasks: Message field was mandatory by mistake
+- Calendar: fixed sprintf() problem with repeating every 2 years
+- Core: Use standard remove format button instead of word paste in html editor
+- Email: Send charset for search as it didn't work without it when using utf8 with a large Polish provider
+- Calendar / core: fix page width when printing current view
+- Finance: Add articles from catalog dialog
+- Catalog: Organize articles in categories
+- Email: check 'automatically save in Sent' checkbox by default as per install script
+- Tasks: In 'Continue task' dialog, make sure that all buttons are shown.
+- Finance: Add project billing for finance
+- Email: show next message in selected mailbox after moving current message
+
+26-08-2024: 6.8.66
+- Core: Fixed header Y coord not working on PDF templates
+- Core: Add several filters to PDF template parser
+- Finance: Fixed search in books
+- Finance: Refresh statuses after book update
+- Finance: Fixed Implicit conversion from float-string \"17.5000\" to int loses precision
+- Finance: minor bugfix optional article description
+- Time registration: fix display issue task combo in dialog
+- Email: Remove starttls. tls does the job.
+
+19-08-2024: 6.8.65
+- Core: Attachments Custom field now shows files grid when configured as pictures
+- Tasks / support: accent class for grouping separator
+- Business: allow users with mayManageEmployees to create or destroy agreements
+- Core: more helpful / less generic "Add link" button icon
+
+13-08-2024: 6.8.64
 - Core: PHP 8.2 compatibility fix
 - Core: Fixed combobox not loading value in Account dialog causing DB error
 
@@ -21,7 +63,7 @@
 - Email: Display files with ampersands in file name correctly, fix download link.
 
 15-07-2024: 6.8.60
-- Busisess: allow users with mayManageEmployees to update their agreements
+- Business: allow users with mayManageEmployees to update their agreements
 - Core: make conditionally required, required and conditionally hidden mutually exclusive
 
 09-07-2024: 6.8.59

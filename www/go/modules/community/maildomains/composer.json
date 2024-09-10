@@ -1,0 +1,13 @@
+{
+  "name": "groupoffice/maildomains",
+  "description": "Group-Office",
+  "require": {
+    "mlocati/spf-lib": "^3.1"
+  },
+  "authors": [
+    {
+      "name": "Joachim van de Haterd",
+      "email": "jvdhaterd@intermesh.nl"
+    }
+  ]
+}

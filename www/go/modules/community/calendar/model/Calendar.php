@@ -3,6 +3,7 @@ namespace go\modules\community\calendar\model;
 
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
+use go\core\db\DbException;
 use go\core\model\Principal;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
@@ -96,16 +97,18 @@ class Calendar extends AclOwnerEntity {
 	 * If the UID of the event already exists in the system. Grab its ID and add the event to the given calendar.
 	 * Then select it again and return the selected event.
 	 * If it doesn't exists just set the calendarId and save() once to behave
-	 * @param $event CalendarEvent
-	 * @param $cal Calendar
-	 * @return CalendarEvent this one is saved in the provided calendar
+	 * @param CalendarEvent $event
+	 * @param int $calendarId
+	 * @return ?CalendarEvent this one is saved in the provided calendar
+	 * @throws DbException
 	 */
-	static function addEvent($event, $calendarId) {
+	static function addEvent(CalendarEvent $event, int $calendarId): ?CalendarEvent
+	{
 		$eventData = go()->getDbConnection()
 			->select(['t.eventId, GROUP_CONCAT(calendarId) as calendarIds'])
 			->from('calendar_event', 't')
 			->join('calendar_calendar_event', 'c', 'c.eventId = t.eventId', 'LEFT')
-			->where(['uid'=>$event->uid])
+			->where(['uid'=>$event->uid, 'recurrenceId' => $event->recurrenceId])
 			->single();
 
 		if(!empty($eventData) && !empty($eventData['eventId'])) {
@@ -187,7 +190,7 @@ class Calendar extends AclOwnerEntity {
 			$this->isSubscribed = true; // auto subscribe the creator.
 			$this->isVisible = true;
 			$this->defaultColor = $this->color;
-		} else if($this->ownerId === go()->getUserId()) {
+		} else if($this->ownerId === go()->getUserId() && !empty($this->color)) {
 			$this->defaultColor = $this->color;
 		}
 		if(empty($this->color)) {

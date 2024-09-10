@@ -30,9 +30,9 @@ class Notify extends Controller {
 			$message->setReplyTo($params['replyTo']);
 		}
 
-		$success = $message->send();
+		$message->send();
 		
-		return ['success' => $success];
+		return ['success' => true];
 	}
 }
 

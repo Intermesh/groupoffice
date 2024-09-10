@@ -212,11 +212,11 @@ export class Main extends Component {
 						menu: menu({}, list({
 							store:inviteStore,
 							renderer: (r, row) => {
-								const item = new CalendarItem({key:r.id, data:r}),
+								const item = new CalendarItem({key:r.id + "", data:r}),
 									owner = item.owner,
 									press = function(b:Button,s:'accepted'|'tentative'|'declined') {
 										b.el.cls('+pressed');
-										item.updateParticipation(s).then(() => {
+										item.updateParticipation(s,() => {
 											inviteStore.reload();
 										});
 

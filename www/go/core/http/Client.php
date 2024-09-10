@@ -26,7 +26,6 @@ class Client
 	private array $lastHeaders = [];
 	protected $headers = [];
 
-
 	/**
 	 * @return false|CurlHandle
 	 * @noinspection PhpMissingReturnTypeInspection

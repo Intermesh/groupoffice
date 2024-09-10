@@ -10,7 +10,7 @@
 
 go.detail.addButton = Ext.extend(Ext.Button, {
 	tooltip: t('Add'),
-	iconCls: 'ic-add',
+	iconCls: 'ic-add-link',
 	menu: [],
 	detailView: null,
 	documentTemplates: true,

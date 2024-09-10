@@ -5,6 +5,7 @@ namespace go\core;
 use DateTimeZone;
 use Exception;
 use go\core\data\Model;
+use go\core\fs\Blob;
 use go\core\model\User;
 use go\core\orm\EntityType;
 use go\core\db\Query;
@@ -224,7 +225,9 @@ class TemplateParser {
 		$this->addFilter('htmlEncode', [$this, "filterHtmlEncode"]);
 		$this->addFilter('dump', [$this, "filterDump"]);
 		$this->addFilter('t', [$this, "filterTranslate"]);
-		$this->addFilter('bloburl', [$this, "filterBlobUrl"]);
+		$this->addFilter('blobUrl', [$this, "filterBlobUrl"]);
+		$this->addFilter('blobPath', [$this, "filterBlobPath"]);
+		$this->addFilter('newRow', [$this,'filterNewRow']);
 
 		$this->addModel('now', new DateTime());
 
@@ -256,9 +259,21 @@ class TemplateParser {
 		return isset($v) ? nl2br($v) : "";
 	}
 
-	private function filterBlobUrl($blob) {
-		return go()->getAuthState()->getDownloadUrl($blob);
+	private function filterBlobUrl(string $blobId): string
+	{
+		return go()->getAuthState()->getDownloadUrl($blobId);
 	}
+
+
+	private function filterBlobPath(string $blobId): string
+	{
+		$b = Blob::findById($blobId);
+		if($b) {
+			return "file://" . $b->getFile()->getPath();
+		}
+		return "";
+	}
+
 
 	/**
 	 * @param Entity $entity
@@ -517,6 +532,19 @@ class TemplateParser {
 		} else {
 			return null;
 		}
+	}
+
+	/**
+	 * Check whether configured number of rows is matched
+	 *
+	 * @example [if {{eachIndex|newRow:4}} == 0]
+	 * @param $idx
+	 * @param $numCols
+	 * @return string
+	 */
+	private function filterNewRow($idx, $numCols=2): string
+	{
+		return $idx % $numCols === 0 ? "1" : "0";
 	}
 	
 	/**

@@ -2333,7 +2333,7 @@ abstract class Property extends Model {
 
 						foreach ($this->mapKeyToValues($id, $relation) as $key => $value) {
 							if (empty($this->$propName[$id]->$key)) {
-								$this->$propName[$id]->$key = $value;
+								$this->$propName[$id]->$key = $this->$propName[$id]->normalizeValue($key,$value);
 							}
 						}
 					} else {

@@ -38,7 +38,7 @@ x Billing module refactor
     - Quota warning: https://doc.dovecot.org/configuration_manual/quota/#quota-warning-scripts
     x limit access per service and filter remote ip address (global and per domain) to stop hacks. https://doc.dovecot.org/configuration_manual/config_file/config_variables/
     x Auto clean spam and trash
-    - DKIM generator and implementation. Zie project doc.
+    x DKIM generator and implementation. Zie project doc.
     - Cron job that checks every hour:
         - SPF record is correct
         - DKIM record is set and valid. Automatically configure rspamd.
@@ -51,7 +51,17 @@ x Billing module refactor
 
 - unbound or bind9?
     x unbound or bind9?
-    - master user: https://doc.dovecot.org/configuration_manual/authentication/master_users/
+    x master user: https://doc.dovecot.org/configuration_manual/authentication/master_users/
+
+    x quota / usage in DB:
+    https://doc.dovecot.org/configuration_manual/quota/quota_count/#quota-backend-count
+    https://doc.dovecot.org/configuration_manual/quota/quota_dict/#quota-backend-dict
+
+    - Autoconfig: https://github.com/smartlyway/email-autoconfig-php/blob/master/README.md
+        https://docs.iredmail.org/iredmail-easy.autoconfig.autodiscover.html#setup-dns-record-for-autoconfig
+        https://github.com/mailcow/mailcow-dockerized/blob/master/data/web/autodiscover.php
+
+    x Autoexpunge: https://dovecot.org/mailman3/hyperkitty/list/dovecot@dovecot.org/thread/HDJ4D5KJJLMNL7K4ALNGA2AFIG2KE37L/
 
 - Rocket chat
     - Live chat on sites feed back into GO

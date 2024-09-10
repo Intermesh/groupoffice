@@ -627,7 +627,7 @@ END;
 		}, $string);
 
 // Clean up entities
-		$string = preg_replace('!(&#0+[0-9]+)!', '$1;', $string);
+		$string = preg_replace('!(&#+[0-9]+)!', '$1;', $string);
 
 // Decode entities not needed because they won't be decoded for display.
 		$string = html_entity_decode($string, ENT_QUOTES|ENT_HTML5, 'UTF-8');
