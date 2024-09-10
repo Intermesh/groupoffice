@@ -586,4 +586,3 @@ class Statement implements \IteratorAggregate
 	}
 
 }
-?>
