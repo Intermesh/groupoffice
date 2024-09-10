@@ -354,6 +354,10 @@ class CalendarEvent extends AclItemEntity {
 		return $blob;
 	}
 
+	public function toVObject() {
+		return ICalendarHelper::toVObject($this)->serialize();
+	}
+
 	public function dateTimeZone() {
 		if(!empty($this->timeZone)) {
 			return new \DateTimeZone($this->timeZone);
@@ -468,6 +472,12 @@ class CalendarEvent extends AclItemEntity {
 		if($uri === null)
 			return $this->uri;
 		$this->uri = $uri;
+	}
+
+	public function etag($v = null) {
+		if($v === null)
+			return $this->etag;
+		$this->etag = $v;
 	}
 
 	protected function internalSave() : bool {

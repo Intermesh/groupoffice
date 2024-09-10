@@ -5,18 +5,17 @@ namespace go\modules\community\davclient\model;
 class HttpClient extends \go\core\http\Client
 {
 
-	public $baseUri;
-	public $baseHeaders;
+	//public $baseHeaders;
 
 	public function __construct($uri, $headers)
 	{
-		$this->baseHeaders = $headers;
 		$this->baseUri = $uri;
+		$this->headers = $headers;
 	}
 
 	protected function getHeadersForCurl(): array
 	{
-		$s = $this->baseHeaders;
+		$s =[];
 		foreach($this->headers as $key => $value) {
 			$s[] = $key.': ' . $value;
 		}
@@ -30,11 +29,21 @@ class HttpClient extends \go\core\http\Client
 		return null;
 	}
 
-	public function PROPFIND($path = '', $data) {
-		$this->setOption(CURLOPT_CUSTOMREQUEST, "PROPFIND");
+	public function PROPFIND($path, $data) {
+		return $this
+			->setOption(CURLOPT_CUSTOMREQUEST, "PROPFIND")
+			->request($path, '<?xml version="1.0"?>'.$data);
 	}
 
-	public function REPORT($path = '', $data) {
-		$this->setOption(CURLOPT_CUSTOMREQUEST, "REPORT");
+	public function REPORT($path, $data) {
+		return $this
+			->setOption(CURLOPT_CUSTOMREQUEST, "REPORT")
+			->request($path,'<?xml version="1.0"?>'.$data);
+	}
+
+	public function PUT($path, $data) {
+		return $this
+			->setOption(CURLOPT_CUSTOMREQUEST, "PUT")
+			->request($path, $data);
 	}
 }

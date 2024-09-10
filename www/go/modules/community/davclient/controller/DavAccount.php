@@ -2,10 +2,9 @@
 
 namespace go\modules\community\davclient\controller;
 
-use go\core\db\Query;
 use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
-use go\modules\community\calendar\model;
+use go\modules\community\davclient\model;
 
 
 class DavAccount extends EntityController {
@@ -27,6 +26,14 @@ class DavAccount extends EntityController {
 
 	public function changes($params) {
 		return $this->defaultChanges($params);
+	}
+
+	public function sync($params) {
+		$account = model\DavAccount::findById($params['accountId']);
+		if(!empty($account)) {
+			$account->synchronizer()->sync();
+		}
+		return ['alreadyUpToDate'=>false, 'accountId'=>$params['accountId']];
 	}
 
 	protected function canCreate(Entity $entity): bool

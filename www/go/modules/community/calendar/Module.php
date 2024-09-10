@@ -108,7 +108,7 @@ class Module extends core\Module
 		$ev = CalendarEvent::findById($key);
 
 		header('Content-Type: text/calendar; charset=UTF-8; component=vevent');
-		echo ICalendarHelper::toVObject($ev)->serialize();
+		echo $ev->toVObject();
 	}
 
 	public function pagePrint($type,$date) {

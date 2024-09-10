@@ -21,7 +21,7 @@ export class CalendarWindow extends FormWindow {
 			this.title = t(this.currentId ? 'Edit calendar' : 'Create calendar');
 		})
 
-		const alertField =alertfield({name: 'defaultAlertsWithTime',isForDefault:true, label:t('Events with time')}),
+		const alertField = alertfield({name: 'defaultAlertsWithTime',isForDefault:true, label:t('Events with time')}),
 			fdAlertField = alertfield({name: 'defaultAlertsWithoutTime',isForDefault:true, fullDay:true, label:t('Events without time (Full-day)')});
 
 		this.generalTab.items.add(

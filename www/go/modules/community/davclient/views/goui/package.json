@@ -1,0 +1,17 @@
+{
+  "type": "module",
+  "devDependencies": {
+    "concurrently": "latest",
+    "esbuild": "latest",
+    "sass": "latest",
+    "typescript": "latest"
+  },
+  "scripts": {
+    "start": "npm run start:esbuild",
+    "start:esbuild": "npx esbuild src/Index.ts --external:../../../../../../views/goui/* --bundle --watch --sourcemap --format=esm --target=esnext --outdir=dist",
+
+    "build": "npm run build:ts",
+    "build:ts": "npx esbuild src/Index.ts --external:../../../../../../views/goui/* --bundle --minify --sourcemap --format=esm --target=esnext --outdir=dist",
+    "build:dts": "npx tsc --declaration --emitDeclarationOnly"
+  }
+}

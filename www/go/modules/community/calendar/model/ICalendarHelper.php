@@ -268,7 +268,7 @@ class ICalendarHelper {
 
 		$exceptions = [];
 		$baseEvents = [];
-		$prodId = $vcalendar->PRODID;
+		$prodId = (string)$vcalendar->PRODID;
 		if(!empty($event->uid)) {
 			$baseEvents[$event->uid] = $event; // so we can attach exceptions if that all we got
 		}
@@ -357,7 +357,7 @@ class ICalendarHelper {
 
 	static function makeBlob(CalendarEvent $event, string $data = null): Blob
 	{
-		$blob = Blob::fromString($data ?? ICalendarHelper::toVObject($event)->serialize());
+		$blob = Blob::fromString($data ?? $event->toVObject());
 		$blob->type = 'text/calendar';
 		// these must stay in sync!
 		$blob->modifiedAt = $event->modifiedAt;
@@ -457,7 +457,7 @@ class ICalendarHelper {
 		if(isset($parts['WKST'])) $values->firstDayOfWeek = strtolower(isset($parts['WKST']));
 		if(isset($parts['BYDAY'])) {
 			$values->byDay = [];
-			$days = $parts['BYDAY'];
+			$days = (array)$parts['BYDAY'];
 			foreach($days as $day) {
 				$bd = (object)['day' => strtolower(substr($day, -2))];
 				if(strlen($day) > 2) {
@@ -478,7 +478,8 @@ class ICalendarHelper {
 			// could be "20240824T063000Z" or "20240824"
 			if(strlen($parts['UNTIL']) > 10) { // has time
 				// convert to localtime
-				$dt = DateTime::createFromFormat('Ymd\THis\Z', $parts['UNTIL'], new \DateTimeZone('etc/UTC'));
+				$isUtc = substr($parts['UNTIL'], -1,1) === 'Z';
+				$dt = DateTime::createFromFormat('Ymd\THis', substr($parts['UNTIL'],0,15), new \DateTimeZone('etc/UTC'));
 				if(!empty($event->timeZone))
 					$dt->setTimezone(new \DateTimeZone($event->timeZone));
 				$values->until = $dt->format('Y-m-d\TH:i:s');

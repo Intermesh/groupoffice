@@ -15,6 +15,7 @@ use go\modules\community\calendar\model\BusyPeriod;
 use go\modules\community\calendar\model\CalendarEvent;
 use go\modules\community\calendar\model\ICalendarHelper;
 use go\modules\community\calendar\model\Settings;
+use go\modules\community\davclient\model\DavAccount;
 use Sabre\VObject\Component\VCalendar;
 
 class Module extends core\Module
@@ -22,6 +23,16 @@ class Module extends core\Module
 	public function getAuthor(): string
 	{
 		return "Intermesh BV <mdhart@intermesh.nl>";
+	}
+
+	public function defineListeners()
+	{
+		CalendarEvent::on(CalendarEvent::EVENT_BEFORE_SAVE, self::class, 'onBeforeEventSave');
+	}
+
+	public static function onBeforeEventSave($event) {
+		$davAccount = DavAccount::findByCalendarId($event->calendarId);
+		return !empty($davAccount) ? $davAccount->put($event) : true;
 	}
 
 	public static function getTitle(): string
