@@ -3,6 +3,7 @@
 namespace GO\Base\Mail;
 
 use Exception;
+use GO;
 use GO\Base\Fs\File;
 use GO\Base\Mail\Exception\ImapAuthenticationFailedException;
 
@@ -2560,10 +2561,12 @@ class Imap extends ImapBodyStruct
 	 * for each run of $command.
 	 * @param string $command IMAP command
 	 * @param array $uids Array of UIDs
-	 * @param boolean $trackErrors passed as third argument to $this->check_response()
-	 * @return boolean
+	 * @param ?bool $trackErrors passed as third argument to $this->check_response()
+	 * @return bool
+	 * @throws Exception
 	 */
-	private function _runInChunks($command, $uids, $trackErrors=true){
+	private function _runInChunks($command, $uids, $trackErrors=true): bool
+	{
 		$status=false;
 		$uid_strings = array();
 		if (empty($uids))
@@ -2581,20 +2584,28 @@ class Imap extends ImapBodyStruct
 			$uid_strings[] = implode(',', $uids);
 		}
 
-		foreach ($uid_strings as $uid_string) {
-			if ($uid_string) {
-				$this->clean($uid_string, 'uid_list');
+		try {
+			foreach ($uid_strings as $uid_string) {
+				if ($uid_string) {
+					$this->clean($uid_string, 'uid_list');
+				}
+				$theCommand = sprintf($command, $uid_string);
+				$this->send_command($theCommand);
+				$res = $this->get_response();
+				$status = $this->check_response($res, false, $trackErrors);
+				if (!$status) {
+					return $status;
+				}
 			}
-			$theCommand = sprintf($command,$uid_string);
-			$this->send_command($theCommand);
-			$res = $this->get_response();
-			$status = $this->check_response($res, false, $trackErrors);
-			if (!$status) {
-				return $status;
-			}
-		}
 
-		return $status;
+			return $status;
+		}
+		catch (\Exception $exception) {
+			GO::debug($exception->getMessage());
+			GO::debug($command);
+			throw $exception;
+//			return false;
+		}
 	}
 
 	/**
