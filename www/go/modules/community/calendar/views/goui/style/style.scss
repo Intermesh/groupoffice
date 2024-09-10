@@ -438,6 +438,7 @@ $timeMargin: dp(72);
 			position:relative;
 			background-color:$surfaceLowest;
 			flex-shrink: 0;
+			overflow-x: hidden;
 			max-height: dp(212); // x all-day events fit
 			min-height:dp(32);
 			border-bottom: 2px solid $colorLine;
