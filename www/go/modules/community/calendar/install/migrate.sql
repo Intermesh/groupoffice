@@ -191,7 +191,7 @@ CREATE TABLE IF NOT EXISTS `calendar_participant` (
 	`eventId` INT UNSIGNED NOT NULL,
 	`name` VARCHAR(100) NULL,
 	`email` VARCHAR(128) NOT NULL,
-	`kind` ENUM('individual', 'group', 'location', 'resource') NOT NULL,
+	`kind` ENUM('individual', 'group', 'location', 'resource','unknown') NOT NULL,
 	`rolesMask` INT NOT NULL DEFAULT 0,
 	`language` VARCHAR(20),
 	`participationStatus` ENUM('needs-action', 'tentative', 'accepted', 'declined', 'delegated') NULL DEFAULT 'needs-action',
