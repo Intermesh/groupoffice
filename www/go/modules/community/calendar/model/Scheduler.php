@@ -5,6 +5,7 @@ namespace go\modules\community\calendar\model;
 use Exception;
 use go\core\mail\Address;
 use go\core\mail\Attachment;
+use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
 use GO\Email\Model\ImapMessage;
 use Sabre\VObject\Component\VCalendar;
@@ -357,8 +358,10 @@ class Scheduler {
 				}
 				if(!$p) continue;
 				if (empty($p->scheduleUpdated) || $p->scheduleUpdated < $replyStamp) {
+
+					// had to use setValues instead of patchProps here?
 					$k = 'participants/'.$p->pid();
-					$existingEvent->recurrenceOverrides[$recurId]->patchProps([
+					$existingEvent->recurrenceOverrides[$recurId]->setValues([
 						$k.'/participationStatus' => $status,
 						$k.'/scheduleUpdated' => $replyStamp->format("Y-m-d\TH:i:s"),
 					]);
@@ -377,7 +380,9 @@ class Scheduler {
 			}
 		}
 
-		$existingEvent->save();
-		return $existingEvent;
+		if(!$existingEvent->save()) {
+			throw new SaveException($existingEvent);
+		}
+		return $exEvent ?? $existingEvent;
 	}
 }

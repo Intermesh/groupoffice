@@ -44,20 +44,20 @@ class CalendarEvent extends AclItemEntity {
 	const Private = 'private';
 	const Secret = 'secret';
 	// Properties shown to others when 'privacy' is set to private
-	const PrivateProperties = ['created', 'due', 'duration', 'estimatedDuration', 'freeBusyStatus', 'privacy',
-		'recurrenceOverrides', 'sequence', 'showWithoutTime', 'start', 'timeZone', 'timeZones', 'uid','updated'];
+//	const PrivateProperties = ['created', 'due', 'duration', 'estimatedDuration', 'freeBusyStatus', 'privacy',
+//		'recurrenceOverrides', 'sequence', 'showWithoutTime', 'start', 'timeZone', 'timeZones', 'uid','updated'];
 
 	const EventProperties = ['uid','isOrigin','replyTo', 'prodId', 'sequence','title','description','locale','location', 'showWithoutTime',
 		'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule','createdAt','modifiedAt',
-		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag','uri', 'eventId'];
+		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag','uri', 'eventId', 'recurrenceId'];
 
 	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'alerts', 'veventBlobId'];
 
-	// If any of this properties is in the recurrenceOverrides the Object most be ignored
-	const IgnoredPropertiesInException = [
-		'uid', 'links', 'method', 'privacy', 'prodId',
-		'recurrenceId', 'recurrenceOverrides','recurrenceRule',
-		'relatedTo','replyTo','sentBy','timeZones'];
+//	// If any of this properties is in the recurrenceOverrides the Object most be ignored
+//	const IgnoredPropertiesInException = [
+//		'uid', 'links', 'method', 'privacy', 'prodId',
+//		'recurrenceId', 'recurrenceOverrides','recurrenceRule',
+//		'relatedTo','replyTo','sentBy','timeZones'];
 
 
 	static $sendSchedulingMessages = false;
@@ -95,6 +95,15 @@ class CalendarEvent extends AclItemEntity {
 	 * @var string
 	 */
 	public $uid;
+
+	/**
+	 * This is only set when somebody is invited to a single occurrence of a series.
+	 *
+	 * Als een participant is uitgenodigd dan wordt er een aparte event met UID . ‘_’. RECURRENCE-ID gemaakt. Dit is denk ik ook de enige manier om dit op te slaan. Je kan dit niet met een recurrence override doen. Maar als je hier je status op zet dan wordt de andere event niet bijgewerkt via caldav. GO stuurt wel een mail maar met UID:d060b367-bc65-4853-bf07-f495bdb29671_2024-09-17T14:00:00 Dan krijg je unable to process invitation omdat deze UID niet gevonden wordt. Als ik aanpas dat deze dezelfde UID gebruikt zonder recurrence-id te appenden, dan krijfgt de genodigde de hele series omdat in Calendar::addEvent() dezelfde calendar_event data wordt bijgevoegd.
+	 *
+	 * @var string|null
+	 */
+	public ?string $recurrenceId = null;
 
 	/**
 	 * This is a revision number that is increased by 1 every time the organizer

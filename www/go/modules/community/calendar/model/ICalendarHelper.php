@@ -127,6 +127,10 @@ class ICalendarHelper {
 	static function toVEvent($vevent, $event, $recurrenceId=false) {
 
 		if(!$recurrenceId) {
+			$recurrenceId = $event->recurrenceId;
+		}
+
+		if(!$recurrenceId) {
 			if(!empty($event->privacy) && $event->privacy !== 'public') $vevent->CLASS = self::$privacyMap[$event->privacy];
 			if(!empty($event->modifiedAt)) $vevent->{'LAST-MODIFIED'} = $event->modifiedAt->format('Ymd\THis\Z'); // @todo: check if datetime must be UTC
 			if(!empty($event->createdAt)) $vevent->DTSTAMP = $event->createdAt;
@@ -273,9 +277,16 @@ class ICalendarHelper {
 		$exceptions = [];
 		$baseEvents = [];
 		$prodId = (string) $vcalendar->PRODID;
+
+
+		if(empty($event->uid)) {
+			$event->uid = ((string) $vcalendar->VEVENT[0]->uid) ?? null;
+		}
+
 		if(!empty($event->uid)) {
 			$baseEvents[$event->uid] = $event; // so we can attach exceptions if that all we got
 		}
+
 		foreach($vcalendar->VEVENT as $vevent) {
 
 			$obj = self::parseOccurrence($vevent, (object)[
@@ -357,7 +368,13 @@ class ICalendarHelper {
 				// You must be invited to a single occurrence
 				$event->setValues((array)$props); // title, description, start, duration, location, status, privacy
 				$event->prodId = $prodId;
-				$event->uid = $uid. '_' . $recurrenceId;
+
+				// this leads to issues as the UID must stay the same for caldav etc.
+				// But removing this leads to another issue. If a participant is invited for
+				// a single occurrence it's added tto the whole series. Because
+				//in Calendar::addEvent() the original base event is attached
+				$event->uid = $uid;
+				$event->recurrenceId = $recurrenceId;
 			}
 		}
 		// All exceptions that do not have the recurrence ID are ignored here
