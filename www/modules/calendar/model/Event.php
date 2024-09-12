@@ -1966,7 +1966,7 @@ $sub = $offset>0;
 					$this->setValidationRule('uuid', 'unique', array('calendar_id','start_time', 'exception_for_event_id'));
 				
 					
-				if(!$this->save(true)){
+				if(!$this->save()){
 
 					if ($importExternal) {
 						$installationName = !empty(\GO::config()->title) ? \GO::config()->title : 'Group-Office';
@@ -2057,7 +2057,7 @@ The following is the error message:
 				}else
 				{
 					$this->is_organizer=true;
-					$this->save(true);
+					$this->save();
 				}
 			}
 			

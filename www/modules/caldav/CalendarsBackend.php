@@ -176,9 +176,9 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			'{urn:ietf:params:xml:ns:caldav}calendar-timezone' => "BEGIN:VCALENDAR\r\n" . $tz->serialize() . "END:VCALENDAR",
 
 			// 1 = owner, 2 = readonly, 3 = readwrite
-			'share-access' => $calendar->getPermissionLevel() == Acl::LEVEL_MANAGE ? 1 : ($calendar->getPermissionLevel() >= Acl::LEVEL_WRITE ? 3 : 2)
-//			'read-only' => false,
-//			'access'=> \Sabre\DAV\Sharing\Plugin::ACCESS_READWRITE
+			'share-access' => $calendar->getPermissionLevel() == Acl::LEVEL_MANAGE ? 1 : ($calendar->getPermissionLevel() >= Acl::LEVEL_WRITE ? 3 : 2),
+			'read-only' => $calendar->getPermissionLevel() < Acl::LEVEL_CREATE,
+			'access'=> $calendar->getPermissionLevel() < Acl::LEVEL_CREATE ? \Sabre\DAV\Sharing\Plugin::ACCESS_READ : \Sabre\DAV\Sharing\Plugin::ACCESS_READWRITE
 //			'{http://apple.com/ns/ical/}calendar-order' => $calendar->id,
 //			'{http://apple.com/ns/ical/}calendar-color' => '#'.$this->nextBackgroundColor()
 		);
@@ -617,10 +617,13 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				}
 			}
 		}catch(\GO\Base\Exception\AccessDenied $e){
+
+			go()->debug("Access denied in caldav create");
+
 			// when inviting local principal. DAV tries local delivery
 			// which only succeeds if the user may write in the invite's calendar
-			return false;
-			//throw new Sabre\DAV\Exception\Forbidden;
+//			return false;
+			throw new Sabre\DAV\Exception\Forbidden;
 		}catch (\Exception $e) {
 			\go\core\ErrorHandler::logException($e);
 		}
