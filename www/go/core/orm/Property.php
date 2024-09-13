@@ -378,22 +378,20 @@ abstract class Property extends Model {
 			case Relation::TYPE_MAP:
 
 				if(!$shouldQuery) {
-					$prop = null;
+					$prop = [];
 				} else
 				{
 					$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly, $this);
 					$prop = $stmt->fetchAll();
 					$stmt->closeCursor();
-					if(empty($prop)) {
-						$prop = null; //Set to null. Otherwise JSON will be serialized as [] instead of {}
-					}	else{
-						$o = [];
-						foreach($prop as $v) {
-							$key = $this->buildMapKey($v, $relation);
-							$o[$key] = $v;
-						}
-						$prop = $o;
+
+					$o = [];
+					foreach($prop as $v) {
+						$key = $this->buildMapKey($v, $relation);
+						$o[$key] = $v;
 					}
+					$prop = $o;
+
 				}
 
 				$this->{$relation->name} = $prop;
@@ -2182,7 +2180,18 @@ abstract class Property extends Model {
 			$properties = $this->fetchProperties;
 		}
 
-		return parent::toArray($properties);
+		$arr = parent::toArray($properties);
+
+		// change empty maps into stdClass so that the JSON will be {} instead of []
+		foreach(static::getMapping()->getRelations() as $relation) {
+			if($relation->type == Relation::TYPE_MAP) {
+				if(array_key_exists($relation->name, $arr) && empty($arr[$relation->name])) {
+					$arr[$relation->name] = new \stdClass();
+				}
+			}
+		}
+
+		return $arr;
 	}
 
   /**
