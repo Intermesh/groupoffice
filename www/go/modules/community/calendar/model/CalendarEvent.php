@@ -105,6 +105,8 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	public ?string $recurrenceId = null;
 
+	public ?bool $excluded = false;
+
 	/**
 	 * This is a revision number that is increased by 1 every time the organizer
 	 * makes a change (except when only the "participants" property is changed)
@@ -296,16 +298,6 @@ class CalendarEvent extends AclItemEntity {
 			});
 	}
 
-	//public function getRecurrenceOverrides() {
-		// todo merge general overrides with the per-user override properties
-		// the following properties should be overriden per user:
-		// - keywords
-		// - color
-		// - freeBusyStatus
-		// - useDefaultAlerts
-		// - alerts
-		//return $this->recurrenceOverrides;
-	//}
 
 	public function categoryNames() {
 			return go()->getDbConnection()
@@ -325,25 +317,6 @@ class CalendarEvent extends AclItemEntity {
 				$this->categoryIds[] = $id;
 			}
 		}
-	}
-
-	/**
-	 * @throws JsonPointerException
-	 * @throws Exception
-	 */
-	public function copyPatched(RecurrenceOverride $patch, string $recurrenceId) : CalendarEvent {
-		$patchArray = $patch->toArray();
-
-		//if start is not patched then we must set the recurrence ID to set the right time
-		if(!isset($patchArray['start'])) {
-			$patchArray['start'] = new DateTime($recurrenceId);
-		}
-
-		$e = JSON::patch($this->copy(), $patchArray);
-
-		unset($e->recurrenceRule, $e->recurrenceOverrides); // , $e->sentBy, $e->relatedTo,
-		return $e;
-		//return (new self())->setValues(array_merge($this->toArray(), $patch->toArray()));
 	}
 
 	public function attachBlob($blobId) {
@@ -486,6 +459,52 @@ class CalendarEvent extends AclItemEntity {
 		}
 	}
 
+
+	/**
+	 * Will create Psuedo CalendarEvent objects from a recurring event.
+	 * All recurrence exceptions will be patched copies with the recurrenceId set
+	 * @return \Generator | [recurrenceId:string]:CalendarEvent
+	 */
+	public function overrides($modifiedOnly = false) {
+		if($this->isInstance()) {
+			return; // yield nothing
+		}
+
+		if(isset($this->recurrenceOverrides)) {
+			foreach ($this->recurrenceOverrides as $recurrenceId => $override) {
+				if (!$modifiedOnly || $override->isModified()) {
+					if($override->excluded) {
+						yield $recurrenceId => $override;
+					} else
+						yield $recurrenceId => $this->patchedInstance($recurrenceId);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @throws JsonPointerException
+	 * @throws Exception
+	 */
+	public function patchedInstance(string $recurrenceId) : CalendarEvent {
+		$patchArray = $this->recurrenceOverrides[$recurrenceId]->toArray();
+
+		//if start is not patched then we must set the recurrence ID to set the right time
+		if(!isset($patchArray['start'])) {
+			$patchArray['start'] = new DateTime($recurrenceId);
+		}
+
+		$e = JSON::patch($this->copy(), $patchArray);
+		$e->recurrenceId = $recurrenceId;
+		unset($e->recurrenceRule, $e->recurrenceOverrides); // , $e->sentBy, $e->relatedTo,
+		return $e;
+		//return (new self())->setValues(array_merge($this->toArray(), $patch->toArray()));
+	}
+
+	public function isInstance() {
+		return !empty($this->recurrenceId);
+	}
+
 	protected function internalSave() : bool {
 
 		if(empty($this->uri)) {
@@ -552,6 +571,13 @@ class CalendarEvent extends AclItemEntity {
 			$this->incrementCalendarModSeq();
 		}
 		return $success;
+	}
+
+	public function toArray(array $properties = null): array|null
+	{
+		$arr =  parent::toArray($properties);
+		unset($arr['recurrenceId'], $arr['excluded']);
+		return $arr;
 	}
 
 	private function addToResourceCalendars() {
@@ -660,6 +686,8 @@ class CalendarEvent extends AclItemEntity {
 	 * @return false|Participant
 	 */
 	public function participantByScheduleId($email) {
+		if(empty($this->participants))
+			return false;
 		foreach($this->participants as $participant) {
 			if($participant->email === $email) { // todo Use scheduleId when ParticipantIdentity is implemented
 				return $participant;

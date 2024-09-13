@@ -76,7 +76,7 @@ class ICalendarHelper {
 							$exdate['VALUE'] = 'DATE';
 					} else {
 						try {
-							$exEvent = $event->copyPatched($patch, $recurrenceId);
+							$exEvent = $event->patchedInstance($recurrenceId);
 							$vcalendar->add(self::toVEvent($vcalendar->createComponent('VEVENT'), $exEvent, $recurrenceId));
 						}catch(JsonPointerException $e) {
 							// There was a case where /partipants/<NOTEXISTINGID>/participantStatus was incorrectly patched
@@ -93,21 +93,19 @@ class ICalendarHelper {
 	static function toInvite(string $method, CalendarEvent &$event) : VCalendar {
 		$c = new VCalendar(['PRODID' => $event->prodId, 'METHOD' => $method]);
 		$forBody = $event;
+		$baseVEvent = null;
 		if($method == 'CANCEL' || $event->isModified(array_merge(CalendarEvent::EventProperties,['participants']))) {
 			// base event
-			$c->add(self::toVEvent($c->createComponent('VEVENT'), $event));
+			$baseVEvent = $c->add(self::toVEvent($c->createComponent('VEVENT'), $event));
 		}
-		if(isset($event->recurrenceOverrides)) {
-			foreach ($event->recurrenceOverrides as $recurrenceId => $override) {
-
-				// problem, isModified() is always true here. This is fixed now in recurrence override.
-
-				if ($override->isModified()) {
-					$patch = $event->recurrenceOverrides[$recurrenceId];
-					$forBody = $event->copyPatched($patch, $recurrenceId);
-					$c->add(self::toVEvent($c->createComponent('VEVENT'), $forBody, $recurrenceId));
-				}
+		foreach($event->overrides(true) as $recurrenceId => $override) {
+			if(!empty($override->excluded) && !empty($baseVEvent)) {
+				$exdate = $baseVEvent->add('EXDATE', new DateTime($recurrenceId, $event->timeZone()));
+				if($event->showWithoutTime)
+					$exdate['VALUE'] = 'DATE';
 			}
+			$forBody = $override;
+			$c->add(self::toVEvent($c->createComponent('VEVENT'), $override));
 		}
 		// &$event is displayed in the email body
 		$event = $forBody;

@@ -119,7 +119,19 @@ class RecurrenceOverride extends Property
 
 	public function setValue(string $name, $value): Model
 	{
-		$this->props->$name = $value;
+
+		// todo: merge $name into patch object here?
+		$parts = explode( '/', $name);
+		$target = &$this->props;
+		while(!empty($parts)) {
+			if(isset($target->{$parts[0]}) && is_object($target->{$parts[0]})) {
+				$target = &$target->{$parts[0]};
+				array_shift($parts);
+			} else {
+				$target->{implode('/',$parts)} = $value;
+				break;
+			}
+		}
 		$this->patch = json_encode($this->props);
 //		$this->isModified = true;
 		return $this;

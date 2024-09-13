@@ -2182,11 +2182,11 @@ abstract class Property extends Model {
 
 		$arr = parent::toArray($properties);
 
-		// change empty maps into stdClass so that the JSON will be {} instead of []
+		// change empty maps into null so that the JSON will be null instead of []
 		foreach(static::getMapping()->getRelations() as $relation) {
 			if($relation->type == Relation::TYPE_MAP) {
 				if(array_key_exists($relation->name, $arr) && empty($arr[$relation->name])) {
-					$arr[$relation->name] = new \stdClass();
+					$arr[$relation->name] = null;
 				}
 			}
 		}

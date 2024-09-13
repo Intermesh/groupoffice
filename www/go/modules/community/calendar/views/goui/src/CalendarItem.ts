@@ -402,27 +402,40 @@ export class CalendarItem {
 		})
 	}
 
-	// todo: per-user -per-override properties ['alert','participants'[n].participationStatus]
-	private static overridableProperties = ['start', 'duration', 'title', 'freeBusyStatus', 'participants','location','status', 'description']
+	// todo: per-user -per-override properties ['alert']
 
 	private patchOccurrence(modified: any, onFinish?: () => void) {
 		this.data.recurrenceOverrides ??= {};
-		for(const prop in modified) {
-			if(!CalendarItem.overridableProperties.includes(prop)) delete modified[prop]; // remove properties that can not be overridden
-		}
-		let o = Object.assign(
-			this.isOverride ? this.data.recurrenceOverrides[this.recurrenceId!] : {},
-			modified
-		);
+
+		let patch: any = this.isOverride ? this.data.recurrenceOverrides[this.recurrenceId!] : {}
+
 		eventDS.single(this.data.id).then(original => {
 			if(!original) return; // why could this be undefined?
 			this.confirmScheduleMessage(modified, () => {
-				for(const name of CalendarItem.overridableProperties) {
-					if(o[name] == original[name]) delete o[name]; // remove properties that are the same as original TODO alerts and participants cannot be compared like this
+				for(const name of ['start', 'duration', 'title', 'freeBusyStatus', 'location','status', 'description']) {
+					if(modified[name] != original[name])
+						patch[name] = modified[name]; // remove properties that are the same as original
 				}
-				this.data.recurrenceOverrides![this.recurrenceId!] = o;
-				const p = eventDS.update(this.data.id, {recurrenceOverrides:this.data.recurrenceOverrides});
-				if(onFinish) p.then(onFinish);
+				if(modified.participants) {
+					for(const key in modified.participants) {
+						const p = modified.participants[key];
+						if(original.participants && key in original.participants) {
+							// patch props that are different (escaped)
+							for(const prop in p) {
+								if(p[prop] != original.participants[key][prop]) {
+									patch['participants/'+key+'/'+prop] = p[prop];
+								}
+							}
+						} else {
+							// patch the whole participant (when added)
+							patch['participants/'+key] = p;
+						}
+					}
+				}
+				// TODO: alerts
+				//this.data.recurrenceOverrides![this.recurrenceId!] = patch;
+				const prom = eventDS.update(this.data.id, {['recurrenceOverrides/'+this.recurrenceId!]:patch});
+				if(onFinish) prom.then(onFinish);
 			});
 		});
 	}

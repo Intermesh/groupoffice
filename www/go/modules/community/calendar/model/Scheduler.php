@@ -23,31 +23,33 @@ class Scheduler {
 	static public function handle(CalendarEvent $event, bool $willDelete = false) {
 
 		// TODO: Series has no participants but override does?!?
-		if(empty($event->participants) || $event->isInPast())
+		if($event->isInPast())
 			return;
 
 		$current = $event->calendarParticipant();
-
-		if(empty($current) ||
-			(!$event->isOrigin && !$current->isModified('participationStatus'))) {
+		if(empty($current)) {
+			// see if you participate in any of the instances
+			foreach ($event->overrides(true) as $exception) {
+				if(!$exception->excluded)
+					self::handle($exception, $willDelete);
+			}
 			return;
 		}
 
 		if ($current->isOwner()) {
 			$newOnly = !$willDelete && $event->isModified('participants') && !$event->isModified(self::EssentialScheduleProps);
-			self::organizeImip($event, $willDelete ? 'CANCEL': 'REQUEST', $newOnly);
-		} else if(!empty($event->replyTo)) { // !$event->isOrigin
-
+			$method = $willDelete ? 'CANCEL': 'REQUEST';
+			self::organizeImip($event, $current, $method, $newOnly);
+		}
+		else if(!empty($event->replyTo) && $current->isModified('participationStatus')) {
 			$status = $willDelete ? Participant::Declined : $current->participationStatus;
-			self::replyImip($event, $status);
-			//$title = ucfirst($status);
+			self::replyImip($event, $current, $status);
 		}
 
 	}
 
-	private static function replyImip(CalendarEvent $event, $status) {
+	private static function replyImip(CalendarEvent $event, $participant, $status) {
 
-		$participant = $event->calendarParticipant();
 		$organizer = $event->organizer();
 		if(!empty($participant->language)) {
 			$old = go()->getLanguage()->setLanguage($participant->language);
@@ -62,7 +64,6 @@ class Scheduler {
 		// filter our other participants
 		foreach($ics->vevent as $vevent) {
 			if(isset($vevent->attendee)) {
-				$filtered = [];
 				foreach($vevent->attendee as $a) {
 					if('mailto:'.strtolower($participant->email) !== (string) $a) {
 						$vevent->remove($a);
@@ -116,7 +117,7 @@ class Scheduler {
 	 * @param $newOnly boolean Only send if participant was added
 	 * @return boolean
 	 */
-	private static function organizeImip(CalendarEvent $event, $method, $newOnly = false) {
+	private static function organizeImip(CalendarEvent $event, $organizer, $method, $newOnly = false) {
 		$success=true;
 
 
@@ -124,7 +125,6 @@ class Scheduler {
 		// participant could have been added as well.
 		$ics = ICalendarHelper::toInvite($method,$event);
 
-		$organizer = $event->calendarParticipant(); // must be organizer at this point
 		foreach($event->participants as $participant) {
 			/** @var $participant Participant */
 			if(($newOnly && !$participant->isNew()) || $participant->isOwner() || $participant->scheduleAgent !== 'server')
@@ -139,8 +139,6 @@ class Scheduler {
 				$subject .= ' ('.go()->t('updated', 'community', 'calendar').')';
 			}
 
-
-
 			try {
 				go()->getMailer()->compose()
 						->setSubject($subject . ': ' . $event->title)
@@ -150,7 +148,6 @@ class Scheduler {
 						->attach(Attachment::fromString($ics->serialize(),
 							'invite.ics',
 							'text/calendar;method=' . $method . ';charset=utf-8', Attachment::ENCODING_8BIT)
-							//->setInline(true)
 						)
 						->setBody(self::mailBody($event, $method, $participant, $subject), 'text/html')
 						->send();
@@ -268,15 +265,19 @@ class Scheduler {
 
 	static function processMessage(VCalendar $vcalendar, string $receiver, object $sender) : ?CalendarEvent{
 
+		$method = $vcalendar->method->getValue();
 		$vevent = $vcalendar->VEVENT[0];
 
-		$existingEvent = CalendarEvent::findByUID((string)$vevent->uid, $receiver)->single();
+
+		$recurrenceId = $method !== 'REPLY' && !empty($vevent->{'RECURRENCE-ID'}) ? (string)$vevent->{'RECURRENCE-ID'} : null;
+		$query = CalendarEvent::findByUID((string)$vevent->uid, $receiver)
+			->andWhere('recurrenceId','=',$recurrenceId);
+
+		$existingEvent = $query->single();
 		// If the existing event has isOrigin=true all below does is add new REQUESTS to the calendar.
 		// We might do that up front and skip all the below processing instead.
 
-
-
-		switch($vcalendar->method->getValue()){
+		switch($method){
 			case 'REQUEST': return self::processRequest($vcalendar,$receiver,$existingEvent);
 			case 'CANCEL': return $existingEvent ? self::processCancel($vcalendar,$existingEvent) : null;
 			case 'REPLY': return $existingEvent ? self::processReply($vcalendar,$existingEvent, $sender) : null;
@@ -293,6 +294,7 @@ class Scheduler {
 		}
 		$calId = Calendar::fetchDefault($receiver);
 		$event = ICalendarHelper::parseVObject($vcalendar, $existingEvent);
+		if(isset($event->participants))
 		foreach($event->participants as $p) {
 			if($p->email == $receiver && $p->kind == 'resource') {
 				return $event; // Do not put the event in the resource admin its calendar
@@ -353,7 +355,7 @@ class Scheduler {
 					$existingEvent->recurrenceOverrides[$recurId] = new RecurrenceOverride($existingEvent);
 					$p = $existingEvent->participantByScheduleId($sender->email);
 				} else {
-					$exEvent = $existingEvent->copyPatched($existingEvent->recurrenceOverrides[$recurId], $recurId);
+					$exEvent = $existingEvent->patchedInstance($recurId);
 					$p = $exEvent->participantByScheduleId($sender->email);
 				}
 				if(!$p) continue;

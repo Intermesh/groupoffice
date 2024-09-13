@@ -201,9 +201,9 @@ CREATE TABLE IF NOT EXISTS `calendar_participant` (
 -- Table `calendar_event_user`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `calendar_event_user` (
-     `eventId` INT UNSIGNED NOT NULL,
-     `userId` INT NOT NULL,
-     `freeBusyStatus` ENUM('free', 'busy') NULL DEFAULT 'busy',
+    `eventId` INT UNSIGNED NOT NULL,
+    `userId` INT NOT NULL,
+    `freeBusyStatus` ENUM('free', 'busy') NULL DEFAULT 'busy',
     `color` VARCHAR(21) NULL DEFAULT NULL,
     `useDefaultAlerts` TINYINT(1) NULL DEFAULT 1,
     `veventBlobId` BINARY(40) NULL,
