@@ -479,11 +479,15 @@ class CalendarEvent extends AclItemEntity {
 		$this->uri = $uri;
 	}
 
-	protected function internalSave() : bool {
-
-		if(empty($this->uid)) {
+	protected function init()
+	{
+		if($this->isNew()) {
 			$this->uid = UUID::v4();
 		}
+	}
+
+	protected function internalSave() : bool {
+
 		if(empty($this->uri)) {
 			$this->uri = strtr($this->uid, '+/=', '-_.') . '.ics';
 		}
