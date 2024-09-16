@@ -1604,3 +1604,17 @@ $updates['202405171539'][] = "alter table core_acl
     add constraint core_acl_ibfk_1
         foreign key (entityTypeId) references core_entity (id) on delete set null;";
 
+
+$updates['202409160946'][] = "alter table core_import_mapping
+    add dateFormat varchar(20) null;";
+
+$updates['202409160946'][] = "alter table core_import_mapping
+    add timeFormat varchar(20) null;";
+
+$updates['202409160946'][] = "alter table core_import_mapping
+    add decimalSeparator char null;";
+
+$updates['202409160946'][] = "alter table core_import_mapping
+    add thousandsSeparator char null;";
+
+

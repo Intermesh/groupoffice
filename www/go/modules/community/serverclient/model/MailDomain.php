@@ -26,7 +26,7 @@ class MailDomain {
 			throw new Exception("Could not connect to mailserver. Please set a strong password in /etc/groupoffice/globalconfig.inc.php.\n\nPlease remove serverclient_username and serverclient_password.\n\nPlease add:\n\n \$config['serverclient_token']='aStrongPasswordOfYourChoice';");
 		}
 
-		$url = GO::config()->serverclient_server_url.'?r='.$url.'&serverclient_token='. GO::config()->serverclient_token;
+		$url = GO::config()->serverclient_server_url.'?r='.$url.'&serverclient_token='. urlencode( GO::config()->serverclient_token);
 
 		return $url;
 	}

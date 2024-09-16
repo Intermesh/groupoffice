@@ -151,4 +151,6 @@ return array (
   'Has phone numbers' => 'Hat Telefonnummern',
   'Has organizations' => 'Hat Organisationen',
   'Start in' => 'Beginnt in',
+  '\'"Don\'\'t link automatically to contacts"\'' => 'Nicht automatisch mit Kontakten verknüpfen',
+  '\'"Are you sure you want to merge the selected items? This can\'\'t be undone."\'' => 'Sind Sie sicher, dass Sie die ausgewählten Elemente zusammenführen möchten? Das kann nicht rückgängig gemacht werden.',
 );

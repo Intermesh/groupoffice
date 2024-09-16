@@ -25,4 +25,5 @@ return array (
   'Start page' => 'Übersicht',
   'webfeeds' => 'Web-Feeds',
   'All users' => 'Alle Benutzer',
+  '\'"You don\'\'t have any items on your start page."\'' => 'Sie haben keine Einträge auf Ihrer Startübersicht',
 );
