@@ -186,12 +186,12 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 									xtype: "textfield",
 									name: "decimalSeparator",
 									value: go.User.decimalSeparator,
-									fieldLabel: t("Decimal separator")
+									fieldLabel: t("Decimal Separator")
 								},{
 									xtype: "textfield",
 									name: "thousandsSeparator",
 									value: go.User.thousandsSeparator,
-									fieldLabel: t("Thousands separator")
+									fieldLabel: t("Thousand Separator")
 								},
 							]
 						}]
