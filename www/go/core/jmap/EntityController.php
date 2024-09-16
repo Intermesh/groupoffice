@@ -1106,6 +1106,10 @@ abstract class EntityController extends Controller {
 			$response['id'] = $mapping->id;
 			$response['columnMapping'] = $mapping->getColumnMapping();
 			$response['updateBy'] = $mapping->updateBy;
+			$response['decimalSeparator'] = $mapping->decimalSeparator;
+			$response['thousandsSeparator'] = $mapping->thousandsSeparator;
+			$response['dateFormat'] = $mapping->dateFormat;
+			$response['timeFormat'] = $mapping->timeFormat;
 		}
 
 		if(!$response) {

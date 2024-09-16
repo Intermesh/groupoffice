@@ -78,27 +78,28 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 		this.formPanel = new Ext.form.FormPanel({
 			
 			items: [
-				this.fieldSet = new Ext.form.FieldSet({
+				{
+					xtype: "fieldset",
 					labelWidth: dp(300),
 					items: [{
 						xtype: 'box',
 						autoEl: 'p',
-						html: t("Please match the CSV columns with the correct Group-Office columns and press 'Import' to continue.")+
-							'<br>'+t('The column profile will be saved with the name provided field below.')
-					},this.csvMappings= new go.form.ComboBoxReset({
+						html: t("Please match the CSV columns with the correct Group-Office columns and press 'Import' to continue.") +
+							'<br>' + t('The column profile will be saved with the name provided field below.')
+					}, this.csvMappings = new go.form.ComboBoxReset({
 						fieldLabel: t("Column profile"),
 						anchor: '99%',
 						pageSize: 50,
 						trigger1Class: 'ic-edit',
-						onTrigger1Click: function(ev,btn) {
-							const isNew = (this.getValue()=='new');
+						onTrigger1Click: function (ev, btn) {
+							const isNew = (this.getValue() == 'new');
 							profileMenu.get('delete').setDisabled(isNew);
 							profileMenu.get('copy').setDisabled(isNew);
 							//profileMenu.get('rename').setDisabled(!isNew);
 							profileMenu.show(btn);
 						},
 						valueField: 'id',
-						submit:false,
+						submit: false,
 						hiddenName: 'mappingId',
 						displayField: 'name',
 						triggerAction: 'all',
@@ -106,11 +107,11 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 						selectOnFocus: true,
 						forceSelection: true,
 						listeners: {
-							'render' : me => me.store.load(),
-							'setvalue' : (me,v) => {
+							'render': me => me.store.load(),
+							'setvalue': (me, v) => {
 								console.log(v);
-								if(v) {
-									if(typeof v === "number" || v === 'new') {
+								if (v) {
+									if (typeof v === "number" || v === 'new') {
 										const rec = me.store.getById(v);
 										this.formPanel.form.setValues(rec.data.columnMapping); // do column mapping
 										v = rec.data.name;
@@ -133,9 +134,9 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 							},
 							listeners: {
 								'load': s => {
-									if(this.foundId)
+									if (this.foundId)
 										this.csvMappings.setValue(this.foundId);
-									if(this.newProfileRecord) {
+									if (this.newProfileRecord) {
 										this.csvMappings.store.insert(0, this.newProfileRecord);
 										this.csvMappings.setValue('new');
 									}
@@ -144,10 +145,66 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 							}
 						}
 					}),
-					{html:'<hr>'},
-					this.createLookupCombo()]
+					]
+				},
+
+				{
+					xtype: "fieldset",
+					title: t("Formatting"),
+
+					// defaults:{
+					// 	flex: 1,
+					// 	layout: "form",
+					// 	xtype: "container",
+					// 	anchor: "100%"
+					// } ,
+					items:[
+						{
+
+							cls: "go-hbox",
+							layout: "form",
+							xtype: "container",
+							defaults: {
+								flex: 1
+							},
+							items: [
+								{
+									xtype: "textfield",
+									name: "dateFormat",
+									value: go.User.dateFormat,
+									fieldLabel: t("Date format")
+								},{
+									xtype: "textfield",
+									name: "timeFormat",
+									value: go.User.timeFormat,
+									fieldLabel: t("Time format")
+								},{
+									xtype: "textfield",
+									name: "decimalSeparator",
+									value: go.User.decimalSeparator,
+									fieldLabel: t("Decimal separator")
+								},{
+									xtype: "textfield",
+									name: "thousandsSeparator",
+									value: go.User.thousandsSeparator,
+									fieldLabel: t("Thousands separator")
+								},
+							]
+						}]
+				},
+
+
+				this.fieldSet = new Ext.form.FieldSet({
+					xtype: "fieldset",
+					labelWidth: dp(300),
+					title: t("Field mapping"),
+					items: [
+						this.createLookupCombo()
+					]
 				})
+
 			]
+
 		});
 		
 		this.items = [this.formPanel];
@@ -203,7 +260,13 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 						if (response.columnMapping) { // mapping found!
 							this.foundId = response.id;
 							this.formPanel.form.setValues(response.columnMapping);
-							this.formPanel.form.setValues({updateBy: response.updateBy});
+							this.formPanel.form.setValues({
+								updateBy: response.updateBy,
+								dateFormat: response.dateFormat ?? go.User.dateFormat,
+								timeFormat: response.timeFormat ?? go.User.timeFormat,
+								decimalSeparator: response.decimalSeparator ?? go.User.decimalSeparator,
+								thousandsSeparator: response.thousandsSeparator ?? go.User.thousandsSeparator
+							});
 						} else { // columns unknown, generate
 							var v = this.transformCsvHeadersToValues(response.goHeaders, this.fields);
 							this.foundId = 0;
@@ -391,6 +454,13 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 		// headers.forEach(function(h) {
 		for(var name in headers) {
 			var h = headers[name];
+
+			// Value is already provided in go.util.importFile() so don't map it from the csv. For example addressBookId is
+			// passed from the selection.
+			if(this.values[h.name]) {
+				continue;
+			}
+
 			if(!go.util.empty(h.properties)) {
 				var formContainer = {
 					xtype: "formcontainer",
@@ -491,10 +561,19 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 		this.getEl().mask(t("Importing..."));
 		var mapping = this.formPanel.form.getFieldValues();
 		var mappingId = this.csvMappings.getValue();
-		var updateBy = mapping.updateBy;
+		var updateBy = mapping.updateBy,
+		decimalSeparator = mapping.decimalSeparator,
+		thousandsSeparator = mapping.thousandsSeparator,
+		dateFormat = mapping.dateFormat;
+		timeFormat = mapping.timeFormat;
+
 		var saveName = this.nameField.getValue();
 
 		delete mapping.updateBy;
+		delete mapping.decimalSeparator;
+		delete mapping.thousandsSeparator;
+		delete mapping.dateFormat;
+		delete mapping.timeFormat;
 
 		go.Jmap.request({
 			method: this.entity + "/import",
@@ -504,7 +583,12 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 				mappingId,
 				mapping,
 				saveName,
-				updateBy
+				updateBy,
+				decimalSeparator,
+				thousandsSeparator,
+				dateFormat,
+				timeFormat
+
 			},
 			callback: function (options, success, response) {
 				this.getEl().unmask();
