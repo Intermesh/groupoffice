@@ -3,6 +3,7 @@
 - Caldav: Fixed users being able to write in read only calendars
 - E-mail: Date was lost if message was an smime signed attachment with headers without the date
 - Core: Provide date, time and number formatting for csv imports
+- Email: fix error when moving or copying to a folder with a % in its name
 
 09-09-2024: 6.8.71
 - Files: Fix PHPMailer compatibility issue
