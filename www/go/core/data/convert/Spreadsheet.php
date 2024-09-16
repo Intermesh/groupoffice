@@ -838,17 +838,6 @@ th {
 		return $values;
 	}
 
-	protected function formatRecord(Entity $entity, array $values) {
-		foreach($values as $column => $value) {
-			if(is_array($value)) {
-				//todo
-			} else
-			{
-
-			}
-		}
-	}
-	
 	protected function setValues(Entity $entity, array $values) {
 		$cf = $values['customFields'] ?? null;
 		unset($values['customFields']);
@@ -941,29 +930,31 @@ th {
 				}
 
 
-				switch($c['dbType']) {
-					case 'datetime':
-						if(isset($this->clientParams['dateFormat']) && isset($this->clientParams['timeFormat'])) {
-							$dt =  \go\core\util\DateTime::createFromFormat($this->clientParams['dateFormat'].' '.$this->clientParams['timeFormat'], $v[$propName]);
-							if($dt) {
-								$v[$propName] = $dt;
+				if($this->extension == 'csv') {
+					switch ($c['dbType']) {
+						case 'datetime':
+							if (isset($this->clientParams['dateFormat']) && isset($this->clientParams['timeFormat'])) {
+								$dt = \go\core\util\DateTime::createFromFormat($this->clientParams['dateFormat'] . ' ' . $this->clientParams['timeFormat'], $v[$propName]);
+								if ($dt) {
+									$v[$propName] = $dt;
+								}
 							}
-						}
 
-					case 'date':
+						case 'date':
 
-						if(isset($this->clientParams['dateFormat'])) {
-							$dt =  \go\core\util\DateTime::createFromFormat($this->clientParams['dateFormat'], $v[$propName]);
-							if($dt) {
-								$v[$propName] = $dt;
+							if (isset($this->clientParams['dateFormat'])) {
+								$dt = \go\core\util\DateTime::createFromFormat($this->clientParams['dateFormat'], $v[$propName]);
+								if ($dt) {
+									$v[$propName] = $dt;
+								}
 							}
-						}
 
-						break;
+							break;
 
-					case 'decimal':
-						$v[$propName] = StringUtil::unlocalizeNumber($v[$propName], $this->clientParams['decimalSeparator'] ?? null, $this->clientParams['thousandsSeparator'] ?? null);
-						break;
+						case 'decimal':
+							$v[$propName] = StringUtil::unlocalizeNumber($v[$propName], $this->clientParams['decimalSeparator'] ?? null, $this->clientParams['thousandsSeparator'] ?? null);
+							break;
+					}
 				}
 			}
 		}

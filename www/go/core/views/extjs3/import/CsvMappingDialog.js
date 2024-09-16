@@ -11,8 +11,11 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 	autoScroll: true,
 
 	newProfileRecord: null, // set and added to store on reload when new profile record needs to be created
-	
+
+	fileName: "",
 	initComponent : function() {
+
+		console.log(this.fileName, this.fileName.toLowerCase().substr(-3))
 
 		const renameWindow = new go.Window({
 			title: t('Rename profile'),
@@ -148,8 +151,9 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 					]
 				},
 
-				{
+			this.formatFieldSet = new Ext.form.FieldSet({
 					xtype: "fieldset",
+					hidden: this.fileName.toLowerCase().substr(-3) != 'csv',
 					title: t("Formatting"),
 
 					// defaults:{
@@ -191,7 +195,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 								},
 							]
 						}]
-				},
+				}),
 
 
 				this.fieldSet = new Ext.form.FieldSet({
