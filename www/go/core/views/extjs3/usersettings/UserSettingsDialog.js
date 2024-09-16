@@ -469,7 +469,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			me.actionStart();
 			me.fireEvent('loadstart',me, me.currentUserId);
 
-			go.Db.store("User").single(me.currentUserId).then(function(user){
+			go.Db.store("User")._getSingleFromServer(me.currentUserId).then(function(user){
 				me.user = user;
 				me.loadModulePanels();
 
