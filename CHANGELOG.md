@@ -1,6 +1,8 @@
 - Calendar: fix HTML code in Qtip
 - Core: Fixed PHP 8.3 compatibility issue: PHP Fatal error:  During inheritance of IteratorAggregate: Uncaught ErrorException: Return type of GO\\Base\\Db\\Statement::getIterator() should either be compatible with IteratorAggregate::getIterator(): Traversable, or the #[\\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /var/customers/webs/office/office.domain.tld/go/base/db/Statement.php:578
 - Caldav: Fixed users being able to write in read only calendars
+- E-mail: Date was lost if message was an smime signed attachment with headers without the date
+- Core: Provide date, time and number formatting for csv imports
 
 09-09-2024: 6.8.71
 - Files: Fix PHPMailer compatibility issue
