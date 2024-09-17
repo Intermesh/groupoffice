@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     "strict" : true,
-    "target": "ES2018",
+    "target": "es2020",
     "sourceMap": true,
-    "lib": ["es2018", "dom"],
-    "moduleResolution": "node",
-    "module":"ES2020",
+    "lib": ["es2020", "dom"],
+    "moduleResolution": "nodenext",
+    "module":"nodenext",
     "esModuleInterop": true,
     "outDir": "./dist", //set this in the extended
     "baseUrl": ".", //set this in the extended too
