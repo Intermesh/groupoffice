@@ -15,7 +15,7 @@ const opts = {
 	bundle: true,
 	sourcemap: true,
 	format: "esm",
-	target: "es2020",
+	target: "esnext",
 	outdir: "dist",
 	plugins: [importPathPlugin],
 	logLevel: "info"

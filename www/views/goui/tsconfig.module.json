@@ -20,6 +20,10 @@
         "../../../../../../views/goui/dist/groupoffice-core/script/index.js"
       ],
 
+      "chart.js/auto": [
+        "../../../../../../views/goui/groupoffice-core/node_modules/chart.js/auto/auto.d.ts",
+      ],
+
       "@intermesh/business/*": [
         "../../../../../../go/modules/business/*/views/goui/dist/Index.d.ts",
         "../../../../../../go/modules/business/*/views/goui/dist/Index.js"
