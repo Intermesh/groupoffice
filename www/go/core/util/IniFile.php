@@ -138,7 +138,7 @@ class IniFile {
 	 *
 	 * @param mixed $value
 	 *
-	 * @return string
+	 * @return string|float|int
 	 */
 	private static function encode($value) {
 		
