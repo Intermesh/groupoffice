@@ -46,4 +46,29 @@ class HttpClient extends \go\core\http\Client
 			->setOption(CURLOPT_CUSTOMREQUEST, "PUT")
 			->request($path, $data);
 	}
+
+	public function parsedMultiStatus() {
+		// skip namespace complexity
+		$body = $this->body();
+		if ($this->statusCode() === 401) {
+			throw new \RuntimeException('Dav Authentication failed');
+		}
+		if ($this->statusCode() === 403) {
+			throw new \RuntimeException('Dav Forbidden');
+		}
+		if (!$body) {
+			throw new \OutOfBoundsException('No response for: ' . '[PAYLOAD HERE]');
+		}
+		$xml = str_ireplace(['<d:','<cal:','<ical:','<cs:','<card:'], '<', $body);
+		$xml = str_ireplace(['</d:','</cal:','</ical:','</cs:','</ard:'], '</', $xml);
+		$multistatus = \simplexml_load_string($xml);
+		$result = [];
+		foreach ($multistatus->response as $response) {
+			list(, $status, ) = explode(' ', $response->propstat->status, 3);
+			if ($status == 200) {
+				$result[(string) $response->href] = $response->propstat->prop;
+			}
+		}
+		return $result;
+	}
 }

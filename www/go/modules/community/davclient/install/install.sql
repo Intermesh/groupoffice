@@ -18,16 +18,16 @@ CREATE TABLE IF NOT EXISTS `davclient_davaccount` (
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS `davclient_calendar` (
+	`id` INT UNSIGNED NOT NULL,
 	`davaccountId` INT UNSIGNED NOT NULL,
 	`uri` VARCHAR(255) NOT NULL,
-	`calendarId` INT UNSIGNED NOT NULL,
 	`ctag` VARCHAR(100) NOT NULL,
 	`synctoken` VARCHAR(100) NOT NULL DEFAULT '',
-	PRIMARY KEY (`davaccountId`, `uri`),
+	PRIMARY KEY (`id`,`davaccountId`),
 	CONSTRAINT `fk_davclient_calendar_davaccount`
 		FOREIGN KEY (`davaccountId`) REFERENCES `davclient_davaccount` (`id`)
 		ON DELETE CASCADE,
 	CONSTRAINT `fk_davclient_calendar_calendarl`
-		FOREIGN KEY (`calendarId`) REFERENCES `calendar_calendar` (`id`)
+		FOREIGN KEY (`id`) REFERENCES `calendar_calendar` (`id`)
 		ON DELETE RESTRICT
 ) ENGINE = InnoDB;

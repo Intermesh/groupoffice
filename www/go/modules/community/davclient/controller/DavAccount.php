@@ -31,9 +31,9 @@ class DavAccount extends EntityController {
 	public function sync($params) {
 		$account = model\DavAccount::findById($params['accountId']);
 		if(!empty($account)) {
-			$account->synchronizer()->sync();
+			$account->sync();
 		}
-		return ['alreadyUpToDate'=>false, 'accountId'=>$params['accountId']];
+		return ['accountId'=>$params['accountId']];
 	}
 
 	protected function canCreate(Entity $entity): bool

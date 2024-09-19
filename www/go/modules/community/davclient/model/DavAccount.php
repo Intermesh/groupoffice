@@ -3,13 +3,24 @@ namespace go\modules\community\davclient\model;
 
 use go\core\acl\model\AclOwnerEntity;
 use go\core\orm\Mapping;
-use go\modules\community\calendar\model\ICalendarHelper;
+use go\core\orm\Query;
 
 /**
  * Calendar entity
  *
  */
 class DavAccount extends AclOwnerEntity {
+
+	private static $xmlNs = [
+		'd:' => "DAV:",
+		'cs:' => "http://calendarserver.org/ns/",
+		'cal:' => "urn:ietf:params:xml:ns:caldav",
+		'card:' => "urn:ietf:params:xml:ns:carddav",
+		'ical:' => "http://apple.com/ns/ical/",
+	];
+	/** @var HttpClient */
+	private $http;
+	private $service = 'caldav';
 
 	const Cal = 'cal';
 	const Card = 'card';
@@ -36,33 +47,31 @@ class DavAccount extends AclOwnerEntity {
 			->addMap('collections', Calendar::class, ['id' => 'davaccountId']);
 	}
 
-	public function synchronizer() {
-		$syncer = new DavSynchronizer($this);
-		if(!$this->isSetup()) {
-			$r = $syncer->serviceDiscovery();
-			//$this->host = $r['baseUri'];
-			$this->principalUri = $r['principalHref'];
-			foreach($r['collections'] as $data) {
-				$cal = $this->addCalendar($data);
-				if(!empty($cal)) {
-					$syncer->fetchEvents($cal);
-				}
-
-			}
-			$this->lastSync = new \DateTime();
-			$this->save();
+	public function http() {
+		if(empty($this->http)) {
+			$this->http = new HttpClient('https://' . $this->host, [
+				'Content-Type' => 'application/xml; charset=utf-8',
+				'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password),
+			]);
 		}
-		return $syncer;
+		return $this->http;
+	}
+
+	public function byHref($href) {
+		foreach($this->collections as $collection) {
+			if($collection->uri === $href)
+				return $collection;
+		}
+		return false;
+	}
+
+	public function byCalendar($id) {
+		return $this->collections[$id];
 	}
 
 	public static function findByCalendarId($id) {
-		return self::find()->join('davclient_calendar', 'c', 'c.accountId = a.id')
-			->where('c.calendarId', '=', $id)->single();
-	}
-
-	public function put($event) {
-		$syncer = new DavSynchronizer($this);
-		return $syncer->put($event);
+		return self::find()->join('davclient_calendar', 'c', 'c.davaccountId = a.id')
+			->where('c.id', '=', $id)->single();
 	}
 
 	private function randomColor($seed) {
@@ -72,35 +81,202 @@ class DavAccount extends AclOwnerEntity {
 			($nb*7)+1,6);
 	}
 
-	private function addCalendar($data)
-	{
-		if($this->collections == null) {
-			$this->collections = [];
+	private function isSetup() {
+		return !empty($this->lastSync) && !empty($this->collections);
+	}
+
+	private function dnsResolve() {
+		// fetch SRV record
+		$s = 's'; // secure first
+		$target = null;
+		while ($target === null) {
+			$result = dns_get_record("_{$this->service}$s._tcp.{$this->http()->baseUri}", DNS_SRV | DNS_TXT);
+			foreach ($result as $record) {
+				if ($record['type'] === 'SRV' && ($target === null || $target['pri'] < $record['pri'])) {
+					$host = $record['target'];
+					$port = $record['port'];
+					// $record['weight'] for picking chance when 'pri' is equal
+					$target = $record;
+				} else if ($record['type'] === 'TXT' && strpos($record['txt'], 'path=') === 0) {
+					$path = substr($record['txt'], 5);
+				}
+			}
+			if ($s === '') {
+				break;
+			}
+			$s = '';
 		}
-		if(array_key_exists($data['uri'], $this->collections))
-			$cal = $this->collections[$data['uri']];
+
+		if (!isset($host)) {
+			$data = $this->http()->get("/.well-known/$this->service");
+			$this->basePath = parse_url(rtrim($data['headers']['location'],'/'), PHP_URL_PATH).'/';
+		}
+	}
+
+	// rfc6764
+	private function serviceDiscovery() {
+
+		$this->dnsResolve(); // or well-known
+		$this->principalUri = $this->principalUri();
+
+		// todo: remove if double
+		$this->lastSync = new \DateTime();
+		$this->save();
+	}
+
+	public function put($event) {
+		$cal = $this->byCalendar($event->calendarId);
+		// must exist
+		return $cal->put($event);
+	}
+
+	public function sync() {
+		if(!$this->isSetup()) {
+			$this->serviceDiscovery();
+		}
+		$homesetUri = $this->homeSetUri($this->principalUri);
+
+		$this->syncCollections($homesetUri);
+
+		// fetch ctag for every calendar.
+		$responses = $this->propfind([
+			'd:sync-token',
+			'cs:getctag'
+		], $homesetUri, 1);
+
+		// todo: delete calendars not in responses
+		foreach($this->collections as $id => $calendar) {
+			if(!array_key_exists($calendar->uri, $responses)) {
+				// delete calendars no longer in response
+				$this->collections[$id] = null;
+				\go\modules\community\calendar\model\Calendar::delete((new Query())->where('id','=',$id));
+			} else {
+				$collection = $responses[$calendar->uri];
+				if($calendar->ctag !== (string)$collection->getctag) {
+					// resync
+					$calendar->sync();
+				}
+				unset($responses[$calendar->uri]);
+			}
+
+		}
+		foreach($responses as $remainingResponse) {
+			// todo: new, fetch, add
+
+		}
+
+		$this->lastSync = new \DateTime();
+		$this->save();
+		// fetch
+	}
+
+	private function syncCollections($homesetUri) {
+		$responses = $this->propfind([
+			$this->service === 'caldav' ? 'cal:supported-calendar-component-set' : 'card:supported-addressbook-component-set',
+			'd:resourcetype',
+			'd:displayname',
+			'ical:calendar-order',
+			'ical:calendar-color',
+			'cal:calendar-timezone',
+			'cal:calendar-description',
+			'd:sync-token',
+			'cs:getctag'
+		], $homesetUri, 1);
+
+		foreach ($responses as $href => $response) {
+//			if (isset($response->resourcetype->addressbook)) {
+//				$this->addAddressbook($href, $response);
+//			}
+			if (isset($response->resourcetype->calendar)) {
+				$this->addCalendar($href, $response);
+			}
+		}
+	}
+
+	/**
+	 * @param string $uri href this calendar is coming from
+	 * @param object $reponse parse XML response with calendar properties from caldav server
+	 * @return Calendar|mixed
+	 * @throws \Exception
+	 */
+	private function addCalendar($uri, $response)
+	{
+		$cal = $this->byHref($uri);
+
 		if (empty($cal)) {
+			$color = str_replace('#', '',(string) $response->{'calendar-color'});
+			$order = (string) $response->{'calendar-order'};
+			$tz = null;
+			if(isset($response->{'calendar-timezone'})) {
+				preg_match('/TZID:(\w*\/\w*)/', (string)$response->{'calendar-timezone'}, $matches);
+				if(isset($matches[1])) {
+					$tz = $matches[1];
+				}
+			}
+
 			$model = new \go\modules\community\calendar\model\Calendar();
-			$model->name = $data['name'];
-			$model->description = $data['description'];
-			$model->sortOrder = is_numeric($data['sortOrder']) ? (int)$data['sortOrder'] : 1;
-			$model->color = !empty($data['color']) ? $data['color'] : $this->randomColor($data['name']);
-			$model->timeZone = $data['timeZone'];
+			$model->name = (string) $response->displayname;
+			$model->description = (string) $response->{'calendar-description'};
+			$model->sortOrder = is_numeric($order) ? (int)$order : 1;
+			$model->color = !empty($color) ? $color : $this->randomColor($model->name);
+			$model->timeZone = $tz;
 			if ($model->save()) {
 				$cal = new Calendar($this);
-				$cal->uri = $data['uri'];
-				$cal->ctag = $data['ctag'];
-				$cal->addModel($model);
-				$this->collections[$cal->uri] = $cal;
+				$cal->id = $model->id;
+				$cal->uri = $uri;
+				$cal->ctag = (string) $response->getctag;
+				$cal->synctoken = (string) $response->{'sync-token'};
+				$this->collections[$cal->id] = $cal;
+				$cal->sync();
 			} else {
 				go()->log('Could not save Calendar '.print_r($model->getValidationErrors(),true));
 			}
 		}
+
 		return $cal;
 	}
 
-	private function isSetup() {
-		return !empty($this->lastSync);
+	private function principalUri() {
+		$prop = 'current-user-principal';
+		$path = $this->basePath;
+		$response = $this->propfind(['d:' . $prop], $path);
+		if (!isset($response[$path]->{$prop})) {
+			throw new \RangeException($prop . ' not found');
+		}
+		return (string) $response[$path]->{$prop}->href;
 	}
 
+	private function homeSetUri($principalUri) {
+		$prop = 'calendar-home-set';
+		$ns = 'cal';
+		if ($this->service == 'carddav') {
+			$prop = 'addressbook-home-set';
+			$ns = 'card';
+		}
+		$response = $this->propfind([$ns . ':' . $prop], $principalUri);
+		if (!isset($response[$principalUri]->{$prop})) {
+			throw new \RangeException("No $prop found");
+		}
+		return (string) $response[$principalUri]->{$prop}->href;
+	}
+
+	private function propfind($props, $uri, $depth = 0) {
+		$ns = [];
+		foreach($props as $prop) {
+			$i = substr($prop, 0, strpos($prop, ':'));
+			$ns[$i] = $i.'="'.self::$xmlNs[$i.':'].'"';
+		}
+		unset($ns['d']);
+		$ns = !empty($ns) ? ' xmlns:' . implode(' xmlns:', $ns) : '';
+		$props = '<' . implode(' /><', $props) . ' />';
+
+		$xml = "<d:propfind xmlns:d=\"DAV:\"$ns><d:prop>$props</d:prop></d:propfind>";
+		$response = $this->http()->setHeader('Depth', $depth)
+			->PROPFIND($uri, $xml)->parsedMultiStatus();
+
+		if (count($response) === 0) {
+			throw new \RangeException('No properties found: ' . $props);
+		}
+		return $response;
+	}
 }
