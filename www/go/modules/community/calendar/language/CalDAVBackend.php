@@ -1,21 +1,21 @@
 <?php
 
-namespace go\modules\community\calendar\model;
+namespace go\modules\community\calendar\language;
 
-use go\core\fs\Blob;
 use go\core\model\Acl;
 use go\core\model\User;
-use go\core\orm\exception\SaveException;
 use go\core\orm\Query;
-use go\core\util\DateTime;
+use go\modules\community\calendar\model\Calendar;
+use go\modules\community\calendar\model\CalendarEvent;
+use go\modules\community\calendar\model\ICalendarHelper;
 use go\modules\community\tasks\convert\VCalendar;
 use go\modules\community\tasks\model\Task;
 use go\modules\community\tasks\model\TaskList;
-use Sabre\CalDAV\Backend\AbstractBackend;
 use Sabre\CalDAV;
+use Sabre\CalDAV\Backend\AbstractBackend;
+use Sabre\DAV;
 use Sabre\DAV\PropPatch;
 use Sabre\VObject;
-use Sabre\DAV;
 
 class CalDAVBackend extends AbstractBackend implements
 //		Sabre\CalDAV\Backend\SyncSupport
