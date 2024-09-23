@@ -1458,7 +1458,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$vevent = $vcalendar->vevent[0];
 
 
-			if($vcalendar->method == 'REQUEST') {
+			if(empty($vcalendar->method) || $vcalendar->method == 'REQUEST') {
 				// If this is an invite request, we must be sure we know which of the participants is the current user.
 				// We do this by checking all mail aliases
 				$aliases = Alias::model()->find(
