@@ -931,7 +931,8 @@ th {
 
 
 				if($this->extension == 'csv') {
-					switch ($c['dbType']) {
+
+					switch ($c['dbType'] ?? "") {
 						case 'datetime':
 							if (isset($this->clientParams['dateFormat']) && isset($this->clientParams['timeFormat'])) {
 								$dt = \go\core\util\DateTime::createFromFormat($this->clientParams['dateFormat'] . ' ' . $this->clientParams['timeFormat'], $v[$propName]);
@@ -939,7 +940,7 @@ th {
 									$v[$propName] = $dt;
 								}
 							}
-
+							break;
 						case 'date':
 
 							if (isset($this->clientParams['dateFormat'])) {
