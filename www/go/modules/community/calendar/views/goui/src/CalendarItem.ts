@@ -4,12 +4,12 @@ import {
 	comp,
 	DateInterval,
 	DateTime,
-	E, EntityID, MaterialIcon,
+	E, EntityID, MaterialIcon, ObjectUtil,
 	tbar, Timezone,
 	win
 } from "@intermesh/goui";
 import {calendarStore, t} from "./Index.js";
-import {applyPatch, client, jmapds, Recurrence} from "@intermesh/groupoffice-core";
+import {client, jmapds, Recurrence} from "@intermesh/groupoffice-core";
 import {EventWindow} from "./EventWindow.js";
 import {EventDetailWindow} from "./EventDetail.js";
 
@@ -76,7 +76,7 @@ export class CalendarItem {
 		Object.assign(this,obj);
 
 
-		this.patched = applyPatch(structuredClone(obj.data), obj.override);
+		this.patched = ObjectUtil.patch(structuredClone(obj.data), obj.override) as CalendarEvent;
 		 if(obj.recurrenceId && (!obj.override || !obj.override.start))
 		 	this.patched.start = obj.recurrenceId;
  		// if(obj.override)
