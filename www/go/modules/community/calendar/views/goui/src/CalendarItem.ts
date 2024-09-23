@@ -405,15 +405,16 @@ export class CalendarItem {
 	// todo: per-user -per-override properties ['alert']
 
 	private patchOccurrence(modified: any, onFinish?: () => void) {
-		this.data.recurrenceOverrides ??= {};
+		//this.data.recurrenceOverrides ??= {};
 
-		let patch: any = this.isOverride ? this.data.recurrenceOverrides[this.recurrenceId!] : {}
+		let patch: any = this.isOverride ? this.data.recurrenceOverrides && this.data.recurrenceOverrides[this.recurrenceId!] : {}
 
 		eventDS.single(this.data.id).then(original => {
 			if(!original) return; // why could this be undefined?
 			this.confirmScheduleMessage(modified, () => {
+
 				for(const name of ['start', 'duration', 'title', 'freeBusyStatus', 'location','status', 'description']) {
-					if(modified[name] != original[name])
+					if((name in modified) && modified[name] != original[name])
 						patch[name] = modified[name]; // remove properties that are the same as original
 				}
 				if(modified.participants) {
@@ -433,8 +434,14 @@ export class CalendarItem {
 					}
 				}
 				// TODO: alerts
-				//this.data.recurrenceOverrides![this.recurrenceId!] = patch;
-				const prom = eventDS.update(this.data.id, {['recurrenceOverrides/'+this.recurrenceId!]:patch});
+
+				const data:any = {};
+				if(this.data.recurrenceOverrides) {
+					data['recurrenceOverrides/'+this.recurrenceId!] = patch;
+				} else {
+					data['recurrenceOverrides'] = {[this.recurrenceId!] : patch };
+				}
+				const prom = eventDS.update(this.data.id, data);
 				if(onFinish) prom.then(onFinish);
 			});
 		});
