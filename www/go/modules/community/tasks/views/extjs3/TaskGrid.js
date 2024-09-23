@@ -109,10 +109,6 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 							m.style += 'color:#'+rec.json.color+';';
 						}
 
-						// if(rec.data.progress == "needs-action" && rec.get("start") <= now) {
-						// 	m.style += 'font-weight: bold;';
-						// }
-
 						return v;
 					},
 					groupable: false
