@@ -1,3 +1,4 @@
+23-09-2024: 6.8.73
 - Core: fix error when importing CSV
 - Finance: Check if project has a customer set before creating an invoice
 - Email: Fix for email not showing ics file when method is not set.
