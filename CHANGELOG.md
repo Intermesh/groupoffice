@@ -1,3 +1,5 @@
+- Tasks: select default tasklist for user more intelligently
+
 23-09-2024: 6.8.73
 - Core: fix error when importing CSV
 - Finance: Check if project has a customer set before creating an invoice

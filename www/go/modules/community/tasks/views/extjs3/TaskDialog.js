@@ -61,6 +61,13 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		}
 	},
 
+	onLoad: function() {
+		if (go.User.tasksSettings && !this.tasklistCombo.value) {
+			this.tasklistCombo.value = this.initialConfig.role === "support" ? go.User.supportSettings.defaultTasklistId : go.User.tasksSettings.defaultTasklistId;
+		}
+
+	},
+
 	setLinkEntity: function (cfg) {
 
 		switch (cfg.entity) {
