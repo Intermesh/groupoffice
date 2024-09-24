@@ -492,9 +492,14 @@ export class CalendarItem {
 
 			const next = Object.assign({},
 				this.data,
-				{start: this.recurrenceId!, id: null, uid: null, recurrenceOverrides: null},
+				{start: this.recurrenceId!},
 				modified
 			);
+
+			delete next.id;
+			delete next.uid;
+			delete next.recurrenceOverrides;
+
 			const p = eventDS.create(next); // create duplicate
 			if (onFinish) p.then(onFinish);
 		});
