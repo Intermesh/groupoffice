@@ -89,7 +89,7 @@ function addEmailAction() {
 
 				if(msg.itip.method === 'REQUEST' && typeof event !== 'string') {
 					let item = new CalendarItem({data:event, key:event.id + ""});
-					if(msg.itip.recurrenceId) {
+					if(msg.itip.recurrenceId && item.isRecurring) {
 						item = item.patchedInstance(msg.itip.recurrenceId);
 					}
 

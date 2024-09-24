@@ -327,7 +327,6 @@ export class CalendarItem {
 	}
 
 	updateParticipation(status: "accepted"|"tentative"|"declined", onFinish?: () => void) {
-		debugger;
 		if(!this.calendarPrincipal)
 			throw new Error('Not a participant');
 		this.calendarPrincipal.participationStatus = status;
