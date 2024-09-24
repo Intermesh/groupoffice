@@ -418,11 +418,24 @@ export class CalendarItem {
 						patch[name] = modified[name]; // remove properties that are the same as original
 				}
 				if(modified.participants) {
+					//remove all earlier participant patches as we will rebuild the patch completely.
+					for(let key in patch) {
+						if(key.startsWith("participants/")) {
+							delete patch[key];
+						}
+					}
+
 					for(const key in modified.participants) {
 						const p = modified.participants[key];
 						if(original.participants && key in original.participants) {
 							// patch props that are different (escaped)
 							for(const prop in p) {
+
+								if(prop == "roles") {
+									//roles is an object and therefore always different with !=. Maybe
+									// just skip here as it never changes in an override.
+									continue;
+								}
 								if(p[prop] != original.participants[key][prop]) {
 									patch['participants/'+key+'/'+prop] = p[prop];
 								}
