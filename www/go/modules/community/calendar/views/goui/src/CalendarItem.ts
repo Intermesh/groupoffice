@@ -13,11 +13,12 @@ import {client, jmapds, Recurrence} from "@intermesh/groupoffice-core";
 import {EventWindow} from "./EventWindow.js";
 import {EventDetailWindow} from "./EventDetail.js";
 
-export type RecurrenceOverride = {[recurrenceId:string]: (Partial<CalendarEvent> & {excluded?:boolean})};
+export type RecurrenceOverride = (Partial<CalendarEvent> & {excluded?:boolean});
+export type RecurrenceOverrides = {[recurrenceId:string]: RecurrenceOverride};
 export interface CalendarEvent extends BaseEntity {
 	id: EntityID
 	recurrenceRule?: any
-	recurrenceOverrides?: RecurrenceOverride
+	recurrenceOverrides?: RecurrenceOverrides
 	links?: any
 	alerts?: any
 	showWithoutTime?: boolean // isAllDay
@@ -109,6 +110,21 @@ export class CalendarItem {
 
 	private isTimeModified() {
 		return this.isNew() || this.initStart !== this.start.format('Y-m-d\TH:i:s') || this.initEnd !== this.end.format('Y-m-d\TH:i:s');
+	}
+
+	patchedInstance(recurrenceId:string) {
+		// debugger;
+		if(!this.data.recurrenceRule || !this.data.recurrenceOverrides || !this.data.recurrenceOverrides[recurrenceId]) {
+			throw "Not found";
+		}
+
+		const o = this.data.recurrenceOverrides![recurrenceId] as RecurrenceOverride;
+
+		if(o.excluded) {
+			throw "Not found";
+		}
+
+		return new CalendarItem({key: this.data.id + '/' + recurrenceId, recurrenceId, override: o, data: this.data});
 	}
 
 	static *expand(e: CalendarEvent, from: DateTime, until: DateTime) : Generator<CalendarItem> {
@@ -311,6 +327,7 @@ export class CalendarItem {
 	}
 
 	updateParticipation(status: "accepted"|"tentative"|"declined", onFinish?: () => void) {
+		debugger;
 		if(!this.calendarPrincipal)
 			throw new Error('Not a participant');
 		this.calendarPrincipal.participationStatus = status;
@@ -477,7 +494,7 @@ export class CalendarItem {
 	 * @return The new "recurrenceOverrides" property
 	 */
 	private removeFutureOverrides(until: DateTime) {
-		const patchRecurrenceOverride: RecurrenceOverride = {};
+		const patchRecurrenceOverride: RecurrenceOverrides = {};
 		if(this.data.recurrenceOverrides) {
 			// Copy recurrence overrides that occur before the until date
 			for(const recurrenceId in this.data.recurrenceOverrides) {

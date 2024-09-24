@@ -53,7 +53,7 @@ function addEmailAction() {
 			});
 		}
 
-		GO.email.handleITIP = (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent|string, feedback?:string}} ) => {
+		GO.email.handleITIP = (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent|string, feedback?:string, recurrenceId?:string}} ) => {
 			if(msg.itip) {
 				const event = msg.itip.event,
 					btns = E('div').cls('btns'),
@@ -88,7 +88,11 @@ function addEmailAction() {
 				}[msg.itip.method] || "Unable to process appointment information.";
 
 				if(msg.itip.method === 'REQUEST' && typeof event !== 'string') {
-					const item = new CalendarItem({data:event, key:event.id + ""});
+					let item = new CalendarItem({data:event, key:event.id + ""});
+					if(msg.itip.recurrenceId) {
+						item = item.patchedInstance(msg.itip.recurrenceId);
+					}
+
 					updateBtns(item);
 				}
 
@@ -96,7 +100,10 @@ function addEmailAction() {
 					if(typeof event === "string") {
 						text += ', '+ event;
 					} else if(msg.itip.method !== 'REPLY') {
-						text += ' "' + event.title + '" ' + t('at') + ' ' + DateTime.createFromFormat(event.start.replace('T', ' '), 'Y-m-d H:i')!.format('D j M H:i')
+
+						const date = msg.itip.recurrenceId ? msg.itip.recurrenceId : event.start;
+
+						text += ' "' + event.title + '" ' + t('at') + ' ' + DateTime.createFromFormat(date.replace('T', ' '), 'Y-m-d H:i')!.format('D j M H:i')
 					}
 				}
 

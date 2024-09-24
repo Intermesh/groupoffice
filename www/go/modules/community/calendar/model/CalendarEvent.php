@@ -495,6 +495,7 @@ class CalendarEvent extends AclItemEntity {
 		}
 
 		$e = JSON::patch($this->copy(), $patchArray);
+		$e->id = $this->id; //preserve ID so it can be used in the e-mail invite for example
 		$e->recurrenceId = $recurrenceId;
 		unset($e->recurrenceRule, $e->recurrenceOverrides); // , $e->sentBy, $e->relatedTo,
 		return $e;
