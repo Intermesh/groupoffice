@@ -367,6 +367,8 @@ class Scheduler {
 						$k.'/participationStatus' => $status,
 						$k.'/scheduleUpdated' => $replyStamp->format("Y-m-d\TH:i:s"),
 					]);
+					//recreate instance with patched above applied
+					$exEvent = $existingEvent->patchedInstance($recurId);
 				}
 
 			} else {
