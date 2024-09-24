@@ -432,6 +432,15 @@ export class CalendarItem {
 							patch['participants/'+key] = p;
 						}
 					}
+
+					// process removed participants
+					if(original.participants) {
+						for(const key in original.participants) {
+							if(!(key in modified.participants)) {
+								patch['participants/'+key] = null;
+							}
+						}
+					}
 				}
 				// TODO: alerts
 
