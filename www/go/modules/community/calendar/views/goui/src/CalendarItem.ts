@@ -327,13 +327,14 @@ export class CalendarItem {
 	}
 
 	updateParticipation(status: "accepted"|"tentative"|"declined", onFinish?: () => void) {
+
 		if(!this.calendarPrincipal)
 			throw new Error('Not a participant');
 		this.calendarPrincipal.participationStatus = status;
 
 		eventDS.setParams.sendSchedulingMessages = true; //todo: use this.calendarPrincipal.expectReply ??
 		// should we notify a reply is sent?
-		this.patch({participants: this.participants}, onFinish,undefined,true);
+		this.patch({participants: this.participants}, onFinish,undefined,false);
 		//return eventDS.update(this.data.id, {participants: this.participants});
 	}
 
