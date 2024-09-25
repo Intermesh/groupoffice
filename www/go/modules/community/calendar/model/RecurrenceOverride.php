@@ -84,12 +84,6 @@ class RecurrenceOverride extends Property
 		$this->setValues($patch);
 	}
 
-	// removed this because of it caused it to be always modified. Not sure what this breaks.
-//	private $isModified;
-	public function isModified(array|string $properties = []): bool|array
-	{
-		return  parent::isModified($properties);
-	}
 
 	/**
 	 * Override to make sure that recurrenceId becomes a DateTime
@@ -159,12 +153,8 @@ class RecurrenceOverride extends Property
 	protected function internalSave(): bool
 	{
 		// TODO: validate what the current user can override
-		if(!empty($this->recurrenceId) && is_string($this->recurrenceId)) {
-			$this->recurrenceId = new DateTime(str_replace('T',' ',$this->recurrenceId));
-		}
-
 		if($this->isModified('patch')) {
-			// sanatize
+			// sanitize
 			foreach (self::Ignored as $prop) {
 				unset($this->props->$prop);
 			}
