@@ -20,11 +20,12 @@ class RecurrenceOverride extends Property
 		'relatedTo', 'replyTo', 'sentBy', 'timeZone', 'uid'];
 
 	protected $fk; // to event
-	/**
-	 * @var DateTime
-	 */
-	protected $recurrenceId; // datetime of occurrence and key of map
 
+	public ?DateTime $recurrenceId; // datetime of occurrence and key of map
+
+	/**
+	 * @deprecated  Not used?
+	 */
 	protected $_start; // indexed in db for finding the first occurrence start
 	protected $_end; // indexed in db for finding the last occurrence end
 
@@ -36,11 +37,6 @@ class RecurrenceOverride extends Property
 	public function init()
 	{
 		$this->props = json_decode(trim($this->patch ?? '{}', "'"));
-	}
-
-	public function recurrenceId()
-	{
-		return $this->recurrenceId;
 	}
 
 	public function start()
