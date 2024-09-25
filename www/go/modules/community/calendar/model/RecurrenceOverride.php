@@ -23,11 +23,6 @@ class RecurrenceOverride extends Property
 
 	public ?DateTime $recurrenceId; // datetime of occurrence and key of map
 
-	/**
-	 * @deprecated  Not used?
-	 */
-	protected $_start; // indexed in db for finding the first occurrence start
-	protected $_end; // indexed in db for finding the last occurrence end
 
 	protected $patch; // json encoded PatchObject for the original event
 
@@ -167,16 +162,11 @@ class RecurrenceOverride extends Property
 		if(!empty($this->recurrenceId) && is_string($this->recurrenceId)) {
 			$this->recurrenceId = new DateTime(str_replace('T',' ',$this->recurrenceId));
 		}
-		if($this->isNew()) {
-			$this->_start = $this->recurrenceId;
-		}
+
 		if($this->isModified('patch')) {
 			// sanatize
 			foreach (self::Ignored as $prop) {
 				unset($this->props->$prop);
-			}
-			if(isset($this->props->start)) {
-				$this->_start = str_replace('T', ' ', $this->props->start);
 			}
 			$this->patch = json_encode($this->props);
 		}
