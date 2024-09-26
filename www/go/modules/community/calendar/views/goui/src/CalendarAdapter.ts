@@ -98,9 +98,9 @@ export class CalendarAdapter {
 						key: '',
 						start,
 						extraIcons: ['family_star'],
+						defaultColor: '025d7b',
 						data: {
 							title: o.title,
-							color: '025d7b',
 							duration: o.duration,
 							showWithoutTime: true,
 						}
@@ -130,9 +130,9 @@ export class CalendarAdapter {
 							dlg.load(task.id);
 						},
 						extraIcons:[task.progress == 'completed' ? 'task_alt' : 'radio_button_unchecked'],
+						defaultColor: '7e472a',
 						data: {
 							title: task.title,
-							color: '7e472a',
 							duration: 'P1D',
 							showWithoutTime: true,
 						}
@@ -173,9 +173,9 @@ export class CalendarAdapter {
 							dlg.load(b.id);
 						},
 						extraIcons: ['cake'],
+						defaultColor: '009c63',
 						data:{
 							title: b.name+'\'s Birthday',
-							color: '009c63',
 							duration: 'P1D',
 							showWithoutTime:true,
 						}

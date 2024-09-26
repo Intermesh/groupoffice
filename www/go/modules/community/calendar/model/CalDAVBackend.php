@@ -1,13 +1,10 @@
 <?php
 
-namespace go\modules\community\calendar\language;
+namespace go\modules\community\calendar\model;
 
 use go\core\model\Acl;
 use go\core\model\User;
 use go\core\orm\Query;
-use go\modules\community\calendar\model\Calendar;
-use go\modules\community\calendar\model\CalendarEvent;
-use go\modules\community\calendar\model\ICalendarHelper;
 use go\modules\community\tasks\convert\VCalendar;
 use go\modules\community\tasks\model\Task;
 use go\modules\community\tasks\model\TaskList;

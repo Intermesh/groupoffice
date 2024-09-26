@@ -45,7 +45,7 @@ interface CalendarItemConfig {
 	start?: DateTime
 	end?: DateTime
 	open?:() => void
-	//color?: string
+	defaultColor?: string
 }
 
 /**
@@ -72,6 +72,7 @@ export class CalendarItem {
 	cal: any
 
 	divs: {[week: string] :HTMLElement}
+	defaultColor?: string
 
 	constructor(obj:CalendarItemConfig) {
 		Object.assign(this,obj);
@@ -188,7 +189,7 @@ export class CalendarItem {
 	}
 
 	get color() {
-		return this.cal?.color || '356772';
+		return this.cal?.color || this.defaultColor || '356772';
 	}
 
 	get participants() {
