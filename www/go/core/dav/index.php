@@ -15,7 +15,7 @@ use go\core\App;
 use go\core\dav\auth\BasicBackend;
 use go\core\dav\davacl\PrincipalBackend;
 use go\core\ErrorHandler;
-use go\modules\community\calendar\language\CalDAVBackend;
+use go\modules\community\calendar\model\CalDAVBackend;
 use go\modules\community\carddav\Backend as CardDAVBackend;
 use Sabre\CalDAV;
 use Sabre\CalDAV\ICSExportPlugin;
