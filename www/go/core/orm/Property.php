@@ -1703,7 +1703,7 @@ abstract class Property extends Model {
 
 			//Check for invalid input
 			if(!($newProp instanceof Property)) {
-				throw new Exception("Invalid value given for '". $relation->name ."'. Should be a GO\Orm\Property");
+				throw new Exception("Invalid value given for '". $relation->name ."'. Should be a go\core\orm\Property");
 			}
 
 			$this->applyRelationKeys($relation, $newProp);
@@ -1712,7 +1712,9 @@ abstract class Property extends Model {
 			// Fixed it by recognizing _NEW_* as a map key that should not be applied as property
 			foreach ($this->mapKeyToValues($mapKey, $relation) as $propName => $value) {
 				if(empty($newProp->$propName)) {
-					$newProp->$propName = $value;
+					// normalize input here. In some cases a DateTime object can be used as key
+					$col = $newProp::getMapping()->getColumn($propName);
+					$newProp->$propName = $col->normalizeInput($value);
 				}
 			}
 
@@ -2342,7 +2344,9 @@ abstract class Property extends Model {
 
 						foreach ($this->mapKeyToValues($id, $relation) as $key => $value) {
 							if (empty($this->$propName[$id]->$key)) {
-								$this->$propName[$id]->$key = $this->$propName[$id]->normalizeValue($key,$value);
+
+								$col = $this->$propName[$id]::getMapping()->getColumn($key);
+								$this->$propName[$id]->$key = $col->normalizeInput($value);
 							}
 						}
 					} else {

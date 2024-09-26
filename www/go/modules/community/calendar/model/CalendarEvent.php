@@ -818,7 +818,8 @@ class CalendarEvent extends AclItemEntity {
 	 * @return void
 	 * @throws Exception
 	 */
-	private function updateOccurrenceSpan() {
+	private function updateOccurrenceSpan(): void
+	{
 		if($this->isNew() || $this->isModified('start')) {
 			$this->firstOccurrence = $this->start();
 		}
@@ -850,10 +851,10 @@ class CalendarEvent extends AclItemEntity {
 		}
 
 		if($this->isModified('recurrenceOverrides')) {
-			foreach ($this->recurrenceOverrides as $override) {
-				$this->firstOccurrence = min($this->firstOccurrence, $override->start());
+			foreach ($this->recurrenceOverrides as $recurrenceId => $override) {
+				$this->firstOccurrence = min($this->firstOccurrence, $override->start($recurrenceId));
 				if($this->lastOccurrence !== null)
-					$this->lastOccurrence = max($this->lastOccurrence, $override->end());
+					$this->lastOccurrence = max($this->lastOccurrence, $override->end($recurrenceId));
 			}
 		}
 	}

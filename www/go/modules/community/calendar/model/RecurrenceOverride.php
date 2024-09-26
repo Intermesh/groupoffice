@@ -2,10 +2,11 @@
 
 namespace go\modules\community\calendar\model;
 
+use DateInterval;
 use go\core\data\Model;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
-use go\core\util\DateTime;
+use DateTime;
 
 /**
  * @property bool $excluded
@@ -19,14 +20,14 @@ class RecurrenceOverride extends Property
 	const Ignored = ['method', 'privacy', 'prodId', 'recurrenceId', 'recurrenceOverrides', 'recurrenceRule',
 		'relatedTo', 'replyTo', 'sentBy', 'timeZone', 'uid'];
 
-	protected $fk; // to event
+	protected ?int $fk; // to event
 
-	public ?DateTime $recurrenceId; // datetime of occurrence and key of map
+	protected ?DateTime $recurrenceId; // datetime of occurrence and key of map
 
 
-	protected $patch; // json encoded PatchObject for the original event
+	protected mixed $patch; // json encoded PatchObject for the original event
 
-	private $props; // decoded patch object
+	private ?\stdClass $props; // decoded patch object
 
 
 	public function init()
@@ -34,16 +35,31 @@ class RecurrenceOverride extends Property
 		$this->props = json_decode(trim($this->patch ?? '{}', "'"));
 	}
 
-	public function start()
+	/**
+	 * Return the start of this occurrence
+	 *
+	 * @param string $recurrenceId As the recurrenceId unknown when this instance is new, it has to be provided
+	 * @return DateTime
+	 * @throws \DateMalformedStringException
+	 */
+	public function start(string $recurrenceId): DateTime
 	{
 		$tz = $this->owner->timeZone();
-		$dateStr = isset($this->props->start) ? $this->props->start : $this->recurrenceId->format("Y-m-d H:i:s");
-		return new \DateTime($dateStr, $tz);
+		$dateStr = $this->props->start ?? $recurrenceId;
+		return new DateTime($dateStr, $tz);
 	}
 
-	public function end()
+	/**
+	 * Return the end of this occurrence
+	 *
+	 * @param string $recurrenceId As the recurrenceId unknown when this instance is new, it has to be provided
+	 *
+	 * @throws \DateMalformedStringException
+	 * @throws \DateMalformedIntervalStringException
+	 */
+	public function end(string $recurrenceId): DateTime
 	{
-		return $this->start()->add(new \DateInterval($this->props->duration ?? $this->owner->duration));
+		return $this->start($recurrenceId)->add(new DateInterval($this->props->duration ?? $this->owner->duration));
 	}
 
 	public function patchProps($props)

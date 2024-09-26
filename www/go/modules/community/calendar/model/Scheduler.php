@@ -396,8 +396,6 @@ class Scheduler {
 					// TODO: check if the given RECURRENCE-ID is valid for $existingEvent->recurrenceRule
 					// If it is not valid an extra instance would be created (RDATE in iCal) GroupOffice does not display these at the moment.
 					$existingEvent->recurrenceOverrides[$recurId] = new RecurrenceOverride($existingEvent);
-					$existingEvent->recurrenceOverrides[$recurId]->recurrenceId = new DateTime($recurId);
-
 //					$exEvent = $existingEvent->patchedInstance($recurId);
 					$p = $existingEvent->participantByScheduleId($sender->email);
 				} else {
