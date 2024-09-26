@@ -119,7 +119,7 @@ export class CalendarAdapter {
 					} else {
 						date = task.due || task.start || (new DateTime()).format('Y-m-d');
 					}
-if(task.title =='test taak met bogus timezone') debugger;
+//if(task.title =='test taak met bogus timezone') debugger;
 					const start = DateTime.createFromFormat(date.substring(0,10), 'Y-m-d');
 					yield new CalendarItem({
 						key: '-',
