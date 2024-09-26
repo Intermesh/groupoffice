@@ -2,6 +2,7 @@
 
 namespace go\modules\community\calendar\model;
 
+use go\core\db\Column;
 use go\core\model\Acl;
 use go\core\model\User;
 use go\core\orm\Query;
@@ -222,15 +223,18 @@ class CalDAVBackend extends AbstractBackend implements
 		}
 
 		foreach ($stmt as $object) {
+			$lastModified = strtotime($object->modified);
 			$result[] = [
 				'id' => $object->id,
 				'calendarid' => $type.'-'.$id, // needed for bug in local delivery scheduler
 				'uri' => $object->uri ?? (strtr($object->uid, '+/=', '-_.') . '.ics'),
-				'lastmodified' => strtotime($object->modified),
-				'etag' => '"' . $object->etag . '"',
+				'lastmodified' => $lastModified,
+				'etag' => '"' . $lastModified . '"',
 				'component' => $component
 			];
 		}
+
+		go()->debug($result);
 
 		return $result;
 	}
@@ -270,11 +274,12 @@ class CalDAVBackend extends AbstractBackend implements
 		go()->debug($data);
 		go()->debug(")");
 
+		$lastModified = strtotime($object->modifiedAt);
 		return [
 			'id' => $object->id,
 			'uri' => $objectUri,
-			'lastmodified' => strtotime($object->modifiedAt),
-			'etag' => '"' . $blob->id . '"',
+			'lastmodified' => $lastModified,
+			'etag' => '"' . $lastModified . '"',
 			'size' => $blob->size,
 			'calendardata' => $data,
 			'component' => $component,
@@ -300,19 +305,19 @@ class CalDAVBackend extends AbstractBackend implements
 				if(Calendar::addEvent($object, $id) === null) {
 					throw new \Exception('Could not create calendar event');
 				}
-				$etag = $object->icsBlobId();
+
 				break;
 			case 't': // tasklist
 				$object = new Task();
 				$object = (new VCalendar)->vtodoToTask(VObject\Reader::read($calendarData, VObject\Reader::OPTION_FORGIVING), $id, $object);
 				$object->save();
-				$etag = $object->vcalendarBlobId;
 				break;
 			default:
 				go()->log("incorrect calendarId ".$calendarId. ' for '.$objectUri);
 				return false;
 		}
 
+		$etag = $object->modifiedAt->getTimestamp();
 
 		return '"' . $etag . '"';
 	}
@@ -339,13 +344,10 @@ class CalDAVBackend extends AbstractBackend implements
 				$object = ICalendarHelper::parseVObject($calendarData, $object);
 				// The attached blob must be identical to the data used to create the event
 				$object->attachBlob(ICalendarHelper::makeBlob($object, $calendarData)->id);
-				$etag = $object->icsBlobId();
-
 				go()->debug($object->getModified());
 				break;
 			case 't':
 				$object = (new VCalendar)->vtodoToTask(VObject\Reader::read($calendarData), $id, $object);
-				$etag = $object->vcalendarBlobId;
 				break;
 		}
 
@@ -355,7 +357,9 @@ class CalDAVBackend extends AbstractBackend implements
 			return false;
 		}
 
-		return '"'.$etag.'"';
+		$etag = $object->modifiedAt->getTimestamp();
+
+		return '"' . $etag . '"';
 	}
 
 	public function deleteCalendarObject($calendarId, $objectUri)
