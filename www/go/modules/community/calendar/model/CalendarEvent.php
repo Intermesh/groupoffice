@@ -330,7 +330,8 @@ class CalendarEvent extends AclItemEntity {
 			$blob = ICalendarHelper::makeBlob($this);
 			$this->veventBlobId = $blob->id;
 			if(!$this->isNew()) {
-				$this->save();
+//				$this->save();
+				$this->saveTables();
 			}
 		}
 		return $blob;
