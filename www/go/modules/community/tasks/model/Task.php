@@ -857,7 +857,7 @@ class Task extends AclItemEntity {
 
 		$excerpt = StringUtil::cutString(strip_tags($comment->text), 50);
 
-		$commenters = Comment::findFor($this)->selectSingleValue("createdBy")->distinct()->all();
+		$commenters = Comment::findForEntity($this)->selectSingleValue("createdBy")->distinct()->all();
 		if($this->responsibleUserId && !in_array($this->responsibleUserId, $commenters)) {
 			$commenters[] = $this->responsibleUserId;
 		}

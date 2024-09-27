@@ -184,7 +184,7 @@ class Comment extends AclItemEntity {
 	 *
 	 * @example To filter by section:
 	 * ```
-	 * $comments = Comment::findFor($entity)->where('section', '=', 'foo');
+	 * $comments = Comment::findForEntity($entity)->where('section', '=', 'foo');
 	 * ```
 	 *
 	 * @param ActiveRecord|Entity $entity
@@ -192,7 +192,7 @@ class Comment extends AclItemEntity {
 	 * @return Query<Comment>
 	 * @throws Exception
 	 */
-	public static function findFor(ActiveRecord|Entity $entity, array $properties = []) : Query {
+	public static function findForEntity(ActiveRecord|Entity $entity, array $properties = []) : Query {
 		$entityTypeId = $entity->entityType()->getId();
 		$entityId = $entity->id;
 
@@ -323,7 +323,7 @@ class Comment extends AclItemEntity {
 	{
 		go()->getDbConnection()->beginTransaction();
 		try {
-			foreach (Comment::findFor($from) as $comment) {
+			foreach (Comment::findForEntity($from) as $comment) {
 				$copy = $comment->copy();
 				if (!$copy->setEntity($to)->save()) {
 					throw new SaveException($copy);
