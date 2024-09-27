@@ -2,6 +2,7 @@
 
 namespace go\modules\community\calendar\model;
 
+use go\core\auth\TemporaryState;
 use go\core\db\Column;
 use go\core\model\Acl;
 use go\core\model\User;
@@ -34,11 +35,15 @@ class CalDAVBackend extends AbstractBackend implements
 	{
 		go()->debug("CalDAVBackend::getCalendarsForUser($principalUri)");
 		$result = [];
-		$tz = new \GO\Base\VObject\VTimezone(); // same for each?
-		// using logged in user, but should use PrincipalUri
-		$calendars = Calendar::find()->where(['isSubscribed'=>1, 'groupId'=>null]);
+		$tz = new \GO\Base\VObject\VTimezone();
+
 		$username = basename($principalUri);
 		$u = User::find(['id'])->where(['username'=>$username])->single();
+
+		$calendars = Calendar::findFor($u->id)
+			->where(['isSubscribed'=>1, 'groupId'=>null]);
+
+
 		foreach($calendars as $calendar) {
 
 			$uri = 'c-'.$calendar->id;
@@ -209,14 +214,14 @@ class CalDAVBackend extends AbstractBackend implements
 		switch($type) {
 			case 'c': $component = 'vevent';
 				$stmt = CalendarEvent::find(['id', 'modifiedAt', 'uid'])
-					->select(['cce.id as id','uid','eventdata.modifiedAt as modified','veventBlobId as etag, uri'])
+					->select(['cce.id as id','uid','eventdata.modifiedAt as modified', 'uri'])
 					->where(['calendarId' => $id])
 					->filter(['before'=> $end, 'after' => $start])
 					->fetchMode(\PDO::FETCH_OBJ);
 				break;
 			case 't' : $component = 'vtodo';
 				$stmt =  Task::find(['id', 'modifiedAt', 'uid'])
-					->select(['task.id as id','task.uid','task.modifiedAt as modified','vcalendarBlobId as etag, uri'])
+					->select(['task.id as id','task.uid','task.modifiedAt as modified','uri'])
 					->filter(['tasklistId' => $id])->fetchMode(\PDO::FETCH_OBJ);
 				break;
 			default: return $result;
@@ -258,13 +263,13 @@ class CalDAVBackend extends AbstractBackend implements
 				break;
 			default:
 				go()->log("incorrect calendarId ".$calendarId. ' for '.$objectUri);
-				return false;
+				return null;
 		}
 
 
 		if (!$object) {
 			go()->log($component. " $objectUri not found in calendar $calendarId!");
-			return false;
+			return null;
 		}
 
 		$blob = $object->icsBlob();
@@ -302,7 +307,12 @@ class CalDAVBackend extends AbstractBackend implements
 				$object->uri($objectUri);
 				// The attached blob must be identical to the data used to create the event
 				$object->attachBlob(ICalendarHelper::makeBlob($object, $calendarData)->id);
-				if(Calendar::addEvent($object, $id) === null) {
+				$object = Calendar::addEvent($object, $id);
+				if($object->uri() != $objectUri) {
+					$object->uri($objectUri);
+					$object->save();
+				}
+				if($object === null) {
 					throw new \Exception('Could not create calendar event');
 				}
 
@@ -316,6 +326,8 @@ class CalDAVBackend extends AbstractBackend implements
 				go()->log("incorrect calendarId ".$calendarId. ' for '.$objectUri);
 				return false;
 		}
+
+		go()->debug("URI: " . $object->uri());
 
 		$etag = $object->modifiedAt->getTimestamp();
 
@@ -364,6 +376,8 @@ class CalDAVBackend extends AbstractBackend implements
 
 	public function deleteCalendarObject($calendarId, $objectUri)
 	{
+		go()->debug("CalDAVBackend::deleteCalendarObject($calendarId, $objectUri)");
+
 		list($type, $id) = explode('-', $calendarId,2);
 		$uid = pathinfo($objectUri, PATHINFO_FILENAME);
 
@@ -384,23 +398,159 @@ class CalDAVBackend extends AbstractBackend implements
 
 	}
 
+	/**
+	 * Returns a single scheduling object.
+	 *
+	 * The returned array should contain the following elements:
+	 *   * uri - A unique basename for the object. This will be used to
+	 *           construct a full uri.
+	 *   * calendardata - The iCalendar object
+	 *   * lastmodified - The last modification date. Can be an int for a unix
+	 *                    timestamp, or a PHP DateTime object.
+	 *   * etag - A unique token that must change if the object changed.
+	 *   * size - The size of the object, in bytes.
+	 *
+	 * @param string $principalUri
+	 * @param string $objectUri
+	 *
+	 * @return array
+	 */
 	public function getSchedulingObject($principalUri, $objectUri)
 	{
-		return null;
+		go()->debug("CalDAVBackend::getSchedulingObject($principalUri, $objectUri)");
+
+		$stmt = go()->getDbConnection()->getPDO()
+			->prepare('SELECT uri, calendardata, lastmodified, etag, size FROM calendar_schedule_object WHERE principaluri = ? AND uri = ?');
+		$stmt->execute([$principalUri, $objectUri]);
+		$row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+		if (!$row) {
+			return null;
+		}
+
+		return [
+			'uri' => $row['uri'],
+			'calendardata' => $row['calendardata'],
+			'lastmodified' => $row['lastmodified'],
+			'etag' => '"'.$row['etag'].'"',
+			'size' => (int) $row['size'],
+		];
 	}
 
+	/**
+	 * Returns all scheduling objects for the inbox collection.
+	 *
+	 * These objects should be returned as an array. Every item in the array
+	 * should follow the same structure as returned from getSchedulingObject.
+	 *
+	 * The main difference is that 'calendardata' is optional.
+	 *
+	 * @param string $principalUri
+	 *
+	 * @return array
+	 */
 	public function getSchedulingObjects($principalUri)
 	{
-		return [];
+
+		go()->debug("CalDAVBackend::getSchedulingObjects($principalUri)");
+
+		$stmt = go()->getDbConnection()->getPDO()->prepare('SELECT id, calendardata, uri, lastmodified, etag, size FROM calendar_schedule_object WHERE principaluri = ?');
+		$stmt->execute([$principalUri]);
+
+		$result = [];
+		foreach ($stmt->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+			$result[] = [
+				'calendardata' => $row['calendardata'],
+				'uri' => $row['uri'],
+				'lastmodified' => $row['lastmodified'],
+				'etag' => '"'.$row['etag'].'"',
+				'size' => (int) $row['size'],
+			];
+		}
+
+		return $result;
 	}
 
+	/**
+	 * Deletes a scheduling object.
+	 *
+	 * @param string $principalUri
+	 * @param string $objectUri
+	 */
 	public function deleteSchedulingObject($principalUri, $objectUri)
 	{
-		return null;
+		go()->debug("CalDAVBackend::deleteSchedulingObject($principalUri, $objectUri)");
+
+		$stmt = go()->getDbConnection()->getPDO()->prepare('DELETE FROM calendar_schedule_object WHERE principaluri = ? AND uri = ?');
+		$stmt->execute([$principalUri, $objectUri]);
 	}
 
+	/**
+	 * Creates a new scheduling object. This should land in a users' inbox.
+	 *
+	 * @param string          $principalUri
+	 * @param string          $objectUri
+	 * @param string|resource $objectData
+	 */
 	public function createSchedulingObject($principalUri, $objectUri, $objectData)
 	{
-		return null;
+
+		go()->debug("CalDAVBackend::createSchedulingObject($principalUri, $objectUri, ...)");
+
+		$stmt = go()->getDbConnection()->getPDO()->prepare('INSERT INTO calendar_schedule_object (principaluri, calendardata, uri, lastmodified, etag, size) VALUES (?, ?, ?, ?, ?, ?)');
+
+		if (is_resource($objectData)) {
+			$objectData = stream_get_contents($objectData);
+		}
+
+		$stmt->execute([$principalUri, $objectData, $objectUri, time(), md5($objectData), strlen($objectData)]);
+	}
+
+
+	/**
+	 * Searches through all of a users calendars and calendar objects to find
+	 * an object with a specific UID.
+	 *
+	 * This method should return the path to this object, relative to the
+	 * calendar home, so this path usually only contains two parts:
+	 *
+	 * calendarpath/objectpath.ics
+	 *
+	 * If the uid is not found, return null.
+	 *
+	 * This method should only consider * objects that the principal owns, so
+	 * any calendars owned by other principals that also appear in this
+	 * collection should be ignored.
+	 *
+	 * @param string $principalUri
+	 * @param string $uid
+	 *
+	 * @return string|null
+	 */
+	public function getCalendarObjectByUID($principalUri, $uid)
+	{
+		go()->debug("getCalendarObjectByUID($principalUri, $uid)");
+
+		$username = str_replace("principals/", "", $principalUri);
+
+		$userId = User::find()->selectSingleValue("id")->where('username', '=', $username)->single();
+
+		$event = CalendarEvent::find()
+			->join('calendar_calendar', 'cal', 'cal.id=cce.calendarId')
+			->select('cce.calendarId, uri')
+			->where(['uid' => $uid, 'cal.ownerId'=>$userId])
+			->fetchMode(\PDO::FETCH_OBJ)
+			->single();
+
+
+		if($event) {
+			$path = "c-" . $event->calendarId . "/" . $event->uri;
+				go()->debug($path);
+			return $path;
+		} else {
+			return null;
+		}
+
+
 	}
 }
