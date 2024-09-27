@@ -111,18 +111,18 @@ export class CalendarAdapter {
 		'task': {
 			enabled: client.user.calendarPreferences?.tasksAreVisible,
 			store: datasourcestore({dataSource: jmapds('Task')}),
-			*items(start:DateTime,end:DateTime) {
+			*items(from:DateTime,until:DateTime) {
 				for(const task of this.store!.items) {
 					let date;
 					if(task.progress == 'completed') {
-						date = task.progressUpdated.substring(0,10); // slice date
+						date = task.progressUpdated; // slice date
 					} else {
 						date = task.due || task.start || (new DateTime()).format('Y-m-d');
 					}
-//if(task.title =='deze is af') debugger;
-					const start = DateTime.createFromFormat(date, 'Y-m-d');
+//if(task.title =='test taak met bogus timezone') debugger;
+					const start = DateTime.createFromFormat(date.substring(0,10), 'Y-m-d');
 					yield new CalendarItem({
-						key: '',
+						key: '-',
 						start,
 						open() {
 							const dlg = new go.modules.community.tasks.TaskDialog();
@@ -146,13 +146,14 @@ export class CalendarAdapter {
 				// 	progressUpdated: start.format('Y-m-d')+'..'+end.format('Y-m-d'),
 				// 	//progress: 'NOT needs-action OR in-progress'
 				// });
-				this.store.baseParams = {filter : {
+				this.store.setFilter('range',{
 					operator: "OR",
 					conditions: [
+						{start:null,due:null},
 						{start: start.format('Y-m-d')+'..'+end.format('Y-m-d')},
 						{progressUpdated: start.format('Y-m-d')+'..'+end.format('Y-m-d')},
 					]
-				}};
+				});
 				return this.store!.load();
 			}
 		},
