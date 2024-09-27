@@ -397,3 +397,15 @@ CREATE TABLE `calendar_calendar_custom_fields` (
 	PRIMARY KEY (`id`),
 	CONSTRAINT `fk_calendar_cf1` FOREIGN KEY (`id`) REFERENCES `calendar_calendar` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
+
+CREATE TABLE calendar_schedule_object (
+                                   id INT(11) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                   principaluri VARBINARY(255),
+                                   calendardata MEDIUMBLOB,
+                                   uri VARBINARY(200),
+                                   lastmodified INT(11) UNSIGNED,
+                                   etag VARBINARY(32),
+                                   size INT(11) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
