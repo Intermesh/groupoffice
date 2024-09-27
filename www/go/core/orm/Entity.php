@@ -188,7 +188,8 @@ abstract class Entity extends Property {
 	 *
 	 * @throws Exception
 	 */
-	public static final function findFor(int $userId, array $properties = [], bool $readOnly = false) {
+	public static final function findForUser(int $userId, array $properties = [], bool $readOnly = false): Query
+	{
 		return static::internalFind($properties, $readOnly, null, $userId);
 	}
 
