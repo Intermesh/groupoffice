@@ -879,11 +879,12 @@ abstract class Property extends Model {
 	 * @param array $fetchProperties
 	 * @param bool $readOnly
 	 * @param Property|null $owner When finding relations the owner or parent Entity / Property is passed so the children can access it.
+	 * @param int|null $userId Join user tables as this user
 	 * @return Query<$this>
-	 * @noinspection PhpReturnDocTypeMismatchInspection
 	 * @throws Exception
 	 */
-	protected static function internalFind(array $fetchProperties = [], bool $readOnly = false, Property $owner = null) {
+	protected static function internalFind(array $fetchProperties = [], bool $readOnly = false, Property $owner = null, ?int $userId = null): Query
+	{
 
 		$tables = self::getMapping()->getTables();
 
@@ -907,7 +908,7 @@ abstract class Property extends Model {
 			$query->mergeWith($mappedQuery);
 		}
 
-		self::joinAdditionalTables($tables, $query);
+		self::joinAdditionalTables($tables, $query, $userId);
 		self::buildSelect($query, $fetchProperties, $readOnly);
 
 		return clone $query;
@@ -1029,31 +1030,34 @@ abstract class Property extends Model {
 
 	}
 
-  /**
-   *
-   * It's not possible to use fetchproperties to determine if they need to be joined. Because the props
-   * can also be used in the where or order by part of the query.
-   *
-   * @param array $tables
-   * @param Query $query
-   *
-   */
-	private static function joinAdditionalTables(array $tables, Query $query) {
+	/**
+	 *
+	 * It's not possible to use fetchproperties to determine if they need to be joined. Because the props
+	 * can also be used in the where or order by part of the query.
+	 *
+	 * @param array $tables
+	 * @param Query $query
+	 * @param int|null $userId
+	 */
+	private static function joinAdditionalTables(array $tables, Query $query, ?int $userId): void
+	{
 		$first = array_shift($tables);
 
 		$alias = $first->getAlias();
 		foreach ($tables as $joinedTable) {
-			static::joinTable($alias, $joinedTable, $query);
+			static::joinTable($alias, $joinedTable, $query, $userId);
 			$alias = $joinedTable->getAlias();
 		}
 	}
 
-  /**
-   * @param $lastAlias
-   * @param MappedTable $joinedTable
-   * @param Query $query
-   */
-	private static function joinTable($lastAlias, MappedTable $joinedTable, Query $query) {
+	/**
+	 * @param $lastAlias
+	 * @param MappedTable $joinedTable
+	 * @param Query $query
+	 * @param int|null $userId
+	 */
+	private static function joinTable($lastAlias, MappedTable $joinedTable, Query $query, ?int $userId): void
+	{
 
 		$on = "";
 		foreach ($joinedTable->getKeys() as $from => $to) {
@@ -1061,11 +1065,11 @@ abstract class Property extends Model {
 				$on .= " AND ";
 			}
 
-			if(strpos($from, '.') === false) {
+			if(!str_contains($from, '.')) {
 				$from = $lastAlias . "." . $from;
 			}
 
-			if(strpos($to, '.') === false) {
+			if(!str_contains($to, '.')) {
 				$to = $joinedTable->getAlias() . "." . $to;
 			}
 
@@ -1073,12 +1077,16 @@ abstract class Property extends Model {
 		}
 
 		if($joinedTable->isUserTable) {
-			if(!go()->getUserId()) {
-				//throw new \Exception("Can't join user table when not authenticated");
+
+			if($userId == null) {
+				$userId = go()->getUserId();
+			}
+
+			if($userId == null) {
 				go()->debug("Can't join user table when not authenticated");
 				return;
 			}
-			$on .= " AND " . $joinedTable->getAlias() . ".userId = " . go()->getUserId();
+			$on .= " AND " . $joinedTable->getAlias() . ".userId = " . $userId;
 		}
 
 		if(!empty($joinedTable->getConstantValues())) {
