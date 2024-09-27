@@ -123,7 +123,7 @@ class Calendar extends AclOwnerEntity {
 				'eventId' => $eventData['eventId']
 			])->execute();
 			$id = go()->getDbConnection()->getPDO()->lastInsertId();
-			Calendar::updateHighestModSeq($calendarId);
+			//Calendar::updateHighestModSeq($calendarId);
 			$found = CalendarEvent::findById($id);
 			$found->useDefaultAlerts = true;
 			$found->save();
