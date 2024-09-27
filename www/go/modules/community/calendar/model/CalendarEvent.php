@@ -442,14 +442,20 @@ class CalendarEvent extends AclItemEntity {
 		Calendar::updateHighestModSeq(self::find()->select('calendarId')->where(['uid'=>$this->uid]));
 		if($this->isModified('calendarId')) {
 			// Event is put in a different calendar so update both modseqs
-			Calendar::updateHighestModSeq($this->getOldValue('calendarId'));
+			$oldCalId = $this->getOldValue('calendarId');
+			if(isset($oldCalId)) {
+				Calendar::updateHighestModSeq($oldCalId);
+			}
 		}
 	}
 
-	public function uri($uri = null) {
-		if($uri === null)
-			return $this->uri;
-		$this->uri = $uri;
+	public function uri($uri = null)
+	{
+		if ($uri !== null) {
+			$this->uri = $uri;
+		}
+
+		return $this->uri;
 	}
 
 	protected function init()
