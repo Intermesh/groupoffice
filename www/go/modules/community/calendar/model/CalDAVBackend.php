@@ -6,6 +6,7 @@ use go\core\auth\TemporaryState;
 use go\core\db\Column;
 use go\core\model\Acl;
 use go\core\model\User;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Query;
 use go\modules\community\tasks\convert\VCalendar;
 use go\modules\community\tasks\model\Task;
@@ -308,19 +309,28 @@ class CalDAVBackend extends AbstractBackend implements
 				// The attached blob must be identical to the data used to create the event
 				$object->attachBlob(ICalendarHelper::makeBlob($object, $calendarData)->id);
 				$object = Calendar::addEvent($object, $id);
-				if($object->uri() != $objectUri) {
-					$object->uri($objectUri);
-					$object->save();
-				}
+
 				if($object === null) {
 					throw new \Exception('Could not create calendar event');
+				}
+
+				// TODO, this is a bit ugly. When thunderbird schedules an event for multiple participants it's added
+				// but the sabre scheduling plugin creates an event before this with a different generated uri. But TB
+				// relies on this URI being created.
+				if($object->uri() != $objectUri) {
+					$object->uri($objectUri);
+					if(!$object->save()) {
+						throw new SaveException($object);
+					}
 				}
 
 				break;
 			case 't': // tasklist
 				$object = new Task();
 				$object = (new VCalendar)->vtodoToTask(VObject\Reader::read($calendarData, VObject\Reader::OPTION_FORGIVING), $id, $object);
-				$object->save();
+				if(!$object->save()) {
+					throw new SaveException($object);
+				}
 				break;
 			default:
 				go()->log("incorrect calendarId ".$calendarId. ' for '.$objectUri);
