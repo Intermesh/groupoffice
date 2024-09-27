@@ -160,7 +160,7 @@ class Calendar extends AclOwnerEntity {
 		return $this->highestItemModSeq;
 	}
 
-	static function updateHighestModSeq($calendarId) {
+	static function updateHighestModSeq(\go\core\db\Query|int|array $calendarId) {
 		go()->getDbConnection()
 			->update(self::getMapping()->getPrimaryTable()->getName(),
 				['highestItemModSeq' => CalendarEvent::getState()],
