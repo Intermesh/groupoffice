@@ -1625,14 +1625,10 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			GO.request({
 				url: 'calendar/event/submit',
 				params: params,
-				success: function(options,  response, result)
-				{					
-					if(event.repeats)
-					{
+				success: function(options,  response, result) {
+					if(event.repeats) {
 						grid.store.reload();
 					}
-
-					GO.calendar.handleMeetingRequest(result);					
 				}
 			});
 				
