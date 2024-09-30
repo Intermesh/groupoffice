@@ -1,6 +1,8 @@
 - Tasks: select default tasklist for user more intelligently
 - Finance: Change document owner
 - Contracts: Change document owner
+- Workflow: Fixed using UTF8 in workflow history
+- Workflow: Make workflow grid work for admins too
 
 23-09-2024: 6.8.73
 - Core: fix error when importing CSV
