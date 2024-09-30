@@ -4,7 +4,7 @@
 - Workflow: Fixed using UTF8 in workflow history
 - Workflow: Make workflow grid work for admins too
 - Calendar: Fix several HTML encoding / decoding issues in Qtip
-- E-mail: Update oauth2 token after refresh
+- E-mail: Update oauth2 token after refresh. Fixes authentication failed error.
 
 23-09-2024: 6.8.73
 - Core: fix error when importing CSV
