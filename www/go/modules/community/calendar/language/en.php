@@ -19,7 +19,10 @@ return [
 	'cancelScheduleText' => 'If you delete this event, the participants will be notified that the event is cancelled',
 
 	'deleteScheduleTitle' => 'Do you want to delete the event and notify the organizer?',
-	'deleteScheduleText' => 'If you delete this event, the organizer will be notified that you wont participate',
+	'deleteScheduleText' => 'If you delete this event, the organizer will be notified that you will not participate',
+
+	'statusScheduleTitle' => 'Do you want to notify the organizer?',
+	'statusScheduleText' => 'You have changed your participation status, the organizer will be notified about your participation.',
 
 	'replyImipBody' => [
 		'needs-action' => '{name} didn\'t decide for "{title}" {date} yet.',

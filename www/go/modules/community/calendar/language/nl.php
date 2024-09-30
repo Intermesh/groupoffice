@@ -153,6 +153,7 @@ return [
 	'%s events were not imported.' => '%s afspraken zijn niet geimporteerd.',
 	'Reasons' => 'Redenen',
 	'ICS file could not be imported, error: '=> 'ICS bestand kon niet geimporteerd worden, fout: ',
+	'Save only' => 'Alleen opslaan',
 
 	// schedule massages
 	'newScheduleTitle' => 'Wil je de deelnemers uitnodigen?',
@@ -166,6 +167,9 @@ return [
 
 	'deleteScheduleTitle' => 'Wil je de activiteit verwijderen en de organisator op de hoogte stellen?',
 	'deleteScheduleText' => 'Als je deze activiteit verwijdert, word de organisator op de hoogte gesteld dat je niet deelneemt',
+
+	'statusScheduleTitle' => 'Wil je de organisator op de hoogte stellen?',
+	'statusScheduleText' => 'Je hebt de aanwezigheidsstatus aangepast, de organisator word hiervan op de hoogte gesteld.',
 
 	'replyImipBody' => [
 		'needs-action' => '{name} heeft nog geen keuze gemaakt voor afspraak "{title}" {date}.',

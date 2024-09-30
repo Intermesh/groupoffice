@@ -261,7 +261,6 @@ export class CalendarItem {
 	}
 
 	confirmScheduleMessage(modified: Partial<CalendarEvent>|false, onAccept: ()=>void) {
-		Object.assign(this.data, modified);
 		const type = this.shouldSchedule(modified);
 		if(type) {
 			const askScheduleWin = win({
@@ -279,10 +278,18 @@ export class CalendarItem {
 						text: t('Cancel'), handler: () => {
 							askScheduleWin.close()
 						}
-					}), '->',
+					}),'->',
+					btn({
+						text: t('Save only'), handler: () => {
+							Object.assign(this.data, modified);
+							onAccept();
+							askScheduleWin.close()
+						}
+					}),
 					btn({
 						text: t('Send'), cls:'primary', handler: () => {
 							eventDS.setParams.sendSchedulingMessages = true;
+							Object.assign(this.data, modified);
 							onAccept();
 							askScheduleWin.close()
 						}
@@ -290,6 +297,7 @@ export class CalendarItem {
 				));
 			askScheduleWin.show();
 		} else {
+			Object.assign(this.data, modified);
 			onAccept();
 		}
 	}
@@ -333,14 +341,13 @@ export class CalendarItem {
 			throw new Error('Not a participant');
 		this.calendarPrincipal.participationStatus = status;
 
-		eventDS.setParams.sendSchedulingMessages = true; //todo: use this.calendarPrincipal.expectReply ??
+		//eventDS.setParams.sendSchedulingMessages = true;
 		// should we notify a reply is sent?
 		this.patch({participants: this.participants}, onFinish,undefined,false);
-		//return eventDS.update(this.data.id, {participants: this.participants});
 	}
 
 	shouldSchedule(modified: Partial<CalendarEvent>|false) {
-		if((!this.data.isOrigin && this.key) || this.isInPast)
+		if((!this.data.isOrigin && this.key) || this.isInPast) // todo: use this.calendarPrincipal.expectReply if not owner ??
 			return;
 		if(modified === false) {
 			if(this.participants && !this.isCancelled) {
@@ -348,7 +355,10 @@ export class CalendarItem {
 			}
 			return undefined;
 		}
-		 if(modified.participants || this.participants) {
+		if(!this.isOwner) {
+			return 'status';
+		}
+		if(modified.participants || this.participants) {
 			if(!this.key) {
 				return 'new';
 			} else {
@@ -398,13 +408,19 @@ export class CalendarItem {
 						}
 					}),
 					btn({
-						text: t(isFirstInSeries ? 'All events' : 'This and future events'), // save to series
+						text: t('This and future events'),
+						hidden : isFirstInSeries || !this.isOwner,
 						handler: _b => {
 							w.close();
-							isFirstInSeries ?
-								this.patchSeries(modified, onFinish) :
-								this.patchThisAndFuture(modified, onFinish);
-
+							this.patchThisAndFuture(modified, onFinish);
+						}
+					}),
+					btn({
+						text: t('All events'), // save to series
+						hidden: !isFirstInSeries,
+						handler: _b => {
+							w.close();
+							this.patchSeries(modified, onFinish);
 						}
 					})
 				)
