@@ -1,3 +1,4 @@
+30-09-2024: 6.8.74
 - Tasks: select default tasklist for user more intelligently
 - Finance: Change document owner
 - Contracts: Change document owner

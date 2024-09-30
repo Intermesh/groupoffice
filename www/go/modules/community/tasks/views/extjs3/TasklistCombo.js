@@ -40,7 +40,6 @@
 						sortInfo: {field: "name", direction: "ASC"},
 						groupField: 'group',
 						groupDir: "ASC",
-						limit: 0,
 						remoteSort: true,
 						remoteGroup: true
 					}
