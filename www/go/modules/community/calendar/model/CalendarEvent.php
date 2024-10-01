@@ -268,7 +268,7 @@ class CalendarEvent extends AclItemEntity {
 					$query->join('calendar_calendar_user', 'ucal', 'ucal.id = cce.calendarId AND ucal.userId = '.go()->getAuthState()->getUserId())
 						->where('ucal.isSubscribed','=', true);
 				} else if(!empty($value)) {
-					$query->andWhere('cce.calendarId', 'IN', $value);
+					$query->andWhere('cce.calendarId', '=', $value);
 				}
 			}, 'subscribedOnly')
 			->add('inCategories', function(Criteria $criteria, $value, Query $query) {

@@ -203,6 +203,7 @@ class CalDAVBackend extends AbstractBackend implements
 
 	public function getCalendarObjects($calendarId)
 	{
+		go()->debug("getCalendarObjects($calendarId)");
 		//id, uri, lastmodified, etag, calendarid, size, componenttype
 		list($type, $id) = explode('-', $calendarId,2);
 
@@ -216,8 +217,7 @@ class CalDAVBackend extends AbstractBackend implements
 			case 'c': $component = 'vevent';
 				$stmt = CalendarEvent::find(['id', 'modifiedAt', 'uid'])
 					->select(['cce.id as id','uid','eventdata.modifiedAt as modified', 'uri'])
-					->where(['calendarId' => $id])
-					->filter(['before'=> $end, 'after' => $start])
+					->filter(['inCalendars'=>$id, 'before'=> $end, 'after' => $start])
 					->fetchMode(\PDO::FETCH_OBJ);
 				break;
 			case 't' : $component = 'vtodo';
@@ -227,6 +227,8 @@ class CalDAVBackend extends AbstractBackend implements
 				break;
 			default: return $result;
 		}
+
+		go()->debug($stmt);
 
 		foreach ($stmt as $object) {
 			$lastModified = strtotime($object->modified);
