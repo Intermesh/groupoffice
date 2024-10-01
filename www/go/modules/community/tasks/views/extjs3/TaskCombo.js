@@ -17,7 +17,7 @@ go.modules.community.tasks.TaskCombo = Ext.extend(go.form.ComboBox, {
 		fields: ['id', 'title', {name: "tasklist", type: "relation"}],
 		entityStore: "Task",
 		baseParams: {
-			sort: [{ property: "tasklist", isAscending: true }],
+			sort: [{ property: "tasklist", isAscending: true }, {property: "title", isAscending: true}],
 			filter: {
 					permissionLevel: go.permissionLevels.write
 			}

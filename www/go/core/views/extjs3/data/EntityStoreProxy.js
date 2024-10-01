@@ -189,7 +189,6 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 		}, this);		
 		
 		Promise.all(promises).catch(function(e) {
-			debugger;
 			console.error(e);
 		}).finally(function(){
 			cb.call(scope);
