@@ -417,7 +417,7 @@ export class CalendarItem {
 					}),
 					btn({
 						text: t('All events'), // save to series
-						hidden: !isFirstInSeries,
+						hidden: !isFirstInSeries && this.isOwner,
 						handler: _b => {
 							w.close();
 							this.patchSeries(modified, onFinish);
