@@ -386,7 +386,7 @@ abstract class AbstractConverter {
 	public function exportToBlob(Query $entities, array $params = []): Blob
 	{
 		$stmt = $entities->execute();
-		if($stmt->rowCount() > $this->exportMaxItems) {
+		if($this->exportMaxItems > 0 && $stmt->rowCount() > $this->exportMaxItems) {
 			throw new Exception(go()->t("Too many items to export. Max is " . $this->exportMaxItems));
 		}
 		$this->clientParams = $params;
