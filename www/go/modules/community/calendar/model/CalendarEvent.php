@@ -786,9 +786,9 @@ class CalendarEvent extends AclItemEntity {
 		$recurrenceId = null;
 		$nextOccurrence = null;
 		if(!empty($this->recurrenceOverrides)) {
-			foreach ($this->recurrenceOverrides as $o) {
+			foreach ($this->recurrenceOverrides as $recurrenceId => $o) {
 				if (!empty($o->excluded)) continue;
-				$start = $o->start();
+				$start = $o->start($recurrenceId);
 				if ($start >= $now) {
 					$nextOccurrence = empty($nextOccurrence) ? $start : min($nextOccurrence, $start);
 					$recurrenceId = $o->recurrenceId;
