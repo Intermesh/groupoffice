@@ -44,10 +44,14 @@ class CalendarConvertor
 	/**
 	 * SERVER -> PHONE
 	 * @param CalendarEvent $event
-	 * @param SyncAppointment|SyncAppointmentException $exception
+	 * @param SyncAppointment|null $exception
+	 * @param $params
 	 * @return SyncAppointment
+	 * @throws DateInvalidTimeZoneException
+	 * @throws DateMalformedStringException
 	 */
-	static function toSyncAppointment($event, $exception, $params) {
+	static function toSyncAppointment(CalendarEvent $event, ?SyncAppointment $exception, $params): SyncAppointment
+	{
 		$message = $exception ?? new SyncAppointment();
 		if(!$exception && !empty($event->timeZone))
 			$message->timezone =  self::mstzFromTZID($event->timeZone);
@@ -94,7 +98,7 @@ class CalendarConvertor
 					if ($override->excluded) {
 						$msgException->deleted = 1;
 					} else {
-						$exEvent = (new CalendarEvent())->setValues($override->toArray());
+						$exEvent = $event->patchedInstance($recurrenceId);// (new CalendarEvent())->setValues($override->toArray());
 						$exEvent->uid = $event->uid; // required
 						$exEvent->timeZone = $event->timeZone;
 						if(empty($exEvent->start)) {
@@ -230,16 +234,14 @@ class CalendarConvertor
 	}
 
 
-
-
 	/**
 	 * PHONE => SERVER
-	 * @param \SyncAppointment $message
+	 * @param SyncAppointment $message
 	 * @param CalendarEvent $event
-	 * @return false|CalendarEvent
-	 * @throws \Exception
+	 * @return CalendarEvent
+	 * @throws DateMalformedStringException
 	 */
-	static function toCalendarEvent($message, $event)
+	static function toCalendarEvent(SyncAppointment $message, CalendarEvent $event) : CalendarEvent
 	{
 		if (isset($message->uid))
 			$event->uid = $message->uid;
@@ -330,7 +332,8 @@ class CalendarConvertor
 		return go()->getAuthState()->getUser(['timezone'])->timezone;
 	}
 
-	static private function toRecurrenceRule(SyncRecurrence $recur) {
+	static private function toRecurrenceRule(SyncRecurrence $recur): object
+	{
 		static $recurType = [0=>'daily',1=>'weekly',2=>'monthly',3=>'monthly',4=>'yearly',5=>'yearly'];
 		$r = (object)['frequency'=>$recurType[$recur->type]];
 		if(!empty($recur->interval) && $recur->interval !== '1') // 1 = default

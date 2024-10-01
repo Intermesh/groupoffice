@@ -82,7 +82,19 @@ class CalendarStore extends Store {
 	{
 		$event = CalendarEvent::findById($id);
 		ZLog::Write(LOGLEVEL_INFO, "GetMessage ".$event->id . ' - '.$event->title);
-		return !$event ? false : CalendarConvertor::toSyncAppointment($event, null, $contentparameters);
+
+		if(!$event) {
+			return false;
+		}
+
+		try {
+			return CalendarConvertor::toSyncAppointment($event, null, $contentparameters);
+		} catch(Exception $e) {
+			ZLog::Write(LOGLEVEL_FATAL, $e->getMessage());
+			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
+		}
+
+		return false;
 	}
 
 	public function ChangeMessage($folderid, $id, $message, $contentParameters)
@@ -98,7 +110,14 @@ class CalendarStore extends Store {
 		}
 
 		$event->calendarId = $folderid;
-		$event = CalendarConvertor::toCalendarEvent($message, $event);
+
+
+		try {
+			$event = CalendarConvertor::toCalendarEvent($message, $event);
+		} catch(Exception $e) {
+			ZLog::Write(LOGLEVEL_FATAL, $e->getMessage());
+			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
+		}
 
 		if(!$event->save()){
 			ZLog::Write(LOGLEVEL_WARN, "Failed to save event: " . var_export($event->getValidationErrors(), true));
