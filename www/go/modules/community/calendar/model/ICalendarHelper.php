@@ -17,6 +17,7 @@ use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use Sabre\VObject;
 use Sabre\VObject\Component\VCalendar;
+use Sabre\VObject\Component\VEvent;
 
 class ICalendarHelper {
 
@@ -37,9 +38,13 @@ class ICalendarHelper {
 	/**
 	 * Parse an Event object to a VObject
 	 * @param CalendarEvent $event
-	 * @param VCalendar $vcalendar The original vcalendar to sync to
+	 * @param VCalendar|null $vcalendar The original vcalendar to sync to
+	 * @return VCalendar
+	 * @throws \DateInvalidTimeZoneException
+	 * @throws \DateMalformedStringException
 	 */
-	static function toVObject(CalendarEvent $event, $vcalendar = null) {
+	static function toVObject(CalendarEvent $event, ?VCalendar $vcalendar = null): VCalendar
+	{
 
 		if($vcalendar === null) {
 			$vcalendar = new VCalendar(['PRODID' => $event->prodId]);
@@ -118,11 +123,14 @@ class ICalendarHelper {
 	}
 
 	/**
-	 * @param VObject\Component\VEvent $vevent
+	 * @param VEvent $vevent
 	 * @param CalendarEvent $event
-	 * @return array
+	 * @param ?string $recurrenceId
+
+	 * @throws \DateMalformedStringException
 	 */
-	static function toVEvent($vevent, $event, $recurrenceId=false) {
+	static function toVEvent(VEvent $vevent, CalendarEvent $event, ?string $recurrenceId = null): VEvent
+	{
 
 		if(!$recurrenceId) {
 			$recurrenceId = $event->recurrenceId;
@@ -205,19 +213,20 @@ class ICalendarHelper {
 
 	/**
 	 * Create an iCalendar RRule from a RecurrenceRule object
-	 * @param RecurrenceRule $recurrenceRule
+	 * @param CalendarEvent $event
 	 * @return string \Sabre\VObject\Property\ICalendar\Recur $rule
+	 * @throws \DateInvalidTimeZoneException
+	 * @throws \DateMalformedStringException
 	 */
-	static private function toRrule($event) {
-		$recurrenceRule = isset($event->recurrenceRule) ? $event->recurrenceRule :  $event->getRecurrenceRule();
+	static private function toRrule(CalendarEvent $event) {
+		$recurrenceRule = $event->getRecurrenceRule();
 		$rule = [];
 		foreach(self::$ruleMap as $iKey => $jKey) {
 			if(!empty($recurrenceRule->{$jKey})) {
 				$val = $recurrenceRule->{$jKey};
 				if($jKey == 'until') {
 					if(strlen($val) > 10) { // with time
-						$tz = $event->timeZone ? new \DateTimeZone($event->timeZone) : null;;
-						$dt = DateTime::createFromFormat('Y-m-d\TH:i:s', $val, $tz);
+						$dt = DateTime::createFromFormat('Y-m-d\TH:i:s', $val, $event->timeZone());
 						$dt->setTimezone(new \DateTimeZone('UTC'));
 						$val = $dt->format('Ymd\THis\Z');
 					} else {
@@ -467,7 +476,8 @@ class ICalendarHelper {
 		return $props;
 	}
 
-	static public function makeRecurrenceIterator($event) {
+	static public function makeRecurrenceIterator(CalendarEvent $event): VObject\Recur\RRuleIterator
+	{
 		return new VObject\Recur\RRuleIterator(self::toRrule($event), $event->start());
 	}
 
