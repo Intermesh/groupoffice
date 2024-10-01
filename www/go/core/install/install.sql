@@ -1242,6 +1242,10 @@ create table core_import_mapping
     `name` VARCHAR(120) NOT NULL DEFAULT '(unnamed)',
     mapping      text                       null,
     updateBy     varchar(100) default null  null,
+    dateFormat varchar(20) null,
+    timeFormat varchar(20) null,
+    decimalSeparator char null,
+    thousandsSeparator char null,
     PRIMARY KEY (`id`),
     constraint core_import_mapping_core_entity_null_fk
         foreign key (entityTypeId) references core_entity (id)

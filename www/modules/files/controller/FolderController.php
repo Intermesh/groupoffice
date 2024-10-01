@@ -23,7 +23,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 	protected function allowGuests() {
 		if($this->isCli())
-			return array('syncfilesystem', 'removeempty');
+			return array('syncfilesystem', 'removeempty', 'cleanaddressbook');
 		else
 			return parent::allowGuests();
 	}
@@ -31,6 +31,55 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
   protected function allowWithoutModuleAccess() {
     return ['images'];
   }
+
+
+	/**
+	 * After migration of the addressbook there where some left over folder. Clean them up with:
+	 *
+	 * sudo -u www-data groupofficecli.php -r=files/folder/cleanAddressbook -c=/etc/groupoffice/multi_instance/intermesh.group-office.com/config.php --dryRun=0
+	 *
+	 * @param $dryRun
+	 * @return void
+	 * @throws AccessDenied
+	 * @throws GO\Base\Exception\CliOnly
+	 * @throws \go\core\db\DbException
+	 */
+
+	public function actionCleanAddressBook($dryRun = 1) {
+		$this->requireCli();;
+		GO::session()->runAsRoot();
+		$folder = Folder::model()->findByPath('addressbook');
+
+		if(!$folder) {
+			exit("Root address book not found");
+		}
+
+		$admin = GO\Base\Model\User::model()->findByPk(1);
+		$home = Folder::model()->findHomeFolder($admin);
+		$trashPath = $home->getFullPath() . "/__ABTRASH__";
+
+		echo "Trash path: " . $trashPath ."\n";
+
+		if(!$dryRun) {
+			$trash = Folder::model()->findByPath($trashPath, true);
+			if (!$trash) {
+				exit("Couldn't create trash folder");
+			}
+		}
+
+		$subWithoutAcl = Folder::model()->findByAttributes(['parent_id'=> $folder->id, 'acl_id' => 0]);
+		echo "Found " . $subWithoutAcl->rowCount() .' folders without ACL'."\n";
+		foreach($subWithoutAcl as $f) {
+			echo "Moving " . $f->name ."\n";
+
+			if(!$dryRun) {
+				$f->parent_id = $trash->id;
+				$f->save();
+			}
+		}
+
+		echo "Done\n";
+	}
 
 
 	public function actionRemoveEmpty() {
@@ -49,7 +98,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		}
 
 		echo "Removed " . $count ." empty folders\n";
-
 	}
 
 	private function removeEmpty() {

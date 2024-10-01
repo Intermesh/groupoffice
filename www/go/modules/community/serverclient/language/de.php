@@ -6,4 +6,5 @@ return array (
   'name' => 'PostfixClient',
   'description' => 'Modul zur automatischen Mailbox-Erstellung bei aktiver PostfixVerwaltung',
   'The mailbox couldn\'t be created' => 'Die Mailbox konnte nicht angelegt werden',
+  '\'"The mailbox couldn\'\'t be created"\'' => 'Die Mailbox konnte nicht angelegt werden',
 );

@@ -153,11 +153,6 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		var available = go.Modules.getAvailable(), config, pnl, i, i1, l2, sepAdded = false;
 
 		for(i = 0, l = available.length; i < l; i++) {
-
-			// if(!available[i].userRights.mayManage) {
-			// 	continue;
-			// }
-			
 			config = go.Modules.getConfig(available[i].package, available[i].name);
 			
 			if(!config.systemSettingsPanels) {

@@ -1,3 +1,39 @@
+- Tasks: sort task combo by task list first, title second
+
+30-09-2024: 6.8.74
+- Tasks: select default tasklist for user more intelligently
+- Finance: Change document owner
+- Contracts: Change document owner
+- Workflow: Fixed using UTF8 in workflow history
+- Workflow: Make workflow grid work for admins too
+- Calendar: Fix several HTML encoding / decoding issues in Qtip
+- E-mail: Update oauth2 token after refresh. Fixes authentication failed error.
+
+23-09-2024: 6.8.73
+- Core: fix error when importing CSV
+- Finance: Check if project has a customer set before creating an invoice
+- Email: Fix for email not showing ics file when method is not set.
+
+16-09-2024: 6.8.72
+- Calendar: fix HTML code in Qtip
+- Core: Fixed PHP 8.3 compatibility issue: PHP Fatal error:  During inheritance of IteratorAggregate: Uncaught ErrorException: Return type of GO\\Base\\Db\\Statement::getIterator() should either be compatible with IteratorAggregate::getIterator(): Traversable, or the #[\\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /var/customers/webs/office/office.domain.tld/go/base/db/Statement.php:578
+- Caldav: Fixed users being able to write in read only calendars
+- E-mail: Date was lost if message was an smime signed attachment with headers without the date
+- Core: Provide date, time and number formatting for csv imports
+- Email: fix error when moving or copying to a folder with a % in its name
+- Business: add row actions to business grid, fix deleting finance books when deleting business record.
+- Business: add row actions to activities grid.
+- Finance: Add counter when multiple books of the same type are created upon installation
+- Core: Updated German language
+- Serverclient: urlencode token
+
+09-09-2024: 6.8.71
+- Files: Fix PHPMailer compatibility issue
+- Core / Studio: fix error when initially loading combobox value
+- Calendar: Fixed invalid error message when sending invites
+- E-mail: Errors were not shown correctly
+- Leavedays: Fixed rounding issue which lead to slightly off numbers in the decimals
+
 05-09-2024: 6.8.70
 - Sieve: text label Out of Office more clear
 - Core: Mask hashes in history log

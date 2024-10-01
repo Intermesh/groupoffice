@@ -14,4 +14,5 @@ return array (
   'Use IMAP credentials' => 'IMAP Zugangsdaten benutzen',
   'Users must login with their full e-mail adress. Enable this option if the IMAP expects. the username without domain.' => 'Benutzer müssen sich mit ihrer vollständigen E-Mail-Adresse anmelden. Aktivieren Sie diese Option, wenn der IMAP den Nutzernamen ohne Domain erwartet.',
   'Use a \'*\' to match all domains.' => 'Verwenden Sie \'*\' für alle Domänen.',
+  '\'"Use a \'\'*\'\' to match all domains."\'' => '\'"Verwenden Sie \'\'*\'\' für alle Domänen."\'',
 );
