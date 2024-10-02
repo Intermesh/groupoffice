@@ -82,9 +82,10 @@ class Client extends Property
 	}
 	public static function collectGarbage(): bool
 	{
-		$threeMonthsAgo = (new DateTime())->sub(new DateInterval('P3M'));
-		return static::delete(
+		$threeMonthsAgo = (new DateTime())->sub(new \DateInterval('P1M'));
+		return static::internalDelete(
 			(new Query)
+				->where('deviceId', '=', '-') // only browsers are without deviceId
 				->andWhere('lastSeen', '<', $threeMonthsAgo));
 	}
 

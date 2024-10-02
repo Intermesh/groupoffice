@@ -7,6 +7,7 @@ use Exception;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\model\Acl;
+use go\core\model\Client;
 use go\core\model\CronJobSchedule;
 use go\core\model\OauthAccessToken;
 use go\core\model\RememberMe;
@@ -58,6 +59,7 @@ class GarbageCollection extends CronJob {
 		Token::collectGarbage();
 		OauthAccessToken::collectGarbage();
 		RememberMe::collectGarbage();
+		Client::collectGarbage();
 		//$this->tmpFiles();
 
 		$this->fireEvent(self::EVENT_RUN);
