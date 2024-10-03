@@ -4,6 +4,7 @@ use go\core\model\Acl;
 use go\modules\community\calendar\model\Calendar;
 use go\modules\community\calendar\model\CalendarEvent;
 use go\modules\community\calendar\model\Participant;
+use go\modules\community\calendar\model\RecurrenceOverride;
 
 class CalendarStore extends Store {
 
@@ -129,18 +130,36 @@ class CalendarStore extends Store {
 		}
 	}
 
-	public function MeetingResponse($requestid, $folderid, $response) {
-		$event = CalendarEvent::findById($requestid);
-		$me = $event->calendarParticipant();
-		if(!$me) {
-			throw new StatusException("Participant not found!");
-		}
-		$me->participationStatus = CalendarConvertor::$meetingResponseMap[$response] ?? Participant::Accepted;
+	public function MeetingResponse($requestid, $folderid, $response, $instanceId) {
 
+		ZLog::Write(LOGLEVEL_DEBUG, "MeetingResponse($requestid, $folderid, $response, $instanceId)");
+
+		$event = CalendarEvent::findById($requestid);
+
+		if($event->isRecurring() && isset($instanceId)) {
+
+			$recurId = (new \go\core\util\DateTime($instanceId))->setTimezone($event->timeZone())->format('Y-m-d\TH:i:s');
+
+			$status = CalendarConvertor::$meetingResponseMap[$response] ?? Participant::Accepted;;
+
+			$email = Calendar::find()
+				->join('core_user', 'u', 'calendar_calendar.ownerId = u.id')
+				->where(['id' => $event->calendarId])
+				->selectSingleValue('u.email')->single();
+
+			\go\modules\community\calendar\model\Scheduler::updateRecurrenceStatus($event, $recurId, $email, $status, new \go\core\util\DateTime());
+
+		} else {
+			$me = $event->calendarParticipant();
+			if (!$me) {
+				throw new StatusException("Participant not found!");
+			}
+			$me->participationStatus = CalendarConvertor::$meetingResponseMap[$response] ?? Participant::Accepted;
+		}
 		if(!$event->save()) {
 			throw new StatusException("Failed to save participant");
 		}
-		ZLog::Write(LOGLEVEL_DEBUG, 'Participant '.$me->email.' set to status '.$me->participationStatus);
+	//	ZLog::Write(LOGLEVEL_DEBUG, 'Participant '.$me->email.' set to status '.$me->participationStatus);
 		return $requestid;
 	}
 

@@ -22,28 +22,23 @@ class Scheduler {
 	 */
 	static public function handle(CalendarEvent $event, bool $willDelete = false) {
 
-		// TODO: Series has no participants but override does?!?
 		if($event->isInPast())
 			return;
 
 		$current = $event->calendarParticipant();
-		if(empty($current)) {
-			// see if you participate in any of the instances
-			foreach ($event->overrides(true) as $exception) {
-				if(!$exception->excluded)
-					self::handle($exception, $willDelete);
+		if(!empty($current)) {
+			if ($current->isOwner()) {
+				$newOnly = !$willDelete && $event->isModified('participants') && !$event->isModified(self::EssentialScheduleProps);
+				$method = $willDelete ? 'CANCEL' : 'REQUEST';
+				self::organizeImip($event, $current, $method, $newOnly);
+			} else if (!empty($event->replyTo) && $current->isModified('participationStatus')) {
+				$status = $willDelete ? Participant::Declined : $current->participationStatus;
+				self::replyImip($event, $current, $status);
 			}
-			return;
 		}
 
-		if ($current->isOwner()) {
-			$newOnly = !$willDelete && $event->isModified('participants') && !$event->isModified(self::EssentialScheduleProps);
-			$method = $willDelete ? 'CANCEL': 'REQUEST';
-			self::organizeImip($event, $current, $method, $newOnly);
-		}
-		else if(!empty($event->replyTo) && $current->isModified('participationStatus')) {
-			$status = $willDelete ? Participant::Declined : $current->participationStatus;
-			self::replyImip($event, $current, $status);
+		foreach ($event->overrides(true) as $exception) {
+			self::handle($exception, $willDelete || $exception->excluded);
 		}
 
 	}
@@ -355,7 +350,7 @@ class Scheduler {
 					if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
 						$existingEvent->recurrenceOverrides[$recurId] = (new RecurrenceOverride($existingEvent));
 					}
-					$existingEvent->recurrenceOverrides[$recurId]->setValues(['status' => CalendarEvent::Cancelled]);
+					$existingEvent->recurrenceOverrides[$recurId]->patchProps((object)['status' => CalendarEvent::Cancelled]);
 				} else {
 					$existingEvent->status = CalendarEvent::Cancelled;
 				}
@@ -392,28 +387,7 @@ class Scheduler {
 			if(isset($vevent->{'RECURRENCE-ID'})) {// occurrence
 				$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
 
-				if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
-					// TODO: check if the given RECURRENCE-ID is valid for $existingEvent->recurrenceRule
-					// If it is not valid an extra instance would be created (RDATE in iCal) GroupOffice does not display these at the moment.
-					$existingEvent->recurrenceOverrides[$recurId] = new RecurrenceOverride($existingEvent);
-//					$exEvent = $existingEvent->patchedInstance($recurId);
-					$p = $existingEvent->participantByScheduleId($sender->email);
-				} else {
-					$exEvent = $existingEvent->patchedInstance($recurId);
-					$p = $exEvent->participantByScheduleId($sender->email);
-				}
-				if(!$p) continue;
-				if (empty($p->scheduleUpdated) || $p->scheduleUpdated < $replyStamp) {
-
-					// had to use setValues instead of patchProps here?
-					$k = 'participants/'.$p->pid();
-					$existingEvent->recurrenceOverrides[$recurId]->setValues([
-						$k.'/participationStatus' => $status,
-						$k.'/scheduleUpdated' => $replyStamp->format("Y-m-d\TH:i:s"),
-					]);
-					//recreate instance with patched above applied
-//					$exEvent = $existingEvent->patchedInstance($recurId);
-				}
+				self::updateRecurrenceStatus($existingEvent, $recurId, $sender->email, $status, $replyStamp);
 
 			} else {
 				// APPLY EVENT
@@ -432,5 +406,40 @@ class Scheduler {
 			throw new SaveException($existingEvent);
 		}
 		return $existingEvent;
+	}
+
+
+	public static function updateRecurrenceStatus(CalendarEvent $existingEvent, string $recurId, string $email, string $status, DateTime $replyStamp): void
+	{
+		if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
+			// TODO: check if the given RECURRENCE-ID is valid for $existingEvent->recurrenceRule
+			// If it is not valid an extra instance would be created (RDATE in iCal) GroupOffice does not display these at the moment.
+			$existingEvent->recurrenceOverrides[$recurId] = new RecurrenceOverride($existingEvent);
+			$exEvent = $existingEvent->patchedInstance($recurId);
+		} else {
+			$exEvent = $existingEvent->patchedInstance($recurId);
+		}
+
+		if( isset($exEvent->participants)) {
+			$modifiedParticipants = $exEvent->participants;
+			$modified = false;
+			foreach ($modifiedParticipants as &$p) {
+				if ($p->email != $email) {
+					continue;
+				}
+				if (empty($p->scheduleUpdated) || $p->scheduleUpdated < $replyStamp) {
+
+					$p->scheduleUpdated = $replyStamp->format("Y-m-d\TH:i:s");
+					$p->participationStatus = $status;
+
+					$modified = true;
+				}
+			}
+			if ($modified) {
+				$existingEvent->recurrenceOverrides[$recurId]->patchProps(
+					(object)['participants' => $modifiedParticipants]
+				);
+			}
+		}
 	}
 }
