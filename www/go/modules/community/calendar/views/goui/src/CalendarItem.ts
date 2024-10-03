@@ -6,7 +6,7 @@ import {
 	DateTime,
 	E, EntityID, MaterialIcon, ObjectUtil,
 	tbar, Timezone,
-	win
+	win, Window
 } from "@intermesh/goui";
 import {calendarStore, t} from "./Index.js";
 import {client, jmapds, Recurrence} from "@intermesh/groupoffice-core";
@@ -375,7 +375,14 @@ export class CalendarItem {
 	patch(modified: any, onFinish?: () => void, onCancel?: () => void, skipAsk = false) {
 		if(!this.isRecurring) {
 			this.confirmScheduleMessage(modified, () => {
-				eventDS.update(this.data.id, modified).then(onFinish)
+				const p = eventDS.update(this.data.id, modified).catch(e => {
+					void Window.error(e);
+					throw e;
+				});
+
+				if(onFinish)
+					p.then(onFinish)
+
 			});
 		} else if(this.isOverride) {
 			this.patchOccurrence(modified, onFinish);
@@ -431,7 +438,12 @@ export class CalendarItem {
 
 	private patchSeries(modified: any, onFinish?: () => void) {
 		this.confirmScheduleMessage(modified, () => {
-			const p = eventDS.update(this.data.id, modified);
+			const p = eventDS.update(this.data.id, modified)
+				.catch(e => {
+					void Window.error(e);
+					throw e;
+				})
+
 			if(onFinish) p.then(onFinish);
 		})
 	}
@@ -497,8 +509,13 @@ export class CalendarItem {
 				} else {
 					data['recurrenceOverrides'] = {[this.recurrenceId!] : patch };
 				}
-				const prom = eventDS.update(this.data.id, data);
-				if(onFinish) prom.then(onFinish);
+
+				const prom = eventDS.update(this.data.id, data)
+					.catch(e => {
+					void Window.error(e);
+					throw e;
+				})
+				if(onFinish) prom.then(onFinish)
 			});
 		});
 	}
@@ -556,7 +573,11 @@ export class CalendarItem {
 			delete next.uid;
 			delete next.recurrenceOverrides;
 
-			const p = eventDS.create(next); // create duplicate
+			const p = eventDS.create(next)
+				.catch(e => {
+					void Window.error(e);
+					throw e;
+				}); // create duplicate
 			if (onFinish) p.then(onFinish);
 		});
 	}

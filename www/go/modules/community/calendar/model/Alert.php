@@ -74,6 +74,8 @@ class Alert extends UserProperty {
 
 	public function schedule($item) {
 
+		return; //todo this is broken
+
 		$alert = new \go\core\model\Alert();
 		$alert->setEntity($item);
 		$alert->userId = go()->getUserId();
@@ -97,14 +99,20 @@ class Alert extends UserProperty {
 			$offset = $this->offset;
 			if($event->isRecurring()) {
 				list($recurrenceId, $next) = $event->upcomingOccurrence();
+				if(!isset($recurrenceId)) {
+
+					// TODO, why here?
+					return;
+				}
 				$coreAlert->recurrenceId = $recurrenceId->format('Y-m-d\TH:i:s');
 				$date = clone $next;
 				$next->add(new \DateInterval($event->duration));
-				if($this->relatedTo === self::End){
+				if ($this->relatedTo === self::End) {
 					$date = $next;
 				} else {
 					$coreAlert->staleAt = (clone $next)->setTimezone(new \DateTimeZone("UTC"));
 				}
+
 			} else {
 				$date = clone ($this->relatedTo === self::End ? $event->end() : $event->start());
 				if($this->relatedTo === self::Start) // don't stale if event is set to trigger after the event
