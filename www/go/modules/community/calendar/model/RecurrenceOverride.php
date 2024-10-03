@@ -64,7 +64,8 @@ class RecurrenceOverride extends Property
 	}
 
 	/**
-	 * Takes values for an occurrence and computes the difference with the series and saves them to this object as a patch
+	 * Adds (does not reset like setValues()) values for an occurrence and computes the difference with the series and saves them
+	 * to this object as a patch
 	 *
 	 * @param stdClass $props
 	 * @return void
@@ -182,7 +183,6 @@ class RecurrenceOverride extends Property
 			}
 			$this->patch = json_encode($this->props);
 		}
-
 		return parent::internalSave();
 	}
 
