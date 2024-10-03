@@ -292,9 +292,12 @@ class CalendarConvertor
 				} else {
 					$p = &$event->participants[$principalId ?? $key];
 				}
-				$p->participationStatus = array_search($attendee->attendeestatus, self::$participationStatusMap);
-				if($p->participationStatus === false) {
-					$p->participationStatus = Participant::NeedsAction;
+
+				if(isset($attendee->attendeestatus)) {
+					$newStatus = array_search($attendee->attendeestatus, self::$participationStatusMap);
+					if($newStatus !== false) {
+						$p->participationStatus = $newStatus;
+					}
 				}
 			}
 		}
