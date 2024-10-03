@@ -1809,7 +1809,8 @@ abstract class Property extends Model {
 	 * @param Query $query
 	 * @throws DbException
 	 */
-	protected function updateTableRecord(Table $table, array $record, Query $query) {
+	protected function updateTableRecord(Table $table, array $record, Query $query): void
+	{
 		$stmt = go()->getDbConnection()->update($table->getName(), $record, $query);
 		$stmt->execute();
 	}
@@ -2619,7 +2620,7 @@ abstract class Property extends Model {
 			$col = static::getMapping()->getColumn($name);
 			if($col) {
 				if(!$col->autoIncrement) {
-					$v = $this->$name;
+					$v = isset($this->$name) ? $this->$name : null;
 					if(is_object($v)) {
 						$copy->$name = clone $v;
 					}	else {
