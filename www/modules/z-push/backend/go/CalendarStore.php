@@ -99,6 +99,8 @@ class CalendarStore extends Store {
 
 	public function ChangeMessage($folderid, $id, $message, $contentParameters)
 	{
+		ZLog::Write(LOGLEVEL_DEBUG, "ChangeMessage($folderid, $id, ..., ...)");
+
 		$event = CalendarEvent::findById($id);
 
 		if (!$event) {

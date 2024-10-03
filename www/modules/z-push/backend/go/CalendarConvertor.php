@@ -362,15 +362,18 @@ class CalendarConvertor
 		}
 		return $byday;
 	}
+
 	/**
 	 * Used for recurrenceOverrides only
-	 * @param $values
-	 * @return array
+	 * @param SyncAppointmentException $values
+	 * @param CalendarEvent $event
+	 * @return stdClass
+	 * @throws DateMalformedStringException
 	 */
-	private static function toOverride(SyncAppointmentException $values, CalendarEvent $event): array
+	private static function toOverride(SyncAppointmentException $values, CalendarEvent $event): stdClass
 	{
 		if($values->deleted)
-			return ['excluded' => true];
+			return (object) ['excluded' => true];
 		$ex = new \stdClass;
 		if(isset($values->subject))
 			$ex->title = $values->subject;
@@ -394,7 +397,7 @@ class CalendarConvertor
 			$ex->start->setTimezone($event->timeZone());
 			$ex->start = $ex->start->format('Y-m-d\TH:i:s');
 		}
-		return (array) $ex;
+		return $ex;
 	}
 
 }
