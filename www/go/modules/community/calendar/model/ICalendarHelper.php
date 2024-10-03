@@ -18,6 +18,7 @@ use go\core\util\StringUtil;
 use Sabre\VObject;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Component\VEvent;
+use stdClass;
 
 class ICalendarHelper {
 
@@ -424,7 +425,7 @@ class ICalendarHelper {
 		];
 	}
 
-	static private function parseOccurrence($vevent, $props) {
+	static private function parseOccurrence(VEvent $vevent, stdClass $props) : stdClass {
 
 		if(isset($vevent->DTSTART)) {
 			$props->start = $vevent->DTSTART->getDateTime();
