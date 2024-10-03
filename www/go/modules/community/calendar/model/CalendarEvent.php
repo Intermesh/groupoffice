@@ -47,9 +47,14 @@ class CalendarEvent extends AclItemEntity {
 //	const PrivateProperties = ['created', 'due', 'duration', 'estimatedDuration', 'freeBusyStatus', 'privacy',
 //		'recurrenceOverrides', 'sequence', 'showWithoutTime', 'start', 'timeZone', 'timeZones', 'uid','updated'];
 
+const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','description','locale','location', 'showWithoutTime',
+'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule'
+
+];
+
 	const EventProperties = ['uid','isOrigin','replyTo', 'prodId', 'sequence','title','description','locale','location', 'showWithoutTime',
 		'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule','createdAt','modifiedAt',
-		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag','uri', 'eventId', 'recurrenceId'];
+		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag','uri', 'eventId', 'recurrsenceId'];
 
 	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'alerts', 'veventBlobId'];
 
@@ -538,7 +543,7 @@ class CalendarEvent extends AclItemEntity {
 
 				$currPart = $this->calendarParticipant();
 				if ($currPart && !$currPart->isOwner()) { // not owner
-					if ($this->isModified(self::EventProperties)) {
+					if ($this->isModified(self::OwnerOnlyProperties)) {
 						throw new Forbidden('Trying to change properties but not the organizer');
 					} else if ($this->isModified(['participants'])) {
 						// we may only set our own participationStatus
