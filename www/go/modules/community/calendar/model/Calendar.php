@@ -70,6 +70,11 @@ class Calendar extends AclOwnerEntity {
 			->addMap('defaultAlertsWithoutTime', DefaultAlertWT::class,  ['id'=>'fk']);
 	}
 
+	protected static function textFilterColumns(): array
+	{
+		return ['name'];
+	}
+
 	/** @return int */
 	public static function fetchDefault($scheduleId) {
 		/** @var Preferences $pref */
