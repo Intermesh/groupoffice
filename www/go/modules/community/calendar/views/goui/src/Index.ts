@@ -87,25 +87,27 @@ function addEmailAction() {
 					REQUEST: t("Invitation")
 				}[msg.itip.method] || "Unable to process appointment information.";
 
-				if(msg.itip.method === 'REQUEST' && typeof event !== 'string') {
+
+				if(typeof event !== 'string') {
 					let item = new CalendarItem({data:event, key:event.id + ""});
+
 					if(msg.itip.recurrenceId && item.isRecurring) {
 						item = item.patchedInstance(msg.itip.recurrenceId);
 					}
+					if(msg.itip.method === 'REQUEST')
+						updateBtns(item);
 
-					updateBtns(item);
-				}
+					if(msg.itip.method !== 'REPLY') {
 
-				if(event) {
-					if(typeof event === "string") {
-						text += ', '+ event;
-					} else if(msg.itip.method !== 'REPLY') {
+						const date = item.start;
 
-						const date = msg.itip.recurrenceId ? msg.itip.recurrenceId : event.start;
-
-						text += ' "' + event.title + '" ' + t('at') + ' ' + DateTime.createFromFormat(date.replace('T', ' '), 'Y-m-d H:i')!.format('D j M H:i')
+						text += ' "' + item.title + '" ' + t('at') + ' ' + date.format('D j M H:i')
 					}
+
+				} else {
+					text += ', '+ event;
 				}
+
 
 				container.append(
 					E('li', E('i', 'event').cls('icon'), text, btns).cls('goui-toolbar')
