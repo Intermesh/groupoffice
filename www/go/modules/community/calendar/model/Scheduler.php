@@ -26,7 +26,7 @@ class Scheduler {
 			return;
 
 		$current = $event->calendarParticipant();
-		if(!empty($current)) {
+		if(!empty($current) && ($willDelete || $event->isModified('participants') || $event->isModified(self::EssentialScheduleProps))) {
 			if ($current->isOwner()) {
 				$newOnly = !$willDelete && $event->isModified('participants') && !$event->isModified(self::EssentialScheduleProps);
 				$method = $willDelete ? 'CANCEL' : 'REQUEST';
