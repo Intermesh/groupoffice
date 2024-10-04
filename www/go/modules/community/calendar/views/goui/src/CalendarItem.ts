@@ -168,7 +168,7 @@ export class CalendarItem {
 	}
 
 	get isRecurring() {
-		return this.key.includes('/') || ('recurrenceRule' in this.data);
+		return this.key.includes('/') || this.data.recurrenceRule;
 	}
 
 	get isOverride() {
