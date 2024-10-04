@@ -85,6 +85,9 @@ export class CalendarItem {
 		 // 	debugger;
 		if(!obj.start) {
 			this.start = new DateTime(this.patched.start);
+			if(this.data.showWithoutTime) {
+				this.start.setHours(0,0,0,0);
+			}
 		}
 		if(obj.data.timeZone) {
 			this.start.timezone = this.patched.timeZone;
