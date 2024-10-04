@@ -298,12 +298,15 @@ export class EventWindow extends FormWindow {
 	}
 
 	parseSavedData(data: any) {
+
 		const end = this.endDate.getValueAsDateTime()!,// DateTime.createFromFormat(data.end, 'Y-m-dTh:i'),
 			start = this.startDate.getValueAsDateTime()!;
-		if(this.form.value.showWithoutTime && data.start) {
+		if(this.form.value.showWithoutTime) {
 			end.setHours(0,0,0).addDays(1);
 			start.setHours(0,0,0);
-			data.start = start.format('Y-m-d');// remove time
+
+			if(data.start)
+				data.start = start.format('Y-m-d');// remove time
 		}
 		if(this.alertField.isModified() || !this.item?.data.id) {
 			data.useDefaultAlerts = this.alertField.useDefault;
