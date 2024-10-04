@@ -7,6 +7,7 @@ use go\core\data\Model;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use DateTime;
+use go\modules\community\addressbook\model\Date;
 use stdClass;
 
 /**
@@ -34,6 +35,10 @@ class RecurrenceOverride extends Property
 	public function init()
 	{
 		$this->props = json_decode(trim($this->patch ?? '{}', "'"));
+	}
+
+	public function changeRecurrenceId(DateTime $recurrenceId) {
+		$this->recurrenceId = $recurrenceId;
 	}
 
 	/**

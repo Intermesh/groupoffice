@@ -527,6 +527,10 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 			$this->updateOccurrenceSpan();
 		}
 
+		if(!$this->isNew() && $this->isRecurring() && $this->isModified('start')) {
+			$this->reindexRecurrenceOverrides();
+		}
+
 		$this->resetICalBlob();
 
 		if(!$this->isNew()) {
@@ -887,5 +891,31 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 		$calendar = Calendar::findById($this->calendarId, ['name'], true);
 
 		return $calendar->name .': '. $this->title . ' - '. $this->start->format('Y-m-d');
+	}
+
+	/**
+	 * When the series start time changes all the recurrence id's must be recreated.
+	 *
+	 * @return void
+	 * @throws \DateMalformedStringException
+	 */
+	private function reindexRecurrenceOverrides(): void
+	{
+		$old = $this->getOldValue('start');
+		$oldHour = $old->format("H");
+		$oldMin = $old->format("i");
+		$newHour = $this->start->format("H");
+		$newMin = $this->start->format("i");
+
+		if($oldHour == $newHour && $newMin == $oldMin) {
+			return;
+		}
+
+		foreach($this->recurrenceOverrides as $recurrenceId => $o) {
+			$date = new DateTime($recurrenceId);
+			$date->setTime($newHour, $newMin);
+			$o->changeRecurrenceId($date);
+		}
+
 	}
 }
