@@ -103,6 +103,9 @@ class ICalendarHelper {
 		if($method == 'CANCEL' || $event->isModified(array_merge(CalendarEvent::EventProperties,['participants']))) {
 			// base event
 			$baseVEvent = $c->add(self::toVEvent($c->createComponent('VEVENT'), $event));
+			if($event->isRecurring()) {
+				$baseVEvent->RRULE = self::toRrule($event);
+			}
 		}
 		foreach($event->overrides(true) as $recurrenceId => $override) {
 			if(!empty($override->excluded) && !empty($baseVEvent)) {
