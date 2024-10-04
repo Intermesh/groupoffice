@@ -7,7 +7,7 @@ export class PreferencesWindow extends FormWindow {
 		super('User');
 		this.width = 480;
 		this.title = t('Preferences');
-		this.generalTab.cls = 'flow scroll';
+		this.generalTab.cls = 'flow fit scroll';
 		this.generalTab.items.add(containerfield({name:'calendarPreferences'},
 			fieldset({},
 				checkbox({name:'showWeekNumbers', label:t('Show week numbers in calendar')}),
