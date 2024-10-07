@@ -1,4 +1,5 @@
 - Tasks: sort task combo by task list first, title second
+- Core: tweak keyword splitting to support double surnames separated by a dash (e.g. Catherine Zeta-Jones)
 
 30-09-2024: 6.8.74
 - Tasks: select default tasklist for user more intelligently
