@@ -17,6 +17,7 @@ namespace GO\Caldav;
 use GO\Calendar\Model\Event;
 use go\core\fs\Blob;
 use go\core\model\Acl;
+use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
 use go\modules\community\tasks\convert\VCalendar;
@@ -36,7 +37,7 @@ use Sabre\DAV\Exception;
 
 class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	implements
-//		Sabre\CalDAV\Backend\SyncSupport
+//		Sabre\CalDAV\Backend\SyncSupport,
 	Sabre\CalDAV\Backend\SchedulingSupport
 {
 	private $_cachedCalendars;
@@ -162,11 +163,14 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 //		\GO::debug("Version: ".$version);
 
 		$tz = new \GO\Base\VObject\VTimezone();
+		//$owner = User::findById($calendar->user_id, ['username']);
+		$level = $calendar->getPermissionLevel();
 
 		return array(
 			'id' => $calendar->id,
 			'uri' => $calendar->getUri(),
 			'principaluri' => $principalUri,
+			//'principaluri' => 'principals/'.$owner->username,
 			'{'.Sabre\CalDAV\Plugin::NS_CALENDARSERVER.'}getctag' => 'GroupOffice/calendar/'.$version,
 //			'{http://sabredav.org/ns}sync-token' => $version,
 			'{'.Sabre\CalDAV\Plugin::NS_CALDAV.'}supported-calendar-component-set' => new Sabre\CalDAV\Xml\Property\SupportedCalendarComponentSet($supportedComponents),
@@ -174,11 +178,10 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			'{DAV:}displayname' => $calendar->name,
 			'{urn:ietf:params:xml:ns:caldav}calendar-description' => 'User calendar',
 			'{urn:ietf:params:xml:ns:caldav}calendar-timezone' => "BEGIN:VCALENDAR\r\n" . $tz->serialize() . "END:VCALENDAR",
-
+			'{http://sabredav.org/ns}read-only' => $level < Acl::LEVEL_WRITE,
 			// 1 = owner, 2 = readonly, 3 = readwrite
-			'share-access' => $calendar->getPermissionLevel() == Acl::LEVEL_MANAGE ? 1 : ($calendar->getPermissionLevel() >= Acl::LEVEL_WRITE ? 3 : 2),
-			'read-only' => $calendar->getPermissionLevel() < Acl::LEVEL_CREATE,
-			'access'=> $calendar->getPermissionLevel() < Acl::LEVEL_CREATE ? \Sabre\DAV\Sharing\Plugin::ACCESS_READ : \Sabre\DAV\Sharing\Plugin::ACCESS_READWRITE
+			'share-access' => $level == Acl::LEVEL_MANAGE ? 1 : ($level >= Acl::LEVEL_WRITE ? 3 : 2),
+			//'access'=> $calendar->getPermissionLevel() < Acl::LEVEL_CREATE ? \Sabre\DAV\Sharing\Plugin::ACCESS_READ : \Sabre\DAV\Sharing\Plugin::ACCESS_READWRITE
 //			'{http://apple.com/ns/ical/}calendar-order' => $calendar->id,
 //			'{http://apple.com/ns/ical/}calendar-color' => '#'.$this->nextBackgroundColor()
 		);
