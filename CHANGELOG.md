@@ -1,3 +1,4 @@
+- Core: Make sure groupoffice core module is always sorted first
 - Tasks: sort task combo by task list first, title second
 
 30-09-2024: 6.8.74
