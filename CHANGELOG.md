@@ -1,3 +1,4 @@
+07-10-2024: 6.8.75
 - Core: Make sure groupoffice core module is always sorted first
 - Tasks: sort task combo by task list first, title second
 - Core: tweak keyword splitting to support double surnames separated by a dash (e.g. Catherine Zeta-Jones)
