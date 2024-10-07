@@ -479,6 +479,29 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	}
 
 	/**
+	 * Join if not already joined
+	 *
+	 * @see join()
+	 *
+	 * @param $tableName
+	 * @param $joinTableAlias
+	 * @param $on
+	 * @param string $type
+	 * @param $indexHint
+	 * @return $this
+	 */
+	public function joinIf($tableName, $joinTableAlias, $on, string $type = 'INNER', $indexHint = null): Query
+	{
+
+		if(!$this->isJoined($tableName, $joinTableAlias)) {
+			$this->join($tableName, $joinTableAlias, $on, $type, $indexHint);
+		}
+
+		return $this;
+	}
+
+
+	/**
 	 * Specify index hints for mysql
 	 *
 	 * @see https://dev.mysql.com/doc/refman/8.0/en/index-hints.html
