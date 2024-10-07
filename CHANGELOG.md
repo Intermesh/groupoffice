@@ -1,4 +1,6 @@
+- Core: Make sure groupoffice core module is always sorted first
 - Tasks: sort task combo by task list first, title second
+- Finance: Don't send statements to customers with a negative amount to be paid
 
 30-09-2024: 6.8.74
 - Tasks: select default tasklist for user more intelligently
