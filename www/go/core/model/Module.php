@@ -237,6 +237,9 @@ class Module extends Entity {
 				}
 				$criteria->andWhere('enabled', '=', (bool)$value);
 			})
+			->add("hideCore", function (Criteria $criteria, $value) {
+				$criteria->andWhere('name', '!=', "core");
+			})
 			->add('groupIsAllowed', function (Criteria $criteria, $value, Query $query) {
 				//this filter doesn't actually filter but sorts the selected members on top
 				$query->join('core_permission', 'p_sort', 'p_sort.moduleId = m.id AND p_sort.groupId = ' . (int)$value, 'LEFT');
@@ -408,6 +411,16 @@ class Module extends Entity {
 	}
 	
 	protected function internalValidate() {
+
+		if($this->package == 'core') {
+			if($this->sort_order != 0) {
+				$this->sort_order = 0;
+			}
+		} else {
+			if($this->sort_order == 0) {
+				$this->sort_order = 1;
+			}
+		}
 		
 		if(!$this->isNew()) {
 			if($this->package == 'core' && $this->isModified('enabled')) {

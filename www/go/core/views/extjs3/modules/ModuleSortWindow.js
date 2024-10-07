@@ -28,6 +28,9 @@ go.modules.ModuleSortWindow = Ext.extend(go.Window,  {
 				field: 'sort_order',
 				direction: 'ASC'
 			},
+			filters: {
+				hideCore: {hideCore: true}
+			},
 			remoteSort:true
 		});
 
@@ -94,7 +97,7 @@ go.modules.ModuleSortWindow = Ext.extend(go.Window,  {
 		for (let i = 0; i < this.grid.store.data.items.length;  i++)
 		{
 			update[this.grid.store.data.items[i].get('id')] = {
-				sort_order: i
+				sort_order: i + 1
 			};
 
 		}
