@@ -677,7 +677,7 @@ class CalendarStore extends Store {
      * @return string       id of the created/updated calendar obj
      * @throws StatusException
      */
-    public function MeetingResponse($requestid, $folderid, $response) {
+    public function MeetingResponse($requestid, $folderid, $response, $instanceId) {
 			
 			ZLog::Write(LOGLEVEL_DEBUG, 'goCalendar->MeetingResponse('.$requestid.', '.$folderid.', '.$response.')');
 			
