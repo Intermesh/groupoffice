@@ -473,14 +473,14 @@ th {
 
 	/**
 	 * Override this to add custom headers
-	 * Override "getValue" and "setVallue" too.
+	 * Override "getValue" and "setValue" too.
 	 *
-	 * @param string $entityCls
 	 * @param bool $forMapping
 	 * @return string[][]
 	 * @throws Exception
 	 */
-	protected function internalGetHeaders(bool $forMapping = false) {
+	protected function internalGetHeaders(bool $forMapping = false): array
+	{
 
 		$entityCls = $this->entityClass;
 

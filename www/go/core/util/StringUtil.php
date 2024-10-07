@@ -23,6 +23,17 @@ use Transliterator;
  */
 class StringUtil {
 
+	/**
+	 * Convert a boolean value to something a human understands in their mother tongue
+	 *
+	 * @param bool $value
+	 * @return string
+	 */
+	public static function booleanToYesNo(bool $value): string
+	{
+		return $value ? go()->t("Yes") : go()->t("No");
+	}
+
   /**
    * Normalize the line end style of text.
    *
