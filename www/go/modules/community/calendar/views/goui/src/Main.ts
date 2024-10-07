@@ -173,7 +173,8 @@ export class Main extends Component {
 						handler: _ => (new CalendarItem({key:'',data:{
 							start:(new DateTime).format('Y-m-d\TH:00:00.000'),
 							title: t('New event'),
-							duration: client.user.calendarPreferences?.defaultDuration ?? "P1H",
+								showWithoutTime: client.user.calendarPreferences?.defaultDuration == null,
+							duration: client.user.calendarPreferences?.defaultDuration ?? "P1D",
 							calendarId: CalendarView.selectedCalendarId
 						}})).save()
 					}),
