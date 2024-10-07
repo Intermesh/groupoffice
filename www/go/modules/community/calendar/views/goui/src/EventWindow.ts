@@ -92,6 +92,11 @@ export class EventWindow extends FormWindow {
 				valueField: 'id',
 				textRenderer: (r: any) => r.name,
 				listeners: {
+					render: () => {
+						if(!calendarStore.loaded) {
+							void calendarStore.load();
+						}
+					},
 					'setvalue': (me, v) => {
 						if(v)
 						calendarStore.dataSource.single(v).then(r => {

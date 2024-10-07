@@ -160,8 +160,9 @@ modules.register(  {
 							start:(new DateTime).format('Y-m-d\TH:00:00.000'),
 							title: t('New event'),
 							showWithoutTime: client.user.calendarPreferences?.defaultDuration == null,
-							duration: client.user.calendarPreferences?.defaultDuration ?? "P1D"
-						}})).save()
+							duration: client.user.calendarPreferences?.defaultDuration ?? "P1D",
+							calendarId: client.user.calendarPreferences?.defaultCalendarId
+						}})).open()
 				},
 				linkDetail:() =>  new EventDetail()
 			}]

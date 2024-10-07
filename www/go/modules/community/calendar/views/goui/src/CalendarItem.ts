@@ -257,6 +257,8 @@ export class CalendarItem {
 		}
 		dlg.show();
 		dlg.loadEvent(this);
+
+		return dlg;
 	}
 
 	downloadIcs(){
