@@ -97,6 +97,7 @@ export class EventWindow extends FormWindow {
 						calendarStore.dataSource.single(v).then(r => {
 							if(!r) return;
 							this.item!.cal = r;
+
 							const d = this.form.value.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
 							this.alertField.setDefaultLabel(d)
 							if(!this.item?.key && !this.participantFld.list.isEmpty()) {

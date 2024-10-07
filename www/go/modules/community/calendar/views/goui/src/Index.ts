@@ -5,6 +5,7 @@ import {datasourcestore, t as coreT, E, translate, DateTime, Window} from "@inte
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {EventWindow} from "./EventWindow.js";
 import {EventDetail, EventDetailWindow} from "./EventDetail.js";
+import {CalendarView} from "./CalendarView.js";
 
 export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list';
 export const calendarStore = datasourcestore({
@@ -154,7 +155,14 @@ modules.register(  {
 			],
 			links: [{
 				iconCls: 'entity ic-event red',
-				linkWindow:(entity:string, entityId) => new EventWindow(),
+				linkWindow:(entity:string, entityId) => {
+					return (new CalendarItem({key:'',data:{
+							start:(new DateTime).format('Y-m-d\TH:00:00.000'),
+							title: t('New event'),
+							showWithoutTime: client.user.calendarPreferences?.defaultDuration == null,
+							duration: client.user.calendarPreferences?.defaultDuration ?? "P1D"
+						}})).save()
+				},
 				linkDetail:() =>  new EventDetail()
 			}]
 		}
