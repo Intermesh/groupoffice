@@ -4,12 +4,12 @@ import { tsPathsPlugin } from './esbuild-resolve-plugin/dist/index.js';
 const watch = (process.argv.length > 2 && process.argv[2] == "watch");
 
 const opts = {
-	entryPoints: ['src/Index.ts'],
+	entryPoints: ['script/Index.ts'],
 	bundle: true,
 	sourcemap: true,
 	format: "esm",
 	target: "esnext",
-	minify: false,
+	minify: !watch,
 	outdir: "dist",
 	plugins: [tsPathsPlugin()],
 	logLevel: "info"
