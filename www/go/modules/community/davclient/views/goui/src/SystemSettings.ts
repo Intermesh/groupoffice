@@ -6,7 +6,7 @@ import {
 	t, table, tbar
 } from "@intermesh/goui";
 import {client, jmapds} from "@intermesh/groupoffice-core";
-import {AccountWindow} from "./AccountWindow";
+import {AccountWindow} from "./AccountWindow.js";
 
 export class SystemSettings extends Component {
 

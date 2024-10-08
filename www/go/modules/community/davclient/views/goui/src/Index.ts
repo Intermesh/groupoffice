@@ -1,6 +1,7 @@
 import {client, modules} from "@intermesh/groupoffice-core";
 import {t, translate} from "@intermesh/goui";
-import {SystemSettings} from "./SystemSettings";
+import {SystemSettings} from "./SystemSettings.js";
+import "./CalendarOverride.js";
 
 modules.register(  {
 	package: "community",
