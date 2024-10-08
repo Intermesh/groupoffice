@@ -244,7 +244,7 @@ foreach($gouiScripts as $gouiScript) {
 
 	$relPath = $baseUrl . $relPath;
 
-	echo '<script type="module" src="'.$relPath. '?mtime='.$gouiScript->getModifiedAt()->format("U").'"></script>' . "\n";
+	echo '<script type="module" src="'.$relPath.'"></script>' . "\n"; // no mtime because it will load more than once with module loading
 }
 
 if (file_exists(GO::view()->getTheme()->getPath() . 'MainLayout.js')) {
