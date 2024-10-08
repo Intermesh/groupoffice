@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "npm run start:sass & npm run start:esbuild",
-    "start:esbuild": "npx esbuild src/Index.ts --external:../../../../../../views/goui/* --bundle --watch --sourcemap --format=esm --target=esnext --outdir=dist",
+    "start:esbuild": "node ../../../../../../views/goui/esbuild-module.mjs watch",
     "start:sass": "npx sass --watch style:dist",
 
     "build": "npm run build:sass && npm run build:ts",
