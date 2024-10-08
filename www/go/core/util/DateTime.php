@@ -93,12 +93,16 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 	 * @param string $format
 	 * @param string $datetime
 	 * @param DateTimeZone|null $timezone
-	 * @return static
-	 * @throws Exception
+	 * @return DateTime|false
+	 * @throws \DateMalformedStringException
 	 */
-	public static function createFromFormat(string $format, string $datetime, DateTimeZone $timezone = null): DateTime
+	public static function createFromFormat(string $format, string $datetime, DateTimeZone $timezone = null): DateTime | false
 	{
-		return new static("@" . parent::createFromFormat($format, $datetime, $timezone)->format("U"));
+		$dt = parent::createFromFormat($format, $datetime, $timezone);
+		if($dt === false) {
+			return false;
+		}
+		return new static("@" . $dt->format("U"));
 	}
 
 	/**

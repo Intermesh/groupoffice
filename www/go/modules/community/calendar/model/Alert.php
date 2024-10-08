@@ -8,6 +8,7 @@ namespace go\modules\community\calendar\model;
 
 use go\core\orm\Mapping;
 use go\core\orm\UserProperty;
+use go\core\util\DateTime;
 
 /**
  * An alarms will ring a bell on a set datum / time
@@ -72,18 +73,24 @@ class Alert extends UserProperty {
 		}
 	}
 
-	public function schedule($item) {
+	public function schedule(CalendarEvent $item) : ?\go\core\model\Alert {
 
 		$alert = new \go\core\model\Alert();
 		$alert->setEntity($item);
 		$alert->userId = go()->getUserId();
 		$alert->tag = $this->id;
 
-		$this->applyTime($alert, $item);
+		$success = $this->applyTime($alert, $item);
+
+		if(!$success) {
+			return null;
+		}
 
 		if (!$alert->save()) {
 			throw new \Exception(var_export($alert->getValidationErrors(), true));
 		}
+
+		return $alert;
 	}
 
 	/**
@@ -97,14 +104,18 @@ class Alert extends UserProperty {
 			$offset = $this->offset;
 			if($event->isRecurring()) {
 				list($recurrenceId, $next) = $event->upcomingOccurrence();
+				if(!isset($recurrenceId)) {
+					return false;
+				}
 				$coreAlert->recurrenceId = $recurrenceId->format('Y-m-d\TH:i:s');
 				$date = clone $next;
 				$next->add(new \DateInterval($event->duration));
-				if($this->relatedTo === self::End){
+				if ($this->relatedTo === self::End) {
 					$date = $next;
 				} else {
 					$coreAlert->staleAt = (clone $next)->setTimezone(new \DateTimeZone("UTC"));
 				}
+
 			} else {
 				$date = clone ($this->relatedTo === self::End ? $event->end() : $event->start());
 				if($this->relatedTo === self::Start) // don't stale if event is set to trigger after the event
@@ -114,7 +125,7 @@ class Alert extends UserProperty {
 			if ($offset[0] == '-') {
 				$date->sub(new \DateInterval(substr($offset, 1)));
 				$coreAlert->triggerAt = $date;
-				return;
+				return true;
 			}
 			if ($offset[0] == '+') {
 				$offset = substr($offset, 1);
@@ -124,6 +135,13 @@ class Alert extends UserProperty {
 		} else if (isset($this->when)) {
 			$coreAlert->triggerAt = $this->when;
 		}
+
+		// don't create alerts in the past
+		if($coreAlert->triggerAt < new DateTime()) {
+			return false;
+		}
+
+		return true;
 	}
 
 }

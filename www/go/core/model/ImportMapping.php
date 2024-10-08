@@ -20,6 +20,11 @@ class ImportMapping extends Entity {
 	protected $mapping;
 	public $updateBy;
 
+	public ?string $thousandsSeparator = null;
+	public ?string $decimalSeparator = null;
+	public ?string $dateFormat = null;
+	public ?string $timeFormat = null;
+
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()

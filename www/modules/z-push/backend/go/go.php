@@ -228,13 +228,13 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	 * @return string       id of the created/updated calendar obj
 	 * @throws StatusException
 	 */
-	public function MeetingResponse($requestid, $folderid, $error) {
-		ZLog::Write(LOGLEVEL_DEBUG, "Combined->MeetingResponse($requestid , $folderid , $error)");
+	public function MeetingResponse($requestid, $folderid, $response, $instanceId) {
+		ZLog::Write(LOGLEVEL_DEBUG, "Combined->MeetingResponse($requestid , $folderid , $response, $instanceId)");
 		$backend = $this->GetBackend($folderid);
 		if ($backend === false)
 			return false;
-		ZLog::Write(LOGLEVEL_DEBUG, "Combined->MeetingResponse($requestid , $folderid , $error) success");
-		return $backend->MeetingResponse($requestid, $this->GetBackendFolder($folderid), $error);
+		ZLog::Write(LOGLEVEL_DEBUG, "Combined->MeetingResponse($requestid , $folderid , $response, $instanceId) success");
+		return $backend->MeetingResponse($requestid, $this->GetBackendFolder($folderid), $response, $instanceId);
 	}
 
 

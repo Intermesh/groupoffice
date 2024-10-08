@@ -3,17 +3,17 @@ import {
 	comp, Component, containerfield,
 	DataSourceForm,
 	datasourceform, DateInterval,
-	DateTime, DisplayField, displayfield, Format, hr, mapfield, MaterialIcon, Notifier,
+	DateTime, DisplayField, displayfield, EntityID, Format, hr, mapfield, MaterialIcon, Notifier,
 	tbar, Toolbar,
 	Window
 } from "@intermesh/goui";
-import {client, JmapDataSource, jmapds, RecurrenceField} from "@intermesh/groupoffice-core";
+import {client, DetailPanel, JmapDataSource, jmapds, RecurrenceField} from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {calendarStore, statusIcons, t} from "./Index.js";
 
 
-export class EventDetail extends Component {
+export class EventDetail extends DetailPanel<CalendarEvent> {
 
 	// title = t('New Event')
 	// width = 800
@@ -27,9 +27,10 @@ export class EventDetail extends Component {
 	toolBar: Toolbar
 
 	constructor() {
-		super();
+		super("CalendarEvent");
 		this.title = t('Event');
-		this.width = 440;
+
+		this.flex = "1";
 		//this.height = 620;
 		this.store = jmapds("CalendarEvent");
 
@@ -64,8 +65,8 @@ export class EventDetail extends Component {
 		// 		}
 		// 	}})
 
-		this.items.add(this.form = datasourceform({
-				cls: 'scroll flow pad',
+		this.scroller.items.add(this.form = datasourceform({
+				cls: 'flow pad',
 				flex:1,
 				dataSource: this.store,
 				listeners: {
@@ -175,12 +176,36 @@ export class EventDetail extends Component {
 	}
 
 
-	loadEvent(ev: CalendarItem) {
+	/**
+	 * Load's an event from the data source without recurrenceId
+	 * @param id
+	 */
+	async load(id:EntityID): Promise<this> {
+		const r = await super.load(id);
+
+		const item = (new CalendarItem({
+			key: id,
+			data:this.entity!
+		}))
+
+		this.loadEvent(item);
+
+		return r;
+	}
+
+	/**
+	 * Loads an event from the CalendarItem view model with recurrence info
+	 *
+	 * @param ev
+	 */
+	async loadEvent(ev: CalendarItem) {
 		this.item = ev;
 		if (!ev.key) {
 			this.item = ev;
 			this.form.create(ev.data);
 		} else {
+			await super.load(ev.data.id);
+
 			this.form.findField('alerts')!.hidden = false;
 			this.form.load(ev.data.id).then(() => {
 				if(ev.recurrenceId) {
@@ -214,6 +239,7 @@ export class EventDetailWindow extends Window {
 		super();
 		this.title = t('Event');
 		this.width = 440;
+		this.height = 600;
 		this.items.add(this.view = new EventDetail());
 		//this.view.form.on('save', () => {this.close();})
 	}

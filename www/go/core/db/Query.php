@@ -80,10 +80,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 
 	public function getSelect(): array
 	{
-		if (empty($this->select)) {
-			$this->select = ['*'];
-		}
-		return $this->select;
+		return $this->select ?? ['*'];
 	}
 
 	public function getOrderBy(): array
@@ -479,6 +476,29 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	}
 
 	/**
+	 * Join if not already joined
+	 *
+	 * @see join()
+	 *
+	 * @param $tableName
+	 * @param $joinTableAlias
+	 * @param $on
+	 * @param string $type
+	 * @param $indexHint
+	 * @return $this
+	 */
+	public function joinIf($tableName, $joinTableAlias, $on, string $type = 'INNER', $indexHint = null): Query
+	{
+
+		if(!$this->isJoined($tableName, $joinTableAlias)) {
+			$this->join($tableName, $joinTableAlias, $on, $type, $indexHint);
+		}
+
+		return $this;
+	}
+
+
+	/**
 	 * Specify index hints for mysql
 	 *
 	 * @see https://dev.mysql.com/doc/refman/8.0/en/index-hints.html
@@ -637,8 +657,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 */
 	public function createStatement(): Statement
 	{
-		$queryBuilder = new QueryBuilder($this->getDbConnection());
-		$build = $queryBuilder->buildSelect($this);
+		$build = $this->build();
 
 		$stmt = $this->getDbConnection()->createStatement($build);
 		$fetchMode = $this->getFetchMode();

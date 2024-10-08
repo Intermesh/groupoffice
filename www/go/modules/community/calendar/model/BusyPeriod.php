@@ -96,11 +96,11 @@ class BusyPeriod {
 	}
 
 	static function expand($p, string $from, string $until) {
-		$it = ICalendarHelper::makeRecurrenceIterator((object)[
+		$it = ICalendarHelper::makeRecurrenceIterator((new CalendarEvent())->setValues([
 			'start'=>new \DateTime($p->start),
 			'recurrenceRule'=>json_decode($p->recurrenceRule),
-			'timezone'=>$p->timeZone
-		]);
+			'timeZone'=>$p->timeZone
+		]));
 		$it->fastForward(new DateTime($from));
 		if(!empty($p->lastOccurrence)) {
 			$until = min($until, $p->lastOccurrence);

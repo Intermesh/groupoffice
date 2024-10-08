@@ -175,6 +175,9 @@ class JSON {
 	 * - If null, set to the default value if specified for this property; otherwise, remove the property from the patched object. If the key is not present in the parent, this a no-op.
 	 * - Anything else: The value to set for this property (this may be a replacement or addition to the object being patched).
 	 *
+	 *
+	 * An Entity will work here because it implements ArrayAccess as if it would ne passed through setValues()
+	 *
 	 * @link https://jmap.io/spec-core.html#set
 	 *
 	 * @param array|ArrayAccess $doc

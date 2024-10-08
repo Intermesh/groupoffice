@@ -47,9 +47,14 @@ class CalendarEvent extends AclItemEntity {
 //	const PrivateProperties = ['created', 'due', 'duration', 'estimatedDuration', 'freeBusyStatus', 'privacy',
 //		'recurrenceOverrides', 'sequence', 'showWithoutTime', 'start', 'timeZone', 'timeZones', 'uid','updated'];
 
+const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','description','locale','location', 'showWithoutTime',
+'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule'
+
+];
+
 	const EventProperties = ['uid','isOrigin','replyTo', 'prodId', 'sequence','title','description','locale','location', 'showWithoutTime',
 		'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule','createdAt','modifiedAt',
-		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag','uri', 'eventId', 'recurrenceId'];
+		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag','uri', 'eventId', 'recurrsenceId'];
 
 	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'alerts', 'veventBlobId'];
 
@@ -104,6 +109,8 @@ class CalendarEvent extends AclItemEntity {
 	 * @var string|null
 	 */
 	public ?string $recurrenceId = null;
+
+	public ?bool $excluded = false;
 
 	/**
 	 * This is a revision number that is increased by 1 every time the organizer
@@ -266,7 +273,7 @@ class CalendarEvent extends AclItemEntity {
 					$query->join('calendar_calendar_user', 'ucal', 'ucal.id = cce.calendarId AND ucal.userId = '.go()->getAuthState()->getUserId())
 						->where('ucal.isSubscribed','=', true);
 				} else if(!empty($value)) {
-					$query->andWhere('cce.calendarId', 'IN', $value);
+					$query->andWhere('cce.calendarId', '=', $value);
 				}
 			}, 'subscribedOnly')
 			->add('inCategories', function(Criteria $criteria, $value, Query $query) {
@@ -296,16 +303,6 @@ class CalendarEvent extends AclItemEntity {
 			});
 	}
 
-	//public function getRecurrenceOverrides() {
-		// todo merge general overrides with the per-user override properties
-		// the following properties should be overriden per user:
-		// - keywords
-		// - color
-		// - freeBusyStatus
-		// - useDefaultAlerts
-		// - alerts
-		//return $this->recurrenceOverrides;
-	//}
 
 	public function categoryNames() {
 			return go()->getDbConnection()
@@ -327,25 +324,6 @@ class CalendarEvent extends AclItemEntity {
 		}
 	}
 
-	/**
-	 * @throws JsonPointerException
-	 * @throws Exception
-	 */
-	public function copyPatched(RecurrenceOverride $patch, string $recurrenceId) : CalendarEvent {
-		$patchArray = $patch->toArray();
-
-		//if start is not patched then we must set the recurrence ID to set the right time
-		if(!isset($patchArray['start'])) {
-			$patchArray['start'] = new DateTime($recurrenceId);
-		}
-
-		$e = JSON::patch($this->copy(), $patchArray);
-
-		unset($e->recurrenceRule, $e->recurrenceOverrides); // , $e->sentBy, $e->relatedTo,
-		return $e;
-		//return (new self())->setValues(array_merge($this->toArray(), $patch->toArray()));
-	}
-
 	public function attachBlob($blobId) {
 		$this->veventBlobId = $blobId;
 	}
@@ -357,7 +335,8 @@ class CalendarEvent extends AclItemEntity {
 			$blob = ICalendarHelper::makeBlob($this);
 			$this->veventBlobId = $blob->id;
 			if(!$this->isNew()) {
-				$this->save();
+//				$this->save();
+				$this->saveTables();
 			}
 		}
 		return $blob;
@@ -473,14 +452,20 @@ class CalendarEvent extends AclItemEntity {
 		Calendar::updateHighestModSeq(self::find()->select('calendarId')->where(['uid'=>$this->uid]));
 		if($this->isModified('calendarId')) {
 			// Event is put in a different calendar so update both modseqs
-			Calendar::updateHighestModSeq($this->getOldValue('calendarId'));
+			$oldCalId = $this->getOldValue('calendarId');
+			if(isset($oldCalId)) {
+				Calendar::updateHighestModSeq($oldCalId);
+			}
 		}
 	}
 
-	public function uri($uri = null) {
-		if($uri === null)
-			return $this->uri;
-		$this->uri = $uri;
+	public function uri($uri = null)
+	{
+		if ($uri !== null) {
+			$this->uri = $uri;
+		}
+
+		return $this->uri;
 	}
 
 	public function etag($v = null) {
@@ -496,6 +481,52 @@ class CalendarEvent extends AclItemEntity {
 		}
 	}
 
+
+	/**
+	 * Will create Psuedo CalendarEvent objects from a recurring event.
+	 * All recurrence exceptions will be patched copies with the recurrenceId set
+	 * @return \Generator | [recurrenceId:string]:CalendarEvent
+	 */
+	public function overrides($modifiedOnly = false) {
+		if($this->isInstance()) {
+			return; // yield nothing
+		}
+
+		if(isset($this->recurrenceOverrides)) {
+			foreach ($this->recurrenceOverrides as $recurrenceId => $override) {
+				if (!$modifiedOnly || $override->isModified()) {
+					if($override->excluded) {
+						yield $recurrenceId => $override;
+					} else
+						yield $recurrenceId => $this->patchedInstance($recurrenceId);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @throws JsonPointerException
+	 * @throws Exception
+	 */
+	public function patchedInstance(string $recurrenceId) : CalendarEvent {
+		$patchArray = $this->recurrenceOverrides[$recurrenceId]->toArray();
+
+		//if start is not patched then we must set the recurrence ID to set the right time
+		if(!isset($patchArray['start'])) {
+			$patchArray['start'] = new DateTime($recurrenceId);
+		}
+
+		$e = JSON::patch($this->copy(), $patchArray);
+		$e->recurrenceId = $recurrenceId;
+		unset($e->recurrenceRule, $e->recurrenceOverrides); // , $e->sentBy, $e->relatedTo,
+		return $e;
+		//return (new self())->setValues(array_merge($this->toArray(), $patch->toArray()));
+	}
+
+	public function isInstance() {
+		return !empty($this->recurrenceId);
+	}
+
 	protected function internalSave() : bool {
 
 		if(empty($this->uri)) {
@@ -504,6 +535,10 @@ class CalendarEvent extends AclItemEntity {
 
 		if($this->isNew() || $this->isModified(['start','duration','recurrenceRule','recurrenceOverrides'])) {
 			$this->updateOccurrenceSpan();
+		}
+
+		if(!$this->isNew() && $this->isRecurring() && $this->isModified('start')) {
+			$this->reindexRecurrenceOverrides();
 		}
 
 		$this->resetICalBlob();
@@ -522,7 +557,7 @@ class CalendarEvent extends AclItemEntity {
 
 				$currPart = $this->calendarParticipant();
 				if ($currPart && !$currPart->isOwner()) { // not owner
-					if ($this->isModified(self::EventProperties)) {
+					if ($this->isModified(self::OwnerOnlyProperties)) {
 						throw new Forbidden('Trying to change properties but not the organizer');
 					} else if ($this->isModified(['participants'])) {
 						// we may only set our own participationStatus
@@ -562,6 +597,13 @@ class CalendarEvent extends AclItemEntity {
 			$this->incrementCalendarModSeq();
 		}
 		return $success;
+	}
+
+	public function toArray(array $properties = null): array|null
+	{
+		$arr =  parent::toArray($properties);
+		unset($arr['recurrenceId'], $arr['excluded']);
+		return $arr;
 	}
 
 	private function addToResourceCalendars() {
@@ -670,6 +712,8 @@ class CalendarEvent extends AclItemEntity {
 	 * @return false|Participant
 	 */
 	public function participantByScheduleId($email) {
+		if(empty($this->participants))
+			return false;
 		foreach($this->participants as $participant) {
 			if($participant->email === $email) { // todo Use scheduleId when ParticipantIdentity is implemented
 				return $participant;
@@ -761,12 +805,12 @@ class CalendarEvent extends AclItemEntity {
 		$recurrenceId = null;
 		$nextOccurrence = null;
 		if(!empty($this->recurrenceOverrides)) {
-			foreach ($this->recurrenceOverrides as $o) {
+			foreach ($this->recurrenceOverrides as $recurrenceId => $o) {
 				if (!empty($o->excluded)) continue;
-				$start = $o->start();
+				$start = $o->start($recurrenceId);
 				if ($start >= $now) {
 					$nextOccurrence = empty($nextOccurrence) ? $start : min($nextOccurrence, $start);
-					$recurrenceId = $o->recurrenceId();
+					$recurrenceId = $o->recurrenceId;
 				}
 			}
 		}
@@ -800,7 +844,8 @@ class CalendarEvent extends AclItemEntity {
 	 * @return void
 	 * @throws Exception
 	 */
-	private function updateOccurrenceSpan() {
+	private function updateOccurrenceSpan(): void
+	{
 		if($this->isNew() || $this->isModified('start')) {
 			$this->firstOccurrence = $this->start();
 		}
@@ -832,10 +877,10 @@ class CalendarEvent extends AclItemEntity {
 		}
 
 		if($this->isModified('recurrenceOverrides')) {
-			foreach ($this->recurrenceOverrides as $override) {
-				$this->firstOccurrence = min($this->firstOccurrence, $override->start());
+			foreach ($this->recurrenceOverrides as $recurrenceId => $override) {
+				$this->firstOccurrence = min($this->firstOccurrence, $override->start($recurrenceId));
 				if($this->lastOccurrence !== null)
-					$this->lastOccurrence = max($this->lastOccurrence, $override->end());
+					$this->lastOccurrence = max($this->lastOccurrence, $override->end($recurrenceId));
 			}
 		}
 	}
@@ -856,5 +901,31 @@ class CalendarEvent extends AclItemEntity {
 		$calendar = Calendar::findById($this->calendarId, ['name'], true);
 
 		return $calendar->name .': '. $this->title . ' - '. $this->start->format('Y-m-d');
+	}
+
+	/**
+	 * When the series start time changes all the recurrence id's must be recreated.
+	 *
+	 * @return void
+	 * @throws \DateMalformedStringException
+	 */
+	private function reindexRecurrenceOverrides(): void
+	{
+		$old = $this->getOldValue('start');
+		$oldHour = $old->format("H");
+		$oldMin = $old->format("i");
+		$newHour = $this->start->format("H");
+		$newMin = $this->start->format("i");
+
+		if($oldHour == $newHour && $newMin == $oldMin) {
+			return;
+		}
+
+		foreach($this->recurrenceOverrides as $recurrenceId => $o) {
+			$date = new DateTime($recurrenceId);
+			$date->setTime($newHour, $newMin);
+			$o->changeRecurrenceId($date);
+		}
+
 	}
 }

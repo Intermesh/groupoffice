@@ -19,7 +19,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		}
 
 
-		if(!this.currentId && this.commentComposer) {//} && this.role == "support") {
+		if (!this.currentId && this.commentComposer) {//} && this.role == "support") {
 			this.commentComposer.show();
 			this.commentComposer.editor.allowBlank = this.role !== "support";
 			if(this.role === "support") {
@@ -34,8 +34,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 				if(this.commentComposer.editor.getValue() != "")
 					this.commentComposer.save(this.role == "support" ? "SupportTicket" : "Task", this.currentId);
 			}, {single:true})
-		} else
-		{
+		} else {
 			this.commentComposer.hide();
 			this.commentComposer.editor.allowBlank = true;
 			this.descriptionFieldset.show();
@@ -60,6 +59,13 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 				}
 				break;
 		}
+	},
+
+	onLoad: function() {
+		if (go.User.tasksSettings && !this.tasklistCombo.value) {
+			this.tasklistCombo.value = this.initialConfig.role === "support" ? go.User.supportSettings.defaultTasklistId : go.User.tasksSettings.defaultTasklistId;
+		}
+
 	},
 
 	setLinkEntity: function (cfg) {
@@ -325,10 +331,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 								this.recurrenceField
 							]
 						},
-
-
-
-
 					},
 					{
 						xtype: "fieldset",
@@ -357,7 +359,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 								})
 
 								]
-						},
+							},
 							{
 								xtype: "chips",
 								entityStore: "TaskCategory",
@@ -421,8 +423,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 
 		});
-
-
 		if(go.Modules.isAvailable("community", "comments")) {
 			this.commentComposer = new go.modules.comments.ComposerFieldset();
 			const pnl = propertiesPanel.items.itemAt(0);

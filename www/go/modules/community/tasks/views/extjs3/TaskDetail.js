@@ -243,7 +243,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 
 	initToolbar: function () {
 
-		var items = this.tbar || [];
+		let items = this.tbar || [];
 
 		items = items.concat([
 			// new go.detail.ScrollToToButton(),

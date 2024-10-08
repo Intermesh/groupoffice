@@ -19,6 +19,7 @@ export class ListView extends CalendarView {
 		this.style = {height:'100%'};
 		this.el.append(this.listEl = E('ul'));
 		this.detail = new EventDetail();
+		this.detail.width = 440;
 		this.items.add(
 			splitter({resizeComponentPredicate: this.detail}),
 			this.detail

@@ -95,7 +95,7 @@ export class ParticipantField extends Component {
 									const email = me.input!.value;
 									this.addParticipant({id:email,email});
 									me.menu.hide();
-									me.value = null;
+									me.value = "";
 								}
 							}
 						});
@@ -105,7 +105,7 @@ export class ParticipantField extends Component {
 						if(record)
 							this.addParticipant(record);
 
-						me.value=null;
+						me.value = "";
 					}
 				},
 				list:table({

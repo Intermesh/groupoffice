@@ -22,32 +22,29 @@ class Scheduler {
 	 */
 	static public function handle(CalendarEvent $event, bool $willDelete = false) {
 
-		// TODO: Series has no participants but override does?!?
-		if(empty($event->participants) || $event->isInPast())
+		if($event->isInPast())
 			return;
 
 		$current = $event->calendarParticipant();
-
-		if(empty($current) ||
-			(!$event->isOrigin && !$current->isModified('participationStatus'))) {
-			return;
+		if(!empty($current) && ($willDelete || $event->isModified('participants') || $event->isModified(self::EssentialScheduleProps))) {
+			if ($current->isOwner()) {
+				$newOnly = !$willDelete && $event->isModified('participants') && !$event->isModified(self::EssentialScheduleProps);
+				$method = $willDelete ? 'CANCEL' : 'REQUEST';
+				self::organizeImip($event, $current, $method, $newOnly);
+			} else if (!empty($event->replyTo) && $current->isModified('participationStatus')) {
+				$status = $willDelete ? Participant::Declined : $current->participationStatus;
+				self::replyImip($event, $current, $status);
+			}
 		}
 
-		if ($current->isOwner()) {
-			$newOnly = !$willDelete && $event->isModified('participants') && !$event->isModified(self::EssentialScheduleProps);
-			self::organizeImip($event, $willDelete ? 'CANCEL': 'REQUEST', $newOnly);
-		} else if(!empty($event->replyTo)) { // !$event->isOrigin
-
-			$status = $willDelete ? Participant::Declined : $current->participationStatus;
-			self::replyImip($event, $status);
-			//$title = ucfirst($status);
+		foreach ($event->overrides(true) as $exception) {
+			self::handle($exception, $willDelete || $exception->excluded);
 		}
 
 	}
 
-	private static function replyImip(CalendarEvent $event, $status) {
+	private static function replyImip(CalendarEvent $event, $participant, $status) {
 
-		$participant = $event->calendarParticipant();
 		$organizer = $event->organizer();
 		if(!empty($participant->language)) {
 			$old = go()->getLanguage()->setLanguage($participant->language);
@@ -62,7 +59,6 @@ class Scheduler {
 		// filter our other participants
 		foreach($ics->vevent as $vevent) {
 			if(isset($vevent->attendee)) {
-				$filtered = [];
 				foreach($vevent->attendee as $a) {
 					if('mailto:'.strtolower($participant->email) !== (string) $a) {
 						$vevent->remove($a);
@@ -116,7 +112,7 @@ class Scheduler {
 	 * @param $newOnly boolean Only send if participant was added
 	 * @return boolean
 	 */
-	private static function organizeImip(CalendarEvent $event, $method, $newOnly = false) {
+	private static function organizeImip(CalendarEvent $event, $organizer, $method, $newOnly = false) {
 		$success=true;
 
 
@@ -124,7 +120,6 @@ class Scheduler {
 		// participant could have been added as well.
 		$ics = ICalendarHelper::toInvite($method,$event);
 
-		$organizer = $event->calendarParticipant(); // must be organizer at this point
 		foreach($event->participants as $participant) {
 			/** @var $participant Participant */
 			if(($newOnly && !$participant->isNew()) || $participant->isOwner() || $participant->scheduleAgent !== 'server')
@@ -139,8 +134,6 @@ class Scheduler {
 				$subject .= ' ('.go()->t('updated', 'community', 'calendar').')';
 			}
 
-
-
 			try {
 				go()->getMailer()->compose()
 						->setSubject($subject . ': ' . $event->title)
@@ -150,7 +143,6 @@ class Scheduler {
 						->attach(Attachment::fromString($ics->serialize(),
 							'invite.ics',
 							'text/calendar;method=' . $method . ';charset=utf-8', Attachment::ENCODING_8BIT)
-							//->setInline(true)
 						)
 						->setBody(self::mailBody($event, $method, $participant, $subject), 'text/html')
 						->send();
@@ -249,9 +241,15 @@ class Scheduler {
 		$itip = [
 			'method' => $method,
 			'scheduleId' => $accountEmail,
-			'event' => $event
+			'event' => $event,
+			'recurrenceId' => empty($vevent->{"RECURRENCE-ID"}) ? null : $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s')
 		];
 		if($method ==='REPLY' && isset($event)) {
+
+			if(!empty($itip['recurrenceId'])) {
+				$event = $event->patchedInstance($itip['recurrenceId']);
+			}
+
 			$p = $event->participantByScheduleId($from['email']);
 			if($p) {
 				$lang = go()->t('replyImipBody', 'community', 'calendar');
@@ -266,17 +264,41 @@ class Scheduler {
 		return $itip;
 	}
 
+	/**
+	 * Will save the event to the calendar and return the celabnder event.
+	 *
+	 * If it's a series it will return the occurrence where this message is about
+	 *
+	 * @param VCalendar $vcalendar
+	 * @param string $receiver
+	 * @param object $sender
+	 * @return CalendarEvent|null
+	 * @throws SaveException
+	 */
 	static function processMessage(VCalendar $vcalendar, string $receiver, object $sender) : ?CalendarEvent{
 
+		// old framework sets user timezone :(
+		date_default_timezone_set("UTC");
+
+		$method = $vcalendar->method->getValue();
 		$vevent = $vcalendar->VEVENT[0];
 
-		$existingEvent = CalendarEvent::findByUID((string)$vevent->uid, $receiver)->single();
+
+
+		$existingEvent = CalendarEvent::findByUID((string)$vevent->uid, $receiver)
+			->andWhere('recurrenceId','=', null)->single();
+
+		// if the current user doesn't have the main event of an recurrence we might have it saved for a single recurrence ID
+		if(!$existingEvent && !empty($vevent->{'RECURRENCE-ID'})) {
+			$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
+			$existingEvent = CalendarEvent::findByUID((string)$vevent->uid, $receiver)
+				->andWhere('recurrenceId','=', $recurId)->single();
+		}
+
 		// If the existing event has isOrigin=true all below does is add new REQUESTS to the calendar.
 		// We might do that up front and skip all the below processing instead.
 
-
-
-		switch($vcalendar->method->getValue()){
+		switch($method){
 			case 'REQUEST': return self::processRequest($vcalendar,$receiver,$existingEvent);
 			case 'CANCEL': return $existingEvent ? self::processCancel($vcalendar,$existingEvent) : null;
 			case 'REPLY': return $existingEvent ? self::processReply($vcalendar,$existingEvent, $sender) : null;
@@ -293,12 +315,30 @@ class Scheduler {
 		}
 		$calId = Calendar::fetchDefault($receiver);
 		$event = ICalendarHelper::parseVObject($vcalendar, $existingEvent);
+		if(isset($event->participants))
 		foreach($event->participants as $p) {
 			if($p->email == $receiver && $p->kind == 'resource') {
 				return $event; // Do not put the event in the resource admin its calendar
 			}
 		}
 		return Calendar::addEvent($event, $calId);
+
+//		if($event->isRecurring()) {
+//
+//			foreach ($vcalendar->VEVENT as $vevent) {
+//
+//				if(!empty($vevent->{'RECURRENCE-ID'})) {
+//					$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
+//
+//					if (isset($event->recurrenceOverrides[$recurId])) {
+//						$exEvent = $event->patchedInstance($recurId);
+//						return $exEvent;
+//					}
+//				}
+//			}
+//
+//			return $event;
+//		}
 	}
 
 	private static function processCancel(VCalendar $vcalendar, CalendarEvent $existingEvent) : CalendarEvent {
@@ -310,7 +350,7 @@ class Scheduler {
 					if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
 						$existingEvent->recurrenceOverrides[$recurId] = (new RecurrenceOverride($existingEvent));
 					}
-					$existingEvent->recurrenceOverrides[$recurId]->setValues(['status' => CalendarEvent::Cancelled]);
+					$existingEvent->recurrenceOverrides[$recurId]->patchProps((object)['status' => CalendarEvent::Cancelled]);
 				} else {
 					$existingEvent->status = CalendarEvent::Cancelled;
 				}
@@ -347,25 +387,7 @@ class Scheduler {
 			if(isset($vevent->{'RECURRENCE-ID'})) {// occurrence
 				$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
 
-				if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
-					// TODO: check if the given RECURRENCE-ID is valid for $existingEvent->recurrenceRule
-					// If it is not valid an extra instance would be created (RDATE in iCal) GroupOffice does not display these at the moment.
-					$existingEvent->recurrenceOverrides[$recurId] = new RecurrenceOverride($existingEvent);
-					$p = $existingEvent->participantByScheduleId($sender->email);
-				} else {
-					$exEvent = $existingEvent->copyPatched($existingEvent->recurrenceOverrides[$recurId], $recurId);
-					$p = $exEvent->participantByScheduleId($sender->email);
-				}
-				if(!$p) continue;
-				if (empty($p->scheduleUpdated) || $p->scheduleUpdated < $replyStamp) {
-
-					// had to use setValues instead of patchProps here?
-					$k = 'participants/'.$p->pid();
-					$existingEvent->recurrenceOverrides[$recurId]->setValues([
-						$k.'/participationStatus' => $status,
-						$k.'/scheduleUpdated' => $replyStamp->format("Y-m-d\TH:i:s"),
-					]);
-				}
+				self::updateRecurrenceStatus($existingEvent, $recurId, $sender->email, $status, $replyStamp);
 
 			} else {
 				// APPLY EVENT
@@ -383,6 +405,41 @@ class Scheduler {
 		if(!$existingEvent->save()) {
 			throw new SaveException($existingEvent);
 		}
-		return $exEvent ?? $existingEvent;
+		return $existingEvent;
+	}
+
+
+	public static function updateRecurrenceStatus(CalendarEvent $existingEvent, string $recurId, string $email, string $status, DateTime $replyStamp): void
+	{
+		if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
+			// TODO: check if the given RECURRENCE-ID is valid for $existingEvent->recurrenceRule
+			// If it is not valid an extra instance would be created (RDATE in iCal) GroupOffice does not display these at the moment.
+			$existingEvent->recurrenceOverrides[$recurId] = new RecurrenceOverride($existingEvent);
+			$exEvent = $existingEvent->patchedInstance($recurId);
+		} else {
+			$exEvent = $existingEvent->patchedInstance($recurId);
+		}
+
+		if( isset($exEvent->participants)) {
+			$modifiedParticipants = $exEvent->participants;
+			$modified = false;
+			foreach ($modifiedParticipants as &$p) {
+				if ($p->email != $email) {
+					continue;
+				}
+				if (empty($p->scheduleUpdated) || $p->scheduleUpdated < $replyStamp) {
+
+					$p->scheduleUpdated = $replyStamp->format("Y-m-d\TH:i:s");
+					$p->participationStatus = $status;
+
+					$modified = true;
+				}
+			}
+			if ($modified) {
+				$existingEvent->recurrenceOverrides[$recurId]->patchProps(
+					(object)['participants' => $modifiedParticipants]
+				);
+			}
+		}
 	}
 }

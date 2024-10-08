@@ -191,7 +191,7 @@ trait SearchableTrait {
 
 //	private function getCommentKeywords(array $keywords) : array {
 //		if(Module::isInstalled("community", "comments")) {
-//			$comments = Comment::findFor($this, ['text']);
+//			$comments = Comment::findForEntity($this, ['text']);
 //			foreach($comments as $comment) {
 //				$plain = strip_tags($comment->text);
 //				$keywords = array_merge($keywords, StringUtil::splitTextKeywords($plain));

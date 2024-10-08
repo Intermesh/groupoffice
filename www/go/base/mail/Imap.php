@@ -3,6 +3,7 @@
 namespace GO\Base\Mail;
 
 use Exception;
+use GO;
 use GO\Base\Fs\File;
 use GO\Base\Mail\Exception\ImapAuthenticationFailedException;
 
@@ -2560,11 +2561,13 @@ class Imap extends ImapBodyStruct
 	 * for each run of $command.
 	 * @param string $command IMAP command
 	 * @param array $uids Array of UIDs
-	 * @param boolean $trackErrors passed as third argument to $this->check_response()
-	 * @return boolean
+	 * @param ?bool $trackErrors passed as third argument to $this->check_response()
+	 * @return bool
+	 * @throws Exception
 	 */
-	private function _runInChunks($command, $uids, $trackErrors=true){
-		$status=false;
+	private function _runInChunks($command, $uids, $trackErrors = true): bool
+	{
+		$status = false;
 		$uid_strings = array();
 		if (empty($uids))
 			return true;
@@ -2576,8 +2579,7 @@ class Imap extends ImapBodyStruct
 			if (count($uids)) {
 				$uid_strings[] = implode(',', $uids);
 			}
-		}
-		else {
+		} else {
 			$uid_strings[] = implode(',', $uids);
 		}
 
@@ -2585,7 +2587,7 @@ class Imap extends ImapBodyStruct
 			if ($uid_string) {
 				$this->clean($uid_string, 'uid_list');
 			}
-			$theCommand = sprintf($command,$uid_string);
+			$theCommand = sprintf($command, $uid_string);
 			$this->send_command($theCommand);
 			$res = $this->get_response();
 			$status = $this->check_response($res, false, $trackErrors);
@@ -2626,14 +2628,20 @@ class Imap extends ImapBodyStruct
 	/**
 	 * Copy a message from the currently selected mailbox to another mailbox
 	 *
-	 * @param <type> $uids
-	 * @param <type> $mailbox
+	 * @param array $uids
+	 * @param string $mailbox
 	 * @return bool
+	 * @throws Exception
 	 */
 	public function copy(array $uids, $mailbox='INBOX') :bool
 	{
 		$this->clean($mailbox, 'mailbox');
 
+		// commands with a percent sign already in them (e.g. a folder name) will break sprintf.
+		// We prevent this by escaping it with another percent sign.
+		if (str_contains($mailbox, '%')) {
+			$mailbox = str_replace('%', '%%', $mailbox);
+		}
 		$command = "UID COPY %s \"".$this->addslashes($this->utf7_encode($mailbox))."\"\r\n";
 		$status = $this->_runInChunks($command, $uids);
 		return $status;
@@ -2646,6 +2654,7 @@ class Imap extends ImapBodyStruct
 	 * @param string $mailbox
 	 * @param bool $expunge
 	 * @return bool
+	 * @throws Exception
 	 */
 	public function move(array $uids, $mailbox='INBOX', $expunge=true)
 	{
@@ -2657,12 +2666,17 @@ class Imap extends ImapBodyStruct
 
 			return $this->delete($uids);
 		}
+		// commands with a percent sign already in them (e.g. a folder name) will break sprintf.
+		// We prevent this by escaping it with another percent sign.
+		if (str_contains($mailbox, '%')) {
+			$mailbox = str_replace('%', '%%', $mailbox);
+		}
 
 		$this->clean($mailbox, 'mailbox');
 
-    $command = "UID MOVE %s \"".$this->addslashes($this->utf7_encode($mailbox))."\"\r\n";
-    $status = $this->_runInChunks($command, $uids);
-    return $status;
+	    $command = "UID MOVE %s \"".$this->addslashes($this->utf7_encode($mailbox))."\"\r\n";
+	    $status = $this->_runInChunks($command, $uids);
+	    return $status;
 
 	}
 
@@ -2724,6 +2738,12 @@ class Imap extends ImapBodyStruct
 		return $success;
 	}
 
+	/**
+	 * @param string $mailbox
+	 * @return array
+	 * @deprecated / not in use!
+	 * @throws Exception
+	 */
 	public function get_folder_tree(string $mailbox)
 	{
 		$this->clean($mailbox, 'mailbox');
@@ -2737,6 +2757,7 @@ class Imap extends ImapBodyStruct
 	 * @param string $mailbox
 	 * @param string $new_mailbox
 	 * @return bool
+	 * @throws Exception
 	 */
 	public function rename_folder(string $mailbox, string $new_mailbox): bool
 	{

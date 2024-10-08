@@ -1,4 +1,5 @@
 delete from calendar_calendar;
+delete from calendar_calendar_event;
 delete from calendar_event;
 delete from calendar_event_custom_fields;
 delete from calendar_event_alert;

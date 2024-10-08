@@ -84,4 +84,5 @@ return array (
   'Show project tasks' => 'Zeige Projektaufgaben',
   'Unknown user' => 'Unbekannter Benutzer',
   'A new task was created in your list by {creator}' => 'Eine neue Aufgabe wurde erstellt von {assigner}',
+  '\'"This customer doesn\'\'t have an active contract"\'' => 'Dieser Kunde hat keinen aktiven Vertrag',
 );

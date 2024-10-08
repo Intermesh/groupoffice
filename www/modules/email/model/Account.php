@@ -423,9 +423,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 			$acct = \go\modules\community\email\model\Account::findById($this->id);
 			$acctSettings = $acct->oauth2_account;
 			if($acctSettings) {
-				if(!$token = $acctSettings->token) {
-					throw new ImapAuthenticationFailedException('OAuth2: Error retrieving token. Please update your refresh token.');
-				}
+
 				$client = Oauth2Client::findById($acctSettings->oauth2ClientId);
 				$tokenParams = [
 					'access_token' => $acctSettings->token,
@@ -434,6 +432,13 @@ class Account extends \GO\Base\Db\ActiveRecord
 				];
 
 				$client->maybeRefreshAccessToken($acct, $tokenParams);
+
+				//token may have been changed
+				$token = $acct->oauth2_account->token;
+
+				if(!$token) {
+					throw new ImapAuthenticationFailedException('OAuth2: Error retrieving token. Please update your refresh token.');
+				}
 
 				$defaultClientId = $client->defaultClientId;
 				$auth = strtolower(DefaultClient::findById($defaultClientId)->authenticationMethod);

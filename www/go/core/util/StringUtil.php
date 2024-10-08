@@ -23,6 +23,17 @@ use Transliterator;
  */
 class StringUtil {
 
+	/**
+	 * Convert a boolean value to something a human understands in their mother tongue
+	 *
+	 * @param bool $value
+	 * @return string
+	 */
+	public static function booleanToYesNo(bool $value): string
+	{
+		return $value ? go()->t("Yes") : go()->t("No");
+	}
+
   /**
    * Normalize the line end style of text.
    *
@@ -1236,17 +1247,25 @@ END;
 	 * @access public
 	 * @return float|null|bool
 	 */
-	public static function unlocalizeNumber(string $number = "")
+	public static function unlocalizeNumber(string $number = "", string $decimalSeparator = null, string $thousandsSeparator = null)
 	{
 		if ($number == "") {
 			return null;
 		}
-		$user = go()->getAuthState()->getUser(['thousandsSeparator', 'decimalSeparator']);
 
-		$ts = $user ? $user->thousandsSeparator : go()->getConfig()['default_thousands_separator'];
-		$ds = $user ? $user->decimalSeparator : go()->getConfig()['default_decimal_separator'];
-		$number = str_replace($ts, '', $number);
-		$number = str_replace($ds, '.', $number);
+		if(!isset($decimalSeparator) || !isset($thousandsSeparator)) {
+			$user = go()->getAuthState()->getUser(['thousandsSeparator', 'decimalSeparator']);
+		}
+
+		if(!isset($thousandsSeparator)) {
+			$thousandsSeparator = $user ? $user->thousandsSeparator : go()->getConfig()['default_thousands_separator'];
+		}
+		if(!isset($decimalSeparator)) {
+			$decimalSeparator = $user ? $user->decimalSeparator : go()->getConfig()['default_decimal_separator'];
+		}
+
+		$number = str_replace($thousandsSeparator, '', $number);
+		$number = str_replace($decimalSeparator, '.', $number);
 
 		if (!empty($number) && !is_numeric($number)) {
 			return false;

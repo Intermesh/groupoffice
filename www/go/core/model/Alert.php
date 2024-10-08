@@ -192,6 +192,7 @@ class Alert extends SingleOwnerEntity
 		return $this;
 	}
 
+
 	protected function internalSave(): bool
 	{
 		if(!self::$enabled) {

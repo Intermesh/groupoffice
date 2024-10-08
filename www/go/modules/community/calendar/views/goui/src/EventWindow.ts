@@ -92,11 +92,17 @@ export class EventWindow extends FormWindow {
 				valueField: 'id',
 				textRenderer: (r: any) => r.name,
 				listeners: {
+					render: () => {
+						if(!calendarStore.loaded) {
+							void calendarStore.load();
+						}
+					},
 					'setvalue': (me, v) => {
 						if(v)
 						calendarStore.dataSource.single(v).then(r => {
 							if(!r) return;
 							this.item!.cal = r;
+
 							const d = this.form.value.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
 							this.alertField.setDefaultLabel(d)
 							if(!this.item?.key && !this.participantFld.list.isEmpty()) {
@@ -132,7 +138,7 @@ export class EventWindow extends FormWindow {
 			}),
 			comp({}),
 			this.startDate = datefield({label: t('Start'), name:'start', flex:1, defaultTime: now.format('H')+':00',
-				listeners:{'change': (me,_v, oldStartDate) => {
+				listeners:{'setvalue': (me,_v) => {
 					const newStartDate = me.getValueAsDateTime(),
 						endDate = this.endDate.getValueAsDateTime(),
 						format= me.withTime ? "Y-m-dTH:i" : 'Y-m-d';
@@ -141,23 +147,22 @@ export class EventWindow extends FormWindow {
 					}
 
 					if (endDate && newStartDate && newStartDate.date > endDate.date) {
-						const oldStart = DateTime.createFromFormat(oldStartDate, format)!,
-							duration = oldStart.diff(endDate);
-						this.endDate.value = newStartDate.add(duration).format(format);
+						this.endDate.value = newStartDate.clone()
+							.add(new DateInterval(client.user.calendarPreferences.defaultDuration))
+							.format(format);
 					}
 				}}
 			}),
 			this.endDate = datefield({label:t('End'), name: 'end', flex:1, defaultTime: (now.getHours()+1 )+':00',
-				listeners: {'change': (me,_v,oldEndDate) => {
+				listeners: {'setvalue': (me,_v) => {
 					const newEndDate = me.getValueAsDateTime(),
 						startDate = this.startDate.getValueAsDateTime(),
 						format= me.withTime ? "Y-m-dTH:i" : 'Y-m-d';
 
 					if (newEndDate && startDate && newEndDate.date < startDate.date) {
-
-						const oldEnd = DateTime.createFromFormat(oldEndDate, format)!,
-							duration = oldEnd.diff(startDate);
-						this.startDate.value = newEndDate.add(duration).format(format);
+						this.startDate.value = newEndDate.clone()
+							.add(new DateInterval('-'+client.user.calendarPreferences.defaultDuration))
+							.format(format);
 					}
 					if(newEndDate && this.item) {
 						this.item.end = newEndDate; // for isInPast
@@ -299,12 +304,15 @@ export class EventWindow extends FormWindow {
 	}
 
 	parseSavedData(data: any) {
+
 		const end = this.endDate.getValueAsDateTime()!,// DateTime.createFromFormat(data.end, 'Y-m-dTh:i'),
 			start = this.startDate.getValueAsDateTime()!;
-		if(this.form.value.showWithoutTime && data.start) {
+		if(this.form.value.showWithoutTime) {
 			end.setHours(0,0,0).addDays(1);
 			start.setHours(0,0,0);
-			data.start = start.format('Y-m-d');// remove time
+
+			if(data.start)
+				data.start = start.format('Y-m-d');// remove time
 		}
 		if(this.alertField.isModified() || !this.item?.data.id) {
 			data.useDefaultAlerts = this.alertField.useDefault;

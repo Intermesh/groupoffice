@@ -241,8 +241,12 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 		var items = all.map(function(e) {
 			var panel = e.linkDetail();
 			panel.itemId = e.entity;
-			
-			return panel;
+
+			if(panel.getItemId) {
+				return panel;
+			}else {
+				return new go.GOUIWrapper({itemId: e.entity,comp:panel, load: (id) => {panel.load(id)}});
+			}
 		});
 		
 		// console.log(items);

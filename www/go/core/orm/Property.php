@@ -378,22 +378,20 @@ abstract class Property extends Model {
 			case Relation::TYPE_MAP:
 
 				if(!$shouldQuery) {
-					$prop = null;
+					$prop = [];
 				} else
 				{
 					$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly, $this);
 					$prop = $stmt->fetchAll();
 					$stmt->closeCursor();
-					if(empty($prop)) {
-						$prop = null; //Set to null. Otherwise JSON will be serialized as [] instead of {}
-					}	else{
-						$o = [];
-						foreach($prop as $v) {
-							$key = $this->buildMapKey($v, $relation);
-							$o[$key] = $v;
-						}
-						$prop = $o;
+
+					$o = [];
+					foreach($prop as $v) {
+						$key = $this->buildMapKey($v, $relation);
+						$o[$key] = $v;
 					}
+					$prop = $o;
+
 				}
 
 				$this->{$relation->name} = $prop;
@@ -881,11 +879,12 @@ abstract class Property extends Model {
 	 * @param array $fetchProperties
 	 * @param bool $readOnly
 	 * @param Property|null $owner When finding relations the owner or parent Entity / Property is passed so the children can access it.
+	 * @param int|null $userId Join user tables as this user
 	 * @return Query<$this>
-	 * @noinspection PhpReturnDocTypeMismatchInspection
 	 * @throws Exception
 	 */
-	protected static function internalFind(array $fetchProperties = [], bool $readOnly = false, Property $owner = null) {
+	protected static function internalFind(array $fetchProperties = [], bool $readOnly = false, Property $owner = null, ?int $userId = null): Query
+	{
 
 		$tables = self::getMapping()->getTables();
 
@@ -909,7 +908,7 @@ abstract class Property extends Model {
 			$query->mergeWith($mappedQuery);
 		}
 
-		self::joinAdditionalTables($tables, $query);
+		self::joinAdditionalTables($tables, $query, $userId);
 		self::buildSelect($query, $fetchProperties, $readOnly);
 
 		return clone $query;
@@ -1031,31 +1030,34 @@ abstract class Property extends Model {
 
 	}
 
-  /**
-   *
-   * It's not possible to use fetchproperties to determine if they need to be joined. Because the props
-   * can also be used in the where or order by part of the query.
-   *
-   * @param array $tables
-   * @param Query $query
-   *
-   */
-	private static function joinAdditionalTables(array $tables, Query $query) {
+	/**
+	 *
+	 * It's not possible to use fetchproperties to determine if they need to be joined. Because the props
+	 * can also be used in the where or order by part of the query.
+	 *
+	 * @param array $tables
+	 * @param Query $query
+	 * @param int|null $userId
+	 */
+	private static function joinAdditionalTables(array $tables, Query $query, ?int $userId): void
+	{
 		$first = array_shift($tables);
 
 		$alias = $first->getAlias();
 		foreach ($tables as $joinedTable) {
-			static::joinTable($alias, $joinedTable, $query);
+			static::joinTable($alias, $joinedTable, $query, $userId);
 			$alias = $joinedTable->getAlias();
 		}
 	}
 
-  /**
-   * @param $lastAlias
-   * @param MappedTable $joinedTable
-   * @param Query $query
-   */
-	private static function joinTable($lastAlias, MappedTable $joinedTable, Query $query) {
+	/**
+	 * @param $lastAlias
+	 * @param MappedTable $joinedTable
+	 * @param Query $query
+	 * @param int|null $userId
+	 */
+	private static function joinTable($lastAlias, MappedTable $joinedTable, Query $query, ?int $userId): void
+	{
 
 		$on = "";
 		foreach ($joinedTable->getKeys() as $from => $to) {
@@ -1063,11 +1065,11 @@ abstract class Property extends Model {
 				$on .= " AND ";
 			}
 
-			if(strpos($from, '.') === false) {
+			if(!str_contains($from, '.')) {
 				$from = $lastAlias . "." . $from;
 			}
 
-			if(strpos($to, '.') === false) {
+			if(!str_contains($to, '.')) {
 				$to = $joinedTable->getAlias() . "." . $to;
 			}
 
@@ -1075,12 +1077,16 @@ abstract class Property extends Model {
 		}
 
 		if($joinedTable->isUserTable) {
-			if(!go()->getUserId()) {
-				//throw new \Exception("Can't join user table when not authenticated");
+
+			if($userId == null) {
+				$userId = go()->getUserId();
+			}
+
+			if($userId == null) {
 				go()->debug("Can't join user table when not authenticated");
 				return;
 			}
-			$on .= " AND " . $joinedTable->getAlias() . ".userId = " . go()->getUserId();
+			$on .= " AND " . $joinedTable->getAlias() . ".userId = " . $userId;
 		}
 
 		if(!empty($joinedTable->getConstantValues())) {
@@ -1705,7 +1711,7 @@ abstract class Property extends Model {
 
 			//Check for invalid input
 			if(!($newProp instanceof Property)) {
-				throw new Exception("Invalid value given for '". $relation->name ."'. Should be a GO\Orm\Property");
+				throw new Exception("Invalid value given for '". $relation->name ."'. Should be a go\core\orm\Property");
 			}
 
 			$this->applyRelationKeys($relation, $newProp);
@@ -1714,7 +1720,9 @@ abstract class Property extends Model {
 			// Fixed it by recognizing _NEW_* as a map key that should not be applied as property
 			foreach ($this->mapKeyToValues($mapKey, $relation) as $propName => $value) {
 				if(empty($newProp->$propName)) {
-					$newProp->$propName = $value;
+					// normalize input here. In some cases a DateTime object can be used as key
+					$col = $newProp::getMapping()->getColumn($propName);
+					$newProp->$propName = $col->normalizeInput($value);
 				}
 			}
 
@@ -1801,7 +1809,8 @@ abstract class Property extends Model {
 	 * @param Query $query
 	 * @throws DbException
 	 */
-	protected function updateTableRecord(Table $table, array $record, Query $query) {
+	protected function updateTableRecord(Table $table, array $record, Query $query): void
+	{
 		$stmt = go()->getDbConnection()->update($table->getName(), $record, $query);
 		$stmt->execute();
 	}
@@ -2182,7 +2191,18 @@ abstract class Property extends Model {
 			$properties = $this->fetchProperties;
 		}
 
-		return parent::toArray($properties);
+		$arr = parent::toArray($properties);
+
+		// change empty maps into null so that the JSON will be null instead of []
+		foreach(static::getMapping()->getRelations() as $relation) {
+			if($relation->type == Relation::TYPE_MAP) {
+				if(array_key_exists($relation->name, $arr) && empty($arr[$relation->name])) {
+					$arr[$relation->name] = null;
+				}
+			}
+		}
+
+		return $arr;
 	}
 
   /**
@@ -2333,7 +2353,9 @@ abstract class Property extends Model {
 
 						foreach ($this->mapKeyToValues($id, $relation) as $key => $value) {
 							if (empty($this->$propName[$id]->$key)) {
-								$this->$propName[$id]->$key = $this->$propName[$id]->normalizeValue($key,$value);
+
+								$col = $this->$propName[$id]::getMapping()->getColumn($key);
+								$this->$propName[$id]->$key = $col->normalizeInput($value);
 							}
 						}
 					} else {
@@ -2598,7 +2620,7 @@ abstract class Property extends Model {
 			$col = static::getMapping()->getColumn($name);
 			if($col) {
 				if(!$col->autoIncrement) {
-					$v = $this->$name;
+					$v = isset($this->$name) ? $this->$name : null;
 					if(is_object($v)) {
 						$copy->$name = clone $v;
 					}	else {

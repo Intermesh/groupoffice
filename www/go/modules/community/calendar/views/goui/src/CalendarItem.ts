@@ -4,20 +4,21 @@ import {
 	comp,
 	DateInterval,
 	DateTime,
-	E, EntityID, MaterialIcon,
+	E, EntityID, MaterialIcon, ObjectUtil,
 	tbar, Timezone,
-	win
+	win, Window
 } from "@intermesh/goui";
 import {calendarStore, t} from "./Index.js";
-import {applyPatch, client, jmapds, Recurrence} from "@intermesh/groupoffice-core";
+import {client, jmapds, Recurrence} from "@intermesh/groupoffice-core";
 import {EventWindow} from "./EventWindow.js";
 import {EventDetailWindow} from "./EventDetail.js";
 
-export type RecurrenceOverride = {[recurrenceId:string]: (Partial<CalendarEvent> & {excluded?:boolean})};
+export type RecurrenceOverride = (Partial<CalendarEvent> & {excluded?:boolean});
+export type RecurrenceOverrides = {[recurrenceId:string]: RecurrenceOverride};
 export interface CalendarEvent extends BaseEntity {
 	id: EntityID
 	recurrenceRule?: any
-	recurrenceOverrides?: RecurrenceOverride
+	recurrenceOverrides?: RecurrenceOverrides
 	links?: any
 	alerts?: any
 	showWithoutTime?: boolean // isAllDay
@@ -44,7 +45,7 @@ interface CalendarItemConfig {
 	start?: DateTime
 	end?: DateTime
 	open?:() => void
-	//color?: string
+	defaultColor?: string
 }
 
 /**
@@ -71,18 +72,22 @@ export class CalendarItem {
 	cal: any
 
 	divs: {[week: string] :HTMLElement}
+	defaultColor?: string
 
 	constructor(obj:CalendarItemConfig) {
 		Object.assign(this,obj);
 
 
-		this.patched = applyPatch(structuredClone(obj.data), obj.override);
+		this.patched = ObjectUtil.patch(structuredClone(obj.data), obj.override) as CalendarEvent;
 		 if(obj.recurrenceId && (!obj.override || !obj.override.start))
 		 	this.patched.start = obj.recurrenceId;
  		// if(obj.override)
 		 // 	debugger;
 		if(!obj.start) {
 			this.start = new DateTime(this.patched.start);
+			if(this.data.showWithoutTime) {
+				this.start.setHours(0,0,0,0);
+			}
 		}
 		if(obj.data.timeZone) {
 			this.start.timezone = this.patched.timeZone;
@@ -109,6 +114,21 @@ export class CalendarItem {
 
 	private isTimeModified() {
 		return this.isNew() || this.initStart !== this.start.format('Y-m-d\TH:i:s') || this.initEnd !== this.end.format('Y-m-d\TH:i:s');
+	}
+
+	patchedInstance(recurrenceId:string) {
+		// debugger;
+		if(!this.data.recurrenceRule || !this.data.recurrenceOverrides || !this.data.recurrenceOverrides[recurrenceId]) {
+			throw "Not found";
+		}
+
+		const o = this.data.recurrenceOverrides![recurrenceId] as RecurrenceOverride;
+
+		if(o.excluded) {
+			throw "Not found";
+		}
+
+		return new CalendarItem({key: this.data.id + '/' + recurrenceId, recurrenceId, override: o, data: this.data});
 	}
 
 	static *expand(e: CalendarEvent, from: DateTime, until: DateTime) : Generator<CalendarItem> {
@@ -148,7 +168,7 @@ export class CalendarItem {
 	}
 
 	get isRecurring() {
-		return this.key.includes('/') || (!this.key && 'recurrenceRule' in this.data);
+		return this.key.includes('/') || this.data.recurrenceRule;
 	}
 
 	get isOverride() {
@@ -172,7 +192,7 @@ export class CalendarItem {
 	}
 
 	get color() {
-		return this.cal?.color || '356772';
+		return this.cal?.color || this.defaultColor || '356772';
 	}
 
 	get participants() {
@@ -237,6 +257,8 @@ export class CalendarItem {
 		}
 		dlg.show();
 		dlg.loadEvent(this);
+
+		return dlg;
 	}
 
 	downloadIcs(){
@@ -244,7 +266,6 @@ export class CalendarItem {
 	}
 
 	confirmScheduleMessage(modified: Partial<CalendarEvent>|false, onAccept: ()=>void) {
-		Object.assign(this.data, modified);
 		const type = this.shouldSchedule(modified);
 		if(type) {
 			const askScheduleWin = win({
@@ -262,10 +283,18 @@ export class CalendarItem {
 						text: t('Cancel'), handler: () => {
 							askScheduleWin.close()
 						}
-					}), '->',
+					}),'->',
+					btn({
+						text: t('Save only'), handler: () => {
+							Object.assign(this.data, modified);
+							onAccept();
+							askScheduleWin.close()
+						}
+					}),
 					btn({
 						text: t('Send'), cls:'primary', handler: () => {
 							eventDS.setParams.sendSchedulingMessages = true;
+							Object.assign(this.data, modified);
 							onAccept();
 							askScheduleWin.close()
 						}
@@ -273,6 +302,7 @@ export class CalendarItem {
 				));
 			askScheduleWin.show();
 		} else {
+			Object.assign(this.data, modified);
 			onAccept();
 		}
 	}
@@ -311,18 +341,18 @@ export class CalendarItem {
 	}
 
 	updateParticipation(status: "accepted"|"tentative"|"declined", onFinish?: () => void) {
+
 		if(!this.calendarPrincipal)
 			throw new Error('Not a participant');
 		this.calendarPrincipal.participationStatus = status;
 
-		eventDS.setParams.sendSchedulingMessages = true; //todo: use this.calendarPrincipal.expectReply ??
+		//eventDS.setParams.sendSchedulingMessages = true;
 		// should we notify a reply is sent?
-		this.patch({participants: this.participants}, onFinish,undefined,true);
-		//return eventDS.update(this.data.id, {participants: this.participants});
+		this.patch({participants: this.participants}, onFinish,undefined,false);
 	}
 
 	shouldSchedule(modified: Partial<CalendarEvent>|false) {
-		if((!this.data.isOrigin && this.key) || this.isInPast)
+		if((!this.data.isOrigin && this.key) || this.isInPast) // todo: use this.calendarPrincipal.expectReply if not owner ??
 			return;
 		if(modified === false) {
 			if(this.participants && !this.isCancelled) {
@@ -330,7 +360,10 @@ export class CalendarItem {
 			}
 			return undefined;
 		}
-		 if(modified.participants || this.participants) {
+		if(!this.isOwner) {
+			return 'status';
+		}
+		if(modified.participants || this.participants) {
 			if(!this.key) {
 				return 'new';
 			} else {
@@ -347,7 +380,14 @@ export class CalendarItem {
 	patch(modified: any, onFinish?: () => void, onCancel?: () => void, skipAsk = false) {
 		if(!this.isRecurring) {
 			this.confirmScheduleMessage(modified, () => {
-				eventDS.update(this.data.id, modified).then(onFinish)
+				const p = eventDS.update(this.data.id, modified).catch(e => {
+					void Window.error(e);
+					throw e;
+				});
+
+				if(onFinish)
+					p.then(onFinish)
+
 			});
 		} else if(this.isOverride) {
 			this.patchOccurrence(modified, onFinish);
@@ -380,13 +420,19 @@ export class CalendarItem {
 						}
 					}),
 					btn({
-						text: t(isFirstInSeries ? 'All events' : 'This and future events'), // save to series
+						text: t('This and future events'),
+						hidden : isFirstInSeries || !this.isOwner,
 						handler: _b => {
 							w.close();
-							isFirstInSeries ?
-								this.patchSeries(modified, onFinish) :
-								this.patchThisAndFuture(modified, onFinish);
-
+							this.patchThisAndFuture(modified, onFinish);
+						}
+					}),
+					btn({
+						text: t('All events'), // save to series
+						hidden: !isFirstInSeries && this.isOwner,
+						handler: _b => {
+							w.close();
+							this.patchSeries(modified, onFinish);
 						}
 					})
 				)
@@ -397,32 +443,84 @@ export class CalendarItem {
 
 	private patchSeries(modified: any, onFinish?: () => void) {
 		this.confirmScheduleMessage(modified, () => {
-			const p = eventDS.update(this.data.id, modified);
+			const p = eventDS.update(this.data.id, modified)
+				.catch(e => {
+					void Window.error(e);
+					throw e;
+				})
+
 			if(onFinish) p.then(onFinish);
 		})
 	}
 
-	// todo: per-user -per-override properties ['alert','participants'[n].participationStatus]
-	private static overridableProperties = ['start', 'duration', 'title', 'freeBusyStatus', 'participants','location','status', 'description']
+	// todo: per-user -per-override properties ['alert']
 
 	private patchOccurrence(modified: any, onFinish?: () => void) {
-		this.data.recurrenceOverrides ??= {};
-		for(const prop in modified) {
-			if(!CalendarItem.overridableProperties.includes(prop)) delete modified[prop]; // remove properties that can not be overridden
-		}
-		let o = Object.assign(
-			this.isOverride ? this.data.recurrenceOverrides[this.recurrenceId!] : {},
-			modified
-		);
+		//this.data.recurrenceOverrides ??= {};
+
+		let patch: any = this.isOverride ? this.data.recurrenceOverrides && this.data.recurrenceOverrides[this.recurrenceId!] : {}
+
 		eventDS.single(this.data.id).then(original => {
 			if(!original) return; // why could this be undefined?
 			this.confirmScheduleMessage(modified, () => {
-				for(const name of CalendarItem.overridableProperties) {
-					if(o[name] == original[name]) delete o[name]; // remove properties that are the same as original TODO alerts and participants cannot be compared like this
+
+				for(const name of ['start', 'duration', 'title', 'freeBusyStatus', 'location','status', 'description']) {
+					if((name in modified) && modified[name] != original[name])
+						patch[name] = modified[name]; // remove properties that are the same as original
 				}
-				this.data.recurrenceOverrides![this.recurrenceId!] = o;
-				const p = eventDS.update(this.data.id, {recurrenceOverrides:this.data.recurrenceOverrides});
-				if(onFinish) p.then(onFinish);
+				if(modified.participants) {
+					//remove all earlier participant patches as we will rebuild the patch completely.
+					for(let key in patch) {
+						if(key.startsWith("participants/")) {
+							delete patch[key];
+						}
+					}
+
+					for(const key in modified.participants) {
+						const p = modified.participants[key];
+						if(original.participants && key in original.participants) {
+							// patch props that are different (escaped)
+							for(const prop in p) {
+
+								if(prop == "roles") {
+									//roles is an object and therefore always different with !=. Maybe
+									// just skip here as it never changes in an override.
+									continue;
+								}
+								if(p[prop] != original.participants[key][prop]) {
+									patch['participants/'+key+'/'+prop] = p[prop];
+								}
+							}
+						} else {
+							// patch the whole participant (when added)
+							patch['participants/'+key] = p;
+						}
+					}
+
+					// process removed participants
+					if(original.participants) {
+						for(const key in original.participants) {
+							if(!(key in modified.participants)) {
+								patch['participants/'+key] = null;
+							}
+						}
+					}
+				}
+				// TODO: alerts
+
+				const data:any = {};
+				if(this.data.recurrenceOverrides) {
+					data['recurrenceOverrides/'+this.recurrenceId!] = patch;
+				} else {
+					data['recurrenceOverrides'] = {[this.recurrenceId!] : patch };
+				}
+
+				const prom = eventDS.update(this.data.id, data)
+					.catch(e => {
+					void Window.error(e);
+					throw e;
+				})
+				if(onFinish) prom.then(onFinish)
 			});
 		});
 	}
@@ -435,7 +533,7 @@ export class CalendarItem {
 	 * @return The new "recurrenceOverrides" property
 	 */
 	private removeFutureOverrides(until: DateTime) {
-		const patchRecurrenceOverride: RecurrenceOverride = {};
+		const patchRecurrenceOverride: RecurrenceOverrides = {};
 		if(this.data.recurrenceOverrides) {
 			// Copy recurrence overrides that occur before the until date
 			for(const recurrenceId in this.data.recurrenceOverrides) {
@@ -472,10 +570,19 @@ export class CalendarItem {
 
 			const next = Object.assign({},
 				this.data,
-				{start: this.recurrenceId!, id: null, uid: null, recurrenceOverrides: null},
+				{start: this.recurrenceId!},
 				modified
 			);
-			const p = eventDS.create(next); // create duplicate
+
+			delete next.id;
+			delete next.uid;
+			delete next.recurrenceOverrides;
+
+			const p = eventDS.create(next)
+				.catch(e => {
+					void Window.error(e);
+					throw e;
+				}); // create duplicate
 			if (onFinish) p.then(onFinish);
 		});
 	}

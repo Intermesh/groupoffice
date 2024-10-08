@@ -183,6 +183,16 @@ abstract class Entity extends Property {
 		return static::internalFind($properties, $readOnly);
 	}
 
+	/**
+	 * Same as {@see find()} but join user tables {@see Mapping::addUserTable()} as another user than the logged in user.
+	 *
+	 * @throws Exception
+	 */
+	public static final function findFor(int $userId, array $properties = [], bool $readOnly = false): Query
+	{
+		return static::internalFind($properties, $readOnly, null, $userId);
+	}
+
 
 	/**
 	 * Find or create an entity
@@ -241,6 +251,7 @@ abstract class Entity extends Property {
 	 * @param string[] $properties
 	 * @param bool $readOnly
 	 * @return ?static
+	 * @throws Exception
 	 */
 	public static final function findById(?string $id, array $properties = [], bool $readOnly = false): ?Entity
 	{

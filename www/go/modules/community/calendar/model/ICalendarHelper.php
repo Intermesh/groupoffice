@@ -17,6 +17,8 @@ use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use Sabre\VObject;
 use Sabre\VObject\Component\VCalendar;
+use Sabre\VObject\Component\VEvent;
+use stdClass;
 
 class ICalendarHelper {
 
@@ -37,9 +39,13 @@ class ICalendarHelper {
 	/**
 	 * Parse an Event object to a VObject
 	 * @param CalendarEvent $event
-	 * @param VCalendar $vcalendar The original vcalendar to sync to
+	 * @param VCalendar|null $vcalendar The original vcalendar to sync to
+	 * @return VCalendar
+	 * @throws \DateInvalidTimeZoneException
+	 * @throws \DateMalformedStringException
 	 */
-	static function toVObject(CalendarEvent $event, $vcalendar = null) {
+	static function toVObject(CalendarEvent $event, ?VCalendar $vcalendar = null): VCalendar
+	{
 
 		if($vcalendar === null) {
 			$vcalendar = new VCalendar(['PRODID' => $event->prodId]);
@@ -76,7 +82,7 @@ class ICalendarHelper {
 							$exdate['VALUE'] = 'DATE';
 					} else {
 						try {
-							$exEvent = $event->copyPatched($patch, $recurrenceId);
+							$exEvent = $event->patchedInstance($recurrenceId);
 							$vcalendar->add(self::toVEvent($vcalendar->createComponent('VEVENT'), $exEvent, $recurrenceId));
 						}catch(JsonPointerException $e) {
 							// There was a case where /partipants/<NOTEXISTINGID>/participantStatus was incorrectly patched
@@ -93,18 +99,22 @@ class ICalendarHelper {
 	static function toInvite(string $method, CalendarEvent &$event) : VCalendar {
 		$c = new VCalendar(['PRODID' => $event->prodId, 'METHOD' => $method]);
 		$forBody = $event;
+		$baseVEvent = null;
 		if($method == 'CANCEL' || $event->isModified(array_merge(CalendarEvent::EventProperties,['participants']))) {
 			// base event
-			$c->add(self::toVEvent($c->createComponent('VEVENT'), $event));
-		}
-		if(isset($event->recurrenceOverrides)) {
-			foreach ($event->recurrenceOverrides as $recurrenceId => $override) {
-				if ($override->isModified()) {
-					$patch = $event->recurrenceOverrides[$recurrenceId];
-					$forBody = $event->copyPatched($patch, $recurrenceId);
-					$c->add(self::toVEvent($c->createComponent('VEVENT'), $forBody, $recurrenceId));
-				}
+			$baseVEvent = $c->add(self::toVEvent($c->createComponent('VEVENT'), $event));
+			if($event->isRecurring()) {
+				$baseVEvent->RRULE = self::toRrule($event);
 			}
+		}
+		foreach($event->overrides(true) as $recurrenceId => $override) {
+			if(!empty($override->excluded) && !empty($baseVEvent)) {
+				$exdate = $baseVEvent->add('EXDATE', new DateTime($recurrenceId, $event->timeZone()));
+				if($event->showWithoutTime)
+					$exdate['VALUE'] = 'DATE';
+			}
+			$forBody = $override;
+			$c->add(self::toVEvent($c->createComponent('VEVENT'), $override));
 		}
 		// &$event is displayed in the email body
 		$event = $forBody;
@@ -117,11 +127,14 @@ class ICalendarHelper {
 	}
 
 	/**
-	 * @param VObject\Component\VEvent $vevent
+	 * @param VEvent $vevent
 	 * @param CalendarEvent $event
-	 * @return array
+	 * @param ?string $recurrenceId
+
+	 * @throws \DateMalformedStringException
 	 */
-	static function toVEvent($vevent, $event, $recurrenceId=false) {
+	static function toVEvent(VEvent $vevent, CalendarEvent $event, ?string $recurrenceId = null): VEvent
+	{
 
 		if(!$recurrenceId) {
 			$recurrenceId = $event->recurrenceId;
@@ -204,19 +217,20 @@ class ICalendarHelper {
 
 	/**
 	 * Create an iCalendar RRule from a RecurrenceRule object
-	 * @param RecurrenceRule $recurrenceRule
+	 * @param CalendarEvent $event
 	 * @return string \Sabre\VObject\Property\ICalendar\Recur $rule
+	 * @throws \DateInvalidTimeZoneException
+	 * @throws \DateMalformedStringException
 	 */
-	static private function toRrule($event) {
-		$recurrenceRule = isset($event->recurrenceRule) ? $event->recurrenceRule :  $event->getRecurrenceRule();
+	static private function toRrule(CalendarEvent $event) {
+		$recurrenceRule = $event->getRecurrenceRule();
 		$rule = [];
 		foreach(self::$ruleMap as $iKey => $jKey) {
 			if(!empty($recurrenceRule->{$jKey})) {
 				$val = $recurrenceRule->{$jKey};
 				if($jKey == 'until') {
 					if(strlen($val) > 10) { // with time
-						$tz = $event->timeZone ? new \DateTimeZone($event->timeZone) : null;;
-						$dt = DateTime::createFromFormat('Y-m-d\TH:i:s', $val, $tz);
+						$dt = DateTime::createFromFormat('Y-m-d\TH:i:s', $val, $event->timeZone());
 						$dt->setTimezone(new \DateTimeZone('UTC'));
 						$val = $dt->format('Ymd\THis\Z');
 					} else {
@@ -408,7 +422,7 @@ class ICalendarHelper {
 		];
 	}
 
-	static private function parseOccurrence($vevent, $props) {
+	static private function parseOccurrence(VEvent $vevent, stdClass $props) : stdClass {
 
 		if(isset($vevent->DTSTART)) {
 			$props->start = $vevent->DTSTART->getDateTime();
@@ -460,7 +474,8 @@ class ICalendarHelper {
 		return $props;
 	}
 
-	static public function makeRecurrenceIterator($event) {
+	static public function makeRecurrenceIterator(CalendarEvent $event): VObject\Recur\RRuleIterator
+	{
 		return new VObject\Recur\RRuleIterator(self::toRrule($event), $event->start());
 	}
 

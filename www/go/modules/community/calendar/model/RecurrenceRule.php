@@ -51,11 +51,7 @@ class RecurrenceRule {
 	public $until = null;
 
 	static function expand(CalendarEvent $p, string $from, string $until) {
-		$it = ICalendarHelper::makeRecurrenceIterator((object)[
-			'start'=>$p->start,
-			'recurrenceRule'=> $p->getRecurrenceRule(),
-			'timezone'=>$p->timeZone
-		]);
+		$it = ICalendarHelper::makeRecurrenceIterator($p);
 		$it->fastForward(new DateTime($from));
 		if(!empty($p->lastOccurrence)) {
 			$until = min($until, $p->lastOccurrence->format('Y-m-d'));

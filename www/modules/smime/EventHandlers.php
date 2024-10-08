@@ -78,10 +78,18 @@ class EventHandlers {
 
 			$newResponse = $message->toOutputArray(true);
 
-			unset($newResponse['sender']);
-			unset($newResponse['from']);
-			unset($newResponse['to']);					
-			unset($newResponse['cc']);
+			unset($newResponse['sender'],
+				$newResponse['from'],
+				$newResponse['full_from'],
+				$newResponse['size'],
+				$newResponse['reply_to'],
+				$newResponse['to'],
+				$newResponse['cc'],
+				$newResponse['date'],
+				$newResponse['udate'],
+				$newResponse['labels']
+			);
+
 					
 			foreach ($newResponse as $key => $value) {
 				if (!empty($value) || $key == 'attachments')

@@ -100,10 +100,7 @@ class EmailReminders extends AbstractCron {
 				$message = \GO\Base\Mail\Message::newInstance($subject, $body);
 				$message->addFrom(\GO::config()->noreply_email,\GO::config()->title);
 				$message->addTo(new Address($userModel->email,$userModel->name));
-				$success =\GO\Base\Mail\Mailer::newGoInstance()->send($message);
-				
-				if(!$success)
-					\go\core\ErrorHandler::log ("Reminder mail failed for recipient: ".\GO\Base\Mail\Mailer::newGoInstance()->lastError());
+				\GO\Base\Mail\Mailer::newGoInstance()->send($message);
 
 				$reminderUserModelSend = \GO\Base\Model\ReminderUser::model()
 					->findSingleByAttributes(array(

@@ -26,6 +26,7 @@
 
 namespace GO\Base\Db;
 use IteratorIterator;
+use ReturnTypeWillChange;
 
 class Statement implements \IteratorAggregate
 {
@@ -575,7 +576,7 @@ class Statement implements \IteratorAggregate
 	 * Making the activefinder iterable
 	 * @return IteratorIterator
 	 */
-	public function getIterator()
+	public function getIterator() : \Traversable
 	{
 		if($this->_statement == null)
 			$this->execute($this->params);
@@ -585,4 +586,3 @@ class Statement implements \IteratorAggregate
 	}
 
 }
-?>

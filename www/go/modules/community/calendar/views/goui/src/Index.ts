@@ -5,6 +5,7 @@ import {datasourcestore, t as coreT, E, translate, DateTime, Window} from "@inte
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {EventWindow} from "./EventWindow.js";
 import {EventDetail, EventDetailWindow} from "./EventDetail.js";
+import {CalendarView} from "./CalendarView.js";
 
 export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list';
 export const calendarStore = datasourcestore({
@@ -53,7 +54,7 @@ function addEmailAction() {
 			});
 		}
 
-		GO.email.handleITIP = (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent|string, feedback?:string}} ) => {
+		GO.email.handleITIP = (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent|string, feedback?:string, recurrenceId?:string}} ) => {
 			if(msg.itip) {
 				const event = msg.itip.event,
 					btns = E('div').cls('btns'),
@@ -87,18 +88,27 @@ function addEmailAction() {
 					REQUEST: t("Invitation")
 				}[msg.itip.method] || "Unable to process appointment information.";
 
-				if(msg.itip.method === 'REQUEST' && typeof event !== 'string') {
-					const item = new CalendarItem({data:event, key:event.id + ""});
-					updateBtns(item);
+
+				if(typeof event !== 'string') {
+					let item = new CalendarItem({data:event, key:event.id + ""});
+
+					if(msg.itip.recurrenceId && item.isRecurring) {
+						item = item.patchedInstance(msg.itip.recurrenceId);
+					}
+					if(msg.itip.method === 'REQUEST')
+						updateBtns(item);
+
+					if(msg.itip.method !== 'REPLY') {
+
+						const date = item.start;
+
+						text += ' "' + item.title + '" ' + t('at') + ' ' + date.format('D j M H:i')
+					}
+
+				} else {
+					text += ', '+ event;
 				}
 
-				if(event) {
-					if(typeof event === "string") {
-						text += ', '+ event;
-					} else if(msg.itip.method !== 'REPLY') {
-						text += ' "' + event.title + '" ' + t('at') + ' ' + DateTime.createFromFormat(event.start.replace('T', ' '), 'Y-m-d H:i')!.format('D j M H:i')
-					}
-				}
 
 				container.append(
 					E('li', E('i', 'event').cls('icon'), text, btns).cls('goui-toolbar')
@@ -145,7 +155,15 @@ modules.register(  {
 			],
 			links: [{
 				iconCls: 'entity ic-event red',
-				linkWindow:(entity:string, entityId) => new EventWindow(),
+				linkWindow:(entity:string, entityId) => {
+					return (new CalendarItem({key:'',data:{
+							start:(new DateTime).format('Y-m-d\TH:00:00.000'),
+							title: t('New event'),
+							showWithoutTime: client.user.calendarPreferences?.defaultDuration == null,
+							duration: client.user.calendarPreferences?.defaultDuration ?? "P1D",
+							calendarId: client.user.calendarPreferences?.defaultCalendarId
+						}})).open()
+				},
 				linkDetail:() =>  new EventDetail()
 			}]
 		}

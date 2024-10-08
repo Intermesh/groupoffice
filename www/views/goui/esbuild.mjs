@@ -10,18 +10,21 @@ let importPathPlugin = {
 	},
 }
 
+const watch = (process.argv.length > 2 && process.argv[2] == "watch");
+
 const opts = {
 	entryPoints: ['goui/script/index.ts', 'groupoffice-core/script/index.ts'],
 	bundle: true,
 	sourcemap: true,
 	format: "esm",
-	target: "es2020",
+	target: "esnext",
+	minify: !watch,
 	outdir: "dist",
 	plugins: [importPathPlugin],
 	logLevel: "info"
 }
 
-if(process.argv.length > 2 && process.argv[2] == "watch") {
+if(watch) {
 	let ctx = await esbuild.context(opts);
 	await ctx.watch();
 	console.log('Watching...');
