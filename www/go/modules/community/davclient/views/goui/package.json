@@ -8,10 +8,10 @@
   },
   "scripts": {
     "start": "npm run start:esbuild",
-    "start:esbuild": "npx esbuild src/Index.ts --external:../../../../../../views/goui/* --bundle --watch --sourcemap --format=esm --target=esnext --outdir=dist",
+    "start:esbuild": "npx esbuild src/Index.ts --external:../../../../../../* --bundle --watch --sourcemap --format=esm --target=esnext --outdir=dist",
 
     "build": "npm run build:ts",
-    "build:ts": "npx esbuild src/Index.ts --external:../../../../../../views/goui/* --bundle --minify --sourcemap --format=esm --target=esnext --outdir=dist",
+    "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
     "build:dts": "npx tsc --declaration --emitDeclarationOnly"
   }
 }

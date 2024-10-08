@@ -3,9 +3,9 @@ import {Main} from "./Main.js";
 import {router} from "@intermesh/groupoffice-core";
 import {datasourcestore, t as coreT, E, translate, DateTime, Window} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
-import {EventWindow} from "./EventWindow.js";
 import {EventDetail, EventDetailWindow} from "./EventDetail.js";
-import {CalendarView} from "./CalendarView.js";
+
+export * from "./Main.js";
 
 export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list';
 export const calendarStore = datasourcestore({

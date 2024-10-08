@@ -12,7 +12,7 @@
     "start:sass": "npx sass --watch style:dist",
 
     "build": "npm run build:sass && npm run build:ts",
-    "build:ts": "npx esbuild src/Index.ts --external:../../../../../../views/goui/* --bundle --minify --sourcemap --format=esm --target=esnext --outdir=dist",
+    "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
     "build:sass": "npx sass --style=compressed style:dist",
     "build:dts": "npx tsc --declaration --emitDeclarationOnly",
 
