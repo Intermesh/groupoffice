@@ -878,6 +878,10 @@ END;
 						$split = mb_split('[_\-\\\\\/.]', $emailPart);
 						$secondPassKeywords = array_merge($secondPassKeywords, $split);
 					}
+				} elseif (strpos($keyword, '-') > 0) {
+					// Split strings with a dash anyway, e.g. as in double surnames
+					$split = mb_split('[\-]', $keyword);
+					$secondPassKeywords = array_merge($secondPassKeywords, $split);
 				}
 			}
 
