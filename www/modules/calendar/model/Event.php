@@ -1622,6 +1622,11 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	{
 		$events=array();
 		if(empty($this->rrule)){
+			if ($this->isPrivate()) {
+				$this->name=\GO::t("Private", "calendar");
+				$this->location='';
+				$this->description='';
+			}
 			$events[]=$this;
 		}else{
 			//a recurring event must be sent with all it's exceptions in the same data

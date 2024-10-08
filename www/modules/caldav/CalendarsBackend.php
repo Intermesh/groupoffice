@@ -178,7 +178,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			'{DAV:}displayname' => $calendar->name,
 			'{urn:ietf:params:xml:ns:caldav}calendar-description' => 'User calendar',
 			'{urn:ietf:params:xml:ns:caldav}calendar-timezone' => "BEGIN:VCALENDAR\r\n" . $tz->serialize() . "END:VCALENDAR",
-			'{http://sabredav.org/ns}read-only' => $level < Acl::LEVEL_WRITE,
+			'{http://sabredav.org/ns}read-only' => $level < Acl::LEVEL_CREATE,
 			// 1 = owner, 2 = readonly, 3 = readwrite
 			'share-access' => $level == Acl::LEVEL_MANAGE ? 1 : ($level >= Acl::LEVEL_WRITE ? 3 : 2),
 			//'access'=> $calendar->getPermissionLevel() < Acl::LEVEL_CREATE ? \Sabre\DAV\Sharing\Plugin::ACCESS_READ : \Sabre\DAV\Sharing\Plugin::ACCESS_READWRITE
@@ -370,26 +370,22 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				}
 			}
 
-			$calendar_user_id = $event->calendar->user_id;
-			$user_id = \GO::user()->id;
-
-			if(!$event->private || $calendar_user_id == $user_id){
+			//if(!$event->isPrivate()){
 
 				$davEvent = DavEvent::model()->findByPk($event->id);
 				if(!$davEvent || $davEvent->mtime != $event->mtime){
 					$davEvent = CaldavModule::saveEvent($event, $davEvent);
 				}
-				$log .= " $event->id, $davEvent->uri \n";
 				$objects[] = array(
 					'uri' => $davEvent->uri,
-					'calendardata' => $davEvent->data,
+					//'calendardata' => $davEvent->data,
 					'lastmodified' => $event->mtime,
 					'etag'=> $event->getEtag(),
 					'size' => strlen($davEvent->data),
 					'component' => 'vevent'
 				);
 
-			}
+			//}
 		}
 
 
@@ -508,9 +504,10 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 		if ($event) {
 
 //			\GO::debug('Found event '.$objectUri);
-			$data = ($event->mtime==$event->client_mtime && !empty($event->data)) ? $event->data : $this->exportCalendarEvent($event);
+			$data = ($event->mtime==$event->client_mtime && !empty($event->data) && !$event->isPrivate()) ? $event->data : $this->exportCalendarEvent($event);
 			//\GO::debug($event->mtime==$event->client_mtime ? "Returning client data (mtime)" : "Returning server data (mtime)");
 //			\GO::debug($data);
+
 
 			$object = array(
 				'uri' => $event->uri,
