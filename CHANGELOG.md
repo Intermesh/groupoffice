@@ -1,4 +1,6 @@
+08-10-2024: 6.8.76
 - ActiveSync: Fixed fatal error because of breaking change in z-push
+- Calendar: fix invitations in readonly calendars
 
 07-10-2024: 6.8.75
 - Core: Make sure groupoffice core module is always sorted first
