@@ -1,3 +1,5 @@
+- ActiveSync: Fixed fatal error because of breaking change in z-push
+
 07-10-2024: 6.8.75
 - Core: Make sure groupoffice core module is always sorted first
 - Tasks: sort task combo by task list first, title second
