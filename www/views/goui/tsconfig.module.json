@@ -12,12 +12,12 @@
     "paths": {
       "@intermesh/goui": [
         "../../../../../../views/goui/dist/goui/script/index.d.ts",
-        "../../../../../../views/goui/dist/goui/script/index.js"
+//        "../../../../../../views/goui/dist/goui/script/index.js"
 
       ],
       "@intermesh/groupoffice-core": [
         "../../../../../../views/goui/dist/groupoffice-core/script/index.d.ts",
-        "../../../../../../views/goui/dist/groupoffice-core/script/index.js"
+//        "../../../../../../views/goui/dist/groupoffice-core/script/index.js"
       ],
 
       "chart.js/auto": [
@@ -26,12 +26,12 @@
 
       "@intermesh/business/*": [
         "../../../../../../go/modules/business/*/views/goui/dist/Index.d.ts",
-        "../../../../../../go/modules/business/*/views/goui/dist/Index.js"
+//        "../../../../../../go/modules/business/*/views/goui/dist/Index.js"
       ],
 
       "@intermesh/community/*": [
         "../../../../../../go/modules/community/*/views/goui/dist/Index.d.ts",
-        "../../../../../../go/modules/community/*/views/goui/dist/Index.js"
+//        "../../../../../../go/modules/community/*/views/goui/dist/Index.js"
       ]
     }
   }
