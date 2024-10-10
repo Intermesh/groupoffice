@@ -56,7 +56,9 @@ class TsPathsPlugin {
             return resolvedFileName;
         }
         let relativePath = (0, node_path_1.relative)((0, node_path_1.dirname)(sourceFile.fileName), resolvedFileName);
-        relativePath = relativePath.substring(0, relativePath.length - 4) + "js";
+        if (relativePath.substring(relativePath.length - 4) == 'd.ts') {
+            relativePath = relativePath.substring(0, relativePath.length - 4) + "js";
+        }
         return relativePath.startsWith('.') ? relativePath : `./${relativePath}`;
     }
 }
