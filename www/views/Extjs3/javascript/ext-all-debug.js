@@ -11934,7 +11934,7 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
     
     findParentByType : function(xtype, shallow){
         return this.findParentBy(function(c){
-            return c.isXType(xtype, shallow);
+            return c.isXType && c.isXType(xtype, shallow);
         });
     },
 
