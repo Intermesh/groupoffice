@@ -407,7 +407,7 @@ class MimeDecode
 	 * @return array Contains parsed headers
 	 * @access private
 	 */
-	private function parseHeaders(string $input): array
+	public static function parseHeaders(string $input): array
 	{
 		if ($input === '') {
 			return [];

@@ -2,7 +2,7 @@
 //This example shows how to send an e-mail with attachments
 
 //Adjust these variables for your installation
-$apiKey = 'your-api-key';
+$apiKey = '6674038600355ab746804785d3d34bb6f7506d220e196';
 $baseUrl = 'http://host.docker.internal/';
 
 $uploadUrl = $baseUrl . '/api/upload.php';
@@ -75,6 +75,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 		"encrypt_smime" => false,
 		"sign_smime" => false,
+
+        "customHeaders" => "X-MySpecial-ID: 123456\nX-MySpecial-Category: custom",
 
 
 		"to" => $_POST['to'],
