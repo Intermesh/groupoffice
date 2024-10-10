@@ -374,5 +374,9 @@ class Mailer {
 		if($message->getAlternateBody()) {
 			$this->mail->AltBody = $message->getAlternateBody();
 		}
+
+		foreach ($message->getHeaders() as $name => $value) {
+			$this->mail->addCustomHeader($name, $value);
+		}
 	}
 }
