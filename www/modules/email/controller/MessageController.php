@@ -1305,7 +1305,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			throw new NotFound();
 		}
 
-		$imapMessage = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
+		$customHeaders = !empty($params['customHeaders']) ? explode(',', $params['customHeaders']) : [];
+		$imapMessage = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid'], $customHeaders);
 
 		if(!$imapMessage) {
 			throw new NotFound();
@@ -1322,6 +1323,11 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$plaintext = !empty($params['plaintext']);
 
 		$response = $imapMessage->toOutputArray(!$plaintext,false,$params['no_max_body_size']);
+
+		foreach($customHeaders as $customHeader) {
+			$response[$customHeader] = $imapMessage->{strtolower(str_replace("-", "_", $customHeader))} ?? null;
+		}
+
 		$response['uid'] = intval($params['uid']);
 		$response['mailbox'] = $params['mailbox'];
 		$response['isDraft'] = $params['mailbox'] == $account->drafts;
