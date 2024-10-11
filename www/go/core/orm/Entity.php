@@ -343,15 +343,9 @@ abstract class Entity extends Property {
 	{
 		$query = static::find($properties, $readOnly);
 		/** @noinspection PhpPossiblePolymorphicInvocationInspection */
-		$query->join(
-			'core_link',
-			'l',
-			$query->getTableAlias() . '.id = l.toId and l.toEntityTypeId = '.static::entityType()->getId())
 
-			->andWhere('fromEntityTypeId = '. $entity::entityType()->getId())
-			->andWhere('fromId', '=', $entity->id);
+		return \go\core\model\Link::joinLinks($query, $entity, static::entityType()->getId());
 
-		return $query;
 	}
 
 
