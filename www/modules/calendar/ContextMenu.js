@@ -26,7 +26,7 @@ GO.calendar.ContextMenu = function(config){
 		}
 	}),
 	this.actionCut = new Ext.menu.Item({
-		iconCls: 'ic-content-cut',
+		iconCls: 'ic-forward',
 		text: t("Move", "calendar"),
 		scope:this,
 		disabled:true,
@@ -155,6 +155,7 @@ Ext.extend(GO.calendar.ContextMenu, Ext.menu.Menu, {
 		}
 
 		this.actionDelete.setDisabled(!deleteEnabled);
+		this.actionCut.setDisabled(!deleteEnabled);
 		
 		if(this.actionAddTimeRegistration) {
 			this.actionAddTimeRegistration.setDisabled(!event.event_id);

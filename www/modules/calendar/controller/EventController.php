@@ -144,13 +144,23 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		}
 	}
 
+	/**
+	 * @param $response
+	 * @param Event $model
+	 * @param $params
+	 * @return false|void
+	 * @throws AccessDenied
+	 * @throws AskPermission
+	 * @throws \go\core\db\DbException
+	 */
 	protected function beforeSubmit(&$response, &$model, &$params) {
 
 		//when duplicating in the calendar with right click
 		if(!empty($params['duplicate'])){
 			if (!empty($params['calendar_id']) && $params['calendar_id']>0)
 				$model->calendar_id = $params['calendar_id'];
-			$model = $model->duplicate(array('uuid'=>null));
+			$model = $model->duplicate(['uuid'=>null,'participants'=>null]);
+
 			$params['id']=$model->id;
 		}
 		

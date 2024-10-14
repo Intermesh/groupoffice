@@ -50,6 +50,11 @@ class Smime {
 	 * @return false|Certificate
 	 */
 	public function latestCert($date = null) {
+		return $this->validCerts($date)->fetch();
+	}
+
+
+	public function validCerts($date = null) {
 		$criteria = FindCriteria::newInstance()->addCondition('account_id', $this->accountId);
 		if(!empty($date)) {
 			$criteria
@@ -61,7 +66,7 @@ class Smime {
 			->criteria($criteria)
 			->order(['valid_until','id'], ['DESC','DESC']));
 		// todo: may need to fetch again when cert is revoked??
-		return $latest->fetch();
+		return $latest;
 	}
 //
 //	/**
