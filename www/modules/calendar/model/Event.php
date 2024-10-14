@@ -222,13 +222,12 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		);
 	}
 	
-	protected function log($action, $save = true, $modifiedCustomfieldAttrs=false) {
+	protected function log(string $action, $save = true, $modifiedCustomfieldAttrs=false): ?bool
+	{
 		if(!$this->updatingRelatedEvent) {
 			return parent::log($action, $save, $modifiedCustomfieldAttrs);
-		} else
-		{
-			return true;
 		}
+		return true;
 	}
 
 	protected function getCacheAttributes() {

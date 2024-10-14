@@ -2,7 +2,6 @@
 
 use go\core\App;
 use go\core\auth\ForcePasswordChange;
-use go\core\db\Table;
 use go\core\util\ClassFinder;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Expression;
@@ -14,8 +13,6 @@ use GO\Base\Model\SearchCacheRecord;
 use go\core\model\Group;
 use go\core\model\Acl;
 use go\core\model\Field;
-
-$updates["201803090847"][] = "ALTER TABLE `go_log` ADD `jsonData` TEXT NULL AFTER `message`;";
 
 $updates["201803161130"][] = function() {
 

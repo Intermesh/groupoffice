@@ -1,0 +1,1 @@
+DROP TABLE `history_log_entry`;
