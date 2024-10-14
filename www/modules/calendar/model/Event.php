@@ -2228,6 +2228,12 @@ The following is the error message:
 		
 		return parent::afterDuplicate($duplicate);
 	}
+
+	public function duplicateRelation($relationName, $duplicate, array $attributes=array(), $findParams=false){
+		if($relationName == 'participants' && isset($attributes['participants']) && $attributes['participants'] === null) {
+			return;
+		}
+	}
 	
 	/**
 	 * Add a participant to this calendar
