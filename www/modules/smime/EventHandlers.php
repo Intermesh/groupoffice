@@ -114,7 +114,7 @@ class EventHandlers {
 
 		$nocerts = true;
 		$certs = (new GO\Smime\Model\Smime($imapMessage->account->id))->validCerts($date);
-
+		// try multiple certs if there are more known because it might be encrypted using an older  one
 		foreach($certs as $cert) {
 
 			if (!$cert || empty($cert->cert)) {
