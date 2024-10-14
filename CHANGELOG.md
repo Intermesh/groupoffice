@@ -1,3 +1,5 @@
+- Timeregistration: Fixed time dialog tracking time starting at midnight
+
 08-10-2024: 6.8.76
 - ActiveSync: Fixed fatal error because of breaking change in z-push
 - Calendar: fix invitations in readonly calendars
