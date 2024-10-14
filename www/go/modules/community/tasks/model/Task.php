@@ -16,6 +16,7 @@ use go\core\db\Expression;
 use go\core\fs\Blob;
 use go\core\model\Acl;
 use go\core\model\Alert as CoreAlert;
+use go\core\model\Link;
 use go\core\model\Principal;
 use go\core\model\User;
 use go\core\model\Module;
@@ -28,6 +29,7 @@ use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\{ArrayObject, DateTime, Recurrence, StringUtil, Time, UUID};
 use go\core\validate\ErrorCode;
+use go\modules\business\projects3\model\Project3;
 use go\modules\community\comments\model\Comment;
 use go\modules\community\tasks\convert\Spreadsheet;
 use go\modules\community\tasks\convert\VCalendar;
@@ -346,10 +348,15 @@ class Task extends AclItemEntity {
 			}, [])
 			->add('projectId', function(Criteria $criteria, $value, Query $query) {
 				if(!empty($value)) {
-					if(!$query->isJoined("tasks_tasklist", "tasklist") ){
-						$query->join("tasks_tasklist", "tasklist", "task.tasklistId = tasklist.id");
-					}
-					$criteria->where(['tasklist.projectId' => $value]);
+
+					$on = $query->getTableAlias() . '.id = l.toId and l.toEntityTypeId = ' . Task::entityType()->getId();
+
+					$query->join(
+						'core_link',
+						'l',
+						$on)
+						->andWhere('fromEntityTypeId = '. Project3::entityType()->getId())
+						->andWhere('fromId', '=', $value);
 				}
 			})
 			->add('role', function(Criteria $criteria, $value, Query $query) {
