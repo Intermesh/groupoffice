@@ -1,3 +1,6 @@
+- Timeregistration: Fixed time dialog tracking time starting at midnight
+- Smime: Handle two valid certficates for the same sender
+
 08-10-2024: 6.8.76
 - ActiveSync: Fixed fatal error because of breaking change in z-push
 - Calendar: fix invitations in readonly calendars

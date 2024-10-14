@@ -15,8 +15,6 @@ use go\core\model\Group;
 use go\core\model\Acl;
 use go\core\model\Field;
 
-$updates["201803090847"][] = "ALTER TABLE `go_log` ADD `jsonData` TEXT NULL AFTER `message`;";
-
 $updates["201803161130"][] = function() {
 
 
