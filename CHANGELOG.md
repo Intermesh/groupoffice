@@ -1,4 +1,5 @@
 - Timeregistration: Fixed time dialog tracking time starting at midnight
+- Newsletters: fix missing property error when sending newsletter with attachment
 - Smime: Handle two valid certficates for the same sender
 
 08-10-2024: 6.8.76

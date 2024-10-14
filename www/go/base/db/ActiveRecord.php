@@ -4752,7 +4752,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * Like: $params = array('attribute1'=>1,'attribute2'=>'Hello');
 	 * @param boolean $save if the copy should be save when calling this function
 	 * @param boolean $ignoreAclPermissions
-	 * @return mixed The newly created object or false if before or after duplicate fails
+	 * @return static The newly created object or false if before or after duplicate fails
 	 *
 	 */
 	public function duplicate($attributes = array(), $save=true, $ignoreAclPermissions=false, $ignoreCustomFields = false) {
