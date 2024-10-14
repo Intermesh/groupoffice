@@ -41560,8 +41560,10 @@ Ext.form.ComboBox = Ext.extend(Ext.form.TriggerField, {
         var zindex;
         if (this.ownerCt){
             this.findParentBy(function(ct){
-                zindex = parseInt(ct.getPositionEl().getStyle('z-index'), 10);
-                return !!zindex;
+							if(ct) { // check for GOUI
+								zindex = parseInt(ct.getPositionEl().getStyle('z-index'), 10);
+								return !!zindex;
+							}
             });
         }
         return zindex;
