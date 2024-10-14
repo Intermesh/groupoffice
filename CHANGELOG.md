@@ -1,6 +1,7 @@
 - Timeregistration: Fixed time dialog tracking time starting at midnight
 - Newsletters: fix missing property error when sending newsletter with attachment
 - Smime: Handle two valid certficates for the same sender
+- Comments / support: display download icon in order to directly download a comment attachment.
 
 08-10-2024: 6.8.76
 - ActiveSync: Fixed fatal error because of breaking change in z-push
