@@ -469,31 +469,34 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			me.actionStart();
 			me.fireEvent('loadstart',me, me.currentUserId);
 
-			go.Db.store("User")._getSingleFromServer(me.currentUserId).then(function(user){
-				me.user = user;
-				me.loadModulePanels();
+			go.Db.store("User").getUpdates().then(() => {
 
-				// loop through child panels and call onLoadComplete function if available
-				me.tabPanel.items.each(function(tab) {
-					if(tab.onLoadStart) {
-						tab.onLoadStart(me.currentUserId);
+				go.Db.store("User").single(me.currentUserId).then(function(user){
+					me.user = user;
+					me.loadModulePanels();
+
+					// loop through child panels and call onLoadComplete function if available
+					me.tabPanel.items.each(function(tab) {
+						if(tab.onLoadStart) {
+							tab.onLoadStart(me.currentUserId);
+						}
+					},me);
+
+					me.formPanel.getForm().setValues(user);
+
+					if(user.id != go.User.id) {
+						me.setTitle(t("User") + ": " + Ext.util.Format.htmlEncode(user.username));
 					}
-				},me);
 
-				me.formPanel.getForm().setValues(user);
+					me.findBy(function(cmp,cont){
+						if(typeof cmp.onLoad === 'function') {
+							cmp.onLoad(user);
+						}
+					},me);
 
-				if(user.id != go.User.id) {
-					me.setTitle(t("User") + ": " + Ext.util.Format.htmlEncode(user.username));
-				}
-				
-				me.findBy(function(cmp,cont){
-					if(typeof cmp.onLoad === 'function') {
-						cmp.onLoad(user);
-					}
-				},me);
-
-				me.loadComplete(user);
-			});
+					me.loadComplete(user);
+				});
+			})
 		}
 		
 		// The form needs to be rendered before the data can be set

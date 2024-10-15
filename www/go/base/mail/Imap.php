@@ -1459,13 +1459,13 @@ class Imap extends ImapBodyStruct
 					'forwarded'=>0
 				);
 	 *
-	 * @param <type> $uid
+	 * @param string $uid
 	 * @return mixed
 	 */
 
-	public function get_message_header($uid, $full_data=false)
+	public function get_message_header($uid, $full_data=false, array $extraHeaders = [])
 	{
-		$headers = $this->get_message_headers(array($uid), $full_data);
+		$headers = $this->get_message_headers(array($uid), $full_data, $extraHeaders);
 		if(isset($headers[$uid])){
 			return $headers[$uid];
 		}
@@ -1503,7 +1503,7 @@ class Imap extends ImapBodyStruct
 	 * @param array $uids
 	 * @return array
 	 */
-	public function get_message_headers(array $uids, $full_data=false)  :array
+	public function get_message_headers(array $uids, $full_data=false, array $extraHeaders = [])  :array
 	{
 
 		if(empty($uids)) {
@@ -1526,13 +1526,18 @@ class Imap extends ImapBodyStruct
 			$command .= " BCC REPLY-TO DISPOSITION-NOTIFICATION-TO CONTENT-TRANSFER-ENCODING MESSAGE-ID REFERENCES IN-REPLY-TO";
 		}
 
+		if(!empty($extraHeaders)) {
+			$extraHeaders = array_map("strtoupper", $extraHeaders);
+			$command .= " " . implode(" ", $extraHeaders);
+		}
+
 		$command .= ")])\r\n";
 
 		$this->send_command($command);
 		$res = $this->get_response(false, true);
 
 		$tags = array('UID' => 'uid', 'FLAGS' => 'flags', 'X-GM-LABELS' => 'flags', 'RFC822.SIZE' => 'size', 'INTERNALDATE' => 'internal_date');
-		$junk = array('SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', 'CC','BCC', '(', ')', ']', 'X-PRIORITY', 'DATE','REPLY-TO','DISPOSITION-NOTIFICATION-TO','CONTENT-TRANSFER-ENCODING', 'MESSAGE-ID', 'REFERENCES', 'IN-REPLY-TO');
+		$junk = array_merge(array('SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', 'CC','BCC', '(', ')', ']', 'X-PRIORITY', 'DATE','REPLY-TO','DISPOSITION-NOTIFICATION-TO','CONTENT-TRANSFER-ENCODING', 'MESSAGE-ID', 'REFERENCES', 'IN-REPLY-TO'), $extraHeaders);
 
 		$headers = array();
 		foreach ($res as $n => $vals) {
@@ -1567,6 +1572,10 @@ class Imap extends ImapBodyStruct
 					'labels'=>array(),
 					'deleted'=>0,
 				);
+
+				foreach($extraHeaders as $extraHeader) {
+					$message[ str_replace('-','_',strtolower($extraHeader))] = "";
+				}
 
 				$count = count($vals);
 				for ($i=0;$i<$count;$i++) {

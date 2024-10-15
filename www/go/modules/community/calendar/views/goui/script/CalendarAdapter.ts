@@ -1,5 +1,5 @@
-import {DataSourceStore, datasourcestore, DateTime, DefaultEntity} from "@intermesh/goui";
-import {client, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
+import {datasourcestore, DateTime, DefaultEntity} from "@intermesh/goui";
+import {client, jmapds} from "@intermesh/groupoffice-core";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 
 interface CalendarProvider {
@@ -114,29 +114,40 @@ export class CalendarAdapter {
 			*items(from:DateTime,until:DateTime) {
 				for(const task of this.store!.items) {
 					let date;
+
 					if(task.progress == 'completed') {
-						date = task.progressUpdated; // slice date
+						date = task.progressUpdated || (new DateTime()).format('Y-m-d'); // slice date
 					} else {
 						date = task.due || task.start || (new DateTime()).format('Y-m-d');
 					}
+
+
 //if(task.title =='test taak met bogus timezone') debugger;
 					const start = DateTime.createFromFormat(date.substring(0,10), 'Y-m-d');
-					yield new CalendarItem({
-						key: '-',
-						start,
-						open() {
-							const dlg = new go.modules.community.tasks.TaskDialog();
-							dlg.show();
-							dlg.load(task.id);
-						},
-						extraIcons:[task.progress == 'completed' ? 'task_alt' : 'radio_button_unchecked'],
-						defaultColor: '7e472a',
-						data: {
-							title: task.title,
-							duration: 'P1D',
-							showWithoutTime: true,
-						}
-					});
+
+					if(!start) {
+						continue;
+					}
+
+					if(start.date <= until.date && start.date >= from.date) {
+						// console.log(task.progress, date, start, task.title, task);
+						yield new CalendarItem({
+							key: '-',
+							start,
+							open() {
+								const dlg = new go.modules.community.tasks.TaskDialog();
+								dlg.show();
+								dlg.load(task.id);
+							},
+							extraIcons: [task.progress == 'completed' ? 'task_alt' : 'radio_button_unchecked'],
+							defaultColor: '7e472a',
+							data: {
+								title: task.title,
+								duration: 'P1D',
+								showWithoutTime: true,
+							}
+						});
+					}
 				}
 			},
 			load(start:DateTime,end:DateTime) {

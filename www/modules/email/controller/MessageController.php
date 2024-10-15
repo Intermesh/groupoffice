@@ -19,6 +19,7 @@ use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\fs\FileSystemObject;
 use go\core\mail\AddressList;
+use go\core\mail\MimeDecode;
 use go\core\model\Module;
 use go\core\model\User;
 use GO\Email\Model\Alias;
@@ -614,6 +615,19 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		
 		$mailer = Mailer::newGoInstance();
 		$mailer->setEmailAccount($account);
+
+		if(!empty($params['customHeaders'])) {
+			$headers = MimeDecode::parseHeaders($params['customHeaders']);
+
+			go()->debug($headers);
+
+			foreach($headers as $header) {
+				if(!str_starts_with($header['name'], 'X-')) {
+					throw new Exception("Custom headers must start with X-");
+				}
+				$message->setHeader($header['name'], $header['value']);
+			}
+		}
 
 
 		$this->fireEvent('beforesend', array(
@@ -1301,7 +1315,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			throw new NotFound();
 		}
 
-		$imapMessage = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
+		$customHeaders = !empty($params['customHeaders']) ? explode(',', $params['customHeaders']) : [];
+		$imapMessage = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid'], $customHeaders);
 
 		if(!$imapMessage) {
 			throw new NotFound();
@@ -1318,6 +1333,11 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$plaintext = !empty($params['plaintext']);
 
 		$response = $imapMessage->toOutputArray(!$plaintext,false,$params['no_max_body_size']);
+
+		foreach($customHeaders as $customHeader) {
+			$response[$customHeader] = $imapMessage->{strtolower(str_replace("-", "_", $customHeader))} ?? null;
+		}
+
 		$response['uid'] = intval($params['uid']);
 		$response['mailbox'] = $params['mailbox'];
 		$response['isDraft'] = $params['mailbox'] == $account->drafts;

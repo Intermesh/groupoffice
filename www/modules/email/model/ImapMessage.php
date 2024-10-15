@@ -238,7 +238,7 @@ class ImapMessage extends ComposerMessage {
 	 * @param Account $account
 	 * @param int $uid 
 	 */
-	public function findByUid(Account $account, $mailbox, $uid) {
+	public function findByUid(Account $account, $mailbox, $uid, $customHeaders = []) {
 
 		$cacheKey='email:'.$account->id.':'.$mailbox.':'.$uid;
 		
@@ -254,7 +254,7 @@ class ImapMessage extends ComposerMessage {
 			
 			$imap = $account->openImapConnection($mailbox);
 
-			$attributes = $imap->get_message_header($uid, true);
+			$attributes = $imap->get_message_header($uid, true, $customHeaders);
 
 			if (!$attributes)
 				return false;

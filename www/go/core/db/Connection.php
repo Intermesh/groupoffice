@@ -470,7 +470,7 @@ class Connection {
    *  selected in the correct order.
    *
    * @return Statement
-   * @throws Exception
+   * @throws DbException
    * @see insert()
    */
 	public function insertIgnore(string $tableName, $data, array $columns = []): Statement
@@ -492,7 +492,7 @@ class Connection {
    *  selected in the correct order.
    *
    * @return Statement
-   * @throws PDOException
+   * @throws DbException
    * @see insert()
    */
 	public function replace(string $tableName, $data, array $columns = []): Statement

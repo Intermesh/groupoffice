@@ -71,6 +71,18 @@ class Link extends AclItemEntity
 	
 	protected $aclId;
 
+	public static function joinLinks(\go\core\db\Query $query, Entity|ActiveRecord $fromEntity, int $toEntityId) : \go\core\db\Query {
+
+		$on = $query->getTableAlias() . '.id = l.toId and l.toEntityTypeId = ' . $toEntityId;
+
+		return $query->join(
+			'core_link',
+			'l',
+			$on)
+			->andWhere('fromEntityTypeId = '. $fromEntity::entityType()->getId())
+			->andWhere('fromId', '=', $fromEntity->id);
+	}
+
 
 	public static function loggable(): bool
 	{

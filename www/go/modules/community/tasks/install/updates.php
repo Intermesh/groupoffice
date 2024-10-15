@@ -249,4 +249,6 @@ $updates['202408091228'][] = "UPDATE tasks_tasklist SET defaultColor = SUBSTRING
 // subscribe to the tasklists the user owns
 $updates['202408091228'][] = "INSERT IGNORE INTO tasks_tasklist_user
 (tasklistId, userId, isSubscribed, isVisible, color, sortOrder, modSeq) SELECT
-	id, ownerId, 1, 1, defaultColor, 0, 1 FROM tasks_tasklist;";
+	id, ownerId, if(role = 1,  1, 0), 1, defaultColor, 0, 1 FROM tasks_tasklist;";
+
+$updates['202408091228'][] = "update tasks_task set progressUpdated = modifiedAt where progressUpdated is null and progress = 3;";

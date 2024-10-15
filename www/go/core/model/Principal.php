@@ -9,6 +9,7 @@ use go\core\orm\EntityType;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
+use go\core\util\DateTime;
 
 /**
  * A Principal represents an individual, group, location (e.g. a room), resource (e.g. a projector) or other entity in a collaborative environment.
@@ -91,6 +92,18 @@ class Principal extends AclOwnerEntity
 			->add('username', function (Criteria $criteria, $value, Query $query){
 				$query->filter(['entity'=>'User']);
 				$criteria->where('description', '=', $value);
+			})
+			->add('isEmployee', function (Criteria $criteria, $value, Query $query){
+
+				//$criteria->where('description', '=', $value);
+
+				// left join to make sure it exists, maybe check if businessId is not empty too?
+				$query->join('business_employee', 'e', 'e.id = '.$query->getTableAlias().'.id');
+				$criteria->andWhere(
+					(new Criteria())
+						->andWhere('e.quitAt', 'IS', NULL)
+						->orWhere('e.quitAt','>',new DateTime())
+				);
 			})
 			->add('groupId', function (Criteria $criteria, $value, Query $query){
 				$query->join('core_user_group', 'ug', 'ug.userId = principal.id')->andWhere(['ug.groupId' => $value]);

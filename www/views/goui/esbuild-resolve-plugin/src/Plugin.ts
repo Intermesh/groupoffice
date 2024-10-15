@@ -90,7 +90,9 @@ export default class TsPathsPlugin implements Plugin {
       resolvedFileName
     );
 
-		relativePath = relativePath.substring(0, relativePath.length - 4) + "js";
+		if(relativePath.substring(relativePath.length - 4) == 'd.ts') {
+			relativePath = relativePath.substring(0, relativePath.length - 4) + "js";
+		}
 
     return relativePath.startsWith('.') ? relativePath : `./${relativePath}`;
   }

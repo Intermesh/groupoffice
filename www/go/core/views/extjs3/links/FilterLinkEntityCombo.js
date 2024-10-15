@@ -8,5 +8,9 @@ go.links.FilterLinkEntityCombo = Ext.extend(go.form.FormContainer, {
         })];
 
         this.supr().initComponent.call(this);
-    }
+    },
+
+	getRawValue: function() { //for go.core.FilterPanel
+			return this.items.itemAt(0).getRawValue();
+	}
 });

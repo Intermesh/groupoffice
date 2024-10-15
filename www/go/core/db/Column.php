@@ -221,6 +221,9 @@ class Column {
 //				$dt->toLocal();
 //				return $dt;
 			case 'datetime':
+				if(empty($value)) {
+					return null;
+				}
 				$isLocal = $this->dbType ==='localdatetime';
 				if ($value instanceof DateTime || $value instanceof DateTimeImmutable) {
 					if(!($value instanceof GoDateTime)) {
@@ -239,6 +242,10 @@ class Column {
 				}
 
 			case 'date':
+				if(empty($value)) {
+					return null;
+				}
+
 				//make sure date is formatted correctly
 				if ($value instanceof DateTime || $value instanceof DateTimeImmutable) {
 					if(!($value instanceof GoDateTime)) {
