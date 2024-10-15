@@ -341,11 +341,16 @@ class Task extends AclItemEntity {
 			->addText("title", function(Criteria $criteria, $comparator, $value, Query $query, array $filters){
 				$criteria->where('title', $comparator, $value);
 			})
-			->add('tasklistId', function(Criteria $criteria, $value) {
-				if(!empty($value)) {
+			->add('tasklistId', function(Criteria $criteria, $value, Query $query) {
+
+				if($value === 'subscribedOnly' || empty($value)) {
+					$query->join('tasks_tasklist_user', 'utl', 'utl.tasklistId = task.tasklistId AND utl.userId = '.go()->getAuthState()->getUserId())
+						->where('utl.isSubscribed','=', true);
+				} else if(!empty($value)) {
 					$criteria->where(['tasklistId' => $value]);
 				}
-			}, [])
+
+			}, "subscribedOnly")
 			->add('projectId', function(Criteria $criteria, $value, Query $query) {
 				if(!empty($value)) {
 
