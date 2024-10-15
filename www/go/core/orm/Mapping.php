@@ -101,8 +101,8 @@ class Mapping {
 	}
 
 
-	private function internalAddTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = []) {
-		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues);
+	private function internalAddTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = [], bool $isUserTable = false) {
+		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues,  $isUserTable);
 		$this->tables[$name]->dynamic = $this->dynamic;
 		foreach($this->tables[$name]->getMappedColumns() as $col) {
 			$col->dynamic = $this->dynamic;
@@ -132,8 +132,7 @@ class Mapping {
    */
 	public function addUserTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = [], $required = false): Mapping
 	{
-		$table = $this->internalAddTable($name, $alias, $keys, $columns, $constantValues);
-		$table->isUserTable = true;
+		$table = $this->internalAddTable($name, $alias, $keys, $columns, $constantValues, true);
 		$table->required = $required;
 		$this->hasUserTable = true;
 
