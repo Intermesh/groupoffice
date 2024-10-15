@@ -368,6 +368,8 @@ abstract class Property extends Model {
 				{
 					$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly, $this);
 
+					go()->debug($stmt);
+
 					$prop = $stmt->fetchAll();
 					$stmt->closeCursor();
 				}
@@ -466,10 +468,6 @@ abstract class Property extends Model {
 			foreach ($where as $field => $value) {
 				$query->andWhere($field . '= :' . $field)
 					->bind(':' . $field, $value);
-			}
-
-			if (is_a($relation->propertyName, UserProperty::class, true)) {
-				$query->andWhere('userId', '=', go()->getAuthState()->getUserId() ?? null);
 			}
 
 			if (!empty($relation->orderBy)) {
