@@ -8,6 +8,10 @@ use go\core\model\Module;
 use go\modules\business\license\model\License;
 use go\modules\business\studio\Module as StudioModule;
 
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+
 ini_set('zlib.output_compression', 0);
 ini_set('implicit_flush', 1);
 
