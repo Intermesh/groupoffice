@@ -130,7 +130,7 @@ export class CalendarAdapter {
 					}
 
 					if(start.date <= until.date && start.date >= from.date) {
-						console.log(task.progress, date, start, task.title, task);
+						// console.log(task.progress, date, start, task.title, task);
 						yield new CalendarItem({
 							key: '-',
 							start,
