@@ -5,6 +5,7 @@ use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core\App;
 use go\core\db\Criteria;
+use go\core\db\DbException;
 use go\core\orm\Entity;
 use go\core\jmap\Entity as JmapEntity;
 use go\core\orm\EntityType;
@@ -475,5 +476,21 @@ class Acl extends Entity {
 		return static::find()
 			->join($refsQuery, 'refs', 'core_acl.id = refs.aclId', 'left')
 			->where('refs.aclId is null');
+	}
+
+
+	/**
+	 * Copy permissions from another ACL
+	 *
+	 * @throws DbException
+	 */
+	public function copyFrom(int $sourceAclId) : void {
+		go()->getDbConnection()
+				->insertIgnore("core_acl_group",
+					go()->getDbConnection()
+						->select($this->id . " as aclId, groupId, level")
+						->from("core_acl_group")
+						->where(['aclId' => $sourceAclId])
+				)->execute();
 	}
 }
