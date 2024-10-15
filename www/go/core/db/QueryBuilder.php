@@ -344,6 +344,10 @@ class QueryBuilder {
 		$this->tableAlias = $query->getTableAlias();
 
 		$from = $query->getFrom();
+
+		if($from == null) {
+			throw new \LogicException("Please specify a table name with Query::from()");
+		}
 		if ($from instanceof Query)  {
 			$fromSql = "FROM " . $this->buildSubQuery($from, $prefix);
 		} else
