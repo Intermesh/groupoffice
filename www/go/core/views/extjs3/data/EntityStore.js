@@ -233,16 +233,10 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 * ```
 	 *
 	 * @param {int} id
-	 * @returns {Promise<object>}
+	 * @returns {Promise<number>}
 	 */
 	destroy : function(id) {
-		return window.groupofficeCore.jmapds(this.entity.name).destroy(id).then((response) => {
-			if(response.destroyed.indexOf(id) == -1) {
-				return Promise.reject({message: response.notDestroyed[id] ?  response.notDestroyed[id].description : t("Failed to delete"), response: response, error: response.notDestroyed[id] || null});
-			} else {
-				return true;
-			}
-		});
+		return window.groupofficeCore.jmapds(this.entity.name).destroy(id);
 	},
 
 	/**
