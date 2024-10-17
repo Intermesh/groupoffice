@@ -251,4 +251,12 @@ $updates['202408091228'][] = "INSERT IGNORE INTO tasks_tasklist_user
 (tasklistId, userId, isSubscribed, isVisible, color, sortOrder, modSeq) SELECT
 	id, ownerId, if(role = 1,  1, 0), 1, defaultColor, 0, 1 FROM tasks_tasklist;";
 
-$updates['202408091228'][] = "update tasks_task set progressUpdated = modifiedAt where progressUpdated is null and progress = 3;";
+$updates['202410170857'][] = "update tasks_task set progressUpdated = modifiedAt where progressUpdated is null and progress = 3;";
+
+$updates['202410170857'][] = "alter table tasks_task
+    add projectId int unsigned null;";
+
+$updates['202410170857'][] = "alter table tasks_task
+    add constraint tasks_task_business_projects3_project3_id_fk
+        foreign key (projectId) references business_projects3_project3 (id)
+            on delete set null;";

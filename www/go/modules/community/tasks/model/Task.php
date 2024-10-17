@@ -68,7 +68,7 @@ class Task extends AclItemEntity {
 	public $groupId;
 
 	/** @var int */
-	public $projectId ;
+	public $projectId ; // TODO Implement this!
 
 	/** @var int */
 	public $createdBy;
