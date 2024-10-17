@@ -77,6 +77,8 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						this.tasklistCombo.setValue(book.tasklistId);
 					}
 				})
+				this.projectCombo.setValue(cfg.data.id);
+
 				break;
 			case 'Project':
 			case "Contact":
@@ -379,7 +381,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 								valueField: 'id',
 								name: "categories",
 								fieldLabel: t("Category", "tasks")
-							}]
+							},
+							this.projectCombo = new go.modules.community.tasks.ProjectCombo({hidden: !go.Modules.isAvailable("business", "projects3")})
+						]
 					}
 					,
 

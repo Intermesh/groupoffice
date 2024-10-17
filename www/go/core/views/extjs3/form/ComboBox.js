@@ -312,9 +312,11 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 		const me = this;
 
 		me.value = value;
+		const setValue = value;
 
 		if(this.setValuePromise) {
 			await this.setValuePromise;
+			this.setValuePromise = null;
 		}
 
 		this.setValuePromise = new Promise(function(resolve, reject) {
@@ -324,6 +326,7 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 			}
 
 			if(!value) {
+				this.setValuePromise = null;
 				resolve(me);
 				go.form.ComboBox.superclass.setValue.call(me, value);
 				me.clearInvalid();
@@ -337,10 +340,11 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 				me.resolveEntity(value).then(function (entity) {
 					//this prevents the list to expand on loading the value
 					const origHasFocus = me.hasFocus;
-					if(me.value != value) {
+					if(setValue != value) {
 						// Abort another setValue() call was made in between. This can happen when fetching the default
 						// value takes longer then the setValue() call of loading a dialog value.
 						// Do resolve though
+						me.setValuePromise = null;
 						resolve(me);
 						return;
 					}
@@ -352,6 +356,7 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 						me.clearInvalid();
 
 						me.hasFocus = origHasFocus;
+						me.setValuePromise = null;
 						resolve(me);
 					}, me, {single: true});
 
@@ -383,7 +388,7 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 					}, me, {single: true});
 					me.store.loadData({records:[data]}, true);
 					//go.form.ComboBox.superclass.setValue.call(me, value);
-
+					me.setValuePromise = null;
 					resolve(me);
 				});
 			} else {

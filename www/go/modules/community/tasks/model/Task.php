@@ -353,15 +353,16 @@ class Task extends AclItemEntity {
 			}, "subscribedOnly")
 			->add('projectId', function(Criteria $criteria, $value, Query $query) {
 				if(!empty($value)) {
+					$criteria->where(['projectId' => $value]);
 
-					$on = $query->getTableAlias() . '.id = l.toId and l.toEntityTypeId = ' . Task::entityType()->getId();
-
-					$query->join(
-						'core_link',
-						'l',
-						$on)
-						->andWhere('fromEntityTypeId = '. Project3::entityType()->getId())
-						->andWhere('fromId', '=', $value);
+//					$on = $query->getTableAlias() . '.id = l.toId and l.toEntityTypeId = ' . Task::entityType()->getId();
+//
+//					$query->join(
+//						'core_link',
+//						'l',
+//						$on)
+//						->andWhere('fromEntityTypeId = '. Project3::entityType()->getId())
+//						->andWhere('fromId', '=', $value);
 				}
 			})
 			->add('role', function(Criteria $criteria, $value, Query $query) {
