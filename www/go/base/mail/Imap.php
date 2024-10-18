@@ -6,6 +6,7 @@ use Exception;
 use GO;
 use GO\Base\Fs\File;
 use GO\Base\Mail\Exception\ImapAuthenticationFailedException;
+use go\core\util\DateTime;
 
 class Imap extends ImapBodyStruct
 {
@@ -2953,16 +2954,24 @@ class Imap extends ImapBodyStruct
 	 * @param string $mailbox
 	 * @param int $size
 	 * @param string $flags
+	 * @param \DateTimeInterface|null $internalDate If this parameter is set, it will set the INTERNALDATE on the appended message. The parameter should be a date string that conforms to the rfc2060 specifications for a date_time value.
 	 * @return bool
+	 * @throws Exception
 	 */
-	public function append_start($mailbox, $size, $flags = "") :bool
+	public function append_start($mailbox, $size, $flags = "", \DateTimeInterface $internalDate = null) :bool
 	{
 		//Select mailbox first so we can predict the UID.
 		$this->select_mailbox($mailbox);
 
 		$this->clean($mailbox, 'mailbox');
 		$this->clean($size, 'uid');
-		$command = 'APPEND "'.$this->addslashes($this->utf7_encode($mailbox)).'" ('.$flags.') {'.$size."}\r\n";
+		$command = 'APPEND "'.$this->addslashes($this->utf7_encode($mailbox)).'" ('.$flags.') ';
+
+		if(isset($internalDate)) {
+			$command .= '"' . $internalDate->format("d-M-Y H:i:s O") . '" ';
+		}
+
+		$command .= '{'.$size."}\r\n";
 		$this->send_command($command);
 		$result = fgets($this->handle);
 		if (substr($result, 0, 1) == '+') {
@@ -2977,13 +2986,15 @@ class Imap extends ImapBodyStruct
 	 * @param string $mailbox
 	 * @param string|File $data
 	 * @param string $flags See set_message_flag
+	 * @param \DateTimeInterface|null $internalDate
 	 * @return boolean
+	 * @throws Exception
 	 */
-	public function append_message($mailbox, $data, $flags="") :bool
+	public function append_message($mailbox, $data, $flags="", \DateTimeInterface $internalDate = null) :bool
 	{
 		if ($data instanceof File) {
 
-			if (!$this->append_start($mailbox, $data->size(), $flags)) {
+			if (!$this->append_start($mailbox, $data->size(), $flags, $internalDate)) {
 				return false;
 			}
 
@@ -2999,7 +3010,7 @@ class Imap extends ImapBodyStruct
 
 		} else {
 
-			if(!$this->append_start($mailbox, strlen($data), $flags)) {
+			if(!$this->append_start($mailbox, strlen($data), $flags, $internalDate)) {
 				return false;
 			}
 

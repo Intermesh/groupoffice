@@ -22,6 +22,7 @@ use go\core\mail\AddressList;
 use go\core\mail\MimeDecode;
 use go\core\model\Module;
 use go\core\model\User;
+use go\core\util\DateTime;
 use GO\Email\Model\Alias;
 use GO\Email\Model\Account;
 use GO\Email\Model\ImapMessage;
@@ -1991,7 +1992,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 					$flags .= ' $Forwarded';
 				}
 
-				if(!$imap2->append_message($params['to_mailbox'], $source, $flags)) {
+				if(!$imap2->append_message($params['to_mailbox'], $source, $flags, new DateTime($header['internal_date']))) {
 					$imap2->disconnect();
 					throw new \Exception('Could not move message');
 				}
