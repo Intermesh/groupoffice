@@ -1,3 +1,5 @@
+- E-mail: Set internal date on IMAP APPEND command's. This way the internal date when moving or copying messages to another account is preserved
+
 14-10-2024: 6.8.77
 - Timeregistration: Fixed time dialog tracking time starting at midnight
 - Newsletters: fix missing property error when sending newsletter with attachment
