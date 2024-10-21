@@ -67,8 +67,8 @@ class Task extends AclItemEntity {
 	/** @var int used for the kanban groups */
 	public $groupId;
 
-	/** @var int */
-	public $projectId ; // TODO Implement this!
+	public ?int $projectId ;
+	public ?int $mileStoneId ;
 
 	/** @var int */
 	public $createdBy;
@@ -351,20 +351,8 @@ class Task extends AclItemEntity {
 				}
 
 			}, "subscribedOnly")
-			->add('projectId', function(Criteria $criteria, $value, Query $query) {
-				if(!empty($value)) {
-					$criteria->where(['projectId' => $value]);
-
-//					$on = $query->getTableAlias() . '.id = l.toId and l.toEntityTypeId = ' . Task::entityType()->getId();
-//
-//					$query->join(
-//						'core_link',
-//						'l',
-//						$on)
-//						->andWhere('fromEntityTypeId = '. Project3::entityType()->getId())
-//						->andWhere('fromId', '=', $value);
-				}
-			})
+			->addColumn('mileStoneId')
+			->addColumn('projectId')
 			->add('role', function(Criteria $criteria, $value, Query $query) {
 				if(!$query->isJoined("tasks_tasklist", "tasklist") ){
 					$query->join("tasks_tasklist", "tasklist", "task.tasklistId = tasklist.id");
