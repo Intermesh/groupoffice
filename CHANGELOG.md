@@ -1,3 +1,4 @@
+21-10-2024: 6.8.78
 - E-mail: Set internal date on IMAP APPEND command's. This way the internal date when moving or copying messages to another account is preserved
 - Core: added endpoint api/up.php that checks the database connection and filesystem disks for uptime monitoring.
 - Core / e-mail: Fixed problem where typing ü would insert a , in the mail composer on german QWERTZ layout
