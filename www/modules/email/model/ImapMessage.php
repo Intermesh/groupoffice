@@ -819,7 +819,7 @@ class ImapMessage extends ComposerMessage {
 //		$msg->setContentType("multipart/mixed");
 
 
-		if(!$this->getImapConnection()->append_message($this->mailbox, $msg->toString(), '\Seen')) {
+		if(!$this->getImapConnection()->append_message($this->mailbox, $msg->toString(), '\Seen', new DateTime($this->date))) {
 			throw new \Exception("Failed to append new message");
 		}
 

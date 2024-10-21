@@ -1,6 +1,12 @@
+- E-mail: Set internal date on IMAP APPEND command's. This way the internal date when moving or copying messages to another account is preserved
+- Core: added endpoint api/up.php that checks the database connection and filesystem disks for uptime monitoring.
+- Core / e-mail: Fixed problem where typing ü would insert a , in the mail composer on german QWERTZ layout
+
+14-10-2024: 6.8.77
 - Timeregistration: Fixed time dialog tracking time starting at midnight
 - Newsletters: fix missing property error when sending newsletter with attachment
 - Smime: Handle two valid certficates for the same sender
+- Comments / support: display download icon in order to directly download a comment attachment.
 
 08-10-2024: 6.8.76
 - ActiveSync: Fixed fatal error because of breaking change in z-push
