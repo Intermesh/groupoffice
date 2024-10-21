@@ -17,12 +17,26 @@ try {
 	if(disk_free_space(go()->getDataFolder()->getPath()) < $minSpace) {
 		Response::get()->setStatus(500);
 		ErrorHandler::log("Out of disk space");
+		exit();
+	}
+
+	if(!go()->getTmpFolder()->getFile("log/up.txt")->putContents(date("c"))) {
+		Response::get()->setStatus(500);
+		ErrorHandler::log("Can't write to data");
+		exit();
 	}
 
 
 	if(disk_free_space(go()->getTmpFolder()->getPath()) < $minSpace) {
 		Response::get()->setStatus(500);
 		ErrorHandler::log("Out of disk space");
+		exit();
+	}
+
+	if(!go()->getTmpFolder()->getFile("up.txt")->putContents(date("c"))) {
+		Response::get()->setStatus(500);
+		ErrorHandler::log("Can't write to tmp");
+		exit();
 	}
 
 	echo "All OK";
