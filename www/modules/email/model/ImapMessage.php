@@ -810,9 +810,17 @@ class ImapMessage extends ComposerMessage {
 		}
 		while ($att = array_shift($atts)) {
 			if ($att->disposition == 'attachment' || empty($att->content_id)) {
+				// Do not delete S/MINE certificate
+				if ($att->mime === "application/x-pkcs7-signature") {
+					continue;
+				}
+
 				$str = $this->addPartString($att, $bIsPlain);
 				$a = Attachment::fromString($str, "", ($bIsPlain ? 'text/plain' : 'text/html'), Attachment::ENCODING_7BIT);
-				$a->setId("");
+
+				// Fool PHPMailer into attaching all attachments. If the IDs are identical, later attachments are not
+				// being attached inline.
+				$a->setId(random_bytes(12));
 				$msg->embed($a);
 			}
 		}
