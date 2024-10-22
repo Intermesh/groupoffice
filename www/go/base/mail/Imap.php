@@ -1068,7 +1068,7 @@ class Imap extends ImapBodyStruct
 					return $uids;
 				}
 			}
-		} elseif (stristr($this->capability, 'SORT')) {
+		} elseif (false && stristr($this->capability, 'SORT')) {
 			$uids=$this->server_side_sort($sort, $reverse, $filter);
 			if($uids === false) {
 				throw new \Exception("Sort error: " . $this->last_error());
@@ -1143,7 +1143,7 @@ class Imap extends ImapBodyStruct
 		 *
 		 * We had some other where it didn't work on a large Polish provider. We'll send it again.
 		 */
-		$charset = 'CHARSET UTF-8 ';
+		$charset = !\GO\Base\Util\StringHelper::isUtf8($terms) ? '' : 'CHARSET UTF-8 ';
 
 		$command = 'UID SEARCH '.$charset.trim($terms)."\r\n";
 		$this->send_command($command);
