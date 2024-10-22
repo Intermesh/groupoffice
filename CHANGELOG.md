@@ -1,3 +1,5 @@
+- E-mail: Server side sort was disabled by accident since May 2024
+
 21-10-2024: 6.8.78
 - E-mail: Set internal date on IMAP APPEND command's. This way the internal date when moving or copying messages to another account is preserved
 - Core: added endpoint api/up.php that checks the database connection and filesystem disks for uptime monitoring.
