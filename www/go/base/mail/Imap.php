@@ -1068,7 +1068,7 @@ class Imap extends ImapBodyStruct
 					return $uids;
 				}
 			}
-		} elseif (false && stristr($this->capability, 'SORT')) {
+		} elseif (stristr($this->capability, 'SORT')) {
 			$uids=$this->server_side_sort($sort, $reverse, $filter);
 			if($uids === false) {
 				throw new \Exception("Sort error: " . $this->last_error());
