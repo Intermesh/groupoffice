@@ -1142,6 +1142,7 @@ class Imap extends ImapBodyStruct
 		 * Without seems to work on different servers.
 		 *
 		 * We had some other where it didn't work on a large Polish provider. We'll send it again.
+		 * It doesn't work on o365 imap too.
 		 */
 		$charset = !\GO\Base\Util\StringHelper::isUtf8($terms) ? '' : 'CHARSET UTF-8 ';
 
