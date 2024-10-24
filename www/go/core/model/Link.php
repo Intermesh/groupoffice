@@ -10,6 +10,7 @@ use GO\Base\Db\ActiveRecord;
 use go\core\acl\model\AclItemEntity;
 use go\core\App;
 use go\core\db\Criteria;
+use go\core\ErrorHandler;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
@@ -628,9 +629,13 @@ class Link extends AclItemEntity
 		$searches = Search::find()->limit($limit)->offset($offset);
 
 		foreach($searches as $search) {
-			$entity = $search->findEntity();
-			if($entity && !$entity->equals($model)) {
-				Link::create($entity, $model);
+			try {
+				$entity = $search->findEntity();
+				if ($entity && !$entity->equals($model)) {
+					Link::create($entity, $model);
+				}
+			} catch(Exception $e) {
+				ErrorHandler::logException($e);
 			}
 		}
 

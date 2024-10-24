@@ -300,6 +300,8 @@ abstract class AclItemEntity extends AclEntity {
 			return self::$aclEntityCache[$cacheKey];
 		}
 
+		go()->debug($stmt);
+
 		$stmt->execute();
 
 		$aclEntity = $stmt->fetch();

@@ -37,7 +37,13 @@ class Module extends core\Module {
 	}
 
 	public static function onUserValidate(User $user) {
-		$plain = $user->plainPassword(); // dV5(
+
+		if(!$user->validatePasswordEnabled()) {
+			// used for demo data
+			return;
+		}
+
+		$plain = $user->plainPassword();
 		if(isset($plain)) {
 
 			if(Settings::get()->enableForGroupId != Group::ID_EVERYONE && !$user->isInGroup(Settings::get()->enableForGroupId)) {

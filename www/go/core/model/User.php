@@ -92,7 +92,24 @@ class User extends AclItemEntity {
 
 	const USERNAME_REGEX = '/[A-Za-z0-9_\-\.@]+/';
 	
-	public $validatePassword = true;
+	private bool $validatePassword = true;
+
+	/**
+	 * Check or set if password validation is enabled
+	 *
+	 * @param bool|null $enabled Supply if you want to change the setting
+	 * @return bool
+	 */
+	public function validatePasswordEnabled(bool $enabled = null) {
+
+		$old = $this->validatePassword;
+
+		if(isset($enabled)) {
+			$this->validatePassword = $enabled;
+		}
+
+		return $old;
+	}
 
 	/**
 	 * The ID

@@ -4,6 +4,7 @@ namespace go\core\model;
 
 use Exception;
 use GO\Base\Db\ActiveRecord;
+use go\core\exception\NotFound;
 use go\core\jmap\Entity;
 use go\core\model\Acl;
 use go\core\acl\model\AclOwnerEntity;
@@ -234,6 +235,9 @@ class Search extends AclOwnerEntity {
 	 */
 	public function findEntity() {
 		$e = EntityType::findById($this->entityTypeId);
+		if(!$e) {
+			throw new NotFound("Can't find entity type ID: " . $this->entityTypeId);
+		}
 		$cls = $e->getClassName();
 		if(is_a($cls, ActiveRecord::class, true)) {
 			return $cls::model()->findByPk($this->entityId);
