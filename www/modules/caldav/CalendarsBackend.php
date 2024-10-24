@@ -378,7 +378,8 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				}
 				$objects[] = array(
 					'uri' => $davEvent->uri,
-					//'calendardata' => $davEvent->data,
+//					'calendardata' => $davEvent->data,
+					'calendarid' => $calendarId, //if data is not present then calendarid must be there. See AbstractBackend line 133
 					'lastmodified' => $event->mtime,
 					'etag'=> $event->getEtag(),
 					'size' => strlen($davEvent->data),
