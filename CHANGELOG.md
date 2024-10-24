@@ -1,4 +1,5 @@
 - E-mail: Server side sort was disabled by accident since May 2024
+- Caldav: Fixed CalDAV sync with DAVx5 error #1192
 
 21-10-2024: 6.8.78
 - E-mail: Set internal date on IMAP APPEND command's. This way the internal date when moving or copying messages to another account is preserved
