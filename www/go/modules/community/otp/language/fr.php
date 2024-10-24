@@ -11,10 +11,8 @@ return array (
   'Not found' => 'Non trouvé',
   'Invalid code' => 'Code invalide',
   'OTP Authenticator' => 'Authentification Google',
-  'Enable OTP Authenticator' => 'Activer l\'authentification Google',
   'Disable OTP Authenticator' => 'Désactiver l\'authentification Google',
   'When disabling OTP Authenticator this step will be removed from the login process.' => 'Lorsque l\'authentification Google est désactivée, cette étape sera supprimée du processus d\'authentification.',
   'Provide your current password to disable OTP Authenticator.' => 'Saisissez votre mot de passe actuel pour désactiver l\'authentification Google.',
-  'Disable OTP Authenticator' => 'Désactiver l\'authentification Google',
   'Provide your current password before you can enable OTP Authenticator.' => 'Saisissez votre mot de passe actuel pour activer l\'authentification Google.',
 );

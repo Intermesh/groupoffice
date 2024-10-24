@@ -122,7 +122,7 @@ class Authenticator extends PrimaryAuthenticator {
 		if($server->hasEmailAccount()) {
 			try {
 				$this->setEmailAccount($ldapUsername, $password, $mappedValues['email'], $server, $user);
-			} catch(ImapAuthenticationFailedException $e) {
+			} catch(\GO\Base\Mail\Exception\ImapAuthenticationFailedException $e) {
 
 				//ignore imap failure.
 				ErrorHandler::logException($e);

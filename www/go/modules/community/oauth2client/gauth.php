@@ -18,7 +18,7 @@ $state = new State();
 //not possible with oauth flow.
 State::$CSRFcheck = false;
 
-$router = (new Router())
+(new Router())
 	->addRoute('/authenticate\/([0-9]+)/', 'GET', Oauth2Client::class, 'auth')
 	->addRoute('/callback/', "GET", Oauth2Client::class, 'callback')
 	->addRoute('/openid\/([0-9]+)/', "GET", Oauth2Client::class, 'openid')

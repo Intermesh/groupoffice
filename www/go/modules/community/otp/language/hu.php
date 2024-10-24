@@ -6,7 +6,6 @@ return array (
   'Not found' => 'Nem található',
   'Invalid code' => 'Érvénytelen kód',
   'OTP Authenticator' => 'Google hitelesítő',
-  'Enable OTP Authenticator' => 'Engedélyezze a Google Hitelesítő',
   'Scan the QR code below to enable OTP Authenticator for your account.' => 'QR-kód beolvasásával követve engedélyezheti a Google Hitelesítő fiókját.',
   'Secret key for manual input' => 'Titkos kulcs manuális bemeneti',
   'No secret available' => 'Titok nem elérhető',
