@@ -1,3 +1,4 @@
+24-10-2024: 6.8.79
 - E-mail: Server side sort was disabled by accident since May 2024
 - Caldav: Fixed CalDAV sync with DAVx5 error #1192
 
