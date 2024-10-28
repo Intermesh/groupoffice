@@ -368,39 +368,36 @@ th {
 		}
 				
 		$path = explode('.', $header);
-		
-		while($seg = array_shift($path)) {
+
+		while ($seg = array_shift($path)) {
 
 			$index = $this->extractIndex($seg);
-			if(isset($index)) {
-				if(!isset($templateValues[$seg][$index])) {
+			if (isset($index)) {
+				if (!isset($templateValues[$seg][$index])) {
 					return "";
-				}else{
+				} else {
 					$templateValues = $templateValues[$seg][$index];
 					continue;
 				}
 			}
-			
-			if(is_array($templateValues)) {
-				if(!isset($templateValues[0])) {		
+
+			if (is_array($templateValues)) {
+				if (!isset($templateValues[0])) {
 					$templateValues = $templateValues[$seg] ?? "";
-				} else
-				{
+				} else {
 					$a = [];
-				
-					foreach($templateValues as $i) {
-						if(is_array($i)) {
+
+					foreach ($templateValues as $i) {
+						if (is_array($i)) {
 							$a[] = $i[$seg] ?? "";
-						} else
-						{
+						} else {
 							$a[] = $i->$seg ?? "";
 						}
 					}
 
 					$templateValues = $a;
 				}
-			}else
-			{
+			} else {
 				$templateValues = $templateValues->$seg ?? "";
 			}
 		}
