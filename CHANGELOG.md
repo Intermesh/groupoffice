@@ -1,5 +1,6 @@
 - Core: bugfix editing individual field set in entity
 - Core: bugfix user export
+- Core: Several bug fixes user import
 
 24-10-2024: 6.8.79
 - E-mail: Server side sort was disabled by accident since May 2024

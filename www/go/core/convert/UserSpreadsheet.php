@@ -34,7 +34,16 @@ class UserSpreadsheet extends Spreadsheet {
 		return "";
   }
 
-  public function importCreateEmailAccount(Entity $entity, $value, $values) {
+	public function importPersonalGroup(Entity $entity, $value, $values): void
+	{
+		if($entity instanceof User && !$entity->getPersonalGroup()) {
+			return;
+		}
+		return;
+	}
+
+	public function importCreateEmailAccount(Entity $entity, $value, $values): void
+	{
     $this->postFixAdminDomain = false;
     $this->postFixAdminPassword = false;
 

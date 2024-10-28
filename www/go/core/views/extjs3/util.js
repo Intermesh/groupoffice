@@ -605,10 +605,9 @@ go.util =  (function () {
 				upload: function (response) {
 					Ext.getBody().mask(t("Importing..."));
 
-
-					if(response.name.toLowerCase().substr(-3) == 'csv' || response.name.toLowerCase().substr(-4) == 'xlsx') {
+					if(response.name.toLowerCase().slice(-3) === 'csv' || response.name.toLowerCase().slice(-4) === 'xlsx') {
 						Ext.getBody().unmask();
-						var dlg = new go.import.CsvMappingDialog({
+						const dlg = new go.import.CsvMappingDialog({
 							entity: entity,
 							fileName: response.name,
 							blobId: response.blobId,
@@ -642,10 +641,6 @@ go.util =  (function () {
 
 									go.Db.store(entity).getUpdates();
 								}
-
-								// if (callback) {
-								// 	callback.call(scope || this, response);
-								// }
 							},
 							scope: this
 						});
