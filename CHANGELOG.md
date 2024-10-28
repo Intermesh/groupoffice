@@ -1,3 +1,4 @@
+28-10-2024: 6.8.80
 - Core: bugfix editing individual field set in entity
 - Core: bugfix user export
 - Core: Several bug fixes user import
