@@ -469,10 +469,6 @@ public function historyLog(): bool|array
 	public function setCurrentPassword($currentPassword){
 		$this->currentPassword = $currentPassword;
 
-		if(go()->getAuthState() && go()->getAuthState()->isAdmin()) {
-			return;
-		}
-
 		if(!$this->checkPassword($currentPassword)) {
 			$this->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
 		}

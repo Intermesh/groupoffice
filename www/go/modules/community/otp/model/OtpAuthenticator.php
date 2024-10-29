@@ -11,6 +11,7 @@ use go\core\orm\Mapping;
 use go\core\fs\File;
 use go\core\orm\Property;
 use go\core\util\QRcode;
+use go\core\validate\ErrorCode;
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'core'.DIRECTORY_SEPARATOR.'util'.DIRECTORY_SEPARATOR.'QRcode.php';
 
@@ -41,6 +42,7 @@ class OtpAuthenticator extends Property {
 			return null;
 		}
 
+
 		if(!$this->owner->hasPermissionLevel(Acl::LEVEL_WRITE)) {
 			throw new Forbidden();
 		}
@@ -52,6 +54,7 @@ class OtpAuthenticator extends Property {
 		if(!$value) {
 			return;
 		}
+
 		if(!$this->owner->hasPermissionLevel(Acl::LEVEL_WRITE)) {
 			throw new Forbidden();
 		}
@@ -77,6 +80,13 @@ class OtpAuthenticator extends Property {
 				$this->setValidationError('verify', \go\core\validate\ErrorCode::INVALID_INPUT, "The verify code is not correct.");
 			} else{
 				$this->verified = true;
+			}
+		}
+
+		if($this->isModified("secret")) {
+			if((!go()->getAuthState() || !go()->getAuthState()->isAdmin()) && !$this->owner->isPasswordVerified()) {
+				$this->owner->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
+				throw new Forbidden();
 			}
 		}
 		
