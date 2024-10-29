@@ -470,18 +470,11 @@ public function historyLog(): bool|array
 		$this->currentPassword = $currentPassword;
 
 		if(go()->getAuthState() && go()->getAuthState()->isAdmin()) {
-			if(!go()->getAuthState()->getUser()->checkPassword($currentPassword)) {
-				$this->passwordVerified = false;
-			}else {
-				$this->passwordVerified = true;
-			}
-		} else {
+			return;
+		}
 
-			if (!$this->checkPassword($currentPassword)) {
-				$this->passwordVerified = false;
-			} else {
-				$this->passwordVerified = true;
-			}
+		if(!$this->checkPassword($currentPassword)) {
+			$this->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
 		}
 	}
 
@@ -580,7 +573,7 @@ public function historyLog(): bool|array
 	private function validatePasswordChange(): bool
 	{
 
-		if($this->passwordVerified) {
+		if($this->passwordVerified || (go()->getAuthState() && go()->getAuthState()->isAdmin())) {
 			return true;
 		}
 

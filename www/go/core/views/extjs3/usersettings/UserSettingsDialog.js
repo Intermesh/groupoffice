@@ -369,6 +369,11 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			{
 				if(response.notUpdated && id in response.notUpdated) {
 					for (var name in response.notUpdated[id].validationErrors) {
+
+						if(name == "currentPassword") {
+							GO.errorDialog.show(t("The current password you entered was incorrect"), t("Invalid password"));
+							continue;
+						}
 						var field = this.formPanel.getForm().findField(name);
 						if (field) {
 							field.markInvalid(response.notUpdated[id].validationErrors[name].description);
@@ -406,6 +411,9 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 */
 	needCurrentPassword : function(){
 		let c = go.User.capabilities['go:core:core'] || {};
+		if(c.mayChangeUsers) {
+			return false;
+		}
 		
 		var needed = false,
 			accountPanel = this.tabPanel.getItem('pnl-account-settings');
