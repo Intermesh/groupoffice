@@ -592,7 +592,15 @@ public function historyLog(): bool|array
 			return true;
 		}
 
-		return false;
+		$authState = App::get()->getAuthState();
+		if(!$authState) {
+			return false;
+		}
+		if(!$authState->isAuthenticated()) {
+			return false;
+		}
+
+		return go()->getModel()->getUserRights()->mayChangeUsers;
 	}
 
 	protected function internalValidate() {
@@ -907,7 +915,7 @@ public function historyLog(): bool|array
 		if($this->isModified(['password'])) {
 			$this->passwordModifiedAt = new DateTime();
 		}
-		
+
 		if(!parent::internalSave()) {
 			return false;
 		}

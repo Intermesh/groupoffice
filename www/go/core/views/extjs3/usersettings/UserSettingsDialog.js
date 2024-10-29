@@ -406,6 +406,9 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 */
 	needCurrentPassword : function(){
 		let c = go.User.capabilities['go:core:core'] || {};
+		if(c.mayChangeUsers) {
+			return false;
+		}
 		
 		var needed = false,
 			accountPanel = this.tabPanel.getItem('pnl-account-settings');
