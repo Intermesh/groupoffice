@@ -1,4 +1,5 @@
 - Core: Admin can change passwords without using own password again
+- Email: Set references header when forwarding mail
 
 28-10-2024: 6.8.80
 - Core: bugfix editing individual field set in entity
