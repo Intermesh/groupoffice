@@ -1617,3 +1617,28 @@ $updates['202409160946'][] = "alter table core_import_mapping
     add thousandsSeparator char null;";
 
 
+
+$updates['202410310946'][] = "alter table core_acl_group
+    drop foreign key core_acl_group_ibfk_2;";
+
+$updates['202410310946'][] = "alter table core_acl_group
+    add constraint core_acl_group_ibfk_2
+        foreign key (aclId) references core_acl (id)
+            on update cascade on delete cascade;";
+
+
+$updates['202410310946'][] = "alter table core_acl_group_changes
+    drop foreign key `all`;";
+
+$updates['202410310946'][] = "alter table core_acl_group_changes
+    add constraint `all`
+        foreign key (aclId) references core_acl (id)
+            on update cascade on delete cascade;";
+
+$updates['202410310946'][] = "alter table core_search
+    drop foreign key core_search_ibfk_2;";
+
+$updates['202410310946'][] = "alter table core_search
+    add constraint core_search_ibfk_2
+        foreign key (aclId) references core_acl (id)
+            on update cascade on delete cascade;";
