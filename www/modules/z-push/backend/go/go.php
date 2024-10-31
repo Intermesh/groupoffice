@@ -7,6 +7,7 @@
 use go\core\auth\Authenticate;
 use go\core\auth\TemporaryState;
 use go\core\model\Settings;
+use go\core\orm\Entity;
 use go\core\util\DateTime;
 
 class BackendGO extends Backend implements IBackend, ISearchProvider {
@@ -626,11 +627,16 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 
 		ZLog::Write(LOGLEVEL_DEBUG, "All sink folders checked");
 
+		// don't use db connection constantly on push connection
 		ZLog::Write(LOGLEVEL_DEBUG, "Closing DB connection: " . go()->getDbConnection()->getId());
-
 		go()->getDbConnection()->disconnect();
+
+		// keep memory usage as low as possible when sleeping
+		ZLog::Write(LOGLEVEL_DEBUG, "Clearing cache memory");
 		\go\core\db\Table::destroyInstances();
 		go()->getCache()->disableMemory();
+		Settings::flushCache();
+		Entity::clearCache();
 		gc_collect_cycles();
 
 		ZLog::Write(LOGLEVEL_DEBUG, "Memory: " . memory_get_usage());
