@@ -872,7 +872,7 @@ abstract class EntityController extends Controller {
    * @throws InvalidArguments
    * @throws Exception
    */
-	private function destroyEntities(array $destroy, ArrayObject $result) {
+	protected function destroyEntities(array $destroy, ArrayObject $result) {
 
 		$doDestroy = [];
 		foreach ($destroy as $id) {
