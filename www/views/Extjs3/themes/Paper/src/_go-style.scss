@@ -26,6 +26,16 @@ body {
 	//background-image: radial-gradient( circle farthest-corner at 10% 20%,  rgba(239,166,76,1) 0%, rgba(245,184,184,1) 100.2% );
 }
 
+:root, body {
+	@include light-theme;
+}
+body.dark {
+	@include dark-theme;
+	* {
+		color-scheme: dark;
+	}
+}
+
 body * {
 	box-sizing: border-box;
 }
