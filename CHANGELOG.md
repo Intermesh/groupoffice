@@ -1,5 +1,6 @@
 - Core: Admin can change passwords without using own password again
 - Email: Set references header when forwarding mail
+- Newsletters: fix php compatibility error when sending newsletters
 
 28-10-2024: 6.8.80
 - Core: bugfix editing individual field set in entity

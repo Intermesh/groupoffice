@@ -431,7 +431,7 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 	 *
 	 * @return bool
 	 */
-	protected function smtpSend($header, $body)
+	protected function smtpSend($header, $body): bool
 	{
 		$header = static::stripTrailingWSP($header) . static::$LE . static::$LE;
 		$bad_rcpt = [];

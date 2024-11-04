@@ -81,11 +81,6 @@ class EmailReminders extends AbstractCron {
 			);
 
 			while ($reminderModel = $remindersStmt->fetch()) {
-//					$relatedModel = $reminderModel->getRelatedModel();
-
-//					var_dump($relatedModel->name);
-
-//					$modelName = $relatedModel ? $relatedModel->localizedName : \GO::t("Unknown");
 				$subject = \GO::t("Reminder").': '.$reminderModel->name;
 
 				$time = !empty($reminderModel->vtime) ? $reminderModel->vtime : $reminderModel->time;
@@ -94,8 +89,6 @@ class EmailReminders extends AbstractCron {
 
 				$body = \GO::t("Time").': '.date($userModel->completeDateFormat.' '.$userModel->time_format,$time)."\n";
 				$body .= \GO::t("Name").': '.str_replace('<br />',',',$reminderModel->name)."\n";
-
-//					date_default_timezone_set(\GO::user()->timezone);
 
 				$message = \GO\Base\Mail\Message::newInstance($subject, $body);
 				$message->addFrom(\GO::config()->noreply_email,\GO::config()->title);
