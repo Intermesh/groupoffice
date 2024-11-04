@@ -2233,6 +2233,7 @@ The following is the error message:
 		if($relationName == 'participants' && isset($attributes['participants']) && $attributes['participants'] === null) {
 			return;
 		}
+		parent::duplicateRelation($relationName, $duplicate, $attributes, $findParams);
 	}
 	
 	/**
