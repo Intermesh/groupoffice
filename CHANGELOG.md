@@ -1,3 +1,4 @@
+04-11-2024: 6.8.81
 - Core: Admin can change passwords without using own password again
 - Email: Set references header when forwarding mail
 - Newsletters: fix php compatibility error when sending newsletters
