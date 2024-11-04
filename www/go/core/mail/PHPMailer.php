@@ -400,7 +400,7 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 			)
 			&& count($this->bcc) > 0
 		) {
-			$header .= $this->addrAppend('Bcc', $this->bcc);
+			$header .= (static::$LE . $this->addrAppend('Bcc', $this->bcc));
 		}
 
 		return static::stripTrailingWSP($header . $this->mailHeader) .
