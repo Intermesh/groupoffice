@@ -635,8 +635,6 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 		ZLog::Write(LOGLEVEL_DEBUG, "Clearing cache memory");
 		\go\core\db\Table::destroyInstances();
 		go()->getCache()->disableMemory();
-		Settings::flushCache();
-		Entity::clearCache();
 		gc_collect_cycles();
 
 		ZLog::Write(LOGLEVEL_DEBUG, "Memory: " . memory_get_usage());

@@ -146,8 +146,6 @@ class PushDispatcher
 			// because there are always many sse requests simultaneously we must keep memory as low as possible.
 			go()->getCache()->disableMemory();
 			Table::destroyInstances();
-			Settings::flushCache();
-			Entity::clearCache();
 			gc_collect_cycles();
 
 			go()->debug("SSE Memory usage: " . memory_get_usage());
