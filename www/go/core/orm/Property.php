@@ -1863,7 +1863,7 @@ abstract class Property extends Model {
 					$modifiedForTable[$to] = $this->{$from} ?? null;
 				}
 
-				if($table->isUserTable || $this instanceof UserProperty) {
+				if($table->isUserTable || ($this instanceof UserProperty && $table->hasColumn('userId'))) {
 					$modifiedForTable["userId"] = go()->getUserId();
 				}
 
