@@ -48,7 +48,8 @@ GO.calendar.formatQtip = function(data,verbose)
 		str += '<br />'+t("Status", "calendar")+': ';
 		
 		if(t("statuses", "calendar")[data.status]){
-			str+=Ext.util.Format.htmlEncode(t("statuses", "calendar")[data.status]);
+			// str+=Ext.util.Format.htmlEncode(t("statuses", "calendar")[data.status]);
+			str+=t("statuses", "calendar")[data.status];
 		}else
 		{
 			str+=data.status;
@@ -57,12 +58,14 @@ GO.calendar.formatQtip = function(data,verbose)
 
 	if(!GO.util.empty(data.calendar_name))
 	{
-		str += '<br />'+t("Calendar", "calendar")+': '+Ext.util.Format.htmlEncode(data.calendar_name);
+		// str += '<br />'+t("Calendar", "calendar")+': '+Ext.util.Format.htmlEncode(data.calendar_name);
+		str += '<br />'+t("Calendar", "calendar")+': '+data.calendar_name;
 	}
 
 	if(!GO.util.empty(data.username))
 	{
-		str += '<br />'+t("Owner")+': '+Ext.util.Format.htmlEncode(data.username);
+		// str += '<br />'+t("Owner")+': '+Ext.util.Format.htmlEncode(data.username);
+		str += '<br />'+t("Owner")+': '+data.username;
 	}
 
 	str += '<br />'+t("Created at")+': '+data.creationDate.format(GO.settings.date_format+' '+GO.settings.time_format);
@@ -71,12 +74,14 @@ GO.calendar.formatQtip = function(data,verbose)
 		
 	if(verbose && !GO.util.empty(data.musername))
 	{
-		str += '<br />'+t("Modified by")+': '+Ext.util.Format.htmlEncode(data.musername);
+		// str += '<br />'+t("Modified by")+': '+Ext.util.Format.htmlEncode(data.musername);
+		str += '<br />'+t("Modified by")+': '+data.musername;
 	}
 	
 	if(!GO.util.empty(data.location))
 	{
-		str += '<br />'+t("Location", "calendar")+': '+Ext.util.Format.htmlEncode(data.location);
+		// str += '<br />'+t("Location", "calendar")+': '+Ext.util.Format.htmlEncode(data.location);
+		str += '<br />'+t("Location", "calendar")+': '+data.location;
 	}
 
 	if(!GO.util.empty(data.description))
@@ -87,12 +92,14 @@ GO.calendar.formatQtip = function(data,verbose)
 	if (!GO.util.empty(data.resources)) {
 		str += '<br />'+t("Used resources", "calendar")+':';
 		for (var i in data.resources)
-			str += '<br /> - '+Ext.util.Format.htmlEncode(data.resources[i]);
+			// str += '<br /> - '+Ext.util.Format.htmlEncode(data.resources[i]);
+			str += '<br /> - '+data.resources[i];
 	}
 	
 	if (!GO.util.empty(data.resourced_calendar_name))
-		str += '<br />'+t("Resource used in", "calendar")+': '+Ext.util.Format.htmlEncode(data.resourced_calendar_name);
-	
+		// str += '<br />'+t("Resource used in", "calendar")+': '+Ext.util.Format.htmlEncode(data.resourced_calendar_name);
+		str += '<br />'+t("Resource used in", "calendar")+': '+data.resourced_calendar_name;
+
 	return Ext.util.Format.htmlEncode(str);
 }
 
