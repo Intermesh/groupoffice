@@ -346,7 +346,7 @@ class Task extends AclItemEntity {
 				if($value === 'subscribedOnly' || empty($value)) {
 					$query->join('tasks_tasklist_user', 'utl', 'utl.tasklistId = task.tasklistId AND utl.userId = '.go()->getAuthState()->getUserId())
 						->where('utl.isSubscribed','=', true);
-				} else if(!empty($value)) {
+				} else if($value != 'any') {
 					$criteria->where(['tasklistId' => $value]);
 				}
 
