@@ -227,7 +227,7 @@ class CalendarConvertor
 		$r = $dayOfWeekBits[strtolower(substr($start->format('l'),0,2))];
 		if($ndays) {
 			foreach ((array)$ndays as $nday) {
-				$r |= $dayOfWeekBits[$nday->day];
+				$r |= $dayOfWeekBits[strtolower($nday->day)];
 			}
 		}
 		return $r;
