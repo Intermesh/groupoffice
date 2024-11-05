@@ -274,8 +274,9 @@ abstract class Entity extends Property {
 	 *
 	 * @param string|int|null $id
 	 * @return bool
+	 * @throws Exception
 	 */
-	public static function exists(?string $id): bool
+	public static function exists(string|int|null $id): bool
 	{
 		if(empty($id)) {
 			return false;
