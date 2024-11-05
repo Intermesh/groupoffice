@@ -225,7 +225,7 @@ abstract class Entity extends Property {
 		} else {
 			$entity->$keyField = $key;
 		}
-		$entity->setValues($values);
+		$entity->setValues($values, false);
 
 		if(!$entity->save()) {
 			throw new SaveException($entity);

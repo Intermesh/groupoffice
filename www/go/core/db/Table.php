@@ -415,6 +415,15 @@ class Table {
 		
 		return false;
 	}
+
+	/**
+	 * @throws DbException
+	 */
+	public function setAutoIncrementValue(int $ai): void
+	{
+		go()->getDbConnection()
+			->exec("ALTER TABLE `" . $this->name ."` AUTO_INCREMENT=" . $ai);
+	}
 	
 	/**
 	 * The primary key columns

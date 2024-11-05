@@ -396,10 +396,10 @@ public function historyLog(): bool|array
 		$this->getPersonalGroup()->setValues($values);
 	}
 	
-	public function setValues(array $values) : Model
+	public function setValues(array $values, bool $checkAPIRights = true) : Model
 	{
 		$this->passwordVerified = null;
-		return parent::setValues($values);
+		return parent::setValues($values, $checkAPIRights);
 	}
 
 
