@@ -639,4 +639,24 @@ class Connection {
 	}
 
 
+	/**
+	 * Get or set foreign key checks
+	 *
+	 * @param bool|null $value Provide to set new value
+	 * @return bool The current or old value
+	 * @throws DbException
+	 */
+	public function foreignKeyChecks(bool $value = null): bool
+	{
+		$stmt = $this->query("SELECT @@SESSION.foreign_key_checks");
+		$current = !!$stmt->fetch(PDO::FETCH_COLUMN, 0);
+
+		if(isset($value) && $value != $current) {
+			$this->exec("set foreign_key_checks = " . ($value ? "1" : "0") . ";");
+		}
+
+		return $current;
+	}
+
+
 }

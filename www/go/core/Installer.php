@@ -135,7 +135,7 @@ class Installer {
 		go()->getDbConnection()->exec("SET default_storage_engine=InnoDB;");
 
 		Utils::runSQLFile(Environment::get()->getInstallFolder()->getFile("go/core/install/install.sql"));
-		go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
+		$oldFKchecks = go()->getDbConnection()->foreignKeyChecks(false);
 
 		if(isset($adminValues['language'])) {
 			go()->getSettings()->language = $adminValues['language'];
@@ -186,7 +186,9 @@ class Installer {
 
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
-		go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
+		if($oldFKchecks) {
+			go()->getDbConnection()->foreignKeyChecks(true);
+		}
 		self::$isInstalling = false;
 
 		go()->enableEvents();
@@ -523,11 +525,13 @@ class Installer {
 		
 		go()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
 
-		go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
+		$oldFKchecks = go()->getDbConnection()->foreignKeyChecks(false);
 		while (!$this->upgradeModules()) {
 			echo "\n\nA module was refactored. Rerunning...\n\n";			
 		}
-		go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
+		if($oldFKchecks) {
+			go()->getDbConnection()->foreignKeyChecks(true);
+		}
 
 		echo "Rebuilding cache\n";
 
@@ -568,6 +572,8 @@ class Installer {
 
 		$this->enableGarbageCollection();
 		$this->enableDiskUsage();
+
+
 
 
 
@@ -844,7 +850,7 @@ class Installer {
 //	}
 
 	public static function fixCollations() {
-		go()->getDbConnection()->exec("SET foreign_key_checks = 0");
+		$oldFKchecks = go()->getDbConnection()->foreignKeyChecks(false);
 		$stmt = go()->getDbConnection()->query("SHOW TABLE STATUS");	
 		
 		foreach($stmt as $record){
@@ -896,7 +902,9 @@ class Installer {
 				}
 			}	
 		}
-		go()->getDbConnection()->exec("SET foreign_key_checks = 1");
+		if($oldFKchecks) {
+			go()->getDbConnection()->foreignKeyChecks(true);
+		}
 	}
 
 }
