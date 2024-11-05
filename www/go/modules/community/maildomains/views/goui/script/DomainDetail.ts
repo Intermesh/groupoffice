@@ -12,14 +12,14 @@ import {
 	tbar, Window
 } from "@intermesh/goui";
 import {DetailPanel, FilterCondition, jmapds} from "@intermesh/groupoffice-core";
-import {DnsSettingsPanel} from "./DnsSettingsPanel";
-import {MailboxTable} from "./MailboxTable";
-import {MailboxDialog} from "./MailboxDialog";
-import {AliasDialog} from "./AliasDialog";
-import {AliasTable} from "./AliasTable";
-import {MailboxExportDialog} from "./MailboxExportDialog";
-import {MailDomain, mailDomainStatus} from "./MailDomain";
-import {DomainDialog} from "./DomainDialog";
+import {DnsSettingsPanel} from "./DnsSettingsPanel.js";
+import {MailboxTable} from "./MailboxTable.js";
+import {MailboxDialog} from "./MailboxDialog.js";
+import {AliasDialog} from "./AliasDialog.js";
+import {AliasTable} from "./AliasTable.js";
+import {MailboxExportDialog} from "./MailboxExportDialog.js";
+import {MailDomain, mailDomainStatus} from "./MailDomain.js";
+import {DomainDialog} from "./DomainDialog.js";
 
 export class DomainDetail extends DetailPanel<MailDomain> {
 	private form: DataSourceForm<MailDomain>;

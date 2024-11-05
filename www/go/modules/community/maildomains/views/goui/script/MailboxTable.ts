@@ -7,7 +7,7 @@ import {
 	Table
 } from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
-import {MailboxDialog} from "./MailboxDialog";
+import {MailboxDialog} from "./MailboxDialog.js";
 
 export class MailboxTable extends Table<DataSourceStore> {
 	constructor() {

@@ -1,5 +1,5 @@
 import {checkbox, fieldset, numberfield, t, textfield} from "@intermesh/goui";
-import {FormWindow, userdisplaycombo} from "@intermesh/groupoffice-core";
+import {FormWindow, principalcombo} from "@intermesh/groupoffice-core";
 
 export class DomainDialog extends FormWindow {
 
@@ -19,7 +19,7 @@ export class DomainDialog extends FormWindow {
 
 		this.generalTab.items.add(
 			fieldset({flex: 1},
-				userdisplaycombo({
+				principalcombo({
 					name: "userId",
 					id: "userId",
 					label: t("User"),
