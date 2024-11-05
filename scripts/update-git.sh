@@ -64,7 +64,7 @@ function buildGOUI() {
     local NODE_DIR="$(dirname "${line}")";
     echo "BUILD:" $NODE_DIR;
     cd $NODE_DIR;
-    npm ci;
+    npm update;
     npm run build;
     cd $DIR;
 
