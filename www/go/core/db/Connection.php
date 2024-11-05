@@ -661,6 +661,11 @@ class Connection {
 			return $stmt;
 		} catch(PDOException $e) {
 			throw new DbException($e, go()->getDebugger()->enabled ? QueryBuilder::debugBuild($build) : null);
+		} catch(Exception $e) {
+			if(go()->getDebugger()->enabled) {
+				go()->debug(QueryBuilder::debugBuild($build));
+			}
+			throw $e;
 		}
 	}
 
