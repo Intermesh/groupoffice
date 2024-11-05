@@ -64,7 +64,7 @@ function buildGOUI() {
     local NODE_DIR="$(dirname "${line}")";
     echo "BUILD:" $NODE_DIR;
     cd $NODE_DIR;
-    npm ci;
+    npm update;
     npm run build;
     cd $DIR;
 
@@ -76,13 +76,13 @@ function buildGOUI() {
 echo "Building GOUI shared libs..."
 cd $DIR;
 cd ./www/views/goui/goui
-npm ci
+npm update
 
 cd ../groupoffice-core
-npm ci
+npm update
 
 cd ..
-npm ci
+npm update
 npm run build
 
 cd $DIR;
