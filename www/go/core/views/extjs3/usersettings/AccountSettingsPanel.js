@@ -140,19 +140,10 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				width: dp(300)
 			},
 			items:[
-				this.currentPasswordField = new Ext.form.TextField(
-					{
-						fieldLabel: t("Your current password"),
-						name: 'currentPassword',
-						inputType: 'password',
-						autocomplete: 'current-password',
-						validateOnBlur: false,
-						hint: go.User.isAdmin ? t("Enter your administrator password") : undefined
-					}
-				),
+
 				this.passwordField1 = new go.form.PasswordGeneratorField({
 					minLength: go.Modules.get("core","core").settings.passwordMinLength,
-					// needPasswordForChange: true,
+					needPasswordForChange: true,
 					listeners: {						
 						generated : function(field, pass) {
 							this.passwordField2.setValue(pass);

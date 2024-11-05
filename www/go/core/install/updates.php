@@ -1619,9 +1619,34 @@ $updates['202409160946'][] = "alter table core_import_mapping
 
 
 
+$updates['202410310946'][] = "alter table core_acl_group
+    drop foreign key core_acl_group_ibfk_2;";
+
+$updates['202410310946'][] = "alter table core_acl_group
+    add constraint core_acl_group_ibfk_2
+        foreign key (aclId) references core_acl (id)
+            on update cascade on delete cascade;";
+
+
+$updates['202410310946'][] = "alter table core_acl_group_changes
+    drop foreign key `all`;";
+
+$updates['202410310946'][] = "alter table core_acl_group_changes
+    add constraint `all`
+        foreign key (aclId) references core_acl (id)
+            on update cascade on delete cascade;";
+
+$updates['202410310946'][] = "alter table core_search
+    drop foreign key core_search_ibfk_2;";
+
+$updates['202410310946'][] = "alter table core_search
+    add constraint core_search_ibfk_2
+        foreign key (aclId) references core_acl (id)
+            on update cascade on delete cascade;";
+
 # ------ 6.9 ---------------
 
-$updates['202409160946'][] = "CREATE TABLE `core_principal`(
+$updates['202411051130'][] = "CREATE TABLE `core_principal`(
    `id` VARCHAR(60) NOT NULL,
 	`name` VARCHAR(100) NOT NULL,
 	`email` VARCHAR(255) NULL,
@@ -1648,7 +1673,7 @@ $updates['202409160946'][] = "CREATE TABLE `core_principal`(
 		ON UPDATE No Action
 ) ENGINE = InnoDB;";
 
-$updates['202409160946'][] = function() {
+$updates['202411051130'][] = function() {
 
 	go()->getDbConnection()->exec('replace into core_principal (id, name, email, type, description, timeZone, entityTypeId, avatarId, entityId, aclId)
 SELECT u.id, u.displayName, u.email, "individual", u.username, u.timezone, (select id from core_entity where name="User"), u.avatarId, u.id, g.aclId from core_user u
@@ -1665,6 +1690,6 @@ group by u.id;');
 
 };
 
-$updates['202409160946'][] = "alter table core_module drop key name;";
-$updates['202409160946'][] = "alter table core_module add constraint name unique (name, package);";
-$updates['202409160946'][] = "ALTER TABLE `core_alert` ADD COLUMN `staleAt` DATETIME NULL AFTER `triggerAt`;";
+$updates['202411051130'][] = "alter table core_module drop key name;";
+$updates['202411051130'][] = "alter table core_module add constraint name unique (name, package);";
+$updates['202411051130'][] = "ALTER TABLE `core_alert` ADD COLUMN `staleAt` DATETIME NULL AFTER `triggerAt`;";

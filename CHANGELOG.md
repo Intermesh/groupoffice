@@ -1,6 +1,29 @@
+04-11-2024: 6.8.82
+- Core: performance hotfix
+
+04-11-2024: 6.8.81
+- Core: Admin can change passwords without using own password again
+- Email: Set references header when forwarding mail
+- Newsletters: fix php compatibility error when sending newsletters
+- Supportclient: make creation dialog wider to fit format toolbar
+- Calendar: fix more HTML encoding issues in Qtip
+
+28-10-2024: 6.8.80
+- Core: bugfix editing individual field set in entity
+- Core: bugfix user export
+- Core: Several bug fixes user import
+
+24-10-2024: 6.8.79
+- E-mail: Server side sort was disabled by accident since May 2024
+- Caldav: Fixed CalDAV sync with DAVx5 error #1192
+- ActiveSync: Fixed Sync in Outlook (Z-push/Activesync) problem #1193
+- Core: Fixed problem in demo data creation
+
+21-10-2024: 6.8.78
 - E-mail: Set internal date on IMAP APPEND command's. This way the internal date when moving or copying messages to another account is preserved
 - Core: added endpoint api/up.php that checks the database connection and filesystem disks for uptime monitoring.
 - Core / e-mail: Fixed problem where typing ü would insert a , in the mail composer on german QWERTZ layout
+- E-mail: Fix 'delete all attachments' bug.
 
 14-10-2024: 6.8.77
 - Timeregistration: Fixed time dialog tracking time starting at midnight

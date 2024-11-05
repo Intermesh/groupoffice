@@ -43,7 +43,7 @@ class PushDispatcher
 	public function __construct(array $types = [])
 	{
 		//Hard code debug to false to prevent spamming of log.
-		go()->getDebugger()->enabled = false;
+//		go()->getDebugger()->enabled = false;
 
 		$query = new Query();
 
@@ -147,6 +147,8 @@ class PushDispatcher
 			go()->getCache()->disableMemory();
 			Table::destroyInstances();
 			gc_collect_cycles();
+
+			go()->debug("SSE Memory usage: " . memory_get_usage());
 
 			$sleeping += self::CHECK_INTERVAL;
 

@@ -1271,6 +1271,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$response['data']['plainbody'] .= $header . $oldMessage['plainbody'];
 		}
 
+		$response['sendParams']['references'] = $message->message_id;
+
 		if($message instanceof ImapMessage){
 			//for saving sent items in actionSend
 			$response['sendParams']['forward_uid'] = $message->uid;
