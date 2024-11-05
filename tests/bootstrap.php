@@ -10,6 +10,7 @@ use go\core\App;
 use go\core\cli\controller\System;
 use go\core\cli\State;
 use GO\Base\Model\Module;
+use go\core\db\Connection;
 use go\core\db\Table;
 use go\core\model\User;
 use go\core\orm\Property;
@@ -133,7 +134,6 @@ try {
 	  system($copyCmd);
 
 	  system('chown -R www-data:www-data ' . $dataFolder->getPath());
-
 
 	  go()->getInstaller()->upgrade();
 

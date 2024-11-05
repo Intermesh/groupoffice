@@ -125,6 +125,32 @@ class Connection {
 		self::$cachedStatements = [];
 	}
 
+
+	/**
+	 * Checks if connection still exists
+	 *
+	 * @param int $id
+	 * @return bool
+	 * @throws DbException
+	 */
+	public static function exists(int $id) : bool {
+
+		$dsn = go()->getDbConnection()->getDsn();
+		$config = go()->getConfig();
+
+		$watchConn = new Connection(
+			$dsn, $config['db_user'], $config['db_pass']
+		);
+		$processes = $watchConn->query("SHOW PROCESSLIST")->fetchAll(\PDO::FETCH_ASSOC);
+
+		foreach($processes as $process) {
+			if($process['Id'] == $id) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private static array $cachedStatements = [];
 
 	/**

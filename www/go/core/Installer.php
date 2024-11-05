@@ -573,9 +573,8 @@ class Installer {
 		$this->enableGarbageCollection();
 		$this->enableDiskUsage();
 
-
-
-
+		// old framework messes it up somewhere
+		date_default_timezone_set("UTC");
 
 		echo "Done!\n";
 
@@ -712,7 +711,6 @@ class Installer {
 				$modStr = '[' . ($module->package ?? "legacy") . '/' . $module->name . '] ';
 				throw new Exception("Fewer queries than version for module " . $modStr . " " . $count . ' < ' . $module->version);
 			}
-
 		}
 
 		ksort($u);
