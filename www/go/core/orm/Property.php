@@ -587,7 +587,7 @@ abstract class Property extends Model {
 	 * Copies all properties so isModified() can detect changes.
 	 * @throws Exception
 	 */
-	private function trackModifications(): void
+	protected function trackModifications(): void
 	{
 		foreach ($this->watchProperties() as $propName) {
 
@@ -1794,7 +1794,8 @@ abstract class Property extends Model {
 	 * @param array $record
 	 * @throws DbException
 	 */
-	protected function insertTableRecord(Table $table, array $record) {
+	protected function insertTableRecord(Table $table, array $record): void
+	{
 		$stmt = go()->getDbConnection()->insert($table->getName(), $record);
 		$stmt->execute();
 	}
@@ -1869,7 +1870,7 @@ abstract class Property extends Model {
 
 				$this->insertTableRecord($table, $modifiedForTable);
 
-				$this->handleAutoIncrement($table, $modified);
+				$aiID = $this->handleAutoIncrement($table, $modified);
 
 				//update primary key data for new state
 				$this->primaryKeys[$table->getAlias()] = [];
@@ -1880,6 +1881,10 @@ abstract class Property extends Model {
 				}
 				if($table->isUserTable) {
 					$this->primaryKeys[$table->getAlias()]['userId'] = go()->getUserId();
+				}
+
+				if(isset($aiID)) {
+					$this->onNewAutoIncrementID($aiID);
 				}
 			} else {
 				if (empty($modifiedForTable)) {
@@ -1921,13 +1926,15 @@ abstract class Property extends Model {
 	}
 
 	/**
-	 * Get's the auto increment ID after an insert query and sets the property in this model
+	 * Gets the auto increment ID after an insert query and sets the property in this model
 	 *
 	 * @param MappedTable $table
 	 * @param array $modified
+	 * @return int|null
 	 * @throws Exception
 	 */
-	private function handleAutoIncrement(MappedTable $table, array &$modified) {
+	private function handleAutoIncrement(MappedTable $table, array &$modified): ?int
+	{
 		$aiCol = $table->getAutoIncrementColumn();
 
 		if ($aiCol) {
@@ -1938,7 +1945,21 @@ abstract class Property extends Model {
 			}
 			$modified[$aiCol->name] = [$lastInsertId, null];
 			$this->{$aiCol->name} = $lastInsertId;
+
+			return $lastInsertId;
 		}
+
+		return null;
+	}
+
+	/**
+	 * Can be overridden to do something when a new auto increment ID has been generated
+	 *
+	 * @param int $id
+	 * @return void
+	 */
+	protected function onNewAutoIncrementID(int $id) : void {
+
 	}
 
 	/**
@@ -1946,7 +1967,8 @@ abstract class Property extends Model {
 	 *
 	 * @param MappedTable $table
 	 */
-	private function rollBackAutoIncrement(MappedTable $table) {
+	private function rollBackAutoIncrement(MappedTable $table): void
+	{
 		if(!$this->recordIsNew($table)) {
 			return;
 		}
