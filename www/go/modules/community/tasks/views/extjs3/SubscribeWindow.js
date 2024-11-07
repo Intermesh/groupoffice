@@ -5,18 +5,25 @@ go.modules.community.tasks.SubscribeWindow = Ext.extend(Ext.Window, {
 		this.title = t('Subscribe to Tasklist');
 		this.height = 800;
 		const store = new go.data.Store({
-			filters:{subscribed: {isSubscribed: false}},
+			filters:{subscribed: {isSubscribed: false}, "role": {role: this.support ? "support" : "list"}},
 			fields: ['id', 'name', 'isSubscribed'],
 			sort:[{property:'name',isAscending:true}],
-			entityStore:'TaskList'
+			entityStore: this.support ? 'SupportList' : 'TaskList',
 		});
 
 		this.on('render', () => {
 			store.load();
 		} )
 
-		this.items = [this.grid = new go.grid.GridPanel({
+		this.items = [
 
+
+			this.grid = new go.grid.GridPanel({
+				tbar: [
+				 '->', {
+						xtype: "tbsearch"
+					}
+					],
 			style:{width:'100%'},
 			hideHeaders: true,
 			store,

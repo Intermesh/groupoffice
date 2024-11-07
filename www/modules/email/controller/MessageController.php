@@ -399,6 +399,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 	private function allowFTS (Account $account, $imap) :bool{
 
+		// TODO DOCS
 		$forceFTS = go()->getConfig()['community']['email']['forceFTS'][$account->host] ?? false;
 
 		if(go()->getDebugger()->enabled) {
