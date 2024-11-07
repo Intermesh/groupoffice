@@ -1,6 +1,7 @@
 - Core: Import responded with invalid JSON due to echo statement.
 - Core: fixed copy pasting images from a Microsoft Word Document in Windows
 - Core: Don't require security token check in legacy API when not using cookies for authentication
+- Core: Default request timeout to 30s instead 3 minutes
 
 17-06-2024: 6.7.84
 - Core: Fixed PHP 7.3 compatibility. GroupOffice 6.7.83 Installation Issue #1152
