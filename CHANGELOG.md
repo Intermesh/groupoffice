@@ -1,6 +1,7 @@
 04-11-2024: 6.8.83
 - Email: Larger move old mail dialog. Also scrollable and resizable
 - Core: Fixed issue in combobox resetting with promise race condition
+- Tasks: Fixed horizontal scrollbar in some cases
 
 04-11-2024: 6.8.82
 - Core: performance hotfix
