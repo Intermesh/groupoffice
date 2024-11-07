@@ -308,15 +308,13 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 		return this.store.entityStore.single(value);
 	},
 	
-	setValue: async function (value) {
+	setValue: function (value) {
 		const me = this;
 
 		me.value = value;
-		const setValue = value;
-
-		if(this.setValuePromise) {
-			await this.setValuePromise;
-			this.setValuePromise = null;
+		if(Ext.isEmpty(value))
+		{
+			return go.form.ComboBox.superclass.setValue.call(me, value);
 		}
 
 		this.setValuePromise = new Promise(function(resolve, reject) {

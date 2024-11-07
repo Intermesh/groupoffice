@@ -116,9 +116,9 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 
 			h = Math.min(this.growMax, Math.max(ts.offsetHeight, this.growMin));
 			if(h != this.lastHeight){
-				this.lastHeight = h;
 				this.el.setHeight(h);
-				this.fireEvent("autosize", this, h);
+				this.fireEvent("autosize", this, h, this.lastHeight);
+				this.lastHeight = h;
 			}
 		},
 
