@@ -1,4 +1,5 @@
 - Core: Default request timeout to 30s instead 3 minutes
+- Finance: Fixed error when dragging existing items to another group
 
 04-11-2024: 6.8.83
 - Email: Larger move old mail dialog. Also scrollable and resizable
