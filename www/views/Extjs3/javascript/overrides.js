@@ -13,7 +13,7 @@
 
 //Default timeout 3 minutes.
 Ext.override(Ext.data.Connection, {
-	timeout: 180000
+	timeout: 30000//180000
 });
 
 Ext.override(Ext.form.TimeField, {

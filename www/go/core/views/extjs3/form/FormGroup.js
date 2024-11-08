@@ -214,6 +214,10 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 					if (dropRow.rowIndex > data.dragIndex) {
 						dropRow.rowIndex--;
 					}
+
+					if(data.sourceField != me) {
+						delete v.id;
+					}
 				} else {
 					//todo id configurable?
 					delete v.id;
@@ -230,6 +234,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 				});
 
 				me.doLayout();
+
+				// this.fire("sort", this, dropRow.rowIndex, data.rowIndex, dragItem)
 
 				return true;
 			}

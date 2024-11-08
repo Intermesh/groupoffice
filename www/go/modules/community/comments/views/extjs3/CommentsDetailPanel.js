@@ -131,6 +131,10 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			this.el.unmask();
 		}, this);
 
+		this.store.on('loadexception', function(store,records,options) {
+			this.el.unmask();
+		}, this);
+
 		this.store.on('remove', function() {
 			this.updateView();
 		}, this);
