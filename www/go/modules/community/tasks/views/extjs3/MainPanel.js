@@ -542,7 +542,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 										dlg.show();
 									})
 								} catch(e) {
-									Ext.MessageBox.alert(t("Error"), e.message);
+									GO.errorDialog.show(e);
 								} finally {
 									Ext.getBody().unmask();
 								}

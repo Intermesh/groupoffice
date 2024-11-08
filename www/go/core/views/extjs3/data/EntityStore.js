@@ -380,33 +380,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 * @returns {Promise<Object>}
 	 */
 	merge: function(ids) {
-
-		return go.Jmap.request({
-			method: this.entity.name + '/merge',
-			params: {
-				ids: ids
-			},
-			
-		}).then((response) => {
-			if(response.updated) {
-				for(var serverId in response.updated) {
-					//merge existing data, with updates from client and server						
-					entity = Ext.apply(this.data[serverId], response.updated[serverId]);
-					this._add(entity, true);
-				}
-			}
-
-			this.setState(response.newState);
-			if(response.destroyed) {
-				for(let i =0, l = response.destroyed.length; i < l; i++) {
-					this._destroy(response.destroyed[i]);
-				}
-			}
-
-			this._fireChanges();
-
-			return response;
-		});
+		return window.groupofficeCore.jmapds(this.entity.name).merge(ids);
 	},
 	
 	/**
