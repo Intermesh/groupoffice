@@ -309,7 +309,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 							if(!response.notCreated) {
 								response.notCreated = {};
 							}
-							response.notCreated[setError.id] = setError;
+							response.notCreated[id] = setError;
 						})
 				);
 			}
@@ -331,7 +331,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 							if(!response.notUpdated) {
 								response.notUpdated = {};
 							}
-							response.notUpdated[setError.id] = setError;
+							response.notUpdated[id] = setError;
 						})
 				);
 			}
@@ -352,7 +352,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 							if(!response.notDestroyed) {
 								response.notUpdated = {};
 							}
-							response.notDestroyed[setError.id] = setError;
+							response.notDestroyed[id] = setError;
 						})
 				);
 			}
