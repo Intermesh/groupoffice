@@ -653,6 +653,15 @@ class Task extends AclItemEntity {
 			$sort->renameKey('tasklist','tasklist.name');
 		}
 
+		if(isset($sort['project'])) {
+
+			if(!$query->isJoined("business_projects3_project3", "project")) {
+				$query->join("business_projects3_project3", "project", "project.id = task.projectId", "left");
+			}
+			$sort->renameKey('project','project.number');
+		}
+
+
 		//sort null dates first
 		if(isset($sort['due'])) {
 

@@ -9,36 +9,43 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 
 	initComponent: function () {
 
+		const storeFields = [
+			'id',
+			'title',
+			{name: 'start', type: "date"},
+			{name: 'due', type: "date"},
+			'description',
+			'repeatEndTime',
+			{name: 'responsible', type: 'relation'},
+			{name: 'createdAt', type: 'date'},
+			{name: 'modifiedAt', type: 'date'},
+			{name: 'creator', type: "relation"},
+			{name: 'modifier', type: "relation"},
+			{name: 'tasklist', type: "relation"},
+			{name: 'categories', type: "relation"},
+
+			'percentComplete',
+			'progress',
+			{
+				name: "complete",
+				convert: function(v, data) {
+					return data.progress == 'completed';
+				}
+			},
+			'estimatedDuration',
+			'timeBooked',
+			'permissionLevel'
+		];
+
+		if(!this.support) {
+			storeFields.push({name: 'project', type: "relation"});
+		}
+
 		this.store = new go.data.GroupingStore({
 			groupField: this.support ? false : 'tasklist',
 			remoteGroup:true,
 			remoteSort: true,
-			fields: [
-				'id',
-				'title',
-				{name: 'start', type: "date"},
-				{name: 'due', type: "date"},
-				'description',
-				'repeatEndTime',
-				{name: 'responsible', type: 'relation'},
-				{name: 'createdAt', type: 'date'},
-				{name: 'modifiedAt', type: 'date'},
-				{name: 'creator', type: "relation"},
-				{name: 'modifier', type: "relation"},
-				{name: 'tasklist', type: "relation"},
-				{name: 'categories', type: "relation"},
-				'percentComplete',
-				'progress',
-				{
-					name: "complete",
-					convert: function(v, data) {
-						return data.progress == 'completed';
-					}
-				},
-				'estimatedDuration',
-				'timeBooked',
-				'permissionLevel'
-			],
+			fields: storeFields,
 			entityStore: this.support ? "SupportTicket" : "Task",
 			sortInfo: this.support ? {
 					field: "modifiedAt",
@@ -176,7 +183,10 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 						return v ? v.name : "-";
 					},
 					groupable: true
-				},{
+				},
+
+
+			{
 					id:"percentComplete",
 					width:dp(150),
 					header: t('% complete', "tasks", "community"),
@@ -235,6 +245,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					groupable: true
 				},
 				{
+					id: "list",
 					header: t('List'),
 					width: dp(160),
 					sortable: true,
@@ -245,7 +256,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					hidden: !this.support,
 					groupable: true
 				},
-				{	
+				{
+					id: "modifiedBy",
 					header: t('Modified by'),
 					width: dp(160),
 					sortable: true,
@@ -283,6 +295,21 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					groupable: false
 				}
 			];
+
+
+		if(!this.support) {
+			this.columns.splice(7, 0,	{
+				id: "project",
+				header: t('Project', "projects3", "business"),
+				width: dp(160),
+				sortable: true,
+				dataIndex: 'project',
+				renderer: function(v) {
+					return v ? v.name : "-";
+				},
+				groupable: true
+			})
+		}
 
 		if(this.forProject) {
 			this.columns.push({

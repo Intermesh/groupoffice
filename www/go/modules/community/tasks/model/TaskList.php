@@ -144,7 +144,7 @@ class TaskList extends AclOwnerEntity
 				$project = ProjectEntity::findById($this->projectId, ['id', 'acl_id']);
 				$this->aclId = $project->acl_id;
 			}
-		} else if($this->ownerId === go()->getUserId()) {
+		} else if($this->ownerId === go()->getUserId() && !empty($this->color)) {
 			$this->defaultColor = $this->color;
 		}
 		if(empty($this->color)) {
