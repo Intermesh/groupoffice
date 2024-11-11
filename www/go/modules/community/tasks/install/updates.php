@@ -251,7 +251,7 @@ $updates['202408091228'][] = "INSERT IGNORE INTO tasks_tasklist_user
 (tasklistId, userId, isSubscribed, isVisible, color, sortOrder, modSeq)
 select tl.id, ug.userId, 1, 1, tl.defaultColor,0,1 from core_acl_group ag
 inner join core_user_group ug on ug.groupId = ag.groupId
-inner join tasks_tasklist tl on tl.aclId = ag.aclId group by tl.id,ug.userId";
+inner join tasks_tasklist tl on tl.aclId = ag.aclId where tl.projectId is not null group by tl.id,ug.userId";
 
 $updates['202410170857'][] = "update tasks_task set progressUpdated = modifiedAt where progressUpdated is null and progress = 3;";
 
