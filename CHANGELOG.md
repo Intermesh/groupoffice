@@ -1,3 +1,4 @@
+11-11-2024: 6.8.84
 - Billing: Sort on price and supplier
 - Core: Bugfix when editing custom fieldset. Also enable editing of fieldset with parent fieldset
 - Core: Default request timeout to 30s instead 3 minutes
