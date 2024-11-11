@@ -1,3 +1,4 @@
+- Billing: Sort on price and supplier
 - Core: Default request timeout to 30s instead 3 minutes
 - Finance: Fixed error when dragging existing items to another group
 
