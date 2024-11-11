@@ -1,3 +1,4 @@
+- Core: Bugfix when editing custom fieldset. Also enable editing of fieldset with parent fieldset
 - Core: Default request timeout to 30s instead 3 minutes
 - Finance: Fixed error when dragging existing items to another group
 
