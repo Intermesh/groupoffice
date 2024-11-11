@@ -6,6 +6,7 @@
  */
 namespace go\modules\community\calendar\model;
 
+use go\core\db\Expression;
 use go\core\ErrorHandler;
 use go\core\exception\JsonPointerException;
 use go\core\fs\Blob;
@@ -409,7 +410,13 @@ class ICalendarHelper {
 
 	static private function parseAttendee($vattendee) {
 		$key = str_ireplace('mailto:', '',(string)$vattendee);
-		$principalId = Principal::find()->selectSingleValue('id')->where('email','=',$key)->orderBy(['entityTypeId'=>'ASC'])->single();
+		$principalId = Principal::find()
+			->join("core_entity", "e", "e.id=principal.entityTypeId")
+			->selectSingleValue('principal.id')
+			->where('email','=',$key)
+			->orderBy([new Expression("(e.name='User') DESC")])
+			->single();
+
 		$p = (object)['email' => $key];
 		if(!empty($vattendee['EMAIL'])) $p->email = (string)$vattendee['EMAIL'];
 		$p->kind = !empty($vattendee['CUTYPE']) ? strtolower($vattendee['CUTYPE']) : 'individual';
