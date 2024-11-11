@@ -433,7 +433,7 @@ class ICalendarHelper {
 		if(isset($vevent->DTSTART)) {
 			$props->start = $vevent->DTSTART->getDateTime();
 			if($vevent->DTSTART->hasTime() && !$vevent->DTSTART->isFloating()) {
-				$props->timeZone = !empty((string)$vevent->DTSTART['TZID']) ? (string)$vevent->DTSTART['TZID'] : 'Etc/UTC';
+				$props->timeZone = $props->start->getTimezone()->getName();
 			}
 		}
 		//empty($vevent->DTSTART) ?: $props->start = $vevent->DTSTART->getDateTime()->format(DateTime::FORMAT_API_LOCAL);
