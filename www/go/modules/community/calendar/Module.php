@@ -60,9 +60,11 @@ class Module extends core\Module
 				->where('groupId', 'IS NOT', null)
 				->andWhere('ownerId', '=', $user->id)->all();
 
-			go()->getDbConnection()
-				->update('core_principal', ['email'=>$user->email], ['id' => $pIds])
-				->execute();
+			if(!empty($pIds)) {
+				go()->getDbConnection()
+					->update('core_principal', ['email' => $user->email], ['id' => $pIds])
+					->execute();
+			}
 
 		}
 	}
