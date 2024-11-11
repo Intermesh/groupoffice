@@ -144,7 +144,7 @@ class ICalendarHelper {
 		if(!$recurrenceId) {
 			if(!empty($event->privacy) && $event->privacy !== 'public') $vevent->CLASS = self::$privacyMap[$event->privacy];
 			if(!empty($event->modifiedAt)) $vevent->{'LAST-MODIFIED'} = $event->modifiedAt->format('Ymd\THis\Z'); // @todo: check if datetime must be UTC
-			if(!empty($event->createdAt)) $vevent->DTSTAMP = $event->createdAt;
+			$vevent->DTSTAMP = new DateTime();
 		} else {
 			$rId = $vevent->add('RECURRENCE-ID', new DateTime($recurrenceId, $event->timeZone()));
 			if(!empty($event->showWithoutTime)) {
