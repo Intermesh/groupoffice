@@ -25,11 +25,6 @@ class Module extends core\Module
 		return "Intermesh BV <mdhart@intermesh.nl>";
 	}
 
-	public static function getTitle(): string
-	{
-		return 'Calendar GOUI';
-	}
-
 	public function getSettings() {
 		return Settings::get();
 	}
