@@ -47,7 +47,8 @@ function addEmailAction() {
 						Window.alert(response.errors.join("<br />"), t("Error"));
 					} else {
 						const dlg = new EventDetailWindow();
-						dlg.loadEvent(new CalendarItem({data:response.data, key:response.data.id + ""}));
+
+						dlg.loadEvent(new CalendarItem({data:response.data, key: response.data.id ? response.data.id + "" : null}));
 						dlg.show();
 					}
 				}

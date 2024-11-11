@@ -36,7 +36,7 @@ export interface CalendarEvent extends BaseEntity {
 const eventDS = jmapds('CalendarEvent');
 
 interface CalendarItemConfig {
-	key: string // id/recurrenceId
+	key: string|null// id/recurrenceId or null if not in the database put parsed from invitation ics
 	recurrenceId?:string
 	extraIcons?: MaterialIcon[]
 	data: Partial<CalendarEvent>
@@ -55,7 +55,7 @@ interface CalendarItemConfig {
  */
 export class CalendarItem {
 
-	key!: string // id/recurrenceId
+	key!: string|null // id/recurrenceId
 	recurrenceId?:string
 	data!: CalendarEvent
 	override?: any // is patch object with props like "participants/u1/participationStatus" Partial<CalendarEvent>
@@ -168,7 +168,7 @@ export class CalendarItem {
 	}
 
 	get isRecurring() {
-		return this.key.includes('/') || this.data.recurrenceRule;
+		return (this.key && this.key.includes('/')) || this.data.recurrenceRule;
 	}
 
 	get isOverride() {
