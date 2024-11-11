@@ -352,8 +352,9 @@ export class CalendarItem {
 	}
 
 	shouldSchedule(modified: Partial<CalendarEvent>|false) {
-		if((!this.data.isOrigin && this.key) || this.isInPast) // todo: use this.calendarPrincipal.expectReply if not owner ??
+		if(this.isInPast) // todo: use this.calendarPrincipal.expectReply if not owner ??
 			return;
+
 		if(modified === false) {
 			if(this.participants && !this.isCancelled) {
 				return this.isOwner ? 'cancel' : 'delete';
