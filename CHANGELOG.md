@@ -1,3 +1,4 @@
+11-11-2024: 6.7.85
 - Core: Import responded with invalid JSON due to echo statement.
 - Core: fixed copy pasting images from a Microsoft Word Document in Windows
 - Core: Don't require security token check in legacy API when not using cookies for authentication
