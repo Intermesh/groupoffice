@@ -1,3 +1,6 @@
+11-11-2024: 6.8.85
+- Billing: Fixed undefined index 'sort'
+
 11-11-2024: 6.8.84
 - Billing: Sort on price and supplier
 - Core: Bugfix when editing custom fieldset. Also enable editing of fieldset with parent fieldset
