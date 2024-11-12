@@ -37,7 +37,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 			'permissionLevel'
 		];
 
-		if(!this.support) {
+		if(!this.support && go.Modules.isAvailable('business', 'projects3')) {
 			storeFields.push({name: 'project', type: "relation"});
 		}
 
