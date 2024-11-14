@@ -23,7 +23,8 @@
 		color: $colorText;
 	}
 	> em {
-		text-overflow:ellipsis;
+		mask-image: linear-gradient(to right, white 80%, transparent);
+		//text-overflow:ellipsis; // this is ugly
 		overflow:hidden;
 		flex: 1 1 auto;
 	}
