@@ -13,6 +13,21 @@ export class CalendarAdapter {
 	private start!: DateTime
 	private end!: DateTime
 
+	constructor() {
+		for(const type in this.providers) {
+			const p = this.providers[type];
+			if(p.watch) {
+				p.store.on('load', (me: & {skipNextEvent:boolean}) => {
+					if(p.skipWatch) {
+						p.skipWatch = false; // skip only once
+					} else {
+						this.onLoad();
+					}
+				});
+			}
+		}
+	}
+
 	onLoad = () => {}
 
 	goto(start:DateTime,end:DateTime) {
@@ -21,20 +36,10 @@ export class CalendarAdapter {
 		const promises =  [];
 		for(const type in this.providers) {
 			const p = this.providers[type];
-			if(!p.enabled) continue;
-			const promise = p.load(start,end);
-			if(p.store) {
-				//p.store.skipNextEvent = true;
+			if(p.enabled) {
+				p.skipWatch = true; // will skip extra onLoad call for providers that have a load handler
+				promises.push(p.load(start, end));
 			}
-			if(p.watch) {
-				promise.then(_evs => {
-					p.store.on('load', (me: & {skipNextEvent:boolean}) => {
-						this.onLoad();
-					});
-					p.watch = false;
-				})
-			}
-			promises.push(promise);
 		}
 		Promise.all(promises).then(this.onLoad);
 	}
