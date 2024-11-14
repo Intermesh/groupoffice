@@ -260,6 +260,14 @@ class CalendarConvertor
 		if($event->timeZone && !$event->showWithoutTime) {
 			$dtstart->setTimezone($event->timeZone());
 		}
+
+		if($event->showWithoutTime) {
+			// times for all day event are in UTC. For example in NL the day starts at the day before 23:00 in UTC time.
+			// we have to set the local timezone to get the correct date
+			$dtstart->setTimezone(new DateTimeZone($event->timeZone));
+			$dtend->setTimezone(new DateTimeZone($event->timeZone));
+		}
+
 		$event->start = $dtstart;
 		if (isset($message->location))
 			$event->location = $message->location;
