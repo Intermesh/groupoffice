@@ -198,11 +198,18 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	 */
 	protected $uri;
 
+
+	/**
+	 * @var Participant[]
+	 */
 	public $participants = [];
 	/**
 	 * @var RecurrenceOverride[]
 	 */
 	public $recurrenceOverrides = [];
+	/**
+	 * @var Alert[]
+	 */
 	public $alerts = [];
 
 	public $categoryIds = [];

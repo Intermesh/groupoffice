@@ -27,8 +27,10 @@ export class AlertField extends SelectField {
 
 	drawOptions() {
 		this.options = this.fullDay ? [
-			{value: '-P1D', name: '1 '+ t('day')+' '+t('before')},
-			{value: '-P2D', name: '2 '+ t('days')+' '+t('before')}
+			{value: 'P0D', name: t('At the start day') + " (9:00)"},
+			{value: '-P1D', name: '1 '+ t('day')+' '+t('before') + " (9:00)"},
+			{value: '-P2D', name: '2 '+ t('days')+' '+t('before')+ " (9:00)"},
+			{value: '-P7D', name: '1 '+ t('week')+' '+t('before')+ " (9:00)"},
 		] : [
 			{value: '-PT5M', name: '5 '+ t('minutes')+' '+t('before')},
 			{value: '-PT10M', name: '10 '+ t('minutes')+' '+t('before')},
@@ -46,6 +48,7 @@ export class AlertField extends SelectField {
 	}
 	/** @ts-ignore */
 	get value() {
+
 		const v = super.value;
 		if(v && v !== 'default')
 			this.addOptionIfNotExist(v as string);
@@ -53,17 +56,24 @@ export class AlertField extends SelectField {
 	}
 	/** @ts-ignore */
 	set value(v: {[id:string]:Alert}|'default'|null) {
-		if(!v || typeof v === 'string') {
-			this.useDefault = v ==='default';
-			super.value = v;
-			return;
-		} else {
-			this.useDefault = false;
+
+		if(!v) {
+			v = null;
+		} else if(!(typeof v === 'string') ) {
+			const firstKey = Object.keys(v)[0];
+			if(v[firstKey]) {
+				v = v[firstKey].trigger ? v[firstKey].trigger.offset : v[firstKey].trigger.when;
+			} else {
+				v = null;
+			}
 		}
-		const firstKey = Object.keys(v)[0];
-		if(v[firstKey]) {
-			super.value = (v && v[firstKey].trigger) ? v[firstKey].trigger.offset : v;
-		}
+
+		this.useDefault = v ==='default';
+
+		if(v && v !== 'default')
+			this.addOptionIfNotExist(v as never);
+
+		super.value = v as never;
 	}
 
 
@@ -74,7 +84,10 @@ export class AlertField extends SelectField {
 			}
 		}
 		// not found, add
-		this.options.push({value: offset, name: this.nameFromOffset(offset)});
+		const opts = this.options
+		opts.push({value: offset, name: this.nameFromOffset(offset)});
+
+		this.options = opts;
 	}
 
 	private nameFromOffset(offset: string) {

@@ -4,6 +4,7 @@ namespace go\modules\community\calendar\model;
 
 use go\core\auth\TemporaryState;
 use go\core\db\Column;
+use go\core\ErrorHandler;
 use go\core\model\Acl;
 use go\core\model\User;
 use go\core\orm\exception\SaveException;
@@ -276,7 +277,14 @@ class CalDAVBackend extends AbstractBackend implements
 		}
 
 		$blob = $object->icsBlob();
-		$data = $blob->getFile()->getContents();
+		try {
+			$data = $blob->getFile()->getContents();
+		} catch(\Exception$e) {
+			ErrorHandler::logException($e);
+			$object->vcalendarBlobId = null;
+			$blob = $object->icsBlob();
+			$data = $blob->getFile()->getContents();
+		}
 
 		go()->debug("CalDAVBackend::getCalendarObject($calendarId, $objectUri, ");
 		go()->debug($data);
