@@ -8,13 +8,13 @@ import {
 	datasourcestore,
 	DateField,
 	datefield, DateInterval,
-	DateTime,
+	DateTime, DisplayField, displayfield,
 	Format, MapField, mapfield, Notifier, numberfield,
 	radio,
 	select,
 	store,
 	table,
-	textarea,
+	textarea, TextAreaField,
 	textfield,
 	TextField,
 	win,
@@ -200,7 +200,41 @@ export class EventWindow extends FormWindow {
 				dlg.show(this.item, this.form.modified);
 			} }),
 			this.alertField,
-			textarea({name:'description', label: t('Description'), autoHeight: true}),
+			textarea({
+				name:'description',
+				label: t('Description'),
+				autoHeight: true,
+				hidden: true,
+				listeners: {
+					render: (comp) => {
+						comp.input!.addEventListener("blur", () => {
+							comp.hide();
+
+							const field = comp.nextSibling() as DisplayField;
+							field.show();
+						})
+					}
+				}
+			}),
+			displayfield({
+				tabIndex: 0,
+				listeners: {
+					render: comp1 => {
+						comp1.el.addEventListener("focus", () => {
+							comp1.hide();
+
+							const field = comp1.previousSibling() as TextAreaField;
+							field.show();
+							field.focus();
+						})
+					}
+				},
+				name:'description',
+				label: t('Description'),
+				cls: "pit",
+				escapeValue: false,
+				renderer: (v, field) => Format.textToHtml(v)}
+			),
 			autocompletechips({
 				list: table({fitParent: true, headers: false, store: datasourcestore({dataSource:categoryStore.dataSource}),
 					rowSelectionConfig: {multiSelect: true},

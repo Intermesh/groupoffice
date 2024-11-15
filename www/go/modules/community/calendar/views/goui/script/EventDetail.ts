@@ -121,7 +121,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 			),
 			recurrenceField,
 			displayfield({name: 'location', label:t('Location')}),
-			displayfield({name:'description'}),
+			displayfield({name:'description', tagName: "div", cls: "pad", escapeValue: false, renderer: (v, field) => Format.textToHtml(v)}),
 			mapfield({name: 'participants',
 
 				buildField: (v: any) => displayfield({
