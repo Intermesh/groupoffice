@@ -1,5 +1,7 @@
 <?php
 namespace go\modules\community\calendar\model;
+use go\core\ErrorHandler;
+
 class Holiday {
 
 	const Public = 'public'; // public holiday
@@ -57,6 +59,11 @@ class Holiday {
 		self::$lang = $lang;
 		self::$names = \json_decode(file_get_contents($dir.'names.json'))->names;
 		$file = $dir.'countries/'.strtolower($set).'.json';
+
+		if(!file_exists($file)) {
+			ErrorHandler::log("Could not find holidays for '$set'");
+			return;
+		}
 		$data = \json_decode(file_get_contents($file));
 
 		if(!$data || !$data->holidays || !$data->holidays->$set || !is_object($data->holidays->$set->days))

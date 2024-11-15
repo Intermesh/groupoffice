@@ -87,11 +87,16 @@ export class CalendarAdapter {
 			list:[],
 			open(){},
 			load(start:DateTime,end:DateTime) {
-				let [lang,country] = client.user.language.split('_');
+				if(!client.user.holidayset) {
+					client.user.holidayset = client.user.language;
+				}
+				let [lang,country] = client.user.holidayset.split('_');
 				if(!country) country = lang;
 				if(country=='uk') country ='gb';
+
+				console.log(client.user, country);
 				return client.jmap("community/calendar/Holiday/fetch",{
-					set: country.toUpperCase(), lang,from:start.format('Y-m-d'),till:end.format('Y-m-d')
+					set: country.toUpperCase(), lang: client.user.holidayset.replace("_", "-"),from:start.format('Y-m-d'),till:end.format('Y-m-d')
 				}).then(r => {
 					this.list = r.list;
 				});
