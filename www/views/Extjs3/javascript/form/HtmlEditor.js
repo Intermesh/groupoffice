@@ -19,6 +19,7 @@ GO.form.HtmlEditor = function (config) {
 	var ioDentPlugin = new Ext.ux.form.HtmlEditor.IndentOutdent();
 	var ssScriptPlugin = new Ext.ux.form.HtmlEditor.SubSuperScript();
 	var rmFormatPlugin = new Ext.ux.form.HtmlEditor.RemoveFormat();
+	var tblPlugin = new Ext.ux.form.HtmlEditor.NEWTablePlugin();
 
 
 	if (GO.settings.pspellSupport) {
@@ -26,6 +27,7 @@ GO.form.HtmlEditor = function (config) {
 	}
 
 	config.plugins.unshift(
+					tblPlugin,
 					ioDentPlugin,
 					rmFormatPlugin,
 					// wordPastePlugin,
