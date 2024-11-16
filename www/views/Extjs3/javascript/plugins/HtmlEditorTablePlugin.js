@@ -1,113 +1,177 @@
 Ext.ns("Ext.ux.form.HtmlEditor");
 
-Ext.ux.form.HtmlEditor.NEWTablePlugin = Ext.extend(Ext.util.Observable, {
+Ext.ux.form.HtmlEditor.NEWTablePlugin = function(config) {
+    Ext.apply(this, config);
+    Ext.ux.form.HtmlEditor.NEWTablePlugin.superclass.constructor.call(this);
+};
+
+Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
+    // Initialize plugin
     init: function(editor) {
-        this.editor = editor;
-        this.editor.on('render', this.onEditorRender, this);
-        this.editor.on('initialize', this.onEditorInitialize, this);
+        var me = this;
+        me.editor = editor;
+        me.editor.on('render', me.onEditorRender, me);
+        me.editor.on('initialize', me.onEditorInitialize, me);
+        me.editor.on('activate', me.addResizeHandlesToAllTables, me);
+
+        // Override the pushValue method to clean up resize handles before syncing
+        var originalPushValue = editor.pushValue;
+        editor.pushValue = function() {
+            // Remove all resize handles before syncing
+            var doc = editor.getDoc();
+            if (doc) {
+                var handles = doc.querySelectorAll('.resize-handle');
+                Ext.each(handles, function(handle) {
+                    handle.parentNode.removeChild(handle);
+                });
+            }
+            // Call original pushValue method
+            originalPushValue.call(editor);
+            // Reapply resize handles after sync
+            me.addResizeHandlesToAllTables();
+        };
     },
 
     onEditorRender: function() {
-        if (this.editor.getToolbar()) {
-            this.editor.getToolbar().addButton({
+        var me = this;
+        if (me.editor.getToolbar()) {
+            me.editor.getToolbar().addButton({
                 text: 'table_chart',
                 tooltip: 'Insert/Modify Table',
-                handler: this.showTableConfigDialog,
+                handler: me.showTableConfigDialog,
                 cls: 'icons-toolbar-tblicon x-btn-text',
-                scope: this
+                scope: me
             });
         }
 
         // Dynamically add CSS for the custom toolbar icon
-        const style = document.createElement('style');
+        var style = document.createElement('style');
         style.type = 'text/css';
-        style.innerHTML = `
-            .icons-toolbar-tblicon .x-btn-text{
-                font-family: 'Icons';
-                font-size: 17px;
-                color: black;
-                display: flex;
-                align-items: center; /* Vertically center the content */
-                justify-content: center; /* Horizontally center the content */
-                padding: 0px;
-                border: 0px;
-                overflow: hidden;
-            }
-        `;
+        style.innerHTML = [
+            '.icons-toolbar-tblicon .x-btn-text{',
+            '    font-family: "Icons";',
+            '    font-size: 17px;',
+            '    color: black;',
+            '    display: flex;',
+            '    align-items: center;',
+            '    justify-content: center;',
+            '    padding: 0px;',
+            '    border: 0px;',
+            '    overflow: hidden;',
+            '}'
+        ].join('');
         document.head.appendChild(style);
+
+        // Add handler for source edit mode toggle
+        if (me.editor.sourceEditMode) {
+            var doc = me.editor.getDoc();
+            var handles = doc.querySelectorAll('.resize-handle');
+            Ext.each(handles, function(handle) {
+                handle.parentNode.removeChild(handle);
+            });
+        }
     },
 
     onEditorInitialize: function() {
-        const editorDoc = this.editor.getDoc();
+        var me = this;
+        var editorDoc = me.editor.getDoc();
 
-        editorDoc.addEventListener('click', () => {
-            const tables = editorDoc.querySelectorAll('table');
-            tables.forEach((table) => {
-                if (!table.querySelector('.resize-handle')) {
-                    this.addResizeHandle(table);
-                }
-            });
+        // Add resize handles to any existing tables
+        me.addResizeHandlesToAllTables();
+
+        // Monitor for clicks in case new tables are added
+        Ext.fly(editorDoc).on('click', function() {
+            me.addResizeHandlesToAllTables();
+        });
+    },
+
+    addResizeHandlesToAllTables: function() {
+        var me = this;
+        var editorDoc = me.editor.getDoc();
+        if (!editorDoc) return;
+
+        var tables = editorDoc.getElementsByTagName('table');
+        Ext.each(tables, function(table) {
+            me.addResizeHandle(table);
         });
     },
 
     showTableConfigDialog: function() {
-        const table = this.getSelectedTable();
+        var me = this;
+        var table = me.getSelectedTable();
 
-        if (!this.tableConfigWindow) {
-            this.rowsField = new Ext.form.NumberField({ fieldLabel: 'Rows', allowBlank: false, minValue: 1, value: 2 });
-            this.columnsField = new Ext.form.NumberField({ fieldLabel: 'Columns', allowBlank: false, minValue: 1, value: 2 });
-            this.captionField = new Ext.form.TextField({ fieldLabel: 'Caption' });
-            this.summaryField = new Ext.form.TextField({ fieldLabel: 'Summary' });
-            this.cellSpacingField = new Ext.form.NumberField({ fieldLabel: 'Cell Spacing', minValue: 0, value: 1 });
-            this.cellPaddingField = new Ext.form.NumberField({ fieldLabel: 'Cell Padding', minValue: 0, value: 1 });
-            this.bordersCheckbox = new Ext.form.Checkbox({ fieldLabel: 'Borders', checked: true });
-            this.alignmentCombo = new Ext.form.ComboBox({
+        if (!me.tableConfigWindow) {
+            me.rowsField = new Ext.form.NumberField({ fieldLabel: 'Rows', allowBlank: false, minValue: 1, value: 2 });
+            me.columnsField = new Ext.form.NumberField({ fieldLabel: 'Columns', allowBlank: false, minValue: 1, value: 2 });
+            me.captionField = new Ext.form.TextField({ fieldLabel: 'Caption' });
+            me.summaryField = new Ext.form.TextField({ fieldLabel: 'Summary' });
+            me.cellSpacingField = new Ext.form.NumberField({ fieldLabel: 'Cell Spacing', minValue: 0, value: 1 });
+            me.cellPaddingField = new Ext.form.NumberField({ fieldLabel: 'Cell Padding', minValue: 0, value: 1 });
+            me.bordersCheckbox = new Ext.form.Checkbox({ fieldLabel: 'Borders', checked: true });
+            me.alignmentCombo = new Ext.form.ComboBox({
                 fieldLabel: 'Alignment',
-                store: ['left', 'center', 'right'],
+                store: new Ext.data.ArrayStore({
+                    fields: ['value'],
+                    data: [['left'], ['center'], ['right']]
+                }),
+                displayField: 'value',
+                valueField: 'value',
                 mode: 'local',
                 editable: false,
                 triggerAction: 'all',
                 value: 'left'
             });
 
-            this.tableConfigWindow = new Ext.Window({
+            me.tableConfigWindow = new Ext.Window({
                 title: 'Insert/Modify Table',
                 width: 400,
                 modal: true,
                 layout: 'form',
                 bodyStyle: 'padding:10px',
                 closeAction: 'hide',
-                items: [
-                    {
-                        layout: 'column',
-                        defaults: { layout: 'form', columnWidth: 0.5, bodyStyle: 'padding:5px' },
-                        items: [
-                            { items: [this.rowsField, this.captionField, this.cellSpacingField, this.bordersCheckbox] },
-                            { items: [this.columnsField, this.summaryField, this.cellPaddingField, this.alignmentCombo] }
-                        ]
-                    }
-                ],
-                buttons: [
-                    { text: 'Insert/Update Table', handler: this.insertOrUpdateTable, scope: this },
-                    { text: 'Cancel', handler: function() { this.tableConfigWindow.hide(); }, scope: this }
-                ]
+                items: [{
+                    layout: 'column',
+                    defaults: { layout: 'form', columnWidth: 0.5, bodyStyle: 'padding:5px' },
+                    items: [
+                        { items: [me.rowsField, me.captionField, me.cellSpacingField, me.bordersCheckbox] },
+                        { items: [me.columnsField, me.summaryField, me.cellPaddingField, me.alignmentCombo] }
+                    ]
+                }],
+                buttons: [{
+                    text: 'Insert/Update Table',
+                    handler: me.insertOrUpdateTable,
+                    scope: me
+                }, {
+                    text: 'Cancel',
+                    handler: function() { me.tableConfigWindow.hide(); }
+                }]
             });
         }
 
         if (table) {
-            this.populateTableConfigDialog(table);
+            me.populateTableConfigDialog(table);
+        } else {
+            me.rowsField.setValue(2);
+            me.columnsField.setValue(2);
+            me.captionField.setValue('');
+            me.summaryField.setValue('');
+            me.cellSpacingField.setValue(1);
+            me.cellPaddingField.setValue(1);
+            me.bordersCheckbox.setValue(true);
+            me.alignmentCombo.setValue('left');
         }
 
-        this.tableConfigWindow.show();
+        me.tableConfigWindow.show();
     },
 
     getSelectedTable: function() {
-        const doc = this.editor.getDoc();
-        const selection = doc.getSelection();
+        var me = this;
+        var doc = me.editor.getDoc();
+        var selection = doc.getSelection();
         if (!selection.rangeCount) return null;
 
-        const range = selection.getRangeAt(0);
-        let element = range.commonAncestorContainer;
+        var range = selection.getRangeAt(0);
+        var element = range.commonAncestorContainer;
 
         while (element && element.nodeName !== 'TABLE') {
             element = element.parentNode;
@@ -117,89 +181,111 @@ Ext.ux.form.HtmlEditor.NEWTablePlugin = Ext.extend(Ext.util.Observable, {
     },
 
     populateTableConfigDialog: function(table) {
-        const caption = table.querySelector('caption') ? table.querySelector('caption').textContent : '';
-        const summary = table.getAttribute('summary') || '';
-        const cellSpacing = table.getAttribute('cellspacing') || 1;
-        const cellPadding = table.getAttribute('cellpadding') || 1;
-        const borders = table.getAttribute('border') === '1';
-        const alignment = table.getAttribute('align') || 'left';
+        var me = this;
+        var caption = table.getElementsByTagName('caption').length ?
+                     table.getElementsByTagName('caption')[0].textContent : '';
+        var summary = table.getAttribute('summary') || '';
+        var cellSpacing = table.getAttribute('cellspacing') || 1;
+        var cellPadding = table.getAttribute('cellpadding') || 1;
+        var borders = table.getAttribute('border') === '1';
+        var alignment = table.getAttribute('align') || 'left';
 
-        this.rowsField.setValue(table.rows.length);
-        this.columnsField.setValue(table.rows[0] ? table.rows[0].cells.length : 0);
-        this.captionField.setValue(caption);
-        this.summaryField.setValue(summary);
-        this.cellSpacingField.setValue(cellSpacing);
-        this.cellPaddingField.setValue(cellPadding);
-        this.bordersCheckbox.setValue(borders);
-        this.alignmentCombo.setValue(alignment);
+        me.rowsField.setValue(table.rows.length);
+        me.columnsField.setValue(table.rows[0] ? table.rows[0].cells.length : 0);
+        me.captionField.setValue(caption);
+        me.summaryField.setValue(summary);
+        me.cellSpacingField.setValue(cellSpacing);
+        me.cellPaddingField.setValue(cellPadding);
+        me.bordersCheckbox.setValue(borders);
+        me.alignmentCombo.setValue(alignment);
     },
 
     insertOrUpdateTable: function() {
-        const rows = this.rowsField.getValue();
-        const columns = this.columnsField.getValue();
-        const caption = this.captionField.getValue();
-        const summary = this.summaryField.getValue();
-        const cellSpacing = this.cellSpacingField.getValue();
-        const cellPadding = this.cellPaddingField.getValue();
-        const borders = this.bordersCheckbox.getValue() ? 1 : 0;
-        const alignment = this.alignmentCombo.getValue();
+        var me = this;
+        var rows = me.rowsField.getValue();
+        var columns = me.columnsField.getValue();
+        var caption = me.captionField.getValue();
+        var summary = me.summaryField.getValue();
+        var cellSpacing = me.cellSpacingField.getValue();
+        var cellPadding = me.cellPaddingField.getValue();
+        var borders = me.bordersCheckbox.getValue() ? 1 : 0;
+        var alignment = me.alignmentCombo.getValue();
 
-        const table = this.getSelectedTable();
+        var existingTable = me.getSelectedTable();
 
-        if (table) {
-            table.setAttribute('summary', summary);
-            table.setAttribute('cellspacing', cellSpacing);
-            table.setAttribute('cellpadding', cellPadding);
-            table.setAttribute('border', borders);
+        if (existingTable) {
+            existingTable.setAttribute('summary', summary);
+            existingTable.setAttribute('cellspacing', cellSpacing);
+            existingTable.setAttribute('cellpadding', cellPadding);
+            existingTable.setAttribute('border', borders);
 
             if (caption) {
-                if (!table.querySelector('caption')) {
-                    const captionElement = table.createCaption();
-                    captionElement.textContent = caption;
-                } else {
-                    table.querySelector('caption').textContent = caption;
+                var captionEl = existingTable.getElementsByTagName('caption')[0];
+                if (!captionEl) {
+                    captionEl = existingTable.createCaption();
                 }
-            } else if (table.querySelector('caption')) {
-                table.deleteCaption();
+                captionEl.textContent = caption;
+            } else {
+                var existingCaption = existingTable.getElementsByTagName('caption')[0];
+                if (existingCaption) {
+                    existingTable.removeChild(existingCaption);
+                }
             }
 
-            this.adjustTableRowsAndColumns(table, rows, columns, alignment);
+            me.adjustTableRowsAndColumns(existingTable, rows, columns, alignment);
+            me.addResizeHandle(existingTable);
         } else {
-            let tableHTML = `<table border="${borders}" cellspacing="${cellSpacing}" cellpadding="${cellPadding}"`;
-            if (summary) tableHTML += ` summary="${summary}"`;
-            tableHTML += '>';
+            var totalWidth = columns * 100;
+            var tableHTML = '<table border="' + borders + '" cellspacing="' + cellSpacing +
+                          '" cellpadding="' + cellPadding + '"' +
+                          (summary ? ' summary="' + summary + '"' : '') +
+                          ' align="' + alignment + '"' +
+                          ' style="width: ' + totalWidth + 'px;">';
 
-            if (caption) tableHTML += `<caption>${caption}</caption>`;
+            if (caption) {
+                tableHTML += '<caption>' + caption + '</caption>';
+            }
 
-            for (let i = 0; i < rows; i++) {
+            for (var i = 0; i < rows; i++) {
                 tableHTML += '<tr>';
-                for (let j = 0; j < columns; j++) {
-                    tableHTML += `<td style="text-align: ${alignment}; width: 100px; height: 30px;">&nbsp;</td>`;
+                for (var j = 0; j < columns; j++) {
+                    tableHTML += '<td style="text-align: ' + alignment + '; width: 100px; height: 30px;">&nbsp;</td>';
                 }
                 tableHTML += '</tr>';
             }
-            tableHTML += '</table><br>';
+            tableHTML += '</table><br><br>';
 
-            this.editor.insertAtCursor(tableHTML);
+            me.editor.insertAtCursor(tableHTML);
+
+            setTimeout(function() {
+                var doc = me.editor.getDoc();
+                var tables = doc.getElementsByTagName('table');
+                var newTable = tables[tables.length - 1];
+                if (newTable) {
+                    me.addResizeHandle(newTable);
+                    var cells = newTable.getElementsByTagName('td');
+                    Ext.each(cells, function(cell) {
+                        cell.style.width = '100px';
+                        cell.style.height = '30px';
+                    });
+                }
+            }, 0);
         }
 
-        const newTable = this.getSelectedTable();
-        if (newTable) {
-            this.addResizeHandle(newTable);
-        }
-
-        this.tableConfigWindow.hide();
+        me.tableConfigWindow.hide();
     },
 
     adjustTableRowsAndColumns: function(table, rows, columns, alignment) {
-        const currentRows = table.rows.length;
-        const currentCols = table.rows[0] ? table.rows[0].cells.length : 0;
+        var currentRows = table.rows.length;
+        var currentCols = table.rows[0] ? table.rows[0].cells.length : 0;
+
+        table.style.width = (columns * 100) + 'px';
 
         if (rows > currentRows) {
-            for (let i = currentRows; i < rows; i++) {
-                const newRow = table.insertRow();
-                for (let j = 0; j < columns; j++) {
-                    const newCell = newRow.insertCell();
+            for (var i = currentRows; i < rows; i++) {
+                var newRow = table.insertRow();
+                for (var j = 0; j < columns; j++) {
+                    var newCell = newRow.insertCell();
                     newCell.innerHTML = '&nbsp;';
                     newCell.style.width = '100px';
                     newCell.style.height = '30px';
@@ -207,99 +293,164 @@ Ext.ux.form.HtmlEditor.NEWTablePlugin = Ext.extend(Ext.util.Observable, {
                 }
             }
         } else if (rows < currentRows) {
-            for (let i = currentRows - 1; i >= rows; i--) {
+            for (var i = currentRows - 1; i >= rows; i--) {
                 table.deleteRow(i);
             }
         }
 
-        for (let i = 0; i < rows; i++) {
-            const row = table.rows[i];
-            const currentColsInRow = row.cells.length;
+        for (var i = 0; i < rows; i++) {
+            var row = table.rows[i];
+            var currentColsInRow = row.cells.length;
 
             if (columns > currentColsInRow) {
-                for (let j = currentColsInRow; j < columns; j++) {
-                    const newCell = row.insertCell();
+                for (var j = currentColsInRow; j < columns; j++) {
+                    var newCell = row.insertCell();
                     newCell.innerHTML = '&nbsp;';
                     newCell.style.width = '100px';
                     newCell.style.height = '30px';
                     newCell.style.textAlign = alignment;
                 }
             } else if (columns < currentColsInRow) {
-                for (let j = currentColsInRow - 1; j >= columns; j--) {
+                for (var j = currentColsInRow - 1; j >= columns; j--) {
                     row.deleteCell(j);
                 }
             }
 
-            for (let j = 0; j < columns; j++) {
-                row.cells[j].style.textAlign = alignment;
+            for (var j = 0; j < columns; j++) {
+                var cell = row.cells[j];
+                cell.style.width = '100px';
+                cell.style.height = '30px';
+                cell.style.textAlign = alignment;
             }
         }
     },
 
-addResizeHandle: function(table) {
-    const editorDoc = this.editor.getDoc();
+    addResizeHandle: function(table) {
+        var me = this;
+        var editorDoc = me.editor.getDoc();
 
-    // Set table-layout to fixed to ensure consistent cell resizing
-    table.style.tableLayout = 'fixed';
+        table.style.tableLayout = 'fixed';
 
-    // Check if the resize handle already exists
-    let resizeHandle = table.querySelector('.resize-handle');
-    if (resizeHandle) return; // If it exists, no need to add another
+        // Remove any existing handle
+        var existingHandle = table.querySelector('.resize-handle');
+        if (existingHandle) {
+            existingHandle.parentNode.removeChild(existingHandle);
+        }
 
-    // Create and style the resize handle
-    resizeHandle = document.createElement('div');
-    resizeHandle.className = 'resize-handle';
-    resizeHandle.innerHTML = 'open_in_full'; // Icon content
-    resizeHandle.style.fontFamily = 'Icons'; // Use specified font family
-    resizeHandle.style.fontSize = '16px';
-    resizeHandle.style.transform = 'rotate(180deg) scaleX(-1)';
-    resizeHandle.style.position = 'absolute';
-    resizeHandle.style.cursor = 'nwse-resize';
-    resizeHandle.style.zIndex = '1000';
-    resizeHandle.style.color = 'black';
-    resizeHandle.style.right = '0';
-    resizeHandle.style.bottom = '0';
-    resizeHandle.style.visibility = 'visible'; // Ensure visibility
-    resizeHandle.spellcheck = false; // Disable spell checking
-    table.style.position = 'relative';
-    table.appendChild(resizeHandle);
+        // Create wrapper div if it doesn't exist
+        var wrapper = table.parentNode;
+        if (!wrapper || !wrapper.classList.contains('table-wrapper')) {
+            wrapper = editorDoc.createElement('div');
+            wrapper.className = 'table-wrapper';
+            wrapper.style.position = 'relative';
+            wrapper.style.display = 'inline-block'; // This ensures wrapper fits table size
+            table.parentNode.insertBefore(wrapper, table);
+            wrapper.appendChild(table);
+        }
 
-    // Attach mousedown event to the resize handle
-    resizeHandle.onmousedown = (e) => {
-        e.preventDefault();
+        var resizeHandle = editorDoc.createElement('div');
+        resizeHandle.className = 'resize-handle';
+        resizeHandle.setAttribute('data-editor-helper', 'true');
 
-        const startWidth = table.offsetWidth;
-        const startHeight = table.offsetHeight;
-        const startX = e.clientX;
-        const startY = e.clientY;
+        // Enhanced hiding properties
+        resizeHandle.style.width = '10px';
+        resizeHandle.style.height = '10px';
+        resizeHandle.style.backgroundColor = '#0066cc';
+        resizeHandle.style.border = '1px solid #003366';
+        resizeHandle.style.position = 'absolute';
+        resizeHandle.style.cursor = 'nwse-resize';
+        resizeHandle.style.zIndex = '1000';
+        resizeHandle.style.right = '0';
+        resizeHandle.style.bottom = '0';
+        resizeHandle.style.display = 'none';
+        resizeHandle.style.visibility = 'hidden';
+        resizeHandle.style.opacity = '0';
+        resizeHandle.style.pointerEvents = 'none';
+        resizeHandle.spellcheck = false;
 
-        const onMouseMove = (event) => {
-            const width = startWidth + (event.clientX - startX);
-            const height = startHeight + (event.clientY - startY);
-            table.style.width = `${width}px`;
-            table.style.height = `${height}px`;
+        // Add handle to wrapper instead of table
+        wrapper.appendChild(resizeHandle);
 
-            // Set the height for each row and cell to ensure they expand vertically
-            Array.from(table.rows).forEach((row) => {
-                row.style.height = `${height / table.rows.length}px`;
-                Array.from(row.cells).forEach((cell) => {
-                    cell.style.height = `${height / table.rows.length}px`;
+        function showHandle() {
+            resizeHandle.style.display = 'block';
+            resizeHandle.style.visibility = 'visible';
+            resizeHandle.style.opacity = '1';
+            resizeHandle.style.pointerEvents = 'auto';
+        }
+
+        function hideHandle() {
+            resizeHandle.style.display = 'none';
+            resizeHandle.style.visibility = 'hidden';
+            resizeHandle.style.opacity = '0';
+            resizeHandle.style.pointerEvents = 'none';
+        }
+
+        // Adjust event listeners to work with wrapper
+        Ext.fly(wrapper).on('mouseenter', showHandle);
+
+        Ext.fly(wrapper).on('mouseleave', function(e) {
+            if (!e.getRelatedTarget() || !Ext.fly(e.getRelatedTarget()).hasClass('resize-handle')) {
+                hideHandle();
+            }
+        });
+
+        Ext.fly(resizeHandle).on('mousedown', function(e) {
+            e.preventDefault();
+            showHandle();
+
+            var startWidth = table.offsetWidth;
+            var startHeight = table.offsetHeight;
+            var startX = e.getPageX();
+            var startY = e.getPageY();
+
+            var onMouseMove = function(moveEvent) {
+                var width = startWidth + (moveEvent.getPageX() - startX);
+                var height = startHeight + (moveEvent.getPageY() - startY);
+                table.style.width = width + 'px';
+                table.style.height = height + 'px';
+
+                Ext.each(table.rows, function(row) {
+                    var rowHeight = height / table.rows.length;
+                    row.style.height = rowHeight + 'px';
+                    Ext.each(row.cells, function(cell) {
+                        cell.style.height = rowHeight + 'px';
+                    });
                 });
-            });
+            };
+
+            var onMouseUp = function(upEvent) {
+                Ext.fly(editorDoc).un('mousemove', onMouseMove);
+                Ext.fly(editorDoc).un('mouseup', onMouseUp);
+
+                var rect = wrapper.getBoundingClientRect();
+                var mouseX = upEvent.getPageX();
+                var mouseY = upEvent.getPageY();
+
+                if (mouseX < rect.left || mouseX > rect.right ||
+                    mouseY < rect.top || mouseY > rect.bottom) {
+                    hideHandle();
+                }
+            };
+
+            Ext.fly(editorDoc).on('mousemove', onMouseMove);
+            Ext.fly(editorDoc).on('mouseup', onMouseUp);
+        });
+
+        // Clean up function for when editor syncs content
+        var cleanup = function() {
+            if (wrapper && wrapper.parentNode) {
+                var parent = wrapper.parentNode;
+                parent.insertBefore(table, wrapper);
+                parent.removeChild(wrapper);
+            }
         };
 
-        const onMouseUp = () => {
-            editorDoc.removeEventListener('mousemove', onMouseMove);
-            editorDoc.removeEventListener('mouseup', onMouseUp);
-        };
-
-        // Attach mousemove and mouseup to the editor's document for proper resizing within the editor
-        editorDoc.addEventListener('mousemove', onMouseMove);
-        editorDoc.addEventListener('mouseup', onMouseUp);
-    };
-}
-
-
+        // Add cleanup to editor's sync event if not already added
+        if (!me._cleanupAdded) {
+            me.editor.on('sync', cleanup);
+            me._cleanupAdded = true;
+        }
+    }
 });
 
-Ext.preg('newtableplugin', Ext.ux.form.HtmlEditor.NEWTablePlugin);
+Ext.reg('newtableplugin', Ext.ux.form.HtmlEditor.NEWTablePlugin);
