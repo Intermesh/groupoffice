@@ -52,6 +52,11 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				}]
 		});
 
+		// route to main grid when details resets / is deleted for mobile view
+		this.noteDetail.on("reset", () => {
+			go.Router.goto("notes");
+		})
+
 		this.westPanel = new Ext.Panel({
 			region: "west",
 			layout: "responsive",
