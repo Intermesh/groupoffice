@@ -101,6 +101,11 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 
 		this.items = [this.westPanel, this.contactDetail];
 
+		// route to main grid when details resets / is deleted for mobile view
+		this.contactDetail.on("reset", () => {
+			go.Router.goto("addressbook");
+		})
+
 		go.modules.community.addressbook.MainPanel.superclass.initComponent.call(this);		
 
 

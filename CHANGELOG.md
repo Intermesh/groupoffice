@@ -1,3 +1,16 @@
+18-11-2024: 6.8.86
+- Files: cron job file notification
+- Core: updated german translation
+- Various: route to main grid when details resets / is deleted for mobile view
+- Privacy settings: several bug fixes in addressbook overrides
+- projects2: automatically convert old project_templates_events to tasks
+- Collabora: Added lang variable for collabora
+- Finance: Migration checks if all custom fields are available
+
+11-11-2024: 6.8.85
+- Billing: Fixed undefined index 'sort'
+
+11-11-2024: 6.8.84
 - Billing: Sort on price and supplier
 - Core: Bugfix when editing custom fieldset. Also enable editing of fieldset with parent fieldset
 - Core: Default request timeout to 30s instead 3 minutes

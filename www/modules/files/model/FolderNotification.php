@@ -247,8 +247,8 @@ class FolderNotification extends \GO\Base\Db\ActiveRecord {
 		
 		$message = new \GO\Base\Mail\Message();
 		$message->setSubject(\GO::t("Updates in folder", "files"))
-			->setTo(new Address($toUser->email, $toUser->displayName))
-			->setFrom(new Address(\GO::config()->webmaster_email, \GO::config()->title))
+			->setTo($toUser->email, $toUser->displayName)
+			->setFrom(\GO::config()->webmaster_email, \GO::config()->title)
 			->setBody($emailBody);
 		\GO\Base\Mail\Mailer::newGoInstance()->send($message);
 		

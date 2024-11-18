@@ -215,6 +215,11 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			this.taskBackButton.setVisible(layout.isNarrow());
 		});
 
+		// route to main grid when details resets / is deleted for mobile view
+		this.taskDetail.on("reset", () => {
+			go.Router.goto("tasks");
+		})
+
 		go.modules.community.tasks.MainPanel.superclass.initComponent.call(this);
 
 		this.on("afterrender", this.runModule, this);
