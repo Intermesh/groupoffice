@@ -1,9 +1,8 @@
 - Files: cron job file notification
 - Core: updated german translation
 - Various: route to main grid when details resets / is deleted for mobile view
-- collabora:  Added lang variable for collabora
+- Collabora: Added lang variable for collabora
 - Finance: Migration checks if all custom fields are available
-
 
 11-11-2024: 6.8.85
 - Billing: Fixed undefined index 'sort'
