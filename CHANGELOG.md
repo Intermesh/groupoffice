@@ -1,6 +1,7 @@
 - Files: cron job file notification
 - Core: updated german translation
 - Various: route to main grid when details resets / is deleted for mobile view
+- Privacy settings: several bug fixes in addressbook overrides
 
 11-11-2024: 6.8.85
 - Billing: Fixed undefined index 'sort'
