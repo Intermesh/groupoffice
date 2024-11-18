@@ -2,6 +2,7 @@
 - Core: updated german translation
 - Various: route to main grid when details resets / is deleted for mobile view
 - Privacy settings: several bug fixes in addressbook overrides
+- projects2: automatically convert old project_templates_events to tasks
 
 11-11-2024: 6.8.85
 - Billing: Fixed undefined index 'sort'
