@@ -1,3 +1,4 @@
+- Files: cron job file notification
 - Core: updated german translation
 - Various: route to main grid when details resets / is deleted for mobile view
 - collabora:  Added lang variable for collabora
