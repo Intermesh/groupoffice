@@ -4,7 +4,7 @@
  * TODO
  * 
  * The whole init process of Group-Office has to be remodelled.
- * The default_scripts.inc.php file is ugly and bad design. Instead all init
+ * The Extjs3.loadGoExt() file is ugly and bad design. Instead all init
  * views in modules should register client scripts and css files.
  */
 
