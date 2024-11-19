@@ -852,7 +852,7 @@ abstract class Entity extends Property {
 					}
 				}
 
-				if(is_int($value[1])) {
+				if(is_numeric($value[0])) {
 					$criteria->andWhere('modifiedBy', '=', $value);
 				} else {
 
@@ -885,7 +885,7 @@ abstract class Entity extends Property {
 					}
 				}
 
-				if(is_int($value[0])) {
+				if(is_numeric($value[0])) {
 					$criteria->andWhere('createdBy', '=', $value);
 				} else {
 					if (!$query->isJoined('core_user', 'creator')) {
