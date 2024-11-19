@@ -208,9 +208,11 @@ export class EventWindow extends FormWindow {
 				listeners: {
 					render: (comp) => {
 						comp.input!.addEventListener("blur", () => {
-							comp.hide();
+
 
 							const field = comp.nextSibling() as DisplayField;
+							field.value = comp.value;
+							comp.hide();
 							field.show();
 						})
 					}
@@ -221,9 +223,11 @@ export class EventWindow extends FormWindow {
 				listeners: {
 					render: comp1 => {
 						comp1.el.addEventListener("focus", () => {
-							comp1.hide();
 
 							const field = comp1.previousSibling() as TextAreaField;
+							field.height = comp1.height;
+							comp1.hide();
+
 							field.show();
 							field.focus();
 						})
@@ -233,6 +237,7 @@ export class EventWindow extends FormWindow {
 				label: t('Description'),
 				cls: "pit",
 				escapeValue: false,
+				hideWhenEmpty: false,
 				renderer: (v, field) => Format.textToHtml(v)}
 			),
 			autocompletechips({
