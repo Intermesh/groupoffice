@@ -2,12 +2,10 @@
 return array (
   'OTP Authenticator' => 'Google баталгаажуулагч',
   'Enable OTP Authenticator' => 'Google баталгаажуулагчийг идэвхжүүлэх',
-  'Disable OTP Authenticator' => 'Google баталгаажуулагчийг идэвхгүй болгох',
   'When disabling OTP Authenticator this step will be removed from the login process.' => 'Google баталгаажуулагчийг идэвхгүй болгох үед, энэ алхам нэвтрэх процессоос хасах болно.',
   'Provide your current password to disable OTP Authenticator.' => 'Google баталгаажуулагчийг идэвхгүй болгохын тулд одоогийн нууц үгээ оруулна уу.',
   'Disable OTP Authenticator' => 'Google баталгаажуулагчийг идэвхгүйжүүл',
   'Provide your current password before you can enable OTP Authenticator.' => 'Google баталгаажуулагчийг идэвхжүүлэхийн тулд одоогийн нууц үгээ оруулна уу.',
-  'Enable OTP Authenticator' => 'Google баталгаажуулагчийг идэвхжүүлэх',
   'Secret' => 'нууцлал',
   'Secret key for manual input' => 'Гараар оруулах нууц түлхүүр',
   'Verify' => 'Баталгаажуулах',

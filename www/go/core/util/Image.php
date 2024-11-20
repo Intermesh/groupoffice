@@ -148,7 +148,7 @@ class Image {
 	/**
 	 * Output image to browser
 	 *
-	 * @param int $image_type
+	 * @param int|false $image_type
 	 * @throws Exception
 	 */
 	public function output($image_type = false) {

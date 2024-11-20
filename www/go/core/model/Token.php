@@ -51,7 +51,7 @@ class Token extends Entity {
 
 	/**
 	 * Time this token expires. Defaults to one day after the token was created {@see LIFETIME}
-	 * @var DateTime
+	 * @var ?DateTime
 	 */							
 	public $expiresAt;
 	
