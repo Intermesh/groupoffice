@@ -253,6 +253,7 @@ CREATE TABLE `core_user` (
   `confirmOnMove` TINYINT(1) NOT NULL DEFAULT 0,
   `passwordModifiedAt` datetime null,
   `forcePasswordChange` boolean default false not null,
+  enableSendShortcut boolean default true not null,
     PRIMARY KEY (`id`)
 )
   ENGINE=InnoDB;

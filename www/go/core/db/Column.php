@@ -216,10 +216,17 @@ class Column {
 		// The dbType can be overriden in the 'comment' of the table column
 		// @see Table::createColumn() @dbType
 		switch ($this->dbType) {
+			case 'int':
+			case 'tinyint':
+			case 'smallint':
+			case 'bigint':
+				if ($this->length === 1) {
+					//Boolean fields in mysql are listed at tinyint(1);
+					return (bool) $value;
+				}
+				return (int) $value;
+
 			case 'localdatetime':
-//				$dt = new GoDateTime($value);
-//				$dt->toLocal();
-//				return $dt;
 			case 'datetime':
 				if(empty($value)) {
 					return null;

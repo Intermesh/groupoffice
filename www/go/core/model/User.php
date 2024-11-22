@@ -280,6 +280,12 @@ class User extends AclItemEntity {
 	public $mute_new_mail_sound;
 	public $show_smilies;
 	public $auto_punctuation;
+
+
+	/**
+	 * @var bool
+	 */
+	public $enableSendShortcut = true;
 	
 	
 	protected $files_folder_id;
