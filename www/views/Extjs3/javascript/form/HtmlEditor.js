@@ -49,8 +49,15 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 	headingsMenu: true,
 
+	enableSendShortcut : true,
+
 	initComponent: function() {
 		GO.form.HtmlEditor.superclass.initComponent.apply(this);
+
+		if(go.User) {
+			console.log(go.User.enableSendShortcut);
+			this.enableSendShortcut = go.User.enableSendShortcut;
+		}
 
 		this.buttonTips['strikeThrough']= {
 			title: 'Strike through',
@@ -75,9 +82,11 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			}
 		},this);
 
-		this.on('activate', function() {
-			this.registerSubmitKey();
-		}, this);
+		if(this.enableSendShortcut) {
+			this.on('activate', function () {
+				this.registerSubmitKey();
+			}, this);
+		}
 	},
 
 	emptyTextRegex: '<span[^>]+[^>]*>{0}<\/span>',

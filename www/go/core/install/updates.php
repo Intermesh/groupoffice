@@ -1642,3 +1642,7 @@ $updates['202410310946'][] = "alter table core_search
     add constraint core_search_ibfk_2
         foreign key (aclId) references core_acl (id)
             on update cascade on delete cascade;";
+
+
+$updates['202411221010'][] = "alter table core_user
+    add enableSendShortcut boolean default true not null;";
