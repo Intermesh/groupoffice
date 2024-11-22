@@ -163,9 +163,10 @@ class MailDomain
 			return;
 		}
 
-		$mb = Mailbox::find(['id', 'username', 'homedir'])->where(['username' => $username])->single();
+
 
 		if ($this->onSameServer()) {
+			$mb = Mailbox::find(['id', 'username', 'homedir'])->where(['username' => $username])->single();
 			$mb->password = $this->password;
 			$mb->save();
 		} else {
@@ -401,6 +402,6 @@ class MailDomain
 	{
 		$settingsUrl = rtrim(go()->getSettings()->URL,'/');
 		$configUrl = rtrim(go()->getConfig()['serverclient_server_url'], '/');
-		return $settingsUrl === $configUrl;
+		return $settingsUrl === $configUrl && go()->getModule("community", "maildomains");
 	}
 }
