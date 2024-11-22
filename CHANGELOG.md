@@ -1,4 +1,5 @@
 - Core: Added new option to toggle use of ctrl + enter to send e-mail / comments
+- Billing: Import and export custom fields and match by ID
 
 18-11-2024: 6.8.86
 - Files: cron job file notification
