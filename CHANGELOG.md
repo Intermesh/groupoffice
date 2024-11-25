@@ -1,3 +1,4 @@
+25-11-2024: 6.8.87
 - Core: Added new option to toggle use of ctrl + enter to send e-mail / comments
 - Billing: Import and export custom fields and match by ID
 - Newsletters: Fixed newsletter template attachements not saving.
