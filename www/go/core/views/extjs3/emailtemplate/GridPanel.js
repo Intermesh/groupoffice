@@ -8,12 +8,15 @@ go.emailtemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 	 */
 	templateDefaults: undefined,
 
+	scrollLoader: true,
+
+
 	viewConfig: {
 		emptyText: 	'<p>' +t("No items to display") + '</p>'
 	},
 
 	setKey: function(key) {
-		this.key = key,
+		this.key = key;
 		this.store.setFilter("module", {module: this.module, key: this.key});
 	},
 
@@ -83,7 +86,7 @@ go.emailtemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 					field: "name"
 				}
 			}),
-			autoHeight: true,
+			// autoHeight: true,
 			columns: [
 				{
 					id: 'name',
