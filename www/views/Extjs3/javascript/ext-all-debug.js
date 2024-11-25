@@ -2969,23 +2969,30 @@ Ext.Element.addMethods(function(){
 
         
         getHeight : function(contentHeight){
-            var me = this,
-                dom = me.dom,
-                hidden = Ext.isIE9m && me.isStyle('display', 'none'),
-                h = MATH.max(dom.offsetHeight, hidden ? 0 : dom.clientHeight) || 0;
+            // var me = this,
+            //     dom = me.dom,
+            //     hidden = Ext.isIE9m && me.isStyle('display', 'none'),
+            //     h = MATH.max(dom.offsetHeight, hidden ? 0 : dom.clientHeight) || 0;
+						//
+            // h = !contentHeight ? h : h - me.getBorderWidth("tb") - me.getPadding("tb");
+            // return h < 0 ? 0 : h;
 
-            h = !contentHeight ? h : h - me.getBorderWidth("tb") - me.getPadding("tb");
-            return h < 0 ? 0 : h;
+					const r = this.dom.getBoundingClientRect();
+
+					return r.height;
         },
 
         
         getWidth : function(contentWidth){
-            var me = this,
-                dom = me.dom,
-                hidden = Ext.isIE9m && me.isStyle('display', 'none'),
-                w = MATH.max(dom.offsetWidth, hidden ? 0 : dom.clientWidth) || 0;
-            w = !contentWidth ? w : w - me.getBorderWidth("lr") - me.getPadding("lr");
-            return w < 0 ? 0 : w;
+            // var me = this,
+            //     dom = me.dom,
+            //     hidden = Ext.isIE9m && me.isStyle('display', 'none'),
+            //     w = MATH.max(dom.offsetWidth, hidden ? 0 : dom.clientWidth) || 0;
+            // w = !contentWidth ? w : w - me.getBorderWidth("lr") - me.getPadding("lr");
+
+						const r = this.dom.getBoundingClientRect();
+
+            return r.width;
         },
 
         
