@@ -9,9 +9,9 @@ import {
 	h3, hr,
 	menu, mstbar, Notifier, searchbtn,
 	t,
-	tbar, Window
+	tbar, Window, Filter
 } from "@intermesh/goui";
-import {DetailPanel, FilterCondition, jmapds} from "@intermesh/groupoffice-core";
+import {DetailPanel, jmapds} from "@intermesh/groupoffice-core";
 import {DnsSettingsPanel} from "./DnsSettingsPanel.js";
 import {MailboxTable} from "./MailboxTable.js";
 import {MailboxDialog} from "./MailboxDialog.js";
@@ -220,7 +220,7 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 				searchbtn({
 					listeners: {
 						input: (_sender, text) => {
-							(mailboxTable!.store.queryParams.filter as FilterCondition).text = text;
+							(mailboxTable!.store.queryParams.filter as Filter).text = text;
 							mailboxTable!.store.load();
 						}
 					}
@@ -307,7 +307,7 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 				searchbtn({
 					listeners: {
 						input: (_sender, text) => {
-							(aliasTable!.store.queryParams.filter as FilterCondition).text = text;
+							(aliasTable!.store.queryParams.filter as Filter).text = text;
 							aliasTable!.store.load();
 						}
 					}
