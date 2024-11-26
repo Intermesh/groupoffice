@@ -13,12 +13,16 @@ DIR="$(pwd)";
 
 
 # pull promodules
-echo "Pulling promodules"
-cd  www/promodules
-git pull
+
+if [ -d "www/promodules" ]; then
+  echo "Pulling promodules"
+  cd  www/promodules
+  git pull
+  cd ../../
+fi
 
 #pull all customer repos
-cd ../go/modules
+cd www/go/modules
 
 for line in $(ls -1 -d */);
 do
@@ -64,7 +68,7 @@ function buildGOUI() {
     local NODE_DIR="$(dirname "${line}")";
     echo "BUILD:" $NODE_DIR;
     cd $NODE_DIR;
-    npm update;
+    npm ci;
     npm run build;
     cd $DIR;
 
@@ -76,13 +80,13 @@ function buildGOUI() {
 echo "Building GOUI shared libs..."
 cd $DIR;
 cd ./www/views/goui/goui
-npm update
+npm ci
 
 cd ../groupoffice-core
-npm update
+npm ci
 
 cd ..
-npm update
+npm ci
 npm run build
 
 cd $DIR;
