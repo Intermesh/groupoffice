@@ -204,7 +204,11 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 						var firstErrorMsg = me.markServerValidationErrors(notSaved[id].validationErrors);
 
 						if(!response.message) {
-							response.message = firstErrorMsg;
+							if(firstErrorMsg) {
+								response.message = firstErrorMsg;
+							} else if(notSaved[id].detail) {
+								response.message = notSaved[id].detail;
+							}
 						}
 						break;
 				}
@@ -223,6 +227,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 				return Promise.reject(response);
 			}
 		}, me).catch(function(error){
+
 			if(cb) {
 				cb.call(scope, me, false, null);
 			}

@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `history_log_entry` (
     FOREIGN KEY (`aclId`)
     REFERENCES `core_acl` (`id`)
     ON DELETE SET NULL
-    ON UPDATE NO ACTION)
+    ON UPDATE cascade)
 ENGINE = InnoDB;
 
 ALTER TABLE `history_log_entry` ADD INDEX(`entityId`);

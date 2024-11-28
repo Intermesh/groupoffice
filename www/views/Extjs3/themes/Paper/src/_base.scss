@@ -2,8 +2,9 @@
 
 $font-scale: 1 !default;
 $resourcePath: './' !default;
-@import '../../../../goui/groupoffice-core/style/theme';
-//@import 'theme';
+//@import '../../../../goui/groupoffice-core/style/_theme.scss';
+@import 'theme';
+
 
 @import 'compat';
 @import 'config';

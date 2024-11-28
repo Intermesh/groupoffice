@@ -1,7 +1,7 @@
 import {client, modules, router} from "@intermesh/groupoffice-core";
 import {MainPanel} from "./MainPanel.js";
 import {comp, t, translate} from "@intermesh/goui";
-import {SystemSettings} from "./SystemSettings";
+import {SystemSettings} from "./SystemSettings.js";
 
 modules.register(  {
 	package: "community",

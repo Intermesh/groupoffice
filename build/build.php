@@ -203,12 +203,12 @@ class Builder
 		cd("../");
 		run("npm ci");
 		run("npm run build");
-		run("npm prune --production");
+		run("npm prune --omit=dev");
 
 		cd("groupoffice-core");
-		run("npm prune --production");
+		run("npm prune --omit=dev");
 		cd("../goui");
-		run("npm prune --production");
+		run("npm prune --omit=dev");
 	}
 
 
@@ -227,7 +227,7 @@ class Builder
 			run("npm ci");
 			run("pwd");
 			run("npm run build");
-			run("npm prune --production");
+			run("npm prune --omit=dev");
 			cd($this->buildDir . "/" . $this->packageName);
 		}
 	}

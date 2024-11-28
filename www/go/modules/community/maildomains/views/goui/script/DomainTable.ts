@@ -12,8 +12,8 @@ import {
 	Window
 } from "@intermesh/goui";
 import {JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
-import {DomainDialog} from "./DomainDialog";
-import {mailDomainStatus} from "./MailDomain";
+import {DomainDialog} from "./DomainDialog.js";
+import {mailDomainStatus} from "./MailDomain.js";
 
 export class DomainTable extends Table<DataSourceStore> {
 	constructor() {

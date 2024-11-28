@@ -147,9 +147,9 @@ class Calendar extends AclOwnerEntity {
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()->add('isSubscribed', function(Criteria $criteria, $value, Query $query) {
-			$query->where('isSubscribed','=', $value);
+			$criteria->where('isSubscribed','=', $value);
 				if($value === false) {
-					$query->orWhere('isSubscribed', 'IS', null);
+					$criteria->orWhere('isSubscribed', 'IS', null);
 				}
 		})->add('isResource', function(Criteria $criteria, $value, Query $query) {
 			$query->where('groupId',$value?'IS NOT':'IS', null);

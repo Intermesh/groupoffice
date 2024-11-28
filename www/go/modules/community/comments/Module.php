@@ -130,17 +130,23 @@ class Module extends core\Module
 		$date = $faker->dateTimeBetween("-2 years", "-" . $commentCount . "days");
 
 		for($i = 0; $i < $commentCount; $i++) {
-			$user = $users[$faker->numberBetween(0, $userCount)];
+			try {
+				$user = $users[$faker->numberBetween(0, $userCount)];
 
-			$comment = new Comment();
-			$comment->setEntity($entity);
-			$comment->text = self::demoText($faker);
-			$comment->createdBy = $user->id;
-			$comment->date = $date;
+				$comment = new Comment();
+				$comment->setEntity($entity);
+				$comment->text = self::demoText($faker);
+				$comment->createdBy = $user->id;
+				$comment->date = $date;
 
-			$date = $date->add(new \DateInterval("P1D"));
+				$date = $date->add(new \DateInterval("P1D"));
 
-			$comment->save();
+				if (!$comment->save()) {
+					throw new core\orm\exception\SaveException($comment);
+				}
+			}catch (\Exception $e) {
+				core\ErrorHandler::logException($e);
+			}
 		}
 	}
 }

@@ -13,6 +13,7 @@ $gouiStyleSheet = $gouiStyleSheet ?? "groupoffice.css";
 $goTitle = basename(dirname($_SERVER['PHP_SELF'])) == 'install' ? go()->t("Installation") : go()->getSettings()->title;
 $primaryColor = go()->getSettings()->primaryColor ?? 'rgb(22, 82, 161)';
 $webclient = Extjs3::get();
+$webclient->loadScripts();
 $themeUrl = $webclient->getThemeUrl();
 $authController = new \GO\Core\Controller\AuthController(); // for some reason the event listeners are in this class
 $cssMtime = filemtime(GO::view()->getTheme()->getPath() . "/style.css");
@@ -48,7 +49,7 @@ $lang = go()->getLanguage()->getIsoCode();
     <link rel="preload" href="<?= $themeUrl;?>fonts/icons.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" media="print, screen"  href="<?= $themeUrl;?>style.css?v=<?=$cssMtime ?>">
 <?php if($loadExt):
-    require(GO::config()->root_path.'views/Extjs3/default_scripts.inc.php');
+	$webclient->drawScripts();
     go()->fireEvent(App::EVENT_SCRIPTS);
 	$authController->fireEvent('head');
     go()->fireEvent(App::EVENT_HEAD);

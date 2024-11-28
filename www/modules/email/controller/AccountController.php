@@ -5,6 +5,7 @@ namespace GO\Email\Controller;
 
 use GO;
 use go\core\ErrorHandler;
+use go\core\util\DateTime;
 
 
 class AccountController extends \GO\Base\Controller\AbstractModelController
@@ -603,7 +604,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
         if ($srcMessageInfo->seen)
 					$flags = '\SEEN';
 
-        $targetImapConnection->append_message($params['targetMailboxPath'], $srcImapMessage->getSource(), $flags);
+        $targetImapConnection->append_message($params['targetMailboxPath'], $srcImapMessage->getSource(), $flags, new DateTime('@'.$srcImapMessage->udate));
 
         if ($move) {
 					$srcImapMessage->delete();

@@ -16,6 +16,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 	initComponent : function() {
 
 		console.log(this.fileName, this.fileName.toLowerCase().substr(-3))
+		console.log(go.User.dateFormat,go.User.decimalSeparator, go.User.timeFormat, go.User.thousandsSeparator);
 
 		const renameWindow = new go.Window({
 			title: t('Rename profile'),
@@ -281,6 +282,13 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 							}, 'new');
 							Ext.apply(v, this.findAliases());
 							this.formPanel.form.setValues(v);
+							this.formPanel.form.setValues({
+								updateBy: response.updateBy,
+								dateFormat: response.dateFormat ?? go.User.dateFormat,
+								timeFormat: response.timeFormat ?? go.User.timeFormat,
+								decimalSeparator: response.decimalSeparator ?? go.User.decimalSeparator,
+								thousandsSeparator: response.thousandsSeparator ?? go.User.thousandsSeparator
+							});
 						}
 
 						this.doLayout();
@@ -396,52 +404,48 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 	 * @returns {{}}
 	 *
 	 */
-	transformCsvHeadersToValues : function(goHeaders, fields, parent) {
-		var v = {};
+	transformCsvHeadersToValues: function (goHeaders, fields, parent) {
+		const v = {};
 
-		for(var name in goHeaders) {
-			var h = goHeaders[name];
+		for (const name in goHeaders) {
+			const h = goHeaders[name];
 
-			if(h.grouped) {
-				if(h.many) {
+			if (h.grouped) {
+				if (h.many) {
 					v[h.name] = [];
-					var index = 1;
-					for (index = 1; index < 10; index++) {
-						var part = h.name + "[" + index + "]";
+					for (let index = 1; index < 10; index++) {
+						let part = h.name + "[" + index + "]";
 						part = parent ? parent + "." + part : part;
 
-						var headerIndex = this.csvHeaders.findIndex(function (csvH) {
+						let headerIndex = this.csvHeaders.findIndex(function (csvH) {
 							return csvH && csvH.toLowerCase().indexOf(part.toLowerCase()) == 0;
 						});
 
-						if (headerIndex == -1) {
+						if (headerIndex === -1) {
 							break;
 						}
 						headerIndex--;
 						v[h.name][headerIndex] = this.transformCsvHeadersToValues(h.properties, fields, part);
 					}
-				}else
-				{
+				} else {
 					v[h.name] = this.transformCsvHeadersToValues(h.properties, fields, h.name);
 				}
-			} else
-			{
+			} else {
 				v[h.name] = this.findSingleCsvIndex(h, parent);
 			}
-		};
-
+		}
 
 		return v;
 	},
 
 	findSingleCsvIndex : function(h, parent) {
-		var csvIndex = -2;
-		var storeIndex = this.csvStore.findBy(function(r) {
-			if(!r.data.name) {
+		let csvIndex = -2;
+		const storeIndex = this.csvStore.findBy(function (r) {
+			if (!r.data.name) {
 				return false;
 			}
-			var csvHeader = r.data.name.toLowerCase().replace(/[_\-\s]/g, '');
-			var goHeader = (parent ? parent + "." + h.name : h.name).toLowerCase().replace(/[_\-\s]/g, '');
+			const csvHeader = r.data.name.toLowerCase().replace(/[_\-\s]/g, '');
+			const goHeader = (parent ? parent + "." + h.name : h.name).toLowerCase().replace(/[_\-\s]/g, '');
 
 			return csvHeader == goHeader || "customfields." + csvHeader == goHeader;
 		});
@@ -477,8 +481,6 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 				};
 
 				if(h.many) {
-
-
 					var field = {
 						name: h.name,
 						xtype: "formgroup",
@@ -568,8 +570,24 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 		var updateBy = mapping.updateBy,
 		decimalSeparator = mapping.decimalSeparator,
 		thousandsSeparator = mapping.thousandsSeparator,
-		dateFormat = mapping.dateFormat;
+		dateFormat = mapping.dateFormat,
 		timeFormat = mapping.timeFormat;
+
+		// Not sure why, but these values are not read properly in the API. Therefore, we translate them
+		// to string values below
+		if(Ext.isArray(decimalSeparator)) {
+			decimalSeparator = decimalSeparator[0];
+		}
+
+		if(Ext.isArray(thousandsSeparator)) {
+			thousandsSeparator = thousandsSeparator[0];
+		}
+		if(Ext.isArray(dateFormat)) {
+			dateFormat = dateFormat[0];
+		}
+		if(Ext.isArray(timeFormat)) {
+			timeFormat = timeFormat[0];
+		}
 
 		var saveName = this.nameField.getValue();
 

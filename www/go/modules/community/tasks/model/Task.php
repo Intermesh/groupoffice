@@ -67,8 +67,8 @@ class Task extends AclItemEntity {
 	/** @var int used for the kanban groups */
 	public $groupId;
 
-	/** @var int */
-	public $projectId ;
+	public ?int $projectId ;
+	public ?int $mileStoneId ;
 
 	/** @var int */
 	public $createdBy;
@@ -346,24 +346,13 @@ class Task extends AclItemEntity {
 				if($value === 'subscribedOnly' || empty($value)) {
 					$query->join('tasks_tasklist_user', 'utl', 'utl.tasklistId = task.tasklistId AND utl.userId = '.go()->getAuthState()->getUserId())
 						->where('utl.isSubscribed','=', true);
-				} else if(!empty($value)) {
+				} else if($value != 'any') {
 					$criteria->where(['tasklistId' => $value]);
 				}
 
 			}, "subscribedOnly")
-			->add('projectId', function(Criteria $criteria, $value, Query $query) {
-				if(!empty($value)) {
-
-					$on = $query->getTableAlias() . '.id = l.toId and l.toEntityTypeId = ' . Task::entityType()->getId();
-
-					$query->join(
-						'core_link',
-						'l',
-						$on)
-						->andWhere('fromEntityTypeId = '. Project3::entityType()->getId())
-						->andWhere('fromId', '=', $value);
-				}
-			})
+			->addColumn('mileStoneId')
+			->addColumn('projectId')
 			->add('role', function(Criteria $criteria, $value, Query $query) {
 				if(!$query->isJoined("tasks_tasklist", "tasklist") ){
 					$query->join("tasks_tasklist", "tasklist", "task.tasklistId = tasklist.id");
@@ -663,6 +652,15 @@ class Task extends AclItemEntity {
 			}
 			$sort->renameKey('tasklist','tasklist.name');
 		}
+
+		if(isset($sort['project'])) {
+
+			if(!$query->isJoined("business_projects3_project3", "project")) {
+				$query->join("business_projects3_project3", "project", "project.id = task.projectId", "left");
+			}
+			$sort->renameKey('project','project.number');
+		}
+
 
 		//sort null dates first
 		if(isset($sort['due'])) {

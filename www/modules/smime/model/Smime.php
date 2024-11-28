@@ -54,6 +54,13 @@ class Smime {
 	}
 
 
+	/**
+	 * Get valid certificates in given period
+	 *
+	 * @param $date
+	 * @return Certificate[]
+	 * @throws \go\core\http\Exception
+	 */
 	public function validCerts($date = null) {
 		$criteria = FindCriteria::newInstance()->addCondition('account_id', $this->accountId);
 		if(!empty($date)) {

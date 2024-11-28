@@ -6,6 +6,7 @@
  */
 namespace go\modules\community\calendar\model;
 
+use go\core\db\Expression;
 use go\core\ErrorHandler;
 use go\core\exception\JsonPointerException;
 use go\core\fs\Blob;
@@ -143,7 +144,7 @@ class ICalendarHelper {
 		if(!$recurrenceId) {
 			if(!empty($event->privacy) && $event->privacy !== 'public') $vevent->CLASS = self::$privacyMap[$event->privacy];
 			if(!empty($event->modifiedAt)) $vevent->{'LAST-MODIFIED'} = $event->modifiedAt->format('Ymd\THis\Z'); // @todo: check if datetime must be UTC
-			if(!empty($event->createdAt)) $vevent->DTSTAMP = $event->createdAt;
+			$vevent->DTSTAMP = new DateTime();
 		} else {
 			$rId = $vevent->add('RECURRENCE-ID', new DateTime($recurrenceId, $event->timeZone()));
 			if(!empty($event->showWithoutTime)) {
@@ -403,7 +404,13 @@ class ICalendarHelper {
 
 	static private function parseAttendee($vattendee) {
 		$key = str_ireplace('mailto:', '',(string)$vattendee);
-		$principalId = Principal::find()->selectSingleValue('id')->where('email','=',$key)->orderBy(['entityTypeId'=>'ASC'])->single();
+		$principalId = Principal::find()
+			->join("core_entity", "e", "e.id=principal.entityTypeId")
+			->selectSingleValue('principal.id')
+			->where('email','=',$key)
+			->orderBy([new Expression("(e.name='User') DESC")])
+			->single();
+
 		$p = (object)['email' => $key];
 		if(!empty($vattendee['EMAIL'])) $p->email = (string)$vattendee['EMAIL'];
 		$p->kind = !empty($vattendee['CUTYPE']) ? strtolower($vattendee['CUTYPE']) : 'individual';
@@ -427,7 +434,7 @@ class ICalendarHelper {
 		if(isset($vevent->DTSTART)) {
 			$props->start = $vevent->DTSTART->getDateTime();
 			if($vevent->DTSTART->hasTime() && !$vevent->DTSTART->isFloating()) {
-				$props->timeZone = !empty((string)$vevent->DTSTART['TZID']) ? (string)$vevent->DTSTART['TZID'] : 'Etc/UTC';
+				$props->timeZone = $props->start->getTimezone()->getName();
 			}
 		}
 		//empty($vevent->DTSTART) ?: $props->start = $vevent->DTSTART->getDateTime()->format(DateTime::FORMAT_API_LOCAL);

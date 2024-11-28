@@ -12,8 +12,8 @@ import {
 	textfield, Window
 } from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
-import {MailDomain} from "./MailDomain";
-import {ImportDkimKeyDialog} from "./ImportDkimKeyDialog";
+import {MailDomain} from "./MailDomain.js";
+import {ImportDkimKeyDialog} from "./ImportDkimKeyDialog.js";
 
 export class DnsSettingsPanel extends Component {
 

@@ -92,7 +92,7 @@ try {
 			$old = date_default_timezone_get();
 			date_default_timezone_set('UTC');
 			//used for direct token login from multi_instance module
-			//this token is used in default_scripts.inc.php too
+			//this token is used in Extjs3.clientSettings() too
 			$token = Token::find()->where('accessToken', '=', $_POST['accessToken'])->single();
 			if($token) {
 

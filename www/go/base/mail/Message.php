@@ -472,7 +472,11 @@ class Message extends \go\core\mail\Message {
 		if(!empty($params['in_reply_to'])){
 			$this->setInReplyTo($params['in_reply_to']);
 			$this->setReferences($params['in_reply_to']);
-		}	
+		}
+
+		if(!empty($params['references'])) {
+			$this->setReferences($params['references']);
+		}
 
 		if($params['content_type']=='html'){
 						

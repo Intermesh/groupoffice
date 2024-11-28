@@ -85,7 +85,10 @@ export class ResourcesWindow extends Window {
 		this.on('render', async () => {
 			resourceStore.load();
 			await resourceGroupStore.load();
-			this.resourceGroupTable.rowSelection!.selected = [0];
+			const first = resourceStore.first();
+			if(first) {
+				this.resourceGroupTable.rowSelection!.add(first);
+			}
 		})
 
 		const aside = comp({tagName:'aside', width: 300},
@@ -99,7 +102,7 @@ export class ResourcesWindow extends Window {
 					multiSelect: false,
 					listeners: {
 						selectionchange: (tableRowSelect) => {
-							const groupIds = tableRowSelect.selected.map((index) => tableRowSelect.list.store.get(index)!.id);
+							const groupIds = tableRowSelect.getSelected().map((row) => row.record.id);
 							this.resourceTable!.store.setFilter("group", {groupId: groupIds[0]})
 							void this.resourceTable!.store.load();
 
@@ -183,7 +186,7 @@ export class ResourcesWindow extends Window {
 							},
 
 							delete: async (_tbl) => {
-								const ids = this.resourceTable!.rowSelection!.selected.map(index => this.resourceTable!.store.get(index)!.id!);
+								const ids = this.resourceTable!.rowSelection!.getSelected().map(row => row.record.id);
 								await jmapds("Resources")
 									.confirmDestroy(ids);
 							}

@@ -26,6 +26,16 @@ body {
 	//background-image: radial-gradient( circle farthest-corner at 10% 20%,  rgba(239,166,76,1) 0%, rgba(245,184,184,1) 100.2% );
 }
 
+:root, body {
+	@include light-theme;
+}
+body.dark {
+	@include dark-theme;
+	* {
+		color-scheme: dark;
+	}
+}
+
 body * {
 	box-sizing: border-box;
 }
@@ -1555,7 +1565,7 @@ table[id^="comments-ext"] b {
 .x-window.go-form-panel .x-window-body,
 .x-column.go-form-panel .x-panel-body,
 .x-form-label-left.go-form-panel > div > .x-panel-body,
-.go-form-panel .x-panel-body, .go-error-dialog{
+.go-form-panel > .x-panel-bwrap > .x-panel-body, .go-error-dialog{
 	padding: dp(8) dp(16);
 }
 

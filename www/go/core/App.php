@@ -999,6 +999,7 @@ namespace go\core {
 				$user->username = "demo";
 				$user->displayName = $faker->name;
 				$user->email = $user->recoveryEmail = 'demo@group-office.com';
+				$user->validatePasswordEnabled(false);
 				$user->setPassword("demo");
 
 				if (!$user->save()) {
@@ -1019,6 +1020,7 @@ namespace go\core {
 					$user->username = $faker->username;
 					$user->displayName = $faker->name;
 					$user->email = $user->recoveryEmail = $user->username . '@' . $faker->domainName;
+					$user->validatePasswordEnabled(false);
 					$user->setPassword($faker->password);
 
 					if (!$user->save()) {

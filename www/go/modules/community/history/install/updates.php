@@ -46,3 +46,11 @@ $updates['202306151226'][] = "create index history_log_entry_removeAcl_action_in
     on history_log_entry (removeAcl, action);";
 
 
+$updates['202306151226'][] = "alter table history_log_entry
+    drop foreign key fk_log_entry_core_acl1;";
+
+$updates['202306151226'][] = "alter table history_log_entry
+    add constraint fk_log_entry_core_acl1
+        foreign key (aclId) references core_acl (id)
+            on update cascade on delete set null;";
+

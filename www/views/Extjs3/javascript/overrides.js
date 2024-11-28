@@ -13,7 +13,7 @@
 
 //Default timeout 3 minutes.
 Ext.override(Ext.data.Connection, {
-	timeout: 180000
+	timeout: 30000//180000
 });
 
 Ext.override(Ext.form.TimeField, {
@@ -44,7 +44,7 @@ function dp(size) {
 (function(){
   
   //add module and package to components so they are aware of the module they belong to.
-	//go.module and go.package are defined in default_scripts.inc.php 
+	//go.module and go.package are defined in Extjs3.loadGoExt()
   var origExtend = Ext.extend;
 
   Ext.extend = function() {

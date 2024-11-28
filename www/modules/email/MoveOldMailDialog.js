@@ -9,12 +9,12 @@ GO.email.MoveOldMailDialog = function(config){
 
 	config.layout='fit';
 	config.title=t("Move old mails", "email");
-	//	config.stateId='email-message-dialog';
+
 	config.maximizable=false;
 	config.modal=false;
-	config.width=dp(640);
-	config.height= dp(400);
-	config.resizable=false;
+	config.width=dp(700);
+	config.height= dp(500);
+	config.resizable=true;
 	config.minizable=false;
 	config.closeAction='hide';	
 	config.items=this.formPanel;
@@ -50,6 +50,7 @@ Ext.extend(GO.email.MoveOldMailDialog, go.Window,{
 
 	buildForm : function() {
 		this.formPanel = new Ext.form.FormPanel({
+			autoScroll: true,
 			timeout:120000,
 			url : GO.url("email/message/MoveOld"),
 			waitMsgTarget : true,

@@ -197,7 +197,7 @@ class MimeDecode
 
 
 
-	const SINGLE_HEADERS = ['subject', 'to', 'from', 'cc', 'bcc', 'from', 'date', 'message-id', 'content-type', 'references', 'in-reply-to'];
+	const SINGLE_HEADERS = ['subject', 'to', 'from', 'cc', 'bcc', 'from', 'date', 'message-id', 'content-type', 'references', 'in-reply-to', 'content-id'];
 
 
 	/**

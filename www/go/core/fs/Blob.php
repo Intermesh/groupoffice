@@ -280,7 +280,7 @@ class Blob extends orm\Entity {
 		return new MetaData($this);
 	}
 
-	protected function insertTableRecord(Table $table, array $record)
+	protected function insertTableRecord(Table $table, array $record): void
 	{
 		$stmt = go()->getDbConnection()->insertIgnore($table->getName(), $record);
 		if (!$stmt->execute()) {

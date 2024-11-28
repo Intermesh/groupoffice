@@ -5,7 +5,7 @@ import {NoteBookGrid, notebookgrid} from "./NoteBookGrid.js";
 import {NoteDetail} from "./NoteDetail.js";
 import {NoteDialog} from "./NoteDialog.js";
 import {NoteBookDialog} from "./NoteBookDialog";
-import {FilterCondition, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
+import {MainThreeColumnPanel} from "@intermesh/groupoffice-core";
 
 
 export class Main extends MainThreeColumnPanel {
@@ -18,7 +18,9 @@ export class Main extends MainThreeColumnPanel {
 
 		this.on("render", async () => {
 			void this.noteBookGrid.store.load();
-			this.noteBookGrid.rowSelection!.selected = [0];
+			const first = this.noteBookGrid.store.first();
+			if(first)
+				this.noteBookGrid.rowSelection!.add(first);
 		})
 	}
 	protected createWest() {
@@ -54,7 +56,7 @@ export class Main extends MainThreeColumnPanel {
 						listeners: {
 							selectionchange: (tableRowSelect) => {
 
-								const noteBookIds = tableRowSelect.selected.map((index) => tableRowSelect.list.store.get(index)!.id);
+								const noteBookIds = tableRowSelect.getSelected().map((row) => row.record.id);
 
 								this.noteGrid.store.queryParams.filter = {
 									noteBookId: noteBookIds
@@ -119,10 +121,8 @@ export class Main extends MainThreeColumnPanel {
 			multiSelect: true,
 			listeners: {
 				selectionchange: (tableRowSelect) => {
-					if (tableRowSelect.selected.length == 1) {
-						const table = tableRowSelect.list;
-						const record = table.store.get(tableRowSelect.selected[0]);
-
+					if (tableRowSelect.getSelected().length == 1) {
+						const record = tableRowSelect.getSelected()[0].record;
 						if(record) {
 							router.goto("goui-notes/" + record.id);
 						}
@@ -144,7 +144,7 @@ export class Main extends MainThreeColumnPanel {
 				searchbtn({
 					listeners: {
 						input: (sender, text) => {
-							(this.noteGrid.store.queryParams.filter as FilterCondition).text = text;
+							this.noteGrid.store.setFilter("search", {text});
 							void this.noteGrid.store.load();
 						}
 					}
@@ -155,7 +155,7 @@ export class Main extends MainThreeColumnPanel {
 					icon: "add",
 					handler: () => {
 						const dlg = new NoteDialog();
-						const noteBookId = this.noteBookGrid.store.get(this.noteBookGrid.rowSelection!.selected[0])!.id;
+						const noteBookId = this.noteBookGrid.rowSelection!.getSelected()[0].record.id;
 
 						dlg.form.value = {
 							noteBookId: noteBookId

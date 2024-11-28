@@ -4,7 +4,7 @@ import {
 	comp,
 	DateInterval,
 	DateTime,
-	E, EntityID, MaterialIcon, ObjectUtil,
+	E, EntityID, MaterialIcon, ObjectUtil, root,
 	tbar, Timezone,
 	win, Window
 } from "@intermesh/goui";
@@ -36,7 +36,7 @@ export interface CalendarEvent extends BaseEntity {
 const eventDS = jmapds('CalendarEvent');
 
 interface CalendarItemConfig {
-	key: string // id/recurrenceId
+	key: string|null// id/recurrenceId or null if not in the database put parsed from invitation ics
 	recurrenceId?:string
 	extraIcons?: MaterialIcon[]
 	data: Partial<CalendarEvent>
@@ -55,7 +55,7 @@ interface CalendarItemConfig {
  */
 export class CalendarItem {
 
-	key!: string // id/recurrenceId
+	key!: string|null // id/recurrenceId
 	recurrenceId?:string
 	data!: CalendarEvent
 	override?: any // is patch object with props like "participants/u1/participationStatus" Partial<CalendarEvent>
@@ -168,7 +168,7 @@ export class CalendarItem {
 	}
 
 	get isRecurring() {
-		return this.key.includes('/') || this.data.recurrenceRule;
+		return (this.key && this.key.includes('/')) || this.data.recurrenceRule;
 	}
 
 	get isOverride() {
@@ -352,8 +352,9 @@ export class CalendarItem {
 	}
 
 	shouldSchedule(modified: Partial<CalendarEvent>|false) {
-		if((!this.data.isOrigin && this.key) || this.isInPast) // todo: use this.calendarPrincipal.expectReply if not owner ??
+		if(this.isInPast) // todo: use this.calendarPrincipal.expectReply if not owner ??
 			return;
+
 		if(modified === false) {
 			if(this.participants && !this.isCancelled) {
 				return this.isOwner ? 'cancel' : 'delete';
@@ -367,7 +368,6 @@ export class CalendarItem {
 			if(!this.key) {
 				return 'new';
 			} else {
-				console.log(modified);
 				if(['start','duration','end','description','title','showWithoutTime', 'location','participants', 'recurrenceRule']
 					.some(k => modified.hasOwnProperty(k)))
 				{
@@ -380,10 +380,15 @@ export class CalendarItem {
 	patch(modified: any, onFinish?: () => void, onCancel?: () => void, skipAsk = false) {
 		if(!this.isRecurring) {
 			this.confirmScheduleMessage(modified, () => {
+
+				root.mask();
+
 				const p = eventDS.update(this.data.id, modified).catch(e => {
 					void Window.error(e);
 					throw e;
-				});
+				}).finally(() => {
+					root.unmask();
+				})
 
 				if(onFinish)
 					p.then(onFinish)
@@ -443,10 +448,14 @@ export class CalendarItem {
 
 	private patchSeries(modified: any, onFinish?: () => void) {
 		this.confirmScheduleMessage(modified, () => {
+
+			root.mask();
 			const p = eventDS.update(this.data.id, modified)
 				.catch(e => {
 					void Window.error(e);
 					throw e;
+				}).finally(() => {
+					root.unmask();
 				})
 
 			if(onFinish) p.then(onFinish);
@@ -508,6 +517,8 @@ export class CalendarItem {
 				}
 				// TODO: alerts
 
+				root.mask();
+
 				const data:any = {};
 				if(this.data.recurrenceOverrides) {
 					data['recurrenceOverrides/'+this.recurrenceId!] = patch;
@@ -515,11 +526,14 @@ export class CalendarItem {
 					data['recurrenceOverrides'] = {[this.recurrenceId!] : patch };
 				}
 
+
 				const prom = eventDS.update(this.data.id, data)
 					.catch(e => {
 					void Window.error(e);
 					throw e;
-				})
+				}).finally(() => {
+						root.unmask();
+					})
 				if(onFinish) prom.then(onFinish)
 			});
 		});

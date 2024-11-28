@@ -4,6 +4,7 @@
 namespace GO\Smime;
 
 use GO;
+use go\core\exception\Unauthorized;
 use GO\Smime\Model\Smime;
 
 
@@ -140,11 +141,18 @@ class EventHandlers {
 			if (!$imapMessage->saveToFile($infile->path()))
 				throw new \Exception("Could not save IMAP message to file for decryption");
 
-			$outfile = $cert->setPassword($password)->decryptFile($infile);
+			try {
+				$outfile = $cert->setPassword($password)->decryptFile($infile);
+			} catch(Unauthorized $e) {
+				$outfile = false;
+			}
 
 			if ($outfile === false) {
 				$response['askPassword'] = true;
 				return;
+			} else if(is_string($outfile)) {
+				//failed decrypting
+				continue;
 			} else {
 				break;
 			}

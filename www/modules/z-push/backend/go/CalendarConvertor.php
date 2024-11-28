@@ -132,11 +132,12 @@ class CalendarConvertor
 			}
 		}
 		//$message->reminder = 0; // timestamp or 0
-//		if(!empty($event->alerts)) {
-//			foreach($event->alerts as $alert) {
-//				//todo
-//			}
-//		}
+		if(!empty($event->alerts)) {
+			$firstAlert = array_shift($event->alerts);
+
+			$triggerU = $firstAlert->buildCoreAlert()->triggerAt->format("U");
+			$message->reminder = ($message->starttime - $triggerU) / 60; // Reminder is in minutes before start
+		}
 		return $message;
 	}
 
@@ -227,7 +228,7 @@ class CalendarConvertor
 		$r = $dayOfWeekBits[strtolower(substr($start->format('l'),0,2))];
 		if($ndays) {
 			foreach ((array)$ndays as $nday) {
-				$r |= $dayOfWeekBits[$nday->day];
+				$r |= $dayOfWeekBits[strtolower($nday->day)];
 			}
 		}
 		return $r;
@@ -260,6 +261,14 @@ class CalendarConvertor
 		if($event->timeZone && !$event->showWithoutTime) {
 			$dtstart->setTimezone($event->timeZone());
 		}
+
+		if($event->showWithoutTime) {
+			// times for all day event are in UTC. For example in NL the day starts at the day before 23:00 in UTC time.
+			// we have to set the local timezone to get the correct date
+			$dtstart->setTimezone(new DateTimeZone($event->timeZone));
+			$dtend->setTimezone(new DateTimeZone($event->timeZone));
+		}
+
 		$event->start = $dtstart;
 		if (isset($message->location))
 			$event->location = $message->location;

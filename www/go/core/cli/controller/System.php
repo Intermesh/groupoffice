@@ -430,7 +430,9 @@ JSON;
 	 */
 	public function convertInts() {
 
-		go()->getDbConnection()->exec("SET foreign_key_checks = 0;");
+		$oldFKchecks = go()->getDbConnection()->foreignKeyChecks(false);
+
+
 
 		$this->installSqls = go()->getEnvironment()->getInstallFolder()->find([
 			'regex' => '/^install\.sql$/'
@@ -465,7 +467,10 @@ JSON;
 				}
 			}
 		}
-		go()->getDbConnection()->exec("SET foreign_key_checks = 1;");
+
+		if($oldFKchecks) {
+			go()->getDbConnection()->foreignKeyChecks(true);
+		}
 	}
 
 	private function convertAlterCol(Column $column) {

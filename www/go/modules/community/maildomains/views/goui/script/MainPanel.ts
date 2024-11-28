@@ -1,8 +1,8 @@
 import {btn, comp, Component, EntityID, Notifier, paginator, router, searchbtn, t, tbar, Window} from "@intermesh/goui";
 import {authManager, client, jmapds, MainThreeColumnPanel, User} from "@intermesh/groupoffice-core";
-import {DomainTable} from "./DomainTable";
-import {DomainDialog} from "./DomainDialog";
-import {DomainDetail} from "./DomainDetail";
+import {DomainTable} from "./DomainTable.js";
+import {DomainDialog} from "./DomainDialog.js";
+import {DomainDetail} from "./DomainDetail.js";
 
 export class MainPanel extends MainThreeColumnPanel {
 

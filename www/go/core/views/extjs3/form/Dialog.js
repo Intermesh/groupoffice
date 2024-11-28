@@ -448,7 +448,6 @@ go.form.Dialog = Ext.extend(go.Window, {
 			return serverId;
 
 		}).catch(function(error) {
-
 			const firstError = me.showFirstInvalidField();
 			return Promise.reject(firstError ? {message: t("You have errors in your form. The invalid fields are marked.")} : error);
 		}).finally(function() {

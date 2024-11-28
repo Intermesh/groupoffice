@@ -289,31 +289,34 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
 	}
 
 
-  /**
-   * Set public properties with key value array.
-   *
-   * This function should also normalize input when you extend this class.
-   *
-   * For example dates in ISO format should be converted into DateTime objects
-   * and related models should be converted to an instance of their class.
-   *
-   *
-   * @Example
-   * ```````````````````````````````````````````````````````````````````````````
-   * $model = User::findByIds([1]);
-   * $model->setValues(['username' => 'admin']);
-   * $model->save();
-   * ```````````````````````````````````````````````````````````````````````````
-   *
-   *
-   * @param array $values ["propName" => "value"]
-   * @return static
-   * @throws InvalidArgumentException
-   */
-	public function setValues(array $values): Model
+	/**
+	 * Set public properties with key value array.
+	 *
+	 * This function should also normalize input when you extend this class.
+	 *
+	 * For example dates in ISO format should be converted into DateTime objects
+	 * and related models should be converted to an instance of their class.
+	 *
+	 * This function is typically used by the JMAP API endpoint. If you need to set
+	 * read only properties like "createdAt" you have to set $checkAPIRights to false.
+	 *
+	 *
+	 * @Example
+	 * ```````````````````````````````````````````````````````````````````````````
+	 * $model = User::findByIds([1]);
+	 * $model->setValues(['username' => 'admin']);
+	 * $model->save();
+	 * ```````````````````````````````````````````````````````````````````````````
+	 *
+	 *
+	 * @param array $values ["propName" => "value"]
+	 * @param bool $checkAPIRights
+	 * @return static
+	 */
+	public function setValues(array $values, bool $checkAPIRights = true): Model
 	{
 		foreach($values as $name => $value) {
-			$this->setValue($name, $value);
+			$this->setValue($name, $value, $checkAPIRights);
 		}
 		return $this;
 	}
@@ -329,7 +332,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
    * @return $this
    * @throws InvalidArgumentException
    */
-	public function setValue(string $propName, mixed $value): Model
+	public function setValue(string $propName, mixed $value, bool $checkAPIRights = true): Model
 	{
 
 		$props = $this->getApiProperties();
@@ -341,7 +344,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
 		if($props[$propName]['setter']) {
 			$setter = 'set' . $propName;	
 			$this->$setter($value);
-		} else if($props[$propName]['access'] == self::PROP_PUBLIC){
+		} else if(!$checkAPIRights || $props[$propName]['access'] == self::PROP_PUBLIC){
 			$this->{$propName} = $this->normalizeValue($propName, $value);
 		}	else if($props[$propName]['access'] == self::PROP_PUBLIC_READONLY || $props[$propName]['getter']) {
 			go()->warn("Ignoring setting of read only property ". $propName ." for " . static::class);

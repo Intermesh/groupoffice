@@ -8,6 +8,7 @@ use go\core\orm\exception\SaveException;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\model;
+use go\core\util\Color;
 use go\core\util\JSON;
 
 class UserSettings extends Property {
@@ -70,6 +71,7 @@ class UserSettings extends Property {
 			$tasklist = new TaskList();
 			$tasklist->createdBy = $this->userId;
 			$tasklist->name = $user->displayName;
+			$tasklist->color = Color::background();
 			if(!$tasklist->save()) {
 				throw new SaveException($tasklist);
 			}

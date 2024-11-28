@@ -6,6 +6,7 @@ go.Modules.register("community", "tasks", {
 		relations: {
 			group: {store: "TaskListGrouping", fk: "groupingId"},
 			creator: {store: "Principal", fk: "createdBy"},
+
 			groups: {name: 'Groups'}
 		}
 	}, {
@@ -54,6 +55,7 @@ go.Modules.register("community", "tasks", {
 			responsible: {store: 'Principal', fk: 'responsibleUserId'},
 			tasklist: {store: 'TaskList', fk: 'tasklistId'},
 			categories: {store: "TaskCategory", fk: "categories"},
+			project: {store: "Project3", fk: "projectId"},
 		},
 
 		/**
