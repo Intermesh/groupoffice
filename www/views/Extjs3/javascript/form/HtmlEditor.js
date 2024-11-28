@@ -55,7 +55,6 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		GO.form.HtmlEditor.superclass.initComponent.apply(this);
 
 		if(go.User) {
-			console.log(go.User.enableSendShortcut);
 			this.enableSendShortcut = go.User.enableSendShortcut;
 		}
 
