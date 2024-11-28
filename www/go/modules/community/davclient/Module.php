@@ -5,6 +5,7 @@ use GO\Base\Exception\AccessDenied;
 use go\core;
 use go\core\cron\GarbageCollection;
 use go\core\model\User;
+use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\model\Module as CoreModule;
@@ -28,6 +29,14 @@ class Module extends core\Module
 	public function defineListeners()
 	{
 		CalendarEvent::on(CalendarEvent::EVENT_BEFORE_SAVE, self::class, 'onBeforeEventSave');
+		Calendar::on(Calendar::EVENT_MAPPING, self::class, 'onCalendarMap');
+	}
+
+	public static function onCalendarMap(Mapping $mapping) {
+		$mapping->addScalarProperty('davaccountId')->addQuery((new Query())
+			->select("davaccountId")
+			->join('davclient_calendar', 'davc', 'davc.id=calendar_calendar.id', 'LEFT')
+		);
 	}
 
 	public static function onBeforeEventSave($event) {

@@ -197,7 +197,7 @@ class Client
 		if($name === null) {
 			return $this->lastHeaders;
 		}
-		return $this->lastHeaders[$name];
+		return @$this->lastHeaders[$name];
 	}
 
 	/**

@@ -11,6 +11,7 @@ use go\modules\community\calendar\model\ICalendarHelper;
 /**
  * Each calendar is a syncable collection in a DAV account
  * it has a reference to a calendar in Group Office were the data is stored.
+ * @property DavAccount $owner
  */
 class Calendar extends Property
 {
@@ -38,21 +39,21 @@ class Calendar extends Property
 		}
 	}
 
-	public function put($event) {
+	public function put(CalendarEvent $event) {
 		$http = $this->owner->http()->setHeader('Content-Type', 'text/calendar; charset=utf-8');
-		if(!empty($event->etag)) { // update
-			$http->setHeader('If-Match', $event->etag);
+		if(!empty($event->etag())) { // update
+			$http->setHeader('If-Match', $event->etag());
 		}
-		if(empty($event->uri)) { // create
-			$event->uri = $this->path . '/' . $event->uid . '.ics';
+		if(empty($event->uri())) { // create
+			$event->uri($event->uid . '.ics');
 		}
-		$http->PUT($event->uri, $event->toVObject());
+		$http->PUT( $this->uri . $event->uri(), $event->toVObject());
 
-		$event->etag = $http->responseHeaders('etag');
-		if(empty($event->etag)) {
+		$event->etag($http->responseHeaders('etag'));
+		if(empty($event->etag())) {
 			// the server made changed and we need to fetch the new VEVENT
-			if($event->save())
-				$this->fetchEvents([], [$event->uri]);
+			//if($event->save())
+			//$this->fetchEvents([], [$event->uri()]);
 		}
 
 		return true;
@@ -83,11 +84,12 @@ XML;
 
 		$perHref = [];
 		foreach($events as $event) {
-			if(!isset($responses[$event->uri()])) {
+			if(!isset($responses[$this->uri.$event->uri()])) {
+
 				// delete missing hrefs
 				$delete[] = $event->id;
 			} else {
-				$perHref[$event->uri()] = $event;
+				$perHref[$this->uri.$event->uri()] = $event;
 			}
 		}
 
@@ -104,7 +106,7 @@ XML;
 
 		// Remove missing
 		if(!empty($delete))
-			CalendarEvent::delete((new Query())->where('id', 'IN', $delete));
+			CalendarEvent::delete((new Query())->where(['id'=> $delete]));
 		// fetch changed and new
 		if(!empty($update) || !empty($create)) {
 			$this->fetchEvents($create, $update);
@@ -134,7 +136,8 @@ XML;
 		foreach ($responses as $href => $response) {
 			if (isset($response->{'calendar-data'})) {
 				if(in_array($href, $update)) // only
-					$event = CalendarEvent::find()->where('uri', '=', $href)->single();
+					$event = CalendarEvent::find()
+						->where(['calendarId'=>$this->id, 'uri'=>basename($href)])->single();
 				if(empty($event)) {
 					$event = new CalendarEvent();
 					$event->calendarId = $this->id;
@@ -142,7 +145,7 @@ XML;
 				}
 				$event = ICalendarHelper::parseVObject((string)$response->{'calendar-data'}, $event);
 				$event->etag((string)$response->etag);
-				$event->uri($href);
+				$event->uri(basename($href));
 				if(!$event->save()){
 					go()->log('cannot sync event '.print_r($event->getValidationErrors(), true));
 				}
