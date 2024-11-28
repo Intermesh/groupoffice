@@ -277,6 +277,17 @@ class Extjs3 {
 		require($themePath . 'pageFooter.php');
 	}
 
+	public $loadGoui = false;
+	public $loadExt = false;
+
+	public $bodyCls = '';
+
+	public $useThemeSettings = true;
+
+	public $gouiStyleSheet = 'groupoffice.css';
+
+	public $density = 140;
+
 	private $gouiScripts;
 	private $goScripts = [];
 	private $cacheFile = null; // stays null when debugging
@@ -288,12 +299,12 @@ class Extjs3 {
 			$this->gouiScripts = go()->getCache()->get("gouiScripts");
 		}
 
-		if(!$this->gouiScripts) {
+		if($this->loadGoui && !$this->gouiScripts) {
 			$this->gouiScripts = $this->loadGoui();
 			if(!go()->getDebugger()->enabled)
 				go()->getCache()->set("gouiScripts", $this->gouiScripts);
 		}
-		if(!$this->cacheFile || !$this->cacheFile->exists()) {
+		if($this->loadExt && (!$this->cacheFile || !$this->cacheFile->exists())) {
 			$this->goScripts = $this->loadGoExt();
 		}
 	}
@@ -303,21 +314,23 @@ class Extjs3 {
 		$baseUri = $this->getRelativeUrl();
 
 		// always draw base ExtJs and language file
-		echo '<script src="'.$this->getRelativeUrl().'views/Extjs3/javascript/ext-base-debug.js?mtime='.filemtime(GO::config()->root_path.'views/Extjs3/javascript/ext-base-debug.js').'"></script>'.
-			'<script src="'.$this->getRelativeUrl().'views/Extjs3/javascript/ext-all-debug.js?mtime='.filemtime(GO::config()->root_path.'views/Extjs3/javascript/ext-all-debug.js').'"></script>'.
-			'<script src="'.$this->getRelativeUrl().'views/Extjs3/lang.php?lang='.\go()->getLanguage()->getIsoCode() . '&v='.$this->getLanguageJS()->getModifiedAt()->format("U").'"></script>'.
-			'<script>Ext.namespace("GO");'.
-				'GO.settings = '. json_encode($this->clientSettings()).';'.
-				'GO.language = "'. go()->getLanguage()->getIsoCode(). '";'.
-				'GO.calltoTemplate = "'. GO::config()->callto_template . '";'.
-				'GO.calltoOpenWindow = '. (GO::config()->callto_open_window ? "true" : "false") .';'.
-				'window.name="'.GO::getId().'";'.
+		if($this->loadExt) {
+			echo '<script src="' . $this->getRelativeUrl() . 'views/Extjs3/javascript/ext-base-debug.js?mtime=' . filemtime(GO::config()->root_path . 'views/Extjs3/javascript/ext-base-debug.js') . '"></script>' .
+				'<script src="' . $this->getRelativeUrl() . 'views/Extjs3/javascript/ext-all-debug.js?mtime=' . filemtime(GO::config()->root_path . 'views/Extjs3/javascript/ext-all-debug.js') . '"></script>' .
+				'<script src="' . $this->getRelativeUrl() . 'views/Extjs3/lang.php?lang=' . \go()->getLanguage()->getIsoCode() . '&v=' . $this->getLanguageJS()->getModifiedAt()->format("U") . '"></script>' .
+				'<script>Ext.namespace("GO");' .
+				'GO.settings = ' . json_encode($this->clientSettings()) . ';' .
+				'GO.language = "' . go()->getLanguage()->getIsoCode() . '";' .
+				'GO.calltoTemplate = "' . GO::config()->callto_template . '";' .
+				'GO.calltoOpenWindow = ' . (GO::config()->callto_open_window ? "true" : "false") . ';' .
+				'window.name="' . GO::getId() . '";' .
 				"var BaseHref = '" . $baseUri . "';";
-		if (isset(GO::session()->values['security_token'])) {
-			echo 'GO.securityToken="' . GO::session()->values['security_token'] . '";' .
-			'Ext.Ajax.extraParams={security_token:"' . GO::session()->values['security_token'] . '"};';
+			if (isset(GO::session()->values['security_token'])) {
+				echo 'GO.securityToken="' . GO::session()->values['security_token'] . '";' .
+					'Ext.Ajax.extraParams={security_token:"' . GO::session()->values['security_token'] . '"};';
+			}
+			echo '</script>';
 		}
-		echo '</script>';
 		// draw go Ext scripts
 		if(!go()->getDebugger()->enabled) {
 			if(!$this->cacheFile->exists()) {
