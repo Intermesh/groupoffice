@@ -67,7 +67,7 @@ export class CalendarList extends Component {
 				multiSelect: false,
 				listeners: {
 					'selectionchange': (tableRowSelect) => {
-						const calIds = tableRowSelect.selected.map((index) => calendarStore.get(index)?.id);
+						const calIds = tableRowSelect.getSelected().map((row) => row.record.id);
 						if (calIds[0]) {
 							CalendarView.selectedCalendarId = calIds[0];
 						}
@@ -76,8 +76,13 @@ export class CalendarList extends Component {
 			},
 			listeners: {'render': me => {
 					me.store.on('load', (s,items)=> {
-						const index = s.findIndex(c => c.id == CalendarView.selectedCalendarId);
-						me.rowSelection!.selected = [index>0 ? index : 0];
+						let record = s.find(c => c.id == CalendarView.selectedCalendarId);
+						if(!record) {
+							record = s.first();
+						}
+						if(record) {
+							me.rowSelection!.add(record);
+						}
 						this.inCalendars = items.reduce((obj, item) => ({ ...obj, [item.id!]: item.isVisible }), {} as any);
 					});
 					me.store.load().then(_c => {
