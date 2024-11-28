@@ -277,8 +277,8 @@ class Extjs3 {
 		require($themePath . 'pageFooter.php');
 	}
 
-	public $loadGoui = false;
-	public $loadExt = false;
+	public $loadGoui;
+	public $loadExt;
 
 	public $bodyCls = '';
 
