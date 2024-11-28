@@ -253,6 +253,7 @@ CREATE TABLE `core_user` (
   `confirmOnMove` TINYINT(1) NOT NULL DEFAULT 0,
   `passwordModifiedAt` datetime null,
   `forcePasswordChange` boolean default false not null,
+  enableSendShortcut boolean default true not null,
     PRIMARY KEY (`id`)
 )
   ENGINE=InnoDB;
@@ -413,21 +414,6 @@ CREATE TABLE `go_holidays` (
   `name` varchar(100) NOT NULL DEFAULT '',
   `region` varchar(10) NOT NULL DEFAULT '',
   `free_day` tinyint(1) NOT NULL DEFAULT 1
-) ENGINE=InnoDB;
-
-CREATE TABLE `go_log` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `username` varchar(50) NOT NULL DEFAULT '',
-  `model` varchar(255) NOT NULL DEFAULT '',
-  `model_id` varchar(255) NOT NULL DEFAULT '',
-  `ctime` int(11) NOT NULL,
-  `user_agent` varchar(255) NOT NULL DEFAULT '',
-  `ip` varchar(45) NOT NULL DEFAULT '',
-  `controller_route` varchar(255) NOT NULL DEFAULT '',
-  `action` varchar(20) NOT NULL DEFAULT '',
-  `message` varchar(255) NOT NULL DEFAULT '',
-  `jsonData` text DEFAULT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE `go_reminders` (
@@ -647,9 +633,6 @@ ALTER TABLE `go_holidays`
   ADD PRIMARY KEY (`id`),
   ADD KEY `region` (`region`);
 
-ALTER TABLE `go_log`
-  ADD PRIMARY KEY (`id`);
-
 ALTER TABLE `go_reminders`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
@@ -725,9 +708,6 @@ ALTER TABLE `go_cron`
 ALTER TABLE `go_holidays`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `go_log`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
 ALTER TABLE `go_reminders`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
@@ -737,10 +717,10 @@ ALTER TABLE `go_saved_exports`
 
 ALTER TABLE `core_acl_group`
   ADD CONSTRAINT `core_acl_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `core_acl_group_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `core_acl_group_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE on update cascade;
 
 ALTER TABLE `core_acl_group_changes`
-  ADD CONSTRAINT `all` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `all` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `group` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `core_auth_method`
@@ -794,7 +774,7 @@ ALTER TABLE `core_link`
 
 
 ALTER TABLE `core_search`
-  ADD CONSTRAINT `core_search_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `core_search_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `core_setting`
   ADD CONSTRAINT `module` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;

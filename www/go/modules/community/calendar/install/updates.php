@@ -165,7 +165,7 @@ $updates['202403121146'][] = function(){ // migrate files to blob and add as cal
 		return 'calendar/' . File::stripInvalidChars($calendarName) . '/' . $yearOfStartTime . '/' . File::stripInvalidChars($title).' ('.$id.')';
 	}
 
-	$insertFolder = function($row, $folderId, $path) use ($filesStmt,$foldersStmt, $insertLinkStmt, &$insertFolder) {
+	function insertFolder($row, $folderId, $path, $filesStmt,$foldersStmt, $insertLinkStmt) {
 		$filesStmt->bindValue(1, $folderId);
 		$filesStmt->execute();
 		foreach($filesStmt as $fileRow) {
@@ -179,15 +179,20 @@ $updates['202403121146'][] = function(){ // migrate files to blob and add as cal
 		$foldersStmt->bindValue(1, $folderId);
 		$foldersStmt->execute();
 		foreach($foldersStmt as $folderRow) {
-			$insertFolder($row, $folderRow, $path.'/'.$folderRow['name']);
+			insertFolder($row, $folderRow, $path.'/'.$folderRow['name'], $filesStmt,$foldersStmt, $insertLinkStmt);
 		}
 	};
 
+
+
 	while($row = $stmt->fetch()) {
 		$path = GO::config()->file_storage_path.buildFilesPath($row['calendarName'], $row['year'], $row['name'], $row['id']);
-		$insertFolder($row, $row['files_folder_id'], $path);
+		insertFolder($row, $row['files_folder_id'], $path, $filesStmt,$foldersStmt, $insertLinkStmt);
 	}
+
+	unset($insertFolder, $filesStmt,$foldersStmt, $insertLinkStmt, $pdo, $stmt);
 };
+
 
 
 $updates['202404071212'][] = "update core_entity set clientName = 'CalendarCategory' where name = 'Category' and moduleId = (select id from core_module where name ='calendar' and package='community')";

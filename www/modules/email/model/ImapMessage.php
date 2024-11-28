@@ -238,7 +238,7 @@ class ImapMessage extends ComposerMessage {
 	 * @param Account $account
 	 * @param int $uid 
 	 */
-	public function findByUid(Account $account, $mailbox, $uid) {
+	public function findByUid(Account $account, $mailbox, $uid, $customHeaders = []) {
 
 		$cacheKey='email:'.$account->id.':'.$mailbox.':'.$uid;
 		
@@ -254,7 +254,7 @@ class ImapMessage extends ComposerMessage {
 			
 			$imap = $account->openImapConnection($mailbox);
 
-			$attributes = $imap->get_message_header($uid, true);
+			$attributes = $imap->get_message_header($uid, true, $customHeaders);
 
 			if (!$attributes)
 				return false;
@@ -810,16 +810,24 @@ class ImapMessage extends ComposerMessage {
 		}
 		while ($att = array_shift($atts)) {
 			if ($att->disposition == 'attachment' || empty($att->content_id)) {
+				// Do not delete S/MINE certificate
+				if ($att->mime === "application/x-pkcs7-signature") {
+					continue;
+				}
+
 				$str = $this->addPartString($att, $bIsPlain);
 				$a = Attachment::fromString($str, "", ($bIsPlain ? 'text/plain' : 'text/html'), Attachment::ENCODING_7BIT);
-				$a->setId("");
+
+				// Fool PHPMailer into attaching all attachments. If the IDs are identical, later attachments are not
+				// being attached inline.
+				$a->setId(random_bytes(12));
 				$msg->embed($a);
 			}
 		}
 //		$msg->setContentType("multipart/mixed");
 
 
-		if(!$this->getImapConnection()->append_message($this->mailbox, $msg->toString(), '\Seen')) {
+		if(!$this->getImapConnection()->append_message($this->mailbox, $msg->toString(), '\Seen', new DateTime($this->date))) {
 			throw new \Exception("Failed to append new message");
 		}
 

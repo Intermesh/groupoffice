@@ -21,3 +21,4 @@ ContinueTaskDialog.js
 Portlet.js
 TaskListGroupingCombo.js
 SubscribeWindow.js
+ProjectCombo.js

@@ -1,10 +1,12 @@
 [submodule "www/views/Extjs3/groupoffice-core"]
 	path = www/views/goui/groupoffice-core
-	url = git@github.com:Intermesh/groupoffice-core.git
+	url = ../groupoffice-core.git
+	branch = main
 [submodule "www/views/goui/goui"]
 	path = www/views/goui/goui
-	url = git@github.com:Intermesh/goui.git
+	url = ../goui.git
+	branch = main
 [submodule "www/go/modules/community/activesync/Z-Push"]
 	path = www/go/modules/community/activesync/Z-Push
-	url = git@github.com:Intermesh/Z-Push.git
+	url = ../Z-Push.git
 	branch = develop

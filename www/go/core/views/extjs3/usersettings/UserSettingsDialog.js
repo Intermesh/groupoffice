@@ -369,6 +369,11 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			{
 				if(response.notUpdated && id in response.notUpdated) {
 					for (var name in response.notUpdated[id].validationErrors) {
+
+						if(name == "currentPassword") {
+							GO.errorDialog.show(t("The current password you entered was incorrect"), t("Invalid password"));
+							continue;
+						}
 						var field = this.formPanel.getForm().findField(name);
 						if (field) {
 							field.markInvalid(response.notUpdated[id].validationErrors[name].description);
@@ -406,6 +411,9 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 */
 	needCurrentPassword : function(){
 		let c = go.User.capabilities['go:core:core'] || {};
+		if(c.mayChangeUsers) {
+			return false;
+		}
 		
 		var needed = false,
 			accountPanel = this.tabPanel.getItem('pnl-account-settings');
@@ -469,31 +477,34 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			me.actionStart();
 			me.fireEvent('loadstart',me, me.currentUserId);
 
-			go.Db.store("User")._getSingleFromServer(me.currentUserId).then(function(user){
-				me.user = user;
-				me.loadModulePanels();
+			go.Db.store("User").getUpdates().then(() => {
 
-				// loop through child panels and call onLoadComplete function if available
-				me.tabPanel.items.each(function(tab) {
-					if(tab.onLoadStart) {
-						tab.onLoadStart(me.currentUserId);
+				go.Db.store("User").single(me.currentUserId).then(function(user){
+					me.user = user;
+					me.loadModulePanels();
+
+					// loop through child panels and call onLoadComplete function if available
+					me.tabPanel.items.each(function(tab) {
+						if(tab.onLoadStart) {
+							tab.onLoadStart(me.currentUserId);
+						}
+					},me);
+
+					me.formPanel.getForm().setValues(user);
+
+					if(user.id != go.User.id) {
+						me.setTitle(t("User") + ": " + Ext.util.Format.htmlEncode(user.username));
 					}
-				},me);
 
-				me.formPanel.getForm().setValues(user);
+					me.findBy(function(cmp,cont){
+						if(typeof cmp.onLoad === 'function') {
+							cmp.onLoad(user);
+						}
+					},me);
 
-				if(user.id != go.User.id) {
-					me.setTitle(t("User") + ": " + Ext.util.Format.htmlEncode(user.username));
-				}
-				
-				me.findBy(function(cmp,cont){
-					if(typeof cmp.onLoad === 'function') {
-						cmp.onLoad(user);
-					}
-				},me);
-
-				me.loadComplete(user);
-			});
+					me.loadComplete(user);
+				});
+			})
 		}
 		
 		// The form needs to be rendered before the data can be set

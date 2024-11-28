@@ -174,13 +174,6 @@ class FieldSet extends AclOwnerEntity {
 		$fromEntityType = $fromEntityCls::entityType();
 		$toEntityType = $toEntityCls::entityType();
 
-		$count = \go\core\model\FieldSet::findByEntity($toEntityType->getName())->selectSingleValue("count(*)")->single();
-		if($count) {
-			echo "Custom fields for ". $toEntityType->getName()." already migrated\n";
-
-			return false;
-		}
-
 		echo "Migrating entity " . $toEntityType->getName() ."\n";
 
 		$fieldSets = \go\core\model\FieldSet::findByEntity($fromEntityType->getName());
@@ -188,20 +181,31 @@ class FieldSet extends AclOwnerEntity {
 		foreach($fieldSets as $fieldSet) {
 
 			echo "Migrating fieldset " . $fieldSet->name . " (". $fieldSet->id .")\n";
-			$newFieldSet = $fieldSet->copy();
-			$newFieldSet->setEntity($toEntityType->getName());
-			if(!$newFieldSet->save()) {
-				throw new \go\core\orm\exception\SaveException($newFieldSet);
+
+			$newFieldSet = FieldSet::findByEntity($toEntityType->getName())->where(['name' => $fieldSet->name])->single();
+
+			if(!$newFieldSet) {
+				$newFieldSet = $fieldSet->copy();
+				$newFieldSet->setEntity($toEntityType->getName());
+				if (!$newFieldSet->save()) {
+					throw new \go\core\orm\exception\SaveException($newFieldSet);
+				}
 			}
 
 			echo $newFieldSet->id ."\n";
 
 			$fields = \go\core\model\Field::find()->where('fieldSetId', '=', $fieldSet->id);
 			foreach($fields as $field) {
-				$newField = $field->copy();
-				$newField->fieldSetId = $newFieldSet->id;
-				if(!$newField->save()) {
-					throw new \go\core\orm\exception\SaveException($newField);
+
+//				echo "Migrating field " . $field->databaseName . "\n";
+				$newField = \go\core\model\Field::find()->where('fieldSetId', '=', $newFieldSet->id)->where(['databaseName' => $field->databaseName])->single();
+
+				if(!$newField) {
+					$newField = $field->copy();
+					$newField->fieldSetId = $newFieldSet->id;
+					if (!$newField->save()) {
+						throw new \go\core\orm\exception\SaveException($newField);
+					}
 				}
 			}
 		}

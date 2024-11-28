@@ -232,7 +232,9 @@ export class Main extends Component {
 					comp({cls: 'group', flex: '1 1 50%', style:{justifyContent: 'end'}},
 						btn({icon: 'keyboard_arrow_left', title: t('Previous'), allowFastClick:true, handler: b => this.backward()}),
 						btn({
-							text: t('Today'), handler: _b => {
+							icon: "today",
+							title: t('Today'),
+							handler: _b => {
 								this.goto().updateView()
 							}
 						}),

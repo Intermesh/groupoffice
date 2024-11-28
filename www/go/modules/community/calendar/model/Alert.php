@@ -6,6 +6,7 @@
  */
 namespace go\modules\community\calendar\model;
 
+use go\core\orm\exception\SaveException;
 use go\core\orm\Mapping;
 use go\core\orm\UserProperty;
 use go\core\util\DateTime;
@@ -75,37 +76,41 @@ class Alert extends UserProperty {
 
 	public function schedule(CalendarEvent $item) : ?\go\core\model\Alert {
 
-		$alert = new \go\core\model\Alert();
-		$alert->setEntity($item);
-		$alert->userId = go()->getUserId();
-		$alert->tag = $this->id;
-
-		$success = $this->applyTime($alert, $item);
-
-		if(!$success) {
+		$alert = $this->buildCoreAlert($item);
+		if(!$alert) {
 			return null;
 		}
 
 		if (!$alert->save()) {
-			throw new \Exception(var_export($alert->getValidationErrors(), true));
+			throw new SaveException($alert);
 		}
 
 		return $alert;
 	}
 
 	/**
-	 * @param \go\core\model\Alert $coreAlert
-	 * @param CalendarEvent $event
-	 * @throws \Exception
+	 * Generate a Group-Office alert based on the calendar alert
+	 *
+	 * @param CalendarEvent|null $event
+	 * @return \go\core\model\Alert|null
+	 * @throws \DateMalformedIntervalStringException
 	 */
-	private function applyTime($coreAlert, $event)
+	public function buildCoreAlert(?CalendarEvent $event = null) : ?\go\core\model\Alert
 	{
+		if(!isset($event)) {
+			$event = $this->owner;
+		}
+		$coreAlert = new \go\core\model\Alert();
+		$coreAlert->setEntity($event);
+		$coreAlert->userId = go()->getUserId();
+		$coreAlert->tag = $this->id;
+
 		if (isset($this->offset)) {
 			$offset = $this->offset;
 			if($event->isRecurring()) {
 				list($recurrenceId, $next) = $event->upcomingOccurrence();
 				if(!isset($recurrenceId)) {
-					return false;
+					return null;
 				}
 				$coreAlert->recurrenceId = $recurrenceId->format('Y-m-d\TH:i:s');
 				$date = clone $next;
@@ -121,11 +126,17 @@ class Alert extends UserProperty {
 				if($this->relatedTo === self::Start) // don't stale if event is set to trigger after the event
 					$coreAlert->staleAt = (clone $event->end())->setTimezone(new \DateTimeZone("UTC"));
 			}
+
+			if($event->showWithoutTime) {
+				// for now we hard code events at 9:00 in the morning
+				$date->add(new \DateInterval("PT9H"));
+			}
+
 			$date->setTimezone(new \DateTimeZone("UTC"));
 			if ($offset[0] == '-') {
 				$date->sub(new \DateInterval(substr($offset, 1)));
 				$coreAlert->triggerAt = $date;
-				return true;
+				return $coreAlert;
 			}
 			if ($offset[0] == '+') {
 				$offset = substr($offset, 1);
@@ -138,10 +149,10 @@ class Alert extends UserProperty {
 
 		// don't create alerts in the past
 		if($coreAlert->triggerAt < new DateTime()) {
-			return false;
+			return null;
 		}
 
-		return true;
+		return $coreAlert;
 	}
 
 }

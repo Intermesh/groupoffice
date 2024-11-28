@@ -52,32 +52,13 @@ class ConnectionTest extends TestCase {
 		// allow one second for mysql 5.7 to close the connection
 		sleep(1);
 
-		$exists = $this->connExists($id);
+		$exists = Connection::exists($id);
 
 		$this->assertEquals(true, $exists);
 
 		go()->getDbConnection()->disconnect();
-		$exists = $this->connExists($id);
+		$exists = Connection::exists($id);
 		$this->assertEquals(false, $exists);
 	}
-
-	private function connExists(int $id) : bool {
-
-		$dsn = go()->getDbConnection()->getDsn();
-		$config = go()->getConfig();
-
-		$watchConn = new Connection(
-			$dsn, $config['db_user'], $config['db_pass']
-		);
-		$processes = $watchConn->query("SHOW PROCESSLIST")->fetchAll(\PDO::FETCH_ASSOC);
-
-		foreach($processes as $process) {
-			if($process['Id'] == $id) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 
 }

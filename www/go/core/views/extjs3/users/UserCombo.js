@@ -19,7 +19,7 @@
 			sortInfo: {
 				field: "name"
 			},
-			filter: {entity: 'User'}
+			filters: {entity: {entity: 'User'}}
 		},
 		tpl: '<tpl for=".">\
 			<div class="x-combo-list-item">\

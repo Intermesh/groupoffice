@@ -5,9 +5,8 @@
 
 $resourcePath: '../Paper/';
 $font-scale: 1.1;
-@import '../../../../goui/groupoffice-core/style/theme';
 
-//@import 'theme';
+@import 'theme';
 @import 'typography';
 @import '../../Paper/src/_styles';
 @import 'overrides';

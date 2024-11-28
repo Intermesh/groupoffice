@@ -125,6 +125,32 @@ class Connection {
 		self::$cachedStatements = [];
 	}
 
+
+	/**
+	 * Checks if connection still exists
+	 *
+	 * @param int $id
+	 * @return bool
+	 * @throws DbException
+	 */
+	public static function exists(int $id) : bool {
+
+		$dsn = go()->getDbConnection()->getDsn();
+		$config = go()->getConfig();
+
+		$watchConn = new Connection(
+			$dsn, $config['db_user'], $config['db_pass']
+		);
+		$processes = $watchConn->query("SHOW PROCESSLIST")->fetchAll(\PDO::FETCH_ASSOC);
+
+		foreach($processes as $process) {
+			if($process['Id'] == $id) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private static array $cachedStatements = [];
 
 	/**
@@ -470,7 +496,7 @@ class Connection {
    *  selected in the correct order.
    *
    * @return Statement
-   * @throws Exception
+   * @throws DbException
    * @see insert()
    */
 	public function insertIgnore(string $tableName, $data, array $columns = []): Statement
@@ -492,7 +518,7 @@ class Connection {
    *  selected in the correct order.
    *
    * @return Statement
-   * @throws PDOException
+   * @throws DbException
    * @see insert()
    */
 	public function replace(string $tableName, $data, array $columns = []): Statement
@@ -635,7 +661,32 @@ class Connection {
 			return $stmt;
 		} catch(PDOException $e) {
 			throw new DbException($e, go()->getDebugger()->enabled ? QueryBuilder::debugBuild($build) : null);
+		} catch(Exception $e) {
+			if(go()->getDebugger()->enabled) {
+				go()->debug(QueryBuilder::debugBuild($build));
+			}
+			throw $e;
 		}
+	}
+
+
+	/**
+	 * Get or set foreign key checks
+	 *
+	 * @param bool|null $value Provide to set new value
+	 * @return bool The current or old value
+	 * @throws DbException
+	 */
+	public function foreignKeyChecks(bool $value = null): bool
+	{
+		$stmt = $this->query("SELECT @@SESSION.foreign_key_checks");
+		$current = !!$stmt->fetch(PDO::FETCH_COLUMN, 0);
+
+		if(isset($value) && $value != $current) {
+			$this->exec("set foreign_key_checks = " . ($value ? "1" : "0") . ";");
+		}
+
+		return $current;
 	}
 
 

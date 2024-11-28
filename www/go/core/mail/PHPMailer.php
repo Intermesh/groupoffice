@@ -216,7 +216,7 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 			//The message returned by openssl contains both headers and body, so need to split them up
 			$parts = explode(static::$LE . static::$LE, $body, 2);
 
-			$this->MIMEHeader = $parts[0];
+			$this->MIMEHeader = $parts[0]. static::$LE;
 			$this->MIMEBody = $parts[1];
 		} else {
 			if(file_exists($signed)) {
@@ -431,7 +431,7 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 	 *
 	 * @return bool
 	 */
-	protected function smtpSend($header, $body)
+	protected function smtpSend($header, $body): bool
 	{
 		$header = static::stripTrailingWSP($header) . static::$LE . static::$LE;
 		$bad_rcpt = [];

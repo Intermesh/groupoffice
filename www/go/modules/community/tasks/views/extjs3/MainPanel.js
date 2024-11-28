@@ -215,6 +215,11 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			this.taskBackButton.setVisible(layout.isNarrow());
 		});
 
+		// route to main grid when details resets / is deleted for mobile view
+		this.taskDetail.on("reset", () => {
+			go.Router.goto("tasks");
+		})
+
 		go.modules.community.tasks.MainPanel.superclass.initComponent.call(this);
 
 		this.on("afterrender", this.runModule, this);
@@ -436,9 +441,13 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				},{
 					icon: 'ic-bookmark_added',
 					text: t('Subscribe to task list') + '…', handler: () => {
-						const dlg = new go.modules.community.tasks.SubscribeWindow();
+						const dlg = new go.modules.community.tasks.SubscribeWindow({
+							support:this.support
+						});
+
 						dlg.show();
-					}
+					},
+					scope: this
 				}]
 			}],
 			listeners: {
@@ -538,7 +547,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 										dlg.show();
 									})
 								} catch(e) {
-									Ext.MessageBox.alert(t("Error"), e.message);
+									GO.errorDialog.show(e);
 								} finally {
 									Ext.getBody().unmask();
 								}

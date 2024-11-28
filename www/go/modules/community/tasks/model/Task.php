@@ -16,6 +16,7 @@ use go\core\db\Expression;
 use go\core\fs\Blob;
 use go\core\model\Acl;
 use go\core\model\Alert as CoreAlert;
+use go\core\model\Link;
 use go\core\model\Principal;
 use go\core\model\User;
 use go\core\model\Module;
@@ -28,6 +29,7 @@ use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\{ArrayObject, DateTime, Recurrence, StringUtil, Time, UUID};
 use go\core\validate\ErrorCode;
+use go\modules\business\projects3\model\Project3;
 use go\modules\community\comments\model\Comment;
 use go\modules\community\tasks\convert\Spreadsheet;
 use go\modules\community\tasks\convert\VCalendar;
@@ -65,8 +67,8 @@ class Task extends AclItemEntity {
 	/** @var int used for the kanban groups */
 	public $groupId;
 
-	/** @var int */
-	public $projectId ;
+	public ?int $projectId ;
+	public ?int $mileStoneId ;
 
 	/** @var int */
 	public $createdBy;
@@ -339,19 +341,18 @@ class Task extends AclItemEntity {
 			->addText("title", function(Criteria $criteria, $comparator, $value, Query $query, array $filters){
 				$criteria->where('title', $comparator, $value);
 			})
-			->add('tasklistId', function(Criteria $criteria, $value) {
-				if(!empty($value)) {
+			->add('tasklistId', function(Criteria $criteria, $value, Query $query) {
+
+				if($value === 'subscribedOnly' || empty($value)) {
+					$query->join('tasks_tasklist_user', 'utl', 'utl.tasklistId = task.tasklistId AND utl.userId = '.go()->getAuthState()->getUserId())
+						->where('utl.isSubscribed','=', true);
+				} else if($value != 'any') {
 					$criteria->where(['tasklistId' => $value]);
 				}
-			}, [])
-			->add('projectId', function(Criteria $criteria, $value, Query $query) {
-				if(!empty($value)) {
-					if(!$query->isJoined("tasks_tasklist", "tasklist") ){
-						$query->join("tasks_tasklist", "tasklist", "task.tasklistId = tasklist.id");
-					}
-					$criteria->where(['tasklist.projectId' => $value]);
-				}
-			})
+
+			}, "subscribedOnly")
+			->addColumn('mileStoneId')
+			->addColumn('projectId')
 			->add('role', function(Criteria $criteria, $value, Query $query) {
 				if(!$query->isJoined("tasks_tasklist", "tasklist") ){
 					$query->join("tasks_tasklist", "tasklist", "task.tasklistId = tasklist.id");
@@ -651,6 +652,15 @@ class Task extends AclItemEntity {
 			}
 			$sort->renameKey('tasklist','tasklist.name');
 		}
+
+		if(isset($sort['project'])) {
+
+			if(!$query->isJoined("business_projects3_project3", "project")) {
+				$query->join("business_projects3_project3", "project", "project.id = task.projectId", "left");
+			}
+			$sort->renameKey('project','project.number');
+		}
+
 
 		//sort null dates first
 		if(isset($sort['due'])) {

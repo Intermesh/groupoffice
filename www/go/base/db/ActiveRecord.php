@@ -3341,16 +3341,20 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	}
 
 	public static $log_enabled = true;
-	
+
 	/**
-	 * Will all a log record in go_log
+	 * Will all a log record in the history_log_record table if the history module is installed
+	 *
 	 * Made protected to be used in \GO\Files\Model\File
 	 * @param string $action
 	 * @param boolean $save set the false to not directly save the create Log record
-	 * @return boolean|\GO\Log\Model\Log returns the created log or succuss status when save is true
+	 * @param bool $modifiedCustomfieldAttrs
+	 * @return boolean|null returns the created log or success status when save is true
+	 * @throws \Exception
 	 */
-	protected function log($action, $save=true, $modifiedCustomfieldAttrs=false){
-		// jsonData field in go_log might not exist yet during upgrade
+	protected function log(string $action, $save=true, $modifiedCustomfieldAttrs=false): ?bool
+	{
+		// jsonData field in might not exist yet during upgrade
 		if(!self::$log_enabled) {
 			return true;
 		}
@@ -3358,7 +3362,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if(go()->getModule('community', 'history') ) {
 			\go\modules\community\history\Module::logActiveRecord($this, $action);
 		}
-
+		return null;
 	}
 
 
@@ -4748,7 +4752,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * Like: $params = array('attribute1'=>1,'attribute2'=>'Hello');
 	 * @param boolean $save if the copy should be save when calling this function
 	 * @param boolean $ignoreAclPermissions
-	 * @return mixed The newly created object or false if before or after duplicate fails
+	 * @return static The newly created object or false if before or after duplicate fails
 	 *
 	 */
 	public function duplicate($attributes = array(), $save=true, $ignoreAclPermissions=false, $ignoreCustomFields = false) {

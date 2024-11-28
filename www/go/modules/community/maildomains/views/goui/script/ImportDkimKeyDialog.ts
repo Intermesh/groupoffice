@@ -11,7 +11,7 @@ import {
 	Window
 } from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
-import {MailDomain} from "./MailDomain";
+import {MailDomain} from "./MailDomain.js";
 
 export class ImportDkimKeyDialog extends Window {
 	readonly form: Form<ContainerFieldValue>;

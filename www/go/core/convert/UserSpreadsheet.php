@@ -4,6 +4,7 @@ namespace go\core\convert;
 use Exception;
 use go\core\data\convert\Spreadsheet;
 use go\core\model\Module;
+use go\core\model\User;
 use go\core\orm\Entity;
 use go\modules\community\serverclient\model\MailDomain;
 use go\modules\community\serverclient\Module as GoModule;
@@ -11,12 +12,13 @@ use go\modules\community\serverclient\Module as GoModule;
 class UserSpreadsheet extends Spreadsheet {
 
 	public static $excludeHeaders = ['syncSettings', 'tasksSettings', 'notesSettings', 'addressBookSettings',
-		'calendarSettings', 'emailSettings', 'supportSettings', 'projectsSettings', 'otp', 'clients', 'authenticators'];
+		'calendarSettings', 'emailSettings', 'supportSettings', 'projectsSettings', 'otp', 'clients', 'authenticators',
+		'profile'];
 
 	protected function init()
 	{
 		parent::init();
-
+		$this->addColumn("personalGroup", go()->t("Personal group"));
 		$this->addColumn('createEmailAccount', go()->t("Create E-mail account"));
 	}
 
@@ -24,7 +26,24 @@ class UserSpreadsheet extends Spreadsheet {
     return "0";
   }
 
-  public function importCreateEmailAccount(Entity $entity, $value, $values) {
+  public function exportPersonalGroup(Entity $entity, array $templateValues, $columnName): string
+  {
+		if($entity instanceof User && $entity->getPersonalGroup()) {
+			return $entity->getPersonalGroup()->name;
+		}
+		return "";
+  }
+
+	public function importPersonalGroup(Entity $entity, $value, $values): void
+	{
+		if($entity instanceof User && !$entity->getPersonalGroup()) {
+			return;
+		}
+		return;
+	}
+
+	public function importCreateEmailAccount(Entity $entity, $value, $values): void
+	{
     $this->postFixAdminDomain = false;
     $this->postFixAdminPassword = false;
 

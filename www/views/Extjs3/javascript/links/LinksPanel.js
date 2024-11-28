@@ -213,16 +213,6 @@ GO.grid.LinksPanel = function(config){
 		for_links: true,
 		region:'south',
 		height:300
-	//		region:'west',
-	//		width:160,
-	//		layout:'border',
-	//		id:config.id+'_west'
-	//		store:new GO.data.JsonStore({
-	//			root: 'results',
-	//			data: {"results":GO.linkTypes}, //defined in /default_scripts.inc.php
-	//			fields: ['id','name', 'checked'],
-	//			id:'id'
-	//		})
 	});
 	this.linkTypeFilter.on('change', function(grid, types){
 		this.linksGrid.store.baseParams.types = Ext.encode(types);

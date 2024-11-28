@@ -225,7 +225,7 @@ abstract class Entity extends Property {
 		} else {
 			$entity->$keyField = $key;
 		}
-		$entity->setValues($values);
+		$entity->setValues($values, false);
 
 		if(!$entity->save()) {
 			throw new SaveException($entity);
@@ -274,8 +274,9 @@ abstract class Entity extends Property {
 	 *
 	 * @param string|int|null $id
 	 * @return bool
+	 * @throws Exception
 	 */
-	public static function exists(?string $id): bool
+	public static function exists(string|int|null $id): bool
 	{
 		if(empty($id)) {
 			return false;
@@ -343,15 +344,9 @@ abstract class Entity extends Property {
 	{
 		$query = static::find($properties, $readOnly);
 		/** @noinspection PhpPossiblePolymorphicInvocationInspection */
-		$query->join(
-			'core_link',
-			'l',
-			$query->getTableAlias() . '.id = l.toId and l.toEntityTypeId = '.static::entityType()->getId())
 
-			->andWhere('fromEntityTypeId = '. $entity::entityType()->getId())
-			->andWhere('fromId', '=', $entity->id);
+		return \go\core\model\Link::joinLinks($query, $entity, static::entityType()->getId());
 
-		return $query;
 	}
 
 
@@ -857,7 +852,7 @@ abstract class Entity extends Property {
 					}
 				}
 
-				if(is_int($value[1])) {
+				if(is_numeric($value[0])) {
 					$criteria->andWhere('modifiedBy', '=', $value);
 				} else {
 
@@ -890,7 +885,7 @@ abstract class Entity extends Property {
 					}
 				}
 
-				if(is_int($value[0])) {
+				if(is_numeric($value[0])) {
 					$criteria->andWhere('createdBy', '=', $value);
 				} else {
 					if (!$query->isJoined('core_user', 'creator')) {

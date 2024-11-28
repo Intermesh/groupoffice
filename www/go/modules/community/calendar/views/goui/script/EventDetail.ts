@@ -11,6 +11,7 @@ import {client, DetailPanel, JmapDataSource, jmapds, RecurrenceField} from "@int
 import {alertfield} from "./AlertField.js";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {calendarStore, statusIcons, t} from "./Index.js";
+import {EventWindow} from "./EventWindow.js";
 
 
 export class EventDetail extends DetailPanel<CalendarEvent> {
@@ -24,7 +25,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 	recurrenceId?: string
 
 	store: JmapDataSource
-	toolBar: Toolbar
+	private statusTbar: Toolbar
 
 	constructor() {
 		super("CalendarEvent");
@@ -41,7 +42,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 				return RecurrenceField.toText(v, this.dataSet.start);
 			}
 		});
-		this.toolBar = tbar({hidden:true, style:{alignItems:'space-between'}},
+		this.statusTbar = tbar({hidden:true, style:{alignItems:'space-between'}, cls: "border-top"},
 			btn({itemId: 'accepted', text:t('Accept'), handler:()=>this.updateStatus('accepted')}),
 			btn({itemId: 'tentative', text:t('Maybe'), handler:()=>this.updateStatus('tentative')}),
 			btn({itemId: 'declined', text:t('Decline'), handler:()=>this.updateStatus('declined')})
@@ -65,6 +66,10 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 		// 		}
 		// 	}})
 
+
+		this.toolbar.hide();
+		this.items.add(this.statusTbar);
+
 		this.scroller.items.add(this.form = datasourceform({
 				cls: 'flow pad',
 				flex:1,
@@ -80,7 +85,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 							recurrenceField.dataSet.start = start;
 
 						if(data.participants && this.item!.calendarPrincipal) {
-							this.toolBar.show();
+							this.statusTbar.show();
 							this.pressButton(this.item!.calendarPrincipal.participationStatus);
 						}
 						if(data.useDefaultAlerts) {
@@ -89,10 +94,8 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 						}
 					},
 					'beforesave':(_, data) => {
-						debugger;
 						if(alertField.isModified() || !this.item?.data.id) {
-							//@ts-ignore
-							data.useDefaultAlerts = alertField.useDefault; // ?
+							data.useDefaultAlerts = alertField.useDefault;
 						}
 					}
 				}
@@ -118,7 +121,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 			),
 			recurrenceField,
 			displayfield({name: 'location', label:t('Location')}),
-			displayfield({name:'description'}),
+			displayfield({name:'description', tagName: "div", cls: "pad", escapeValue: false, renderer: (v, field) => Format.textToHtml(v)}),
 			mapfield({name: 'participants',
 
 				buildField: (v: any) => displayfield({
@@ -159,13 +162,13 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 					}})
 				)
 			})
-		),
-			this.toolBar
+		)
+
 		);
 	}
 
 	private pressButton(v:'accepted'|'declined'|'tentative') {
-		this.toolBar.items.forEach(btn => {
+		this.statusTbar.items.forEach(btn => {
 			btn.el.cls('pressed', btn.itemId === v);
 		});
 
@@ -201,8 +204,22 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 	async loadEvent(ev: CalendarItem) {
 		this.item = ev;
 		if (!ev.key) {
+
 			this.item = ev;
 			this.form.create(ev.data);
+
+			this.scroller.hidden = false;
+			this.disabled = false;
+
+			this.statusTbar.items.replace(btn({
+				text: t("Add"),
+				handler: button => {
+					const dlg = new EventWindow();
+					dlg.show();
+					dlg.loadEvent(this.item!);
+				}
+			}))
+
 		} else {
 			await super.load(ev.data.id);
 

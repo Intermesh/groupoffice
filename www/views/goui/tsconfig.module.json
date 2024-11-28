@@ -4,8 +4,8 @@
     "target": "es2020",
     "sourceMap": true,
     "lib": ["es2020", "dom"],
-    "moduleResolution": "nodenext",
-    "module":"nodenext",
+    "moduleResolution": "bundler",
+    "module":"preserve",
     "esModuleInterop": true,
     "outDir": "./dist", //set this in the extended
     "baseUrl": ".", //set this in the extended too

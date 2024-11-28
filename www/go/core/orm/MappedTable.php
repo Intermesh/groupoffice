@@ -65,9 +65,10 @@ class MappedTable extends Table {
 	 *   the joined table always needs to have a value 
 	 *   ['type' => "foo"] then you can set it with this parameter.
 	 */
-	public function __construct(string $name, string $alias, array $keys = null, array $columns = [], array $constantValues = [], Connection $conn = null) {
+	public function __construct(string $name, string $alias, array $keys = null, array $columns = [], array $constantValues = [], bool $isUserTable = false, Connection $conn = null) {
 
 		$this->alias = $alias;
+		$this->isUserTable = $isUserTable;
 
 		parent::__construct($name, $conn ?? go()->getDbConnection());
 
@@ -107,6 +108,10 @@ class MappedTable extends Table {
 	{
 		$keys = [];
 		foreach ($this->getPrimaryKey() as $pkName) {
+			if($this->isUserTable && $pkName == "userId") {
+				continue;
+			}
+
 			$keys[$pkName] = $pkName;
 		}
 		

@@ -1,5 +1,70 @@
+- Core: Added new option to toggle use of ctrl + enter to send e-mail / comments
+- Billing: Import and export custom fields and match by ID
+
+18-11-2024: 6.8.86
+- Files: cron job file notification
+- Core: updated german translation
+- Various: route to main grid when details resets / is deleted for mobile view
+- Privacy settings: several bug fixes in addressbook overrides
+- projects2: automatically convert old project_templates_events to tasks
+- Collabora: Added lang variable for collabora
+- Finance: Migration checks if all custom fields are available
+
+11-11-2024: 6.8.85
+- Billing: Fixed undefined index 'sort'
+
+11-11-2024: 6.8.84
+- Billing: Sort on price and supplier
+- Core: Bugfix when editing custom fieldset. Also enable editing of fieldset with parent fieldset
+- Core: Default request timeout to 30s instead 3 minutes
+- Finance: Fixed error when dragging existing items to another group
+
+04-11-2024: 6.8.83
+- Email: Larger move old mail dialog. Also scrollable and resizable
+- Core: Fixed issue in combobox resetting with promise race condition
+- Tasks: Fixed horizontal scrollbar in some cases
+
+04-11-2024: 6.8.82
+- Core: performance hotfix
+
+04-11-2024: 6.8.81
+- Core: Admin can change passwords without using own password again
+- Email: Set references header when forwarding mail
+- Newsletters: fix php compatibility error when sending newsletters
+- Supportclient: make creation dialog wider to fit format toolbar
+- Calendar: fix more HTML encoding issues in Qtip
+
+28-10-2024: 6.8.80
+- Core: bugfix editing individual field set in entity
+- Core: bugfix user export
+- Core: Several bug fixes user import
+
+24-10-2024: 6.8.79
+- E-mail: Server side sort was disabled by accident since May 2024
+- Caldav: Fixed CalDAV sync with DAVx5 error #1192
+- ActiveSync: Fixed Sync in Outlook (Z-push/Activesync) problem #1193
+- Core: Fixed problem in demo data creation
+
+21-10-2024: 6.8.78
+- E-mail: Set internal date on IMAP APPEND command's. This way the internal date when moving or copying messages to another account is preserved
+- Core: added endpoint api/up.php that checks the database connection and filesystem disks for uptime monitoring.
+- Core / e-mail: Fixed problem where typing ü would insert a , in the mail composer on german QWERTZ layout
+- E-mail: Fix 'delete all attachments' bug.
+
+14-10-2024: 6.8.77
+- Timeregistration: Fixed time dialog tracking time starting at midnight
+- Newsletters: fix missing property error when sending newsletter with attachment
+- Smime: Handle two valid certficates for the same sender
+- Comments / support: display download icon in order to directly download a comment attachment.
+
+08-10-2024: 6.8.76
+- ActiveSync: Fixed fatal error because of breaking change in z-push
+- Calendar: fix invitations in readonly calendars
+
+07-10-2024: 6.8.75
 - Core: Make sure groupoffice core module is always sorted first
 - Tasks: sort task combo by task list first, title second
+- Core: tweak keyword splitting to support double surnames separated by a dash (e.g. Catherine Zeta-Jones)
 - Finance: Don't send statements to customers with a negative amount to be paid
 
 30-09-2024: 6.8.74

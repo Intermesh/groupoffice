@@ -246,7 +246,28 @@ $updates['202408091228'][] = "ALTER TABLE `tasks_tasklist_user` CHANGE COLUMN `c
 $updates['202408091228'][] = "ALTER TABLE `tasks_tasklist_user` CHANGE COLUMN `modSeq` `modSeq` INT NOT NULL DEFAULT 0 ;";
 // set random default color for the color field
 $updates['202408091228'][] = "UPDATE tasks_tasklist SET defaultColor = SUBSTRING('#CDAD00#E74C3C#9B59B6#8E44AD#2980B9#3498DB#1ABC9C#16A085#27AE60#2ECC71#F1C40F#F39C12#E67E22#D35400#95A5A6#34495E#808B96#1652a1', (id MOD 18) * 7 + 2 ,6);";
-// subscribe to the tasklists the user owns
+// subscribe to the tasklists the user has access to
 $updates['202408091228'][] = "INSERT IGNORE INTO tasks_tasklist_user
-(tasklistId, userId, isSubscribed, isVisible, color, sortOrder, modSeq) SELECT
-	id, ownerId, 1, 1, defaultColor, 0, 1 FROM tasks_tasklist;";
+(tasklistId, userId, isSubscribed, isVisible, color, sortOrder, modSeq)
+select tl.id, ug.userId, 1, 1, tl.defaultColor,0,1 from core_acl_group ag
+inner join core_user_group ug on ug.groupId = ag.groupId
+inner join tasks_tasklist tl on tl.aclId = ag.aclId where tl.projectId is not null group by tl.id,ug.userId";
+
+$updates['202410170857'][] = "update tasks_task set progressUpdated = modifiedAt where progressUpdated is null and progress = 3;";
+
+$updates['202410170857'][] = "alter table tasks_task
+    add projectId int unsigned null;";
+
+$updates['202410170857'][] = "alter table tasks_task
+    add constraint tasks_task_business_projects3_project3_id_fk
+        foreign key (projectId) references business_projects3_project3 (id)
+            on delete set null;";
+
+
+$updates['202410170857'][] = "alter table tasks_task
+    add mileStoneId int unsigned null;";
+
+$updates['202410170857'][] = "alter table tasks_task
+    add constraint tasks_task_business_projects3_project3_milestone_id_fk
+        foreign key (mileStoneId) references business_projects3_project3_milestone (id)
+            on delete set null;";

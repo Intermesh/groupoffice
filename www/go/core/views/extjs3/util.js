@@ -533,7 +533,6 @@ go.util =  (function () {
 	 * @return {undefined}
 	 */
 	exportToFile: function (entity, queryParams, extension, params) {
-		
 
 
 		function doExport(columns) {
@@ -556,6 +555,10 @@ go.util =  (function () {
 				params.columns = columns;
 			}
 
+			//allow longer requests for export. TODO. move this to a background process
+			const oldTimeout = go.Jmap.requestTimeout;
+			go.Jmap.requestTimeout = 180000;
+
 			return go.Jmap.request({
 				method: entity + "/export",
 				params: params
@@ -565,6 +568,8 @@ go.util =  (function () {
 				Ext.MessageBox.alert(t("Error"), response.message);
 			}).finally(function() {
 				Ext.getBody().unmask();
+
+				go.Jmap.requestTimeout = oldTimeout;
 			})
 		}
 
@@ -605,10 +610,9 @@ go.util =  (function () {
 				upload: function (response) {
 					Ext.getBody().mask(t("Importing..."));
 
-
-					if(response.name.toLowerCase().substr(-3) == 'csv' || response.name.toLowerCase().substr(-4) == 'xlsx') {
+					if(response.name.toLowerCase().slice(-3) === 'csv' || response.name.toLowerCase().slice(-4) === 'xlsx') {
 						Ext.getBody().unmask();
-						var dlg = new go.import.CsvMappingDialog({
+						const dlg = new go.import.CsvMappingDialog({
 							entity: entity,
 							fileName: response.name,
 							blobId: response.blobId,
@@ -642,10 +646,6 @@ go.util =  (function () {
 
 									go.Db.store(entity).getUpdates();
 								}
-
-								// if (callback) {
-								// 	callback.call(scope || this, response);
-								// }
 							},
 							scope: this
 						});

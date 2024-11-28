@@ -1,5 +1,5 @@
-import {DataSourceStore, datasourcestore, DateTime, DefaultEntity} from "@intermesh/goui";
-import {client, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
+import {datasourcestore, DateTime, DefaultEntity} from "@intermesh/goui";
+import {client, jmapds} from "@intermesh/groupoffice-core";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 
 interface CalendarProvider {
@@ -13,6 +13,21 @@ export class CalendarAdapter {
 	private start!: DateTime
 	private end!: DateTime
 
+	constructor() {
+		for(const type in this.providers) {
+			const p = this.providers[type];
+			if(p.watch) {
+				p.store.on('load', (me: & {skipNextEvent:boolean}) => {
+					if(p.skipWatch) {
+						p.skipWatch = false; // skip only once
+					} else {
+						this.onLoad();
+					}
+				});
+			}
+		}
+	}
+
 	onLoad = () => {}
 
 	goto(start:DateTime,end:DateTime) {
@@ -21,20 +36,10 @@ export class CalendarAdapter {
 		const promises =  [];
 		for(const type in this.providers) {
 			const p = this.providers[type];
-			if(!p.enabled) continue;
-			const promise = p.load(start,end);
-			if(p.store) {
-				//p.store.skipNextEvent = true;
+			if(p.enabled) {
+				p.skipWatch = true; // will skip extra onLoad call for providers that have a load handler
+				promises.push(p.load(start, end));
 			}
-			if(p.watch) {
-				promise.then(_evs => {
-					p.store.on('load', (me: & {skipNextEvent:boolean}) => {
-						this.onLoad();
-					});
-					p.watch = false;
-				})
-			}
-			promises.push(promise);
 		}
 		Promise.all(promises).then(this.onLoad);
 	}
@@ -82,11 +87,16 @@ export class CalendarAdapter {
 			list:[],
 			open(){},
 			load(start:DateTime,end:DateTime) {
-				let [lang,country] = client.user.language.split('_');
+				if(!client.user.holidayset) {
+					client.user.holidayset = client.user.language;
+				}
+				let [lang,country] = client.user.holidayset.split('_');
 				if(!country) country = lang;
 				if(country=='uk') country ='gb';
+
+				console.log(client.user, country);
 				return client.jmap("community/calendar/Holiday/fetch",{
-					set: country.toUpperCase(), lang,from:start.format('Y-m-d'),till:end.format('Y-m-d')
+					set: country.toUpperCase(), lang: client.user.holidayset.replace("_", "-"),from:start.format('Y-m-d'),till:end.format('Y-m-d')
 				}).then(r => {
 					this.list = r.list;
 				});
@@ -114,29 +124,40 @@ export class CalendarAdapter {
 			*items(from:DateTime,until:DateTime) {
 				for(const task of this.store!.items) {
 					let date;
+
 					if(task.progress == 'completed') {
-						date = task.progressUpdated; // slice date
+						date = task.progressUpdated || (new DateTime()).format('Y-m-d'); // slice date
 					} else {
 						date = task.due || task.start || (new DateTime()).format('Y-m-d');
 					}
+
+
 //if(task.title =='test taak met bogus timezone') debugger;
 					const start = DateTime.createFromFormat(date.substring(0,10), 'Y-m-d');
-					yield new CalendarItem({
-						key: '-',
-						start,
-						open() {
-							const dlg = new go.modules.community.tasks.TaskDialog();
-							dlg.show();
-							dlg.load(task.id);
-						},
-						extraIcons:[task.progress == 'completed' ? 'task_alt' : 'radio_button_unchecked'],
-						defaultColor: '7e472a',
-						data: {
-							title: task.title,
-							duration: 'P1D',
-							showWithoutTime: true,
-						}
-					});
+
+					if(!start) {
+						continue;
+					}
+
+					if(start.date <= until.date && start.date >= from.date) {
+						// console.log(task.progress, date, start, task.title, task);
+						yield new CalendarItem({
+							key: '-',
+							start,
+							open() {
+								const dlg = new go.modules.community.tasks.TaskDialog();
+								dlg.show();
+								dlg.load(task.id);
+							},
+							extraIcons: [task.progress == 'completed' ? 'task_alt' : 'radio_button_unchecked'],
+							defaultColor: '7e472a',
+							data: {
+								title: task.title,
+								duration: 'P1D',
+								showWithoutTime: true,
+							}
+						});
+					}
 				}
 			},
 			load(start:DateTime,end:DateTime) {

@@ -135,7 +135,7 @@ class Installer {
 		go()->getDbConnection()->exec("SET default_storage_engine=InnoDB;");
 
 		Utils::runSQLFile(Environment::get()->getInstallFolder()->getFile("go/core/install/install.sql"));
-		go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
+		$oldFKchecks = go()->getDbConnection()->foreignKeyChecks(false);
 
 		if(isset($adminValues['language'])) {
 			go()->getSettings()->language = $adminValues['language'];
@@ -186,7 +186,9 @@ class Installer {
 
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
-		go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
+		if($oldFKchecks) {
+			go()->getDbConnection()->foreignKeyChecks(true);
+		}
 		self::$isInstalling = false;
 
 		go()->enableEvents();
@@ -523,11 +525,13 @@ class Installer {
 		
 		go()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
 
-		go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
+		$oldFKchecks = go()->getDbConnection()->foreignKeyChecks(false);
 		while (!$this->upgradeModules()) {
 			echo "\n\nA module was refactored. Rerunning...\n\n";			
 		}
-		go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
+		if($oldFKchecks) {
+			go()->getDbConnection()->foreignKeyChecks(true);
+		}
 
 		echo "Rebuilding cache\n";
 
@@ -569,7 +573,8 @@ class Installer {
 		$this->enableGarbageCollection();
 		$this->enableDiskUsage();
 
-
+		// old framework messes it up somewhere
+		date_default_timezone_set("UTC");
 
 		echo "Done!\n";
 
@@ -682,10 +687,10 @@ class Installer {
 			$modulesById[$module->id] = $module;
 
 			$updatesFile = $this->getUpdatesFile($module);
-			if(!$updatesFile) {
+			if (!$updatesFile) {
 				continue;
 			}
-			
+
 			$updates = array();
 			require($updatesFile);
 
@@ -695,18 +700,17 @@ class Installer {
 			$count = 0;
 			foreach ($updates as $timestamp => $updatequeries) {
 				//somehow this doesn't always match on some installations with Ioncube !?
-			  if(go()->getDebugger()->enabled && !preg_match("/^[0-9]{12}$/", $timestamp)) {
-			    throw new Exception("Invalid timestamp '$timestamp' in file '$updatesFile'");
-        }
+				if (go()->getDebugger()->enabled && !preg_match("/^[0-9]{12}$/", $timestamp)) {
+					throw new Exception("Invalid timestamp '$timestamp' in file '$updatesFile'");
+				}
 				$u["$timestamp"][$module->id] = $updatequeries;
 				$count += count($updatequeries);
 			}
 
-			if(go()->getDebugger()->enabled && $count < $module->version) {
-				$modStr = '[' . ($module->package ?? "legacy") .'/'. $module->name .'] ';
-				throw new Exception("Less queries than version for module " . $modStr ." " . $count .' < '. $module->version);
+			if (go()->getDebugger()->enabled && $count < $module->version) {
+				$modStr = '[' . ($module->package ?? "legacy") . '/' . $module->name . '] ';
+				throw new Exception("Fewer queries than version for module " . $modStr . " " . $count . ' < ' . $module->version);
 			}
-
 		}
 
 		ksort($u);
@@ -844,7 +848,7 @@ class Installer {
 //	}
 
 	public static function fixCollations() {
-		go()->getDbConnection()->exec("SET foreign_key_checks = 0");
+		$oldFKchecks = go()->getDbConnection()->foreignKeyChecks(false);
 		$stmt = go()->getDbConnection()->query("SHOW TABLE STATUS");	
 		
 		foreach($stmt as $record){
@@ -896,7 +900,9 @@ class Installer {
 				}
 			}	
 		}
-		go()->getDbConnection()->exec("SET foreign_key_checks = 1");
+		if($oldFKchecks) {
+			go()->getDbConnection()->foreignKeyChecks(true);
+		}
 	}
 
 }

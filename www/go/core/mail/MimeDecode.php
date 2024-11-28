@@ -197,7 +197,7 @@ class MimeDecode
 
 
 
-	const SINGLE_HEADERS = ['subject', 'to', 'from', 'cc', 'bcc', 'from', 'date', 'message-id', 'content-type', 'references', 'in-reply-to'];
+	const SINGLE_HEADERS = ['subject', 'to', 'from', 'cc', 'bcc', 'from', 'date', 'message-id', 'content-type', 'references', 'in-reply-to', 'content-id'];
 
 
 	/**
@@ -407,7 +407,7 @@ class MimeDecode
 	 * @return array Contains parsed headers
 	 * @access private
 	 */
-	private function parseHeaders(string $input): array
+	public static function parseHeaders(string $input): array
 	{
 		if ($input === '') {
 			return [];

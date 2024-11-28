@@ -63,11 +63,11 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 		},
 
 		onSpecialKey: function(field, e) {
-			if(this.isExpanded()) {
+			if(this.isExpanded() && e.browserEvent.key !== ";" ) {
 				return;
 			}
 
-			if (e.getKey() === e.ENTER || e.getKey() == 186) {
+			if (e.browserEvent.key === "Enter" || e.browserEvent.key === ";") {
 				const v = this.getValue().trim(), lastChar = v.charAt(v.length -1);
 				if(lastChar !== this.sep) {
 					this.setValue(v + this.sep + " ");
@@ -116,9 +116,9 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 
 			h = Math.min(this.growMax, Math.max(ts.offsetHeight, this.growMin));
 			if(h != this.lastHeight){
-				this.lastHeight = h;
 				this.el.setHeight(h);
-				this.fireEvent("autosize", this, h);
+				this.fireEvent("autosize", this, h, this.lastHeight);
+				this.lastHeight = h;
 			}
 		},
 

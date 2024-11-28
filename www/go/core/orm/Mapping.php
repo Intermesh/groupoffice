@@ -3,6 +3,7 @@
 namespace go\core\orm;
 
 use Exception;
+use go\core\db\Col;
 use go\core\db\Column;
 use go\core\db\Query;
 use go\core\db\Table;
@@ -100,8 +101,8 @@ class Mapping {
 	}
 
 
-	private function internalAddTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = []) {
-		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues);
+	private function internalAddTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = [], bool $isUserTable = false) {
+		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues,  $isUserTable);
 		$this->tables[$name]->dynamic = $this->dynamic;
 		foreach($this->tables[$name]->getMappedColumns() as $col) {
 			$col->dynamic = $this->dynamic;
@@ -131,8 +132,7 @@ class Mapping {
    */
 	public function addUserTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = [], $required = false): Mapping
 	{
-		$table = $this->internalAddTable($name, $alias, $keys, $columns, $constantValues);
-		$table->isUserTable = true;
+		$table = $this->internalAddTable($name, $alias, $keys, $columns, $constantValues, true);
 		$table->required = $required;
 		$this->hasUserTable = true;
 
@@ -331,6 +331,37 @@ class Mapping {
 		$this->relations[$name]->dynamic = $this->dynamic;
 		return $this;
 	}
+
+	private array $scalarProperties = [];
+
+	/**
+	 * Add a dynamic property in {@see Property::EVENT_MAPPING}. This is needed when querying additional columns
+	 * using {@see Mapping::addQuery()}.
+	 *
+	 * @param string $name
+	 * @param string $type
+	 * @return $this
+	 */
+	public function addScalarProperty(string $name, string $type = 'varchar'): static
+	{
+		$col = new Column();
+		$col->dynamic = true;
+		$col->name = $name;
+		$col->dbType = strtolower($type);
+
+		$this->scalarProperties[] = $col;
+
+		return $this;
+	}
+
+	/**
+	 * Get the dynamic properties added with {@see addScalarProperty()}
+	 *
+	 * @return array
+	 */
+	public function getScalarProperties() : array {
+		return $this->scalarProperties;
+	}
 	
 	/**
 	 * Get all relational properties
@@ -516,6 +547,10 @@ class Mapping {
 		
 		foreach($this->getRelations() as $relation) {
 			$props[$relation->name] = $relation;
+		}
+
+		foreach($this->getScalarProperties() as $col) {
+			$props[$col->name] = $col;
 		}
 		
 		return $props;

@@ -145,51 +145,52 @@ class MailDomain
 	 */
 	public function setMailboxPassword(User $user, string $domain)
 	{
-		$username = explode('@', $user->username)[0];
-
-		// if username contains domain then only change it for that domain.
-		if(isset($usernameParts[1]) && $domain != $usernameParts[1]) {
-			return;
-		}
-
-		$username .= '@' . $domain;
-
-		// Backwards compatibility
-		if (go()->getModule(null, "postfixadmin")) {
-			$this->legacySetMailboxPassword($username);
-		}
-
-		if (!go()->getModule(null, "email")) {
-			return;
-		}
-
-		$mb = Mailbox::find(['id', 'username', 'homedir'])->where(['username' => $username])->single();
-
-		if ($this->onSameServer()) {
-			$mb->password = $this->password;
-			$mb->save();
-		} else {
-			$data = [['MailBox/set',
-				[
-					'update' => [
-						$mb->id => [
-							'username' => $username,
-							'password' => $this->password
-						]
-					]
-				],
-				'clientCallId-1'
-			]];
-			$response = $this->jmapCall($data);
-		}
+//		$username = explode('@', $user->username)[0];
+//
+//		// if username contains domain then only change it for that domain.
+//		if(isset($usernameParts[1]) && $domain != $usernameParts[1]) {
+//			return;
+//		}
+//
+//		$username .= '@' . $domain;
+//
+//		// Backwards compatibility
+//		if (go()->getModule(null, "postfixadmin")) {
+//			$this->legacySetMailboxPassword($username);
+//		}
+//
+//		if (!go()->getModule(null, "email")) {
+//			return;
+//		}
 
 
-		$stmt = Account::model()->findByAttributes(['username' => $username]);
+// TODO fix this
+//		if ($this->onSameServer()) {
+//			$mb = Mailbox::find(['id', 'username', 'homedir'])->where(['username' => $username])->single();
+//			$mb->password = $this->password;
+//			$mb->save();
+//		} else {
+//			$data = [['MailBox/set',
+//				[
+//					'update' => [
+//						$mb->id => [
+//							'username' => $username,
+//							'password' => $this->password
+//						]
+//					]
+//				],
+//				'clientCallId-1'
+//			]];
+//			$response = $this->jmapCall($data);
+//		}
 
-		while ($account = $stmt->fetch()) {
-			$account->password = $this->password;
-			$account->save(true);
-		}
+
+//		$stmt = Account::model()->findByAttributes(['username' => $username]);
+//
+//		while ($account = $stmt->fetch()) {
+//			$account->password = $this->password;
+//			$account->save(true);
+//		}
 	}
 
 	/**
@@ -401,6 +402,6 @@ class MailDomain
 	{
 		$settingsUrl = rtrim(go()->getSettings()->URL,'/');
 		$configUrl = rtrim(go()->getConfig()['serverclient_server_url'], '/');
-		return $settingsUrl === $configUrl;
+		return $settingsUrl === $configUrl && go()->getModule("community", "maildomains");
 	}
 }

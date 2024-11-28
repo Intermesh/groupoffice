@@ -25,11 +25,6 @@ class Module extends core\Module
 		return "Intermesh BV <mdhart@intermesh.nl>";
 	}
 
-	public static function getTitle(): string
-	{
-		return 'Calendar GOUI';
-	}
-
 	public function getSettings() {
 		return Settings::get();
 	}
@@ -60,9 +55,11 @@ class Module extends core\Module
 				->where('groupId', 'IS NOT', null)
 				->andWhere('ownerId', '=', $user->id)->all();
 
-			go()->getDbConnection()
-				->update('core_principal', ['email'=>$user->email], ['id' => $pIds])
-				->execute();
+			if(!empty($pIds)) {
+				go()->getDbConnection()
+					->update('core_principal', ['email' => $user->email], ['id' => $pIds])
+					->execute();
+			}
 
 		}
 	}

@@ -43,11 +43,19 @@ go.form.TimeField = Ext.extend(Ext.form.TextField, {
 	},
 
 	getSeconds: function() {
-		return this.getMinutes() * 60; // this field cant display/set seconds
+		const v = this.getMinutes();
+		if(!v) {
+			return v; //possibly null
+		}
+		return v * 60; // this field cant display/set seconds
 	},
 
 	getMinutes: function(minutes) {
-		return go.util.Format.minutes(this.getRawValue());
+		var v = this.getRawValue();
+		if(!v) {
+			return null;
+		}
+		return go.util.Format.minutes(v);
 	},
 
 	setValue : function(v) {
@@ -79,7 +87,7 @@ go.form.TimeField = Ext.extend(Ext.form.TextField, {
 		}
 		var v = this.getRawValue();
 		if(!v) {
-			return;
+			return null;
 		}
 		if(v.length > 5) {
 			return v;

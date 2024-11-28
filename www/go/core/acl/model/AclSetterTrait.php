@@ -1,6 +1,7 @@
 <?php
 namespace go\core\acl\model;
 
+use Exception;
 use go\core\model\Acl;
 use go\core\orm\exception\SaveException;
 use go\core\util\ArrayObject;
@@ -10,14 +11,15 @@ trait AclSetterTrait {
 
 	/**
 	 * The acl entity
-	 * @var Acl
+	 *
+	 * @var ?Acl
 	 */
-	private $acl;
+	private ?Acl $acl;
 
 	/**
 	 * Get the ACL entity
 	 *
-	 * @return Acl
+	 * @return ?Acl
 	 * @throws Exception
 	 */
 	public function findAcl(): ?Acl
@@ -36,7 +38,7 @@ trait AclSetterTrait {
 	 *
 	 * @throws Exception
 	 */
-	protected function saveAcl()
+	protected function saveAcl(): void
 	{
 		if(!isset($this->setAcl)) {
 			return;
@@ -45,7 +47,7 @@ trait AclSetterTrait {
 		$a = $this->findAcl();
 
 		if(!$a) {
-			throw new \Exception("There's no ACL set for this entity");
+			throw new Exception("There's no ACL set for this entity");
 		}
 
 		foreach($this->setAcl as $groupId => $level) {
@@ -60,7 +62,7 @@ trait AclSetterTrait {
 	/**
 	 * Returns an array with group ID as key and permission level as value.
 	 *
-	 * @return array eg. ["2" => 50, "3" => 10]
+	 * @return ArrayObject eg. ["2" => 50, "3" => 10]
 	 * @throws Exception
 	 */
 	public function getAcl(): ArrayObject
@@ -89,7 +91,7 @@ trait AclSetterTrait {
 	/**
 	 * Set the ACL
 	 *
-	 * @param array|null $acl An array with group ID as key and permission level as value. eg. ["2" => 50, "3" => 10]
+	 * @param array|ArrayObject|null $acl An array with group ID as key and permission level as value. eg. ["2" => 50, "3" => 10]
 	 *
 	 * @example
 	 * ```
@@ -98,7 +100,7 @@ trait AclSetterTrait {
 	 * ]);
 	 * ```
 	 */
-	public function setAcl(array|ArrayObject|null $acl)
+	public function setAcl(array|ArrayObject|null $acl): void
 	{
 		$this->setAcl = $acl;
 	}

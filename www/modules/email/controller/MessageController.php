@@ -19,8 +19,10 @@ use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\fs\FileSystemObject;
 use go\core\mail\AddressList;
+use go\core\mail\MimeDecode;
 use go\core\model\Module;
 use go\core\model\User;
+use go\core\util\DateTime;
 use GO\Email\Model\Alias;
 use GO\Email\Model\Account;
 use GO\Email\Model\ImapMessage;
@@ -397,6 +399,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 	private function allowFTS (Account $account, $imap) :bool{
 
+		// TODO DOCS
 		$forceFTS = go()->getConfig()['community']['email']['forceFTS'][$account->host] ?? false;
 
 		if(go()->getDebugger()->enabled) {
@@ -614,6 +617,19 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		
 		$mailer = Mailer::newGoInstance();
 		$mailer->setEmailAccount($account);
+
+		if(!empty($params['customHeaders'])) {
+			$headers = MimeDecode::parseHeaders($params['customHeaders']);
+
+			go()->debug($headers);
+
+			foreach($headers as $header) {
+				if(!str_starts_with($header['name'], 'X-')) {
+					throw new Exception("Custom headers must start with X-");
+				}
+				$message->setHeader($header['name'], $header['value']);
+			}
+		}
 
 
 		$this->fireEvent('beforesend', array(
@@ -1256,6 +1272,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$response['data']['plainbody'] .= $header . $oldMessage['plainbody'];
 		}
 
+		$response['sendParams']['references'] = $message->message_id;
+
 		if($message instanceof ImapMessage){
 			//for saving sent items in actionSend
 			$response['sendParams']['forward_uid'] = $message->uid;
@@ -1301,7 +1319,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			throw new NotFound();
 		}
 
-		$imapMessage = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
+		$customHeaders = !empty($params['customHeaders']) ? explode(',', $params['customHeaders']) : [];
+		$imapMessage = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid'], $customHeaders);
 
 		if(!$imapMessage) {
 			throw new NotFound();
@@ -1318,6 +1337,11 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$plaintext = !empty($params['plaintext']);
 
 		$response = $imapMessage->toOutputArray(!$plaintext,false,$params['no_max_body_size']);
+
+		foreach($customHeaders as $customHeader) {
+			$response[$customHeader] = $imapMessage->{strtolower(str_replace("-", "_", $customHeader))} ?? null;
+		}
+
 		$response['uid'] = intval($params['uid']);
 		$response['mailbox'] = $params['mailbox'];
 		$response['isDraft'] = $params['mailbox'] == $account->drafts;
@@ -1877,7 +1901,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 					$flags .= ' $Forwarded';
 				}
 
-				if(!$imap2->append_message($params['to_mailbox'], $source, $flags)) {
+				if(!$imap2->append_message($params['to_mailbox'], $source, $flags, new DateTime($header['internal_date']))) {
 					$imap2->disconnect();
 					throw new \Exception('Could not move message');
 				}

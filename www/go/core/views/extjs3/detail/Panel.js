@@ -56,7 +56,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		this.cls += " go-detail-view-" + this.entityStore.entity.name.toLowerCase();
 		
 		this.on('afterrender', function() {
-			this.reset();
+			this.internalReset();
 
 			this.body.on("click", this.onBodyClick, this);
 		}, this);
@@ -120,18 +120,23 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 
 	reset: function () {
 
+		this.internalReset();
+
+		
+		this.fireEvent('reset', this);
+	},
+
+	internalReset: function() {
 		this.data = {};
 		this.currentId = null;
 
 		if(this.getTopToolbar()) {
 			this.getTopToolbar().setDisabled(true);
 		}
-		
+
 		this.items.each(function (item, index, length) {
 			item.hide();
 		}, this);
-		
-		this.fireEvent('reset', this);
 	},
 
 	onLoad: async function () {

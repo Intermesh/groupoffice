@@ -51,6 +51,7 @@ class TaskList extends AclOwnerEntity
 		return self::Roles[$this->role] ?? 'list';
 	}
 
+
 	/**
 	 *
 	 * @param string $value ['list'|'board'|'project']
@@ -91,9 +92,9 @@ class TaskList extends AclOwnerEntity
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()->add('isSubscribed', function(Criteria $criteria, $value, Query $query) {
-				$query->where('isSubscribed','=', $value);
+			$criteria->where('isSubscribed','=', $value);
 				if($value === false) {
-					$query->orWhere('isSubscribed', 'IS', null);
+					$criteria->orWhere('isSubscribed', 'IS', null);
 				}
 			})
 			->add('role', function (Criteria $criteria, $value) {
@@ -143,7 +144,7 @@ class TaskList extends AclOwnerEntity
 				$project = ProjectEntity::findById($this->projectId, ['id', 'acl_id']);
 				$this->aclId = $project->acl_id;
 			}
-		} else if($this->ownerId === go()->getUserId()) {
+		} else if($this->ownerId === go()->getUserId() && !empty($this->color)) {
 			$this->defaultColor = $this->color;
 		}
 		if(empty($this->color)) {
