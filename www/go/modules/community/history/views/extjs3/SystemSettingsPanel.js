@@ -29,7 +29,7 @@ go.modules.community.history.SystemSettingsPanel = Ext.extend(go.systemsettings.
 				}]
 		}];
 
-		go.modules.community.addressbook.SystemSettingsPanel.superclass.initComponent.call(this);
+		go.modules.community.history.SystemSettingsPanel.superclass.initComponent.call(this);
 	}
 
 });

@@ -6,21 +6,28 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 	_isDirty: false,
 	hidden: false,
 
+	hasDescription: false,
+
 	initComponent: function () {
 
+		const fields = [
+			"blobId",
+			"name",
+			{
+				name: "inline",
+				type: "bool"
+			}, {
+				name: "attachment",
+				type: "bool"
+			}
+		];
+
+		if(this.hasDescription) {
+			fields.push("description");
+		}
+
 		this.store = new go.data.Store({
-			fields: [
-				"blobId",
-				"name",
-				{
-					name: "inline",
-					type: "bool"
-				}, {
-					name: "attachment",
-					type: "bool"
-				},
-				"description"
-			]
+			fields
 		});
 
 		this.dataView = new Ext.DataView({
@@ -34,7 +41,7 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 				'<div style="overflow-x:hidden" tabindex="0" class="go-attachments">' +
 				'<tpl for=".">',
 				'<span class="filetype-link filetype-{[this.getExtension(values.name)]} x-unselectable" unselectable="on" style="float:left" id="{id}">{name}' +
-				'<tpl if="description"> - <span style="color: var(--c-secondary);">{description}</span></tpl></span>' +
+				'<tpl if="values.description"> - <span style="color: var(--c-secondary);">{description}</span></tpl></span>' +
 				'</tpl>' +
 				'</div>',
 				'<div class="x-clear"></div>',
@@ -92,6 +99,7 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 						window.open(go.Jmap.downloadUrl(records[0].data.blobId, true));
 					}
 				},{
+					hidden: !this.hasDescription,
 					iconCls: 'ic-edit',
 					text: t("Edit"),
 					scope: this,

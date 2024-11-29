@@ -2971,8 +2971,7 @@ Ext.Element.addMethods(function(){
         getHeight : function(contentHeight){
             var me = this,
                 dom = me.dom,
-                hidden = Ext.isIE9m && me.isStyle('display', 'none'),
-                h = MATH.max(dom.offsetHeight, hidden ? 0 : dom.clientHeight) || 0;
+                h = MATH.max(dom.offsetHeight, dom.clientHeight, this.dom.getBoundingClientRect().height) || 0;
 
             h = !contentHeight ? h : h - me.getBorderWidth("tb") - me.getPadding("tb");
             return h < 0 ? 0 : h;
@@ -2982,10 +2981,10 @@ Ext.Element.addMethods(function(){
         getWidth : function(contentWidth){
             var me = this,
                 dom = me.dom,
-                hidden = Ext.isIE9m && me.isStyle('display', 'none'),
-                w = MATH.max(dom.offsetWidth, hidden ? 0 : dom.clientWidth) || 0;
+                w = MATH.max(dom.offsetWidth, dom.clientWidth, this.dom.getBoundingClientRect().width) || 0;
             w = !contentWidth ? w : w - me.getBorderWidth("lr") - me.getPadding("lr");
-            return w < 0 ? 0 : w;
+					return w < 0 ? 0 : w;
+
         },
 
         
@@ -17559,10 +17558,6 @@ Ext.Container.LAYOUTS.toolbar = Ext.layout.ToolbarLayout;
         if(ct.floating){
             if(w){
                 ct.setWidth(w);
-            }else if(Ext.isIE9m){
-                ct.setWidth(Ext.isStrict && (Ext.isIE7 || Ext.isIE8 || Ext.isIE9) ? 'auto' : ct.minWidth);
-                var el = ct.getEl(), t = el.dom.offsetWidth; 
-                ct.setWidth(ct.getLayoutTarget().getWidth() + el.getFrameWidth('lr'));
             }
         }
     }
@@ -38523,40 +38518,43 @@ Ext.menu.Menu = Ext.extend(Ext.Container, {
 
     
     showAt : function(xy, parentMenu){
+
         if(this.fireEvent('beforeshow', this) !== false){
             this.parentMenu = parentMenu;
             if(!this.el){
                 this.render();
             }
+
+					this.el.setXY(xy);
+					this.el.show();
+					Ext.menu.Menu.superclass.onShow.call(this);
+
+					this.hidden = false;
             if(this.enableScrolling){
                 
                 this.el.setXY(xy);
-                
-                xy[1] = this.constrainScroll(xy[1]);
-                xy = [this.el.adjustForConstraints(xy)[0], xy[1]];
+								// we need to wait for the transition to get the correct height
+                setTimeout(() => {
+									xy[1] = this.constrainScroll(xy[1]);
+
+									xy = [this.el.adjustForConstraints(xy)[0], xy[1]];
+								}, 300)
             }else{
                 
                 xy = this.el.adjustForConstraints(xy);
             }
-            this.el.setXY(xy);
-            this.el.show();
-            Ext.menu.Menu.superclass.onShow.call(this);
-            if(Ext.isIE9m){
-                
-                this.fireEvent('autosize', this);
-                if(!Ext.isIE8){
-                    this.el.repaint();
-                }
-            }
-            this.hidden = false;
+
+
             this.focus();
             this.fireEvent('show', this);
         }
     },
 
     constrainScroll : function(y){
+
         var max, full = this.ul.setHeight('auto').getHeight(),
             returnY = y, normalY, parentEl, scrollTop, viewHeight;
+
         if(this.floating){
             parentEl = Ext.fly(this.el.dom.parentNode);
             scrollTop = parentEl.getScroll().top;

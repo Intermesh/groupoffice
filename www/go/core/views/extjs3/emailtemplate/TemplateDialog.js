@@ -5,7 +5,8 @@ go.emailtemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 	entityStore: "EmailTemplate",
 	width: dp(1000),
 	height: dp(800),
-	formPanelLayout: "fit",
+	// formPanelLayout: "fit",
+	autoScroll: false,
 	resizable: true,
 	maximizable: true,
 	collapsible: true,
@@ -14,7 +15,9 @@ go.emailtemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 	initFormItems: function () {
 
 		return [
-			new go.emailtemplate.TemplateFieldset()
+			new go.emailtemplate.TemplateFieldset({
+				anchor: "100% 100%"
+			})
 		];
 	}
 
