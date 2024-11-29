@@ -1,3 +1,4 @@
+- ldapauth: Create postfixadmin account if domain matches serverclient domain
 - Finance: Fixed group by employee when billing from projects
 - History: History was depending on address book module by mistake
 - Billing: Fixed catalog export number formatting
