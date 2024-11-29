@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpComposerExtensionStubsInspection */
 
 namespace go\core\ldap;
 
@@ -20,7 +20,10 @@ use Iterator;
  * @license AGPL/Proprietary http://www.group-office.com/LICENSE.TXT
  * @link http://www.group-office.com
  * @copyright Copyright Intermesh BV
- * @author Merijn Schering <mschering@intermesh.nl> 
+ * @author Merijn Schering <mschering@intermesh.nl>
+ *
+ * @template T
+ * @implements Iterator<T>
  */
 class Result implements Iterator, Countable {
 
@@ -48,18 +51,20 @@ class Result implements Iterator, Countable {
 		$this->connection = $ldapConn;
 	}
 
-	#[\ReturnTypeWillChange]
-	public function current() {		
+	/**
+	 * @return T
+	 */
+	public function current() :mixed {
 		return $this->current;
 	}
 
-	#[\ReturnTypeWillChange]
-	public function key() {
+	public function key(): mixed
+	{
 		return $this->index;
 	}
 
-	#[\ReturnTypeWillChange]
-	public function next() {	
+	public function next(): void
+	{
 		$this->index++;
 		$this->setEntry(ldap_next_entry($this->connection->getLink(), $this->entryId));
 	}
