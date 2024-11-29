@@ -75,7 +75,7 @@ go.filter.FilterGrid = Ext.extend(go.grid.GridPanel, {
 		const selected = this.getSelectionModel().getSelections();
 
 		if(!selected.length) {
-			this.filterStore.setFilter("user", null);
+			this.filterStore.setFilter("user", undefined);
 		} else {
 			let filter = {
 				operator: "AND",
