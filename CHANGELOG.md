@@ -1,3 +1,4 @@
+- Core: Fixed checkbox custom field filter to match null values when client sends 'false'
 - ldapauth: Create postfixadmin account if domain matches serverclient domain
 - Finance: Fixed group by employee when billing from projects
 - History: History was depending on address book module by mistake
