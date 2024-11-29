@@ -2,6 +2,7 @@
 - History: History was depending on address book module by mistake
 - Billing: Fixed catalog export number formatting
 - Billing: Fixed order xls export
+- ldapauth: handle error: Partial search results returned: Sizelimit exceeded
 
 25-11-2024: 6.8.87
 - Core: Added new option to toggle use of ctrl + enter to send e-mail / comments
