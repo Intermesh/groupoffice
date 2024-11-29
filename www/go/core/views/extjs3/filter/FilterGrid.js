@@ -75,7 +75,13 @@ go.filter.FilterGrid = Ext.extend(go.grid.GridPanel, {
 		const selected = this.getSelectionModel().getSelections();
 
 		if(!selected.length) {
-			this.filterStore.setFilter("user", undefined);
+			if(this.filterStore) {
+				this.filterStore.setFilter("user", undefined);
+			}
+
+			this.fire("change", this, undefined);
+
+
 		} else {
 			let filter = {
 				operator: "AND",
@@ -86,9 +92,15 @@ go.filter.FilterGrid = Ext.extend(go.grid.GridPanel, {
 				filter.conditions.push(record.get('filter'));
 			});
 
-			this.filterStore.setFilter("user", filter);
+			if(this.filterStore) {
+				this.filterStore.setFilter("user", filter);
+			}
+
+			this.fire("change", this, filter);
 		}
-		this.filterStore.load();
+
+		if(this.filterStore)
+			this.filterStore.load();
 	},
 
 	initRowActions: function () {

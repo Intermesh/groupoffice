@@ -181,8 +181,14 @@ go.filter.VariableFilterPanel = Ext.extend(Ext.Panel, {
 
 		});
 
-		this.filterStore.setFilter('customfilters', filter);
-		this.filterStore.load().then(() => {this.fireEvent('resize');});
+		if(this.filterStore) {
+			this.filterStore.setFilter('customfilters', filter);
+			this.filterStore.load().then(() => {
+				this.fireEvent('resize');
+			});
+		}
+
+		this.fire("change", this, filter);
 	},
 
 
