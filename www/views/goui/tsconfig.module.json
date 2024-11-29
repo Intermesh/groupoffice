@@ -6,26 +6,31 @@
     "lib": ["es2020", "dom"],
     "moduleResolution": "bundler",
     "module":"preserve",
+    "esModuleInterop": true,
     "outDir": "./dist", //set this in the extended
     "baseUrl": ".", //set this in the extended too
     "paths": {
       "@intermesh/goui": [
-        "../../../../../../views/goui/goui/script/index.ts"
+        "../../../../../../views/goui/dist/goui/script/index.d.ts",
+        "../../../../../../views/goui/goui/script/index.ts" // second line is needed for PHPStorm
 
       ],
       "@intermesh/groupoffice-core": [
+        "../../../../../../views/goui/dist/groupoffice-core/script/index.d.ts",
         "../../../../../../views/goui/groupoffice-core/script/index.ts"
       ],
 
       "chart.js/auto": [
-        "../../../../../../views/goui/groupoffice-core/node_modules/chart.js/auto/auto.d.ts"
+        "../../../../../../views/goui/groupoffice-core/node_modules/chart.js/auto/auto.d.ts",
       ],
 
       "@intermesh/business/*": [
+        "../../../../../../go/modules/business/*/views/goui/dist/Index.d.ts",
         "../../../../../../go/modules/business/*/views/goui/script/Index.ts"
       ],
 
       "@intermesh/community/*": [
+        "../../../../../../go/modules/community/*/views/goui/dist/Index.d.ts",
         "../../../../../../go/modules/community/*/views/goui/script/Index.ts"
       ]
     }
