@@ -1,3 +1,4 @@
+02-12-2024: 6.8.88
 - Calendar: When events are private but writable. Posting the event with CalDAV will not change the title or description
 - Files: Detail panel will change to folder when a different folder is selected in the tree.
 - Core: Fixed checkbox custom field filter to match null values when client sends 'false'
@@ -11,7 +12,6 @@
 - Core: fixed displacement of context menu
 
 25-11-2024: 6.8.87
-
 - Core: Added new option to toggle use of ctrl + enter to send e-mail / comments
 - Billing: Import and export custom fields and match by ID
 - Newsletters: Fixed newsletter template attachments not saving.
