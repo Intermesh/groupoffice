@@ -1,5 +1,6 @@
 - Finance: Fixed group by employee when billing from projects
 - History: History was depending on address book module by mistake
+- Files: bugfix file notification
 
 25-11-2024: 6.8.87
 - Core: Added new option to toggle use of ctrl + enter to send e-mail / comments
