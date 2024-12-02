@@ -51,7 +51,8 @@ export class EventWindow extends FormWindow {
 		const m = go.Modules.get('community','calendar');
 		this.title = t('Event');
 		this.width = 440;
-		this.height = 820;
+		this.height = 840;
+		this.resizable = true;
 		this.store = this.form.dataSource as JmapDataSource; //jmapds("CalendarEvent");
 		// this.startTime = textfield({type:'time',value: '12:00', width: 128})
 		// this.endTime = textfield({type:'time',value: '13:00', width: 128})
