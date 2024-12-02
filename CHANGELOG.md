@@ -1,8 +1,15 @@
+- Core: Fixed checkbox custom field filter to match null values when client sends 'false'
+- ldapauth: Create postfixadmin account if domain matches serverclient domain
 - Finance: Fixed group by employee when billing from projects
 - History: History was depending on address book module by mistake
 - Files: bugfix file notification
+- Billing: Fixed catalog export number formatting
+- Billing: Fixed order xls export
+- ldapauth: handle error: Partial search results returned: Sizelimit exceeded
+- Core: fixed displacement of context menu
 
 25-11-2024: 6.8.87
+
 - Core: Added new option to toggle use of ctrl + enter to send e-mail / comments
 - Billing: Import and export custom fields and match by ID
 - Newsletters: Fixed newsletter template attachments not saving.

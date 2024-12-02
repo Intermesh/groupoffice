@@ -38525,28 +38525,24 @@ Ext.menu.Menu = Ext.extend(Ext.Container, {
                 this.render();
             }
 
+
+            if(this.enableScrolling){
+                this.el.setXY(xy);
+
+								xy[1] = this.constrainScroll(xy[1]);
+								xy = [this.el.adjustForConstraints(xy)[0], xy[1]];
+            }else {
+                xy = this.el.adjustForConstraints(xy);
+            }
+
 					this.el.setXY(xy);
 					this.el.show();
 					Ext.menu.Menu.superclass.onShow.call(this);
 
 					this.hidden = false;
-            if(this.enableScrolling){
-                
-                this.el.setXY(xy);
-								// we need to wait for the transition to get the correct height
-                setTimeout(() => {
-									xy[1] = this.constrainScroll(xy[1]);
 
-									xy = [this.el.adjustForConstraints(xy)[0], xy[1]];
-								}, 300)
-            }else{
-                
-                xy = this.el.adjustForConstraints(xy);
-            }
-
-
-            this.focus();
-            this.fireEvent('show', this);
+					this.focus();
+					this.fireEvent('show', this);
         }
     },
 
