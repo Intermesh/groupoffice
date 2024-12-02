@@ -1,3 +1,4 @@
+- Calendar: When events are private but writable. Posting the event with CalDAV will not change the title or description
 - Files: Detail panel will change to folder when a different folder is selected in the tree.
 - Core: Fixed checkbox custom field filter to match null values when client sends 'false'
 - ldapauth: Create postfixadmin account if domain matches serverclient domain
