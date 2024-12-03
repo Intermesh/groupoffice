@@ -296,6 +296,8 @@ class Contact extends AclItemEntity {
 
 	public ?DateTime $lastCommentAt = null;
 
+	public ?DateTime $actionAt = null;
+
 	public function getStarred(): bool
 	{
 		return !!$this->starred;
@@ -667,11 +669,8 @@ class Contact extends AclItemEntity {
 												->andWhere('dob.date',$comparator, $value);
 										})
 										->addDateTime("actionDate", function(Criteria $criteria, $comparator, $value, Query $query) {
-											if(!$query->isJoined('addressbook_date', 'actionDate')) {
-												$query->join('addressbook_date', 'actionDate', 'actionDate.contactId = c.id');
-											}
-											$criteria->where('actionDate.type', '=', Date::TYPE_ACTION)
-												->andWhere('actionDate.date',$comparator, $value);
+
+											$criteria->where('actionAt',$comparator, $value);
 										})
 										->addDateTime("birthday", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_date', 'bdate')) {
@@ -785,11 +784,6 @@ class Contact extends AclItemEntity {
 			$query->join('addressbook_addressbook', 'abSort', 'abSort.id = c.addressBookId', 'INNER');
 			$sort->renameKey('addressBook', 'abSort.name');
 		}
-
-		if(isset($sort['actionDate'])) {
-			$query->join('addressbook_date', 'actionDateSort', 'actionDateSort.contactId = c.id and actionDateSort.type="action"', 'LEFT');
-			$sort->renameKey('actionDate', 'actionDateSort.date');
-		};
 		
 		return parent::sort($query, $sort);
 	}

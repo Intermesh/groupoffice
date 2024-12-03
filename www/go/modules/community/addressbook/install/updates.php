@@ -224,3 +224,13 @@ $updates['202412031558'][] = "update addressbook_contact c
     inner join comments_comment com on 
         com.entityId = c.id and com.entityTypeId = (select id from core_entity where name='Contact')
 set c.lastCommentAt = com.createdAt;";
+
+
+$updates['202412031558'][] = "alter table addressbook_contact
+    add actionAt date null;";
+
+$updates['202412031558'][] = "create index addressbook_contact_actionAt_index
+    on addressbook_contact (actionAt);";
+
+$updates['202412031558'][] = "update addressbook_contact c
+set c.actionAt = (select max(date) from addressbook_date where contactId = c.id);";

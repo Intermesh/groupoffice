@@ -31,6 +31,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				{name: 'createdAt', type: 'date'},
 				{name: 'modifiedAt', type: 'date'},
 				{name: 'lastCommentAt', type: 'date'},
+				{name: 'actionAt', type: 'date'},
 				{name: 'creator', type: "relation"},
 				{name: 'modifier', type: "relation"},
 				{name: 'addressbook', type: "relation"},
@@ -45,7 +46,6 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				'starred',
 				"birthday",
 				"age",
-				"actionDate",
 				"gender",
 				"streetAddresses",
 				{name: 'organizations', type: "relation"},
@@ -335,24 +335,13 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: "age",
 					hidden: this.enabledColumns.indexOf('age') == -1,
 				},{
-					id: 'actionDate',
+					id: 'actionAt',
+					xtype: "datecolumn",
 					header: t('Action date'),
 					sortable: true,
-					dataIndex: "actionDate",
-					renderer: function(v, meta, record) {
-						if(!record.data.dates) {
-							return "";
-						}
-						var bday = "";
-						record.data.dates.forEach(function(date) {
-							if(date.type == "action") {
-								bday = date.date;
-							}
-						});
+					dataIndex: "actionAt",
 
-						return go.util.Format.date(bday);
-					},
-					hidden: this.enabledColumns.indexOf('actionDate') == -1,
+					hidden: this.enabledColumns.indexOf('actionAt') == -1,
 				}
 			],
 			viewConfig: {
