@@ -56,7 +56,8 @@ CREATE TABLE `addressbook_contact` (
   `color` CHAR(6) NULL DEFAULT NULL,
   `nameBank` varchar(50) DEFAULT NULL,
   `BIC` varchar(11) DEFAULT NULL,
-  `newsletterAllowed` boolean default true null
+  `newsletterAllowed` boolean default true null,
+  lastCommentAt datetime null
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `addressbook_contact_custom_fields` (
@@ -244,3 +245,6 @@ create index addressbook_contact_addressBookId_name_index
 
 create index addressbook_contact_isOrganization_index
     on addressbook_contact (isOrganization);
+
+create index addressbook_contact_lastCommentAt_index
+    on addressbook_contact (lastCommentAt);

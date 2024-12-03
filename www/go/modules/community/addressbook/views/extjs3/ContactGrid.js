@@ -30,6 +30,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				'lastName',
 				{name: 'createdAt', type: 'date'},
 				{name: 'modifiedAt', type: 'date'},
+				{name: 'lastCommentAt', type: 'date'},
 				{name: 'creator', type: "relation"},
 				{name: 'modifier', type: "relation"},
 				{name: 'addressbook', type: "relation"},
@@ -183,6 +184,16 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					},
 					width: dp(200),
 					hidden: this.enabledColumns.indexOf('addressbook') == -1
+				},
+				{
+					xtype: "datecolumn",
+					id: 'lastCommentAt',
+					header: t('Last commented at'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'lastCommentAt',
+
+					hidden: this.enabledColumns.indexOf('createdAt') == -1
 				},
 				{
 					xtype: "datecolumn",

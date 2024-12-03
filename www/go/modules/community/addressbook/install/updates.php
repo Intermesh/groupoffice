@@ -212,3 +212,15 @@ $updates['202406271434'][] = "alter table addressbook_contact
 
 
 $updates['202406271434'][] = "update addressbook_contact set lastName = SUBSTRING(name, 1, 100) where isOrganization=true;";
+
+
+$updates['202412031558'][] = "alter table addressbook_contact
+    add lastCommentAt datetime null;";
+
+$updates['202412031558'][] = "create index addressbook_contact_lastCommentAt_index
+    on addressbook_contact (lastCommentAt);";
+
+$updates['202412031558'][] = "update addressbook_contact c 
+    inner join comments_comment com on 
+        com.entityId = c.id and com.entityTypeId = (select id from core_entity where name='Contact')
+set c.lastCommentAt = com.createdAt;";

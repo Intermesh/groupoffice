@@ -292,6 +292,10 @@ class Contact extends AclItemEntity {
 	 */
 	public bool $newsletterAllowed = true;
 
+
+
+	public ?DateTime $lastCommentAt = null;
+
 	public function getStarred(): bool
 	{
 		return !!$this->starred;
