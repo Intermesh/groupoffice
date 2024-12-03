@@ -16,12 +16,12 @@ class Spreadsheet extends convert\Spreadsheet
 	protected function init() {
 		$this->addColumn('notebook', go()->t('Notebook', 'community', 'notes'));
 	}
-	protected function exportList(Note $note) {
+	protected function exportNotebook(Note $note) {
 		$nb = NoteBook::findById($note->noteBookId, ['name']);
 		return $nb->name;
 	}
 
-	protected function importList(Note $note, $value, array $values) {
+	protected function importNotebook(Note $note, $value, array $values) {
 		$nb = TaskList::find(['id'])->where('name', '=', $value);
 		if($nb) {
 			$note->noteBookId = $nb->id;
