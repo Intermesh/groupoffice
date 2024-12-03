@@ -39,7 +39,6 @@ go.Router = (function () {
 			//this._setPath = path; //to cancel event
 			if ("#" + path != window.location.hash) {
 				this.suspendEvent = true;
-				debugger;
 				window.location.hash = path;
 			}
 		},
@@ -101,7 +100,6 @@ go.Router = (function () {
 			if (this.suspendEvent) {
 				var me = this;
 				setTimeout(function () {
-					debugger;
 					me.suspendEvent = false;
 				});
 
