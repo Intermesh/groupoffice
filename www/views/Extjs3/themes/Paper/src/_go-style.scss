@@ -361,7 +361,7 @@ a {
 	top: 0;
 	right: 0;
 	position: absolute;
-	z-index: 1;
+	//z-index: 1;
 	padding-right: dp(8);
 	/* padding: 20px 20px 20px 0px; */
 	/* height: 46px; */
@@ -921,7 +921,7 @@ button {
 	position:absolute;	
 	right: dp(16);
 	top: dp(6);
-	z-index:15;
+	//z-index:15;
 	.avatar {
 		border: 1px solid white;
 	}
