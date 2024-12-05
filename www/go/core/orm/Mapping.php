@@ -349,7 +349,7 @@ class Mapping {
 		$col->name = $name;
 		$col->dbType = strtolower($type);
 
-		$this->scalarProperties[] = $col;
+		$this->scalarProperties[$name] = $col;
 
 		return $this;
 	}
@@ -361,6 +361,10 @@ class Mapping {
 	 */
 	public function getScalarProperties() : array {
 		return $this->scalarProperties;
+	}
+
+	public function getScalarProperty($name): ?Column {
+		return $this->scalarProperties[$name] ?? null;
 	}
 	
 	/**
@@ -507,7 +511,7 @@ class Mapping {
 	 */
 	public function hasProperty(string $name): bool
 	{
-		return $this->getRelation($name) != false || $this->getColumn($name) != false;
+		return $this->getProperty($name) != false;
 	}
 
 	/**
@@ -523,6 +527,11 @@ class Mapping {
 		}
 
 		$col = $this->getColumn($name);
+		if($col) {
+			return $col;
+		}
+
+		$col = $this->getScalarProperty($name);
 		if($col) {
 			return $col;
 		}

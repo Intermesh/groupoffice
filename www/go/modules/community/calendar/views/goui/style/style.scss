@@ -757,10 +757,22 @@ $timeMargin: dp(72);
 //	}
 //}
 
-@media only screen and (max-width: 845px) {
+@media only screen and ((max-device-width: $breakpointMedium) or (max-device-height: $breakpointMedium)) {
 	//.cal.week > ul:first-child em {
 	//	display:inline-block !important;
 	//}
+	.cal.lijst {
+		.detail { display:none;}
+	}
+	.goui.cal {
+		zoom:.76;
+		.events > div {
+			padding-right:0 !important;
+			padding-left:2px !important;
+			&:before {display:none;}
+			span {display:none;}
+		}
+	}
 	.goui.hbox.tablet-cards > aside.active {
 		position:absolute;
 		inset:0;

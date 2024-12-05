@@ -9,6 +9,7 @@ import {t} from "./Index.js";
 
 export interface MonthViewEventMap<Type> extends ComponentEventMap<Type> {
 	selectweek: (me: Type, day: DateTime) => false | void
+	dayclick: (me: Type, day: any) => void
 }
 
 export interface MonthView extends CalendarView {
@@ -183,11 +184,14 @@ export class MonthView extends CalendarView {
 				eventContainer = E('li').cls('events'),
 				row = E('ol',eventContainer);
 			for (i = 0; i < 7; i++) {
+				const cDay = day.clone();
 				row.append(E('li',
 					(i==0 && client.user.calendarPreferences.showWeekNumbers) ? E('sub','W '+day.getWeekOfYear()).cls('weeknb').cls('not-small-device')
 						.on('click',_e => this.fire('selectweek', this, weekStart))
 						.on('mousedown',e=>e.stopPropagation()):'',
-					E('span',E('em', day.format( 'j')), day.format( day.getDate() === 1 ?' M' :''))
+					E('span',E('em', day.format( 'j')), day.format( day.getDate() === 1 ?' M' :'')).on('click', _e => {
+						this.fire('dayclick', this, cDay);
+					}).on('mousedown', e => { e.stopPropagation()})
 				).attr('data-date', day.format('Y-m-d'))
 				 .cls('today', day.format('Ymd') === now.format('Ymd'))
 				 .cls('past', day.format('Ymd') < now.format('Ymd'))
