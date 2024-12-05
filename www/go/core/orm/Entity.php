@@ -869,20 +869,16 @@ abstract class Entity extends Property {
 
 		$filters->addDateTime('commentedAt', function (Criteria $criteria, $comparator, $value, Query $query) {
 
-			if(static::getMapping()->getColumn('lastCommentAt')) {
-				$criteria->where('lastCommentAt', $comparator, $value);
-			} else {
-
-				if (!$query->isJoined('comments_comment', 'comment')) {
-					$query->join('comments_comment', 'comment', 'comment.entityId = ' . $query->getTableAlias() . '.id AND comment.entityTypeId=' . static::entityType()->getId());
-				}
-
-				$tag = ":commentedAt" . uniqid();
-
-				$query->having('MAX(comment.date) ' . $comparator . ' ' . $tag)
-					->bind($tag, $value->format(Column::DATETIME_FORMAT))
-					->groupBy(['id']);
+			if (!$query->isJoined('comments_comment', 'comment')) {
+				$query->join('comments_comment', 'comment', 'comment.entityId = ' . $query->getTableAlias() . '.id AND comment.entityTypeId=' . static::entityType()->getId());
 			}
+
+			$tag = ":commentedAt" . uniqid();
+
+			$query->having('MAX(comment.date) ' . $comparator . ' ' . $tag)
+				->bind($tag, $value->format(Column::DATETIME_FORMAT))
+				->groupBy(['id']);
+
 		});
 
 		$filters->addText('comment', function (Criteria $criteria, $comparator, $value, Query $query) {

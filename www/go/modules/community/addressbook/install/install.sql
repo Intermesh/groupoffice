@@ -57,7 +57,7 @@ CREATE TABLE `addressbook_contact` (
   `nameBank` varchar(50) DEFAULT NULL,
   `BIC` varchar(11) DEFAULT NULL,
   `newsletterAllowed` boolean default true null,
-  lastCommentAt datetime null,
+  lastContactAt datetime null,
   actionAt date null
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -247,8 +247,8 @@ create index addressbook_contact_addressBookId_name_index
 create index addressbook_contact_isOrganization_index
     on addressbook_contact (isOrganization);
 
-create index addressbook_contact_lastCommentAt_index
-    on addressbook_contact (lastCommentAt);
+create index addressbook_contact_lastContactAt_index
+    on addressbook_contact (lastContactAt);
 
 create index addressbook_contact_actionAt_index
     on addressbook_contact (actionAt);
