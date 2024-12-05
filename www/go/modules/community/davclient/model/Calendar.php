@@ -98,7 +98,7 @@ XML;
 			if(!isset($perHref[$href])) {
 				// create new hrefs
 				$create[] = $href;
-			} else if($perHref[$href]->etag() !== $response->getetag) {
+			} else if($perHref[$href]->etag() !== (string)$response->getetag) {
 				// refetch changed etags
 				$update[] = $href;
 			}
@@ -144,7 +144,7 @@ XML;
 					$event->useDefaultAlerts = true;
 				}
 				$event = ICalendarHelper::parseVObject((string)$response->{'calendar-data'}, $event);
-				$event->etag((string)$response->etag);
+				$event->etag((string)$response->getetag);
 				$event->uri(basename($href));
 				if(!$event->save()){
 					go()->log('cannot sync event '.print_r($event->getValidationErrors(), true));

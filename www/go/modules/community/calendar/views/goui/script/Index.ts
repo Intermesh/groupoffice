@@ -6,11 +6,12 @@ import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {EventDetail, EventDetailWindow} from "./EventDetail.js";
 
 export * from "./Main.js";
+export * from "./CalendarList.js";
 
 export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list';
 export const calendarStore = datasourcestore({
 	dataSource:jmapds('Calendar'),
-	queryParams:{filter:{isSubscribed: true}},
+	queryParams:{filter:{isSubscribed: true, davaccountId : null}},
 	sort: [{property:'sortOrder'},{property:'name'}]
 });
 

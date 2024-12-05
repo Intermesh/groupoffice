@@ -33,8 +33,8 @@ class Module extends core\Module
 	}
 
 	public static function onCalendarMap(Mapping $mapping) {
-		$mapping->addScalarProperty('davaccountId')->addQuery((new Query())
-			->select("davaccountId")
+		$mapping->addScalarProperty('davaccountId','int')->addQuery((new Query())
+			->select("davc.davaccountId")
 			->join('davclient_calendar', 'davc', 'davc.id=calendar_calendar.id', 'LEFT')
 		);
 	}

@@ -1,5 +1,5 @@
 import {
-	btn,
+	btn,Format,
 	column, comp,
 	Component, datasourcestore,
 	h3,
@@ -14,22 +14,26 @@ export class SystemSettings extends Component {
 	constructor() {
 		super();
 
+		const store = datasourcestore({
+			dataSource: jmapds('DavAccount'),
+		});
+
 		this.items.add(comp({cls:'fit'},
 			tbar({}, h3(t('DAV Accounts')), '->',
 				btn({icon:'add',handler: () => { (new AccountWindow()).show()}})
 			),
 			table({
 				fitParent:true,
-				store: datasourcestore({
-					dataSource: jmapds('DavAccount'),
-				}),
+				store,
 				columns: [
 					column({id:'id', header:'id'}),
 					column({id:'name', header:'name'}),
+					column({id:'lastSync', header:'Last Sync',renderer: (date: string) => Format.smartDateTime(date, true)}),
 					column({id:'id', header:'action', renderer: (v) => {
-						return btn({text:'Sync', handler:() => {
+						return btn({text:'Sync', handler:(me) => {
+								me.disabled = true;
 								client.jmap('DavAccount/sync', {accountId:v}).then((response)=> {
-									console.log(response);
+									store.reload();
 								});
 							}
 						})
@@ -43,7 +47,7 @@ export class SystemSettings extends Component {
 					},
 
 					delete: async (tbl) => {
-						const ids = tbl.rowSelection!.selected.map(index => tbl.store.get(index)!.id!);
+						const ids = tbl.rowSelection!.getSelected().map(row => row.id);
 						await jmapds("DavAccount").confirmDestroy(ids);
 					},
 					render: tbl => { tbl.store.load(); }

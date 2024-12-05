@@ -136,37 +136,41 @@ class DavAccount extends AclOwnerEntity {
 		}
 		$homesetUri = $this->homeSetUri($this->principalUri);
 
-		$this->syncCollections($homesetUri);
+		go()->getDbConnection()->beginTransaction();
+
+		$responses = $this->syncCollections($homesetUri);
 
 		// fetch ctag for every calendar.
-		$responses = $this->propfind([
-			'd:sync-token',
-			'cs:getctag'
-		], $homesetUri, 1);
+//		$responses = $this->propfind([
+//			'd:sync-token',
+//			'cs:getctag'
+//		], $homesetUri, 1);
 
-		// todo: delete calendars not in responses
+		// delete calendars not in responses
+		$deletedCalendars = [];
 		foreach($this->collections as $id => $calendar) {
 			if(!array_key_exists($calendar->uri, $responses)) {
 				// delete calendars no longer in response
-				$this->collections[$id] = null;
-				\go\modules\community\calendar\model\Calendar::delete((new Query())->where('id','=',$id));
+				unset($this->collections[$id]);
+				$deletedCalendars[] = $id;
 			} else {
 				$collection = $responses[$calendar->uri];
-				if($calendar->ctag !== (string)$collection->getctag) {
+				if($calendar->isNew() || $calendar->ctag !== (string)$collection->getctag) {
 					// resync
 					$calendar->sync();
 				}
 				unset($responses[$calendar->uri]);
 			}
-
-		}
-		foreach($responses as $remainingResponse) {
-			// todo: new, fetch, add
-
 		}
 
 		$this->lastSync = new \DateTime();
-		$this->save();
+		if(!$this->save()) {
+			go()->log('Could not save dav account '. $homesetUri);
+			go()->getDbConnection()->rollBack();
+		} else if(!empty($deletedCalendars)) {
+			\go\modules\community\calendar\model\Calendar::delete((new Query())->where('id','IN',$deletedCalendars));
+		}
+		go()->getDbConnection()->commit();
 		// fetch
 	}
 
@@ -187,10 +191,18 @@ class DavAccount extends AclOwnerEntity {
 //			if (isset($response->resourcetype->addressbook)) {
 //				$this->addAddressbook($href, $response);
 //			}
-			if (isset($response->resourcetype->calendar)) {
+			$isCalendar = false;
+			if(isset($response->{'supported-calendar-component-set'})) {
+				$isCalendar = (string)$response->{'supported-calendar-component-set'}->comp->attributes()->name === 'VEVENT';
+			}
+
+			if ($isCalendar) {
 				$this->addCalendar($href, $response);
+			} else {
+				// $this->addTasklist()??
 			}
 		}
+		return $responses;
 	}
 
 	/**
@@ -227,7 +239,7 @@ class DavAccount extends AclOwnerEntity {
 				$cal->ctag = (string) $response->getctag;
 				$cal->synctoken = (string) $response->{'sync-token'};
 				$this->collections[$cal->id] = $cal;
-				$cal->sync();
+				//$cal->sync();
 			} else {
 				go()->log('Could not save Calendar '.print_r($model->getValidationErrors(),true));
 			}

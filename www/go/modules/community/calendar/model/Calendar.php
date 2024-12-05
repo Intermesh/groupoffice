@@ -152,9 +152,11 @@ class Calendar extends AclOwnerEntity {
 					$criteria->orWhere('isSubscribed', 'IS', null);
 				}
 		})->add('isResource', function(Criteria $criteria, $value, Query $query) {
-			$query->where('groupId',$value?'IS NOT':'IS', null);
+			$criteria->where('groupId',$value?'IS NOT':'IS', null);
 		})->add('groupId', function(Criteria $criteria, $value, Query $query) {
-			$query->where('groupId','=', $value);
+			$criteria->where('groupId','=', $value);
+		})->add('davaccountId', function(Criteria $criteria, $value, Query $query) {
+			//$criteria->where('davc.davaccountId','=', $value);
 		});
 	}
 

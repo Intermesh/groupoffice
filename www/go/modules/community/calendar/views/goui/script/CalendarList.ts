@@ -34,10 +34,12 @@ export class CalendarList extends Component {
 	private visibleChanges: {[id:number]:boolean} = {};
 
 	list?: List
+	store
 
-	constructor(){
+	constructor(store = calendarStore){
 		super()
-		this.items.add(tbar({cls: 'dense'},
+		this.store = store;
+		this.items.add(store !== calendarStore ? comp() :tbar({cls: 'dense'},
 			comp({tagName: 'h3', html: t('Calendars')}),
 			//btn({icon: 'done_all', handler: () => { this.calendarList.rowSelection!.selectAll();}}),
 			btn({
@@ -61,7 +63,8 @@ export class CalendarList extends Component {
 				)
 			})
 		), this.list = list({
-			store: calendarStore,
+			tagName: 'div',
+			store,
 			cls: 'check-list',
 			rowSelectionConfig: {
 				multiSelect: false,
@@ -75,33 +78,38 @@ export class CalendarList extends Component {
 				}
 			},
 			listeners: {'render': me => {
-					me.store.on('load', (s,items)=> {
-						let record = s.find(c => c.id == CalendarView.selectedCalendarId);
-						if(!record) {
-							record = s.first();
-						}
-						if(record) {
-							me.rowSelection!.add(record);
-						}
-						this.inCalendars = items.reduce((obj, item) => ({ ...obj, [item.id!]: item.isVisible }), {} as any);
-					});
-					me.store.load().then(_c => {
-						// after initial load. check for changed
-						//console.log('calendars loaded');
+				this.localGroup = document.createElement('ul');
+				me.el.append(this.localGroup);
+
+				me.store.on('load', (s,items)=> {
+					let record = s.find(c => c.id == CalendarView.selectedCalendarId);
+					if(!record) {
+						record = s.first();
+					}
+					if(record) {
+						me.rowSelection!.add(record);
+					}
+					this.inCalendars = items.reduce((obj, item) => ({ ...obj, [item.id!]: item.isVisible }), {} as any);
+				});
+				me.store.load().then(_c => {
+					// after initial load. check for changed
+					//console.log('calendars loaded');
 
 
-						//this.applyInCalendarFilter();
-						this.fire('changevisible', this, Object.keys(this.inCalendars).filter(key => this.inCalendars[key]));
+					//this.applyInCalendarFilter();
+					this.fire('changevisible', this, Object.keys(this.inCalendars).filter(key => this.inCalendars[key]));
 
-						//this.updateView();
+					//this.updateView();
 
-					});
-				}},
-			renderer: this.checkboxRenderer
+				});
+			}},
+			renderer: this.checkboxRenderer.bind(this)
 		}));
 	}
+	private davGroups: {[id:number]: HTMLElement} = {}
+	private localGroup!: HTMLElement;
 
-	checkboxRenderer: RowRenderer = (data, _row, _list, _storeIndex) => {
+	checkboxRenderer(data: any, _row: HTMLElement, _list: List, _storeIndex: number) {
 		// if(data.isVisible) {
 		// 	this.inCalendars[storeIndex] = true;
 		// }
@@ -135,12 +143,12 @@ export class CalendarList extends Component {
 							dlg.show();
 						}}),
 					btn({icon:'delete', text: t('Delete','core','core')+'…', disabled:!data.myRights.mayAdmin, handler: async _ => {
-							jmapds("Calendar").confirmDestroy([data.id]);
-						}}),
+						jmapds("Calendar").confirmDestroy([data.id]);
+					}}),
 					hr(),
 					btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
-							calendarStore.dataSource.update(data.id, {isSubscribed: false});
-						}}),
+						jmapds('Calendar').update(data.id, {isSubscribed: false});
+					}}),
 					hr(),
 					btn({icon:'file_save',hidden:data.groupId, text: t('Export','core','core'), handler: _ => { client.getBlobURL('community/calendar/calendar/'+data.id).then(window.open) }}),
 					btn({icon:'upload_file',hidden:data.groupId, text:t('Import','core','core')+'…', handler: async ()=> {
@@ -157,7 +165,7 @@ export class CalendarList extends Component {
 	private importIcs(blob: any, data:any) {
 		const calendarSelect = select({
 				label: t('Calendar'), name: 'calendarId', required: true, flex: '1 30%',value:data.id,
-				store: calendarStore, valueField: 'id', textRenderer: (r: any) => r.name,
+				store: this.store, valueField: 'id', textRenderer: (r: any) => r.name,
 			}),
 			uidCheckbox = checkbox({name:'ignoreUID', label: t('Import events as new (Ignore UID)')}),
 			statusReport = comp({hidden:true}),
@@ -208,7 +216,7 @@ export class CalendarList extends Component {
 	saveSelectionChanges = FunctionUtil.buffer(2000, () => {
 		//save isVisible
 		for(const id in this.visibleChanges) {
-			calendarStore.dataSource.update(id, {isVisible:this.visibleChanges[id]});
+			jmapds('Calendar').update(id, {isVisible:this.visibleChanges[id]});
 		}
 		this.visibleChanges = {};
 	})
