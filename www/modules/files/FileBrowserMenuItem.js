@@ -29,11 +29,11 @@ GO.files.openDetailViewFileBrowser = function () {
 
 			folderId = result.files_folder_id;
 
-			//hack to update entity store
-			var store = go.Db.store(fb.model_name);
-			if (store && store.data[fb.model_id]) {
-				store.data[fb.model_id].filesFolderId = result.files_folder_id;
-			}
+			// //hack to update entity store
+			// var store = go.Db.store(fb.model_name);
+			// if (store && store.data[fb.model_id]) {
+			// 	store.data[fb.model_id].filesFolderId = result.files_folder_id;
+			// }
 
 			//reload display panel on close
 			GO.files.fileBrowserWin.on('hide', function () {
