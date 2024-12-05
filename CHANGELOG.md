@@ -1,4 +1,4 @@
-- Addressbook: Last commented at in columns
+Address book: Added "Last contact at" column that updates when a comment is made or an e-mail is linked
 
 02-12-2024: 6.8.88
 - Calendar: When events are private but writable. Posting the event with CalDAV will not change the title or description
