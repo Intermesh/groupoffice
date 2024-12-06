@@ -26,7 +26,6 @@ import {Settings} from "./Settings.js";
 import {ResourcesWindow} from "./ResourcesWindow.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 import {ListView} from "./ListView.js";
-import {PreferencesWindow} from "./PreferencesWindow.js";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarList} from "./CalendarList.js";
 
@@ -261,12 +260,7 @@ export class Main extends Component {
 								btn({icon: 'view_module', text: t('Month'), handler:() => { this.openPDF('month'); }})
 							)
 						}),
-						btn({icon:'meeting_room', text:t('Resources')+'…', handler: _ => { (new ResourcesWindow()).show()}}),
-						btn({icon: 'settings', text: t('Preferences')+'…', handler: _ => {
-							const d=new PreferencesWindow();
-							d.show();
-							d.load(go.User.id);
-						}})
+						btn({icon:'meeting_room', text:t('Resources')+'…', handler: _ => { (new ResourcesWindow()).show()}})
 					)})
 				),
 				this.cards = cards({flex: 1, activeItem:1, listeners: {render: m => this.applySwipeEvents(m)}},
