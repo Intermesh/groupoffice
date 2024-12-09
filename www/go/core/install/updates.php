@@ -1646,3 +1646,11 @@ $updates['202410310946'][] = "alter table core_search
 
 $updates['202411221010'][] = "alter table core_user
     add enableSendShortcut boolean default true not null;";
+
+$updates['202412090921'][] = "alter table core_auth_token
+    add constraint core_auth_token_pk
+        unique (accessToken);
+";
+
+$updates['202412090921'][] = "drop index accessToken on core_auth_token;";
+

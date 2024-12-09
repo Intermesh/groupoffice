@@ -232,3 +232,7 @@ $updates['202408061358'][] = "create index tasks_task_start_index
 
 $updates['202408061358'][] = "create index tasks_tasklist_name_index
     on tasks_tasklist (name);";
+
+$updates['202412090921'][] = "alter table tasks_tasklist_group
+    add constraint tasks_tasklist_group_pk
+        unique (id);";
