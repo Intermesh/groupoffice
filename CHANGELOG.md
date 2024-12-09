@@ -1,7 +1,9 @@
 - Address book: Added "Last contact at" column that updates when a comment is made or an e-mail is linked
 - Address book: Made action date a regular property of contacts
-
-
+- Finance: replace invalid chars for filenames when saving PDF's
+- Tasks: MySQL 9 compatibility change
+- Core: MySQL 9 compatibility change
+- 
 02-12-2024: 6.8.88
 - Calendar: When events are private but writable. Posting the event with CalDAV will not change the title or description
 - Files: Detail panel will change to folder when a different folder is selected in the tree.
