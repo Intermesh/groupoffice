@@ -2,7 +2,7 @@
 namespace go\modules\community\ldapauthenticator\model;
 
 use Exception;
-use GO\Base\Mail\ImapAuthenticationFailedException;
+use GO\Base\Mail\Exception\ImapAuthenticationFailedException;
 use go\core\auth\PrimaryAuthenticator;
 use go\core\ErrorHandler;
 use go\core\ldap\Record;
@@ -119,8 +119,6 @@ class Authenticator extends PrimaryAuthenticator {
 		
 		if($server->hasEmailAccount()) {
 
-
-
 			try {
 				$this->setEmailAccount($domain, $ldapUsername, $password, $mappedValues['email'], $server, $user);
 			} catch(ImapAuthenticationFailedException $e) {
@@ -161,6 +159,31 @@ class Authenticator extends PrimaryAuthenticator {
 		return false;
 	}
 
+	private function updatePostfixMailbox($domain, $username, $password, $email, Server $server, User $user) {
+		if(!go()->getModule("community", "serverclient")) {
+			return false;
+		}
+
+		$domains = \go\modules\community\serverclient\Module::getDomains();
+
+		if(!in_array($domain, $domains)) {
+			return false;
+		}
+
+		go()->debug("LDAPAUTH: Adding postfix mailbox for $username to $domain");
+
+		$postfixAdmin = new MailDomain($password);
+
+		try {
+			$postfixAdmin->setMailboxPassword($user, $domain);
+
+			return true;
+		} catch(Exception $e) {
+			ErrorHandler::logException($e);
+		}
+		return false;
+	}
+
 	/**
 	 * @throws Exception
 	 */
@@ -180,6 +203,8 @@ class Authenticator extends PrimaryAuthenticator {
 
 		if(!$accounts) {
 			$this->addPostfixMailbox($domain, $username, $password, $email, $server, $user);
+		} else {
+			$this->updatePostfixMailbox($domain, $username, $password, $email, $server, $user);
 		}
 		
 		$foundForUser = false;
