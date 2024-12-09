@@ -1648,9 +1648,18 @@ $updates['202410310946'][] = "alter table core_search
 $updates['202411221010'][] = "alter table core_user
     add enableSendShortcut boolean default true not null;";
 
+$updates['202412090921'][] = "alter table core_auth_token
+    add constraint core_auth_token_pk
+        unique (accessToken);
+";
+
+$updates['202412090921'][] = "drop index accessToken on core_auth_token;";
+
+
+
 # ------ 6.9 ---------------
 
-$updates['202411221010'][] = "CREATE TABLE `core_principal`(
+$updates['202412090921'][] = "CREATE TABLE `core_principal`(
    `id` VARCHAR(60) NOT NULL,
 	`name` VARCHAR(100) NOT NULL,
 	`email` VARCHAR(255) NULL,
@@ -1677,7 +1686,7 @@ $updates['202411221010'][] = "CREATE TABLE `core_principal`(
 		ON UPDATE No Action
 ) ENGINE = InnoDB;";
 
-$updates['202411221010'][] = function() {
+$updates['202412090921'][] = function() {
 
 	go()->getDbConnection()->exec('replace into core_principal (id, name, email, type, description, timeZone, entityTypeId, avatarId, entityId, aclId)
 SELECT u.id, u.displayName, u.email, "individual", u.username, u.timezone, (select id from core_entity where name="User"), u.avatarId, u.id, g.aclId from core_user u
@@ -1694,6 +1703,6 @@ group by u.id;');
 
 };
 
-$updates['202411221010'][] = "alter table core_module drop key name;";
-$updates['202411221010'][] = "alter table core_module add constraint name unique (name, package);";
-$updates['202411221010'][] = "ALTER TABLE `core_alert` ADD COLUMN `staleAt` DATETIME NULL AFTER `triggerAt`;";
+$updates['202412090921'][] = "alter table core_module drop key name;";
+$updates['202412090921'][] = "alter table core_module add constraint name unique (name, package);";
+$updates['202412090921'][] = "ALTER TABLE `core_alert` ADD COLUMN `staleAt` DATETIME NULL AFTER `triggerAt`;";

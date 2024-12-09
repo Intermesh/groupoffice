@@ -1,10 +1,21 @@
+- Address book: Added "Last contact at" column that updates when a comment is made or an e-mail is linked
+- Address book: Made action date a regular property of contacts
+- Finance: replace invalid chars for filenames when saving PDF's
+- Tasks: MySQL 9 compatibility change
+- Core: MySQL 9 compatibility change
+- 
+02-12-2024: 6.8.88
+- Calendar: When events are private but writable. Posting the event with CalDAV will not change the title or description
+- Files: Detail panel will change to folder when a different folder is selected in the tree.
 - Core: Fixed checkbox custom field filter to match null values when client sends 'false'
 - ldapauth: Create postfixadmin account if domain matches serverclient domain
 - Finance: Fixed group by employee when billing from projects
 - History: History was depending on address book module by mistake
+- Files: bugfix file notification
 - Billing: Fixed catalog export number formatting
 - Billing: Fixed order xls export
 - ldapauth: handle error: Partial search results returned: Sizelimit exceeded
+- Core: fixed displacement of context menu
 
 25-11-2024: 6.8.87
 - Core: Added new option to toggle use of ctrl + enter to send e-mail / comments
