@@ -30,8 +30,8 @@ export class MainPanel extends MainThreeColumnPanel {
 	    this.tbl = new DomainTable();
 
 			this.tbl.rowSelection!.on("rowselect", rowSelect => {
-			    if(rowSelect.selected.length) {
-				    router.goto("maildomains/" + rowSelect.list.store.get(rowSelect.selected[0])!.id);
+			    if(rowSelect.getSelected().length) {
+				    router.goto("maildomains/" + rowSelect.getSelected()[0].record.id);
 			    }
 	    })
 

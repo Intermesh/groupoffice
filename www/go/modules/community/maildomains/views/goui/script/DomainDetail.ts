@@ -68,7 +68,7 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 							label: t("User"),
 							name: "userId",
 							renderer: async (userId) => {
-								return jmapds("UserDisplay").single(userId).then(u => u?.displayName ?? t("Not found"));
+								return jmapds("Principal").single(userId).then(u => u?.name ?? t("Not found"));
 							}
 						}),
 
@@ -251,7 +251,7 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 						icon: "delete",
 						handler: async (btn) => {
 
-							const ids = mailboxTable.rowSelection!.selected.map(index => mailboxTable.store.get(index)!.id);
+							const ids = mailboxTable.rowSelection!.getSelected().map(row =>row.record.id);
 
 							const result = await jmapds("Mailbox")
 								.confirmDestroy(ids);
@@ -337,7 +337,7 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 						icon: "delete",
 						handler: async (btn) => {
 
-							const ids = aliasTable.rowSelection!.selected.map(index => aliasTable.store.get(index)!.id);
+							const ids = aliasTable.rowSelection!.getSelected().map(row => row.record.id);
 
 							const result = await jmapds("Alias")
 								.confirmDestroy(ids);

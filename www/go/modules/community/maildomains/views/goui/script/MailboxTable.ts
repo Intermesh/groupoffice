@@ -87,7 +87,7 @@ export class MailboxTable extends Table<DataSourceStore> {
 				sortable: true,
 				resizable: true,
 				renderer: (v) => {
-					return v.displayName;
+					return v.name;
 				}
 			}),
 			datecolumn({
@@ -103,7 +103,7 @@ export class MailboxTable extends Table<DataSourceStore> {
 				hidden: true,
 				resizable: true,
 				renderer: (v) => {
-					return v.displayName;
+					return v.name;
 				}
 			}),
 

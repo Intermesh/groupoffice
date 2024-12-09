@@ -201,12 +201,12 @@ export class DnsSettingsPanel extends Component {
 				})
 			),
 			comp({cls: "group"},
-			this.mxFld = textfield({
-				flex: 1,
-				name: "mx",
-				label: "MX",
-				placeholder: "smtp.example.com",
-				readOnly: true
+				this.mxFld = textfield({
+					flex: 1,
+					name: "mx",
+					label: "MX",
+					placeholder: "smtp.example.com",
+					readOnly: true
 					}),
 				displayfield({
 					escapeValue: false,

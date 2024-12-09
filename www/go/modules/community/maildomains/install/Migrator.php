@@ -64,7 +64,9 @@ final class Migrator
 				'autoExpunge' => '0'
 			];
 		}
-		go()->getDbConnection()->insert('community_maildomains_mailbox', $data)->execute();
+		if(!empty($data)) {
+			go()->getDbConnection()->insert('community_maildomains_mailbox', $data)->execute();
+		}
 		unset($data);
 		unset($ms);
 		unset($m);
@@ -84,7 +86,10 @@ final class Migrator
 				'active' => $a['active']
 			];
 		}
-		go()->getDbConnection()->insert('community_maildomains_alias', $data)->execute();
+
+		if(!empty($data)) {
+			go()->getDbConnection()->insert('community_maildomains_alias', $data)->execute();
+		}
 
 		go()->getDbConnection()->commit();
 	}
