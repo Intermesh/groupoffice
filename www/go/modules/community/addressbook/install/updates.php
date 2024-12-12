@@ -220,10 +220,17 @@ $updates['202412031558'][] = "alter table addressbook_contact
 $updates['202412031558'][] = "create index addressbook_contact_lastContactAt_index
     on addressbook_contact (lastContactAt);";
 
-$updates['202412031558'][] = "update addressbook_contact c 
+$updates['202412031558'][] = function() {
+	if(go()->getDatabase()->hasTable("comments_comment")) {
+		$sql = "update addressbook_contact c 
     inner join comments_comment com on 
         com.entityId = c.id and com.entityTypeId = (select id from core_entity where name='Contact')
 set c.lastContactAt = com.createdAt;";
+
+		echo "Running: " . $sql . "\n";
+		go()->getDbConnection()->exec($sql);
+	}
+};
 
 
 $updates['202412031558'][] = "alter table addressbook_contact
