@@ -1,3 +1,6 @@
+- Core: Show database error on upgrade
+- Addressbook: Check if comments module is installed
+
 - 09-12-2024: 6.8.89
 - Address book: Added "Last contact at" column that updates when a comment is made or an e-mail is linked
 - Address book: Made action date a regular property of contacts
