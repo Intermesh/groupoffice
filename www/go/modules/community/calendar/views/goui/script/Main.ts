@@ -291,13 +291,15 @@ export class Main extends Component {
 	}
 
 	private applySwipeEvents(cards: CardContainer) {
-		let initX = 0;
+		let initX = 0, initY = 0;
 		cards.el.on('touchstart', e => {
 			console.log('touchstart');
-			initX = e.changedTouches[0].screenX;
+			initX = e.changedTouches[0].screenX,
+			initY = e.changedTouches[0].screenY;
 		}).on('touchend', e => {
-			const diffX = initX - e.changedTouches[0].screenX;
-			if(Math.abs(diffX) < 10) return;
+			const diffX = initX - e.changedTouches[0].screenX,
+				diffY = initY - e.changedTouches[0].screenY;
+			if(Math.abs(diffY) > Math.abs(diffX) || Math.abs(diffX) < 10) return;
 			if (diffX > 0) {
 				this.forward();
 			} else {
