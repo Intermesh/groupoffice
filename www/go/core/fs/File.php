@@ -5,6 +5,7 @@ use Exception;
 use go\core\ErrorHandler;
 use go\core\http\Response;
 use go\core\util\StringUtil;
+use Throwable;
 
 
 /**
@@ -58,10 +59,9 @@ class File extends FileSystemObject {
 	public function isWritable(): bool
 	{
 		try {
-			if($this->exists()) {
+			if ($this->exists()) {
 				return is_writable($this->path);
-			}else
-			{
+			} else {
 				return $this->getFolder()->isWritable();
 			}
 		} catch(Throwable $e) {
@@ -471,11 +471,12 @@ class File extends FileSystemObject {
 
 	/**
 	 * Open file pointer
-	 * 
+	 *
 	 * See php fopen function
-	 * 
+	 *
 	 * @param string $mode
 	 * @return resource
+	 * @throws Exception
 	 */
 	public function open(string $mode){
 		

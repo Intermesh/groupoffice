@@ -13,6 +13,8 @@ use go\modules\community\tasks\model\Alert;
 use go\modules\community\tasks\model\Category;
 use go\modules\community\tasks\model\Task;
 use Sabre\VObject\Component\VCalendar as VCalendarComponent;
+use Sabre\VObject\InvalidDataException;
+use Sabre\VObject\ParseException;
 use Sabre\VObject\Reader;
 use Sabre\VObject\Splitter\ICalendar as VCalendarSplitter;
 
@@ -33,14 +35,15 @@ class VCalendar extends AbstractConverter {
 	const EMPTY_NAME = '(no name)';
 
 
-
 	/**
 	 * Parse an Event object to a VObject
 	 *
 	 *
 	 * @param task $task
+	 * @throws \DateMalformedStringException
 	 */
-	public function export(Task $task) {
+	public function export(Task $task): \Sabre\VObject\Document|VCalendarComponent
+	{
 		if ($task->vcalendarBlobId) {
 			//Contact has a stored VCard
 			$blob = Blob::findById($task->vcalendarBlobId);
@@ -187,18 +190,29 @@ class VCalendar extends AbstractConverter {
 
 	private $importSplitter;
 	private $currentRecord;
+
+	/**
+	 * @throws ParseException
+	 * @throws Exception
+	 */
 	protected function initImport(File $file): void
 	{
-		$contents = $file->getContents();
-		$this->importSplitter = new VCalendarSplitter(StringUtil::cleanUtf8($contents), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
+//		$contents = $file->getContents();
+//		$this->importSplitter = new VCalendarSplitter(StringUtil::cleanUtf8($contents), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
+		$this->importSplitter = new VCalendarSplitter($file->open('r'), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 
 	}
 	protected function nextImportRecord(): bool
 	{
 		$this->currentRecord = $this->importSplitter->getNext();
-		return $this->currentRecord;
+		return isset($this->currentRecord);
 	}
-	protected function importEntity() {
+
+	/**
+	 * @throws InvalidDataException
+	 */
+	protected function importEntity(): ?Task
+	{
 		$vcal = $this->currentRecord;
 		$tasklistId = $this->clientParams['values']['tasklistId'];
 
@@ -279,15 +293,17 @@ class VCalendar extends AbstractConverter {
 	 * @return Task
 	 * @throws \Sabre\VObject\InvalidDataException
 	 */
-	public function vtodoToTask(VCalendarComponent $vcal, $tasklistId, $task = null) {
+	public function vtodoToTask(VCalendarComponent $vcal, $tasklistId, $task = null)
+	{
 		$todo = $vcal->VTODO;
 		$categoryIds = Category::find()->selectSingleValue('id')
-			->where('name', 'IN', explode(",",(string)$todo->CATEGORIES))
+			->where('name', 'IN', explode(",", (string)$todo->CATEGORIES))
 			->all();
-		if(!empty($todo->RRULE) && !empty($todo->DTSTART))
+		if (!empty($todo->RRULE) && !empty($todo->DTSTART)) {
 			$rule = Recurrence::fromString((string)$todo->RRULE, $todo->DTSTART->getDateTime())->toArray();
-		else
-			$rule = null;
+		} else {
+		$rule = null;
+		}
 		if($task === null) {
 			$task = new Task();
 		}
@@ -354,6 +370,25 @@ class VCalendar extends AbstractConverter {
 
 		return $task;
 	}
+
+	/**
+	 *
+	 * @param VCalendarComponent $VCalendarComponent
+	 * @param int $taskListId
+	 * @return Task | false
+	 * @throws Exception
+	 */
+	private function findTask(VCalendarComponent $VCalendarComponent, int $taskListId): null|Task
+	{
+		$task = null;
+
+		if (isset($VCalendarComponent->VTODO->uid)) {
+			$task = Task::find()->where(['tasklistId' => $taskListId, 'uid' => (string)$VCalendarComponent->VTODO->UID])->single();
+		}
+
+		return $task;
+	}
+
 
 	public static function supportedExtensions(): array
 	{

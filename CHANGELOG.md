@@ -1,3 +1,5 @@
+- Tasks: fix several bugs in ICS import
+
 12-12-2024: 6.8.90
 - Core: Show database error on upgrade
 - Addressbook: Check if comments module is installed
