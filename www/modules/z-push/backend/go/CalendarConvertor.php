@@ -208,7 +208,7 @@ class CalendarConvertor
 			case 'monthly':
 				if (isset($rule->byDay[0])) {
 					$recur->type = "3";
-					$recur->weekofmonth = $rule->bySetPosition;
+					$recur->weekofmonth = $rule->bySetPosition ?? $rule->byDay[0]->nthOfPeriod;
 					$recur->dayofweek = self::nDayToAS($rule->byDay??[], $event->start());
 				} else {
 					$recur->dayofmonth = $event->start()->format('j');
