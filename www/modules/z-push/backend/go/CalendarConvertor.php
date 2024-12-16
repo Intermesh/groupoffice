@@ -139,6 +139,10 @@ class CalendarConvertor
 			if($coreAlert) {
 				$triggerU = $coreAlert->triggerAt->format("U");
 				$message->reminder = ($message->starttime - $triggerU) / 60; // Reminder is in minutes before start
+
+				if($message->reminder < 0) {
+					$message->reminder = null;
+				}
 			}
 		}
 		return $message;
