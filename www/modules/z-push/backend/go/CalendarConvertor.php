@@ -220,6 +220,9 @@ class CalendarConvertor
 				if (isset($rule->byDay[0])) {
 					$recur->type = "3";
 					$recur->weekofmonth = $rule->bySetPosition ?? $rule->byDay[0]->nthOfPeriod;
+					if($recur->weekofmonth == -1) { // last of month is supported by EAS but using 5.
+						$recur->weekofmonth = 5;
+					}
 					$recur->dayofweek = self::nDayToAS($rule->byDay??[], $event->start());
 				} else {
 					$recur->dayofmonth = $event->start()->format('j');
@@ -374,7 +377,7 @@ class CalendarConvertor
 			$r->byDay = self::aSync2Nday($recur->dayofweek);
 
 		if (!empty($recur->weekofmonth))
-			$r->bySetPosition = $recur->weekofmonth;
+			$r->bySetPosition = $recur->weekofmonth == 5 ? -1 : $recur->weekofmonth;
 		return $r;
 	}
 
