@@ -461,13 +461,15 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		}
 
 		var dirty = false;
-		this.items.each(function(wrap) {
-			if(wrap.formField.isDirty()) {
-				dirty = true;
-				//stops iteration
-				return false;
-			}
-		}, this);
+		if(this.items) {
+			this.items.each(function (wrap) {
+				if (wrap.formField.isDirty()) {
+					dirty = true;
+					//stops iteration
+					return false;
+				}
+			}, this);
+		}
 		
 		return dirty;
 	},
