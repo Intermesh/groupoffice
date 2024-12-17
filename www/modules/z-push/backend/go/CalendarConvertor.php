@@ -377,7 +377,7 @@ class CalendarConvertor
 			$r->byDay = self::aSync2Nday($recur->dayofweek);
 
 		if (!empty($recur->weekofmonth))
-			$r->bySetPosition = $recur->weekofmonth == 5 ? -1 : $recur->weekofmonth;
+			$r->bySetPosition = [$recur->weekofmonth == 5 ? -1 : (int) $recur->weekofmonth];
 		return $r;
 	}
 
