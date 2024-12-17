@@ -141,7 +141,14 @@ class CalendarConvertor
 				$message->reminder = ($message->starttime - $triggerU) / 60; // Reminder is in minutes before start
 
 				if($message->reminder < 0) {
-					$message->reminder = null;
+					//iphone and GO allows a reminder after the start time when using an all day event.
+					//EAS does not support this. We'll set a reminder at 9:00 the day before so it's not
+					//completely lost.
+					if($event->showWithoutTime) {
+						$message->reminder = 900;
+					} else {
+						$message->reminder = 30;
+					}
 				}
 			}
 		}
