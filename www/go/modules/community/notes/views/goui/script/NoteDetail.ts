@@ -1,6 +1,7 @@
 import {br, btn, comp, Component, h1, h3, hr, menu, t} from "@intermesh/goui";
 import {addbutton, DetailPanel, filesbutton, Image, jmapds, linkbrowserbutton, modules} from "@intermesh/groupoffice-core";
 import {NoteDialog} from "./NoteDialog";
+import {CommentsPanel} from "@intermesh/community/comments";
 
 export class NoteDetail extends DetailPanel {
 	private content: Component;
@@ -13,9 +14,11 @@ export class NoteDetail extends DetailPanel {
 				cls: "normalize card pad"
 			})
 		);
-
+		this.scroller.items.add(new CommentsPanel(this.entityName));
 		this.addCustomFields();
-		this.addComments();
+
+
+
 		this.addFiles();
 		this.addLinks();
 		this.addHistory();
@@ -60,10 +63,6 @@ export class NoteDetail extends DetailPanel {
 
 		this.on("load", (detailPanel, entity) => {
 			this.title = entity.name;
-
-			let test = h1({
-				text: "tex"
-			});
 
 			this.content.items.clear();
 			this.content.items.add(h3({
