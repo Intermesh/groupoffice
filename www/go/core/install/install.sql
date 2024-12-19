@@ -298,28 +298,33 @@ CREATE TABLE `core_auth_remember_me` (
     ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
-CREATE TABLE `core_auth_token` (
-    `loginToken` VARCHAR(100) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NOT NULL,
-    `accessToken` VARCHAR(100) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NULL DEFAULT NULL,
-    `CSRFToken` VARCHAR(100) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NULL DEFAULT NULL,
-    `userId` INT(11) NOT NULL,
-    `createdAt` DATETIME NOT NULL,
-    `expiresAt` DATETIME NULL DEFAULT NULL,
-    `passedAuthenticators` VARCHAR(190) NULL DEFAULT NULL,
-    `clientId` INT UNSIGNED NOT NULL,
-    PRIMARY KEY (`loginToken`),
-    INDEX `accessToken` (`accessToken` ASC),
-    INDEX `fk_core_auth_token_core_client1_idx` (`clientId` ASC),
-    INDEX `fk_core_auth_token_core_user1_idx` (`userId` ASC),
-    CONSTRAINT `fk_core_auth_token_core_client1`
-    FOREIGN KEY (`clientId`)
-    REFERENCES `core_client` (`id`)
-    ON DELETE CASCADE,
-    CONSTRAINT `fk_core_auth_token_core_user1`
-    FOREIGN KEY (`userId`)
-    REFERENCES `core_user` (`id`)
-    ON DELETE CASCADE
-) ENGINE = InnoDB;
+create table core_auth_token
+(
+    loginToken           varchar(100) collate ascii_bin not null
+        primary key,
+    accessToken          varchar(100) collate ascii_bin null,
+    CSRFToken            varchar(100) collate ascii_bin null,
+    userId               int                            not null,
+    createdAt            datetime                       not null,
+    expiresAt            datetime                       null,
+    passedAuthenticators varchar(190)                   null,
+    clientId             int unsigned                   not null,
+    constraint core_auth_token_pk
+        unique (accessToken),
+    constraint fk_core_auth_token_core_client1
+        foreign key (clientId) references core_client (id)
+            on delete cascade,
+    constraint fk_core_auth_token_core_user1
+        foreign key (userId) references core_user (id)
+            on delete cascade
+);
+
+create index fk_core_auth_token_core_client1_idx
+    on core_auth_token (clientId);
+
+create index fk_core_auth_token_core_user1_idx
+    on core_auth_token (userId);
+
 
 CREATE TABLE `core_user_custom_fields` (
   `id` int(11) NOT NULL

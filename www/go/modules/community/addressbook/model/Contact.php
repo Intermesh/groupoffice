@@ -296,6 +296,12 @@ class Contact extends AclItemEntity {
 	 */
 	public bool $newsletterAllowed = true;
 
+
+
+	public ?DateTime $lastContactAt = null;
+
+	public ?DateTime $actionAt = null;
+
 	public function getStarred(): bool
 	{
 		return !!$this->starred;
@@ -579,6 +585,10 @@ class Contact extends AclItemEntity {
 											}
 											$criteria->where('org.name', $comparator, $value);
 										})
+
+										->addDate("lastContactAt", function(Criteria $criteria, $comparator, ?DateTime $value){
+										 	$criteria->where('lastContactAt', $comparator, $value);
+										})
 //
 //										->add("orgFilter", function(Criteria $criteria, $value, Query $query){
 //											if( !$query->isJoined('addressbook_contact', 'orgFilter')) {
@@ -667,11 +677,8 @@ class Contact extends AclItemEntity {
 												->andWhere('dob.date',$comparator, $value);
 										})
 										->addDateTime("actionDate", function(Criteria $criteria, $comparator, $value, Query $query) {
-											if(!$query->isJoined('addressbook_date', 'actionDate')) {
-												$query->join('addressbook_date', 'actionDate', 'actionDate.contactId = c.id');
-											}
-											$criteria->where('actionDate.type', '=', Date::TYPE_ACTION)
-												->andWhere('actionDate.date',$comparator, $value);
+
+											$criteria->where('actionAt',$comparator, $value);
 										})
 										->addDateTime("birthday", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_date', 'bdate')) {
@@ -783,11 +790,6 @@ class Contact extends AclItemEntity {
 			$query->join('addressbook_addressbook', 'abSort', 'abSort.id = c.addressBookId', 'INNER');
 			$sort->renameKey('addressBook', 'abSort.name');
 		}
-
-		if(isset($sort['actionDate'])) {
-			$query->join('addressbook_date', 'actionDateSort', 'actionDateSort.contactId = c.id and actionDateSort.type="action"', 'LEFT');
-			$sort->renameKey('actionDate', 'actionDateSort.date');
-		};
 		
 		return parent::sort($query, $sort);
 	}
@@ -1206,22 +1208,35 @@ class Contact extends AclItemEntity {
 	 */
 	public static function onLinkSave(Link $link) {
 
-		if(!$link->isBetween("Contact", "Contact")) {
-			return;
-		}
-		
-		$to = Contact::findById($link->toId);
-		$from = Contact::findById($link->fromId);
-		
-		//Save contact as link to organizations affect the search entities too.
-		if(!$to->isOrganization) {			
-			$to->saveSearch();
-			Contact::entityType()->change($to);
-		}
-		
-		if(!$from->isOrganization) {			
-			$from->saveSearch();
-			Contact::entityType()->change($from);
+		if($link->isBetween("Contact", "Contact")) {
+
+
+			$to = Contact::findById($link->toId);
+			$from = Contact::findById($link->fromId);
+
+			//Save contact as link to organizations affect the search entities too.
+			if (!$to->isOrganization) {
+				$to->saveSearch();
+				Contact::entityType()->change($to);
+			}
+
+			if (!$from->isOrganization) {
+				$from->saveSearch();
+				Contact::entityType()->change($from);
+			}
+		} else if($link->isBetween("Contact", "LinkedEmail")) {
+			if($link->getToEntity() == "Contact") {
+				$contact = Contact::findById($link->toId);
+				$email = \GO\Savemailas\Model\LinkedEmail::model()->findByPk($link->fromId);
+			} else {
+				$contact = Contact::findById($link->fromId);
+				$email = \GO\Savemailas\Model\LinkedEmail::model()->findByPk($link->toId);
+			}
+
+			if($contact && $email) {
+				$contact->lastContactAt = new DateTime("@" . $email->time);
+				$contact->save();
+			}
 		}
 	}
 

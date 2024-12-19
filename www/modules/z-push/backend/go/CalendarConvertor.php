@@ -139,6 +139,17 @@ class CalendarConvertor
 			if($coreAlert) {
 				$triggerU = $coreAlert->triggerAt->format("U");
 				$message->reminder = ($message->starttime - $triggerU) / 60; // Reminder is in minutes before start
+
+				if($message->reminder < 0) {
+					//iphone and GO allows a reminder after the start time when using an all day event.
+					//EAS does not support this. We'll set a reminder at 9:00 the day before so it's not
+					//completely lost.
+					if($event->showWithoutTime) {
+						$message->reminder = 900;
+					} else {
+						$message->reminder = 30;
+					}
+				}
 			}
 		}
 		return $message;
@@ -208,7 +219,10 @@ class CalendarConvertor
 			case 'monthly':
 				if (isset($rule->byDay[0])) {
 					$recur->type = "3";
-					$recur->weekofmonth = $rule->bySetPosition;
+					$recur->weekofmonth = $rule->bySetPosition ?? $rule->byDay[0]->nthOfPeriod;
+					if($recur->weekofmonth == -1) { // last of month is supported by EAS but using 5.
+						$recur->weekofmonth = 5;
+					}
 					$recur->dayofweek = self::nDayToAS($rule->byDay??[], $event->start());
 				} else {
 					$recur->dayofmonth = $event->start()->format('j');
@@ -363,7 +377,7 @@ class CalendarConvertor
 			$r->byDay = self::aSync2Nday($recur->dayofweek);
 
 		if (!empty($recur->weekofmonth))
-			$r->bysetpos = $recur->weekofmonth;
+			$r->bySetPosition = [$recur->weekofmonth == 5 ? -1 : (int) $recur->weekofmonth];
 		return $r;
 	}
 

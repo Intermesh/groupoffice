@@ -105,7 +105,6 @@ class StringUtil {
    *
    * @param ?string $str
    * @param string|null $sourceCharset
-   * @param string
    * @return string
    */
 	public static function cleanUtf8(?string $str, string $sourceCharset = null): string

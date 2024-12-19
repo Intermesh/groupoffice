@@ -80,6 +80,10 @@ GO.files.FileBrowser = function(config){
 	this.treePanel.on('click', function(node)	{
 		this.setFolderID(node.id, true);
 		this.cardPanel.show();
+		if(node.id !== 'shared') {
+			this.folderDetail.load(parseInt(node.id));
+			this.eastPanel.getLayout().setActiveItem(this.folderDetail);
+		}
 	}, this);
 
 	this.treePanel.on('contextmenu', function(node, e){

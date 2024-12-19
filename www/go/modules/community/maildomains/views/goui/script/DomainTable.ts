@@ -24,15 +24,15 @@ export class DomainTable extends Table<DataSourceStore> {
 			relations: {
 				owner: {
 					path: "userId",
-					dataSource: jmapds("UserDisplay")
+					dataSource: jmapds("Principal")
 				},
 				creator: {
 					path: "createdBy",
-					dataSource: jmapds("UserDisplay")
+					dataSource: jmapds("Principal")
 				},
 				modifier: {
 					path: "modifiedBy",
-					dataSource: jmapds("UserDisplay")
+					dataSource: jmapds("Principal")
 				}
 
 			}
@@ -63,7 +63,7 @@ export class DomainTable extends Table<DataSourceStore> {
 				sortable: true,
 				width: 200,
 				renderer: (v, _record) => {
-					return v.displayName;
+					return v.name;
 				},
 				hidden: true
 			}),
@@ -172,7 +172,7 @@ export class DomainTable extends Table<DataSourceStore> {
 				sortable: true,
 				resizable: true,
 				renderer: (v) => {
-					return v.displayName;
+					return v.name;
 				}
 			}),
 			datecolumn({
@@ -188,7 +188,7 @@ export class DomainTable extends Table<DataSourceStore> {
 				hidden: true,
 				resizable: true,
 				renderer: (v) => {
-					return v.displayName;
+					return v.name;
 				}
 			}),
 			column({

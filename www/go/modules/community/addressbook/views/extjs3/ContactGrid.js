@@ -5,7 +5,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 	initComponent: function () {
 
 		if(!this.enabledColumns) {
-			this.enabledColumns = ['name', 'organizations'];
+			this.enabledColumns = ['name', 'organizations', 'lastContactAt'];
 		}
 
 		if(!go.User.addressBookSettings) {
@@ -30,6 +30,8 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				'lastName',
 				{name: 'createdAt', type: 'date'},
 				{name: 'modifiedAt', type: 'date'},
+				{name: 'lastContactAt', type: 'date'},
+				{name: 'actionAt', type: 'date'},
 				{name: 'creator', type: "relation"},
 				{name: 'modifier', type: "relation"},
 				{name: 'addressbook', type: "relation"},
@@ -44,7 +46,6 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				'starred',
 				"birthday",
 				"age",
-				"actionDate",
 				"gender",
 				"streetAddresses",
 				{name: 'organizations', type: "relation"},
@@ -186,6 +187,15 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				},
 				{
 					xtype: "datecolumn",
+					id: 'lastContactAt',
+					header: t('Last contact at'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'lastContactAt',
+					hidden: this.enabledColumns.indexOf('lastContactAt') == -1
+				},
+				{
+					xtype: "datecolumn",
 					id: 'createdAt',
 					header: t('Created at'),
 					width: dp(160),
@@ -324,24 +334,13 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: "age",
 					hidden: this.enabledColumns.indexOf('age') == -1,
 				},{
-					id: 'actionDate',
+					id: 'actionAt',
+					xtype: "datecolumn",
 					header: t('Action date'),
 					sortable: true,
-					dataIndex: "actionDate",
-					renderer: function(v, meta, record) {
-						if(!record.data.dates) {
-							return "";
-						}
-						var bday = "";
-						record.data.dates.forEach(function(date) {
-							if(date.type == "action") {
-								bday = date.date;
-							}
-						});
+					dataIndex: "actionAt",
 
-						return go.util.Format.date(bday);
-					},
-					hidden: this.enabledColumns.indexOf('actionDate') == -1,
+					hidden: this.enabledColumns.indexOf('actionAt') == -1,
 				}
 			],
 			viewConfig: {
