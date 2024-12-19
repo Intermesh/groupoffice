@@ -97,14 +97,7 @@ go.Router = (function () {
 			this.oldPath = this.loadedPath;
 			this.loadedPath = path;
 
-			if (this.suspendEvent) {
-				var me = this;
-				setTimeout(function () {
-					me.suspendEvent = false;
-				});
 
-				return this;
-			}
 
 			for (var i = 0; i < this.routes.length; i++) {
 				var match = path.match(this.routes[i].re);
@@ -133,6 +126,15 @@ go.Router = (function () {
 			}
 
 			this.params = match;
+
+			if (this.suspendEvent) {
+				var me = this;
+				setTimeout(function () {
+					me.suspendEvent = false;
+				});
+
+				return this;
+			}
 
 			this.routing = true;
 			route.handler.apply({}, match);

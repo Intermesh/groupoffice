@@ -55,11 +55,15 @@ try {
 			$inline = false;
 		}
 
-		$ua_info = \donatj\UserAgent\parse_user_agent();
-		if($ua_info['browser'] == 'Safari' && substr(strtolower($blob->name), -5) == '.webm' && !strstr(Request::get()->getUri(), 'webm')) {
-			//workaround webm bug in safari that needs a webm extension :(
-			header("Location: " . str_replace('download.php?', 'download.php/' . rawurlencode($blob->name) . '?', Request::get()->getFullUrl()));
-			exit();
+		try {
+			$ua_info = \donatj\UserAgent\parse_user_agent();
+			if ($ua_info['browser'] == 'Safari' && substr(strtolower($blob->name), -5) == '.webm' && !strstr(Request::get()->getUri(), 'webm')) {
+				//workaround webm bug in safari that needs a webm extension :(
+				header("Location: " . str_replace('download.php?', 'download.php/' . rawurlencode($blob->name) . '?', Request::get()->getFullUrl()));
+				exit();
+			}
+		}catch(\Exception $e) {
+			//ignore
 		}
 
 		$inline = !empty($_GET['inline']);
@@ -106,7 +110,7 @@ try {
 
 	call_user_func_array([$c, $method], $parts);
 } catch(Exception $e) {
-	require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageHeader.php');
+	//require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageHeader.php');
 
 	ErrorHandler::logException($e);
 	Response::get()->setStatus(500);
@@ -118,5 +122,5 @@ try {
 		echo "</pre>";
 	}
 
-	require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageFooter.php');
+	//require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageFooter.php');
 }

@@ -24,6 +24,16 @@ class SpreadSheetExport extends Entity
 			->addTable("core_spreadsheet_export", "export");
 	}
 
+	protected function canCreate(): bool
+	{
+		return true;
+	}
+
+	protected function internalGetPermissionLevel(): int
+	{
+		return Acl::LEVEL_MANAGE;
+	}
+
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()

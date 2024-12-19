@@ -7,12 +7,12 @@ import {
 	Component, datasourcestore,
 	DatePicker,
 	datepicker,
-	DateTime, displayfield, fieldset, Format,
+	DateTime,
 	FunctionUtil, h3, hr, List,
 	list,
-	menu, router, select,
+	menu, router,
 	splitter,
-	tbar, win,
+	tbar,
 } from "@intermesh/goui";
 import {MonthView} from "./MonthView.js";
 import {WeekView} from "./WeekView.js";
@@ -26,7 +26,6 @@ import {Settings} from "./Settings.js";
 import {ResourcesWindow} from "./ResourcesWindow.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 import {ListView} from "./ListView.js";
-import {PreferencesWindow} from "./PreferencesWindow.js";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarList} from "./CalendarList.js";
 
@@ -84,6 +83,9 @@ export class Main extends Component {
 
 		monthView.on('selectweek', (me, day) => {
 			this.routeTo('week', day);
+		});
+		monthView.on('dayclick', (me,day) => {
+			this.routeTo('day', day);
 		});
 		yearView.on('dayclick', (me,day) => {
 			this.routeTo('day', day);
@@ -179,6 +181,7 @@ export class Main extends Component {
 						}})).save()
 					}),
 					btn({
+						cls:'not-medium-device',
 						icon: 'inbox',
 						title: t('Invitations'),
 						hidden: !client.user.calendarPreferences?.autoAddInvitations,
@@ -257,15 +260,10 @@ export class Main extends Component {
 								btn({icon: 'view_module', text: t('Month'), handler:() => { this.openPDF('month'); }})
 							)
 						}),
-						btn({icon:'meeting_room', text:t('Resources')+'…', handler: _ => { (new ResourcesWindow()).show()}}),
-						btn({icon: 'settings', text: t('Preferences')+'…', handler: _ => {
-							const d=new PreferencesWindow();
-							d.show();
-							d.load(go.User.id);
-						}})
+						btn({icon:'meeting_room', text:t('Resources')+'…', handler: _ => { (new ResourcesWindow()).show()}})
 					)})
 				),
-				this.cards = cards({flex: 1, activeItem:1},
+				this.cards = cards({flex: 1, activeItem:1, listeners: {render: m => this.applySwipeEvents(m)}},
 					weekView,
 					monthView,
 					yearView,
@@ -290,6 +288,24 @@ export class Main extends Component {
 			this.updateView();
 		});
 		this.on('render', () => { inviteStore.load(); });
+	}
+
+	private applySwipeEvents(cards: CardContainer) {
+		let initX = 0, initY = 0;
+		cards.el.on('touchstart', e => {
+			console.log('touchstart');
+			initX = e.changedTouches[0].screenX,
+			initY = e.changedTouches[0].screenY;
+		}).on('touchend', e => {
+			const diffX = initX - e.changedTouches[0].screenX,
+				diffY = initY - e.changedTouches[0].screenY;
+			if(Math.abs(diffY) > Math.abs(diffX) || Math.abs(diffX) < 10) return;
+			if (diffX > 0) {
+				this.forward();
+			} else {
+				this.backward();
+			}
+		})
 	}
 
 	private export(calId: number) {
@@ -409,6 +425,7 @@ export class Main extends Component {
 				break;
 			case 'split':
 				route += '-'+this.spanAmount;
+				/** @fallthough */
 			case 'week':
 				this.date.addDays(value * 7);
 				break;
@@ -469,7 +486,7 @@ export class Main extends Component {
 				break;
 			case 'week':
 				this.spanAmount = 7;
-				// @fall-though intended
+				/** @fall-though intended */
 			case 'split':
 				start.setWeekDay(0);
 				this.currentText.html = start.format('F ') + `<em> ${start.format('Y')}</em>`;

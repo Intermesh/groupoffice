@@ -89,7 +89,9 @@ class CalendarStore extends Store {
 		}
 
 		try {
-			return CalendarConvertor::toSyncAppointment($event, null, $contentparameters);
+			$msg = CalendarConvertor::toSyncAppointment($event, null, $contentparameters);
+			ZLog::Write(LOGLEVEL_DEBUG, "reminder: " . ($msg->reminder ?? "-"));
+			return $msg;
 		} catch(Exception $e) {
 			ZLog::Write(LOGLEVEL_FATAL, $e->getMessage());
 			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());

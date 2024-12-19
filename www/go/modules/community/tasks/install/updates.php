@@ -232,42 +232,50 @@ $updates['202408061358'][] = "create index tasks_task_start_index
 
 $updates['202408061358'][] = "create index tasks_tasklist_name_index
     on tasks_tasklist (name);";
+
+$updates['202412090921'][] = "alter table tasks_tasklist_group
+    add constraint tasks_tasklist_group_pk
+        unique (id);";
+
+// 6.9
+
+
 // Fix being able to delete the calendar module. because the tasklists acl's belonged to the TasklistCompat entity which belongs to Calendar
-$updates['202401191150'][] = "UPDATE core_acl a join core_entity e on a.entityTypeId = e.id 
+$updates['202412090921'][] = "UPDATE core_acl a join core_entity e on a.entityTypeId = e.id 
 SET a.entityTypeId = (SELECT id FROM core_entity WHERE clientName = 'Tasklist')
 WHERE e.clientName = 'TasklistCompat';";
 
-$updates['202408091228'][] = "ALTER TABLE `tasks_tasklist` 
+$updates['202412090921'][] = "ALTER TABLE `tasks_tasklist` 
 ADD COLUMN `defaultColor` VARCHAR(21) NOT NULL DEFAULT '' AFTER `createdBy`,
 ADD COLUMN `highestItemModSeq` VARCHAR(32) NOT NULL DEFAULT 0 AFTER `defaultColor`;";
 
-$updates['202408091228'][] = "ALTER TABLE `tasks_tasklist` DROP COLUMN `version`;";
-$updates['202408091228'][] = "ALTER TABLE `tasks_tasklist_user` CHANGE COLUMN `color` `color` VARCHAR(21) NULL DEFAULT NULL ;";
-$updates['202408091228'][] = "ALTER TABLE `tasks_tasklist_user` CHANGE COLUMN `modSeq` `modSeq` INT NOT NULL DEFAULT 0 ;";
+$updates['202412090921'][] = "ALTER TABLE `tasks_tasklist` DROP COLUMN `version`;";
+$updates['202412090921'][] = "ALTER TABLE `tasks_tasklist_user` CHANGE COLUMN `color` `color` VARCHAR(21) NULL DEFAULT NULL ;";
+$updates['202412090921'][] = "ALTER TABLE `tasks_tasklist_user` CHANGE COLUMN `modSeq` `modSeq` INT NOT NULL DEFAULT 0 ;";
 // set random default color for the color field
-$updates['202408091228'][] = "UPDATE tasks_tasklist SET defaultColor = SUBSTRING('#CDAD00#E74C3C#9B59B6#8E44AD#2980B9#3498DB#1ABC9C#16A085#27AE60#2ECC71#F1C40F#F39C12#E67E22#D35400#95A5A6#34495E#808B96#1652a1', (id MOD 18) * 7 + 2 ,6);";
+$updates['202412090921'][] = "UPDATE tasks_tasklist SET defaultColor = SUBSTRING('#CDAD00#E74C3C#9B59B6#8E44AD#2980B9#3498DB#1ABC9C#16A085#27AE60#2ECC71#F1C40F#F39C12#E67E22#D35400#95A5A6#34495E#808B96#1652a1', (id MOD 18) * 7 + 2 ,6);";
 // subscribe to the tasklists the user has access to
-$updates['202408091228'][] = "INSERT IGNORE INTO tasks_tasklist_user
+$updates['202412090921'][] = "INSERT IGNORE INTO tasks_tasklist_user
 (tasklistId, userId, isSubscribed, isVisible, color, sortOrder, modSeq)
 select tl.id, ug.userId, 1, 1, tl.defaultColor,0,1 from core_acl_group ag
 inner join core_user_group ug on ug.groupId = ag.groupId
 inner join tasks_tasklist tl on tl.aclId = ag.aclId where tl.projectId is not null group by tl.id,ug.userId";
 
-$updates['202410170857'][] = "update tasks_task set progressUpdated = modifiedAt where progressUpdated is null and progress = 3;";
+$updates['202412090921'][] = "update tasks_task set progressUpdated = modifiedAt where progressUpdated is null and progress = 3;";
 
-$updates['202410170857'][] = "alter table tasks_task
+$updates['202412090921'][] = "alter table tasks_task
     add projectId int unsigned null;";
 
-$updates['202410170857'][] = "alter table tasks_task
+$updates['202412090921'][] = "alter table tasks_task
     add constraint tasks_task_business_projects3_project3_id_fk
         foreign key (projectId) references business_projects3_project3 (id)
             on delete set null;";
 
 
-$updates['202410170857'][] = "alter table tasks_task
+$updates['202412090921'][] = "alter table tasks_task
     add mileStoneId int unsigned null;";
 
-$updates['202410170857'][] = "alter table tasks_task
+$updates['202412090921'][] = "alter table tasks_task
     add constraint tasks_task_business_projects3_project3_milestone_id_fk
         foreign key (mileStoneId) references business_projects3_project3_milestone (id)
             on delete set null;";

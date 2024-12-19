@@ -266,6 +266,9 @@ class Comment extends AclItemEntity {
 			$entity = $this->findEntity();
 			if(method_exists($entity, 'onCommentAdded')) {
 				$entity->onCommentAdded($this);
+			}elseif(property_exists($entity, 'lastContactAt')) {
+				$entity->lastContactAt = new DateTime();
+				$entity->save();
 			}
 		} else {
 			$entity = $this->findEntity();

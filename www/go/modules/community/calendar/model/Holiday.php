@@ -40,7 +40,14 @@ class Holiday {
 			else
 				$this->title = var_export($data->_name,true);
 		} else if($data->name) {
+			if(!isset($data->name->{self::$lang})) {
+				self::$lang = substr(self::$lang,0,2);
+				if(!isset($data->name->{self::$lang})) {
+					self::$lang = 'en';
+				}
+			}
 			$this->title = $data->name->{self::$lang};
+
 		}
 		if(isset($data->type)) {
 			$this->type = $data->type;

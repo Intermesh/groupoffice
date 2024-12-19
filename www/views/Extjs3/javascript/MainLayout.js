@@ -154,7 +154,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		//blur active form fields on tab change. Otherwise auto complete combo boxes
 		//will remain focussed but the autocomplete functionality fails.
-		this.tabPanel.on('tabchange', function (tabpanel, newTab) {
+		this.tabPanel.on('beforetabchange', function (tabpanel, newTab) {
 
 			if (!newTab) {
 				return;
@@ -162,7 +162,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 			//update hash if not already set.
 			if (!go.Router.routing) {
-				window.go.Router.setPath(newTab.moduleName);
+				window.go.Router.goto(newTab.moduleName);
 			}
 
 			if (document.activeElement && typeof document.activeElement.blur === 'function')

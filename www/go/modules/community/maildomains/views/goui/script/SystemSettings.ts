@@ -44,7 +44,6 @@ export class SystemSettings extends Component {
 			this.form.load(mod.id);
 	}
 	onSubmit() {
-		debugger;
 		return this.form.submit();
 	}
 }
