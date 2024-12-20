@@ -11,7 +11,7 @@ import {
 	t,
 	tbar, Button, hr
 } from "@intermesh/goui";
-import {MainThreeColumnPanel, filterpanel} from "@intermesh/groupoffice-core";
+import {MainThreeColumnPanel, filterpanel, jmapds, client} from "@intermesh/groupoffice-core";
 import {notebookgrid, NoteBookGrid} from "./NoteBookGrid";
 import {NoteBookDialog} from "./NoteBookDialog";
 import {NoteGrid} from "./NoteGrid";
@@ -29,10 +29,6 @@ export class Main extends MainThreeColumnPanel {
 
 		this.on("render", async () => {
 			void this.noteBookGrid.store.load();
-
-			const first = this.noteBookGrid.store.first();
-			if (first)
-				this.noteBookGrid.rowSelection!.add(first);
 		});
 	}
 
@@ -86,6 +82,14 @@ export class Main extends MainThreeColumnPanel {
 							this.noteGrid.store.load();
 
 							this.addButton.disabled = !noteBookIds[0];
+
+							if (client.user.notesSettings.rememberLastItems) {
+								jmapds("User").update(client.user.id, {
+									notesSettings: {
+										lastNoteBookIds: noteBookIds
+									}
+								})
+							}
 						}
 					}
 				},

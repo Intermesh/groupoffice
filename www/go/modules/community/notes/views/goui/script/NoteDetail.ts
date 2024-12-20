@@ -1,5 +1,13 @@
 import {br, btn, comp, Component, h1, h3, hr, menu, t} from "@intermesh/goui";
-import {addbutton, DetailPanel, filesbutton, Image, jmapds, linkbrowserbutton, modules} from "@intermesh/groupoffice-core";
+import {
+	addbutton,
+	DetailPanel,
+	filesbutton,
+	Image,
+	jmapds,
+	linkbrowserbutton,
+	modules
+} from "@intermesh/groupoffice-core";
 import {NoteDialog} from "./NoteDialog";
 import {CommentsPanel} from "@intermesh/community/comments";
 
@@ -16,7 +24,6 @@ export class NoteDetail extends DetailPanel {
 		);
 		this.scroller.items.add(new CommentsPanel(this.entityName));
 		this.addCustomFields();
-
 
 
 		this.addFiles();
@@ -39,7 +46,7 @@ export class NoteDetail extends DetailPanel {
 				icon: "more_vert",
 				menu: menu({},
 					btn({
-						icon:"print",
+						icon: "print",
 						text: t("Print"),
 						handler: () => {
 							this.print();
@@ -57,7 +64,7 @@ export class NoteDetail extends DetailPanel {
 			})
 		)
 
-		if(modules.isAvailable("legacy", "files")) {
+		if (modules.isAvailable("legacy", "files")) {
 			this.toolbar.items.insert(-1, filesbutton());
 		}
 
