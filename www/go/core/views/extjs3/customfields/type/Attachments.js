@@ -17,7 +17,13 @@ go.customfields.type.Attachments = Ext.extend(go.customfields.type.Text, {
 
 		if (!customfield.options.accept || customfield.options.accept.indexOf("image") === -1) {
 			return '<i class="icon ic-attachment"></i> ' +
-				values.map(a => '<a target="_blank" href="' + go.Jmap.downloadUrl(a.blobId, true) + '">' + a.name + '</a>').join(", ");
+				values.map(a => {
+					let s = '<a target="_blank" href="' + go.Jmap.downloadUrl(a.blobId, true) + '">' + (a.description || a.name);
+
+					s += '</a>';
+
+					return s;
+				}).join(", ");
 		}
 
 		let r = `<div class="x-panel card x-panel-noborder">
@@ -48,73 +54,11 @@ go.customfields.type.Attachments = Ext.extend(go.customfields.type.Text, {
 
 		return Object.assign(this.supr().createFormFieldConfig.call(this, customfield, config), {
 			xtype: 'attachmentfield',
+			hasDescription: true,
 			cls:'x-portlet card',
 			height: 150
 		});
 
-		return Object.assign(this.supr().createFormFieldConfig.call(this, customfield, config), {
-			xtype:'panel',
-			frame:true,
-			cls:'x-portlet',
-			height: 350,
-			collapsible:true,
-			layout:'fit',
-			tools:[{
-				id:'add',
-				handler: (e,dom,pnl) => {
-					go.util.openFileDialog({
-						multiple: customfield.options.multiFileSelect, // We do not yet support multiple file upload
-						accept: customfield.options.accept,
-						directory: false, // We do not yet support directories
-						autoUpload: true,
-						listeners: {
-							upload: (data) => {
-								const s = pnl.items.itemAt(0).store,
-									r = new s.recordType({blobId: data.blobId, name: data.name, size: data.size, type: data.type,modifiedAt:data.modifiedAt });
-								s.add(r);
-							},
-							uploadComplete: () => { pnl.items.itemAt(0).getEl().unmask();},
-							select: () => { pnl.items.itemAt(0).getEl().mask(t('Uploading...')) },
-						}
-					});
-				}
-			}],
-			//title:customfield.name,
-			// bbar: ['->',
-			// 	{text:t('Upload'), iconCls: 'ic-upload', handler: (btn) => {
-			// 			go.util.openFileDialog({
-			// 				multiple: customfield.options.multiFileSelect, // We do not yet support multiple file upload
-			// 				accept: customfield.options.accept,
-			// 				directory: false, // We do not yet support directories
-			// 				autoUpload: true,
-			// 				listeners: {
-			// 					upload: (data) => {
-			// 						const s = btn.findParentByType('panel').items.itemAt(0).store,
-			// 						 	r = new s.recordType({blobId: data.blobId, name: data.name, size: data.size, type: data.type,modifiedAt:data.modifiedAt });
-			// 						s.add(r);
-			// 					},
-			// 					uploadComplete: () => { btn.findParentByType('panel').items.itemAt(0).getEl().unmask();},
-			// 					select: () => { btn.findParentByType('panel').items.itemAt(0).getEl().mask(t('Uploading...')) },
-			// 				}
-			// 			});
-			// 		}}
-			// ],
-			items: {
-				xtype:'dataview',
-				store: {
-					xtype:'arraystore',
-					fields: ['blobId', 'name','description', 'size','type','modifiedAt'],
-					data: []
-				},
-				tpl: '<div style="overflow-x:hidden" tabindex="0" class="go-attachments"><tpl for="."><div class="filetype-link filetype-{[values.name.split(\'.\').pop()]}" title="{modifiedAt}">\
-					{name} ({[go.util.humanFileSize(values.size)]})\
-				</div></tpl></div>',
-				autoHeight: true,
-				selectable: false,
-				emptyText: '<div class="go-dropzone">'+t('Empty')+'</div>',
-				itemSelector: 'a'
-			}
-		});
 	},
 
 	getFieldType () {

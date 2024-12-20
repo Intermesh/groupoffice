@@ -59,15 +59,21 @@ class Sync extends Controller
 			return $d->name;
 		}, $server->domains);
 
-		$records = Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=" . $username);
+		$records = Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=" . $username, 100);
 
 		foreach ($records as $record) {
+
+//			var_dump($record->getAttributes());
+//
+//			var_dump($record->getObjectClass());
+
+
 			echo $record->getDn() . "\n";
-
+//
 			$user = $this->ldapRecordToUser($record, $server, false);
-
+//
 			echo "User: " . $user->username . "\n";
-			var_dump($record->memberOf);
+//			var_dump($record->memberOf);
 		}
 	}
 

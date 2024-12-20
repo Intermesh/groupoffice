@@ -332,3 +332,6 @@ alter table tasks_tasklist
         foreign key (groupingId) references tasks_tasklist_grouping (id)
             on delete set null;
 
+alter table tasks_tasklist_group
+    add constraint tasks_tasklist_group_pk
+        unique (id);

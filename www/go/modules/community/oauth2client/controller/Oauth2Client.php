@@ -62,9 +62,9 @@ final class Oauth2Client extends EntityController
 		if (!empty($_GET['error'])) {
 			throw new Exception(500, 'Got error: ' . htmlspecialchars($_GET['error'], ENT_QUOTES));
 		}
-//		if (!isset($_SESSION['accountId'])) {
-//			throw new Exception(500, 'Invalid parameter');
-//		}
+		if (!isset($_SESSION['accountId']) || !isset($_SESSION['oauth2state'])) {
+			throw new Exception(500, 'A session variable is missing. Please retry with a new session.');
+		}
 
 		if (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
 

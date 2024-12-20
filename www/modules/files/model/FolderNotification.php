@@ -227,14 +227,9 @@ class FolderNotification extends \GO\Base\Db\ActiveRecord {
 					);
 					break;
 			}
-			
-			//switch status of notification to sent
-			//$notification->status = 1;
-			//$notification->save();
 			$notification->delete();
 		}
 
-		//TODO: create emailBody
 		$emailBody = '';
 		$types = array_keys($messages);
 		foreach ($types as $type) {
@@ -248,7 +243,7 @@ class FolderNotification extends \GO\Base\Db\ActiveRecord {
 		$message = new \GO\Base\Mail\Message();
 		$message->setSubject(\GO::t("Updates in folder", "files"))
 			->setTo(new Address($toUser->email, $toUser->displayName))
-			->setFrom(new Address(\GO::config()->webmaster_email, \GO::config()->title))
+			->setFrom(\GO::config()->webmaster_email, \GO::config()->title)
 			->setBody($emailBody);
 		\GO\Base\Mail\Mailer::newGoInstance()->send($message);
 		

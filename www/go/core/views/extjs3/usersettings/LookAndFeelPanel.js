@@ -140,6 +140,11 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				},{
 					xtype:'xcheckbox',
 					hideLabel: true,
+					boxLabel: t("Use shortcut to send forms") + " (" + (Ext.isMac ? "⌘" : "Ctrl") + " + Enter)",
+					name: 'enableSendShortcut'
+				},{
+					xtype:'xcheckbox',
+					hideLabel: true,
 					boxLabel: t("Show smilies"),
 					name: 'show_smilies'
 				},{

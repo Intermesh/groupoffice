@@ -1642,3 +1642,15 @@ $updates['202410310946'][] = "alter table core_search
     add constraint core_search_ibfk_2
         foreign key (aclId) references core_acl (id)
             on update cascade on delete cascade;";
+
+
+$updates['202411221010'][] = "alter table core_user
+    add enableSendShortcut boolean default true not null;";
+
+$updates['202412090921'][] = "alter table core_auth_token
+    add constraint core_auth_token_pk
+        unique (accessToken);
+";
+
+$updates['202412090921'][] = "drop index accessToken on core_auth_token;";
+

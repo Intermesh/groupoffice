@@ -1,6 +1,8 @@
-<?php
+<?php /** @noinspection PhpComposerExtensionStubsInspection */
 
 namespace go\core\ldap;
+
+use Exception;
 
 /**
  * LDAP record
@@ -28,14 +30,17 @@ class Record {
 	 */
 	private $connection;
 	private $entryId;
-	private $attributes;
+	private array $attributes;
+
+	private $objectClass;
 	
 	protected static $_mapping = false;
 
 	public function __construct(Connection $connection = null, $entryId = null) {
 		$this->entryId = $entryId;
 		$this->connection = $connection;
-	}	
+	}
+
 
 	/**
 	 * Get all attributes with values in a key value array
@@ -65,10 +70,20 @@ class Record {
 
 				unset($this->attributes[$key]['count']);
 			}
+
+			$this->objectClass = $this->attributes['objectclass'];
 			unset($this->attributes['objectclass']);
 		}
 
 		return $this->attributes;
+	}
+
+	public function getObjectClass() {
+		if(!isset($this->objectClass)) {
+			$this->getAttributes();
+		}
+
+		return $this->objectClass;
 	}
 
 	private function convertUTF8($attr) {
@@ -82,22 +97,36 @@ class Record {
 		}
 
 		return $new;
-	}	
+	}
 
 	/**
-	 * 
-	 * @param \go\core\ldap\Connection $connection
+	 * Find LDAP records
+	 *
+	 * @param Connection $connection
 	 * @param string $dn
 	 * @param string $query
-	 * @return static[]
+	 * @param int $sizeLimit
+	 * @return Result<Record>
 	 */
-	public static function find(Connection $connection, $dn, $query) {
-		
+	public static function find(Connection $connection, string $dn, string $query, int $sizeLimit = -1): Result
+	{
 		go()->debug('Find DN: "'.$dn.'", Query: "' . $query . '"');
-		
-		$searchId = ldap_search($connection->getLink(), $dn, $query);
-		
-		return new Result($connection, $searchId);
+
+		$oldHandler = set_error_handler(function($no, $message, $file, $line) use (&$oldHandler) {
+			if(str_contains($message, 'Partial search results returned: Sizelimit exceeded')) {
+				return true;
+			}
+			$oldHandler($no, $message, $file, $line);
+			return true;
+		});
+		try {
+			$searchId = ldap_search($connection->getLink(), $dn, $query, [], 0, $sizeLimit);
+			restore_error_handler();
+			return new Result($connection, $searchId);
+		} catch (Exception $e) {
+			restore_error_handler();
+			throw $e;
+		}
 	}
 
 	/**
