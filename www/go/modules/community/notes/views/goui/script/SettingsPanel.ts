@@ -27,8 +27,8 @@ export class SettingsPanel extends Component {
 						type: "box",
 						value: "lastNotebook",
 						options: [
-							{text: t("Default note book"), value: "0"},
-							{text: t("Remember last selected note book"), value: "1"}
+							{text: t("Default note book"), value: 0},
+							{text: t("Remember last selected note book"), value: 1}
 						]
 					})
 				)
