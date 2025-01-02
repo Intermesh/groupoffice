@@ -63,12 +63,7 @@ class CalendarStore extends Store {
 			$query->andWhere('privacy', '=', 'public');
 		}
 
-		ZLog::Write(LOGLEVEL_DEBUG, (string) $query);
-
-		$all =  $query->fetchMode(\PDO::FETCH_ASSOC)->all();
-
-		ZLog::Write(LOGLEVEL_DEBUG, var_export($all, true));
-		return $all;
+		return $query->fetchMode(\PDO::FETCH_ASSOC)->all();
 	}
 
 	public function StatMessage($folderid, $id)
