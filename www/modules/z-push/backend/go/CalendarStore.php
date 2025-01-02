@@ -57,10 +57,13 @@ class CalendarStore extends Store {
 		if (!empty($cutoffdate)) {
 			$query->andWhere('start > "' . date('Y-m-d H:i:s', $cutoffdate).'"');
 		}
-		ZLog::Write(LOGLEVEL_INFO, "GetMessageList ".$folderid. ' '. $cutoffdate);
-		if(Calendar::findById($folderid)->ownerId != go()->getUserId()) {
+		$calendar = Calendar::findById($folderid);
+		ZLog::Write(LOGLEVEL_INFO, "GetMessageList ".$folderid. ' ('.$calendar->name.') '. $cutoffdate);
+		if($calendar->ownerId != go()->getUserId()) {
 			$query->andWhere('privacy', '=', 'public');
 		}
+
+		ZLog::Write(LOGLEVEL_DEBUG, (string) $query);
 
 		return $query->fetchMode(\PDO::FETCH_ASSOC)->all();
 	}
