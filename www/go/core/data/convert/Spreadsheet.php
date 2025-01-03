@@ -16,6 +16,7 @@ use go\core\orm\exception\SaveException;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\orm\Relation;
+use go\core\util\ArrayObject;
 use go\core\util\DateTime as GoDateTime;
 use go\core\util\StringUtil;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
@@ -27,6 +28,8 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 use PhpOffice\PhpSpreadsheet\Worksheet\RowIterator;
 use Sabre\VObject\Property\VCard\DateTime;
+use function go\core\util\sorter;
+
 
 /**
  * CSV converter.
@@ -112,6 +115,12 @@ class Spreadsheet extends AbstractConverter {
 	 */
 	protected $spreadsheetRowIterator;
 	private array $highest;
+
+
+	/**
+	 * @var Relation[]
+	 */
+	protected array $relations = [];
 
 
 	/**

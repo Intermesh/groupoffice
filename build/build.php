@@ -239,7 +239,7 @@ class Builder
         $cmd = $this->encoder . ' -r ';
 
         if(!empty($excludes)) {
-	        $cmd .= "--exclude " . implode("--exclude ", array_map("escapeshellarg", $excludes));
+	        $cmd .= "-c " . implode("-c ", array_map("escapeshellarg", $excludes));
         }
 
         $cmd .= ' -f "*.php" -o ' . $this->buildDir . "/" . $this->packageName . $targetPath . " ".basename($sourcePath)."/*";
