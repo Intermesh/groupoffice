@@ -1,3 +1,5 @@
+- Core: Fixed that cron could get stuck when an error occurred in a job
+
 23-12-2024: 6.8.91
 - Tasks: fix several bugs in ICS import
 - OAuth2 client: return more informative exception if a session variable is missing.
