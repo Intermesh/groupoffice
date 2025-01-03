@@ -5,6 +5,7 @@ namespace go\modules\community\maildomains\cli\controller;
 use go\core\Controller;
 use go\core\db\Query;
 use go\core\fs\Folder;
+use go\modules\community\maildomains\install\Migrator;
 use go\modules\community\maildomains\model;
 
 final class Script extends Controller
@@ -78,27 +79,18 @@ final class Script extends Controller
 	}
 
 	/**
-	 * Clean up removed mail boxes
+	 * Migrates DKIM keys from filesystem to database.
+	 * It can't run automatically as www-data has no access to the files. This must be changed first.
 	 *
-	 * ./cli.php community/maildomains/Script/mailboxUsage  --quiet=[0|1]
+	 * chown www-data -R /var/lib/rspamd/dkim
+	 *
+	 * docker compose exec -u www-data groupoffice-develop ./www/cli.php community/maildomains/Script/migrateDKIM
+	 *
+	 * @param array $params
+	 * @return void
 	 */
-	public function mailboxUsage(array $params)
-	{
-		extract($this->checkParams($params, ['q' => 1]));
-
-		$q = (boolean) $q;
-
-		$mbs = model\Mailbox::find()->where(['active' => 1])->select(["maildir", "username", "domainId"])->all();
-
-		foreach ($mbs as $mb) {
-			if (!$q) {
-				echo 'Calculating size of ' . $mb->getMaildirFolder()->getPath() . PHP_EOL;
-			}
-			$mb->cacheUsage();
-
-			if (!$q) {
-				echo \GO\Base\Util\Number::formatSize($mb->usage) . PHP_EOL;
-			}
-		}
+	public function migrateDKIM(array $params) {
+			$m = new Migrator();
+			$m->migrateDKIM($params['folder'] ?? "/var/lib/rspamd/dkim", $params['selector'] ?? "mail");
 	}
 }
