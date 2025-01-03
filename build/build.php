@@ -49,15 +49,15 @@ class Builder
 {
 	public $test = false;
 
-	private $majorVersion = "6.8";
+	private $majorVersion = "25.2";
 
-	private $gitBranch = 'master';
+	private $gitBranch = 'develop';
 
 	/**
 	 *
 	 * @var string sixsix, sixseven etc or testing
 	 */
-	public $distro = "sixeight";
+	public $distro = "testing";
 
 
 	public $repreproDir = __DIR__ . "/deploy/reprepro";
