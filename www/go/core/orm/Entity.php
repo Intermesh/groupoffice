@@ -363,7 +363,7 @@ abstract class Entity extends Property {
 			}
 
 			return $this->commit() && !$this->hasValidationErrors();
-		} catch(Exception $e) {
+		} catch(\Throwable $e) {
 			ErrorHandler::logException($e);
 			$this->rollback();
 			throw $e;
@@ -535,7 +535,7 @@ abstract class Entity extends Property {
 			}
 
 			return true;
-		} catch(Exception $e) {
+		} catch(\Throwable $e) {
 			if(go()->getDbConnection()->inTransaction()) {
 				go()->getDbConnection()->rollBack();
 			}
