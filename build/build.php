@@ -171,6 +171,7 @@ class Builder
 
 		$this->buildNodeCore();
 		$this->buildNodeModules();
+        $this->cleanupNodeCore();
 
         putenv("COMPOSER_ALLOW_SUPERUSER=1");
 		run("composer install --no-dev --optimize-autoloader --ignore-platform-reqs");
@@ -200,16 +201,18 @@ class Builder
         cd("../groupoffice-core");
 		run("npm ci");
 
-		cd("../");
-		run("npm ci");
-		run("npm run build");
-		run("npm prune --omit=dev");
-
-		cd("groupoffice-core");
-		run("npm prune --omit=dev");
-		cd("../goui");
-		run("npm prune --omit=dev");
 	}
+
+    private function cleanupNodeCore() {
+        cd($this->buildDir . "/" . $this->packageName);
+        cd("views/goui/goui");
+        run("npm prune --omit=dev");
+
+        cd("groupoffice-core");
+        run("npm prune --omit=dev");
+        cd("../goui");
+        run("npm prune --omit=dev");
+    }
 
 
 	private function buildNodeModules()
