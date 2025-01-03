@@ -1,4 +1,5 @@
 - Core: Fixed that cron could get stuck when an error occurred in a job
+- Core: Module "vendor" folders where not included in the build
 
 23-12-2024: 6.8.91
 - Tasks: fix several bugs in ICS import
