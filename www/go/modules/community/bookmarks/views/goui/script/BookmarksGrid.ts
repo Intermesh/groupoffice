@@ -12,6 +12,12 @@ export class BookmarksGrid extends Component {
 		this.store = datasourcestore({
 			dataSource: jmapds("Bookmark"),
 			sort: [{property: "categoryId", isAscending: true}],
+			queryParams: {
+				limit: 0,
+				filter: {
+					permissionLevel: 5
+				}
+			},
 			listeners: {
 				load: (store, bookmarks) => {
 					this.items.clear();
