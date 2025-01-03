@@ -209,11 +209,12 @@ class Builder
 
     private function cleanupNodeCore() {
         cd($this->buildDir . "/" . $this->packageName);
-        cd("views/goui/goui");
+        cd("views/goui");
         run("npm prune --omit=dev");
 
         cd("groupoffice-core");
         run("npm prune --omit=dev");
+
         cd("../goui");
         run("npm prune --omit=dev");
     }
