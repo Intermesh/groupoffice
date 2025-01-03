@@ -201,6 +201,10 @@ class Builder
         cd("../groupoffice-core");
 		run("npm ci");
 
+        cd("../");
+        run("npm ci");
+        run("npm run build");
+
 	}
 
     private function cleanupNodeCore() {
