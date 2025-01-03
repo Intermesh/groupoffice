@@ -16,28 +16,53 @@ export class BookmarksGrid extends Component {
 				load: (store, bookmarks) => {
 					this.items.clear();
 
-					const container = comp({cls: "hbox"})
+					const container = comp({cls: "flow"});
+
+					let lastCategoryId = 0;
 
 					bookmarks.forEach((bookmark) => {
+						if (bookmark.category.id != lastCategoryId) {
+							container.items.add(
+								comp({tagName: "h3", text: bookmark.category.name})
+							)
+
+							lastCategoryId = bookmark.category.id;
+						}
+
 						const bookmarkComp = comp({
-							cls: "bookmark",
-							width: 300,
-							height: 100
-						});
-
-						const logo = img({
-							cls: "bookmark-logo",
-							blobId: bookmark.logo,
-							width: 30,
-							height: 30
-						});
-
-						bookmarkComp.items.add(
-							comp({cls: "hbox fit"},
-								logo,
-								comp({cls: "fit"},
-									comp({tagName: "h4", text: bookmark.name}),
-									comp({tagName: "p", text: bookmark.description})
+								cls: "bookmark flow",
+								width: 300,
+								height: 100,
+								style: {
+									overflow: "hidden",
+									textOverflow: "ellipsis"
+								}
+							},
+							comp({flex:1, cls: "hbox"},
+								img({
+									style: {
+										width: "32px",
+										height: "32px",
+									},
+									blobId: bookmark.logo
+								}),
+								comp({
+										cls: "vbox"
+									},
+									comp({
+										text: bookmark.name,
+										style: {
+											paddingLeft: "0.5rem"
+										}
+									}),
+									comp({
+										cls: "",
+										text: bookmark.description,
+										style: {
+											padding: "0.5rem",
+											fontSize: "11px"
+										}
+									})
 								)
 							)
 						);
@@ -46,6 +71,12 @@ export class BookmarksGrid extends Component {
 					});
 
 					this.items.add(container);
+				}
+			},
+			relations: {
+				category: {
+					path: "categoryId",
+					dataSource: jmapds("BookmarksCategory")
 				}
 			}
 		})

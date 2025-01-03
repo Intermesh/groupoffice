@@ -1,12 +1,10 @@
-import {FormWindow, jmapds, img, client} from "@intermesh/groupoffice-core";
+import {FormWindow, jmapds, client} from "@intermesh/groupoffice-core";
 import {
 	browser,
 	btn, Button,
 	checkbox,
 	CheckboxField,
 	combobox, comp,
-	DisplayField,
-	displayfield,
 	fieldset, HiddenField, hiddenfield,
 	t,
 	TextField,
@@ -14,7 +12,7 @@ import {
 } from "@intermesh/goui";
 
 export class BookmarksDialog extends FormWindow {
-	private newTabCheckbox: CheckboxField
+	private readonly newTabCheckbox: CheckboxField
 	private urlTextField: TextField
 	private nameTextField: TextField
 	private descriptionTextField: TextField
@@ -29,6 +27,7 @@ export class BookmarksDialog extends FormWindow {
 		this.stateId = "bookmark-dialog";
 		this.maximizable = true;
 		this.resizable = true;
+		this.modal = true;
 
 		this.height = 550;
 		this.width = 500;
