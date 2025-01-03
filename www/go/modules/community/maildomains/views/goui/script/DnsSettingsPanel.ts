@@ -144,7 +144,7 @@ export class DnsSettingsPanel extends Component {
 
 		const fd2 = fieldset({},
 
-			comp({cls: "group"},
+			comp({cls: "hbox gap"},
 				this.spfFld = textfield({
 					flex: 1,
 					name: "spf",
@@ -156,6 +156,7 @@ export class DnsSettingsPanel extends Component {
 					escapeValue: false,
 					name: "spfStatus",
 					value: false,
+					style: {alignSelf: "start"},
 					renderer: (v, field) => {
 
 						if(!v) {
@@ -173,7 +174,7 @@ export class DnsSettingsPanel extends Component {
 				})
 			),
 
-			comp({cls: "group"},
+			comp({cls: "hbox gap"},
 				this.dmarcFld = textfield({
 					flex: 1,
 					name: "dmarc",
@@ -184,6 +185,7 @@ export class DnsSettingsPanel extends Component {
 				displayfield({
 					escapeValue: false,
 					name: "dmarcStatus",
+					style: {alignSelf: "start"},
 					renderer: (v, field) => {
 
 						if(!v) {
@@ -200,7 +202,7 @@ export class DnsSettingsPanel extends Component {
 					}
 				})
 			),
-			comp({cls: "group"},
+			comp({cls: "hbox gap"},
 				this.mxFld = textfield({
 					flex: 1,
 					name: "mx",
@@ -209,6 +211,7 @@ export class DnsSettingsPanel extends Component {
 					readOnly: true
 					}),
 				displayfield({
+					style: {alignSelf: "start"},
 					escapeValue: false,
 					name: "mxStatus",
 					renderer: (v, field) => {
