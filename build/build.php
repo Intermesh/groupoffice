@@ -173,6 +173,8 @@ class Builder
 		$this->buildNodeModules();
         $this->cleanupNodeCore();
 
+        cd($this->buildDir . "/" . $this->packageName);
+
         putenv("COMPOSER_ALLOW_SUPERUSER=1");
 		run("composer install --no-dev --optimize-autoloader --ignore-platform-reqs");
 
