@@ -1,15 +1,22 @@
 import {btn, combobox, comp, Component, Filter, searchbtn, t, tbar} from "@intermesh/goui";
-import {BookmarksGrid} from "./BookmarksGrid.js";
+import {BookmarksGridView} from "./BookmarksGridView.js";
 import {jmapds} from "@intermesh/groupoffice-core";
 import {BookmarksDialog} from "./BookmarksDialog.js";
 import {ManageCategoriesWindow} from "./ManageCategoriesWindow.js";
+import {BookmarksColumnView} from "./BookmarksColumnView.js";
 
 export class Main extends Component {
+	private isGridView: boolean = true;
+
 	constructor() {
 		super();
 
-		const grid = new BookmarksGrid();
-		void grid.store.load();
+		const gridView = new BookmarksGridView();
+		void gridView.store.load();
+
+		const columnView = new BookmarksColumnView();
+		void columnView.store.load();
+		columnView.hidden = true;
 
 		const toolbar = tbar({
 				cls: "border-bottom"
@@ -27,7 +34,10 @@ export class Main extends Component {
 				icon: "view_module",
 				text: t("Toggle view"),
 				handler: () => {
+					this.isGridView = !this.isGridView;
 
+					gridView.hidden = !this.isGridView;
+					columnView.hidden = this.isGridView;
 				}
 			}),
 			btn({
@@ -46,15 +56,19 @@ export class Main extends Component {
 				placeholder: t("Show all"),
 				listeners: {
 					setvalue: (field, newValue, oldValue) => {
-						grid.store.setFilter("categoryId", {categoryId: newValue});
+						gridView.store.setFilter("categoryId", {categoryId: newValue});
+						columnView.store.setFilter("categoryId", {categoryId: newValue});
 
-						void grid.store.load();
+						void gridView.store.load();
+						void columnView.store.load();
 					},
 					change: (field, newValue, oldValue) => {
 						if (newValue === "") {
-							grid.store.clearFilter("categoryId");
+							gridView.store.clearFilter("categoryId");
+							columnView.store.clearFilter("categoryId");
 
-							void grid.store.load();
+							void gridView.store.load();
+							void columnView.store.load();
 						}
 					}
 				},
@@ -64,15 +78,18 @@ export class Main extends Component {
 			searchbtn({
 				listeners: {
 					input: (sender, text) => {
-						(grid.store.queryParams.filter as Filter).text = text;
-						void grid.store.load();
+						(gridView.store.queryParams.filter as Filter).text = text;
+						void gridView.store.load();
+
+						(columnView.store.queryParams.filter as Filter).text = text;
+						void columnView.store.load();
 					}
 				}
 			})
 		);
 
 		this.items.add(toolbar);
-		this.items.add(grid)
-
+		this.items.add(gridView);
+		this.items.add(columnView);
 	}
 }

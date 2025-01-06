@@ -13,6 +13,22 @@
   }
 }
 
+.bookmark-grid-view, .bookmark-column-view {
+  max-height: 90vh;
+}
+
+.bookmark-column {
+  width: 320px !important;
+}
+
+.bookmark-in-column {
+
+  &:hover {
+    cursor: pointer;
+    background-color: var(--bg-highest);
+  }
+}
+
 .bookmark-logo {
   width: 24px;
   height: 24px;
@@ -24,6 +40,15 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.bookmark-in-column > .bookmark-logo {
+  margin: 1rem;
+}
+
+.bookmark-in-column > .bookmark-name {
+  width: 83%;
+  line-height: 3rem;
 }
 
 .bookmark-desc {

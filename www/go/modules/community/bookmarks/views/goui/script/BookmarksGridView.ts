@@ -1,14 +1,15 @@
-import {btn, comp, Component, datasourcestore, DataSourceStore, menu, t} from "@intermesh/goui";
+import {comp, Component, datasourcestore, DataSourceStore} from "@intermesh/goui";
 import {jmapds, img, client} from "@intermesh/groupoffice-core";
-import {BookmarksDialog} from "./BookmarksDialog.js";
+import {BookmarkContextMenu} from "./BookmarkContextMenu.js";
 
-export class BookmarksGrid extends Component {
+export class BookmarksGridView extends Component {
 	public store: DataSourceStore;
 
 	constructor() {
 		super();
 
-		this.cls = "pad";
+		this.cls = "scroll pad bookmark-grid-view";
+
 
 		this.store = datasourcestore({
 			dataSource: jmapds("Bookmark"),
@@ -36,16 +37,14 @@ export class BookmarksGrid extends Component {
 							lastCategoryId = bookmark.category.id;
 						}
 
-						let writtenByUser = (client.user.id == bookmark.creator.id);
-
 						const bookmarkComp = comp({
-								cls: "bookmark flow",
+								cls: "bookmark",
 								listeners: {
 									beforerender: (cmp) => {
 										cmp.el.addEventListener("click", ev => {
 											ev.preventDefault();
 
-											if(bookmark.openExtern){
+											if (bookmark.openExtern) {
 												window.open(bookmark.content);
 											} else {
 												window.open(bookmark.content, "_self");
@@ -57,32 +56,7 @@ export class BookmarksGrid extends Component {
 										cmp.el.addEventListener("contextmenu", ev => {
 											ev.preventDefault();
 
-											const contextMenu = menu({
-													isDropdown: true
-												},
-												btn({
-													icon: "edit",
-													text: t("Edit"),
-													disabled: client.user.isAdmin ? false : !writtenByUser,
-													handler: () => {
-														if (client.user.isAdmin || writtenByUser) {
-															const dlg = new BookmarksDialog();
-															void dlg.load(bookmark.id);
-															dlg.show();
-														}
-													}
-												}),
-												btn({
-													icon: "delete",
-													text: t("Delete"),
-													disabled: client.user.isAdmin ? false : !writtenByUser,
-													handler: () => {
-														if (client.user.isAdmin || writtenByUser) {
-															jmapds("Bookmark").confirmDestroy([bookmark.id]);
-														}
-													}
-												})
-											)
+											const contextMenu = new BookmarkContextMenu(client.user, bookmark);
 
 											contextMenu.showAt(ev);
 										})
@@ -115,7 +89,6 @@ export class BookmarksGrid extends Component {
 								)
 							)
 						);
-
 
 						container.items.add(bookmarkComp);
 					});
