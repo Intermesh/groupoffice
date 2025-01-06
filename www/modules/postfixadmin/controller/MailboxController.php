@@ -4,6 +4,11 @@
 namespace GO\Postfixadmin\Controller;
 
 
+use GO\Base\Exception\NotFound;
+use go\core\orm\exception\SaveException;
+use go\modules\community\maildomains\model\Alias;
+use go\modules\community\maildomains\model\Mailbox;
+
 class MailboxController extends \GO\Base\Controller\AbstractModelController {
 
 	protected $model = 'GO\Postfixadmin\Model\Mailbox';
@@ -44,6 +49,8 @@ class MailboxController extends \GO\Base\Controller\AbstractModelController {
 				\GO::session()->runAsRoot();
 			}
 		}
+
+		$this->setPasswordForMaildomains($params);
 		
 		$mailbox = \GO\Postfixadmin\Model\Mailbox::model()->findSingleByAttributes(array(
 				"username"=>$params["username"]				
@@ -74,6 +81,8 @@ class MailboxController extends \GO\Base\Controller\AbstractModelController {
 				\GO::session()->runAsRoot();
 			}
 		}
+
+		$this->addMailboxForMaildomains($params);
 
 		
 		if(isset($params['domain_id']))
@@ -204,6 +213,61 @@ class MailboxController extends \GO\Base\Controller\AbstractModelController {
 //		
 //		system('fetchmail -r /tmp/importFetchmailRc -v');
 //	}
-	
+	private function setPasswordForMaildomains($params)
+	{
+		/**
+		 * "username" => $username,
+		 * "password" => $this->password,
+		 */
+
+		if(!go()->getModule("community", "maildomains")) {
+			return;
+		}
+
+		$mailbox = Mailbox::find()->where(['username' => $params['username']])->single();
+
+		if(!$mailbox) {
+			throw new NotFound();
+		}
+
+		$mailbox->setPassword($params['password']);
+		if(!$mailbox->save()) {
+			throw new SaveException($mailbox);
+		}
+
+	}
+
+	private function addMailboxForMaildomains($params)
+	{
+		if(!go()->getModule("community", "maildomains")) {
+			return;
+		}
+		/**
+		 * 'name' => $user->displayName,
+		 * 'username' => $username,
+		 * 'alias' => $alias,
+		 * 'password' => $this->password,
+		 * 'password2' => $this->password,
+		 * 'domain' => $domain
+		 */
+
+		$mailbox = new Mailbox();
+		$mailbox->username = $params['username'] . '@' . $params['domain'];
+		$mailbox->setPassword($params['password']);
+		$mailbox->description = $params['name'];
+		if(!$mailbox->save()) {
+			throw new SaveException($mailbox);
+		}
+
+		if(!empty($params['alias'])) {
+			$alias = new Alias();
+			$alias->address = $params['alias'];
+			$alias->goto = $params['username'];
+			if(!$alias->save()) {
+				throw new SaveException($alias);
+			}
+		}
+	}
+
 }
 
