@@ -1,6 +1,9 @@
 - Core: Fixed that cron could get stuck when an error occurred in a job
-- Core: Module "vendor" folders where not included in the build
+- Core: Module "vendor" folders were not included in the build
 - Core: Updated German translation
+- E-mail: Restored long lost quota warning style
+- Core: Updated PL holidays (Github #1212)
+- Core: Create separate alert for each error while importing new entities
 
 23-12-2024: 6.8.91
 - Tasks: fix several bugs in ICS import

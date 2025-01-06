@@ -323,9 +323,9 @@ class Imap extends ImapBodyStruct
 				$command = "CAPABILITY\r\n";
 				$this->send_command($command);
 				$response = $this->get_response();
-				$this->capability = implode(' ', $response);
+				$this->capability = \GO::session()->values['GO_IMAP'][$key]['imap_capability'] = implode(' ', $response);
 			}
-			$this->capability = \GO::session()->values['GO_IMAP'][$key]['imap_capability'] = implode(' ', $response);
+
 		}
 		return $this->capability;
 	}
