@@ -197,25 +197,30 @@ abstract class AbstractConverter {
 		}
 	}
 
-	private function notifyError(string $error) {
-		// JH20241223: TODO? This alert is overwritten immediately. Would it not make sense to make an alert for each faild import...
-		// ...so instead of using $this->>alert just create its own alert?
-		$this->alert = new Alert();
-
+	/**
+	 * @param string $error
+	 * @return void
+	 * @throws SaveException
+	 * @throws \JsonException
+	 * @throws Exception
+	 */
+	private function notifyError(string $error)
+	{
+		$a = new Alert();
 
 		$module = \go\core\model\Module::findByClass($this->entityClass, ['id', 'name', 'package']);
 
-		$this->alert->setEntity($module);
-		$this->alert->userId = go()->getUserId();
-		$this->alert->triggerAt = new DateTime();
-		$this->alert->setData([
+		$a->setEntity($module);
+		$a->userId = go()->getUserId();
+		$a->triggerAt = new DateTime();
+		$a->setData([
 				'title' => go()->t("Import error"),
 				'body' => $error
 			]
 		);
 
-		if (!$this->alert->save()) {
-			throw new SaveException($this->alert);
+		if (!$a->save()) {
+			throw new SaveException($a);
 		}
 	}
 
