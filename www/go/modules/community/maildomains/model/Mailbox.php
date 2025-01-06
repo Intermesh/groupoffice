@@ -92,7 +92,7 @@ final class Mailbox extends AclItemEntity
 	 */
 	protected static function textFilterColumns(): array
 	{
-		return ['name', 'username'];
+		return ['description', 'username'];
 	}
 
 	/**
@@ -111,13 +111,18 @@ final class Mailbox extends AclItemEntity
 	protected function internalValidate()
 	{
 		$d = $this->getDomain();
+
+		if($this->isNew() && !$this->isModified(['quota'])) {
+			$this->quota = $d->defaultQuota;
+		}
+
 		if ($this->isModified('password') && strlen($this->password) > 0 && strlen($this->password) < go()->getSettings()->passwordMinLength) {
 			if (strlen($this->plainPassword) < go()->getSettings()->passwordMinLength) {
 				$this->setValidationError('password', ErrorCode::INVALID_INPUT, "Minimum password length is " . go()->getSettings()->passwordMinLength . " chars");
 			}
 		}
 
-		$this->checkQuota(); // TODO
+		$this->checkQuota();
 
 		if (!empty($d->maxMailboxes) && $this->isNew() && count($d->mailboxes) + 1 > $d->maxMailboxes) {
 			throw new Forbidden('The maximum number of mailboxes for this domain has been reached.');
@@ -282,9 +287,20 @@ final class Mailbox extends AclItemEntity
 	/**
 	 * As the ORM does currently not support retrieving its owner entity through a relation, we simply retrieve the entity by ID
 	 * @return Domain|null
+	 * @throws \Exception
 	 */
 	private function getDomain(): Domain|null
 	{
+		if(!isset($this->domainId) && isset($this->username)) {
+			$domain = explode("@", $this->username)[1];
+
+			$this->domain = Domain::find()->where(['domain' => $domain])->single();
+
+			if($this->domain) {
+				$this->domainId = $this->domain->id;
+			}
+		}
+
 		if (!isset($this->domain) && isset($this->domainId)) {
 			$this->domain = Domain::findById($this->domainId);
 		}

@@ -135,9 +135,20 @@ final class Alias extends AclItemEntity
 	 * As the ORM does currently not support retrieving its owner entity through a relation, we simply retrieve the
 	 * entity by ID
 	 * @return Domain|null
+	 * @throws \Exception
 	 */
 	private function getDomain(): Domain|null
 	{
+		if(!isset($this->domainId) && isset($this->address)) {
+			$domain = explode("@", $this->address)[1];
+
+			$this->domain = Domain::find()->where(['domain' => $domain])->single();
+
+			if($this->domain) {
+				$this->domainId = $this->domain->id;
+			}
+		}
+
 		if (!isset($this->domain) && isset($this->domainId)) {
 			$this->domain = Domain::findById($this->domainId);
 		}
