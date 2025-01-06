@@ -1,3 +1,5 @@
+- Core: Added PL holidays from 6.8 branch
+
 11-11-2024: 6.7.85
 - Core: Import responded with invalid JSON due to echo statement.
 - Core: fixed copy pasting images from a Microsoft Word Document in Windows
