@@ -35,11 +35,11 @@ x Billing module refactor
     - Auto dismiss reminders after event start time
 
 - Mailserver
-    - Quota warning: https://doc.dovecot.org/configuration_manual/quota/#quota-warning-scripts
+    x Quota warning: https://doc.dovecot.org/configuration_manual/quota/#quota-warning-scripts
     x limit access per service and filter remote ip address (global and per domain) to stop hacks. https://doc.dovecot.org/configuration_manual/config_file/config_variables/
     x Auto clean spam and trash
-    - DKIM generator and implementation. Zie project doc.
-    - Cron job that checks every hour:
+    x DKIM generator and implementation. Zie project doc.
+    x Cron job that checks every hour:
         - SPF record is correct
         - DKIM record is set and valid. Automatically configure rspamd.
         - MX record points to the server
@@ -47,7 +47,7 @@ x Billing module refactor
         - Perhaps black list check?
      x flush cache on password change: doveadm auth cache flush <USER> (NIET NODIG!)
     x unbound or bind9?
-    - master user: https://doc.dovecot.org/configuration_manual/authentication/master_users/
+    x master user: https://doc.dovecot.org/configuration_manual/authentication/master_users/
 
 - Rocket chat
     - Live chat on sites feed back into GO
