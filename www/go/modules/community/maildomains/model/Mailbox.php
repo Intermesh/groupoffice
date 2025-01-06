@@ -22,7 +22,7 @@ final class Mailbox extends AclItemEntity
 	public ?int $id;
 	public int $domainId;
 	public string $username;
-	public ?string $password;
+	protected ?string $password;
 	public bool $domainOwner = false;
 	public bool $smtpAllowed;
 	public bool $fts;
@@ -81,6 +81,9 @@ final class Mailbox extends AclItemEntity
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()
+			->add("username", function (Criteria $criteria, $value) {
+				$criteria->andWhere('username', '=', $value);
+			})
 			->add("domainId", function (Criteria $criteria, $value) {
 				$criteria->andWhere('domainId', '=', $value);
 			});
@@ -116,7 +119,7 @@ final class Mailbox extends AclItemEntity
 			$this->quota = $d->defaultQuota;
 		}
 
-		if ($this->isModified('password') && strlen($this->password) > 0 && strlen($this->password) < go()->getSettings()->passwordMinLength) {
+		if (isset($this->plainPassword)) {
 			if (strlen($this->plainPassword) < go()->getSettings()->passwordMinLength) {
 				$this->setValidationError('password', ErrorCode::INVALID_INPUT, "Minimum password length is " . go()->getSettings()->passwordMinLength . " chars");
 			}
@@ -132,9 +135,8 @@ final class Mailbox extends AclItemEntity
 
 	protected function internalSave(): bool
 	{
-		if ($this->isModified('password') && strlen($this->password)) {
-			$this->setPassword($this->password);
-			$this->password = $this->crypt($this->password);
+		if (isset($this->plainPassword)) {
+			$this->password = $this->crypt($this->plainPassword);
 		}
 
 		if ($this->isNew() || empty($this->homedir)) {
@@ -143,8 +145,7 @@ final class Mailbox extends AclItemEntity
 			$this->homedir = $d->domain . '/' . $parts[0] . '/';
 			$this->maildir = $d->domain . '/' . $parts[0] . '/Maildir/';
 		}
-//		$domain = $this->getDomain();
-//		Domain::entityType()->changes([$this->domainId, $domain->findAclId(), false]);
+
 		return parent::internalSave();
 	}
 
@@ -315,6 +316,10 @@ final class Mailbox extends AclItemEntity
 	public function setPassword(string $password): void
 	{
 		$this->plainPassword = $password;
+	}
+
+	public function getPassword() {
+		return null;
 	}
 
 	/**
