@@ -1,98 +1,78 @@
-import {comp, Component, datasourcestore, DataSourceStore} from "@intermesh/goui";
-import {client, jmapds, img} from "@intermesh/groupoffice-core";
+import {comp, Component, DataSourceStore} from "@intermesh/goui";
+import {client, img} from "@intermesh/groupoffice-core";
 import {BookmarkContextMenu} from "./BookmarkContextMenu.js";
 
 export class BookmarksColumnView extends Component {
 	public store: DataSourceStore;
 
-	constructor() {
+	constructor(store: DataSourceStore) {
 		super();
 
 		this.cls = "scroll bookmark-column-view";
 
-		this.store = datasourcestore({
-			dataSource: jmapds("Bookmark"),
-			sort: [{property: "categoryId", isAscending: true}],
-			queryParams: {
-				limit: 0,
-				filter: {
-					permissionLevel: 5
+		this.store = store;
+
+		this.store.on("load", (store, bookmarks) => {
+			this.items.clear();
+
+			const container = comp({cls: "flow"});
+
+			let lastCategoryId = 0;
+			let lastCategoryComp: Component;
+
+			bookmarks.forEach((bookmark) => {
+				if (bookmark.category.id != lastCategoryId || typeof (lastCategoryComp) == undefined) {
+					lastCategoryComp = comp({
+							cls: "vbox bookmark-column"
+						},
+						comp({tagName: "h3", text: bookmark.category.name})
+					)
+
+					lastCategoryId = bookmark.category.id;
+					container.items.add(lastCategoryComp);
 				}
-			},
-			listeners: {
-				load: (store, bookmarks) => {
-					this.items.clear();
 
-					const container = comp({cls: "flow"});
+				const bookmarkComp = comp({
+						cls: "hbox bookmark-in-column",
+						listeners: {
+							beforerender: (cmp) => {
+								cmp.el.addEventListener("click", ev => {
+									ev.preventDefault();
 
-					let lastCategoryId = 0;
-					let lastCategoryComp: Component;
-
-					bookmarks.forEach((bookmark) => {
-						if (bookmark.category.id != lastCategoryId || typeof (lastCategoryComp) == undefined) {
-							lastCategoryComp = comp({
-									cls: "vbox bookmark-column"
-								},
-								comp({tagName: "h3", text: bookmark.category.name})
-							)
-
-							lastCategoryId = bookmark.category.id;
-							container.items.add(lastCategoryComp);
-						}
-
-						const bookmarkComp = comp({
-								cls: "hbox bookmark-in-column",
-								listeners: {
-									beforerender: (cmp) => {
-										cmp.el.addEventListener("click", ev => {
-											ev.preventDefault();
-
-											if (bookmark.openExtern) {
-												window.open(bookmark.content);
-											} else {
-												window.open(bookmark.content, "_self");
-											}
-
-										})
-									},
-									render: (cmp) => {
-										cmp.el.addEventListener("contextmenu", ev => {
-											ev.preventDefault();
-
-											const contextMenu = new BookmarkContextMenu(client.user, bookmark);
-
-											contextMenu.showAt(ev);
-										})
+									if (bookmark.openExtern) {
+										window.open(bookmark.content);
+									} else {
+										window.open(bookmark.content, "_self");
 									}
-								}
+
+								})
 							},
-							img({
-								cls: "bookmark-logo",
-								blobId: bookmark.logo
-							}),
-							comp({
-								cls: "bookmark-name",
-								tagName: "h4",
-								text: bookmark.name
-							})
-						);
+							render: (cmp) => {
+								cmp.el.addEventListener("contextmenu", ev => {
+									ev.preventDefault();
 
-						lastCategoryComp.items.add(bookmarkComp);
-					});
+									const contextMenu = new BookmarkContextMenu(client.user, bookmark);
 
-					this.items.add(container);
-				}
-			},
-			relations: {
-				category: {
-					path: "categoryId",
-					dataSource: jmapds("BookmarksCategory")
-				},
-				creator: {
-					path: "createdBy",
-					dataSource: jmapds("Principal")
-				}
-			}
-		})
+									contextMenu.showAt(ev);
+								})
+							}
+						}
+					},
+					img({
+						cls: "bookmark-logo",
+						blobId: bookmark.logo
+					}),
+					comp({
+						cls: "bookmark-name",
+						tagName: "h4",
+						text: bookmark.name
+					})
+				);
+
+				lastCategoryComp.items.add(bookmarkComp);
+			});
+
+			this.items.add(container);
+		});
 	}
 }
