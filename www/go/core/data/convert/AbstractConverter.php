@@ -198,6 +198,8 @@ abstract class AbstractConverter {
 	}
 
 	private function notifyError(string $error) {
+		// JH20241223: TODO? This alert is overwritten immediately. Would it not make sense to make an alert for each faild import...
+		// ...so instead of using $this->>alert just create its own alert?
 		$this->alert = new Alert();
 
 
@@ -278,10 +280,13 @@ abstract class AbstractConverter {
 				EntityType::push(100);
 
 				if($entity->hasValidationErrors()) {
-					$msg = "Item ". $this->index . ": ". var_export($entity->getValidationErrors(), true);
-					$this->notifyError($msg);
+					foreach ($entity->getValidationErrors() as $key =>  $validationError) {
+						$msg = "Validation error in item " . $this->index . ": " . $key . " - " . $validationError['description'];
+						$this->notifyError($msg);
 
-					$response['errors'][] = $msg;
+						$response['errors'][] = $msg;
+
+					}
 				} elseif($this->afterSave($entity)) {
 					$response['count']++;
 				} else{

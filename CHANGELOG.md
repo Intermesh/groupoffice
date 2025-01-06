@@ -1,5 +1,11 @@
+- Core: Fixed that cron could get stuck when an error occurred in a job
+- Core: Module "vendor" folders where not included in the build
+- Core: Updated German translation
+
+23-12-2024: 6.8.91
 - Tasks: fix several bugs in ICS import
 - OAuth2 client: return more informative exception if a session variable is missing.
+- Core: Slightly more helpful debug data upon validation errors import
 
 12-12-2024: 6.8.90
 - Core: Show database error on upgrade

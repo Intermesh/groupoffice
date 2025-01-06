@@ -108,4 +108,4 @@ select
     `k`.`privateKey` AS `privateKey`
 from (`community_maildomains_dkim_key` `k` join `community_maildomains_domain` `d`
       on (`k`.`domainId` = `d`.`id`))
-where k.enabled = true
+where k.enabled = true;
