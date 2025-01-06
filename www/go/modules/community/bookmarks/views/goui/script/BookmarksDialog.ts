@@ -82,7 +82,16 @@ export class BookmarksDialog extends FormWindow {
 					label: t("Description")
 				}),
 				this.logoHiddenField = hiddenfield({
-					name: "logo"
+					name: "logo",
+					listeners: {
+						setvalue: async (field, newValue, oldValue) => {
+							const blobURL = await client.getBlobURL(newValue);
+
+							this.logoButton.style = {
+								backgroundImage: `url(${blobURL})`
+							}
+						}
+					}
 				}),
 				comp({cls: "vbox"},
 					comp({tagName: "h5", text: t("Logo"), style: {margin: "0 0.5rem"}}),
@@ -99,12 +108,6 @@ export class BookmarksDialog extends FormWindow {
 							this.mask();
 							const blob = await client.upload(files[0]);
 							this.unmask();
-
-							const blobURL = await client.getBlobURL(blob.id);
-
-							this.logoButton.style = {
-								backgroundImage: `url(${blobURL})`
-							}
 
 							this.logoHiddenField.value = blob.id;
 						}

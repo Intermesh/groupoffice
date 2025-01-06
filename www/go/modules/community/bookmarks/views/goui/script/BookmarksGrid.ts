@@ -1,5 +1,6 @@
-import {comp, Component, datasourcestore, DataSourceStore} from "@intermesh/goui";
-import {jmapds, img} from "@intermesh/groupoffice-core";
+import {btn, comp, Component, datasourcestore, DataSourceStore, menu, t} from "@intermesh/goui";
+import {jmapds, img, client} from "@intermesh/groupoffice-core";
+import {BookmarksDialog} from "./BookmarksDialog.js";
 
 export class BookmarksGrid extends Component {
 	public store: DataSourceStore;
@@ -35,43 +36,86 @@ export class BookmarksGrid extends Component {
 							lastCategoryId = bookmark.category.id;
 						}
 
+						let writtenByUser = (client.user.id == bookmark.creator.id);
+
 						const bookmarkComp = comp({
 								cls: "bookmark flow",
-								width: 300,
-								height: 100,
-								style: {
-									overflow: "hidden",
-									textOverflow: "ellipsis"
+								listeners: {
+									beforerender: (cmp) => {
+										cmp.el.addEventListener("click", ev => {
+											ev.preventDefault();
+
+											if(bookmark.openExtern){
+												window.open(bookmark.content);
+											} else {
+												window.open(bookmark.content, "_self");
+											}
+
+										})
+									},
+									render: (cmp) => {
+										cmp.el.addEventListener("contextmenu", ev => {
+											ev.preventDefault();
+
+											const contextMenu = menu({
+													isDropdown: true
+												},
+												btn({
+													icon: "edit",
+													text: t("Edit"),
+													disabled: client.user.isAdmin ? false : !writtenByUser,
+													handler: () => {
+														if (client.user.isAdmin || writtenByUser) {
+															const dlg = new BookmarksDialog();
+															void dlg.load(bookmark.id);
+															dlg.show();
+														}
+													}
+												}),
+												btn({
+													icon: "delete",
+													text: t("Delete"),
+													disabled: client.user.isAdmin ? false : !writtenByUser,
+													handler: () => {
+														if (client.user.isAdmin || writtenByUser) {
+															jmapds("Bookmark").confirmDestroy([bookmark.id]);
+														}
+													}
+												})
+											)
+
+											contextMenu.showAt(ev);
+										})
+									}
 								}
 							},
-							comp({flex:1, cls: "hbox"},
+							comp({
+									cls: "hbox"
+								},
 								img({
-									style: {
-										width: "32px",
-										height: "32px",
-									},
+									cls: "bookmark-logo",
 									blobId: bookmark.logo
 								}),
 								comp({
-										cls: "vbox"
+										cls: "vbox",
+										style: {
+											width: "85%",
+											paddingLeft: "1.5rem"
+										}
 									},
 									comp({
-										text: bookmark.name,
-										style: {
-											paddingLeft: "0.5rem"
-										}
+										cls: "bookmark-name",
+										tagName: "h4",
+										text: bookmark.name
 									}),
 									comp({
-										cls: "",
-										text: bookmark.description,
-										style: {
-											padding: "0.5rem",
-											fontSize: "11px"
-										}
+										cls: "bookmark-desc",
+										text: bookmark.description
 									})
 								)
 							)
 						);
+
 
 						container.items.add(bookmarkComp);
 					});
@@ -83,6 +127,10 @@ export class BookmarksGrid extends Component {
 				category: {
 					path: "categoryId",
 					dataSource: jmapds("BookmarksCategory")
+				},
+				creator: {
+					path: "createdBy",
+					dataSource: jmapds("Principal")
 				}
 			}
 		})

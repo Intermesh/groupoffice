@@ -3,7 +3,35 @@
 
 
 .goui .bookmark {
+  width: 300px;
+  height: 100px;
+  margin: 8px 4px;
+
   &:hover {
-    background-color: black;
+    cursor: pointer;
+    background-color: var(--bg-highest);
   }
+}
+
+.bookmark-logo {
+  width: 24px;
+  height: 24px;
+  margin-top: 1rem;
+  margin-left: 1rem;
+}
+
+.bookmark-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bookmark-desc {
+  font-size: 11px;
+  margin-top: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }

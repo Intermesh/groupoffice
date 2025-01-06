@@ -52,7 +52,6 @@ class Extjs3 {
             if($debug && $file->getModifiedAt() > $modifiedAt) {
             	$modifiedAt = $file->getModifiedAt();
             }
-            continue;
           }
 
 
@@ -63,7 +62,6 @@ class Extjs3 {
 						if($debug && $file->getModifiedAt() > $modifiedAt) {
 							$modifiedAt = $file->getModifiedAt();
 						}
-						continue;
 					}
 
 					$file = $folder->getFile('views/goui/dist/style.css');
@@ -73,7 +71,6 @@ class Extjs3 {
 						if($debug && $file->getModifiedAt() > $modifiedAt) {
 							$modifiedAt = $file->getModifiedAt();
 						}
-						continue;
 					}
 
 
