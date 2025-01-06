@@ -1,3 +1,4 @@
+06-01-2024: 6.8.92
 - Core: Fixed that cron could get stuck when an error occurred in a job
 - Core: Module "vendor" folders were not included in the build
 - Core: Updated German translation
