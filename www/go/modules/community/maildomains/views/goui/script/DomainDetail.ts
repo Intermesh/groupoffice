@@ -176,7 +176,7 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 						icon: "delete",
 						text: t("Delete"),
 						handler: () => {
-							jmapds("Application").confirmDestroy([this.entity!.id]);
+							jmapds("MailDomain").confirmDestroy([this.entity!.id]);
 						}
 					})
 					)

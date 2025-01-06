@@ -140,7 +140,7 @@ final class Domain extends AclOwnerEntity
 	 */
 	protected static function textFilterColumns(): array
 	{
-		return ['id', 'description'];
+		return ['description', 'domain'];
 	}
 
 	/**

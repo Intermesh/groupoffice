@@ -226,7 +226,7 @@ export class MailboxDialog extends FormWindow {
 
 		this.on("ready", async  () => {
 			if (this.currentId) {
-				this.usernameFld.disabled = true;
+				this.usernameFld.readOnly = true;
 				const username = this.usernameFld.value as string;
 				if (username.indexOf("@") >-1) {
 					const parts = username.split("@")
