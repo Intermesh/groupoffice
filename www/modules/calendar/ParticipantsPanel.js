@@ -345,7 +345,7 @@ Ext.extend(GO.calendar.ParticipantsPanel, Ext.Panel, {
 		var filtered=[];
 		for(var i=0;i<result.results.length;i++){
 			var email = result.results[i].email;
-			var record = this.store.find("email", email);
+			var record = this.store.find("email", email, 0, false);
 			if(record==-1){
 				filtered.push(result.results[i]);
 			}
