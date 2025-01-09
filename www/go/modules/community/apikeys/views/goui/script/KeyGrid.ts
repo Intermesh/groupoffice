@@ -7,7 +7,7 @@ import {
 	datecolumn,
 	menu,
 	t,
-	Table
+	Table, browser
 } from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
 
@@ -65,7 +65,7 @@ export class KeyGrid extends Table<DataSourceStore> {
 								btn({
 									text: t("Copy token to clipboard"),
 									handler: (button, ev) => {
-										go.util.copyTextToClipboard(record.accessToken);
+										browser.copyTextToClipboard(record.accessToken);
 									}
 								}),
 								btn({
