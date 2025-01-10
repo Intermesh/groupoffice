@@ -1,3 +1,4 @@
+10-01-2024: 6.8.93
 - Finance: Option to migrate all from billing automatically.
 - Finance / Core: Copy paste PDF and e-mail templates
 
