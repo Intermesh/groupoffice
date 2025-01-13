@@ -1,3 +1,5 @@
+10-01-2024: 6.8.94
+- Core: Increased font size to match the font size in legacy lib
 - Finance: Changed library for Zugferd and UBL e-invoicing
 - Finance: Handle missing address for Zugferd
 
