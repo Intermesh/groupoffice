@@ -264,7 +264,7 @@ abstract class EntityController extends Controller {
 
 		try {
 
-			$ids = $idsQuery->all();
+			$ids = array_map("strval", $idsQuery->all());
 
 			if($p['calculateHasMore'] && count($ids) > $params['limit']) {
 				$hasMore = !!array_pop($ids);
@@ -881,7 +881,6 @@ abstract class EntityController extends Controller {
 
 		$doDestroy = [];
 		foreach ($destroy as $id) {
-//			$id = (string) $id;
 			$entity = $this->getEntity($id);
 			if (!$entity) {
 				$result['notDestroyed'][$id] = new SetError('notFound', go()->t("Item not found"));
