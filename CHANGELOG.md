@@ -1,3 +1,13 @@
+10-01-2024: 6.8.94
+- Core: Increased font size to match the font size in legacy lib
+- Finance: Changed library for Zugferd and UBL e-invoicing
+- Finance: Handle missing address for Zugferd
+
+10-01-2024: 6.8.93
+- Finance: Option to migrate all from billing automatically.
+- Finance / Core: Copy paste PDF and e-mail templates
+
+06-01-2024: 6.8.92
 - Core: Fixed that cron could get stuck when an error occurred in a job
 - Core: Module "vendor" folders were not included in the build
 - Core: Updated German translation
