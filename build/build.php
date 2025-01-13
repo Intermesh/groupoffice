@@ -173,7 +173,16 @@ class Builder
 		$this->buildNodeModules();
 
         putenv("COMPOSER_ALLOW_SUPERUSER=1");
-		run("composer install --no-dev --optimize-autoloader --ignore-platform-reqs");
+
+
+        $composerFiles = run("find . composer.json -type f");
+
+        foreach ($composerFiles as $composerFile) {
+            cd(dirname($composerFile));
+            run("composer install --no-dev --optimize-autoloader --ignore-platform-reqs");
+        }
+
+        cd($this->buildDir . "/" . $this->packageName);
 
 		$sassFiles = run("find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*'");
 

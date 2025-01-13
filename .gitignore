@@ -8,7 +8,7 @@ forum
 /*-license.txt
 /www/*-license.txt
 .idea
-/www/vendor
+vendor
 /config.php
 /www/config.php
 /**/*.css
