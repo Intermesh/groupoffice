@@ -174,12 +174,16 @@ class Builder
 
         putenv("COMPOSER_ALLOW_SUPERUSER=1");
 
-
-        $composerFiles = run("find . composer.json -type f");
+        cd($this->buildDir . "/" . $this->packageName);
+        $composerFiles = run("find . -name composer.json -type f -not -path '*/vendor/*'");
 
         foreach ($composerFiles as $composerFile) {
+
+            echo $composerFile . "\n";
+
             cd(dirname($composerFile));
             run("composer install --no-dev --optimize-autoloader --ignore-platform-reqs");
+            cd($this->buildDir . "/" . $this->packageName);
         }
 
         cd($this->buildDir . "/" . $this->packageName);
@@ -189,7 +193,6 @@ class Builder
 		foreach ($sassFiles as $sassFile) {
 			run("sass --no-source-map $sassFile " . dirname(dirname($sassFile)) . '/' . str_replace('scss', 'css', basename($sassFile)));
 		}
-
 
 		// remove sensitive files OWASP WSTG - WSTG-INFO-05
 		run("rm composer.json composer.lock vendor/composer/installed.json");
