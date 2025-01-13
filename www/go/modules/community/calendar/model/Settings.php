@@ -10,7 +10,16 @@ class Settings extends core\Settings
 
 	public bool $videoJwtEnabled = false;
 
-	public string $videoJwtSecret = ''; //TODO: jitsiJwtSecret is leaked on the client side! I dont know how to prevent that...
+	protected string $videoJwtSecret = '';
+
+	public function setVideoJwtSecret(string $secret): void
+	{
+		$this->videoJwtSecret = $secret;
+	}
+
+	public function getVideoJwtSecret() {
+		return null;
+	}
 
 	public string $videoJwtAppId = '';
 
@@ -31,5 +40,11 @@ class Settings extends core\Settings
 		$settings = self::get();
 		$room =  bin2hex(random_bytes(5));
 		return $room . ($settings->videoJwtEnabled ? '?jwt=' .self::createJwtToken($settings->videoJwtAppId, $room, $settings->videoJwtSecret) :'');
+	}
+
+	public function save(): bool
+	{
+		$this->videoUri = rtrim($this->videoUri, '/') . '/';
+		return parent::save();
 	}
 }
