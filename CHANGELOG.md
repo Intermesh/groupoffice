@@ -1,3 +1,4 @@
+- SMIME: OSCP check not shown as error when no OSCP info is present
 - Core: Added PL holidays from 6.8 branch
 
 11-11-2024: 6.7.85
