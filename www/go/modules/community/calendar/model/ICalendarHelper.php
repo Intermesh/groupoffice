@@ -501,9 +501,9 @@ class ICalendarHelper {
 		if(isset($parts['RSCALE'])) $values->rscale = strtolower(isset($parts['RSCALE']));
 		if(isset($parts['SKIP'])) $values->skip = strtolower(isset($parts['SKIP']));
 		if(isset($parts['WKST'])) $values->firstDayOfWeek = strtolower(isset($parts['WKST']));
-		if(isset($parts['BYDAY'])) {
+		if(!empty($parts['BYDAY'])) {
 			$values->byDay = [];
-			$days = $parts['BYDAY'];
+			$days =array_map('trim',explode(",", $parts['BYDAY']));
 			foreach($days as $day) {
 				$bd = (object)['day' => strtolower(substr($day, -2))];
 				if(strlen($day) > 2) {
