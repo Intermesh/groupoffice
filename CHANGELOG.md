@@ -1,5 +1,7 @@
 - SMIME: OSCP check not shown as error when no OSCP info is present
-- 
+- Core: Select font family and size for PDF templates
+- Core: Improved rendering quality of PDF
+
 10-01-2024: 6.8.94
 - Core: Increased font size to match the font size in legacy lib
 - Finance: Changed library for Zugferd and UBL e-invoicing
