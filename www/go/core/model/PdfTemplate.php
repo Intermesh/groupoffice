@@ -112,6 +112,10 @@ class PdfTemplate extends Entity {
 	 */							
 	public $measureUnit = 'mm';
 
+	public string $fontFamily = "dejavusans";
+
+	public int $fontSize = 10;
+
 	/**
 	 * @var PdfBlock[]
 	 */

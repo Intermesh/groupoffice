@@ -1098,6 +1098,8 @@ create table core_pdf_template
     footer           text                                           null,
     footerX          decimal(19, 4)                default 0.0000   null,
     footerY          decimal(19, 4)                default -20.0000 null,
+    fontFamily varchar(100) default 'dejavusans' not null,
+    fontSize tinyint default 10 null,
     constraint core_pdf_template_core_blob_id_fk
         foreign key (logoBlobId) references core_blob (id),
     constraint core_pdf_template_ibfk_1

@@ -1654,3 +1654,12 @@ $updates['202412090921'][] = "alter table core_auth_token
 
 $updates['202412090921'][] = "drop index accessToken on core_auth_token;";
 
+
+
+$updates['202501141553'][] = "alter table core_pdf_template
+    add fontFamily varchar(100) default 'dejavusans' not null;";
+
+$updates['202501141553'][] = "alter table core_pdf_template
+    add fontSize tinyint default 10 null;";
+
+
