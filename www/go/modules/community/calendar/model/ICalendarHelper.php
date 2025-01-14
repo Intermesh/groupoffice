@@ -498,9 +498,9 @@ class ICalendarHelper {
 		if(isset($parts['INTERVAL']) && $parts['INTERVAL'] != 1) {
 			$values->interval = intval($parts['INTERVAL']);
 		}
-		if(isset($parts['RSCALE'])) $values->rscale = strtolower(isset($parts['RSCALE']));
-		if(isset($parts['SKIP'])) $values->skip = strtolower(isset($parts['SKIP']));
-		if(isset($parts['WKST'])) $values->firstDayOfWeek = strtolower(isset($parts['WKST']));
+		if(isset($parts['RSCALE'])) $values->rscale = strtolower($parts['RSCALE']);
+		if(isset($parts['SKIP'])) $values->skip = strtolower($parts['SKIP']);
+		if(isset($parts['WKST'])) $values->firstDayOfWeek = strtolower($parts['WKST']);
 		if(!empty($parts['BYDAY'])) {
 			$values->byDay = [];
 			$days =array_map('trim',explode(",", $parts['BYDAY']));
