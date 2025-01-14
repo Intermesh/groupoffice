@@ -1,9 +1,9 @@
 import {
-	btn,Format,
+	btn, Format,
 	column, comp,
 	Component, datasourcestore,
 	h3,
-	t, table, tbar
+	t, table, tbar, Window
 } from "@intermesh/goui";
 import {client, jmapds} from "@intermesh/groupoffice-core";
 import {AccountWindow} from "./AccountWindow.js";
@@ -32,9 +32,15 @@ export class SystemSettings extends Component {
 					column({id:'id', header:'action', renderer: (v) => {
 						return btn({text:'Sync', handler:(me) => {
 								me.disabled = true;
+								this.mask();
 								client.jmap('DavAccount/sync', {accountId:v}).then((response)=> {
 									store.reload();
-								});
+								}).catch((err) => {
+									me.disabled = false;
+									Window.error(err);
+								}).finally(() => {
+									this.unmask();
+								})
 							}
 						})
 					}})

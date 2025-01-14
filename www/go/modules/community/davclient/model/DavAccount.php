@@ -131,9 +131,9 @@ class DavAccount extends AclOwnerEntity {
 	}
 
 	public function sync() {
-		if(!$this->isSetup()) {
+//		if(!$this->isSetup()) {
 			$this->serviceDiscovery();
-		}
+//		}
 		$homesetUri = $this->homeSetUri($this->principalUri);
 
 		go()->getDbConnection()->beginTransaction();
