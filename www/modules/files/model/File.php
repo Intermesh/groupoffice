@@ -113,6 +113,10 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 			return false;
 		}
 
+		if(!$this->folder) {
+			return false;
+		}
+
 		return array('name'=>$this->name, 'description'=>$path, 'filter' => $this->folder->getIdPath() . "/");
 	}
 

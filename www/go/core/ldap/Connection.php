@@ -1,8 +1,8 @@
-<?php
+<?php /** @noinspection PhpComposerExtensionStubsInspection */
 
 namespace go\core\ldap;
 
-use go\core\Environment;
+use Exception;
 
 /**
  * LDAP connection
@@ -14,25 +14,31 @@ use go\core\Environment;
  */
 class Connection {
 
-	private $link;
+	private \LDAP\Connection $link;
 
 	/**
 	 * Connect to the LDAP server
-	 * 
+	 *
 	 * @param string $uri eg. ldap://localhost:389
 	 * @return  boolean
+	 * @throws Exception
 	 */
-	public function connect($uri) {
+	public function connect(string $uri): bool
+	{
 		
 		go()->debug('Connect to '.$uri);
 
 		if(!function_exists("ldap_connect")) {
-			throw new \Exception("Please install the LDAP extesion for PHP if you wish to use LDAP authentication.");
+			throw new Exception("Please install the LDAP extension for PHP if you wish to use LDAP authentication.");
 		}
-		
-		$this->link = ldap_connect($uri);
+		$link = ldap_connect($uri);
+		if(!$link)
+		{
+			return false;
+		}
+		$this->link = $link;
 
-		return $this->link != false;
+		return true;
 	}
 
 	/**
@@ -45,7 +51,8 @@ class Connection {
 	 * 
 	 * @return bool
 	 */
-	public function setOption($name, $value) {
+	public function setOption(int $name, mixed $value): bool
+	{
 		return ldap_set_option($this->link, $name, $value);
 	}
 
@@ -54,10 +61,11 @@ class Connection {
 	 * 
 	 * @return boolean
 	 */
-	public function startTLS() {
+	public function startTLS(): bool
+	{
 		try {
 			return ldap_start_tls($this->link);		
-		} catch(\ErrorException $e) {
+		} catch(Exception $e) {
 			return false;
 		}
 	}
@@ -67,16 +75,18 @@ class Connection {
 	 * 
 	 * @return string
 	 */
-	public function getError() {
+	public function getError(): string
+	{
 		return ldap_error($this->link);
 	}
 
 	/**
 	 * Get the last error number
 	 * 
-	 * @return string
+	 * @return int
 	 */
-	public function getErrorNo() {
+	public function getErrorNo(): int
+	{
 		return ldap_errno($this->link);
 	}
 
@@ -85,22 +95,25 @@ class Connection {
 	 * 
 	 * @return boolean
 	 */
-	public function disconnect() {
+	public function disconnect(): bool
+	{
 		return ldap_close($this->link);
 	}
 
 	/**
 	 * Bind to the LDAP directory
-	 * 
+	 *
 	 * @param string $bindRdn eg . cn=admin,dc=intermesh,dc=dev
 	 * @param string $password
-	 * @return boolean 
+	 * @return boolean
+	 * @throws Exception
 	 */
-	public function bind($bindRdn, $password) {
+	public function bind(string $bindRdn, string $password): bool
+	{
 		try {
 			go()->debug("bind: " . $bindRdn);
 			return ldap_bind($this->link, $bindRdn, $password);
-		} catch (\ErrorException $e) {
+		} catch (Exception $e) {
 
 			if($this->getErrorNo() == -1) {
 				throw $e;
@@ -115,9 +128,10 @@ class Connection {
 	/**
 	 * Get the LDAP link for use with other ldap_* functions
 	 * 
-	 * @return resource
+	 * @return \LDAP\Connection
 	 */
-	public function getLink() {
+	public function getLink(): \LDAP\Connection
+	{
 		return $this->link;
 	}
 

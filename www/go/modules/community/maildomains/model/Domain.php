@@ -131,6 +131,9 @@ final class Domain extends AclOwnerEntity
 				if (!empty($value)) {
 					$criteria->where(['id' => $value]);
 				}
+			})
+			->add('active', function (Criteria $criteria, $value) {
+				$criteria->where(['active' => $value]);
 			});
 	}
 
@@ -140,7 +143,7 @@ final class Domain extends AclOwnerEntity
 	 */
 	protected static function textFilterColumns(): array
 	{
-		return ['id', 'description'];
+		return ['description', 'domain'];
 	}
 
 	/**

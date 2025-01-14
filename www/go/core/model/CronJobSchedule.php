@@ -190,6 +190,8 @@ class CronJobSchedule extends Entity
 
 		$this->nextRunAt = $this->getNextRunDate();
 
+//		echo "Next running at: " . $this->nextRunAt->format("c") . "\n";
+
 		if (!$this->save()) {
 			throw new Exception("Could not save CRON job");
 		}

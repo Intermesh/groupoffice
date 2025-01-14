@@ -7,10 +7,13 @@ use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\App;
+use go\core\auth\Method;
 use go\core\data\ArrayableInterface;
 use go\core\db\DbException;
 use go\core\db\Query;
 use go\core\ErrorHandler;
+use go\core\fs\Blob;
+use go\core\model\Client;
 use go\core\model\Module;
 use go\core\jmap;
 use go\core\model\Acl;
@@ -375,9 +378,21 @@ class EntityType implements ArrayableInterface {
 
 		if (isset($record['modulePackage'])) {
 			if($record['modulePackage'] == 'core') {
-				$e->className = 'go\\core\\model\\' . ucfirst($e->name);
-				if(!class_exists($e->className)) {
-					$e->className = 'GO\\Base\\Model\\' . ucfirst($e->name);
+
+				switch($e->name) {
+					case "Blob":
+						$e->className = Blob::class;
+						Break;
+
+					case "Method":
+						$e->className = Method::class;
+						Break;
+
+					default:
+						$e->className = 'go\\core\\model\\' . ucfirst($e->name);
+						if (!class_exists($e->className) || !is_a($e->className, Entity::class, true)) {
+							$e->className = 'GO\\Base\\Model\\' . ucfirst($e->name);
+						}
 				}
 			} else {
 				$e->className = 'go\\modules\\' . $record['modulePackage'] . '\\' . $record['moduleName'] . '\\model\\' . ucfirst($e->name);

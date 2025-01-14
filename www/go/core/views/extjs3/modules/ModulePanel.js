@@ -1,4 +1,4 @@
-go.modules.ModulePanel = Ext.extend(Ext.Container, {
+go.modules.ModulePanel = Ext.extend(Ext.Panel, {
 
 	title: '',
 	setTitle(title, _iconCls){

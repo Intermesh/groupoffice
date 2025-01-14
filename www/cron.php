@@ -34,7 +34,9 @@ if(!empty($_GET['exec'])) {
 App::get()->setAuthState(new State());
 
 //for debugging
+//go()->getDebugger()->enable();
 //go()->getDebugger()->output = true;
+//go()->getDbConnection()->debug = true;
 
 if(go()->getSettings()->databaseVersion != go()->getVersion()) {
     echo "Aborting CRON because an update is needed: " . go()->getSettings()->databaseVersion . " -> " . go()->getVersion() . "\n";

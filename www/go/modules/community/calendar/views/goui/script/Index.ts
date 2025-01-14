@@ -1,9 +1,10 @@
 import {client, jmapds, modules} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {router} from "@intermesh/groupoffice-core";
-import {datasourcestore, t as coreT, E, translate, DateTime, Window} from "@intermesh/goui";
+import {datasourcestore, t as coreT, E, translate, DateTime, Window, h3} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {EventDetail, EventDetailWindow} from "./EventDetail.js";
+import {PreferencesPanel} from "./PreferencesPanel";
 
 export * from "./Main.js";
 export * from "./CalendarList.js";
@@ -247,6 +248,10 @@ modules.register(  {
 				}
 			});
 
+		});
+
+		modules.addAccountSettingsPanel("community", "calendar", "calendar", t("Calendar"), "today", () => {
+			return new PreferencesPanel();
 		});
 	}
 });

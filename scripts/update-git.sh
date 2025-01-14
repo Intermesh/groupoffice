@@ -30,7 +30,7 @@ do
 
     echo "Pulling $line"
     cd $line
-    git reset --hard
+   #git reset --hard
     git pull
     cd ..
   fi
@@ -38,16 +38,16 @@ done
 
 # pull main github repo
 cd ../../
-git reset --hard
+#git reset --hard
 cd views/goui/goui
-git reset --hard
+#git reset --hard
 cd ../groupoffice-core
-git reset --hard
+#git reset --hard
 cd $DIR/www;
 
 echo "Pulling main repository"
 
-git pull 
+git pull
 git submodule update --init
 
 for line in $(find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*' | sort -r );
@@ -96,7 +96,14 @@ buildGOUI "./www/go/modules"
 
 cd www
 
-composer install -n --no-dev -o
+for line in $(find . -name composer.json -type f -not -path '*/vendor/*')
+do
+  COMPOSER_DIR="$(dirname "${line}")";
+  echo "Composer install:" $COMPOSER_DIR;
+  cd $COMPOSER_DIR;
+  composer install -n --no-dev -o
+  cd $DIR/www
+done
 
 if [ -z "$CONFIG" ]; then
   echo NOTE: Not upgrading database because no config file was passed. eg. ./update-git.sh /etc/groupoffice/multi_instance/manage.group-office.com/config.php

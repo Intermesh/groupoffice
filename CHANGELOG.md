@@ -1,5 +1,53 @@
+10-01-2024: 6.8.94
+- Core: Increased font size to match the font size in legacy lib
+- Finance: Changed library for Zugferd and UBL e-invoicing
+- Finance: Handle missing address for Zugferd
+
+10-01-2024: 6.8.93
+- Finance: Option to migrate all from billing automatically.
+- Finance / Core: Copy paste PDF and e-mail templates
+
+06-01-2024: 6.8.92
+- Core: Fixed that cron could get stuck when an error occurred in a job
+- Core: Module "vendor" folders were not included in the build
+- Core: Updated German translation
+- E-mail: Restored long lost quota warning style
+- Core: Updated PL holidays (Github #1212)
+- Core: Create separate alert for each error while importing new entities
+
+23-12-2024: 6.8.91
+- Tasks: fix several bugs in ICS import
+- OAuth2 client: return more informative exception if a session variable is missing.
+- Core: Slightly more helpful debug data upon validation errors import
+
+12-12-2024: 6.8.90
+- Core: Show database error on upgrade
+- Addressbook: Check if comments module is installed
+
+09-12-2024: 6.8.89
+- Address book: Added "Last contact at" column that updates when a comment is made or an e-mail is linked
+- Address book: Made action date a regular property of contacts
+- Finance: replace invalid chars for filenames when saving PDF's
+- Tasks: MySQL 9 compatibility change
+- Core: MySQL 9 compatibility change
+ 
+02-12-2024: 6.8.88
+- Calendar: When events are private but writable. Posting the event with CalDAV will not change the title or description
+- Files: Detail panel will change to folder when a different folder is selected in the tree.
+- Core: Fixed checkbox custom field filter to match null values when client sends 'false'
+- ldapauth: Create postfixadmin account if domain matches serverclient domain
+- Finance: Fixed group by employee when billing from projects
+- History: History was depending on address book module by mistake
+- Files: bugfix file notification
+- Billing: Fixed catalog export number formatting
+- Billing: Fixed order xls export
+- ldapauth: handle error: Partial search results returned: Sizelimit exceeded
+- Core: fixed displacement of context menu
+
+25-11-2024: 6.8.87
 - Core: Added new option to toggle use of ctrl + enter to send e-mail / comments
 - Billing: Import and export custom fields and match by ID
+- Newsletters: Fixed newsletter template attachments not saving.
 
 18-11-2024: 6.8.86
 - Files: cron job file notification

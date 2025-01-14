@@ -50,8 +50,9 @@ export class EventWindow extends FormWindow {
 
 		const m = go.Modules.get('community','calendar');
 		this.title = t('Event');
-		this.width = 440;
-		this.height = 820;
+		this.width = 565;
+		this.height = 840;
+		this.resizable = true;
 		this.store = this.form.dataSource as JmapDataSource; //jmapds("CalendarEvent");
 		// this.startTime = textfield({type:'time',value: '12:00', width: 128})
 		// this.endTime = textfield({type:'time',value: '13:00', width: 128})
@@ -81,6 +82,38 @@ export class EventWindow extends FormWindow {
 		});
 		this.form.on('save', () => { this.close();});
 		this.generalTab.cls = 'flow fit scroll pad';
+		this.startDate = datefield({label: t('Start'), name:'start',flex:1, defaultTime: now.format('H')+':00',
+			listeners:{'setvalue': (me,_v) => {
+					const newStartDate = me.getValueAsDateTime(),
+						endDate = this.endDate.getValueAsDateTime(),
+						format= me.withTime ? "Y-m-dTH:i" : 'Y-m-d';
+					if(newStartDate){
+						recurrenceField.setStartDate(newStartDate);
+					}
+
+					if (endDate && newStartDate && newStartDate.date > endDate.date) {
+						this.endDate.value = newStartDate.clone()
+							.add(new DateInterval(client.user.calendarPreferences.defaultDuration))
+							.format(format);
+					}
+				}}
+		});
+		this.endDate = datefield({label:t('End'), name: 'end', flex:1, defaultTime: (now.getHours()+1 )+':00',
+			listeners: {'setvalue': (me,_v) => {
+					const newEndDate = me.getValueAsDateTime(),
+						startDate = this.startDate.getValueAsDateTime(),
+						format= me.withTime ? "Y-m-dTH:i" : 'Y-m-d';
+
+					if (newEndDate && startDate && newEndDate.date < startDate.date) {
+						this.startDate.value = newEndDate.clone()
+							.add(new DateInterval('-'+client.user.calendarPreferences.defaultDuration))
+							.format(format);
+					}
+					if(newEndDate && this.item) {
+						this.item.end = newEndDate; // for isInPast
+					}
+				}}
+		});
 
 		this.generalTab.items.add(
 			this.titleField = textfield({placeholder: t('Enter a title, name or place'), name: 'title', flex: '0 1 60%', listeners: {
@@ -124,10 +157,11 @@ export class EventWindow extends FormWindow {
 			btn({icon:'video_call', hidden: !m?.settings?.videoUri, cls:'filled', width:50, handler: async (btn) => {
 					(btn.previousSibling() as TextField)!.value = await this.createVideoLink(m?.settings);
 			}}),
-			this.withoutTimeToggle = checkbox({type:'switch',name: 'showWithoutTime', label: t('All day'), style:{width:'auto'},
+			this.withoutTimeToggle = checkbox({type:'switch',value:undefined, name: 'showWithoutTime', label: t('All day'), style:{width:'auto'},
 				listeners: {'setvalue':(_, checked) => {
 					this.alertField.fullDay = checked;
 					this.alertField.drawOptions();
+
 					calendarStore.dataSource.single(this.form.value.calendarId).then(r => {
 						if(!r) return;
 						const d = checked ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
@@ -137,38 +171,7 @@ export class EventWindow extends FormWindow {
 				}}
 			}),
 			comp({}),
-			this.startDate = datefield({label: t('Start'), name:'start', flex:1, defaultTime: now.format('H')+':00',
-				listeners:{'setvalue': (me,_v) => {
-					const newStartDate = me.getValueAsDateTime(),
-						endDate = this.endDate.getValueAsDateTime(),
-						format= me.withTime ? "Y-m-dTH:i" : 'Y-m-d';
-					if(newStartDate){
-						recurrenceField.setStartDate(newStartDate);
-					}
-
-					if (endDate && newStartDate && newStartDate.date > endDate.date) {
-						this.endDate.value = newStartDate.clone()
-							.add(new DateInterval(client.user.calendarPreferences.defaultDuration))
-							.format(format);
-					}
-				}}
-			}),
-			this.endDate = datefield({label:t('End'), name: 'end', flex:1, defaultTime: (now.getHours()+1 )+':00',
-				listeners: {'setvalue': (me,_v) => {
-					const newEndDate = me.getValueAsDateTime(),
-						startDate = this.startDate.getValueAsDateTime(),
-						format= me.withTime ? "Y-m-dTH:i" : 'Y-m-d';
-
-					if (newEndDate && startDate && newEndDate.date < startDate.date) {
-						this.startDate.value = newEndDate.clone()
-							.add(new DateInterval('-'+client.user.calendarPreferences.defaultDuration))
-							.format(format);
-					}
-					if(newEndDate && this.item) {
-						this.item.end = newEndDate; // for isInPast
-					}
-				}}
-			}),
+			this.startDate,this.endDate,
 			comp({cls:'hbox'},
 				recurrenceField,
 				exceptionsBtn,

@@ -836,7 +836,11 @@ class Instance extends Entity {
 
 				$modPackageFolder = $instance->getModulePackageFolder();
 				if($modPackageFolder->exists()) {
-					$instance->getModulePackageFolder()->move($instance->getDataFolder()->getFolder($instance->getStudioPackage() . '_MODULE_PACKAGE'));
+					$dest = $instance->getDataFolder()->getFolder($instance->getStudioPackage() . '_MODULE_PACKAGE');
+					if ($dest->exists()) {
+						$dest = new Folder($dest->getPath() . '-' . uniqid());
+					}
+					$instance->getModulePackageFolder()->move($dest);
 				}
 
 				$instance->getConfigFile()->getFolder()->delete();

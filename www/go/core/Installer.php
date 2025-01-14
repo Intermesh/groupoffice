@@ -793,7 +793,7 @@ class Installer {
 
 							} else {
 
-								$msg = $e->getCode() . ': '.$e->getMessage() . "\n".
+								$msg = $e->getPrevious()->getCode() . ': '.$e->getPrevious()->getMessage() . "\n".
 								  "Query: " . $query . "\n".
 								  "Package: " . ($module->package ?? "legacy") . "\n".
 								  "Module: " . $module->name . "\n".

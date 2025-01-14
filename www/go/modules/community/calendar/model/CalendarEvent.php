@@ -665,8 +665,10 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 				$event = self::findById($coreAlert->entityId);
 				// we wont save $event but if the event isn't modified updateAlerts() wont work
 				//$event->recurrenceOverrides[$calert->recurrenceId]['alerts/'.$calert->tag.'/acknowledged'] = true;
-				foreach ($event->alerts() as $newAlert) {
-					$newAlert->schedule($event);
+				if($event) {
+					foreach ($event->alerts() as $newAlert) {
+						$newAlert->schedule($event);
+					}
 				}
 			}
 		}

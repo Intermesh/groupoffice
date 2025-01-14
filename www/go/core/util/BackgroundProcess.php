@@ -56,6 +56,7 @@ class BackgroundProcess {
 
 	public function run(): int
 	{
+
 		$cmd = $this->getCommand();
 
 		go()->debug("BACKGROUND CMD: ". $cmd);

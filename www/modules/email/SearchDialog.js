@@ -158,13 +158,12 @@ GO.email.SearchDialog = function(config){
 				});
 
 
-				if(GO.settings.config.email_allow_body_search) {
 					this.formPanel.insert(4, {
 						xtype: "textfield",
 						fieldLabel: t("Body", "email"),
 						name: 'body'
 					});
-				}
+
 				
 				this.dialog = new go.Window({
 					layout: 'fit',

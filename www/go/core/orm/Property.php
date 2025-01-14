@@ -408,7 +408,7 @@ abstract class Property extends Model {
 					$scalar = $stmt->fetchAll();
 					$stmt->closeCursor();
 				}
-				$this->{$relation->name} = $scalar;
+				$this->{$relation->name} = array_map("strval", $scalar);
 				break;
 		}
 	}
@@ -682,18 +682,18 @@ abstract class Property extends Model {
 	 *
 	 * Note: if this logic ever changes it must be changed here too: {@see \go\core\jmap\Entity::changesQuery()}
 	 *
-	 * @return int|string|null eg. 1 or with multiple keys: "1-2"
+	 * @return string|null eg. 1 or with multiple keys: "1-2"
 	 */
 	public function id() : string|int|null {
 		if(property_exists($this, 'id')) {
-			return $this->id ?? null;
+			return ((string) $this->id) ?? null;
 		}
 		$keys = $this->primaryKeyValues();
 		if(empty($keys)) {
 			// can we ever get here?
-			return "";
+			return null;
 		}
-		return count($keys) > 1 ? implode("-", array_values($keys)) : array_values($keys)[0];
+		return count($keys) > 1 ? implode("-", array_values($keys)) : (string) array_values($keys)[0];
 	}
 
 	/**

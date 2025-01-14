@@ -7,17 +7,19 @@
     "moduleResolution": "bundler",
     "module":"preserve",
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
     "outDir": "./dist", //set this in the extended
     "baseUrl": ".", //set this in the extended too
     "paths": {
       "@intermesh/goui": [
         "../../../../../../views/goui/dist/goui/script/index.d.ts",
-//        "../../../../../../views/goui/dist/goui/script/index.js"
+        "../../../../../../views/goui/goui/script/index.ts" // second line is needed for PHPStorm
 
       ],
       "@intermesh/groupoffice-core": [
         "../../../../../../views/goui/dist/groupoffice-core/script/index.d.ts",
-//        "../../../../../../views/goui/dist/groupoffice-core/script/index.js"
+        "../../../../../../views/goui/groupoffice-core/script/index.ts"
       ],
 
       "chart.js/auto": [
@@ -26,12 +28,12 @@
 
       "@intermesh/business/*": [
         "../../../../../../go/modules/business/*/views/goui/dist/Index.d.ts",
-//        "../../../../../../go/modules/business/*/views/goui/dist/Index.js"
+        "../../../../../../go/modules/business/*/views/goui/script/Index.ts"
       ],
 
       "@intermesh/community/*": [
         "../../../../../../go/modules/community/*/views/goui/dist/Index.d.ts",
-//        "../../../../../../go/modules/community/*/views/goui/dist/Index.js"
+        "../../../../../../go/modules/community/*/views/goui/script/Index.ts"
       ]
     }
   }

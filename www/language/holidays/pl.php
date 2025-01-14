@@ -7,6 +7,7 @@ $input_holidays['fix']['05-03'] = 'Święto Konstytucji 3 Maja';
 $input_holidays['fix']['08-15'] = 'Wniebowzięcie Najświętszej Maryi Panny';
 $input_holidays['fix']['11-01'] = 'Wszystkich Świętych';
 $input_holidays['fix']['11-11'] = 'Dzień Niepodległości';
+$input_holidays['fix']['12-24'] = 'Wigilia Bożego Narodzenia';
 $input_holidays['fix']['12-25'] = 'Boże Narodzenie (pierwszy dzień)';
 $input_holidays['fix']['12-26'] = 'Boże Narodzenie (drugi dzień)';
 
