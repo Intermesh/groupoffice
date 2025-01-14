@@ -1,3 +1,4 @@
+14-01-2024: 6.8.95
 - SMIME: OSCP check not shown as error when no OSCP info is present
 - Core: Select font family and size for PDF templates
 - Core: Improved rendering quality of PDF
