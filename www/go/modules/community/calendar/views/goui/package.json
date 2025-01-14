@@ -7,11 +7,12 @@
     "typescript": "latest"
   },
   "scripts": {
-    "start": "npm run start:sass & npm run start:esbuild",
+    "start": "npm run build:clean && concurrently --kill-others \"npm run start:ts\"  \"npm run start:sass\"",
     "start:esbuild": "node ../../../../../../views/goui/esbuild-module.mjs watch",
     "start:sass": "npx sass --watch style:dist",
 
-    "build": "npm run build:sass && npm run build:ts",
+    "build": "npm run build:clean && npm run build:sass && npm run build:ts",
+    "build:clean": "rm -rf ./dist/*",
     "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
     "build:sass": "npx sass --style=compressed style:dist",
     "build:dts": "npx tsc --declaration --emitDeclarationOnly",
