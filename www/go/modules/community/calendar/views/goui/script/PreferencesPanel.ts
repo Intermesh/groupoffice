@@ -1,6 +1,6 @@
 import {checkbox, Component, containerfield, DataSourceForm, datasourceform, fieldset, select} from "@intermesh/goui";
 import {client, jmapds, User} from "@intermesh/groupoffice-core";
-import {calendarStore, t} from "@intermesh/community/calendar";
+import {calendarStore, t} from "./Index.js";
 
 export class PreferencesPanel extends Component {
 	private form: DataSourceForm<User>;
