@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS `davclient_davaccount` (
 	`username` VARCHAR(60) NULL,
 	`password` VARCHAR(60) NULL,
 	`basePath` VARCHAR(100) NOT NULL DEFAULT '/',
+	`principalUri` VARCHAR(512) NOT NULL DEFAULT '',
 	`refreshInterval` INT NOT NULL,
 	`lastSync` DATETIME NULL,
 	`lastError` TEXT NULL,
