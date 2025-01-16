@@ -1,3 +1,6 @@
+- Finance / Core: Fixed HTML editor labels in Dark mode by always showing html editor toolbar
+- Finance: Fixed status filter showing some items with different status in the list
+
 14-01-2024: 6.8.95
 - SMIME: OSCP check not shown as error when no OSCP info is present
 - Core: Select font family and size for PDF templates
