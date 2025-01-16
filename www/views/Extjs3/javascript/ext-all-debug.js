@@ -40867,7 +40867,7 @@ Ext.form.TextArea = Ext.extend(Ext.form.TextField,  {
           
         }
         ts.innerHTML = v;
-        h = Math.min(this.growMax, Math.max(ts.offsetHeight, this.growMin));
+        h = Math.min(this.growMax, Math.max(ts.offsetHeight, this.growMin)) + 24;
         if(h != this.lastHeight){
             this.lastHeight = h;
             this.el.setHeight(h);
