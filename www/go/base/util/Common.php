@@ -94,11 +94,11 @@ class Common {
 
 		$format = isset($af[$isoCountry]) ? $af[$isoCountry] : $af['default'];
 
-		$format= str_replace('{address}', $address, $format);
-		$format= str_replace('{address_no}', $address_no, $format);
-		$format= str_replace('{city}', $city, $format);
-		$format= str_replace('{zip}', $zip, $format);
-		$format= str_replace('{state}', $state, $format);
+		$format= str_replace('{address}', $address ?? "", $format);
+		$format= str_replace('{address_no}', $address_no ?? "", $format);
+		$format= str_replace('{city}', $city ?? "", $format);
+		$format= str_replace('{zip}', $zip ?? "", $format);
+		$format= str_replace('{state}', $state ?? "", $format);
 		$format= str_replace('{country}', $strCountry, $format);
 
 		return preg_replace("/(\r\n)+|(\n|\r)+/", "\n", $format);
