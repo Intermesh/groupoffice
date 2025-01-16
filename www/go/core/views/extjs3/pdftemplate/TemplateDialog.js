@@ -119,6 +119,7 @@ go.pdftemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 				xtype: 'gonumberfield',
 				fieldLabel: t('Font size'),
 				name: 'fontSize',
+				decimals: 0,
 				value: 10
 			},
 
