@@ -570,7 +570,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		body.style.width = "100%";
 		body.style.lineHeight = dp(20) + "px";
 
-		var h =  Math.max(this.growMinHeight, body.offsetHeight); // 400  max height
+		var h =  Math.max(this.growMinHeight, body.offsetHeight + dp(20)); // 400  max height
 
 		// if(h > dp(48)) {
 		// 	this.tb.show();
