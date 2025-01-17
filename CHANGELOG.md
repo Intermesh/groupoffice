@@ -3,6 +3,7 @@
 - Finance: Removed separate finance options from link menu and created select book step between
 - Finance: Added unit to finance documents and catalog articles
 - Finance: Added unit to invoice items (disabled by default) and made shown item fields configurable.
+- Finance: update margin field instead of price when adding costs
 
 14-01-2024: 6.8.95
 - SMIME: OSCP check not shown as error when no OSCP info is present
