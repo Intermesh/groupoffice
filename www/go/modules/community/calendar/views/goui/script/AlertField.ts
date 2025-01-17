@@ -25,6 +25,13 @@ export class AlertField extends SelectField {
 		})
 	}
 
+	public onAdded(index: number){
+		super.onAdded(index);
+		if(!this.isForDefault) {
+			this.defaultValue = 'default';
+		}
+	}
+
 	drawOptions() {
 		this.options = this.fullDay ? [
 			{value: 'P0D', name: t('At the start day') + " (9:00)"},
@@ -40,7 +47,6 @@ export class AlertField extends SelectField {
 			{value: 'P0D', name: t('At the start')},
 		];
 		if(!this.isForDefault) {
-			this.value = 'default';
 			this.options.unshift({value: 'default', name: t('Default')});
 		}
 		this.options.unshift({value: null, name: t('None')})
@@ -56,7 +62,6 @@ export class AlertField extends SelectField {
 	}
 
 	set value(v: {[id:string]:Alert}|'default'|null) {
-
 		if(!v) {
 			v = null;
 		} else if(!(typeof v === 'string') ) {

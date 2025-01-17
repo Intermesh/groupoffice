@@ -54,23 +54,22 @@ class ICalendarHelper {
 
 		$vevent = $vcalendar->add(self::toVEvent($vcalendar->createComponent('VEVENT'),$event));
 
-		if(!$event->useDefaultAlerts && is_array($event->alerts)) {
-			foreach($event->alerts as $id => $alert) {
-				if(!empty($alert->offset)) {
-					$vevent->add('VALARM', [
-						'TRIGGER' => $alert->offset, // 15 minutes before the event
-						'DESCRIPTION' => 'Alarm',
-						'ACTION' => $alert->action,
-					]);
-				} else if (!empty($alert->when)) {
-					$vevent->add('VALARM', [
-						'TRIGGER' => $alert->when, // 15 minutes before the event
-						'DESCRIPTION' => 'Alarm',
-						'ACTION' => $alert->action,
-					]);
-				}
+		foreach($event->alerts() as $id => $alert) {
+			if(!empty($alert->getTrigger()['offset'])) {
+				$vevent->add('VALARM', [
+					'TRIGGER' => $alert->getTrigger()['offset'], // 15 minutes before the event
+					'DESCRIPTION' => 'Alarm',
+					'ACTION' => $alert->action,
+				]);
+			} else if (!empty($alert->getTrigger()['when'])) {
+				$vevent->add('VALARM', [
+					'TRIGGER' => $alert->getTrigger()['when'], // 15 minutes before the event
+					'DESCRIPTION' => 'Alarm',
+					'ACTION' => $alert->action,
+				]);
 			}
 		}
+
 		//@todo: ATTACHMENT Files?
 
 		if($event->isRecurring()) {
