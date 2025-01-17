@@ -95,6 +95,7 @@ export class EventWindow extends FormWindow {
 						recurrenceField.setStartDate(newStartDate);
 					}
 
+
 					if (endDate && newStartDate && newStartDate.date >= endDate.date) {
 						this.endDate.value = newStartDate.clone()
 							.add(di)
