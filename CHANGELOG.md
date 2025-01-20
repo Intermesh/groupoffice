@@ -1,3 +1,4 @@
+- CardDav: deprecated DavTask model, updated cleanup script
 - Finance / Core: Fixed HTML editor labels in Dark mode by always showing html editor toolbar
 - Finance: Fixed status filter showing some items with different status in the list
 - Finance: Removed separate finance options from link menu and created select book step between

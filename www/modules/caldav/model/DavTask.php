@@ -15,6 +15,7 @@
  * @version $Id: DavTask.php 22174 2017-03-21 09:04:12Z mdhart $
  * @copyright Copyright Intermesh BV.
  * @author <<FIRST_NAME>> <<LAST_NAME>> <<EMAIL>>@intermesh.nl
+ * @deprecated since 6.6 (JMAP tasks module))
  */
 
 namespace GO\Caldav\Model;

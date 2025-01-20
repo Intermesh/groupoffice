@@ -17,7 +17,6 @@ namespace GO\Caldav;
 use GO\Calendar\Model\Event;
 use go\core\fs\Blob;
 use go\core\model\Acl;
-use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
 use go\modules\community\tasks\convert\VCalendar;
@@ -28,7 +27,6 @@ use Sabre;
 use GO;
 use GO\Caldav\Model\CalendarChange;
 use GO\Caldav\Model\DavEvent;
-use GO\Caldav\Model\DavTask;
 use GO\Base\Db\FindParams;
 use GO\Base\Db\FindCriteria;
 use Sabre\DAV\Exception\Forbidden;
@@ -125,8 +123,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				$this->_cachedCalendars[$principalUri][] = $this->_modelToDAVCalendar($calendar, $principalUri);
 			}
 		}
-
-		//\GO::debug($this->_cachedCalendars[$principalUri]);
 
 		return $this->_cachedCalendars[$principalUri];
 	}
@@ -321,8 +317,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	 */
 	public function getCalendarObjects($calendarId)
 	{
-//		\GO::debug("c:getCalendarObjects($calendarId)");
-		$log = '';
 		//weird bug?
 		if(!\GO::user()) {
 			throw new Exception\NotAuthenticated();
@@ -394,10 +388,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			$tasklist = TaskList::findById($calendar->tasklist_id); // ignore acl?
 
 			if($tasklist) {
-
-//				$monthsOld = \GO::config()->caldav_max_months_old;
-//				$monthsOld = 0 - $monthsOld;
-
 				$tasks = Task::find()->filter(['tasklistId' => $calendar->tasklist_id])
 					//->andWhere('due > (NOW() - INTERVAL '.$monthsOld.' MONTH)') // DUE can be NULL
 					->all();
@@ -406,7 +396,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 				foreach ($tasks as $task) {
 					$data = $this->fromBlob($task);
-//					$log .= " $task->id, ".$task->getUri()." \n";
 					$objects[] = array(
 						'uri' => $task->getUri(),
 						'calendardata' => $data,
@@ -418,8 +407,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				}
 			}
 		}
-
-//		\GO::debug($objects);
 
 		return $objects;
 	}
@@ -472,7 +459,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	 */
 	public function getCalendarObject($calendarId, $objectUri) {
 
-		\GO::debug("c:getCalendarObject($calendarId,$objectUri)");
+//		\GO::debug("c:getCalendarObject($calendarId,$objectUri)");
 
 		/*
 		 * When a client adds or updates an event, the server must return the
@@ -504,10 +491,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 		if ($event) {
 
-//			\GO::debug('Found event '.$objectUri);
 			$data = ($event->mtime==$event->client_mtime && !empty($event->data) && !$event->isPrivate()) ? $event->data : $this->exportCalendarEvent($event);
-			//\GO::debug($event->mtime==$event->client_mtime ? "Returning client data (mtime)" : "Returning server data (mtime)");
-//			\GO::debug($data);
 
 
 			$object = array(
@@ -522,9 +506,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			return $object;
 		}
 		else {
-//			$calendar = GO\Calendar\Model\Calendar::model()->findByPk($calendarId, false, true);
-//			$uid = str_replace('.ics', '',$objectUri);
-
 			$task = $this->getTaskByUri($objectUri, $calendarId);
 
 			if ($task) {
@@ -539,8 +520,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 					'size' => strlen($data),
 					'component' => 'vtodo'
 				);
-
-//				go()->debug($object);
 
 				return $object;
 			}
@@ -598,14 +577,11 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 					}
 				}
 
-				if (!$event)
+				if (!$event) {
 					return false;
-				else
+				}else {
 					return $event->getETag();
-
-				//store calendar data because we need to reply with the exact client data
-
-
+				}
 			} else { // VTODO
 				$calendar = Calendar::model()->findByPk($calendarId);
 				$parser = new VCalendar();
@@ -665,7 +641,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	public function updateCalendarObject($calendarId, $objectUri, $calendarData) {
 
 		\GO::debug("updateCalendarObject($calendarId,$objectUri,[data])");
-//		\GO::debug($calendarData);
 
 		try{
 
@@ -690,8 +665,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 					foreach($vcalendar->vevent as $e){
 						if((string) $e->rrule!=''){
 							$VEvent=$e;
-						}else
-						{
+						}else {
 							$exceptionVEvents[]=$e;
 						}
 					}
@@ -736,14 +710,10 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 						if(!$existing) {
 							\GO::debug("Creating exception for date: ".$recurrenceDate);
-
-
 							$exceptionEvent= $event->createExceptionEvent($recurrenceDate, array(), true);
-
 							$exceptionEvent->importVObject($exceptionVEvent);
 						} else {
 							\GO::debug("Exception already exists for date: ".$recurrenceDate);
-
 						}
 
 					}
@@ -803,7 +773,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				}
 			}
 		}catch(\GO\Base\Exception\AccessDenied $e){
-//			\GO::debug($e);
 			throw new Sabre\DAV\Exception\Forbidden;
 		}
 	}
@@ -834,7 +803,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	 * @return array
 	 */
 	public function getChangesForCalendar($calendarId, $syncToken, $syncLevel, $limit = null) {
-		\GO::debug("getChangesForCalendar($calendarId,$syncToken)");
+//		\GO::debug("getChangesForCalendar($calendarId,$syncToken)");
 		// Current synctoken
 		$calendar = GO\Calendar\Model\Calendar::model()->findByPk($calendarId);
 
