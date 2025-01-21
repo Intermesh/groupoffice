@@ -1,3 +1,4 @@
+- Finance: draft invoices with delivery date set didn't show up in list when filtering on drafts
 - Finance: Fixed invalid article category constraint
 - Core: Fixed export import of attachment custom field. Also used in finance migration.
 - Finance: Fixed sql error in finance migration
