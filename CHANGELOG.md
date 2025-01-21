@@ -1,4 +1,6 @@
 - Finance: Fixed invalid article category constraint
+- Core: Fixed export import of attachment custom field. Also used in finance migration.
+- Finance: Fixed sql error in finance migration
 
 20-01-2024: 6.8.96
 - CardDav: deprecated DavTask model, updated cleanup script
