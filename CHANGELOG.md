@@ -1,3 +1,5 @@
+- Finance: Fixed invalid article category constraint
+
 20-01-2024: 6.8.96
 - CardDav: deprecated DavTask model, updated cleanup script
 - Finance / Core: Fixed HTML editor labels in Dark mode by always showing html editor toolbar
