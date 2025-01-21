@@ -90,6 +90,7 @@ DROP TABLE IF EXISTS `wl_ip_addresses`, `wl_enabled_groups`;
 -- Tasks < 6.6
 DROP TABLE IF EXISTS ta_tasklists, ta_tasks, ta_categories, ta_settings, ta_portlet_tasklists;
 DROP TABLE IF EXISTS cf_ta_tasks;
+DROP TABLE IF EXISTS dav_tasks;
 
 -- SMime
 DELETE FROM smi_certs WHERE user_id NOT IN (SELECT id FROM core_user);
