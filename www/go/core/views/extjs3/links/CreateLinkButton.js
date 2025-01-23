@@ -255,13 +255,33 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 
 		this.linkGrid.store.setFilter("link", f);
 
-		this.linkGrid.store.load({
+		return this.linkGrid.store.load({
 			scope: this,
 			callback: function() {
 				this.setCount(this.linkGrid.store.getTotalCount());			
 			}
 		});
 		//this.menu.on("show", this.load, this, {single: true});
+	},
+
+	/**
+	 * Copy links from another entity
+	 *
+	 * @param entity
+	 * @param entityId
+	 * @returns {Promise<*>}
+	 */
+	copyFrom: async function (entity, entityId) {
+
+		const p = this.setEntity(entity, entityId);
+		p.then(() => {
+			this.newLinks = this.newLinks.concat(this.store.data.items.map(r => {return {
+					"toId": r.data.toId,
+					"toEntity": r.data.toEntity
+			}}));
+		})
+		this.linkGrid.store.setFilter("link", null);
+		return p;
 	},
 	
 	reset : function() {
