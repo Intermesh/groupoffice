@@ -1,3 +1,5 @@
+23-01-2025: 6.8.97
+- Finance: revert updating margin from unit cost change. But only update price if the margin is set.
 - Finance: Copy project links when duplicating finance docs
 - Finance: Copy custom fields and set recipient from customer when duplicating finance docs
 - Contracts: Add unit too like in finance
