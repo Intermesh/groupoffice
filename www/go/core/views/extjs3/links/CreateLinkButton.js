@@ -271,8 +271,11 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 	 * @param entityId
 	 * @returns {Promise<*>}
 	 */
-	copyFrom: async function (entity, entityId) {
+	copyFrom: async function (entity, entityId, entities) {
 
+		if(entities) {
+			this.linkGrid.store.setFilter("entities", {entities: entities});
+		}
 		const p = this.setEntity(entity, entityId);
 		p.then(() => {
 			this.newLinks = this.newLinks.concat(this.store.data.items.map(r => {return {
@@ -281,6 +284,7 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			}}));
 		})
 		this.linkGrid.store.setFilter("link", null);
+		this.linkGrid.store.setFilter("copy", null);
 		return p;
 	},
 	
