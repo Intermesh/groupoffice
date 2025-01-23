@@ -1,3 +1,4 @@
+- Finance: Copy project links when duplicating finance docs
 - Finance: Copy custom fields and set recipient from customer when duplicating finance docs
 - Contracts: Add unit too like in finance
 - Finance: draft invoices with delivery date set didn't show up in list when filtering on drafts
