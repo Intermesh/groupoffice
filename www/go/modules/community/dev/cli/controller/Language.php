@@ -82,7 +82,7 @@ class Language extends Controller {
 		while ($record = fgetcsv($this->handle, 0, $this->delimiter, self::ENCLOSURE)) {
 			
 			try {
-				list($package, $module, $en, $translation, $source) = $record;
+				list($package, $module, $en, $translation) = $record;
 			} catch(\Exception $e) {
 				echo "ERROR: Could not read record: ". var_export($record, true) ."\n\n";
 			}			
