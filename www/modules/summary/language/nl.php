@@ -23,4 +23,6 @@ return array (
   'Type' => 'Type',
   'Rss Feeds' => 'Rss Feeds',
   'Start page' => 'Startpagina',
+  'webfeeds' => 'webfeeds',
+  'All users' => 'Alle gebruikers',
 );

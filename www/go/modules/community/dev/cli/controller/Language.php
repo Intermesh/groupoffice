@@ -84,7 +84,7 @@ class Language extends Controller {
 			try {
 				list($package, $module, $en, $translation) = $record;
 			} catch(\Exception $e) {
-				echo "ERROR: Could not read record: ". var_export($record, true) ."\n\n";
+				echo "ERROR: Could not read record: " . $e->getMessage().' : '. var_export($record, true) ."\n\n";
 			}			
 
 			if (empty($translation)) {

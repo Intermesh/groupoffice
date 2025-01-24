@@ -21,4 +21,6 @@ return array (
   'Deactivate instance' => 'Deactiveer omgeving',
   'Activate instance' => 'Activeeer omgeving',
   'Allowed' => 'Toegestaan',
+  'Is trial' => 'Is trial',
+  'Modules' => 'Modules',
 );
