@@ -436,6 +436,7 @@ class Folder extends FileSystemObject {
 	 *  older: Return files if the file wasn't modified after the given DateTime object
 	 *  newer: Return files if the file was modified after the given DateTime object
 	 *  empty: Return empty folders
+	 *  exclude: Exclude if name matches this regex.
 	 *
 	 *
 	 * @param boolean $findFolders
@@ -452,6 +453,11 @@ class Folder extends FileSystemObject {
 		}
 
 		foreach($this->getChildren($findFiles, true) as $child) {
+
+			if(!empty($config['exclude']) && preg_match($config['exclude'], $child->getName())) {
+				continue;
+			}
+
 			$isFolder = $child->isFolder();
 
 			if($isFolder) {
