@@ -137,7 +137,7 @@ export class CalendarList extends Component {
 			},
 			buttons: [btn({
 				icon: 'more_horiz', menu: menu({},
-					btn({icon:'refresh', text: t('Synchonize'), hidden: !data.davaccountId, handler: (me) => {
+					btn({icon:'sync', text: t('Synchronize'), hidden: !data.davaccountId, handler: (me) => {
 						const cb = me.findAncestor((cmp) => cmp instanceof CheckboxField);
 						if(cb) {
 							cb.mask();

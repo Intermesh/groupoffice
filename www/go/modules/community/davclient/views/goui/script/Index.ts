@@ -20,7 +20,7 @@ modules.register(  {
 			}
 
 			//const ui = new Main();
-			modules.addSystemSettingsPanel("community", "davclient", "davclient", t("DAV Accounts"), "manage_accounts", () => {
+			modules.addAccountSettingsPanel("community", "davclient", "davclient", t("DAV Accounts"), "manage_accounts", () => {
 				return new SystemSettings();
 			});
 			//modules.addMainPanel("calendar", "Calendar", 'calendar', t('Calendar'), () => ui);

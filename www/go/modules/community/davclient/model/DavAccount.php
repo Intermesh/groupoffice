@@ -2,6 +2,7 @@
 namespace go\modules\community\davclient\model;
 
 use go\core\acl\model\AclOwnerEntity;
+use go\core\model\Module;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 
@@ -47,6 +48,12 @@ class DavAccount extends AclOwnerEntity {
 		return parent::defineMapping()
 			->addTable("davclient_davaccount", 'a')
 			->addMap('collections', Calendar::class, ['id' => 'davaccountId']);
+	}
+
+	protected function canCreate(): bool
+	{
+		return Module::findByName('community', 'davclient')
+			->getUserRights()->mayManage;
 	}
 
 	public function http() {

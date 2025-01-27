@@ -13,7 +13,7 @@ export class AccountWindow extends FormWindow {
 				//checkbox({type:'switch',name:'active',value:true,label:t('Enabled')}),
 				textfield({name:'name', label: t('Name')}),
 				textfield({name:'host', label: t('Host')}),
-				textfield({name:'principalUri', label: t('Path')}),
+				// textfield({name:'principalUri', label: t('Path')}),
 				textfield({name:'username', label: t('Username')}),
 				textfield({name:'password', label: t('Password'), type:'password'}),
 				//textfield({name:'uri', readOnly:true, label: t('Common name')}),
