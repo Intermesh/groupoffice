@@ -31,11 +31,11 @@ class Calendar extends Property
 			->addTable("davclient_calendar");
 	}
 
-	public function sync() {
+	public function sync(): bool {
 		if($this->isNew())
-			$this->fetchEvents();
+			return $this->fetchEvents();
 		else {
-			$this->fetchEtags(); // sync changed only after comparing etags
+			return $this->fetchEtags(); // sync changed only after comparing etags
 		}
 	}
 
@@ -48,14 +48,15 @@ class Calendar extends Property
 			$event->uri($event->uid . '.ics');
 		}
 		$http->PUT( $this->uri . $event->uri(), $event->toVObject());
-
-		$event->etag($http->responseHeaders('etag'));
-		if(empty($event->etag())) {
+		if($http->statusCode() === 412) { // precondition (if-match) failed
 			// the server made changed and we need to fetch the new VEVENT
-			//if($event->save())
-			//$this->fetchEvents([], [$event->uri()]);
+			$this->fetchEvents([], [$event->uri()]);
+			// here we will have disposed our own changes
+		} else if ($http->statusCode() <= 299) {
+			$event->etag($http->responseHeaders('etag'));
+		} else {
+			return false;
 		}
-
 		return true;
 	}
 
@@ -103,36 +104,37 @@ XML;
 				$update[] = $href;
 			}
 		}
-
+		$success = true;
 		// Remove missing
 		if(!empty($delete))
-			CalendarEvent::delete((new Query())->where(['id'=> $delete]));
+			$success = CalendarEvent::delete((new Query())->where(['id'=> $delete]));
 		// fetch changed and new
 		if(!empty($update) || !empty($create)) {
-			$this->fetchEvents($create, $update);
+			$success = $this->fetchEvents($create, $update) && $success;
 		}
+		return $success;
+	}
+
+	private function fetchAll() {
+
 	}
 
 	private function fetchEvents($create = [], $update = []) {
 		$hrefs = array_merge($create,$update);
-		$xml = '<c:calendar-query xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav">
+		$xml = '<c:calendar-multiget xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav">
     <d:prop>
         <d:getetag />
         <c:calendar-data />
     </d:prop>'.
 			(!empty($hrefs) ? implode("\n",array_map(function($h) {return '<d:href>'.$h.'</d:href>';},$hrefs)) : '')
-			.'<c:filter>
-        <c:comp-filter name="VCALENDAR">
-			<c:comp-filter name="VEVENT" />
-        </c:comp-filter>
-    </c:filter>
-</c:calendar-query>';
+		.'</c:calendar-multiget>';
 		$responses = $this->owner->http()
 			->setHeader('Depth', 1)
 			->setHeader('Prefer', 'return-minimal')
 			->REPORT($this->uri, $xml)
 			->parsedMultiStatus();
 		//$events = [];
+		$success=true;
 		foreach ($responses as $href => $response) {
 			if (isset($response->{'calendar-data'})) {
 				if(in_array($href, $update)) // only
@@ -147,10 +149,12 @@ XML;
 				$event->etag((string)$response->getetag);
 				$event->uri(basename($href));
 				if(!$event->save()){
+					$success = false;
 					go()->log('cannot sync event '.print_r($event->getValidationErrors(), true));
 				}
 				$event = null;
 			}
 		}
+		return $success;
 	}
 }

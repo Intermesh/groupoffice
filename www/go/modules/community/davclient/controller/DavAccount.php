@@ -21,6 +21,9 @@ class DavAccount extends EntityController {
 		return $this->defaultGet($params);
 	}
 	public function set($params) {
+		if(!empty($params['keepData'])) {
+			model\DavAccount::$keepData = true;
+		}
 		return $this->defaultSet($params);
 	}
 

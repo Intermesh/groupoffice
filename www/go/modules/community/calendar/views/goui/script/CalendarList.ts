@@ -1,7 +1,7 @@
 import {
 	browser,
 	btn,
-	checkbox,
+	checkbox, CheckboxField,
 	comp,
 	Component, ComponentEventMap,
 	displayfield, fieldset, Format,
@@ -10,7 +10,7 @@ import {
 	list,
 	menu, ObservableListenerOpts, RowRenderer,
 	select,
-	tbar, win
+	tbar, win, Window
 } from "@intermesh/goui";
 import {calendarStore, t} from "./Index.js";
 import {CalendarView} from "./CalendarView.js";
@@ -137,12 +137,25 @@ export class CalendarList extends Component {
 			},
 			buttons: [btn({
 				icon: 'more_horiz', menu: menu({},
-					btn({icon:'edit', text: t('Edit')+'…', disabled:!data.myRights.mayAdmin, handler: async _ => {
+					btn({icon:'refresh', text: t('Synchonize'), hidden: !data.davaccountId, handler: (me) => {
+						const cb = me.findAncestor((cmp) => cmp instanceof CheckboxField);
+						if(cb) {
+							cb.mask();
+							client.jmap('DavAccount/sync', {accountId:data.davaccountId}).then((response)=> {
+								// reload should be automaticly
+							}).catch((err) => {
+								Window.error(err);
+							}).finally(() => {
+								cb.unmask();
+							})
+						}
+					}}),
+					btn({icon:'edit', text: t('Edit')+'…', hidden: data.davaccountId, disabled:!data.myRights.mayAdmin, handler: async _ => {
 							const dlg = data.groupId ? new ResourceWindow() : new CalendarWindow();
 							await dlg.load(data.id);
 							dlg.show();
 						}}),
-					btn({icon:'delete', text: t('Delete','core','core')+'…', disabled:!data.myRights.mayAdmin, handler: async _ => {
+					btn({icon:'delete', text: t('Delete','core','core')+'…', hidden: data.davaccountId, disabled:!data.myRights.mayAdmin, handler: async _ => {
 						jmapds("Calendar").confirmDestroy([data.id]);
 					}}),
 					hr(),

@@ -11,6 +11,8 @@ use go\core\orm\Query;
  */
 class DavAccount extends AclOwnerEntity {
 
+	static $keepData = false;
+
 	private static $xmlNs = [
 		'd:' => "DAV:",
 		'cs:' => "http://calendarserver.org/ns/",
@@ -49,7 +51,8 @@ class DavAccount extends AclOwnerEntity {
 
 	public function http() {
 		if(empty($this->http)) {
-			$this->http = new HttpClient('https://' . $this->host, [
+			$proto = substr($this->host, -2, 2) === '80' ? 'http://' : 'https://';
+			$this->http = new HttpClient($proto . $this->host, [
 				'Content-Type' => 'application/xml; charset=utf-8',
 				'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password),
 			]);
@@ -83,6 +86,24 @@ class DavAccount extends AclOwnerEntity {
 
 	private function isSetup() {
 		return !empty($this->lastSync) && !empty($this->collections);
+	}
+
+	protected static function internalDelete(Query $query): bool
+	{
+		$calIDs = \go\modules\community\calendar\model\Calendar::find()->selectSingleValue('calendar_calendar.id')
+			->join('davclient_calendar','d', 'd.id = calendar_calendar.id')
+			->where(['d.davaccountId' => $query])->all();
+
+		$ok = parent::internalDelete($query);
+		if($ok && !self::$keepData && \go\core\Module::isAllowed('calendar', 'community')) {
+			// remove the calendars after
+			if(!\go\modules\community\calendar\model\Calendar::delete(['id'=>$calIDs])) {
+				$ok = false;
+				throw new \Exception("Unable to delete calendars related to dav account");
+			}
+
+		}
+		return $ok;
 	}
 
 	private function dnsResolve() {
@@ -157,7 +178,9 @@ class DavAccount extends AclOwnerEntity {
 				$collection = $responses[$calendar->uri];
 				if($calendar->isNew() || $calendar->ctag !== (string)$collection->getctag) {
 					// resync
-					$calendar->sync();
+					if($calendar->sync()) {
+						$calendar->ctag = (string)$collection->getctag;
+					}
 				}
 				unset($responses[$calendar->uri]);
 			}
@@ -214,10 +237,9 @@ class DavAccount extends AclOwnerEntity {
 	private function addCalendar($uri, $response)
 	{
 		$cal = $this->byHref($uri);
-
+		$color = str_replace('#', '',(string) $response->{'calendar-color'});
+		$order = (string) $response->{'calendar-order'};
 		if (empty($cal)) {
-			$color = str_replace('#', '',(string) $response->{'calendar-color'});
-			$order = (string) $response->{'calendar-order'};
 			$tz = null;
 			if(isset($response->{'calendar-timezone'})) {
 				preg_match('/TZID:(\w*\/\w*)/', (string)$response->{'calendar-timezone'}, $matches);
@@ -236,13 +258,21 @@ class DavAccount extends AclOwnerEntity {
 				$cal = new Calendar($this);
 				$cal->id = $model->id;
 				$cal->uri = $uri;
-				$cal->ctag = (string) $response->getctag;
+				$cal->ctag = '';// (string) $response->getctag;
 				$cal->synctoken = (string) $response->{'sync-token'};
 				$this->collections[$cal->id] = $cal;
 				//$cal->sync();
 			} else {
 				go()->log('Could not save Calendar '.print_r($model->getValidationErrors(),true));
 			}
+		} else {
+			// update name, description, order and color
+			$model = \go\modules\community\calendar\model\Calendar::findById($cal->id);
+			$model->name = (string) $response->displayname;
+			$model->description = (string) $response->{'calendar-description'};
+			$model->sortOrder = is_numeric($order) ? (int)$order : 1;
+			$model->color = !empty($color) ? $color : $this->randomColor($model->name);
+			$model->save();
 		}
 
 		return $cal;

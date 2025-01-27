@@ -59,9 +59,10 @@ class HttpClient extends \go\core\http\Client
 		if (!$body) {
 			throw new \OutOfBoundsException('No response for: ' . '[PAYLOAD HERE]');
 		}
-		$xml = str_ireplace(['<d:','<cal:','<ical:','<cs:','<card:'], '<', $body);
-		$xml = str_ireplace(['</d:','</cal:','</ical:','</cs:','</ard:'], '</', $xml);
-		$multistatus = \simplexml_load_string($xml);
+//		$xml = str_ireplace(['<d:','<cal:','<ical:','<cs:','<card:'], '<', $body);
+//		$xml = str_ireplace(['</d:','</cal:','</ical:','</cs:','</ard:'], '</', $xml);
+		$cleanXml = preg_replace('/<([\/]?)(\w+:)?(\w+)([^>]*)>/', '<$1$3$4>', $body);
+		$multistatus = \simplexml_load_string($cleanXml);
 		$result = [];
 		foreach ($multistatus->response as $response) {
 			list(, $status, ) = explode(' ', $response->propstat->status, 3);
@@ -71,4 +72,18 @@ class HttpClient extends \go\core\http\Client
 		}
 		return $result;
 	}
+
+//	private function parseXMl($xml) {
+//		$multistatus = \simplexml_load_string($xml);
+//		$result = [];
+//		$namespaces = $multistatus->getNamespaces(true);
+//		foreach ($multistatus->response as $response) {
+//			list(, $status, ) = explode(' ', $response->propstat->status, 3);
+//			if ($status == 200) {
+//				$result[(string) $response->href] = $response->propstat->prop;
+//			}
+//		}
+//		iterator_to_array($response->propstat->prop->children('http://apple.com/ns/ical/'))
+//		return $result;
+//	}
 }
