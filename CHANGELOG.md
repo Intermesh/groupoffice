@@ -1,3 +1,4 @@
+- 27-01-2025: 6 8 98
 - Calendar: Minor fix import ICS and international characters
 
 23-01-2025: 6.8.97
