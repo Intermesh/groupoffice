@@ -144,15 +144,13 @@ class Language extends Controller {
 
 
 	/**
-	 * docker compose exec groupoffice-develop php www/cli.php community/dev/Language/export --language=nl
+	 * docker compose exec groupoffice php www/cli.php community/dev/Language/export --language=nl --translate --missingOnly
 	 *
 	 * @param $params
 	 * @return void
 	 */
 	public function export($params) {
 		$params['output'] = true;
-		$params['translate'] = true;
-		$params['missingOnly'] = true;
 		$c = new \go\modules\community\dev\controller\Language();
 		$c->export($params);
 	}
