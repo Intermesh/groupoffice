@@ -62,6 +62,7 @@ use go\core\ErrorHandler;
 use go\core\mail\Address;
 use go\core\mail\Attachment;
 use go\core\model\Module;
+use go\core\util\StringUtil;
 use Sabre;
 
 /**
@@ -1758,9 +1759,11 @@ $sub = $offset>0;
 	 */
 	public function importVObject(Sabre\VObject\Component $vobject, $attributes=array(), $dontSave=false, $makeSureUserParticipantExists=false, $importExternal=false, $withCategories = true){
 
-		$uid = (string) $vobject->uid;
-		if(!empty($uid))
-			$this->uuid = $uid;
+		$uid = (string)$vobject->uid;
+		if (!empty($uid)) {
+			// In certain cases, accented characters will throw a DB collation error, as the field is in ASCII collation
+			$this->uuid = StringUtil::toAscii($uid);
+		}
 
 		if(!$this->isPrivate() || $this->user_id === go()->getUserId()) {
 			$this->name = (string)$vobject->summary;

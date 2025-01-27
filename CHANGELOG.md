@@ -1,3 +1,5 @@
+- Calendar: Minor fix import ICS and international characters
+
 23-01-2025: 6.8.97
 - Finance: revert updating margin from unit cost change. But only update price if the margin is set.
 - Finance: Copy project links when duplicating finance docs
