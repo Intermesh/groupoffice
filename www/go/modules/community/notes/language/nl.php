@@ -18,4 +18,6 @@ return array (
   'Add test' => 'Toevoegen test',
   'Display options for notebooks' => 'Weergave instellingen voor notitieblokken',
   'Remember last selected note book' => 'Onthoud mijn laatst geselecteerde notitieblokken ',
+  'Start in' => 'Beginnen',
+  'Web page' => 'Webpagina',
 );

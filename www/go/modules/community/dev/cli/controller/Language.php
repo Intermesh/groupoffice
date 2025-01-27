@@ -70,8 +70,8 @@ class Language extends Controller {
 		if (!$headers) {
 			throw new \Exception("Could not read CSV");
 		}
-		if (count($headers) < 5) {
-			throw new \Exception("Invalid CSV file (Header count != 5): First record: ".var_export($headers, true));
+		if (count($headers) < 4) {
+			throw new \Exception("Invalid CSV file (Header count < 4): First record: ".var_export($headers, true));
 		}
 
 		$lang = strtolower($headers[3]);
@@ -82,9 +82,9 @@ class Language extends Controller {
 		while ($record = fgetcsv($this->handle, 0, $this->delimiter, self::ENCLOSURE)) {
 			
 			try {
-				list($package, $module, $en, $translation, $source) = $record;
+				list($package, $module, $en, $translation) = $record;
 			} catch(\Exception $e) {
-				echo "ERROR: Could not read record: ". var_export($record, true) ."\n\n";
+				echo "ERROR: Could not read record: " . $e->getMessage().' : '. var_export($record, true) ."\n\n";
 			}			
 
 			if (empty($translation)) {
@@ -144,15 +144,13 @@ class Language extends Controller {
 
 
 	/**
-	 * docker compose exec groupoffice-develop php www/cli.php community/dev/Language/export --language=nl
+	 * docker compose exec groupoffice php www/cli.php community/dev/Language/export --language=nl --translate --missingOnly | tee nl-missing.csv
 	 *
 	 * @param $params
 	 * @return void
 	 */
 	public function export($params) {
 		$params['output'] = true;
-		$params['translate'] = true;
-		$params['missingOnly'] = true;
 		$c = new \go\modules\community\dev\controller\Language();
 		$c->export($params);
 	}
