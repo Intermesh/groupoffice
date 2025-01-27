@@ -247,6 +247,29 @@ class Language {
 		
 		return $this->data[$package][$module][$str] ?? $this->replaceBrand($str);
 	}
+
+
+	/**
+	 * Get the translation of a string or null if it doesn't exist
+	 *
+	 * @param string $str
+	 * @param string|null $package
+	 * @param string|null $module
+	 * @return string|null
+	 */
+	public function getTranslation(string $str, ?string $package = null, ?string $module = null) : null|string|array {
+		if($package == null) {
+			$package = $this->defaultPackage;
+		}
+
+		if($module == null) {
+			$module = $this->defaultModule;
+		}
+
+		$this->loadSection($package, $module);
+
+		return $this->data[$package][$module][$str] ?? null;
+	}
 	
 	public function translationExists($str, $package = 'core', $module = 'core') {
 		$this->loadSection($package, $module);
