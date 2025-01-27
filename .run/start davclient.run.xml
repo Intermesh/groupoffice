@@ -4,7 +4,6 @@
     <command value="run" />
     <scripts>
       <script value="start" />
-      <script value="davclient" />
     </scripts>
     <node-interpreter value="project" />
     <envs />
