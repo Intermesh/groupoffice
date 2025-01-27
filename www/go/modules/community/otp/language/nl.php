@@ -13,7 +13,7 @@ return array (
   'Provide your current password to disable OTP Authenticator.' => 'Voer uw huidig wachtwoord in om OTP Authenticator uit te schakelen',
   'Disable OTP Authenticator' => 'OTP Authenticator uitschakelen',
   'Get the code from the OTP Authenticator app on your mobile device and fill it in below' => 'Haal de code uit de OTP Authenticator app op uw mobiel apparaat en vul deze hieronder in.',
-  'Code' => 'Rubriek',
+  'Code' => 'Code',
   'Code is required' => 'Code is verplicht',
   'Not found' => 'Niet gevonden',
   'Invalid code' => 'Ongeldige code',
