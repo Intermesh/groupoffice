@@ -266,16 +266,10 @@ $updates['202412090921'][] = "update tasks_task set progressUpdated = modifiedAt
 $updates['202412090921'][] = "alter table tasks_task
     add projectId int unsigned null;";
 
-$updates['202412090921'][] = "alter table tasks_task
-    add constraint tasks_task_business_projects3_project3_id_fk
-        foreign key (projectId) references business_projects3_project3 (id)
-            on delete set null;";
+$updates['202412090921'][] = "";
 
 
 $updates['202412090921'][] = "alter table tasks_task
     add mileStoneId int unsigned null;";
 
-$updates['202412090921'][] = "alter table tasks_task
-    add constraint tasks_task_business_projects3_project3_milestone_id_fk
-        foreign key (mileStoneId) references business_projects3_project3_milestone (id)
-            on delete set null;";
+$updates['202412090921'][] = "";

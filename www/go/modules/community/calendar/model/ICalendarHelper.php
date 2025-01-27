@@ -54,23 +54,22 @@ class ICalendarHelper {
 
 		$vevent = $vcalendar->add(self::toVEvent($vcalendar->createComponent('VEVENT'),$event));
 
-		if(!$event->useDefaultAlerts && is_array($event->alerts)) {
-			foreach($event->alerts as $id => $alert) {
-				if(!empty($alert->offset)) {
-					$vevent->add('VALARM', [
-						'TRIGGER' => $alert->offset, // 15 minutes before the event
-						'DESCRIPTION' => 'Alarm',
-						'ACTION' => $alert->action,
-					]);
-				} else if (!empty($alert->when)) {
-					$vevent->add('VALARM', [
-						'TRIGGER' => $alert->when, // 15 minutes before the event
-						'DESCRIPTION' => 'Alarm',
-						'ACTION' => $alert->action,
-					]);
-				}
+		foreach($event->alerts() as $id => $alert) {
+			if(!empty($alert->getTrigger()['offset'])) {
+				$vevent->add('VALARM', [
+					'TRIGGER' => $alert->getTrigger()['offset'], // 15 minutes before the event
+					'DESCRIPTION' => 'Alarm',
+					'ACTION' => $alert->action,
+				]);
+			} else if (!empty($alert->getTrigger()['when'])) {
+				$vevent->add('VALARM', [
+					'TRIGGER' => $alert->getTrigger()['when'], // 15 minutes before the event
+					'DESCRIPTION' => 'Alarm',
+					'ACTION' => $alert->action,
+				]);
 			}
 		}
+
 		//@todo: ATTACHMENT Files?
 
 		if($event->isRecurring()) {
@@ -492,12 +491,12 @@ class ICalendarHelper {
 		if(isset($parts['INTERVAL']) && $parts['INTERVAL'] != 1) {
 			$values->interval = intval($parts['INTERVAL']);
 		}
-		if(isset($parts['RSCALE'])) $values->rscale = strtolower(isset($parts['RSCALE']));
-		if(isset($parts['SKIP'])) $values->skip = strtolower(isset($parts['SKIP']));
-		if(isset($parts['WKST'])) $values->firstDayOfWeek = strtolower(isset($parts['WKST']));
-		if(isset($parts['BYDAY'])) {
+		if(isset($parts['RSCALE'])) $values->rscale = strtolower($parts['RSCALE']);
+		if(isset($parts['SKIP'])) $values->skip = strtolower($parts['SKIP']);
+		if(isset($parts['WKST'])) $values->firstDayOfWeek = strtolower($parts['WKST']);
+		if(!empty($parts['BYDAY'])) {
 			$values->byDay = [];
-			$days = (array)$parts['BYDAY'];
+			$days =array_map('trim',explode(",", $parts['BYDAY']));
 			foreach($days as $day) {
 				$bd = (object)['day' => strtolower(substr($day, -2))];
 				if(strlen($day) > 2) {

@@ -83,30 +83,37 @@ export class EventWindow extends FormWindow {
 		this.form.on('save', () => { this.close();});
 		this.generalTab.cls = 'flow fit scroll pad';
 		this.startDate = datefield({label: t('Start'), name:'start',flex:1, defaultTime: now.format('H')+':00',
-			listeners:{'setvalue': (me,_v) => {
+			listeners:{'change': (me,_v, old) => {
+
 					const newStartDate = me.getValueAsDateTime(),
 						endDate = this.endDate.getValueAsDateTime(),
-						format= me.withTime ? "Y-m-dTH:i" : 'Y-m-d';
+						format= me.withTime ? "Y-m-dTH:i" : 'Y-m-d',
+						oldStartDate = old ? DateTime.createFromFormat(old, format) : undefined,
+						di = endDate && oldStartDate ? oldStartDate.diff(endDate) : new DateInterval(client.user.calendarPreferences.defaultDuration);
+
 					if(newStartDate){
 						recurrenceField.setStartDate(newStartDate);
 					}
 
-					if (endDate && newStartDate && newStartDate.date > endDate.date) {
+
+					if (endDate && newStartDate && newStartDate.date >= endDate.date) {
 						this.endDate.value = newStartDate.clone()
-							.add(new DateInterval(client.user.calendarPreferences.defaultDuration))
+							.add(di)
 							.format(format);
 					}
 				}}
 		});
 		this.endDate = datefield({label:t('End'), name: 'end', flex:1, defaultTime: (now.getHours()+1 )+':00',
-			listeners: {'setvalue': (me,_v) => {
+			listeners: {'change': (me,_v, old) => {
 					const newEndDate = me.getValueAsDateTime(),
 						startDate = this.startDate.getValueAsDateTime(),
-						format= me.withTime ? "Y-m-dTH:i" : 'Y-m-d';
+						format= me.withTime ? "Y-m-dTH:i" : 'Y-m-d',
+						oldEndDate = old ? DateTime.createFromFormat(old, format) : undefined,
+						di = startDate && oldEndDate ? oldEndDate.diff(startDate) : new DateInterval("-" + (client.user.calendarPreferences.defaultDuration ?? "P0"));
 
-					if (newEndDate && startDate && newEndDate.date < startDate.date) {
+					if (newEndDate && startDate && ( (me.withTime &&  newEndDate.date <= startDate.date) || (!me.withTime &&  newEndDate.date < startDate.date))) {
 						this.startDate.value = newEndDate.clone()
-							.add(new DateInterval('-'+client.user.calendarPreferences.defaultDuration))
+							.add(di)
 							.format(format);
 					}
 					if(newEndDate && this.item) {

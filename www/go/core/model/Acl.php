@@ -289,42 +289,6 @@ class Acl extends Entity {
 		}
 		$subQuery->andWhere('acl_g.level', '>=', $level);
 		$query->where($column, 'IN', $subQuery);
-
-		//where exists
-		// $subQuery = (new Query)
-		// 				->select('aclId')
-		// 				->from('core_acl_group', 'acl_g')
-		// 				->where('acl_g.aclId = '.$column)
-		// 				->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
-		// 				->andWhere([
-		// 						'acl_u.userId' => $userId 					
-		// 								]);
-
-		// if($level != self::LEVEL_READ) {			
-		// 	$subQuery->andWhere('acl_g.level', '>=', $level);
-		// }
-		
-		// $query->whereExists(
-		// 				$subQuery
-		// 				);
-
-
-		// join
-//		$on =  'acl_g.aclId = ' . $column;
-//		if($level != self::LEVEL_READ) {
-//			$on .= ' AND level >= ' .$level;
-//		}
-//
-//		if(isset($groups)) {
-//			$on = (new Criteria)->where($on)->andWhere('acl_g.groups', 'IN', $groups);
-//		}
-//
-//		$query->join('core_acl_group', 'acl_g', $on)
-//			->groupBy(['id']);
-//
-//		if(!isset($groups)) {
-//			$query->join('core_user_group', 'acl_u', 'acl_u.groupId = acl_g.groupId AND acl_u.userId=' . $userId);
-//		}
 		
 	}
 	

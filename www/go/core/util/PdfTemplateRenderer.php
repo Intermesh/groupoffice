@@ -65,6 +65,9 @@ class PdfTemplateRenderer extends PdfRenderer {
 			$this->parser->addModel($name, $model);
 		}
 
+		$this->defaultFont = $this->template->fontFamily;
+		$this->defaultFontSize = $this->template->fontSize;
+
 		parent::__construct($orientation, $this->template->measureUnit, $this->template->pageSize);
 
 		$this->SetTopMargin($this->template->marginTop);

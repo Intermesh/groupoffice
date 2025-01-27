@@ -96,6 +96,31 @@ go.pdftemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 				}),
 				valueField: 'value',
 				displayField: 'display'
+			},{
+				xtype: 'combo',
+				name: 'fontFamily',
+				fieldLabel: t('Font'),
+				mode: 'local',
+				editable: false,
+				triggerAction: 'all',
+				value: "dejavusans",
+				store: new Ext.data.ArrayStore({
+					fields: [
+						'value',
+						'display'
+					],
+					data: [['dejavusans', 'DejaVu Sans'], ['freesans', 'Freesans'],['freemono', 'Free mono'],['freeserif', 'Free serif'], ['helvetica', 'Helvetica'], ['times', 'Times New Roman', 'aefurat', "Arabic Furat"]]
+				}),
+				valueField: 'value',
+				displayField: 'display'
+			},
+
+			{
+				xtype: 'gonumberfield',
+				fieldLabel: t('Font size'),
+				name: 'fontSize',
+				decimals: 0,
+				value: 10
 			},
 
 			 new go.form.FileButtonField({

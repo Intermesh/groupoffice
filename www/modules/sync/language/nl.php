@@ -24,4 +24,9 @@ return array (
   'Synchronization' => 'Synchronisatie',
   'Delete older events and tasks at the client (they will be kept in Group-Office)' => 'Verwijder oude afspraken en taken op de client (Ze blijven bewaard in {product_name})',
   'Model' => 'Model',
+  'Allow delete via synchronization' => 'Verwijderen toestaan via synchronisatie',
+  'By default devices are not allowed to delete items. This was added due to a bug in Android 12 that deleted contacts after an update.' => 'Standaard mogen apparaten items niet verwijderen. Dit werd toegevoegd als gevolg van een bug in Android 12 dat verwijderde contacten na een update.',
+  'Notebooks' => 'Notitieboeken',
+  'Address books' => 'Adresboeken',
+  'Tasklists' => 'Taaklijsten',
 );

@@ -644,7 +644,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	/**
 	 * @return Alert[]
 	 */
-	private function alerts() {
+	public function alerts() {
 		if($this->useDefaultAlerts) {
 			$calendar = Calendar::findById($this->calendarId, ['id', 'ownerId', $this->showWithoutTime?'defaultAlertsWithoutTime':'defaultAlertsWithTime']);
 			return ($this->showWithoutTime ? $calendar->defaultAlertsWithoutTime : $calendar->defaultAlertsWithTime) ?? [];
@@ -822,6 +822,12 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 					$recurrenceId = $o->recurrenceId;
 				}
 			}
+		}
+		if(is_string($recurrenceId)) {
+			$recurrenceId = new \DateTime($recurrenceId, $this->timeZone());
+		}
+		if(is_string($nextOccurrence)) {
+			$nextOccurrence = new \DateTime($nextOccurrence, $this->timeZone());
 		}
 		$it = ICalendarHelper::makeRecurrenceIterator($this);
 		$nextRecurrenceId = null;

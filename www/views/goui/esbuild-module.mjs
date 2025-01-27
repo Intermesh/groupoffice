@@ -6,7 +6,7 @@ const watch = (process.argv.length > 2 && process.argv[2] == "watch");
 const opts = {
 	entryPoints: ['script/Index.ts'],
 	bundle: true,
-	sourcemap: true,
+	sourcemap: watch,
 	format: "esm",
 	target: "esnext",
 	minify: !watch,

@@ -68,11 +68,11 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			this.height = this.growMinHeight;
 		}
 
-		this.on('afterrender', function() {
-			if(this.grow && this.growMinHeight <= dp(46)) {
-				this.tb.hide();
-			}
-		}, this);
+		// this.on('afterrender', function() {
+		// 	if(this.grow && this.growMinHeight <= dp(46)) {
+		// 		this.tb.hide();
+		// 	}
+		// }, this);
 		this.on('initialize', function(){
 
 			if(this.grow) {
@@ -570,18 +570,18 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		body.style.width = "100%";
 		body.style.lineHeight = dp(20) + "px";
 
-		var h =  Math.max(this.growMinHeight, body.offsetHeight); // 400  max height
+		var h =  Math.max(this.growMinHeight, body.offsetHeight + dp(20)); // 400  max height
 
-		if(h > dp(48)) {
-			this.tb.show();
-			//workaround for combo
-			if(this.tb.items.itemAt(0).wrap) {
-				this.tb.items.itemAt(0).wrap.dom.style.width = "100px";
-			}
-			this.tb.doLayout();
-		} else {
-			this.tb.hide();
-		}
+		// if(h > dp(48)) {
+		// 	this.tb.show();
+		// 	//workaround for combo
+		// 	if(this.tb.items.itemAt(0).wrap) {
+		// 		this.tb.items.itemAt(0).wrap.dom.style.width = "100px";
+		// 	}
+		// 	this.tb.doLayout();
+		// } else {
+		// 	this.tb.hide();
+		// }
 
 		h +=  this.tb.el.getHeight();
 
