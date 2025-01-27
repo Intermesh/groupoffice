@@ -144,7 +144,7 @@ class Language extends Controller {
 
 
 	/**
-	 * docker compose exec groupoffice php www/cli.php community/dev/Language/export --language=nl --translate --missingOnly
+	 * docker compose exec groupoffice php www/cli.php community/dev/Language/export --language=nl --translate --missingOnly | tee nl-missing.csv
 	 *
 	 * @param $params
 	 * @return void
