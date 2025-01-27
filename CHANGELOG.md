@@ -1,4 +1,5 @@
 - Finance: Migrate billing B2C. Handle case when no company is set on invoices.
+- Finance: Invalid foreign key
 
 27-01-2025: 6.8.98
 - Calendar: Minor fix import ICS and international characters
