@@ -313,32 +313,22 @@ class Scheduler {
 			$existingEvent->isOrigin = false;
 			$existingEvent->replyTo = str_replace('mailto:', '',(string)$vcalendar->VEVENT[0]->{'ORGANIZER'});
 		}
-		$calId = Calendar::fetchDefault($receiver);
+
 		$event = ICalendarHelper::parseVObject($vcalendar, $existingEvent);
-		if(isset($event->participants))
-		foreach($event->participants as $p) {
-			if($p->email == $receiver && $p->kind == 'resource') {
-				return $event; // Do not put the event in the resource admin its calendar
+		if(isset($event->participants)) {
+			foreach ($event->participants as $p) {
+				if ($p->email == $receiver && $p->kind == 'resource') {
+					return $event; // Do not put the event in the resource admin its calendar
+				}
 			}
 		}
-		return Calendar::addEvent($event, $calId);
 
-//		if($event->isRecurring()) {
-//
-//			foreach ($vcalendar->VEVENT as $vevent) {
-//
-//				if(!empty($vevent->{'RECURRENCE-ID'})) {
-//					$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
-//
-//					if (isset($event->recurrenceOverrides[$recurId])) {
-//						$exEvent = $event->patchedInstance($recurId);
-//						return $exEvent;
-//					}
-//				}
-//			}
-//
-//			return $event;
-//		}
+		if($existingEvent->isNew()) {
+			return Calendar::addEvent($event,  Calendar::fetchDefault($receiver));
+		} else {
+			$existingEvent->save();
+			return $existingEvent;
+		}
 	}
 
 	private static function processCancel(VCalendar $vcalendar, CalendarEvent $existingEvent) : CalendarEvent {

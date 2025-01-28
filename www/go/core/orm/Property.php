@@ -190,11 +190,19 @@ abstract class Property extends Model {
 	 */
 	public function populate(array $record): static
 	{
+		$this->populateTableRecord($record);
+		$this->initRelations();
+		if(!$this->readOnly) {
+			$this->trackModifications();
+		}
+		$this->init();
+
+		return $this;
+	}
+
+	private function populateTableRecord(array $record) : void {
 		$m = static::getMapping();
 		foreach($record as $colName => $value) {
-
-
-
 			if(str_contains($colName, '.')) {
 				$this->setPrimaryKey($colName, $value);
 			} else {
@@ -205,16 +213,39 @@ abstract class Property extends Model {
 				$this->$colName = $value;
 			}
 		}
+	}
 
-		$this->initRelations();
-
-		if(!$this->readOnly) {
-			$this->trackModifications();
+	/**
+	 * Populate the model with an existing table record.
+	 *
+	 * This function should rarely be used. It was needed for the calendar event model that exists of two tables.
+	 * A shared table between invitees and an table linking it to a calendar. When a new
+	 * meeting request comes in we have to find the existing shared record and populate the model
+	 * that might have a new calender link.
+	 *
+	 * @param string $tableAlias
+	 * @param array $record
+	 * @return void
+	 * @throws Exception
+	 */
+	public function populateTable(string $tableAlias, array $record) {
+		$tbls = static::getMapping()->getTables();
+		foreach($tbls as $tbl) {
+			// fill in the primary keys values to track if the record was new
+			if($tbl->getAlias() == $tableAlias) {
+				$pks = $tbl->getPrimaryKey();
+				foreach ($pks as $pk) {
+					if(!empty($record[$pk])) {
+						$record[$tableAlias.'.'.$pk] = $record[$pk];
+						if(!property_exists($this, $pk)) {
+							unset($record[$pk]);
+						}
+					}
+				}
+			}
 		}
 
-		$this->init();
-
-		return $this;
+		$this->populateTableRecord($record);
 	}
 
 	/**

@@ -5,6 +5,7 @@ use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\db\DbException;
 use go\core\model\Principal;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\PrincipalTrait;
@@ -110,36 +111,38 @@ class Calendar extends AclOwnerEntity {
 	static function addEvent(CalendarEvent $event, int $calendarId): ?CalendarEvent
 	{
 		$eventData = go()->getDbConnection()
-			->select(['t.eventId, GROUP_CONCAT(calendarId) as calendarIds'])
+			->select(['t.eventId, GROUP_CONCAT(calendarId) as calendarIds'] && CalendarEvent::UserProperties)
 			->from('calendar_event', 't')
 			->join('calendar_calendar_event', 'c', 'c.eventId = t.eventId', 'LEFT')
+			->join('calendar_event_user', 'cu', 'cu.eventId = t.eventId and cu.userId='. go()->getUserId(), 'LEFT')
 			->where(['uid'=>$event->uid, 'recurrenceId' => $event->recurrenceId])
 			->single();
 
 		if(!empty($eventData) && !empty($eventData['eventId'])) {
+			/**
+			 * The populateTable function should rarely be used. It was needed for the calendar event model that exists of two tables.
+			 *  A shared table between invitees and an table linking it to a calendar. When a new
+			 *  meeting request comes in we have to find the existing shared record and populate the model
+			 *  that might have a new calender link.
+			 */
+			$event->populateTable('eventdata', ['eventId' => $eventData['eventId']]);
 			$calendarIds = explode(',', $eventData['calendarIds']??'');
 			if(in_array($calendarId, $calendarIds)) {
-				// found and already in calendar
-				return CalendarEvent::find()->where(['calendarId'=>$calendarId, 'uid' => $event->uid])->single();
+				$event->populateTable('cce', ['calendarId'=>$calendarId]);
 			}
-			// found but not in calendar (insert)
-			go()->getDbConnection()->insert('calendar_calendar_event', [
-				'calendarId' => $calendarId,
-				'eventId' => $eventData['eventId']
-			])->execute();
-			$id = go()->getDbConnection()->getPDO()->lastInsertId();
-			//Calendar::updateHighestModSeq($calendarId);
-			$found = CalendarEvent::findById($id);
-			$found->useDefaultAlerts = true;
-			$found->save();
-			return $found;
+
+			if(isset($eventData['userId'])) {
+				unset($eventData['calendarIds']);
+				$event->populateTable('eventuser', $eventData);
+			}
+		} else {
+			$event->useDefaultAlerts = true;
 		}
 		//not found, set calendarId save and return
 		$event->calendarId = $calendarId;
-		$event->useDefaultAlerts = true;
+
 		if(!$event->save()) {
-			go()->log('failed to create event object' . var_export($event->getValidationErrors(), true));
-			return null;
+			throw new SaveException($event);
 		}
 		return $event;
 	}
