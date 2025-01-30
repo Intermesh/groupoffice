@@ -1,9 +1,18 @@
 <?php
-require ('../www/GO.php');
-$folder = 'Folder name with "quotes"';
-$test1 = mb_convert_encoding($folder, "UTF7-IMAP", "UTF-8");
-var_dump($test1);
+require (dirname(__DIR__) . '/www/GO.php');
 
-$imap = new \GO\Base\Mail\Imap();
-$test2 = $imap->utf7_encode($folder);
-var_dump($test2);
+use go\core\http\Client;
+
+$client = new Client();
+$client->setOption(CURLOPT_CONNECTTIMEOUT, 120);
+$client->setHeader("Connection", "close");
+$response = $client->postJson("http://libretranslate:5010/translate", [
+	"q" => "Categories",
+	"source" => "en",
+	"target" => "nl",
+	"format" => "text",
+	"alternatives" => 0
+]);
+
+
+echo $response['body']['translatedText'] ."\n";
