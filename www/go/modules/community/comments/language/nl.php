@@ -5,7 +5,6 @@ return array (
   '{author} wrote at {date}' => '{author} schreef op {date}',
   'Unknown user' => 'Onbekende gebruiker',
   'Add labels' => 'Labels toevoegen',
-  'Labels' => 'Etiketten',
   'Edited by {author} at {date}' => 'Bewerkt door {author} op {date}',
   'The date was changed to {date}' => 'De datum is veranderd naar {date}',
   'Could not find this user in the address book for you.' => 'Deze gebruiker kon niet in het adresboek worden gevonden',
