@@ -1,3 +1,4 @@
+- Finance: Don't count empty lines in VAT totals
 - Finance: Migrate billing B2C. Handle case when no company is set on invoices.
 - Finance: Invalid foreign key
 - Catalog: Fixed uninstall typo in table
