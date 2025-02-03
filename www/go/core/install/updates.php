@@ -1663,3 +1663,10 @@ $updates['202501141553'][] = "alter table core_pdf_template
     add fontSize tinyint default 10 null;";
 
 
+$updates['202501141553'][] = "UPDATE core_user t
+SET t.language   = 'en_gb'
+WHERE t.language='en_uk';";
+
+$updates['202501141553'][] = "UPDATE core_user t
+SET  t.holidayset = 'en_gb'
+WHERE t.holidayset='en_uk';";
