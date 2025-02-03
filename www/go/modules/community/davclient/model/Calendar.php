@@ -7,6 +7,7 @@ use go\core\orm\Property;
 use go\core\orm\Query;
 use go\modules\community\calendar\model\CalendarEvent;
 use go\modules\community\calendar\model\ICalendarHelper;
+use go\modules\community\davclient\Module;
 
 /**
  * Each calendar is a syncable collection in a DAV account
@@ -32,11 +33,11 @@ class Calendar extends Property
 	}
 
 	public function sync(): bool {
-		if($this->isNew())
-			return $this->fetchEvents();
-		else {
+//		if($this->isNew())
+//			return $this->fetchEvents();
+//		else {
 			return $this->fetchEtags(); // sync changed only after comparing etags
-		}
+		//}
 	}
 
 	public function put(CalendarEvent $event) {
@@ -96,6 +97,7 @@ XML;
 
 		// fetch changed etags
 		foreach ($responses as $href => $response) {
+			if($href === $this->uri) continue;
 			if(!isset($perHref[$href])) {
 				// create new hrefs
 				$create[] = $href;
@@ -104,12 +106,14 @@ XML;
 				$update[] = $href;
 			}
 		}
+		go()->log('Found: New.'.count($create). ' Changed.'.count($update). ' Removed.'.count($delete));
 		$success = true;
 		// Remove missing
 		if(!empty($delete))
 			$success = CalendarEvent::delete((new Query())->where(['id'=> $delete]));
 		// fetch changed and new
 		if(!empty($update) || !empty($create)) {
+			go()->log([$create,$update]);
 			$success = $this->fetchEvents($create, $update) && $success;
 		}
 		return $success;
@@ -135,8 +139,10 @@ XML;
 			->parsedMultiStatus();
 		//$events = [];
 		$success=true;
+		Module::$IS_SYNCING = true;
 		foreach ($responses as $href => $response) {
 			if (isset($response->{'calendar-data'})) {
+				go()->log($href);
 				if(in_array($href, $update)) // only
 					$event = CalendarEvent::find()
 						->where(['calendarId'=>$this->id, 'uri'=>basename($href)])->single();
@@ -155,6 +161,7 @@ XML;
 				$event = null;
 			}
 		}
+		Module::$IS_SYNCING = false;
 		return $success;
 	}
 }
