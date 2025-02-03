@@ -1,5 +1,7 @@
 <?php /** @noinspection PhpUndefinedFieldInspection */
 
+use GO\Calendar\Model\Calendar;
+
 class CalendarStore extends Store {
 
 	
@@ -786,12 +788,18 @@ class CalendarStore extends Store {
 			if (!$calendar) {
 				return false;
 			}
+//
+			$defaultId = go()->getDbConnection()
+				->selectSingleValue('calendar_id')
+				->from('cal_settings')
+				->where('user_id', '=', go()->getUserId())
+				->single();
 
 			$folder = new SyncFolder();
 			$folder->serverid = $id;
 			$folder->parentid = "0";
 			$folder->displayname = $calendar->name;
-			$folder->type = SYNC_FOLDER_TYPE_APPOINTMENT;
+			$folder->type = $id == $defaultId ? SYNC_FOLDER_TYPE_APPOINTMENT : SYNC_FOLDER_TYPE_USER_APPOINTMENT;
 
 			return $folder;
 		} catch(\Exception $e) {
