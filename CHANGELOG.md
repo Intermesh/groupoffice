@@ -1,3 +1,5 @@
+- ActiveSync: Fixed Android showing all calendars with e-mail address
+
 03-02-2025: 6.8.99
 - Core: Implemented SourceGuardian version >= 14 check. Fixes Last release 6.8 SourceGuardian mandatory #1216
 - Wopi / Collabora: Corrected locale name en_uk to en_gb. Users with en_UK locale are not able to use Collabora #1220
