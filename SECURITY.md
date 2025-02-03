@@ -11,4 +11,4 @@ currently being supported with security updates.
 
 ## Reporting a Vulnerability
 
-If you find a vulnerability in this project, please send it to support@intermesh.nl so we can fix it.
+If you find a vulnerability in this project, please submit it via GitHub (https://github.com/Intermesh/groupoffice/security) or send it to support@intermesh.nl so we can resolve the issue.
