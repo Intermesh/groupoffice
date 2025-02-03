@@ -4,6 +4,7 @@
 - Finance: Migrate billing B2C. Handle case when no company is set on invoices.
 - Finance: Invalid foreign key
 - Catalog: Fixed uninstall typo in table
+- Finance: Check if default lang is found and don;t validate html custom fields. Fixes #1222.
 
 27-01-2025: 6.8.98
 - Calendar: Minor fix import ICS and international characters
