@@ -19,7 +19,14 @@ class CalendarStore extends Store {
 		$folder->serverid = $id;
 		$folder->parentid = "0";
 		$folder->displayname = $calendar->name;
-		$folder->type = SYNC_FOLDER_TYPE_APPOINTMENT;
+
+		$user = go()->getAuthState()->getUser(['calendarPreferences']);
+
+		if($user && $user->calendarPreferences->defaultCalendarId == $id) {
+			$folder->type = SYNC_FOLDER_TYPE_APPOINTMENT;
+		} else {
+			$folder->type = SYNC_FOLDER_TYPE_USER_APPOINTMENT;
+		}
 
 		return $folder;
 	}
