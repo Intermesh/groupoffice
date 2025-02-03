@@ -369,10 +369,13 @@ function test_system() :array
 	$test['feedback']='Warning: pdfinfo is not installed or not executable. Please install the poppler-utils package';
 	$test['fatal']=false;
 	$tests[]=$test;
-	
+
+
+	$version = phpversion("sourceGuardian");
+	$sgInstalled = $version && version_compare($version, '14.0.0', '>=');
 	$test['name']='SourceGuardian enabled';
-	$test['pass']=$sgInstalled = function_exists('sg_load');
-	$test['feedback']='Warning: SourceGuardian is not installed. The professional modules will not be enabled.';
+	$test['pass']= $sgInstalled;
+	$test['feedback']='Warning: SourceGuardian is not installed or version is lower than 14.0.0. The professional modules will not be enabled.';
 	$test['fatal']=false;
 
 	$tests[]=$test;
