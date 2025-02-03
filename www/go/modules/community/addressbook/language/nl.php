@@ -152,7 +152,6 @@ return array (
   'Only link to the contacts from the address books below' => 'Alleen koppelen als contact in onderstaadn adresboek zit',
   'Multiple Contacts' => 'Meerdere contacten',
   'BIC' => 'BIC',
-  'Labels' => 'Etiketten',
   'Last contact at' => 'Laatste contact op',
   'Has phone numbers' => 'Heeft telefoonnummers',
   'Has organizations' => 'Heeft organisaties',

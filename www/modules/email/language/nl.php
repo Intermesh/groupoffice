@@ -343,7 +343,7 @@ Instellingen -> Accounts -> Dubbelklik account -> Mappen.',
   'Server' => 'Server',
   'Are you sure you want to select all {count} results?' => 'Weet u zeker dat u alle {count} resultaten wilt selecteren?',
   'Processing...' => 'Verwerken...',
-  'Labels' => 'Etiketten',
+
   'Search items' => 'Items zoeken',
   'Open with' => 'Open met',
   'Copy image' => 'Afbeelding kopiﾃｫren',
