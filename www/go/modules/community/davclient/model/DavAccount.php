@@ -5,6 +5,7 @@ use go\core\acl\model\AclOwnerEntity;
 use go\core\model\Module;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
+use go\core\util\Crypt;
 
 /**
  * Calendar entity
@@ -32,7 +33,7 @@ class DavAccount extends AclOwnerEntity {
 	public $active;
 	public $host;
 	public $username;
-	public $password;
+	protected $password;
 	public $basePath;
 	public $principalUri;
 	public $capabilities;
@@ -43,6 +44,13 @@ class DavAccount extends AclOwnerEntity {
 	/** @var Calendar[] the collections items with ctag and uri */
 	public $collections = [];
 
+	public function setPassword($v) {
+		$this->password = Crypt::encrypt($v);
+	}
+	public function decryptPassword(): string
+	{
+		return Crypt::decrypt($this->password);
+	}
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
@@ -61,7 +69,7 @@ class DavAccount extends AclOwnerEntity {
 			$proto = substr($this->host, -2, 2) === '80' ? 'http://' : 'https://';
 			$this->http = new HttpClient($proto . $this->host, [
 				'Content-Type' => 'application/xml; charset=utf-8',
-				'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password),
+				'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->decryptPassword()),
 			]);
 		}
 		return $this->http;
