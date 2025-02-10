@@ -7,6 +7,7 @@
 - Core: Added referrer-policy header for increased privacy
 - Time registration: allow employee to export registrations
 - Core: Image resize and table edit plugin thanks to Polarismail
+- Finance: Improved unit cost, price and margin field logic
 
 03-02-2025: 6.8.99
 - Core: Implemented SourceGuardian version >= 14 check. Fixes Last release 6.8 SourceGuardian mandatory #1216
