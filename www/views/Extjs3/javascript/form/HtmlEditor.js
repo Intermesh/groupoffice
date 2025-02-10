@@ -19,6 +19,8 @@ GO.form.HtmlEditor = function (config) {
 	var ioDentPlugin = new Ext.ux.form.HtmlEditor.IndentOutdent();
 	var ssScriptPlugin = new Ext.ux.form.HtmlEditor.SubSuperScript();
 	var rmFormatPlugin = new Ext.ux.form.HtmlEditor.RemoveFormat();
+	var imageResizePlugin = new GO.plugins.HtmlEditorImageResize();
+	var tablePlugin = new Ext.ux.form.HtmlEditor.NEWTablePlugin();
 
 
 	if (GO.settings.pspellSupport) {
@@ -30,7 +32,9 @@ GO.form.HtmlEditor = function (config) {
 					rmFormatPlugin,
 					// wordPastePlugin,
 					hrPlugin,
-					ssScriptPlugin
+					ssScriptPlugin,
+					imageResizePlugin,
+		tablePlugin
 					);
 
 	if(config.headingsMenu) {
