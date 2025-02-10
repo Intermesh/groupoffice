@@ -120,23 +120,6 @@ Ext.extend(GO.plugins.HtmlEditorImageInsert, Ext.util.Observable, {
 		this.editor.focus();
 		this.editor.insertAtCursor(img);
 		
-
-		// this.selectedRecord = r;
-		// this.selectedPath = r.data.path;
-		
-		// var token = GO.base.util.MD5(r.data.name);
-		
-		// //filename is added as parameter. This is only for matching the url in the body of the html in GO\\Base\\Mail\\Message::handleEmailFormInput with preg_match.
-		// this.selectedUrl = GO.url("files/file/download",{id:r.data.id,token:token});
-						
-		// var html = '<img src="'+this.selectedUrl+'" border="0" />';
-								
-		// this.fireEvent('insert', this, this.selectedPath, false, token);
-
-		// this.editor.focus();
-			
-		// this.editor.insertAtCursor(html);
-		
 		GO.selectFileBrowserWindow.hide();
 	}
 	
