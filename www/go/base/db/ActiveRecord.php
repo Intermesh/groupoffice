@@ -200,6 +200,20 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	}
 
 	/**
+	 * @return void
+	 * @throws DbException
+	 * @throws GO\Base\Exception\AccessDenied
+	 */
+	protected function deleteFilesFolder(): void
+	{
+		if ($this->hasFiles() && $this->files_folder_id > 0 && GO::modules()->isInstalled('files')) {
+			$folder = \GO\Files\Model\Folder::model()->findByPk($this->files_folder_id, false, true);
+			if ($folder)
+				$folder->delete(true);
+		}
+	}
+
+	/**
 	 * Get the localized human friendly name of this model.
 	 * This function must be overriden.
 	 *
@@ -4058,13 +4072,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		if($attr){
 			\go\core\model\Search::delete(['entityId' => $this->pk, 'entityTypeId'=>$this->modelTypeId()]);
-		}		
-
-		if($this->hasFiles() && $this->files_folder_id > 0 && GO::modules()->isInstalled('files')){
-			$folder = \GO\Files\Model\Folder::model()->findByPk($this->files_folder_id,false,true);
-			if($folder)
-				$folder->delete(true);
 		}
+
+
+		$this->deleteFilesFolder();
 
 		$this->_deleteLinks();	
 
