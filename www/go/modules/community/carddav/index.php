@@ -52,6 +52,21 @@ go()->getDebugger()->setRequestId("CardDAV " . ($_SERVER['REQUEST_METHOD'] ?? ""
 
 /* Initializing server */
 $server = new Server($nodes);
+
+// Remove CalDAV properties because SabreDAV will still return them even though we want just CardDAV ones
+$server->on('propFind', function($propFind, $node) {
+    $requestedProps = $propFind->getRequestedProperties();
+
+    // Filter out CalDAV properties
+    foreach($requestedProps as $prop) {
+        if (strpos($prop, 'urn:ietf:params:xml:ns:caldav') !== false) {
+            $propFind->set($prop, null, 404);
+        }
+    }
+
+// Listen with high priority, before the others
+},1000);
+
 $server->debugExceptions = go()->getDebugger()->enabled;
 $server->on('exception', function($e){
 	if(!($e instanceof NotAuthenticated) && !($e instanceof NotFound)) {
