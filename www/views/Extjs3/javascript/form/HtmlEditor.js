@@ -276,7 +276,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			el = doc.createElement("div");
 			el.innerHTML = "<div style='display:none' id='go-stored-cursor'></div>";
 			frag = doc.createDocumentFragment();
-			while ((node = el.firstChild)) {
+			while ((node = el.firstChildElement)) {
 				lastNode = frag.appendChild(node);
 			}
 			firstNode = frag.firstChild;
