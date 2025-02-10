@@ -3,6 +3,7 @@
 - Finance: Use default country in Zugferd.
 - Finance: Fixed missing address data in Zugferd XML
 - OAuth2Client: fix minor bug openID login
+- History: Fixed Stored XSS Vulnerability via user's name field (GHSA-j7p3-v652-p3gf)
 
 03-02-2025: 6.8.99
 - Core: Implemented SourceGuardian version >= 14 check. Fixes Last release 6.8 SourceGuardian mandatory #1216
