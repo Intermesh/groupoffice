@@ -59,7 +59,7 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 				html.push('<b>' + key + '</b> ' + this.renderJsonValue(data[key]));
 			}
 		} else {
-			html.push(data);
+			html.push(Ext.util.Format.htmlEncode(data));
 		}
 		return html;
 	},
@@ -132,7 +132,7 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 			cls: "go-text-dialog",
 			closable: true,
 			collapsible: true,
-			title: rec.data.description,
+			title: Ext.util.Format.htmlEncode(rec.data.description),
 			html: html,
 			autoScroll: true,
 			width: dp(800),

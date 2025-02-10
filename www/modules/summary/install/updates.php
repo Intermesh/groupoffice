@@ -74,3 +74,4 @@ $updates['202102111534'][] = "alter table su_latest_read_announcement_records
 
 $updates['202102111534'][] = "alter table su_latest_read_announcement_records modify announcement_id int default null null;";
 
+$updates['202502100933'][] = "ALTER TABLE `su_rss_feeds` CHANGE COLUMN `url` `url` VARCHAR(512) DEFAULT NULL;";

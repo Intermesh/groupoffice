@@ -19,6 +19,8 @@ GO.form.HtmlEditor = function (config) {
 	var ioDentPlugin = new Ext.ux.form.HtmlEditor.IndentOutdent();
 	var ssScriptPlugin = new Ext.ux.form.HtmlEditor.SubSuperScript();
 	var rmFormatPlugin = new Ext.ux.form.HtmlEditor.RemoveFormat();
+	var imageResizePlugin = new GO.plugins.HtmlEditorImageResize();
+	var tablePlugin = new Ext.ux.form.HtmlEditor.NEWTablePlugin();
 
 
 	if (GO.settings.pspellSupport) {
@@ -30,7 +32,9 @@ GO.form.HtmlEditor = function (config) {
 					rmFormatPlugin,
 					// wordPastePlugin,
 					hrPlugin,
-					ssScriptPlugin
+					ssScriptPlugin,
+					imageResizePlugin,
+		tablePlugin
 					);
 
 	if(config.headingsMenu) {
@@ -272,7 +276,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			el = doc.createElement("div");
 			el.innerHTML = "<div style='display:none' id='go-stored-cursor'></div>";
 			frag = doc.createDocumentFragment();
-			while ((node = el.firstChild)) {
+			while ((node = el.firstChildElement)) {
 				lastNode = frag.appendChild(node);
 			}
 			firstNode = frag.firstChild;

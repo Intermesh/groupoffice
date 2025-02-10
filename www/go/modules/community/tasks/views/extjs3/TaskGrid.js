@@ -189,6 +189,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 			{
 					id:"percentComplete",
 					width:dp(150),
+					sortable:true,
 					header: t('% complete', "tasks", "community"),
 					dataIndex: 'percentComplete',
 					renderer:function (value, meta, rec, row, col, store){
@@ -200,6 +201,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					hidden: !this.support,
 					id:"progress",
 					width:dp(150),
+					sortable:true,
 					header: t('Progress', "tasks", "community"),
 					dataIndex: 'progress',
 					renderer:function (value, meta, rec, row, col, store){

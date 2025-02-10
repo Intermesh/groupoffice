@@ -58,6 +58,8 @@ views/Extjs3/javascript/plugins/PanelCollapsedTitle.js
 views/Extjs3/javascript/plugins/DataView.js
 views/Extjs3/javascript/plugins/InsertAtCursorTextarea.js
 views/Extjs3/javascript/plugins/HtmlEditorImageInsert.js
+views/Extjs3/javascript/plugins/HtmlEditorImageResize.js
+views/Extjs3/javascript/plugins/HtmlEditorTablePlugin.js
 views/Extjs3/javascript/plugins/HtmlEditorSpellCheck.js
 views/Extjs3/javascript/plugins/Ext.ux.HtmlEditor.Plugins-0.2-all.js
 views/Extjs3/javascript/panels/DisplayPanel.js
