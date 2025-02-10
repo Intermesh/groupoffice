@@ -1,3 +1,4 @@
+10-02-2025: 6.8.100
 - ActiveSync: Fixed Android showing all calendars with e-mail address
 - Finance: Added "creator" to e-mail templates
 - Finance: Use default country in Zugferd.
