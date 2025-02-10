@@ -12,7 +12,12 @@ class ManualsiteModule extends Module {
 	public function adminModule() {
 		return false;
 	}
-	
+
+	public function getStatus(): string
+	{
+		return \go\core\Module::STATUS_DEPRECATED;
+	}
+
 	public function depends() {
 		return array('site');
 	}
