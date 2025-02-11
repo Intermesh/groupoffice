@@ -1,3 +1,6 @@
+11-02-2025: 6.8.101
+- Core: Fixed bug in html table editor plugin causing form load errors and sometimes the resize handlers were submitted
+
 10-02-2025: 6.8.100
 - ActiveSync: Fixed Android showing all calendars with e-mail address
 - Finance: Added "creator" to e-mail templates
