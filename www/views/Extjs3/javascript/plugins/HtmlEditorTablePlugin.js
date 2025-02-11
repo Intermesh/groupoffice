@@ -9,38 +9,22 @@ Ext.ux.form.HtmlEditor.NEWTablePlugin = function(config) {
 Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 	// Initialize plugin
 	init: function(editor) {
-		var me = this;
-		me.editor = editor;
-		me.editor.on('render', me.onEditorRender, me);
+		this.editor = editor;
+		this.editor.on('render', this.onEditorRender, this);
+		this.editor.on('initialize', this.onEditorInit, this);
+	},
 
-		me.editor.on('sync', function() {
-			// After syncing (switching modes), reattach resize handlers to our tables
-			var doc = editor.getDoc();
-			if (doc) {
-				var tables = doc.getElementsByTagName('table');
-				Ext.each(tables, function(table) {
-					// Only add resize handlers to tables with our session ID
-					if (table.id && table.id.indexOf('GO-' + me.sessionId) === 0) {
-						me.addResizeHandle(table);
-					}
-				});
-			}
-		});
+	onEditorInit: function(editor) {
+		var editorDoc = editor.getDoc();
+		// Add mousedown listener to editor document with capture phase
+		editorDoc.addEventListener('mousedown', (e) => {this.handleMouseDown(e);}, true);
 
-		// Override the pushValue method to clean up resize handles before syncing
-		var originalPushValue = editor.pushValue;
-		editor.pushValue = function() {
-			// Remove all resize handles before syncing
-			var doc = editor.getDoc();
-			if (doc) {
-				var handles = doc.querySelectorAll('.resize-handle');
-				Ext.each(handles, function(handle) {
-					handle.parentNode.removeChild(handle);
-				});
+		//make sure handles are gone when leaving the editor so they won't be submitted. This also removes them before going to source edit
+		editorDoc.addEventListener('mouseleave', (e) => {
+			if(e.target == editorDoc) {
+				this.removeHandles();
 			}
-			// Call original pushValue method
-			originalPushValue.call(editor);
-		};
+			}, true);
 	},
 
 	getSelectedTable: function() {
@@ -99,15 +83,6 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 			'}'
 		].join('');
 		document.head.appendChild(style);
-
-		// Add handler for source edit mode toggle
-		if (me.editor.sourceEditMode) {
-			var doc = me.editor.getDoc();
-			var handles = doc.querySelectorAll('.resize-handle');
-			Ext.each(handles, function(handle) {
-				handle.parentNode.removeChild(handle);
-			});
-		}
 	},
 
 	showTableConfigDialog: function() {
@@ -267,7 +242,7 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 				tableHTML += '<tr>';
 				for (var j = 0; j < columns; j++) {
 					tableHTML += '<td style="text-align: ' + alignment +
-						'; width: 100px; height: 30px; border: 1px solid #ddd; ' +
+						'; width: 100px; height: 30px; ' +
 						' font-family: ' + currentFontFamily + ';' +
 						' font-size: ' + currentFontSize + ';' +
 						'-webkit-text-size-adjust: 100% !important; ' +
@@ -360,15 +335,9 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 	},
 
 	addResizeHandle: function(table) {
-		if (!table.id || !table.id.startsWith('GO-' + this.sessionId)) {
+		if (!table.id || !table.id.startsWith('GO-')) {
 			return;
 		}
-
-		var me = this;
-		var editorDoc = me.editor.getDoc();
-		var editorWin = me.editor.getWin();
-		var resizeHandle = null;
-		var deleteHandle = null;
 
 		// Store the original width as a data attribute when first adding handles
 		if (!table.getAttribute('data-original-width')) {
@@ -386,184 +355,176 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 			'border-collapse: separate !important'
 		].join(';');
 
-		function createHandles() {
-			// Remove any existing handles first
-			removeHandles();
+	},
 
-			// Create resize handle
-			resizeHandle = editorDoc.createElement('div');
-			resizeHandle.className = 'resize-handle';
-			resizeHandle.setAttribute('data-editor-helper', 'true');
+	createHandles: function(table) {
+		// Remove any existing handles first
+		this.removeHandles();
 
-			resizeHandle.style.cssText = [
-				'width: 10px !important',
-				'height: 10px !important',
-				'background-color: #0066cc !important',
-				'border: 1px solid #003366 !important',
-				'position: absolute !important',
-				'cursor: nwse-resize !important',
-				'z-index: 9999 !important',
-				'right: -5px !important',
-				'bottom: -5px !important',
-				'display: block !important',
-				'pointer-events: auto !important'
-			].join(';');
+		// Create resize handle
+		resizeHandle = this.editor.getDoc().createElement('div');
+		resizeHandle.className = 'resize-handle';
+		resizeHandle.setAttribute('data-editor-helper', 'true');
 
-			// Create delete handle
-			deleteHandle = editorDoc.createElement('div');
-			deleteHandle.className = 'delete-handle';
-			deleteHandle.setAttribute('data-editor-helper', 'true');
+		resizeHandle.style.cssText = [
+			'width: 10px !important',
+			'height: 10px !important',
+			'background-color: #0066cc !important',
+			'border: 1px solid #003366 !important',
+			'position: absolute !important',
+			'cursor: nwse-resize !important',
+			'z-index: 9999 !important',
+			'right: -5px !important',
+			'bottom: -5px !important',
+			'display: block !important',
+			'pointer-events: auto !important'
+		].join(';');
 
-			deleteHandle.style.cssText = [
-				'width: 10px !important',
-				'height: 10px !important',
-				'background-color: #cc0000 !important',
-				'border: 1px solid #660000 !important',
-				'position: absolute !important',
-				'cursor: pointer !important',
-				'z-index: 9999 !important',
-				'right: -5px !important',
-				'top: -5px !important',
-				'display: block !important',
-				'pointer-events: auto !important'
-			].join(';');
+		// Create delete handle
+		deleteHandle = this.editor.getDoc().createElement('div');
+		deleteHandle.className = 'delete-handle';
+		deleteHandle.setAttribute('data-editor-helper', 'true');
 
-			// Insert handles as direct children of table
-			table.insertBefore(resizeHandle, table.firstChild);
-			table.insertBefore(deleteHandle, table.firstChild);
+		deleteHandle.style.cssText = [
+			'width: 10px !important',
+			'height: 10px !important',
+			'background-color: #cc0000 !important',
+			'border: 1px solid #660000 !important',
+			'position: absolute !important',
+			'cursor: pointer !important',
+			'z-index: 9999 !important',
+			'right: -5px !important',
+			'top: -5px !important',
+			'display: block !important',
+			'pointer-events: auto !important'
+		].join(';');
 
-			// Ensure all cells maintain the correct width
+		// Insert handles as direct children of table
+		table.insertBefore(resizeHandle, table.firstChild);
+		table.insertBefore(deleteHandle, table.firstChild);
+
+
+		var originalWidth = parseInt(table.getAttribute('data-original-width'));
+		var columnCount = table.rows[0].cells.length;
+		var columnWidth = Math.floor(originalWidth / columnCount);
+		// Ensure all cells maintain the correct width
+		Ext.each(table.rows, function (row) {
+			Ext.each(row.cells, function (cell) {
+				cell.style.width = columnWidth + 'px';
+			});
+		});
+
+	},
+
+	deleteTable: function(e, table) {
+		e.preventDefault();
+		e.stopPropagation();
+
+		if (table && table.parentNode) {
+			table.parentNode.removeChild(table);
+			this.editor.syncValue();
+		}
+	},
+
+	startResize: function(e, table) {
+		e.preventDefault();
+		e.stopPropagation();
+		var me = this,
+			editorDoc = me.editor.getDoc(),
+			editorWin = me.editor.getWin();
+		me._isResizing = true;
+
+		var startWidth = table.offsetWidth;
+		var startHeight = table.offsetHeight;
+		var startX = e.pageX;
+		var startY = e.pageY;
+		var numCols = table.rows[0].cells.length;
+		var numRows = table.rows.length;
+		var minColWidth = 10;
+		var minRowHeight = 10;
+		var minTableWidth = minColWidth * numCols;
+		var minTableHeight = minRowHeight * numRows;
+
+		function onMouseMove(moveEvent) {
+			moveEvent.preventDefault();
+			moveEvent.stopPropagation();
+
+			var newWidth = Math.max(minTableWidth, startWidth + (moveEvent.pageX - startX));
+			var newColWidth = Math.floor(newWidth / numCols);
+			var newHeight = Math.max(minTableHeight, startHeight + (moveEvent.pageY - startY));
+			var newRowHeight = newHeight / numRows;
+
+			table.style.width = newWidth + 'px';
+
 			Ext.each(table.rows, function(row) {
 				Ext.each(row.cells, function(cell) {
-					cell.style.width = columnWidth + 'px';
+					cell.style.width = newColWidth + 'px';
+					cell.style.height = newRowHeight + 'px';
 				});
 			});
 		}
 
-		function removeHandles() {
-			var handles = table.querySelectorAll('.resize-handle, .delete-handle');
-			handles.forEach(function(handle) {
-				if (handle && handle.parentNode) {
-					handle.parentNode.removeChild(handle);
+		function onMouseUp(upEvent) {
+			upEvent.preventDefault();
+			upEvent.stopPropagation();
+
+			me._isResizing = false;
+			editorDoc.removeEventListener('mousemove', onMouseMove);
+			editorWin.removeEventListener('mouseup', onMouseUp);
+			document.removeEventListener('mouseup', onMouseUp);
+
+			// Update the stored original width after resize
+			table.setAttribute('data-original-width', table.offsetWidth);
+
+			setTimeout(function() {
+				me.createHandles(table);
+				if (editorDoc.defaultView.getSelection) {
+					var selection = editorDoc.defaultView.getSelection();
+					var firstCell = table.rows[0].cells[0];
+					var range = editorDoc.createRange();
+					range.selectNodeContents(firstCell);
+					selection.removeAllRanges();
+					selection.addRange(range);
 				}
-			});
-			resizeHandle = null;
-			deleteHandle = null;
+			}, 0);
 		}
 
-		function deleteTable(e) {
-			e.preventDefault();
-			e.stopPropagation();
+		editorDoc.addEventListener('mousemove', onMouseMove);
+		editorWin.addEventListener('mouseup', onMouseUp);
+		document.addEventListener('mouseup', onMouseUp);
 
-			if (table && table.parentNode) {
-				table.parentNode.removeChild(table);
-				me.editor.syncValue();
+	},
+
+	removeHandles: function() {
+		var handles = this.editor.getDoc().querySelectorAll('.resize-handle, .delete-handle');
+		handles.forEach(function(handle) {
+			console.log("REMOVE2")
+			if (handle && handle.parentNode) {
+				handle.parentNode.removeChild(handle);
 			}
+		});
+
+		this.editor.syncValue();
+	},
+
+	handleMouseDown: function (e) {
+		var target = e.target,
+			table = target.closest('table');
+
+		if (target && target.classList.contains('resize-handle')) {
+			this.startResize(e, table);
+			return;
+		}
+		if (target && target.classList.contains('delete-handle')) {
+			this.deleteTable(e, table);
+			return;
 		}
 
-		function startResize(e) {
-			e.preventDefault();
-			e.stopPropagation();
-			me._isResizing = true;
-
-			var startWidth = table.offsetWidth;
-			var startHeight = table.offsetHeight;
-			var startX = e.pageX;
-			var startY = e.pageY;
-			var numCols = table.rows[0].cells.length;
-			var numRows = table.rows.length;
-			var minColWidth = 10;
-			var minRowHeight = 10;
-			var minTableWidth = minColWidth * numCols;
-			var minTableHeight = minRowHeight * numRows;
-
-			function onMouseMove(moveEvent) {
-				moveEvent.preventDefault();
-				moveEvent.stopPropagation();
-
-				var newWidth = Math.max(minTableWidth, startWidth + (moveEvent.pageX - startX));
-				var newColWidth = Math.floor(newWidth / numCols);
-				var newHeight = Math.max(minTableHeight, startHeight + (moveEvent.pageY - startY));
-				var newRowHeight = newHeight / numRows;
-
-				table.style.width = newWidth + 'px';
-
-				Ext.each(table.rows, function(row) {
-					Ext.each(row.cells, function(cell) {
-						cell.style.width = newColWidth + 'px';
-						cell.style.height = newRowHeight + 'px';
-					});
-				});
-			}
-
-			function onMouseUp(upEvent) {
-				upEvent.preventDefault();
-				upEvent.stopPropagation();
-
-				me._isResizing = false;
-				editorDoc.removeEventListener('mousemove', onMouseMove);
-				editorWin.removeEventListener('mouseup', onMouseUp);
-				document.removeEventListener('mouseup', onMouseUp);
-
-				// Update the stored original width after resize
-				table.setAttribute('data-original-width', table.offsetWidth);
-
-				setTimeout(function() {
-					createHandles();
-					if (editorDoc.defaultView.getSelection) {
-						var selection = editorDoc.defaultView.getSelection();
-						var firstCell = table.rows[0].cells[0];
-						var range = editorDoc.createRange();
-						range.selectNodeContents(firstCell);
-						selection.removeAllRanges();
-						selection.addRange(range);
-					}
-				}, 0);
-			}
-
-			editorDoc.addEventListener('mousemove', onMouseMove);
-			editorWin.addEventListener('mouseup', onMouseUp);
-			document.addEventListener('mouseup', onMouseUp);
+		if (table) {
+			this.createHandles(table);
+		} else {
+			this.removeHandles();
 		}
-
-		function handleMouseDown(e) {
-			var isInsideEditor = false;
-			try {
-				isInsideEditor = e.target.ownerDocument === editorDoc;
-			} catch(err) {
-				isInsideEditor = false;
-			}
-
-			if (isInsideEditor) {
-				if (resizeHandle && e.target === resizeHandle) {
-					startResize(e);
-					return;
-				}
-				if (deleteHandle && e.target === deleteHandle) {
-					deleteTable(e);
-					return;
-				}
-
-				var target = e.target;
-				var isInsideTable = false;
-				while (target && target !== editorDoc.body) {
-					if (target === table) {
-						isInsideTable = true;
-						break;
-					}
-					target = target.parentNode;
-				}
-
-				if (isInsideTable) {
-					createHandles();
-				} else {
-					removeHandles();
-				}
-			}
-		}
-
-		// Add mousedown listener to editor document with capture phase
-		editorDoc.addEventListener('mousedown', handleMouseDown, true);
 	}
 
 });
