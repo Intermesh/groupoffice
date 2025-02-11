@@ -1,3 +1,6 @@
+11-02-2025: 6.8.102
+- Core: Fixed html editor bug where style was removed if you deleted the first character
+
 11-02-2025: 6.8.101
 - Core: Fixed bug in html table editor plugin causing form load errors and sometimes the resize handlers were submitted
 
