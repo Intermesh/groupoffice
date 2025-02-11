@@ -371,7 +371,7 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 
 		// Create resize handle
 		resizeHandle = this.editor.getDoc().createElement('div');
-		resizeHandle.className = 'resize-handle';
+		resizeHandle.className = 'tbl-resize-handle';
 		resizeHandle.setAttribute('data-editor-helper', 'true');
 
 		resizeHandle.style.cssText = [
@@ -390,7 +390,7 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 
 		// Create delete handle
 		deleteHandle = this.editor.getDoc().createElement('div');
-		deleteHandle.className = 'delete-handle';
+		deleteHandle.className = 'tbl-delete-handle';
 		deleteHandle.setAttribute('data-editor-helper', 'true');
 
 		deleteHandle.style.cssText = [
@@ -504,7 +504,11 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 	},
 
 	removeHandles: function() {
-		var handles = this.editor.getDoc().querySelectorAll('.resize-handle, .delete-handle');
+		var handles = this.editor.getDoc().querySelectorAll('.tbl-resize-handle, .tbl-delete-handle');
+
+		if(!handles || !handles.length) {
+			return;
+		}
 		handles.forEach(function(handle) {
 			if (handle && handle.parentNode) {
 				handle.parentNode.removeChild(handle);
@@ -518,11 +522,11 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 		var target = e.target,
 			table = target.closest('table');
 
-		if (target && target.classList.contains('resize-handle')) {
+		if (target && target.classList.contains('tbl-resize-handle')) {
 			this.startResize(e, table);
 			return;
 		}
-		if (target && target.classList.contains('delete-handle')) {
+		if (target && target.classList.contains('tbl-delete-handle')) {
 			this.deleteTable(e, table);
 			return;
 		}

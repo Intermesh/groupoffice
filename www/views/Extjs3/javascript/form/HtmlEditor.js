@@ -34,7 +34,7 @@ GO.form.HtmlEditor = function (config) {
 					hrPlugin,
 					ssScriptPlugin,
 					imageResizePlugin,
-		tablePlugin
+					tablePlugin
 					);
 
 	if(config.headingsMenu) {
