@@ -42,7 +42,7 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 
 		// Only return the table if it's one of ours
 		if (element && element.nodeName === 'TABLE' &&
-			element.id && element.id.startsWith('GO-' + me.sessionId)) {
+			element.id && element.id.startsWith('GO-')) {
 			return element;
 		}
 
@@ -94,8 +94,8 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 			me.columnsField = new Ext.form.NumberField({ fieldLabel: 'Columns', allowBlank: false, minValue: 1, value: 2 });
 			me.captionField = new Ext.form.TextField({ fieldLabel: 'Caption' });
 			me.summaryField = new Ext.form.TextField({ fieldLabel: 'Summary' });
-			me.cellSpacingField = new Ext.form.NumberField({ fieldLabel: 'Cell Spacing', minValue: 0, value: 1 });
-			me.cellPaddingField = new Ext.form.NumberField({ fieldLabel: 'Cell Padding', minValue: 0, value: 1 });
+			me.cellSpacingField = new Ext.form.NumberField({ fieldLabel: 'Cell Spacing', minValue: 0, value: 0 });
+			me.cellPaddingField = new Ext.form.NumberField({ fieldLabel: 'Cell Padding', minValue: 0, value: 0 });
 			me.bordersCheckbox = new Ext.form.Checkbox({ fieldLabel: 'Borders', checked: true });
 			me.alignmentCombo = new Ext.form.ComboBox({
 				fieldLabel: 'Alignment',
@@ -144,8 +144,8 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 			me.columnsField.setValue(2);
 			me.captionField.setValue('');
 			me.summaryField.setValue('');
-			me.cellSpacingField.setValue(1);
-			me.cellPaddingField.setValue(1);
+			me.cellSpacingField.setValue(0);
+			me.cellPaddingField.setValue(0);
 			me.bordersCheckbox.setValue(true);
 			me.alignmentCombo.setValue('left');
 		}
@@ -158,8 +158,8 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 		var caption = table.getElementsByTagName('caption').length ?
 			table.getElementsByTagName('caption')[0].textContent : '';
 		var summary = table.getAttribute('summary') || '';
-		var cellSpacing = table.getAttribute('cellspacing') || 1;
-		var cellPadding = table.getAttribute('cellpadding') || 1;
+		var cellSpacing = table.getAttribute('cellspacing') || 0;
+		var cellPadding = table.getAttribute('cellpadding') || 0;
 		var borders = table.getAttribute('border') === '1';
 		var alignment = table.getAttribute('align') || 'left';
 
@@ -198,7 +198,7 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 			existingTable.setAttribute('summary', summary);
 			existingTable.setAttribute('cellspacing', cellSpacing);
 			existingTable.setAttribute('cellpadding', cellPadding);
-			existingTable.setAttribute('border', borders);
+			existingTable.setAttribute('border', "0");
 			existingTable.style.marginBottom = '1em';
 
 			if (caption) {
@@ -214,14 +214,16 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 				}
 			}
 
-			me.adjustTableRowsAndColumns(existingTable, rows, columns, alignment, currentFontFamily, currentFontSize);
+			me.adjustTableRowsAndColumns(existingTable, rows, columns, alignment, currentFontFamily, currentFontSize, borders);
 			me.addResizeHandle(existingTable);
 			me.editor.syncValue();
 		} else {
+
+			var borderCSS = borders ? 'border: 0.5px solid black !important;' : '';
 			var totalWidth = columns * 100;
 			var tableId = 'GO-' + me.sessionId + '-' + new Date().getTime();
 			tableHTML = '<table id="' + tableId + '" ' +
-				'border="' + borders + '" ' +
+				'border="0" '+
 				'cellspacing="' + cellSpacing + '" ' +
 				'cellpadding="' + cellPadding + '" ' +
 				'align="' + alignment + '" ' +
@@ -231,6 +233,7 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 				'margin-bottom: 1em !important; ' +
 				'border-collapse: separate !important; ' +
 				'border-spacing: 0 !important; ' +
+				borderCSS +
 				'table-layout: fixed !important;">';
 
 
@@ -248,6 +251,7 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 						'-webkit-text-size-adjust: 100% !important; ' +
 						'-moz-text-size-adjust: 100% !important; ' +
 						'-ms-text-size-adjust: 100% !important; ' +
+						borderCSS +
 						'text-size-adjust: 100% !important;">&nbsp;</td>';
 				}
 				tableHTML += '</tr>';
@@ -276,7 +280,7 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 		me.tableConfigWindow.hide();
 	},
 
-	adjustTableRowsAndColumns: function(table, rows, columns, alignment, fontFamily, fontSize) {
+	adjustTableRowsAndColumns: function(table, rows, columns, alignment, fontFamily, fontSize, borders) {
 		var currentRows = table.rows.length;
 		var currentCols = table.rows[0] ? table.rows[0].cells.length : 0;
 
@@ -324,14 +328,18 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 				cell.style.fontFamily = fontFamily;
 				cell.style.fontSize = fontSize;
 				cell.style.textAlign = alignment;
-				cell.style.border = '1px solid #ddd';
-				//cell.style.padding = '8px';
+				if(borders) {
+					cell.style.border = '0.5px solid black';
+				}
+
 				cell.style.webkitTextSizeAdjust = '100%';
 				cell.style.mozTextSizeAdjust = '100%';
 				cell.style.msTextSizeAdjust = '100%';
 				cell.style.textSizeAdjust = '100%';
 			}
 		}
+
+		table.setAttribute('data-original-width', table.offsetWidth);
 	},
 
 	addResizeHandle: function(table) {
@@ -352,7 +360,7 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 			'table-layout: fixed !important;',
 			'width: ' + originalWidth + 'px !important;',
 			'position: relative !important;',
-			'border-collapse: separate !important'
+			'border-collapse: separate !important;'
 		].join(';');
 
 	},
