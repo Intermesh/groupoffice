@@ -498,7 +498,6 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 	removeHandles: function() {
 		var handles = this.editor.getDoc().querySelectorAll('.resize-handle, .delete-handle');
 		handles.forEach(function(handle) {
-			console.log("REMOVE2")
 			if (handle && handle.parentNode) {
 				handle.parentNode.removeChild(handle);
 			}
