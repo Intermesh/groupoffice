@@ -1,6 +1,7 @@
 - Timeregistration: Don't user user e-mail in dissapprove mail because it may lead to problems with the system settings mail server configuration not allowing this from addrers.
 - Finance: Always show PDF button
-- 
+- Finance: Keep catalog state when adding from catalog
+
 11-02-2025: 6.8.102
 - Core: Fixed html editor bug where style was removed if you deleted the first character
 
