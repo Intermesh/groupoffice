@@ -316,6 +316,7 @@ class ICalendarHelper {
 			$event->prodId = $prodId;
 			$baseEvents[$event->uid] = $event;
 			if($event->isNew())
+			if(isset($vevent->{'DTSTAMP'}))
 				$event->createdAt = $vevent->DTSTAMP->getDateTime();
 			if(isset($vevent->{'LAST-MODIFIED'}))
 				$event->modifiedAt = $vevent->{'LAST-MODIFIED'}->getDateTime();

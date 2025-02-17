@@ -21,6 +21,9 @@ use Sabre\VObject\Component\VCalendar;
 
 class Module extends core\Module
 {
+
+	static $IS_SYNCING = false;
+
 	public function getAuthor(): string
 	{
 		return "Intermesh BV <mdhart@intermesh.nl>";
@@ -40,6 +43,9 @@ class Module extends core\Module
 	}
 
 	public static function onBeforeEventSave($event) {
+		if(self::$IS_SYNCING) {
+			return true;
+		}
 		$davAccount = DavAccount::findByCalendarId($event->calendarId);
 		return !empty($davAccount) ? $davAccount->put($event) : true;
 	}

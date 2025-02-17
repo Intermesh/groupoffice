@@ -141,13 +141,15 @@ export class CalendarList extends Component {
 						const cb = me.findAncestor((cmp) => cmp instanceof CheckboxField);
 						if(cb) {
 							cb.mask();
+							client.requestTimeout = 300000;
 							client.jmap('DavAccount/sync', {accountId:data.davaccountId}).then((response)=> {
 								// reload should be automaticly
 							}).catch((err) => {
 								Window.error(err);
 							}).finally(() => {
 								cb.unmask();
-							})
+								client.requestTimeout = 30000;
+							});
 						}
 					}}),
 					btn({icon:'edit', text: t('Edit')+'…', hidden: data.davaccountId, disabled:!data.myRights.mayAdmin, handler: async _ => {
