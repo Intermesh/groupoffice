@@ -1,3 +1,4 @@
+17-02-2025: 6.8.103
 - Timeregistration: Don't user user e-mail in dissapprove mail because it may lead to problems with the system settings mail server configuration not allowing this from addrers.
 - Finance: Always show PDF button
 - Finance: Keep catalog state when adding from catalog
