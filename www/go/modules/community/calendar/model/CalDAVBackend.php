@@ -302,6 +302,39 @@ class CalDAVBackend extends AbstractBackend implements
 		];
 	}
 
+	private static function eventByVEvent($vcalendar, $calendarId) {
+		$vevent = $vcalendar->VEVENT[0];
+		$uid = (string)$vevent->uid;
+
+		$existingEvent = CalendarEvent::find()->where(['uid'=>$uid, 'calendarId' => $calendarId])->single();
+		if($existingEvent){
+			return $existingEvent;
+		}
+
+		$eventCalendars = go()->getDbConnection()->select(['t.eventId, GROUP_CONCAT(calendarId) as calendarIds'])
+			->from('calendar_event', 't')
+			->join('calendar_calendar_event', 'c', 'c.eventId = t.eventId', 'LEFT')
+			->where(['uid'=>$uid, 'recurrenceId' => null])->single();
+
+		if(!empty($eventCalendars['eventId'])) {
+			// add it to the current receivers default calendar
+			$added = go()->getDbConnection()->insert('calendar_calendar_event', [
+				['calendarId'=>$calendarId, 'eventId'=>$eventCalendars['eventId']]
+			])->execute();
+			if(!$added) {
+				go()->debug('Could not add event to '.$calendarId);
+			}
+			$event = CalendarEvent::findById(go()->getDbConnection()->getPDO()->lastInsertId());
+		} else {
+			$event = new CalendarEvent();
+			$organizerEmail = str_replace('mailto:', '',(string)$vcalendar->VEVENT[0]->{'ORGANIZER'});
+			$event->isOrigin = true;//go()->getAuthState()->getUser(['email'])->email === $organizerEmail; // if you created this event by yourself.
+			$event->replyTo = $organizerEmail;
+			$event->calendarId = $calendarId;
+		}
+		return $event;
+	}
+
 	public function createCalendarObject($calendarId, $objectUri, $calendarData)
 	{
 		list($type, $id) = explode('-', $calendarId,2);
@@ -310,41 +343,41 @@ class CalDAVBackend extends AbstractBackend implements
 		go()->debug($calendarData);
 		go()->debug(")");
 
+		$vCalendar = VObject\Reader::read($calendarData, VObject\Reader::OPTION_FORGIVING);
+
 		switch($type) {
 			case 'c': // calendar
-				$object = new CalendarEvent();
-				//$object->uid = $uid;
+				$object = self::eventByVEvent($vCalendar, $id);
 				$object = ICalendarHelper::parseVObject($calendarData, $object);
 				$object->uri($objectUri);
-				// The attached blob must be identical to the data used to create the event
 				$object->attachBlob(ICalendarHelper::makeBlob($object, $calendarData)->id);
-				$object = Calendar::addEvent($object, $id);
 
-				if($object === null) {
-					throw new \Exception('Could not create calendar event');
-				}
+//				if($object === null) {
+//					throw new \Exception('Could not create calendar event');
+//				}
 
 				// TODO, this is a bit ugly. When thunderbird schedules an event for multiple participants it's added
 				// but the sabre scheduling plugin creates an event before this with a different generated uri. But TB
 				// relies on this URI being created.
-				if($object->uri() != $objectUri) {
-					$object->uri($objectUri);
-					if(!$object->save()) {
-						throw new SaveException($object);
-					}
-				}
+//				if($object->uri() != $objectUri) {
+//					$object->uri($objectUri);
+//					if(!$object->save()) {
+//						throw new SaveException($object);
+//					}
+//				}
 
 				break;
 			case 't': // tasklist
 				$object = new Task();
-				$object = (new VCalendar)->vtodoToTask(VObject\Reader::read($calendarData, VObject\Reader::OPTION_FORGIVING), $id, $object);
-				if(!$object->save()) {
-					throw new SaveException($object);
-				}
+				$object = (new VCalendar)->vtodoToTask($vCalendar, $id, $object);
+
 				break;
 			default:
 				go()->log("incorrect calendarId ".$calendarId. ' for '.$objectUri);
 				return false;
+		}
+		if(!$object->save()) {
+			throw new SaveException($object);
 		}
 
 		go()->debug("URI: " . $object->uri());

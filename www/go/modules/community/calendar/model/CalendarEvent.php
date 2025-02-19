@@ -54,7 +54,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 
 	const EventProperties = ['uid','isOrigin','replyTo', 'prodId', 'sequence','title','description','locale','location', 'showWithoutTime',
 		'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule','createdAt','modifiedAt',
-		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag','uri', 'eventId', 'recurrsenceId'];
+		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag','uri', 'eventId', 'recurrenceId'];
 
 	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'alerts', 'veventBlobId'];
 
@@ -104,7 +104,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	/**
 	 * This is only set when somebody is invited to a single occurrence of a series.
 	 *
-	 * Als een participant is uitgenodigd dan wordt er een aparte event met UID . ‘_’. RECURRENCE-ID gemaakt. Dit is denk ik ook de enige manier om dit op te slaan. Je kan dit niet met een recurrence override doen. Maar als je hier je status op zet dan wordt de andere event niet bijgewerkt via caldav. GO stuurt wel een mail maar met UID:d060b367-bc65-4853-bf07-f495bdb29671_2024-09-17T14:00:00 Dan krijg je unable to process invitation omdat deze UID niet gevonden wordt. Als ik aanpas dat deze dezelfde UID gebruikt zonder recurrence-id te appenden, dan krijfgt de genodigde de hele series omdat in Calendar::addEvent() dezelfde calendar_event data wordt bijgevoegd.
+	 * Als een participant is uitgenodigd dan wordt er een aparte event met UID . ‘_’. RECURRENCE-ID gemaakt.
 	 *
 	 * @var string|null
 	 */
@@ -619,7 +619,9 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 			if($participant->kind == 'resource') {
 				$resourceCalendar = Calendar::findById(str_replace('Calendar:', '', $pid));
 				if(!empty($resourceCalendar)) {
-					Calendar::addEvent($this,$resourceCalendar->id);
+					 go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
+						['calendarId'=>$resourceCalendar->id, 'eventId'=>$this->eventId]
+					])->execute();
 				}
 			}
 		}

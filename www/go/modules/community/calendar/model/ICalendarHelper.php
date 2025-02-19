@@ -374,11 +374,6 @@ class ICalendarHelper {
 				// You must be invited to a single occurrence
 				$event->setValues((array)$props); // title, description, start, duration, location, status, privacy
 				$event->prodId = $prodId;
-
-				// this leads to issues as the UID must stay the same for caldav etc.
-				// But removing this leads to another issue. If a participant is invited for
-				// a single occurrence it's added tto the whole series. Because
-				//in Calendar::addEvent() the original base event is attached
 				$event->uid = $uid;
 				$event->recurrenceId = $recurrenceId;
 			}

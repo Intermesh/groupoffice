@@ -265,7 +265,7 @@ class Scheduler {
 	}
 
 	/**
-	 * Will save the event to the calendar and return the celabnder event.
+	 * Will save the event to the calendar and return the calendar event.
 	 *
 	 * If it's a series it will return the occurrence where this message is about
 	 *
@@ -281,40 +281,75 @@ class Scheduler {
 		date_default_timezone_set("UTC");
 
 		$method = $vcalendar->method->getValue();
-		$vevent = $vcalendar->VEVENT[0];
+		$event = self::eventByVEvent($vcalendar, $receiver);
 
-
-
-		$existingEvent = CalendarEvent::findByUID((string)$vevent->uid, $receiver)
-			->andWhere('recurrenceId','=', null)->single();
-
-		// if the current user doesn't have the main event of an recurrence we might have it saved for a single recurrence ID
-		if(!$existingEvent && !empty($vevent->{'RECURRENCE-ID'})) {
-			$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
-			$existingEvent = CalendarEvent::findByUID((string)$vevent->uid, $receiver)
-				->andWhere('recurrenceId','=', $recurId)->single();
-		}
-
-		// If the existing event has isOrigin=true all below does is add new REQUESTS to the calendar.
-		// We might do that up front and skip all the below processing instead.
-
+		if($event->isNew() && $method !== 'REQUEST')
+			return null;
 		switch($method){
-			case 'REQUEST': return self::processRequest($vcalendar,$receiver,$existingEvent);
-			case 'CANCEL': return $existingEvent ? self::processCancel($vcalendar,$existingEvent) : null;
-			case 'REPLY': return $existingEvent ? self::processReply($vcalendar,$existingEvent, $sender) : null;
+			case 'REQUEST': return self::processRequest($vcalendar,$receiver,$event);
+			case 'CANCEL': return self::processCancel($vcalendar,$event);
+			case 'REPLY': return self::processReply($vcalendar,$event, $sender);
 		}
 		go()->debug("invalid method ".$vcalendar->method);
 		return null;
 	}
 
-	private static function processRequest(VCalendar $vcalendar, $receiver, ?CalendarEvent $existingEvent) {
-		if(!$existingEvent) {
-			$existingEvent = new CalendarEvent();
-			$existingEvent->isOrigin = false;
-			$existingEvent->replyTo = str_replace('mailto:', '',(string)$vcalendar->VEVENT[0]->{'ORGANIZER'});
+	private static function eventByVEvent($vcalendar, $receiver) {
+		$vevent = $vcalendar->VEVENT[0];
+		$uid = (string)$vevent->uid;
+		$recurId = !empty($vevent->{'RECURRENCE-ID'}) ? $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s') : null;
+
+		$existingEvent = CalendarEvent::findByUID($uid, $receiver)
+			->andWhere('recurrenceId','=', null)->single();
+
+		// if the current user doesn't have the main event of a recurrence we might have it saved for a single recurrence ID
+		if(!$existingEvent && $recurId !== null) {
+			$existingEvent = CalendarEvent::findByUID($uid, $receiver)
+				->andWhere('recurrenceId','=', $recurId)->single();
 		}
 
-		$event = ICalendarHelper::parseVObject($vcalendar, $existingEvent);
+		if($existingEvent) {
+			return $existingEvent;
+		}
+
+		// still not found. See if an event with the same UID exists in someone else its calendar and add it to ours
+		$eventCalendars = go()->getDbConnection()->select(['t.eventId, GROUP_CONCAT(calendarId) as calendarIds'])
+			->from('calendar_event', 't')
+			->join('calendar_calendar_event', 'c', 'c.eventId = t.eventId', 'LEFT')
+			->where(['uid'=>$uid, 'recurrenceId' => null])->single();
+		if(!$eventCalendars && $recurId !== null) {
+			// this happens when multiple users are invites to the same instance of a recurrence (but not too the series)
+			// we are then reusing the single instance eventdata for multiple calendars.
+			$eventCalendars = go()->getDbConnection()->select(['t.eventId, GROUP_CONCAT(calendarId) as calendarIds'])
+				->from('calendar_event', 't')
+				->join('calendar_calendar_event', 'c', 'c.eventId = t.eventId', 'LEFT')
+				->where(['uid'=>$uid, 'recurrenceId' => $recurId])->single();
+		}
+		$calendarId = Calendar::fetchDefault($receiver);
+		if($eventCalendars) {
+			// add it to the current receivers default calendar
+			$added = go()->getDbConnection()->insert('calendar_calendar_event', [
+				['calendarId'=>$calendarId, 'eventId'=>$eventCalendars['eventId']]
+			])->execute();
+			// if added then
+			$event = CalendarEvent::findById(go()->getDbConnection()->getPDO()->lastInsertId());
+		} else {
+			$event = new CalendarEvent();
+			$event->calendarId = $calendarId;
+			$event->isOrigin = false;
+			$event->replyTo = str_replace('mailto:', '',(string)$vcalendar->VEVENT[0]->{'ORGANIZER'});
+		}
+		return $event;
+	}
+
+	private static function processRequest(VCalendar $vcalendar, $receiver, ?CalendarEvent $event) {
+		if(!$event) {
+			$event = new CalendarEvent();
+			$event->isOrigin = false;
+			$event->replyTo = str_replace('mailto:', '',(string)$vcalendar->VEVENT[0]->{'ORGANIZER'});
+			$event = ICalendarHelper::parseVObject($vcalendar, $event);
+			$event->save(); // we may need to save existing event to if we are not the origin
+		}
 		if(isset($event->participants)) {
 			foreach ($event->participants as $p) {
 				if ($p->email == $receiver && $p->kind == 'resource') {
@@ -322,13 +357,10 @@ class Scheduler {
 				}
 			}
 		}
-
-		if($existingEvent->isNew()) {
-			return Calendar::addEvent($event,  Calendar::fetchDefault($receiver));
-		} else {
-			$existingEvent->save();
-			return $existingEvent;
-		}
+//		if($event->isNew()) {
+//			$event->save(); // the eventByVEvent() function has added it to the calendar if it is not new
+//		}
+		return $event;
 	}
 
 	private static function processCancel(VCalendar $vcalendar, CalendarEvent $existingEvent) : CalendarEvent {
