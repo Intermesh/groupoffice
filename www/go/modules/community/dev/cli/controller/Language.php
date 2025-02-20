@@ -35,7 +35,7 @@ class Language extends Controller {
 	 * docker compose exec groupoffice-64 php www/cli.php community/dev/Language/import --path=lang.csv
 	 * ```
 	 * 
-	 * @param type $params
+	 * @param array $params
 	 * @throws \Exception
 	 */
 	public function import($params) {

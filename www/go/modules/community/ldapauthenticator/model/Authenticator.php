@@ -206,7 +206,7 @@ class Authenticator extends PrimaryAuthenticator {
 		} else {
 			$this->updatePostfixMailbox($domain, $username, $password, $email, $server, $user);
 		}
-		
+
 		$foundForUser = false;
 		foreach($accounts as $account) {
 			/** @var Account $account */

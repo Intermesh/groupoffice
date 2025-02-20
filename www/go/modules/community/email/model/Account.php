@@ -4,6 +4,9 @@ namespace go\modules\community\email\model;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\orm\Mapping;
 
+/**
+ * @property \go\modules\community\oauth2client\model\Oauth2Account|null $oauth2_account
+ */
 class Account extends AclOwnerEntity {
 	
 	public $id;
