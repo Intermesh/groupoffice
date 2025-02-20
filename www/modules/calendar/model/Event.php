@@ -54,12 +54,15 @@ use DateInterval;
 use DateTime;
 use DateTimeZone;
 use GO\Base\Db\FindParams;
+use GO\Base\Mail\Mailer;
 use GO\Calendar\Model\Exception;
 use GO;
 use GO\Base\Util\StringHelper;
+use go\core\ErrorHandler;
 use go\core\mail\Address;
 use go\core\mail\Attachment;
 use go\core\model\Module;
+use go\core\util\StringUtil;
 use Sabre;
 
 /**
@@ -220,13 +223,12 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		);
 	}
 	
-	protected function log($action, $save = true, $modifiedCustomfieldAttrs=false) {
+	protected function log(string $action, $save = true, $modifiedCustomfieldAttrs=false): ?bool
+	{
 		if(!$this->updatingRelatedEvent) {
 			return parent::log($action, $save, $modifiedCustomfieldAttrs);
-		} else
-		{
-			return true;
 		}
+		return true;
 	}
 
 	protected function getCacheAttributes() {
@@ -1620,6 +1622,11 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	{
 		$events=array();
 		if(empty($this->rrule)){
+			if ($this->isPrivate()) {
+				$this->name=\GO::t("Private", "calendar");
+				$this->location='';
+				$this->description='';
+			}
 			$events[]=$this;
 		}else{
 			//a recurring event must be sent with all it's exceptions in the same data
@@ -1752,13 +1759,25 @@ $sub = $offset>0;
 	 */
 	public function importVObject(Sabre\VObject\Component $vobject, $attributes=array(), $dontSave=false, $makeSureUserParticipantExists=false, $importExternal=false, $withCategories = true){
 
-		$uid = (string) $vobject->uid;
-		if(!empty($uid))
-			$this->uuid = $uid;
-		
-		$this->name = (string) $vobject->summary;
-		if(empty($this->name))
-			$this->name = \GO::t("Unnamed");
+		$uid = (string)$vobject->uid;
+		if (!empty($uid)) {
+			// In certain cases, accented characters will throw a DB collation error, as the field is in ASCII collation
+			$this->uuid = StringUtil::toAscii($uid);
+		}
+
+		if(!$this->isPrivate() || $this->user_id === go()->getUserId()) {
+			$this->name = (string)$vobject->summary;
+			if (empty($this->name))
+				$this->name = \GO::t("Unnamed");
+
+			if ($vobject->description)
+				$this->description = (string)$vobject->description;
+		} else if(!$this->isNew()) {
+			// the caldav client is posting the data with name and content removed.
+			// Put it back into the vobject for the vobject cache.
+			$vobject->summary = $this->name;
+			$vobject->description = $this->description;
+		}
 		
 		$dtstart = $vobject->dtstart ? $vobject->dtstart->getDateTime() : new \DateTime();
 		$dtend = $vobject->dtend ? $vobject->dtend->getDateTime() : new \DateTime();
@@ -1801,10 +1820,6 @@ $sub = $offset>0;
 		}
 		if($this->end_time<=$this->start_time)
 			$this->end_time=$this->start_time+3600;
-				
-		
-		if($vobject->description)
-			$this->description = (string) $vobject->description;
 		
 		
 		if((string) $vobject->rrule != ""){
@@ -1993,10 +2008,14 @@ The following is the error message:
 
 						$message->setHtmlAlternateBody(nl2br($body));
 
-						if (\GO\Base\Mail\Mailer::newGoInstance()->send($message))
+						try {
+							Mailer::newGoInstance()->send($message);
+
 							throw new \GO\Base\Exception\Validation('DUE TO ERROR, CRON SENT MAIL TO: '.$this->calendar->user->email.'. THIS IS THE EMAIL MESSAGE:'."\r\n".$body);
-						else
+						}catch (\Exception $e) {
+							ErrorHandler::logException($e);
 							throw new \GO\Base\Exception\Validation('CRON COULD NOT SEND EMAIL WITH ERROR MESSAGE TO: '.$this->calendar->user->email.'. THIS IS THE EMAIL MESSAGE:'."\r\n".$body);
+						}
 					} else {
 						throw new \GO\Base\Exception\Validation(implode("\n", $this->getValidationErrors())."\n");
 					}
@@ -2217,6 +2236,13 @@ The following is the error message:
 		}
 		
 		return parent::afterDuplicate($duplicate);
+	}
+
+	public function duplicateRelation($relationName, $duplicate, array $attributes=array(), $findParams=false){
+		if($relationName == 'participants' && isset($attributes['participants']) && $attributes['participants'] === null) {
+			return;
+		}
+		parent::duplicateRelation($relationName, $duplicate, $attributes, $findParams);
 	}
 	
 	/**
@@ -2682,10 +2708,7 @@ The following is the error message:
 						$message->setSender(go()->getSettings()->systemEmail);
 					}
 
-					if(!$mailer->send($message)) {
-						throw new \Exception("Failed to send invite");
-					}
-					
+					$mailer->send($message);
 				}
 				
 			}

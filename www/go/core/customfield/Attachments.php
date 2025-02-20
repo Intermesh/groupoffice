@@ -97,12 +97,15 @@ final class Attachments extends MultiSelect
 			return [];
 		}
 
-		return (new Query())
+		$q = (new Query())
 			->select("blobId, name, description")
 			->from($this->getMultiSelectTableName())
 			->where(['modelId' => $entity->id])
-			->orderBy(['order'=>'ASC'])
-			->all();
+			->orderBy(['order'=>'ASC']);
+
+		$results = $q->all();
+
+		return $results;
 	}
 
 	public function dbToText($value, CustomFieldsModel $values, $entity)
@@ -113,11 +116,9 @@ final class Attachments extends MultiSelect
 		}
 
 		return implode(", ", (new Query())
-			->selectSingleValue("blb.name")
-			->join("core_blob", "blb", "blb.id = ms.blobId")
+			->selectSingleValue("blobId")
 			->from($this->getMultiSelectTableName(), 'ms')
 			->where(['modelId' => $entity->id])
-			->orderBy(['blb.name' => 'ASC'])
 			->all());
 	}
 
@@ -133,11 +134,9 @@ final class Attachments extends MultiSelect
 		$texts = array_map('trim', explode(',', $value));
 
 		$ids = (new Query())
-			->selectSingleValue("id")
+			->select("id as blobId, name, '' as description")
 			->from("core_blob", 'b')
-			->where(['name' => $texts])
-			->andWhere(['fieldId' => $this->field->id])
-			->orderBy(['b.name' => 'ASC'])
+			->where(['id' => $texts])
 			->all();
 
 		if(count($ids) != count($texts)) {

@@ -23,6 +23,17 @@ use Transliterator;
  */
 class StringUtil {
 
+	/**
+	 * Convert a boolean value to something a human understands in their mother tongue
+	 *
+	 * @param bool $value
+	 * @return string
+	 */
+	public static function booleanToYesNo(bool $value): string
+	{
+		return $value ? go()->t("Yes") : go()->t("No");
+	}
+
   /**
    * Normalize the line end style of text.
    *
@@ -624,7 +635,7 @@ END;
 		}, $string);
 
 // Clean up entities
-		$string = preg_replace('!(&#0+[0-9]+)!', '$1;', $string);
+		$string = preg_replace('!(&#+[0-9]+)!', '$1;', $string);
 
 // Decode entities not needed because they won't be decoded for display.
 		$string = html_entity_decode($string, ENT_QUOTES|ENT_HTML5, 'UTF-8');
@@ -863,6 +874,10 @@ END;
 						$split = mb_split('[_\-\\\\\/.]', $emailPart);
 						$secondPassKeywords = array_merge($secondPassKeywords, $split);
 					}
+				} elseif (strpos($keyword, '-') > 0) {
+					// Split strings with a dash anyway, e.g. as in double surnames
+					$split = mb_split('[\-]', $keyword);
+					$secondPassKeywords = array_merge($secondPassKeywords, $split);
 				}
 			}
 
@@ -979,6 +994,7 @@ END;
 		// <style><!-- body{} --></style>
 		if($preserveHtmlStyle) {
 			$prefix =  uniqid();
+			$html = $html ?? "";
 			$styles = self::extractStyles($html, $prefix);
 		}
 
@@ -1231,17 +1247,25 @@ END;
 	 * @access public
 	 * @return float|null|bool
 	 */
-	public static function unlocalizeNumber(string $number = "")
+	public static function unlocalizeNumber(string $number = "", string $decimalSeparator = null, string $thousandsSeparator = null)
 	{
 		if ($number == "") {
 			return null;
 		}
-		$user = go()->getAuthState()->getUser(['thousandsSeparator', 'decimalSeparator']);
 
-		$ts = $user ? $user->thousandsSeparator : go()->getConfig()['default_thousands_separator'];
-		$ds = $user ? $user->decimalSeparator : go()->getConfig()['default_decimal_separator'];
-		$number = str_replace($ts, '', $number);
-		$number = str_replace($ds, '.', $number);
+		if(!isset($decimalSeparator) || !isset($thousandsSeparator)) {
+			$user = go()->getAuthState()->getUser(['thousandsSeparator', 'decimalSeparator']);
+		}
+
+		if(!isset($thousandsSeparator)) {
+			$thousandsSeparator = $user ? $user->thousandsSeparator : go()->getConfig()['default_thousands_separator'];
+		}
+		if(!isset($decimalSeparator)) {
+			$decimalSeparator = $user ? $user->decimalSeparator : go()->getConfig()['default_decimal_separator'];
+		}
+
+		$number = str_replace($thousandsSeparator, '', $number);
+		$number = str_replace($decimalSeparator, '.', $number);
 
 		if (!empty($number) && !is_numeric($number)) {
 			return false;

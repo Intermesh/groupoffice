@@ -335,7 +335,19 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					}
 				},
 				items: [
-					this.datesField = new go.modules.community.addressbook.DatesField(),
+					{
+						xtype: "container",
+						layout: "form",
+						items: [
+							{
+								xtype: "datefield",
+								name: "actionAt",
+								fieldLabel: t("Action date")
+							},
+							this.datesField = new go.modules.community.addressbook.DatesField(),
+						]
+					},
+
 					this.urlsField = new go.modules.community.addressbook.UrlsField()
 
 				]

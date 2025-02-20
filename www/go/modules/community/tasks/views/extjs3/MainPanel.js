@@ -215,6 +215,11 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			this.taskBackButton.setVisible(layout.isNarrow());
 		});
 
+		// route to main grid when details resets / is deleted for mobile view
+		this.taskDetail.on("reset", () => {
+			go.Router.goto("tasks");
+		})
+
 		go.modules.community.tasks.MainPanel.superclass.initComponent.call(this);
 
 		this.on("afterrender", this.runModule, this);
@@ -572,24 +577,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					{
 						iconCls: 'ic-more-vert',
 						menu: [
-							// {
-							// 	text: "refresh",
-							// 	handler: function () {
-							// 		const store = this.taskGrid.store, o = go.util.clone(store.lastOptions);
-							// 		o.params = o.params || {};
-							// 		o.params.position = 0;
-							// 		o.add = false;
-							// 		o.keepScrollPosition = true;
-							//
-							// 		if (store.lastOptions.params && store.lastOptions.params.position) {
-							// 			o.params.limit = store.lastOptions.params.position + (store.lastOptions.limit || store.baseParams.limit || 20);
-							// 		}
-							//
-							// 		store.load(o);
-							// 	},
-							// 	scope: this
-							// }
-							// ,
 							{
 								iconCls: 'ic-cloud-upload',
 								text: t("Import"),
@@ -755,35 +742,29 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	onTaskGridDblClick : function (grid, rowIndex, e) {
 
 		const record = grid.getStore().getAt(rowIndex);
-		if (record.get('permissionLevel') < go.permissionLevels.write) {
-			return;
-		}
-
-		let dlg = new go.modules.community.tasks.TaskDialog({
-			entityStore: this.support ? "SupportTicket" : "Task",
-			role: this.support ? "support" : "list"
-		});
-		dlg.load(record.id).show();
+		this.editTask(record);
 	},
 	
 	onTaskGridKeyPress : function(e) {
 		if(e.keyCode != e.ENTER) {
 			return;
 		}
-		var record = this.taskGrid.getSelectionModel().getSelected();
+		const record = this.taskGrid.getSelectionModel().getSelected();
 		if(!record) {
 			return;
 		}
+		this.editTask(record)
+	},
 
+	editTask: function(record) {
 		if (record.get('permissionLevel') < go.permissionLevels.write) {
 			return;
 		}
-
 		const dlg = new go.modules.community.tasks.TaskDialog({
 			role: this.support ? "support" : "list",
 			entityStore: this.support ? "SupportTicket" : "Task",
 		});
 		dlg.load(record.id).show();
-	}	
+	}
 });
 

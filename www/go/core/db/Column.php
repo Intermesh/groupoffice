@@ -214,6 +214,16 @@ class Column {
 		}
 		
 		switch ($this->dbType) {
+			case 'int':
+			case 'tinyint':
+			case 'smallint':
+			case 'bigint':
+				if ($this->length === 1) {
+					//Boolean fields in mysql are listed at tinyint(1);
+					return (bool) $value;
+				}
+				return (int) $value;
+
 			case 'datetime':
 				if ($value instanceof DateTime || $value instanceof DateTimeImmutable) {
 					if(!($value instanceof GoDateTime)) {

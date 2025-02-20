@@ -281,6 +281,15 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 			$data = $data->toArray();
 		}
 
+
+		$fn = $asText ? 'textToDb' : 'apiToDb';
+		foreach($this->getCustomFieldModels() as $field) {
+			//if client didn't post value then skip it
+ 			if(array_key_exists($field->databaseName, $data)) {
+				$data[$field->databaseName] = $field->getDataType()->$fn(isset($data[$field->databaseName]) ? $data[$field->databaseName] : null,  $this, $this->entity);
+			}
+		}
+
 		$columns = Table::getInstance(static::customFieldsTableName())->getColumns();
 		foreach($columns as $name => $column) {
 			if(array_key_exists($name, $data)) {
@@ -291,13 +300,6 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 				} else {
 					$data[$name] = $column->normalizeInput($data[$name]);
 				}
-			}
-		}
-		$fn = $asText ? 'textToDb' : 'apiToDb';
-		foreach($this->getCustomFieldModels() as $field) {
-			//if client didn't post value then skip it
- 			if(array_key_exists($field->databaseName, $data)) {
-				$data[$field->databaseName] = $field->getDataType()->$fn(isset($data[$field->databaseName]) ? $data[$field->databaseName] : null,  $this, $this->entity);
 			}
 		}
 
@@ -350,14 +352,14 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 	public function toArray(array $properties = null): array|null
 	{
 		$fn = $this->returnAsText ? 'dbToText' : 'dbToApi';
-		$record = $this->internalGetCustomFields();
+		$r = $this->internalGetCustomFields();
+		$record = [];
 		foreach($this->getCustomFieldModels() as $field) {
 			if(empty($field->databaseName)) {
 				continue; //For type Notes which doesn't store any data
 			}
-			$record[$field->databaseName] = $field->getDataType()->$fn($record[$field->databaseName] ?? null, $this, $this->entity);
+			$record[$field->databaseName] = $field->getDataType()->$fn($r[$field->databaseName] ?? null, $this, $this->entity);
 		}
-		unset($record['id']);
 		return $record;
 	}
 

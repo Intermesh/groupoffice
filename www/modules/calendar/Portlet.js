@@ -56,12 +56,7 @@ GO.calendar.SummaryGroupPanel = function(config)
 		remoteSort:true
 	});
 
-	// config.store.on('load', function(){
-	// 	//do layout on Startpage
-	// 	this.ownerCt.ownerCt.ownerCt.doLayout();
-	// }, this);
-
-	config.paging=false,			
+	config.paging=false;
 	config.autoExpandColumn='summary-calendar-name-heading';
 
 	config.cls = "go-grid3-hide-headers";
@@ -82,7 +77,7 @@ GO.calendar.SummaryGroupPanel = function(config)
 		header:t("Name"),
 		dataIndex: 'name',
 		renderer:function(value, p, record){
-			p.attr = 'ext:qtip="'+Ext.util.Format.htmlEncode(GO.calendar.formatQtip(record.data))+'"';
+			p.attr = 'ext:qtip="'+GO.calendar.formatQtip(record.data)+'"';
 			return value;
 		},
 		groupable:false
@@ -104,12 +99,6 @@ GO.calendar.SummaryGroupPanel = function(config)
 	config.autoHeight=true;
 	
 	GO.calendar.SummaryGroupPanel.superclass.constructor.call(this, config);
-
-//with auto expand column this works better otherwise you'll get a big scrollbar
-/*this.store.on('load', function(){
-		this.addClass('go-grid3-hide-headers');
-	}, this, {single:true})*/
-	
 };
 
 
@@ -183,57 +172,6 @@ GO.mainLayout.onReady(function(){
 					}
 					this.selectCalendarWin.show();
 					
-//					if(!this.manageCalsWindow)
-//					{
-//						this.manageCalsWindow = new Ext.Window({
-//							layout:'fit',
-//							items:this.PortletSettings =  new GO.calendar.PortletSettings(),
-//							width:700,
-//							height:400,
-//							title:t("Visible calendars", "calendar"),
-//							closeAction:'hide',
-//							buttons:[{
-//								text: t("Save"),
-//								handler: function(){
-//									var params={
-//										'task' : 'save_portlet'
-//									};
-//									if(this.PortletSettings.store.loaded){
-//										params['calendars']=Ext.encode(this.PortletSettings.getGridData());
-//									}
-//									Ext.Ajax.request({
-//										url: GO.settings.modules.calendar.url+'action.php',
-//										params: params,
-//										callback: function(options, success, response){
-//											if(!success)
-//											{
-//												Ext.MessageBox.alert(t("Error"), t("Could not connect to the server. Please check your internet connection."));
-//											}else
-//											{
-//												//var responseParams = Ext.decode(response.responseText);
-//												this.PortletSettings.store.reload();
-//												this.manageCalsWindow.hide();
-//
-//												calGrid.store.reload();
-//											}
-//										},
-//										scope:this
-//									});
-//								},
-//								scope: this
-//							}],
-//							listeners:{
-//								show: function(){
-//									if(!this.PortletSettings.store.loaded)
-//									{
-//										this.PortletSettings.store.load();
-//									}
-//								},
-//								scope:this
-//							}
-//						});
-//					}
-//					this.manageCalsWindow.show();
 				}
 			},{
 				id:'close',

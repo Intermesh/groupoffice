@@ -26,7 +26,7 @@ GO.smime.CertificateDetailWindow = Ext.extend(Ext.Window, {
 			'</td></tr>'+
 			'<tr><td>'+t("Valid from", "smime")+':</td><td>{validFrom}</td></tr>'+
 			'<tr><td>'+t("Valid to", "smime")+':</td><td>{validTo}</td></tr>'+
-			'<tr><td>OCSP:</td><td class="{[!values.ocsp ? "danger" : "success"]}">{ocspMsg}</td></tr>'+
+			'<tpl if="values.ocspFound"><tr><td>OCSP:</td><td class="{[!values.ocsp ? "danger" : "success"]}">{ocspMsg}</td></tr></tpl>'+
 			'</table></div>');
 
 		this.supr().initComponent.call(this);

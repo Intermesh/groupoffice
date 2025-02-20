@@ -369,10 +369,13 @@ function test_system() :array
 	$test['feedback']='Warning: pdfinfo is not installed or not executable. Please install the poppler-utils package';
 	$test['fatal']=false;
 	$tests[]=$test;
-	
+
+
+	$version = phpversion("sourceGuardian");
+	$sgInstalled = $version && version_compare($version, '14.0.0', '>=');
 	$test['name']='SourceGuardian enabled';
-	$test['pass']=$sgInstalled = function_exists('sg_load');
-	$test['feedback']='Warning: SourceGuardian is not installed. The professional modules will not be enabled.';
+	$test['pass']= $sgInstalled;
+	$test['feedback']='Warning: SourceGuardian is not installed or version is lower than 14.0.0. The professional modules will not be enabled.';
 	$test['fatal']=false;
 
 	$tests[]=$test;
@@ -408,7 +411,7 @@ function test_system() :array
 	$test['name']='Shared Memory Functions';
 	$test['showSuccessFeedback'] = false;
 	$test['pass']= function_exists('sem_get') && function_exists('shm_attach') && function_exists('sem_acquire') && function_exists('shm_get_var');
-	$test['feedback']= "InterProcessData::InitSharedMem(): PHP libraries for the use shared memory are not available. Locking performance will increase with them and Z-push will work unreliably!";
+	$test['feedback']= "InterProcessData::InitSharedMem(): PHP libraries for the use shared memory are not available (sysvmsg, sysvsem, sysvshm). Locking performance will increase with them and Z-push will work unreliably!";
 	$test['fatal']=false;
 
 	$tests[]=$test;

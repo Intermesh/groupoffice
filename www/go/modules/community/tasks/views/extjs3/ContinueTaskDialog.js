@@ -61,7 +61,7 @@ go.modules.community.tasks.ContinueTaskDialog = Ext.extend(go.form.Dialog, {
 					value: tomorrow,
 					submit:false
 				})],
-				width: 240,
+				width: 280,
 				style: 'margin:auto;'
 			},
 				//new GO.form.HtmlComponent({html: '<br />'}),

@@ -11,8 +11,12 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 	autoScroll: true,
 
 	newProfileRecord: null, // set and added to store on reload when new profile record needs to be created
-	
+
+	fileName: "",
 	initComponent : function() {
+
+		console.log(this.fileName, this.fileName.toLowerCase().substr(-3))
+		console.log(go.User.dateFormat,go.User.decimalSeparator, go.User.timeFormat, go.User.thousandsSeparator);
 
 		const renameWindow = new go.Window({
 			title: t('Rename profile'),
@@ -78,27 +82,28 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 		this.formPanel = new Ext.form.FormPanel({
 			
 			items: [
-				this.fieldSet = new Ext.form.FieldSet({
+				{
+					xtype: "fieldset",
 					labelWidth: dp(300),
 					items: [{
 						xtype: 'box',
 						autoEl: 'p',
-						html: t("Please match the CSV columns with the correct Group-Office columns and press 'Import' to continue.")+
-							'<br>'+t('The column profile will be saved with the name provided field below.')
-					},this.csvMappings= new go.form.ComboBoxReset({
+						html: t("Please match the CSV columns with the correct Group-Office columns and press 'Import' to continue.") +
+							'<br>' + t('The column profile will be saved with the name provided field below.')
+					}, this.csvMappings = new go.form.ComboBoxReset({
 						fieldLabel: t("Column profile"),
 						anchor: '99%',
 						pageSize: 50,
 						trigger1Class: 'ic-edit',
-						onTrigger1Click: function(ev,btn) {
-							const isNew = (this.getValue()=='new');
+						onTrigger1Click: function (ev, btn) {
+							const isNew = (this.getValue() == 'new');
 							profileMenu.get('delete').setDisabled(isNew);
 							profileMenu.get('copy').setDisabled(isNew);
 							//profileMenu.get('rename').setDisabled(!isNew);
 							profileMenu.show(btn);
 						},
 						valueField: 'id',
-						submit:false,
+						submit: false,
 						hiddenName: 'mappingId',
 						displayField: 'name',
 						triggerAction: 'all',
@@ -106,11 +111,11 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 						selectOnFocus: true,
 						forceSelection: true,
 						listeners: {
-							'render' : me => me.store.load(),
-							'setvalue' : (me,v) => {
+							'render': me => me.store.load(),
+							'setvalue': (me, v) => {
 								console.log(v);
-								if(v) {
-									if(typeof v === "number" || v === 'new') {
+								if (v) {
+									if (typeof v === "number" || v === 'new') {
 										const rec = me.store.getById(v);
 										this.formPanel.form.setValues(rec.data.columnMapping); // do column mapping
 										v = rec.data.name;
@@ -133,9 +138,9 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 							},
 							listeners: {
 								'load': s => {
-									if(this.foundId)
+									if (this.foundId)
 										this.csvMappings.setValue(this.foundId);
-									if(this.newProfileRecord) {
+									if (this.newProfileRecord) {
 										this.csvMappings.store.insert(0, this.newProfileRecord);
 										this.csvMappings.setValue('new');
 									}
@@ -144,10 +149,67 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 							}
 						}
 					}),
-					{html:'<hr>'},
-					this.createLookupCombo()]
+					]
+				},
+
+			this.formatFieldSet = new Ext.form.FieldSet({
+					xtype: "fieldset",
+					hidden: this.fileName.toLowerCase().substr(-3) != 'csv',
+					title: t("Formatting"),
+
+					// defaults:{
+					// 	flex: 1,
+					// 	layout: "form",
+					// 	xtype: "container",
+					// 	anchor: "100%"
+					// } ,
+					items:[
+						{
+
+							cls: "go-hbox",
+							layout: "form",
+							xtype: "container",
+							defaults: {
+								flex: 1
+							},
+							items: [
+								{
+									xtype: "textfield",
+									name: "dateFormat",
+									value: go.User.dateFormat,
+									fieldLabel: t("Date format")
+								},{
+									xtype: "textfield",
+									name: "timeFormat",
+									value: go.User.timeFormat,
+									fieldLabel: t("Time format")
+								},{
+									xtype: "textfield",
+									name: "decimalSeparator",
+									value: go.User.decimalSeparator,
+									fieldLabel: t("Decimal Separator")
+								},{
+									xtype: "textfield",
+									name: "thousandsSeparator",
+									value: go.User.thousandsSeparator,
+									fieldLabel: t("Thousand Separator")
+								},
+							]
+						}]
+				}),
+
+
+				this.fieldSet = new Ext.form.FieldSet({
+					xtype: "fieldset",
+					labelWidth: dp(300),
+					title: t("Field mapping"),
+					items: [
+						this.createLookupCombo()
+					]
 				})
+
 			]
+
 		});
 		
 		this.items = [this.formPanel];
@@ -203,7 +265,13 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 						if (response.columnMapping) { // mapping found!
 							this.foundId = response.id;
 							this.formPanel.form.setValues(response.columnMapping);
-							this.formPanel.form.setValues({updateBy: response.updateBy});
+							this.formPanel.form.setValues({
+								updateBy: response.updateBy,
+								dateFormat: response.dateFormat ?? go.User.dateFormat,
+								timeFormat: response.timeFormat ?? go.User.timeFormat,
+								decimalSeparator: response.decimalSeparator ?? go.User.decimalSeparator,
+								thousandsSeparator: response.thousandsSeparator ?? go.User.thousandsSeparator
+							});
 						} else { // columns unknown, generate
 							var v = this.transformCsvHeadersToValues(response.goHeaders, this.fields);
 							this.foundId = 0;
@@ -214,6 +282,13 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 							}, 'new');
 							Ext.apply(v, this.findAliases());
 							this.formPanel.form.setValues(v);
+							this.formPanel.form.setValues({
+								updateBy: response.updateBy,
+								dateFormat: response.dateFormat ?? go.User.dateFormat,
+								timeFormat: response.timeFormat ?? go.User.timeFormat,
+								decimalSeparator: response.decimalSeparator ?? go.User.decimalSeparator,
+								thousandsSeparator: response.thousandsSeparator ?? go.User.thousandsSeparator
+							});
 						}
 
 						this.doLayout();
@@ -329,52 +404,48 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 	 * @returns {{}}
 	 *
 	 */
-	transformCsvHeadersToValues : function(goHeaders, fields, parent) {
-		var v = {};
+	transformCsvHeadersToValues: function (goHeaders, fields, parent) {
+		const v = {};
 
-		for(var name in goHeaders) {
-			var h = goHeaders[name];
+		for (const name in goHeaders) {
+			const h = goHeaders[name];
 
-			if(h.grouped) {
-				if(h.many) {
+			if (h.grouped) {
+				if (h.many) {
 					v[h.name] = [];
-					var index = 1;
-					for (index = 1; index < 10; index++) {
-						var part = h.name + "[" + index + "]";
+					for (let index = 1; index < 10; index++) {
+						let part = h.name + "[" + index + "]";
 						part = parent ? parent + "." + part : part;
 
-						var headerIndex = this.csvHeaders.findIndex(function (csvH) {
+						let headerIndex = this.csvHeaders.findIndex(function (csvH) {
 							return csvH && csvH.toLowerCase().indexOf(part.toLowerCase()) == 0;
 						});
 
-						if (headerIndex == -1) {
+						if (headerIndex === -1) {
 							break;
 						}
 						headerIndex--;
 						v[h.name][headerIndex] = this.transformCsvHeadersToValues(h.properties, fields, part);
 					}
-				}else
-				{
+				} else {
 					v[h.name] = this.transformCsvHeadersToValues(h.properties, fields, h.name);
 				}
-			} else
-			{
+			} else {
 				v[h.name] = this.findSingleCsvIndex(h, parent);
 			}
-		};
-
+		}
 
 		return v;
 	},
 
 	findSingleCsvIndex : function(h, parent) {
-		var csvIndex = -2;
-		var storeIndex = this.csvStore.findBy(function(r) {
-			if(!r.data.name) {
+		let csvIndex = -2;
+		const storeIndex = this.csvStore.findBy(function (r) {
+			if (!r.data.name) {
 				return false;
 			}
-			var csvHeader = r.data.name.toLowerCase().replace(/[_\-\s]/g, '');
-			var goHeader = (parent ? parent + "." + h.name : h.name).toLowerCase().replace(/[_\-\s]/g, '');
+			const csvHeader = r.data.name.toLowerCase().replace(/[_\-\s]/g, '');
+			const goHeader = (parent ? parent + "." + h.name : h.name).toLowerCase().replace(/[_\-\s]/g, '');
 
 			return csvHeader == goHeader || "customfields." + csvHeader == goHeader;
 		});
@@ -391,6 +462,13 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 		// headers.forEach(function(h) {
 		for(var name in headers) {
 			var h = headers[name];
+
+			// Value is already provided in go.util.importFile() so don't map it from the csv. For example addressBookId is
+			// passed from the selection.
+			if(this.values[h.name]) {
+				continue;
+			}
+
 			if(!go.util.empty(h.properties)) {
 				var formContainer = {
 					xtype: "formcontainer",
@@ -403,8 +481,6 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 				};
 
 				if(h.many) {
-
-
 					var field = {
 						name: h.name,
 						xtype: "formgroup",
@@ -491,10 +567,35 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 		this.getEl().mask(t("Importing..."));
 		var mapping = this.formPanel.form.getFieldValues();
 		var mappingId = this.csvMappings.getValue();
-		var updateBy = mapping.updateBy;
+		var updateBy = mapping.updateBy,
+		decimalSeparator = mapping.decimalSeparator,
+		thousandsSeparator = mapping.thousandsSeparator,
+		dateFormat = mapping.dateFormat,
+		timeFormat = mapping.timeFormat;
+
+		// Not sure why, but these values are not read properly in the API. Therefore, we translate them
+		// to string values below
+		if(Ext.isArray(decimalSeparator)) {
+			decimalSeparator = decimalSeparator[0];
+		}
+
+		if(Ext.isArray(thousandsSeparator)) {
+			thousandsSeparator = thousandsSeparator[0];
+		}
+		if(Ext.isArray(dateFormat)) {
+			dateFormat = dateFormat[0];
+		}
+		if(Ext.isArray(timeFormat)) {
+			timeFormat = timeFormat[0];
+		}
+
 		var saveName = this.nameField.getValue();
 
 		delete mapping.updateBy;
+		delete mapping.decimalSeparator;
+		delete mapping.thousandsSeparator;
+		delete mapping.dateFormat;
+		delete mapping.timeFormat;
 
 		go.Jmap.request({
 			method: this.entity + "/import",
@@ -504,7 +605,12 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 				mappingId,
 				mapping,
 				saveName,
-				updateBy
+				updateBy,
+				decimalSeparator,
+				thousandsSeparator,
+				dateFormat,
+				timeFormat
+
 			},
 			callback: function (options, success, response) {
 				this.getEl().unmask();

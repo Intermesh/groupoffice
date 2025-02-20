@@ -19,6 +19,8 @@ GO.form.HtmlEditor = function (config) {
 	var ioDentPlugin = new Ext.ux.form.HtmlEditor.IndentOutdent();
 	var ssScriptPlugin = new Ext.ux.form.HtmlEditor.SubSuperScript();
 	var rmFormatPlugin = new Ext.ux.form.HtmlEditor.RemoveFormat();
+	var imageResizePlugin = new GO.plugins.HtmlEditorImageResize();
+	var tablePlugin = new Ext.ux.form.HtmlEditor.NEWTablePlugin();
 
 
 	if (GO.settings.pspellSupport) {
@@ -27,10 +29,12 @@ GO.form.HtmlEditor = function (config) {
 
 	config.plugins.unshift(
 					ioDentPlugin,
-					// rmFormatPlugin,
-					wordPastePlugin,
+					rmFormatPlugin,
+					// wordPastePlugin,
 					hrPlugin,
-					ssScriptPlugin
+					ssScriptPlugin,
+					imageResizePlugin,
+					tablePlugin
 					);
 
 	if(config.headingsMenu) {
@@ -49,8 +53,14 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 	headingsMenu: true,
 
+	enableSendShortcut : true,
+
 	initComponent: function() {
 		GO.form.HtmlEditor.superclass.initComponent.apply(this);
+
+		if(go.User) {
+			this.enableSendShortcut = go.User.enableSendShortcut;
+		}
 
 		this.buttonTips['strikeThrough']= {
 			title: 'Strike through',
@@ -62,11 +72,11 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			this.height = this.growMinHeight;
 		}
 
-		this.on('afterrender', function() {
-			if(this.grow && this.growMinHeight <= dp(46)) {
-				this.tb.hide();
-			}
-		}, this);
+		// this.on('afterrender', function() {
+		// 	if(this.grow && this.growMinHeight <= dp(46)) {
+		// 		this.tb.hide();
+		// 	}
+		// }, this);
 		this.on('initialize', function(){
 
 			if(this.grow) {
@@ -75,14 +85,77 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			}
 		},this);
 
-		this.on('activate', function() {
-			this.registerSubmitKey();
-		}, this);
+		if(this.enableSendShortcut) {
+			this.on('activate', function () {
+				this.registerSubmitKey();
+			}, this);
+		}
 	},
 
 	emptyTextRegex: '<span[^>]+[^>]*>{0}<\/span>',
 	emptyTextTpl: '<span style="color:#ccc;">{0}</span>',
 	emptyText: '',
+
+	blankText : 'This field is required',
+
+	allowBlank: true,
+
+	getErrors: function(value) {
+
+		var errors = Ext.form.HtmlEditor.superclass.getErrors.apply(this, arguments);
+
+		value = Ext.isDefined(value) ? value : this.getValue();
+
+		value = Ext.util.Format.stripTags(value).trim().replace(/\u200B/g,'');
+
+		if (!this.allowBlank && value.length < 1) {
+			errors.push(this.blankText);
+		}
+
+		return errors;
+	},
+
+	markInvalid : function(msg){
+
+		if (this.rendered && !this.preventMark) {
+			msg = msg || this.invalidText;
+
+			var mt = this.getMessageHandler();
+			if(mt){
+				mt.mark(this, msg);
+			}else if(this.msgTarget){
+				this.el.addClass(this.invalidClass);
+				var t = Ext.getDom(this.msgTarget);
+				if(t){
+					t.innerHTML = msg;
+					t.style.display = this.msgDisplay;
+				}
+			}
+		}
+
+		this.setActiveError(msg);
+	},
+
+	clearInvalid : function(){
+
+		if (this.rendered && !this.preventMark) {
+			this.el.removeClass(this.invalidClass);
+			var mt = this.getMessageHandler();
+			if(mt){
+				mt.clear(this);
+			}else if(this.msgTarget){
+				this.el.removeClass(this.invalidClass);
+				var t = Ext.getDom(this.msgTarget);
+				if(t){
+					t.innerHTML = '';
+					t.style.display = 'none';
+				}
+			}
+		}
+
+		this.unsetActiveError();
+	},
+
 
 	registerSubmitKey: function() {
 		var doc = this.getDoc();
@@ -177,7 +250,9 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 				}
 			});
 
+			console.warn(h != anchored);
 			if(h != anchored) {
+
 				this.getEditorBody().innerHTML = anchored;
 				this.restoreCursorPosition();
 			}else
@@ -201,7 +276,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			range = sel.getRangeAt(0);
 
 			el = doc.createElement("div");
-			el.innerHTML = "<div style='display:none' id='go-stored-cursor'></div>";
+			el.innerHTML = "<span style='display:none' id='go-stored-cursor'></span>";
 			frag = doc.createDocumentFragment();
 			while ((node = el.firstChild)) {
 				lastNode = frag.appendChild(node);
@@ -501,18 +576,18 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		body.style.width = "100%";
 		body.style.lineHeight = dp(20) + "px";
 
-		var h =  Math.max(this.growMinHeight, body.offsetHeight); // 400  max height
+		var h =  Math.max(this.growMinHeight, body.offsetHeight + dp(20)); // 400  max height
 
-		if(h > dp(48)) {
-			this.tb.show();
-			//workaround for combo
-			if(this.tb.items.itemAt(0).wrap) {
-				this.tb.items.itemAt(0).wrap.dom.style.width = "100px";
-			}
-			this.tb.doLayout();
-		} else {
-			this.tb.hide();
-		}
+		// if(h > dp(48)) {
+		// 	this.tb.show();
+		// 	//workaround for combo
+		// 	if(this.tb.items.itemAt(0).wrap) {
+		// 		this.tb.items.itemAt(0).wrap.dom.style.width = "100px";
+		// 	}
+		// 	this.tb.doLayout();
+		// } else {
+		// 	this.tb.hide();
+		// }
 
 		h +=  this.tb.el.getHeight();
 

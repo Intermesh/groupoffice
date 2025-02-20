@@ -1,17 +1,15 @@
 <?php
 namespace go\modules\community\ldapauthenticator\model;
 
-use ErrorException as ErrorExceptionAlias;
 use Exception;
-use GO\Base\Mail\ImapAuthenticationFailedException;
-use go\core\model\User;
+use GO\Base\Mail\Exception\ImapAuthenticationFailedException;
 use go\core\auth\PrimaryAuthenticator;
 use go\core\ErrorHandler;
-use go\core\ldap\Connection;
 use go\core\ldap\Record;
+use go\core\model\User;
 use GO\Email\Model\Account;
-
 use go\modules\community\ldapauthenticator\Module;
+use go\modules\community\serverclient\model\MailDomain;
 
 /**
  * LDAP Authenticator
@@ -120,9 +118,10 @@ class Authenticator extends PrimaryAuthenticator {
 		}
 		
 		if($server->hasEmailAccount()) {
+
 			try {
-				$this->setEmailAccount($ldapUsername, $password, $mappedValues['email'], $server, $user);
-			} catch(\GO\Base\Mail\Exception\ImapAuthenticationFailedException $e) {
+				$this->setEmailAccount($domain, $ldapUsername, $password, $mappedValues['email'], $server, $user);
+			} catch(ImapAuthenticationFailedException $e) {
 
 				//ignore imap failure.
 				ErrorHandler::logException($e);
@@ -134,10 +133,61 @@ class Authenticator extends PrimaryAuthenticator {
 	
 	}
 
+
+	private function addPostfixMailbox($domain, $username, $password, $email, Server $server, User $user) {
+		if(!go()->getModule("community", "serverclient")) {
+			return false;
+		}
+
+		$domains = \go\modules\community\serverclient\Module::getDomains();
+
+		if(!in_array($domain, $domains)) {
+			return false;
+		}
+
+		go()->debug("LDAPAUTH: Adding postfix mailbox for $username to $domain");
+
+		$postfixAdmin = new MailDomain($password);
+
+		try {
+			$postfixAdmin->addMailbox($user, $domain);
+
+			return true;
+		} catch(Exception $e) {
+			ErrorHandler::logException($e);
+		}
+		return false;
+	}
+
+	private function updatePostfixMailbox($domain, $username, $password, $email, Server $server, User $user) {
+		if(!go()->getModule("community", "serverclient")) {
+			return false;
+		}
+
+		$domains = \go\modules\community\serverclient\Module::getDomains();
+
+		if(!in_array($domain, $domains)) {
+			return false;
+		}
+
+		go()->debug("LDAPAUTH: Adding postfix mailbox for $username to $domain");
+
+		$postfixAdmin = new MailDomain($password);
+
+		try {
+			$postfixAdmin->setMailboxPassword($user, $domain);
+
+			return true;
+		} catch(Exception $e) {
+			ErrorHandler::logException($e);
+		}
+		return false;
+	}
+
 	/**
 	 * @throws Exception
 	 */
-	private function setEmailAccount($username, $password, $email, Server $server, User $user) {
+	private function setEmailAccount($domain, $username, $password, $email, Server $server, User $user) {
 		
 		if(!$user->hasModule('legacy', 'email')) {
 			return;
@@ -150,7 +200,13 @@ class Authenticator extends PrimaryAuthenticator {
 					'host' => $server->imapHostname,
 					'username' => $imapUsername
 							))->fetchAll();
-		
+
+		if(!$accounts) {
+			$this->addPostfixMailbox($domain, $username, $password, $email, $server, $user);
+		} else {
+			$this->updatePostfixMailbox($domain, $username, $password, $email, $server, $user);
+		}
+
 		$foundForUser = false;
 		foreach($accounts as $account) {
 			/** @var Account $account */

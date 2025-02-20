@@ -3,6 +3,7 @@
 namespace go\core\data\convert;
 
 use Exception;
+use go\core\db\Column;
 use go\core\event\EventEmitterTrait;
 use go\core\fs\Blob;
 use go\core\fs\File;
@@ -15,7 +16,9 @@ use go\core\orm\exception\SaveException;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\orm\Relation;
+use go\core\util\ArrayObject;
 use go\core\util\DateTime as GoDateTime;
+use go\core\util\StringUtil;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet as PhpSpreadsheet;
@@ -25,6 +28,8 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 use PhpOffice\PhpSpreadsheet\Worksheet\RowIterator;
 use Sabre\VObject\Property\VCard\DateTime;
+use function go\core\util\sorter;
+
 
 /**
  * CSV converter.
@@ -110,7 +115,6 @@ class Spreadsheet extends AbstractConverter {
 	 */
 	protected $spreadsheetRowIterator;
 	private array $highest;
-
 
 	/**
 	 * @inheritDoc
@@ -366,39 +370,36 @@ th {
 		}
 				
 		$path = explode('.', $header);
-		
-		while($seg = array_shift($path)) {
+
+		while ($seg = array_shift($path)) {
 
 			$index = $this->extractIndex($seg);
-			if(isset($index)) {
-				if(!isset($templateValues[$seg][$index])) {
+			if (isset($index)) {
+				if (!isset($templateValues[$seg][$index])) {
 					return "";
-				}else{
+				} else {
 					$templateValues = $templateValues[$seg][$index];
 					continue;
 				}
 			}
-			
-			if(is_array($templateValues)) {
-				if(!isset($templateValues[0])) {		
+
+			if (is_array($templateValues)) {
+				if (!isset($templateValues[0])) {
 					$templateValues = $templateValues[$seg] ?? "";
-				} else
-				{
+				} else {
 					$a = [];
-				
-					foreach($templateValues as $i) {
-						if(is_array($i)) {
+
+					foreach ($templateValues as $i) {
+						if (is_array($i)) {
 							$a[] = $i[$seg] ?? "";
-						} else
-						{
+						} else {
 							$a[] = $i->$seg ?? "";
 						}
 					}
 
 					$templateValues = $a;
 				}
-			}else
-			{
+			} else {
 				$templateValues = $templateValues->$seg ?? "";
 			}
 		}
@@ -471,14 +472,14 @@ th {
 
 	/**
 	 * Override this to add custom headers
-	 * Override "getValue" and "setVallue" too.
+	 * Override "getValue" and "setValue" too.
 	 *
-	 * @param string $entityCls
 	 * @param bool $forMapping
 	 * @return string[][]
 	 * @throws Exception
 	 */
-	protected function internalGetHeaders(bool $forMapping = false) {
+	protected function internalGetHeaders(bool $forMapping = false): array
+	{
 
 		$entityCls = $this->entityClass;
 
@@ -579,7 +580,7 @@ th {
 		if(!($prop instanceof Relation)) {
 			if(!$prop->primary) {
 				//client will define labels if not given. Only custom fields provide label
-				$headers[$header] = ['name' => $header, 'label' => null, 'many' => $many];
+				$headers[$header] = ['name' => $header, 'label' => null, 'many' => $many, 'dbType' => $prop->dbType];
 			}
 			return $headers;
 		}
@@ -711,6 +712,9 @@ th {
 		}
 		$mapping->setMap($this->clientParams['mapping']);
 		$mapping->updateBy =$this->updateBy;
+		$mapping->thousandsSeparator = $this->clientParams['thousandsSeparator'] ?? null;
+		$mapping->decimalSeparator = $this->clientParams['decimalSeparator'] ?? null;
+		$mapping->dateFormat = $this->clientParams['dateFormat'] ?? null;
 		$mapping->name = $this->saveName;
 		$mapping->save();
 
@@ -832,7 +836,7 @@ th {
 		}
 		return $values;
 	}
-	
+
 	protected function setValues(Entity $entity, array $values) {
 		$cf = $values['customFields'] ?? null;
 		unset($values['customFields']);
@@ -922,6 +926,35 @@ th {
 
 				if(!empty($c['many'])) {
 					$v[$propName] = explode(static::$multipleDelimiter, $v[$propName]);
+				}
+
+
+				if($this->extension == 'csv') {
+
+					switch ($c['dbType'] ?? "") {
+						case 'datetime':
+							if (isset($this->clientParams['dateFormat']) && isset($this->clientParams['timeFormat'])) {
+								$dt = \go\core\util\DateTime::createFromFormat($this->clientParams['dateFormat'] . ' ' . $this->clientParams['timeFormat'], $v[$propName]);
+								if ($dt) {
+									$v[$propName] = $dt;
+								}
+							}
+							break;
+						case 'date':
+
+							if (isset($this->clientParams['dateFormat'])) {
+								$dt = \go\core\util\DateTime::createFromFormat($this->clientParams['dateFormat'], $v[$propName]);
+								if ($dt) {
+									$v[$propName] = $dt;
+								}
+							}
+
+							break;
+
+						case 'decimal':
+							$v[$propName] = StringUtil::unlocalizeNumber($v[$propName], $this->clientParams['decimalSeparator'] ?? null, $this->clientParams['thousandsSeparator'] ?? null);
+							break;
+					}
 				}
 			}
 		}

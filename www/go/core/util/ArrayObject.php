@@ -116,7 +116,7 @@ class ArrayObject extends CoreArrayObject implements JsonSerializable {
 	#[\ReturnTypeWillChange]
 	public function jsonSerialize()
 	{
-		if($this->serializeJsonAsObject && empty($this)) 
+		if($this->serializeJsonAsObject && !$this->count())
 		{
 			return new stdClass;
 		} 
@@ -219,6 +219,25 @@ class ArrayObject extends CoreArrayObject implements JsonSerializable {
 	 */
 	public function hasKey(string $name) : bool{
 		return array_key_exists($name, $this->getArrayCopy());
+	}
+
+	/**
+	 * Sort a multi-dimensional array by the sub array's property
+	 *
+	 * @link https://www.php.net/manual/en/function.usort.php#function.usort.examples.closure	 *
+	 * @param string $key
+	 * @return void
+	 */
+	public function multiDimensionalSort(string $key): void
+	{
+		function sorter($key) {
+			return function ($a, $b) use ($key) {
+				return strnatcmp($a[$key], $b[$key]);
+			};
+		}
+		$this->uasort(
+			sorter($key)
+		);
 	}
 
 	

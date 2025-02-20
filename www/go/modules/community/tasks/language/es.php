@@ -37,7 +37,7 @@ return array (
   'Global category' => 'Categoría global',
   'List' => 'Lista',
   'Group name' => 'Nombre del grupo',
-  'Ok' => 'Ok',
+  'Ok' => 'Aceptar',
   'Display options for lists' => 'Opciones de visualización de las hojas de ruta',
   'Default list' => 'Lista por defecto',
   'Start in' => 'Empezar en',
@@ -62,4 +62,7 @@ return array (
   'When' => 'En',
   'Completed tasks' => 'Tareas completadas',
   'You were assigned to this task by {assigner}' => 'Usted fue asignado a esta tarea por {assigner}.',
+  'Show project tasks' => 'Mostrar tareas del proyecto',
+  'Unknown user' => 'Usuario desconocido',
+  'A new task was created in your list by {creator}' => 'Una nueva tarea ha sido creada por  {creator} en tu lista de tareas ',
 );

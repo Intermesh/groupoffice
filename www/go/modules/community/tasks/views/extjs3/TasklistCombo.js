@@ -12,7 +12,8 @@
 		selectOnFocus: true,
 		forceSelection: true,
 		role: null, // set to "list" or "board" to filter the tasklist store
-		allowBlank: false
+		allowBlank: false,
+		groupField: "group"
 	};
 
 	go.modules.community.tasks.TasklistCombo = Ext.extend(go.form.ComboBox, Ext.apply(cfg,
@@ -25,7 +26,10 @@
 						fields: ['id', 'name', {
 							name: "group",
 							type: "relation",
-							fields: ["name"]
+							fields: ["name"],
+							convert: (group) => {
+								return group ? `<span class="tasklists-category-separator">${group.name}</span>` : "";
+							}
 						}],
 						entityStore: this.initialConfig.role && this.initialConfig.role == "support" ? "SupportList" : "TaskList",
 						filters: {
@@ -36,26 +40,17 @@
 						sortInfo: {field: "name", direction: "ASC"},
 						groupField: 'group',
 						groupDir: "ASC",
+						remoteSort: true,
+						remoteGroup: true
 					}
 				);
-				this.tpl = new Ext.XTemplate(
-					'<tpl for=".">',
-					'<tpl if="this.group != values.group">',
-					'<tpl exec="this.group = values.group"></tpl>',
-					'<tpl if="this.group">',
-					'<div class="menu-title">{this.group.name}</div>',
-					'</tpl>',
-					'</tpl>',
-					'<div class="x-combo-list-item">{[Ext.util.Format.htmlDecode(values.name)]}</div>',
-					'</tpl>',
-					'<tpl exec="this.group = null"></tpl>'
-				);
+
 				if (this.initialConfig.role) {
 					this.store.setFilter('role', {role: this.initialConfig.role});
 				}
-				if (go.User.tasksSettings && !("value" in this.initialConfig)) {
-					this.value = this.initialConfig.role == "support" ? go.User.supportSettings.defaultTasklistId : go.User.tasksSettings.defaultTasklistId;
-				}
+				// if (go.User.tasksSettings && !("value" in this.initialConfig)) {
+				// 	this.value = this.initialConfig.role == "support" ? go.User.supportSettings.defaultTasklistId : go.User.tasksSettings.defaultTasklistId;
+				// }
 			}
 	}));
 

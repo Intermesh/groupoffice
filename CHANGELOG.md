@@ -1,8 +1,286 @@
+20-02-2025: 6.8.104
+- Addressbook: Translate phone types to nl
+- Core: Updated Spanish translation with special thanks to Diputación de Huelva
+- Email: Fixed sending problem with gmail because of change in oauth2-client 2.8.0. We reverted to 2.7.0: https://github.com/PHPMailer/PHPMailer/issues/3131 and https://github.com/thephpleague/oauth2-client/issues/1052
+
+17-02-2025: 6.8.103
+- Timeregistration: Don't user user e-mail in dissapprove mail because it may lead to problems with the system settings mail server configuration not allowing this from addrers.
+- Finance: Always show PDF button
+- Finance: Keep catalog state when adding from catalog
+
+11-02-2025: 6.8.102
+- Core: Fixed html editor bug where style was removed if you deleted the first character
+
+11-02-2025: 6.8.101
+- Core: Fixed bug in html table editor plugin causing form load errors and sometimes the resize handlers were submitted
+
+10-02-2025: 6.8.100
+- ActiveSync: Fixed Android showing all calendars with e-mail address
+- Finance: Added "creator" to e-mail templates
+- Finance: Use default country in Zugferd.
+- Finance: Fixed missing address data in Zugferd XML
+- OAuth2Client: fix minor bug openID login
+- History: Fixed Stored XSS Vulnerability via user's name field (GHSA-j7p3-v652-p3gf)
+- Core: Added referrer-policy header for increased privacy
+- Time registration: allow employee to export registrations
+- Core: Image resize and table edit plugin thanks to Polarismail
+- Finance: Improved unit cost, price and margin field logic
+- Site / Defaultsite: deprecate module status.
+
+03-02-2025: 6.8.99
+- Core: Implemented SourceGuardian version >= 14 check. Fixes Last release 6.8 SourceGuardian mandatory #1216
+- Wopi / Collabora: Corrected locale name en_uk to en_gb. Users with en_UK locale are not able to use Collabora #1220
+- Finance: Sort books by name in combo
+- Finance: Don't count empty lines in VAT totals
+- Finance: Migrate billing B2C. Handle case when no company is set on invoices.
+- Finance: Invalid foreign key
+- Catalog: Fixed uninstall typo in table
+- Finance: Check if default lang is found and don;t validate html custom fields. Fixes #1222.
+
+27-01-2025: 6.8.98
+- Calendar: Minor fix import ICS and international characters
+
+23-01-2025: 6.8.97
+- Finance: revert updating margin from unit cost change. But only update price if the margin is set.
+- Finance: Copy project links when duplicating finance docs
+- Finance: Copy custom fields and set recipient from customer when duplicating finance docs
+- Contracts: Add unit too like in finance
+- Finance: draft invoices with delivery date set didn't show up in list when filtering on drafts
+- Finance: Fixed invalid article category constraint
+- Core: Fixed export import of attachment custom field. Also used in finance migration.
+- Finance: Fixed sql error in finance migration
+
+20-01-2024: 6.8.96
+- CardDav: deprecated DavTask model, updated cleanup script
+- Finance / Core: Fixed HTML editor labels in Dark mode by always showing html editor toolbar
+- Finance: Fixed status filter showing some items with different status in the list
+- Finance: Removed separate finance options from link menu and created select book step between
+- Finance: Added unit to finance documents and catalog articles
+- Finance: Added unit to invoice items (disabled by default) and made shown item fields configurable.
+- Finance: update margin field instead of price when adding costs
+
+14-01-2024: 6.8.95
+- SMIME: OSCP check not shown as error when no OSCP info is present
+- Core: Select font family and size for PDF templates
+- Core: Improved rendering quality of PDF
+
+10-01-2024: 6.8.94
+- Core: Increased font size to match the font size in legacy lib
+- Finance: Changed library for Zugferd and UBL e-invoicing
+- Finance: Handle missing address for Zugferd
+
+10-01-2024: 6.8.93
+- Finance: Option to migrate all from billing automatically.
+- Finance / Core: Copy paste PDF and e-mail templates
+
+06-01-2024: 6.8.92
+- Core: Fixed that cron could get stuck when an error occurred in a job
+- Core: Module "vendor" folders were not included in the build
+- Core: Updated German translation
+- E-mail: Restored long lost quota warning style
+- Core: Updated PL holidays (Github #1212)
+- Core: Create separate alert for each error while importing new entities
+
+23-12-2024: 6.8.91
+- Tasks: fix several bugs in ICS import
+- OAuth2 client: return more informative exception if a session variable is missing.
+- Core: Slightly more helpful debug data upon validation errors import
+
+12-12-2024: 6.8.90
+- Core: Show database error on upgrade
+- Addressbook: Check if comments module is installed
+
+09-12-2024: 6.8.89
+- Address book: Added "Last contact at" column that updates when a comment is made or an e-mail is linked
+- Address book: Made action date a regular property of contacts
+- Finance: replace invalid chars for filenames when saving PDF's
+- Tasks: MySQL 9 compatibility change
+- Core: MySQL 9 compatibility change
+ 
+02-12-2024: 6.8.88
+- Calendar: When events are private but writable. Posting the event with CalDAV will not change the title or description
+- Files: Detail panel will change to folder when a different folder is selected in the tree.
+- Core: Fixed checkbox custom field filter to match null values when client sends 'false'
+- ldapauth: Create postfixadmin account if domain matches serverclient domain
+- Finance: Fixed group by employee when billing from projects
+- History: History was depending on address book module by mistake
+- Files: bugfix file notification
+- Billing: Fixed catalog export number formatting
+- Billing: Fixed order xls export
+- ldapauth: handle error: Partial search results returned: Sizelimit exceeded
+- Core: fixed displacement of context menu
+
+25-11-2024: 6.8.87
+- Core: Added new option to toggle use of ctrl + enter to send e-mail / comments
+- Billing: Import and export custom fields and match by ID
+- Newsletters: Fixed newsletter template attachments not saving.
+
+18-11-2024: 6.8.86
+- Files: cron job file notification
+- Core: updated german translation
+- Various: route to main grid when details resets / is deleted for mobile view
+- Privacy settings: several bug fixes in addressbook overrides
+- projects2: automatically convert old project_templates_events to tasks
+- Collabora: Added lang variable for collabora
+- Finance: Migration checks if all custom fields are available
+
+11-11-2024: 6.8.85
+- Billing: Fixed undefined index 'sort'
+
+11-11-2024: 6.8.84
+- Billing: Sort on price and supplier
+- Core: Bugfix when editing custom fieldset. Also enable editing of fieldset with parent fieldset
+- Core: Default request timeout to 30s instead 3 minutes
+- Finance: Fixed error when dragging existing items to another group
+
+04-11-2024: 6.8.83
+- Email: Larger move old mail dialog. Also scrollable and resizable
+- Core: Fixed issue in combobox resetting with promise race condition
+- Tasks: Fixed horizontal scrollbar in some cases
+
+04-11-2024: 6.8.82
+- Core: performance hotfix
+
+04-11-2024: 6.8.81
+- Core: Admin can change passwords without using own password again
+- Email: Set references header when forwarding mail
+- Newsletters: fix php compatibility error when sending newsletters
+- Supportclient: make creation dialog wider to fit format toolbar
+- Calendar: fix more HTML encoding issues in Qtip
+
+28-10-2024: 6.8.80
+- Core: bugfix editing individual field set in entity
+- Core: bugfix user export
+- Core: Several bug fixes user import
+
+24-10-2024: 6.8.79
+- E-mail: Server side sort was disabled by accident since May 2024
+- Caldav: Fixed CalDAV sync with DAVx5 error #1192
+- ActiveSync: Fixed Sync in Outlook (Z-push/Activesync) problem #1193
+- Core: Fixed problem in demo data creation
+
+21-10-2024: 6.8.78
+- E-mail: Set internal date on IMAP APPEND command's. This way the internal date when moving or copying messages to another account is preserved
+- Core: added endpoint api/up.php that checks the database connection and filesystem disks for uptime monitoring.
+- Core / e-mail: Fixed problem where typing ü would insert a , in the mail composer on german QWERTZ layout
+- E-mail: Fix 'delete all attachments' bug.
+
+14-10-2024: 6.8.77
+- Timeregistration: Fixed time dialog tracking time starting at midnight
+- Newsletters: fix missing property error when sending newsletter with attachment
+- Smime: Handle two valid certficates for the same sender
+- Comments / support: display download icon in order to directly download a comment attachment.
+
+08-10-2024: 6.8.76
+- ActiveSync: Fixed fatal error because of breaking change in z-push
+- Calendar: fix invitations in readonly calendars
+
+07-10-2024: 6.8.75
+- Core: Make sure groupoffice core module is always sorted first
+- Tasks: sort task combo by task list first, title second
+- Core: tweak keyword splitting to support double surnames separated by a dash (e.g. Catherine Zeta-Jones)
+- Finance: Don't send statements to customers with a negative amount to be paid
+
+30-09-2024: 6.8.74
+- Tasks: select default tasklist for user more intelligently
+- Finance: Change document owner
+- Contracts: Change document owner
+- Workflow: Fixed using UTF8 in workflow history
+- Workflow: Make workflow grid work for admins too
+- Calendar: Fix several HTML encoding / decoding issues in Qtip
+- E-mail: Update oauth2 token after refresh. Fixes authentication failed error.
+
+23-09-2024: 6.8.73
+- Core: fix error when importing CSV
+- Finance: Check if project has a customer set before creating an invoice
+- Email: Fix for email not showing ics file when method is not set.
+
+16-09-2024: 6.8.72
+- Calendar: fix HTML code in Qtip
+- Core: Fixed PHP 8.3 compatibility issue: PHP Fatal error:  During inheritance of IteratorAggregate: Uncaught ErrorException: Return type of GO\\Base\\Db\\Statement::getIterator() should either be compatible with IteratorAggregate::getIterator(): Traversable, or the #[\\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /var/customers/webs/office/office.domain.tld/go/base/db/Statement.php:578
+- Caldav: Fixed users being able to write in read only calendars
+- E-mail: Date was lost if message was an smime signed attachment with headers without the date
+- Core: Provide date, time and number formatting for csv imports
+- Email: fix error when moving or copying to a folder with a % in its name
+- Business: add row actions to business grid, fix deleting finance books when deleting business record.
+- Business: add row actions to activities grid.
+- Finance: Add counter when multiple books of the same type are created upon installation
+- Core: Updated German language
+- Serverclient: urlencode token
+
+09-09-2024: 6.8.71
+- Files: Fix PHPMailer compatibility issue
+- Core / Studio: fix error when initially loading combobox value
+- Calendar: Fixed invalid error message when sending invites
+- E-mail: Errors were not shown correctly
+- Leavedays: Fixed rounding issue which lead to slightly off numbers in the decimals
+
+05-09-2024: 6.8.70
+- Sieve: text label Out of Office more clear
+- Core: Mask hashes in history log
+- Core: Fixed various invalid mail send() errors
+
+04-09-2024: 6.8.69
+- ActiveSync: Sending mail reported an error during sent even though it was actually sent
+
+03-09-2024: 6.8.68
+- Billing: Fixed Uncaught exception: Access level to GO\Billing\Pdf::$pageWidth must be protected (as in class GO\Base\Util\Pdf) or weaker at 2024-09-03T08:58:25+02:00
+
+02-09-2024: 6.8.67
+- Finance: Fixed additional PDF templates not working
+- Tasks: Message field was mandatory by mistake
+- Calendar: fixed sprintf() problem with repeating every 2 years
+- Core: Use standard remove format button instead of word paste in html editor
+- Email: Send charset for search as it didn't work without it when using utf8 with a large Polish provider
+- Calendar / core: fix page width when printing current view
+- Finance: Add articles from catalog dialog
+- Catalog: Organize articles in categories
+- Email: check 'automatically save in Sent' checkbox by default as per install script
+- Tasks: In 'Continue task' dialog, make sure that all buttons are shown.
+- Finance: Add project billing for finance
+- Email: show next message in selected mailbox after moving current message
+
+26-08-2024: 6.8.66
+- Core: Fixed header Y coord not working on PDF templates
+- Core: Add several filters to PDF template parser
+- Finance: Fixed search in books
+- Finance: Refresh statuses after book update
+- Finance: Fixed Implicit conversion from float-string \"17.5000\" to int loses precision
+- Finance: minor bugfix optional article description
+- Time registration: fix display issue task combo in dialog
+- Email: Remove starttls. tls does the job.
+
+19-08-2024: 6.8.65
+- Core: Attachments Custom field now shows files grid when configured as pictures
+- Tasks / support: accent class for grouping separator
+- Business: allow users with mayManageEmployees to create or destroy agreements
+- Core: more helpful / less generic "Add link" button icon
+
+13-08-2024: 6.8.64
+- Core: PHP 8.2 compatibility fix
+- Core: Fixed combobox not loading value in Account dialog causing DB error
+
+12-08-2024: 6.8.63
+- Core: Don't require security token check in legacy API when not using cookies for authentication
+- Core: HTML field supports required
+- Tasks: Fixed grouping in combo and showing numeric value. Related to support ticket #32767
+- Email: Raised IMAP and SMTP username database length from 50 to 190
+- Caldav: Fixed sending IMIP email invitations to participants with a comma in them
+- Tasks: Added some indexes to speed up search query
+- Webdav: Removed tickets directory from webdav as it will cause permission issues
+- Email: Autolink checks didn't show when viewing for the first time
+- Caldav: Include sabre/dav iCalendar Export Plugin #1169
+- Studio: generate title() method properly in backend code. #1166
+
+29-07-2024: 6.8.62
+- ActiveSync: Restored correct ActiveSync Z-Push version
+
+19-07-2024: 6.8.61
 - Email: Fix attachment problem with ampersands in file name.
 - Email: Display files with ampersands in file name correctly, fix download link.
 
 15-07-2024: 6.8.60
-- Busisess: allow users with mayManageEmployees to update their agreements
+- Business: allow users with mayManageEmployees to update their agreements
 - Core: make conditionally required, required and conditionally hidden mutually exclusive
 
 09-07-2024: 6.8.59

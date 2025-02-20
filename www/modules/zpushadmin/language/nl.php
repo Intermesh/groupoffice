@@ -1,8 +1,7 @@
 <?php
 return array (
-	'name' => 'ActiveSync',
-	'description' => 'Beheer z-push synchronisatie.',
-
+  'name' => 'ActiveSync',
+  'description' => 'Beheer z-push synchronisatie.',
   'Device' => 'Apparaat',
   'Device ID' => 'Apparaat ID',
   'Device Type' => 'Apparaat Type',
@@ -34,5 +33,8 @@ return array (
   'Model' => 'Model',
   'Imei' => 'Imei',
   'SMS' => 'SMS',
-  'Errors' => 'Errors',
+  'Errors' => 'Fouten',
+  'Resync' => 'Resync',
+  'ActiveSync management' => 'ActiefSync-beheer',
+  'ActiveSync' => 'ActiveSync',
 );

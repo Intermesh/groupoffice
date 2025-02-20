@@ -4,6 +4,7 @@
 namespace GO\Smime;
 
 use GO;
+use go\core\exception\Unauthorized;
 use GO\Smime\Model\Smime;
 
 
@@ -78,10 +79,18 @@ class EventHandlers {
 
 			$newResponse = $message->toOutputArray(true);
 
-			unset($newResponse['sender']);
-			unset($newResponse['from']);
-			unset($newResponse['to']);					
-			unset($newResponse['cc']);
+			unset($newResponse['sender'],
+				$newResponse['from'],
+				$newResponse['full_from'],
+				$newResponse['size'],
+				$newResponse['reply_to'],
+				$newResponse['to'],
+				$newResponse['cc'],
+				$newResponse['date'],
+				$newResponse['udate'],
+				$newResponse['labels']
+			);
+
 					
 			foreach ($newResponse as $key => $value) {
 				if (!empty($value) || $key == 'attachments')
@@ -104,37 +113,60 @@ class EventHandlers {
 
 		$date = date('Y-m-d H:i:s', $imapMessage->udate);
 
-		$cert = (new GO\Smime\Model\Smime($imapMessage->account->id))->latestCert($date);
+		$nocerts = true;
+		$certs = (new GO\Smime\Model\Smime($imapMessage->account->id))->validCerts($date);
+		// try multiple certs if there are more known because it might be encrypted using an older  one
+		foreach($certs as $cert) {
 
-		if (!$cert || empty($cert->cert)) {
-			GO::debug('SMIME: No private key at all found for this account');
-			$response['htmlbody'] =GO::t("This message is encrypted and you don't have the private key to decrypt this message.", "smime");
-			return false;
+			if (!$cert || empty($cert->cert)) {
+				GO::debug('SMIME: No private key at all found for this account');
+				$response['htmlbody'] = GO::t("This message is encrypted and you don't have the private key to decrypt this message.", "smime");
+				continue;
+			}
+
+			$nocerts = false;
+
+			if (isset($_REQUEST['password']))
+				GO::session()->values['smime']['passwords'][$imapMessage->account->id] = $_REQUEST['password'];
+
+			if (!isset(GO::session()->values['smime']['passwords'][$imapMessage->account->id])) {
+				$response['askPassword'] = true;
+				GO::debug("Need to ask for password");
+				return false;
+			}
+
+			$password = GO::session()->values['smime']['passwords'][$imapMessage->account->id];
+			$infile = \GO\Base\Fs\File::tempFile();
+
+			if (!$imapMessage->saveToFile($infile->path()))
+				throw new \Exception("Could not save IMAP message to file for decryption");
+
+			try {
+				$outfile = $cert->setPassword($password)->decryptFile($infile);
+			} catch(Unauthorized $e) {
+				$outfile = false;
+			}
+
+			if ($outfile === false) {
+				$response['askPassword'] = true;
+				return;
+			} else if(is_string($outfile)) {
+				//failed decrypting
+				continue;
+			} else {
+				break;
+			}
+
 		}
 
-		if (isset($_REQUEST['password']))
-			GO::session()->values['smime']['passwords'][$imapMessage->account->id] = $_REQUEST['password'];
-
-		if (!isset(GO::session()->values['smime']['passwords'][$imapMessage->account->id])) {
-			$response['askPassword'] = true;
-			GO::debug("Need to ask for password");
-			return false;
-		}
-
-		$password = GO::session()->values['smime']['passwords'][$imapMessage->account->id];
-		$infile = \GO\Base\Fs\File::tempFile();
-
-		if(!$imapMessage->saveToFile($infile->path()))
-			throw new \Exception("Could not save IMAP message to file for decryption");
-
-		$outfile = $cert->setPassword($password)->decryptFile($infile);
-
-		if($outfile === false) {
-			$response['askPassword'] = true;
+		if (isset($outfile) && is_string($outfile)) { // failed decrypting
+			$response['htmlbody'] = $outfile;
 			return;
 		}
-		if(is_string($outfile)) { // failed decrypting
-			$response['htmlbody'] = $outfile;
+
+		if ($nocerts) {
+			GO::debug('SMIME: No private key at all found for this account');
+			$response['htmlbody'] = GO::t("This message is encrypted and you don't have the private key to decrypt this message.", "smime");
 			return;
 		}
 

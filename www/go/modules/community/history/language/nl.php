@@ -7,7 +7,7 @@ return array (
   'Changes' => 'Wijzigingen',
   'Action' => 'Actie',
   'Actions' => 'Acties',
-  'Types' => 'Types',
+  'Types' => 'Typen',
   'Create' => 'Maken',
   'Update' => 'Bewerken',
   'Delete' => 'Verwijderen',
@@ -18,4 +18,6 @@ return array (
   'Entity' => 'Entitieit',
   'Bad login' => 'Verkeerd ingelogd',
   'Delete entries after' => 'Verwijderer records na',
+  'Request ID' => 'ID aanvragen',
+  'Entity ID' => 'Identiteit van de entiteit',
 );

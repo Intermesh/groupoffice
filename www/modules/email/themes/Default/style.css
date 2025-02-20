@@ -51,11 +51,15 @@
 
 .em-statusbar-body span{
 line-height:21px !important;
-padding-left:2px;
+/*padding-left:2px;*/
 }
 
 .em-usage-95{
+	background-color: #fdc1bb;
 	color:red !important;
+	border: 1px solid red;
+	border-radius: 8px;
+	padding: 8px;
 	font-weight:bold !important;
 	line-height: 20px !important;
 }

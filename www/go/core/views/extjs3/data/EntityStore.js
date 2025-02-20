@@ -11,8 +11,8 @@
  * It will pass:
  * 
  * store: the entity store
- * added: Object Entity object mapped by ID
- * changed: Object Entity object mapped by ID
+ * added: int[]|string[] array of ids's
+ * changed: int[]|string[] array of ids's
  * destroyed: int[]|string[] array of ids's
  *
  * Do not instantiate directly use:
@@ -149,9 +149,12 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		
 		this.isComplete = false;
 
+		window.indexedDB.deleteDatabase("goui") //quick hack to delete goui stores. This works well in develop.
+
 		return Promise.all([
 			this.metaStore.clear(),
 			this.stateStore.clear(),
+
 
 		]).then(() => {
 			return Promise.all([

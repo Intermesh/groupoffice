@@ -211,6 +211,9 @@ class Calendar extends \GO\Base\Model\AbstractUserDefaultModel {
 	 * Remove all events
 	 */
 	public function truncate(){
+		// could take some time on large calendars.
+		set_time_limit(0);
+
 		$events = $this->events;
 		
 		foreach($events as $event){

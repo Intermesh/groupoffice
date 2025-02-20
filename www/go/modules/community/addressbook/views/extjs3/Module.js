@@ -64,6 +64,12 @@ go.Modules.register("community", "addressbook", {
 				type: 'string'
 			},
 			{
+				title: t("Last contact at"),
+				name: 'lastcontactat',
+				multiple: false,
+				type: 'date'
+			},
+			{
 				title: t("Commented at"),
 				name: 'commentedat',
 				multiple: false,

@@ -128,8 +128,8 @@ return array (
   'after' => 'después de',
   'description' => 'Gestión de reglas para filtrado automático de correos',
   'Test' => 'Prueba',
-  'Ok' => 'Ok',
-  'autoReplyMessage' => 'autoReplyMessage',
+  'Ok' => 'Aceptar',
+  'autoReplyMessage' => 'Mensaje de autorespuesta',
   'Body doesn\'t match' => 'El cuerpo no coincide',
   'Body matches' => 'El cuerpo coincide',
   'Subject doesn\'t match' => 'El asunto no coincide',
@@ -143,4 +143,5 @@ return array (
   'Sieve' => 'Tamizar',
   'Activate' => 'Activar',
   'Senders will only be notified periodically. You can set the number of days below.' => 'Los remitentes sólo recibirán notificaciones periódicamente. Puede establecer el número de días a continuación.',
+  'Mailing list' => 'Lista de correo',
 );

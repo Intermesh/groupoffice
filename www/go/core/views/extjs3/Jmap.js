@@ -10,7 +10,7 @@ go.Jmap = {
 
 	paused: 0,
 
-	requestTimeout: 180000,
+	requestTimeout: 30000,
 
 	/**
 	 * Enable for XDEBUG profiling
@@ -510,7 +510,7 @@ go.Jmap = {
 
 				for(var i = 0, l = opts.jsonData.length; i < l; i++) {
 					var clientCallId = opts.jsonData[i][2];
-					this.requestOptions[clientCallId].reject({message: response.responseText});
+					this.requestOptions[clientCallId].reject({message: response.isTimeout ? t("The request timed out. The server took too long to respond. Please try again.") :  response.responseText});
 					delete this.requestOptions[clientCallId];
 				}
 

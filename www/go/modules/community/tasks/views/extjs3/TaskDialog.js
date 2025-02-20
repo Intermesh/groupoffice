@@ -19,9 +19,10 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		}
 
 
-		if(!this.currentId && this.commentComposer) {//} && this.role == "support") {
+		if (!this.currentId && this.commentComposer) {//} && this.role == "support") {
 			this.commentComposer.show();
-			if(this.role == "support") {
+			this.commentComposer.editor.allowBlank = this.role !== "support";
+			if(this.role === "support") {
 				this.descriptionFieldset.hide();
 			}
 
@@ -33,9 +34,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 				if(this.commentComposer.editor.getValue() != "")
 					this.commentComposer.save(this.role == "support" ? "SupportTicket" : "Task", this.currentId);
 			}, {single:true})
-		} else
-		{
+		} else {
 			this.commentComposer.hide();
+			this.commentComposer.editor.allowBlank = true;
 			this.descriptionFieldset.show();
 		}
 	},
@@ -58,6 +59,13 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 				}
 				break;
 		}
+	},
+
+	onLoad: function() {
+		if (go.User.tasksSettings && !this.tasklistCombo.value) {
+			this.tasklistCombo.value = this.initialConfig.role === "support" ? go.User.supportSettings.defaultTasklistId : go.User.tasksSettings.defaultTasklistId;
+		}
+
 	},
 
 	setLinkEntity: function (cfg) {
@@ -110,7 +118,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			this.title = t("Ticket", "support", "business");
 		}
 		this.supr().initComponent.call(this);
-		},
+	},
 
 	initFormItems: function () {
 		const start = {
@@ -230,24 +238,13 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		});
 
 		this.recurrenceField = new go.form.RecurrenceField({
-			anchor: "100%",
+			anchor: "-20",
 			name: 'recurrenceRule',
 			hidden: this.hideRecurrence || this.role == "support",
 			disabled: true
 		})
 
-
-		const propertiesPanel = new Ext.Panel({
-			hideMode: 'offsets',
-			//title : t("Properties"),
-			labelAlign: 'top',
-			layout: 'form',
-			autoScroll: true,
-			items: [{
-				xtype: "container",
-				layout: "form",
-
-				items: [
+		const items = [
 					{
 
 						xtype: 'fieldset',
@@ -271,7 +268,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 								flex: 1,
 								disabled: this.role != "support",
 								hidden: this.role != "support",
-								anchor: undefined,
+								anchor: "-20",
 								fieldLabel: t('Customer'),
 								hiddenName: 'createdBy',
 								allowBlank: false,
@@ -281,6 +278,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 							this.ccField = new go.form.RecipientCombo({
 								fieldLabel : t("CC", "email"),
 								name : 'cc',
+								anchor: "-20",
 								flex: 1,
 								hidden: this.role != "support",
 								disabled: this.role != "support",
@@ -289,7 +287,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						]
 
 
-					}, {
+					},{
 						xtype: 'fieldset',
 						defaults: {
 							layout: 'form',
@@ -316,15 +314,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 								this.recurrenceField
 							]
 						},
-
-
-
-
 					},
 					{
 						xtype: "fieldset",
-						// collapsible: true,
-						// title: t("Assignment"),
 						items: [{
 							xtype: "container",
 							cls: "go-hbox",
@@ -350,7 +342,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 								})
 
 								]
-						},
+							},
 							{
 								xtype: "chips",
 								entityStore: "TaskCategory",
@@ -379,8 +371,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 					this.descriptionFieldset = new Ext.form.FieldSet({
 						xtype: "fieldset",
-						// collapsible: true,
-						// title: t("Other"),
 						defaults: {
 							anchor: '100%'
 						},
@@ -389,7 +379,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 							{
 								xtype: 'textarea',
 								name: 'description',
-								//allowBlank : false,
 								fieldLabel: t("Description"),
 								grow: true
 
@@ -406,39 +395,17 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 					{
 						xtype: "fieldset",
-						// collapsible: true,
 						title: t("Alerts"),
 						items: [new go.modules.community.tasks.AlertFields()]
 					}
-
-
-
-				]
-			}]
-
-
-		});
-
+				];
 
 		if(go.Modules.isAvailable("community", "comments")) {
 			this.commentComposer = new go.modules.comments.ComposerFieldset();
-			const pnl = propertiesPanel.items.itemAt(0);
-			pnl.insert(pnl.items.getCount() - 1, this.commentComposer);
+
+			items.splice(items.length - 1,0, this.commentComposer);
 		}
 
-
-
-		//this.recurrencePanel = new go.modules.community.tasks.RecurrencePanel();
-
-		this.tabPanel = new Ext.form.FieldSet({
-			activeTab: 0,
-			deferredRender: false,
-			border: false,
-			anchor: '100% 100%',
-			hideLabel: true,
-			items: []
-		});
-
-		return [propertiesPanel];//this.tabPanel;
+		return items;
 	}
 });

@@ -12,7 +12,7 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 		this.createGrid();
 		
 		this.sidePanel = new Ext.Panel({
-			width: dp(300),
+			width: dp(330),
 			cls: 'go-sidenav',
 			region: "west",
 			split: true,
@@ -28,6 +28,7 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 
 		this.searchField = new go.SearchField({
 			anchor: "100%",
+			flex:true,
 			handler: function(field, v){
 				this.search(v);
 			},
@@ -41,9 +42,18 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 			region: "north",
 			autoHeight: true,
 			items: [{
-					xtype: "fieldset",
-					items: [this.searchField]
-				}]
+				xtype: "fieldset",
+				layout:'hbox',
+				items: [{
+					xtype:'button',
+					cls: 'go-narrow',
+					//margins:{right:dp(8)},
+					iconCls: "ic-menu",
+					handler: () => {
+						this.sidePanel.show();
+					}
+				},this.searchField]
+			}]
 		});
 
 		this.items = [search, {xtype:'panel',layout:'responsive',region:'center', items:[this.grid,  this.sidePanel]}];
@@ -115,7 +125,7 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 			{
 				//this class will hide it on larger screens
 				cls: 'go-narrow',
-				iconCls: "ic-arrow-forward",
+				iconCls: "ic-close",
 				tooltip: t("Contacts"),
 				handler: function () {
 					this.grid.show();

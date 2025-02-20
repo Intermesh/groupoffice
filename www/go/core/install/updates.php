@@ -2,7 +2,6 @@
 
 use go\core\App;
 use go\core\auth\ForcePasswordChange;
-use go\core\db\Table;
 use go\core\util\ClassFinder;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Expression;
@@ -1604,3 +1603,70 @@ $updates['202405171539'][] = "alter table core_acl
     add constraint core_acl_ibfk_1
         foreign key (entityTypeId) references core_entity (id) on delete set null;";
 
+
+$updates['202409160946'][] = "alter table core_import_mapping
+    add dateFormat varchar(20) null;";
+
+$updates['202409160946'][] = "alter table core_import_mapping
+    add timeFormat varchar(20) null;";
+
+$updates['202409160946'][] = "alter table core_import_mapping
+    add decimalSeparator char null;";
+
+$updates['202409160946'][] = "alter table core_import_mapping
+    add thousandsSeparator char null;";
+
+
+
+$updates['202410310946'][] = "alter table core_acl_group
+    drop foreign key core_acl_group_ibfk_2;";
+
+$updates['202410310946'][] = "alter table core_acl_group
+    add constraint core_acl_group_ibfk_2
+        foreign key (aclId) references core_acl (id)
+            on update cascade on delete cascade;";
+
+
+$updates['202410310946'][] = "alter table core_acl_group_changes
+    drop foreign key `all`;";
+
+$updates['202410310946'][] = "alter table core_acl_group_changes
+    add constraint `all`
+        foreign key (aclId) references core_acl (id)
+            on update cascade on delete cascade;";
+
+$updates['202410310946'][] = "alter table core_search
+    drop foreign key core_search_ibfk_2;";
+
+$updates['202410310946'][] = "alter table core_search
+    add constraint core_search_ibfk_2
+        foreign key (aclId) references core_acl (id)
+            on update cascade on delete cascade;";
+
+
+$updates['202411221010'][] = "alter table core_user
+    add enableSendShortcut boolean default true not null;";
+
+$updates['202412090921'][] = "alter table core_auth_token
+    add constraint core_auth_token_pk
+        unique (accessToken);
+";
+
+$updates['202412090921'][] = "drop index accessToken on core_auth_token;";
+
+
+
+$updates['202501141553'][] = "alter table core_pdf_template
+    add fontFamily varchar(100) default 'dejavusans' not null;";
+
+$updates['202501141553'][] = "alter table core_pdf_template
+    add fontSize tinyint default 10 null;";
+
+
+$updates['202501141553'][] = "UPDATE core_user t
+SET t.language   = 'en_gb'
+WHERE t.language='en_uk';";
+
+$updates['202501141553'][] = "UPDATE core_user t
+SET  t.holidayset = 'en_gb'
+WHERE t.holidayset='en_uk';";

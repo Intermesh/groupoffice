@@ -3,6 +3,7 @@ namespace go\core\acl\model;
 
 use go\core\model\Acl;
 use go\core\orm\exception\SaveException;
+use go\core\util\ArrayObject;
 
 trait AclSetterTrait {
 
@@ -62,16 +63,18 @@ trait AclSetterTrait {
 	 * @return array eg. ["2" => 50, "3" => 10]
 	 * @throws Exception
 	 */
-	public function getAcl(): ?array
+	public function getAcl(): ArrayObject
 	{
 		$a = $this->findAcl();
 
+		$acl = new ArrayObject();
+		$acl->serializeJsonAsObject = true;
+
 		if(empty($a->groups)) {
 			//return null because an empty array is serialzed as [] instead of {}
-			return null;
+			return $acl;
 		}
 
-		$acl = [];
 		if($a) {
 			foreach($a->groups as $group) {
 				$acl[$group->groupId] = $group->level;
@@ -95,7 +98,7 @@ trait AclSetterTrait {
 	 * ]);
 	 * ```
 	 */
-	public function setAcl(?array $acl)
+	public function setAcl(array|ArrayObject|null $acl)
 	{
 		$this->setAcl = $acl;
 	}

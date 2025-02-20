@@ -247,5 +247,15 @@ Het volgende is de foutmelding:
   'description' => 'Agenda module; Iedere gebruiker kan afspraken toevoegen, bewerken of verwijderen. Ook kunnen afspraken van andere gebruikers worden ingezien en als het nodig is aangepast worden.',
   'Calendar' => 'Agenda',
   'Status' => 'Status',
-	'Cancelled' => "Geannuleerd"
+  'Cancelled' => 'Geannuleerd',
+  'colors' => 'kleuren',
+  'Visible tasklists' => 'Zichtbare takenlijsten',
+  'Tasklist' => 'Takenlijst',
+  'Remove duplicates' => 'Duplicaten verwijderen',
+  'Show event statuses in views' => 'Gebeurtenissenstatus tonen in weergaven',
+  'Check for conflicts' => 'Controleren op conflicten',
+  'Ok' => 'OK',
+  'Note that if the event is marked as private, the files of this event are still accessible by users who have permissions to this event\'s calendar.' => 'Merk op dat als de gebeurtenis als privﾃｩ wordt gemarkeerd, de bestanden van deze gebeurtenis nog steeds toegankelijk zijn voor gebruikers die rechten hebben op de agenda van deze gebeurtenis.',
+  'Start' => 'Begin',
+  'Only show this field set for selected calendar groups' => 'Dit veld alleen tonen voor geselecteerde agendagroepen',
 );

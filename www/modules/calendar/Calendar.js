@@ -48,7 +48,8 @@ GO.calendar.formatQtip = function(data,verbose)
 		str += '<br />'+t("Status", "calendar")+': ';
 		
 		if(t("statuses", "calendar")[data.status]){
-			str+=Ext.util.Format.htmlEncode(t("statuses", "calendar")[data.status]);
+			// str+=Ext.util.Format.htmlEncode(t("statuses", "calendar")[data.status]);
+			str+=t("statuses", "calendar")[data.status];
 		}else
 		{
 			str+=data.status;
@@ -57,12 +58,14 @@ GO.calendar.formatQtip = function(data,verbose)
 
 	if(!GO.util.empty(data.calendar_name))
 	{
-		str += '<br />'+t("Calendar", "calendar")+': '+Ext.util.Format.htmlEncode(data.calendar_name);
+		// str += '<br />'+t("Calendar", "calendar")+': '+Ext.util.Format.htmlEncode(data.calendar_name);
+		str += '<br />'+t("Calendar", "calendar")+': '+data.calendar_name;
 	}
 
 	if(!GO.util.empty(data.username))
 	{
-		str += '<br />'+t("Owner")+': '+Ext.util.Format.htmlEncode(data.username);
+		// str += '<br />'+t("Owner")+': '+Ext.util.Format.htmlEncode(data.username);
+		str += '<br />'+t("Owner")+': '+data.username;
 	}
 
 	str += '<br />'+t("Created at")+': '+data.creationDate.format(GO.settings.date_format+' '+GO.settings.time_format);
@@ -71,28 +74,32 @@ GO.calendar.formatQtip = function(data,verbose)
 		
 	if(verbose && !GO.util.empty(data.musername))
 	{
-		str += '<br />'+t("Modified by")+': '+Ext.util.Format.htmlEncode(data.musername);
+		// str += '<br />'+t("Modified by")+': '+Ext.util.Format.htmlEncode(data.musername);
+		str += '<br />'+t("Modified by")+': '+data.musername;
 	}
 	
 	if(!GO.util.empty(data.location))
 	{
-		str += '<br />'+t("Location", "calendar")+': '+Ext.util.Format.htmlEncode(data.location);
+		// str += '<br />'+t("Location", "calendar")+': '+Ext.util.Format.htmlEncode(data.location);
+		str += '<br />'+t("Location", "calendar")+': '+data.location;
 	}
-	
+
 	if(!GO.util.empty(data.description))
 	{
-		str += '<br /><br />'+GO.util.nl2br(data.description);
+		str += '<br /><br />'+GO.util.nl2br(Ext.util.Format.htmlDecode(data.description));
+		// str += '<br /><br />'+Ext.util.Format.htmlEncode(data.description);
 	}
 	if (!GO.util.empty(data.resources)) {
 		str += '<br />'+t("Used resources", "calendar")+':';
 		for (var i in data.resources)
-			str += '<br /> - '+Ext.util.Format.htmlEncode(data.resources[i]);
+			// str += '<br /> - '+Ext.util.Format.htmlEncode(data.resources[i]);
+			str += '<br /> - '+data.resources[i];
 	}
 	
 	if (!GO.util.empty(data.resourced_calendar_name))
-		str += '<br />'+t("Resource used in", "calendar")+': '+Ext.util.Format.htmlEncode(data.resourced_calendar_name);
-	
-	// return str;
+		// str += '<br />'+t("Resource used in", "calendar")+': '+Ext.util.Format.htmlEncode(data.resourced_calendar_name);
+		str += '<br />'+t("Resource used in", "calendar")+': '+data.resourced_calendar_name;
+
 	return Ext.util.Format.htmlEncode(str);
 }
 
@@ -962,7 +969,6 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 				{
 					var activeGrid = this.getActivePanel();
 
-					//var oldDomId = activeGrid.domIds[newEvent.event_id] ? activeGrid.domIds[newEvent.event_id][0] : false;
 					//reload grid if old or new event repeats. Do not reload if an occurence of a repeating event is modified
 					if(newEvent.repeats || !oldDomId || !activeGrid.remoteEvents[oldDomId] || activeGrid.remoteEvents[oldDomId].repeats)
 					{
@@ -1614,9 +1620,6 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 				duration_end_time : actionData.end_time
 			};
 
-//			if(event.has_other_participants)
-//				params.send_invitation=confirm(t("Would you like to send updated meeting information to participants?", "calendar")) ? 1 : 0;
-			
 			if(actionData.singleInstance)
 			{				
 				params['exception_date']=actionData.dragDate.format("U");
@@ -1629,14 +1632,10 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			GO.request({
 				url: 'calendar/event/submit',
 				params: params,
-				success: function(options,  response, result)
-				{					
-					if(event.repeats)
-					{
+				success: function(options,  response, result) {
+					if(event.repeats) {
 						grid.store.reload();
 					}
-
-					GO.calendar.handleMeetingRequest(result);					
 				}
 			});
 				
@@ -1711,9 +1710,6 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 				id : event['event_id']
 			};
 
-//			if(event.has_other_participants)
-//				params.send_invitation=confirm(t("Would you like to send updated meeting information to participants?", "calendar")) ? 1 : 0;
-			
 			if(actionData.offset)
 				params['offset']=actionData.offset;
 			
@@ -1820,10 +1816,6 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 				}
 		
 				if(!event.is_organizer){
-					// You are not authorised to edit this event because you are not the organizer.
-					// Show message to the user
-					//Ext.Msg.alert(t("You are not the organizer", "calendar"), t("You are not authorised to edit this event because you are not the organizer.", "calendar"));
-
 					if(!this.attendanceWindow){
 						this.attendanceWindow = new GO.calendar.AttendanceWindow ();
 						this.attendanceWindow.on('save', function(){
@@ -1865,10 +1857,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
     
 	onEventMove : function(grid, event, actionData, domIds){
 
-		var params = {
-			//task : 'update_grid_event',
-			//id : event['event_id']
-		};
+		var params = {};
 
 		if(actionData.offset)
 			params['offset']=actionData.offset;
@@ -1892,22 +1881,11 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			params['calendar_id']=actionData.calendar_id;
 		}
 
-//		if(event.has_other_participants)
-//			params.send_invitation=confirm(t("Would you like to send updated meeting information to participants?", "calendar")) ? 1 : 0;
-
 		GO.request({
 			url: 'calendar/event/submit',
 			params: params,
 			success: function(response, options, result)
 			{
-
-//				if(event.repeats && !actionData.singleInstance)
-//				{
-//					grid.store.reload();
-//				}else if(responseParams.id)
-//				{
-//					grid.setNewEventId(domIds, responseParams.id);
-//				}
 				if(event.repeats)
 					grid.store.reload();
 
@@ -1977,8 +1955,6 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 				}
 			}),
 
-            
-			
 			this.calendarDialog = GO.calendar.calendarDialog = new GO.calendar.CalendarDialog();
 			this.calendarDialog.on('save', function(e, group_id)
 			{
@@ -2096,7 +2072,6 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 				tbar: [{					
 					iconCls: 'ic-add',
 					text: t("Add"),
-//					disabled: !GO.settings.modules.calendar.write_permission,
 					handler: function(){
 						this.viewDialog.show();
 					},
@@ -2104,7 +2079,6 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 				},{
 					iconCls: 'ic-delete',
 					text: t("Delete"),
-//					disabled: !GO.settings.modules.calendar.write_permission,
 					handler: function(){
 						this.viewsGrid.deleteSelected();
 					},
@@ -2317,18 +2291,6 @@ GO.mainLayout.onReady(function(){
 		remoteSort : true
 	});
 
-//	GO.newMenuItems.push({
-//		text: t("Appointment", "calendar"),
-//		iconCls: 'go-model-icon-GO\\Calendar\\Model\\Event',
-//		handler:function(item, e){
-//
-//			var eventShowConfig = item.parentMenu.eventShowConfig || {};
-//			eventShowConfig.link_config=item.parentMenu.link_config
-//
-//			GO.calendar.showEventDialog(eventShowConfig);
-//		}
-//	});
-
 	//GO.checker is not available in some screens like accept invitation from calendar
 	if(go.Modules.isAvailable("legacy", "checker")){
 
@@ -2470,11 +2432,6 @@ GO.calendar.importIcs = function(config) {
 		url: GO.url('calendar/event/loadICS'),
 		params: {
 			file_id: config.id
-			// account_id: panel.account_id,
-			// mailbox: panel.mailbox,
-			// uid: panel.uid,
-			// number: attachment.number,
-			// encoding: attachment.encoding
 		}
 	});
 }

@@ -160,7 +160,7 @@ class Folder extends Base {
 	 * @param Folder $destinationFolder 
 	 * @param string $newFolderName Optionally rename the folder too.
 	 * @param boolean $appendNumberToNameIfDestinationExists Rename the folder like "folder (1)" if it already exists.	 * 
-	 * @return Folder $destinationFolder
+	 * @return bool
 	 */
 	public function move(Folder $destinationFolder, $newFolderName=false,$appendNumberToNameIfDestinationExists=false){	
 		if(!$this->exists())

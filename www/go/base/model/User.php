@@ -5,6 +5,7 @@ use GO;
 use GO\Base\Mail\Message;
 use GO\Base\Mail\Mailer;
 use go\core\db\Query;
+use go\core\ErrorHandler;
 use go\core\mail\Address;
 use go\modules\business\business\model\EmployeeAgreement;
 
@@ -62,7 +63,7 @@ use go\modules\business\business\model\EmployeeAgreement;
  * @property string $recoveryEmail
  * @property string $digest
  * @property int $last_password_change
- * @property boolean $force_password_change
+ * @property boolean $forcePasswordChange
  * @property string $homeDir
  *
  *
@@ -496,9 +497,9 @@ class User extends \GO\Base\Db\ActiveRecord {
 			// Only reset this when it's not modified in the same request.
 			// Otherwise checking this checkbox will not work in the Admin Users module 
 			// when you have changed the password at the same time.
-			if(!$this->isModified('force_password_change')){
-				// Reset the force_password_change boolean
-				$this->force_password_change = false;
+			if(!$this->isModified('forcePasswordChange')){
+				// Reset the forcePasswordChange boolean
+				$this->forcePasswordChange = false;
 			}
 		}
 		
@@ -735,7 +736,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function checkPasswordChangeRequired(){
 		
-		if($this->force_password_change){
+		if($this->forcePasswordChange){
 			return true;
 		}
 		
@@ -914,8 +915,13 @@ Password: {password}", "users");
 		$message->setSubject($title)
 			->setBody($emailBody, $type)
 			->addTo(new Address($this->email,$this->getName()));
-
-		return Mailer::newGoInstance()->send($message);
+		try {
+			Mailer::newGoInstance()->send($message);
+		}catch (\Exception $e) {
+			ErrorHandler::logException($e);
+			return false;
+		}
+		return true;
 	}
 	
 	/**

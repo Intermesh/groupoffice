@@ -225,3 +225,14 @@ $updates['202301301230'][] = "alter table tasks_tasklist
                             on delete set null;";
 $updates['202305231613'][] = "ALTER TABLE `tasks_task` DROP FOREIGN KEY `tasks_task_core_acl_id_fk`;";
 $updates['202305231613'][] = "ALTER TABLE `tasks_task` DROP COLUMN `aclId`, DROP INDEX `tasks_task_core_acl_id_fk` ;";
+
+
+$updates['202408061358'][] = "create index tasks_task_start_index
+    on tasks_task (start);";
+
+$updates['202408061358'][] = "create index tasks_tasklist_name_index
+    on tasks_tasklist (name);";
+
+$updates['202412090921'][] = "alter table tasks_tasklist_group
+    add constraint tasks_tasklist_group_pk
+        unique (id);";

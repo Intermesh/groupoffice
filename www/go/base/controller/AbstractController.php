@@ -50,6 +50,7 @@ use GO\Base\Model\Module;
 use GO\Base\Observable;
 use GO\Base\Util\Number;
 use GO\Base\View\AbstractView;
+use go\core\auth\Authenticate;
 use go\core\jmap\State;
 use ReflectionMethod;
 
@@ -186,7 +187,11 @@ abstract class AbstractController extends Observable {
 	 */
 	protected function checkSecurityToken()
 	{
+		// When using JMAP API requests without cookies don't check CSRF
+		$state = go()->getAuthState();
+		$usingCookies = (!($state instanceof State) || $state->isAuthenticatedUsingCookie());
 		if (
+      $usingCookies &&
 			!GO::config()->debug &&
 			!GO::config()->disable_security_token_check &&
 			!empty($_REQUEST['r']) &&

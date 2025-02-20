@@ -543,7 +543,7 @@ class Installer {
 		echo "Registering all entities\n";		
 		$modules = model\Module::find(['id', 'name', 'package', 'version', 'enabled'])->where(['enabled' => true])->all();
 		foreach($modules as $module) {
-			if(isset($module->package) && $module->isAvailable()) {
+			if($module->isAvailable()) {
 				$module->module()->registerEntities();
 			}
 		}
@@ -681,10 +681,10 @@ class Installer {
 			$modulesById[$module->id] = $module;
 
 			$updatesFile = $this->getUpdatesFile($module);
-			if(!$updatesFile) {
+			if (!$updatesFile) {
 				continue;
 			}
-			
+
 			$updates = array();
 			require($updatesFile);
 
@@ -694,16 +694,16 @@ class Installer {
 			$count = 0;
 			foreach ($updates as $timestamp => $updatequeries) {
 				//somehow this doesn't always match on some installations with Ioncube !?
-			  if(go()->getDebugger()->enabled && !preg_match("/^[0-9]{12}$/", $timestamp)) {
-			    throw new Exception("Invalid timestamp '$timestamp' in file '$updatesFile'");
-        }
+				if (go()->getDebugger()->enabled && !preg_match("/^[0-9]{12}$/", $timestamp)) {
+					throw new Exception("Invalid timestamp '$timestamp' in file '$updatesFile'");
+				}
 				$u["$timestamp"][$module->id] = $updatequeries;
 				$count += count($updatequeries);
 			}
 
-			if(go()->getDebugger()->enabled && $count < $module->version) {
-				$modStr = '[' . ($module->package ?? "legacy") .'/'. $module->name .'] ';
-				throw new Exception("Less queries than version for module " . $modStr ." " . $count .' < '. $module->version);
+			if (go()->getDebugger()->enabled && $count < $module->version) {
+				$modStr = '[' . ($module->package ?? "legacy") . '/' . $module->name . '] ';
+				throw new Exception("Fewer queries than version for module " . $modStr . " " . $count . ' < ' . $module->version);
 			}
 
 		}
@@ -788,7 +788,7 @@ class Installer {
 
 							} else {
 
-								$msg = $e->getCode() . ': '.$e->getMessage() . "\n".
+								$msg = $e->getPrevious()->getCode() . ': '.$e->getPrevious()->getMessage() . "\n".
 								  "Query: " . $query . "\n".
 								  "Package: " . ($module->package ?? "legacy") . "\n".
 								  "Module: " . $module->name . "\n".

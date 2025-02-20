@@ -7,6 +7,7 @@
 use go\core\auth\Authenticate;
 use go\core\auth\TemporaryState;
 use go\core\model\Settings;
+use go\core\orm\Entity;
 use go\core\util\DateTime;
 
 class BackendGO extends Backend implements IBackend, ISearchProvider {
@@ -228,13 +229,13 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	 * @return string       id of the created/updated calendar obj
 	 * @throws StatusException
 	 */
-	public function MeetingResponse($requestid, $folderid, $error) {
-		ZLog::Write(LOGLEVEL_DEBUG, "Combined->MeetingResponse($requestid , $folderid , $error)");
+	public function MeetingResponse($requestid, $folderid, $response, $instanceId) {
+		ZLog::Write(LOGLEVEL_DEBUG, "Combined->MeetingResponse($requestid , $folderid , $response)");
 		$backend = $this->GetBackend($folderid);
 		if ($backend === false)
 			return false;
-		ZLog::Write(LOGLEVEL_DEBUG, "Combined->MeetingResponse($requestid , $folderid , $error) success");
-		return $backend->MeetingResponse($requestid, $this->GetBackendFolder($folderid), $error);
+		ZLog::Write(LOGLEVEL_DEBUG, "Combined->MeetingResponse($requestid , $folderid , $response) success");
+		return $backend->MeetingResponse($requestid, $this->GetBackendFolder($folderid), $response, $instanceId);
 	}
 
 
@@ -626,9 +627,12 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 
 		ZLog::Write(LOGLEVEL_DEBUG, "All sink folders checked");
 
+		// don't use db connection constantly on push connection
 		ZLog::Write(LOGLEVEL_DEBUG, "Closing DB connection: " . go()->getDbConnection()->getId());
-
 		go()->getDbConnection()->disconnect();
+
+		// keep memory usage as low as possible when sleeping
+		ZLog::Write(LOGLEVEL_DEBUG, "Clearing cache memory");
 		\go\core\db\Table::destroyInstances();
 		go()->getCache()->disableMemory();
 		gc_collect_cycles();

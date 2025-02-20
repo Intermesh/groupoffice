@@ -421,9 +421,11 @@ abstract class EntityController extends Controller {
 
 		if(!empty($params['ids'])) {
 			$params['ids'] = array_unique($params['ids']);
-//			$params['ids'] = array_filter($params['ids'], function($id) {
-//				return !empty($id);
-//			});
+
+			//ignore null as ID. Might happen with JMAP result references
+			$params['ids'] = array_filter($params['ids'], function($id) {
+				return !empty($id);
+			});
 		}
 
 		if(!isset($params['properties'])) {
@@ -501,6 +503,7 @@ abstract class EntityController extends Controller {
 			if($this->canRead($e)) {
 				try {
 					$arr = $e->toArray();
+					// make sure the entity result has an ID property. Otherwise it's difficult to identify objects in the "list" array.
 					$arr['id'] = $e->id();
 					$unsorted[$arr['id']] = $arr;
 					$foundIds[] = $arr['id'];
@@ -869,7 +872,7 @@ abstract class EntityController extends Controller {
    * @throws InvalidArguments
    * @throws Exception
    */
-	private function destroyEntities(array $destroy, ArrayObject $result) {
+	protected function destroyEntities(array $destroy, ArrayObject $result) {
 
 		$doDestroy = [];
 		foreach ($destroy as $id) {
@@ -1103,6 +1106,10 @@ abstract class EntityController extends Controller {
 			$response['id'] = $mapping->id;
 			$response['columnMapping'] = $mapping->getColumnMapping();
 			$response['updateBy'] = $mapping->updateBy;
+			$response['decimalSeparator'] = $mapping->decimalSeparator;
+			$response['thousandsSeparator'] = $mapping->thousandsSeparator;
+			$response['dateFormat'] = $mapping->dateFormat;
+			$response['timeFormat'] = $mapping->timeFormat;
 		}
 
 		if(!$response) {

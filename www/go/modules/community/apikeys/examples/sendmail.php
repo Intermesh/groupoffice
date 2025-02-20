@@ -76,6 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		"encrypt_smime" => false,
 		"sign_smime" => false,
 
+        "customHeaders" => "X-MySpecial-ID: 123456\nX-MySpecial-Category: custom",
+
 
 		"to" => $_POST['to'],
 		"cc" => "",

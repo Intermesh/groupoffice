@@ -77,21 +77,13 @@ GO.files.FileBrowser = function(config){
 	}, this, {single:true});
 	
 	
-	// this.treePanel.getLoader().on('load', function()
-	// {		
-		
-	// 	if(!this.folder_id)
-	// 	{
-	// 		this.folder_id=this.treePanel.getRootNode().childNodes[0].id;
-	// 	}
-	// 	this.setFolderID(this.folder_id);
-		
-	// }, this);
-	
-
 	this.treePanel.on('click', function(node)	{
 		this.setFolderID(node.id, true);
 		this.cardPanel.show();
+		if(node.id !== 'shared') {
+			this.folderDetail.load(parseInt(node.id));
+			this.eastPanel.getLayout().setActiveItem(this.folderDetail);
+		}
 	}, this);
 
 	this.treePanel.on('contextmenu', function(node, e){
@@ -246,12 +238,6 @@ GO.files.FileBrowser = function(config){
 
 
 	this.gridStore = new GO.data.JsonStore({
-//		url: GO.settings.modules.files.url+'json.php',
-//		baseParams: {
-//			'task': 'grid'
-//		},
-//		root: 'results',
-//		totalProperty: 'total',
 		url:GO.url("files/folder/list"),
 		baseParams: {
 			'query' : ''
@@ -259,10 +245,6 @@ GO.files.FileBrowser = function(config){
 		id: 'type_id',
 		fields:fields.fields,
 		remoteSort:true
-		// load: function() {
-		// 	debugger;
-		// 	GO.data.JsonStore.prototype.load.apply(this, arguments);
-		// }
 	});
 
 	this.gridStore.on('load', this.onStoreLoad, this);
@@ -399,8 +381,6 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 
 	}, this);
 
-//	this.filesContextMenu= this.filesContextMenu;
-
 	this.gridPanel.on('rowcontextmenu', this.onGridRowContextMenu, this);
 
 	// todo: lower max disk space with quota, (in core)
@@ -483,11 +463,6 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 
 
    var quotaPercentage = (GO.settings.disk_quota && GO.settings.disk_quota>0) ? GO.settings.disk_usage/GO.settings.disk_quota : 0;
-
-        
-        //if(!GO.settings.disk_quota)
-          //  this.quotaBar.hidden = true;
-
 	this.upButton = new Ext.Button({
 		iconCls: 'ic-arrow-upward',
 		tooltip: t("Up"),
@@ -603,17 +578,6 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		disabled: true,
 		scope: this
 	}));
-
-	// tbar.push('->', {
-	// 	iconCls: 'ic-more',
-	// 	overflowText: t('File info'),
-	// 	tooltip: t('File info'),
-	// 	//hidden: (config.id === "go-module-panel-files"),
-	// 	handler: function(btn) {
-	// 		this.eastPanel.toggleCollapse();
-	// 	},
-	// 	scope:this
-	// });
 
 		tbar.push(this.newButton);
 

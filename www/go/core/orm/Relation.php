@@ -105,11 +105,11 @@ class Relation {
 		if(!is_subclass_of($propertyName, Property::class, true)) {
 			throw new InvalidArgumentException($propertyName . ' must extend '. Property::class);
 		}
-		
-		if(is_subclass_of($propertyName, Entity::class, true)) {
-			throw new InvalidArgumentException($propertyName . ' may not be an '. Entity::class .'. Only '. Property::class .' objects can be mapped.');
-		}
-		
+
+//		if(is_subclass_of($propertyName, Entity::class, true)) {
+//			throw new InvalidArgumentException($propertyName . ' may not be an '. Entity::class .'. Only '. Property::class .' objects can be mapped.');
+//		}
+
 		$this->propertyName = $propertyName;
 
 		return $this;

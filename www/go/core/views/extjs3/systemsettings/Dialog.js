@@ -1,5 +1,7 @@
 /* global go */
 
+GO.systemSettingsPanels = [];
+
 /** 
  * Copyright Intermesh
  * 
@@ -16,8 +18,8 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	
 	modal:true,
 	resizable:true,
-	maximizable:true,
-	//maximized: true,
+	// maximizable:true,
+	maximized: true,
 	iconCls: 'ic-settings',
 	title: t("System settings"),	
 	width:dp(1000),
@@ -148,14 +150,9 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	},
 	
 	loadModulePanels : function() {
-		var available = go.Modules.getAvailable(), config, pnl, i, i1, sepAdded = false;
+		var available = go.Modules.getAvailable(), config, pnl, i, i1, l2, sepAdded = false;
 
 		for(i = 0, l = available.length; i < l; i++) {
-
-			// if(!available[i].userRights.mayManage) {
-			// 	continue;
-			// }
-			
 			config = go.Modules.getConfig(available[i].package, available[i].name);
 			
 			if(!config.systemSettingsPanels) {
@@ -175,6 +172,19 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 				});
 			}
 		}
+
+		GO.systemSettingsPanels.forEach((pnl) => {
+
+			var menuRec = new Ext.data.Record({
+				itemId: pnl.itemId,
+				name: pnl.title,
+				iconCls: pnl.iconCls
+			});
+
+			this.tabStore.add(menuRec);
+
+			this.tabPanel.add(pnl);
+		})
 	},
 
 	setActiveItem: function(itemId) {

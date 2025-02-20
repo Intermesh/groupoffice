@@ -131,6 +131,10 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			this.el.unmask();
 		}, this);
 
+		this.store.on('loadexception', function(store,records,options) {
+			this.el.unmask();
+		}, this);
+
 		this.store.on('remove', function() {
 			this.updateView();
 		}, this);
@@ -157,7 +161,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				iconCls: 'ic-edit',
 				text: t("Edit"),
 				handler: function() {
-					var dlg = new go.modules.comments.CommentForm();					
+					const dlg = new go.modules.comments.CommentForm();
 					dlg.load(this.contextMenu.record.id).show();
 				},
 				scope:this
@@ -330,7 +334,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			if(r.data.attachments && r.data.attachments.length) {
 				let atts = "";
 				r.data.attachments.forEach(a => {
-					atts += `<a class="attachment" target="_blank" title="${a.name}" href="${go.Jmap.downloadUrl(a.blobId, true)}"><span class="filetype filetype-${a.name.substring(a.name.lastIndexOf(".") + 1)}"></span>${a.name}</a>`;
+					atts += `<a class="attachment" target="_blank" title="${a.name}" href="${go.Jmap.downloadUrl(a.blobId, true)}"><span class="filetype filetype-${a.name.substring(a.name.lastIndexOf(".") + 1)}"></span>${a.name}</a>&nbsp;`;
+					atts += `<a target="_blank" title="${t("Download")}" href="${go.Jmap.downloadUrl(a.blobId, false)}"><i class="icon primary ic-download-for-offline" style="padding-bottom: 8px;"></i></a>`;
 				})
 				readMore.insert(2, {xtype: 'box', html: atts, cls: "attachments"});
 			}

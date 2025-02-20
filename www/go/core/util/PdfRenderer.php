@@ -24,7 +24,7 @@ class PdfRenderer extends Fpdi {
 	 *
 	 * @var float
 	 */
-	public $defaultFontSize = 9;
+	public $defaultFontSize = 10;
 
 //	/**
 //	 * Line height

@@ -8,8 +8,8 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 		
 		this.tbar = this.initToolbar();
 
-		var me = this;
-		
+		const me = this;
+
 		Ext.apply(this, {
 			items: [{
 				xtype: "panel",
@@ -24,11 +24,6 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					detailView.avatar.update(go.util.avatar(detailView.data.name, detailView.data.photoBlobId, icon))
 				},
 				items:[
-				// 	{
-				// 	cls: 'go-addressbook-url-panel',
-				// 	xtype: "box",
-				// 	tpl: '<tpl for="urls">&nbsp;&nbsp;<a target="_blank" href="{[go.modules.community.addressbook.Utils.transformUrl(values.url, values.type)]}" class="go-addressbook-url {type}"></a></tpl>'
-				// },
 				{
 					xtype: 'container',
 					layout: "hbox",
@@ -49,18 +44,6 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 									});
 								}
 							}
-							// tpl: new Ext.XTemplate('<div class="avatar {[values.isOrganization && !values.photoBlobId ? \'organization\' : \'\']}" style="{[this.getStyle(values)]}">{[this.getHtml(values)]}</div>',
-							// {
-							// 	getHtml: function (v) {
-							// 		if(v.photoBlobId) {
-							// 			return "";
-							// 		}
-							// 		return v.isOrganization ? '<i class="icon">business</i>' : go.util.initials(v.name);
-							// 	},
-							// 	getStyle: function (v) {
-							// 		return v.photoBlobId ? 'background-image: url(' + go.Jmap.thumbUrl(v.photoBlobId, {w: 40, h: 40, zc: 1})  + ')"' : "background-image:none;background-color: #" + v.color;;
-							// 	}
-							// })
 						}),
 					
 						this.namePanel = new Ext.BoxComponent({
@@ -219,8 +202,12 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 							}, this);
 						}
 					},
-					tpl: '<tpl if="dates.length"><div class="icons">\
-						<hr class="indent">\
+					tpl: '<tpl if="values.actionAt || dates.length"><div class="icons">\
+					<hr class="indent">\
+						<tpl if="values.actionAt"><a class="s6"><i class="icon label">event</i></tpl>\
+							<span>{[go.util.Format.date(values.actionAt)]}</span>\
+							<label>{[t("Action date")]}</label>\
+						</a>\
 						<tpl for="dates"><a class="s6"><tpl if="xindex == 1"><i class="icon label">cake</i></tpl>\
 							<span>{[go.util.Format.date(values.date)]}</span>\
 							<label>{[t("dateTypes")[values.type] || values.type]}</label>\

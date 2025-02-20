@@ -1278,8 +1278,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 			});
 
 			resizer.on('resize', function(eventEl, adjWidth, adjHeight, rawWidth, rawHeight){
-				if(adjHeight>0)
-				{
+				if(adjHeight>0) {
 					var times = this.domToTimes(eventEl.el.id, false);
 
 					//var newStartTime = times.startDate.format('U');
@@ -1298,30 +1297,26 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 					var elX = eventEl.el.getX();
 					this.clickedDay = this.getDayByX(elX);
 
-					if(this.remoteEvents[eventEl.el.id]['repeats'])
-					{
+					if(this.remoteEvents[eventEl.el.id]['repeats']) {
 						event.day = this.clickedDay;
 						this.handleRecurringEvent("eventResize", event, actionData);
-					}else
-					{
+					} else {
 						this.resizeAppointment(eventEl.el.id, this.clickedDay);
 						this.fireEvent("eventResize", this, event, actionData,[eventEl.el.id]);
 					}
 
-					var timeEl = eventEl.el.select('span.x-calGrid-event-time');
-					if(timeEl)
-					{
-						timeEl.update(event.startDate.format(GO.settings.time_format));
+					const timeEl = eventEl.el.select('span.x-calGrid-event-time');
+					if (timeEl) {
 						eventEl.el.set({
-							'ext:qtip': GO.calendar.formatQtip(event)
-							});
+							'ext:qtip': Ext.util.Format.htmlDecode(GO.calendar.formatQtip(event))
+						});
+						timeEl.update(event.startDate.format(GO.settings.time_format));
 					}
 				}
 			}, this);
 		}
 
-		if(recalculateAppointments)
-		{
+		if(recalculateAppointments) {
 			this.calculateAppointments(day);
 		}
 

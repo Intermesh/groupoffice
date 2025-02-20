@@ -92,7 +92,24 @@ class User extends AclItemEntity {
 
 	const USERNAME_REGEX = '/[A-Za-z0-9_\-\.@]+/';
 	
-	public $validatePassword = true;
+	private bool $validatePassword = true;
+
+	/**
+	 * Check or set if password validation is enabled
+	 *
+	 * @param bool|null $enabled Supply if you want to change the setting
+	 * @return bool
+	 */
+	public function validatePasswordEnabled(bool $enabled = null) {
+
+		$old = $this->validatePassword;
+
+		if(isset($enabled)) {
+			$this->validatePassword = $enabled;
+		}
+
+		return $old;
+	}
 
 	/**
 	 * The ID
@@ -261,6 +278,12 @@ class User extends AclItemEntity {
 	public $mute_new_mail_sound;
 	public $show_smilies;
 	public $auto_punctuation;
+
+
+	/**
+	 * @var bool
+	 */
+	public $enableSendShortcut = true;
 	
 	
 	protected $files_folder_id;
@@ -331,6 +354,16 @@ public function historyLog(): bool|array
 {
 	$log = parent::historyLog();
 
+	if(isset($log['otp'])) {
+		if(isset($log['otp'][0])) {
+			$log['otp'][0] = "MASKED";
+		}
+
+		if(isset($log['otp'][1])) {
+			$log['otp'][1] = "MASKED";
+		}
+	}
+
 	if(isset($log['password'])) {
 		if(isset($log['password'][0])) {
 			$log['password'][0] = "MASKED";
@@ -338,6 +371,16 @@ public function historyLog(): bool|array
 
 		if(isset($log['password'][1])) {
 			$log['password'][1] = "MASKED";
+		}
+	}
+
+	if(isset($log['recoveryHash'])) {
+		if(isset($log['recoveryHash'][0])) {
+			$log['recoveryHash'][0] = "MASKED";
+		}
+
+		if(isset($log['password'][1])) {
+			$log['recoveryHash'][1] = "MASKED";
 		}
 	}
 
@@ -432,19 +475,8 @@ public function historyLog(): bool|array
 	public function setCurrentPassword($currentPassword){
 		$this->currentPassword = $currentPassword;
 
-		if(go()->getAuthState() && go()->getAuthState()->isAdmin()) {
-			if(!go()->getAuthState()->getUser()->checkPassword($currentPassword)) {
-				$this->passwordVerified = false;
-			}else {
-				$this->passwordVerified = true;
-			}
-		} else {
-
-			if (!$this->checkPassword($currentPassword)) {
-				$this->passwordVerified = false;
-			} else {
-				$this->passwordVerified = true;
-			}
+		if(!$this->checkPassword($currentPassword)) {
+			$this->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
 		}
 	}
 
@@ -543,7 +575,7 @@ public function historyLog(): bool|array
 	private function validatePasswordChange(): bool
 	{
 
-		if($this->passwordVerified) {
+		if($this->passwordVerified || (go()->getAuthState() && go()->getAuthState()->isAdmin())) {
 			return true;
 		}
 
@@ -841,9 +873,8 @@ public function historyLog(): bool|array
 			->setSubject(go()->t('Lost password'))
 			->setBody($emailBody);
 		
-		if(!$message->send()) {
-			throw new Exception("Could not send mail. The notication system setttings may be incorrect.");
-		}
+		$message->send();
+
 	}
 	
 	protected function internalSave(): bool

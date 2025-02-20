@@ -309,11 +309,15 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	},
 	
 	setValue: function (value) {
+		const me = this;
 
-		var me = this;
+		me.value = value;
+		if(Ext.isEmpty(value))
+		{
+			return go.form.ComboBox.superclass.setValue.call(me, value);
+		}
 
 		this.setValuePromise = new Promise(function(resolve, reject) {
-
 			//hack for old framework where relations are "0" instead of null.
 			if(value == "0" && me.store.entityStore) {
 				value = null;
@@ -330,14 +334,14 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 			//create record from entity store if not exists
 			if (me.store && me.store.entityStore && me.store.entityStore.entity && !me.findRecord(me.valueField, value)) {
 
-				me.value = value;
-
 				me.resolveEntity(value).then(function (entity) {
 					//this prevents the list to expand on loading the value
-					var origHasFocus = me.hasFocus;
+					const origHasFocus = me.hasFocus;
 					if(me.value != value) {
 						// Abort another setValue() call was made in between. This can happen when fetching the default
 						// value takes longer then the setValue() call of loading a dialog value.
+						// Do resolve though
+						resolve(me);
 						return;
 					}
 
@@ -362,7 +366,7 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 					}
 					console.error(e);
-					var data = {};
+					const data = {};
 					//console.warn("Invalid entity ID '" + value + "' for entity store '" + me.store.entityStore.entity.name + "'");
 					//Set all record keys to prevent errors in XTemplates
 					me.store.fields.keys.forEach(function(key) {
@@ -382,9 +386,8 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 					resolve(me);
 				});
-			} else
-			{
-				var text = value;
+			} else {
+				let text = value;
 				if(me.valueField){
 					 var r = me.findRecord(me.valueField, value);
 					 if(r){

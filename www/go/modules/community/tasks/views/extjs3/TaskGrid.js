@@ -109,10 +109,6 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 							m.style += 'color:#'+rec.json.color+';';
 						}
 
-						// if(rec.data.progress == "needs-action" && rec.get("start") <= now) {
-						// 	m.style += 'font-weight: bold;';
-						// }
-
 						return v;
 					},
 					groupable: false
@@ -183,6 +179,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 				},{
 					id:"percentComplete",
 					width:dp(150),
+					sortable:true,
 					header: t('% complete', "tasks", "community"),
 					dataIndex: 'percentComplete',
 					renderer:function (value, meta, rec, row, col, store){
@@ -194,6 +191,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					hidden: !this.support,
 					id:"progress",
 					width:dp(150),
+					sortable:true,
 					header: t('Progress', "tasks", "community"),
 					dataIndex: 'progress',
 					renderer:function (value, meta, rec, row, col, store){

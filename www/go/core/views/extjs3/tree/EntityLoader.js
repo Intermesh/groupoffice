@@ -37,9 +37,8 @@ go.tree.EntityLoader = Ext.extend(Ext.tree.TreeLoader, {
 				throw "Invalid 'entityStore' property given to component"; 
 			}
 		}
-	},	
-	
-	
+	},
+
 	load: function (node, callback, scope) {
 		if (this.clearOnLoad) {
 			while (node.firstChild) {

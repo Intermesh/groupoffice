@@ -88,6 +88,10 @@ $server->addPlugin($authPlugin);
 $caldavPlugin = new Sabre\CalDAV\Plugin();
 $server->addPlugin($caldavPlugin);
 
+// iCalendar Export Plugin
+$icsPlugin = new Sabre\CalDAV\ICSExportPlugin();
+$server->addPlugin($icsPlugin);
+
 // ACL plugin
 $aclPlugin = new Sabre\DAVACL\Plugin();
 $aclPlugin->allowUnauthenticatedAccess = false;

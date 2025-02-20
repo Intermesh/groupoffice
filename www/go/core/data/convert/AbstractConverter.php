@@ -2,6 +2,7 @@
 namespace go\core\data\convert;
 
 use Exception;
+use go\core\db\DbException;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\fs\File;
@@ -196,23 +197,30 @@ abstract class AbstractConverter {
 		}
 	}
 
-	private function notifyError(string $error) {
-		$this->alert = new Alert();
-
+	/**
+	 * @param string $error
+	 * @return void
+	 * @throws SaveException
+	 * @throws \JsonException
+	 * @throws Exception
+	 */
+	private function notifyError(string $error)
+	{
+		$a = new Alert();
 
 		$module = \go\core\model\Module::findByClass($this->entityClass, ['id', 'name', 'package']);
 
-		$this->alert->setEntity($module);
-		$this->alert->userId = go()->getUserId();
-		$this->alert->triggerAt = new DateTime();
-		$this->alert->setData([
+		$a->setEntity($module);
+		$a->userId = go()->getUserId();
+		$a->triggerAt = new DateTime();
+		$a->setData([
 				'title' => go()->t("Import error"),
 				'body' => $error
 			]
 		);
 
-		if (!$this->alert->save()) {
-			throw new SaveException($this->alert);
+		if (!$a->save()) {
+			throw new SaveException($a);
 		}
 	}
 
@@ -277,10 +285,13 @@ abstract class AbstractConverter {
 				EntityType::push(100);
 
 				if($entity->hasValidationErrors()) {
-					$msg = "Item ". $this->index . ": ". var_export($entity->getValidationErrors(), true);
-					$this->notifyError($msg);
+					foreach ($entity->getValidationErrors() as $key =>  $validationError) {
+						$msg = "Validation error in item " . $this->index . ": " . $key . " - " . $validationError['description'];
+						$this->notifyError($msg);
 
-					$response['errors'][] = $msg;
+						$response['errors'][] = $msg;
+
+					}
 				} elseif($this->afterSave($entity)) {
 					$response['count']++;
 				} else{
@@ -363,25 +374,38 @@ abstract class AbstractConverter {
 	}
 
 
+	/**
+	 * Maximum number of items to export
+	 *
+	 * @var int
+	 */
+	public int $exportMaxItems = 100000;
+
+
 	/** start of export */
 
 
 	/**
 	 * Export entities to a blob
 	 *
-	 * @param Query|array $entities
+	 * @param Query $entities
 	 * @param array $params
 	 * @return Blob
+	 * @throws DbException
 	 */
 	public function exportToBlob(Query $entities, array $params = []): Blob
 	{
+		$stmt = $entities->execute();
+		if($this->exportMaxItems > 0 && $stmt->rowCount() > $this->exportMaxItems) {
+			throw new Exception(go()->t("Too many items to export. Max is " . $this->exportMaxItems));
+		}
 		$this->clientParams = $params;
 		$this->entitiesQuery = $entities;
 		$this->initExport();
 		//	$total = $entities->getIterator()->rowCount();
 
 		$this->index = 0;
-		foreach($entities as $entity) {
+		foreach($stmt as $entity) {
 			$this->exportEntity($entity);
 			$this->index++;
 		}

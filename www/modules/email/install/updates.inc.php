@@ -259,3 +259,9 @@ $updates['202208101034'][] = "ALTER TABLE `em_accounts` CHANGE COLUMN `smtp_encr
 $updates['202302271615'][] = "ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(350) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';";
 $updates['202405171348'][] = "alter table em_accounts
     add save_sent BOOL default true not null;";
+
+$updates['202408051549'][] = "alter table em_accounts
+    modify username varchar(190) null;";
+
+$updates['202408051549'][] = "alter table em_accounts
+    modify smtp_username varchar(190) null;";

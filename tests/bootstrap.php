@@ -31,6 +31,11 @@ $config['tmpdir'] = $dataFolder->getFolder('tmp')->getPath();
 try {
 	//for autoload
 	App::get();
+
+	// debugger
+	//go()->getDebugger()->enabled = true;
+	//go()->getDebugger()->output = true;
+
 	$c = new core\util\ArrayObject(go()->getConfig());
 	$c->mergeRecursive($config);
 	go()->setConfig($c->getArray());
@@ -54,7 +59,7 @@ try {
 			echo "Dropping database 'groupoffice-phpunit'\n";
 			$pdo->query("DROP DATABASE groupoffice_phpunit");
 		}catch(\Exception $e) {
-
+			echo $e->getMessage() ."\n";
 		}
 
 		GO::clearCache(); //legacy
@@ -158,8 +163,6 @@ try {
 	throw $e;
 }
 
-// debugger
-//go()->getDebugger()->enabled = true;
-//go()->getDebugger()->output = true;
+
 
 echo "Done\n\n\n";

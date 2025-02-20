@@ -19,8 +19,10 @@ use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\fs\FileSystemObject;
 use go\core\mail\AddressList;
+use go\core\mail\MimeDecode;
 use go\core\model\Module;
 use go\core\model\User;
+use go\core\util\DateTime;
 use GO\Email\Model\Alias;
 use GO\Email\Model\Account;
 use GO\Email\Model\ImapMessage;
@@ -86,7 +88,8 @@ class MessageController extends \GO\Base\Controller\AbstractController
 
 		$mailer = Mailer::newGoInstance();
 		$mailer->setEmailAccount($account);
-		$response['success'] = $mailer->send($message);
+		$mailer->send($message);
+		$response['success'] = true;
 
 		return $response;
 	}
@@ -604,6 +607,19 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$mailer = Mailer::newGoInstance();
 		$mailer->setEmailAccount($account);
 
+		if(!empty($params['customHeaders'])) {
+			$headers = MimeDecode::parseHeaders($params['customHeaders']);
+
+			go()->debug($headers);
+
+			foreach($headers as $header) {
+				if(!str_starts_with($header['name'], 'X-')) {
+					throw new Exception("Custom headers must start with X-");
+				}
+				$message->setHeader($header['name'], $header['value']);
+			}
+		}
+
 
 		$this->fireEvent('beforesend', array(
 				&$this,
@@ -615,16 +631,18 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				$params
 		));
 
-		
-		$success = $mailer->send($message);
 
-		if(!$success) {
+		try {
+			$mailer->send($message);
+		} catch(\Throwable $e) {
 			$msg = GO::t("Sorry, an error occurred") . ': '. $mailer->lastError();
 			throw new Exception($msg);
 		}
 
+
+
 		// Update "last mailed" time of the emailed contacts.
-		if ($success && Module::findByName("community", "addressbook")->getUserRights()->mayRead) {
+		if (Module::findByName("community", "addressbook")->getUserRights()->mayRead) {
 			$toAddresses = $message->getTo();
 			if (empty($toAddresses)) {
 				$toAddresses = array();
@@ -677,15 +695,15 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$account->sent = $params['reply_mailbox'];
 		}
 
-		if ($success) {
-			//if a sent items folder is set in the account then save it to the imap folder
-			// auto linking will happen on save to sent items
-			if (!$account->saveToSentItems($message, $params)) {
-				//$imap->append_message($account->sent, $message, "\Seen");
-				$response['success'] = false;
-				$response['feedback'] .= 'Failed to save sent item to ' . $account->sent;
-			}
+
+		//if a sent items folder is set in the account then save it to the imap folder
+		// auto linking will happen on save to sent items
+		if (!$account->saveToSentItems($message, $params)) {
+			//$imap->append_message($account->sent, $message, "\Seen");
+			$response['success'] = false;
+			$response['feedback'] .= 'Failed to save sent item to ' . $account->sent;
 		}
+
 
 
 		if (!empty($params['draft_uid'])) {
@@ -1243,6 +1261,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$response['data']['plainbody'] .= $header . $oldMessage['plainbody'];
 		}
 
+		$response['sendParams']['references'] = $message->message_id;
+
 		if($message instanceof ImapMessage){
 			//for saving sent items in actionSend
 			$response['sendParams']['forward_uid'] = $message->uid;
@@ -1288,7 +1308,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			throw new NotFound();
 		}
 
-		$imapMessage = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
+		$customHeaders = !empty($params['customHeaders']) ? explode(',', $params['customHeaders']) : [];
+		$imapMessage = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid'], $customHeaders);
 
 		if(!$imapMessage) {
 			throw new NotFound();
@@ -1300,9 +1321,16 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$imapMessage->createTempFilesForAttachments();
 		}
 
+		$imapMessage->autoLink();
+
 		$plaintext = !empty($params['plaintext']);
 
 		$response = $imapMessage->toOutputArray(!$plaintext,false,$params['no_max_body_size']);
+
+		foreach($customHeaders as $customHeader) {
+			$response[$customHeader] = $imapMessage->{strtolower(str_replace("-", "_", $customHeader))} ?? null;
+		}
+
 		$response['uid'] = intval($params['uid']);
 		$response['mailbox'] = $params['mailbox'];
 		$response['isDraft'] = $params['mailbox'] == $account->drafts;
@@ -1316,7 +1344,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 
 			$response = $this->_blockImages($params, $response);
-			$imapMessage->autoLink();
+
 
 			$response = $this->_handleInvitations($imapMessage, $params, $response);
 			
@@ -1453,7 +1481,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$vevent = $vcalendar->vevent[0];
 
 
-			if($vcalendar->method == 'REQUEST') {
+			if(empty($vcalendar->method) || $vcalendar->method == 'REQUEST') {
 				// If this is an invite request, we must be sure we know which of the participants is the current user.
 				// We do this by checking all mail aliases
 				$aliases = Alias::model()->find(
@@ -1966,7 +1994,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 					$flags .= ' $Forwarded';
 				}
 
-				if(!$imap2->append_message($params['to_mailbox'], $source, $flags)) {
+				if(!$imap2->append_message($params['to_mailbox'], $source, $flags, new DateTime($header['internal_date']))) {
 					$imap2->disconnect();
 					throw new \Exception('Could not move message');
 				}
