@@ -112,6 +112,10 @@ class PdfTemplate extends Entity {
 	 */							
 	public $measureUnit = 'mm';
 
+	public string $fontFamily = "dejavusans";
+
+	public int $fontSize = 10;
+
 	/**
 	 * @var PdfBlock[]
 	 */
@@ -188,12 +192,12 @@ class PdfTemplate extends Entity {
 	 */
 	protected function internalGetPermissionLevel(): int
 	{
-		return Module::findById($this->moduleId)->getPermissionLevel();
+		return Module::findById($this->moduleId)->getPermissionLevel() > 0 ? Acl::LEVEL_MANAGE : 0;
 	}
 
 	protected function canCreate(): bool
 	{
-		return Module::findById($this->moduleId)->getPermissionLevel();
+		return Module::findById($this->moduleId)->getPermissionLevel() > 0;
 	}
 
 	/**

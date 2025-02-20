@@ -62,6 +62,7 @@ use go\core\ErrorHandler;
 use go\core\mail\Address;
 use go\core\mail\Attachment;
 use go\core\model\Module;
+use go\core\util\StringUtil;
 use Sabre;
 
 /**
@@ -1758,13 +1759,25 @@ $sub = $offset>0;
 	 */
 	public function importVObject(Sabre\VObject\Component $vobject, $attributes=array(), $dontSave=false, $makeSureUserParticipantExists=false, $importExternal=false, $withCategories = true){
 
-		$uid = (string) $vobject->uid;
-		if(!empty($uid))
-			$this->uuid = $uid;
-		
-		$this->name = (string) $vobject->summary;
-		if(empty($this->name))
-			$this->name = \GO::t("Unnamed");
+		$uid = (string)$vobject->uid;
+		if (!empty($uid)) {
+			// In certain cases, accented characters will throw a DB collation error, as the field is in ASCII collation
+			$this->uuid = StringUtil::toAscii($uid);
+		}
+
+		if(!$this->isPrivate() || $this->user_id === go()->getUserId()) {
+			$this->name = (string)$vobject->summary;
+			if (empty($this->name))
+				$this->name = \GO::t("Unnamed");
+
+			if ($vobject->description)
+				$this->description = (string)$vobject->description;
+		} else if(!$this->isNew()) {
+			// the caldav client is posting the data with name and content removed.
+			// Put it back into the vobject for the vobject cache.
+			$vobject->summary = $this->name;
+			$vobject->description = $this->description;
+		}
 		
 		$dtstart = $vobject->dtstart ? $vobject->dtstart->getDateTime() : new \DateTime();
 		$dtend = $vobject->dtend ? $vobject->dtend->getDateTime() : new \DateTime();
@@ -1807,10 +1820,6 @@ $sub = $offset>0;
 		}
 		if($this->end_time<=$this->start_time)
 			$this->end_time=$this->start_time+3600;
-				
-		
-		if($vobject->description)
-			$this->description = (string) $vobject->description;
 		
 		
 		if((string) $vobject->rrule != ""){

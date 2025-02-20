@@ -1646,3 +1646,27 @@ $updates['202410310946'][] = "alter table core_search
 
 $updates['202411221010'][] = "alter table core_user
     add enableSendShortcut boolean default true not null;";
+
+$updates['202412090921'][] = "alter table core_auth_token
+    add constraint core_auth_token_pk
+        unique (accessToken);
+";
+
+$updates['202412090921'][] = "drop index accessToken on core_auth_token;";
+
+
+
+$updates['202501141553'][] = "alter table core_pdf_template
+    add fontFamily varchar(100) default 'dejavusans' not null;";
+
+$updates['202501141553'][] = "alter table core_pdf_template
+    add fontSize tinyint default 10 null;";
+
+
+$updates['202501141553'][] = "UPDATE core_user t
+SET t.language   = 'en_gb'
+WHERE t.language='en_uk';";
+
+$updates['202501141553'][] = "UPDATE core_user t
+SET  t.holidayset = 'en_gb'
+WHERE t.holidayset='en_uk';";

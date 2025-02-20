@@ -37,6 +37,7 @@
     "lcobucci/jwt": "*",
     "firebase/php-jwt": "@stable",
     "donatj/phpuseragentparser": "@stable",
+    "league/oauth2-client": "2.7.0",
     "league/oauth2-google": "@stable",
     "fakerphp/faker": "@stable",
     "ext-fileinfo": "*",

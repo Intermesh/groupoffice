@@ -255,7 +255,11 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 				$percentage = ceil($quota['usage']*100/$quota['limit']);
 				$usage = sprintf(\GO::t("%s of %s used", "email"), $percentage.'%', \GO\Base\Util\Number::formatSize($quota['limit']*1024));
 				
-				$round5 = floor($quota['usage']/5)*5;
+				$round5 = floor($percentage / 5)*5;
+
+				if($round5 > 95) {
+					$round5 = 95;
+				}
 				
 				$usage='<span class="em-usage-'.$round5.'">'.$usage.'</span>';
 

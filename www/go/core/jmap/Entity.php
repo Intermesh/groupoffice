@@ -423,6 +423,7 @@ abstract class Entity  extends OrmEntity {
 		$ids = clone $query;
 		/** @noinspection PhpRedundantOptionalArgumentInspection */
 		$ids = $ids->selectSingleValue($query->getTableAlias() . '.filesFolderId')
+			->groupWhere()
 			->andWhere($query->getTableAlias() . '.filesFolderId', '!=', null)
 			->all();
 

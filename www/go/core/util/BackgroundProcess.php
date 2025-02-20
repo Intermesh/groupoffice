@@ -39,9 +39,7 @@ class BackgroundProcess {
 		return $this->outputFile->getContents();
 	}
 
-	public function run(): int
-	{
-
+	public function getCommand() : string {
 		$cmd = go()->getEnvironment()->getInstallFolder()->getFile("cli.php") ." "
 			. escapeshellarg($this->cmd);
 
@@ -52,6 +50,14 @@ class BackgroundProcess {
 		$cmd .= " --userId=" . go()->getUserId();
 
 		$cmd .= " -c=" . escapeshellarg(App::findConfigFile());
+
+		return $cmd;
+	}
+
+	public function run(): int
+	{
+
+		$cmd = $this->getCommand();
 
 		go()->debug("BACKGROUND CMD: ". $cmd);
 

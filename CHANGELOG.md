@@ -1,5 +1,119 @@
+20-02-2025: 6.8.104
+- Addressbook: Translate phone types to nl
+- Core: Updated Spanish translation with special thanks to Diputación de Huelva
+- Email: Fixed sending problem with gmail because of change in oauth2-client 2.8.0. We reverted to 2.7.0: https://github.com/PHPMailer/PHPMailer/issues/3131 and https://github.com/thephpleague/oauth2-client/issues/1052
+
+17-02-2025: 6.8.103
+- Timeregistration: Don't user user e-mail in dissapprove mail because it may lead to problems with the system settings mail server configuration not allowing this from addrers.
+- Finance: Always show PDF button
+- Finance: Keep catalog state when adding from catalog
+
+11-02-2025: 6.8.102
+- Core: Fixed html editor bug where style was removed if you deleted the first character
+
+11-02-2025: 6.8.101
+- Core: Fixed bug in html table editor plugin causing form load errors and sometimes the resize handlers were submitted
+
+10-02-2025: 6.8.100
+- ActiveSync: Fixed Android showing all calendars with e-mail address
+- Finance: Added "creator" to e-mail templates
+- Finance: Use default country in Zugferd.
+- Finance: Fixed missing address data in Zugferd XML
+- OAuth2Client: fix minor bug openID login
+- History: Fixed Stored XSS Vulnerability via user's name field (GHSA-j7p3-v652-p3gf)
+- Core: Added referrer-policy header for increased privacy
+- Time registration: allow employee to export registrations
+- Core: Image resize and table edit plugin thanks to Polarismail
+- Finance: Improved unit cost, price and margin field logic
+- Site / Defaultsite: deprecate module status.
+
+03-02-2025: 6.8.99
+- Core: Implemented SourceGuardian version >= 14 check. Fixes Last release 6.8 SourceGuardian mandatory #1216
+- Wopi / Collabora: Corrected locale name en_uk to en_gb. Users with en_UK locale are not able to use Collabora #1220
+- Finance: Sort books by name in combo
+- Finance: Don't count empty lines in VAT totals
+- Finance: Migrate billing B2C. Handle case when no company is set on invoices.
+- Finance: Invalid foreign key
+- Catalog: Fixed uninstall typo in table
+- Finance: Check if default lang is found and don;t validate html custom fields. Fixes #1222.
+
+27-01-2025: 6.8.98
+- Calendar: Minor fix import ICS and international characters
+
+23-01-2025: 6.8.97
+- Finance: revert updating margin from unit cost change. But only update price if the margin is set.
+- Finance: Copy project links when duplicating finance docs
+- Finance: Copy custom fields and set recipient from customer when duplicating finance docs
+- Contracts: Add unit too like in finance
+- Finance: draft invoices with delivery date set didn't show up in list when filtering on drafts
+- Finance: Fixed invalid article category constraint
+- Core: Fixed export import of attachment custom field. Also used in finance migration.
+- Finance: Fixed sql error in finance migration
+
+20-01-2024: 6.8.96
+- CardDav: deprecated DavTask model, updated cleanup script
+- Finance / Core: Fixed HTML editor labels in Dark mode by always showing html editor toolbar
+- Finance: Fixed status filter showing some items with different status in the list
+- Finance: Removed separate finance options from link menu and created select book step between
+- Finance: Added unit to finance documents and catalog articles
+- Finance: Added unit to invoice items (disabled by default) and made shown item fields configurable.
+- Finance: update margin field instead of price when adding costs
+
+14-01-2024: 6.8.95
+- SMIME: OSCP check not shown as error when no OSCP info is present
+- Core: Select font family and size for PDF templates
+- Core: Improved rendering quality of PDF
+
+10-01-2024: 6.8.94
+- Core: Increased font size to match the font size in legacy lib
+- Finance: Changed library for Zugferd and UBL e-invoicing
+- Finance: Handle missing address for Zugferd
+
+10-01-2024: 6.8.93
+- Finance: Option to migrate all from billing automatically.
+- Finance / Core: Copy paste PDF and e-mail templates
+
+06-01-2024: 6.8.92
+- Core: Fixed that cron could get stuck when an error occurred in a job
+- Core: Module "vendor" folders were not included in the build
+- Core: Updated German translation
+- E-mail: Restored long lost quota warning style
+- Core: Updated PL holidays (Github #1212)
+- Core: Create separate alert for each error while importing new entities
+
+23-12-2024: 6.8.91
+- Tasks: fix several bugs in ICS import
+- OAuth2 client: return more informative exception if a session variable is missing.
+- Core: Slightly more helpful debug data upon validation errors import
+
+12-12-2024: 6.8.90
+- Core: Show database error on upgrade
+- Addressbook: Check if comments module is installed
+
+09-12-2024: 6.8.89
+- Address book: Added "Last contact at" column that updates when a comment is made or an e-mail is linked
+- Address book: Made action date a regular property of contacts
+- Finance: replace invalid chars for filenames when saving PDF's
+- Tasks: MySQL 9 compatibility change
+- Core: MySQL 9 compatibility change
+ 
+02-12-2024: 6.8.88
+- Calendar: When events are private but writable. Posting the event with CalDAV will not change the title or description
+- Files: Detail panel will change to folder when a different folder is selected in the tree.
+- Core: Fixed checkbox custom field filter to match null values when client sends 'false'
+- ldapauth: Create postfixadmin account if domain matches serverclient domain
+- Finance: Fixed group by employee when billing from projects
+- History: History was depending on address book module by mistake
+- Files: bugfix file notification
+- Billing: Fixed catalog export number formatting
+- Billing: Fixed order xls export
+- ldapauth: handle error: Partial search results returned: Sizelimit exceeded
+- Core: fixed displacement of context menu
+
+25-11-2024: 6.8.87
 - Core: Added new option to toggle use of ctrl + enter to send e-mail / comments
 - Billing: Import and export custom fields and match by ID
+- Newsletters: Fixed newsletter template attachments not saving.
 
 18-11-2024: 6.8.86
 - Files: cron job file notification

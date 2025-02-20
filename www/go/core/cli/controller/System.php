@@ -410,7 +410,7 @@ JSON;
 
 
 	/**
-	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/checkBlobs --delete
+	 * docker compose exec --user www-data groupoffice ./www/cli.php  core/System/checkBlobs --delete
 	 *
 	 * @return void
 	 * @throws Exception
@@ -422,7 +422,7 @@ JSON;
 	/**
 	 * Make keys unsigned
 	 *
-	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/convertInts
+	 * docker compose exec --user www-data groupoffice ./www/cli.php  core/System/convertInts
 	 *
 	 * @return void
 	 */
@@ -530,6 +530,8 @@ JSON;
 
 	/**
 	 * Set password for user
+	 *
+	 * docker compose exec --user www-data groupoffice ./www/cli.php  core/System/setPassword --username=admin
 	 *
 	 * @throws SaveException
 	 * @throws Exception
