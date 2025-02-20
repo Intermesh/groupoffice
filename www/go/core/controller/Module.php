@@ -46,11 +46,7 @@ class Module extends EntityController {
 	 */
 	protected function canUpdate(Entity $entity): bool
 	{
-		if (go()->getAuthState()->isAdmin()) {
-			return true;
-		}
-
-		return $entity->getUserRights()->mayManage;
+		return $entity->getUserRights()->mayManage ?? go()->getAuthState()->isAdmin();
 	}
 
 	protected function canCreate(Entity $entity): bool
