@@ -14,7 +14,7 @@ return array (
   'For multiple recipients use a comma separated list eg. alias1@domain.com,alias2@domain.com' => 'Para varios destinatarios, utilice una lista separada por comas, por ejemplo: alias1@domain.com,alias2@dominio.com',
   'E-mail domains' => 'Dominios de correo electrónico',
   'Mailbox' => 'Buzón',
-  'Ok' => 'Ok',
+  'Ok' => 'Aceptar',
   'Allow external SMTP usage' => 'Permitir el uso de SMTP externo',
   'Automatic reply' => 'Respuesta automática',
   'Enable automatic reply' => 'Activar respuesta automática',
@@ -26,4 +26,5 @@ return array (
   'Max mailboxes' => 'Max buzones',
   'Max quota (MB)' => 'Cuota máxima (MB)',
   'Default quota (MB)' => 'Cuota por defecto (MB)',
+  'Enable Full Text Search' => 'Habilitar búsqueda de texto completa',
 );

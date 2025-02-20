@@ -12,4 +12,5 @@ return array (
   'The date was changed to {date}' => 'La fecha fue cambiada a {date}',
   'Add labels' => 'Añadir etiquetas',
   'A comment was made by {creator}' => 'Un comentario fue hecho por {creator}',
+  'Message' => 'Mensaje',
 );
