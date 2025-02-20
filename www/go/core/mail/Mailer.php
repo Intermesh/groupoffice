@@ -245,12 +245,16 @@ class Mailer {
 
 				$provider = $client->getProvider();
 
+				$username = !empty($this->emailAccount->smtp_username) ? $this->emailAccount->smtp_username : $this->emailAccount->username;
+
+				go()->debug("SMTP XOAUTH2 username: $username");
+
 				$this->mail->setOAuth(new OAuth([
 					'provider' => $provider,
 					'clientId' => $client->clientId,
 					'clientSecret' => $client->clientSecret,
 					'refreshToken' => $cltAcct['refreshToken'],
-					'userName' => !empty($this->emailAccount->smtp_username) ? $this->emailAccount->smtp_username : $this->emailAccount->username,
+					'userName' => $username,
 				]));
 
 			} else if (!empty($this->emailAccount->force_smtp_login)){
