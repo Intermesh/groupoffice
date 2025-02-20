@@ -224,7 +224,7 @@ $updates['202412031558'][] = function() {
 	if(go()->getDatabase()->hasTable("comments_comment")) {
 		$sql = "update addressbook_contact c 
     inner join comments_comment com on 
-        com.entityId = c.id and com.entityTypeId = (select id from core_entity where name='Contact')
+        com.entityId = c.id and com.entityTypeId = (select id from core_entity where clientName='Contact')
 set c.lastContactAt = com.createdAt;";
 
 		echo "Running: " . $sql . "\n";
