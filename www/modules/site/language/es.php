@@ -117,7 +117,7 @@ return array (
   'Add from Group-Office' => 'Añadir desde {product_name}',
   'Zoom' => 'Zoom',
   'Crop' => 'Recortar',
-  'Ok' => 'Ok',
+  'Ok' => 'Aceptar',
   'Global properties' => 'Propiedades globales',
   'Website Manager' => 'Gestor de sitios web',
 );

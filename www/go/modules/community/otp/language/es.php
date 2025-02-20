@@ -17,7 +17,7 @@ return array (
   'Provide your current password to disable OTP Authenticator.' => 'Proporcione su contraseña actual para desactivar OTP Authenticator.',
   'OTP Authenticator' => 'Autenticador OTP',
   'Enforce two factor authentication for users in a specific group' => 'Imponer la autenticación de dos factores a los usuarios de un grupo específico',
-  'Block Group-Office usage until setup is done' => 'Bloquear el uso de Group-Office hasta que se realice la configuración',
+  'Block Group-Office usage until setup is done' => 'Bloquear el uso de {product_name} hasta que se realice la configuración',
   'Count down' => 'Cuenta atrás',
   'Count down this number of seconds until the user can cancel the setup' => 'Cuenta atrás de este número de segundos hasta que el usuario puede cancelar la configuración',
   'Provide your current password before you can enable OTP Authenticator.' => 'Proporcione su contraseña actual antes de habilitar OTP Authenticator.',

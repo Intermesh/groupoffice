@@ -94,8 +94,6 @@ go.login.LoginDialog = Ext.extend(go.Window, {
 	
 	reset : function(){
 
-//		this.welcomeComp.clearWelcomeMessage();
-//		this.avatarComp.clearAvatar();
 		this.items.each(function(item, index, length){
 			item.reset();
 		},this);

@@ -40,7 +40,12 @@ return array (
   ),
   'phoneTypes' => 
   array (
-    'fax' => 'Fax',
+		"work" => "Werk",
+		"home" => "Thuis",
+		"mobile" => "Mobiel",
+		"workmobile" => "Mobiel werk",
+		"fax" => "Fax",
+		"workfax" => "Fax werl"
   ),
   'Call' => 'Bellen',
   'addressTypes' => 

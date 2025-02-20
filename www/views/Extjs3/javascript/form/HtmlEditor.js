@@ -34,7 +34,7 @@ GO.form.HtmlEditor = function (config) {
 					hrPlugin,
 					ssScriptPlugin,
 					imageResizePlugin,
-		tablePlugin
+					tablePlugin
 					);
 
 	if(config.headingsMenu) {
@@ -250,7 +250,9 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 				}
 			});
 
+			console.warn(h != anchored);
 			if(h != anchored) {
+
 				this.getEditorBody().innerHTML = anchored;
 				this.restoreCursorPosition();
 			}else
@@ -274,9 +276,9 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			range = sel.getRangeAt(0);
 
 			el = doc.createElement("div");
-			el.innerHTML = "<div style='display:none' id='go-stored-cursor'></div>";
+			el.innerHTML = "<span style='display:none' id='go-stored-cursor'></span>";
 			frag = doc.createDocumentFragment();
-			while ((node = el.firstChildElement)) {
+			while ((node = el.firstChild)) {
 				lastNode = frag.appendChild(node);
 			}
 			firstNode = frag.firstChild;

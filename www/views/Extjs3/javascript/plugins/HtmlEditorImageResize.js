@@ -41,17 +41,17 @@ Ext.extend(GO.plugins.HtmlEditorImageResize, Ext.util.Observable, {
                 -moz-user-select: none;
                 -ms-user-select: none;
             }
-            .resize-handle {
+            .img-resize-handle {
                 width: 8px;
                 height: 8px;
                 background-color: #4285f4;
                 position: absolute;
                 z-index: 1000;
             }
-            .resize-handle.tl { top: -4px; left: -4px; cursor: nwse-resize; }
-            .resize-handle.tr { top: -4px; right: -4px; cursor: nesw-resize; }
-            .resize-handle.bl { bottom: -4px; left: -4px; cursor: nesw-resize; }
-            .resize-handle.br { bottom: -4px; right: -4px; cursor: nwse-resize; }
+            .img-resize-handle.tl { top: -4px; left: -4px; cursor: nwse-resize; }
+            .img-resize-handle.tr { top: -4px; right: -4px; cursor: nesw-resize; }
+            .img-resize-handle.bl { bottom: -4px; left: -4px; cursor: nesw-resize; }
+            .img-resize-handle.br { bottom: -4px; right: -4px; cursor: nwse-resize; }
             .image-size {
                 position: absolute;
                 top: -20px;
@@ -119,7 +119,6 @@ Ext.extend(GO.plugins.HtmlEditorImageResize, Ext.util.Observable, {
 				activeWrapper = null;
 
 				// Re-enable editing and remove image-editing class
-				this.editor.getDoc().designMode = 'on';
 				editorDoc.body.contentEditable = 'true';
 				editorDoc.body.classList.remove('image-editing');
 
@@ -222,7 +221,7 @@ Ext.extend(GO.plugins.HtmlEditorImageResize, Ext.util.Observable, {
 
 			['tl', 'tr', 'bl', 'br'].forEach(pos => {
 				const handle = editorDoc.createElement('div');
-				handle.className = `resize-handle ${pos}`;
+				handle.className = `img-resize-handle ${pos}`;
 				handle.addEventListener('mousedown', function (e) {
 					startResize(e, handle);
 				}, true);
@@ -255,7 +254,6 @@ Ext.extend(GO.plugins.HtmlEditorImageResize, Ext.util.Observable, {
 			activeWrapper = wrapper;
 
 			// Disable editing completely while wrapper is active
-			this.editor.getDoc().designMode = 'off';
 			editorDoc.body.contentEditable = 'false';
 			editorDoc.body.classList.add('image-editing');
 
@@ -308,7 +306,7 @@ Ext.extend(GO.plugins.HtmlEditorImageResize, Ext.util.Observable, {
 				return;
 			}
 
-			if (event.target.closest('.resize-handle')) {
+			if (event.target.closest('.img-resize-handle')) {
 				return; // Let the event propagate to the handle's mousedown listener
 			}
 
@@ -378,7 +376,6 @@ Ext.extend(GO.plugins.HtmlEditorImageResize, Ext.util.Observable, {
 					activeWrapper = null;
 
 					// Re-enable editing after deletion
-					this.editor.getDoc().designMode = 'on';
 					editorDoc.body.contentEditable = 'true';
 					editorDoc.body.classList.remove('image-editing');
 
@@ -399,7 +396,7 @@ Ext.extend(GO.plugins.HtmlEditorImageResize, Ext.util.Observable, {
 			lastRange = null;
 			removeWrapper();
 			activeWrapper = null;
-			this.editor.getDoc().designMode = 'on';
+
 			this.editor.getDoc().body.contentEditable = 'true';
 			this.editor.getDoc().body.classList.remove('image-editing');
 		});
@@ -408,7 +405,7 @@ Ext.extend(GO.plugins.HtmlEditorImageResize, Ext.util.Observable, {
 			lastRange = null;
 			removeWrapper();
 			activeWrapper = null;
-			this.editor.getDoc().designMode = 'on';
+
 			this.editor.getDoc().body.contentEditable = 'true';
 			this.editor.getDoc().body.classList.remove('image-editing');
 		});
