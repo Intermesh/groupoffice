@@ -11,7 +11,7 @@ export class CategoryWindow extends FormWindow {
 		this.height = 360;
 
 		this.on('beforerender', () => {
-			this.title = t(this.currentId ? 'Edit category' : 'Create category');
+			this.title = t(this.form.currentId ? 'Edit category' : 'Create category');
 		});
 
 		//client.getUser().capabilities['community:calendar'].mayEditCategories;
