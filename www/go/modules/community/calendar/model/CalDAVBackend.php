@@ -352,20 +352,6 @@ class CalDAVBackend extends AbstractBackend implements
 				$object->uri($objectUri);
 				$object->attachBlob(ICalendarHelper::makeBlob($object, $calendarData)->id);
 
-//				if($object === null) {
-//					throw new \Exception('Could not create calendar event');
-//				}
-
-				// TODO, this is a bit ugly. When thunderbird schedules an event for multiple participants it's added
-				// but the sabre scheduling plugin creates an event before this with a different generated uri. But TB
-				// relies on this URI being created.
-//				if($object->uri() != $objectUri) {
-//					$object->uri($objectUri);
-//					if(!$object->save()) {
-//						throw new SaveException($object);
-//					}
-//				}
-
 				break;
 			case 't': // tasklist
 				$object = new Task();
