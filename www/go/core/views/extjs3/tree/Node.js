@@ -49,7 +49,17 @@ go.tree.Node = Ext.extend(Ext.tree.AsyncTreeNode, {
         if(this.rendered){
             this.ui.onSecondaryIconClsChange(this, cls, old);
         }
-    }
+    },
+
+	loadComplete: function (deep, anim, callback, scope) {
+		this.loading = false;
+		this.loaded = true;
+		if (this.ui) {
+			this.ui.afterLoad(this);
+		}
+		this.fireEvent("load", this);
+		this.expand(deep, anim, callback, scope);
+	},
 
 });
 
