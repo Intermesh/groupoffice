@@ -343,10 +343,7 @@ class Scheduler {
 	}
 
 	private static function processRequest(VCalendar $vcalendar, $receiver, ?CalendarEvent $event) {
-		if(!$event) {
-			$event = new CalendarEvent();
-			$event->isOrigin = false;
-			$event->replyTo = str_replace('mailto:', '',(string)$vcalendar->VEVENT[0]->{'ORGANIZER'});
+		if($event->isNew()) {
 			$event = ICalendarHelper::parseVObject($vcalendar, $event);
 			$event->save(); // we may need to save existing event to if we are not the origin
 		}
