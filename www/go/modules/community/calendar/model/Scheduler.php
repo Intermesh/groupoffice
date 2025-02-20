@@ -326,7 +326,7 @@ class Scheduler {
 				->where(['uid'=>$uid, 'recurrenceId' => $recurId])->single();
 		}
 		$calendarId = Calendar::fetchDefault($receiver);
-		if($eventCalendars) {
+		if(!empty($eventCalendars['eventId'])) {
 			// add it to the current receivers default calendar
 			$added = go()->getDbConnection()->insert('calendar_calendar_event', [
 				['calendarId'=>$calendarId, 'eventId'=>$eventCalendars['eventId']]
