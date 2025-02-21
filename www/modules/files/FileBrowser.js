@@ -343,7 +343,6 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		this.onDownloadLink(records,email);
 	}, this);
 
-
 	this.filesContextMenu.on('email_files', function(menu, records){
 		this.emailFiles(records);
 	}, this);
@@ -746,14 +745,9 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		region:'east',
 		layout:'card',
 		activeItem: 0,
-		//items:[this.filePanel, this.folderPanel],
 		collapsed:config.filePanelCollapsed,
 		width:450,
-		//collapseMode:'mini',
-		//collapsible:true,
-		//hideCollapseTool:true,
 		split:true,
-		//border:false,
 		id: config.id+'fs-east-panel'
 	});
 
@@ -826,9 +820,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 
 	this.on('fileselected',function(grid, r){
 		if(r.data.extension!='folder'){
-//			this.folderPanel.setVisible(false);
 			this.eastPanel.show();
-			// this.filePanel.show();			
 			this.eastPanel.getLayout().setActiveItem(this.filePanel);
 
 			this.filePanel.load(r.id.substr(2));
@@ -905,14 +897,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 	fileClickHandler : false,
 	scope : this,
-//	pasteSelections : Array(),
-	/*
-	 * cut or copy
-	 */
-//	pasteMode : 'cut',
-
 	path : '',
-
 
 	transformBlobs : function(blobs) {
 		return blobs.map(function(b)  {
@@ -924,24 +909,24 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		});
 	},
 
-        _enableFilesContextMenuButtons : function(enable) {
-            this.filesContextMenu.cutButton.setDisabled(!enable);
-            this.filesContextMenu.copyButton.setDisabled(!enable);
-            this.filesContextMenu.compressButton.setDisabled(!enable);
-            this.filesContextMenu.decompressButton.setDisabled(!enable);
-            this.filesContextMenu.createDownloadLinkButton.setDisabled(!enable);
-            
-            if (!GO.util.empty(this.filesContextMenu.gotaButton))
-                this.filesContextMenu.gotaButton.setDisabled(!enable);
-            
-            if (!GO.util.empty(this.filesContextMenu.downloadLinkButton))
-                this.filesContextMenu.downloadLinkButton.setDisabled(!enable);
-            
-            if (!GO.util.empty(this.filesContextMenu.emailFilesButton))
-                this.filesContextMenu.emailFilesButton.setDisabled(!enable);
-							
-			this.filesContextMenu.downloadSelectedFilesButton.setDisabled(!enable);
-				},
+	_enableFilesContextMenuButtons: function (enable) {
+		this.filesContextMenu.cutButton.setDisabled(!enable);
+		this.filesContextMenu.copyButton.setDisabled(!enable);
+		this.filesContextMenu.compressButton.setDisabled(!enable);
+		this.filesContextMenu.decompressButton.setDisabled(!enable);
+		this.filesContextMenu.createDownloadLinkButton.setDisabled(!enable);
+
+		if (!GO.util.empty(this.filesContextMenu.gotaButton))
+			this.filesContextMenu.gotaButton.setDisabled(!enable);
+
+		if (!GO.util.empty(this.filesContextMenu.downloadLinkButton))
+			this.filesContextMenu.downloadLinkButton.setDisabled(!enable);
+
+		if (!GO.util.empty(this.filesContextMenu.emailFilesButton))
+			this.filesContextMenu.emailFilesButton.setDisabled(!enable);
+
+		this.filesContextMenu.downloadSelectedFilesButton.setDisabled(!enable);
+	},
 				
 	callFileClickHandler : function(record) {
 		if(!this.createBlobs) {
@@ -987,9 +972,6 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 			state = Ext.state.Manager.get(this.gridPanel.id);
 		}
 		
-		
-		
-
 		if (store.reader.jsonData.disk_usage!==null ) {
 			GO.settings.disk_usage = store.reader.jsonData.disk_usage;
 		} else {
@@ -1015,13 +997,13 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 			
 			if(typeof GO.settings.disk_quota!='undefined') {
 				
-				if(quotaPercentage==0 && GO.settings.disk_quota==0)
-					quotaPercentage=1;
+				if(quotaPercentage==0 && GO.settings.disk_quota==0) {
+					quotaPercentage = 1;
+				}
 					
-					text = Math.round(quotaPercentage*100)+'% ('+ GO.settings.disk_usage+' of '+GO.settings.disk_quota+'MB)';
-					this.quotaBar.updateProgress(quotaPercentage, text);
-//				}
-				
+				text = Math.round(quotaPercentage*100)+'% ('+ GO.settings.disk_usage+' of '+GO.settings.disk_quota+'MB)';
+				this.quotaBar.updateProgress(quotaPercentage, text);
+
 				
 					if(quotaPercentage*100 > 99) {
 						this.quotaBar.addClass('error');
@@ -1041,7 +1023,6 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 				} else {
 					var remainingDiskSpace = 0
 				}
-				//this.uploadItem.lowerMaxFileSize(remainingDiskSpace);
 			}
 			
 		//state.sort=store.sortInfo;
@@ -1152,9 +1133,6 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 		GO.files.folderPropertiesDialogListeners={
 			scope:this,
-//			save:function(dlg, folder_id){
-//				this.setFolderID(folder_id, true);
-//			},
 			save:function(dlg, folder_id, parent_id){
 				if(parent_id==this.folder_id)
 				{
@@ -1193,12 +1171,10 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 				
 				this.treePanel.setExpandFolderId(folder_id);
 				
-				if(folder_id || folder_id==0)
+				if(folder_id || folder_id==0) {
 					this.setFolderID(this.folder_id);
-					//this.refresh();
+				}
 		}
-                
-//    this.fireEvent('folderIdSet');
 	},
 
 	buildNewMenu : function(){
@@ -1732,10 +1708,6 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 				var pasteSources = Ext.decode(this.overwriteParams.ids);
 				var pasteDestination = this.overwriteParams.destination_folder_id;
 
-
-				//delete params.paste_sources;
-				//delete params.paste_destination;
-
 				if(!success)
 				{
 					Ext.MessageBox.alert(t("Error"), t("Could not connect to the server. Please check your internet connection."));
@@ -1835,8 +1807,6 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 								}
 							}
 
-
-
 							if(pasteSources && params.paste_mode=="cut")
 							{
 								//remove moved nodes if we cut and paste
@@ -1908,25 +1878,13 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 		this.fireEvent('filedblclicked', this, record);
 
-		if(record.data.extension=='folder')
-		{
+		if(record.data.extension=='folder') {
 			this.setFolderID(record.data.id, true);
-		}else
-		{
-			if(this.fileClickHandler)
-			{				
+		}else {
+			if(this.fileClickHandler) {
 				this.callFileClickHandler(record);
-			}else
-			{
-				//browsers don't like loading a json request and download dialog at the same time.'
-//				if(this.filePanel.loading)
-//				{
-//					this.onGridDoubleClick.defer(200, this, [grid, rowClicked, e]);
-//				}else
-//				{
-//					GO.files.openFile({id:record.data.id});
-					record.data.handler.call(this);
-//				}
+			}else {
+				record.data.handler.call(this);
 			}
 		}
 	},
@@ -1947,13 +1905,10 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		this.copyButton.setDisabled(permissionLevel<=0);
                 
 		this.pasteButton.setDisabled(!writePermission || !GO.files.pasteSelections.length);
-
-	//this.filesContextMenu.deleteButton.setDisabled(!writePermission);
 	},
 
-	setFolderID : function(id, expand, forceReload)
-	{
-    this.expandTree=expand;
+	setFolderID : function(id, expand, forceReload) {
+	    this.expandTree=expand;
 		this.fireEvent('beforeFolderIdSet');
 		  
 		this.folder_id = id;
@@ -1975,8 +1930,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 						if(activeNode){
 							activeNode.expand();
-							//this.updateLocation();
-						}else{						
+						}else{
 							this.treePanel.setExpandFolderId(id);
 							this.treePanel.getRootNode().reload();	
 						}
@@ -2051,11 +2005,9 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 			this.setFolderID(dv.data.folder_id || dv.data.parent_id, true);
 		}, this, {single: true});
 		this[detailViewName].load(parseInt(id));
-//		mainPanel[detailViewName].show();
 		this.eastPanel.getLayout().setActiveItem(this[detailViewName]);
 	}
 });
-
 
 GO.files.createDownloadLink = function(records,email){
 
@@ -2064,7 +2016,7 @@ GO.files.createDownloadLink = function(records,email){
 	}
 	
 	GO.files.expireDateDialog.show(records,email);
-},
+}
 
 GO.files.showFilePropertiesDialog = function(file_id){
 
@@ -2092,8 +2044,6 @@ GO.files.showFolderPropertiesDialog = function(folder_id){
 
 	GO.files.folderPropertiesDialog.show(folder_id);
 }
-
-
 
 GO.mainLayout.onReady(function(){
 
@@ -2190,29 +2140,12 @@ GO.files.downloadFile = function (fileId){
 	go.util.downloadFile(url);
 }
 
-//GO.files.editFile = function (fileId){
-//
-//	if(GO.settings.modules.gota && GO.settings.modules.gota.read_permission && !GO.util.isAndroid())
-//	{
-//		if(!deployJava.isWebStartInstalled('1.6.0'))
-//		{
-//			Ext.MessageBox.alert(t("Error"), t("Java Webstart is not installed. Java enables easier editing of files and easier file uploading. Please visit <a class=\"normal-link\" href=\"http://www.java.com/download\" target=\"_blank\">http://www.java.com/download</a> to install it."));
-//		}else
-//		{
-//			document.location.href=GO.url('gota/file/edit&id='+fileId);
-//			return;
-//		}
-//	}
-//	GO.files.downloadFile(fileId);
-//}
-
 //for external links
 GO.files.showFolder = function(folder_id){
 
 	var fb = GO.mainLayout.openModule("files");
 	
 	fb.onReady(function(){
-		//fb.setRootID(folder_id);
 		fb.setFolderID(folder_id, true);
 	}, this);
 	
@@ -2254,11 +2187,7 @@ GO.files.openFolder = function(id, folder_id)
 GO.files.createSelectFileBrowser = function(){
 	if(!GO.selectFileBrowser)
 	{
-		GO.selectFileBrowser= new GO.files.FileBrowser({
-			// border:false
-			// filePanelCollapsed:true,
-			// treeCollapsed:false
-		});
+		GO.selectFileBrowser= new GO.files.FileBrowser({});
 
 		GO.selectFileBrowserWindow = new GO.Window({
 			title: t("Select files"),
@@ -2314,8 +2243,6 @@ GO.files.MainPanel = Ext.extend(GO.files.FileBrowser, {
 })
 
 go.Modules.register("legacy", 'files', {
-	// mainPanel: GO.files.FileBrowser,
-
 	initModule: function() {
 		if (go.Modules.get("legacy", "files").userRights.mayAccessMainPanel)
 		{

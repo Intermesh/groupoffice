@@ -24,10 +24,6 @@ GO.files.FilesContextMenu = function(config)
 		text: t("Open", "files"),
 		iconCls: 'ic-open-in-new',
 		handler: function(){
-//			GO.files.openFile({
-//				id:this.records[0].data.id
-//			});
-
 			this.records[0].data.handler.call(this);
 		},
 		scope: this
@@ -92,18 +88,6 @@ GO.files.FilesContextMenu = function(config)
 		},
 		scope: this
 	});
-
-
-
-	/*this.pasteButton = new Ext.menu.Item({
-					iconCls: 'btn-paste',
-					text: 'Paste',
-					cls: 'x-btn-text-icon',
-					handler: function(){
-						this.fireEvent('paste', this);
-					},
-					scope: this
-				});*/
 
 	this.deleteButton = new Ext.menu.Item({
 		iconCls: 'ic-delete',
@@ -279,7 +263,7 @@ GO.files.FilesContextMenu = function(config)
 		},
 		scope: this
 	});
-	config['items'].push(this.createDownloadLinkButton);
+	// config['items'].push(this.createDownloadLinkButton);
 
 	if(go.Modules.isAvailable("legacy", "email")) {
 		this.downloadLinkButton = new Ext.menu.Item({
@@ -290,7 +274,7 @@ GO.files.FilesContextMenu = function(config)
 			},
 			scope: this
 		});
-		config['items'].push(this.downloadLinkButton);
+		// config['items'].push(this.downloadLinkButton);
 
 		this.emailFilesButton = new Ext.menu.Item({
 			iconCls: 'ic-email',
@@ -300,9 +284,20 @@ GO.files.FilesContextMenu = function(config)
 			},
 			scope: this
 		});
-		config['items'].push(this.emailFilesButton);
+		// config['items'].push(this.emailFilesButton);
 	}
-	
+	this.shareMenuButton = new Ext.menu.Item({
+		iconCls: "ic-share",
+		text: t("Share", "files"),
+		menu: [
+			this.createDownloadLinkButton
+		]
+	});
+	if (go.Modules.isAvailable("legacy", "email")) {
+		this.shareMenuButton.menu.add(this.downloadLinkButton, this.emailFilesButton);
+	}
+
+	config['items'].push(this.shareMenuButton);
 	// Download selected (As Zip)
 	this.downloadSelectedFilesButton = new Ext.menu.Item({
 			iconCls: 'ic-cloud-download',

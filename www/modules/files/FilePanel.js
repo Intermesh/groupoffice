@@ -33,8 +33,6 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 	createTopToolbar : function(){
 		var tbar = GO.files.FilePanel.superclass.createTopToolbar.call(this);
 				
-		// this.editButton.setText(t("Edit"));
-
 		tbar.splice(1,0,this.downloadButton= new Ext.Button({
 			iconCls: 'ic-save',
 			tooltip: t("Download"),
@@ -49,33 +47,39 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 				this.launch();
 			},
 			scope: this
-		}));
+		}),
+			this.createDirectLinkButton = new Ext.Button({
+				iconCls: "ic-open-in-browser",
+				tooltip: t("Copy direct link", "files"),
+				handler: function() {
+					let url = GO.settings.config.full_url + "#"+this.entity.toLowerCase()+"/"+this.model_id;
+					go.util.copyTextToClipboard(url);
+					Ext.MessageBox.alert(t("Success"), t("Value copied to clipboard"));
+				},
+				scope: this
+			})
+		);
 
 		return tbar;
 	},
 
 	launch : function() {
 		//browsers don't like loading a json request and download dialog at the same time.'
-		if(this.loading)
-		{
+		if(this.loading) {
 			this.launch.defer(200, this);
-		}else
-		{	
-			//GO.files.openFile({id:this.data.id});
+		}else {
 			this.data.handler.call(this);
 		}		
 	},
 
 	reset : function(){
 		GO.files.FilePanel.superclass.reset.call(this);
-//		this.setTitle('&nbsp;');
 	},
 
 	setData : function(data)
 	{
 		GO.files.FilePanel.superclass.setData.call(this, data);
-//		this.setTitle(data.name);		
-		this.editButton.setDisabled(data.locked || !this.data.write_permission);	
+		this.editButton.setDisabled(data.locked || !this.data.write_permission);
 		
 		//custom fields pass path as ID and it will be looked up by the controller. So we must set the actual ID here.
 		//see actionDisplay in FileController
@@ -155,23 +159,9 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 					</tpl>' +
 
 				'<table class="display-panel" cellpadding="0" cellspacing="0" border="0">'+
-//					'<tr>'+
-//						'<td width="120">'+t("Path", "files")+':</td>'+
-//						'<td>{path}</td>'+
-//					'</tr>'+
 					'<tr>'+
 						'<td colspan="2" class="display-panel-heading">{path}</td>'+
 					'</tr>'+
-					
-//					'<tr>'+
-//						'<td>ID</td><td>{id}</td>'+
-//					'</tr>'+
-					
-//					'<tr>'+
-//						'<td>'+t("Type")+':</td>'+
-//						'<td colspan=><div class="go-grid-icon filetype filetype-{extension}">{type}</div></td>'+						
-//					'</tr>'+
-
 					'<tr>'+
 						'<td>'+t("Size")+':</td>'+
 						'<td>{[values.size==\'-\' ? values.size : Ext.util.Format.fileSize(values.size)]}</td>'+
@@ -254,13 +244,6 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
           '</tpl>'+
 
 					this.extraTemplateProperties +
-
-					/*'<tr>'+
-						'<td>'+t("Accessed at")+'</td>'+
-						'<td>{atime}</td>'+
-					'</tr>'+*/
-
-				
 				'</table>';
 
 	
