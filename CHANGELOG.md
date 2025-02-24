@@ -2,7 +2,8 @@
 - Core: Log outgoing e-mail messages
 - Core: if no primary authenticator was found then also allow password recovery to create a password
 - Business / Finance: Sortable VAT rates
-
+- Support: Delete from detail view routed to tasks instead of support
+- 
 20-02-2025: 6.8.104
 - Addressbook: Translate phone types to nl
 - Core: Updated Spanish translation with special thanks to Diputación de Huelva
