@@ -8,6 +8,8 @@ import {PreferencesPanel} from "./PreferencesPanel";
 
 export * from "./Main.js";
 export * from "./CalendarList.js";
+export * from "./CalendarView.js";
+export * from "./CalendarItem.js";
 
 export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list';
 export const calendarStore = datasourcestore({
