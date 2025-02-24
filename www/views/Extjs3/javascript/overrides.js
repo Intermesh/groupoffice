@@ -1220,6 +1220,7 @@ Ext.override(Ext.Panel, {
 });
 
 Ext.override(Ext.form.Field, {
+	validateOnBlur: false,
 	fieldInitComponent : Ext.form.Field.prototype.initComponent,
 	
 	initComponent : function() {
