@@ -1,3 +1,4 @@
+24-02-2025: 6.8.105
 - Core: HTML editor sends links to blank page automatically
 - Core: Log outgoing e-mail messages
 - Core: if no primary authenticator was found then also allow password recovery to create a password
