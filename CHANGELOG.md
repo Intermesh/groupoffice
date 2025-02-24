@@ -1,5 +1,6 @@
 - Core: Log outgoing e-mail messages
 - Core: if no primary authenticator was found then also allow password recovery to create a password
+- Business / Finance: Sortable VAT rates
 
 20-02-2025: 6.8.104
 - Addressbook: Translate phone types to nl
