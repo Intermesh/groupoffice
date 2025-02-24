@@ -1,4 +1,7 @@
-18-02-2025:
+- Calendar time tracking module
+- Tasks / Support: Easier task dialog
+
+18-02-2025: 25.0.4
 - Many bug fixes and tweaks
  
 27-01-2025: 25.0.3
