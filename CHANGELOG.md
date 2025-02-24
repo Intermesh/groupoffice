@@ -1,3 +1,5 @@
+- Core: Log outgoing e-mail messages
+
 20-02-2025: 6.8.104
 - Addressbook: Translate phone types to nl
 - Core: Updated Spanish translation with special thanks to Diputación de Huelva
