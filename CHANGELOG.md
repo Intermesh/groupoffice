@@ -1,3 +1,4 @@
+- Core: HTML editor sends links to blank page automatically
 - Core: Log outgoing e-mail messages
 - Core: if no primary authenticator was found then also allow password recovery to create a password
 - Business / Finance: Sortable VAT rates
