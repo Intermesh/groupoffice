@@ -174,7 +174,10 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			'{DAV:}displayname' => $calendar->name,
 			'{urn:ietf:params:xml:ns:caldav}calendar-description' => 'User calendar',
 			'{urn:ietf:params:xml:ns:caldav}calendar-timezone' => "BEGIN:VCALENDAR\r\n" . $tz->serialize() . "END:VCALENDAR",
-			'{http://sabredav.org/ns}read-only' => $level < Acl::LEVEL_CREATE,
+			// To prevent sync errors. Calendars with READ+CREATE will show as read only. DAV does not have read+create.
+			// therefor user could write existing events and will have an error on sync and the change is later reverted.
+			// Also, the create-only permission would have to be checked manually is made available
+			'{http://sabredav.org/ns}read-only' => $level <= Acl::LEVEL_CREATE,
 			// 1 = owner, 2 = readonly, 3 = readwrite
 			'share-access' => $level == Acl::LEVEL_MANAGE ? 1 : ($level >= Acl::LEVEL_WRITE ? 3 : 2),
 			//'access'=> $calendar->getPermissionLevel() < Acl::LEVEL_CREATE ? \Sabre\DAV\Sharing\Plugin::ACCESS_READ : \Sabre\DAV\Sharing\Plugin::ACCESS_READWRITE
