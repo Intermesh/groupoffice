@@ -276,15 +276,15 @@ class Builder
 
 
 		//business package
-		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/multisafepay');
-
 		$this->runEncoder('/business', '/go/modules');
 
 		$businessDir = new DirectoryIterator($this->sourceDir . '/business');
 		foreach ($businessDir as $fileinfo) {
 			if ($fileinfo->isDot() || !$fileinfo->isDir() || $fileinfo->getBasename() == '.git') {
 				continue;
-			}
+			} elseif ($fileinfo->getBasename() == 'multisafepay') {
+                continue;
+            }
 
 			$moduleName = $fileinfo->getBasename();
 
@@ -313,6 +313,7 @@ class Builder
 
 
 		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/kanban');
+		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/multisafepay');
 		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/projects3');
 
 
