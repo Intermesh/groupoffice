@@ -1,3 +1,4 @@
+24-02-2024: 6.7.86
 - SMIME: OSCP check not shown as error when no OSCP info is present
 - Core: Added PL holidays from 6.8 branch
 - Core / Email: Fix odd bug in HTML editor with Firefox >=135 (backport from 6.8)
