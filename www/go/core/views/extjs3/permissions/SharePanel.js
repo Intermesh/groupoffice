@@ -74,7 +74,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 					name: 'selected', 
 					type: {
 						convert: function (v, data) {
-							return me.getSelectedGroupIds().indexOf(data.id) > -1;
+							return me.getSelectedGroupIds().indexOf(parseInt(data.id)) > -1;
 						}
 					},
 					sortType:function(checked) {
