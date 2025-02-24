@@ -313,16 +313,21 @@ export class EventWindow extends FormWindow {
 
 	private async createVideoLink(s: any) {
 		const room = this.b64UrlEncode(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(8))));
+
 		if(!s.videoJwtEnabled) {
 			return s.videoUri+room;
 		}
-		const id = s.videoJwtAppId,
-			head= this.b64UrlEncode(JSON.stringify({alg: 'HS256', typ: 'JWT'})),
-			load = this.b64UrlEncode(JSON.stringify({aud: id, iss: id, room})),
-			key = await crypto.subtle.importKey('raw', (new TextEncoder()).encode(s.videoJwtSecret),
-				{ name: 'HMAC', hash: 'SHA-256' }, false, ['sign']),
-			sign = await window.crypto.subtle.sign("HMAC", key, (new TextEncoder()).encode(`${head}.${load}`));
-		return  s.videoUri+room+'?jwt='+`${head}.${load}.${this.b64UrlEncode(String.fromCharCode(...new Uint8Array(sign)))}`;
+
+		const response = await client.jmap("CalendarEvent/generateJWT", {room}, 'pJwt');
+
+		return  s.videoUri+room+'?jwt='+response.jwt;
+		// const id = s.videoJwtAppId,
+		// 	head= this.b64UrlEncode(JSON.stringify({alg: 'HS256', typ: 'JWT'})),
+		// 	load = this.b64UrlEncode(JSON.stringify({aud: id, iss: id, room})),
+		// 	key = await crypto.subtle.importKey('raw', (new TextEncoder()).encode(s.videoJwtSecret),
+		// 		{ name: 'HMAC', hash: 'SHA-256' }, false, ['sign']),
+		// 	sign = await window.crypto.subtle.sign("HMAC", key, (new TextEncoder()).encode(`${head}.${load}`));
+		// return  s.videoUri+room+'?jwt='+`${head}.${load}.${this.b64UrlEncode(String.fromCharCode(...new Uint8Array(sign)))}`;
 	}
 
 	private openExceptionsWindow() {

@@ -10,6 +10,7 @@ use GO\Email\Model\Account;
 use go\modules\community\addressbook\convert\VCard;
 use go\modules\community\calendar\model;
 use go\modules\community\calendar\model\ICalendarHelper;
+use go\modules\community\calendar\Module;
 
 
 /**
@@ -87,6 +88,29 @@ class CalendarEvent extends EntityController {
 	public function parse($params) {
 
 	}
+
+	private function b64UrlEncode($data) {
+		return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+	}
+
+	function generateJWT($params) {
+		$s = Module::get()->getSettings();
+
+		$header = $this->b64UrlEncode(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
+		$payload = $this->b64UrlEncode(json_encode([
+			'aud' => $s['videoJwtAppId'],
+			'iss' => $s['videoJwtAppId'],
+			'room' => $params['room']
+		]));
+
+		$signature = hash_hmac('sha256', "$header.$payload", $s['videoJwtSecret'], true);
+
+		return [
+			'success' => true,
+			'jwt' => "$header.$payload." . $this->b64UrlEncode($signature)
+		];
+	}
+
 
 	public function loadICS( array $params) :array
 	{
