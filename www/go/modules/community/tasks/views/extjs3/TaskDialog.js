@@ -94,9 +94,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 	onTaskListChange: function (combo, val) {
 
-		if (!Ext.isNumber(val)) {
-			return; //some bug calling this with string
-		}
 		const categories = this.formPanel.form.findField('categories');
 		categories.comboStore.setFilter("tasklistId", {
 			operator: "OR",
