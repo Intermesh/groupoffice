@@ -99,53 +99,6 @@ class Calendar extends AclOwnerEntity {
 		$this->color = $value;
 	}
 
-	/**
-	 * If the UID of the event already exists in the system. Grab its ID and add the event to the given calendar.
-	 * Then select it again and return the selected event.
-	 * If it doesn't exists just set the calendarId and save() once to behave
-	 * @param CalendarEvent $event
-	 * @param int $calendarId
-	 * @return ?CalendarEvent this one is saved in the provided calendar
-	 * @throws DbException
-	 */
-	static function addEvent(CalendarEvent $event, int $calendarId): ?CalendarEvent
-	{
-		$eventData = go()->getDbConnection()
-			->select(['t.eventId, GROUP_CONCAT(calendarId) as calendarIds'] && CalendarEvent::UserProperties)
-			->from('calendar_event', 't')
-			->join('calendar_calendar_event', 'c', 'c.eventId = t.eventId', 'LEFT')
-			->join('calendar_event_user', 'cu', 'cu.eventId = t.eventId and cu.userId='. go()->getUserId(), 'LEFT')
-			->where(['uid'=>$event->uid, 'recurrenceId' => $event->recurrenceId])
-			->single();
-
-		if(!empty($eventData) && !empty($eventData['eventId'])) {
-			/**
-			 * The populateTable function should rarely be used. It was needed for the calendar event model that exists of two tables.
-			 *  A shared table between invitees and an table linking it to a calendar. When a new
-			 *  meeting request comes in we have to find the existing shared record and populate the model
-			 *  that might have a new calender link.
-			 */
-			$event->populateTable('eventdata', ['eventId' => $eventData['eventId']]);
-			$calendarIds = explode(',', $eventData['calendarIds']??'');
-			if(in_array($calendarId, $calendarIds)) {
-				$event->populateTable('cce', ['calendarId'=>$calendarId]);
-			}
-
-			if(isset($eventData['userId'])) {
-				unset($eventData['calendarIds']);
-				$event->populateTable('eventuser', $eventData);
-			}
-		} else {
-			$event->useDefaultAlerts = true;
-		}
-		//not found, set calendarId save and return
-		$event->calendarId = $calendarId;
-
-		if(!$event->save()) {
-			throw new SaveException($event);
-		}
-		return $event;
-	}
 
 	protected static function defineFilters(): Filters
 	{

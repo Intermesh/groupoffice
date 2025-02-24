@@ -210,8 +210,11 @@ final class Oauth2Client extends EntityController
 
 			$account = \GO\Email\Model\Account::model()->findByPk($accountId);
 			$account->createDefaultFolders();
-			if(method_exists($token, "getIdTokenClaims") && isset($token->getIdTokenClaims()['email']) && $account->smtp_username != $token->getIdTokenClaims()['email']) {
+			if(method_exists($token, "getIdTokenClaims") && !empty($token->getIdTokenClaims()['email']) && $account->smtp_username != $token->getIdTokenClaims()['email']) {
 				$account->smtp_username = $token->getIdTokenClaims()['email'];
+				$account->save();
+			} else if(empty($account->smtp_username)) {
+				$account->smtp_username = $account->username;
 				$account->save();
 			}
 			//$ownerDetails = $provider->getResourceOwner($token);

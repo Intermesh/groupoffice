@@ -345,7 +345,7 @@ class Extjs3 {
 		} else {
 			foreach ($this->goScripts as $script) {
 				echo ($script instanceof File ?
-						'<script src="' . str_replace($rootPath, '', $script->getPath()) . '?mtime=' . $script->getModifiedAt()->format("U") . '"></script>' :
+						'<script src="' . str_replace($rootPath, '', $script->getPath())  . '"></script>' :
 						'<script>' . $script . '</script>') . "\n";
 
 			}

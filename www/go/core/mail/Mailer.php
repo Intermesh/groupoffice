@@ -2,8 +2,13 @@
 
 namespace go\core\mail;
 
+use go\core\ErrorHandler;
+use go\core\http\Request;
 use go\core\model\SmtpAccount;
+use go\core\model\User;
+use go\core\util\StringUtil;
 use GO\Email\Model\Account;
+use go\modules\community\history\model\LogEntry;
 use go\modules\community\oauth2client\model\Oauth2Client;
 use League\OAuth2\Client\Provider\Google;
 use PHPMailer\PHPMailer\Exception;
@@ -135,6 +140,9 @@ class Mailer {
 	{
 		$message->setMailer($this);
 		$this->prepareMessage($message);
+
+		$this->log($message);
+
 		$this->mail->send();
 		$this->sent = true;
 	}
@@ -245,12 +253,16 @@ class Mailer {
 
 				$provider = $client->getProvider();
 
+				$username = !empty($this->emailAccount->smtp_username) ? $this->emailAccount->smtp_username : $this->emailAccount->username;
+
+				go()->debug("SMTP XOAUTH2 username: $username");
+
 				$this->mail->setOAuth(new OAuth([
 					'provider' => $provider,
 					'clientId' => $client->clientId,
 					'clientSecret' => $client->clientSecret,
 					'refreshToken' => $cltAcct['refreshToken'],
-					'userName' => !empty($this->emailAccount->smtp_username) ? $this->emailAccount->smtp_username : $this->emailAccount->username,
+					'userName' => $username,
 				]));
 
 			} else if (!empty($this->emailAccount->force_smtp_login)){
@@ -385,6 +397,39 @@ class Mailer {
 
 		foreach ($message->getHeaders() as $name => $value) {
 			$this->mail->addCustomHeader($name, $value);
+		}
+	}
+
+	private function log(Message $message): void
+	{
+		$logMsg = "From: " . $message->getFrom()->getEmail().
+			", To: ". implode(',', array_map(function($a) { return $a->getEmail(); }, $message->getTo())).
+			", Subject: ".$message->getSubject().
+			", Id: ".$message->getId();
+
+		go()->debug("Sending e-mail: ". $logMsg);
+
+		$log = new LogEntry();
+
+		if($this->smtpAccount) {
+			$log->setEntity($this->smtpAccount);
+		} else if($this->emailAccount) {
+			$log->setEntity($this->emailAccount);
+		} else {
+			$user = go()->getAuthState()->getUser();
+			if(isset($user)) {
+				$log->setEntity($user);
+			} else{
+				$log->entityTypeId = User::entityType()->getId();
+			}
+		}
+
+		$log->description = StringUtil::cutString($logMsg, 384, false, "");
+
+		$log->setAction('email');
+		$log->changes = null;
+		if(!$log->save()){
+			ErrorHandler::log("Failed to write e-mail log");
 		}
 	}
 }

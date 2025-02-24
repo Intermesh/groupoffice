@@ -69,7 +69,8 @@ class LogEntry extends AclOwnerEntity {
 		'login' => 4,
 		'logout' => 5,
 		'badlogin' => 6,
-		'download' => 7
+		'download' => 7,
+		'email' => 8
 	];
 
 	public $id;
