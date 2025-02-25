@@ -32,6 +32,7 @@ class Module extends core\Module
 	public function defineListeners()
 	{
 		CalendarEvent::on(CalendarEvent::EVENT_BEFORE_SAVE, self::class, 'onBeforeEventSave');
+		CalendarEvent::on(CalendarEvent::EVENT_BEFORE_DELETE, self::class, 'onBeforeDelete');
 		Calendar::on(Calendar::EVENT_MAPPING, self::class, 'onCalendarMap');
 	}
 
@@ -48,6 +49,23 @@ class Module extends core\Module
 		}
 		$davAccount = DavAccount::findByCalendarId($event->calendarId);
 		return !empty($davAccount) ? $davAccount->put($event) : true;
+	}
+
+	public static function onBeforeDelete($query) {
+		if(self::$IS_SYNCING) {
+			return true;
+		}
+
+		$success = true;
+		$events = CalendarEvent::find(['calendarId', 'uri'])->mergeWith($query);
+
+		foreach($events as $event) {
+			$davAccount = DavAccount::findByCalendarId($event->calendarId);
+			if(!empty($davAccount)) {
+				$success = $davAccount->remove($event) && $success;
+			}
+		}
+		return $success;
 	}
 
 	public static function getTitle(): string

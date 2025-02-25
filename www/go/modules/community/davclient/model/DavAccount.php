@@ -181,6 +181,14 @@ class DavAccount extends AclOwnerEntity {
 		return $cal->put($event);
 	}
 
+	public function remove($event) {
+		// calendar and uri is needed
+		$cal = $this->byCalendar($event->calendarId);
+		// calendar must exist
+		return $cal->remove($event);
+	}
+
+
 	public function sync() {
 //		if(!$this->isSetup()) {
 			$this->serviceDiscovery();
@@ -263,6 +271,7 @@ class DavAccount extends AclOwnerEntity {
 				// $this->addTasklist()??
 			}
 		}
+		$this->save(); // make sure the added calendars are also linked to the account before timeouts happen.
 		return $calendars;
 	}
 

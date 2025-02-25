@@ -61,17 +61,25 @@ class Calendar extends Property
 		return true;
 	}
 
+	public function remove(CalendarEvent $event) {
+		$http = $this->owner->http()->setHeader('Content-Type', 'text/calendar; charset=utf-8');
+		$http->DELETE( $this->uri . $event->uri());
+		// any success status from the server will indicate all is well.
+		return ($http->statusCode() <= 299);
+	}
+
+
 	private function fetchEtags() {
 		$xml = <<<XML
 <c:calendar-query xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav">
-    <d:prop>
-        <d:getetag />
-    </d:prop>
-    <c:filter>
-        <c:comp-filter name="VCALENDAR">
+	<d:prop>
+		<d:getetag />
+	</d:prop>
+	<c:filter>
+		<c:comp-filter name="VCALENDAR">
 			<c:comp-filter name="VEVENT" />
-        </c:comp-filter>
-    </c:filter>
+		</c:comp-filter>
+	</c:filter>
 </c:calendar-query>
 XML;
 		$responses = $this->owner->http()
