@@ -1,5 +1,14 @@
+24-02-2025: 6.8.105
+- Core: HTML editor sends links to blank page automatically
+- Core: Log outgoing e-mail messages
+- Core: if no primary authenticator was found then also allow password recovery to create a password
+- Business / Finance: Sortable VAT rates
+- Support: Delete from detail view routed to tasks instead of support
+- 
+20-02-2025: 6.8.104
 - Addressbook: Translate phone types to nl
 - Core: Updated Spanish translation with special thanks to Diputación de Huelva
+- Email: Fixed sending problem with gmail because of change in oauth2-client 2.8.0. We reverted to 2.7.0: https://github.com/PHPMailer/PHPMailer/issues/3131 and https://github.com/thephpleague/oauth2-client/issues/1052
 
 17-02-2025: 6.8.103
 - Timeregistration: Don't user user e-mail in dissapprove mail because it may lead to problems with the system settings mail server configuration not allowing this from addrers.
