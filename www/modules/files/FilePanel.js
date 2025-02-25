@@ -30,36 +30,74 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 		
 	},
 
-	createTopToolbar : function(){
-		var tbar = GO.files.FilePanel.superclass.createTopToolbar.call(this);
-				
-		tbar.splice(1,0,this.downloadButton= new Ext.Button({
-			iconCls: 'ic-save',
-			tooltip: t("Download"),
-			handler: function(){
-				GO.files.downloadFile(this.model_id);
-			},
-			scope: this
-		}),this.propertiesBtn = new Ext.Button({
-			iconCls: 'ic-launch',
-			tooltip: t("Open"),			
-			handler: function(){
-				this.launch();
-			},
-			scope: this
-		}),
-			this.createDirectLinkButton = new Ext.Button({
-				iconCls: "ic-open-in-browser",
-				tooltip: t("Copy direct link", "files"),
-				handler: function() {
-					let url = GO.settings.config.full_url + "#"+this.entity.toLowerCase()+"/"+this.model_id;
-					go.util.copyTextToClipboard(url);
-					Ext.MessageBox.alert(t("Success"), t("Value copied to clipboard"));
+	createTopToolbar: function () {
+
+		const tbar = GO.files.FilePanel.superclass.createTopToolbar.call(this);
+
+		tbar.splice(1, 0, this.downloadButton = new Ext.Button({
+				iconCls: 'ic-save',
+				tooltip: t("Download"),
+				handler: function () {
+					GO.files.downloadFile(this.model_id);
 				},
 				scope: this
+			}), this.propertiesBtn = new Ext.Button({
+				iconCls: 'ic-launch',
+				tooltip: t("Open"),
+				handler: function () {
+					this.launch();
+				},
+				scope: this
+			}),
+			this.shareMenuButton = new Ext.Button({
+				iconCls: "ic-share",
+				tooltip: t("Share", "files"),
+				menu: [
+					new Ext.menu.Item({
+						iconCls: "ic-open-in-browser",
+						text: t("Copy direct link", "files"),
+						handler: function () {
+							let url = GO.settings.config.full_url + "#" + this.entity.toLowerCase() + "/" + this.model_id;
+							go.util.copyTextToClipboard(url);
+							Ext.MessageBox.alert(t("Success"), t("Value copied to clipboard"));
+						},
+						scope: this
+					}),
+					new Ext.menu.Item({
+						iconCls: 'ic-link',
+						text: t("Create download link", "files"),
+						handler: function(){
+							GO.files.createDownloadLink([{data: this.data}],false);
+						},
+						scope: this
+					})
+				]
 			})
 		);
+		if (go.Modules.isAvailable("legacy", "email")) {
+			this.shareMenuButton.menu.add(
+				new Ext.menu.Item({
+					iconCls: 'ic-email',
+					text: t("Email download link", "files"),
+					handler: function () {
+						GO.files.createDownloadLink([{data: this.data}],true);
+					},
+					scope: this
+				}),
 
+				new Ext.menu.Item({
+					iconCls: 'ic-email',
+					text: t("Email files", "email"),
+					handler: function () {
+						if(this.data.folder_id) {
+							this.data.name = String(this.data.name).split('/').reverse()[0];
+						}
+						GO.email.emailFiles([this.data]);
+					},
+					scope: this
+				}))
+			;
+		}
 		return tbar;
 	},
 
@@ -89,7 +127,7 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 	},
 
 	initComponent : function(){
-		
+
 		this.on('bodyclick',function(panel,target, e){
 						
 			target = Ext.get(target);
@@ -116,9 +154,9 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 			}
 			
 			if(target.hasClass("fs-deleteDL")){
-				
-			var answer = confirm(t("You are going to delete this link, are you sure?", "files"));
-			if(answer){
+
+				const answer = confirm(t("You are going to delete this link, are you sure?", "files"));
+				if(answer){
 				
 					GO.request({
 						url:'files/file/submit',
@@ -140,7 +178,7 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 
 			if(target.hasClass("go-scrollintoview")){
 
-				var scrollToName = target.getAttribute('data-scrollintoview-el');
+				const scrollToName = target.getAttribute('data-scrollintoview-el');
 
 				if(!Ext.isEmpty(scrollToName)){
 					var p = this.getEl();
@@ -224,7 +262,7 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 						
 						'<tpl if="!GO.util.empty(delete_when_expired)">'+
 							'<tr>'+
-								'<td colspan="2"><span style="color:red;">'+t("File will be automatically deleted when its download link expires", "files")+'</span></td>'+
+								'<td colspan="2"><span style="color:var(--hue-red);">'+t("File will be automatically deleted when its download link expires", "files")+'</span></td>'+
 							'</tr>'+
 						'</tpl>'+
 						
@@ -248,8 +286,9 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 
 	
 		
-		if(go.Modules.isAvailable("legacy", "workflow"))
-			this.template +=GO.workflow.WorkflowTemplate;
+		if(go.Modules.isAvailable("legacy", "workflow")) {
+			this.template += GO.workflow.WorkflowTemplate;
+		}
 
 		GO.files.FilePanel.superclass.initComponent.call(this);
 		

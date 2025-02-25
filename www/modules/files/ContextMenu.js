@@ -412,23 +412,6 @@ Ext.extend(GO.files.FilesContextMenu, Ext.menu.Menu,{
 
 						break;
 
-	//				case '':
-	//					
-	//					this.downloadButton.show();
-	//
-	//					this.decompressButton.show();
-	//					this.compressButton.hide();
-	//					if(this.downloadLinkButton)
-	//						this.downloadLinkButton.show();
-	//					this.createDownloadLinkButton.show();
-	//
-	//					if(this.emailFilesButton)
-	//						this.emailFilesButton.show();
-	//
-	//					
-	//					this.bookmarkButton.hide();
-	//					
-	//					break;
 					case 'folder':
 
 						this.lockButton.hide();
