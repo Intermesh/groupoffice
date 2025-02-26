@@ -73,8 +73,8 @@ GO.files.ExpireDateDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 					},
 					success: function(options, response, result)
 					{
-						if(response && response.url) {
-							go.util.copyTextToClipboard(GO.settings.config.full_url + response.url);
+						if(result && result.url) {
+							go.util.copyTextToClipboard(result.url.replace(/&amp;/g,"&"));
 							Ext.MessageBox.alert(t("Success"), t("Value copied to clipboard"));
 						}
 						this.refreshActiveDisplayPanels();
