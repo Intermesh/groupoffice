@@ -794,6 +794,13 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			tpl:'<tpl for="."><div class="x-combo-list-item"><div style="float:left;width:20px;margin-right:5px;background-color:#{color}">&nbsp;</div>{[Ext.util.Format.htmlDecode(values.name)]}</div></tpl>'
 		});
 
+		this.descriptionField = new Ext.form.TextArea({
+			xtype: 'textarea',
+			fieldLabel: t("Description"),
+			name: 'description',
+			grow: true
+		});
+
 		this.selectCategory.on('select', function(combo, record)
 		{
 			this.colorField.setValue(record.data.color);
@@ -867,31 +874,34 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 				layout: "form",
 				cls: "go-hbox",
 
-				items : [this.startDate,this.startTime,this.allDayCB
-				]
+				items : [this.startDate,this.startTime,this.allDayCB]
 			},{
 					xtype : 'container',
 					layout: "form",
 					cls: "go-hbox",
-				items : [this.endDate, this.endTime,this.checkAvailabilityButton
-				]
+				items : [this.endDate, this.endTime,this.checkAvailabilityButton]
 			},{
 					xtype : 'container',
 					layout: "form",
 					cls: "go-hbox",
-				items : [
-				this.eventStatus,
-				this.busy,
-				this.privateCB
-				]
+				items : [this.eventStatus, this.busy, this.privateCB]
 			},
 			this.selectCategory,
-			{
-				xtype:'textarea',
-				fieldLabel:t("Description"),
-				name : 'description',
-				grow: true
-			}]
+			this.descriptionField,
+				{
+					xtype: 'container',
+					layout: "form",
+					cls: "go-hbox",
+					items: [
+						this.addDownLoadLinkButton = new Ext.Button({
+							iconCls: "ic-link",
+							text: t("Add download link", "files"),
+							handler: this.fileBrowserHandle,
+							scope: this
+						})
+					]
+				}
+			]
 
 		});
 		// Start of recurrence tab
@@ -1005,20 +1015,17 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 	},
 
 
-	buildAccordion : function()
-	{
+	buildAccordion : function() {
 		this.resourcesPanel.removeAll(true);
 		this.resourcesPanel.forceLayout=true;
 
 		var newFormField;
-		for(var i=0; i<this.resourceGroupsStore.getCount(); i++)
-		{
+		for(var i=0; i<this.resourceGroupsStore.getCount(); i++) {
 			var record = this.resourceGroupsStore.data.items[i].data;
 			var resourceFieldSets = [];
 			var resources = record.resources;
 
-			for(var j=0; j<resources.length; j++)
-			{
+			for(var j=0; j<resources.length; j++) {
 				var resourceOptions = [];
 
 				var pfieldStatus = new GO.form.PlainField({
@@ -1061,15 +1068,13 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 						var fieldSets = go.customfields.CustomFields.getFormFieldSets("Event"), length = fieldSets.length;
 
 						if(length) {
-							for(var l=0; l<length; l++)
-							{
+							for(var l=0; l<length; l++) {
 								var cf = go.customfields.CustomFields.getFormFields(fieldSets[l].fieldSet.id);
 								resourceOptions.push(new GO.form.PlainField({
 										hideLabel: true,
 										value: '<b>'+fieldSets[l].fieldSet.name+'</b>'
 									}));
-								for(var m=0; m<cf.length; m++)
-								{
+								for(var m=0; m<cf.length; m++) {
 
 									cf[m].name = 'resource_options['+resources[j].id+']['+cf[m].field.databaseName+']';
 									cf[m].id ='resource_options['+resources[j].id+']['+cf[m].field.databaseName+']';
@@ -1089,9 +1094,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 
 							}
 						}
-					}
-					else
-					{
+					} else {
 						resourceOptions.push(new GO.form.PlainField({
 							name:'no_fields_'+resources[j].id,
 							hideLabel:true,
@@ -1179,6 +1182,42 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			event_id : this.event_id,
 			resourceIds : Ext.encode(this.getResourceIds())
 		});
+	},
+
+	fileBrowserHandle: function (result) {
+		GO.files.createSelectFileBrowser();
+
+		GO.selectFileBrowser.setFileClickHandler(function () {
+			const selections = GO.selectFileBrowser.getSelectedGridRecords();
+			if(selections.length) {
+				if (!GO.files.expireDateDialog){
+					GO.files.expireDateDialog = new GO.files.ExpireDateDialog();
+					GO.files.expireDateDialog.on("pasteLinks", (r) => {
+						if (r.url) {
+							const description = t("External download link", "files", "legacy") + ": " + r.url;
+
+							let v = this.descriptionField.getValue();
+							if(go.util.empty(v)) {
+								v = description;
+							} else {
+								v += "\r\n" + description;
+							}
+							this.descriptionField.setValue(v);						}
+					});
+				}
+				GO.files.expireDateDialog.show(selections,false, true);
+			}
+			GO.selectFileBrowserWindow.hide();
+		}, this);
+		GO.selectFileBrowser.setFilesFilter('');
+
+		// TODO? current files_folder_id of calendar?
+		if (result) {
+			GO.selectFileBrowser.setRootID(result.files_folder_id, result.files_folder_id);
+		} else {
+			GO.selectFileBrowser.setRootID(0, 0);
+		}
+		GO.selectFileBrowserWindow.show();
 	}
 
 });
