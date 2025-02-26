@@ -400,12 +400,12 @@ CREATE TABLE IF NOT EXISTS calendar_preferences (
 ) COLLATE = utf8mb4_unicode_ci;
 
 
-CREATE TABLE calendar_event_custom_fields LIKE cal_events_custom_fields;
+CREATE TABLE IF NOT EXISTS calendar_event_custom_fields LIKE cal_events_custom_fields;
 ALTER TABLE calendar_event_custom_fields CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL;
 ALTER TABLE `calendar_event_custom_fields`
 	ADD CONSTRAINT `calendar_event_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `calendar_event` (`eventId`) ON DELETE CASCADE;
 
-CREATE TABLE calendar_calendar_custom_fields LIKE cal_calendars_custom_fields;
+CREATE TABLE IF NOT EXISTS calendar_calendar_custom_fields LIKE cal_calendars_custom_fields;
 ALTER TABLE calendar_calendar_custom_fields CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL;
 ALTER TABLE `calendar_calendar_custom_fields`
 	ADD CONSTRAINT `calendar_calendar_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `calendar_calendar` (`id`) ON DELETE CASCADE;
@@ -513,11 +513,14 @@ INSERT INTO calendar_participant
 
 INSERT INTO calendar_participant
 (id, eventId, name, email, kind, rolesMask, participationStatus, scheduleAgent, expectReply, scheduleUpdated) SELECT
-CONCAT('Calendar:',c.id), r.id as eventId, c.name,u.email , 'resource', 0 ,IF(e.status = 'CONFIRMED', 'accepted', LOWER(e.status)), 'server',1,FROM_UNIXTIME(IF(e.mtime='',0, e.mtime))FROM cal_events e
+CONCAT('Calendar:',c.id), r.id as eventId, c.name,u.email , 'resource', 0 ,
+IF(MIN(e.status) = 'CONFIRMED', 'accepted', LOWER(MIN(e.status))), 'server',1,
+FROM_UNIXTIME(IF(MAX(e.mtime)='',0, MAX(e.mtime))) FROM cal_events e
 	 JOIN cal_calendars c ON e.calendar_id = c.id
 	 JOIN core_user u ON c.user_id = u.id
 	 JOIN cal_events r ON e.resource_event_id = r.id
-WHERE c.group_id != 1 AND e.resource_event_id IS NOT NULL;
+WHERE c.group_id != 1 AND e.resource_event_id IS NOT NULL
+GROUP BY e.calendar_id, e.resource_event_id ;
 
 
 INSERT INTO calendar_preferences (userId, weekViewGridSnap, defaultCalendarId) SELECT user_id, 15, calendar_id FROM cal_settings s JOIN core_user u ON u.id = s.user_id;

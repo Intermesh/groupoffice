@@ -1,4 +1,4 @@
-import {datasourcestore, DateTime, DefaultEntity} from "@intermesh/goui";
+import {datasourcestore, DateTime, DefaultEntity,t} from "@intermesh/goui";
 import {client, jmapds} from "@intermesh/groupoffice-core";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 
@@ -182,10 +182,12 @@ export class CalendarAdapter {
 			enabled: client.user.calendarPreferences?.birthdaysAreVisible,
 			store: datasourcestore({dataSource: jmapds('Contact')}),
 			*items(from:DateTime,end:DateTime) {
-				const sy= from.getYear();
+				const sy= from.getYear(),
+					ey= end.getYear();
 				for(const b of this.store.items) {
 					const start = DateTime.createFromFormat(b.birthday,'Y-m-d')!;
-					start.setYear(sy);
+
+					start.setYear(b.birthday.split('-')[1]<7?ey:sy);
 					yield new CalendarItem({
 						key: "",
 						start,
@@ -197,7 +199,7 @@ export class CalendarAdapter {
 						extraIcons: ['cake'],
 						defaultColor: '009c63',
 						data:{
-							title: b.name+'\'s Birthday',
+							title: t('{name}\'s birthday').replace('{name}',b.name),
 							duration: 'P1D',
 							showWithoutTime:true,
 						}

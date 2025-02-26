@@ -399,7 +399,7 @@ abstract class Property extends Model {
 				{
 					$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly, $this);
 
-					go()->debug($stmt);
+					//go()->debug($stmt);
 
 					$prop = $stmt->fetchAll();
 					$stmt->closeCursor();

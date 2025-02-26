@@ -41,6 +41,7 @@ return [
 	'Add calendar from link' => 'Agenda toevoegen via link',
 
 	'Birthdays'=>'Verjaardagen',
+	'{name}\'s birthday' => '{name}\'s verjaardag',
 	'Tasks' => 'Taken',
 	'Holidays' => 'Feestdagen',
 

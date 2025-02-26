@@ -1,5 +1,0 @@
-modules/favorites/views/Extjs3/Stores.js
-
-modules/favorites/views/Extjs3/CalendarFavoritesList.js
-modules/favorites/views/Extjs3/CalendarOverrides.js
-

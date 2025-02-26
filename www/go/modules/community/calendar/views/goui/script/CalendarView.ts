@@ -109,7 +109,7 @@ export abstract class CalendarView extends Component {
 	protected calcRow(start: number, days: number) {
 		let row = 0,
 			end = Math.min(start+days, this.slots.length);
-		while(row < 10) {
+		while(row < 20) {
 			for(let i = start; i < end; i++) {
 				if(this.slots[i][row]){ // used
 					break; // next row
@@ -124,7 +124,7 @@ export abstract class CalendarView extends Component {
 			}
 			row++;
 		}
-		return 10;
+		return 20;
 	}
 
 	protected ROWHEIGHT = 2.6;
