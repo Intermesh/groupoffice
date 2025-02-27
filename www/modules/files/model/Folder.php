@@ -885,14 +885,11 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$items = $this->fsFolder->ls();
 
 			foreach ($items as $item) {
-//				try{
-				//\GO::debug("FS SYNC: Adding fs ".$item->name()." to database");
 					if ($item->isFile()) {
 						$file = $this->hasFile($item->name());
 						if (!$file){
 							$this->addFile($item->name());
-						}else
-						{
+						}else {
 							//this will update timestamp and size of file
 
 							//todo: how can it be that $file->fsFile->exists() is needed here?
@@ -902,8 +899,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 							}
 						}
 
-					}else
-					{
+					}else {
 
 						$willSync = $recurseOneLevel || $recurseAll;
 
@@ -916,12 +912,8 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 							$folder->syncFilesystem($recurseAll, false);
 					}
 //				}
-//				catch(\Exception $e){
-//					echo "<span style='color:red;'>".$e->getMessage()."</span>\n";
-//				}
 			}
-		}else
-		{
+		}else {
 			$this->fsFolder->create();
 		}
 
@@ -935,22 +927,16 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		$stmt= $this->folders();
 		while($folder = $stmt->fetch()){
-//			try{
-				if(!$folder->fsFolder->exists() || $folder->fsFolder->isFile())
+				if(!$folder->fsFolder->exists() || $folder->fsFolder->isFile()) {
 					$folder->delete(true);
-//			}catch(\Exception $e){
-//				echo "<span style='color:red;'>".$e->getMessage()."</span>\n";
-//			}
+				}
 		}
 
 		$stmt= $this->files();
 		while($file = $stmt->fetch()){
-//			try{
-				if(!$file->fsFile->exists() || $file->fsFile->isFolder())
+				if(!$file->fsFile->exists() || $file->fsFile->isFolder()) {
 					$file->delete(true);
-//			}catch(\Exception $e){
-//				echo "<span style='color:red;'>".$e->getMessage()."</span>\n";
-//			}
+				}
 		}
 
 		$this->mtime=$this->fsFolder->mtime();
@@ -1384,10 +1370,6 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	}
 
 	public function copyContentsFrom(Folder $sourceFolder, $mergeFolders=false){
-		//make sure database is in sync with filesystem.
-	//	$sourceFolder->syncFilesystem(true);
-
-
 		$stmt = $sourceFolder->folders();
 		while($subfolder = $stmt->fetch()){
 
@@ -1561,8 +1543,6 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		if(!$folder){
 			throw new Exception("Failed to create folder ".$filesPath);
 		}
-//      if (!empty($model->acl_id))
-//          $folder->acl_id = $model->acl_id;
 
 		$folder->acl_id=$aclId;
 

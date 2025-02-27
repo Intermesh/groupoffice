@@ -294,3 +294,19 @@ alter table fs_bookmarks
     add constraint fs_bookmarks_fs_folders_folder_id_fk
         foreign key (folder_id) references fs_folders (id)
             on delete cascade;
+
+CREATE TABLE `fs_trash` (
+                            `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+                            `parentId` INT(11) UNSIGNED NOT NULL,
+                            `aclId` INT(11) NOT NULL DEFAULT 0,
+                            `entityId` INT(11) NOT NULL,
+                            `entityTypeId` INT(11) NOT NULL,
+                            `deletedBy` INT(11) NOT NULL,
+                            `deletedAt` DATETIME DEFAULT NOW(),
+                            `name` varchar(260) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+                            `fullPath` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+                            PRIMARY KEY (`id`),
+                            CONSTRAINT `fs_trash_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE,
+                            CONSTRAINT `fs_trash_ibfk_2` FOREIGN KEY (`deletedBy`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
+                            CONSTRAINT `fs_trash_ibfk_3` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
