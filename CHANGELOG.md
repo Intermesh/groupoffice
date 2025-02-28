@@ -1,3 +1,6 @@
+28-02-2024: 6.8.108
+- Calender: new button to add external download link for a file to a calendar event
+
 25-02-2024: 6.8.107
 - Files: add file sharing menu to file detail panel
 - Files: add button 'copy link to entity' to file sharing menu
