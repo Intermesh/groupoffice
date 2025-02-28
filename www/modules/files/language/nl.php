@@ -146,4 +146,5 @@ De volgende wijzigingen zijn aangebracht door %s:
   'Email files' => 'E-mailbestanden',
   'Sorry, something went wrong' => 'Sorry, er is iets misgegaan',
   'No items found' => 'Geen items gevonden',
+	'External download link' => 'Externe downloadlink',
 );
