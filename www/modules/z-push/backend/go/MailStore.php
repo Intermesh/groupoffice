@@ -1256,9 +1256,17 @@ class MailStore extends Store implements ISearchProvider {
 		$message->meetingrequest->globalobjid = base64_encode($vevent->uid);
 		$message->meetingrequest->starttime = $vevent->dtstart->getDateTime()->format("U");
 		$message->meetingrequest->alldayevent = $vevent->dtstart->hasTime();
+
 		if(isset($vevent->dtend)) {
 			$message->meetingrequest->endtime = $vevent->dtend->getDateTime()->format("U");
-		} else {
+		} else if(isset($vevent->duration)) {
+			try {
+				$message->meetingrequest->endtime = $vevent->dtstart->getDateTime()->add(new DateInterval($vevent->duration));
+			} catch(Exception $e) {
+				ZLog::Write(LOGLEVEL_WARN, "Failed to add duration: " . $vevent->duration ." :" . $e->getMessage());
+				$message->meetingrequest->endtime = $message->meetingrequest->starttime + 3600;
+			}
+		}else {
 			$message->meetingrequest->endtime = $message->meetingrequest->starttime + 3600;
 		}
 
