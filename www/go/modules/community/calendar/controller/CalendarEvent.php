@@ -98,6 +98,12 @@ class CalendarEvent extends EntityController {
 
 		$header = $this->b64UrlEncode(json_encode(['typ' => 'JWT', 'alg' => 'HS256']));
 		$payload = $this->b64UrlEncode(json_encode([
+			"context" => [
+			"user"=> [
+            "name" => go()->getAuthState()->getUser()->displayName,
+            "email" => go()->getAuthState()->getUser()->email
+        ]
+    	],
 			'aud' => $s['videoJwtAppId'],
 			'iss' => $s['videoJwtAppId'],
 			'room' => $params['room'],
