@@ -89,11 +89,11 @@ class CalendarEvent extends EntityController {
 
 	}
 
-	private function b64UrlEncode($data) {
-		return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+	private function b64UrlEncode(string $data) : string{
+		return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($data));
 	}
 
-	function generateJWT($params) {
+	public function generateJWT(array $params) : array {
 		$s = Module::get()->getSettings();
 
 		$header = $this->b64UrlEncode(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
