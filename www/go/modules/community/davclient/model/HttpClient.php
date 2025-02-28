@@ -60,6 +60,12 @@ class HttpClient extends \go\core\http\Client
 			->request($path, $data);
 	}
 
+	public function DELETE($path) {
+		return $this
+			->setOption(CURLOPT_CUSTOMREQUEST, "DELETE")
+			->request($path, '');
+	}
+
 	public function parsedMultiStatus() {
 		// skip namespace complexity
 		$body = $this->body();

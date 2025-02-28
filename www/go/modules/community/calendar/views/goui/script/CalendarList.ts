@@ -12,7 +12,7 @@ import {
 	select,
 	tbar, win, Window
 } from "@intermesh/goui";
-import {calendarStore, t} from "./Index.js";
+import {calendarStore, categoryStore, t} from "./Index.js";
 import {CalendarView} from "./CalendarView.js";
 import {ResourceWindow} from "./ResourcesWindow.js";
 import {CalendarWindow} from "./CalendarWindow.js";
@@ -233,6 +233,7 @@ export class CalendarList extends Component {
 		for(const id in this.visibleChanges) {
 			jmapds('Calendar').update(id, {isVisible:this.visibleChanges[id]});
 		}
+		//categoryStore.setFilter('calendars', {calendarId: this.visibleChanges}).load();
 		this.visibleChanges = {};
 	})
 }

@@ -281,6 +281,7 @@ export class Main extends Component {
 			if(!this.initialized) {
 				// after initial load. check for changed
 				calendarStore.on('load', () => {
+					categoryStore.reload();
 					this.view.update();
 				});
 				this.initialized = true;

@@ -319,6 +319,9 @@
 }
 
 .cal.month, .cal.split {
+	.weekend div.more {
+		background-color: $surfaceLow;
+	}
 	ol { // week row
 		background-color: $surfaceLowest;
 		display: flex;
@@ -329,6 +332,20 @@
 		user-select:none;
 		> li { // day
 			border-right: 1px solid $colorDivider;
+			&.showMore > div.more {
+				display:block;
+			}
+			> div.more {
+				bottom:0;
+				position:absolute;
+				padding-left:dp(26);
+				width: 14.2%;
+				background-color: $surfaceLowest;
+				color: $colorText;
+				display:none;
+				mask-image: linear-gradient(to top, white 80%, transparent);
+
+			}
 			&:first-child,
 			&:last-child { border-right:0;}
 			&.events {
@@ -353,7 +370,7 @@
 							content: '';
 							border-radius: 999px;
 							width:dp(6);
-							height:dp(6);
+							height:dp(16);
 							margin: dp(5); // same width as white-space in allday events
 							background-color: currentColor;
 						}

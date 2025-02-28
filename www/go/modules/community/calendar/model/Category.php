@@ -8,6 +8,7 @@ use go\core\model\Acl;
 use go\core\model\Module;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
+use go\core\orm\Query;
 
 /**
  * Category model
@@ -80,7 +81,16 @@ class Category extends Entity {
 
 	protected static function defineFilters(): Filters
 	{
-		return parent::defineFilters()
+		return parent::defineFilters()->add('inCalendars', function(Criteria $criteria, $value, Query $query) {
+			if($value === 'subscribedOnly') {
+				$query->join('calendar_calendar_user', 'ucal', 'ucal.id = category.calendarId AND ucal.userId = '.go()->getAuthState()->getUserId(), 'LEFT');
+					$criteria
+					->where('ucal.isSubscribed','=', true)
+					->orWhere('category.calendarId', 'IS', null);
+			} else if(!empty($value)) {
+				$criteria->andWhere('category.calendarId', '=', $value);
+			}
+		}, 'subscribedOnly')
 			->add('ownerId', function(Criteria $criteria, $value) {
 				$criteria->where('ownerId', '=', $value)
 					->andWhere('calendarId' , '=', null);
