@@ -1256,7 +1256,11 @@ class MailStore extends Store implements ISearchProvider {
 		$message->meetingrequest->globalobjid = base64_encode($vevent->uid);
 		$message->meetingrequest->starttime = $vevent->dtstart->getDateTime()->format("U");
 		$message->meetingrequest->alldayevent = $vevent->dtstart->hasTime();
-		$message->meetingrequest->endtime = $vevent->dtend->getDateTime()->format("U");
+		if(isset($vevent->dtend)) {
+			$message->meetingrequest->endtime = $vevent->dtend->getDateTime()->format("U");
+		} else {
+			$message->meetingrequest->endtime = $message->meetingrequest->starttime + 3600;
+		}
 
 		if(isset($vevent->organizer)) {
 			$message->meetingrequest->organizer = str_ireplace("MAILTO:", "",$vevent->organizer);
