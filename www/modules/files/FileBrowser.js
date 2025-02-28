@@ -23,8 +23,9 @@ GO.files.FileBrowser = function(config){
 	{
 		config = {};
 	}
-	if(!config.id)
-		config.id=Ext.id();
+	if(!config.id) {
+		config.id = Ext.id();
+	}
 
 	this.westPanel = new Ext.Panel({
 		hideMode:"offsets",
@@ -78,9 +79,12 @@ GO.files.FileBrowser = function(config){
 	
 	
 	this.treePanel.on('click', function(node)	{
+		debugger;
 		this.setFolderID(node.id, true);
 		this.cardPanel.show();
-		if(node.id !== 'shared') {
+		if(node.id === "trash") {
+			console.log("TODO: show trash folder")
+		} else if(node.id !== 'shared') {
 			this.folderDetail.load(parseInt(node.id));
 			this.eastPanel.getLayout().setActiveItem(this.folderDetail);
 		}

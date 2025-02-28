@@ -343,13 +343,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			case 'root':
 				if (!empty($params['root_folder_id'])) {
 					$folder = Folder::model()->findByPk($params['root_folder_id']);
-//					$folder->checkFsSync();
 					$node = $this->_folderToNode($folder, $expandFolderIds, true, $showFiles);
 					$response[] = $node;
 				} else {
 					$folder = Folder::model()->findHomeFolder(\GO::user());
-
-//					$folder->checkFsSync();
 
 					$node = $this->_folderToNode($folder, $expandFolderIds, true, $showFiles);
 					$node['text'] = \GO::t("Personal", "files");
@@ -414,14 +411,22 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					
 					if(\GO::user()->isAdmin()){
 						$logFolder = Folder::model()->findByPath('log', true);
-//						$logFolder->syncFilesystem();
-						
+
 						$node = $this->_folderToNode($logFolder, $expandFolderIds, false, $showFiles);
 						$node['path'] = $logFolder->path;
 						$node['text']=\GO::t("Log files");
 						
 						$response[]=$node;
 					}
+					$trashFolder = Folder::model()->findByPath('trash', true);
+					$node = $this->_folderToNode($trashFolder, $expandFolderIds, false, $showFiles);
+					$node['iconCls'] = 'ic-delete';
+					$node['id'] = 'trash';
+					$node['allowDrop'] = false;
+					$node['path'] = $trashFolder->path;
+					$node['text'] = \GO::t("Trash", "files");
+
+					$response[] = $node;
 				}
 
 
