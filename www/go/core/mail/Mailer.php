@@ -402,12 +402,16 @@ class Mailer {
 
 	private function log(Message $message): void
 	{
+
 		$logMsg = "From: " . $message->getFrom()->getEmail().
 			", To: ". implode(',', array_map(function($a) { return $a->getEmail(); }, $message->getTo())).
 			", Subject: ".$message->getSubject().
 			", Id: ".$message->getId();
 
 		go()->debug("Sending e-mail: ". $logMsg);
+
+		if(!go()->getModule('community', 'history'))
+			return;
 
 		$log = new LogEntry();
 
