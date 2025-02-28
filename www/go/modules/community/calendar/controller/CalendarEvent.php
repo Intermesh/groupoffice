@@ -98,16 +98,12 @@ class CalendarEvent extends EntityController {
 
 		$header = $this->b64UrlEncode(json_encode(['typ' => 'JWT', 'alg' => 'HS256']));
 		$payload = $this->b64UrlEncode(json_encode([
-			"context" => [
-			"user"=> [
-            "name" => go()->getAuthState()->getUser()->displayName,
-            "email" => go()->getAuthState()->getUser()->email
-        ]
-    	],
+//			"context" => [],
 			'aud' => $s['videoJwtAppId'],
 			'iss' => $s['videoJwtAppId'],
 			'room' => $params['room'],
-			'exp' => strtotime('+1 day'),
+			'sub' => '*',
+			'exp' => strtotime('+30 days'),
 		]));
 
 		$signature = hash_hmac('sha256', "$header.$payload", $s['videoJwtSecret'], true);
