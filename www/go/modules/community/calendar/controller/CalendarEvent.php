@@ -96,11 +96,12 @@ class CalendarEvent extends EntityController {
 	public function generateJWT(array $params) : array {
 		$s = Module::get()->getSettings();
 
-		$header = $this->b64UrlEncode(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
+		$header = $this->b64UrlEncode(json_encode(['typ' => 'JWT', 'alg' => 'HS256']));
 		$payload = $this->b64UrlEncode(json_encode([
 			'aud' => $s['videoJwtAppId'],
 			'iss' => $s['videoJwtAppId'],
-			'room' => $params['room']
+			'room' => $params['room'],
+			'exp' => strtotime('+1 day'),
 		]));
 
 		$signature = hash_hmac('sha256', "$header.$payload", $s['videoJwtSecret'], true);
