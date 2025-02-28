@@ -169,11 +169,13 @@ export class EventWindow extends FormWindow {
 					this.alertField.fullDay = checked;
 					this.alertField.drawOptions();
 
-					calendarStore.dataSource.single(this.form.value.calendarId).then(r => {
-						if(!r) return;
-						const d = checked ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
-						this.alertField.setDefaultLabel(d)
-					});
+					if(this.form.value.calendarId) {
+						calendarStore.dataSource.single(this.form.value.calendarId).then(r => {
+							if (!r) return;
+							const d = checked ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
+							this.alertField.setDefaultLabel(d)
+						});
+					}
 					this.startDate.withTime = this.endDate.withTime = !checked;
 				}}
 			}),
