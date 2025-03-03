@@ -1,3 +1,4 @@
+03-03-2025: 25.0.5
 - Calendar time tracking module
 - Tasks / Support: Easier task dialog
 
