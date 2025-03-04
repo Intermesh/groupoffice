@@ -131,9 +131,19 @@ class User extends AclItemEntity {
 	 * @var string
 	 */
 	public $displayName;
-	
+
+	/**
+	 * User profile picture blob ID. Can be downloaded via the download endpoint.
+	 *
+	 * @var string
+	 */
 	public $avatarId;
 
+	/**
+	 * Enabled for login
+	 *
+	 * @var bool
+	 */
 	public $enabled;
 	/**
 	 * E-mail address
