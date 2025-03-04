@@ -73,6 +73,9 @@ export class HistoryDetailWindow extends Window {
 						}).join("");
 					}
 
+					newStr = !isNaN(new Date(newStr).getTime()) ?  Format.dateTime(newStr) : newStr;
+					oldStr = !isNaN(new Date(oldStr).getTime()) ?  Format.dateTime(oldStr) : oldStr;
+
 					tableData.push({
 						name: change[0],
 						old: oldStr,
@@ -82,7 +85,7 @@ export class HistoryDetailWindow extends Window {
 
 				this.changesComp.items.add(
 					table({
-						cls: "scroll",
+						cls: "history-changes-table scroll",
 						columns: [
 							column({
 								id: "name",
