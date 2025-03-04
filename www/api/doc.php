@@ -115,7 +115,7 @@ uksort($mods, function($a, $b) {return strcmp($a, $b);})
  --header 'Authorization: Bearer $YOUR_API_TOKEN' \
  --data '[
  ["User/query", {}, "r1"],
- ["User/get", {"properties":[], "#ids": { "resultOf": "r1", "path": "/ids"}, "r2"]
+ ["User/get", {"properties":[], "#ids": {"resultOf": "r1", "path": "/ids"}}, "r2"]
  ]'
 </code>
 
