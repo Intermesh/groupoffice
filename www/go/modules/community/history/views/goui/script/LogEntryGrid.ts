@@ -1,5 +1,6 @@
 import {btn, column, comp, datasourcestore, DataSourceStore, datecolumn, t, Table} from "@intermesh/goui";
 import {jmapds, img} from "@intermesh/groupoffice-core";
+import {HistoryDetailWindow} from "./HistoryDetailWindow.js";
 
 export class LogEntryGrid extends Table<DataSourceStore> {
 	constructor() {
@@ -14,6 +15,11 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 					creator: {
 						dataSource: jmapds("Principal"),
 						path: "createdBy"
+					}
+				},
+				queryParams: {
+					filter: {
+						actions: {}
 					}
 				}
 			}),
@@ -32,13 +38,13 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 					resizable: true
 				}),
 				column({
-					header: t("Entity"),
 					id: "entity",
+					header: t("Entity"),
 					resizable: true
 				}),
 				column({
-					header: t("User"),
 					id: "creator",
+					header: t("User"),
 					resizable: true,
 					renderer: (v) => {
 						return comp({
@@ -48,7 +54,7 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 								cls: "goui-avatar",
 								blobId: v.avatarId
 							}),
-							comp({text: v.name, cls:"history-created-by"})
+							comp({text: v.name, cls: "history-created-by"})
 						)
 					}
 				}),
@@ -58,13 +64,16 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 					resizable: true,
 					width: 80,
 					align: "center",
-					renderer: (v) => {
-						if (v) {
+					renderer: (columnValue, record, td, table, storeIndex, column) => {
+						if (columnValue) {
 							return btn({
 								cls: "history-changes-button",
 								icon: "note",
-								handler: () => {
+								handler: async () => {
+									const win = new HistoryDetailWindow();
+									await win.load(record.id);
 
+									win.show();
 								}
 							})
 						}
