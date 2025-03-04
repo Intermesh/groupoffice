@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4a57737cd50aa2ade6c7a34d04d3bb00",
+    "content-hash": "6824bdcc72302c00246e9ddcd91e29e1",
     "packages": [
         {
             "name": "composer/pcre",
@@ -829,6 +829,104 @@
                 "source": "https://github.com/mtibben/html2text/tree/4.3.2"
             },
             "time": "2024-08-20T02:43:29+00:00"
+        },
+        {
+            "name": "jasny/php-functions",
+            "version": "v3.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jasny/php-functions.git",
+                "reference": "2dac4273d80f7aadff8e027c8574d61c85a607ac"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jasny/php-functions/zipball/2dac4273d80f7aadff8e027c8574d61c85a607ac",
+                "reference": "2dac4273d80f7aadff8e027c8574d61c85a607ac",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6"
+            },
+            "require-dev": {
+                "jasny/php-code-quality": "^2.0",
+                "phpunit/phpunit": "^5.7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/array_functions.php",
+                    "src/case_functions.php",
+                    "src/string_functions.php",
+                    "src/server_functions.php",
+                    "src/type_functions.php",
+                    "src/file_functions.php",
+                    "src/func_functions.php",
+                    "src/object_functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Arnold Daniels",
+                    "email": "arnold@jasny.net",
+                    "homepage": "http://www.jasny.net"
+                }
+            ],
+            "description": "A set of useful PHP functions",
+            "support": {
+                "issues": "https://github.com/jasny/php-functions/issues",
+                "source": "https://github.com/jasny/php-functions"
+            },
+            "time": "2018-11-26T11:24:27+00:00"
+        },
+        {
+            "name": "jasny/phpdoc-parser",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jasny/phpdoc-parser.git",
+                "reference": "76ccfca06ebf16a86c6ae66b89b30a998ad8aeb6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jasny/phpdoc-parser/zipball/76ccfca06ebf16a86c6ae66b89b30a998ad8aeb6",
+                "reference": "76ccfca06ebf16a86c6ae66b89b30a998ad8aeb6",
+                "shasum": ""
+            },
+            "require": {
+                "jasny/php-functions": "^3.3",
+                "php": ">=7.4.0"
+            },
+            "require-dev": {
+                "jasny/php-code-quality": "~2.7.0",
+                "phpunit/phpunit": ">= 9.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Jasny\\PhpdocParser\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Arnold Daniels",
+                    "email": "arnold@jasny.net",
+                    "homepage": "http://www.jasny.net"
+                }
+            ],
+            "description": "Jasny skeleton library",
+            "support": {
+                "issues": "https://github.com/jasny/phpdoc-parser/issues",
+                "source": "https://github.com/jasny/phpdoc-parser"
+            },
+            "time": "2023-06-09T11:51:52+00:00"
         },
         {
             "name": "lcobucci/clock",

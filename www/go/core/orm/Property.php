@@ -871,7 +871,7 @@ abstract class Property extends Model {
 	 	 */
 	public static function atypicalApiProperties(): array
 	{
-		return ['modified', 'oldValues', 'validationErrors', 'modifiedCustomFields', 'validationErrorsAsString', 'searchDescription', 'returnAsText', 'dontChangeModifiedAt'];
+		return ['modified', 'oldValues', 'validationError', 'validationErrors', 'modifiedCustomFields', 'validationErrorsAsString', 'searchDescription', 'returnAsText', 'dontChangeModifiedAt', 'values', 'value', 'customFieldsJSON'];
 	}
 
 	/**

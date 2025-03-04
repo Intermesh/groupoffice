@@ -15,6 +15,7 @@ use go\core\orm\EntityType;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
+use go\core\util\DateTime;
 use go\core\util\JSON;
 use go\modules\community\comments\model\Comment;
 use JsonException;
@@ -27,22 +28,21 @@ use stdClass;
  */
 class Alert extends SingleOwnerEntity
 {
-	public static $enabled = true;
+	public static bool $enabled = true;
 
-	public $id;
+	public ?int $id;
 
-	protected $entityTypeId;
+	protected ?int $entityTypeId;
 
-	public $entityId;
+	public ?int $entityId;
 
-	public $userId;
-	public $triggerAt;
-	public $staleAt;
+	public ?DateTime $triggerAt;
+	public ?DateTime $staleAt;
 
 	public $recurrenceId;
-	public $tag;
+	public ?string $tag;
 
-	protected $data;
+	protected ?string $data;
 
 	/**
 	 * Set to true if user has mail reminders enabled

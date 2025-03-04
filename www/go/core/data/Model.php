@@ -6,6 +6,10 @@ use ArrayAccess;
 use go\core\App;
 use go\core\util\DateTime;
 use InvalidArgumentException;
+use Jasny\PhpdocParser\PhpdocParser;
+use Jasny\PhpdocParser\Set\PhpDocumentor;
+use Jasny\PhpdocParser\Tag\DescriptionTag;
+use Jasny\PhpdocParser\Tag\Summery;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionMethod;
@@ -30,6 +34,157 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
 
 
 	const PROP_PUBLIC_READONLY = 3;
+
+	/**
+	 * @return array
+	 */
+	public static function buildApiProperties(bool $forDocs = false): array
+	{
+		$arr = [];
+		$reflectionObject = new ReflectionClass(static::class);
+		$methods = $reflectionObject->getMethods(ReflectionMethod::IS_PUBLIC);
+
+		if($forDocs) {
+			$parser = new PhpdocParser(PhpDocumentor::tags()->with([new Summery()]));
+		}
+
+		foreach ($methods as $method) {
+
+			if ($method->isStatic()) {
+				continue;
+			}
+
+			if (substr($method->getName(), 0, 3) == 'get') {
+
+				$params = $method->getParameters();
+//				This code breaks ioncube. It's not possible to use reflection parameters on encoded files from
+				// non encoded files. It will result in a segmentation fault.
+				foreach ($params as $p) {
+					if (!$p->isDefaultValueAvailable()) {
+						continue 2;
+					}
+				}
+
+				// Make first char lowercase if the second is not. So that getDNS() will become "DNS" and getFoo() will become "foo".
+				$propName = substr($method->getName(), 3);
+				$secondChar = substr($propName, 1, 1);
+				if ($secondChar != strtoupper($secondChar)) {
+					$propName = lcfirst($propName);
+				}
+
+				if (!isset($arr[$propName])) {
+					$arr[$propName] = ["setter" => false, "getter" => false, "access" =>  self::PROP_PUBLIC];
+				}
+				$arr[$propName]['getter'] = true;
+
+				if($forDocs) {
+					if(!isset($arr[$propName]['type'])) {
+						$rt = $method->getReturnType();
+						if (isset($rt))
+							$arr[$propName]['type'] = $rt->getName();
+					}
+
+					$meta = $parser->parse($method->getDocComment());
+					$arr[$propName]['description'] = $meta['description'] ?? null;
+					if(!isset($arr[$propName]['type']) && isset($meta['return']['type'])) {
+						$arr[$propName]['type'] = $meta['return']['type'];
+					}
+				}
+			}
+
+			if (substr($method->getName(), 0, 3) == 'set') {
+
+				$params = $method->getParameters();
+				if (!count($params)) {
+					continue;
+				}
+				array_shift($params);
+
+//				This code breaks ioncube. It's not possible to use reflection parameters on encoded files from
+				// non encoded files. It will result in a segmentation fault.
+				foreach ($params as $p) {
+					if (!$p->isDefaultValueAvailable()) {
+						continue 2;
+					}
+				}
+				$propName = lcfirst(substr($method->getName(), 3));
+				if (!isset($arr[$propName])) {
+					$arr[$propName] = ["setter" => false, "getter" => false, "access" => self::PROP_PUBLIC];
+				}
+				$arr[$propName]['setter'] = true;
+
+				if($forDocs) {
+					if(!isset($arr[$propName]['type'])) {
+						$params = $method->getParameters();
+						if (isset($params[0])) {
+							$type = $params[0]->getType();
+							if (isset($type)) {
+								$arr[$propName]['type'] = $type->getName();
+							}
+						}
+					}
+					try {
+						if(!isset($arr[$propName]['description'])) {
+							$meta = $parser->parse($method->getDocComment());
+							$arr[$propName]['description'] = $meta['description'] ?? null;
+						}
+					}catch(\Throwable $e) {
+						$arr[$propName]['error'] = $e->getMessage();
+					}
+
+				}
+			}
+		}
+
+		$props = $reflectionObject->getProperties();
+
+		foreach ($props as $prop) {
+			if (!$prop->isStatic()) {
+				$propName = $prop->getName();
+				if (!isset($arr[$propName])) {
+					$arr[$propName] = ["setter" => false, "getter" => false, "access" => null];
+				}
+
+				if ($prop->isPublic()) {
+					$arr[$propName]['access'] = in_array($propName, static::readOnlyProps()) ? self::PROP_PUBLIC_READONLY : self::PROP_PUBLIC;
+					$arr[$propName]['setter'] = false;
+					$arr[$propName]['getter'] = false;
+				}
+				if ($prop->isProtected()) {
+					$arr[$propName]['access'] = self::PROP_PROTECTED;
+				}
+
+				if($forDocs) {
+					$type = $prop->getType();
+					if(isset($type)) {
+						$arr[$propName]['type'] = $type->getName();
+					}
+					$meta = $parser->parse($prop->getDocComment());
+					$arr[$propName]['description'] = $meta['description'] ?? null;
+					if(!isset($arr[$propName]['type']) && isset($meta['var']['type'])) {
+						$arr[$propName]['type'] = $meta['var']['type'];
+					}
+				}
+			}
+		}
+
+		if($forDocs) {
+			$arr = array_filter($arr, function($meta, $name) {
+				if(in_array($name, static::atypicalApiProperties())) {
+					return false;
+				}
+
+				return $meta['access'] == self::PROP_PUBLIC || $meta['access'] == self::PROP_PUBLIC_READONLY;
+
+			}, ARRAY_FILTER_USE_BOTH );
+		}
+		return $arr;
+	}
+
+	public static function atypicalApiProperties(): array
+	{
+		return [];
+	}
 
 	/**
 	 * Get all properties exposed to the API
@@ -63,73 +218,8 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
 			return $ret;
 		}
 
-		$arr = [];
-		$reflectionObject = new ReflectionClass(static::class);
-		$methods = $reflectionObject->getMethods(ReflectionMethod::IS_PUBLIC);
+		$arr = self::buildApiProperties();
 
-		foreach ($methods as $method) {
-
-			if ($method->isStatic()) {
-				continue;
-			}
-			
-			if (substr($method->getName(), 0, 3) == 'get') {
-
-				$params = $method->getParameters();
-				if(count($params)) {
-					continue;
-				}
-
-//				This code breaks ioncube. It's not possible to use reflection parameters on encoded files from
-				// non encoded files. It will result in a segmentation fault.
-//				foreach ($params as $p) {
-//					if (!$p->isDefaultValueAvailable()) {
-//						continue 2;
-//					}
-//				}
-
-				// Make first char lowercase if the second is not. So that getDNS() will become "DNS" and getFoo() will become "foo".
-				$propName = substr($method->getName(), 3);
-				$secondChar = substr($propName, 1, 1);
-				if($secondChar != strtoupper($secondChar)) {
-					$propName = lcfirst($propName);
-				}
-
-				if(!isset($arr[$propName])) {
-					$arr[$propName] = ["setter" => false, "getter" => false, "access" => null];
-				}
-				$arr[$propName]['getter'] = true;				
-			}
-
-			if (substr($method->getName(), 0, 3) == 'set') {
-				$propName = lcfirst(substr($method->getName(), 3));
-				if(!isset($arr[$propName])) {
-					$arr[$propName] = ["setter" => false, "getter" => false, "access" => null];
-				}
-				$arr[$propName]['setter'] = true;				
-			}
-		}
-
-		$props = $reflectionObject->getProperties();
-
-		foreach ($props as $prop) {
-			if (!$prop->isStatic()) {
-				$propName = $prop->getName();
-				if(!isset($arr[$propName])) {
-					$arr[$propName] = ["setter" => false, "getter" => false, "access" => null];
-				}
-
-				if($prop->isPublic()) {	
-					$arr[$propName]['access'] = in_array($propName, static::readOnlyProps()) ? self::PROP_PUBLIC_READONLY : self::PROP_PUBLIC;
-					$arr[$propName]['setter'] = false;
-					$arr[$propName]['getter'] = false;
-				}				
-				if($prop->isProtected()) {
-					$arr[$propName]['access'] = self::PROP_PROTECTED;					
-				}
-			}
-		}
-		
 		App::get()->getCache()->set($cacheKey, $arr);
 
 		return $arr;
