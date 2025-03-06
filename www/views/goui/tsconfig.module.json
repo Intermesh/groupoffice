@@ -15,15 +15,19 @@
       "@intermesh/goui": [
         "../../../../../../views/goui/goui/script/index.ts"
       ],
+
       "@intermesh/groupoffice-core": [
         "../../../../../../views/goui/groupoffice-core/script/index.ts"
       ],
+
       "chart.js/auto": [
         "../../../../../../views/goui/groupoffice-core/node_modules/chart.js/auto/auto.d.ts",
       ],
+
       "@intermesh/business/*": [
         "../../../../../../go/modules/business/*/views/goui/script/Index.ts"
       ],
+
       "@intermesh/community/*": [
         "../../../../../../go/modules/community/*/views/goui/script/Index.ts"
       ]
