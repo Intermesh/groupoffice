@@ -229,7 +229,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
 			return $ret;
 		}
 
-		$arr = self::buildApiProperties();
+		$arr = static::buildApiProperties();
 
 		App::get()->getCache()->set($cacheKey, $arr);
 
