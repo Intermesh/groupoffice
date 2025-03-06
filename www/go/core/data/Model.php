@@ -35,6 +35,8 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
 
 	const PROP_PUBLIC_READONLY = 3;
 
+	const PROP_PUBLIC_WRITEONLY = 4;
+
 	/**
 	 * @return array
 	 */
@@ -73,9 +75,13 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
 				}
 
 				if (!isset($arr[$propName])) {
-					$arr[$propName] = ["setter" => false, "getter" => false, "access" =>  self::PROP_PUBLIC];
+					$arr[$propName] = ["setter" => false, "getter" => true, "access" =>  self::PROP_PUBLIC_READONLY];
+				} else {
+					$arr[$propName]['getter'] = true;
+					if($arr[$propName]['setter']) {
+						$arr[$propName]['access'] = self::PROP_PUBLIC;
+					}
 				}
-				$arr[$propName]['getter'] = true;
 
 				if($forDocs) {
 					if(!isset($arr[$propName]['type'])) {
@@ -108,10 +114,15 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
 					}
 				}
 				$propName = lcfirst(substr($method->getName(), 3));
+
 				if (!isset($arr[$propName])) {
-					$arr[$propName] = ["setter" => false, "getter" => false, "access" => self::PROP_PUBLIC];
+					$arr[$propName] = ["setter" => true, "getter" => false, "access" =>  self::PROP_PUBLIC_WRITEONLY];
+				} else {
+					$arr[$propName]['setter'] = true;
+					if($arr[$propName]['getter']) {
+						$arr[$propName]['access'] = self::PROP_PUBLIC;
+					}
 				}
-				$arr[$propName]['setter'] = true;
 
 				if($forDocs) {
 					if(!isset($arr[$propName]['type'])) {

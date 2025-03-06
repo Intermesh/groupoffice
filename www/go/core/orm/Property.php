@@ -736,42 +736,23 @@ abstract class Property extends Model {
 		return ["modifiedBy", "createdAt", "createdBy", "modifiedAt"];
 	}
 
-  /**
-   * @inheritDoc
-   */
-	public static function getApiProperties(): array
+	public static function buildApiProperties(bool $forDocs = false): array
 	{
-		$cls = static::class;
+		$props = parent::buildApiProperties($forDocs);
 
-		//this function is called many times. This seems to have a slight performance benefit
-//		if(isset(self::$apiProperties[$cls])) {
-//			return self::$apiProperties[$cls];
-//		}
-
-		$cacheKey = 'property-getApiProperties-' . $cls;
-
-		$props = go()->getCache()->get($cacheKey);
-
-		if(!$props) {
-			$props = parent::getApiProperties();
-
-			//add dynamic relations		
-			foreach(static::getMapping()->getProperties() as $propName => $type) {
-				//do property_exists because otherwise it will add protected properties too.
-				if(!isset($props[$propName])) {
-					$props[$propName] = ['setter' => false, 'getter' => false, 'access' => self::PROP_PUBLIC, 'dynamic' => true];
-				}
-				$props[$propName]['db'] = true;
+		//add dynamic relations
+		foreach(static::getMapping()->getProperties() as $propName => $type) {
+			//do property_exists because otherwise it will add protected properties too.
+			if(!isset($props[$propName])) {
+				$props[$propName] = ['setter' => false, 'getter' => false, 'access' => self::PROP_PUBLIC, 'dynamic' => true];
 			}
-
-			if(method_exists(static::class, 'getCustomFields')) {
-				$props['customFields'] = ['setter' => true, 'getter' => true, 'access' => null];
-			}
-
-			go()->getCache()->set($cacheKey, $props);
+			$props[$propName]['db'] = true;
 		}
 
-//		self::$apiProperties[$cls] = $props;
+		if(method_exists(static::class, 'getCustomFields')) {
+			$props['customFields'] = ['setter' => true, 'getter' => true, 'access' => null];
+		}
+
 		return $props;
 	}
 
