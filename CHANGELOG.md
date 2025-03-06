@@ -1,3 +1,6 @@
+06-03-2025: 25.0.6
+- Calendar time tracking build problem fixed
+
 03-03-2025: 25.0.5
 - Calendar time tracking module
 - Tasks / Support: Easier task dialog
