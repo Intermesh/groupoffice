@@ -4,16 +4,15 @@ namespace go\core\data;
 
 use ArrayAccess;
 use go\core\App;
+use go\core\util\ArrayObject;
 use go\core\util\DateTime;
 use InvalidArgumentException;
 use Jasny\PhpdocParser\PhpdocParser;
 use Jasny\PhpdocParser\Set\PhpDocumentor;
-use Jasny\PhpdocParser\Tag\DescriptionTag;
 use Jasny\PhpdocParser\Tag\Summery;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionMethod;
-use go\core\util\ArrayObject;
 
 
 /**
