@@ -53,6 +53,7 @@ export class EventWindow extends FormWindow {
 		this.width = 565;
 		this.height = 840;
 		this.resizable = true;
+		this.hasLinks = true;
 		this.store = this.form.dataSource as JmapDataSource; //jmapds("CalendarEvent");
 		// this.startTime = textfield({type:'time',value: '12:00', width: 128})
 		// this.endTime = textfield({type:'time',value: '13:00', width: 128})
