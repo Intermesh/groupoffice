@@ -2639,7 +2639,7 @@ abstract class Property extends Model {
 		$props = $this->getApiProperties();
 
 		foreach($props as $name => $p) {
-			if(!isset($p['access']) && (!$p['getter'] || !$p['setter'])) {
+			if((!isset($p['access']) || $p['access'] == self::PROP_PUBLIC_READONLY || $p['access'] == self::PROP_PUBLIC_WRITEONLY) && (!$p['getter'] || !$p['setter'])) {
 				continue;
 			}
 
