@@ -36,8 +36,8 @@ class Alert extends SingleOwnerEntity
 
 	public ?int $entityId;
 
-	public ?DateTime $triggerAt;
-	public ?DateTime $staleAt;
+	public ?\DateTimeInterface $triggerAt;
+	public ?\DateTimeInterface $staleAt;
 
 	public $recurrenceId;
 	public ?string $tag;
