@@ -303,11 +303,8 @@ export class EventWindow extends FormWindow {
 			})
 		);
 
-		this.bbar.items.insert(0,
-			// this.createLinkBtn,
-			btn({icon:'attach_file', handler: _ => this.attachFile() }),
-			// comp({flex:1}),
-			// this.submitBtn = btn({text:t('Save'), cls:'primary filled',handler: _ => this.submit()})
+		this.bbar.items.insert(1,
+			btn({icon:'attach_file', handler: _ => this.attachFile() })
 		);
 
 		this.addCustomFields();
