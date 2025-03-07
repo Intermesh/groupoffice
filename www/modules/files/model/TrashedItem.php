@@ -39,7 +39,22 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 		return 'aclId';
 	}
 
+	public function relations() {
+		return array(
+			'parent' => array('type' => self::BELONGS_TO, 'model' => 'GO\Files\Model\Folder', 'field' => 'parent_id'),
+			'deletedByUser' => array('type' => self::BELONGS_TO, 'model' => 'GO\Base\Model\User', 'field' => 'deletedBy'),
+			'entityType' => array('type' => self::BELONGS_TO, 'model' => 'GO\Base\Model\ModelType', 'field' => 'entityTypeId'),
+		);
+	}
 
+
+	/**
+	 * A folder has just been moved to Trash. Create a fs_trash record if it does not exist yet
+	 *
+	 * @param \GO\Files\Model\Folder $folder
+	 * @return void
+	 * @throws GO\Base\Exception\AccessDenied
+	 */
 	public function saveForFolder(Folder $folder): void
 	{
 		$entityType = EntityType::findByName('Folder');
@@ -59,6 +74,15 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 		$t->fullPath = $folder->parent->path;
 		$t->save();
 	}
+
+	/**
+	 * A file has just been trashed. Create as fs_trash record if it does not exist
+	 *
+	 * @param \GO\Files\Model\File $file
+	 * @return void
+	 * @throws GO\Base\Exception\AccessDenied
+	 * @throws \go\core\db\DbException
+	 */
 
 	public function saveForFile(File $file): void
 	{

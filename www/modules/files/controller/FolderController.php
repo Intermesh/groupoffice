@@ -343,7 +343,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		switch ($params['node']) {
 			case 'trash':
 				$folder = Folder::model()->findByPath("trash");
-				$node = $this->_folderToNode($folder, $expandFolderIds, true, $showFiles);
+				$node = $this->_folderToNode($folder, $expandFolderIds, false, $showFiles);
 				$response[] = $node;
 				break;
 			case 'shared':
@@ -817,7 +817,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			if ($params['folder_id'] == 'shared') {
 				return $this->_listShares($params);
 			} elseif ($params['folder_id'] == 'trash') {
-				$folder = Folder::model()->findByPath('trash');
+				return $this->listTrash($params);
+//				$folder = Folder::model()->findByPath('trash');
 			} else {
 				$folder = Folder::model()->findByPk($params['folder_id']);
 			}
@@ -959,7 +960,26 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		return $response;
 	}
 
-	/**
+	protected function actionTrash(array $params): array
+	{
+		return $this->listTrash($params);
+	}
+
+	private function listTrash(array $params): array
+	{
+		$cm = new \GO\Base\Data\ColumnModel('GO\Files\Model\TrashedItem');
+		$cm->setFormatRecordFunction(array($this, 'formatTrashListRecord'));
+
+		$findParams = \GO\Base\Db\FindParams::newInstance()
+			->order(new \go\core\db\Expression('name COLLATE utf8mb4_unicode_ci ASC'));
+
+		$store = new \GO\Base\Data\DbStore('GO\Files\Model\TrashedItem',$cm, $params, $findParams);
+		$response = $store->getData();
+		$response['permission_level'] = \GO\Base\Model\Acl::READ_PERMISSION;
+		return $response;
+	}
+
+		/**
 	 * Process deletes, separate function because it needs to be called from different places.
 	 *
 	 * @param array $params
@@ -1110,6 +1130,14 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		}
 		$record['thumb_url'] = $model->thumbURL;
 
+		return $record;
+	}
+
+	public function formatTrashListRecord($record, $model)
+	{
+		$record['fullPath'] = htmlspecialchars($model->fullPath);
+		$record['entity'] = $model->entityType->name === "Folder" ? "d": "f";
+		$record['deletedByUser'] = $model->deletedByUser->displayName;
 		return $record;
 	}
 
