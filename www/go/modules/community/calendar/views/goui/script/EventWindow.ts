@@ -32,7 +32,7 @@ export class EventWindow extends FormWindow {
 	private item?: CalendarItem
 
 	private store: JmapDataSource
-	private submitBtn:Button
+	// private submitBtn:Button
 	private endDate: DateField
 	private startDate: DateField
 	private withoutTimeToggle: CheckboxField
@@ -44,6 +44,7 @@ export class EventWindow extends FormWindow {
 
 	private titleField: TextField
 	private alertField: AlertField
+	private confirmedScheduleMessage: boolean = false;
 
 	constructor() {
 		super("CalendarEvent");
@@ -82,6 +83,8 @@ export class EventWindow extends FormWindow {
 			//recurrenceField.setStartDate(start)
 		});
 		this.form.on('save', () => { this.close();});
+		this.form.on("beforesubmit", this.onBeforeSubmit, {bind:this});
+
 		this.generalTab.cls = 'flow fit scroll pad';
 		this.startDate = datefield({label: t('Start'), name:'start',flex:1, defaultTime: now.format('H')+':00',
 			listeners:{'change': (me,_v, old) => {
@@ -300,10 +303,11 @@ export class EventWindow extends FormWindow {
 			})
 		);
 
-		this.bbar.items.clear().add(
+		this.bbar.items.insert(0,
+			// this.createLinkBtn,
 			btn({icon:'attach_file', handler: _ => this.attachFile() }),
-			comp({flex:1}),
-			this.submitBtn = btn({text:t('Save'), cls:'primary filled',handler: _ => this.submit()})
+			// comp({flex:1}),
+			// this.submitBtn = btn({text:t('Save'), cls:'primary filled',handler: _ => this.submit()})
 		);
 
 		this.addCustomFields();
@@ -413,16 +417,26 @@ export class EventWindow extends FormWindow {
 
 	}
 
-	submit() {
+	private onBeforeSubmit() {
+		if(this.confirmedScheduleMessage) {
+			return;
+		}
 		if(this.item!.isRecurring) {
 
 			this.item!.patch(this.parseSavedData(this.form.modified), () => {
 				this.close();
 			});
+			// cancel normal submit
+			return false;
 		} else {
 			this.item!.confirmScheduleMessage(this.parseSavedData(this.form.modified), () => {
+				this.confirmedScheduleMessage = true;
 				this.form.submit();
+				this.confirmedScheduleMessage = false;
 			});
+
+			// cancel normal submit
+			return false;
 		}
 	}
 
