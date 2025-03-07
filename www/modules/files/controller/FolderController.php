@@ -7,12 +7,15 @@ use Exception;
 use GO;
 use GO\Base\Db\FindCriteria;
 use GO\Base\Exception\AccessDenied;
+use go\core\db\DbException;
+use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\jmap\Entity;
 use go\core\model\Alert as CoreAlert;
 use go\core\orm\SearchableTrait;
 use go\core\orm\EntityType;
 use go\core\util\StringUtil;
+use GO\Files\Model\File;
 use GO\Files\Model\Folder;
 
 class FolderController extends \GO\Base\Controller\AbstractModelController {
@@ -314,7 +317,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 	}
 
 
-	protected function actionTree($params) {
+	protected function actionTree(array $params)
+	{
 
 		//refresh forces sync with db
 		if(!empty($params['sync_folder_id'])){
@@ -337,6 +341,11 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$showFiles = isset($params['showFiles']);
 
 		switch ($params['node']) {
+			case 'trash':
+				$folder = Folder::model()->findByPath("trash");
+				$node = $this->_folderToNode($folder, $expandFolderIds, true, $showFiles);
+				$response[] = $node;
+				break;
 			case 'shared':
 				$response=$this->_buildSharedTree($expandFolderIds);
 				break;
@@ -422,7 +431,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					$node = $this->_folderToNode($trashFolder, $expandFolderIds, false, $showFiles);
 					$node['iconCls'] = 'ic-delete';
 					$node['id'] = 'trash';
-					$node['allowDrop'] = false;
+					$node['allowDrop'] = true;
 					$node['path'] = $trashFolder->path;
 					$node['text'] = \GO::t("Trash", "files");
 
@@ -611,7 +620,18 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		return parent::afterDisplay($response, $model, $params);
 	}
 
-	protected function actionPaste($params) {
+	/**
+	 * Paste one or more files into a folder
+	 *
+	 * @todo: handle pasting into trash folder propahly
+	 * @param array $params
+	 * @return array
+	 * @throws AccessDenied
+	 * @throws DbException
+	 * @throws GO\Base\Exception\RelationDeleteRestrict
+	 */
+	protected function actionPaste(array $params): array
+	{
 
 		$response['success'] = true;
 
@@ -622,7 +642,13 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		if (isset($params['ids']) && $params['overwrite'] == 'ask')
 			\GO::session()->values['files']['pasteIds'] = $this->_splitFolderAndFileIds(json_decode($params['ids'], true));
 
-		$destinationFolder = Folder::model()->findByPk($params['destination_folder_id']);
+		if($params['destination_folder_id'] === 'trash') {
+			$destinationFolder = Folder::model()->findByPath('trash');
+
+			// @TODO: call the moveToTrash() action
+		} else {
+			$destinationFolder = Folder::model()->findByPk($params['destination_folder_id']);
+		}
 
 		if (!$destinationFolder->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION))
 			throw new \GO\Base\Exception\AccessDenied();
@@ -767,26 +793,37 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 	private $_listFolderPermissionLevel;
 
-	protected function actionList($params) {
-
+	/**
+	 * List folder contents
+	 *
+	 * @param array $params
+	 * @return array
+	 * @throws DbException
+	 * @throws Forbidden
+	 * @throws AccessDenied
+	 * @throws Exception
+	 */
+	protected function actionList(array $params): array
+	{
 		if (!empty($params['query'])) {
 			return $this->_searchFiles($params);
 		}
-            
 
-		
 		//get the folder that contains the files and folders to list.
 		//This will check permissions too.
-		if(empty($params['folder_id'])) {
-			$folder = Folder::model()->findHomeFolder (GO::user());
-		}else {
+		if (empty($params['folder_id'])) {
+			$folder = Folder::model()->findHomeFolder(GO::user());
+		} else {
 			if ($params['folder_id'] == 'shared') {
 				return $this->_listShares($params);
+			} elseif ($params['folder_id'] == 'trash') {
+				$folder = Folder::model()->findByPath('trash');
+			} else {
+				$folder = Folder::model()->findByPk($params['folder_id']);
 			}
-			$folder = Folder::model()->findByPk($params['folder_id']);
 		}
-		
-		if(!$folder) {
+
+		if (!isset($folder)) {
 			throw new \Exception('No Folder found with id ' . $params['folder_id']);
 		}
 
@@ -927,8 +964,9 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 	 *
 	 * @param array $params
 	 * @param type $store
+	 * @throws Exception
 	 */
-	private function _processDeletes($params, $store=false){
+	private function _processDeletes(array $params, $store=false){
 		if(!$store){
 			$store = \GO\Base\Data\Store::newInstance(Folder::model());
 		}
@@ -944,6 +982,19 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			$params['delete_keys'] = json_encode($ids['files']);
 			$store->processDeleteActions($params, "GO\Files\Model\File");
 			$this->fireEvent('afterListDeleteActionFolder', [$params]);
+		}
+
+		if (isset($params['trash_keys'])) {
+			$ids = $this->_splitFolderAndFileIds(json_decode($params['trash_keys'], true));
+			foreach ($ids['folders'] as $folderId) {
+				$f = Folder::model()->findByPk($folderId);
+				$f->moveToTrash();
+			}
+
+			foreach ($ids['files'] as $fileId) {
+				$f = File::model()->findByPk($fileId);
+				$f->moveToTrash();
+			}
 		}
 	}
 

@@ -63,23 +63,21 @@ GO.files.FileBrowser = function(config){
 	});
 	
 	//select the first inbox to be displayed in the messages grid
-	
-	this.treePanel.getRootNode().on('load', function(node)
-	{
+
+	this.treePanel.getRootNode().on('load', function (node) {
 		//var grid_id = !this.treePanel.rootVisible && node.childNodes[0] ? node.childNodes[0].id : node.id;
-		if(!this.folder_id)
-		{
-			this.folder_id=node.childNodes[0].id;
+		if (!this.folder_id) {
+			this.folder_id = node.childNodes[0].id;
 		}
 		this.setFolderID(this.folder_id);
-		
-		this.ready=true;
+
+		this.ready = true;
 		this.fireEvent('filebrowserready', this);
-	}, this, {single:true});
+	}, this, {single: true});
 	
 	
 	this.treePanel.on('click', function(node)	{
-		debugger;
+		// debugger;
 		this.setFolderID(node.id, true);
 		this.cardPanel.show();
 		if(node.id === "trash") {
@@ -258,8 +256,7 @@ GO.files.FileBrowser = function(config){
 	
 	
 	
-	if(config.filesFilter)
-	{
+	if(config.filesFilter) {
 		this.setFilesFilter(config.filesFilter);
 	}
 
@@ -334,6 +331,11 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	this.filesContextMenu.on('delete', function(menu, records, clickedAt){
 		this.onDelete(clickedAt);
 	}, this);
+
+	this.filesContextMenu.on('moveToTrash', function(menu, records, clickedAt){
+		this.onMoveToTrash(clickedAt);
+	}, this);
+
 
 	this.filesContextMenu.on('compress', function(menu, records, clickedAt){
 		this.onCompress(records);
@@ -481,6 +483,14 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		disabled:true
 	});
 
+	this.moveToTrashButton = new Ext.menu.Item({
+		iconCls: "ic-delete",
+		text: t("Move to trash"),
+		handler: () => {
+			this.onMoveToTrash('grid');
+		}
+	});
+
 	this.deleteButton = new Ext.menu.Item({
 		iconCls: 'ic-delete',
 		text: t("Delete"),
@@ -532,7 +542,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		scope: this
 	});
 
-	var tbar = [
+	const tbar = [
 		{
 			cls: 'go-narrow',
 			iconCls: "ic-menu",
@@ -582,27 +592,27 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		scope: this
 	}));
 
-		tbar.push(this.newButton);
+	tbar.push(this.newButton);
 
-		tbar.push(this.moreBtn = new Ext.Button({
-			iconCls: 'ic-more-vert',
-			tooltip: t("More"),
-			menu: [
-				{
-					iconCls: "ic-refresh",
-					text:t("Refresh"),
-					overflowText:t("Refresh"),
-					handler: function(){          
-						this.refresh(true);
-					},
-					scope:this
-				}
-			]
-		}));
+	tbar.push(this.moreBtn = new Ext.Button({
+		iconCls: 'ic-more-vert',
+		tooltip: t("More"),
+		menu: [
+			{
+				iconCls: "ic-refresh",
+				text:t("Refresh"),
+				overflowText:t("Refresh"),
+				handler: function(){
+					this.refresh(true);
+				},
+				scope:this
+			}
+		]
+	}));
 
-		if(!config.hideActionButtons) {
-			this.moreBtn.menu.add(this.deleteButton);
-		}
+	if(!config.hideActionButtons) {
+		this.moreBtn.menu.add(this.deleteButton, this.moveToTrashButton);
+	}
 
 
 	config.keys=[{
@@ -1326,7 +1336,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 	onCompress : function(records, filename, utf8)
 	{
 
-    if (GO.util.empty(this.gridStore.baseParams['query'])) {
+  	  if (GO.util.empty(this.gridStore.baseParams['query'])) {
 
 			var params = {
 				compress_sources: [],
@@ -1490,65 +1500,90 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		GO.files.pasteSelections = Array();
 	},
 
-	onDelete : function(clickedAt){
-		if(clickedAt=='tree')
-		{
-			var records = this.getSelectedTreeRecords();
+	onDelete : function(clickedAt) {
+		if (clickedAt === 'tree') {
+			const records = this.getSelectedTreeRecords();
 			GO.deleteItems({
-				url:GO.url('files/folder/delete'),
-				params:{
+				url: GO.url('files/folder/delete'),
+				params: {
 					id: records[0].data.id
 				},
-				count:1,
-				callback:function(responseParams){
+				count: 1,
+				callback: function (responseParams) {
 
-					if(responseParams.success)
-					{
-						var treeNode = this.treePanel.getNodeById(records[0].data.id);
-						if(treeNode)
-						{
+					if (responseParams.success) {
+						const treeNode = this.treePanel.getNodeById(records[0].data.id);
+						if (treeNode) {
 							//parentNode is destroyed after remove so keep it for later use
-							var parentNodeId = treeNode.parentNode.id;
+							const parentNodeId = treeNode.parentNode.id;
 							treeNode.remove();
 
-							var activeTreenode = this.treePanel.getNodeById(this.folder_id);
-							if(!activeTreenode){
+							const activeTreenode = this.treePanel.getNodeById(this.folder_id);
+							if (!activeTreenode) {
 								//current folder must have been removed. Let's go up.
 								this.setFolderID(parentNodeId);
 							}
 						}
 					}
 				},
-				scope:this
+				scope: this
 			});
-		}else
-		{
+		} else {
 			//detect grid on selModel. thumbs doesn't have that
-			if(this.cardPanel.getLayout().activeItem.id == this.gridPanel.id)
-			{
+			if (this.cardPanel.getLayout().activeItem.id === this.gridPanel.id) {
 				this.gridPanel.deleteSelected({
-					callback:function(){
-						var treeNode = this.treePanel.getNodeById(this.folder_id);
-						if(treeNode)
-						{
+					callback: function () {
+						const treeNode = this.treePanel.getNodeById(this.folder_id);
+						if (treeNode) {
 							delete treeNode.attributes.children;
 							treeNode.reload();
 						}
 					},
-					scope:this
+					scope: this
 				});
-			}else
-			{
+			} else {
 				this.thumbsPanel.deleteSelected({
-					callback:function(){
-						var treeNode = this.treePanel.getNodeById(this.folder_id);
-						if(treeNode)
-						{
+					callback: function () {
+						const treeNode = this.treePanel.getNodeById(this.folder_id);
+						if (treeNode) {
 							delete treeNode.attributes.children;
 							treeNode.reload();
 						}
 					},
-					scope:this
+					scope: this
+				});
+			}
+		}
+	},
+
+	onMoveToTrash: function (clickedAt) {
+		if (clickedAt === 'tree') {
+			// TODO?
+		} else {
+			//detect grid on selModel. thumbs doesn't have that
+			if (this.cardPanel.getLayout().activeItem.id === this.gridPanel.id) {
+				this.gridPanel.deleteSelected({
+					deleteParam: "trash_keys",
+					callback: function () {
+						const treeNode = this.treePanel.getNodeById(this.folder_id);
+						if (treeNode) {
+							delete treeNode.attributes.children;
+							treeNode.reload();
+						}
+					},
+					scope: this
+				});
+			} else {
+				this.thumbsPanel.deleteSelected({
+					deleteParam: "trash_keys",
+					callback: function () {
+						const treeNode = this.treePanel.getNodeById(this.folder_id);
+						if (treeNode) {
+							delete treeNode.attributes.children;
+							treeNode.reload();
+						}
+					},
+					scope: this
 				});
 			}
 		}
@@ -1903,7 +1938,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 		this.newButton.setDisabled(!createPermission);
 		this.deleteButton.setDisabled(!deletePermission);
-		
+		this.moveToTrashButton.setDisabled(!deletePermission);
+
 		this.cutButton.setDisabled(!deletePermission);
                 
 		this.copyButton.setDisabled(permissionLevel<=0);

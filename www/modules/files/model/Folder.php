@@ -21,6 +21,7 @@ use go\core\fs\FileSystemObject;
 use go\core\fs\Folder as GoFolder;
 use go\core\model\Acl;
 use go\core\model\Module;
+use modules\files\model\TrashedItem;
 
 /**
  * The Folder model
@@ -193,24 +194,25 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * This getter recursively builds the folder path.
 	 * @return string
 	 */
-	protected function getPath($forceResolve=false) {
+	protected function getPath($forceResolve = false)
+	{
 
-		if($forceResolve || !isset($this->_path)){
+		if ($forceResolve || !isset($this->_path)) {
 			$this->_path = $this->name;
 			$currentFolder = $this;
 
+			$ids = array();
 
-			$ids=array();
-
-			if(!empty($this->id))
-				$ids[]=$this->id;
+			if (!empty($this->id)) {
+				$ids[] = $this->id;
+			}
 
 			while ($currentFolder = $currentFolder->parent) {
-
-				if(in_array($currentFolder->id, $ids))
-					throw new Exception("Infinite folder loop detected in ".$this->_path." ".implode(",", $ids));
-				else
-					$ids[]=$currentFolder->id;
+				if (in_array($currentFolder->id, $ids)) {
+					throw new Exception("Infinite folder loop detected in " . $this->_path . " " . implode(",", $ids));
+				} else {
+					$ids[] = $currentFolder->id;
+				}
 
 				$this->_path = $currentFolder->name . '/' . $this->_path;
 			}
@@ -1558,5 +1560,30 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		
 		return $folder;
 		
+	}
+
+	/**
+	 * Soft delete a folder by moving it to Trash
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function moveToTrash(): void
+	{
+		$trashFolder = Folder::model()->findByPath('trash');
+		\GO\Files\Model\TrashedItem::model()->saveForFolder($this);
+
+//		if ($this->parent_id == $trashFolder->id) {
+//			throw new Exception("Folder is already in trash");
+//		}
+//		$this->parent_id = $trashFolder->id;
+//		$this->save();
+//
+		$this->move($trashFolder);
+		if(!$this->fsFolder->move($trashFolder->fsFolder)) {
+			throw new Exception("Unable to move current folder to trash");
+		}
+
+
 	}
 }
