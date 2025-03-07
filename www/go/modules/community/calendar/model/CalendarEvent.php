@@ -809,10 +809,11 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	}
 
 	/**
-	 * @return \DateTime[]
+	 * @return DateTime[]
+	 * @throws \DateMalformedStringException
 	 */
 	public function upcomingOccurrence() {
-		$now = new \DateTime('now', $this->timeZone());
+		$now = new DateTime('now', $this->timeZone());
 		$recurrenceId = null;
 		$nextOccurrence = null;
 		if(!empty($this->recurrenceOverrides)) {
@@ -826,10 +827,10 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 			}
 		}
 		if(is_string($recurrenceId)) {
-			$recurrenceId = new \DateTime($recurrenceId, $this->timeZone());
+			$recurrenceId = new DateTime($recurrenceId, $this->timeZone());
 		}
 		if(is_string($nextOccurrence)) {
-			$nextOccurrence = new \DateTime($nextOccurrence, $this->timeZone());
+			$nextOccurrence = new DateTime($nextOccurrence, $this->timeZone());
 		}
 		$it = ICalendarHelper::makeRecurrenceIterator($this);
 		$nextRecurrenceId = null;
