@@ -5,4 +5,9 @@ return array (
   'Online meeting' => 'Online-Meeting',
   'JWT authentification' => 'JWT Authentifizierung',
   'Enable JWT authentification' => 'JWT Authentifizierung aktivieren',
+  'Jitsi' => 'Jitsi',
+  'Jitsi meet' => 'Jitsi meet',
+  'Server URL' => 'Server URL',
+  'App Secret' => 'App Secret',
+  'App ID' => 'App ID',
 );
