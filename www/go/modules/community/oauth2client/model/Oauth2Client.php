@@ -81,6 +81,7 @@ final class Oauth2Client extends Entity
 
 			case 'Keycloak':
 
+				// TODO: Make keycloak configurable
 				// https://medium.com/@buffetbenjamin/keycloak-essentials-openid-connect-c7fa87d3129d
 				// https://github.com/stevenmaguire/oauth2-keycloak
 
