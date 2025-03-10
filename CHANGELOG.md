@@ -1,3 +1,12 @@
+- Finance:fix handler 'add from catalog' button when switching invoices
+
+28-02-2024: 6.8.108
+- Calender: new button to add external download link for a file to a calendar event
+
+25-02-2024: 6.8.107
+- Files: add file sharing menu to file detail panel
+- Files: add button 'copy link to entity' to file sharing menu
+
 25-02-2024: 6.8.106
 - Mail: prevent error when history module not installed
 
