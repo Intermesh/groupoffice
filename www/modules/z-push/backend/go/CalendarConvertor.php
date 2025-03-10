@@ -1,5 +1,6 @@
 <?php
 
+use go\core\ErrorHandler;
 use go\core\mail\Util;
 use go\core\model\Principal;
 use go\modules\community\calendar\model\Alert;
@@ -109,7 +110,13 @@ class CalendarConvertor
 						}
 						$msgException = self::toSyncAppointment($exEvent, $msgException, $params);
 					}
-					$msgException->exceptionstarttime = (new DateTime($recurrenceId, new \DateTimeZone($event->timeZone)))->getTimestamp();
+					try {
+						$tz = new DateTimeZone($event->timeZone);
+					} catch(Exception $e) {
+						ErrorHandler::logException($e, "Failed to set timezone " . $event->timeZone. " for event" . $event->id);
+						$tz = new DateTimeZone($event->timeZone);
+					}
+					$msgException->exceptionstarttime = (new DateTime($recurrenceId, $tz))->getTimestamp();
 					$message->exceptions[] = $msgException;
 				}
 			}
@@ -271,20 +278,30 @@ class CalendarConvertor
 		$event->showWithoutTime = $message->alldayevent;
 		$event->title = $message->subject ?? "No subject";
 		$event->description = GoSyncUtils::getBodyFromMessage($message);
-		$dtstart = new DateTime('@'.(isset($message->starttime) ? $message->starttime : $message->dtstamp), new \DateTimeZone('etc/UTC'));
+		$dtstart = new DateTime('@'.(isset($message->starttime) ? $message->starttime : $message->dtstamp), new DateTimeZone('etc/UTC'));
 		if (isset($message->endtime)) {
-			$dtend = new DateTime('@' . $message->endtime, new \DateTimeZone('etc/UTC'));
+			$dtend = new DateTime('@' . $message->endtime, new DateTimeZone('etc/UTC'));
 			$event->duration = DateTime::intervalToISO($dtend->diff($dtstart));
 		}
 		if($event->timeZone && !$event->showWithoutTime) {
 			$dtstart->setTimezone($event->timeZone());
 		}
 
+
+
 		if($event->showWithoutTime) {
+
+			try {
+				$tz = new DateTimeZone($event->timeZone);
+			} catch(Exception $e) {
+				ErrorHandler::logException($e, "Failed to set timezone " . $event->timeZone. " for event" . $event->id);
+				$tz = new DateTimeZone($event->timeZone);
+			}
+
 			// times for all day event are in UTC. For example in NL the day starts at the day before 23:00 in UTC time.
 			// we have to set the local timezone to get the correct date
-			$dtstart->setTimezone(new DateTimeZone($event->timeZone));
-			$dtend->setTimezone(new DateTimeZone($event->timeZone));
+			$dtstart->setTimezone($tz);
+			$dtend->setTimezone($tz);
 		}
 
 		$event->start = $dtstart;
@@ -335,7 +352,7 @@ class CalendarConvertor
 		if (isset($message->exceptions)) {
 			$event->recurrenceOverrides = []; // empty first to delete what is not present
 			foreach ($message->exceptions as $v) {
-				$rDT = new DateTime('@'.$v->exceptionstarttime, new \DateTimeZone('etc/UTC'));
+				$rDT = new DateTime('@'.$v->exceptionstarttime, new DateTimeZone('etc/UTC'));
 				if($event->timeZone && !$event->showWithoutTime) {
 					$rDT->setTimezone($event->timeZone());
 				}
@@ -370,7 +387,7 @@ class CalendarConvertor
 			$r->interval = (int)$recur->interval;
 		if (!empty($recur->until)) {
 
-			$untilDT = new DateTime('@'.$recur->until, new \DateTimeZone('etc/UTC'));
+			$untilDT = new DateTime('@'.$recur->until, new DateTimeZone('etc/UTC'));
 			$untilDT->setTimezone(new DateTimeZone(self::tzid()));
 			$r->until = $untilDT->format('Y-m-d\TH:i:s');
 		}
@@ -411,11 +428,11 @@ class CalendarConvertor
 		if(!empty($description))
 			$ex->description = $description;
 		if(isset($values->starttime))
-			$ex->start = new DateTime('@'.$values->starttime, new \DateTimeZone('etc/UTC'));
+			$ex->start = new DateTime('@'.$values->starttime, new DateTimeZone('etc/UTC'));
 		if (isset($values->endtime)) {
 			// timezone needs to be the same for correct duration of exception
-			$ex->duration = DateTime::intervalToISO((new DateTime('@' . $values->endtime, new \DateTimeZone('etc/UTC')))
-				->diff($ex->start ?? new DateTime('@' . $values->exceptionstarttime, new \DateTimeZone('etc/UTC'))));
+			$ex->duration = DateTime::intervalToISO((new DateTime('@' . $values->endtime, new DateTimeZone('etc/UTC')))
+				->diff($ex->start ?? new DateTime('@' . $values->exceptionstarttime, new DateTimeZone('etc/UTC'))));
 		}
 		if (isset($values->location))
 			$ex->location = $values->location;
