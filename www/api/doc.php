@@ -59,7 +59,7 @@ foreach($types as $type) {
 			return strcmp($a, $b);
 		});
 		foreach($properties as $name => $property) {
-			$html .= "<tr><td>" . $name . "</td><td>".($property['type'] ?? "")."</td><td>".$property['description']."</td></tr>";
+			$html .= "<tr><td>" . $name . "</td><td>".($property['type'] ?? "")."</td><td>".($property['description'] ?? "-?-")."</td></tr>";
 		}
 
 		$html .= "</table>";
