@@ -1,3 +1,10 @@
+10-03-2025: 25.0.7
+- Calendar: fix cancellation event
+- Time zone fix
+- Phpstan
+- Create link button
+- several updated dependencies
+
 06-03-2025: 25.0.6
 - Calendar time tracking build problem fixed
 
