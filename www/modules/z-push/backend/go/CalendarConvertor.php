@@ -110,12 +110,8 @@ class CalendarConvertor
 						}
 						$msgException = self::toSyncAppointment($exEvent, $msgException, $params);
 					}
-					try {
-						$tz = new DateTimeZone($event->timeZone);
-					} catch(Exception $e) {
-						ErrorHandler::logException($e, "Failed to set timezone " . $event->timeZone. " for event" . $event->id);
-						$tz = new DateTimeZone("UTC");
-					}
+
+					$tz = $event->dateTimeZone();
 					$msgException->exceptionstarttime = (new DateTime($recurrenceId, $tz))->getTimestamp();
 					$message->exceptions[] = $msgException;
 				}
@@ -291,12 +287,7 @@ class CalendarConvertor
 
 		if($event->showWithoutTime) {
 
-			try {
-				$tz = new DateTimeZone($event->timeZone);
-			} catch(Exception $e) {
-				ErrorHandler::logException($e, "Failed to set timezone " . $event->timeZone. " for event" . $event->id);
-				$tz = new DateTimeZone("UTC");
-			}
+			$tz = $event->dateTimeZone();
 
 			// times for all day event are in UTC. For example in NL the day starts at the day before 23:00 in UTC time.
 			// we have to set the local timezone to get the correct date

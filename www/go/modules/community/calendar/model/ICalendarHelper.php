@@ -515,12 +515,9 @@ class ICalendarHelper {
 				// convert to localtime
 				$isUtc = substr($parts['UNTIL'], -1,1) === 'Z';
 				$dt = DateTime::createFromFormat('Ymd\THis', substr($parts['UNTIL'],0,15), new \DateTimeZone('etc/UTC'));
-				try {
-					if (!empty($event->timeZone))
-						$dt->setTimezone(new \DateTimeZone($event->timeZone));
-				}catch (\Exception $e) {
-					ErrorHandler::logException($e, "Failed to set timezone " . $event->timeZone. " for event" . $event->id);
-				}
+
+				$tz = $event->dateTimeZone();
+				$dt->setTimezone($tz);
 				$values->until = $dt->format('Y-m-d\TH:i:s');
 			} else {
 				// add dashes and append 0-time
