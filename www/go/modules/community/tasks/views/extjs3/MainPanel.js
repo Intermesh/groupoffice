@@ -439,7 +439,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					},
 					scope: this
 				},{
-					icon: 'ic-bookmark_added',
+					iconCls: 'ic-bookmark-added',
 					text: t('Subscribe to task list') + '…', handler: () => {
 						const dlg = new go.modules.community.tasks.SubscribeWindow({
 							support:this.support
