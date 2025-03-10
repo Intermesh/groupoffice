@@ -25,7 +25,7 @@ class Language extends Controller {
 	private bool $translate = false;
 	private bool $missingOnly = false;
 
-	protected function authenticate() {  
+	protected function authenticate() {
     if (!go()->getAuthState()->isAuthenticated()) {			
       throw new Exception(401, "Unauthorized");
 		}  	

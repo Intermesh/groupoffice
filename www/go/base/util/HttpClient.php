@@ -88,9 +88,9 @@ class HttpClient{
 	 * Make a POST request to any URL
 	 * 
 	 * @param string $url
-	 * @param string $params POST parameters
+	 * @param array $params POST parameters
 	 * @return string Response of the server.
-	 * @throws Exception 
+	 * @throws \Exception
 	 */
 	public function request($url, $params=array()){
 		

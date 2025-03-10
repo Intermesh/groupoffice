@@ -152,4 +152,5 @@ The following changes were made by %s:
   '\'"Apply the folder\'\'s display settings for everyone."\'' => 'Anzeigeeinstellungen dieses Ordners für alle Nutzer übernehmen',
   '\'"You can\'\'t edit this folder"\'' => 'Sie können diesen Ordner nicht bearbeiten',
   '\'"Can\'\'t do this when in search mode."\'' => 'Im Such-Modus nicht möglich.',
+  'Copy direct link' => 'Direktlink kopieren',
 );

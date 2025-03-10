@@ -61,7 +61,7 @@ trait ValidationTrait {
 	 * If the attribute has no error then fals will be returned
 	 * 
 	 * @param string $key
-	 * @return array{code:int, description:string, data:array}|false eg. array('code'=>'maxLength','info'=>array('length'=>10))
+	 * @return array{code:string, description:string, data:array}|false eg. array('code'=>'maxLength','info'=>array('length'=>10))
 	 */
 	public function getValidationError($key) {
 		$validationErrors = $this->getValidationErrors();

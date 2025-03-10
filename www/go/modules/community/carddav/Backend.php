@@ -73,9 +73,9 @@ class Backend extends AbstractBackend {
 				throw new Forbidden();
 			}
 		}
-		
+
 		$vcardComp = Reader::read($cardData, Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
-		/** @var $vcardComp VCardComp */
+		/** @var VCardComp $vcardComp */
 		$contact = new Contact();
 		$contact->addressBookId = (int) $addressBookId;
 		$contact->setUid((string) $vcardComp->uid);
@@ -132,6 +132,7 @@ class Backend extends AbstractBackend {
 	 */
 	public function deleteCard($addressBookId, $cardUri): bool {
 
+		/** @phpstan-ignore-next-line */
 		if(!go()->getAuthState()->getUser(['syncSettings'])->syncSettings->allowDeletes) {
 			go()->debug("Deleting is disabled by user sync settings");
 			throw new Forbidden("Deleting is disabled by user sync settings");

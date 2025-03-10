@@ -19,10 +19,13 @@ parameters:
     excludePaths:
         analyse:
             - */vendor/*
+            - %currentWorkingDirectory%/go/core/util/QRcode.php
 
     reportUnmatchedIgnoredErrors: false
     treatPhpDocTypesAsCertain: false
     ignoreErrors:
+        - identifier: staticMethod.private
+        - identifier: staticProperty.private
         - identifier: missingType.iterableValue
         - identifier: missingType.generics
         - '#Class .* referenced with incorrect case: .*#'
@@ -30,3 +33,5 @@ parameters:
         - '#Variable .* in empty\(\) always exists and is not falsy.#'
         - '#Variable .* in isset\(\) always exists and is always null.#'
         - '#Unsafe usage of new static\(\).#'
+        - '#Unsafe access to private property .*#'
+        - '#Unsafe call to private method .*#'

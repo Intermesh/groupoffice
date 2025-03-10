@@ -51,6 +51,9 @@ class LogEntry extends AclOwnerEntity {
 
 	public $entityId;
 
+	/**
+	 * @var string
+	 */
 	protected $entity;
 
 	public $description;
@@ -180,7 +183,7 @@ class LogEntry extends AclOwnerEntity {
 	/**
 	 * Entity name
 	 *
-	 * @return @string
+	 * @return string
 	 */
 	public function getEntity() {
 		return $this->entity;

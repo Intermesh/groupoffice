@@ -163,4 +163,5 @@ return array (
   '\'"Sender doesn\'\'t exist"\'' => 'Absender nicht vorhanden',
   '\'"Recipient doesn\'\'t exist"\'' => 'Empfänger vorhanden',
   '\'"Please click \'\'add\'\' to add a criterium"\'' => '\'"Klicken Sie bitte \'\'Hinzufügen\'\', um eine Bedingung hinzuzufügen"\'',
+  'Sieve' => 'Sieve',
 );
