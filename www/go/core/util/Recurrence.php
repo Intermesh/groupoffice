@@ -37,7 +37,6 @@ class Recurrence extends RRuleIterator {
 
 	/**
 	 * Recurrence constructor.
-	 * @param string $rrule RRULE FORMAT AS IN
 	 * @param DateTimeInterface $start
 	 * @throws InvalidDataException
 	 * @noinspection PhpMissingParentConstructorInspection

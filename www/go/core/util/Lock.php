@@ -16,7 +16,7 @@ class Lock {
 	private static $locks = [];
 
 	/**
-	 * @var resource
+	 * @var null|\SysvSemaphore|false
 	 */
 	private $sem;
 	/**
@@ -58,7 +58,7 @@ class Lock {
 	/**
 	 * The file pinter for the lock method
 	 * 
-	 * @var resource 
+	 * @var ?resource
 	 */
 	private $lockFp;
 
