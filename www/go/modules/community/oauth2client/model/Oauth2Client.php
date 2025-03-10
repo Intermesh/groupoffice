@@ -10,6 +10,7 @@ use go\modules\community\email\model\Account;
 use go\modules\community\oauth2client\provider\Azure;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Google;
+use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
 
 final class Oauth2Client extends Entity
 {
@@ -77,6 +78,17 @@ final class Oauth2Client extends Entity
 			'redirectUri' => $url . '/go/modules/community/oauth2client/gauth.php/callback',
 		];
 		switch ($defaultClient->name) {
+
+			case 'Keycloak':
+
+				// https://medium.com/@buffetbenjamin/keycloak-essentials-openid-connect-c7fa87d3129d
+				// https://github.com/stevenmaguire/oauth2-keycloak
+
+				$params['authServerUrl'] = 'http://host.docker.internal:9081';
+				$params['realm'] = 'myrealm';
+				$params['scopes'] = $scopes ?? ['openid'];
+				return new Keycloak($params);
+
 			case 'Google':
 				// see https://developers.google.com/identity/protocols/oauth2/web-server
 				$params['accessType'] = 'offline';
