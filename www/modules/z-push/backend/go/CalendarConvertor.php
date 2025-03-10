@@ -111,7 +111,7 @@ class CalendarConvertor
 						$msgException = self::toSyncAppointment($exEvent, $msgException, $params);
 					}
 
-					$tz = $event->dateTimeZone();
+					$tz = $event->timeZone() ?? new DateTimeZone("UTC");
 					$msgException->exceptionstarttime = (new DateTime($recurrenceId, $tz))->getTimestamp();
 					$message->exceptions[] = $msgException;
 				}
@@ -287,12 +287,14 @@ class CalendarConvertor
 
 		if($event->showWithoutTime) {
 
-			$tz = $event->dateTimeZone();
+			$tz = $event->timeZone();
 
-			// times for all day event are in UTC. For example in NL the day starts at the day before 23:00 in UTC time.
-			// we have to set the local timezone to get the correct date
-			$dtstart->setTimezone($tz);
-			$dtend->setTimezone($tz);
+			if(isset($tz)) {
+				// times for all day event are in UTC. For example in NL the day starts at the day before 23:00 in UTC time.
+				// we have to set the local timezone to get the correct date
+				$dtstart->setTimezone($tz);
+				$dtend->setTimezone($tz);
+			}
 		}
 
 		$event->start = $dtstart;

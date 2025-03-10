@@ -516,8 +516,11 @@ class ICalendarHelper {
 				$isUtc = substr($parts['UNTIL'], -1,1) === 'Z';
 				$dt = DateTime::createFromFormat('Ymd\THis', substr($parts['UNTIL'],0,15), new \DateTimeZone('etc/UTC'));
 
-				$tz = $event->dateTimeZone();
-				$dt->setTimezone($tz);
+				$tz = $event->timeZone();
+				if(isset($tz)) {
+					$dt->setTimezone($tz);
+				}
+
 				$values->until = $dt->format('Y-m-d\TH:i:s');
 			} else {
 				// add dashes and append 0-time

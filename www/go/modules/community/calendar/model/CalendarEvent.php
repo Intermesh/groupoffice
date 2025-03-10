@@ -7,6 +7,7 @@
 
 namespace go\modules\community\calendar\model;
 
+use DateTimeZone;
 use Exception;
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
@@ -352,26 +353,6 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 
 	public function toVObject() {
 		return ICalendarHelper::toVObject($this)->serialize();
-	}
-
-	public function dateTimeZone() {
-		try {
-			if (!empty($this->timeZone)) {
-				return new \DateTimeZone($this->timeZone);
-			}
-			static $currentTZUser;
-			if (empty($currentTZUser)) {
-				$currentTZUser = go()->getAuthState()->getUser(['dateFormat', 'timezone', 'timeFormat']);
-				if (empty($currentTZUser)) {
-					$currentTZUser = User::findById(1, ['dateFormat', 'timezone', 'timeFormat'], true);
-				}
-			}
-			return new \DateTimeZone($currentTZUser->timezone);
-		} catch(Exception $e) {
-			ErrorHandler::logException($e, "Failed to set timezone " . $this->timeZone. " for event" . $this->id);
-
-			return new \DateTimeZone("UTC");
-		}
 	}
 
 	public function icsBlobId() {
@@ -811,13 +792,27 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 		return !empty($this->recurrenceRule); // && !empty($this->recurrenceRule->frequency));
 	}
 
-	public function timeZone() {
+	public function timeZone(): ?DateTimeZone
+	{
 		try {
-			return $this->timeZone ? new \DateTimeZone($this->timeZone) : null;
+			return $this->timeZone ? new DateTimeZone($this->timeZone) : null;
 		}catch(Exception $e) {
 			ErrorHandler::logException($e, "Failed to set timezone " . $this->timeZone. " for event" . $this->id);
 
+			static $currentTZUser;
+			if (empty($currentTZUser)) {
+				$currentTZUser = go()->getAuthState()->getUser(['dateFormat', 'timezone', 'timeFormat']);
+				if (empty($currentTZUser)) {
+					$currentTZUser = User::findById(1, ['dateFormat', 'timezone', 'timeFormat'], true);
+				}
+			}
+			try {
+				return new DateTimeZone($currentTZUser->timezone);
+			}catch(Exception $e) {
+				ErrorHandler::logException($e, "Failed to fallback on user timezone " . $currentTZUser->timezone. " for event" . $this->id);
+			}
 			return null;
+
 		}
 	}
 
