@@ -744,13 +744,13 @@ abstract class Property extends Model {
 		foreach(static::getMapping()->getProperties() as $propName => $type) {
 			//do property_exists because otherwise it will add protected properties too.
 			if(!isset($props[$propName])) {
-				$props[$propName] = ['setter' => false, 'getter' => false, 'access' => self::PROP_PUBLIC, 'dynamic' => true];
+				$props[$propName] = ['setter' => false, 'getter' => false, 'access' => self::PROP_PUBLIC, 'dynamic' => true, "description" => ""];
 			}
 			$props[$propName]['db'] = true;
 		}
 
 		if(method_exists(static::class, 'getCustomFields')) {
-			$props['customFields'] = ['setter' => true, 'getter' => true, 'access' => null];
+			$props['customFields'] = ['setter' => true, 'getter' => true, 'access' => null, "description" => ""];
 		}
 
 		return $props;
