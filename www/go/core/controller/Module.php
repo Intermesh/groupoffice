@@ -39,9 +39,14 @@ class Module extends EntityController {
 		return $query;
 	}
 
+	/**
+	 * @param model\Module $entity
+	 * @return bool
+	 * @throws \Exception
+	 */
 	protected function canUpdate(Entity $entity): bool
 	{
-		return go()->getAuthState()->isAdmin();
+		return $entity->getUserRights()->mayManage ?? go()->getAuthState()->isAdmin();
 	}
 
 	protected function canCreate(Entity $entity): bool
