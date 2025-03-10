@@ -10,6 +10,7 @@ namespace go\modules\community\calendar\model;
 use Exception;
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
+use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
 use go\core\exception\JsonPointerException;
 use go\core\fs\Blob;
@@ -354,17 +355,23 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	}
 
 	public function dateTimeZone() {
-		if(!empty($this->timeZone)) {
-			return new \DateTimeZone($this->timeZone);
-		}
-		static $currentTZUser;
-		if(empty($currentTZUser)) {
-			$currentTZUser = go()->getAuthState()->getUser(['dateFormat', 'timezone', 'timeFormat' ]);
-			if(empty($currentTZUser)) {
-				$currentTZUser = User::findById(1, ['dateFormat', 'timezone', 'timeFormat'], true);
+		try {
+			if (!empty($this->timeZone)) {
+				return new \DateTimeZone($this->timeZone);
 			}
+			static $currentTZUser;
+			if (empty($currentTZUser)) {
+				$currentTZUser = go()->getAuthState()->getUser(['dateFormat', 'timezone', 'timeFormat']);
+				if (empty($currentTZUser)) {
+					$currentTZUser = User::findById(1, ['dateFormat', 'timezone', 'timeFormat'], true);
+				}
+			}
+			return new \DateTimeZone($currentTZUser->timezone);
+		} catch(Exception $e) {
+			ErrorHandler::logException($e, "Failed to set timezone " . $this->timeZone. " for event" . $this->id);
+
+			return new \DateTimeZone("UTC");
 		}
-		return new \DateTimeZone($currentTZUser->timezone);
 	}
 
 	public function icsBlobId() {
@@ -805,7 +812,13 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	}
 
 	public function timeZone() {
-		return $this->timeZone ? new \DateTimeZone($this->timeZone) : null;
+		try {
+			return $this->timeZone ? new \DateTimeZone($this->timeZone) : null;
+		}catch(Exception $e) {
+			ErrorHandler::logException($e, "Failed to set timezone " . $this->timeZone. " for event" . $this->id);
+
+			return null;
+		}
 	}
 
 	/**

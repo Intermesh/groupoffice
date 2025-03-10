@@ -481,7 +481,7 @@ class ICalendarHelper {
 		return new VObject\Recur\RRuleIterator(self::toRrule($event), $event->start());
 	}
 
-	static private function parseRrule(VObject\Property\ICalendar\Recur $rule, $event) {
+	static private function parseRrule(VObject\Property\ICalendar\Recur $rule, CalendarEvent $event) {
 		$parts = $rule->getParts();
 		$values = (object)['frequency' => strtolower($parts['FREQ'])];
 		if(isset($parts['INTERVAL']) && $parts['INTERVAL'] != 1) {
@@ -515,8 +515,12 @@ class ICalendarHelper {
 				// convert to localtime
 				$isUtc = substr($parts['UNTIL'], -1,1) === 'Z';
 				$dt = DateTime::createFromFormat('Ymd\THis', substr($parts['UNTIL'],0,15), new \DateTimeZone('etc/UTC'));
-				if(!empty($event->timeZone))
-					$dt->setTimezone(new \DateTimeZone($event->timeZone));
+				try {
+					if (!empty($event->timeZone))
+						$dt->setTimezone(new \DateTimeZone($event->timeZone));
+				}catch (\Exception $e) {
+					ErrorHandler::logException($e, "Failed to set timezone " . $event->timeZone. " for event" . $event->id);
+				}
 				$values->until = $dt->format('Y-m-d\TH:i:s');
 			} else {
 				// add dashes and append 0-time
