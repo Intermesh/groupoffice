@@ -514,8 +514,8 @@ class Module extends Entity {
 		return array_merge(
 			parent::buildApiProperties($forDocs),
 			[
-				'permissionLevel' => ["setter" => false, "getter" => true, "access" => self::PROP_PUBLIC_READONLY],
-				'userRights' => ["setter" => false, "getter" => true, "access" => self::PROP_PUBLIC_READONLY]
+				'permissionLevel' => ["setter" => false, "getter" => true, "access" => self::PROP_PUBLIC_READONLY, 'description' => 'Deprecated: The permission level of the current user for backwards compatibility. Use userRights instead.'],
+				'userRights' => ["setter" => false, "getter" => true, "access" => self::PROP_PUBLIC_READONLY, 'description' => 'The rights the current user has']
 			]
 		);
 	}
