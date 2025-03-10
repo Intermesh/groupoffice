@@ -1,4 +1,5 @@
 - Finance:fix handler 'add from catalog' button when switching invoices
+- Core: Updated German language (thanks Universisy of Greifswald!)
 
 28-02-2024: 6.8.108
 - Calender: new button to add external download link for a file to a calendar event
