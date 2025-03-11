@@ -177,7 +177,7 @@ class Language {
 	/**
 	 * Format an address
 	 *
-	 * @param array $address array with street, street2, city, zipCode and state
+	 * @param array $address array with address, city, zipCode and state
 	 * @param string|null $countryCode
 	 * @param boolean|null $showCountry When null it will be false if the country is the system default
 	 * @return string
@@ -188,7 +188,8 @@ class Language {
 			$countryCode = self::defaultCountry();
 		}
 
-		if (empty($address['street']) && empty($address['street2']) && empty($address['city']) && empty($address['state'])) {
+		// street and street2 still used for backwards compatibility
+		if (empty($address['address']) && empty($address['street']) && empty($address['zipCode']) && empty($address['city']) && empty($address['state'])) {
 			return "";
 		}
 
