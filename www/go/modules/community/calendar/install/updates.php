@@ -244,5 +244,8 @@ $updates['202404071212'][] = "UPDATE calendar_event SET timeZone = NULL WHERE sh
 $updates['202502261353'][] = "DELETE cat FROM calendar_category cat LEFT JOIN calendar_calendar c on c.id = cat.calendarId WHERE c.id IS NULL;";
 // fix: set duration at 1 hour if duration is negative
 $updates['202503101510'][] = "UPDATE calendar_event SET duration = 'PT1H' WHERE duration LIKE 'PT-%';";
+$updates['202503111342'][] = function(){
+	\go\modules\community\calendar\cron\ScanEmailForInvites::install("*/5 * * * *");
+};
 
 // TODO: calendar views -> custom filters
