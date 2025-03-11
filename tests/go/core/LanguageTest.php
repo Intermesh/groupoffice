@@ -20,6 +20,6 @@ class LanguageTest extends \PHPUnit\Framework\TestCase
 			'address' => 'Veemarktkade 8'
 		], "gb", false);
 
-		$this->assertEquals("Veemarktkade\n8", $address);
+		$this->assertEquals("Veemarktkade 8", $address);
 	}
 }
