@@ -58,6 +58,14 @@ class DavAccount extends AclOwnerEntity {
 			->addMap('collections', Calendar::class, ['id' => 'davaccountId']);
 	}
 
+	public function needsSync() {
+
+		$needSync = new \DateTime();
+		$needSync->sub(new \DateInterval('PT'.$this->refreshInterval.'M'));
+
+		return $this->lastSync < $needSync; // longer then [interval] minutes ago
+	}
+
 	protected function canCreate(): bool
 	{
 		return Module::findByName('community', 'davclient')
