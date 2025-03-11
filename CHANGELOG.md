@@ -1,3 +1,6 @@
+- E_mail: Save mail as project
+- E-mail: Save mail as appointment
+
 10-03-2025: 25.0.7
 - Calendar: fix cancellation event
 - Time zone fix
