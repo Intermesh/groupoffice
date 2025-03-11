@@ -6,6 +6,7 @@ import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {EventDetail, EventDetailWindow} from "./EventDetail.js";
 import {PreferencesPanel} from "./PreferencesPanel";
 import {EventWindow} from "./EventWindow";
+import {CalendarView} from "./CalendarView";
 
 export * from "./Main.js";
 export * from "./CalendarList.js";
@@ -59,6 +60,10 @@ function addEmailAction() {
 
 		go.openEventWindow = (data:any, editable: boolean) => {
 			const dlg = editable ? new EventWindow() : new EventDetailWindow();
+			data.start = data.start ?? (new DateTime).format('Y-m-d\TH:00:00.000');
+			data.showWithoutTime = data.showWithoutTime ?? client.user.calendarPreferences?.defaultDuration == null;
+				data.duration = data.duration ?? client.user.calendarPreferences?.defaultDuration ?? "P1D";
+				data.calendarId = data.calendarId ?? client.user.calendarPreferences?.defaultCalendarId;
 			dlg.loadEvent(new CalendarItem({data:data, key: data.id ? data.id + "" : null}));
 			dlg.show();
 		};

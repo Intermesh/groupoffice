@@ -240,7 +240,9 @@ $updates['202404071212'][] = function() {
 
 // after timezone conversion make all full day event floating-time
 $updates['202404071212'][] = "UPDATE calendar_event SET timeZone = NULL WHERE showWithoutTime = 1;";
-//remove orphan categories
+// remove orphan categories
 $updates['202502261353'][] = "DELETE cat FROM calendar_category cat LEFT JOIN calendar_calendar c on c.id = cat.calendarId WHERE c.id IS NULL;";
+// fix: set duration at 1 hour if duration is negative
+$updates['202503101510'][] = "UPDATE calendar_event SET duration = 'PT1H' WHERE duration LIKE 'PT-%';";
 
 // TODO: calendar views -> custom filters
