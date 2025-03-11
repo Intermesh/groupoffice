@@ -1818,4 +1818,5 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Categories' => 'Categories',
   'Labels' => 'Labels',
   'N/A' => 'N/A',
+  'Rebuild principals' => 'Rebuild principals',
 );
