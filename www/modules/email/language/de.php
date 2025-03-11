@@ -377,4 +377,6 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Ihre Mailbox ist v
   '\'"You didn\'\'t configure an e-mail account yet. Go to Start menu -> E-mail -> Administration -> Accounts to setup your first e-mail account"\'' => 'Sie haben kein E-Mail-Konto konfiguriert. Gehen Sie auf Administration -> E-Mail-Konten, um dies nachzuholen',
   '\'"You didn\'\'t fill in a subject. Are you sure you want to save this message without a subject?"\'' => 'Sie haben keinen Betreff eingetragen. Sind Sie sicher, dass Ihre Nachricht ohne Betreff gespeichert werden soll?',
   '\'"You didn\'\'t fill in a subject. Are you sure you want to send this message without a subject?"\'' => 'Sie haben keinen Betreff eingetragen. Sind Sie sicher, dass Ihre Nachricht ohne Betreff gesendet werden soll?',
+  'Processing...' => 'Processing...',
+  'Server' => 'Server',
 );

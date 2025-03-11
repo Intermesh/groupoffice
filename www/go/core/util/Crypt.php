@@ -32,9 +32,8 @@ class Crypt {
 
 	/** Decryption Procedure
 	 *
-	 * @param string   msg      output from encrypt()
-	 * @param string   k        encryption key
-	 * @param boolean  base64   base64 decode msg
+	 * @param string   $ciphertext      output from encrypt()
+	 * @param string   $password        encryption key
 	 *
 	 * @return  string   original message/data or
 	 *           boolean  false on error
@@ -153,11 +152,11 @@ class Crypt {
 
 	/** PBKDF2 Implementation (as described in RFC 2898);
 	 *
-	 * 	@param   string  p   password
-	 * 	@param   string  s   salt
-	 * 	@param   int     c   iteration count (use 1000 or higher)
-	 * 	@param   int     kl  derived key length
-	 * 	@param   string  a   hash algorithm
+	 * 	@param   string  $p   password
+	 * 	@param   string  $s   salt
+	 * 	@param   int     $c   iteration count (use 1000 or higher)
+	 * 	@param   int     $kl  derived key length
+	 * 	@param   string  $a   hash algorithm
 	 *
 	 * 	@return  string  derived key
 	 */

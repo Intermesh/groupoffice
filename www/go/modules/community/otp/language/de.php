@@ -23,4 +23,7 @@ return array (
   'Setup later' => 'Später aufsetzen',
   'Reading from your clipboard isn\'t allowed' => 'Von der Zwischenablage zu lesen ist nicht erlaubt',
   'Two Factor Authentication' => 'Zwei-Faktor-Authentifizierung',
+  'Code' => 'Code',
+  'Setup one-time password authentication using an OTP application which generates a unique PIN for each login.' => 'Einrichten eines Einmal-Passworts über eine OTP Applikation, die für jedes Login eine einmalige PIN erzeugt.',
+  'Count down' => 'Count down',
 );

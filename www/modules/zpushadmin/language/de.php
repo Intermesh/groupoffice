@@ -35,4 +35,6 @@ return array (
   'ActiveSync management' => 'ActiveSync-Verwaltung',
   'Status' => 'Status',
   'SMS' => 'SMS',
+  'Resync' => 'Resync',
+  'ActiveSync' => 'ActiveSync',
 );

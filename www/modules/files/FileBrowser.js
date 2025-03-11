@@ -2102,7 +2102,7 @@ GO.files.createDownloadLink = function(records,email){
 		GO.files.expireDateDialog = new GO.files.ExpireDateDialog();
 	}
 	
-	GO.files.expireDateDialog.show(records,email);
+	GO.files.expireDateDialog.show(records, email, false);
 }
 
 GO.files.showFilePropertiesDialog = function(file_id){

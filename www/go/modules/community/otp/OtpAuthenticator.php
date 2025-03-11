@@ -16,7 +16,8 @@ class OtpAuthenticator extends SecondaryAuthenticator {
 			$this->setValidationError('otp_code', ErrorCode::REQUIRED);
 			return false;
 		}
-		
+
+		/** @phpstan-ignore-next-line */
 		$otp = $token->getUser()->otp;
 		if(!$otp){
 			$this->setValidationError('otp_code', ErrorCode::NOT_FOUND);
