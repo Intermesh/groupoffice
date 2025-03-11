@@ -1866,6 +1866,29 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		echo $this->render('delete', array('success'=> true, 'model' => $model));
 	}
 
+	protected function actionRestore(array $params): array
+	{
+		if (!isset($params['ids'])) {
+			throw new \go\core\http\Exception(412, "Missing ids");
+		}
+
+		foreach (explode(',', $params['ids']) as $id) {
+			$trashPanda = GO\Files\Model\TrashedItem::model()->findByPk($id);
+			if (!$trashPanda) {
+				// Do we need an exception here?
+				throw new \GO\Base\Exception\NotFound();
+			}
+			try {
+				$trashPanda->restore();
+			}
+			catch (\Exception $e) {
+				throw new \go\core\http\Exception(500, $e->getMessage());
+			}
+		}
+
+		return ['success' => true];
+	}
+
 	/**
 	 * @param $model
 	 * @return mixed

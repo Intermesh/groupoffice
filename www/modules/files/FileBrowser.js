@@ -320,6 +320,15 @@ GO.files.FileBrowser = function(config){
 	this.trashGridPanel = new GO.files.TrashGrid(({
 		id: config.id + '-trash-grid',
 		store: this.trashGridStore,
+		deleteConfig: {
+			scope: this,
+			success:function(){
+				const activeNode = this.treePanel.getNodeById(this.folder_id);
+				if (activeNode) {
+					activeNode.reload();
+				}
+			}
+		},
 	}));
 
 	this.filesContextMenu = new GO.files.FilesContextMenu();
@@ -1631,13 +1640,32 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 				strConfirm = template.applyTemplate({'count': selected.length});
 				break;
 		}
+		const ids = [];
+		for (const s of selected) {
+			ids.push(s.data.id);
+		}
 		if(confirm(strConfirm)) {
-
+			GO.request({
+				url:'files/folder/restore',
+				params:{
+					ids: ids.join(",")
+				},
+				success:function(action, response, result){
+					// debugger;
+					this.trashGridPanel.store.reload();
+					// const treeNode = this.treePanel.getNodeById(this.folder_id);
+					// if (treeNode) {
+					// 	delete treeNode.attributes.children;
+					// 	treeNode.reload();
+					// }
+				},
+				scope:this
+			})
 		}
 	},
 
 	emailFiles: function(records) {
-		var files = new Array();
+		var files = [];
 		Ext.each(records, function(record) {
 			var folderId = record.data.folder_id;
 			var id = record.data.id;

@@ -3,6 +3,7 @@
 namespace GO\Files\Model;
 
 use GO;
+use go\core\http\Exception;
 use go\core\util\DateTime;
 use go\core\orm\EntityType;
 use GO\Files\Model\File;
@@ -106,5 +107,37 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 
 	}
 
+	/**
+	 * Restore a file or folder to its original position. If either does not exist, throw an error.
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GO\Base\Exception\AccessDenied
+	 * @throws GO\Base\Exception\RelationDeleteRestrict
+	 * @throws \go\core\db\DbException
+	 */
+	public function restore(): void
+	{
+		$parentFolder = Folder::model()->findByPk($this->parentId);
+		if (!$parentFolder) {
+			throw new Exception(404, GO()->t("The original parent folder has gone."));
+		}
+
+		$entityType = EntityType::findById($this->entityTypeId);
+		if ($entityType->getName() == 'File') {
+			$f = \GO\Files\Model\File::model()->findByPk($this->entityId);
+			if(!$f) {
+				throw new Exception(404, GO()->t("File not found."));
+			}
+		} else {
+			$f = \GO\Files\Model\Folder::model()->findByPk($this->entityId);
+			if(!$f) {
+				throw new Exception(404, GO()->t("Folder not found."));
+			}
+		}
+		if ($f->move($parentFolder)) {
+			$this->delete();
+		}
+	}
 
 }

@@ -906,8 +906,6 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 			throw new Exception("File is already in trash");
 		}
 		$this->move($trashFolder, true);
-//		$this->folder_id = $trashFolder->id;
-//		$this->save();
 	}
 
 }
