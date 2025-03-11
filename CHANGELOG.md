@@ -1,4 +1,7 @@
-10-03-2024 :6.8.109
+- Addressbook: Empty address appeared when city not filled
+- Contracts: Decimals for contract items
+
+10-03-2024 6.8.109
 - Finance:fix handler 'add from catalog' button when switching invoices
 - Core: Updated German language (thanks Universisy of Greifswald!)
 
