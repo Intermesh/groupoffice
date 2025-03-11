@@ -1,3 +1,4 @@
+- Addressbook: Empty address appeared when city not filled
 - Contracts: Decimals for contract items
 
 10-03-2024 6.8.109
