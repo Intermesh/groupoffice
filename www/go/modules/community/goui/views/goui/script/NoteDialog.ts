@@ -1,5 +1,5 @@
 import {notebookcombo} from "./NoteBookCombo.js";
-import {comp, htmlfield, Notifier, root, t, textfield} from "@intermesh/goui";
+import {comp, fieldset, htmlfield, Notifier, root, t, textfield} from "@intermesh/goui";
 import {client, FormWindow, Image} from "@intermesh/groupoffice-core";
 
 export class NoteDialog extends FormWindow {
@@ -12,46 +12,52 @@ export class NoteDialog extends FormWindow {
 		this.stateId = "note-dialog";
 		this.maximizable = true;
 
+		this.width = 800;
+		this.height = 800;
+
 		this.generalTab.items.add(
-			comp({cls: "hbox gap"},
+
+			fieldset({},
+
 				textfield({
-					flex: 2,
+					flex: 1,
 					name: "name",
 					label: t("Name"),
 					required: true
 				}),
 
 				notebookcombo({
-					flex: 1
+					width: 240
 				}),
-			),
 
-			htmlfield({
-				name: "content",
-				listeners: {
 
-					setvalue: (field, newValue, oldValue) => {
-						Image.replaceImages(field.el);
-					},
+				htmlfield({
+					name: "content",
+					listeners: {
 
-					insertimage: (htmlfield, file, img) => {
-						root.mask();
+						setvalue: (field, newValue, oldValue) => {
+							Image.replaceImages(field.el);
+						},
 
-						client.upload(file).then(r => {
-							if (img) {
-								img.dataset.blobId = r.id;
-								img.removeAttribute("id");
-							}
-							Notifier.success("Uploaded " + file.name + " successfully");
-						}).catch((err) => {
-							console.error(err);
-							Notifier.error("Failed to upload " + file.name);
-						}).finally(() => {
-							root.unmask();
-						});
+						insertimage: (htmlfield, file, img) => {
+							root.mask();
+
+							client.upload(file).then(r => {
+								if (img) {
+									img.dataset.blobId = r.id;
+									img.removeAttribute("id");
+								}
+								Notifier.success("Uploaded " + file.name + " successfully");
+							}).catch((err) => {
+								console.error(err);
+								Notifier.error("Failed to upload " + file.name);
+							}).finally(() => {
+								root.unmask();
+							});
+						}
 					}
-				}
-			})
+				})
+			)
 		);
 
 		this.addCustomFields();

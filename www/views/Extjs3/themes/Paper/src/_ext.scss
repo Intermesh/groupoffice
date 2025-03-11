@@ -13,7 +13,7 @@
 	letter-spacing: 0;
 	text-align:center;
 	border-radius: dp(10.5); // only round with 1 char
-	background-color: #727272; //color($fg, 'secondary-text');
+	background-color: #727272; //var(--fg-secondary-text);
 
 	.x-tree-node & {
 		//position: absolute;
@@ -22,7 +22,7 @@
 }
 
 .ext-el-mask {
-	background-color: color($fg,'text');
+	background-color: var(--bg-dim);
 	&-msg { // replace with loading bar
 		@extend .x-mask-loading;
 	}
@@ -40,7 +40,7 @@
 	height: dp(32);
 	width: dp(32);
 	animation: rotate 0.8s infinite $curve-deceleration;
-	border: dp(8) solid var(--c-primary);
+	border: dp(8) solid var(--fg-main);
 	border-right-color: transparent;
 	border-radius: 50%;
 }
@@ -86,19 +86,19 @@
 		position: relative;
 		margin: 0 auto;
 		top: dp(5);			
-		background-color: color($bg, "background");
+		background-color: var(--bg-low);
 		padding: dp(20) dp(40);
 		font-size: dp(18);
 		@extend .z12;
 		text-align: center;
 		border-radius: $borderRadius;
-		border: 1px solid color($fg, 'line');
+		border: 1px solid var(--fg-line);
 
 	}
 }
 
 .x-splitbar-proxy {
-	background-color: color($fg, 'line');
+	background-color: var(--fg-line);
 }
 
 // ###################
@@ -134,7 +134,7 @@
 }
 
 .x-ie-shadow {
-	background-color:color($fg,'text');;
+	background-color:var(--fg-text);;
 }
 
 //todo
@@ -149,9 +149,9 @@
 		border-width: 0 0 0 0;
 	}
 	&-header {
-		//border-bottom: 1px solid color($fg, 'line');
+		//border-bottom: 1px solid var(--fg-line);
 		.x-window-body form > .x-tab-panel > &, .x-window-body > .x-tab-panel > & {
-			background-color: color($bg, 'app-bar');
+			background-color: transparent;
 		}
 	}
 	&-footer{
@@ -180,11 +180,11 @@
 
 	&-top{
 		height: dp(48);
-		@include var(color, c-primary);
+		@include var(color, fg-main);
 	}
 	&-bottom{
 		height: dp(48);
-		@include var(color, c-primary);
+		@include var(color, fg-main);
 		> li {
 			border-top: dp(4) solid transparent;
 			border-bottom: 0;
@@ -192,12 +192,12 @@
 	}
 	&-wrap {
 		padding: 0 dp(4);
-		border-bottom: 1px solid color($fg, 'line');
+		border-bottom: 1px solid var(--fg-line);
 	}
 	>li.x-tab-strip-active {
-		@include var(border-color, c-tertiary);
+		@include var(border-color, c-secondary);
 		span.x-tab-strip-text {
-			color: color($fg, 'text');
+			color: var(--fg-text);
 			font-weight: bold;
 		}
 	}
@@ -206,7 +206,7 @@
 		font-weight: normal;
 	}
 	&-disabled .x-tabs-text {
-		color: color($fg, 'disabled');
+		color: var(--fg-disabled);
 	}
 
 	span.x-tab-strip-text {
@@ -217,7 +217,7 @@
 		}
 	}
 	&-over span.x-tab-strip-text {
-		@include var(color, c-primary);
+		@include var(color, fg-main);
 		&.primary {
 			color: white;
 		}
@@ -227,10 +227,10 @@
 			@extend %icon;
 			content: 'close';
 			font-size: 1.1em !important;
-			color: color($fg, 'icon');
+			color: var(--fg-icon);
 		}
 		&:hover:before{
-			@include var(color, c-primary);
+			@include var(color, fg-main);
 		}
 	}
 }
@@ -240,7 +240,7 @@
 	border:0;
 	position: relative;
 	overflow:hidden;
-	background-color:color($bg, 'background');
+	background-color:var(--bg-mid);
 	&-top {
 		border-top: 0 none;
 	}
@@ -256,7 +256,7 @@
 
 	border:0;
 	&-over {
-		color: color($fg, 'text');
+		color: var(--fg-text);
 	}
 	&-disabled {
       background-position: -18px 0;
@@ -288,8 +288,9 @@
 	min-height: dp(22);
 	width: dp(22);
 	height:dp(22);
-	background-color: color($bg, 'box');
-	border: 1px solid color($fg, 'textbox-line');
+	color: var(--bg-input);
+	background-color: currentColor;
+	border: 1px solid var(--fg-outline);
 	border-radius: dp(4);
 	&:before { // tick
 		content: '';
@@ -303,7 +304,7 @@
 		background-color: var(--fg-tick);
 	}
 	&:disabled {
-		background-color: var(--bg-background);
+		background-color: var(--bg-highest);
 		border-color: var(--fg-disabled);
 		&:before {
 			background-color: var(--fg-disabled);
@@ -313,7 +314,7 @@
 		transform: scale(1);
 	}
 	&:focus {
-		@include var(border-color, c-primary);
+		@include var(border-color, fg-main);
 		box-shadow: 0 0 0 1px $cPrimary;
 	}
 	&[style]:checked:before {
@@ -367,13 +368,13 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 
 .ext-mb-input {
 	@extend %font-data;
-	color: color($fg, 'text');
+	color: var(--fg-text);
 	min-height: dp(32);
 	line-height: dp(18);
 	transition: border-color 100ms linear, box-shadow 225ms linear;
 	border-radius: dp(4);
-	background-color:color($bg, 'box');
-	border: 1px solid color($fg, 'track');
+	background-color:var(--bg-input);
+	border: 1px solid var(--fg-outline);
 	display: inline-block;
 	padding: dp(6) dp(8);
 }
@@ -393,10 +394,10 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 	.x-panel, .x-fieldset {
 		overflow: hidden;
 	}
-	background-color: color($bg, 'form');
+
 	> .x-tab-panel {
 		 > .x-tab-panel-bwrap> .x-tab-panel-body > div { // tabbed form dialog
-			background-color:color($bg, 'form');
+			background-color:var(--bg-form);
 		}
 	}
 	
@@ -423,31 +424,31 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 		line-height: dp(20);
 		padding: dp(10) dp(16);
 		border-radius: dp(10);
-		border: 1px solid color($fg, 'line');
+		border: 1px solid var(--fg-line);
 	}
 	
 	&-field {
 		@extend %font-data;
-		color: color($fg, 'text');
+		color: var(--fg-text);
 		min-height: dp(44); //line-height 20 + padding 11 + borders = 44
 		line-height: dp(20);
 		//line-height: dp(18);
 		transition: border-color 100ms linear, box-shadow 225ms linear;
 		border-radius: dp(10);
 		&.x-item-disabled {
-			background-color: color($bg, 'background');
+			background-color: var(--bg-low);
 		}
 		+ .x-form-twin-triggers, + .x-form-trigger {
 			border-radius: 0;
-			border-left: 1px solid var(--fg-track);
+			border-left: 1px solid var(--fg-outline);
 		}
 		
 		&[readonly] {
-			background-color: color($bg, 'readonly');
+			background-color: var(--bg-readonly);
 		}
 		
 		&.x-triggerfield-selectonly {
-			background-color:color($bg, 'box');
+			background-color:var(--bg-input);
 		}
 
 		.x-small-editor & {
@@ -459,14 +460,14 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 	}
 	&-duration, &-text, textarea.x-form-field, &-time {
 		@extend %font-data;
-		background-color:color($bg, 'box');
-		border: 1px solid color($fg, 'track');
+		background-color:var(--bg-input);
+		border: 1px solid var(--fg-outline);
 		display: inline-block;
 		padding: dp(11) dp(16);
 
 		&:-webkit-autofill {
 			background-color: transparent !important;
-			-webkit-box-shadow: 0 0 0 50px color($bg, 'box') inset;
+			-webkit-box-shadow: 0 0 0 50px var(--bg-input) inset;
 			animation-name: onautofillstart;
 		}
 		&:not(:-webkit-autofill) {
@@ -491,12 +492,12 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 	//	visibility:hidden; // only show clear button when not
 	//}
 	&-select-one {
-      background-color:color($bg, 'box');
-      border-color:color($fg, 'line');
+      background-color:var(--bg-input);
+      border-color:var(--fg-line);
 	}
 	&-check-group-label {
       //border-bottom: 1px solid $cBgDark;
-      color: color($fg, 'text');
+      color: var(--fg-text);
 	}
 	&-cb-label {
 		//top:4px;
@@ -523,8 +524,8 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 	&-radio-group {
 		padding: dp(4) dp(16);
 		overflow: visible;
-		border: 1px solid color($fg, 'track');;
-		background-color: color($bg, 'box');
+		border: 1px solid var(--fg-outline);;
+		background-color: var(--bg-input);
 		overflow:visible;
 	}
 	&-item {
@@ -563,14 +564,14 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 
 			padding: 0 dp(4);
 			overflow: visible;
-			background-color: color($bg, 'box');
+			background-color: var(--bg-input);
 			height: 2px;
 
 			z-index:2;
 		}
 
 		label.x-form-focus-label {
-			@include var(color, c-primary);
+			@include var(color, fg-main);
 		}
 
 		label.x-form-invalid-label {
@@ -579,7 +580,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 		}
 
 		//label.x-form-readonly-label {
-		//	background-color: color($bg, 'readonly');
+		//	background-color: var(--bg-readonly);
 		//}
 	}
 
@@ -594,7 +595,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 	
 	&-focus, textarea.x-form-focus {
 		@extend .z2;
-		@include var(border-color, c-primary);
+		@include var(border-color, fg-main);
 	}
 
 	&-invalid, textarea.x-form-invalid {
@@ -657,7 +658,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 		width: dp(44);
 		vertical-align: middle;
 		padding:0;
-		color: color($fg, 'icon');
+		color: var(--fg-icon);
 		&::before {
 			max-height: dp(44);
 			max-width: dp(44);
@@ -666,7 +667,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 		}
 		&.x-form-trigger-over {
 			//color:black;
-			color:var(--fg-base);
+			color:var(--fg-text);
 			background-color: var(--bg-hover);
 		}
 		&.x-form-clear-trigger::before {content: 'clear'; font-size: sp(18)}
@@ -686,12 +687,12 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 
 	&.x-item-disabled {
 		.x-form-field {
-			background-color: color($bg, 'background');
+			background-color: var(--bg-low);
 		}
 	}
 }
 .x-trigger-wrap-focus .x-form-trigger {
-	@include var(color, c-primary);
+	@include var(color, fg-main);
 }
 .x-form-invalid + .x-form-trigger {
 	border-color: $cDanger;
@@ -732,7 +733,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 }
 
 .x-fieldset {
-	border: 1px solid color($fg, "line");
+	border: 1px solid var(--fg-line);
 	margin: dp(16);
 	&-noborder {
 		margin: 0;
@@ -740,10 +741,10 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 	}
 
 	padding: dp(8) dp(16);
-	~ .x-fieldset { border-top: 1px solid color($fg, 'divider'); }
+	~ .x-fieldset { border-top: 1px solid var(--fg-divider); }
 	legend {
 		/*@extend %font-caption;*/
-		/*color: color($primary, 900); //color($fg, 'text');*/
+		/*color: color($primary, 900); //var(--fg-text);*/
 		
 		@extend %font-subheading; //changed this to be the same as panel headers as they are mixed in forms
 		//float:left;
@@ -786,7 +787,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 	white-space: nowrap;
 	overflow: hidden;
 	cursor: pointer;	
-	border: 1px solid color($fg, "line");
+	border: 1px solid var(--fg-line);
 	color: inherit;
 	transition: background-color 225ms linear, box-shadow 225ms $curve-standard;
 	
@@ -815,13 +816,13 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 
 	//&.x-item-disabled {
 	//	.x-btn-text {
-	//		color: color($fg, "disabled-button");
+	//		color: var(--fg-disabled-button);
 	//	}
 	//}
 	 
 	&.raised {
 		@extend .z2;
-		@include var(background-color, c-primary);
+		@include var(background-color, fg-main);
 		button.x-btn-text {
 			color:white;
 		}
@@ -833,7 +834,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 		}
 
 		&.accent {
-			@include var(background-color, c-secondary);
+			@include var(background-color, c-primary);
 		}
 	}
 	.x-toolbar & {
@@ -853,7 +854,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
    }	 
 
 	&.primary {
-		@include var('background-color', c-secondary);
+		@include var('background-color', c-primary);
 		color: white;
 	}
 
@@ -863,12 +864,12 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 
 		&:focus, &:hover {
 			transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
-			@include var(background-color, c-primary);
+			@include var(background-color, fg-main);
 		}
 	}
 
 	&.primary-icon {
-		@include var('color', c-secondary);
+		@include var('color', c-primary);
 	}
 
 	&.accent-icon {
@@ -877,7 +878,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 
 	&.danger {
 		&:focus, &:hover{
-			@include var(background-color, c-primary-tp);
+			@include var(background-color, fg-main-tp);
 		}
 		//.x-btn-text {
 			color: $cDanger;
@@ -886,7 +887,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 
 	&:focus, &-focus,  &:hover {
 		//transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
-		@include var(background-color, c-primary-tp);
+		@include var(background-color, fg-main-tp);
 		//filter: brightness(120%);
 	}
 
@@ -905,14 +906,14 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 		}
 	}
    &.x-btn-pressed > tbody {
-		background-color: color($bg, 'pressed');
+		background-color: var(--bg-pressed);
    }
    &-click {
-		background-color: color($bg, 'pressed') !important;
-		.x-btn-text { @include var(color, c-primary); }
+		background-color: var(--bg-pressed) !important;
+		.x-btn-text { @include var(color, fg-main); }
    }
 	&-click.primary {
-		.x-btn-text { @include var(color, c-secondary); }
+		.x-btn-text { @include var(color, c-primary); }
 	}
    &-icon {
 		i {
@@ -995,18 +996,18 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 	width: dp(8);
 }
 
-.x-btn-disabled *{
-	color:color($fg, 'disabled-button') !important;
-}
+//.x-btn-disabled *{
+//	color:var(--fg-disabled-button) !important;
+//}
 
 // BUTTON GROUP = TODO
 .x-btn-group {
 	padding:0;
-	background-color: color($bg, 'card');
+	background-color: var(--bg-mid);
 	margin-right: dp(8);
 	border-radius:$borderRadius;
 	overflow: hidden;
-	border: 1px solid color($fg, 'line');
+	border: 1px solid var(--fg-line);
 	&-header{
 		color: inherit;
 	}
@@ -1026,13 +1027,13 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 	}
 	.x-btn-pressed {
 		box-shadow: inset 0 -2px 0 $cPrimary; // underline
-		background-color: color($bg, 'card');
+		background-color: var(--bg-mid);
 	}
 	.x-btn-icon button {
 		min-height: dp(36); 
 	}
 	td.x-table-layout-cell:first-child ~ td {
-		border-left: 1px solid color($fg, 'line');
+		border-left: 1px solid var(--fg-line);
 
 	}
 }
@@ -1048,7 +1049,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 		padding:0 dp(4);
 	}
 	.x-searchbar {
-		background-color: color($bg, 'box');
+		background-color: var(--bg-input);
 		opacity:1;
 		padding:0;
 		position:absolute;
@@ -1104,22 +1105,22 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 
 
 	.x-panel-tbar & {
-		border-bottom: 1px solid color($fg, 'border');
+		border-bottom: 1px solid var(--fg-border);
 	}
 
 	.x-panel-bbar & {
 		height: dp(56);
-		border-top: 1px solid color($fg, 'border');
+		border-top: 1px solid var(--fg-border);
 	}
 
 /*	.go-module-panel > div > .x-panel-tbar & {
-		border-bottom: 1px solid color($fg, 'line');
+		border-bottom: 1px solid var(--fg-line);
 	}*/
 /*	.x-panel-bbar & {
 		height: dp(48);
 	}*/
 	&.primary {
-		@include var(background-color, c-primary);
+		@include var(background-color, fg-main);
 	}
 	&.header {
 		border-bottom: 0;
@@ -1170,7 +1171,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 
 
 .x-toolbar .xtb-sep {
-	background-color: color($fg, 'line');
+	background-color: var(--fg-line);
 	margin: 0 dp(8);
 	width: 1px;
 	height: dp(32);
@@ -1249,10 +1250,10 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 .x-grid3{
 
 	&-summary-row {
-		border-top: 1px solid color($fg, 'line');
+		border-top: 1px solid var(--fg-line);
 	}
 
-	background-color: color($bg, "box");
+	background-color: var(--bg-lowest);
 	&-scroller {
 		-webkit-overflow-scrolling: touch;
 	}
@@ -1272,10 +1273,10 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 		}
 		&-row td {
 			@extend %font-caption;
-			color: color($fg, 'text');
+			color: var(--fg-text);
 			border-left:0;
-			border-right: 1px solid color($fg, 'border');
-			//border-image: linear-gradient(to bottom, transparent, color($fg, 'line')) 1 100%;
+			border-right: 1px solid var(--fg-border);
+			//border-image: linear-gradient(to bottom, transparent, var(--fg-line)) 1 100%;
 			height: dp(32);
 
 			//This made resizing impossible
@@ -1284,20 +1285,20 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 			//}
 			&.x-grid3-hd-over.x-grid3-sortable { 
 				cursor:pointer; 
-				@include var(color, c-primary); 
+				@include var(color, fg-main);
 			}
 		}
 		 
 		&-text {
-			color:color($fg, 'text');
+			color:var(--fg-text);
 		}
 		&-inner { position:initial;}
 	}
 	&-header{
 		//margin-top: dp(9); //don't understand why +1 here?
 		height:dp(32);
-		border-bottom: 1px solid color($fg, 'border');
-		background-color: color($bg, 'background');
+		border-bottom: 1px solid var(--fg-border);
+		background-color: var(--bg-background);
 	}
 
 	&-cell-first {
@@ -1340,7 +1341,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 
 	&-row {
 		border:0;
-		border-bottom:1px solid color($fg, 'divider');
+		border-bottom:1px solid var(--fg-divider);
 
 		&:hover {
 			background-color:$cHover;
@@ -1410,7 +1411,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 	}
 	&-row-body {
 		padding: 0 0 dp(8) dp(16);
-		color: color($fg, "secondary-text");
+		color: var(--fg-secondary-text);
 	}
 	&-hd-inner {
 		min-height: dp(20);
@@ -1451,12 +1452,12 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 
 
 .x-grid3-radio-col:before {
-	color: color($fg, 'icon');
+	color: var(--fg-icon);
 	@extend %icon;
 	content: 'radio_button_unchecked';
 }
 .x-grid3-radio-col-on:before {
-	color: color($fg, 'icon');
+	color: var(--fg-icon);
 	@extend %icon;
 	content: 'radio_button_checked';
 }
@@ -1470,7 +1471,7 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 }
 
 .x-grid3-locked td.x-grid3-row-marker div, .x-grid3-locked .x-grid3-row-selected td.x-grid3-row-marker div{
-	color:color($fg, 'text') !important;
+	color:var(--fg-text) !important;
 }
 
 .x-grid3-cell-text, .x-grid3-hd-text {
@@ -1496,7 +1497,7 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 	background: none;
 	&:after{
 		@extend %icon;
-		color: color($fg, 'hint-text');
+		color: var(--fg-hint-text);
 		left: dp(14);
 		top: dp(10); 
 		font-size: sp(13);
@@ -1580,7 +1581,7 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 
 	div.x-grid-group-title {
 		@extend %font-caption;
-		/*@include var(color, c-primary);*/
+		/*@include var(color, fg-main);*/
 		padding: dp(8);
 		&::before {
 			@extend %icon;
@@ -1615,7 +1616,7 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 	transform: translate(-50%, -50%);*/
 	padding: dp(16);
 	text-align:center;
-	color: color($fg, 'disabled');
+	color: var(--fg-disabled);
 	&::before {
 		@extend %icon;
 		font-size: sp(120) !important;
@@ -1643,7 +1644,7 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 // #####################
 .x-dd-drag-ghost {
 	@extend %font-data;
-	color:color($fg, 'text');
+	color:var(--fg-text);
 	opacity:.9;
 	border:0;
 	padding: 0 dp(8) 0 dp(40);
@@ -1652,7 +1653,7 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 }
 .x-dd-drag-proxy {
 	@extend .z4;
-	background-color:color($bg,'card');
+	background-color:var(--bg-mid);
 	line-height: dp(40);
 
 	.x-grid3-hd-inner{
@@ -1664,7 +1665,7 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 	@extend %icon;
 	.x-dd-drop-ok-add & {
 		content: 'add';
-		@include var(color, c-primary);
+		@include var(color, fg-main);
 	}
 	.x-dd-drop-nodrop & {
 		content: 'block';
@@ -1739,7 +1740,7 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 	&-ec-icon, &-node-icon {
 		position:relative;
 		//display:inline-block;
-		color: color($fg, 'icon');
+		color: var(--fg-icon);
 		&::before {
 			@extend %icon;
 		}
@@ -1772,7 +1773,7 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 			width: dp(24);
 		}
 		a, .x-dd-drag-ghost a{
-			color: color($fg, 'text');
+			color: var(--fg-text);
 			span {
 				color: inherit;
 			}
@@ -1807,11 +1808,11 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 
 .x-tree-node-loading a{
 	font-style: italic;
-	color:color($fg, 'disabled');
+	color:var(--fg-disabled);
 }
 
 .x-tree-node .x-tree-node-disabled a{
-	color: color($fg, 'secondary-text') !important;
+	color: var(--fg-secondary-text) !important;
 }
 
 .x-tree-node div.x-tree-drag-insert-below{
@@ -1898,7 +1899,7 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 			line-height: dp(32);
 			width: dp(32);
 			text-align:center;
-			color:color($fg, 'text');
+			color:var(--fg-text);
 			border-radius: 50%;
 		}
 		td {
@@ -1911,10 +1912,10 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 			border: 1px solid currentColor;
 			padding:0;
 			font-weight: 700;
-			@include var(color, c-primary);
+			@include var(color, fg-main);
 		}
 		.x-date-selected a {
-			@include var(background-color, c-primary);
+			@include var(background-color, fg-main);
 			color:white;
 			border:0;
 			padding:0;
@@ -1963,7 +1964,7 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 }
 
 .x-date-mp {
-	background-color: color($bg, 'background');
+	background-color: var(--bg-background);
 }
 
 .x-date-mp td {
@@ -1979,11 +1980,11 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 }
 
 .x-date-mp-btns td {
-	border-top-color: color($fg, 'divider');;
+	border-top-color: var(--fg-divider);;
 }
 
 td.x-date-mp-month a,td.x-date-mp-year a {
-	color:color($fg, 'text');
+	color:var(--fg-text);
 	padding: dp(8) 0;
 }
 
@@ -1994,7 +1995,7 @@ td.x-date-mp-month a:hover,td.x-date-mp-year a:hover {
 
 td.x-date-mp-sel a {
 	border-radius: $borderRadius;
-	@include var(background-color, c-primary);
+	@include var(background-color, fg-main);
 	color:white;
 	//background-image: url(../images/default/shared/glass-bg.gif);
 	border:0;
@@ -2009,12 +2010,12 @@ td.x-date-mp-sel a {
 		content: 'chevron_right';
 	}
 	&:hover {
-		@include var(color, c-primary);
+		@include var(color, fg-main);
 	}
 }
 
 td.x-date-mp-sep {
-   border-right-color:color($fg, 'divider');
+   border-right-color:var(--fg-divider);
 }
 
 // ###############
@@ -2024,14 +2025,14 @@ td.x-date-mp-sep {
 .x-tip { 
 	border-radius: $borderRadius;
 	box-sizing:content-box;
-	background-color: color($bg, 'alt');
+	background-color: var(--bg-alt);
 	.x-tip-header-text {
 		@extend %font-body2;
 		color:white;
 	}
 	.x-tip-body {
 		@extend %font-data;
-		color:color($fg, 'alt');
+		color:var(--fg-alt);
 		//letter-spacing: 0.04em; // fixes ugly ext bug for Lato font
 	}
 	.x-tip-close {
@@ -2073,7 +2074,7 @@ td.x-date-mp-sep {
 .x-menu{
 	@extend .z5;
 	border-radius: $borderRadius;
-	background-color:color($bg,'layer');
+	background-color:var(--bg-layer);
 	opacity: 1;
 	transition: opacity 90ms $curve-standard, transform 120ms $curve-deceleration;
 	transform-origin: left top 0;
@@ -2100,7 +2101,7 @@ td.x-date-mp-sep {
 	&-sep {
 		margin: dp(8) 0;
 		height: 1px;
-		background-color: color($fg, 'divider');
+		background-color: var(--fg-divider);
 		border:0;
 	}
 	&-list-item {
@@ -2173,7 +2174,7 @@ a.x-menu-item {
 
 .x-combo-list-group {
 	@extend %font-caption;
-	@include var(color, c-primary);
+	@include var(color, fg-main);
 	padding: dp(16) dp(8) dp(8) dp(8);
 }
 
@@ -2202,10 +2203,10 @@ $menuScrollerSize : dp(4);
 		pointer-events: none;
 	}
 	&-top::before {
-		border-bottom-color: color($fg,'icon'); 
+		border-bottom-color: var(--fg-icon);
 	}
 	&-bottom::before {
-		border-top-color: color($fg,'icon'); 
+		border-top-color: var(--fg-icon);
 	}
 }
 
@@ -2223,9 +2224,9 @@ $menuScrollerSize : dp(4);
 .x-combo-list {
 	@extend .z2;
 	@extend %font-body1;
-	border: 1px solid color($fg, 'line');
+	border: 1px solid var(--fg-line);
 	border-radius: $borderRadius;
-	background-color: color($bg, 'card');
+	background-color: var(--bg-mid);
 	&-inner {
 		padding: dp(8) 0;
 		h4 {
@@ -2234,7 +2235,7 @@ $menuScrollerSize : dp(4);
 	}
 	&-hd {
 		@extend %font-body2;
-		color:color($fg, 'text');
+		color:var(--fg-text);
 	}
 	&-item {
 		min-height: dp(32);
@@ -2248,7 +2249,7 @@ $menuScrollerSize : dp(4);
 	}
 	.x-toolbar {
 		height: dp(40);
-		border-top: 1px solid color($fg, 'line');
+		border-top: 1px solid var(--fg-line);
 		.xtb-sep { display:none;}
 		.x-toolbar-cell {padding:0;}
 	}
@@ -2273,13 +2274,13 @@ $menuScrollerSize : dp(4);
 // #################
 
 .x-border-panel {
-	border-right: 1px solid color($fg,'divider');
+	border-right: 1px solid var(--fg-divider);
 	&:last-child {
 		border-right: 0;
 	}
 }
 .x-panel{
-	border: 1px solid color($fg, "line");
+	border: 1px solid var(--fg-line);
 	&-noborder {
 		border:0;
 	}
@@ -2289,7 +2290,7 @@ $menuScrollerSize : dp(4);
 	}
 	&-header {
 		border: 0;
-		border-top: 1px solid color($fg, 'divider');
+		border-top: 1px solid var(--fg-divider);
 		padding: 0 dp(8) 0 dp(14);
 		height: dp(48);
 		line-height: dp(48);
@@ -2326,7 +2327,7 @@ $menuScrollerSize : dp(4);
 	}
 	&-floating {
 		@extend .z8;
-		background-color: color($bg, 'background');
+		background-color: var(--bg-background);
 		// see x-panel-collapsed
 	}
 	&-bwrap {
@@ -2347,7 +2348,7 @@ $menuScrollerSize : dp(4);
 	border-radius: $borderRadius;
 
 	&.primary {
-		@include var('background-color', c-secondary);
+		@include var('background-color', c-primary);
 		color: white;
 
 		&:hover {
@@ -2362,12 +2363,12 @@ $menuScrollerSize : dp(4);
 
 		&:hover {
 			transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
-			@include var(background-color, c-primary);
+			@include var(background-color, fg-main);
 		}
 	}
 
 	&.primary-icon {
-		@include var('color', c-secondary);
+		@include var('color', c-primary);
 	}
 
 	&.accent-icon {
@@ -2376,7 +2377,7 @@ $menuScrollerSize : dp(4);
 
 	&:hover {
 		transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
-		@include var(background-color, c-primary-tp);
+		@include var(background-color, fg-main-tp);
 	}
 	&::before{
 		position: absolute;
@@ -2392,7 +2393,7 @@ $menuScrollerSize : dp(4);
 
 .x-panel-tl .x-panel-header {
 	/*padding: 0 dp(8); removed for start page*/
-	color:color($fg, 'text');
+	color:var(--fg-text);
 }
 
 .x-panel-tc {
@@ -2405,7 +2406,7 @@ $menuScrollerSize : dp(4);
 
 .x-panel-mc {
 	@extend %font-body2;
-	background-color: color($bg, 'box');
+	background-color: var(--bg-low);
 }
 
 .x-panel-ghost {
@@ -2426,7 +2427,7 @@ $menuScrollerSize : dp(4);
 .x-panel-fbar td,.x-panel-fbar span,.x-panel-fbar input,.x-panel-fbar div,.x-panel-fbar select,.x-panel-fbar label{
 	@extend %font-data;
 	button {
-		//@include var(color, c-primary);
+		//@include var(color, fg-main);
 	}
 }
 
@@ -2436,12 +2437,12 @@ $menuScrollerSize : dp(4);
 .x-window{
 	@extend .z24;
 	will-change: left, top;
-	background-color:color($bg,'layer');
+	background-color:var(--bg-layer);
 	border-radius: $borderRadius;
 	overflow:hidden;
-	border: 1px solid color($fg, 'line');
-	form > div:not(.x-tab-panel) {
-		background-color:color($bg,'background');
+	border: 1px solid var(--fg-line);
+	form > div:not(.x-tab-panel, .goui) {
+		background-color:var(--bg-background);
 	}
 	&-noborder, &-maximized{
 		border: 0;
@@ -2451,14 +2452,13 @@ $menuScrollerSize : dp(4);
 	}
 	&-footer {
 		padding: dp(8);
-		border-top: 1px solid color($fg, 'line');
+		border-top: 1px solid var(--fg-line);
 	}
 	&-footer-noborder {
 		border-top: 0;
 	}
 	&-header {
 		@extend %font-title;
-		background-color:color($bg,'app-bar');
 		border-radius: $borderRadius $borderRadius 0 0;
 		padding: 0 dp(16);
 		&-text {
@@ -2482,10 +2482,10 @@ $menuScrollerSize : dp(4);
 		background-color:white;
 	}
 	&-bbar .x-toolbar {
-		border-top-color: color($fg, 'divider');;
+		border-top-color: var(--fg-divider);;
 	}
 	&-maximized {
-		background-color:color($bg,'card');
+		background-color:var(--bg-mid);
 		border-radius: 0;
 	}
 }
@@ -2495,7 +2495,7 @@ $menuScrollerSize : dp(4);
 }
 
 .x-panel-ghost .x-window-tl {
-	border-bottom-color: color($fg, 'divider');
+	border-bottom-color: var(--fg-divider);
 }
 
 .x-dlg-mask{
@@ -2512,8 +2512,8 @@ body.x-body-masked .x-window-plain .x-window-mc {
 // HTML
 .x-html-editor-wrap {
 	border-radius: dp(10);
-	border:1px solid color($fg, 'track');
-	background-color:color($bg, 'box');
+	border:1px solid var(--fg-outline);
+	background-color:var(--bg-input);
 
 	iframe {
 		border-radius: dp(10);
@@ -2549,7 +2549,7 @@ body.x-body-masked .x-window-plain .x-window-mc {
 
 	.x-btn-text {
 		background-image: none; //url(wysiwyg.gif);
-		color: color($fg, 'secondary-text');
+		color: var(--fg-secondary-text);
 	}
 }
 
@@ -2558,7 +2558,7 @@ body.x-body-masked .x-window-plain .x-window-mc {
 // ####################
 .x-border-layout-ct {
 	form & {
-		background-color:color($bg, 'form');
+		background-color:var(--bg-form);
 	}
 }
 
@@ -2568,27 +2568,27 @@ body.x-body-masked .x-window-plain .x-window-mc {
 
 .x-accordion-hd {
 	@extend %font-body1;
-	color:color($fg, 'text');
+	color:var(--fg-text);
 	border-bottom: 0 !important;
 	&:hover {
-		background-color: color($fg, 'hover');
+		background-color: var(--fg-hover);
 	}
 	.x-panel-collapsed & {
-		border-bottom: 1px solid color($fg, 'divider') !important;
+		border-bottom: 1px solid var(--fg-divider) !important;
 	}
 	.x-tool {
-		color: color($fg, 'icon');
+		color: var(--fg-icon);
 	}
 }
 
 .x-layout-collapsed {
 	display:none;
-	background-color:color($bg, 'app-bar');
+	background-color:var(--bg-mid);
 	border:0;
 	width:dp(0);
    height:dp(24);
 	&-over{
-		background-color:color($bg, 'hover');
+		background-color:var(--bg-hover);
 	}
 	.x-tool {
 		margin:0;
@@ -2625,7 +2625,7 @@ $resizerSize : dp(3);
 		}
 	}
 	.x-layout-mini {
-		background-color: color($bg, 'box');
+		background-color: var(--bg-low);
 		opacity: 1;
 	}
 }
@@ -2643,25 +2643,25 @@ $resizerSize : dp(3);
 		height:0;
 		.x-layout-split-west &,
 		.x-layout-cmini-east & {
-			border-right-color: color($fg,'icon'); 
+			border-right-color: var(--fg-icon);
 			right:dp(6); 
 			top:13px;
 		}
 		.x-layout-split-east &,
 		.x-layout-cmini-west & {
-			border-left-color: color($fg,'icon'); 
+			border-left-color: var(--fg-icon);
 			right:0; 
 			top:13px;
 		}
 		.x-layout-split-north &,
 		.x-layout-cmini-south & {
-			border-bottom-color: color($fg,'icon');
+			border-bottom-color: var(--fg-icon);
 			top:dp(-6); 
 			left: 13px; 
 		}
 		.x-layout-split-south &,
 		.x-layout-cmini-north & {
-			border-top-color: color($fg,'icon');
+			border-top-color: var(--fg-icon);
 			top:0; left: 13px;
 		}
 	}
@@ -2678,10 +2678,10 @@ $resizerSize : dp(3);
 	}
 	&-inner {
 		height: dp(32);
-		@include var(background-color, c-primary-tp);
+		@include var(background-color, fg-main-tp);
 	}
 	&-bar {
-		@include var(background-color, c-primary);
+		@include var(background-color, fg-main);
 		border:0;
 	}
 	&-text {
@@ -2690,7 +2690,7 @@ $resizerSize : dp(3);
 		line-height: dp(32);
 		&-back {
 			line-height: dp(32);
-			color:color($fg, 'text');
+			color:var(--fg-text);
 		}
 	}
 }
@@ -2717,7 +2717,7 @@ $resizerSize : dp(3);
 }
 
 .x-list-selected {
-	background-color:color($bg, 'background');
+	background-color:var(--bg-background);
 }
 
 .x-list-resizer {
@@ -2738,7 +2738,7 @@ $resizerSize : dp(3);
 	overflow:visible;
 	.x-slider-inner {
 		top: dp(24);
-		background-color: color($fg, 'track');
+		background-color: var(--fg-outline);
 		border-radius: $borderRadius;
 		height: dp(2);
 	}
@@ -2746,18 +2746,18 @@ $resizerSize : dp(3);
 		height: dp(2);
 		transform-origin: 0 0;
 		width:100%;
-		background-color: var(--c-primary);
+		background-color: var(--fg-main);
 	}
 	.x-slider-thumb {
 		cursor: grab;
 		top: dp(-9);
-		border: 3px solid var(--c-primary);
+		border: 3px solid var(--fg-main);
 		width:dp(20);
 		height: dp(20);
 		transform: scale(.7);
 		transform: .4s $curve-sharper,background-color .4s $curve-sharper, border-color .4s $curve-sharper;
 		border-radius: 50%;
-		background-color:var(--c-primary);
+		background-color:var(--fg-main);
 		&.x-slider-thumb-drag {
 			cursor: grabbing;
 			transform: scale(1);
@@ -2765,7 +2765,7 @@ $resizerSize : dp(3);
 	}
 }
 input[value="0"] + .x-slider .x-slider-thumb {
-	border-color: color($fg, 'track');
+	border-color: var(--fg-outline);
 	background-color: white; 
 }
 
@@ -2784,7 +2784,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 // ### DIALOG ###
 // ##############
 .x-window-dlg {
-	background-color: color($bg, 'layer');
+	background-color: var(--bg-layer);
 	border-radius: $borderRadius;
 }
 .x-window-dlg .ext-mb-text,
@@ -2806,7 +2806,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 	@extend %icon;
 	content: 'info';
 	font-size:2.2em;
-	@include var(color, c-primary);
+	@include var(color, fg-main);
 }
 
 .x-window-dlg .ext-mb-warning:after {
@@ -2820,7 +2820,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 	@extend %icon;
 	content: 'help';
 	font-size:2.2em;
-	@include var(color, c-primary);
+	@include var(color, fg-main);
 }
 
 //.x-window-dlg .ext-mb-error {
@@ -2848,7 +2848,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 							 top:0;
 							 height: dp(24);
 							 width: dp(24);
-							 background-color: color($bg, 'form');
+							 background-color: var(--bg-form);
 							 z-index:1;
 							 border-radius: 50%;
 		}
@@ -2864,7 +2864,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 		}
 	}
 	> .track {
-		background-color: color($fg, 'disabled');
+		background-color: var(--fg-disabled);
 		position:absolute;
 		height: dp(16);
 		top:dp(3); // track in middle of label lineheight
@@ -2880,11 +2880,11 @@ input[value="0"] + .x-slider .x-slider-thumb {
 		&:checked {
 			~ .thumb {
 				transform: translate(dp(24), 0);
-				&::after { @include var(background-color, c-primary);}
-				&::before {@include var(border-color, c-primary);}
+				&::after { @include var(background-color, fg-main);}
+				&::before {@include var(border-color, fg-main);}
 			}
 			~ .track {
-				@include var(background-color, c-primary-tp);
+				@include var(background-color, fg-main-tp);
 			}
 		}
 		&:focus {
@@ -2904,7 +2904,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 				}
 			}
 			~ .track {
-				background-color: color($fg, 'divider');
+				background-color: var(--fg-divider);
 			}
 		}
 		~ label {
@@ -2942,7 +2942,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 	&-stacked li { float: none !important;}
 	&-display-btns { padding-right: dp(64); }
 	&-btns {
-		border-left: 1px solid color($fg, 'divider');
+		border-left: 1px solid var(--fg-divider);
 		position: absolute; 
 		right: 0; 
 		top: 0; 
@@ -2960,13 +2960,13 @@ input[value="0"] + .x-slider .x-slider-thumb {
 	&-btn {
 		&-clear:before { @extend %icon; content: 'clear'; font-size:dp(18);width: dp(24);text-align: center }
 		&-expand:before { @extend %icon; content: 'arrow_drop_down'; line-height:dp(18); }
-		&-over { color: var(--fg-base); }
+		&-over { color: var(--fg-text); }
 		&-hide { display:none; }
 	}
 	&-item {
 		position: relative; 
 		border-radius: $borderRadius;
-		@include var(background-color, c-primary-tp);
+		@include var(background-color, fg-main-tp);
 		padding: 0px dp(32) 0px dp(8); 
 		&-hover { background-color: $cHover; }
 		&-focus {background-color: $cSelected; color: white;}
@@ -2983,13 +2983,13 @@ input[value="0"] + .x-slider .x-slider-thumb {
 				font-size: 1em;
 			}
 			&:hover, &:active {
-				color: var(--fg-base);
+				color: var(--fg-text);
 			}
 			.x-superboxselect-item-focus & {
 				color:white;
 			}
 			.x-item-disabled & {
-				color: color($fg, 'disabled');
+				color: var(--fg-disabled);
 			}
 		}
 	}

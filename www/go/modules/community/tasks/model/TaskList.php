@@ -24,6 +24,8 @@ use GO\Projects2\Model\ProjectEntity;
  */
 class TaskList extends AclOwnerEntity
 {
+	const UserProperties = ['color', 'sortOrder', 'isVisible', 'isSubscribed'];
+
 	const List = 1;
 	const Board = 2;
 	const Project = 3;
@@ -49,6 +51,7 @@ class TaskList extends AclOwnerEntity
 		return self::Roles[$this->role] ?? 'list';
 	}
 
+
 	/**
 	 *
 	 * @param string $value ['list'|'board'|'project']
@@ -72,9 +75,13 @@ class TaskList extends AclOwnerEntity
 
 	/** @var int */
 	public $aclId;
+	protected $defaultColor;
+	public $color;
+	public $sortOrder;
+	public $isVisible;
+	public $isSubscribed;
 
-	/** @var int */
-	public $version = 1;
+	protected $highestItemModSeq;
 
 	public $groups = [];
 
@@ -84,13 +91,17 @@ class TaskList extends AclOwnerEntity
 
 	protected static function defineFilters(): Filters
 	{
-		return parent::defineFilters()
+		return parent::defineFilters()->add('isSubscribed', function(Criteria $criteria, $value, Query $query) {
+			$criteria->where('isSubscribed','=', $value);
+				if($value === false) {
+					$criteria->orWhere('isSubscribed', 'IS', null);
+				}
+			})
 			->add('role', function (Criteria $criteria, $value) {
 				$roleID = array_search($value, self::Roles, true);
 				$criteria->where(['role' => $roleID]);
 			})
 			->add('projectId', function (Criteria $criteria, $value) {
-
 				$criteria->where(['projectId' => $value]);
 			});
 
@@ -105,13 +116,16 @@ class TaskList extends AclOwnerEntity
 	{
 		return parent::defineMapping()
 			->addTable("tasks_tasklist", "tasklist")
-			->addUserTable('tasks_tasklist_user', "ut", ['id' => 'tasklistId'])
+			->addUserTable('tasks_tasklist_user', "ut", ['id' => 'tasklistId'], self::UserProperties)
 			->addArray('groups', TaskListGroup::class, ['id' => 'tasklistId'], ['orderBy'=>'sortOrder']);
 	}
 
 	protected function internalSave(): bool
 	{
-		if ($this->isNew()) {
+		if($this->isNew()) {
+			$this->isSubscribed = true; // auto subscribe the creator.
+			$this->isVisible = true;
+			$this->defaultColor = $this->color;
 
 			if($this->role == self::Board) {
 				if (empty($this->groups)) {
@@ -130,6 +144,11 @@ class TaskList extends AclOwnerEntity
 				$project = ProjectEntity::findById($this->projectId, ['id', 'acl_id']);
 				$this->aclId = $project->acl_id;
 			}
+		} else if($this->ownerId === go()->getUserId() && !empty($this->color)) {
+			$this->defaultColor = $this->color;
+		}
+		if(empty($this->color)) {
+			$this->color = $this->defaultColor;
 		}
 		return parent::internalSave();
 	}
@@ -179,5 +198,17 @@ class TaskList extends AclOwnerEntity
 			$sort->renameKey("group", "grouping.name");
 		}
 		return parent::sort($query, $sort);
+	}
+
+	public function highestItemModSeq() {
+		return $this->highestItemModSeq;
+	}
+
+	static function updateHighestModSeq($tasklistId) {
+		go()->getDbConnection()
+			->update(self::getMapping()->getPrimaryTable()->getName(),
+				['highestItemModSeq' => Task::getState()],
+				['id' => $tasklistId]
+			)->execute();
 	}
 }

@@ -53,7 +53,6 @@ use go\core\model\Alert;
 use go\core\model\Link;
 use go\core\model\Module;
 use go\core\model\User;
-use go\core\model\UserDisplay;
 use go\core\orm\exception\SaveException;
 use go\core\orm\SearchableTrait;
 use go\core\util\StringUtil;
@@ -202,6 +201,20 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	public static function entityType() {
 		return \go\core\orm\EntityType::findByClassName(static::class);
+	}
+
+	/**
+	 * @return void
+	 * @throws DbException
+	 * @throws GO\Base\Exception\AccessDenied
+	 */
+	protected function deleteFilesFolder(): void
+	{
+		if ($this->hasFiles() && $this->files_folder_id > 0 && GO::modules()->isInstalled('files')) {
+			$folder = \GO\Files\Model\Folder::model()->findByPk($this->files_folder_id, false, true);
+			if ($folder)
+				$folder->delete(true);
+		}
 	}
 
 	/**
@@ -1212,7 +1225,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 *
 	 *
 	 * @param FindParams $params
-	 * @return static ActiveStatement
+	 * @return static[]|ActiveStatement<$this>
 	 */
 	public function find($params=array()){
 
@@ -3673,7 +3686,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 	private function getCommentKeywords(array $keywords) : array {
 		if(Module::isInstalled("community", "comments")) {
-			$comments = Comment::findFor($this, ['text']);
+			$comments = Comment::findForEntity($this, ['text']);
 			foreach($comments as $comment) {
 				$plain = strip_tags($comment->text);
 				$keywords = array_merge($keywords, StringUtil::splitTextKeywords($plain));
@@ -4063,13 +4076,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		if($attr){
 			\go\core\model\Search::delete(['entityId' => $this->pk, 'entityTypeId'=>$this->modelTypeId()]);
-		}		
-
-		if($this->hasFiles() && $this->files_folder_id > 0 && GO::modules()->isInstalled('files')){
-			$folder = \GO\Files\Model\Folder::model()->findByPk($this->files_folder_id,false,true);
-			if($folder)
-				$folder->delete(true);
 		}
+
+
+		$this->deleteFilesFolder();
 
 		$this->_deleteLinks();	
 

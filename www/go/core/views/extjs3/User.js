@@ -15,8 +15,13 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		// we only want this in a httpOnly cookie for security
 		delete session.accessToken;
 
+		GO.settings.state = session.state;
+		delete session.state;
+
 		// Needed for every non-GET request when using the access token as cookie.
 		Ext.Ajax.defaultHeaders['X-CSRF-Token'] = session.CSRFToken;
+
+		window.groupofficeCore.client.session = session;
 
 		this.capabilities = go.Jmap.capabilities = session.capabilities;
 		this.session = session;
@@ -28,8 +33,6 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		this.eventSourceUrl = session.eventSourceUrl;		
 		this.loaded = true;
 		this.apiVersion = session.version + "-" + session.cacheClearedAt;
-
-		GO.settings.state = session.state;
 
 		const prefersColorQuery = window.matchMedia('(prefers-color-scheme: dark)'),
 			changeTheme = e => {
@@ -144,7 +147,7 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 }));
 
 // Update go.User when it's edited
-Ext.onReady(function(){
+GO.mainLayout.on("authenticated", function(){
 	go.Db.store("User").on("changes", function(store, added, changed, deleted){
 		if(changed.indexOf(go.User.id) > -1) {
 			store.single(go.User.id).then((user) => {

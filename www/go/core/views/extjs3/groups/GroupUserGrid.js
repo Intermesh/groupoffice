@@ -38,12 +38,9 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 		this.store = new go.data.Store({
 				fields: [
 					'id',
-					'username',
-					'displayName',
+					'description',
+					'name',
 					'avatarId',
-					'loginCount',
-					{name: 'createdAt', type: 'date'},
-					{name: 'lastLogin', type: 'date'},
 					{
 						name: 'selected',
 						type: {
@@ -57,10 +54,13 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 					}
 				],
 				sortInfo: {
-					field: 'displayName',
+					field: 'name',
 					direction: 'ASC'
 				},
-				entityStore: "UserDisplay"
+				entityStore: "Principal",
+				filter: {
+					default: {entity: 'User'}
+				}
 			});
 
 		Ext.apply(this, {		
@@ -83,15 +83,15 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 					header: t('Name'),
 					width: dp(200),
 					sortable: false,
-					dataIndex: 'displayName',
-					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
+					dataIndex: 'name',
+					renderer: function (value, metaData, record) {
 						
 						var style = record.get('avatarId') ?  'background-image: url(' + go.Jmap.thumbUrl(record.get("avatarId"), {w: 40, h: 40, zc: 1}) + ')"' : "";						
 						
 						return '<div class="user"><div class="avatar" style="' + style + '"></div>' +
 							'<div class="wrap">'+
 								'<div class="displayName">' + value + '</div>' +
-								'<small class="username">' + Ext.util.Format.htmlEncode(record.get('username')) + '</small>' +
+								'<small class="username">' + Ext.util.Format.htmlEncode(record.get('description')) + '</small>' +
 							'</div>'+
 							'</div>';
 					}

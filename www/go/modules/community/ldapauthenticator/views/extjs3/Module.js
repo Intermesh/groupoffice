@@ -4,8 +4,10 @@ go.Modules.register("community", 'ldapauthenticator', {
 	entities: ["LdapAuthServer"]	
 });
 
-go.Db.store("LdapAuthServer").on('changes', function(store, added, changed, destroyed) {
+GO.mainLayout.on("authenticated", function() {
+	go.Db.store("LdapAuthServer").on('changes', function (store, added, changed, destroyed) {
 
-	GO.SystemSettingsDomainCombo.reloadDomains();
+		GO.SystemSettingsDomainCombo.reloadDomains();
 
+	});
 });

@@ -147,6 +147,7 @@ abstract class Module extends Singleton {
 			throw new Exception("This module has already been installed!");
 		}
 
+		$oldFKchecks = go()->getDbConnection()->foreignKeyChecks(false);
 		try{
 
 			$model = new model\Module();
@@ -165,7 +166,7 @@ abstract class Module extends Singleton {
 			try {
 				self::installDependencies($this);
 
-				go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
+
 
 				$this->installDatabase();
 			} catch(Exception $e) {
@@ -208,7 +209,9 @@ abstract class Module extends Singleton {
 			$this->rollBack();
 			throw $e;
 		} finally {
-			go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
+			if($oldFKchecks) {
+				go()->getDbConnection()->foreignKeyChecks(true);
+			}
 		}
 		
 		return $model;
@@ -389,9 +392,15 @@ abstract class Module extends Singleton {
 		
 		if ($sqlFile->exists()) {
 			//disable foreign keys
-			go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
-			Utils::runSQLFile($sqlFile);
-			go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
+			$oldFKchecks = go()->getDbConnection()->foreignKeyChecks(false);
+			try {
+				Utils::runSQLFile($sqlFile);
+			} finally {
+				if($oldFKchecks) {
+					go()->getDbConnection()->foreignKeyChecks(true);
+				}
+			}
+
 		}
 	}
 

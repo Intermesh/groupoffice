@@ -19,35 +19,40 @@ class B extends A {
 	 *
 	 * @var string
 	 */
-	public $propB;
+	public string $propB;
+
+	public string $propC;
+
+	public string $propE = "defaultE";
 	
-	public $cId;
+	public ?int $cId;
 	
 	/**
 	 * The sum of all ID's in table B
 	 * 
 	 * @var int
 	 */
-	protected $sumOfTableBIds;
+	protected int $sumOfTableBIds;
 
 
-	public $testSaveOtherModel = false;
+	public bool $testSaveOtherModel = false;
 
-	public $userId;
+	public ?int $userId;
 	
 	
 	protected static function defineMapping(): Mapping
 	{
 		$mapping = parent::defineMapping()
 			->addTable('test_b', 'b', ['id' => 'id'], null, ['userId' => go()->getUserId()])
-			->addQuery((new Query())->select("SUM(b.id) AS sumOfTableBIds")->join('test_b', 'bc', 'bc.id=a.id')->groupBy(['a.id']));
+			->addQuery((new Query())->select("IFNULL(SUM(b.id), 0) AS sumOfTableBIds")
+				->join('test_b', 'bc', 'bc.id=a.id')->groupBy(['a.id']));
 		
 		return $mapping;
 	}
 	
 		
-	public function getSumOfTableBIds() {
-		return $this->sumOfTableBIds;
+	public function getSumOfTableBIds() : int {
+		return $this->sumOfTableBIds ?? 0;
 	}
 	
 	/**
@@ -55,7 +60,7 @@ class B extends A {
 	 * @return C
 	 */
 	public function getC() {
-		return $this->cId ? C::findById($this->cId) : null;
+		return isset($this->cId) ? C::findById($this->cId) : null;
 	}
 	
 	protected static function defineFilters(): Filters
@@ -84,6 +89,7 @@ class B extends A {
 			$other = new self;
 			$other->propA = 'other';
 			$other->propB = 'other';
+			$other->propE = 'other';
 			if(!$other->save()) {
 				$this->setValidationError('testSaveOtherModel', ErrorCode::GENERAL, 'Could not save other model: '. var_export($other->getValidationErrors(), true));
 			}

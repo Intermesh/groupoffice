@@ -157,7 +157,8 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	applyTemplateToItems : function(items) {
 		items.each(function (item, index, length) {
 
-			item.show();
+			if(!item.initialConfig.hidden)
+				item.show();
 
 			if (item.tpl) {
 				//debugger;

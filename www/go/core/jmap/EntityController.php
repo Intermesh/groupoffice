@@ -9,6 +9,7 @@ use go\core\event\EventEmitterTrait;
 use go\core\exception\NotFound;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\fs\File;
+use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\jmap\exception\UnsupportedSort;
 use go\core\model\Acl;
 use go\core\App;
@@ -263,7 +264,7 @@ abstract class EntityController extends Controller {
 
 		try {
 
-			$ids = $idsQuery->all();
+			$ids = array_map("strval", $idsQuery->all());
 
 			if($p['calculateHasMore'] && count($ids) > $params['limit']) {
 				$hasMore = !!array_pop($ids);
@@ -630,6 +631,9 @@ abstract class EntityController extends Controller {
 		if(empty($result['created'])) {
 			$result['created'] = null;
 		}
+
+		static::$createdEntitities = [];
+		static::$updatedEntitities = [];
 	}
 
   /**
@@ -821,10 +825,11 @@ abstract class EntityController extends Controller {
 			}
 			
 			//create snapshot of props client should be aware of
-			$clientProps = array_merge($entity->toArray(), $properties);
+			$clientProps = JSON::patch($entity->toArray(), $properties);
 			
 			//apply new values before canUpdate so this function can check for modified properties too.
-			$entity->setValues($properties);
+			$entity = JSON::patch($entity, $properties);
+//			$entity->setValues($properties);
 			
 			
 			if(!$this->canUpdate($entity)) {
@@ -849,7 +854,7 @@ abstract class EntityController extends Controller {
 			$diff = $entityProps->diff($clientProps);
 
 			// In some rare cases like password values may be set but not retrieved. We must add "null" here for the client.
-			foreach($properties as $key => $value) {
+			foreach($clientProps as $key => $value) {
 				if(!$entityProps->hasKey($key)) {
 					$diff[$key] = null;
 				}
@@ -876,7 +881,6 @@ abstract class EntityController extends Controller {
 
 		$doDestroy = [];
 		foreach ($destroy as $id) {
-//			$id = (string) $id;
 			$entity = $this->getEntity($id);
 			if (!$entity) {
 				$result['notDestroyed'][$id] = new SetError('notFound', go()->t("Item not found"));
@@ -940,6 +944,7 @@ abstract class EntityController extends Controller {
 	}
 
 
+
   /**
    * Handles the Foo entity's getFooUpdates command
    *
@@ -951,7 +956,7 @@ abstract class EntityController extends Controller {
 	protected function defaultChanges(array $params): ArrayObject
 	{
 		$p = $this->paramsGetUpdates($params);	
-		$cls = $this->entityClass();		
+		$cls = $this->entityClass();
 		
 		$result = $cls::getChanges($p['sinceState'], $p['maxChanges']);
 

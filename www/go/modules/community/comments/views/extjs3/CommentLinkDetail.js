@@ -15,7 +15,7 @@ go.modules.community.comments.CommentLinkDetail = Ext.extend(go.detail.Panel, {
                 onLoad: function (detailView) {
 
                     let title = t('{author} wrote at {date}')
-                        .replace('{author}', Ext.util.Format.htmlEncode(detailView.data.creator.displayName))
+                        .replace('{author}', Ext.util.Format.htmlEncode(detailView.data.creator.name))
                         .replace('{date}', Ext.util.Format.date(detailView.data.createdAt,go.User.dateTimeFormat));
 
                     this.setTitle(Ext.util.Format.htmlEncode(title));

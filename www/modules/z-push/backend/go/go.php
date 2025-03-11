@@ -230,11 +230,11 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	 * @throws StatusException
 	 */
 	public function MeetingResponse($requestid, $folderid, $response, $instanceId) {
-		ZLog::Write(LOGLEVEL_DEBUG, "Combined->MeetingResponse($requestid , $folderid , $response)");
+		ZLog::Write(LOGLEVEL_DEBUG, "Combined->MeetingResponse($requestid , $folderid , $response, $instanceId)");
 		$backend = $this->GetBackend($folderid);
 		if ($backend === false)
 			return false;
-		ZLog::Write(LOGLEVEL_DEBUG, "Combined->MeetingResponse($requestid , $folderid , $response) success");
+		ZLog::Write(LOGLEVEL_DEBUG, "Combined->MeetingResponse($requestid , $folderid , $response, $instanceId) success");
 		return $backend->MeetingResponse($requestid, $this->GetBackendFolder($folderid), $response, $instanceId);
 	}
 

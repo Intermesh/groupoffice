@@ -349,3 +349,7 @@ $updates['202303140904'][] = "alter table cal_events
 
 $updates['202303140904'][] = "alter table cal_events
     drop column repeat_every;";
+
+//final server update for old module
+$updates['202403130920'][] = 'update core_entity set name=\'CalendarEvent\', clientName=\'CalendarEvent\' WHERE name=\'Event\';';
+$updates['202403130920'][] = 'update core_module set package=\'community\', version=0 where name=\'calendar\'';

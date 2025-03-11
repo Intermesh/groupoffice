@@ -4,8 +4,10 @@ go.Modules.register("community", 'imapauthenticator', {
 	entities: ["ImapAuthServer"]	
 });
 
-go.Db.store("ImapAuthServer").on('changes', function(store, added, changed, destroyed) {
+GO.mainLayout.on("authenticated", function() {
+	go.Db.store("ImapAuthServer").on('changes', function (store, added, changed, destroyed) {
 
-	GO.SystemSettingsDomainCombo.reloadDomains();
+		GO.SystemSettingsDomainCombo.reloadDomains();
 
+	});
 });

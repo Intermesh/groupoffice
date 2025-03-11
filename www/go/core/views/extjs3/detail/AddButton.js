@@ -171,6 +171,10 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 						return;
 					}
 
+					if(!(window instanceof Ext.Window)) {
+						return this.handleGOUI(window);
+					}
+
 					//If go.form.Dialog turn off redirect to detail view.
 					window.redirectOnSave = false;
 
@@ -266,6 +270,12 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 	
 	getEntity : function() {
 		return this.detailView.entity || this.detailView.entityStore.entity.name; //entity must be set on old panels
+	},
+
+
+	handleGOUI: function (w) {
+		w.addLinkOnSave(this.getEntity(), this.getEntityId());
+		w.show();
 	}
 });
 

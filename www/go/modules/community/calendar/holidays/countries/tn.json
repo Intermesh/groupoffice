@@ -1,0 +1,75 @@
+{
+  "holidays": {
+    "TN": {
+      "names": {
+        "ar": "الجمهورية التونسية",
+        "fr": "République tunisienne",
+        "en": "Tunisia"
+      },
+      "langs": [
+        "ar",
+        "fr"
+      ],
+      "zones": [
+        "Africa/Tunis"
+      ],
+      "dayoff": "sunday",
+      "days": {
+        "01-01": {
+          "_name": "01-01"
+        },
+        "01-14": {
+          "name": {
+            "fr": "Fête de la Révolution et de la Jeunesse",
+            "ar": "عيد الثورة و الشباب"
+          }
+        },
+        "03-20": {
+          "name": {
+            "fr": "Fête de l'indépendance",
+            "ar": "عيد الإستقلال"
+          }
+        },
+        "04-09": {
+          "name": {
+            "fr": "Journée des Martyrs",
+            "ar": "عيد الشهداء"
+          }
+        },
+        "12 Rabi al-awwal": {
+          "_name": "12 Rabi al-awwal"
+        },
+        "1 Muharram": {
+          "_name": "1 Muharram"
+        },
+        "1 Shawwal": {
+          "_name": "1 Shawwal"
+        },
+        "10 Dhu al-Hijjah": {
+          "_name": "10 Dhu al-Hijjah"
+        },
+        "05-01": {
+          "_name": "05-01"
+        },
+        "07-25": {
+          "name": {
+            "fr": "Fête de la République",
+            "ar": "عيد الجمهورية"
+          }
+        },
+        "08-13": {
+          "name": {
+            "fr": "Fête de la Femme et de la Famille",
+            "ar": "عيد المرأة"
+          }
+        },
+        "10-15": {
+          "name": {
+            "fr": "Fête de l'Évacuation",
+            "ar": "عيد الجلاء"
+          }
+        }
+      }
+    }
+  }
+}

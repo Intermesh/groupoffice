@@ -20,6 +20,13 @@ go.Router = (function () {
 
 		defaultRoute: null,
 
+		params: [],
+
+
+		getParams() {
+			return this.params;
+		},
+
 		config: function (options) {
 			this.root = options && options.root ? '/' + this.trimSlashes(options.root) + '/' : '/';
 			return this;
@@ -30,7 +37,7 @@ go.Router = (function () {
 
 		setPath: function (path) {
 			//this._setPath = path; //to cancel event
-			if (path != window.location.hash) {
+			if ("#" + path != window.location.hash) {
 				this.suspendEvent = true;
 				window.location.hash = path;
 			}
@@ -90,14 +97,7 @@ go.Router = (function () {
 			this.oldPath = this.loadedPath;
 			this.loadedPath = path;
 
-			if (this.suspendEvent) {
-				var me = this;
-				setTimeout(function () {
-					me.suspendEvent = false;
-				});
 
-				return this;
-			}
 
 			for (var i = 0; i < this.routes.length; i++) {
 				var match = path.match(this.routes[i].re);
@@ -120,9 +120,22 @@ go.Router = (function () {
 				return;// this.goto('login');
 			}
 
+
 			for (var n = 0, l = match.length; n < l; n++) {
-				match[n] = decodeURIComponent(match[n]);
+				match[n] = match[n] ? decodeURIComponent(match[n]) : match[n];
 			}
+
+			this.params = match;
+
+			if (this.suspendEvent) {
+				var me = this;
+				setTimeout(function () {
+					me.suspendEvent = false;
+				});
+
+				return this;
+			}
+
 			this.routing = true;
 			route.handler.apply({}, match);
 			this.routing = false;

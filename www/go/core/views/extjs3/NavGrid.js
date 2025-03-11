@@ -31,7 +31,10 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 			this.selModel = new Ext.grid.RowSelectionModel({singleSelect: true});
 		} else
 		{
-			this.selModel = new Ext.grid.CheckboxSelectionModel();
+			this.selModel = new Ext.grid.CheckboxSelectionModel({renderer : function(v, p, record){
+				const s = !record.data.color ? '' : ' style="color:#'+record.data.color+';"';
+				return `<div class="x-grid3-row-checker"${s}>&#160;</div>`;
+			}});
 		}
 
 		if(!this.columns) {

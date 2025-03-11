@@ -2,6 +2,7 @@
 
 use go\core\App;
 use go\core\auth\ForcePasswordChange;
+use go\core\orm\PrincipalTrait;
 use go\core\util\ClassFinder;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Expression;
@@ -1670,3 +1671,53 @@ WHERE t.language='en_uk';";
 $updates['202501141553'][] = "UPDATE core_user t
 SET  t.holidayset = 'en_gb'
 WHERE t.holidayset='en_uk';";
+
+# ------ 6.9 ---------------
+
+$updates['202501141553'][] = "CREATE TABLE `core_principal`(
+   `id` VARCHAR(60) NOT NULL,
+	`name` VARCHAR(100) NOT NULL,
+	`email` VARCHAR(255) NULL,
+	`type` ENUM('individual', 'group', 'resource', 'location', 'other'),
+	`description` VARCHAR(255) NOT NULL,
+	`timeZone` VARCHAR(129) NULL,
+	`entityTypeId` INT NOT NULL,
+	`avatarId` BINARY(40) NULL,
+	`entityId` INT UNSIGNED NOT NULL,
+	`aclId` INT NOT NULL,
+	PRIMARY KEY (`id`),
+	INDEX `index_core_entity_id` ( `entityTypeId` ),
+	INDEX `index_core_blob_id` ( `avatarId` ),
+	CONSTRAINT `fk_core_principal_core_acl1`
+		FOREIGN KEY (`aclId`)
+			REFERENCES `core_acl` (`id`),
+	CONSTRAINT `lnk_core_entity_core_principal` FOREIGN KEY ( `entityTypeId` )
+		REFERENCES `core_entity`( `id` )
+		ON DELETE Cascade
+		ON UPDATE Cascade,
+	CONSTRAINT `lnk_core_blob_core_principal` FOREIGN KEY ( `avatarId` )
+		REFERENCES `core_blob`( `id` )
+		ON DELETE Restrict
+		ON UPDATE No Action
+) ENGINE = InnoDB;";
+
+$updates['202501141553'][] = function() {
+
+	go()->getDbConnection()->exec('replace into core_principal (id, name, email, type, description, timeZone, entityTypeId, avatarId, entityId, aclId)
+SELECT u.id, u.displayName, u.email, "individual", u.username, u.timezone, (select id from core_entity where name="User"), u.avatarId, u.id, g.aclId from core_user u
+inner join core_group g on g.isUserGroupFor = u.id;');
+
+
+	if(\go\core\model\Module::isInstalled("community", "addressbook")) {
+		go()->getDbConnection()->exec('replace into core_principal (id, name, email, type, description, timeZone, entityTypeId, avatarId, entityId, aclId)
+SELECT concat("contact:", u.id), u.name, e.email, "individual", if(u.isOrganization, "Organization", "Contact"), null, (select id from core_entity where name="Contact"), u.photoBlobId, u.id, a.aclId from addressbook_contact u
+inner join addressbook_addressbook a on a.id = u.addressBookId
+inner join addressbook_email_address e on e.contactId = u.id
+group by u.id;');
+	}
+
+};
+
+$updates['202501141553'][] = "alter table core_module drop key name;";
+$updates['202501141553'][] = "alter table core_module add constraint name unique (name, package);";
+$updates['202501141553'][] = "ALTER TABLE `core_alert` ADD COLUMN `staleAt` DATETIME NULL AFTER `triggerAt`;";

@@ -31,7 +31,7 @@ class UserSettings extends Property {
 	
 	protected static function defineMapping(): Mapping
 	{
-		return parent::defineMapping()->addTable('core_user');
+		return parent::defineMapping()->addTable('core_user', 'em_settings');
 	}
 	
 	protected function init() {

@@ -44,7 +44,7 @@ function dp(size) {
 (function(){
   
   //add module and package to components so they are aware of the module they belong to.
-	//go.module and go.package are defined in default_scripts.inc.php 
+	//go.module and go.package are defined in Extjs3.loadGoExt()
   var origExtend = Ext.extend;
 
   Ext.extend = function() {
@@ -1156,6 +1156,7 @@ Ext.override(Ext.Panel, {
 });
 
 Ext.override(Ext.form.Field, {
+	validateOnBlur: false,
 	fieldInitComponent : Ext.form.Field.prototype.initComponent,
 	
 	initComponent : function() {
@@ -1177,7 +1178,20 @@ Ext.override(Ext.form.Field, {
 		} else {
 			this.fieldLabel = label;
 		}
-	}		
+	},
+
+	//For GOUI compat
+	isModified: function() {
+		return this.isDirty();
+	},
+//For GOUI compat
+	trackReset: function() {
+		this.dirty = false;
+		this.originalValue = this.getValue();
+		if(this.setNotDirty) {
+			this.setNotDirty();
+		}
+	}
 });
 
 Ext.override(Ext.form.Hidden, {

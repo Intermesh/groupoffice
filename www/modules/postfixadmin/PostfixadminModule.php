@@ -6,6 +6,11 @@ namespace GO\Postfixadmin;
 
 class PostfixadminModule extends \GO\Base\Module {
 
+	public function getStatus(): string
+	{
+		return \go\core\Module::STATUS_DEPRECATED;
+	}
+
 	public function install() {
 
 		parent::install();		

@@ -1,64 +1,29 @@
-import {
-	btn,
-	checkboxselectcolumn,
-	column,
-	comp,
-	Component, menu,
-	router, searchbtn,
-	splitter,
-	t, Table,
-	TableColumn,
-	tbar
-} from "@intermesh/goui";
+import {btn, checkboxselectcolumn, column, comp, EntityID, menu, router, searchbtn, t, tbar} from "@intermesh/goui";
 
 import {NoteGrid} from "./NoteGrid.js";
 import {NoteBookGrid, notebookgrid} from "./NoteBookGrid.js";
 import {NoteDetail} from "./NoteDetail.js";
 import {NoteDialog} from "./NoteDialog.js";
 import {NoteBookDialog} from "./NoteBookDialog";
-import {FilterCondition} from "@intermesh/groupoffice-core";
+import {MainThreeColumnPanel} from "@intermesh/groupoffice-core";
 
 
-export class Main extends Component {
-
-	// class hbox devides screen in horizontal columns
+export class Main extends MainThreeColumnPanel {
 	private noteBookGrid!: NoteBookGrid;
 	private noteGrid!: NoteGrid;
-	readonly noteDetail!: NoteDetail;
+	protected east!: NoteDetail;
 
-	public constructor() {
-		super();
-
-		this.cls = "hbox fit";
-
-		const west = this.createWest();
-
-		this.noteDetail = new NoteDetail();
-
-		this.items.add(
-			west,
-			splitter({
-				stateId: "gouidemo-splitter-west",
-				resizeComponentPredicate: west
-			}),
-			this.createCenter(),
-			splitter({
-				stateId: "gouidemo-splitter-east",
-				resizeComponentPredicate: this.noteDetail
-			}),
-			this.noteDetail
-		);
+	constructor() {
+		super("goui-notes");
 
 		this.on("render", async () => {
-			const records = await this.noteBookGrid.store.load();
-			this.noteBookGrid.rowSelection!.selected = [0];
+			void this.noteBookGrid.store.load();
+			const first = this.noteBookGrid.store.first();
+			if(first)
+				this.noteBookGrid.rowSelection!.add(first);
 		})
 	}
-
-
-
-	private createWest() {
-
+	protected createWest() {
 
 		return comp({
 				cls: "vbox",
@@ -79,7 +44,8 @@ export class Main extends Component {
 						const dlg = new NoteBookDialog();
 						dlg.show();
 					}
-				})
+				}),
+				this.showCenterButton()
 			),
 			comp({flex: 1, cls: "scroll"},
 	this.noteBookGrid = notebookgrid({
@@ -90,7 +56,7 @@ export class Main extends Component {
 						listeners: {
 							selectionchange: (tableRowSelect) => {
 
-								const noteBookIds = tableRowSelect.selected.map((index) => tableRowSelect.list.store.get(index)!.id);
+								const noteBookIds = tableRowSelect.getSelected().map((row) => row.record.id);
 
 								this.noteGrid.store.queryParams.filter = {
 									noteBookId: noteBookIds
@@ -145,7 +111,7 @@ export class Main extends Component {
 		);
 	}
 
-	private createCenter() {
+	protected createCenter() {
 
 		this.noteGrid = new NoteGrid();
 
@@ -155,10 +121,8 @@ export class Main extends Component {
 			multiSelect: true,
 			listeners: {
 				selectionchange: (tableRowSelect) => {
-					if (tableRowSelect.selected.length == 1) {
-						const table = tableRowSelect.list;
-						const record = table.store.get(tableRowSelect.selected[0]);
-
+					if (tableRowSelect.getSelected().length == 1) {
+						const record = tableRowSelect.getSelected()[0].record;
 						if(record) {
 							router.goto("goui-notes/" + record.id);
 						}
@@ -175,11 +139,12 @@ export class Main extends Component {
 			tbar({
 					cls: "border-bottom"
 				},
+				this.showWestButton(),
 				"->",
 				searchbtn({
 					listeners: {
 						input: (sender, text) => {
-							(this.noteGrid.store.queryParams.filter as FilterCondition).text = text;
+							this.noteGrid.store.setFilter("search", {text});
 							void this.noteGrid.store.load();
 						}
 					}
@@ -190,7 +155,7 @@ export class Main extends Component {
 					icon: "add",
 					handler: () => {
 						const dlg = new NoteDialog();
-						const noteBookId = this.noteBookGrid.store.get(this.noteBookGrid.rowSelection!.selected[0])!.id;
+						const noteBookId = this.noteBookGrid.rowSelection!.getSelected()[0].record.id;
 
 						dlg.form.value = {
 							noteBookId: noteBookId
@@ -209,8 +174,16 @@ export class Main extends Component {
 		)
 	}
 
-	public  showNote(noteId: string) {
-		this.noteDetail.load(noteId);
+	protected createEast(){
+		const d= new NoteDetail();
+		d.toolbar.items.insert(0, this.showCenterButton());
+		return d;
+	}
+
+
+	showNote(noteId: EntityID) {
+		void this.east.load(noteId);
+		this.activatePanel(this.east);
 	}
 
 }

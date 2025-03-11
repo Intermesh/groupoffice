@@ -13,6 +13,9 @@
 
 Ext.namespace("GO.email");
 
+//placeholder overriden in calendar
+GO.email.handleITIP = function(dom, msg) {};
+
 GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 	initComponent : function() {
@@ -1157,15 +1160,12 @@ GO.email.openAttachment = function(attachment, panel, forceDownload) {
 		} else {
 			switch(attachment.extension) {
 				case 'ics':
-					GO.calendar.showEventDialog({
-						url: GO.url('calendar/event/loadICS'),
-						params: {
-							account_id: panel.account_id,
-							mailbox: panel.mailbox,
-							uid: panel.uid,
-							number: attachment.number,
-							encoding: attachment.encoding
-						}
+					go.openIcs && go.openIcs({
+						accountId:panel.account_id,
+						mailbox: panel.mailbox,
+						uid:panel.uid,
+						partId: attachment.number,
+						encoding:attachment.encoding
 					});
 					break;
 				case 'vcf':

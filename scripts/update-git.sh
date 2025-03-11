@@ -96,6 +96,7 @@ buildGOUI "./www/go/modules"
 
 cd www
 
+export COMPOSER_ALLOW_SUPERUSER=1
 for line in $(find . -name composer.json -type f -not -path '*/vendor/*')
 do
   COMPOSER_DIR="$(dirname "${line}")";

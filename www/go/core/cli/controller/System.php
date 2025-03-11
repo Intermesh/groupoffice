@@ -154,6 +154,8 @@ JSON;
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=contracts --package=business --name=CreateInvoices
 	 *
 	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=core --package=core --name=GarbageCollection
+	 *
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=calendar --package=community --name=ScanEmailForInvites
 	 * @throws NotFound
 	 */
 	public function runCron($params) {
@@ -428,7 +430,9 @@ JSON;
 	 */
 	public function convertInts() {
 
-		go()->getDbConnection()->exec("SET foreign_key_checks = 0;");
+		$oldFKchecks = go()->getDbConnection()->foreignKeyChecks(false);
+
+
 
 		$this->installSqls = go()->getEnvironment()->getInstallFolder()->find([
 			'regex' => '/^install\.sql$/'
@@ -463,7 +467,10 @@ JSON;
 				}
 			}
 		}
-		go()->getDbConnection()->exec("SET foreign_key_checks = 1;");
+
+		if($oldFKchecks) {
+			go()->getDbConnection()->foreignKeyChecks(true);
+		}
 	}
 
 	private function convertAlterCol(Column $column) {

@@ -54,8 +54,10 @@ go.filter.VariableFilterPanel = Ext.extend(Ext.Panel, {
 				chipView.store.on('remove', me.load, me);
 				const event = cmp.events.select ? 'select' : 'change';
 				cmp.on(event, function(cmp) {
+
+					setTimeout(() => {
 					let v = cmp.getValue();
-// debugger;
+
 // 					if(!v) {
 // 						if(event === "select") {
 // 							chipView.store.removeAll();
@@ -72,8 +74,10 @@ go.filter.VariableFilterPanel = Ext.extend(Ext.Panel, {
 							display: cmp.getRawValue()
 						}]}, true);
 
-					setTimeout( () => {
+					// setTimeout( () => {
 						cmp.reset();
+					// })
+
 					})
 
 
@@ -177,8 +181,14 @@ go.filter.VariableFilterPanel = Ext.extend(Ext.Panel, {
 
 		});
 
-		this.filterStore.setFilter('customfilters', filter);
-		this.filterStore.load().then(() => {this.fireEvent('resize');});
+		if(this.filterStore) {
+			this.filterStore.setFilter('customfilters', filter);
+			this.filterStore.load().then(() => {
+				this.fireEvent('resize');
+			});
+		}
+
+		this.fire("change", this, filter);
 	},
 
 

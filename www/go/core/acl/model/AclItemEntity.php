@@ -332,15 +332,6 @@ abstract class AclItemEntity extends AclEntity {
 		return $this->isModified(array_keys(static::aclEntityKeys()));
 	}
 
-	protected function internalSave(): bool
-	{
-		if(!$this->isNew() && $this->isAclChanged()) {
-			static::fireEvent(self::EVENT_ACL_CHANGED, $this);
-		}
-
-		return parent::internalSave();
-	}
-
 	/**
 	 * @inheritDoc
 	 * @throws Exception

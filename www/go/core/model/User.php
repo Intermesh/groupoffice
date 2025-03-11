@@ -29,6 +29,7 @@ use go\core\mail\Util;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
+use go\core\orm\PrincipalTrait;
 use go\core\orm\Query;
 use go\core\exception\Forbidden;
 use go\core\jmap\Entity;
@@ -58,6 +59,7 @@ use http\Exception\InvalidArgumentException;
 class User extends AclItemEntity {
 	
 	use CustomFieldsTrait;
+	use PrincipalTrait;
 
 	const ID_SUPER_ADMIN = 1;
 
@@ -129,9 +131,19 @@ class User extends AclItemEntity {
 	 * @var string
 	 */
 	public $displayName;
-	
+
+	/**
+	 * User profile picture blob ID. Can be downloaded via the download endpoint.
+	 *
+	 * @var string
+	 */
 	public $avatarId;
 
+	/**
+	 * Enabled for login
+	 *
+	 * @var bool
+	 */
 	public $enabled;
 	/**
 	 * E-mail address
@@ -417,10 +429,10 @@ public function historyLog(): bool|array
 		$this->getPersonalGroup()->setValues($values);
 	}
 	
-	public function setValues(array $values) : Model
+	public function setValues(array $values, bool $checkAPIRights = true) : Model
 	{
 		$this->passwordVerified = null;
-		return parent::setValues($values);
+		return parent::setValues($values, $checkAPIRights);
 	}
 
 
@@ -926,10 +938,6 @@ public function historyLog(): bool|array
 		}
 
 		$this->changeHomeDir();
-
-		if($this->isModified(['username', 'displayName', 'avatarId', 'email']) && !Installer::isInstalling()) {
-			UserDisplay::entityType()->changes([[$this->id, $this->findAclId(), 0]]);
-		}
 
 		if($this->isModified(['password'])) {
 			Token::destroyOtherSessons($this->id);
@@ -1503,5 +1511,26 @@ public function historyLog(): bool|array
 	protected static function aclEntityKeys(): array
 	{
 		return ['id' => 'isUserGroupFor'];
+	}
+
+	protected function principalAttrs(): array
+	{
+		return [
+			'name' => $this->displayName,
+			'description' => $this->username,
+			'email' => $this->email,
+			'timeZone' => $this->timezone,
+			'avatarId' => $this->avatarId
+		];
+	}
+
+	protected function isPrincipalModified(): bool
+	{
+		return $this->isModified(['displayName', 'email', 'username', 'timezone', 'avatarId']) !== false;
+	}
+
+	protected function principalType(): string
+	{
+		return Principal::Individual;
 	}
 }

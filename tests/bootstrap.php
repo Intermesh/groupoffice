@@ -10,6 +10,7 @@ use go\core\App;
 use go\core\cli\controller\System;
 use go\core\cli\State;
 use GO\Base\Model\Module;
+use go\core\db\Connection;
 use go\core\db\Table;
 use go\core\model\User;
 use go\core\orm\Property;
@@ -39,6 +40,8 @@ try {
 	$c = new core\util\ArrayObject(go()->getConfig());
 	$c->mergeRecursive($config);
 	go()->setConfig($c->getArray());
+	\GO::config()->file_storage_path = $config['file_storage_path'];
+	\GO::config()->tmpdir = $config['tmpdir'];
 
 	// Install new if db doesn't exist otherwise use existing
 	if(!isset($installDb)) {
@@ -131,7 +134,6 @@ try {
 	  system($copyCmd);
 
 	  system('chown -R www-data:www-data ' . $dataFolder->getPath());
-
 
 	  go()->getInstaller()->upgrade();
 

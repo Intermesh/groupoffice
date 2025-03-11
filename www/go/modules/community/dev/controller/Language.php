@@ -152,34 +152,34 @@ class Language extends Controller {
 		foreach ($strings as $string) {
 			$enTranslation = $this->en->t($string, $package, $module);
 
-			$translated = go()->t($string, $package, $module);
+			$translated = go()->getLanguage()->getTranslation($string, $package, $module);
 			if (is_array($enTranslation)) {
 				foreach ($enTranslation as $key => $stringItem) {
-					$translatedItem = $translated[$key] ?? "";
+					$translatedItem = isset($translated) ? $translated[$key] ?? null : null;
 
 					$fields = [
 							$package,
 							$module,
 							$string . '[' . $key . ']',
-							$translatedItem == $stringItem ? $this->translateAPI($stringItem) : $translatedItem
+							!isset($translatedItem) ? $this->translateAPI($stringItem) : $translatedItem
 					];
-					if(!$this->missingOnly || $translatedItem == $stringItem ) {
+					if(!$this->missingOnly || !isset($translatedItem) ) {
 						fputcsv($this->handle, $fields, self::DELIMITER, self::ENCLOSURE);
 					}
 				}
 			} else {
 				
-				if(!is_scalar($translated)) {
+				if(!is_scalar($translated) && $translated != null) {
 					throw new \Exception("Invalid language in ".$package."/".$module.": ".$string);
 				}
 				$fields = [
 						$package,
 						$module,
 						$string,
-						$translated == $string ? $this->translateAPI($string) : $translated
+						$translated ?? $this->translateAPI($string)
 				];
 
-				if(!$this->missingOnly || $translated == $string ) {
+				if(!$this->missingOnly || $translated == null) {
 					fputcsv($this->handle, $fields, self::DELIMITER, self::ENCLOSURE);
 				}
 			}

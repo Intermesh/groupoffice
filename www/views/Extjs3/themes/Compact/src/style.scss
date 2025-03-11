@@ -2,7 +2,11 @@
 @import '../../Paper/src/_compat';
 @import '../../Paper/src/_utils';
 @import 'config';
+
+$resourcePath: '../Paper/';
+$font-scale: 1.1;
+
 @import 'theme';
 @import 'typography';
 @import '../../Paper/src/_styles';
-@import 'overrides'; 
+@import 'overrides';

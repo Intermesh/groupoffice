@@ -93,7 +93,7 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'name',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {						
 					
-						memberStr = record.get("users").column('displayName').join(", ");								
+						memberStr = record.get("users").column('name').join(", ");
 						var more = record.json._meta.users.total - store.fields.item('users').limit;
 						if(more > 0) {
 							memberStr += t(" and {count} more").replace('{count}', more);

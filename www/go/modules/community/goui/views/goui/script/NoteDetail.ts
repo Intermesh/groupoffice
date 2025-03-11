@@ -1,11 +1,9 @@
 import {NoteDialog} from "./NoteDialog.js";
-import {btn, Button, comp, Component, t} from "@intermesh/goui";
+import {btn, comp, Component, t} from "@intermesh/goui";
 import {DetailPanel, Image} from "@intermesh/groupoffice-core";
 
 
 export class NoteDetail extends DetailPanel {
-	private editBtn!: Button;
-
 	private content: Component;
 
 	constructor() {
@@ -24,7 +22,7 @@ export class NoteDetail extends DetailPanel {
 		this.addHistory();
 
 		this.toolbar.items.add(
-			this.editBtn = btn({
+			btn({
 				icon: "edit",
 				title: t("Edit"),
 				handler: (button, ev) => {
@@ -37,7 +35,6 @@ export class NoteDetail extends DetailPanel {
 
 		this.on("load",(detailPanel, entity) => {
 			this.title = entity.name;
-
 
 			this.content.items.clear();
 			this.content.items.add(Image.replace(entity.content));

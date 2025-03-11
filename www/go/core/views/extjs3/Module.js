@@ -4,14 +4,14 @@ go.Modules.register("core", 'core', {
 		{
 			name: 'Alert',
 			relations: {
-				user: {store: "UserDisplay", fk:'userId'}
+				user: {store: "Principal", fk:'userId'}
 			}
 		},
 		{
 			name: 'Group',
 			relations: {
-				users: {store: "UserDisplay", fk: "users"},
-				user: {store: "UserDisplay", fk:'isUserGroupFor'}
+				users: {store: "Principal", fk: "users"},
+				user: {store: "Principal", fk:'isUserGroupFor'}
 			}
 		},
 
@@ -76,7 +76,7 @@ go.Modules.register("core", 'core', {
 			]
 
 		},
-		'UserDisplay',
+		'Principal',
 		'Field', 
 		{
 			name: 'FieldSet', 

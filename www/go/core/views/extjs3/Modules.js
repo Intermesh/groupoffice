@@ -236,7 +236,7 @@ go.Modules = (function () {
 						if (config.initModule){
 							go.Translate.setModule(mod.package, mod.name);
 
-							initModulePromise = config.initModule.call(this);
+							initModulePromise = config.initModule.call(this, config);
 							if(initModulePromise) {
 								promises.push(initModulePromise);
 							}

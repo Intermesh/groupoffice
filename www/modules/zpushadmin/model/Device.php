@@ -62,7 +62,7 @@ class Device extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	protected function afterLoad() {
-		$isLowerCaseNeeded = \GO\Zpushadmin\ZpushadminModule::checkZPushVersion('2.3');
+		$isLowerCaseNeeded = \GO\Zpushadmin\ZpushadminModule::checkZPushVersion('2.7');
 		if($isLowerCaseNeeded)
 			$this->device_id=strtolower($this->device_id);
 		

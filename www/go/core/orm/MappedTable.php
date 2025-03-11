@@ -36,6 +36,18 @@ class MappedTable extends Table {
 	 * @var boolean 
 	 */
 	public $isUserTable = false;
+
+	/**
+	 * When true this will LEFT join when fetched and in the delete query
+	 * @var bool
+	 */
+	public $required = false;
+
+
+	protected function getCacheKey(): string
+	{
+		return 'dbColumns_' . $this->dsn . '_' . $this->getName().'_'.$this->getAlias();
+	}
 	
 	/**
 	 * Mapped table constructor
@@ -53,10 +65,12 @@ class MappedTable extends Table {
 	 *   the joined table always needs to have a value 
 	 *   ['type' => "foo"] then you can set it with this parameter.
 	 */
-	public function __construct(string $name, string $alias, array $keys = null, array $columns = [], array $constantValues = [], Connection $conn = null) {
-		parent::__construct($name, $conn ?? go()->getDbConnection());
-		
+	public function __construct(string $name, string $alias, array $keys = null, array $columns = [], array $constantValues = [], bool $isUserTable = false, Connection $conn = null) {
+
 		$this->alias = $alias;
+		$this->isUserTable = $isUserTable;
+
+		parent::__construct($name, $conn ?? go()->getDbConnection());
 
 		if (!isset($keys)) {
 			$keys = $this->buildDefaultKeys();
@@ -94,6 +108,10 @@ class MappedTable extends Table {
 	{
 		$keys = [];
 		foreach ($this->getPrimaryKey() as $pkName) {
+			if($this->isUserTable && $pkName == "userId") {
+				continue;
+			}
+
 			$keys[$pkName] = $pkName;
 		}
 		

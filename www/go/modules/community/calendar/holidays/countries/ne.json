@@ -1,0 +1,64 @@
+{
+  "holidays": {
+    "NE": {
+      "names": {
+        "fr": "République du Niger",
+        "en": "Republic of the Niger"
+      },
+      "langs": [
+        "fr"
+      ],
+      "zones": [
+        "Africa/Lagos"
+      ],
+      "dayoff": "sunday",
+      "days": {
+        "01-01": {
+          "_name": "01-01"
+        },
+        "04-24": {
+          "name": {
+            "fr": "Journée Nationale de la Concorde",
+            "en": "Concord Day"
+          }
+        },
+        "05-01": {
+          "_name": "05-01"
+        },
+        "08-03": {
+          "_name": "Independence Day",
+          "name": {
+            "fr": "Proclamation de l'indépendance"
+          }
+        },
+        "12-18": {
+          "name": {
+            "fr": "Proclamation de la République",
+            "en": "Republic Day"
+          }
+        },
+        "12-25": {
+          "_name": "12-25"
+        },
+        "easter 1": {
+          "_name": "easter 1"
+        },
+        "1 Shawwal": {
+          "_name": "1 Shawwal"
+        },
+        "10 Dhu al-Hijjah": {
+          "_name": "10 Dhu al-Hijjah"
+        },
+        "12 Rabi al-awwal": {
+          "_name": "12 Rabi al-awwal"
+        },
+        "1 Muharram": {
+          "_name": "1 Muharram"
+        },
+        "27 Ramadan": {
+          "_name": "27 Ramadan"
+        }
+      }
+    }
+  }
+}

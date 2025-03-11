@@ -53,6 +53,14 @@ class Mailer {
 		return $message;
 	}
 
+	public function getSender() {
+		if(!empty($this->emailAccount)) {
+			return $this->emailAccount->getDefaultAlias()->email;
+		} else if ($this->smtpAccount) {
+			return $this->smtpAccount->fromEmail;
+		}
+	}
+
 	/**
 	 * Provide SMTP account. If omited the system notification settings will be used.
 	 * 
@@ -245,12 +253,16 @@ class Mailer {
 
 				$provider = $client->getProvider();
 
+				$username = !empty($this->emailAccount->smtp_username) ? $this->emailAccount->smtp_username : $this->emailAccount->username;
+
+				go()->debug("SMTP XOAUTH2 username: $username");
+
 				$this->mail->setOAuth(new OAuth([
 					'provider' => $provider,
 					'clientId' => $client->clientId,
 					'clientSecret' => $client->clientSecret,
 					'refreshToken' => $cltAcct['refreshToken'],
-					'userName' => !empty($this->emailAccount->smtp_username) ? $this->emailAccount->smtp_username : $this->emailAccount->username,
+					'userName' => $username,
 				]));
 
 			} else if (!empty($this->emailAccount->force_smtp_login)){

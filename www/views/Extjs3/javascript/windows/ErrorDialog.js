@@ -61,10 +61,12 @@ Ext.extend(GO.ErrorDialog, GO.Window, {
 
 		if (!this.rendered)
 			this.render(Ext.getBody());
-
 		if(!error)
 			error = "No error message given";
 		else if(error.message) {
+			error = error.message;
+		} if(error.detail) {
+			// for request level errors in GOUI https://www.rfc-editor.org/rfc/rfc7807#section-3
 			error = error.message;
 		}
 		

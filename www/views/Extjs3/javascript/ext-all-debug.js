@@ -11933,7 +11933,7 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
     
     findParentByType : function(xtype, shallow){
         return this.findParentBy(function(c){
-            return c.isXType(xtype, shallow);
+            return c.isXType && c.isXType(xtype, shallow);
         });
     },
 
@@ -40037,7 +40037,8 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent, {
         this.value = v;
         if(this.rendered){
             this.el.dom.value = (Ext.isEmpty(v) ? '' : v);
-            this.validate();
+						// MS: removed this to avoid validating too early
+            // this.validate();
         }
         this.fireEvent('setvalue', this, v);
         return this;
@@ -41554,8 +41555,10 @@ Ext.form.ComboBox = Ext.extend(Ext.form.TriggerField, {
         var zindex;
         if (this.ownerCt){
             this.findParentBy(function(ct){
-                zindex = parseInt(ct.getPositionEl().getStyle('z-index'), 10);
-                return !!zindex;
+							if(ct) { // check for GOUI
+								zindex = parseInt(ct.getPositionEl().getStyle('z-index'), 10);
+								return !!zindex;
+							}
             });
         }
         return zindex;

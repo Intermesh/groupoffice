@@ -10,7 +10,12 @@
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
+
+GO.userSettingsPanels = [];
+
+
 go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
+	closeAction: "hide",
 	modal:true,
 	resizable: !GO.util.isMobileOrTablet(),
 	maximizable: !GO.util.isMobileOrTablet(),
@@ -220,6 +225,11 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			}
 		}
 
+		GO.userSettingsPanels.forEach((pnl) => {
+
+			this._addPanelCmp(pnl);
+		})
+
 		this.modulePanelsLoaded = true;
 
 		this.doLayout();
@@ -364,7 +374,20 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		go.Db.store("User").set(params, function(options, success, response){
 						
 			if(response.updated && id in response.updated){
-				this.submitComplete(response);
+
+
+				debugger;
+				const onSubmits = this.findBy(function(cmp,cont){
+					return typeof cmp.onSubmit === 'function';
+				},this);
+
+				Promise.all(onSubmits.map(p => {
+					return p.onSubmit() ?? Promise.resolve();
+				})).then(() => {
+
+					this.submitComplete(response);
+				})
+
 			} else
 			{
 				if(response.notUpdated && id in response.notUpdated) {
@@ -470,38 +493,42 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 */
 	load : function(userId){
 		var me = this;
-		
-		function innerLoad(){
+
+		function  innerLoad(){
 			me.currentUserId = userId ? userId : me.currentUserId;
 		
 			me.actionStart();
 			me.fireEvent('loadstart',me, me.currentUserId);
 
-			go.Db.store("User")._getSingleFromServer(me.currentUserId).then(function(user){
-				me.user = user;
-				me.loadModulePanels();
+			go.Db.store("User").getUpdates().then(() => {
 
-				// loop through child panels and call onLoadComplete function if available
-				me.tabPanel.items.each(function(tab) {
-					if(tab.onLoadStart) {
-						tab.onLoadStart(me.currentUserId);
+				go.Db.store("User").single(me.currentUserId).then(async function(user){
+					me.user = user;
+					me.loadModulePanels();
+
+					// loop through child panels and call onLoadComplete function if available
+					me.tabPanel.items.each(function(tab) {
+						if(tab.onLoadStart) {
+							tab.onLoadStart(me.currentUserId);
+						}
+					},me);
+
+					me.formPanel.getForm().setValues(user);
+
+					if(user.id != go.User.id) {
+						me.setTitle(t("User") + ": " + Ext.util.Format.htmlEncode(user.username));
 					}
-				},me);
+					const onLoads = me.findBy(function(cmp,cont){
+						return typeof cmp.onLoad === 'function';
+					},me);
 
-				me.formPanel.getForm().setValues(user);
+					await Promise.all(onLoads.map(p => {
+						return p.onLoad(user) ?? Promise.resolve();
+					}))
 
-				if(user.id != go.User.id) {
-					me.setTitle(t("User") + ": " + Ext.util.Format.htmlEncode(user.username));
-				}
-				
-				me.findBy(function(cmp,cont){
-					if(typeof cmp.onLoad === 'function') {
-						cmp.onLoad(user);
-					}
-				},me);
-
-				me.loadComplete(user);
-			});
+					me.loadComplete(user);
+				});
+			})
 		}
 		
 		// The form needs to be rendered before the data can be set

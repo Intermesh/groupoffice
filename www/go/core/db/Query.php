@@ -80,10 +80,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 
 	public function getSelect(): array
 	{
-		if (empty($this->select)) {
-			$this->select = ['*'];
-		}
-		return $this->select;
+		return $this->select ?? ['*'];
 	}
 
 	public function getOrderBy(): array
@@ -660,8 +657,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 */
 	public function createStatement(): Statement
 	{
-		$queryBuilder = new QueryBuilder($this->getDbConnection());
-		$build = $queryBuilder->buildSelect($this);
+		$build = $this->build();
 
 		$stmt = $this->getDbConnection()->createStatement($build);
 		$fetchMode = $this->getFetchMode();

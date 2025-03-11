@@ -1,0 +1,43 @@
+POST http://localhost:80/go66/www/api/jmap.php HTTP/1.1
+Accept: */*
+Accept-Encoding: gzip, deflate, br
+Accept-Language: nl
+Authorization: Bearer 00000
+Cache-Control: no-cache
+Connection: keep-alive
+Content-Type: application/json
+Host: localhost
+Origin: http://localhost
+Pragma: no-cache
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.79 Safari/537.36
+X-Requested-With: XMLHttpRequest
+
+[
+  [
+    "community/calendar/calendar/set",
+    {
+      "create": {
+        "gen1": {
+          "name": "Michael w alerts",
+          "description": "This is a test",
+          "color": "00FF00",
+          "sortOrder": 0,
+          "isSubscribed": true,
+          "isVisible": true,
+          "defaultAlertsWithTime" : [{
+            "action": "display",
+            "trigger": {"relatedTo":"start", "offset": "-PT10M" }
+          }],
+          "defaultAlertsWithoutTime" : [{
+            "action": "email",
+            "trigger": {"relatedTo":"end", "offset": "-P1D" }
+          }]
+        }
+      },
+      "ifInState": "1:0:0"
+    },
+    "test1"
+  ]
+]
+
+###

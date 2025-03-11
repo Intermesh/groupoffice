@@ -63,7 +63,7 @@ go.modules.community.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'creator',
 					renderer: function(v) {
-						return v ? v.displayName : "-";
+						return v ? v.name : "-";
 					}
 				},
 				{	
@@ -73,7 +73,7 @@ go.modules.community.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'modifier',
 					renderer: function(v) {
-						return v ? v.displayName : "-";
+						return v ? v.name : "-";
 					}
 				}
 			],

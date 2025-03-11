@@ -1,0 +1,73 @@
+{
+  "holidays": {
+    "KN": {
+      "names": {
+        "en": "St. Kitts & Nevis"
+      },
+      "langs": [
+        "en"
+      ],
+      "zones": [
+        "America/Port_of_Spain"
+      ],
+      "dayoff": "sunday",
+      "days": {
+        "01-01 and if Saturday then next Monday": {
+          "substitute": true,
+          "_name": "01-01"
+        },
+        "01-02": {
+          "name": {
+            "en": "Carnival Day"
+          }
+        },
+        "easter -2": {
+          "_name": "easter -2"
+        },
+        "easter": {
+          "_name": "easter",
+          "type": "observance"
+        },
+        "easter 1": {
+          "_name": "easter 1"
+        },
+        "easter 49": {
+          "_name": "easter 49",
+          "type": "observance"
+        },
+        "easter 50": {
+          "_name": "easter 50"
+        },
+        "1st Monday in May": {
+          "_name": "05-01"
+        },
+        "1st Monday in August": {
+          "name": {
+            "en": "Emancipation Day"
+          }
+        },
+        "1st Tuesday in August": {
+          "name": {
+            "en": "Culturama Day"
+          }
+        },
+        "09-16 and if Sunday then next Monday": {
+          "substitute": true,
+          "name": {
+            "en": "National Heroes' Day"
+          }
+        },
+        "09-19 if Sunday then next Monday": {
+          "substitute": true,
+          "_name": "Independence Day"
+        },
+        "12-25": {
+          "_name": "12-25"
+        },
+        "12-26": {
+          "_name": "12-26"
+        }
+      }
+    }
+  }
+}

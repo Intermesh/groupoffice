@@ -317,7 +317,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 						'isAccount'=>true,
 						'permission_level'=>$account->getPermissionLevel(),
 						'hasError'=>false,
-						'iconCls' => 'ic-account-box c-primary',
+						'iconCls' => 'ic-account-box fg-main',
 						'expanded' => $this->_isExpanded($nodeId),
 						'noselect' => false,
 						'account_id' => $account->id,
@@ -425,7 +425,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 			}
 
 			$sortIndex = 5;
-			$node['iconCls'] = 'c-secondary ';
+			$node['iconCls'] = 'c-primary ';
 			switch ($mailbox->name) {
 				case 'INBOX':
 					$node['iconCls'] .= 'ic-inbox';

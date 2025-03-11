@@ -20,11 +20,21 @@ go.filter.FilterPanel = Ext.extend(Ext.Panel,{
 			{
 				xtype: 'filtergrid',
 				filterStore: this.store,
-				entity: this.entity
+				entity: this.entity,
+				listeners: {
+					change: (g, filter) => {
+						this.fire("filterchange", this, filter)
+					}
+				}
 			}, {
 				xtype: 'variablefilterpanel',
 				filterStore: this.store,
-				entity: this.entity
+				entity: this.entity,
+				listeners: {
+					change: (g, filter) => {
+						this.fire("variablefilterchange", this, filter)
+					}
+				}
 			}
 		];
 

@@ -573,7 +573,7 @@ ALTER TABLE `core_link`
 
 ALTER TABLE `core_module`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`);
+  ADD UNIQUE KEY `name` (`name`, `package`);
 
 ALTER TABLE `core_search`
   ADD PRIMARY KEY (`id`),
@@ -1041,6 +1041,7 @@ CREATE TABLE `core_alert` (
   `entityId` INT NOT NULL,
   `userId` INT NOT NULL,
   `triggerAt` DATETIME NOT NULL,
+  `staleAt` DATETIME NULL,
     tag varchar(50) null,
   `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
   `data` text null,
@@ -1248,3 +1249,30 @@ create index core_search_filter_index
 alter table core_module
     add constraint core_module_core_acl_id_fk
         foreign key (shadowAclId) references core_acl (id);
+
+CREATE TABLE `core_principal`(
+	`id` VARCHAR(60) NOT NULL,
+	`name` VARCHAR(100) NOT NULL,
+	`email` VARCHAR(255) NULL,
+	`type` ENUM('individual', 'group', 'resource', 'location', 'other'),
+	`description` VARCHAR(255) NOT NULL,
+	`timeZone` VARCHAR(129) NULL,
+	`entityTypeId` INT NOT NULL,
+	`avatarId` BINARY(40) NULL,
+	`entityId` INT UNSIGNED NOT NULL,
+	`aclId` INT NOT NULL,
+	PRIMARY KEY (`id`),
+	INDEX `index_core_entity_id` ( `entityTypeId` ),
+	INDEX `index_core_blob_id` ( `avatarId` ),
+	CONSTRAINT `fk_core_principal_core_acl1`
+		FOREIGN KEY (`aclId`)
+			REFERENCES `core_acl` (`id`),
+	CONSTRAINT `lnk_core_entity_core_principal` FOREIGN KEY ( `entityTypeId` )
+		REFERENCES `core_entity`( `id` )
+		ON DELETE Cascade
+		ON UPDATE Cascade,
+	CONSTRAINT `lnk_core_blob_core_principal` FOREIGN KEY ( `avatarId` )
+		REFERENCES `core_blob`( `id` )
+		ON DELETE Restrict
+		ON UPDATE No Action
+) ENGINE = InnoDB;

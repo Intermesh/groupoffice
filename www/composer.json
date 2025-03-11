@@ -43,7 +43,9 @@
     "ext-fileinfo": "*",
     "thenetworg/oauth2-azure": "@stable",
     "erusev/parsedown": "@stable",
-    "phpmailer/phpmailer": "@stable"
+    "phpmailer/phpmailer": "@stable",
+    "jasny/phpdoc-parser": "^1.0",
+    "stevenmaguire/oauth2-keycloak": "^5.1"
   },
   "license": "AGPL",
   "authors": [

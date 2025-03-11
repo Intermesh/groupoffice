@@ -1,0 +1,18 @@
+{
+  "type": "module",
+  "devDependencies": {
+    "concurrently": "latest",
+    "esbuild": "latest",
+    "sass": "latest",
+    "typescript": "latest"
+  },
+  "scripts": {
+    "start": "concurrently --kill-others \"npm run start:ts\"",
+    "start:ts": "node ../../../../../../views/goui/esbuild-module.mjs watch",
+
+    "build": "npm run build:ts",
+    "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
+
+    "test": "npx tsc --noEmit"
+  }
+}

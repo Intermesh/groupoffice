@@ -7,11 +7,13 @@ use go\core\db\Column;
 use go\core\db\Criteria;
 use go\core\mail\Address as MailAddress;
 use go\core\model\Link;
+use go\core\model\Principal;
 use go\core\model\User;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\Entity;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
+use go\core\orm\PrincipalTrait;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\ArrayObject;
@@ -39,6 +41,8 @@ class Contact extends AclItemEntity {
 	use CustomFieldsTrait;
 	
 	use SearchableTrait;
+
+	use PrincipalTrait;
 
 	/**
 	 * 
@@ -682,11 +686,9 @@ class Contact extends AclItemEntity {
 											}
 
 											$date = $value->format(Column::DATE_FORMAT);
-											$now = new DateTime();
-											$year = $now->format("Y");
-											$nowStr = $now->format(Column::DATE_FORMAT);
+											$year = $value->format("Y");
 
-											$query->select("IF (STR_TO_DATE(CONCAT('$year', '/', MONTH(bdate.date), '/', DAY(bdate.date)),'%Y/%c/%e') >= '$nowStr', "
+											$query->select("IF (STR_TO_DATE(CONCAT('$year', '/', MONTH(bdate.date), '/', DAY(bdate.date)),'%Y/%c/%e') >= '$date', "
 												."STR_TO_DATE(CONCAT('$year', '/', MONTH(bdate.date), '/', DAY(bdate.date)),'%Y/%c/%e') , "
 												."STR_TO_DATE(CONCAT('$year' + 1,'/', MONTH(bdate.date), '/', DAY(bdate.date)),'%Y/%c/%e')) as upcomingBirthday", true);
 
@@ -1387,4 +1389,25 @@ class Contact extends AclItemEntity {
 	  parent::check();
   }
 
+	protected function principalAttrs(): array {
+		return [
+			'name' => $this->name,
+			'email' => $this->emailAddresses[0]->email,
+			'avatarId' =>$this->photoBlobId,
+			'description' => go()->t($this->isOrganization?'Organization': 'Contact'). ' '. implode(' ', array_filter([$this->department,$this->jobTitle])),
+		];
+	}
+
+	protected function isPrincipal(): bool {
+		return isset($this->emailAddresses[0]); // must at least have 1 email
+	}
+
+	protected function isPrincipalModified(): bool {
+		return $this->isModified(['name', 'emailAddresses', 'photoBlobId','jobTitle', 'department','isOrganization','addressBookId']); // addressBookId for ACL
+	}
+
+	protected function principalType(): string
+	{
+		return Principal::Individual;
+	}
 }

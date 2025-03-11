@@ -1,0 +1,59 @@
+{
+  "holidays": {
+    "BL": {
+      "names": {
+        "fr": "St. Barthélemy",
+        "en": "St. Barths"
+      },
+      "langs": [
+        "fr"
+      ],
+      "zones": [
+        "America/St_Barthelemy"
+      ],
+      "_days": "FR",
+      "days": {
+        "easter -48": {
+          "_name": "easter -48",
+          "type": "observance"
+        },
+        "easter -47": {
+          "_name": "easter -47",
+          "type": "Observance"
+        },
+        "easter -46": {
+          "_name": "easter -46",
+          "type": "observance"
+        },
+        "easter -21": {
+          "name": {
+            "fr": "Mi-Carême",
+            "en": "Laetare Sunday"
+          },
+          "type": "observance"
+        },
+        "easter -2": {
+          "_name": "easter -2",
+          "type": "bank"
+        },
+        "easter": {
+          "_name": "easter",
+          "type": "observance"
+        },
+        "08-24": {
+          "name": {
+            "fr": "Fête de Saint Barthélemy",
+            "en": "Saint Barth"
+          },
+          "type": "observance"
+        },
+        "10-09": {
+          "_name": "Abolition of Slavery"
+        },
+        "12-25": {
+          "_name": "12-25"
+        }
+      }
+    }
+  }
+}

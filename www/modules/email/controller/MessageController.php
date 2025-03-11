@@ -28,6 +28,7 @@ use GO\Email\Model\Account;
 use GO\Email\Model\ImapMessage;
 use GO\Email\Model\Label;
 use go\modules\community\addressbook\model\Contact;
+use go\modules\community\calendar\model\Scheduler;
 
 
 class MessageController extends \GO\Base\Controller\AbstractController
@@ -316,6 +317,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$query = 'OR OR OR FROM "' .$matches[1] . '" SUBJECT "' .$matches[1] . '" TO "' .$matches[1] . '" CC "' .$matches[1] . '"';
 		}
 
+		go()->debug("IMAP SEARCH: " . $query);
+
 		$messages = ImapMessage::model()->find(
 						$account,
 						$params['mailbox'],
@@ -396,8 +399,16 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 	private function allowFTS (Account $account, $imap) :bool{
 
+		// TODO DOCS
 		$forceFTS = go()->getConfig()['community']['email']['forceFTS'][$account->host] ?? false;
 
+		if(go()->getDebugger()->enabled) {
+			go()->debug("Force FTS: ");
+			go()->debug($forceFTS);
+
+			go()->debug("Has XFTS capability: ");
+			go()->debug($imap->has_capability("XFTS"));
+		}
 
 		return $forceFTS || $imap->has_capability("XFTS");
 	}
@@ -1472,118 +1483,14 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 	private function _handleInvitations(ImapMessage $imapMessage, $params, $response)
 	{
-		if(!GO::modules()->isInstalled('calendar')) {
-			return $response;
-		}
-
-		$vcalendar = $imapMessage->getInvitationVcalendar();
-		if($vcalendar){
-			$vevent = $vcalendar->vevent[0];
-
-
-			if(empty($vcalendar->method) || $vcalendar->method == 'REQUEST') {
-				// If this is an invite request, we must be sure we know which of the participants is the current user.
-				// We do this by checking all mail aliases
-				$aliases = Alias::model()->find(
-					GO\Base\Db\FindParams::newInstance()
-						->select('email')
-						->criteria(GO\Base\Db\FindCriteria::newInstance()->addCondition('account_id', $imapMessage->account->id))
-				)->fetchAll(\PDO::FETCH_COLUMN, 0);
-
-				// for case insensitive match
-				$aliases = array_map('strtolower', $aliases);
-
-				$emailFound = false;
-				if (isset($vevent->attendee)) {
-					foreach ($vevent->attendee as $vattendee) {
-						$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vattendee));
-						if (in_array($attendeeEmail, $aliases)) {
-							$emailFound = true;
-							$accountEmail = $attendeeEmail;
-						}
-					}
-				}
-
-				if (!$emailFound && isset($vevent->organizer)) {
-					$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vevent->organizer));
-					if (in_array($attendeeEmail, $aliases)) {
-						$emailFound = true;
-						$accountEmail = $attendeeEmail;
-					}
-				}
-
-				if (!$emailFound) {
-					$response['iCalendar']['feedback'] = GO::t("None of the participants match your e-mail aliases for this e-mail account.", "email");
-					return $response;
-				}
-			}
-
-			//is this an update for a specific recurrence?
-			$recurrenceDate = isset($vevent->{"recurrence-id"}) ? $vevent->{"recurrence-id"}->getDateTime()->format('U') : 0;
-
-			//find existing event
-			$event = \GO\Calendar\Model\Event::model()->findByUuid((string) $vevent->uid, $imapMessage->account->user_id, $recurrenceDate);
-
-			$uuid = (string) $vevent->uid;
-
-			$alreadyProcessed = false;
-			if($event){
-
-				//import to check if there are relevant updates
-				$event->importVObject($vevent, array(), true);
-				$alreadyProcessed = false; //!$event->isModified($event->getRelevantMeetingAttributes());
-			}
-
-			switch($vcalendar->method){
-				case 'CANCEL':
-					$response['iCalendar']['feedback'] = GO::t("This message contains an event cancellation.", "email");
-					break;
-
-				case 'REPLY':
-					$response['iCalendar']['feedback'] = GO::t("This message contains an update to an event.", "email");
-					break;
-
-				case 'REQUEST':
-					$response['iCalendar']['feedback'] = GO::t("This message contains an invitation to an event.", "email");
-					break;
-			}
-
-			if($vcalendar->method!='REQUEST' && $vcalendar->method!='PUBLISH' && !$event){
-				$response['iCalendar']['feedback'] = GO::t("The appointment of this message was deleted.", "email");
-			}
-
-			$response['iCalendar']['invitation'] = array(
-					'uuid' => $uuid,
-					'email_sender' => $response['sender'],
-					'email' => $accountEmail ?? null,
-					//'event_declined' => $event && $event->status == 'DECLINED',
-					'event_id' => $event ? $event->id : 0,
-					'is_organizer'=>$event && $event->is_organizer,
-					'is_processed'=>$alreadyProcessed,
-					'is_update' => !$alreadyProcessed && $vcalendar->method == 'REPLY',// || ($vcalendar->method == 'REQUEST' && $event),
-					'is_invitation' => !$alreadyProcessed && $vcalendar->method == 'REQUEST', //&& !$event,
-					'is_cancellation' => $vcalendar->method == 'CANCEL'
-			);
-
-			//filter out invites
-
-			$response['attachments'] = array_values(array_filter($response['attachments'], function($a) {
-				return $a['isInvite'] == false;
-			}));
-
-		if(empty($uuid) || strpos($response['htmlbody'], $uuid)===false){
-			$event = new \GO\Calendar\Model\Event();
-			try {
-				$event->importVObject($vevent, array(), true);
-
-				$response['htmlbody'].= '<div style="border: 1px solid black;margin-top:10px">'.
-								'<div style="font-weight:bold;margin:2px;">'.GO::t("Attached appointment information", "email").'</div>'.
-								$event->toHtml().
-								'</div>';
-				}
-				catch(\Exception $e){
-					//$response['htmlbody'].= '<div style="border: 1px solid black;margin-top:10px">Could not render event</div>';
-				}
+		if(Module::isInstalled('community', 'calendar', true)) {
+			$itip = Scheduler::handleIMIP($imapMessage);
+			if($itip) {
+				$response['itip'] = $itip;
+//				filter out invites
+//				$response['attachments'] = array_values(array_filter($response['attachments'], function($a) {
+//					return $a['isInvite'] == false;
+//				}));
 			}
 		}
 

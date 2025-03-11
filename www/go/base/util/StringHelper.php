@@ -25,6 +25,7 @@ namespace GO\Base\Util;
 use Exception;
 use go\core\ErrorHandler;
 use go\core\util\StringUtil;
+use Random\RandomException;
 
 class StringHelper {
 	
@@ -866,65 +867,16 @@ class StringHelper {
 	 * @param int|null $password_length
 	 *
 	 * @param string|null $characters_allow
-	 * @param string|null  $characters_disallow
+	 * @param string|null $characters_disallow
 	 *
 	 * @return string
-	 * @throws Exception
+	 * @throws RandomException
+	 * @deprecated use \go\core\util\Password instead . For backwards compatibility, the new function is called with the
+	 * old defaults
 	 */
 	static function randomPassword(?int $password_length = 0, ?string $characters_allow = 'a-z,1-9', ?string $characters_disallow = 'i,o' ): string
 	{
-
-		if($password_length==0) {
-			$password_length = \GO::config()->default_password_length;
-		}
-
-		// Generate array of allowable characters.
-		$characters_allow = explode(',', $characters_allow);
-
-		$array_allow = [];
-		for ($i = 0; $i < count($characters_allow); $i ++) {
-			if (substr_count($characters_allow[$i], '-') > 0) {
-				$character_range = explode('-', $characters_allow[$i]);
-
-				for ($j = ord($character_range[0]); $j <= ord($character_range[1]); $j ++) {
-					$array_allow[] = chr($j);
-				}
-			} else {
-				$array_allow[] = $characters_allow[$i];
-			}
-		}
-
-		// Generate array of disallowed characters.
-		$characters_disallow = explode(',', $characters_disallow);
-		$array_disallow = [];
-		for ($i = 0; $i < count($characters_disallow); $i ++) {
-			if (substr_count($characters_disallow[$i], '-') > 0) {
-				$character_range = explode('-', $characters_disallow[$i]);
-
-				for ($j = ord($character_range[0]); $j <= ord($character_range[1]); $j ++) {
-					$array_disallow[] = chr($j);
-				}
-			} else {
-				$array_disallow[] = $characters_disallow[$i];
-			}
-		}
-
-		// Generate array of allowed characters by removing disallowed
-		// characters from array.
-		$array_allow = array_diff($array_allow, $array_disallow);
-		// Resets the keys since they won't be consecutive after
-		// removing the disallowed characters.
-		$array_allow = array_values($array_allow);
-
-		$password = '';
-		while (strlen($password) < $password_length) {
-			$character = random_int(0, count($array_allow) - 1);
-			// Characters are not allowed to repeat
-			if (substr_count($password, $array_allow[$character]) == 0) {
-				$password .= $array_allow[$character];
-			}
-		}
-		return $password;
+		return \go\core\util\Password::generateRandom($password_length, $characters_allow,$characters_disallow);
 	}
 
 	/**

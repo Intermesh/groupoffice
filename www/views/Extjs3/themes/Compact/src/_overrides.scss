@@ -1,5 +1,5 @@
-.x-btn, .x-toolbar .x-btn, .x-small-editor .x-btn {
-	background-color: color($bg, 'button');
+*:not(.goui) .x-btn, .x-toolbar .x-btn, .x-small-editor .x-btn {
+	background-color: var(--bg-bright);
 	.x-btn-group & {
 	 border-radius: 0;
 	}
@@ -12,12 +12,12 @@
 	 .x-btn-text{color:inherit;}
 	}
 	&.x-btn-focus {
-	 @include var(background-color, c-primary-tp);
+	 @include var(background-color, fg-main-tp);
 	}
 	&.primary, &.raised {
 		color: white;
-		background-color: var(--c-secondary);
-		@include var('background-color', c-secondary);
+		background-color: var(--c-primary);
+		@include var('background-color', c-primary);
 	}
 	&.accent {
 	  background-color: var(--c-accent);
@@ -33,7 +33,7 @@
 	margin-left: dp(16);
 	margin-right: dp(16);
 }
-.x-menu-item-text, .go-sidenav *, .go-nav * {
+.x-menu-item-text, .go-sidenav *, .go-nav *, aside *, {
 	@extend %font-menu;
 }
 .x-toolbar .xtb-sep{
@@ -92,7 +92,7 @@
 }
 
 .cal-display-panel {
-  background-color: color($bg, 'card');
+  background-color: var(--bg-mid);
 }
 
 //html editor icons in outline set:
@@ -111,3 +111,6 @@
 	border-top: 0;
 }
 .x-portlet { overflow:hidden;}
+
+// for filter panel in goui
+.goui .x-btn { background-color:transparent;}

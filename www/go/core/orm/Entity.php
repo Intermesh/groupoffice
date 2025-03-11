@@ -183,25 +183,49 @@ abstract class Entity extends Property {
 		return static::internalFind($properties, $readOnly);
 	}
 
+	/**
+	 * Same as {@see find()} but join user tables {@see Mapping::addUserTable()} as another user than the logged in user.
+	 *
+	 * @throws Exception
+	 */
+	public static final function findFor(int $userId, array $properties = [], bool $readOnly = false): Query
+	{
+		return static::internalFind($properties, $readOnly, null, $userId);
+	}
+
 
 	/**
 	 * Find or create an entity
 	 *
-	 * @param string $id $businessId . "-" . $contactId
+	 * @param string $key $businessId . "-" . $contactId
+	 * @param string|null $keyField Field to search on. If null then findById() is used.
 	 * @param array $values Values to apply if it needs to be created.
+	 * @param bool $update Update the found entity with new data
 	 * @return static
-	 * @throws Exception
+	 * @throws SaveException
 	 */
-	public static function findOrCreate(string $id, array $values = []): Entity
+	public static function findOrCreate(string $key, string $keyField = null, array $values = [], bool $update = false): Entity
 	{
-		$entity = static::findById($id);
-		if($entity) {
-			return $entity;
+		if($keyField === null) {
+			$entity = static::findById($key);
+		} else {
+			$entity = static::find()->where($keyField, '=', $key)->single();
 		}
 
-		$entity = new static();
-		$entity->setValues(static::idToPrimaryKeys($id));
-		$entity->setValues($values);
+		if($entity) {
+			if(!$update) {
+				return $entity;
+			}
+		} else {
+			$entity = new static();
+		}
+
+		if($keyField === null) {
+			$entity->setValues(static::idToPrimaryKeys($key));
+		} else {
+			$entity->$keyField = $key;
+		}
+		$entity->setValues($values, false);
 
 		if(!$entity->save()) {
 			throw new SaveException($entity);
@@ -227,6 +251,7 @@ abstract class Entity extends Property {
 	 * @param string[] $properties
 	 * @param bool $readOnly
 	 * @return ?static
+	 * @throws Exception
 	 */
 	public static final function findById(?string $id, array $properties = [], bool $readOnly = false): ?Entity
 	{
@@ -249,8 +274,9 @@ abstract class Entity extends Property {
 	 *
 	 * @param string|int|null $id
 	 * @return bool
+	 * @throws Exception
 	 */
-	public static function exists(?string $id): bool
+	public static function exists(string|int|null $id): bool
 	{
 		if(empty($id)) {
 			return false;
@@ -318,15 +344,9 @@ abstract class Entity extends Property {
 	{
 		$query = static::find($properties, $readOnly);
 		/** @noinspection PhpPossiblePolymorphicInvocationInspection */
-		$query->join(
-			'core_link',
-			'l',
-			$query->getTableAlias() . '.id = l.toId and l.toEntityTypeId = '.static::entityType()->getId())
 
-			->andWhere('fromEntityTypeId = '. $entity::entityType()->getId())
-			->andWhere('fromId', '=', $entity->id);
+		return \go\core\model\Link::joinLinks($query, $entity, static::entityType()->getId());
 
-		return $query;
 	}
 
 
@@ -444,6 +464,14 @@ abstract class Entity extends Property {
 			}
 		}
 
+		//See \go\core\orm\PrincipalTrait;
+		if(method_exists($this, 'savePrincipal') && $this->isModified()) {
+			if(!$this->savePrincipal()) {
+				$this->setValidationError("principal", ErrorCode::INVALID_INPUT, "Could not save core_principal entry");
+				return false;
+			}
+		}
+
 		return true;
 	}
 
@@ -515,6 +543,14 @@ abstract class Entity extends Property {
 			//See \go\core\orm\SearchableTrait;
 			if(method_exists(static::class, 'deleteSearchAndLinks')) {
 				if(!static::deleteSearchAndLinks($query)) {				
+					go()->getDbConnection()->rollBack();
+					return false;
+				}
+			}
+
+			//See \go\core\orm\PrincipalTrait;
+			if(method_exists(static::class, 'deletePrincipal')) {
+				if(!static::deletePrincipal($query)) {
 					go()->getDbConnection()->rollBack();
 					return false;
 				}
@@ -816,7 +852,7 @@ abstract class Entity extends Property {
 					}
 				}
 
-				if(is_int($value[1])) {
+				if(is_numeric($value[0])) {
 					$criteria->andWhere('modifiedBy', '=', $value);
 				} else {
 
@@ -849,7 +885,7 @@ abstract class Entity extends Property {
 					}
 				}
 
-				if(is_int($value[0])) {
+				if(is_numeric($value[0])) {
 					$criteria->andWhere('createdBy', '=', $value);
 				} else {
 					if (!$query->isJoined('core_user', 'creator')) {

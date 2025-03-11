@@ -212,7 +212,9 @@ class Column {
 		if (!isset($value)) {
 			return null;
 		}
-		
+
+		// The dbType can be overriden in the 'comment' of the table column
+		// @see Table::createColumn() @dbType
 		switch ($this->dbType) {
 			case 'int':
 			case 'tinyint':
@@ -224,23 +226,38 @@ class Column {
 				}
 				return (int) $value;
 
+			case 'localdatetime':
 			case 'datetime':
+				if(empty($value)) {
+					return null;
+				}
+				$isLocal = $this->dbType ==='localdatetime';
 				if ($value instanceof DateTime || $value instanceof DateTimeImmutable) {
 					if(!($value instanceof GoDateTime)) {
-						$value = new GoDateTime('@' . $value->getTimestamp(), $value->getTimezone());
+						// convert to GoDateTime with exact same time and timezone info. We need the isLocal property.
+						$value = new GoDateTime($value->format("Y-m-d H:i:s"), $value->getTimezone());
 					}
 					return $value;
 				} else {
 					$dt = new GoDateTime($value);
-					$dt->setTimezone(new DateTimeZone("UTC")); //UTC
+					if(!$isLocal)
+						$dt->setTimezone(new DateTimeZone("UTC")); //UTC
+					else {
+						$dt->isLocal = $isLocal;
+					}
 					return $dt;
 				}
 
 			case 'date':
+				if(empty($value)) {
+					return null;
+				}
+
 				//make sure date is formatted correctly
 				if ($value instanceof DateTime || $value instanceof DateTimeImmutable) {
 					if(!($value instanceof GoDateTime)) {
-						$value = new GoDateTime('@' . $value->getTimestamp(), $value->getTimezone());
+						// convert to GoDateTime with exact same time and timezone info. We need the isLocal property.
+						$value = new GoDateTime($value->format("Y-m-d"), $value->getTimezone());
 					}
 					return $value;
 				} else {
@@ -272,6 +289,7 @@ class Column {
 		}
 		
 		switch ($this->dbType) {
+			case 'localdatetime':
 			case 'datetime':
 				return $value->format(self::DATETIME_FORMAT);
 
@@ -316,7 +334,7 @@ class Column {
 
 			case 'date':
 			case 'datetime':
-
+			case 'localdatetime':
 				if(strtolower(substr($value, 0, 3)) == "cur") {
 					return new DateTime();
 				}
@@ -326,15 +344,17 @@ class Column {
 					return null;
 				}
 
+				$isLocal = $this->dbType === 'localdatetime';
 				if(!($value instanceof GoDateTime)) {
 					try {
-						$value = new GoDateTime($value, new DateTimeZone("UTC"));
+						$value = new GoDateTime($value, $isLocal ? null : new DateTimeZone("UTC"));
 					}catch(Exception $e) {
 						throw new LogicException("Could not read date from database: " . $e->getMessage());
 					}
 				}
 
-				$value->hasTime = $this->dbType == 'datetime';
+				$value->isLocal = $isLocal; // for formatting
+				$value->hasTime = $this->dbType != 'date';
 
 				return $value;
 

@@ -80,11 +80,15 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	 * @returns {undefined}
 	 */
 	boot : async function() {
+
+		window.groupofficeCore = await import(BaseHref + "views/goui/dist/groupoffice-core/script/index.js");
+		window.GOUI = await import(BaseHref + "views/goui/dist/goui/script/index.js");
+
 		var me = this;
 
 		// GOUI in ext , Warning: breaks old safari
-		// window.goui = await import(BaseHref + "views/goui/dist/goui/script/index.js");
-		// window.groupofficeCore = await import(BaseHref + "views/goui/dist/groupoffice-core/script/index.js");
+		window.goui = await import(BaseHref + "views/goui/dist/goui/script/index.js");
+		window.groupofficeCore = await import(BaseHref + "views/goui/dist/groupoffice-core/script/index.js");
 
 		go.browserStorage.connect().finally(function() {
 			Ext.QuickTips.init();
@@ -92,20 +96,19 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				dismissDelay: 0,
 				maxWidth: 500
 			});
-			
+
 			Ext.Ajax.defaultHeaders = {'Accept-Language': GO.lang.iso};
 
 			go.User.authenticate().then((user) => {
-				me.on('render', function() {
+				me.on('render', function () {
 					me.fireEvent('boot', me);
-				}, me, {single:true});
+				}, me, {single: true});
 				me.onAuthentication(); // <- start Group-Office
-			}).catch(() => {
+			}).catch((e) => {
+				console.warn(e);
 				me.fireEvent("boot", me);
 				go.Router.check();
 			})
-
-				
 		});
 
 	},
@@ -151,7 +154,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		//blur active form fields on tab change. Otherwise auto complete combo boxes
 		//will remain focussed but the autocomplete functionality fails.
-		this.tabPanel.on('tabchange', function (tabpanel, newTab) {
+		this.tabPanel.on('beforetabchange', function (tabpanel, newTab) {
 
 			if (!newTab) {
 				return;
@@ -159,7 +162,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 			//update hash if not already set.
 			if (!go.Router.routing) {
-				window.go.Router.setPath(newTab.moduleName);
+				window.go.Router.goto(newTab.moduleName);
 			}
 
 			if (document.activeElement && typeof document.activeElement.blur === 'function')
@@ -324,16 +327,16 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			]).then(function(){
 				go.Entities.init();
 
-				me.fireEvent('authenticated', this, go.User, password);
-				// window.groupofficeCore.client.fireAuth();
-
-				me.renderUI();
-				Ext.getBody().unmask();
-				setTimeout(() => {
-					//give "authenticated" listeners above a change to add routes
-					me.addDefaultRoutes();
-					go.Router.check();
-				})
+				window.groupofficeCore.client.authenticate().then(() => {
+					me.fireEvent('authenticated', this, go.User, password);
+					me.renderUI();
+					Ext.getBody().unmask();
+					setTimeout(() => {
+						//give "authenticated" listeners above a change to add routes
+						me.addDefaultRoutes();
+						go.Router.check();
+					})
+				});
 			});
 		}).catch(function(error) {
 			// Ext.getBody().unmask();
@@ -906,6 +909,14 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		this.fireEvent('render');
 
 		this.welcome();
+
+		screen.orientation.addEventListener("change", (event) => {
+			const w = screen.width,
+				h = screen.height;
+			setTimeout(()=>{
+				GO.viewport.fireResize(w, h);
+			},600);
+		});
 
 		this.handleBrowserOnlineOffline();
 		// Start in 5s to give the browser some time to boot other requests.

@@ -97,7 +97,7 @@ class Table {
 		return $this->name;
 	}
 
-	private function getCacheKey(): string
+	protected function getCacheKey(): string
 	{
 		return 'dbColumns_' . $this->dsn . '_' . $this->name;
 	}
@@ -196,6 +196,11 @@ class Table {
 			$c->dbType = strtolower(preg_replace("/\(.*\)$/", "", $field['Type']));
 			$c->length = null;
 		}
+
+		preg_match('/@dbType=(\w*)/i', $c->comment, $matches);
+		if($matches) {
+			$c->dbType = strtolower($matches[1]);
+		}
 		
 //		if($c->default == 'CURRENT_TIMESTAMP') {
 //			throw new InvalidArgumentException("Please don't use CURRENT_TIMESTAMP as default mysql value. It's only supported in MySQL 5.6+");
@@ -231,6 +236,9 @@ class Table {
 				break;
 			
 			case 'text':
+				if(isset($c->default)) {
+					$c->default = trim($c->default, "'\"");
+				}
 				$c->length = 65535;
 				$c->trimInput = true;
 				break;
@@ -238,6 +246,9 @@ class Table {
 				$c->length = 4294967295;
 				break;
 			case 'longtext':
+				if(isset($c->default)) {
+					$c->default = trim($c->default, "'\"");
+				}
 				$c->length = 4294967295;
 				$c->trimInput = true;
 
@@ -248,11 +259,17 @@ class Table {
 				}
 				break;
 			case 'mediumtext':
+				if(isset($c->default)) {
+					$c->default = trim($c->default, "'\"");
+				}
 				$c->length = 16777215;
 				$c->trimInput = true;
 				break;
 
 			case 'tinytext':
+				if(isset($c->default)) {
+					$c->default = trim($c->default, "'\"");
+				}
 				$c->length = 255;
 				$c->trimInput = true;
 				break;
@@ -397,6 +414,15 @@ class Table {
 		}
 		
 		return false;
+	}
+
+	/**
+	 * @throws DbException
+	 */
+	public function setAutoIncrementValue(int $ai): void
+	{
+		go()->getDbConnection()
+			->exec("ALTER TABLE `" . $this->name ."` AUTO_INCREMENT=" . $ai);
 	}
 	
 	/**

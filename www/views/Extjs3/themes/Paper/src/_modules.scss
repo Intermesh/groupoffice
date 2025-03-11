@@ -83,7 +83,7 @@
       white-space: nowrap;
       font-size: .9em;
       color: white;
-      text-shadow: 0 1px 0 color($fg, 'unfocused');
+      text-shadow: 0 1px 0 var(--fg-unfocused);
   }
   #x-menu-el-go-start-menu-admin-menu { display:none;}
 }
@@ -148,7 +148,7 @@ i.icon.em-low_priority {
 }
 
 .ml-unseen-dot {
-	@include var(background-color, c-primary);
+	@include var(background-color, fg-main);
 	width: 9px;
 	height: 9px;
 	margin: dp(2);
@@ -164,7 +164,7 @@ i.icon.em-low_priority {
 		float: right;
 		width: dp(16);
 		height: dp(16);
-		color: color($fg, 'secondary-text');
+		color: var(--fg-secondary-text);
 	}
 }
 
@@ -225,7 +225,7 @@ i.icon.em-low_priority {
 
 #email-message-panel {
 	.x-panel-body {
-		background-color: color($bg, 'box');
+		background-color: var(--bg-input);
 	}
 }
 
@@ -237,7 +237,7 @@ i.icon.em-low_priority {
 
 .message-header {
 	position: relative;
-	border-bottom:1px solid color($fg, "line");
+	border-bottom:1px solid var(--fg-line);
 	padding: dp(8) dp(16);
 		
 	b {
@@ -280,10 +280,10 @@ i.icon.em-low_priority {
 		cursor: pointer;
 
 		&.x-view-selected {
-			background-color: color($bg, 'selected');
+			background-color: var(--bg-selected);
 		}
 		&.x-view-over {
-			background-color: color($bg, 'hover');
+			background-color: var(--bg-hover);
 		}
 
 		i {

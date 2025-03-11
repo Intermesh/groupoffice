@@ -143,7 +143,12 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, Iter
 	{
 		$param = $this->build['paramMap'][$param] ?? $param;
 
-		return $this->pdoStmt->bindValue($param, $value, $type);
+		try {
+			return $this->pdoStmt->bindValue($param, $value, $type);
+		} catch(\Throwable $e) {
+			ErrorHandler::logException($e, "Invalid value for '" . $param . "'" . var_export($value, true));
+			throw $e;
+		}
 	}
 
 	/**

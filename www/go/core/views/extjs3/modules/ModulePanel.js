@@ -1,5 +1,11 @@
 go.modules.ModulePanel = Ext.extend(Ext.Panel, {
 
+	title: '',
+	setTitle(title, _iconCls){
+		this.title = title;
+		this.fireEvent('titlechange', this, title);
+		return this;
+	},
 	/**
 	 * When the module name is routed. Eg. "notes" then this function is called.
 	 */

@@ -6,11 +6,11 @@ use go\core\orm\Mapping;
 
 class AHasOne extends \go\core\orm\Property {
 	
-	protected $id;
+	protected ?int $id;
 	
-	protected $aId;
+	protected ?int $aId;
 	
-	public $propA;
+	public string $propA;
 	
 	protected static function defineMapping(): Mapping
 	{

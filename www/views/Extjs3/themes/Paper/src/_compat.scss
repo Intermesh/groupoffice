@@ -8,16 +8,16 @@ $bg: bg;
 	#{$property}: var(--#{$varName});
 }
 
-$cPrimary:		var(--c-primary);
-$cPrimaryTp:	var(--c-primary-tp);
+$cPrimary:		var(--fg-main);
+$cPrimaryTp:	var(--fg-main-tp);
 $cHeaderBg: 	var(--c-header-bg);
-$cSecondary: 	var(--c-secondary);
-$cTertiary: 	var(--c-tertiary);
+$cSecondary: 	var(--c-primary);
+$cTertiary: 	var(--c-secondary);
 $cAccent: 		var(--c-accent);
 $cAccentTp:		var(--c-accent-tp);
 
-$cSelected: 	color($bg, 'selected'); // click on menus, tree items, table
-$cHover: 		color($bg, 'hover') !default;
+$cSelected: 	var(--bg-selected); // click on menus, tree items, table
+$cHover: 		var(--bg-hover) !default;
 $cAnchor: 		$cPrimary !default;
 
 $cDanger:		#E53935 !default;

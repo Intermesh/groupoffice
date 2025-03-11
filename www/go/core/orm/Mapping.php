@@ -3,6 +3,7 @@
 namespace go\core\orm;
 
 use Exception;
+use go\core\db\Col;
 use go\core\db\Column;
 use go\core\db\Query;
 use go\core\db\Table;
@@ -73,6 +74,9 @@ class Mapping {
 	/**
 	 * Adds a table to the model
 	 *
+	 * Note: If two tables both have a primary key column with a distinct value the name must be different. If they share
+	 * the same ID it's possible to use the same name.
+	 *
 	 * @param string $name The table name
 	 * @param string|null $alias The table alias to use in the queries
 	 * @param array|null $keys [thiscol => targetcol] If null then it's assumed the key name is identical in
@@ -97,8 +101,8 @@ class Mapping {
 	}
 
 
-	private function internalAddTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = []) {
-		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues);
+	private function internalAddTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = [], bool $isUserTable = false) {
+		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues,  $isUserTable);
 		$this->tables[$name]->dynamic = $this->dynamic;
 		foreach($this->tables[$name]->getMappedColumns() as $col) {
 			$col->dynamic = $this->dynamic;
@@ -126,11 +130,10 @@ class Mapping {
    * @param string[] $constantValues
    * @return Mapping
    */
-	public function addUserTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = []): Mapping
+	public function addUserTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = [], $required = false): Mapping
 	{
-		$table = $this->internalAddTable($name, $alias, $keys, $columns, $constantValues);
-		$table->isUserTable = true;
-
+		$table = $this->internalAddTable($name, $alias, $keys, $columns, $constantValues, true);
+		$table->required = $required;
 		$this->hasUserTable = true;
 
 		if(!Table::getInstance($name)->getColumn('modSeq')) {
@@ -328,6 +331,41 @@ class Mapping {
 		$this->relations[$name]->dynamic = $this->dynamic;
 		return $this;
 	}
+
+	private array $scalarProperties = [];
+
+	/**
+	 * Add a dynamic property in {@see Property::EVENT_MAPPING}. This is needed when querying additional columns
+	 * using {@see Mapping::addQuery()}.
+	 *
+	 * @param string $name
+	 * @param string $type
+	 * @return $this
+	 */
+	public function addScalarProperty(string $name, string $type = 'varchar'): static
+	{
+		$col = new Column();
+		$col->dynamic = true;
+		$col->name = $name;
+		$col->dbType = strtolower($type);
+
+		$this->scalarProperties[$name] = $col;
+
+		return $this;
+	}
+
+	/**
+	 * Get the dynamic properties added with {@see addScalarProperty()}
+	 *
+	 * @return array
+	 */
+	public function getScalarProperties() : array {
+		return $this->scalarProperties;
+	}
+
+	public function getScalarProperty($name): ?Column {
+		return $this->scalarProperties[$name] ?? null;
+	}
 	
 	/**
 	 * Get all relational properties
@@ -473,7 +511,7 @@ class Mapping {
 	 */
 	public function hasProperty(string $name): bool
 	{
-		return $this->getRelation($name) != false || $this->getColumn($name) != false;
+		return $this->getProperty($name) != false;
 	}
 
 	/**
@@ -489,6 +527,11 @@ class Mapping {
 		}
 
 		$col = $this->getColumn($name);
+		if($col) {
+			return $col;
+		}
+
+		$col = $this->getScalarProperty($name);
 		if($col) {
 			return $col;
 		}
@@ -513,6 +556,10 @@ class Mapping {
 		
 		foreach($this->getRelations() as $relation) {
 			$props[$relation->name] = $relation;
+		}
+
+		foreach($this->getScalarProperties() as $col) {
+			$props[$col->name] = $col;
 		}
 		
 		return $props;

@@ -145,8 +145,9 @@ class EntityType implements ArrayableInterface {
 			try {
 				go()->getDbConnection()->insert('core_entity', $record)->execute();
 			} catch(DbException $e) {
-				ErrorHandler::log("Failed to register new entity type for class '$className'.");
-				go()->debug($c);
+				// maybe cache is out of date. Delete it for next attempt.
+				go()->getCache()->delete('entity-types');
+				ErrorHandler::logException($e, "Failed to register new entity type for class '$className'.");
 				throw $e;
 			}
 			$record['id'] = go()->getDbConnection()->getPDO()->lastInsertId();

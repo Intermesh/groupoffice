@@ -7,6 +7,7 @@ use Exception;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\model\Acl;
+use go\core\model\Alert;
 use go\core\model\Client;
 use go\core\model\CronJobSchedule;
 use go\core\model\OauthAccessToken;
@@ -55,6 +56,7 @@ class GarbageCollection extends CronJob {
 		$this->change();
 		$this->links();
 		$this->acls();
+		$this->alerts();
 
 		Token::collectGarbage();
 		OauthAccessToken::collectGarbage();
@@ -80,6 +82,12 @@ class GarbageCollection extends CronJob {
 		foreach($garbage as $item) {
 			$item->delete();
 		}
+	}
+
+	private function alerts() {
+		go()->debug("Cleaning up stale Alerts");
+		Alert::delete(Alert::findStale());
+		go()->debug("Deleted " . (isset(Alert::$lastDeleteStmt) ? Alert::$lastDeleteStmt->rowCount() : 0) . " stale alerts");
 	}
 
 	private function blobs() {

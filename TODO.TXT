@@ -46,8 +46,22 @@ x Billing module refactor
         - PTR record for server IP is set
         - Perhaps black list check?
      x flush cache on password change: doveadm auth cache flush <USER> (NIET NODIG!)
+     - unbound dep?
+     x fts: https://github.com/Intermesh/groupoffice/issues/762#issuecomment-1997097362
+
+- unbound or bind9?
     x unbound or bind9?
     x master user: https://doc.dovecot.org/configuration_manual/authentication/master_users/
+
+    x quota / usage in DB:
+    https://doc.dovecot.org/configuration_manual/quota/quota_count/#quota-backend-count
+    https://doc.dovecot.org/configuration_manual/quota/quota_dict/#quota-backend-dict
+
+    - Autoconfig: https://github.com/smartlyway/email-autoconfig-php/blob/master/README.md
+        https://docs.iredmail.org/iredmail-easy.autoconfig.autodiscover.html#setup-dns-record-for-autoconfig
+        https://github.com/mailcow/mailcow-dockerized/blob/master/data/web/autodiscover.php
+
+    x Autoexpunge: https://dovecot.org/mailman3/hyperkitty/list/dovecot@dovecot.org/thread/HDJ4D5KJJLMNL7K4ALNGA2AFIG2KE37L/
 
 - Rocket chat
     - Live chat on sites feed back into GO

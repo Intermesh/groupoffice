@@ -28,11 +28,9 @@ use Sabre\DAVACL\PrincipalBackend\AbstractBackend;
 
 class PrincipalBackend extends AbstractBackend {
 
-	private array $users;
-
 	private function modelToDAVUser(User $user) {
 
-		return array(
+		$data = array(
 				'id' => $user->id,
 				'uri' => 'principals/' . $user->username,
 				'{DAV:}displayname' => $user->displayName,
@@ -41,7 +39,10 @@ class PrincipalBackend extends AbstractBackend {
 				'{urn:ietf:params:xml:ns:caldav}schedule-inbox-URL' => new Href('principals/' . $user->username . '/inbox'),
 				'{urn:ietf:params:xml:ns:caldav}schedule-outbox-URL' => new Href('principals/' . $user->username . '/outbox')
 		);
+
+		return $data;
 	}
+	private $users;
 
 	/**
 	 * Returns a list of principals based on a prefix.
@@ -81,18 +82,15 @@ class PrincipalBackend extends AbstractBackend {
 	 * getPrincipalsByPrefix. 
 	 * 
 	 * @param string $path 
-	 * @return array 
+	 * @return array | void
 	 */
 	public function getPrincipalByPath($path) {
 
-		//path can be principals/username or
-		//principals/username/calendar-proxy-write
-		//we ignore principals and the second element is our username.
+		// path can be principals/username or
+		// principals/username/calendar-proxy-write
+		// we ignore principals and the second element is our username.
 
 		$pathParts = explode('/', $path);
-
-		//var_dump($pathParts);
-
 
 		$username = $pathParts[1];
 
@@ -101,14 +99,15 @@ class PrincipalBackend extends AbstractBackend {
 		$user = User::find(['id', 'username', 'displayName', 'email'])->where('username', '=', $username)->single();
 		if (!$user) {
 			return;
-		} elseif (isset($pathParts[2])) {
-			return array(
-					'uri' => $path,
-					'{DAV:}displayname' => $pathParts[2]
-			);
-		} else {
-			return $this->modelToDAVUser($user);
 		}
+		if (isset($pathParts[2])) {
+			return [
+				'uri' => $path,
+				'{DAV:}displayname' => $pathParts[2]
+			];
+		}
+		return $this->modelToDAVUser($user);
+
 	}
 
 	/**
@@ -119,7 +118,7 @@ class PrincipalBackend extends AbstractBackend {
 	 */
 	public function getGroupMemberSet($principal) {
 		go()->debug("getGroupMemberSet($principal)");
-		return array();
+		return [];
 	}
 
 	/**
@@ -130,8 +129,7 @@ class PrincipalBackend extends AbstractBackend {
 	 */
 	public function getGroupMembership($principal) {
 		go()->debug("getGroupMemberSet($principal)");
-
-		return array();
+		return [];
 	}
 
 	/**

@@ -1,9 +1,9 @@
 <?php
-
-$bodyCls = $bodyCls ?? 'go-page';
-$loadExt = $loadExt ?? false;
-$loadGoui = $loadGoui ?? false;
-require(go\core\webclient\Extjs3::get()->getBasePath().'/views/Layout.php');?>
+$client = go\core\webclient\Extjs3::get();
+$client->loadExt ??= false;
+$client->bodyCls = 'go-page';
+$client->loadGoui ??=  false;
+require($client->getBasePath().'/views/Layout.php');?>
 
 <header>
     <div class="go-app-logo"></div>

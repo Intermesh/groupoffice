@@ -1,0 +1,106 @@
+{
+  "holidays": {
+    "LU": {
+      "names": {
+        "fr": "Luxembourg",
+        "en": "Luxembourg",
+        "de": "Luxemburg",
+        "lb": "Lëtzebuerg",
+        "pt": "Luxemburgo"
+      },
+      "langs": [
+        "fr",
+        "de",
+        "lb"
+      ],
+      "zones": [
+        "Europe/Luxembourg"
+      ],
+      "days": {
+        "01-01": {
+          "_name": "01-01"
+        },
+        "01-23": {
+          "_name": "National Holiday",
+          "active": [
+            {
+              "from": "1947-08-08",
+              "to": "1961-12-23"
+            }
+          ]
+        },
+        "easter -2": {
+          "_name": "easter -2",
+          "type": "observance"
+        },
+        "easter": {
+          "_name": "easter",
+          "type": "observance"
+        },
+        "easter 1": {
+          "_name": "easter 1",
+          "active": [
+            {
+              "from": "1892-02-16"
+            }
+          ]
+        },
+        "05-01": {
+          "_name": "05-01",
+          "name": {
+            "fr": "1er mai"
+          },
+          "active": [
+            {
+              "from": "1946-04-23"
+            }
+          ]
+        },
+        "05-09": {
+          "_name": "05-09",
+          "active": [
+            {
+              "from": "2019-01-01"
+            }
+          ]
+        },
+        "easter 39": {
+          "_name": "easter 39"
+        },
+        "easter 50": {
+          "_name": "easter 50",
+          "active": [
+            {
+              "from": "1892-02-16"
+            }
+          ]
+        },
+        "06-23": {
+          "_name": "National Holiday",
+          "active": [
+            {
+              "from": "1961-12-23"
+            }
+          ]
+        },
+        "08-15": {
+          "_name": "08-15"
+        },
+        "11-01": {
+          "_name": "11-01"
+        },
+        "12-25": {
+          "_name": "12-25"
+        },
+        "12-26": {
+          "_name": "12-26",
+          "active": [
+            {
+              "from": "1892-02-16"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

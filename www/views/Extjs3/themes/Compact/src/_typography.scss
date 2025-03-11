@@ -19,12 +19,12 @@ $font-weight-l: 100;
 }
 %font-menu {
 	font-size: sp(16);
-	font-weight: 600;
+	font-weight: 500;
 	letter-spacing: -0.1px;
 }
 %font-body1 {
 	font-size: sp(16);
-	color: color($fg, 'text');
+	color: var(--fg-text);
 	font-weight: $font-weight-r;
 	line-height: dp(24);
 	.primary & { color: white; }
@@ -49,7 +49,7 @@ $font-weight-l: 100;
 	font-size: sp(12);
 	line-height: sp(16);
 	font-weight: $font-weight-m;
-	color: color($fg, 'secondary-text');
+	color: var(--fg-secondary-text);
 }
 
 %font-subheading {
@@ -63,13 +63,13 @@ $font-weight-l: 100;
 %font-label {
 	font-size: sp(13);
 	line-height: dp(16);
-	color: color($fg, 'secondary-text');
+	color: var(--fg-secondary-text);
 	font-weight: $font-weight-r;
 }
 
 %font-subheading-dense {
 	font-size: sp(13);
-	color: color($fg, 'secondary-text');
+	color: var(--fg-secondary-text);
 	font-weight: $font-weight-r;
 }
 

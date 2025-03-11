@@ -44,10 +44,11 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 				fields: [
 					'id',
 					'name',
+					'color',
 					{name: "group", type: "relation", mapping: "group.name"}
 				],
 				entityStore: this.support ? "SupportList" : "Tasklist",
-				filters: {role: {role: 'list'}},
+				filters: {role: {role: 'list'}, subscribed: {isSubscribed:true}},
 				sortInfo: {
 					field: 'name',
 					direction: 'ASC'
@@ -58,7 +59,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 				{
 					itemId: "edit",
 					iconCls: 'ic-edit',
-					text: t("Edit"),
+					text: t("Edit")+'…',
 					handler: function() {
 						var dlg = new go.modules.community.tasks.TasklistDialog({entityStore: this.support ? "SupportList" : "TaskList"});
 						dlg.load(this.moreMenu.record.id).show();
@@ -67,7 +68,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 				},{
 					itemId: "delete",
 					iconCls: 'ic-delete',
-					text: t("Delete"),
+					text: t("Delete")+'…',
 					handler: function() {
 						Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
 							if (btn != "yes") {
@@ -77,6 +78,13 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 						}, this);
 					},
 					scope: this
+				},'-',
+				{
+					text: t('Unsubscribe'),
+					iconCls: 'ic-remove-circle',
+					handler: () => {
+						this.store.entityStore.save({isSubscribed: false}, this.moreMenu.record.id);
+					}
 				}
 			],
 

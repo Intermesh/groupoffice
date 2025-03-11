@@ -122,6 +122,12 @@ final class Oauth2Client extends EntityController
 
 		$default = model\DefaultClient::findById($client->defaultClientId);
 
+
+		if(empty($default->imapHost)) {
+			header("Location: " . go()->getSettings()->URL);
+			exit();
+		}
+
 		//old framework code here
 		$account = \GO\Email\Model\Account::model()->findSingleByAttributes(array(
 			'host' => $default->imapHost,
@@ -210,8 +216,11 @@ final class Oauth2Client extends EntityController
 
 			$account = \GO\Email\Model\Account::model()->findByPk($accountId);
 			$account->createDefaultFolders();
-			if(method_exists($token, "getIdTokenClaims") && isset($token->getIdTokenClaims()['email']) && $account->smtp_username != $token->getIdTokenClaims()['email']) {
+			if(method_exists($token, "getIdTokenClaims") && !empty($token->getIdTokenClaims()['email']) && $account->smtp_username != $token->getIdTokenClaims()['email']) {
 				$account->smtp_username = $token->getIdTokenClaims()['email'];
+				$account->save();
+			} else if(empty($account->smtp_username)) {
+				$account->smtp_username = $account->username;
 				$account->save();
 			}
 			//$ownerDetails = $provider->getResourceOwner($token);
@@ -325,7 +334,7 @@ final class Oauth2Client extends EntityController
 		// Google can do it in one.
 		$provider = $client->getProvider(['openid', 'profile', 'email']);
 		$url = $provider->getAuthorizationUrl([
-//			"prompt" => "consent"
+			"scope" => ['openid', 'profile', 'email'],
 		]);
 
 		//$url .= '&login_hint=MSchering@txg8h.onmicrosoft.com';

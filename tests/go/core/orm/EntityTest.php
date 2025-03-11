@@ -24,6 +24,12 @@ class EntityTest extends TestCase {
 		$this->assertEquals(0, $stmt->rowCount());
 	}
 
+	public function testDefaultValueFromDB() {
+		$entity = new B();
+
+		$this->assertEquals("test", $entity->propC);
+	}
+
 	public function testCreate() {
 
 		$entity = new B();
@@ -74,7 +80,7 @@ class EntityTest extends TestCase {
 
 		$this->assertEquals(2, $count);
 	}
-	private function internalTestMap() {
+	public function internalTestMap() {
 		$a1 = new A();
 		$a1->propA = 'map-' . uniqid();
 		$success = $a1->save();
@@ -120,6 +126,8 @@ class EntityTest extends TestCase {
 		$a1 = A::findById($a1->id);
 
 		$this->assertEquals(1, count($a1->map));
+
+		return $a1;
 
 	}
 	

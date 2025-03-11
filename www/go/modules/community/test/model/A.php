@@ -17,43 +17,46 @@ class A extends Entity {
 	/**
 	 * The primary key
 	 * 
-	 * @var int 
+	 *
 	 */
-	public $id;
+	public ?int $id;
 	
 
 	/**
 	 *
 	 * @var DateTime
 	 */
-	public $createdAt;
+	public DateTime $createdAt;
 	
 	/**
 	 *
 	 * @var DateTime
 	 */
-	public $modifiedAt;
+	public DateTime $modifiedAt;
 	
 	/**
 	 *
 	 * @var string
 	 */
-	public $propA;
+	public string $propA;
 	
 	/**
 	 *
 	 * @var AHasMany[] $hasMany The has many property models
 	 */
-	public $hasMany = [];	
+	public array $hasMany = [];
 	
 	/**
 	 *
 	 * @var AHasOne $hasOne The hasOne property model 
 	 */
-	public $hasOne;
+	public ?AHasOne $hasOne;
 
 
-	public $map;
+	/**
+	 * @var AMap[]
+	 */
+	public ?array $map;
 					
 	protected static function defineMapping(): Mapping
 	{

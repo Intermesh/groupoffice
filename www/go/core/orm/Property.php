@@ -129,6 +129,8 @@ abstract class Property extends Model {
 	 */
 	protected $owner = null;
 
+
+
 	/**
 	 * Constructor
 	 *
@@ -170,6 +172,14 @@ abstract class Property extends Model {
 	}
 
 	/**
+	 * True if the model was fetched with all of it's properties.
+	 * @return bool
+	 */
+	public function isFetchedComplete() :bool {
+		return count($this->fetchProperties) == count(static::getDefaultFetchProperties());
+	}
+
+	/**
 	 * Populate model with values from database
 	 *
 	 * Used by {@see Statement} to populate the record.
@@ -180,13 +190,22 @@ abstract class Property extends Model {
 	 */
 	public function populate(array $record): static
 	{
+		$this->populateTableRecord($record);
+		$this->initRelations();
+		if(!$this->readOnly) {
+			$this->trackModifications();
+		}
+		$this->init();
+
+		return $this;
+	}
+
+	private function populateTableRecord(array $record) : void {
 		$m = static::getMapping();
 		foreach($record as $colName => $value) {
-
 			if(str_contains($colName, '.')) {
 				$this->setPrimaryKey($colName, $value);
 			} else {
-
 				$col = $m->getColumn($colName);
 				if($col) {
 					$value = $col->castFromDb($value);
@@ -194,16 +213,39 @@ abstract class Property extends Model {
 				$this->$colName = $value;
 			}
 		}
+	}
 
-		$this->initRelations();
-
-		if(!$this->readOnly) {
-			$this->trackModifications();
+	/**
+	 * Populate the model with an existing table record.
+	 *
+	 * This function should rarely be used. It was needed for the calendar event model that exists of two tables.
+	 * A shared table between invitees and an table linking it to a calendar. When a new
+	 * meeting request comes in we have to find the existing shared record and populate the model
+	 * that might have a new calender link.
+	 *
+	 * @param string $tableAlias
+	 * @param array $record
+	 * @return void
+	 * @throws Exception
+	 */
+	public function populateTable(string $tableAlias, array $record) {
+		$tbls = static::getMapping()->getTables();
+		foreach($tbls as $tbl) {
+			// fill in the primary keys values to track if the record was new
+			if($tbl->getAlias() == $tableAlias) {
+				$pks = $tbl->getPrimaryKey();
+				foreach ($pks as $pk) {
+					if(!empty($record[$pk])) {
+						$record[$tableAlias.'.'.$pk] = $record[$pk];
+						if(!property_exists($this, $pk)) {
+							unset($record[$pk]);
+						}
+					}
+				}
+			}
 		}
 
-		$this->init();
-
-		return $this;
+		$this->populateTableRecord($record);
 	}
 
 	/**
@@ -357,6 +399,8 @@ abstract class Property extends Model {
 				{
 					$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly, $this);
 
+					//go()->debug($stmt);
+
 					$prop = $stmt->fetchAll();
 					$stmt->closeCursor();
 				}
@@ -367,22 +411,20 @@ abstract class Property extends Model {
 			case Relation::TYPE_MAP:
 
 				if(!$shouldQuery) {
-					$prop = null;
+					$prop = [];
 				} else
 				{
 					$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly, $this);
 					$prop = $stmt->fetchAll();
 					$stmt->closeCursor();
-					if(empty($prop)) {
-						$prop = null; //Set to null. Otherwise JSON will be serialized as [] instead of {}
-					}	else{
-						$o = [];
-						foreach($prop as $v) {
-							$key = $this->buildMapKey($v, $relation);
-							$o[$key] = $v;
-						}
-						$prop = $o;
+
+					$o = [];
+					foreach($prop as $v) {
+						$key = $this->buildMapKey($v, $relation);
+						$o[$key] = $v;
 					}
+					$prop = $o;
+
 				}
 
 				$this->{$relation->name} = $prop;
@@ -397,7 +439,7 @@ abstract class Property extends Model {
 					$scalar = $stmt->fetchAll();
 					$stmt->closeCursor();
 				}
-				$this->{$relation->name} = $scalar;
+				$this->{$relation->name} = array_map("strval", $scalar);
 				break;
 		}
 	}
@@ -457,10 +499,6 @@ abstract class Property extends Model {
 			foreach ($where as $field => $value) {
 				$query->andWhere($field . '= :' . $field)
 					->bind(':' . $field, $value);
-			}
-
-			if (is_a($relation->propertyName, UserProperty::class, true)) {
-				$query->andWhere('userId', '=', go()->getAuthState()->getUserId() ?? null);
 			}
 
 			if (!empty($relation->orderBy)) {
@@ -580,7 +618,7 @@ abstract class Property extends Model {
 	 * Copies all properties so isModified() can detect changes.
 	 * @throws Exception
 	 */
-	private function trackModifications(): void
+	protected function trackModifications(): void
 	{
 		foreach ($this->watchProperties() as $propName) {
 
@@ -675,18 +713,18 @@ abstract class Property extends Model {
 	 *
 	 * Note: if this logic ever changes it must be changed here too: {@see \go\core\jmap\Entity::changesQuery()}
 	 *
-	 * @return int|string|null eg. 1 or with multiple keys: "1-2"
+	 * @return string|null eg. 1 or with multiple keys: "1-2"
 	 */
 	public function id() : string|int|null {
 		if(property_exists($this, 'id')) {
-			return $this->id ?? null;
+			return isset($this->id) ? (string) $this->id : null;
 		}
 		$keys = $this->primaryKeyValues();
 		if(empty($keys)) {
 			// can we ever get here?
-			return "";
+			return null;
 		}
-		return count($keys) > 1 ? implode("-", array_values($keys)) : array_values($keys)[0];
+		return count($keys) > 1 ? implode("-", array_values($keys)) : (string) array_values($keys)[0];
 	}
 
 	/**
@@ -698,42 +736,23 @@ abstract class Property extends Model {
 		return ["modifiedBy", "createdAt", "createdBy", "modifiedAt"];
 	}
 
-  /**
-   * @inheritDoc
-   */
-	public static function getApiProperties(): array
+	public static function buildApiProperties(bool $forDocs = false): array
 	{
-		$cls = static::class;
+		$props = parent::buildApiProperties($forDocs);
 
-		//this function is called many times. This seems to have a slight performance benefit
-//		if(isset(self::$apiProperties[$cls])) {
-//			return self::$apiProperties[$cls];
-//		}
-
-		$cacheKey = 'property-getApiProperties-' . $cls;
-
-		$props = go()->getCache()->get($cacheKey);
-
-		if(!$props) {
-			$props = parent::getApiProperties();
-
-			//add dynamic relations		
-			foreach(static::getMapping()->getProperties() as $propName => $type) {
-				//do property_exists because otherwise it will add protected properties too.
-				if(!isset($props[$propName])) {
-					$props[$propName] = ['setter' => false, 'getter' => false, 'access' => self::PROP_PUBLIC, 'dynamic' => true];
-				}
-				$props[$propName]['db'] = true;
+		//add dynamic relations
+		foreach(static::getMapping()->getProperties() as $propName => $type) {
+			//do property_exists because otherwise it will add protected properties too.
+			if(!isset($props[$propName])) {
+				$props[$propName] = ['setter' => false, 'getter' => false, 'access' => self::PROP_PUBLIC, 'dynamic' => true, "description" => ""];
 			}
-
-			if(method_exists(static::class, 'getCustomFields')) {
-				$props['customFields'] = ['setter' => true, 'getter' => true, 'access' => null];
-			}
-
-			go()->getCache()->set($cacheKey, $props);
+			$props[$propName]['db'] = true;
 		}
 
-//		self::$apiProperties[$cls] = $props;
+		if(method_exists(static::class, 'getCustomFields')) {
+			$props['customFields'] = ['setter' => true, 'getter' => true, 'access' => null, "description" => ""];
+		}
+
 		return $props;
 	}
 
@@ -804,11 +823,15 @@ abstract class Property extends Model {
 		}
 		//this is a primary key value. See buildSelect()
 		$alias = substr($name, 0, $pos);
-		$col = substr($name, $pos + 1);
+		$colName = substr($name, $pos + 1);
+		$column = static::getMapping()->getColumn($colName);
+		if($column) {
+			$value = $column->castFromDb($value);
+		}
 		if(!isset($this->primaryKeys[$alias])) {
 			$this->primaryKeys[$alias] = [];
 		}
-		$this->primaryKeys[$alias][$col] = $value;
+		$this->primaryKeys[$alias][$colName] = $value;
 
 		return true;
 	}
@@ -829,7 +852,7 @@ abstract class Property extends Model {
 	 	 */
 	public static function atypicalApiProperties(): array
 	{
-		return ['modified', 'oldValues', 'validationErrors', 'modifiedCustomFields', 'validationErrorsAsString', 'searchDescription', 'returnAsText', 'dontChangeModifiedAt'];
+		return ['modified', 'oldValues', 'validationError', 'validationErrors', 'modifiedCustomFields', 'validationErrorsAsString', 'searchDescription', 'returnAsText', 'dontChangeModifiedAt', 'values', 'value', 'customFieldsJSON'];
 	}
 
 	/**
@@ -866,11 +889,12 @@ abstract class Property extends Model {
 	 * @param array $fetchProperties
 	 * @param bool $readOnly
 	 * @param Property|null $owner When finding relations the owner or parent Entity / Property is passed so the children can access it.
+	 * @param int|null $userId Join user tables as this user
 	 * @return Query<$this>
-	 * @noinspection PhpReturnDocTypeMismatchInspection
 	 * @throws Exception
 	 */
-	protected static function internalFind(array $fetchProperties = [], bool $readOnly = false, Property $owner = null) {
+	protected static function internalFind(array $fetchProperties = [], bool $readOnly = false, Property $owner = null, ?int $userId = null): Query
+	{
 
 		$tables = self::getMapping()->getTables();
 
@@ -894,7 +918,7 @@ abstract class Property extends Model {
 			$query->mergeWith($mappedQuery);
 		}
 
-		self::joinAdditionalTables($tables, $query);
+		self::joinAdditionalTables($tables, $query, $userId);
 		self::buildSelect($query, $fetchProperties, $readOnly);
 
 		return clone $query;
@@ -997,7 +1021,8 @@ abstract class Property extends Model {
 				}
 			}
 
-			//also select primary key values separately to check if tables were new when saving. They are stored in $this->primaryKeys when they go through the __set function.
+			//also select primary key values separately to check if tables were new when saving. They are stored in
+			// $this->primaryKeys when they go through the __set function.
 			if(!$readOnly) {
 				foreach($table->getPrimaryKey() as $pk) {
 					//$query->select("alias.id AS `alias.userId`");
@@ -1015,31 +1040,34 @@ abstract class Property extends Model {
 
 	}
 
-  /**
-   *
-   * It's not possible to use fetchproperties to determine if they need to be joined. Because the props
-   * can also be used in the where or order by part of the query.
-   *
-   * @param array $tables
-   * @param Query $query
-   *
-   */
-	private static function joinAdditionalTables(array $tables, Query $query) {
+	/**
+	 *
+	 * It's not possible to use fetchproperties to determine if they need to be joined. Because the props
+	 * can also be used in the where or order by part of the query.
+	 *
+	 * @param array $tables
+	 * @param Query $query
+	 * @param int|null $userId
+	 */
+	private static function joinAdditionalTables(array $tables, Query $query, ?int $userId): void
+	{
 		$first = array_shift($tables);
 
 		$alias = $first->getAlias();
 		foreach ($tables as $joinedTable) {
-			static::joinTable($alias, $joinedTable, $query);
+			static::joinTable($alias, $joinedTable, $query, $userId);
 			$alias = $joinedTable->getAlias();
 		}
 	}
 
-  /**
-   * @param $lastAlias
-   * @param MappedTable $joinedTable
-   * @param Query $query
-   */
-	private static function joinTable($lastAlias, MappedTable $joinedTable, Query $query) {
+	/**
+	 * @param $lastAlias
+	 * @param MappedTable $joinedTable
+	 * @param Query $query
+	 * @param int|null $userId
+	 */
+	private static function joinTable($lastAlias, MappedTable $joinedTable, Query $query, ?int $userId): void
+	{
 
 		$on = "";
 		foreach ($joinedTable->getKeys() as $from => $to) {
@@ -1047,11 +1075,11 @@ abstract class Property extends Model {
 				$on .= " AND ";
 			}
 
-			if(strpos($from, '.') === false) {
+			if(!str_contains($from, '.')) {
 				$from = $lastAlias . "." . $from;
 			}
 
-			if(strpos($to, '.') === false) {
+			if(!str_contains($to, '.')) {
 				$to = $joinedTable->getAlias() . "." . $to;
 			}
 
@@ -1059,18 +1087,22 @@ abstract class Property extends Model {
 		}
 
 		if($joinedTable->isUserTable) {
-			if(!go()->getUserId()) {
-				//throw new \Exception("Can't join user table when not authenticated");
+
+			if($userId == null) {
+				$userId = go()->getUserId();
+			}
+
+			if($userId == null) {
 				go()->debug("Can't join user table when not authenticated");
 				return;
 			}
-			$on .= " AND " . $joinedTable->getAlias() . ".userId = " . go()->getUserId();
+			$on .= " AND " . $joinedTable->getAlias() . ".userId = " . $userId;
 		}
 
 		if(!empty($joinedTable->getConstantValues())) {
 			$on = Criteria::normalize($on)->andWhere($joinedTable->getConstantValues());
 		}
-		$query->join($joinedTable->getName(), $joinedTable->getAlias(), $on, "LEFT");
+		$query->join($joinedTable->getName(), $joinedTable->getAlias(), $on, $joinedTable->required ? 'INNER' : 'LEFT');
 	}
 
 	/**
@@ -1226,9 +1258,10 @@ abstract class Property extends Model {
 	 * Only database columns and relations are tracked. Not the getters and setters.
 	 *
 	 * @param array|string $properties If empty then all properties are checked.
-	 * @return boolean
+	 * @return boolean|array
 	 */
-	public function isModified($properties = []) {
+	public function isModified(array|string $properties = []): bool|array
+	{
 		return $this->internalGetModified($properties, true);
 	}
 
@@ -1309,6 +1342,9 @@ abstract class Property extends Model {
 
 			if($bHasAI && !$aHasAI) {
 				return 1;
+			}
+			if($aHasAI && $bHasAI) {
+				return 1; // do B First as A is likely the primary table linking a data table
 			}
 
 			return 0;
@@ -1475,9 +1511,6 @@ abstract class Property extends Model {
    */
 	private function saveRelatedArray(Relation $relation): bool
 	{
-
-
-
 		$modified = $this->getModified([$relation->name]);
 		if(empty($modified)) {
 			return true;
@@ -1603,7 +1636,8 @@ abstract class Property extends Model {
 	 * @param Property $model
 	 * @throws Exception
 	 */
-	private static function arrayContains(array $models, self $model) {
+	private static function arrayContains(array $models, self $model): bool
+	{
 		foreach($models as $m) {
 			if($m->equals($model)) {
 				return true;
@@ -1687,7 +1721,7 @@ abstract class Property extends Model {
 
 			//Check for invalid input
 			if(!($newProp instanceof Property)) {
-				throw new Exception("Invalid value given for '". $relation->name ."'. Should be a GO\Orm\Property");
+				throw new Exception("Invalid value given for '". $relation->name ."'. Should be a go\core\orm\Property");
 			}
 
 			$this->applyRelationKeys($relation, $newProp);
@@ -1696,7 +1730,9 @@ abstract class Property extends Model {
 			// Fixed it by recognizing _NEW_* as a map key that should not be applied as property
 			foreach ($this->mapKeyToValues($mapKey, $relation) as $propName => $value) {
 				if(empty($newProp->$propName)) {
-					$newProp->$propName = $value;
+					// normalize input here. In some cases a DateTime object can be used as key
+					$col = $newProp::getMapping()->getColumn($propName);
+					$newProp->$propName = $col->normalizeInput($value);
 				}
 			}
 
@@ -1770,7 +1806,8 @@ abstract class Property extends Model {
 	 * @param array $record
 	 * @throws DbException
 	 */
-	protected function insertTableRecord(Table $table, array $record) {
+	protected function insertTableRecord(Table $table, array $record): void
+	{
 		$stmt = go()->getDbConnection()->insert($table->getName(), $record);
 		$stmt->execute();
 	}
@@ -1783,7 +1820,8 @@ abstract class Property extends Model {
 	 * @param Query $query
 	 * @throws DbException
 	 */
-	protected function updateTableRecord(Table $table, array $record, Query $query) {
+	protected function updateTableRecord(Table $table, array $record, Query $query): void
+	{
 		$stmt = go()->getDbConnection()->update($table->getName(), $record, $query);
 		$stmt->execute();
 	}
@@ -1838,13 +1876,13 @@ abstract class Property extends Model {
 					$modifiedForTable[$to] = $this->{$from} ?? null;
 				}
 
-				if($table->isUserTable || $this instanceof UserProperty) {
+				if($table->isUserTable || ($this instanceof UserProperty && $table->hasColumn('userId'))) {
 					$modifiedForTable["userId"] = go()->getUserId();
 				}
 
 				$this->insertTableRecord($table, $modifiedForTable);
 
-				$this->handleAutoIncrement($table, $modified);
+				$aiID = $this->handleAutoIncrement($table, $modified);
 
 				//update primary key data for new state
 				$this->primaryKeys[$table->getAlias()] = [];
@@ -1855,6 +1893,10 @@ abstract class Property extends Model {
 				}
 				if($table->isUserTable) {
 					$this->primaryKeys[$table->getAlias()]['userId'] = go()->getUserId();
+				}
+
+				if(isset($aiID)) {
+					$this->onNewAutoIncrementID($aiID);
 				}
 			} else {
 				if (empty($modifiedForTable)) {
@@ -1896,13 +1938,15 @@ abstract class Property extends Model {
 	}
 
 	/**
-	 * Get's the auto increment ID after an insert query and sets the property in this model
+	 * Gets the auto increment ID after an insert query and sets the property in this model
 	 *
 	 * @param MappedTable $table
 	 * @param array $modified
+	 * @return int|null
 	 * @throws Exception
 	 */
-	private function handleAutoIncrement(MappedTable $table, array &$modified) {
+	private function handleAutoIncrement(MappedTable $table, array &$modified): ?int
+	{
 		$aiCol = $table->getAutoIncrementColumn();
 
 		if ($aiCol) {
@@ -1913,7 +1957,21 @@ abstract class Property extends Model {
 			}
 			$modified[$aiCol->name] = [$lastInsertId, null];
 			$this->{$aiCol->name} = $lastInsertId;
+
+			return $lastInsertId;
 		}
+
+		return null;
+	}
+
+	/**
+	 * Can be overridden to do something when a new auto increment ID has been generated
+	 *
+	 * @param int $id
+	 * @return void
+	 */
+	protected function onNewAutoIncrementID(int $id) : void {
+
 	}
 
 	/**
@@ -1921,7 +1979,8 @@ abstract class Property extends Model {
 	 *
 	 * @param MappedTable $table
 	 */
-	private function rollBackAutoIncrement(MappedTable $table) {
+	private function rollBackAutoIncrement(MappedTable $table): void
+	{
 		if(!$this->recordIsNew($table)) {
 			return;
 		}
@@ -2066,6 +2125,7 @@ abstract class Property extends Model {
 		switch ($column->dbType) {
 			case 'date':
 			case 'datetime':
+			case 'localdatetime':
 				if(!($value instanceof CoreDateTime) && !($value instanceof DateTimeImmutable)){
 					$this->setValidationError($column->name, ErrorCode::MALFORMED, "No date object given for date column");
 				}
@@ -2137,35 +2197,10 @@ abstract class Property extends Model {
 			return true;
 		}
 
-		switch ($column->dbType) {
-
-			case 'int':
-			case 'tinyint':
-			case 'smallint':
-			case 'bigint':
-
-			case 'float':
-			case 'double':
-			case 'decimal':
-
-			case 'datetime':
-
-			case 'date':
-
-			case 'binary':
-				if (!isset($this->{$column->name})) {
-					$this->setValidationError($column->name, ErrorCode::REQUIRED);
-					return false;
-				}
-				break;
-			default:
-				if (empty($this->{$column->name})) {
-					$this->setValidationError($column->name, ErrorCode::REQUIRED);
-					return false;
-				}
-				break;
+		if (!isset($this->{$column->name})) {
+			$this->setValidationError($column->name, ErrorCode::REQUIRED);
+			return false;
 		}
-
 
 		return true;
 	}
@@ -2188,7 +2223,18 @@ abstract class Property extends Model {
 			$properties = $this->fetchProperties;
 		}
 
-		return parent::toArray($properties);
+		$arr = parent::toArray($properties);
+
+		// change empty maps into null so that the JSON will be null instead of []
+		foreach(static::getMapping()->getRelations() as $relation) {
+			if($relation->type == Relation::TYPE_MAP) {
+				if(array_key_exists($relation->name, $arr) && empty($arr[$relation->name])) {
+					$arr[$relation->name] = null;
+				}
+			}
+		}
+
+		return $arr;
 	}
 
   /**
@@ -2339,7 +2385,9 @@ abstract class Property extends Model {
 
 						foreach ($this->mapKeyToValues($id, $relation) as $key => $value) {
 							if (empty($this->$propName[$id]->$key)) {
-								$this->$propName[$id]->$key = $value;
+
+								$col = $this->$propName[$id]::getMapping()->getColumn($key);
+								$this->$propName[$id]->$key = $col->normalizeInput($value);
 							}
 						}
 					} else {
@@ -2368,13 +2416,12 @@ abstract class Property extends Model {
 			return [];
 		}
 
-		$values = explode("-", $id);
-
 		$cls = $relation->propertyName;
 
 		$pk = $cls::getPrimaryKey();
 
 		$diff = array_diff($pk, array_values($relation->keys));
+		$values = explode("-", $id, count($diff));
 
 		$id = [];
 		foreach($diff as $field) {
@@ -2511,6 +2558,10 @@ abstract class Property extends Model {
 
 		$keysWithAlias = [];
 		foreach($keys as $key) {
+			if(str_contains($key, '.')) {
+				$keysWithAlias[] = $key; // alias already provided
+				continue;
+			}
 			/** @noinspection PhpPossiblePolymorphicInvocationInspection */
 			$alias = static::getMapping()->getColumn($key)->table->getAlias();
 			$keysWithAlias[] = $alias . '.' . $key;
@@ -2588,7 +2639,7 @@ abstract class Property extends Model {
 		$props = $this->getApiProperties();
 
 		foreach($props as $name => $p) {
-			if(!isset($p['access']) && (!$p['getter'] || !$p['setter'])) {
+			if((!isset($p['access']) || $p['access'] == self::PROP_PUBLIC_READONLY || $p['access'] == self::PROP_PUBLIC_WRITEONLY) && (!$p['getter'] || !$p['setter'])) {
 				continue;
 			}
 
@@ -2601,7 +2652,7 @@ abstract class Property extends Model {
 			$col = static::getMapping()->getColumn($name);
 			if($col) {
 				if(!$col->autoIncrement) {
-					$v = $this->$name;
+					$v = isset($this->$name) ? $this->$name : null;
 					if(is_object($v)) {
 						$copy->$name = clone $v;
 					}	else {

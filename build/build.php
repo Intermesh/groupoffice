@@ -49,15 +49,15 @@ class Builder
 {
 	public $test = false;
 
-	private $majorVersion = "6.8";
+	private $majorVersion = "25.0";
 
-	private $gitBranch = 'master';
+	private $gitBranch = 'develop';
 
 	/**
 	 *
 	 * @var string sixsix, sixseven etc or testing
 	 */
-	public $distro = "sixeight";
+	public $distro = "testing";
 
 
 	public $repreproDir = __DIR__ . "/deploy/reprepro";
@@ -171,6 +171,9 @@ class Builder
 
 		$this->buildNodeCore();
 		$this->buildNodeModules();
+        $this->cleanupNodeCore();
+
+        cd($this->buildDir . "/" . $this->packageName);
 
         putenv("COMPOSER_ALLOW_SUPERUSER=1");
 
@@ -212,16 +215,23 @@ class Builder
         cd("../groupoffice-core");
 		run("npm ci");
 
-		cd("../");
-		run("npm ci");
-		run("npm run build");
-		run("npm prune --omit=dev");
+        cd("../");
+        run("npm ci");
+        run("npm run build");
 
-		cd("groupoffice-core");
-		run("npm prune --omit=dev");
-		cd("../goui");
-		run("npm prune --omit=dev");
 	}
+
+    private function cleanupNodeCore() {
+        cd($this->buildDir . "/" . $this->packageName);
+        cd("views/goui");
+        run("npm prune --omit=dev");
+
+        cd("groupoffice-core");
+        run("npm prune --omit=dev");
+
+        cd("../goui");
+        run("npm prune --omit=dev");
+    }
 
 
 	private function buildNodeModules()
@@ -325,10 +335,7 @@ class Builder
 		}
 
 		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/.git*');
-
-
 		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/kanban');
-		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/projects3');
 
 
 		//needs to be open source as it's used by Module files

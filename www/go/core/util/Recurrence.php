@@ -71,11 +71,14 @@ class Recurrence extends RRuleIterator {
 				$data[$key] = $this->{$key};
 			}
 		}
+		if($data['interval'] === 1) {
+			unset($data['interval']);
+		}
 		if(!empty($this->bySetPos)) {
 			$data['bySetPosition'] = $this->bySetPos;
 		}
 		if(!empty($this->until)) {
-			$data['until'] = $this->until->format($allDay ? "Ymd" : "Ymd\THis\Z");
+			$data['until'] = $this->until->format($allDay ? "Y-m-d" : "Y-m-d\TH:i:s\Z");
 		}
 		if ($this->byDay) {
 			$data['byDay'] = [];
@@ -141,7 +144,7 @@ class Recurrence extends RRuleIterator {
 	public function toString(bool $allDay = true): string
 	{
 		$rrule = ["FREQ=".strtoupper($this->frequency)];
-		if($this->interval) {
+		if(isset($this->interval) && $this->interval !== 1) {
 			$rrule[] = "INTERVAL=".$this->interval;
 		}
 		if (!empty($this->until)) {
@@ -149,9 +152,6 @@ class Recurrence extends RRuleIterator {
 		}
 		if (isset($this->count)) {
 			$rrule[] = "COUNT=" . $this->count;
-		}
-		if (isset($this->interval)) {
-			$rrule[] = "INTERVAL=" . $this->interval;
 		}
 		foreach(['byDay', 'byYearDay', 'byWeekNo', 'byMonthDay', 'byMonth', 'bySetPos'] as $k) {
 			if(!empty($this->{$k})) {

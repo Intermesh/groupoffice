@@ -72,6 +72,18 @@ class Link extends AclItemEntity
 	
 	protected $aclId;
 
+	public static function joinLinks(\go\core\db\Query $query, Entity|ActiveRecord $fromEntity, int $toEntityId) : \go\core\db\Query {
+
+		$on = $query->getTableAlias() . '.id = l.toId and l.toEntityTypeId = ' . $toEntityId;
+
+		return $query->join(
+			'core_link',
+			'l',
+			$on)
+			->andWhere('fromEntityTypeId = '. $fromEntity::entityType()->getId())
+			->andWhere('fromId', '=', $fromEntity->id);
+	}
+
 
 	public static function loggable(): bool
 	{
@@ -592,7 +604,7 @@ class Link extends AclItemEntity
 	 * @return bool
 	 * @throws SaveException
 	 */
-	public static function copyTo($from, $to): bool
+	public static function copyTo($from, $to, bool $checkExisting = true): bool
 	{
 		go()->getDbConnection()->beginTransaction();
 		try {
@@ -600,8 +612,17 @@ class Link extends AclItemEntity
 				$copy = $link->copy();
 				$copy->fromEntityTypeId = $to::entityType()->getId();
 				$copy->fromId = $to->id;
-				if (!$copy->save()) {
-					throw new SaveException($copy);
+
+				if(!$checkExisting || !Link::find(['fromEntityTypeId'])->where([
+					'fromEntityTypeId' => $copy->fromEntityTypeId,
+					'fromId' => $copy->fromId,
+					'toEntityTypeId' => $copy->toEntityTypeId,
+					'toId' => $copy->toId,
+				])->single()) {
+
+					if (!$copy->save()) {
+						throw new SaveException($copy);
+					}
 				}
 			}
 		} catch(Exception $e) {

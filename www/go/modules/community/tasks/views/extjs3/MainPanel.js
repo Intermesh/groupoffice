@@ -1,9 +1,9 @@
-/** 
+/**
  * Copyright Intermesh
- * 
+ *
  * This file is part of Group-Office. You should have received a copy of the
  * Group-Office license along with Group-Office. See the file /LICENSE.TXT
- * 
+ *
  * If you have questions write an e-mail to info@intermesh.nl
  *
  * @copyright Copyright Intermesh
@@ -423,21 +423,33 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			support: this.support,
 			split: true,
 			tbar: [{
-					xtype: 'tbtitle',
-					text: t('Lists', 'tasks','community')
-				}, '->', {
-					xtype: "tbsearch"
-				},{
-				// hidden: !go.Modules.get("community", 'tasks') || !go.Modules.get("community", 'tasks').userRights.mayChangeTasklists,
-				hidden: !this.canEditTaskLists(),
+				xtype: 'tbtitle',
+				text: t('Lists', 'tasks','community')
+			}, '->', {
+				xtype: "tbsearch"
+			},{
+				iconCls: 'ic-more-vert',
+				menu: [{
+					hidden: !this.canEditTaskLists(),
 					iconCls: 'ic-add',
-					tooltip: t('Add'),
+					text: t('Create tasklist')+'…',
 					handler: function (e, toolEl) {
 						let dlg = new go.modules.community.tasks.TasklistDialog({entityStore: this.support ? "SupportList" : "Tasklist"});
 						dlg.show();
 					},
 					scope: this
-				}],
+				},{
+					iconCls: 'ic-bookmark-added',
+					text: t('Subscribe to task list') + '…', handler: () => {
+						const dlg = new go.modules.community.tasks.SubscribeWindow({
+							support:this.support
+						});
+
+						dlg.show();
+					},
+					scope: this
+				}]
+			}],
 			listeners: {
 				afterrender: function(grid) {
 					new Ext.dd.DropTarget(grid.getView().mainBody, {
@@ -535,7 +547,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 										dlg.show();
 									})
 								} catch(e) {
-									Ext.MessageBox.alert(t("Error"), e.message);
+									GO.errorDialog.show(e);
 								} finally {
 									Ext.getBody().unmask();
 								}

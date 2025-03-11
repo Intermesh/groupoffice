@@ -87,4 +87,10 @@ return array (
   '\'"This customer doesn\'\'t have an active contract"\'' => 'Dieser Kunde hat keinen aktiven Vertrag',
   'Ticket' => 'Ticket',
   'CC' => 'CC',
+  'Create tasklist' => 'Aufgabenliste erstellen',
+  'Subscribe to task list' => 'Aufgabenliste abonnieren',
+  'Project' => 'Projekt',
+  'Unsubscribe' => 'Deabonnieren',
+  'Subscribe to Tasklist' => 'Aufgabenliste abonnieren',
+  'Subscribe' => 'Abonnieren',
 );

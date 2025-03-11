@@ -61,7 +61,7 @@ abstract class Controller {
         foreach($required as $key => $value) {
             if(is_numeric($key)) {
                 if(!array_key_exists($value, $params)) {
-                    throw new \InvalidArgumentException($key . " param is required");
+                    throw new \InvalidArgumentException("'". $value . "' param is required");
                 }
             } else{
                 if(!array_key_exists($key, $params)) {

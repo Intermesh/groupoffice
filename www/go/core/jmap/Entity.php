@@ -81,7 +81,7 @@ abstract class Entity  extends OrmEntity {
 		
 		$state .= static::getMapping()->hasUserTable  ? static::entityType()->getHighestUserModSeq() : "0";		
 
-		return $state;
+		return self::appendCacheCleared($state);
 	}
 
   /**
@@ -420,30 +420,35 @@ abstract class Entity  extends OrmEntity {
    */
 	protected static function deleteFilesFolders(Query $query): bool
 	{
-		$ids = clone $query;
+		$idsQuery = clone $query;
 		/** @noinspection PhpRedundantOptionalArgumentInspection */
-		$ids = $ids->selectSingleValue($query->getTableAlias() . '.filesFolderId')
-			->groupWhere()
-			->andWhere($query->getTableAlias() . '.filesFolderId', '!=', null)
-			->all();
+	 	$idsQuery->selectSingleValue($query->getTableAlias() . '.filesFolderId')
+		 	->groupWhere()
+			->andWhere($query->getTableAlias() . '.filesFolderId', '!=', null);
 
+		 $ids = $idsQuery->all();
+
+
+
+		return static::internalDeleteFilesFolders($ids);
+	}
+
+	protected static function internalDeleteFilesFolders(array $folderIds): bool
+	{
 		// make sure ID=0 is not there. Shouldn't be but this caused a disaster with a root folder with id=0 wiping
 		// the data
-		$ids = array_filter($ids, function($id) {
+		$folderIds = array_filter($folderIds, function($id) {
 			return !empty($id);
 		});
-
-		if(empty($ids)) {
+		if(empty($folderIds)) {
 			return true;
 		}
-
-		$folders = Folder::model()->findByAttribute('id', $ids);
+		$folders = Folder::model()->findByAttribute('id', $folderIds);
 		foreach($folders as $folder) {
 			if(!$folder->delete(true)) {
 				return false;
 			}
 		}
-
 		return true;
 	}
 
@@ -532,6 +537,8 @@ abstract class Entity  extends OrmEntity {
 	 */
 	protected static function parseState(string $state): array
 	{
+		$state = static::checkCacheCleared($state);
+
 		return array_map(function($s) {
 			
 			$modSeqAndOffset = explode("|", $s);
@@ -553,6 +560,20 @@ abstract class Entity  extends OrmEntity {
 		return implode(":", array_map(function($s) {	
 			return $s['modSeq'] . '|' . $s['offset'];			
 		},$stateArray));
+	}
+
+
+	private static function checkCacheCleared(string $state) : string {
+		$firstColon = strpos($state, ":");
+		if($firstColon === false || substr($state, 0, $firstColon) != go()->getSettings()->cacheClearedAt) {
+			throw new CannotCalculateChanges("Resync required");
+		}
+
+		return substr($state, $firstColon + 1);
+	}
+
+	private static function appendCacheCleared(string $state) : string {
+		return go()->getSettings()->cacheClearedAt . ':' . $state;
 	}
 
 

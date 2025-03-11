@@ -1,0 +1,46 @@
+{
+  "holidays": {
+    "GU": {
+      "names": {
+        "en": "Guam"
+      },
+      "dayoff": "sunday",
+      "langs": [
+        "en-us",
+        "en"
+      ],
+      "zones": [
+        "Pacific/Guam"
+      ],
+      "_days": [
+        "US"
+      ],
+      "days": {
+        "3rd monday in February": false,
+        "03-17": false,
+        "1st monday in March": {
+          "name": {
+            "en": "Guam History and Chamorro Heritage Day"
+          }
+        },
+        "easter -2": {
+          "_name": "easter -2",
+          "type": "observance"
+        },
+        "07-21 if sunday then next monday": {
+          "name": {
+            "en": "Liberation Day"
+          }
+        },
+        "11-02": {
+          "_name": "11-02"
+        },
+        "12-08 if sunday then next monday": {
+          "name": {
+            "en": "Our Lady of Camarin Day"
+          }
+        }
+      }
+    }
+  }
+}

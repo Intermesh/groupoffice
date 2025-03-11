@@ -37,6 +37,7 @@ namespace GO\Sync\Model;
 use go\core\model\Acl;
 use go\core\model\User;
 use go\modules\community\addressbook\model\AddressBook;
+use go\modules\community\calendar\model\Calendar;
 use go\modules\community\notes\model\NoteBook;
 use go\modules\community\tasks\model\TaskList;
 
@@ -68,9 +69,9 @@ class Settings extends \GO\Base\Db\ActiveRecord{
     return array(
 //				'addressbooks' => array('type'=>self::MANY_MANY, 'model'=>'GO\Addressbook\Model\Addressbook', 'field'=>'user_id', 'linkModel' => 'GO\Sync\Model\UserAddressbook'),
 //				'tasklists' => array('type'=>self::MANY_MANY, 'model'=>'GO\Tasks\Model\Tasklist', 'field'=>'user_id', 'linkModel' => 'GO\Sync\Model\UserTasklist'),
-				'calendars' => array('type'=>self::MANY_MANY, 'model'=>'GO\Calendar\Model\Calendar', 'field'=>'user_id', 'linkModel'=> 'GO\Sync\Model\UserCalendar'),
+				//'calendars' => array('type'=>self::MANY_MANY, 'model'=>'GO\Calendar\Model\Calendar', 'field'=>'user_id', 'linkModel'=> 'GO\Sync\Model\UserCalendar'),
 				//'noteCategories' => array('type'=>self::MANY_MANY, 'model'=>'GO\Notes\Model\Category', 'field'=>'user_id', 'linkModel' => 'GO\Sync\Model\UserNoteCategory'),
-				'calendar' => array('type'=>self::BELONGS_TO, 'model'=>'GO\Calendar\Model\Calendar', 'field'=>'calendar_id'),
+				//'calendar' => array('type'=>self::BELONGS_TO, 'model'=>'GO\Calendar\Model\Calendar', 'field'=>'calendar_id'),
 				'account' => array('type'=>self::BELONGS_TO, 'model'=>'GO\Email\Model\Account', 'field'=>'account_id'),
 		);
   }
@@ -99,11 +100,14 @@ class Settings extends \GO\Base\Db\ActiveRecord{
 	}
 	
 	public function getDefaultCalendar(){
-		return $this->calendars(\GO\Base\Db\FindParams::newInstance()
-			->single()
-			->criteria(\GO\Base\Db\FindCriteria::newInstance()
-					->addCondition('default_calendar',1,'=','link_t'))
-		);
+		$calendar = Calendar::find()->filter(['isSubscribed'=>true,'permissionLevel'=>Acl::LEVEL_WRITE])
+			->where('cal.ownerId', '=', go()->getAuthState()->getUserId())
+			->single();
+
+		if (!$calendar)
+			throw new Exception("FATAL: No owner subscribed writable calendar");
+
+		return $calendar;
 	}
 	
 	private $_cache;
@@ -128,15 +132,15 @@ class Settings extends \GO\Base\Db\ActiveRecord{
 				}
 			}
 
-			if (\GO::modules()->calendar) {
-				$stmt = $this->calendars();
-				if (!$stmt->rowCount()) {
-					$calendar = \GO\Calendar\Model\Calendar::model()->findSingleByAttribute('user_id', $user->id);
-					if ($calendar) {
-						$settings->addManyMany('calendars', $calendar->id, array('default_calendar' => 1));
-					}
-				}
-			}
+//			if (\GO::modules()->calendar) {
+//				$stmt = $this->calendars();
+//				if (!$stmt->rowCount()) {
+//					$calendar = \GO\Calendar\Model\Calendar::model()->findSingleByAttribute('user_id', $user->id);
+//					if ($calendar) {
+//						$settings->addManyMany('calendars', $calendar->id, array('default_calendar' => 1));
+//					}
+//				}
+//			}
 
 
 			//$newUser = User::findById($user->id, ['syncSettings', 'addressBookSettings', 'notesSettings']);
