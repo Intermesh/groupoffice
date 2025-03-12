@@ -1866,7 +1866,36 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		echo $this->render('delete', array('success'=> true, 'model' => $model));
 	}
 
+	/**
+	 * Try to restore a trashed item to its original place.
+	 *
+	 * @param array $params
+	 * @return true[]
+	 * @throws AccessDenied
+	 * @throws DbException
+	 * @throws GO\Base\Exception\NotFound
+	 * @throws \go\core\http\Exception
+	 */
 	protected function actionRestore(array $params): array
+	{
+		return $this->doTrashAction($params, "restore");
+	}
+
+	/**
+	 * Remove trashed items permanently
+	 *
+	 * @param array $params
+	 * @return true[]
+	 * @throws GO\Base\Exception\NotFound
+	 * @throws \go\core\http\Exception
+	 */
+	protected function actionDeleteFromTrash(array $params): array
+	{
+		return $this->doTrashAction($params, "deletePermanently");
+	}
+
+
+	private function doTrashAction(array $params, string $action): array
 	{
 		if (!isset($params['ids'])) {
 			throw new \go\core\http\Exception(412, "Missing ids");
@@ -1879,7 +1908,11 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				throw new \GO\Base\Exception\NotFound();
 			}
 			try {
-				$trashPanda->restore();
+				if (method_exists($trashPanda, $action)) {
+					$trashPanda->$action();
+				} else {
+					throw new \go\core\http\Exception(412, "Unknown action '$action'");
+				}
 			}
 			catch (\Exception $e) {
 				throw new \go\core\http\Exception(500, $e->getMessage());

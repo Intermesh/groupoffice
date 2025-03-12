@@ -140,4 +140,18 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 		}
 	}
 
+	public function deletePermanently(): void
+	{
+		$entityType = EntityType::findById($this->entityTypeId);
+		if ($entityType->getName() == 'File') {
+			$f = \GO\Files\Model\File::model()->findByPk($this->entityId);
+		} else {
+			$f = \GO\Files\Model\Folder::model()->findByPk($this->entityId);
+		}
+		if (isset($f)) {
+			$f->delete();
+		}
+		$this->delete();
+	}
+
 }

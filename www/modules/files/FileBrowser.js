@@ -760,7 +760,7 @@ GO.files.FileBrowser = function(config){
 							iconCls: 'ic-delete',
 							tooltip: t("Delete permanently"),
 							overflowText:t("Restore"),
-							handler: this.onDelete,
+							handler: this.onDeletePermanently,
 							scope: this,
 						}),
 						new Ext.Button({
@@ -1651,13 +1651,42 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 					ids: ids.join(",")
 				},
 				success:function(action, response, result){
-					// debugger;
 					this.trashGridPanel.store.reload();
-					// const treeNode = this.treePanel.getNodeById(this.folder_id);
-					// if (treeNode) {
-					// 	delete treeNode.attributes.children;
-					// 	treeNode.reload();
-					// }
+				},
+				scope:this
+			})
+		}
+	},
+	onDeletePermanently: function() {
+		const selected = this.trashGridPanel.getSelectionModel().getSelections();
+		let strConfirm;
+		switch (selected.length) {
+			case 0:
+				alert(t("You didn't select an item."));
+				return false;
+			case 1:
+				strConfirm =t("Are you sure you want to delete the selected item permanently?");
+				break;
+
+			default:
+				var template = new Ext.Template(
+					t("Are you sure you want to delete the {count} items permanently?")
+				);
+				strConfirm = template.applyTemplate({'count': selected.length});
+				break;
+		}
+		const ids = [];
+		for (const s of selected) {
+			ids.push(s.data.id);
+		}
+		if(confirm(strConfirm)) {
+			GO.request({
+				url:'files/folder/deleteFromTrash',
+				params:{
+					ids: ids.join(",")
+				},
+				success:function(action, response, result){
+					this.trashGridPanel.store.reload();
 				},
 				scope:this
 			})
