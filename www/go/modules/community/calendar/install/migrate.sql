@@ -524,3 +524,11 @@ GROUP BY e.calendar_id, e.resource_event_id ;
 
 
 INSERT INTO calendar_preferences (userId, weekViewGridSnap, defaultCalendarId) SELECT user_id, 15, calendar_id FROM cal_settings s JOIN core_user u ON u.id = s.user_id;
+
+-- remove all the old dead links
+DELETE l FROM core_link l
+		JOIN core_entity et ON et.id = l.fromEntityTypeId AND et.name = 'CalendarEvent'
+		LEFT JOIN cal_events e on e.id = l.fromId WHERE e.id IS NULL;
+DELETE l FROM core_link l
+	JOIN core_entity et ON et.id = l.toEntityTypeId AND et.name = 'CalendarEvent'
+	LEFT JOIN cal_events e on e.id = l.toId WHERE e.id IS NULL;
