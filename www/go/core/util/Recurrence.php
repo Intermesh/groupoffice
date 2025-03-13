@@ -65,17 +65,23 @@ class Recurrence extends RRuleIterator {
 	public function toArray(bool $allDay = true): array
 	{
 		$data = [];
-		foreach(['frequency', 'interval', 'count',
-				  'byMonth', 'byYearDay', 'byWeekNo', 'byMonthDay'] as $key) {
+		foreach(['frequency', 'interval', 'count','byMonth'] as $key) {
 			if(!empty($this->{$key})) {
 				$data[$key] = $this->{$key};
 			}
 		}
+
+		foreach(['byYearDay', 'byWeekNo', 'byMonthDay'] as $key) {
+			if(!empty($rule[$key])) {
+				$data[$key] = array_map("intval", $this->{$key});
+			}
+		}
+
 		if($data['interval'] === 1) {
 			unset($data['interval']);
 		}
 		if(!empty($this->bySetPos)) {
-			$data['bySetPosition'] = $this->bySetPos;
+			$data['bySetPosition'] = array_map("intval", $this->bySetPos);
 		}
 		if(!empty($this->until)) {
 			$data['until'] = $this->until->format($allDay ? "Y-m-d" : "Y-m-d\TH:i:s\Z");
