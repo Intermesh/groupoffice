@@ -3,11 +3,20 @@ import {
 	comp, Component, containerfield,
 	DataSourceForm,
 	datasourceform, DateInterval,
-	DateTime, DisplayField, displayfield, EntityID, Format, hr, mapfield, MaterialIcon, Notifier,
+	DateTime, DisplayField, displayfield, EntityID, fieldset, Format, hr, mapfield, MaterialIcon, menu, Notifier,
 	tbar, Toolbar,
 	Window
 } from "@intermesh/goui";
-import {client, DetailPanel, JmapDataSource, jmapds, RecurrenceField} from "@intermesh/groupoffice-core";
+import {
+	addbutton,
+	client,
+	DetailPanel,
+	JmapDataSource,
+	jmapds,
+	linkbrowserbutton,
+	RecurrenceField,
+	entities
+} from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {calendarStore, statusIcons, t} from "./Index.js";
@@ -67,11 +76,10 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 		// 	}})
 
 
-		this.toolbar.hide();
 		this.items.add(this.statusTbar);
 
+
 		this.scroller.items.add(this.form = datasourceform({
-				cls: 'flow pad',
 				flex:1,
 				dataSource: this.store,
 				listeners: {
@@ -100,71 +108,119 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 					}
 				}
 			},
-			displayfield({name: 'title',flex:1, label:t('Title')}),
-			displayfield({name: 'calendarId', width:160, label:t('Calendar'), renderer: async (v) => {
-				const c = await calendarStore.dataSource.single(v);
-				return c ? c.name : t('Unknown');
-			},listeners: {
-				'setvalue': (me, v) => {
-					if(v)
-						calendarStore.dataSource.single(v).then(r => {
-							if(!r) return;
-							this.item!.cal = r;
-							const d = this.item!.data.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
-							alertField.setDefaultLabel(d)
-						});
-				}
-			}  }),
-			comp({cls:'hbox'},
-				displayfield({label: t('Start'), name:'start',renderer:d=>Format.dateTime(d), flex:1}),
-				displayfield({label:t('End'), name: 'end',renderer:d=>Format.dateTime(d), flex:1})
-			),
-			recurrenceField,
-			displayfield({name: 'location', label:t('Location')}),
-			displayfield({name:'description', tagName: "div", cls: "pad", escapeValue: false, renderer: (v, field) => Format.textToHtml(v)}),
-			mapfield({name: 'participants',
+				comp({cls: "card flow"},
+					fieldset({},
+						displayfield({name: 'title',flex:1, label:t('Title')}),
+						displayfield({name: 'calendarId', width:160, label:t('Calendar'), renderer: async (v) => {
+							const c = await calendarStore.dataSource.single(v);
+							return c ? c.name : t('Unknown');
+						},listeners: {
+							'setvalue': (me, v) => {
+								if(v)
+									calendarStore.dataSource.single(v).then(r => {
+										if(!r) return;
+										this.item!.cal = r;
+										const d = this.item!.data.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
+										alertField.setDefaultLabel(d)
+									});
+							}
+						}  }),
+						comp({cls:'hbox'},
+							displayfield({label: t('Start'), name:'start',renderer:d=>Format.dateTime(d), flex:1}),
+							displayfield({label:t('End'), name: 'end',renderer:d=>Format.dateTime(d), flex:1})
+						),
+						recurrenceField,
+						displayfield({name: 'location', label:t('Location')}),
+						displayfield({name:'description', tagName: "div", cls: "pad", escapeValue: false, renderer: (v, field) => Format.textToHtml(v)}),
+						mapfield({name: 'participants',
 
-				buildField: (v: any) => displayfield({
-					escapeValue: false,
-					//label: v.roles.owner?'Organizer': 'Participant',
-					icon: statusIcons[v.participationStatus][0] as MaterialIcon,
-					//icon: v.roles.owner ? 'manage_accounts' : (v.name?'person':'contact_mail'),
-					renderer: (v) => {
-						//const statusIcon = statusIcons[v.participationStatus] || v.participationStatus;
-						let r = v.email;
-						// type can be You or Organizer
-						let type = '';
-						if(v.email == this.item?.calendarPrincipal?.email) {
-							type = this.item!.principalId === client.user.id ? t('You') : t('This');
-						}
-						if(v.roles.owner)
-							type = t('Organizer');
+							buildField: (v: any) => displayfield({
+								escapeValue: false,
+								//label: v.roles.owner?'Organizer': 'Participant',
+								icon: statusIcons[v.participationStatus][0] as MaterialIcon,
+								//icon: v.roles.owner ? 'manage_accounts' : (v.name?'person':'contact_mail'),
+								renderer: (v) => {
+									//const statusIcon = statusIcons[v.participationStatus] || v.participationStatus;
+									let r = v.email;
+									// type can be You or Organizer
+									let type = '';
+									if(v.email == this.item?.calendarPrincipal?.email) {
+										type = this.item!.principalId === client.user.id ? t('You') : t('This');
+									}
+									if(v.roles.owner)
+										type = t('Organizer');
 
-						if(type) type = ' ('+type+')';
+									if(type) type = ' ('+type+')';
 
-						if(v.name) {
-							r = Format.escapeHTML(v.name) + '<br>' + type;
-						} else if(type) {
-							r += '<br>' + type
-						}
-						return r; //+`<i class="icon" title="${statusIcon[1]}">${statusIcon[0]}</i>`;
-					}
-				})
-			}),
-			hr(),
-			alertField,
-			mapfield({name: 'links', cls:'goui-pit',
-				buildField: (v: any) => containerfield({flex:'1 0 100%',cls: 'flow'},
-					btn({icon: "description", text: v.title, flex:'1', style:{textAlign:'left'}, handler() {
-						client.downloadBlobId(v.blobId, v.title).catch((error) => {
-							Notifier.error(error);
+									if(v.name) {
+										r = Format.escapeHTML(v.name) + '<br>' + type;
+									} else if(type) {
+										r += '<br>' + type
+									}
+									return r; //+`<i class="icon" title="${statusIcon[1]}">${statusIcon[0]}</i>`;
+								}
+							})
+						}),
+						hr(),
+						alertField,
+						mapfield({name: 'links', cls:'goui-pit',
+							buildField: (v: any) => containerfield({flex:'1 0 100%',cls: 'flow'},
+								btn({icon: "description", text: v.title, flex:'1', style:{textAlign:'left'}, handler() {
+									client.downloadBlobId(v.blobId, v.title).catch((error) => {
+										Notifier.error(error);
+									})
+								}})
+							)
 						})
-					}})
+					)
+				)
+			)
+
+		);
+
+
+		this.addLinks();
+		this.addComments();
+		this.addCustomFields();
+
+
+		this.toolbar.items.add(
+
+			btn({
+				icon: "edit",
+				title: t("Edit"),
+				handler: (button, ev) => {
+					entities.get("CalendarEvent").goto(this.entity!.id);
+				}
+			}),
+
+			addbutton(),
+
+			linkbrowserbutton(),
+
+			btn({
+				icon: "more_vert",
+				menu: menu({},
+					btn({
+						icon: "print",
+						text: t("Print"),
+						handler: () => {
+							this.print();
+						}
+					}),
+
+					hr(),
+
+					btn({
+						icon: "delete",
+						text: t("Delete"),
+						handler: () => {
+							jmapds("CalendarEvent").confirmDestroy([this.entity!.id]);
+						}
+					})
 				)
 			})
 		)
-
-		);
 	}
 
 	private pressButton(v:'accepted'|'declined'|'tentative') {
