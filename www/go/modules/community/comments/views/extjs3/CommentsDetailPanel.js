@@ -79,12 +79,16 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		this.on("added", (cont) => {
 
 			cont.ownerCt.on("beforeload", (dv, id) => {
-				if(this.composer.textField.isDirty() && this.composer.textField.getValue() != "" && this.composer.textField.getValue() != "<br>") {
-					if(confirm(t("You have an unsaved comment. Are you sure you want to discard the comment?"))) {
-						this.composer.reset();
-						return true;
+				try {
+					if (this.composer.textField.isDirty() && this.composer.textField.getValue() != "" && this.composer.textField.getValue() != "<br>") {
+						if (confirm(t("You have an unsaved comment. Are you sure you want to discard the comment?"))) {
+							this.composer.reset();
+							return true;
+						}
+						return false;
 					}
-					return false;
+				}catch (e) {
+					console.error(e);
 				}
 			});
 		})
