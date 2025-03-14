@@ -303,7 +303,7 @@ export class EventWindow extends FormWindow {
 			})
 		);
 
-		this.bbar.items.insert(1,
+		this.bbar.items.insert(2,
 			btn({icon:'attach_file', handler: _ => this.attachFile() })
 		);
 
