@@ -247,7 +247,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 			data:this.entity!
 		}))
 
-		this.loadEvent(item);
+		await this.loadEvent(item);
 
 		return r;
 	}
@@ -277,7 +277,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 			}))
 
 		} else {
-			await super.load(ev.data.id);
+			// await super.load(ev.data.id);
 
 			this.form.findField('alerts')!.hidden = false;
 			this.form.load(ev.data.id).then(() => {
