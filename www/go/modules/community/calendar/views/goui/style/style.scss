@@ -74,6 +74,7 @@
 
 
 	i {
+		display:inline-block;
 		font-size: inherit !important;
 		color: inherit;
 		min-height: dp(16);
@@ -176,6 +177,12 @@
 }
 
 .cal {
+	i.cat {
+		background-color: currentColor;
+		border-radius: dp(3);
+		margin:dp(2);
+		vertical-align: middle;
+	}
 	i.icon {
 		display:inline-block !important;
 	}
@@ -522,6 +529,9 @@ $timeMargin: dp(72);
 		position: absolute;
 		min-height: dp(24); // big enough to click on it
 		border-left: dp(6) solid currentColor;
+		> em {
+			mask-image:none;
+		}
 		> em, > span, > i {
 			color: color-mix(in srgb, currentColor 36%, var(--fg-text));
 		}

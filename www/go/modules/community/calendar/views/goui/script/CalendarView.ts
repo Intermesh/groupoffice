@@ -64,6 +64,7 @@ export abstract class CalendarView extends Component {
 			}
 			div = E('div',
 				E('em', item.title || '('+t('Nameless')+')'),
+				...item.categoryDots,
 				...item.icons,
 				time
 			)
