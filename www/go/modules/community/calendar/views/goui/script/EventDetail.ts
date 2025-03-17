@@ -186,13 +186,14 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 		this.toolbar.items.add(
 
-			btn({
-				icon: "edit",
-				title: t("Edit"),
-				handler: (button, ev) => {
-					entities.get("CalendarEvent").goto(this.entity!.id);
-				}
-			}),
+			// btn({
+			// 	icon: "edit",
+			// 	title: t("Edit"),
+			// 	handler: (button, ev) => {
+			// 		entities.get("CalendarEvent").goto(this.entity!.id);
+			// 	}
+			// }),
+			// this might be a occurrence and we do not have an entity but a calendar item
 
 			addbutton(),
 
@@ -301,6 +302,8 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 				this.item = ev;
 			});
 		}
+		this.scroller.hidden = false;
+		this.disabled = false;
 	}
 
 }

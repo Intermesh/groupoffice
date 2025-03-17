@@ -85,10 +85,10 @@ class Category extends Entity {
 			if($value === 'subscribedOnly') {
 				$query->join('calendar_calendar_user', 'ucal', 'ucal.id = category.calendarId AND ucal.userId = '.go()->getAuthState()->getUserId(), 'LEFT');
 					$criteria
-					->where('ucal.isSubscribed','=', true)
+					->where(['ucal.isSubscribed' => true])
 					->orWhere('category.calendarId', 'IS', null);
 			} else if(!empty($value)) {
-				$criteria->andWhere('category.calendarId', '=', $value);
+				$criteria->andWhere(['category.calendarId' => $value]);
 			}
 		}, 'subscribedOnly')
 			->add('ownerId', function(Criteria $criteria, $value) {
