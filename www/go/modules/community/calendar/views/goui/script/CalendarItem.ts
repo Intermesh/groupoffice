@@ -229,8 +229,7 @@ export class CalendarItem {
 
 	get categoryDots() {
 		for (const cat of this.categories) {
-
-			return [E('i').cls('cat').css({color: '#'+cat.color})];
+			return [E('i').cls('cat').attr('title',cat.name).css({color: '#'+cat.color})];
 		}
 		return [];
 	}
