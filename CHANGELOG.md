@@ -3,6 +3,7 @@
 - Contracts: Decimals for contract items
 - Finance: Link not created to document when creating from another item using the + menu.
 - Core: fix preventing deleting system groups
+- Leavedays: fix calculation for spent special budget hours
 
 10-03-2024 6.8.109
 - Finance:fix handler 'add from catalog' button when switching invoices
