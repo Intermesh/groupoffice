@@ -162,7 +162,7 @@ export class CalendarList extends Component {
 					}}),
 					hr(),
 					btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
-						jmapds('Calendar').update(data.id, {isSubscribed: false});
+						jmapds('Calendar').update(data.id, {isSubscribed: false}).catch(e => Window.error(e))
 					}}),
 					hr(),
 					btn({icon:'file_save',hidden:data.groupId, text: t('Export','core','core'), handler: _ => { client.getBlobURL('community/calendar/calendar/'+data.id).then(window.open) }}),
