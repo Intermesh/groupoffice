@@ -690,7 +690,7 @@ abstract class Entity  extends OrmEntity {
   /**
    * Get all user property names.
    *
-   * User properties can vary between users. For example "starred" of a contact
+   * User properties belong to users and can be different between users. For example "starred" of a contact
    * can be different between users.
    *
    * @return string[]
