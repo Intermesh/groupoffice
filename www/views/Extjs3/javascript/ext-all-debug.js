@@ -11701,7 +11701,7 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
     
     afterRender : Ext.emptyFn,
 
-    
+
     destroy : function(){
         if(!this.isDestroyed){
             if(this.fireEvent('beforedestroy', this) !== false){
@@ -11729,6 +11729,8 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
             }
         }
     },
+
+	remove: function(){this.destroy()}, // alias for goui
 
     deleteMembers : function(){
         var args = arguments;
