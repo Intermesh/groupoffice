@@ -1,5 +1,8 @@
 - E_mail: Save mail as project
 - E-mail: Save mail as appointment
+- Calendar: Create and browse links from event dialog
+- Calendar: Fixed unsubscribe from calendar
+- Core: Color picker render issue
 
 10-03-2025: 25.0.7
 - Calendar: fix cancellation event
