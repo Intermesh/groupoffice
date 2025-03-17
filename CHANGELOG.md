@@ -1,6 +1,7 @@
 - Finance: Try to sanitize HTML to avoid too much vertical space between text on the PDF
 - Addressbook: Empty address appeared when city not filled
 - Contracts: Decimals for contract items
+- Core: fix preventing deleting system groups
 
 10-03-2024 6.8.109
 - Finance:fix handler 'add from catalog' button when switching invoices

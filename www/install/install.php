@@ -54,11 +54,6 @@ if (!empty($_POST)) {
             throw new Exception(go()->t("The passwords didn't match"));
         }
 
-//		go()->getDbConnection()->exec("DROP DATABASE test");
-//		go()->getDbConnection()->exec("CREATE DATABASE test");
-//		go()->getDbConnection()->exec("USE test");
-
-
         if(!preg_match(User::USERNAME_REGEX, $_POST['username'])) {
             throw new Exception(go()->t("You have invalid characters in the username") . " (a-z, 0-9, -, _, ., @).");
         }
