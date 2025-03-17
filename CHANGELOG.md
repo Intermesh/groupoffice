@@ -1,3 +1,5 @@
+- Supportclient: add 'select all lists' checkbox to sidebar
+
 17-03-2025: 6.8.110
 - Finance: Try to sanitize HTML to avoid too much vertical space between text on the PDF
 - Addressbook: Empty address appeared when city not filled
