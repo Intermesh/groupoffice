@@ -1,5 +1,6 @@
 18-03-2025: 25.0.9
 - Core: Build error
+- Core: maximum call stack exceeded error- 
 
 18-03-2025: 25.0.8
 - E_mail: Save mail as project
