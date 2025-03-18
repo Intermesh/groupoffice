@@ -1224,7 +1224,7 @@ END;
 			return null;
 		}
 		$html = preg_replace('#<(div|p)><br( /)?></\1>#', '<br>', $html);
-		$html = preg_replace('#<div>(.*)</div>#U', "$1", $html);
+//		$html = preg_replace('#<div>(.*)</div>#U', "$1", $html);
 		$html = preg_replace("#<div>(<ol.*</ol>.*)</div>#", "$1", $html);
 
 		return $html;
