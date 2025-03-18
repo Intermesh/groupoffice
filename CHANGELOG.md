@@ -1,3 +1,6 @@
+18-03-2025: 25.0.9
+- Core: Build error
+
 18-03-2025: 25.0.8
 - E_mail: Save mail as project
 - E-mail: Save mail as appointment
