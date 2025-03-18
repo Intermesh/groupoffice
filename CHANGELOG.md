@@ -1,3 +1,4 @@
+18-03-2025: 25.0.8
 - E_mail: Save mail as project
 - E-mail: Save mail as appointment
 - Calendar: Create and browse links from event dialog
