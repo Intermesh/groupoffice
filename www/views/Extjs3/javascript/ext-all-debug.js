@@ -11730,8 +11730,6 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
         }
     },
 
-	remove: function(){this.destroy()}, // alias for goui
-
     deleteMembers : function(){
         var args = arguments;
         for(var i = 0, len = args.length; i < len; ++i){
