@@ -55,7 +55,7 @@ class Category extends Entity {
 		if(isset($this->calendarId)) {
 			$calendar = Calendar::findById($this->calendarId);
 
-			return $calendar->getPermissionLevel() >= Acl::LEVEL_MANAGE ? Acl::LEVEL_DELETE : Acl::LEVEL_READ;
+			return $calendar->getPermissionLevel() >= Acl::LEVEL_MANAGE ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
 		} else {
 			return $this->ownerId == go()->getUserId() ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
 		}

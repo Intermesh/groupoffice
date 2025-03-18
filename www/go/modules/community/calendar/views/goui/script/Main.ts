@@ -442,6 +442,9 @@ export class Main extends Component {
 								const dlg = new CategoryWindow();
 								await dlg.load(data.id);
 								dlg.show();
+							}}),
+							btn({icon:'delete', text: t('Delete'), disabled:!data.myRights.mayAdmin, handler: async _ => {
+									jmapds("CalendarCategory").confirmDestroy([data.id]);
 							}})
 						)
 					})]
