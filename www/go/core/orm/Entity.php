@@ -425,12 +425,12 @@ abstract class Entity extends Property {
 	 */
 	protected function internalSave(): bool
 	{
-		if (property_exists($this, 'filesFolderId') && count($this->attachments)) {
+		if (property_exists($this, 'filesFolderId') && count($this->_attachments)) {
 			$folder = Folder::model()->findForEntity($this, false);
 			if (!isset($this->filesFolderId)) {
 				$this->filesFolderId = $folder->id;
 			}
-			foreach ($this->attachments as $attachment) {
+			foreach ($this->_attachments as $attachment) {
 				$b = Blob::findById($attachment['blobId']);
 				if (!$b) {
 					throw new Exception("No blob found");
@@ -1545,11 +1545,11 @@ abstract class Entity extends Property {
 	/**
 	 * @var array
 	 */
-	protected $attachments = [];
+	private $_attachments = [];
 
 	public function setAttachments(array $attachments)
 	{
-		$this->attachments = $attachments;
+		$this->_attachments = $attachments;
 	}
 	
 }
