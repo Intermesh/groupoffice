@@ -281,6 +281,7 @@ export class Main extends Component {
 			if(!this.initialized) {
 				// after initial load. check for changed
 				calendarStore.on('load', () => {
+					categoryStore.reload();
 					this.view.update();
 				});
 				this.initialized = true;
@@ -441,6 +442,9 @@ export class Main extends Component {
 								const dlg = new CategoryWindow();
 								await dlg.load(data.id);
 								dlg.show();
+							}}),
+							btn({icon:'delete', text: t('Delete'), disabled:!data.myRights.mayAdmin, handler: async _ => {
+									jmapds("CalendarCategory").confirmDestroy([data.id]);
 							}})
 						)
 					})]

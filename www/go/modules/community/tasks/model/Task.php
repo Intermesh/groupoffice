@@ -408,10 +408,6 @@ class Task extends AclItemEntity {
 			}
 		}
 
-		if(isset($this->projectId) && $this->hasConflicts()) {
-			$this->setValidationError('start', ErrorCode::CONFLICT, 'this task is in conflict with other tasks');
-		}
-
 		parent::internalValidate();
 	}
 

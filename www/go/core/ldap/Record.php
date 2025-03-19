@@ -19,7 +19,9 @@ use Exception;
  * @license AGPL/Proprietary http://www.group-office.com/LICENSE.TXT
  * @link http://www.group-office.com
  * @copyright Copyright Intermesh BV
- * @author Merijn Schering <mschering@intermesh.nl> 
+ * @author Merijn Schering <mschering@intermesh.nl>
+ *
+ * @property string $cn
  */
 class Record {
 

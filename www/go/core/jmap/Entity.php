@@ -420,29 +420,35 @@ abstract class Entity  extends OrmEntity {
    */
 	protected static function deleteFilesFolders(Query $query): bool
 	{
-		$ids = clone $query;
+		$idsQuery = clone $query;
 		/** @noinspection PhpRedundantOptionalArgumentInspection */
-		$ids = $ids->selectSingleValue($query->getTableAlias() . '.filesFolderId')
-			->andWhere($query->getTableAlias() . '.filesFolderId', '!=', null)
-			->all();
+	 	$idsQuery->selectSingleValue($query->getTableAlias() . '.filesFolderId')
+		 	->groupWhere()
+			->andWhere($query->getTableAlias() . '.filesFolderId', '!=', null);
 
+		 $ids = $idsQuery->all();
+
+
+
+		return static::internalDeleteFilesFolders($ids);
+	}
+
+	protected static function internalDeleteFilesFolders(array $folderIds): bool
+	{
 		// make sure ID=0 is not there. Shouldn't be but this caused a disaster with a root folder with id=0 wiping
 		// the data
-		$ids = array_filter($ids, function($id) {
+		$folderIds = array_filter($folderIds, function($id) {
 			return !empty($id);
 		});
-
-		if(empty($ids)) {
+		if(empty($folderIds)) {
 			return true;
 		}
-
-		$folders = Folder::model()->findByAttribute('id', $ids);
+		$folders = Folder::model()->findByAttribute('id', $folderIds);
 		foreach($folders as $folder) {
 			if(!$folder->delete(true)) {
 				return false;
 			}
 		}
-
 		return true;
 	}
 
@@ -684,7 +690,7 @@ abstract class Entity  extends OrmEntity {
   /**
    * Get all user property names.
    *
-   * User properties can vary between users. For example "starred" of a contact
+   * User properties belong to users and can be different between users. For example "starred" of a contact
    * can be different between users.
    *
    * @return string[]

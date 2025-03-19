@@ -190,11 +190,19 @@ abstract class Property extends Model {
 	 */
 	public function populate(array $record): static
 	{
+		$this->populateTableRecord($record);
+		$this->initRelations();
+		if(!$this->readOnly) {
+			$this->trackModifications();
+		}
+		$this->init();
+
+		return $this;
+	}
+
+	private function populateTableRecord(array $record) : void {
 		$m = static::getMapping();
 		foreach($record as $colName => $value) {
-
-
-
 			if(str_contains($colName, '.')) {
 				$this->setPrimaryKey($colName, $value);
 			} else {
@@ -205,16 +213,39 @@ abstract class Property extends Model {
 				$this->$colName = $value;
 			}
 		}
+	}
 
-		$this->initRelations();
-
-		if(!$this->readOnly) {
-			$this->trackModifications();
+	/**
+	 * Populate the model with an existing table record.
+	 *
+	 * This function should rarely be used. It was needed for the calendar event model that exists of two tables.
+	 * A shared table between invitees and an table linking it to a calendar. When a new
+	 * meeting request comes in we have to find the existing shared record and populate the model
+	 * that might have a new calender link.
+	 *
+	 * @param string $tableAlias
+	 * @param array $record
+	 * @return void
+	 * @throws Exception
+	 */
+	public function populateTable(string $tableAlias, array $record) {
+		$tbls = static::getMapping()->getTables();
+		foreach($tbls as $tbl) {
+			// fill in the primary keys values to track if the record was new
+			if($tbl->getAlias() == $tableAlias) {
+				$pks = $tbl->getPrimaryKey();
+				foreach ($pks as $pk) {
+					if(!empty($record[$pk])) {
+						$record[$tableAlias.'.'.$pk] = $record[$pk];
+						if(!property_exists($this, $pk)) {
+							unset($record[$pk]);
+						}
+					}
+				}
+			}
 		}
 
-		$this->init();
-
-		return $this;
+		$this->populateTableRecord($record);
 	}
 
 	/**
@@ -368,7 +399,7 @@ abstract class Property extends Model {
 				{
 					$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly, $this);
 
-					go()->debug($stmt);
+					//go()->debug($stmt);
 
 					$prop = $stmt->fetchAll();
 					$stmt->closeCursor();
@@ -705,42 +736,23 @@ abstract class Property extends Model {
 		return ["modifiedBy", "createdAt", "createdBy", "modifiedAt"];
 	}
 
-  /**
-   * @inheritDoc
-   */
-	public static function getApiProperties(): array
+	public static function buildApiProperties(bool $forDocs = false): array
 	{
-		$cls = static::class;
+		$props = parent::buildApiProperties($forDocs);
 
-		//this function is called many times. This seems to have a slight performance benefit
-//		if(isset(self::$apiProperties[$cls])) {
-//			return self::$apiProperties[$cls];
-//		}
-
-		$cacheKey = 'property-getApiProperties-' . $cls;
-
-		$props = go()->getCache()->get($cacheKey);
-
-		if(!$props) {
-			$props = parent::getApiProperties();
-
-			//add dynamic relations		
-			foreach(static::getMapping()->getProperties() as $propName => $type) {
-				//do property_exists because otherwise it will add protected properties too.
-				if(!isset($props[$propName])) {
-					$props[$propName] = ['setter' => false, 'getter' => false, 'access' => self::PROP_PUBLIC, 'dynamic' => true];
-				}
-				$props[$propName]['db'] = true;
+		//add dynamic relations
+		foreach(static::getMapping()->getProperties() as $propName => $type) {
+			//do property_exists because otherwise it will add protected properties too.
+			if(!isset($props[$propName])) {
+				$props[$propName] = ['setter' => false, 'getter' => false, 'access' => self::PROP_PUBLIC, 'dynamic' => true, "description" => ""];
 			}
-
-			if(method_exists(static::class, 'getCustomFields')) {
-				$props['customFields'] = ['setter' => true, 'getter' => true, 'access' => null];
-			}
-
-			go()->getCache()->set($cacheKey, $props);
+			$props[$propName]['db'] = true;
 		}
 
-//		self::$apiProperties[$cls] = $props;
+		if(method_exists(static::class, 'getCustomFields')) {
+			$props['customFields'] = ['setter' => true, 'getter' => true, 'access' => null, "description" => ""];
+		}
+
 		return $props;
 	}
 
@@ -840,7 +852,7 @@ abstract class Property extends Model {
 	 	 */
 	public static function atypicalApiProperties(): array
 	{
-		return ['modified', 'oldValues', 'validationErrors', 'modifiedCustomFields', 'validationErrorsAsString', 'searchDescription', 'returnAsText', 'dontChangeModifiedAt'];
+		return ['modified', 'oldValues', 'validationError', 'validationErrors', 'modifiedCustomFields', 'validationErrorsAsString', 'searchDescription', 'returnAsText', 'dontChangeModifiedAt', 'values', 'value', 'customFieldsJSON'];
 	}
 
 	/**
@@ -2627,7 +2639,7 @@ abstract class Property extends Model {
 		$props = $this->getApiProperties();
 
 		foreach($props as $name => $p) {
-			if(!isset($p['access']) && (!$p['getter'] || !$p['setter'])) {
+			if((!isset($p['access']) || $p['access'] == self::PROP_PUBLIC_READONLY || $p['access'] == self::PROP_PUBLIC_WRITEONLY) && (!$p['getter'] || !$p['setter'])) {
 				continue;
 			}
 

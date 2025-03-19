@@ -8,7 +8,7 @@ import {
 	tbar, Timezone,
 	win, Window
 } from "@intermesh/goui";
-import {calendarStore, t} from "./Index.js";
+import {calendarStore, categoryStore, t} from "./Index.js";
 import {client, jmapds, Recurrence} from "@intermesh/groupoffice-core";
 import {EventWindow} from "./EventWindow.js";
 import {EventDetailWindow} from "./EventDetail.js";
@@ -27,10 +27,16 @@ export interface CalendarEvent extends BaseEntity {
 	timeZone:Timezone
 	title: string
 	color?: string
+	categoryIds: string[]
 	status?: string
 	isOrigin: boolean
 	participants?: {[key:string]: any}
 	calendarId: string
+}
+
+export interface CalendarCategory extends BaseEntity {
+	name: string
+	color: string
 }
 
 const eventDS = jmapds('CalendarEvent');
@@ -70,6 +76,7 @@ export class CalendarItem {
 	readonly initEnd: string
 
 	cal: any
+	categories : CalendarCategory[] = []
 
 	divs: {[week: string] :HTMLElement}
 	defaultColor?: string
@@ -97,6 +104,12 @@ export class CalendarItem {
 			this.end = this.start.clone().add(new DateInterval(this.patched.duration!));
 		//}
 		this.cal = calendarStore.find((c:any) => c.id == this.patched.calendarId);
+		if(this.patched.categoryIds)
+		for(const id of this.patched.categoryIds) {
+			const cat = categoryStore.find((c:any) => c.id == id);
+			if(cat)
+				this.categories.push(cat as CalendarCategory);
+		}
 
 		this.initStart = this.start.format('Y-m-d\TH:i:s');
 		this.initEnd = this.end.format('Y-m-d\TH:i:s');
@@ -214,6 +227,12 @@ export class CalendarItem {
 		return 1 + this.start.diff(this.end.clone().addSeconds(-1)).getTotalDays()!;
 	}
 
+	get categoryDots() {
+		for (const cat of this.categories) {
+			return [E('i').cls('cat').attr('title',cat.name).css({color: '#'+cat.color})];
+		}
+		return [];
+	}
 	get icons() {
 		const e = this.data;
 		const icons = [...this.extraIcons];

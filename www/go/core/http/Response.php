@@ -347,6 +347,8 @@ class Response extends Singleton{
 		$this->setHeader("Strict-Transport-Security","max-age=31536000");
 		$this->setHeader("X-XSS-Protection", "1;mode=block");
 		$this->setHeader('X-Robots-Tag', 'noindex');
+		$this->setHeader('Referrer-Policy', 'same-origin');
+
 
 		return $this;
 	}

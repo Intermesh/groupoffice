@@ -32,7 +32,7 @@ export class EventWindow extends FormWindow {
 	private item?: CalendarItem
 
 	private store: JmapDataSource
-	private submitBtn:Button
+	// private submitBtn:Button
 	private endDate: DateField
 	private startDate: DateField
 	private withoutTimeToggle: CheckboxField
@@ -44,6 +44,7 @@ export class EventWindow extends FormWindow {
 
 	private titleField: TextField
 	private alertField: AlertField
+	private confirmedScheduleMessage: boolean = false;
 
 	constructor() {
 		super("CalendarEvent");
@@ -53,6 +54,7 @@ export class EventWindow extends FormWindow {
 		this.width = 565;
 		this.height = 840;
 		this.resizable = true;
+		this.hasLinks = true;
 		this.store = this.form.dataSource as JmapDataSource; //jmapds("CalendarEvent");
 		// this.startTime = textfield({type:'time',value: '12:00', width: 128})
 		// this.endTime = textfield({type:'time',value: '13:00', width: 128})
@@ -81,6 +83,8 @@ export class EventWindow extends FormWindow {
 			//recurrenceField.setStartDate(start)
 		});
 		this.form.on('save', () => { this.close();});
+		this.form.on("beforesubmit", this.onBeforeSubmit, {bind:this});
+
 		this.generalTab.cls = 'flow fit scroll pad';
 		this.startDate = datefield({label: t('Start'), name:'start',flex:1, defaultTime: now.format('H')+':00',
 			listeners:{'change': (me,_v, old) => {
@@ -169,11 +173,13 @@ export class EventWindow extends FormWindow {
 					this.alertField.fullDay = checked;
 					this.alertField.drawOptions();
 
-					calendarStore.dataSource.single(this.form.value.calendarId).then(r => {
-						if(!r) return;
-						const d = checked ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
-						this.alertField.setDefaultLabel(d)
-					});
+					if(this.form.value.calendarId) {
+						calendarStore.dataSource.single(this.form.value.calendarId).then(r => {
+							if (!r) return;
+							const d = checked ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
+							this.alertField.setDefaultLabel(d)
+						});
+					}
 					this.startDate.withTime = this.endDate.withTime = !checked;
 				}}
 			}),
@@ -297,10 +303,8 @@ export class EventWindow extends FormWindow {
 			})
 		);
 
-		this.bbar.items.clear().add(
-			btn({icon:'attach_file', handler: _ => this.attachFile() }),
-			comp({flex:1}),
-			this.submitBtn = btn({text:t('Save'), cls:'primary filled',handler: _ => this.submit()})
+		this.bbar.items.insert(2,
+			btn({icon:'attach_file', handler: _ => this.attachFile() })
 		);
 
 		this.addCustomFields();
@@ -313,16 +317,21 @@ export class EventWindow extends FormWindow {
 
 	private async createVideoLink(s: any) {
 		const room = this.b64UrlEncode(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(8))));
+
 		if(!s.videoJwtEnabled) {
 			return s.videoUri+room;
 		}
-		const id = s.videoJwtAppId,
-			head= this.b64UrlEncode(JSON.stringify({alg: 'HS256', typ: 'JWT'})),
-			load = this.b64UrlEncode(JSON.stringify({aud: id, iss: id, room})),
-			key = await crypto.subtle.importKey('raw', (new TextEncoder()).encode(s.videoJwtSecret),
-				{ name: 'HMAC', hash: 'SHA-256' }, false, ['sign']),
-			sign = await window.crypto.subtle.sign("HMAC", key, (new TextEncoder()).encode(`${head}.${load}`));
-		return  s.videoUri+room+'?jwt='+`${head}.${load}.${this.b64UrlEncode(String.fromCharCode(...new Uint8Array(sign)))}`;
+
+		const response = await client.jmap("CalendarEvent/generateJWT", {room}, 'pJwt');
+
+		return  s.videoUri+room+'?jwt='+response.jwt;
+		// const id = s.videoJwtAppId,
+		// 	head= this.b64UrlEncode(JSON.stringify({alg: 'HS256', typ: 'JWT'})),
+		// 	load = this.b64UrlEncode(JSON.stringify({aud: id, iss: id, room})),
+		// 	key = await crypto.subtle.importKey('raw', (new TextEncoder()).encode(s.videoJwtSecret),
+		// 		{ name: 'HMAC', hash: 'SHA-256' }, false, ['sign']),
+		// 	sign = await window.crypto.subtle.sign("HMAC", key, (new TextEncoder()).encode(`${head}.${load}`));
+		// return  s.videoUri+room+'?jwt='+`${head}.${load}.${this.b64UrlEncode(String.fromCharCode(...new Uint8Array(sign)))}`;
 	}
 
 	private openExceptionsWindow() {
@@ -405,16 +414,26 @@ export class EventWindow extends FormWindow {
 
 	}
 
-	submit() {
+	private onBeforeSubmit() {
+		if(this.confirmedScheduleMessage) {
+			return;
+		}
 		if(this.item!.isRecurring) {
 
 			this.item!.patch(this.parseSavedData(this.form.modified), () => {
 				this.close();
 			});
+			// cancel normal submit
+			return false;
 		} else {
 			this.item!.confirmScheduleMessage(this.parseSavedData(this.form.modified), () => {
+				this.confirmedScheduleMessage = true;
 				this.form.submit();
+				this.confirmedScheduleMessage = false;
 			});
+
+			// cancel normal submit
+			return false;
 		}
 	}
 

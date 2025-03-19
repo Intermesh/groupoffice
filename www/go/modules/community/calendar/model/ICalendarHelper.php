@@ -316,6 +316,7 @@ class ICalendarHelper {
 			$event->prodId = $prodId;
 			$baseEvents[$event->uid] = $event;
 			if($event->isNew())
+			if(isset($vevent->{'DTSTAMP'}))
 				$event->createdAt = $vevent->DTSTAMP->getDateTime();
 			if(isset($vevent->{'LAST-MODIFIED'}))
 				$event->modifiedAt = $vevent->{'LAST-MODIFIED'}->getDateTime();
@@ -373,11 +374,6 @@ class ICalendarHelper {
 				// You must be invited to a single occurrence
 				$event->setValues((array)$props); // title, description, start, duration, location, status, privacy
 				$event->prodId = $prodId;
-
-				// this leads to issues as the UID must stay the same for caldav etc.
-				// But removing this leads to another issue. If a participant is invited for
-				// a single occurrence it's added tto the whole series. Because
-				//in Calendar::addEvent() the original base event is attached
 				$event->uid = $uid;
 				$event->recurrenceId = $recurrenceId;
 			}
@@ -485,7 +481,7 @@ class ICalendarHelper {
 		return new VObject\Recur\RRuleIterator(self::toRrule($event), $event->start());
 	}
 
-	static private function parseRrule(VObject\Property\ICalendar\Recur $rule, $event) {
+	static private function parseRrule(VObject\Property\ICalendar\Recur $rule, CalendarEvent $event) {
 		$parts = $rule->getParts();
 		$values = (object)['frequency' => strtolower($parts['FREQ'])];
 		if(isset($parts['INTERVAL']) && $parts['INTERVAL'] != 1) {
@@ -519,8 +515,12 @@ class ICalendarHelper {
 				// convert to localtime
 				$isUtc = substr($parts['UNTIL'], -1,1) === 'Z';
 				$dt = DateTime::createFromFormat('Ymd\THis', substr($parts['UNTIL'],0,15), new \DateTimeZone('etc/UTC'));
-				if(!empty($event->timeZone))
-					$dt->setTimezone(new \DateTimeZone($event->timeZone));
+
+				$tz = $event->timeZone();
+				if(isset($tz)) {
+					$dt->setTimezone($tz);
+				}
+
 				$values->until = $dt->format('Y-m-d\TH:i:s');
 			} else {
 				// add dashes and append 0-time

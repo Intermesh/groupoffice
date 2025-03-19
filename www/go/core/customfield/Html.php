@@ -9,6 +9,8 @@ use go\core\validate\ErrorCode;
 use go\core\util\StringUtil;
 
 class Html extends Base {
+
+	public static bool $validationEnabled = true;
 	/**
 	 * Get column definition for SQL
 	 * 
@@ -28,7 +30,7 @@ class Html extends Base {
 	 */
 	public function validate($value, Field $field, $model): bool
 	{
-		if(!empty($value) && StringUtil::detectXSS($value)) {
+		if(self::$validationEnabled && !empty($value) && StringUtil::detectXSS($value)) {
 			$model->setValidationError("customFields." . $field->databaseName, ErrorCode::INVALID_INPUT, "You're not allowed to put scripts in customFields." . $field->databaseName);				
 			return false;
 		}

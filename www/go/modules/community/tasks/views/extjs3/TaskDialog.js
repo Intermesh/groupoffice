@@ -62,6 +62,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	},
 
 	onLoad: function() {
+
+		this.supr().onLoad.call(this);
+
 		if (go.User.tasksSettings && !this.tasklistCombo.value) {
 			this.tasklistCombo.value = this.initialConfig.role === "support" ? go.User.supportSettings.defaultTasklistId : go.User.tasksSettings.defaultTasklistId;
 		}
@@ -94,9 +97,10 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 	onTaskListChange: function (combo, val) {
 
-		if (!Ext.isNumber(val)) {
-			return; //some bug calling this with string
+		if(!val) {
+			return;
 		}
+
 		const categories = this.formPanel.form.findField('categories');
 		categories.comboStore.setFilter("tasklistId", {
 			operator: "OR",
@@ -254,169 +258,184 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		})
 
 		const items = [
+			{
+
+				xtype: 'fieldset',
+				items: [
 					{
-
-						xtype: 'fieldset',
-						items: [
-							{
-								xtype: "container",
-								layout: "form",
-								cls: 'go-hbox',
-								items: [{
-									flex: 1,
-									xtype: 'textfield',
-									name: 'title',
-									allowBlank: false,
-									fieldLabel: t("Subject")
-								},
-									{xtype: 'colorfield', emptyText: 'color', name: 'color', hideLabel: true}
-								]
-							},
-
-							this.customerCombo = new go.users.UserCombo({
-								flex: 1,
-								disabled: this.role != "support",
-								hidden: this.role != "support",
-								anchor: "-20",
-								fieldLabel: t('Customer'),
-								hiddenName: 'createdBy',
-								allowBlank: false,
-								value: null
-							}),
-
-							this.ccField = new go.form.RecipientCombo({
-								fieldLabel : t("CC", "email"),
-								name : 'cc',
-								anchor: "-20",
-								flex: 1,
-								hidden: this.role != "support",
-								disabled: this.role != "support",
-								value: ""
-							})
-						]
-
-
-					},{
-						xtype: 'fieldset',
-						defaults: {
-							layout: 'form',
-							xtype: 'container',
-							cls: "go-hbox"
-						},
-						mobile: {
-							items: [{
-								items: [start, due]
-							},{
-								items: [estimatedDuration, progress]
-							}, {
-								items: [percentComplete, priority]
-							},
-								this.recurrenceField]
-						},
-						desktop: {
-							items: [
-								{
-									items: [start, due, estimatedDuration, estimatedDurationLbl]
-								},{
-									items: [progress, percentComplete, priority]
-								},
-								this.recurrenceField
-							]
-						},
-					},
-					{
-						xtype: "fieldset",
+						xtype: "container",
+						layout: "form",
+						cls: 'go-hbox',
 						items: [{
-							xtype: "container",
-							cls: "go-hbox",
-							layout: "form",
-							items: [
-								this.tasklistCombo = new go.modules.community.tasks.TasklistCombo({
-									flex: 1,
-									anchor: undefined,
-									role: this.role,
-									listeners: {
-										change: this.onTaskListChange,
-										setvalue: this.onTaskListChange,
-										scope: this
-									}
-								}),
-								this.responsibleCombo = new go.users.UserCombo({
-									flex: 1,
-									anchor: undefined,
-									fieldLabel: t('Responsible'),
-									hiddenName: 'responsibleUserId',
-									allowBlank: true,
-									value: null
-								})
-
-								]
-							},
-							{
-								xtype: "chips",
-								entityStore: "TaskCategory",
-								comboStoreConfig: {
-									filters: {
-										tasklistId: {
-											operator: "OR",
-											conditions: [
-												{tasklistId: this.tasklistCombo.getValue()},
-												{global: true},
-												{ownerId: go.User.id}
-											]
-										}
-									}
-								},
-								displayField: "name",
-								valueField: 'id',
-								name: "categories",
-								fieldLabel: t("Category", "tasks")
-							},
-							this.projectCombo = new go.modules.community.tasks.ProjectCombo({
-								hidden: this.role === "support" || !go.Modules.isAvailable("business", "projects3")
-							})
-						]
-					}
-					,
-
-					{xtype: 'hidden', name: 'groupId'},
-
-
-					this.descriptionFieldset = new Ext.form.FieldSet({
-						xtype: "fieldset",
-						defaults: {
-							anchor: '100%'
+							flex: 1,
+							xtype: 'textfield',
+							name: 'title',
+							allowBlank: false,
+							fieldLabel: t("Subject")
 						},
-						items: [
-
-							{
-								xtype: 'textarea',
-								name: 'description',
-								fieldLabel: t("Description"),
-								grow: true
-
-							}, {
-								xtype: 'textarea',
-								name: 'location',
-								allowBlank: true,
-								fieldLabel: t("Location"),
-								grow: true
-
-							}
+							{xtype: 'colorfield', emptyText: 'color', name: 'color', hideLabel: true}
 						]
+					},
+
+
+
+					this.customerCombo = new go.users.UserCombo({
+						flex: 1,
+						disabled: this.role != "support",
+						hidden: this.role != "support",
+						anchor: "100%",
+						fieldLabel: t('Customer'),
+						hiddenName: 'createdBy',
+						allowBlank: false,
+						value: null
+					}),
+
+					this.ccField = new go.form.RecipientCombo({
+						fieldLabel : t("CC", "email"),
+						name : 'cc',
+						anchor: "100%",
+						flex: 1,
+						hidden: this.role != "support",
+						disabled: this.role != "support",
+						value: ""
 					}),
 
 					{
-						xtype: "fieldset",
-						title: t("Alerts"),
-						items: [new go.modules.community.tasks.AlertFields()]
+						xtype: "container",
+						cls: "go-hbox",
+						layout: "form",
+						items: [
+							this.responsibleCombo = new go.users.UserCombo({
+								flex: 1,
+								anchor: undefined,
+								fieldLabel: t('Responsible'),
+								hiddenName: 'responsibleUserId',
+								allowBlank: true,
+								value: null
+							}),
+							this.tasklistCombo = new go.modules.community.tasks.TasklistCombo({
+								flex: 1,
+								anchor: undefined,
+								role: this.role,
+								listeners: {
+									change: this.onTaskListChange,
+									setvalue: this.onTaskListChange,
+									scope: this
+								}
+							}),
+
+
+						]
 					}
-				];
+				]
+
+
+			},
+
+			{
+				xtype: "fieldset",
+				items: [
+					{
+						xtype: "chips",
+						entityStore: "TaskCategory",
+						comboStoreConfig: {
+							filters: {
+								tasklistId: {
+									operator: "OR",
+									conditions: [
+										{tasklistId: this.tasklistCombo.getValue()},
+										{global: true},
+										{ownerId: go.User.id}
+									]
+								}
+							}
+						},
+						displayField: "name",
+						valueField: 'id',
+						name: "categories",
+						fieldLabel: t("Category", "tasks")
+					},
+					...(go.Modules.isAvailable("business", "projects3") ? [this.projectCombo = new go.modules.community.tasks.ProjectCombo({
+						hidden: this.role === "support" || !go.Modules.isAvailable("business", "projects3")
+					})] : [])
+				]
+			}
+			,
+			{
+				title: t("Date"),
+				collapsible: true,
+				collapsed: true,
+				xtype: 'fieldset',
+				defaults: {
+					layout: 'form',
+					xtype: 'container',
+					cls: "go-hbox"
+				},
+				mobile: {
+					items: [{
+						items: [start, due]
+					},{
+						items: [estimatedDuration, progress]
+					}, {
+						items: [percentComplete, priority]
+					},
+						this.recurrenceField]
+				},
+				desktop: {
+					items: [
+						{
+							items: [start, due, estimatedDuration, estimatedDurationLbl]
+						},{
+							items: [progress, percentComplete, priority]
+						},
+						this.recurrenceField
+					]
+				},
+			},
+
+			{xtype: 'hidden', name: 'groupId'},
+
+
+			this.descriptionFieldset = new Ext.form.FieldSet({
+				collapsed: true,
+				collapsible: true,
+				title: t("Description") + " / " + t("Location"),
+				xtype: "fieldset",
+				defaults: {
+					anchor: '100%'
+				},
+				items: [
+
+					{
+						xtype: 'textarea',
+						name: 'description',
+						fieldLabel: t("Description"),
+						grow: true
+
+					}, {
+						xtype: 'textarea',
+						name: 'location',
+						allowBlank: true,
+						fieldLabel: t("Location"),
+						grow: true
+
+					}
+				]
+			}),
+
+			{
+				collapsed: true,
+				collapsible: true,
+				xtype: "fieldset",
+				title: t("Alerts"),
+				items: [new go.modules.community.tasks.AlertFields()]
+			}
+		];
 
 		if(go.Modules.isAvailable("community", "comments")) {
 			this.commentComposer = new go.modules.comments.ComposerFieldset();
 
-			items.splice(items.length - 1,0, this.commentComposer);
+			items.splice(1,0, this.commentComposer);
 		}
 
 		return items;

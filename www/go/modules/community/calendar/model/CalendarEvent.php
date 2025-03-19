@@ -7,9 +7,11 @@
 
 namespace go\modules\community\calendar\model;
 
+use DateTimeZone;
 use Exception;
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
+use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
 use go\core\exception\JsonPointerException;
 use go\core\fs\Blob;
@@ -54,7 +56,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 
 	const EventProperties = ['uid','isOrigin','replyTo', 'prodId', 'sequence','title','description','locale','location', 'showWithoutTime',
 		'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule','createdAt','modifiedAt',
-		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag','uri', 'eventId', 'recurrsenceId'];
+		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag','uri', 'eventId', 'recurrenceId'];
 
 	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'alerts', 'veventBlobId'];
 
@@ -104,7 +106,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	/**
 	 * This is only set when somebody is invited to a single occurrence of a series.
 	 *
-	 * Als een participant is uitgenodigd dan wordt er een aparte event met UID . ‘_’. RECURRENCE-ID gemaakt. Dit is denk ik ook de enige manier om dit op te slaan. Je kan dit niet met een recurrence override doen. Maar als je hier je status op zet dan wordt de andere event niet bijgewerkt via caldav. GO stuurt wel een mail maar met UID:d060b367-bc65-4853-bf07-f495bdb29671_2024-09-17T14:00:00 Dan krijg je unable to process invitation omdat deze UID niet gevonden wordt. Als ik aanpas dat deze dezelfde UID gebruikt zonder recurrence-id te appenden, dan krijfgt de genodigde de hele series omdat in Calendar::addEvent() dezelfde calendar_event data wordt bijgevoegd.
+	 * Als een participant is uitgenodigd dan wordt er een aparte event met UID . ‘_’. RECURRENCE-ID gemaakt.
 	 *
 	 * @var string|null
 	 */
@@ -351,20 +353,6 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 
 	public function toVObject() {
 		return ICalendarHelper::toVObject($this)->serialize();
-	}
-
-	public function dateTimeZone() {
-		if(!empty($this->timeZone)) {
-			return new \DateTimeZone($this->timeZone);
-		}
-		static $currentTZUser;
-		if(empty($currentTZUser)) {
-			$currentTZUser = go()->getAuthState()->getUser(['dateFormat', 'timezone', 'timeFormat' ]);
-			if(empty($currentTZUser)) {
-				$currentTZUser = User::findById(1, ['dateFormat', 'timezone', 'timeFormat'], true);
-			}
-		}
-		return new \DateTimeZone($currentTZUser->timezone);
 	}
 
 	public function icsBlobId() {
@@ -619,7 +607,9 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 			if($participant->kind == 'resource') {
 				$resourceCalendar = Calendar::findById(str_replace('Calendar:', '', $pid));
 				if(!empty($resourceCalendar)) {
-					Calendar::addEvent($this,$resourceCalendar->id);
+					 go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
+						['calendarId'=>$resourceCalendar->id, 'eventId'=>$this->eventId]
+					])->execute();
 				}
 			}
 		}
@@ -802,15 +792,36 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 		return !empty($this->recurrenceRule); // && !empty($this->recurrenceRule->frequency));
 	}
 
-	public function timeZone() {
-		return $this->timeZone ? new \DateTimeZone($this->timeZone) : null;
+	public function timeZone(): ?DateTimeZone
+	{
+		try {
+			return $this->timeZone ? new DateTimeZone($this->timeZone) : null;
+		}catch(Exception $e) {
+			ErrorHandler::logException($e, "Failed to set timezone " . $this->timeZone. " for event" . $this->id);
+
+			static $currentTZUser;
+			if (empty($currentTZUser)) {
+				$currentTZUser = go()->getAuthState()->getUser(['dateFormat', 'timezone', 'timeFormat']);
+				if (empty($currentTZUser)) {
+					$currentTZUser = User::findById(1, ['dateFormat', 'timezone', 'timeFormat'], true);
+				}
+			}
+			try {
+				return new DateTimeZone($currentTZUser->timezone);
+			}catch(Exception $e) {
+				ErrorHandler::logException($e, "Failed to fallback on user timezone " . $currentTZUser->timezone. " for event" . $this->id);
+			}
+			return null;
+
+		}
 	}
 
 	/**
-	 * @return \DateTime[]
+	 * @return DateTime[]
+	 * @throws \DateMalformedStringException
 	 */
 	public function upcomingOccurrence() {
-		$now = new \DateTime('now', $this->timeZone());
+		$now = new DateTime('now', $this->timeZone());
 		$recurrenceId = null;
 		$nextOccurrence = null;
 		if(!empty($this->recurrenceOverrides)) {
@@ -824,10 +835,10 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 			}
 		}
 		if(is_string($recurrenceId)) {
-			$recurrenceId = new \DateTime($recurrenceId, $this->timeZone());
+			$recurrenceId = new DateTime($recurrenceId, $this->timeZone());
 		}
 		if(is_string($nextOccurrence)) {
-			$nextOccurrence = new \DateTime($nextOccurrence, $this->timeZone());
+			$nextOccurrence = new DateTime($nextOccurrence, $this->timeZone());
 		}
 		$it = ICalendarHelper::makeRecurrenceIterator($this);
 		$nextRecurrenceId = null;

@@ -392,7 +392,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event_custom_fields` (
 	CONSTRAINT `fk_calendar_event_cf1` FOREIGN KEY (`id`) REFERENCES `calendar_event` (`eventId`) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
-CREATE TABLE `calendar_calendar_custom_fields` (
+CREATE TABLE IF NOT EXISTS `calendar_calendar_custom_fields` (
 	`id` INT UNSIGNED NOT NULL,
 	PRIMARY KEY (`id`),
 	CONSTRAINT `fk_calendar_cf1` FOREIGN KEY (`id`) REFERENCES `calendar_calendar` (`id`) ON DELETE CASCADE
@@ -400,7 +400,7 @@ CREATE TABLE `calendar_calendar_custom_fields` (
 
 
 
-CREATE TABLE calendar_schedule_object (
+CREATE TABLE IF NOT EXISTS calendar_schedule_object (
                                    id INT(11) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
                                    principaluri VARBINARY(255),
                                    calendardata MEDIUMBLOB,

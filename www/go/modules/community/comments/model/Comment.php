@@ -189,7 +189,7 @@ class Comment extends AclItemEntity {
 	 *
 	 * @param ActiveRecord|Entity $entity
 	 * @param array $properties
-	 * @return Query<Comment>
+	 * @return Query<$this>
 	 * @throws Exception
 	 */
 	public static function findForEntity(ActiveRecord|Entity $entity, array $properties = []) : Query {

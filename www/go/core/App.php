@@ -647,7 +647,7 @@ namespace go\core {
 				return $model;
 			}
 
-			$model = ModuleModel::find()->where(['package' => $package, 'name' => $name, 'enabled' => true])->single();
+			$model = ModuleModel::find()->where(['package' => $package == "legacy" ? null : $package, 'name' => $name, 'enabled' => true])->single();
 			if(!$model || !$model->isAvailable()) {
 				$model = false;
 			}

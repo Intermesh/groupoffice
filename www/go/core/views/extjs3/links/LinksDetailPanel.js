@@ -208,6 +208,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 		});
 
 		this.store.baseParams.position = 0;
+		// debugger;
 		this.store.load();
 	}
 });

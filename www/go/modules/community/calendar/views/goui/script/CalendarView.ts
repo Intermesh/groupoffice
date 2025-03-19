@@ -64,6 +64,7 @@ export abstract class CalendarView extends Component {
 			}
 			div = E('div',
 				E('em', item.title || '('+t('Nameless')+')'),
+				...item.categoryDots,
 				...item.icons,
 				time
 			)
@@ -105,11 +106,11 @@ export abstract class CalendarView extends Component {
 		this.viewModel = [];
 	}
 
-	protected slots: any;
+	protected slots!: any[];
 	protected calcRow(start: number, days: number) {
 		let row = 0,
 			end = Math.min(start+days, this.slots.length);
-		while(row < 10) {
+		while(row < 40) {
 			for(let i = start; i < end; i++) {
 				if(this.slots[i][row]){ // used
 					break; // next row
@@ -124,16 +125,17 @@ export abstract class CalendarView extends Component {
 			}
 			row++;
 		}
-		return 10;
+		return 40;
 	}
 
 	protected ROWHEIGHT = 2.6;
 
 	// for full day view
 	protected makestyle(e: CalendarItem, weekstart: DateTime, row?: number): Partial<CSSStyleDeclaration> {
-		const day = weekstart.diff(e.start).getTotalDays()!,
-			pos = Math.max(0,day),
-		dwidth = e.dayLength + (day < 0 ? day : 0);
+		const dayDiff = weekstart.diff(e.start),
+			days = dayDiff.getTotalDays()!,
+			pos = dayDiff.invert ? 0 : days,
+			dwidth = e.dayLength - (dayDiff.invert ? days : 0);
 
 		row = row ?? this.calcRow(pos,dwidth);
 
@@ -142,7 +144,7 @@ export abstract class CalendarView extends Component {
 			top = row * this.ROWHEIGHT;
 		return {
 			width: (width-.6).toFixed(2)+'%',
-			left : (left+(day<0?0:.3)).toFixed(2)+'%',
+			left : (left+(dayDiff.invert?0:.3)).toFixed(2)+'%',
 			top: top.toFixed(2)+'rem',
 			color: '#'+e.color
 		};

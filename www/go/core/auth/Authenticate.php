@@ -254,7 +254,8 @@ class Authenticate {
 		}
 
 		$primary = $this->getPrimaryAuthenticatorForUser($user->username);
-		if(!($primary instanceof Password)) {
+		// if no primary authenticator was found then also allow password recovery to create a password
+		if($primary && !($primary instanceof Password)) {
 			go()->debug("Authenticator doesn't support recovery");
 			return false;
 		}

@@ -5,6 +5,7 @@ use go\core\acl\model\AclOwnerEntity;
 use go\core\model\Module;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
+use go\core\util\Crypt;
 
 /**
  * Calendar entity
@@ -32,7 +33,7 @@ class DavAccount extends AclOwnerEntity {
 	public $active;
 	public $host;
 	public $username;
-	public $password;
+	protected $password;
 	public $basePath;
 	public $principalUri;
 	public $capabilities;
@@ -43,11 +44,26 @@ class DavAccount extends AclOwnerEntity {
 	/** @var Calendar[] the collections items with ctag and uri */
 	public $collections = [];
 
+	public function setPassword($v) {
+		$this->password = Crypt::encrypt($v);
+	}
+	public function decryptPassword(): string
+	{
+		return Crypt::decrypt($this->password);
+	}
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
 			->addTable("davclient_davaccount", 'a')
 			->addMap('collections', Calendar::class, ['id' => 'davaccountId']);
+	}
+
+	public function needsSync() {
+
+		$needSync = new \DateTime();
+		$needSync->sub(new \DateInterval('PT'.$this->refreshInterval.'M'));
+
+		return $this->lastSync < $needSync; // longer then [interval] minutes ago
 	}
 
 	protected function canCreate(): bool
@@ -61,7 +77,7 @@ class DavAccount extends AclOwnerEntity {
 			$proto = substr($this->host, -2, 2) === '80' ? 'http://' : 'https://';
 			$this->http = new HttpClient($proto . $this->host, [
 				'Content-Type' => 'application/xml; charset=utf-8',
-				'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password),
+				'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->decryptPassword()),
 			]);
 		}
 		return $this->http;
@@ -103,10 +119,12 @@ class DavAccount extends AclOwnerEntity {
 
 		$ok = parent::internalDelete($query);
 		if($ok && !self::$keepData && \go\core\Module::isAllowed('calendar', 'community')) {
-			// remove the calendars after
-			if(!\go\modules\community\calendar\model\Calendar::delete(['id'=>$calIDs])) {
-				$ok = false;
-				throw new \Exception("Unable to delete calendars related to dav account");
+			if(!empty($calIDs)) {
+				// remove the calendars after
+				if (!\go\modules\community\calendar\model\Calendar::delete(['id' => $calIDs])) {
+					$ok = false;
+					throw new \Exception("Unable to delete calendars related to dav account");
+				}
 			}
 
 		}
@@ -136,8 +154,21 @@ class DavAccount extends AclOwnerEntity {
 		}
 
 		if (!isset($host)) {
+			// Thunderbird will do HEAD /, GET /, PROPFIND .well-known
 			$data = $this->http()->get("/.well-known/$this->service");
-			$this->basePath = parse_url(rtrim($data['headers']['location'],'/'), PHP_URL_PATH).'/';
+			if(isset($data['headers']['location'])) {
+				$this->basePath = parse_url(rtrim($data['headers']['location'], '/'), PHP_URL_PATH) . '/';
+				$this->principalUri = $this->principalUri();
+			} else {
+				$responses = $this->propfind(['d:current-user-principal'], "/.well-known/$this->service");
+				foreach ($responses as $href => $response) {
+					if (isset($response->{'current-user-principal'})) {
+						$this->principalUri = $href;
+						return;
+					}
+				}
+				throw new \Exception("Could not find principalUri");
+			}
 		}
 	}
 
@@ -145,7 +176,7 @@ class DavAccount extends AclOwnerEntity {
 	private function serviceDiscovery() {
 
 		$this->dnsResolve(); // or well-known
-		$this->principalUri = $this->principalUri();
+
 
 		// todo: remove if double
 		$this->lastSync = new \DateTime();
@@ -158,13 +189,21 @@ class DavAccount extends AclOwnerEntity {
 		return $cal->put($event);
 	}
 
+	public function remove($event) {
+		// calendar and uri is needed
+		$cal = $this->byCalendar($event->calendarId);
+		// calendar must exist
+		return $cal->remove($event);
+	}
+
+
 	public function sync() {
 //		if(!$this->isSetup()) {
 			$this->serviceDiscovery();
 //		}
 		$homesetUri = $this->homeSetUri($this->principalUri);
 
-		go()->getDbConnection()->beginTransaction();
+
 
 		$responses = $this->syncCollections($homesetUri);
 
@@ -185,9 +224,12 @@ class DavAccount extends AclOwnerEntity {
 				$collection = $responses[$calendar->uri];
 				if($calendar->isNew() || $calendar->ctag !== (string)$collection->getctag) {
 					// resync
+					go()->getDbConnection()->beginTransaction();
+					go()->log('Synchronizing '. $calendar->uri. ' ctag mismatch ['. $calendar->ctag .' != '. $collection->getctag.']');
 					if($calendar->sync()) {
 						$calendar->ctag = (string)$collection->getctag;
 					}
+					go()->getDbConnection()->commit();
 				}
 				unset($responses[$calendar->uri]);
 			}
@@ -195,12 +237,11 @@ class DavAccount extends AclOwnerEntity {
 
 		$this->lastSync = new \DateTime();
 		if(!$this->save()) {
-			go()->log('Could not save dav account '. $homesetUri);
-			go()->getDbConnection()->rollBack();
+			go()->log('Could not save last sync '. $homesetUri);
+			//go()->getDbConnection()->rollBack();
 		} else if(!empty($deletedCalendars)) {
 			\go\modules\community\calendar\model\Calendar::delete((new Query())->where('id','IN',$deletedCalendars));
 		}
-		go()->getDbConnection()->commit();
 		// fetch
 	}
 
@@ -217,22 +258,29 @@ class DavAccount extends AclOwnerEntity {
 			'cs:getctag'
 		], $homesetUri, 1);
 
+		$calendars = [];
+
 		foreach ($responses as $href => $response) {
 //			if (isset($response->resourcetype->addressbook)) {
 //				$this->addAddressbook($href, $response);
 //			}
 			$isCalendar = false;
-			if(isset($response->{'supported-calendar-component-set'})) {
-				$isCalendar = (string)$response->{'supported-calendar-component-set'}->comp->attributes()->name === 'VEVENT';
+			if(isset($response->resourcetype->calendar)) {
+				$isCalendar = true;
+				if(isset($response->{'supported-calendar-component-set'})) {
+					$isCalendar = (string)$response->{'supported-calendar-component-set'}->comp->attributes()->name === 'VEVENT';
+				}
 			}
 
 			if ($isCalendar) {
 				$this->addCalendar($href, $response);
+				$calendars[$href] = $response;
 			} else {
 				// $this->addTasklist()??
 			}
 		}
-		return $responses;
+		$this->save(); // make sure the added calendars are also linked to the account before timeouts happen.
+		return $calendars;
 	}
 
 	/**
@@ -266,7 +314,7 @@ class DavAccount extends AclOwnerEntity {
 				$cal->id = $model->id;
 				$cal->uri = $uri;
 				$cal->ctag = '';// (string) $response->getctag;
-				$cal->synctoken = (string) $response->{'sync-token'};
+				$cal->synctoken = '' ;// (string) $response->{'sync-token'}; ( not supported at the moment)
 				$this->collections[$cal->id] = $cal;
 				//$cal->sync();
 			} else {

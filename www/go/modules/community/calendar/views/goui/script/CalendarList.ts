@@ -12,7 +12,7 @@ import {
 	select,
 	tbar, win, Window
 } from "@intermesh/goui";
-import {calendarStore, t} from "./Index.js";
+import {calendarStore, categoryStore, t} from "./Index.js";
 import {CalendarView} from "./CalendarView.js";
 import {ResourceWindow} from "./ResourcesWindow.js";
 import {CalendarWindow} from "./CalendarWindow.js";
@@ -141,13 +141,15 @@ export class CalendarList extends Component {
 						const cb = me.findAncestor((cmp) => cmp instanceof CheckboxField);
 						if(cb) {
 							cb.mask();
+							client.requestTimeout = 300000;
 							client.jmap('DavAccount/sync', {accountId:data.davaccountId}).then((response)=> {
 								// reload should be automaticly
 							}).catch((err) => {
 								Window.error(err);
 							}).finally(() => {
 								cb.unmask();
-							})
+								client.requestTimeout = 30000;
+							});
 						}
 					}}),
 					btn({icon:'edit', text: t('Edit')+'…', hidden: data.davaccountId, disabled:!data.myRights.mayAdmin, handler: async _ => {
@@ -160,7 +162,7 @@ export class CalendarList extends Component {
 					}}),
 					hr(),
 					btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
-						jmapds('Calendar').update(data.id, {isSubscribed: false});
+						jmapds('Calendar').update(data.id, {isSubscribed: false}).catch(e => Window.error(e))
 					}}),
 					hr(),
 					btn({icon:'file_save',hidden:data.groupId, text: t('Export','core','core'), handler: _ => { client.getBlobURL('community/calendar/calendar/'+data.id).then(window.open) }}),
@@ -231,6 +233,7 @@ export class CalendarList extends Component {
 		for(const id in this.visibleChanges) {
 			jmapds('Calendar').update(id, {isVisible:this.visibleChanges[id]});
 		}
+		//categoryStore.setFilter('calendars', {calendarId: this.visibleChanges}).load();
 		this.visibleChanges = {};
 	})
 }

@@ -791,7 +791,23 @@ abstract class EntityController extends Controller {
 		if($ret = self::fireEvent(self::EVENT_BEFORE_CAN_UPDATE, $entity)) {
 			return $ret;
 		}
-		return $entity->hasPermissionLevel(Acl::LEVEL_WRITE) && $this->checkAclChange($entity);
+		return ($entity->hasPermissionLevel(Acl::LEVEL_WRITE) || $this->onlyUserPropsModified($entity)) && $this->checkAclChange($entity);
+	}
+
+	/**
+	 * Checks if the entity only has modifications to the user properties. As they belong to the current user it's ok that
+	 * they are modified by the current user.
+	 *
+	 * @param Entity $entity
+	 * @return bool
+	 * @throws Exception
+	 */
+	protected function onlyUserPropsModified(Entity $entity): bool {
+		$userPropNames = $entity->getUserProperties();
+		$modified = $entity->getModified();
+
+		$diff = array_diff(array_keys($modified), $userPropNames);
+		return empty($diff);
 	}
 
 

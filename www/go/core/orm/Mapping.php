@@ -268,7 +268,7 @@ class Mapping {
 	 * @param class-string<Property> $propertyClsName The name of the Property model
 	 * @param array $keys The keys of the relation. eg. ['id' => 'articleId']
 	 * @param array $options pass ['orderBy' => 'sortOrder'] to save the sort order in this int column. This property can
-	 *   be a protected property because the client does not need to know of it's existence.
+	 *   be a protected property because the client does not need to know of its existence.
 	 *
 	 * @return $this;
 	 */

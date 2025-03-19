@@ -106,53 +106,71 @@ $updates['202402221543'][] = function(){ // migrate recurrence rules and fix las
 
 		if($row['recurrenceRule'][0] == '{')
 			continue; // already done
+
 		$start = new DateTime($row["start"]);
 		try {
 			$rrule = \go\core\util\Recurrence::fromString($row['recurrenceRule'], $start);
-		} catch(Exception $e) {
-			die("RRULE Exception: " . $e->getMessage() ."\n");
-		}
-		$recurrenceRule = json_encode($rrule->toArray());
-		$data = ['recurrenceRule' => $recurrenceRule];
-		if(isset($rrule->until)) {
-			$data['lastOccurrence'] = clone $rrule->until;
-		} else if(isset($rrule->count)) {
-			$lastOccurrence = clone $start;
-			$it = new \Sabre\VObject\Recur\RRuleIterator($row['recurrenceRule'], $start);
-			$maxDate = new \DateTime('2058-01-01');
-			while ($it->valid() && $lastOccurrence < $maxDate) {
-				$lastOccurrence = $it->current(); // will clone :(
-				$it->next();
+
+			$recurrenceRule = json_encode($rrule->toArray());
+			$data = ['recurrenceRule' => $recurrenceRule];
+			if(isset($rrule->until)) {
+				$data['lastOccurrence'] = clone $rrule->until;
+			} else if(isset($rrule->count)) {
+				$lastOccurrence = clone $start;
+				$it = new \Sabre\VObject\Recur\RRuleIterator($row['recurrenceRule'], $start);
+				$maxDate = new \DateTime('2058-01-01');
+				while ($it->valid() && $lastOccurrence < $maxDate) {
+					$lastOccurrence = $it->current(); // will clone :(
+					$it->next();
+				}
+				$data['lastOccurrence'] = $lastOccurrence;
+			} else {
+				$data['lastOccurrence'] = null;
 			}
-			$data['lastOccurrence'] = $lastOccurrence;
-		} else {
-			$data['lastOccurrence'] = null;
-		}
-		// check max exception vs currentEnd if not null
-		if($data['lastOccurrence'] !== null) {
-			$lastEx = go()->getDbConnection()->query("SELECT FROM_UNIXTIME(MAX(`start_time`)) FROM cal_events WHERE exception_for_event_id = " . $row['eventId'])->fetchColumn();
-			if(!empty($lastEx)) {
-				$dt = tz_convert($lastEx, $row['timeZone']);
-				if ($dt > $data['lastOccurrence']) {
-					$data['lastOccurrence'] = $dt;
+			// check max exception vs currentEnd if not null
+			if($data['lastOccurrence'] !== null) {
+				$lastEx = go()->getDbConnection()->query("SELECT FROM_UNIXTIME(MAX(`start_time`)) FROM cal_events WHERE exception_for_event_id = " . $row['eventId'])->fetchColumn();
+				if(!empty($lastEx)) {
+					$dt = tz_convert($lastEx, $row['timeZone']);
+					if ($dt > $data['lastOccurrence']) {
+						$data['lastOccurrence'] = $dt;
+					}
+				}
+				$data['lastOccurrence']->add(new \DateInterval($row['duration']));
+			}
+			// check min exception vs start
+			$firstEx = go()->getDbConnection()->query("SELECT FROM_UNIXTIME(MIN(`start_time`)) FROM cal_events WHERE exception_for_event_id = ".$row['eventId'])->fetchColumn();
+			if(!empty($firstEx)) {
+				$dt = tz_convert($firstEx, $row['timeZone']);
+				if($dt < $start) {
+					$data['firstOccurrence'] = $dt;
 				}
 			}
-			$data['lastOccurrence']->add(new \DateInterval($row['duration']));
+		} catch(Exception $e) {
+			echo "Remove invalid RRULE for event:".$row['eventId'].": " . $e->getMessage() ."\n";
+			$data = ['recurrenceRule' => null];
 		}
-		// check min exception vs start
-		$firstEx = go()->getDbConnection()->query("SELECT FROM_UNIXTIME(MIN(`start_time`)) FROM cal_events WHERE exception_for_event_id = ".$row['eventId'])->fetchColumn();
-		if(!empty($firstEx)) {
-			$dt = tz_convert($firstEx, $row['timeZone']);
-			if($dt < $start) {
-				$data['firstOccurrence'] = $dt;
-			}
-		}
-
 
 		go()->getDbConnection()->updateIgnore('calendar_event', $data, ['eventId' => $row['eventId']])->execute();
 
 	}
 };
+
+//delete empty event folders
+$updates['202403121146'][] = "DELETE f FROM fs_folders f
+	LEFT JOIN fs_files fi ON fi.folder_id = f.id
+	LEFT JOIN fs_folders ff ON ff.parent_id = f.id
+	WHERE 
+		 fi.folder_id IS NULL 
+		 AND ff.parent_id IS NULL
+		 AND f.id IN (SELECT files_folder_id FROM cal_events);";
+
+// unset files id of event with folders that no longer exist
+$updates['202403121146'][] = "UPDATE cal_events e 
+   LEFT JOIN fs_folders f on e.files_folder_Id = f.id
+   SET files_folder_id = 0
+   WHERE e.files_folder_id != 0 AND f.id IS NULL";
+
 
 $updates['202403121146'][] = function(){ // migrate files to blob and add as calendar_link
 	$pdo = go()->getDbConnection()->getPDO();
@@ -165,7 +183,7 @@ $updates['202403121146'][] = function(){ // migrate files to blob and add as cal
 		return 'calendar/' . File::stripInvalidChars($calendarName) . '/' . $yearOfStartTime . '/' . File::stripInvalidChars($title).' ('.$id.')';
 	}
 
-	function insertFolder($row, $folderId, $path, $filesStmt,$foldersStmt, $insertLinkStmt) {
+	function insertFolder($row, $folderId, $path, PDOStatement $filesStmt,$foldersStmt, $insertLinkStmt) {
 		$filesStmt->bindValue(1, $folderId);
 		$filesStmt->execute();
 		foreach($filesStmt as $fileRow) {
@@ -179,7 +197,7 @@ $updates['202403121146'][] = function(){ // migrate files to blob and add as cal
 		$foldersStmt->bindValue(1, $folderId);
 		$foldersStmt->execute();
 		foreach($foldersStmt as $folderRow) {
-			insertFolder($row, $folderRow, $path.'/'.$folderRow['name'], $filesStmt,$foldersStmt, $insertLinkStmt);
+			insertFolder($row, $folderRow['id'], $path.'/'.$folderRow['name'], $filesStmt,$foldersStmt, $insertLinkStmt);
 		}
 	};
 
@@ -222,6 +240,22 @@ $updates['202404071212'][] = function() {
 
 // after timezone conversion make all full day event floating-time
 $updates['202404071212'][] = "UPDATE calendar_event SET timeZone = NULL WHERE showWithoutTime = 1;";
+// remove orphan categories
+$updates['202502261353'][] = "DELETE cat FROM calendar_category cat LEFT JOIN calendar_calendar c on c.id = cat.calendarId WHERE c.id IS NULL;";
+// fix: set duration at 1 hour if duration is negative
+$updates['202503101510'][] = "UPDATE calendar_event SET duration = 'PT1H' WHERE duration LIKE 'PT-%';";
+$updates['202503111342'][] = function(){
+	\go\modules\community\calendar\cron\ScanEmailForInvites::install("*/5 * * * *");
+};
 
+$updates['202503131043'][] = "UPDATE core_link l
+	JOIN core_entity et ON et.id = l.fromEntityTypeId
+	JOIN calendar_calendar_event e on e.eventId = l.fromId AND et.name = 'CalendarEvent'
+	SET l.fromId = e.id;";
+
+$updates['202503131043'][] = "UPDATE core_link l
+	JOIN core_entity et ON et.id = l.toEntityTypeId
+	JOIN calendar_calendar_event e on e.eventId = l.toId AND et.name = 'CalendarEvent'
+	SET l.toId = e.id;";
 
 // TODO: calendar views -> custom filters

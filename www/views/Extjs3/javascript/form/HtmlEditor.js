@@ -19,6 +19,8 @@ GO.form.HtmlEditor = function (config) {
 	var ioDentPlugin = new Ext.ux.form.HtmlEditor.IndentOutdent();
 	var ssScriptPlugin = new Ext.ux.form.HtmlEditor.SubSuperScript();
 	var rmFormatPlugin = new Ext.ux.form.HtmlEditor.RemoveFormat();
+	var imageResizePlugin = new GO.plugins.HtmlEditorImageResize();
+	var tablePlugin = new Ext.ux.form.HtmlEditor.NEWTablePlugin();
 
 
 	if (GO.settings.pspellSupport) {
@@ -30,7 +32,9 @@ GO.form.HtmlEditor = function (config) {
 					rmFormatPlugin,
 					// wordPastePlugin,
 					hrPlugin,
-					ssScriptPlugin
+					ssScriptPlugin,
+					imageResizePlugin,
+					tablePlugin
 					);
 
 	if(config.headingsMenu) {
@@ -50,6 +54,9 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	headingsMenu: true,
 
 	enableSendShortcut : true,
+
+	defaultLinkValue : 'https:/'+'/',
+
 
 	initComponent: function() {
 		GO.form.HtmlEditor.superclass.initComponent.apply(this);
@@ -246,7 +253,9 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 				}
 			});
 
+			console.warn(h != anchored);
 			if(h != anchored) {
+
 				this.getEditorBody().innerHTML = anchored;
 				this.restoreCursorPosition();
 			}else
@@ -270,7 +279,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			range = sel.getRangeAt(0);
 
 			el = doc.createElement("div");
-			el.innerHTML = "<div style='display:none' id='go-stored-cursor'></div>";
+			el.innerHTML = "<span style='display:none' id='go-stored-cursor'></span>";
 			frag = doc.createDocumentFragment();
 			while ((node = el.firstChild)) {
 				lastNode = frag.appendChild(node);
@@ -502,7 +511,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			// If firefox is used, then manually add the "a" tag to the text
 			var t = this.getSelectedText();
 			if (t.length < 1) {
-				value = '<a href="' + value + '">' + value + "</a>";
+				value = '<a href="' + value + '" target="_blank">' + value + "</a>";
 				this.insertAtCursor(value);
 			}
 		}
@@ -646,20 +655,6 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		this.lastKey = ev.key;
 	},
 
-	// getFontStyle :  function() {
-	// 	var style = getComputedStyle(this.getEl().dom);
-	// 	return "font-size: " + style['font-size'] + ';font-family: '+style['font-family'];
-	// },
-	//
-	// getEditorFrameStyle : function() {
-	// 	return 'body,p,td,div,span{' + this.getFontStyle() + '};body{border: 0; margin: 0; padding: {0}px; height: {1}px; cursor: text}body p{margin:0px;}';
-	// },
-	//
-	// getDocMarkup: function () {
-	// 	console.warn( this.getEditorFrameStyle());
-	// 	var h = Ext.fly(this.iframe).getHeight() - this.iframePad * 2;
-	// 	return String.format('<html><head><meta name="SKYPE_TOOLBAR" content="SKYPE_TOOLBAR_PARSER_COMPATIBLE" /><style type="text/css">' + this.getEditorFrameStyle() + '</style></head><body></body></html>', this.iframePad, h);
-	// },
 	fixKeys: function (e) { // load time branching for fastest keydown performance
 
 				var k = e.getKey(), doc;
@@ -714,13 +709,17 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 	createLink: function () {
 		var url = prompt(this.createLinkText, this.defaultLinkValue);
-		if (url && url != 'http:/' + '/') {
+		if (url && url != 'https:/' + '/') {
 			if (Ext.isSafari) {
 				this.execCmd("createlink", url);
 				this.updateToolbar();
-			} else
-			{
-				this.relayCmd("createlink", url);
+			} else {
+				// this.relayCmd("createlink", url);
+				let t = this.getSelectedText();
+				if (t.length < 1) {
+					t = url;
+				}
+				this.insertAtCursor('<a href="' + url + '" target="_blank">' + t + "</a>");
 			}
 		}
 	},

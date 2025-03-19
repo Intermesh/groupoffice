@@ -345,7 +345,7 @@ class Extjs3 {
 		} else {
 			foreach ($this->goScripts as $script) {
 				echo ($script instanceof File ?
-						'<script src="' . str_replace($rootPath, '', $script->getPath()) . '?mtime=' . $script->getModifiedAt()->format("U") . '"></script>' :
+						'<script src="' . str_replace($rootPath, '', $script->getPath())  . '"></script>' :
 						'<script>' . $script . '</script>') . "\n";
 
 			}
@@ -354,7 +354,7 @@ class Extjs3 {
 
 		// gouiScripts array is loaded from apcu when not debugging
 		foreach($this->gouiScripts as $script) {
-			echo '<script type="module" src="'.str_replace($rootPath, $baseUri, $script->getPath()). '?mtime='.$script->getModifiedAt()->format("U").'"></script>' . "\n";
+			echo '<script type="module" src="'.str_replace($rootPath, $baseUri, $script->getPath()). '"></script>' . "\n";
 		}
 		if (file_exists(GO::view()->getTheme()->getPath() . 'MainLayout.js')) {
 			echo '<script src="' . GO::view()->getTheme()->getUrl() . 'MainLayout.js" type="text/javascript"></script>';

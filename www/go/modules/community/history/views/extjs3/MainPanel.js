@@ -156,7 +156,8 @@ Ext.define('go.modules.community.history.MainPanel', {
 						{id: 'login', boxLabel: t('Login')},
 						{id: 'logout', boxLabel: t('Logout')},
 						{id: 'badlogin', boxLabel: t('Bad login')},
-						{id: 'download', boxLabel: t('Download')}
+						{id: 'download', boxLabel: t('Download')},
+						{id: 'email', boxLabel: t('E-mail')}
 					]
 				}, {
 					xtype: 'panel',

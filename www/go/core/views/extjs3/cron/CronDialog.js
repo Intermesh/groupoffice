@@ -62,7 +62,7 @@ go.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '99%',
 			maxLength: 100,
 			allowBlank:false,
-			fieldLabel: t("Minutes", "cron") +' '+ t("(0-59)", "cron")
+			fieldLabel: t("Minutes", "cron") +" (0-59)"
 		});
 		
 		this.hoursField = new Ext.form.TextField({
@@ -71,7 +71,7 @@ go.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '99%',
 			maxLength: 100,
 			allowBlank:false,
-			fieldLabel: t("Hours", "cron") +' '+ t("(0-23)", "cron")
+			fieldLabel: t("Hours", "cron") +" (0-23)"
 		});
 		
 		this.monthDaysField = new Ext.form.TextField({
@@ -80,7 +80,7 @@ go.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '99%',
 			maxLength: 100,
 			allowBlank:false,
-			fieldLabel: t("Month days", "cron") +' '+ t("(1-31)", "cron")
+			fieldLabel: t("Month days", "cron") +" (1-31)"
 		});
 		
 		this.monthsField = new Ext.form.TextField({
@@ -89,7 +89,7 @@ go.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '99%',
 			maxLength: 100,
 			allowBlank:false,
-			fieldLabel: t("Months", "cron") +' '+ t("(1-12)", "cron")
+			fieldLabel: t("Months", "cron") + " (1-12)"
 		});
 		
 		this.weekdaysField = new Ext.form.TextField({
@@ -98,7 +98,7 @@ go.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '99%',
 			maxLength: 100,
 			allowBlank:false,
-			fieldLabel: t("Week days", "cron") +' '+ t("(0-6)", "cron")
+			fieldLabel: t("Week days", "cron") +" (0-6)"
 		});
 		
 //		this.yearsField = new Ext.form.TextField({

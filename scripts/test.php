@@ -1,8 +1,8 @@
 <?php
+require (dirname(__DIR__) . '/www/GO.php');
 
-$start = new DateTime("2023-03-20 10:15");
-$end = new DateTime("2023-05-01 09:12");
+$version = phpversion("sourceGuardian");
 
-$diff = $start->diff($end);
+$val = version_compare($version, '16.0.0', '>=');
 
-var_dump($diff);
+var_dump($val);

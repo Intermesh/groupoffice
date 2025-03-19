@@ -217,7 +217,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		// route to main grid when details resets / is deleted for mobile view
 		this.taskDetail.on("reset", () => {
-			go.Router.goto("tasks");
+			go.Router.goto(this.support ? "support" : "tasks");
 		})
 
 		go.modules.community.tasks.MainPanel.superclass.initComponent.call(this);
@@ -439,7 +439,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					},
 					scope: this
 				},{
-					icon: 'ic-bookmark_added',
+					iconCls: 'ic-bookmark-added',
 					text: t('Subscribe to task list') + '…', handler: () => {
 						const dlg = new go.modules.community.tasks.SubscribeWindow({
 							support:this.support

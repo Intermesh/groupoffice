@@ -167,7 +167,10 @@ class Environment extends Singleton {
 	 */
 	public function hasIoncube(): bool
 	{
-		return function_exists('sg_load') || !self::sourceIsEncoded();
+		$version = phpversion("sourceGuardian");
+
+		return ($version && version_compare($version, '14.0.0', '>=')) || !self::sourceIsEncoded();
+
 	}
 
 	private static function sourceIsEncoded() : bool {

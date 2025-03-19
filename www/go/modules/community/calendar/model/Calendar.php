@@ -5,6 +5,7 @@ use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\db\DbException;
 use go\core\model\Principal;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\PrincipalTrait;
@@ -98,51 +99,6 @@ class Calendar extends AclOwnerEntity {
 		$this->color = $value;
 	}
 
-	/**
-	 * If the UID of the event already exists in the system. Grab its ID and add the event to the given calendar.
-	 * Then select it again and return the selected event.
-	 * If it doesn't exists just set the calendarId and save() once to behave
-	 * @param CalendarEvent $event
-	 * @param int $calendarId
-	 * @return ?CalendarEvent this one is saved in the provided calendar
-	 * @throws DbException
-	 */
-	static function addEvent(CalendarEvent $event, int $calendarId): ?CalendarEvent
-	{
-		$eventData = go()->getDbConnection()
-			->select(['t.eventId, GROUP_CONCAT(calendarId) as calendarIds'])
-			->from('calendar_event', 't')
-			->join('calendar_calendar_event', 'c', 'c.eventId = t.eventId', 'LEFT')
-			->where(['uid'=>$event->uid, 'recurrenceId' => $event->recurrenceId])
-			->single();
-
-		if(!empty($eventData) && !empty($eventData['eventId'])) {
-			$calendarIds = explode(',', $eventData['calendarIds']??'');
-			if(in_array($calendarId, $calendarIds)) {
-				// found and already in calendar
-				return CalendarEvent::find()->where(['calendarId'=>$calendarId, 'uid' => $event->uid])->single();
-			}
-			// found but not in calendar (insert)
-			go()->getDbConnection()->insert('calendar_calendar_event', [
-				'calendarId' => $calendarId,
-				'eventId' => $eventData['eventId']
-			])->execute();
-			$id = go()->getDbConnection()->getPDO()->lastInsertId();
-			//Calendar::updateHighestModSeq($calendarId);
-			$found = CalendarEvent::findById($id);
-			$found->useDefaultAlerts = true;
-			$found->save();
-			return $found;
-		}
-		//not found, set calendarId save and return
-		$event->calendarId = $calendarId;
-		$event->useDefaultAlerts = true;
-		if(!$event->save()) {
-			go()->log('failed to create event object' . var_export($event->getValidationErrors(), true));
-			return null;
-		}
-		return $event;
-	}
 
 	protected static function defineFilters(): Filters
 	{

@@ -18,7 +18,7 @@ export class CalendarWindow extends FormWindow {
 		this.height = 650;
 
 		this.on('beforerender', () => {
-			this.title = t(this.currentId ? 'Edit calendar' : 'Create calendar');
+			this.title = t(this.form.currentId ? 'Edit calendar' : 'Create calendar');
 		})
 
 		const alertField = alertfield({name: 'defaultAlertsWithTime',isForDefault:true, label:t('Events with time')}),
