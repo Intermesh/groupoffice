@@ -1,0 +1,1 @@
+insert into email_accounts select from em_accounts;
