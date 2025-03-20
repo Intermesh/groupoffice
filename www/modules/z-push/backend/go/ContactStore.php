@@ -221,6 +221,7 @@ class ContactStore extends Store implements ISearchProvider {
 	public function getNotification($folder = null) {
 
 		$stmt = Contact::find()
+			->removeJoins()
 			->fetchMode(PDO::FETCH_ASSOC)
 			->select('COALESCE(count(*), 0) AS count, COALESCE(max(modifiedAt), 0) AS modifiedAt')
 			->where('addressBookId = :addressBookId')
