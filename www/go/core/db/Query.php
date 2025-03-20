@@ -343,9 +343,9 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * @param Query $query
 	 * @return $this
 	 */
-	public function union(Query $query): Query
+	public function union(Query $query, bool $all = false): Query
 	{
-		$this->unions[] = $query;
+		$this->unions[] = [$query, $all];
 		
 		return $this;
 	}
