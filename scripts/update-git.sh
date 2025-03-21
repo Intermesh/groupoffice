@@ -1,6 +1,5 @@
 #!/bin/bash
-
-# This script can be used to update an environment on a server.
+# This script updates all git repo's and builds SASS, installs composer packages and build's the GOUI modules
 
 set -e
 
@@ -60,51 +59,7 @@ do
 done
 
 
-function buildGOUI() {
-  echo BUILDING node modules inside "$1"...
-  cd $DIR;
-  for line in $(find $1 -name package.json -not -path '*/node_modules/*');
-  do
-    local NODE_DIR="$(dirname "${line}")";
-    echo "BUILD:" $NODE_DIR;
-    cd $NODE_DIR;
-    npm ci;
-    npm run build;
-    cd $DIR;
-
-  done
-
-  echo "DONE";
-}
-
-echo "Building GOUI shared libs..."
-cd $DIR;
-cd ./www/views/goui/goui
-npm ci
-
-cd ../groupoffice-core
-npm ci
-
-cd ..
-npm ci
-npm run build
-
-cd $DIR;
-echo "DONE";
-
-buildGOUI "./www/go/modules"
-
-cd www
-
-export COMPOSER_ALLOW_SUPERUSER=1
-for line in $(find . -name composer.json -type f -not -path '*/vendor/*')
-do
-  COMPOSER_DIR="$(dirname "${line}")";
-  echo "Composer install:" $COMPOSER_DIR;
-  cd $COMPOSER_DIR;
-  composer install -n --no-dev -o
-  cd $DIR/www
-done
+../scripts/build.sh
 
 if [ -z "$CONFIG" ]; then
   echo NOTE: Not upgrading database because no config file was passed. eg. ./update-git.sh /etc/groupoffice/multi_instance/manage.group-office.com/config.php

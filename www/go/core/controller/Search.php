@@ -98,7 +98,7 @@ class Search extends EntityController {
 			self::fireEvent(self::EVENT_SEARCH_EMAIL_CONTACTS, $contactsQuery, $query ?? $contactsQuery);
 
 			if(isset($query)) {
-				$query->union($contactsQuery);
+				$query->union($contactsQuery, true);
 			} else{
 				$query = $contactsQuery;
 			}
@@ -136,18 +136,10 @@ class Search extends EntityController {
 
 	protected function getQueryQuery(ArrayObject $params): Query
 	{
-		$hasIndex = go()->getDatabase()->getTable('core_search')->hasIndex("core_search_entityTypeId_filter_modifiedAt_aclId_index");
-
 		$query = parent::getQueryQuery($params)
 				->groupBy([])
 				->select("search.id")
 				->removeJoin('core_entity', 'e');
-
-		if($hasIndex) {
-			$query->useIndex("use index(PRIMARY, core_search_entityTypeId_filter_modifiedAt_aclId_index)");
-		} else{
-			ErrorHandler::log("Index core_search_entityTypeId_filter_modifiedAt_aclId_index is missing. If search cache is rebuilding then this is normal.");
-		}
 
 		return $query;
 	}
