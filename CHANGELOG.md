@@ -1,6 +1,13 @@
+- Supportclient: add 'select all lists' checkbox to sidebar
+- Finance: When duplicating quotes or invoices etc. default to the same book
+- Finance: Optimized database index
+- Core: Optimized database indexes for core_change, search.
+- ActiveSync: Optimized notification queries
+- Core: Updated German translation thanks to University of Greifswald
+
 18-03-2025: 25.0.9
 - Core: Build error
-- Core: maximum call stack exceeded error- 
+- Core: maximum call stack exceeded error
 
 18-03-2025: 25.0.8
 - E_mail: Save mail as project
