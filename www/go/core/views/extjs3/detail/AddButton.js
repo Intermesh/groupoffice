@@ -184,7 +184,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 							window.setLinkEntity({
 								entity: this.getEntity(),
 								entityId: this.getEntityId(),
-								data: this.detailView.data
+								data: structuredClone(this.detailView.data) // to avoid that the detailview data is modified
 							});
 						//}, this, {single: true});
 					}
