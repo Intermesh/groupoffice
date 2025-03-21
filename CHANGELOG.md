@@ -1,4 +1,8 @@
 - Supportclient: add 'select all lists' checkbox to sidebar
+- Finance: When duplicating quotes or invoices etc. default to the same book
+- Finance: Optimized database index
+- Core: Optimized database indexes for core_change, search.
+- ActiveSync: Optimized notification queries
 
 17-03-2025: 6.8.110
 - Finance: Try to sanitize HTML to avoid too much vertical space between text on the PDF
