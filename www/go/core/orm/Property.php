@@ -2085,6 +2085,36 @@ abstract class Property extends Model {
 				}
 				break;
 
+			case 'tinyint':
+				$max = 127;
+			case 'smallint':
+				if(!isset($max))
+					$max = 32767;
+			case 'mediumint':
+				if(!isset($max))
+					$max = 8388607;
+			case 'int':
+				if(!isset($max))
+					$max = 2147483647;
+			case 'bigint':
+				if(!isset($max))
+					$max = PHP_INT_MAX;
+
+				if($column->unsigned) {
+					$min = 0;
+					$max = $max * 2 + 1;
+				} else {
+					$min = 0 - $max - 1;
+				}
+
+				if($value < $min) {
+					$this->setValidationError($column->name, ErrorCode::MALFORMED, 'int value must be greater than ' . $min . '. Value given: ' . $value);
+				} else if($value > $max) {
+					$this->setValidationError($column->name, ErrorCode::MALFORMED, 'int value must be lower than ' . $max . '. Value given: ' . $value);
+				}
+
+				break;
+
 			case "json":
 				break;
 
