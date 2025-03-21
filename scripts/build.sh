@@ -18,6 +18,7 @@ cd "$DIR/www"
 
 
 echo "Installing PHP Composer packages"
+export COMPOSER_ALLOW_SUPERUSER=1;
 for line in $(find . -name composer.json -type f -not -path '*/vendor/*'  | cut -c3- )
 do
   COMPOSER_DIR="$(dirname "${line}")";
