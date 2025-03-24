@@ -9,6 +9,7 @@
 - DAV: Remove obsolete DavTask model
 - Core: update cache on setting default user groups
 - Calendar: only display and enable 'Add download link' button if end user has 'access_main' permission
+- Core: fix disabling 'ActiveSync devices can connect' setting
 
 17-03-2025: 6.8.110
 - Finance: Try to sanitize HTML to avoid too much vertical space between text on the PDF
