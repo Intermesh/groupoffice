@@ -662,6 +662,8 @@ class Settings extends core\Settings {
 				throw new Exception("Could not save group id ".$groupId);
 			}
 		}
+		unset($this->defaultGroups);
+		$this->getDefaultGroups();
 	}
 
 
@@ -680,6 +682,10 @@ class Settings extends core\Settings {
 	{
 		if(!$this->validate()){
 			return false;
+		}
+
+		if($this->activeSyncCanConnect !== true) {
+			$this->activeSyncCanConnect = "0"; // We save this into a varchar field, which will save a false as an empty string.
 		}
 
 		if(isset($this->logoId)) {
