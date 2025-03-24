@@ -894,6 +894,8 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					cls: "go-hbox",
 					items: [
 						this.addDownLoadLinkButton = new Ext.Button({
+							hidden: true,
+							disabled: true,
 							iconCls: "ic-link",
 							text: t("Add download link", "files"),
 							handler: this.fileBrowserHandle,
@@ -1011,7 +1013,11 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			this.tabPanel.doLayout();
 		},this);
 
-
+		// If file browsing in enabled for current user, show the 'add link' button...
+		if (go.Modules.get("legacy", "files").userRights.mayAccessMainPanel) {
+			this.addDownLoadLinkButton.enable();
+			this.addDownLoadLinkButton.show();
+		}
 	},
 
 
