@@ -78,3 +78,5 @@ $updates['202212051053'][] = "alter table pa_mailboxes
 
 $updates['202404231045'][] = "alter table pa_mailboxes
     add fts boolean default false not null after smtpAllowed;";
+
+$updates['202503251427'][] = "update core_module set package='community',name='maildomains' version=0 where name='postfixadmin'";
