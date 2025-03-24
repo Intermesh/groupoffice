@@ -36,7 +36,7 @@ do
 done
 
 
-echo "Building SASS\n"
+echo "Building SASS"
 
 for line in $(find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*' | sort -r );
 do
@@ -64,7 +64,7 @@ function buildGOUI() {
   echo "DONE";
 }
 
-echo "Building GOUI shared libs..."
+echo "Building GOUI shared libs"
 cd $DIR;
 cd ./www/views/goui/goui
 npm ci
