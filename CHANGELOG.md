@@ -1,3 +1,5 @@
+- Core: Catch database exception in legacy session handler to catch the case where a session exists but the 
+  database is not installed yet. Reported in issue #1242.
 - Supportclient: add 'select all lists' checkbox to sidebar
 - Finance: When duplicating quotes or invoices etc. default to the same book
 - Finance: Optimized database index
