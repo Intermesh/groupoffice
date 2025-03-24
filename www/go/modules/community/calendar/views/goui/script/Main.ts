@@ -139,7 +139,7 @@ export class Main extends Component {
 					tbar({cls: 'dense'},comp({tagName: 'h3', html: t('Other')})),
 					comp({tagName:'ul', cls:'goui check-list'}, ...this.renderAdapterBoxes()),
 					tbar({cls: 'dense'},
-						comp({tagName: 'h3', html: t('Categories')}),
+						comp({tagName: 'h3', html: t('Categories','core','core')}),
 						btn({
 							icon: 'add', menu: menu({},
 								btn({
