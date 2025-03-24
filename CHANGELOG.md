@@ -1,3 +1,4 @@
+- Fixed exception in database check. Reported in issue #1242.
 - Supportclient: add 'select all lists' checkbox to sidebar
 - Finance: When duplicating quotes or invoices etc. default to the same book
 - Finance: Optimized database index
