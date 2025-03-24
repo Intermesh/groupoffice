@@ -7,6 +7,7 @@
 - ActiveSync: Optimized notification queries
 - Core: Updated German translation thanks to University of Greifswald
 - DAV: Remove obsolete DavTask model
+- Core: update cache on setting default user groups
 
 17-03-2025: 6.8.110
 - Finance: Try to sanitize HTML to avoid too much vertical space between text on the PDF

@@ -662,6 +662,8 @@ class Settings extends core\Settings {
 				throw new Exception("Could not save group id ".$groupId);
 			}
 		}
+		unset($this->defaultGroups);
+		$this->getDefaultGroups();
 	}
 
 
