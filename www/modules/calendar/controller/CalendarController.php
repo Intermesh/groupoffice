@@ -20,6 +20,11 @@
 
 namespace GO\Calendar\Controller;
 
+use DateTimeZone;
+use Sabre\VObject\Reader;
+use Sabre\VObject\Splitter\ICalendar;
+use Sabre\VObject\TimezoneGuesser\TimezoneFinder;
+use Sabre\VObject\TimeZoneUtil;
 use SimpleXMLElement;
 
 use GO;
@@ -157,17 +162,27 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 			$file = new File($_FILES['ical_file']['tmp_name'][0]);
 			
 			$ext = strtolower(File::getExtension($_FILES['ical_file']['name'][0]));
-			
 			if($ext == 'ics'){
-				$i = new \GO\Base\Vobject\Iterator($file, "VEVENT");
-				foreach($i as $vevent){					
-
-					$event = new Event();
-					try{
-						$event->importVObject( $vevent, array('calendar_id'=>$params['calendar_id']) );
-						$count++;
-					}catch(\Exception $e){
-						$failed[]=$e->getMessage();
+				$splitter = new ICalendar(fopen($file->path(),"r"), Reader::OPTION_FORGIVING);
+				TimeZoneUtil::addTimezoneFinder('mssucks', new class implements TimezoneFinder {
+					public function find(string $tzid, bool $failIfUncertain = false): ?DateTimeZone
+					{
+						if($tzid === "tzone://Microsoft/Utc") {
+							return new DateTimeZone('UTC');
+						}
+						return null;
+					}
+				});
+				//$i = new \GO\Base\Vobject\Iterator($file, );
+				while($vcalendar = $splitter->getNext()){
+					foreach($vcalendar->VEVENT as $vevent) {
+						$event = new Event();
+						try {
+							$event->importVObject($vevent, array('calendar_id' => $params['calendar_id']));
+							$count++;
+						} catch (\Exception $e) {
+							$failed[] = $e->getMessage();
+						}
 					}
 				}
 			}elseif($ext=='xml')
