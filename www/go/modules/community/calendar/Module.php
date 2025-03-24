@@ -65,6 +65,33 @@ class Module extends core\Module
 					->update('core_principal', ['email' => $user->email], ['id' => $pIds])
 					->execute();
 			}
+		}
+
+		if($user->isNew()) {
+			// create new personal calendar
+			$calendar = new Calendar();
+			$calendar->setValues([
+				'name' => $user->displayName,
+				'ownerId' => $user->id,
+				'color' => Calendar::randomColor($user->displayName)
+			]);
+
+			if($calendar->save()) {
+				$acl = $calendar->findAcl();
+				$acl->addGroup($user->getPersonalGroup()->id, \go\core\model\Acl::LEVEL_MANAGE);
+				$acl->save();
+
+				//subscribe user
+				go()->getDbConnection()->insert('calendar_calendar_user', [
+					'userId'=>$user->id,
+					'id'=>$calendar->id,
+					'isSubscribed'=>true,
+					'includeInAvailability'=>'all',
+					'color'=>$calendar->color
+				])->execute();
+
+				$user->calendarPreferences->defaultCalendarId = $calendar->id;
+			}
 
 		}
 	}

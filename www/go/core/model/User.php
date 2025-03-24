@@ -8,7 +8,7 @@ use GO\Base\Model\AbstractUserDefaultModel;
 use GO\Base\Model\User as LegacyUser;
 use GO\Base\Util\Http;
 use GO\Calendar\Model\Calendar;
-use GO\Calendar\Model\UserSettings as CalendarUserSettings;
+use go\modules\community\calendar\model\Preferences as CalendarUserSettings;
 use go\core\acl\model\AclItemEntity;
 use go\core\App;
 use go\core\auth\Authenticate;
@@ -54,7 +54,7 @@ use http\Exception\InvalidArgumentException;
  * @property ?TasksUserSettings $tasksSettings
  * @property ?NotesUserSettings $notesSettings
  * @property ?UserSettings $addressBookSettings
- * @property ?CalendarUserSettings $calendarSettings
+ * @property ?CalendarUserSettings $calendarPreferences
  */
 class User extends AclItemEntity {
 	
