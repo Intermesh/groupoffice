@@ -35,7 +35,6 @@ do
   fi
 done
 
-exit
 
 echo "Building SASS\n"
 
@@ -81,22 +80,3 @@ cd $DIR;
 echo "DONE";
 
 buildGOUI "./www/go/modules"
-
-cd www
-
-for line in $(find . -name composer.json -type f -not -path '*/vendor/*')
-do
-  COMPOSER_DIR="$(dirname "${line}")";
-
-  if [ -z "$DOCKERCONTAINER" ]; then
-    echo "docker"
-    docker compose exec $DOCKERCONTAINER -w "/usr/local/share/src/www/$COMPOSER_DIR" composer install -o
-  else
-    echo "Composer install:" $COMPOSER_DIR;
-    cd $COMPOSER_DIR;
-    composer install -o
-    cd $DIR/www
-  fi
-done
-
-
