@@ -20,6 +20,11 @@ use Sabre\VObject\Component\VCalendar;
 class Module extends core\Module
 {
 
+	public function autoInstall(): bool
+	{
+		return true;
+	}
+
 	public function getAuthor(): string
 	{
 		return "Intermesh BV <mdhart@intermesh.nl>";
