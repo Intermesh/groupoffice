@@ -233,6 +233,9 @@ class Module extends core\Module
 
 	protected function afterInstall(CoreModule $model): bool {
 		cron\ScanEmailForInvites::install("*/5 * * * *");
+
+		Calendar::entityType()->setDefaultAcl([core\model\Group::ID_INTERNAL => core\model\Acl::LEVEL_READ]);
+
 		return parent::afterInstall($model);
 	}
 
