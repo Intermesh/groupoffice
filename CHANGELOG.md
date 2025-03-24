@@ -1,3 +1,5 @@
+- Finance: Add second catalog item failed
+
 24-03-2025: 6.8.111 
 - Core: Catch database exception in legacy session handler to catch the case where a session exists but the 
   database is not installed yet. Reported in issue #1242.
