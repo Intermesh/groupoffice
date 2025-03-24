@@ -115,4 +115,5 @@ return array (
   'Enable JWT authentification' => 'JWT Authentifizierung aktivieren',
   'App Secret' => 'App Secret',
   'App ID' => 'App ID',
+	'Wk' => 'Wo'
 );

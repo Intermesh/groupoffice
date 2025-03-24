@@ -185,6 +185,7 @@ modules.register(  {
 	],
 	init () {
 		//const user = client.user;
+		translate.load(GO.lang.core.core, "core", "core");
 		translate.load(GO.lang.community.calendar, "community", "calendar");
 
 		addEmailAction();

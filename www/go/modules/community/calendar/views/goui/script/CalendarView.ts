@@ -20,7 +20,7 @@ export abstract class CalendarView extends Component {
 	protected recur?: {[id:string]: Recurrence}
 	protected contextMenu = menu({removeOnClose:false, isDropdown: true},
 		//btn({icon:'open_with', text: t('Show'), handler:_ =>alert(this.current!.data.id)}),
-		btn({icon:'edit', text: t('Edit'), handler: _ => this.current!.open()}),
+		btn({icon:'edit', text: t('Edit','core','core'), handler: _ => this.current!.open()}),
 		btn({icon:'email', text: t('E-mail participants'), handler: _ => {
 				if (this.current!.data.participants){
 					go.showComposer({to: Object.values(this.current!.data.participants).map((p:any) => p.email)});
@@ -28,7 +28,7 @@ export abstract class CalendarView extends Component {
 			}
 		}),
 		//'-',
-		btn({icon:'delete', text: t('Delete'), handler: _ => this.current!.remove() }),
+		btn({icon:'delete', text: t('Delete','core'), handler: _ => this.current!.remove() }),
 		btn({icon: 'import_export', text: t('Download ICS'), handler: _ => this.current!.downloadIcs() })
 	);
 
