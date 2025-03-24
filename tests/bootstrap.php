@@ -56,10 +56,12 @@ try {
 
 
 		//connect to server without database
+		echo "MySQL host: ".  $config['db_host'] ."\n\n";
+
 		$pdo = new PDO('mysql:host='. $config['db_host'], $config['db_user'], $config['db_pass']);
 
 		try {
-			echo "Dropping database 'groupoffice-phpunit'\n";
+			echo "Dropping database 'groupoffice_phpunit'\n";
 			$pdo->query("DROP DATABASE groupoffice_phpunit");
 		}catch(\Exception $e) {
 			echo $e->getMessage() ."\n";
@@ -73,7 +75,7 @@ try {
 		Property::clearCachedRelationStmts();
 
 
-		echo "Creating database 'groupoffice-phpunit'\n";
+		echo "Creating database 'groupoffice_phpunit'\n";
 		$pdo->query("CREATE DATABASE groupoffice_phpunit");
 		$pdo = null;
 	}
