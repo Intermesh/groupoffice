@@ -1,4 +1,4 @@
-CREATE TABLE calendar_resource_group (
+CREATE TABLE IF NOT EXISTS calendar_resource_group (
 	id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 	name           VARCHAR(200) NULL,
 	description    MEDIUMTEXT NULL,
@@ -252,7 +252,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event_alert` (
 CREATE TABLE IF NOT EXISTS `calendar_recurrence_override` (
       `fk` INT UNSIGNED NOT NULL AUTO_INCREMENT,
       `recurrenceId` DATETIME NOT NULL COMMENT '@dbType=localdatetime',
-      `patch` MEDIUMTEXT NOT NULL DEFAULT '{}',
+      `patch` MEDIUMTEXT NOT NULL,
       PRIMARY KEY (`fk`, `recurrenceId`),
     INDEX `fk_recurrence_override_calendar_event1_idx` (`fk` ASC),
     CONSTRAINT `fk_recurrence_override_calendar_event1`
