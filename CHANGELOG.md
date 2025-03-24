@@ -1,3 +1,4 @@
+24-03-2025: 6.8.111 
 - Core: Catch database exception in legacy session handler to catch the case where a session exists but the 
   database is not installed yet. Reported in issue #1242.
 - Supportclient: add 'select all lists' checkbox to sidebar
