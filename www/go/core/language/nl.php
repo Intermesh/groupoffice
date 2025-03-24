@@ -1649,4 +1649,6 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   '(Only on the given numbers)' => '(Alleen op de gegeven nummers)',
   '(Between 0 and 4 and between 8 and 12)' => '(tussen 0 en 4 en tussen 8 en 12)',
 	'Labels' => 'Labels',
+	'Unsubscribe' => 'Afmelden',
+	'Subscribe' => 'Aanmelden',
 );

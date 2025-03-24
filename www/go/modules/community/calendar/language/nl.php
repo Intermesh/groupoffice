@@ -28,8 +28,7 @@ return [
 	'New event' => 'Nieuwe afspraak',
 	'Event' => 'Afspraak',
 	'All day' => 'Hele dag',
-	'Unsubscribe' => 'Afmelden',
-	'Subscribe' => 'Aanmelden',
+
 	'Events with time' => 'Afspraken met tijd',
 	'Events without time (Full-day)' => 'Afspraken zonder tijd (Hele dag)',
 	'Default notifications' => 'Standaard meldingen',
