@@ -39,6 +39,11 @@ return [
 	'Subscribe to calendar' => 'Aanmelden bij agenda',
 	'Add calendar from link' => 'Agenda toevoegen via link',
 
+	'There are no calendars to add an appointment.'=>'Er zijn geen calendar om afspraken aan toe te voegen',
+	'Subscribe to an existing calendar or create a personal calendar.'=>'Abonneer op een bestaande agenda of maak een persoonlijk agenda.',
+	'Show calendars' => 'Toon agenda\'s',
+	'Create personal calendar' => 'Maak persoonlijke agenda',
+
 	'Birthdays'=>'Verjaardagen',
 	'{name}\'s birthday' => '{name}\'s verjaardag',
 	'+ {n} more' => '+ nog {n}',

@@ -12,6 +12,7 @@ import {calendarStore, categoryStore, t} from "./Index.js";
 import {client, jmapds, Recurrence} from "@intermesh/groupoffice-core";
 import {EventWindow} from "./EventWindow.js";
 import {EventDetailWindow} from "./EventDetail.js";
+import {SubscribeWindow} from "./SubscribeWindow";
 
 export type RecurrenceOverride = (Partial<CalendarEvent> & {excluded?:boolean});
 export type RecurrenceOverrides = {[recurrenceId:string]: RecurrenceOverride};
@@ -262,22 +263,63 @@ export class CalendarItem {
 	}
 
 	open(onCancel?: Function) {
-		//if (!ev.data.id) {
-		const dlg = !this.isOwner ? new EventDetailWindow() : new EventWindow();
-		if(dlg instanceof EventWindow) {
-			dlg.on('close', () => {
-				// cancel ?
-				onCancel && onCancel();
-				// did we save then show loading circle instead
-				if (!this.key) // new
-					Object.values(this.divs).forEach(d => d.remove());
 
-			})
+		const internalOpen = () => {
+			const dlg = !this.isOwner ? new EventDetailWindow() : new EventWindow();
+			if (dlg instanceof EventWindow) {
+				dlg.on('close', () => {
+					// cancel ?
+					onCancel && onCancel();
+					// did we save then show loading circle instead
+					if (!this.key) // new
+						Object.values(this.divs).forEach(d => d.remove());
+
+				})
+			}
+			dlg.show();
+			dlg.loadEvent(this);
+
+			return dlg;
 		}
-		dlg.show();
-		dlg.loadEvent(this);
+		const cals = calendarStore.all()
+		if(!cals.length) {
+			const w = win({
+				title: t('No writeable calendars'),
+				width: 520
+			},
+				comp({cls:'pad',html:t('There are no calendars to add an appointment.')+'<br>'+t('Subscribe to an existing calendar or create a personal calendar.')}),
+				tbar({},
+					btn({text: t('Show calendars')+'...',handler:()=>{
+						const d = new SubscribeWindow();
+						d.show();
+						w.close();
+					}}),
+					btn({text: t('Create personal calendar'), handler:() => {
+						jmapds('Calendar').create({
+							name:go.User.displayName,
+							color:this.randomColor(go.User.displayName),
+							ownerId: go.User.id
+						});
+						w.close();
+					}})
+				)
+			);
+			w.show();
+			if(onCancel) onCancel();
+		} else {
+			internalOpen();
+		}
+	}
 
-		return dlg;
+	private randomColor(seed: string) {
+		const colors = [
+			"CDAD00", "E74C3C", "9B59B6", "8E44AD", "2980B9", "3498DB",
+			"1ABC9C", "16A085", "27AE60", "2ECC71", "F1C40F", "F39C12",
+			"E67E22", "D35400", "95A5A6", "34495E", "808B96", "1652A1"
+		];
+
+		let hash = [...seed].reduce((acc, char) => acc + char.charCodeAt(0), 0);
+		return colors[hash % colors.length];
 	}
 
 	downloadIcs(){
