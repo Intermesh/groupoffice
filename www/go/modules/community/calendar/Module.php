@@ -51,6 +51,7 @@ class Module extends core\Module
 	{
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 		User::on(User::EVENT_SAVE, static::class, 'onUserSave');
+		User::on(User::EVENT_ARCHIVE, static::class, 'onUserArchive');
 		GarbageCollection::on(GarbageCollection::EVENT_RUN, static::class, 'onGarbageCollection');
 	}
 
@@ -67,32 +68,11 @@ class Module extends core\Module
 			}
 		}
 
-		if($user->isNew()) {
-			// create new personal calendar
-			$calendar = new Calendar();
-			$calendar->setValues([
-				'name' => $user->displayName,
-				'ownerId' => $user->id,
-				'color' => Calendar::randomColor($user->displayName)
-			]);
+	}
 
-			if($calendar->save()) {
-				$acl = $calendar->findAcl();
-				$acl->addGroup($user->getPersonalGroup()->id, \go\core\model\Acl::LEVEL_MANAGE);
-				$acl->save();
-
-				//subscribe user
-				go()->getDbConnection()->insert('calendar_calendar_user', [
-					'userId'=>$user->id,
-					'id'=>$calendar->id,
-					'isSubscribed'=>true,
-					'includeInAvailability'=>'all',
-					'color'=>$calendar->color
-				])->execute();
-
-				$user->calendarPreferences->defaultCalendarId = $calendar->id;
-			}
-
+	static function onArchiveUser(User $user, &$aclIds) {
+		if (($calendarId = $user->calendarPreferences->defaultCalendarId) && ($calendar = Calendar::findById($calendarId))) {
+			$aclIds[] = $calendar->findAclId();
 		}
 	}
 
@@ -113,6 +93,7 @@ class Module extends core\Module
 	{
 		$mapping->addHasOne('calendarPreferences', Preferences::class, ['id' => 'userId'], true);
 	}
+
 	public function downloadCalendar($id) {
 		$calendar = Calendar::findById($id);
 		if($calendar->getPermissionLevel() < 50) {

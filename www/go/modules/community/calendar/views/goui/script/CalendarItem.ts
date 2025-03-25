@@ -293,19 +293,25 @@ export class CalendarItem {
 						const d = new SubscribeWindow();
 						d.show();
 						w.close();
+						if(onCancel) onCancel();
 					}}),
 					btn({text: t('Create personal calendar'), handler:() => {
-						jmapds('Calendar').create({
-							name:go.User.displayName,
-							color:this.randomColor(go.User.displayName),
-							ownerId: go.User.id
+						client.jmap("Calendar/first", {}, 'pFirst').then(r => {
+							calendarStore.reload().then(r2 => {
+								this.data.calendarId = r.calendarId;
+								internalOpen();
+							});
+
+						}).catch(r => {
+							Window.error(r.message);
+							if(onCancel) onCancel();
 						});
 						w.close();
 					}})
 				)
 			);
 			w.show();
-			if(onCancel) onCancel();
+
 		} else {
 			internalOpen();
 		}

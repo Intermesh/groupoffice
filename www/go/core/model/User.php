@@ -8,7 +8,6 @@ use GO\Base\Model\AbstractUserDefaultModel;
 use GO\Base\Model\User as LegacyUser;
 use GO\Base\Util\Http;
 use GO\Calendar\Model\Calendar;
-use go\modules\community\calendar\model\Preferences as CalendarUserSettings;
 use go\core\acl\model\AclItemEntity;
 use go\core\App;
 use go\core\auth\Authenticate;
@@ -54,7 +53,7 @@ use http\Exception\InvalidArgumentException;
  * @property ?TasksUserSettings $tasksSettings
  * @property ?NotesUserSettings $notesSettings
  * @property ?UserSettings $addressBookSettings
- * @property ?CalendarUserSettings $calendarPreferences
+ * @property ?\go\modules\community\calendar\model\Preferences $calendarPreferences
  */
 class User extends AclItemEntity {
 	
@@ -91,6 +90,14 @@ class User extends AclItemEntity {
 	 * @param User $user Can be null
 	 */
 	const EVENT_BADLOGIN = 'badlogin';
+
+	/**
+	 * Fires when user is archived. Used mostly to remove user from any shared items
+	 *
+	 * @param User $user
+	 * @param array $aclIds
+	 */
+	const EVENT_ARCHIVE = 'archive';
 
 	const USERNAME_REGEX = '/[A-Za-z0-9_\-\.@]+/';
 	
@@ -1430,11 +1437,8 @@ public function historyLog(): bool|array
 			}
 		}
 
-		if(Module::isInstalled("legacy", "calendar")) {
-			if (($calendarId = $this->calendarSettings->calendar_id) && ($calendar = Calendar::model()->findByPk($calendarId))) {
-				$aclIds[] = $calendar->findAclId();
-			}
-		}
+		static::fireEvent(self::EVENT_ARCHIVE, $this, $aclIds);
+
 
 		if (Module::isInstalled("legacy", "projects2")) {
 			go()->getDbConnection()->delete('pr2_default_resources', ['user_id' => $this->id] )->execute();
