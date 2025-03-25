@@ -870,7 +870,16 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 
 		//handle delete request for both files and folder
-		$this->_processDeletes($params, $store);
+		try {
+			$this->_processDeletes($params, $store);
+		}catch(\Exception $e) {
+			$response['deleteSuccess'] = false;
+			$response['deleteFeedback'] = $e->getMessage();
+		}
+
+		if(!isset($response['deleteSuccess'])){
+			$response['deleteSuccess'] = true;
+		}
 
 		$store->getColumnModel()->setFormatRecordFunction(array($this, 'formatListRecord'));
 
@@ -1006,15 +1015,17 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		if (isset($params['trash_keys'])) {
 			$ids = $this->_splitFolderAndFileIds(json_decode($params['trash_keys'], true));
-			foreach ($ids['folders'] as $folderId) {
-				$f = Folder::model()->findByPk($folderId);
-				$f->moveToTrash();
-			}
 
-			foreach ($ids['files'] as $fileId) {
-				$f = File::model()->findByPk($fileId);
-				$f->moveToTrash();
-			}
+				foreach ($ids['folders'] as $folderId) {
+					$f = Folder::model()->findByPk($folderId);
+					$f->moveToTrash();
+				}
+
+				foreach ($ids['files'] as $fileId) {
+					$f = File::model()->findByPk($fileId);
+					$f->moveToTrash();
+				}
+
 		}
 	}
 
@@ -1027,7 +1038,16 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			$stripPath = $folder->path;
 		}
 		//handle delete request for both files and folder
-		$this->_processDeletes($params);
+		try {
+			$this->_processDeletes($params);
+		}catch(\Exception $e) {
+			$response['deleteSuccess'] = false;
+			$response['deleteFeedback'] = $e->getMessage();
+		}
+
+		if(!isset($response['deleteSuccess'])){
+			$response['deleteSuccess'] = true;
+		}
 
 		$response['success'] = true;
 
@@ -1901,12 +1921,12 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			throw new \go\core\http\Exception(412, "Missing ids");
 		}
 
-		foreach (explode(',', $params['ids']) as $id) {
-			$trashPanda = GO\Files\Model\TrashedItem::model()->findByPk($id);
-			if (!$trashPanda) {
-				// Do we need an exception here?
-				throw new \GO\Base\Exception\NotFound();
-			}
+			foreach (explode(',', $params['ids']) as $id) {
+				$trashPanda = GO\Files\Model\TrashedItem::model()->findByPk($id);
+				if (!$trashPanda) {
+					// Do we need an exception here?
+					throw new \GO\Base\Exception\NotFound();
+				}
 //			try {
 				if (method_exists($trashPanda, $action)) {
 					$trashPanda->$action();
@@ -1917,7 +1937,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 //			catch (\Exception $e) {
 //				throw new \go\core\http\Exception(500, $e->getMessage());
 //			}
-		}
+			}
+
 
 		return ['success' => true];
 	}
