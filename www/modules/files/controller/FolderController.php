@@ -1907,16 +1907,16 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				// Do we need an exception here?
 				throw new \GO\Base\Exception\NotFound();
 			}
-			try {
+//			try {
 				if (method_exists($trashPanda, $action)) {
 					$trashPanda->$action();
 				} else {
 					throw new \go\core\http\Exception(412, "Unknown action '$action'");
 				}
-			}
-			catch (\Exception $e) {
-				throw new \go\core\http\Exception(500, $e->getMessage());
-			}
+//			}
+//			catch (\Exception $e) {
+//				throw new \go\core\http\Exception(500, $e->getMessage());
+//			}
 		}
 
 		return ['success' => true];

@@ -1143,9 +1143,12 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @param Folder $destinationFolder
 	 * @return boolean
 	 */
-	public function move($destinationFolder){
+	public function move($destinationFolder, $appendNumberToNameIfExists = false) {
 
 		$this->parent_id=$destinationFolder->id;
+		if($appendNumberToNameIfExists) {
+			$this->appendNumberToNameIfExists();
+		}
 		$this->_recalculateQuota();
 		return $this->save();
 	}

@@ -118,10 +118,7 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 	 */
 	public function restore(): void
 	{
-		$parentFolder = Folder::model()->findByPk($this->parentId);
-		if (!$parentFolder) {
-			throw new Exception(404, GO()->t("The original parent folder has gone."));
-		}
+		$parentFolder = Folder::model()->findByPath($this->fullPath, true);
 
 		$entityType = EntityType::findById($this->entityTypeId);
 		if ($entityType->getName() == 'File') {
@@ -135,7 +132,7 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 				throw new Exception(404, GO()->t("Folder not found."));
 			}
 		}
-		if ($f->move($parentFolder)) {
+		if ($f->move($parentFolder, true)) {
 			$this->delete();
 		}
 	}
