@@ -457,38 +457,6 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 			if(!$this->fsFolder->exists()){
 
-				if($this->isModified('parent_id')){
-					Folder::model()->clearFolderCache();
-					//file will be moved so we need the old folder path.
-					$oldFolderId = $this->getOldAttributeValue('parent_id');
-					$oldFolder = Folder::model()->findByPk($oldFolderId, false, true);
-					$oldRelPath = $oldFolder->path;
-
-					$oldName = $this->isModified('name') ? $this->getOldAttributeValue('name') : $this->name;
-
-					$oldPath = \GO::config()->file_storage_path . $oldRelPath . '/' . $oldName;
-
-					$fsFolder = new \GO\Base\Fs\Folder($oldPath);
-
-					$newRelPath = $this->getPath(true);
-
-					$newFsFolder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path . dirname($newRelPath));
-
-					if (!$fsFolder->move($newFsFolder))
-						throw new Exception("Could not rename folder on the filesystem");
-
-					$this->notifyUsers(
-						array(
-						    $this->id,
-						    $oldFolder->id,
-						    $this->parent->id
-						),
-						FolderNotificationMessage::MOVE_FOLDER,
-						$oldRelPath . '/' . $oldName,
-						$newRelPath
-					);
-				}
-
 				//if the filesystem folder is missing check if we need to move it when the name or parent folder changes.
 				if($this->isModified('name')){
 
@@ -502,15 +470,50 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 					$this->notifyUsers(
 						array(
-                            $this->id,
-                            $this->parent->id
-                        ),
+							$this->id,
+							$this->parent->id
+						),
 						FolderNotificationMessage::RENAME_FOLDER,
 						$this->parent->path . '/' . $this->getOldAttributeValue('name'),
 						$this->parent->path . '/' . $this->name
 					);
 				}
 			}
+
+
+			if($this->isModified('parent_id')){
+				Folder::model()->clearFolderCache();
+				//file will be moved so we need the old folder path.
+				$oldFolderId = $this->getOldAttributeValue('parent_id');
+				$oldFolder = Folder::model()->findByPk($oldFolderId, false, true);
+				$oldRelPath = $oldFolder->path;
+
+				$oldName = $this->isModified('name') ? $this->getOldAttributeValue('name') : $this->name;
+
+				$oldPath = \GO::config()->file_storage_path . $oldRelPath . '/' . $oldName;
+
+				$fsFolder = new \GO\Base\Fs\Folder($oldPath);
+
+				$newRelPath = $this->getPath(true);
+
+				$newFsFolder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path . dirname($newRelPath));
+
+				if (!$fsFolder->move($newFsFolder))
+					throw new Exception("Could not rename folder on the filesystem");
+
+				$this->notifyUsers(
+					array(
+							$this->id,
+							$oldFolder->id,
+							$this->parent->id
+					),
+					FolderNotificationMessage::MOVE_FOLDER,
+					$oldRelPath . '/' . $oldName,
+					$newRelPath
+				);
+			}
+
+
 			
 			if($this->recursiveApplyCustomFieldCategories == 'true') {
 				$this->recursivlyApplyCustomfieldSettings();
