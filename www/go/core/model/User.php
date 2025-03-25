@@ -1404,7 +1404,8 @@ public function historyLog(): bool|array
 	 */
 	private function archiveUser()
 	{
-		$aclIds = [];
+		// used ArrayObject so it will be passed by reference to event listener
+		$aclIds = new \go\core\util\ArrayObject();
 
 		if(Module::isInstalled("community", "addressbook")) {
 
@@ -1446,7 +1447,7 @@ public function historyLog(): bool|array
 
 		if (count($aclIds)) {
 			$grpId = $this->getPersonalGroup()->id();
-			foreach (Acl::findByIds($aclIds) as $rec) {
+			foreach (Acl::findByIds($aclIds->getArray()) as $rec) {
 				foreach ($rec->groups as $aclGrp) {
 					if ($aclGrp->groupId != $grpId) {
 						$rec->removeGroup($aclGrp->groupId);

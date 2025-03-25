@@ -70,7 +70,7 @@ class Module extends core\Module
 
 	}
 
-	static function onArchiveUser(User $user, &$aclIds) {
+	static function onUserArchive(User $user, core\util\ArrayObject $aclIds) {
 		if (($calendarId = $user->calendarPreferences->defaultCalendarId) && ($calendar = Calendar::findById($calendarId))) {
 			$aclIds[] = $calendar->findAclId();
 		}
