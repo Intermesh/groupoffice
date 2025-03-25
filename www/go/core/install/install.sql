@@ -1206,11 +1206,11 @@ CREATE TABLE `core_permission` (
           ON UPDATE NO ACTION)
     ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create index core_change_modSeq_entityTypeId_entityId_index
-    on core_change (modSeq, entityTypeId, entityId);
+create index core_change_modSeq_entityTypeId_entityId_destroyed_index
+    on core_change (modSeq, entityTypeId, entityId, destroyed);
 
 create index core_change_user_modSeq_userId_entityTypeId_entityId_index
-    on core_change_user (modSeq, userId, entityTypeId, entityId);
+    on core_change_user (modSeq, userId, entityTypeId);
 
 
 alter table core_customfields_field_set

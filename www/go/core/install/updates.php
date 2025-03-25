@@ -1670,3 +1670,17 @@ WHERE t.language='en_uk';";
 $updates['202501141553'][] = "UPDATE core_user t
 SET  t.holidayset = 'en_gb'
 WHERE t.holidayset='en_uk';";
+
+
+$updates['202503201426'][] = "create index core_search_modifiedAt_index
+    on core_search (modifiedAt);";
+
+$updates['202503201426'][] = "drop index core_change_modSeq_entityTypeId_entityId_index on core_change;";
+
+$updates['202503201426'][] = "create index core_change_modSeq_entityTypeId_entityId_destroyed_index
+    on core_change (modSeq, entityTypeId, entityId, destroyed);";
+
+$updates['202503201426'][] = "drop index core_change_user_modSeq_userId_entityTypeId_entityId_index on core_change_user;";
+
+$updates['202503201426'][] = "create index core_change_user_modSeq_userId_entityTypeId_entityId_index
+    on core_change_user (modSeq, userId, entityTypeId);";

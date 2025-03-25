@@ -220,74 +220,23 @@ class Group extends AclOwnerEntity {
 
 		$query->andWhere(['isUserGroupFor' => null]);
 
-		$ids = $query->all();
+		$ids = array_map(fn($record): int => $record['id'], $query->all());
 
 		if(in_array(self::ID_ADMINS, $ids)) {
-			throw new Forbidden("You can't delete the administrators group");
+			throw new Forbidden("You can't delete the 'Administrators' group");
 		}
 
 		if(in_array(self::ID_INTERNAL, $ids)) {
-			throw new Forbidden("You can't delete the internal group");
+			throw new Forbidden("You can't delete the 'Internal' group");
 		}
 
 		if(in_array(self::ID_EVERYONE, $ids)) {
-			throw new Forbidden("You can't delete the internal group");
+			throw new Forbidden("You can't delete the 'Everyone' group");
 		}
-		
-		// if(isset($this->isUserGroupFor)) {
-		// 	$this->setValidationError('isUserGroupFor', ErrorCode::FORBIDDEN, "You can't delete a user's personal group");
-		// 	return false;
-		// }
 		
 		return parent::internalDelete($query);
 	}
-
-
-//	public function getModules() {
-//		$modules = [];
-//
-//		$mods = Module::find()
-//							->select('id,level')
-//							->fetchMode(\PDO::FETCH_ASSOC)
-//							->join('core_acl_group', 'acl_g', 'acl_g.aclId=m.aclId')
-//							->where(['acl_g.groupId' => $this->id])
-//							->all();
-//
-//		if(empty($mods)) {
-//			//return null because an empty array is serialzed as [] instead of {}
-//			return null;
-//		}
-//
-//		foreach($mods as $m) {
-//			$modules[$m['id']] = $m['level'];
-//		}
-//
-//		return $modules;
-//	}
-//
-//	private $setModules;
-//
-//	public function setModules($modules) {
-//		$this->setModules = $modules;
-//	}
-
-//	private function saveModules() {
-//		if(!isset($this->setModules)) {
-//			return true;
-//		}
-//
-//		foreach($this->setModules as $moduleId => $level) {
-//			$module = Module::findById($moduleId);
-//			if(!$module) {
-//				throw new \Exception("Module with ID " . $moduleId . " not found");
-//			}
-//			$module->setAcl([
-//				$this->id => $level
-//			]);
-//			$module->save();
-//		}
-//	}
-
+	
 	/**
 	 * Get the group ID that is used for granting permissions for the given user ID
 	 *

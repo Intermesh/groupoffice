@@ -1,9 +1,30 @@
+- Finance: Add second catalog item failed
+
+24-03-2025: 6.8.111 
+- Core: Catch database exception in legacy session handler to catch the case where a session exists but the 
+  database is not installed yet. Reported in issue #1242.
+- Supportclient: add 'select all lists' checkbox to sidebar
+- Finance: When duplicating quotes or invoices etc. default to the same book
+- Finance: Optimized database index
+- Core: Optimized database indexes for core_change, search.
+- ActiveSync: Optimized notification queries
+- Core: Updated German translation thanks to University of Greifswald
+- DAV: Remove obsolete DavTask model
+- Core: update cache on setting default user groups
+- Calendar: only display and enable 'Add download link' button if end user has 'access_main' permission
+- Core: fix disabling 'ActiveSync devices can connect' setting
+
+17-03-2025: 6.8.110
+- Finance: Try to sanitize HTML to avoid too much vertical space between text on the PDF
 - Addressbook: Empty address appeared when city not filled
 - Contracts: Decimals for contract items
+- Finance: Link not created to document when creating from another item using the + menu.
+- Core: fix preventing deleting system groups
+- Leavedays: fix calculation for spent special budget hours
 
 10-03-2024 6.8.109
 - Finance:fix handler 'add from catalog' button when switching invoices
-- Core: Updated German language (thanks Universisy of Greifswald!)
+- Core: Updated German language (thanks University of Greifswald!)
 
 28-02-2024: 6.8.108
 - Calender: new button to add external download link for a file to a calendar event
