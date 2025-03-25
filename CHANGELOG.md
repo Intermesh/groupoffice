@@ -1,4 +1,5 @@
 - Finance: Add second catalog item failed
+- Files: add 'Copy direct link' button to context menu, preselect file in grid when called directly
 
 24-03-2025: 6.8.111 
 - Core: Catch database exception in legacy session handler to catch the case where a session exists but the 
