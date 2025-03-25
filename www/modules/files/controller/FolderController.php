@@ -342,9 +342,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		switch ($params['node']) {
 			case 'trash':
-				$folder = Folder::model()->findByPath("trash");
-				$node = $this->_folderToNode($folder, $expandFolderIds, false, $showFiles);
-				$response[] = $node;
+				// no children in trash
 				break;
 			case 'shared':
 				$response=$this->_buildSharedTree($expandFolderIds);
@@ -434,6 +432,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					$node['allowDrop'] = true;
 					$node['path'] = $trashFolder->path;
 					$node['text'] = \GO::t("Trash", "files");
+					$node['expanded']=true;
+					$node['children']=[];
 
 					$response[] = $node;
 				}
