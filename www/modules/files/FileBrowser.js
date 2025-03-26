@@ -18,14 +18,8 @@ Ext.namespace("GO.files");
  * if config.treeRootVisible == false (default) then the tree will load automatically!
  */
 GO.files.FileBrowser = function(config){
-
-	if(!config)
-	{
-		config = {};
-	}
-	if(!config.id) {
-		config.id = Ext.id();
-	}
+	config = config || {};
+	config.id = config.id || Ext.id();
 
 	this.westPanel = new Ext.Panel({
 		hideMode:"offsets",
@@ -485,7 +479,7 @@ GO.files.FileBrowser = function(config){
 
 
    var quotaPercentage = (GO.settings.disk_quota && GO.settings.disk_quota>0) ? GO.settings.disk_usage/GO.settings.disk_quota : 0;
-	this.upButton = new Ext.Button({
+   this.upButton = new Ext.Button({
 		iconCls: 'ic-arrow-upward',
 		tooltip: t("Up"),
 		handler: function(){
@@ -669,7 +663,6 @@ GO.files.FileBrowser = function(config){
 	}];
 
 
-
 	this.thumbsPanel = new GO.files.ThumbsPanel({
 		store:this.gridStore
 	});
@@ -759,7 +752,7 @@ GO.files.FileBrowser = function(config){
 						new Ext.Button({
 							iconCls: 'ic-delete',
 							tooltip: t("Delete permanently"),
-							overflowText:t("Restore"),
+							overflowText:t("Delete permanently"),
 							handler: this.onDeletePermanently,
 							scope: this,
 						}),
@@ -857,15 +850,14 @@ GO.files.FileBrowser = function(config){
 
 	GO.files.FileBrowser.superclass.constructor.call(this, config);
 
-	
 
 	this.addEvents({
-		fileselected : true,
-		filedblclicked : true,
-                refresh : true,
-                folderIdSet : true,
-                rootIdSet : true,
-                search : true
+		fileselected: true,
+		filedblclicked: true,
+		refresh: true,
+		folderIdSet: true,
+		rootIdSet: true,
+		search: true
 	});
 
 	this.on('fileselected',function(grid, r){
@@ -1067,15 +1059,13 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 				}
 				
 				//Tell the maximun filesize is the disk quota
-				
+
 				if(typeof GO.settings.disk_quota != ' undefined') {
 					var remainingDiskSpace = Math.ceil((GO.settings.disk_quota-GO.settings.disk_usage)*1024*1024);
 				} else {
 					var remainingDiskSpace = 0
 				}
 			}
-			
-		//state.sort=store.sortInfo;
 
 		if(state){
 			this.gridPanel.applyStoredState(state);
@@ -1132,15 +1122,11 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 			this.treePanel.getRootNode().reload();
 		}
 
-		if(!this.parentID)// || !this.treePanel.getNodeById(this.parentID))
-		{
+		if(!this.parentID)  {
 			this.upButton.setDisabled(true);
-		}else
-		{
+		} else {
 			this.upButton.setDisabled(false);
 		}
-
-
 	},
 
 
@@ -1781,14 +1767,10 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 	paste : function(pasteMode, destination, records)
 	{
 		var paste_sources = Array();
-		//var folderSelected = false;
+
 		for(var i=0;i<records.length;i++)
 		{
 			paste_sources.push(records[i].data['type_id']);
-		/*if(records[i].data['extension']=='folder')
-			{
-				folderSelected = true;
-			}*/
 		}
 
 		var params = {
@@ -2138,7 +2120,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 			this.on('filebrowserready', fn, scope);
 		}
 	},
-	
+
 	route: function(id, entity) {
 
 		this.show();
