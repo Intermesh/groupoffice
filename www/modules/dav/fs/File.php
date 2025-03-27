@@ -65,6 +65,18 @@ class File extends \Sabre\DAV\FS\File {
 		//\GO::debug('ADDED FILE WITH WEBDAV -> FILE_ID: ' . $file_id);
 	}
 
+    public function lock() {
+        $file = \GO\Files\Model\File::model()->findByPath($this->relpath);
+        $file->locked_user_id = \GO::user()->id;
+        $file->save(true);
+    }
+
+    public function unlock() {
+        $file = \GO\Files\Model\File::model()->findByPath($this->relpath);
+        $file->locked_user_id =0;
+        $file->save(true);
+    }
+
 	/**
 	 * Renames the node
 	 *
