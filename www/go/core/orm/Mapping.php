@@ -234,15 +234,23 @@ class Mapping {
 	}
 
 	/**
-	 * Add has one relation
+	 * Add a relation
 	 *
-	 * An empty value is null and not an empty object. Set to null to remove.
-	 *
-	 * @param string $name Property name
-	 * @param class-string<Property> $propertyClsName The class name of the property model
-	 * @param array $keys
-	 * @param bool $autoCreate If not found then automatically create an empty object
-	 *
+	 * @param string $name
+	 * @param Relation $relation
+	 * @return $this
+	 */
+	public function add(string $name, Relation $relation) {
+		$relation->name = $name;
+		$relation->dynamic = $this->dynamic;
+		$this->relations[$name] = $relation;
+
+		return $this;
+	}
+
+	/**
+	 * @deprecated by self::add()
+	 * @see Relation::one()
 	 * @return $this;
 	 */
 	public function addHasOne(string $name, string $propertyClsName, array $keys, bool $autoCreate = false): Mapping
@@ -255,21 +263,8 @@ class Mapping {
 	}
 
 	/**
-	 * Add an array relation.
-	 *
-	 * - Array's can be sorted. When the property does not have a primary key, the whole array will be deleted and rewritten
-	 *   when saved. This will retain the sort order automatically.
-	 * - If the property does have a primary key. The client can send it along to retain it. In this case the sort order must
-	 *   be stored in an int column. The framework does this automatically when you specify this. See the $options parameter.
-	 * - The property can't be null. An empty value is an empty array.
-	 * - When updating the array property, the client must send all items. Items not included will be removed.
-	 *
-	 * @param string $name Name of the property
-	 * @param class-string<Property> $propertyClsName The name of the Property model
-	 * @param array $keys The keys of the relation. eg. ['id' => 'articleId']
-	 * @param array $options pass ['orderBy' => 'sortOrder'] to save the sort order in this int column. This property can
-	 *   be a protected property because the client does not need to know of its existence.
-	 *
+	 * @deprecated by self::add()
+	 * @see Relation::array()
 	 * @return $this;
 	 */
 	public function addArray(string $name, string $propertyClsName, array $keys, array $options = []): Mapping
@@ -284,18 +279,9 @@ class Mapping {
 	}
 
 	/**
-	 * Add a mapped relation. Index is the ID of the {@see Property}.
-	 *
-	 * - Map objects are unsorted!
-	 * - If the map is empty the value is null and not an empty object
-	 * - When updating a map the client must send the full property value. Everything that is not included will be removed.
-	 * - Setting a value to null or false will remove it from the map.
-	 *
-	 * @param string $name
-	 * @param class-string<Property> $propertyClsName
-	 * @param array $keys
-	 *
-	 * @return $this
+	 * @deprecated by self::add()
+	 * @see Relation::map()
+	 * @return $this;
 	 */
 	public function addMap(string $name, string $propertyClsName, array $keys): Mapping
 	{
@@ -306,23 +292,9 @@ class Mapping {
 	}
 
 	/**
-	 * Add a scalar relation. For example an array of ID's.
-	 *
-	 * A scalar is always an array. It can't be null.
-	 *
-	 * Sort order of scalars are not guaranteed! MySQL may return it in a different order then it was written.
-	 * 
-	 * Note: When an entity with scalar relations is saved it automatically looks for other entities referencing the same
-	 * scalar relation for tracking changes.
-	 * @todo maybe this is unneeded and scalars should only be defined in one entity?
-	 *
-	 * eg. When a group's users[] change. It will mark all users as changed too because they have a scalar groups[] property.
-	 * 
-	 * @param string $name
-	 * @param string $tableName
-	 * @param array $keys
-	 * 
-	 * @return $this
+	 * @deprecated by self::add()
+	 * @see Relation::scalar()
+	 * @return $this;
 	 */
 	public function addScalar(string $name, string $tableName, array $keys): Mapping
 	{
