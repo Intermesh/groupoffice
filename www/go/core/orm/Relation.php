@@ -62,7 +62,7 @@ class Relation {
 	 *
 	 * @var array
 	 */
-	public $constants;
+	public $constants = [];
 
 	/**
 	 * If set this is the column that will be returned in a scalar Relation
