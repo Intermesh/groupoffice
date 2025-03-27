@@ -1,5 +1,6 @@
 - Core: fix order of database migrations
-- 
+- Studio: automatically patch modules to 25.0 code base
+
 25-03-2025: 25.0.10
 - Calendar: Fixed install on MySQL 8
 - Calendar: Auto install on fresh install
