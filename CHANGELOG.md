@@ -1,3 +1,5 @@
+- Core: fix order of database migrations
+- 
 25-03-2025: 25.0.10
 - Calendar: Fixed install on MySQL 8
 - Calendar: Auto install on fresh install
