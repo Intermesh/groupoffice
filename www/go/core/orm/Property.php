@@ -538,6 +538,9 @@ abstract class Property extends Model {
 		foreach ($relation->keys as $from => $to) {
 			$where[$to] = $this->$from ?? null;
 		}
+		foreach ($relation->constants as $name => $value) {
+			$where[$name] = $value;
+		}
 		return $where;
 	}
 
@@ -1725,6 +1728,7 @@ abstract class Property extends Model {
 			}
 
 			$this->applyRelationKeys($relation, $newProp);
+			$this->applyRelationContants($relation, $newProp);
 
 			// This went bad when creating new map values with "ext-gen1" as key.
 			// Fixed it by recognizing _NEW_* as a map key that should not be applied as property
@@ -1767,6 +1771,13 @@ abstract class Property extends Model {
 
 		foreach ($relation->keys as $from => $to) {
 			$property->$to = $this->$from ?? null;
+		}
+	}
+
+	private function applyRelationContants(Relation $relation, Property $property) {
+
+		foreach ($relation->constants as $name => $value) {
+			$property->$name = $value;
 		}
 	}
 
