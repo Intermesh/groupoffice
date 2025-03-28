@@ -375,8 +375,6 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 						
 			if(response.updated && id in response.updated){
 
-
-				debugger;
 				const onSubmits = this.findBy(function(cmp,cont){
 					return typeof cmp.onSubmit === 'function';
 				},this);
