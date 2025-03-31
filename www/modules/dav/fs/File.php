@@ -51,29 +51,32 @@ class File extends \Sabre\DAV\FS\File {
 		\GO::debug("DAVFile:put( ".$this->relpath.")");
 		$this->checkWritePermission();
 		
-//		$file = \GO\Files\Model\File::model()->findByPath($this->relpath);
+//		$file = $this->getFile()
 //		$file->saveVersion();
 //		$file->putContents($data);
 		
 
-		$file = \GO\Files\Model\File::model()->findByPath($this->relpath);
+		$file = $this->getFile();
 		$file->putContents($data);
 
 //		file_put_contents($this->path, $data);
-//		\GO\Files\Model\File::model()->findByPath($this->relpath);
+//		$this->getFile()
 
 		//\GO::debug('ADDED FILE WITH WEBDAV -> FILE_ID: ' . $file_id);
 	}
 
-    public function lock() {
-        $file = \GO\Files\Model\File::model()->findByPath($this->relpath);
-        $file->locked_user_id = \GO::user()->id;
-        $file->save(true);
+    public function lock($lock_id = "") {
+			$file = $this->getFile();
+			$file->locked_user_id = \GO::user()->id;
+
+			$file->lock_id = $lock_id;
+			$file->save(true);
     }
 
     public function unlock() {
-        $file = \GO\Files\Model\File::model()->findByPath($this->relpath);
+        $file = $this->getFile();
         $file->locked_user_id =0;
+				$file->lock_id = "";
         $file->save(true);
     }
 
@@ -90,7 +93,7 @@ class File extends \Sabre\DAV\FS\File {
 
 		parent::setName($name);
 		
-		$file = \GO\Files\Model\File::model()->findByPath($this->relpath);
+		$file = $this->getFile();
 		$file->name=$name;
 		$file->save();
 		
@@ -116,7 +119,7 @@ class File extends \Sabre\DAV\FS\File {
 		$destFsFolder = new \GO\Base\Fs\Folder(dirname($newPath));		
 		$destFolder = \GO\Files\Model\Folder::model()->findByPath($destFsFolder->stripFileStoragePath());
 		
-		$file = \GO\Files\Model\File::model()->findByPath($this->relpath);
+		$file = $this->getFile();
 		$file->folder_id=$destFolder->id;
 		$file->name = \GO\Base\Fs\File::utf8Basename($newPath);
 		$file->save();
@@ -124,6 +127,16 @@ class File extends \Sabre\DAV\FS\File {
 		$this->relpath = $file->path;
 		$this->path = \GO::config()->file_storage_path.$this->relpath;
 	}
+	
+	private $file;
+	public function getFile(): bool|\GO\Files\Model\File
+	{
+		if(!isset($this->file)) {
+			$this->file = \GO\Files\Model\File::model()->findByPath($this->relpath);
+		}
+		
+		return $this->file;
+}
 
 	/**
 	 * Returns the data
@@ -131,7 +144,7 @@ class File extends \Sabre\DAV\FS\File {
 	 * @return string
 	 */
 	public function get() {
-		$file = \GO\Files\Model\File::model()->findByPath($this->relpath);
+		$file = $this->getFile();
 		$file->open();
 		return fopen($this->path, 'r');
 	}
@@ -139,11 +152,38 @@ class File extends \Sabre\DAV\FS\File {
 	/**
 	 * Delete the current file
 	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
 	 * @return void
 	 */
 	public function delete() {
 		$this->checkWritePermission(true);
-		$file = \GO\Files\Model\File::model()->findByPath($this->relpath);
+		$file = $this->getFile();
 		if($file) {
 			$file->delete();
 		}
