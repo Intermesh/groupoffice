@@ -40,6 +40,13 @@ export class CalendarList extends Component {
 		super()
 		this.store = store;
 		this.items.add(store !== calendarStore ? comp() :tbar({cls: 'dense'},
+			checkbox({
+				listeners: {
+					change: (field, newValue, oldValue) => {
+						this.select(-1,newValue);
+					}
+				}
+			}),
 			comp({tagName: 'h3', html: t('Calendars')}),
 			//btn({icon: 'done_all', handler: () => { this.calendarList.rowSelection!.selectAll();}}),
 			btn({
