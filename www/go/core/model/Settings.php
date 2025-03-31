@@ -427,6 +427,7 @@ class Settings extends core\Settings {
 		foreach(['primary', 'secondary', 'tertiary', 'accent'] as $type) {
 			if(!empty($this->{$type.$theme})) $str .= '--c-'.$type.': #'.$this->{$type.$theme}.';';
 		}
+		$str .= '--fg-main: var(--c-primary);';
 		return $str;
 	}
 
