@@ -138,7 +138,7 @@ class Holiday {
 			$monthDay = substr($monthDay, 5);
 		}
 		if($month = array_search($monthDay, self::$months)) {
-			$monthDay = str_pad($month, 2, '0', STR_PAD_LEFT).'-01';
+			$monthDay = str_pad($month+1, 2, '0', STR_PAD_LEFT).'-00';
 		}
 		$this->start = new \DateTime($year.'-'.$monthDay);
 	}
