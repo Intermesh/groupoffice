@@ -1014,7 +1014,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 		},this);
 
 		// If file browsing in enabled for current user, show the 'add link' button...
-		if (go.Modules.get("legacy", "files").userRights.mayAccessMainPanel) {
+		if (go.Modules.isAvailable("legacy", "files") && go.Modules.get("legacy", "files").userRights.mayAccessMainPanel) {
 			this.addDownLoadLinkButton.enable();
 			this.addDownLoadLinkButton.show();
 		}

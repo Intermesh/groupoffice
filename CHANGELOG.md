@@ -7,6 +7,7 @@
 - Email: fix display of name with apostrophe 
 - Tasks: displays categories with ampersands correctly in grid
 - Core: expand warning when archiving users
+- Calendar: fix 'Add event' dialog when user has no access to files module
 
 24-03-2025: 6.8.111 
 - Core: Catch database exception in legacy session handler to catch the case where a session exists but the 
