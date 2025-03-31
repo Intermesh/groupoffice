@@ -1538,7 +1538,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Secondary color' => 'Sekundäre Farbe',
   'Accent color' => 'Akzentfarbe',
   'Archive user' => 'Benutzer archivieren',
-  'Archiving a user will disable them and make their items invisible. Are you sure?' => 'Wenn Sie einen Benutzer archivieren, wird er deaktiviert und seine Elemente werden unsichtbar. Sind Sie sicher?',
+  'Archiving a user will disable them, revoke all group memberships and make their items invisible. Are you sure?' => 'Wenn Sie einen Benutzer archivieren, wird er deaktiviert, alle Gruppenmitgliedschaften werden aufgehoben und seine Elemente werden unsichtbar. Sind Sie sicher?',
   'You can\' t archive yourself' => 'Sie können sich nicht selbst archivieren',
   'Show users' => 'Benutzer zeigen',
   'Show groups' => 'Gruppen zeigen',

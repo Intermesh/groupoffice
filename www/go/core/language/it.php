@@ -997,7 +997,7 @@ Se non hai richiesto una nuova password ti preghiamo di eliminare questo messagg
   'Add online url' => 'Aggiungi URL online',
   'Default note book:' => 'Rubrica predefinita',
   'Show from field by default' => 'Mostra il campo per impostazione predefinita',
-  'Archiving a user will disable them and make their items invisible. Are you sure?' => 'L\'archiviazione di un utente lo disabiliterà e renderà i suoi elementi invisibili. Sei sicuro?',
+  'Archiving a user will disable them, revoke all group memberships and make their items invisible. Are you sure?' => 'L\'archiviazione di un utente lo disabiliterà e renderà i suoi elementi invisibili. Sei sicuro?',
   'Archive user' => 'Archivio utente',
   'User default' => 'Impostazione utente',
   'Sort order' => 'Ordinamento',

@@ -40,6 +40,13 @@ export class CalendarList extends Component {
 		super()
 		this.store = store;
 		this.items.add(store !== calendarStore ? comp() :tbar({cls: 'dense'},
+			checkbox({
+				listeners: {
+					change: (field, newValue, oldValue) => {
+						this.select(-1,newValue);
+					}
+				}
+			}),
 			comp({tagName: 'h3', html: t('Calendars')}),
 			//btn({icon: 'done_all', handler: () => { this.calendarList.rowSelection!.selectAll();}}),
 			btn({
@@ -109,7 +116,7 @@ export class CalendarList extends Component {
 	private davGroups: {[id:number]: HTMLElement} = {}
 	private localGroup!: HTMLElement;
 
-	checkboxRenderer(data: any, _row: HTMLElement, _list: List, _storeIndex: number) {
+	checkboxRenderer(data: any, _row: HTMLElement, list: List, storeIndex: number) {
 		// if(data.isVisible) {
 		// 	this.inCalendars[storeIndex] = true;
 		// }
@@ -123,6 +130,15 @@ export class CalendarList extends Component {
 					field.input.addEventListener("mousedown", (ev) => {
 						ev.stopPropagation(); // stop lists row selector event
 					});
+					field.input.addEventListener('contextmenu', (ev) => {
+						ev.preventDefault();
+						const m = menu({isDropdown:true},
+							btn({text:t('Select all'),handler:()=>{this.select(-1,true)}}),
+							btn({text:t('Select none'),handler:()=>{this.select(-1)}}),
+							btn({text:t('Deselect others'),handler:()=>{this.select(storeIndex)}})
+						);
+						m.showAt(ev);
+					})
 				},
 				'change': (p, newValue) => {
 					this.inCalendars[data.id] = newValue;
@@ -175,6 +191,20 @@ export class CalendarList extends Component {
 				)
 			})]
 		})];
+	}
+
+	private select(index:number, all:boolean = false) {
+		const rows = this.list!.el.querySelectorAll('li.data');
+		this.list!.store.forEach((rec, rowIndex) => {
+			const cb = rows[rowIndex].querySelector<HTMLInputElement>('input')!,
+				on = (index == rowIndex || all);
+			cb.checked = on;
+			this.visibleChanges[rec.id] = on;
+			this.inCalendars[rec.id] = on;
+		});
+
+		this.saveSelectionChanges();
+		this.fire('changevisible', this, Object.keys(this.inCalendars).filter(key => this.inCalendars[key]));
 	}
 
 	private importIcs(blob: any, data:any) {
