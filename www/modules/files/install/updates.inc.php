@@ -333,3 +333,6 @@ $updates['202502271100'][] = function() {
 	$folder->save();
 	$folder->acl->addGroup(\GO::config()->group_everyone, \GO\Base\Model\Acl::READ_PERMISSION);
 };
+
+$updates['202503311434'][] = "alter table fs_files
+    add lock_id varchar(192) null after locked_user_id";

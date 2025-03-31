@@ -1,4 +1,15 @@
+31-03-2025: 6.8.112
 - Finance: Add second catalog item failed
+- Files: add 'Copy direct link' button to context menu, preselect file in grid when called directly
+- Webdav: File will be locked in Group-Office when locked via WebDAV
+- OnlyOffice: Editing will lock file in Group-Office
+- OnlyOffice: Open in read only mode from temporary files like in an e-mail
+- wopi: Open file in read only mode when it's a temp file
+- wopi: Editing will lock file in Group-Office
+- Email: fix display of name with apostrophe 
+- Tasks: displays categories with ampersands correctly in grid
+- Core: expand warning when archiving users
+- Calendar: fix 'Add event' dialog when user has no access to files module
 
 24-03-2025: 6.8.111 
 - Core: Catch database exception in legacy session handler to catch the case where a session exists but the 

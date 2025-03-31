@@ -359,6 +359,9 @@ GO.files.FileBrowser = function(config){
 	this.filesContextMenu.on('download_link', function(menu, records, clickedAt, email){
 		this.onDownloadLink(records,email);
 	}, this);
+	this.filesContextMenu.on('direct_link', function(menu, records){
+		this.onDirectLink(records);
+	}, this);
 
 	this.filesContextMenu.on('email_files', function(menu, records){
 		this.emailFiles(records);
@@ -957,6 +960,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		this.filesContextMenu.compressButton.setDisabled(!enable);
 		this.filesContextMenu.decompressButton.setDisabled(!enable);
 		this.filesContextMenu.createDownloadLinkButton.setDisabled(!enable);
+		this.filesContextMenu.createDirectLinkButton.setDisabled(!enable);
 
 		if (!GO.util.empty(this.filesContextMenu.gotaButton))
 			this.filesContextMenu.gotaButton.setDisabled(!enable);
@@ -1486,7 +1490,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		//detect grid on selModel. thumbs doesn't have that
 		if(this.cardPanel.getLayout().activeItem.selModel)
 		{
-			var selModel = this.gridPanel.getSelectionModel();
+			const selModel = this.gridPanel.getSelectionModel();
 			return selModel.getSelections();
 		}else
 		{
@@ -1713,6 +1717,18 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 	onDownloadLink : function(records,email){
 		GO.files.createDownloadLink(records,email);
+	},
+
+	onDirectLink: function(records) {
+		for ( const record of records ) {
+			const arId = record.id.split(":");
+			if(arId.length !== 2) {
+				return; // We do not know what to link
+			}
+			let url = GO.settings.config.full_url + "#" + (arId[0] === "f" ? "file" : "folder") + "/" + arId[1];
+			go.util.copyTextToClipboard(url);
+			Ext.MessageBox.alert(t("Success"), t("Value copied to clipboard"));
+		}
 	},
 
 	onGridNotifyOver : function(dd, e, data){
@@ -2136,13 +2152,19 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 	},
 
 	route: function(id, entity) {
-
 		this.show();
-		
-		var detailViewName = entity.name.toLowerCase() + "Detail";
-		
+		const entityId = (entity.name === "File" ? "f": "d")+":"+id;
+		const detailViewName = entity.name.toLowerCase() + "Detail";
 		this[detailViewName].on("load", function(dv){
 			this.setFolderID(dv.data.folder_id || dv.data.parent_id, true);
+		}, this, {single: true});
+		
+		this.gridStore.on("load", function(a,b,c) {
+			const idx = b.findIndex( (bb) => bb.id === entityId);
+			if(idx > -1 && !this.thumbsToggle.pressed) {
+				const sm = this.gridPanel.getSelectionModel();
+				sm.selectRow(idx);
+			}
 		}, this, {single: true});
 		this[detailViewName].load(parseInt(id));
 		this.eastPanel.getLayout().setActiveItem(this[detailViewName]);

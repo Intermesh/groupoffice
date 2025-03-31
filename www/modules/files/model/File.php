@@ -32,6 +32,7 @@ use go\core\exception\NotFound;
  * @property String $name
 
  * @property int $locked_user_id
+ * @property string $lock_id;
  * @property int $status_id
  * @property int $ctime
  * @property int $mtime
@@ -321,6 +322,19 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 			$existingFile = $this->folder->hasFile($this->name);
 			if($existingFile && $existingFile->id!=$this->id)
 				throw new \Exception(sprintf(\GO::t("Filename %s already exists", "files"), $this->path));
+		}
+
+		if($this->isModified("locked_user_id")) {
+
+			// for backwards compatibility. lock_id was added later for wopi and dav.
+			// GO does not set lock_id but wopi needs it.
+			if ($this->locked_user_id && !$this->lock_id) {
+				$this->lock_id = uniqid($this->locked_user_id . "-");
+			}
+
+			if(!$this->locked_user_id) {
+				$this->lock_id = "";
+			}
 		}
 
 		if(!$this->isNew){
