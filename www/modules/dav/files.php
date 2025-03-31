@@ -62,9 +62,7 @@ $locksDir = $tmpDir->createChild('locksdb', false);
 $locksDir->create();
 
 // Support for LOCK and UNLOCK
-//$lockBackend = new Sabre\DAV\Locks\Backend\FS($locksDir->path());
-$lockBackend = new Sabre\DAV\Locks\Backend\PDO(\GO::getDbConnection());
-$lockBackend->tableName = 'dav_locks';
+$lockBackend = new \GO\Dav\Locks\LocksBackend($server);
 $lockPlugin = new Sabre\DAV\Locks\Plugin($lockBackend);
 $server->addPlugin($lockPlugin);
 

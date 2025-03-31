@@ -277,7 +277,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'categories',
 					renderer: function(v) {
-						return v.map(v=>'<span class="tasks-category">'+Ext.util.Format.htmlEncode(v.name)+'</span>').join("");
+						return v.map(v=>'<span class="tasks-category">'+Ext.util.Format.htmlDecode(Ext.util.Format.htmlEncode(v.name))+'</span>').join("");
+						// return v.map(v=>'<span class="tasks-category">'+Ext.util.Format.htmlEncode(v.name)+'</span>').join("");
 					},
 					hidden: true,
 					groupable: false

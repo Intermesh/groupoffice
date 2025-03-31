@@ -307,3 +307,7 @@ $updates['202310311413'][] = function() {
 	echo "\n\nNOTE: Search cache of files will be updated at midnight.\n\n";
 	\go\core\cron\BuildSearchCache::install("0 0 * * *", true);
 };
+
+
+$updates['202503311434'][] = "alter table fs_files
+    add lock_id varchar(192) null after locked_user_id";
