@@ -4,6 +4,7 @@
 - OnlyOffice: Editing will lock file in Group-Office
 - OnlyOffice: Open in read only mode from temporary files like in an e-mail
 - wopi: Open file in read only mode when it's a temp file
+- wopi: Editing will lock file in Group-Office
 - Email: fix display of name with apostrophe 
 - Tasks: displays categories with ampersands correctly in grid
 - Core: expand warning when archiving users
