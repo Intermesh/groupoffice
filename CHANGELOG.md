@@ -2,6 +2,7 @@
 - Files: add 'Copy direct link' button to context menu, preselect file in grid when called directly
 - Webdav: File will be locked in Group-Office when locked via WebDAV
 - OnlyOffice: Editing will lock file in Group-Office
+- OnlyOffice: Open in read only mode from temporary files like in an e-mail
 
 24-03-2025: 6.8.111 
 - Core: Catch database exception in legacy session handler to catch the case where a session exists but the 
