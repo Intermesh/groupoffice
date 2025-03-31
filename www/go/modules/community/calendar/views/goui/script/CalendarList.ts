@@ -193,9 +193,11 @@ export class CalendarList extends Component {
 				on = (index == rowIndex || all);
 			cb.checked = on;
 			this.visibleChanges[rec.id] = on;
+			this.inCalendars[rec.id] = on;
 		});
 
 		this.saveSelectionChanges();
+		this.fire('changevisible', this, Object.keys(this.inCalendars).filter(key => this.inCalendars[key]));
 	}
 
 	private importIcs(blob: any, data:any) {
