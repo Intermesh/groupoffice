@@ -1581,6 +1581,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		} else {
 			//detect grid on selModel. thumbs doesn't have that
 			if (this.cardPanel.getLayout().activeItem.id === this.gridPanel.id) {
+				debugger;
 				this.gridPanel.deleteSelected({
 					deleteParam: "trash_keys",
 					callback: function () {
@@ -1589,6 +1590,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 							delete treeNode.attributes.children;
 							treeNode.reload();
 						}
+						this.gridStore.reload();
+						this.trashGridStore.reload();
 					},
 					scope: this
 				});
@@ -1601,6 +1604,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 							delete treeNode.attributes.children;
 							treeNode.reload();
 						}
+						this.gridStore.reload();
+						this.trashGridStore.reload();
 					},
 					scope: this
 				});
@@ -1637,7 +1642,15 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 					ids: ids.join(",")
 				},
 				success:function(action, response, result){
-					this.trashGridPanel.store.reload();
+					// this.trashGridPanel.store.reload();
+					const treeNode = this.treePanel.getNodeById(this.folder_id);
+					if (treeNode) {
+						delete treeNode.attributes.children;
+						treeNode.reload();
+					}
+					this.gridStore.reload();
+					this.trashGridStore.reload();
+
 				},
 				scope:this
 			})
@@ -1672,7 +1685,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 					ids: ids.join(",")
 				},
 				success:function(action, response, result){
-					this.trashGridPanel.store.reload();
+					this.gridStore.reload();
+					this.trashGridStore.reload();
 				},
 				scope:this
 			})
