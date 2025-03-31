@@ -6,6 +6,7 @@
 - wopi: Open file in read only mode when it's a temp file
 - Email: fix display of name with apostrophe 
 - Tasks: displays categories with ampersands correctly in grid
+- Core: expand warning when archiving users
 
 24-03-2025: 6.8.111 
 - Core: Catch database exception in legacy session handler to catch the case where a session exists but the 

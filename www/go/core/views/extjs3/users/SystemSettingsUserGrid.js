@@ -320,7 +320,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 
 						Ext.MessageBox.confirm(
 							t("Confirm"),
-							t("Archiving a user will disable them and make their items invisible. Are you sure?"),
+							t("Archiving a user will disable them, revoke all group memberships and make their items invisible. Are you sure?"),
 							function(btn) {
 								if(btn !== 'yes') {
 									return;

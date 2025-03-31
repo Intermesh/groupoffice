@@ -1557,7 +1557,7 @@ Si no ha solicitado una nueva contraseña por favor ignore y borre este e-mail.'
   'Enable' => 'Activar',
   'Permission overview' => 'Resumen de permisos',
   'Archive user' => 'Archivar usuario',
-  'Archiving a user will disable them and make their items invisible. Are you sure?' => 'Al archivar un usuario, éste se desactiva y sus elementos se vuelven invisibles. ¿Está usted seguro?',
+  'Archiving a user will disable them, revoke all group memberships and make their items invisible. Are you sure?' => 'Al archivar un usuario, éste se desactiva y sus elementos se vuelven invisibles. ¿Está usted seguro?',
   'You can\' t archive yourself' => 'No se puede archivar uno mismo',
   'PDF template' => 'Plantilla PDF',
   'Saved successfully' => 'Guardado correctamente',
