@@ -1,3 +1,4 @@
+31-03-2025: 6.8.112
 - Finance: Add second catalog item failed
 - Files: add 'Copy direct link' button to context menu, preselect file in grid when called directly
 - Webdav: File will be locked in Group-Office when locked via WebDAV
