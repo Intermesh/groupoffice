@@ -1,9 +1,9 @@
 import {MainThreeColumnPanel} from "@intermesh/groupoffice-core";
 import {btn, checkboxselectcolumn, column, comp, Filter, h3, hr, menu, searchbtn, t, tbar} from "@intermesh/goui";
 import {tasklistgrid, TasklistGrid} from "./TasklistGrid.js";
-import {CategoryGrid} from "./CategoryGrid.js";
 import {TaskGrid} from "./TaskGrid.js";
 import {TaskDetail} from "./TaskDetail.js";
+import {taskcategorygrid, TaskCategoryGrid} from "./TaskCategoryGrid.js";
 
 export enum ProgressType {
 	'needs-action' = 'Needs action',
@@ -15,6 +15,7 @@ export enum ProgressType {
 
 export class Main extends MainThreeColumnPanel {
 	private taskListGrid!: TasklistGrid;
+	private taskCategoryGrid!: TaskCategoryGrid;
 
 	private taskGrid!: TaskGrid;
 	private taskDetail!: TaskDetail;
@@ -24,15 +25,11 @@ export class Main extends MainThreeColumnPanel {
 
 		this.on("render", () => {
 			void this.taskListGrid.store.load();
-		})
+			void this.taskCategoryGrid.store.load();
+		});
 	}
 
 	protected createWest() {
-
-
-		const categoryGrid = new CategoryGrid();
-		void categoryGrid.store.load();
-
 		return comp({
 				cls: "vbox",
 				width: 300
@@ -139,8 +136,78 @@ export class Main extends MainThreeColumnPanel {
 					]
 				})
 			),
-			comp({cls: "pad"}),
-			categoryGrid
+
+			tbar({
+					cls: "border-bottom"
+				},
+				h3({
+					text: t("Categories")
+				}),
+				"->",
+				btn({
+					icon: "add",
+					handler: () => {
+
+					}
+				})
+			),
+			comp({
+					flex: 1,
+					cls: "scroll"
+				},
+				this.taskCategoryGrid = taskcategorygrid({
+					cls: "no-row-lines",
+					fitParent: true,
+					rowSelectionConfig: {
+						multiSelect: true,
+						listeners: {
+							selectionchange: (tableRowSelect) => {
+								const categoryIds = tableRowSelect.getSelected().map((row) => row.record.id);
+
+								this.taskGrid.store.queryParams.filter = {
+									categories: categoryIds
+								}
+
+								void this.taskGrid.store.load();
+							}
+						}
+					},
+					columns: [
+						checkboxselectcolumn(),
+						column({
+							id: "name",
+							header: t("Name"),
+							resizable: false
+						}),
+						column({
+							id: "btn",
+							sticky: true,
+							width: 32,
+							renderer: (columnValue, record, td, table1, storeIndex) => {
+								return btn({
+									icon: "more_vert",
+									menu: menu({},
+										btn({
+											icon: "edit",
+											text: t("Edit"),
+											handler: () => {
+
+											}
+										}),
+										btn({
+											icon: "delete",
+											text: t("Delete"),
+											handler: () => {
+
+											}
+										})
+									)
+								})
+							}
+						})
+					]
+				})
+			)
 		);
 	}
 
