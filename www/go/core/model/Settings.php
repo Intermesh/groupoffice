@@ -424,10 +424,13 @@ class Settings extends core\Settings {
 
 	public function printCssVars($theme = 'Color') {
 		$str = !empty($this->{'primary'.$theme}) ? '--fg-main-tp: '.$this->getPrimaryColorTransparent($theme).';' : '';
-		foreach(['primary', 'secondary', 'tertiary', 'accent'] as $type) {
-			if(!empty($this->{$type.$theme})) $str .= '--c-'.$type.': #'.$this->{$type.$theme}.';';
+
+		foreach(['--fg-main'=>'primary',
+					  '--c-primary'=>'secondary',
+					  '--c-secondary'=>'tertiary',
+					  '--c-accent'=>'accent'] as $css => $type) {
+			if(!empty($this->{$type.$theme})) $str .= $css.': #'.$this->{$type.$theme}.';';
 		}
-		$str .= '--fg-main: var(--c-primary);';
 		return $str;
 	}
 
