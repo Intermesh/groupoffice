@@ -1,5 +1,8 @@
+01-04-2025: 25.0.11
 - Core: fix order of database migrations
 - Studio: automatically patch modules to 25.0 code base
+- Core: fix multiple upgrade errors
+- Core: fix theme colors
 
 25-03-2025: 25.0.10
 - Calendar: Fixed install on MySQL 8
