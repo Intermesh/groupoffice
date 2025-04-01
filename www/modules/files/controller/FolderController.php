@@ -642,24 +642,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		if (isset($params['ids']) && $params['overwrite'] == 'ask')
 			\GO::session()->values['files']['pasteIds'] = $this->_splitFolderAndFileIds(json_decode($params['ids'], true));
 
-		if($params['destination_folder_id'] === 'trash') {
-			/**
-			 * ids: ["f:11"]
-			 * destination_folder_id: trash
-			 * paste_mode: cut
-			 * id: 2
-			 * command: ask
-			 * security_token: UE3vWc8ySR1LdVGYJODM
-			 */
-			// TO
-
-			/**
-			 * query:
-			 * limit: 20
-			 * folder_id: 2
-			 * trash_keys: ["f:7"]
-			 * security_token: UE3vWc8ySR1LdVGYJODM
-			 */
+		if ($params['destination_folder_id'] === 'trash') {
 			$destinationFolder = Folder::model()->findByPath('trash');
 			$store = \GO\Base\Data\Store::newInstance(Folder::model());
 
@@ -671,21 +654,21 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 			//handle delete request for both files and folder
 			try {
+				$securityToken = GO::request()->get["security_token"];
 				$this->_processDeletes([
 					'trash_keys' => $params['ids'],
 					'folder_id' => $params['id'],
 					'limit' => 20,
-					'security_token' => $params['security_token']
+					'security_token' => $securityToken
 				], $store);
-			}catch(\Exception $e) {
+			} catch(\Exception $e) {
 				$response['deleteSuccess'] = false;
 				$response['deleteFeedback'] = $e->getMessage();
 			}
 
-			if(!isset($response['deleteSuccess'])){
+			if (!isset($response['deleteSuccess'])){
 				$response['deleteSuccess'] = true;
 			}
-			// @TODO: call the moveToTrash() action
 		} else {
 			$destinationFolder = Folder::model()->findByPk($params['destination_folder_id']);
 		}

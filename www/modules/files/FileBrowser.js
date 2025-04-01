@@ -414,7 +414,6 @@ GO.files.FileBrowser = function(config){
 				autoUpload: true,
 				listeners: {
 					uploadComplete: function(blobs) {
-						console.warn(folder_id);
 						blobs = this.transformBlobs(blobs);
 						this.sendOverwrite({
 							upload:true,
@@ -1178,7 +1177,6 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 				{
 					this.setFolderID(parent_id, false, true);
 				}
-				//console.log(parent_id);
 				var node = this.treePanel.getNodeById(parent_id);
 				if(node)
 				{
@@ -1585,7 +1583,6 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		} else {
 			//detect grid on selModel. thumbs doesn't have that
 			if (this.cardPanel.getLayout().activeItem.id === this.gridPanel.id) {
-				debugger;
 				this.gridPanel.deleteSelected({
 					deleteParam: "trash_keys",
 					callback: function () {
