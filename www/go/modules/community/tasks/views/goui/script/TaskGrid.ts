@@ -2,7 +2,7 @@ import {
 	avatar,
 	checkboxcolumn,
 	column,
-	comp,
+	comp, DataSourceStore,
 	datasourcestore,
 	datecolumn,
 	Format,
@@ -12,7 +12,7 @@ import {
 import {img, jmapds} from "@intermesh/groupoffice-core";
 import {ProgressType} from "./Main.js";
 
-export class TaskGrid extends Table {
+export class TaskGrid extends Table<DataSourceStore> {
 	constructor() {
 		super(
 			datasourcestore({
@@ -39,6 +39,9 @@ export class TaskGrid extends Table {
 						path: "categories",
 						dataSource: jmapds("TaskCategory")
 					}
+				},
+				queryParams: {
+
 				},
 				buildRecord: async entity => {
 					return Object.assign({complete: entity.progress == "completed"}, entity);
