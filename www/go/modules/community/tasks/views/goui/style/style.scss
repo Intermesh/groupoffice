@@ -1,4 +1,42 @@
-.task-principal-name {
+.tasks-principal-name {
   line-height: 4rem;
   padding-left: 0.5rem;
+}
+
+.card {
+  .status {
+    cursor: pointer;
+
+  }
+}
+
+.tasks-status-needs-action {
+  background-color: var(--hue-yellow);
+  fill: var(--hue-yellow);
+}
+
+.tasks-status-in-progress {
+  background-color: var(--hue-blue);
+  fill: var(--hue-blue);
+}
+
+.tasks-status-completed {
+  background-color: var(--hue-green);
+  fill: var(--hue-green);
+}
+
+.tasks-status-failed {
+  background-color: var(--hue-red);
+  fill: var(--hue-red);
+}
+
+.tasks-status-cancelled {
+  background-color: var(--hue-bluegrey);
+  fill: var(--hue-bluegrey);
+}
+
+.task-progressbar-displayfield {
+  .control {
+    width: 100%;
+  }
 }

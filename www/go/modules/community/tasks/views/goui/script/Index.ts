@@ -1,7 +1,7 @@
 import {client, modules, router} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 
-const tester = false;
+const tester = true;
 
 if (tester) {
 	modules.register({

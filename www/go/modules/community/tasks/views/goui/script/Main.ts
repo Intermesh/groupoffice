@@ -3,9 +3,19 @@ import {btn, comp, menu, searchbtn, t, tbar} from "@intermesh/goui";
 import {TasklistGrid} from "./TasklistGrid.js";
 import {CategoryGrid} from "./CategoryGrid.js";
 import {TaskGrid} from "./TaskGrid.js";
+import {TaskDetail} from "./TaskDetail.js";
+
+export enum ProgressType {
+	'needs-action' = 'Needs action',
+	'in-progress'= 'In progress',
+	'completed'= 'Completed',
+	'failed' = 'Failed',
+	'cancelled' = 'Cancelled'
+}
 
 export class Main extends MainThreeColumnPanel {
 	private taskGrid!: TaskGrid;
+	private taskDetail!: TaskDetail;
 
 	constructor() {
 		super("tasks");
@@ -14,6 +24,8 @@ export class Main extends MainThreeColumnPanel {
 	protected createWest() {
 		const tasklistGrid = new TasklistGrid();
 		void tasklistGrid.store.load();
+
+
 
 		const categoryGrid = new CategoryGrid();
 		void categoryGrid.store.load();
@@ -34,18 +46,31 @@ export class Main extends MainThreeColumnPanel {
 		this.taskGrid.fitParent = true;
 		void this.taskGrid.store.load();
 
+		this.taskGrid.rowSelectionConfig = {
+			multiSelect: true,
+			listeners: {
+				selectionchange: (tableRowSelect) => {
+					const taskIds = tableRowSelect.getSelected().map((row) => row.record.id);
+
+					if (taskIds[0]) {
+						void this.taskDetail.load(taskIds[0]);
+					}
+				}
+			}
+		}
+
 		return comp({
 				cls: "vbox bg-lowest",
 				flex: 1
 			},
 			tbar({
-				cls: "bg-mid border-bottom"
+					cls: "bg-mid border-bottom"
 				},
 				this.showWestButton(),
 				"->",
 				searchbtn({
 					listeners: {
-						input: (sender,text) => {
+						input: (sender, text) => {
 
 						}
 					}
@@ -82,12 +107,18 @@ export class Main extends MainThreeColumnPanel {
 				})
 			),
 			comp({cls: "scroll", flex: 1},
-			this.taskGrid
+				this.taskGrid
 			)
 		);
 	}
 
 	protected createEast() {
-		return comp();
+		this.taskDetail = new TaskDetail();
+
+		return comp({
+				cls: "vbox"
+			},
+			this.taskDetail
+		);
 	}
 }

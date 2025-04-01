@@ -6,11 +6,11 @@ import {
 	datasourcestore,
 	datecolumn,
 	Format,
-	store,
 	t,
 	Table, Window
 } from "@intermesh/goui";
 import {img, jmapds} from "@intermesh/groupoffice-core";
+import {ProgressType} from "./Main.js";
 
 export class TaskGrid extends Table {
 	constructor() {
@@ -47,6 +47,7 @@ export class TaskGrid extends Table {
 			[
 				checkboxcolumn({
 					id: "complete",
+					hidable: false,
 					listeners: {
 						change: async (col, checkbox, value, record, storeIndex) => {
 							this.mask();
@@ -144,7 +145,7 @@ export class TaskGrid extends Table {
 								avatar({
 									displayName: record.responsible.name
 								}),
-							comp({cls: "task-principal-name", text: record.responsible.name}));
+							comp({cls: "tasks-principal-name", text: record.responsible.name}));
 					}
 				}),
 				column({
@@ -162,7 +163,9 @@ export class TaskGrid extends Table {
 					sortable: true,
 					header: t("% complete"),
 					renderer: (columnValue, record) => {
-						return '<div class="go-progressbar"><div style="width:' + Math.ceil(columnValue) + '%"></div></div>';
+						return comp({cls: "go-progressbar"},
+							comp({style: {width: `${Math.ceil(columnValue)}%`}})
+						)
 					}
 				}),
 				column({
@@ -171,8 +174,7 @@ export class TaskGrid extends Table {
 					width: 150,
 					sortable: true,
 					renderer: (columnValue, record, td, table, store) => {
-						// todo
-						return "";
+						return comp({cls: "status tasks-status-" + columnValue, html: ProgressType[columnValue as keyof typeof ProgressType]});
 					}
 				}),
 				datecolumn({
