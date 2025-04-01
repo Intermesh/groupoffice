@@ -118,17 +118,11 @@ try {
 
 		// fake URL
 		go()->getSettings()->URL = "http://localhost";
-
-//		echo "Installing demo data\n";
-//
-//		$ctrl = new System();
-//		$ctrl->demo();
-
 		echo "Done\n\n";
 	} else if($installDb == INSTALL_UPGRADE) {
-    echo "Running upgrade: ";
-	  $importCmd = 'mysql -h ' .  escapeshellarg($config['db_host']) . ' -u '.escapeshellarg($config['db_user']) . ' -p'.escapeshellarg($config['db_pass']).' groupoffice_phpunit < ' . __DIR__ . '/upgradetest/go68.sql';
-    echo "Running: " . $importCmd . "\n";
+        echo "Running upgrade: ";
+		$importCmd = 'mysql -h ' .  escapeshellarg($config['db_host']) . ' -u '.escapeshellarg($config['db_user']) . ' -p'.escapeshellarg($config['db_pass']).' groupoffice_phpunit < ' . __DIR__ . '/upgradetest/go68.sql';
+        echo "Running: " . $importCmd . "\n";
 	  system($importCmd);
 
 	  $copyCmd = 'cp -r ' . __DIR__ . '/upgradetest/68data/* ' . $dataFolder->getPath();
