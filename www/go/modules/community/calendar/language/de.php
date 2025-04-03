@@ -115,4 +115,9 @@ return array (
   'Enable JWT authentification' => 'JWT Authentifizierung aktivieren',
   'App Secret' => 'App Secret',
   'App ID' => 'App ID',
+	'Wk' => 'Wo',
+	'There are no calendars to add an appointment.' => 'Es gibt keine Kalender, um Termine hinzuzufügen.',
+	'Subscribe to an existing calendar or create a personal calendar.' => 'Abonnieren Sie einen bestehenden Kalender oder erstellen Sie einen persönlichen Kalender.',
+	'Show calendars' => 'Kalender anzeigen',
+	'Create personal calendar' => 'Persönlichen Kalender erstellen',
 );

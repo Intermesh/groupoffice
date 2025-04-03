@@ -630,7 +630,7 @@ abstract class Entity  extends OrmEntity {
 		$userChanges = static::getUserChangesQuery($states[1]['modSeq']);
 			
 		$changesQuery = static::getEntityChangesQuery($states[0]['modSeq'])
-						->union($userChanges)
+						->union($userChanges, true)
 						->offset($states[1]['offset'])
 						->limit($maxChanges + 1);
 		$changes = $changesQuery->execute();
@@ -735,7 +735,7 @@ abstract class Entity  extends OrmEntity {
     return (new Query)
             ->select('entityId,max(destroyed) AS destroyed')
             ->from('core_change', 'change')
-	          ->useIndex("USE INDEX (core_change_modSeq_entityTypeId_entityId_index)")
+//	          ->useIndex("USE INDEX (core_change_modSeq_entityTypeId_entityId_index)")
             ->fetchMode(PDO::FETCH_ASSOC)
             ->groupBy(['entityId'])
             ->where(["entityTypeId" => static::entityType()->getId()])

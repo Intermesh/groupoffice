@@ -931,7 +931,7 @@ return array (
   'Login as this user' => '以此用户身份登录',
   'Failed to login as this user' => '以该用户身份登录失败',
   'Archive user' => '存档用户',
-  'Archiving a user will disable them and make their items invisible. Are you sure?' => '存档用户将禁用他们并使他们的项目不可见。 你确定吗？',
+  'Archiving a user will disable them, revoke all group memberships and make their items invisible. Are you sure?' => '存档用户将禁用他们并使他们的项目不可见。 你确定吗？',
   'You can\' t archive yourself' => '你不能自己存档',
   'Edit contact' => '更改联系资料',
   'Regional' => '区域',

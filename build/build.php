@@ -383,7 +383,7 @@ class Builder
 
 		$tpl = '{package} ({version}-' . $this->distro . ') ' . $this->distro . '; urgency=medium
 
-  * Changes can be found in /usr/share/groupoffice/changelog.md
+  * Changes can be found in /usr/share/groupoffice/CHANGELOG.md
 
  -- Intermesh BV (Developer key) <info@intermesh.nl>  {date}';
 

@@ -54,7 +54,7 @@ export class SubscribeWindow extends Window {
 			columns: [
 				column({id:'name'}),
 				column({id:'id', width:120, renderer: v=> btn({
-						text: "Subscribe",
+						text: t("Subscribe"),
 						cls:'primary',
 						handler: () => { store.dataSource.update(v, {isSubscribed: true}); }
 					})

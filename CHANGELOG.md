@@ -1,6 +1,25 @@
+01-04-2025: 25.0.11
+- Core: fix order of database migrations
+- Studio: automatically patch modules to 25.0 code base
+- Core: fix multiple upgrade errors
+- Core: fix theme colors
+
+25-03-2025: 25.0.10
+- Calendar: Fixed install on MySQL 8
+- Calendar: Auto install on fresh install
+- Core: Catch database exception in legacy session handler to catch the case where a session exists but the
+  database is not installed yet. Reported in issue #1242.
+- Fixed exception in database check. Reported in issue #1242.
+- Supportclient: add 'select all lists' checkbox to sidebar
+- Finance: When duplicating quotes or invoices etc. default to the same book
+- Finance: Optimized database index
+- Core: Optimized database indexes for core_change, search.
+- ActiveSync: Optimized notification queries
+- Core: Updated German translation thanks to University of Greifswald
+
 18-03-2025: 25.0.9
 - Core: Build error
-- Core: maximum call stack exceeded error- 
+- Core: maximum call stack exceeded error
 
 18-03-2025: 25.0.8
 - E_mail: Save mail as project

@@ -2,14 +2,16 @@
 
 use go\core\fs\File;
 
-function tz_convert($input, $tz) {
-	if(!isset($input)) {
-		return $input;
+if (!function_exists('tz_convert')) {
+	function tz_convert($input, $tz) {
+		if(!isset($input)) {
+			return $input;
+		}
+		$datetime = new DateTime($input, new DateTimeZone("UTC")); // tz during upgrade is UTC
+		if(!empty($tz))
+			$datetime->setTimezone(new DateTimeZone($tz));
+		return $datetime;
 	}
-	$datetime = new DateTime($input, new DateTimeZone("UTC")); // tz during upgrade is UTC
-	if(!empty($tz))
-		$datetime->setTimezone(new DateTimeZone($tz));
-	return $datetime;
 }
 
 // TODO: Remove extension module for old calendar: categoryfilter, 2weekview, caltimetracking, jitsi, defaultcalendaracl, external calendar poll,

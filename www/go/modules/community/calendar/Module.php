@@ -20,6 +20,11 @@ use Sabre\VObject\Component\VCalendar;
 class Module extends core\Module
 {
 
+	public function autoInstall(): bool
+	{
+		return true;
+	}
+
 	public function getAuthor(): string
 	{
 		return "Intermesh BV <mdhart@intermesh.nl>";
@@ -46,6 +51,7 @@ class Module extends core\Module
 	{
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 		User::on(User::EVENT_SAVE, static::class, 'onUserSave');
+		User::on(User::EVENT_ARCHIVE, static::class, 'onUserArchive');
 		GarbageCollection::on(GarbageCollection::EVENT_RUN, static::class, 'onGarbageCollection');
 	}
 
@@ -60,7 +66,13 @@ class Module extends core\Module
 					->update('core_principal', ['email' => $user->email], ['id' => $pIds])
 					->execute();
 			}
+		}
 
+	}
+
+	static function onUserArchive(User $user, core\util\ArrayObject $aclIds) {
+		if (($calendarId = $user->calendarPreferences->defaultCalendarId) && ($calendar = Calendar::findById($calendarId))) {
+			$aclIds[] = $calendar->findAclId();
 		}
 	}
 
@@ -81,6 +93,7 @@ class Module extends core\Module
 	{
 		$mapping->addHasOne('calendarPreferences', Preferences::class, ['id' => 'userId'], true);
 	}
+
 	public function downloadCalendar($id) {
 		$calendar = Calendar::findById($id);
 		if($calendar->getPermissionLevel() < 50) {
@@ -228,6 +241,9 @@ class Module extends core\Module
 
 	protected function afterInstall(CoreModule $model): bool {
 		cron\ScanEmailForInvites::install("*/5 * * * *");
+
+		Calendar::entityType()->setDefaultAcl([core\model\Group::ID_INTERNAL => core\model\Acl::LEVEL_READ]);
+
 		return parent::afterInstall($model);
 	}
 

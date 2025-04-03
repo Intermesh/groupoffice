@@ -28,8 +28,7 @@ return [
 	'New event' => 'Nieuwe afspraak',
 	'Event' => 'Afspraak',
 	'All day' => 'Hele dag',
-	'Unsubscribe' => 'Afmelden',
-	'Subscribe' => 'Aanmelden',
+
 	'Events with time' => 'Afspraken met tijd',
 	'Events without time (Full-day)' => 'Afspraken zonder tijd (Hele dag)',
 	'Default notifications' => 'Standaard meldingen',
@@ -39,6 +38,11 @@ return [
 	'Create calendar' => 'Nieuwe agenda maken',
 	'Subscribe to calendar' => 'Aanmelden bij agenda',
 	'Add calendar from link' => 'Agenda toevoegen via link',
+
+	'There are no calendars to add an appointment.'=>'Er zijn geen calendar om afspraken aan toe te voegen',
+	'Subscribe to an existing calendar or create a personal calendar.'=>'Abonneer op een bestaande agenda of maak een persoonlijk agenda.',
+	'Show calendars' => 'Toon agenda\'s',
+	'Create personal calendar' => 'Maak persoonlijke agenda',
 
 	'Birthdays'=>'Verjaardagen',
 	'{name}\'s birthday' => '{name}\'s verjaardag',

@@ -164,11 +164,10 @@ abstract class Module extends Singleton {
 			go()->getDbConnection()->pauseTransactions();
 
 			try {
+
 				self::installDependencies($this);
-
-
-
 				$this->installDatabase();
+
 			} catch(Exception $e) {
 				ErrorHandler::logException($e);
 				go()->getDbConnection()->resumeTransactions();
