@@ -15,10 +15,12 @@
 
 namespace GO\Files\Model;
 
+use Exception;
 use GO;
 use go\core\fs\Blob;
 use go\core\mail\Attachment;
 use go\core\model\Module;
+use GO\Files\Model\TrashedItem;
 use go\modules\community\history\model\LogEntry;
 use go\core\exception\NotFound;
 
@@ -902,4 +904,22 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		$service = \go\modules\business\fileconverter\Module::getAvailableService();
 		$service->convert($this->fsFile, $outputFile, $format);
 	}
+
+	/**
+	 * Soft delete a file by moving it to Trash
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function moveToTrash(): void
+	{
+		TrashedItem::model()->saveForFile($this);
+
+		$trashFolder = Folder::model()->findByPath('trash');
+		if ($this->folder_id == $trashFolder->id) {
+			throw new Exception("File is already in trash");
+		}
+		$this->move($trashFolder, true);
+	}
+
 }

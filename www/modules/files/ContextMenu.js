@@ -97,6 +97,15 @@ GO.files.FilesContextMenu = function(config)
 		},
 		scope: this
 	});
+
+	this.moveToTrashButton = new Ext.menu.Item({
+		iconCls: "ic-delete",
+		text: t("Move to Trash"),
+		handler: function()  {
+			this.fireEvent("moveToTrash", this, this.records, this.clickedAt);
+		},
+		scope: this
+	});
 	
 	this.batchEditButton = new Ext.menu.Item({
 		iconCls: 'ic-select-all',
@@ -250,6 +259,7 @@ GO.files.FilesContextMenu = function(config)
 	//this.pasteButton,
 	config['items'].push(this.deleteSeparator = new Ext.menu.Separator());
 	config['items'].push(this.deleteButton);
+	config['items'].push(this.moveToTrashButton);
 	config['items'].push(this.batchEditButton);
 	config['items'].push(this.compressSeparator = new Ext.menu.Separator());
 	config['items'].push(this.compressButton);
