@@ -1,9 +1,26 @@
-import {MainThreeColumnPanel} from "@intermesh/groupoffice-core";
-import {btn, checkboxselectcolumn, column, comp, Filter, h3, hr, menu, searchbtn, t, tbar} from "@intermesh/goui";
+import {client, filterpanel, jmapds, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
+import {
+	btn, checkbox, CheckboxField,
+	checkboxselectcolumn,
+	column,
+	comp,
+	Filter,
+	h3,
+	hr,
+	list,
+	menu,
+	searchbtn,
+	store,
+	t, table,
+	tbar
+} from "@intermesh/goui";
 import {tasklistgrid, TasklistGrid} from "./TasklistGrid.js";
 import {TaskGrid} from "./TaskGrid.js";
 import {TaskDetail} from "./TaskDetail.js";
 import {taskcategorygrid, TaskCategoryGrid} from "./TaskCategoryGrid.js";
+import {TasklistDialog} from "./TasklistDialog.js";
+import {SubscribeWindow} from "./SubscribeWindow.js";
+import {TaskCategoryDialog} from "./TaskCategoryDialog.js";
 
 export enum ProgressType {
 	'needs-action' = 'Needs action',
@@ -16,9 +33,11 @@ export enum ProgressType {
 export class Main extends MainThreeColumnPanel {
 	private taskListGrid!: TasklistGrid;
 	private taskCategoryGrid!: TaskCategoryGrid;
-
 	private taskGrid!: TaskGrid;
 	private taskDetail!: TaskDetail;
+
+	private assignedToMeCheckbox!: CheckboxField;
+	private unassignedCheckbox!: CheckboxField;
 
 	constructor() {
 		super("tasks");
@@ -30,11 +49,117 @@ export class Main extends MainThreeColumnPanel {
 	}
 
 	protected createWest() {
+		const filterList = table({
+			headers: false,
+			fitParent: true,
+			cls: "no-row-lines tasks-filter-table",
+			store: store({
+				data: [
+					{
+						name: t("Today"),
+						icon: "content_paste",
+						iconCls: "green",
+						value: "today"
+					},
+					{
+						name: t("Due in seven days"),
+						icon: "filter_7",
+						iconCls: "purple",
+						value: "week"
+					},
+					{
+						name: t("All"),
+						icon: "assignment",
+						iconCls: "red",
+						value: "all"
+					},
+					{
+						name: t("Unscheduled"),
+						icon: "event_busy",
+						iconCls: "blue",
+						value: "unscheduled"
+					},
+					{
+						name: t("Scheduled"),
+						icon: "event",
+						iconCls: "orange",
+						value: "scheduled"
+					}
+				]
+			}),
+			columns: [
+				column({
+					id: "icon",
+					width: 32,
+					renderer: (value, record) => {
+						return comp({tagName: "i", cls: "icon " + record.iconCls, text: value});
+					}
+				}),
+				column({
+					id: "name"
+				})
+			],
+			rowSelectionConfig: {
+				multiSelect: false,
+				listeners: {
+					selectionchange: (rowSelect) => {
+						const value = rowSelect.getSelected().map((row) => row.record.value)[0];
+
+						const filters: Record<string, Filter> = {
+							today: {start: "<=now"},
+							week: {due: "<=7days"},
+							unscheduled: {scheduled: false},
+							scheduled: {scheduled: true},
+							all: {}
+						};
+
+						const filter = filters[value];
+
+						if (filter) {
+							this.taskGrid.store.setFilter("status", filter);
+
+							void this.taskGrid.store.load();
+						}
+					}
+				}
+			}
+		});
+
 		return comp({
-				cls: "vbox",
+				cls: "vbox scroll fit",
 				width: 300
 			},
-			tbar({}, this.showCenterButton()),
+			this.showCenterButton(),
+			filterList,
+			comp({cls: "pad"},
+				checkbox({
+					value: true,
+					label: t("Show completed"),
+					listeners: {
+						change: (field, newValue, oldValue) => {
+							this.taskGrid.store.setFilter("completed", newValue ? {} : {complete: false});
+							void this.taskGrid.store.load();
+						}
+					}
+				}),
+				h3({text: t("Assigned")}),
+				this.assignedToMeCheckbox = checkbox({
+					label: t("Mine"),
+					listeners: {
+						change: () => {
+							this.setAssignmentFilters();
+						}
+					}
+				}),
+				this.unassignedCheckbox = checkbox({
+					label: t("Unassigned"),
+					listeners: {
+						change: () => {
+							this.setAssignmentFilters();
+						}
+					}
+				})
+			),
 			tbar({
 					cls: "border-bottom"
 				},
@@ -57,21 +182,22 @@ export class Main extends MainThreeColumnPanel {
 							icon: "add",
 							text: t("Create task list..."),
 							handler: () => {
-
+								const dlg = new TasklistDialog();
+								dlg.show();
 							}
 						}),
 						btn({
 							icon: "bookmark_added",
 							text: t("Subscribe to task list..."),
 							handler: () => {
-
+								const wdw = new SubscribeWindow();
+								wdw.show();
 							}
 						})
 					)
 				})
 			),
 			comp({
-					flex: 1,
 					cls: "scroll"
 				},
 				this.taskListGrid = tasklistgrid({
@@ -110,23 +236,25 @@ export class Main extends MainThreeColumnPanel {
 										btn({
 											icon: "edit",
 											text: t("Edit..."),
-											handler: () => {
-
+											handler: async () => {
+												const dlg = new TasklistDialog();
+												await dlg.load(record.id);
+												dlg.show();
 											}
 										}),
 										btn({
 											icon: "delete",
 											text: t("Delete..."),
 											handler: () => {
-
+												void jmapds("TaskList").confirmDestroy([record.id]);
 											}
 										}),
-										hr({}),
+										hr(),
 										btn({
 											icon: "remove_circle",
 											text: t("Unsubscribe"),
-											handler: () => {
-
+											handler: async () => {
+												await jmapds("TaskList").update(record.id, {isSubscribed: false});
 											}
 										})
 									)
@@ -147,12 +275,12 @@ export class Main extends MainThreeColumnPanel {
 				btn({
 					icon: "add",
 					handler: () => {
-
+						const dlg = new TaskCategoryDialog();
+						dlg.show();
 					}
 				})
 			),
 			comp({
-					flex: 1,
 					cls: "scroll"
 				},
 				this.taskCategoryGrid = taskcategorygrid({
@@ -190,15 +318,17 @@ export class Main extends MainThreeColumnPanel {
 										btn({
 											icon: "edit",
 											text: t("Edit"),
-											handler: () => {
-
+											handler: async () => {
+												const dlg = new TaskCategoryDialog();
+												await dlg.load(record.id);
+												dlg.show();
 											}
 										}),
 										btn({
 											icon: "delete",
 											text: t("Delete"),
-											handler: () => {
-
+											handler: async () => {
+												await jmapds("TaskCategory").confirmDestroy([record.id]);
 											}
 										})
 									)
@@ -207,7 +337,11 @@ export class Main extends MainThreeColumnPanel {
 						})
 					]
 				})
-			)
+			),
+			filterpanel({
+				store: this.taskGrid.store,
+				entityName: "Task"
+			})
 		);
 	}
 
@@ -290,5 +424,27 @@ export class Main extends MainThreeColumnPanel {
 			},
 			this.taskDetail
 		);
+	}
+
+	private setAssignmentFilters() {
+		if (!this.assignedToMeCheckbox.value && !this.unassignedCheckbox.value) {
+			this.taskGrid.store.setFilter("assignedToMe", {});
+		} else if (this.assignedToMeCheckbox.value && !this.unassignedCheckbox.value) {
+			this.taskGrid.store.setFilter("assignedToMe", {responsibleUserId: client.user.id});
+		} else if (!this.assignedToMeCheckbox.value && this.unassignedCheckbox.value) {
+			this.taskGrid.store.setFilter("assignedToMe", {responsibleUserId: null})
+		} else {
+			this.taskGrid.store.setFilter("assignedToMe",
+				{
+					operator: "OR",
+					conditions: [
+						{responsibleUserId: client.user.id},
+						{responsibleUserId: null}
+					]
+				}
+			);
+		}
+
+		void this.taskGrid.store.load();
 	}
 }

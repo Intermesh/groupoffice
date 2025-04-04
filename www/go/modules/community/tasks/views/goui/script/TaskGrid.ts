@@ -41,7 +41,7 @@ export class TaskGrid extends Table<DataSourceStore> {
 					}
 				},
 				queryParams: {
-
+					limit: 0
 				},
 				buildRecord: async entity => {
 					return Object.assign({complete: entity.progress == "completed"}, entity);
