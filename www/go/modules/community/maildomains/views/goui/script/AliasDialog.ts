@@ -55,7 +55,7 @@ export class AliasDialog extends FormWindow {
 
 		this.on("ready", async () => {
 
-			if (this.currentId) {
+			if (this.form.currentId) {
 				const idField = 	this.form.findField("address")!;
 				let address = idField.value as String;
 				if (address.indexOf("@") > -1) {
@@ -76,7 +76,7 @@ export class AliasDialog extends FormWindow {
 		});
 
 		this.form.on("beforesave", (f, v) => {
-			if(!this.currentId) {
+			if(!this.form.currentId) {
 				v.address = v.address + "@" + this.form.findField("domain")!.value;
 			}
 		});

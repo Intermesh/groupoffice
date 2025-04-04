@@ -60,10 +60,6 @@ final class Domain extends AclOwnerEntity
 	/** @var boolean */
 	public $active = true;
 
-	public $aliases;
-
-	public $mailboxes;
-
 	public $spf;
 
 	public $spfStatus;
@@ -77,11 +73,6 @@ final class Domain extends AclOwnerEntity
 	public $dmarcStatus;
 	public $dkim;
 
-	/** @var int */
-	public $numAliases;
-
-	/** @var int */
-	public $numMailboxes;
 
 	/** @var int Used quota in bytes */
 	public $sumUsedQuota;
@@ -104,10 +95,7 @@ final class Domain extends AclOwnerEntity
 				(new Query())
 					->select('SUM(COALESCE(`cmm`.`quota`,0)) as `sumUsedQuota`, SUM(COALESCE(`cmm`.`bytes`,0)) as `sumUsage`')
 				->join('community_maildomains_mailbox', 'cmm', '`cmd`.`id`=`cmm`.`domainId`', 'LEFT')
-//				->join('community_maildomains_quota', 'cmq', 'cmq.username = cmm.username', 'LEFT')
 				->groupBy(['`cmm`.`domainId`']))
-//			->addScalar('aliases', 'community_maildomains_alias', ['id' => 'domainId'])
-//			->addScalar('mailboxes', 'community_maildomains_mailbox', ['id' => 'domainId'])
 			->addMap('dkim', DkimKey::class, ['id' => 'domainId']);
 	}
 
@@ -135,6 +123,23 @@ final class Domain extends AclOwnerEntity
 			->add('active', function (Criteria $criteria, $value) {
 				$criteria->where(['active' => $value]);
 			});
+	}
+
+	public function countMailboxes(): int {
+		return go()->getDbConnection()
+			->selectSingleValue('count(*)')
+			->from("community_maildomains_mailbox")
+			->where("domainId", "=", $this->id)
+			->single();
+	}
+
+	public function countAliases(): int {
+		return go()->getDbConnection()
+			->selectSingleValue('count(*)')
+			->from("community_maildomains_alias")
+			->from("community_maildomains_alias")
+			->where("domainId", "=", $this->id)
+			->single();
 	}
 
 
@@ -165,16 +170,6 @@ final class Domain extends AclOwnerEntity
 	}
 
 
-	public function getNumAliases(): int
-	{
-		return count($this->aliases);
-
-	}
-
-	public function getNumMailboxes(): int
-	{
-		return count($this->mailboxes);
-	}
 
 	protected function internalSave(): bool
 	{

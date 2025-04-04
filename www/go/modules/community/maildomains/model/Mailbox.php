@@ -127,9 +127,10 @@ final class Mailbox extends AclItemEntity
 
 		$this->checkQuota();
 
-		if (!empty($d->maxMailboxes) && $this->isNew() && count($d->mailboxes) + 1 > $d->maxMailboxes) {
+		if (!empty($d->maxMailboxes) && $this->isNew() && $d->countMailboxes() + 1 > $d->maxMailboxes) {
 			throw new Forbidden('The maximum number of mailboxes for this domain has been reached.');
 		}
+
 		parent::internalValidate();
 	}
 
