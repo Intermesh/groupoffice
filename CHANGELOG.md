@@ -1,3 +1,7 @@
+- Maildomains: Fixed bug in dialogs not splitting user and domain
+- Maildomains: Fixed bug in checking max aliases and max mailboxes
+- Webdav: Creating new files was broken
+
 01-04-2025: 25.0.11
 - Core: fix order of database migrations
 - Studio: automatically patch modules to 25.0 code base
