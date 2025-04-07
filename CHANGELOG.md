@@ -2,6 +2,8 @@
 - Assistant: Locks file and asks to unlock files
 - Webdav: Creating new files was broken
 - E-mail: Fixed hanging of email when password decryption failed
+- Core: Make sure empty p tags uses horizonal space so we don't get much empty space in tcpdf.
+  <p></p><p></p> would take up zero space in GO html editor but two empty lines in tcpdf
 
 31-03-2025: 6.8.112
 - Finance: Add second catalog item failed
