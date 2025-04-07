@@ -1,3 +1,4 @@
+07-04-2025: 25.0.12
 - Maildomains: Fixed bug in dialogs not splitting user and domain
 - Maildomains: Fixed bug in checking max aliases and max mailboxes
 - Webdav: Creating new files was broken
