@@ -2,6 +2,7 @@
 - Maildomains: Fixed bug in checking max aliases and max mailboxes
 - Webdav: Creating new files was broken
 - Studio: fix creator and modifier names in grid
+- Core: refactor old calendar event models out of system tools
 
 01-04-2025: 25.0.11
 - Core: fix order of database migrations
