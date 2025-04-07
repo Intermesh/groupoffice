@@ -443,7 +443,7 @@ INSERT IGNORE INTO calendar_default_alert_with_time
 
 INSERT INTO calendar_category
 	(id, name, color, ownerId, calendarId) SELECT
-	 id, name, color, null, calendar_id FROM cal_categories;
+	 id, name, color, null, IF(calendar_id=0, null,calendar_id) FROM cal_categories;
 
 -- insert instance that belongs to the organizer
 INSERT INTO calendar_event
