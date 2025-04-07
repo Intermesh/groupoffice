@@ -264,4 +264,6 @@ $updates['202504070955'][] = "INSERT IGNORE INTO calendar_category
 	(id, name, color, ownerId, calendarId) SELECT
 	 id, name, color, null, IF(calendar_id=0, null,calendar_id) FROM cal_categories;";
 
+$updates['202504071345'][] = "ALTER TABLE `calendar_event` CHANGE COLUMN `location` `location` TEXT NULL;";
+
 // TODO: calendar views -> custom filters
