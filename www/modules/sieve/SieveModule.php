@@ -138,7 +138,7 @@ class SieveModule extends Module{
 				// Add the found rule to the response
 				$response['data'] = array_merge($response['data'],$rule);
 			}
-		} catch (\Exception $e) {
+		} catch (\Throwable $e) {
 			\GO::debug('ERROR OOO_SIEVE: '. $e->getMessage());
 			return;
 		}
