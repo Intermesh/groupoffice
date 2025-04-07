@@ -16,6 +16,7 @@
 namespace GO\Sieve\Util;
 
 use GO;
+use GO\Base\Mail\Exception\ImapAuthenticationFailedException;
 use GO\Email\Model\Account;
 
 // make sure path_separator is defined
@@ -92,6 +93,9 @@ class Sieve {
 
 	public function connect($username, $password='', $host='localhost', $port=2000, $auth_type=null, $usetls=true, $disabled=array(), $debug=false) {
 
+		if (empty($password)) {
+			throw new \AuthenticationRequiredException('Wrong password');
+		}
 		$host = $this->rewrite_host($host);
 
 		\GO::debug("sieve::connect($username, ***, $host, $port, $auth_type, $usetls)");
