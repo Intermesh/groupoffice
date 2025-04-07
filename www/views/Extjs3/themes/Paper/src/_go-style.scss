@@ -2052,6 +2052,7 @@ table[id^="comments-ext"] b {
 
 	p {
 		margin: dp(8) 0;
+		min-height: dp(24); // line height so enter always gives vertical space in html editor
 	}
 
 	a:link, a:visited, a:active {
