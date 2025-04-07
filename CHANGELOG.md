@@ -1,6 +1,7 @@
 - Files: Deleted files go to trash
 - Assistant: Locks file and asks to unlock files
 - Webdav: Creating new files was broken
+- E-mail: Fixed hanging of email when password decryption failed
 
 31-03-2025: 6.8.112
 - Finance: Add second catalog item failed
