@@ -114,7 +114,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event` (
     `sequence` INT UNSIGNED NOT NULL DEFAULT 1,
     `title` VARCHAR(255) NOT NULL,
     `description` TEXT NULL,
-    `location` VARCHAR(255) NOT NULL DEFAULT '',
+    `location` TEXT NULL,
     `locale` VARCHAR(6) NULL,
     `showWithoutTime` TINYINT(1) NOT NULL DEFAULT 0,
     `start` DATETIME NOT NULL COMMENT '@dbType=localdatetime',

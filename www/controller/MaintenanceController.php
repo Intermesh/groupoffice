@@ -101,7 +101,7 @@ class MaintenanceController extends AbstractController {
 		GO::session()->closeWriting(); //close writing otherwise concurrent requests are blocked.
 		
 		$checkModels = array(
-				"GO\Calendar\Model\Event"=>array('name', 'start_time', 'end_time', 'calendar_id', 'rrule'),
+//				"GO\Calendar\Model\Event"=>array('name', 'start_time', 'end_time', 'calendar_id', 'rrule'),
 //				"GO\Tasks\Model\Task"=>array('name', 'start_time', 'due_time', 'tasklist_id', 'rrule', 'user_id'),
 				"GO\Files\Model\Folder"=>array('name', 'parent_id'),
 //				"GO\Calendar\Model\Participant"=>array('event_id', 'email'),
@@ -383,8 +383,10 @@ class MaintenanceController extends AbstractController {
 				if (empty($params['package']) || $params['package'] == 'legacy') {
 
 					$class = 'GO\\' . ucfirst($params['module']) . '\\' . ucfirst($params['module']) . 'Module';
-					$module = $class::get();
-					$module->checkDatabase($response);
+					if (class_exists($class)) {
+						$module = $class::get();
+						$module->checkDatabase($response);
+					}
 				} else {
 					$class = 'go\\modules\\' . $params['package'] . '\\' . $params['module'] . '\\Module';
 					$module = $class::get();

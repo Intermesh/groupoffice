@@ -243,7 +243,7 @@ $updates['202404071212'][] = function() {
 // after timezone conversion make all full day event floating-time
 $updates['202404071212'][] = "UPDATE calendar_event SET timeZone = NULL WHERE showWithoutTime = 1;";
 // remove orphan categories
-$updates['202502261353'][] = "DELETE cat FROM calendar_category cat LEFT JOIN calendar_calendar c on c.id = cat.calendarId WHERE c.id IS NULL;";
+$updates['202502261353'][] = "DELETE cat FROM calendar_category cat LEFT JOIN calendar_calendar c on c.id = cat.calendarId WHERE c.id IS NOT NULL;";
 // fix: set duration at 1 hour if duration is negative
 $updates['202503101510'][] = "UPDATE calendar_event SET duration = 'PT1H' WHERE duration LIKE 'PT-%';";
 $updates['202503111342'][] = function(){
@@ -259,5 +259,11 @@ $updates['202503131043'][] = "UPDATE core_link l
 	JOIN core_entity et ON et.id = l.toEntityTypeId
 	JOIN calendar_calendar_event e on e.eventId = l.toId AND et.name = 'CalendarEvent'
 	SET l.toId = e.id;";
+// fixed missing global calendars because it had calendar_id=0 in the old database
+$updates['202504070955'][] = "INSERT IGNORE INTO calendar_category
+	(id, name, color, ownerId, calendarId) SELECT
+	 id, name, color, null, IF(calendar_id=0, null,calendar_id) FROM cal_categories;";
+
+$updates['202504071345'][] = "ALTER TABLE `calendar_event` CHANGE COLUMN `location` `location` TEXT NULL;";
 
 // TODO: calendar views -> custom filters
