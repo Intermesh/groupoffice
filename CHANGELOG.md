@@ -1,3 +1,4 @@
+07-04-2025: 6.8.113
 - Files: Deleted files go to trash
 - Assistant: Locks file and asks to unlock files
 - Webdav: Creating new files was broken
