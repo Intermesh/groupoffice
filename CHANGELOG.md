@@ -1,3 +1,8 @@
+08-04-2025: 25.0.14
+- Maildomains: Cannot create Alias #1255
+- ActiveSync: Was still not fixed.
+- Calendar: Upgrade errors if files not installed
+
 08-04-2025: 25.0.13
 - Files: If you had files module installed but disabled the upgrade failed
 - ActiveSync: Wrong lib included which made sync fail
