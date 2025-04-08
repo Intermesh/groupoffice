@@ -990,9 +990,13 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 					if(btn == 'yes') {
 						Ext.getBody().mask(t("Loading..."));
+						const oldRT = go.Jmap.requestTimeout;
+						go.Jmap.requestTimeout = 180000;
 						go.Jmap.request({method: "core/System/demo"}).finally(() => {
 							Ext.getBody().unmask();
-						});
+						}).finally(() =>{
+							go.Jmap.requestTimeout = oldRT;
+						})
 					}
 				}, this);
 			}
