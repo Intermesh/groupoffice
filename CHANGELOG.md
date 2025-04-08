@@ -1,3 +1,5 @@
+- Files: If you had files module installed but disabled the upgrade failed
+
 07-04-2025: 6.8.113
 - Files: Deleted files go to trash
 - Assistant: Locks file and asks to unlock files
