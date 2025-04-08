@@ -62,9 +62,6 @@ export class MailboxDialog extends FormWindow {
 
 					hr(),
 
-
-
-
 					this.passwordFld = textfield({
 						name: "password",
 						id: "password",

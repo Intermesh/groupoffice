@@ -32,7 +32,7 @@ export class AliasDialog extends FormWindow {
 						name: "domain",
 						id: "domain",
 						label: t("Domain"),
-						readOnly: true,
+						disabled: true,
 						icon: "alternate_email"
 					}),
 				),
