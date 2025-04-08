@@ -1,3 +1,6 @@
+- Demo data: Longer timeout so it won't time out after 30s.
+- Tasks: Default color for task lists
+
 08-04-2025: 25.0.15
 - Calendar: Upgrade errors if files not installed part 2
 
