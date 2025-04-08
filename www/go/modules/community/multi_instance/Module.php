@@ -137,8 +137,8 @@ class Module extends \go\core\Module {
 
 		foreach(Instance::find() as $instance) {
 			$version = $instance->getMajorVersion();
-			if(!$version || $version == go()->getMajorVersion()) {
-				$version = 'DEFAULT';
+			if(empty($version)) {
+				continue;
 			}
 			if(!isset($i[$version])) {
 				$i[$version] = [];
@@ -152,14 +152,10 @@ class Module extends \go\core\Module {
 		$tpl = file_get_contents(__DIR__ . '/site-conf.tpl');
 
 		foreach($i as $version => $hostnames) {
-			if($version == 'DEFAULT') {
-				continue;
-			}
-
 			echo $this->parseTemplate($tpl, $version, $hostnames);
 		}
 
-		echo $this->parseTemplate($tpl, "DEFAULT", $i['DEFAULT']);
+		echo $this->parseTemplate($tpl, "DEFAULT", [$_SERVER['SERVER_NAME']]);
 	}
 
 	private function getTLD() : string {
