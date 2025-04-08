@@ -1,6 +1,6 @@
+08-04-2025: 25.0.13
 - Files: If you had files module installed but disabled the upgrade failed
 - ActiveSync: Wrong lib included which made sync fail
-- 
 
 07-04-2025: 25.0.12
 - Maildomains: Fixed bug in dialogs not splitting user and domain
