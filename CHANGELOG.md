@@ -1,3 +1,4 @@
+08-04-2025: 6.8.114
 - Files: If you had files module installed but disabled the upgrade failed
 
 07-04-2025: 6.8.113
