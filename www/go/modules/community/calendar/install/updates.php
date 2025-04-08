@@ -262,9 +262,7 @@ $updates['202503131043'][] = "UPDATE core_link l
 	JOIN calendar_calendar_event e on e.eventId = l.toId AND et.name = 'CalendarEvent'
 	SET l.toId = e.id;";
 // fixed missing global calendars because it had calendar_id=0 in the old database
-$updates['202504070955'][] = "INSERT IGNORE INTO calendar_category
-	(id, name, color, ownerId, calendarId) SELECT
-	 id, name, color, null, IF(calendar_id=0, null,calendar_id) FROM cal_categories;";
+$updates['202504070955'][] = "";
 
 $updates['202504071345'][] = "ALTER TABLE `calendar_event` CHANGE COLUMN `location` `location` TEXT NULL;";
 
