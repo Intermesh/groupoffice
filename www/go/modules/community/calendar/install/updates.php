@@ -159,22 +159,23 @@ $updates['202402221543'][] = function(){ // migrate recurrence rules and fix las
 };
 
 //delete empty event folders
-$updates['202403121146'][] = "DELETE f FROM fs_folders f
+$updates['202403121146'][] = function() {
+	if(go()->getModule(null, "files")) {
+		go()->getDbConnection()->exec("DELETE f FROM fs_folders f
 	LEFT JOIN fs_files fi ON fi.folder_id = f.id
 	LEFT JOIN fs_folders ff ON ff.parent_id = f.id
 	WHERE 
 		 fi.folder_id IS NULL 
 		 AND ff.parent_id IS NULL
-		 AND f.id IN (SELECT files_folder_id FROM cal_events);";
+		 AND f.id IN (SELECT files_folder_id FROM cal_events);");
 
-// unset files id of event with folders that no longer exist
-$updates['202403121146'][] = "UPDATE cal_events e 
+		go()->getDbConnection()->exec("UPDATE cal_events e 
    LEFT JOIN fs_folders f on e.files_folder_Id = f.id
    SET files_folder_id = 0
-   WHERE e.files_folder_id != 0 AND f.id IS NULL";
+   WHERE e.files_folder_id != 0 AND f.id IS NULL");
+	}
 
 
-$updates['202403121146'][] = function(){ // migrate files to blob and add as calendar_link
 	$pdo = go()->getDbConnection()->getPDO();
 	$stmt = go()->getDbConnection()->query("SELECT e.id, FROM_UNIXTIME(e.start_time, '%Y') as year, e.name, cal.name as calendarName, e.files_folder_id FROM cal_events e JOIN cal_calendars cal ON calendar_id = cal.id  WHERE e.files_folder_id != 0;");
 	$filesStmt = $pdo->prepare("SELECT id, name FROM fs_files WHERE folder_id = ?");
@@ -203,8 +204,6 @@ $updates['202403121146'][] = function(){ // migrate files to blob and add as cal
 		}
 	};
 
-
-
 	while($row = $stmt->fetch()) {
 		$path = GO::config()->file_storage_path.buildFilesPath($row['calendarName'], $row['year'], $row['name'], $row['id']);
 		insertFolder($row, $row['files_folder_id'], $path, $filesStmt,$foldersStmt, $insertLinkStmt);
@@ -213,6 +212,9 @@ $updates['202403121146'][] = function(){ // migrate files to blob and add as cal
 	unset($insertFolder, $filesStmt,$foldersStmt, $insertLinkStmt, $pdo, $stmt);
 };
 
+// unset files id of event with folders that no longer exist
+$updates['202403121146'][] = ""; // empty by reason
+$updates['202403121146'][] = "";
 
 
 $updates['202404071212'][] = "update core_entity set clientName = 'CalendarCategory' where name = 'Category' and moduleId = (select id from core_module where name ='calendar' and package='community')";
