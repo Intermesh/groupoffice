@@ -23,7 +23,7 @@ const INSTALL_NONE = 2;
 $autoLoader = require(__DIR__ . "/../www/vendor/autoload.php");
 $autoLoader->add('go\\', __DIR__);
 
-$dataFolder = new \go\core\fs\Folder(__DIR__ . '/data');
+$dataFolder = new \go\core\fs\Folder( '/tmp/phpunit');
 
 require(__DIR__ . "/config.php");
 $config['file_storage_path'] = $dataFolder->getPath();
