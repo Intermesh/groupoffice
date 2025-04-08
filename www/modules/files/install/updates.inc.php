@@ -308,7 +308,7 @@ $updates['202310311413'][] = function() {
 	\go\core\cron\BuildSearchCache::install("0 0 * * *", true);
 };
 
-$updates['202310311413'][] = "CREATE TABLE `fs_trash` (
+$updates['202502271100'][] = "CREATE TABLE `fs_trash` (
     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
     `parentId` INT(11) UNSIGNED NOT NULL,
     `aclId` INT(11) NOT NULL DEFAULT 0,
@@ -324,7 +324,7 @@ $updates['202310311413'][] = "CREATE TABLE `fs_trash` (
     CONSTRAINT `fs_trash_ibfk_3` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-$updates['202310311413'][] = function() {
+$updates['202502271100'][] = function() {
 	echo "Auto-creating Trash folder...\n\n";
 	$folder = \GO\Files\Model\Folder::model()->findByPath("trash", true);
 	$folder->setNewAcl();
@@ -334,11 +334,11 @@ $updates['202310311413'][] = function() {
 	$folder->acl->addGroup(\GO::config()->group_everyone, \GO\Base\Model\Acl::READ_PERMISSION);
 };
 
-$updates['202310311413'][] = "alter table fs_files
+$updates['202503311434'][] = "alter table fs_files
     add lock_id varchar(192) null after locked_user_id";
 
 
-$updates['202310311413'][] = "CREATE TABLE IF NOT EXISTS `fs_trash` (
+$updates['202504081525'][] = "CREATE TABLE IF NOT EXISTS `fs_trash` (
     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
     `parentId` INT(11) UNSIGNED NOT NULL,
     `aclId` INT(11) NOT NULL DEFAULT 0,
@@ -354,7 +354,7 @@ $updates['202310311413'][] = "CREATE TABLE IF NOT EXISTS `fs_trash` (
     CONSTRAINT `fs_trash_ibfk_3` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-$updates['202310311413'][] = function() {
+$updates['202504081525'][] = function() {
 	echo "Auto-creating Trash folder...\n\n";
 	$folder = \GO\Files\Model\Folder::model()->findByPath("trash", true);
 	if(!$folder->acl_id) {
