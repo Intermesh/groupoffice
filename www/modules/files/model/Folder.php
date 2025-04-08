@@ -314,7 +314,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			//top level folders are readonly to everyone.
 			$this->readonly=1;
 
-			$mod = Module::findByName(null, "files");
+			$mod = Module::findByName(null, "files", null);
 
 			$this->acl_id = $mod->getShadowAclId();
 		}
