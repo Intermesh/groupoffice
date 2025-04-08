@@ -173,43 +173,47 @@ $updates['202403121146'][] = function() {
    LEFT JOIN fs_folders f on e.files_folder_Id = f.id
    SET files_folder_id = 0
    WHERE e.files_folder_id != 0 AND f.id IS NULL");
-	}
 
 
-	$pdo = go()->getDbConnection()->getPDO();
-	$stmt = go()->getDbConnection()->query("SELECT e.id, FROM_UNIXTIME(e.start_time, '%Y') as year, e.name, cal.name as calendarName, e.files_folder_id FROM cal_events e JOIN cal_calendars cal ON calendar_id = cal.id  WHERE e.files_folder_id != 0;");
-	$filesStmt = $pdo->prepare("SELECT id, name FROM fs_files WHERE folder_id = ?");
-	$foldersStmt = $pdo->prepare("SELECT id, name FROM fs_folders WHERE parent_id = ?");
-	$insertLinkStmt = $pdo->prepare("INSERT INTO calendar_event_link (eventId, title, contentType,size,rel,blobId) VALUES (?, ?, ?, ?, 'enclosure', ?)");
-	function buildFilesPath($calendarName, $yearOfStartTime, $title, $id) {
+		$pdo = go()->getDbConnection()->getPDO();
+		$stmt = go()->getDbConnection()->query("SELECT e.id, FROM_UNIXTIME(e.start_time, '%Y') as year, e.name, cal.name as calendarName, e.files_folder_id FROM cal_events e JOIN cal_calendars cal ON calendar_id = cal.id  WHERE e.files_folder_id != 0;");
+		$filesStmt = $pdo->prepare("SELECT id, name FROM fs_files WHERE folder_id = ?");
+		$foldersStmt = $pdo->prepare("SELECT id, name FROM fs_folders WHERE parent_id = ?");
+		$insertLinkStmt = $pdo->prepare("INSERT INTO calendar_event_link (eventId, title, contentType,size,rel,blobId) VALUES (?, ?, ?, ?, 'enclosure', ?)");
+		function buildFilesPath($calendarName, $yearOfStartTime, $title, $id)
+		{
 
-		return 'calendar/' . File::stripInvalidChars($calendarName) . '/' . $yearOfStartTime . '/' . File::stripInvalidChars($title).' ('.$id.')';
-	}
+			return 'calendar/' . File::stripInvalidChars($calendarName) . '/' . $yearOfStartTime . '/' . File::stripInvalidChars($title) . ' (' . $id . ')';
+		}
 
-	function insertFolder($row, $folderId, $path, PDOStatement $filesStmt,$foldersStmt, $insertLinkStmt) {
-		$filesStmt->bindValue(1, $folderId);
-		$filesStmt->execute();
-		foreach($filesStmt as $fileRow) {
-			$file = new File($path . '/' . $fileRow['name']);
-			if(!$file->exists()) continue; // skip missing file. TODO: text with files
-			$blob = \go\core\fs\Blob::fromFile($file, true);
-			if($blob->save()) {
-				$insertLinkStmt->execute([$row['id'], $file->getName(), $file->getContentType(), $file->getSize(), $blob->id]);
+		function insertFolder($row, $folderId, $path, PDOStatement $filesStmt, $foldersStmt, $insertLinkStmt)
+		{
+			$filesStmt->bindValue(1, $folderId);
+			$filesStmt->execute();
+			foreach ($filesStmt as $fileRow) {
+				$file = new File($path . '/' . $fileRow['name']);
+				if (!$file->exists()) continue; // skip missing file. TODO: text with files
+				$blob = \go\core\fs\Blob::fromFile($file, true);
+				if ($blob->save()) {
+					$insertLinkStmt->execute([$row['id'], $file->getName(), $file->getContentType(), $file->getSize(), $blob->id]);
+				}
+			}
+			$foldersStmt->bindValue(1, $folderId);
+			$foldersStmt->execute();
+			foreach ($foldersStmt as $folderRow) {
+				insertFolder($row, $folderRow['id'], $path . '/' . $folderRow['name'], $filesStmt, $foldersStmt, $insertLinkStmt);
 			}
 		}
-		$foldersStmt->bindValue(1, $folderId);
-		$foldersStmt->execute();
-		foreach($foldersStmt as $folderRow) {
-			insertFolder($row, $folderRow['id'], $path.'/'.$folderRow['name'], $filesStmt,$foldersStmt, $insertLinkStmt);
+
+		;
+
+		while ($row = $stmt->fetch()) {
+			$path = GO::config()->file_storage_path . buildFilesPath($row['calendarName'], $row['year'], $row['name'], $row['id']);
+			insertFolder($row, $row['files_folder_id'], $path, $filesStmt, $foldersStmt, $insertLinkStmt);
 		}
-	};
 
-	while($row = $stmt->fetch()) {
-		$path = GO::config()->file_storage_path.buildFilesPath($row['calendarName'], $row['year'], $row['name'], $row['id']);
-		insertFolder($row, $row['files_folder_id'], $path, $filesStmt,$foldersStmt, $insertLinkStmt);
+		unset($insertFolder, $filesStmt, $foldersStmt, $insertLinkStmt, $pdo, $stmt);
 	}
-
-	unset($insertFolder, $filesStmt,$foldersStmt, $insertLinkStmt, $pdo, $stmt);
 };
 
 // unset files id of event with folders that no longer exist
