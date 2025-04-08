@@ -71,7 +71,6 @@ class UserSettings extends Property {
 			$tasklist = new TaskList();
 			$tasklist->createdBy = $this->userId;
 			$tasklist->name = $user->displayName;
-			$tasklist->color = Color::background();
 			if(!$tasklist->save()) {
 				throw new SaveException($tasklist);
 			}

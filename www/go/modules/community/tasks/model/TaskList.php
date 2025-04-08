@@ -17,6 +17,7 @@ use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\util\ArrayObject;
+use go\core\util\Color;
 use GO\Projects2\Model\ProjectEntity;
 
 /**
@@ -122,6 +123,9 @@ class TaskList extends AclOwnerEntity
 
 	protected function internalSave(): bool
 	{
+		if(!isset($this->color)) {
+			$this->color = trim(Color::background(), '#');
+		}
 		if($this->isNew()) {
 			$this->isSubscribed = true; // auto subscribe the creator.
 			$this->isVisible = true;
