@@ -130,23 +130,29 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'id'
 				},
 				{
-					id: 'name',
-					header: t('Name'),
-					width: dp(300),
-					sortable: true,
-					dataIndex: go.User.addressBookSettings.sortBy,
+					id: 'icon',
+					sortable: false,
+					header: "",
+					width: dp(80),
+					dataIndex: "photoBlobId",
 					hidden: this.enabledColumns.indexOf('name') == -1,
-					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
-
+					renderer: (value, metaData, record, rowIndex, colIndex, store) => {
 						const icon = record.data.isOrganization ? '<i class="icon">business</i>' : null;
 
 						if(record.get("color")) {
 							metaData.attr = 'style="color: #' + record.get("color") + ';"';
 						}
 
-						return '<span class="go-ab-avatar">' + go.util.avatar(record.data.name, record.data.photoBlobId, icon) + '</span>' + Ext.util.Format.htmlEncode(record.data.name);
-
+						return '<span class="go-ab-avatar">' + go.util.avatar(record.data.name, record.data.photoBlobId, icon) + '</span>';
 					}
+				},
+				{
+					id: 'name',
+					header: t('Name'),
+					width: dp(220),
+					sortable: true,
+					dataIndex: 'name',
+					hidden: this.enabledColumns.indexOf('name') == -1
 				},
 				{
 					hidden: this.enabledColumns.indexOf('gender') == -1,
