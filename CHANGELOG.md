@@ -1,3 +1,6 @@
+09-04-2025: 6.8.115
+- Files: fix update script in the rare case that the fs_trash table was not initially created.
+
 08-04-2025: 6.8.114
 - Files: If you had files module installed but disabled the upgrade failed
 
