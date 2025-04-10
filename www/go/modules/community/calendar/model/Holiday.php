@@ -10,7 +10,7 @@ class Holiday {
 	const Optional = 'optional'; // majority people take a day off
 	const Observance = 'observance'; // optional festivity, no paid day off
 
-	private static $days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+	private static $days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 	private static $months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 	static $lang;
@@ -113,7 +113,7 @@ class Holiday {
 			$this->parseEaster(array_shift($rule));
 		} else if(preg_match('/\d+(st|nd|rd|th)/', $date)) {
 			$this->parseCount($date, $rule);
-		} else if(in_array($date, self::$days)) {
+		} else if(in_array(strtolower($date), self::$days)) {
 			array_unshift($rule, $date);
 			$this->parseCount(1, $rule);
 		} else {
@@ -147,7 +147,7 @@ class Holiday {
 		$ed = easter_days($this->year);
 		$ed += intval($nb);
 		$this->start = new \DateTime($this->year.'-03-21');
-		$this->start->modify('+'.$ed. ' days');
+		$this->start->modify(($ed>=0?'+':'').$ed. ' days');
 	}
 
 	private function parseCondition(&$rule) {
