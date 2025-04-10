@@ -81,11 +81,12 @@ export class ParticipantField extends Component {
 				//valueProperty: "id",
 				listeners: {
 					'autocomplete': async (field, input) => {
-						field.list.store.queryParams = {filter: {text: input}, limit: 20 };
+						field.list.store.setFilter('text', {text: input})
+						field.list.store.queryParams.limit = 20;
 						field.list.store.sort = [{property: "name"}];
 						await field.list.store.load();
 						if(field.list.store.count() == 0) {
-							field.list.hide();
+							field.menu.hide();
 						}
 					},
 					'render' : (me) => {
