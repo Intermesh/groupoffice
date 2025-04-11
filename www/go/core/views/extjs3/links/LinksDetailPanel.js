@@ -52,7 +52,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 		Ext.apply(this, {
 			listeners: {
 				added: function(me, dv, index) {
-					this.stateId = 'go-links-' + (dv.entity ? dv.entity : dv.entityStore.entity.name);
+					this.stateId = 'go-links-' + (dv.entity ? dv.entity : dv.entityStore.entity.name) + "-" + this.link.entity;
 					this.initState();
 				},
 				expand: function() {
