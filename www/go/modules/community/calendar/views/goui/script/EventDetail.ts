@@ -1,5 +1,5 @@
 import {
-	btn, checkbox,
+	btn, Button, checkbox,
 	comp, Component, containerfield,
 	DataSourceForm,
 	datasourceform, DateInterval,
@@ -35,6 +35,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 	store: JmapDataSource
 	private statusTbar: Toolbar
+	private editBtn: Button;
 
 	constructor() {
 		super("CalendarEvent");
@@ -186,14 +187,14 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 		this.toolbar.items.add(
 
-			// btn({
-			// 	icon: "edit",
-			// 	title: t("Edit"),
-			// 	handler: (button, ev) => {
-			// 		entities.get("CalendarEvent").goto(this.entity!.id);
-			// 	}
-			// }),
-			// this might be a occurrence and we do not have an entity but a calendar item
+			this.editBtn = btn({
+				icon: "edit",
+				title: t("Edit"),
+				handler: (button, ev) => {
+					void this.item!.open();
+				},
+			}),
+
 
 			addbutton(),
 
@@ -244,7 +245,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 		const r = await super.load(id);
 
 		const item = (new CalendarItem({
-			key: id,
+			key: id + "",
 			data:this.entity!
 		}))
 
@@ -260,6 +261,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 	 */
 	async loadEvent(ev: CalendarItem) {
 		this.item = ev;
+
 		if (!ev.key) {
 
 			this.item = ev;
