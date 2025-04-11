@@ -408,7 +408,20 @@ class Task extends AclItemEntity {
 			}
 		}
 
+		if(isset($this->start) && isset($this->due)) {
+			if($this->start > $this->due) {
+				$this->setValidationError('start', ErrorCode::INVALID_INPUT, 'start can not be greater than due');
+			}
+		}
+
 		parent::internalValidate();
+	}
+
+	public static function check()
+	{
+		parent::check();
+
+		go()->getDbConnection()->exec("update tasks_task set start = due where start > due;");
 	}
 
 	protected function internalSave(): bool

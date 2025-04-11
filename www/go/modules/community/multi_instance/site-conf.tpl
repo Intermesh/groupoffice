@@ -99,7 +99,7 @@ SSLCertificateFile /etc/letsencrypt/live/{tld}/fullchain.pem
 
 # Optionally enable php fpm to run different PHP version
 ## Increased timeout for long running requests (sse, activesync)
-#ProxyTimeout 1800
+#ProxyTimeout 86400
 #
 ##Pass authorization header
 #SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
