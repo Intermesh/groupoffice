@@ -1,7 +1,8 @@
 - Files: If files on disk match the entity path eg. addressbook/Public/contacts/A/Albert Foo/ then it will be connected by the database check.
 - Address book: Option to hide index character and icon to show more contacts on screen
 - Address book: update action date form detail view
-- 
+- Core: Use geo: https://en.wikipedia.org/wiki/Geo_URI_scheme for address links so user can choose the maps app
+
 08-04-2025: 25.0.16
 - Demo data: Longer timeout so it won't time out after 30s.
 - Tasks: Default color for task lists
