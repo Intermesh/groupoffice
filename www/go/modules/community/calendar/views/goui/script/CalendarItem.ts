@@ -262,7 +262,7 @@ export class CalendarItem {
 		}
 	}
 
-	open(onCancel?: Function) {
+	async open(onCancel?: Function) {
 
 		const internalOpen = () => {
 			const dlg = !this.isOwner ? new EventDetailWindow() : new EventWindow();
@@ -281,39 +281,48 @@ export class CalendarItem {
 
 			return dlg;
 		}
+
+		if(!calendarStore.loaded) {
+			await calendarStore.load();
+		}
 		const cals = calendarStore.all()
 		if(!cals.length) {
-			const w = win({
-				title: t('No writeable calendars'),
-				width: 520
-			},
-				comp({cls:'pad',html:t('There are no calendars to add an appointment.')+'<br>'+t('Subscribe to an existing calendar or create a personal calendar.')}),
-				tbar({},
-					btn({text: t('Show calendars')+'...',handler:()=>{
-						const d = new SubscribeWindow();
-						d.show();
-						w.close();
-						if(onCancel) onCancel();
-					}}),
-					btn({text: t('Create personal calendar'), handler:() => {
-						client.jmap("Calendar/first", {}, 'pFirst').then(r => {
-							calendarStore.reload().then(r2 => {
-								this.data.calendarId = r.calendarId;
-								internalOpen();
-							});
-
-						}).catch(r => {
-							Window.error(r.message);
+			return new Promise(resolve => {
+				const w = win({
+					title: t('No writeable calendars'),
+					width: 520
+				},
+					comp({cls:'pad',html:t('There are no calendars to add an appointment.')+'<br>'+t('Subscribe to an existing calendar or create a personal calendar.')}),
+					tbar({},
+						btn({text: t('Show calendars')+'...',handler:()=>{
+							const d = new SubscribeWindow();
+							d.show();
+							w.close();
 							if(onCancel) onCancel();
-						});
-						w.close();
-					}})
-				)
-			);
-			w.show();
+						}}),
+						btn({text: t('Create personal calendar'), handler:() => {
+							client.jmap("Calendar/first", {}, 'pFirst').then(r => {
+								calendarStore.reload().then(r2 => {
+									this.data.calendarId = r.calendarId;
+									resolve(internalOpen());
+								});
+
+							}).catch(r => {
+								Window.error(r.message);
+								if(onCancel) onCancel();
+							});
+							w.close();
+						}})
+					)
+				);
+				w.show();
+			})
 
 		} else {
-			internalOpen();
+			if(!this.data.calendarId) {
+				this.data.calendarId = client.user.calendarPreferences.defaultCalendarId;
+			}
+			return internalOpen();
 		}
 	}
 
