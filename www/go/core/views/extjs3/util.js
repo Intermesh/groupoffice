@@ -251,13 +251,14 @@ go.util =  (function () {
 				adr += ", " + config.country;
 			}
 
-			if(Ext.isSafari || Ext.isMac) {
-				document.location = "http://maps.apple.com/?address=" + encodeURIComponent(adr);
-			} else {
-				window.open("https://maps.google.com/maps?q=" + encodeURIComponent(adr));
-			}
+			// https://en.wikipedia.org/wiki/Geo_URI_scheme
+			const uri = "geo:0,0?q=" + adr;
 
-			//window.open("https://www.openstreetmap.org/search?query=" + encodeURIComponent(config.street + ", " + config.zipCode.replace(/ /g, '') + ", " + config.country));
+			const a = document.createElement("a");
+			a.setAttribute("target", "_blank");
+			a.setAttribute("href", uri);
+			a.click();
+
 		},
 
 		showDate: function (date) {
