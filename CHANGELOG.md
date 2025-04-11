@@ -2,6 +2,8 @@
 - Address book: Option to hide index character and icon to show more contacts on screen
 - Address book: update action date form detail view
 - Core: Use geo: https://en.wikipedia.org/wiki/Geo_URI_scheme for address links so user can choose the maps app
+- sync: workaround for Z-push error SyncObject->Check(): object from type SyncMail: parameter 'to' contains an invalid email address 'undisclosed-recipients:'. Address is removed.
+- tasks: correct invalid state where due is before start date
 
 08-04-2025: 25.0.16
 - Demo data: Longer timeout so it won't time out after 30s.
