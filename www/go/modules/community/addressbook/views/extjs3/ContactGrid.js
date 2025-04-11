@@ -110,7 +110,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: "name",
 					sortable: false,
 					draggable: false,
-					hideable: false,
+					orgHeader: t("Index character"),
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 
 						if(!value) {
@@ -132,8 +132,10 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				{
 					id: 'icon',
 					sortable: false,
-					header: "",
-					width: dp(80),
+					resizable: false,
+
+					orgHeader: t("Icon"),
+					width: dp(56),
 					dataIndex: "photoBlobId",
 					hidden: this.enabledColumns.indexOf('name') == -1,
 					renderer: (value, metaData, record, rowIndex, colIndex, store) => {
