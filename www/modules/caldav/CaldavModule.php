@@ -4,6 +4,7 @@ namespace GO\Caldav;
 
 use GO\Caldav\Model\DavEvent;
 use go\core\http\Exception;
+use Sabre\VObject\StringUtil;
 
 class CaldavModule extends \GO\Base\Module {
 	
@@ -59,10 +60,12 @@ class CaldavModule extends \GO\Base\Module {
 	/**
 	 * Event to VObject data
 	 * Copied from CalendarBackend
-	 * @param type $event
-	 * @return type
+	 * @param \GO\Calendar\Model\Event $event
+	 * @return string
 	 */
-	static private function exportCalendarEvent($event){
-		return $event->exportFullRecurrenceICS()->serialize();
+	static public function exportCalendarEvent($event): string {
+		return StringUtil::convertToUTF8($event->exportFullRecurrenceICS()->serialize());
 	}
+
+
 }

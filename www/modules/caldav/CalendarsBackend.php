@@ -306,10 +306,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	}
 
 
-	private function exportCalendarEvent($event) {
-		return $event->exportFullRecurrenceICS()->serialize();
-	}
-
 
 	/**
 	 * Returns all calendar objects within a calendar object.
@@ -494,7 +490,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 		if ($event) {
 
-			$data = ($event->mtime==$event->client_mtime && !empty($event->data) && !$event->isPrivate()) ? $event->data : $this->exportCalendarEvent($event);
+			$data = ($event->mtime==$event->client_mtime && !empty($event->data) && !$event->isPrivate()) ? $event->data : CaldavModule::exportCalendarEvent($event);
 
 
 			$object = array(
