@@ -6,7 +6,8 @@
 - Files: pressing delete-key will not continue trashing a file with insufficient permissions
 - Files: hide trash folders for non-admins
 - Files: fix ACL issues when restoring files or folders to their original position
-
+- Core: Shorten long filenames in the file button fields so the trash button is visible
+- 
 09-04-2025: 6.8.115
 - Files: fix update script in the rare case that the fs_trash table was not initially created.
 
