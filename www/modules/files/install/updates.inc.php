@@ -369,7 +369,7 @@ $updates['202504081525'][] = function() {
 $updates['202504141045'][] = function() {
 	echo "Set Trash folder permissions...\n\n";
 	$folder = \GO\Files\Model\Folder::model()->findByPath("trash", true);
-	if(!$folder->acl_id) {
+	if(!$folder->acl) {
 		$folder->setNewAcl();
 		$folder->visible = 1;
 		$folder->readonly = 1;
