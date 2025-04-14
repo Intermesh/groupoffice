@@ -207,7 +207,7 @@ class FilesModule extends \GO\Base\Module{
 		$folder->visible = 1;
 		$folder->readonly = 1;
 		$folder->save();
-		$folder->acl->addGroup(\GO::config()->group_everyone, \GO\Base\Model\Acl::READ_PERMISSION);
+		$folder->acl->addGroup(\GO::config()->group_root, \GO\Base\Model\Acl::MANAGE_PERMISSION);
 	}
 	
 	

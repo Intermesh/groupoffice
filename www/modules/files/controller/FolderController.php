@@ -1042,14 +1042,17 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 				foreach ($ids['folders'] as $folderId) {
 					$f = Folder::model()->findByPk($folderId);
-					$f->moveToTrash();
+					if ($f) {
+						$f->moveToTrash();
+					}
 				}
 
 				foreach ($ids['files'] as $fileId) {
 					$f = File::model()->findByPk($fileId);
-					$f->moveToTrash();
+					if ($f) {
+						$f->moveToTrash();
+					}
 				}
-
 		}
 	}
 

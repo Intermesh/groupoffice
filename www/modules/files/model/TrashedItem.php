@@ -73,7 +73,7 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 		$t->deletedBy = GO()->getUserId();
 		$t->name = $folder->name;
 		$t->fullPath = $folder->parent->path;
-		$t->save();
+		$t->save(true);
 	}
 
 	/**
@@ -103,7 +103,7 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 		$t->deletedBy = GO()->getUserId();
 		$t->name = $file->name;
 		$t->fullPath = $folder->path;
-		$t->save();
+		$t->save(true);
 
 	}
 
@@ -122,17 +122,17 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 
 		$entityType = EntityType::findById($this->entityTypeId);
 		if ($entityType->getName() == 'File') {
-			$f = \GO\Files\Model\File::model()->findByPk($this->entityId);
-			if(!$f) {
+			$f = \GO\Files\Model\File::model()->findByPk($this->entityId, false, true);
+			if (!$f) {
 				throw new Exception(404, GO()->t("File not found."));
 			}
 		} else {
-			$f = \GO\Files\Model\Folder::model()->findByPk($this->entityId);
-			if(!$f) {
+			$f = \GO\Files\Model\Folder::model()->findByPk($this->entityId, false, true);
+			if (!$f) {
 				throw new Exception(404, GO()->t("Folder not found."));
 			}
 		}
-		if ($f->move($parentFolder, true)) {
+		if ($f->move($parentFolder, true, true)) {
 			$this->delete();
 		}
 	}
@@ -141,14 +141,14 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 	{
 		$entityType = EntityType::findById($this->entityTypeId);
 		if ($entityType->getName() == 'File') {
-			$f = \GO\Files\Model\File::model()->findByPk($this->entityId);
+			$f = \GO\Files\Model\File::model()->findByPk($this->entityId, false, true);
 		} else {
-			$f = \GO\Files\Model\Folder::model()->findByPk($this->entityId);
+			$f = \GO\Files\Model\Folder::model()->findByPk($this->entityId, false, true);
 		}
 		if (isset($f)) {
-			$f->delete();
+			$f->delete(true);
 		}
-		$this->delete();
+		$this->delete(true);
 	}
 
 }
