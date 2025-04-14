@@ -1,3 +1,4 @@
+14-04-2024: 25.0.17
 - Files: If files on disk match the entity path eg. addressbook/Public/contacts/A/Albert Foo/ then it will be connected by the database check.
 - Address book: Option to hide index character and icon to show more contacts on screen
 - Address book: update action date form detail view
