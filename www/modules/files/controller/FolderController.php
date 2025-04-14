@@ -11,6 +11,7 @@ use go\core\db\DbException;
 use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\jmap\Entity;
+use go\core\model\Acl;
 use go\core\model\Alert as CoreAlert;
 use go\core\orm\SearchableTrait;
 use go\core\orm\EntityType;
@@ -410,7 +411,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 						if ($projectsFolder) {
 							$node = $this->_folderToNode($projectsFolder, $expandFolderIds, false, $showFiles);
-								$node['path'] = $projectsFolder->path;
+							$node['path'] = $projectsFolder->path;
 							$node['text'] = \GO::t("Projects", "projects2");
 							$response[] = $node;
 						}
@@ -467,12 +468,12 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		return $response;
 	}
 
-	private function _folderToNode($folder, $expandFolderIds=array(), $withChildren=true, $withFiles = false) {
+	private function _folderToNode(Folder $folder, $expandFolderIds=array(), $withChildren=true, $withFiles = false) {
 		$expanded = $withChildren || in_array($folder->id, $expandFolderIds);
 		$node = array(
 				'text' => $folder->name,
 				'id' => $folder->id,
-				'draggable' => false,
+				'draggable' => $folder->parent_id && $folder->getPermissionLevel() >= Acl::LEVEL_WRITE,
 				'iconCls' => !$folder->acl_id || $folder->readonly ? 'ic-folder' : 'ic-folder-shared',
 				'expanded' => $expanded,
 				'parent_id'=>$folder->parent_id,
