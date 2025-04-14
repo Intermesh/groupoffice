@@ -242,14 +242,14 @@ GO.files.FilesContextMenu = function(config)
 	config['items'].push(this.unlockButton);
 
 
-	config['items'].push({
+	config['items'].push(this.propertiesButton = new Ext.menu.Item({
 		iconCls: 'ic-settings-applications',
 		text: t("Properties"),
 		handler: function(){
 			this.fireEvent('properties', this, this.records);
 		},
 		scope:this
-	});
+	}));
 
 	config['items'].push(this.bookmarkButton);
 
@@ -383,8 +383,7 @@ Ext.extend(GO.files.FilesContextMenu, Ext.menu.Menu,{
 
 			var extension = '';
 			
-			if(records.length=='1')
-			{
+			if(records.length=='1') {
 				extension = records[0].data.extension;
 
 				switch (extension) {
@@ -408,8 +407,7 @@ Ext.extend(GO.files.FilesContextMenu, Ext.menu.Menu,{
 						this.downloadAsPdf.hide();
 				}
 
-				switch(extension)
-				{
+				switch(extension) {
 					case 'zip':
 					case 'tar':
 					case 'tgz':
@@ -455,6 +453,11 @@ Ext.extend(GO.files.FilesContextMenu, Ext.menu.Menu,{
 							this.emailFilesButton.hide();
 
 						this.bookmarkButton.show();
+
+						this.propertiesButton.hidden = true;
+						if (Ext.isNumber(records[0].data.id)) {
+							this.propertiesButton.show();
+						};
 
 						break;
 
@@ -507,9 +510,9 @@ Ext.extend(GO.files.FilesContextMenu, Ext.menu.Menu,{
 
 				Ext.each(this.records, function(record) {
 					if (record.data.extension == 'folder') {
-
-						if(this.emailFilesButton)
+						if (this.emailFilesButton) {
 							this.emailFilesButton.hide();
+						}
 
 						return false;
 					}
