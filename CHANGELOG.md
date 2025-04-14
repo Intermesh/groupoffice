@@ -4,6 +4,7 @@
 - Core: Use geo: https://en.wikipedia.org/wiki/Geo_URI_scheme for address links so user can choose the maps app
 - sync: workaround for Z-push error SyncObject->Check(): object from type SyncMail: parameter 'to' contains an invalid email address 'undisclosed-recipients:'. Address is removed.
 - tasks: correct invalid state where due is before start date
+- Core: Updated German language thanks to the University of Greifswald
 
 08-04-2025: 25.0.16
 - Demo data: Longer timeout so it won't time out after 30s.
