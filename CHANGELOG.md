@@ -1,6 +1,7 @@
 - sync: workaround for Z-push error SyncObject->Check(): object from type SyncMail: parameter 'to' contains an invalid email address 'undisclosed-recipients:'. Address is removed.
 - tasks: correct invalid state where due is before start date
 - Files: do not show "Properties" menu when folder-id is not numeric
+- Files: Dragging folders in tree was not possible
 
 09-04-2025: 6.8.115
 - Files: fix update script in the rare case that the fs_trash table was not initially created.
