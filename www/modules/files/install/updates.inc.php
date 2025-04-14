@@ -365,3 +365,10 @@ $updates['202504081525'][] = function() {
 		$folder->acl->addGroup(\GO::config()->group_everyone, \GO\Base\Model\Acl::READ_PERMISSION);
 	}
 };
+
+$updates['202504141045'][] = function() {
+	echo "Set Trash folder permissions...\n\n";
+	$folder = \GO\Files\Model\Folder::model()->findByPath("trash", true);
+	$folder->acl->removeGroup(\GO::config()->group_everyone);
+	$folder->acl->addGroup(\GO::config()->group_root, \GO\Base\Model\Acl::MANAGE_PERMISSION);
+};

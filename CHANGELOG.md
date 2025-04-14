@@ -3,7 +3,9 @@
 - Files: do not show "Properties" menu when folder-id is not numeric
 - Files: Dragging folders in tree was not possible
 - Files: Merge folders if exist
-- Files: pressing delete-key will not continue trashing a file with unsufficient permissions
+- Files: pressing delete-key will not continue trashing a file with insufficient permissions
+- Files: hide trash folders for non-admins
+- Files: fix ACL issues when restoring files or folders to their original position
 
 09-04-2025: 6.8.115
 - Files: fix update script in the rare case that the fs_trash table was not initially created.
