@@ -43,7 +43,10 @@ Ext.extend(GO.files.FilesGrid, GO.grid.GridPanel, {
             if (e.target.tagName === "INPUT") {
                 return;
             }
-
+            const selected = this.selModel.getSelected();
+            if (selected.data.permission_level < GO.permissionLevels.writeAndDelete) {
+                return;
+            }
             const params = {
                 deleteParam: "trash_keys",
                 callback: function () {

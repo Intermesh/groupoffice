@@ -17,6 +17,7 @@ namespace GO\Files\Model;
 
 use Exception;
 use GO;
+use GO\Base\Exception\AccessDenied;
 use go\core\fs\Blob;
 use go\core\mail\Attachment;
 use go\core\model\Module;
@@ -586,14 +587,19 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	 * Move a file to another folder
 	 *
 	 * @param Folder $destinationFolder
+	 * @param bool $appendNumberToNameIfExists
+	 * @param bool $ignoreAcl
 	 * @return boolean
+	 * @throws AccessDenied
 	 */
-	public function move($destinationFolder,$appendNumberToNameIfExists=false){
+	public function move(Folder $destinationFolder,bool $appendNumberToNameIfExists=false, bool $ignoreAcl = false)
+	{
 
 		$this->folder_id=$destinationFolder->id;
-		if($appendNumberToNameIfExists)
+		if($appendNumberToNameIfExists) {
 			$this->appendNumberToNameIfExists();
-		return $this->save();
+		}
+		return $this->save($ignoreAcl);
 	}
 
 	/**

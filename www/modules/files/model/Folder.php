@@ -1146,14 +1146,14 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @param Folder $destinationFolder
 	 * @return boolean
 	 */
-	public function move($destinationFolder, $appendNumberToNameIfExists = false) {
-
+	public function move(Folder $destinationFolder, bool $appendNumberToNameIfExists = false, bool $ignoreAcl = false): bool
+	{
 		$this->parent_id=$destinationFolder->id;
 		if($appendNumberToNameIfExists) {
 			$this->appendNumberToNameIfExists();
 		}
 		$this->_recalculateQuota();
-		return $this->save();
+		return $this->save($ignoreAcl);
 	}
 	
 	protected function beforeDuplicate(&$duplicate) {

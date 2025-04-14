@@ -549,10 +549,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					}
 				}
 				
-//				$acl = new \GO\Base\Model\Acl();
-//				$acl->description = $model->tableName() . '.' . $model->aclField();
-//				$acl->user_id = \GO::user() ? \GO::user()->id : 1;
-//				$acl->save();
 				$shared_folder = $model;
 				while(!$shared_folder->isSomeonesHomeFolder() && $shared_folder->parent_id!=0) {
 					$shared_folder = $shared_folder->parent;
@@ -1046,14 +1042,17 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 				foreach ($ids['folders'] as $folderId) {
 					$f = Folder::model()->findByPk($folderId);
-					$f->moveToTrash();
+					if ($f) {
+						$f->moveToTrash();
+					}
 				}
 
 				foreach ($ids['files'] as $fileId) {
 					$f = File::model()->findByPk($fileId);
-					$f->moveToTrash();
+					if ($f) {
+						$f->moveToTrash();
+					}
 				}
-
 		}
 	}
 
