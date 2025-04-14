@@ -1436,7 +1436,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'loading...' => 'Laden…',
   'Use $config' => 
   array (
-    '\'debug\'' => 'Use $config[\'debug\']=true; only with development and problem solving. It slows " + t(\'product_name',
+    '\'debug\'' => '$config[\'debug\']=true; nur für Entwicklung und Problemlösung verwenden. Es verlangsamt " + t(\'product_name',
   ),
   'Is organization' => 'Ist eine Organisation',
   'Registration number' => 'Register-Nummer',
@@ -1477,7 +1477,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'is after' => 'ist nach',
   'Filters' => 'Filter',
   'Commented at' => 'Kommentiert am',
-  'Has links to...' => 'Hat Verknüpfungen mit?',
+  'Has links to...' => 'Hat Verknüpfungen mit…',
   'full_months' => 
   array (
     1 => 'Januar',
@@ -1546,7 +1546,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Last week' => 'Letzte Woche',
   'This year' => 'Dieses Jahr',
   'Setup notifications' => 'Einrichtungsbenachrichtigung',
-  'Please choose if you\'d like to allow desktop notifications by Group-Office after pressing \'Ok\'.' => 'Bitte wählen Sie die Einstellungen für die Benachrichtigungsanzeige für {product_name} nach Klick auf \'Ok\'.',
+  'Please choose if you\'d like to allow desktop notifications by Group-Office after pressing \'Ok\'.' => 'Bitte wählen Sie die Einstellungen für die Benachrichtigungsanzeige für {product_name} nach Klick auf \'OK\'.',
   'Scheduled tasks' => 'Geplante Aufgaben',
   'Expression' => 'Ausdruck',
   'Loading..' => 'Lade..',
@@ -1702,7 +1702,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'the' => 'der',
   'Duplicate' => 'Duplizieren',
   'Confirm duplication' => 'Duplizierung bestätigen',
-  'Are you sure you want to duplicate this item?' => 'Hat Links zu…',
+  'Are you sure you want to duplicate this item?' => 'Sind Sie sicher, dass Sie dieses Objekt duplizieren möchten?',
   'Please select at least two items' => 'Bitte wählen Sie mindestens zwei Artikel aus',
   'The selected items will be merged into one. The item you selected first will be used primarily. Are you sure?' => 'Die ausgewählten Elemente werden zu einem einzigen zusammengeführt. Das zuerst ausgewählte Element wird vorrangig verwendet. Sind Sie sicher?',
   'Information panel' => 'Information Panel',
@@ -1812,11 +1812,13 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Paper' => 'Paper',
   'Compact' => 'Compact',
   'Global' => 'Global',
-  'Use shortcut to send forms' => 'Use shortcut to send forms',
+  'Use shortcut to send forms' => 'Shortcut zum Absenden der Formulare verwenden',
   'orry, maintenance mode is enabled and you can\'t login right now. Please come back later or contact your system administrator' => 'Entschuldigung, der Wartungsmodus ist aktiviert und Sie können sich momentan nicht einloggen. Bitte kommen Sie später wieder oder kontaktieren Sie Ihren Systemadministrator',
   'Business' => 'Business',
-  'Categories' => 'Categories',
+  'Categories' => 'Kategorien',
   'Labels' => 'Labels',
   'N/A' => 'N/A',
-  'Rebuild principals' => 'Rebuild principals',
+  'Rebuild principals' => 'Principals neu bauen',
+  'Unsubscribe' => 'Abbestellen',
+  'Subscribe' => 'Abonnieren',
 );
