@@ -138,6 +138,10 @@ export class TaskGrid extends Table<DataSourceStore> {
 					width: 180,
 					sortable: true,
 					renderer: (columnValue, record, td, table, storeIndex) => {
+						if(!record.responsible){
+							return "-";
+						}
+
 						return comp({cls: "hbox"},
 							record?.responsible.avatarId ?
 								img({

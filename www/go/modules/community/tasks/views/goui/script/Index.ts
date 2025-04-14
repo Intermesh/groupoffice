@@ -8,6 +8,8 @@ if (tester) {
 		package: "community",
 		name: "tasks",
 		async init() {
+
+			let  tasks: Main;
 			client.on("authenticated", (client, session) => {
 				if (!session.capabilities["go:community:tasks"]) {
 					return;
@@ -15,10 +17,12 @@ if (tester) {
 
 				router.add(/^tasks\/(\d+)$/, (taskId) => {
 					modules.openMainPanel("tasks");
+					tasks.showTask(taskId);
 				});
 
 				modules.addMainPanel("community", "tasks", "tasks", "Tasks", () => {
-					return new Main();
+					tasks = new Main();
+					return tasks;
 				});
 			});
 		}

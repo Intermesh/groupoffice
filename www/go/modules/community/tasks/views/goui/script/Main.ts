@@ -3,7 +3,7 @@ import {
 	btn, checkbox, CheckboxField,
 	checkboxselectcolumn,
 	column,
-	comp,
+	comp, EntityID,
 	Filter,
 	h3,
 	hr,
@@ -21,6 +21,7 @@ import {taskcategorygrid, TaskCategoryGrid} from "./TaskCategoryGrid.js";
 import {TasklistDialog} from "./TasklistDialog.js";
 import {SubscribeWindow} from "./SubscribeWindow.js";
 import {TaskCategoryDialog} from "./TaskCategoryDialog.js";
+import {TaskDialog} from "./TaskDialog.js";
 
 export enum ProgressType {
 	'needs-action' = 'Needs action',
@@ -375,7 +376,8 @@ export class Main extends MainThreeColumnPanel {
 				searchbtn({
 					listeners: {
 						input: (sender, text) => {
-
+							(this.taskGrid.store.queryParams.filter as Filter).text = text;
+							void this.taskGrid.store.load();
 						}
 					}
 				}),
@@ -383,7 +385,8 @@ export class Main extends MainThreeColumnPanel {
 					cls: "primary filled",
 					icon: "add",
 					handler: () => {
-
+						const dlg = new TaskDialog();
+						dlg.show();
 					}
 				}),
 				btn({
@@ -446,5 +449,9 @@ export class Main extends MainThreeColumnPanel {
 		}
 
 		void this.taskGrid.store.load();
+	}
+
+	public showTask(taskId: EntityID) {
+		void this.taskDetail.load(taskId);
 	}
 }
