@@ -6,7 +6,7 @@
 Define DOC_ROOT_{version} {docroot}
 ServerName {version}.wopi.{tld}
 ServerAlias {wopialiases}
-DocumentRoot ${DOC_ROOT_DEFAULT}
+DocumentRoot ${DOC_ROOT_{version}}
 
 #Include hostname for multi instance
 LogFormat "%V %h %l %u %t \"%r\" %s %b" vcommon
