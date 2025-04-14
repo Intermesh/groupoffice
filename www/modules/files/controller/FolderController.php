@@ -748,7 +748,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 					case 'yestoall':
 					case 'yes':
-						//$existingFolder->delete();
 
 						if ($params['overwrite'] == 'yes')
 							$params['overwrite'] = 'ask';
@@ -764,10 +763,15 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			}
 
 			if ($params['paste_mode'] == 'cut') {
-				if (!$folder->move($destinationFolder))
+
+				if($existingFolder) {
+					$existingFolder->moveContentsFrom($folder, true);
+				}else if (!$folder->move($destinationFolder))
 					throw new \Exception("Could not move " . $folder->name);
 			}else {
-				if (!$folder->copy($destinationFolder, $folderName))
+				if($existingFolder) {
+					$existingFolder->copyContentsFrom($folder, true);
+				}else if (!$folder->copy($destinationFolder, $folderName))
 					throw new \Exception("Could not copy " . $folder->name);
 			}
 		}
