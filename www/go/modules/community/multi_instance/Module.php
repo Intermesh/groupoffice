@@ -136,29 +136,35 @@ class Module extends \go\core\Module {
 		$i = [];
 
 		foreach(Instance::find() as $instance) {
+			$tld = $this->getTLD($instance->hostname);
+			if(!isset($i[$tld])) {
+				$i[$tld] = [];
+			}
 			$version = $instance->getMajorVersion();
 			if(empty($version)) {
 				continue;
 			}
 			if(!isset($i[$version])) {
-				$i[$version] = [];
+				$i[$tld][$version] = [];
 			}
 
-			$i[$version][] = $instance->hostname;
+			$i[$tld][$version][] = $instance->hostname;
 		}
 
 	//	$i['6.5'] = ['test.65', 'test2.65', 'test.65', 'test2.65', 'test.65', 'test2.65'];
 
 		$tpl = file_get_contents(__DIR__ . '/site-conf.tpl');
 
-		foreach($i as $version => $hostnames) {
-			echo $this->parseTemplate($tpl, $version, $hostnames);
+		foreach($i as $tld => $versions) {
+			foreach ($versions as $version => $hostnames) {
+				echo $this->parseTemplate($tpl, $version, $hostnames, $tld);
+			}
 		}
 
-		echo $this->parseTemplate($tpl, "DEFAULT", [$_SERVER['SERVER_NAME']]);
+		echo $this->parseTemplate($tpl, "DEFAULT", [$_SERVER['SERVER_NAME']], $this->getTLD($_SERVER['SERVER_NAME']));
 	}
 
-	private function getTLD() : string {
+	private function getTLD($hostname) : string {
 		$hostname = Request::get()->getHost();
 		$dotPos = strpos($hostname, '.');
 
@@ -169,10 +175,9 @@ class Module extends \go\core\Module {
 		return substr($hostname, $dotPos + 1);
 	}
 
-	private function parseTemplate($tpl, $version, $hostnames) {
+	private function parseTemplate($tpl, $version, $hostnames, $tld) {
 
 
-		$tld = $this->getTLD();
 
 		// Each instance must have a dedicated WOPI subdomain for Microsoft: https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/online/build-test-ship/environments#wopi-discovery-urls
 		$wopialiases = array_map(function($hostname) {
