@@ -144,7 +144,7 @@ class Module extends \go\core\Module {
 			if(empty($version)) {
 				continue;
 			}
-			if(!isset($i[$version])) {
+			if(!isset($i[$tld][$version])) {
 				$i[$tld][$version] = [];
 			}
 
