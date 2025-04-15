@@ -5,7 +5,7 @@ import {
 	comp, DataSourceStore,
 	datasourcestore,
 	datecolumn,
-	Format,
+	Format, StoreRecord,
 	t,
 	Table, Window
 } from "@intermesh/goui";
@@ -79,7 +79,7 @@ export class TaskGrid extends Table<DataSourceStore> {
 					sortable: true,
 					renderer: (columnValue, record, td, table, storeIndex) => {
 						if (record.color) {
-							td.style.color = record.color;
+							td.style.color = `#${record.color}`;
 						}
 
 						return columnValue;
@@ -94,26 +94,25 @@ export class TaskGrid extends Table<DataSourceStore> {
 
 						if (record.priority != 0) {
 							if (record.priority < 5) {
-								v += '<i class="icon small orange">priority_high</i>';
+								v += '<i class="icon orange">priority_high</i>';
 							}
 
 							if (record.priority > 5) {
-								v += '<i class="icon small blue">low_priority</i>';
+								v += '<i class="icon blue">low_priority</i>';
 							}
 						}
 
 						if (record.recurrenceRule) {
-							v += '<i class="icon small">repeat</i>';
+							v += '<i class="icon">repeat</i>';
 						}
 						if (record.filesFolderId) {
-							v += '<i class="icon small">attachment</i>';
+							v += '<i class="icon">attachment</i>';
 						}
-						if (record.alerts && record.alerts.length > 0) {
-							v += '<i class="icon small">alarm</i>';
+						if (record.alerts) {
+							v += '<i class="icon">alarm</i>';
 						}
-
 						if (record.timeBooked && record.timeBooked > 0) {
-							v += '<i class="icon small">timer</i>';
+							v += '<i class="icon">timer</i>';
 						}
 
 						return v;
@@ -124,13 +123,19 @@ export class TaskGrid extends Table<DataSourceStore> {
 					header: t("Start at"),
 					width: 160,
 					sortable: true,
-					hidden: false
+					hidden: false,
+					renderer: (columnValue, record, td, table) => {
+						return this.startDueRenderer(columnValue, record, td);
+					}
 				}),
 				datecolumn({
 					id: "due",
 					header: t("Due at"),
 					width: 160,
-					sortable: true
+					sortable: true,
+					renderer: (columnValue, record, td, table) => {
+						return this.startDueRenderer(columnValue, record, td);
+					}
 				}),
 				column({
 					id: "responsible",
@@ -138,7 +143,7 @@ export class TaskGrid extends Table<DataSourceStore> {
 					width: 180,
 					sortable: true,
 					renderer: (columnValue, record, td, table, storeIndex) => {
-						if(!record.responsible){
+						if (!record.responsible) {
 							return "-";
 						}
 
@@ -181,7 +186,10 @@ export class TaskGrid extends Table<DataSourceStore> {
 					width: 150,
 					sortable: true,
 					renderer: (columnValue, record, td, table, store) => {
-						return comp({cls: "status tasks-status-" + columnValue, html: ProgressType[columnValue as keyof typeof ProgressType]});
+						return comp({
+							cls: "status tasks-status-" + columnValue,
+							html: ProgressType[columnValue as keyof typeof ProgressType]
+						});
 					}
 				}),
 				datecolumn({
@@ -255,5 +263,20 @@ export class TaskGrid extends Table<DataSourceStore> {
 				// TODO: time booked
 			]
 		);
+	}
+
+	private startDueRenderer(columnValue: string, record: StoreRecord, td: HTMLTableCellElement) {
+		const now = new Date();
+
+		const start = record.start ? new Date(record.start) : undefined;
+		const due = record.due ? new Date(record.due) : undefined;
+
+		if (due && due < now) {
+			td.cls("danger");
+		} else if (start && start <= now) {
+			td.cls("success");
+		}
+
+		return columnValue;
 	}
 }

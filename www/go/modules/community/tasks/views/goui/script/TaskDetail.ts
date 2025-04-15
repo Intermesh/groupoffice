@@ -81,7 +81,7 @@ export class TaskDetail extends DetailPanel {
 								}
 							})
 						),
-						comp({cls: "vbox"},
+						comp({cls: "vbox", flex: 1},
 							displayfield({
 								name: "due",
 								label: t("Due at")
@@ -121,6 +121,27 @@ export class TaskDetail extends DetailPanel {
 								comp({style: {width: `${Math.ceil(v)}%`}})
 							)
 						}
+					}),
+					displayfield({
+						name: "description",
+						label: t("Description")
+					}),
+					displayfield({
+						name: "location",
+						label: t("Location")
+					}),
+					displayfield({
+						name: "categories",
+						label: t("Categories"),
+						renderer: async (categoryIds: string[]) => {
+							const response = await jmapds("TaskCategory").get(categoryIds);
+
+							if (response.list) {
+								return response.list.map(record => record.name).join(", ");
+							}
+
+							return "";
+						}
 					})
 				)
 			)
@@ -145,6 +166,7 @@ export class TaskDetail extends DetailPanel {
 
 				}
 			}),
+			// todo: fix
 			// addbutton(),
 			btn({
 				icon: "more_vert",

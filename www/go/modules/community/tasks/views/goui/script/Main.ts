@@ -7,8 +7,7 @@ import {
 	Filter,
 	h3,
 	hr,
-	list,
-	menu,
+	menu, router,
 	searchbtn,
 	store,
 	t, table,
@@ -358,7 +357,7 @@ export class Main extends MainThreeColumnPanel {
 					const taskIds = tableRowSelect.getSelected().map((row) => row.record.id);
 
 					if (taskIds[0]) {
-						void this.taskDetail.load(taskIds[0]);
+						router.goto("tasks/" + taskIds[0]);
 					}
 				}
 			}
