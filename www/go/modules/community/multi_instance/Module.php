@@ -164,7 +164,8 @@ class Module extends \go\core\Module {
 		echo $this->parseTemplate($tpl, "DEFAULT", [$_SERVER['SERVER_NAME']], $this->getTLD($_SERVER['SERVER_NAME']));
 	}
 
-	private function getTLD(string $hostname) : string {
+	private function getTLD($hostname) : string {
+		$hostname = Request::get()->getHost();
 		$dotPos = strpos($hostname, '.');
 
 		if(!$dotPos) {
