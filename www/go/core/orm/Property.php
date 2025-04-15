@@ -896,7 +896,7 @@ abstract class Property extends Model {
 	 * @return Query<$this>
 	 * @throws Exception
 	 */
-	protected static function internalFind(array $fetchProperties = [], bool $readOnly = false, Property $owner = null, ?int $userId = null): Query
+	protected static function internalFind(array $fetchProperties = [], bool $readOnly = false, Property|null $owner = null, ?int $userId = null): Query
 	{
 
 		$tables = self::getMapping()->getTables();
@@ -2258,7 +2258,7 @@ abstract class Property extends Model {
 		}
 	}
 
-	public function toArray(array $properties = null): array|null
+	public function toArray(array|null $properties = null): array|null
 	{
 		if (empty($properties)) {
 			$properties = $this->fetchProperties;

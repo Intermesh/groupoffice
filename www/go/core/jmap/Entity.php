@@ -845,8 +845,8 @@ abstract class Entity  extends OrmEntity {
 	 * @return Alert
 	 */
 	public function createAlert(DateTimeInterface $triggerAt,
-	                            ?string            $tag = null,
-	                            int               $userId = null): Alert
+	                            string|null            $tag = null,
+	                            int|null               $userId = null): Alert
 	{
 		$alert = new Alert();
 
@@ -867,7 +867,7 @@ abstract class Entity  extends OrmEntity {
 	 * @return bool
 	 * @throws Exception
 	 */
-	public function deleteAlert(string $tag, int $userId = null): bool
+	public function deleteAlert(string $tag, int|null $userId = null): bool
 	{
 		return Alert::delete([
 			'entityTypeId' => self::entityType()->getId(),

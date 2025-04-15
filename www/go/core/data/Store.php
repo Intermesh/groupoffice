@@ -100,7 +100,7 @@ class Store implements IteratorAggregate, ArrayableInterface, Countable  {
 	 * @return array|null
 	 */
 	
-	public function toArray(array $properties = null): array|null
+	public function toArray(array|null $properties = null): array|null
 	{
 		$records = [];
 		

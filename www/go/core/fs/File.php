@@ -234,7 +234,7 @@ class File extends FileSystemObject {
    * @since 4.3
    * @since 5.0
    */
-	public function getContents(int $offset = 0, int $maxlen = null) {
+	public function getContents(int $offset = 0, int|null $maxlen = null) {
 		if(isset($maxlen)) {
 			return file_get_contents($this->getPath(), false, null, $offset, $maxlen);	
 		} else{
@@ -635,7 +635,7 @@ class File extends FileSystemObject {
 	 * @return self|bool $successful
 	 * @throws Exception
 	 */
-	public function touch(bool $createPath = false, int $time = null, int $atime = null) {
+	public function touch(bool $createPath = false, int|null $time = null, int|null $atime = null) {
 		if ($createPath){
 			$this->getFolder()->create();
 		}

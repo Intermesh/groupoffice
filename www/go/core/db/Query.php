@@ -785,7 +785,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    * @return array|null
    * @throws Exception
    */
-  public function toArray(array $properties = null): array|null
+  public function toArray(array|null $properties = null): array|null
   {
 		$arr = [];
 		foreach($this->execute() as $entity) {

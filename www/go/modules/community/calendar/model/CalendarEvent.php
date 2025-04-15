@@ -594,7 +594,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 		return $success;
 	}
 
-	public function toArray(array $properties = null): array|null
+	public function toArray(array|null $properties = null): array|null
 	{
 		$arr =  parent::toArray($properties);
 		unset($arr['recurrenceId'], $arr['excluded']);

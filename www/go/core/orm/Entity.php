@@ -15,6 +15,7 @@ use go\core\fs\Blob;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
+use go\core\model\Link;
 use go\core\model\Search;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
@@ -204,7 +205,7 @@ abstract class Entity extends Property {
 	 * @return static
 	 * @throws SaveException
 	 */
-	public static function findOrCreate(string $key, string $keyField = null, array $values = [], bool $update = false): Entity
+	public static function findOrCreate(string $key, string|null $keyField = null, array $values = [], bool $update = false): Entity
 	{
 		if($keyField === null) {
 			$entity = static::findById($key);
@@ -345,7 +346,7 @@ abstract class Entity extends Property {
 		$query = static::find($properties, $readOnly);
 		/** @noinspection PhpPossiblePolymorphicInvocationInspection */
 
-		return \go\core\model\Link::joinLinks($query, $entity, static::entityType()->getId());
+		return Link::joinLinks($query, $entity, static::entityType()->getId());
 
 	}
 
@@ -673,7 +674,7 @@ abstract class Entity extends Property {
 	 * @param int[]|null $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
 	 * @return Query $query;
 	 */
-	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
+	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int|null $userId = null, array|null $groups = null): Query
 	{
 		return $query;
 	}

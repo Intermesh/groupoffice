@@ -846,10 +846,10 @@ abstract class Module extends Singleton {
 	 *
 	 * @param string $name
 	 * @param string|null $package
-	 * @param string|array $allowedModules If not given the current configuration file is used.
+	 * @param string|array|null $allowedModules If not given the current configuration file is used.
 	 * @return bool
 	 */
-	public static function isAllowed(string $name, string $package = null, $allowedModules = null): bool
+	public static function isAllowed(string $name, string|null $package = null, string|array|null $allowedModules = null): bool
 	{
 
 		if(!isset($allowedModules)) {
