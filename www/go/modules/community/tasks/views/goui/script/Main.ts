@@ -421,11 +421,7 @@ export class Main extends MainThreeColumnPanel {
 	protected createEast() {
 		this.taskDetail = new TaskDetail();
 
-		return comp({
-				cls: "vbox"
-			},
-			this.taskDetail
-		);
+		return this.taskDetail;
 	}
 
 	private setAssignmentFilters() {

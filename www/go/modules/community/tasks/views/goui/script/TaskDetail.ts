@@ -12,6 +12,7 @@ import {
 	tbar
 } from "@intermesh/goui";
 import {ProgressType} from "./Main.js";
+import {ContinueTaskDialog} from "./ContinueTaskDialog.js";
 
 export class TaskDetail extends DetailPanel {
 	private form: DataSourceForm;
@@ -147,16 +148,35 @@ export class TaskDetail extends DetailPanel {
 			)
 		);
 
+		this.addCustomFields();
+		this.addComments();
+		this.addLinks();
+		this.addHistory();
+
+		this.items.add(
+			tbar({
+				cls: "border-top"
+				},
+				"->",
+				btn({
+					text: t("Continue task"),
+					icon: "arrow_right_alt",
+					handler: () => {
+						const dlg = new ContinueTaskDialog();
+						void dlg.load(this.entity!.id)
+						dlg.show();
+					}
+				})
+			)
+		);
+
 		this.on("load", (detailPanel, entity) => {
 			this.title = entity.title;
 
 			void this.form.load(entity.id);
 		});
 
-		this.addCustomFields();
-		this.addComments();
-		this.addLinks();
-		this.addHistory();
+
 
 		this.toolbar.items.add(
 			btn({
@@ -166,13 +186,13 @@ export class TaskDetail extends DetailPanel {
 
 				}
 			}),
-			// todo: fix
-			// addbutton(),
+			addbutton(),
 			btn({
 				icon: "more_vert",
 				menu: menu({
 						isDropdown: true
 					},
+					// todo: fix
 					// linkbrowserbutton({
 					// 	text: t("Links")
 					// }),
