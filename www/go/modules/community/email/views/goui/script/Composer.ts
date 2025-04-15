@@ -21,7 +21,7 @@ import {
 } from "@intermesh/goui";
 import {client, jmapds} from "@intermesh/groupoffice-core";
 
-class Composer extends Window {
+export class Composer extends Window {
 
 
 	form: DataSourceForm
@@ -136,7 +136,9 @@ class Composer extends Window {
 	}
 
 	private send(email: any, identity: any) {
-		const id = "123";
+		const id = "123",
+			draftBox = {id:1},
+			sentBox = {id:2};
 		jmapds('EmailSubmission').setParams = {onSuccessUpdateEmail: {[id]: {
 					["mailboxIds/"+draftBox.id]: null,
 					["mailboxIds/"+sentBox.id]: true,

@@ -1,23 +1,24 @@
 <?php
 
-namespace go\modules\community\email;
+namespace go\modules\community\email\model;
 
 
 
+use go\core\acl\model\AclItemEntity;
+use go\core\db\Criteria;
 use go\core\jmap\Entity;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
 
-class Mailbox extends Entity {
+class Mailbox extends AclItemEntity {
 
-	const mayReadItems = 1;
-	const mayAddItems = 2;
-	const mayRemoveItems = 4;
-	const mayCreateChild = 8;
-	const mayRename = 16;
-
+	public $id;
 	/** User-visible name for the Mailbox, e.g., “Inbox”. */
 	public ?string $name;
 	/** The Mailbox id for the parent of this Mailbox, or null if this Mailbox is at the top leve */
 	public ?int $parentId;
+
+	public ?int $accountId;
 	/** Identifies Mailboxes that have a particular common purpose */
 	public ?string $role;
 	/** unsigned Defines the sort order of Mailboxes when presented in the client’s UI, so it is consistent between devices */
@@ -32,22 +33,46 @@ class Mailbox extends Entity {
 
 	// IMAP sync properties
 	protected ?string $highestUID;
-	protected ?string $uid;
-	protected ?string $highestmodseq;
+	protected ?string $uid; // uidvalidity
 
-	public function __construct()
+
+	protected static function defineMapping(): Mapping
 	{
-		if (isset($this->role)) {
-			$this->role = Role::get($this->role);
-		}
+		return parent::defineMapping()
+			->addTable('email_mailbox', 'm')
+			->addUserTable('email_mailbox_user', 'mu', ['id' => 'mailboxId']);
+	}
+
+	protected static function defineFilters(): Filters
+	{
+		return parent::defineFilters()
+			->add('parentId', function(Criteria $criteria, $value) {
+				$criteria->where('parentId', '=', $value);
+			})->add('accountId', function(Criteria $criteria, $value) {
+				$criteria->where('accountId', '=', $value);
+			});
 	}
 
 	public function qresync() {
 		return [
-			$this->uidvalidity,			// UIDVALIDITY
-			$this->highestmodseq		// last known modseq
+			$this->uid,			// UIDVALIDITY
+			$this->emailHighestModSeq		// last known modseq
 			// optional set of known UIDs
 			// optional list of known sequence ranges
+		];
+	}
+
+	public function myRights() {
+		$imap = [
+			'mayReadItems' => 'lr', // l read
+			'mayAddItems' => 'i', // insert
+			'mayRemoveItems' => 'te', // truncate
+			'maySetSeen' => 's', // seen
+			'maySetKeywords' => 'w', // write
+			'mayCreateChild' => 'k', // subfolders
+			'mayRename' => 'x', // change folder name
+			'mayDelete' => 'x',
+			'maySubmit' => 'p' // append items
 		];
 	}
 
@@ -84,30 +109,25 @@ class Mailbox extends Entity {
 
 	public function getTotalEmails() {
 		$query = Email::find()
-			->select('count(id)')
-			->leftJoin('email_map m', 't.id = m.emailId')
+			->selectSingleValue('count(id)')
+			->join('email_map', 'm', 'email_email.id = m.fk', 'LEFT')
 			->where(['mailboxId' => $this->id]);
 
-		return (int) $query->scalar();
+		return (int) $query->single();
 	}
 
 	public function addMessage($message) {
 		//insert intio message map
 	}
 
-	public function setFlags($flags) {
-		if (strtoupper($this->name) === 'INBOX') {
-			$this->role = Role::Inbox;
-			return;
-		}
-		//$this->flags = $flags;
-		foreach ($flags as $flag) {
-			if (isset(Role::$map[strtolower($flag)])) {
-				$role = Role::$map[strtolower($flag)];
-				$this->role = Role::fromString($role);
-				break;
-			}
-		}
+
+	protected static function aclEntityClass(): string
+	{
+		return EmailAccount::class;
 	}
 
+	protected static function aclEntityKeys(): array
+	{
+		return ['accountId'=>'id'];
+	}
 }

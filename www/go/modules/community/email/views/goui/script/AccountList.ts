@@ -1,15 +1,49 @@
-import {btn, comp, Component, hr, list, List, menu, tbar, t} from "@intermesh/goui";
-import {jmapds} from "@intermesh/groupoffice-core";
+import {
+	btn,
+	comp,
+	Component,
+	hr,
+	list,
+	List,
+	menu,
+	tbar,
+	t,
+	tree,
+	treecolumn,
+	TreeRecord, ComponentEventMap, DateTime, ObservableListenerOpts
+} from "@intermesh/goui";
+import {client, jmapds} from "@intermesh/groupoffice-core";
 import {AccountWindow} from "./AccountWindow";
+import {accountStore} from "@intermesh/community/email";
+import {IdentityWindow} from "./IdentityWindow";
+import {SettingsWindow} from "./SettingsWindow";
+
+export interface AccountListEventMap<Type> extends ComponentEventMap<Type> {
+	selectaccount: (me: Type, account: any) => false | void
+	selectmailbox: (me: Type, account: any, mailbox:any) => void
+}
+
+export interface AccountList extends Component {
+	on<K extends keyof AccountListEventMap<this>, L extends Function>(eventName: K, listener: Partial<AccountListEventMap<this>>[K], options?: ObservableListenerOpts): L
+	fire<K extends keyof AccountListEventMap<this>>(eventName: K, ...args: Parameters<AccountListEventMap<any>[K]>): boolean
+}
 
 export class AccountList extends Component {
 
 	list:List
 
-	constructor(store){
+	constructor(){
 		super()
 
-		this.items.add(store !== calendarStore ? comp() :tbar({cls: 'dense'},
+		const mailboxDS = jmapds('Mailbox');
+
+		const identityDialog = new IdentityWindow(),
+			settingsDialog = new SettingsWindow(),
+			accountMenu = menu({cls:'dropdown'},
+
+			);
+
+		this.items.add(tbar({cls: 'dense'},
 			comp({tagName: 'h3', html: t('Accounts')}),
 			btn({
 				icon: 'more_vert', menu: menu({},
@@ -24,16 +58,15 @@ export class AccountList extends Component {
 					btn({
 						icon: 'bookmark_added',
 						text: t('Subscribe to mailbox') + '…', handler: () => {
-							const d = new SubscribeWindow();
-							d.show();
+							// const d = new SubscribeWindow();
+							// d.show();
 						}
-					}),
-					btn({icon: 'travel_explore',text: t('Add calendar from link') + '…'})
+					})
 				)
 			})
 		), this.list = list({
 			tagName: 'div',
-			store,
+			store:accountStore,
 			cls: 'check-list',
 			rowSelectionConfig: {
 				multiSelect: false,
@@ -46,39 +79,99 @@ export class AccountList extends Component {
 			listeners: {'render': me => {
 					me.store.load();
 				}},
-			renderer: this.mailboxRenderer.bind(this)
+			renderer: (account: any, _row: HTMLElement, _list: List, _storeIndex: number) => {
+				// if(data.isVisible) {
+				// 	this.inCalendars[storeIndex] = true;
+				// }
+				return [btn({
+					icon: account.role,
+					//style: 'padding: 0 8px',
+					text: account.name,
+					menu: menu({},
+						btn({icon: 'settings',text: t('Settings'), handler: function() {settingsDialog.show().form.load('mail');}}), // hidden: !$.auth.roles.admin,
+						btn({icon: 'badge', 	text: t('Identities'), handler: function() {identityDialog.show();}}),
+						btn({icon: 'refresh', text: 'Refetch all', handler: () => { this.imapFill(account.id /*aid*/) }}),
+						'-',
+						btn({icon:'edit', text: t('Edit')+'…', disabled:!account.myRights.mayAdmin, handler: async _ => {
+								const dlg = new AccountWindow();
+								await dlg.load(account.id);
+								dlg.show();
+							}}),
+						btn({icon:'delete', text: t('Delete','core','core')+'…', disabled:!account.myRights.mayAdmin, handler: async _ => {
+								jmapds("Mailbox").confirmDestroy([account.id]);
+							}}),
+						hr(),
+						btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
+								jmapds('Mailbox').update(account.id, {isSubscribed: false});
+							}}),
+						hr(),
+						btn({icon:'file_save',hidden:account.groupId, text: t('Share','core','core'), handler: _ => {  }}),
+
+					)
+
+				}),tree({
+					fitParent:true,
+					columns: [
+						treecolumn({
+							id: "name",
+							header: "Name",
+							defaultIcon: "folder",
+							sortable: true
+						})
+					],
+					rowSelectionConfig: {
+						multiSelect:false,
+						listeners:{
+							'rowselect':(me, mailboxRow)=> {
+
+								this.fire('selectmailbox',this, account, mailboxRow);
+							}
+						}
+					},
+					nodeProvider: async (record, store) : Promise<TreeRecord[]> => {
+
+						let childIds;
+						if(record) {
+							// We already fetched the childIds in its parent. See below
+							childIds = record.childIds;
+						} else {
+							// When there's no record we're fetching the root of the tree
+							const q = await mailboxDS.query({
+								filter: {accountId: account.id, parentId: null},
+								//sort: store.sort
+							});
+
+							childIds = q.ids;
+						}
+
+						const getResponse = await mailboxDS.get(childIds)
+						//at the root of the tree record is undefined
+						return Promise.all(getResponse.list.map(async (e) => {
+							// prefetch child id's so the Tree component knows if this node has children
+							const childIds = (await mailboxDS.query({filter: {accountId: account.id, parentId: e.id}})).ids;
+
+							return {
+								id: e.id + "",
+								name: e.name,
+								createdAt: e.createdAt,
+
+								// Store the child id's in the node record so we can use it when it's expanded
+								childIds,
+
+								// Set to empty array if it has no children. Then the Tree component knows it's a leaf and won't present an expand arrow
+								children: childIds.length ? undefined : []
+							}
+						}))
+					},
+				})];
+			}
 		}));
 	}
 
-	mailboxRenderer(data: any, _row: HTMLElement, _list: List, _storeIndex: number) {
-		// if(data.isVisible) {
-		// 	this.inCalendars[storeIndex] = true;
-		// }
-		return [btn({
-			icon: data.role,
-			//style: 'padding: 0 8px',
-			text: data.name,
-			menu: menu({},
-					btn({icon:'sync', text: t('Synchronize'), hidden: !data.davaccountId, handler: (me) => {
-
-					}}),
-					btn({icon:'edit', text: t('Edit')+'…', hidden: data.davaccountId, disabled:!data.myRights.mayAdmin, handler: async _ => {
-							const dlg = new MailboxWindow();
-							await dlg.load(data.id);
-							dlg.show();
-						}}),
-					btn({icon:'delete', text: t('Delete','core','core')+'…', hidden: data.davaccountId, disabled:!data.myRights.mayAdmin, handler: async _ => {
-							jmapds("Mailbox").confirmDestroy([data.id]);
-						}}),
-					hr(),
-					btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
-							jmapds('Mailbox').update(data.id, {isSubscribed: false});
-						}}),
-					hr(),
-					btn({icon:'file_save',hidden:data.groupId, text: t('Share','core','core'), handler: _ => {  }}),
-
-				)
-
-		})];
+	private imapFill(accountId: number) {
+		client.jmap('EmailAccount/fill',{accountId}).then(r => {
+			alert('done');
+		})
 	}
+
 }

@@ -6,7 +6,7 @@ use go\core\jmap\EntityController;
 use go\modules\community\email\model;
 
 
-class Account extends EntityController {
+class EmailAccount extends EntityController {
 	
 	/**
 	 * The class name of the entity this controller is for.
@@ -15,7 +15,7 @@ class Account extends EntityController {
 	 */
 	protected function entityClass(): string
 	{
-		return model\Account::class;
+		return model\EmailAccount::class;
 	}	
 	
 	/**
@@ -57,5 +57,22 @@ class Account extends EntityController {
 	 */
 	public function changes($params) {
 		return $this->defaultChanges($params);
+	}
+
+	public function fill($params){
+		$account = model\EmailAccount::findById($params['accountId']);
+		$backend = $account->connect();
+		if ($backend) {
+			return $backend->fill();
+		}
+	}
+
+	public function sync($params) {
+
+		$account = model\EmailAccount::findById($params['accountId']);
+		$backend = $account->connect();
+		if ($backend) {
+			return $backend->sync($params['mailboxId']);
+		}
 	}
 }

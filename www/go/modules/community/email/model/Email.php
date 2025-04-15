@@ -3,9 +3,19 @@
 namespace go\modules\community\email\model;
 
 use go\core\acl\model\AclItemEntity;
+use go\core\db\Criteria;
+use go\core\db\Query;
+use go\core\orm\Filters;
+use go\core\orm\Mapping;
+use go\core\orm\Relation;
 
 class Email extends AclItemEntity {
-	const defaultProps = ["id", "blobId", "threadId", "mailboxIds", "keywords", "size",
+
+	public ?int $id;
+	/**
+	 * If there are no properties provided in Email/get these should be used
+	 */
+	const defaultProperties = ["id", "blobId", "threadId", "mailboxIds", "keywords", "size",
 		"receivedAt", "messageId", "inReplyTo", "references", "sender", "from",
 		"to", "cc", "bcc", "replyTo", "subject", "sentAt", "hasAttachment", "attachments",
 		"preview"];//, "bodyValues", "textBody", "htmlBody", "attachments"];
@@ -16,6 +26,8 @@ class Email extends AclItemEntity {
 		return $this->uid;
 	}
 
+	public ?int $accountId;
+
 	/** @var string binary(20) id to raw RFC5322 message */
 	public ?string $blobId;
 
@@ -23,35 +35,37 @@ class Email extends AclItemEntity {
 	public ?int $threadId;
 
 	/** @var array<string,bool> Set of mailbox ids the email belongs to. */
-	public ?\stdClass $mailboxIds;
+	public ?array $mailboxIds;
 
 	/** @var array<string,bool> $draft, $seen, $flagged, $answered, $forwarded, $phishing, $junk, $notjunk. */
-	private ?\stdClass $dkeywords;
-	private ?string $keywords;
+	protected ?string $keywords;
+	protected ?bool $seen;
+	protected ?bool $answered;
+	protected ?bool $flagged;
 
 	/** @var int The size in bytes (immutabke) */
 	public ?int $size;
 
-	/** @var string Date in UTC when the mail was created on the server  (IMAP internal date) */
-	protected ?string $receivedAt;
+	/** @var \DateTime Date in UTC when the mail was created on the server  (IMAP internal date) */
+	public $receivedAt;
 
-	protected ?string $sender;
+	public ?array $sender;
 
-	protected ?string $from;
+	public ?array $from;
 
-	protected ?string $to;
+	public ?array $to;
 
-	protected ?string $cc;
+	public ?array $cc;
 
-	protected ?string $bcc;
+	public ?array $bcc;
 
-	protected ?string $replyTo;
+	public ?array $replyTo;
 
 	/** @var string Subject */
-	public ?string $subject;
+	public $subject;
 
-	/** @var string DateTime Date */
-	protected ?string $sentAt;
+	/** @var \DateTime Date */
+	public $sentAt;
 
 	/** @var EmailBodyPart full MIME structure of body */
 	private $_bodyStructure;
@@ -80,23 +94,74 @@ class Email extends AclItemEntity {
 
 	//header fields (all immutable)
 	/** @var string[] Message-ID */
-	public ?\stdClass $messageId;
+	public ?array $messageId;
 
 	/** @var string[] In-Reply-To */
-	public ?\stdClass $inReplyTo;
+	public ?array $inReplyTo;
 
 	/** @var string[] References */
-	public ?\stdCLass $references;
+	public ?array $references;
 
-	static protected function relations(): array
+	protected static function defineMapping(): Mapping
 	{
-		return [
-			'mailboxIds' => base\Model::many()->from('email_map')->column('mailboxId'),
-			'messageId' => base\Model::many()->from('email_id_map')->where(['type' => "messageId"])->column('messageId'),
-			'inReplyTo' => base\Model::many()->from('email_id_map')->where(['type' => "inReplyTo"])->column('messageId'),
-			'references' => base\Model::many()->from('email_id_map')->where(['type' => "references"])->column('messageId')
-		];
+		return parent::defineMapping()
+			->addTable('email_email')
+			->add('mailboxIds', Relation::scalar('email_map', 'mailboxId')->keys(['id' => 'fk']))
+			->add('messageId', Relation::scalar('email_id','messageId')->keys(['id' => 'fk'])->constants(['type'=>'messageId']))
+			->add('inReplyTo', Relation::scalar('email_id','messageId')->keys(['id' => 'fk'])->constants(['type'=>'inReplyTo']))
+			->add('references', Relation::scalar('email_id','messageId')->keys(['id' => 'fk'])->constants(['type'=>'references']))
+			->add('sender', Relation::array(EmailAddress::class)->keys(['id'=>'fk'])->constants(['type'=>'sender']))
+			->add('from', Relation::array(EmailAddress::class)->keys(['id'=>'fk'])->constants(['type'=>'from']))
+			->add('to', Relation::array(EmailAddress::class)->keys(['id'=>'fk'])->constants(['type'=>'to']))
+			->add('cc', Relation::array(EmailAddress::class)->keys(['id'=>'fk'])->constants(['type'=>'cc']))
+			->add('bcc', Relation::array(EmailAddress::class)->keys(['id'=>'fk'])->constants(['type'=>'bcc']))
+			->add('replyTo', Relation::array(EmailAddress::class)->keys(['id'=>'fk'])->constants(['type'=>'replyTo']));
 	}
+
+	protected static function defineFilters(): Filters
+	{
+		return parent::defineFilters()
+			->add('mailboxId', function(Criteria $criteria, $value, Query $query) {
+				$query->join('email_map', 'map', 'map.fk = id');
+				$criteria->where('map.mailboxId', '=', $value);
+			})->add('accountId', function(Criteria $criteria, $value) {
+				$criteria->where('accountId', '=', $value);
+			})->add('inMailboxes', function(Criteria $criteria, $value, $query) {
+				$query->join('email_map', '`id` = `fk`');
+				$criteria->andWhere('email_map.mailboxId', '=', $value);
+			});
+	}
+
+	public function getKeywords(){
+		$kw = [];
+		if($this->seen) $kw['$seen'] = true;
+		if($this->answered) $kw['$answered'] = true;
+		if($this->flagged) $kw['$flagged'] = true;
+		return (object)array_merge(json_decode($this->keywords,true), $kw);
+	}
+
+	public function setKeywords($v) {
+
+		$kw = (array)$v;
+		//set 3 indexed keywords when keywords change
+		foreach(['flagged', 'seen', 'answered'] as $indexedKeyword) {
+			$w = '$'.$indexedKeyword;
+			if(isset($kw[$w])) {
+				$this->{$indexedKeyword} = !empty($kw[$w]);
+				unset($kw[$w]);
+			}
+		}
+		foreach($kw as $word => $true) {
+			if($true) {
+				$kw[$word] = true;
+			} else if(isset($kw[$word])) {
+				unset($kw[$word]);
+			}
+		}
+
+		$this->keywords = json_encode((object)$kw);
+	}
+
 
 	static function rules(): array
 	{
@@ -145,16 +210,6 @@ class Email extends AclItemEntity {
 		$this->uid = $uid;
 	}
 
-	public function setReceivedAt($val)
-	{
-		$this->receivedAt = strtotime($val);
-	}
-
-	public function setSentAt($val)
-	{
-		$this->sentAt = strtotime($val);
-	}
-
 	public function getBodyStructure()
 	{
 		$this->loadBody();
@@ -189,162 +244,24 @@ class Email extends AclItemEntity {
 		return $this->_htmlBody;
 	}
 
-	public function getAttachments()
-	{
-		if(isset($this->attachments))
-			return json_decode($this->attachments);
-	}
-	public function setAttachments($val)
-	{
-		$this->attachments = json_encode($val);
-	}
-
-	public function getKeywords()
-	{
-		if(!isset($this->keywords)) {
-			$this->keywords = self::find()->select('keywords')->where('id = :id',['id'=>$this->id])->scalar();
-		}
-		if(!isset($this->dkeywords)) {
-			$this->dkeywords = json_decode($this->keywords);
-		}
-		return $this->dkeywords;
-		// if(is_object($this->keywords))
-		// 	return (array)$this->keywords;
-		// return array_fill_keys(explode(';', $this->keywords), true);
-	}
-
-	public function setKeywords($v) {
-		if($this->isNew) {
-			$this->keywords = json_encode((object)$v);
-			return;
-		}
-		$kw = $this->getKeywords();
-		foreach($v as $word => $true) {
-			if($true) {
-				$kw[$word] = true;
-			} else if(isset($kw[$word])) {
-				unset($kw[$word]);
-			}
-		}
-		$this->keywords = json_encode((object)$kw);
-	}
-
 	public function __isset($name) {
-		if($name === 'keywords' && !isset($this->keywords) && !$this->isNew) {
+		if($name === 'keywords' && !isset($this->keywords) && !$this->isNew()) {
 			$this->getKeywords();
 			//$this->keywords = self::find()->select('keywords')->where('id = :id',['id'=>$this->id])->scalar();
 		}
 		return isset($this->$name);
 	}
 
-	public function toData():array {
-		$d = parent::toData();
-		if(isset($this->dkeywords)) {
-			$d['keywords'] = json_encode($this->dkeywords);
-		}
-		return $d;
-	}
-
-	static function ids($args) {
-		$query = parent::ids($args);
-		if(self::$collapseThreads) {
-			$query->groupBy('threadId');
-		}
-		return $query;
-	}
-
-	public function getTo() {
-		if(isset($this->to))
-			return $this->asAddresses($this->to);
-	}
-
-	public function getFrom() {
-		if(isset($this->from))
-			return $this->asAddresses($this->from);
-	}
-
 	public function setHeaders($val) {
-		if($this->isNew)
+		if($this->isNew())
 			foreach($val as $header => $value) {
 				$this->{$header} = $value;
 			}
 	}
 
-	public function setFrom($val) {
-		if(is_string($val)) {
-			$this->from = $val;
-		} else {
-			$from = [];
-			foreach($val as $addr) {
-				$from[] = isset($addr->name) ? $addr->name . ' <'.$addr->email.'>' : $addr->email;
-			}
-			$this->from = implode(',', $from);
-		}
-	}
-
-	public function getSender()
-	{
-		if(isset($this->sender))
-			return $this->asAddresses($this->sender);
-	}
-
-	public function getCc()
-	{
-		if(isset($this->cc))
-			return $this->asAddresses($this->cc);
-	}
-
-	public function getBcc()
-	{
-		if(isset($this->bcc))
-			return $this->asAddresses($this->bcc);
-	}
-
-	public function getMessageId() {
-		return $this->messageId ?? (object)[];
-	}
-
-	public function references() {
-		return $this->references ?? (object)[];
-	}
-
-	public function inReplyTo() {
-		return $this->inReplyTo ?? (object)[];
-	}
-
-	public function getSentAt()
-	{
-		if(isset($this->sentAt))
-			return $this->asDate($this->sentAt);
-	}
-
-	public function getReceivedAt()
-	{
-		if(isset($this->receivedAt))
-			return $this->asDate($this->receivedAt);
-	}
-
 	public function date() {
 		return $this->sentAt;
 	}
-
-
-	static function defineFilters()
-	{
-		return parent::defineFilters()
-		if (!empty($condition->inMailboxes)) {
-			$query->innerJoin('email_map', '`id` = `fk`')
-				->andWhereIn('email_map.mailBoxId', $condition->inMailboxes);
-		}
-	}
-
-//	public function populate(array $vars)
-//	{
-//		parent::populate($vars);
-//
-//		return $this;
-//	}
-
 
 	/**
 	 * If we fetch body properties we need to select to uid to fetch it from IMAP
@@ -373,25 +290,25 @@ class Email extends AclItemEntity {
 			return;
 		}
 		try {
-			$cmd = ImapBackend::connect()->cmd();
-
-
-			$mailbox = Mailbox::find()
-				->leftJoin('email_map m', 'm.mailboxId = t.id')
-				->where('m.fk = '.$this->id)
-				->fetch();
-
-			$cmd->open($mailbox->name);
-
-			list($this->_bodyStructure, $this->_bodyValues) = $cmd->fetchBody($this->uid);
-//			$this->_bodyStructure = $cmd->getBodyStructure($this, $this->uid);
-//			$this->_bodyValues = $cmd->getBodyValues($this->uid); // of previouse get structure
-
-			$this->_htmlBody = [];
-			$this->_textBody = [];
-			$_attachments = [];
-
-			$this->parseStructure([$this->_bodyStructure], 'mixed', false, $this->_htmlBody, $this->_textBody, $_attachments);
+//			$cmd = ImapBackend::connect()->cmd();
+//
+//
+//			$mailbox = Mailbox::find()
+//				->leftJoin('email_map m', 'm.mailboxId = t.id')
+//				->where('m.fk = '.$this->id)
+//				->fetch();
+//
+//			$cmd->open($mailbox->name);
+//
+//			list($this->_bodyStructure, $this->_bodyValues) = $cmd->fetchBody($this->uid);
+////			$this->_bodyStructure = $cmd->getBodyStructure($this, $this->uid);
+////			$this->_bodyValues = $cmd->getBodyValues($this->uid); // of previouse get structure
+//
+//			$this->_htmlBody = [];
+//			$this->_textBody = [];
+//			$_attachments = [];
+//
+//			$this->parseStructure([$this->_bodyStructure], 'mixed', false, $this->_htmlBody, $this->_textBody, $_attachments);
 		} catch(\RuntimeException $e) {
 			$this->_htmlBody = [$e->getMessage()];
 			// TODO: let user know email body didn't exist? if so
@@ -524,46 +441,14 @@ class Email extends AclItemEntity {
 		}
 	}
 
-	public function internalSave(): bool
+
+	protected static function aclEntityClass(): string
 	{
-		if ($this->isNew()) {
-
-
-		} else if(isset($this->dkeywords)) {
-			$me = go()->getDbConnection()->query()->select('uid, keywords, email_map.mailboxId as mailboxId')->from(self::from())
-				->innerJoin('email_map', '`id` = `fk`')->where(['id' => $this->id])
-				->prepare()->fetch();
-
-			// todo: remove flasgs also
-			// $mailbox = Mailbox::find()->where(['id' => $me->mailboxId])->fetch();
-			// if(!ImapBackend::connect()->select($mailbox)->setFlags($this->getKeywords(), $me->uid)){
-			// 	return false;
-			// }
-			// // merge into true only keywords
-			// $keywords = (object)array_filter(
-			// 	array_merge(json_decode($me->keywords,true), json_decode($this->keywords, true)),
-			// 	fn($v) => $v === true
-			// );
-			// $this->keywords = json_encode($keywords);
-			//$success = parent::save();
-			// if($modified) {
-			// 	$modified->keywords = $keywords;
-			// }
-			// return $modified;
-		}
-
-		// if($this->mailboxIds) {
-		// 	foreach($this->mailboxIds as $id) {
-		// 		EmailMap::add($this, $id);
-		// 	}
-		// }
-		return parent::internalSave();
+		return EmailAccount::class;
 	}
 
-	private function makePreview()
+	protected static function aclEntityKeys(): array
 	{
-		$text = $this->textBody;
-		return substr($text, 0, 256);
+		return ['accountId'=>'id'];
 	}
-
 }

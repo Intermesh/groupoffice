@@ -13,7 +13,7 @@ import {
 } from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
 
-export class IdentityDialog extends Window {
+export class IdentityWindow extends Window {
 
 	form: DataSourceForm
 

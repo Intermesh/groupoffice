@@ -1,0 +1,10 @@
+DROP TABLE `email_mailbox_user`;
+DROP TABLE `email_address`;
+DROP TABLE `email_id`;
+DROP TABLE `email_submission`;
+DROP TABLE `email_identity`;
+DROP TABLE `email_map`;
+DROP TABLE `email_email`;
+DROP TABLE `email_thread`;
+DROP TABLE `email_mailbox`;
+DROP TABLE `email_account`;
