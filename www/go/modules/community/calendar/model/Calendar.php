@@ -10,6 +10,7 @@ use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\PrincipalTrait;
 use go\core\orm\Query;
+use go\core\orm\Relation;
 
 /**
  * Calendar entity
@@ -67,8 +68,8 @@ class Calendar extends AclOwnerEntity {
 		return parent::defineMapping()
 			->addTable("calendar_calendar")
 			->addUserTable('calendar_calendar_user', 'caluser',['id' => 'id'], self::UserProperties)
-			->addMap('defaultAlertsWithTime', DefaultAlert::class,  ['id'=>'fk'])
-			->addMap('defaultAlertsWithoutTime', DefaultAlertWT::class,  ['id'=>'fk']);
+			->add('defaultAlertsWithTime', Relation::map(DefaultAlert::class)->keys(['id'=>'fk']))
+			->add('defaultAlertsWithoutTime', Relation::map(DefaultAlertWT::class)->keys(['id'=>'fk']));
 	}
 
 	protected static function textFilterColumns(): array
