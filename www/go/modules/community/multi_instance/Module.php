@@ -147,6 +147,8 @@ class Module extends \go\core\Module {
 			$i[$version][] = $instance->hostname;
 		}
 
+		ksort($i);
+
 	//	$i['6.5'] = ['test.65', 'test2.65', 'test.65', 'test2.65', 'test.65', 'test2.65'];
 
 		$tpl = file_get_contents(__DIR__ . '/site-conf.tpl');
