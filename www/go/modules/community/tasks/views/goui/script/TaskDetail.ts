@@ -1,7 +1,7 @@
-import {addbutton, DetailPanel, filesbutton, img, jmapds, linkbrowserbutton} from "@intermesh/groupoffice-core";
+import {addbutton, client, DetailPanel, filesbutton, img, jmapds, linkbrowserbutton} from "@intermesh/groupoffice-core";
 import {
-	a, avatar, br,
-	btn,
+	avatar,
+	btn, Button,
 	comp,
 	datasourceform,
 	DataSourceForm,
@@ -13,9 +13,14 @@ import {
 } from "@intermesh/goui";
 import {ProgressType} from "./Main.js";
 import {ContinueTaskDialog} from "./ContinueTaskDialog.js";
+import {TaskDialog} from "./TaskDialog.js";
 
 export class TaskDetail extends DetailPanel {
 	private form: DataSourceForm;
+
+	private assignMeBtn: Button;
+	private deleteBtn: Button;
+	private editBtn: Button;
 
 	constructor() {
 		super("Task");
@@ -155,7 +160,7 @@ export class TaskDetail extends DetailPanel {
 
 		this.items.add(
 			tbar({
-				cls: "border-top"
+					cls: "border-top"
 				},
 				"->",
 				btn({
@@ -173,17 +178,21 @@ export class TaskDetail extends DetailPanel {
 		this.on("load", (detailPanel, entity) => {
 			this.title = entity.title;
 
+			this.editBtn.disabled = (entity.permissionLevel < go.permissionLevels.write);
+			this.deleteBtn.disabled = (entity.permissionLevel < go.permissionLevels.writeAndDelete);
+			this.assignMeBtn.hidden = (entity.responsibleUserId);
+
 			void this.form.load(entity.id);
 		});
 
-
-
 		this.toolbar.items.add(
-			btn({
+			this.editBtn = btn({
 				icon: "edit",
 				title: t("Edit"),
 				handler: () => {
-
+					const dlg = new TaskDialog();
+					void dlg.load(this.form.currentId!);
+					dlg.show();
 				}
 			}),
 			addbutton(),
@@ -208,14 +217,28 @@ export class TaskDetail extends DetailPanel {
 						}
 					}),
 					hr(),
-					btn({
+					this.deleteBtn = btn({
 						icon: "delete",
 						text: t("Delete"),
 						handler: () => {
-
+							void jmapds("Task").confirmDestroy([this.form.currentId!]);
 						}
 					})
 				)
+			})
+		);
+
+		this.toolbar.items.insert(-this.toolbar.items.count(),
+			this.assignMeBtn = btn({
+				text: t("Assign me"),
+				handler: async () => {
+					this.mask();
+					await jmapds("Task").update(this.form.currentId!, {
+						responsibleUserId: client.user.id
+					});
+					this.unmask();
+				},
+				hidden: true
 			})
 		);
 	}
