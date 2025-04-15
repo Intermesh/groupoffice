@@ -174,8 +174,9 @@ class Module extends \go\core\Module {
 
 		$tld = $this->getTLD();
 
+		$withWopi = [];
 		// Each instance must have a dedicated WOPI subdomain for Microsoft: https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/online/build-test-ship/environments#wopi-discovery-urls
-		$wopialiases = array_map(function($hostname) {
+		foreach($hostnames as $hostname) {
 			$parts = explode(".", $hostname);
 			$first = array_shift($parts);
 			$alias = $first . '.wopi';
@@ -183,13 +184,15 @@ class Module extends \go\core\Module {
 			if(count($parts)) {
 				$alias .= '.' . implode("." , $parts);
 			}
-			return $alias;
-		}, $hostnames);
+
+			$withWopi[] = $hostname;
+			$withWopi[] = $alias;
+		};
 
 		$replacements = [
 			'{docroot}' => $version == 'DEFAULT' ? go()->getEnvironment()->getInstallFolder()->getPath() : '/usr/local/share/groupoffice-' . $version . '/www',
-			'{aliases}' => $version == 'DEFAULT' ? '*.' . $tld .' ' .$this->implode($hostnames) : $this->implode($hostnames),
-			'{wopialiases}' => $version == 'DEFAULT' ? '*.wopi.' . $tld .' ' .$this->implode($wopialiases) : $this->implode($wopialiases),
+			'{aliases}' => $version == 'DEFAULT' ? '*.' . $tld .' *.wopi.' . $tld .' ' .$this->implode($withWopi) : $this->implode($withWopi),
+
 			'{tld}' => $tld,
 			'{servername}' => strtolower(str_replace('.', '', $version)) . '.' . $tld,
 			'{version}' => str_replace('.', '', $version)

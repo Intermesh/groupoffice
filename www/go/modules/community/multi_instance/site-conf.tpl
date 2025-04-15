@@ -1,44 +1,4 @@
 <VirtualHost *:443>
-
-# Each instance must have a dedicated WOPI subdomain for Microsoft:
-# https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/online/build-test-ship/environments#wopi-discovery-urls
-
-Define DOC_ROOT_{version} {docroot}
-ServerName {version}.wopi.{tld}
-ServerAlias {wopialiases}
-DocumentRoot ${DOC_ROOT_{version}}
-
-#Include hostname for multi instance
-LogFormat "%V %h %l %u %t \"%r\" %s %b" vcommon
-ErrorLogFormat "[%V] [%t] [%l] [pid %P] %F: %E: [client %a] %M"
-ErrorLog ${APACHE_LOG_DIR}/groupoffice_error.log
-CustomLog ${APACHE_LOG_DIR}/groupoffice_access.log vcommon
-
-<Directory ${DOC_ROOT_{version}}>
-Require all granted
-AllowOverride None
-Options FollowSymLinks
-</Directory>
-
-#For WOPI (O365 and LibreOffice online) support
-Alias /wopi ${DOC_ROOT_{version}}/go/modules/business/wopi/wopi.php
-
-SSLEngine on
-SSLCertificateKeyFile /etc/letsencrypt/live/wopi.{tld}/privkey.pem
-SSLCertificateFile /etc/letsencrypt/live/wopi.{tld}/fullchain.pem
-
-# Optionally enable php fpm to run different PHP version
-## Increased timeout for long running requests (sse, activesync)
-#ProxyTimeout 1800
-#
-##Pass authorization header
-#SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
-#<FilesMatch \.php$>
-#    SetHandler "proxy:unix:/run/php/php8.2-fpm.sock|fcgi://localhost"
-#</FilesMatch>
-</VirtualHost>
-
-<VirtualHost *:443>
 Define DOC_ROOT_{version} {docroot}
 ServerName {servername}
 ServerAlias {aliases}
