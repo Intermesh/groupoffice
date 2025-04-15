@@ -1,6 +1,7 @@
+15-04-2025: 6.8.117
 - Files: fix ACL issues when restoring files or folders to their original position
 - Files: Disable new webdav locking by default to test it more. can be enabled with $config['webdavEnableLocks'] = true;
-- 
+ 
 14-04-2025: 6.8.116
 - sync: workaround for Z-push error SyncObject->Check(): object from type SyncMail: parameter 'to' contains an invalid email address 'undisclosed-recipients:'. Address is removed.
 - tasks: correct invalid state where due is before start date
