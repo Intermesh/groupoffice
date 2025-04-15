@@ -92,6 +92,8 @@ class ICalendarHelper {
 				}
 			}
 		}
+		// this will remove the invalid UTF-8 characters for XML response in caldav.
+		$vcalendar->validate(VObject\Node::REPAIR);
 
 		return $vcalendar;
 	}
