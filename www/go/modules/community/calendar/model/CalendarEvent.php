@@ -22,6 +22,7 @@ use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
+use go\core\orm\Relation;
 use go\core\orm\SearchableTrait;
 use go\core\util\JSON;
 use go\core\util\UUID;
@@ -237,15 +238,12 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 		return parent::defineMapping()
 			->addTable('calendar_calendar_event', 'cce', ['eventId' => 'eventId'], ['id', 'calendarId'])
 			->addTable('calendar_event', "eventdata", ['eventId' => 'eventId'], self::EventProperties)
-			//->addTable('calendar_calendar','cal',['cce.calendarId' => 'id'], ['ownerId']) // fetch calendar ownerId
 			->addUserTable('calendar_event_user', 'eventuser', ['cce.eventId' => 'eventId'],self::UserProperties)
-			//->addHasOne('recurrenceRule', RecurrenceRule::class, ['id' => 'eventId'])
-			->addMap('participants', Participant::class, ['eventId' => 'eventId'])
-			->addMap('recurrenceOverrides', RecurrenceOverride::class, ['eventId'=>'fk'])
-			->addMap('alerts', Alert::class, ['eventId' => 'fk'])
-			->addMap('links', Link::class, ['eventId' => 'eventId'])
-			->addScalar('categoryIds', 'calendar_event_category', ['eventId' => 'eventId']);
-			//->addMap('locations', Location::class, ['id' => 'eventId']);
+			->add('participants',Relation::map(Participant::class)->keys(['eventId' => 'fk']))
+			->add('recurrenceOverrides',Relation::map(RecurrenceOverride::class)->keys(['eventId' => 'fk']))
+			->add('alerts',Relation::map(Alert::class)->keys(['eventId' => 'fk']))
+			->add('links',Relation::map(Link::class)->keys(['eventId' => 'eventId']))
+			->add('categoryIds',Relation::scalar('calendar_event_category')->keys(['eventId' => 'eventId']));
 	}
 
 	/**
