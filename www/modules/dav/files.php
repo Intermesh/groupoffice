@@ -59,7 +59,7 @@ $baseUri = strpos($_SERVER['REQUEST_URI'],'files.php') ? \GO::config()->host . '
 $server->setBaseUri($baseUri);
 
 // Support for LOCK and UNLOCK
-if(empty(go()->getConfig()['filesEnableLocks'])) {
+if(empty(go()->getConfig()['webdavEnableLocks'])) {
 	$lockBackend = new Sabre\DAV\Locks\Backend\PDO(\GO::getDbConnection());
 	$lockBackend->tableName = 'dav_locks';
 } else {
