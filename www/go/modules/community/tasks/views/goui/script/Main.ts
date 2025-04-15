@@ -9,8 +9,7 @@ import {
 	hr,
 	menu, router,
 	searchbtn,
-	store,
-	t, table,
+	t,
 	tbar
 } from "@intermesh/goui";
 import {tasklistgrid, TasklistGrid} from "./TasklistGrid.js";
@@ -21,6 +20,7 @@ import {TasklistDialog} from "./TasklistDialog.js";
 import {SubscribeWindow} from "./SubscribeWindow.js";
 import {TaskCategoryDialog} from "./TaskCategoryDialog.js";
 import {TaskDialog} from "./TaskDialog.js";
+import {schedulefilter} from "./ScheduleFilter.js";
 
 export enum ProgressType {
 	'needs-action' = 'Needs action',
@@ -49,88 +49,49 @@ export class Main extends MainThreeColumnPanel {
 	}
 
 	protected createWest() {
-		const filterList = table({
-			headers: false,
-			fitParent: true,
-			cls: "no-row-lines tasks-filter-table",
-			store: store({
-				data: [
-					{
-						name: t("Today"),
-						icon: "content_paste",
-						iconCls: "green",
-						value: "today"
-					},
-					{
-						name: t("Due in seven days"),
-						icon: "filter_7",
-						iconCls: "purple",
-						value: "week"
-					},
-					{
-						name: t("All"),
-						icon: "assignment",
-						iconCls: "red",
-						value: "all"
-					},
-					{
-						name: t("Unscheduled"),
-						icon: "event_busy",
-						iconCls: "blue",
-						value: "unscheduled"
-					},
-					{
-						name: t("Scheduled"),
-						icon: "event",
-						iconCls: "orange",
-						value: "scheduled"
-					}
-				]
-			}),
-			columns: [
-				column({
-					id: "icon",
-					width: 32,
-					renderer: (value, record) => {
-						return comp({tagName: "i", cls: "icon " + record.iconCls, text: value});
-					}
-				}),
-				column({
-					id: "name"
-				})
-			],
-			rowSelectionConfig: {
-				multiSelect: false,
-				listeners: {
-					selectionchange: (rowSelect) => {
-						const value = rowSelect.getSelected().map((row) => row.record.value)[0];
-
-						const filters: Record<string, Filter> = {
-							today: {start: "<=now"},
-							week: {due: "<=7days"},
-							unscheduled: {scheduled: false},
-							scheduled: {scheduled: true},
-							all: {}
-						};
-
-						const filter = filters[value];
-
-						if (filter) {
-							this.taskGrid.store.setFilter("status", filter);
-
-							void this.taskGrid.store.load();
-						}
-					}
-				}
-			}
-		});
-
 		return comp({
 				cls: "vbox scroll fit",
 				width: 300
 			},
 			this.showCenterButton(),
-			filterList,
+			schedulefilter({
+				columns: [
+					column({
+						id: "icon",
+						width: 32,
+						renderer: (value, record) => {
+							return comp({tagName: "i", cls: "icon " + record.iconCls, text: value});
+						}
+					}),
+					column({
+						id: "name"
+					})
+				],
+				rowSelectionConfig: {
+					multiSelect: false,
+					listeners: {
+						selectionchange: (rowSelect) => {
+							const value = rowSelect.getSelected().map((row) => row.record.value)[0];
+
+							const filters: Record<string, Filter> = {
+								today: {start: "<=now"},
+								week: {due: "<=7days"},
+								unscheduled: {scheduled: false},
+								scheduled: {scheduled: true},
+								all: {}
+							};
+
+							const filter = filters[value];
+
+							if (filter) {
+								this.taskGrid.store.setFilter("status", filter);
+
+								void this.taskGrid.store.load();
+							}
+						}
+					}
+				}
+			}),
 			comp({cls: "pad"},
 				checkbox({
 					value: true,
@@ -218,7 +179,15 @@ export class Main extends MainThreeColumnPanel {
 						}
 					},
 					columns: [
-						checkboxselectcolumn(),
+						checkboxselectcolumn({
+							id: "check",
+							listeners: {
+								render: (column1, result, record, storeIndex, td) => {
+									const checkbox = result as CheckboxField;
+									checkbox.color = "#" + record.color;
+								}
+							}
+						}),
 						column({
 							header: t("Name"),
 							id: "name",
