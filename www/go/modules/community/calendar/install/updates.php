@@ -269,5 +269,11 @@ $updates['202503131043'][] = "UPDATE core_link l
 $updates['202504070955'][] = "";
 
 $updates['202504071345'][] = "ALTER TABLE `calendar_event` CHANGE COLUMN `location` `location` TEXT NULL;";
+// replace existing resource into core_participants
+$updates['202504150919'][] = 'REPLACE INTO core_principal (id, name, email, type, description, timeZone, entityTypeId, entityId, aclId)
+SELECT concat("Calendar:", c.id), c.name, u.email, "resource", IFNULL(c.description, ""), c.timeZone, (select id from core_entity where name="Calendar"),  c.id, c.aclId from calendar_calendar c
+   join core_user u ON u.id = c.ownerId where c.groupId IS NOT NULL AND c.ownerId IS NOT NULL;';
+// set the participant id to the user id if the participant is an existing groupoffice user
+$updates["202504150959"][] = "UPDATE calendar_participant p INNER JOIN core_user u ON u.email = p.email COLLATE utf8mb4_unicode_ci AND p.id != u.id SET p.id = u.id WHERE kind = 'individual';";
 
 // TODO: calendar views -> custom filters
