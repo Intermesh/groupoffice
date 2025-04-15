@@ -1546,6 +1546,7 @@ abstract class Property extends Model {
 			}
 
 			$this->applyRelationKeys($relation, $newProp);
+			$this->applyRelationContants($relation, $newProp);
 
 			// this is also done in {@see Property::patchArray()} but that is only done when settings the relation via {@see setValues()}
 			// when setting the objects directy it relies on this procedure:
@@ -1679,8 +1680,9 @@ abstract class Property extends Model {
 		$insertIds = array_diff($new, $old);
 
 		if(!empty($insertIds)) {
-			$data = array_values(array_map(function($v) use($key, $where) {
-				return array_merge($where, [$key => $v]);
+			$constants = $relation->constants;
+			$data = array_values(array_map(function($v) use($key, $constants, $where) {
+				return array_merge($constants, $where, [$key => $v]);
 			}, $insertIds));
 
 			if(!go()->getDbConnection()->insert($relation->tableName, $data)->execute()) {
