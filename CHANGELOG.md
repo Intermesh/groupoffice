@@ -1,3 +1,5 @@
+- ActiveSync: Fix broken utf-8 when recreating MIME for Z-push
+
 15-04-2025: 6.8.117
 - Files: fix ACL issues when restoring files or folders to their original position
 - Files: Disable new webdav locking by default to test it more. can be enabled with $config['webdavEnableLocks'] = true;
