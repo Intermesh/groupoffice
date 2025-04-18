@@ -55,7 +55,9 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
 			if ($method->isStatic()) {
 				continue;
 			}
-
+if (strpos($method->getDocComment(), '@noapi') > 0) {
+				continue;
+			}
 			if (substr($method->getName(), 0, 3) == 'get') {
 
 				$params = $method->getParameters();
@@ -228,7 +230,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
 	public static function getApiProperties(): array
 	{
 		$cacheKey = 'api-props-' . static::class;
-		
+
 		$ret = App::get()->getCache()->get($cacheKey);
 		if ($ret !== null) {
 			return $ret;
