@@ -136,7 +136,7 @@ class Router {
 			// convert jmap classes to set error response
 			// https://jmap.io/spec-core.html#errors
 			$error = [
-				"message" => $e->getMessage(),
+				"message" => $type,
 				"type" => $type
 			];
 			
