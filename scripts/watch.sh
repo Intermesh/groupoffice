@@ -28,7 +28,8 @@ npm start &
 
 
 echo "Building SASS"
-cd $DIR;
+cd $DIR/www/
+
 for line in $(find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*' | sort -r );
 do
   replace1=${line/src\/style.scss/style.css};
@@ -37,9 +38,6 @@ do
 	$SASS $line $replace3 &
 done
 
-
-
 buildGOUI "./www/go/modules"
-
 
 wait;
