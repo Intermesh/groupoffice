@@ -1,4 +1,5 @@
 - ActiveSync: Fix broken utf-8 when recreating MIME for Z-push
+- Comments: use translations for tasks feedback
 
 15-04-2025: 6.8.117
 - Files: fix ACL issues when restoring files or folders to their original position
