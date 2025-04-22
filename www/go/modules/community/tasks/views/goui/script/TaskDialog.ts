@@ -201,8 +201,8 @@ export class TaskDialog extends FormWindow {
 							flex: 1,
 							label: t("Percent complete"),
 							name: "percentComplete",
-							step: 10,
 							value: 0,
+							step: 10,
 							max: 100
 						}),
 						prioritycombo({
@@ -278,12 +278,14 @@ export class TaskDialog extends FormWindow {
 						name: "alerts",
 						buildField: (value) => {
 							return containerfield({
+									name: "trigger",
 									cls: "group"
 								},
 								datefield({
 									name: "when",
 									withTime: true,
-									flex: 2
+									flex: 2,
+									value: new DateTime().format("Y-m-d")
 								}),
 								btn({
 									icon: "delete",
@@ -299,7 +301,7 @@ export class TaskDialog extends FormWindow {
 						cls: "primary outlined",
 						text: t("Add alert"),
 						handler: (btn) => {
-							btn.parent?.findChildByType(ArrayField)?.addValue({when: ''});
+							btn.parent?.findChildByType(ArrayField)?.addValue({});
 						}
 					})
 				)

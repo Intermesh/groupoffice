@@ -5,19 +5,20 @@ import {
 	comp, DataSourceStore,
 	datasourcestore,
 	datecolumn,
-	Format, StoreRecord,
+	Format, span, StoreRecord,
 	t,
 	Table, Window
 } from "@intermesh/goui";
 import {img, jmapds} from "@intermesh/groupoffice-core";
 import {ProgressType} from "./Main.js";
+import {TaskDialog} from "./TaskDialog.js";
 
 export class TaskGrid extends Table<DataSourceStore> {
 	constructor() {
 		super(
 			datasourcestore({
 				dataSource: jmapds("Task"),
-				sort: [{property: "start", isAscending: true}],
+				sort: [{property: "tasklist", isAscending: true}, {property: "start", isAscending: true}],
 				relations: {
 					responsible: {
 						path: "responsibleUserId",
@@ -70,7 +71,7 @@ export class TaskGrid extends Table<DataSourceStore> {
 					hidden: true,
 					width: 80,
 					sortable: true,
-					align: "right",
+					align: "right"
 				}),
 				column({
 					id: "title",
@@ -83,7 +84,8 @@ export class TaskGrid extends Table<DataSourceStore> {
 						}
 
 						return columnValue;
-					}
+					},
+					resizable: true
 				}),
 				column({
 					id: "icons",
@@ -116,7 +118,8 @@ export class TaskGrid extends Table<DataSourceStore> {
 						}
 
 						return v;
-					}
+					},
+					resizable: true
 				}),
 				datecolumn({
 					id: "start",
@@ -126,7 +129,8 @@ export class TaskGrid extends Table<DataSourceStore> {
 					hidden: false,
 					renderer: (columnValue, record, td, table) => {
 						return this.startDueRenderer(columnValue, record, td);
-					}
+					},
+					resizable: true
 				}),
 				datecolumn({
 					id: "due",
@@ -135,7 +139,8 @@ export class TaskGrid extends Table<DataSourceStore> {
 					sortable: true,
 					renderer: (columnValue, record, td, table) => {
 						return this.startDueRenderer(columnValue, record, td);
-					}
+					},
+					resizable: true
 				}),
 				column({
 					id: "responsible",
@@ -158,7 +163,8 @@ export class TaskGrid extends Table<DataSourceStore> {
 									displayName: record.responsible.name
 								}),
 							comp({cls: "tasks-principal-name", text: record.responsible.name}));
-					}
+					},
+					resizable: true
 				}),
 				column({
 					id: "project",
@@ -167,7 +173,8 @@ export class TaskGrid extends Table<DataSourceStore> {
 					sortable: true,
 					renderer: (columnValue) => {
 						return columnValue ? columnValue.name : "-";
-					}
+					},
+					resizable: true
 				}),
 				column({
 					id: "percentComplete",
@@ -178,7 +185,8 @@ export class TaskGrid extends Table<DataSourceStore> {
 						return comp({cls: "go-progressbar"},
 							comp({style: {width: `${Math.ceil(columnValue)}%`}})
 						)
-					}
+					},
+					resizable: true
 				}),
 				column({
 					id: "progress",
@@ -190,21 +198,24 @@ export class TaskGrid extends Table<DataSourceStore> {
 							cls: "status tasks-status-" + columnValue,
 							html: ProgressType[columnValue as keyof typeof ProgressType]
 						});
-					}
+					},
+					resizable: true
 				}),
 				datecolumn({
 					id: "createdAt",
 					header: t("Created at"),
 					width: 160,
 					sortable: true,
-					hidden: true
+					hidden: true,
+					resizable: true
 				}),
 				datecolumn({
 					id: "modifiedAt",
 					header: t("Modified at"),
 					width: 160,
 					sortable: true,
-					hidden: true
+					hidden: true,
+					resizable: true
 				}),
 				column({
 					id: "creator",
@@ -214,7 +225,8 @@ export class TaskGrid extends Table<DataSourceStore> {
 					renderer: (columnValue) => {
 						return columnValue ? columnValue.name : "-";
 					},
-					hidden: true
+					hidden: true,
+					resizable: true
 				}),
 				column({
 					id: "tasklist",
@@ -224,7 +236,8 @@ export class TaskGrid extends Table<DataSourceStore> {
 					renderer: (columnValue) => {
 						return columnValue ? columnValue.name : "-";
 					},
-					hidden: true
+					hidden: true,
+					resizable: true
 				}),
 				column({
 					id: "modifier",
@@ -234,7 +247,8 @@ export class TaskGrid extends Table<DataSourceStore> {
 					renderer: (columnValue) => {
 						return columnValue ? columnValue.name : "-";
 					},
-					hidden: true
+					hidden: true,
+					resizable: true
 				}),
 				column({
 					id: "categories",
@@ -245,7 +259,8 @@ export class TaskGrid extends Table<DataSourceStore> {
 						return columnValue.map((v: {
 							name: any;
 						}) => '<span class="tasks-category">' + Ext.util.Format.htmlEncode(v.name) + '</span>').join("");
-					}
+					},
+					resizable: true
 				}),
 				column({
 					id: "estimatedDuration",
@@ -258,11 +273,62 @@ export class TaskGrid extends Table<DataSourceStore> {
 							return Format.duration(columnValue, false);
 						}
 						return "";
-					}
-				}),
+					},
+					resizable: true
+				})
 				// TODO: time booked
 			]
 		);
+
+		this.on("rowdblclick", async (table, rowIndex, ev) => {
+			const dlg = new TaskDialog();
+			await dlg.load(table.store.get(rowIndex)!.id);
+			dlg.show();
+		});
+
+		this.groupBy = "tasklist";
+
+		this.groupByRenderer = async (grouping) => {
+			if (!grouping) {
+				return t("List: None");
+			}
+
+			const groupRow = comp({
+					cls: "hbox tasks-tasklist-row"
+				},
+				span({
+					itemId: "tasks-tasklist-icon",
+					cls: "icon",
+					text: "expand_more"
+				}),
+				comp({
+					text: t("List") + ": " + grouping.name,
+					style: {color: `#${grouping.color}`}
+				})
+			);
+
+			groupRow.el.addEventListener("click", (ev) => {
+				const groupContainer = groupRow.el.closest("tbody");
+				if (!groupContainer) {
+					return
+				}
+
+				const icon = groupRow.findChild("tasks-tasklist-icon")!;
+				icon.text == "expand_more" ? icon.text = "chevron_right" : icon.text = "expand_more";
+
+				const dataRows = groupContainer.querySelectorAll("tr.data");
+
+				dataRows.forEach((row) => {
+					const tableRow = row as HTMLTableRowElement;
+
+					tableRow.style.display == "none" ? tableRow.style.display = "" : tableRow.style.display = "none";
+				});
+			});
+
+			return groupRow;
+		}
+
+		this.draggable = true;
 	}
 
 	private startDueRenderer(columnValue: string, record: StoreRecord, td: HTMLTableCellElement) {

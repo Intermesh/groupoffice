@@ -27,8 +27,7 @@ export class ContinueTaskDialog extends FormWindow {
 		this.width = 700;
 		this.resizable = true;
 		this.maximizable = false;
-
-		this.collapsible = true;
+		this.modal = true;
 
 		const tomorrow = new DateTime();
 		tomorrow.setDate(tomorrow.getDate() + 1);

@@ -7,10 +7,10 @@ import {
 	Filter,
 	h3,
 	hr,
-	menu, router,
+	menu, mstbar, MultiSelectToolbar, router,
 	searchbtn,
-	t,
-	tbar
+	t, Table,
+	tbar, Toolbar, Window
 } from "@intermesh/goui";
 import {tasklistgrid, TasklistGrid} from "./TasklistGrid.js";
 import {TaskGrid} from "./TaskGrid.js";
@@ -21,6 +21,7 @@ import {SubscribeWindow} from "./SubscribeWindow.js";
 import {TaskCategoryDialog} from "./TaskCategoryDialog.js";
 import {TaskDialog} from "./TaskDialog.js";
 import {schedulefilter} from "./ScheduleFilter.js";
+import {ImportTaskDialog} from "./ImportTaskDialog.js";
 
 export enum ProgressType {
 	'needs-action' = 'Needs action',
@@ -39,6 +40,8 @@ export class Main extends MainThreeColumnPanel {
 	private assignedToMeCheckbox!: CheckboxField;
 	private unassignedCheckbox!: CheckboxField;
 
+	private taskGridToolbar!: Toolbar;
+
 	constructor() {
 		super("tasks");
 
@@ -49,7 +52,7 @@ export class Main extends MainThreeColumnPanel {
 	}
 
 	protected createWest() {
-		return comp({
+		const west = comp({
 				cls: "vbox scroll fit",
 				width: 300
 			},
@@ -164,6 +167,8 @@ export class Main extends MainThreeColumnPanel {
 				this.taskListGrid = tasklistgrid({
 					fitParent: true,
 					cls: "no-row-lines",
+					dropOn: true,
+					sortableGroup: "TaskToList",
 					rowSelectionConfig: {
 						multiSelect: true,
 						listeners: {
@@ -312,11 +317,27 @@ export class Main extends MainThreeColumnPanel {
 				entityName: "Task"
 			})
 		);
+
+		this.taskListGrid.on("drop", async (toComponent, toIndex, fromIndex, droppedOn, fromComp, dragDataSet) => {
+			const fromTable = fromComp as Table;
+
+			const tasklist = toComponent.store.get(toIndex);
+			const task = fromTable.store.get(fromIndex);
+
+			if (tasklist && task) {
+				void jmapds("Task").update(task.id, {tasklistId: tasklist.id});
+				void fromTable.store.load();
+			}
+		});
+
+		return west;
 	}
 
 	protected createCenter() {
 		this.taskGrid = new TaskGrid();
 		this.taskGrid.fitParent = true;
+		this.taskGrid.draggable = true;
+		this.taskGrid.sortableGroup = "TaskToList";
 		void this.taskGrid.store.load();
 
 		this.taskGrid.rowSelectionConfig = {
@@ -328,6 +349,8 @@ export class Main extends MainThreeColumnPanel {
 					if (taskIds[0]) {
 						router.goto("tasks/" + taskIds[0]);
 					}
+
+					taskIds.length > 1 ? this.taskGridToolbar.hide() : this.taskGridToolbar.show();
 				}
 			}
 		}
@@ -336,7 +359,7 @@ export class Main extends MainThreeColumnPanel {
 				cls: "vbox bg-lowest",
 				flex: 1
 			},
-			tbar({
+			this.taskGridToolbar = tbar({
 					cls: "bg-mid border-bottom"
 				},
 				this.showWestButton(),
@@ -364,21 +387,108 @@ export class Main extends MainThreeColumnPanel {
 							icon: "cloud_upload",
 							text: t("Import"),
 							handler: () => {
-
+								const dlg = new ImportTaskDialog();
+								dlg.show();
 							}
 						}),
 						btn({
 							icon: "cloud_download",
-							text: t("Export")
+							text: t("Export"),
+							menu: menu({},
+								btn({
+									icon: "calendar_today",
+									text: t("vCalendar"),
+									handler: () => {
+										go.util.exportToFile(
+											"Task",
+											this.taskGrid.store.queryParams,
+											"ics"
+										);
+									}
+								}),
+								btn({
+									icon: "unknown_document",
+									text: t("Microsoft Excel"),
+									handler: () => {
+										go.util.exportToFile(
+											"Task",
+											this.taskGrid.store.queryParams,
+											"xlsx"
+										);
+									}
+								}),
+								btn({
+									icon: "csv",
+									text: "Comma Seperated Values",
+									handler: () => {
+										go.util.exportToFile(
+											"Task",
+											this.taskGrid.store.queryParams,
+											"csv"
+										);
+									}
+								}),
+								btn({
+									icon: "html",
+									text: t("Web page") + " (HTML)",
+									handler: () => {
+										go.util.exportToFile(
+											"Task",
+											this.taskGrid.store.queryParams,
+											"html"
+										);
+									}
+								})
+							)
 						}),
+						hr(),
 						btn({
 							icon: "delete",
 							text: t("Delete"),
 							handler: () => {
+								const taskIds = this.taskGrid.rowSelection!.getSelected().map((row) => row.record.id);
 
+								jmapds("Task").confirmDestroy(taskIds);
 							}
 						})
 					)
+				})
+			),
+			mstbar({
+					table: this.taskGrid
+				},
+				"->",
+				btn({
+					icon: "merge",
+					handler: async () => {
+						const taskIds = this.taskGrid.rowSelection!.getSelected().map((row) => row.record.id);
+
+						if (taskIds.length < 2) {
+							Window.alert(t("Please select at least two items"), t("Error"));
+						} else {
+							const confirmed = await Window.confirm(t("The selected items will be merged into one. The item you selected first will be used primarily. Are you sure?"), t("Merge"));
+
+							if (confirmed) {
+								try {
+									const result = await jmapds("Task").merge(taskIds);
+
+									const dlg = new TaskDialog();
+									await dlg.load(result.id);
+									dlg.show();
+								} catch (e) {
+									Window.error(e);
+								}
+							}
+						}
+					}
+				}),
+				btn({
+					icon: "delete",
+					handler: () => {
+						const taskIds = this.taskGrid.rowSelection!.getSelected().map((row) => row.record.id);
+
+						jmapds("Task").confirmDestroy(taskIds);
+					}
 				})
 			),
 			comp({cls: "scroll", flex: 1},
