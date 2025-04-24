@@ -1,5 +1,7 @@
 import {client, modules, router} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
+import { t } from "@intermesh/goui";
+import {SettingsPanel} from "./SettingsPanel.js";
 
 const tester = true;
 
@@ -23,6 +25,10 @@ if (tester) {
 				modules.addMainPanel("community", "tasks", "tasks", "Tasks", () => {
 					tasks = new Main();
 					return tasks;
+				});
+
+				modules.addAccountSettingsPanel("community", "tasks", "tasks", t("Tasks"), "check", () => {
+					return new SettingsPanel();
 				});
 			});
 		}
