@@ -1,5 +1,6 @@
 - ActiveSync: Fix broken utf-8 when recreating MIME for Z-push
 - Comments: use translations for tasks feedback
+- Core: Reset create link button on close so it won't fail when dialogs perform an async task before opening. This happened with documents in finance.
 
 15-04-2025: 6.8.117
 - Files: fix ACL issues when restoring files or folders to their original position
