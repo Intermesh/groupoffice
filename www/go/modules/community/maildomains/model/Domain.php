@@ -15,52 +15,48 @@ use go\modules\community\maildomains\util\DnsCheck;
 
 final class Domain extends AclOwnerEntity
 {
-	/** @var int */
-	public $id;
 
-	/** @var int */
-	public $userId;
+	public ?int $id;
+	public ?int $userId;
+	public string $domain;
+	public string|null $description;
 
-	/** @var string */
-	public $domain;
+	/**
+	 * Maximum number of aliases
+	 */
+	public int $maxAliases = 0;
 
-	/** @var string */
-	public $description;
+	/**
+	 * Maximum number of mailboxes
+	 *
+	 * @var int
+	 */
+	public int $maxMailboxes = 0;
 
-	/** @var int >= 0 */
-	public $maxAliases = 0;
 
-	/** @var int */
-	public $maxMailboxes = 0;
+	/**
+	 * Max assignable quota in bytes
+	 *
+	 * @var int
+	 */
+	public int $totalQuota = 0;
 
-	/** @var int */
-	public $totalQuota = 0;
+	/**
+	 * Default quota in bytes
+	 */
+	public int $defaultQuota = 0;
 
-	/** @var int */
-	public $defaultQuota = 0;
-
-	/** @var string */
-	public $transport;
-
-	/** @var bool */
-	public $backupMx = false;
-
-	/** @var int */
-	public $createdBy;
-
-	/** @var DateTime */
-	public $createdAt;
-
-	/** @var int */
-	public $modifiedBy;
-
-	/** @var DateTime */
-	public $modifiedAt;
+	public string $transport;
+	public bool $backupMx = false;
+	public ?int $createdBy;
+	public ?DateTime $createdAt;
+	public int $modifiedBy;
+	public ?DateTime $modifiedAt;
 
 	/** @var boolean */
-	public $active = true;
+	public bool $active = true;
 
-	public $spf;
+	public ?string $spf;
 
 	public $spfStatus;
 
@@ -73,15 +69,16 @@ final class Domain extends AclOwnerEntity
 	public $dmarcStatus;
 	public $dkim;
 
-
-	/** @var int Used quota in bytes */
-	public $sumUsedQuota;
-
-	/** @var int Disk usage in bytes */
-	public $sumUsage;
 	/**
-	 * @var mixed|null
+	 * Used quota in bytes
 	 */
+	public ?int $sumUsedQuota;
+
+	/**
+	 * Disk usage in bytes
+	 */
+	public ?int $sumUsage;
+
 	public bool $checkDNS = false;
 
 	/**

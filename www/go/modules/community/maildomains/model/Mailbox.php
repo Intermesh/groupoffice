@@ -23,12 +23,36 @@ final class Mailbox extends AclItemEntity
 	public int $domainId;
 	public string $username;
 	protected ?string $password;
+
+
+	/**
+	 * When enabled this user can login to all mailboxes of the domain using user@example.com*thisuser@example.com
+	 * @var bool
+	 */
 	public bool $domainOwner = false;
+
+	/**
+	 * Enable this account for SMTP
+	 *
+	 * @var bool
+	 */
 	public bool $smtpAllowed;
+
+	/**
+	 * Enable Full Text Search indexing for this mailbox
+	 *
+	 * @var bool
+	 */
 	public bool $fts;
 	public ?string $description;
 	public string $maildir;
 	public string $homedir;
+
+	/**
+	 * Quota in bytes
+	 *
+	 * @var int
+	 */
 	public int $quota;
 
 	/**
@@ -45,6 +69,12 @@ final class Mailbox extends AclItemEntity
 	public ?int $modifiedBy;
 	public ?DateTime $modifiedAt;
 	public bool $active = true;
+
+	/**
+	 * Usage in bytes
+	 *
+	 * @var int|null
+	 */
 	public ?int $bytes;
 	public ?int $messages;
 
@@ -309,7 +339,7 @@ final class Mailbox extends AclItemEntity
 		return $this->domain;
 	}
 
-	public function plainPassword(): string
+	public function plainPassword(): string | null
 	{
 		return $this->plainPassword;
 	}

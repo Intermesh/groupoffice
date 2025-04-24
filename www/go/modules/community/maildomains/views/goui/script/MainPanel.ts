@@ -41,6 +41,7 @@ export class MainPanel extends MainThreeColumnPanel {
     protected createWest(): Component {
 
 	    this.tbl = new DomainTable();
+			this.tbl.stateId = "maildomains-table";
 			this.tbl!.store.setFilter("active", {active: true});
 
 			this.tbl.rowSelection!.on("rowselect", rowSelect => {
