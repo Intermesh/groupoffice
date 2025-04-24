@@ -2,10 +2,6 @@
 	path = www/views/goui/groupoffice-core
 	url = ../groupoffice-core.git
 	branch = main
-[submodule "www/views/goui/goui"]
-	path = www/views/goui/goui
-	url = ../goui.git
-	branch = main
 [submodule "www/go/modules/community/activesync/Z-Push"]
 	path = www/go/modules/community/activesync/Z-Push
 	url = ../Z-Push.git

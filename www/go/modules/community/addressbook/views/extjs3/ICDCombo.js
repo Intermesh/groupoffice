@@ -1136,11 +1136,13 @@ const icdList = {
 const store = Ext.create({
 	xtype: 'jsonstore',
 	fields: ['iso6523', 'scheme-name'],
-	data: icdList,
 	root: 'values',
 	idProperty: 'iso6523',
 	autoDestroy: false
 });
+
+
+// filter by country
 
 Ext.define('go.modules.community.addressbook.ICDCombo',{
 	extend: go.form.ComboBox,
@@ -1156,7 +1158,19 @@ Ext.define('go.modules.community.addressbook.ICDCombo',{
 	forceSelection: true,
 	allowBlank: true,
 	mode: "local",
-	store: store
+	store: store,
+
+	loadCountry: (country) => {
+
+		const l = [];
+		icdList.values.forEach(i => {
+			if(i.country == country) {
+				l.push(i);
+			}
+		})
+
+		store.loadData({values: l}, false);
+	}
 });
 
 Ext.reg("icdcombo", go.modules.community.addressbook.ICDCombo);
