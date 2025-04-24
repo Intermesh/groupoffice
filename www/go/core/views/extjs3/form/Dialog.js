@@ -278,10 +278,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 			this.createLinkButton.setEntity(this.entityStore.entity.name, this.currentId);
 		}, this);
 
-		this.on("show", function() {
-			if(!this.currentId) {
-				this.createLinkButton.reset();
-			}
+		this.on("close", function() {
+			this.createLinkButton.reset();
 		}, this);
 
 		this.on("submit", function(dlg, success, serverId) {			
