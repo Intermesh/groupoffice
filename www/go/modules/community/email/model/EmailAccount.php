@@ -30,6 +30,9 @@ class EmailAccount extends AclOwnerEntity {
 	protected $mtaDsn; // smtp
 	protected $mdaDsn; // imap
 
+	public $createdAt;
+	public $modifiedAt;
+
 	
 	protected static function defineMapping(): Mapping
 	{
@@ -127,6 +130,10 @@ class EmailAccount extends AclOwnerEntity {
 		}
 
 		$data->pass = Crypt::decrypt($data->pass);
-		return ImapBackend::connect($data, $this);
+		try {
+			return ImapBackend::connect($data, $this);
+		} catch(\ErrorException $e) {
+			throw new \Exception('No connection to IMAP host '.$data->host);
+		}
 	}
 }

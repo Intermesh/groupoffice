@@ -23,6 +23,12 @@ class Email extends EntityController {
 	}
 
 	public function get($params) {
+		if(!isset($params['properties'])) {
+			$params['properties'] = ["id","accountId", "blobId", "threadId", "mailboxIds", "keywords", "size",
+				"receivedAt", "messageId", "inReplyTo", "references", "sender", "from",
+				"to", "cc", "bcc", "replyTo", "subject", "sentAt", "hasAttachment",
+				"preview"];
+		}
 		return $this->defaultGet($params);
 	}
 

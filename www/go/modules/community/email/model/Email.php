@@ -80,7 +80,7 @@ class Email extends AclItemEntity {
 	private $_htmlBody;
 
 	/** @var string only if not in textBody or textHtml and not `multipart/*` */
-	protected ?string $attachments;
+	public $attachments;
 
 	/** @var boolean true if there is 1 attachement that is not inline or embedded */
 	public ?bool $hasAttachment;
@@ -105,7 +105,7 @@ class Email extends AclItemEntity {
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
-			->addTable('email_email')
+			->addTable('email_email', 'e')
 			->add('mailboxIds', Relation::scalar('email_map', 'mailboxId')->keys(['id' => 'fk']))
 			->add('messageId', Relation::scalar('email_id','messageId')->keys(['id' => 'fk'])->constants(['type'=>'messageId']))
 			->add('inReplyTo', Relation::scalar('email_id','messageId')->keys(['id' => 'fk'])->constants(['type'=>'inReplyTo']))
@@ -268,18 +268,18 @@ class Email extends AclItemEntity {
 	 * @param array $props
 	 * @return string[]
 	 */
-	static public function fetchProps($props) {
-		if(empty($props)) {
-			$props = self::defaultProps;
-		}
-		foreach (['htmlBody', 'textBody', 'attachments', 'bodyStructure', 'bodyValues'] as $p) {
-			if (in_array($p, $props)) {
-				$props[] = 'uid'; // needed for imap fetch
-				break;
-			}
-		}
-		return $props;
-	}
+//	static public function fetchProps($props) {
+//		if(empty($props)) {
+//			$props = self::defaultProps;
+//		}
+//		foreach (['htmlBody', 'textBody', 'attachments', 'bodyStructure', 'bodyValues'] as $p) {
+//			if (in_array($p, $props)) {
+//				$props[] = 'uid'; // needed for imap fetch
+//				break;
+//			}
+//		}
+//		return $props;
+//	}
 
 	/**
 	 * Get the body parts (only IMAP backend for now)
@@ -290,28 +290,26 @@ class Email extends AclItemEntity {
 			return;
 		}
 		try {
-//			$cmd = ImapBackend::connect()->cmd();
-//
-//
-//			$mailbox = Mailbox::find()
-//				->leftJoin('email_map m', 'm.mailboxId = t.id')
-//				->where('m.fk = '.$this->id)
-//				->fetch();
-//
-//			$cmd->open($mailbox->name);
-//
-//			list($this->_bodyStructure, $this->_bodyValues) = $cmd->fetchBody($this->uid);
-////			$this->_bodyStructure = $cmd->getBodyStructure($this, $this->uid);
-////			$this->_bodyValues = $cmd->getBodyValues($this->uid); // of previouse get structure
-//
-//			$this->_htmlBody = [];
-//			$this->_textBody = [];
-//			$_attachments = [];
-//
-//			$this->parseStructure([$this->_bodyStructure], 'mixed', false, $this->_htmlBody, $this->_textBody, $_attachments);
-		} catch(\RuntimeException $e) {
-			$this->_htmlBody = [$e->getMessage()];
-			// TODO: let user know email body didn't exist? if so
+			$account = EmailAccount::findById($this->accountId);
+			$imapConnection = $account->connect();
+			$mailbox = Mailbox::find()
+				->join('email_map','m', 'm.mailboxId = box.id', 'LEFT')
+				->where('m.fk = '.$this->id)
+				->single();
+
+			list($this->_bodyStructure, $this->_bodyValues) = $imapConnection->select($mailbox->name)->fetchBody($this->uid);
+//			$this->_bodyStructure = $cmd->getBodyStructure($this, $this->uid);
+//			$this->_bodyValues = $cmd->getBodyValues($this->uid); // of previouse get structure
+
+			$this->_htmlBody = [];
+			$this->_textBody = [];
+			$this->attachments = [];
+
+			$this->parseStructure([$this->_bodyStructure], 'mixed', false, $this->_htmlBody, $this->_textBody, $this->attachments);
+		} catch(\Exception $e) {
+			// generated a body value showing a readable error
+			$this->_htmlBody = [['type'=>'text/error', 'partId'=>'1']];
+			$this->_bodyValues = ['1'=>['value'=>$e->getMessage().'<br>'.$e->getFile(). ':'.$e->getLine()]];
 		}
 		$this->bodyLoaded = true;
 	}

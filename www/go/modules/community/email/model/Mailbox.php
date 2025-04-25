@@ -39,7 +39,7 @@ class Mailbox extends AclItemEntity {
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
-			->addTable('email_mailbox', 'm')
+			->addTable('email_mailbox', 'box')
 			->addUserTable('email_mailbox_user', 'mu', ['id' => 'mailboxId']);
 	}
 
@@ -110,7 +110,7 @@ class Mailbox extends AclItemEntity {
 	public function getTotalEmails() {
 		$query = Email::find()
 			->selectSingleValue('count(id)')
-			->join('email_map', 'm', 'email_email.id = m.fk', 'LEFT')
+			->join('email_map', 'm', 'e.id = m.fk', 'LEFT')
 			->where(['mailboxId' => $this->id]);
 
 		return (int) $query->single();

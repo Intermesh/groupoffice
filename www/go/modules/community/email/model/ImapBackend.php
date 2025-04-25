@@ -9,7 +9,7 @@ class ImapBackend {
 	/**
 	 * The items we fetch to build an index // BODY.PEEK[1]<0.512>
 	 */
-	const Descriptor = ['UID', 'FLAGS', 'INTERNALDATE','RFC822.SIZE', 'PREVIEW', 'BODY.PEEK[HEADER.FIELDS ('.self::HeaderFields.')]'];
+	const IndexedFields = ['UID', 'FLAGS', 'INTERNALDATE','RFC822.SIZE', 'PREVIEW', 'BODY.PEEK[HEADER.FIELDS ('.self::HeaderFields.')]'];
 
 	/** @var array<string,string> known IMAP flags to parse to JMAP keywords */
 	protected static $knownFlags = [
@@ -85,7 +85,10 @@ class ImapBackend {
 		$this->imap = $protocol;
 	}
 
-	/** @return self|false */
+	/** @return self|false
+	 * @throws \ErrorException
+	 * @throws \RuntimeException
+	 */
 	static public function connect($dsn, $account) {
 		//none numeric?
 		if (!isset(self::$instance)) {
@@ -107,6 +110,12 @@ class ImapBackend {
 
 	function cmd() {
 		return new ImapCommand($this);
+	}
+
+	public function select($box = 'INBOX', $params = []) {
+		$repsonse = $this->imap->select($box, $params);
+		// todo: mailbox found???
+		return $this;
 	}
 
 	private function setMailbox($json) {
@@ -334,14 +343,14 @@ class ImapBackend {
 		$syncable = $imailbox['uidvalidity'] == $mailbox->uid(); // same mailbox
 		if($syncable) { // fetch new mail only
 			if($imailbox['uidnext'] != $mailbox->uidnext()) {
-				$newMails = $this->imap->fetch(self::Descriptor, $mailbox->uidnext(), INF, true); // new
+				$newMails = $this->imap->fetch(self::IndexedFields, $mailbox->uidnext(), INF, true); // new
 			}
 		} else { // full refetch of mailbox
 			// delete all mail that is in this mailbox
 			go()->getDbConnection()->delete('email_email')
 				->join('email_map', 'fk = id', 'LEFT')
 				->where("mailboxId = $mailbox->id")->exec();
-			$newMails = $this->imap->fetch(self::Descriptor, 1, INF, true); // all
+			$newMails = $this->imap->fetch(self::IndexedFields, 1, INF, true); // all
 			$mailbox->setUid($imailbox['uidvalidity']);
 		}
 
@@ -380,8 +389,8 @@ class ImapBackend {
 		// insert new mail
 		$newMailIds = [];
 		foreach($newMails as $item) {
-			$email = $this->parseFetchedEmail($item);
-			if($email->save() === true){
+			$email = $this->parseIndexedFields($item);
+			if($email->save()){
 				$newMailIds[] = $email->id;
 			}
 		}
@@ -509,10 +518,10 @@ class ImapBackend {
 	}
 
 	private function fillMessages($mailbox) {
-		$messages = $this->imap->fetch(self::Descriptor, 1, INF); // ['RFC822']
+		$messages = $this->imap->fetch(self::IndexedFields, 1, INF); // ['RFC822']
 		$ids = [];
 		foreach ($messages as $item) {
-			$email = $this->parseFetchedEmail($item);
+			$email = $this->parseIndexedFields($item);
 			if($email->save()){
 				$ids[] = [$email->id, $mailbox->id];
 			}
@@ -521,18 +530,19 @@ class ImapBackend {
 		return $ids;
 	}
 
-	private function parseFetchedEmail($item) {
+	private function parseIndexedFields($item) {
 		// only works for default descriptor
 		//find first?
 		// $decoder = new \Mail_mimeDecode($item['BODY.PEEK[HEADER.FIELDS'][11]);
 		//$decoded = $decoder->decode();
+		$hasAttachment = false;
 		$email = (new Email)->setValues([
 			'uid'=>$item['UID'],
 			'accountId' => $this->account->id,
 			'receivedAt' => \DateTime::createFromFormat('d-M-Y H:i:s O+', $item['INTERNALDATE']), // "19-Mar-2020 17:54:09 +0100"
 			'size' => (int) $item['RFC822.SIZE'],
-			'keywords' =>$this->readFlags($item['FLAGS'], $hasAttachements),
-			'hasAttachment' => $hasAttachements, // || $this->hasAttachment($item["BODYSTRUCTURE"]);
+			'keywords' =>$this->readFlags($item['FLAGS'], $hasAttachment),
+			'hasAttachment' => $hasAttachment, // || $this->hasAttachment($item["BODYSTRUCTURE"]);
 			'preview' =>$item['PREVIEW'], // $this->parsePreview($item);
 		]);
 		$email->setHeaders($this->decodeHeaders($item['BODY[HEADER.FIELDS'][11],$email));
@@ -607,7 +617,7 @@ class ImapBackend {
 	private function readFlags($flags, &$hasAttachment)
 	{
 		$keywords = [];
-		$hasAttachment = false;
+
 		foreach ($flags as $value) {
 			if (isset(self::$knownFlags[$value])) {
 				if (self::$knownFlags[$value] !== false) {
@@ -687,7 +697,7 @@ class ImapBackend {
 		$response = $this->imap->fetch($parts, $uid, null, true);
 		$parts = [];
 		foreach ($this->textBodyParts as $nb => $enc) {
-			$parts[$nb] = ['value' => ImapSource::decodeBody($response["BODY[$nb]"], $enc[0], $enc[1])];
+			$parts[$nb] = ['value' => self::decodeBody($response["BODY[$nb]"], $enc[0], $enc[1])];
 		}
 		return $parts;
 	}
@@ -704,15 +714,132 @@ class ImapBackend {
 		return trim($value);
 	}
 
-	public function getBodyStructure(Email $email, $uid) {
+
+	public function fetchBody($uid, $withTextValues = true) {
 		$response = $this->imap->fetch(['BODYSTRUCTURE'], $uid, null, true);
-		$this->currentEmail = $email;
-		return $this->parseBodyStructure($response, 'message/rfc822');
+
+		$structure = $this->parseBodyStructure($response['BODYSTRUCTURE'], 'message/rfc822');
+
+		if($withTextValues) {
+			$parts = ['UID'];
+			foreach ($this->textParts as $nb => $enc) {
+				$parts[] = 'BODY.PEEK[' . $nb . ']';
+			}
+			$response = $this->imap->fetch($parts, $uid, null, true);
+			$values = [];
+			foreach ($this->textParts as $nb => $enc) {
+				$values[$nb] = ['value' => self::decodeBody($response["BODY[$nb]"], $enc[0], $enc[1])];
+			}
+			return [$structure, $values];
+		}
+		return $structure;
+
+	}
+
+	private function parseBodyStructure($structure, $parentType, $partId = '1') {
+
+		$bodyPart = new EmailBodyPart();
+
+		if (is_array($structure[0])) { // multipart
+			$i = 0;
+			$type = $structure[count($structure)-5];
+			while (is_array($structure[0])) {
+				$i++;
+				if ($parentType == 'message/rfc822') {
+					$subPartId = $partId + $i - 1;
+				} else {
+					$subPartId = "$partId." . ((int) $i);
+					$bodyPart->partId = $partId; // for testing
+				}
+				$bodyPart->subParts[] = $this->parseBodyStructure(array_shift($structure), 'multipart/' . $type, $subPartId);
+			}
+			$bodyPart->type = 'multipart/' . strtolower($structure[0]);
+			//$structure[1][1]; boundery
+			//$structure[2]; NIL
+			//$structure[3]; NIL
+			//$structure[4]; NIL
+			return $bodyPart;
+		}
+		$bodyPart->partId = $partId;
+		$type = array_shift($structure);
+		$bodyPart->type = $type . '/' . array_shift($structure);
+		$params = array_shift($structure);
+		if (is_array($params)) {
+
+			while ($key = array_shift($params)) {
+				switch ($key) {
+					case 'charset':
+						$bodyPart->charset = array_shift($params);
+						break;
+					case 'name':
+						$bodyPart->name = array_shift($params);
+						break;
+					default: array_shift($params);
+				}
+			}
+		}
+		$cid = array_shift($structure);
+		if ($cid !== 'NIL') {
+			$bodyPart->cid = trim($cid, '<>');
+		}
+		$description = array_shift($structure);
+		//if ($description !== 'NIL') {
+		//	  $bodyPart->description;
+		//}
+		$encoding = array_shift($structure);
+		if ($encoding !== 'NIL') {
+			$bodyPart->encoding = $encoding;
+		}
+		if ($type === 'text') {
+			$bodyPart->charset = empty($bodyPart->charset) ? 'us-ascii' : $bodyPart->charset; // default
+			$this->textParts[(string) $partId] = [$encoding, $bodyPart->charset];
+		}
+		$size = array_shift($structure);
+		if ($size !== 'NIL') {
+			$bodyPart->size = (int) $size;
+		}
+		if ($bodyPart->type === 'message/rfc822') {
+			$envelope = array_shift($structure);
+			$bodyStructure = array_shift($structure);
+			$lines = array_shift($structure);
+		}
+
+		if ($bodyPart->isA('text')) {
+			$lines = array_shift($structure);
+		}
+
+		$md5 = array_shift($structure); // A string giving the body MD5 value (or NIL)
+
+		$disposition = array_shift($structure);
+		if ($disposition !== 'NIL' && is_array($disposition)) {
+			$bodyPart->disposition = array_shift($disposition);
+			$params = array_shift($disposition);
+			//$bodyPart->blobId = 'mail.'.$this->currentEmail->id.'-'.$partId;
+			if (is_array($params)) {
+				while ($key = array_shift($params)) {
+					switch ($key) {
+						case 'filename':
+							$bodyPart->name = array_shift($params);
+							break;
+						default: array_shift($params);
+					}
+				}
+			}
+		}
+		$language = array_shift($structure);
+		if ($language !== 'NIL') {
+			$bodyPart->language = $language;
+		}
+		$location = array_shift($structure);
+		if ($location !== 'NIL') {
+			$bodyPart->location = $location;
+		}
+		return $bodyPart;
 	}
 
 	private $currentEmail;
 
-	private $textBodyParts = [];
+	private $textParts = [];
 
 
 

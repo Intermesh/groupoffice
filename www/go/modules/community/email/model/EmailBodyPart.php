@@ -46,10 +46,12 @@ class EmailBodyPart extends Model {
 	public $subParts = [];
 
 	/** @var string encoding type for transport '7/8bit', 'quoted-printable', 'base64' */
-	private $encoding = '8bit';
+	public $encoding = '8bit';
 
 	/** @var string the boundary string for multipart types */
 	private $boundary;
+
+	private $content;
 
 	/** @var int uniqueness for boundary */
 	protected static $makeUnique = 0;

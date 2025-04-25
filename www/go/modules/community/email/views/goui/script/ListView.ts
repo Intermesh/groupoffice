@@ -1,27 +1,49 @@
-import {btn, comp, Component, datasourcestore, hr, List, menu, t, E, treecolumn, DateTime} from "@intermesh/goui";
+import {
+	btn,
+	comp,
+	datasourcestore,
+	hr,
+	List,
+	menu,
+	t,
+	E,
+	DateTime,
+	ObservableListenerOpts, ListEventMap
+} from "@intermesh/goui";
 import {client, jmapds} from "@intermesh/groupoffice-core";
 import {MailCtlr} from "./MailCtlr";
+import {ThreadView} from "./ThreadView";
 
 const listitem = function(mail) {
-	const item =  comp({tagName:'li'});
+	const abbr =  comp({tagName:'abbr'}),
+		text = comp({tagName:'div', cls:'line'});
 	const tr = {emailIds:[]}; //fake thread
-	item.el.append(E('abbr',
+	abbr.el.append(
 		!mail.keywords?.$seen ?  E('b', '•').cls('large'):'',
-		mail.keywords?.$answered ? E('i', 'reply').cls('small').css({color:'green'}):'',
-		mail.keywords?.$forwarded ? E('i', 'forward').cls('small').css({color:'purple'}):'',
-		mail.keywords?.$flagged ? E('i', 'flag').cls('small').css({color:'red'}):'',
+		mail.keywords?.$answered ? E('i', 'reply').cls('small icon').css({color:'green'}):'',
+		mail.keywords?.$forwarded ? E('i', 'forward').cls('small icon').css({color:'purple'}):'',
+		mail.keywords?.$flagged ? E('i', 'flag').cls('small icon').css({color:'red'}):'',
 		E('br'),
-		mail.hasAttachment ? 'P!':''
-	),
-	E('div',
-		E('h3', mail.from ? mail.from[0].name || mail.from[0].email : ''),
+		mail.hasAttachment ? E('i', 'paperclip').cls('small icon'):''
+	);
+	text.el.append(
 		E('h4', DateTime.createFromFormat(mail.receivedAt)!.format('d-m-Y')).cls('right').css({float:'right'}),
+		E('h3', mail.from.length ? (mail.from[0].name || mail.from[0].email) : ''),
 		E('div', mail.subject || '('+t('No subject')+')',
 			tr.emailIds.length > 1 ? E('div', tr.emailIds.length+' »').cls('badge primary right') :''
 		).cls('subject'),
 		E('sub', mail.preview).cls('clamp')
-	).cls('line'));
-	return item;
+	);
+	return [abbr,text];
+}
+
+export interface ListViewEventMap<Type> extends ListEventMap<Type> {
+	selectmail: (me: Type, row: any) => false | void
+}
+
+export interface ListView extends List {
+	on<K extends keyof ListViewEventMap<this>, L extends Function>(eventName: K, listener: Partial<ListViewEventMap<this>>[K], options?: ObservableListenerOpts): L
+	fire<K extends keyof ListViewEventMap<this>>(eventName: K, ...args: Parameters<ListViewEventMap<any>[K]>): boolean
 }
 
 export class ListView extends List {
@@ -30,11 +52,20 @@ export class ListView extends List {
 		super(
 			datasourcestore({dataSource:jmapds('Email'), sort:[{property:'receivedAt',isAscending:false}]}),
 			function (record,row,list,storeIndex) {
-				return [listitem(record)];
+				return listitem(record);
 			}
 		);
+		this.cls = 'email-list';
+		this.rowSelectionConfig = {
+			multiSelect:false,
+			listeners: {
+				'rowselect':(me,row)=> {
+					this.fire('selectmail', this, row);
+				}
+			}
+		};
 
-		const rowContextMenu = menu({},
+		const rowContextMenu = menu({isDropdown: true},
 			btn({icon: 'send', text: t('Send again'), handler: (btn) => { MailCtlr.resend(this.lastId).show(btn.dom); }}),
 			btn({icon: 'reply', text: t('Reply'), handler: (btn) => { MailCtlr.reply(this.lastId).show(btn.dom); }}),
 			btn({icon: 'reply_all', text: t('Reply all'), handler: (btn) => { MailCtlr.reply(this.lastId,false).show(btn.dom);}}),
@@ -52,6 +83,11 @@ export class ListView extends List {
 			hr(),
 			btn({icon: 'code', text: t('View source'), handler: () => {window.open(client.downloadBlobId('mail.src.todo'))}})
 		);
+
+		this.on('rowcontextmenu',(_me, index, row, ev) =>{
+			ev.preventDefault();
+			rowContextMenu.showAt(ev);
+		})
 
 	}
 

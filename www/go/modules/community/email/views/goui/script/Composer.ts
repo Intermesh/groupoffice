@@ -39,6 +39,7 @@ export class Composer extends Window {
 		this.items.add(
 			this.form = datasourceform({
 					cls: 'vbox',
+				flex:1,
 					dataSource: jmapds('Email'),
 					listeners: {
 						'load': me => {
@@ -51,12 +52,12 @@ export class Composer extends Window {
 						}
 					}
 				},
-				comp({cls: 'vbox',flex:1},
+				comp({cls: 'vbox fit'},
 					select({cls: 'w100',required:true,label: t('From'), name: 'identityId', store: datasourcestore({dataSource:jmapds('Identity')}), textRenderer: (r) => `${r.name} &lt;${r.email}&gt`}),
 					textfield({cls: 'w100', label: t('To'), name: 'to'}), //chips
-					textfield({cls: 'w100',name: 'subject', placeholder: t('Subject'), style: 'font-size:1.2em; height:42px;'}),
+					textfield({cls: 'w100',name: 'subject', placeholder: t('Subject'), style: {fontSize:'1.2em', height:'42px'}}),
 					htmlfield({cls: 'w100',flex:1, name: 'htmlBody', placeholder: t('Type a message')}),
-					this.attachmentFld = arrayfield({cls: 'pad attachments',name: 'attachments',
+					this.attachmentFld = arrayfield({cls: 'attachments',name: 'attachments',
 						buildField: (data) => containerfield({
 								tagName: 'a',
 								listeners: {

@@ -1,6 +1,103 @@
 @use '../../../../../../../views/goui/goui/style/_util.scss' as *;
-@use '../../../../../../../views/goui/goui/style/_config.scss' as *;
+@use '../../../../../../../views/goui/goui/style/_config.scss' as config;
 
 .email {
 	display:inline; // all is well
+}
+
+.email-list {
+	background-color: config.$surfaceLowest;
+
+	&:focus-within {
+		.data.selected {
+			background-color: config.$colorSelectedRow;
+			outline: none;
+			color: config.$colorSelectedRowText;
+
+			a, i.icon {
+				color: inherit;
+			}
+		}
+
+		.data:focus-visible {
+			background-color: config.$colorFocus;
+		}
+
+		.data:hover {
+
+		}
+	}
+
+	.data {
+		&:hover {
+			background-color: config.$colorHover;
+		}
+
+		&.selected {
+			background-color: config.$colorSelectedRowInactive;
+		}
+	}
+	> li {
+		display: block;
+		position: relative;
+		min-height: dp(32);
+		color: var(--fg-text);
+		padding: dp(8) dp(12) 0;
+		margin: 0 dp(8);
+		border-radius: config.$borderRadius;
+		//&:hover:not(.disabled) { @extend %hover; }
+		> div {
+			&.line {
+				border-bottom: 1px solid var(--fg-line);
+				padding-bottom: dp(8);
+			}
+		}
+
+		&.selected {
+			margin-top: dp(-1);
+			padding-top: dp(9);
+
+			> div.line {
+				padding-bottom: dp(9);
+				border-bottom: 0;
+			}
+		}
+		h3 {
+			margin:0;
+			color: config.$colorText;
+		}
+		h4 {
+			color: config.$colorTextSecondary;
+		}
+		sub {
+			font-size: 11px;
+			padding: 2px 0;
+
+			&.clamp {
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+				text-overflow: ellipsis;
+				overflow: hidden;
+				height: dp(28);
+				white-space: normal;
+			}
+		}
+	}
+	abbr { // icon before content but provide info
+
+		position: absolute;
+		top: dp(12);
+		text-align: center;
+		line-height: .8em;
+		//min-width: dp(32);
+		color: config.$colorPrimary;
+		//margin-right: dp(8);
+		+ div {
+			margin-left: dp(24);
+			display: block;
+			width: auto;
+			overflow: hidden;
+		}
+	}
 }

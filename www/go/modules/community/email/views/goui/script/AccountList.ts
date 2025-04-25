@@ -10,7 +10,7 @@ import {
 	t,
 	tree,
 	treecolumn,
-	TreeRecord, ComponentEventMap, DateTime, ObservableListenerOpts
+	TreeRecord, ComponentEventMap, DateTime, ObservableListenerOpts, Tree
 } from "@intermesh/goui";
 import {client, jmapds} from "@intermesh/groupoffice-core";
 import {AccountWindow} from "./AccountWindow";
@@ -31,6 +31,16 @@ export interface AccountList extends Component {
 export class AccountList extends Component {
 
 	list:List
+
+
+	private static mailboxRoles = { // key: label, icon, color
+		inbox: [t('Inbox','mail'), 'inbox'],
+		drafts: [t('Drafts','mail'), 'drafts'],
+		sent: [t('Sent','mail'), 'send'],
+		trash: [t('Trash','mail'), 'delete'],
+		spam: [t('Junk','mail'), 'delete_forever'],
+		archive: [t('Archive','mail'), 'archive'],
+	}
 
 	constructor(){
 		super()
@@ -83,33 +93,7 @@ export class AccountList extends Component {
 				// if(data.isVisible) {
 				// 	this.inCalendars[storeIndex] = true;
 				// }
-				return [btn({
-					icon: account.role,
-					//style: 'padding: 0 8px',
-					text: account.name,
-					menu: menu({},
-						btn({icon: 'settings',text: t('Settings'), handler: function() {settingsDialog.show().form.load('mail');}}), // hidden: !$.auth.roles.admin,
-						btn({icon: 'badge', 	text: t('Identities'), handler: function() {identityDialog.show();}}),
-						btn({icon: 'refresh', text: 'Refetch all', handler: () => { this.imapFill(account.id /*aid*/) }}),
-						'-',
-						btn({icon:'edit', text: t('Edit')+'…', disabled:!account.myRights.mayAdmin, handler: async _ => {
-								const dlg = new AccountWindow();
-								await dlg.load(account.id);
-								dlg.show();
-							}}),
-						btn({icon:'delete', text: t('Delete','core','core')+'…', disabled:!account.myRights.mayAdmin, handler: async _ => {
-								jmapds("Mailbox").confirmDestroy([account.id]);
-							}}),
-						hr(),
-						btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
-								jmapds('Mailbox').update(account.id, {isSubscribed: false});
-							}}),
-						hr(),
-						btn({icon:'file_save',hidden:account.groupId, text: t('Share','core','core'), handler: _ => {  }}),
-
-					)
-
-				}),tree({
+				const mboxTree = tree({
 					fitParent:true,
 					columns: [
 						treecolumn({
@@ -149,10 +133,12 @@ export class AccountList extends Component {
 						return Promise.all(getResponse.list.map(async (e) => {
 							// prefetch child id's so the Tree component knows if this node has children
 							const childIds = (await mailboxDS.query({filter: {accountId: account.id, parentId: e.id}})).ids;
-
+							/** @ts-ignore */
+							const r: any[]|undefined = AccountList.mailboxRoles[e.role];
 							return {
 								id: e.id + "",
-								name: e.name,
+								name: r ? r[0] : e.name,
+								icon: r ? r[1] : 'folder',
 								createdAt: e.createdAt,
 
 								// Store the child id's in the node record so we can use it when it's expanded
@@ -163,14 +149,42 @@ export class AccountList extends Component {
 							}
 						}))
 					},
-				})];
+				});
+
+				return [btn({
+					icon: 'account_box',
+					//style: 'padding: 0 8px',
+					text: account.name,
+					menu: menu({},
+						btn({icon: 'settings',text: t('Settings'), handler: function() {settingsDialog.show(); }}), // hidden: !$.auth.roles.admin,
+						btn({icon: 'badge', 	text: t('Identities'), handler: function() {identityDialog.show();}}),
+						btn({icon: 'refresh', text: 'Refetch all', handler: () => { this.imapFill(account.id, mboxTree) }}),
+						'-',
+						btn({icon:'edit', text: t('Edit')+'…', disabled:!account.myRights.mayAdmin, handler: async _ => {
+								const dlg = new AccountWindow();
+								await dlg.load(account.id);
+								dlg.show();
+							}}),
+						btn({icon:'delete', text: t('Delete','core','core')+'…', disabled:!account.myRights.mayAdmin, handler: async _ => {
+								jmapds("Mailbox").confirmDestroy([account.id]);
+							}}),
+						hr(),
+						btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
+								jmapds('Mailbox').update(account.id, {isSubscribed: false});
+							}}),
+						hr(),
+						btn({icon:'file_save',hidden:account.groupId, text: t('Share','core','core'), handler: _ => {  }}),
+
+					)
+
+				}),mboxTree];
 			}
 		}));
 	}
 
-	private imapFill(accountId: number) {
+	private imapFill(accountId: number, mboxTree: Tree) {
 		client.jmap('EmailAccount/fill',{accountId}).then(r => {
-			alert('done');
+			mboxTree.store.reload();
 		})
 	}
 

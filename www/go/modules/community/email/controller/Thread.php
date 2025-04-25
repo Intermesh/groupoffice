@@ -24,7 +24,7 @@ class Thread extends EntityController {
 		//return Api::get(Thread::class, $json);
 		$emails = model\Email::find()
 			->select('id, threadId') //->groupBy('threadId')
-			->andWhere('threadId', 'IN', $params->ids ?? [])
+			->andWhere('threadId', '=', $params['ids'] ?? [])
 			->all();
 
 		$threads = [];

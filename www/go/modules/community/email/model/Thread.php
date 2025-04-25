@@ -4,6 +4,7 @@ namespace go\modules\community\email\model;
 
 use go\core\jmap\Entity;
 use go\core\orm\Mapping;
+use go\core\orm\Relation;
 
 class Thread extends Entity {
 
@@ -21,7 +22,7 @@ class Thread extends Entity {
 	static protected function defineMapping(): Mapping {
 		return parent::defineMapping()
 			->addTable("email_thread")
-			->addScalar('emailIds','email_email', ['threadId' => 'id']);
+			->add('emailIds', Relation::scalar('emailIds','email_email')->keys(['threadId' => 'id']));
 	}
 
 	static public function normalizeSubject($subject) {
@@ -48,10 +49,10 @@ class Thread extends Entity {
 		if (!empty($in)) {
 			$thread = Email::find()
 				->select(['id' => 'threadId'])->distinct()
-				->join('email_id','ids', 'ids.fk = email_email.id')
+				->join('email_id','ids', 'ids.fk = e.id')
 				->join('email_thread', 'thr', 'threadId = thr.id','LEFT')
 				->where(['thr.subjectHash' => $subjectHash])
-				->andWhere('ids.messageId', 'IN', array_keys($in))->single();
+				->andWhere('ids.messageId', '=', array_keys($in))->single();
 		}
 		if (empty($thread)) {
 			$thread = new self();

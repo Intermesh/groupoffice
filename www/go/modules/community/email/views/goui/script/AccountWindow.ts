@@ -10,6 +10,7 @@ export class AccountWindow extends FormWindow {
 
 		this.generalTab.items.add(
 			textfield({label: t('Name'), name: 'name'}),
+			textfield({label: t('E-Mail'), name: 'email'}),
 			//mda
 			containerfield({name:'mda'},
 				textfield({label: t('Hostname'), name: 'host'}),

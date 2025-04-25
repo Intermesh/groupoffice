@@ -95,7 +95,7 @@ export class MailCtlr {
 				}
 				html = data.bodyValues[data.htmlBody[i].partId].value;
 				if('DOMPurify' in window) {
-					html = DOMPurify.sanitize(html);
+					html = DOMPurify.sanitize(html, {FORCE_BODY: true});
 				}
 				if(type == 'text/plain') {
 					html = html.replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1<br>$2')

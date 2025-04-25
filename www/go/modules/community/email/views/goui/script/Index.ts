@@ -1,5 +1,5 @@
-import {client, jmapds, modules} from "@intermesh/groupoffice-core";
-import {datasourcestore, router, t, translate} from "@intermesh/goui";
+import {client, jmapds, modules, router} from "@intermesh/groupoffice-core";
+import {datasourcestore, t, translate} from "@intermesh/goui";
 import {Main} from "./Main";
 export * from "./Main.js";
 
@@ -38,12 +38,21 @@ modules.register(  {
 		client.on("authenticated",  (client, session) => {
 
 			const ui = new Main(),
-				nav = (accountId:string, mailboxId: string) => {
+				nav = (accountId:string, mailboxId: string, threadId: string = '') => {
 					modules.openMainPanel("email");
-					ui.goto(accountId,mailboxId);
+					// client.jmap('Thread/get',{
+					// 	'#ids': {resultOf: 'c1', name: 'Email/get', path: '/list/*/threadId'}
+					// })
+					// client.jmap('Email/get',{
+					// 	'#ids': {resultOf: 'r'+($dw.jmap.reqCount-1), name: 'Thread/get', path: '/list/*/emailIds'},
+					// 	properties: ["threadId", "mailboxIds", "keywords", "hasAttachment", "from", "subject", "receivedAt", "size", "preview"]
+					// }).then((response) => {
+					// 	todo('update', {ids:response.ids});
+					// })
+					ui.goto(accountId,mailboxId, threadId);
 				};
-			router.add(/^email\/a(\d+)\/m(\d+)$/, (accountId, mailboxId) => {
-				nav(accountId, mailboxId);
+			router.add(/^email\/a(\d+)\/m(\d+)(?:\/t(\d+))?$/, (accountId, mailboxId, threadId?: string) => {
+				nav(accountId, mailboxId, threadId);
 			}).add(/^email\/a(\d+)$/, async (accountId) => {
 				nav(accountId, "0");
 			});
