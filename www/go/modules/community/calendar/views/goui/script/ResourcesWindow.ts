@@ -21,7 +21,7 @@ class ResourceGroupWindow extends FormWindow {
 	constructor() {
 		super('ResourceGroup');
 		this.title = t('Resource group');
-		this.width = 500
+		this.width = 500;
 		this.generalTab.cls = 'flow pad';
 		this.generalTab.items.add(
 			textfield({name:'name', label: t('Name')}),
@@ -48,6 +48,7 @@ export class ResourceWindow extends FormWindow {
 	constructor() {
 		super('Calendar');
 		this.title = t('Resource');
+
 		this.generalTab.cls = 'flow pad';
 		this.generalTab.items.add(
 			select({name:'groupId', label:t('Group'), 	store: resourceGroupStore, valueField: 'id', textRenderer: (r: any) => r.name}),
@@ -79,8 +80,9 @@ export class ResourcesWindow extends Window {
 	constructor() {
 		super();
 		this.title = t('Manage resources');
-		this.width = 800;
+		this.width = 900;
 		this.height = 600;
+		this.resizable = true;
 
 		this.on('render', async () => {
 			resourceStore.load();
@@ -130,7 +132,7 @@ export class ResourcesWindow extends Window {
 										icon: "delete",
 										text: t("Delete"),
 										handler: async (_btn) => {
-											jmapds("ResourceGroup").confirmDestroy(table.store.get(rowIndex)!.id);
+											jmapds("ResourceGroup").confirmDestroy([table.store.get(rowIndex)!.id]);
 										}
 									})
 
