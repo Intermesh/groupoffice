@@ -530,11 +530,11 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		}	
 		
 		
-		if($this->exception_for_event_id != 0 && $this->exception_for_event_id == $this->id){
+		if($this->isException() && $this->exception_for_event_id == $this->id){
 			throw new \Exception("Exception event ID can't be set to ID");
 		}
 		
-		if($this->exception_for_event_id != 0 && !empty($this->rrule)) {
+		if($this->isException() && !empty($this->rrule)) {
 			throw new \Exception("Can't create exception with RRULE");
 		}
 
@@ -747,7 +747,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	public function isException() {
-		return $this->exception_for_event_id != 0;
+		return $this->exception_for_event_id > 0;
 	}
 	
 	protected function afterSave($wasNew) {
@@ -859,7 +859,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		$findParams->getCriteria()
 						->addCondition("uuid", $this->uuid) //recurring series and participants all share the same uuid
 						->addCondition('start_time', $start_time) //make sure start time matches for recurring series
-						->addCondition("exception_for_event_id", 0, $this->exception_for_event_id==0 ? '=' : '!='); //the master event or a single occurrence can start at the same time. Therefore we must check if exception event has a value or is 0.
+						->addCondition("exception_for_event_id", 0, !$this->isException() ? '<=' : '>'); //the master event or a single occurrence can start at the same time. Therefore we must check if exception event has a value or is 0.
 		
 		if(!$includeThisEvent)
 			$findParams->getCriteria()->addCondition('id', $this->id, '!=');
@@ -1321,7 +1321,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 
 		}else
 		{
-			$whereCriteria->addCondition('exception_for_event_id', 0);
+			$whereCriteria->addCondition('exception_for_event_id', 0, '<=');
 		}
 
 		$params->criteria($whereCriteria);
@@ -1503,7 +1503,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		
 		$dateType = $this->all_day_event ? "DATE" : "DATETIME";
 		
-		if($this->exception_for_event_id>0) {
+		if($this->isException()) {
 			if (!$recurrenceTime){
 				//this is an exception
 
@@ -2272,7 +2272,7 @@ The following is the error message:
 		if ($calendar && $calendar->userHasCreatePermission()){
 			
 			//find if an event for this exception already exists.
-			$exceptionDate = $this->exception_for_event_id!=0 ? $this->start_time : false;			
+			$exceptionDate = $this->isException() ? $this->start_time : false;
 			$existing = Event::model()->findByUuid($this->uuid, 0, $calendar->id, $exceptionDate);
 
 			if(!$existing){				
@@ -2460,7 +2460,7 @@ The following is the error message:
 						->addCondition('user_id', $this->user_id)
 						->addCondition('uuid', $this->uuid,'=','e')  //recurring series and participants all share the same uuid
 						->addCondition('start_time', $this->start_time,'=','e') //make sure start time matches for recurring series
-						->addCondition("exception_for_event_id", 0, $this->exception_for_event_id==0 ? '=' : '!=','e');//the master event or a single occurrence can start at the same time. Therefore we must check if exception event has a value or is 0.
+						->addCondition("exception_for_event_id", 0, !$this->isException() ? '<=' : '>','e');//the master event or a single occurrence can start at the same time. Therefore we must check if exception event has a value or is 0.
 		
 		return Participant::model()->find($findParams);			
 		
