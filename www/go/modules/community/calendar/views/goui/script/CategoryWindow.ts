@@ -14,9 +14,6 @@ export class CategoryWindow extends FormWindow {
 			this.title = t(this.form.currentId ? 'Edit category' : 'Create category');
 		});
 
-		//client.getUser().capabilities['community:calendar'].mayEditCategories;
-		const mayEditCategories = false; // todo: fetch from module permissions
-
 		this.generalTab.items.add(
 			comp({cls:'flow pad'},
 				textfield({name: 'name', label: t('Name'), required:true, flex:1}),
@@ -27,7 +24,7 @@ export class CategoryWindow extends FormWindow {
 					dataSource: jmapds("Calendar"),
 					displayProperty: 'name',
 				}),
-				checkbox({hidden: !mayEditCategories, label: t('Global category')})
+				checkbox({hidden: !client.user.isAdmin, label: t('Global category')})
 			)
 		);
 	}

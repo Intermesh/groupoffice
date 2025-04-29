@@ -3,6 +3,7 @@
 namespace go\modules\community\calendar\controller;
 
 use go\core\db\Query;
+use go\core\exception\Forbidden;
 use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
 use go\modules\community\calendar\model;
@@ -30,6 +31,8 @@ class Calendar extends EntityController {
 	 * 	messages to participants or create CalendarEventNotification objects.
 	 */
 	public function set($params) {
+		if(!$this->rights->mayChangeCalendars)
+			throw new Forbidden('Permission denied');
 		if(!empty($params['onDestroyRemoveEvents']) && isset($params['destroy'])) {
 				go()->getDbConnection()->delete('calendar_calendar_event',
 					(new Query())->where('calendarId', 'IN', $params['destroy']));

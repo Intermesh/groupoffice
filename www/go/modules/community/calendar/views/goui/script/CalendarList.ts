@@ -16,7 +16,7 @@ import {calendarStore, categoryStore, t} from "./Index.js";
 import {CalendarView} from "./CalendarView.js";
 import {ResourceWindow} from "./ResourcesWindow.js";
 import {CalendarWindow} from "./CalendarWindow.js";
-import {client, jmapds} from "@intermesh/groupoffice-core";
+import {client, jmapds, modules} from "@intermesh/groupoffice-core";
 import {SubscribeWindow} from "./SubscribeWindow.js";
 
 export interface CalendarListEventMap<Type> extends ComponentEventMap<Type> {
@@ -39,6 +39,8 @@ export class CalendarList extends Component {
 	constructor(store = calendarStore){
 		super()
 		this.store = store;
+		const rights = modules.get("community", "calendar")!.userRights;
+
 		this.items.add(store !== calendarStore ? comp() :tbar({cls: 'dense'},
 			checkbox({
 				listeners: {
@@ -52,6 +54,7 @@ export class CalendarList extends Component {
 			btn({
 				icon: 'more_vert', menu: menu({},
 					btn({
+						hidden: !rights.mayChangeCalendar,
 						icon: 'add',
 						text: t('Create calendar') + '…', handler: () => {
 							const dlg = new CalendarWindow();
@@ -120,6 +123,8 @@ export class CalendarList extends Component {
 		// if(data.isVisible) {
 		// 	this.inCalendars[storeIndex] = true;
 		// }
+		const rights = modules.get("community", "calendar")!.userRights;
+
 		return [checkbox({
 			color: '#' + data.color,
 			//style: 'padding: 0 8px',
@@ -168,15 +173,15 @@ export class CalendarList extends Component {
 							});
 						}
 					}}),
-					btn({icon:'edit', text: t('Edit')+'…', hidden: data.davaccountId, disabled:!data.myRights.mayAdmin, handler: async _ => {
+					btn({icon:'edit', text: t('Edit')+'…', hidden: data.davaccountId || !rights.mayChangeCalendar, disabled:!data.myRights.mayAdmin, handler: async _ => {
 							const dlg = data.groupId ? new ResourceWindow() : new CalendarWindow();
 							await dlg.load(data.id);
 							dlg.show();
 						}}),
-					btn({icon:'delete', text: t('Delete','core','core')+'…', hidden: data.davaccountId, disabled:!data.myRights.mayAdmin, handler: async _ => {
+					btn({icon:'delete', text: t('Delete','core','core')+'…', hidden: data.davaccountId || !rights.mayChangeCalendar, disabled:!data.myRights.mayAdmin, handler: async _ => {
 						jmapds("Calendar").confirmDestroy([data.id]);
 					}}),
-					hr(),
+					hr({hidden: !rights.mayChangeCalendar}),
 					btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
 						jmapds('Calendar').update(data.id, {isSubscribed: false}).catch(e => Window.error(e))
 					}}),
