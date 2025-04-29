@@ -105,7 +105,13 @@ export class EventWindow extends FormWindow {
 							.add(di)
 							.format(format);
 					}
-				}}
+				},
+			'setvalue': (me) => {
+				const d = me.getValueAsDateTime();
+				if(d){
+					recurrenceField.setStartDate(d);
+				}
+			}}
 		});
 		this.endDate = datefield({label:t('End'), name: 'end', flex:1, defaultTime: (now.getHours()+1 )+':00',
 			listeners: {'change': (me,_v, old) => {
