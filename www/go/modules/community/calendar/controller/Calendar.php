@@ -31,8 +31,6 @@ class Calendar extends EntityController {
 	 * 	messages to participants or create CalendarEventNotification objects.
 	 */
 	public function set($params) {
-		if(!$this->rights->mayChangeCalendars)
-			throw new Forbidden('Permission denied');
 		if(!empty($params['onDestroyRemoveEvents']) && isset($params['destroy'])) {
 				go()->getDbConnection()->delete('calendar_calendar_event',
 					(new Query())->where('calendarId', 'IN', $params['destroy']));
