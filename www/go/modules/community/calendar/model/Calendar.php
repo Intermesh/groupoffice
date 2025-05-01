@@ -57,7 +57,7 @@ class Calendar extends AclOwnerEntity {
 
 	public $defaultAlertsWithTime;
 	public $defaultAlertsWithoutTime;
-	public $ownerId;
+	protected $ownerId;
 	public $createdBy;
 
 	public $groupId;
@@ -75,6 +75,14 @@ class Calendar extends AclOwnerEntity {
 	protected static function textFilterColumns(): array
 	{
 		return ['name'];
+	}
+
+	public function setOwnerId($v) {
+		$this->ownerId = $v;
+	}
+
+	public function getOwnerId() {
+		return !empty($this->groupId) ? ('Calendar:'.$this->id) : $this->ownerId;
 	}
 
 	/** @return int */
@@ -226,12 +234,14 @@ class Calendar extends AclOwnerEntity {
 
 	protected function principalAttrs(): array {
 		// isPrinicpal() dictates an owner exists
-		$owner = Principal::findById($this->ownerId);
+		$resourceGroupOwner = Principal::find(['name','email'])
+			->join('calendar_resource_group', 'rg', 'rg.defaultOwnerId = principal.id')
+			->where('rg.id', '=', $this->groupId);
 		return [
 			'name'=>$this->name,
-			'description' => $this->description ?? $owner->name ?? '',
+			'description' => $this->description ?? $resourceGroupOwner->name ?? '',
 			'timeZone' => $this->timeZone,
-			'email' => $owner->email
+			'email' => $resourceGroupOwner->email
 		];
 	}
 

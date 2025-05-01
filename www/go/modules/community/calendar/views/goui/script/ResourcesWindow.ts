@@ -41,7 +41,8 @@ const resourceStore = datasourcestore({
 })
 
 const resourceGroupStore = datasourcestore({
-	dataSource: jmapds("ResourceGroup")
+	dataSource: jmapds("ResourceGroup"),
+	sort: [{property:'name'}]
 });
 
 export class ResourceWindow extends FormWindow {

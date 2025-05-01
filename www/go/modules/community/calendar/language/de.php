@@ -47,7 +47,7 @@ return array (
   'Maybe' => 'Vielleicht',
   'Decline' => 'Ablehnen',
   'You' => 'Du',
-  'This' => 'Dieser ',
+  'This' => 'Dieser',
   'Organizer' => 'Organisator',
   'Exceptions' => 'Ausnahmen',
   'Enter a title, name or place' => 'Tragen Sie einen Titel, Namen oder Ort ein',
