@@ -92,6 +92,7 @@ export class ParticipantField extends Component {
 					'render' : (me) => {
 						me.el.on('keydown' , ev => {
 							if(ev.key === 'Enter') {
+								ev.preventDefault();
 								if(validateEmail(me.input!.value)) {
 									const email = me.input!.value;
 									this.addParticipant({id:email,email});
@@ -172,7 +173,7 @@ export class ParticipantField extends Component {
 			name: principal.name || principal.email,
 			roles: {attendee:true},
 			scheduleAgent: principal.id ? 'server' : 'server',
-			kind: principal.type,
+			kind: principal.type ?? 'individual',
 			participationStatus:"needs-action",
 			expectReply:true
 		}, principal.id);
