@@ -443,14 +443,16 @@ export class EventWindow extends FormWindow {
 		}
 	}
 
-	private async attachFile() {
-		 const files = await browser.pickLocalFiles(true);
-		 this.mask();
-		 const blobs = await client.uploadMultiple(files);
-		 this.unmask();
-		 for(const r of blobs)
-		 	this.attachments.add({blobId:r.id, title:r.name, size:r.size, contentType:r.type}, );
-		 //console.warn(blobs);
+	private attachFile() {
+		 browser.pickLocalFiles(true).then(files => {
+			 this.attachments.mask();
+			 client.uploadMultiple(files).then(blobs => {
+				 for(const r of blobs)
+					 this.attachments.add({blobId:r.id, title:r.name, size:r.size, contentType:r.type}, );
+			 }).finally(() => {
+				 this.attachments.unmask();
+			 });
+		 });
 	}
 
 }
