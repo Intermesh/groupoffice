@@ -285,7 +285,13 @@ export class TaskDialog extends FormWindow {
 									name: "when",
 									withTime: true,
 									flex: 2,
-									value: new DateTime().format("Y-m-d")
+									listeners: {
+										render: (field) => {
+											if (!field.value && this.startDate.value) {
+												field.value = this.startDate.value;
+											}
+										}
+									}
 								}),
 								btn({
 									icon: "delete",
