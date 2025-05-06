@@ -284,4 +284,7 @@ WHERE `a`.`id` < `b`.`id`
     AND `a`.`eventId` <=> `b`.`eventId`
     AND `a`.`calendarId` <=> `b`.`calendarId`;";
 $updates["202505011057"][] = "ALTER TABLE `calendar_calendar_event` ADD UNIQUE INDEX `event_once_per_calendar` (`eventId` ASC, `calendarId` ASC);";
+
+$updates["202505061137"][] = "ALTER TABLE `calendar_event` ADD INDEX `fk_calendar_event_uid_index` (`uid` ASC);";
+
 // TODO: calendar views -> custom filters
