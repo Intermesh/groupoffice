@@ -114,14 +114,15 @@ export class MainPanel extends MainThreeColumnPanel {
 			}
 			await this.tbl.store.load();
 			client.jmap( "MailDomain/checkPtr", {}).then((result) => {
-				let ptrOk = true;
+				let ptrOk = true, ip = "";
 				for(const rr of result) {
 					ptrOk = ptrOk && rr.status === "SUCCESS";
+					ip += rr.ip + " ";
 				}
 				if (ptrOk) {
 					this.ptrStatus.html = '<i class="icon success">check</i>&nbsp;' +t("PTR OK")
 				} else {
-					this.ptrStatus.html = '<i class="icon warning">warning</i>&nbsp;' + t("PTR error");
+					this.ptrStatus.html = '<i class="icon warning">warning</i>&nbsp;' + t("PTR error") + " (" + ip + ")";
 				}
 			}).catch((e) => {
 				this.ptrStatus.html = '<i class="icon warning">warning</i>&nbsp;' + t("PTR error");
