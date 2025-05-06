@@ -19,7 +19,7 @@ import {WeekView} from "./WeekView.js";
 import {calendarStore, categoryStore, t, ValidTimeSpan} from "./Index.js";
 import {YearView} from "./YearView.js";
 import {SplitView} from "./SpltView.js";
-import {client, filterpanel, jmapds} from "@intermesh/groupoffice-core";
+import {client, filterpanel, jmapds, modules} from "@intermesh/groupoffice-core";
 import {CalendarView} from "./CalendarView.js";
 import {CategoryWindow} from "./CategoryWindow.js";
 import {Settings} from "./Settings.js";
@@ -96,6 +96,7 @@ export class Main extends Component {
 		yearView.on('monthclick', (me,day) => {
 			this.routeTo('month', day);
 		});
+		const rights = modules.get("community", "calendar")!.userRights;
 
 		this.items.add(
 			this.west = comp({tagName: 'aside', width: 274, cls:'scroll',style: {paddingTop:'1.2rem', minWidth: '27.4rem'}},
@@ -141,6 +142,7 @@ export class Main extends Component {
 					tbar({cls: 'dense'},
 						comp({tagName: 'h3', html: t('Categories','core','core')}),
 						btn({
+							hidden: !rights.mayChangeCategories,
 							icon: 'add', menu: menu({},
 								btn({
 									text: t('Create category') + '…', handler: () => {
@@ -245,7 +247,7 @@ export class Main extends Component {
 						btn({icon: 'keyboard_arrow_right', title: t('Next'), allowFastClick:true, handler: b => this.forward()}),
 					),
 					btn({icon:'more_vert',cls: 'not-small-device', menu:menu({},
-						btn({icon:'video_call',text:t('Video meeting')+'…', handler: _ => {(new Settings()).openLoad()}}),
+						btn({icon:'video_call',hidden:!client.user.isAdmin,text:t('Video meeting')+'…', handler: _ => {(new Settings()).openLoad()}}),
 						btn({
 							icon: 'print', text:t('Print'), menu: menu({},
 								this.printCurrentBtn = btn({icon: 'print', text: t('Current view'), handler:() => {
@@ -261,7 +263,7 @@ export class Main extends Component {
 								btn({icon: 'view_module', text: t('Month'), handler:() => { this.openPDF('month'); }})
 							)
 						}),
-						btn({icon:'meeting_room', text:t('Resources')+'…', handler: _ => { (new ResourcesWindow()).show()}})
+						btn({icon:'meeting_room',hidden: !rights.mayChangeResources, text:t('Resources')+'…', handler: _ => { (new ResourcesWindow()).show()}})
 					)})
 				),
 				this.cards = cards({flex: 1, activeItem:1, listeners: {render: m => this.applySwipeEvents(m)}},
@@ -404,6 +406,7 @@ export class Main extends Component {
 	}
 
 	private buildCategoryFilter() {
+		const rights = modules.get("community", "calendar")!.userRights;
 		const selected: any = {},
 			selectionChange = () => {
 				const store = this.adapter.byType('event').store;
@@ -437,6 +440,7 @@ export class Main extends Component {
 						}
 					},
 					buttons: [btn({
+						hidden: !rights.mayChangeCategories,
 						icon: 'more_horiz', menu: menu({},
 							btn({icon:'edit', text: t('Edit'), disabled:!data.myRights.mayAdmin, handler: async _ => {
 								const dlg = new CategoryWindow();

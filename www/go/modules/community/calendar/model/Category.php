@@ -22,7 +22,7 @@ class Category extends Entity {
 	public $name;
 
 	/** @var int could be NULL for global categories */
-	public $ownerId;
+	protected $ownerId;
 
 	public $color;
 
@@ -35,11 +35,20 @@ class Category extends Entity {
 			->addTable("calendar_category", "category");
 	}
 
+	public function setOwnerId($id) {
+		if(go()->getAuthState()->isAdmin())
+			$this->ownerId = $id; // only admin may create global categories
+	}
+
+	public function getOwnerId() {
+		return $this->ownerId;
+	}
+
 	protected function init()
 	{
 		parent::init();
 
-		if($this->isNew())  {
+		if($this->isNew() )  {
 			$this->ownerId = go()->getUserId();
 		}
 	}

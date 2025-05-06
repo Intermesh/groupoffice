@@ -3,6 +3,7 @@
 namespace go\modules\community\calendar\controller;
 
 use go\core\db\Query;
+use go\core\exception\Forbidden;
 use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
 use go\modules\community\calendar\model;

@@ -1,3 +1,4 @@
+25-04s2025: 25.0.19
 - Maildomains: Wrong quota display and cleaned up code
 
 15-04-2024: 25.0.18

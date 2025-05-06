@@ -158,6 +158,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_event` (
      PRIMARY KEY (`id`),
     INDEX `fk_calendar_calendar_event_calendar_event1_idx` (`eventId` ASC),
     INDEX `fk_calendar_calendar_event_calendar_calendar1_idx` (`calendarId` ASC),
+		 UNIQUE INDEX `event_once_per_calendar` (`eventId` ASC, `calendarId` ASC),
     CONSTRAINT `fk_calendar_calendar_event_calendar_event1`
     FOREIGN KEY (`eventId`)
     REFERENCES `calendar_event` (`eventId`)

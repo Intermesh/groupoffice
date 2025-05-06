@@ -272,8 +272,16 @@ $updates['202504071345'][] = "ALTER TABLE `calendar_event` CHANGE COLUMN `locati
 // replace existing resource into core_participants
 $updates['202504150919'][] = 'REPLACE INTO core_principal (id, name, email, type, description, timeZone, entityTypeId, entityId, aclId)
 SELECT concat("Calendar:", c.id), c.name, u.email, "resource", IFNULL(c.description, ""), c.timeZone, (select id from core_entity where name="Calendar"),  c.id, c.aclId from calendar_calendar c
-   join core_user u ON u.id = c.ownerId where c.groupId IS NOT NULL AND c.ownerId IS NOT NULL;';
+  JOIN calendar_resource_group rg ON c.groupId = rg.id
+  JOIN core_user u ON u.id = rg.defaultOwnerId 
+  WHERE c.groupId IS NOT NULL AND rg.defaultOwnerId IS NOT NULL;';
 // set the participant id to the user id if the participant is an existing groupoffice user
 $updates["202504150959"][] = "UPDATE calendar_participant p INNER JOIN core_user u ON u.email = p.email COLLATE utf8mb4_unicode_ci AND p.id != u.id SET p.id = u.id WHERE kind = 'individual';";
 
+$updates["202505011057"][] = "DELETE `a`
+FROM `calendar_calendar_event` AS `a`, `calendar_calendar_event` AS `b`
+WHERE `a`.`id` < `b`.`id`
+    AND `a`.`eventId` <=> `b`.`eventId`
+    AND `a`.`calendarId` <=> `b`.`calendarId`;";
+$updates["202505011057"][] = "ALTER TABLE `calendar_calendar_event` ADD UNIQUE INDEX `event_once_per_calendar` (`eventId` ASC, `calendarId` ASC);";
 // TODO: calendar views -> custom filters
