@@ -1,4 +1,17 @@
-25-04s2025: 25.0.19
+- Core: Fixed: Blind Stored XSS in Phone Number Field Enables Forced Redirect and Unauthorized Actions
+- Core: Fixed:  DOM-Based XSS in all Date Input Fields Allow Arbitrary JavaScript Execution
+- Core: fixed Stored XSS in Tasks Comment Section
+- Files: Fixed: Group-Office vulnerable to path traversal Vulnerability ID: JVN#23673287
+- History: Fixed cross site scripting vulnerability JVN#30520482, JVN#87138325 and JVN#72111431
+- Email: fix deprecation error
+- ActiveSync: Fix broken utf-8 when recreating MIME for Z-push
+- Comments: use translations for tasks feedback
+- Core: Reset create link button on close so it won't fail when dialogs perform an async task before opening. This happened with documents in finance.
+- Finance: Add payment due date to Zugferd invoice
+- Addressbook: Filter ICD combo by selected country from address
+
+
+25-04-2025: 25.0.19
 - Maildomains: Wrong quota display and cleaned up code
 
 15-04-2024: 25.0.18

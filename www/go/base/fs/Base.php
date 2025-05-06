@@ -348,6 +348,10 @@ abstract class Base{
 //		return is_file($this->path);
 		return is_a($this, "\GO\Base\Fs\File"); //works with non existing files
 	}
+
+	public function isLink(){
+		return is_link($this->path);
+	}
 	
 	/**
 	 * Rename a file or folder

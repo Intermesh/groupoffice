@@ -136,7 +136,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 		</div>', {
 			getLinkDescription: function(values) {
 				if(values.description && values.description.length > 0) {
-					return '<small>'+values.description+'</small>';
+					return '<small>'+Ext.util.Format.htmlEncode(values.description)+'</small>';
 				}
 				return "";
 			},

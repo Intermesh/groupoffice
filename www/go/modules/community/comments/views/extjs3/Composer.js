@@ -134,7 +134,10 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 								hideLabel: true,
 								xtype: "plainfield",
 								name: "name",
-								submit: true
+								submit: true,
+								renderer : function(v, field) {
+									return Ext.util.Format.htmlEncode(v);
+								}
 							},{
 								hideLabel: true,
 								xtype: "hidden",
