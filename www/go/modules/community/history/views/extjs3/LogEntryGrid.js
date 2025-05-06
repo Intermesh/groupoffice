@@ -34,7 +34,7 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 				html.push.apply(html, this.renderJson(json[key], name && name != "customFields" ? name + "." + key : key));
 			}
 		} else { // string number bool
-			html.push('<b>' + name + '</b> ' + json);
+			html.push('<b>' + name + '</b> ' + Ext.util.Format.htmlEncode(json));
 		}
 
 		return html;
