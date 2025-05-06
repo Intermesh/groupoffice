@@ -141,6 +141,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event` (
 		INDEX `calendar_event_lastOccurrence_index` (`lastOccurrence` ASC),
     INDEX `fk_calendar_event_core_user1_idx` (`createdBy` ASC),
     INDEX `fk_calendar_event_core_user2_idx` (`modifiedBy` ASC),
+		INDEX `fk_calendar_event_uid_index` (`uid` ASC),
     CONSTRAINT `fk_calendar_event_core_user1`
     FOREIGN KEY (`createdBy`)
     REFERENCES `core_user` (`id`)
