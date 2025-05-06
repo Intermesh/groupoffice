@@ -16,7 +16,8 @@ class Inline implements FilehandlerInterface{
 	}
 	
 	public function fileIsSupported(\GO\Files\Model\File $file){
-		return $file->isImage() || in_array(strtolower($file->extension),$this->defaultExtensions);
+		// don't support inline svg as they may contain scripts
+		return ($file->isImage() && strtolower($file->extension) != 'svg') || in_array(strtolower($file->extension),$this->defaultExtensions);
 	}
 	
 	public function getIconCls(){

@@ -508,7 +508,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 				throw new Forbidden("Symlinks are forbidden");
 
 			// prevent html to render on same domain having access to all global JS stuff
-			if($coreFsFile->getContentType() == 'text/html') {
+			if($coreFsFile->getContentType() == 'text/html' || $coreFsFile->getContentType() == 'image/svg+xml') {
 				$inline = false;
 			}
 
