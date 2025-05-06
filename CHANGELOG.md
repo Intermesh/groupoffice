@@ -1,3 +1,5 @@
+- Core: Fixed: Blind Stored XSS in Phone Number Field Enables Forced Redirect and Unauthorized Actions
+- 
 25-04-2025: 6.8.118
 - ActiveSync: Fix broken utf-8 when recreating MIME for Z-push
 - Comments: use translations for tasks feedback
