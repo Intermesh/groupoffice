@@ -2,6 +2,7 @@
 - Core: Fixed:  DOM-Based XSS in all Date Input Fields Allow Arbitrary JavaScript Execution
 - Core: fixed Stored XSS in Tasks Comment Section
 - Files: Fixed: Group-Office vulnerable to path traversal Vulnerability ID: JVN#23673287
+- History: Fixed cross site scripting vulnerability JVN#30520482, JVN#87138325 and JVN#72111431
 - Email: fix deprecation error
 
 25-04-2025: 6.8.118
