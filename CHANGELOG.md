@@ -2,8 +2,9 @@
 - Core: Fixed:  DOM-Based XSS in all Date Input Fields Allow Arbitrary JavaScript Execution
 - Core: fixed Stored XSS in Tasks Comment Section
 - Files: Fixed: Group-Office vulnerable to path traversal Vulnerability ID: JVN#23673287
+- Email: fix deprecation error
 
-- 25-04-2025: 6.8.118
+25-04-2025: 6.8.118
 - ActiveSync: Fix broken utf-8 when recreating MIME for Z-push
 - Comments: use translations for tasks feedback
 - Core: Reset create link button on close so it won't fail when dialogs perform an async task before opening. This happened with documents in finance.
