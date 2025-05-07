@@ -58,7 +58,9 @@ interface CalendarItemConfig {
 /**
  * This is the ViewModel for items displaying in the calendar.
  * For now, they can be generated from the CalendarEvent model.
- * Because if recurrence (and overridden) 1 CalendarEvent may return multiple items
+ * With recurrence (and overrides) 1 CalendarEvent may return multiple items
+ * Other items like tasks and birthdays can also generate calendar items for display
+ * Items are generated in the CalendarAdapter class
  */
 export class CalendarItem {
 
