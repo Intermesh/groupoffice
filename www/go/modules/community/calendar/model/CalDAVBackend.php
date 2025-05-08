@@ -70,7 +70,7 @@ class CalDAVBackend extends AbstractBackend implements
 				'{http://sabredav.org/ns}sync-token' => self::VERSION.'-'.$calendar->highestItemModSeq(),
 				'share-resource-uri' => '/ns/share/'.$uri,
 				// 1 = owner, 2 = readonly, 3 = readwrite
-				'share-access' => $calendar->getPermissionLevel() == Acl::LEVEL_MANAGE ? 1 : ($calendar->getPermissionLevel() >= Acl::LEVEL_WRITE ? 3 : 2),
+				'share-access' => $calendar->getPermissionLevel() == Acl::LEVEL_MANAGE ? 1 : (($calendar->getPermissionLevel() >= Acl::LEVEL_WRITE && empty($calendar->webcalUri)) ? 3 : 2),
 			];
 		}
 		$tasklists = TaskList::find()->where(['isSubscribed'=>1, 'role'=>1])

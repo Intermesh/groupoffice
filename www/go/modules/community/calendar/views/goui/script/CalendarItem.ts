@@ -684,6 +684,8 @@ export class CalendarItem {
 	}
 
 	remove() {
+		if(!this.mayChange)
+			return;
 		if(!this.isRecurring) {
 			this.confirmScheduleMessage(false, () => {
 				eventDS.destroy(this.data.id);
