@@ -10,6 +10,7 @@ $manageConfig = "/etc/groupoffice/manage/config.php";
 
 echo "Updating sources\n";
 exec("./update-git.sh");
+exec("./build.sh");
 $rsyncCmd = "rsync -av --delete --exclude=.git ../ " . $target;
 echo "Running: " . $rsyncCmd . "\n";
 system($rsyncCmd);
