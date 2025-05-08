@@ -1,3 +1,4 @@
+08-05-2025: 25.0.20
 - Core: Fixed: Blind Stored XSS in Phone Number Field Enables Forced Redirect and Unauthorized Actions
 - Core: Fixed:  DOM-Based XSS in all Date Input Fields Allow Arbitrary JavaScript Execution
 - Core: fixed Stored XSS in Tasks Comment Section
