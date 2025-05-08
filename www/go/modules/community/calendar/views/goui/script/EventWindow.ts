@@ -424,6 +424,10 @@ export class EventWindow extends FormWindow {
 		if(this.confirmedScheduleMessage) {
 			return;
 		}
+		if(!this.form.isModified()) {
+			this.close();
+			return false;
+		}
 		if(this.item!.isRecurring) {
 
 			this.item!.patch(this.parseSavedData(this.form.modified), () => {
