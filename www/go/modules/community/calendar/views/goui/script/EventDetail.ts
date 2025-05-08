@@ -40,9 +40,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 	constructor() {
 		super("CalendarEvent");
 		this.title = t('Event');
-
 		this.flex = "1";
-		//this.height = 620;
 		this.store = jmapds("CalendarEvent");
 
 		const recurrenceField = displayfield({
@@ -314,8 +312,9 @@ export class EventDetailWindow extends Window {
 	constructor() {
 		super();
 		this.title = t('Event');
-		this.width = 440;
-		this.height = 600;
+
+		this.width = 565;
+		this.height = 840;
 		this.items.add(this.view = new EventDetail());
 		//this.view.form.on('save', () => {this.close();})
 	}

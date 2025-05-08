@@ -267,7 +267,7 @@ export class CalendarItem {
 	async open(onCancel?: Function) {
 
 		const internalOpen = () => {
-			const dlg = !this.isOwner ? new EventDetailWindow() : new EventWindow();
+			const dlg = !this.mayChange ? new EventDetailWindow() : new EventWindow();
 			if (dlg instanceof EventWindow) {
 				dlg.on('close', () => {
 					// cancel ?
@@ -387,6 +387,10 @@ export class CalendarItem {
 
 	get isOwner() {
 		return !this.participants || this.calendarPrincipal?.roles?.owner || false;
+	}
+
+	get mayChange() {
+		return this.isOwner && this.cal.myRights.mayWriteAll;
 	}
 
 	get calendarPrincipal() {

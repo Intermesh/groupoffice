@@ -18,6 +18,7 @@ import {ResourceWindow} from "./ResourcesWindow.js";
 import {CalendarWindow} from "./CalendarWindow.js";
 import {client, jmapds, modules} from "@intermesh/groupoffice-core";
 import {SubscribeWindow} from "./SubscribeWindow.js";
+import {SubscribeWebCalWindow} from "./SubscribeWebCalWindow";
 
 export interface CalendarListEventMap<Type> extends ComponentEventMap<Type> {
 	changevisible: (me: Type, ids: string[]) => false | void
@@ -54,7 +55,7 @@ export class CalendarList extends Component {
 			btn({
 				icon: 'more_vert', menu: menu({},
 					btn({
-						hidden: !rights.mayChangeCalendar,
+						hidden: !rights.mayChangeCalendars,
 						icon: 'add',
 						text: t('Create calendar') + '…', handler: () => {
 							const dlg = new CalendarWindow();
@@ -69,7 +70,10 @@ export class CalendarList extends Component {
 							d.show();
 						}
 					}),
-					btn({icon: 'travel_explore',text: t('Add calendar from link') + '…'})
+					btn({icon: 'travel_explore',text: t('Add calendar from link') + '…', handler: () => {
+						const d = new SubscribeWebCalWindow();
+						d.show();
+					}})
 				)
 			})
 		), this.list = list({
@@ -80,9 +84,9 @@ export class CalendarList extends Component {
 				multiSelect: false,
 				listeners: {
 					'selectionchange': (tableRowSelect) => {
-						const calIds = tableRowSelect.getSelected().map((row) => row.record.id);
-						if (calIds[0]) {
-							CalendarView.selectedCalendarId = calIds[0];
+						const s = tableRowSelect.getSelected();
+						if (s[0] && s[0].record.myRights.mayWriteAll) {
+							CalendarView.selectedCalendarId = s[0].id;
 						}
 					}
 				}
@@ -124,12 +128,12 @@ export class CalendarList extends Component {
 		// 	this.inCalendars[storeIndex] = true;
 		// }
 		const rights = modules.get("community", "calendar")!.userRights;
-
+		const icon = data.webcalUri ? ' <i class="icon">web</i>' : '';
 		return [checkbox({
 			color: '#' + data.color,
 			//style: 'padding: 0 8px',
 			value: data.isVisible,
-			label: data.name,
+			label: data.name + icon,
 			listeners: {
 				'render': (field) => {
 					field.input.addEventListener("mousedown", (ev) => {
@@ -163,9 +167,7 @@ export class CalendarList extends Component {
 						if(cb) {
 							cb.mask();
 							client.requestTimeout = 300000;
-							client.jmap('DavAccount/sync', {accountId:data.davaccountId}).then((response)=> {
-								// reload should be automaticly
-							}).catch((err) => {
+							client.jmap('DavAccount/sync', {accountId:data.davaccountId}).catch((err) => {
 								Window.error(err);
 							}).finally(() => {
 								cb.unmask();
@@ -173,15 +175,28 @@ export class CalendarList extends Component {
 							});
 						}
 					}}),
-					btn({icon:'edit', text: t('Edit')+'…', hidden: data.davaccountId || !rights.mayChangeCalendar, disabled:!data.myRights.mayAdmin, handler: async _ => {
+					btn({icon:'sync', text: t('Reload'), hidden: !data.webcalUri, handler: (me) => {
+						const cb = me.findAncestor((cmp) => cmp instanceof CheckboxField);
+						if(cb) {
+							cb.mask();
+							client.requestTimeout = 300000;
+							client.jmap('Calendar/reload', {calendarId:data.id}).catch((err) => {
+								Window.error(err);
+							}).finally(() => {
+								cb.unmask();
+								client.requestTimeout = 30000;
+							});
+						}
+					}}),
+					btn({icon:'edit', text: t('Edit')+'…', hidden: data.davaccountId || !rights.mayChangeCalendars, disabled:!data.myRights.mayAdmin, handler: async _ => {
 							const dlg = data.groupId ? new ResourceWindow() : new CalendarWindow();
 							await dlg.load(data.id);
 							dlg.show();
 						}}),
-					btn({icon:'delete', text: t('Delete','core','core')+'…', hidden: data.davaccountId || !rights.mayChangeCalendar, disabled:!data.myRights.mayAdmin, handler: async _ => {
+					btn({icon:'delete', text: t('Delete','core','core')+'…', hidden: data.davaccountId || !rights.mayChangeCalendars, disabled:!data.myRights.mayAdmin, handler: async _ => {
 						jmapds("Calendar").confirmDestroy([data.id]);
 					}}),
-					hr({hidden: !rights.mayChangeCalendar}),
+					hr({hidden: !rights.mayChangeCalendars}),
 					btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
 						jmapds('Calendar').update(data.id, {isSubscribed: false}).catch(e => Window.error(e))
 					}}),

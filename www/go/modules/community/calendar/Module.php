@@ -25,6 +25,11 @@ class Module extends core\Module
 		return true;
 	}
 
+	public function getStatus() : string {
+		return self::STATUS_STABLE;
+	}
+
+
 	public function getAuthor(): string
 	{
 		return "Intermesh BV <mdhart@intermesh.nl>";

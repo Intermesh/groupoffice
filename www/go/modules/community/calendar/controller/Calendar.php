@@ -85,6 +85,13 @@ class Calendar extends EntityController {
 
 	}
 
+	public function reload($params) {
+		$cal = model\Calendar::findById($params['calendarId']);
+		if($cal)
+			return $cal->importWebcal();
+		return ['success' => false];
+	}
+
 	public function changes($params) {
 		return $this->defaultChanges($params);
 	}

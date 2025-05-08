@@ -520,6 +520,44 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 		return !empty($this->recurrenceId);
 	}
 
+	/**
+	 * @param $blobIds
+	 * @param $calendarId
+	 * @param $uid string 'check', 'ignore', 'new'
+	 * @return object
+	 */
+	static function import($blobIds, $calendarId, $uid='check') {
+		$r = (object)[
+			'saved'=>0,
+			'failed'=>0,
+			'skipped'=>0,
+			'failureReasons'=>[]
+		];
+		foreach($blobIds as $blobId) {
+			foreach(ICalendarHelper::calendarEventFromFile($blobId) as $ev) {
+				if(is_array($ev)){
+					$r->failureReasons[$r->failed] = 'Parse error '.$ev['vevent']->VEVENT[0]->UID. ': '. $ev['error']->getMessage();
+					$r->failed++;
+					continue;
+				}
+				$ev->calendarId = $calendarId;
+				if($uid === 'new') {
+					$ev->uid = UUID::v4();
+				} else if($uid === 'check' && self::find()->selectSingleValue('id')->where(['uid'=>$ev->uid])->single() !== null) {
+					$r->skipped++;
+					continue;
+					// check if exists
+				} // else use UID from ics file without checking.
+				if($ev->save()){ // will fail if UID exists. We dont want to modify existing events like this
+					$r->saved++;
+				} else {
+					$r->failureReasons[$r->failed] = 'Validate error '.$ev->uid. ': '. var_export($ev->getValidationErrors(),true);
+					$r->failed++;
+				}
+			}
+		}
+		return $r;
+	}
 	protected function internalSave() : bool {
 
 		if(empty($this->uri)) {
@@ -774,7 +812,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 		$calIds = $calendarModSeq->selectSingleValue('calendarId')->distinct()->all();
 		// Garbage collector will delete event when last user instance is removed
 		$success =  parent::internalDelete($query); // delete none recurring or complete series
-		if($success) {
+		if($success && !empty($calIds)) {
 			Calendar::updateHighestModSeq($calIds);
 		}
 		return $success;

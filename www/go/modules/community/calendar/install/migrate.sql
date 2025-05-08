@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar` (
 	`description` TEXT NULL,
 	`defaultColor` VARCHAR(21) NOT NULL, # lightgoldenrodyellow
 	`timeZone` VARCHAR(45) NULL,
+	`webcalUri` VARCHAR(512) DEFAULT NULL,
 	`groupId` INT UNSIGNED NULL,
 	`aclId` INT NOT NULL,
 	`createdBy` INT NULL,
@@ -419,8 +420,8 @@ GROUP by g.id;
 
 -- concat 18  random hex colors and select 1 with calendar.id % 18 * hexlength if null
 INSERT INTO calendar_calendar
-	(id,		name, description, defaultColor, timeZone, groupId, aclId,createdBy,ownerId) SELECT
-   cal.id, name, comment,IFNULL(cu.color, SUBSTRING('#CDAD00#E74C3C#9B59B6#8E44AD#2980B9#3498DB#1ABC9C#16A085#27AE60#2ECC71#F1C40F#F39C12#E67E22#D35400#95A5A6#34495E#808B96#1652a1', (cal.id MOD 18) * 7 + 2 ,6)), null, 	IF(group_id=1,null,group_id), acl_id, 1,	cal.user_id FROM
+	(id,		name, description,webcalUri, defaultColor,timeZone, groupId, aclId,createdBy,ownerId) SELECT
+   cal.id, name, comment,IF(enable_ics_import=1 AND ics_import_url!='',ics_import_url,null), IFNULL(cu.color, SUBSTRING('#CDAD00#E74C3C#9B59B6#8E44AD#2980B9#3498DB#1ABC9C#16A085#27AE60#2ECC71#F1C40F#F39C12#E67E22#D35400#95A5A6#34495E#808B96#1652a1', (cal.id MOD 18) * 7 + 2 ,6)), null, 	IF(group_id=1,null,group_id), acl_id, 1,	cal.user_id FROM
   cal_calendars cal LEFT JOIN cal_calendar_user_colors cu ON cal.id = cu.calendar_id GROUP BY cal.id;
 
 -- subscribe to calendars user has access to

@@ -286,5 +286,6 @@ WHERE `a`.`id` < `b`.`id`
 $updates["202505011057"][] = "ALTER TABLE `calendar_calendar_event` ADD UNIQUE INDEX `event_once_per_calendar` (`eventId` ASC, `calendarId` ASC);";
 
 $updates["202505061137"][] = "ALTER TABLE `calendar_event` ADD INDEX `fk_calendar_event_uid_index` (`uid` ASC);";
+$updates["202505071158"][] = "ALTER TABLE `calendar_calendar` ADD COLUMN `webcalUri` VARCHAR(512) NULL DEFAULT NULL AFTER `timeZone`;";
 
 // TODO: calendar views -> custom filters

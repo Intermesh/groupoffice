@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar` (
    `description` TEXT NULL,
     `defaultColor` VARCHAR(21) NOT NULL, # lightgoldenrodyellow
     `timeZone` VARCHAR(45) NULL,
-	 `groupId` INT UNSIGNED NULL,
+	  `webcalUri` VARCHAR(512) NULL DEFAULT NULL,
+	  `groupId` INT UNSIGNED NULL,
     `aclId` INT NOT NULL,
     `createdBy` INT NULL,
     `ownerId` INT NULL,
