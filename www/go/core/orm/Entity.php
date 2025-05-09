@@ -180,7 +180,8 @@ abstract class Entity extends Property {
 	 * For a single value do:
 	 *
 	 */
-	public static final function find(array $properties = [], bool $readOnly = false) {
+	public static final function find(array $properties = [], bool $readOnly = false): Query
+	{
 		return static::internalFind($properties, $readOnly);
 	}
 
