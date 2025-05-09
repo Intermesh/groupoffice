@@ -188,6 +188,7 @@ abstract class Entity extends Property {
 	 * Same as {@see find()} but join user tables {@see Mapping::addUserTable()} as another user than the logged in user.
 	 *
 	 * @throws Exception
+	 * @return Query<$this>
 	 */
 	public static final function findFor(int $userId, array $properties = [], bool $readOnly = false): Query
 	{
