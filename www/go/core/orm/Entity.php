@@ -942,6 +942,12 @@ abstract class Entity extends Property {
 
 		*/
 		$filters->add("link", function (Criteria $criteria, $value, Query $query) {
+
+			if(!isset($value['entity']) || (count($value) > 1 && !isset($value['id']))) {
+				throw new \LogicException("link filter must have 'entity' and an optional 'id' parameter");
+			}
+
+
 			$linkAlias = 'link_' . uniqid();
 			$on = $query->getTableAlias() . '.id =  ' . $linkAlias . '.toId  AND ' . $linkAlias . '.toEntityTypeId = ' . static::entityType()->getId() . ' AND ' . $linkAlias . '.fromEntityTypeId = ' . EntityType::findByName($value['entity'])->getId();
 
