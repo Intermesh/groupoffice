@@ -1,3 +1,4 @@
+12-05-2025: 25.0.21
 - Core: fix database error in disk space calculation cronjob
 - ActiveSync: Fixed error in calendar sync because ownerId was changed to getOwnerId()
 - CalDAV: Fixed error in calendar sync because ownerId was changed to getOwnerId()
