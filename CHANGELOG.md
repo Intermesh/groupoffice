@@ -1,3 +1,4 @@
+12-05-2025: 6.8.119
 - OAuth2 client: minor tweak project_id label
 - Core: Fixed: Blind Stored XSS in Phone Number Field Enables Forced Redirect and Unauthorized Actions
 - Core: Fixed:  DOM-Based XSS in all Date Input Fields Allow Arbitrary JavaScript Execution
