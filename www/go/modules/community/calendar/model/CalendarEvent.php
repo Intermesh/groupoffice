@@ -338,7 +338,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	public function icsBlob() {
 
 		$blob = isset($this->veventBlobId) ? Blob::findById($this->veventBlobId) : null;
-		if(!$blob || $blob->modifiedAt < $this->modifiedAt) {
+		if(!$blob || $blob->modifiedAt < $this->modifiedAt || !$blob->getFile()->exists()) {
 			$blob = ICalendarHelper::makeBlob($this);
 			$this->veventBlobId = $blob->id;
 			if(!$this->isNew()) {

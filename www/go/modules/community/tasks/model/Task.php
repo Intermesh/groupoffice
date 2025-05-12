@@ -706,7 +706,7 @@ class Task extends AclItemEntity {
 
 	public function icsBlob() {
 		$blob = isset($this->vcalendarBlobId) ? Blob::findById($this->vcalendarBlobId) : null;
-		if(!$blob || $blob->modifiedAt < $this->modifiedAt) {
+		if(!$blob || $blob->modifiedAt < $this->modifiedAt || !$blob->getFile()->exists()) {
 			$this->modifiedAt = new DateTime();
 			$blob = self::makeBlob($this);
 			$this->vcalendarBlobId = $blob->id;
