@@ -281,7 +281,6 @@ class CalDAVBackend extends AbstractBackend implements
 			$data = $blob->getFile()->getContents();
 		} catch(\Exception$e) {
 			ErrorHandler::logException($e);
-			$object->vcalendarBlobId = null;
 			$blob = $object->icsBlob();
 			$data = $blob->getFile()->getContents();
 		}
