@@ -66,7 +66,7 @@ class CalendarStore extends Store {
 		}
 		$calendar = Calendar::findById($folderid);
 		ZLog::Write(LOGLEVEL_INFO, "GetMessageList ".$folderid. ' ('.$calendar->name.') '. $cutoffdate);
-		if($calendar->ownerId != go()->getUserId()) {
+		if($calendar->getOwnerId() != go()->getUserId()) {
 			$query->andWhere('privacy', '=', 'public');
 		}
 
