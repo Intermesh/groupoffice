@@ -6,6 +6,7 @@
 - History: Fixed cross site scripting vulnerability JVN#30520482, JVN#87138325 and JVN#72111431
 - Email: fix deprecation error
 - Support: bugfix saving default task list
+- SUpportclient: make support list combo single select in 'new request' window
 
 25-04-2025: 6.8.118
 - ActiveSync: Fix broken utf-8 when recreating MIME for Z-push
