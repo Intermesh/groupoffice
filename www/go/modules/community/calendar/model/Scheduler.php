@@ -3,11 +3,16 @@
 namespace go\modules\community\calendar\model;
 
 use Exception;
+use GO\Base\Db\FindCriteria;
+use GO\Base\Db\FindParams;
+use go\core\exception\JsonPointerException;
 use go\core\mail\Address;
 use go\core\mail\Attachment;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
+use GO\Email\Model\Alias;
 use GO\Email\Model\ImapMessage;
+use PDO;
 use Sabre\VObject\Component\VCalendar;
 
 class Scheduler {
@@ -174,12 +179,14 @@ class Scheduler {
 
 	/**
 	 * @param ImapMessage $imapMessage
-	 * @param $ifMethod
+	 * @param null $ifMethod
 	 * @return array{method:string, feedback:string, event:CalendarEvent, scheduleId: int, status:string}|false
+	 * @throws SaveException
+	 * @throws JsonPointerException
 	 * @throws \go\core\http\Exception
-	 *
 	 */
-	static function handleIMIP(ImapMessage $imapMessage, $ifMethod=null) {
+	static function handleIMIP(ImapMessage $imapMessage, $ifMethod=null): bool|array
+	{
 		$vcalendar = $imapMessage->getInvitationVcalendar();
 		if(!$vcalendar) {
 			return false;
@@ -190,11 +197,11 @@ class Scheduler {
 		}
 		$vevent = $vcalendar->VEVENT[0];
 
-		$aliases = \GO\Email\Model\Alias::model()->find(
-			\GO\Base\Db\FindParams::newInstance()
+		$aliases = Alias::model()->find(
+			FindParams::newInstance()
 				->select('email')
-				->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('account_id', $imapMessage->account->id))
-		)->fetchAll(\PDO::FETCH_COLUMN, 0);
+				->criteria(FindCriteria::newInstance()->addCondition('account_id', $imapMessage->account->id))
+		)->fetchAll(PDO::FETCH_COLUMN, 0);
 
 		// for case insensitive match
 		$aliases = array_map('strtolower', $aliases);
