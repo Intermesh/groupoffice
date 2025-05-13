@@ -280,6 +280,10 @@ class Scheduler {
 		// old framework sets user timezone :(
 		date_default_timezone_set("UTC");
 
+		if(!isset($vcalendar->method)) {
+			return null;
+		}
+
 		$method = $vcalendar->method->getValue();
 		$event = self::eventByVEvent($vcalendar, $receiver);
 
@@ -290,7 +294,7 @@ class Scheduler {
 			case 'CANCEL': return self::processCancel($vcalendar,$event);
 			case 'REPLY': return self::processReply($vcalendar,$event, $sender);
 		}
-		go()->debug("invalid method ".$vcalendar->method);
+		go()->debug("invalid method " . $method);
 		return null;
 	}
 
