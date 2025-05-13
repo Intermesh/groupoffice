@@ -24,6 +24,7 @@ export interface CalendarEvent extends BaseEntity {
 	alerts?: any
 	showWithoutTime?: boolean // isAllDay
 	duration: string
+	privacy: 'public' | 'private' | 'secret'
 	start: string
 	timeZone:Timezone
 	title: string

@@ -574,7 +574,6 @@ class CalDAVBackend extends AbstractBackend implements
 		$userId = User::find()->selectSingleValue("id")->where('username', '=', $username)->single();
 
 		$event = CalendarEvent::find()
-			->join('calendar_calendar', 'cal', 'cal.id=cce.calendarId')
 			->select('cce.calendarId, uri')
 			->where(['uid' => $uid, 'cal.ownerId'=>$userId])
 			->fetchMode(\PDO::FETCH_OBJ)
