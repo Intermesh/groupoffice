@@ -254,7 +254,7 @@ class Calendar extends AclOwnerEntity {
 		// isPrinicpal() dictates an owner exists
 		$resourceGroupOwner = Principal::find(['name','email'])
 			->join('calendar_resource_group', 'rg', 'rg.defaultOwnerId = principal.id')
-			->where('rg.id', '=', $this->groupId);
+			->where('rg.id', '=', $this->groupId)->single();
 		return [
 			'name'=>$this->name,
 			'description' => $this->description ?? $resourceGroupOwner->name ?? '',
