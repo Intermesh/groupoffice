@@ -97,6 +97,15 @@ GO.files.FilesContextMenu = function(config)
 		},
 		scope: this
 	});
+
+	this.moveToTrashButton = new Ext.menu.Item({
+		iconCls: "ic-delete",
+		text: t("Move to Trash"),
+		handler: function()  {
+			this.fireEvent("moveToTrash", this, this.records, this.clickedAt);
+		},
+		scope: this
+	});
 	
 	this.batchEditButton = new Ext.menu.Item({
 		iconCls: 'ic-select-all',
@@ -233,14 +242,14 @@ GO.files.FilesContextMenu = function(config)
 	config['items'].push(this.unlockButton);
 
 
-	config['items'].push({
+	config['items'].push(this.propertiesButton = new Ext.menu.Item({
 		iconCls: 'ic-settings-applications',
 		text: t("Properties"),
 		handler: function(){
 			this.fireEvent('properties', this, this.records);
 		},
 		scope:this
-	});
+	}));
 
 	config['items'].push(this.bookmarkButton);
 
@@ -250,10 +259,20 @@ GO.files.FilesContextMenu = function(config)
 	//this.pasteButton,
 	config['items'].push(this.deleteSeparator = new Ext.menu.Separator());
 	config['items'].push(this.deleteButton);
+	config['items'].push(this.moveToTrashButton);
 	config['items'].push(this.batchEditButton);
 	config['items'].push(this.compressSeparator = new Ext.menu.Separator());
 	config['items'].push(this.compressButton);
 	config['items'].push(this.decompressButton);
+
+	this.createDirectLinkButton = new Ext.menu.Item({
+		iconCls: "ic-open-in-browser",
+		text: t("Copy direct link", "files"),
+		handler: function () {
+			this.fireEvent('direct_link', this, this.records, this.clickedAt)
+		},
+		scope: this
+	});
 
 	this.createDownloadLinkButton = new Ext.menu.Item({
 		iconCls: 'ic-link',
@@ -263,7 +282,6 @@ GO.files.FilesContextMenu = function(config)
 		},
 		scope: this
 	});
-	// config['items'].push(this.createDownloadLinkButton);
 
 	if(go.Modules.isAvailable("legacy", "email")) {
 		this.downloadLinkButton = new Ext.menu.Item({
@@ -290,7 +308,7 @@ GO.files.FilesContextMenu = function(config)
 		iconCls: "ic-share",
 		text: t("Share", "files"),
 		menu: [
-			this.createDownloadLinkButton
+			this.createDirectLinkButton,this.createDownloadLinkButton
 		]
 	});
 	if (go.Modules.isAvailable("legacy", "email")) {
@@ -322,6 +340,7 @@ GO.files.FilesContextMenu = function(config)
 		'compress' : true,
 		'decompress' : true,
 		'download_link' : true,
+		'direct_link': true,
 		'email_files' : true,
 		'addBookmark' : true,
 		'download_selected': true
@@ -364,8 +383,7 @@ Ext.extend(GO.files.FilesContextMenu, Ext.menu.Menu,{
 
 			var extension = '';
 			
-			if(records.length=='1')
-			{
+			if(records.length=='1') {
 				extension = records[0].data.extension;
 
 				switch (extension) {
@@ -389,8 +407,7 @@ Ext.extend(GO.files.FilesContextMenu, Ext.menu.Menu,{
 						this.downloadAsPdf.hide();
 				}
 
-				switch(extension)
-				{
+				switch(extension) {
 					case 'zip':
 					case 'tar':
 					case 'tgz':
@@ -404,6 +421,7 @@ Ext.extend(GO.files.FilesContextMenu, Ext.menu.Menu,{
 						if(this.downloadLinkButton)
 							this.downloadLinkButton.show();
 						this.createDownloadLinkButton.show();
+						this.createDirectLinkButton.show();
 
 						if(this.emailFilesButton)
 							this.emailFilesButton.show();
@@ -429,11 +447,17 @@ Ext.extend(GO.files.FilesContextMenu, Ext.menu.Menu,{
 						this.batchEditButton.hide();
 
 						this.createDownloadLinkButton.hide();
+						this.createDirectLinkButton.hide();
 
 						if(this.emailFilesButton)
 							this.emailFilesButton.hide();
 
 						this.bookmarkButton.show();
+
+						this.propertiesButton.hidden = true;
+						if (Ext.isNumber(records[0].data.id)) {
+							this.propertiesButton.show();
+						};
 
 						break;
 
@@ -459,6 +483,7 @@ Ext.extend(GO.files.FilesContextMenu, Ext.menu.Menu,{
 						this.batchEditButton.show();
 						
 						this.createDownloadLinkButton.show();
+						this.createDirectLinkButton.show();
 
 						if(this.emailFilesButton)
 							this.emailFilesButton.show();
@@ -467,9 +492,7 @@ Ext.extend(GO.files.FilesContextMenu, Ext.menu.Menu,{
 
 						break;
 				}
-			}else
-			{
-
+			} else {
 				clickedAt == 'tree' ? this.compressButton.hide() : this.compressButton.show();
 				this.decompressButton.hide();
 				this.downloadButton.hide();
@@ -480,15 +503,16 @@ Ext.extend(GO.files.FilesContextMenu, Ext.menu.Menu,{
 				this.downloadAsPdf.hide();
 
 				this.createDownloadLinkButton.hide();
+				this.createDirectLinkButton.hide();
 
 				if(this.emailFilesButton)
 					this.emailFilesButton.show();
 
 				Ext.each(this.records, function(record) {
 					if (record.data.extension == 'folder') {
-
-						if(this.emailFilesButton)
+						if (this.emailFilesButton) {
 							this.emailFilesButton.hide();
+						}
 
 						return false;
 					}

@@ -74,6 +74,7 @@
 
 
 	i {
+		display:inline-block;
 		font-size: inherit !important;
 		color: inherit;
 		min-height: dp(16);
@@ -176,6 +177,12 @@
 }
 
 .cal {
+	i.cat {
+		background-color: currentColor;
+		border-radius: dp(3);
+		margin:dp(2);
+		vertical-align: middle;
+	}
 	i.icon {
 		display:inline-block !important;
 	}
@@ -443,11 +450,10 @@ $timeMargin: dp(72);
 			border-right: 1px solid var(--fg-divider);
 		}
 	}
-	> ul { //header + all-day
+	> ul { //header
 		display: flex;
 		scrollbar-gutter: stable;
 		overflow-y:auto;
-		max-height: dp(212); // x all-day events fit
 		border-bottom: 2px solid $colorBorder;
 		&:first-child { // header
 			@extend %weekhead;
@@ -457,7 +463,7 @@ $timeMargin: dp(72);
 			background-color:$surfaceLowest;
 			flex-shrink: 0;
 			overflow-x: hidden;
-			max-height: dp(212); // x all-day events fit
+			max-height: 30%; // x all-day events fit
 			min-height:dp(32);
 			border-bottom: 2px solid $colorLine;
 		}
@@ -522,6 +528,9 @@ $timeMargin: dp(72);
 		position: absolute;
 		min-height: dp(24); // big enough to click on it
 		border-left: dp(6) solid currentColor;
+		> em {
+			mask-image:none;
+		}
 		> em, > span, > i {
 			color: color-mix(in srgb, currentColor 36%, var(--fg-text));
 		}

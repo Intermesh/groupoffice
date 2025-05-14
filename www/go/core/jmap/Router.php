@@ -3,6 +3,7 @@
 namespace go\core\jmap;
 
 use Exception as CoreException;
+use go\core\db\DbException;
 use go\core\ErrorHandler;
 use go\core\exception\JsonPointerException;
 use go\core\fs\File;
@@ -118,6 +119,8 @@ class Router {
 
 			$debugMessage = ErrorHandler::logException($e);
 
+			$msg = $e->getMessage();
+
 			if($e instanceof Exception) {
 				switch($e->getCode()) {
 					case 401:
@@ -130,13 +133,16 @@ class Router {
 					default:
 						$type = "serverFail";
 				}
-			} else{
+			} else {
 				$type = lcfirst((new ReflectionClass($e))->getShortName());
+				if($e instanceof DbException) {
+					$msg = "Database exception. Check server logs for details.";
+				}
 			}
 			// convert jmap classes to set error response
 			// https://jmap.io/spec-core.html#errors
 			$error = [
-				"message" => $e->getMessage(),
+				"message" => $msg,
 				"type" => $type
 			];
 			

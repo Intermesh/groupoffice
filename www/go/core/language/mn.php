@@ -813,7 +813,7 @@ return array (
   'Login as this user' => 'Хэрэглэгчийн эрхээр нэвтэрнэ үү',
   'Failed to login as this user' => 'Нэвтрэх оролдлого амжилтгүй боллоо',
   'Archive user' => 'Хэрэглэгчийн архивлах',
-  'Archiving a user will disable them and make their items invisible. Are you sure?' => 'Архив хийж байгаа хэрэглэгч идэвхгүй болж хэрэглэгчийн файлууд байгууд харагдахгүй горимд шилжинэ. Та итгэлтэй байна уу?',
+  'Archiving a user will disable them, revoke all group memberships and make their items invisible. Are you sure?' => 'Архив хийж байгаа хэрэглэгч идэвхгүй болж хэрэглэгчийн файлууд байгууд харагдахгүй горимд шилжинэ. Та итгэлтэй байна уу?',
   'You can\' t archive yourself' => 'Архивлах боломжгүй',
   'Error while saving the data' => 'Мэдээллийг хадгалах явцад алдаа',
   'Edit contact' => 'Холбоо барих мэдээллийг засварлах',

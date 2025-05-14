@@ -255,7 +255,7 @@ class Link extends AclItemEntity
 	 * @throws SaveException
 	 * @throws Exception
 	 */
-	public static function create($a, $b, string $description = null, bool $checkExisting = true) {
+	public static function create($a, $b, string|null $description = null, bool $checkExisting = true) {
 		
 		$existingLink = $checkExisting ? static::findLink($a, $b) : false;
 		if($existingLink) {
@@ -485,7 +485,7 @@ class Link extends AclItemEntity
 
 	}
 	
-	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
+	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int|null $userId = null, array|null $groups = null): Query
 	{
 		$level = Acl::LEVEL_READ;
 		//return parent::applyAclToQuery($query, $level, $userId, $groups);

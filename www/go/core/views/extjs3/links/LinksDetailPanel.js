@@ -52,7 +52,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 		Ext.apply(this, {
 			listeners: {
 				added: function(me, dv, index) {
-					this.stateId = 'go-links-' + (dv.entity ? dv.entity : dv.entityStore.entity.name);
+					this.stateId = 'go-links-' + (dv.entity ? dv.entity : dv.entityStore.entity.name) + "-" + this.link.entity;
 					this.initState();
 				},
 				expand: function() {
@@ -63,6 +63,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 //			header: false,
 			collapsible: true,
 			titleCollapse: true,
+			hidden: true,
 			hideMode: "offsets",
 			title: this.link.title,
 			items: [this.dataView = new Ext.DataView({
@@ -135,7 +136,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 		</div>', {
 			getLinkDescription: function(values) {
 				if(values.description && values.description.length > 0) {
-					return '<small>'+values.description+'</small>';
+					return '<small>'+Ext.util.Format.htmlEncode(values.description)+'</small>';
 				}
 				return "";
 			},
@@ -196,19 +197,28 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 		this.linkMoreMenu.showAt(e.getXY());
 	},
 	
-	onLoad: function (dv) {
-		
-		this.detailView = dv;	
-		
+	onLoad: async function (dv) {
+
+		const entity = dv.entity ? dv.entity : dv.entityStore.entity.name, //dv.entity exists on old DetailView or display panels
+		entityId =dv.model_id ? dv.model_id : dv.currentId //model_id is from old display panel
+
+		const f = this.store.getFilter('fromEntity');
+
+		if(f && f.entity == entity && f.entityId == entityId) {
+			return;
+		}
+
+		this.detailView = dv;
+
 		this.hide();
 		
 		this.store.setFilter('fromEntity', {
-			entity: dv.entity ? dv.entity : dv.entityStore.entity.name, //dv.entity exists on old DetailView or display panels
-			entityId: dv.model_id ? dv.model_id : dv.currentId //model_id is from old display panel
+			entity,
+			entityId
 		});
 
 		this.store.baseParams.position = 0;
-		this.store.load();
+		return this.store.load();
 	}
 });
 

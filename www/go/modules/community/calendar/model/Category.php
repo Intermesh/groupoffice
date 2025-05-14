@@ -22,7 +22,7 @@ class Category extends Entity {
 	public $name;
 
 	/** @var int could be NULL for global categories */
-	public $ownerId;
+	protected $ownerId;
 
 	public $color;
 
@@ -35,11 +35,20 @@ class Category extends Entity {
 			->addTable("calendar_category", "category");
 	}
 
+	public function setOwnerId($id) {
+		if(go()->getAuthState()->isAdmin())
+			$this->ownerId = $id; // only admin may create global categories
+	}
+
+	public function getOwnerId() {
+		return $this->ownerId;
+	}
+
 	protected function init()
 	{
 		parent::init();
 
-		if($this->isNew())  {
+		if($this->isNew() )  {
 			$this->ownerId = go()->getUserId();
 		}
 	}
@@ -55,7 +64,7 @@ class Category extends Entity {
 		if(isset($this->calendarId)) {
 			$calendar = Calendar::findById($this->calendarId);
 
-			return $calendar->getPermissionLevel() >= Acl::LEVEL_MANAGE ? Acl::LEVEL_DELETE : Acl::LEVEL_READ;
+			return $calendar->getPermissionLevel() >= Acl::LEVEL_MANAGE ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
 		} else {
 			return $this->ownerId == go()->getUserId() ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
 		}
@@ -85,10 +94,10 @@ class Category extends Entity {
 			if($value === 'subscribedOnly') {
 				$query->join('calendar_calendar_user', 'ucal', 'ucal.id = category.calendarId AND ucal.userId = '.go()->getAuthState()->getUserId(), 'LEFT');
 					$criteria
-					->where('ucal.isSubscribed','=', true)
+					->where(['ucal.isSubscribed' => true])
 					->orWhere('category.calendarId', 'IS', null);
 			} else if(!empty($value)) {
-				$criteria->andWhere('category.calendarId', '=', $value);
+				$criteria->andWhere(['category.calendarId' => $value]);
 			}
 		}, 'subscribedOnly')
 			->add('ownerId', function(Criteria $criteria, $value) {

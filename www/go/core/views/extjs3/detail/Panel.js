@@ -56,6 +56,13 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		this.cls += " go-detail-view-" + this.entityStore.entity.name.toLowerCase();
 		
 		this.on('afterrender', function() {
+
+			this.items.each(function (item, index, length) {
+
+				if (item.hiddenOnInit === undefined) {
+					item.hiddenOnInit = item.hidden;
+				}
+			});
 			this.internalReset();
 
 			this.body.on("click", this.onBodyClick, this);
@@ -146,7 +153,10 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		this.applyTemplateToItems(this.items);
 		
 		this.doLayout();
-		this.body.scrollTo('top', 0);		
+
+		if(!this.reloading) {
+			this.body.scrollTo('top', 0);
+		}
 	},
 
 	/**
@@ -157,11 +167,10 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	applyTemplateToItems : function(items) {
 		items.each(function (item, index, length) {
 
-			if(!item.initialConfig.hidden)
+			if(!item.hiddenOnInit)
 				item.show();
 
 			if (item.tpl) {
-				//debugger;
 				item.update(this.data);
 			}
 			if (item.onLoad) {
@@ -173,8 +182,11 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 
 	reload: function () {
 		const id = this.currentId;
+		this.reloading = true
 		this.currentId = null;
-		this.load(id);
+		return this.load(id).finally(()=> {
+			this.reloading = false;
+		})
 	},
 	
 	internalLoad : async function(data) {

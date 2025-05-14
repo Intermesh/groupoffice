@@ -340,19 +340,6 @@ class Acl extends Entity {
 		return self::$permissionLevelCache[$cacheKey];
 	}
 
-
-	/**
-	 * @return UserDisplay[]|Query
-	 */
-	public function findAuthorizedUsers(): Query
-	{
-		return UserDisplay::find()
-			->join('core_user_group', 'ug', 'ug.userId = u.id')
-			->join('core_acl_group', 'ag', 'ag.groupId = ug.id')
-			->where('ag.aclId', '=', $this->id);
-	}
-
-
 	/**
 	 * Get ACL changes
 	 *

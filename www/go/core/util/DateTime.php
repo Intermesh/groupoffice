@@ -67,7 +67,7 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 		return self::$currentUser;
 	}
 
-	public function toUserFormat(bool $withTime = false, User $user = null): string
+	public function toUserFormat(bool $withTime = false, User|null $user = null): string
 	{
 		if(!isset($user)) {
 			$user = self::currentUser();
@@ -96,7 +96,7 @@ class DateTime extends PHPDateTime implements JsonSerializable {
 	 * @return DateTime|false
 	 * @throws \DateMalformedStringException
 	 */
-	public static function createFromFormat(string $format, string $datetime, DateTimeZone $timezone = null): DateTime | false
+	public static function createFromFormat(string $format, string $datetime, DateTimeZone|null $timezone = null): DateTime | false
 	{
 		$dt = parent::createFromFormat($format, $datetime, $timezone);
 		if($dt === false) {

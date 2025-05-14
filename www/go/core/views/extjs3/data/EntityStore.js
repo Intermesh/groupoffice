@@ -392,7 +392,6 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 * @returns {Promise<any>} Client call ID
 	 */
 	query : function(params, cb, scope) {
-
 		const callId = window.groupofficeCore.jmapds(this.entity.name).nextCallId;
 		let retProm = window.groupofficeCore.jmapds(this.entity.name)
 			.query(params)

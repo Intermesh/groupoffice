@@ -2075,10 +2075,11 @@ td.x-date-mp-sep {
 	@extend .z5;
 	border-radius: $borderRadius;
 	background-color:var(--bg-layer);
-	opacity: 1;
-	transition: opacity 90ms $curve-standard, transform 120ms $curve-deceleration;
-	transform-origin: left top 0;
-	transform: scale(1);
+	//removed scale as it doesn't play nice with layout's using getBoundingClientRect() instread of offsetHeight. We need precise numbers with decimals now.
+	//opacity: 1;
+	//transition: opacity 90ms $curve-standard, transform 120ms $curve-deceleration;
+	//transform-origin: left top 0;
+	//transform: scale(1);
 	will-change: transform, opacity;
 	
 	&.x-menu-no-icons {
@@ -2088,8 +2089,8 @@ td.x-date-mp-sep {
 	}
 	
 	&.x-hide-offsets {
-		opacity: 0;
-		transform: scale(0.6);
+		//opacity: 0;
+		//transform: scale(0.6);
 	}
 	&-list {
 		padding: dp(8) 0; 

@@ -677,7 +677,7 @@ class Connection {
 	 * @return bool The current or old value
 	 * @throws DbException
 	 */
-	public function foreignKeyChecks(bool $value = null): bool
+	public function foreignKeyChecks(bool|null $value = null): bool
 	{
 		$stmt = $this->query("SELECT @@SESSION.foreign_key_checks");
 		$current = !!$stmt->fetch(PDO::FETCH_COLUMN, 0);

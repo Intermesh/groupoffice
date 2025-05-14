@@ -22,7 +22,6 @@ export class SubscribeWindow extends Window {
 		});
 
 
-
 		this.on('render', () => {
 			store.addScrollLoader(this.scroller.el)
 			void store.load();
@@ -32,7 +31,6 @@ export class SubscribeWindow extends Window {
 
 			tbar({},
 				'->',
-
 				searchbtn({
 					listeners: {
 						input: (searchBtn, text) => {
@@ -41,8 +39,7 @@ export class SubscribeWindow extends Window {
 						}
 					}
 				})
-
-				),
+			),
 
 			this.scroller = comp({cls:'scroll', flex:1},
 
@@ -54,7 +51,7 @@ export class SubscribeWindow extends Window {
 			columns: [
 				column({id:'name'}),
 				column({id:'id', width:120, renderer: v=> btn({
-						text: "Subscribe",
+						text: t("Subscribe"),
 						cls:'primary',
 						handler: () => { store.dataSource.update(v, {isSubscribed: true}); }
 					})

@@ -105,7 +105,13 @@ export class EventWindow extends FormWindow {
 							.add(di)
 							.format(format);
 					}
-				}}
+				},
+			'setvalue': (me) => {
+				const d = me.getValueAsDateTime();
+				if(d){
+					recurrenceField.setStartDate(d);
+				}
+			}}
 		});
 		this.endDate = datefield({label:t('End'), name: 'end', flex:1, defaultTime: (now.getHours()+1 )+':00',
 			listeners: {'change': (me,_v, old) => {
@@ -303,7 +309,7 @@ export class EventWindow extends FormWindow {
 			})
 		);
 
-		this.bbar.items.insert(1,
+		this.bbar.items.insert(2,
 			btn({icon:'attach_file', handler: _ => this.attachFile() })
 		);
 
@@ -349,7 +355,7 @@ export class EventWindow extends FormWindow {
 				store: exceptionStore,
 				columns: [
 					column({id: "recurrenceId", header:t('Start'), renderer(v,record) {
-						return Format.dateTime(v)+ `<br><small>${record.excluded ? 'Excluded' : 'Override'}</small>`;
+						return Format.dateTime(v)+ '<br><small>'+t(record.excluded ? 'Excluded' : 'Override')+'</small>';
 					}}),
 					column({id: "excluded", header: '', width:90, renderer: (v,r) => btn({icon:'delete',handler:()=>{
 						this.item!.undoException(r.recurrenceId).then(_=> { exceptionStore.remove(r)})
@@ -418,6 +424,10 @@ export class EventWindow extends FormWindow {
 		if(this.confirmedScheduleMessage) {
 			return;
 		}
+		if(!this.form.isModified()) {
+			this.close();
+			return false;
+		}
 		if(this.item!.isRecurring) {
 
 			this.item!.patch(this.parseSavedData(this.form.modified), () => {
@@ -437,14 +447,16 @@ export class EventWindow extends FormWindow {
 		}
 	}
 
-	private async attachFile() {
-		 const files = await browser.pickLocalFiles(true);
-		 this.mask();
-		 const blobs = await client.uploadMultiple(files);
-		 this.unmask();
-		 for(const r of blobs)
-		 	this.attachments.add({blobId:r.id, title:r.name, size:r.size, contentType:r.type}, );
-		 //console.warn(blobs);
+	private attachFile() {
+		 browser.pickLocalFiles(true).then(files => {
+			 this.attachments.mask();
+			 client.uploadMultiple(files).then(blobs => {
+				 for(const r of blobs)
+					 this.attachments.add({blobId:r.id, title:r.name, size:r.size, contentType:r.type}, );
+			 }).finally(() => {
+				 this.attachments.unmask();
+			 });
+		 });
 	}
 
 }

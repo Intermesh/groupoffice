@@ -1219,7 +1219,7 @@ Minden jog fenntartva.<br />
   'Recovery e-mail' => 'Helyreállítási e-mail',
   'Permission overview' => 'Az engedélyek áttekintése',
   'Archive user' => 'Felhasználó archiválása',
-  'Archiving a user will disable them and make their items invisible. Are you sure?' => 'A felhasználó archiválása letiltja őt, és láthatatlanná teszi az elemeit. Biztos vagy benne?',
+  'Archiving a user will disable them, revoke all group memberships and make their items invisible. Are you sure?' => 'A felhasználó archiválása letiltja őt, és láthatatlanná teszi az elemeit. Biztos vagy benne?',
   'You can\' t archive yourself' => 'Nem archiválhatod magad',
   'Are you sure you want to select all {count} results?' => 'Biztos, hogy az összes {count} eredményt ki akarja választani?',
   'Search...' => 'Keresés...',

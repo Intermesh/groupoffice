@@ -15,6 +15,7 @@ use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
 use go\core\exception\JsonPointerException;
 use go\core\fs\Blob;
+use go\core\model\Acl;
 use go\core\model\Alert as CoreAlert;
 use go\core\model\User;
 use go\core\orm\CustomFieldsTrait;
@@ -22,6 +23,7 @@ use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
+use go\core\orm\Relation;
 use go\core\orm\SearchableTrait;
 use go\core\util\JSON;
 use go\core\util\UUID;
@@ -236,17 +238,17 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	protected static function defineMapping(): Mapping {
 		return parent::defineMapping()
 			->addTable('calendar_calendar_event', 'cce', ['eventId' => 'eventId'], ['id', 'calendarId'])
-			->addTable('calendar_event', "eventdata", ['eventId' => 'eventId'], self::EventProperties)
-			//->addTable('calendar_calendar','cal',['cce.calendarId' => 'id'], ['ownerId']) // fetch calendar ownerId
+			->addQuery((new Query())->select("ownerId")->join('calendar_calendar', 'cal', 'cal.id=cce.calendarId'))
+			->addTable('calendar_event', "eventdata", ['cce.eventId' => 'eventId'], self::EventProperties)
 			->addUserTable('calendar_event_user', 'eventuser', ['cce.eventId' => 'eventId'],self::UserProperties)
-			//->addHasOne('recurrenceRule', RecurrenceRule::class, ['id' => 'eventId'])
-			->addMap('participants', Participant::class, ['eventId' => 'eventId'])
-			->addMap('recurrenceOverrides', RecurrenceOverride::class, ['eventId'=>'fk'])
-			->addMap('alerts', Alert::class, ['eventId' => 'fk'])
-			->addMap('links', Link::class, ['eventId' => 'eventId'])
-			->addScalar('categoryIds', 'calendar_event_category', ['eventId' => 'eventId']);
-			//->addMap('locations', Location::class, ['id' => 'eventId']);
+			->add('participants',Relation::map(Participant::class)->keys(['eventId' => 'eventId']))
+			->add('recurrenceOverrides',Relation::map(RecurrenceOverride::class)->keys(['eventId' => 'fk']))
+			->add('alerts',Relation::map(Alert::class)->keys(['eventId' => 'fk']))
+			->add('links',Relation::map(Link::class)->keys(['eventId' => 'eventId']))
+			->add('categoryIds',Relation::scalar('calendar_event_category')->keys(['eventId' => 'eventId']));
 	}
+
+
 
 	/**
 	 * Find an event by UID
@@ -262,8 +264,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 			->filter(['permissionLevel' => 25]); // rsvp
 
 		if(isset($userEmail)) {
-			$query->join('calendar_calendar', 'cal', 'cal.id = cce.calendarId', 'LEFT')
-				->join('core_user', 'u', 'u.id = cal.ownerId')
+			$query->join('core_user', 'u', 'u.id = cal.ownerId')
 				->where(['u.email' => $userEmail]);
 		}
 
@@ -302,8 +303,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 				$crit->where('firstOccurrence', '<', $value);
 			})->add('inbox', function(Criteria $crit, $value, Query $query) {
 				// value must be true
-				$query->join('calendar_calendar','cal', 'cal.id = cce.calendarId')
-					->join('calendar_participant', 'p', 'p.eventId = eventdata.eventId AND p.id = cal.ownerId');
+				$query->join('calendar_participant', 'p', 'p.eventId = eventdata.eventId AND p.id = cal.ownerId');
 				$crit->where('p.id', '=', go()->getUserId())
 					->andWhere('p.rolesMask & 1 = 0') // !isOwner
 					->andWhere('p.participationStatus', '=', 'needs-action')
@@ -340,7 +340,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	public function icsBlob() {
 
 		$blob = isset($this->veventBlobId) ? Blob::findById($this->veventBlobId) : null;
-		if(!$blob || $blob->modifiedAt < $this->modifiedAt) {
+		if(!$blob || $blob->modifiedAt < $this->modifiedAt || !$blob->getFile()->exists()) {
 			$blob = ICalendarHelper::makeBlob($this);
 			$this->veventBlobId = $blob->id;
 			if(!$this->isNew()) {
@@ -444,7 +444,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 
 	private function incrementCalendarModSeq() {
 
-		Calendar::updateHighestModSeq(self::find()->select('calendarId')->where(['uid'=>$this->uid]));
+		Calendar::updateHighestModSeq(self::find()->select('calendarId')->removeJoin('calendar_calendar')->where(['uid'=>$this->uid]));
 		if($this->isModified('calendarId')) {
 			// Event is put in a different calendar so update both modseqs
 			$oldCalId = $this->getOldValue('calendarId');
@@ -522,6 +522,44 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 		return !empty($this->recurrenceId);
 	}
 
+	/**
+	 * @param $blobIds
+	 * @param $calendarId
+	 * @param $uid string 'check', 'ignore', 'new'
+	 * @return object
+	 */
+	static function import($blobIds, $calendarId, $uid='check') {
+		$r = (object)[
+			'saved'=>0,
+			'failed'=>0,
+			'skipped'=>0,
+			'failureReasons'=>[]
+		];
+		foreach($blobIds as $blobId) {
+			foreach(ICalendarHelper::calendarEventFromFile($blobId) as $ev) {
+				if(is_array($ev)){
+					$r->failureReasons[$r->failed] = 'Parse error '.$ev['vevent']->VEVENT[0]->UID. ': '. $ev['error']->getMessage();
+					$r->failed++;
+					continue;
+				}
+				$ev->calendarId = $calendarId;
+				if($uid === 'new') {
+					$ev->uid = UUID::v4();
+				} else if($uid === 'check' && self::find()->selectSingleValue('id')->where(['uid'=>$ev->uid])->single() !== null) {
+					$r->skipped++;
+					continue;
+					// check if exists
+				} // else use UID from ics file without checking.
+				if($ev->save()){ // will fail if UID exists. We dont want to modify existing events like this
+					$r->saved++;
+				} else {
+					$r->failureReasons[$r->failed] = 'Validate error '.$ev->uid. ': '. var_export($ev->getValidationErrors(),true);
+					$r->failed++;
+				}
+			}
+		}
+		return $r;
+	}
 	protected function internalSave() : bool {
 
 		if(empty($this->uri)) {
@@ -594,9 +632,14 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 		return $success;
 	}
 
-	public function toArray(array $properties = null): array|null
+	public function toArray(array|null $properties = null): array|null
 	{
 		$arr =  parent::toArray($properties);
+		if($this->isPrivate() && $this->getPermissionLevel() <= Acl::LEVEL_READ && $this->ownerId !== go()->getUserId()) {
+			$arr['title'] = '';
+			$arr['description'] = '';
+			$arr['location'] = '';
+		}
 		unset($arr['recurrenceId'], $arr['excluded']);
 		return $arr;
 	}
@@ -776,7 +819,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 		$calIds = $calendarModSeq->selectSingleValue('calendarId')->distinct()->all();
 		// Garbage collector will delete event when last user instance is removed
 		$success =  parent::internalDelete($query); // delete none recurring or complete series
-		if($success) {
+		if($success && !empty($calIds)) {
 			Calendar::updateHighestModSeq($calIds);
 		}
 		return $success;

@@ -408,7 +408,20 @@ class Task extends AclItemEntity {
 			}
 		}
 
+		if(isset($this->start) && isset($this->due)) {
+			if($this->start > $this->due) {
+				$this->setValidationError('start', ErrorCode::INVALID_INPUT, 'start can not be greater than due');
+			}
+		}
+
 		parent::internalValidate();
+	}
+
+	public static function check()
+	{
+		parent::check();
+
+		go()->getDbConnection()->exec("update tasks_task set start = due where start > due;");
 	}
 
 	protected function internalSave(): bool
@@ -678,7 +691,7 @@ class Task extends AclItemEntity {
 		}
 
 		if(isset($sort['responsible'])) {
-			$query->join('core_user', 'responsible', 'responsible.id = '.$query->getTableAlias() . '.responsibleUserId');
+			$query->join('core_user', 'responsible', 'responsible.id = '.$query->getTableAlias() . '.responsibleUserId', 'LEFT');
 			$sort->renameKey('responsible', 'responsible.displayName');
 		}
 
@@ -693,7 +706,7 @@ class Task extends AclItemEntity {
 
 	public function icsBlob() {
 		$blob = isset($this->vcalendarBlobId) ? Blob::findById($this->vcalendarBlobId) : null;
-		if(!$blob || $blob->modifiedAt < $this->modifiedAt) {
+		if(!$blob || $blob->modifiedAt < $this->modifiedAt || !$blob->getFile()->exists()) {
 			$this->modifiedAt = new DateTime();
 			$blob = self::makeBlob($this);
 			$this->vcalendarBlobId = $blob->id;
