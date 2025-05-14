@@ -273,7 +273,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	}
 
 	public function isPrivate(){
-		return $this->privacy === self::Private;
+		return $this->privacy !== self::Public;
 	}
 
 	protected static function defineFilters(): Filters
@@ -309,7 +309,12 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 					->andWhere('p.participationStatus', '=', 'needs-action')
 					->andWhere('eventdata.status', '=', 'confirmed')
 					->andWhere('eventdata.start', '>=', new DateTime());
-			});
+			})->add('hideSecret', function(Criteria $criteria, $value, $query) {
+				$query->andWhere((new Criteria())
+					->where('privacy', '!=', 'secret')
+					->orWhere('cal.ownerId','=',go()->getUserId())
+				);
+			},1);
 	}
 
 
