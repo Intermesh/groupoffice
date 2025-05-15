@@ -304,10 +304,14 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	 */
 	public function Fetch($folderid, $id, $contentparameters) {
 		ZLog::Write(LOGLEVEL_DEBUG, sprintf("Combined->Fetch('%s', '%s', CPO)", $folderid, $id));
+
+		// id might be in the new longid format, so we have to split it here
+		list($fsk, $sk) = Utils::SplitMessageId($id);
+
 		$backend = $this->GetBackend($folderid);
 		if ($backend == false)
 			return false;
-		return $backend->Fetch($this->GetBackendFolder($folderid), $id, $contentparameters);
+		return $backend->Fetch($this->GetBackendFolder($folderid), $sk, $contentparameters);
 	}
 
 	function GetWasteBasket() {

@@ -89,6 +89,7 @@ class MailStore extends Store implements ISearchProvider {
 	 * @return \SyncMail
 	 */
 	public function GetMessage($folderid, $id, $contentparameters) {
+		ZLog::Write(LOGLEVEL_INFO, sprintf("goMail->GetMessage('%s','%s','...')", $folderid, $id));
 
 		try {
 			$truncsize = Utils::GetTruncSize($contentparameters->GetTruncation());
@@ -181,7 +182,7 @@ class MailStore extends Store implements ISearchProvider {
 					} else {
 						$message->asbody->truncated = 0;
 					}
-					$message->asbody->data = version_compare(ZPUSH_VERSION, '2.3', '<') ? $asBodyData : StringStreamWrapper::Open($asBodyData);
+					$message->asbody->data = StringStreamWrapper::Open($asBodyData);
 					$message->asbody->type = $bpReturnType;
 //				$message->nativebodytype = $bpReturnType; //This casued outlook 2013 to fail!!
 					$message->asbody->estimatedDataSize = strlen($asBodyData);
@@ -1147,7 +1148,8 @@ class MailStore extends Store implements ISearchProvider {
 			$items[] = array(
 					'class' => 'Email',
 					'longid' => 'm/'.$searchFolder.':'.$message->uid,
-					'folderid' => 'm/'.$searchFolder
+					'folderid' => 'm/'.$searchFolder,
+					'serverid' => $message->uid,
 			);
 		}
 		return $items;
