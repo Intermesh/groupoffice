@@ -68,7 +68,7 @@ class UserSettings extends Property {
 				return null;
 			}
 
-			$tasklist = new TaskList();
+			$tasklist = TaskList::createFor($this->userId);
 			$tasklist->createdBy = $this->userId;
 			$tasklist->name = $user->displayName;
 			if(!$tasklist->save()) {

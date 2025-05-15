@@ -129,7 +129,10 @@ abstract class Property extends Model {
 	 */
 	protected $owner = null;
 
-
+	/**
+	 * @var int When the entity has a user table this is the user we want to join or save that record for
+	 */
+	protected int $_forUserId;
 
 	/**
 	 * Constructor
@@ -1839,6 +1842,10 @@ abstract class Property extends Model {
 		$stmt->execute();
 	}
 
+	public function forUserId(){
+		return $this->_forUserId ?? go()->getUserId();
+	}
+
 	/**
 	 * Saves properties to the mapped table
 	 *
@@ -1890,7 +1897,7 @@ abstract class Property extends Model {
 				}
 
 				if($table->isUserTable || ($this instanceof UserProperty && $table->hasColumn('userId'))) {
-					$modifiedForTable["userId"] = go()->getUserId();
+					$modifiedForTable["userId"] = $this->forUserId();
 				}
 
 				$this->insertTableRecord($table, $modifiedForTable);
@@ -1905,7 +1912,7 @@ abstract class Property extends Model {
 					$this->primaryKeys[$table->getAlias()][$to] = $this->$from;
 				}
 				if($table->isUserTable) {
-					$this->primaryKeys[$table->getAlias()]['userId'] = go()->getUserId();
+					$this->primaryKeys[$table->getAlias()]['userId'] = $this->forUserId();
 				}
 
 				if(isset($aiID)) {
@@ -1918,7 +1925,7 @@ abstract class Property extends Model {
 
 				$keys = $this->primaryKeys[$table->getAlias()];
 				if($table->isUserTable) {
-					$keys['userId'] = go()->getUserId();
+					$keys['userId'] = $this->forUserId();
 				}
 
 				$query = Query::normalize($keys)->tableAlias($table->getAlias());
