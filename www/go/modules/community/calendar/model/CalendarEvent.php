@@ -550,7 +550,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 				$ev->calendarId = $calendarId;
 				if($uid === 'new') {
 					$ev->uid = UUID::v4();
-				} else if($uid === 'check' && self::find()->selectSingleValue('id')->where(['uid'=>$ev->uid])->single() !== null) {
+				} else if($uid === 'check' && self::find()->selectSingleValue('cce.id')->where(['uid'=>$ev->uid])->single() !== null) {
 					$r->skipped++;
 					continue;
 					// check if exists
