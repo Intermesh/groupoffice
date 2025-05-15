@@ -9,6 +9,7 @@ namespace go\modules\community\tasks;
 use Exception;
 use Faker\Generator;
 use go\core;
+use go\core\orm\Relation;
 use go\core\model;
 use go\core\model\Group;
 use go\core\model\Link;
@@ -49,20 +50,10 @@ class Module extends core\Module {
 		User::on(User::EVENT_BEFORE_SAVE, static::class, 'onUserBeforeSave');
 	}
 
-
-//	public function initListeners()
-//	{
-//		if(model\Module::isInstalled('legacy', 'projects2')) {
-//			$prj = new Project();
-//			$prj->addListener('beforedelete', self::class, 'onBeforeProjectDelete');
-//		}
-//	}
-
-
-
 	public static function onMap(Mapping $mapping) {
-		$mapping->addHasOne('tasksSettings', UserSettings::class, ['id' => 'userId'], true);
-		$mapping->addScalar('taskPortletTaskLists', "tasks_portlet_tasklist", ['id' => 'userId']);
+		$mapping
+			->add('tasksSettings', Relation::one(UserSettings::class, true)->keys(['id' => 'userId']))
+			->add('taskPortletTaskLists', Relation::scalar('tasks_portlet_tasklist')->keys(['id' => 'userId']));
 	}
 
 	protected function rights(): array
