@@ -1,3 +1,5 @@
+- Core: Z-Push upgraded to 2.7.5 (With some patches from us).
+
 12-05-2025: 25.0.21
 - Core: fix database error in disk space calculation cronjob
 - ActiveSync: Fixed error in calendar sync because ownerId was changed to getOwnerId()

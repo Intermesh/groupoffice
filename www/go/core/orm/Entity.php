@@ -196,7 +196,11 @@ abstract class Entity extends Property {
 		return static::internalFind($properties, $readOnly, null, $userId);
 	}
 
-
+	public static final function createFor(int $userId): static {
+		$instance = new static();
+		$instance->_forUserId = $userId;
+		return $instance;
+	}
 	/**
 	 * Find or create an entity
 	 *
