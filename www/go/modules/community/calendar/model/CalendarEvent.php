@@ -273,7 +273,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	}
 
 	public function isPrivate(){
-		return $this->privacy === self::Private;
+		return $this->privacy !== self::Public;
 	}
 
 	protected static function defineFilters(): Filters
@@ -309,7 +309,12 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 					->andWhere('p.participationStatus', '=', 'needs-action')
 					->andWhere('eventdata.status', '=', 'confirmed')
 					->andWhere('eventdata.start', '>=', new DateTime());
-			});
+			})->add('hideSecret', function(Criteria $criteria, $value, $query) {
+				$query->andWhere((new Criteria())
+					->where('privacy', '!=', 'secret')
+					->orWhere('cal.ownerId','=',go()->getUserId())
+				);
+			},1);
 	}
 
 
@@ -545,7 +550,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 				$ev->calendarId = $calendarId;
 				if($uid === 'new') {
 					$ev->uid = UUID::v4();
-				} else if($uid === 'check' && self::find()->selectSingleValue('id')->where(['uid'=>$ev->uid])->single() !== null) {
+				} else if($uid === 'check' && self::find()->selectSingleValue('cce.id')->where(['uid'=>$ev->uid])->single() !== null) {
 					$r->skipped++;
 					continue;
 					// check if exists

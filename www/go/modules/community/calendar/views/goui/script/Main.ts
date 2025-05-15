@@ -48,7 +48,7 @@ export class Main extends Component {
 	spanAmount?: number = 31 // 2-7, 14, 21, 28
 
 	//eventStore: DataSourceStore<JmapDataSource<CalendarEvent>>
-	private adapter = new CalendarAdapter()
+	adapter = new CalendarAdapter()
 
 	private calendarList: CalendarList
 	private categoryList: List

@@ -12,7 +12,7 @@ import {
 	select,
 	tbar, win, Window
 } from "@intermesh/goui";
-import {calendarStore, categoryStore, t} from "./Index.js";
+import {calendarStore, categoryStore, Main, t} from "./Index.js";
 import {CalendarView} from "./CalendarView.js";
 import {ResourceWindow} from "./ResourcesWindow.js";
 import {CalendarWindow} from "./CalendarWindow.js";
@@ -243,7 +243,8 @@ export class CalendarList extends Component {
 						ignoreUid: uidCheckbox.value
 					}, 'pIcs').then(r => {
 						w.unmask();
-						//this.adapter.byType('event').store!.load();
+						const main = this.findAncestor(cmp => cmp instanceof Main) as Main;
+						if(main) main.adapter.byType('event').store!.load();
 						let statuses = [];
 						if(r.saved) {
 							statuses.push(displayfield({icon: 'done', cls:'green',value: t('Imported %s events successful.').replace('%s', r.saved)}));
