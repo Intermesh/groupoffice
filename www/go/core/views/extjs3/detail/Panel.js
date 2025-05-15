@@ -13,12 +13,16 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
+let commentsModule;
 
+import(BaseHref + "go/modules/community/comments/views/goui/dist/Index.js").then (m => {
+	commentsModule = m;
+})
 
 /**
- * 
+ *
  * Detail view panel
- * 
+ *
  * All panel items are updated automatically if they have a "tpl" (Ext.XTemplate) property or an "onLoad" function. The panel is passed as argument.
  * @type |||
  */
@@ -43,18 +47,18 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	 * When specified the Detailview will listen to these store and fetch the related entities
 	 */
 	relations: [],
-	
+
 	entityStore: null,
 
 	width: dp(500),
 
 	initComponent: function () {
-		go.detail.Panel.superclass.initComponent.call(this, arguments);			
+		go.detail.Panel.superclass.initComponent.call(this, arguments);
 
 		this.watchRelations = {};
 
 		this.cls += " go-detail-view-" + this.entityStore.entity.name.toLowerCase();
-		
+
 		this.on('afterrender', function() {
 
 			this.items.each(function (item, index, length) {
@@ -77,7 +81,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			e.preventDefault();
 		}
 	},
-	
+
 	onChanges : function(entityStore, added, changed, destroyed) {
 
 		if(this.loading) {
@@ -104,18 +108,18 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			}
 		}
 	},
-	
+
 	// listen to relational stores as well
 	initEntityStore: Ext.Panel.prototype.initEntityStore.createSequence(function () {
-		
+
 		//for(let i = 0,relName; relName = this.relations[i]; i++) {
 		this.relations.forEach(function(relName) {
 			var relation = this.entityStore.entity.findRelation(relName),
 				entityStore = go.Db.store(relation.store);
-				
+
 			if(entityStore) {
 				this.on("afterrender", function() {
-					entityStore.on('changes',this.onChanges, this);		
+					entityStore.on('changes',this.onChanges, this);
 				}, this);
 
 				this.on('beforedestroy', function() {
@@ -129,7 +133,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 
 		this.internalReset();
 
-		
+
 		this.fireEvent('reset', this);
 	},
 
@@ -147,11 +151,11 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	},
 
 	onLoad: async function () {
-		
+
 		go.Translate.setModule(this.package, this.module);
 
 		this.applyTemplateToItems(this.items);
-		
+
 		this.doLayout();
 
 		if(!this.reloading) {
@@ -188,7 +192,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			this.reloading = false;
 		})
 	},
-	
+
 	internalLoad : async function(data) {
 
 		//in case user destroys panel while loading
@@ -207,8 +211,8 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			await this.onLoad();
 			this.fireEvent('load', this);
 			return Promise.resolve(data);
-		}	
-		
+		}
+
 		return go.Relations.get(this.entityStore, data, this.relations).then(async (result) => {
 			this.watchRelations = result.watch;
 			await this.onLoad();
@@ -217,7 +221,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		}).catch((result) => {
 			console.warn("Failed to fetch relation", result);
 		});
-		
+
 	},
 
 	print() {
@@ -242,6 +246,10 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 
 		if(this.fireEvent("beforeload", this, id) === false) {
 			return Promise.resolve(this.data);
+		}
+
+		if(this.comments) {
+			this.comments.load(id);
 		}
 
 		this.currentId = id;
@@ -276,11 +284,19 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		return this.add(new go.links.getDetailPanels(sortFn));
 	},
 
-	addComments : function(large) {
+	addComments: async function () {
 		if (go.Modules.isAvailable("community", "comments")) {
-			this.add(new go.modules.comments.CommentsDetailPanel({
-				large: large
-			}));
+			const wrapper = new go.GOUIWrapper({
+				cls: ""
+			});
+
+			this.add(wrapper);
+
+
+
+			this.comments = new commentsModule.CommentsPanel(this.entityStore.entity.name);
+
+			wrapper.comp = this.comments;
 		}
 	},
 	addFiles : function() {
