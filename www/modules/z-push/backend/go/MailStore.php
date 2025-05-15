@@ -1046,7 +1046,7 @@ class MailStore extends Store implements ISearchProvider {
 		$recursive = false;
 
 		if ($cpo->GetFindSearchId()) {
-
+			$searchrange = $cpo->GetFindRange();
 			$searchwords = $cpo->GetFindFreeText();
 			$searchFolder = $cpo->GetFindFolderid(); // RESULTS IN "m/INBOX" OR "m/Concepten"
 			if (!$searchFolder) {
@@ -1064,7 +1064,7 @@ class MailStore extends Store implements ISearchProvider {
 			}
 
 		} else {
-
+			$searchrange = $cpo->GetSearchRange();
 			$searchwords = $cpo->GetSearchFreeText();
 			$searchFolder = $cpo->GetSearchFolderid(); // RESULTS IN "m/INBOX" OR "m/Concepten"
 			if (!$searchFolder) {
@@ -1105,7 +1105,7 @@ class MailStore extends Store implements ISearchProvider {
 
 		$maxPageSize = 30;
 		
-		$searchrange = $cpo->GetSearchRange();
+
 		$rangestart = 0;
 		$rangeend = $maxPageSize;
 
