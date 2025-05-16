@@ -20,6 +20,7 @@ export class ManageCategoriesWindow extends Window {
 
 		this.store = datasourcestore({
 			dataSource: jmapds("BookmarksCategory"),
+			sort: [{property: "name"}],
 			relations: {
 				creator: {
 					path: "createdBy",

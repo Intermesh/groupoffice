@@ -79,6 +79,9 @@ export class BookmarksDialog extends FormWindow {
 
 				combobox({
 					dataSource: jmapds("BookmarksCategory"),
+					storeConfig: {
+						sort: [{property: "name"}]
+					},
 					label: t("Category"),
 					name: "categoryId",
 					required: true,
