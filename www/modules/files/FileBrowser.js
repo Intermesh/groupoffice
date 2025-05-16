@@ -815,7 +815,7 @@ GO.files.FileBrowser = function(config){
 
 	this.eastPanel.add(this.filePanel);
 
-	this.folderPanel = this.folderDetail = new GO.files.FolderPanel({
+	this.folderPanel = new GO.files.FolderPanel({
 		id:config.id+'-folder-panel',
 		hidden:true,
 		expandListenObject:this.eastPanel,
@@ -2151,7 +2151,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 	route: function(id, entity) {
 		this.show();
 		const entityId = (entity.name === "File" ? "f": "d")+":"+id;
-		const detailViewName = entity.name.toLowerCase() + "Detail";
+		const detailViewName = entity.name.toLowerCase() + "Panel";
 		this[detailViewName].on("load", function(dv){
 			this.setFolderID(dv.data.folder_id || dv.data.parent_id, true);
 		}, this, {single: true});
