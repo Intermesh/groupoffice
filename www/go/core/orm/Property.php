@@ -130,9 +130,9 @@ abstract class Property extends Model {
 	protected $owner = null;
 
 	/**
-	 * @var int When the entity has a user table this is the user we want to join or save that record for
+	 * @var int|null When the entity has a user table this is the user we want to join or save that record for
 	 */
-	protected int $_forUserId;
+	protected ?int $_forUserId = null;
 
 	/**
 	 * Constructor
