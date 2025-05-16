@@ -29,17 +29,12 @@ export class BookmarksDialog extends FormWindow {
 		this.resizable = true;
 		this.modal = true;
 
-		this.height = 550;
+		this.height = 650;
 		this.width = 500;
 
 		this.generalTab.items.add(
 			fieldset({},
-				combobox({
-					dataSource: jmapds("BookmarksCategory"),
-					label: t("Category"),
-					name: "categoryId",
-					required: true
-				}),
+
 				this.urlTextField = textfield({
 					name: "content",
 					type: "url",
@@ -81,6 +76,15 @@ export class BookmarksDialog extends FormWindow {
 					name: "description",
 					label: t("Description")
 				}),
+
+				combobox({
+					dataSource: jmapds("BookmarksCategory"),
+					label: t("Category"),
+					name: "categoryId",
+					required: true,
+					selectFirst: true
+				}),
+
 				this.logoHiddenField = hiddenfield({
 					name: "logo",
 					listeners: {
