@@ -815,7 +815,7 @@ GO.files.FileBrowser = function(config){
 
 	this.eastPanel.add(this.filePanel);
 
-	this.folderPanel = this.folderDetail = new GO.files.FolderPanel({
+	this.folderPanel = new GO.files.FolderPanel({
 		id:config.id+'-folder-panel',
 		hidden:true,
 		expandListenObject:this.eastPanel,
