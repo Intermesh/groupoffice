@@ -39,9 +39,14 @@ class Module extends EntityController {
 		return $query;
 	}
 
+	/**
+	 * @param model\Module $entity
+	 * @return bool
+	 * @throws \Exception
+	 */
 	protected function canUpdate(Entity $entity): bool
 	{
-		return go()->getAuthState()->isAdmin();
+		return $entity->getUserRights()->mayManage ?? go()->getAuthState()->isAdmin();
 	}
 
 	protected function canCreate(Entity $entity): bool
@@ -130,7 +135,7 @@ class Module extends EntityController {
 		$model = $mod->install();
 
 		if(!$model) {
-			throw new \Exception("Failed to install");
+			throw new \Exception("Failed to install module. Please check the server error log for details.");
 		}
 
     return $this->get(['ids' => [$model->id]]);

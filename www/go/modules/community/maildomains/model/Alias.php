@@ -4,6 +4,7 @@ namespace go\modules\community\maildomains\model;
 
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
+use go\core\exception\Forbidden;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\SearchableTrait;
@@ -101,6 +102,10 @@ final class Alias extends AclItemEntity
 		if (isset($domainParts[1]) && ($domainParts[1] !== $d->domain)) {
 			$this->setValidationError('address', "The domain part of the address must match with the main domain");
 		}
+
+		if (!empty($d->maxAliases) && $this->isNew() && $d->countAliases() + 1 > $d->maxAliases) {
+			throw new Forbidden('The maximum number of mailboxes for this domain has been reached.');
+		}
 		parent::internalValidate();
 	}
 
@@ -113,11 +118,6 @@ final class Alias extends AclItemEntity
 	protected function internalSave(): bool
 	{
 		$d = $this->getDomain();
-		if ($this->isNew() && !empty($d->maxAliases)) {
-			if ($d->getNumAliases() >= $d->maxAliases) {
-				throw new \Exception('The maximum number of aliases for this domain has been reached.');
-			}
-		}
 
 		//chop off wildcard because in db it must be @domain.com but we use *@domain.com
 		if(substr($this->address, 0,2) == '*@') {
@@ -135,9 +135,20 @@ final class Alias extends AclItemEntity
 	 * As the ORM does currently not support retrieving its owner entity through a relation, we simply retrieve the
 	 * entity by ID
 	 * @return Domain|null
+	 * @throws \Exception
 	 */
 	private function getDomain(): Domain|null
 	{
+		if(!isset($this->domainId) && isset($this->address)) {
+			$domain = explode("@", $this->address)[1];
+
+			$this->domain = Domain::find()->where(['domain' => $domain])->single();
+
+			if($this->domain) {
+				$this->domainId = $this->domain->id;
+			}
+		}
+
 		if (!isset($this->domain) && isset($this->domainId)) {
 			$this->domain = Domain::findById($this->domainId);
 		}

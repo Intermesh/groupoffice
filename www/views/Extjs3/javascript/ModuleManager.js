@@ -16,8 +16,7 @@
 GO.ModuleManager = Ext.extend(function(){	
 	this.addEvents({
 		'moduleReady' : true,
-		'moduleconstructed' : true,
-		'languageLoaded' : true
+		'moduleconstructed' : true
 	});	
 	this.resumeEvents();
 

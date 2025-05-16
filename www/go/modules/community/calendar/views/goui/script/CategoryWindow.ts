@@ -1,5 +1,5 @@
 import {client, FormWindow, jmapds} from "@intermesh/groupoffice-core";
-import {checkbox, colorfield, combobox, comp, textfield} from "@intermesh/goui";
+import {checkbox, colorfield, combobox, comp, hiddenfield, textfield} from "@intermesh/goui";
 import {t} from "./Index.js";
 
 export class CategoryWindow extends FormWindow {
@@ -8,14 +8,20 @@ export class CategoryWindow extends FormWindow {
 		super('CalendarCategory');
 		this.title = 'category';
 		this.width = 380;
-		this.height = 360;
+		this.height = 390;
 
 		this.on('beforerender', () => {
-			this.title = t(this.currentId ? 'Edit category' : 'Create category');
+			this.title = t(this.form.currentId ? 'Edit category' : 'Create category');
 		});
 
-		//client.getUser().capabilities['community:calendar'].mayEditCategories;
-		const mayEditCategories = false; // todo: fetch from module permissions
+		this.form.on('beforesave', (frm,data) => {
+			data.ownerId = data.isGlobal ? null : client.user.id;
+			delete data.isGlobal;
+			return data;
+		});
+		this.form.on('load', (_, data) => {
+			data.isGlobal = data.ownerId === null;
+		});
 
 		this.generalTab.items.add(
 			comp({cls:'flow pad'},
@@ -27,8 +33,9 @@ export class CategoryWindow extends FormWindow {
 					dataSource: jmapds("Calendar"),
 					displayProperty: 'name',
 				}),
-				checkbox({hidden: !mayEditCategories, label: t('Global category')})
+				checkbox({hidden: !client.user.isAdmin,name:'isGlobal', label: t('Global category')})
 			)
 		);
+
 	}
 }

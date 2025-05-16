@@ -38,7 +38,7 @@ class Table {
 	 * @param Connection|null $conn
 	 * @return self
 	 */
-	public static function getInstance(string $name, Connection $conn = null): Table
+	public static function getInstance(string $name, Connection|null $conn = null): Table
 	{
 
 		if(!isset($conn)) {
@@ -53,7 +53,7 @@ class Table {
 		return self::$cache[$cacheKey];	
 	}
 
-	public static function destroyInstance($name, Connection $conn = null) {
+	public static function destroyInstance($name, Connection|null $conn = null) {
 		if(!isset($conn)) {
 			$conn = go()->getDbConnection();
 		}

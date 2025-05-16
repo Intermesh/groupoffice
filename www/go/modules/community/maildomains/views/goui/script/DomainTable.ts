@@ -102,7 +102,6 @@ export class DomainTable extends Table<DataSourceStore> {
 					if(v === 0) {
 						return t("Unlimited");
 					}
-					v *= 1024;
 					return Format.fileSize(v);
 				},
 				hidden: true
@@ -114,8 +113,6 @@ export class DomainTable extends Table<DataSourceStore> {
 				width: 100,
 				sortable: false,
 				renderer: (v, _record) => {
-					v = parseInt(v);
-					v *= 1024;
 					return (v > 0) ? Format.fileSize(v) : "0B";
 				},
 				hidden: true
@@ -128,8 +125,7 @@ export class DomainTable extends Table<DataSourceStore> {
 				width: 100,
 				sortable: false,
 				renderer: (v, _record) => {
-					v = parseInt(v);
-					return (v > 0) ? Format.fileSize(v) : "0B";
+						return (v > 0) ? Format.fileSize(v) : "0B";
 				},
 				hidden: true
 

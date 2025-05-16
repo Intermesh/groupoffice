@@ -18,5 +18,5 @@ interface ArrayableInterface {
 	 * @param string[]|null $properties
 	 * @return array|null Key value array of the object properties
 	 */
-	public function toArray(array $properties = null): array|null;
+	public function toArray(array|null $properties = null): array|null;
 }

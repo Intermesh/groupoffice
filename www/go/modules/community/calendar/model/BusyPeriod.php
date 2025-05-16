@@ -133,11 +133,5 @@ class BusyPeriod {
 			$it->next();
 		}
 	}
-//	private function toUtc() {
-//		$dt = DateTime::createFromFormat('Y-m-d H:i:s', $val, $event->timeZone());
-//		$dt->setTimezone(new \DateTimeZone('UTC'));
-//	}
-
-
 
 }

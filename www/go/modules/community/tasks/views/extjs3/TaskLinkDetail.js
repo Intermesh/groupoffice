@@ -4,6 +4,7 @@ go.modules.community.tasks.TaskLinkDetail = Ext.extend(go.modules.community.task
 	title: t("Tasks"),
 	stateId: "link-task-list",
 	collapsible: true,
+	hidden: true,
 	initComponent: function() {
 
 		this.tbar = [
@@ -98,19 +99,31 @@ go.modules.community.tasks.TaskLinkDetail = Ext.extend(go.modules.community.task
 		this.store.reload();
 	},
 
-	onLoad: function (dv) {
+	onLoad: async function (dv) {
+
+		const entity = dv.entity ? dv.entity : dv.entityStore.entity.name, //dv.entity exists on old DetailView or display panels
+			entityId =dv.model_id ? dv.model_id : dv.currentId //model_id is from old display panel
+
+		if(this.entity == entity && this.entityId == entityId) {
+			return;
+		}
+
+		this.entityId = entityId;
+		this.entity = entity;
 
 		this.detailView = dv;
 
 		this.hide();
 
-		this.store.setFilter("link" , {link: {
-				entity: dv.entity ? dv.entity : dv.entityStore.entity.name, //dv.entity exists on old DetailView or display panels
-				id: dv.model_id ? dv.model_id : dv.currentId //model_id is from old display panel
-			}})
+		this.store.setFilter("link", {
+			link: {
+				entity,
+				id: entityId
+			}
+		})
 
 		this.store.baseParams.position = 0;
-		this.store.load();
+		return this.store.load();
 	},
 
 	initMoreMenu: function (node, e, record) {

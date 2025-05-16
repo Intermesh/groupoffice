@@ -655,7 +655,7 @@ return array (
   'Login as this user' => 'このユーザーでログイン',
   'Failed to login as this user' => 'このユーザーとしてログインできませんでした',
   'Archive user' => 'アーカイブユーザー',
-  'Archiving a user will disable them and make their items invisible. Are you sure?' => 'ユーザーをアーカイブすると、ユーザーが無効になり、アイテムが非表示になります。よろしいですか?',
+  'Archiving a user will disable them, revoke all group memberships and make their items invisible. Are you sure?' => 'ユーザーをアーカイブすると、ユーザーが無効になり、アイテムが非表示になります。よろしいですか?',
   'You can\' t archive yourself' => '自分自身をアーカイブすることはできません',
   'Error while saving the data' => 'データの保存中にエラーが発生しました',
   'Are you sure you want to select all {count} results?' => '{count} 件の結果をすべて選択してもよろしいですか?',

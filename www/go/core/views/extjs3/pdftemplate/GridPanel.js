@@ -13,7 +13,7 @@ go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 	templateDefaults: undefined,
 
 	setKey: function(key) {
-		this.key = key,
+		this.key = key;
 		this.store.setFilter("module", {module: this.module, key: this.key});
 	},
 
@@ -24,6 +24,8 @@ go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 			scope: this,
 			menu: {
 				items: [
+
+
 					{
 						itemId: "edit",
 						iconCls: 'ic-edit',
@@ -33,6 +35,18 @@ go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 							var record = this.store.getAt(item.parentMenu.rowIndex);
 
 							this.edit(record.data.id);
+
+						},
+						scope: this
+					},{
+						itemId: "copy",
+						iconCls: 'ic-content-copy',
+						text: t("Copy"),
+						handler: function(item) {
+							var record = this.store.getAt(item.parentMenu.rowIndex);
+							go.copyPdfTemplate = record.json;
+							delete go.copyPdfTemplate.id;
+							go.copyPdfTemplate.blocks.map(b => delete b.id);
 
 						},
 						scope: this
@@ -63,6 +77,19 @@ go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 					xtype: 'tbsearch'
 				},
 				{
+					iconCls: 'ic-content-paste',
+					tooltip: t("Paste"),
+					handler: function() {
+						if(!go.copyPdfTemplate) {
+							Ext.MessageBox.alert(t("Error"), "Copy one first");
+							return;
+						}
+						var dlg = new go.pdftemplate.TemplateDialog();
+						dlg.setValues(Ext.apply(go.copyPdfTemplate, {id:undefined,module: this.module, key: this.key})).show();
+					},
+					scope: this
+				},
+				{
 					iconCls: 'ic-add',
 					handler: function() {
 						var dlg = new go.pdftemplate.TemplateDialog();
@@ -72,7 +99,8 @@ go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 						}
 					},
 					scope: this
-			}],
+				}
+				],
 			
 			store: new go.data.Store({
 				fields: ['id', 'name', 'language'],

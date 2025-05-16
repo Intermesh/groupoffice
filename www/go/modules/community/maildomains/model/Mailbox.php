@@ -22,13 +22,37 @@ final class Mailbox extends AclItemEntity
 	public ?int $id;
 	public int $domainId;
 	public string $username;
-	public ?string $password;
+	protected ?string $password;
+
+
+	/**
+	 * When enabled this user can login to all mailboxes of the domain using user@example.com*thisuser@example.com
+	 * @var bool
+	 */
 	public bool $domainOwner = false;
+
+	/**
+	 * Enable this account for SMTP
+	 *
+	 * @var bool
+	 */
 	public bool $smtpAllowed;
+
+	/**
+	 * Enable Full Text Search indexing for this mailbox
+	 *
+	 * @var bool
+	 */
 	public bool $fts;
 	public ?string $description;
 	public string $maildir;
 	public string $homedir;
+
+	/**
+	 * Quota in bytes
+	 *
+	 * @var int
+	 */
 	public int $quota;
 
 	/**
@@ -45,6 +69,12 @@ final class Mailbox extends AclItemEntity
 	public ?int $modifiedBy;
 	public ?DateTime $modifiedAt;
 	public bool $active = true;
+
+	/**
+	 * Usage in bytes
+	 *
+	 * @var int|null
+	 */
 	public ?int $bytes;
 	public ?int $messages;
 
@@ -81,6 +111,9 @@ final class Mailbox extends AclItemEntity
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()
+			->add("username", function (Criteria $criteria, $value) {
+				$criteria->andWhere('username', '=', $value);
+			})
 			->add("domainId", function (Criteria $criteria, $value) {
 				$criteria->andWhere('domainId', '=', $value);
 			});
@@ -92,7 +125,7 @@ final class Mailbox extends AclItemEntity
 	 */
 	protected static function textFilterColumns(): array
 	{
-		return ['name', 'username'];
+		return ['description', 'username'];
 	}
 
 	/**
@@ -111,25 +144,30 @@ final class Mailbox extends AclItemEntity
 	protected function internalValidate()
 	{
 		$d = $this->getDomain();
-		if ($this->isModified('password') && strlen($this->password) > 0 && strlen($this->password) < go()->getSettings()->passwordMinLength) {
+
+		if($this->isNew() && !$this->isModified(['quota'])) {
+			$this->quota = $d->defaultQuota;
+		}
+
+		if (isset($this->plainPassword)) {
 			if (strlen($this->plainPassword) < go()->getSettings()->passwordMinLength) {
 				$this->setValidationError('password', ErrorCode::INVALID_INPUT, "Minimum password length is " . go()->getSettings()->passwordMinLength . " chars");
 			}
 		}
 
-		$this->checkQuota(); // TODO
+		$this->checkQuota();
 
-		if (!empty($d->maxMailboxes) && $this->isNew() && count($d->mailboxes) + 1 > $d->maxMailboxes) {
+		if (!empty($d->maxMailboxes) && $this->isNew() && $d->countMailboxes() + 1 > $d->maxMailboxes) {
 			throw new Forbidden('The maximum number of mailboxes for this domain has been reached.');
 		}
+
 		parent::internalValidate();
 	}
 
 	protected function internalSave(): bool
 	{
-		if ($this->isModified('password') && strlen($this->password)) {
-			$this->setPassword($this->password);
-			$this->password = $this->crypt($this->password);
+		if (isset($this->plainPassword)) {
+			$this->password = $this->crypt($this->plainPassword);
 		}
 
 		if ($this->isNew() || empty($this->homedir)) {
@@ -138,8 +176,7 @@ final class Mailbox extends AclItemEntity
 			$this->homedir = $d->domain . '/' . $parts[0] . '/';
 			$this->maildir = $d->domain . '/' . $parts[0] . '/Maildir/';
 		}
-//		$domain = $this->getDomain();
-//		Domain::entityType()->changes([$this->domainId, $domain->findAclId(), false]);
+
 		return parent::internalSave();
 	}
 
@@ -282,16 +319,27 @@ final class Mailbox extends AclItemEntity
 	/**
 	 * As the ORM does currently not support retrieving its owner entity through a relation, we simply retrieve the entity by ID
 	 * @return Domain|null
+	 * @throws \Exception
 	 */
 	private function getDomain(): Domain|null
 	{
+		if(!isset($this->domainId) && isset($this->username)) {
+			$domain = explode("@", $this->username)[1];
+
+			$this->domain = Domain::find()->where(['domain' => $domain])->single();
+
+			if($this->domain) {
+				$this->domainId = $this->domain->id;
+			}
+		}
+
 		if (!isset($this->domain) && isset($this->domainId)) {
 			$this->domain = Domain::findById($this->domainId);
 		}
 		return $this->domain;
 	}
 
-	public function plainPassword(): string
+	public function plainPassword(): string | null
 	{
 		return $this->plainPassword;
 	}
@@ -299,6 +347,10 @@ final class Mailbox extends AclItemEntity
 	public function setPassword(string $password): void
 	{
 		$this->plainPassword = $password;
+	}
+
+	public function getPassword() {
+		return null;
 	}
 
 	/**

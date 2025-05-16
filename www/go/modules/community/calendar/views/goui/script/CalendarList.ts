@@ -1,7 +1,7 @@
 import {
 	browser,
 	btn,
-	checkbox,
+	checkbox, CheckboxField,
 	comp,
 	Component, ComponentEventMap,
 	displayfield, fieldset, Format,
@@ -10,14 +10,15 @@ import {
 	list,
 	menu, ObservableListenerOpts, RowRenderer,
 	select,
-	tbar, win
+	tbar, win, Window
 } from "@intermesh/goui";
-import {calendarStore, t} from "./Index.js";
+import {calendarStore, categoryStore, Main, t} from "./Index.js";
 import {CalendarView} from "./CalendarView.js";
 import {ResourceWindow} from "./ResourcesWindow.js";
 import {CalendarWindow} from "./CalendarWindow.js";
-import {client, jmapds} from "@intermesh/groupoffice-core";
+import {client, jmapds, modules} from "@intermesh/groupoffice-core";
 import {SubscribeWindow} from "./SubscribeWindow.js";
+import {SubscribeWebCalWindow} from "./SubscribeWebCalWindow";
 
 export interface CalendarListEventMap<Type> extends ComponentEventMap<Type> {
 	changevisible: (me: Type, ids: string[]) => false | void
@@ -34,15 +35,27 @@ export class CalendarList extends Component {
 	private visibleChanges: {[id:number]:boolean} = {};
 
 	list?: List
+	store
 
-	constructor(){
+	constructor(store = calendarStore){
 		super()
-		this.items.add(tbar({cls: 'dense'},
+		this.store = store;
+		const rights = modules.get("community", "calendar")!.userRights;
+
+		this.items.add(store !== calendarStore ? comp() :tbar({cls: 'dense'},
+			checkbox({
+				listeners: {
+					change: (field, newValue, oldValue) => {
+						this.select(-1,newValue);
+					}
+				}
+			}),
 			comp({tagName: 'h3', html: t('Calendars')}),
 			//btn({icon: 'done_all', handler: () => { this.calendarList.rowSelection!.selectAll();}}),
 			btn({
 				icon: 'more_vert', menu: menu({},
 					btn({
+						hidden: !rights.mayChangeCalendars,
 						icon: 'add',
 						text: t('Create calendar') + '…', handler: () => {
 							const dlg = new CalendarWindow();
@@ -57,64 +70,84 @@ export class CalendarList extends Component {
 							d.show();
 						}
 					}),
-					btn({icon: 'travel_explore',text: t('Add calendar from link') + '…'})
+					btn({icon: 'travel_explore',text: t('Add calendar from link') + '…', handler: () => {
+						const d = new SubscribeWebCalWindow();
+						d.show();
+					}})
 				)
 			})
 		), this.list = list({
-			store: calendarStore,
+			tagName: 'div',
+			store,
 			cls: 'check-list',
 			rowSelectionConfig: {
 				multiSelect: false,
 				listeners: {
 					'selectionchange': (tableRowSelect) => {
-						const calIds = tableRowSelect.getSelected().map((row) => row.record.id);
-						if (calIds[0]) {
-							CalendarView.selectedCalendarId = calIds[0];
+						const s = tableRowSelect.getSelected();
+						if (s[0] && s[0].record.myRights.mayWriteAll) {
+							CalendarView.selectedCalendarId = s[0].id;
 						}
 					}
 				}
 			},
 			listeners: {'render': me => {
-					me.store.on('load', (s,items)=> {
-						let record = s.find(c => c.id == CalendarView.selectedCalendarId);
-						if(!record) {
-							record = s.first();
-						}
-						if(record) {
-							me.rowSelection!.add(record);
-						}
-						this.inCalendars = items.reduce((obj, item) => ({ ...obj, [item.id!]: item.isVisible }), {} as any);
-					});
-					me.store.load().then(_c => {
-						// after initial load. check for changed
-						//console.log('calendars loaded');
+				this.localGroup = document.createElement('ul');
+				me.el.append(this.localGroup);
+
+				me.store.on('load', (s,items)=> {
+					let record = s.find(c => c.id == CalendarView.selectedCalendarId);
+					if(!record) {
+						record = s.first();
+					}
+					if(record) {
+						me.rowSelection!.add(record);
+					}
+					this.inCalendars = items.reduce((obj, item) => ({ ...obj, [item.id!]: item.isVisible }), {} as any);
+				});
+				me.store.load().then(_c => {
+					// after initial load. check for changed
+					//console.log('calendars loaded');
 
 
-						//this.applyInCalendarFilter();
-						this.fire('changevisible', this, Object.keys(this.inCalendars).filter(key => this.inCalendars[key]));
+					//this.applyInCalendarFilter();
+					this.fire('changevisible', this, Object.keys(this.inCalendars).filter(key => this.inCalendars[key]));
 
-						//this.updateView();
+					//this.updateView();
 
-					});
-				}},
-			renderer: this.checkboxRenderer
+				});
+			}},
+			renderer: this.checkboxRenderer.bind(this)
 		}));
 	}
+	private davGroups: {[id:number]: HTMLElement} = {}
+	private localGroup!: HTMLElement;
 
-	checkboxRenderer: RowRenderer = (data, _row, _list, _storeIndex) => {
+	checkboxRenderer(data: any, _row: HTMLElement, list: List, storeIndex: number) {
 		// if(data.isVisible) {
 		// 	this.inCalendars[storeIndex] = true;
 		// }
+		const rights = modules.get("community", "calendar")!.userRights;
+		const icon = data.webcalUri ? ' <i class="icon">web</i>' : '';
 		return [checkbox({
 			color: '#' + data.color,
 			//style: 'padding: 0 8px',
 			value: data.isVisible,
-			label: data.name,
+			label: data.name + icon,
 			listeners: {
 				'render': (field) => {
 					field.input.addEventListener("mousedown", (ev) => {
 						ev.stopPropagation(); // stop lists row selector event
 					});
+					field.input.addEventListener('contextmenu', (ev) => {
+						ev.preventDefault();
+						const m = menu({isDropdown:true},
+							btn({text:t('Select all'),handler:()=>{this.select(-1,true)}}),
+							btn({text:t('Select none'),handler:()=>{this.select(-1)}}),
+							btn({text:t('Deselect others'),handler:()=>{this.select(storeIndex)}})
+						);
+						m.showAt(ev);
+					})
 				},
 				'change': (p, newValue) => {
 					this.inCalendars[data.id] = newValue;
@@ -129,18 +162,44 @@ export class CalendarList extends Component {
 			},
 			buttons: [btn({
 				icon: 'more_horiz', menu: menu({},
-					btn({icon:'edit', text: t('Edit')+'…', disabled:!data.myRights.mayAdmin, handler: async _ => {
+					btn({icon:'sync', text: t('Synchronize'), hidden: !data.davaccountId, handler: (me) => {
+						const cb = me.findAncestor((cmp) => cmp instanceof CheckboxField);
+						if(cb) {
+							cb.mask();
+							client.requestTimeout = 300000;
+							client.jmap('DavAccount/sync', {accountId:data.davaccountId}).catch((err) => {
+								Window.error(err);
+							}).finally(() => {
+								cb.unmask();
+								client.requestTimeout = 30000;
+							});
+						}
+					}}),
+					btn({icon:'sync', text: t('Reload'), hidden: !data.webcalUri, handler: (me) => {
+						const cb = me.findAncestor((cmp) => cmp instanceof CheckboxField);
+						if(cb) {
+							cb.mask();
+							client.requestTimeout = 300000;
+							client.jmap('Calendar/reload', {calendarId:data.id}).catch((err) => {
+								Window.error(err);
+							}).finally(() => {
+								cb.unmask();
+								client.requestTimeout = 30000;
+							});
+						}
+					}}),
+					btn({icon:'edit', text: t('Edit')+'…', hidden: data.davaccountId || !rights.mayChangeCalendars, disabled:!data.myRights.mayAdmin, handler: async _ => {
 							const dlg = data.groupId ? new ResourceWindow() : new CalendarWindow();
 							await dlg.load(data.id);
 							dlg.show();
 						}}),
-					btn({icon:'delete', text: t('Delete','core','core')+'…', disabled:!data.myRights.mayAdmin, handler: async _ => {
-							jmapds("Calendar").confirmDestroy([data.id]);
-						}}),
-					hr(),
+					btn({icon:'delete', text: t('Delete','core','core')+'…', hidden: data.davaccountId || !rights.mayChangeCalendars, disabled:!data.myRights.mayAdmin, handler: async _ => {
+						jmapds("Calendar").confirmDestroy([data.id]);
+					}}),
+					hr({hidden: !rights.mayChangeCalendars}),
 					btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
-							calendarStore.dataSource.update(data.id, {isSubscribed: false});
-						}}),
+						jmapds('Calendar').update(data.id, {isSubscribed: false}).catch(e => Window.error(e))
+					}}),
 					hr(),
 					btn({icon:'file_save',hidden:data.groupId, text: t('Export','core','core'), handler: _ => { client.getBlobURL('community/calendar/calendar/'+data.id).then(window.open) }}),
 					btn({icon:'upload_file',hidden:data.groupId, text:t('Import','core','core')+'…', handler: async ()=> {
@@ -154,10 +213,24 @@ export class CalendarList extends Component {
 		})];
 	}
 
+	private select(index:number, all:boolean = false) {
+		const rows = this.list!.el.querySelectorAll('li.data');
+		this.list!.store.forEach((rec, rowIndex) => {
+			const cb = rows[rowIndex].querySelector<HTMLInputElement>('input')!,
+				on = (index == rowIndex || all);
+			cb.checked = on;
+			this.visibleChanges[rec.id] = on;
+			this.inCalendars[rec.id] = on;
+		});
+
+		this.saveSelectionChanges();
+		this.fire('changevisible', this, Object.keys(this.inCalendars).filter(key => this.inCalendars[key]));
+	}
+
 	private importIcs(blob: any, data:any) {
 		const calendarSelect = select({
 				label: t('Calendar'), name: 'calendarId', required: true, flex: '1 30%',value:data.id,
-				store: calendarStore, valueField: 'id', textRenderer: (r: any) => r.name,
+				store: this.store, valueField: 'id', textRenderer: (r: any) => r.name,
 			}),
 			uidCheckbox = checkbox({name:'ignoreUID', label: t('Import events as new (Ignore UID)')}),
 			statusReport = comp({hidden:true}),
@@ -170,7 +243,8 @@ export class CalendarList extends Component {
 						ignoreUid: uidCheckbox.value
 					}, 'pIcs').then(r => {
 						w.unmask();
-						//this.adapter.byType('event').store!.load();
+						const main = this.findAncestor(cmp => cmp instanceof Main) as Main;
+						if(main) main.adapter.byType('event').store!.load();
 						let statuses = [];
 						if(r.saved) {
 							statuses.push(displayfield({icon: 'done', cls:'green',value: t('Imported %s events successful.').replace('%s', r.saved)}));
@@ -208,8 +282,9 @@ export class CalendarList extends Component {
 	saveSelectionChanges = FunctionUtil.buffer(2000, () => {
 		//save isVisible
 		for(const id in this.visibleChanges) {
-			calendarStore.dataSource.update(id, {isVisible:this.visibleChanges[id]});
+			jmapds('Calendar').update(id, {isVisible:this.visibleChanges[id]});
 		}
+		//categoryStore.setFilter('calendars', {calendarId: this.visibleChanges}).load();
 		this.visibleChanges = {};
 	})
 }

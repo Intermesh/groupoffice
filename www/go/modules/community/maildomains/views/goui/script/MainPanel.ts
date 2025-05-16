@@ -1,4 +1,17 @@
-import {btn, comp, Component, EntityID, Notifier, paginator, router, searchbtn, t, tbar, Window} from "@intermesh/goui";
+import {
+	btn,
+	checkbox,
+	comp,
+	Component,
+	EntityID,
+	Notifier,
+	paginator,
+	router,
+	searchbtn,
+	t,
+	tbar,
+	Window
+} from "@intermesh/goui";
 import {authManager, client, jmapds, MainThreeColumnPanel, User} from "@intermesh/groupoffice-core";
 import {DomainTable} from "./DomainTable.js";
 import {DomainDialog} from "./DomainDialog.js";
@@ -28,6 +41,8 @@ export class MainPanel extends MainThreeColumnPanel {
     protected createWest(): Component {
 
 	    this.tbl = new DomainTable();
+			this.tbl.stateId = "maildomains-table";
+			this.tbl!.store.setFilter("active", {active: true});
 
 			this.tbl.rowSelection!.on("rowselect", rowSelect => {
 			    if(rowSelect.getSelected().length) {
@@ -36,11 +51,21 @@ export class MainPanel extends MainThreeColumnPanel {
 	    })
 
 	    return comp({
-			    width: 300,
+			    width: 560,
 			    cls: 'vbox active' //for mobile view this is active
 		    },
 
 		    tbar({},
+					checkbox({
+						type: "switch",
+						label: t("Show inactive"),
+						listeners: {
+							change: (cb, checked) => {
+								this.tbl!.store.setFilter("active", checked ? undefined : {active: true});
+								this.tbl!.store.load();
+							}
+						}
+					}),
 			    '->',
 			    this.ptrStatus = comp({html: ""}),
 			    searchbtn({
@@ -89,14 +114,15 @@ export class MainPanel extends MainThreeColumnPanel {
 			}
 			await this.tbl.store.load();
 			client.jmap( "MailDomain/checkPtr", {}).then((result) => {
-				let ptrOk = true;
+				let ptrOk = true, ip = "";
 				for(const rr of result) {
 					ptrOk = ptrOk && rr.status === "SUCCESS";
+					ip += rr.ip + " ";
 				}
 				if (ptrOk) {
 					this.ptrStatus.html = '<i class="icon success">check</i>&nbsp;' +t("PTR OK")
 				} else {
-					this.ptrStatus.html = '<i class="icon warning">warning</i>&nbsp;' + t("PTR error");
+					this.ptrStatus.html = '<i class="icon warning">warning</i>&nbsp;' + t("PTR error") + " (" + ip + ")";
 				}
 			}).catch((e) => {
 				this.ptrStatus.html = '<i class="icon warning">warning</i>&nbsp;' + t("PTR error");

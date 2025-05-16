@@ -61,7 +61,7 @@ class CalDAVBackend extends AbstractBackend implements
 				'{urn:ietf:params:xml:ns:caldav}calendar-timezone' => "BEGIN:VCALENDAR\r\n" . $tz->serialize() . "END:VCALENDAR",
 				'{urn:ietf:params:xml:ns:caldav}supported-calendar-component-set' => new CalDAV\Xml\Property\SupportedCalendarComponentSet(['VEVENT']),
 				// free when calendar does not belong to the user
-				'{urn:ietf:params:xml:ns:caldav}schedule-calendar-transp' => new CalDAV\Xml\Property\ScheduleCalendarTransp($calendar->ownerId == $u->id ? 'opaque' : 'transparent'),
+				'{urn:ietf:params:xml:ns:caldav}schedule-calendar-transp' => new CalDAV\Xml\Property\ScheduleCalendarTransp($calendar->getOwnerId() == $u->id ? 'opaque' : 'transparent'),
 
 				'{http://calendarserver.org/ns/}getctag' => 'GroupOffice/calendar/'.self::VERSION.'/'.$calendar->highestItemModSeq(),
 				//'{http://calendarserver.org/ns/}subscribed-strip-todos' => '0',
@@ -70,7 +70,7 @@ class CalDAVBackend extends AbstractBackend implements
 				'{http://sabredav.org/ns}sync-token' => self::VERSION.'-'.$calendar->highestItemModSeq(),
 				'share-resource-uri' => '/ns/share/'.$uri,
 				// 1 = owner, 2 = readonly, 3 = readwrite
-				'share-access' => $calendar->getPermissionLevel() == Acl::LEVEL_MANAGE ? 1 : ($calendar->getPermissionLevel() >= Acl::LEVEL_WRITE ? 3 : 2),
+				'share-access' => $calendar->getPermissionLevel() == Acl::LEVEL_MANAGE ? 1 : (($calendar->getPermissionLevel() >= Acl::LEVEL_WRITE && empty($calendar->webcalUri)) ? 3 : 2),
 			];
 		}
 		$tasklists = TaskList::find()->where(['isSubscribed'=>1, 'role'=>1])
@@ -118,9 +118,9 @@ class CalDAVBackend extends AbstractBackend implements
 			$type = $properties[$sccs]->getValue();
 		}
 		$transp = '{urn:ietf:params:xml:ns:caldav}schedule-calendar-transp';
-		if (isset($properties[$transp])) {
-			$ownerId = $properties[$transp]->getValue() === 'transparent' ? null : go()->getUserId();
-		}
+
+		$ownerId = isset($properties[$transp]) && $properties[$transp]->getValue() === 'transparent' ? null : go()->getUserId();
+
 		$values = ['ownerId' => $ownerId];
 		foreach ($this->propertyMap as $xmlName => $dbName) {
 			if (isset($properties[$xmlName])) {
@@ -259,7 +259,8 @@ class CalDAVBackend extends AbstractBackend implements
 		switch($type) {
 			case 'c': // calendar
 				$component = 'vevent';
-				$object = CalendarEvent::find()->where(['cce.calendarId'=> $id, 'eventdata.uri'=>$objectUri])->single();
+				$q = CalendarEvent::find()->filter(['hideSecret'=>1])->where(['cce.calendarId'=> $id, 'eventdata.uri'=>$objectUri]);
+				$object = $q->single();
 				break;
 			case 't': // tasklist
 				$component = 'vtodo';
@@ -281,7 +282,6 @@ class CalDAVBackend extends AbstractBackend implements
 			$data = $blob->getFile()->getContents();
 		} catch(\Exception$e) {
 			ErrorHandler::logException($e);
-			$object->vcalendarBlobId = null;
 			$blob = $object->icsBlob();
 			$data = $blob->getFile()->getContents();
 		}
@@ -302,6 +302,39 @@ class CalDAVBackend extends AbstractBackend implements
 		];
 	}
 
+	private static function eventByVEvent($vcalendar, $calendarId) {
+		$vevent = $vcalendar->VEVENT[0];
+		$uid = (string)$vevent->uid;
+
+		$existingEvent = CalendarEvent::find()->where(['uid'=>$uid, 'calendarId' => $calendarId])->single();
+		if($existingEvent){
+			return $existingEvent;
+		}
+
+		$eventCalendars = go()->getDbConnection()->select(['t.eventId, GROUP_CONCAT(calendarId) as calendarIds'])
+			->from('calendar_event', 't')
+			->join('calendar_calendar_event', 'c', 'c.eventId = t.eventId', 'LEFT')
+			->where(['uid'=>$uid, 'recurrenceId' => null])->single();
+
+		if(!empty($eventCalendars['eventId'])) {
+			// add it to the current receivers default calendar
+			$added = go()->getDbConnection()->insert('calendar_calendar_event', [
+				['calendarId'=>$calendarId, 'eventId'=>$eventCalendars['eventId']]
+			])->execute();
+			if(!$added) {
+				go()->debug('Could not add event to '.$calendarId);
+			}
+			$event = CalendarEvent::findById(go()->getDbConnection()->getPDO()->lastInsertId());
+		} else {
+			$event = new CalendarEvent();
+			$organizerEmail = str_replace('mailto:', '',(string)$vcalendar->VEVENT[0]->{'ORGANIZER'});
+			$event->isOrigin = true;//go()->getAuthState()->getUser(['email'])->email === $organizerEmail; // if you created this event by yourself.
+			$event->replyTo = $organizerEmail;
+			$event->calendarId = $calendarId;
+		}
+		return $event;
+	}
+
 	public function createCalendarObject($calendarId, $objectUri, $calendarData)
 	{
 		list($type, $id) = explode('-', $calendarId,2);
@@ -310,41 +343,27 @@ class CalDAVBackend extends AbstractBackend implements
 		go()->debug($calendarData);
 		go()->debug(")");
 
+		$vCalendar = VObject\Reader::read($calendarData, VObject\Reader::OPTION_FORGIVING);
+
 		switch($type) {
 			case 'c': // calendar
-				$object = new CalendarEvent();
-				//$object->uid = $uid;
+				$object = self::eventByVEvent($vCalendar, $id);
 				$object = ICalendarHelper::parseVObject($calendarData, $object);
 				$object->uri($objectUri);
-				// The attached blob must be identical to the data used to create the event
 				$object->attachBlob(ICalendarHelper::makeBlob($object, $calendarData)->id);
-				$object = Calendar::addEvent($object, $id);
-
-				if($object === null) {
-					throw new \Exception('Could not create calendar event');
-				}
-
-				// TODO, this is a bit ugly. When thunderbird schedules an event for multiple participants it's added
-				// but the sabre scheduling plugin creates an event before this with a different generated uri. But TB
-				// relies on this URI being created.
-				if($object->uri() != $objectUri) {
-					$object->uri($objectUri);
-					if(!$object->save()) {
-						throw new SaveException($object);
-					}
-				}
 
 				break;
 			case 't': // tasklist
 				$object = new Task();
-				$object = (new VCalendar)->vtodoToTask(VObject\Reader::read($calendarData, VObject\Reader::OPTION_FORGIVING), $id, $object);
-				if(!$object->save()) {
-					throw new SaveException($object);
-				}
+				$object = (new VCalendar)->vtodoToTask($vCalendar, $id, $object);
+
 				break;
 			default:
 				go()->log("incorrect calendarId ".$calendarId. ' for '.$objectUri);
 				return false;
+		}
+		if(!$object->save()) {
+			throw new SaveException($object);
 		}
 
 		go()->debug("URI: " . $object->uri());
@@ -556,7 +575,6 @@ class CalDAVBackend extends AbstractBackend implements
 		$userId = User::find()->selectSingleValue("id")->where('username', '=', $username)->single();
 
 		$event = CalendarEvent::find()
-			->join('calendar_calendar', 'cal', 'cal.id=cce.calendarId')
 			->select('cce.calendarId, uri')
 			->where(['uid' => $uid, 'cal.ownerId'=>$userId])
 			->fetchMode(\PDO::FETCH_OBJ)

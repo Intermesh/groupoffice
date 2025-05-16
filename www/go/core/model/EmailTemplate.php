@@ -205,7 +205,12 @@ class EmailTemplate extends Entity
 	 */
 	protected function internalGetPermissionLevel(): int
 	{
-		return Module::findById($this->moduleId)->getPermissionLevel();
+		return Module::findById($this->moduleId)->getPermissionLevel() > 0 ? Acl::LEVEL_MANAGE : 0;
+	}
+
+	protected function canCreate(): bool
+	{
+		return Module::findById($this->moduleId)->getPermissionLevel() > 0;
 	}
 
 	private function parseImages()
@@ -237,7 +242,7 @@ class EmailTemplate extends Entity
 		}
 	}
 
-	public function toArray(array $properties = null): array|null
+	public function toArray(array|null $properties = null): array|null
 	{
 		$array =  parent::toArray($properties);
 

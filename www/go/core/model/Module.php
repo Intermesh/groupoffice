@@ -509,16 +509,15 @@ class Module extends Entity {
 		return !empty($mod) && $mod->getPermissionLevel($userId) >= $level;
 	}
 
-	public static function getApiProperties(): array
+	public static function buildApiProperties(bool $forDocs = false): array
 	{
 		return array_merge(
-			parent::getApiProperties(),
+			parent::buildApiProperties($forDocs),
 			[
-				'permissionLevel' => ["setter" => false, "getter" => true, "access" => null],
-				'userRights' => ["setter" => false, "getter" => true, "access" => null]
+				'permissionLevel' => ["setter" => false, "getter" => true, "access" => self::PROP_PUBLIC_READONLY, 'description' => 'Deprecated: The permission level of the current user for backwards compatibility. Use userRights instead.'],
+				'userRights' => ["setter" => false, "getter" => true, "access" => self::PROP_PUBLIC_READONLY, 'description' => 'The rights the current user has']
 			]
 		);
-
 	}
 
 	/**

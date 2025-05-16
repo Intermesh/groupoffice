@@ -14,7 +14,7 @@ export class Settings extends FormWindow {
 			checkbox({label: t("Enable JWT authentification"), name: "videoJwtEnabled", listeners: {
 
 			}}),
-			textfield({label: t('App Secret'), name: 'videoJwtSecret',}),
+			textfield({type: "password", label: t('App Secret'), name: 'videoJwtSecret',}),
 			textfield({label: t('App ID'), name: 'videoJwtAppId',}),
 		));
 	}

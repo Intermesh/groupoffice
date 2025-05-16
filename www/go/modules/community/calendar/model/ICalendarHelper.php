@@ -54,23 +54,22 @@ class ICalendarHelper {
 
 		$vevent = $vcalendar->add(self::toVEvent($vcalendar->createComponent('VEVENT'),$event));
 
-		if(!$event->useDefaultAlerts && is_array($event->alerts)) {
-			foreach($event->alerts as $id => $alert) {
-				if(!empty($alert->offset)) {
-					$vevent->add('VALARM', [
-						'TRIGGER' => $alert->offset, // 15 minutes before the event
-						'DESCRIPTION' => 'Alarm',
-						'ACTION' => $alert->action,
-					]);
-				} else if (!empty($alert->when)) {
-					$vevent->add('VALARM', [
-						'TRIGGER' => $alert->when, // 15 minutes before the event
-						'DESCRIPTION' => 'Alarm',
-						'ACTION' => $alert->action,
-					]);
-				}
+		foreach($event->alerts() as $id => $alert) {
+			if(!empty($alert->getTrigger()['offset'])) {
+				$vevent->add('VALARM', [
+					'TRIGGER' => $alert->getTrigger()['offset'], // 15 minutes before the event
+					'DESCRIPTION' => 'Alarm',
+					'ACTION' => $alert->action,
+				]);
+			} else if (!empty($alert->getTrigger()['when'])) {
+				$vevent->add('VALARM', [
+					'TRIGGER' => $alert->getTrigger()['when'], // 15 minutes before the event
+					'DESCRIPTION' => 'Alarm',
+					'ACTION' => $alert->action,
+				]);
 			}
 		}
+
 		//@todo: ATTACHMENT Files?
 
 		if($event->isRecurring()) {
@@ -93,6 +92,8 @@ class ICalendarHelper {
 				}
 			}
 		}
+		// this will remove the invalid UTF-8 characters for XML response in caldav.
+		$vcalendar->validate(VObject\Node::REPAIR);
 
 		return $vcalendar;
 	}
@@ -317,6 +318,7 @@ class ICalendarHelper {
 			$event->prodId = $prodId;
 			$baseEvents[$event->uid] = $event;
 			if($event->isNew())
+			if(isset($vevent->{'DTSTAMP'}))
 				$event->createdAt = $vevent->DTSTAMP->getDateTime();
 			if(isset($vevent->{'LAST-MODIFIED'}))
 				$event->modifiedAt = $vevent->{'LAST-MODIFIED'}->getDateTime();
@@ -363,28 +365,17 @@ class ICalendarHelper {
 			$uid = $props->uid;
 			$recurrenceId = $props->recurrenceId;
 			unset($props->recurrenceId, $props->uid);
-			go()->debug("UID: " . $uid);
-			go()->debug("RecurrenceID: " . $recurrenceId);
 
 			if(isset($baseEvents[$uid]) && $baseEvents[$uid]->isRecurring()) {
 				if(!isset($baseEvents[$uid]->recurrenceOverrides[$recurrenceId])) {
 					$baseEvents[$uid]->recurrenceOverrides[$recurrenceId] = new RecurrenceOverride($baseEvents[$uid]);
 				}
 				$baseEvents[$uid]->recurrenceOverrides[$recurrenceId]->patchProps($props);
-
-				go()->debug($baseEvents[$uid]->recurrenceOverrides[$recurrenceId]->isModified());
 			} else {
-
-				go()->debug("No recurring event");
 				// ICS contains exception but no base event.
 				// You must be invited to a single occurrence
 				$event->setValues((array)$props); // title, description, start, duration, location, status, privacy
 				$event->prodId = $prodId;
-
-				// this leads to issues as the UID must stay the same for caldav etc.
-				// But removing this leads to another issue. If a participant is invited for
-				// a single occurrence it's added tto the whole series. Because
-				//in Calendar::addEvent() the original base event is attached
 				$event->uid = $uid;
 				$event->recurrenceId = $recurrenceId;
 			}
@@ -396,7 +387,7 @@ class ICalendarHelper {
 
 	static function makeBlob(CalendarEvent $event, string $data = null): Blob
 	{
-		$blob = Blob::fromString($data ?? ICalendarHelper::toVObject($event)->serialize());
+		$blob = Blob::fromString($data ?? $event->toVObject());
 		$blob->type = 'text/calendar';
 		// these must stay in sync!
 		$blob->modifiedAt = $event->modifiedAt;
@@ -443,9 +434,10 @@ class ICalendarHelper {
 				$props->timeZone = $props->start->getTimezone()->getName();
 			}
 		}
+		go()->log($vevent->DESCRIPTION);
 		//empty($vevent->DTSTART) ?: $props->start = $vevent->DTSTART->getDateTime()->format(DateTime::FORMAT_API_LOCAL);
 		if(!empty($vevent->SUMMARY)) $props->title = (string)$vevent->SUMMARY;
-		if(!empty($vevent->DESCRIPTION)) $props->description = (string)$vevent->DESCRIPTION;
+		if(!empty($vevent->DESCRIPTION)) $props->description = str_replace('\n',"\n", $vevent->DESCRIPTION->getValue());
 		if(!empty($vevent->LOCATION)) $props->location = (string)$vevent->LOCATION;
 		if(!empty($vevent->STATUS)) {
 			$status = strtolower($vevent->STATUS);
@@ -492,18 +484,18 @@ class ICalendarHelper {
 		return new VObject\Recur\RRuleIterator(self::toRrule($event), $event->start());
 	}
 
-	static private function parseRrule(VObject\Property\ICalendar\Recur $rule, $event) {
+	static private function parseRrule(VObject\Property\ICalendar\Recur $rule, CalendarEvent $event) {
 		$parts = $rule->getParts();
 		$values = (object)['frequency' => strtolower($parts['FREQ'])];
 		if(isset($parts['INTERVAL']) && $parts['INTERVAL'] != 1) {
 			$values->interval = intval($parts['INTERVAL']);
 		}
-		if(isset($parts['RSCALE'])) $values->rscale = strtolower(isset($parts['RSCALE']));
-		if(isset($parts['SKIP'])) $values->skip = strtolower(isset($parts['SKIP']));
-		if(isset($parts['WKST'])) $values->firstDayOfWeek = strtolower(isset($parts['WKST']));
-		if(isset($parts['BYDAY'])) {
+		if(isset($parts['RSCALE'])) $values->rscale = strtolower($parts['RSCALE']);
+		if(isset($parts['SKIP'])) $values->skip = strtolower($parts['SKIP']);
+		if(isset($parts['WKST'])) $values->firstDayOfWeek = strtolower($parts['WKST']);
+		if(!empty($parts['BYDAY'])) {
 			$values->byDay = [];
-			$days = $parts['BYDAY'];
+			$days =array_map('trim',explode(",", $parts['BYDAY']));
 			foreach($days as $day) {
 				$bd = (object)['day' => strtolower(substr($day, -2))];
 				if(strlen($day) > 2) {
@@ -524,9 +516,14 @@ class ICalendarHelper {
 			// could be "20240824T063000Z" or "20240824"
 			if(strlen($parts['UNTIL']) > 10) { // has time
 				// convert to localtime
-				$dt = DateTime::createFromFormat('Ymd\THis\Z', $parts['UNTIL'], new \DateTimeZone('etc/UTC'));
-				if(!empty($event->timeZone))
-					$dt->setTimezone(new \DateTimeZone($event->timeZone));
+				$isUtc = substr($parts['UNTIL'], -1,1) === 'Z';
+				$dt = DateTime::createFromFormat('Ymd\THis', substr($parts['UNTIL'],0,15), new \DateTimeZone('etc/UTC'));
+
+				$tz = $event->timeZone();
+				if(isset($tz)) {
+					$dt->setTimezone($tz);
+				}
+
 				$values->until = $dt->format('Y-m-d\TH:i:s');
 			} else {
 				// add dashes and append 0-time

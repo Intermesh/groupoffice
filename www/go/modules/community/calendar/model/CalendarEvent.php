@@ -7,12 +7,15 @@
 
 namespace go\modules\community\calendar\model;
 
+use DateTimeZone;
 use Exception;
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
+use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
 use go\core\exception\JsonPointerException;
 use go\core\fs\Blob;
+use go\core\model\Acl;
 use go\core\model\Alert as CoreAlert;
 use go\core\model\User;
 use go\core\orm\CustomFieldsTrait;
@@ -20,6 +23,7 @@ use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
+use go\core\orm\Relation;
 use go\core\orm\SearchableTrait;
 use go\core\util\JSON;
 use go\core\util\UUID;
@@ -54,7 +58,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 
 	const EventProperties = ['uid','isOrigin','replyTo', 'prodId', 'sequence','title','description','locale','location', 'showWithoutTime',
 		'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule','createdAt','modifiedAt',
-		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag','uri', 'eventId', 'recurrsenceId'];
+		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag','uri', 'eventId', 'recurrenceId'];
 
 	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'alerts', 'veventBlobId'];
 
@@ -104,7 +108,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	/**
 	 * This is only set when somebody is invited to a single occurrence of a series.
 	 *
-	 * Als een participant is uitgenodigd dan wordt er een aparte event met UID . ‘_’. RECURRENCE-ID gemaakt. Dit is denk ik ook de enige manier om dit op te slaan. Je kan dit niet met een recurrence override doen. Maar als je hier je status op zet dan wordt de andere event niet bijgewerkt via caldav. GO stuurt wel een mail maar met UID:d060b367-bc65-4853-bf07-f495bdb29671_2024-09-17T14:00:00 Dan krijg je unable to process invitation omdat deze UID niet gevonden wordt. Als ik aanpas dat deze dezelfde UID gebruikt zonder recurrence-id te appenden, dan krijfgt de genodigde de hele series omdat in Calendar::addEvent() dezelfde calendar_event data wordt bijgevoegd.
+	 * Als een participant is uitgenodigd dan wordt er een aparte event met UID . ‘_’. RECURRENCE-ID gemaakt.
 	 *
 	 * @var string|null
 	 */
@@ -234,17 +238,17 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	protected static function defineMapping(): Mapping {
 		return parent::defineMapping()
 			->addTable('calendar_calendar_event', 'cce', ['eventId' => 'eventId'], ['id', 'calendarId'])
-			->addTable('calendar_event', "eventdata", ['eventId' => 'eventId'], self::EventProperties)
-			//->addTable('calendar_calendar','cal',['cce.calendarId' => 'id'], ['ownerId']) // fetch calendar ownerId
+			->addQuery((new Query())->select("ownerId")->join('calendar_calendar', 'cal', 'cal.id=cce.calendarId'))
+			->addTable('calendar_event', "eventdata", ['cce.eventId' => 'eventId'], self::EventProperties)
 			->addUserTable('calendar_event_user', 'eventuser', ['cce.eventId' => 'eventId'],self::UserProperties)
-			//->addHasOne('recurrenceRule', RecurrenceRule::class, ['id' => 'eventId'])
-			->addMap('participants', Participant::class, ['eventId' => 'eventId'])
-			->addMap('recurrenceOverrides', RecurrenceOverride::class, ['eventId'=>'fk'])
-			->addMap('alerts', Alert::class, ['eventId' => 'fk'])
-			->addMap('links', Link::class, ['eventId' => 'eventId'])
-			->addScalar('categoryIds', 'calendar_event_category', ['eventId' => 'eventId']);
-			//->addMap('locations', Location::class, ['id' => 'eventId']);
+			->add('participants',Relation::map(Participant::class)->keys(['eventId' => 'eventId']))
+			->add('recurrenceOverrides',Relation::map(RecurrenceOverride::class)->keys(['eventId' => 'fk']))
+			->add('alerts',Relation::map(Alert::class)->keys(['eventId' => 'fk']))
+			->add('links',Relation::map(Link::class)->keys(['eventId' => 'eventId']))
+			->add('categoryIds',Relation::scalar('calendar_event_category')->keys(['eventId' => 'eventId']));
 	}
+
+
 
 	/**
 	 * Find an event by UID
@@ -260,8 +264,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 			->filter(['permissionLevel' => 25]); // rsvp
 
 		if(isset($userEmail)) {
-			$query->join('calendar_calendar', 'cal', 'cal.id = cce.calendarId', 'LEFT')
-				->join('core_user', 'u', 'u.id = cal.ownerId')
+			$query->join('core_user', 'u', 'u.id = cal.ownerId')
 				->where(['u.email' => $userEmail]);
 		}
 
@@ -270,7 +273,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	}
 
 	public function isPrivate(){
-		return $this->privacy === self::Private;
+		return $this->privacy !== self::Public;
 	}
 
 	protected static function defineFilters(): Filters
@@ -300,14 +303,18 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 				$crit->where('firstOccurrence', '<', $value);
 			})->add('inbox', function(Criteria $crit, $value, Query $query) {
 				// value must be true
-				$query->join('calendar_calendar','cal', 'cal.id = cce.calendarId')
-					->join('calendar_participant', 'p', 'p.eventId = eventdata.eventId AND p.id = cal.ownerId');
+				$query->join('calendar_participant', 'p', 'p.eventId = eventdata.eventId AND p.id = cal.ownerId');
 				$crit->where('p.id', '=', go()->getUserId())
 					->andWhere('p.rolesMask & 1 = 0') // !isOwner
 					->andWhere('p.participationStatus', '=', 'needs-action')
 					->andWhere('eventdata.status', '=', 'confirmed')
 					->andWhere('eventdata.start', '>=', new DateTime());
-			});
+			})->add('hideSecret', function(Criteria $criteria, $value, $query) {
+				$query->andWhere((new Criteria())
+					->where('privacy', '!=', 'secret')
+					->orWhere('cal.ownerId','=',go()->getUserId())
+				);
+			},1);
 	}
 
 
@@ -338,7 +345,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	public function icsBlob() {
 
 		$blob = isset($this->veventBlobId) ? Blob::findById($this->veventBlobId) : null;
-		if(!$blob || $blob->modifiedAt < $this->modifiedAt) {
+		if(!$blob || $blob->modifiedAt < $this->modifiedAt || !$blob->getFile()->exists()) {
 			$blob = ICalendarHelper::makeBlob($this);
 			$this->veventBlobId = $blob->id;
 			if(!$this->isNew()) {
@@ -349,18 +356,8 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 		return $blob;
 	}
 
-	public function dateTimeZone() {
-		if(!empty($this->timeZone)) {
-			return new \DateTimeZone($this->timeZone);
-		}
-		static $currentTZUser;
-		if(empty($currentTZUser)) {
-			$currentTZUser = go()->getAuthState()->getUser(['dateFormat', 'timezone', 'timeFormat' ]);
-			if(empty($currentTZUser)) {
-				$currentTZUser = User::findById(1, ['dateFormat', 'timezone', 'timeFormat'], true);
-			}
-		}
-		return new \DateTimeZone($currentTZUser->timezone);
+	public function toVObject() {
+		return ICalendarHelper::toVObject($this)->serialize();
 	}
 
 	public function icsBlobId() {
@@ -452,7 +449,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 
 	private function incrementCalendarModSeq() {
 
-		Calendar::updateHighestModSeq(self::find()->select('calendarId')->where(['uid'=>$this->uid]));
+		Calendar::updateHighestModSeq(self::find()->select('calendarId')->removeJoin('calendar_calendar')->where(['uid'=>$this->uid]));
 		if($this->isModified('calendarId')) {
 			// Event is put in a different calendar so update both modseqs
 			$oldCalId = $this->getOldValue('calendarId');
@@ -469,6 +466,12 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 		}
 
 		return $this->uri;
+	}
+
+	public function etag($v = null) {
+		if($v === null)
+			return $this->etag;
+		$this->etag = $v;
 	}
 
 	protected function init()
@@ -524,6 +527,44 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 		return !empty($this->recurrenceId);
 	}
 
+	/**
+	 * @param $blobIds
+	 * @param $calendarId
+	 * @param $uid string 'check', 'ignore', 'new'
+	 * @return object
+	 */
+	static function import($blobIds, $calendarId, $uid='check') {
+		$r = (object)[
+			'saved'=>0,
+			'failed'=>0,
+			'skipped'=>0,
+			'failureReasons'=>[]
+		];
+		foreach($blobIds as $blobId) {
+			foreach(ICalendarHelper::calendarEventFromFile($blobId) as $ev) {
+				if(is_array($ev)){
+					$r->failureReasons[$r->failed] = 'Parse error '.$ev['vevent']->VEVENT[0]->UID. ': '. $ev['error']->getMessage();
+					$r->failed++;
+					continue;
+				}
+				$ev->calendarId = $calendarId;
+				if($uid === 'new') {
+					$ev->uid = UUID::v4();
+				} else if($uid === 'check' && self::find()->selectSingleValue('cce.id')->where(['uid'=>$ev->uid])->single() !== null) {
+					$r->skipped++;
+					continue;
+					// check if exists
+				} // else use UID from ics file without checking.
+				if($ev->save()){ // will fail if UID exists. We dont want to modify existing events like this
+					$r->saved++;
+				} else {
+					$r->failureReasons[$r->failed] = 'Validate error '.$ev->uid. ': '. var_export($ev->getValidationErrors(),true);
+					$r->failed++;
+				}
+			}
+		}
+		return $r;
+	}
 	protected function internalSave() : bool {
 
 		if(empty($this->uri)) {
@@ -596,9 +637,14 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 		return $success;
 	}
 
-	public function toArray(array $properties = null): array|null
+	public function toArray(array|null $properties = null): array|null
 	{
 		$arr =  parent::toArray($properties);
+		if($this->isPrivate() && $this->getPermissionLevel() <= Acl::LEVEL_READ && $this->ownerId !== go()->getUserId()) {
+			$arr['title'] = '';
+			$arr['description'] = '';
+			$arr['location'] = '';
+		}
 		unset($arr['recurrenceId'], $arr['excluded']);
 		return $arr;
 	}
@@ -609,7 +655,9 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 			if($participant->kind == 'resource') {
 				$resourceCalendar = Calendar::findById(str_replace('Calendar:', '', $pid));
 				if(!empty($resourceCalendar)) {
-					Calendar::addEvent($this,$resourceCalendar->id);
+					 go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
+						['calendarId'=>$resourceCalendar->id, 'eventId'=>$this->eventId]
+					])->execute();
 				}
 			}
 		}
@@ -634,7 +682,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	/**
 	 * @return Alert[]
 	 */
-	private function alerts() {
+	public function alerts() {
 		if($this->useDefaultAlerts) {
 			$calendar = Calendar::findById($this->calendarId, ['id', 'ownerId', $this->showWithoutTime?'defaultAlertsWithoutTime':'defaultAlertsWithTime']);
 			return ($this->showWithoutTime ? $calendar->defaultAlertsWithoutTime : $calendar->defaultAlertsWithTime) ?? [];
@@ -776,7 +824,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 		$calIds = $calendarModSeq->selectSingleValue('calendarId')->distinct()->all();
 		// Garbage collector will delete event when last user instance is removed
 		$success =  parent::internalDelete($query); // delete none recurring or complete series
-		if($success) {
+		if($success && !empty($calIds)) {
 			Calendar::updateHighestModSeq($calIds);
 		}
 		return $success;
@@ -792,15 +840,36 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 		return !empty($this->recurrenceRule); // && !empty($this->recurrenceRule->frequency));
 	}
 
-	public function timeZone() {
-		return $this->timeZone ? new \DateTimeZone($this->timeZone) : null;
+	public function timeZone(): ?DateTimeZone
+	{
+		try {
+			return $this->timeZone ? new DateTimeZone($this->timeZone) : null;
+		}catch(Exception $e) {
+			ErrorHandler::logException($e, "Failed to set timezone " . $this->timeZone. " for event" . $this->id);
+
+			static $currentTZUser;
+			if (empty($currentTZUser)) {
+				$currentTZUser = go()->getAuthState()->getUser(['dateFormat', 'timezone', 'timeFormat']);
+				if (empty($currentTZUser)) {
+					$currentTZUser = User::findById(1, ['dateFormat', 'timezone', 'timeFormat'], true);
+				}
+			}
+			try {
+				return new DateTimeZone($currentTZUser->timezone);
+			}catch(Exception $e) {
+				ErrorHandler::logException($e, "Failed to fallback on user timezone " . $currentTZUser->timezone. " for event" . $this->id);
+			}
+			return null;
+
+		}
 	}
 
 	/**
-	 * @return \DateTime[]
+	 * @return DateTime[]
+	 * @throws \DateMalformedStringException
 	 */
 	public function upcomingOccurrence() {
-		$now = new \DateTime('now', $this->timeZone());
+		$now = new DateTime('now', $this->timeZone());
 		$recurrenceId = null;
 		$nextOccurrence = null;
 		if(!empty($this->recurrenceOverrides)) {
@@ -812,6 +881,12 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 					$recurrenceId = $o->recurrenceId;
 				}
 			}
+		}
+		if(is_string($recurrenceId)) {
+			$recurrenceId = new DateTime($recurrenceId, $this->timeZone());
+		}
+		if(is_string($nextOccurrence)) {
+			$nextOccurrence = new DateTime($nextOccurrence, $this->timeZone());
 		}
 		$it = ICalendarHelper::makeRecurrenceIterator($this);
 		$nextRecurrenceId = null;

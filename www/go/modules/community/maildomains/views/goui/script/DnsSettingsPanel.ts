@@ -94,7 +94,6 @@ export class DnsSettingsPanel extends Component {
 										title: t("Copy to clipboard"),
 										handler: (b) => {
 											browser.copyTextToClipboard(b.findAncestorByType(TextAreaField)!.value + "");
-											Notifier.success(t("Key is copied to clipboard"))
 										}
 									})]
 								})

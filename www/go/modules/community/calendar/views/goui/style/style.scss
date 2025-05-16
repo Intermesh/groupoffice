@@ -74,6 +74,7 @@
 
 
 	i {
+		display:inline-block;
 		font-size: inherit !important;
 		color: inherit;
 		min-height: dp(16);
@@ -176,6 +177,12 @@
 }
 
 .cal {
+	i.cat {
+		background-color: currentColor;
+		border-radius: dp(3);
+		margin:dp(2);
+		vertical-align: middle;
+	}
 	i.icon {
 		display:inline-block !important;
 	}
@@ -319,6 +326,9 @@
 }
 
 .cal.month, .cal.split {
+	.weekend div.more {
+		background-color: $surfaceLow;
+	}
 	ol { // week row
 		background-color: $surfaceLowest;
 		display: flex;
@@ -329,6 +339,20 @@
 		user-select:none;
 		> li { // day
 			border-right: 1px solid $colorDivider;
+			&.showMore > div.more {
+				display:block;
+			}
+			> div.more {
+				bottom:0;
+				position:absolute;
+				padding-left:dp(26);
+				width: 14.2%;
+				background-color: $surfaceLowest;
+				color: $colorText;
+				display:none;
+				mask-image: linear-gradient(to top, white 80%, transparent);
+
+			}
 			&:first-child,
 			&:last-child { border-right:0;}
 			&.events {
@@ -353,7 +377,7 @@
 							content: '';
 							border-radius: 999px;
 							width:dp(6);
-							height:dp(6);
+							height:dp(16);
 							margin: dp(5); // same width as white-space in allday events
 							background-color: currentColor;
 						}
@@ -426,11 +450,10 @@ $timeMargin: dp(72);
 			border-right: 1px solid var(--fg-divider);
 		}
 	}
-	> ul { //header + all-day
+	> ul { //header
 		display: flex;
 		scrollbar-gutter: stable;
 		overflow-y:auto;
-		max-height: dp(212); // x all-day events fit
 		border-bottom: 2px solid $colorBorder;
 		&:first-child { // header
 			@extend %weekhead;
@@ -440,7 +463,7 @@ $timeMargin: dp(72);
 			background-color:$surfaceLowest;
 			flex-shrink: 0;
 			overflow-x: hidden;
-			max-height: dp(212); // x all-day events fit
+			max-height: 30%; // x all-day events fit
 			min-height:dp(32);
 			border-bottom: 2px solid $colorLine;
 		}
@@ -505,6 +528,9 @@ $timeMargin: dp(72);
 		position: absolute;
 		min-height: dp(24); // big enough to click on it
 		border-left: dp(6) solid currentColor;
+		> em {
+			mask-image:none;
+		}
 		> em, > span, > i {
 			color: color-mix(in srgb, currentColor 36%, var(--fg-text));
 		}

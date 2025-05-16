@@ -436,7 +436,7 @@ abstract class AbstractController extends Observable {
 			$response['success'] = false;
 			
 			$response['feedback'] = !empty($response['feedback']) ? $response['feedback']."\r\n\r\n" : '';
-			$response['feedback'] .= go()->getDebugger()->enabled ? $msg : $e->getMessage();
+			$response['feedback'] .= go()->getDebugger()->enabled ? $msg : get_class($e);
 			
 			$response['exceptionCode'] = $e->getCode();
 					

@@ -223,11 +223,9 @@ class Message extends \go\core\mail\Message {
 		}
 
 		if($charset!='UTF-8'){
-			$part->body = \GO\Base\Util\StringHelper::to_utf8($part->body, $charset);
-			
 			$part->body = str_ireplace($charset, 'UTF-8', $part->body);
-			
 		}
+		$part->body = \GO\Base\Util\StringHelper::clean_utf8($part->body, $charset);
 	}
 	
 	private function _getParts($structure, $part_number_prefix='')

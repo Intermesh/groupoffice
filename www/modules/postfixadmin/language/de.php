@@ -1,6 +1,6 @@
 <?php
 return array (
-  'E-mail domains' => 'Postfix',
+  'E-mail domains' => 'E-Mail Domains',
   'Address' => 'Adresse',
   'Goto' => 'Gehe zu',
   'Max quota (MB)' => 'Max. Quota (MB)',
@@ -57,4 +57,6 @@ return array (
   'Allow external SMTP usage' => 'Externe SMTP-Nutzung zulassen',
   'If you enable reset passwords then a new password will be generated and exported for each account. Warning! Existing client configuration will need to be updated after this action.' => 'Wenn Sie Passwort zurücksetzen aktivieren, wird ein neues Passwort generiert und für jeden Account exportiert. Achtung! Vorhandene Clients müssen danach aktualisiert werden!',
   '\'"Use \'\'*\'\' for a catch all alias (not recommended)."\'' => '\'"Verwenden Sie \'\'*\'\' für einen CatchAll (nicht empfohlen)."\'',
+  'Postfix admin' => 'Postfix admin',
+  'Enable Full Text Search' => 'Volltextsuche aktivieren',
 );

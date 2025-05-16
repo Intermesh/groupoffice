@@ -15,10 +15,13 @@
 
 namespace GO\Files\Model;
 
+use Exception;
 use GO;
+use GO\Base\Exception\AccessDenied;
 use go\core\fs\Blob;
 use go\core\mail\Attachment;
 use go\core\model\Module;
+use GO\Files\Model\TrashedItem;
 use go\modules\community\history\model\LogEntry;
 use go\core\exception\NotFound;
 
@@ -30,6 +33,7 @@ use go\core\exception\NotFound;
  * @property String $name
 
  * @property int $locked_user_id
+ * @property string $lock_id;
  * @property int $status_id
  * @property int $ctime
  * @property int $mtime
@@ -110,6 +114,10 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 
 		//Don't cache tickets files because there are permissions issues. Everyone has read access to the types but may not see other peoples files.
 		if(strpos($path, 'tickets/')===0){
+			return false;
+		}
+
+		if(!$this->folder) {
 			return false;
 		}
 
@@ -315,6 +323,19 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 			$existingFile = $this->folder->hasFile($this->name);
 			if($existingFile && $existingFile->id!=$this->id)
 				throw new \Exception(sprintf(\GO::t("Filename %s already exists", "files"), $this->path));
+		}
+
+		if($this->isModified("locked_user_id")) {
+
+			// for backwards compatibility. lock_id was added later for wopi and dav.
+			// GO does not set lock_id but wopi needs it.
+			if ($this->locked_user_id && !$this->lock_id) {
+				$this->lock_id = uniqid($this->locked_user_id . "-");
+			}
+
+			if(!$this->locked_user_id) {
+				$this->lock_id = "";
+			}
 		}
 
 		if(!$this->isNew){
@@ -566,14 +587,19 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	 * Move a file to another folder
 	 *
 	 * @param Folder $destinationFolder
+	 * @param bool $appendNumberToNameIfExists
+	 * @param bool $ignoreAcl
 	 * @return boolean
+	 * @throws AccessDenied
 	 */
-	public function move($destinationFolder,$appendNumberToNameIfExists=false){
+	public function move(Folder $destinationFolder,bool $appendNumberToNameIfExists=false, bool $ignoreAcl = false)
+	{
 
 		$this->folder_id=$destinationFolder->id;
-		if($appendNumberToNameIfExists)
+		if($appendNumberToNameIfExists) {
 			$this->appendNumberToNameIfExists();
-		return $this->save();
+		}
+		return $this->save($ignoreAcl);
 	}
 
 	/**
@@ -884,4 +910,22 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		$service = \go\modules\business\fileconverter\Module::getAvailableService();
 		$service->convert($this->fsFile, $outputFile, $format);
 	}
+
+	/**
+	 * Soft delete a file by moving it to Trash
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function moveToTrash(): void
+	{
+		TrashedItem::model()->saveForFile($this);
+
+		$trashFolder = Folder::model()->findByPath('trash');
+		if ($this->folder_id == $trashFolder->id) {
+			throw new Exception("File is already in trash");
+		}
+		$this->move($trashFolder, true);
+	}
+
 }

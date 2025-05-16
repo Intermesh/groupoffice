@@ -23,7 +23,7 @@ const INSTALL_NONE = 2;
 $autoLoader = require(__DIR__ . "/../www/vendor/autoload.php");
 $autoLoader->add('go\\', __DIR__);
 
-$dataFolder = new \go\core\fs\Folder(__DIR__ . '/data');
+$dataFolder = new \go\core\fs\Folder( '/tmp/phpunit');
 
 require(__DIR__ . "/config.php");
 $config['file_storage_path'] = $dataFolder->getPath();
@@ -56,10 +56,12 @@ try {
 
 
 		//connect to server without database
+		echo "MySQL host: ".  $config['db_host'] ."\n\n";
+
 		$pdo = new PDO('mysql:host='. $config['db_host'], $config['db_user'], $config['db_pass']);
 
 		try {
-			echo "Dropping database 'groupoffice-phpunit'\n";
+			echo "Dropping database 'groupoffice_phpunit'\n";
 			$pdo->query("DROP DATABASE groupoffice_phpunit");
 		}catch(\Exception $e) {
 			echo $e->getMessage() ."\n";
@@ -73,7 +75,7 @@ try {
 		Property::clearCachedRelationStmts();
 
 
-		echo "Creating database 'groupoffice-phpunit'\n";
+		echo "Creating database 'groupoffice_phpunit'\n";
 		$pdo->query("CREATE DATABASE groupoffice_phpunit");
 		$pdo = null;
 	}
@@ -116,20 +118,14 @@ try {
 
 		// fake URL
 		go()->getSettings()->URL = "http://localhost";
-
-//		echo "Installing demo data\n";
-//
-//		$ctrl = new System();
-//		$ctrl->demo();
-
 		echo "Done\n\n";
 	} else if($installDb == INSTALL_UPGRADE) {
-    echo "Running upgrade: ";
-	  $importCmd = 'mysql -h ' .  escapeshellarg($config['db_host']) . ' -u '.escapeshellarg($config['db_user']) . ' -p'.escapeshellarg($config['db_pass']).' groupoffice_phpunit < ' . __DIR__ . '/upgradetest/go67.sql';
-    echo "Running: " . $importCmd . "\n";
+        echo "Running upgrade: ";
+		$importCmd = 'mysql -h ' .  escapeshellarg($config['db_host']) . ' -u '.escapeshellarg($config['db_user']) . ' -p'.escapeshellarg($config['db_pass']).' groupoffice_phpunit < ' . __DIR__ . '/upgradetest/go68.sql';
+        echo "Running: " . $importCmd . "\n";
 	  system($importCmd);
 
-	  $copyCmd = 'cp -r ' . __DIR__ . '/upgradetest/go67data/* ' . $dataFolder->getPath();
+	  $copyCmd = 'cp -r ' . __DIR__ . '/upgradetest/68data/* ' . $dataFolder->getPath();
 	  echo "Running: " . $copyCmd . "\n";
 	  system($copyCmd);
 

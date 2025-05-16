@@ -58,10 +58,10 @@ class MailDomain
 	{
 		//strip domain from username if it's present.
 		$username = str_replace('@' . $domain, '', $user->username);
-		$alias = strpos($user->email, '@' . $domain) ? $user->email : '';
 
 		// For backwards compatibility
-		if (go()->getModule(null, 'postfixadmin')) {
+		if (empty(go()->getConfig()['serverclient_jmap'])) {
+			$alias = strpos($user->email, '@' . $domain) ? $user->email : '';
 			$this->legacyAddMailbox(array(
 				'name' => $user->displayName,
 				'username' => $username,
@@ -70,32 +70,27 @@ class MailDomain
 				'password2' => $this->password,
 				'domain' => $domain
 			));
+			return;
 		}
 
-
-		$d = Domain::find()->where(['domain' => $domain])->single();
 		$data[] = [
 			'MailBox/set',
 			['create' => [
 				'mb' => [
 					'active' => true,
-					'fts' => false,
-					'name' => $user->displayName,
+					'description' => $user->displayName,
 					'username' => $username . '@' . $domain,
-					'password' => $this->password,
-					'domainId' => $d->id,
-					'quota' => $d->defaultQuota
+					'password' => $this->password
 				]]],
 			'clientCallId-1'
 		];
-		if (strlen($alias)) {
+		if ( strpos($user->email, '@' . $domain) && $user->email != $username . '@' . $domain) {
 			$data[] = [
 				"MailAlias/set",
 				["create" => [
 					'ma' => [
 						'active' => true,
 						'address' => $user->email,
-						'domainId' => $d->id,
 						'goto' => $user->email
 					]]],
 				'clientCallId-2'
@@ -145,52 +140,63 @@ class MailDomain
 	 */
 	public function setMailboxPassword(User $user, string $domain)
 	{
-//		$username = explode('@', $user->username)[0];
-//
-//		// if username contains domain then only change it for that domain.
-//		if(isset($usernameParts[1]) && $domain != $usernameParts[1]) {
-//			return;
-//		}
-//
-//		$username .= '@' . $domain;
-//
-//		// Backwards compatibility
-//		if (go()->getModule(null, "postfixadmin")) {
-//			$this->legacySetMailboxPassword($username);
-//		}
-//
-//		if (!go()->getModule(null, "email")) {
-//			return;
-//		}
+		$username = explode('@', $user->username)[0];
+
+		// if username contains domain then only change it for that domain.
+		if (isset($usernameParts[1]) && $domain != $usernameParts[1]) {
+			return;
+		}
+
+		$username .= '@' . $domain;
+
+		// Backwards compatibility
+		if (empty(GO::config()->serverclient_jmap)) {
+			$this->legacySetMailboxPassword($username);
+			return;
+		}
 
 
-// TODO fix this
-//		if ($this->onSameServer()) {
-//			$mb = Mailbox::find(['id', 'username', 'homedir'])->where(['username' => $username])->single();
-//			$mb->password = $this->password;
-//			$mb->save();
-//		} else {
-//			$data = [['MailBox/set',
-//				[
-//					'update' => [
-//						$mb->id => [
-//							'username' => $username,
-//							'password' => $this->password
-//						]
-//					]
-//				],
-//				'clientCallId-1'
-//			]];
-//			$response = $this->jmapCall($data);
-//		}
+		$data = [
+			['MailBox/query',
+				[
+					'filter' => ['username' => $username]
+				],
+				'clientCallId-1'
+			]
+		];
+		$responses = $this->jmapCall($data);
 
+		$mailboxId = $responses[0][1]['ids'][0] ?? null;
 
-//		$stmt = Account::model()->findByAttributes(['username' => $username]);
-//
-//		while ($account = $stmt->fetch()) {
-//			$account->password = $this->password;
-//			$account->save(true);
-//		}
+		if($mailboxId == null) {
+			//not found on mailserver
+			return;
+		}
+
+		$data = [
+			['MailBox/set',
+				[
+					'update' => [
+						$mailboxId => [
+							'username' => $username,
+							'password' => $this->password
+						]
+					]
+				],
+				'clientCallId-1'
+			]
+		];
+		$response = $this->jmapCall($data);
+
+		if (!go()->getModule(null, "email")) {
+			return;
+		}
+		$stmt = Account::model()->findByAttributes(['username' => $username]);
+
+		while ($account = $stmt->fetch()) {
+			$account->password = $this->password;
+			$account->save(true);
+		}
 	}
 
 	/**
@@ -338,7 +344,7 @@ class MailDomain
 
 		$apiUrl = $this->getBaseUrl();
 
-		$apiKey = go()->getConfig()['serverclient_api_token'];
+		$apiKey = go()->getConfig()['serverclient_token'];
 		$this->http->setOption(CURLOPT_HTTPHEADER, array(
 			"Content-Type: application/json; charset=utf-8",
 			"Content-Length: " . strlen($dataStr),

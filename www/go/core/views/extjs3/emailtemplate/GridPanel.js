@@ -38,7 +38,22 @@ go.emailtemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 
 						},
 						scope: this
-					},{
+					},
+
+					{
+						itemId: "copy",
+						iconCls: 'ic-content-copy',
+						text: t("Copy"),
+						handler: function(item) {
+							var record = this.store.getAt(item.parentMenu.rowIndex);
+							go.copyEmailTemplate = record.json;
+							delete go.copyEmailTemplate.id;
+
+						},
+						scope: this
+					},
+
+					{
 						itemId: "delete",
 						iconCls: 'ic-delete',
 						text: t("Delete"),
@@ -64,6 +79,21 @@ go.emailtemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 				{
 					xtype: 'tbsearch'
 				},
+
+				{
+					iconCls: 'ic-content-paste',
+					tooltip: t("Paste"),
+					handler: function() {
+						if(!go.copyEmailTemplate) {
+							Ext.MessageBox.alert(t("Error"), "Copy one first");
+							return;
+						}
+						var dlg = new go.emailtemplate.TemplateDialog();
+						dlg.setValues(Ext.apply(go.copyEmailTemplate, {module: this.module, key: this.key})).show();
+					},
+					scope: this
+				},
+
 				{
 					iconCls: 'ic-add',
 					handler: function() {

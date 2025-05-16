@@ -110,7 +110,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: "name",
 					sortable: false,
 					draggable: false,
-					hideable: false,
+					orgHeader: t("Index character"),
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 
 						if(!value) {
@@ -130,23 +130,31 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'id'
 				},
 				{
-					id: 'name',
-					header: t('Name'),
-					width: dp(300),
-					sortable: true,
-					dataIndex: go.User.addressBookSettings.sortBy,
-					hidden: this.enabledColumns.indexOf('name') == -1,
-					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
+					id: 'icon',
+					sortable: false,
+					resizable: false,
 
+					orgHeader: t("Icon"),
+					width: dp(56),
+					dataIndex: "photoBlobId",
+					hidden: this.enabledColumns.indexOf('name') == -1,
+					renderer: (value, metaData, record, rowIndex, colIndex, store) => {
 						const icon = record.data.isOrganization ? '<i class="icon">business</i>' : null;
 
 						if(record.get("color")) {
 							metaData.attr = 'style="color: #' + record.get("color") + ';"';
 						}
 
-						return '<span class="go-ab-avatar">' + go.util.avatar(record.data.name, record.data.photoBlobId, icon) + '</span>' + Ext.util.Format.htmlEncode(record.data.name);
-
+						return '<span class="go-ab-avatar">' + go.util.avatar(record.data.name, record.data.photoBlobId, icon) + '</span>';
 					}
+				},
+				{
+					id: 'name',
+					header: t('Name'),
+					width: dp(220),
+					sortable: true,
+					dataIndex: 'name',
+					hidden: this.enabledColumns.indexOf('name') == -1
 				},
 				{
 					hidden: this.enabledColumns.indexOf('gender') == -1,
@@ -277,7 +285,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(300),
 					hidden: this.enabledColumns.indexOf('phoneNumbers') == -1,
 					renderer: function (phoneNumbers, meta, record) {
-						return phoneNumbers.column("number").join(", ");
+						return Ext.util.Format.htmlEncode(phoneNumbers.column("number").join(", "));
 					}
 				},
 				{
@@ -288,7 +296,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(300),
 					hidden: this.enabledColumns.indexOf('emailAddresses') == -1,
 					renderer: function (emailAddresses, meta, record) {
-						return emailAddresses.column("email").join(", ");
+						return Ext.util.Format.htmlEncode(emailAddresses.column("email").join(", "));
 					}
 				},{
 					id: 'firstName',

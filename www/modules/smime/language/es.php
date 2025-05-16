@@ -30,7 +30,7 @@ return array (
   'Valid to' => 'Válido hasta',
   'Valid from' => 'Válido desde',
   'name' => 'Soporte de SMIME',
-  'To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => 'Para cargar un nuevo certificado PKCS12 debe introducir su contraseña de Group-Office. Por motivos de seguridad, la contraseña de la oficina del grupo debe ser distinta a la de su certificado PCSK12. También está prohibido no introducir ninguna contraseña.',
+  'To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => 'Para cargar un nuevo certificado PKCS12 debe introducir su contraseña de {product_name}. Por motivos de seguridad, la contraseña de la oficina del grupo debe ser distinta a la de su certificado PCSK12. También está prohibido no introducir ninguna contraseña.',
   'The Group-Office password was incorrect.' => 'La contraseña de {product_name} es incorrecta.',
   'Your SMIME key password matches your Group-Office password. This is prohibited for security reasons!' => 'Tu contraseña de la clave SMIME coincide con tu contraseña de {product_name}. Esto está prohibido por razones de seguridad.',
   'E-mail' => 'E-mail',

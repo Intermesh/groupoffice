@@ -80,7 +80,6 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 								if(v === 0) {
 									return t("Unlimited");
 								}
-								v *= 1024;
 								return Format.fileSize(v);
 							}
 						}),
@@ -90,8 +89,6 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 							label: t("Used quota"),
 							name: "sumUsedQuota",
 							renderer: (v, _record) => {
-								v = parseInt(v);
-								v *= 1024;
 								return (v > 0) ? Format.fileSize(v) : "0B";
 							}
 						}),
@@ -102,7 +99,6 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 							name: "sumUsage",
 							width: 100,
 							renderer: (v, _record) => {
-								v = parseInt(v);
 								return (v > 0) ? Format.fileSize(v) : "0B";
 							},
 							hidden: true
@@ -176,7 +172,7 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 						icon: "delete",
 						text: t("Delete"),
 						handler: () => {
-							jmapds("Application").confirmDestroy([this.entity!.id]);
+							jmapds("MailDomain").confirmDestroy([this.entity!.id]);
 						}
 					})
 					)

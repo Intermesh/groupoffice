@@ -62,9 +62,6 @@ export class MailboxDialog extends FormWindow {
 
 					hr(),
 
-
-
-
 					this.passwordFld = textfield({
 						name: "password",
 						id: "password",
@@ -225,8 +222,8 @@ export class MailboxDialog extends FormWindow {
 		);
 
 		this.on("ready", async  () => {
-			if (this.currentId) {
-				this.usernameFld.disabled = true;
+			if (this.form.currentId) {
+				this.usernameFld.readOnly = true;
 				const username = this.usernameFld.value as string;
 				if (username.indexOf("@") >-1) {
 					const parts = username.split("@")
@@ -244,7 +241,7 @@ export class MailboxDialog extends FormWindow {
 
 		this.form.on("beforesave", (_f, v) => {
 
-			if(this.currentId) {
+			if(this.form.currentId) {
 				if(v.password && v.password.length === 0) {
 					delete v.password;
 				}

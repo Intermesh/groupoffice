@@ -2,12 +2,13 @@ import {
 	checkbox,
 	comp,
 	DefaultEntity, fieldset,
-	t, textarea,
+	t, textarea, TextField,
 	textfield
 } from "@intermesh/goui";
 import {FormWindow} from "@intermesh/groupoffice-core";
 
 export class AliasDialog extends FormWindow {
+	private domainFld: TextField;
 	constructor() {
 		super("MailAlias");
 
@@ -27,11 +28,11 @@ export class AliasDialog extends FormWindow {
 						required: true,
 						hint: t("Use '*' for a catch all alias (not recommended)."),
 					}),
-					textfield({
+					this.domainFld = textfield({
 						name: "domain",
 						id: "domain",
 						label: t("Domain"),
-						readOnly: true,
+						disabled: true,
 						icon: "alternate_email"
 					}),
 				),
@@ -54,25 +55,28 @@ export class AliasDialog extends FormWindow {
 
 		this.on("ready", async () => {
 
-			if (this.currentId) {
+			if (this.form.currentId) {
 				const idField = 	this.form.findField("address")!;
 				let address = idField.value as String;
 				if (address.indexOf("@") > -1) {
-					address = address.split("@")[0];
+					const parts = address.split("@")
+					address = parts[0];
 					if(address.length === 0) {
 						address = "*";
 					}
+
+					this.domainFld.value = parts[1];
 				}
 				idField.value = address;
 
-				idField.disabled = true;
+				idField.readOnly = true;
 
 				this.form.trackReset();
 			}
 		});
 
 		this.form.on("beforesave", (f, v) => {
-			if(!this.currentId) {
+			if(!this.form.currentId) {
 				v.address = v.address + "@" + this.form.findField("domain")!.value;
 			}
 		});
