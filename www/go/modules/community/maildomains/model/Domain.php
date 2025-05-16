@@ -15,56 +15,48 @@ use go\modules\community\maildomains\util\DnsCheck;
 
 final class Domain extends AclOwnerEntity
 {
-	/** @var int */
-	public $id;
 
-	/** @var int */
-	public $userId;
+	public ?int $id;
+	public ?int $userId;
+	public string $domain;
+	public string|null $description;
 
-	/** @var string */
-	public $domain;
+	/**
+	 * Maximum number of aliases
+	 */
+	public int $maxAliases = 0;
 
-	/** @var string */
-	public $description;
+	/**
+	 * Maximum number of mailboxes
+	 *
+	 * @var int
+	 */
+	public int $maxMailboxes = 0;
 
-	/** @var int >= 0 */
-	public $maxAliases = 0;
 
-	/** @var int */
-	public $maxMailboxes = 0;
+	/**
+	 * Max assignable quota in bytes
+	 *
+	 * @var int
+	 */
+	public int $totalQuota = 0;
 
-	/** @var int */
-	public $totalQuota = 0;
+	/**
+	 * Default quota in bytes
+	 */
+	public int $defaultQuota = 0;
 
-	/** @var int */
-	public $defaultQuota = 0;
-
-	/** @var string */
-	public $transport;
-
-	/** @var bool */
-	public $backupMx = false;
-
-	/** @var int */
-	public $createdBy;
-
-	/** @var DateTime */
-	public $createdAt;
-
-	/** @var int */
-	public $modifiedBy;
-
-	/** @var DateTime */
-	public $modifiedAt;
+	public string $transport;
+	public bool $backupMx = false;
+	public ?int $createdBy;
+	public ?DateTime $createdAt;
+	public int $modifiedBy;
+	public ?DateTime $modifiedAt;
 
 	/** @var boolean */
-	public $active = true;
+	public bool $active = true;
 
-	public $aliases;
-
-	public $mailboxes;
-
-	public $spf;
+	public ?string $spf;
 
 	public $spfStatus;
 
@@ -77,20 +69,16 @@ final class Domain extends AclOwnerEntity
 	public $dmarcStatus;
 	public $dkim;
 
-	/** @var int */
-	public $numAliases;
-
-	/** @var int */
-	public $numMailboxes;
-
-	/** @var int Used quota in bytes */
-	public $sumUsedQuota;
-
-	/** @var int Disk usage in bytes */
-	public $sumUsage;
 	/**
-	 * @var mixed|null
+	 * Used quota in bytes
 	 */
+	public ?int $sumUsedQuota;
+
+	/**
+	 * Disk usage in bytes
+	 */
+	public ?int $sumUsage;
+
 	public bool $checkDNS = false;
 
 	/**
@@ -104,10 +92,7 @@ final class Domain extends AclOwnerEntity
 				(new Query())
 					->select('SUM(COALESCE(`cmm`.`quota`,0)) as `sumUsedQuota`, SUM(COALESCE(`cmm`.`bytes`,0)) as `sumUsage`')
 				->join('community_maildomains_mailbox', 'cmm', '`cmd`.`id`=`cmm`.`domainId`', 'LEFT')
-//				->join('community_maildomains_quota', 'cmq', 'cmq.username = cmm.username', 'LEFT')
 				->groupBy(['`cmm`.`domainId`']))
-//			->addScalar('aliases', 'community_maildomains_alias', ['id' => 'domainId'])
-//			->addScalar('mailboxes', 'community_maildomains_mailbox', ['id' => 'domainId'])
 			->addMap('dkim', DkimKey::class, ['id' => 'domainId']);
 	}
 
@@ -135,6 +120,23 @@ final class Domain extends AclOwnerEntity
 			->add('active', function (Criteria $criteria, $value) {
 				$criteria->where(['active' => $value]);
 			});
+	}
+
+	public function countMailboxes(): int {
+		return go()->getDbConnection()
+			->selectSingleValue('count(*)')
+			->from("community_maildomains_mailbox")
+			->where("domainId", "=", $this->id)
+			->single();
+	}
+
+	public function countAliases(): int {
+		return go()->getDbConnection()
+			->selectSingleValue('count(*)')
+			->from("community_maildomains_alias")
+			->from("community_maildomains_alias")
+			->where("domainId", "=", $this->id)
+			->single();
 	}
 
 
@@ -165,16 +167,6 @@ final class Domain extends AclOwnerEntity
 	}
 
 
-	public function getNumAliases(): int
-	{
-		return count($this->aliases);
-
-	}
-
-	public function getNumMailboxes(): int
-	{
-		return count($this->mailboxes);
-	}
 
 	protected function internalSave(): bool
 	{

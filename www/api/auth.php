@@ -39,9 +39,9 @@ function output(array $data = [], int $status = 200, string $statusMsg = null) {
 		$json = JSON::encode($data);
 		Response::get()->output($json);
 	} catch(Exception $e) {
-		Response::get()->setStatus(500, $e->getMessage());
+		Response::get()->setStatus(500, get_class($e));
 
-		echo $e->getMessage();
+		echo get_class($e);
 
 		ErrorHandler::logException($e);
 	}
@@ -294,7 +294,5 @@ try {
 } catch (Throwable $e) {
 	ErrorHandler::logException($e);
 
-	// make sure there's no newline in the status text
-	$text = StringUtil::normalizeCrlf($e->getMessage(), " - ");
-	output([], 500, $text);
+	output([], 500, get_class($e));
 }

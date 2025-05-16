@@ -79,12 +79,16 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		this.on("added", (cont) => {
 
 			cont.ownerCt.on("beforeload", (dv, id) => {
-				if(this.composer.textField.isDirty() && this.composer.textField.getValue() != "" && this.composer.textField.getValue() != "<br>") {
-					if(confirm(t("You have an unsaved comment. Are you sure you want to discard the comment?"))) {
-						this.composer.reset();
-						return true;
+				try {
+					if (this.composer.textField.isDirty() && this.composer.textField.getValue() != "" && this.composer.textField.getValue() != "<br>") {
+						if (confirm(t("You have an unsaved comment. Are you sure you want to discard the comment?"))) {
+							this.composer.reset();
+							return true;
+						}
+						return false;
 					}
-					return false;
+				}catch (e) {
+					console.error(e);
 				}
 			});
 		})
@@ -334,6 +338,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			if(r.data.attachments && r.data.attachments.length) {
 				let atts = "";
 				r.data.attachments.forEach(a => {
+					a.name = Ext.util.Format.htmlEncode(a.name);
 					atts += `<a class="attachment" target="_blank" title="${a.name}" href="${go.Jmap.downloadUrl(a.blobId, true)}"><span class="filetype filetype-${a.name.substring(a.name.lastIndexOf(".") + 1)}"></span>${a.name}</a>&nbsp;`;
 					atts += `<a target="_blank" title="${t("Download")}" href="${go.Jmap.downloadUrl(a.blobId, false)}"><i class="icon primary ic-download-for-offline" style="padding-bottom: 8px;"></i></a>`;
 				})

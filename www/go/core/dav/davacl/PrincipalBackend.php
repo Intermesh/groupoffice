@@ -29,18 +29,15 @@ use Sabre\DAVACL\PrincipalBackend\AbstractBackend;
 class PrincipalBackend extends AbstractBackend {
 
 	private function modelToDAVUser(User $user) {
-
-		$data = array(
-				'id' => $user->id,
-				'uri' => 'principals/' . $user->username,
-				'{DAV:}displayname' => $user->displayName,
-				'{http://sabredav.org/ns}email-address' => $user->email,
-				'{urn:ietf:params:xml:ns:caldav}calendar-home-set' => new Href('calendars/' . $user->username),
-				'{urn:ietf:params:xml:ns:caldav}schedule-inbox-URL' => new Href('principals/' . $user->username . '/inbox'),
-				'{urn:ietf:params:xml:ns:caldav}schedule-outbox-URL' => new Href('principals/' . $user->username . '/outbox')
-		);
-
-		return $data;
+		return [
+			'id' => $user->id,
+			'uri' => 'principals/' . $user->username,
+			'{DAV:}displayname' => $user->displayName,
+			'{http://sabredav.org/ns}email-address' => $user->email,
+			'{urn:ietf:params:xml:ns:caldav}calendar-home-set' => new Href('calendars/' . $user->username),
+			'{urn:ietf:params:xml:ns:caldav}schedule-inbox-URL' => new Href('principals/' . $user->username . '/inbox'),
+			'{urn:ietf:params:xml:ns:caldav}schedule-outbox-URL' => new Href('principals/' . $user->username . '/outbox')
+		];
 	}
 	private $users;
 

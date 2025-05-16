@@ -2,6 +2,7 @@
 
 namespace go\modules\community\calendar\controller;
 
+use go\core\exception\Forbidden;
 use go\core\jmap\EntityController;
 use go\modules\community\calendar\model;
 
@@ -35,6 +36,8 @@ class ResourceGroup extends EntityController {
 	 * @see https://jmap.io/spec-core.html#/get
 	 */
 	public function get($params) {
+		if(!$this->rights->mayChangeResources)
+			throw new Forbidden('Permission denied');
 		return $this->defaultGet($params);
 	}
 	
@@ -49,6 +52,8 @@ class ResourceGroup extends EntityController {
 	 * 	messages to participants or create CalendarEventNotification objects.
 	 */
 	public function set($params) {
+		if(!$this->rights->mayChangeResources)
+			throw new Forbidden('Permission denied');
 		return $this->defaultSet($params);
 	}
 	

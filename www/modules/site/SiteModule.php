@@ -9,7 +9,12 @@ class SiteModule extends \GO\Base\Module{
 	public function autoInstall() {
 		return false;
 	}
-	
+
+	public function getStatus(): string
+	{
+		return \go\core\Module::STATUS_DEPRECATED;
+	}
+
 	public function author() {
 		return 'Wesley Smits';
 	}

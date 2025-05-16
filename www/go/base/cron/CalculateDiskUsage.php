@@ -82,8 +82,8 @@ class CalculateDiskUsage extends AbstractCron {
 				}
 			}
 		} else if(\GO::modules()->maildomains) {
-			$result = go()->getDbConnection()->query("SHOW SUM('usage') as 'usage' FROM community_maildomains_mailbox")->fetch();
-			if($result) {
+			$result = go()->getDbConnection()->query("SELECT SUM('bytes') as 'usage' FROM community_maildomains_mailbox")->fetch();
+			if ($result) {
 				\GO::config()->save_setting('mailbox_usage', $result['usage']);
 			} else {
 				\GO::config()->save_setting('mailbox_usage', 0);

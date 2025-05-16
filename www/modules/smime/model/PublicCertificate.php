@@ -21,6 +21,7 @@ namespace GO\Smime\Model;
 
 use GO\Base\Db\FindCriteria;
 use GO\Base\Db\FindParams;
+use GO\Base\Exception\NotFound;
 use GO\Base\Fs\File;
 use GO\Base\Util\HttpClient;
 use GO\Base\Util\StringHelper;
@@ -37,6 +38,8 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 	private $valid;
 	private $ocsp;
 	private $ocspMsg;
+
+	private bool $ocspFound = true;
 
 	public function tableName() {
 		return 'smi_certs';
@@ -148,7 +151,9 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 		try {
 			$cert->ocsp = $cert->checkOCSP($pubCertFile, $arr);
 			$cert->ocspMsg = $cert->ocsp ? "OK" : \GO::t("The certificate has been revoked!", "smime");
-		}catch(\Exception $e) {
+		}catch(NotFound $e) {
+			$cert->ocspFound = false;
+		}	catch(\Exception $e) {
 			$cert->ocspMsg = $e->getMessage();
 			$cert->ocsp = false;
 		}
@@ -191,6 +196,7 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 			self::oscp($this, $pubCertFile, $arr);
 			$pubCertFile->delete();
 		}
+		$result['ocspFound'] = $this->ocspFound;
 		$result['ocsp'] = $this->ocsp;
 		if($this->ocspMsg) {
 			$result['ocspMsg'] = $this->ocspMsg;
@@ -209,7 +215,7 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 	private function checkOCSP($publicCertFile, $arr) {
 
 		if(!isset($arr['extensions']['authorityInfoAccess'])) {
-			throw new \Exception( "No OCSP information found in certificate");
+			throw new NotFound( "No OCSP information found in certificate");
 		}
 
 		preg_match_all('/^.*URI:(.*)$/m', $arr['extensions']['authorityInfoAccess'], $matches, PREG_SET_ORDER);
@@ -224,11 +230,11 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 		}
 
 		if(!isset($ocspURI)) {
-			throw new \Exception("No OCSP URI found : " . var_export($matches, true));
+			throw new NotFound(go()->t("No OCSP URI found", "legacy","smime"));
 		}
 
 		if(!isset($issuerURI)) {
-			return "No issuer URI found";
+			return go()->t("No issuer URI found", "legacy","smime");
 		}
 
 		//Get OSCP uri and Issuer uri

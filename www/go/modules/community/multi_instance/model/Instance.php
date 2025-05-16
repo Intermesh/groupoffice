@@ -834,13 +834,17 @@ class Instance extends Entity {
 
 				$instance->mysqldump();
 
-				$modPackageFolder = $instance->getModulePackageFolder();
-				if($modPackageFolder->exists()) {
-					$dest = $instance->getDataFolder()->getFolder($instance->getStudioPackage() . '_MODULE_PACKAGE');
-					if ($dest->exists()) {
-						$dest = new Folder($dest->getPath() . '-' . uniqid());
+				try {
+					$modPackageFolder = $instance->getModulePackageFolder();
+					if ($modPackageFolder->exists()) {
+						$dest = $instance->getDataFolder()->getFolder($instance->getStudioPackage() . '_MODULE_PACKAGE');
+						if ($dest->exists()) {
+							$dest = new Folder($dest->getPath() . '-' . uniqid());
+						}
+						$instance->getModulePackageFolder()->move($dest);
 					}
-					$instance->getModulePackageFolder()->move($dest);
+				} catch(\Throwable $e) {
+					ErrorHandler::logException($e, "Error while deleting module folder for instance ". $instance->hostname);
 				}
 
 				$instance->getConfigFile()->getFolder()->delete();

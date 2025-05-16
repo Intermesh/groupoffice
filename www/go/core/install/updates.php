@@ -1657,9 +1657,39 @@ $updates['202412090921'][] = "drop index accessToken on core_auth_token;";
 
 
 
+$updates['202501141553'][] = "alter table core_pdf_template
+    add fontFamily varchar(100) default 'dejavusans' not null;";
+
+$updates['202501141553'][] = "alter table core_pdf_template
+    add fontSize tinyint default 10 null;";
+
+
+$updates['202501141553'][] = "UPDATE core_user t
+SET t.language   = 'en_gb'
+WHERE t.language='en_uk';";
+
+$updates['202501141553'][] = "UPDATE core_user t
+SET  t.holidayset = 'en_gb'
+WHERE t.holidayset='en_uk';";
+
+
+$updates['202503201426'][] = "create index core_search_modifiedAt_index
+    on core_search (modifiedAt);";
+
+$updates['202503201426'][] = "drop index core_change_modSeq_entityTypeId_entityId_index on core_change;";
+
+$updates['202503201426'][] = "create index core_change_modSeq_entityTypeId_entityId_destroyed_index
+    on core_change (modSeq, entityTypeId, entityId, destroyed);";
+
+$updates['202503201426'][] = "drop index core_change_user_modSeq_userId_entityTypeId_entityId_index on core_change_user;";
+
+$updates['202503201426'][] = "create index core_change_user_modSeq_userId_entityTypeId_entityId_index
+    on core_change_user (modSeq, userId, entityTypeId);";
+
+
 # ------ 6.9 ---------------
 
-$updates['202412090921'][] = "CREATE TABLE `core_principal`(
+$updates['202503271129'][] = "CREATE TABLE `core_principal`(
    `id` VARCHAR(60) NOT NULL,
 	`name` VARCHAR(100) NOT NULL,
 	`email` VARCHAR(255) NULL,
@@ -1686,7 +1716,7 @@ $updates['202412090921'][] = "CREATE TABLE `core_principal`(
 		ON UPDATE No Action
 ) ENGINE = InnoDB;";
 
-$updates['202412090921'][] = function() {
+$updates['202503271129'][] = function() {
 
 	go()->getDbConnection()->exec('replace into core_principal (id, name, email, type, description, timeZone, entityTypeId, avatarId, entityId, aclId)
 SELECT u.id, u.displayName, u.email, "individual", u.username, u.timezone, (select id from core_entity where name="User"), u.avatarId, u.id, g.aclId from core_user u
@@ -1703,6 +1733,6 @@ group by u.id;');
 
 };
 
-$updates['202412090921'][] = "alter table core_module drop key name;";
-$updates['202412090921'][] = "alter table core_module add constraint name unique (name, package);";
-$updates['202412090921'][] = "ALTER TABLE `core_alert` ADD COLUMN `staleAt` DATETIME NULL AFTER `triggerAt`;";
+$updates['202503271129'][] = "alter table core_module drop key name;";
+$updates['202503271129'][] = "alter table core_module add constraint name unique (name, package);";
+$updates['202503271129'][] = "ALTER TABLE `core_alert` ADD COLUMN `staleAt` DATETIME NULL AFTER `triggerAt`;";

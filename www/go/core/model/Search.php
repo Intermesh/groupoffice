@@ -100,7 +100,7 @@ class Search extends AclOwnerEntity {
 		return $this->entity;
 	}
 	
-	public function setAclId($aclId) {
+	public function setAclId(?int $aclId) {
 		$this->aclId = $aclId;
 	}
 	

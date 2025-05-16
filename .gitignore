@@ -8,8 +8,7 @@ forum
 /*-license.txt
 /www/*-license.txt
 .idea
-/www/vendor
-/www/go/modules/community/maildomains/vendor
+vendor
 /config.php
 /www/config.php
 /**/*.css
@@ -76,6 +75,7 @@ forum
 .DS_Store
 .sass-cache
 lang.csv
+.gitmodules
 /www/branding
 /.project
 .phpunit.result.cache
@@ -87,3 +87,4 @@ dist
 /www/ca.crt
 /scripts/emaildomaincheck/result.json
 /scripts/ignore/
+/www/go/modules/community/activesync/Z-Push/vendor/

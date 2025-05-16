@@ -18,10 +18,10 @@ export class CalendarWindow extends FormWindow {
 		this.height = 650;
 
 		this.on('beforerender', () => {
-			this.title = t(this.currentId ? 'Edit calendar' : 'Create calendar');
+			this.title = t(this.form.currentId ? 'Edit calendar' : 'Create calendar');
 		})
 
-		const alertField =alertfield({name: 'defaultAlertsWithTime',isForDefault:true, label:t('Events with time')}),
+		const alertField = alertfield({name: 'defaultAlertsWithTime',isForDefault:true, label:t('Events with time')}),
 			fdAlertField = alertfield({name: 'defaultAlertsWithoutTime',isForDefault:true, fullDay:true, label:t('Events without time (Full-day)')});
 
 		this.generalTab.items.add(
@@ -38,7 +38,8 @@ export class CalendarWindow extends FormWindow {
 					label: t("Owner"), name: "ownerId", filterName: "text", flex:'1 0', clearable:true
 				}),
 				comp({tagName:'h3',flex:'1 0 100%',text:t('Default notifications') }),
-				alertField, fdAlertField
+				alertField,
+				fdAlertField
 				//unsubscribeBtn
 			),
 		);

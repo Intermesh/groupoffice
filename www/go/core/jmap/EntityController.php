@@ -244,7 +244,7 @@ abstract class EntityController extends Controller {
 	}
 
   /**
-   * Handles the Foo entity's  "getFooList" command
+   * Handles the Foo entity's  "Foo\query" command
    *
    * @param array $params
    * @return ArrayObject
@@ -264,7 +264,7 @@ abstract class EntityController extends Controller {
 
 		try {
 
-			$ids = $idsQuery->all();
+			$ids = array_map("strval", $idsQuery->all());
 
 			if($p['calculateHasMore'] && count($ids) > $params['limit']) {
 				$hasMore = !!array_pop($ids);
@@ -791,7 +791,23 @@ abstract class EntityController extends Controller {
 		if($ret = self::fireEvent(self::EVENT_BEFORE_CAN_UPDATE, $entity)) {
 			return $ret;
 		}
-		return $entity->hasPermissionLevel(Acl::LEVEL_WRITE) && $this->checkAclChange($entity);
+		return ($entity->hasPermissionLevel(Acl::LEVEL_WRITE) || $this->onlyUserPropsModified($entity)) && $this->checkAclChange($entity);
+	}
+
+	/**
+	 * Checks if the entity only has modifications to the user properties. As they belong to the current user it's ok that
+	 * they are modified by the current user.
+	 *
+	 * @param Entity $entity
+	 * @return bool
+	 * @throws Exception
+	 */
+	protected function onlyUserPropsModified(Entity $entity): bool {
+		$userPropNames = $entity->getUserProperties();
+		$modified = $entity->getModified();
+
+		$diff = array_diff(array_keys($modified), $userPropNames);
+		return empty($diff);
 	}
 
 
@@ -881,7 +897,6 @@ abstract class EntityController extends Controller {
 
 		$doDestroy = [];
 		foreach ($destroy as $id) {
-//			$id = (string) $id;
 			$entity = $this->getEntity($id);
 			if (!$entity) {
 				$result['notDestroyed'][$id] = new SetError('notFound', go()->t("Item not found"));

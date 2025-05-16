@@ -37,6 +37,21 @@ export class MonthView extends CalendarView {
 				});
 			}
 		});
+		const observer = new ResizeObserver(entries => {
+			if(this.weekRows.length) {
+				for (let entry of entries) {
+					//const height = (entry.contentRect.height - entry.target.firstElementChild!.clientHeight) / this.weekRows.length;
+
+					this.updateHasMore();
+					//entry.contentRect.height / this.weekRows.length;
+					//console.log(entry.contentRect.height, this.weekRows.length);
+					//console.log("Size changed:", entry.contentRect.width, entry.contentRect.height);
+				}
+			}
+
+		});
+		observer.observe(this.el);
+
 		return super.internalRender();
 	}
 
@@ -162,7 +177,8 @@ export class MonthView extends CalendarView {
 		for(const item of this.adapter.items) {
 			this.viewModel.push(item);
 		}
-		this.updateItems()
+		this.updateItems();
+		this.updateHasMore();
 	}
 
 	renderView() {
@@ -191,7 +207,10 @@ export class MonthView extends CalendarView {
 						.on('mousedown',e=>e.stopPropagation()):'',
 					E('span',E('em', day.format( 'j')), day.format( day.getDate() === 1 ?' M' :'')).on('click', _e => {
 						this.fire('dayclick', this, cDay);
-					}).on('mousedown', e => { e.stopPropagation()})
+					}).on('mousedown', e => { e.stopPropagation()}),
+					E('div','+ 0 more').cls('more').on('click', _e => {
+						this.fire('dayclick', this, cDay);
+					}).on('mousedown',e=>e.stopPropagation())
 				).attr('data-date', day.format('Y-m-d'))
 				 .cls('today', day.format('Ymd') === now.format('Ymd'))
 				 .cls('past', day.format('Ymd') < now.format('Ymd'))
@@ -203,17 +222,41 @@ export class MonthView extends CalendarView {
 			this.weekRows.push([weekStart, eventContainer]);
 			this.el.append(row);
 		}
+
 	}
 
+
+	private updateHasMore() {
+		// height of the week row
+		const height = (this.el.clientHeight - this.el.firstElementChild!.clientHeight) / this.weekRows.length;
+		// how many event fit in the week row (todo: rem to pix != /10)
+		const fit = Math.floor((height/10) / this.ROWHEIGHT);
+
+		const ols = this.el.getElementsByTagName('ol');
+		for (let i = 0; i < ols.length; i++) {
+			const lis = ols[i].getElementsByTagName('li');
+			for (let j = 0; j < lis.length; j++) {
+				const li = lis[j];
+				if(li.hasAttribute('amount')) {
+					const moreCount = (+li.getAttribute('amount')! - fit);
+					li.cls('showMore', moreCount > 0);
+					li.lastElementChild!.innerHTML = t('+ {n} more').replace('{n}', moreCount) ;
+				}
+			}
+		}
+	}
 
 	private updateItems() {
 		this.continues = [];
 		this.iterator = 0;
-
 		this.viewModel.sort((a,b) => a.start.date < b.start.date ? -1 : 1);
 		for(const [ws, container] of this.weekRows) {
 			container.append(...this.drawWeek(ws));
+			this.slots.forEach((v, i) => {
+				container.parentElement!.children[i+1]!.setAttribute('amount', ''+Object.keys(v).length);
+			})
 		}
+
 		// call draw week but re-use divs only set style ignore the return value
 	}
 

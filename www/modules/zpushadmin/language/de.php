@@ -5,7 +5,7 @@ return array (
   'Device Type' => 'Gerätetyp',
   'Ip-Address' => 'IP-Adresse',
   'Can connect' => 'Kann sich verbinden',
-  'Last synchronisation attempt' => 'Letzer Synchronisationsversuch',
+  'Last synchronisation attempt' => 'Letzter Synchronisationsversuch',
   'First synchronisation attempt' => 'Erster Synchronisationsversuch',
   'Is new device' => 'Ist neues Gerät',
   'User' => 'Benutzer',
@@ -35,4 +35,6 @@ return array (
   'ActiveSync management' => 'ActiveSync-Verwaltung',
   'Status' => 'Status',
   'SMS' => 'SMS',
+  'Resync' => 'Resync',
+  'ActiveSync' => 'ActiveSync',
 );

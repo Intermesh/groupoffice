@@ -116,13 +116,6 @@ class Spreadsheet extends AbstractConverter {
 	protected $spreadsheetRowIterator;
 	private array $highest;
 
-
-	/**
-	 * @var Relation[]
-	 */
-	protected array $relations = [];
-
-
 	/**
 	 * @inheritDoc
 	 */

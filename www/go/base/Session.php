@@ -115,9 +115,14 @@ class Session extends Observable{
 
 		// if access token from new JMAP API connected to this session was destroyed then destroy this session too!
 		// this is set in go/core/model/Token.php
-		if(!empty($this->values['user_id']) && !empty($this->values['accessToken']) && !go()->getCache()->get('token-' . $this->values['accessToken']) && !Token::find()->where('accessToken' , '=', $this->values['accessToken'])->single()) {
-			ErrorHandler::log("Destroying session because access token '" . $this->values['accessToken'] . "' not found");
+		try {
+			if (!empty($this->values['user_id']) && !empty($this->values['accessToken']) && !go()->getCache()->get('token-' . $this->values['accessToken']) && !Token::find()->where('accessToken', '=', $this->values['accessToken'])->single()) {
+				ErrorHandler::log("Destroying session because access token '" . $this->values['accessToken'] . "' not found");
+				$this->values = [];
+			}
+		} catch (\Exception $e) {
 			$this->values = [];
+			ErrorHandler::logException($e, "Destroying session because of db exception");
 		}
 	}
 

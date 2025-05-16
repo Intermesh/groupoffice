@@ -28,6 +28,7 @@ class Note extends EntityController {
 	}
 
 	/**
+	 * @param array $params
 	 * @throws Exception
 	 */
 	public function decrypt($params) {
@@ -49,7 +50,7 @@ class Note extends EntityController {
 	 * Handles the Foo entity's Foo/query command
 	 *
 	 * @param array $params
-	 * @return array
+	 * @return ArrayObject
 	 * @throws InvalidArguments
 	 * @see https://jmap.io/spec-core.html#/query
 	 */
@@ -62,7 +63,7 @@ class Note extends EntityController {
 	 * Handles the Foo entity's Foo/get command
 	 *
 	 * @param array $params
-	 * @return array
+	 * @return ArrayObject
 	 * @throws Exception
 	 * @see https://jmap.io/spec-core.html#/get
 	 */
@@ -76,7 +77,7 @@ class Note extends EntityController {
 	 *
 	 * @see https://jmap.io/spec-core.html#/set
 	 * @param array $params
-	 * @return array
+	 * @return ArrayObject
 	 * @throws InvalidArguments
 	 * @throws StateMismatch
 	 */
@@ -85,6 +86,10 @@ class Note extends EntityController {
 		return $this->defaultSet($params);
 	}
 
+	/**
+	 * @param \go\modules\community\notes\model\Note $entity
+	 * @return bool
+	 */
 	protected function canDestroy(Entity $entity): bool
 	{
 		if($entity->createdBy === go()->getUserId()) {
@@ -101,7 +106,7 @@ class Note extends EntityController {
 	 * Handles the Foo entity's Foo/changes command
 	 *
 	 * @param array $params
-	 * @return array
+	 * @return ArrayObject
 	 * @throws InvalidArguments
 	 * @see https://jmap.io/spec-core.html#/changes
 	 */
@@ -115,7 +120,7 @@ class Note extends EntityController {
 	 * Handles export
 	 *
 	 * @param array $params
-	 * @return array
+	 * @return ArrayObject
 	 * @throws InvalidArguments
 	 */
 	public function export(array $params): ArrayObject
@@ -128,7 +133,7 @@ class Note extends EntityController {
 	 * Handles import
 	 *
 	 * @param array $params
-	 * @return array
+	 * @return ArrayObject
 	 * @throws Exception
 	 */
 	public function import(array $params): ArrayObject
@@ -141,7 +146,7 @@ class Note extends EntityController {
 	 * Returns a mapping object the client can use for importing data
 	 *
 	 * @param array $params
-	 * @return array
+	 * @return ArrayObject
 	 * @throws Exception
 	 */
 	public function importCSVMapping(array $params): ArrayObject
@@ -153,7 +158,7 @@ class Note extends EntityController {
 	 * Returns columns that can be exported
 	 *
 	 * @param array $params
-	 * @return array
+	 * @return ArrayObject
 	 */
 	public function exportColumns(array $params): ArrayObject
 	{

@@ -187,16 +187,10 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * @return Query
 	 * @throws Exception
 	 */
-	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
+	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int|null $userId = null, array|null $groups = null): Query
 	{
-//		$tables = static::getMapping()->getTables();
-
 		$col = static::getMapping()->getColumn(static::$aclColumnName);
 		$tableAlias = $col->table->getAlias();
-//		$firstTable = array_shift($tables);
-//		$tableAlias = $firstTable->getAlias();
-
-
 		Acl::applyToQuery($query, $tableAlias . '.' . static::$aclColumnName, $level, $userId, $groups);
 
 		return $query;

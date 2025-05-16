@@ -49,7 +49,6 @@ function dp(size) {
 
   Ext.extend = function() {
     var cls = origExtend.apply(this, arguments);
-    //console.log(go.module);
     cls.prototype.module = go.module;
     cls.prototype.package = go.package;
 
@@ -434,8 +433,9 @@ Ext.override(Ext.data.GroupingStore,{
             }
 						
 						//added this to prevent store to request data when state is initalized in the construct
-						if(this.lastOptions)
+						if(this.lastOptions) {
 							this.reload();
+						}
         }else{
             this.sort();
             this.fireEvent('datachanged', this);
@@ -457,14 +457,6 @@ Ext.override(Ext.form.CompositeField, {
 		}
 	}
 });
-
-/*testing
-Ext.TaskMgr.start({
-	run: function(){
-		document.title=GO.hasFocus ? 'Focus' : 'No focus';
-	},
-	interval: 1000
-});*/
 
 /*
  * When idValuePair is true on a form field it will assume that the value is
@@ -798,18 +790,6 @@ Ext.MessageBox.buttonText.cancel = t("Cancel");
 
 
 /*
- * Fix for loosing pasted value in HTML editor
-
-Ext.override(Ext.form.HtmlEditor, {
-	getValue : function() {
-		this.syncValue();
-		return Ext.form.HtmlEditor.superclass.getValue.call(this);
-	}
-}); */
-
-
-
-/*
 * Print elements
 */
 var noBoxAdjust = Ext.isStrict ? {
@@ -983,13 +963,8 @@ Ext.override(Ext.grid.GridView,{
                 tooltip: this.getColumnTooltip(i)
             };
             
-						//disable padding right in GO theme because it looks ugly
-            // if (GO.settings.theme!='Group-Office' && colModel.config[i].align == 'right') {
-            //     properties.istyle = 'padding-right: 16px;';
-            // } else {
-                delete properties.istyle;
-            // }
-            
+			delete properties.istyle;
+
             cells[i] = headerTpl.apply(properties);
         }
         
@@ -1009,39 +984,6 @@ Ext.override(Ext.form.Checkbox, {
 		}
 	}
 });
-
-
-/**
- * Override of Ext.removeNode function
- * 
- * Added "&& !Ext.isIE9" to this function because it is also not working on IE9
- * 
- * <p>Removes this element from the document, removes all DOM event listeners, and deletes the cache reference.
- * All DOM event listeners are removed from this element. If {@link Ext#enableNestedListenerRemoval} is
- * <code>true</code>, then DOM event listeners are also removed from all child nodes. The body node
- * will be ignored if passed in.</p>
- * @param {HTMLElement} node The node to remove
- * @method
- */
-// Ext.removeNode = Ext.isIE && !Ext.isIE8 && !Ext.isIE9 && !Ext.isIE10 ? function() {
-//
-//	var d;
-//	return function(n) {
-//		if (n && n.tagName != 'BODY') {
-//			(Ext.enableNestedListenerRemoval) ? Ext.EventManager.purgeElement(n, true) : Ext.EventManager.removeAll(n);
-//			d = d || document.createElement('div');
-//			d.appendChild(n);
-//			d.innerHTML = '';
-//			delete Ext.elCache[n.id];
-//		}
-//	};
-//}() : function(n) {
-//	if (n && n.parentNode && n.tagName != 'BODY') {
-//		(Ext.enableNestedListenerRemoval) ? Ext.EventManager.purgeElement(n, true) : Ext.EventManager.removeAll(n);
-//		n.parentNode.removeChild(n);
-//		delete Ext.elCache[n.id];
-//	}
-//};
 
 
 Ext.override(Ext.layout.ToolbarLayout ,{
@@ -1149,12 +1091,6 @@ Ext.layout.MenuLayout.prototype.itemTpl = new Ext.XTemplate(
 	'</li>'
 );
 
-// Not needed and breaks rss feed reader
-//Ext.override(Ext.data.Field, {
-//	dateFormat: "c" //from server
-//});
-
-
 
 Ext.override(Ext.Panel, {
 	border: false,
@@ -1220,6 +1156,7 @@ Ext.override(Ext.Panel, {
 });
 
 Ext.override(Ext.form.Field, {
+	validateOnBlur: false,
 	fieldInitComponent : Ext.form.Field.prototype.initComponent,
 	
 	initComponent : function() {

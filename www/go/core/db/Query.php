@@ -340,9 +340,9 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * @param Query $query
 	 * @return $this
 	 */
-	public function union(Query $query): Query
+	public function union(Query $query, bool $all = false): Query
 	{
-		$this->unions[] = $query;
+		$this->unions[] = [$query, $all];
 		
 		return $this;
 	}
@@ -785,7 +785,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    * @return array|null
    * @throws Exception
    */
-  public function toArray(array $properties = null): array|null
+  public function toArray(array|null $properties = null): array|null
   {
 		$arr = [];
 		foreach($this->execute() as $entity) {

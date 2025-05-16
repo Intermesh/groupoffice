@@ -77,7 +77,7 @@ catch(\Exception $e) {
 
 	$response = [
 		"title" => "Upload failed",
-		"detail" => $e->getMessage(),
+		"detail" => get_class($e),
 		"status" => 500
 	];
 

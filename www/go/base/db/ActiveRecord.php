@@ -34,7 +34,7 @@
  * @property String $localizedName The localized human friendly name of this model.
  * @property int $permissionLevel @see \GO\Base\Model\Acl for available levels. Returns -1 if no aclField() is set in the model.
  *
- * @property GO\Files\Model\Folder $filesFolder The folder model that belongs to this model if hasFiles is true.
+ * @property \GO\Files\Model\Folder $filesFolder The folder model that belongs to this model if hasFiles is true.
  */
 
 
@@ -58,6 +58,10 @@ use go\core\orm\SearchableTrait;
 use go\core\util\StringUtil;
 use go\modules\community\comments\model\Comment;
 
+/**
+ * @property int $ctime
+ * @property int $mtime
+ */
 abstract class ActiveRecord extends \GO\Base\Model{
 	const EVENT_URL = "url";
 
@@ -197,6 +201,20 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	public static function entityType() {
 		return \go\core\orm\EntityType::findByClassName(static::class);
+	}
+
+	/**
+	 * @return void
+	 * @throws DbException
+	 * @throws GO\Base\Exception\AccessDenied
+	 */
+	protected function deleteFilesFolder(): void
+	{
+		if ($this->hasFiles() && $this->files_folder_id > 0 && GO::modules()->isInstalled('files')) {
+			$folder = \GO\Files\Model\Folder::model()->findByPk($this->files_folder_id, false, true);
+			if ($folder)
+				$folder->delete(true);
+		}
 	}
 
 	/**
@@ -4058,13 +4076,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		if($attr){
 			\go\core\model\Search::delete(['entityId' => $this->pk, 'entityTypeId'=>$this->modelTypeId()]);
-		}		
-
-		if($this->hasFiles() && $this->files_folder_id > 0 && GO::modules()->isInstalled('files')){
-			$folder = \GO\Files\Model\Folder::model()->findByPk($this->files_folder_id,false,true);
-			if($folder)
-				$folder->delete(true);
 		}
+
+
+		$this->deleteFilesFolder();
 
 		$this->_deleteLinks();	
 

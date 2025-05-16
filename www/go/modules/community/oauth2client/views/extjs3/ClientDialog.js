@@ -19,11 +19,11 @@ go.modules.community.oauth2client.ClientDialog = Ext.extend(go.form.Dialog, {
 					listeners: {
 						'show': function(me) {
 							const value = me.getValue(),
-								label = (value === 2) ? 'Tenant ID' : t("Client Id");
+								label = (value === 2) ? 'Tenant ID' : t("Project Id");
 
 						},
 						'select': function( combo, record, index ) {
-							this.projectIdFld.setFieldLabel(( record.id === 2 )? 'Tenant Id' : t('Client Id'));
+							this.projectIdFld.setFieldLabel(( record.id === 2 )? 'Tenant Id' : t('Project Id'));
 						},
 						scope: this
 					}

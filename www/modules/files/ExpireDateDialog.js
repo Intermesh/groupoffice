@@ -1,6 +1,7 @@
 GO.files.ExpireDateDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 
 	emailDownloadLink : false,
+	pasteLinks: false,
 	fileData : {},
 	downloadLinkIds : [],
 	
@@ -19,7 +20,7 @@ GO.files.ExpireDateDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			collapsible:true,
 			closeAction:'hide'
 		});
-		
+
 		GO.files.ExpireDateDialog.superclass.initComponent.call(this);
 		
 	},
@@ -44,11 +45,9 @@ GO.files.ExpireDateDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		});
 		
 		this.datePicker.on('select', function(field,date){
-			
+			let deleteWhenExpired = 0;
 			if (!this.deleteWhenExpiredCB.disabled){
-				var deleteWhenExpired = this.deleteWhenExpiredCB.getValue() ? 1 : 0;
-			} else {
-				var deleteWhenExpired = 0;
+				deleteWhenExpired = this.deleteWhenExpiredCB.getValue() ? 1 : 0;
 			}
 			
 			if(this.emailDownloadLink){
@@ -71,8 +70,16 @@ GO.files.ExpireDateDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 						expire_time: parseInt(date.setDate(date.getDate())/1000),
 						delete_when_expired: deleteWhenExpired
 					},
-					success: function(options, response, result)
-					{
+					success: function(options, response, result) {
+						if(result && result.url) {
+							result.url = result.url.replace(/&amp;/g,"&");
+							if (this.pasteLinks) {
+								this.fireEvent("pasteLinks", result);
+							} else {
+								go.util.copyTextToClipboard(result.url);
+								Ext.MessageBox.alert(t("Success"), t("Value copied to clipboard"));
+							}
+						}
 						this.refreshActiveDisplayPanels();
 					},
 					scope:this
@@ -105,7 +112,7 @@ GO.files.ExpireDateDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		this.addPanel(this.propertiesPanel);
 	},
 	
-	show : function(records,email){
+	show : function(records, sendByMail, pasteLinks){
 		
 		GO.request({
 			url: 'files/email/checkDeleteCron',
@@ -117,9 +124,10 @@ GO.files.ExpireDateDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			scope: this
 		});
 		
-		this.emailDownloadLink=email;
+		this.emailDownloadLink=sendByMail;
+		this.pasteLinks = pasteLinks;
 		
-		// reset the file list thet will be add to the mail
+		// reset the file list that will be add to the mail
 		this.downloadLinkIds = [];
 		for(var i=0; i<records.length; i++){
 			this.downloadLinkIds.push(records[i].data.id);

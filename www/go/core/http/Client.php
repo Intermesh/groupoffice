@@ -17,11 +17,14 @@ use go\core\util\JSON;
 class Client
 {
 
-	private CurlHandle|false $curl;
+	protected CurlHandle|false $curl;
 
+	public $baseUri;
+	protected $lastBody;
 	public array $baseParams = [];
 
 	private array $lastHeaders = [];
+	protected $headers = [];
 
 	/**
 	 * @return false|CurlHandle
@@ -31,12 +34,11 @@ class Client
 	{
 		if (!isset($this->curl)) {
 			$this->curl = curl_init();
-			$this->setOption(CURLOPT_FOLLOWLOCATION, true);
-			$this->setOption(CURLOPT_ENCODING, "UTF-8");
-			$this->setOption(CURLOPT_USERAGENT, "Group-Office HttpClient " . go()->getVersion() . " (curl)");
-
-			$this->setOption(CURLOPT_CONNECTTIMEOUT, 5);
-			$this->setOption(CURLOPT_TIMEOUT, 360);
+			$this->setOption(CURLOPT_FOLLOWLOCATION, true)
+				->setOption(CURLOPT_ENCODING, "UTF-8")
+				->setOption(CURLOPT_USERAGENT, "Group-Office HttpClient " . go()->getVersion() . " (curl)")
+				->setOption(CURLOPT_CONNECTTIMEOUT, 5)
+				->setOption(CURLOPT_TIMEOUT, 360);
 		}
 		return $this->curl;
 	}
@@ -48,17 +50,15 @@ class Client
 	 * @param mixed $value
 	 * @return bool
 	 */
-	public function setOption(int $option, $value): bool
+	public function setOption(int $option, $value): static
 	{
-		return curl_setopt($this->getCurl(), $option, $value);
+		curl_setopt($this->getCurl(), $option, $value);
+		return $this;
 	}
-
-	private $headers = [];
 
 	public function setHeader(string $name, string $value): Client
 	{
 		$this->headers[$name] = $value;
-
 		return $this;
 	}
 
@@ -67,25 +67,22 @@ class Client
 		unset($this->headers[$name]);
 	}
 
-	private function initRequest($url)
+	private function initRequest($path)
 	{
 		$this->lastHeaders = [];
-		$this->setOption(CURLOPT_URL, $url);
-		$this->setOption(CURLOPT_RETURNTRANSFER, true);
-		$this->setOption(CURLOPT_HEADERFUNCTION, function ($curl, $header) {
-			if (preg_match('/([\w-]+): (.*)/i', $header, $matches)) {
-				$this->lastHeaders[strtolower($matches[1])] = trim($matches[2]);
-			}
-
-			return strlen($header);
-		});
-
+		$this->setOption(CURLOPT_URL, $this->baseUri.$path)
+			->setOption(CURLOPT_RETURNTRANSFER, true)
+			->setOption(CURLOPT_HEADERFUNCTION, function ($curl, $header) {
+				if (preg_match('/([\w-]+): (.*)/i', $header, $matches)) {
+					$this->lastHeaders[strtolower($matches[1])] = trim($matches[2]);
+				}
+				return strlen($header);
+			});
 
 		$headers = $this->getHeadersForCurl();
 		if (!empty($headers)) {
 			$this->setOption(CURLOPT_HTTPHEADER, $headers);
 		}
-
 	}
 
 	/**
@@ -139,7 +136,6 @@ class Client
 		$this->unsetHeader("Content-Type");
 		$this->unsetHeader("Content-Length");
 		$this->unsetHeader("Accept");
-
 		return $response;
 	}
 
@@ -160,17 +156,7 @@ class Client
 			$this->setOption(CURLOPT_POST, true);
 		}
 
-		$this->initRequest($url);
-		$this->setOption(CURLOPT_POSTFIELDS, $data);
-
-		$body = curl_exec($this->getCurl());
-
-		$status = curl_getinfo($this->getCurl(), CURLINFO_HTTP_CODE);
-
-		$error = curl_error($this->getCurl());
-		if (!empty($error)) {
-			throw new CoreException($error . ', HTTP Status: ' . $status);
-		}
+		$this->request($url, $data);
 
 		$info = curl_getinfo($this->getCurl());
 
@@ -181,8 +167,37 @@ class Client
 			'status' => $info['http_code'],
 			'info' => $info,
 			'headers' => $this->lastHeaders,
-			'body' => $body
+			'body' => $this->lastBody
 		];
+	}
+
+	protected function request($path, $data)
+	{
+		$this->initRequest($path);
+		$this->setOption(CURLOPT_POSTFIELDS, $data);
+
+		$body = curl_exec($this->getCurl());
+		$this->lastBody = $body;
+		$status = curl_getinfo($this->getCurl(), CURLINFO_HTTP_CODE);
+
+		$error = curl_error($this->getCurl());
+		if (!empty($error)) {
+			throw new CoreException($error . ', HTTP Status: ' . $status);
+		}
+		$this->lastBody = $body;
+		return $this;
+	}
+
+	public function body() {
+
+		return $this->lastBody;
+	}
+
+	public function responseHeaders($name) {
+		if($name === null) {
+			return $this->lastHeaders;
+		}
+		return @$this->lastHeaders[$name];
 	}
 
 	/**
@@ -232,7 +247,7 @@ class Client
 		curl_close($this->curl);
 	}
 
-	private function getHeadersForCurl(): array
+	protected function getHeadersForCurl(): array
 	{
 		$s = [];
 		foreach ($this->headers as $key => $value) {

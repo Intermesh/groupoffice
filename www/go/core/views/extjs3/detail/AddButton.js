@@ -164,8 +164,8 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 			items.push({
 				iconCls: l.iconCls,
 				text: l.title,				
-				handler: function () {
-					var window = l.linkWindow.call(l.scope, this.getEntity(), this.getEntityId(), this.detailView.data, this.detailView);
+				handler: async function () {
+					var window = await l.linkWindow.call(l.scope, this.getEntity(), this.getEntityId(), this.detailView.data, this.detailView);
 
 					if (!window) {
 						return;
@@ -188,7 +188,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 							window.setLinkEntity({
 								entity: this.getEntity(),
 								entityId: this.getEntityId(),
-								data: this.detailView.data
+								data: structuredClone(this.detailView.data) // to avoid that the detailview data is modified
 							});
 						//}, this, {single: true});
 					}

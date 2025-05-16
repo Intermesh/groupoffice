@@ -528,7 +528,7 @@ namespace go\core {
 		 * @param array|null $config
 		 * @return string
 		 */
-		public function createDsn(string $dbName = null, array $config = null): string {
+		public function createDsn(string|null $dbName = null, array|null $config = null): string {
 
 			if(!isset($config)) {
 				$config = $this->getConfig();
@@ -647,7 +647,7 @@ namespace go\core {
 				return $model;
 			}
 
-			$model = ModuleModel::find()->where(['package' => $package, 'name' => $name, 'enabled' => true])->single();
+			$model = ModuleModel::find()->where(['package' => $package == "legacy" ? null : $package, 'name' => $name, 'enabled' => true])->single();
 			if(!$model || !$model->isAvailable()) {
 				$model = false;
 			}
@@ -848,10 +848,10 @@ namespace go\core {
 		 * Translates a language variable name into the local language.
 		 * 
 		 * @param string $str String to translate
-		 * @param ?string $package The module package name. Defaults to {@see Language::$defaultPackage}
-		 * @param string|array|null $module Name of the module. Defaults to {@see Language::$defaultModule}
+		 * @param string|null $package The module package name. Defaults to {@see Language::$defaultPackage}
+		 * @param string|null $module Name of the module. Defaults to {@see Language::$defaultModule}
 		 */
-		public function t(string $str, string $package = null, string $module = null) {
+		public function t(string $str, string|null $package = null, string|null $module = null) {
 			return $this->getLanguage()->t($str, $package, $module);
 		}
 		
@@ -1075,7 +1075,7 @@ namespace go\core {
 			$stmt = GO\Base\Model\Template::model()->find(['ignoreAcl'=>true]);
 			$stmt->callOnEach('checkAcl', true);
 
-			return parent::checkAcls();
+			parent::checkAcls();
 		}
 	}
 

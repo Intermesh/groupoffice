@@ -2,7 +2,7 @@
 return array (
   'name' => 'OTP Authenticator',
   'description' => 'Verbeter de beveiliging door het toevoegen van 2-factor authenticatie opties in het gebruikers account',
-  'OTP Authenticator' => 'OTP Authenticator',
+  'OTP Authenticator' => 'OTP-authenticatie',
   'Enable OTP Authenticator' => 'OTP Authenticator inschakelen',
   'Scan the QR code below to enable OTP Authenticator for your account.' => 'Scan de QR code om OTP Authenticator in te schakelen op uw account.',
   'Secret key for manual input' => 'Geheime sleutel voor handmatige invoer',
@@ -28,4 +28,6 @@ return array (
   'Block Group-Office usage until setup is done' => 'Blokkeer {product_name} gebruik tot de installatie is voltooid',
   'Count down' => 'Tel af',
   'Count down this number of seconds until the user can cancel the setup' => 'Tel dit aantal seconden af totdat de gebruiker kan annueleren',
+  'Two Factor Authentication' => 'Twee factor-authenticatie',
+  'Setup one-time password authentication using an OTP application which generates a unique PIN for each login.' => 'One-Time-Password authenticatie instellen met behulp van een OTP-toepassing die een unieke pincode genereert voor elke login.',
 );

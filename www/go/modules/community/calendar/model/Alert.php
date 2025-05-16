@@ -109,7 +109,7 @@ class Alert extends UserProperty {
 			$offset = $this->offset;
 			if($event->isRecurring()) {
 				list($recurrenceId, $next) = $event->upcomingOccurrence();
-				if(!isset($recurrenceId)) {
+				if(!isset($recurrenceId) || !isset($next)) {
 					return null;
 				}
 				$coreAlert->recurrenceId = $recurrenceId->format('Y-m-d\TH:i:s');

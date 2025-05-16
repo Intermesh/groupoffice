@@ -81,7 +81,27 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					title: t("Information"),
 					items: [
 						{
-							xtype: "icdcombo"
+							xtype: "icdcombo",
+							listeners: {
+								focus: (f) => {
+
+									const v = this.formPanel.getValues();
+
+									let countryCode = "";
+									v.addresses.forEach((address) => {
+										if(!countryCode && !countryCode) {
+											countryCode = address.countryCode;
+										}
+									});
+
+									if(!countryCode) {
+										Ext.MessageBox.alert(t("No address"), t("Please add an address with a country"));
+										return;
+									}
+
+									f.loadCountry(countryCode);
+								}
+							}
 						},
 						this.registrationNumberField = new Ext.form.TextField({
 							xtype: "textfield",

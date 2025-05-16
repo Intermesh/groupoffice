@@ -158,9 +158,11 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 			listeners: {
 				scope: this,
 				show: function(menu) {
-					var record = this.store.getAt(menu.rowIndex);
+					const record = this.store.getAt(menu.rowIndex);
+					// prevent the three system groups from being deleted. These IDs are hard coded in the Group Model class
+					let isSystemGroup = record.id <= 3;
 
-					menu.items.item("delete").setDisabled(record.json.permissionLevel < go.permissionLevels.writeAndDelete);
+					menu.items.item("delete").setDisabled(isSystemGroup || record.json.permissionLevel < go.permissionLevels.writeAndDelete);
 				}
 			}
 		});

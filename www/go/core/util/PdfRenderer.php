@@ -24,7 +24,7 @@ class PdfRenderer extends Fpdi {
 	 *
 	 * @var float
 	 */
-	public $defaultFontSize = 9;
+	public $defaultFontSize = 10;
 
 //	/**
 //	 * Line height
@@ -49,10 +49,10 @@ class PdfRenderer extends Fpdi {
 		$this->normal();
 
 		$this->setHtmlVSpace([
-//			'p' => [0 => ['h' => 0, 'n' => 0.1], 1 => ['h' => 0, 'n' => 0.1]],
-//			'div' => [0 => ['h' => 0, 'n' => 0.1], 1 => ['h' => 0, 'n' => 0.1]],
-			'ol' => [0 => ['h' => 0, 'n' => 0], 1 => ['h' => 0, 'n' => 0]],
-			'ul' => [0 => ['h' => 0, 'n' => 0], 1 => ['h' => 0, 'n' => 0]],
+			'p' => [0 => ['h' => 0, 'n' => 0.1], 1 => ['h' => 0, 'n' => 0.1]],
+			'div' => [0 => ['h' => 0, 'n' => 0.1], 1 => ['h' => 0, 'n' => 0.1]],
+			'ol' => [0 => ['h' => 0, 'n' => 0.1], 1 => ['h' => 0, 'n' => 0.1]],
+			'ul' => [0 => ['h' => 0, 'n' => 0.1], 1 => ['h' => 0, 'n' => 0.1]],
 		]);
 
 		$this->setCellHeightRatio(1.25);

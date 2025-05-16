@@ -56,6 +56,7 @@ class BackgroundProcess {
 
 	public function run(): int
 	{
+
 		$cmd = $this->getCommand();
 
 		go()->debug("BACKGROUND CMD: ". $cmd);
@@ -77,7 +78,7 @@ class BackgroundProcess {
 			if( count(preg_split("/\n/", $result)) > 2){
 				return true;
 			}
-		}catch(Exception $e){}
+		}catch(\Exception $e){}
 
 		return false;
 	}

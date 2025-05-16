@@ -30,6 +30,7 @@ return array (
     'home' => 'Privat',
     'mobile' => 'Mobil',
     'workmobile' => 'Arbeit Mobil',
+    'fax' => 'Fax',
     'workfax' => 'Arbeit Fax',
   ),
   'addressTypes' => 
@@ -153,4 +154,10 @@ return array (
   'Start in' => 'Beginnt in',
   '\'"Don\'\'t link automatically to contacts"\'' => 'Nicht automatisch mit Kontakten verknüpfen',
   '\'"Are you sure you want to merge the selected items? This can\'\'t be undone."\'' => 'Sind Sie sicher, dass Sie die ausgewählten Elemente zusammenführen möchten? Das kann nicht rückgängig gemacht werden.',
+  'Information' => 'Information',
+  'BIC' => 'BIC',
+  'Last contact at' => 'Letzter Kontakt am',
+  'ICD' => 'ICD',
+  'UUID' => 'UUID',
+  'URL\'s' => 'URL\'s',
 );

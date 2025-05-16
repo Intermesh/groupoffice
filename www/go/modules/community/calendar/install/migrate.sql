@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar` (
 	`description` TEXT NULL,
 	`defaultColor` VARCHAR(21) NOT NULL, # lightgoldenrodyellow
 	`timeZone` VARCHAR(45) NULL,
+	`webcalUri` VARCHAR(512) DEFAULT NULL,
 	`groupId` INT UNSIGNED NULL,
 	`aclId` INT NOT NULL,
 	`createdBy` INT NULL,
@@ -400,12 +401,12 @@ CREATE TABLE IF NOT EXISTS calendar_preferences (
 ) COLLATE = utf8mb4_unicode_ci;
 
 
-CREATE TABLE calendar_event_custom_fields LIKE cal_events_custom_fields;
+CREATE TABLE IF NOT EXISTS calendar_event_custom_fields LIKE cal_events_custom_fields;
 ALTER TABLE calendar_event_custom_fields CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL;
 ALTER TABLE `calendar_event_custom_fields`
 	ADD CONSTRAINT `calendar_event_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `calendar_event` (`eventId`) ON DELETE CASCADE;
 
-CREATE TABLE calendar_calendar_custom_fields LIKE cal_calendars_custom_fields;
+CREATE TABLE IF NOT EXISTS calendar_calendar_custom_fields LIKE cal_calendars_custom_fields;
 ALTER TABLE calendar_calendar_custom_fields CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL;
 ALTER TABLE `calendar_calendar_custom_fields`
 	ADD CONSTRAINT `calendar_calendar_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `calendar_calendar` (`id`) ON DELETE CASCADE;
@@ -419,8 +420,8 @@ GROUP by g.id;
 
 -- concat 18  random hex colors and select 1 with calendar.id % 18 * hexlength if null
 INSERT INTO calendar_calendar
-	(id,		name, description, defaultColor, timeZone, groupId, aclId,createdBy,ownerId) SELECT
-   cal.id, name, comment,IFNULL(cu.color, SUBSTRING('#CDAD00#E74C3C#9B59B6#8E44AD#2980B9#3498DB#1ABC9C#16A085#27AE60#2ECC71#F1C40F#F39C12#E67E22#D35400#95A5A6#34495E#808B96#1652a1', (cal.id MOD 18) * 7 + 2 ,6)), null, 	IF(group_id=1,null,group_id), acl_id, 1,	cal.user_id FROM
+	(id,		name, description,webcalUri, defaultColor,timeZone, groupId, aclId,createdBy,ownerId) SELECT
+   cal.id, name, comment,IF(enable_ics_import=1 AND ics_import_url!='',ics_import_url,null), IFNULL(cu.color, SUBSTRING('#CDAD00#E74C3C#9B59B6#8E44AD#2980B9#3498DB#1ABC9C#16A085#27AE60#2ECC71#F1C40F#F39C12#E67E22#D35400#95A5A6#34495E#808B96#1652a1', (cal.id MOD 18) * 7 + 2 ,6)), null, 	IF(group_id=1,null,group_id), acl_id, 1,	cal.user_id FROM
   cal_calendars cal LEFT JOIN cal_calendar_user_colors cu ON cal.id = cu.calendar_id GROUP BY cal.id;
 
 -- subscribe to calendars user has access to
@@ -443,7 +444,7 @@ INSERT IGNORE INTO calendar_default_alert_with_time
 
 INSERT INTO calendar_category
 	(id, name, color, ownerId, calendarId) SELECT
-	 id, name, color, null, calendar_id FROM cal_categories;
+	 id, name, color, null, IF(calendar_id=0, null,calendar_id) FROM cal_categories;
 
 -- insert instance that belongs to the organizer
 INSERT INTO calendar_event
@@ -513,11 +514,22 @@ INSERT INTO calendar_participant
 
 INSERT INTO calendar_participant
 (id, eventId, name, email, kind, rolesMask, participationStatus, scheduleAgent, expectReply, scheduleUpdated) SELECT
-CONCAT('Calendar:',c.id), r.id as eventId, c.name,u.email , 'resource', 0 ,IF(e.status = 'CONFIRMED', 'accepted', LOWER(e.status)), 'server',1,FROM_UNIXTIME(IF(e.mtime='',0, e.mtime))FROM cal_events e
+CONCAT('Calendar:',c.id), r.id as eventId, c.name,u.email , 'resource', 0 ,
+IF(MIN(e.status) = 'CONFIRMED', 'accepted', LOWER(MIN(e.status))), 'server',1,
+FROM_UNIXTIME(IF(MAX(e.mtime)='',0, MAX(e.mtime))) FROM cal_events e
 	 JOIN cal_calendars c ON e.calendar_id = c.id
 	 JOIN core_user u ON c.user_id = u.id
 	 JOIN cal_events r ON e.resource_event_id = r.id
-WHERE c.group_id != 1 AND e.resource_event_id IS NOT NULL;
+WHERE c.group_id != 1 AND e.resource_event_id IS NOT NULL
+GROUP BY e.calendar_id, e.resource_event_id ;
 
 
 INSERT INTO calendar_preferences (userId, weekViewGridSnap, defaultCalendarId) SELECT user_id, 15, calendar_id FROM cal_settings s JOIN core_user u ON u.id = s.user_id;
+
+-- remove all the old dead links
+DELETE l FROM core_link l
+		JOIN core_entity et ON et.id = l.fromEntityTypeId AND et.name = 'CalendarEvent'
+		LEFT JOIN cal_events e on e.id = l.fromId WHERE e.id IS NULL;
+DELETE l FROM core_link l
+	JOIN core_entity et ON et.id = l.toEntityTypeId AND et.name = 'CalendarEvent'
+	LEFT JOIN cal_events e on e.id = l.toId WHERE e.id IS NULL;

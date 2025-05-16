@@ -5,13 +5,18 @@ import {datasourcestore, t as coreT, E, translate, DateTime, Window, h3} from "@
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {EventDetail, EventDetailWindow} from "./EventDetail.js";
 import {PreferencesPanel} from "./PreferencesPanel";
+import {EventWindow} from "./EventWindow";
+import {CalendarView} from "./CalendarView";
 
 export * from "./Main.js";
+export * from "./CalendarList.js";
+export * from "./CalendarView.js";
+export * from "./CalendarItem.js";
 
 export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list';
 export const calendarStore = datasourcestore({
 	dataSource:jmapds('Calendar'),
-	queryParams:{filter:{isSubscribed: true}},
+	queryParams:{filter:{isSubscribed: true, davaccountId : null}},
 	sort: [{property:'sortOrder'},{property:'name'}]
 });
 
@@ -47,16 +52,24 @@ function addEmailAction() {
 					if (!success) {
 						Window.alert(response.errors.join("<br />"), t("Error"));
 					} else {
-						const dlg = new EventDetailWindow();
-
-						dlg.loadEvent(new CalendarItem({data:response.data, key: response.data.id ? response.data.id + "" : null}));
-						dlg.show();
+						go.openEventWindow(response.data);
 					}
 				}
 			});
 		}
 
-		GO.email.handleITIP = (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent|string, feedback?:string, recurrenceId?:string}} ) => {
+		go.openEventWindow = (data:any, editable: boolean) => {
+			const dlg = editable ? new EventWindow() : new EventDetailWindow();
+			data.start = data.start ?? (new DateTime).format('Y-m-d\TH:00:00.000');
+			data.showWithoutTime = data.showWithoutTime ?? client.user.calendarPreferences?.defaultDuration == null;
+				data.duration = data.duration ?? client.user.calendarPreferences?.defaultDuration ?? "P1D";
+				data.calendarId = data.calendarId ?? client.user.calendarPreferences?.defaultCalendarId;
+			dlg.loadEvent(new CalendarItem({data:data, key: data.id ? data.id + "" : null}));
+			dlg.show();
+		};
+
+
+		if(GO.email) GO.email.handleITIP = (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent|string, feedback?:string, recurrenceId?:string}} ) => {
 			if(msg.itip) {
 				const event = msg.itip.event,
 					btns = E('div').cls('btns'),
@@ -91,7 +104,7 @@ function addEmailAction() {
 				}[msg.itip.method] || "Unable to process appointment information.";
 
 
-				if(typeof event !== 'string') {
+				if(event && typeof event !== 'string') {
 					let item = new CalendarItem({data:event, key:event.id + ""});
 
 					if(msg.itip.recurrenceId && item.isRecurring) {
@@ -108,7 +121,7 @@ function addEmailAction() {
 					}
 
 				} else {
-					text += ', '+ event;
+					text += ', '+ (event ?? t('Unexisting event'));
 				}
 
 
@@ -172,6 +185,7 @@ modules.register(  {
 	],
 	init () {
 		//const user = client.user;
+		translate.load(GO.lang.core.core, "core", "core");
 		translate.load(GO.lang.community.calendar, "community", "calendar");
 
 		addEmailAction();

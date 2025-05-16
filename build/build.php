@@ -49,15 +49,15 @@ class Builder
 {
 	public $test = false;
 
-	private $majorVersion = "25.2";
+	private $majorVersion = "25.0";
 
-	private $gitBranch = 'develop';
+	private $gitBranch = 'master';
 
 	/**
 	 *
 	 * @var string sixsix, sixseven etc or testing
 	 */
-	public $distro = "testing";
+	public $distro = "twentyfivezero";
 
 
 	public $repreproDir = __DIR__ . "/deploy/reprepro";
@@ -176,14 +176,26 @@ class Builder
         cd($this->buildDir . "/" . $this->packageName);
 
         putenv("COMPOSER_ALLOW_SUPERUSER=1");
-		run("composer install --no-dev --optimize-autoloader --ignore-platform-reqs");
+
+        cd($this->buildDir . "/" . $this->packageName);
+        $composerFiles = run("find . -name composer.json -type f -not -path '*/vendor/*'");
+
+        foreach ($composerFiles as $composerFile) {
+
+            echo $composerFile . "\n";
+
+            cd(dirname($composerFile));
+            run("composer install --no-dev --optimize-autoloader --ignore-platform-reqs");
+            cd($this->buildDir . "/" . $this->packageName);
+        }
+
+        cd($this->buildDir . "/" . $this->packageName);
 
 		$sassFiles = run("find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*'");
 
 		foreach ($sassFiles as $sassFile) {
 			run("sass --no-source-map $sassFile " . dirname(dirname($sassFile)) . '/' . str_replace('scss', 'css', basename($sassFile)));
 		}
-
 
 		// remove sensitive files OWASP WSTG - WSTG-INFO-05
 		run("rm composer.json composer.lock vendor/composer/installed.json");
@@ -323,10 +335,7 @@ class Builder
 		}
 
 		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/.git*');
-
-
 		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/kanban');
-		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/projects3');
 
 
 		//needs to be open source as it's used by Module files
@@ -374,7 +383,7 @@ class Builder
 
 		$tpl = '{package} ({version}-' . $this->distro . ') ' . $this->distro . '; urgency=medium
 
-  * Changes can be found in /usr/share/groupoffice/changelog.md
+  * Changes can be found in /usr/share/groupoffice/CHANGELOG.md
 
  -- Intermesh BV (Developer key) <info@intermesh.nl>  {date}';
 

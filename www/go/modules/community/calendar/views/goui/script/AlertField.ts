@@ -4,7 +4,8 @@ import {t} from "./Index.js";
 interface Alert {
 	trigger:any // {offset, relativeTo} | {when}
 	acknowledged?:string
-	action?:'display'|'email'
+	action?:'display'|'email',
+
 }
 
 export class AlertField extends SelectField {
@@ -20,9 +21,15 @@ export class AlertField extends SelectField {
 		this.label = t('Reminder');
 		this.drawOptions();
 		this.on('change',(me,v) => {
-			/** @ts-ignore */
-			this.useDefault = me.control?.value === 'default';
+			this.useDefault = (me.control as HTMLSelectElement).value === 'default';
 		})
+	}
+
+	public onAdded(index: number){
+		super.onAdded(index);
+		if(!this.isForDefault) {
+			this.defaultValue = 'default';
+		}
 	}
 
 	drawOptions() {
@@ -40,13 +47,12 @@ export class AlertField extends SelectField {
 			{value: 'P0D', name: t('At the start')},
 		];
 		if(!this.isForDefault) {
-			this.value = 'default';
 			this.options.unshift({value: 'default', name: t('Default')});
 		}
 		this.options.unshift({value: null, name: t('None')})
 		super.drawOptions();
 	}
-	/** @ts-ignore */
+
 	get value() {
 
 		const v = super.value;
@@ -54,9 +60,8 @@ export class AlertField extends SelectField {
 			this.addOptionIfNotExist(v as string);
 		return (v && v !== 'default') ? {1:{trigger:{offset:v}}} : (v === 'default' ? {} : null);
 	}
-	/** @ts-ignore */
-	set value(v: {[id:string]:Alert}|'default'|null) {
 
+	set value(v: {[id:string]:Alert}|'default'|null) {
 		if(!v) {
 			v = null;
 		} else if(!(typeof v === 'string') ) {

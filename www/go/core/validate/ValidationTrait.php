@@ -61,7 +61,7 @@ trait ValidationTrait {
 	 * If the attribute has no error then fals will be returned
 	 * 
 	 * @param string $key
-	 * @return array{code:int, description:string, data:array}|false eg. array('code'=>'maxLength','info'=>array('length'=>10))
+	 * @return array{code:string, description:string, data:array}|false eg. array('code'=>'maxLength','info'=>array('length'=>10))
 	 */
 	public function getValidationError($key) {
 		$validationErrors = $this->getValidationErrors();
@@ -83,7 +83,7 @@ trait ValidationTrait {
 	 * @param string|null $description Override the default description. Pure info for the API developer. Clients shouldn't use this.
 	 * @param array $data Arbitrary data for output to the client
 	 */
-	public function setValidationError(string $key, int $code, string $description = null, array $data = []) {
+	public function setValidationError(string $key, int $code, string|null $description = null, array $data = []) {
 
 		if (!isset($description)) {
 			$description = ErrorCode::getDescription($code);
@@ -99,7 +99,7 @@ trait ValidationTrait {
 	 * @param string|null $key attribute name. Use null to check all attributes.
 	 * @return bool whether there is any error.
 	 */
-	public function hasValidationErrors(string $key = null): bool
+	public function hasValidationErrors(string|null $key = null): bool
 	{
 		$validationErrors = $this->getValidationErrors();
 

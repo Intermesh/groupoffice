@@ -21,4 +21,12 @@ return array (
   'Delete users' => 'Verwijder gebruikers',
   'Max delete percentage' => 'Maximaal percentage te verwijderen',
   'Delete groups' => 'Verwijder groepen',
+  'Follow referrals' => 'Na raadpleging',
+  'For older Microsoft ActiveDirectory installation this has to be disabled' => 'Voor oudere Microsoft ActiveDirectory installatie moet dit worden uitgeschakeld',
+  'Use \'samaccountname\' for Microsoft ActiveDirectory.' => 'Gebruik \'samaccountname\' voor Microsoft ActiveDirectory.',
+  'For Microsoft ActiveDirectory use \'(objectCategory=InetOrgPerson)\'' => 'Voor Microsoft ActiveDirectory gebruik \'(objectcategorie=InetOrgPerson) \'',
+  'For Microsoft ActiveDirectory it\'s typically \'cn=Users,dc=example,dc=com\'.' => 'Voor Microsoft Active Map het is typisch \'cn=Users,dc=example,dc=com\'.',
+  'For Microsoft ActiveDirectory it\'s typically \'cn=Groups,dc=example,dc=com\'.' => 'Voor Microsoft Active Map het is typisch \'cn=Groepen,dc=voorbeeld,dc=com\'.',
+  'Use e-mail instead of LDAP username as IMAP username' => 'E-mail gebruiken in plaats van LDAP-gebruikersnaam als IMAP-gebruikersnaam',
+  'For Microsoft ActiveDirectory use \'(objectCategory=group)\'' => 'Voor Microsoft ActiveDirectory gebruik \'(objectcategorie=groep) \'',
 );

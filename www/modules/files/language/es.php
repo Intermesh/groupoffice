@@ -130,7 +130,7 @@ Los siguientes cambios fueron realizados por %s:
   'You can\'t edit this folder' => 'No puedes editar esta carpeta',
   'Please open the upload program and upload your files. Click \'Yes\' when the upload is done.' => 'Abra el programa de carga y suba sus archivos. Haga clic en \'Sí\' cuando finalice la carga.',
   'File info' => 'Información del archivo',
-  'Ok' => 'Ok',
+  'Ok' => 'Aceptar',
   'Content expires at' => 'El contenido expira en',
   'noItems' => 'No hay elementos',
   'Show folder' => 'Mostrar carpeta',
