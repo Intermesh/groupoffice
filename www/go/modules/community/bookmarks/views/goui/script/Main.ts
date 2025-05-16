@@ -25,7 +25,7 @@ export class Main extends Component {
 
 		this.store = datasourcestore({
 			dataSource: jmapds("Bookmark"),
-			sort: [{property: "categoryId", isAscending: true}],
+			sort: [{property: "category", isAscending: true}, {property: "name"}],
 			queryParams: {
 				limit: 0,
 				filter: {
