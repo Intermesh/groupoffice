@@ -1,9 +1,13 @@
+12-05-2025: 6.8.119
+- OAuth2 client: minor tweak project_id label
 - Core: Fixed: Blind Stored XSS in Phone Number Field Enables Forced Redirect and Unauthorized Actions
 - Core: Fixed:  DOM-Based XSS in all Date Input Fields Allow Arbitrary JavaScript Execution
 - Core: fixed Stored XSS in Tasks Comment Section
 - Files: Fixed: Group-Office vulnerable to path traversal Vulnerability ID: JVN#23673287
 - History: Fixed cross site scripting vulnerability JVN#30520482, JVN#87138325 and JVN#72111431
 - Email: fix deprecation error
+- Support: bugfix saving default task list
+- SUpportclient: make support list combo single select in 'new request' window
 
 25-04-2025: 6.8.118
 - ActiveSync: Fix broken utf-8 when recreating MIME for Z-push
