@@ -8,7 +8,7 @@
   },
 
   "scripts": {
-    "start history": "concurrently --kill-others \"npm run start:esbuild\"  \"npm run start:sass\"",
+    "start": "concurrently --kill-others \"npm run start:esbuild\"  \"npm run start:sass\"",
     "start:esbuild": "node ../../../../../../views/goui/esbuild-module.mjs watch",
     "start:sass": "npx sass --watch style:dist",
 

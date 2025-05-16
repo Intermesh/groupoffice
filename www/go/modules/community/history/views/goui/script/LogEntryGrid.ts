@@ -1,5 +1,5 @@
-import {btn, column, comp, datasourcestore, DataSourceStore, datecolumn, t, Table} from "@intermesh/goui";
-import {jmapds, img} from "@intermesh/groupoffice-core";
+import {avatar, btn, column, comp, datasourcestore, DataSourceStore, datecolumn, t, Table} from "@intermesh/goui";
+import {jmapds, img, client} from "@intermesh/groupoffice-core";
 import {HistoryDetailWindow} from "./HistoryDetailWindow.js";
 
 export class LogEntryGrid extends Table<DataSourceStore> {
@@ -50,10 +50,13 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 						return comp({
 								cls: "hbox"
 							},
-							img({
-								cls: "goui-avatar",
-								blobId: v.avatarId
+
+							avatar({
+								cls: "inline",
+								displayName: v.name,
+								backgroundImage: v.avatarId ? client.downloadUrl(v.avatarId) : undefined
 							}),
+
 							comp({text: v.name, cls: "history-created-by"})
 						)
 					}
