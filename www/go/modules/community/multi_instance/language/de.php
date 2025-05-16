@@ -23,4 +23,6 @@ return array (
   'Trial' => 'Versuch',
   'Modules' => 'Module',
   'Allowed' => 'Erlaubt',
+  'Version' => 'Version',
+  'Is trial' => 'Is trial',
 );

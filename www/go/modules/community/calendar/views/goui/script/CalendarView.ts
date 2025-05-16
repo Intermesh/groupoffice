@@ -20,7 +20,7 @@ export abstract class CalendarView extends Component {
 	protected recur?: {[id:string]: Recurrence}
 	protected contextMenu = menu({removeOnClose:false, isDropdown: true},
 		//btn({icon:'open_with', text: t('Show'), handler:_ =>alert(this.current!.data.id)}),
-		btn({icon:'edit', text: t('Edit'), handler: _ => this.current!.open()}),
+		btn({icon:'edit', text: t('Edit','core','core'), handler: _ => this.current!.open()}),
 		btn({icon:'email', text: t('E-mail participants'), handler: _ => {
 				if (this.current!.data.participants){
 					go.showComposer({to: Object.values(this.current!.data.participants).map((p:any) => p.email)});
@@ -28,7 +28,7 @@ export abstract class CalendarView extends Component {
 			}
 		}),
 		//'-',
-		btn({icon:'delete', text: t('Delete'), handler: _ => this.current!.remove() }),
+		btn({icon:'delete', text: t('Delete','core'), handler: _ => this.current!.remove() }),
 		btn({icon: 'import_export', text: t('Download ICS'), handler: _ => this.current!.downloadIcs() })
 	);
 
@@ -63,7 +63,8 @@ export abstract class CalendarView extends Component {
 				}
 			}
 			div = E('div',
-				E('em', item.title || '('+t('Nameless')+')'),
+				E('em', item.title || '('+t(item.data.privacy!='public' ? 'Private' :'Nameless')+')'),
+				...item.categoryDots,
 				...item.icons,
 				time
 			)
@@ -105,11 +106,11 @@ export abstract class CalendarView extends Component {
 		this.viewModel = [];
 	}
 
-	protected slots: any;
+	protected slots!: any[];
 	protected calcRow(start: number, days: number) {
 		let row = 0,
 			end = Math.min(start+days, this.slots.length);
-		while(row < 20) {
+		while(row < 40) {
 			for(let i = start; i < end; i++) {
 				if(this.slots[i][row]){ // used
 					break; // next row
@@ -124,7 +125,7 @@ export abstract class CalendarView extends Component {
 			}
 			row++;
 		}
-		return 20;
+		return 40;
 	}
 
 	protected ROWHEIGHT = 2.6;

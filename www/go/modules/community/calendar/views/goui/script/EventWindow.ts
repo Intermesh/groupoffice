@@ -32,7 +32,7 @@ export class EventWindow extends FormWindow {
 	private item?: CalendarItem
 
 	private store: JmapDataSource
-	private submitBtn:Button
+	// private submitBtn:Button
 	private endDate: DateField
 	private startDate: DateField
 	private withoutTimeToggle: CheckboxField
@@ -44,6 +44,7 @@ export class EventWindow extends FormWindow {
 
 	private titleField: TextField
 	private alertField: AlertField
+	private confirmedScheduleMessage: boolean = false;
 
 	constructor() {
 		super("CalendarEvent");
@@ -53,6 +54,7 @@ export class EventWindow extends FormWindow {
 		this.width = 565;
 		this.height = 840;
 		this.resizable = true;
+		this.hasLinks = true;
 		this.store = this.form.dataSource as JmapDataSource; //jmapds("CalendarEvent");
 		// this.startTime = textfield({type:'time',value: '12:00', width: 128})
 		// this.endTime = textfield({type:'time',value: '13:00', width: 128})
@@ -81,6 +83,8 @@ export class EventWindow extends FormWindow {
 			//recurrenceField.setStartDate(start)
 		});
 		this.form.on('save', () => { this.close();});
+		this.form.on("beforesubmit", this.onBeforeSubmit, {bind:this});
+
 		this.generalTab.cls = 'flow fit scroll pad';
 		this.startDate = datefield({label: t('Start'), name:'start',flex:1, defaultTime: now.format('H')+':00',
 			listeners:{'change': (me,_v, old) => {
@@ -101,7 +105,13 @@ export class EventWindow extends FormWindow {
 							.add(di)
 							.format(format);
 					}
-				}}
+				},
+			'setvalue': (me) => {
+				const d = me.getValueAsDateTime();
+				if(d){
+					recurrenceField.setStartDate(d);
+				}
+			}}
 		});
 		this.endDate = datefield({label:t('End'), name: 'end', flex:1, defaultTime: (now.getHours()+1 )+':00',
 			listeners: {'change': (me,_v, old) => {
@@ -169,11 +179,13 @@ export class EventWindow extends FormWindow {
 					this.alertField.fullDay = checked;
 					this.alertField.drawOptions();
 
-					calendarStore.dataSource.single(this.form.value.calendarId).then(r => {
-						if(!r) return;
-						const d = checked ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
-						this.alertField.setDefaultLabel(d)
-					});
+					if(this.form.value.calendarId) {
+						calendarStore.dataSource.single(this.form.value.calendarId).then(r => {
+							if (!r) return;
+							const d = checked ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
+							this.alertField.setDefaultLabel(d)
+						});
+					}
 					this.startDate.withTime = this.endDate.withTime = !checked;
 				}}
 			}),
@@ -297,10 +309,8 @@ export class EventWindow extends FormWindow {
 			})
 		);
 
-		this.bbar.items.clear().add(
-			btn({icon:'attach_file', handler: _ => this.attachFile() }),
-			comp({flex:1}),
-			this.submitBtn = btn({text:t('Save'), cls:'primary filled',handler: _ => this.submit()})
+		this.bbar.items.insert(2,
+			btn({icon:'attach_file', handler: _ => this.attachFile() })
 		);
 
 		this.addCustomFields();
@@ -345,7 +355,7 @@ export class EventWindow extends FormWindow {
 				store: exceptionStore,
 				columns: [
 					column({id: "recurrenceId", header:t('Start'), renderer(v,record) {
-						return Format.dateTime(v)+ `<br><small>${record.excluded ? 'Excluded' : 'Override'}</small>`;
+						return Format.dateTime(v)+ '<br><small>'+t(record.excluded ? 'Excluded' : 'Override')+'</small>';
 					}}),
 					column({id: "excluded", header: '', width:90, renderer: (v,r) => btn({icon:'delete',handler:()=>{
 						this.item!.undoException(r.recurrenceId).then(_=> { exceptionStore.remove(r)})
@@ -410,27 +420,43 @@ export class EventWindow extends FormWindow {
 
 	}
 
-	submit() {
+	private onBeforeSubmit() {
+		if(this.confirmedScheduleMessage) {
+			return;
+		}
+		if(!this.form.isModified()) {
+			this.close();
+			return false;
+		}
 		if(this.item!.isRecurring) {
 
 			this.item!.patch(this.parseSavedData(this.form.modified), () => {
 				this.close();
 			});
+			// cancel normal submit
+			return false;
 		} else {
 			this.item!.confirmScheduleMessage(this.parseSavedData(this.form.modified), () => {
+				this.confirmedScheduleMessage = true;
 				this.form.submit();
+				this.confirmedScheduleMessage = false;
 			});
+
+			// cancel normal submit
+			return false;
 		}
 	}
 
-	private async attachFile() {
-		 const files = await browser.pickLocalFiles(true);
-		 this.mask();
-		 const blobs = await client.uploadMultiple(files);
-		 this.unmask();
-		 for(const r of blobs)
-		 	this.attachments.add({blobId:r.id, title:r.name, size:r.size, contentType:r.type}, );
-		 //console.warn(blobs);
+	private attachFile() {
+		 browser.pickLocalFiles(true).then(files => {
+			 this.attachments.mask();
+			 client.uploadMultiple(files).then(blobs => {
+				 for(const r of blobs)
+					 this.attachments.add({blobId:r.id, title:r.name, size:r.size, contentType:r.type}, );
+			 }).finally(() => {
+				 this.attachments.unmask();
+			 });
+		 });
 	}
 
 }

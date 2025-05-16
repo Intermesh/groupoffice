@@ -6,6 +6,7 @@ use go\core\db\Criteria;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
+use go\core\util\ArrayObject;
 use go\modules\community\bookmarks\controller\Bookmark as GoBookmark;
 
 /**
@@ -120,5 +121,14 @@ class Bookmark extends AclItemEntity {
 	protected static function aclEntityKeys(): array
 	{
 		return ['categoryId' => 'id'];
+	}
+
+	public static function sort(Query $query, ArrayObject $sort): Query
+	{
+		if(isset($sort['category'])) {
+			$query->join("bookmarks_category", 'category', 'category.id = bookmarks.categoryId', 'INNER');
+			$sort->renameKey('category', 'category.name');
+		}
+		return parent::sort($query, $sort);
 	}
 }

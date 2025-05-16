@@ -33,6 +33,8 @@ GO.form.PlainField = Ext.extend(Ext.form.Field, {
 	//Doesn't send value by default!
 	submit: false,
 
+	htmlEncode: false,
+
 	// private
 	initComponent: function() {
 		GO.form.PlainField.superclass.initComponent.call(this);
@@ -105,7 +107,7 @@ GO.form.PlainField = Ext.extend(Ext.form.Field, {
 	},
 
 	renderer : function(v, field) {
-		return v;
+		return this.htmlEncode ? Ext.util.Format.htmlEncode(v) : v;
 	}
 
 });

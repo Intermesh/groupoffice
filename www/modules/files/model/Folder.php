@@ -21,6 +21,7 @@ use go\core\fs\FileSystemObject;
 use go\core\fs\Folder as GoFolder;
 use go\core\model\Acl;
 use go\core\model\Module;
+use modules\files\model\TrashedItem;
 
 /**
  * The Folder model
@@ -193,24 +194,25 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * This getter recursively builds the folder path.
 	 * @return string
 	 */
-	protected function getPath($forceResolve=false) {
+	protected function getPath($forceResolve = false)
+	{
 
-		if($forceResolve || !isset($this->_path)){
+		if ($forceResolve || !isset($this->_path)) {
 			$this->_path = $this->name;
 			$currentFolder = $this;
 
+			$ids = array();
 
-			$ids=array();
-
-			if(!empty($this->id))
-				$ids[]=$this->id;
+			if (!empty($this->id)) {
+				$ids[] = $this->id;
+			}
 
 			while ($currentFolder = $currentFolder->parent) {
-
-				if(in_array($currentFolder->id, $ids))
-					throw new Exception("Infinite folder loop detected in ".$this->_path." ".implode(",", $ids));
-				else
-					$ids[]=$currentFolder->id;
+				if (in_array($currentFolder->id, $ids)) {
+					throw new Exception("Infinite folder loop detected in " . $this->_path . " " . implode(",", $ids));
+				} else {
+					$ids[] = $currentFolder->id;
+				}
 
 				$this->_path = $currentFolder->name . '/' . $this->_path;
 			}
@@ -312,7 +314,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			//top level folders are readonly to everyone.
 			$this->readonly=1;
 
-			$mod = Module::findByName(null, "files");
+			$mod = Module::findByName(null, "files", null);
 
 			$this->acl_id = $mod->getShadowAclId();
 		}
@@ -455,38 +457,6 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 			if(!$this->fsFolder->exists()){
 
-				if($this->isModified('parent_id')){
-					Folder::model()->clearFolderCache();
-					//file will be moved so we need the old folder path.
-					$oldFolderId = $this->getOldAttributeValue('parent_id');
-					$oldFolder = Folder::model()->findByPk($oldFolderId, false, true);
-					$oldRelPath = $oldFolder->path;
-
-					$oldName = $this->isModified('name') ? $this->getOldAttributeValue('name') : $this->name;
-
-					$oldPath = \GO::config()->file_storage_path . $oldRelPath . '/' . $oldName;
-
-					$fsFolder = new \GO\Base\Fs\Folder($oldPath);
-
-					$newRelPath = $this->getPath(true);
-
-					$newFsFolder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path . dirname($newRelPath));
-
-					if (!$fsFolder->move($newFsFolder))
-						throw new Exception("Could not rename folder on the filesystem");
-
-					$this->notifyUsers(
-						array(
-						    $this->id,
-						    $oldFolder->id,
-						    $this->parent->id
-						),
-						FolderNotificationMessage::MOVE_FOLDER,
-						$oldRelPath . '/' . $oldName,
-						$newRelPath
-					);
-				}
-
 				//if the filesystem folder is missing check if we need to move it when the name or parent folder changes.
 				if($this->isModified('name')){
 
@@ -500,15 +470,50 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 					$this->notifyUsers(
 						array(
-                            $this->id,
-                            $this->parent->id
-                        ),
+							$this->id,
+							$this->parent->id
+						),
 						FolderNotificationMessage::RENAME_FOLDER,
 						$this->parent->path . '/' . $this->getOldAttributeValue('name'),
 						$this->parent->path . '/' . $this->name
 					);
 				}
 			}
+
+
+			if($this->isModified('parent_id')){
+				Folder::model()->clearFolderCache();
+				//file will be moved so we need the old folder path.
+				$oldFolderId = $this->getOldAttributeValue('parent_id');
+				$oldFolder = Folder::model()->findByPk($oldFolderId, false, true);
+				$oldRelPath = $oldFolder->path;
+
+				$oldName = $this->isModified('name') ? $this->getOldAttributeValue('name') : $this->name;
+
+				$oldPath = \GO::config()->file_storage_path . $oldRelPath . '/' . $oldName;
+
+				$fsFolder = new \GO\Base\Fs\Folder($oldPath);
+
+				$newRelPath = $this->getPath(true);
+
+				$newFsFolder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path . dirname($newRelPath));
+
+				if (!$fsFolder->move($newFsFolder))
+					throw new Exception("Could not rename folder on the filesystem");
+
+				$this->notifyUsers(
+					array(
+							$this->id,
+							$oldFolder->id,
+							$this->parent->id
+					),
+					FolderNotificationMessage::MOVE_FOLDER,
+					$oldRelPath . '/' . $oldName,
+					$newRelPath
+				);
+			}
+
+
 			
 			if($this->recursiveApplyCustomFieldCategories == 'true') {
 				$this->recursivlyApplyCustomfieldSettings();
@@ -885,14 +890,11 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$items = $this->fsFolder->ls();
 
 			foreach ($items as $item) {
-//				try{
-				//\GO::debug("FS SYNC: Adding fs ".$item->name()." to database");
 					if ($item->isFile()) {
 						$file = $this->hasFile($item->name());
 						if (!$file){
 							$this->addFile($item->name());
-						}else
-						{
+						}else {
 							//this will update timestamp and size of file
 
 							//todo: how can it be that $file->fsFile->exists() is needed here?
@@ -902,8 +904,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 							}
 						}
 
-					}else
-					{
+					}else {
 
 						$willSync = $recurseOneLevel || $recurseAll;
 
@@ -916,12 +917,8 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 							$folder->syncFilesystem($recurseAll, false);
 					}
 //				}
-//				catch(\Exception $e){
-//					echo "<span style='color:red;'>".$e->getMessage()."</span>\n";
-//				}
 			}
-		}else
-		{
+		}else {
 			$this->fsFolder->create();
 		}
 
@@ -935,22 +932,16 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		$stmt= $this->folders();
 		while($folder = $stmt->fetch()){
-//			try{
-				if(!$folder->fsFolder->exists() || $folder->fsFolder->isFile())
+				if(!$folder->fsFolder->exists() || $folder->fsFolder->isFile()) {
 					$folder->delete(true);
-//			}catch(\Exception $e){
-//				echo "<span style='color:red;'>".$e->getMessage()."</span>\n";
-//			}
+				}
 		}
 
 		$stmt= $this->files();
 		while($file = $stmt->fetch()){
-//			try{
-				if(!$file->fsFile->exists() || $file->fsFile->isFolder())
+				if(!$file->fsFile->exists() || $file->fsFile->isFolder()) {
 					$file->delete(true);
-//			}catch(\Exception $e){
-//				echo "<span style='color:red;'>".$e->getMessage()."</span>\n";
-//			}
+				}
 		}
 
 		$this->mtime=$this->fsFolder->mtime();
@@ -1155,11 +1146,14 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @param Folder $destinationFolder
 	 * @return boolean
 	 */
-	public function move($destinationFolder){
-
+	public function move(Folder $destinationFolder, bool $appendNumberToNameIfExists = false, bool $ignoreAcl = false): bool
+	{
 		$this->parent_id=$destinationFolder->id;
+		if($appendNumberToNameIfExists) {
+			$this->appendNumberToNameIfExists();
+		}
 		$this->_recalculateQuota();
-		return $this->save();
+		return $this->save($ignoreAcl);
 	}
 	
 	protected function beforeDuplicate(&$duplicate) {
@@ -1384,10 +1378,6 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	}
 
 	public function copyContentsFrom(Folder $sourceFolder, $mergeFolders=false){
-		//make sure database is in sync with filesystem.
-	//	$sourceFolder->syncFilesystem(true);
-
-
 		$stmt = $sourceFolder->folders();
 		while($subfolder = $stmt->fetch()){
 
@@ -1561,8 +1551,6 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		if(!$folder){
 			throw new Exception("Failed to create folder ".$filesPath);
 		}
-//      if (!empty($model->acl_id))
-//          $folder->acl_id = $model->acl_id;
 
 		$folder->acl_id=$aclId;
 
@@ -1578,5 +1566,24 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		
 		return $folder;
 		
+	}
+
+	/**
+	 * Soft delete a folder by moving it to Trash
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function moveToTrash(): void
+	{
+		$trashFolder = Folder::model()->findByPath('trash');
+		\GO\Files\Model\TrashedItem::model()->saveForFolder($this);
+
+		$this->move($trashFolder);
+		if(!$this->fsFolder->move($trashFolder->fsFolder)) {
+			throw new Exception("Unable to move current folder to trash");
+		}
+
+
 	}
 }

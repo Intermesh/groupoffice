@@ -266,6 +266,7 @@ class NoteStore extends Store {
 	public function getNotification($folder=null) {
 		ZLog::Write(LOGLEVEL_DEBUG,'goNote->getNotification('.$folder.')');
 		$stmt = Note::find()
+				->removeJoins()
 				->fetchMode(PDO::FETCH_ASSOC)
 				->select('COALESCE(count(*), 0) AS count, COALESCE(max(modifiedAt), 0) AS modifiedAt')
 				->where('n.noteBookId = :noteBookId')

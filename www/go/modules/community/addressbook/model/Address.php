@@ -65,7 +65,7 @@ class Address extends Property {
 	
 	/**
 	 * ISO 3601 2 char country code. eg. "NL".
-	 * @var string
+	 * @var ?string
 	 */
 	public $countryCode;
 	

@@ -25,7 +25,7 @@ import { build } from 'esbuild';
 import { tsPathsPlugin } from '@awalgawe/esbuild-typescript-paths-plugin';
 
 build({
-  entryPoints: ['src/main.ts'],
+  entryPoints: ['src/Main.ts'],
   bundle: true,
   outfile: 'dist/bundle.js',
   plugins: [tsPathsPlugin()],

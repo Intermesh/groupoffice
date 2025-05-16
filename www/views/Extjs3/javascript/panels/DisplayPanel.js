@@ -234,7 +234,12 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		
 		
 		this.items.each(function (item, index, length) {
-			item.hide();
+
+			if (item.hiddenOnInit === undefined) {
+				item.hiddenOnInit = item.hidden;
+			}
+
+			this.hide();
 		}, this);
 		
 
@@ -477,7 +482,9 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 	//for compatibility with new detail view panels
 	onLoad : function() {
 		this.items.each(function(item, index, length){
-			item.show();
+
+			if(!item.hiddenOnInit)
+				item.show();
 			
 			if(index == 0) {
 				return;

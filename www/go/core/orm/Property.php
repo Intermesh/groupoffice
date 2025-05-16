@@ -129,7 +129,10 @@ abstract class Property extends Model {
 	 */
 	protected $owner = null;
 
-
+	/**
+	 * @var int|null When the entity has a user table this is the user we want to join or save that record for
+	 */
+	protected ?int $_forUserId = null;
 
 	/**
 	 * Constructor
@@ -538,6 +541,9 @@ abstract class Property extends Model {
 		foreach ($relation->keys as $from => $to) {
 			$where[$to] = $this->$from ?? null;
 		}
+		foreach ($relation->constants as $name => $value) {
+			$where[$name] = $value;
+		}
 		return $where;
 	}
 
@@ -736,42 +742,23 @@ abstract class Property extends Model {
 		return ["modifiedBy", "createdAt", "createdBy", "modifiedAt"];
 	}
 
-  /**
-   * @inheritDoc
-   */
-	public static function getApiProperties(): array
+	public static function buildApiProperties(bool $forDocs = false): array
 	{
-		$cls = static::class;
+		$props = parent::buildApiProperties($forDocs);
 
-		//this function is called many times. This seems to have a slight performance benefit
-//		if(isset(self::$apiProperties[$cls])) {
-//			return self::$apiProperties[$cls];
-//		}
-
-		$cacheKey = 'property-getApiProperties-' . $cls;
-
-		$props = go()->getCache()->get($cacheKey);
-
-		if(!$props) {
-			$props = parent::getApiProperties();
-
-			//add dynamic relations		
-			foreach(static::getMapping()->getProperties() as $propName => $type) {
-				//do property_exists because otherwise it will add protected properties too.
-				if(!isset($props[$propName])) {
-					$props[$propName] = ['setter' => false, 'getter' => false, 'access' => self::PROP_PUBLIC, 'dynamic' => true];
-				}
-				$props[$propName]['db'] = true;
+		//add dynamic relations
+		foreach(static::getMapping()->getProperties() as $propName => $type) {
+			//do property_exists because otherwise it will add protected properties too.
+			if(!isset($props[$propName])) {
+				$props[$propName] = ['setter' => false, 'getter' => false, 'access' => self::PROP_PUBLIC, 'dynamic' => true, "description" => ""];
 			}
-
-			if(method_exists(static::class, 'getCustomFields')) {
-				$props['customFields'] = ['setter' => true, 'getter' => true, 'access' => null];
-			}
-
-			go()->getCache()->set($cacheKey, $props);
+			$props[$propName]['db'] = true;
 		}
 
-//		self::$apiProperties[$cls] = $props;
+		if(method_exists(static::class, 'getCustomFields')) {
+			$props['customFields'] = ['setter' => true, 'getter' => true, 'access' => null, "description" => ""];
+		}
+
 		return $props;
 	}
 
@@ -871,7 +858,7 @@ abstract class Property extends Model {
 	 	 */
 	public static function atypicalApiProperties(): array
 	{
-		return ['modified', 'oldValues', 'validationErrors', 'modifiedCustomFields', 'validationErrorsAsString', 'searchDescription', 'returnAsText', 'dontChangeModifiedAt'];
+		return ['modified', 'oldValues', 'validationError', 'validationErrors', 'modifiedCustomFields', 'validationErrorsAsString', 'searchDescription', 'returnAsText', 'dontChangeModifiedAt', 'values', 'value', 'customFieldsJSON'];
 	}
 
 	/**
@@ -912,7 +899,7 @@ abstract class Property extends Model {
 	 * @return Query<$this>
 	 * @throws Exception
 	 */
-	protected static function internalFind(array $fetchProperties = [], bool $readOnly = false, Property $owner = null, ?int $userId = null): Query
+	protected static function internalFind(array $fetchProperties = [], bool $readOnly = false, Property|null $owner = null, ?int $userId = null): Query
 	{
 
 		$tables = self::getMapping()->getTables();
@@ -1562,6 +1549,7 @@ abstract class Property extends Model {
 			}
 
 			$this->applyRelationKeys($relation, $newProp);
+			$this->applyRelationContants($relation, $newProp);
 
 			// this is also done in {@see Property::patchArray()} but that is only done when settings the relation via {@see setValues()}
 			// when setting the objects directy it relies on this procedure:
@@ -1695,8 +1683,9 @@ abstract class Property extends Model {
 		$insertIds = array_diff($new, $old);
 
 		if(!empty($insertIds)) {
-			$data = array_values(array_map(function($v) use($key, $where) {
-				return array_merge($where, [$key => $v]);
+			$constants = $relation->constants;
+			$data = array_values(array_map(function($v) use($key, $constants, $where) {
+				return array_merge($constants, $where, [$key => $v]);
 			}, $insertIds));
 
 			if(!go()->getDbConnection()->insert($relation->tableName, $data)->execute()) {
@@ -1744,6 +1733,7 @@ abstract class Property extends Model {
 			}
 
 			$this->applyRelationKeys($relation, $newProp);
+			$this->applyRelationContants($relation, $newProp);
 
 			// This went bad when creating new map values with "ext-gen1" as key.
 			// Fixed it by recognizing _NEW_* as a map key that should not be applied as property
@@ -1786,6 +1776,13 @@ abstract class Property extends Model {
 
 		foreach ($relation->keys as $from => $to) {
 			$property->$to = $this->$from ?? null;
+		}
+	}
+
+	private function applyRelationContants(Relation $relation, Property $property) {
+
+		foreach ($relation->constants as $name => $value) {
+			$property->$name = $value;
 		}
 	}
 
@@ -1845,6 +1842,10 @@ abstract class Property extends Model {
 		$stmt->execute();
 	}
 
+	public function forUserId(){
+		return $this->_forUserId ?? go()->getUserId();
+	}
+
 	/**
 	 * Saves properties to the mapped table
 	 *
@@ -1896,7 +1897,7 @@ abstract class Property extends Model {
 				}
 
 				if($table->isUserTable || ($this instanceof UserProperty && $table->hasColumn('userId'))) {
-					$modifiedForTable["userId"] = go()->getUserId();
+					$modifiedForTable["userId"] = $this->forUserId();
 				}
 
 				$this->insertTableRecord($table, $modifiedForTable);
@@ -1911,7 +1912,7 @@ abstract class Property extends Model {
 					$this->primaryKeys[$table->getAlias()][$to] = $this->$from;
 				}
 				if($table->isUserTable) {
-					$this->primaryKeys[$table->getAlias()]['userId'] = go()->getUserId();
+					$this->primaryKeys[$table->getAlias()]['userId'] = $this->forUserId();
 				}
 
 				if(isset($aiID)) {
@@ -1924,7 +1925,7 @@ abstract class Property extends Model {
 
 				$keys = $this->primaryKeys[$table->getAlias()];
 				if($table->isUserTable) {
-					$keys['userId'] = go()->getUserId();
+					$keys['userId'] = $this->forUserId();
 				}
 
 				$query = Query::normalize($keys)->tableAlias($table->getAlias());
@@ -2164,6 +2165,36 @@ abstract class Property extends Model {
 				}
 				break;
 
+			case 'tinyint':
+				$max = 127;
+			case 'smallint':
+				if(!isset($max))
+					$max = 32767;
+			case 'mediumint':
+				if(!isset($max))
+					$max = 8388607;
+			case 'int':
+				if(!isset($max))
+					$max = 2147483647;
+			case 'bigint':
+				if(!isset($max))
+					$max = PHP_INT_MAX;
+
+				if($column->unsigned) {
+					$min = 0;
+					$max = $max * 2 + 1;
+				} else {
+					$min = 0 - $max - 1;
+				}
+
+				if($value < $min) {
+					$this->setValidationError($column->name, ErrorCode::MALFORMED, 'int value must be greater than ' . $min . '. Value given: ' . $value);
+				} else if($value > $max) {
+					$this->setValidationError($column->name, ErrorCode::MALFORMED, 'int value must be lower than ' . $max . '. Value given: ' . $value);
+				}
+
+				break;
+
 			case "json":
 				break;
 
@@ -2236,7 +2267,7 @@ abstract class Property extends Model {
 		}
 	}
 
-	public function toArray(array $properties = null): array|null
+	public function toArray(array|null $properties = null): array|null
 	{
 		if (empty($properties)) {
 			$properties = $this->fetchProperties;
@@ -2658,7 +2689,7 @@ abstract class Property extends Model {
 		$props = $this->getApiProperties();
 
 		foreach($props as $name => $p) {
-			if(!isset($p['access']) && (!$p['getter'] || !$p['setter'])) {
+			if((!isset($p['access']) || $p['access'] == self::PROP_PUBLIC_READONLY || $p['access'] == self::PROP_PUBLIC_WRITEONLY) && (!$p['getter'] || !$p['setter'])) {
 				continue;
 			}
 

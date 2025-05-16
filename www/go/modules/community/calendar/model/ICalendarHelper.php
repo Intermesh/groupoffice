@@ -92,6 +92,8 @@ class ICalendarHelper {
 				}
 			}
 		}
+		// this will remove the invalid UTF-8 characters for XML response in caldav.
+		$vcalendar->validate(VObject\Node::REPAIR);
 
 		return $vcalendar;
 	}
@@ -432,9 +434,10 @@ class ICalendarHelper {
 				$props->timeZone = $props->start->getTimezone()->getName();
 			}
 		}
+		go()->log($vevent->DESCRIPTION);
 		//empty($vevent->DTSTART) ?: $props->start = $vevent->DTSTART->getDateTime()->format(DateTime::FORMAT_API_LOCAL);
 		if(!empty($vevent->SUMMARY)) $props->title = (string)$vevent->SUMMARY;
-		if(!empty($vevent->DESCRIPTION)) $props->description = (string)$vevent->DESCRIPTION;
+		if(!empty($vevent->DESCRIPTION)) $props->description = str_replace('\n',"\n", $vevent->DESCRIPTION->getValue());
 		if(!empty($vevent->LOCATION)) $props->location = (string)$vevent->LOCATION;
 		if(!empty($vevent->STATUS)) {
 			$status = strtolower($vevent->STATUS);
@@ -481,7 +484,7 @@ class ICalendarHelper {
 		return new VObject\Recur\RRuleIterator(self::toRrule($event), $event->start());
 	}
 
-	static private function parseRrule(VObject\Property\ICalendar\Recur $rule, $event) {
+	static private function parseRrule(VObject\Property\ICalendar\Recur $rule, CalendarEvent $event) {
 		$parts = $rule->getParts();
 		$values = (object)['frequency' => strtolower($parts['FREQ'])];
 		if(isset($parts['INTERVAL']) && $parts['INTERVAL'] != 1) {
@@ -515,8 +518,12 @@ class ICalendarHelper {
 				// convert to localtime
 				$isUtc = substr($parts['UNTIL'], -1,1) === 'Z';
 				$dt = DateTime::createFromFormat('Ymd\THis', substr($parts['UNTIL'],0,15), new \DateTimeZone('etc/UTC'));
-				if(!empty($event->timeZone))
-					$dt->setTimezone(new \DateTimeZone($event->timeZone));
+
+				$tz = $event->timeZone();
+				if(isset($tz)) {
+					$dt->setTimezone($tz);
+				}
+
 				$values->until = $dt->format('Y-m-d\TH:i:s');
 			} else {
 				// add dashes and append 0-time

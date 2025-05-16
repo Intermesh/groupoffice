@@ -89,21 +89,24 @@ class CalendarEvent extends EntityController {
 
 	}
 
-	private function b64UrlEncode($data) {
-		return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+	private function b64UrlEncode(string $data) : string{
+		return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($data));
 	}
 
-	function generateJWT($params) {
+	public function generateJWT(array $params) : array {
 		$s = Module::get()->getSettings();
 
-		$header = $this->b64UrlEncode(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
+		$header = $this->b64UrlEncode(json_encode(['typ' => 'JWT', 'alg' => 'HS512']));
 		$payload = $this->b64UrlEncode(json_encode([
+//			"context" => [],
 			'aud' => $s['videoJwtAppId'],
 			'iss' => $s['videoJwtAppId'],
-			'room' => $params['room']
+			'room' => $params['room'],
+			'sub' => '*',
+			'exp' => strtotime('+30 days'),
 		]));
 
-		$signature = hash_hmac('sha256', "$header.$payload", $s['videoJwtSecret'], true);
+		$signature = hash_hmac('sha512', "$header.$payload", $s['videoJwtSecret'], true);
 
 		return [
 			'success' => true,
@@ -136,36 +139,12 @@ class CalendarEvent extends EntityController {
 	 * @throws \Exception
 	 */
 	public function import($params) {
-		$r = (object)[
-			'saved'=>0,
-			'failed'=>0,
-			'skipped'=>0,
-			'failureReasons'=>[]
-		];
-		foreach($params['blobIds'] as $blobId) {
-			foreach(model\ICalendarHelper::calendarEventFromFile($blobId) as $ev) {
-				if(is_array($ev)){
-					$r->failureReasons[$r->failed] = 'Parse error '.$ev['vevent']->VEVENT[0]->UID. ': '. $ev['error']->getMessage();
-					$r->failed++;
-					continue;
-				}
-				$ev->calendarId = $params['calendarId'];
-				if(!empty($params['ignoreUid'])) {
-					$ev->uid = UUID::v4();
-				} else if(model\CalendarEvent::find()->selectSingleValue('id')->where(['uid'=>$ev->uid])->single() !== null) {
-					$r->skipped++;
-					continue;
-					// check if exists
-				}
-				if($ev->save()){ // will fail if UID exists. We dont want to modify existing events like this
-					$r->saved++;
-				} else {
-					$r->failureReasons[$r->failed] = 'Validate error '.$ev->uid. ': '. var_export($ev->getValidationErrors(),true);
-					$r->failed++;
-				}
-			}
-		}
-		return $r;
+
+		return model\CalendarEvent::import(
+			$params['blobIds'],
+			$params['calendarId'],
+			!empty($params['ignoreUid']) ? 'new':'check'
+		);
 	}
 
 	public function countMine(): int

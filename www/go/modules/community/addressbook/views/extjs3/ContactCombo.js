@@ -70,7 +70,7 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 				'<div class="x-combo-list-item"><div class="user">\
 					 <div class="avatar" style="{[this.getStyle(values)]}">{[this.getHtml(values)]}</div>\
 					 <div class="wrap">\
-						 <div><tpl if="!values.id"><b>' + t("Create new") + ':</b> </tpl>{name}</div>\
+						 <div><tpl if="!values.id"><b>' + t("Create new") + ':</b> </tpl>{[Ext.util.Format.htmlEncode(values.name)]}</div>\
 						 <tpl if="values.emailAddresses && values.emailAddresses[0]"><small>{[values.emailAddresses[0].email]}</small></tpl>\\n\
 						 {[this.getSmallPrint(values)]}\
 					 </div>\
@@ -95,7 +95,7 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 						retstr += v.addressbook.name;
 					}
 					if(retstr.length) {
-						retstr = "<small>"+retstr+"</small>";
+						retstr = "<small>"+Ext.util.Format.htmlEncode(retstr)+"</small>";
 					}
 					return retstr;
 				}

@@ -207,6 +207,7 @@ export class CalendarAdapter {
 				}
 			},
 			load(start:DateTime,end:DateTime) {
+				start = start.clone().addDays(1);// birthday filter end date in inclusive
 				this.store! //.setFilter('addressBookIds', {addressBookIds: go.User.birthdayPortletAddressBooks})
 					.setFilter('isOrganisation', {isOrganization: false})
 					.setFilter('birthday', {birthday: start.format('Y-m-d')+'..'+end.format('Y-m-d')})

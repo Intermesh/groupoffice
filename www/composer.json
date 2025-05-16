@@ -43,7 +43,9 @@
     "ext-fileinfo": "*",
     "thenetworg/oauth2-azure": "@stable",
     "erusev/parsedown": "@stable",
-    "phpmailer/phpmailer": "@stable"
+    "phpmailer/phpmailer": "@stable",
+    "jasny/phpdoc-parser": "^1.0",
+    "stevenmaguire/oauth2-keycloak": "^5.1"
   },
   "license": "AGPL",
   "authors": [
@@ -57,7 +59,15 @@
     "phpstan/phpstan": "^1.11"
   },
   "autoload": {
+    "exclude-from-classmap": [
+      "**/vendor/**",
+      "./go/modules/community/activesync/Z-Push/src",
+      "./go/modules/community/dokuwiki/lib/plugins",
+      "./go/modules/community/activesync/Z-Push/tools"
+
+    ],
     "psr-4": {
+
       "go\\core\\": "go/core/",
       "go\\modules\\": "go/modules/"
     }

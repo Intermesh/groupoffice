@@ -81,7 +81,7 @@ class StringUtil {
   /**
    * Check if UTF-8 string is in FORM_C
    *
-   * @param $text
+   * @param string $text
    * @return bool
    */
 	public static function isNormalized($text): bool
@@ -92,7 +92,6 @@ class StringUtil {
   /**
    * Converts any "CamelCased" into an "underscored_word".
    * @param string $camelCasedString the word(s) to underscore
-   * @param string
    * @return string
    */
 	public static function camelCaseToUnderscore(string $camelCasedString): string
@@ -508,7 +507,6 @@ END;
    * @param string $replace
    * @param string $subject
    * @param bool $found Pass this to check if an occurence was replaced or not
-   * @param string
    * @return string
    */
 	public static function replaceOnce(string $search, string $replace, string $subject, bool &$found = false): string
@@ -567,7 +565,7 @@ END;
    * Convert plain text to HTML
    *
    * @param string $text Plain text string
-   * @param string HTML formatted string
+   * @param bool $convertLinks Whether to convert URLs to links
    * @return string
    */
 	public static function textToHtml(string $text, $convertLinks = true): string
@@ -695,7 +693,6 @@ END;
    * eg. message_id or message-id will become messageId
    *
    * @param string $str
-   * @param string
    * @return string
    */
 	public static function lowerCamelCasify(string $str): string
@@ -784,7 +781,7 @@ END;
 
 	/**
 	 * Converts to ASCII.
-	 * @param  string  UTF-8 encoding
+	 * @param  string $str  UTF-8 encoding
 	 * @return string  ASCII
 	 *
 	 * @see https://3v4l.org/CiH8j
@@ -908,7 +905,7 @@ END;
 	 * will already cover that.
 	 *
 	 * @param array $keywords
-	 * @return void
+	 * @return array
 	 */
 	public static function filterRedundantSearchWords(array $keywords) : array {
 		$keywords = array_unique($keywords);
@@ -1219,6 +1216,18 @@ END;
 		}
 
 		return $style;
+	}
+
+
+	public static function sanitizeHtmlEditor(?string $html): ?string {
+		if(!isset($html)) {
+			return null;
+		}
+		$html = preg_replace('#<(div|p)><br( /)?></\1>#', '<br>', $html);
+//		$html = preg_replace('#<div>(.*)</div>#U', "$1", $html);
+		$html = preg_replace("#<div>(<ol.*</ol>.*)</div>#", "$1", $html);
+
+		return $html;
 	}
 
 

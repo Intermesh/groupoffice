@@ -89,36 +89,36 @@ class Contact extends AclItemEntity {
 
 	/**
 	 * Prefixes like 'Sir'
-	 * @var string
+	 * @var ?string
 	 */							
 	public $prefixes = '';
 	
 	/**
-	 * @var string
+	 * @var ?string
 	 */
 	public $initials = '';
 	
 	/**
 	 * 
-	 * @var string
+	 * @var ?string
 	 */							
 	public $firstName = '';
 
 	/**
 	 * 
-	 * @var string
+	 * @var ?string
 	 */							
 	public $middleName = '';
 
 	/**
 	 * 
-	 * @var string
+	 * @var ?string
 	 */							
 	public $lastName = '';
 
 	/**
 	 * Suffixes like 'Msc.'
-	 * @var string
+	 * @var ?string
 	 */							
 	public $suffixes = '';
 

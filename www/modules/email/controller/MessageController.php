@@ -34,6 +34,8 @@ use go\modules\community\calendar\model\Scheduler;
 class MessageController extends \GO\Base\Controller\AbstractController
 {
 
+	private string $_tmpDir;
+
 	protected function allowGuests()
 	{
 		return array("mailto");
@@ -646,7 +648,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		try {
 			$mailer->send($message);
 		} catch(\Throwable $e) {
-			$msg = GO::t("Sorry, an error occurred") . ': '. $mailer->lastError();
+			$msg = GO::t("Sorry, an error occurred") . ': '. $mailer->lastError(). ' - '. $e->getMessage();
 			throw new Exception($msg);
 		}
 

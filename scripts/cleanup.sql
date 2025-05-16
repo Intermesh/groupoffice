@@ -1,4 +1,4 @@
-SET SESSION foreign_key_checks=OFF;
+SET SESSION foreign_key_checks=0;
 
 -- Address books
 DROP TABLE IF EXISTS ab_addressbooks, ab_companies, ab_contacts, ab_contacts_vcard_props;
@@ -75,7 +75,7 @@ DELETE FROM su_notes WHERE user_id NOT IN (SELECT id FROM core_user);
 DELETE FROM su_rss_feeds WHERE user_id NOT IN (SELECT id FROM core_user);
 DELETE FROM su_visible_calendars WHERE user_id NOT IN (SELECT id FROM core_user);
 DELETE FROM su_visible_calendars WHERE calendar_id NOT IN (SELECT id FROM cal_calendars);
-DELETE FROM cal_visible_tasklists WHERE tasklist_id NOT IN (SELECT id FROM ta_tasklists);
+DELETE FROM cal_visible_tasklists WHERE tasklist_id NOT IN (SELECT id FROM tasks_tasklist);
 DELETE FROM su_latest_read_announcement_records WHERE user_id NOT IN (SELECT id FROM core_user);
 DROP TABLE IF EXISTS su_visible_lists;
 
@@ -117,4 +117,4 @@ DROP TABLE IF EXISTS `go_links_pr2_projects`, `go_links_ta_tasks`, `go_links_ti_
 DROP TABLE IF EXISTS `go_links_go_users`, `go_links_no_notes`, `go_links_pm_projects`, `go_link_pm_report_templates`, `go_link_pr2_report_templates`;
 DROP TABLE IF EXISTS cf_select_tree_options, cf_tree_select_options;
 
-SET SESSION foreign_key_checks=ON;
+SET SESSION foreign_key_checks=1;

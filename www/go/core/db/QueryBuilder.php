@@ -299,8 +299,7 @@ class QueryBuilder {
 		$unions = $query->getUnions();
 		
 		$r = $this->internalBuildSelect($query, empty($unions) ? $prefix : $prefix . "\t");
-		
-		$unions = $query->getUnions();
+
 		if(empty($unions)) {
 			return $r;
 		}
@@ -308,8 +307,11 @@ class QueryBuilder {
 		$r['sql'] = "(\n" . $r['sql'];
 		
 		foreach($unions as $q) {
-			$u = $this->internalBuildSelect($q, $prefix . "\t");
-			$r['sql'] .=  $prefix . "\n) UNION (\n" . $u['sql'];
+			$u = $this->internalBuildSelect($q[0], $prefix . "\t");
+
+			$cmd = $q[1] ? "UNION ALL" : "UNION";
+
+			$r['sql'] .=  $prefix . "\n) $cmd (\n" . $u['sql'];
 			$r['params'] = array_merge($r['params'], $u['params']);
 			$r['paramMap'] = array_merge($r['paramMap'], $u['paramMap']);
 		}

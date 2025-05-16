@@ -574,7 +574,7 @@ return array (
   'Login as this user' => 'Login como esse utilizador',
   'Failed to login as this user' => 'Falha ao fazer login como esse utilizador',
   'Archive user' => 'Arquivar utilizador',
-  'Archiving a user will disable them and make their items invisible. Are you sure?' => 'Arquivar este utilizador, fará com que deixe de efetuar login, e toda a sua informação ficará invisível. Tem a certeza?',
+  'Archiving a user will disable them, revoke all group memberships and make their items invisible. Are you sure?' => 'Arquivar este utilizador, fará com que deixe de efetuar login, e toda a sua informação ficará invisível. Tem a certeza?',
   'You can\' t archive yourself' => 'Não pode pode arquivar o próprio utilizador',
   'Error while saving the data' => 'Erro enquanto gravava dados',
   'Are you sure you want to select all {count} results?' => 'Tem certeza de que deseja selecionar todos os {count} resultados?',

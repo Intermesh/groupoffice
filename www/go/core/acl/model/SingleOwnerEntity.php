@@ -11,10 +11,8 @@ abstract class SingleOwnerEntity extends Entity
 {
 	/**
 	 * The user ID owning this entity
-	 *
-	 * @var int
 	 */
-	public $userId;
+	public ?int $userId;
 
 	/**
 	 * @param Query $query

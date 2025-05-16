@@ -23,6 +23,5 @@ chown www-data:www-data /var/lib/groupoffice
 if [ -z "$2" ]; then
   echo "Please finish the install in the browser";
 else
-  /usr/share/groupoffice/cli.php core/System/upgrade
+  su -s /bin/bash -c '/usr/share/groupoffice/cli.php core/System/upgrade' www-data
 fi
-

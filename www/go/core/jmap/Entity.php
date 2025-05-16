@@ -236,28 +236,21 @@ abstract class Entity  extends OrmEntity {
 			}
 
 			/** @noinspection PhpRedundantOptionalArgumentInspection */
-			$entities = static::find(array_merge(['id', 'filesFolderId'], $filesPathProperties))
-				->where('filesFolderId', '!=', null);
-//				->where('filesFolderId', 'NOT IN', (new Query())->select('id')->from('fs_folders'));
+			$entities = static::find(array_merge(['id', 'filesFolderId'], $filesPathProperties));
 
 			foreach($entities as $e) {
-				$e->checkFilesFolder(true);
-			}
+				if($e->filesFolderId == null) {
 
-//			//update fs_folders set acl_id = 0 where acl_id not in (select id from core_acl)
-//			// select * from fs_folders where acl_id not in (select id from core_acl)
-//			if(is_a(static::class, AclOwnerEntity::class, true)) {
-//				$entities = static::find(array_merge(['id', 'filesFolderId'], static::filesPathProperties()));
-//
-//				$entities->join('fs_folders', 'f', 'f.id = '.$entities->getTableAlias() .'.filesFolderId')
-//					->where('f.acl_id', 'NOT IN', (new Query())->select('id')->from('core_acl'));
-//
-//				//$sql = (string) $entities;
-//
-//				foreach($entities as $e) {
-//					$e->checkFilesFolder(true);
-//				}
-//			}
+					// if filesFolderId is null then pickup from disk if it exists in the right way
+					$filesPath = $e->buildFilesPath();
+					if(go()->getDataFolder()->getFolder($filesPath)->exists()) {
+						$folder = Folder::model()->findForEntity($e);
+						$folder->syncFilesystem();
+					}
+				} else {
+					$e->checkFilesFolder(true);
+				}
+			}
 		}
 	}
 
@@ -630,7 +623,7 @@ abstract class Entity  extends OrmEntity {
 		$userChanges = static::getUserChangesQuery($states[1]['modSeq']);
 			
 		$changesQuery = static::getEntityChangesQuery($states[0]['modSeq'])
-						->union($userChanges)
+						->union($userChanges, true)
 						->offset($states[1]['offset'])
 						->limit($maxChanges + 1);
 		$changes = $changesQuery->execute();
@@ -690,7 +683,7 @@ abstract class Entity  extends OrmEntity {
   /**
    * Get all user property names.
    *
-   * User properties can vary between users. For example "starred" of a contact
+   * User properties belong to users and can be different between users. For example "starred" of a contact
    * can be different between users.
    *
    * @return string[]
@@ -735,7 +728,7 @@ abstract class Entity  extends OrmEntity {
     return (new Query)
             ->select('entityId,max(destroyed) AS destroyed')
             ->from('core_change', 'change')
-	          ->useIndex("USE INDEX (core_change_modSeq_entityTypeId_entityId_index)")
+//	          ->useIndex("USE INDEX (core_change_modSeq_entityTypeId_entityId_index)")
             ->fetchMode(PDO::FETCH_ASSOC)
             ->groupBy(['entityId'])
             ->where(["entityTypeId" => static::entityType()->getId()])
@@ -852,8 +845,8 @@ abstract class Entity  extends OrmEntity {
 	 * @return Alert
 	 */
 	public function createAlert(DateTimeInterface $triggerAt,
-	                            ?string            $tag = null,
-	                            int               $userId = null): Alert
+	                            string|null            $tag = null,
+	                            int|null               $userId = null): Alert
 	{
 		$alert = new Alert();
 
@@ -874,7 +867,7 @@ abstract class Entity  extends OrmEntity {
 	 * @return bool
 	 * @throws Exception
 	 */
-	public function deleteAlert(string $tag, int $userId = null): bool
+	public function deleteAlert(string $tag, int|null $userId = null): bool
 	{
 		return Alert::delete([
 			'entityTypeId' => self::entityType()->getId(),

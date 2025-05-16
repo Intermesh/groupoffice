@@ -5,6 +5,7 @@ namespace GO\Files\Controller;
 
 use GO\Base\Exception\AccessDenied;
 use GO\Base\Exception\NotFound;
+use go\core\exception\Forbidden;
 use go\core\http\Client;
 use go\core\http\Request;
 use go\core\http\Response;
@@ -503,8 +504,11 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			//Supports range download
 			$coreFsFile = new \go\core\fs\File($file->fsFile->path());
 
+			if($coreFsFile->isLink())
+				throw new Forbidden("Symlinks are forbidden");
+
 			// prevent html to render on same domain having access to all global JS stuff
-			if($coreFsFile->getContentType() == 'text/html') {
+			if($coreFsFile->getContentType() == 'text/html' || $coreFsFile->getContentType() == 'image/svg+xml') {
 				$inline = false;
 			}
 

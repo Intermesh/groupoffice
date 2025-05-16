@@ -58,6 +58,14 @@ class DavAccount extends AclOwnerEntity {
 			->addMap('collections', Calendar::class, ['id' => 'davaccountId']);
 	}
 
+	public function needsSync() {
+
+		$needSync = new \DateTime();
+		$needSync->sub(new \DateInterval('PT'.$this->refreshInterval.'M'));
+
+		return $this->lastSync < $needSync; // longer then [interval] minutes ago
+	}
+
 	protected function canCreate(): bool
 	{
 		return Module::findByName('community', 'davclient')
@@ -90,13 +98,6 @@ class DavAccount extends AclOwnerEntity {
 	public static function findByCalendarId($id) {
 		return self::find()->join('davclient_calendar', 'c', 'c.davaccountId = a.id')
 			->where('c.id', '=', $id)->single();
-	}
-
-	private function randomColor($seed) {
-		srand(crc32($seed));
-		$nb = rand(0,17);
-		return substr('#CDAD00#E74C3C#9B59B6#8E44AD#2980B9#3498DB#1ABC9C#16A085#27AE60#2ECC71#F1C40F#F39C12#E67E22#D35400#95A5A6#34495E#808B96#1652a1',
-			($nb*7)+1,6);
 	}
 
 	private function isSetup() {
@@ -299,7 +300,7 @@ class DavAccount extends AclOwnerEntity {
 			$model->name = (string) $response->displayname;
 			$model->description = (string) $response->{'calendar-description'};
 			$model->sortOrder = is_numeric($order) ? (int)$order : 1;
-			$model->color = !empty($color) ? $color : $this->randomColor($model->name);
+			$model->color = !empty($color) ? $color : \go\modules\community\calendar\model\Calendar::randomColor($model->name);
 			$model->timeZone = $tz;
 			if ($model->save()) {
 				$cal = new Calendar($this);
@@ -318,7 +319,7 @@ class DavAccount extends AclOwnerEntity {
 			$model->name = (string) $response->displayname;
 			$model->description = (string) $response->{'calendar-description'};
 			$model->sortOrder = is_numeric($order) ? (int)$order : 1;
-			$model->color = !empty($color) ? $color : $this->randomColor($model->name);
+			$model->color = !empty($color) ? $color : \go\modules\community\calendar\model\Calendar::randomColor($model->name);
 			$model->save();
 		}
 

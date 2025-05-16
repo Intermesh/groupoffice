@@ -122,6 +122,12 @@ final class Oauth2Client extends EntityController
 
 		$default = model\DefaultClient::findById($client->defaultClientId);
 
+
+		if(empty($default->imapHost)) {
+			header("Location: " . go()->getSettings()->URL);
+			exit();
+		}
+
 		//old framework code here
 		$account = \GO\Email\Model\Account::model()->findSingleByAttributes(array(
 			'host' => $default->imapHost,
@@ -328,7 +334,7 @@ final class Oauth2Client extends EntityController
 		// Google can do it in one.
 		$provider = $client->getProvider(['openid', 'profile', 'email']);
 		$url = $provider->getAuthorizationUrl([
-//			"prompt" => "consent"
+			"scope" => ['openid', 'profile', 'email'],
 		]);
 
 		//$url .= '&login_hint=MSchering@txg8h.onmicrosoft.com';

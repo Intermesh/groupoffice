@@ -339,7 +339,7 @@ class PdfTableColumn{
 	public $colspan;
 	public $class;
 	public $extraStyle="";
-	
+	public $color;
 	public $isHeader=false;
 	
 	public function __construct($config) {

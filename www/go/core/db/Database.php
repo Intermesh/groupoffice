@@ -26,7 +26,7 @@ class Database {
 	 */
 	private $version;
 
-	public function __construct(Connection $conn = null) {
+	public function __construct(Connection|null $conn = null) {
 		$this->conn = $conn ?? go()->getDbConnection();
 	}
 

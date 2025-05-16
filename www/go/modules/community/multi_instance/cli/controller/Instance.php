@@ -9,8 +9,7 @@ class Instance extends Controller {
 	/**
 	 * docker compose exec --user www-data groupoffice php ./www/cli.php community/multi_instance/Instance/restore --name=test.example.com
 	 *
-	 * @param $name
-	 * @param null $trashPath
+	 * @param array $params
 	 * @throws NotFound
 	 */
 	public function restore($params) {

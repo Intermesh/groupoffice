@@ -8,7 +8,6 @@ use GO\Base\Model\AbstractUserDefaultModel;
 use GO\Base\Model\User as LegacyUser;
 use GO\Base\Util\Http;
 use GO\Calendar\Model\Calendar;
-use GO\Calendar\Model\UserSettings as CalendarUserSettings;
 use go\core\acl\model\AclItemEntity;
 use go\core\App;
 use go\core\auth\Authenticate;
@@ -54,7 +53,7 @@ use http\Exception\InvalidArgumentException;
  * @property ?TasksUserSettings $tasksSettings
  * @property ?NotesUserSettings $notesSettings
  * @property ?UserSettings $addressBookSettings
- * @property ?CalendarUserSettings $calendarSettings
+ * @property ?\go\modules\community\calendar\model\Preferences $calendarPreferences
  */
 class User extends AclItemEntity {
 	
@@ -91,6 +90,14 @@ class User extends AclItemEntity {
 	 * @param User $user Can be null
 	 */
 	const EVENT_BADLOGIN = 'badlogin';
+
+	/**
+	 * Fires when user is archived. Used mostly to remove user from any shared items
+	 *
+	 * @param User $user
+	 * @param array $aclIds
+	 */
+	const EVENT_ARCHIVE = 'archive';
 
 	const USERNAME_REGEX = '/[A-Za-z0-9_\-\.@]+/';
 	
@@ -131,9 +138,19 @@ class User extends AclItemEntity {
 	 * @var string
 	 */
 	public $displayName;
-	
+
+	/**
+	 * User profile picture blob ID. Can be downloaded via the download endpoint.
+	 *
+	 * @var string
+	 */
 	public $avatarId;
 
+	/**
+	 * Enabled for login
+	 *
+	 * @var bool
+	 */
 	public $enabled;
 	/**
 	 * E-mail address
@@ -1387,7 +1404,8 @@ public function historyLog(): bool|array
 	 */
 	private function archiveUser()
 	{
-		$aclIds = [];
+		// used ArrayObject so it will be passed by reference to event listener
+		$aclIds = new \go\core\util\ArrayObject();
 
 		if(Module::isInstalled("community", "addressbook")) {
 
@@ -1420,11 +1438,8 @@ public function historyLog(): bool|array
 			}
 		}
 
-		if(Module::isInstalled("legacy", "calendar")) {
-			if (($calendarId = $this->calendarSettings->calendar_id) && ($calendar = Calendar::model()->findByPk($calendarId))) {
-				$aclIds[] = $calendar->findAclId();
-			}
-		}
+		static::fireEvent(self::EVENT_ARCHIVE, $this, $aclIds);
+
 
 		if (Module::isInstalled("legacy", "projects2")) {
 			go()->getDbConnection()->delete('pr2_default_resources', ['user_id' => $this->id] )->execute();
@@ -1432,7 +1447,7 @@ public function historyLog(): bool|array
 
 		if (count($aclIds)) {
 			$grpId = $this->getPersonalGroup()->id();
-			foreach (Acl::findByIds($aclIds) as $rec) {
+			foreach (Acl::findByIds($aclIds->getArray()) as $rec) {
 				foreach ($rec->groups as $aclGrp) {
 					if ($aclGrp->groupId != $grpId) {
 						$rec->removeGroup($aclGrp->groupId);

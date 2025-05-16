@@ -268,6 +268,7 @@ export class WeekView extends CalendarView {
 		this.slots = Array.from({length: this.days}, _ => ({}) );
 
 		this.alldayCtr.innerHTML = '';
+		console.log(this.viewModel);
 		this.alldayCtr.prepend(...this.viewModel.map(e =>
 			super.eventHtml(e).css(this.makestyle(e, this.day))
 		));

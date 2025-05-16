@@ -114,7 +114,7 @@ try {
 
 	ErrorHandler::logException($e);
 	Response::get()->setStatus(500);
-	Response::get()->output($e->getMessage());
+	Response::get()->output(get_class($e));
 
 	if(go()->getDebugger()->enabled) {
 		echo "<pre>";
