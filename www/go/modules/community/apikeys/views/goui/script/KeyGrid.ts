@@ -63,9 +63,10 @@ export class KeyGrid extends Table<DataSourceStore> {
 							icon: "more_vert",
 							menu: menu({},
 								btn({
+									icon: "content_copy",
 									text: t("Copy token to clipboard"),
 									handler: (button, ev) => {
-										browser.copyTextToClipboard(record.accessToken);
+										browser.copyTextToClipboard(record.accessToken, true);
 									}
 								}),
 								btn({

@@ -17,7 +17,10 @@ export class SystemSettingsPanel extends Component {
 				text: t("API keys can be used for other services to connect to the API. A website feeding contact information for example.")
 			}),
 			tbar({},
+				"->",
 				btn({
+					icon: "add",
+					cls: "filled accent",
 					text: t("Add key"),
 					handler: () => {
 						const dlg = new KeyDialog();
