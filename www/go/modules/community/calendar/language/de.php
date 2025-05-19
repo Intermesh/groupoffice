@@ -55,6 +55,7 @@ return [
 	'This' => 'Dieser',
 	'Organizer' => 'Organisator',
 	'Exceptions' => 'Ausnahmen',
+	'Override' => 'Überschreiben',
 	'Enter a title, name or place' => 'Tragen Sie einen Titel, Namen oder Ort ein',
 	'All day' => 'Ganztägig',
 	'Check availability' => 'Verfügbarkeit prüfen',
