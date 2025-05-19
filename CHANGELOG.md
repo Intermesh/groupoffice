@@ -1,3 +1,4 @@
+19-05-2025: 6.8.120
 - Files: Fixed opening file from link or search result
 - Core: Z-Push upgraded to 2.7.5 (With some patches from us).
 - Finance: Work around missing VAT rate ID
