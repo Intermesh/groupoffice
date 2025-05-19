@@ -284,7 +284,7 @@ const SEARCH_PROVIDER = '';
 const SEARCH_WAIT = 10;
 // The maximum number of results to send to the client. Setting it too high
 // might result in timeout. Default is 10.
-const SEARCH_MAXRESULTS = 10;
+const SEARCH_MAXRESULTS = 100;
 
 // Don't collection any data for z-push-top
 //define('TOPCOLLECTOR_DISABLED', true);
