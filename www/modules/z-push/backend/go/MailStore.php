@@ -1122,6 +1122,9 @@ class MailStore extends Store implements ISearchProvider {
 			$rangeend = substr($searchrange, ($pos + 1));
 		}
 
+		ZLog::Write(LOGLEVEL_INFO,'QUERY ~~ '.var_export($query,true) . ' range: ' . $searchrange . ' -> ' . $rangestart.' - '. $rangeend);
+
+
 		if($rangeend-$rangestart>SEARCH_MAXRESULTS){
 			$rangeend=$rangestart+SEARCH_MAXRESULTS;
 		}

@@ -281,7 +281,7 @@ const BACKEND_PROVIDER = "BackendGO";
 const SEARCH_PROVIDER = '';
 // Time in seconds for the server search. Setting it too high might result in timeout.
 // Setting it too low might not return all results. Default is 10.
-const SEARCH_WAIT = 10;
+const SEARCH_WAIT = 20;
 // The maximum number of results to send to the client. Setting it too high
 // might result in timeout. Default is 10.
 const SEARCH_MAXRESULTS = 100;
