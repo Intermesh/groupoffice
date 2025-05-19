@@ -1,3 +1,4 @@
+19-05-2025: 25.0.22
 - Core: Z-Push upgraded to 2.7.5 (With some patches from us).
 - Files: Fixed opening file from link or search result
 
