@@ -1,3 +1,8 @@
+20-05-2025: 25.0.23
+- Projects: Problem with loading project panel
+- Z-Push: Created new Z-Push repository
+
+19-05-2025: 25.0.22
 - Core: Z-Push upgraded to 2.7.5 (With some patches from us).
 - Files: Fixed opening file from link or search result
 

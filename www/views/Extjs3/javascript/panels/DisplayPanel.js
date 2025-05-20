@@ -239,7 +239,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 				item.hiddenOnInit = item.hidden;
 			}
 
-			this.hide();
+			item.hide();
 		}, this);
 		
 

@@ -53,7 +53,7 @@ export class ResourceWindow extends FormWindow {
 
 		this.generalTab.cls = 'flow pad';
 		this.generalTab.items.add(
-			select({name:'groupId', label:t('Group'), 	store: resourceGroupStore, valueField: 'id', textRenderer: (r: any) => r.name}),
+			select({name:'groupId', required:true,label:t('Group'), 	store: resourceGroupStore, valueField: 'id', textRenderer: (r: any) => r.name}),
 			textfield({name:'name', flex:1,label: t('Name')}),
 			colorfield({name:'color',width:100, value: '69554f'}),
 			textarea({name:'description', label: t('Description')})
@@ -219,7 +219,6 @@ export class ResourcesWindow extends Window {
 
 										)
 									})
-
 							})
 						],
 						listeners: {

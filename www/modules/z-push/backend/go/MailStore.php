@@ -1113,20 +1113,20 @@ class MailStore extends Store implements ISearchProvider {
 		}
 
 
-		$maxPageSize = 30;
-		
-
 		$rangestart = 0;
-		$rangeend = $maxPageSize;
+		$rangeend = SEARCH_MAXRESULTS;
 
 		if($searchrange != '0') {
 			$pos = strpos($searchrange, '-');
 			$rangestart = substr($searchrange, 0, $pos);
 			$rangeend = substr($searchrange, ($pos + 1));
 		}
-		
-		if($rangeend-$rangestart>$maxPageSize){
-			$rangeend=$rangestart+$maxPageSize;
+
+		ZLog::Write(LOGLEVEL_INFO,'QUERY ~~ '.var_export($query,true) . ' range: ' . $searchrange . ' -> ' . $rangestart.' - '. $rangeend);
+
+
+		if($rangeend-$rangestart>SEARCH_MAXRESULTS){
+			$rangeend=$rangestart+SEARCH_MAXRESULTS;
 		}
 
     ZLog::Write(LOGLEVEL_INFO,'QUERY ~~ '.var_export($query,true) . ' range: ' . $rangestart.' - '. $rangeend);
@@ -1139,7 +1139,11 @@ class MailStore extends Store implements ISearchProvider {
 			\GO\Base\Mail\Imap::SORT_DATE,
 			true,
 			$query);
-		
+
+		$count = count($messages);
+
+		$rangeend = $rangestart + $count;
+
 		$items = array();
 		$items['searchtotal'] = $imapAccount->getImapConnection()->sort_count;
 		$items["range"] = $rangestart.'-'.$rangeend;
