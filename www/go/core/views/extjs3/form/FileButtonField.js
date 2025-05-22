@@ -96,7 +96,14 @@ go.form.FileButtonField = Ext.extend(Ext.form.CompositeField,{
 	setFileNameField : function(name, size){
 		if(this.showFileName){
 
+			if(name.length > 20) {
+				name = name.substring(0, 20) + "...";
+			}
+
 			if(this.showSize && size){
+
+
+
 				name += ' ('+go.util.humanFileSize(size,true)+')';
 			}
 

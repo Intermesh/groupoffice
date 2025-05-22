@@ -15,10 +15,13 @@
 
 namespace GO\Files\Model;
 
+use Exception;
 use GO;
+use GO\Base\Exception\AccessDenied;
 use go\core\fs\Blob;
 use go\core\mail\Attachment;
 use go\core\model\Module;
+use GO\Files\Model\TrashedItem;
 use go\modules\community\history\model\LogEntry;
 use go\core\exception\NotFound;
 
@@ -584,14 +587,19 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	 * Move a file to another folder
 	 *
 	 * @param Folder $destinationFolder
+	 * @param bool $appendNumberToNameIfExists
+	 * @param bool $ignoreAcl
 	 * @return boolean
+	 * @throws AccessDenied
 	 */
-	public function move($destinationFolder,$appendNumberToNameIfExists=false){
+	public function move(Folder $destinationFolder,bool $appendNumberToNameIfExists=false, bool $ignoreAcl = false)
+	{
 
 		$this->folder_id=$destinationFolder->id;
-		if($appendNumberToNameIfExists)
+		if($appendNumberToNameIfExists) {
 			$this->appendNumberToNameIfExists();
-		return $this->save();
+		}
+		return $this->save($ignoreAcl);
 	}
 
 	/**
@@ -902,4 +910,22 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		$service = \go\modules\business\fileconverter\Module::getAvailableService();
 		$service->convert($this->fsFile, $outputFile, $format);
 	}
+
+	/**
+	 * Soft delete a file by moving it to Trash
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function moveToTrash(): void
+	{
+		TrashedItem::model()->saveForFile($this);
+
+		$trashFolder = Folder::model()->findByPath('trash');
+		if ($this->folder_id == $trashFolder->id) {
+			throw new Exception("File is already in trash");
+		}
+		$this->move($trashFolder, true);
+	}
+
 }

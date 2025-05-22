@@ -89,7 +89,7 @@ try {
 
 	ErrorHandler::logException($e);
 
-	echo"<h1>" . $e->getMessage() ."</h1>";
+	echo"<h1>" . get_class($e) ."</h1>";
 
 	if(go()->getDebugger()->enabled) {
 		echo "<pre>";

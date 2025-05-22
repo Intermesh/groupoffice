@@ -105,7 +105,7 @@ class Installer {
 	 * @param Module[]|null $installModules
 	 * @throws Exception
 	 */
-	public function install(array $adminValues = [], array $installModules = null) {
+	public function install(array $adminValues = [], array|null $installModules = null) {
 
 		ini_set("max_execution_time", 0);
 		

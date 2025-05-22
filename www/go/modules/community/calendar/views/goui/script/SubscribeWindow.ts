@@ -22,7 +22,6 @@ export class SubscribeWindow extends Window {
 		});
 
 
-
 		this.on('render', () => {
 			store.addScrollLoader(this.scroller.el)
 			void store.load();
@@ -32,7 +31,6 @@ export class SubscribeWindow extends Window {
 
 			tbar({},
 				'->',
-
 				searchbtn({
 					listeners: {
 						input: (searchBtn, text) => {
@@ -41,8 +39,7 @@ export class SubscribeWindow extends Window {
 						}
 					}
 				})
-
-				),
+			),
 
 			this.scroller = comp({cls:'scroll', flex:1},
 

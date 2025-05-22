@@ -164,8 +164,8 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 			items.push({
 				iconCls: l.iconCls,
 				text: l.title,				
-				handler: function () {
-					var window = l.linkWindow.call(l.scope, this.getEntity(), this.getEntityId(), this.detailView.data, this.detailView);
+				handler: async function () {
+					var window = await l.linkWindow.call(l.scope, this.getEntity(), this.getEntityId(), this.detailView.data, this.detailView);
 
 					if (!window) {
 						return;

@@ -1,5 +1,5 @@
 import {
-	btn, checkbox,
+	btn, Button, checkbox,
 	comp, Component, containerfield,
 	DataSourceForm,
 	datasourceform, DateInterval,
@@ -35,13 +35,12 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 	store: JmapDataSource
 	private statusTbar: Toolbar
+	private editBtn: Button;
 
 	constructor() {
 		super("CalendarEvent");
 		this.title = t('Event');
-
 		this.flex = "1";
-		//this.height = 620;
 		this.store = jmapds("CalendarEvent");
 
 		const recurrenceField = displayfield({
@@ -134,32 +133,30 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 						displayfield({name:'description', tagName: "div", cls: "pad", escapeValue: false, renderer: (v, field) => Format.textToHtml(v)}),
 						mapfield({name: 'participants',
 
-							buildField: (v: any) => displayfield({
-								escapeValue: false,
-								//label: v.roles.owner?'Organizer': 'Participant',
-								icon: statusIcons[v.participationStatus][0] as MaterialIcon,
-								//icon: v.roles.owner ? 'manage_accounts' : (v.name?'person':'contact_mail'),
-								renderer: (v) => {
-									//const statusIcon = statusIcons[v.participationStatus] || v.participationStatus;
-									let r = v.email;
-									// type can be You or Organizer
-									let type = '';
-									if(v.email == this.item?.calendarPrincipal?.email) {
-										type = this.item!.principalId === client.user.id ? t('You') : t('This');
-									}
-									if(v.roles.owner)
-										type = t('Organizer');
+							buildField: (v: any) => {
+								const userIcon = v.roles?.owner ?
+										'manage_accounts' : (v.kind == 'resource' ?
+												'meeting_room' : (v.name ?
+													'person' : 'contact_mail')
+										),
+									statusIcon = statusIcons[v.participationStatus] || v.participationStatus;
 
-									if(type) type = ' ('+type+')';
-
-									if(v.name) {
-										r = Format.escapeHTML(v.name) + '<br>' + type;
-									} else if(type) {
-										r += '<br>' + type
-									}
-									return r; //+`<i class="icon" title="${statusIcon[1]}">${statusIcon[0]}</i>`;
+								let type = '';
+								if(v.email == this.item?.calendarPrincipal?.email) {
+									type = ' ('+(this.item!.principalId === client.user.id ? t('You') : t('This'))+')';
 								}
-							})
+								let name = v.name ? v.name + (v.email ? type+'<br>' + v.email :'') : v.email+type;
+
+								return containerfield({cls:'hbox', style: {alignItems: 'center', cursor:'default'}},
+									comp({tagName:'i',cls:'icon',html:userIcon, style:{margin:'0 8px'}}),
+									comp({
+										flex: '1 0 60%',
+										html: name
+									}),
+									comp({tagName:'i',cls:'icon '+statusIcon[2],html:statusIcon[0],title:statusIcon[1], style:{margin:'0 8px'}}),
+								);
+							}
+
 						}),
 						hr(),
 						alertField,
@@ -186,14 +183,14 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 		this.toolbar.items.add(
 
-			// btn({
-			// 	icon: "edit",
-			// 	title: t("Edit"),
-			// 	handler: (button, ev) => {
-			// 		entities.get("CalendarEvent").goto(this.entity!.id);
-			// 	}
-			// }),
-			// this might be a occurrence and we do not have an entity but a calendar item
+			this.editBtn = btn({
+				icon: "edit",
+				title: t("Edit"),
+				handler: (button, ev) => {
+					void this.item!.open();
+				},
+			}),
+
 
 			addbutton(),
 
@@ -244,7 +241,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 		const r = await super.load(id);
 
 		const item = (new CalendarItem({
-			key: id,
+			key: id + "",
 			data:this.entity!
 		}))
 
@@ -260,6 +257,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 	 */
 	async loadEvent(ev: CalendarItem) {
 		this.item = ev;
+
 		if (!ev.key) {
 
 			this.item = ev;
@@ -314,8 +312,9 @@ export class EventDetailWindow extends Window {
 	constructor() {
 		super();
 		this.title = t('Event');
-		this.width = 440;
-		this.height = 600;
+
+		this.width = 565;
+		this.height = 840;
 		this.items.add(this.view = new EventDetail());
 		//this.view.form.on('save', () => {this.close();})
 	}

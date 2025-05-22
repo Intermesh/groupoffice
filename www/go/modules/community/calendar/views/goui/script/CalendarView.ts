@@ -63,7 +63,7 @@ export abstract class CalendarView extends Component {
 				}
 			}
 			div = E('div',
-				E('em', item.title || '('+t('Nameless')+')'),
+				E('em', item.title || '('+t(item.data.privacy!='public' ? 'Private' :'Nameless')+')'),
 				...item.categoryDots,
 				...item.icons,
 				time

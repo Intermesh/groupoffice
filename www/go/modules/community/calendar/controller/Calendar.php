@@ -3,6 +3,7 @@
 namespace go\modules\community\calendar\controller;
 
 use go\core\db\Query;
+use go\core\exception\Forbidden;
 use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
 use go\modules\community\calendar\model;
@@ -82,6 +83,13 @@ class Calendar extends EntityController {
 			'calendarId'=>$calendar->id
 		];
 
+	}
+
+	public function reload($params) {
+		$cal = model\Calendar::findById($params['calendarId']);
+		if($cal)
+			return $cal->importWebcal();
+		return ['success' => false];
 	}
 
 	public function changes($params) {

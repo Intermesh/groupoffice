@@ -82,16 +82,19 @@ GO.files.FilePropertiesDialog = function(config){
 		{
 			xtype: 'plainfield',
 			fieldLabel: t("User"),
-			name: 'username'
+			name: 'username',
+			htmlEncode: true
 		},
 		{
 			xtype: 'plainfield',
 			fieldLabel: t("Modified by"),
-			name: 'musername'
+			name: 'musername',
+			htmlEncode: true
 		},{
 			xtype: 'plainfield',
 			fieldLabel: t("Locked by", "files"),
-			name: 'locked_user_name'
+			name: 'locked_user_name',
+					htmlEncode: true
 		}]}
 		,
 		{xtype:'fieldset', items:[

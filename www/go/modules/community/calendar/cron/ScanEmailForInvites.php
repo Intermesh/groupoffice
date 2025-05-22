@@ -13,11 +13,11 @@ class ScanEmailForInvites extends CronJob {
 	public function enableUserAndGroupSupport(){ return false; }
 
 	public function getLabel(){
-		return \GO::t('Scan e-mail for invites','calendar', 'community');
+		return go()->t('Scan e-mail for invites','calendar', 'community');
 	}
 
 	public function getDescription(){
-		return \GO::t('Auto add invites and updates to calendar when enabled','calendar', 'community');
+		return go()->t('Auto add invites and updates to calendar when enabled','calendar', 'community');
 	}
 	
 	/**

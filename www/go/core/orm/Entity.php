@@ -15,6 +15,7 @@ use go\core\fs\Blob;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
+use go\core\model\Link;
 use go\core\model\Search;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
@@ -179,7 +180,8 @@ abstract class Entity extends Property {
 	 * For a single value do:
 	 *
 	 */
-	public static final function find(array $properties = [], bool $readOnly = false) {
+	public static final function find(array $properties = [], bool $readOnly = false): Query
+	{
 		return static::internalFind($properties, $readOnly);
 	}
 
@@ -187,13 +189,18 @@ abstract class Entity extends Property {
 	 * Same as {@see find()} but join user tables {@see Mapping::addUserTable()} as another user than the logged in user.
 	 *
 	 * @throws Exception
+	 * @return Query<$this>
 	 */
 	public static final function findFor(int $userId, array $properties = [], bool $readOnly = false): Query
 	{
 		return static::internalFind($properties, $readOnly, null, $userId);
 	}
 
-
+	public static final function createFor(int $userId): static {
+		$instance = new static();
+		$instance->_forUserId = $userId;
+		return $instance;
+	}
 	/**
 	 * Find or create an entity
 	 *
@@ -204,7 +211,7 @@ abstract class Entity extends Property {
 	 * @return static
 	 * @throws SaveException
 	 */
-	public static function findOrCreate(string $key, string $keyField = null, array $values = [], bool $update = false): Entity
+	public static function findOrCreate(string $key, string|null $keyField = null, array $values = [], bool $update = false): Entity
 	{
 		if($keyField === null) {
 			$entity = static::findById($key);
@@ -345,7 +352,7 @@ abstract class Entity extends Property {
 		$query = static::find($properties, $readOnly);
 		/** @noinspection PhpPossiblePolymorphicInvocationInspection */
 
-		return \go\core\model\Link::joinLinks($query, $entity, static::entityType()->getId());
+		return Link::joinLinks($query, $entity, static::entityType()->getId());
 
 	}
 
@@ -673,7 +680,7 @@ abstract class Entity extends Property {
 	 * @param int[]|null $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
 	 * @return Query $query;
 	 */
-	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
+	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int|null $userId = null, array|null $groups = null): Query
 	{
 		return $query;
 	}
@@ -939,6 +946,12 @@ abstract class Entity extends Property {
 
 		*/
 		$filters->add("link", function (Criteria $criteria, $value, Query $query) {
+
+			if(!isset($value['entity']) || (count($value) > 1 && !isset($value['id']))) {
+				throw new \LogicException("link filter must have 'entity' and an optional 'id' parameter");
+			}
+
+
 			$linkAlias = 'link_' . uniqid();
 			$on = $query->getTableAlias() . '.id =  ' . $linkAlias . '.toId  AND ' . $linkAlias . '.toEntityTypeId = ' . static::entityType()->getId() . ' AND ' . $linkAlias . '.fromEntityTypeId = ' . EntityType::findByName($value['entity'])->getId();
 

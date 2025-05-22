@@ -30974,6 +30974,24 @@ INSERT INTO `fs_versions` VALUES
 /*!40000 ALTER TABLE `fs_versions` ENABLE KEYS */;
 UNLOCK TABLES;
 
+
+DROP TABLE IF EXISTS `fs_trash`;
+CREATE TABLE `fs_trash` (
+                            `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+                            `parentId` INT(11) UNSIGNED NOT NULL,
+                            `aclId` INT(11) NOT NULL DEFAULT 0,
+                            `entityId` INT(11) NOT NULL,
+                            `entityTypeId` INT(11) NOT NULL,
+                            `deletedBy` INT(11) NOT NULL,
+                            `deletedAt` DATETIME DEFAULT NOW(),
+                            `name` varchar(260) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+                            `fullPath` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+                            PRIMARY KEY (`id`),
+                            CONSTRAINT `fs_trash_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE,
+                            CONSTRAINT `fs_trash_ibfk_2` FOREIGN KEY (`deletedBy`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
+                            CONSTRAINT `fs_trash_ibfk_3` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 --
 -- Table structure for table `go_address_format`
 --

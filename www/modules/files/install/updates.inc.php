@@ -308,6 +308,73 @@ $updates['202310311413'][] = function() {
 	\go\core\cron\BuildSearchCache::install("0 0 * * *", true);
 };
 
+$updates['202502271100'][] = "CREATE TABLE `fs_trash` (
+    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `parentId` INT(11) UNSIGNED NOT NULL,
+    `aclId` INT(11) NOT NULL DEFAULT 0,
+    `entityId` INT(11) NOT NULL,
+    `entityTypeId` INT(11) NOT NULL,
+    `deletedBy` INT(11) NOT NULL,
+    `deletedAt` DATETIME DEFAULT NOW(),
+    `name` varchar(260) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+    `fullPath` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fs_trash_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fs_trash_ibfk_2` FOREIGN KEY (`deletedBy`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fs_trash_ibfk_3` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+$updates['202502271100'][] = function() {
+	echo "Auto-creating Trash folder...\n\n";
+	$folder = \GO\Files\Model\Folder::model()->findByPath("trash", true);
+	$folder->setNewAcl();
+	$folder->visible = 1;
+	$folder->readonly = 1;
+	$folder->save();
+	$folder->acl->addGroup(\GO::config()->group_everyone, \GO\Base\Model\Acl::READ_PERMISSION);
+};
 
 $updates['202503311434'][] = "alter table fs_files
     add lock_id varchar(192) null after locked_user_id";
+
+
+$updates['202504081525'][] = "CREATE TABLE IF NOT EXISTS `fs_trash` (
+    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `parentId` INT(11) UNSIGNED NOT NULL,
+    `aclId` INT(11) NOT NULL DEFAULT 0,
+    `entityId` INT(11) NOT NULL,
+    `entityTypeId` INT(11) NOT NULL,
+    `deletedBy` INT(11) NOT NULL,
+    `deletedAt` DATETIME DEFAULT NOW(),
+    `name` varchar(260) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+    `fullPath` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fs_trash_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fs_trash_ibfk_2` FOREIGN KEY (`deletedBy`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fs_trash_ibfk_3` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+$updates['202504081525'][] = function() {
+	echo "Auto-creating Trash folder...\n\n";
+	$folder = \GO\Files\Model\Folder::model()->findByPath("trash", true);
+	if(!$folder->acl_id) {
+		$folder->setNewAcl();
+		$folder->visible = 1;
+		$folder->readonly = 1;
+		$folder->save();
+		$folder->acl->addGroup(\GO::config()->group_everyone, \GO\Base\Model\Acl::READ_PERMISSION);
+	}
+};
+
+$updates['202504141045'][] = function() {
+	echo "Set Trash folder permissions...\n\n";
+	$folder = \GO\Files\Model\Folder::model()->findByPath("trash", true);
+	if(!$folder->acl) {
+		$folder->setNewAcl();
+		$folder->visible = 1;
+		$folder->readonly = 1;
+		$folder->save();
+	} else {
+		$folder->acl->removeGroup(\GO::config()->group_everyone);
+	}
+};

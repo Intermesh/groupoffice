@@ -113,6 +113,12 @@ class Participant extends Property
 	  return parent::defineMapping()->addTable("calendar_participant", "participant");
 	}
 
+	public function init() {
+		if($this->isNew()) {
+			$this->kind = 'individual'; // default
+		}
+	}
+
 	public function getRoles() {
 		$roles = [];
 		foreach (self::ValidRoles as $item => $bitPosition) {

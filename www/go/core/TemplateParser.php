@@ -235,6 +235,14 @@ class TemplateParser {
 			"title" => go()->getSettings()->title,
 			"url" => go()->getSettings()->URL
 		]);
+		$this->config = [
+			'decimals' => 2,
+			'decimalSeparator' => go()->getSettings()->defaultDecimalSeparator,
+			'thousandsSeparator' => go()->getSettings()->defaultThousandSeparator,
+			'dateFormat' => go()->getSettings()->defaultDateFormat
+		];
+
+
 	}
 
 	private $_currentUser;

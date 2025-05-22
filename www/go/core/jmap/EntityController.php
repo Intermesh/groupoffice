@@ -244,7 +244,7 @@ abstract class EntityController extends Controller {
 	}
 
   /**
-   * Handles the Foo entity's  "getFooList" command
+   * Handles the Foo entity's  "Foo\query" command
    *
    * @param array $params
    * @return ArrayObject

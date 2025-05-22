@@ -41154,7 +41154,7 @@ Ext.form.DateField = Ext.extend(Ext.form.TriggerField,  {
              return errors;
         }
 
-        var svalue = value;
+				var svalue = Ext.util.Format.htmlEncode(value);
         value = this.parseDate(value);
         if (!value) {
             errors.push(String.format(this.invalidText, svalue, this.format));

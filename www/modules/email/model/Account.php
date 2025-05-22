@@ -341,7 +341,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 			}
 		}
 		
-		return $decrypted ? $decrypted : $this->password;
+		return $decrypted;
 	}
 
 	public function decryptSmtpPassword(){
@@ -359,7 +359,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 			}
 		}
 		
-		return $decrypted ? $decrypted : $this->smtp_password;
+		return $decrypted;
 	}
 
 	/**

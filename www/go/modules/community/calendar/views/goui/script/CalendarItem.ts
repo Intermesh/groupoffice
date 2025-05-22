@@ -24,6 +24,7 @@ export interface CalendarEvent extends BaseEntity {
 	alerts?: any
 	showWithoutTime?: boolean // isAllDay
 	duration: string
+	privacy: 'public' | 'private' | 'secret'
 	start: string
 	timeZone:Timezone
 	title: string
@@ -58,7 +59,9 @@ interface CalendarItemConfig {
 /**
  * This is the ViewModel for items displaying in the calendar.
  * For now, they can be generated from the CalendarEvent model.
- * Because if recurrence (and overridden) 1 CalendarEvent may return multiple items
+ * With recurrence (and overrides) 1 CalendarEvent may return multiple items
+ * Other items like tasks and birthdays can also generate calendar items for display
+ * Items are generated in the CalendarAdapter class
  */
 export class CalendarItem {
 
@@ -262,10 +265,10 @@ export class CalendarItem {
 		}
 	}
 
-	open(onCancel?: Function) {
+	async open(onCancel?: Function) {
 
 		const internalOpen = () => {
-			const dlg = !this.isOwner ? new EventDetailWindow() : new EventWindow();
+			const dlg = !this.mayChange ? new EventDetailWindow() : new EventWindow();
 			if (dlg instanceof EventWindow) {
 				dlg.on('close', () => {
 					// cancel ?
@@ -281,39 +284,48 @@ export class CalendarItem {
 
 			return dlg;
 		}
+
+		if(!calendarStore.loaded) {
+			await calendarStore.load();
+		}
 		const cals = calendarStore.all()
 		if(!cals.length) {
-			const w = win({
-				title: t('No writeable calendars'),
-				width: 520
-			},
-				comp({cls:'pad',html:t('There are no calendars to add an appointment.')+'<br>'+t('Subscribe to an existing calendar or create a personal calendar.')}),
-				tbar({},
-					btn({text: t('Show calendars')+'...',handler:()=>{
-						const d = new SubscribeWindow();
-						d.show();
-						w.close();
-						if(onCancel) onCancel();
-					}}),
-					btn({text: t('Create personal calendar'), handler:() => {
-						client.jmap("Calendar/first", {}, 'pFirst').then(r => {
-							calendarStore.reload().then(r2 => {
-								this.data.calendarId = r.calendarId;
-								internalOpen();
-							});
-
-						}).catch(r => {
-							Window.error(r.message);
+			return new Promise(resolve => {
+				const w = win({
+					title: t('No writeable calendars'),
+					width: 520
+				},
+					comp({cls:'pad',html:t('There are no calendars to add an appointment.')+'<br>'+t('Subscribe to an existing calendar or create a personal calendar.')}),
+					tbar({},
+						btn({text: t('Show calendars')+'...',handler:()=>{
+							const d = new SubscribeWindow();
+							d.show();
+							w.close();
 							if(onCancel) onCancel();
-						});
-						w.close();
-					}})
-				)
-			);
-			w.show();
+						}}),
+						btn({text: t('Create personal calendar'), handler:() => {
+							client.jmap("Calendar/first", {}, 'pFirst').then(r => {
+								calendarStore.reload().then(r2 => {
+									this.data.calendarId = r.calendarId;
+									resolve(internalOpen());
+								});
+
+							}).catch(r => {
+								Window.error(r.message);
+								if(onCancel) onCancel();
+							});
+							w.close();
+						}})
+					)
+				);
+				w.show();
+			})
 
 		} else {
-			internalOpen();
+			if(!this.data.calendarId) {
+				this.data.calendarId = client.user.calendarPreferences.defaultCalendarId;
+			}
+			return internalOpen();
 		}
 	}
 
@@ -376,6 +388,10 @@ export class CalendarItem {
 
 	get isOwner() {
 		return !this.participants || this.calendarPrincipal?.roles?.owner || false;
+	}
+
+	get mayChange() {
+		return this.isOwner && this.cal.myRights.mayWriteAll;
 	}
 
 	get calendarPrincipal() {
@@ -669,6 +685,8 @@ export class CalendarItem {
 	}
 
 	remove() {
+		if(!this.mayChange)
+			return;
 		if(!this.isRecurring) {
 			this.confirmScheduleMessage(false, () => {
 				eventDS.destroy(this.data.id);

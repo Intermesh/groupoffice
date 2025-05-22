@@ -408,146 +408,114 @@ GO.jsonAuthHandler = function(json, callback, scope)
 //store. If you pass a store it will automatically reload it with the params
 //it will reload with a callback that will check for deleteSuccess in the json reponse. If it
 //failed it will display deleteFeedback
-GO.deleteItems = function(config)
-{	
-	config.extraWarning=config.extraWarning || "";
-	switch(config.count)
-	{
+GO.deleteItems = function (config) {
+	config.extraWarning = config.extraWarning || "";
+	switch (config.count) {
 		case 0:
 			alert(t("You didn't select an item."));
 			return false;
-		
+
 		case 1:
-			var strConfirm = config.extraWarning+t("Are you sure you want to delete the selected item?");
-		break;
-		
+			var strConfirm = config.extraWarning + t("Are you sure you want to delete the selected item?");
+			break;
+
 		default:
 			var template = new Ext.Template(
-		    	config.extraWarning+t("Are you sure you want to delete the {count} items?")
+				config.extraWarning + t("Are you sure you want to delete the {count} items?")
 			);
-			var strConfirm = template.applyTemplate({'count': config.count});						
-		break;						
+			var strConfirm = template.applyTemplate({'count': config.count});
+			break;
 	}
 
-	if(config.noConfirmation || confirm(strConfirm)){
-		
-		if(config.maskEl){
+	if (config.noConfirmation || confirm(strConfirm)) {
+
+		if (config.maskEl) {
 			config.maskEl.mask(t("Delete"));
 		}
-		
-		if(config.store)
-		{
+
+		if (config.store) {
 			//add the parameters
-			for(var param in config.params)
-			{
-				config.store.baseParams[param]=config.params[param];
+			for (var param in config.params) {
+				config.store.baseParams[param] = config.params[param];
 			}
-			
+
 			var params = {};
-			
-			if(config.store.lastOptions && config.store.lastOptions.params && config.store.lastOptions.params.start)
-				params.start=config.store.lastOptions.params.start;
-			
-			
-						
+
+			if (config.store.lastOptions && config.store.lastOptions.params && config.store.lastOptions.params.start) {
+				params.start = config.store.lastOptions.params.start;
+			}
+
 			config.store.load({
 				params: params,
-				callback: function(){
-					
-					if(config.maskEl)
-						config.maskEl.unmask();	
-					
+				callback: function () {
+
+					if (config.maskEl) {
+						config.maskEl.unmask();
+					}
+
 					var callback;
-					if(!this.reader.jsonData.deleteSuccess)
-					{
-						if(config.failure)
-						{
+					if (!this.reader.jsonData.deleteSuccess) {
+						if (config.failure) {
 							callback = config.failure.createDelegate(config.scope);
 							callback.call(config.scope, config);
 						}
-						Ext.MessageBox.alert(t("Error"),this.reader.jsonData.deleteFeedback);
-//						alert( this.reader.jsonData.deleteFeedback);
-					}else
-					{
-						if(config.success)
-						{
+						Ext.MessageBox.alert(t("Error"), this.reader.jsonData.deleteFeedback);
+					} else {
+						if (config.success) {
 							callback = config.success.createDelegate(config.scope);
 							callback.call(config.scope, config);
 						}
 					}
-					
-					if(config.callback)
-					{
+
+					if (config.callback) {
 						callback = config.callback.createDelegate(config.scope);
 						callback.call(this, config);
-					}	
-					
-					
-					if(config.grid && typeof(config.grid.selectNextAfterDelete)=="function"){
-	
-						config.grid.selectNextAfterDelete(config.selectRecordAfterDelete);
-						
-//						if(!GO.util.empty(config.selectRecordAfterDelete)){
-//							
-//						} else {
-//							config.grid.selectNextAfterDelete();
-//						}
 					}
-					
-				}
-			}
-			);
-			
-			//remove the delete params
-			for(var param in config.params)
-			{					
-				delete config.store.baseParams[param];					
-			}
-			
-			
-		}else
-		{
 
+
+					if (config.grid && typeof (config.grid.selectNextAfterDelete) == "function") {
+						config.grid.selectNextAfterDelete(config.selectRecordAfterDelete);
+					}
+				}
+			});
+
+			//remove the delete params
+			for (var param in config.params) {
+				delete config.store.baseParams[param];
+			}
+		} else {
 			Ext.Ajax.request({
 				url: config.url,
 				params: config.params,
-				callback: function(options, success, response)
-				{
-					if(config.maskEl)
-						config.maskEl.unmask();	
-					
+				callback: function (options, success, response) {
+					if (config.maskEl) {
+						config.maskEl.unmask();
+					}
+
 					var callback;
-					
+
 					var responseParams = Ext.decode(response.responseText);
-					if(!responseParams.success)
-					{
-						if(config.failure)
-						{
+					if (!responseParams.success) {
+						if (config.failure) {
 							callback = config.failure.createDelegate(config.scope);
 							callback.call(this, responseParams);
 						}
-//						alert( responseParams.feedback);
-						Ext.MessageBox.alert(t("Error"),responseParams.feedback);
-					}else
-					{
-						if(config.success)
-						{
+						Ext.MessageBox.alert(t("Error"), responseParams.feedback);
+					} else {
+						if (config.success) {
 							callback = config.success.createDelegate(config.scope);
 							callback.call(this, responseParams);
 						}
 					}
-					
-					if(config.callback)
-					{
+
+					if (config.callback) {
 						callback = config.callback.createDelegate(config.scope);
 						callback.call(this, responseParams);
 					}
 				}
-							
 			});
-		}	
+		}
 	}
-	
 }
 
 GO.util.unlocalizeNumber = function (number, decimal_separator, thousands_separator)

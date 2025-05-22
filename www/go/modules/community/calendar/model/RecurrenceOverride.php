@@ -172,7 +172,7 @@ class RecurrenceOverride extends Property
 		return $this->props->$name;
 	}
 
-	public function toArray(array $properties = null): array|null
+	public function toArray(array|null $properties = null): array|null
 	{
 		if(empty($this->props)) return null;
 		return json_decode($this->patch,true);

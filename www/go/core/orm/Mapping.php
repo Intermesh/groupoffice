@@ -91,7 +91,7 @@ class Mapping {
 	 *   ['type' => "foo"] then you can set it with this parameter.
 	 * @return $this
 	 */
-	public function addTable(string $name, string $alias = null, array $keys = null, array $columns = null, array $constantValues = []): Mapping
+	public function addTable(string $name, string|null $alias = null, array|null $keys = null, array|null $columns = null, array $constantValues = []): Mapping
 	{
 		if(!$alias) {
 			$alias = $name;
@@ -101,7 +101,7 @@ class Mapping {
 	}
 
 
-	private function internalAddTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = [], bool $isUserTable = false) {
+	private function internalAddTable(string $name, string $alias, array|null $keys = null, array|null $columns = null, array $constantValues = [], bool $isUserTable = false) {
 		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues,  $isUserTable);
 		$this->tables[$name]->dynamic = $this->dynamic;
 		foreach($this->tables[$name]->getMappedColumns() as $col) {
@@ -130,7 +130,7 @@ class Mapping {
    * @param string[] $constantValues
    * @return Mapping
    */
-	public function addUserTable(string $name, string $alias, array $keys = null, array $columns = null, array $constantValues = [], $required = false): Mapping
+	public function addUserTable(string $name, string $alias, array|null $keys = null, array|null $columns = null, array $constantValues = [], $required = false): Mapping
 	{
 		$table = $this->internalAddTable($name, $alias, $keys, $columns, $constantValues, true);
 		$table->required = $required;

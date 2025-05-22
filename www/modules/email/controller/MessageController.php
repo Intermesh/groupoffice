@@ -34,6 +34,8 @@ use go\modules\community\calendar\model\Scheduler;
 class MessageController extends \GO\Base\Controller\AbstractController
 {
 
+	private string $_tmpDir;
+
 	protected function allowGuests()
 	{
 		return array("mailto");

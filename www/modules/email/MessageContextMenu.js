@@ -212,6 +212,7 @@ GO.email.MessageContextMenu = Ext.extend(Ext.menu.Menu, {
 			,'-',{
 				iconCls: 'ic-add',
 				text: t("Add senders to...", "email"),
+				hideOnClick:false,
 				menu: {
 					items: addSendersItems
 				},
@@ -219,6 +220,7 @@ GO.email.MessageContextMenu = Ext.extend(Ext.menu.Menu, {
 			},{
 				iconCls: 'ic-delete',
 				text: t("Delete senders from...", "email"),
+				hideOnClick:false,
 				menu: {
 					items: deleteSendersItems
 				},
@@ -247,6 +249,7 @@ GO.email.MessageContextMenu = Ext.extend(Ext.menu.Menu, {
 				iconCls: 'ic-save',
 				text:t("Save as"),
 				menu:this.saveAsMenu,
+				hideOnClick:false,
 				multiple:true
 			});
 		}
@@ -280,6 +283,7 @@ GO.email.MessageContextMenu = Ext.extend(Ext.menu.Menu, {
 			this.contextMenuLabels = new Ext.menu.Item ({
 				iconCls: 'ic-label',
 				text: t("Labels", "email"),
+				hideOnClick:false,
 				menu: this.labelsContextMenu = new GO.menu.JsonMenu({
 					id: 'email-messages-labels-menu',
 					store: new GO.data.JsonStore({

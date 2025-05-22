@@ -450,11 +450,10 @@ $timeMargin: dp(72);
 			border-right: 1px solid var(--fg-divider);
 		}
 	}
-	> ul { //header + all-day
+	> ul { //header
 		display: flex;
 		scrollbar-gutter: stable;
 		overflow-y:auto;
-		max-height: dp(212); // x all-day events fit
 		border-bottom: 2px solid $colorBorder;
 		&:first-child { // header
 			@extend %weekhead;
@@ -464,7 +463,7 @@ $timeMargin: dp(72);
 			background-color:$surfaceLowest;
 			flex-shrink: 0;
 			overflow-x: hidden;
-			max-height: dp(212); // x all-day events fit
+			max-height: 30%; // x all-day events fit
 			min-height:dp(32);
 			border-bottom: 2px solid $colorLine;
 		}

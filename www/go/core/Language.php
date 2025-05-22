@@ -226,10 +226,10 @@ class Language {
 	 * @see App::t() For shorter access
 	 *
 	 * @param string $str String to translate
-	 * @param ?string $package The module package name. Defaults to {@see Language::$defaultPackage}
-	 * @param string|array|null $module Name of the module. Defaults to {@see Language::$defaultModule}
+	 * @param string|null $package The module package name. Defaults to {@see Language::$defaultPackage}
+	 * @param string|null $module Name of the module. Defaults to {@see Language::$defaultModule}
  */
-	public function t(string $str, ?string $package = null, ?string $module = null) {
+	public function t(string $str, string|null $package = null, string|null $module = null) {
 
 		if($package == null) {
 			$package = $this->defaultPackage;

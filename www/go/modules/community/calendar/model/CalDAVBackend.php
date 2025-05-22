@@ -61,7 +61,7 @@ class CalDAVBackend extends AbstractBackend implements
 				'{urn:ietf:params:xml:ns:caldav}calendar-timezone' => "BEGIN:VCALENDAR\r\n" . $tz->serialize() . "END:VCALENDAR",
 				'{urn:ietf:params:xml:ns:caldav}supported-calendar-component-set' => new CalDAV\Xml\Property\SupportedCalendarComponentSet(['VEVENT']),
 				// free when calendar does not belong to the user
-				'{urn:ietf:params:xml:ns:caldav}schedule-calendar-transp' => new CalDAV\Xml\Property\ScheduleCalendarTransp($calendar->ownerId == $u->id ? 'opaque' : 'transparent'),
+				'{urn:ietf:params:xml:ns:caldav}schedule-calendar-transp' => new CalDAV\Xml\Property\ScheduleCalendarTransp($calendar->getOwnerId() == $u->id ? 'opaque' : 'transparent'),
 
 				'{http://calendarserver.org/ns/}getctag' => 'GroupOffice/calendar/'.self::VERSION.'/'.$calendar->highestItemModSeq(),
 				//'{http://calendarserver.org/ns/}subscribed-strip-todos' => '0',
@@ -70,7 +70,7 @@ class CalDAVBackend extends AbstractBackend implements
 				'{http://sabredav.org/ns}sync-token' => self::VERSION.'-'.$calendar->highestItemModSeq(),
 				'share-resource-uri' => '/ns/share/'.$uri,
 				// 1 = owner, 2 = readonly, 3 = readwrite
-				'share-access' => $calendar->getPermissionLevel() == Acl::LEVEL_MANAGE ? 1 : ($calendar->getPermissionLevel() >= Acl::LEVEL_WRITE ? 3 : 2),
+				'share-access' => $calendar->getPermissionLevel() == Acl::LEVEL_MANAGE ? 1 : (($calendar->getPermissionLevel() >= Acl::LEVEL_WRITE && empty($calendar->webcalUri)) ? 3 : 2),
 			];
 		}
 		$tasklists = TaskList::find()->where(['isSubscribed'=>1, 'role'=>1])
@@ -118,9 +118,9 @@ class CalDAVBackend extends AbstractBackend implements
 			$type = $properties[$sccs]->getValue();
 		}
 		$transp = '{urn:ietf:params:xml:ns:caldav}schedule-calendar-transp';
-		if (isset($properties[$transp])) {
-			$ownerId = $properties[$transp]->getValue() === 'transparent' ? null : go()->getUserId();
-		}
+
+		$ownerId = isset($properties[$transp]) && $properties[$transp]->getValue() === 'transparent' ? null : go()->getUserId();
+
 		$values = ['ownerId' => $ownerId];
 		foreach ($this->propertyMap as $xmlName => $dbName) {
 			if (isset($properties[$xmlName])) {
@@ -259,7 +259,8 @@ class CalDAVBackend extends AbstractBackend implements
 		switch($type) {
 			case 'c': // calendar
 				$component = 'vevent';
-				$object = CalendarEvent::find()->where(['cce.calendarId'=> $id, 'eventdata.uri'=>$objectUri])->single();
+				$q = CalendarEvent::find()->filter(['hideSecret'=>1])->where(['cce.calendarId'=> $id, 'eventdata.uri'=>$objectUri]);
+				$object = $q->single();
 				break;
 			case 't': // tasklist
 				$component = 'vtodo';
@@ -281,7 +282,6 @@ class CalDAVBackend extends AbstractBackend implements
 			$data = $blob->getFile()->getContents();
 		} catch(\Exception$e) {
 			ErrorHandler::logException($e);
-			$object->vcalendarBlobId = null;
 			$blob = $object->icsBlob();
 			$data = $blob->getFile()->getContents();
 		}
@@ -575,7 +575,6 @@ class CalDAVBackend extends AbstractBackend implements
 		$userId = User::find()->selectSingleValue("id")->where('username', '=', $username)->single();
 
 		$event = CalendarEvent::find()
-			->join('calendar_calendar', 'cal', 'cal.id=cce.calendarId')
 			->select('cce.calendarId, uri')
 			->where(['uid' => $uid, 'cal.ownerId'=>$userId])
 			->fetchMode(\PDO::FETCH_OBJ)

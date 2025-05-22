@@ -159,60 +159,66 @@ $updates['202402221543'][] = function(){ // migrate recurrence rules and fix las
 };
 
 //delete empty event folders
-$updates['202403121146'][] = "DELETE f FROM fs_folders f
+$updates['202403121146'][] = function() {
+	if(go()->getModule(null, "files")) {
+		go()->getDbConnection()->exec("DELETE f FROM fs_folders f
 	LEFT JOIN fs_files fi ON fi.folder_id = f.id
 	LEFT JOIN fs_folders ff ON ff.parent_id = f.id
 	WHERE 
 		 fi.folder_id IS NULL 
 		 AND ff.parent_id IS NULL
-		 AND f.id IN (SELECT files_folder_id FROM cal_events);";
+		 AND f.id IN (SELECT files_folder_id FROM cal_events);");
 
-// unset files id of event with folders that no longer exist
-$updates['202403121146'][] = "UPDATE cal_events e 
+		go()->getDbConnection()->exec("UPDATE cal_events e 
    LEFT JOIN fs_folders f on e.files_folder_Id = f.id
    SET files_folder_id = 0
-   WHERE e.files_folder_id != 0 AND f.id IS NULL";
+   WHERE e.files_folder_id != 0 AND f.id IS NULL");
 
 
-$updates['202403121146'][] = function(){ // migrate files to blob and add as calendar_link
-	$pdo = go()->getDbConnection()->getPDO();
-	$stmt = go()->getDbConnection()->query("SELECT e.id, FROM_UNIXTIME(e.start_time, '%Y') as year, e.name, cal.name as calendarName, e.files_folder_id FROM cal_events e JOIN cal_calendars cal ON calendar_id = cal.id  WHERE e.files_folder_id != 0;");
-	$filesStmt = $pdo->prepare("SELECT id, name FROM fs_files WHERE folder_id = ?");
-	$foldersStmt = $pdo->prepare("SELECT id, name FROM fs_folders WHERE parent_id = ?");
-	$insertLinkStmt = $pdo->prepare("INSERT INTO calendar_event_link (eventId, title, contentType,size,rel,blobId) VALUES (?, ?, ?, ?, 'enclosure', ?)");
-	function buildFilesPath($calendarName, $yearOfStartTime, $title, $id) {
+		$pdo = go()->getDbConnection()->getPDO();
+		$stmt = go()->getDbConnection()->query("SELECT e.id, FROM_UNIXTIME(e.start_time, '%Y') as year, e.name, cal.name as calendarName, e.files_folder_id FROM cal_events e JOIN cal_calendars cal ON calendar_id = cal.id  WHERE e.files_folder_id != 0;");
+		$filesStmt = $pdo->prepare("SELECT id, name FROM fs_files WHERE folder_id = ?");
+		$foldersStmt = $pdo->prepare("SELECT id, name FROM fs_folders WHERE parent_id = ?");
+		$insertLinkStmt = $pdo->prepare("INSERT INTO calendar_event_link (eventId, title, contentType,size,rel,blobId) VALUES (?, ?, ?, ?, 'enclosure', ?)");
+		function buildFilesPath($calendarName, $yearOfStartTime, $title, $id)
+		{
 
-		return 'calendar/' . File::stripInvalidChars($calendarName) . '/' . $yearOfStartTime . '/' . File::stripInvalidChars($title).' ('.$id.')';
-	}
+			return 'calendar/' . File::stripInvalidChars($calendarName) . '/' . $yearOfStartTime . '/' . File::stripInvalidChars($title) . ' (' . $id . ')';
+		}
 
-	function insertFolder($row, $folderId, $path, PDOStatement $filesStmt,$foldersStmt, $insertLinkStmt) {
-		$filesStmt->bindValue(1, $folderId);
-		$filesStmt->execute();
-		foreach($filesStmt as $fileRow) {
-			$file = new File($path . '/' . $fileRow['name']);
-			if(!$file->exists()) continue; // skip missing file. TODO: text with files
-			$blob = \go\core\fs\Blob::fromFile($file, true);
-			if($blob->save()) {
-				$insertLinkStmt->execute([$row['id'], $file->getName(), $file->getContentType(), $file->getSize(), $blob->id]);
+		function insertFolder($row, $folderId, $path, PDOStatement $filesStmt, $foldersStmt, $insertLinkStmt)
+		{
+			$filesStmt->bindValue(1, $folderId);
+			$filesStmt->execute();
+			foreach ($filesStmt as $fileRow) {
+				$file = new File($path . '/' . $fileRow['name']);
+				if (!$file->exists()) continue; // skip missing file. TODO: text with files
+				$blob = \go\core\fs\Blob::fromFile($file, true);
+				if ($blob->save()) {
+					$insertLinkStmt->execute([$row['id'], $file->getName(), $file->getContentType(), $file->getSize(), $blob->id]);
+				}
+			}
+			$foldersStmt->bindValue(1, $folderId);
+			$foldersStmt->execute();
+			foreach ($foldersStmt as $folderRow) {
+				insertFolder($row, $folderRow['id'], $path . '/' . $folderRow['name'], $filesStmt, $foldersStmt, $insertLinkStmt);
 			}
 		}
-		$foldersStmt->bindValue(1, $folderId);
-		$foldersStmt->execute();
-		foreach($foldersStmt as $folderRow) {
-			insertFolder($row, $folderRow['id'], $path.'/'.$folderRow['name'], $filesStmt,$foldersStmt, $insertLinkStmt);
+
+		;
+
+		while ($row = $stmt->fetch()) {
+			$path = GO::config()->file_storage_path . buildFilesPath($row['calendarName'], $row['year'], $row['name'], $row['id']);
+			insertFolder($row, $row['files_folder_id'], $path, $filesStmt, $foldersStmt, $insertLinkStmt);
 		}
-	};
 
-
-
-	while($row = $stmt->fetch()) {
-		$path = GO::config()->file_storage_path.buildFilesPath($row['calendarName'], $row['year'], $row['name'], $row['id']);
-		insertFolder($row, $row['files_folder_id'], $path, $filesStmt,$foldersStmt, $insertLinkStmt);
+		unset($insertFolder, $filesStmt, $foldersStmt, $insertLinkStmt, $pdo, $stmt);
 	}
-
-	unset($insertFolder, $filesStmt,$foldersStmt, $insertLinkStmt, $pdo, $stmt);
 };
 
+// unset files id of event with folders that no longer exist
+$updates['202403121146'][] = ""; // empty by reason
+$updates['202403121146'][] = "";
 
 
 $updates['202404071212'][] = "update core_entity set clientName = 'CalendarCategory' where name = 'Category' and moduleId = (select id from core_module where name ='calendar' and package='community')";
@@ -243,7 +249,7 @@ $updates['202404071212'][] = function() {
 // after timezone conversion make all full day event floating-time
 $updates['202404071212'][] = "UPDATE calendar_event SET timeZone = NULL WHERE showWithoutTime = 1;";
 // remove orphan categories
-$updates['202502261353'][] = "DELETE cat FROM calendar_category cat LEFT JOIN calendar_calendar c on c.id = cat.calendarId WHERE c.id IS NULL;";
+$updates['202502261353'][] = "DELETE cat FROM calendar_category cat LEFT JOIN calendar_calendar c on c.id = cat.calendarId WHERE c.id IS NOT NULL;";
 // fix: set duration at 1 hour if duration is negative
 $updates['202503101510'][] = "UPDATE calendar_event SET duration = 'PT1H' WHERE duration LIKE 'PT-%';";
 $updates['202503111342'][] = function(){
@@ -259,5 +265,27 @@ $updates['202503131043'][] = "UPDATE core_link l
 	JOIN core_entity et ON et.id = l.toEntityTypeId
 	JOIN calendar_calendar_event e on e.eventId = l.toId AND et.name = 'CalendarEvent'
 	SET l.toId = e.id;";
+// fixed missing global calendars because it had calendar_id=0 in the old database
+$updates['202504070955'][] = "";
+
+$updates['202504071345'][] = "ALTER TABLE `calendar_event` CHANGE COLUMN `location` `location` TEXT NULL;";
+// replace existing resource into core_participants
+$updates['202504150919'][] = 'REPLACE INTO core_principal (id, name, email, type, description, timeZone, entityTypeId, entityId, aclId)
+SELECT concat("Calendar:", c.id), c.name, u.email, "resource", IFNULL(c.description, ""), c.timeZone, (select id from core_entity where name="Calendar"),  c.id, c.aclId from calendar_calendar c
+  JOIN calendar_resource_group rg ON c.groupId = rg.id
+  JOIN core_user u ON u.id = rg.defaultOwnerId 
+  WHERE c.groupId IS NOT NULL AND rg.defaultOwnerId IS NOT NULL;';
+// set the participant id to the user id if the participant is an existing groupoffice user
+$updates["202504150959"][] = "UPDATE calendar_participant p INNER JOIN core_user u ON u.email = p.email COLLATE utf8mb4_unicode_ci AND p.id != u.id SET p.id = u.id WHERE kind = 'individual';";
+
+$updates["202505011057"][] = "DELETE `a`
+FROM `calendar_calendar_event` AS `a`, `calendar_calendar_event` AS `b`
+WHERE `a`.`id` < `b`.`id`
+    AND `a`.`eventId` <=> `b`.`eventId`
+    AND `a`.`calendarId` <=> `b`.`calendarId`;";
+$updates["202505011057"][] = "ALTER TABLE `calendar_calendar_event` ADD UNIQUE INDEX `event_once_per_calendar` (`eventId` ASC, `calendarId` ASC);";
+
+$updates["202505061137"][] = "ALTER TABLE `calendar_event` ADD INDEX `fk_calendar_event_uid_index` (`uid` ASC);";
+$updates["202505071158"][] = "ALTER TABLE `calendar_calendar` ADD COLUMN `webcalUri` VARCHAR(512) NULL DEFAULT NULL AFTER `timeZone`;";
 
 // TODO: calendar views -> custom filters
