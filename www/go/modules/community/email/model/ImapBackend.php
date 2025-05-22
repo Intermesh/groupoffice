@@ -2,6 +2,7 @@
 
 namespace go\modules\community\email\model;
 
+use go\core\db\Query;
 use go\core\mail;
 
 class ImapBackend {
@@ -76,6 +77,9 @@ class ImapBackend {
 	 * When the adapter is fetching mail do not syncback to the server. we are in reading mode
 	 */
 	private $isFetching = false;
+	public function isFetching() {
+		return $this->isFetching;
+	}
 
 	private EmailAccount $account;
 
@@ -102,9 +106,9 @@ class ImapBackend {
 				throw new \RuntimeException('Imap Authentication failed');
 			}
 		}
-		if(self::$instance->isFetching) { // todo: remove when imap update goes before local
-			return false; // dont sync back
-		}
+//		if(self::$instance->isFetching) { // todo: remove when imap update goes before local
+//			return false; // dont sync back
+//		}
 		return self::$instance;
 	}
 
@@ -284,6 +288,10 @@ class ImapBackend {
 		return $uid ? $mime : false;
 	}
 
+	public function copy($mailbox,$uid) {
+		$this->imap->copy($mailbox,$uid,null,true);
+	}
+
 	public function setFlags($keywords, $uid) {
 		$addflags = [];
 		$removeflags = [];
@@ -333,9 +341,9 @@ class ImapBackend {
 	 * slow resync (but check for condstore)
 	 * enhance: send both command (dont wait for response)
 	 */
-	public function sync($mailboxId) {
+	public function fetchChanges($mailboxId) {
 		$this->isFetching = true;
-		$mailbox = Mailbox::find()->where(['id' => $mailboxId])->fetch();
+		$mailbox = Mailbox::findById($mailboxId);
 		$imailbox = $this->imap->examine($mailbox->name);
 
 		// TODO: imailbox could be deleted
@@ -355,11 +363,12 @@ class ImapBackend {
 		}
 
 		// If CONDSTORE extension, only fetch new flags
-		$capabilities = $this->service->capabilities;
+		$capabilities = $this->account->mdaCapabilities();
 		$vanished = [];
-		if(in_array('CONDSTORE',$capabilities)) {
+		if(in_array('CONDSTORE', $capabilities)) {
 			$this->imap->sendRequest('ENABLE QRESYNC'); // CHUCK NORRIS
 			$response = $this->imap->fetch(['FLAGS', 'UID'], 1, $mailbox->uidnext(), true, ['CHANGEDSINCE '.$mailbox->highestModSeq(). ' VANISHED']); // new
+			$existingFlags = [];
 			foreach($response as $k => $v) {
 				if($v === null) {
 					if(strpos($k, ':')) {
@@ -377,10 +386,11 @@ class ImapBackend {
 			//$uids = $this->imap->search(['ALL'], true);
 			// delete all mail not in UIDs
 			if(!empty($vanished)) {
-				go()->getDbConnection()->delete('email_email')
+				go()->getDbConnection()->delete('email_email', (new Query)
 					->join('email_map', 'fk = id', 'left')
 					->where("mailboxId = $mailbox->id")
-					->andWhereIn('uid', $vanished)->execute();
+					->andWhere('uid', 'IN', $vanished))
+					->execute();
 			}
 		} else if($syncable) {
 			$existingFlags = $this->imap->fetch(['FLAGS', 'UID'], 1, $mailbox->uidnext(), true); // all
@@ -391,19 +401,22 @@ class ImapBackend {
 		foreach($newMails as $item) {
 			$email = $this->parseIndexedFields($item);
 			if($email->save()){
-				$newMailIds[] = $email->id;
+				$newMailIds[] = [$email->id,$mailbox->id];
 			}
 		}
-		go()->getDbConnection()->insert('email_map', ['fk'], $newMailIds, ['mailboxId' => $mailbox->id]);
+		if(!empty($newMailIds))
+			go()->getDbConnection()->insert('email_map', $newMailIds, ['fk', 'mailboxId'])->execute();
 
 
 		// TODO flags and expunged when no CONDSTORE extension available
 		//$localUids = Email::find()->fetchKeyPair('uid', 'id');
 		foreach($existingFlags as $change) {
 			// update flag
-			go()->getDbConnection()->update('email_email')
-				->set(['keywords' => json_encode($this->readFlags($change['FLAGS'], $hasAtt))])
-				->where(['uid' => $change['UID']])->exec();
+			go()->getDbConnection()->update(
+				'email_email',
+				['keywords' => json_encode($this->readFlags($change['FLAGS'], $hasAtt))],
+				(new Query())->where(['uid' => $change['UID']])
+			)->execute();
 		}
 
 		// update mailbox highestmodseq
@@ -617,7 +630,7 @@ class ImapBackend {
 	private function readFlags($flags, &$hasAttachment)
 	{
 		$keywords = [];
-
+		go()->debug($flags);
 		foreach ($flags as $value) {
 			if (isset(self::$knownFlags[$value])) {
 				if (self::$knownFlags[$value] !== false) {

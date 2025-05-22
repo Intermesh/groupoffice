@@ -67,12 +67,13 @@ class EmailAccount extends EntityController {
 		}
 	}
 
-	public function sync($params) {
+	public function update($params) {
 
 		$account = model\EmailAccount::findById($params['accountId']);
 		$backend = $account->connect();
 		if ($backend) {
-			return $backend->sync($params['mailboxId']);
+			return $backend->fetchChanges($params['mailboxId']);
 		}
+		return ['success'=>true, 'feedback'=> 'no backend'];
 	}
 }

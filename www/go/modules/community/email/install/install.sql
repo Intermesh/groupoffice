@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS `email_account` (
 	`lowestModSeq` BIGINT NOT NULL DEFAULT 1,
 	`mtaDsn` MEDIUMTEXT NOT NULL,
 	`mdaDsn` MEDIUMTEXT NOT NULL,
+	`mdaCapabilities` MEDIUMTEXT NOT NULL,
 	`modifiedAt` DATETIME NULL,
 	`createdAt` DATETIME NOT NULL,
 	`aclId` INT NOT NULL,

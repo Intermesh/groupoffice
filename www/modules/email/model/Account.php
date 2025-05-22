@@ -390,7 +390,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 		if (!go()->getModule('community', 'oauth2client')) {
 			return;
 		}
-		$accountEntity = \go\modules\community\email\model\Account::findById($this->id);
+		$accountEntity = \go\modules\community\email\model\EmailAccount::findById($this->id);
 		if ($acctSettings = $accountEntity->oauth2_account) {
 			if (!$acctSettings->refreshToken || !$acctSettings->expires) {
 				go()->debug("The new refresh token needs to be generated.");
@@ -420,7 +420,7 @@ class Account extends \GO\Base\Db\ActiveRecord
 		$token = null;
 		$auth = 'plain';
 		if(!$this->isNew() && go()->getModule('community', 'oauth2client')) {
-			$acct = \go\modules\community\email\model\Account::findById($this->id);
+			$acct = \go\modules\community\email\model\EmailAccount::findById($this->id);
 			$acctSettings = $acct->oauth2_account;
 			if($acctSettings) {
 

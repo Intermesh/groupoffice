@@ -69,12 +69,12 @@ export class MailCtlr {
 		return cmp;
 	}
 
-	static flag(ids: string[], name: string, on: true|null) {
-		const s = $.db.store('Email');
-		for(const id of ids) {
-			s.update(id, {['keywords/'+name]:on});
+	static flag(rows: any[], name: string, on: true|null) {
+		const s = jmapds('Email');
+		for(const row of rows) {
+			s.update(row.id, {['keywords/'+name]: on ?? !row.record.keywords[name]});
 		}
-		s.commit();
+		//s.commit();
 	}
 
 	// actions

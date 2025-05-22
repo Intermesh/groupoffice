@@ -12,7 +12,7 @@ use GO\Email\Controller\AccountController;
 use GO\Email\Controller\MessageController;
 use GO\Email\Model\Account as ActiveRecordAccount;
 use GO\Email\Model\Alias;
-use go\modules\community\email\model\Account;
+use go\modules\community\email\model\EmailAccount;
 use go\modules\community\oauth2client\model\Oauth2Client;
 use go\modules\community\oauth2client\model\Authenticator;
 use go\modules\community\oauth2client\model\DefaultClient;
@@ -91,7 +91,7 @@ class Module extends core\Module
 
 	public function defineListeners()
 	{
-		Account::on(Property::EVENT_MAPPING, static::class, 'onMap');
+		EmailAccount::on(Property::EVENT_MAPPING, static::class, 'onMap');
 		CSP::on(Csp::EVENT_CREATE, static::class, 'onCspCreate');
 		core\App::on(core\App::EVENT_HEAD, static::class, 'onHead');
 	}
@@ -123,7 +123,7 @@ class Module extends core\Module
 	public static function loadAccountSettings($self, array &$response, ActiveRecordAccount &$model, array &$params)
 	{
 		$id = $model->id;
-		$acct = Account::findById($id);
+		$acct = EmailAccount::findById($id);
 		if ($acct && $acct->oauth2_account) {
 			$model->checkImapConnectionOnSave = false;
 			$response['data']['oauth2_client_id'] = $acct->oauth2_account->oauth2ClientId;
@@ -143,7 +143,7 @@ class Module extends core\Module
 	public static function saveAccountSettings(AccountController $self, array &$response, ActiveRecordAccount &$model, array $params, array $modifiedAttributes)
 	{
 		if (isset($params['oauth2_client_id']) && intval($params['oauth2_client_id']) > 0) {
-			$acct = Account::findById($response['id']);
+			$acct = EmailAccount::findById($response['id']);
 			$oauth2_account = $acct->oauth2_account;
 			if(empty($oauth2_account)) {
 				go()->getDbConnection()->insert('oauth2client_account', [
@@ -174,7 +174,7 @@ class Module extends core\Module
 	 */
 	public static function beforeSend(MessageController $self, array $response, \GO\Base\Mail\SmimeMessage &$message,
 	                                  \GO\Base\Mail\Mailer &$mailer , ActiveRecordAccount $activeRecordAccount, Alias $alias, array $params) {
-		$account = Account::findById($activeRecordAccount->id); // Need the JMAP entity for this!
+		$account = EmailAccount::findById($activeRecordAccount->id); // Need the JMAP entity for this!
 		if ($acctSettings = $account->oauth2_account) {
 			$client = Oauth2Client::findById($acctSettings->oauth2ClientId);
 			$tokenParams = [

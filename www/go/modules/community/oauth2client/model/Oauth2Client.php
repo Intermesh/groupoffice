@@ -6,7 +6,7 @@ use go\core\exception\NotFound;
 use go\core\http\Exception;
 use go\core\jmap\Entity;
 use go\core\orm\Mapping;
-use go\modules\community\email\model\Account;
+use go\modules\community\email\model\EmailAccount;
 use go\modules\community\oauth2client\provider\Azure;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Google;
@@ -142,12 +142,12 @@ final class Oauth2Client extends Entity
 	 * The token parameter expires_in is preferred over the 'expires' parameter and is calculated as the
 	 * seconds (positive or negative) since the current time.
 	 *
-	 * @param Account $account
+	 * @param EmailAccount $account
 	 * @param array $tokenParams ['refresh_token','access_token','expires_in']
 	 * @throws \Exception
 	 * @throws NotFound
 	 */
-	public function maybeRefreshAccessToken(Account $account, array $tokenParams)
+	public function maybeRefreshAccessToken(EmailAccount $account, array $tokenParams)
 	{
 		$provider = $this->getProvider();
 

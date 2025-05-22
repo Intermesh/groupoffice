@@ -8,7 +8,7 @@ use go\core\http\Exception;
 use go\core\jmap\EntityController;
 use go\core\model\User;
 use go\core\webclient\Extjs3;
-use go\modules\community\email\model\Account;
+use go\modules\community\email\model\EmailAccount;
 use go\modules\community\oauth2client\model;
 use go\modules\community\oauth2client\provider\Azure;
 use League\OAuth2\Client\Provider\AbstractProvider;
@@ -170,7 +170,7 @@ final class Oauth2Client extends EntityController
 			}
 		}
 
-		$acct = Account::findById($account->id);
+		$acct = EmailAccount::findById($account->id);
 		if(empty($acct->oauth2_account)) {
 			$acct->oauth2_account = new model\Oauth2Account($acct);
 			$acct->oauth2_account->oauth2ClientId = $client->id;
@@ -202,7 +202,7 @@ final class Oauth2Client extends EntityController
 		]);
 
 		try {
-			$acct = Account::findById($accountId);
+			$acct = EmailAccount::findById($accountId);
 			$acct->oauth2_account->token = $token->getToken();
 			$acct->oauth2_account->expires = $token->getExpires();
 
@@ -259,7 +259,7 @@ final class Oauth2Client extends EntityController
 		$_SESSION['accountId'] = $accountId;
 
 		$provider = false;
-		$acct = Account::findById($accountId);
+		$acct = EmailAccount::findById($accountId);
 		if ($acctSettings = $acct->oauth2_account) {
 			$client = model\Oauth2Client::findById($acctSettings->oauth2ClientId);
 
@@ -305,7 +305,7 @@ final class Oauth2Client extends EntityController
 	 */
 	private function getProvider(int $accountId): ?AbstractProvider
 	{
-		$acct = Account::findById($accountId);
+		$acct = EmailAccount::findById($accountId);
 		if ($acctSettings = $acct->oauth2_account) {
 			$client = model\Oauth2Client::findById($acctSettings->oauth2ClientId);
 

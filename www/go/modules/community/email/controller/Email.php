@@ -33,6 +33,7 @@ class Email extends EntityController {
 	}
 
 	public function set($params) {
+
 		return $this->defaultSet($params);
 	}
 

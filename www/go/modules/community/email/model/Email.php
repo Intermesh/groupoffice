@@ -82,7 +82,7 @@ class Email extends AclItemEntity {
 	/** @var string only if not in textBody or textHtml and not `multipart/*` */
 	public $attachments;
 
-	/** @var boolean true if there is 1 attachement that is not inline or embedded */
+	/** @var boolean true if there is 1 attachment that is not inline or embedded */
 	public ?bool $hasAttachment;
 
 	/** @var string up to 255 bytes of summarising body text */
@@ -137,11 +137,12 @@ class Email extends AclItemEntity {
 		if($this->seen) $kw['$seen'] = true;
 		if($this->answered) $kw['$answered'] = true;
 		if($this->flagged) $kw['$flagged'] = true;
-		return (object)array_merge(json_decode($this->keywords,true), $kw);
+		return array_merge(json_decode($this->keywords,true), $kw);
 	}
 
+	private $kw;
 	public function setKeywords($v) {
-
+		$this->kw = $v;
 		$kw = (array)$v;
 		//set 3 indexed keywords when keywords change
 		foreach(['flagged', 'seen', 'answered'] as $indexedKeyword) {
@@ -162,6 +163,30 @@ class Email extends AclItemEntity {
 		$this->keywords = json_encode((object)$kw);
 	}
 
+	protected function internalSave(): bool
+	{
+		// when fetching from backend. We are updating our index.
+		// all other save requests go to the backend and sync back
+		if($this->backend()->isFetching())
+			return parent::internalSave();
+
+		$success = true;
+		if(!$this->isNew()) {
+			// we may only: change mailbox, set flags
+			if($this->isModified('keywords')) {
+				// compare old to new and change on backend first.
+				$success &= $this->backend()->select($this->firstMailbox())->setFlags($this->kw, $this->uid);
+			}
+			if($this->isModified('mailboxIds')) {
+				// todo
+				$success &= $this->backend()->copy('test', $this->uid);
+			}
+		}
+		foreach($this->mailboxIds as $mailboxId) {
+			$success &= $this->backend()->fetchChanges($mailboxId)['success'];
+		}
+		return $success;
+	}
 
 	static function rules(): array
 	{
@@ -281,6 +306,20 @@ class Email extends AclItemEntity {
 //		return $props;
 //	}
 
+	private $_account;
+	private function backend() {
+		if(!isset($this->_account))
+			$this->_account = EmailAccount::findById($this->accountId);
+		return $this->_account->backend();
+	}
+
+	private function firstMailbox() {
+		return Mailbox::find()
+			->join('email_map','m', 'm.mailboxId = box.id', 'LEFT')
+			->where('m.fk = '.$this->id)
+			->single();
+	}
+
 	/**
 	 * Get the body parts (only IMAP backend for now)
 	 */
@@ -290,16 +329,9 @@ class Email extends AclItemEntity {
 			return;
 		}
 		try {
-			$account = EmailAccount::findById($this->accountId);
-			$imapConnection = $account->connect();
-			$mailbox = Mailbox::find()
-				->join('email_map','m', 'm.mailboxId = box.id', 'LEFT')
-				->where('m.fk = '.$this->id)
-				->single();
-
-			list($this->_bodyStructure, $this->_bodyValues) = $imapConnection->select($mailbox->name)->fetchBody($this->uid);
-//			$this->_bodyStructure = $cmd->getBodyStructure($this, $this->uid);
-//			$this->_bodyValues = $cmd->getBodyValues($this->uid); // of previouse get structure
+			list($this->_bodyStructure, $this->_bodyValues) = $this->backend()
+				->select($this->firstMailbox()->name)
+				->fetchBody($this->uid);
 
 			$this->_htmlBody = [];
 			$this->_textBody = [];
@@ -312,6 +344,7 @@ class Email extends AclItemEntity {
 			$this->_bodyValues = ['1'=>['value'=>$e->getMessage().'<br>'.$e->getFile(). ':'.$e->getLine()]];
 		}
 		$this->bodyLoaded = true;
+
 	}
 
 	private function asText($val)

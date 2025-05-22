@@ -24,7 +24,7 @@ const listitem = function(mail) {
 		mail.keywords?.$forwarded ? E('i', 'forward').cls('small icon').css({color:'purple'}):'',
 		mail.keywords?.$flagged ? E('i', 'flag').cls('small icon').css({color:'red'}):'',
 		E('br'),
-		mail.hasAttachment ? E('i', 'paperclip').cls('small icon'):''
+		mail.hasAttachment ? E('i', 'attachment').cls('small icon'):''
 	);
 	text.el.append(
 		E('h4', DateTime.createFromFormat(mail.receivedAt)!.format('d-m-Y')).cls('right').css({float:'right'}),
@@ -65,17 +65,17 @@ export class ListView extends List {
 			}
 		};
 
-		const rowContextMenu = menu({isDropdown: true},
+		const rowContextMenu = menu({isDropdown: true, removeOnClose: false},
 			btn({icon: 'send', text: t('Send again'), handler: (btn) => { MailCtlr.resend(this.lastId).show(btn.dom); }}),
 			btn({icon: 'reply', text: t('Reply'), handler: (btn) => { MailCtlr.reply(this.lastId).show(btn.dom); }}),
 			btn({icon: 'reply_all', text: t('Reply all'), handler: (btn) => { MailCtlr.reply(this.lastId,false).show(btn.dom);}}),
 			btn({icon: 'forward', text: t('Forward'), handler: (btn) => { MailCtlr.forward(this.lastId).show(btn.dom);}}),
 			hr(),
-			btn({icon: 'mail', text: t('Mark as unread'), handler:() => { MailCtlr.flag(this.list.selectedIds, '$seen', null)}}),
+			btn({icon: 'mail', text: t('Mark as unread'), handler:() => { MailCtlr.flag(this.rowSelection!.getSelected(), '$seen', null)}}),
 			btn({icon: 'report', text: t('Move to "Spam"'), disabled: true}),
 			btn({icon: 'delete', text: t('Delete'), disabled: true}),
 			hr(),
-			btn({icon: 'flag', text: t('Flag'), handler:() => { MailCtlr.flag(this.list.selectedIds, '$flagged', true)}}),
+			btn({icon: 'flag', text: t('Flag'), handler:() => { MailCtlr.flag(this.rowSelection!.getSelected(), '$flagged', null)}}),
 			hr(),
 			btn({icon: 'archive', text: t('Archive'), disabled: true}),
 			btn({icon: 'folder_open', text: t('Move')+'...', disabled: true}),

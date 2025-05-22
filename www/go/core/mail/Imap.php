@@ -191,10 +191,11 @@ class Imap {
 		  array('foo', 'baz', 'bar', array('f\\\"oo', 'bar'));
 		 */
 		//  replace any trailing <NL> including spaces with a single space
-		$line = rtrim($line) . ' ';
+		$line = rtrim(str_replace(')(', ') (',$line)) . ' ';
 		while (($pos = strpos($line, ' ')) !== false) {
 			$token = substr($line, 0, $pos);
 			if (! strlen($token)) {
+				$line = ltrim($line, " "); // consume spaces
 				continue;
 			}
 			while ($token[0] == '(') {
@@ -203,29 +204,41 @@ class Imap {
 				$token  = substr($token, 1);
 			}
 			if ($token[0] == '"') {
-				if (preg_match('/^"((?:\\\\.|[^"\\\\])*)"\s*/', $line, $matches)) {
-					$tokens[] = stripcslashes($matches[1]);
-					$line     = substr($line, strlen($matches[0]));
-					continue;
+				$offset = strpos($line, '"')+1;
+				for ($i = $offset, $len = strlen($line); $i < $len; ++$i) {
+					if ($line[$i] === '\\') {
+						$i++;
+					} elseif ($line[$i] === '"') {
+						$tokens[] = stripcslashes(substr($line, $offset, $i-$offset)); // before quote
+						$line     = substr($line, $i+1); // minus 2 quotes
+						continue 2;
+					}
 				}
-			}
-			if ($token[0] == '{') {
+				throw new \RuntimeException('Unterminated quoted string');
+//				if (preg_match('/^\(*\"((.|\\\|\")*?)\"( |$)/', $line, $matches)) {
+//					$tokens[] = stripcslashes($matches[1]);
+//					$line     = substr($line, strlen($matches[0]));
+//					continue;
+//				}
+			} else if ($token[0] == '{') {
 				$endPos = strpos($token, '}');
 				$chars  = substr($token, 1, $endPos - 1);
-				if (is_numeric($chars)) {
-					$token = '';
-					while (strlen($token) < $chars) {
-						$token .= $this->nextLine();
-					}
-					$line = '';
-					if (strlen($token) > $chars) {
-						$line  = substr($token, $chars);
-						$token = substr($token, 0, $chars);
-					} else {
-						$line .= $this->nextLine();
-					}
+				if (ctype_digit($chars)) {
+					$token = stream_get_contents($this->socket, (int)$chars);
+					go()->log('L: '. $token);// literal
+//					while (strlen($token) < $chars) {
+//						$token .= $this->nextLine();
+//					}
+
+//					if (strlen($token) > $chars) {
+//						$line  = substr($token, $chars);
+//						$token = substr($token, 0, $chars);
+//					} else {
+//						$line .= $this->nextLine();
+//					}
 					$tokens[] = $token;
-					$line     = trim($line) . ' ';
+					$line = $this->nextLine();
+					$line     = rtrim(str_replace(')(', ') (',$line)) . ' ';
 					continue;
 				}
 			}
@@ -260,6 +273,11 @@ class Imap {
 		}
 
 		return $tokens;
+	}
+
+	private function readQuotedString(&$line) {
+
+		throw new \RuntimeException('Unterminated quoted string');
 	}
 
 	/**
@@ -450,15 +468,16 @@ class Imap {
 	public function capability() {
 		$response = $this->requestAndResponse('CAPABILITY');
 
-		if (!$response) {
+		if (!is_array($response)) {
 			return $response;
 		}
 
-		$capabilities = [];
-		foreach ($response as $line) {
-			$capabilities = array_merge($capabilities, $line);
-		}
-		return $capabilities;
+		return $response[0];
+//		foreach ($response as $line) {
+//			if($line === 'OK') break;
+//			$capabilities = array_merge($capabilities, $line);
+//		}
+//		return $capabilities;
 	}
 
 	public function getNamespace() {
@@ -549,7 +568,7 @@ class Imap {
 	 *                      if one items of messages are fetched it's returned as (msgno => value)
 	 *                      if items of messages are fetched it's returned as (msgno => (name => value))
 	 */
-	public function fetch($items, $from, $to = null, $uid = false) {
+	public function fetch($items, $from, $to = null, $uid = false, $options = null) {
 		if (is_array($from)) {
 			$set = implode(',', $from);
 		} elseif ($to === null) {
@@ -561,9 +580,13 @@ class Imap {
 		}
 
 		$itemList = $this->escapeList((array)$items);
+		$params = [$set, $this->escapeList((array)$items)];
+		if($options) {
+			$params[] = $this->escapeList((array)$options);
+		}
 
 		$tag = null;  // define $tag variable before first use
-		$this->sendRequest(($uid ? 'UID ' : '') . 'FETCH', [$set, $itemList], $tag);
+		$this->sendRequest(($uid ? 'UID ' : '') . 'FETCH', $params, $tag);
 
 		go()->log('TIME request fetch: '.round((microtime(true) - $this->mstime) * 1000, 2) . "ms");
 		$result = [];
@@ -577,14 +600,8 @@ class Imap {
 				continue;
 			}
 
-			// find array key of UID value; try the last elements, or search for it
 			if ($uid) {
-				$count = count($tokens[2]);
-				if ($tokens[2][$count - 2] == 'UID') {
-					$uidKey = $count - 1;
-				} else {
-					$uidKey = array_search('UID', $tokens[2]) + 1;
-				}
+				$uidKey = array_search('UID', $tokens[2]) + 1;
 			}
 
 			// ignore other messages
@@ -592,34 +609,15 @@ class Imap {
 				continue;
 			}
 
-			// if we only want one item we return that one directly
-			if (count($items) == 1) {
-				if ($tokens[2][0] == $items[0]) {
-					$data = $tokens[2][1];
-				} elseif ($uid && $tokens[2][2] == $items[0]) {
-					$data = $tokens[2][3];
-				} else {
-					// maybe the server send an other field we didn't wanted
-					$count = count($tokens[2]);
-					// we start with 2, because 0 was already checked
-					for ($i = 2; $i < $count; $i += 2) {
-						if ($tokens[2][$i] != $items[0]) {
-							continue;
-						}
-						$data = $tokens[2][$i + 1];
-						break;
-					}
+			$data = [];
+			while (key($tokens[2]) !== null) {
+				if(is_array(current($tokens[2]))){
+					throw new \Exception('wrong datatype');
 				}
-			} else {
-				$data = [];
-				while (key($tokens[2]) !== null) {
-					if(is_array(current($tokens[2]))){
-						throw new \Exception('wrong datatype');
-					}
-					$data[current($tokens[2])] = next($tokens[2]);
-					next($tokens[2]);
-				}
+				$data[current($tokens[2])] = next($tokens[2]);
+				next($tokens[2]);
 			}
+
 
 			// if we want only one message we can ignore everything else and just return
 			if ($to === null && !is_array($from) && ($uid ? $tokens[2][$uidKey] == $from : $tokens[0] == $from)) {
@@ -634,7 +632,7 @@ class Imap {
 		go()->log('TIME response fetch: '.round((microtime(true) - $this->mstime) * 1000, 2) . "ms");
 
 		if ($to === null && !is_array($from)) {
-			throw new \RuntimeException('the single id ' . $from . ' was not found in response');
+			throw new \RuntimeException('Email with id ' . $from . ' was not found on the mail server');
 		}
 
 		return $result;

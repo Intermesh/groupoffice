@@ -217,7 +217,7 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 		// Dirty hack. OAuth2 accounts that are not fully configured should not retrieve mailboxes
 		$bfetchMailboxes = true;
 		if(go()->getModule('community', 'oauth2client')) {
-			$acct = \go\modules\community\email\model\Account::findById($params['account_id']);
+			$acct = \go\modules\community\email\model\EmailAccount::findById($params['account_id']);
 			$clt = $acct->oauth2_account;
 			if($clt && ! $clt->token) {
 				$bfetchMailboxes = false;

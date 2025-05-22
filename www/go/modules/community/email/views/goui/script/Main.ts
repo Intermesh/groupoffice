@@ -21,6 +21,7 @@ export class Main extends Component {
 	currentText: Component
 
 	private currentMailbox?: string;
+	private currentAccount?: string
 
 	private listView: ListView
 	private threadView: ThreadView
@@ -39,6 +40,7 @@ export class Main extends Component {
 
 
 	goto(accountId:string, mailboxId: string, threadId?:string) {
+		this.currentAccount = accountId;
 		if(this.currentMailbox !== mailboxId) {
 			this.currentMailbox = mailboxId;
 			this.listView.goto(accountId, mailboxId);
@@ -100,6 +102,11 @@ export class Main extends Component {
 					}),
 					this.currentText = comp({tagName: 'h3', text: t('Inbox'), flex: '1 1 50%', style: {minWidth: '100px', fontSize: '1.8em'}}),
 					'->',
+					btn({icon:'refresh',handler: () => {
+						client.jmap('EmailAccount/update',{accountId:this.currentAccount,mailboxId:this.currentMailbox}).then(r => {
+							this.listView.store.reload();
+						})
+					}}),
 					btn({icon: 'search', title: t('Search')}),
 					btn({icon:'more_vert',cls: 'not-small-device', menu:menu({},
 						btn({icon:'move',text:t('Move to')+'…', handler: _ => { }}),

@@ -29,6 +29,7 @@ class EmailAccount extends AclOwnerEntity {
 	 */
 	protected $mtaDsn; // smtp
 	protected $mdaDsn; // imap
+	protected $mdaCapabilities;
 
 	public $createdAt;
 	public $modifiedAt;
@@ -120,6 +121,29 @@ class EmailAccount extends AclOwnerEntity {
 		}
 		unset($data->pass);
 		return $data;
+	}
+
+	public function mdaCapabilities() {
+		return json_decode($this->mdaCapabilities);
+	}
+
+	protected function internalValidate()
+	{
+		if($this->isModified('mdaDsn')) {
+			// test connection and fetch capabilities
+			$conn = $this->connect();
+			$capa = $conn->imap->capability();
+			$this->mdaCapabilities = json_encode($capa ?? []);
+		}
+
+		parent::internalValidate();
+	}
+
+	private $backend;
+	public function backend() {
+		if(!isset($this->backend))
+			$this->backend = $this->connect();
+		return $this->backend;
 	}
 
 	public function connect() {
