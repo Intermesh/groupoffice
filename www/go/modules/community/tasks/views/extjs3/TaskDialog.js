@@ -62,6 +62,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	},
 
 	onLoad: function() {
+
+		this.supr().onLoad.call(this);
+
 		if (go.User.tasksSettings && !this.tasklistCombo.value) {
 			this.tasklistCombo.value = this.initialConfig.role === "support" ? go.User.supportSettings.defaultTasklistId : go.User.tasksSettings.defaultTasklistId;
 		}
@@ -93,6 +96,10 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 
 	onTaskListChange: function (combo, val) {
+
+		if(!val) {
+			return;
+		}
 
 		const categories = this.formPanel.form.findField('categories');
 		categories.comboStore.setFilter("tasklistId", {
@@ -348,9 +355,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						name: "categories",
 						fieldLabel: t("Category", "tasks")
 					},
-					this.projectCombo = new go.modules.community.tasks.ProjectCombo({
+					...(go.Modules.isAvailable("business", "projects3") ? [this.projectCombo = new go.modules.community.tasks.ProjectCombo({
 						hidden: this.role === "support" || !go.Modules.isAvailable("business", "projects3")
-					})
+					})] : [])
 				]
 			}
 			,

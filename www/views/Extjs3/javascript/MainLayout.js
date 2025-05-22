@@ -81,15 +81,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	 */
 	boot : async function() {
 
-		window.groupofficeCore = await import(BaseHref + "views/goui/dist/groupoffice-core/script/index.js");
 		window.GOUI = await import(BaseHref + "views/goui/dist/goui/script/index.js");
+		window.groupofficeCore = await import(BaseHref + "views/goui/dist/groupoffice-core/script/index.js");
 
 		var me = this;
-
-		// GOUI in ext , Warning: breaks old safari
-		window.goui = await import(BaseHref + "views/goui/dist/goui/script/index.js");
-		window.groupofficeCore = await import(BaseHref + "views/goui/dist/groupoffice-core/script/index.js");
-
 		go.browserStorage.connect().finally(function() {
 			Ext.QuickTips.init();
 			Ext.apply(Ext.QuickTips.getQuickTip(), {
@@ -990,9 +985,13 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 					if(btn == 'yes') {
 						Ext.getBody().mask(t("Loading..."));
+						const oldRT = go.Jmap.requestTimeout;
+						go.Jmap.requestTimeout = 180000;
 						go.Jmap.request({method: "core/System/demo"}).finally(() => {
 							Ext.getBody().unmask();
-						});
+						}).finally(() =>{
+							go.Jmap.requestTimeout = oldRT;
+						})
 					}
 				}, this);
 			}

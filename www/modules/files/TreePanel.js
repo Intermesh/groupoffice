@@ -33,7 +33,7 @@ GO.files.TreePanel = function (config){
 		layout:'fit',
 		split:true,
 		autoScroll:true,
-		animate:true,
+		animate:false,
 		rootVisible:false,
 		containerScroll: true,
 		selModel:new Ext.tree.MultiSelectionModel()		

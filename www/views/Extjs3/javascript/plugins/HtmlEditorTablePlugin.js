@@ -366,11 +366,17 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 	},
 
 	createHandles: function(table) {
+
+		if (!table.id || !table.id.startsWith('GO-')) {
+			return;
+		}
+
 		// Remove any existing handles first
 		this.removeHandles();
 
+
 		// Create resize handle
-		resizeHandle = this.editor.getDoc().createElement('div');
+		var resizeHandle = this.editor.getDoc().createElement('div');
 		resizeHandle.className = 'tbl-resize-handle';
 		resizeHandle.setAttribute('data-editor-helper', 'true');
 
@@ -389,7 +395,7 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 		].join(';');
 
 		// Create delete handle
-		deleteHandle = this.editor.getDoc().createElement('div');
+		var deleteHandle = this.editor.getDoc().createElement('div');
 		deleteHandle.className = 'tbl-delete-handle';
 		deleteHandle.setAttribute('data-editor-helper', 'true');
 
@@ -407,9 +413,13 @@ Ext.extend(Ext.ux.form.HtmlEditor.NEWTablePlugin, Ext.util.Observable, {
 			'pointer-events: auto !important'
 		].join(';');
 
+		// const tbody = this.editor.getDoc().createElement('tbody');
+
 		// Insert handles as direct children of table
-		table.insertBefore(resizeHandle, table.firstChild);
-		table.insertBefore(deleteHandle, table.firstChild);
+		table.appendChild(resizeHandle);
+		table.appendChild(deleteHandle);
+
+		// table.insertBefore(tbody, table.firstChild);
 
 
 		var originalWidth = parseInt(table.getAttribute('data-original-width'));

@@ -73,7 +73,7 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, Iter
 		return $this->fetchAll();
 	}
 
-	public function toArray(array $properties = null): array|null
+	public function toArray(array|null $properties = null): array|null
 	{
 		return $this->fetchAll();
 	}

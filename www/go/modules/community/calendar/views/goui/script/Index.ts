@@ -69,7 +69,7 @@ function addEmailAction() {
 		};
 
 
-		GO.email.handleITIP = (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent|string, feedback?:string, recurrenceId?:string}} ) => {
+		if(GO.email) GO.email.handleITIP = (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent|string, feedback?:string, recurrenceId?:string}} ) => {
 			if(msg.itip) {
 				const event = msg.itip.event,
 					btns = E('div').cls('btns'),
@@ -185,6 +185,7 @@ modules.register(  {
 	],
 	init () {
 		//const user = client.user;
+		translate.load(GO.lang.core.core, "core", "core");
 		translate.load(GO.lang.community.calendar, "community", "calendar");
 
 		addEmailAction();

@@ -10,18 +10,16 @@ class LanguageTest extends \PHPUnit\Framework\TestCase
 {
 	public function testFormatAddress() {
 		$address = go()->getLanguage()->formatAddress([
-			'street' => 'Veemarktkade',
-			'street2' => '8'
+			'address' => 'Veemarktkade 8',
 		], "nl", false);
 
 		$this->assertEquals('Veemarktkade 8', $address);
 
 
 		$address = go()->getLanguage()->formatAddress([
-			'street' => 'Veemarktkade',
-			'street2' => '8'
+			'address' => 'Veemarktkade 8'
 		], "gb", false);
 
-		$this->assertEquals("Veemarktkade\n8", $address);
+		$this->assertEquals("Veemarktkade 8", $address);
 	}
 }

@@ -60,9 +60,14 @@ class CalendarConvertor
 		if(!empty($event->createdAt))
 			$message->dtstamp = $event->createdAt->getTimestamp();
 		$message->starttime = $event->start()->getTimestamp();
-		$message->subject = $event->title;
 		$message->uid = $event->uid;
-		$message->location = $event->location;
+
+		if(!$event->isPrivate() || $event->getPermissionLevel() > \go\core\model\Acl::LEVEL_READ) {
+			$message->subject = $event->title;
+			$message->location = $event->location;
+			$message->asbody = GoSyncUtils::createASBody($event->description, $params);
+		}
+
 		if(!empty($event->duration))
 		$message->endtime = $event->end()->getTimeStamp();
 		if(!empty($event->privacy))
@@ -85,9 +90,6 @@ class CalendarConvertor
 				}
 			}
 		}
-
-
-		$message->asbody = GoSyncUtils::createASBody($event->description, $params);
 
 
 		if($event->isRecurring()) {

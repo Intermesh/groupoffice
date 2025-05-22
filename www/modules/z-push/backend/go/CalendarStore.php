@@ -57,19 +57,17 @@ class CalendarStore extends Store {
 
 	public function GetMessageList($folderid, $cutoffdate)
 	{
-		$query = CalendarEvent::find()
-			->select(['cce.id', 'UNIX_TIMESTAMP(modifiedAt) as "mod"', '1 as flags'])
-			->where(['calendarId' => $folderid]);
-
+		$query = CalendarEvent::find()->select(['cce.id', 'UNIX_TIMESTAMP(modifiedAt) as "mod"', '1 as flags']);
+		$filter = [
+			'inCalendars'=>$folderid,
+			'after' => date('Y-m-d H:i:s', $cutoffdate),
+			'hideSecret'=>1
+		];
 		if (!empty($cutoffdate)) {
-			$query->andWhere('start > "' . date('Y-m-d H:i:s', $cutoffdate).'"');
+			$filter['after'] = date('Y-m-d H:i:s', $cutoffdate);
 		}
-		$calendar = Calendar::findById($folderid);
-		ZLog::Write(LOGLEVEL_INFO, "GetMessageList ".$folderid. ' ('.$calendar->name.') '. $cutoffdate);
-		if($calendar->ownerId != go()->getUserId()) {
-			$query->andWhere('privacy', '=', 'public');
-		}
-
+		$query->filter($filter);
+		ZLog::Write(LOGLEVEL_INFO, "GetMessageList ".$folderid. ' '. $cutoffdate);
 		return $query->fetchMode(\PDO::FETCH_ASSOC)->all();
 	}
 

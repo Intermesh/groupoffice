@@ -371,7 +371,7 @@ class Folder extends FileSystemObject {
 	 * @return File
 	 * @throws Exception
 	 */
-	public function createLink(Folder $target, string $linkName = null): File
+	public function createLink(Folder $target, string|null $linkName = null): File
 	{
 		if (!isset($linkName)) {
 			$linkName = $target->getName();

@@ -139,11 +139,12 @@ abstract class Message extends \GO\Base\Model
 	{
 
 		$this->attributes = array_merge($this->attributes, $attributes);
-		
-		$this->attributes['to'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8($this->attributes['to']));
-		$this->attributes['cc'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8($this->attributes['cc']));
-		$this->attributes['bcc'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8($this->attributes['bcc']));
-		$this->attributes['from'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8($this->attributes['from']));
+
+		//quick hack to filter out undisclosed-recipients:. EmailRecipients should be replaced with AddressList and it should support groups like in z_RFC822.php that the imap backend uses in z-push
+		$this->attributes['to'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8(str_ireplace('undisclosed-recipients:','',$this->attributes['to'])));
+		$this->attributes['cc'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8(str_ireplace('undisclosed-recipients:','',$this->attributes['cc'])));
+		$this->attributes['bcc'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8(str_ireplace('undisclosed-recipients:','',$this->attributes['bcc'])));
+		$this->attributes['from'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8(str_ireplace('undisclosed-recipients:','',$this->attributes['from'])));
 		$this->attributes['disposition_notification_to'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8($this->attributes['disposition_notification_to']));
 		//workaround for invalid from
 		if(!$this->attributes['from']->getAddress()) {

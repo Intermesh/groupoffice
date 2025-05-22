@@ -92,7 +92,7 @@ export class DomainDialog extends FormWindow {
 		this.addSharePanel();
 
 		this.on("ready", async () => {
-			if (this.currentId) {
+			if (this.form.currentId) {
 
 				this.form.findField("domain")!.disabled = true;
 

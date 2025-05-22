@@ -137,8 +137,8 @@ class Module extends \go\core\Module {
 
 		foreach(Instance::find() as $instance) {
 			$version = $instance->getMajorVersion();
-			if(!$version || $version == go()->getMajorVersion()) {
-				$version = 'DEFAULT';
+			if(empty($version)) {
+				continue;
 			}
 			if(!isset($i[$version])) {
 				$i[$version] = [];
@@ -147,19 +147,17 @@ class Module extends \go\core\Module {
 			$i[$version][] = $instance->hostname;
 		}
 
+		ksort($i);
+
 	//	$i['6.5'] = ['test.65', 'test2.65', 'test.65', 'test2.65', 'test.65', 'test2.65'];
 
 		$tpl = file_get_contents(__DIR__ . '/site-conf.tpl');
 
 		foreach($i as $version => $hostnames) {
-			if($version == 'DEFAULT') {
-				continue;
-			}
-
 			echo $this->parseTemplate($tpl, $version, $hostnames);
 		}
 
-		echo $this->parseTemplate($tpl, "DEFAULT", $i['DEFAULT']);
+		echo $this->parseTemplate($tpl, "DEFAULT", [$_SERVER['SERVER_NAME']]);
 	}
 
 	private function getTLD() : string {
@@ -178,8 +176,9 @@ class Module extends \go\core\Module {
 
 		$tld = $this->getTLD();
 
+		$withWopi = [];
 		// Each instance must have a dedicated WOPI subdomain for Microsoft: https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/online/build-test-ship/environments#wopi-discovery-urls
-		$wopialiases = array_map(function($hostname) {
+		foreach($hostnames as $hostname) {
 			$parts = explode(".", $hostname);
 			$first = array_shift($parts);
 			$alias = $first . '.wopi';
@@ -187,13 +186,15 @@ class Module extends \go\core\Module {
 			if(count($parts)) {
 				$alias .= '.' . implode("." , $parts);
 			}
-			return $alias;
-		}, $hostnames);
+
+			$withWopi[] = $hostname;
+			$withWopi[] = $alias;
+		};
 
 		$replacements = [
 			'{docroot}' => $version == 'DEFAULT' ? go()->getEnvironment()->getInstallFolder()->getPath() : '/usr/local/share/groupoffice-' . $version . '/www',
-			'{aliases}' => $version == 'DEFAULT' ? '*.' . $tld .' ' .$this->implode($hostnames) : $this->implode($hostnames),
-			'{wopialiases}' => $version == 'DEFAULT' ? '*.wopi.' . $tld .' ' .$this->implode($wopialiases) : $this->implode($wopialiases),
+			'{aliases}' => $version == 'DEFAULT' ? '*.' . $tld .' *.wopi.' . $tld .' ' .$this->implode($withWopi) : $this->implode($withWopi),
+
 			'{tld}' => $tld,
 			'{servername}' => strtolower(str_replace('.', '', $version)) . '.' . $tld,
 			'{version}' => str_replace('.', '', $version)

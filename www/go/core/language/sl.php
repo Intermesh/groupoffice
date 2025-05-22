@@ -539,7 +539,7 @@ return array (
   'Login as this user' => 'Prijavite se kot ta uporabnik',
   'Failed to login as this user' => 'Kot ta uporabnik ni uspel prijaviti',
   'Archive user' => 'Arhivski uporabnik',
-  'Archiving a user will disable them and make their items invisible. Are you sure?' => 'Arhiviranje uporabnika jih bo onemogočilo in postalo njihove predmete nevidne. Ali si prepričan?',
+  'Archiving a user will disable them, revoke all group memberships and make their items invisible. Are you sure?' => 'Arhiviranje uporabnika jih bo onemogočilo in postalo njihove predmete nevidne. Ali si prepričan?',
   'You can\' t archive yourself' => 'Ne moreš se arhivirati',
   'Error while saving the data' => 'Napaka med shranjevanjem podatkov',
   'All' => 'Vse',

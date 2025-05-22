@@ -177,7 +177,7 @@ class Language {
 	/**
 	 * Format an address
 	 *
-	 * @param array $address array with street, street2, city, zipCode and state
+	 * @param array $address array with address, city, zipCode and state
 	 * @param string|null $countryCode
 	 * @param boolean|null $showCountry When null it will be false if the country is the system default
 	 * @return string
@@ -188,7 +188,8 @@ class Language {
 			$countryCode = self::defaultCountry();
 		}
 
-		if (empty($address['street']) && empty($address['street2']) && empty($address['city']) && empty($address['state'])) {
+		// street and street2 still used for backwards compatibility
+		if (empty($address['address']) && empty($address['street']) && empty($address['zipCode']) && empty($address['city']) && empty($address['state'])) {
 			return "";
 		}
 
@@ -225,10 +226,10 @@ class Language {
 	 * @see App::t() For shorter access
 	 *
 	 * @param string $str String to translate
-	 * @param ?string $package The module package name. Defaults to {@see Language::$defaultPackage}
-	 * @param string|array|null $module Name of the module. Defaults to {@see Language::$defaultModule}
+	 * @param string|null $package The module package name. Defaults to {@see Language::$defaultPackage}
+	 * @param string|null $module Name of the module. Defaults to {@see Language::$defaultModule}
  */
-	public function t(string $str, ?string $package = null, ?string $module = null) {
+	public function t(string $str, string|null $package = null, string|null $module = null) {
 
 		if($package == null) {
 			$package = $this->defaultPackage;

@@ -1,6 +1,6 @@
 <?php
 return array (
-  'E-mail domains' => 'Postfix',
+  'E-mail domains' => 'E-Mail Domains',
   'Address' => 'Adresse',
   'Goto' => 'Gehe zu',
   'Max quota (MB)' => 'Max. Quota (MB)',

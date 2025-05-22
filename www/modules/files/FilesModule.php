@@ -202,6 +202,12 @@ class FilesModule extends \GO\Base\Module{
 		$stmt->execute();
 
 
+		$folder = Model\Folder::model()->findByPath("trash", true);
+		$folder->setNewAcl();
+		$folder->visible = 1;
+		$folder->readonly = 1;
+		$folder->save();
+		$folder->acl->addGroup(\GO::config()->group_root, \GO\Base\Model\Acl::MANAGE_PERMISSION);
 	}
 	
 	

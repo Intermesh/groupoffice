@@ -333,7 +333,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
    * @param string[]|null $properties
    * @return array|null
    */
-	public function toArray(array $properties = null): array|null
+	public function toArray(array|null $properties = null): array|null
 	{
 		$arr = [];
 		

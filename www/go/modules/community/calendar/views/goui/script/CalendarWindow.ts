@@ -38,7 +38,8 @@ export class CalendarWindow extends FormWindow {
 					label: t("Owner"), name: "ownerId", filterName: "text", flex:'1 0', clearable:true
 				}),
 				comp({tagName:'h3',flex:'1 0 100%',text:t('Default notifications') }),
-				alertField, fdAlertField
+				alertField,
+				fdAlertField
 				//unsubscribeBtn
 			),
 		);

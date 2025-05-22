@@ -139,7 +139,12 @@ class Principal extends AclOwnerEntity
 	{
 		//remove principal cache with invalid aclId's. Can happen in old framework.
 		go()->getDbConnection()->exec("delete p from core_principal p left join core_acl a on a.id = p.aclId where a.id is null");
-		return parent::check();
+		parent::check();
+	}
+
+	public static function checkAcls()
+	{
+		// do nothing for Principals
 	}
 
 
