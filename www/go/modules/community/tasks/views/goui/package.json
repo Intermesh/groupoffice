@@ -8,8 +8,9 @@
   },
 
   "scripts": {
-    "start": "concurrently --kill-others \"npm run start:esbuild\"  \"npm run start:sass\"",
+    "start": "concurrently --kill-others \"npm run start:esbuild\"  \"npm run start:sass\"  \"npm run start:dts\"",
     "start:esbuild": "node ../../../../../../views/goui/esbuild-module.mjs watch",
+    "start:dts": "npx tsc --declaration --emitDeclarationOnly --watch",
     "start:sass": "npx sass --watch style:dist",
 
     "build": "npm run build:sass && npm run build:ts && npm run build:dts",
