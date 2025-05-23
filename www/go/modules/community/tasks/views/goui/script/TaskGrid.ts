@@ -288,45 +288,10 @@ export class TaskGrid extends Table<DataSourceStore> {
 
 		this.groupBy = "tasklist";
 
-		this.groupByRenderer = async (grouping) => {
-			if (!grouping) {
-				return t("List: None");
-			}
-
-			const groupRow = comp({
-					cls: "hbox tasks-tasklist-row"
-				},
-				span({
-					itemId: "tasks-tasklist-icon",
-					cls: "icon",
-					text: "expand_more"
-				}),
-				comp({
-					text: t("List") + ": " + grouping.name,
-					style: {color: `#${grouping.color}`}
-				})
-			);
-
-			groupRow.el.addEventListener("click", (ev) => {
-				const groupContainer = groupRow.el.closest("tbody");
-				if (!groupContainer) {
-					return
-				}
-
-				const icon = groupRow.findChild("tasks-tasklist-icon")!;
-				icon.text == "expand_more" ? icon.text = "chevron_right" : icon.text = "expand_more";
-
-				const dataRows = groupContainer.querySelectorAll("tr.data");
-
-				dataRows.forEach((row) => {
-					const tableRow = row as HTMLTableRowElement;
-
-					tableRow.style.display == "none" ? tableRow.style.display = "" : tableRow.style.display = "none";
-				});
-			});
-
-			return groupRow;
-		}
+		this.groupByRenderer = (grouping) => comp({
+			text: t("List") + ": " + grouping.name,
+			style: {color: `#${grouping.color}`}
+		});
 
 		this.draggable = true;
 	}
