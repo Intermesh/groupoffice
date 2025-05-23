@@ -16,7 +16,7 @@ import {
 	comp, Component, ContainerField, containerfield, DateField,
 	datefield, DateInterval, DateTime, durationfield,
 	fieldset,
-	h3,
+	h4,
 	hr,
 	htmlfield, rangefield, router,
 	t,
@@ -105,12 +105,13 @@ export class TaskDialog extends FormWindow {
 				)
 			),
 			fieldset({
-					flex: 1
+					flex: 1,
+					cls: "flow border-top"
 				},
 				tbar({
-						cls: "border-top"
+
 					},
-					h3({
+					h4({
 						text: t("Message")
 					})
 				),
@@ -119,9 +120,9 @@ export class TaskDialog extends FormWindow {
 				})
 			),
 			fieldset({
-					flex: 1
+					flex: 1,
+					cls: "flow border-top"
 				},
-				hr(),
 				this.categoryChips = taskcategorychips({
 					label: t("Categories"),
 					name: "categories"
@@ -135,12 +136,13 @@ export class TaskDialog extends FormWindow {
 				})
 			),
 			fieldset({
-					flex: 1
+					flex: 1,
+					cls: "flow border-top"
 				},
 				tbar({
-						cls: "border-top"
+
 					},
-					h3({
+					h4({
 						text: t("Date")
 					}),
 					"->",
@@ -217,12 +219,13 @@ export class TaskDialog extends FormWindow {
 				)
 			),
 			fieldset({
-					flex: 1
+					flex: 1,
+					cls: "flow border-top"
 				},
 				tbar({
-						cls: "border-top"
+
 					},
-					h3({
+					h4({
 						text: t("Description") + " / " + t("Location")
 					}),
 					"->",
@@ -249,12 +252,13 @@ export class TaskDialog extends FormWindow {
 				)
 			),
 			fieldset({
-					flex: 1
+					flex: 1,
+					cls: "flow border-top"
 				},
 				tbar({
-						cls: "border-top"
+
 					},
-					h3({
+					h4({
 						text: t("Alerts")
 					}),
 					"->",
