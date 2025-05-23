@@ -127,6 +127,14 @@ export class Main extends MainThreeColumnPanel {
 			tbar({
 					cls: "border-bottom"
 				},
+				checkbox({
+					listeners: {
+						change: (field, newValue, oldValue) => {
+							const rs = this.taskListGrid.rowSelection!;
+							newValue ? rs.selectAll() : rs.clear();
+						}
+					}
+				}),
 				h3({
 					text: t("Lists")
 				}),
@@ -165,6 +173,7 @@ export class Main extends MainThreeColumnPanel {
 					cls: "scroll"
 				},
 				this.taskListGrid = tasklistgrid({
+					headers: false,
 					fitParent: true,
 					cls: "no-row-lines",
 					dropOn: true,
