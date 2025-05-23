@@ -10,10 +10,10 @@ import {
 import {
 	ArrayField,
 	arrayfield,
-	btn, Button,
+	btn, Button, collapsebtn, CollapseButton,
 	colorfield,
 	combobox,
-	comp, ContainerField, containerfield, DateField,
+	comp, Component, ContainerField, containerfield, DateField,
 	datefield, DateInterval, DateTime, durationfield,
 	fieldset,
 	h3,
@@ -144,11 +144,9 @@ export class TaskDialog extends FormWindow {
 						text: t("Date")
 					}),
 					"->",
-					btn({
-						icon: "expand_more",
-						handler: (btn) => {
-							this.collapseBtnHandler(btn);
-						}
+					collapsebtn({
+						stateId: "task-dialog-date",
+						collapseEl: btn => btn.parent!.nextSibling()!
 					})
 				),
 				comp({
@@ -228,11 +226,9 @@ export class TaskDialog extends FormWindow {
 						text: t("Description") + " / " + t("Location")
 					}),
 					"->",
-					btn({
-						icon: "expand_more",
-						handler: (btn) => {
-							this.collapseBtnHandler(btn);
-						}
+					collapsebtn({
+						stateId: "task-dialog-desc",
+						collapseEl: btn => btn.parent!.nextSibling()!
 					})
 				),
 				comp({
@@ -262,12 +258,10 @@ export class TaskDialog extends FormWindow {
 						text: t("Alerts")
 					}),
 					"->",
-					btn({
-						icon: "expand_more",
-						handler: (btn) => {
-							this.collapseBtnHandler(btn);
-						}
-					})
+					collapsebtn({
+						stateId: "task-dialog-alerts",
+						collapseEl: btn => btn.parent!.nextSibling()!
+					}),
 				),
 				comp({
 						cls: "flow",
@@ -315,15 +309,4 @@ export class TaskDialog extends FormWindow {
 		)
 	}
 
-	private collapseBtnHandler(btn: Button) {
-		const isHidden = btn.parent!.nextSibling()!.hidden;
-
-		if (isHidden) {
-			btn.parent!.nextSibling()!.show();
-			btn.icon = "expand_less";
-		} else {
-			btn.parent!.nextSibling()!.hide();
-			btn.icon = "expand_more";
-		}
-	}
 }
