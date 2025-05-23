@@ -251,6 +251,14 @@ export class Main extends MainThreeColumnPanel {
 			tbar({
 					cls: "border-bottom"
 				},
+				checkbox({
+					listeners: {
+						change: (field, newValue, oldValue) => {
+							const rs = this.taskCategoryGrid.rowSelection!;
+							newValue ? rs.selectAll() : rs.clear();
+						}
+					}
+				}),
 				h3({
 					text: t("Categories")
 				}),
@@ -268,6 +276,7 @@ export class Main extends MainThreeColumnPanel {
 				},
 				this.taskCategoryGrid = taskcategorygrid({
 					cls: "no-row-lines",
+					headers: false,
 					fitParent: true,
 					rowSelectionConfig: {
 						multiSelect: true,
