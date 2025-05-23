@@ -291,11 +291,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			});
 
 			this.add(wrapper);
-
-
-
 			this.comments = new commentsModule.CommentsPanel(this.entityStore.entity.name);
-
 			wrapper.comp = this.comments;
 		}
 	},
