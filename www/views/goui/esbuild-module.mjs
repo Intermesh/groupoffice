@@ -1,6 +1,25 @@
 import * as esbuild from 'esbuild';
 
+/**
+ * Usage:
+ *
+ *  "scripts": {
+ *     "start": "npm run build:clean && concurrently --kill-others \"npm run start:ts\"",
+ *     "start:ts": "node ../../../../../../views/goui/esbuild-module.mjs watch script/Index.ts,script/Participant.ts",
+ *
+ *
+ *     "build": "npm run build:clean && npm run build:ts",
+ *     "build:clean": "rm -rf ./dist/*",
+ *     "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs build script/Index.ts,script/Participant.ts",
+ *
+ *     "test": "npx tsc --noEmit"
+ *   }
+ * @type {boolean}
+ */
+
 const watch = (process.argv.length > 2 && process.argv[2] == "watch");
+
+const entryPoints = process.argv.length > 3 ? process.argv[3].split(",") : ['script/Index.ts'];
 
 //First I used this plugin to resolve paths: https://github.com/Awalgawe/esbuild-typescript-paths-plugin/tree/main/src
 //But this seems much simpler and give more control. It must align with tsconfig.module.js though.
@@ -10,7 +29,6 @@ const moduleResolverPlugin = {
 
 	setup(build) {
 		build.onResolve({ filter: new RegExp("@intermesh\/.*")}, args => {
-
 				const parts = args.path.split("/");
 
 				if(parts.length === 3) {
@@ -35,7 +53,7 @@ const moduleResolverPlugin = {
 }
 
 const opts = {
-	entryPoints: ['script/Index.ts'],
+	entryPoints: entryPoints,
 	bundle: true,
 	sourcemap: watch,
 	format: "esm",
