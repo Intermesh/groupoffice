@@ -1,3 +1,5 @@
+- Files: fix permission error when restoring file as end user
+
 20-05-2025: 25.0.23
 - Projects: Problem with loading project panel
 - Z-Push: Created new Z-Push repository
