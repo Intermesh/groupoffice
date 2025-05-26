@@ -191,7 +191,7 @@ class Scheduler {
 		if(!$vcalendar) {
 			return false;
 		}
-		$method = $vcalendar->method ? $vcalendar->method->getValue() : "REQUEST";
+		$method = $vcalendar->method ? $vcalendar->method->getValue() : "NONE";
 		if($ifMethod !== null && $ifMethod != $method) {
 			return false;
 		}
@@ -235,14 +235,19 @@ class Scheduler {
 			}
 		}
 
-		if (!$accountEmail) {
+		if (!$accountEmail && $method !== 'NONE') {
 			return ['method' => $method, 'event' => go()->t("None of the participants match your e-mail aliases for this e-mail account.", "email")];
+		} else if ($method === 'NONE') {
+			$event = ICalendarHelper::parseVObject($vcalendar, new CalendarEvent());
+		} else {
+			$from = $imapMessage->from->getAddress();
+			$event = Scheduler::processMessage($vcalendar, $accountEmail, (object)[
+				'email'=>$from['email'],
+				'name'=>$from['personal']
+			]);
 		}
-		$from = $imapMessage->from->getAddress();
-		$event = Scheduler::processMessage($vcalendar, $accountEmail, (object)[
-			'email'=>$from['email'],
-			'name'=>$from['personal']
-		]);
+
+
 
 
 		$itip = [

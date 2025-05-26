@@ -78,7 +78,11 @@ function addEmailAction() {
 
 						btns.innerHTML = '';
 						if(!item.calendarPrincipal){
-							btns.append(t('You are not an invited to this event'));
+							btns.append(E('div',t('You are not an invited to this event')).cls('goui group').css({alignItems: 'center'}),
+								E('button', t("Import")).cls('goui-button').on('click', _ => {
+									debugger;
+									item.save();
+								}));
 						} else {
 							btns.append(
 								E('div',
@@ -100,17 +104,18 @@ function addEmailAction() {
 					};
 				let text = msg.itip.feedback || {
 					CANCEL: t("Cancellation"),
-					REQUEST: t("Invitation")
+					REQUEST: t("Invitation"),
+					NONE: t('Event')
 				}[msg.itip.method] || "Unable to process appointment information.";
 
 
 				if(event && typeof event !== 'string') {
-					let item = new CalendarItem({data:event, key:event.id + ""});
+					let item = new CalendarItem({data:event, key:event.id ? event.id + "" : ''});
 
 					if(msg.itip.recurrenceId && item.isRecurring) {
 						item = item.patchedInstance(msg.itip.recurrenceId);
 					}
-					if(msg.itip.method === 'REQUEST')
+					if(msg.itip.method === 'REQUEST' || msg.itip.method === 'NONE')
 						updateBtns(item);
 
 					if(msg.itip.method !== 'REPLY') {

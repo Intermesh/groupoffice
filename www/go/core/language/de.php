@@ -1636,7 +1636,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Redirect URI' => 'URI umleiten',
   'Warning' => 'Warnung',
   'The entity has been modified by someone else. Do you want to discard your changes and load the changes in this form?' => 'Die Entität wurde von einer anderen Person geändert. Möchten Sie Ihre Änderungen verwerfen und die Änderungen in dieses Formular laden?',
-  'at ' => 'um',
+  'at ' => 'um ',
   'at day' => 'an Tag',
   'Customize' => 'Anpassen',
   'At' => 'Um',
