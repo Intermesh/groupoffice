@@ -1,3 +1,4 @@
+26-05-2025: 25.0.24
 - Files: fix permission error when restoring file as end user
 - ActiveSync: Z-Push problem fixed: z-push sync for notes and tasks #1289
 - Newsletters: When setting max messages per minute to 0 it will send as fast as possible and doesn't default to 120 messages per minute
