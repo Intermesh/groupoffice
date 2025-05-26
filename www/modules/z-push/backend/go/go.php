@@ -409,7 +409,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
      */
     public function GetSupportedASVersion() {
 
-        return ZPush::ASV_141;
+        return ZPush::ASV_161;
 //        $version = ZPush::ASV_14;
 //        foreach ($this->backends as $i => $b) {
 //            $subversion = $this->backends[$i]->GetSupportedASVersion();
