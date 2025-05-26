@@ -1,4 +1,5 @@
 - Files: fix permission error when restoring file as end user
+- ActiveSync: Z-Push problem fixed: z-push sync for notes and tasks #1289
 
 20-05-2025: 25.0.23
 - Projects: Problem with loading project panel
