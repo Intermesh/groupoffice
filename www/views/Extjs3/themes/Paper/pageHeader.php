@@ -1,7 +1,7 @@
 <?php
 $client = go\core\webclient\Extjs3::get();
 $client->loadExt ??= false;
-$client->bodyCls = $bodyClass ?? 'go-page';
+$client->bodyCls = $bodyCls ?? 'go-page';
 $client->loadGoui ??=  false;
 require($client->getBasePath().'/views/Layout.php');?>
 
