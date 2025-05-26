@@ -130,6 +130,7 @@ class Mailer {
 	 */
 	public function send(Message $message) : void
 	{
+
 		$message->setMailer($this);
 		$this->prepareMessage($message);
 
@@ -138,7 +139,6 @@ class Mailer {
 		$this->mail->send();
 		$this->sent = true;
 	}
-
 
 	/**
 	 * Output message to a readable stream
@@ -282,6 +282,9 @@ class Mailer {
 		}
 
 		$this->mail->getSMTPInstance()->setTimeout(go()->getSettings()->smtpTimeout);
+
+		//speeds up multiple sends.
+		$this->mail->SMTPKeepAlive = true;
 
 	}
 
