@@ -1,4 +1,5 @@
--Workflows: prevent sorting by virtual column 
+- Workflow: prevent sorting by virtual column
+- Files: prevent permission error when restoring trashed file
 
 19-05-2025: 6.8.120
 - Files: Fixed opening file from link or search result
