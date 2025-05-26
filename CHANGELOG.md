@@ -1,3 +1,4 @@
+26-05-2025: 6.8.121
 - Workflow: prevent sorting by virtual column
 - Files: prevent permission error when restoring trashed file
 - ActiveSync: z-push sync for notes and tasks #1289
