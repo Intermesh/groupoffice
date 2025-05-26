@@ -80,7 +80,6 @@ function addEmailAction() {
 						if(!item.calendarPrincipal){
 							btns.append(E('div',t('You are not an invited to this event')).cls('goui group').css({alignItems: 'center'}),
 								E('button', t("Import")).cls('goui-button').on('click', _ => {
-									debugger;
 									item.save();
 								}));
 						} else {
