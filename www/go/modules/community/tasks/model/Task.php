@@ -353,6 +353,18 @@ class Task extends AclItemEntity {
 			}, "subscribedOnly")
 			->addColumn('mileStoneId')
 			->addColumn('projectId')
+			->add('projectId', function(Criteria $criteria, $value, Query $query) {
+				if(!empty($value)) {
+					if(go()->getModule("business", "projects3")) {
+						$criteria->where('projectId', $value);
+					} else {
+						if (!$query->isJoined("tasks_tasklist", "tasklist")) {
+							$query->join("tasks_tasklist", "tasklist", "task.tasklistId = tasklist.id");
+						}
+						$criteria->where(['tasklist.projectId' => $value]);
+					}
+				}
+			})
 			->add('role', function(Criteria $criteria, $value, Query $query) {
 				if(!$query->isJoined("tasks_tasklist", "tasklist") ){
 					$query->join("tasks_tasklist", "tasklist", "task.tasklistId = tasklist.id");
