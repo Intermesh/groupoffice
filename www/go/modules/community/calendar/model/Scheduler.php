@@ -235,10 +235,12 @@ class Scheduler {
 			}
 		}
 
-		if (!$accountEmail && $method !== 'NONE') {
-			return ['method' => $method, 'event' => go()->t("None of the participants match your e-mail aliases for this e-mail account.", "email")];
-		} else if ($method === 'NONE') {
-			$event = ICalendarHelper::parseVObject($vcalendar, new CalendarEvent());
+		if (!$accountEmail || $method === 'NONE') {
+			return [
+				'method' => $method,
+				'feedback' => $accountEmail ? "" : go()->t('You are not an invited to this event', "email"),
+				'event' => ICalendarHelper::parseVObject($vcalendar, new CalendarEvent())
+			];
 		} else {
 			$from = $imapMessage->from->getAddress();
 			$event = Scheduler::processMessage($vcalendar, $accountEmail, (object)[
@@ -246,9 +248,6 @@ class Scheduler {
 				'name'=>$from['personal']
 			]);
 		}
-
-
-
 
 		$itip = [
 			'method' => $method,

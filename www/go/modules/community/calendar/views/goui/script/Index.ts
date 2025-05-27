@@ -78,7 +78,7 @@ function addEmailAction() {
 
 						btns.innerHTML = '';
 						if(!item.calendarPrincipal){
-							btns.append(E('div',t('You are not an invited to this event')).cls('goui group').css({alignItems: 'center'}),
+							btns.append(
 								E('button', t("Import")).cls('goui-button').on('click', _ => {
 									item.save();
 								}));
@@ -101,7 +101,7 @@ function addEmailAction() {
 							);
 						}
 					};
-				let text = msg.itip.feedback || {
+				let text = {
 					CANCEL: t("Cancellation"),
 					REQUEST: t("Invitation"),
 					NONE: t('Event')
@@ -128,9 +128,15 @@ function addEmailAction() {
 					text += ', '+ (event ?? t('Unexisting event'));
 				}
 
+				const items = [text];
+
+				if(msg.itip.feedback) {
+					items.push(E("br"), msg.itip.feedback);
+				}
+
 
 				container.append(
-					E('li', E('i', 'event').cls('icon'), text, btns).cls('goui-toolbar')
+					E('li', E('i', 'event').cls('icon'), E("div",  ...items).css({flex: "1"}), btns).cls('goui-toolbar')
 				);
 			}
 		};

@@ -152,7 +152,7 @@ ul.actions li {
 ul.actions li > .btns {
     float:right;
     display:flex;
-    flex: 1;
+    /*flex: 1;*/
     margin-left: 1.6rem;
 }
 
