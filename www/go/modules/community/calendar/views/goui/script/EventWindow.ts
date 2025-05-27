@@ -160,6 +160,7 @@ export class EventWindow extends FormWindow {
 								jmapds('Principal').single(this.item!.principalId).then(p=>{
 									if(p)
 										this.participantFld.addOrganiser(p);
+										this.participantFld.list.trackReset();
 								});
 							}
 						});
@@ -392,6 +393,9 @@ export class EventWindow extends FormWindow {
 	loadEvent(ev: CalendarItem) {
 
 		//this.title = t(!ev.key ? 'New event' : 'Edit event');
+		if(ev.data.calendarId) {
+			ev.data.calendarId = ev.data.calendarId + ""; // select fields will change it to string and will trigger a modification
+		}
 		if (!ev.key) {
 			this.item = ev;
 			this.form.create(ev.data);

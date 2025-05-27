@@ -263,6 +263,9 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 			this.item = ev;
 			this.form.create(ev.data);
 
+			this.toolbar.hide();
+
+
 			this.scroller.hidden = false;
 			this.disabled = false;
 
@@ -272,11 +275,16 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 					const dlg = new EventWindow();
 					dlg.show();
 					dlg.loadEvent(this.item!);
+					console.log(dlg.form.value);
+					console.log(dlg.form.modified);
 				}
 			}))
+			this.statusTbar.show();
 
 		} else {
 			// await super.load(ev.data.id);
+
+			this.toolbar.show();
 
 			this.form.findField('alerts')!.hidden = false;
 			this.form.load(ev.data.id).then(() => {
