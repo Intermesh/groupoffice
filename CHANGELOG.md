@@ -1,5 +1,6 @@
 - Calendar: Show import button if calendar event is not a valid scheduling object
 - Calendar: Show open calendar button on all invites
+- Projects2: Find project tasks in time registration window
 
 26-05-2025: 25.0.24
 - Files: fix permission error when restoring file as end user
