@@ -1,3 +1,5 @@
+- Calendar: Show import button if calendar event is not a valid scheduling object
+
 26-05-2025: 25.0.24
 - Files: fix permission error when restoring file as end user
 - ActiveSync: Z-Push problem fixed: z-push sync for notes and tasks #1289

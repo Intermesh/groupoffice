@@ -94,17 +94,16 @@ function addEmailAction() {
 											});
 										})
 									)
-								).cls('goui group'),
-								E('button', t("Open Calendar")).cls('goui-button').on('click', _ => {
-									router.goto("calendar/day/" + item.start.format('Y-m-d'));
-								})
+								).cls('goui group')
+
 							);
 						}
 					};
 				let text = {
 					CANCEL: t("Cancellation"),
 					REQUEST: t("Invitation"),
-					NONE: t('Event')
+					NONE: t('Event'),
+					REPLY: t('Reply'),
 				}[msg.itip.method] || "Unable to process appointment information.";
 
 
@@ -116,6 +115,12 @@ function addEmailAction() {
 					}
 					if(msg.itip.method === 'REQUEST' || msg.itip.method === 'NONE')
 						updateBtns(item);
+
+					if(item.start) {
+						btns.append(E('button', t("Open Calendar")).cls('goui-button').on('click', _ => {
+							router.goto("calendar/day/" + item.start.format('Y-m-d'));
+						}));
+					}
 
 					if(msg.itip.method !== 'REPLY') {
 
@@ -131,9 +136,8 @@ function addEmailAction() {
 				const items = [text];
 
 				if(msg.itip.feedback) {
-					items.push(E("br"), msg.itip.feedback);
+					items.push(msg.itip.method != "REPLY" ? E("br") : ": ", msg.itip.feedback);
 				}
-
 
 				container.append(
 					E('li', E('i', 'event').cls('icon'), E("div",  ...items).css({flex: "1"}), btns).cls('goui-toolbar')
