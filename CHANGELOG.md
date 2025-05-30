@@ -3,6 +3,8 @@
 - Calendar: removed displayfield() for description as it had some unexpected results when the description was overridden for an occurrence
 - Calendar: New event without any changes wouldn't save anymore
 - Calendar: all events disappeared in week view when deleting an event that has participants or is recurring
+- Core: Stretch custom date fields so larger labels don't run out of the field
+- Core: Fixed creating double user groups
 
 27-05-2025: 25.0.25
 - Calendar: Show import button if calendar event is not a valid scheduling object
