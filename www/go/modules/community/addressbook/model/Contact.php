@@ -502,10 +502,13 @@ class Contact extends AclItemEntity {
 											$criteria->andWhere('isOrganization', '=', (bool) $value);
 										})
 										->add("hasEmailAddresses", function(Criteria $criteria, $value, Query $query) {
-											$criteria->andWhere('c.id in (select contactId from addressbook_email_address)');
+
+											$in = $value ? 'IN' : 'NOT IN';
+											$criteria->andWhere('c.id ' . $in . ' (select contactId from addressbook_email_address)');
 										})
 										->add("hasPhoneNumbers", function(Criteria $criteria, $value, Query $query) {
-											$criteria->andWhere('c.id in (select contactId from addressbook_phone_number)');
+											$in = $value ? 'IN' : 'NOT IN';
+											$criteria->andWhere('c.id ' . $in . ' (select contactId from addressbook_phone_number)');
 										})
 										->add("hasOrganizations", function(Criteria $criteria, $value, Query $query) {
 
