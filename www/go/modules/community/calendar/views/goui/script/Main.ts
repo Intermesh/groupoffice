@@ -164,7 +164,7 @@ export class Main extends Component {
 			),
 			splitter({
 				stateId: "calendar-splitter-west",
-				resizeComponentPredicate: this.west
+				resizeComponent: this.west
 			}),
 			comp({cls: 'vbox active', flex: 1},
 				tbar({},

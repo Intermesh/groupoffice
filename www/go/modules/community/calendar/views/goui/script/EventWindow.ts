@@ -428,7 +428,7 @@ export class EventWindow extends FormWindow {
 		if(this.confirmedScheduleMessage) {
 			return;
 		}
-		if(!this.form.isModified()) {
+		if(this.form.currentId && !this.form.isModified()) {
 			this.close();
 			return false;
 		}
