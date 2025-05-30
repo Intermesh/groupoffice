@@ -487,7 +487,7 @@ $timeMargin: dp(72);
 			//max-height: 1680px;
 			background: linear-gradient(180deg, $colorLine 1px, transparent 1px) repeat-y;
 			background-size: 100% $hourHeight;
-			border-right: 1px solid $colorDivider;
+			border-right: 1px solid $colorLine;
 			&:last-child { border-right: 0;}
 		}
 		> dt { // time display
