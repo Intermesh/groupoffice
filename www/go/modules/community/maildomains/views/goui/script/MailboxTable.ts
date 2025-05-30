@@ -110,10 +110,8 @@ export class MailboxTable extends Table<DataSourceStore> {
 			column({
 				width: 48,
 				id: "btn",
-
+				sticky: true,
 				renderer: (columnValue: any, record, td, table, rowIndex) => {
-
-
 					return btn({
 						icon: "more_vert",
 						menu: menu({},
