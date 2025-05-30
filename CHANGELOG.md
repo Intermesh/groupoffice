@@ -1,3 +1,6 @@
+- Core: Fixed store load error when using custom filters
+- Address book: Removed duplicate action date in detail
+
 27-05-2025: 25.0.25
 - Calendar: Show import button if calendar event is not a valid scheduling object
 - Calendar: Show open calendar button on all invites
