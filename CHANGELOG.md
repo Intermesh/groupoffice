@@ -1,3 +1,4 @@
+30-05-2025: 25.0.26
 - Core: Fixed store load error when using custom filters
 - Address book: Removed duplicate action date in detail
 - Calendar: removed displayfield() for description as it had some unexpected results when the description was overridden for an occurrence
