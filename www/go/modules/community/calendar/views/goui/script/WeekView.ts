@@ -27,12 +27,9 @@ export class WeekView extends CalendarView {
 				this.selected.forEach(item => {
 					const i = this.dayItems.indexOf(item as CalendarDayItem);
 					if(i > -1) {
-						//Object.values(item.divs).forEach(d => d.remove());
-						//this.dayItems.splice(i,1);
 						item.remove();
 					}
 				});
-				this.renderView();
 			}
 		});
 
