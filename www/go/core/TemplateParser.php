@@ -2,6 +2,7 @@
 
 namespace go\core;
 
+use DateInterval;
 use DateTimeZone;
 use Exception;
 use go\core\data\Model;
@@ -201,7 +202,8 @@ class TemplateParser {
 	];
 	
 	public function __construct() {
-		$this->addFilter('date', [$this, "filterDate"]);		
+		$this->addFilter('date', [$this, "filterDate"]);
+		$this->addFilter('dateAdd', [$this, "filterDateAdd"]);
 		$this->addFilter('timestamp', [$this, "filterUnixTimestamp"]);
 		$this->addFilter('number', [$this, "filterNumber"]);
 		$this->addFilter('filter', [$this, "filterFilter"]);
@@ -217,8 +219,10 @@ class TemplateParser {
 		$this->addFilter('links', [$this, "filterLinks"]);
 		$this->addFilter('prop', [$this, "filterProp"]);
 
+
 		$this->addFilter('entityFiles', [$this, "filterEntityFiles"]);
 
+		$this->addFilter('substr', [$this, "filterSubstr"]);
 		$this->addFilter('nl2br', [$this, "filterNl2br"]);
 		$this->addFilter('markdown', [$this, "filterMarkdown"]);
 		$this->addFilter('empty', [$this, "filterEmpty"]);
@@ -321,6 +325,24 @@ class TemplateParser {
 		$date->setTimezone(new DateTimeZone($this->_currentUser()->timezone));
 
 		return $date->format($format);
+	}
+
+	private function filterDateAdd(?DateTime $date, string $interval): ?DateTime
+	{
+		if(!isset($date)) {
+			return null;
+		}
+
+		$di = new DateInterval($interval);
+		return $date->add($di);
+
+	}
+
+	private function filterSubstr(string|null $text, int $start, int $length = null): string {
+		if(!isset($text)) {
+			return "";
+		}
+		return substr($text, $start, $length);
 	}
 
 	/**
