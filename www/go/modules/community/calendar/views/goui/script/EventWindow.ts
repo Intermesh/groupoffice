@@ -223,46 +223,13 @@ export class EventWindow extends FormWindow {
 				dlg.show(this.item, this.form.modified);
 			} }),
 			this.alertField,
+
 			textarea({
 				name:'description',
 				label: t('Description'),
-				autoHeight: true,
-				hidden: true,
-				listeners: {
-					render: (comp) => {
-						comp.input!.addEventListener("blur", () => {
-
-
-							const field = comp.nextSibling() as DisplayField;
-							field.value = comp.value;
-							comp.hide();
-							field.show();
-						})
-					}
-				}
+				autoHeight: true
 			}),
-			displayfield({
-				tabIndex: 0,
-				listeners: {
-					render: comp1 => {
-						comp1.el.addEventListener("focus", () => {
 
-							const field = comp1.previousSibling() as TextAreaField;
-							field.height = comp1.height;
-							comp1.hide();
-
-							field.show();
-							field.focus();
-						})
-					}
-				},
-				name:'description',
-				label: t('Description'),
-				cls: "pit",
-				escapeValue: false,
-				hideWhenEmpty: false,
-				renderer: (v, field) => Format.textToHtml(v)}
-			),
 			autocompletechips({
 				list: table({fitParent: true, headers: false, store: datasourcestore({dataSource:categoryStore.dataSource}),
 					rowSelectionConfig: {multiSelect: true},
