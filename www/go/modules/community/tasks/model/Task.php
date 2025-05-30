@@ -356,7 +356,7 @@ class Task extends AclItemEntity {
 			->add('projectId', function(Criteria $criteria, $value, Query $query) {
 				if(!empty($value)) {
 					if(go()->getModule("business", "projects3")) {
-						$criteria->where('projectId', $value);
+						$criteria->where('projectId','=', $value);
 					} else {
 						if (!$query->isJoined("tasks_tasklist", "tasklist")) {
 							$query->join("tasks_tasklist", "tasklist", "task.tasklistId = tasklist.id");
