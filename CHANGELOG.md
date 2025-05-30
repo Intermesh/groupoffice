@@ -7,6 +7,8 @@
 - Core: Stretch custom date fields so larger labels don't run out of the field
 - Core: Fixed creating double user groups and duplicates will be removed.
 - Addressbook: filter hasemailaddresses and hasphonenumbers work with false too
+- Finance: Added "nextContractDate" to finance document model
+- Core: Added dateAdd() and subtr() function to template parser
 
 27-05-2025: 25.0.25
 - Calendar: Show import button if calendar event is not a valid scheduling object
