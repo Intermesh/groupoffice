@@ -376,7 +376,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 						}
 						var field = this.formPanel.getForm().findField(name);
 						if (field) {
-							field.markInvalid(response.notUpdated[id].validationErrors[name].description);
+							field.markInvalid(Ext.util.Format.htmlEncode(response.notUpdated[id].validationErrors[name].description));
 						}
 					}
 
