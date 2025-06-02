@@ -1,3 +1,7 @@
+- Leavedays: fix status loop when disapproving leave day requests
+- Freebusy: Fix non editable free busy permissions after user creation
+- Supportclient: Fixed grouping in support lists
+
 30-05-2025: 25.0.26
 - Core: Fixed store load error when using custom filters
 - Address book: Removed duplicate action date in detail
