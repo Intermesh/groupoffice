@@ -236,17 +236,22 @@ class Calendar extends AclOwnerEntity {
 		}
 	}
 
+	public function isWritable(): bool
+	{
+		return !$this->webcalUri;
+	}
+
 	public function getMyRights() {
 		$lvl = $this->getPermissionLevel();
 		return [
 			'mayReadFreeBusy' => $lvl >= 5,
 			'mayReadItems' => $lvl >= 10,
 			'mayUpdatePrivate' => $lvl >= 20, // per-user properties only
-			'mayRSVP' => $lvl >= 25 && !$this->webcalUri, // only own principal status
-			'mayWriteOwn' => $lvl >= 30 && !$this->webcalUri, // write only owned events
-			'mayWriteAll' => $lvl >= 35 && !$this->webcalUri,
+			'mayRSVP' => $lvl >= 25 && $this->isWritable(), // only own principal status
+			'mayWriteOwn' => $lvl >= 30 && $this->isWritable(), // write only owned events
+			'mayWriteAll' => $lvl >= 35 && $this->isWritable(),
 			'mayAdmin' => $lvl >= 50,
-			'mayDelete' => $lvl >= 35 && $this->isOwner() && !$this->webcalUri, // calendar itself
+			'mayDelete' => $lvl >= 35 && $this->isOwner() && $this->isWritable(), // calendar itself
 		];
 	}
 

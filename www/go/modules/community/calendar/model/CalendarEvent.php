@@ -640,7 +640,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	public function toArray(array|null $properties = null): array|null
 	{
 		$arr =  parent::toArray($properties);
-		if($this->isPrivate() && $this->getPermissionLevel() <= Acl::LEVEL_READ && $this->ownerId !== go()->getUserId()) {
+		if($this->isPrivate() && $this->getPermissionLevel() <= 30/*Write own*/ && $this->ownerId !== go()->getUserId()) {
 			$arr['title'] = '';
 			$arr['description'] = '';
 			$arr['location'] = '';
