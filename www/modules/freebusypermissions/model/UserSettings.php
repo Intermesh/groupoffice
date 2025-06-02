@@ -1,6 +1,7 @@
 <?php
 namespace GO\Freebusypermissions\Model;
 
+use go\core\model\Acl;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use function GO;
@@ -33,7 +34,8 @@ class UserSettings extends Property {
 	}
 
 	private function createAcl() {
-		$acl = new \GO\Base\Model\Acl();
+
+		$acl = new Acl();
 		$acl->ownedBy = $this->user_id;
 		$acl->usedIn = FreeBusyAcl::model()->tableName();
 		$acl->save();
