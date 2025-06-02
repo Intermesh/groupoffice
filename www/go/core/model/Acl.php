@@ -19,6 +19,14 @@ use go\core\exception\Forbidden;
  * The Acl class
  * 
  * Is an Access Control List to restrict access to data.
+ *
+ * @example
+ * ```
+ * $acl = new Acl();
+ * $acl->ownedBy = 1;
+ * $acl->usedIn = "some_table";
+ * $acl->save();
+ * ```
  */
 class Acl extends Entity {
 
