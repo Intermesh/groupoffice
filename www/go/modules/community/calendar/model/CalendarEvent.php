@@ -31,7 +31,10 @@ use go\core\util\DateTime;
 
 class CalendarEvent extends AclItemEntity {
 
-	use CustomFieldsTrait;
+	use CustomFieldsTrait {
+		customFieldsModelId as traitCustomFieldModelId;
+	}
+
 	use SearchableTrait;
 
 	const PROD = '-//Intermesh//Group Office {VERSION}//EN';
@@ -233,6 +236,10 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	public static function customFieldsTableName(): string
 	{
 		return 'calendar_event_custom_fields';
+	}
+
+	public function customFieldsModelId() : string {
+		return (string) $this->eventId;
 	}
 
 	protected static function defineMapping(): Mapping {

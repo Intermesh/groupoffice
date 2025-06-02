@@ -55,6 +55,10 @@ trait CustomFieldsTrait {
 		return $this->customFieldsModel;
 	}
 
+	public function customFieldsModelId() : string {
+		return $this->id();
+	}
+
   /**
    * Setter for legacy modules
    *
