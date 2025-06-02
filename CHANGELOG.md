@@ -1,4 +1,5 @@
 - Leavedays: fix status loop when disapproving leave day requests
+- Fix non editable free busy permissions after user creation
 
 27-05-2025: 6.8.122
 - ActiveSync: z-push sync for notes and tasks #1289
