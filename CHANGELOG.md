@@ -1,3 +1,7 @@
+02-06-2025: 25.0.28
+- Calendar: Custom fields not saved
+- Core: TreeSelect was broken in GOUI
+
 02-06-2025: 25.0.27
 - Leavedays: fix status loop when disapproving leave day requests
 - Leavedays: show number of open requests
