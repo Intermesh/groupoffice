@@ -1,4 +1,6 @@
+02-06-2025: 25.0.27
 - Leavedays: fix status loop when disapproving leave day requests
+- Leavedays: show number of open requests
 - Freebusy: Fix non editable free busy permissions after user creation
 - Supportclient: Fixed grouping in support lists
 - Core: XSS error fixed in my account -> sync
