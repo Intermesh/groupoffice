@@ -2,6 +2,7 @@
 - Freebusy: Fix non editable free busy permissions after user creation
 - Supportclient: Fixed grouping in support lists
 - Core: XSS error fixed in my account -> sync
+- Core: Reflected XSS in Look and feel section of the application
 
 27-05-2025: 6.8.122
 - ActiveSync: z-push sync for notes and tasks #1289
