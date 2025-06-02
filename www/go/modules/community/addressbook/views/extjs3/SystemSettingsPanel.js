@@ -35,7 +35,7 @@ go.modules.community.addressbook.SystemSettingsPanel = Ext.extend(go.systemsetti
 					}
 				}))({
 					columns:1,
-					fieldLabel: t("Automatic linking"),
+					fieldLabel: t("Automatic e-mail linking"),
 					name:"autoLink",
 					disabled: !GO.savemailas,
 					hint: t("Warning: this will copy e-mails to the Group-Office storage and will therefore increase disk space usage. The e-mail will be visible to all people that can view the contact too."),

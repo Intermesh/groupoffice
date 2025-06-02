@@ -142,7 +142,7 @@ return array (
   'The selected contacts will be merged into one contact. Are you sure?' => 'Die ausgewählten Kontakte werden zu einem Kontakt zusammengefasst. Sind Sie sicher?',
   'Multiple Contacts' => 'Mehrfachkontakte',
   'Could not find this user in the address book for you.' => 'Dieser Nutzer konnte im Adressbuch nicht gefunden werden',
-  'Automatic linking' => 'Automatische Verknüpfung',
+  'Automatic e-mail linking' => 'Automatische e-mail Verknüpfung',
   'Don\'t link automatically to contacts' => 'Nicht automatisch mit Kontakten verknüpfen',
   'Link to all contacts' => 'Verknüpfen zu allen Kontakten',
   'Exclude contacts from the address books below' => 'Kontakte von folgenden Adressbüchern ausschließen',
