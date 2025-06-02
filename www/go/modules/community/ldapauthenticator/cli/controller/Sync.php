@@ -79,7 +79,7 @@ class Sync extends Controller
 
 
 	/**
-	 * docker-compose exec --user www-data groupoffice php /usr/local/share/src/www/cli.php community/ldapauthenticator/Sync/users --id=1 --dryRun=1 --delete=1 --maxDeletePercentage=50
+	 * docker compose exec --user www-data groupoffice php /usr/local/share/src/www/cli.php community/ldapauthenticator/Sync/users --id=1 --dryRun=1 --delete=1 --maxDeletePercentage=50
 	 * @throws NotFound
 	 * @throws Exception
 	 */
