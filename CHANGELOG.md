@@ -2,6 +2,7 @@
 - Freebusy: Fix non editable free busy permissions after user creation
 - Supportclient: Fixed grouping in support lists
 - Core: XSS error fixed in my account -> sync
+- Core: Reflected XSS in Look and feel section of the application
 
 30-05-2025: 25.0.26
 - Core: Fixed store load error when using custom filters
