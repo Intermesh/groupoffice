@@ -1,3 +1,4 @@
+02-06-2025: 6.8.123
 - Leavedays: fix status loop when disapproving leave day requests
 - Freebusy: Fix non editable free busy permissions after user creation
 - Supportclient: Fixed grouping in support lists
