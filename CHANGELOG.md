@@ -1,4 +1,6 @@
-02-06-2025: 25.0.28
+- Comments: show principal name
+
+- 02-06-2025: 25.0.28
 - Calendar: Custom fields not saved
 - Core: TreeSelect was broken in GOUI
 
