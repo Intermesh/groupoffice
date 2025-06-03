@@ -477,9 +477,6 @@ abstract class Property extends Model {
 		return $stmt;
 	}
 
-
-
-
 	/**
 	 * Needed to close the database connection
 	 *
@@ -489,7 +486,6 @@ abstract class Property extends Model {
 	{
 		self::$cachedRelationStmts = [];
 	}
-
 
 	private static function queryRelation($cls, array $where, Relation $relation, $readOnly, $owner): Statement
 	{
@@ -521,12 +517,8 @@ abstract class Property extends Model {
 				$stmt->bindValue(':'.$field, $value);
 			}
 		}
-
-
 		$stmt->execute();
-
 		return $stmt;
-
 	}
 
 	/**
