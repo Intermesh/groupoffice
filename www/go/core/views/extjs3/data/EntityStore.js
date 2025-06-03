@@ -350,7 +350,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 						})
 						.catch(setError => {
 							if(!response.notDestroyed) {
-								response.notUpdated = {};
+								response.notDestroyed = {};
 							}
 							response.notDestroyed[id] = setError;
 						})
