@@ -284,8 +284,7 @@ class TaskStore extends Store {
 		$tasks =  Task::find()
 			->select('task.id, UNIX_TIMESTAMP(task.modifiedAt) AS `mod`, "1" AS flags')
 			->fetchMode(PDO::FETCH_ASSOC)
-			->filter(["permissionLevel" => Acl::LEVEL_READ])
-			->where('tasklistId','=', $folderid);
+			->filter(["permissionLevel" => Acl::LEVEL_READ, "tasklistId" => $folderid]);
 
 		if (!empty($cutoffdate)) {
 			ZLog::Write(LOGLEVEL_DEBUG, 'Client sent cutoff date for tasks: ' . \GO\Base\Util\Date::get_timestamp($cutoffdate));
