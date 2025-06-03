@@ -2,6 +2,7 @@
 - Comments: show principal name
 - Core: module panels not visible to admins in user settings
 - Core: Fixed custom fields loading problem in system settings
+- Savemailas: Save link description when creating links
 
 - 02-06-2025: 25.0.28
 - Calendar: Custom fields not saved
