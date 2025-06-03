@@ -253,7 +253,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 				result.entities.forEach((e) => {
 
 					if (this.store.findBy(function (record) {
-						if (record.data.isFieldSet && record.data.fieldSetId === e.fieldSetId) {
+						if (record.data.isFieldSet && record.data.fieldSetId == e.fieldSetId) {
 							return true;
 						}
 					}) === -1) {
@@ -262,7 +262,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 					}
 
 					const record = this.store.getAt(this.store.findBy(function (record) {
-						if (record.data.fieldId === e.id) {
+						if (record.data.fieldId == e.id) {
 							return true;
 						}
 					}));
@@ -479,7 +479,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 		}
 	},
 
-	load: function () {
+	load: async function () {
 
 		const ss = this.getView().getScrollState();
 
@@ -493,7 +493,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 			filter: {
 				entities: [this.entity]
 			}
-		}, function (response) {
+		}, async function (response) {
 
 			if(!response.ids.length) {
 				this.store.loadData([], false);
@@ -501,7 +501,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 				return;
 			}
 
-			go.Db.store("FieldSet").get(response.ids, function (fieldSets) {
+			await go.Db.store("FieldSet").get(response.ids, function (fieldSets) {
 				fieldSetsLoaded = true;
 				var storeData = [], lastSortOrder = -1;
 				fieldSets.forEach(function (fs) {
