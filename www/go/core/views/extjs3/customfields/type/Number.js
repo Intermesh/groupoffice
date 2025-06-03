@@ -39,8 +39,6 @@ go.customfields.type.Number = Ext.extend(go.customfields.type.Text, {
 	createFormFieldConfig: function (customfield, config) {
 		var config = go.customfields.type.Number.superclass.createFormFieldConfig.call(this, customfield, config);
 
-		delete config.anchor;
-		config.width = dp(200);
 		config.xtype = "numberfield";
 		config.decimals = customfield.options.numberDecimals;
 
