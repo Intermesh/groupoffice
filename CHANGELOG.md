@@ -1,3 +1,4 @@
+- Tasks: Sync subscribed tasklists and remove sync settings
 - Comments: show principal name
 - Core: module panels not visible to admins in user settings
 
