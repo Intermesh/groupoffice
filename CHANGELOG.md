@@ -1,4 +1,5 @@
 - Comments: show principal name
+- Core: module panels not visible to admins in user settings
 
 - 02-06-2025: 25.0.28
 - Calendar: Custom fields not saved
