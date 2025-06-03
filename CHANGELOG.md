@@ -1,6 +1,7 @@
 - Tasks: Sync subscribed tasklists and remove sync settings
 - Comments: show principal name
 - Core: module panels not visible to admins in user settings
+- Core: Fixed custom fields loading problem in system settings
 
 - 02-06-2025: 25.0.28
 - Calendar: Custom fields not saved
