@@ -179,11 +179,15 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		
 	},
 
+	data() {
+		return window.groupofficeCore.jmapds(this.entity.name).data;
+	},
+
 
 	// TODO
 	findBy : function(fn, scope, startIndex) {
 		startIndex = startIndex || 0;
-		const data = Object.values(this.data);
+		const data = Object.values(this.data());
 		for(let i = startIndex, l = data.length; i < l; i++) {
 			if(fn.call(scope || this, data[i])) {
 				return data[i];
