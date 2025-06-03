@@ -35,8 +35,6 @@ Ext.define('go.form.ArrayFieldGrid',{
 
 	autoHeight: true,
 
-	entities: null,
-
 	constructor: function (config) {
 
 		config = config || {};
@@ -59,7 +57,7 @@ Ext.define('go.form.ArrayFieldGrid',{
 				dataIndex: config.idField,
 				renderer: function (id) {
 					//must be preloaded... but why?
-					return Ext.util.Format.htmlEncode(me.entities[id][me.displayField]);
+					return Ext.util.Format.htmlEncode(me.entityStore.findBy(item => item.id === id)[me.displayField]);
 				}
 			}
 		];
@@ -191,14 +189,6 @@ Ext.define('go.form.ArrayFieldGrid',{
 
 		//we must preload the notebooks so notebook select can use it in a renderer
 		this.entityStore.get(ids, function (entities) {
-
-			this.entities = {};
-
-			entities.forEach(e => {
-				this.entities[e.id] = e;
-			})
-
-
 			this.store.loadData({records: records});
 		}, this);
 	},
