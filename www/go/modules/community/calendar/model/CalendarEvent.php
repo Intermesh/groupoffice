@@ -644,10 +644,19 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 		return $success;
 	}
 
+	private function currentUserIsOwner() {
+		return $this->ownerId === go()->getUserId() ||
+		 ($this->ownerId === null && $this->createdBy === go()->getUserId());
+	}
+
 	public function toArray(array|null $properties = null): array|null
 	{
 		$arr =  parent::toArray($properties);
-		if($this->isPrivate() && $this->getPermissionLevel() <= Acl::LEVEL_READ && $this->ownerId !== go()->getUserId()) {
+		$showAsPrivate = $this->isPrivate() && $this->getPermissionLevel() <= 30/*Write own*/;
+		if($this->getPermissionLevel() === 30 && $this->currentUserIsOwner()) {
+			$showAsPrivate = false;
+		}
+		if($showAsPrivate) {
 			$arr['title'] = '';
 			$arr['description'] = '';
 			$arr['location'] = '';
