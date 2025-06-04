@@ -1,3 +1,5 @@
+- Leavedays: do not show notification if no open leave days (again)
+
 02-06-2025: 6.8.123
 - Leavedays: fix status loop when disapproving leave day requests
 - Freebusy: Fix non editable free busy permissions after user creation
