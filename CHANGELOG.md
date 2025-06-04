@@ -1,3 +1,4 @@
+04-06-2025: 6.8.124
 - Leavedays: do not show notification if no open leave days (again)
 
 02-06-2025: 6.8.123
