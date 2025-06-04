@@ -3,6 +3,7 @@
 - Core: module panels not visible to admins in user settings
 - Core: Fixed custom fields loading problem in system settings
 - Savemailas: Save link description when creating links
+- Return sums as int to hopefully fix issue quota / postfixverwaltung #1272
 
 - 02-06-2025: 25.0.28
 - Calendar: Custom fields not saved
