@@ -27,7 +27,7 @@ class Calendar extends AclOwnerEntity {
 	const Attending = 'attending';
 	const None = 'none';
 
-	const UserProperties = ['color', 'sortOrder', 'isVisible', 'isSubscribed'];
+	const UserProperties = ['color', 'sortOrder', 'isVisible', 'isSubscribed', 'includeInAvailability'];
 
 	public $id;
 	/** @var string The user-visible name of the calendar */
@@ -48,7 +48,7 @@ class Calendar extends AclOwnerEntity {
 	 *	- attending: events the user is a confirmed or tentative participant of are considered.
 	 *	- none: all events are ignored (but may be considered if also in another calendar).
 	 */
-	public $includeInAvailability = self::All;
+	public $includeInAvailability;
 
 	/** @var ?string default for event. If NULL client will use the Users default timeZone  */
 	public $timeZone;

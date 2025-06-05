@@ -20,7 +20,7 @@ class Crypt {
 	 * @return string
 	 * @throws EnvironmentIsBrokenException
 	 */
-	public static function encrypt(string $plaintext, string $password = null): string
+	public static function encrypt(string $plaintext, string|null $password = null): string
 	{
 		if (!isset($password)) {
 			$key = self::getKey();

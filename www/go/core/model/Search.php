@@ -178,7 +178,7 @@ class Search extends AclOwnerEntity {
 	 * @param Query $query
 	 * @param int $level
 	 */
-	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
+	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int|null $userId = null, array|null $groups = null): Query
 	{
 		Acl::applyToQuery($query, 'search.aclId', $level, $userId, $groups);
 		

@@ -204,41 +204,41 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 			});
 		}
 
-		if(go.Modules.isAvailable("community", "tasks"))
-		{
-			var defaultCol = new GO.grid.RadioColumn({
-				header: t("Default", "sync"),
-				dataIndex: 'isDefault',
-				width: dp(104)
-			});
-
-			this.tasklistSelect = new go.form.multiselect.Field({
-				name: "syncSettings.tasklists",
-				idField: "tasklistId",
-				displayField: "name",
-				entityStore: "Tasklist",
-				hideLabel: true,
-				extraColumns: [defaultCol],
-				extraFields: [{name: "isDefault", type: "boolean"}],
-				plugins: [defaultCol],
-				storeConfig: {
-					filters: {
-						default: {
-							role: 'list'
-						},
-						permission: {}
-					}
-				}
-			});
-
-			this.items.push({
-				xtype: "panel",
-				border: true,
-				style: "margin: " + dp(16) + "px",
-				items: [this.tasklistSelect],
-				title: t("Tasklists", "tasks", "community"),
-			});
-		}
+		// if(go.Modules.isAvailable("community", "tasks"))
+		// {
+		// 	var defaultCol = new GO.grid.RadioColumn({
+		// 		header: t("Default", "sync"),
+		// 		dataIndex: 'isDefault',
+		// 		width: dp(104)
+		// 	});
+		//
+		// 	this.tasklistSelect = new go.form.multiselect.Field({
+		// 		name: "syncSettings.tasklists",
+		// 		idField: "tasklistId",
+		// 		displayField: "name",
+		// 		entityStore: "Tasklist",
+		// 		hideLabel: true,
+		// 		extraColumns: [defaultCol],
+		// 		extraFields: [{name: "isDefault", type: "boolean"}],
+		// 		plugins: [defaultCol],
+		// 		storeConfig: {
+		// 			filters: {
+		// 				default: {
+		// 					role: 'list'
+		// 				},
+		// 				permission: {}
+		// 			}
+		// 		}
+		// 	});
+		//
+		// 	this.items.push({
+		// 		xtype: "panel",
+		// 		border: true,
+		// 		style: "margin: " + dp(16) + "px",
+		// 		items: [this.tasklistSelect],
+		// 		title: t("Tasklists", "tasks", "community"),
+		// 	});
+		// }
 	
 		this.on('show',function(){
 			if(this.panelCalendar)

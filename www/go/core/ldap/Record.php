@@ -38,7 +38,7 @@ class Record {
 	
 	protected static $_mapping = false;
 
-	public function __construct(Connection $connection = null, $entryId = null) {
+	public function __construct(Connection|null $connection = null, $entryId = null) {
 		$this->entryId = $entryId;
 		$this->connection = $connection;
 	}

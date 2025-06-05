@@ -73,7 +73,7 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 					dataIndex: config.idField,
 					renderer: function (id,meta, record) {
 						//must be preloaded
-						return me.entities[id][me.displayField];
+						return Ext.util.Format.htmlEncode(me.entities[id][me.displayField]);
 					}
 				}
 			];

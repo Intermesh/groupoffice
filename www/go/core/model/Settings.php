@@ -634,12 +634,12 @@ class Settings extends core\Settings {
 	/**
 	 * New users will be member of these groups
 	 * 
-	 * @return int[]
+	 * @return string[]
 	 */
 	public function getDefaultGroups(): array
 	{
 		if(!isset($this->defaultGroups)) {
-			$this->defaultGroups = array_map("intval", (new core\db\Query)
+			$this->defaultGroups = array_map("strval", (new core\db\Query)
 				->selectSingleValue('groupId')
 				->from("core_group_default_group")
 				->all());

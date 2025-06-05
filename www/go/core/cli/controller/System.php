@@ -149,13 +149,15 @@ JSON;
 	}
 
 	/**
-	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=ldapauthenticator --package=community --name=Sync
+	 * docker compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=ldapauthenticator --package=community --name=Sync
 	 *
-	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=contracts --package=business --name=CreateInvoices
+	 * docker compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=contracts --package=business --name=CreateInvoices
 	 *
-	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=core --package=core --name=GarbageCollection
+	 * docker compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=core --package=core --name=GarbageCollection
 	 *
-	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=calendar --package=community --name=ScanEmailForInvites
+	 * docker compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=calendar --package=community --name=ScanEmailForInvites
+	 *
+	 * docker compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=newsletters --package=business --name=Mailer
 	 * @throws NotFound
 	 */
 	public function runCron($params) {

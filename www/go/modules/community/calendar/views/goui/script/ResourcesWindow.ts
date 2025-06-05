@@ -160,7 +160,7 @@ export class ResourcesWindow extends Window {
 		this.items.add(
 			comp({cls:'hbox', flex:1},
 				aside,
-				splitter({stateId:'resource-splitter',resizeComponentPredicate:aside}),
+				splitter({stateId:'resource-splitter',resizeComponent:aside}),
 				comp({flex:1, cls:'vbox', style:{backgroundColor: 'var(--bg-low)'}},
 					tbar({cls: "border-bottom"},
 						h3(t("Resources")),

@@ -78,7 +78,10 @@ function addEmailAction() {
 
 						btns.innerHTML = '';
 						if(!item.calendarPrincipal){
-							btns.append(t('You are not an invited to this event'));
+							btns.append(
+								E('button', t("Import")).cls('goui-button').on('click', _ => {
+									item.save();
+								}));
 						} else {
 							btns.append(
 								E('div',
@@ -91,27 +94,33 @@ function addEmailAction() {
 											});
 										})
 									)
-								).cls('goui group'),
-								E('button', t("Open Calendar")).cls('goui-button').on('click', _ => {
-									router.goto("calendar/day/" + item.start.format('Y-m-d'));
-								})
+								).cls('goui group')
+
 							);
 						}
 					};
-				let text = msg.itip.feedback || {
+				let text = {
 					CANCEL: t("Cancellation"),
-					REQUEST: t("Invitation")
+					REQUEST: t("Invitation"),
+					NONE: t('Event'),
+					REPLY: t('Reply'),
 				}[msg.itip.method] || "Unable to process appointment information.";
 
 
 				if(event && typeof event !== 'string') {
-					let item = new CalendarItem({data:event, key:event.id + ""});
+					let item = new CalendarItem({data:event, key:event.id ? event.id + "" : ''});
 
 					if(msg.itip.recurrenceId && item.isRecurring) {
 						item = item.patchedInstance(msg.itip.recurrenceId);
 					}
-					if(msg.itip.method === 'REQUEST')
+					if(msg.itip.method === 'REQUEST' || msg.itip.method === 'NONE')
 						updateBtns(item);
+
+					if(item.start) {
+						btns.append(E('button', t("Open Calendar")).cls('goui-button').on('click', _ => {
+							router.goto("calendar/day/" + item.start.format('Y-m-d'));
+						}));
+					}
 
 					if(msg.itip.method !== 'REPLY') {
 
@@ -124,9 +133,14 @@ function addEmailAction() {
 					text += ', '+ (event ?? t('Unexisting event'));
 				}
 
+				const items = [text];
+
+				if(msg.itip.feedback) {
+					items.push(msg.itip.method != "REPLY" ? E("br") : ": ", msg.itip.feedback);
+				}
 
 				container.append(
-					E('li', E('i', 'event').cls('icon'), text, btns).cls('goui-toolbar')
+					E('li', E('i', 'event').cls('icon'), E("div",  ...items).css({flex: "1"}), btns).cls('goui-toolbar')
 				);
 			}
 		};

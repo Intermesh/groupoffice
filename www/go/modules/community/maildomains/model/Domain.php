@@ -90,7 +90,7 @@ final class Domain extends AclOwnerEntity
 			->addTable('community_maildomains_domain', 'cmd')
 			->addQuery(
 				(new Query())
-					->select('SUM(COALESCE(`cmm`.`quota`,0)) as `sumUsedQuota`, SUM(COALESCE(`cmm`.`bytes`,0)) as `sumUsage`')
+					->select('CAST(SUM(`cmm`.`quota`) AS SIGNED) as `sumUsedQuota`, CAST(SUM(`cmm`.`bytes`) AS SIGNED) as `sumUsage`')
 				->join('community_maildomains_mailbox', 'cmm', '`cmd`.`id`=`cmm`.`domainId`', 'LEFT')
 				->groupBy(['`cmm`.`domainId`']))
 			->addMap('dkim', DkimKey::class, ['id' => 'domainId']);

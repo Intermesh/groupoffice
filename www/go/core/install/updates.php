@@ -1736,3 +1736,24 @@ group by u.id;');
 $updates['202503271129'][] = "alter table core_module drop key name;";
 $updates['202503271129'][] = "alter table core_module add constraint name unique (name, package);";
 $updates['202503271129'][] = "ALTER TABLE `core_alert` ADD COLUMN `staleAt` DATETIME NULL AFTER `triggerAt`;";
+
+
+$updates['202505301440'][] = function() {
+	$stmt = go()->getDbConnection()
+		->select("id,name,isUserGroupFor")
+		->from("core_group")
+		->where('isUserGroupFor', '!=', null)
+		->orderBy(['isUserGroupFor' => 'ASC', 'name' => 'ASC']);
+
+	$lastIsUserGroupFor = -1;
+	foreach($stmt as $row) {
+		if($lastIsUserGroupFor == $row['isUserGroupFor']) {
+			go()->getDbConnection()
+				->delete("core_group", (new Query())->where('id', '=', $row['id']))
+				->execute();
+		}
+
+		$lastIsUserGroupFor  = $row['isUserGroupFor'];
+	}
+
+};

@@ -422,6 +422,8 @@ class Link extends AclItemEntity
 	}
 
 	/**
+	 * Update the models so that custom template fields will update their value
+	 *
 	 * @throws \GO\Base\Exception\AccessDenied
 	 */
 	private function updateEntities(): bool

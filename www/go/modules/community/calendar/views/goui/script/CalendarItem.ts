@@ -391,7 +391,9 @@ export class CalendarItem {
 	}
 
 	get mayChange() {
-		return this.isOwner && this.cal.myRights.mayWriteAll;
+		return this.isNew() ||
+			this.cal.myRights.mayWriteAll ||
+			(this.cal.myRights.mayWriteOwn && this.isOwner);
 	}
 
 	get calendarPrincipal() {

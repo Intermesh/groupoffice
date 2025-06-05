@@ -111,7 +111,7 @@ export class AvailabilityWindow extends Window {
 		jmapds('Principal').get(this.principalIds).then(response => {
 			for(const p of response.list) {
 
-				let available = p.id == go.User.id ? 'Organizer' : 'Beschikbaar' ;
+				let available = t(p.id == go.User.id ? 'Organizer' : 'Available') ;
 				const mAvatar = avatar({cls:"",displayName: p.name, backgroundImage: p.avatarId ? client.downloadUrl(p.avatarId) : undefined});
 
 				this.scheduleContainers[p.id!] = E('dd');

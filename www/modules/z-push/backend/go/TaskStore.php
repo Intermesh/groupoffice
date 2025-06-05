@@ -284,8 +284,7 @@ class TaskStore extends Store {
 		$tasks =  Task::find()
 			->select('task.id, UNIX_TIMESTAMP(task.modifiedAt) AS `mod`, "1" AS flags')
 			->fetchMode(PDO::FETCH_ASSOC)
-			->filter(["permissionLevel" => Acl::LEVEL_READ])
-			->where('tasklistId','=', $folderid);
+			->filter(["permissionLevel" => Acl::LEVEL_READ, "tasklistId" => $folderid]);
 
 		if (!empty($cutoffdate)) {
 			ZLog::Write(LOGLEVEL_DEBUG, 'Client sent cutoff date for tasks: ' . \GO\Base\Util\Date::get_timestamp($cutoffdate));
@@ -367,11 +366,8 @@ class TaskStore extends Store {
 
 		$tasklists = TaskList::find()
 			->selectSingleValue('tasklist.id')
-			->join("sync_tasklist_user", "u", "u.tasklistId = tasklist.id")
-			->andWhere('u.userId', '=', go()->getAuthState()->getUserId())
-			->filter([
-				"permissionLevel" => Acl::LEVEL_READ
-			]);
+			->andWhere('role', '=',1)
+			->andWhere('isSubscribed', '=', 1);
 
 		foreach($tasklists as $tasklistId) {
 			$folder = $this->StatFolder($tasklistId);
@@ -382,7 +378,6 @@ class TaskStore extends Store {
 		return $folders;
 	}
 
-	private $notificationStmt;
 
 	public function getNotification($folder = null) {
 

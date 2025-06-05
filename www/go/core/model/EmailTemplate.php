@@ -125,7 +125,7 @@ class EmailTemplate extends Entity
 	 * @param string|null $key
 	 * @return EmailTemplate|null
 	 */
-	public static function findByModule(string $package, string $name, ?string $preferredLanguage = null, string $key = null) : ?EmailTemplate {
+	public static function findByModule(string $package, string $name, ?string $preferredLanguage = null, string|null $key = null) : ?EmailTemplate {
 		$moduleModel = ModuleModel::findByName($package, $name);
 
 		if(!$moduleModel) {

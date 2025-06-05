@@ -2,6 +2,7 @@
 
 namespace go\core;
 
+use DateInterval;
 use DateTimeZone;
 use Exception;
 use go\core\data\Model;
@@ -201,7 +202,8 @@ class TemplateParser {
 	];
 	
 	public function __construct() {
-		$this->addFilter('date', [$this, "filterDate"]);		
+		$this->addFilter('date', [$this, "filterDate"]);
+		$this->addFilter('dateAdd', [$this, "filterDateAdd"]);
 		$this->addFilter('timestamp', [$this, "filterUnixTimestamp"]);
 		$this->addFilter('number', [$this, "filterNumber"]);
 		$this->addFilter('filter', [$this, "filterFilter"]);
@@ -217,8 +219,10 @@ class TemplateParser {
 		$this->addFilter('links', [$this, "filterLinks"]);
 		$this->addFilter('prop', [$this, "filterProp"]);
 
+
 		$this->addFilter('entityFiles', [$this, "filterEntityFiles"]);
 
+		$this->addFilter('substr', [$this, "filterSubstr"]);
 		$this->addFilter('nl2br', [$this, "filterNl2br"]);
 		$this->addFilter('markdown', [$this, "filterMarkdown"]);
 		$this->addFilter('empty', [$this, "filterEmpty"]);
@@ -307,7 +311,7 @@ class TemplateParser {
 		return go()->t($text, $package, $module);
 	}
 
-	private function filterDate(DateTime $date = null, $format = null): string
+	private function filterDate(DateTime|null$date = null, string|null $format = null): string
 	{
 
 		if(!isset($date)) {
@@ -321,6 +325,24 @@ class TemplateParser {
 		$date->setTimezone(new DateTimeZone($this->_currentUser()->timezone));
 
 		return $date->format($format);
+	}
+
+	private function filterDateAdd(?DateTime $date, string $interval): ?DateTime
+	{
+		if(!isset($date)) {
+			return null;
+		}
+
+		$di = new DateInterval($interval);
+		return $date->add($di);
+
+	}
+
+	private function filterSubstr(string|null $text, int $start, int|null $length = null): string {
+		if(!isset($text)) {
+			return "";
+		}
+		return substr($text, $start, $length);
 	}
 
 	/**
@@ -991,7 +1013,7 @@ class TemplateParser {
 		$expression = str_replace(';', ' ; ', $expression);
 		
 		//$parts = preg_split('#\s*((?<!\\\\)"[^"]*")\s*|\s+#', $expression, -1 , PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-		$parts = empty($expression) ? [] : str_getcsv($expression,' ','"');
+		$parts = empty($expression) ? [] : str_getcsv($expression,' ','"', "");
 		$parts = array_map('trim', $parts);
 		
 		$str = '';
@@ -1061,7 +1083,7 @@ class TemplateParser {
 		$value = $this->getVar($varPath);		
 		foreach($filters as $filter) {
 			
-			$args = array_map('trim', str_getcsv($filter, ':', '"'));
+			$args = array_map('trim', str_getcsv($filter, ':', '"', ""));
 			$filterName = strtolower(array_shift($args));
 			array_unshift($args, $value);
 

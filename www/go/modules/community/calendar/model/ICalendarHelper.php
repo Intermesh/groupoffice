@@ -385,7 +385,7 @@ class ICalendarHelper {
 		return $event;
 	}
 
-	static function makeBlob(CalendarEvent $event, string $data = null): Blob
+	static function makeBlob(CalendarEvent $event, string|null $data = null): Blob
 	{
 		$blob = Blob::fromString($data ?? $event->toVObject());
 		$blob->type = 'text/calendar';

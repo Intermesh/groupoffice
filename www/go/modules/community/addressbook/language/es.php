@@ -120,7 +120,7 @@ return array (
   'Bank details' => 'Datos bancarios',
   'Name bank' => 'Nombre del banco',
   'BIC' => 'BIC',
-  'Automatic linking' => 'Vinculación automática',
+  'Automatic e-mail  linking' => 'Vinculación e-mail automática',
   'Don\'t link automatically to contacts' => 'No vincular automáticamente a los contactos',
   'Link to all contacts' => 'Vincular a todos los contactos',
   'Exclude contacts from the address books below' => 'Excluir contactos de las libretas de direcciones',

@@ -4392,7 +4392,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if((!$this->hasLinks() && !$isSearchCacheModel) || $linksDisabled)
 			throw new \Exception("Links not supported by ".$this->className ());
 
-		Link::create($this, $model);
+		Link::create($this, $model, $description);
 
 		$this->fireEvent('link', array($this, $model, $description, $this_folder_id, $model_folder_id));
 		return true;

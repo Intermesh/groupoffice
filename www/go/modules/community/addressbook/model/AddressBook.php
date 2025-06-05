@@ -135,7 +135,7 @@ class AddressBook extends AclOwnerEntity {
 	 * @return \go\modules\community\addressbook\model\AddressBook
 	 * @throws \Exception
 	 */
-	public static function getDefault(\go\core\model\User $user = null) {
+	public static function getDefault(\go\core\model\User|null $user = null) {
 		
 		if(!isset($user)) {
 			$user = go()->getAuthState()->getUser(['addressBookSettings']);

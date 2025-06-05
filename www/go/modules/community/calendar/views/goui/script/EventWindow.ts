@@ -160,6 +160,7 @@ export class EventWindow extends FormWindow {
 								jmapds('Principal').single(this.item!.principalId).then(p=>{
 									if(p)
 										this.participantFld.addOrganiser(p);
+										this.participantFld.list.trackReset();
 								});
 							}
 						});
@@ -222,46 +223,13 @@ export class EventWindow extends FormWindow {
 				dlg.show(this.item, this.form.modified);
 			} }),
 			this.alertField,
+
 			textarea({
 				name:'description',
 				label: t('Description'),
-				autoHeight: true,
-				hidden: true,
-				listeners: {
-					render: (comp) => {
-						comp.input!.addEventListener("blur", () => {
-
-
-							const field = comp.nextSibling() as DisplayField;
-							field.value = comp.value;
-							comp.hide();
-							field.show();
-						})
-					}
-				}
+				autoHeight: true
 			}),
-			displayfield({
-				tabIndex: 0,
-				listeners: {
-					render: comp1 => {
-						comp1.el.addEventListener("focus", () => {
 
-							const field = comp1.previousSibling() as TextAreaField;
-							field.height = comp1.height;
-							comp1.hide();
-
-							field.show();
-							field.focus();
-						})
-					}
-				},
-				name:'description',
-				label: t('Description'),
-				cls: "pit",
-				escapeValue: false,
-				hideWhenEmpty: false,
-				renderer: (v, field) => Format.textToHtml(v)}
-			),
 			autocompletechips({
 				list: table({fitParent: true, headers: false, store: datasourcestore({dataSource:categoryStore.dataSource}),
 					rowSelectionConfig: {multiSelect: true},
@@ -392,6 +360,9 @@ export class EventWindow extends FormWindow {
 	loadEvent(ev: CalendarItem) {
 
 		//this.title = t(!ev.key ? 'New event' : 'Edit event');
+		if(ev.data.calendarId) {
+			ev.data.calendarId = ev.data.calendarId + ""; // select fields will change it to string and will trigger a modification
+		}
 		if (!ev.key) {
 			this.item = ev;
 			this.form.create(ev.data);
@@ -424,7 +395,7 @@ export class EventWindow extends FormWindow {
 		if(this.confirmedScheduleMessage) {
 			return;
 		}
-		if(!this.form.isModified()) {
+		if(this.form.currentId && !this.form.isModified()) {
 			this.close();
 			return false;
 		}

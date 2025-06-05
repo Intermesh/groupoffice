@@ -204,6 +204,12 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 			await this.openMailboxDlg(table.store.get(rowIndex)!.id);
 		});
 
+		mailboxTable.on("delete", async (tbl) => {
+			const ids = tbl.rowSelection!.getSelected().map(row => row.id);
+			await jmapds("MailBox")
+				.confirmDestroy(ids);
+		});
+
 		this.mailboxTable = mailboxTable;
 
 		return comp({
@@ -290,6 +296,12 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 		const aliasTable = new AliasTable();
 		aliasTable.on("rowdblclick", async (table, rowIndex, _ev) => {
 			await this.openAliasDlg(table.store.get(rowIndex)!.id);
+		});
+
+		aliasTable.on("delete", async (tbl) => {
+			const ids = tbl.rowSelection!.getSelected().map(row => row.id);
+			await jmapds("MailAlias")
+				.confirmDestroy(ids);
 		});
 
 		this.aliasTable = aliasTable;

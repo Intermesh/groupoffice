@@ -33,11 +33,11 @@ class DateTimeParser {
      * returned DateTime object will still be in the UTC timezone.
      *
      * @param string $dt
-     * @param DateTimeZone $tz
+     * @param DateTimeZone|null $tz
      *
      * @return DateTime
      */
-    static function parseDateTime($dt, DateTimeZone $tz = null) {
+    static function parseDateTime($dt, DateTimeZone|null $tz = null) {
 
         // Format is YYYYMMDD + "T" + hhmmss
         $result = preg_match('/^([0-9]{4})([0-1][0-9])([0-3][0-9])T([0-2][0-9])([0-5][0-9])([0-5][0-9])([Z]?)$/', $dt, $matches);
@@ -68,7 +68,7 @@ class DateTimeParser {
      *
      * @return DateTime
      */
-    static function parseDate($date, DateTimeZone $tz = null) {
+    static function parseDate($date, DateTimeZone|null $tz = null) {
 
         // Format is YYYYMMDD
         $result = preg_match('/^([0-9]{4})([0-1][0-9])([0-3][0-9])$/', $date, $matches);

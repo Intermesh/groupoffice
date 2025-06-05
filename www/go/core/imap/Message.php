@@ -506,7 +506,7 @@ class Message extends Model {
 	 * @param Streamer $streamer
 	 * @param string|boolean Returns boolean if streamer is given and operation was successful
 	 */
-	public function fetchPartData($partNumber, $peek = true, Streamer $streamer = null) {
+	public function fetchPartData($partNumber, $peek = true, Streamer|null $streamer = null) {
 		
 		$peek_str = $peek ? '.PEEK' : '';
 

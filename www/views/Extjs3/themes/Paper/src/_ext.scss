@@ -1399,12 +1399,11 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 		}
 		&-selected{
 			background-color: $cSelected;
-			color:#000;
 			span{
-				color:#000 !important;
+				color:var(--fg-text) !important;
 			}
 			.x-grid3-cell-text{
-				color:#000;
+				color:var(--fg-text);
 			}
 		}
 		//padding: dp(8) dp(16) dp(0) dp(32);
@@ -1529,7 +1528,7 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 
 .x-grid-editor {
 	.x-form-field {
-		min-height: dp(40);
+		min-height: dp(36);
 		border: 0;
 		padding-left: dp(16);
 		border-radius: 0;

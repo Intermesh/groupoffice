@@ -202,12 +202,8 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 							}, this);
 						}
 					},
-					tpl: '<tpl if="values.actionAt || dates.length"><div class="icons">\
+					tpl: '<tpl if="dates.length"><div class="icons">\
 					<hr class="indent">\
-						<tpl if="values.actionAt"><a class="s6"><i class="icon label">event</i></tpl>\
-							<span>{[go.util.Format.date(values.actionAt)]}</span>\
-							<label>{[t("Action date")]}</label>\
-						</a>\
 						<tpl for="dates"><a class="s6"><tpl if="xindex == 1"><i class="icon label">cake</i></tpl>\
 							<span>{[go.util.Format.date(values.date)]}</span>\
 							<label>{[t("dateTypes")[values.type] || values.type]}</label>\

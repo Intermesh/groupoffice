@@ -293,7 +293,7 @@ class QueryBuilder {
 	/**
 	 * Build the select SQL and params
 	 */
-	public function buildSelect(Query $query = null, $prefix = ""): array
+	public function buildSelect(Query|null $query = null, $prefix = ""): array
 	{
 
 		$unions = $query->getUnions();

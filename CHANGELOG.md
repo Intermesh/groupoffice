@@ -1,3 +1,48 @@
+05-06-2025: 25.0.29
+- Tasks: Sync subscribed tasklists and remove sync settings
+- Comments: show principal name
+- Leavedays: refactor notification code
+- Core: module panels not visible to admins in user settings
+- Core: Fixed custom fields loading problem in system settings
+- Savemailas: Save link description when creating links
+- Maildomains: Return sums as int to hopefully fix issue quota / postfixverwaltung #1272
+- ActiveSync: Fix for all day events spanning an extra day
+
+02-06-2025: 25.0.28
+- Calendar: Custom fields not saved
+- Core: TreeSelect was broken in GOUI
+
+02-06-2025: 25.0.27
+- Leavedays: fix status loop when disapproving leave day requests
+- Leavedays: show number of open requests
+- Freebusy: Fix non editable free busy permissions after user creation
+- Supportclient: Fixed grouping in support lists
+- Core: XSS error fixed in my account -> sync
+- Core: Reflected XSS in Look and feel section of the application
+
+30-05-2025: 25.0.26
+- Core: Fixed store load error when using custom filters
+- Address book: Removed duplicate action date in detail
+- Calendar: removed displayfield() for description as it had some unexpected results when the description was overridden for an occurrence
+- Calendar: New event without any changes wouldn't save anymore
+- Calendar: all events disappeared in week view when deleting an event that has participants or is recurring
+- Core: Stretch custom date fields so larger labels don't run out of the field
+- Core: Fixed creating double user groups and duplicates will be removed.
+- Addressbook: filter hasemailaddresses and hasphonenumbers work with false too
+- Finance: Added "nextContractDate" to finance document model
+- Core: Added dateAdd() and subtr() function to template parser
+
+27-05-2025: 25.0.25
+- Calendar: Show import button if calendar event is not a valid scheduling object
+- Calendar: Show open calendar button on all invites
+- Projects2: Find project tasks in time registration window
+
+26-05-2025: 25.0.24
+- Files: fix permission error when restoring file as end user
+- ActiveSync: Z-Push problem fixed: z-push sync for notes and tasks #1289
+- Newsletters: When setting max messages per minute to 0 it will send as fast as possible and doesn't default to 120 messages per minute
+- Newsletters: When a sending limit is applied the sending time is now taken in to account too.
+
 20-05-2025: 25.0.23
 - Projects: Problem with loading project panel
 - Z-Push: Created new Z-Push repository
