@@ -1,3 +1,4 @@
+- Leavedays: Manager of logged in user got notification if you added a holiday on behalf of someone else
 - Updated German translations. Danke, Daniel!
 - Leavedays: fully refactor notification
 
