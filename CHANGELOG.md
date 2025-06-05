@@ -1,3 +1,4 @@
+05-06-2025: 25.0.29
 - Tasks: Sync subscribed tasklists and remove sync settings
 - Comments: show principal name
 - Leavedays: refactor notification code
@@ -7,7 +8,7 @@
 - Maildomains: Return sums as int to hopefully fix issue quota / postfixverwaltung #1272
 - ActiveSync: Fix for all day events spanning an extra day
 
-- 02-06-2025: 25.0.28
+02-06-2025: 25.0.28
 - Calendar: Custom fields not saved
 - Core: TreeSelect was broken in GOUI
 
