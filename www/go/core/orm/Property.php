@@ -1,5 +1,4 @@
 <?php
-
 namespace go\core\orm;
 
 use DateTimeImmutable;
@@ -477,9 +476,6 @@ abstract class Property extends Model {
 		return $stmt;
 	}
 
-
-
-
 	/**
 	 * Needed to close the database connection
 	 *
@@ -489,7 +485,6 @@ abstract class Property extends Model {
 	{
 		self::$cachedRelationStmts = [];
 	}
-
 
 	private static function queryRelation($cls, array $where, Relation $relation, $readOnly, $owner): Statement
 	{
@@ -521,12 +516,8 @@ abstract class Property extends Model {
 				$stmt->bindValue(':'.$field, $value);
 			}
 		}
-
-
 		$stmt->execute();
-
 		return $stmt;
-
 	}
 
 	/**
@@ -935,10 +926,10 @@ abstract class Property extends Model {
 	/**
 	 * Changes the string key "1-2" into ['primaryKey1' => 1', 'primaryKey2' => '2]
 	 *
-	 * @param string $id eg. "1-2"
+	 * @param string|int $id eg. "1-2"
 	 * @return array eg. ['primaryKey1' => 1', 'primaryKey2' => '2]
 	 */
-	public static function idToPrimaryKeys(string $id): array
+	public static function idToPrimaryKeys(string|int $id): array
 	{
 		$primaryTable = static::getMapping()->getPrimaryTable();
 

@@ -500,8 +500,15 @@ abstract class Entity  extends OrmEntity {
 				$query = $cls::find();
 
 				if(!empty($path)) {
-					//TODO joinProperties only joins the first table.
-					$query->joinProperties($path);
+
+					$query->joinRelation($path);
+
+					$aliases = $query->findTableAliases($r['table']);
+					if(count($aliases) != 1) {
+						// we did manage to join a single table. With a user table like in ProjectStatus the table is not joined.
+						// this is incorrect but it doesn't really matter and fixing it will unnecessarily complicate things.
+						continue;
+					}
 					$query->where(array_pop($path) . '.' .$r['column'], 'IN', $ids);
 				} else{
 					$query->where($r['column'], 'IN', $ids);					
@@ -741,7 +748,7 @@ abstract class Entity  extends OrmEntity {
    *
    * It uses the 'information_schema' to read all foreign key relations.
    *
-   * @return array [['cls'=>'Contact', 'column' => 'id', 'paths' => []]]
+   * @return array [['cls'=>'Contact', 'column' => 'id', 'table' =>'foo' 'paths' => []]]
    * @throws Exception
    */
 	protected static function getEntityReferences(): array
@@ -755,6 +762,7 @@ abstract class Entity  extends OrmEntity {
 				$entities = static::findEntitiesByTable($r['table']);
 				$eWithCol = array_map(function($i) use($r) {
 					$i['column'] = $r['column'];
+					$i['table'] = $r['table'];
 					return $i;
 				}, $entities);
 

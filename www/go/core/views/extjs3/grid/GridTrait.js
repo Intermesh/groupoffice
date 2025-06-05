@@ -450,7 +450,7 @@ go.grid.GridTrait = {
 
 			var msg = "";
 			for(var id in result.notDestroyed) {
-				msg += id + ": " + result.notDestroyed[id].description + "<br />";
+				msg += id + ": " + result.notDestroyed[id].message + "<br />";
 			}
 						
 			Ext.MessageBox.alert(t("Error"), t("Could not delete some items: <br /><br />" + msg));

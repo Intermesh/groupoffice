@@ -1,5 +1,11 @@
+- Tasks: Sync subscribed tasklists and remove sync settings
 - Comments: show principal name
 - Leavedays: refactor notification code
+- Core: module panels not visible to admins in user settings
+- Core: Fixed custom fields loading problem in system settings
+- Savemailas: Save link description when creating links
+- Maildomains: Return sums as int to hopefully fix issue quota / postfixverwaltung #1272
+- ActiveSync: Fix for all day events spanning an extra day
 
 - 02-06-2025: 25.0.28
 - Calendar: Custom fields not saved

@@ -366,11 +366,8 @@ class TaskStore extends Store {
 
 		$tasklists = TaskList::find()
 			->selectSingleValue('tasklist.id')
-			->join("sync_tasklist_user", "u", "u.tasklistId = tasklist.id")
-			->andWhere('u.userId', '=', go()->getAuthState()->getUserId())
-			->filter([
-				"permissionLevel" => Acl::LEVEL_READ
-			]);
+			->andWhere('role', '=',1)
+			->andWhere('isSubscribed', '=', 1);
 
 		foreach($tasklists as $tasklistId) {
 			$folder = $this->StatFolder($tasklistId);
@@ -381,7 +378,6 @@ class TaskStore extends Store {
 		return $folders;
 	}
 
-	private $notificationStmt;
 
 	public function getNotification($folder = null) {
 

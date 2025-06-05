@@ -99,10 +99,13 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 
 	load(form, values, customFields) {
 
-		if(this.fieldSet.collapseIfEmpty) {
-			isModified = false;
+		if(!this.fieldSet.isTab && this.fieldSet.collapseIfEmpty) {
+			let isModified = false;
 			for (const field of customFields) {
-				const name = field.name.replace('customFields.', '');
+
+				const nameProp = field.name ? "name" : "hiddenName";
+
+				const name = field[nameProp].replace('customFields.', '');
 				if (name) {
 					if (!(name in values.customFields) || values.customFields[name] == field.value ||
 						(Ext.isEmpty(values.customFields[name]) && Ext.isEmpty(field.value))) {

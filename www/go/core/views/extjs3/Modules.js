@@ -113,7 +113,7 @@ go.Modules = (function () {
 				{
 					allow = true;
 				}
-				if(allow && user.groups.indexOf(parseInt(groupId)) != -1) {
+				if(allow && user.groups.indexOf(groupId) != -1) {
 					return true;
 				}
 			}
