@@ -64,16 +64,16 @@ class Contact extends AclItemEntity {
 	/**
 	 * Prefixes like 'Sir'
 	 */							
-	public string $prefixes = '';
-	public string $initials = '';
-	public string $firstName = '';
-	public string $middleName = '';
-	public string $lastName = '';
+	public ?string $prefixes = '';
+	public ?string $initials = '';
+	public ?string $firstName = '';
+	public ?string $middleName = '';
+	public ?string $lastName = '';
 
 	/**
 	 * Suffixes like 'Msc.'
 	 */							
-	public string $suffixes = '';
+	public ?string $suffixes = '';
 
 	/**
 	 * M for Male, F for Female or null for unknown
@@ -95,31 +95,31 @@ class Contact extends AclItemEntity {
 	/**
 	 * name field for companies and contacts. It should be the display name of first, middle and last name
 	 */							
-	public string $name;
+	public ?string $name;
 
 	/**
 	 * name of the bank for this contact
 	 * @var string
 	 */
-	public string $nameBank = '';
+	public ?string $nameBank = '';
 
 	/**
 	 *
 	 * @var string
 	 */
-	public string $BIC = '';
+	public ?string $BIC = '';
 
 	/**
 	 * 
 	 * @var string
 	 */							
-	public string $IBAN = '';
+	public ?string $IBAN = '';
 
 	/**
 	 * Company trade registration number
 	 * @var string
 	 */							
-	public string $registrationNumber = '';
+	public ?string $registrationNumber = '';
 
 	/**
 	 * International Code Designator (ISO/IEC 6523)
