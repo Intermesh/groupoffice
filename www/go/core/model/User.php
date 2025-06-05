@@ -326,7 +326,7 @@ class User extends AclItemEntity {
 	public $sort_email_Addresses_by_time;
 	public $no_reminders;
 	
-	protected ?DateTime $passwordModifiedAt;
+	protected ?DateTime $passwordModifiedAt = null;
 	public bool $forcePasswordChange = false;
 
 	public function getDateTimeFormat(): string

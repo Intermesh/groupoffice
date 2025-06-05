@@ -22,23 +22,17 @@ class EntityFilter extends AclOwnerEntity {
 	 * 
 	 * @var int
 	 */							
-	public $id;
+	public ?string $id;
 	
-	protected $entityTypeId;
+	protected int $entityTypeId;
 
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $createdBy;
+	public ?string $createdBy;
 	
-	public $name;
+	public string $name;
 	
-	protected $filter;
-	
-	public $aclId;
+	protected string $filter;
 
-	public $type = "fixed";
+	public string $type = "fixed";
 
 	protected static function defineMapping(): Mapping
 	{
