@@ -1,4 +1,5 @@
 - Comments: show principal name
+- Leavedays: refactor notification code
 
 - 02-06-2025: 25.0.28
 - Calendar: Custom fields not saved
