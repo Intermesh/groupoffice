@@ -21,56 +21,22 @@ class Address extends Property {
 	const TYPE_HOME = "home";
 	const TYPE_DELIVERY = "delivery";
 
-	/**
-	 * 
-	 * @var int
-	 */							
-	protected $contactId;
-
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $type;
-
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $address = '';
-
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $zipCode = '';
-
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $city = '';
-
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $state = '';
-
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $country;
+	protected int $contactId;
+	public ?string $type = '';
+	public ?string $address = '';
+	public ?string $zipCode = '';
+	public ?string $city = '';
+	public ?string $state = '';
+	public ?string $country = '';
 	
 	/**
 	 * ISO 3601 2 char country code. eg. "NL".
 	 * @var ?string
 	 */
-	public $countryCode;
+	public ?string $countryCode = null;
 	
-	public $latitude;
-	public $longitude;
+	public ?float $latitude = null;
+	public ?float $longitude = null;
 
 	protected static function defineMapping(): Mapping
 	{

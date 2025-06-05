@@ -19,8 +19,8 @@ final class Mailbox extends AclItemEntity
 {
 	const EVENT_PASSWORD_VERIFIED = 'passwordverified';
 
-	public ?int $id;
-	public int $domainId;
+	public ?string $id;
+	public string $domainId;
 	public string $username;
 	protected ?string $password;
 

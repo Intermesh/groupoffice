@@ -37,16 +37,16 @@ class Participant extends Property
 		'contact'=>5
 	];
 
-	protected $id;
-	protected $eventId;
+	protected ?int $id;
+	protected int $eventId;
 	/** @var string display name of participant */
-	public $name;
+	public string $name;
 
 	/** @var string email address for the participant */
-	public $email;
+	public string $email;
 
-	/** @var string description with for example information about there role or how best to contact them. */
-	public $description;
+	/** @var ?string description with for example information about there role or how best to contact them. */
+	public ?string $description;
 
 	/**
 	* @var string[string] method => uri
@@ -54,7 +54,7 @@ class Participant extends Property
 	* future methods may be specified
 	* eg. ['imap'=>'mailto:michael@example.com']
 	*/
-	public $sendTo;
+	public ?string $sendTo;
 
 	/** @var string What kind of entity this participant is: 'individuel', 'group', 'location', 'resource */
 	public $kind;
@@ -81,7 +81,7 @@ class Participant extends Property
 	public $scheduleAgent;
 
 	/** @var int The sequence number of the last response from the participant.  */
-	public $scheduleSequence = 0;
+	public int $scheduleSequence = 0;
 
 	/** @var string[] A list of status codes, returned from the precessing of the most recent scheduling messages */
 	//public $scheduleStatus = [];
@@ -90,7 +90,7 @@ class Participant extends Property
 	public $scheduleUpdated;
 
 	/** @var string The requestStatus received when the participant sends an REPLY iTip */
-	public $scheduleStatus;
+	public ?string  $scheduleStatus = null;
 	/** @var string used for access to the invite page to accept/decline */
 	protected $scheduleSecret;
 

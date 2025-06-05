@@ -19,47 +19,46 @@ use go\core\validate\ErrorCode;
 
 class Server extends Entity {
 	
-	public $id;
-	public $hostname;
-	public $port = 389;
-	public $encryption = "tls";
-	public $ldapVerifyCertificate = true;
+	public ?string $hostname;
+	public int $port = 389;
+	public ?string $encryption = "tls";
+	public bool $ldapVerifyCertificate = true;
 	
-	public $usernameAttribute = "uid";
+	public string $usernameAttribute = "uid";
 	
-	public $peopleDN = "";
-	public $groupsDN = "";
+	public string $peopleDN = "";
+	public string $groupsDN = "";
 	
 	
-	public $imapHostname;
-	public $imapPort;
-	public $imapEncryption;
+	public ?string $imapHostname;
+	public ?int $imapPort;
+	public ?string $imapEncryption;
 	
-	public $imapValidateCertificate = true;
+	public bool $imapValidateCertificate = true;
 
-	public $loginWithEmail = false;
+	public bool $loginWithEmail = false;
 
-	public $smtpHostname;
-	public $smtpPort;
-	public $smtpUsername;
-	public $smtpPassword;
-	public $smtpUseUserCredentials= false;
-	public $smtpValidateCertificate = true;
-	public $smtpEncryption;
+	public ?string $smtpHostname;
+	public ?int $smtpPort;
+	public ?string $smtpUsername;
+	public ?string $smtpPassword;
+	public bool $smtpUseUserCredentials= false;
+	public bool $smtpValidateCertificate = true;
+	public ?string $smtpEncryption;
 
-	public $syncUsers = false;
-	public $syncUsersDelete = false;
-	public $syncUsersQuery;
-	public $syncGroups = false;
-	public $syncGroupsDelete = false;
-	public $syncGroupsQuery;
-	public $syncGroupsMaxDeletePercentage = 5;
-	public $syncUsersMaxDeletePercentage = 5;
+	public bool $syncUsers = false;
+	public bool $syncUsersDelete = false;
+	public ?string $syncUsersQuery;
+	public bool $syncGroups = false;
+	public bool $syncGroupsDelete = false;
+	public ?string $syncGroupsQuery;
+	public int $syncGroupsMaxDeletePercentage = 5;
+	public int $syncUsersMaxDeletePercentage = 5;
 
-	public $imapUseEmailForUsername = false;
+	public bool $imapUseEmailForUsername = false;
 
-	public $followReferrals = 1;
-	public $protocolVersion = 3;
+	public int $followReferrals = 1;
+	public int $protocolVersion = 3;
 
 	
 	
@@ -69,29 +68,29 @@ class Server extends Entity {
 	 * 
 	 * @var Domain[]
 	 */
-	public $domains;
+	public array $domains;
 	
 	/**
 	 * New users will be added to these user groups
 	 * 
 	 * @var Group[]
 	 */
-	public $groups;
+	public array $groups;
 
 	
 	/**
 	 * Set username authentication is needed to lookup users / groups.
 	 * 
-	 * @var string
+	 * @var ?string
 	 */
-	public $username;
+	public ?string $username;
 	
 	/**
 	 * Set password authentication is needed to lookup users / groups.
 	 * 
-	 * @var string
+	 * @var ?string
 	 */
-	protected $password;
+	protected ?string $password;
 
 
 	public function historyLog(): bool|array

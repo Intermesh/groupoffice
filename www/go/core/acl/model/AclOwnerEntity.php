@@ -214,7 +214,7 @@ abstract class AclOwnerEntity extends AclEntity {
 		return (new Query)->selectSingleValue(static::$aclColumnName)->distinct()->from($firstTable->getName());
 	}
 
-	public function findAclId(): ?int {
+	public function findAclId(): int {
 		return $this->{static::$aclColumnName};
 	}
 

@@ -6,9 +6,9 @@ use go\core\orm\Mapping;
 
 class Domain extends \go\core\orm\Property {
 	
-	public $id;
-	public $serverId;
-	public $name;
+	public ?int $id;
+	public int $serverId;
+	public string $name;
 	
 	protected static function defineMapping(): Mapping
 	{

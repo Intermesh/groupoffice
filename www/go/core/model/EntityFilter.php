@@ -17,11 +17,7 @@ use go\core\util\ArrayObject;
  */
 
 class EntityFilter extends AclOwnerEntity {
-	
-	/**
-	 * 
-	 * @var int
-	 */							
+
 	public ?string $id;
 	
 	protected int $entityTypeId;

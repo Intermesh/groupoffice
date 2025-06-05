@@ -14,21 +14,10 @@ use go\core\orm\Property;
 
 class CommentAttachment extends Property {
 
-	public $id;
-	/**
-	 *
-	 * @var int
-	 */
-	public $commentId;
-
-	/**
-	 *
-	 * @var string
-	 */
-	public $blobId;
-
-
-	public $name;
+	public int $id;
+	public string $commentId;
+	public string $blobId;
+	public string $name;
 
 	protected static function defineMapping(): Mapping
 	{

@@ -2,6 +2,7 @@
 
 namespace go\modules\community\history\model;
 
+use DateTime;
 use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core\acl\model\AclEntity;
@@ -35,32 +36,32 @@ class LogEntry extends AclOwnerEntity {
 		'email' => 8
 	];
 
-	public $id;
+	public ?string $id;
 
-	protected $action;
+	protected int $action;
 
-	public $changes;
+	public ?string $changes;
 
-	public $createdAt;
+	public ?DateTime $createdAt = null;
 
-	public $createdBy;
+	public ?string $createdBy = null;
 
-	public $removeAcl;
+	public bool $removeAcl = false;
 
-	public $entityTypeId;
+	public int $entityTypeId;
 
-	public $entityId;
+	public int $entityId;
 
 	/**
 	 * @var string
 	 */
-	protected $entity;
+	protected string $entity;
 
-	public $description;
+	public ?string $description;
 
-	public $remoteIp;
+	public ?string $remoteIp;
 
-	public $requestId;
+	public ?string $requestId;
 
 	protected function init()
 	{

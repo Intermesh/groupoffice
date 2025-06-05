@@ -16,8 +16,8 @@ use go\modules\community\maildomains\util\DnsCheck;
 final class Domain extends AclOwnerEntity
 {
 
-	public ?int $id;
-	public ?int $userId;
+	public ?string $id;
+	public ?string $userId;
 	public string $domain;
 	public string|null $description;
 

@@ -16,15 +16,15 @@ use go\modules\community\davclient\Module;
  */
 class Calendar extends Property
 {
-	protected $davaccountId;
+	protected int $davaccountId;
 	/** @var string uri to the calendar on the server, also key of map */
-	public $uri;
+	public string $uri;
 
-	public $id; // not auto increment but uses the Calendar id
+	public string $id; // not auto increment but uses the Calendar id
 
-	/** @var string if server has different ctag we need to fetch all etag to find out what changed. */
-	public $ctag;
-	public $synctoken;
+	/** @var ?string if server has different ctag we need to fetch all etag to find out what changed. */
+	public ?string $ctag = null;
+	public ?string $synctoken = null;
 
 	protected static function defineMapping(): Mapping
 	{

@@ -1559,7 +1559,7 @@ abstract class Entity extends Property {
 	/**
 	 * @var array
 	 */
-	protected $attachments = [];
+	protected array $attachments = [];
 
 	public function setAttachments(array $attachments)
 	{

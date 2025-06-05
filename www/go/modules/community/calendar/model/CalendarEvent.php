@@ -54,10 +54,10 @@ class CalendarEvent extends AclItemEntity {
 //	const PrivateProperties = ['created', 'due', 'duration', 'estimatedDuration', 'freeBusyStatus', 'privacy',
 //		'recurrenceOverrides', 'sequence', 'showWithoutTime', 'start', 'timeZone', 'timeZones', 'uid','updated'];
 
-const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','description','locale','location', 'showWithoutTime',
-'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule'
+	const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','description','locale','location', 'showWithoutTime',
+	'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule'
 
-];
+	];
 
 	const EventProperties = ['uid','isOrigin','replyTo', 'prodId', 'sequence','title','description','locale','location', 'showWithoutTime',
 		'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule','createdAt','modifiedAt',
@@ -72,41 +72,34 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 //		'relatedTo','replyTo','sentBy','timeZones'];
 
 
-	static $sendSchedulingMessages = false;
-	static $fromClient = false;
+	static bool $sendSchedulingMessages = false;
+	static bool $fromClient = false;
 
-	public $calendarId;
-	protected $eventId;
+	public string $calendarId;
+	protected ?int $eventId;
 	/**
 	 * @var boolean true when this event is created by this calendar system
 	 * false if the event is imported from an invitation and the organizer is in another system
 	 */
-	public $isOrigin;
+	public bool $isOrigin;
 	/**
 	 * When isOrigin is false this is the organizers email
-	 * @var string email
+	 * @var ?string email
 	 */
-	public $replyTo;
-	/**
-	 * @var string status is set after a scheduling action like sending a REPLY iTip to the organizer
-	 */
-	public $responseStatus;
+	public ?string $replyTo;
 
-	public $role;
-	public $email;
+	public ?string $id;
+	public ?string $prodId;
+	public ?string $timeZone;
+	public ?string $locale;
+	public int $priority = 0;
+	public ?string $color;
+	public bool $useDefaultAlerts = true;
 
-	public $id;
-	public $prodId;
-	public $timeZone;
-	public $locale;
-	public $priority;
-	public $color;
-	public $useDefaultAlerts;
 	/**
 	 * A unique identifier for the object.
-	 * @var string
 	 */
-	public $uid;
+	public ?string $uid;
 
 	/**
 	 * This is only set when somebody is invited to a single occurrence of a series.
@@ -124,19 +117,19 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	 * makes a change (except when only the "participants" property is changed)
 	 * @var int
 	 */
-	public $sequence = 0;
+	public int $sequence = 0;
 
 	/**
 	 * Time is ignored for this event when true
 	 * @var bool
 	 */
-	public $showWithoutTime = false;
+	public bool $showWithoutTime = false;
 
 	/**
 	 * The start time of the event
 	 * @var DateTime
 	 */
-	public $start;
+	public ?DateTime $start;
 
 	public $utcStart;
 	public $utcEnd;
@@ -146,31 +139,30 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	 * (optional, default: PT0S)
 	 * @var string
 	 */
-	public $duration;
+	public string $duration;
 
 	/**
 	 * The title
 	 * @var string
 	 */
-	public $title = '';
+	public string $title = '';
 
 	/**
 	 * free text that would describe the event
 	 * @var string
 	 */
-	public $description = '';
+	public string $description = '';
 
 	/**
 	 * The location where the event takes place
 	 * @var string
 	 */
-	public $location;
+	public string $location;
 
 	/**
 	 * Status of event (confirmed, canceled, tentative)
-	 * @var int
 	 */
-	public $status = self::Confirmed;
+	public string $status = self::Confirmed;
 
 	/**
 	 * auto tagging to give the event some flair. See Resource folder

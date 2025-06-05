@@ -11,50 +11,41 @@ use go\core\orm\Property;
 class Preferences extends Property
 {
 
-	public $userId;
+	public int $userId;
 
 	/** @var bool  If true, enables multiple time zone support. */
-	public $useTimeZones = 0;
+	public bool $useTimeZones = false;
 
 	/** @var bool If true, shows week number in calendar. */
-	public $showWeekNumbers;
+	public bool $showWeekNumbers;
 
 	/** @var bool If true, show events that you have RSVPed "no" to */
-	public $showDeclined;
+	public bool $showDeclined;
 
 	/** @var bool Show birthdays on the calendar */
-	public $birthdaysAreVisible = 0;
+	public bool $birthdaysAreVisible = false;
 	/** @var bool Show birthdays on the calendar */
-	public $tasksAreVisible = 0;
+	public bool $tasksAreVisible = false;
 	/** @var bool Show birthdays on the calendar */
-	public $holidaysAreVisible =0;
+	public bool $holidaysAreVisible = false;
 
-	/** @var int The id of the user's default calendar. */
-	public $defaultCalendarId;
+	/** @var ?string The id of the user's default calendar. */
+	public ?string $defaultCalendarId = null;
 
 	/**
 	 * If true, whenever an event invitation is received, add the event to the
 	 * user's calendar with the id given in *autoAddCalendarId*.
 	 * @var bool
 	 */
-	public $autoAddInvitations = 1;
+	public bool $autoAddInvitations = true;
 
-	/**
-	 * If true, only automatically add the event if the sender of the invitation is
-	 * in the contact group given by the *autoAddGroupId* preference.
-	 * @var bool
-	 */
-	//public $onlyAutoAddIfInGroup;
-
-	/** @var int|null The id of the contact group to auto-add events from, or null for All Contacts. */
-	//public $autoAddGroupId;
 
 	/**
 	 * If true, for emails where the event is auto-added to the calendar, mark
 	 * the email as read and file in the folder specified by *autoAddFileIn*.
 	 * @var bool
 	 */
-	public $markReadAndFileAutoAdd;
+	public bool $markReadAndFileAutoAdd = false;
 
 	/** @var int The id of the mailbox to file event invitations in; should default to the Archive folder. */
 	//public $autoAddFileIn;
@@ -65,33 +56,29 @@ class Preferences extends Property
 	 * the event is cancelled.
 	 * @var bool
 	 */
-	public $autoUpdateInvitations;
+	public bool $autoUpdateInvitations = false;
 
 	/**
 	 * If true, for emails where the event is auto-updated, mark the email
 	 * as read and file in the folder specified by *autoUpdateFileIn*.
 	 * @var boolean
 	 */
-	public $markReadAndFileAutoUpdate;
+	public bool $markReadAndFileAutoUpdate = false;
 
-	/** @var string date last scan was performed in internal_date format eg: "1-Mar-2019" */
-	public $lastProcessed;
-	/** @var int UID of the last processed email */
-	public $lastProcessedUid;
+	/** @var ?string date last scan was performed in internal_date format eg: "1-Mar-2019" */
+	public ?string $lastProcessed = null;
+	/** @var ?int UID of the last processed email */
+	public ?int $lastProcessedUid = null;
 
-	/**
-	 * @var int The id of the mailbox to file event updates in; should default to the Archive folder.
-	 */
-	//public $autoUpdateFileIn;
 
 	/** @var int the amount of minutes the event should snap to when dragged over the weekview. */
-	public $weekViewGridSnap = '15';
+	public int $weekViewGridSnap = 15;
 
-	/** @var string Which view to show first when the user opens the calendar. */
-	public $startView;
+	/** @var ?string Which view to show first when the user opens the calendar. */
+	public ?string $startView = null;
 
-	/** @var string ISO signed duration for a new event or null for full day. */
-	public $defaultDuration = 'PT1H';
+	/** @var ?string ISO signed duration for a new event or null for full day. */
+	public ?string $defaultDuration = null;
 
 	protected static function defineMapping(): Mapping {
 		return parent::defineMapping()->addTable("calendar_preferences", "ccs");

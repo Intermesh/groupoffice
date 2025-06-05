@@ -10,6 +10,6 @@ class Settings extends core\Settings {
 	 * 
 	 * @var int
 	 */
-	public $deleteAfterDays = 365;
+	public int $deleteAfterDays = 365;
 
 }

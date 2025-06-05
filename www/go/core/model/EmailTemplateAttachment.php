@@ -17,41 +17,41 @@ class EmailTemplateAttachment extends Property {
   /**
    * Primary key
    */
-  protected $id;
+  protected int $id;
 	
 	/**
 	 * 
 	 * @var int
 	 */							
-	protected $emailTemplateId;
+	protected int $emailTemplateId;
 
 	/**
 	 *  The blob ID
    * 
 	 * @var string
 	 */							
-  public $blobId;
+  public string $blobId;
   
   /**
    * File name
    * 
    * @var string
    */
-  public $name;
+  public string $name;
 
   /**
    * True if it's inline
    * 
    * @var bool
    */
-  public $inline;
+  public bool $inline = false;
 
   /**
    * True if it's attached
    * 
    * @var bool
    */
-  public $attachment;
+  public bool $attachment = true;
 
 	protected static function defineMapping(): Mapping
 	{

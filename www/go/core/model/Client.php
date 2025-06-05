@@ -11,7 +11,7 @@ use go\core\util\DateTime;
 
 class Client extends Property
 {
-	public $id;
+	public ?int $id;
 	public $deviceId = '-';
 	public $platform;
 	public $name;

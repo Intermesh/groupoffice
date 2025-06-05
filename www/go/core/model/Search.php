@@ -20,16 +20,13 @@ use go\core\db\Expression;
 
 class Search extends AclOwnerEntity {
 
-	public $id;
-	public $entityId;
-	protected $entityTypeId;
-	/**
-	 * @var EntityType
-	 */
-	protected $entity;
-	protected $moduleId;
+	public ?string $id;
+	public string $entityId;
+	protected int $entityTypeId;
+	protected string $entity;
+	protected int $moduleId;
 
-	public $dontChangeModifiedAt = true;
+	public bool $dontChangeModifiedAt = true;
 
 	public static function loggable(): bool
 	{
@@ -110,7 +107,7 @@ class Search extends AclOwnerEntity {
 		return [];
 	}
 
-	public function findAclId() : ?int {
+	public function findAclId() : int {
 		return $this->aclId;
 	}
 	

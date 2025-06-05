@@ -22,15 +22,15 @@ class Token extends Entity {
 	
 	/**
 	 * The token that identifies the user in the login process.
-	 * @var string
+	 * @var ?string
 	 */							
-	public $loginToken;
+	public ?string $loginToken;
 	
 	/**
 	 * The token that identifies the user. Sent in HTTPOnly cookie.
-	 * @var string
+	 * @var ?string
 	 */							
-	public $accessToken;
+	public ?string $accessToken;
 
 	/**
 	 * Cross Site Request Forgery token
@@ -41,40 +41,39 @@ class Token extends Entity {
 	 *
 	 * @var string
 	 */
-	public $CSRFToken;
+	public ?string $CSRFToken;
 
 	/**
 	 * 
 	 * @var int
 	 */							
-	public $userId;
+	public ?string $userId;
 
 	/**
 	 * Time this token expires. Defaults to one day after the token was created {@see LIFETIME}
 	 * @var ?DateTime
 	 */							
-	public $expiresAt;
+	public ?DateTime $expiresAt = null;
 	
 	/**
 	 *
 	 * @var DateTime
 	 */
-	public $createdAt;
+	public ?DateTime $createdAt;
 
 	/**
 	 * FK to the core_client table
 	 *
-	 * @var int
 	 */
-	public $clientId;
+	public ?string $clientId;
 
 	/**
 	 *
 	 * When the user was last active. Updated every 5 minutes.
 	 * 
-	 * @var DateTime
+	 * @var ?DateTime
 	 */
-	public $lastActiveAt;
+	public ?DateTime $lastActiveAt;
 
 	/**
 	 * | separated list of "core_auth" id's that are successfully applied 
@@ -133,7 +132,7 @@ class Token extends Entity {
 	 */
 	public function activity(): bool
 	{
-		if($this->lastActiveAt < new DateTime("-1 mins", new DateTimeZone("UTC"))) {
+		if(!isset($this->lastActiveAt) || $this->lastActiveAt < new DateTime("-1 mins", new DateTimeZone("UTC"))) {
 			$this->lastActiveAt = new DateTime("now", new DateTimeZone("UTC"));
 
 			//also refresh token

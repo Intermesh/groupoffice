@@ -13,9 +13,9 @@ use go\core\orm\Property;
  */
 class Permission extends Property {
 
-	public $moduleId;
-	public $groupId;
-	protected $rights;
+	public int $moduleId;
+	public int $groupId;
+	protected int $rights;
 
 	protected static function defineMapping(): Mapping
 	{

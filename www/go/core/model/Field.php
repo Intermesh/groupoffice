@@ -11,6 +11,7 @@ use go\core\orm\EntityType;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
+use go\core\orm\Relation;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
 
@@ -26,26 +27,25 @@ class Field extends AclItemEntity {
 	 * 
 	 * @var int
 	 */
-	public $id;
+	public ?string $id;
 	
 	/**
 	 * Display name
 	 * @var string 
 	 */
-	public $name;
+	public string $name;
 	
 	/**
 	 * Foreign key for fieldSet
-	 * @var int
 	 */
-	public $fieldSetId;
+	public ?string $fieldSetId;
 	
 	/**
 	 * Sort order
 	 * 
 	 * @var int
 	 */
-	public $sortOrder;
+	public int $sortOrder;
 	protected $options;
 	
 	
@@ -54,76 +54,75 @@ class Field extends AclItemEntity {
 	 * 
 	 * @var string 
 	 */
-	public $databaseName;
+	public string $databaseName;
 	
 	/**
 	 * True if an entry is requied
 	 * @var boolean
 	 */
-	public $required;
+	public bool $required = false;
 
-	public $relatedFieldCondition;
+	public ?string $relatedFieldCondition = null;
 
-	public $conditionallyRequired;
+	public bool $conditionallyRequired = false;
 
-	public $conditionallyHidden;
+	public bool $conditionallyHidden = false;
 	
 	/**
 	 * Hint text to display in the form
-	 * @var string
 	 */
-	public $hint;
+	public ?string $hint = null;
 	
 	/**
 	 * Field prefix
 	 * 
 	 * eg. :"€:
 	 * 
-	 * @var string
+	 * @var ?string
 	 */
-	public $prefix;
+	public ?string $prefix;
 	
 	/**
 	 * Field suffix
 	 * 
 	 * eg. "%"
 	 * 
-	 * @var string 
+	 * @var ?string
 	 */
-	public $suffix;
+	public ?string $suffix;
 	
 	/**
 	 * Data type
 	 * 
 	 * @var string
 	 */
-	public $type;
+	public string $type;
 	
 	/**
 	 * Modified at time
 	 * 
-	 * @var DateTime
+	 * @var ?DateTime
 	 */
-	public $modifiedAt;
+	public ?DateTime $modifiedAt;
 	
 	/**
 	 * Created at time
 	 * ]
-	 * @var DateTime
+	 * @var ?DateTime
 	 */
-	public $createdAt;
+	public ?DateTime $createdAt;
 
 	/**
 	 * @var Relation[]
 	 */
-	public $customFieldRelations = [];
+	public array $customFieldRelations = [];
 
 	/**
 	 * Hide field by default in grids
 	 *
 	 * @var bool
 	 */
-	public $hiddenInGrid = true;
+	public bool $hiddenInGrid = true;
 
 	
 	private $default;

@@ -22,17 +22,17 @@ use stdClass;
 use Throwable;
 
 class Module extends Entity {
-	public $id;
-	public $name;
-	public $package;
-	public $sort_order;
-	public $version;
-	public $enabled;
+	public ?string $id;
+	public string $name;
+	public ?string $package;
+	public int $sort_order;
+	public int $version;
+	public bool $enabled = true;
 
 	/**
 	 * @var Permission[]
 	 */
-	public $permissions = [];
+	public array $permissions = [];
 
 	public static function sort(Query $query, ArrayObject $sort): Query
 	{

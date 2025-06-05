@@ -21,14 +21,11 @@ use go\modules\community\addressbook\Module;
  */
 
 class AddressBook extends AclOwnerEntity {
-	
 
 	public ?string $id;
 	public string $name;
 	public ?string $createdBy;
-
 	public ?string $filesFolderId;
-
 	public ?string $salutationTemplate;
 
 	/**

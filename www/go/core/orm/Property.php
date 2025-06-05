@@ -388,7 +388,8 @@ abstract class Property extends Model {
 				if(!$prop && $relation->autoCreate) {
 					$prop = new $cls($this, true, [], $this->readOnly);
 
-					$this->applyRelationKeys($relation, $prop);
+					if(!$this->isNew())
+						$this->applyRelationKeys($relation, $prop);
 				}
 				$this->{$relation->name} = $prop;
 				break;
@@ -1363,7 +1364,7 @@ abstract class Property extends Model {
 	 *
 	 * @var bool
 	 */
-	public $dontChangeModifiedAt = false;
+	public bool $dontChangeModifiedAt = false;
 
 	/**
 	 * Sets some default values such as modifiedAt and modifiedBy
@@ -2697,7 +2698,9 @@ abstract class Property extends Model {
 					if(is_object($v)) {
 						$copy->$name = clone $v;
 					}	else {
-						$copy->$name = $v;
+						if(isset($v) || isset($this->$name) ) {
+							$copy->$name = $v;
+						}
 					}
 				}
 			} else {
@@ -2712,7 +2715,9 @@ abstract class Property extends Model {
 					}
 				} else {
 					// protected prop that's neither a column or relation
-					$copy->$name = $this->$name;
+					if(isset($copy->$name) || isset($this->$name) ) {
+						$copy->$name = $this->$name ?? null;
+					}
 				}
 			}
 		}

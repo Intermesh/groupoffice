@@ -15,29 +15,24 @@ class UserSettings extends Property {
 
 	/**
 	 * Primary key to User id
-	 * 
-	 * @var int
 	 */
-	public $userId;
+	public int $userId;
 	
 	/**
 	 * Default address book ID
-	 * 
-	 * @var int
 	 */
-	protected $defaultAddressBookId;
+	protected ?int $defaultAddressBookId = null;
 
 
 	/**
 	 * @var string 'allcontacts', 'starred', 'default', 'remember'
 	 */
-	public $startIn = "allcontacts";
+	public string $startIn = "allcontacts";
 
 	/**
 	 * Last selected item
-	 * @var int
 	 */
-	public $lastAddressBookId;
+	public ?string $lastAddressBookId = null;
 
 
 	protected static function defineMapping(): Mapping

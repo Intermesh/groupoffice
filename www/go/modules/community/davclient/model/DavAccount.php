@@ -29,7 +29,7 @@ class DavAccount extends AclOwnerEntity {
 	const Cal = 'cal';
 	const Card = 'card';
 
-	public $id;
+	public ?string $id;
 	public $active;
 	public $host;
 	public $username;

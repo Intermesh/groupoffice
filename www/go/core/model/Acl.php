@@ -37,48 +37,46 @@ class Acl extends Entity {
 	const LEVEL_MANAGE = 50;
 	
 	
-	public $id;
+	public int $id;
 	
 	/**
 	 * The table.field this aclId is used in
 	 * 
 	 * @var string
 	 */
-	public $usedIn;
+	public string $usedIn;
 	
 	/**
 	 * The user that owns the ACL
 	 * @var int
 	 */
-	public $ownedBy;
+	public int $ownedBy;
 	
 	/**
 	 * Modification time
-	 * 
-	 * @var DateTime
 	 */
-	public $modifiedAt;
+	public ?DateTime $modifiedAt;
 
 	/**
 	 * The entity type this ACL belongs to.
 	 * 
-	 * @var int
+	 * @var ?int
 	 */
-	public $entityTypeId;
+	public ?int $entityTypeId;
 
 	/**
 	 * The ID of the entity this ACL belongs to.
 	 * 
-	 * @var int
+	 * @var ?int
 	 */
-	public $entityId;
+	public ?int $entityId;
 	
 	/**
 	 * The list of groups that have access
 	 * 
 	 * @var AclGroup[] 
 	 */
-	public $groups = [];
+	public array $groups = [];
 
 	protected static function defineMapping(): Mapping
 	{

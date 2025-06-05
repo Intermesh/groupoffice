@@ -48,235 +48,158 @@ class Contact extends AclItemEntity {
 	 * 
 	 * @var int
 	 */							
-	public $id;
+	public ?string $id;
 
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $addressBookId;
+	public string $addressBookId;
 	
 	/**
 	 * If this contact belongs to a user then this is set to the user ID.
-	 * 
-	 * @var int 
 	 */
-	public $goUserId;
-
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $createdBy;
-	
-	/**
-	 *
-	 * @var int 
-	 */
-	public $modifiedBy;
-
-	/**
-	 * 
-	 * @var DateTime
-	 */							
-	public $createdAt;
-
-	/**
-	 * 
-	 * @var DateTime
-	 */							
-	public $modifiedAt;
+	public ?string $goUserId;
+	public ?string $createdBy;
+	public ?string $modifiedBy;
+	public DateTime $createdAt;
+	public DateTime $modifiedAt;
 
 	/**
 	 * Prefixes like 'Sir'
-	 * @var ?string
 	 */							
-	public $prefixes = '';
-	
-	/**
-	 * @var ?string
-	 */
-	public $initials = '';
-	
-	/**
-	 * 
-	 * @var ?string
-	 */							
-	public $firstName = '';
-
-	/**
-	 * 
-	 * @var ?string
-	 */							
-	public $middleName = '';
-
-	/**
-	 * 
-	 * @var ?string
-	 */							
-	public $lastName = '';
+	public string $prefixes = '';
+	public string $initials = '';
+	public string $firstName = '';
+	public string $middleName = '';
+	public string $lastName = '';
 
 	/**
 	 * Suffixes like 'Msc.'
-	 * @var ?string
 	 */							
-	public $suffixes = '';
+	public string $suffixes = '';
 
 	/**
 	 * M for Male, F for Female or null for unknown
-	 * @var string
 	 */							
-	public $gender;
-
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $notes;
-
-	/**
-	 *
-	 * @var bool
-	 */
-	public $isOrganization = false;
+	public ?string $gender;
+	public ?string $notes;
+	public bool $isOrganization = false;
 	
 	/**
 	 * The job title
-	 * 
-	 * @var string 
 	 */
-	public $jobTitle;
+	public ?string $jobTitle = null;
 
 	/**
 	 * The department
-	 *
-	 * @var string
 	 */
-	public $department;
+	public ?string $department = null;
 
 	/**
 	 * name field for companies and contacts. It should be the display name of first, middle and last name
-	 * @var string
 	 */							
-	public $name;
+	public string $name;
 
 	/**
 	 * name of the bank for this contact
 	 * @var string
 	 */
-	public $nameBank = '';
+	public string $nameBank = '';
 
 	/**
 	 *
 	 * @var string
 	 */
-	public $BIC = '';
+	public string $BIC = '';
 
 	/**
 	 * 
 	 * @var string
 	 */							
-	public $IBAN = '';
+	public string $IBAN = '';
 
 	/**
 	 * Company trade registration number
 	 * @var string
 	 */							
-	public $registrationNumber = '';
+	public string $registrationNumber = '';
 
 	/**
 	 * International Code Designator (ISO/IEC 6523)
 	 *
 	 * @link https://en.wikipedia.org/wiki/ISO/IEC_6523
 	 * @link https://docs.peppol.eu/edelivery/codelists/
-	 * @var string
 	 */
 	public ?string $icd;
 
 	/**
-	 * 
-	 * @var string
+	 * The VAT number
 	 */							
-	public $vatNo;
+	public ?string $vatNo = null;
 	
 	/**
 	 * Don't charge VAT in sender country
-	 * 
-	 * @var boolean
 	 */							
-	public $vatReverseCharge = false;
+	public bool $vatReverseCharge = false;
 
 	/**
 	 * The debtor number.
 	 *
 	 * @var string
 	 */
-	public $debtorNumber;
+	public ?string $debtorNumber = null;
 
 	/**
 	 * 
 	 * @var string
 	 */							
-	public $photoBlobId;
+	public ?string $photoBlobId = null;
 
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $language;
-	
-	/**
-	 *
-	 * @var int
-	 */
-	public $filesFolderId;
+	public ?string $language = null;
+
+	public ?string $filesFolderId;
 
 	/**
 	 * Holds an array of email addresses.
 	 *
 	 * @var EmailAddress[]
 	 */
-	 public $emailAddresses = [];
+	 public array $emailAddresses = [];
 
 	/**
 	 * An array to hold phone numbers.
 	 *
 	 * @var PhoneNumber[]
 	 */
-	public $phoneNumbers = [];
+	public array $phoneNumbers = [];
 
 	/**
 	 * Holds an array of dates.
 	 *
 	 * @var Date[];
 	 */
-	public $dates = [];
+	public array $dates = [];
 	
 	/**
 	 *
 	 * @var Url[]
 	 */
-	public $urls = [];	
+	public array $urls = [];
 	
 	
 	/**
 	 *
 	 * @var Address[]
 	 */
-	public $addresses = [];
+	public array $addresses = [];
 
 	/**
 	 *
 	 * @var int[]
 	 */
-	public $groups = [];
+	public array $groups = [];
 
   /**
    * Color in hex
-   *
-   * @var string
    */
-	public $color;
+	public ?string $color = null;
 	
 	
 	/**
@@ -286,7 +209,7 @@ class Contact extends AclItemEntity {
 	 *
 	 * @var boolean
 	 */
-	protected $starred = null;
+	protected ?bool $starred = null;
 
 
 	/**

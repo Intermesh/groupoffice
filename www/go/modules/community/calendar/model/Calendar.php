@@ -29,18 +29,18 @@ class Calendar extends AclOwnerEntity {
 
 	const UserProperties = ['color', 'sortOrder', 'isVisible', 'isSubscribed', 'includeInAvailability'];
 
-	public $id;
+	public ?string $id;
 	/** @var string The user-visible name of the calendar */
-	public $name;
-	public $description;
+	public string $name;
+	public ?string $description;
 	/** @var string Any valid CSS color value. The color to be used when displaying events associated with the calendar */
-	public $color;
+	public ?string $color;
 	/** @var int uint32 Defines the sort order of calendars when presented in the client’s UI, so it is consistent between devices */
-	public $sortOrder = 0;
+	public int $sortOrder = 0;
 	/** @var bool Has the user indicated they wish to see this Calendar in their client */
-	public $isSubscribed;
+	public bool $isSubscribed;
 	/** @var bool Should the calendar’s events be displayed to the user at the moment? */
-	public $isVisible = true; // per user
+	public bool $isVisible = true; // per user
 	/**
 	 * @var string (default: all) Should the calendar’s events be used as part of availability calculation?
 	 * This MUST be one of:
@@ -48,21 +48,29 @@ class Calendar extends AclOwnerEntity {
 	 *	- attending: events the user is a confirmed or tentative participant of are considered.
 	 *	- none: all events are ignored (but may be considered if also in another calendar).
 	 */
-	public $includeInAvailability;
+	public string $includeInAvailability = 'all';
 
 	/** @var ?string default for event. If NULL client will use the Users default timeZone  */
-	public $timeZone;
+	public ?string $timeZone;
 
-	protected $defaultColor;
+	protected string $defaultColor;
 
-	public $defaultAlertsWithTime;
-	public $defaultAlertsWithoutTime;
-	protected $ownerId;
-	public $createdBy;
-	public $webcalUri;
 
-	public $groupId;
-	protected $highestItemModSeq;
+	/**
+	 * @var DefaultAlert[]
+	 */
+	public array $defaultAlertsWithTime;
+
+	/**
+	 * @var DefaultAlertWT[]
+	 */
+	public array $defaultAlertsWithoutTime;
+	protected int $ownerId;
+	public ?string $createdBy;
+	public ?string $webcalUri;
+
+	public ?string $groupId;
+	protected ?string $highestItemModSeq;
 
 	protected static function defineMapping(): Mapping
 	{

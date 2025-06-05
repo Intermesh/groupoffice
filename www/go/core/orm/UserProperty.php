@@ -9,7 +9,7 @@ namespace go\core\orm;
  */
 class UserProperty extends Property {
 
-	protected $userId;
+	protected int $userId;
 
 	protected function init()
 	{

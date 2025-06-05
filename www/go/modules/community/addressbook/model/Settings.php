@@ -10,21 +10,21 @@ class Settings extends core\Settings {
 	 * 
 	 * @var bool
 	 */
-	public $autoLinkEmail = false;
+	public bool $autoLinkEmail = false;
 
 	/**
 	 * Create a personal address book for each new user
 	 *
 	 * @var bool
 	 */
-	public $createPersonalAddressBooks = true;
+	public bool $createPersonalAddressBooks = true;
 
 	// on: auto link all contacts
 	// off: never auto link
 	// incl: auto link contact in addressbooks listed in $autoLinkaddressBookIds
 	// excl auto link all contact except from addressbooks listed in $autoLinkaddressBookIds
-	public $autoLink = "off";
-	protected $autoLinkAddressBookIds;
+	public string $autoLink = "off";
+	protected ?string $autoLinkAddressBookIds = null;
 
 	public function getAutoLinkAddressBookIds() : array {
 		return !empty($this->autoLinkAddressBookIds) ? json_decode($this->autoLinkAddressBookIds) : [];

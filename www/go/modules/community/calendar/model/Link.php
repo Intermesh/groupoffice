@@ -6,18 +6,18 @@ use go\core\orm\Mapping;
 use go\core\orm\Property;
 class Link extends Property {
 
-	protected $id;
-	protected $eventId;
+	protected ?int $id;
+	protected int $eventId;
 
-	public $rel = 'enclosure';
+	public string $rel = 'enclosure';
 
-	public $title;
+	public string $title;
 
-	public $contentType;
+	public string $contentType;
 
-	public $size;
+	public int $size;
 
-	public $blobId;
+	public string $blobId;
 
 	// other optional values are not implemented as it is now only used for attachments
 	protected static function defineMapping(): Mapping

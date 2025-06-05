@@ -27,29 +27,26 @@ class Alert extends UserProperty {
 	const Email = 'email';
 	const Display = 'display';
 
-	/** @var int auto increment primary key */
-	public $id;
+	/** @var ?int auto increment primary key */
+	public ?int $id;
 
-	/** @var string ISO 8061 signed duration */
-	protected $offset;
+	/** @var ?string ISO 8061 signed duration */
+	protected ?string $offset;
 
-	/** @var \DateTime Time to trigger the alarm. */
-	protected $when;
+	/** @var DateTime|null Time to trigger the alarm. */
+	protected DateTime|null $when;
 
 	/** @var string 'start' | 'end' of the startdate of the event */
-	protected $relatedTo = self::Start;
+	protected string $relatedTo = self::Start;
 
-	/** @var \DateTime when to user has dismissed the alert or when the server has carried out sending the email */
-	public $acknowledged;
+	/** @var DateTime when to user has dismissed the alert or when the server has carried out sending the email */
+	public DateTime $acknowledged;
 
 	/** @var string 'email' | 'display'  */
-	public $action;
+	public string $action = 'display';
 
 	/** @var int PK of the event this alarm is set on */
-	protected $fk;
-
-	/** @var int */
-	protected $userId;
+	protected int $fk;
 
 	protected static function defineMapping(): Mapping
 	{

@@ -31,41 +31,31 @@ class RememberMe extends Entity {
 	 * The token that identifies the user in the login process.
 	 * @var string
 	 */							
-	public $id;
+	public ?string $id;
 	
 	/**
 	 * The token that identifies the user. Sent in HTTPOnly cookie.
 	 * @var string
 	 */							
-	public $token;
+	public string $token;
 
 	private $unhashedToken;
 
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $userId;
+	public ?string $userId;
 
 	/**
 	 * Time this token expires. Defaults to one day after the token was created {@see LIFETIME}
-	 * @var DateTime
+	 * @var ?DateTime
 	 */							
-	public $expiresAt;
-	
-	/**
-	 *
-	 * @var DateTime
-	 */
-	public $series;
+	public ?DateTime $expiresAt = null;
+
+	public string $series;
 
 
 	/**
 	 * FK to the core_client table
-	 *
-	 * @var int
 	 */
-	public $clientId;
+	public string $clientId;
 
 	/**
 	 * A date interval for the lifetime of a token
