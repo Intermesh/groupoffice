@@ -1,3 +1,6 @@
+- Updated German translations. Danke, Daniel!
+- Leavedays: fully refactor notification
+
 04-06-2025: 6.8.124
 - Leavedays: do not show notification if no open leave days (again)
 

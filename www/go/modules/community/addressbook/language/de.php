@@ -160,4 +160,6 @@ return array (
   'ICD' => 'ICD',
   'UUID' => 'UUID',
   'URL\'s' => 'URL\'s',
+  'No address' => 'Keine Adresse',
+  'Please add an address with a country' => 'Bitte fügen Sie eine Adresse mit einem Land hinzu',
 );
