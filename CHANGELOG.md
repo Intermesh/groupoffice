@@ -1,3 +1,6 @@
+- Timeregistration2: Tasks only querying in subscribed lists
+- Core: PHP 8.4 compatibility
+
 05-06-2025: 25.0.29
 - Tasks: Sync subscribed tasklists and remove sync settings
 - Comments: show principal name
