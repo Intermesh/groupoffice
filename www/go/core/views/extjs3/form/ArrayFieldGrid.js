@@ -56,7 +56,7 @@ Ext.define('go.form.ArrayFieldGrid',{
 				header: t('Name'),
 				dataIndex: config.idField,
 				renderer: function (id) {
-					//must be preloaded... but why?
+					//must be preloaded because that works async
 					return Ext.util.Format.htmlEncode(me.entityStore.findBy(item => item.id === id)[me.displayField]);
 				}
 			}

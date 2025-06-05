@@ -2527,7 +2527,7 @@ abstract class Property extends Model {
 		$keys = static::getPrimaryKey();
 		$v = [];
 		foreach($keys as $key) {
-			$v[$key] = $this->$key;
+			$v[$key] = $this->$key ?? null;
 		}
 
 		return $v;
