@@ -31,7 +31,7 @@ class Query extends DbQuery {
    * @param Property|null $owner When finding relations the owner or parent Entity / Property is passed so the children can access it.
    * @return $this
    */
-	public function setModel(string $cls, array $fetchProperties = [], bool $readOnly = false, Property $owner = null): Query
+	public function setModel(string $cls, array $fetchProperties = [], bool $readOnly = false, Property|null$owner = null): Query
 	{
 		$this->model = $cls;
 		$this->readOnly = $readOnly;

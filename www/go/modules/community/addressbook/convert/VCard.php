@@ -298,7 +298,7 @@ class VCard extends AbstractConverter {
 	 * @throws Exception
 	 * @noinspection PhpCastIsUnnecessaryInspection
 	 */
-	public function import(VCardComponent $vcardComponent, Entity $entity = null): Contact
+	public function import(VCardComponent $vcardComponent, Entity|null $entity = null): Contact
 	{
 		if ($vcardComponent->VERSION != "3.0") {
 			$vcardComponent = $vcardComponent->convert(SabreDocument::VCARD30);

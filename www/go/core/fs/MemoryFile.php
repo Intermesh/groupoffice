@@ -23,14 +23,14 @@ class MemoryFile extends File {
 		parent::__construct($filename);
 	}
 	
-	public function getContents(int $offset = 0, int $maxlen = null) {
+	public function getContents(int $offset = 0, int|null $maxlen = null) {
 		return $this->data;
 	}
 	public function contents() {
 		return $this->data;
 	}
 	
-	public function putContents($data, int $flags = null, $context = null) {
+	public function putContents($data, int|null $flags = null, $context = null) {
 		if($flags === FILE_APPEND){
 			$this->data .= $data;
 		}else

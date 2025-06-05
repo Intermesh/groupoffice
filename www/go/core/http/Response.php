@@ -187,7 +187,7 @@ class Response extends Singleton{
 	 * @param int $httpCode
 	 * @param string|null $text Status text. May not contain new lines in headers.
 	 */
-	public function setStatus(int $httpCode, string $text = null): Response
+	public function setStatus(int $httpCode, string|null $text = null): Response
 	{
 		if (!isset($text)) {
 			$text = http\Exception::$codes[$httpCode];
@@ -246,7 +246,7 @@ class Response extends Singleton{
 	 * @param CoreDateTime|null $expires
 	 * @return self
 	 */
-	public function setExpires(DateTime $expires = null): self
+	public function setExpires(DateTime|null $expires = null): self
 	{
 		return $this->setHeader("Expires", $expires->format('D, d M Y H:i:s'));
 	}

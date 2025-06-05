@@ -109,7 +109,7 @@ class User extends AclItemEntity {
 	 * @param bool|null $enabled Supply if you want to change the setting
 	 * @return bool
 	 */
-	public function validatePasswordEnabled(bool $enabled = null) {
+	public function validatePasswordEnabled(bool|null $enabled = null) {
 
 		$old = $this->validatePassword;
 

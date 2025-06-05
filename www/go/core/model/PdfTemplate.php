@@ -170,7 +170,7 @@ class PdfTemplate extends Entity {
 	 * @param string|null $key
 	 * @return PdfTemplate|null
 	 */
-	public static function findByModule(string $package, string $name, ?string $preferredLanguage = null, string $key = null) : ?PdfTemplate {
+	public static function findByModule(string $package, string $name, ?string $preferredLanguage = null, string|null $key = null) : ?PdfTemplate {
 		$moduleModel = ModuleModel::findByName($package, $name);
 
 		$template = isset($preferredLanguage) ? static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key, 'language' => $preferredLanguage])->single() : null;

@@ -70,7 +70,7 @@ class ClassFinder {
 	 * @param string $namespace
 	 * @param Folder|null $folder If not given it will use the installation root + namespace
 	 */
-	public function addNamespace(string $namespace, Folder $folder = null) {
+	public function addNamespace(string $namespace, Folder|null $folder = null) {
 		if(!isset($folder)) {
 			$folder = Environment::get()->getInstallFolder()->getFolder(str_replace('\\', '/', $namespace));
 		}		

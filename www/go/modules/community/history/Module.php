@@ -252,7 +252,7 @@ class Module extends core\Module
 	/**
 	 * @throws Exception
 	 */
-	public static function onBadLogin($username, User $user = null) {
+	public static function onBadLogin($username, User|null $user = null) {
 		$log = new LogEntry();
 		if(isset($user)) {
 			$log->setEntity($user);

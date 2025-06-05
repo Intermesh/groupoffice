@@ -39,7 +39,7 @@ trait CustomFieldsTrait {
    * @return CustomFieldsModel
    * @throws Exception
    */
-	public function getCustomFields(bool $asText = null): CustomFieldsModel
+	public function getCustomFields(bool|null $asText = null): CustomFieldsModel
 	{
 
 		if(!isset($asText)) {

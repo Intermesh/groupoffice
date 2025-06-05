@@ -311,7 +311,7 @@ class TemplateParser {
 		return go()->t($text, $package, $module);
 	}
 
-	private function filterDate(DateTime $date = null, $format = null): string
+	private function filterDate(DateTime|null$date = null, string|null $format = null): string
 	{
 
 		if(!isset($date)) {
@@ -338,7 +338,7 @@ class TemplateParser {
 
 	}
 
-	private function filterSubstr(string|null $text, int $start, int $length = null): string {
+	private function filterSubstr(string|null $text, int $start, int|null $length = null): string {
 		if(!isset($text)) {
 			return "";
 		}
@@ -1013,7 +1013,7 @@ class TemplateParser {
 		$expression = str_replace(';', ' ; ', $expression);
 		
 		//$parts = preg_split('#\s*((?<!\\\\)"[^"]*")\s*|\s+#', $expression, -1 , PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-		$parts = empty($expression) ? [] : str_getcsv($expression,' ','"');
+		$parts = empty($expression) ? [] : str_getcsv($expression,' ','"', "");
 		$parts = array_map('trim', $parts);
 		
 		$str = '';
@@ -1083,7 +1083,7 @@ class TemplateParser {
 		$value = $this->getVar($varPath);		
 		foreach($filters as $filter) {
 			
-			$args = array_map('trim', str_getcsv($filter, ':', '"'));
+			$args = array_map('trim', str_getcsv($filter, ':', '"', ""));
 			$filterName = strtolower(array_shift($args));
 			array_unshift($args, $value);
 

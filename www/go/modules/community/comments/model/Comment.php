@@ -232,7 +232,7 @@ class Comment extends AclItemEntity {
 	 * @param array|null $groups
 	 * @return Query $query;
 	 */
-	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
+	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int|null $userId = null, array|null $groups = null): Query
 	{
 		return $query;
 	}

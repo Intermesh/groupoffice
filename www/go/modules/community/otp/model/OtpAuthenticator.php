@@ -190,7 +190,7 @@ class OtpAuthenticator extends Property {
 	 * @param null $title
 	 * @param array $params
 	 */
-	public function outputQr(string $name=null, $secret=null, $title = null, $params = array()) {
+	public function outputQr(string|null $name=null, $secret=null, $title = null, $params = array()) {
 
 		
 		$name = empty($name) ? $this->owner->username . '@' . File::stripInvalidChars(go()->getSettings()->title) : $name;

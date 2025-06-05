@@ -21,7 +21,7 @@ abstract class SingleOwnerEntity extends Entity
 	 * @param array|null $groups
 	 * @return Query
 	 */
-	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null) : Query
+	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int|null $userId = null, array|null $groups = null) : Query
 	{
 		$query->andWhere($query->getTableAlias() . '.userId', $userId);
 

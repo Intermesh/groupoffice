@@ -163,7 +163,7 @@ class Module extends Entity {
 	 * @return stdClass For example ['mayRead' => true, 'mayManage'=> true, 'mayHaveSuperCowPowers' => true]
 	 * @noinspection DuplicatedCode
 	 */
-	public function getUserRights(int $userId = null) : stdClass
+	public function getUserRights(int|null $userId = null) : stdClass
 	{
 		if(!isset($userId)) {
 			$userId = go()->getAuthState()->getUserId();
@@ -499,7 +499,7 @@ class Module extends Entity {
 	 * @param int $level
 	 * @return boolean
 	 */
-	public static function isAvailableFor(string $package, string $name, int $userId = null, int $level = Acl::LEVEL_READ): bool
+	public static function isAvailableFor(string $package, string $name, int|null $userId = null, int $level = Acl::LEVEL_READ): bool
 	{
 
 		if($package == "legacy") {
@@ -596,7 +596,7 @@ class Module extends Entity {
 	 * @param null|boolean $enabled If set, then the module's enabled flag will be matched
 	 * @return bool
 	 */
-	public static function isInstalled(string $package, string $name, bool $enabled = null): bool
+	public static function isInstalled(string $package, string $name, bool|null $enabled = null): bool
 	{
 		if($package == "legacy") {
 			$package = null;
