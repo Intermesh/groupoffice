@@ -76,7 +76,7 @@ class CalendarEvent extends AclItemEntity {
 	static bool $fromClient = false;
 
 	public string $calendarId;
-	protected ?int $eventId;
+	protected ?int $eventId = null;
 	/**
 	 * @var boolean true when this event is created by this calendar system
 	 * false if the event is imported from an invitation and the organizer is in another system
@@ -94,7 +94,7 @@ class CalendarEvent extends AclItemEntity {
 	public ?string $locale;
 	public int $priority = 0;
 	public ?string $color;
-	public bool $useDefaultAlerts = true;
+	public ?bool $useDefaultAlerts = true;
 
 	/**
 	 * A unique identifier for the object.
@@ -139,25 +139,25 @@ class CalendarEvent extends AclItemEntity {
 	 * (optional, default: PT0S)
 	 * @var string
 	 */
-	public string $duration;
+	public ?string $duration;
 
 	/**
 	 * The title
 	 * @var string
 	 */
-	public string $title = '';
+	public ?string $title = '';
 
 	/**
 	 * free text that would describe the event
 	 * @var string
 	 */
-	public string $description = '';
+	public ?string $description = '';
 
 	/**
 	 * The location where the event takes place
 	 * @var string
 	 */
-	public string $location;
+	public ?string $location;
 
 	/**
 	 * Status of event (confirmed, canceled, tentative)

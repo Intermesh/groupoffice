@@ -37,7 +37,7 @@ class Participant extends Property
 		'contact'=>5
 	];
 
-	protected ?int $id;
+	protected ?string $id;
 	protected int $eventId;
 	/** @var string display name of participant */
 	public string $name;
