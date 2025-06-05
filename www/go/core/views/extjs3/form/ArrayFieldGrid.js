@@ -57,7 +57,7 @@ Ext.define('go.form.ArrayFieldGrid',{
 				dataIndex: config.idField,
 				renderer: function (id) {
 					//must be preloaded... but why?
-					return me.entityStore.data[id][me.displayField];
+					return Ext.util.Format.htmlEncode(me.entityStore.data[id][me.displayField]);
 				}
 			}
 		];
