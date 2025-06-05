@@ -1812,7 +1812,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Paper' => 'Paper',
   'Compact' => 'Compact',
   'Global' => 'Global',
-  'Use shortcut to send forms' => 'Use shortcut to send forms',
+  'Use shortcut to send forms' => 'Tastenkombination zum Absenden von Formularen verwenden',
   'orry, maintenance mode is enabled and you can\'t login right now. Please come back later or contact your system administrator' => 'Entschuldigung, der Wartungsmodus ist aktiviert und Sie können sich momentan nicht einloggen. Bitte kommen Sie später wieder oder kontaktieren Sie Ihren Systemadministrator',
   'Business' => 'Business',
   'Categories' => 'Categories',
