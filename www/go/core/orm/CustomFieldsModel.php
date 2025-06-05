@@ -221,25 +221,7 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 	{
 		if(!isset($this->data)) {
 
-			$stmt = go()->getDbConnection()->getCachedStatment('cf-' . $this->customFieldsTableName());
-			if(!$stmt) {
-				$query = (new Query())
-					->select('*')
-					->from($this->customFieldsTableName(), 'cf')
-					->where('cf.id = :id')
-					->bind(':id', $this->getCustomFieldsModelId());
-
-				$stmt = $query->createStatement();
-				go()->getDbConnection()->cacheStatement('cf-' . $this->customFieldsTableName(), $stmt);
-			} else {
-				$stmt->bindValue(':id', $this->getCustomFieldsModelId());
-			}
-
-			$stmt->execute();
-
-			$record = $stmt->fetch();
-
-			$stmt->closeCursor();
+			$record = $this->getRecord();
 
 			$this->customFieldsIsNew = !$record;
 
@@ -273,7 +255,7 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 	 * cases like the calendar event it's different.
 	 * @return string
 	 */
-	protected function getCustomFieldsModelId() : string {
+	protected function getCustomFieldsModelId() : string|int|null {
 		return $this->entity->customFieldsModelId();
 	}
 
@@ -478,5 +460,40 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 	public function jsonSerialize(): mixed
 	{
 		return (object) $this->toArray();
+	}
+
+	/**
+	 * @return array|null
+	 * @throws DbException
+	 * @throws \Throwable
+	 */
+	public function getRecord(): array|false
+	{
+		$id = $this->getCustomFieldsModelId();
+
+		if(!$id) {
+			return false;
+		}
+
+		$stmt = go()->getDbConnection()->getCachedStatment('cf-' . $this->customFieldsTableName());
+		if (!$stmt) {
+			$query = (new Query())
+				->select('*')
+				->from($this->customFieldsTableName(), 'cf')
+				->where('cf.id = :id')
+				->bind(':id', $this->getCustomFieldsModelId());
+
+			$stmt = $query->createStatement();
+			go()->getDbConnection()->cacheStatement('cf-' . $this->customFieldsTableName(), $stmt);
+		} else {
+			$stmt->bindValue(':id', $this->getCustomFieldsModelId());
+		}
+
+		$stmt->execute();
+
+		$record = $stmt->fetch();
+
+		$stmt->closeCursor();
+		return $record;
 	}
 }

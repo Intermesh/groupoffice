@@ -55,7 +55,7 @@ trait CustomFieldsTrait {
 		return $this->customFieldsModel;
 	}
 
-	public function customFieldsModelId() : string {
+	public function customFieldsModelId() : string|int|null {
 		return $this->id();
 	}
 

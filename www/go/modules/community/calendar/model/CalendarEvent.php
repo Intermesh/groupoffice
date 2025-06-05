@@ -238,8 +238,8 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 		return 'calendar_event_custom_fields';
 	}
 
-	public function customFieldsModelId() : string {
-		return (string) $this->eventId;
+	public function customFieldsModelId() : string|int|null {
+		return $this->eventId;
 	}
 
 	protected static function defineMapping(): Mapping {
