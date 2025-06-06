@@ -350,9 +350,9 @@ JSON;
 	 * @throws Forbidden
 	 * @example
 	 * ```
-	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/demo
+	 * docker compose exec --user www-data groupoffice ./www/cli.php core/System/demo
 	 *
-	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/demo --package=business --module=catalog
+	 * docker compose exec --user www-data groupoffice ./www/cli.php core/System/demo --package=business --module=catalog
 	 * ```
 	 */
 	public function demo($params = []) {
