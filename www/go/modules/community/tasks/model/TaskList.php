@@ -43,6 +43,7 @@ class TaskList extends AclOwnerEntity
 	public ?string $id;
 	public string $name;
 
+	public int $aclId;
 
 	protected int $role = self::List;
 
@@ -206,6 +207,9 @@ class TaskList extends AclOwnerEntity
 	}
 
 	static function updateHighestModSeq($tasklistId) {
+		if(empty($tasklistId)) {
+			return;
+		}
 		go()->getDbConnection()
 			->update(self::getMapping()->getPrimaryTable()->getName(),
 				['highestItemModSeq' => Task::getState()],
