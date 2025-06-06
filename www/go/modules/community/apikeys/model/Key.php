@@ -11,7 +11,7 @@ class Key extends Entity {
 	public ?string $id;
 	public ?string $name;
 	public ?string $accessToken;
-	public ?DateTime $createdAt;
+	public ?\DateTimeInterface $createdAt;
 	
 	protected static function defineMapping(): Mapping
 	{

@@ -55,7 +55,7 @@ class Acl extends Entity {
 	/**
 	 * Modification time
 	 */
-	public ?DateTime $modifiedAt;
+	public ?\DateTimeInterface $modifiedAt;
 
 	/**
 	 * The entity type this ACL belongs to.

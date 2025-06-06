@@ -23,7 +23,7 @@ class OtpAuthenticator extends Property {
 		
 	public int $userId;
 	protected $secret;
-	public ?DateTime $createdAt = null;
+	public ?\DateTimeInterface $createdAt = null;
 
 	protected bool $verified = false;
 	

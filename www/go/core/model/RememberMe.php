@@ -47,7 +47,7 @@ class RememberMe extends Entity {
 	 * Time this token expires. Defaults to one day after the token was created {@see LIFETIME}
 	 * @var ?DateTime
 	 */							
-	public ?DateTime $expiresAt = null;
+	public ?\DateTimeInterface $expiresAt = null;
 
 	public string $series;
 

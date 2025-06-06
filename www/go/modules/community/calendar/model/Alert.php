@@ -40,7 +40,7 @@ class Alert extends UserProperty {
 	protected string $relatedTo = self::Start;
 
 	/** @var DateTime when to user has dismissed the alert or when the server has carried out sending the email */
-	public DateTime $acknowledged;
+	public \DateTimeInterface $acknowledged;
 
 	/** @var string 'email' | 'display'  */
 	public string $action = 'display';

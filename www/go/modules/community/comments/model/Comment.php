@@ -31,12 +31,12 @@ class Comment extends AclItemEntity {
 	
 	public int $entityTypeId;
 
-	public ?DateTime $createdAt = null;
+	public ?\DateTimeInterface $createdAt = null;
 
-	public ?DateTime $modifiedAt = null;
+	public ?\DateTimeInterface $modifiedAt = null;
 	public ?string $createdBy = null;
 	public ?string $modifiedBy = null;
-	public ?DateTime $date;
+	public ?\DateTimeInterface $date;
 	public bool $validateXSS = true;
 
 	/**

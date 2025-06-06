@@ -18,9 +18,9 @@ final class Alias extends AclItemEntity
 	public string $address;
 	public string $goto;
 	public ?string $createdBy;
-	public ?DateTime $createdAt;
+	public ?\DateTimeInterface $createdAt;
 	public ?string $modifiedBy;
-	public ?DateTime $modifiedAt;
+	public ?\DateTimeInterface $modifiedAt;
 	public bool $active = true;
 	private ?Domain $domain = null;
 

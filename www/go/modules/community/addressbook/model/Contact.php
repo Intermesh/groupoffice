@@ -58,8 +58,8 @@ class Contact extends AclItemEntity {
 	public ?string $goUserId;
 	public ?string $createdBy;
 	public ?string $modifiedBy;
-	public DateTime $createdAt;
-	public DateTime $modifiedAt;
+	public \DateTimeInterface $createdAt;
+	public \DateTimeInterface $modifiedAt;
 
 	/**
 	 * Prefixes like 'Sir'
@@ -221,9 +221,9 @@ class Contact extends AclItemEntity {
 
 
 
-	public ?DateTime $lastContactAt = null;
+	public ?\DateTimeInterface $lastContactAt = null;
 
-	public ?DateTime $actionAt = null;
+	public ?\DateTimeInterface $actionAt = null;
 
 	public function getStarred(): bool
 	{

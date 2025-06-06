@@ -26,9 +26,9 @@ class Note extends AclItemEntity {
 	public string $content;
 	public string $noteBookId;
 
-	public ?DateTime $createdAt;
+	public ?\DateTimeInterface $createdAt;
 
-	public ?DateTime $modifiedAt;
+	public ?\DateTimeInterface $modifiedAt;
 	public ?string $createdBy;
 	public ?string $modifiedBy;
 	public ?string  $filesFolderId;

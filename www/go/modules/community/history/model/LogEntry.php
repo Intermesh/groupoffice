@@ -42,7 +42,7 @@ class LogEntry extends AclOwnerEntity {
 
 	public ?string $changes;
 
-	public ?DateTime $createdAt = null;
+	public ?\DateTimeInterface $createdAt = null;
 
 	public ?string $createdBy = null;
 

@@ -186,11 +186,11 @@ class User extends AclItemEntity {
 	 * 
 	 * @var ?DateTime
 	 */
-	public ?DateTime $lastLogin = null;
+	public ?\DateTimeInterface $lastLogin = null;
 
-	public ?DateTime $modifiedAt;
+	public ?\DateTimeInterface $modifiedAt;
 
-	public ?DateTime $createdAt;
+	public ?\DateTimeInterface $createdAt;
 	
 	/**
 	 * Date format

@@ -26,13 +26,13 @@ class A extends Entity {
 	 *
 	 * @var DateTime
 	 */
-	public DateTime $createdAt;
+	public \DateTimeInterface $createdAt;
 	
 	/**
 	 *
 	 * @var DateTime
 	 */
-	public DateTime $modifiedAt;
+	public \DateTimeInterface $modifiedAt;
 	
 	/**
 	 *

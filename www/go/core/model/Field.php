@@ -103,14 +103,14 @@ class Field extends AclItemEntity {
 	 * 
 	 * @var ?DateTime
 	 */
-	public ?DateTime $modifiedAt;
+	public ?\DateTimeInterface $modifiedAt;
 	
 	/**
 	 * Created at time
 	 * ]
 	 * @var ?DateTime
 	 */
-	public ?DateTime $createdAt;
+	public ?\DateTimeInterface $createdAt;
 
 	/**
 	 * @var Relation[]

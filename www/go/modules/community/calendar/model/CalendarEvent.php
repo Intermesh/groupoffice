@@ -129,7 +129,7 @@ class CalendarEvent extends AclItemEntity {
 	 * The start time of the event
 	 * @var DateTime
 	 */
-	public ?DateTime $start;
+	public ?\DateTimeInterface $start;
 
 	public $utcStart;
 	public $utcEnd;

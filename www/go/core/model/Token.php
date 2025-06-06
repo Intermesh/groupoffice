@@ -53,13 +53,13 @@ class Token extends Entity {
 	 * Time this token expires. Defaults to one day after the token was created {@see LIFETIME}
 	 * @var ?DateTime
 	 */							
-	public ?DateTime $expiresAt = null;
+	public ?\DateTimeInterface $expiresAt = null;
 	
 	/**
 	 *
 	 * @var DateTime
 	 */
-	public ?DateTime $createdAt;
+	public ?\DateTimeInterface $createdAt;
 
 	/**
 	 * FK to the core_client table
@@ -73,7 +73,7 @@ class Token extends Entity {
 	 * 
 	 * @var ?DateTime
 	 */
-	public ?DateTime $lastActiveAt;
+	public ?\DateTimeInterface $lastActiveAt;
 
 	/**
 	 * | separated list of "core_auth" id's that are successfully applied 

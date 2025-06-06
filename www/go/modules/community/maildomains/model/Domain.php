@@ -49,9 +49,9 @@ final class Domain extends AclOwnerEntity
 	public string $transport;
 	public bool $backupMx = false;
 	public ?int $createdBy;
-	public ?DateTime $createdAt;
+	public ?\DateTimeInterface $createdAt;
 	public int $modifiedBy;
-	public ?DateTime $modifiedAt;
+	public ?\DateTimeInterface $modifiedAt;
 
 	/** @var boolean */
 	public bool $active = true;
