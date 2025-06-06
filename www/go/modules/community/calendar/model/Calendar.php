@@ -34,11 +34,11 @@ class Calendar extends AclOwnerEntity {
 	public string $name;
 	public ?string $description;
 	/** @var string Any valid CSS color value. The color to be used when displaying events associated with the calendar */
-	public ?string $color;
+	public ?string $color = null;
 	/** @var int uint32 Defines the sort order of calendars when presented in the client’s UI, so it is consistent between devices */
 	public int $sortOrder = 0;
 	/** @var bool Has the user indicated they wish to see this Calendar in their client */
-	public bool $isSubscribed;
+	public bool $isSubscribed = true;
 	/** @var bool Should the calendar’s events be displayed to the user at the moment? */
 	public bool $isVisible = true; // per user
 	/**
@@ -51,9 +51,9 @@ class Calendar extends AclOwnerEntity {
 	public string $includeInAvailability = 'all';
 
 	/** @var ?string default for event. If NULL client will use the Users default timeZone  */
-	public ?string $timeZone;
+	public ?string $timeZone = null;
 
-	protected string $defaultColor;
+	protected ?string $defaultColor = null;
 
 
 	/**
@@ -67,7 +67,7 @@ class Calendar extends AclOwnerEntity {
 	public array $defaultAlertsWithoutTime;
 	protected int $ownerId;
 	public ?string $createdBy;
-	public ?string $webcalUri;
+	public ?string $webcalUri = null;
 
 	public ?string $groupId;
 	protected ?string $highestItemModSeq;
@@ -169,7 +169,7 @@ class Calendar extends AclOwnerEntity {
 	protected function internalValidate()
 	{
 		if($this->isNew()) {
-			if($this->webcalUri && !$this->fetchWebcalBlob()) {
+			if(isset($this->webcalUri) && !$this->fetchWebcalBlob()) {
 				$this->setValidationError('webcalUri', 404, 'Could not download webcal file');
 			}
 		}
@@ -178,6 +178,9 @@ class Calendar extends AclOwnerEntity {
 
 	protected function internalSave(): bool
 	{
+		if(!isset($this->defaultColor) && !isset($this->color)) {
+			$this->color = $this->defaultColor = self::randomColor($this->name);
+		}
 		if($this->isNew()) {
 			$this->isSubscribed = true; // auto subscribe the creator.
 			$this->isVisible = true;
@@ -209,7 +212,8 @@ class Calendar extends AclOwnerEntity {
 		return $success;
 	}
 
-	static function randomColor($seed) {
+	static function randomColor(string $seed): string
+	{
 		srand(crc32($seed));
 		$nb = rand(0,17);
 		return substr('#CDAD00#E74C3C#9B59B6#8E44AD#2980B9#3498DB#1ABC9C#16A085#27AE60#2ECC71#F1C40F#F39C12#E67E22#D35400#95A5A6#34495E#808B96#1652a1',
@@ -307,9 +311,9 @@ class Calendar extends AclOwnerEntity {
 		return CalendarEvent::import([$this->webcalBlob], $this->id, 'ignore');
 	}
 
-	protected function isPrincipal()
+	protected function isPrincipal() : bool
 	{
-		return $this->groupId != null && $this->ownerId != null;
+		return isset($this->groupId) && isset($this->ownerId);
 	}
 
 	protected static function queryMissingPrincipals(int $offset = 0): Query {

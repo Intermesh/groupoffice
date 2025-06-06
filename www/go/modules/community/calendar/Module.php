@@ -1,15 +1,17 @@
 <?php
 namespace go\modules\community\calendar;
 
-use GO\Base\Exception\AccessDenied;
+use DateInterval;
+use Faker\Generator;
 use go\core;
 use go\core\cron\GarbageCollection;
+use go\core\model\Link;
 use go\core\model\User;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\model\Module as CoreModule;
-use go\modules\community\calendar\cron;
 use go\modules\community\calendar\model\Calendar;
+use go\modules\community\calendar\model\Participant;
 use go\modules\community\calendar\model\Preferences;
 use go\modules\community\calendar\model\BusyPeriod;
 use go\modules\community\calendar\model\CalendarEvent;
@@ -259,4 +261,79 @@ class Module extends core\Module
 //			'mayExportItems', // Allows users to export contacts
 //		];
 //	}
+
+
+	public function demo(Generator $faker)
+	{
+		$users = User::find(['id', 'displayName', 'email'])->limit(10)->all();
+		$userCount = count($users) - 1;
+
+		$locations = ['Online', 'Office', 'Customer', ''];
+
+		foreach($users as $user) {
+
+			$calendar = Calendar::find()->where('name', '=', $user->displayName)->single();
+			if(!$calendar) {
+				$calendar = Calendar::createFor($user->id);
+				$calendar->name = $user->displayName;
+				$calendar->setOwnerId($user->id);
+				$calendar->setAcl([core\model\Group::ID_INTERNAL => core\model\Acl::LEVEL_READ]);
+				if(!$calendar->save()) {
+					throw new core\orm\exception\SaveException($calendar);
+				}
+			}
+
+			for($i = 0; $i < 5; $i++) {
+
+				$time = new core\util\DateTime("-8 days");
+				$time->setTime(6,0,0);
+				$di = new DateInterval("P" . $faker->numberBetween(1, 14) ."D");
+				$time->add($di);
+
+				$event = new CalendarEvent();
+				$event->start = (clone $time)->add(new DateInterval("PT" . $faker->numberBetween(1, 9) ."H"));
+				$event->duration = "PT30M";
+				$event->location = $locations[$faker->numberBetween(0, 3)];
+				$event->title = $faker->company;
+				$event->calendarId = $calendar->id;
+
+
+				$participant = new Participant($event);
+				$participant->email = $user->email;
+				$participant->name = $user->displayName;
+				$participant->setRoles(["owner" => true, 'attendee'=>true]); //organizer
+				$participant->participationStatus = Participant::Accepted;
+				$event->participants[$user->id] = $participant;
+
+				$user2 = $users[$faker->numberBetween(0, $userCount)];
+				$user3 = $users[$faker->numberBetween(0, $userCount)];
+
+				if($user2->id != $user->id) {
+					$participant = new Participant($event);
+					$participant->setRoles(['attendee'=>true]); //organizer
+					$participant->email = $user2->email;
+					$participant->name = $user2->displayName;
+					$participant->expectReply = true;
+					$event->participants[$user2->id ] = $participant;
+				}
+
+				if($user3->id != $user->id) {
+					$participant = new Participant($event);
+					$participant->setRoles(['attendee'=>true]); //organizer
+					$participant->email = $user3->email;
+					$participant->name = $user3->displayName;
+					$participant->expectReply = true;
+					$event->participants[$user3->id] = $participant;
+				}
+				if(!$event->save()) {
+					throw new core\orm\exception\SaveException($event);
+				}
+
+				Link::demo($faker, $event);
+
+				echo ".";
+			}
+		}
+
+	}
 }

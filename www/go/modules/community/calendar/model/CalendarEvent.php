@@ -851,7 +851,7 @@ class CalendarEvent extends AclItemEntity {
 	public function timeZone(): ?DateTimeZone
 	{
 		try {
-			return $this->timeZone ? new DateTimeZone($this->timeZone) : null;
+			return !empty($this->timeZone) ? new DateTimeZone($this->timeZone) : null;
 		}catch(Exception $e) {
 			ErrorHandler::logException($e, "Failed to set timezone " . $this->timeZone. " for event" . $this->id);
 

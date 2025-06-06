@@ -2,6 +2,7 @@
 
 namespace go\modules\community\calendar\model;
 
+use DateTimeInterface;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\util\DateTime;
@@ -57,56 +58,37 @@ class Participant extends Property
 	public ?string $sendTo;
 
 	/** @var string What kind of entity this participant is: 'individuel', 'group', 'location', 'resource */
-	public $kind;
+	public string $kind = 'individual';
 
 	/** @var int mask to be converted to string[bool] 'owner','attendee','optional','informational','chair','contact' */
-	protected $rolesMask;
-
-	/** @var string An id from the CalendarObject its `locations` array Where this participant is expected to be attending */
-	//public $locationId;
-
-	/** @var string language tag the best describes the participant's preferred language */
-	//public $language;
+	protected int $rolesMask = 0;
 
 	/** @var string 'needs-action', 'accepted', 'declined', 'tentative', 'delegated' */
-	public $participationStatus = self::NeedsAction;
+	public string $participationStatus = self::NeedsAction;
 
-	/** @var string a note from the participant to explain there participation status */
-	public $participationComment;
+	/** @var ?string a note from the participant to explain there participation status */
+	public ?string $participationComment = null;
 
 	/** @var bool true if organizer is expecting the participant to notify them of their participation status. */
-	public $expectReply;
+	public bool $expectReply = false;
 
-	/** @var string is the 'client', 'server' or 'none' responsible for sending imip invites */
-	public $scheduleAgent;
+	/** @var?string is the 'client', 'server' or 'none' responsible for sending imip invites */
+	public ?string $scheduleAgent = null;
 
 	/** @var int The sequence number of the last response from the participant.  */
 	public int $scheduleSequence = 0;
 
-	/** @var string[] A list of status codes, returned from the precessing of the most recent scheduling messages */
-	//public $scheduleStatus = [];
+	/** @var ?DateTimeInterface The timestamp for the most recent response from this participant. */
+	public ?DateTimeInterface $scheduleUpdated = null;
 
-	/** @var DateTime The timestamp for the most recent response from this participant. */
-	public $scheduleUpdated;
-
-	/** @var string The requestStatus received when the participant sends an REPLY iTip */
+	/** @var ?string The requestStatus received when the participant sends an REPLY iTip */
 	public ?string  $scheduleStatus = null;
-	/** @var string used for access to the invite page to accept/decline */
-	protected $scheduleSecret;
+	/** @var ?string used for access to the invite page to accept/decline */
+	protected ?string $scheduleSecret = null;
 
-	/** @var string The participant id of the participant who invited this one, if known */
-	public $invitedBy;
+	/** @var ?string The participant id of the participant who invited this one, if known */
+	public ?string $invitedBy = null;
 
-	/** @var string[bool] participantIds A set of participant ids that this participant has delegated their participation to. */
-	//public $delegatedTo;
-
-	/** @var string[bool] participantIds A set of participant ids that this participant is acting as a delegate for */
-	//public $delegatedFrom;
-
-	/** @var string[bool] participantIds A set of group participants that were invited to this calendar
-	object, which caused this participant to be invited due to their
-	membership in the group(s). */
-	//public $memberOf;
 
 	protected static function defineMapping(): Mapping
 	{
@@ -173,7 +155,7 @@ class Participant extends Property
 		return ($this->rolesMask & (1 << $bitPosition)) !== 0;
 	}
 
-	public function setRoles($roles) {
+	public function setRoles(array $roles) {
 		if(empty($roles)) {
 			$this->rolesMask = 0;
 			return;
