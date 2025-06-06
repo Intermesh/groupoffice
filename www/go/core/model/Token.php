@@ -305,7 +305,7 @@ class Token extends Entity {
 	public function setAuthenticated(bool $increaseLogins = true): bool
 	{
 		
-		$user = $this->getUser(['loginCount', 'lastLogin', 'language']);
+		$user = $this->getUser(['username','displayName', 'email', 'loginCount', 'lastLogin', 'language']);
 
 		if(!$this->refresh()) {
 			return false;

@@ -277,7 +277,10 @@ class Module extends core\Module
 				$calendar = Calendar::createFor($user->id);
 				$calendar->name = $user->displayName;
 				$calendar->setOwnerId($user->id);
-				$calendar->setAcl([core\model\Group::ID_INTERNAL => core\model\Acl::LEVEL_READ]);
+				$calendar->createdBy = $user->id; // This will make the ACL owned by the user too
+				$calendar->setAcl([
+					core\model\Group::ID_INTERNAL => core\model\Acl::LEVEL_READ
+				]);
 				if(!$calendar->save()) {
 					throw new core\orm\exception\SaveException($calendar);
 				}

@@ -288,4 +288,10 @@ $updates["202505011057"][] = "ALTER TABLE `calendar_calendar_event` ADD UNIQUE I
 $updates["202505061137"][] = "ALTER TABLE `calendar_event` ADD INDEX `fk_calendar_event_uid_index` (`uid` ASC);";
 $updates["202505071158"][] = "ALTER TABLE `calendar_calendar` ADD COLUMN `webcalUri` VARCHAR(512) NULL DEFAULT NULL AFTER `timeZone`;";
 
+$updates["202506061051"][] = "alter table calendar_calendar_user
+    alter column includeInAvailability set default 'all';";
+
+
 // TODO: calendar views -> custom filters
+
+

@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_user` (
     `color` VARCHAR(21) NOT NULL,
     `sortOrder` INT NOT NULL DEFAULT 0,
     `timeZone` VARCHAR(45) NULL,
-    `includeInAvailability` ENUM('all', 'attending', 'none') NOT NULL,
+    `includeInAvailability` ENUM('all', 'attending', 'none') NOT NULL DEFAULT 'all',
 		`modSeq` INT NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`, `userId`),
     CONSTRAINT `fk_calendar_calendar_user_calendar_calendar1`

@@ -33,14 +33,14 @@ class Calendar extends AclOwnerEntity {
 	/** @var string The user-visible name of the calendar */
 	public string $name;
 	public ?string $description;
-	/** @var string Any valid CSS color value. The color to be used when displaying events associated with the calendar */
+	/** @var ?string Any valid CSS color value. The color to be used when displaying events associated with the calendar */
 	public ?string $color = null;
-	/** @var int uint32 Defines the sort order of calendars when presented in the client’s UI, so it is consistent between devices */
-	public int $sortOrder = 0;
+	/** @var ?int uint32 Defines the sort order of calendars when presented in the client’s UI, so it is consistent between devices */
+	public ?int $sortOrder = 0;
 	/** @var bool Has the user indicated they wish to see this Calendar in their client */
-	public bool $isSubscribed = true;
+	public ?bool $isSubscribed = null;
 	/** @var bool Should the calendar’s events be displayed to the user at the moment? */
-	public bool $isVisible = true; // per user
+	public ?bool $isVisible = null; // per user
 	/**
 	 * @var string (default: all) Should the calendar’s events be used as part of availability calculation?
 	 * This MUST be one of:
@@ -48,7 +48,7 @@ class Calendar extends AclOwnerEntity {
 	 *	- attending: events the user is a confirmed or tentative participant of are considered.
 	 *	- none: all events are ignored (but may be considered if also in another calendar).
 	 */
-	public string $includeInAvailability = 'all';
+	public ?string $includeInAvailability = null;
 
 	/** @var ?string default for event. If NULL client will use the Users default timeZone  */
 	public ?string $timeZone = null;
