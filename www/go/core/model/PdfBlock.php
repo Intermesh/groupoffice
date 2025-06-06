@@ -29,25 +29,25 @@ class PdfBlock extends Property {
 	 * If x is null then the left margin will be used
 	 * @var double
 	 */							
-	public float $x;
+	public ?float $x;
 
 	/**
 	 * If y is null then it will continue on where last block had the highest y
 	 * @var double
 	 */							
-	public float $y;
+	public ?float $y;
 
 	/**
 	 * If null then the full page width will be used
 	 * @var double
 	 */							
-	public float $width;
+	public ?float $width;
 
 	/**
 	 * If null then the height will be automatic depending on the content.
 	 * @var double
 	 */							
-	public float $height;
+	public ?float $height;
 
 	/**
 	 * See tcpdf align. Default to L for left.
