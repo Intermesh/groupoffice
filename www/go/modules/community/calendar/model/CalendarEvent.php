@@ -345,8 +345,7 @@ class CalendarEvent extends AclItemEntity {
 
 		$blob = isset($this->veventBlobId) ? Blob::findById($this->veventBlobId) : null;
 		if(!$blob || $blob->modifiedAt < $this->modifiedAt || !$blob->getFile()->exists()) {
-			go()->debug("BLOB UPDATE " . ( $blob ? $blob->modifiedAt->format('Y-m-d H:i:s') : 'null') .' = ' . $this->modifiedAt->format('Y-m-d H:i:s'));
-			$this->modifiedAt = new DateTime();
+			$this->modifiedAt = new DateTime(); // important to set here so blob will get the same modifiedAt
 			$blob = ICalendarHelper::makeBlob($this);
 			$this->veventBlobId = $blob->id;
 			if(!$this->isNew()) {
