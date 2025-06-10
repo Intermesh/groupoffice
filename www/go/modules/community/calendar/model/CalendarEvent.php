@@ -89,7 +89,7 @@ class CalendarEvent extends AclItemEntity {
 	public ?string $replyTo;
 
 	public ?string $id;
-	public ?string $prodId;
+	public ?string $prodId = null;
 	public ?string $timeZone;
 	public ?string $locale;
 	public int $priority = 0;
