@@ -2,6 +2,7 @@
 namespace go\modules\community\calendar\model;
 
 use go\core\acl\model\AclOwnerEntity;
+use go\core\App;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\http;
@@ -116,6 +117,14 @@ class Calendar extends AclOwnerEntity {
 
 	public function setColor($value) {
 		$this->color = $value;
+	}
+
+	protected function getDefaultCreatedBy(): ?int
+	{
+		if(!empty($this->ownerId)) {
+			return $this->ownerId;
+		}
+		return parent::getDefaultCreatedBy();
 	}
 
 

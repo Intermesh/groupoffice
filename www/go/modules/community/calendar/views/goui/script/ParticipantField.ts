@@ -77,7 +77,7 @@ export class ParticipantField extends Component {
 				}
 			}),
 			autocomplete({
-				placeholder:t('Invite people'),
+				placeholder:t('Invite people') + ' / ' + t('Resource request'),
 				//valueProperty: "id",
 				listeners: {
 					'autocomplete': async (field, input) => {

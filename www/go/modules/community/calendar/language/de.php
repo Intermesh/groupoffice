@@ -91,6 +91,7 @@ return [
 	'+ {n} more' => '+ {n} mehr',
 	'Write email' => 'E-Mail schreiben',
 	'Invite people' => 'Personen einladen',
+	'Resource request' => 'Ressourcenanfrage',
 	'Preferences' => 'Präferenzen',
 	'Show week numbers in calendar' => 'Zeige Wochennummern im Kalender',
 	'Show events that you have declined' => 'Zeige abgelehnte Termine',
