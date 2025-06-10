@@ -151,20 +151,24 @@ class CalendarConvertor
 			}
 		}
 		//$message->reminder = 0; // timestamp or 0
+
+
 		$alerts = $event->alerts();
+
 		if(!empty($alerts)) {
 			$firstAlert = array_shift($alerts);
 
+			// TODO $alert->setEntity() failes on recurring items because id is null in that case becuase of a $event->patchedInstance();
 			$coreAlert = $firstAlert->buildCoreAlert($event);
-			if($coreAlert) {
+			if ($coreAlert) {
 				$triggerU = $coreAlert->triggerAt->format("U");
 				$message->reminder = ($message->starttime - $triggerU) / 60; // Reminder is in minutes before start
 
-				if($message->reminder < 0) {
+				if ($message->reminder < 0) {
 					//iphone and GO allows a reminder after the start time when using an all day event.
 					//EAS does not support this. We'll set a reminder at 9:00 the day before so it's not
 					//completely lost.
-					if($event->showWithoutTime) {
+					if ($event->showWithoutTime) {
 						$message->reminder = 900;
 					} else {
 						$message->reminder = 30;
@@ -172,6 +176,7 @@ class CalendarConvertor
 				}
 			}
 		}
+
 		return $message;
 	}
 

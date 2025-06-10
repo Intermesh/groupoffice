@@ -88,7 +88,7 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	public ?string $replyTo;
 
-	public ?string $id;
+	public ?string $id = null;
 	public ?string $prodId = null;
 	public ?string $timeZone;
 	public ?string $locale;
@@ -127,7 +127,7 @@ class CalendarEvent extends AclItemEntity {
 
 	/**
 	 * The start time of the event
-	 * @var DateTime
+	 * @var ?\DateTimeInterface|null
 	 */
 	public ?\DateTimeInterface $start;
 
