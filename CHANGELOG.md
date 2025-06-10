@@ -1,6 +1,7 @@
 - Leavedays: Manager of logged in user got notification if you added a holiday on behalf of someone else
 - Updated German translations. Danke, Daniel!
 - Leavedays: fully refactor notification
+- Files: Use load() instead of reload() otherwise it might retrash the files as it will send the last load params
 
 04-06-2025: 6.8.124
 - Leavedays: do not show notification if no open leave days (again)
