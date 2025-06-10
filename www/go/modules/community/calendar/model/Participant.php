@@ -155,7 +155,7 @@ class Participant extends Property
 		return ($this->rolesMask & (1 << $bitPosition)) !== 0;
 	}
 
-	public function setRoles(array $roles) {
+	public function setRoles(array|\stdClass $roles) {
 		if(empty($roles)) {
 			$this->rolesMask = 0;
 			return;
