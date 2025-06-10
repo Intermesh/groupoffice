@@ -208,7 +208,7 @@ export class WeekView extends CalendarView {
 		}
 
 		this.viewModel = allDay.sort((a,b) => Math.sign(+a.start.date - +b.start.date));
-		this.dayItems = withTime.sort((a,b) => Math.sign(+a.start.date - +b.start.date));
+		this.dayItems = withTime;
 		this.updateFullDayItems();
 		this.updateItems();
 	}
@@ -274,7 +274,7 @@ export class WeekView extends CalendarView {
 	}
 
 	private updateItems(day?: DateTime) {
-
+		this.dayItems = this.dayItems.sort((a,b) => Math.sign(+a.start.date - +b.start.date));
 		this.continues = [];
 		this.iter = 0;
 		if(day) {
