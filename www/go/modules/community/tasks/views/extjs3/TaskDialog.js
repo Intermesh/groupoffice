@@ -399,7 +399,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			this.descriptionFieldset = new Ext.form.FieldSet({
 				collapsed: true,
 				collapsible: true,
-				title: t("Description") + " / " + t("Location"),
+				title: t("Description"),
 				xtype: "fieldset",
 				defaults: {
 					anchor: '100%'
@@ -410,13 +410,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						xtype: 'textarea',
 						name: 'description',
 						fieldLabel: t("Description"),
-						grow: true
-
-					}, {
-						xtype: 'textarea',
-						name: 'location',
-						allowBlank: true,
-						fieldLabel: t("Location"),
 						grow: true
 
 					}
