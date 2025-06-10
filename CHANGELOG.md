@@ -1,5 +1,7 @@
 - Timeregistration2: Tasks only querying in subscribed lists
 - Core: PHP 8.4 compatibility
+- Studio: patch generated models with type hinted attributes
+- Studio: generate new models with type hinted attributes
 
 05-06-2025: 25.0.29
 - Tasks: Sync subscribed tasklists and remove sync settings
