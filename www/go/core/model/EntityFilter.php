@@ -26,7 +26,7 @@ class EntityFilter extends AclOwnerEntity {
 	
 	public string $name;
 	
-	protected string $filter;
+	protected ?string $filter = null;
 
 	public string $type = "fixed";
 

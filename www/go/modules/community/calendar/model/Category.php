@@ -20,8 +20,8 @@ class Category extends Entity {
 	/** @var string */
 	public string $name;
 
-	/** @var int could be NULL for global categories */
-	protected int $ownerId;
+	/** @var ?int could be NULL for global categories */
+	protected ?int $ownerId;
 
 	public ?string $color;
 

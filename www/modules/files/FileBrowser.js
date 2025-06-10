@@ -1591,8 +1591,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 							delete treeNode.attributes.children;
 							treeNode.reload();
 						}
-						this.gridStore.reload();
-						this.trashGridStore.reload();
+						this.gridStore.load();
+						this.trashGridStore.load();
 					},
 					scope: this
 				});
@@ -1605,8 +1605,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 							delete treeNode.attributes.children;
 							treeNode.reload();
 						}
-						this.gridStore.reload();
-						this.trashGridStore.reload();
+						this.gridStore.load();
+						this.trashGridStore.load();
 					},
 					scope: this
 				});
@@ -1649,8 +1649,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 						delete treeNode.attributes.children;
 						treeNode.reload();
 					}
-					this.gridStore.reload();
-					this.trashGridStore.reload();
+					this.gridStore.load();
+					this.trashGridStore.load();
 
 				},
 				scope:this
@@ -1686,8 +1686,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 					ids: ids.join(",")
 				},
 				success:function(action, response, result){
-					this.gridStore.reload();
-					this.trashGridStore.reload();
+					this.gridStore.load();
+					this.trashGridStore.load();
 				},
 				scope:this
 			})

@@ -265,7 +265,7 @@ class Module extends core\Module
 
 	public function demo(Generator $faker)
 	{
-		$users = User::find(['id', 'displayName', 'email'])->limit(10)->all();
+		$users = User::find(['id', 'displayName', 'email', 'timezone'])->limit(10)->all();
 		$userCount = count($users) - 1;
 
 		$locations = ['Online', 'Office', 'Customer', ''];
@@ -276,6 +276,7 @@ class Module extends core\Module
 			if(!$calendar) {
 				$calendar = Calendar::createFor($user->id);
 				$calendar->name = $user->displayName;
+				$calendar->timeZone = $user->timezone;
 				$calendar->setOwnerId($user->id);
 				$calendar->createdBy = $user->id; // This will make the ACL owned by the user too
 				$calendar->setAcl([
@@ -294,6 +295,7 @@ class Module extends core\Module
 				$time->add($di);
 
 				$event = new CalendarEvent();
+				$event->timeZone = $calendar->timeZone;
 				$event->start = (clone $time)->add(new DateInterval("PT" . $faker->numberBetween(1, 9) ."H"));
 				$event->duration = "PT30M";
 				$event->location = $locations[$faker->numberBetween(0, 3)];

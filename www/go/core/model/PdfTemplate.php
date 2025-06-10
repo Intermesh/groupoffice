@@ -109,8 +109,8 @@ class PdfTemplate extends Entity {
 	public array $blocks = [];
 
 
-	public string $footer = "";
-	public string $header = "";
+	public ?string $footer = null;
+	public ?string $header = null;
 
 	public float $headerX = 0;
 	public float $headerY = 20;

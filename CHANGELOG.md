@@ -2,6 +2,8 @@
 - Core: PHP 8.4 compatibility
 - Studio: patch generated models with type hinted attributes
 - Studio: generate new models with type hinted attributes
+- Files: Use load() instead of reload() otherwise it might retrash the files as it will send the last load param
+- Core: All model properties have types so keys will always be a string according to JMAP spec
 
 05-06-2025: 25.0.29
 - Tasks: Sync subscribed tasklists and remove sync settings
