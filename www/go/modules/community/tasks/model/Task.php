@@ -743,7 +743,7 @@ class Task extends AclItemEntity {
 
 	private function incrementTasklistModSeq() {
 		// all() is needed because tasklist might be joined and is also changed
-		TaskList::updateHighestModSeq(self::find()->select('tasklistId')->distinct()->where(['uid'=>$this->uid])->all());
+		TaskList::updateHighestModSeq(self::find()->selectSingleValue('tasklistId')->distinct()->where(['uid'=>$this->uid])->all());
 		if($this->isModified('tasklistId')) {
 			// Event is put in a different calendar so update both modseqs
 			TaskList::updateHighestModSeq($this->getOldValue('tasklistId'));
