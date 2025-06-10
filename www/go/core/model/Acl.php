@@ -42,9 +42,9 @@ class Acl extends Entity {
 	/**
 	 * The table.field this aclId is used in
 	 * 
-	 * @var string
+	 * @var ?string
 	 */
-	public string $usedIn;
+	public ?string $usedIn;
 	
 	/**
 	 * The user that owns the ACL
