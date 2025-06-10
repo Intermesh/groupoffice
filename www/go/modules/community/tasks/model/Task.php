@@ -49,23 +49,22 @@ class Task extends AclItemEntity {
 
 	use SearchableTrait;
 	use CustomFieldsTrait;
-	
-	/** @var int PK in the database */
-	public $id;
+
+	public ?string $id = null;
 
 	/** @var string global unique id for invites and sync  */
 	protected $uid = '';
 
 //	protected $userId;
 
-	/** @var int The list this Task belongs to */
-	public $tasklistId;
+	/** @var string The list this Task belongs to */
+	public string $tasklistId;
 
-	/** @var int id of user responsible for completing this tasks  */
-	public $responsibleUserId;
+	/** @var ?string id of user responsible for completing this tasks  */
+	public ?string $responsibleUserId;
 
-	/** @var int used for the kanban groups */
-	public $groupId;
+	/** @var ?int used for the kanban groups */
+	public ?int $groupId;
 
 	public ?int $projectId ;
 	public ?int $mileStoneId ;
@@ -177,11 +176,11 @@ class Task extends AclItemEntity {
 	/** @var string public , private, secret */
 	public $privacy = 'public';
 
-   public $replyTo;
-   public $participants;
+ public $replyTo;
+ public $participants;
 
 	/** @var int between 0 and 100 */
-	public $percentComplete = 0;
+	public int $percentComplete = 0;
 
 	protected $uri;
 
@@ -191,8 +190,7 @@ class Task extends AclItemEntity {
     /** @var Alert[] List of notification alerts when $useDefaultAlerts is not set */
 	public $alerts = [];
 
-	/** @var int */
-	public $vcalendarBlobId;
+	public ?string $vcalendarBlobId;
 
 	/**
 	 * Time booked in seconds
@@ -718,6 +716,10 @@ class Task extends AclItemEntity {
 
 	public function icsBlob() {
 		$blob = isset($this->vcalendarBlobId) ? Blob::findById($this->vcalendarBlobId) : null;
+
+		if(str_starts_with($this->title, "Verify backups"))
+			go()->debug("ICS: !!!! " . $this->title . " " . $this->vcalendarBlobId . " - " . ($blob ? $blob->modifiedAt : "null") ." < " . $this->modifiedAt);
+
 		if(!$blob || $blob->modifiedAt < $this->modifiedAt || !$blob->getFile()->exists()) {
 			$this->modifiedAt = new DateTime();
 			$blob = self::makeBlob($this);

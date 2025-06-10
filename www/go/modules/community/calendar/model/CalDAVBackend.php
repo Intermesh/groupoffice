@@ -216,34 +216,57 @@ class CalDAVBackend extends AbstractBackend implements
 
 		switch($type) {
 			case 'c': $component = 'vevent';
-				$stmt = CalendarEvent::find(['id', 'modifiedAt', 'uid'])
-					->select(['cce.id as id','uid','eventdata.modifiedAt as modified', 'uri'])
-					->filter(['inCalendars'=>$id, 'before'=> $end, 'after' => $start])
-					->fetchMode(\PDO::FETCH_OBJ);
+				$stmt = CalendarEvent::find()
+					->filter(['inCalendars'=>$id, 'before'=> $end, 'after' => $start]);
 				break;
 			case 't' : $component = 'vtodo';
-				$stmt =  Task::find(['id', 'modifiedAt', 'uid'])
-					->select(['task.id as id','task.uid','task.modifiedAt as modified','uri'])
-					->filter(['tasklistId' => $id])->fetchMode(\PDO::FETCH_OBJ);
+				$stmt =  Task::find()
+					->filter(['tasklistId' => $id]);
 				break;
 			default: return $result;
 		}
-
-		go()->debug($stmt);
-
 		foreach ($stmt as $object) {
-			$lastModified = strtotime($object->modified);
-			$result[] = [
-				'id' => $object->id,
-				'calendarid' => $type.'-'.$id, // needed for bug in local delivery scheduler
-				'uri' => $object->uri ?? (strtr($object->uid, '+/=', '-_.') . '.ics'),
-				'lastmodified' => $lastModified,
-				'etag' => '"' . $lastModified . '"',
-				'component' => $component
-			];
+			$result[] = $this->toCalendarObject($object, $calendarId, $this->getObjectUri($object, $component), $component);
 		}
 
-		go()->debug($result);
+		return $result;
+	}
+
+	private function getObjectUri($object, $component) : string {
+		if($component == 'vtodo') {
+			return $object->getUri();
+		} else {
+			return $object->uri ?? (strtr($object->uid, '+/=', '-_.') . '.ics');
+		}
+	}
+
+	public function getMultipleCalendarObjects($calendarId, array $uris)
+	{
+		go()->debug("CalDAVBackend::getMultipleCalendarObjects($calendarId)");
+
+		list($type, $id) = explode('-', $calendarId,2);
+
+		switch($type) {
+			case 'c': // calendar
+				$component = 'vevent';
+				$objects = CalendarEvent::find()->filter(['hideSecret'=>1])
+					->where(['cce.calendarId'=> $id]);
+
+				break;
+			case 't': // tasklist
+				$component = 'vtodo';
+				$objects = Task::find()
+					->where(['task.tasklistId'=> $id]);
+				break;
+			default:
+				go()->log("incorrect calendarId ".$calendarId);
+				return null;
+		}
+
+		$result = [];
+		foreach($objects as $object) {
+			$result[] = $this->toCalendarObject($object, $calendarId, $this->getObjectUri($object, $component), $component);
+		}
 
 		return $result;
 	}
@@ -277,29 +300,7 @@ class CalDAVBackend extends AbstractBackend implements
 			return null;
 		}
 
-		$blob = $object->icsBlob();
-		try {
-			$data = $blob->getFile()->getContents();
-		} catch(\Exception$e) {
-			ErrorHandler::logException($e);
-			$blob = $object->icsBlob();
-			$data = $blob->getFile()->getContents();
-		}
-
-		go()->debug("CalDAVBackend::getCalendarObject($calendarId, $objectUri, ");
-		go()->debug($data);
-		go()->debug(")");
-
-		$lastModified = strtotime($object->modifiedAt);
-		return [
-			'id' => $object->id,
-			'uri' => $objectUri,
-			'lastmodified' => $lastModified,
-			'etag' => '"' . $lastModified . '"',
-			'size' => $blob->size,
-			'calendardata' => $data,
-			'component' => $component,
-		];
+		return $this->toCalendarObject($object, $calendarId, $objectUri, $component);
 	}
 
 	private static function eventByVEvent($vcalendar, $calendarId) {
@@ -588,7 +589,39 @@ class CalDAVBackend extends AbstractBackend implements
 		} else {
 			return null;
 		}
+	}
 
+	/**
+	 * @param mixed $object
+	 * @param mixed $calendarId
+	 * @param string $objectUri
+	 * @param string $component
+	 * @return array
+	 */
+	private function toCalendarObject(mixed $object, mixed $calendarId, string $objectUri, string $component): array
+	{
+		$blob = $object->icsBlob();
+		try {
+			$data = $blob->getFile()->getContents();
+		} catch (\Exception $e) {
+			ErrorHandler::logException($e);
+			$blob = $object->icsBlob();
+			$data = $blob->getFile()->getContents();
+		}
 
+//		go()->debug("CalDAVBackend::getCalendarObject($calendarId, $objectUri, ");
+//		go()->debug($data);
+//		go()->debug(")");
+
+		$lastModified = strtotime($object->modifiedAt);
+		return [
+			'id' => $object->id,
+			'uri' => $objectUri,
+			'lastmodified' => $lastModified,
+			'etag' => '"' . $lastModified . '"',
+			'size' => $blob->size,
+			'calendardata' => $data,
+			'component' => $component,
+		];
 	}
 }
