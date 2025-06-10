@@ -140,9 +140,13 @@ class EmailBodyPart extends Model {
 	public function isInline() {
 		return $this->disposition !== "attachment" &&
 			// Must be one of the allowed body types
-			( $this->type === "text/plain" ||
-				$this->type === "text/html" ||
+			( $this->isInlineText() ||
 				$this->isInlineMedia() );
+	}
+
+	public function isInlineText() {
+		return $this->type === "text/plain" ||
+			$this->type === "text/html";
 	}
 
 	/**  relative, mixed and alternative */

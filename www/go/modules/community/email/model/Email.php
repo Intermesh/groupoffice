@@ -173,9 +173,9 @@ class Email extends AclItemEntity {
 		$success = true;
 		if(!$this->isNew()) {
 			// we may only: change mailbox, set flags
-			if($this->isModified('keywords')) {
+			if($this->isModified(['keywords','flagged','seen','answered'])) {
 				// compare old to new and change on backend first.
-				$success &= $this->backend()->select($this->firstMailbox())->setFlags($this->kw, $this->uid);
+				$success &= $this->backend()->select($this->firstMailbox()->name)->setFlags($this->kw, $this->uid);
 			}
 			if($this->isModified('mailboxIds')) {
 				// todo
@@ -313,11 +313,21 @@ class Email extends AclItemEntity {
 		return $this->_account->backend();
 	}
 
+	/**
+	 * Because we only support IMAP backend the first mailbox is also the only mailbox
+	 * @return Mailbox|mixed|null
+	 * @throws \Exception
+	 */
 	private function firstMailbox() {
 		return Mailbox::find()
 			->join('email_map','m', 'm.mailboxId = box.id', 'LEFT')
 			->where('m.fk = '.$this->id)
 			->single();
+	}
+
+	public function toArray(?array $properties = self::defaultProperties): array|null
+	{
+		return parent::toArray($properties);
 	}
 
 	/**

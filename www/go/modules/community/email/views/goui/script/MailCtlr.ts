@@ -1,13 +1,14 @@
 import {client, jmapds} from "@intermesh/groupoffice-core";
 import {Composer} from "./Composer";
+import {DateTime} from "@intermesh/goui";
 
 declare var DOMPurify: any;
 
 export class MailCtlr {
-	static resend(id: string) {
+	static resend(item: any) {
 		const cmp = new Composer();
 
-		jmapds('Email').single(id).then(email => {
+		jmapds('Email').single(item.id).then(email => {
 			cmp.form.create({
 				identityId: 1,
 				subject: email.subject,
@@ -21,18 +22,19 @@ export class MailCtlr {
 		return cmp;
 	}
 
-	static reply(id :string, all?:boolean) {
+	static reply(item :any, all?:boolean) {
 
 		const cmp = new Composer();
-		jmapds('Email').get(id, email => {
+		jmapds('Email').single(item.id).then(email => {
 			const txt = MailCtlr.emailText(email),
-				at = (email.sentAt || email.receivedAt).date();
+				at = new DateTime(email.sentAt || email.receivedAt);
 
-			let htmlBody = "Op "+at.to('j M Y')+ ' om '+ at.to('H:i')+" heeft "+email.from[0].name+' het volgende geschreven:<br><blockquote>'+txt+'</blockquote>',
-				to = email.from;
+			let htmlBody = "<br><br>Op "+at.format('j M Y')+ ' om '+ at.format('H:i')+" heeft "+email.from[0].name+' het volgende geschreven:<br><blockquote>'+txt+'</blockquote>',
+				to = email.from,
+				cc = [];
 
-			if(all && $.isArray(email.cc)) {
-				email.cc.forEach(addr => to.push(addr));
+			if(all && email.cc.length) {
+				cc = email.cc;
 			}
 
 			cmp.form.create({
@@ -40,22 +42,23 @@ export class MailCtlr {
 				htmlBody,
 				inReplyTo: email.messageId,
 				subject: 'Re: '+email.subject,
-				to
+				to,
+				cc
 			});
 		});
 		return cmp;
 	}
 
-	static forward(id: string) {
+	static forward(item: any) {
 		const cmp = new Composer();
-		jmapds('Email').get(id, email => {
+		jmapds('Email').single(item.id).then(email => {
 			const txt = MailCtlr.emailText(email),
-				at = (email.sentAt || email.receivedAt).date(),
-				htmlBody = "<blockquote>Begin doorgestuurd bericht:<br>"+
-					'<br><b>Van:</b> '+ MailCtlr.addrToText(email.from[0]) +
+				at = new DateTime(email.sentAt || email.receivedAt),
+				htmlBody = "<br><br><blockquote>Begin doorgestuurd bericht:<br>"+
+					'<br><b>Van:</b> '+ MailCtlr.addrToText(email.from) +
 					'<br><b>Onderwerp:</b> '+ email.subject +
-					'<br><b>Datum:</b> '+ at.to('j M Y') + ' om ' + at.to('h:i:s')+ ' CEST'+
-					'<br><b>Aan:</b> '+ MailCtlr.addrToText(email.to[0]) +
+					'<br><b>Datum:</b> '+ at.format('j M Y') + ' om ' + at.format('h:i:s')+ ' CEST'+
+					'<br><b>Aan:</b> '+ MailCtlr.addrToText(email.to) +
 					'<br><br>'+txt+'</blockquote>'
 
 			cmp.form.create({
@@ -72,15 +75,16 @@ export class MailCtlr {
 	static flag(rows: any[], name: string, on: true|null) {
 		const s = jmapds('Email');
 		for(const row of rows) {
+			console.log( row.record.keywords[name]);
 			s.update(row.id, {['keywords/'+name]: on ?? !row.record.keywords[name]});
 		}
 		//s.commit();
 	}
 
 	// actions
-	static addrToText(addrs) {
+	static addrToText(addrs: any[]) {
 		if(!addrs) return '';
-		let texts = addrs.map(a => $.isEmpty(a.name) ?
+		let texts = addrs.map(a => a.name ?
 			a.email :
 			a.name + '<'+a.email+'>') ;
 		return texts.join(', ');

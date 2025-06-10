@@ -355,9 +355,10 @@ class ImapBackend {
 			}
 		} else { // full refetch of mailbox
 			// delete all mail that is in this mailbox
-			go()->getDbConnection()->delete('email_email')
+			go()->getDbConnection()->delete('email_email',(new Query)
 				->join('email_map', 'fk = id', 'LEFT')
-				->where("mailboxId = $mailbox->id")->exec();
+				->where("mailboxId = $mailbox->id")
+			)->execute();
 			$newMails = $this->imap->fetch(self::IndexedFields, 1, INF, true); // all
 			$mailbox->setUid($imailbox['uidvalidity']);
 		}
@@ -803,7 +804,7 @@ class ImapBackend {
 		if ($encoding !== 'NIL') {
 			$bodyPart->encoding = $encoding;
 		}
-		if ($type === 'text') {
+		if ($bodyPart->isInlineText()) {
 			$bodyPart->charset = empty($bodyPart->charset) ? 'us-ascii' : $bodyPart->charset; // default
 			$this->textParts[(string) $partId] = [$encoding, $bodyPart->charset];
 		}
@@ -817,7 +818,7 @@ class ImapBackend {
 			$lines = array_shift($structure);
 		}
 
-		if ($bodyPart->isA('text')) {
+		if ($bodyPart->isInlineText()) {
 			$lines = array_shift($structure);
 		}
 

@@ -31,8 +31,8 @@ export class Composer extends Window {
 		super();
 
 		this.title = t('Compose mail');
-		this.width = 695;
-		this.height = 600;
+		this.width = 995;
+		this.height = 800;
 		this.resizable = true;
 
 

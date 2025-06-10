@@ -55,7 +55,10 @@ export class EmailView extends DataSourceForm {
 					btn({icon: 'delete', title:t('Delete'), handler: () => { this.destroy(); }})
 				),
 				btn({icon: 'more_vert', menu: menu({},
-					btn({icon: 'print', text: t('Print')}),
+					btn({icon: 'print', text: t('Print'), handler: () => {
+						const data = this.value;
+						this.body.el.print({title: data.sentAt + " - " + " - " + data.subject});
+					}}),
 					'-',
 					btn({icon:'folder_open', text: t('Move')+'...'}),
 					btn({icon: 'report', text: t('Report spam')}),

@@ -65,11 +65,13 @@ export class ListView extends List {
 			}
 		};
 
+		let clickedItem = null;
+
 		const rowContextMenu = menu({isDropdown: true, removeOnClose: false},
-			btn({icon: 'send', text: t('Send again'), handler: (btn) => { MailCtlr.resend(this.lastId).show(btn.dom); }}),
-			btn({icon: 'reply', text: t('Reply'), handler: (btn) => { MailCtlr.reply(this.lastId).show(btn.dom); }}),
-			btn({icon: 'reply_all', text: t('Reply all'), handler: (btn) => { MailCtlr.reply(this.lastId,false).show(btn.dom);}}),
-			btn({icon: 'forward', text: t('Forward'), handler: (btn) => { MailCtlr.forward(this.lastId).show(btn.dom);}}),
+			btn({icon: 'send', text: t('Send again'), handler: (btn) => { MailCtlr.resend(clickedItem).show(); }}),
+			btn({icon: 'reply', text: t('Reply'), handler: (btn) => { MailCtlr.reply(clickedItem).show(); }}),
+			btn({icon: 'reply_all', text: t('Reply all'), handler: (btn) => { MailCtlr.reply(clickedItem,false).show();}}),
+			btn({icon: 'forward', text: t('Forward'), handler: (btn) => { MailCtlr.forward(clickedItem).show();}}),
 			hr(),
 			btn({icon: 'mail', text: t('Mark as unread'), handler:() => { MailCtlr.flag(this.rowSelection!.getSelected(), '$seen', null)}}),
 			btn({icon: 'report', text: t('Move to "Spam"'), disabled: true}),
@@ -86,6 +88,7 @@ export class ListView extends List {
 
 		this.on('rowcontextmenu',(_me, index, row, ev) =>{
 			ev.preventDefault();
+			clickedItem = this.store.get(index);
 			rowContextMenu.showAt(ev);
 		})
 
