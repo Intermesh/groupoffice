@@ -5,7 +5,7 @@ import {
 	comp, containerfield,
 	DataSourceStore,
 	datasourcestore, displayfield, durationfield,
-	h3,
+	h3, hiddenfield,
 	hr, mapfield,
 	menu, numberfield,
 	searchbtn, select, splitter,
@@ -56,7 +56,8 @@ export class ResourceWindow extends FormWindow {
 			select({name:'groupId', required:true,label:t('Group'), 	store: resourceGroupStore, valueField: 'id', textRenderer: (r: any) => r.name}),
 			textfield({name:'name', flex:1,label: t('Name')}),
 			colorfield({name:'color',width:100, value: '69554f'}),
-			textarea({name:'description', label: t('Description')})
+			textarea({name:'description', label: t('Description')}),
+			hiddenfield({name:'includeInAvailability', value: 'all'})
 			//checkbox({disabled:true, name:'needsApproval', label: t('Needs approval')})
 		);
 
@@ -190,9 +191,9 @@ export class ResourcesWindow extends Window {
 					this.resourceTable = table({
 						fitParent: true,
 						store: resourceStore,
-						columns: [column({header: t("ID"), id:"id", sortable: true, width: 60}),
+						columns: [column({header: t("ID"), id:"id", sortable: true, hidden:true, width: 60}),
+							column({header: t("Color"), id:"color", width: 40, renderer: v => comp({text:'-',style:{backgroundColor:'#'+v}}) }),
 							column({header: t("Name"), id:"name", resizable: true, sortable: true, width: 180}),
-							column({header: t("Needs approval"),hidden:true, id: "needsApproval"}),
 							column({id: "btn", width: 48,renderer: (columnValue: any, record, td, table, rowIndex) =>
 									btn({
 										icon: "more_vert",
