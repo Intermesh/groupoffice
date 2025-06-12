@@ -20,6 +20,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 
 		if (!this.currentId && this.commentComposer) {//} && this.role == "support") {
+
+			this.closeOnSubmit = false;
+
 			this.commentComposer.show();
 			this.commentComposer.editor.allowBlank = this.role !== "support";
 			if(this.role === "support") {
@@ -31,8 +34,16 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			})
 
 			this.on("submit", () => {
-				if(this.commentComposer.editor.getValue() != "")
-					this.commentComposer.save(this.role == "support" ? "SupportTicket" : "Task", this.currentId);
+				if(this.commentComposer.editor.getValue() != "") {
+					// we need to use setTimeout otherwise the change event of the Comment entity fires during the store load and
+					// it won't be reloaded.
+					setTimeout(() => {
+						this.commentComposer.save(this.role == "support" ? "SupportTicket" : "Task", this.currentId);
+						this.close();
+					});
+				}else {
+					this.close();
+				}
 			}, {single:true})
 		} else {
 			this.commentComposer.hide();
