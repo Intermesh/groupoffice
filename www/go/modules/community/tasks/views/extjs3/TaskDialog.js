@@ -365,6 +365,12 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 				title: t("Date"),
 				collapsible: true,
 				collapsed: true,
+				listeners: {
+					expand: () => {
+						//renders invalid when collapsed
+						percentComplete.slider.moveThumb(0, percentComplete.slider.translateValue(percentComplete.getValue()))
+					}
+				},
 				xtype: 'fieldset',
 				defaults: {
 					layout: 'form',
