@@ -189,6 +189,12 @@ go.Jmap = {
 		console.log("Start check for updates every 60s.");
 		const checkFn = function() {
 			go.Db.stores().forEach(function(store) {
+
+				if(store.entity.package == "legacy" || store.entity.name == "Search" || store.entity.name == "User") {
+					// Search and user get lots of updates. We only update them when needed,
+					return;
+				}
+
 				store.getState().then(function(state) {
 					if (state)
 						store.getUpdates();
