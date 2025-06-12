@@ -1,3 +1,4 @@
+- Tasks/Core: Fixed invalid change event in tasklist combo where the tasklist name would be the value in the change event
 - Leavedays: allow employees to request negative hours
 
 12-06-2025: 6.8.125
