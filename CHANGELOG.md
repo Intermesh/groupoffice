@@ -1,3 +1,5 @@
+- Leavedays: allow employees to request negative hours
+
 12-06-2025: 6.8.125
 - Leavedays: Manager of logged in user got notification if you added a holiday on behalf of someone else
 - Updated German translations. Danke, Daniel!
