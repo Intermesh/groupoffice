@@ -7,6 +7,7 @@
 - Tasks/Core: Fixed invalid change event in tasklist combo where the tasklist name would be the value in the change event
 - Tasks: percent complete render error when hidden
 - Tasks/Support: Fixed comment load on new ticket / task
+- Addressbook: City, state and country in grid
 
 05-06-2025: 25.0.29
 - Tasks: Sync subscribed tasklists and remove sync settings
