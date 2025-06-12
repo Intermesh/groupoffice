@@ -1,5 +1,8 @@
 - Tasks/Core: Fixed invalid change event in tasklist combo where the tasklist name would be the value in the change event
 - Leavedays: allow employees to request negative hours
+- Core: SSE Push was broken
+- Core: Polling omits Search and User like SSE for performance
+- 
 
 12-06-2025: 6.8.125
 - Leavedays: Manager of logged in user got notification if you added a holiday on behalf of someone else
