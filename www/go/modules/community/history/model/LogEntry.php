@@ -19,6 +19,7 @@ use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\acl\model\AclOwnerEntity;
 use GO\Files\Model\Folder;
+use go\modules\community\history\Module;
 
 /**
  * LogEntry model
@@ -50,7 +51,7 @@ class LogEntry extends AclOwnerEntity {
 
 	public int $entityTypeId;
 
-	public int $entityId;
+	public ?int $entityId;
 
 	/**
 	 * @var string
@@ -71,7 +72,7 @@ class LogEntry extends AclOwnerEntity {
 		}
 	}
 
-	protected function createAcl()
+	protected function createAcl() : void
 	{
 	 //never create acl for log entry
 	}
@@ -201,11 +202,7 @@ class LogEntry extends AclOwnerEntity {
 		$this->entity = $entity->entityType()->getName();
 		$this->entityId = $entity->id();
 
-		if($entity instanceof AclInheritEntity) {
-			$this->removeAcl = $entity->hasOwnAcl();
-		} else {
-			$this->removeAcl = $entity instanceof AclOwnerEntity || ($entity instanceof ActiveRecord && $entity->aclField() && (!$entity->isJoinedAclField || $entity->isAclOverwritten() || ($entity instanceof Folder && !empty($entity->acl_id) && !$entity->readonly)));
-		}
+		$this->removeAcl = $entity instanceof AclOwnerEntity || ($entity instanceof ActiveRecord && $entity->aclField() && (!$entity->isJoinedAclField || $entity->isAclOverwritten() || ($entity instanceof Folder && !empty($entity->acl_id) && !$entity->readonly)));
 
 		$this->description = $entity->title();
 		$this->cutPropertiesToColumnLength();
@@ -223,6 +220,10 @@ class LogEntry extends AclOwnerEntity {
 
 	protected function internalSave(): bool
 	{
+		if(!isset($this->aclId)) {
+			// if no aclId set then use module's acl
+			$this->aclId = \go\core\model\Module::findByName("community", "history")->getShadowAclId();
+		}
 		if($this->action != self::$actionMap['delete']) {
 			$this->removeAcl = false;
 		}

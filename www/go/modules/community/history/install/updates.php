@@ -54,3 +54,10 @@ $updates['202306151226'][] = "alter table history_log_entry
         foreign key (aclId) references core_acl (id)
             on update cascade on delete set null;";
 
+
+$updates['202506122116'][] = function() {
+	$aclId =\go\core\model\Module::findByName("community", "history")->getShadowAclId();
+	go()->getDbConnection()
+		->update("history_log_entry", ['aclId' => $aclId], (new \go\core\db\Query())->where("aclId", "=", null))
+		->execute();
+};

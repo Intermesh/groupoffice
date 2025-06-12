@@ -29,7 +29,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	protected int $aclId;
 
 
-	public static $aclColumnName = 'aclId';
+	public static string $aclColumnName = 'aclId';
 
 	protected function internalSave(): bool
 	{
@@ -65,7 +65,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	/**
 	 * @throws Exception
 	 */
-	protected function createAcl() {
+	protected function createAcl() : void {
 
 		// Copy the default one. When installing the default one can't be accessed yet.
 		// When ACL has been provided by the client don't copy the default.

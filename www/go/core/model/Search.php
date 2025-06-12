@@ -76,7 +76,7 @@ class Search extends AclOwnerEntity {
 		}
 	}
 
-	protected function createAcl()
+	protected function createAcl() : void
 	{
 		// don't for search
 	}
