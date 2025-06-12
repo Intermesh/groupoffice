@@ -17,13 +17,13 @@ class Preferences extends Property
 	public bool $useTimeZones = false;
 
 	/** @var bool If true, shows week number in calendar. */
-	public bool $showWeekNumbers;
+	public bool $showWeekNumbers = true;
 
 	/** If true, show tool tip popup when the mouse hovers over events and tasks. */
-	public bool $showTooltips;
+	public bool $showTooltips = true;
 
 	/** @var bool If true, show events that you have RSVPed "no" to */
-	public bool $showDeclined;
+	public bool $showDeclined = true;
 
 	/** @var bool Show birthdays on the calendar */
 	public bool $birthdaysAreVisible = false;
@@ -49,9 +49,6 @@ class Preferences extends Property
 	 * @var bool
 	 */
 	public bool $markReadAndFileAutoAdd = false;
-
-	/** @var int The id of the mailbox to file event invitations in; should default to the Archive folder. */
-	//public $autoAddFileIn;
 
 	/**
 	 * If true, whenever an update to an event already in the user's calendar
