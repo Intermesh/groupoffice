@@ -2,6 +2,9 @@
 - Updated German translations. Danke, Daniel!
 - Leavedays: fully refactor notification
 - Files: Use load() instead of reload() otherwise it might retrash the files as it will send the last load params
+- Newsletters: When setting max messages per minute to 0 it will send as fast as possible and doesn't default to 120 messages per minute
+- Newsletters: When a sending limit is applied the sending time is now taken in to account too.
+
 
 04-06-2025: 6.8.124
 - Leavedays: do not show notification if no open leave days (again)
