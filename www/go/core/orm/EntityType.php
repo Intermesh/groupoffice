@@ -184,8 +184,8 @@ class EntityType implements ArrayableInterface {
 	 * @return int
 	 * @throws PDOException
 	 */
-	public function getHighestModSeq(): int
-	{
+	public function getHighestModSeq(): int{
+
 		if(isset($this->highestModSeq)) {
 			return $this->highestModSeq;
 		}
@@ -206,6 +206,8 @@ class EntityType implements ArrayableInterface {
 		$stmt->bindValue(':id' , $this->id);
 		$stmt->execute();
 		$this->highestModSeq = $stmt->fetch();
+
+		$stmt->closeCursor();
 
 		return $this->highestModSeq ?? 0;
 	}
@@ -261,7 +263,7 @@ class EntityType implements ArrayableInterface {
 		}
 
 		$records = $query
-			->select('e.*, m.name AS moduleName, m.package AS modulePackage, m.enabled')
+			->select('e.id')
 			->from('core_entity', 'e')
 			->join('core_module', 'm', 'm.id = e.moduleId')
 //						->where(['m.enabled' => true])
@@ -269,18 +271,7 @@ class EntityType implements ArrayableInterface {
 
 		$i = [];
 		foreach($records as $record) {
-			$type = static::fromRecord($record);
-			$cls = $type->getClassName();
-			try {
-				if (!class_exists($cls) || (!is_a($cls, Entity::class, true) && !is_a($cls, ActiveRecord::class, true))) {
-					go()->warn('Entity class "' . $cls . '" in database but it is not found on disk!');
-					continue;
-				}
-			} catch(Exception $e) {
-				go()->warn('Entity class "' . $cls . '" in database but there was an error loading it: ' . $e->getMessage());
-				continue;
-			}
-			$i[] = $type;
+			$i[] = self::findById($record['id']);
 		}
 
 		return $i;
