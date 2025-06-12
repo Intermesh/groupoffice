@@ -390,6 +390,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					hidden: this.enabledColumns.indexOf('age') == -1,
 				},{
 					id: 'actionAt',
+					dateOnly: true,
 					xtype: "datecolumn",
 					header: t('Action date'),
 					sortable: true,
