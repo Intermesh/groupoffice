@@ -25,6 +25,7 @@ export class PreferencesPanel extends Component {
 			containerfield({name:'calendarPreferences'},
 				fieldset({},
 					checkbox({name:'showWeekNumbers', label:t('Show week numbers in calendar')}),
+					checkbox({name:'showTooltips', label:t('Show pop-up info when hovering over appointments')}),
 					checkbox({name:'showDeclined', label: t('Show events that you have declined')}),
 					select({name:'defaultCalendarId', label: t('Default calendar'), store: calendarStore, valueField: 'id',
 						hint: t('Invitation to event will be added into this calendar')}),

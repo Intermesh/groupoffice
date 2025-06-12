@@ -4,12 +4,12 @@ import {
 	comp,
 	DateInterval,
 	DateTime,
-	E, EntityID, MaterialIcon, ObjectUtil, root,
+	E, EntityID, Format, MaterialIcon, ObjectUtil, root,
 	tbar, Timezone,
 	win, Window
 } from "@intermesh/goui";
-import {calendarStore, categoryStore, t} from "./Index.js";
-import {client, jmapds, Recurrence} from "@intermesh/groupoffice-core";
+import {calendarStore, categoryStore, statusIcons, t} from "./Index.js";
+import {client, jmapds, Recurrence, RecurrenceField} from "@intermesh/groupoffice-core";
 import {EventWindow} from "./EventWindow.js";
 import {EventDetailWindow} from "./EventDetail.js";
 import {SubscribeWindow} from "./SubscribeWindow";
@@ -34,6 +34,12 @@ export interface CalendarEvent extends BaseEntity {
 	isOrigin: boolean
 	participants?: {[key:string]: any}
 	calendarId: string
+	modifier: any
+	creator: any
+	createdAt: string
+	modifiedAt: string
+	location?:string
+	description?:string
 }
 
 export interface CalendarCategory extends BaseEntity {
@@ -402,6 +408,73 @@ export class CalendarItem {
 	}
 	get principalId() {
 		return (this.cal && this.cal.ownerId) ? this.cal.ownerId+'' : go.User.id+''
+	}
+
+	get quickText(): string {
+		const cal = this.cal ? ('<sup style="color:#'+this.cal.color+';">'+this.cal.name+'</sup>') : '';
+		const lines = [
+			'<h2 style="padding:0;margin:0;">'+this.title+'</h2>'+cal,
+			...this.humanReadableDate(),
+		];
+		if(this.isRecurring) {
+			lines.push(RecurrenceField.toText(this.data.recurrenceRule,this.start));
+		}
+		if(this.participants) {
+			lines.push('<hr>'+t('Participants'));
+			for(const key in this.participants) {
+				const p = this.participants[key],
+					icon = statusIcons[p.participationStatus],
+					 i= '<i class="icon '+icon[2]+'" title="'+icon[1]+'">'+icon[0]+'</i>' ;
+				lines.push(i+' '+(p.name ?? p.email));
+			}
+
+		}
+		if(this.data.creator && this.data.modifier) {
+			lines.push(
+				'<hr>' + t('Created at') + ': ' + Format.smartDateTime(this.data.createdAt) + ' ' + t('by') + ' ' + this.data.creator.name,
+				t('Modified at') + ': ' + Format.smartDateTime(this.data.modifiedAt) + ' ' + t('by') + ' ' + this.data.modifier.name
+			);
+		}
+		if(this.data.location) {
+			lines.push(t('Location')+ ': '+this.data.location);
+		}
+		if(this.data.description)
+			lines.push('<p style="max-width:360px;">'+this.data.description+'</p>');
+		// status
+		return lines.join('<br>');
+	}
+
+	private humanReadableDate() {
+		const start = this.start;
+		const end = this.end.clone();
+		const oneDay = start.format('Ymd') === end.format('Ymd');
+
+		let line1 = start.format('l j F Y');
+
+		if (!oneDay) {
+			if (!this.data.showWithoutTime) {
+				line1 += ', '+start.format('H:i');
+			}
+			line1 += ' '+t('until');
+		}
+
+		let line2;
+		if (oneDay) {
+			if(!this.data.showWithoutTime) {
+				line2 = `${start.format('H:i')} - ${end.format('H:i')}`;
+			}
+		} else {
+			if(this.data.showWithoutTime) {
+				// if more then 1 day and without time. the day in inclusieve so we remove the last one
+				end.addSeconds(-1);
+			}
+			line2 = end.format('l j F Y');
+			if (!this.data.showWithoutTime) {
+				line2 += `, ${end.format('H:i')}`;
+			}
+		}
+
+		return [line1, line2];
 	}
 
 	private get isInPast() {

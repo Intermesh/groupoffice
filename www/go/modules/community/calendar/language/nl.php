@@ -111,6 +111,7 @@ return [
 	'Preferences' => 'Voorkeuren',
 	'Show week numbers in calendar' => 'Toon weeknummers in de agenda',
 	'Show events that you have declined' => 'Toon afspraken die je hebt afgewezen',
+	'Show pop-up info when hovering over appointments' => 'Toon pop-up info bij aanwijzen van afspraken',
 	'Default calendar' => 'Standaard agenda',
 	'Process e-mail in' => 'Verwerk e-mail in',
 	'Archive folder' => 'Archief map',

@@ -292,6 +292,9 @@ $updates["202506061051"][] = "alter table calendar_calendar_user
     alter column includeInAvailability set default 'all';";
 
 
+$updates["202506121207"][] = "alter table `calendar_preferences` add column showTooltips	TINYINT(1)  DEFAULT 0 NOT NULL AFTER holidaysAreVisible;";
+
+
 // TODO: calendar views -> custom filters
 
 

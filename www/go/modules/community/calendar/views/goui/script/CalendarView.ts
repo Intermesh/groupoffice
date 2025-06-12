@@ -3,6 +3,7 @@ import {
 	Component,
 	DateTime,
 	E,
+	tooltip,
 	menu
 } from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
@@ -71,6 +72,11 @@ export abstract class CalendarView extends Component {
 		}
 		if(item.key) {
 			div.dataset.key = item.key;
+			if(client.user.calendarPreferences?.showTooltips)
+				tooltip({
+					listeners: { 'render': (me) => {me.html = item.quickText}},
+					target:div
+				});
 		}
 		return div.cls('allday',e.showWithoutTime)
 			.cls('declined', item.isDeclined || item.isCancelled)

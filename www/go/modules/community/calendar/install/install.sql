@@ -382,6 +382,7 @@ CREATE TABLE calendar_preferences (
 	birthdaysAreVisible   TINYINT(1) DEFAULT 0 NOT NULL,
 	tasksAreVisible       TINYINT(1) DEFAULT 0 NOT NULL,
 	holidaysAreVisible    TINYINT(1)  DEFAULT 0 NOT NULL,
+	showTooltips			    TINYINT(1)  DEFAULT 0 NOT NULL,
 	defaultCalendarId     INT UNSIGNED NULL,
 	startView             ENUM ('week', 'month', 'year', 'list') DEFAULT 'month' NULL,
 	CONSTRAINT calendar_preferences_core_user_id_fk FOREIGN KEY (userId)

@@ -19,6 +19,9 @@ class Preferences extends Property
 	/** @var bool If true, shows week number in calendar. */
 	public bool $showWeekNumbers;
 
+	/** If true, show tool tip popup when the mouse hovers over events and tasks. */
+	public bool $showTooltips;
+
 	/** @var bool If true, show events that you have RSVPed "no" to */
 	public bool $showDeclined;
 
