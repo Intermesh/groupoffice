@@ -271,7 +271,10 @@ class EntityType implements ArrayableInterface {
 
 		$i = [];
 		foreach($records as $record) {
-			$i[] = self::findById($record['id']);
+			$et = self::findById($record['id']);
+			if($et) {
+				$i[] = $et;
+			}
 		}
 
 		return $i;
