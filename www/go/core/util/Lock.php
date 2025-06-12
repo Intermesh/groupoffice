@@ -7,6 +7,7 @@ use go\core\ErrorHandler;
 use go\core\fs\File;
 use go\core\jmap\Request;
 use LogicException;
+use Throwable;
 use function GO;
 
 /**
@@ -138,7 +139,7 @@ class Lock {
 		try {
 			$this->sem = sem_get((int)hexdec(substr(md5(go()->getConfig()['db_name'] . $this->name), 24)));
 			$acquired = $this->sem && sem_acquire($this->sem, true);
-		} catch(Exception $e) {
+		} catch(Throwable $e) {
 			ErrorHandler::logException($e, "Failed to acquire lock for " . $this->name);
 			//identifier might be removed by other process
 			$acquired = false;

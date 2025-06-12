@@ -278,6 +278,34 @@ class EntityType implements ArrayableInterface {
 		return $i;
 	}
 
+	private static function findFromDb(): array
+	{
+		$records = go()->getDbConnection()
+			->select('e.*, m.name AS moduleName, m.package AS modulePackage, m.enabled')
+			->from('core_entity', 'e')
+			->join('core_module', 'm', 'm.id = e.moduleId')
+//						->where(['m.enabled' => true])
+			->all();
+
+		$i = [];
+		foreach($records as $record) {
+			$type = static::fromRecord($record);
+			$cls = $type->getClassName();
+			try {
+				if (!class_exists($cls) || (!is_a($cls, Entity::class, true) && !is_a($cls, ActiveRecord::class, true))) {
+					go()->warn('Entity class "' . $cls . '" in database but it is not found on disk!');
+					continue;
+				}
+			} catch(Exception $e) {
+				go()->warn('Entity class "' . $cls . '" in database but there was an error loading it: ' . $e->getMessage());
+				continue;
+			}
+			$i[] = $type;
+		}
+
+		return $i;
+	}
+
 	/**
 	 * @return array
 	 */
@@ -289,7 +317,7 @@ class EntityType implements ArrayableInterface {
 			$cache= [
 				'id' => [],
 				'name' => [],
-				'models' => self::findAll(new Query)
+				'models' => self::findFromDb()
 			];
 
 			for($i = 0, $c = count($cache['models']); $i < $c; $i++) {
