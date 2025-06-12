@@ -289,7 +289,7 @@ $updates["202505061137"][] = "ALTER TABLE `calendar_event` ADD INDEX `fk_calenda
 $updates["202505071158"][] = "ALTER TABLE `calendar_calendar` ADD COLUMN `webcalUri` VARCHAR(512) NULL DEFAULT NULL AFTER `timeZone`;";
 
 $updates["202506061051"][] = "alter table calendar_calendar_user
-    alter column includeInAvailability set default 'all';";
+    alter column includeInAvailability set default 'none';";
 
 
 $updates["202506121207"][] = "alter table `calendar_preferences` add column showTooltips	TINYINT(1)  DEFAULT 1 NOT NULL AFTER holidaysAreVisible;";
