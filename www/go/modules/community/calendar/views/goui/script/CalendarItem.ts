@@ -439,7 +439,7 @@ export class CalendarItem {
 			lines.push(t('Location')+ ': '+this.data.location);
 		}
 		if(this.data.description)
-			lines.push('<p style="max-width:360px;">'+this.data.description+'</p>');
+			lines.push('<p style="max-width:360px;">'+Format.textToHtml(this.data.description)+'</p>');
 		// status
 		return lines.join('<br>');
 	}
