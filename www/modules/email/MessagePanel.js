@@ -399,7 +399,12 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		}
 
 		this.actions = this.body.dom.querySelector('ul.actions');
-		GO.email.handleITIP(this.actions, data); // function is defined in calendar module
+		try {
+			GO.email.handleITIP(this.actions, data); // function is defined in calendar module
+		} catch(e) {
+			GO.errorDialog.show(t("Failed to process invitation"))
+			console.error(e);
+		}
 
 		this.body.scrollTo('top',0);
 
