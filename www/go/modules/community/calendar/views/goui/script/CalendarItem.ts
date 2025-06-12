@@ -436,7 +436,7 @@ export class CalendarItem {
 			);
 		}
 		if(this.data.location) {
-			lines.push(t('Location')+ ': '+this.data.location);
+			lines.push(t('Location')+ ': ' + Format.convertUrisToAnchors(this.data.location));
 		}
 		if(this.data.description)
 			lines.push('<p style="max-width:360px;">'+Format.textToHtml(this.data.description)+'</p>');
