@@ -42,12 +42,33 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				"isOrganization",
 				"emailAddresses",
 				"phoneNumbers",
+
+				{
+					name: "city",
+					convert: function(v, data) {
+						return data.addresses ? data.addresses.column("city").filter(i => !go.util.empty(i)).unique().join(", ") : "";
+					}
+				},
+
+				{
+					name: "state",
+					convert: function(v, data) {
+						return data.addresses ? data.addresses.column("state").filter(i => !go.util.empty(i)).unique().join(", ") : "";
+					}
+				},
+
+				{
+					name: "country",
+					convert: function(v, data) {
+						return data.addresses ? data.addresses.column("country").filter(i => !go.util.empty(i)).unique().join(", ") : "";
+					}
+				},
+
 				"dates",
 				'starred',
 				"birthday",
 				"age",
 				"gender",
-				"streetAddresses",
 				{name: 'organizations', type: "relation"},
 				"jobTitle",
 				"department",
@@ -287,6 +308,32 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function (phoneNumbers, meta, record) {
 						return Ext.util.Format.htmlEncode(phoneNumbers.column("number").join(", "));
 					}
+				},
+				{
+					id: 'city',
+					header: t('City'),
+					sortable: true,
+					dataIndex: "city",
+					width: dp(300),
+					hidden: true
+				},
+
+				{
+					id: 'state',
+					header: t('State'),
+					sortable: true,
+					dataIndex: "state",
+					width: dp(300),
+					hidden: true
+				},
+
+				{
+					id: 'country',
+					header: t('Country'),
+					sortable: true,
+					dataIndex: "country",
+					width: dp(300),
+					hidden: true
 				},
 				{
 					id: 'emailAddresses',
