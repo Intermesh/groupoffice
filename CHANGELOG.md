@@ -1,3 +1,4 @@
+- Core: Auto dismiss alerts for entities no longer known
 - Timeregistration2: Tasks only querying in subscribed lists
 - Core: PHP 8.4 compatibility
 - Studio: patch generated models with type hinted attributes
