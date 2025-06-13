@@ -79,8 +79,8 @@ GO.files.FileBrowser = function(config){
 		}
 
 		if (node.id !== "shared" && node.id !== "trash") {
-			this.folderDetail.load(parseInt(node.id));
-			this.eastPanel.getLayout().setActiveItem(this.folderDetail);
+			this.folderPanel.load(parseInt(node.id));
+			this.eastPanel.getLayout().setActiveItem(this.folderPanel);
 		}
 		const cpt = this.cardPanel.getTopToolbar();
 		if(showTrashBar) {
