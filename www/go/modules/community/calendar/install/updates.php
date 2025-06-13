@@ -295,6 +295,16 @@ $updates["202506061051"][] = "alter table calendar_calendar_user
 $updates["202506121207"][] = "alter table `calendar_preferences` add column showTooltips	TINYINT(1)  DEFAULT 1 NOT NULL AFTER holidaysAreVisible;";
 
 
+$updates['202506130832'][] = "CREATE TABLE IF NOT EXISTS calendar_schedule_object (
+                                   id INT(11) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                   principaluri VARBINARY(255),
+                                   calendardata MEDIUMBLOB,
+                                   uri VARBINARY(200),
+                                   lastmodified INT(11) UNSIGNED,
+                                   etag VARBINARY(32),
+                                   size INT(11) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
 // TODO: calendar views -> custom filters
 
 
