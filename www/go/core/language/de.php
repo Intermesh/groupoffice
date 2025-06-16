@@ -1727,7 +1727,6 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Enable 2-Factor authentication for ActiveSync devices' => 'Aktivieren der 2-Faktor-Authentifizierung für ActiveSync-Geräte',
   'ActiveSync devices can connect by default.' => 'ActiveSync-Geräte können standardmäßig eine Verbindung herstellen.',
   'When disabled the administrator has to allow each new device manually' => 'Wenn deaktiviert, muss der Administrator jedes neue Gerät manuell zulassen.',
-  'Allow user registration requests by everyone. Be careful!' => 'Benutzerregistrierungsanfragen von jedermann zulassen. Seien Sie vorsichtig!',
   'Authenticators' => 'Authentifizierer',
   'Unknown error' => 'Unbekannter Fehler',
   'For page numbers use' => 'Für Seitennummern benutze',

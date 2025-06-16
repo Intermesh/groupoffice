@@ -10,6 +10,7 @@
 - Tasks/Support: Fixed comment load on new ticket / task
 - Addressbook: City, state and country in grid
 - Files: only display 'Share' button if any menu items available
+- Core: Clearer label for 'allowRegistration' system setting
 
 05-06-2025: 25.0.29
 - Tasks: Sync subscribed tasklists and remove sync settings
