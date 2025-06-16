@@ -214,17 +214,29 @@ abstract class Property extends Model {
 				if (str_contains($colName, '.')) {
 					$this->setPrimaryKey($colName, $value);
 				} else {
-					$col = $m->getColumn($colName);
-					if ($col) {
-						$value = $col->castFromDb($value);
-					}
-					$this->$colName = $value;
+					$this->$colName = $this->castProperty($colName, $value);
 				}
 			} catch(Throwable $e) {
 				ErrorHandler::logException($e, "Failed to populate property ' " .static::class. ":{$colName}' with value '" . var_export($value, true) . "'");
 				throw $e;
 			}
 		}
+	}
+
+	/**
+	 * Casts a property to the right type based on the database column type
+	 *
+	 * @param string $colName
+	 * @param $value
+	 * @return mixed
+	 * @throws Exception
+	 */
+	protected function castProperty(string $colName, $value) : mixed {
+		$col = static::getMapping()->getColumn($colName);
+		if ($col) {
+			$value = $col->castFromDb($value);
+		}
+		return $value;
 	}
 
 	/**
