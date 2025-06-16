@@ -9,6 +9,7 @@
 - Tasks: percent complete render error when hidden
 - Tasks/Support: Fixed comment load on new ticket / task
 - Addressbook: City, state and country in grid
+- Files: only display 'Share' button if any menu items available
 
 05-06-2025: 25.0.29
 - Tasks: Sync subscribed tasklists and remove sync settings
