@@ -13,6 +13,7 @@ use go\core\db\DbException;
 use go\core\db\Statement;
 use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
+use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
 use DateTime as CoreDateTime;
@@ -533,6 +534,11 @@ abstract class Property extends Model {
 		foreach ($relation->keys as $from => $to) {
 			$where[$to] = $this->$from ?? null;
 		}
+
+		if(is_a($relation->propertyName, UserProperty::class, true)) {
+			$where['userId'] = $this->forUserId();
+		}
+
 		foreach ($relation->constants as $name => $value) {
 			$where[$name] = $value;
 		}
@@ -1834,7 +1840,8 @@ abstract class Property extends Model {
 		$stmt->execute();
 	}
 
-	public function forUserId(){
+	public function forUserId(): ?int
+	{
 		return $this->_forUserId ?? go()->getUserId();
 	}
 
