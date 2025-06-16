@@ -197,13 +197,12 @@ class Scheduler {
 		}
 		$vevent = $vcalendar->VEVENT[0];
 
-		$aliases = Alias::model()->find(
-			FindParams::newInstance()
-				->select('email')
-				->criteria(FindCriteria::newInstance()->addCondition('account_id', $imapMessage->account->id))
-		)->fetchAll(PDO::FETCH_COLUMN, 0);
+		$aliases = go()->getDbConnection()
+			->select("email")
+			->from("core_user", "u")
+			->where('id', '=', $imapMessage->account->user_id)
+			->single();
 
-		// for case insensitive match
 		$aliases = array_map('strtolower', $aliases);
 
 		$accountEmail = false;
