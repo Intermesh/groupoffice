@@ -1,3 +1,4 @@
+16-06-2025: 25.0.30
 - Calendar: Fixed display issue in e-mail invite
 - Core: Auto dismiss alerts for entities no longer known
 - Timeregistration2: Tasks only querying in subscribed lists
