@@ -1,4 +1,5 @@
 - Files: only display 'Share' menu if sharing options are available.
+- Core: better label for 'allowRegistration' option in system settings.
 
 13-06-2025: 6.8.126
 - Tasks/Core: Fixed invalid change event in tasklist combo where the tasklist name would be the value in the change event
