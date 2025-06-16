@@ -1188,16 +1188,15 @@ button.filetype-pdf, button.filetype-doc {
 			height: dp(24);
 			position: absolute;
 			color: var(--fg-icon);
-
 		}
 
 		&.more-btn {
-			i:last-child {
+			i:last-child, a:last-child{
 				position: absolute;
-				right: dp(16);
+				right: dp(12);
 				top: dp(16);
 			}
-			padding-right: dp(32);
+			padding-right: dp(44);
 		}
 
 		.avatar {

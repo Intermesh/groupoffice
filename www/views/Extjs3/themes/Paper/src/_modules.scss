@@ -223,6 +223,13 @@ i.icon.em-low_priority {
 	}
 }
 
+.em-attachments{
+	.filetype-link {
+		display: inline-block;
+	}
+	margin-left: -0.8rem
+}
+
 #email-message-panel {
 	.x-panel-body {
 		background-color: var(--bg-input);
