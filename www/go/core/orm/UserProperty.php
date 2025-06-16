@@ -10,6 +10,11 @@ namespace go\core\orm;
  */
 class UserProperty extends Property {
 
+	/**
+	 * The owner of this property
+	 *
+	 * @var int|null
+	 */
 	protected ?int $userId;
 
 	protected function init()
