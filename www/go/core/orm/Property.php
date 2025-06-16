@@ -26,6 +26,7 @@ use PDO;
 use PDOException;
 use ReflectionClass;
 use ReflectionProperty;
+use Throwable;
 use function GO;
 use go\core\db\Table;
 use go\core\ErrorHandler;
@@ -189,7 +190,7 @@ abstract class Property extends Model {
 	 *
 	 * @param array $record
 	 * @return $this
-	 * @throws Exception
+	 * @throws Throwable
 	 */
 	public function populate(array $record): static
 	{
@@ -203,17 +204,25 @@ abstract class Property extends Model {
 		return $this;
 	}
 
+	/**
+	 * @throws Throwable
+	 */
 	private function populateTableRecord(array $record) : void {
 		$m = static::getMapping();
 		foreach($record as $colName => $value) {
-			if(str_contains($colName, '.')) {
-				$this->setPrimaryKey($colName, $value);
-			} else {
-				$col = $m->getColumn($colName);
-				if($col) {
-					$value = $col->castFromDb($value);
+			try {
+				if (str_contains($colName, '.')) {
+					$this->setPrimaryKey($colName, $value);
+				} else {
+					$col = $m->getColumn($colName);
+					if ($col) {
+						$value = $col->castFromDb($value);
+					}
+					$this->$colName = $value;
 				}
-				$this->$colName = $value;
+			} catch(Throwable $e) {
+				ErrorHandler::logException($e, "Failed to populate property ' " .static::class. ":{$colName}' with value '" . var_export($value, true) . "'");
+				throw $e;
 			}
 		}
 	}
