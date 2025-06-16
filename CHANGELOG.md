@@ -1,3 +1,4 @@
+16-06-2025: 6.8.127 
 - Files: only display 'Share' menu if sharing options are available.
 - Core: better label for 'allowRegistration' option in system settings.
 
