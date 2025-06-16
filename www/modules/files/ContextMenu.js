@@ -383,7 +383,7 @@ Ext.extend(GO.files.FilesContextMenu, Ext.menu.Menu,{
 
 			var extension = '';
 			
-			if(records.length=='1') {
+			if(records.length === 1) {
 				extension = records[0].data.extension;
 
 				switch (extension) {
@@ -520,6 +520,21 @@ Ext.extend(GO.files.FilesContextMenu, Ext.menu.Menu,{
 
 			}
 
+			// Hide the share button if none of its child items are visible
+			let doHideShareMenuButton = true;
+			this.shareMenuButton.menu.items.each((item) => {
+				if(!item.hidden) {
+					doHideShareMenuButton = false;
+					return false;
+				}
+				return true
+			});
+
+			if (doHideShareMenuButton) {
+				this.shareMenuButton.hide();
+			} else {
+				this.shareMenuButton.show();
+			}
 		}
 
 		GO.files.FilesContextMenu.superclass.showAt.call(this, xy);
