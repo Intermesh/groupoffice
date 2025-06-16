@@ -1,3 +1,5 @@
+- Files: only display 'Share' menu if sharing options are available.
+
 13-06-2025: 6.8.126
 - Tasks/Core: Fixed invalid change event in tasklist combo where the tasklist name would be the value in the change event
 - Leavedays: allow employees to request negative hours
