@@ -1635,6 +1635,5 @@ Si no ha solicitado una nueva contraseña por favor ignore y borre este e-mail.'
   'Enable 2-Factor authentication for ActiveSync devices' => 'Activar la autenticación de 2 factores para dispositivos ActiveSync',
   'ActiveSync devices can connect by default.' => 'Los dispositivos ActiveSync pueden conectarse por defecto.',
   'When disabled the administrator has to allow each new device manually' => 'Si se desactiva, el administrador debe autorizar manualmente cada nuevo dispositivo.',
-  'Allow user registration requests by everyone. Be careful!' => 'Permitir las solicitudes de registro de usuarios a todo el mundo. Tenga cuidado.',
   'Unknown error' => 'Error desconocido',
 );
