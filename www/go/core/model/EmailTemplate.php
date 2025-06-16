@@ -122,10 +122,10 @@ class EmailTemplate extends Entity
 	 */ 
   public function setModule( $module) {
 
-		if(is_int($module)) {
-			$this->moduleId = $module;
-			return;
-		}
+	if(is_numeric($module)) {
+		$this->moduleId = (int) $module;
+		return;
+	}
     $module = Module::findByName($module['package'], $module['name']);
     if(!$module) {
       $this->setValidationError('module', ErrorCode::INVALID_INPUT, 'Module was not found');
