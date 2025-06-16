@@ -241,7 +241,10 @@ class Task extends AclItemEntity {
 
 	protected function getSearchKeywords(): ?array
 	{
-		$keywords = [$this->title, $this->description];
+		$keywords = [$this->title];
+		if(isset($this->description)) {
+			$keywords[] = $this->description;
+		}
 		if($this->responsibleUserId) {
 			$responsible = Principal::findById($this->responsibleUserId);
 			$keywords[] = $responsible->name;
