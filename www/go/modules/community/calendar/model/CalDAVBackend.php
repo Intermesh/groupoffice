@@ -240,36 +240,37 @@ class CalDAVBackend extends AbstractBackend implements
 		}
 	}
 
-	public function getMultipleCalendarObjects($calendarId, array $uris)
-	{
-		go()->debug("CalDAVBackend::getMultipleCalendarObjects($calendarId)");
-
-		list($type, $id) = explode('-', $calendarId,2);
-
-		switch($type) {
-			case 'c': // calendar
-				$component = 'vevent';
-				$objects = CalendarEvent::find()->filter(['hideSecret'=>1])
-					->where(['cce.calendarId'=> $id]);
-
-				break;
-			case 't': // tasklist
-				$component = 'vtodo';
-				$objects = Task::find()
-					->where(['task.tasklistId'=> $id]);
-				break;
-			default:
-				go()->log("incorrect calendarId ".$calendarId);
-				return null;
-		}
-
-		$result = [];
-		foreach($objects as $object) {
-			$result[] = $this->toCalendarObject($object, $calendarId, $this->getObjectUri($object, $component), $component);
-		}
-
-		return $result;
-	}
+//	TODO, this function does not use uri's parent function could be optimized
+//	public function getMultipleCalendarObjects($calendarId, array $uris)
+//	{
+//		go()->debug("CalDAVBackend::getMultipleCalendarObjects($calendarId)");
+//
+//		list($type, $id) = explode('-', $calendarId,2);
+//
+//		switch($type) {
+//			case 'c': // calendar
+//				$component = 'vevent';
+//				$objects = CalendarEvent::find()->filter(['hideSecret'=>1])
+//					->where(['cce.calendarId'=> $id]);
+//
+//				break;
+//			case 't': // tasklist
+//				$component = 'vtodo';
+//				$objects = Task::find()
+//					->where(['task.tasklistId'=> $id]);
+//				break;
+//			default:
+//				go()->log("incorrect calendarId ".$calendarId);
+//				return null;
+//		}
+//
+//		$result = [];
+//		foreach($objects as $object) {
+//			$result[] = $this->toCalendarObject($object, $calendarId, $this->getObjectUri($object, $component), $component);
+//		}
+//
+//		return $result;
+//	}
 
 	/**
 	 * Check if this is only called when the getCalendarObjects does not provide the calendardata
