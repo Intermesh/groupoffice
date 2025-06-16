@@ -189,7 +189,7 @@ class Crypt {
 		$key_file = go()->getDataFolder()->getFile('key.txt');
 
 		if ($key_file->exists()) {
-			$key = $key_file->getContents();
+			$key = trim($key_file->getContents());
 		} else {
 			throw new Exception("Encryoption key for old method not found!");
 		}
