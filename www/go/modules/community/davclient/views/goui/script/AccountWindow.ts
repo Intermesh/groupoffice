@@ -7,6 +7,7 @@ import {client, FormWindow} from "@intermesh/groupoffice-core";
 import {statusIcons} from "@intermesh/community/calendar";
 export class AccountWindow extends FormWindow {
 
+	protected closeOnSave = false
 	constructor() {
 		super('DavAccount');
 		this.title = t('Account');
@@ -78,8 +79,6 @@ export class AccountWindow extends FormWindow {
 
 		this.addSharePanel();
 
-		let closeIt = false;
-
 		this.form.on('load' , (m,data) => {
 			this.submitBtn.text = t(data.lastError  ? "Connect":"Save")
 			enabledCb.hidden = !!data.lastError;
@@ -97,17 +96,13 @@ export class AccountWindow extends FormWindow {
 
 		this.form.on('save', (me,e) => {
 			// if connect failed. show error and prevent close
+			this.form.findField('lastError')!.value = e.lastError
+			this.form.trackReset();
 			if(!e.lastError && e.active) {
 				this.cards.activeItem = 1;
 			} else if(!e.lastError && !e.active) {
-				closeIt = true;
+				this.close();
 			}
-			this.form.findField('lastError')!.value = e.lastError
-			this.close(); // call it again because it was cancelled in orgi save()
-		});
-		//hacky preventClose solution
-		this.on('beforeclose', () => {
-			return closeIt;
 		});
 	}
 }
