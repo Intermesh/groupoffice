@@ -56,7 +56,7 @@ $updates['202306151226'][] = "alter table history_log_entry
 
 
 $updates['202506122116'][] = function() {
-	$aclId =\go\core\model\Module::findByName("community", "history")->getShadowAclId();
+	$aclId =\go\core\model\Module::findByName("community", "history", null)->getShadowAclId();
 	go()->getDbConnection()
 		->update("history_log_entry", ['aclId' => $aclId], (new \go\core\db\Query())->where("aclId", "=", null))
 		->execute();
