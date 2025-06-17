@@ -2,6 +2,7 @@
 
 namespace go\modules\community\calendar\model;
 
+use GO\Base\Html\Error;
 use go\core\auth\TemporaryState;
 use go\core\db\Column;
 use go\core\ErrorHandler;
@@ -608,6 +609,10 @@ class CalDAVBackend extends AbstractBackend implements
 			ErrorHandler::logException($e);
 			$blob = $object->icsBlob();
 			$data = $blob->getFile()->getContents();
+		}
+
+		if(empty($objectUri)) {
+			ErrorHandler::log("Object URI is empty of ". $object->id ."  in calendar  ". $calendarId);
 		}
 
 //		go()->debug("CalDAVBackend::getCalendarObject($calendarId, $objectUri, ");
