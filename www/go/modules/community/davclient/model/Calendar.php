@@ -25,19 +25,30 @@ class Calendar extends Property
 	/** @var ?string if server has different ctag we need to fetch all etag to find out what changed. */
 	public ?string $ctag = null;
 	public ?string $synctoken = null;
+	public ?string $name;
+
+	public $lastSync;
+	public ?string $lastError;
 
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
-			->addTable("davclient_calendar");
+			->addTable("davclient_calendar")
+			->addTable('calendar_calendar', 'cal', ['id'=>'id'], ['name']);
 	}
 
 	public function sync(): bool {
-//		if($this->isNew())
-//			return $this->fetchEvents();
-//		else {
-			return $this->fetchEtags(); // sync changed only after comparing etags
-		//}
+		$this->lastError = '';
+		try {
+			$success = $this->fetchEtags(); // sync only after comparing etags
+			if($success) {
+				$this->lastSync = new \DateTime();
+			}
+			return $success;
+		} catch(\Exception $e) {
+			$this->lastError = $e->getMessage();
+			return false;
+		}
 	}
 
 	public function put(CalendarEvent $event) {
@@ -117,8 +128,14 @@ XML;
 		go()->log('Found: New.'.count($create). ' Changed.'.count($update). ' Removed.'.count($delete));
 		$success = true;
 		// Remove missing
-		if(!empty($delete))
-			$success = CalendarEvent::delete((new Query())->where(['id'=> $delete]));
+		if(!empty($delete)) {
+			Module::$IS_SYNCING = true;
+			$success = CalendarEvent::delete((new Query())->where(['id' => $delete]));
+			Module::$IS_SYNCING = false;
+		}
+		if(!$success) {
+			$this->lastError = 'Could not remove deleted dav calendar';
+		}
 		// fetch changed and new
 		if(!empty($update) || !empty($create)) {
 			go()->log([$create,$update]);
@@ -164,7 +181,8 @@ XML;
 				$event->uri(basename($href));
 				if(!$event->save()){
 					$success = false;
-					go()->log('cannot sync event '.print_r($event->getValidationErrors(), true));
+					$this->lastError = 'cannot sync event '.print_r($event->getValidationErrors(), true);
+					go()->log($this->lastError);
 				}
 				$event = null;
 			}

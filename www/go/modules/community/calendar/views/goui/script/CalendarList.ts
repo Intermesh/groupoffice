@@ -167,7 +167,10 @@ export class CalendarList extends Component {
 						if(cb) {
 							cb.mask();
 							client.requestTimeout = 300000;
-							client.jmap('DavAccount/sync', {accountId:data.davaccountId}).catch((err) => {
+							client.jmap('DavAccount/sync', {accountId:data.davaccountId,collectionId:data.id}).then(() => {
+								debugger;
+								this.fire('changevisible', this, Object.keys(this.inCalendars).filter(key => this.inCalendars[key]));
+							}).catch((err) => {
 								Window.error(err);
 							}).finally(() => {
 								cb.unmask();

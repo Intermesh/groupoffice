@@ -24,6 +24,8 @@ CREATE TABLE IF NOT EXISTS `davclient_calendar` (
 	`uri` VARCHAR(255) NOT NULL,
 	`ctag` VARCHAR(100) NOT NULL,
 	`synctoken` VARCHAR(100) NOT NULL DEFAULT '',
+	`lastSync` DATETIME NULL,
+	`lastError` TEXT NULL,
 	PRIMARY KEY (`id`,`davaccountId`),
 	CONSTRAINT `fk_davclient_calendar_davaccount`
 		FOREIGN KEY (`davaccountId`) REFERENCES `davclient_davaccount` (`id`)

@@ -156,7 +156,7 @@ export class WeekView extends CalendarView {
 				this.el.on('mousemove', mouseMove);
 			}
 			if(target.isA('dd')) { // CREATE
-				anchor = Math.round(e.offsetY / pxPerSnap) * SNAP;
+				anchor = Math.round((e.clientY - offset) / pxPerSnap) * SNAP;
 				const data = {
 						start: (new DateTime(target.dataset.day!)).setHours(0, anchor).format('c'),
 						title: t('New event'),

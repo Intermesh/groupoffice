@@ -58,6 +58,17 @@ class DavAccount extends AclOwnerEntity {
 			->addMap('collections', Calendar::class, ['id' => 'davaccountId']);
 	}
 
+	protected function internalSave(): bool
+	{
+		if($this->isModified(['active', 'password', 'host', 'username']) && $this->active === true) {
+			// when account is new or reactivated. Trigger discovery and resync homeset.
+			if(!$this->sync()) {
+				$this->active = false;
+			}
+		}
+		return parent::internalSave();// maybe again for lastError and lastSync
+	}
+
 	public function needsSync() {
 
 		$needSync = new \DateTime();
@@ -124,7 +135,7 @@ class DavAccount extends AclOwnerEntity {
 		return $ok;
 	}
 
-	private function dnsResolve() {
+	private function serviceDiscovery() {
 		// fetch SRV record
 		$s = 's'; // secure first
 		$target = null;
@@ -166,16 +177,6 @@ class DavAccount extends AclOwnerEntity {
 	}
 
 	// rfc6764
-	private function serviceDiscovery() {
-
-		$this->dnsResolve(); // or well-known
-
-
-		// todo: remove if double
-		$this->lastSync = new \DateTime();
-		$this->save();
-	}
-
 	public function put($event) {
 		$cal = $this->byCalendar($event->calendarId);
 		// must exist
@@ -189,53 +190,84 @@ class DavAccount extends AclOwnerEntity {
 		return $cal->remove($event);
 	}
 
-
-	public function sync() {
+	public function sync($syncItems = false) {
+		try {
+			$this->lastError = '';
+			if($this->isNew()) {
+				parent::internalSave();
+			}
 //		if(!$this->isSetup()) {
 			$this->serviceDiscovery();
 //		}
-		$homesetUri = $this->homeSetUri($this->principalUri);
+			$homesetUri = $this->homeSetUri($this->principalUri);
+			$responses = $this->syncCollections($homesetUri);
 
-
-
-		$responses = $this->syncCollections($homesetUri);
-
-		// fetch ctag for every calendar.
+			// fetch ctag for every calendar.
 //		$responses = $this->propfind([
 //			'd:sync-token',
 //			'cs:getctag'
 //		], $homesetUri, 1);
 
-		// delete calendars not in responses
-		$deletedCalendars = [];
-		foreach($this->collections as $id => $calendar) {
-			if(!array_key_exists($calendar->uri, $responses)) {
-				// delete calendars no longer in response
-				unset($this->collections[$id]);
-				$deletedCalendars[] = $id;
-			} else {
-				$collection = $responses[$calendar->uri];
-				if($calendar->isNew() || $calendar->ctag !== (string)$collection->getctag) {
-					// resync
-					go()->getDbConnection()->beginTransaction();
-					go()->log('Synchronizing '. $calendar->uri. ' ctag mismatch ['. $calendar->ctag .' != '. $collection->getctag.']');
-					if($calendar->sync()) {
-						$calendar->ctag = (string)$collection->getctag;
+			// delete calendars not in responses
+			$deletedCalendars = [];
+			foreach ($this->collections as $id => $calendar) {
+				if (!array_key_exists($calendar->uri, $responses)) {
+					// delete calendars no longer in response
+					unset($this->collections[$id]);
+					$deletedCalendars[] = $id;
+				} else if ($syncItems) {
+					$collection = $responses[$calendar->uri];
+					if ($calendar->isNew() || $calendar->ctag !== (string)$collection->getctag) {
+						// resync
+						go()->getDbConnection()->beginTransaction();
+						go()->log('Synchronizing ' . $calendar->uri . ' ctag mismatch [' . $calendar->ctag . ' != ' . $collection->getctag . ']');
+						if ($calendar->sync()) {
+							$calendar->ctag = (string)$collection->getctag;
+						}
+						go()->getDbConnection()->commit();
 					}
-					go()->getDbConnection()->commit();
+					unset($responses[$calendar->uri]);
 				}
-				unset($responses[$calendar->uri]);
 			}
-		}
 
-		$this->lastSync = new \DateTime();
-		if(!$this->save()) {
-			go()->log('Could not save last sync '. $homesetUri);
-			//go()->getDbConnection()->rollBack();
-		} else if(!empty($deletedCalendars)) {
-			\go\modules\community\calendar\model\Calendar::delete((new Query())->where('id','IN',$deletedCalendars));
+			$this->lastSync = new \DateTime();
+//			if(!$this->save()) {
+//				go()->log('Could not save last sync '. $homesetUri);
+//				//go()->getDbConnection()->rollBack();
+//			} else
+			if (!empty($deletedCalendars)) {
+				\go\modules\community\calendar\model\Calendar::delete((new Query())->where('id', 'IN', $deletedCalendars));
+			}
+			return true;
+		} catch(\Exception $e) {
+			$this->lastError = $e->getMessage();
 		}
-		// fetch
+		return false;
+	}
+
+	public function syncCollection(Calendar $calendar) {
+
+		$responses = $this->propfind([
+			$this->service === 'caldav' ? 'cal:supported-calendar-component-set' : 'card:supported-addressbook-component-set',
+			'd:sync-token',
+			'cs:getctag'
+		], $calendar->uri, 0);
+
+		$collection = $responses[$calendar->uri];
+
+
+		if($calendar->ctag !== (string)$collection->getctag) {
+			// resync
+			go()->getDbConnection()->beginTransaction();
+			go()->log('Synchronizing '. $calendar->uri. ' ctag mismatch ['. $calendar->ctag .' != '. $collection->getctag.']');
+			if($calendar->sync()) {
+				$calendar->ctag = (string)$collection->getctag;
+			}
+			go()->getDbConnection()->commit();
+		} else {
+			$calendar->lastSync = new \DateTime(); // nothing to do
+		}
+		return $this->save();
 	}
 
 	private function syncCollections($homesetUri) {
@@ -272,7 +304,6 @@ class DavAccount extends AclOwnerEntity {
 				// $this->addTasklist()??
 			}
 		}
-		$this->save(); // make sure the added calendars are also linked to the account before timeouts happen.
 		return $calendars;
 	}
 
@@ -365,7 +396,7 @@ class DavAccount extends AclOwnerEntity {
 			->PROPFIND($uri, $xml)->parsedMultiStatus();
 
 		if (count($response) === 0) {
-			throw new \RangeException('No properties found: ' . $props);
+			throw new \RangeException('No properties found: ' . $props . ' at: '.$this->http()->baseUri);
 		}
 		return $response;
 	}
