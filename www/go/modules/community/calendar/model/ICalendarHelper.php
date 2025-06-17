@@ -92,6 +92,8 @@ class ICalendarHelper {
 				}
 			}
 		}
+		// this will remove the invalid UTF-8 characters for XML response in caldav.
+		$vcalendar->validate(VObject\Node::REPAIR);
 
 		return $vcalendar;
 	}
@@ -383,7 +385,7 @@ class ICalendarHelper {
 		return $event;
 	}
 
-	static function makeBlob(CalendarEvent $event, string $data = null): Blob
+	static function makeBlob(CalendarEvent $event, string|null $data = null): Blob
 	{
 		$blob = Blob::fromString($data ?? $event->toVObject());
 		$blob->type = 'text/calendar';
@@ -432,9 +434,10 @@ class ICalendarHelper {
 				$props->timeZone = $props->start->getTimezone()->getName();
 			}
 		}
+		go()->log($vevent->DESCRIPTION);
 		//empty($vevent->DTSTART) ?: $props->start = $vevent->DTSTART->getDateTime()->format(DateTime::FORMAT_API_LOCAL);
 		if(!empty($vevent->SUMMARY)) $props->title = (string)$vevent->SUMMARY;
-		if(!empty($vevent->DESCRIPTION)) $props->description = (string)$vevent->DESCRIPTION;
+		if(!empty($vevent->DESCRIPTION)) $props->description = str_replace('\n',"\n", $vevent->DESCRIPTION->getValue());
 		if(!empty($vevent->LOCATION)) $props->location = (string)$vevent->LOCATION;
 		if(!empty($vevent->STATUS)) {
 			$status = strtolower($vevent->STATUS);

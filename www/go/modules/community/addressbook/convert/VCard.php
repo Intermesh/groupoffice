@@ -63,9 +63,9 @@ class VCard extends AbstractConverter {
 				try {
 					$vcard = Reader::read($file->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 					/** @var $vcard VCardComponent */
-					if ($vcard->VERSION != "3.0") {
+					if ($vcard->VERSION != "4.0") {
 						// we can only use 3.0 for photo's somehow :( See https://github.com/sabre-io/vobject/issues/294#issuecomment-231987064
-						$vcard = $vcard->convert(SabreDocument::VCARD30);
+						$vcard = $vcard->convert(SabreDocument::VCARD40);
 					}
 
 					//remove all supported properties
@@ -85,9 +85,8 @@ class VCard extends AbstractConverter {
 			}
 		}
 
-		//We have to use 3.0 for the photo property :( See https://github.com/sabre-io/vobject/issues/294#issuecomment-231987064
 		return new VCardComponent([
-				"VERSION" => "3.0",
+				"VERSION" => "4.0",
 				"UID" => $contact->getUid()
 		]);
 	}
@@ -162,9 +161,10 @@ class VCard extends AbstractConverter {
 
 		$blob = isset($contact->photoBlobId) ? Blob::findById($contact->photoBlobId) : false;
 		if ($blob && $blob->getFile()->exists()) {
-			//Attepted this for vcard 4.0 version
-			//$vcard->add('PHOTO', "data:" . $blob->type . ";base64," . base64_encode($blob->getFile()->getContents()));
-			$vcard->add('PHOTO', $blob->getFile()->getContents(), ['TYPE' => $blob->type, 'ENCODING' => 'b']);
+			// vCard v4 version
+			$vcard->add('PHOTO', "data:" . $blob->type . ";base64," . base64_encode($blob->getFile()->getContents()));
+			// vCard v3 version
+			//$vcard->add('PHOTO', $blob->getFile()->getContents(), ['TYPE' => $blob->type, 'ENCODING' => 'b']);
 		}
 
 		return $vcard->serialize();
@@ -298,7 +298,7 @@ class VCard extends AbstractConverter {
 	 * @throws Exception
 	 * @noinspection PhpCastIsUnnecessaryInspection
 	 */
-	public function import(VCardComponent $vcardComponent, Entity $entity = null): Contact
+	public function import(VCardComponent $vcardComponent, Entity|null $entity = null): Contact
 	{
 		if ($vcardComponent->VERSION != "3.0") {
 			$vcardComponent = $vcardComponent->convert(SabreDocument::VCARD30);

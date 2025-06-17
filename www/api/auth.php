@@ -22,7 +22,7 @@ use go\core\util\JSON;
  * @param int $status
  * @param ?string $statusMsg
  */
-function output(array $data = [], int $status = 200, string $statusMsg = null) {
+function output(array $data = [], int $status = 200, string|null $statusMsg = null) {
 
 	Response::get()->setHeader('Content-Type', 'application/json;charset=utf-8');
 	Response::get()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -39,9 +39,9 @@ function output(array $data = [], int $status = 200, string $statusMsg = null) {
 		$json = JSON::encode($data);
 		Response::get()->output($json);
 	} catch(Exception $e) {
-		Response::get()->setStatus(500, $e->getMessage());
+		Response::get()->setStatus(500, get_class($e));
 
-		echo $e->getMessage();
+		echo get_class($e);
 
 		ErrorHandler::logException($e);
 	}
@@ -49,7 +49,7 @@ function output(array $data = [], int $status = 200, string $statusMsg = null) {
 	exit();
 }
 
-function finishLogin(Token $token, string $rememberMeToken = null) {
+function finishLogin(Token $token, string|null $rememberMeToken = null) {
 	$authState = new State();
 	$authState->setToken($token);
 	go()->setAuthState($authState);
@@ -294,7 +294,5 @@ try {
 } catch (Throwable $e) {
 	ErrorHandler::logException($e);
 
-	// make sure there's no newline in the status text
-	$text = StringUtil::normalizeCrlf($e->getMessage(), " - ");
-	output([], 500, $text);
+	output([], 500, get_class($e));
 }

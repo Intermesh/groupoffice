@@ -1,4 +1,4 @@
-CREATE TABLE calendar_resource_group (
+CREATE TABLE IF NOT EXISTS calendar_resource_group (
 	id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 	name           VARCHAR(200) NULL,
 	description    MEDIUMTEXT NULL,
@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar` (
    `description` TEXT NULL,
     `defaultColor` VARCHAR(21) NOT NULL, # lightgoldenrodyellow
     `timeZone` VARCHAR(45) NULL,
-	 `groupId` INT UNSIGNED NULL,
+	  `webcalUri` VARCHAR(512) NULL DEFAULT NULL,
+	  `groupId` INT UNSIGNED NULL,
     `aclId` INT NOT NULL,
     `createdBy` INT NULL,
     `ownerId` INT NULL,
@@ -114,7 +115,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event` (
     `sequence` INT UNSIGNED NOT NULL DEFAULT 1,
     `title` VARCHAR(255) NOT NULL,
     `description` TEXT NULL,
-    `location` VARCHAR(255) NOT NULL DEFAULT '',
+    `location` TEXT NULL,
     `locale` VARCHAR(6) NULL,
     `showWithoutTime` TINYINT(1) NOT NULL DEFAULT 0,
     `start` DATETIME NOT NULL COMMENT '@dbType=localdatetime',
@@ -141,6 +142,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event` (
 		INDEX `calendar_event_lastOccurrence_index` (`lastOccurrence` ASC),
     INDEX `fk_calendar_event_core_user1_idx` (`createdBy` ASC),
     INDEX `fk_calendar_event_core_user2_idx` (`modifiedBy` ASC),
+		INDEX `fk_calendar_event_uid_index` (`uid` ASC),
     CONSTRAINT `fk_calendar_event_core_user1`
     FOREIGN KEY (`createdBy`)
     REFERENCES `core_user` (`id`)
@@ -158,6 +160,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_event` (
      PRIMARY KEY (`id`),
     INDEX `fk_calendar_calendar_event_calendar_event1_idx` (`eventId` ASC),
     INDEX `fk_calendar_calendar_event_calendar_calendar1_idx` (`calendarId` ASC),
+		 UNIQUE INDEX `event_once_per_calendar` (`eventId` ASC, `calendarId` ASC),
     CONSTRAINT `fk_calendar_calendar_event_calendar_event1`
     FOREIGN KEY (`eventId`)
     REFERENCES `calendar_event` (`eventId`)
@@ -252,7 +255,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event_alert` (
 CREATE TABLE IF NOT EXISTS `calendar_recurrence_override` (
       `fk` INT UNSIGNED NOT NULL AUTO_INCREMENT,
       `recurrenceId` DATETIME NOT NULL COMMENT '@dbType=localdatetime',
-      `patch` MEDIUMTEXT NOT NULL DEFAULT '{}',
+      `patch` MEDIUMTEXT NOT NULL,
       PRIMARY KEY (`fk`, `recurrenceId`),
     INDEX `fk_recurrence_override_calendar_event1_idx` (`fk` ASC),
     CONSTRAINT `fk_recurrence_override_calendar_event1`

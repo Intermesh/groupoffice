@@ -59,7 +59,15 @@
     "phpstan/phpstan": "^1.11"
   },
   "autoload": {
+    "exclude-from-classmap": [
+      "**/vendor/**",
+      "./go/modules/community/activesync/Z-Push/src",
+      "./go/modules/community/dokuwiki/lib/plugins",
+      "./go/modules/community/activesync/Z-Push/tools"
+
+    ],
     "psr-4": {
+
       "go\\core\\": "go/core/",
       "go\\modules\\": "go/modules/"
     }

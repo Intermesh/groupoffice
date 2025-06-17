@@ -84,7 +84,7 @@ return array (
   'Action date' => 'Data akcji',
   'Automatically link e-mail to contacts' => 'Autatycznie powiąż e-maile z kontaktami',
   'Warning: this will copy e-mails to the Group-Office storage and will therefore increase disk space usage. The e-mail will be visible to all people that can view the contact too.' => 'Uwaga: skopiuje to e-maile do przestrzeni {product_name}, przez co zwiększy się zajęcie dysku. E-mail będzie widoczny dla wszystkich użytkowników którzy mogą wyświetlić kontakt.',
-  'Automatic linking' => 'Powiąż automatycznie',
+  'Automatic e-mail linking' => 'Powiąż e-mail automatycznie',
   'Don\'t link automatically to contacts' => 'Nie powiązuj z kontaktami automatycznie',
   'Link to all contacts' => 'Powiąż dla wszystkich kontaktów',
   'Exclude contacts from the address books below' => 'Wyklucz kontakty z książek adresowych poniżej',

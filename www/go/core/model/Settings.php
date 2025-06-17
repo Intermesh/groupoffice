@@ -424,8 +424,12 @@ class Settings extends core\Settings {
 
 	public function printCssVars($theme = 'Color') {
 		$str = !empty($this->{'primary'.$theme}) ? '--fg-main-tp: '.$this->getPrimaryColorTransparent($theme).';' : '';
-		foreach(['primary', 'secondary', 'tertiary', 'accent'] as $type) {
-			if(!empty($this->{$type.$theme})) $str .= '--c-'.$type.': #'.$this->{$type.$theme}.';';
+
+		foreach(['--fg-main'=>'primary',
+					  '--c-primary'=>'secondary',
+					  '--c-secondary'=>'tertiary',
+					  '--c-accent'=>'accent'] as $css => $type) {
+			if(!empty($this->{$type.$theme})) $str .= $css.': #'.$this->{$type.$theme}.';';
 		}
 		return $str;
 	}
@@ -630,12 +634,12 @@ class Settings extends core\Settings {
 	/**
 	 * New users will be member of these groups
 	 * 
-	 * @return int[]
+	 * @return string[]
 	 */
 	public function getDefaultGroups(): array
 	{
 		if(!isset($this->defaultGroups)) {
-			$this->defaultGroups = array_map("intval", (new core\db\Query)
+			$this->defaultGroups = array_map("strval", (new core\db\Query)
 				->selectSingleValue('groupId')
 				->from("core_group_default_group")
 				->all());
@@ -662,6 +666,8 @@ class Settings extends core\Settings {
 				throw new Exception("Could not save group id ".$groupId);
 			}
 		}
+		unset($this->defaultGroups);
+		$this->getDefaultGroups();
 	}
 
 
@@ -680,6 +686,10 @@ class Settings extends core\Settings {
 	{
 		if(!$this->validate()){
 			return false;
+		}
+
+		if($this->activeSyncCanConnect !== true) {
+			$this->activeSyncCanConnect = "0"; // We save this into a varchar field, which will save a false as an empty string.
 		}
 
 		if(isset($this->logoId)) {

@@ -135,6 +135,14 @@ Ext.extend(go.customfields.type.SelectOptionsTree, Ext.tree.TreePanel, {
 		return true;
 	},
 
+	isModified: function() {
+		return this.isDirty()
+	},
+
+	trackReset: function() {
+
+	},
+
 	save: function(node, attributes) {
 		node.text = attributes.text;
 		node.attributes.text = attributes.text;

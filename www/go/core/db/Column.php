@@ -219,6 +219,7 @@ class Column {
 			case 'int':
 			case 'tinyint':
 			case 'smallint':
+			case 'mediumint':
 			case 'bigint':
 				if ($this->length === 1) {
 					//Boolean fields in mysql are listed at tinyint(1);
@@ -321,6 +322,7 @@ class Column {
 			case 'int':
 			case 'tinyint':
 			case 'smallint':
+			case 'mediumint':
 			case 'bigint':
 				if ($this->length === 1) {
 					//Boolean fields in mysql are listed at tinyint(1);

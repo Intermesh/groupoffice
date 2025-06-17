@@ -61,7 +61,7 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 
 		var actions = this.initRowActions();
 
-		var fields = [config.idField];
+		var fields = [config.idField], me = this;
 		var columns = [
 				{
 					id: 'name',
@@ -71,9 +71,9 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 					draggable: false,
 					menuDisabled: true,
 					dataIndex: config.idField,
-					renderer: function (id) {
+					renderer: function (id,meta, record) {
 						//must be preloaded
-						return me.entityStore.data[id][me.displayField];
+						return Ext.util.Format.htmlEncode(me.entities[id][me.displayField]);
 					}
 				}
 			];
@@ -91,8 +91,7 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 		}
 		
 		columns.push(actions);
-		
-		var me = this;
+
 		
 		Ext.apply(config, {
 
@@ -183,7 +182,13 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 		}
 	
 		//we must preload the notebooks so notebook select can use it in a renderer
-		this.entityStore.get(ids, function () {
+		this.entityStore.get(ids, function (entities) {
+
+			this.entities = {};
+
+			entities.forEach(e => {
+				this.entities[e.id] = e;
+			})
 
 			this.store.loadData({records: records});
 		}, this);

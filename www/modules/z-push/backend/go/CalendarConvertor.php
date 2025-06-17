@@ -54,19 +54,38 @@ class CalendarConvertor
 	static function toSyncAppointment(CalendarEvent $event, ?SyncAppointment $exception, $params): SyncAppointment
 	{
 		$message = $exception ?? new SyncAppointment();
-		if(!$exception && !empty($event->timeZone))
-			$message->timezone =  self::mstzFromTZID($event->timeZone);
-		$message->alldayevent = empty($event->showWithoutTime) ? 0 : 1;
+
 		if(!empty($event->createdAt))
 			$message->dtstamp = $event->createdAt->getTimestamp();
-		$message->starttime = $event->start()->getTimestamp();
-		$message->subject = $event->title;
+
+		if($event->showWithoutTime) {
+			$message->alldayevent = 1;
+
+			$start = (new \DateTime($event->start->format("Y-m-d") . " 00:00:00" , new \DateTimeZone("UTC")));
+			$message->starttime = $start->getTimestamp();
+			if (!empty($event->duration))
+				$message->endtime = $start->add(new \DateInterval($event->duration))->getTimestamp();
+
+		} else {
+			$message->alldayevent = 0;
+			$message->starttime = $event->start()->getTimestamp();
+			if (!empty($event->duration))
+				$message->endtime = $event->end()->getTimeStamp();
+
+			if(!$exception && !empty($event->timeZone))
+				$message->timezone =  self::mstzFromTZID($event->timeZone);
+		}
+
 		$message->uid = $event->uid;
-		$message->location = $event->location;
-		if(!empty($event->duration))
-		$message->endtime = $event->end()->getTimeStamp();
+
+		if(!$event->isPrivate() || $event->getPermissionLevel() > \go\core\model\Acl::LEVEL_READ) {
+			$message->subject = $event->title;
+			$message->location = $event->location;
+			$message->asbody = GoSyncUtils::createASBody($event->description, $params);
+		}
+
 		if(!empty($event->privacy))
-		$message->sensitivity = ['public'=> '0', 'private' => '2', 'secret'=> '3'][$event->privacy];
+			$message->sensitivity = ['public'=> '0', 'private' => '2', 'secret'=> '3'][$event->privacy];
 		if(!empty($event->freeBusyStatus))
 		$message->busystatus = $event->freeBusyStatus == 'busy' ? "2" : "0";
 		$message->meetingstatus = 0;
@@ -85,9 +104,6 @@ class CalendarConvertor
 				}
 			}
 		}
-
-
-		$message->asbody = GoSyncUtils::createASBody($event->description, $params);
 
 
 		if($event->isRecurring()) {

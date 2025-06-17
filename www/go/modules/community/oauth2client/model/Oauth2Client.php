@@ -67,7 +67,7 @@ final class Oauth2Client extends Entity
 	 * @return ?AbstractProvider
 	 * @throws NotFound
 	 */
-	public function getProvider(array $scopes = null): ?AbstractProvider
+	public function getProvider(array|null $scopes = null): ?AbstractProvider
 	{
 		$defaultClient = DefaultClient::findById($this->defaultClientId);
 		$url = rtrim(go()->getSettings()->URL, '/');

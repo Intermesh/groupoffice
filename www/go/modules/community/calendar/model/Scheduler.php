@@ -3,11 +3,16 @@
 namespace go\modules\community\calendar\model;
 
 use Exception;
+use GO\Base\Db\FindCriteria;
+use GO\Base\Db\FindParams;
+use go\core\exception\JsonPointerException;
 use go\core\mail\Address;
 use go\core\mail\Attachment;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
+use GO\Email\Model\Alias;
 use GO\Email\Model\ImapMessage;
+use PDO;
 use Sabre\VObject\Component\VCalendar;
 
 class Scheduler {
@@ -174,27 +179,29 @@ class Scheduler {
 
 	/**
 	 * @param ImapMessage $imapMessage
-	 * @param $ifMethod
+	 * @param null $ifMethod
 	 * @return array{method:string, feedback:string, event:CalendarEvent, scheduleId: int, status:string}|false
+	 * @throws SaveException
+	 * @throws JsonPointerException
 	 * @throws \go\core\http\Exception
-	 *
 	 */
-	static function handleIMIP(ImapMessage $imapMessage, $ifMethod=null) {
+	static function handleIMIP(ImapMessage $imapMessage, $ifMethod=null): bool|array
+	{
 		$vcalendar = $imapMessage->getInvitationVcalendar();
 		if(!$vcalendar) {
 			return false;
 		}
-		$method = $vcalendar->method ? $vcalendar->method->getValue() : "REQUEST";
+		$method = $vcalendar->method ? $vcalendar->method->getValue() : "NONE";
 		if($ifMethod !== null && $ifMethod != $method) {
 			return false;
 		}
 		$vevent = $vcalendar->VEVENT[0];
 
-		$aliases = \GO\Email\Model\Alias::model()->find(
-			\GO\Base\Db\FindParams::newInstance()
+		$aliases = Alias::model()->find(
+			FindParams::newInstance()
 				->select('email')
-				->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('account_id', $imapMessage->account->id))
-		)->fetchAll(\PDO::FETCH_COLUMN, 0);
+				->criteria(FindCriteria::newInstance()->addCondition('account_id', $imapMessage->account->id))
+		)->fetchAll(PDO::FETCH_COLUMN, 0);
 
 		// for case insensitive match
 		$aliases = array_map('strtolower', $aliases);
@@ -228,15 +235,19 @@ class Scheduler {
 			}
 		}
 
-		if (!$accountEmail) {
-			return ['method' => $method, 'event' => go()->t("None of the participants match your e-mail aliases for this e-mail account.", "email")];
+		if (!$accountEmail || $method === 'NONE') {
+			return [
+				'method' => $method,
+				'feedback' => $accountEmail ? "" : go()->t('You are not an invited to this event', "email"),
+				'event' => ICalendarHelper::parseVObject($vcalendar, new CalendarEvent())
+			];
+		} else {
+			$from = $imapMessage->from->getAddress();
+			$event = Scheduler::processMessage($vcalendar, $accountEmail, (object)[
+				'email'=>$from['email'],
+				'name'=>$from['personal']
+			]);
 		}
-		$from = $imapMessage->from->getAddress();
-		$event = Scheduler::processMessage($vcalendar, $accountEmail, (object)[
-			'email'=>$from['email'],
-			'name'=>$from['personal']
-		]);
-
 
 		$itip = [
 			'method' => $method,
@@ -280,6 +291,10 @@ class Scheduler {
 		// old framework sets user timezone :(
 		date_default_timezone_set("UTC");
 
+		if(!isset($vcalendar->method)) {
+			return null;
+		}
+
 		$method = $vcalendar->method->getValue();
 		$event = self::eventByVEvent($vcalendar, $receiver);
 
@@ -290,7 +305,7 @@ class Scheduler {
 			case 'CANCEL': return self::processCancel($vcalendar,$event);
 			case 'REPLY': return self::processReply($vcalendar,$event, $sender);
 		}
-		go()->debug("invalid method ".$vcalendar->method);
+		go()->debug("invalid method " . $method);
 		return null;
 	}
 

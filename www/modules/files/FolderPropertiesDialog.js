@@ -40,7 +40,8 @@ GO.files.FolderPropertiesDialog = function(config){
 				},{
 					xtype: 'plainfield',
 					fieldLabel: t("Location"),
-					name: 'path'
+					name: 'path',
+						htmlEncode: true
 				},
 				{
 					xtype: 'plainfield',
@@ -63,12 +64,14 @@ GO.files.FolderPropertiesDialog = function(config){
 				{
 					xtype: 'plainfield',
 					fieldLabel: t("Created by"),
-					name: 'username'
+					name: 'username',
+					htmlEncode: true
 				},
 				{
 					xtype: 'plainfield',
 					fieldLabel: t("Modified by"),
-					name: 'musername'
+					name: 'musername',
+					htmlEncode: true
 				},
 				{
 					xtype: 'htmlcomponent',

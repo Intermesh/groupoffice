@@ -375,8 +375,6 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 						
 			if(response.updated && id in response.updated){
 
-
-				debugger;
 				const onSubmits = this.findBy(function(cmp,cont){
 					return typeof cmp.onSubmit === 'function';
 				},this);
@@ -399,7 +397,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 						}
 						var field = this.formPanel.getForm().findField(name);
 						if (field) {
-							field.markInvalid(response.notUpdated[id].validationErrors[name].description);
+							field.markInvalid(Ext.util.Format.htmlEncode(response.notUpdated[id].validationErrors[name].description));
 						}
 					}
 

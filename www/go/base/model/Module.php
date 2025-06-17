@@ -127,7 +127,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	 * @param int|null $userId The user ID to query. defaults to current authorized user.
 	 * @return stdClass For example ['mayRead' => true, 'mayManage'=> true, 'mayHaveSuperCowPowers' => true]
 	 */
-	public function getUserRights(int $userId = null)
+	public function getUserRights(int|null $userId = null)
 	{
 
 		if(!isset($userId)) {

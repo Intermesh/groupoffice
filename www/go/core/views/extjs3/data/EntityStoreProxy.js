@@ -119,7 +119,9 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 
 			var ret = me.fireEvent('exception', me.store, 'remote', action, o, response, null);
 			o.request.callback.call(o.request.scope, response, o.request.arg, false);
-		});
+
+			me.activeRequest[action] = undefined;
+		})
 
 
 	},

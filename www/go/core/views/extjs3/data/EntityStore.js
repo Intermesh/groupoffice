@@ -179,11 +179,15 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		
 	},
 
+	data() {
+		return window.groupofficeCore.jmapds(this.entity.name).data;
+	},
+
 
 	// TODO
 	findBy : function(fn, scope, startIndex) {
 		startIndex = startIndex || 0;
-		const data = Object.values(this.data);
+		const data = Object.values(this.data());
 		for(let i = startIndex, l = data.length; i < l; i++) {
 			if(fn.call(scope || this, data[i])) {
 				return data[i];
@@ -350,7 +354,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 						})
 						.catch(setError => {
 							if(!response.notDestroyed) {
-								response.notUpdated = {};
+								response.notDestroyed = {};
 							}
 							response.notDestroyed[id] = setError;
 						})
@@ -392,7 +396,6 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 * @returns {Promise<any>} Client call ID
 	 */
 	query : function(params, cb, scope) {
-
 		const callId = window.groupofficeCore.jmapds(this.entity.name).nextCallId;
 		let retProm = window.groupofficeCore.jmapds(this.entity.name)
 			.query(params)

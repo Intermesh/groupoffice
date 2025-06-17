@@ -57,7 +57,7 @@ class Store implements IteratorAggregate, ArrayableInterface, Countable  {
 	 *
 	 * @param Traversable|null $traversable
 	 */
-	public function __construct(Traversable $traversable = null) {
+	public function __construct(Traversable|null $traversable = null) {
 		$this->traversable = $traversable;
 	}
 
@@ -100,7 +100,7 @@ class Store implements IteratorAggregate, ArrayableInterface, Countable  {
 	 * @return array|null
 	 */
 	
-	public function toArray(array $properties = null): array|null
+	public function toArray(array|null $properties = null): array|null
 	{
 		$records = [];
 		

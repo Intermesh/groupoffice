@@ -3,7 +3,7 @@ return array (
   'Create personal address book for each user' => 'Ustvarite osebni imenik za vsakega uporabnika',
   'Automatically link e-mail to contacts' => 'Samodejno povežite e-pošto s stiki',
   'Warning: this will copy e-mails to the Group-Office storage and will therefore increase disk space usage. The e-mail will be visible to all people that can view the contact too.' => 'OPOZORILO: To bo kopiranje e-poštnih sporočil v skupinsko-uradno shranjevanje in bo zato povečalo porabo prostora na disku. E-pošta bo vidna vsem ljudem, ki si lahko ogledajo tudi stik.',
-  'Automatic linking' => 'Samodejno povezovanje',
+  'Automatic e-mail linking' => 'Samodejno e-mail povezovanje',
   'Don\'t link automatically to contacts' => 'Ne povezujte se samodejno na stike',
   'Link to all contacts' => 'Povezava do vseh stikov',
   'Exclude contacts from the address books below' => 'Izključite stike iz spodnjega imenika',

@@ -1672,9 +1672,24 @@ $updates['202501141553'][] = "UPDATE core_user t
 SET  t.holidayset = 'en_gb'
 WHERE t.holidayset='en_uk';";
 
+
+$updates['202503201426'][] = "create index core_search_modifiedAt_index
+    on core_search (modifiedAt);";
+
+$updates['202503201426'][] = "drop index core_change_modSeq_entityTypeId_entityId_index on core_change;";
+
+$updates['202503201426'][] = "create index core_change_modSeq_entityTypeId_entityId_destroyed_index
+    on core_change (modSeq, entityTypeId, entityId, destroyed);";
+
+$updates['202503201426'][] = "drop index core_change_user_modSeq_userId_entityTypeId_entityId_index on core_change_user;";
+
+$updates['202503201426'][] = "create index core_change_user_modSeq_userId_entityTypeId_entityId_index
+    on core_change_user (modSeq, userId, entityTypeId);";
+
+
 # ------ 6.9 ---------------
 
-$updates['202501141553'][] = "CREATE TABLE `core_principal`(
+$updates['202503271129'][] = "CREATE TABLE `core_principal`(
    `id` VARCHAR(60) NOT NULL,
 	`name` VARCHAR(100) NOT NULL,
 	`email` VARCHAR(255) NULL,
@@ -1701,7 +1716,7 @@ $updates['202501141553'][] = "CREATE TABLE `core_principal`(
 		ON UPDATE No Action
 ) ENGINE = InnoDB;";
 
-$updates['202501141553'][] = function() {
+$updates['202503271129'][] = function() {
 
 	go()->getDbConnection()->exec('replace into core_principal (id, name, email, type, description, timeZone, entityTypeId, avatarId, entityId, aclId)
 SELECT u.id, u.displayName, u.email, "individual", u.username, u.timezone, (select id from core_entity where name="User"), u.avatarId, u.id, g.aclId from core_user u
@@ -1718,6 +1733,27 @@ group by u.id;');
 
 };
 
-$updates['202501141553'][] = "alter table core_module drop key name;";
-$updates['202501141553'][] = "alter table core_module add constraint name unique (name, package);";
-$updates['202501141553'][] = "ALTER TABLE `core_alert` ADD COLUMN `staleAt` DATETIME NULL AFTER `triggerAt`;";
+$updates['202503271129'][] = "alter table core_module drop key name;";
+$updates['202503271129'][] = "alter table core_module add constraint name unique (name, package);";
+$updates['202503271129'][] = "ALTER TABLE `core_alert` ADD COLUMN `staleAt` DATETIME NULL AFTER `triggerAt`;";
+
+
+$updates['202505301440'][] = function() {
+	$stmt = go()->getDbConnection()
+		->select("id,name,isUserGroupFor")
+		->from("core_group")
+		->where('isUserGroupFor', '!=', null)
+		->orderBy(['isUserGroupFor' => 'ASC', 'name' => 'ASC']);
+
+	$lastIsUserGroupFor = -1;
+	foreach($stmt as $row) {
+		if($lastIsUserGroupFor == $row['isUserGroupFor']) {
+			go()->getDbConnection()
+				->delete("core_group", (new Query())->where('id', '=', $row['id']))
+				->execute();
+		}
+
+		$lastIsUserGroupFor  = $row['isUserGroupFor'];
+	}
+
+};

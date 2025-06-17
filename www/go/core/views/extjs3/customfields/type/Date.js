@@ -39,7 +39,7 @@ go.customfields.type.Date = Ext.extend(go.customfields.type.Text, {
 	createFormFieldConfig: function (customfield, config) {
 		var config = go.customfields.type.Date.superclass.createFormFieldConfig.call(this, customfield, config);
 
-		delete config.anchor;
+		// delete config.anchor;
 		
 		config.xtype = "datefield";
 		

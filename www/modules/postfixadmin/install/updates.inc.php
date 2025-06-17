@@ -78,3 +78,9 @@ $updates['202212051053'][] = "alter table pa_mailboxes
 
 $updates['202404231045'][] = "alter table pa_mailboxes
     add fts boolean default false not null after smtpAllowed;";
+
+$updates['202503251427'][] = "update core_module set enabled=0 where name='postfixadmin'";
+$updates['202503251427'][] = function() {
+    echo "Installing maildomains module";
+    \go\modules\community\maildomains\Module::get()->install();
+};

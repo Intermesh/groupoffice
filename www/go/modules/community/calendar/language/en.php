@@ -1,7 +1,7 @@
 <?php
 return [
 	'name' => 'Calendar',
-	'description' => 'Calendar module; Every user can add, edit or delete appointments Also appointments from other users can be viewed and if necessary it can be changed.',
+	'description' => 'A powerful scheduling calendar for teams and individuals. It helps you organize events, manage availability, and coordinate with others in real-time. With support for recurring events, shared calendars, and automatic invite handling, it simplifies planning across time zones and organizations. The fast, modern web interface offers multiple views to give you full control over tracking personal appointments or managing team schedules. Smart filters and custom views make navigating busy calendars easy.',
 	'CalendarEvent' => 'Event',
 
 
@@ -31,8 +31,8 @@ return [
 		'tentative' => '{name} is tentative about event "{title}" {date}',
 	],
 	'replyPageMessage' => [
-		'accepted' => 'U have accepted the event',
-		'declined' => 'U have declined the event',
-		'tentative' => 'U are tentative about the event',
+		'accepted' => 'You have accepted the event',
+		'declined' => 'You have declined the event',
+		'tentative' => 'You are tentative about the event',
 	],
 ];

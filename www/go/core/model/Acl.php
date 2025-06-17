@@ -19,6 +19,14 @@ use go\core\exception\Forbidden;
  * The Acl class
  * 
  * Is an Access Control List to restrict access to data.
+ *
+ * @example
+ * ```
+ * $acl = new Acl();
+ * $acl->ownedBy = 1;
+ * $acl->usedIn = "some_table";
+ * $acl->save();
+ * ```
  */
 class Acl extends Entity {
 
@@ -252,7 +260,7 @@ class Acl extends Entity {
 	 * @param int[]|null $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
 	 * @throws Forbidden
 	 */
-	public static function applyToQuery(Query $query, string $column, int $level = self::LEVEL_READ, int $userId = null, array $groups = null): void
+	public static function applyToQuery(Query $query, string $column, int $level = self::LEVEL_READ, int|null $userId = null, array|null $groups = null): void
 	{
 
 		if(!isset($userId)) {
@@ -340,19 +348,6 @@ class Acl extends Entity {
 		return self::$permissionLevelCache[$cacheKey];
 	}
 
-
-	/**
-	 * @return UserDisplay[]|Query
-	 */
-	public function findAuthorizedUsers(): Query
-	{
-		return UserDisplay::find()
-			->join('core_user_group', 'ug', 'ug.userId = u.id')
-			->join('core_acl_group', 'ag', 'ag.groupId = ug.id')
-			->where('ag.aclId', '=', $this->id);
-	}
-
-
 	/**
 	 * Get ACL changes
 	 *
@@ -361,7 +356,7 @@ class Acl extends Entity {
 	 * @param Query|null $acls
 	 * @return array<boolean> AclId as key and granted as value.
 	 */
-	public static function changeLog(int $userId, string $sinceState, Query $acls = null): array {
+	public static function changeLog(int $userId, string $sinceState, Query|null $acls = null): array {
 		$query = (new Query())
 			->select('agc.aclId, granted')
 			->from('core_acl_group_changes', 'agc')

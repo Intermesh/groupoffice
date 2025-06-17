@@ -2971,7 +2971,7 @@ Ext.Element.addMethods(function(){
         getHeight : function(contentHeight){
             var me = this,
                 dom = me.dom,
-                h = MATH.max(dom.offsetHeight, dom.clientHeight, this.dom.getBoundingClientRect().height) || 0;
+                h = dom.getBoundingClientRect().height || 0;
 
             h = !contentHeight ? h : h - me.getBorderWidth("tb") - me.getPadding("tb");
             return h < 0 ? 0 : h;
@@ -2981,7 +2981,7 @@ Ext.Element.addMethods(function(){
         getWidth : function(contentWidth){
             var me = this,
                 dom = me.dom,
-                w = MATH.max(dom.offsetWidth, dom.clientWidth, this.dom.getBoundingClientRect().width) || 0;
+                w = dom.getBoundingClientRect().width || 0;
             w = !contentWidth ? w : w - me.getBorderWidth("lr") - me.getPadding("lr");
 					return w < 0 ? 0 : w;
 
@@ -3067,7 +3067,7 @@ Ext.Element.addMethods(function(){
                 len = sidesArr.length;
             for (i = 0; i < len; i++) {
                 side = sidesArr[i];
-                size = side && parseInt(this.getStyle(styles[side]), 10);
+                size = side && parseFloat(this.getStyle(styles[side]), 10);
                 if (size) {
                     ttlSize += MATH.abs(size);
                 }
@@ -11701,7 +11701,7 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
     
     afterRender : Ext.emptyFn,
 
-    
+
     destroy : function(){
         if(!this.isDestroyed){
             if(this.fireEvent('beforedestroy', this) !== false){
@@ -38525,7 +38525,6 @@ Ext.menu.Menu = Ext.extend(Ext.Container, {
                 this.render();
             }
 
-
             if(this.enableScrolling){
                 this.el.setXY(xy);
 
@@ -41155,7 +41154,7 @@ Ext.form.DateField = Ext.extend(Ext.form.TriggerField,  {
              return errors;
         }
 
-        var svalue = value;
+				var svalue = Ext.util.Format.htmlEncode(value);
         value = this.parseDate(value);
         if (!value) {
             errors.push(String.format(this.invalidText, svalue, this.format));

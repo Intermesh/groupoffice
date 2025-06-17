@@ -166,7 +166,7 @@ class Criteria {
 	 * 
 	 * @return $this
 	 */
-	public function where($condition, string $comparisonOperator = null, $value = null): Criteria
+	public function where($condition, string|null $comparisonOperator = null, $value = null): Criteria
 	{
 		return $this->andWhere($condition, $comparisonOperator, $value);
 	}
@@ -240,7 +240,7 @@ class Criteria {
 	 * @param mixed $value
 	 * @return $this
 	 */
-	public function andWhere($column, string $operator = null, $value = null): Criteria
+	public function andWhere($column, string|null $operator = null, $value = null): Criteria
 	{
 		$this->where[] = $this->internalWhere($column, $operator, $value, 'AND');
 		return $this;
@@ -260,7 +260,7 @@ class Criteria {
 	 * @param mixed $value
 	 * @return $this
 	 */
-	public function andWhereNot($column, string $operator = null, $value = null): Criteria
+	public function andWhereNot($column, string|null $operator = null, $value = null): Criteria
 	{
 		$this->where[] = $this->internalWhere($column, $operator, $value, 'AND NOT');
 		return $this;
@@ -286,7 +286,7 @@ class Criteria {
 	 * @param mixed $value
 	 * @return $this
 	 */
-	public function andWhereNotOrNull($column, string $operator = null, $value = null): Criteria
+	public function andWhereNotOrNull($column, string|null $operator = null, $value = null): Criteria
 	{
 		//NOT_OR_NULL will wrap an IFNULL(..., false) around it so it will also match NULL values
 		$this->where[] = $this->internalWhere($column, $operator, $value, 'AND NOT_OR_NULL');
@@ -303,7 +303,7 @@ class Criteria {
 	 * @param mixed $value
 	 * @return $this
 	 */
-	public function orWhereNot($column, string $operator = null, $value = null): Criteria
+	public function orWhereNot($column, string|null$operator = null, $value = null): Criteria
 	{
 		$this->where[] = $this->internalWhere($column, $operator, $value, 'OR NOT');
 		return $this;
@@ -329,7 +329,7 @@ class Criteria {
 	 * @param mixed $value
 	 * @return $this
 	 */
-	public function orWhereNotOrNull($column, string $operator = null, $value = null): Criteria
+	public function orWhereNotOrNull($column, string|null $operator = null, $value = null): Criteria
 	{
 		$this->where[] = $this->internalWhere($column, $operator, $value, 'OR NOT_OR_NULL');
 		return $this;
@@ -345,7 +345,7 @@ class Criteria {
    * @param mixed $value
 	 * @return $this
 	 */
-	public function orWhere($column, string $operator = null, $value = null): Criteria
+	public function orWhere($column, string|null $operator = null, $value = null): Criteria
 	{
 		$this->where[] = $this->internalWhere($column, $operator, $value, 'OR');
 		return $this;
@@ -412,7 +412,7 @@ class Criteria {
 	 * @param int|null $pdoType {@see \PDO} Autodetected based on the type of $value if omitted.
 	 * @return $this
 	 */
-	public function bind($tag, $value = null, int $pdoType = null): Criteria
+	public function bind($tag, mixed $value = null, int|null $pdoType = null): Criteria
 	{
 		
 		if(is_array($tag)) {

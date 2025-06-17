@@ -80,7 +80,6 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 								if(v === 0) {
 									return t("Unlimited");
 								}
-								v *= 1024;
 								return Format.fileSize(v);
 							}
 						}),
@@ -90,8 +89,6 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 							label: t("Used quota"),
 							name: "sumUsedQuota",
 							renderer: (v, _record) => {
-								v = parseInt(v);
-								v *= 1024;
 								return (v > 0) ? Format.fileSize(v) : "0B";
 							}
 						}),
@@ -102,7 +99,6 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 							name: "sumUsage",
 							width: 100,
 							renderer: (v, _record) => {
-								v = parseInt(v);
 								return (v > 0) ? Format.fileSize(v) : "0B";
 							},
 							hidden: true
@@ -208,6 +204,12 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 			await this.openMailboxDlg(table.store.get(rowIndex)!.id);
 		});
 
+		mailboxTable.on("delete", async (tbl) => {
+			const ids = tbl.rowSelection!.getSelected().map(row => row.id);
+			await jmapds("MailBox")
+				.confirmDestroy(ids);
+		});
+
 		this.mailboxTable = mailboxTable;
 
 		return comp({
@@ -294,6 +296,12 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 		const aliasTable = new AliasTable();
 		aliasTable.on("rowdblclick", async (table, rowIndex, _ev) => {
 			await this.openAliasDlg(table.store.get(rowIndex)!.id);
+		});
+
+		aliasTable.on("delete", async (tbl) => {
+			const ids = tbl.rowSelection!.getSelected().map(row => row.id);
+			await jmapds("MailAlias")
+				.confirmDestroy(ids);
 		});
 
 		this.aliasTable = aliasTable;

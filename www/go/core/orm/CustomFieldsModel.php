@@ -221,25 +221,7 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 	{
 		if(!isset($this->data)) {
 
-			$stmt = go()->getDbConnection()->getCachedStatment('cf-' . $this->customFieldsTableName());
-			if(!$stmt) {
-				$query = (new Query())
-					->select('*')
-					->from($this->customFieldsTableName(), 'cf')
-					->where('cf.id = :id')
-					->bind(':id', $this->entity->id());
-
-				$stmt = $query->createStatement();
-				go()->getDbConnection()->cacheStatement('cf-' . $this->customFieldsTableName(), $stmt);
-			} else {
-				$stmt->bindValue(':id', $this->entity->id());
-			}
-
-			$stmt->execute();
-
-			$record = $stmt->fetch();
-
-			$stmt->closeCursor();
+			$record = $this->getRecord();
 
 			$this->customFieldsIsNew = !$record;
 
@@ -264,6 +246,17 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 		}
 
 		return $this->data;//array_filter($this->customFieldsData, function($key) {return $key != 'id';}, ARRAY_FILTER_USE_KEY);
+	}
+
+	/**
+	 * Gets the primary key for the custom fields model.
+	 *
+	 * Usually this is the entity's id but in some
+	 * cases like the calendar event it's different.
+	 * @return string
+	 */
+	protected function getCustomFieldsModelId() : string|int|null {
+		return $this->entity->customFieldsModelId();
 	}
 
 	/**
@@ -349,7 +342,7 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 	/**
 	 * @throws Exception
 	 */
-	public function toArray(array $properties = null): array|null
+	public function toArray(array|null $properties = null): array|null
 	{
 		$fn = $this->returnAsText ? 'dbToText' : 'dbToApi';
 		$r = $this->internalGetCustomFields();
@@ -396,7 +389,7 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 			if($this->customFieldsIsNew) {
 
 				//if(!empty($record)) { //always create record for select fields with foreign keys!
-				$record['id'] = $this->entity->id();
+				$record['id'] = $this->getCustomFieldsModelId();
 				if(!App::get()
 					->getDbConnection()
 					->insert($this->customFieldsTableName(), $record)->execute()){
@@ -407,7 +400,7 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 			} else {
 				if(!empty($record) && !App::get()
 						->getDbConnection()
-						->update($this->customFieldsTableName(), $record, ['id' => $this->entity->id()])->execute()) {
+						->update($this->customFieldsTableName(), $record, ['id' => $this->getCustomFieldsModelId()])->execute()) {
 					return false;
 				}
 			}
@@ -467,5 +460,40 @@ class CustomFieldsModel implements ArrayableInterface, ArrayAccess, JsonSerializ
 	public function jsonSerialize(): mixed
 	{
 		return (object) $this->toArray();
+	}
+
+	/**
+	 * @return array|null
+	 * @throws DbException
+	 * @throws \Throwable
+	 */
+	public function getRecord(): array|false
+	{
+		$id = $this->getCustomFieldsModelId();
+
+		if(!$id) {
+			return false;
+		}
+
+		$stmt = go()->getDbConnection()->getCachedStatment('cf-' . $this->customFieldsTableName());
+		if (!$stmt) {
+			$query = (new Query())
+				->select('*')
+				->from($this->customFieldsTableName(), 'cf')
+				->where('cf.id = :id')
+				->bind(':id', $this->getCustomFieldsModelId());
+
+			$stmt = $query->createStatement();
+			go()->getDbConnection()->cacheStatement('cf-' . $this->customFieldsTableName(), $stmt);
+		} else {
+			$stmt->bindValue(':id', $this->getCustomFieldsModelId());
+		}
+
+		$stmt->execute();
+
+		$record = $stmt->fetch();
+
+		$stmt->closeCursor();
+		return $record;
 	}
 }

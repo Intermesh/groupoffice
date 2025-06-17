@@ -135,7 +135,7 @@ class Module extends EntityController {
 		$model = $mod->install();
 
 		if(!$model) {
-			throw new \Exception("Failed to install");
+			throw new \Exception("Failed to install module. Please check the server error log for details.");
 		}
 
     return $this->get(['ids' => [$model->id]]);

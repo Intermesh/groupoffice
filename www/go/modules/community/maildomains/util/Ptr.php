@@ -29,7 +29,7 @@ final class Ptr
 
 		exec('nslookup '.escapeshellarg($myhostname), $output, $ret);
 		if($ret !== 0) {
-			throw new Exception(500, "Could not check PTR record. Error running nslookup.");
+			throw new Exception(500, "Could not check PTR record. Error running nslookup for " . $myhostname . " " . implode(" ", $output));
 		}
 
 		$regex = '/^Name:\s+'.preg_quote($myhostname)."\s+Address:\s+([^\s]+)$/m";

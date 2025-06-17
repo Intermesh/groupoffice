@@ -31,7 +31,7 @@ class Query extends DbQuery {
    * @param Property|null $owner When finding relations the owner or parent Entity / Property is passed so the children can access it.
    * @return $this
    */
-	public function setModel(string $cls, array $fetchProperties = [], bool $readOnly = false, Property $owner = null): Query
+	public function setModel(string $cls, array $fetchProperties = [], bool $readOnly = false, Property|null$owner = null): Query
 	{
 		$this->model = $cls;
 		$this->readOnly = $readOnly;
@@ -144,13 +144,15 @@ class Query extends DbQuery {
 	}
 
   /**
-   * Join properties on the main model. The table will be aliased as the property name
+   * Join relational properties on the main model. The table will be aliased as the property name.
+	 *
+	 * For example the emailAddresses on the contact model.
    *
    * @param string[] $path eg. ['emailAddreses']
    * @return $this;
    * @throws Exception
    */
-	public function joinProperties(array $path): Query
+	public function joinRelation(array $path): Query
 	{
 		$cls = $this->model;
 		$alias = $this->getTableAlias();
@@ -163,7 +165,7 @@ class Query extends DbQuery {
 				$cls = $relation->propertyName;
 				
 				//TODO: What if the property has more than one table in the mapping? Also might be a problem in Entity::changeReferencedEntities()
-				$table = array_values($cls::getMapping()->getTables())[0]->getName();
+				$table = $cls::getMapping()->getPrimaryTable()->getName();
 			} else {
 				$table = $relation->tableName;
 			}
@@ -177,6 +179,27 @@ class Query extends DbQuery {
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Find's table aliases for the given table name
+	 *
+	 * @param string $tableName
+	 * @return string[]
+	 */
+	public function findTableAliases(string $tableName) : array {
+		$aliases = [];
+		if($this->getFrom() == $tableName) {
+			$aliases[] = $this->getTableAlias();
+		}
+
+		foreach($this->joins as $join) {
+			if($join['src'] == $tableName) {
+				$aliases[] = $join['joinTableAlias'];
+			}
+		}
+
+		return $aliases;
 	}
 
   /**

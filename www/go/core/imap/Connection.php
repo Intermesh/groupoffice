@@ -317,7 +317,7 @@ class Connection {
 	 * ```````````````````````````````````````````````````````````````````````````
 	 * 
 	 */
-	public function getResponse(Streamer $streamer = null) {
+	public function getResponse(Streamer|null $streamer = null) {
 
 		$response = [];	
 		
@@ -416,7 +416,7 @@ class Connection {
 	 * @param Streamer $streamer
 	 * @param string
 	 */
-	private function getLiteralDataResponse($size, Streamer $streamer = null) {
+	private function getLiteralDataResponse($size, Streamer|null $streamer = null) {
 		
 		$max = 8192 > $size ? $size : 8192;
 		

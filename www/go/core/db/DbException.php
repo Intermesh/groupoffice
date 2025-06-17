@@ -1,20 +1,18 @@
 <?php
 namespace go\core\db;
-class DbException extends \Exception {
+use Exception;
+use PDOException;
+
+class DbException extends Exception {
 
 	public mixed $sql;
-	public function __construct(\PDOException $previous, mixed $sql = null)
+	public function __construct(PDOException $previous, mixed $sql = null)
 	{
 		$this->sql = $sql;
 
-		$msg = "Database exception";
-		if(go()->getDebugger()->enabled) {
-
-			$msg .= ", DEBUG: " . $previous->getMessage();
-
-			if(isset($sql)) {
-				$msg .= ", Full SQL: " . $sql;
-			}
+		$msg = "Database exception: " . $previous->getMessage();
+		if(isset($sql)) {
+			$msg .= ", Full SQL: " . $sql;
 		}
 
 		parent::__construct($msg, 0, $previous);

@@ -154,7 +154,8 @@ class ArrayObject extends CoreArrayObject implements JsonSerializable {
 	 * @param string|null $key
 	 * @return void
 	 */
-	public function insert(int $index, $value, string $key = null ) {
+	public function insert(int $index, mixed $value, string|null $key = null ): void
+	{
 		$copy = $this->getArrayCopy();
 		if(isset($key)) {
 			$insert = [$key => $value];

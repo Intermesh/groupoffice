@@ -162,7 +162,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * @param string|null $tableAlias Will default to 't' if not set
 	 * @return $this
 	 */
-	public function from($source, string $tableAlias = null): Query
+	public function from(string|Query $source, string|null $tableAlias = null): Query
 	{
 		$this->tableName = $source;
 		return $this->tableAlias($tableAlias);
@@ -340,9 +340,9 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * @param Query $query
 	 * @return $this
 	 */
-	public function union(Query $query): Query
+	public function union(Query $query, bool $all = false): Query
 	{
-		$this->unions[] = $query;
+		$this->unions[] = [$query, $all];
 		
 		return $this;
 	}
@@ -519,7 +519,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * @param string|null $joinTableAlias If given the alias of the existing join must match too.
 	 * @return boolean
 	 */
-	public function isJoined(string $tableName, string $joinTableAlias = null): bool
+	public function isJoined(string $tableName, string|null $joinTableAlias = null): bool
 	{
 		foreach($this->joins as $join) {
 			if($join['src'] != $tableName) {
@@ -545,7 +545,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 * @param string|null $joinTableAlias If given the alias of the existing join must match too.
 	 * @return $this
 	 */
-	public function removeJoin(string $tableName, string $joinTableAlias = null): Query
+	public function removeJoin(string $tableName, string|null $joinTableAlias = null): Query
 	{
 		$new = [];
 		foreach($this->joins as $join) {
@@ -785,7 +785,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    * @return array|null
    * @throws Exception
    */
-  public function toArray(array $properties = null): array|null
+  public function toArray(array|null $properties = null): array|null
   {
 		$arr = [];
 		foreach($this->execute() as $entity) {

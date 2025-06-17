@@ -545,7 +545,7 @@ class Token extends Entity {
 	 * Used on password change.
 	 * @throws Exception
 	 */
-	public static function destroyOtherSessons(int $userId = null) : bool {
+	public static function destroyOtherSessons(int|null $userId = null) : bool {
 
 		$q = (new Query)
 			->where('expiresAt', '!=', null)

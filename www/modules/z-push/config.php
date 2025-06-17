@@ -95,7 +95,7 @@ const IPC_PROVIDER = '';
 // note: you can't use z-push constants in the GO config file!
 // use 16 for debug or 32 for wbxml
 if(!isset(\GO::config()->zpush2_loglevel)){
-	\GO::config()->zpush2_loglevel = \GO::config()->debug ? LOGLEVEL_FATAL | LOGLEVEL_ERROR | LOGLEVEL_WARN | LOGLEVEL_INFO | LOGLEVEL_DEBUG : LOGLEVEL_OFF;
+	\GO::config()->zpush2_loglevel = \GO::config()->debug ? LOGLEVEL_FATAL | LOGLEVEL_ERROR | LOGLEVEL_WARN | LOGLEVEL_INFO | LOGLEVEL_DEBUG | LOGLEVEL_WBXML : LOGLEVEL_OFF;
 }
 
 		define('LOGBACKEND', 'filelog');
@@ -281,10 +281,10 @@ const BACKEND_PROVIDER = "BackendGO";
 const SEARCH_PROVIDER = '';
 // Time in seconds for the server search. Setting it too high might result in timeout.
 // Setting it too low might not return all results. Default is 10.
-const SEARCH_WAIT = 10;
+const SEARCH_WAIT = 20;
 // The maximum number of results to send to the client. Setting it too high
 // might result in timeout. Default is 10.
-const SEARCH_MAXRESULTS = 10;
+const SEARCH_MAXRESULTS = 100;
 
 // Don't collection any data for z-push-top
 //define('TOPCOLLECTOR_DISABLED', true);

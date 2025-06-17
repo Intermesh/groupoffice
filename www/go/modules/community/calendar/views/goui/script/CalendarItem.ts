@@ -8,10 +8,11 @@ import {
 	tbar, Timezone,
 	win, Window
 } from "@intermesh/goui";
-import {calendarStore, t} from "./Index.js";
+import {calendarStore, categoryStore, t} from "./Index.js";
 import {client, jmapds, Recurrence} from "@intermesh/groupoffice-core";
 import {EventWindow} from "./EventWindow.js";
 import {EventDetailWindow} from "./EventDetail.js";
+import {SubscribeWindow} from "./SubscribeWindow";
 
 export type RecurrenceOverride = (Partial<CalendarEvent> & {excluded?:boolean});
 export type RecurrenceOverrides = {[recurrenceId:string]: RecurrenceOverride};
@@ -23,14 +24,21 @@ export interface CalendarEvent extends BaseEntity {
 	alerts?: any
 	showWithoutTime?: boolean // isAllDay
 	duration: string
+	privacy: 'public' | 'private' | 'secret'
 	start: string
 	timeZone:Timezone
 	title: string
 	color?: string
+	categoryIds: string[]
 	status?: string
 	isOrigin: boolean
 	participants?: {[key:string]: any}
 	calendarId: string
+}
+
+export interface CalendarCategory extends BaseEntity {
+	name: string
+	color: string
 }
 
 const eventDS = jmapds('CalendarEvent');
@@ -51,7 +59,9 @@ interface CalendarItemConfig {
 /**
  * This is the ViewModel for items displaying in the calendar.
  * For now, they can be generated from the CalendarEvent model.
- * Because if recurrence (and overridden) 1 CalendarEvent may return multiple items
+ * With recurrence (and overrides) 1 CalendarEvent may return multiple items
+ * Other items like tasks and birthdays can also generate calendar items for display
+ * Items are generated in the CalendarAdapter class
  */
 export class CalendarItem {
 
@@ -70,6 +80,7 @@ export class CalendarItem {
 	readonly initEnd: string
 
 	cal: any
+	categories : CalendarCategory[] = []
 
 	divs: {[week: string] :HTMLElement}
 	defaultColor?: string
@@ -97,6 +108,12 @@ export class CalendarItem {
 			this.end = this.start.clone().add(new DateInterval(this.patched.duration!));
 		//}
 		this.cal = calendarStore.find((c:any) => c.id == this.patched.calendarId);
+		if(this.patched.categoryIds)
+		for(const id of this.patched.categoryIds) {
+			const cat = categoryStore.find((c:any) => c.id == id);
+			if(cat)
+				this.categories.push(cat as CalendarCategory);
+		}
 
 		this.initStart = this.start.format('Y-m-d\TH:i:s');
 		this.initEnd = this.end.format('Y-m-d\TH:i:s');
@@ -214,6 +231,12 @@ export class CalendarItem {
 		return 1 + this.start.diff(this.end.clone().addSeconds(-1)).getTotalDays()!;
 	}
 
+	get categoryDots() {
+		for (const cat of this.categories) {
+			return [E('i').cls('cat').attr('title',cat.name).css({color: '#'+cat.color})];
+		}
+		return [];
+	}
 	get icons() {
 		const e = this.data;
 		const icons = [...this.extraIcons];
@@ -242,23 +265,79 @@ export class CalendarItem {
 		}
 	}
 
-	open(onCancel?: Function) {
-		//if (!ev.data.id) {
-		const dlg = !this.isOwner ? new EventDetailWindow() : new EventWindow();
-		if(dlg instanceof EventWindow) {
-			dlg.on('close', () => {
-				// cancel ?
-				onCancel && onCancel();
-				// did we save then show loading circle instead
-				if (!this.key) // new
-					Object.values(this.divs).forEach(d => d.remove());
+	async open(onCancel?: Function) {
 
-			})
+		const internalOpen = () => {
+			const dlg = !this.mayChange ? new EventDetailWindow() : new EventWindow();
+			if (dlg instanceof EventWindow) {
+				dlg.on('close', () => {
+					// cancel ?
+					onCancel && onCancel();
+					// did we save then show loading circle instead
+					if (!this.key) // new
+						Object.values(this.divs).forEach(d => d.remove());
+
+				})
+			}
+			dlg.show();
+			dlg.loadEvent(this);
+
+			return dlg;
 		}
-		dlg.show();
-		dlg.loadEvent(this);
 
-		return dlg;
+		if(!calendarStore.loaded) {
+			await calendarStore.load();
+		}
+		const cals = calendarStore.all()
+		if(!cals.length) {
+			return new Promise(resolve => {
+				const w = win({
+					title: t('No writeable calendars'),
+					width: 520
+				},
+					comp({cls:'pad',html:t('There are no calendars to add an appointment.')+'<br>'+t('Subscribe to an existing calendar or create a personal calendar.')}),
+					tbar({},
+						btn({text: t('Show calendars')+'...',handler:()=>{
+							const d = new SubscribeWindow();
+							d.show();
+							w.close();
+							if(onCancel) onCancel();
+						}}),
+						btn({text: t('Create personal calendar'), handler:() => {
+							client.jmap("Calendar/first", {}, 'pFirst').then(r => {
+								calendarStore.reload().then(r2 => {
+									this.data.calendarId = r.calendarId;
+									resolve(internalOpen());
+								});
+
+							}).catch(r => {
+								Window.error(r.message);
+								if(onCancel) onCancel();
+							});
+							w.close();
+						}})
+					)
+				);
+				w.show();
+			})
+
+		} else {
+			if(!this.data.calendarId) {
+				this.data.calendarId = client.user.calendarPreferences.defaultCalendarId;
+			}
+			return internalOpen();
+		}
+	}
+
+	private randomColor(seed: string) {
+		const colors = [
+			"CDAD00", "E74C3C", "9B59B6", "8E44AD", "2980B9", "3498DB",
+			"1ABC9C", "16A085", "27AE60", "2ECC71", "F1C40F", "F39C12",
+			"E67E22", "D35400", "95A5A6", "34495E", "808B96", "1652A1"
+		];
+
+		let hash = [...seed].reduce((acc, char) => acc + char.charCodeAt(0), 0);
+		return colors[hash % colors.length];
 	}
 
 	downloadIcs(){
@@ -309,6 +388,12 @@ export class CalendarItem {
 
 	get isOwner() {
 		return !this.participants || this.calendarPrincipal?.roles?.owner || false;
+	}
+
+	get mayChange() {
+		return this.isNew() ||
+			this.cal.myRights.mayWriteAll ||
+			(this.cal.myRights.mayWriteOwn && this.isOwner);
 	}
 
 	get calendarPrincipal() {
@@ -602,6 +687,8 @@ export class CalendarItem {
 	}
 
 	remove() {
+		if(!this.mayChange)
+			return;
 		if(!this.isRecurring) {
 			this.confirmScheduleMessage(false, () => {
 				eventDS.destroy(this.data.id);

@@ -106,7 +106,7 @@ class StringUtil {
    * @param string|null $sourceCharset
    * @return string
    */
-	public static function cleanUtf8(?string $str, string $sourceCharset = null): string
+	public static function cleanUtf8(?string $str, string|null $sourceCharset = null): string
 	{
 		if(empty($str)) {
 			return $str;
@@ -1219,6 +1219,18 @@ END;
 	}
 
 
+	public static function sanitizeHtmlEditor(?string $html): ?string {
+		if(!isset($html)) {
+			return null;
+		}
+		$html = preg_replace('#<(div|p)><br( /)?></\1>#', '<br>', $html);
+//		$html = preg_replace('#<div>(.*)</div>#U', "$1", $html);
+		$html = preg_replace("#<div>(<ol.*</ol>.*)</div>#", "$1", $html);
+
+		return $html;
+	}
+
+
 	/**
 	 * Format a number by using the user preferences
 	 *
@@ -1247,7 +1259,7 @@ END;
 	 * @access public
 	 * @return float|null|bool
 	 */
-	public static function unlocalizeNumber(string $number = "", string $decimalSeparator = null, string $thousandsSeparator = null)
+	public static function unlocalizeNumber(string $number = "", string|null $decimalSeparator = null, string|null $thousandsSeparator = null)
 	{
 		if ($number == "") {
 			return null;

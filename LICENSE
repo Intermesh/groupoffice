@@ -38,7 +38,8 @@ See https://www.group-office.com/self-hosted-license-agreement for the terms.
 
 Used components / libraries
 ------------------------------------------------------------------------------------------
-Swift: LGPL 3.0 license /usr/share/common-licenses/LGPL
-TCPDF: LGPL 2.0 license /usr/share/common-licenses/LGPL
-ExtJS: GPL 3.0 license /usr/share/common-licenses/GPL
-SabreDAV BSD license
+PHPMailer: LGPL 2.1 license
+Icons8: https://icons8.github.io/flat-color-icons/: MIT License
+TCPDF: LGPL 2.0 license
+ExtJS: GPL 3.0 license
+SabreDAV: BSD license

@@ -202,12 +202,8 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 							}, this);
 						}
 					},
-					tpl: '<tpl if="values.actionAt || dates.length"><div class="icons">\
+					tpl: '<tpl if="dates.length"><div class="icons">\
 					<hr class="indent">\
-						<tpl if="values.actionAt"><a class="s6"><i class="icon label">event</i></tpl>\
-							<span>{[go.util.Format.date(values.actionAt)]}</span>\
-							<label>{[t("Action date")]}</label>\
-						</a>\
 						<tpl for="dates"><a class="s6"><tpl if="xindex == 1"><i class="icon label">cake</i></tpl>\
 							<span>{[go.util.Format.date(values.date)]}</span>\
 							<label>{[t("dateTypes")[values.type] || values.type]}</label>\
@@ -290,10 +286,38 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 			return 1;
 		});
 		this.addComments();
+		this.addActionDate();
 		this.addFiles();
 		this.addHistory();
 
+	},
 
+	addActionDate: function() {
+		const dateFld = new Ext.form.DateField({
+			listeners: {
+				change: (date, v) => {
+
+					go.Db.store("Contact")
+						.save({actionAt: date.getValue().format("Y-m-d")}, this.data.id)
+						.catch((e) => GO.errorDialog.show(e))
+						.then(() => {
+							go.Notifier.flyout({title: t("Success"), description: t("Saved successfully")});
+						});
+				}
+			}
+		});
+		this.items.add(new Ext.Panel({
+			stateId: "contact-action-date",
+			collapsible: true,
+			onLoad: () => {
+				dateFld.setValue(this.data.actionAt);
+			},
+			title: t("Action date"),
+			items: [{
+				xtype: 'fieldset',
+				items:[dateFld]
+			}]
+		}));
 	},
 
 	onLoad: function () {

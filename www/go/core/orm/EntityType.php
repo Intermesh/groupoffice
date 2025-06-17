@@ -255,7 +255,7 @@ class EntityType implements ArrayableInterface {
 	 * @return static[]
 	 * @throws PDOException
 	 */
-	public static function findAll(Query $query = null): array
+	public static function findAll(Query|null $query = null): array
 	{
 		if(!isset($query)) {
 			return array_values(static::getCache()['models']);
@@ -974,7 +974,7 @@ class EntityType implements ArrayableInterface {
 	/**
 	 * @throws SaveException
 	 */
-	public function toArray(array $properties = null): array|null
+	public function toArray(array|null $properties = null): array|null
 	{
 		return [
 			"name" => $this->getName(),
