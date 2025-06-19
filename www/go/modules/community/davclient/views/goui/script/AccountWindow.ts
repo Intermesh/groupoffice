@@ -1,10 +1,9 @@
 import {
 	checkbox,
 	comp, select,
-	textfield, t, btn, table, mapfield, containerfield, menu, hr, Window, Format, displayfield
+	textfield, t, btn, mapfield, containerfield, menu, hr, Window, Format, displayfield
 } from "@intermesh/goui";
 import {client, FormWindow} from "@intermesh/groupoffice-core";
-import {statusIcons} from "@intermesh/community/calendar";
 export class AccountWindow extends FormWindow {
 
 	protected closeOnSave = false
@@ -15,7 +14,7 @@ export class AccountWindow extends FormWindow {
 		this.height = 650;
 
 		const enabledCb = checkbox({type:'switch',hidden:true,name:'active',value:true,label:t('Enabled'),
-			listeners:{'change':(me,v)=> {this.submitBtn.text = t(v ? "Connect":"Save")}}});
+			listeners:{'change':(_me,v)=> {this.submitBtn.text = t(v ? "Connect":"Save")}}});
 
 		this.generalTab.items.add(comp({cls:'flow pad'},
 				enabledCb,
@@ -60,7 +59,7 @@ export class AccountWindow extends FormWindow {
 									}
 
 								}).catch((err) => {
-									Window.error(err);
+									void Window.error(err);
 								}).finally(() => {
 									icon.unmask();
 								})
@@ -80,7 +79,7 @@ export class AccountWindow extends FormWindow {
 
 		this.addSharePanel();
 
-		this.form.on('load' , (m,data) => {
+		this.form.on('load' , (_m,data) => {
 			this.submitBtn.text = t(data.lastError  ? "Connect":"Save")
 			enabledCb.hidden = !!data.lastError;
 			if(!data.lastError){
@@ -95,7 +94,7 @@ export class AccountWindow extends FormWindow {
 			}
 		});
 
-		this.form.on('save', (me,e) => {
+		this.form.on('save', (_me,e) => {
 			// if connect failed. show error and prevent close
 			this.form.findField('lastError')!.value = e.lastError
 			this.form.trackReset();
