@@ -4,7 +4,7 @@ import {
 	DateTime,
 	E,
 	tooltip,
-	menu
+	menu, Format
 } from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
@@ -58,9 +58,9 @@ export abstract class CalendarView extends Component {
 		if(!div) { // default
 			const time = E('span');
 			if(!e.showWithoutTime) {
-				time.append(item.start.format('G:i'));
+				time.append(Format.time(item.start));
 				if(item.dayLength > 1) {
-					time.append(item.end.format(' - G:i'));
+					time.append(' - ',Format.time(item.end));
 				}
 			}
 			div = E('div',

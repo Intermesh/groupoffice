@@ -1,5 +1,5 @@
 import {CalendarView} from "./CalendarView.js";
-import {DateTime, E} from "@intermesh/goui";
+import {DateTime, E, Format} from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {client} from "@intermesh/groupoffice-core";
 import {t} from "./Index.js";
@@ -221,8 +221,9 @@ export class WeekView extends CalendarView {
 		//day.setWeekDay(0);
 
 		let heads = [], days = [],fullDays = [], hours = [], showNowBar=false ,nowbar;
+		const fnTime = /[Aa]$/.test(Format.timeFormat) ?  (h => h<=12?h+'am':(h-12)+'pm') : (h => h+':00');
 		for (hour = 1; hour < 24; hour++) {
-			hours.push(E('em', hour+':00'));
+			hours.push(E('em', fnTime(hour)));
 		}
 
 		this.dayCols = {};
@@ -247,7 +248,7 @@ export class WeekView extends CalendarView {
 				left = 100 / this.days * (now.getWeekDay() - this.day.getWeekDay());
 			nowbar = E('div', E('hr'),
 				E('b').attr('style', `left: ${left}%;`),
-				E('span', now.format('G:i'))
+				E('span', Format.time(now))
 			).cls('now').attr('style', `top:${top}vh;`)
 		}
 		let ol: HTMLElement;
