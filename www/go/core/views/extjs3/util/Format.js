@@ -131,7 +131,7 @@
 						idIndex: 0,
 						data : [
 						['G:i', t('24 hour format','users','core')],
-						['g:i a', t('12 hour format','users','core')]
+						['g:i A', t('12 hour format','users','core')]
 						]
 					}),
 		age: function(birthday) {
