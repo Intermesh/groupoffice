@@ -11,7 +11,8 @@ export class AccountWindow extends FormWindow {
 	constructor() {
 		super('DavAccount');
 		this.title = t('Account');
-		this.width = 600;
+		this.width = 740;
+		this.height = 650;
 
 		const enabledCb = checkbox({type:'switch',hidden:true,name:'active',value:true,label:t('Enabled'),
 			listeners:{'change':(me,v)=> {this.submitBtn.text = t(v ? "Connect":"Save")}}});
@@ -44,9 +45,9 @@ export class AccountWindow extends FormWindow {
 
 					const f = containerfield({cls:'hbox', style: {alignItems: 'center', cursor:'default'}},
 						icon,
-						comp({flex: '1 0 50%',html: v.uri}),
-						comp({width:100, html: v.name}),
-						comp({width:80, html: v.lastSync ? Format.dateTime(v.lastSync) : t('Never')}),
+						comp({flex: '1 0 30%',html: v.uri}),
+						comp({width:220, html: v.name}),
+						comp({width:160, html: v.lastSync ? Format.dateTime(v.lastSync) : t('Never')}),
 						btn({icon:'more_vert', menu: menu({},
 							btn({icon:'sync',text:t('Sync now'), handler: _ =>{
 									icon.mask();
