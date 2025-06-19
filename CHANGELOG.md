@@ -1,3 +1,6 @@
+- Projects3: Improved finance integration
+- Core: Upgraded SourceGuardian encoder to fully support PHP 8.4
+
 16-06-2025: 25.0.30
 - Calendar: Fixed display issue in e-mail invite
 - Core: Auto dismiss alerts for entities no longer known
