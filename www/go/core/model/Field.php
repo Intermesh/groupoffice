@@ -24,14 +24,11 @@ class Field extends AclItemEntity {
 
 	/**
 	 * The Entity ID
-	 * 
-	 * @var int
 	 */
 	public ?string $id;
 	
 	/**
 	 * Display name
-	 * @var string 
 	 */
 	public string $name;
 	
@@ -42,8 +39,6 @@ class Field extends AclItemEntity {
 	
 	/**
 	 * Sort order
-	 * 
-	 * @var int
 	 */
 	public int $sortOrder;
 	protected $options;
@@ -51,10 +46,8 @@ class Field extends AclItemEntity {
 	
 	/**
 	 * The database column name
-	 * 
-	 * @var string 
 	 */
-	public string $databaseName;
+	public ?string $databaseName;
 	
 	/**
 	 * True if an entry is requied
@@ -77,8 +70,6 @@ class Field extends AclItemEntity {
 	 * Field prefix
 	 * 
 	 * eg. :"€:
-	 * 
-	 * @var ?string
 	 */
 	public ?string $prefix;
 	
@@ -86,29 +77,21 @@ class Field extends AclItemEntity {
 	 * Field suffix
 	 * 
 	 * eg. "%"
-	 * 
-	 * @var ?string
 	 */
 	public ?string $suffix;
 	
 	/**
 	 * Data type
-	 * 
-	 * @var string
 	 */
 	public string $type;
 	
 	/**
 	 * Modified at time
-	 * 
-	 * @var ?DateTime
 	 */
 	public ?\DateTimeInterface $modifiedAt;
 	
 	/**
 	 * Created at time
-	 * ]
-	 * @var ?DateTime
 	 */
 	public ?\DateTimeInterface $createdAt;
 
@@ -119,8 +102,6 @@ class Field extends AclItemEntity {
 
 	/**
 	 * Hide field by default in grids
-	 *
-	 * @var bool
 	 */
 	public bool $hiddenInGrid = true;
 
