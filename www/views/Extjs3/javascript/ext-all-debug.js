@@ -44353,12 +44353,12 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
 
     
     getDoc : function(){
-        return Ext.isIE ? this.getWin().document : (this.iframe.contentDocument || this.getWin().document);
+        return (this.iframe.contentDocument || this.getWin().document);
     },
 
     
     getWin : function(){
-        return Ext.isIE ? this.iframe.contentWindow : window.frames[this.iframe.name];
+        return window.frames[this.iframe.name];
     },
 
     
