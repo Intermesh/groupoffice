@@ -316,6 +316,7 @@ GO.files.FilesContextMenu = function(config)
 	}
 
 	config['items'].push(this.shareMenuButton);
+
 	// Download selected (As Zip)
 	this.downloadSelectedFilesButton = new Ext.menu.Item({
 			iconCls: 'ic-cloud-download',
@@ -377,12 +378,11 @@ Ext.extend(GO.files.FilesContextMenu, Ext.menu.Menu,{
 			}
 
 		} else {
-		
 			if(clickedAt)
 				this.clickedAt = clickedAt;
 
 			var extension = '';
-			
+
 			if(records.length === 1) {
 				extension = records[0].data.extension;
 
