@@ -6,6 +6,7 @@
  */
 namespace go\modules\community\calendar\model;
 
+use DateTimeInterface;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Mapping;
 use go\core\orm\UserProperty;
@@ -33,14 +34,14 @@ class Alert extends UserProperty {
 	/** @var ?string ISO 8061 signed duration */
 	protected ?string $offset;
 
-	/** @var DateTime|null Time to trigger the alarm. */
-	protected DateTime|null $when;
+	/** Time to trigger the alarm. */
+	protected DateTimeInterface|null $when;
 
 	/** @var string 'start' | 'end' of the startdate of the event */
 	protected string $relatedTo = self::Start;
 
-	/** @var DateTime when to user has dismissed the alert or when the server has carried out sending the email */
-	public \DateTimeInterface $acknowledged;
+	/** when to user has dismissed the alert or when the server has carried out sending the email */
+	public DateTimeInterface $acknowledged;
 
 	/** @var string 'email' | 'display'  */
 	public string $action = 'display';
