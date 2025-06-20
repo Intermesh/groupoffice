@@ -1,5 +1,6 @@
 - Projects3: Improved finance integration
 - Core: Upgraded SourceGuardian encoder to fully support PHP 8.4
+- CalDAV: Fixed sync problem in tasks and calendar
 
 16-06-2025: 25.0.30
 - Calendar: Fixed display issue in e-mail invite
