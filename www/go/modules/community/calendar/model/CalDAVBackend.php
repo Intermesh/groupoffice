@@ -278,7 +278,6 @@ class CalDAVBackend extends AbstractBackend implements
 	 */
 	public function getCalendarObject($calendarId, $objectUri)
 	{
-		$uid = pathinfo($objectUri, PATHINFO_FILENAME);
 		list($type, $id) = explode('-', $calendarId,2);
 
 		switch($type) {
@@ -289,13 +288,12 @@ class CalDAVBackend extends AbstractBackend implements
 				break;
 			case 't': // tasklist
 				$component = 'vtodo';
-				$object = Task::find()->where(['task.tasklistId'=> $id, 'task.uid'=>$uid])->single();
+				$object = Task::find()->where(['task.tasklistId'=> $id, 'task.uri' => $objectUri])->single();
 				break;
 			default:
 				go()->log("incorrect calendarId ".$calendarId. ' for '.$objectUri);
 				return null;
 		}
-
 
 		if (!$object) {
 			go()->log($component. " $objectUri not found in calendar $calendarId!");
@@ -359,6 +357,7 @@ class CalDAVBackend extends AbstractBackend implements
 			case 't': // tasklist
 				$object = new Task();
 				$object = (new VCalendar)->vtodoToTask($vCalendar, $id, $object);
+				$object->setUri($objectUri);
 
 				break;
 			default:
