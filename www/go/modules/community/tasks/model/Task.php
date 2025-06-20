@@ -389,6 +389,9 @@ class Task extends AclItemEntity {
 		if ($this->isNew() && empty($this->uid)) {
 			$this->uid = UUID::v4();
 		}
+		if(!isset($this->uri)) {
+			$this->uri = $this->uid . ".ics";
+		}
 
 		if ($this->progress == Progress::Completed) {
 			$this->percentComplete = 100;
@@ -723,10 +726,6 @@ class Task extends AclItemEntity {
 
 	public function getUri(): string
 	{
-		if(!isset($this->uri)) {
-			$this->uri = $this->getUid() . '.ics';
-		}
-
 		return $this->uri;
 	}
 
