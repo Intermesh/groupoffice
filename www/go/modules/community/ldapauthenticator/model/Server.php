@@ -18,7 +18,8 @@ use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
 
 class Server extends Entity {
-	
+
+	public ?string $id;
 	public ?string $hostname;
 	public int $port = 389;
 	public ?string $encryption = "tls";
