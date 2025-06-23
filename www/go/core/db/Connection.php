@@ -474,7 +474,7 @@ class Connection {
    * ```
    * App::get()->getDbConnection()
    *  ->update("core_state", new \go\core\db\Expression("highestModSeq = highestModSeq + 1"), $query);
-   * ````
+   * ```
    *
    */
 	public function insert(string $tableName, $data, array $columns = []): Statement
@@ -561,7 +561,7 @@ class Connection {
    *
    * $stmt = App::get()->getDbConnection()->update("test_a", $data, ['id' => 1]);
    * $stmt->execute();
-   * ````
+   * ```
    *
    */
 	public function update(string $tableName, $data, $query = null): Statement
