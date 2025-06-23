@@ -2,6 +2,7 @@
 namespace go\core\model;
 
 use DateInterval;
+use DateTimeInterface;
 use DateTimeZone;
 use Exception;
 use go\core\auth\BaseAuthenticator;
@@ -53,13 +54,13 @@ class Token extends Entity {
 	 * Time this token expires. Defaults to one day after the token was created {@see LIFETIME}
 	 * @var ?DateTime
 	 */							
-	public ?\DateTimeInterface $expiresAt = null;
+	public ?DateTimeInterface $expiresAt = null;
 	
 	/**
 	 *
 	 * @var DateTime
 	 */
-	public ?\DateTimeInterface $createdAt;
+	public ?DateTimeInterface $createdAt;
 
 	/**
 	 * FK to the core_client table
@@ -71,9 +72,9 @@ class Token extends Entity {
 	 *
 	 * When the user was last active. Updated every 5 minutes.
 	 * 
-	 * @var ?DateTime
+	 * @var ?DateTimeInterface
 	 */
-	public ?\DateTimeInterface $lastActiveAt;
+	public ?DateTimeInterface $lastActiveAt;
 
 	/**
 	 * | separated list of "core_auth" id's that are successfully applied 

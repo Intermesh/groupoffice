@@ -73,6 +73,8 @@ class Client extends Property
 				$this->platform = $ua_info['platform'] ?? '-';
 				$this->name = $ua_info['browser'] ?? '-';
 
+				$this->cutPropertiesToColumnLength();
+
 			}else if(Environment::get()->isCli()) {
 				$this->version = 'CLI';
                 $this->platform = 'CLI';
