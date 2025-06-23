@@ -220,7 +220,7 @@ class Module extends core\Module
 			->join('calendar_participant', 'p', 'p.eventId = eventdata.eventId', 'LEFT')
 			->where(['p.scheduleSecret' => $secret, 'eventdata.uid'=>$uid])->single();
 		if(!$event) {
-			throw new AccessDenied();
+			throw new core\exception\Forbidden();
 		}
 		$title = go()->t('Event page', 'community', 'calendar');
 		$method = 'PAGE'; // will show participation statusses or other participants
@@ -231,7 +231,7 @@ class Module extends core\Module
 			}
 		}
 		if(!$participant) {
-			throw new AccessDenied();
+			throw new core\exception\Forbidden();
 		}
 		if(isset($_GET['reply']) && in_array($_GET['reply'], ['accepted', 'tentative', 'declined'])) {
 			$participant->participationStatus = $_GET['reply'];

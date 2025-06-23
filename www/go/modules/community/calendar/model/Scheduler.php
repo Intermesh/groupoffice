@@ -197,37 +197,32 @@ class Scheduler {
 		}
 		$vevent = $vcalendar->VEVENT[0];
 
-		$aliases = go()->getDbConnection()
-			->select("email")
+		$accountUserEmail = go()->getDbConnection()
+			->selectSingleValue("email")
 			->from("core_user", "u")
 			->where('id', '=', $imapMessage->account->user_id)
 			->single();
 
-		$aliases = array_map('strtolower', $aliases);
+		$accountUserEmail = strtolower($accountUserEmail);
 
 		$accountEmail = false;
 		if($method ==='REPLY') {
 			if (isset($vevent->ORGANIZER)) {
 				$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vevent->ORGANIZER));
-				if (in_array($attendeeEmail, $aliases)) {
+				if ($attendeeEmail === $accountUserEmail) {
 					$accountEmail = $attendeeEmail;
 				}
 			} else { // Find event data's replyTo by UID when organizer is missing in VEVENT
 				$replyTo = go()->getDbConnection()->selectSingleValue('replyTo')->from('calendar_event')->where('uid', '=', (string) $vevent->UID)->single();
-				if(in_array($replyTo, $aliases)) {
+				if ($replyTo === $accountUserEmail) {
 					$accountEmail = $replyTo;
 				}
-//				// Microsoft ActiveSync does not (always?) send organizer
-//				$existingEvent = CalendarEvent::findByUID((string) $vevent->uid)->single();
-//				if ($existingEvent && in_array($existingEvent->organizer()->email, $aliases)) {
-//					$accountEmail = $existingEvent->organizer()->email;
-//				}
 			}
 		} else {
 			if (isset($vevent->attendee)) {
 				foreach ($vevent->attendee as $vattendee) {
 					$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vattendee));
-					if (in_array($attendeeEmail, $aliases)) {
+					if ($attendeeEmail === $accountUserEmail) {
 						$accountEmail = $attendeeEmail;
 					}
 				}
@@ -242,7 +237,7 @@ class Scheduler {
 			];
 		} else {
 			$from = $imapMessage->from->getAddress();
-			$event = Scheduler::processMessage($vcalendar, $accountEmail, (object)[
+			$event = Scheduler::processMessage($vcalendar, $imapMessage->account->user_id, (object)[
 				'email'=>$from['email'],
 				'name'=>$from['personal']
 			]);
@@ -285,7 +280,7 @@ class Scheduler {
 	 * @return CalendarEvent|null
 	 * @throws SaveException
 	 */
-	static function processMessage(VCalendar $vcalendar, string $receiver, object $sender) : ?CalendarEvent{
+	private static function processMessage(VCalendar $vcalendar, int $userId, object $sender) : ?CalendarEvent{
 
 		// old framework sets user timezone :(
 		date_default_timezone_set("UTC");
@@ -295,12 +290,12 @@ class Scheduler {
 		}
 
 		$method = $vcalendar->method->getValue();
-		$event = self::eventByVEvent($vcalendar, $receiver);
+		$event = self::eventByVEvent($vcalendar, $userId);
 
 		if($event->isNew() && $method !== 'REQUEST')
 			return null;
 		switch($method){
-			case 'REQUEST': return self::processRequest($vcalendar,$receiver,$event);
+			case 'REQUEST': return self::processRequest($vcalendar,$event);
 			case 'CANCEL': return self::processCancel($vcalendar,$event);
 			case 'REPLY': return self::processReply($vcalendar,$event, $sender);
 		}
@@ -308,17 +303,17 @@ class Scheduler {
 		return null;
 	}
 
-	private static function eventByVEvent($vcalendar, $receiver) {
+	private static function eventByVEvent($vcalendar, $userId) {
 		$vevent = $vcalendar->VEVENT[0];
 		$uid = (string)$vevent->uid;
 		$recurId = !empty($vevent->{'RECURRENCE-ID'}) ? $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s') : null;
 
-		$existingEvent = CalendarEvent::findByUID($uid, $receiver)
+		$existingEvent = CalendarEvent::findForUser($uid, $userId)
 			->andWhere('recurrenceId','=', null)->single();
 
 		// if the current user doesn't have the main event of a recurrence we might have it saved for a single recurrence ID
 		if(!$existingEvent && $recurId !== null) {
-			$existingEvent = CalendarEvent::findByUID($uid, $receiver)
+			$existingEvent = CalendarEvent::findForUser($uid, $userId)
 				->andWhere('recurrenceId','=', $recurId)->single();
 		}
 
@@ -339,7 +334,7 @@ class Scheduler {
 				->join('calendar_calendar_event', 'c', 'c.eventId = t.eventId', 'LEFT')
 				->where(['uid'=>$uid, 'recurrenceId' => $recurId])->single();
 		}
-		$calendarId = Calendar::fetchDefault($receiver);
+		$calendarId = Calendar::fetchDefault($userId);
 		if(!empty($eventCalendars['eventId'])) {
 			// add it to the current receivers default calendar
 			$added = go()->getDbConnection()->insert('calendar_calendar_event', [
@@ -356,18 +351,18 @@ class Scheduler {
 		return $event;
 	}
 
-	private static function processRequest(VCalendar $vcalendar, $receiver, ?CalendarEvent $event) {
+	private static function processRequest(VCalendar $vcalendar, ?CalendarEvent $event) {
 		if($event->isNew()) {
 			$event = ICalendarHelper::parseVObject($vcalendar, $event);
 			$event->save(); // we may need to save existing event to if we are not the origin
 		}
-		if(isset($event->participants)) {
-			foreach ($event->participants as $p) {
-				if ($p->email == $receiver && $p->kind == 'resource') {
-					return $event; // Do not put the event in the resource admin its calendar
-				}
-			}
-		}
+//		if(isset($event->participants)) {
+//			foreach ($event->participants as $p) {
+//				if ($p->email == $receiver && $p->kind == 'resource') {
+//					return $event; // Do not put the event in the resource admin its calendar
+//				}
+//			}
+//		}
 //		if($event->isNew()) {
 //			$event->save(); // the eventByVEvent() function has added it to the calendar if it is not new
 //		}
