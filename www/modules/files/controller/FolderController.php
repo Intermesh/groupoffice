@@ -154,10 +154,12 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		\GO\Files\Model\SharedRootFolder::model()->rebuildCache(\GO::user()->id);
 	}
 
-	protected function actionSyncFilesystem($params){	
+	protected function actionSyncFilesystem(array $params)
+	{
 		
-		if(!$this->isCli() && !\GO::user()->isAdmin())
+		if(!$this->isCli() && !\GO::user()->isAdmin()) {
 			throw new \GO\Base\Exception\AccessDenied();
+		}
 		
 		$oldAllowDeletes = \GO\Base\Fs\File::setAllowDeletes(false);
 
@@ -175,7 +177,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 			$folders = go()->getDbConnection()->selectSingleValue('name')
 				->from('fs_folders')
-				->where('(parent_id=0 OR parent_id is null) and name != "billing" and name != "email"')
+				->where('(parent_id=0 OR parent_id is null) and name != "billing" and name != "email" and name != "trash"')
 				->all();
 
 			$billingFolder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path.'billing');
