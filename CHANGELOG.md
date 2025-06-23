@@ -1,3 +1,4 @@
+23-06-2025: 25.0.32
 - LDAPServer: Fix primary key error
 
 20-06-2025: 25.0.31
