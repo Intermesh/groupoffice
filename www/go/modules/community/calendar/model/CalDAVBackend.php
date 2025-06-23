@@ -218,7 +218,7 @@ class CalDAVBackend extends AbstractBackend implements
 		switch($type) {
 			case 'c': $component = 'vevent';
 				$stmt = CalendarEvent::find()
-					->filter(['inCalendars'=>$id, 'before'=> $end, 'after' => $start]);
+					->filter(['hideSecret' => 1, 'inCalendars' => $id, 'before' => $end, 'after' => $start]);
 				break;
 			case 't' : $component = 'vtodo';
 				$stmt =  Task::find()
