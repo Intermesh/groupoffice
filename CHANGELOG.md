@@ -1,3 +1,5 @@
+- LDAPServer: Fix primary key error
+
 20-06-2025: 25.0.31
 - Projects3: Improved finance integration
 - Core: Upgraded SourceGuardian encoder to fully support PHP 8.4
