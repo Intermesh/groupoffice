@@ -2,6 +2,7 @@
 
 namespace go\modules\community\maildomains\model;
 
+use DateTimeInterface;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\jmap\Request;
@@ -36,10 +37,8 @@ final class Domain extends AclOwnerEntity
 
 	/**
 	 * Max assignable quota in bytes
-	 *
-	 * @var int
 	 */
-	public int $totalQuota = 0;
+	public float $totalQuota = 0;
 
 	/**
 	 * Default quota in bytes
@@ -49,9 +48,9 @@ final class Domain extends AclOwnerEntity
 	public string $transport;
 	public bool $backupMx = false;
 	public ?int $createdBy;
-	public ?\DateTimeInterface $createdAt;
+	public ?DateTimeInterface $createdAt;
 	public int $modifiedBy;
-	public ?\DateTimeInterface $modifiedAt;
+	public ?DateTimeInterface $modifiedAt;
 
 	/** @var boolean */
 	public bool $active = true;
@@ -72,12 +71,12 @@ final class Domain extends AclOwnerEntity
 	/**
 	 * Used quota in bytes
 	 */
-	public ?int $sumUsedQuota;
+	public ?float $sumUsedQuota;
 
 	/**
 	 * Disk usage in bytes
 	 */
-	public ?int $sumUsage;
+	public ?float $sumUsage;
 
 	public bool $checkDNS = false;
 
