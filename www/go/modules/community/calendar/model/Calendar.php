@@ -7,6 +7,7 @@ use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\http;
 use go\core\model\Principal;
+use go\core\model\User;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\PrincipalTrait;
@@ -96,16 +97,18 @@ class Calendar extends AclOwnerEntity {
 	}
 
 	/** @return int */
-	public static function fetchDefault($scheduleId) {
-		/** @var Preferences $pref */
-		$pref = go()->getAuthState()->getUser(['calendarPreferences'])->calendarPreferences;
-		if(!empty($pref->defaultCalendarId)) {
-			return $pref->defaultCalendarId;
+	public static function fetchDefault($userId) {
+		$user = User::findById($userId, ['calendarPreferences'], true);
+		if(!empty($user)) {
+			/** @var Preferences $pref */
+			$pref = $user->calendarPreferences;
+			if (!empty($pref->defaultCalendarId)) {
+				return $pref->defaultCalendarId;
+			}
 		}
 		// If default preference is empty use the first owned calendar
 		return self::find()->selectSingleValue('calendar_calendar.id')
-			->join('core_user', 'u', 'u.id = calendar_calendar.ownerId')
-			->where(['u.email' => $scheduleId])
+			->where(['calendar_calendar.ownerId' => $userId])
 			->andWhere(['groupId'=>null])
 			->orderBy(['sortOrder'=>'ASC'])
 			->single();
