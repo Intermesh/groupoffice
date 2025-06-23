@@ -43,7 +43,7 @@ final class Domain extends AclOwnerEntity
 	/**
 	 * Default quota in bytes
 	 */
-	public int $defaultQuota = 0;
+	public float $defaultQuota = 0;
 
 	public string $transport;
 	public bool $backupMx = false;
