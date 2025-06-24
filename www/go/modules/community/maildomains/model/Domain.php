@@ -5,13 +5,10 @@ namespace go\modules\community\maildomains\model;
 use DateTimeInterface;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
-use go\core\jmap\Request;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
-use go\core\orm\SearchableTrait;
 use go\core\util\ArrayObject;
-use go\core\util\DateTime;
 use go\modules\community\maildomains\util\DnsCheck;
 
 final class Domain extends AclOwnerEntity
