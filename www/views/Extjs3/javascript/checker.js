@@ -231,6 +231,12 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					}
 				}
 			},
+			failure: function(response, opts) {
+				//silently ignore
+				console.error('server-side failure with status code ' + response.status);
+				console.error(response);
+
+			},
 			scope:this
 		});
 	},
