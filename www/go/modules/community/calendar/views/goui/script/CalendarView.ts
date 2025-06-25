@@ -4,12 +4,13 @@ import {
 	DateTime,
 	E,
 	tooltip,
-	menu, Format
+	menu, Format, hr
 } from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 import {client,Recurrence} from "@intermesh/groupoffice-core";
 import {t} from "./Index.js";
+import {EventWindow} from "./EventWindow";
 
 export abstract class CalendarView extends Component {
 
@@ -22,6 +23,11 @@ export abstract class CalendarView extends Component {
 	protected contextMenu = menu({removeOnClose:false, isDropdown: true},
 		//btn({icon:'open_with', text: t('Show'), handler:_ =>alert(this.current!.data.id)}),
 		btn({icon:'edit', text: t('Edit','core','core'), handler: _ => this.current!.open()}),
+		hr(),
+		btn({icon:'delete', text: t('Delete','core'), handler: _ => this.current!.remove() }),
+		btn({icon:'content_cut', text: t('Cut','core'), handler: _ => this.current!.cut() }),
+		btn({icon:'content_copy', text: t('Copy','core'), handler: _ => this.current!.copy() }),
+		hr(),
 		btn({icon:'email', text: t('E-mail participants'), handler: _ => {
 				if (this.current!.data.participants){
 					go.showComposer({to: Object.values(this.current!.data.participants).map((p:any) => p.email)});
@@ -29,8 +35,32 @@ export abstract class CalendarView extends Component {
 			}
 		}),
 		//'-',
-		btn({icon:'delete', text: t('Delete','core'), handler: _ => this.current!.remove() }),
+
 		btn({icon: 'import_export', text: t('Download ICS'), handler: _ => this.current!.downloadIcs() })
+	);
+
+	protected contextMenuEmpty = menu({removeOnClose:false, isDropdown: true, listeners: {
+		beforeshow: me => {
+			const btn =me.items.get(3);
+			if(btn) {
+				btn.disabled = !CalendarItem.clipboard;
+				btn.text = CalendarItem.clipboard ? t('Paste ','core') + ' '+CalendarItem.clipboard.title : t('Paste ','core');
+			}
+		}}},
+		btn({icon:'add', text: t('Appointment'), handler: _ => {
+			(new CalendarItem({key:'',data:{
+				start:(new DateTime).format('Y-m-d\TH:00:00.000'),
+				title: t('New event'),
+				showWithoutTime: client.user.calendarPreferences?.defaultDuration == null,
+				duration: client.user.calendarPreferences?.defaultDuration ?? "P1D",
+				calendarId: CalendarView.selectedCalendarId
+			}})).save()
+		}}),
+		btn({icon:'add', text: t('Reminder'), handler: _ => { console.warn('todo:reminder'); }}),
+		hr(),
+		btn({icon:'content_paste', text: t('Paste ','core'), handler: _ => {
+			CalendarItem.paste(CalendarView.selectedCalendarId, this.contextMenuEmpty.dataSet.date)
+		}})
 	);
 
 	protected selected: CalendarItem[] = []

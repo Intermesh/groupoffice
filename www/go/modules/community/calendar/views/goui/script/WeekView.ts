@@ -31,6 +31,17 @@ export class WeekView extends CalendarView {
 					}
 				});
 			}
+		}).on('contextmenu', e =>{
+			e.preventDefault();
+			if(e.target.isA('dd')) { // CREATE
+				const SNAP = client.user.calendarPreferences.weekViewGridSnap,
+				 	liRect = this.el.lastElementChild!.lastElementChild!.getBoundingClientRect(),
+					pxPerSnap = liRect.height / (1440 / SNAP), // 96 quarter-hours in a day
+					minute = Math.round((e.clientY - liRect.top) / pxPerSnap) * SNAP;
+
+				this.contextMenuEmpty.dataSet.date = (new DateTime(e.target.dataset.day!)).setHours(0, minute).format('c');
+				this.contextMenuEmpty.showAt(e);
+			}
 		});
 
 		return super.internalRender();
@@ -130,10 +141,10 @@ export class WeekView extends CalendarView {
 			changed = false;
 			if (e.button !== 0) return;
 
-			const li = this.el.lastElementChild!.lastElementChild as HTMLElement,
+			const liRect = this.el.lastElementChild!.lastElementChild!.getBoundingClientRect(),
 				target = e.target as HTMLElement;
-			pxPerSnap = li.offsetHeight / (1440 / SNAP); // 96 quarter-hours in a day
-			offset = li.getBoundingClientRect().top;
+			pxPerSnap = liRect.height / (1440 / SNAP); // 96 quarter-hours in a day
+			offset = liRect.top;
 			currDayEl = target.up('[data-day]')!;
 			const event = target.up('div[data-key]');
 			if (event) { // MOVE
@@ -221,7 +232,7 @@ export class WeekView extends CalendarView {
 		//day.setWeekDay(0);
 
 		let heads = [], days = [],fullDays = [], hours = [], showNowBar=false ,nowbar;
-		const fnTime = /[Aa]$/.test(Format.timeFormat) ?  (h => h<=12?h+'am':(h-12)+'pm') : (h => h+':00');
+		const fnTime = /[Aa]$/.test(Format.timeFormat) ?  ((h:number) => h<=12?h+'am':(h-12)+'pm') : ((h: number) => h+':00');
 		for (hour = 1; hour < 24; hour++) {
 			hours.push(E('em', fnTime(hour)));
 		}

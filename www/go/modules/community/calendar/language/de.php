@@ -51,6 +51,7 @@ return [
 	'Accept' => 'Akzeptieren',
 	'Maybe' => 'Vielleicht',
 	'Decline' => 'Ablehnen',
+	'Participants' => 'Teilnehmer',
 	'You' => 'Du',
 	'This' => 'Dieser',
 	'Organizer' => 'Organisator',

@@ -71,6 +71,8 @@ interface CalendarItemConfig {
  */
 export class CalendarItem {
 
+	static clipboard?: CalendarItem;
+
 	key!: string|null // id/recurrenceId
 	recurrenceId?:string
 	data!: CalendarEvent
@@ -238,10 +240,11 @@ export class CalendarItem {
 	}
 
 	get categoryDots() {
+		const dots = [];
 		for (const cat of this.categories) {
-			return [E('i').cls('cat').attr('title',cat.name).css({color: '#'+cat.color})];
+			dots.push(E('i').cls('cat').attr('title',cat.name).css({color: '#'+cat.color}));
 		}
-		return [];
+		return dots;
 	}
 	get icons() {
 		const e = this.data;
@@ -757,6 +760,53 @@ export class CalendarItem {
 				}); // create duplicate
 			if (onFinish) p.then(onFinish);
 		});
+	}
+
+	cut() {
+		CalendarItem.clipboard = this;
+	}
+
+	copy() {
+		const data: any = {};
+		const copyKeys = ['alerts','categoryIds','duration','description', 'freeBusyStatus','location','participants','privacy',
+			'showWithoutTime','start','status','timeZone','title','useDefaultAlerts'];
+		for (const key of copyKeys) { // @ts-ignore
+			data[key] = this.data[key];
+		}
+
+		CalendarItem.clipboard = new CalendarItem({
+			data,
+			key:null,
+			open(this: CalendarItem) { // when opening the copy. just save
+				this.confirmScheduleMessage(data, () => {
+					root.mask();
+					eventDS.create(data).catch(e => {
+						void Window.error(e);
+						throw e;
+					}).then(r => {
+						// to copy again keep the id empty
+						this.data.id = '';
+					}).finally(() => {
+						root.unmask();
+					});
+				});
+			}
+		});
+	}
+
+	static paste(calendarId: string, date: string) {
+		if (!CalendarItem.clipboard!) return;
+		const withoutTime = date.length === 10;
+		let item = CalendarItem.clipboard;
+		if (withoutTime) { // keep orig time
+			const [y, m, d] = date.split('-').map(Number);
+			item.start.setYear(y).setMonth(m).setDate(d);
+		} else {
+			item.start = new DateTime(date);
+		}
+		item.end = item.start.clone().add(new DateInterval(item.data.duration));
+		item.data.calendarId = calendarId;
+		item.save();
 	}
 
 	remove() {

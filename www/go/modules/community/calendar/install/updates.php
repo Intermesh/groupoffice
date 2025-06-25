@@ -265,8 +265,11 @@ $updates['202503131043'][] = "UPDATE core_link l
 	JOIN core_entity et ON et.id = l.toEntityTypeId
 	JOIN calendar_calendar_event e on e.eventId = l.toId AND et.name = 'CalendarEvent'
 	SET l.toId = e.id;";
-// fixed missing global calendars because it had calendar_id=0 in the old database
-$updates['202504070955'][] = "";
+// new migrations will update the alerts. Others will have dismissed those in the last 3 months.
+$updates['202504070955'][] = "UPDATE IGNORE core_alert a
+	JOIN core_entity et ON et.id = a.entityTypeId
+	JOIN calendar_calendar_event e on e.eventId = a.entityId AND et.name = 'CalendarEvent'
+	SET a.entityId = e.id;";
 
 $updates['202504071345'][] = "ALTER TABLE `calendar_event` CHANGE COLUMN `location` `location` TEXT NULL;";
 // replace existing resource into core_participants

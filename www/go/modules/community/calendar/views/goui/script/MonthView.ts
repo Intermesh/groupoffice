@@ -36,6 +36,13 @@ export class MonthView extends CalendarView {
 					}
 				});
 			}
+		}).on('contextmenu', e =>{
+			e.preventDefault();
+			const day = e.target.up('li[data-date]');
+			if(day) {
+				this.contextMenuEmpty.dataSet.date = day.dataset.date;
+				this.contextMenuEmpty.showAt(e);
+			}
 		});
 		const observer = new ResizeObserver(entries => {
 			if(this.weekRows.length) {
