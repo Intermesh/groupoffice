@@ -332,7 +332,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 		$whereCriteria = FindCriteria::newInstance()
 			->addModel(\GO\Calendar\Model\Event::model())
-			->addCondition('exception_for_event_id', 0)
+			->addCondition('exception_for_event_id', 1, '<')
 			->addCondition('calendar_id', $calendarId);
 
 		$findParams = FindParams::newInstance()

@@ -359,6 +359,10 @@ class Folder extends FileSystemObject {
 		}
 		catch(Exception $e){
 			App::get()->debug($e->getMessage());
+			if(is_dir($this->path)){
+				//perhaps this was a race condition
+				return $this;
+			}
 		}
 		throw new Exception("Could not create folder " . $this->path);		
 	}

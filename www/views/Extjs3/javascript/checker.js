@@ -231,12 +231,18 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					}
 				}
 			},
+			failure: function(response, opts) {
+				//silently ignore
+				console.error('server-side failure with status code ' + response.status);
+				console.error(response);
+
+			},
 			scope:this
 		});
 	},
 
 	handleReminderResponse : function(storeData){
-//		this.fireEvent('check', this, data);
+
 		var hasReminders = (storeData.total && storeData.total > 0);
 		var me = this;
 		// go.Notifier.toggleIcon('reminder',hasReminders);
@@ -250,29 +256,6 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 		}
 
 		this.lastCount = this.reminderStore.getCount();
-
-		// if(!GO.util.empty(GO.settings.popup_reminders)){
-		// 	if (!("Notification" in window)) {
-		// 		if(GO.util.isMobileOrTablet()) {
-		// 			return;
-		// 		}
-		// 		GO.reminderPopup = GO.util.popup({
-		// 			width:400,
-		// 			height:400,
-		// 			url:GO.url("reminder/display"),
-		// 			target:'groupofficeReminderPopup',
-		// 			position:'br',
-		// 			closeOnFocus:false
-		// 		});
-		// 	} else {
-		//
-		// 		// for (var i = 0, l = storeData.results.length; i < l; i++) {
-		// 		// 	var rem = storeData.results[i];
-		// 		//
-		// 		// }
-		//
-		// 	}
-		// }
 
 		go.Notifier.showNotifications();
 		go.Notifier.playSound('message-new-email', 'reminder');

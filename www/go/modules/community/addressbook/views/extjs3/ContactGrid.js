@@ -277,7 +277,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(300),
 					hidden: this.enabledColumns.indexOf('phoneNumbers') == -1,
 					renderer: function (phoneNumbers, meta, record) {
-						return phoneNumbers.column("number").join(", ");
+						return Ext.util.Format.htmlEncode(phoneNumbers.column("number").join(", "));
 					}
 				},
 				{
@@ -288,7 +288,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(300),
 					hidden: this.enabledColumns.indexOf('emailAddresses') == -1,
 					renderer: function (emailAddresses, meta, record) {
-						return emailAddresses.column("email").join(", ");
+						return Ext.util.Format.htmlEncode(emailAddresses.column("email").join(", "));
 					}
 				},{
 					id: 'firstName',

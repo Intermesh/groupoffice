@@ -41154,7 +41154,7 @@ Ext.form.DateField = Ext.extend(Ext.form.TriggerField,  {
              return errors;
         }
 
-        var svalue = value;
+				var svalue = Ext.util.Format.htmlEncode(value);
         value = this.parseDate(value);
         if (!value) {
             errors.push(String.format(this.invalidText, svalue, this.format));
@@ -44353,12 +44353,12 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
 
     
     getDoc : function(){
-        return Ext.isIE ? this.getWin().document : (this.iframe.contentDocument || this.getWin().document);
+        return (this.iframe.contentDocument || this.getWin().document);
     },
 
     
     getWin : function(){
-        return Ext.isIE ? this.iframe.contentWindow : window.frames[this.iframe.name];
+        return window.frames[this.iframe.name];
     },
 
     

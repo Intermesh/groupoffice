@@ -312,7 +312,7 @@ class Participant extends \GO\Base\Db\ActiveRecord {
 		$params->getCriteria()
 						->addCondition('uuid', $this->event->uuid)
 						->addCondition('start_time', $this->event->start_time) //make sure start time matches for recurring series
-						->addCondition("exception_for_event_id", 0, $this->event->exception_for_event_id==0 ? '=' : '!='); //the master event or a single occurrence can start at the same time. Therefore we must check if exception event has a value or is 0.
+						->addCondition("exception_for_event_id", 0, $this->event->isException() ? '<=' : '>'); //the master event or a single occurrence can start at the same time. Therefore we must check if exception event has a value or is 0.
 
 
 		$joinCriteria = \GO\Base\Db\FindCriteria::newInstance()
@@ -474,7 +474,7 @@ class Participant extends \GO\Base\Db\ActiveRecord {
 						->addCondition('email', $this->email)
 						->addCondition('uuid', $this->event->uuid,'=','e')  //recurring series and participants all share the same uuid
 						->addCondition('start_time', $this->event->start_time,'=','e') //make sure start time matches for recurring series
-						->addCondition("exception_for_event_id", 0, $this->event->exception_for_event_id==0 ? '=' : '!=','e');//the master event or a single occurrence can start at the same time. Therefore we must check if exception event has a value or is 0.
+						->addCondition("exception_for_event_id", 0, $this->event->isException() ? '<=' : '>','e');//the master event or a single occurrence can start at the same time. Therefore we must check if exception event has a value or is 0.
 		
 		return Participant::model()->find($findParams);			
 		

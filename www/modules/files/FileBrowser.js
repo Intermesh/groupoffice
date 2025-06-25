@@ -79,8 +79,8 @@ GO.files.FileBrowser = function(config){
 		}
 
 		if (node.id !== "shared" && node.id !== "trash") {
-			this.folderDetail.load(parseInt(node.id));
-			this.eastPanel.getLayout().setActiveItem(this.folderDetail);
+			this.folderPanel.load(parseInt(node.id));
+			this.eastPanel.getLayout().setActiveItem(this.folderPanel);
 		}
 		const cpt = this.cardPanel.getTopToolbar();
 		if(showTrashBar) {
@@ -815,7 +815,7 @@ GO.files.FileBrowser = function(config){
 
 	this.eastPanel.add(this.filePanel);
 
-	this.folderPanel = this.folderDetail = new GO.files.FolderPanel({
+	this.folderPanel = new GO.files.FolderPanel({
 		id:config.id+'-folder-panel',
 		hidden:true,
 		expandListenObject:this.eastPanel,
@@ -1591,8 +1591,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 							delete treeNode.attributes.children;
 							treeNode.reload();
 						}
-						this.gridStore.reload();
-						this.trashGridStore.reload();
+						this.gridStore.load();
+						this.trashGridStore.load();
 					},
 					scope: this
 				});
@@ -1605,8 +1605,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 							delete treeNode.attributes.children;
 							treeNode.reload();
 						}
-						this.gridStore.reload();
-						this.trashGridStore.reload();
+						this.gridStore.load();
+						this.trashGridStore.load();
 					},
 					scope: this
 				});
@@ -1649,8 +1649,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 						delete treeNode.attributes.children;
 						treeNode.reload();
 					}
-					this.gridStore.reload();
-					this.trashGridStore.reload();
+					this.gridStore.load();
+					this.trashGridStore.load();
 
 				},
 				scope:this
@@ -1686,8 +1686,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 					ids: ids.join(",")
 				},
 				success:function(action, response, result){
-					this.gridStore.reload();
-					this.trashGridStore.reload();
+					this.gridStore.load();
+					this.trashGridStore.load();
 				},
 				scope:this
 			})
@@ -2151,7 +2151,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 	route: function(id, entity) {
 		this.show();
 		const entityId = (entity.name === "File" ? "f": "d")+":"+id;
-		const detailViewName = entity.name.toLowerCase() + "Detail";
+		const detailViewName = entity.name.toLowerCase() + "Panel";
 		this[detailViewName].on("load", function(dv){
 			this.setFolderID(dv.data.folder_id || dv.data.parent_id, true);
 		}, this, {single: true});

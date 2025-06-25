@@ -133,12 +133,7 @@ class Search extends AclOwnerEntity {
 	public $name;
 	public $description;
 	public $filter;
-//	protected $keywords;
-//
-//	public function setKeywords($keywords) {
-//		$this->keywords = $keywords;
-//	}
-	
+
 	protected function internalValidate() {
 		
 		$this->name = StringUtil::cutString($this->name, $this->getMapping()->getColumn('name')->length, false);
@@ -245,42 +240,4 @@ class Search extends AclOwnerEntity {
 			return $cls::findById($this->entityId);
 		}
 	}
-
-//	public static function sort(\go\core\orm\Query $query, array $sort)
-//	{
-//		//no sorting. Too big tables!
-//		return $query;
-//	}
-
-//	 public static function convertQuery($value) {
-//
-//	 		//first occuring quote type will be used for tokenizing.
-//	 		$doublepos = strpos($value, '"');
-//	 		$singlepos = strpos($value, "'");
-//	 		$quote = '"';
-//	 		if($singlepos !== false && $singlepos > $doublepos) {
-//	 			$quote = "'";
-//	 		}
-//
-//	 		//https://stackoverflow.com/questions/2202435/php-explode-the-string-but-treat-words-in-quotes-as-a-single-word
-//	 		preg_match_all('/'.$quote.'(?:\\\\.|[^\\\\'.$quote.'])*'.$quote.'|\S+/', $value, $tokens);
-//
-//	 		$str = "";
-//
-//	 		foreach($tokens[0] as $token) {
-//
-//	 				if(substr($token, -1,1) !== $quote) {
-//	 					$token = $token .= '*';
-//	 				}
-//	 				$str .= '+' . $token . ' ';
-//	 		}
-//
-//	 		return $str;
-//	 }
-//
-	
-	// protected static function textFilterColumns() {
-	// 	return ['keywords'];
-	// }
-	
 }

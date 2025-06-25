@@ -1,4 +1,66 @@
+20-06-2025: 6.8.128
+- Core: Fixed cursor jump in Firefox
+
+16-06-2025: 6.8.127 
+- Files: only display 'Share' menu if sharing options are available.
+- Core: better label for 'allowRegistration' option in system settings.
+
+13-06-2025: 6.8.126
+- Tasks/Core: Fixed invalid change event in tasklist combo where the tasklist name would be the value in the change event
+- Leavedays: allow employees to request negative hours
+- Core: SSE Push was broken
+- Core: Polling omits Search and User like SSE for performance
+
+12-06-2025: 6.8.125
+- Leavedays: Manager of logged in user got notification if you added a holiday on behalf of someone else
+- Updated German translations. Danke, Daniel!
+- Leavedays: fully refactor notification
+- Files: Use load() instead of reload() otherwise it might retrash the files as it will send the last load params
+- Newsletters: When setting max messages per minute to 0 it will send as fast as possible and doesn't default to 120 messages per minute
+- Newsletters: When a sending limit is applied the sending time is now taken in to account too.
+
+
+04-06-2025: 6.8.124
+- Leavedays: do not show notification if no open leave days (again)
+
+02-06-2025: 6.8.123
+- Leavedays: fix status loop when disapproving leave day requests
+- Freebusy: Fix non editable free busy permissions after user creation
+- Supportclient: Fixed grouping in support lists
+- Core: XSS error fixed in my account -> sync
+- Core: Reflected XSS in Look and feel section of the application
+- Leavedays: add counter for open leave day requests
+
+27-05-2025: 6.8.122
+- ActiveSync: z-push sync for notes and tasks #1289
+
+26-05-2025: 6.8.121
+- Workflow: prevent sorting by virtual column
+- Files: prevent permission error when restoring trashed file
+
+19-05-2025: 6.8.120
+- Files: Fixed opening file from link or search result
+- Core: Z-Push upgraded to 2.7.5 (With some patches from us).
+- Finance: Work around missing VAT rate ID
+- Leavedays: force manager to select existing special leave budget when applicable
+
+12-05-2025: 6.8.119
+- OAuth2 client: minor tweak project_id label
+- Core: Fixed: Blind Stored XSS in Phone Number Field Enables Forced Redirect and Unauthorized Actions
+- Core: Fixed:  DOM-Based XSS in all Date Input Fields Allow Arbitrary JavaScript Execution
+- Core: fixed Stored XSS in Tasks Comment Section
+- Files: Fixed: Group-Office vulnerable to path traversal Vulnerability ID: JVN#23673287
+- History: Fixed cross site scripting vulnerability JVN#30520482, JVN#87138325 and JVN#72111431
+- Email: fix deprecation error
+- Support: bugfix saving default task list
+- SUpportclient: make support list combo single select in 'new request' window
+
+25-04-2025: 6.8.118
 - ActiveSync: Fix broken utf-8 when recreating MIME for Z-push
+- Comments: use translations for tasks feedback
+- Core: Reset create link button on close so it won't fail when dialogs perform an async task before opening. This happened with documents in finance.
+- Finance: Add payment due date to Zugferd invoice
+- Addressbook: Filter ICD combo by selected country from address
 
 15-04-2025: 6.8.117
 - Files: fix ACL issues when restoring files or folders to their original position

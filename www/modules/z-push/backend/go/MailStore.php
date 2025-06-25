@@ -1029,7 +1029,7 @@ class MailStore extends Store implements ISearchProvider {
  /**
 	* Searches for the emails on the server
 	*
-	* @param ContentParameter $cpo
+	* @param ContentParameters $cpo
 	*
   * TODO: IMPLEMENT SEARCH IN SPECIFIC PARTS (SUBJECT, TO, FROM) 
 	* @return array
@@ -1040,22 +1040,49 @@ class MailStore extends Store implements ISearchProvider {
 		$imapAccount = $this->getImapAccount();
 		if(!$imapAccount)
 			return false;
-												
-		$searchwords = $cpo->GetSearchFreeText();
-		// split the search on whitespache and look for every word
-//		$searchwords = preg_split("/\W+/", $searchwords);
+
+
+		//todo, not implemented yet
+		$recursive = false;
+
+		if ($cpo->GetFindSearchId()) {
+			$searchrange = $cpo->GetFindRange();
+			$searchwords = $cpo->GetFindFreeText();
+			$searchFolder = $cpo->GetFindFolderid(); // RESULTS IN "m/INBOX" OR "m/Concepten"
+			if (!$searchFolder) {
+				//happens when searching "All folders" on iphone but we don't support this yet.
+				$searchFolder = 'INBOX';
+			} else {
+
+				if (!empty($searchFolder) && substr($searchFolder, 0, 2) == 'm/')
+					$searchFolder = substr($searchFolder, 2);// REMOVE THE "m/" from the folder id
+			}
+
+			// if subfolders are required, do a recursive search
+			if ($cpo->GetFindDeepTraversal()) {
+				$recursive = true;
+			}
+
+		} else {
+			$searchrange = $cpo->GetSearchRange();
+			$searchwords = $cpo->GetSearchFreeText();
+			$searchFolder = $cpo->GetSearchFolderid(); // RESULTS IN "m/INBOX" OR "m/Concepten"
+			if (!$searchFolder) {
+				//happens when searching "All folders" on iphone but we don't support this yet.
+				$searchFolder = 'INBOX';
+			} else {
+
+				if (!empty($searchFolder) && substr($searchFolder, 0, 2) == 'm/')
+					$searchFolder = substr($searchFolder, 2);// REMOVE THE "m/" from the folder id
+			}
+
+			// if subfolders are required, do a recursive search
+			if ($cpo->GetSearchDeepTraversal()) {
+				$recursive = true;
+			}
+		}
 
 		$searchwords = $this->parseSearchFreeText($searchwords);
-		
-		$searchFolder = $cpo->GetSearchFolderid(); // RESULTS IN "m/INBOX" OR "m/Concepten"
-		if(!$searchFolder) {
-			//happens when searching "All folders" on iphone but we don't support this yet.
-			$searchFolder = 'INBOX';
-		} else {
-
-			if(!empty($searchFolder) && substr($searchFolder, 0, 2) == 'm/')
-				$searchFolder = substr($searchFolder, 2);// REMOVE THE "m/" from the folder id
-		}
 		
 		// Build the imap search query
 		$searchData = $cpo->GetData();
@@ -1078,7 +1105,7 @@ class MailStore extends Store implements ISearchProvider {
 
 		$maxPageSize = 30;
 		
-		$searchrange = $cpo->GetSearchRange();
+
 		$rangestart = 0;
 		$rangeend = $maxPageSize;
 

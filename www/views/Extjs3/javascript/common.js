@@ -22,6 +22,12 @@ Ext.namespace('GO.util');
 
 
 Ext.Ajax.on('requestexception', function(conn, response, options) {
+
+	if(options.failure || options.callback) {
+		// failure handled elsewhere
+		return;
+	}
+
 	if(response.isAbort) {
 		console.warn("Connection aborted", conn, response, options);
 	} else if(response.isTimeout || response.status == 0) {
