@@ -8,7 +8,7 @@ import {
 	tbar, Timezone,
 	win, Window
 } from "@intermesh/goui";
-import {calendarStore, categoryStore, statusIcons, t} from "./Index.js";
+import {calendarStore, CalendarView, categoryStore, statusIcons, t} from "./Index.js";
 import {client, jmapds, Recurrence, RecurrenceField} from "@intermesh/groupoffice-core";
 import {EventWindow} from "./EventWindow.js";
 import {EventDetailWindow} from "./EventDetail.js";
@@ -270,6 +270,10 @@ export class CalendarItem {
 				this.data.start = start;
 				this.data.duration = duration;
 				this.open(onCancel); // open dialog
+				// add to invisible calendar
+				if(!this.cal.isVisible) {
+					jmapds('Calendar').update(this.cal.id, {isVisible:true});
+				}
 			}
 		}
 	}

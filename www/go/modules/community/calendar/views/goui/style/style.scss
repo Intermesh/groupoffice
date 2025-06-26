@@ -564,6 +564,7 @@ $timeMargin: dp(72);
 		pointer-events:none;
 		transition: height 84ms ease-out, top 84ms ease-out;
 	}
+	li.all-days { pointer-events:none; }
 }
 
 .cal.split {

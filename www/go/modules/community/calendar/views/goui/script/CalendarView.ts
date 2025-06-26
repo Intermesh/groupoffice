@@ -10,12 +10,12 @@ import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 import {client,Recurrence} from "@intermesh/groupoffice-core";
 import {t} from "./Index.js";
-import {EventWindow} from "./EventWindow";
 
 export abstract class CalendarView extends Component {
 
 	static selectedCalendarId: string
 
+	protected currentCreation?: CalendarItem
 	protected day: DateTime = new DateTime()
 	protected days: number = 1
 	protected firstDay?: DateTime
@@ -41,24 +41,33 @@ export abstract class CalendarView extends Component {
 
 	protected contextMenuEmpty = menu({removeOnClose:false, isDropdown: true, listeners: {
 		beforeshow: me => {
-			const btn =me.items.get(3);
+			const btn =me.items.find(item => item.itemId === 'paste');
 			if(btn) {
 				btn.disabled = !CalendarItem.clipboard;
 				btn.text = CalendarItem.clipboard ? t('Paste ','core') + ' '+CalendarItem.clipboard.title : t('Paste ','core');
 			}
 		}}},
 		btn({icon:'add', text: t('Appointment'), handler: _ => {
+			const date = this.contextMenuEmpty.dataSet.date;
+			let start;
+			if (date.length > 10) {
+				start = new DateTime(date);
+			} else {
+				const [y, m, d] = date.split('-').map(Number);
+				start = new DateTime(); // time = now
+				start.setYear(y).setMonth(m).setDate(d);
+			}
 			(new CalendarItem({key:'',data:{
-				start:(new DateTime).format('Y-m-d\TH:00:00.000'),
+				start:start.format('Y-m-d\TH:00:00.000'),
 				title: t('New event'),
 				showWithoutTime: client.user.calendarPreferences?.defaultDuration == null,
 				duration: client.user.calendarPreferences?.defaultDuration ?? "P1D",
 				calendarId: CalendarView.selectedCalendarId
 			}})).save()
 		}}),
-		btn({icon:'add', text: t('Reminder'), handler: _ => { console.warn('todo:reminder'); }}),
+		// btn({icon:'add', text: t('Reminder'), handler: _ => { console.warn('todo:reminder'); }}),
 		hr(),
-		btn({icon:'content_paste', text: t('Paste ','core'), handler: _ => {
+		btn({itemId:'paste',icon:'content_paste', text: t('Paste ','core'), handler: _ => {
 			CalendarItem.paste(CalendarView.selectedCalendarId, this.contextMenuEmpty.dataSet.date)
 		}})
 	);
@@ -184,6 +193,16 @@ export abstract class CalendarView extends Component {
 			top: top.toFixed(2)+'rem',
 			color: '#'+e.color
 		};
+	}
+
+	protected drawEventLine(e: CalendarItem, weekstart: DateTime) {
+		if(!e.divs[weekstart.format('YW')]) {
+			e.divs[weekstart.format('YW')] = this.eventHtml(e);
+		}
+		return e.divs[weekstart.format('YW')]
+			.css(this.makestyle(e, weekstart))
+			//.attr('style',this.makestyle(e, weekstart))
+			.cls('continues', weekstart.diff(e.start).getTotalDays()! < 0)
 	}
 
 	abstract renderView(): void;

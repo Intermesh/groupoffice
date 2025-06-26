@@ -123,16 +123,8 @@ export class MonthView extends CalendarView {
 		mouseUp = (_e: MouseEvent) => {
 			el.un('mousemove', mouseMove);
 			(hasMoved || action === create) && ev.save( () => {
-				//clean
-				//debugger;
-				//if(!ev.data.id) {
-				//	const i = this.viewModel.indexOf(ev)
-				//	this.viewModel.splice(i, 1);
-				//} else {
-					this.populateViewModel();
-				//}
-
-				this.updateItems();
+				this.currentCreation = undefined;
+				this.populateViewModel();
 			});
 		};
 		el.on('mousedown', (e) => {
@@ -150,7 +142,7 @@ export class MonthView extends CalendarView {
 						showWithoutTime: !dd
 					},
 					start = (new DateTime(data.start));
-				ev = new CalendarItem({start, data, key: ''});
+				this.currentCreation = ev = new CalendarItem({start, data, key: ''});
 				this.viewModel.unshift(ev);
 				this.updateItems();
 				//this.drawEvent(ev, weekStart);
@@ -184,6 +176,8 @@ export class MonthView extends CalendarView {
 		for(const item of this.adapter.items) {
 			this.viewModel.push(item);
 		}
+		if(this.currentCreation)
+			this.viewModel.unshift(this.currentCreation);
 		this.updateItems();
 		this.updateHasMore();
 	}
@@ -277,7 +271,7 @@ export class MonthView extends CalendarView {
 		this.slots = [{},{},{},{},{},{},{}];
 		let stillContinueing = [];
 		while(e = this.continues.shift()) {
-			eventEls.push(this.drawEvent(e, wstart));
+			eventEls.push(this.drawEventLine(e, wstart));
 			if(e.end.date > end.date) {
 				stillContinueing.push(e); // push it back for next week
 			}
@@ -285,7 +279,7 @@ export class MonthView extends CalendarView {
 		this.continues = stillContinueing;
 
 		while((e = this.viewModel[this.iterator]) && e.start.format('Ymd') < end.format('Ymd')) {
-			eventEls.push(this.drawEvent(e, wstart));
+			eventEls.push(this.drawEventLine(e, wstart));
 			if(e.end.date > end.date) {
 				this.continues.push(e);
 			}
@@ -294,13 +288,5 @@ export class MonthView extends CalendarView {
 		return eventEls;
 	}
 
-	drawEvent(e: CalendarItem, weekstart: DateTime) {
-		if(!e.divs[weekstart.format('YW')]) {
-			e.divs[weekstart.format('YW')] = super.eventHtml(e);
-		}
-		return e.divs[weekstart.format('YW')]
-			.css(this.makestyle(e, weekstart))
-			//.attr('style',this.makestyle(e, weekstart))
-			.cls('continues', weekstart.diff(e.start).getTotalDays()! < 0)
-	}
+
 }

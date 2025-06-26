@@ -103,19 +103,14 @@ export class CalendarList extends Component {
 					if(record) {
 						me.rowSelection!.add(record);
 					}
+					const oldLength = Object.values(this.inCalendars).filter(Boolean).length;
 					this.inCalendars = items.reduce((obj, item) => ({ ...obj, [item.id!]: item.isVisible }), {} as any);
+					const ids = Object.keys(this.inCalendars).filter(key => this.inCalendars[key]);
+					if(oldLength !== ids.length) {
+						this.fire('changevisible', this, ids);
+					}
 				});
-				me.store.load().then(_c => {
-					// after initial load. check for changed
-					//console.log('calendars loaded');
-
-
-					//this.applyInCalendarFilter();
-					this.fire('changevisible', this, Object.keys(this.inCalendars).filter(key => this.inCalendars[key]));
-
-					//this.updateView();
-
-				});
+				me.store.load()
 			}},
 			renderer: this.checkboxRenderer.bind(this)
 		}));
@@ -124,9 +119,7 @@ export class CalendarList extends Component {
 	private localGroup!: HTMLElement;
 
 	checkboxRenderer(data: any, _row: HTMLElement, list: List, storeIndex: number) {
-		// if(data.isVisible) {
-		// 	this.inCalendars[storeIndex] = true;
-		// }
+
 		const rights = modules.get("community", "calendar")!.userRights;
 		const icon = data.webcalUri ? ' <i class="icon">web</i>' : '';
 		return [checkbox({
@@ -150,12 +143,9 @@ export class CalendarList extends Component {
 					})
 				},
 				'change': (p, newValue) => {
-					this.inCalendars[data.id] = newValue;
-					//this.applyInCalendarFilter();
-					// FunctionUtil.buffer(1,() => {
+					this.inCalendars[data.id] = newValue; // update to make sure it doesn't fire changevisible twice
 					this.fire('changevisible', this, Object.keys(this.inCalendars).filter(key => this.inCalendars[key]));
-					//this.updateView();
-					// })();
+					console.log(this.inCalendars);
 					this.visibleChanges[data.id] = newValue;
 					this.saveSelectionChanges();
 				}
@@ -215,6 +205,15 @@ export class CalendarList extends Component {
 			})]
 		})];
 	}
+
+	private saveSelectionChanges = FunctionUtil.buffer(2000, () => {
+		//save isVisible
+		for(const id in this.visibleChanges) {
+			jmapds('Calendar').update(id, {isVisible:this.visibleChanges[id]});
+		}
+		//categoryStore.setFilter('calendars', {calendarId: this.visibleChanges}).load();
+		this.visibleChanges = {};
+	})
 
 	private select(index:number, all:boolean = false) {
 		const rows = this.list!.el.querySelectorAll('li.data');
@@ -281,13 +280,4 @@ export class CalendarList extends Component {
 		w.show();
 
 	}
-
-	saveSelectionChanges = FunctionUtil.buffer(2000, () => {
-		//save isVisible
-		for(const id in this.visibleChanges) {
-			jmapds('Calendar').update(id, {isVisible:this.visibleChanges[id]});
-		}
-		//categoryStore.setFilter('calendars', {calendarId: this.visibleChanges}).load();
-		this.visibleChanges = {};
-	})
 }
