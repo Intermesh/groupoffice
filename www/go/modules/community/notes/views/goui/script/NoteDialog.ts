@@ -31,10 +31,10 @@ export class NoteDialog extends FormWindow {
 				htmlfield({
 					name: "content",
 					listeners: {
-						setvalue: (field, newValue, oldValue) => {
-							Image.replaceImages(field.el);
+						setvalue: ({target}) => {
+							Image.replaceImages(target.el);
 						},
-						insertimage: (htmlfield, file, img) => {
+						insertimage: ({file, img}) => {
 							root.mask();
 
 							client.upload(file).then(r => {

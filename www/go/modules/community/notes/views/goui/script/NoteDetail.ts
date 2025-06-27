@@ -68,7 +68,7 @@ export class NoteDetail extends DetailPanel {
 			this.toolbar.items.insert(-1, filesbutton());
 		}
 
-		this.on("load", (detailPanel, entity) => {
+		this.on("load", ( {entity}) => {
 			this.title = entity.name;
 
 			this.content.items.clear();

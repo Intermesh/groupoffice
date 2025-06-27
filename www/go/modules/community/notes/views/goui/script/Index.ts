@@ -10,7 +10,7 @@ modules.register({
 
 		let notes: Main;
 
-		client.on("authenticated", (client, session) => {
+		client.on("authenticated", ( {session}) => {
 			if (!session.capabilities["go:community:notes"]) {
 				// User has no access to this module
 				return;

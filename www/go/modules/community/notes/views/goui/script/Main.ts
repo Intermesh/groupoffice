@@ -42,9 +42,9 @@ export class Main extends MainThreeColumnPanel {
 				},
 				checkbox({
 					listeners: {
-						change: (cb, checked) => {
+						change: ( {newValue}) => {
 							const rs = this.noteBookGrid.rowSelection!
-							checked ? rs.selectAll() : rs.clear();
+							newValue ? rs.selectAll() : rs.clear();
 						}
 					}
 				}),
@@ -52,7 +52,7 @@ export class Main extends MainThreeColumnPanel {
 				"->",
 				searchbtn({
 					listeners: {
-						input: (sender, text) => {
+						input: ( {text}) => {
 							(this.noteBookGrid.store.queryParams.filter as Filter).text = text;
 							this.noteBookGrid.store.load();
 						}
@@ -77,15 +77,15 @@ export class Main extends MainThreeColumnPanel {
 				rowSelectionConfig: {
 					multiSelect: true,
 					listeners: {
-						selectionchange: (tableRowSelect) => {
+						selectionchange: ({selected}) => {
 
-							const noteBookIds = tableRowSelect.getSelected().map((row) => row.record.id);
+							const noteBookIds = selected.map((row) => row.record.id);
 
 							this.noteGrid.store.queryParams.filter = {
 								noteBookId: noteBookIds
 							};
 
-							this.noteGrid.store.load();
+							void this.noteGrid.store.load();
 
 							this.addButton.disabled = !noteBookIds[0];
 
@@ -148,9 +148,9 @@ export class Main extends MainThreeColumnPanel {
 		this.noteGrid.rowSelectionConfig = {
 			multiSelect: true,
 			listeners: {
-				selectionchange: (tableRowSelect) => {
-					if (tableRowSelect.getSelected().length == 1) {
-						const record = tableRowSelect.getSelected()[0].record;
+				selectionchange: ({selected}) => {
+					if (selected.length == 1) {
+						const record = selected[0].record;
 
 						if (record) {
 							router.goto("notes/" + record.id);
@@ -188,7 +188,7 @@ export class Main extends MainThreeColumnPanel {
 				"->",
 				searchbtn({
 					listeners: {
-						input: (sender, text) => {
+						input: ( {text}) => {
 							this.noteGrid.store.setFilter("search", {text});
 							void this.noteGrid.store.load();
 						}

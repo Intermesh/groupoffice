@@ -1,4 +1,4 @@
-import {column, datasourcestore, DataSourceStore, datetimecolumn, menucolumn, t, Table} from "@intermesh/goui";
+import {column, datasourcestore, DataSourceStore, datetimecolumn, menucolumn, t, table, Table} from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
 import {NoteDialog} from "./NoteDialog";
 
@@ -25,12 +25,11 @@ export class NoteGrid extends Table<DataSourceStore> {
 			]
 		);
 
-		this.on("rowdblclick", async (table, rowIndex, ev) => {
+		this.on("rowdblclick", async ({target, storeIndex}) => {
 			const dlg = new NoteDialog();
 			dlg.show();
-			await dlg.load(table.store.get(rowIndex)!.id);
+			await dlg.load(target.store.get(storeIndex)!.id);
 		});
-
 
 		this.fitParent = true;
 	}
