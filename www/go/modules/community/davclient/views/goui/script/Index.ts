@@ -12,7 +12,7 @@ modules.register(  {
 		//const user = client.user;
 		translate.load(GO.lang.community.davclient, "community", "davclient");
 
-		client.on("authenticated",  (client, session) => {
+		client.on("authenticated",  ( {session}) => {
 
 			//client.user.calendarPreferences ||= {};
 			if(!session.capabilities["go:community:davclient"] || !session.capabilities["go:community:calendar"]) {
