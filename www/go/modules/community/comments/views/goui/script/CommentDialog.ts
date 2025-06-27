@@ -24,10 +24,6 @@ export class CommentDialog extends FormWindow {
 		this.width = 600;
 		this.height = 400;
 
-		this.form.on("beforesetvalue", (f, v) => {
-			console.log(v);
-		})
-
 		this.generalTab.items.add(fieldset({},
 			datefield({
 				name: "date",

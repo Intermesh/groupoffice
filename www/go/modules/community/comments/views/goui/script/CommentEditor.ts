@@ -38,7 +38,7 @@ export class CommentEditor extends Component {
 					name: "text",
 					required: true,
 					listeners: {
-						insertimage: (htmlfield, file, img) => {
+						insertimage: ( {file, img}) => {
 							root.mask();
 
 							client.upload(file).then(r => {
@@ -113,13 +113,13 @@ export class CommentEditor extends Component {
 		this.store = datasourcestore({
 			dataSource: jmapds("CommentLabel"),
 			listeners: {
-				load: (store, labels) => {
-					if (labels) {
+				load: ( {records}) => {
+					if (records) {
 						this.addBtn.disabled = false;
 
 						let labelButtons: string | Component | Button[] = [];
 
-						labels.forEach((label) => {
+						records.forEach((label) => {
 							labelButtons.push(
 								btn({
 									icon: "label",
