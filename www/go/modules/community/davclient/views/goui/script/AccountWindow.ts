@@ -14,7 +14,7 @@ export class AccountWindow extends FormWindow {
 		this.height = 650;
 
 		const enabledCb = checkbox({type:'switch',hidden:true,name:'active',value:true,label:t('Enabled'),
-			listeners:{'change':(_me,v)=> {this.submitBtn.text = t(v ? "Connect":"Save")}}});
+			listeners:{'change':({newValue})=> {this.submitBtn.text = t(newValue ? "Connect":"Save")}}});
 
 		this.generalTab.items.add(comp({cls:'flow pad'},
 				enabledCb,
@@ -79,7 +79,7 @@ export class AccountWindow extends FormWindow {
 
 		this.addSharePanel();
 
-		this.form.on('load' , (_m,data) => {
+		this.form.on('load' , ({data}) => {
 			this.submitBtn.text = t(data.lastError  ? "Connect":"Save")
 			enabledCb.hidden = !!data.lastError;
 			if(!data.lastError){
@@ -87,20 +87,20 @@ export class AccountWindow extends FormWindow {
 			}
 		});
 
-		this.form.on('beforesave', (me ,data) => {
+		this.form.on('beforesave', ({target, data}) => {
 			// if there was an error reactivate with new details.
-			if(me.value.lastError) {
+			if(target.value.lastError) {
 				data.active = true;
 			}
 		});
 
-		this.form.on('save', (_me,e) => {
+		this.form.on('save', ({data}) => {
 			// if connect failed. show error and prevent close
-			this.form.findField('lastError')!.value = e.lastError
+			this.form.findField('lastError')!.value = data.lastError
 			this.form.trackReset();
-			if(!e.lastError && e.active) {
+			if(!data.lastError && data.active) {
 				this.cards.activeItem = 1;
-			} else if(!e.lastError && !e.active) {
+			} else if(!data.lastError && !data.active) {
 				this.close();
 			}
 		});

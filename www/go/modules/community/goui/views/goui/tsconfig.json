@@ -1,7 +1,0 @@
-{
-  "extends": "../../../../../../views/goui/tsconfig.module.json",
-  "compilerOptions": {
-    "baseUrl": ".",
-    "outDir": "./dist"
-  }
-}
