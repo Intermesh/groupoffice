@@ -9,7 +9,7 @@ import {
 	menu,
 	searchbtn,
 	t,
-	tbar, Button, hr
+	tbar, Button, hr, checkbox, h3
 } from "@intermesh/goui";
 import {MainThreeColumnPanel, filterpanel, jmapds, client} from "@intermesh/groupoffice-core";
 import {notebookgrid, NoteBookGrid} from "./NoteBookGrid";
@@ -40,11 +40,16 @@ export class Main extends MainThreeColumnPanel {
 			tbar({
 					cls: "border-bottom"
 				},
-				comp({
-					tagName: "h3",
-					text: "Notebooks",
-					flex: 1
+				checkbox({
+					listeners: {
+						change: (cb, checked) => {
+							const rs = this.noteBookGrid.rowSelection!
+							checked ? rs.selectAll() : rs.clear();
+						}
+					}
 				}),
+				h3(t("Notebooks")),
+				"->",
 				searchbtn({
 					listeners: {
 						input: (sender, text) => {
@@ -66,6 +71,7 @@ export class Main extends MainThreeColumnPanel {
 				flex: 1,
 				cls: "scroll"
 			}, this.noteBookGrid = notebookgrid({
+				headers: false,
 				fitParent: true,
 				cls: "no-row-lines",
 				rowSelectionConfig: {
