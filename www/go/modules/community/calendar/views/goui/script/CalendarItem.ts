@@ -576,7 +576,7 @@ export class CalendarItem {
 					title: t('Do you want to edit a recurring event?'),
 					width:550,
 					modal: true,
-					listeners: {'close': (_me,byUser) => { if(byUser && onCancel) onCancel();  }}
+					listeners: {'close': ({byUser}) => { if(byUser && onCancel) onCancel();  }}
 				},comp({cls: 'pad flow'},
 					comp({tagName:'i',cls:'icon',html:'event_repeat', width:100, style:{fontSize:'3em'}}),
 					comp({html: t('You will be editing a recurring event. Do you want to edit this occurrence only or all future occurrences?'), flex:1}),

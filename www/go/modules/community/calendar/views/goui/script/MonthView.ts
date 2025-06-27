@@ -7,16 +7,12 @@ import {t} from "./Index.js";
 
 // add selectweek event
 
-export interface MonthViewEventMap<Type> extends ComponentEventMap<Type> {
-	selectweek: (me: Type, day: DateTime) => false | void
-	dayclick: (me: Type, day: any) => void
+export interface MonthViewEventMap extends ComponentEventMap {
+	selectweek: {day: DateTime}
+	dayclick: { day: any}
 }
 
-export interface MonthView extends CalendarView {
-	on<K extends keyof MonthViewEventMap<this>, L extends Function>(eventName: K, listener: Partial<MonthViewEventMap<this>>[K], options?: ObservableListenerOpts): L
-	fire<K extends keyof MonthViewEventMap<this>>(eventName: K, ...args: Parameters<MonthViewEventMap<any>[K]>): boolean
-}
-export class MonthView extends CalendarView {
+export class MonthView extends CalendarView<MonthViewEventMap> {
 
 	start!: DateTime
 	dragData?: CalendarEvent
@@ -204,13 +200,13 @@ export class MonthView extends CalendarView {
 				const cDay = day.clone();
 				row.append(E('li',
 					(i==0 && client.user.calendarPreferences.showWeekNumbers) ? E('sub','W '+day.getWeekOfYear()).cls('weeknb').cls('not-small-device')
-						.on('click',_e => this.fire('selectweek', this, weekStart))
+						.on('click',_e => this.fire('selectweek', {day: weekStart}))
 						.on('mousedown',e=>e.stopPropagation()):'',
 					E('span',E('em', day.format( 'j')), day.format( day.getDate() === 1 ?' M' :'')).on('click', _e => {
-						this.fire('dayclick', this, cDay);
+						this.fire('dayclick', {day: cDay});
 					}).on('mousedown', e => { e.stopPropagation()}),
 					E('div','+ 0 more').cls('more').on('click', _e => {
-						this.fire('dayclick', this, cDay);
+						this.fire('dayclick', {day: cDay});
 					}).on('mousedown',e=>e.stopPropagation())
 				).attr('data-date', day.format('Y-m-d'))
 				 .cls('today', day.format('Ymd') === now.format('Ymd'))

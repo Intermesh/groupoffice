@@ -206,39 +206,10 @@ export class DomainTable extends Table<DataSourceStore> {
 		this.rowSelectionConfig =  {
 			multiSelect: true
 		};
-		this.on("rowdblclick", async (table, rowIndex, ev) => {
+		this.on("rowdblclick", async ( {storeIndex}) => {
 			const dlg = new DomainDialog();
 			dlg.show();
-			await dlg.load(table.store.get(rowIndex)!.id);
+			await dlg.load(this.store.get(storeIndex)!.id);
 		});
-
 	}
-
-	// private onStatusBtnClick(allIsWell: boolean, record: DefaultEntity) {
-	// 	let msg = "";
-	// 	if(allIsWell) {
-	// 		msg += t("No DNS problems found!", "community", "maildomains");
-	// 	} else {
-	// 		if (Object.keys(record.dkim).length === 0) {
-	// 			msg += "&bull;&nbsp;" + t("No DKIM records found.") + "<br/>";
-	// 		} else {
-	// 			for (const selector in record.dkim) {
-	// 				if (!record.dkim[selector].status) {
-	// 					msg += "&bull;$nbsp;" + t("Missing or invalid DKIM record for ", "community", "maildomains") +
-	// 						" " + selector + ".<br/>";
-	// 				}
-	// 			}
-	// 		}
-	// 		if (!record.spfStatus) {
-	// 			msg += "&bull;&nbsp;" + t("Missing or invalid SPF TXT record", "community","maildomains") + ".<br>";
-	// 		}
-	// 		if (!record.dmarcStatus) {
-	// 			msg += "&bull;&nbsp;" + t("Missing or invalid DMARC TXT record", "community","maildomains") + ".<br>";
-	// 		}
-	// 		if (!record.mxStatus) {
-	// 			msg += "&bull;&nbsp;" + t("Missing or invalid MX TXT record", "community","maildomains") + ".<br>";
-	// 		}
-	// 	}
-	// 	void Window.alert(msg, t("DNS Status"));
-	// }
 }

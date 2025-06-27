@@ -107,11 +107,10 @@ export class ResourcesWindow extends Window {
 					rowSelectionConfig: {
 						multiSelect: false,
 						listeners: {
-							selectionchange: (tableRowSelect) => {
-								const groupIds = tableRowSelect.getSelected().map((row) => row.record.id);
+							selectionchange: ({selected}) => {
+								const groupIds = selected.map((row) => row.record.id);
 								this.resourceTable!.store.setFilter("group", {groupId: groupIds[0]})
 								void this.resourceTable!.store.load();
-
 							}
 						}
 					},
@@ -168,7 +167,7 @@ export class ResourcesWindow extends Window {
 						'->',
 						searchbtn({
 							listeners: {
-								input: (searchBtn, text) => {
+								input: ( {text}) => {
 									this.resourceTable!.store.setFilter("search", {text: text})
 								}
 							}
@@ -223,10 +222,10 @@ export class ResourcesWindow extends Window {
 							})
 						],
 						listeners: {
-							rowdblclick:(list, storeIndex) => {
+							rowdblclick:( {target, storeIndex}) => {
 								const d = new ResourceWindow();
 								d.show();
-								void d.load(list.store.get(storeIndex)!.id!);
+								void d.load(target.store.get(storeIndex)!.id!);
 							},
 
 							delete: async (_tbl) => {

@@ -4,14 +4,14 @@ import {
 	DateTime,
 	E,
 	tooltip,
-	menu, Format, hr
+	menu, Format, hr, ComponentEventMap
 } from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 import {client,Recurrence} from "@intermesh/groupoffice-core";
 import {t} from "./Index.js";
 
-export abstract class CalendarView extends Component {
+export abstract class CalendarView<EventMap extends ComponentEventMap = ComponentEventMap> extends Component<EventMap> {
 
 	static selectedCalendarId: string
 
@@ -40,8 +40,8 @@ export abstract class CalendarView extends Component {
 	);
 
 	protected contextMenuEmpty = menu({removeOnClose:false, isDropdown: true, listeners: {
-		beforeshow: me => {
-			const btn =me.items.find(item => item.itemId === 'paste');
+		beforeshow: ({target}) => {
+			const btn = target.items.find(item => item.itemId === 'paste');
 			if(btn) {
 				btn.disabled = !CalendarItem.clipboard;
 				btn.text = CalendarItem.clipboard ? t('Paste ','core') + ' '+CalendarItem.clipboard.title : t('Paste ','core');
@@ -113,7 +113,7 @@ export abstract class CalendarView extends Component {
 			div.dataset.key = item.key;
 			if(client.user.calendarPreferences?.showTooltips)
 				tooltip({
-					listeners: { 'render': (me) => {me.html = item.quickText}},
+					listeners: { 'render': ({target}) => {target.html = item.quickText}},
 					target:div
 				});
 		}

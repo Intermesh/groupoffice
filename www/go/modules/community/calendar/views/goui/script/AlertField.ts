@@ -20,8 +20,8 @@ export class AlertField extends SelectField {
 		this.name = 'alerts';
 		this.label = t('Reminder');
 		this.drawOptions();
-		this.on('change',(me,v) => {
-			this.useDefault = (me.control as HTMLSelectElement).value === 'default';
+		this.on('change',({target}) => {
+			this.useDefault = (target.control as HTMLSelectElement).value === 'default';
 		})
 	}
 
@@ -167,4 +167,4 @@ export class AlertField extends SelectField {
 
 }
 
-export const alertfield = (config?: Config<AlertField, FieldEventMap<AlertField>>) => createComponent(new AlertField(), config);
+export const alertfield = (config?: Config<AlertField>) => createComponent(new AlertField(), config);
