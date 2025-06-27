@@ -12,7 +12,7 @@ export class BookmarksColumnView extends Component {
 
 		this.store = store;
 
-		this.store.on("load", (store, bookmarks) => {
+		this.store.on("load", ( {records, target}) => {
 			this.items.clear();
 
 			const container = comp({cls: "flow"});
@@ -20,7 +20,7 @@ export class BookmarksColumnView extends Component {
 			let lastCategoryId = 0;
 			let lastCategoryComp: Component;
 
-			bookmarks.forEach((bookmark) => {
+			records.forEach((bookmark) => {
 				if (bookmark.category.id != lastCategoryId || typeof (lastCategoryComp) == undefined) {
 					lastCategoryComp = comp({
 							cls: "vbox bookmark-column"
@@ -35,8 +35,8 @@ export class BookmarksColumnView extends Component {
 				const bookmarkComp = comp({
 						cls: "hbox bookmark-in-column",
 						listeners: {
-							beforerender: (cmp) => {
-								cmp.el.addEventListener("click", ev => {
+							beforerender: ({target}) => {
+								target.el.addEventListener("click", ev => {
 									ev.preventDefault();
 
 									if (bookmark.openExtern) {
@@ -47,8 +47,8 @@ export class BookmarksColumnView extends Component {
 
 								})
 							},
-							render: (cmp) => {
-								cmp.el.addEventListener("contextmenu", ev => {
+							render: ({target}) => {
+								target.el.addEventListener("contextmenu", ev => {
 									ev.preventDefault();
 
 									const contextMenu = new BookmarkContextMenu(client.user, bookmark);

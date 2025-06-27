@@ -89,12 +89,12 @@ export class Main extends Component {
 				name: "category",
 				placeholder: t("Show all"),
 				listeners: {
-					setvalue: (field, newValue, oldValue) => {
+					setvalue: ( {newValue}) => {
 						this.store.setFilter("categoryId", {categoryId: newValue});
 
 						void this.store.load();
 					},
-					change: (field, newValue, oldValue) => {
+					change: ({newValue}) => {
 						if (newValue === "") {
 							this.store.clearFilter("categoryId");
 
@@ -107,8 +107,8 @@ export class Main extends Component {
 			'->',
 			searchbtn({
 				listeners: {
-					input: (sender, input) => {
-						this.store.setFilter("search", {text: input});
+					input: ( {text}) => {
+						this.store.setFilter("search", {text: text});
 						void this.store.load();
 					}
 				}

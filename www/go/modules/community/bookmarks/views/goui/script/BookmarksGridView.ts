@@ -12,14 +12,14 @@ export class BookmarksGridView extends Component {
 
 		this.store = store;
 
-		this.store.on("load", (store, bookmarks) => {
+		this.store.on("load", ({target, records}) => {
 			this.items.clear();
 
 			const container = comp({cls: "flow"});
 
 			let lastCategoryId = 0;
 
-			bookmarks.forEach((bookmark) => {
+			records.forEach((bookmark) => {
 				if (bookmark.category.id != lastCategoryId) {
 					container.items.add(
 						comp({tagName: "h3", text: bookmark.category.name})
@@ -31,8 +31,8 @@ export class BookmarksGridView extends Component {
 				const bookmarkComp = comp({
 						cls: "bookmark",
 						listeners: {
-							beforerender: (cmp) => {
-								cmp.el.addEventListener("click", ev => {
+							beforerender: ({target}) => {
+								target.el.addEventListener("click", ev => {
 									ev.preventDefault();
 
 									if (bookmark.openExtern) {
@@ -43,8 +43,8 @@ export class BookmarksGridView extends Component {
 
 								})
 							},
-							render: (cmp) => {
-								cmp.el.addEventListener("contextmenu", ev => {
+							render: ({target}) => {
+								target.el.addEventListener("contextmenu", ev => {
 									ev.preventDefault();
 
 									const contextMenu = new BookmarkContextMenu(client.user, bookmark);
