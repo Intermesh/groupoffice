@@ -17,28 +17,18 @@ use go\core\util\ArrayObject;
  */
 
 class EntityFilter extends AclOwnerEntity {
-	
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $id;
-	
-	protected $entityTypeId;
 
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $createdBy;
+	public ?string $id;
 	
-	public $name;
-	
-	protected $filter;
-	
-	public $aclId;
+	protected int $entityTypeId;
 
-	public $type = "fixed";
+	public ?string $createdBy;
+	
+	public string $name;
+	
+	protected ?string $filter = null;
+
+	public string $type = "fixed";
 
 	protected static function defineMapping(): Mapping
 	{

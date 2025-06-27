@@ -30,11 +30,11 @@ class Criteria {
 	 * * String: "col=:val" = (new Criteria())->where("col=:val"); 
 	 * * A Query object is returned as is.
 	 * 
-	 * @param array|string|static $criteria
+	 * @param array|string|static|null $criteria
 	 * @return static
 	 * @throws InvalidArgumentException
 	 */
-	public static function normalize($criteria = null): Criteria
+	public static function normalize(Criteria|array|string|null $criteria = null): Criteria
 	{
 		if (!isset($criteria)) {
 			return new static;

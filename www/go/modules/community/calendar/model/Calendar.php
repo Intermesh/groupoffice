@@ -2,10 +2,12 @@
 namespace go\modules\community\calendar\model;
 
 use go\core\acl\model\AclOwnerEntity;
+use go\core\App;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\http;
 use go\core\model\Principal;
+use go\core\model\User;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\PrincipalTrait;
@@ -29,18 +31,18 @@ class Calendar extends AclOwnerEntity {
 
 	const UserProperties = ['color', 'sortOrder', 'isVisible', 'isSubscribed', 'includeInAvailability'];
 
-	public $id;
+	public ?string $id;
 	/** @var string The user-visible name of the calendar */
-	public $name;
-	public $description;
-	/** @var string Any valid CSS color value. The color to be used when displaying events associated with the calendar */
-	public $color;
-	/** @var int uint32 Defines the sort order of calendars when presented in the client’s UI, so it is consistent between devices */
-	public $sortOrder = 0;
+	public string $name;
+	public ?string $description;
+	/** @var ?string Any valid CSS color value. The color to be used when displaying events associated with the calendar */
+	public ?string $color = null;
+	/** @var ?int uint32 Defines the sort order of calendars when presented in the client’s UI, so it is consistent between devices */
+	public ?int $sortOrder = 0;
 	/** @var bool Has the user indicated they wish to see this Calendar in their client */
-	public $isSubscribed;
+	public ?bool $isSubscribed = null;
 	/** @var bool Should the calendar’s events be displayed to the user at the moment? */
-	public $isVisible = true; // per user
+	public ?bool $isVisible = null; // per user
 	/**
 	 * @var string (default: all) Should the calendar’s events be used as part of availability calculation?
 	 * This MUST be one of:
@@ -48,21 +50,29 @@ class Calendar extends AclOwnerEntity {
 	 *	- attending: events the user is a confirmed or tentative participant of are considered.
 	 *	- none: all events are ignored (but may be considered if also in another calendar).
 	 */
-	public $includeInAvailability;
+	public ?string $includeInAvailability = null;
 
 	/** @var ?string default for event. If NULL client will use the Users default timeZone  */
-	public $timeZone;
+	public ?string $timeZone = null;
 
-	protected $defaultColor;
+	protected ?string $defaultColor = null;
 
-	public $defaultAlertsWithTime;
-	public $defaultAlertsWithoutTime;
-	protected $ownerId;
-	public $createdBy;
-	public $webcalUri;
 
-	public $groupId;
-	protected $highestItemModSeq;
+	/**
+	 * @var DefaultAlert[]
+	 */
+	public array $defaultAlertsWithTime;
+
+	/**
+	 * @var DefaultAlertWT[]
+	 */
+	public array $defaultAlertsWithoutTime;
+	protected ?int $ownerId;
+	public ?string $createdBy;
+	public ?string $webcalUri = null;
+
+	public ?string $groupId;
+	protected ?string $highestItemModSeq;
 
 	protected static function defineMapping(): Mapping
 	{
@@ -87,16 +97,18 @@ class Calendar extends AclOwnerEntity {
 	}
 
 	/** @return int */
-	public static function fetchDefault($scheduleId) {
-		/** @var Preferences $pref */
-		$pref = go()->getAuthState()->getUser(['calendarPreferences'])->calendarPreferences;
-		if(!empty($pref->defaultCalendarId)) {
-			return $pref->defaultCalendarId;
+	public static function fetchDefault($userId) {
+		$user = User::findById($userId, ['calendarPreferences'], true);
+		if(!empty($user)) {
+			/** @var Preferences $pref */
+			$pref = $user->calendarPreferences;
+			if (!empty($pref->defaultCalendarId)) {
+				return $pref->defaultCalendarId;
+			}
 		}
 		// If default preference is empty use the first owned calendar
 		return self::find()->selectSingleValue('calendar_calendar.id')
-			->join('core_user', 'u', 'u.id = calendar_calendar.ownerId')
-			->where(['u.email' => $scheduleId])
+			->where(['calendar_calendar.ownerId' => $userId])
 			->andWhere(['groupId'=>null])
 			->orderBy(['sortOrder'=>'ASC'])
 			->single();
@@ -108,6 +120,14 @@ class Calendar extends AclOwnerEntity {
 
 	public function setColor($value) {
 		$this->color = $value;
+	}
+
+	protected function getDefaultCreatedBy(): ?int
+	{
+		if(!empty($this->ownerId)) {
+			return $this->ownerId;
+		}
+		return parent::getDefaultCreatedBy();
 	}
 
 
@@ -161,7 +181,7 @@ class Calendar extends AclOwnerEntity {
 	protected function internalValidate()
 	{
 		if($this->isNew()) {
-			if($this->webcalUri && !$this->fetchWebcalBlob()) {
+			if(isset($this->webcalUri) && !$this->fetchWebcalBlob()) {
 				$this->setValidationError('webcalUri', 404, 'Could not download webcal file');
 			}
 		}
@@ -170,6 +190,9 @@ class Calendar extends AclOwnerEntity {
 
 	protected function internalSave(): bool
 	{
+		if(!isset($this->defaultColor) && !isset($this->color)) {
+			$this->color = $this->defaultColor = self::randomColor($this->name);
+		}
 		if($this->isNew()) {
 			$this->isSubscribed = true; // auto subscribe the creator.
 			$this->isVisible = true;
@@ -192,6 +215,11 @@ class Calendar extends AclOwnerEntity {
 		if($this->isModified('defaultAlertsWithoutTime')) {
 			$this->updateEventAlerts($this->defaultAlertsWithoutTime, false);
 		}
+		if(empty($this->includeInAvailability) && !$this->isPrincipal()) {
+			// set sane default
+			$this->includeInAvailability = $this->ownerId == go()->getUserId() ? 'all' :
+				(empty($this->ownerId) ? 'attending' : 'none');
+		}
 		$success = parent::internalSave();
 
 		if(!empty($this->webcalBlob)) {
@@ -201,7 +229,8 @@ class Calendar extends AclOwnerEntity {
 		return $success;
 	}
 
-	static function randomColor($seed) {
+	static function randomColor(string $seed): string
+	{
 		srand(crc32($seed));
 		$nb = rand(0,17);
 		return substr('#CDAD00#E74C3C#9B59B6#8E44AD#2980B9#3498DB#1ABC9C#16A085#27AE60#2ECC71#F1C40F#F39C12#E67E22#D35400#95A5A6#34495E#808B96#1652a1',
@@ -299,9 +328,9 @@ class Calendar extends AclOwnerEntity {
 		return CalendarEvent::import([$this->webcalBlob], $this->id, 'ignore');
 	}
 
-	protected function isPrincipal()
+	protected function isPrincipal() : bool
 	{
-		return $this->groupId != null && $this->ownerId != null;
+		return isset($this->groupId) && isset($this->ownerId);
 	}
 
 	protected static function queryMissingPrincipals(int $offset = 0): Query {

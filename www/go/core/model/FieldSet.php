@@ -33,39 +33,37 @@ use go\core\orm\Query;
 class FieldSet extends AclOwnerEntity {
 /**
 	 * The ID
-	 * 
-	 * @var int
 	 */
-	public $id;
+	public ?string $id;
 
-	public $name;
+	public string $name;
 	
-	public $description;
+	public ?string $description;
 	
-	protected $entityId;
+	protected int $entityId;
 	
-	public $sortOrder;
+	public ?int $sortOrder;
 	
 	protected $entity;
 	
 	protected $filter;	
 
-	public $parentFieldSetId;
+	public ?string $parentFieldSetId = null;
 	/**
 	 * Show this fieldset as a tab in clients
 	 * 
 	 * @var bool 
 	 */
-	public $isTab = false;
+	public bool $isTab = false;
 
-	public $collapseIfEmpty;
+	public bool $collapseIfEmpty = false;
 
 	/**
 	 * Amount of columns the fieldset should render.
 	 *
 	 * @var int
 	 */
-	public $columns = 2;
+	public int $columns = 2;
 	
 	/**
 	 * The filter is an object that can be used to show and hide field sets based

@@ -7,8 +7,7 @@ use go\core\orm\Mapping;
 
 final class DefaultClient extends Entity
 {
-	/** @var int */
-	public $id;
+	public ?string $id;
 
 	/**
 	 * @var string

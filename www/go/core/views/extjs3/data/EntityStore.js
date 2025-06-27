@@ -31,7 +31,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		
 		this.addEvents({changes:true, error:true});
 
-		window.groupofficeCore.jmapds(this.entity.name).on('change', (store, changes) => {
+		window.groupofficeCore.jmapds(this.entity.name).on('change', ({changes}) => {
 			this.fireEvent('changes', this, changes.created, changes.updated, changes.destroyed);
 		})
 	},

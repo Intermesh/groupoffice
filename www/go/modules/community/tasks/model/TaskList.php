@@ -40,15 +40,14 @@ class TaskList extends AclOwnerEntity
 		self::Support => 'support'
 	];
 
-	/** @var int */
-	public $id;
+	public ?string $id;
+	public string $name;
 
-	/** @var string */
-	public $name;
+	public int $aclId;
+
+	protected int $role = self::List;
 
 	/** @var string What kind of list: 'list', 'board' */
-	protected $role = self::List;
-
 	public function getRole() : string {
 		return self::Roles[$this->role] ?? 'list';
 	}
@@ -75,8 +74,6 @@ class TaskList extends AclOwnerEntity
 	/** @var int */
 	public $ownerId;
 
-	/** @var int */
-	public $aclId;
 	protected $defaultColor;
 	public $color;
 	public $sortOrder;
@@ -210,6 +207,9 @@ class TaskList extends AclOwnerEntity
 	}
 
 	static function updateHighestModSeq($tasklistId) {
+		if(empty($tasklistId)) {
+			return;
+		}
 		go()->getDbConnection()
 			->update(self::getMapping()->getPrimaryTable()->getName(),
 				['highestItemModSeq' => Task::getState()],

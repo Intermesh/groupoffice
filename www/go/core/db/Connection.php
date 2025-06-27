@@ -9,6 +9,7 @@ use LogicException;
 use PDO;
 use PDOException;
 use PDOStatement;
+use Throwable;
 
 /**
  * The database connection object. It uses PDO to connect to the database.
@@ -160,7 +161,8 @@ class Connection {
 	 * @param Statement $statement
 	 * @return void
 	 */
-	public function cacheStatement(string $name, Statement $statement) {
+	public function cacheStatement(string $name, Statement $statement): void
+	{
 		self::$cachedStatements[$name] = $statement;
 	}
 
@@ -474,7 +476,7 @@ class Connection {
    * ```
    * App::get()->getDbConnection()
    *  ->update("core_state", new \go\core\db\Expression("highestModSeq = highestModSeq + 1"), $query);
-   * ````
+   * ```
    *
    */
 	public function insert(string $tableName, $data, array $columns = []): Statement
@@ -499,7 +501,7 @@ class Connection {
    * @throws DbException
    * @see insert()
    */
-	public function insertIgnore(string $tableName, $data, array $columns = []): Statement
+	public function insertIgnore(string $tableName, Query|array $data, array $columns = []): Statement
 	{
 
 		$queryBuilder = new QueryBuilder($this);
@@ -518,10 +520,10 @@ class Connection {
    *  selected in the correct order.
    *
    * @return Statement
-   * @throws DbException
+   * @throws Throwable
    * @see insert()
    */
-	public function replace(string $tableName, $data, array $columns = []): Statement
+	public function replace(string $tableName, Query|array $data, array $columns = []): Statement
 	{
 
 		$queryBuilder = new QueryBuilder($this);
@@ -535,7 +537,7 @@ class Connection {
    *
    * @param string $tableName
    * @param $data
-   * @param Query|string|array $query {@see Query::normalize()}
+   * @param Query|string|array|null $query {@see Query::normalize()}
    * @return Statement
    * @throws PDOException
    * @example with join
@@ -561,10 +563,10 @@ class Connection {
    *
    * $stmt = App::get()->getDbConnection()->update("test_a", $data, ['id' => 1]);
    * $stmt->execute();
-   * ````
+   * ```
    *
    */
-	public function update(string $tableName, $data, $query = null): Statement
+	public function update(string $tableName, $data, Criteria|array|string|null $query = null): Statement
 	{
 		$query = Query::normalize($query);
 
@@ -574,17 +576,17 @@ class Connection {
 		return $this->createStatement($build);
 	}
 
-  /**
-   * Update but with ignore
-   *
-   * @param $tableName
-   * @param $data
-   * @param null $query
-   * @return Statement
-   * @throws Exception
-   * @see update()
-   */
-	public function updateIgnore($tableName, $data, $query = null): Statement
+	/**
+	 * Update but with ignore
+	 *
+	 * @param $tableName
+	 * @param $data
+	 * @param Criteria|array|string|null $query
+	 * @return Statement
+	 * @throws Exception
+	 * @see update()
+	 */
+	public function updateIgnore($tableName, $data, Criteria|array|string|null $query = null): Statement
 	{
 		$query = Query::normalize($query);
 
@@ -612,7 +614,7 @@ class Connection {
    *
    * @see Query
    */
-	public function select($select = "*"): Query
+	public function select(array|string $select = "*"): Query
 	{
 		$query = new Query();
 		return $query->setDbConnection($this)->select($select);
@@ -640,7 +642,7 @@ class Connection {
 	 *
 	 * @param array $build
 	 * @return Statement
-	 * @throws DbException
+	 * @throws Exception
 	 */
 	public function createStatement(array &$build): Statement
 	{

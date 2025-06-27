@@ -9,8 +9,8 @@ use go\core\orm\Mapping;
  */
 class Account extends AclOwnerEntity {
 	
-	public $id;
-	public $username;
+	public ?string $id;
+	public string $username;
 	
 	protected static function defineMapping(): Mapping
 	{

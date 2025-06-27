@@ -18,60 +18,16 @@ use go\modules\community\bookmarks\controller\Bookmark as GoBookmark;
  */
 
 class Bookmark extends AclItemEntity {
-	
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $id;
 
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $categoryId;
-
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $createdBy;
-
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $name;
-
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $content;
-
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $description;
-
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $logo;
-
-	/**
-	 * 
-	 * @var bool
-	 */							
-	public $openExtern = true;
-
-	/**
-	 * 
-	 * @var bool
-	 */							
-	public $behaveAsModule = false;
+	public ?string $id;
+	public string $categoryId;
+	public ?string $createdBy;
+	public string $name;
+	public string $content;
+	public ?string $description;
+	public ?string $logo;
+	public bool $openExtern = true;
+	public bool $behaveAsModule = false;
 
 	protected static function defineMapping(): Mapping
 	{

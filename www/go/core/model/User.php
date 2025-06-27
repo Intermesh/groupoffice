@@ -122,156 +122,146 @@ class User extends AclItemEntity {
 
 	/**
 	 * The ID
-	 * 
-	 * @var int
 	 */
-	public $id;
+	public ?string $id = null;
 
 	/**
 	 * Username eg. "john"
 	 * @var string
 	 */
-	public $username;
+	public string $username;
 
 	/**
 	 * Display name eg. "John Smith"
 	 * @var string
 	 */
-	public $displayName;
+	public string $displayName;
 
 	/**
 	 * User profile picture blob ID. Can be downloaded via the download endpoint.
 	 *
-	 * @var string
+	 * @var ?string
 	 */
-	public $avatarId;
+	public ?string $avatarId = null;
 
 	/**
 	 * Enabled for login
 	 *
 	 * @var bool
 	 */
-	public $enabled;
+	public bool $enabled = true;
+
 	/**
 	 * E-mail address
 	 * 
 	 * @var string
 	 */
-	public $email;
-
+	public string $email;
 
 	/**
 	 * Flag indicating if the user is allowed to receive newsletters
 	 *
 	 * @var bool
 	 */
-	public $newsletterAllowed = true;
+	public bool $newsletterAllowed = true;
 
 	/**
 	 * Alternative e-mail address for password reset
 	 * 
 	 * @var string
 	 */
-	public $recoveryEmail;
-	protected $recoveryHash;
-	protected $recoverySendAt;
+	public ?string $recoveryEmail;
+	protected ?string $recoveryHash;
+	protected ?DateTime $recoverySendAt;
 	
 	/**
 	 * Login count
 	 * 
 	 * @var int
 	 */
-	public $loginCount;
+	public int $loginCount = 0;
 	
 	/**
 	 * Last login time
 	 * 
-	 * @var DateTime
+	 * @var ?DateTime
 	 */
-	public $lastLogin;
-	
-	/**
-	 *
-	 * @var DateTime
-	 */
-	public $modifiedAt;
-	
-	/**
-	 *
-	 * @var DateTime
-	 */
-	public $createdAt;
+	public ?\DateTimeInterface $lastLogin = null;
+
+	public ?\DateTimeInterface $modifiedAt;
+
+	public ?\DateTimeInterface $createdAt;
 	
 	/**
 	 * Date format
 	 * @var string
 	 */
-	public $dateFormat;
+	public string $dateFormat = "d-m-Y";
 	
 	/**
 	 * Display dates short in lists.
 	 * 
 	 * @var bool
 	 */
-	public $shortDateInList = true;
+	public bool $shortDateInList = true;
 	
 	/**
 	 * Time format
 	 * 
 	 * @var string
 	 */
-	public $timeFormat;
+	public string $timeFormat = "H:i";
 	
 	/**
 	 * char to separate thousands in numbers
 	 * 
 	 * @var string
 	 */
-	public $thousandsSeparator;
+	public string $thousandsSeparator = ".";
 	
 	/**
 	 * Char to separate decimals in numbers
 	 * @var string
 	 */
-	public $decimalSeparator;
+	public string $decimalSeparator = ",";
 	
 	/**
 	 * Currency char
 	 * 
 	 * @var string
 	 */
-	public $currency;
+	public string $currency = "€";
 	
 	/**
 	 * Separator for CSV lists. eg. ; or ,
 	 * @var string
 	 */
-	public $listSeparator;
+	public string $listSeparator = ",";
 	
 	/**
 	 * Separator for text in CSV. eg. '"'
 	 * 
 	 * @var string
 	 */
-	public $textSeparator;
+	public string $textSeparator = '"';
 
 	/**
 	 * Home directory of the user
 	 *
 	 * eg. users/admin
 	 *
-	 * @var string
+	 * @var ?string
 	 */
-	public $homeDir;
+	public ?string $homeDir;
 
 	/**
 	 * When true the user interface will show a confirm dialog before moving item with drag and drop
 	 * @var bool
 	 */
-	public $confirmOnMove;
+	public bool $confirmOnMove = false;
 	
 	
-	public $max_rows_list;
+	public int $max_rows_list = 50;
 
 	/**
 	 *
@@ -282,9 +272,9 @@ class User extends AclItemEntity {
 	/**
 	 * The user timezone
 	 * 
-	 * @var string eg. europe/amsterdam
+	 * @var ?string eg. europe/amsterdam
 	 */
-	public $timezone;
+	public ?string $timezone;
 	public $start_module;
 	public $language;
 	public $theme;
@@ -326,7 +316,7 @@ class User extends AclItemEntity {
 	public $sort_email_Addresses_by_time;
 	public $no_reminders;
 	
-	protected ?DateTime $passwordModifiedAt;
+	protected ?DateTime $passwordModifiedAt = null;
 	public bool $forcePasswordChange = false;
 
 	public function getDateTimeFormat(): string

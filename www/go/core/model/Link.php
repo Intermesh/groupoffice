@@ -57,20 +57,20 @@ class Link extends AclItemEntity
 	/**
 	 * The auto increment primary key
 	 * 
-	 * @var int
+	 * @var ?string
      *
 	 */
-	public $id;
+	public ?string $id;
 
-	protected $fromEntityTypeId;
-	protected $toEntityTypeId;
-	protected $toEntity;
-	protected $fromEntity;	
-	protected $toName;
-	protected $toDescription;
-	public $toSearchId;
+	protected int $fromEntityTypeId;
+	protected int $toEntityTypeId;
+	protected ?string $toEntity;
+	protected ?string $fromEntity;
+	protected ?string $toName;
+	protected ?string $toDescription;
+	public ?string $toSearchId;
 	
-	protected $aclId;
+	protected ?int $aclId;
 
 	public static function joinLinks(\go\core\db\Query $query, Entity|ActiveRecord $fromEntity, int $toEntityId) : \go\core\db\Query {
 
@@ -112,7 +112,7 @@ class Link extends AclItemEntity
 	 * 
 	 * @var int
 	 */
-	public $fromId;
+	public int $fromId;
 	
 	/**
 	 * The entity type of the entity it links from

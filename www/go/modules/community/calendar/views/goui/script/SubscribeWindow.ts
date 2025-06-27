@@ -33,7 +33,7 @@ export class SubscribeWindow extends Window {
 				'->',
 				searchbtn({
 					listeners: {
-						input: (searchBtn, text) => {
+						input: ({text}) => {
 							store.setFilter("search", {text: text})
 							void store.load();
 						}

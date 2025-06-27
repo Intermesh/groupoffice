@@ -19,41 +19,29 @@ class Note extends AclItemEntity {
 
 	/**
 	 * The Entity ID
-	 * 
-	 * @var int
 	 */
-	public $id;
+	public ?string $id;
 
-	public $name;
-	public $content;
-	public $noteBookId;
-	
-	/**
-	 *
-	 * @var DateTime
-	 */
-	public $createdAt;
-	
-	/**
-	 *
-	 * @var DateTime
-	 */
-	public $modifiedAt;
-	public $createdBy;
-	public $modifiedBy;
-	public $filesFolderId;
-	public $password;
+	public string $name;
+	public string $content;
+	public string $noteBookId;
+
+	public ?\DateTimeInterface $createdAt;
+
+	public ?\DateTimeInterface $modifiedAt;
+	public ?string $createdBy;
+	public ?string $modifiedBy;
+	public ?string  $filesFolderId;
+	public ?string $password;
 	
 	use CustomFieldsTrait;
-	
 	use SearchableTrait;
-
 
 	/**
 	 *
 	 * @var string[]
 	 */
-	protected $images = [];
+	protected array $images = [];
 	
 	protected static function defineMapping(): Mapping
 	{

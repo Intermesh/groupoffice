@@ -43,47 +43,19 @@ use go\core\validate\ErrorCode;
 
 class EmailTemplate extends Entity
 {
-
-	/**
-	 * 
-	 * @var int
-	 */
-	public $id;
-
-
-	/**
-	 * 
-	 * @var int
-	 */
-	public $moduleId;
-
-	public $key;
-
-	public $language = "en";
-
-	/**
-	 * 
-	 * @var string
-	 */
-	public $body;
-
-	/**
-	 * 
-	 * @var string
-	 */
-	public $name;
-
-	/**
-	 * 
-	 * @var string
-	 */
-	public $subject;
+	public ?string $id;
+	public ?string $moduleId;
+	public ?string $key = null;
+	public string $language = "en";
+	public string $body;
+	public string $name;
+	public string $subject;
 
 	/**
 	 * 
 	 * @var EmailTemplateAttachment[]
 	 */
-	public $attachments = [];
+	public array $attachments = [];
 
 
 	protected static function defineMapping(): Mapping
@@ -150,10 +122,10 @@ class EmailTemplate extends Entity
 	 */ 
   public function setModule( $module) {
 
-		if(is_int($module)) {
-			$this->moduleId = $module;
-			return;
-		}
+	if(is_numeric($module)) {
+		$this->moduleId = (int) $module;
+		return;
+	}
     $module = Module::findByName($module['package'], $module['name']);
     if(!$module) {
       $this->setValidationError('module', ErrorCode::INVALID_INPUT, 'Module was not found');

@@ -59,7 +59,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 		const alertField = alertfield({
 			hidden:true,
 			listeners:{
-			'change': (me, newValue) => {
+			'change': () => {
 				if(this.item?.data.id) {
 					this.form.submit(); // hoppakee
 				}
@@ -82,7 +82,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 				flex:1,
 				dataSource: this.store,
 				listeners: {
-					'load': (_, data) => {
+					'load': ( {data}) => {
 						const start = new DateTime(data.start);
 						data.end = start.add(new DateInterval(data.duration)).addDays(data.showWithoutTime? -1 : 0).format('c');
 						this.title = data.title;
@@ -100,7 +100,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 							delete data.alerts;
 						}
 					},
-					'beforesave':(_, data) => {
+					'beforesave':( {data}) => {
 						if(alertField.isModified() || !this.item?.data.id) {
 							data.useDefaultAlerts = alertField.useDefault;
 						}
@@ -114,9 +114,9 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 							const c = await calendarStore.dataSource.single(v);
 							return c ? c.name : t('Unknown');
 						},listeners: {
-							'setvalue': (me, v) => {
-								if(v)
-									calendarStore.dataSource.single(v).then(r => {
+							'setvalue': ({newValue}) => {
+								if(newValue)
+									calendarStore.dataSource.single(newValue).then(r => {
 										if(!r) return;
 										this.item!.cal = r;
 										const d = this.item!.data.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;

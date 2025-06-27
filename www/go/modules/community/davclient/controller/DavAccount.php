@@ -34,10 +34,19 @@ class DavAccount extends EntityController {
 	public function sync($params) {
 		set_time_limit(600);
 		$account = model\DavAccount::findById($params['accountId']);
+		$success = false;
+		$collection = null;
 		if(!empty($account)) {
-			$account->sync();
+			if(isset($params['collectionId'])) {
+				if(isset($account->collections[$params['collectionId']])) {
+					$collection = $account->collections[$params['collectionId']];
+					$success = $account->syncCollection($collection);
+				}
+			} else {
+				$success = $account->sync(true); // full sync, incl homeset
+			}
 		}
-		return ['accountId'=>$params['accountId']];
+		return ['accountId'=>$params['accountId'], 'collection'=>$collection, 'success' => $success];
 	}
 
 	protected function canCreate(Entity $entity): bool

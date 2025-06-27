@@ -10,7 +10,7 @@ class OauthClient extends \go\core\jmap\Entity implements ClientEntityInterface
 {
 	use EntityTrait, ClientTrait;
 
-	public $id;
+	public ?string $id;
 
 	protected $secret;
 

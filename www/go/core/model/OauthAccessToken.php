@@ -23,7 +23,7 @@ class OauthAccessToken extends Entity implements AccessTokenEntityInterface
 {
     use AccessTokenTrait, TokenEntityTrait, EntityTrait;
 
-    protected $clientId;
+    protected int $clientId;
 
     protected static function defineMapping(): Mapping
     {

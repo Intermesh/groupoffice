@@ -9,10 +9,10 @@ use go\core\orm\Query;
 
 class NoteBook extends AclOwnerEntity {
 	
-	public $id;
-	public $createdBy;
-	public $name;
-	public $filesFolderId;
+	public ?string $id;
+	public ?string $createdBy;
+	public string $name;
+	public ?string $filesFolderId;
 	
 	protected static function defineMapping(): Mapping
 	{

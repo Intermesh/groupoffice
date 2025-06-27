@@ -12,6 +12,7 @@ use go\core\ErrorHandler;
 use go\core\http\Request;
 use go\core\jmap\Entity;
 use go\core\model\CronJobSchedule;
+use go\core\model\Group;
 use go\core\model\Search;
 use go\core\model\User;
 use go\core\orm\Query;
@@ -237,13 +238,15 @@ class Module extends core\Module
 	/**
 	 * @throws Exception
 	 */
-	public static function onLogin(User $user) {
+	public static function onLogin(User $user): void
+	{
 		$log = new LogEntry();
 		$log->setEntity($user);
 		$log->description = $user->username . ' [' . Request::get()->getRemoteIpAddress() . ']';
 		$log->setAction('login');
 		$log->changes = null;
 		$log->createdBy = $user->id;
+		$log->setAclId($user->findAclId());
 		if(!$log->save()){
 			throw new Exception("Could not save log");
 		}
@@ -252,7 +255,8 @@ class Module extends core\Module
 	/**
 	 * @throws Exception
 	 */
-	public static function onBadLogin($username, User|null $user = null) {
+	public static function onBadLogin($username, User|null $user = null): void
+	{
 		$log = new LogEntry();
 		if(isset($user)) {
 			$log->setEntity($user);

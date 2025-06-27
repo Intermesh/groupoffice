@@ -238,7 +238,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			clearTimeout(this.debounceTimeout);
 			this.debounceTimeout = undefined;
 
-			this.storeCursorPosition();
+			const index = this.getCaretCharacterOffsetWithin();
 			var h = this.getEditorBody().innerHTML;
 			var anchored = Autolinker.link(h, {
 				stripPrefix: false,
@@ -253,14 +253,10 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 				}
 			});
 
-			console.warn(h != anchored);
 			if(h != anchored) {
 
 				this.getEditorBody().innerHTML = anchored;
-				this.restoreCursorPosition();
-			}else
-			{
-				this.forgetCursorPosition();
+				this.setCaretPosition(index);
 			}
 
 			console.warn("autolink");
@@ -268,55 +264,49 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		}, 500);
 	},
 
-	storeCursorPosition : function() {
 
-		var win = this.getWin(),
-			doc = this.getDoc(),
-			sel, range, el, frag, node, lastNode, firstNode;
-
-		sel = win.getSelection();
-		if (sel.getRangeAt && sel.rangeCount) {
-			range = sel.getRangeAt(0);
-
-			el = doc.createElement("div");
-			el.innerHTML = "<span style='display:none' id='go-stored-cursor'></span>";
-			frag = doc.createDocumentFragment();
-			while ((node = el.firstChild)) {
-				lastNode = frag.appendChild(node);
-			}
-			firstNode = frag.firstChild;
-			range.insertNode(frag);
-
-			if (lastNode) {
-				range = range.cloneRange();
-				range.setStartAfter(lastNode);
-				range.setStartBefore(firstNode);
-				// range.collapse(true);
-				sel.removeAllRanges();
-				sel.addRange(range);
-			}
+	getCaretCharacterOffsetWithin: function () {
+		const win = this.getWin(), doc = this.getDoc(), element = this.getEditorBody();
+		let caretOffset = 0;
+		const sel = win.getSelection();
+		if (sel.rangeCount > 0) {
+			const range = sel.getRangeAt(0);
+			const preCaretRange = range.cloneRange();
+			preCaretRange.selectNodeContents(element);
+			preCaretRange.setEnd(range.endContainer, range.endOffset);
+			caretOffset = preCaretRange.toString().length;
 		}
+		return caretOffset;
 	},
 
-	forgetCursorPosition: function() {
-		var cursor = this.getDoc().getElementById("go-stored-cursor");
-		if(cursor) {
-			cursor.remove();
-		}
-	},
+	setCaretPosition: function (offset) {
+		const win = this.getWin(), doc = this.getDoc(), element = this.getEditorBody();
+		let currentOffset = 0;
+		const nodeStack = [element];
+		let node, found = false;
 
-	restoreCursorPosition : function() {
-		var doc = this.getDoc(), sel = this.getWin().getSelection();
-		var cursor = doc.getElementById("go-stored-cursor");
-		if(!cursor) {
-			return false;
+		while (nodeStack.length && !found) {
+			node = nodeStack.pop();
+			if (node.nodeType === Node.TEXT_NODE) {
+				const nextOffset = currentOffset + node.length;
+				if (offset <= nextOffset) {
+					const range = win.document.createRange();
+					range.setStart(node, offset - currentOffset);
+					range.collapse(true);
+					const sel = win.getSelection();
+					sel.removeAllRanges();
+					sel.addRange(range);
+					found = true;
+				} else {
+					currentOffset = nextOffset;
+				}
+			} else {
+				let i = node.childNodes.length;
+				while (i--) {
+					nodeStack.push(node.childNodes[i]);
+				}
+			}
 		}
-		var range = new Range();
-		range.setStart(cursor, 0);
-		range.collapse(true);
-		sel.removeAllRanges();
-		sel.addRange(range);
-		cursor.remove();
 	},
 
 	onDrop: function(e) {

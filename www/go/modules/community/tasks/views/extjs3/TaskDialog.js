@@ -20,6 +20,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 
 		if (!this.currentId && this.commentComposer) {//} && this.role == "support") {
+
+			this.closeOnSubmit = false;
+
 			this.commentComposer.show();
 			this.commentComposer.editor.allowBlank = this.role !== "support";
 			if(this.role === "support") {
@@ -31,8 +34,16 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			})
 
 			this.on("submit", () => {
-				if(this.commentComposer.editor.getValue() != "")
-					this.commentComposer.save(this.role == "support" ? "SupportTicket" : "Task", this.currentId);
+				if(this.commentComposer.editor.getValue() != "") {
+					// we need to use setTimeout otherwise the change event of the Comment entity fires during the store load and
+					// it won't be reloaded.
+					setTimeout(() => {
+						this.commentComposer.save(this.role == "support" ? "SupportTicket" : "Task", this.currentId);
+						this.close();
+					});
+				}else {
+					this.close();
+				}
 			}, {single:true})
 		} else {
 			this.commentComposer.hide();
@@ -365,6 +376,12 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 				title: t("Date"),
 				collapsible: true,
 				collapsed: true,
+				listeners: {
+					expand: () => {
+						//renders invalid when collapsed
+						percentComplete.slider.moveThumb(0, percentComplete.slider.translateValue(percentComplete.getValue()))
+					}
+				},
 				xtype: 'fieldset',
 				defaults: {
 					layout: 'form',
@@ -399,7 +416,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			this.descriptionFieldset = new Ext.form.FieldSet({
 				collapsed: true,
 				collapsible: true,
-				title: t("Description") + " / " + t("Location"),
+				title: t("Description"),
 				xtype: "fieldset",
 				defaults: {
 					anchor: '100%'
@@ -410,13 +427,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						xtype: 'textarea',
 						name: 'description',
 						fieldLabel: t("Description"),
-						grow: true
-
-					}, {
-						xtype: 'textarea',
-						name: 'location',
-						allowBlank: true,
-						fieldLabel: t("Location"),
 						grow: true
 
 					}

@@ -75,9 +75,9 @@ export class AliasDialog extends FormWindow {
 			}
 		});
 
-		this.form.on("beforesave", (f, v) => {
+		this.form.on("beforesave", ({data}) => {
 			if(!this.form.currentId) {
-				v.address = v.address + "@" + this.form.findField("domain")!.value;
+				data.address = data.address + "@" + this.form.findField("domain")!.value;
 			}
 		});
 	}

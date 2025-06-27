@@ -1,3 +1,28 @@
+23-06-2025: 25.0.32
+- LDAPServer: Fix primary key error
+
+20-06-2025: 25.0.31
+- Projects3: Improved finance integration
+- Core: Upgraded SourceGuardian encoder to fully support PHP 8.4
+- CalDAV: Fixed sync problem in tasks and calendar
+- Core: Fixed cursor jump in Firefox
+
+16-06-2025: 25.0.30
+- Calendar: Fixed display issue in e-mail invite
+- Core: Auto dismiss alerts for entities no longer known
+- Timeregistration2: Tasks only querying in subscribed lists
+- Core: PHP 8.4 compatibility
+- Studio: patch generated models with type hinted attributes
+- Studio: generate new models with type hinted attributes
+- Files: Use load() instead of reload() otherwise it might retrash the files as it will send the last load param
+- Core: All model properties have types so keys will always be a string according to JMAP spec
+- Tasks/Core: Fixed invalid change event in tasklist combo where the tasklist name would be the value in the change event
+- Tasks: percent complete render error when hidden
+- Tasks/Support: Fixed comment load on new ticket / task
+- Addressbook: City, state and country in grid
+- Files: only display 'Share' button if any menu items available
+- Core: Clearer label for 'allowRegistration' system setting
+
 05-06-2025: 25.0.29
 - Tasks: Sync subscribed tasklists and remove sync settings
 - Comments: show principal name

@@ -13,12 +13,8 @@ use go\core\orm\Property;
  */
 
 class ContactCustomFields extends Property {
-	
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $id;
+
+	public string $id;
 
 	protected static function defineMapping(): Mapping
 	{

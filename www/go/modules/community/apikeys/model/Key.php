@@ -8,10 +8,10 @@ use go\core\orm\Query;
 use go\core\util\DateTime;
 
 class Key extends Entity {
-	public ?int $id;
+	public ?string $id;
 	public ?string $name;
 	public ?string $accessToken;
-	public ?DateTime $createdAt;
+	public ?\DateTimeInterface $createdAt;
 	
 	protected static function defineMapping(): Mapping
 	{

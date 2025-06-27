@@ -485,15 +485,22 @@ $timeMargin: dp(72);
 			overflow: hidden;
 			height: 24*$hourHeight;
 			//max-height: 1680px;
-			background: linear-gradient(180deg, $colorLine 1px, transparent 1px) repeat-y;
-			background-size: 100% $hourHeight;
+			//background: linear-gradient(180deg, $colorLine 1px, transparent 1px) repeat-y;
+			background-image: repeating-linear-gradient(
+				to bottom,
+				$colorLine 0px,
+				$colorLine 1px,
+				transparent 1px,
+				transparent $hourHeight
+			);
+			//background-size: 100% $hourHeight;
 			border-right: 1px solid $colorLine;
 			&:last-child { border-right: 0;}
 		}
 		> dt { // time display
 			position: initial;
-			background-size: 8px $hourHeight;
-			background-position: top right;
+			//background-size: 8px $hourHeight;
+			//background-position: top right;
 			border-right: 0;
 
 			> em { //time
@@ -557,6 +564,7 @@ $timeMargin: dp(72);
 		pointer-events:none;
 		transition: height 84ms ease-out, top 84ms ease-out;
 	}
+	li.all-days { pointer-events:none; }
 }
 
 .cal.split {
@@ -638,7 +646,7 @@ $timeMargin: dp(72);
 			}
 			span:first-of-type { // time
 				margin-left:dp(8);
-				width: dp(176);
+				width: dp(198);
 			}
 		}
 	}

@@ -21,23 +21,9 @@ class PhoneNumber extends Property {
 	const TYPE_FAX = "fax";
 	const TYPE_WORK_FAX = "workfax";
 
-	/**
-	 * 
-	 * @var int
-	 */							
-	protected $contactId;
-
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $type = 'mobile';
-
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $number;
+	protected int $contactId;
+	public ?string $type = 'mobile';
+	public string $number;
 
 	protected static function defineMapping(): Mapping
 	{

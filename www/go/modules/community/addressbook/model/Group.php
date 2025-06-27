@@ -19,24 +19,10 @@ use go\modules\community\addressbook\model\Contact;
  */
 
 class Group extends AclItemEntity {
-	
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $id;
 
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $addressBookId;
-
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $name;
+	public ?string $id;
+	public string $addressBookId;
+	public string $name;
 
 	protected static function defineMapping(): Mapping
 	{

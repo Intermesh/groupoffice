@@ -4,12 +4,12 @@ import {
 	comp,
 	DateInterval,
 	DateTime,
-	E, EntityID, MaterialIcon, ObjectUtil, root,
+	E, EntityID, Format, MaterialIcon, ObjectUtil, root,
 	tbar, Timezone,
 	win, Window
 } from "@intermesh/goui";
-import {calendarStore, categoryStore, t} from "./Index.js";
-import {client, jmapds, Recurrence} from "@intermesh/groupoffice-core";
+import {calendarStore, CalendarView, categoryStore, statusIcons, t} from "./Index.js";
+import {client, jmapds, Recurrence, RecurrenceField} from "@intermesh/groupoffice-core";
 import {EventWindow} from "./EventWindow.js";
 import {EventDetailWindow} from "./EventDetail.js";
 import {SubscribeWindow} from "./SubscribeWindow";
@@ -34,6 +34,12 @@ export interface CalendarEvent extends BaseEntity {
 	isOrigin: boolean
 	participants?: {[key:string]: any}
 	calendarId: string
+	modifier: any
+	creator: any
+	createdAt: string
+	modifiedAt: string
+	location?:string
+	description?:string
 }
 
 export interface CalendarCategory extends BaseEntity {
@@ -64,6 +70,8 @@ interface CalendarItemConfig {
  * Items are generated in the CalendarAdapter class
  */
 export class CalendarItem {
+
+	static clipboard?: CalendarItem;
 
 	key!: string|null // id/recurrenceId
 	recurrenceId?:string
@@ -232,10 +240,11 @@ export class CalendarItem {
 	}
 
 	get categoryDots() {
+		const dots = [];
 		for (const cat of this.categories) {
-			return [E('i').cls('cat').attr('title',cat.name).css({color: '#'+cat.color})];
+			dots.push(E('i').cls('cat').attr('title',cat.name).css({color: '#'+cat.color}));
 		}
-		return [];
+		return dots;
 	}
 	get icons() {
 		const e = this.data;
@@ -261,6 +270,10 @@ export class CalendarItem {
 				this.data.start = start;
 				this.data.duration = duration;
 				this.open(onCancel); // open dialog
+				// add to invisible calendar
+				if(!this.cal.isVisible) {
+					jmapds('Calendar').update(this.cal.id, {isVisible:true});
+				}
 			}
 		}
 	}
@@ -404,6 +417,73 @@ export class CalendarItem {
 		return (this.cal && this.cal.ownerId) ? this.cal.ownerId+'' : go.User.id+''
 	}
 
+	get quickText(): string {
+		const cal = this.cal ? ('<sup style="color:#'+this.cal.color+';">'+this.cal.name+'</sup>') : '';
+		const lines = [
+			'<h2 style="padding:0;margin:0;">'+this.title+'</h2>'+cal,
+			...this.humanReadableDate(),
+		];
+		if(this.isRecurring) {
+			lines.push(RecurrenceField.toText(this.data.recurrenceRule,this.start));
+		}
+		if(this.participants) {
+			lines.push('<hr>'+t('Participants'));
+			for(const key in this.participants) {
+				const p = this.participants[key],
+					icon = statusIcons[p.participationStatus],
+					 i= '<i class="icon '+icon[2]+'" title="'+icon[1]+'">'+icon[0]+'</i>' ;
+				lines.push(i+' '+(p.name ?? p.email));
+			}
+
+		}
+		if(this.data.creator && this.data.modifier) {
+			lines.push(
+				'<hr>' + t('Created at') + ': ' + Format.smartDateTime(this.data.createdAt) + ' ' + t('by') + ' ' + this.data.creator.name,
+				t('Modified at') + ': ' + Format.smartDateTime(this.data.modifiedAt) + ' ' + t('by') + ' ' + this.data.modifier.name
+			);
+		}
+		if(this.data.location) {
+			lines.push(t('Location')+ ': ' + Format.convertUrisToAnchors(this.data.location));
+		}
+		if(this.data.description)
+			lines.push('<p style="max-width:360px;">'+Format.textToHtml(this.data.description)+'</p>');
+		// status
+		return lines.join('<br>');
+	}
+
+	private humanReadableDate() {
+		const start = this.start;
+		const end = this.end.clone();
+		const oneDay = start.format('Ymd') === end.format('Ymd');
+
+		let line1 = start.format('l j F Y');
+
+		if (!oneDay) {
+			if (!this.data.showWithoutTime) {
+				line1 += ', '+start.format('H:i');
+			}
+			line1 += ' '+t('until');
+		}
+
+		let line2;
+		if (oneDay) {
+			if(!this.data.showWithoutTime) {
+				line2 = `${start.format('H:i')} - ${end.format('H:i')}`;
+			}
+		} else {
+			if(this.data.showWithoutTime) {
+				// if more then 1 day and without time. the day in inclusieve so we remove the last one
+				end.addSeconds(-1);
+			}
+			line2 = end.format('l j F Y');
+			if (!this.data.showWithoutTime) {
+				line2 += `, ${end.format('H:i')}`;
+			}
+		}
+
+		return [line1, line2];
+	}
+
 	private get isInPast() {
 		let lastOccurrence = this.end;
 		if(this.isRecurring && this.data.recurrenceRule) {
@@ -496,7 +576,7 @@ export class CalendarItem {
 					title: t('Do you want to edit a recurring event?'),
 					width:550,
 					modal: true,
-					listeners: {'close': (_me,byUser) => { if(byUser && onCancel) onCancel();  }}
+					listeners: {'close': ({byUser}) => { if(byUser && onCancel) onCancel();  }}
 				},comp({cls: 'pad flow'},
 					comp({tagName:'i',cls:'icon',html:'event_repeat', width:100, style:{fontSize:'3em'}}),
 					comp({html: t('You will be editing a recurring event. Do you want to edit this occurrence only or all future occurrences?'), flex:1}),
@@ -684,6 +764,53 @@ export class CalendarItem {
 				}); // create duplicate
 			if (onFinish) p.then(onFinish);
 		});
+	}
+
+	cut() {
+		CalendarItem.clipboard = this;
+	}
+
+	copy() {
+		const data: any = {};
+		const copyKeys = ['alerts','categoryIds','duration','description', 'freeBusyStatus','location','participants','privacy',
+			'showWithoutTime','start','status','timeZone','title','useDefaultAlerts'];
+		for (const key of copyKeys) { // @ts-ignore
+			data[key] = this.data[key];
+		}
+
+		CalendarItem.clipboard = new CalendarItem({
+			data,
+			key:null,
+			open(this: CalendarItem) { // when opening the copy. just save
+				this.confirmScheduleMessage(data, () => {
+					root.mask();
+					eventDS.create(data).catch(e => {
+						void Window.error(e);
+						throw e;
+					}).then(r => {
+						// to copy again keep the id empty
+						this.data.id = '';
+					}).finally(() => {
+						root.unmask();
+					});
+				});
+			}
+		});
+	}
+
+	static paste(calendarId: string, date: string) {
+		if (!CalendarItem.clipboard!) return;
+		const withoutTime = date.length === 10;
+		let item = CalendarItem.clipboard;
+		if (withoutTime) { // keep orig time
+			const [y, m, d] = date.split('-').map(Number);
+			item.start.setYear(y).setMonth(m).setDate(d);
+		} else {
+			item.start = new DateTime(date);
+		}
+		item.end = item.start.clone().add(new DateInterval(item.data.duration));
+		item.data.calendarId = calendarId;
+		item.save();
 	}
 
 	remove() {

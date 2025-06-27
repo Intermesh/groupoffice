@@ -13,30 +13,12 @@ use go\core\orm\Query;
  */
 
 class Category extends AclOwnerEntity {
-	
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $id;
 
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $createdBy;
+	public ?string $id;
 
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $aclId;
+	public ?string $createdBy;
 
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $name;
+	public string $name;
 
 	protected static function defineMapping(): Mapping
 	{
