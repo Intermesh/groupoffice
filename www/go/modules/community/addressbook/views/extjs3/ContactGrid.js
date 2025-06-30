@@ -175,7 +175,13 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(220),
 					sortable: true,
 					dataIndex: 'name',
-					hidden: this.enabledColumns.indexOf('name') == -1
+					hidden: this.enabledColumns.indexOf('name') == -1,
+					renderer: function (v, meta, record) {
+						if(record.get("color")) {
+							meta.attr = 'style="color: #' + record.get("color") + ';"';
+						}
+						return v;
+					}
 				},
 				{
 					hidden: this.enabledColumns.indexOf('gender') == -1,
