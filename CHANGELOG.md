@@ -1,3 +1,5 @@
+- Files: fix external link to folder in folder panel
+
 20-06-2025: 6.8.128
 - Core: Fixed cursor jump in Firefox
 
