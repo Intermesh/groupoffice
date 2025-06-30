@@ -1,9 +1,10 @@
+30-06-2025: 25.0.33
 - Files: fix external link to folder in folder panel
 - Support: new icon for link to prevent confusion with old tickets module
 - Core / email: Improved converting url to anchors so text cursor won't jump to last line
 - Address book: Contact color back in grid
 
-- 23-06-2025: 25.0.32
+23-06-2025: 25.0.32
 - LDAPServer: Fix primary key error
 
 20-06-2025: 25.0.31
