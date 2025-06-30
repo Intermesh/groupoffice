@@ -1,4 +1,5 @@
 - Files: fix external link to folder in folder panel
+- Support: new icon for link to prevent confusion with old tickets module
 
 23-06-2025: 25.0.32
 - LDAPServer: Fix primary key error
