@@ -266,8 +266,9 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 *
 	 * @return string
 	 */
-	public function getExternalURL(){
-		return \GO::createExternalUrl("files", "showFolder", array($this->id));
+	public function getExternalURL(): string
+	{
+		return \GO::config()->orig_full_url . '#folder/' .$this->id;
 	}
 
 	public function getFolderIdsInPath($folder_id){
