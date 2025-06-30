@@ -35,6 +35,9 @@ class MailStore extends Store implements ISearchProvider {
 			//$this->imap_reopenFolder($folderid);
 
 			$imap = $this->_imapLogon();
+			if(!$imap) {
+				return false;
+			}
 
 			//remove m/ from the combined stuff
 			if (!empty($folderid)) {
