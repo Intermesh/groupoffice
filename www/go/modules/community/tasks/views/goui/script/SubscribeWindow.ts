@@ -22,7 +22,7 @@ export class SubscribeWindow extends Window {
 				"->",
 				searchbtn({
 					listeners: {
-						input: (sender, text) => {
+						input: ({text}) => {
 							(this.tasklistGrid.store.queryParams.filter as Filter).text = text;
 							void this.tasklistGrid.store.load();
 						}

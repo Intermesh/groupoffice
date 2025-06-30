@@ -89,7 +89,7 @@ export class ContinueTaskDialog extends FormWindow {
 			)
 		);
 
-		this.form.on("beforesave", (form, data) => {
+		this.form.on("beforesave", ({data}) => {
 			data.alerts = [{
 				trigger: {when: this.alertDatePicker.value.format("Y-m-d") + " " + this.alertTime.value}
 			}];

@@ -32,7 +32,7 @@ export class ImportTaskDialog extends Window {
 				this.importIDFromFileCheckBox = checkbox({
 					label: t("Import list ID from CSV file"),
 					listeners: {
-						change: (cb, newValue, oldValue) => {
+						change: ({newValue}) => {
 							this.tasklistGrid.disabled = newValue;
 						}
 					}
@@ -42,7 +42,7 @@ export class ImportTaskDialog extends Window {
 				"->",
 				searchbtn({
 					listeners: {
-						input: (sender, text) => {
+						input: ({text}) => {
 							(this.tasklistGrid.store.queryParams.filter as Filter).text = text;
 							void this.tasklistGrid.store.load();
 						}
@@ -91,8 +91,8 @@ export class ImportTaskDialog extends Window {
 					rowSelectionConfig: {
 						multiSelect: false,
 						listeners: {
-							selectionchange: (rowSelect) => {
-								const tasklistId = rowSelect.getSelected().map((row) => row.record.id)[0];
+							selectionchange: ({target}) => {
+								const tasklistId = target.getSelected().map((row) => row.record.id)[0];
 
 								if (tasklistId) {
 									this.selectedTasklistId = tasklistId;

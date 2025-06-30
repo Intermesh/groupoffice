@@ -39,13 +39,13 @@ export class TaskCategoryChips extends AutocompleteChips<Table<DataSourceStore>>
 			chip.text = record!.name;
 		};
 
-		this.on("autocomplete", (field, input) => {
-			(field.list.store.filter as Filter).text = input;
-			void field.list.store.load();
+		this.on("autocomplete", ({target, input}) => {
+			(target.list.store.filter as Filter).text = input;
+			void target.list.store.load();
 		});
 
-		this.on("render", (field) => {
-			void field.list.store.load();
+		this.on("render", ({target}) => {
+			void target.list.store.load();
 		});
 	}
 }

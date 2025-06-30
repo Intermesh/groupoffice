@@ -47,7 +47,7 @@ export class TaskDialog extends FormWindow {
 		this.collapsible = true;
 		this.resizable = true;
 
-		this.form.on("save", (form, data, isNew) => {
+		this.form.on("save", ({data}) => {
 			router.goto("tasks/" + data.id)
 		});
 
@@ -79,7 +79,7 @@ export class TaskDialog extends FormWindow {
 						name: "tasklistId",
 						required: true,
 						listeners: {
-							change: async (field, newValue, oldValue) => {
+							change: async ({newValue}) => {
 								if (!newValue) {
 									return
 								}
@@ -162,7 +162,7 @@ export class TaskDialog extends FormWindow {
 							name: "start",
 							flex: 1,
 							listeners: {
-								change: (field, newValue, oldValue) => {
+								change: ({newValue}) => {
 
 									if (!newValue) {
 										this.recurrenceField.disabled = true;
@@ -286,9 +286,9 @@ export class TaskDialog extends FormWindow {
 									withTime: true,
 									flex: 2,
 									listeners: {
-										render: (field) => {
-											if (!field.value && this.startDate.value) {
-												field.value = this.startDate.value;
+										render: ({target}) => {
+											if (!target.value && this.startDate.value) {
+												target.value = this.startDate.value;
 											}
 										}
 									}

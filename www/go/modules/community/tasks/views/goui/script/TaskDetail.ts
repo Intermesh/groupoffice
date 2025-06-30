@@ -41,8 +41,8 @@ export class TaskDetail extends DetailPanel {
 									cls: "status tasks-status-" + v,
 									html: ProgressType[v as keyof typeof ProgressType],
 									listeners: {
-										render: (cmp) => {
-											cmp.el.addEventListener("click", ev => {
+										render: ({target}) => {
+											target.el.addEventListener("click", ev => {
 												ev.preventDefault();
 
 												const changeMenu = menu({isDropdown: true});
@@ -175,7 +175,7 @@ export class TaskDetail extends DetailPanel {
 			)
 		);
 
-		this.on("load", (detailPanel, entity) => {
+		this.on("load", ({entity}) => {
 			this.title = entity.title;
 
 			this.editBtn.disabled = (entity.permissionLevel < go.permissionLevels.write);

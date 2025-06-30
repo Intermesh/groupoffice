@@ -53,10 +53,10 @@ export class TaskGrid extends Table<DataSourceStore> {
 					id: "complete",
 					hidable: false,
 					listeners: {
-						change: async (col, checkbox, value, record, storeIndex) => {
+						change: async ({record, checked}) => {
 							this.mask();
 							try {
-								await jmapds("Task").update(record.id, {progress: (value ? 'completed' : 'needs-action')})
+								await jmapds("Task").update(record.id, {progress: (checked ? 'completed' : 'needs-action')})
 							} catch (e) {
 								void Window.error(e);
 							} finally {
@@ -270,7 +270,7 @@ export class TaskGrid extends Table<DataSourceStore> {
 					width: 100,
 					renderer: (columnValue) => {
 						if (parseInt(columnValue) > 0) {
-							return Format.duration(columnValue, false);
+							return Format.duration(columnValue);
 						}
 						return "";
 					},
@@ -280,9 +280,9 @@ export class TaskGrid extends Table<DataSourceStore> {
 			]
 		);
 
-		this.on("rowdblclick", async (table, rowIndex, ev) => {
+		this.on("rowdblclick", async ({target, storeIndex}) => {
 			const dlg = new TaskDialog();
-			await dlg.load(table.store.get(rowIndex)!.id);
+			await dlg.load(target.store.get(storeIndex)!.id);
 			dlg.show();
 		});
 

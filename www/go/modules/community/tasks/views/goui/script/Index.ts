@@ -12,7 +12,7 @@ if (tester) {
 		async init() {
 
 			let  tasks: Main;
-			client.on("authenticated", (client, session) => {
+			client.on("authenticated", ({session}) => {
 				if (!session.capabilities["go:community:tasks"]) {
 					return;
 				}

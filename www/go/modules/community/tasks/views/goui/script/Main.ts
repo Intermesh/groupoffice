@@ -73,8 +73,8 @@ export class Main extends MainThreeColumnPanel {
 				rowSelectionConfig: {
 					multiSelect: false,
 					listeners: {
-						selectionchange: (rowSelect) => {
-							const value = rowSelect.getSelected().map((row) => row.record.value)[0];
+						selectionchange: ({target}) => {
+							const value = target.getSelected().map((row) => row.record.value)[0];
 
 							const filters: Record<string, Filter> = {
 								today: {start: "<=now"},
@@ -100,7 +100,7 @@ export class Main extends MainThreeColumnPanel {
 					value: true,
 					label: t("Show completed"),
 					listeners: {
-						change: (field, newValue, oldValue) => {
+						change: ({newValue}) => {
 							this.taskGrid.store.setFilter("completed", newValue ? {} : {complete: false});
 							void this.taskGrid.store.load();
 						}
@@ -133,7 +133,7 @@ export class Main extends MainThreeColumnPanel {
 				"->",
 				searchbtn({
 					listeners: {
-						input: (sender, text) => {
+						input: ({text}) => {
 							(this.taskListGrid.store.queryParams.filter as Filter).text = text;
 							void this.taskListGrid.store.load();
 						}
@@ -172,8 +172,8 @@ export class Main extends MainThreeColumnPanel {
 					rowSelectionConfig: {
 						multiSelect: true,
 						listeners: {
-							selectionchange: (tableRowSelect) => {
-								const taskListIds = tableRowSelect.getSelected().map((row) => row.record.id);
+							selectionchange: ({target}) => {
+								const taskListIds = target.getSelected().map((row) => row.record.id);
 
 								this.taskGrid.store.queryParams.filter = {
 									taskListId: taskListIds
@@ -187,7 +187,7 @@ export class Main extends MainThreeColumnPanel {
 						checkboxselectcolumn({
 							id: "check",
 							listeners: {
-								render: (column1, result, record, storeIndex, td) => {
+								render: ({result, record}) => {
 									const checkbox = result as CheckboxField;
 									checkbox.color = "#" + record.color;
 								}
@@ -263,8 +263,8 @@ export class Main extends MainThreeColumnPanel {
 					rowSelectionConfig: {
 						multiSelect: true,
 						listeners: {
-							selectionchange: (tableRowSelect) => {
-								const categoryIds = tableRowSelect.getSelected().map((row) => row.record.id);
+							selectionchange: ({target}) => {
+								const categoryIds = target.getSelected().map((row) => row.record.id);
 
 								this.taskGrid.store.queryParams.filter = {
 									categories: categoryIds
@@ -318,10 +318,10 @@ export class Main extends MainThreeColumnPanel {
 			})
 		);
 
-		this.taskListGrid.on("drop", async (toComponent, toIndex, fromIndex, droppedOn, fromComp, dragDataSet) => {
-			const fromTable = fromComp as Table;
+		this.taskListGrid.on("drop", async ({toIndex, fromIndex, source, target}) => {
+			const fromTable = source as Table;
 
-			const tasklist = toComponent.store.get(toIndex);
+			const tasklist = target.store.get(toIndex);
 			const task = fromTable.store.get(fromIndex);
 
 			if (tasklist && task) {
@@ -343,8 +343,8 @@ export class Main extends MainThreeColumnPanel {
 		this.taskGrid.rowSelectionConfig = {
 			multiSelect: true,
 			listeners: {
-				selectionchange: (tableRowSelect) => {
-					const taskIds = tableRowSelect.getSelected().map((row) => row.record.id);
+				selectionchange: ({target}) => {
+					const taskIds = target.getSelected().map((row) => row.record.id);
 
 					if (taskIds[0]) {
 						router.goto("tasks/" + taskIds[0]);
@@ -366,7 +366,7 @@ export class Main extends MainThreeColumnPanel {
 				"->",
 				searchbtn({
 					listeners: {
-						input: (sender, text) => {
+						input: ({text}) => {
 							(this.taskGrid.store.queryParams.filter as Filter).text = text;
 							void this.taskGrid.store.load();
 						}
