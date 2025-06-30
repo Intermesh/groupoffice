@@ -2,6 +2,7 @@
 namespace go\core\model;
 
 use DateInterval;
+use DateTimeInterface;
 use DateTimeZone;
 use Exception;
 use go\core\auth\BaseAuthenticator;
@@ -22,15 +23,15 @@ class Token extends Entity {
 	
 	/**
 	 * The token that identifies the user in the login process.
-	 * @var string
+	 * @var ?string
 	 */							
-	public $loginToken;
+	public ?string $loginToken;
 	
 	/**
 	 * The token that identifies the user. Sent in HTTPOnly cookie.
-	 * @var string
+	 * @var ?string
 	 */							
-	public $accessToken;
+	public ?string $accessToken;
 
 	/**
 	 * Cross Site Request Forgery token
@@ -41,40 +42,39 @@ class Token extends Entity {
 	 *
 	 * @var string
 	 */
-	public $CSRFToken;
+	public ?string $CSRFToken;
 
 	/**
 	 * 
 	 * @var int
 	 */							
-	public $userId;
+	public ?string $userId;
 
 	/**
 	 * Time this token expires. Defaults to one day after the token was created {@see LIFETIME}
 	 * @var ?DateTime
 	 */							
-	public $expiresAt;
+	public ?DateTimeInterface $expiresAt = null;
 	
 	/**
 	 *
 	 * @var DateTime
 	 */
-	public $createdAt;
+	public ?DateTimeInterface $createdAt;
 
 	/**
 	 * FK to the core_client table
 	 *
-	 * @var int
 	 */
-	public $clientId;
+	public ?string $clientId;
 
 	/**
 	 *
 	 * When the user was last active. Updated every 5 minutes.
 	 * 
-	 * @var DateTime
+	 * @var ?DateTimeInterface
 	 */
-	public $lastActiveAt;
+	public ?DateTimeInterface $lastActiveAt;
 
 	/**
 	 * | separated list of "core_auth" id's that are successfully applied 
@@ -133,7 +133,7 @@ class Token extends Entity {
 	 */
 	public function activity(): bool
 	{
-		if($this->lastActiveAt < new DateTime("-1 mins", new DateTimeZone("UTC"))) {
+		if(!isset($this->lastActiveAt) || $this->lastActiveAt < new DateTime("-1 mins", new DateTimeZone("UTC"))) {
 			$this->lastActiveAt = new DateTime("now", new DateTimeZone("UTC"));
 
 			//also refresh token
@@ -306,7 +306,7 @@ class Token extends Entity {
 	public function setAuthenticated(bool $increaseLogins = true): bool
 	{
 		
-		$user = $this->getUser(['loginCount', 'lastLogin', 'language']);
+		$user = $this->getUser(['username','displayName', 'email', 'loginCount', 'lastLogin', 'language']);
 
 		if(!$this->refresh()) {
 			return false;

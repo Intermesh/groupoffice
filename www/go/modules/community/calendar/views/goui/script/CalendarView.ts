@@ -3,17 +3,19 @@ import {
 	Component,
 	DateTime,
 	E,
-	menu
+	tooltip,
+	menu, Format, hr, ComponentEventMap
 } from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 import {client,Recurrence} from "@intermesh/groupoffice-core";
 import {t} from "./Index.js";
 
-export abstract class CalendarView extends Component {
+export abstract class CalendarView<EventMap extends ComponentEventMap = ComponentEventMap> extends Component<EventMap> {
 
 	static selectedCalendarId: string
 
+	protected currentCreation?: CalendarItem
 	protected day: DateTime = new DateTime()
 	protected days: number = 1
 	protected firstDay?: DateTime
@@ -21,6 +23,11 @@ export abstract class CalendarView extends Component {
 	protected contextMenu = menu({removeOnClose:false, isDropdown: true},
 		//btn({icon:'open_with', text: t('Show'), handler:_ =>alert(this.current!.data.id)}),
 		btn({icon:'edit', text: t('Edit','core','core'), handler: _ => this.current!.open()}),
+		hr(),
+		btn({icon:'delete', text: t('Delete','core'), handler: _ => this.current!.remove() }),
+		btn({icon:'content_cut', text: t('Cut','core'), handler: _ => this.current!.cut() }),
+		btn({icon:'content_copy', text: t('Copy','core'), handler: _ => this.current!.copy() }),
+		hr(),
 		btn({icon:'email', text: t('E-mail participants'), handler: _ => {
 				if (this.current!.data.participants){
 					go.showComposer({to: Object.values(this.current!.data.participants).map((p:any) => p.email)});
@@ -28,8 +35,41 @@ export abstract class CalendarView extends Component {
 			}
 		}),
 		//'-',
-		btn({icon:'delete', text: t('Delete','core'), handler: _ => this.current!.remove() }),
+
 		btn({icon: 'import_export', text: t('Download ICS'), handler: _ => this.current!.downloadIcs() })
+	);
+
+	protected contextMenuEmpty = menu({removeOnClose:false, isDropdown: true, listeners: {
+		beforeshow: ({target}) => {
+			const btn = target.items.find(item => item.itemId === 'paste');
+			if(btn) {
+				btn.disabled = !CalendarItem.clipboard;
+				btn.text = CalendarItem.clipboard ? t('Paste ','core') + ' '+CalendarItem.clipboard.title : t('Paste ','core');
+			}
+		}}},
+		btn({icon:'add', text: t('Appointment'), handler: _ => {
+			const date = this.contextMenuEmpty.dataSet.date;
+			let start;
+			if (date.length > 10) {
+				start = new DateTime(date);
+			} else {
+				const [y, m, d] = date.split('-').map(Number);
+				start = new DateTime(); // time = now
+				start.setYear(y).setMonth(m).setDate(d);
+			}
+			(new CalendarItem({key:'',data:{
+				start:start.format('Y-m-d\TH:00:00.000'),
+				title: t('New event'),
+				showWithoutTime: client.user.calendarPreferences?.defaultDuration == null,
+				duration: client.user.calendarPreferences?.defaultDuration ?? "P1D",
+				calendarId: CalendarView.selectedCalendarId
+			}})).save()
+		}}),
+		// btn({icon:'add', text: t('Reminder'), handler: _ => { console.warn('todo:reminder'); }}),
+		hr(),
+		btn({itemId:'paste',icon:'content_paste', text: t('Paste ','core'), handler: _ => {
+			CalendarItem.paste(CalendarView.selectedCalendarId, this.contextMenuEmpty.dataSet.date)
+		}})
 	);
 
 	protected selected: CalendarItem[] = []
@@ -57,9 +97,9 @@ export abstract class CalendarView extends Component {
 		if(!div) { // default
 			const time = E('span');
 			if(!e.showWithoutTime) {
-				time.append(item.start.format('G:i'));
+				time.append(Format.time(item.start));
 				if(item.dayLength > 1) {
-					time.append(item.end.format(' - G:i'));
+					time.append(' - ',Format.time(item.end));
 				}
 			}
 			div = E('div',
@@ -71,6 +111,11 @@ export abstract class CalendarView extends Component {
 		}
 		if(item.key) {
 			div.dataset.key = item.key;
+			if(client.user.calendarPreferences?.showTooltips)
+				tooltip({
+					listeners: { 'render': ({target}) => {target.html = item.quickText}},
+					target:div
+				});
 		}
 		return div.cls('allday',e.showWithoutTime)
 			.cls('declined', item.isDeclined || item.isCancelled)
@@ -148,6 +193,16 @@ export abstract class CalendarView extends Component {
 			top: top.toFixed(2)+'rem',
 			color: '#'+e.color
 		};
+	}
+
+	protected drawEventLine(e: CalendarItem, weekstart: DateTime) {
+		if(!e.divs[weekstart.format('YW')]) {
+			e.divs[weekstart.format('YW')] = this.eventHtml(e);
+		}
+		return e.divs[weekstart.format('YW')]
+			.css(this.makestyle(e, weekstart))
+			//.attr('style',this.makestyle(e, weekstart))
+			.cls('continues', weekstart.diff(e.start).getTotalDays()! < 0)
 	}
 
 	abstract renderView(): void;

@@ -6,7 +6,7 @@ modules.register({
 	package: "community",
 	name: "comments",
 	async init() {
-		client.on("authenticated", (client, session) => {
+		client.on("authenticated", ( {session}) => {
 			if (!session.capabilities["go:community:comments"]) {
 				// User does not have access to this module
 				return;

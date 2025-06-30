@@ -13,35 +13,16 @@ use go\core\validate\ErrorCode;
 
 final class Alias extends AclItemEntity
 {
-
-	/** @var int */
-	public $id;
-
-	/** @var int */
-	public $domainId;
-
-	/** @var string */
-	public $address;
-
-	/** @var string */
-	public $goto;
-
-	/** @var int */
-	public $createdBy;
-
-	/** @var DateTime */
-	public $createdAt;
-
-	/** @var int */
-	public $modifiedBy;
-
-	/** @var DateTime */
-	public $modifiedAt;
-
-	/** @var bool */
-	public $active = true;
-
-	private $domain = null;
+	public ?string $id;
+	public ?string $domainId;
+	public string $address;
+	public string $goto;
+	public ?string $createdBy;
+	public ?\DateTimeInterface $createdAt;
+	public ?string $modifiedBy;
+	public ?\DateTimeInterface $modifiedAt;
+	public bool $active = true;
+	private ?Domain $domain = null;
 
 	/**
 	 * @inheritDoc

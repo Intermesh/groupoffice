@@ -533,3 +533,8 @@ DELETE l FROM core_link l
 DELETE l FROM core_link l
 	JOIN core_entity et ON et.id = l.toEntityTypeId AND et.name = 'CalendarEvent'
 	LEFT JOIN cal_events e on e.id = l.toId WHERE e.id IS NULL;
+
+-- set new entity id for existing alerts
+DELETE a FROM core_alert a
+	JOIN core_entity et ON et.id = a.entityTypeId AND et.name = 'CalendarEvent'
+	LEFT JOIN cal_events e on e.id = a.entityId WHERE e.id IS NULL;

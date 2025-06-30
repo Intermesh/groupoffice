@@ -20,7 +20,7 @@ export class NoteBookGrid extends Table<DataSourceStore> {
 		const store = datasourcestore<JmapDataSource<NoteBook>>({
 			dataSource: jmapds("NoteBook"),
 			listeners: {
-				load: (store, records, append) => {
+				load: () => {
 					const defaultNoteBookIds: any[] = [];
 
 					if (!client.user.notesSettings.rememberLastItems) {

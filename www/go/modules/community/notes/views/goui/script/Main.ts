@@ -9,7 +9,7 @@ import {
 	menu,
 	searchbtn,
 	t,
-	tbar, Button, hr
+	tbar, Button, hr, checkbox, h3
 } from "@intermesh/goui";
 import {MainThreeColumnPanel, filterpanel, jmapds, client} from "@intermesh/groupoffice-core";
 import {notebookgrid, NoteBookGrid} from "./NoteBookGrid";
@@ -40,14 +40,19 @@ export class Main extends MainThreeColumnPanel {
 			tbar({
 					cls: "border-bottom"
 				},
-				comp({
-					tagName: "h3",
-					text: "Notebooks",
-					flex: 1
+				checkbox({
+					listeners: {
+						change: ( {newValue}) => {
+							const rs = this.noteBookGrid.rowSelection!
+							newValue ? rs.selectAll() : rs.clear();
+						}
+					}
 				}),
+				h3(t("Notebooks")),
+				"->",
 				searchbtn({
 					listeners: {
-						input: (sender, text) => {
+						input: ( {text}) => {
 							(this.noteBookGrid.store.queryParams.filter as Filter).text = text;
 							this.noteBookGrid.store.load();
 						}
@@ -66,20 +71,21 @@ export class Main extends MainThreeColumnPanel {
 				flex: 1,
 				cls: "scroll"
 			}, this.noteBookGrid = notebookgrid({
+				headers: false,
 				fitParent: true,
 				cls: "no-row-lines",
 				rowSelectionConfig: {
 					multiSelect: true,
 					listeners: {
-						selectionchange: (tableRowSelect) => {
+						selectionchange: ({selected}) => {
 
-							const noteBookIds = tableRowSelect.getSelected().map((row) => row.record.id);
+							const noteBookIds = selected.map((row) => row.record.id);
 
 							this.noteGrid.store.queryParams.filter = {
 								noteBookId: noteBookIds
 							};
 
-							this.noteGrid.store.load();
+							void this.noteGrid.store.load();
 
 							this.addButton.disabled = !noteBookIds[0];
 
@@ -142,9 +148,9 @@ export class Main extends MainThreeColumnPanel {
 		this.noteGrid.rowSelectionConfig = {
 			multiSelect: true,
 			listeners: {
-				selectionchange: (tableRowSelect) => {
-					if (tableRowSelect.getSelected().length == 1) {
-						const record = tableRowSelect.getSelected()[0].record;
+				selectionchange: ({selected}) => {
+					if (selected.length == 1) {
+						const record = selected[0].record;
 
 						if (record) {
 							router.goto("notes/" + record.id);
@@ -182,7 +188,7 @@ export class Main extends MainThreeColumnPanel {
 				"->",
 				searchbtn({
 					listeners: {
-						input: (sender, text) => {
+						input: ( {text}) => {
 							this.noteGrid.store.setFilter("search", {text});
 							void this.noteGrid.store.load();
 						}

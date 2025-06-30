@@ -14,36 +14,12 @@ use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
 
 final class Oauth2Client extends Entity
 {
-
-	/**
-	 * @var int
-	 */
-	public $id;
-
-	/**
-	 * @var string
-	 */
-	public $name;
-
-	/**
-	 * @var int
-	 */
-	public $defaultClientId;
-
-	/**
-	 * @var string
-	 */
-	public $clientSecret;
-
-	/**
-	 * @var string
-	 */
-	public $clientId;
-
-	/**
-	 * @var string
-	 */
-	public $projectId;
+	public ?string $id;
+	public string $name;
+	public ?string $defaultClientId;
+	public string $clientSecret;
+	public string $clientId;
+	public ?string $projectId;
 
 
 	/**

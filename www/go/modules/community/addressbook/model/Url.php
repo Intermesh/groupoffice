@@ -21,24 +21,9 @@ class Url extends Property {
 	const TYPE_INSTAGRAM = "instagram";
 	const TYPE_TIKTOK = "tiktok";
 
-
-	/**
-	 * 
-	 * @var int
-	 */							
-	protected $contactId;
-	
-	/**
-	 *
-	 * @var string
-	 */
-	public $type;
-
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $url;
+	protected int $contactId;
+	public string $type;
+	public string $url;
 
 	protected static function defineMapping(): Mapping
 	{

@@ -1,4 +1,5 @@
 import {
+	a,
 	avatar, browser, btn,
 	comp,
 	Component,
@@ -21,7 +22,7 @@ export class CommentList extends Component {
 			dataSource: jmapds("Comment"),
 			sort: [{property: "date", isAscending: true}],
 			listeners: {
-				load: (store, comments) => {
+				load: ( {records}) => {
 					this.items.clear();
 
 					this.scroller = comp({
@@ -34,7 +35,7 @@ export class CommentList extends Component {
 
 					let lastDate: string;
 
-					comments.forEach((comment) => {
+					records.forEach((comment) => {
 						let currentDate = Format.date(comment.date);
 
 						if (!lastDate || currentDate !== lastDate) {
@@ -54,8 +55,8 @@ export class CommentList extends Component {
 								cls: "go-detail-view-avatar",
 								itemId: "avatar-container",
 								listeners: {
-									render: (a) => {
-										a.el.onclick = () => {
+									render: ({target}) => {
+										target.el.onclick = () => {
 											router.goto("contact", comment.creator.id)
 										}
 									}
@@ -99,11 +100,11 @@ export class CommentList extends Component {
 							title: commentTitle,
 							html: comment.text,
 							listeners: {
-								beforerender: (cmp) => {
-									imgPromises.push(Image.replaceImages(cmp.el));
+								beforerender: ({target}) => {
+									imgPromises.push(Image.replaceImages(target.el));
 
 									// Enlarge images when clicked in window
-									cmp.el.addEventListener("click", (e) => {
+									target.el.addEventListener("click", (e) => {
 										if (e.target && (e.target as HTMLElement).tagName == "IMG") {
 											const img = e.target as HTMLImageElement
 
@@ -124,12 +125,12 @@ export class CommentList extends Component {
 														justifyContent: "center"
 													},
 													listeners: {
-														beforerender: (w) => {
+														beforerender: ({target}) => {
 															const i = img.cloneNode() as HTMLImageElement;
 															i.style.height = "100%";
 															i.style.width = "100%";
 															i.style.objectFit = "contain";
-															w.el.appendChild(i);
+															target.el.appendChild(i);
 														}
 													}
 												})
@@ -140,8 +141,8 @@ export class CommentList extends Component {
 										}
 									});
 								},
-								render: (cmp) => {
-									cmp.el.addEventListener("contextmenu", ev => {
+								render: ({target}) => {
+									target.el.addEventListener("contextmenu", ev => {
 										ev.preventDefault();
 
 										const contextMenu = menu({

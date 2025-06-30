@@ -6,7 +6,7 @@ modules.register({
 	package: "community",
 	name: "bookmarks",
 	async init() {
-		client.on("authenticated", (client, session) => {
+		client.on("authenticated", ( {session}) => {
 			if(!session.capabilities["go:community:bookmarks"]) {
 				// User has no access to this module
 				return;

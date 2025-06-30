@@ -36,7 +36,7 @@ export class Main extends Component {
 		this.items.add(
 			this.west = this.createWest(),
 			splitter({
-				resizeComponentPredicate: "west"
+				resizeComponent: this.west
 			}),
 			this.center = this.createCenter()
 		)
@@ -59,7 +59,7 @@ export class Main extends Component {
 				daterangefield({
 					label: t("Date"),
 					listeners: {
-						change: (field, newValue, oldValue) => {
+						change: ({newValue}) => {
 							void this.logEntryGrid.store.setFilter("createdAt", {createdAt: newValue}).load();
 						}
 					}
@@ -71,8 +71,8 @@ export class Main extends Component {
 					placeholder: t("All users"),
 					required: false,
 					listeners: {
-						select: (field, record) => {
-							this.logEntryGrid.store.setFilter("user", {createdBy: field.value});
+						select: ({target, record}) => {
+							this.logEntryGrid.store.setFilter("user", {createdBy:target.value});
 							void this.logEntryGrid.store.load();
 						}
 					}
@@ -99,8 +99,8 @@ export class Main extends Component {
 					return [comp({}, checkbox({
 							label: v.label,
 							listeners: {
-								change: (field, newValue, oldValue) => {
-									const record = list.store.find((i) => i.label == field.label);
+								change: ({target, newValue}) => {
+									const record = list.store.find((i) => i.label == target.label);
 
 									if (newValue) {
 										this.selectedActions.push(record!.id);
@@ -140,7 +140,7 @@ export class Main extends Component {
 				"->",
 				searchbtn({
 					listeners: {
-						input: (sender, text) => {
+						input: ({text}) => {
 							this.logEntryGrid.store.setFilter("search", {text});
 							void this.logEntryGrid.store.load();
 						}

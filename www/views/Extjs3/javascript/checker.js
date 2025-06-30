@@ -22,7 +22,6 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			run: this.checkForNotifications,
 			scope:this,
 			interval: GO.settings.config.checker_interval*1000
-						 // interval: 10000 // debug / test config
 		});
 		this.initReminders();
 
@@ -230,6 +229,12 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 						this.callbacks[id].callback.call(this.callbacks[id].scope, this, result[id]);
 					}
 				}
+			},
+			failure: function(response, opts) {
+				//silently ignore
+				console.error('server-side failure with status code ' + response.status);
+				console.error(response);
+
 			},
 			scope:this
 		});

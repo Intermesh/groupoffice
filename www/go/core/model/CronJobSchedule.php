@@ -4,6 +4,7 @@ namespace go\core\model;
 
 use Cron\CronExpression;
 use DateTime as CoreDateTime;
+use DateTimeInterface;
 use go\core\ErrorHandler;
 use go\core\jmap\Entity;
 use go\core\model\Module as ModuleModel;
@@ -19,54 +20,32 @@ class CronJobSchedule extends Entity
 
 	/**
 	 * The Entity ID
-	 * 
-	 * @var int
 	 */
-	public $id;
+	public ?string $id;
 
-	/**
-	 * @var int
-	 */
-	public $moduleId;
+	public string $moduleId;
 	/**
 	 * @var string
 	 */
-	public $description;
+	public ?string $description;
 	/**
 	 * @var string
 	 */
-	public $name;
+	public string $name;
 	/**
 	 * @var string
 	 */
-	public $expression;
+	public string $expression;
 	/**
 	 * @var bool
 	 */
-	public $enabled = true;
+	public bool $enabled = true;
 
-	/**
-	 *
-	 * @var DateTime
-	 */
-	public $nextRunAt;
+	public ?DateTimeInterface $nextRunAt;
+	public ?DateTimeInterface $lastRunAt;
+	public ?DateTimeInterface $runningSince;
 
-	/**
-	 *
-	 * @var DateTime
-	 */
-	public $lastRunAt;
-	
-	/**
-	 *
-	 * @var DateTime
-	 */
-	public $runningSince;
-
-	/**
-	 * @var string
-	 */
-	public $lastError;
+	public ?string $lastError;
 	
 	protected static function defineMapping(): Mapping
 	{

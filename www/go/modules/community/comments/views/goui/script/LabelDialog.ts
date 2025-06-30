@@ -49,8 +49,8 @@ export class LabelDialog extends Window {
 							name: "name",
 							value: value,
 							listeners: {
-								change: (t) => {
-									jmapds("CommentLabel").update(record.id, {name: t.value});
+								change: ({newValue}) => {
+									jmapds("CommentLabel").update(record.id, {name: newValue});
 								}
 							}
 						})
@@ -66,8 +66,8 @@ export class LabelDialog extends Window {
 							name: "color",
 							value: value,
 							listeners: {
-								change: (c) =>{
-									jmapds("CommentLabel").update(record.id, {color: c.value});
+								change: ({newValue}) =>{
+									jmapds("CommentLabel").update(record.id, {color: newValue});
 								}
 
 							}

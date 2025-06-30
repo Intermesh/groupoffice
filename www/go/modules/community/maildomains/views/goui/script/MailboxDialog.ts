@@ -72,15 +72,15 @@ export class MailboxDialog extends FormWindow {
 						},
 						required: true,
 						listeners: {
-							validate: (fld) => {
-								const v = fld.value as string, l = v.length,
-									minValidationLength = fld.required ? 0 : 1;
+							validate: ({target}) => {
+								const v = target.value as string, l = v.length,
+									minValidationLength = target.required ? 0 : 1;
 								if (l >= minValidationLength && l < minPasswordLength) {
-									fld.setInvalid(t("The minimum length for this field is {max}").replace("{max}", minPasswordLength));
+									target.setInvalid(t("The minimum length for this field is {max}").replace("{max}", minPasswordLength));
 								}
 								const vc = this.passwordConfirmFld.value as string;
 								if (vc && vc.length > 0 && v !== vc) {
-									fld.setInvalid(t("The passwords do not match"));
+									target.setInvalid(t("The passwords do not match"));
 								}
 							}
 						}
@@ -95,11 +95,11 @@ export class MailboxDialog extends FormWindow {
 							minlength: minPasswordLength,
 						},
 						listeners: {
-							validate: (fld) => {
-								const v = fld.value as string, l = v.length,
-									minValidationLength = fld.required ? 0 : 1;
+							validate: ({target}) => {
+								const v = target.value as string, l = v.length,
+									minValidationLength = target.required ? 0 : 1;
 								if (l >= minValidationLength && l < minPasswordLength) {
-									fld.setInvalid(t("The minimum length for this field is {max}").replace("{max}", minPasswordLength));
+									target.setInvalid(t("The minimum length for this field is {max}").replace("{max}", minPasswordLength));
 								}
 								const vc = this.passwordFld.value as string;
 								if (vc && vc.length > 0 && v !== vc) {
@@ -167,17 +167,17 @@ export class MailboxDialog extends FormWindow {
 
 								listeners: {
 
-									beforesetvalue: (field,e) => {
+									beforesetvalue: (e) => {
 										if(e.value == "0") {
 											e.value = {enabled: false, days: 30}
 										} else {
 											e.value = {enabled: true, days: parseInt(e.value.substring(0, e.value.length-1))}
 										}
-										field.findField("days")!.disabled = !e.value.enabled;
+										e.target.findField("days")!.disabled = !e.value.enabled;
 
 									},
 
-									beforegetvalue: (field, e) => {
+									beforegetvalue: ( e) => {
 
 										if(!e.value.enabled) {
 											e.value = "0";
@@ -193,8 +193,8 @@ export class MailboxDialog extends FormWindow {
 								value: true,
 								name: "enabled",
 								listeners: {
-									change:(field, newValue, oldValue) => {
-										const p = field.nextSibling()!
+									change:( {newValue, target}) => {
+										const p = target.nextSibling()!
 										p.disabled = !newValue;
 										p.nextSibling()!.disabled = !newValue;
 									},
@@ -202,8 +202,6 @@ export class MailboxDialog extends FormWindow {
 							}),
 
 							p({text: t("Automatically delete mail from the Trash and Spam folder after a period of time.")}),
-
-
 
 							numberfield({
 								flex: 1,
@@ -239,16 +237,16 @@ export class MailboxDialog extends FormWindow {
 			this.form.trackReset();
 		});
 
-		this.form.on("beforesave", (_f, v) => {
+		this.form.on("beforesave", ({data}) => {
 
 			if(this.form.currentId) {
-				if(v.password && v.password.length === 0) {
-					delete v.password;
+				if(data.password && data.password.length === 0) {
+					delete data.password;
 				}
 			} else {
-				v.username += "@" + this.form.findField("domain")!.value;
+				data.username += "@" + this.form.findField("domain")!.value;
 			}
-			delete v.passwordConfirm;
+			delete data.passwordConfirm;
 		})
 	}
 }

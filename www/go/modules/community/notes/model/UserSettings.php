@@ -16,27 +16,19 @@ class UserSettings extends Property {
 	 * 
 	 * @var int
 	 */
-	public $userId;
+	public int $userId;
 	
 	/**
 	 * Default Note book ID
-	 * 
-	 * @var int
 	 */
-	protected $defaultNoteBookId;
+	protected ?int $defaultNoteBookId;
 
 	/**
 	 * @var bool
 	 */
-	public $rememberLastItems = true;
+	public bool $rememberLastItems = true;
 
-	/** @var string */
-	protected $lastNoteBookIds;
-
-	/**
-	 * @return Mapping
-	 * @throws \ReflectionException
-	 */
+	protected ?string $lastNoteBookIds;
 
 	protected static function defineMapping(): Mapping
 	{

@@ -24,7 +24,7 @@ export class NoteBookCombo extends AutocompleteField<NoteBookGrid> {
 		this.label = t("Notebook");
 		this.name = "noteBookId";
 
-		this.on("autocomplete", async (field, input) => {
+		this.on("autocomplete", async ( {input}) => {
 			this.list.store.queryParams = {filter: {text: input}};
 			await this.list.store.load();
 		});

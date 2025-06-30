@@ -13,6 +13,7 @@ use PDO;
 use PDOException;
 use PDOStatement;
 use stdClass;
+use Throwable;
 
 /**
  * PDO Statement
@@ -145,7 +146,7 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, Iter
 
 		try {
 			return $this->pdoStmt->bindValue($param, $value, $type);
-		} catch(\Throwable $e) {
+		} catch(PDOException $e) {
 			ErrorHandler::logException($e, "Invalid value for '" . $param . "'" . var_export($value, true));
 			throw $e;
 		}

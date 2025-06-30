@@ -42,7 +42,7 @@ export class BookmarksDialog extends FormWindow {
 					placeholder: "https://example.com",
 					required: true,
 					listeners: {
-						change: async (field, newValue, oldValue) => {
+						change: async ( {newValue}) => {
 							this.mask();
 
 							await client.jmap("community/bookmarks/Bookmark/description", {
@@ -91,7 +91,7 @@ export class BookmarksDialog extends FormWindow {
 				this.logoHiddenField = hiddenfield({
 					name: "logo",
 					listeners: {
-						setvalue: async (field, newValue, oldValue) => {
+						setvalue: async ( {newValue}) => {
 							const blobURL = await client.getBlobURL(newValue);
 
 							this.logoButton.style = {
@@ -130,7 +130,7 @@ export class BookmarksDialog extends FormWindow {
 					name: "behaveAsModule",
 					label: t("Behave as a module (Browser reload required)"),
 					listeners: {
-						change: (field, newValue, oldValue) => {
+						change: ( {newValue}) => {
 							this.newTabCheckbox["disabled"] = newValue;
 
 							if (newValue) {

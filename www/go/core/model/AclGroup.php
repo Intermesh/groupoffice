@@ -15,20 +15,20 @@ use go\core\orm\Property;
  */
 class AclGroup extends Property {
 	
-	protected $aclId;
+	protected int $aclId;
 	
-	public $groupId;
+	public int $groupId;
 	
 	/**
 	 * The level of access see. The LEVEL_* constants in Acl
 	 * 
 	 * @var int
 	 */
-	public $level;
+	public int $level;
 	
-	protected $grantModSeq;
+	protected ?string $grantModSeq;
 	
-	protected $revokeModSeq;
+	protected ?string $revokeModSeq;
 	
 	protected static function defineMapping(): Mapping
 	{

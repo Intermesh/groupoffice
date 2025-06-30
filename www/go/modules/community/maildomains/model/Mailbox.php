@@ -19,8 +19,8 @@ final class Mailbox extends AclItemEntity
 {
 	const EVENT_PASSWORD_VERIFIED = 'passwordverified';
 
-	public ?int $id;
-	public int $domainId;
+	public ?string $id;
+	public string $domainId;
 	public string $username;
 	protected ?string $password;
 
@@ -65,9 +65,9 @@ final class Mailbox extends AclItemEntity
 	 */
 	public string $autoExpunge = "30d";
 	public int $createdBy;
-	public DateTime $createdAt;
+	public \DateTimeInterface $createdAt;
 	public ?int $modifiedBy;
-	public ?DateTime $modifiedAt;
+	public ?\DateTimeInterface $modifiedAt;
 	public bool $active = true;
 
 	/**

@@ -13,18 +13,9 @@ use go\core\orm\Property;
  */
 
 class ContactGroup extends Property {
-	
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $contactId;
 
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $groupId;
+	public string $contactId;
+	public string $groupId;
 
 	protected static function defineMapping(): Mapping
 	{

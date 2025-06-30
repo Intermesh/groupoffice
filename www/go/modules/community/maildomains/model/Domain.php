@@ -2,22 +2,20 @@
 
 namespace go\modules\community\maildomains\model;
 
+use DateTimeInterface;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
-use go\core\jmap\Request;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
-use go\core\orm\SearchableTrait;
 use go\core\util\ArrayObject;
-use go\core\util\DateTime;
 use go\modules\community\maildomains\util\DnsCheck;
 
 final class Domain extends AclOwnerEntity
 {
 
-	public ?int $id;
-	public ?int $userId;
+	public ?string $id;
+	public ?string $userId;
 	public string $domain;
 	public string|null $description;
 
@@ -36,22 +34,20 @@ final class Domain extends AclOwnerEntity
 
 	/**
 	 * Max assignable quota in bytes
-	 *
-	 * @var int
 	 */
-	public int $totalQuota = 0;
+	public float $totalQuota = 0;
 
 	/**
 	 * Default quota in bytes
 	 */
-	public int $defaultQuota = 0;
+	public float $defaultQuota = 0;
 
 	public string $transport;
 	public bool $backupMx = false;
 	public ?int $createdBy;
-	public ?DateTime $createdAt;
+	public ?DateTimeInterface $createdAt;
 	public int $modifiedBy;
-	public ?DateTime $modifiedAt;
+	public ?DateTimeInterface $modifiedAt;
 
 	/** @var boolean */
 	public bool $active = true;
@@ -72,12 +68,12 @@ final class Domain extends AclOwnerEntity
 	/**
 	 * Used quota in bytes
 	 */
-	public ?int $sumUsedQuota;
+	public ?float $sumUsedQuota;
 
 	/**
 	 * Disk usage in bytes
 	 */
-	public ?int $sumUsage;
+	public ?float $sumUsage;
 
 	public bool $checkDNS = false;
 

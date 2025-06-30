@@ -11,7 +11,7 @@ use go\core\util\DateTime;
 
 class Client extends Property
 {
-	public $id;
+	public ?int $id;
 	public $deviceId = '-';
 	public $platform;
 	public $name;
@@ -72,6 +72,8 @@ class Client extends Property
 				$ua_info = \donatj\UserAgent\parse_user_agent();
 				$this->platform = $ua_info['platform'] ?? '-';
 				$this->name = $ua_info['browser'] ?? '-';
+
+				$this->cutPropertiesToColumnLength();
 
 			}else if(Environment::get()->isCli()) {
 				$this->version = 'CLI';

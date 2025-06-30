@@ -25,6 +25,7 @@ export class PreferencesPanel extends Component {
 			containerfield({name:'calendarPreferences'},
 				fieldset({},
 					checkbox({name:'showWeekNumbers', label:t('Show week numbers in calendar')}),
+					checkbox({name:'showTooltips', label:t('Show pop-up info when hovering over appointments')}),
 					checkbox({name:'showDeclined', label: t('Show events that you have declined')}),
 					select({name:'defaultCalendarId', label: t('Default calendar'), store: calendarStore, valueField: 'id',
 						hint: t('Invitation to event will be added into this calendar')}),
@@ -54,7 +55,7 @@ export class PreferencesPanel extends Component {
 				fieldset({legend:t('Process e-mail in')+': '+client.user.email},
 					checkbox({name:'autoAddInvitations',label:t('Automatically add invitation to your calendar'),
 						hint: t('Whenever an event invitation is received, add the event to your default calendar'),
-						listeners: {'setvalue': b => {b.nextSibling()!.hidden = !b.value}}}),
+						listeners: {'setvalue': ({target}) => {target.nextSibling()!.hidden = !target.value}}}),
 					checkbox({name:'markReadAndFileAutoAdd', style:{marginLeft: '2.4rem'}, label:t('Mark invitation as read and archive'),hidden:true
 						//,listeners: {'setvalue': b => {b.nextSibling()!.hidden = !b.value}}
 					}),
@@ -62,7 +63,7 @@ export class PreferencesPanel extends Component {
 
 					checkbox({name:'autoUpdateInvitations', label: t('Automatically apply updates from organizer'),
 						hint: t('Whenever an update to an event already in your calendar is received, update the event, or delete it if the event is cancelled'),
-						listeners: {'setvalue': b => {b.nextSibling()!.hidden = !b.value}}}),
+						listeners: {'setvalue': ({target}) => {target.nextSibling()!.hidden = !target.value}}}),
 					checkbox({name:'markReadAndFileAutoUpdate', style:{marginLeft: '2.4rem'}, label:t('Mark updates as read and archive'),hidden:true
 						//,listeners: {'setvalue': b => {b.nextSibling()!.hidden = !b.value}}
 					})

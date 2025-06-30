@@ -449,7 +449,7 @@ namespace go\core {
 				"frameAncestors" => "",
 				"theme" => "Paper",
 				"allow_themes" => true,
-				"file_storage_path" => '/home/groupoffice',
+				"file_storage_path" => '/var/lib/groupoffice',
 				"tmpdir" => sys_get_temp_dir() . '/groupoffice',
 				"debug" => false,
 				"debugEmail" => false,

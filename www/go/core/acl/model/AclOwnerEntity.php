@@ -26,10 +26,10 @@ abstract class AclOwnerEntity extends AclEntity {
 	 *
 	 * @var int
 	 */
-	protected $aclId;
+	protected int $aclId;
 
 
-	public static $aclColumnName = 'aclId';
+	public static string $aclColumnName = 'aclId';
 
 	protected function internalSave(): bool
 	{
@@ -65,7 +65,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	/**
 	 * @throws Exception
 	 */
-	protected function createAcl() {
+	protected function createAcl() : void {
 
 		// Copy the default one. When installing the default one can't be accessed yet.
 		// When ACL has been provided by the client don't copy the default.
@@ -147,7 +147,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	protected function internalGetPermissionLevel() : int
 	{
 
-		if($this->isNew() && !$this->{static::$aclColumnName}) {
+		if($this->isNew() && !isset($this->{static::$aclColumnName})) {
 			return parent::internalGetPermissionLevel();
 		}
 
@@ -214,7 +214,7 @@ abstract class AclOwnerEntity extends AclEntity {
 		return (new Query)->selectSingleValue(static::$aclColumnName)->distinct()->from($firstTable->getName());
 	}
 
-	public function findAclId(): ?int {
+	public function findAclId(): int {
 		return $this->{static::$aclColumnName};
 	}
 

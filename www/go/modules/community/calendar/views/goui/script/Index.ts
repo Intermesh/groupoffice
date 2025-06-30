@@ -204,7 +204,7 @@ modules.register(  {
 
 		addEmailAction();
 
-		client.on("authenticated",  (client, session) => {
+		client.on("authenticated",  ({session}) => {
 
 			// OLD CODE
 			async function showBadge() {

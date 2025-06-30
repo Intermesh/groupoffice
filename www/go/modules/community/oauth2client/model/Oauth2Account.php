@@ -7,16 +7,10 @@ use go\core\orm\Property;
 
 final class Oauth2Account extends Property
 {
+	public ?string $accountId;
 
-	/**
-	 * @var int
-	 */
-	public $accountId;
 
-	/**
-	 * @var int
-	 */
-	public $oauth2ClientId;
+	public ?string $oauth2ClientId;
 
 	/**
 	 * @var string

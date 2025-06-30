@@ -127,7 +127,7 @@ export class CommentsPanel extends Component {
 
 	public static addToDetail(detailPanel:DetailPanel) {
 		const comments = new CommentsPanel(detailPanel.entityName);
-		detailPanel.on("load", (detailPanel, entity) => {
+		detailPanel.on("load", ( {entity}) => {
 			comments.load(entity.id);
 		})
 		detailPanel.scroller.items.add(comments);
