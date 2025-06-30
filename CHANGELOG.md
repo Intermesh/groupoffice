@@ -1,3 +1,5 @@
+- Tasks / support: make location field available in grid.
+
 30-06-2025: 6.8.129
 - Files: fix external link to folder in folder panel
 - Core / email: Improved converting url to anchors so text cursor won't jump to last line
