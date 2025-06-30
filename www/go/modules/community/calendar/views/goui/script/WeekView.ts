@@ -28,6 +28,11 @@ export class WeekView extends CalendarView {
 					const i = this.dayItems.indexOf(item as CalendarDayItem);
 					if(i > -1) {
 						item.remove();
+					} else { // search in full day items
+						const i = this.viewModel.indexOf(item);
+						if(i > -1) {
+							item.remove();
+						}
 					}
 				});
 			}
