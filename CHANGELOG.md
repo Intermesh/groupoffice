@@ -1,5 +1,6 @@
 - Files: fix external link to folder in folder panel
-
+- Core / email: Improved converting url to anchors so text cursor won't jump to last line
+- 
 23-06-2025: 25.0.32
 - LDAPServer: Fix primary key error
 
