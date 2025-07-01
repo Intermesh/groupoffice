@@ -28,9 +28,10 @@ Ext.override(Ext.form.TimeField, {
  * 
  * @type Number
  */
-GO.util.density = GO.util.isMobileOrTablet() ? 160 : 140;
+GO.util.density = GO.util.isMobileOrTablet() ? 1 : 0.875;
 function dp(size) {
-	size = ((size * GO.util.density) / 160);
+	// set in User.js: const Density = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('font-size').trim()) / 10;
+	size *= GO.util.density;// ((size * GO.util.density) / 160);
 	if(size > 20) {
 		return Math.ceil(size);
 	} else {

@@ -241,7 +241,7 @@ class Extjs3 {
 		return $themes;
 	}
 
-	private $theme;
+	private $theme = 'Paper';
 
 	public function getTheme() {
 		if(!isset($this->theme)) {

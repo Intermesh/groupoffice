@@ -6,7 +6,7 @@ namespace GO\Base\View;
 
 class Theme{
 
-	private $name;
+	private $name = 'Paper';
 	/**
 	 * Get the name of the theme that is selected by the user.
 	 * 
