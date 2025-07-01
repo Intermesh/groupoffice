@@ -3184,8 +3184,12 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			
 			//change ACL owner
 			if($this->aclField() && !$this->getIsJoinedAclField() && $this->isModified('user_id')) {
-				$this->acl->ownedBy = $this->user_id;
-				$this->acl->save();
+				$acl = $this->acl;
+				if($acl) {
+					$acl->ownedBy = $this->user_id;
+					$acl->save();
+				}
+
 			}
 
 

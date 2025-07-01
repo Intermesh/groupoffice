@@ -34,6 +34,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 			},
 			'estimatedDuration',
 			'timeBooked',
+				'location',
 			'permissionLevel'
 		];
 
@@ -296,7 +297,16 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 						return '';
 					},
 					groupable: false
-				}
+				},{
+				id:"location",
+				header: t("Location", "tasks", 'community' ),
+				dataIndex: 'location',
+				align: "right",
+				hidden: true,
+				width: dp(100),
+				groupable: false,
+				sortable: false
+			}
 			];
 
 
