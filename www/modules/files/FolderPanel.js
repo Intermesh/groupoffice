@@ -11,28 +11,9 @@ GO.files.FolderPanel = Ext.extend(GO.DisplayPanel,{
 		GO.files.showFolderPropertiesDialog(this.link_id+"");
 	},
 
-	// createTopToolbar : function(){
-	// 	var tbar = GO.files.FolderPanel.superclass.createTopToolbar.call(this);
-
-	// 	tbar.splice(1,1,{
-	// 		iconCls: 'btn-settings',
-	// 		text: t("Properties"),
-	// 		cls: 'x-btn-text-icon',
-	// 		handler: function(){
-	// 			GO.files.showFolderPropertiesDialog(this.link_id+"");
-	// 		},
-	// 		scope: this
-	// 	});
-
-	// 	return tbar;
-	// },
 
 	setData : function(data)
 	{
-//		this.setTitle(data.name);
-	
-		// this.topToolbar.items.items[0].setVisible(false);
-
 		GO.files.FolderPanel.superclass.setData.call(this, data);
 	},
 
@@ -46,11 +27,12 @@ GO.files.FolderPanel = Ext.extend(GO.DisplayPanel,{
 					'<tr>'+
 						'<td colspan="2" class="display-panel-heading">'+t("Folder", "files")+': {path}</td>'+
 					'</tr>'+
+			'<tpl if="!GO.util.empty(url)">'+
 					'<tr>'+
 						'<td>URL:</td>'+
 						'<td><a target="_blank" href="{url}">'+t("Right click to copy", "files")+'</a></td>'+
 					'</tr>'+
-
+			'</tpl>'+
 					'<tpl if="!GO.util.empty(comment)">'+
 						'<tr>'+
 							'<td colspan="2" class="display-panel-heading">'+t("Comments", "files")+'</td>'+

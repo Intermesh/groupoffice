@@ -1,3 +1,19 @@
+- Calendar: fixed 12-hour time format
+
+30-06-2025: 25.0.33
+- Files: fix external link to folder in folder panel
+- Support: new icon for link to prevent confusion with old tickets module
+- Core / email: Improved converting url to anchors so text cursor won't jump to last line
+- Address book: Contact color back in grid
+- Calendar: Delete full day event from weekview with Delete key works
+- Calendar: Drag and drop full day event in weekview
+- Calendar: Make calendar visible when new event is created
+- Calendar: Fix weekview horizontal lines aligned for Safari.
+- Calendar: When invites are inserted the calendar of the email account owner will be used.
+- Calendar: If user has no default calendar selecter the invite will be safed in the first owned calendar
+- Calendar: When updating invites all the calendar owned by the user will be searched for the event.
+- Calendar: Added location to html of invite emails and fixed translation.
+
 23-06-2025: 25.0.32
 - LDAPServer: Fix primary key error
 
@@ -5,7 +21,10 @@
 - Projects3: Improved finance integration
 - Core: Upgraded SourceGuardian encoder to fully support PHP 8.4
 - CalDAV: Fixed sync problem in tasks and calendar
+- CalDAV: Added collections to sync a single calendar.
+- CalDAV: Show sync error in the account dialog per account or per calendar.
 - Core: Fixed cursor jump in Firefox
+- Calendar: Fixed Windows scaling issues in weekview.
 
 16-06-2025: 25.0.30
 - Calendar: Fixed display issue in e-mail invite
@@ -22,6 +41,12 @@
 - Addressbook: City, state and country in grid
 - Files: only display 'Share' button if any menu items available
 - Core: Clearer label for 'allowRegistration' system setting
+- Calendar: Added include in availability option for calendars with owner based default.
+- Calendar: Added popup windows with event details when hovering over the event and a setting to turn them off.
+- Calendar: Fixed render glitch when added new event in weekview before existing events.
+- Calendar: Participant field description is now "Add participant or resource"
+- Calendar: Added color column for calendar resources. remove add approve until it is supported.
+- Calendar: Resource group owner will have manage permission to the resources in the group by default.
 
 05-06-2025: 25.0.29
 - Tasks: Sync subscribed tasklists and remove sync settings

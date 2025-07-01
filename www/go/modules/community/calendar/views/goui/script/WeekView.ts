@@ -28,6 +28,11 @@ export class WeekView extends CalendarView {
 					const i = this.dayItems.indexOf(item as CalendarDayItem);
 					if(i > -1) {
 						item.remove();
+					} else { // search in full day items
+						const i = this.viewModel.indexOf(item);
+						if(i > -1) {
+							item.remove();
+						}
 					}
 				});
 			}
@@ -51,10 +56,6 @@ export class WeekView extends CalendarView {
 		if(!day) {
 			day = new DateTime();
 		}
-		// if(day.format('Ymd') === this.day.format('Ymd') && this.days === amount) {
-		// 	this.update();
-		// 	return;
-		// }
 
 		this.days = amount;
 		this.day = day.setHours(0,0,0,0);
@@ -62,16 +63,6 @@ export class WeekView extends CalendarView {
 		// 	endWeek = startWeek.clone().addDays(7);
 		this.renderView();
 		this.adapter.goto(day, day.clone().addDays(amount));
-
-		// Object.assign(this.store.queryParams.filter ||= {}, {
-		// 	after: day.format('Y-m-d'),
-		// 	before: day.clone().addDays(amount).format('Y-m-d')
-		// });
-		//
-		// this.store.load();
-		//this.store.filter('date', {after: day.to('Y-m-dT00:00:00'), before: end.to('Y-m-dT00:00:00')}).fetch(0,500);
-
-
 	}
 
 	private makeDraggable() {
@@ -231,15 +222,7 @@ export class WeekView extends CalendarView {
 			withTime = [];
 		if(this.currentCreation)
 			withTime.unshift(this.currentCreation as CalendarDayItem);
-		// for (const e of this.store.items) {
-		//
-		// 	const items = CalendarItem.expand(e as CalendarEvent, this.day, viewEnd);
-		// 	if(e.showWithoutTime) {
-		// 		allDay.push(...items as CalendarItem[]);
-		// 	} else {
-		// 		withTime.push(...items as CalendarDayItem[]);
-		// 	}
-		// }
+
 		for(const item of this.adapter.items) {
 			if(item.data?.showWithoutTime) {
 				allDay.push(item);

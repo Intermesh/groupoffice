@@ -26,7 +26,7 @@ body {
 	//background-image: radial-gradient( circle farthest-corner at 10% 20%,  rgba(239,166,76,1) 0%, rgba(245,184,184,1) 100.2% );
 }
 
-:root, body {
+html, body {
 	@include light-theme;
 }
 body.dark {
@@ -47,10 +47,6 @@ body, html {
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
 	//height: 100%;
-}
-
-button, html, input, select, textarea {
-    font-family: $font-family;
 }
 
 h1 {

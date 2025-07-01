@@ -7,7 +7,7 @@ import {
 	Component, datasourcestore,
 	DatePicker,
 	datepicker,
-	DateTime,
+	DateTime, Format,
 	FunctionUtil, h3, hr, List,
 	list,
 	menu, router,
@@ -203,7 +203,7 @@ export class Main extends Component {
 								return [
 									comp({cls:'pad'},
 										comp({html:'<i style="color:#'+item.color+'">&bull;</i> <strong>'+r.title+'</strong><br><small>'+(owner?.name ?? owner?.email ?? t('Unknown owner'))+'</small>' }),
-										h3({html: item.start.format('D j M')+' '+t('at')+' '+item.start.format('H:i')}),
+										h3({html: item.start.format('D j M')+' '+t('at')+' '+Format.time(item.start)}),
 									comp({cls:'group'},
 										btn({itemId: 'accepted', text:t('Accept'), handler:b=>press(b,'accepted')}),
 										btn({itemId: 'tentative', text:t('Maybe'), handler:b=>press(b,'tentative')}),
