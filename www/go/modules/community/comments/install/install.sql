@@ -6,14 +6,14 @@ create table comments_comment
     date          datetime                       not null,
     entityId      int                            not null,
     entityTypeId  int                            not null,
-    createdBy     int                            null,
+    createdBy     varchar(60)                            null,
     modifiedBy    int                            null,
     modifiedAt    datetime                       null,
     text          mediumtext charset utf8mb4     null,
     section       varchar(50)                    null,
     mimeMessageId varchar(255) collate ascii_bin null,
     constraint fk_comments_comment_core_user1
-        foreign key (createdBy) references core_user (id)
+        foreign key (createdBy) references core_principal (id)
             on delete set null,
     constraint fk_comments_comment_core_user2
         foreign key (modifiedBy) references core_user (id)
