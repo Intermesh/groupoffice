@@ -237,76 +237,49 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		this.debounceTimeout = setTimeout( () => {
 			clearTimeout(this.debounceTimeout);
 			this.debounceTimeout = undefined;
-
-			const index = this.getCaretCharacterOffsetWithin();
-			var h = this.getEditorBody().innerHTML;
-			var anchored = Autolinker.link(h, {
-				stripPrefix: false,
-				stripTrailingSlash: false,
-				className: "normal-link",
-				newWindow: true,
-				phone: false,
-				urls: {
-					schemeMatches : true,
-					wwwMatches    : false,
-					tldMatches    : false
-				}
-			});
-
-			if(h != anchored) {
-
-				this.getEditorBody().innerHTML = anchored;
-				this.setCaretPosition(index);
-			}
-
-			console.warn("autolink");
-
+			this.convertUrisToAnchors();
 		}, 500);
 	},
 
 
-	getCaretCharacterOffsetWithin: function () {
-		const win = this.getWin(), doc = this.getDoc(), element = this.getEditorBody();
-		let caretOffset = 0;
-		const sel = win.getSelection();
-		if (sel.rangeCount > 0) {
-			const range = sel.getRangeAt(0);
-			const preCaretRange = range.cloneRange();
-			preCaretRange.selectNodeContents(element);
-			preCaretRange.setEnd(range.endContainer, range.endOffset);
-			caretOffset = preCaretRange.toString().length;
-		}
-		return caretOffset;
-	},
+	convertUrisToAnchors: function() {
+		const walk = (node) => {
 
-	setCaretPosition: function (offset) {
-		const win = this.getWin(), doc = this.getDoc(), element = this.getEditorBody();
-		let currentOffset = 0;
-		const nodeStack = [element];
-		let node, found = false;
+			if(node.nodeType == Node.ELEMENT_NODE && node.tagName == "A") {
+				// don't traverse into anchor tags
+				return;
+			}
 
-		while (nodeStack.length && !found) {
-			node = nodeStack.pop();
-			if (node.nodeType === Node.TEXT_NODE) {
-				const nextOffset = currentOffset + node.length;
-				if (offset <= nextOffset) {
-					const range = win.document.createRange();
-					range.setStart(node, offset - currentOffset);
-					range.collapse(true);
-					const sel = win.getSelection();
-					sel.removeAllRanges();
-					sel.addRange(range);
-					found = true;
-				} else {
-					currentOffset = nextOffset;
+			//walk nodes recursively
+			node.childNodes.forEach(walk);
+
+			if(node.nodeType == Node.TEXT_NODE) {
+				if(node == this.getDoc().getSelection().anchorNode) {
+					return;
 				}
-			} else {
-				let i = node.childNodes.length;
-				while (i--) {
-					nodeStack.push(node.childNodes[i]);
+
+				if (node.textContent && node.textContent.indexOf("http") > -1) {
+					const anchored = this.replaceUriWithAnchor(node.textContent);
+					if (anchored != node.textContent) {
+						const tmp = document.createElement("span");
+						tmp.innerHTML = anchored;
+						node.replaceWith(tmp);
+					}
 				}
 			}
 		}
+
+		walk(this.getEditorBody());
+	},
+
+	replaceUriWithAnchor : function(html) {
+		// Regular expression to match URIs that are not inside anchor tags
+		const uriRegex = /(https?:\/\/[^\s]+|ftp:\/\/[^\s]+)/ig;
+
+		// Replace matched URIs with anchor tags
+		return html.replace(uriRegex, (url) => {
+			return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+		});
 	},
 
 	onDrop: function(e) {

@@ -1,5 +1,5 @@
 import {CalendarView} from "./CalendarView.js";
-import {ComponentEventMap, DateTime, E, ObservableListenerOpts} from "@intermesh/goui";
+import {ComponentEventMap, DateTime, E, Format, ObservableListenerOpts} from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {client} from "@intermesh/groupoffice-core";
 
@@ -127,7 +127,7 @@ export class YearView extends CalendarView<YearViewEventMap> {
 			return; // ff
 		}
 		container.append(E('p')
-			.attr('title', e.title+' - '+e.start.format('H:i'))
+			.attr('title', e.title+' - '+Format.time(e.start))
 			.css({backgroundColor: '#'+e.color})
 		);
 

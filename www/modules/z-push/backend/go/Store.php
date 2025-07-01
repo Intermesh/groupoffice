@@ -22,10 +22,10 @@ abstract class Store extends \BackendDiff {
 				try{
 					self::$_account = \GO\Email\Model\Account::model()->findByPk($settings->account_id);
 					if(!self::$_account){
-						ZLog::Write(LOGLEVEL_FATAL, 'E-mail account not found!');
+						ZLog::Write(LOGLEVEL_INFO, 'E-mail account not found!');
 					}
 				}catch(\GO\Base\Exception\AccessDenied $e){
-					ZLog::Write(LOGLEVEL_FATAL, 'GoBaseBackendDiff->getImapAccount() ~~ ACCESS DENIED to e-mail account configured in sync settings('.(string)$e->getMessage().')');
+					ZLog::Write(LOGLEVEL_WARN, 'GoBaseBackendDiff->getImapAccount() ~~ ACCESS DENIED to e-mail account configured in sync settings('.(string)$e->getMessage().')');
 				}
 			}else
 			{

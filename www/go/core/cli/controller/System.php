@@ -158,6 +158,8 @@ JSON;
 	 * docker compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=calendar --package=community --name=ScanEmailForInvites
 	 *
 	 * docker compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=newsletters --package=business --name=Mailer
+	 *
+	 * docker compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=automation --package=business --name=AutomationCron
 	 * @throws NotFound
 	 */
 	public function runCron($params) {
