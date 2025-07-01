@@ -6,6 +6,7 @@ use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use go\modules\community\calendar\model\CalendarEvent;
+use go\modules\community\calendar\model\Calendar as EventCalendar;
 use go\modules\community\calendar\model\ICalendarHelper;
 use go\modules\community\davclient\Module;
 
@@ -77,6 +78,15 @@ class Calendar extends Property
 		$http->DELETE( $this->uri . $event->uri());
 		// any success status from the server will indicate all is well.
 		return ($http->statusCode() <= 299);
+	}
+
+	protected function internalSave(): bool
+	{
+		$s= parent::internalSave();
+		if($this->isNew()) {
+			$this->name = EventCalendar::find()->selectSingleValue('name')->where(['id'=>$this->id])->single();
+		}
+		return $s;
 	}
 
 
