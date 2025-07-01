@@ -34,7 +34,7 @@ class Calendar extends Property
 	{
 		return parent::defineMapping()
 			->addTable("davclient_calendar")
-			->addTable('calendar_calendar', 'cal', ['id'=>'id'], ['name']);
+			->addQuery((new Query())->select("name")->join('calendar_calendar', 'cal', 'cal.id=davclient_calendar.id'));
 	}
 
 	public function sync(): bool {
