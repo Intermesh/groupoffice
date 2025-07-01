@@ -460,7 +460,7 @@ export class CalendarItem {
 
 		if (!oneDay) {
 			if (!this.data.showWithoutTime) {
-				line1 += ', '+start.format('H:i');
+				line1 += ', '+Format.time(start);
 			}
 			line1 += ' '+t('until');
 		}
@@ -468,7 +468,7 @@ export class CalendarItem {
 		let line2;
 		if (oneDay) {
 			if(!this.data.showWithoutTime) {
-				line2 = `${start.format('H:i')} - ${end.format('H:i')}`;
+				line2 = `${Format.time(start)} - ${Format.time(end)}`;
 			}
 		} else {
 			if(this.data.showWithoutTime) {
@@ -477,7 +477,7 @@ export class CalendarItem {
 			}
 			line2 = end.format('l j F Y');
 			if (!this.data.showWithoutTime) {
-				line2 += `, ${end.format('H:i')}`;
+				line2 += `, ${Format.time(end)}`;
 			}
 		}
 
