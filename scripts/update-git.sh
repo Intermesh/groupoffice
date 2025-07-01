@@ -44,5 +44,6 @@ echo "Pulling main repository"
 git pull
 git submodule update --init
 
+echo "All done"
 
 
