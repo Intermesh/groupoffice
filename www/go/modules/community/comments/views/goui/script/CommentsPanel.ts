@@ -6,7 +6,7 @@ import {
 	EntityID,
 	form,
 	t,
-	tbar, Toolbar
+	tbar, Toolbar, Window
 } from "@intermesh/goui";
 import {CommentList} from "./CommentList.js";
 import {CommentEditor} from "./CommentEditor.js";
@@ -86,7 +86,9 @@ export class CommentsPanel extends Component {
 								})
 							).then((r) => {
 								form.reset();
-							});
+							}).catch((err) => {
+								void Window.error(err);
+							})
 						}
 					}
 				},

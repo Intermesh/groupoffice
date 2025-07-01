@@ -288,15 +288,13 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						]
 					},
 
-
-
-					this.customerCombo = new go.users.UserCombo({
+					this.customerCombo = new go.PrincipalCombo({
 						flex: 1,
 						disabled: this.role != "support",
 						hidden: this.role != "support",
 						anchor: "100%",
 						fieldLabel: t('Customer'),
-						hiddenName: 'createdBy',
+						hiddenName: 'customerId',
 						allowBlank: false,
 						value: null
 					}),
