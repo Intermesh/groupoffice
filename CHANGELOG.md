@@ -1,4 +1,5 @@
 - Calendar: fixed 12-hour time format
+- Calendar: fixed patchThisAndFuture trying to set modifier
 
 30-06-2025: 25.0.33
 - Files: fix external link to folder in folder panel
