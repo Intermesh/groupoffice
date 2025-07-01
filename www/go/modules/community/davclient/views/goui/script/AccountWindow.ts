@@ -1,12 +1,14 @@
 import {
 	checkbox,
 	comp, select,
-	textfield, t, btn, mapfield, containerfield, menu, hr, Window, Format, displayfield
+	textfield, t, btn, mapfield, containerfield, menu, hr, Window, Format, displayfield, MapField
 } from "@intermesh/goui";
 import {client, FormWindow} from "@intermesh/groupoffice-core";
 export class AccountWindow extends FormWindow {
 
 	protected closeOnSave = false
+
+	private collections: MapField
 	constructor() {
 		super('DavAccount');
 		this.title = t('Account');
@@ -36,7 +38,7 @@ export class AccountWindow extends FormWindow {
 		this.generalTab.title = t('Server');
 
 		this.cards.items.add(comp({title:t('Collections')},
-			mapfield({name: 'collections',
+			this.collections = mapfield({name: 'collections',
 				buildField: (v: any) => {
 
 				const icon = v.lastError ? comp({tagName:'i',cls:'icon',html:'warning', title:v.lastError, style:{margin:'0 8px'}}) :
@@ -44,8 +46,7 @@ export class AccountWindow extends FormWindow {
 
 					const f = containerfield({cls:'hbox', style: {alignItems: 'center', cursor:'default'}},
 						icon,
-						comp({flex: '1 0 30%',html: v.uri}),
-						comp({width:220, html: v.name}),
+						comp({flex: '1 0 30%', html: v.name+'<br><small>'+v.uri+'</small>'}),
 						comp({width:160, html: v.lastSync ? Format.dateTime(v.lastSync) : t('Never')}),
 						btn({icon:'more_vert', menu: menu({},
 							btn({icon:'sync',text:t('Sync now'), handler: _ =>{
@@ -100,6 +101,7 @@ export class AccountWindow extends FormWindow {
 			this.form.trackReset();
 			if(!data.lastError && data.active) {
 				this.cards.activeItem = 1;
+				this.collections.value = data.collections;
 			} else if(!data.lastError && !data.active) {
 				this.close();
 			}

@@ -311,6 +311,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				expires: new Date(new Date().getTime()+(1000*60*60*24*30)), //30 days
 			}));
 		}
+		document.documentElement.cls('compact',go.User.theme === 'Compact');
+		GO.util.density = parseFloat(window.getComputedStyle(document.documentElement).fontSize) / 10;
 
 		var me = this;
 

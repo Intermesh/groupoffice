@@ -31,6 +31,12 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				{xtype:'radiogroup',
 				name:'theme',
 				value: GO.settings.config.theme,
+				// live update theme can be used when ExtJs is fased out.
+				// listeners: {
+				// 	'change':(me, selectedItem) => {
+				// 		document.documentElement.cls('compact',selectedItem.inputValue === 'Compact');
+				// 	}
+				// },
 				items: [
 					{inputValue: 'Paper', boxLabel: t('Paper')},
 					{inputValue: 'Compact', boxLabel: t('Compact')}
@@ -55,17 +61,18 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					}
 					}},
 				{xtype:'container', cls: 'go-theme-color', defaults: {
-					enableToggle:true,
-					handler: function(me,ev) {
-						const hiddenField = this.ownerCt.previousSibling();
-						hiddenField.setValue(me.inputValue);
-					}
+						enableToggle:true,
+						handler: function(me,ev) {
+							const hiddenField = this.ownerCt.previousSibling();
+							hiddenField.setValue(me.inputValue);
+						}
+					},
+					items: [
+						{xtype:'button', inputValue: 'light', cls:'mode-light', tooltip:t('Light')},
+						{xtype:'button', inputValue: 'dark', cls:'mode-dark', tooltip:t('Dark')},
+						{xtype:'button', inputValue: 'system', cls:'mode-system', tooltip:t('System default')}
+					]
 				},
-				items: [
-					{xtype:'button', inputValue: 'light', cls:'mode-light', tooltip:t('Light')},
-					{xtype:'button', inputValue: 'dark', cls:'mode-dark', tooltip:t('Dark')},
-					{xtype:'button', inputValue: 'system', cls:'mode-system', tooltip:t('System default')}
-				]},
 				{xtype:'container',layout: 'hbox',defaults: {style:'width:33%;text-align:center;'},items:[
 						{html: t('Light')},
 						{html: t('Dark')},
