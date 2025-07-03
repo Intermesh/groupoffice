@@ -1,6 +1,6 @@
-import {client, modules, router} from "@intermesh/groupoffice-core";
+import {AclItemEntity, AclOwnerEntity, client, JmapDataSource, modules, router} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
-import {t} from "@intermesh/goui";
+import {EntityID, t} from "@intermesh/goui";
 import {SettingsPanel} from "./SettingsPanel.js";
 import {NoteDialog} from "./NoteDialog";
 import {NoteDetail} from "./NoteDetail";
@@ -93,8 +93,8 @@ modules.register({
 			/**
 			 * Opens a dialog to create a new linked item
 			 *
-			 * @param {string} entity eg. "Note"
-			 * @param {string|int} entityId
+			 * @param entity eg. "Note"
+			 * @param entityId
 			 */
 			linkWindow:  (entity, entityId) => {
 				return new NoteDialog();
@@ -113,3 +113,17 @@ modules.register({
 		name: "NoteBook", title: t("Note book")
 	}],
 });
+
+
+export interface Note extends AclItemEntity {
+	name: string,
+	content: string
+	noteBookId: EntityID
+}
+
+export interface NoteBook extends AclOwnerEntity {
+	name: string
+}
+
+export const noteBookDS = new JmapDataSource<NoteBook>("NoteBook");
+export const noteDS = new JmapDataSource<NoteBook>("Note");

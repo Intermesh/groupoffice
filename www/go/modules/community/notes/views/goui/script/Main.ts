@@ -1,22 +1,26 @@
 import {
 	btn,
+	Button,
+	checkbox,
 	checkboxselectcolumn,
 	column,
 	comp,
 	EntityID,
-	Filter,
-	router,
+	h3,
+	hr,
 	menu,
+	router,
 	searchbtn,
 	t,
-	tbar, Button, hr, checkbox, h3
+	tbar
 } from "@intermesh/goui";
-import {MainThreeColumnPanel, filterpanel, jmapds, client} from "@intermesh/groupoffice-core";
+import {AclLevel, client, filterpanel, jmapds, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
 import {notebookgrid, NoteBookGrid} from "./NoteBookGrid";
 import {NoteBookDialog} from "./NoteBookDialog";
 import {NoteGrid} from "./NoteGrid";
 import {NoteDetail} from "./NoteDetail";
 import {NoteDialog} from "./NoteDialog";
+import {NoteBook, noteBookDS} from "./Index.js";
 
 export class Main extends MainThreeColumnPanel {
 	private noteBookGrid!: NoteBookGrid;
@@ -53,8 +57,8 @@ export class Main extends MainThreeColumnPanel {
 				searchbtn({
 					listeners: {
 						input: ( {text}) => {
-							(this.noteBookGrid.store.queryParams.filter as Filter).text = text;
-							this.noteBookGrid.store.load();
+							this.noteBookGrid.store.setFilter("search", {text});
+							void this.noteBookGrid.store.load();
 						}
 					}
 				}),
@@ -81,16 +85,16 @@ export class Main extends MainThreeColumnPanel {
 
 							const noteBookIds = selected.map((row) => row.record.id);
 
-							this.noteGrid.store.queryParams.filter = {
+							this.noteGrid.store.setFilter("notebook", {
 								noteBookId: noteBookIds
-							};
+							});
 
 							void this.noteGrid.store.load();
 
 							this.addButton.disabled = !noteBookIds[0];
 
 							if (client.user.notesSettings.rememberLastItems) {
-								jmapds("User").update(client.user.id, {
+								void jmapds("User").update(client.user.id, {
 									notesSettings: {
 										lastNoteBookIds: noteBookIds
 									}
@@ -110,20 +114,31 @@ export class Main extends MainThreeColumnPanel {
 					column({
 						width: 48,
 						id: "btn",
-						renderer: (columnValue: any, record, td, table, rowIndex) => {
+						renderer: (columnValue: any, record:NoteBook, td, table, rowIndex) => {
 							return btn({
 								icon: "more_vert",
 								menu: menu({},
 									btn({
+										disabled: record.permissionLevel < AclLevel.MANAGE,
 										icon: "edit",
 										text: t("Edit"),
 										handler: () => {
 											const record = table.store.get(rowIndex)!;
 
 											const dlg = new NoteBookDialog();
-											dlg.load(record.id);
+											void dlg.load(record.id);
 											dlg.show();
 
+										}
+									}),
+
+									btn({
+										disabled: !go.Modules.get("community", 'notes').userRights.mayChangeNoteBooks || record.permissionLevel < AclLevel.MANAGE,
+										icon: "delete",
+										text: t("Delete"),
+										handler: () => {
+											const record = table.store.get(rowIndex)!;
+											void noteBookDS.confirmDestroy([record.id]);
 										}
 									})
 								)
