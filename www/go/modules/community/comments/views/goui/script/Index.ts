@@ -1,5 +1,7 @@
 import {client, modules} from "@intermesh/groupoffice-core";
 import {t} from "@intermesh/goui";
+import {CommentDetail} from "./CommentDetail";
+import {CommentsPanel} from "./CommentsPanel";
 
 export * from "./CommentsPanel.js";
 
@@ -7,6 +9,13 @@ modules.register({
 	package: "community",
 	name: "comments",
 	async init() {
+
+		// make available in legacy extjs modules
+
+		GO.comments = {
+			CommentsPanel
+		}
+
 		client.on("authenticated", ( {session}) => {
 			if (!session.capabilities["go:community:comments"]) {
 				// User does not have access to this module
@@ -38,5 +47,22 @@ modules.register({
 				});
 			}
 		});
-	}
+	},
+	entities: [{
+		name: "Comment",
+		links: [{
+			iconCls: "entity ic-note purple",
+			searchOnly: true,
+
+			/**
+			 * Return component for the detail view
+			 *
+			 */
+			linkDetail: function () {
+				return new CommentDetail();
+			}
+		}]
+	},
+		"CommentLabel"
+	]
 })

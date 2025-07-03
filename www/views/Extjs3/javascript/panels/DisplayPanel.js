@@ -11,6 +11,12 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
+let commentsModule;
+
+import(BaseHref + "go/modules/community/comments/views/goui/dist/Index.js").then (m => {
+	commentsModule = m;
+})
+
 GO.DisplayPanel=function(config){
 	config = config || {};
 
@@ -200,9 +206,17 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
             }
 		}
 		
+
 		if (this.showComments && go.Modules.isAvailable("community", "comments")) {
-			this.add(new go.modules.comments.CommentsDetailPanel());
+			const wrapper = new go.GOUIWrapper({
+				cls: ""
+			});
+
+			this.add(wrapper);
+			this.comments = new GO.comments.CommentsPanel(this.entity);
+			wrapper.comp = this.comments;
 		}
+
 		
 		if(!this.expandListenObject){
 			this.expandListenObject=this;
@@ -333,6 +347,10 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		this.data=data;
 		
 		this.updateToolbar();
+
+		if(this.comments) {
+			this.comments.load(data.id);
+		}
 		
 		if(this.mainItem.body) { // TODO: this will unly render it the second time
 			this.xtemplate.overwrite(this.mainItem.body, data);

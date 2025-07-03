@@ -13,11 +13,6 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-let commentsModule;
-
-import(BaseHref + "go/modules/community/comments/views/goui/dist/Index.js").then (m => {
-	commentsModule = m;
-})
 
 /**
  *
@@ -291,7 +286,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			});
 
 			this.add(wrapper);
-			this.comments = new commentsModule.CommentsPanel(this.entityStore.entity.name);
+			this.comments = new GO.comments.CommentsPanel(this.entityStore.entity.name);
 			wrapper.comp = this.comments;
 		}
 	},

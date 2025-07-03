@@ -2,9 +2,9 @@ import {
 	browser,
 	btn, collapsebtn,
 	comp,
-	Component, DefaultEntity,
+	Component, ComponentEventMap, DefaultEntity,
 	EntityID,
-	form,
+	form, section,
 	t,
 	tbar, Toolbar, Window
 } from "@intermesh/goui";
@@ -20,10 +20,32 @@ export class CommentsPanel extends Component {
 
 	private entityId: EntityID | undefined;
 
+	private _title!:string
+	private titleCmp: Component;
+	set title(title: string) {
+		if(this.titleCmp) {
+			this.titleCmp.html = title;
+		}
+		this._title = title;
+	}
+
+	get title() {
+		return this._title;
+	}
+
+	set section(section: string|undefined) {
+		this.commentList.store.setFilter("section", {section: section})
+	}
+
+	get section() {
+		return this.commentList.store.getFilter("section")?.section
+	}
 	constructor(public entityName: string) {
 		super();
 
 		this.cls = "card";
+
+		this.title = t("Comments");
 
 		this.commentList = new CommentList();
 		this.commentEditor = new CommentEditor();
@@ -42,9 +64,9 @@ export class CommentsPanel extends Component {
 			tbar({},
 				comp({
 						cls: "hbox"
-					}, comp({
+					}, this.titleCmp = comp({
 						tagName: "h3",
-						text: t("Comments"),
+						text: this.title,
 						flex: 1
 					}),
 					this.countBadge,
@@ -82,7 +104,8 @@ export class CommentsPanel extends Component {
 									entityId: this.entityId!,
 									labels: labelIds,
 									text: form.value.text,
-									attachments: form.value.attachments
+									attachments: form.value.attachments,
+									section: this.section
 								})
 							).then((r) => {
 								form.reset();
@@ -142,9 +165,9 @@ export class CommentsPanel extends Component {
 	public load(id: EntityID): void {
 		this.entityId = id;
 
-		this.commentList.store.queryParams.filter = {
+		this.commentList.store.setFilter("entity", {
 			entityId: id
-		}
+		});
 
 		this.commentList.store.load().then(() => {
 			this.countBadge.text = this.commentList.store.count().toString();
