@@ -182,6 +182,8 @@
 
 			}).catch((reason) => {
 				console.warn("Alert for unknown entity", reason, alert);
+
+				void go.Db.store("Alert").destroy(alert.id);
 			})
 		}
 	})
