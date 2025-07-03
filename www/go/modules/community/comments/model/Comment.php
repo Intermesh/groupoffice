@@ -393,8 +393,20 @@ class Comment extends AclItemEntity {
 				new DateTime(),
 				'mention',
 				$userId
-			)->save();
+			)->setData(['excerpt' => $this->getExcerpt($username)])->save();
 		}
+
+	}
+
+	private function getExcerpt(string $username) : string {
+		$text = strip_tags($this->text);
+		$start = strrpos($text, "@".$username);
+
+		if($start) {
+			$text = substr($text, $start);
+		}
+
+		return StringUtil::cutString($text, 50);
 
 	}
 }
