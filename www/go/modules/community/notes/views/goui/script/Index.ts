@@ -16,7 +16,7 @@ modules.register({
 				return;
 			}
 
-			router.add(/^notes\/(\d+)$/, (noteId) => {
+			router.add(/^note\/(\d+)$/, (noteId) => {
 				modules.openMainPanel("notes");
 				notes.showNote(noteId);
 			});

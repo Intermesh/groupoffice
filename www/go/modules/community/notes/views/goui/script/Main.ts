@@ -153,7 +153,7 @@ export class Main extends MainThreeColumnPanel {
 						const record = selected[0].record;
 
 						if (record) {
-							router.goto("notes/" + record.id);
+							router.goto("note/" + record.id);
 						}
 					}
 				}
