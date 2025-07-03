@@ -1039,6 +1039,7 @@ CREATE TABLE `core_alert` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `entityTypeId` INT NOT NULL,
   `entityId` INT NOT NULL,
+  createdBy varchar(60) null,
   `userId` INT NOT NULL,
   `triggerAt` DATETIME NOT NULL,
   `staleAt` DATETIME NULL,
@@ -1058,7 +1059,10 @@ CREATE TABLE `core_alert` (
     FOREIGN KEY (`userId`)
     REFERENCES `core_user` (`id`)
     ON DELETE cascade
-    ON UPDATE NO ACTION)
+    ON UPDATE NO ACTION),
+    constraint core_alert_core_principal_id_fk
+                             foreign key (createdBy) references core_principal (id)
+                                 on delete set null
     ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 create unique index core_alert_entityTypeId_entityId_tag_userId_uindex

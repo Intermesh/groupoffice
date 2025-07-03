@@ -1757,3 +1757,12 @@ $updates['202505301440'][] = function() {
 	}
 
 };
+
+
+$updates['202507031141'][] = "alter table core_alert
+                         add createdBy varchar(60) null after entityId";
+
+$updates['202507031141'][] = "alter table core_alert
+                         add constraint core_alert_core_principal_id_fk
+                             foreign key (createdBy) references core_principal (id)
+                                 on delete set null";
