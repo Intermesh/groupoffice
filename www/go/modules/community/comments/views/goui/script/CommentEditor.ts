@@ -9,7 +9,7 @@ import {
 	root,
 	t
 } from "@intermesh/goui";
-import {client, jmapds} from "@intermesh/groupoffice-core";
+import {client, jmapds, HtmlFieldMentionPlugin} from "@intermesh/groupoffice-core";
 
 export class CommentEditor extends Component {
 	public labels: ArrayField;
@@ -38,6 +38,20 @@ export class CommentEditor extends Component {
 					name: "text",
 					required: true,
 					listeners: {
+
+						render:ev => {
+							new HtmlFieldMentionPlugin(ev.target, async (text) => {
+								const r = await jmapds("Principal").query({
+									filter: {
+										entity: "User",
+										text: text
+									}
+								});
+								const get = await jmapds("Principal").get(r.ids);
+								return get.list.map(p => {return {value:p.description, display:p.name}});
+							})
+						},
+
 						insertimage: ( {file, img}) => {
 							root.mask();
 
