@@ -1,6 +1,8 @@
 <?php
-namespace go\modules\community\calendar\model;
+namespace go\core\model;
+use go\core\Environment;
 use go\core\ErrorHandler;
+use go\core\fs\Folder;
 
 class Holiday {
 
@@ -62,7 +64,7 @@ class Holiday {
 
 
 	static function generate($set, $lang, $from, $till) {
-		$dir = __DIR__.'/../holidays/';
+		$dir = __DIR__ . '/../language/holidays/';
 		self::$lang = $lang;
 		self::$names = \json_decode(file_get_contents($dir.'names.json'))->names;
 		$file = $dir.'countries/'.strtolower($set).'.json';
@@ -191,5 +193,40 @@ class Holiday {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Retrieve known holiday sets
+	 *
+	 * @param void
+	 * @return array
+	 */
+	public static function getHolidaySets(): array
+	{
+		$holidaySets = [];
+		$availableLanguages = go()->getLanguage()->getLanguages();
+
+//		$folderPath = Environment::get()->getInstallFolder() . '/go/core/language/holidays/countries';
+		// For now, we let the old holidays fol[der be. There is no 1 to 1 relationship with languge, country and locale
+		// and it is a friday afternoon
+		$folderPath = Environment::get()->getInstallFolder() . '/language/holidays/';
+
+
+		$countriesFolder = new Folder($folderPath);
+		foreach ($countriesFolder->getFiles() as $f) {
+			$isoCode = strtolower($f->getNameWithoutExtension());
+			if (!array_key_exists($isoCode, $availableLanguages)) {
+				continue;
+			}
+			$label = $availableLanguages[$isoCode];
+			$holidaySets[$label] = [
+				'ise' => $isoCode,
+				'label' => $label
+			];
+		}
+
+
+		ksort($holidaySets);
+		return array_values($holidaySets);
 	}
 }
