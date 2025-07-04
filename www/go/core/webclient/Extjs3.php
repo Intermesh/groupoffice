@@ -166,8 +166,9 @@ class Extjs3 {
 
 			$str .= 'GO.lang = ' . json_encode($l) . ";\n";
 			
-			$str .= "GO.lang.holidaySets = " . json_encode(\GO\Base\Model\Holiday::getAvailableHolidayFiles()) .";\n";
-			
+//			$str .= "GO.lang.holidaySets = " . json_encode(\GO\Base\Model\Holiday::getAvailableHolidayFiles()) .";\n";
+			$str .= "GO.lang.holidaySets = " . json_encode(\go\core\model\Holiday::getHolidaySets()) .";\n";
+
 			$cacheFile->putContents($str);
 		}
 		

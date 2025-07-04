@@ -22,6 +22,7 @@
  * @property String $name
  * @property String $region
  * @property boolean $free_day
+ * @deprecated
  */
 
 namespace GO\Base\Model;
@@ -173,15 +174,18 @@ class Holiday extends \GO\Base\Db\ActiveRecord {
 	 * Get all the available holiday files
 	 * 
 	 * @return array key => label
+	 * @deprecated
 	 */
-	public static function getAvailableHolidayFiles(){
+	public static function getAvailableHolidayFiles() {
+		return \go\core\model\Holiday::getHolidaySets();
+		/*
 		$holidays = array();
-		
+
 		$lang = go()->getLanguage()->getLanguages();
-		
+
 		$folderPath = \GO::config()->root_path.'language/holidays/';
 		$folder = new \GO\Base\Fs\Folder($folderPath);
-		
+
 		$children = $folder->ls();
 		foreach($children as $child){
 			$iso = $child->nameWithoutExtension();
@@ -190,6 +194,7 @@ class Holiday extends \GO\Base\Db\ActiveRecord {
 		}
 		ksort($holidays);
 		return array_values($holidays);
+		*/
 	}	
 	
 	/**

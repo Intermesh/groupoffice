@@ -31235,33 +31235,6 @@ LOCK TABLES `go_cron_users` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `go_holidays`
---
-
-DROP TABLE IF EXISTS `go_holidays`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `go_holidays` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `date` date NOT NULL,
-  `name` varchar(100) NOT NULL DEFAULT '',
-  `region` varchar(10) NOT NULL DEFAULT '',
-  `free_day` tinyint(1) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`id`),
-  KEY `region` (`region`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `go_holidays`
---
-
-LOCK TABLES `go_holidays` WRITE;
-/*!40000 ALTER TABLE `go_holidays` DISABLE KEYS */;
-/*!40000 ALTER TABLE `go_holidays` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `go_links_em_links`
 --
 

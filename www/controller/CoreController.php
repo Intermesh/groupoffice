@@ -251,7 +251,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 	 * Get the holidayfiles that are available groups
 	 */
 	protected function actionHolidays($params) {
-		$available = \GO\Base\Model\Holiday::getAvailableHolidayFiles();
+		$available = \go\core\model\Holiday::getHolidaySets();
 		
 		$store = new \GO\Base\Data\ArrayStore();
 		$store->setRecords($available);

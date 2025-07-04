@@ -99,7 +99,7 @@ export class CalendarAdapter {
 				if(!country) country = lang;
 				if(country=='uk')
 					country ='gb';
-				return client.jmap("community/calendar/Holiday/fetch",{
+				return client.jmap("core/Holiday/fetch",{
 					set: country.toUpperCase(), lang: client.user.holidayset.replace("_", "-"),from:start.format('Y-m-d'),till:end.format('Y-m-d')
 				}).then(r => {
 					this.list = r.list;
