@@ -119,12 +119,15 @@ class FieldSet extends AclOwnerEntity {
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()
-						->add('entities', function(Criteria $criteria, $value) {
-							$criteria->andWhere('e.name', 'IN', $value);
-						})
-						->add('isTab', function(Criteria $criteria, $value) {
-							$criteria->andWhere('isTab', '=', $value);
-						});
+			->add('entity', function(Criteria $criteria, $value) {
+				$criteria->andWhere('e.name', '=', $value);
+			})
+			->add('entities', function(Criteria $criteria, $value) {
+				$criteria->andWhere('e.name', 'IN', $value);
+			})
+			->add('isTab', function(Criteria $criteria, $value) {
+				$criteria->andWhere('isTab', '=', $value);
+			});
 	}
 	
 	protected static function internalDelete(Query $query): bool
