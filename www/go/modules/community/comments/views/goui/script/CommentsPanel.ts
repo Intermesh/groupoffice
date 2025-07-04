@@ -47,6 +47,8 @@ export class CommentsPanel extends Component {
 
 		this.title = t("Comments");
 
+		this.disabled = true;
+
 		this.commentList = new CommentList();
 		this.commentEditor = new CommentEditor();
 
@@ -162,16 +164,17 @@ export class CommentsPanel extends Component {
 		this.load(entity.id);
 	}
 
-	public load(id: EntityID): void {
+	public async load(id: EntityID) {
 		this.entityId = id;
+
+		void this.commentEditor.store.load();
 
 		this.commentList.store.setFilter("entity", {
 			entityId: id
 		});
 
-		this.commentList.store.load().then(() => {
-			this.countBadge.text = this.commentList.store.count().toString();
-		});
-		this.commentEditor.store.load();
+		await this.commentList.store.load();
+		this.countBadge.text = this.commentList.store.count().toString();
+		this.disabled = false;
 	}
 }
