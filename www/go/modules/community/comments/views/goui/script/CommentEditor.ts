@@ -3,7 +3,7 @@ import {
 	ArrayField,
 	btn, Button,
 	Component, ContainerField, containerfield, datasourcestore, DataSourceStore, displayfield,
-	fieldset, Format,
+	fieldset, Format, hr,
 	htmlfield, menu,
 	Notifier,
 	root,
@@ -39,7 +39,7 @@ export class CommentEditor extends Component {
 					required: true,
 					listeners: {
 
-						render:ev => {
+						beforerender:ev => {
 							new HtmlFieldMentionPlugin(ev.target, async (text) => {
 								const r = await jmapds("Principal").query({
 									filter: {
@@ -49,7 +49,9 @@ export class CommentEditor extends Component {
 								});
 								const get = await jmapds("Principal").get(r.ids);
 								return get.list.map(p => {return {value:p.description, display:p.name}});
-							})
+							}, 5);
+
+							ev.target.getToolbar().items.insert(6, hr());
 						},
 
 						insertimage: ( {file, img}) => {
