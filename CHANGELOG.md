@@ -1,3 +1,4 @@
+07-07-2025: 25.0.34
 - Calendar: fixed 12-hour time format
 - Calendar: fixed patchThisAndFuture trying to set modifier
 - Core: fix generic spreadsheet import
