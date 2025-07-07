@@ -1,7 +1,7 @@
 - CardDAV: not possible to create vCards in addressbooks without write permission.
 - Projects2: Fixed sub project internal fees calculation
-
 - Tasks / support: make location field available in grid.
+- Leavedays: fix several minor errors
 
 30-06-2025: 6.8.129
 - Files: fix external link to folder in folder panel
