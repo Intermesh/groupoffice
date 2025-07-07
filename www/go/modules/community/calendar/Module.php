@@ -166,10 +166,13 @@ class Module extends core\Module
 
 	private function printWeek($date, $calendarIds, $span){
 
-		$start = (new \DateTime($date))->modify('Monday this week');
+		$report = new reports\Week();
+
+		$dayName = $report->firstWeekday===1 ? 'Monday' : 'Sunday';
+		$start = (new \DateTime($date))->modify($dayName.' this week');
 		$end = (clone $start)->modify('+'.$span.' days');
 
-		$report = new reports\Week();
+
 		$report->dayCount = $span;
 		$report->day = $start;
 		$report->end = $end;
