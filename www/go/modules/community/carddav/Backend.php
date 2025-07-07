@@ -69,7 +69,7 @@ class Backend extends AbstractBackend {
 				throw new NotFound();
 			}
 
-			if (!$addressbook->getPermissionLevel()) {
+			if (!$addressbook->hasPermissionLevel(ACL::LEVEL_CREATE)) {
 				throw new Forbidden();
 			}
 		}
@@ -227,7 +227,7 @@ class Backend extends AbstractBackend {
 			throw new NotFound();
 		}
 
-		if(!$contact->getPermissionLevel()) {
+		if(!$contact->hasPermissionLevel(Acl::LEVEL_READ)) {
 			throw new Forbidden();
 		}
 		
@@ -298,7 +298,7 @@ class Backend extends AbstractBackend {
 				throw new NotFound();
 			}
 
-			if (!$addressbook->getPermissionLevel()) {
+			if (!$addressbook->hasPermissionLevel(Acl::LEVEL_READ)) {
 				throw new Forbidden();
 			}
 		}
