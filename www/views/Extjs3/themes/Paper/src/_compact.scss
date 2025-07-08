@@ -1,3 +1,8 @@
+@use "compat";
+@use "typography";
+@use "utils";
+@use "shadows";
+
 html.compact {
 
 	*:not(.goui) .x-btn, .x-toolbar .x-btn, .x-small-editor .x-btn {
@@ -14,29 +19,29 @@ html.compact {
 			.x-btn-text{color:inherit;}
 		}
 		&.x-btn-focus {
-			@include var(background-color, fg-main-tp);
+			@include compat.var(background-color, fg-main-tp);
 		}
 		&.primary, &.raised {
 			color: white;
 			background-color: var(--c-primary);
-			@include var('background-color', c-primary);
+			@include compat.var('background-color', c-primary);
 		}
 		&.accent {
 			background-color: var(--c-accent);
 		}
 	}
 	.go-main-tab-panel.x-tab-panel > .x-tab-panel-header .x-tab-strip > li {
-		padding: 0 dp(20);
+		padding: 0 utils.dp(20);
 	}
 	.x-menu {
 		border: 1px solid var(--fg-disabled);
 	}
 	.x-menu-sep {
-		margin-left: dp(16);
-		margin-right: dp(16);
+		margin-left: utils.dp(16);
+		margin-right: utils.dp(16);
 	}
 	.x-menu-item-text, .go-sidenav *, .go-nav *, aside .data * {
-		font-size: sp(16);
+		font-size: utils.sp(16);
 		font-weight: 500;
 		letter-spacing: -0.1px;
 	}
@@ -69,11 +74,11 @@ html.compact {
 	.x-window{
 		border: 1px solid var(--fg-divider);
 		&-header-text {
-			height: dp(40);
-			line-height:dp(40);
+			height: utils.dp(40);
+			line-height:utils.dp(40);
 		}
 		&-header .x-tool {
-			margin:dp(6) 0;
+			margin:utils.dp(6) 0;
 		}
 	}
 
@@ -84,8 +89,8 @@ html.compact {
 	}
 
 	.go-form-group .x-panel-bbar .x-btn-text {
-		font-size: sp(14);
-		font-weight: $font-weight-m;
+		font-size: utils.sp(14);
+		font-weight: typography.$font-weight-m;
 		letter-spacing: 0.022em;
 		text-decoration: none;
 		//color: inherit;

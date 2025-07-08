@@ -1,10 +1,15 @@
+@use "compat";
+@use "theme";
+@use "utils";
+@use "go-style";
+
 #startMenu.x-menu {
   width: 100%;
   bottom: 0;
   border-radius: 0;
   top: 0 !important;
   opacity: 1;
-  transition: opacity 300ms $curve-sharp;
+  transition: opacity 300ms compat.$curve-sharp;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   background-color: rgba(0, 0, 0, 0.68);
@@ -16,25 +21,25 @@
   &:before {
       content: " ";
 	  position:absolute;
-      background-image: url(#{$resourcePath}img/logo-white.svg);
+      background-image: url(#{theme.$resourcePath}img/logo-white.svg);
       background-size: contain;
       background-repeat: no-repeat;
-      height: dp(40);
-      width: dp(240);
-      margin: dp(12) dp(16);
+      height: utils.dp(40);
+      width: utils.dp(240);
+      margin: utils.dp(12) utils.dp(16);
       display:block;
   }
 
   ul {
       max-width: 95%;
-	  padding-top:dp(40);
+	  padding-top:utils.dp(40);
       display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(10rem, 17%), 1fr));
       justify-content: space-between;
     align-content: start;
     transform: scale(1);
     grid-gap: 4vw 4vh;
-      transition: transform 200ms $curve-sharp;
+      transition: transform 200ms compat.$curve-sharp;
       margin: 0 5%;
       height: calc(100vh - 56px) !important;
       overflow-y: auto;
@@ -51,8 +56,8 @@
     cursor: pointer;
   }
   .x-menu-item-icon {
-      max-width: dp(96);
-      height: dp(96);
+      max-width: utils.dp(96);
+      height: utils.dp(96);
 	  margin-right:0;
       width: 100% !important;
       background-position: center !important;
@@ -77,7 +82,7 @@
   .x-menu-item-text {
       @extend %font-data;
       display:block;
-      padding: dp(8) 0;
+      padding: utils.dp(8) 0;
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;
@@ -148,10 +153,10 @@ i.icon.em-low_priority {
 }
 
 .ml-unseen-dot {
-	@include var(background-color, fg-main);
+	@include compat.var(background-color, fg-main);
 	width: 9px;
 	height: 9px;
-	margin: dp(2);
+	margin: utils.dp(2);
 	border-radius: 50%;
 	float: right;
 }
@@ -160,10 +165,10 @@ i.icon.em-low_priority {
 	text-overflow: initial;
 	white-space: normal;
 	i {
-		font-size: dp(16);
+		font-size: utils.dp(16);
 		float: right;
-		width: dp(16);
-		height: dp(16);
+		width: utils.dp(16);
+		height: utils.dp(16);
 		color: var(--fg-secondary-text);
 	}
 }
@@ -171,7 +176,7 @@ i.icon.em-low_priority {
 .x-grid3-col-icon {
 		i {
 			&.em-flag {
-				color: $cDanger;
+				color: compat.$cDanger;
 			}
 	}
 }
@@ -180,6 +185,8 @@ i.icon.em-low_priority {
 	background-color: white;
 	position: relative;
 	color: black;
+	color-scheme: light;
+	padding: utils.dp(16);
 
 	> * {
 		color:inherit;
@@ -207,11 +214,11 @@ i.icon.em-low_priority {
 		font-size:11.0pt;
 	}
 
-	color-scheme: light;
+
 	* {
 		color-scheme: light;
 	}
-	padding: dp(16);
+
 
 	img {
 		// no horizontal scrolling in email
@@ -224,10 +231,10 @@ i.icon.em-low_priority {
 }
 
 .em-attachments{
+	margin-left: -0.8rem;
 	.filetype-link {
 		display: inline-block;
 	}
-	margin-left: -0.8rem
 }
 
 #email-message-panel {
@@ -238,27 +245,27 @@ i.icon.em-low_priority {
 
 .message-header-table{
 	float:left;
-	margin-right: dp(72);
-	margin-bottom: dp(8);
+	margin-right: utils.dp(72);
+	margin-bottom: utils.dp(8);
 }
 
 .message-header {
 	position: relative;
 	border-bottom:1px solid var(--fg-line);
-	padding: dp(8) dp(16);
+	padding: utils.dp(8) utils.dp(16);
 		
 	b {
 		@extend %font-caption;
 	}
 	
 	.avatar {
-		width: dp(64);
-		height: dp(64);
-		line-height: dp(64);
-		font-size: dp(24);
+		width: utils.dp(64);
+		height: utils.dp(64);
+		line-height: utils.dp(64);
+		font-size: utils.dp(24);
 		position: absolute;
-		top: dp(16);
-		right: dp(16);
+		top: utils.dp(16);
+		right: utils.dp(16);
 	}
 	
 	.x-form-checkbox {
@@ -267,7 +274,7 @@ i.icon.em-low_priority {
 }
 
 .mo-description {
-	padding-left: dp(40);
+	padding-left: utils.dp(40);
 }
 
 
@@ -275,7 +282,7 @@ i.icon.em-low_priority {
 .cal-has-links{
 	//background:url(../../../../views/Extjs3/themes/Default/images/attach.gif) no-repeat center 3px;
 	@extend %icon;
-	font-size: dp(16);
+	font-size: utils.dp(16);
 	&:before {
 		content: "link";
 	}
@@ -312,17 +319,17 @@ i.icon.em-low_priority {
 	position:relative;
 	display:inline-block;
 	padding:0;
-	background: url(#{$resourcePath}img/default-avatar.svg) no-repeat center center;
+	background: url(#{theme.$resourcePath}img/default-avatar.svg) no-repeat center center;
 	background-size:cover;	
 	border-radius: 50%;
-	width:dp(40);
-	height: dp(40);
-	font-size: dp(28);	
+	width:utils.dp(40);
+	height: utils.dp(40);
+	font-size: utils.dp(28);	
 	text-align: center;	
 	
 	.icon {
 		color: red;
-		line-height: dp(40);
+		line-height: utils.dp(40);
 		font-size: inherit;			
 		height: 100%;
 		width: 100%;
@@ -330,8 +337,8 @@ i.icon.em-low_priority {
 
 	.go-detail-view & {
 		//float:left; ?? why?
-		margin-top:dp(4);
-		margin-right: dp(16);
+		margin-top:utils.dp(4);
+		margin-right: utils.dp(16);
 	}
 	
 	.x-btn {
