@@ -47,7 +47,7 @@ class Client extends Property
 	protected static function internalDelete(Query $query): bool
 	{
 		$query->select('id')->setModel(self::class)->from('core_client', 'cl'); // needed for proerty
-		if(!Token::delete(['clientId' => $query])) {
+		if(!Token::delete((new Query)->where(['clientId' => $query])->andWhere('expiresAt', '!=', null))) {
 			throw new \Exception("Could not delete token");
 		}
 		return parent::internalDelete($query);
