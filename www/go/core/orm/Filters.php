@@ -232,7 +232,7 @@ class Filters {
 					$range = $this->checkDateRange($value, $filterConfig['type']=='datetime');
 					if($range) {
 						call_user_func($filterConfig['fn'], $criteria, '>=', $range[0], $query, $filter, $this);
-						call_user_func($filterConfig['fn'], $criteria, '<=', $range[1], $query, $filter, $this);
+						call_user_func($filterConfig['fn'], $criteria, $range['endHasTime'] ? '<=' : '<', $range[1], $query, $filter, $this);
 					} else
 					{
 						if($value == null) {
@@ -470,6 +470,9 @@ class Filters {
 		}
 
 		$parts['endHasTime'] = $endHasTime;
+		if(!$endHasTime) {
+			$parts[1]->modify('+1 day');
+		}
 
 		return $parts;
 	}
