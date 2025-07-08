@@ -170,6 +170,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		
 		
 		this.mainItem = new Ext.Panel({
+			hiddenOnInit: false,
 			listeners: {
 				render: function() {
 					this.mainItem.body.on('click', this.onBodyClick, this);
