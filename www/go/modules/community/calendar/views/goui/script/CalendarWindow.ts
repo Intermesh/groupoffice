@@ -37,7 +37,7 @@ export class CalendarWindow extends FormWindow {
 					dataSource: jmapds("Principal"), placeholder: t('Shared'),displayProperty: 'name', filter: {entity: 'User'},
 					label: t("Owner"), name: "ownerId", filterName: "text", flex:'1 0', clearable:true
 				}),
-				radio({type:'button',label: t('Include in availability'), value: 'all', name: 'includeInAvailability', options: [
+				radio({type:'button',label: t('Availability'), value: 'all', name: 'includeInAvailability', options: [
 					{value:'all',text: t('All')},
 					{value:'attending',text: t('Attending')},
 					{value:'none',text: t('None')}
@@ -51,10 +51,6 @@ export class CalendarWindow extends FormWindow {
 
 		alertField.drawOptions();
 		fdAlertField.drawOptions();
-
-		// this.form.on('load', (me, data) => {
-		// 	unsubscribeBtn.hidden = !data.id;
-		// })
 		//
 		// this.cards.items.add(comp({title: t('Categories')},
 		// 	table({
