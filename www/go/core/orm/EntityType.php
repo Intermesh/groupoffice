@@ -20,6 +20,7 @@ use go\core\model\Acl;
 use go\core\model\Search;
 use go\core\orm\exception\SaveException;
 use go\core\util\Lock;
+use GO\Files\Model\Folder;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
@@ -918,7 +919,7 @@ class EntityType implements ArrayableInterface {
 		return $cls != Search::class &&
 			(
 				is_subclass_of($cls, AclOwnerEntity::class) ||
-				(is_subclass_of($cls, ActiveRecord::class) && $cls::model()->aclField() && !$cls::model()->isJoinedAclField)
+				(is_subclass_of($cls, ActiveRecord::class) && $cls::model()->aclField() && (!$cls::model()->isJoinedAclField || $cls == Folder::class))
 			);
 	}
 
