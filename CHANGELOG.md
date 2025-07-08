@@ -1,3 +1,5 @@
+- Files: Fixed invalid deletion of file acl's in garbage collection
+- 
 07-07-2025: 6.8.130 
 - CardDAV: not possible to create vCards in addressbooks without write permission.
 - Projects2: Fixed sub project internal fees calculation
