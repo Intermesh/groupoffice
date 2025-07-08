@@ -1,5 +1,6 @@
 08-07-2025: 25.0.35
 - Core: Small fonts issue
+- Core: 32 bit support, (Issue quota / postfixverwaltung #1272)
 
 07-07-2025: 25.0.34
 - Calendar: fixed 12-hour time format
