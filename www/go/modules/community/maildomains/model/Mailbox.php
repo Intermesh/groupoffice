@@ -50,10 +50,8 @@ final class Mailbox extends AclItemEntity
 
 	/**
 	 * Quota in bytes
-	 *
-	 * @var int
 	 */
-	public int $quota;
+	public float $quota;
 
 	/**
 	 * Auto expunge in this period.

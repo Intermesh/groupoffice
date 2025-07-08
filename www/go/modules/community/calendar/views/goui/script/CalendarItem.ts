@@ -752,7 +752,8 @@ export class CalendarItem {
 				{start: this.recurrenceId!},
 				modified
 			);
-
+			delete next.modifier;
+			delete next.creator;
 			delete next.id;
 			delete next.uid;
 			delete next.recurrenceOverrides;

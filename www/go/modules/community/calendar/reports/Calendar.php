@@ -56,9 +56,11 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 	protected $events = [];
 	protected $early = [];
 	protected $late = [];
+	public int $firstWeekday;
 
 	public function __construct($orientation = 'P', $unit = 'mm', $size = 'A4') {
 		$this->defaultFont = 'helvetica';
+		$this->firstWeekday = go()->getAuthState()->getUser(['firstWeekday'])->firstWeekday;
 		parent::__construct($orientation, $unit, $size);
 
 		$this->setCellPaddings(1,1,0,1);
@@ -136,12 +138,14 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 		
 		$this->Ln();
 		$this->Line($this->GetX(), $this->GetY(), $this->GetX()+$w, $this->GetY(),['width'=>0.1]);
+
+		$firstWeekDay = $this->wd(date('w',$firstDay));
 		$day='';
 		for($r=0;$r<6;$r++){
 			for($c=0;$c<7;$c++){ //toggle weekday
-				if($this->wd(date('N',$firstDay))==$c && $day==='')
+				if($firstWeekDay == $c && $day==='')
 					$day=1;
-				$this->Cell($w/7,$h/8,$day, 0,0,'R');
+				$this->Cell($w/7,$h/8,$day , 0,0,'R');
 				if(!empty($day))
 					$day++;
 				if($day>date('d',$lastDay))
@@ -234,11 +238,11 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 	 * @return int 0 for monday
 	 */
 	protected function wd($wd) {
-		if(\GO::user()->first_weekday==0)
+		if($this->firstWeekday==0)
 			return $wd;
-		if ($wd==0) 
-			return 6;
+		if ($wd==7)
+			return 0;
 		else 
-			return --$wd;
+			return $wd-1;
 	}
 }

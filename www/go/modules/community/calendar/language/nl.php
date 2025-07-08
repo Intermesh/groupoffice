@@ -28,7 +28,9 @@ return [
 	'New event' => 'Nieuwe afspraak',
 	'Event' => 'Afspraak',
 	'All day' => 'Hele dag',
-
+	'Attending' => 'Aanwezig',
+	'Include in availability' => 'Invloed op beschikbaarheid',
+	'Check availability' => 'Beschikbaarheid controleren',
 	'Events with time' => 'Afspraken met tijd',
 	'Events without time (Full-day)' => 'Afspraken zonder tijd (Hele dag)',
 	'Default notifications' => 'Standaard meldingen',
@@ -36,6 +38,7 @@ return [
 	'Override' => 'Overschreven',
 
 	'Create calendar' => 'Nieuwe agenda maken',
+	'Edit calendar' => 'Agenda bewerken',
 	'Subscribe to calendar' => 'Aanmelden bij agenda',
 	'Add calendar from link' => 'Agenda toevoegen via link',
 

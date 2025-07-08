@@ -1,3 +1,5 @@
+@use "utils";
+
 #paper {
   display: none;
 }
@@ -45,7 +47,7 @@
     border-collapse: collapse;
   }
   td, th {
-    padding: 0 dp(8);
+    padding: 0 utils.dp(8);
   }
   th {
     font-weight: bold;

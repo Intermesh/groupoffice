@@ -1,10 +1,12 @@
+@use "theme";
+
 @font-face {
   font-family: 'Lato';
-  src: url('#{$resourcePath}fonts/Lato-Medium.eot'); /* IE9 Compat Modes */
-  src: url('#{$resourcePath}fonts/Lato-Medium.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('#{$resourcePath}fonts/Lato-Medium.woff2') format('woff2'), /* Modern Browsers */
-       url('#{$resourcePath}fonts/Lato-Medium.woff') format('woff'), /* Modern Browsers */
-       url('#{$resourcePath}fonts/Lato-Medium.ttf') format('truetype');
+  src: url('#{theme.$resourcePath}fonts/Lato-Medium.eot'); /* IE9 Compat Modes */
+  src: url('#{theme.$resourcePath}fonts/Lato-Medium.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('#{theme.$resourcePath}fonts/Lato-Medium.woff2') format('woff2'), /* Modern Browsers */
+       url('#{theme.$resourcePath}fonts/Lato-Medium.woff') format('woff'), /* Modern Browsers */
+       url('#{theme.$resourcePath}fonts/Lato-Medium.ttf') format('truetype');
   font-style: normal;
   font-weight: normal;
   text-rendering: optimizeLegibility;
@@ -12,11 +14,11 @@
 
 @font-face {
   font-family: 'Lato';
-  src: url('#{$resourcePath}fonts/Lato-MediumItalic.eot'); /* IE9 Compat Modes */
-  src: url('#{$resourcePath}fonts/Lato-MediumItalic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('#{$resourcePath}fonts/Lato-MediumItalic.woff2') format('woff2'), /* Modern Browsers */
-       url('#{$resourcePath}fonts/Lato-MediumItalic.woff') format('woff'), /* Modern Browsers */
-       url('#{$resourcePath}fonts/Lato-MediumItalic.ttf') format('truetype');
+  src: url('#{theme.$resourcePath}fonts/Lato-MediumItalic.eot'); /* IE9 Compat Modes */
+  src: url('#{theme.$resourcePath}fonts/Lato-MediumItalic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('#{theme.$resourcePath}fonts/Lato-MediumItalic.woff2') format('woff2'), /* Modern Browsers */
+       url('#{theme.$resourcePath}fonts/Lato-MediumItalic.woff') format('woff'), /* Modern Browsers */
+       url('#{theme.$resourcePath}fonts/Lato-MediumItalic.ttf') format('truetype');
   font-style: italic;
   font-weight: normal;
   text-rendering: optimizeLegibility;
@@ -24,11 +26,11 @@
 
 @font-face {
   font-family: 'Lato';
-  src: url('#{$resourcePath}fonts/Lato-Heavy.eot'); /* IE9 Compat Modes */
-  src: url('#{$resourcePath}fonts/Lato-Heavy.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('#{$resourcePath}fonts/Lato-Heavy.woff2') format('woff2'), /* Modern Browsers */
-       url('#{$resourcePath}fonts/Lato-Heavy.woff') format('woff'), /* Modern Browsers */
-       url('#{$resourcePath}fonts/Lato-Heavy.ttf') format('truetype');
+  src: url('#{theme.$resourcePath}fonts/Lato-Heavy.eot'); /* IE9 Compat Modes */
+  src: url('#{theme.$resourcePath}fonts/Lato-Heavy.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('#{theme.$resourcePath}fonts/Lato-Heavy.woff2') format('woff2'), /* Modern Browsers */
+       url('#{theme.$resourcePath}fonts/Lato-Heavy.woff') format('woff'), /* Modern Browsers */
+       url('#{theme.$resourcePath}fonts/Lato-Heavy.ttf') format('truetype');
   font-style: normal;
   font-weight: bold;
   text-rendering: optimizeLegibility;
@@ -36,11 +38,11 @@
 
 @font-face {
   font-family: 'Lato';
-  src: url('#{$resourcePath}fonts/Lato-HeavyItalic.eot'); /* IE9 Compat Modes */
-  src: url('#{$resourcePath}fonts/Lato-HeavyItalic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('#{$resourcePath}fonts/Lato-HeavyItalic.woff2') format('woff2'), /* Modern Browsers */
-       url('#{$resourcePath}fonts/Lato-HeavyItalic.woff') format('woff'), /* Modern Browsers */
-       url('#{$resourcePath}fonts/Lato-HeavyItalic.ttf') format('truetype');
+  src: url('#{theme.$resourcePath}fonts/Lato-HeavyItalic.eot'); /* IE9 Compat Modes */
+  src: url('#{theme.$resourcePath}fonts/Lato-HeavyItalic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('#{theme.$resourcePath}fonts/Lato-HeavyItalic.woff2') format('woff2'), /* Modern Browsers */
+       url('#{theme.$resourcePath}fonts/Lato-HeavyItalic.woff') format('woff'), /* Modern Browsers */
+       url('#{theme.$resourcePath}fonts/Lato-HeavyItalic.ttf') format('truetype');
   font-style: italic;
   font-weight:  bold;
   text-rendering: optimizeLegibility;
@@ -74,22 +76,22 @@
 
 @font-face {
   font-family: 'Lato';
-  src: url('#{$resourcePath}fonts/Lato-Light.eot'); /* IE9 Compat Modes */
-  src: url('#{$resourcePath}fonts/Lato-Light.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('#{$resourcePath}fonts/Lato-Light.woff2') format('woff2'), /* Modern Browsers */
-       url('#{$resourcePath}fonts/Lato-Light.woff') format('woff'), /* Modern Browsers */
-       url('#{$resourcePath}fonts/Lato-Light.ttf') format('truetype');
+  src: url('#{theme.$resourcePath}fonts/Lato-Light.eot'); /* IE9 Compat Modes */
+  src: url('#{theme.$resourcePath}fonts/Lato-Light.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('#{theme.$resourcePath}fonts/Lato-Light.woff2') format('woff2'), /* Modern Browsers */
+       url('#{theme.$resourcePath}fonts/Lato-Light.woff') format('woff'), /* Modern Browsers */
+       url('#{theme.$resourcePath}fonts/Lato-Light.ttf') format('truetype');
   font-style: normal;
   font-weight: 100;
   text-rendering: optimizeLegibility;
 }
 @font-face {
   font-family: 'Lato';
-  src: url('#{$resourcePath}fonts/Lato-LightItalic.eot'); /* IE9 Compat Modes */
-  src: url('#{$resourcePath}fonts/Lato-LightItalic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('#{$resourcePath}fonts/Lato-LightItalic.woff2') format('woff2'), /* Modern Browsers */
-       url('#{$resourcePath}fonts/Lato-LightItalic.woff') format('woff'), /* Modern Browsers */
-       url('#{$resourcePath}fonts/Lato-LightItalic.ttf') format('truetype');
+  src: url('#{theme.$resourcePath}fonts/Lato-LightItalic.eot'); /* IE9 Compat Modes */
+  src: url('#{theme.$resourcePath}fonts/Lato-LightItalic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('#{theme.$resourcePath}fonts/Lato-LightItalic.woff2') format('woff2'), /* Modern Browsers */
+       url('#{theme.$resourcePath}fonts/Lato-LightItalic.woff') format('woff'), /* Modern Browsers */
+       url('#{theme.$resourcePath}fonts/Lato-LightItalic.ttf') format('truetype');
   font-style: italic;
   font-weight: 100;
   text-rendering: optimizeLegibility;
