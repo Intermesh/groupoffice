@@ -63,7 +63,7 @@ class CalendarEvent extends AclItemEntity {
 		'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule','createdAt','modifiedAt',
 		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag','uri', 'eventId', 'recurrenceId'];
 
-	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'alerts', 'veventBlobId'];
+	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'veventBlobId'];
 
 //	// If any of this properties is in the recurrenceOverrides the Object most be ignored
 //	const IgnoredPropertiesInException = [
@@ -623,6 +623,9 @@ class CalendarEvent extends AclItemEntity {
 				// Remove alert when event is cancelled
 				CoreAlert::deleteByEntity($this);
 			}
+		}
+		if(!empty($this->alerts)) {
+			$this->useDefaultAlerts = false;
 		}
 
 		if(!empty($this->participants) && empty($this->replyTo)) {
