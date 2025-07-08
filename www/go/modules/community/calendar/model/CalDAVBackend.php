@@ -85,7 +85,7 @@ class CalDAVBackend extends AbstractBackend implements
 				'principaluri' => $principalUri, // echo back
 				'{DAV:}displayname' => $tasklist->name,
 				//'{http://apple.com/ns/ical/}refreshrate' => '0',
-				'{http://apple.com/ns/ical/}calendar-order' => $tasklist->sortOrder,
+				'{http://apple.com/ns/ical/}calendar-order' => $tasklist->sortOrder ?: $tasklist->id,
 				'{http://apple.com/ns/ical/}calendar-color' => '#'.$tasklist->color,
 				'{urn:ietf:params:xml:ns:caldav}calendar-description' => $tasklist->description,
 				'{urn:ietf:params:xml:ns:caldav}calendar-timezone' => "BEGIN:VCALENDAR\r\n" . $tz->serialize() . "END:VCALENDAR",
@@ -184,7 +184,6 @@ class CalDAVBackend extends AbstractBackend implements
 					break;
 				case 't':
 					$cal = Tasklist::findById($id);
-					unset($newValues['sortOrder']); // not supported for tasklist
 					break;
 			}
 			$cal->setValues($newValues);
@@ -367,8 +366,6 @@ class CalDAVBackend extends AbstractBackend implements
 		if(!$object->save()) {
 			throw new SaveException($object);
 		}
-
-		go()->debug("URI: " . $object->uri());
 
 		$etag = $object->modifiedAt->getTimestamp();
 

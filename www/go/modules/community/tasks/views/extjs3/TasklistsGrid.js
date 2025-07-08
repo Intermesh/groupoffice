@@ -50,7 +50,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 				entityStore: this.support ? "SupportList" : "Tasklist",
 				filters: {role: {role: 'list'}, subscribed: {isSubscribed:true}},
 				sortInfo: {
-					field: 'name',
+					field: 'sortOrder',
 					direction: 'ASC'
 				}
 			}),
