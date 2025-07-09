@@ -3,6 +3,7 @@ namespace go\core\model;
 use go\core\Environment;
 use go\core\ErrorHandler;
 use go\core\fs\Folder;
+use go\core\util\DateTime;
 
 class Holiday {
 
@@ -15,6 +16,7 @@ class Holiday {
 	private static $days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 	private static $months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
+	static $set;
 	static $lang;
 	static $names;
 
@@ -48,7 +50,7 @@ class Holiday {
 					self::$lang = 'en';
 				}
 			}
-			$this->title = $data->name->{self::$lang};
+			$this->title = $data->name->{self::$lang} ?? $data->name->{self::$set};
 
 		}
 		if(isset($data->type)) {
@@ -63,8 +65,9 @@ class Holiday {
 	}
 
 
-	static function generate($set, $lang, $from, $till) {
+	static function generate(string $set, string $lang, DateTime $from, DateTime $till) {
 		$dir = __DIR__ . '/../language/holidays/';
+		self::$set = strtolower($set);
 		self::$lang = $lang;
 		self::$names = \json_decode(file_get_contents($dir.'names.json'))->names;
 		$file = $dir.'countries/'.strtolower($set).'.json';
