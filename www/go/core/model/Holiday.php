@@ -2,6 +2,7 @@
 namespace go\core\model;
 use go\core\Environment;
 use go\core\ErrorHandler;
+use go\core\fs\File;
 use go\core\fs\Folder;
 use go\core\util\DateTime;
 
@@ -31,6 +32,15 @@ class Holiday {
 	public $type = 'public';
 
 	public $duration = 'P1D';
+
+	public static $mapping = array(
+		'at'=>'de-at',
+		'ch'=>'de-ch',
+		'au'=>'en-au',
+		'uk'=>'en_UK',
+		'us'=>'en-US',
+	);
+
 
 	public function __construct(string $rule, $data,$year) {
 		$this->year = $year;
@@ -231,5 +241,32 @@ class Holiday {
 
 		ksort($holidaySets);
 		return array_values($holidaySets);
+	}
+
+	/**
+	 * Get the holiday locale from the $countryCode that is provided.
+	 *
+	 * If no match can be found then the self::$systemDefaultLocale variable is used.
+	 *
+	 * @param string $countryCode
+	 * @return mixed the locale for the holidays or false when none found
+	 */
+	public static function getHolidaySet(string $countryCode): ?string
+	{
+		if (key_exists($countryCode, self::$mapping)) {
+			$countryCode = self::$mapping[$countryCode];
+		} else if (key_exists(strtolower($countryCode), self::$mapping)) {
+			$countryCode = self::$mapping[strtolower($countryCode)];
+		}
+		$countryCode = strtolower($countryCode);
+
+		$languageFolderPath = Environment::get()->getInstallFolder() . '/language/holidays/';
+
+		$file = new File($languageFolderPath . $countryCode . '.php');
+		if ($file->exists()) {
+			return $countryCode;
+		}
+
+		return null;
 	}
 }

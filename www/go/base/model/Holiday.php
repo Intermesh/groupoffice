@@ -22,7 +22,7 @@
  * @property String $name
  * @property String $region
  * @property boolean $free_day
- * @deprecated
+ * @deprecated - use go\core\model\Holiday instead
  */
 
 namespace GO\Base\Model;
@@ -352,11 +352,12 @@ class Holiday extends \GO\Base\Db\ActiveRecord {
 	
 	/**
 	 * Get the holiday locale from the $countryCode that is provided.
-	 * 
+	 *
 	 * If no match can be found then the self::$systemDefaultLocale variable is used.
-	 * 
+	 *
 	 * @param string $countryCode
 	 * @return mixed the locale for the holidays or false when none found
+	 * @deprecated: replaced by go\core\model\Holiday::getHolidaySet
 	 */
 	public static function localeFromCountry($countryCode){
 
@@ -364,11 +365,11 @@ class Holiday extends \GO\Base\Db\ActiveRecord {
 			$countryCode = self::$mapping[$countryCode];
 		else if(key_exists(strtolower($countryCode),self::$mapping))
 			$countryCode = self::$mapping[strtolower($countryCode)];
-		
+
 		$languageFolderPath = \GO::config()->root_path.'language/holidays/';
-		
+
 		$file = new \GO\Base\Fs\File($languageFolderPath.$countryCode.'.php');
-		
+
 		if($file->exists()){
 			return $countryCode;
 		}else{
@@ -376,7 +377,7 @@ class Holiday extends \GO\Base\Db\ActiveRecord {
 			if($file->exists())
 				return strtolower($countryCode);
 		}
-		
+
 		return false;
 	}
 	
