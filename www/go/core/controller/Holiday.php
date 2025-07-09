@@ -3,6 +3,7 @@
 namespace go\core\controller;
 
 use go\core\Controller;
+use go\core\util\DateTime;
 use go\modules\community\calendar\model;
 
 class Holiday extends Controller
@@ -10,8 +11,8 @@ class Holiday extends Controller
 	public function fetch(array $params): array
 	{
 		// params need '
-		$from = new \DateTime($params['from']);
-		$till = new \DateTime($params['till']);
+		$from = new DateTime($params['from']);
+		$till = new DateTime($params['till']);
 		$list = [];
 		foreach(model\Holiday::generate($params['set'],$params['lang'],$from, $till) as $holiday){
 			$key = $holiday->title .'-'.$holiday->start;
