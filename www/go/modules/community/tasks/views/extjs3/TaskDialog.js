@@ -42,6 +42,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						this.close();
 					});
 				}else {
+					this.closeWithModifications = true;
 					this.close();
 				}
 			}, {single:true})

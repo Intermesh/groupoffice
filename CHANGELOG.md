@@ -1,3 +1,7 @@
+- Tasks: Fixed are you sure close message on save
+- Files: Fixed invalid deletion of file acl's in garbage collection
+- Core: Fixed bug in garbage collection stopping on api keys 
+
 08-07-2025: 25.0.35
 - Core: Small fonts issue
 - Core: 32 bit support, (Issue quota / postfixverwaltung #1272)
