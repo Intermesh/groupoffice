@@ -101,7 +101,7 @@ export class CalendarList extends Component<CalendarListEventMap> {
 						const oldLength = Object.values(this.inCalendars).filter(Boolean).length;
 						this.inCalendars = records.reduce((obj, item) => ({ ...obj, [item.id!]: item.isVisible }), {} as any);
 						const ids = Object.keys(this.inCalendars).filter(key => this.inCalendars[key]);
-						if(oldLength !== ids.length) {
+						if(oldLength !== ids.length || oldLength === 0) {
 							this.fire('changevisible', {ids});
 						}
 					});
@@ -154,7 +154,6 @@ export class CalendarList extends Component<CalendarListEventMap> {
 							cb.mask();
 							client.requestTimeout = 300000;
 							client.jmap('DavAccount/sync', {accountId:data.davaccountId,collectionId:data.id}).then(() => {
-								debugger;
 								this.fire('changevisible', {ids: Object.keys(this.inCalendars).filter(key => this.inCalendars[key])});
 							}).catch((err) => {
 								Window.error(err);

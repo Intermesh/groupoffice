@@ -67,7 +67,7 @@ class Calendar extends AclOwnerEntity {
 	 * @var DefaultAlertWT[]
 	 */
 	public ?array $defaultAlertsWithoutTime;
-	protected ?int $ownerId;
+	protected ?int $ownerId = null;
 	public ?string $createdBy;
 	public ?string $webcalUri = null;
 

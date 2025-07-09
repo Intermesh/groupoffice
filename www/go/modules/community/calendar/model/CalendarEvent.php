@@ -764,7 +764,7 @@ class CalendarEvent extends AclItemEntity {
 	public function calendarParticipant() {
 		if($this->calendarParticipant === null && !empty($this->participants)) {
 			$scheduleId = Calendar::find()
-				->join('core_user', 'u', 'calendar_calendar.ownerId = u.id')
+				->join('core_user', 'u', 'IFNULL(calendar_calendar.ownerId, '.go()->getUserId().') = u.id')
 				->where(['id' => $this->calendarId])
 				->selectSingleValue('u.email')->single();
 			$this->calendarParticipant = $this->participantByScheduleId($scheduleId);
