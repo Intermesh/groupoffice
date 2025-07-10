@@ -2,6 +2,7 @@
 - Files: Fixed invalid deletion of file acl's in garbage co llection
 - Core: Fixed bug in garbage collection stopping on api keys
 - Projects3: Fixed migration of billed status from projects2
+- Projects3: Reset registrations billed state when invoice is removed
 
 08-07-2025: 25.0.35
 - Core: Small fonts issue
