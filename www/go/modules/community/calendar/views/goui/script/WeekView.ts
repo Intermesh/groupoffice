@@ -188,7 +188,7 @@ export class WeekView extends CalendarView {
 			if(target.isA('dd')) { // CREATE
 				anchor = Math.round((e.clientY - offset) / pxPerSnap) * SNAP;
 				const data = {
-						start: (new DateTime(target.dataset.day! + " 00:00:00")).setHours(0, anchor).format('c'),
+						start: (new DateTime(target.dataset.day!)).setHours(0, anchor).format('c'),
 						title: t('New event'),
 						duration: client.user.calendarPreferences.defaultDuration ?? "PT1H",
 						calendarId: CalendarView.selectedCalendarId,
