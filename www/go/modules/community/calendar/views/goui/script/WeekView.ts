@@ -118,7 +118,7 @@ export class WeekView extends CalendarView {
 				ev.end.setHours(0, till);
 				const firstDiv = Object.values(ev.divs)[0];
 				if(firstDiv)
-					firstDiv.lastElementChild!.textContent = ev.start.format('G:i') + ' - ' + ev.end.format('G:i');
+					firstDiv.lastElementChild!.textContent = ev.start.format(Format.timeFormat) + ' - ' + ev.end.format(Format.timeFormat);
 				changed = true;
 				this.updateItems(ev.start.clone());
 			}
@@ -188,7 +188,7 @@ export class WeekView extends CalendarView {
 			if(target.isA('dd')) { // CREATE
 				anchor = Math.round((e.clientY - offset) / pxPerSnap) * SNAP;
 				const data = {
-						start: (new DateTime(target.dataset.day!)).setHours(0, anchor).format('c'),
+						start: (new DateTime(target.dataset.day! + " 00:00:00")).setHours(0, anchor).format('c'),
 						title: t('New event'),
 						duration: client.user.calendarPreferences.defaultDuration ?? "PT1H",
 						calendarId: CalendarView.selectedCalendarId,
@@ -196,6 +196,7 @@ export class WeekView extends CalendarView {
 					},
 					start = new DateTime(data.start),
 					end = start.clone().addHours(1);
+
 				this.currentCreation = ev = new CalendarDayItem({start,end,data,key:''});
 				this.dayItems.unshift(ev as CalendarDayItem);
 				this.updateItems(start.clone().setHours(0,0,0,0));
