@@ -152,12 +152,12 @@ final class Domain extends AclOwnerEntity
 		return $this->id;
 	}
 
-	public function getSumUsedQuota(): int
+	public function getSumUsedQuota(): float
 	{
-		return $this->sumUsedQuota;
+		return $this->sumUsedQuota ?? 0;
 	}
 
-	public function getSumUsage(): int
+	public function getSumUsage(): float
 	{
 		return $this->sumUsage;
 	}
