@@ -8,7 +8,7 @@ import {
 	datasourcestore,
 	DateField,
 	datefield, DateInterval,
-	DateTime, DisplayField, displayfield,
+	DateTime, datetimefield, DateTimeField, DisplayField, displayfield,
 	Format, MapField, mapfield, Notifier, numberfield,
 	radio,
 	select,
@@ -33,8 +33,8 @@ export class EventWindow extends FormWindow {
 
 	private store: JmapDataSource
 	// private submitBtn:Button
-	private endDate: DateField
-	private startDate: DateField
+	private endDate: DateTimeField
+	private startDate: DateTimeField
 	private withoutTimeToggle: CheckboxField
 
 	private attachments:MapField
@@ -86,7 +86,7 @@ export class EventWindow extends FormWindow {
 		this.form.on("beforesubmit", this.onBeforeSubmit, {bind:this});
 
 		this.generalTab.cls = 'flow fit scroll pad';
-		this.startDate = datefield({label: t('Start'), name:'start',flex:1, defaultTime: now.format('H')+':00',
+		this.startDate = datetimefield({label: t('Start'), name:'start',flex:1, defaultTime: now.format('H')+':00',
 			listeners:{'change': ({target, oldValue}) => {
 
 					const newStartDate = target.getValueAsDateTime(),
@@ -112,7 +112,7 @@ export class EventWindow extends FormWindow {
 				}
 			}}
 		});
-		this.endDate = datefield({label:t('End'), name: 'end', flex:1, defaultTime: (now.getHours()+1 )+':00',
+		this.endDate = datetimefield({label:t('End'), name: 'end', flex:1, defaultTime: (now.getHours()+1 )+':00',
 			listeners: {'change': ({target, oldValue}) => {
 					const newEndDate = target.getValueAsDateTime(),
 						startDate = this.startDate.getValueAsDateTime(),
