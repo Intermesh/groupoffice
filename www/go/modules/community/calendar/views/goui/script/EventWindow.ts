@@ -51,7 +51,8 @@ export class EventWindow extends FormWindow {
 
 		const m = go.Modules.get('community','calendar');
 		this.title = t('Event');
-		this.width = 565;
+		this.width = 620;
+		this.stateId = "calendar-event-window";
 		this.height = 840;
 		this.resizable = true;
 		this.hasLinks = true;
