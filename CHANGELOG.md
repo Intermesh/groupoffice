@@ -1,3 +1,6 @@
+- Calendar: Fixed error when caldav server had acknowledged alerts
+- Calendar: Fixed wrong day headers when your timezone is west from UTC
+- Calendar: Implemented custom time picker to support 12 hour time format
 - Tasks: Fixed are you sure close message on save
 - Files: Fixed invalid deletion of file acl's in garbage co llection
 - Core: Fixed bug in garbage collection stopping on api keys
