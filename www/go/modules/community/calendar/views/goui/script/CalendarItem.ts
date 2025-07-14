@@ -8,7 +8,7 @@ import {
 	tbar, Timezone,
 	win, Window
 } from "@intermesh/goui";
-import {calendarStore, CalendarView, categoryStore, statusIcons, t} from "./Index.js";
+import {calendarStore, CalendarView, categoryStore, statusIcons, t, writeableCalendarStore} from "./Index.js";
 import {client, jmapds, Recurrence, RecurrenceField} from "@intermesh/groupoffice-core";
 import {EventWindow} from "./EventWindow.js";
 import {EventDetailWindow} from "./EventDetail.js";
@@ -298,10 +298,10 @@ export class CalendarItem {
 			return dlg;
 		}
 
-		if(!calendarStore.loaded) {
-			await calendarStore.load();
+		if(!writeableCalendarStore.loaded) {
+			await writeableCalendarStore.load();
 		}
-		const cals = calendarStore.all()
+		const cals = writeableCalendarStore.all()
 		if(!cals.length) {
 			return new Promise(resolve => {
 				const w = win({
@@ -318,7 +318,8 @@ export class CalendarItem {
 						}}),
 						btn({text: t('Create personal calendar'), handler:() => {
 							client.jmap("Calendar/first", {}, 'pFirst').then(r => {
-								calendarStore.reload().then(r2 => {
+								calendarStore.reload();
+								writeableCalendarStore.reload().then(r2 => {
 									this.data.calendarId = r.calendarId;
 									resolve(internalOpen());
 								});

@@ -133,7 +133,7 @@ return [
 	'Select none' => 'Keinen auswählen',
 	'Deselect others' => 'Andere abwählen',
 
-	'mayChangeCalendars' => 'Kalender ändern',
+	'mayChangeCalendars' => 'Kalender erstellen/löschen',
 	'mayChangeCategories' => 'Kategorien ändern',
 	'mayChangeResources' => 'Ressourcen ändern',
 

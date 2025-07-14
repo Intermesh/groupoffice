@@ -176,7 +176,7 @@ export class CalendarList extends Component<CalendarListEventMap> {
 							});
 						}
 					}}),
-					btn({icon:'edit', text: t('Edit')+'…', hidden: data.davaccountId || !rights.mayChangeCalendars, disabled:!data.myRights.mayAdmin, handler: async _ => {
+					btn({icon:'edit', text: t('Edit')+'…', hidden: data.davaccountId || (data.groupId && !rights.mayChangeResources), disabled:!data.myRights.mayAdmin, handler: async _ => {
 							const dlg = data.groupId ? new ResourceWindow() : new CalendarWindow();
 							await dlg.load(data.id);
 							dlg.show();
@@ -188,7 +188,7 @@ export class CalendarList extends Component<CalendarListEventMap> {
 					btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
 						jmapds('Calendar').update(data.id, {isSubscribed: false}).catch(e => Window.error(e))
 					}}),
-					hr(),
+					hr({hidden:data.groupId}),
 					btn({icon:'file_save',hidden:data.groupId, text: t('Export','core','core'), handler: _ => { client.getBlobURL('community/calendar/calendar/'+data.id).then(window.open) }}),
 					btn({icon:'upload_file',hidden:data.groupId, text:t('Import','core','core')+'…', handler: async ()=> {
 							const files = await browser.pickLocalFiles(false,false,'text/calendar');

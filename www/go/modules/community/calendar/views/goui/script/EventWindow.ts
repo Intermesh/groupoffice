@@ -20,7 +20,7 @@ import {
 	win,
 } from "@intermesh/goui";
 import {client, FormWindow, JmapDataSource, jmapds, recurrencefield} from "@intermesh/groupoffice-core";
-import {calendarStore, categoryStore,t} from "./Index.js";
+import {categoryStore, t, writeableCalendarStore} from "./Index.js";
 import {ParticipantField, participantfield} from "./ParticipantField.js";
 import {AlertField, alertfield} from "./AlertField.js";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
@@ -138,18 +138,18 @@ export class EventWindow extends FormWindow {
 			}}),
 			select({
 				label: t('Calendar'), name: 'calendarId', required: true, flex: '1 30%',
-				store: calendarStore,
+				store: writeableCalendarStore,
 				valueField: 'id',
 				textRenderer: (r: any) => r.name,
 				listeners: {
 					render: () => {
-						if(!calendarStore.loaded) {
-							void calendarStore.load();
+						if(!writeableCalendarStore.loaded) {
+							void writeableCalendarStore.load();
 						}
 					},
 					'setvalue': ({newValue}) => {
 						if(newValue)
-						calendarStore.dataSource.single(newValue).then(r => {
+							writeableCalendarStore.dataSource.single(newValue).then(r => {
 							if(!r) return;
 							this.item!.cal = r;
 
@@ -181,7 +181,7 @@ export class EventWindow extends FormWindow {
 					this.alertField.drawOptions();
 
 					if(this.form.value.calendarId) {
-						calendarStore.dataSource.single(this.form.value.calendarId).then(r => {
+						writeableCalendarStore.dataSource.single(this.form.value.calendarId).then(r => {
 							if (!r) return;
 							const d = newValue ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
 							this.alertField.setDefaultLabel(d)

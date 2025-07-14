@@ -5,7 +5,7 @@ return [
 	'description' => 'Een krachtige agenda voor teams en individuen. Het helpt je om afspraken te organiseren, beschikbaarheid te beheren en in realtime met anderen te coördineren. Met ondersteuning voor terugkerende afspraken, gedeelde agenda\'s en automatische verwerking van uitnodigingen maakt het plannen over tijdzones en organisaties heen eenvoudig. De snelle, moderne webinterface biedt meerdere weergaven, zodat je volledige controle hebt over het bijhouden van persoonlijke afspraken of het beheren van teamagenda\'s. Met slimme filters en aangepaste weergaven kun je makkelijk navigeren door drukke agenda\'s.',
 
 
-	'mayChangeCalendars'=> 'Wijzig Agenda\'s',
+	'mayChangeCalendars'=> 'Agenda\'s maken/verwijderen',
 	'mayChangeCategories' => 'Wijzig Categorieën',
 	'mayChangeResources' => 'Wijzig Faciliteiten',
 
