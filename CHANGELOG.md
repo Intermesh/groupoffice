@@ -1,3 +1,4 @@
+14-07-2025: 6.8.131
 - Files: Fixed invalid deletion of file acl's in garbage collection
 - Core: Fixed bug in garbage collection stopping on api keys
 - Studio: Fix error in generated ACL module mainpanel without detailpanel
