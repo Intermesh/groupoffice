@@ -1,3 +1,4 @@
+14-07-2025: 25.0.36
 - OTP: dialog would not popup when OTP setup is required.
 - OTP: Code would not verify during setup of a new OTP token.
 - Calendar: Event dialog will only make writeable calendars selectable.
