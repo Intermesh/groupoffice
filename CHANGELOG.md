@@ -1,6 +1,12 @@
+- OTP: dialog would not popup when OTP setup is required.
+- OTP: Code would not verify during setup of a new OTP token.
+- Calendar: Event dialog will only make writeable calendars selectable.
+- Calendar: The create first calendar dialog will popup if there are no writable calendars.
+- Calendar: mayChangeCalendar is named "Create/Delete calendars", edit is allowed based on permissions. 
+    A user with owner permission must also have create/delete permission on the module to delete a calendar
 - Calendar: Fixed error when caldav server had acknowledged alerts
 - Calendar: Fixed wrong day headers when your timezone is west from UTC
-- Calendar: Implemented custom time picker to support 12 hour time format
+- GOUI: Implemented custom time picker to support 12 hour time format
 - Tasks: Fixed are you sure close message on save
 - Files: Fixed invalid deletion of file acl's in garbage co llection
 - Core: Fixed bug in garbage collection stopping on api keys
