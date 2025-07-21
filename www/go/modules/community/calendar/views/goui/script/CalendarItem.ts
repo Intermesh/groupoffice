@@ -355,7 +355,7 @@ export class CalendarItem {
 	}
 
 	downloadIcs(){
-		client.getBlobURL('community/calendar/ics/'+this.key).then(window.open)
+		client.downloadBlobId('community/calendar/ics/'+this.key, this.cal.name + '_'+this.start.format('Y-m-dTHi')+'_'+this.title+'.ics');
 	}
 
 	confirmScheduleMessage(modified: Partial<CalendarEvent>|false, onAccept: ()=>void) {
