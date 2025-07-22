@@ -312,6 +312,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			}));
 		}
 		document.documentElement.cls('compact',go.User.theme === 'Compact');
+		window.GOUI.DateTime.staticInit(go.User.language.substring(0,2), go.User.firstWeekday);
+
 		GO.util.density = parseFloat(window.getComputedStyle(document.documentElement).fontSize) / 10;
 
 		var me = this;
