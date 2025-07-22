@@ -308,6 +308,8 @@ $updates['202506130832'][] = "CREATE TABLE IF NOT EXISTS calendar_schedule_objec
                                    size INT(11) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
+$updates["202507221653"][] = "alter table `calendar_preferences` add column weekViewGridSize	INT DEFAULT 8 NOT NULL AFTER weekViewGridSnap;";
+
 // TODO: calendar views -> custom filters
 
 

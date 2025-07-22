@@ -369,6 +369,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event_category` (
 CREATE TABLE calendar_preferences (
 	userId                INT NOT NULL PRIMARY KEY,
 	weekViewGridSnap      INT NULL,
+	weekViewGridSize      INT DEFAULT 8 NOT NULL,
 	defaultDuration       VARCHAR(32) NULL,
 	autoUpdateInvitations TINYINT(1) DEFAULT 0 NOT NULL,
 	autoAddInvitations    TINYINT(1) DEFAULT 0 NOT NULL,

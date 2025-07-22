@@ -395,8 +395,6 @@
 	}
 }
 
-$hourHeight: 8vh;
-$halfHour: 4vh;
 $timeMargin: dp(72);
 
 %weekhead {
@@ -423,6 +421,7 @@ $timeMargin: dp(72);
 }
 
 .cal.week {
+	--hour-height: 5vh;
 	height:100%;
 	display: flex;
 	flex-direction: column;
@@ -483,7 +482,7 @@ $timeMargin: dp(72);
 		> dd { // day column
 			position: relative;
 			overflow: hidden;
-			height: 24*$hourHeight;
+			height: calc(24 * var(--hour-height));
 			//max-height: 1680px;
 			//background: linear-gradient(180deg, $colorLine 1px, transparent 1px) repeat-y;
 			background-image: repeating-linear-gradient(
@@ -491,7 +490,7 @@ $timeMargin: dp(72);
 				$colorLine 0px,
 				$colorLine 1px,
 				transparent 1px,
-				transparent $hourHeight
+				transparent var(--hour-height)
 			);
 			//background-size: 100% $hourHeight;
 			border-right: 1px solid $colorLine;
@@ -508,7 +507,7 @@ $timeMargin: dp(72);
 				font-style: normal;
 				display: block;
 				font-size: .8em;
-				height: $hourHeight;
+				height: var(--hour-height);
 				//max-height: 70px; // 1680 / 24
 				color: $colorTextSecondary;
 				text-align: right;
