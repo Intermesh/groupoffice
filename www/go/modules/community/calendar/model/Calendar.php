@@ -8,6 +8,7 @@ use go\core\fs\Blob;
 use go\core\http;
 use go\core\model\Principal;
 use go\core\model\User;
+use go\core\orm\CustomFieldsTrait;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\PrincipalTrait;
@@ -19,6 +20,10 @@ use go\core\orm\Relation;
  *
  */
 class Calendar extends AclOwnerEntity {
+
+	use CustomFieldsTrait {
+		customFieldsModelId as traitCustomFieldModelId;
+	}
 
 	use PrincipalTrait {
 		queryMissingPrincipals as protected traitMissingPrincipals;
