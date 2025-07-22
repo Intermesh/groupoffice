@@ -185,7 +185,6 @@ CREATE TABLE IF NOT EXISTS `calendar_participant` (
     `rolesMask` INT NOT NULL DEFAULT 0,
 	  `language` VARCHAR(20),
     `participationStatus` ENUM('needs-action', 'tentative', 'accepted', 'declined', 'delegated') NULL DEFAULT 'needs-action',
-    `scheduleAgent` ENUM('server', 'client', 'none') DEFAULT 'server',
     `expectReply` TINYINT(1) NOT NULL DEFAULT 0,
     `scheduleUpdated` DATETIME NULL,
 		`scheduleStatus` varchar(255) DEFAULT NULL,

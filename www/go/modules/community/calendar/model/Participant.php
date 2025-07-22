@@ -72,9 +72,6 @@ class Participant extends Property
 	/** @var bool true if organizer is expecting the participant to notify them of their participation status. */
 	public bool $expectReply = false;
 
-	/** @var?string is the 'client', 'server' or 'none' responsible for sending imip invites */
-	public ?string $scheduleAgent = null;
-
 	/** @var int The sequence number of the last response from the participant.  */
 	public int $scheduleSequence = 0;
 
@@ -119,8 +116,7 @@ class Participant extends Property
 //
 //	/**
 //	 * A client may set the property on a participant to true to request that the server send a scheduling message to
-//	 * the participant when it would not normally do so (e.g., if no significant change is made the object or the
-//	 * scheduleAgent is set to client). The property MUST NOT be stored in the JSCalendar object on the server or appear
+//	 * the participant when it would not normally do so (e.g., if no significant change is made the object). The property MUST NOT be stored in the JSCalendar object on the server or appear
 //	 * in a scheduling message.
 //	 *
 //	 * @todo this doesn't seem to do anytning?

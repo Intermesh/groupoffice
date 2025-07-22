@@ -127,7 +127,7 @@ class Scheduler {
 
 		foreach($event->participants as $participant) {
 			/** @var $participant Participant */
-			if(($newOnly && !$participant->isNew()) || $participant->isOwner() || $participant->scheduleAgent !== 'server')
+			if(($newOnly && !$participant->isNew()) || $participant->isOwner())
 				continue;
 
 			if(!empty($participant->language)) {

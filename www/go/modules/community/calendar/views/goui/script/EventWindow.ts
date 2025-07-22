@@ -6,15 +6,14 @@ import {
 	column,
 	comp, containerfield,
 	datasourcestore,
-	DateField,
-	datefield, DateInterval,
-	DateTime, datetimefield, DateTimeField, DisplayField, displayfield,
+	DateInterval,
+	DateTime, datetimefield, DateTimeField,
 	Format, MapField, mapfield, Notifier, numberfield,
 	radio,
 	select,
 	store,
 	table,
-	textarea, TextAreaField,
+	textarea,
 	textfield,
 	TextField,
 	win,
@@ -238,7 +237,7 @@ export class EventWindow extends FormWindow {
 						column({id: "name"})
 					]
 				}),
-				label: "Categories",
+				label: t("Categories",'core','core'),
 				name: "categoryIds",
 				chipRenderer: async (chip, id) => {
 					categoryStore.dataSource.single(id).then(v => { chip.text = v?.name ?? '???'});

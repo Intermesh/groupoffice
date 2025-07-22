@@ -167,7 +167,6 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 			email:principal.email,
 			name: principal.name || principal.email,
 			roles: {attendee:true},
-			scheduleAgent: principal.id ? 'server' : 'server',
 			kind: principal.type ?? 'individual',
 			participationStatus:"needs-action",
 			expectReply:true
