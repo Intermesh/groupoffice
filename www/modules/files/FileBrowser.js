@@ -750,6 +750,14 @@ GO.files.FileBrowser = function(config){
 				new Ext.Toolbar({
 					hidden: true,
 					items: [
+						{
+							cls: 'go-narrow',
+							iconCls: "ic-menu",
+							handler: function () {
+								this.westPanel.show();
+							},
+							scope: this
+						},
 						"->",
 						new Ext.Button({
 							iconCls: 'ic-delete',
