@@ -51,11 +51,8 @@ class LogEntry extends AclOwnerEntity {
 
 	public int $entityTypeId;
 
-	public ?int $entityId;
+	public int|string|null $entityId;
 
-	/**
-	 * @var string
-	 */
 	protected string $entity;
 
 	public ?string $description;
