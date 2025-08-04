@@ -57,7 +57,7 @@ create table community_maildomains_dkim_key
 (
     domainId int(11) unsigned             not null,
     selector varchar(190)      default '' not null,
-    publicKey      text              default '' not null,
+    publicKey      text          null,
     `privateKey`    text                         null,
     status   smallint unsigned default 0  null,
     enabled bool default false not null,
