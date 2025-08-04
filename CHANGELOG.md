@@ -7,6 +7,7 @@
 - Core: Improved setting link on image in htmleditor
 - ldapauthenticator: Fixed ErrorException in /usr/share/groupoffice/go/modules/community/ldapauthenticator/cli/controller/Sync.php at line 443: Trying to access array offset on value of type null
 - caldav: Fixed: ErrorException in /usr/share/groupoffice/go/modules/community/calendar/model/CalDAVBackend.php at line 131: Undefined array key "color"
+- caldav: Fixed: InvalidArgumentException in /usr/share/groupoffice/vendor/sabre/dav/lib/CalDAV/CalendarObject.php at line 58: The objectData argument must contain an 'uri' property
 
 14-07-2025: 25.0.36
 - OTP: dialog would not popup when OTP setup is required.
