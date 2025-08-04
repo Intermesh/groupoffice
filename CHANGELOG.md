@@ -8,6 +8,7 @@
 - ldapauthenticator: Fixed ErrorException in /usr/share/groupoffice/go/modules/community/ldapauthenticator/cli/controller/Sync.php at line 443: Trying to access array offset on value of type null
 - caldav: Fixed: ErrorException in /usr/share/groupoffice/go/modules/community/calendar/model/CalDAVBackend.php at line 131: Undefined array key "color"
 - caldav: Fixed: InvalidArgumentException in /usr/share/groupoffice/vendor/sabre/dav/lib/CalDAV/CalendarObject.php at line 58: The objectData argument must contain an 'uri' property
+- maildomains: Fixed install error on mysql Database exception: SQLSTATE[42000]: Syntax error or access violation: 1101 BLOB, TEXT, GEOMETRY or JSON column 'publicKey' can't have a default value
 
 14-07-2025: 25.0.36
 - OTP: dialog would not popup when OTP setup is required.
