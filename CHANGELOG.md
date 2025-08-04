@@ -3,6 +3,7 @@
 - GOUI: when SelectField was set to null the option item was not selected.
 - GOUI: DateTime object will respect the users language and first day of the week.
 - Calendar: ics export filename will be calendar+date+title instead of uid
+- Finance: Payment should be verified / checked by default
 
 14-07-2025: 25.0.36
 - OTP: dialog would not popup when OTP setup is required.
