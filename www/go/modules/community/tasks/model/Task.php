@@ -21,6 +21,7 @@ use go\core\model\Principal;
 use go\core\model\User;
 use go\core\model\Module;
 use go\core\orm\CustomFieldsTrait;
+use go\core\orm\EntityType;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
@@ -433,6 +434,11 @@ class Task extends AclItemEntity {
 		$this->incrementTasklistModSeq();
 		$this->createSystemAlerts();
 
+		// update kanban boards tracking this task's tasklist
+		if (Module::isInstalled('business', 'kanban')) {
+			\go\modules\business\kanban\model\Board::updateBoards(EntityType::findByClassName(TaskList::class)->getId(), $this->tasklistId);
+		}
+
 		// if alert can be based on start / due of task check those properties as well
 		$modified = $this->getModified('alerts');
 		if (!empty($modified)) {
@@ -576,7 +582,7 @@ class Task extends AclItemEntity {
 		$nextTask->freeBusyStatus = 'free';
 
 		$rrule = $this->getRecurrenceRule();
-			
+
 		if(!empty($rrule->count)) {
 			$rrule->count--;
 			$nextTask->setRecurrenceRule($rrule->count > 0 ? $rrule : null);
@@ -712,7 +718,7 @@ class Task extends AclItemEntity {
 
 	public function getUid(): string
 	{
-		return $this->uid;		
+		return $this->uid;
 	}
 
 	public function setUid(string $uid) {
