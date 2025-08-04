@@ -114,6 +114,25 @@ Ext.extend(GO.plugins.HtmlEditorImageResize, Ext.util.Observable, {
 
 					if (width) img.style.width = width.includes('px') ? width : width + 'px';
 					if (height) img.style.height = height.includes('px') ? height : height + 'px';
+
+					// Create a range and select the image
+					const range = editorDoc.createRange();
+					range.selectNode(img.parentNode && img.parentNode.tagName == "A" ? img.parentNode : img);
+					const selection = editorDoc.getSelection();
+
+					// Clear current selection
+					selection.removeAllRanges();
+
+					// Add the new range to the selection
+					selection.addRange(range);
+				} else {
+					// Restore cursor position
+					if (lastRange) {
+						const selection = editorDoc.getSelection();
+						selection.removeAllRanges();
+						selection.addRange(lastRange);
+						lastRange = null;
+					}
 				}
 				activeWrapper.parentNode.removeChild(activeWrapper);
 				activeWrapper = null;
@@ -121,14 +140,6 @@ Ext.extend(GO.plugins.HtmlEditorImageResize, Ext.util.Observable, {
 				// Re-enable editing and remove image-editing class
 				editorDoc.body.contentEditable = 'true';
 				editorDoc.body.classList.remove('image-editing');
-
-				// Restore cursor position
-				if (lastRange) {
-					const selection = editorDoc.getSelection();
-					selection.removeAllRanges();
-					selection.addRange(lastRange);
-					lastRange = null;
-				}
 			}
 		};
 
