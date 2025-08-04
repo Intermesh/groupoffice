@@ -490,7 +490,7 @@ WHERE e.exception_for_event_id = -1 and ce.recurrenceId is not null;
 
 INSERT INTO calendar_event_alert
 	(id, `offset`, relativeTo, fk, userId) SELECT
-	1, CONCAT('PT',reminder,'S'), 'start', id, user_id FROM cal_events WHERE (start_time > unix_timestamp() or repeat_end_time > unix_timestamp()) AND exception_for_event_id = 0 AND reminder IS NOT NULL;
+	1, CONCAT('-PT',reminder,'S'), 'start', id, user_id FROM cal_events WHERE (start_time > unix_timestamp() or repeat_end_time > unix_timestamp()) AND exception_for_event_id = 0 AND reminder IS NOT NULL;
 
 INSERT INTO calendar_event_category
 	(eventId, categoryId) SELECT

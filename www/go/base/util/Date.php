@@ -66,35 +66,39 @@ class Date {
 	/**
 	 * Returns true if the time is a holiday or in the weekend
 	 *
-	 * @param <type> $time
-	 * @param <type> $region
-	 * @return <type> boolean
+	 * @param Date $time
+	 * @param ?string $region
+	 * @return bool
+	 * @throws \Exception
+	 * @deprecated
 	 */
-	public static function is_on_free_day($time, $region=false) {
-
+	public static function is_on_free_day(Date $time, ?string $region=null): bool
+	{
 		$weekday = date('w', $time);
 		if ($weekday==6 || $weekday==0) {
 			return true;
-		} else {
-			$date = date('Y-m-d', $time);
-			
-			$region = $region ? $region : \GO::config()->language;
-
-			
-			$year = date('Y', $time);
-			if(!isset(self::$holidays[$region][$year])){
-				$hstmt = \GO\Base\Model\Holiday::model()->getHolidaysInPeriod($year.'-01-01', $year.'-12-31', $region);			
-				
-				if($hstmt) {
-					foreach($hstmt as $h){
-						self::$holidays[$region][$year][$h->date]=$h->name;
-					}
-				}
-			}
-			
-			return isset(self::$holidays[$region][$year][$date]);
 		}
-		return false;
+		$date = date('Y-m-d', $time);
+
+		$region = $region ?? \GO::config()->language;
+
+		$year = date('Y', $time);
+		$startDate = \DateTime::createFromFormat('Y-m-d', $year.'-01-01');
+		$endDate = \DateTime::createFromFormat('Y-m-d', $year.'-12-31');
+		if (!isset(self::$holidays[$region][$year])){
+			/*
+			$hstmt = \GO\Base\Model\Holiday::model()->getHolidaysInPeriod($year.'-01-01', $year.'-12-31', $region);
+			if($hstmt) {
+				foreach($hstmt as $h){
+					self::$holidays[$region][$year][$h->date]=$h->name;
+				}
+			}*/
+			foreach (\go\core\model\Holiday::generate($region, \GO::config()->language, $startDate, $endDate) as $h) {
+				self::$holidays[$region][$year][$h->start] = $h->title;
+			}
+		}
+			
+		return isset(self::$holidays[$region][$year][$date]);
 	}
 
 	/**

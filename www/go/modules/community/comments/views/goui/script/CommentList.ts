@@ -51,13 +51,19 @@ export class CommentList extends Component {
 							lastDate = currentDate;
 						}
 
+						if(!comment.creator) {
+							comment.creator = {
+								name: t("Unknown user")
+							};
+						}
+
 						const avatarCnt = comp({
 								cls: "go-detail-view-avatar",
 								itemId: "avatar-container",
 								listeners: {
 									render: ({target}) => {
 										target.el.onclick = () => {
-											router.goto("contact", comment.creator.id)
+											go.modules.community.addressbook.lookUpUserContact(comment.creator.id)
 										}
 									}
 								}

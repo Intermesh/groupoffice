@@ -315,4 +315,5 @@ chart/BarChart.js
 license/LicenseDialog.js
 
 Alert.js
+PrincipalCombo.js
 

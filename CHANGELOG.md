@@ -1,17 +1,30 @@
+- Tasks: Fixed are you sure close message on save
+- Files: Fixed invalid deletion of file acl's in garbage collection
+- Core: Fixed bug in garbage collection stopping on api keys 
+
+08-07-2025: 25.0.35
+- Core: Small fonts issue
+- Core: 32 bit support, (Issue quota / postfixverwaltung #1272)
+
+07-07-2025: 25.0.34
 - Calendar: fixed 12-hour time format
+- Calendar: fixed patchThisAndFuture trying to set modifier
+- Core: fix generic spreadsheet import
+- Newsletters: fix import new contacts
 
 30-06-2025: 25.0.33
 - Files: fix external link to folder in folder panel
 - Support: new icon for link to prevent confusion with old tickets module
 - Core / email: Improved converting url to anchors so text cursor won't jump to last line
 - Address book: Contact color back in grid
+- Calendar: Added copy/cut/paste to right-click menu of events
 - Calendar: Delete full day event from weekview with Delete key works
 - Calendar: Drag and drop full day event in weekview
 - Calendar: Make calendar visible when new event is created
 - Calendar: Fix weekview horizontal lines aligned for Safari.
 - Calendar: When invites are inserted the calendar of the email account owner will be used.
 - Calendar: If user has no default calendar selecter the invite will be safed in the first owned calendar
-- Calendar: When updating invites all the calendar owned by the user will be searched for the event.
+- Calendar: When updating invites all the calendars owned by the user will be searched for the event.
 - Calendar: Added location to html of invite emails and fixed translation.
 
 23-06-2025: 25.0.32

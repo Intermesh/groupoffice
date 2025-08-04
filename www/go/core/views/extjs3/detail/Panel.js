@@ -13,11 +13,6 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-let commentsModule;
-
-import(BaseHref + "go/modules/community/comments/views/goui/dist/Index.js").then (m => {
-	commentsModule = m;
-})
 
 /**
  *
@@ -207,6 +202,10 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 
 		this.data = data;
 
+		if(this.comments) {
+			this.comments.load(this.data.id);
+		}
+
 		if(!this.relations.length) {
 			await this.onLoad();
 			this.fireEvent('load', this);
@@ -229,7 +228,6 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	},
 
 	load: function (id) {
-
 		id = parseInt(id);
 
 		if(this.loading) {
@@ -246,10 +244,6 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 
 		if(this.fireEvent("beforeload", this, id) === false) {
 			return Promise.resolve(this.data);
-		}
-
-		if(this.comments) {
-			this.comments.load(id);
 		}
 
 		this.currentId = id;
@@ -291,7 +285,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			});
 
 			this.add(wrapper);
-			this.comments = new commentsModule.CommentsPanel(this.entityStore.entity.name);
+			this.comments = new GO.comments.CommentsPanel(this.entityStore.entity.name);
 			wrapper.comp = this.comments;
 		}
 	},

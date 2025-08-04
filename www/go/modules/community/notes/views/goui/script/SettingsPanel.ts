@@ -1,15 +1,15 @@
 import {Component, containerfield, datasourceform, fieldset, radio, t} from "@intermesh/goui";
 import {notebookcombo} from "./NoteBookCombo";
-import {jmapds, User} from "@intermesh/groupoffice-core";
+import {User, userDS} from "@intermesh/groupoffice-core";
 
 export class SettingsPanel extends Component {
-	private form;
+	private readonly form;
 
 	constructor() {
 		super();
 
 		this.form = datasourceform({
-				dataSource: jmapds("User")
+				dataSource: userDS
 			},
 			fieldset({
 					legend: t("Display options for notebooks")

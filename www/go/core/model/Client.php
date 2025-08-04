@@ -44,15 +44,6 @@ class Client extends Property
 		return $this->status === 'allowed';
 	}
 
-	protected static function internalDelete(Query $query): bool
-	{
-		$query->select('id')->setModel(self::class)->from('core_client', 'cl'); // needed for proerty
-		if(!Token::delete(['clientId' => $query])) {
-			throw new \Exception("Could not delete token");
-		}
-		return parent::internalDelete($query);
-	}
-
 	protected function init()
 	{
 		parent::init();
@@ -87,6 +78,9 @@ class Client extends Property
 		$threeMonthsAgo = (new DateTime())->sub(new \DateInterval('P1M'));
 		return static::internalDelete(
 			(new Query)
+				->tableAlias("client")
+				->join("core_auth_token", "token", "token.clientId = client.id")
+				->where("token.expiresAt", "!=", null)
 				->where('deviceId', '=', '-') // only browsers are without deviceId
 				->andWhere('lastSeen', '<', $threeMonthsAgo));
 	}

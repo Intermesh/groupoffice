@@ -355,7 +355,7 @@ class ICalendarHelper {
 							['offset' => (string)$valarm->TRIGGER, 'relativeTo' => 'start']
 					]);
 					if(isset($valarm->ACKNOWLEDGED))
-						$a->acknowledged = !!$valarm->ACKNOWLEDGED;
+						$a->acknowledged = $valarm->ACKNOWLEDGED->getDateTime();
 					$event->alerts[] = $a;
 				}
 			}

@@ -684,7 +684,7 @@ $updates['202002041223'][] = "ALTER TABLE `core_link` ADD INDEX(`toEntityTypeId`
 $updates['202002041223'][] = "ALTER TABLE `core_link` ADD INDEX(`toId`);";
 
 $updates['202004281031'][] = "UPDATE `core_customfields_field` SET `type` = 'FunctionField' WHERE `type` = 'Function';";
-$updates['202004292101'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
+$updates['202004292101'][] = ""; //delete FROM `go _ holidays` WHERE region like 'en_uk';"
 
 
 $updates['202006041416'][] = "CREATE TABLE `core_oauth_access_token` (
@@ -954,9 +954,9 @@ $updates['202110211653'][] = "UPDATE core_user u JOIN addressbook_contact c ON c
 $updates['202111151100'][] = "UPDATE `core_user` SET `theme`='Paper' WHERE `theme` NOT IN ('Paper', 'Dark', 'Compact');";
 
 // recalculate because of substitute days
-$updates['202112131205'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
+$updates['202112131205'][] = ""; //delete FROM `go _ holidays` WHERE region like 'en_uk';"
 // recalculate because of substitute days (again)
-$updates['202112131205'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
+$updates['202112131205'][] = ""; //delete FROM `go _ holidays` WHERE region like 'en_uk';"
 
 $updates['202112131205'][] = "UPDATE `core_user` SET `theme`='Paper' WHERE `theme` NOT IN ('Paper', 'Dark', 'Compact');";
 
@@ -1249,8 +1249,8 @@ $updates['202212231031'][] = "alter table core_auth_token
     add `CSRFToken` varchar(100) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL after accessToken;";
 
 
-$updates['202301091428'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
-$updates['202301121428'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
+$updates['202301091428'][] = ""; //delete FROM `go _ holidays` WHERE region like 'en_uk';"
+$updates['202301121428'][] = ""; //delete FROM `go _ holidays` WHERE region like 'en_uk';"
 $updates['202301231301'][] = 'delete from go_settings where name = "file_storage_usage"';
 $updates['202301231301'][] = 'delete from go_settings where name = "database_usage"';
 $updates['202301231301'][] = 'delete from go_settings where name = "mailbox_usage"';
@@ -1757,3 +1757,12 @@ $updates['202505301440'][] = function() {
 	}
 
 };
+
+
+$updates['202507031141'][] = "alter table core_alert
+                         add createdBy varchar(60) null after entityId";
+
+$updates['202507031141'][] = "alter table core_alert
+                         add constraint core_alert_core_principal_id_fk
+                             foreign key (createdBy) references core_principal (id)
+                                 on delete set null";

@@ -715,7 +715,7 @@ th {
 		$mapping->thousandsSeparator = $this->clientParams['thousandsSeparator'] ?? null;
 		$mapping->decimalSeparator = $this->clientParams['decimalSeparator'] ?? null;
 		$mapping->dateFormat = $this->clientParams['dateFormat'] ?? null;
-		$mapping->name = $this->saveName;
+		$mapping->name = $this->saveName ?? "";
 		$mapping->save();
 
 	}

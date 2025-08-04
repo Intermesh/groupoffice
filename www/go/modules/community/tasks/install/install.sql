@@ -58,7 +58,6 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
   `percentComplete` TINYINT(4) NOT NULL DEFAULT 0,
   `uri` VARCHAR(190) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NULL DEFAULT NULL,
   `vcalendarBlobId` BINARY(40) NULL,
-  `location` TEXT NULL DEFAULT NULL,
   `latitude` decimal(10,8) DEFAULT NULL,
   `longitude` decimal(11,8) DEFAULT NULL,
     `location` TEXT DEFAULT NULL,

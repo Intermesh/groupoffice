@@ -1,3 +1,6 @@
+@use "compat";
+@use "utils";
+
 .text-crop {
 	
 	position:relative;
@@ -11,8 +14,8 @@
 	//h1, h2, h3, h4, h5, h6 { margin-bottom: dp(16); }
 
 	.content {
-		max-height: dp(400);
-		padding: dp(16) dp(16);
+		max-height: utils.dp(400);
+		padding: utils.dp(16) utils.dp(16);
 		/*transition: max-height 360ms $curve-acceleration;*/
 	}
 
@@ -34,18 +37,18 @@
 
 	.more {
 		position: absolute;
-		top: dp(344);
+		top: utils.dp(344);
 		left:0;
 		right: 0;
-		height: dp(56);
+		height: utils.dp(56);
 		transition: opacity 0s linear 360ms;
 		background-image: linear-gradient(to bottom, rgba(var(--bg-input),.0), var(--bg-input));
 
-		padding-top: dp(24);
+		padding-top: utils.dp(24);
 		.x-btn {
 			
 			background-color: transparent;
-			@include var(color, fg-main);
+			@include compat.var(color, fg-main);
 			margin: 0 auto;
 			border: 0;
 		}
@@ -58,10 +61,10 @@
 	{
 		@extend %icon;
 		display:block;
-		margin: dp(8) auto;
+		margin: utils.dp(8) auto;
 		display: block;
-		font-size: dp(48);
-		max-height: dp(48);
+		font-size: utils.dp(48);
+		max-height: utils.dp(48);
 		color: var(--fg-hint-text);
 	}
 
@@ -69,9 +72,9 @@
 .empty-state {
 	p {
 		color: var(--fg-hint-text);
-		margin: dp(8);
+		margin: utils.dp(8);
 		text-align: center;
-		font-size: dp(12);
+		font-size: utils.dp(12);
 	}
 }
 

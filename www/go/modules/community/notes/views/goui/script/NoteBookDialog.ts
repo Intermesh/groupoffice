@@ -1,7 +1,8 @@
 import {fieldset, t, textfield} from "@intermesh/goui";
 import {FormWindow} from "@intermesh/groupoffice-core";
+import {NoteBook} from "./Index";
 
-export class NoteBookDialog extends FormWindow {
+export class NoteBookDialog extends FormWindow<NoteBook> {
 	constructor() {
 		super("NoteBook");
 

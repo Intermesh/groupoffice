@@ -1,1 +1,3 @@
-$borderRadius: dp(12) !default;
+@use "utils";
+
+$borderRadius: utils.dp(12) !default;

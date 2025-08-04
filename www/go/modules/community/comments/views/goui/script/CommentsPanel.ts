@@ -2,11 +2,11 @@ import {
 	browser,
 	btn, collapsebtn,
 	comp,
-	Component, DefaultEntity,
+	Component, ComponentEventMap, DefaultEntity,
 	EntityID,
-	form,
+	form, section,
 	t,
-	tbar, Toolbar
+	tbar, Toolbar, Window
 } from "@intermesh/goui";
 import {CommentList} from "./CommentList.js";
 import {CommentEditor} from "./CommentEditor.js";
@@ -20,10 +20,34 @@ export class CommentsPanel extends Component {
 
 	private entityId: EntityID | undefined;
 
+	private _title!:string
+	private titleCmp: Component;
+	set title(title: string) {
+		if(this.titleCmp) {
+			this.titleCmp.html = title;
+		}
+		this._title = title;
+	}
+
+	get title() {
+		return this._title;
+	}
+
+	set section(section: string|undefined) {
+		this.commentList.store.setFilter("section", {section: section})
+	}
+
+	get section() {
+		return this.commentList.store.getFilter("section")?.section
+	}
 	constructor(public entityName: string) {
 		super();
 
 		this.cls = "card";
+
+		this.title = t("Comments");
+
+		this.disabled = true;
 
 		this.commentList = new CommentList();
 		this.commentEditor = new CommentEditor();
@@ -42,9 +66,9 @@ export class CommentsPanel extends Component {
 			tbar({},
 				comp({
 						cls: "hbox"
-					}, comp({
+					}, this.titleCmp = comp({
 						tagName: "h3",
-						text: t("Comments"),
+						text: this.title,
 						flex: 1
 					}),
 					this.countBadge,
@@ -82,11 +106,14 @@ export class CommentsPanel extends Component {
 									entityId: this.entityId!,
 									labels: labelIds,
 									text: form.value.text,
-									attachments: form.value.attachments
+									attachments: form.value.attachments,
+									section: this.section
 								})
 							).then((r) => {
 								form.reset();
-							});
+							}).catch((err) => {
+								void Window.error(err);
+							})
 						}
 					}
 				},
@@ -137,16 +164,17 @@ export class CommentsPanel extends Component {
 		this.load(entity.id);
 	}
 
-	public load(id: EntityID): void {
+	public async load(id: EntityID) {
 		this.entityId = id;
 
-		this.commentList.store.queryParams.filter = {
-			entityId: id
-		}
+		void this.commentEditor.store.load();
 
-		this.commentList.store.load().then(() => {
-			this.countBadge.text = this.commentList.store.count().toString();
+		this.commentList.store.setFilter("entity", {
+			entityId: id
 		});
-		this.commentEditor.store.load();
+
+		await this.commentList.store.load();
+		this.countBadge.text = this.commentList.store.count().toString();
+		this.disabled = false;
 	}
 }

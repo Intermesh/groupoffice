@@ -1,33 +1,11 @@
-import {NoteBookGrid} from "./NoteBookGrid";
-import {AutocompleteField, Config, createComponent, listStoreType, storeRecordType, t} from "@intermesh/goui";
-import {jmapds} from "@intermesh/groupoffice-core";
+import {ComboBox, Config, createComponent, t} from "@intermesh/goui";
+import {noteBookDS} from "./Index";
 
-
-export class NoteBookCombo extends AutocompleteField<NoteBookGrid> {
-
-	pickerRecordToValue(field: this, record: storeRecordType<listStoreType<NoteBookGrid>>): string {
-		return record.id;
-	}
-
-	async valueToTextField(field: this, value: string): Promise<string> {
-		const entityStore = jmapds("NoteBook");
-		const nb = await entityStore.single(value);
-
-		return nb ? nb.name : "?";
-	}
-
+export class NoteBookCombo extends ComboBox {
 	constructor() {
-		super(new NoteBookGrid());
-		this.list.headers = false;
-		this.list.fitParent = true;
-
+		super(noteBookDS, "name", "id");
 		this.label = t("Notebook");
 		this.name = "noteBookId";
-
-		this.on("autocomplete", async ( {input}) => {
-			this.list.store.queryParams = {filter: {text: input}};
-			await this.list.store.load();
-		});
 	}
 }
 

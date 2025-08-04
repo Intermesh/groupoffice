@@ -370,12 +370,17 @@ class Field extends AclItemEntity {
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()
-						->add('fieldSetId', function (Criteria $criteria, $value){
-							$criteria->andWhere(['fieldSetId' => $value]);
-						})
-						->add('type', function(Criteria $criteria, string $value){
-							$criteria->andWhere(['type' => $value]);
-						});
+			->add('entity', function (Criteria $criteria, $value, Query $query){
+				$query->joinIf("core_customfields_field_set", "fs", "fs.id = f.id");
+				$query->joinIf("core_entity", "e", "fs.entityTypeId = e.id");
+				$criteria->andWhere(['e.name' => $value]);
+			})
+			->add('fieldSetId', function (Criteria $criteria, $value){
+				$criteria->andWhere(['fieldSetId' => $value]);
+			})
+			->add('type', function(Criteria $criteria, string $value){
+				$criteria->andWhere(['type' => $value]);
+			});
 	}
 
   /**

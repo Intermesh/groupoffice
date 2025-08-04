@@ -298,6 +298,8 @@ class Mailer {
 		//speeds up multiple sends.
 		$this->mail->SMTPKeepAlive = true;
 
+		go()->debug("SMTP Host: ".$this->mail->Host);
+
 	}
 
 	private function disableSSLVerification() {

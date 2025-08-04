@@ -6,6 +6,9 @@ use GO\Base\Exception\AccessDenied;
 use go\core\acl\model\AclItemEntity;
 use go\core\fs\Blob;
 use go\core\model\Acl;
+use go\core\model\Alert;
+use go\core\model\Principal;
+use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\model\Search;
 use go\core\orm\Filters;
@@ -251,7 +254,10 @@ class Comment extends AclItemEntity {
 
 	protected function internalSave(): bool
 	{
-		$this->images = Blob::parseFromHtml($this->text, true);
+		if($this->isModified('text')) {
+			$this->images = Blob::parseFromHtml($this->text, true);
+			$this->findMentions();
+		}
 
 		if(!parent::internalSave()) {
 			return false;
@@ -354,5 +360,53 @@ class Comment extends AclItemEntity {
 	protected function getSearchKeywords(): ?array
 	{
 		return [$this->getAsText()];
+	}
+
+	private static function parseMentions(string|null $text) : array {
+		if(empty($text)) {
+			return [];
+		}
+		$regex = "/(?<![\w.])@([\w-]+)/";
+		preg_match_all($regex, $text, $matches, PREG_PATTERN_ORDER );
+		return $matches[1];
+	}
+
+	private function findMentions()
+	{
+
+		$old = $this->getOldValue('text');
+		$oldMentions = self::parseMentions($old);
+		$newMentions = self::parseMentions($this->text);
+
+		$new = array_diff($newMentions, $oldMentions);
+
+		if(!count($new)) {
+			return;
+		}
+
+		$entity = $this->findEntity();
+
+		foreach($new as $username) {
+			$userId = User::find(['id'])->selectSingleValue('id')->where('username', '=', $username)->single();
+
+			$entity->createAlert(
+				new DateTime(),
+				'mention',
+				$userId
+			)->setData(['excerpt' => $this->getExcerpt($username)])->save();
+		}
+
+	}
+
+	private function getExcerpt(string $username) : string {
+		$text = strip_tags($this->text);
+		$start = strrpos($text, "@".$username);
+
+		if($start) {
+			$text = substr($text, $start);
+		}
+
+		return StringUtil::cutString($text, 50);
+
 	}
 }

@@ -744,7 +744,7 @@ CREATE TABLE `cal_calendars_custom_fields` (
   `id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `cal_calendars_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `cal_calendars` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1020,7 +1020,7 @@ CREATE TABLE `cal_events_custom_fields` (
   `id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `cal_events_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `cal_events` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1804,7 +1804,7 @@ CREATE TABLE `comments_comment` (
   `createdBy` int(11) DEFAULT NULL,
   `modifiedBy` int(11) DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
-  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_uca1400_ai_ci DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `section` varchar(50) DEFAULT NULL,
   `mimeMessageId` varchar(255) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -30349,7 +30349,7 @@ CREATE TABLE `em_links` (
   PRIMARY KEY (`id`),
   KEY `account_id` (`user_id`),
   KEY `uid` (`uid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -30613,7 +30613,7 @@ CREATE TABLE `fs_files_custom_fields` (
   `id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fs_files_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `fs_files` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -30847,7 +30847,7 @@ CREATE TABLE `fs_shared_root_folders` (
   `user_id` int(11) NOT NULL,
   `folder_id` int(11) NOT NULL,
   PRIMARY KEY (`user_id`,`folder_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -31232,33 +31232,6 @@ CREATE TABLE `go_cron_users` (
 LOCK TABLES `go_cron_users` WRITE;
 /*!40000 ALTER TABLE `go_cron_users` DISABLE KEYS */;
 /*!40000 ALTER TABLE `go_cron_users` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `go_holidays`
---
-
-DROP TABLE IF EXISTS `go_holidays`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `go_holidays` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `date` date NOT NULL,
-  `name` varchar(100) NOT NULL DEFAULT '',
-  `region` varchar(10) NOT NULL DEFAULT '',
-  `free_day` tinyint(1) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`id`),
-  KEY `region` (`region`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `go_holidays`
---
-
-LOCK TABLES `go_holidays` WRITE;
-/*!40000 ALTER TABLE `go_holidays` DISABLE KEYS */;
-/*!40000 ALTER TABLE `go_holidays` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -32280,7 +32253,7 @@ CREATE TABLE `pa_aliases` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `address` (`address`),
   KEY `domain_id` (`domain_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci COMMENT='Postfix Admin - Virtual Aliases';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Postfix Admin - Virtual Aliases';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -32318,7 +32291,7 @@ CREATE TABLE `pa_domains` (
   `acl_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `domain` (`domain`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci COMMENT='Postfix Admin - Virtual Domains';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Postfix Admin - Virtual Domains';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -32358,7 +32331,7 @@ CREATE TABLE `pa_mailboxes` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   KEY `go_installation_id` (`go_installation_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci COMMENT='Postfix Admin - Virtual Mailboxes';
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Postfix Admin - Virtual Mailboxes';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -32562,7 +32535,7 @@ CREATE TABLE `sync_addressbook_user` (
   KEY `userId` (`userId`),
   CONSTRAINT `sync_addressbook_user_ibfk_1` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook` (`id`) ON DELETE CASCADE,
   CONSTRAINT `sync_addressbook_user_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
