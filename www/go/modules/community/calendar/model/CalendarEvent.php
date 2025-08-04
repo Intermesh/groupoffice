@@ -137,25 +137,22 @@ class CalendarEvent extends AclItemEntity {
 	/**
 	 * The duration of the event (or the occurence)
 	 * (optional, default: PT0S)
-	 * @var string
+	 *
 	 */
 	public ?string $duration;
 
 	/**
 	 * The title
-	 * @var string
 	 */
 	public ?string $title = '';
 
 	/**
 	 * free text that would describe the event
-	 * @var string
 	 */
 	public ?string $description = '';
 
 	/**
 	 * The location where the event takes place
-	 * @var string
 	 */
 	public ?string $location;
 
