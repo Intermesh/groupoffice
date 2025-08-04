@@ -273,6 +273,31 @@ class CalDAVBackend extends AbstractBackend implements
 //	}
 
 	/**
+	 * Returns a list of calendar objects.
+	 *
+	 * This method should work identical to getCalendarObject, but instead
+	 * return all the calendar objects in the list as an array.
+	 *
+	 * If the backend supports this, it may allow for some speed-ups.
+	 *
+	 * @param mixed $calendarId
+	 *
+	 * @return array
+	 */
+	public function getMultipleCalendarObjects($calendarId, array $uris)
+	{
+		$o = [];
+		foreach($uris as $uri) {
+			$obj = $this->getCalendarObject($calendarId, $uri);
+			if($obj) {
+				$o[] = $obj;
+			}
+		}
+
+		return $o;
+	}
+
+	/**
 	 * Check if this is only called when the getCalendarObjects does not provide the calendardata
 	 */
 	public function getCalendarObject($calendarId, $objectUri)
