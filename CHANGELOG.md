@@ -5,6 +5,7 @@
 - Calendar: ics export filename will be calendar+date+title instead of uid
 - Finance: Payment should be verified / checked by default
 - Core: Improved setting link on image in htmleditor
+- ldapauthenticator: Fixed ErrorException in /usr/share/groupoffice/go/modules/community/ldapauthenticator/cli/controller/Sync.php at line 443: Trying to access array offset on value of type null
 
 14-07-2025: 25.0.36
 - OTP: dialog would not popup when OTP setup is required.

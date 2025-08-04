@@ -128,7 +128,7 @@ class CalDAVBackend extends AbstractBackend implements
 				$values[$dbName] = $properties[$xmlName];
 			}
 		}
-		if($values['color']) {
+		if(isset($values['color'])) {
 			$values['color'] = substr($values['color'], 1); // remove #
 		}
 		switch($type[0]) {
