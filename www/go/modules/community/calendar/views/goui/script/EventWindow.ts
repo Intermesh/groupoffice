@@ -112,8 +112,13 @@ export class EventWindow extends FormWindow {
 				}
 			}}
 		});
-		this.endDate = datetimefield({label:t('End'), name: 'end', flex:1, defaultTime: (now.getHours()+1 )+':00',
-			listeners: {'change': ({target, oldValue}) => {
+		this.endDate = datetimefield({
+			label: t('End'),
+			name: 'end',
+			flex:1,
+			defaultTime: (now.getHours()+1 )+':00',
+			listeners: {
+				change: ({target, oldValue}) => {
 					const newEndDate = target.getValueAsDateTime(),
 						startDate = this.startDate.getValueAsDateTime(),
 						format= target.withTime ? "Y-m-dTH:i" : 'Y-m-d',
@@ -128,7 +133,24 @@ export class EventWindow extends FormWindow {
 					if(newEndDate && this.item) {
 						this.item.end = newEndDate; // for isInPast
 					}
-				}}
+				},
+				validate: ev => {
+
+					const end = ev.target.getValueAsDateTime(), start = this.startDate.getValueAsDateTime();
+					if(!end) {
+						ev.target.setInvalid(t("Invalid date"));
+						return;
+					}
+					if(!start) {
+						this.startDate.setInvalid(t("Invalid date"));
+						return;
+					}
+
+					if(end.date <= start.date) {
+						ev.target.setInvalid(t("The end time must be greater than the start date"));
+					}
+				}
+			}
 		});
 
 		this.generalTab.items.add(
