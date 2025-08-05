@@ -1,3 +1,5 @@
+- Maildomains: Fixed domains with no mailboxes not showing
+
 04-08-2025: 25.0.37
 - Calendar: added customfields for calendar entity.
 - GOUI: when SelectField was set to null the option item was not selected.
