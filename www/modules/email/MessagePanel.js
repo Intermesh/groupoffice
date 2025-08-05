@@ -104,7 +104,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'<tpl for="links">'+
 					'<div class="go-icon-list"><p class="more-btn"><i class="label entity {[this.linkIconCls(values)]}"></i> ' +
 					'<a href="#email"  onclick="const win = new go.links.LinkDetailWindow({entity\:\'{entity}\'});win.load({model_id});">'+
-					'{name}</a> <label>{description}</label>' +
+					'{name:htmlEncode}</a> <label>{description:htmlEncode}</label>' +
 					'{[this.addDeleteBtn(values)]}</p>' +
 					'</div>' +
 				'</tpl>'+
@@ -412,7 +412,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		if(GO.savemailas && this.data.sender_contact_id){
 			this.linkMessageCB = new Ext.form.Checkbox({
 				name:'link',
-				boxLabel:t("Link e-mail conversation to contact %s", "savemailas").replace('%s', this.data.contact_name),
+				boxLabel:t("Link e-mail conversation to contact %s", "savemailas").replace('%s', Ext.util.Format.htmlEncode(this.data.contact_name)),
 				hideLabel:true,
 				renderTo:this.linkMessageId,
 				checked:this.data.contact_linked_message_id>0,
@@ -459,7 +459,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		if(GO.savemailas && this.data.sender_company_id){
 			this.linkCompanyMessageCB = new Ext.form.Checkbox({
 				name:'link',
-				boxLabel:t("Link e-mail conversation to company %s", "savemailas").replace('%s', this.data.company_name),
+				boxLabel:t("Link e-mail conversation to company %s", "savemailas").replace('%s', Ext.util.Format.htmlEncode(this.data.company_name)),
 				hideLabel:true,
 				renderTo:this.linkMessageId,
 				checked:this.data.company_linked_message_id>0,
