@@ -1,6 +1,7 @@
 - Maildomains: Fixed domains with no mailboxes not showing
 - Calendar: Added confirm dialog to delete event
 - Core: Fixed external function handlers like mailto: links
+- Tasks: expand description, date and alert panels
 
 04-08-2025: 25.0.37
 - Calendar: added customfields for calendar entity.
