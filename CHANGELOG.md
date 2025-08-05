@@ -1,4 +1,5 @@
 - Maildomains: Fixed domains with no mailboxes not showing
+- Calendar: Added confirm dialog to delete event
 
 04-08-2025: 25.0.37
 - Calendar: added customfields for calendar entity.
