@@ -2,6 +2,7 @@
 - Calendar: Added confirm dialog to delete event
 - Core: Fixed external function handlers like mailto: links
 - Tasks: expand description, date and alert panels
+- Files: Raise max filename size to 260 characters
 
 04-08-2025: 25.0.37
 - Calendar: added customfields for calendar entity.
