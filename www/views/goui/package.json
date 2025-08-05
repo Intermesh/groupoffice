@@ -9,8 +9,8 @@
 
   "scripts": {
     "test": "mocha",
-    "start": "npm run build:clean && npm run build:assets && npm run start:parallel",
-    "start:parallel": "npx concurrently --kill-others \"npm run start:watch\"  \"npm run start:watch-goui-dts\" \"npm run start:watch-groupoffice-core-dts\" \"npm run start:groupoffice-core-sass\"",
+    "start": "npm run build:clean && npm run build:assets && npm run build:goui-dts && npm run start:parallel",
+    "start:parallel": "npx concurrently \"npm run start:watch\"  \"npm run start:watch-goui-dts\" \"npm run start:watch-groupoffice-core-dts\" \"npm run start:groupoffice-core-sass\"",
     "start:watch": "node esbuild.mjs watch",
     "start:groupoffice-core-sass": "npx sass --watch ./groupoffice-core/style:./dist/groupoffice-core/style ./goui/style:./goui/dist/",
     "start:watch-goui-dts": "npx tsc -w -p goui/tsconfig.json --emitDeclarationOnly --outDir ./dist/goui/script/",
