@@ -86,7 +86,7 @@ GO.calendar.formatQtip = function(data,verbose)
 
 	if(!GO.util.empty(data.description))
 	{
-		str += '<br /><br />'+GO.util.nl2br(Ext.util.Format.htmlDecode(data.description));
+		str += '<br /><br /><span style="white-space: pre-wrap">'+data.description + '</span>';
 		// str += '<br /><br />'+Ext.util.Format.htmlEncode(data.description);
 	}
 	if (!GO.util.empty(data.resources)) {
