@@ -146,7 +146,7 @@ export class EventWindow extends FormWindow {
 						return;
 					}
 
-					if(end.date <= start.date) {
+					if(ev.target.withTime && end.date <= start.date) {
 						ev.target.setInvalid(t("The end time must be greater than the start date"));
 					}
 				}
