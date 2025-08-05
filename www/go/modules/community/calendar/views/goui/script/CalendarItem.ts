@@ -395,8 +395,16 @@ export class CalendarItem {
 				));
 			askScheduleWin.show();
 		} else {
-			Object.assign(this.data, modified);
-			onAccept();
+			if(modified) {
+				Object.assign(this.data, modified);
+				onAccept();
+			} else {
+				Window.confirm(t("Are you sure you want to delete the selected item?")).then((confirmed) => {
+					if(confirmed) {
+						onAccept();
+					}
+				})
+			}
 		}
 	}
 
