@@ -136,11 +136,12 @@ class Alert extends UserProperty {
 			try {
 				if ($offset[0] == '-') {
 					$date->sub(new \DateInterval(substr($offset, 1)));
+				} else {
+					if ($offset[0] == '+') {
+						$offset = substr($offset, 1);
+					}
+					$date->add(new \DateInterval($offset));
 				}
-				if ($offset[0] == '+') {
-					$offset = substr($offset, 1);
-				}
-				$date->add(new \DateInterval($offset));
 			} catch(\Exception $e) {
 				ErrorHandler::logException($e, "Invalid alert offset " . $offset);
 			}
