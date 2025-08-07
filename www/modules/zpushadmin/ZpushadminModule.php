@@ -21,7 +21,6 @@ class ZpushadminModule extends \GO\Base\Module {
 
 
 	public static function checkZPushVersion($versionToCompare) {
-		\GO::debug("Compare active z-push version with: " . $versionToCompare);
 
 //		if (!defined('ZPUSH_VERSION')) {
 			self::includeZpushFiles();
@@ -29,20 +28,15 @@ class ZpushadminModule extends \GO\Base\Module {
 
 		$shortversion = false;
 		if (defined('ZPUSH_VERSION')) {
-			\GO::debug("Found z-push version :" . ZPUSH_VERSION);
-
-			$shortversion = substr(ZPUSH_VERSION, 0, 3);
-			\GO::debug("Short z-push version :" . $shortversion);
+				$shortversion = substr(ZPUSH_VERSION, 0, 3);
 		}else
 		{
 			throw new \Exception("Z-Push was not found. Is it installed?");
 		}
 
 		if ($versionToCompare === $shortversion) {
-			\GO::debug("Comparison OK: " . $versionToCompare . " - " . $shortversion);
 			return true;
 		} else {
-			\GO::debug("Comparison WRONG: " . $versionToCompare . " - " . $shortversion);
 			return false;
 		}
 	}
