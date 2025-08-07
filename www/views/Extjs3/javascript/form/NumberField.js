@@ -86,7 +86,7 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 			if(this.serverFormats) {
 				number = GO.util.unlocalizeNumber(number);
 			}
-			if(!number && this.minValue!=Number.NEGATIVE_INFINITY){
+			if(!number && number !== 0 && this.minValue!=Number.NEGATIVE_INFINITY){
 				number = this.minValue;
 			}
 			if(this.serverFormats) {
