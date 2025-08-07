@@ -5,6 +5,8 @@
 - Files: Raise max filename size to 260 characters
 - Calendar: Allow same date with full day
 - ActiveSync: Fixed empty reminder issue
+- ActiveSync: Sends scheduling messages now
+- ActiveSync: Improved exception handling
 
 04-08-2025: 25.0.37
 - Calendar: added customfields for calendar entity.
