@@ -123,8 +123,9 @@ class CalendarStore extends Store {
 		}
 
 		// what if it's already in this calendar ???? ticket #36205
+		// Can't replicate it with an iphone as it's impossible to move an event that is in multiple calendars. Perhaps
+		// with android. I hope the exception handling below will catch the error and will undo the change.
 		$event->calendarId = $folderid;
-
 
 		try {
 			$event = CalendarConvertor::toCalendarEvent($message, $event);
