@@ -553,13 +553,13 @@ class CalendarEvent extends AclItemEntity {
 			'failureReasons'=>[]
 		];
 		foreach($blobIds as $blobId) {
-			foreach(ICalendarHelper::calendarEventFromFile($blobId) as $ev) {
+			foreach(ICalendarHelper::calendarEventFromFile($blobId, ['calendarId' => $calendarId]) as $ev) {
 				if(is_array($ev)){
 					$r->failureReasons[$r->failed] = 'Parse error '.$ev['vevent']->VEVENT[0]->UID. ': '. $ev['error']->getMessage();
 					$r->failed++;
 					continue;
 				}
-				$ev->calendarId = $calendarId;
+
 				if($uid === 'new') {
 					$ev->uid = UUID::v4();
 				} else if($uid === 'check' && self::find()->selectSingleValue('cce.id')->where(['uid'=>$ev->uid])->single() !== null) {
