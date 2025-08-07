@@ -1,3 +1,4 @@
+07-08-2025: 25.0.38
 - Maildomains: Fixed domains with no mailboxes not showing
 - Calendar: Added confirm dialog to delete event
 - Core: Fixed external function handlers like mailto: links
@@ -7,6 +8,7 @@
 - ActiveSync: Fixed empty reminder issue
 - ActiveSync: Sends scheduling messages now
 - ActiveSync: Improved exception handling
+- Timeregistration2: Fixed timer button
 
 04-08-2025: 25.0.37
 - Calendar: added customfields for calendar entity.
