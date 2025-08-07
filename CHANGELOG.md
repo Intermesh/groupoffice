@@ -3,6 +3,8 @@
 - Core: Fixed external function handlers like mailto: links
 - Tasks: expand description, date and alert panels
 - Files: Raise max filename size to 260 characters
+- Calendar: Allow same date with full day
+- ActiveSync: Fixed empty reminder issue
 
 04-08-2025: 25.0.37
 - Calendar: added customfields for calendar entity.
