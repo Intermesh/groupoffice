@@ -828,7 +828,7 @@ export class CalendarItem {
 			return;
 		if(!this.isRecurring) {
 			this.confirmScheduleMessage(false, () => {
-				eventDS.destroy(this.data.id);
+				eventDS.destroy(this.data.id).catch(e => Window.error(e))
 				Object.values(this.divs).forEach(d => d.remove())
 			});
 		} else {
@@ -861,7 +861,7 @@ export class CalendarItem {
 	private removeFutureEvents() {
 		this.confirmScheduleMessage(false, () => {
 			this.data.recurrenceRule.until = (new DateTime(this.recurrenceId)).addDays(-1).format('Y-m-d'); // could be minus 1 seconds, but we don't recur within day
-			eventDS.update(this.data.id,{recurrenceRule: this.data.recurrenceRule});
+			eventDS.update(this.data.id,{recurrenceRule: this.data.recurrenceRule}).catch(e => Window.error(e))
 		});
 	}
 
@@ -871,7 +871,7 @@ export class CalendarItem {
 
 				this.data.recurrenceOverrides ??= {};
 				this.data.recurrenceOverrides[this.recurrenceId!] = {excluded: true};
-				eventDS.update(this.data.id, {recurrenceOverrides: this.data.recurrenceOverrides});
+				eventDS.update(this.data.id, {recurrenceOverrides: this.data.recurrenceOverrides}).catch(e => Window.error(e))
 			} else {
 				// set status to not participating
 			}
@@ -880,12 +880,12 @@ export class CalendarItem {
 
 	private removeSeries() {
 		this.confirmScheduleMessage(false, () => {
-			eventDS.destroy(this.data.id);
+			eventDS.destroy(this.data.id).catch(e => Window.error(e))
 		});
 	}
 
 	undoException(recurrenceId: string) {
 		delete this.data.recurrenceOverrides![recurrenceId];
-		return eventDS.update(this.data.id, {recurrenceOverrides:this.data.recurrenceOverrides});
+		return eventDS.update(this.data.id, {recurrenceOverrides:this.data.recurrenceOverrides}).catch(e => Window.error(e))
 	}
 }
