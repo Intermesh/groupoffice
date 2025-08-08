@@ -236,7 +236,7 @@ class CalDAVBackend extends AbstractBackend implements
 		if($component == 'vtodo') {
 			return $object->getUri();
 		} else {
-			return $object->uri ?? (strtr($object->uid, '+/=', '-_.') . '.ics');
+			return $object->uri();
 		}
 	}
 

@@ -477,7 +477,7 @@ class CalendarEvent extends AclItemEntity {
 			$this->uri = $uri;
 		}
 
-		return $this->uri;
+		return $this->uri ?? strtr($this->uid, '+/=', '-_.') . '.ics';
 	}
 
 	public function etag($v = null) {
