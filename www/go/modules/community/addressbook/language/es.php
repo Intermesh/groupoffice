@@ -82,8 +82,8 @@ return array (
   array (
     'work' => 'Trabajo',
     'home' => 'Casa',
-    'mobile' => 'Móvil',
-    'workmobile' => 'Móvil de Trabajo',
+    'cell' => 'Móvil',
+    'workcell' => 'Móvil de Trabajo',
     'fax' => 'Fax',
     'workfax' => 'Fax de Trabajo',
   ),

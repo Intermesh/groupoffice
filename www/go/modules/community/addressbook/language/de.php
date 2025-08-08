@@ -28,8 +28,8 @@ return array (
   array (
     'work' => 'Arbeit',
     'home' => 'Privat',
-    'mobile' => 'Mobil',
-    'workmobile' => 'Arbeit Mobil',
+    'cell' => 'Mobil',
+    'workcell' => 'Arbeit Mobil',
     'fax' => 'Fax',
     'workfax' => 'Arbeit Fax',
   ),

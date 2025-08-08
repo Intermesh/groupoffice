@@ -53,8 +53,8 @@ return array (
   array (
     'work' => 'Professionnel',
     'home' => 'Personnel',
-    'mobile' => 'Mobile',
-    'workmobile' => 'Mobile Professionnel',
+    'cell' => 'Mobile',
+    'workcell' => 'Mobile Professionnel',
     'fax' => 'Télécopie Personnel',
     'workfax' => 'Télécopie Professionnel',
   ),

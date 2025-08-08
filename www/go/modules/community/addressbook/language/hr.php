@@ -50,8 +50,8 @@ return array (
   array (
     'work' => 'Poslovni',
     'home' => 'Kućni',
-    'mobile' => 'Mobitel',
-    'workmobile' => 'Mobitel poslovni',
+    'cell' => 'Mobitel',
+    'workcell' => 'Mobitel poslovni',
     'fax' => 'Faks',
     'workfax' => 'Faks poslovni',
   ),

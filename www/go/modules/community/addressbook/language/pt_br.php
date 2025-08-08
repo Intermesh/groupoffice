@@ -43,8 +43,8 @@ return array (
   array (
     'work' => 'Trabalho',
     'home' => 'Residência',
-    'mobile' => 'Celular',
-    'workmobile' => 'Celular de trabalho',
+    'cell' => 'Celular',
+    'workcell' => 'Celular de trabalho',
     'workfax' => 'Fax de trabalho',
   ),
   'addressTypes' => 
