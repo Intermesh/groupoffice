@@ -253,13 +253,18 @@ class ICalendarHelper {
 		return implode(';',$rule);
 	}
 
-	static function calendarEventFromFile(string $blobId) {
+	static function calendarEventFromFile(string $blobId, array|null $values = null) {
 		$data = file_get_contents(Blob::buildPath($blobId));
 		$splitter = new VObject\Splitter\ICalendar(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING + VObject\Reader::OPTION_IGNORE_INVALID_LINES);
 		while($vevent = $splitter->getNext()) {
 			try {
-				yield self::parseVObject($vevent, new CalendarEvent());
+				$event = new CalendarEvent();
+				if(isset($values)) {
+					$event->setValues($values);
+				}
+				yield self::parseVObject($vevent, $event);
 			} catch(\Throwable $e) {
+				ErrorHandler::logException($e, "Failed to import event");
 				yield ['error'=>$e, 'vevent'=>$vevent];
 			}
 		}

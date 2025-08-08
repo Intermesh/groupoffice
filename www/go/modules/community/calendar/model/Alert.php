@@ -7,6 +7,7 @@
 namespace go\modules\community\calendar\model;
 
 use DateTimeInterface;
+use go\core\ErrorHandler;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Mapping;
 use go\core\orm\UserProperty;
@@ -131,15 +132,19 @@ class Alert extends UserProperty {
 			}
 
 			$date->setTimezone(new \DateTimeZone("UTC"));
-			if ($offset[0] == '-') {
-				$date->sub(new \DateInterval(substr($offset, 1)));
-				$coreAlert->triggerAt = $date;
-				return $coreAlert;
+
+			try {
+				if ($offset[0] == '-') {
+					$date->sub(new \DateInterval(substr($offset, 1)));
+				} else {
+					if ($offset[0] == '+') {
+						$offset = substr($offset, 1);
+					}
+					$date->add(new \DateInterval($offset));
+				}
+			} catch(\Exception $e) {
+				ErrorHandler::logException($e, "Invalid alert offset " . $offset);
 			}
-			if ($offset[0] == '+') {
-				$offset = substr($offset, 1);
-			}
-			$date->add(new \DateInterval($offset));
 			$coreAlert->triggerAt =  $date;
 		} else if (isset($this->when)) {
 			$coreAlert->triggerAt = $this->when;

@@ -185,7 +185,6 @@ CREATE TABLE IF NOT EXISTS `calendar_participant` (
     `rolesMask` INT NOT NULL DEFAULT 0,
 	  `language` VARCHAR(20),
     `participationStatus` ENUM('needs-action', 'tentative', 'accepted', 'declined', 'delegated') NULL DEFAULT 'needs-action',
-    `scheduleAgent` ENUM('server', 'client', 'none') DEFAULT 'server',
     `expectReply` TINYINT(1) NOT NULL DEFAULT 0,
     `scheduleUpdated` DATETIME NULL,
 		`scheduleStatus` varchar(255) DEFAULT NULL,
@@ -370,6 +369,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event_category` (
 CREATE TABLE calendar_preferences (
 	userId                INT NOT NULL PRIMARY KEY,
 	weekViewGridSnap      INT NULL,
+	weekViewGridSize      INT DEFAULT 8 NOT NULL,
 	defaultDuration       VARCHAR(32) NULL,
 	autoUpdateInvitations TINYINT(1) DEFAULT 0 NOT NULL,
 	autoAddInvitations    TINYINT(1) DEFAULT 0 NOT NULL,

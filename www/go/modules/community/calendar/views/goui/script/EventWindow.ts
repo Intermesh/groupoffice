@@ -6,21 +6,20 @@ import {
 	column,
 	comp, containerfield,
 	datasourcestore,
-	DateField,
-	datefield, DateInterval,
-	DateTime, DisplayField, displayfield,
+	DateInterval,
+	DateTime, datetimefield, DateTimeField,
 	Format, MapField, mapfield, Notifier, numberfield,
 	radio,
 	select,
 	store,
 	table,
-	textarea, TextAreaField,
+	textarea,
 	textfield,
 	TextField,
 	win,
 } from "@intermesh/goui";
 import {client, FormWindow, JmapDataSource, jmapds, recurrencefield} from "@intermesh/groupoffice-core";
-import {calendarStore, categoryStore,t} from "./Index.js";
+import {categoryStore, t, writeableCalendarStore} from "./Index.js";
 import {ParticipantField, participantfield} from "./ParticipantField.js";
 import {AlertField, alertfield} from "./AlertField.js";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
@@ -33,8 +32,8 @@ export class EventWindow extends FormWindow {
 
 	private store: JmapDataSource
 	// private submitBtn:Button
-	private endDate: DateField
-	private startDate: DateField
+	private endDate: DateTimeField
+	private startDate: DateTimeField
 	private withoutTimeToggle: CheckboxField
 
 	private attachments:MapField
@@ -51,7 +50,8 @@ export class EventWindow extends FormWindow {
 
 		const m = go.Modules.get('community','calendar');
 		this.title = t('Event');
-		this.width = 565;
+		this.width = 620;
+		this.stateId = "calendar-event-window";
 		this.height = 840;
 		this.resizable = true;
 		this.hasLinks = true;
@@ -86,7 +86,7 @@ export class EventWindow extends FormWindow {
 		this.form.on("beforesubmit", this.onBeforeSubmit, {bind:this});
 
 		this.generalTab.cls = 'flow fit scroll pad';
-		this.startDate = datefield({label: t('Start'), name:'start',flex:1, defaultTime: now.format('H')+':00',
+		this.startDate = datetimefield({label: t('Start'), name:'start',flex:1, defaultTime: now.format('H')+':00',
 			listeners:{'change': ({target, oldValue}) => {
 
 					const newStartDate = target.getValueAsDateTime(),
@@ -112,8 +112,13 @@ export class EventWindow extends FormWindow {
 				}
 			}}
 		});
-		this.endDate = datefield({label:t('End'), name: 'end', flex:1, defaultTime: (now.getHours()+1 )+':00',
-			listeners: {'change': ({target, oldValue}) => {
+		this.endDate = datetimefield({
+			label: t('End'),
+			name: 'end',
+			flex:1,
+			defaultTime: (now.getHours()+1 )+':00',
+			listeners: {
+				change: ({target, oldValue}) => {
 					const newEndDate = target.getValueAsDateTime(),
 						startDate = this.startDate.getValueAsDateTime(),
 						format= target.withTime ? "Y-m-dTH:i" : 'Y-m-d',
@@ -128,7 +133,24 @@ export class EventWindow extends FormWindow {
 					if(newEndDate && this.item) {
 						this.item.end = newEndDate; // for isInPast
 					}
-				}}
+				},
+				validate: ev => {
+
+					const end = ev.target.getValueAsDateTime(), start = this.startDate.getValueAsDateTime();
+					if(!end) {
+						ev.target.setInvalid(t("Invalid date"));
+						return;
+					}
+					if(!start) {
+						this.startDate.setInvalid(t("Invalid date"));
+						return;
+					}
+
+					if(ev.target.withTime && end.date <= start.date) {
+						ev.target.setInvalid(t("The end time must be greater than the start date"));
+					}
+				}
+			}
 		});
 
 		this.generalTab.items.add(
@@ -137,18 +159,18 @@ export class EventWindow extends FormWindow {
 			}}),
 			select({
 				label: t('Calendar'), name: 'calendarId', required: true, flex: '1 30%',
-				store: calendarStore,
+				store: writeableCalendarStore,
 				valueField: 'id',
 				textRenderer: (r: any) => r.name,
 				listeners: {
 					render: () => {
-						if(!calendarStore.loaded) {
-							void calendarStore.load();
+						if(!writeableCalendarStore.loaded) {
+							void writeableCalendarStore.load();
 						}
 					},
 					'setvalue': ({newValue}) => {
 						if(newValue)
-						calendarStore.dataSource.single(newValue).then(r => {
+							writeableCalendarStore.dataSource.single(newValue).then(r => {
 							if(!r) return;
 							this.item!.cal = r;
 
@@ -180,7 +202,7 @@ export class EventWindow extends FormWindow {
 					this.alertField.drawOptions();
 
 					if(this.form.value.calendarId) {
-						calendarStore.dataSource.single(this.form.value.calendarId).then(r => {
+						writeableCalendarStore.dataSource.single(this.form.value.calendarId).then(r => {
 							if (!r) return;
 							const d = newValue ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
 							this.alertField.setDefaultLabel(d)
@@ -237,7 +259,7 @@ export class EventWindow extends FormWindow {
 						column({id: "name"})
 					]
 				}),
-				label: "Categories",
+				label: t("Categories",'core','core'),
 				name: "categoryIds",
 				chipRenderer: async (chip, id) => {
 					categoryStore.dataSource.single(id).then(v => { chip.text = v?.name ?? '???'});

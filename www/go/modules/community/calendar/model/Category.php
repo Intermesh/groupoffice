@@ -21,12 +21,12 @@ class Category extends Entity {
 	public string $name;
 
 	/** @var ?int could be NULL for global categories */
-	protected ?int $ownerId;
+	protected ?int $ownerId = null;
 
 	public ?string $color;
 
 	/** @var ?string When not null this category is only visible when the tasklist is selected (no ACL checking allowed)  */
-	public ?string $calendarId;
+	public ?string $calendarId = null;
 
 	protected static function defineMapping(): Mapping
 	{

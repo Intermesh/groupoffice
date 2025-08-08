@@ -88,7 +88,7 @@ final class Domain extends AclOwnerEntity
 				(new Query())
 					->select('CAST(SUM(`cmm`.`quota`) AS SIGNED) as `sumUsedQuota`, CAST(SUM(`cmm`.`bytes`) AS SIGNED) as `sumUsage`')
 				->join('community_maildomains_mailbox', 'cmm', '`cmd`.`id`=`cmm`.`domainId`', 'LEFT')
-				->groupBy(['`cmm`.`domainId`']))
+				->groupBy(['`cmd`.`id`']))
 			->addMap('dkim', DkimKey::class, ['id' => 'domainId']);
 	}
 
@@ -152,12 +152,12 @@ final class Domain extends AclOwnerEntity
 		return $this->id;
 	}
 
-	public function getSumUsedQuota(): int
+	public function getSumUsedQuota(): float
 	{
-		return $this->sumUsedQuota;
+		return $this->sumUsedQuota ?? 0;
 	}
 
-	public function getSumUsage(): int
+	public function getSumUsage(): float
 	{
 		return $this->sumUsage;
 	}

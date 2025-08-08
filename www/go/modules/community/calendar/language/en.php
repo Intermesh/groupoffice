@@ -5,7 +5,7 @@ return [
 	'CalendarEvent' => 'Event',
 
 
-	'mayChangeCalendars'=> 'Change Calendars',
+	'mayChangeCalendars'=> 'Create/Delete Calendars',
 	'mayChangeCategories' => 'Change Categories',
 	'mayChangeResources' => 'Change Resource',
 

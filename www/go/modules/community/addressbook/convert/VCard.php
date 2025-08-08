@@ -526,7 +526,7 @@ class VCard extends AbstractConverter {
 					break;
 
 				case 'cell':
-					return 'mobile';
+					return 'cell';
 
 				case 'internet':
 					return null;

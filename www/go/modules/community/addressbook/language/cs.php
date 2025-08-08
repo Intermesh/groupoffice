@@ -21,8 +21,8 @@ return array (
   array (
     'work' => 'Pracovní telefon',
     'home' => 'Soukromý telefon',
-    'mobile' => 'Mobilní telefon',
-    'workmobile' => 'Pracovní mobilní telefon',
+    'cell' => 'Mobilní telefon',
+    'workcell' => 'Pracovní mobilní telefon',
     'fax' => 'Fax',
     'workfax' => 'Pracovní Fax',
   ),

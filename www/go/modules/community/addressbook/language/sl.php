@@ -29,8 +29,8 @@ return array (
   array (
     'work' => 'Posel',
     'home' => 'Doma',
-    'mobile' => 'Mobitel',
-    'workmobile' => 'Mobitel poslovni',
+    'cell' => 'Mobitel',
+    'workcell' => 'Mobitel poslovni',
     'fax' => 'Faks',
     'workfax' => 'Posel faksa',
   ),

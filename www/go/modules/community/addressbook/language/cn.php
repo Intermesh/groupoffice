@@ -19,8 +19,8 @@ return array (
   array (
     'work' => '工作电话',
     'home' => '家庭电话',
-    'mobile' => '移动电话',
-    'workmobile' => '工作移动电话',
+    'cell' => '移动电话',
+    'workcell' => '工作移动电话',
     'fax' => '传真',
     'workfax' => '工作传真',
   ),

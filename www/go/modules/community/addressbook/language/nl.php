@@ -42,8 +42,8 @@ return array (
   array (
 		"work" => "Werk",
 		"home" => "Thuis",
-		"mobile" => "Mobiel",
-		"workmobile" => "Mobiel werk",
+		"cell" => "Mobiel",
+		"workcell" => "Mobiel werk",
 		"fax" => "Fax",
 		"workfax" => "Fax werl"
   ),

@@ -378,3 +378,6 @@ $updates['202504141045'][] = function() {
 		$folder->acl->removeGroup(\GO::config()->group_everyone);
 	}
 };
+
+$updates['202508051525'][] = "alter table fs_files
+    modify name varchar(260) collate utf8mb4_bin not null;";

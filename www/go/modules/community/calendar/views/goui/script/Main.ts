@@ -136,7 +136,6 @@ export class Main extends Component {
 				}),
 				comp({cls:'scroll'},
 					this.calendarList = new CalendarList(),
-					//this.stuffThatShouldGoIntoTheDavClientModuleWhenOverridesArePossible(),
 					tbar({cls: 'dense'},comp({tagName: 'h3', html: t('Other')})),
 					comp({tagName:'ul', cls:'goui check-list'}, ...this.renderAdapterBoxes()),
 					tbar({cls: 'dense'},
@@ -308,55 +307,6 @@ export class Main extends Component {
 				this.forward();
 			} else {
 				this.backward();
-			}
-		})
-	}
-
-	private stuffThatShouldGoIntoTheDavClientModuleWhenOverridesArePossible() {
-
-		return list({
-			store: datasourcestore({
-				dataSource: jmapds('DavAccount'),
-			}),
-			listeners:{
-				'render': ({target})=>{
-					target.store.load();
-				}
-			},
-			renderer: (a) => {
-				const list = new CalendarList(datasourcestore({
-					dataSource: jmapds('Calendar'),
-					queryParams: {filter: {isSubscribed: true, davaccountId: a.id}},
-					sort: [{property: 'sortOrder'}, {property: 'name'}]
-				}));
-
-				list.on('changevisible', ( {ids}) => {
-					if(!this.initialized) {
-						// after initial load. check for changed
-						list.store.on('load', () => {
-							this.view.update();
-						});
-						this.initialized = true;
-					}
-					this.applyInCalendarFilter(ids);
-					this.updateView();
-				});
-				return [comp({},
-					tbar({tagName: 'li', cls: 'dense'},
-						comp({tagName: 'h3', html: a.name}),
-						btn({icon: 'more_vert', menu: menu({},
-							btn({icon: 'edit', text: t('Edit') + '…', handler: () => {
-									// todo
-								}
-							}),
-							btn({icon: 'sync', text: t('Sync'), handler: () => {
-									client.jmap('DavAccount/sync', {accountId: a.id});
-								}
-							}))
-						})
-					),
-					list
-				)];
 			}
 		})
 	}

@@ -137,25 +137,22 @@ class CalendarEvent extends AclItemEntity {
 	/**
 	 * The duration of the event (or the occurence)
 	 * (optional, default: PT0S)
-	 * @var string
+	 *
 	 */
 	public ?string $duration;
 
 	/**
 	 * The title
-	 * @var string
 	 */
 	public ?string $title = '';
 
 	/**
 	 * free text that would describe the event
-	 * @var string
 	 */
 	public ?string $description = '';
 
 	/**
 	 * The location where the event takes place
-	 * @var string
 	 */
 	public ?string $location;
 
@@ -480,7 +477,7 @@ class CalendarEvent extends AclItemEntity {
 			$this->uri = $uri;
 		}
 
-		return $this->uri;
+		return $this->uri ?? strtr($this->uid, '+/=', '-_.') . '.ics';
 	}
 
 	public function etag($v = null) {
@@ -556,13 +553,13 @@ class CalendarEvent extends AclItemEntity {
 			'failureReasons'=>[]
 		];
 		foreach($blobIds as $blobId) {
-			foreach(ICalendarHelper::calendarEventFromFile($blobId) as $ev) {
+			foreach(ICalendarHelper::calendarEventFromFile($blobId, ['calendarId' => $calendarId]) as $ev) {
 				if(is_array($ev)){
 					$r->failureReasons[$r->failed] = 'Parse error '.$ev['vevent']->VEVENT[0]->UID. ': '. $ev['error']->getMessage();
 					$r->failed++;
 					continue;
 				}
-				$ev->calendarId = $calendarId;
+
 				if($uid === 'new') {
 					$ev->uid = UUID::v4();
 				} else if($uid === 'check' && self::find()->selectSingleValue('cce.id')->where(['uid'=>$ev->uid])->single() !== null) {
@@ -764,7 +761,7 @@ class CalendarEvent extends AclItemEntity {
 	public function calendarParticipant() {
 		if($this->calendarParticipant === null && !empty($this->participants)) {
 			$scheduleId = Calendar::find()
-				->join('core_user', 'u', 'calendar_calendar.ownerId = u.id')
+				->join('core_user', 'u', 'IFNULL(calendar_calendar.ownerId, '.go()->getUserId().') = u.id')
 				->where(['id' => $this->calendarId])
 				->selectSingleValue('u.email')->single();
 			$this->calendarParticipant = $this->participantByScheduleId($scheduleId);

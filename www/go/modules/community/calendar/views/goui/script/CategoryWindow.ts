@@ -32,6 +32,9 @@ export class CategoryWindow extends FormWindow {
 					placeholder:t("All"),
 					dataSource: jmapds("Calendar"),
 					displayProperty: 'name',
+					storeConfig: {
+						filters: {manageOnly: {permissionLevel: go.permissionLevels.manage}}
+					}
 				}),
 				checkbox({hidden: !client.user.isAdmin,name:'isGlobal', label: t('Global category')})
 			)

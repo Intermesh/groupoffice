@@ -100,8 +100,8 @@ return array (
   array (
     'work' => 'Praca',
     'home' => 'Dom',
-    'mobile' => 'Komórka',
-    'workmobile' => 'Komórka służbowy',
+    'cell' => 'Komórka',
+    'workcell' => 'Komórka służbowy',
     'fax' => 'Fax',
     'workfax' => 'Fax biurowy',
   ),

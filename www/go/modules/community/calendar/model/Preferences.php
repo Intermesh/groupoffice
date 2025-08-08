@@ -74,6 +74,9 @@ class Preferences extends Property
 	/** @var int the amount of minutes the event should snap to when dragged over the weekview. */
 	public int $weekViewGridSnap = 15;
 
+	/** @var int a percentage of view height a single hour should be */
+	public int $weekViewGridSize = 8; //vh
+
 	/** @var ?string Which view to show first when the user opens the calendar. */
 	public ?string $startView = null;
 

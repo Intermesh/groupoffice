@@ -101,7 +101,7 @@ export class CalendarList extends Component<CalendarListEventMap> {
 						const oldLength = Object.values(this.inCalendars).filter(Boolean).length;
 						this.inCalendars = records.reduce((obj, item) => ({ ...obj, [item.id!]: item.isVisible }), {} as any);
 						const ids = Object.keys(this.inCalendars).filter(key => this.inCalendars[key]);
-						if(oldLength !== ids.length) {
+						if(oldLength !== ids.length || oldLength === 0) {
 							this.fire('changevisible', {ids});
 						}
 					});
@@ -154,7 +154,6 @@ export class CalendarList extends Component<CalendarListEventMap> {
 							cb.mask();
 							client.requestTimeout = 300000;
 							client.jmap('DavAccount/sync', {accountId:data.davaccountId,collectionId:data.id}).then(() => {
-								debugger;
 								this.fire('changevisible', {ids: Object.keys(this.inCalendars).filter(key => this.inCalendars[key])});
 							}).catch((err) => {
 								Window.error(err);
@@ -177,7 +176,7 @@ export class CalendarList extends Component<CalendarListEventMap> {
 							});
 						}
 					}}),
-					btn({icon:'edit', text: t('Edit')+'…', hidden: data.davaccountId || !rights.mayChangeCalendars, disabled:!data.myRights.mayAdmin, handler: async _ => {
+					btn({icon:'edit', text: t('Edit')+'…', hidden: data.davaccountId || (data.groupId && !rights.mayChangeResources), disabled:!data.myRights.mayAdmin, handler: async _ => {
 							const dlg = data.groupId ? new ResourceWindow() : new CalendarWindow();
 							await dlg.load(data.id);
 							dlg.show();
@@ -189,7 +188,7 @@ export class CalendarList extends Component<CalendarListEventMap> {
 					btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
 						jmapds('Calendar').update(data.id, {isSubscribed: false}).catch(e => Window.error(e))
 					}}),
-					hr(),
+					hr({hidden:data.groupId}),
 					btn({icon:'file_save',hidden:data.groupId, text: t('Export','core','core'), handler: _ => { client.getBlobURL('community/calendar/calendar/'+data.id).then(window.open) }}),
 					btn({icon:'upload_file',hidden:data.groupId, text:t('Import','core','core')+'…', handler: async ()=> {
 							const files = await browser.pickLocalFiles(false,false,'text/calendar');

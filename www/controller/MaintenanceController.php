@@ -29,7 +29,7 @@ use ReflectionMethod;
 class MaintenanceController extends AbstractController {
 	
 	protected function allowGuests() {
-		return array('upgrade','checkdatabase','servermanagerreport','test','downloadfromshop', 'removeduplicates','buildsearchcache');
+		return array('upgrade','checkdatabase','servermanagerreport','test','downloadfromshop', 'removeduplicates','buildsearchcache', "buildprincipals");
 	}
 	
 	//don't check token in this controller

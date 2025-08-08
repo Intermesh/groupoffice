@@ -118,7 +118,7 @@ export class WeekView extends CalendarView {
 				ev.end.setHours(0, till);
 				const firstDiv = Object.values(ev.divs)[0];
 				if(firstDiv)
-					firstDiv.lastElementChild!.textContent = ev.start.format('G:i') + ' - ' + ev.end.format('G:i');
+					firstDiv.lastElementChild!.textContent = ev.start.format(Format.timeFormat) + ' - ' + ev.end.format(Format.timeFormat);
 				changed = true;
 				this.updateItems(ev.start.clone());
 			}
@@ -196,6 +196,7 @@ export class WeekView extends CalendarView {
 					},
 					start = new DateTime(data.start),
 					end = start.clone().addHours(1);
+
 				this.currentCreation = ev = new CalendarDayItem({start,end,data,key:''});
 				this.dayItems.unshift(ev as CalendarDayItem);
 				this.updateItems(start.clone().setHours(0,0,0,0));
@@ -268,12 +269,12 @@ export class WeekView extends CalendarView {
 		}
 		if(showNowBar) {
 			// an hour is 8vh
-			const top = 8 / 60 * now.getMinuteOfDay(), // 1296 = TOTAL HEIGHT of DAY
+			const top = now.getMinuteOfDay() / 60, // 1296 = TOTAL HEIGHT of DAY
 				left = 100 / this.days * (now.getWeekDay() - this.day.getWeekDay());
 			nowbar = E('div', E('hr'),
 				E('b').attr('style', `left: ${left}%;`),
 				E('span', Format.time(now))
-			).cls('now').attr('style', `top:${top}vh;`)
+			).cls('now').attr('style', `top: calc(var(--hour-height) * ${top});`)
 		}
 		let ol: HTMLElement;
 
@@ -281,6 +282,7 @@ export class WeekView extends CalendarView {
 			E('ul',E('li',t('Wk')+' '+this.day.getWeekOfYear()).cls('current',showNowBar), ...heads),
 			E('ul',E('li', t('All day')), this.alldayCtr = E('li').cls('all-days'), ...fullDays),
 			ol = E('dl',E('dt', nowbar || '', E('em'), ...hours), ...days)
+				.attr('style','--hour-height: '+(client.user.calendarPreferences.weekViewGridSize??8)+'vh')
 		);
 		setTimeout(() => ol.scrollTop = oldScrollTop || (ol.scrollHeight / 4)); // = scroll 6hours down (1/4 of day)
 	}

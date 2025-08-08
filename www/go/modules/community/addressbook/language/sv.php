@@ -20,8 +20,8 @@ return array (
   array (
     'work' => 'phoneTypes[Arbete]',
     'home' => 'phoneTypes[Hem]',
-    'mobile' => 'phoneTypes[Mobilnr]',
-    'workmobile' => 'phoneTypes[Arbete mobilnr]',
+    'cell' => 'phoneTypes[Mobilnr]',
+    'workcell' => 'phoneTypes[Arbete mobilnr]',
     'fax' => 'phoneTypes[fax]',
     'workfax' => 'phoneTypes[fax-arbete]',
   ),

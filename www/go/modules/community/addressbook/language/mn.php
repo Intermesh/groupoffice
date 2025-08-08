@@ -76,8 +76,8 @@ return array (
   array (
     'work' => 'phoneTypes [ажил]',
     'home' => 'phoneTypes [гэр]',
-    'mobile' => 'phoneTypes [гар утас]',
-    'workmobile' => 'phoneTypes [ажилын утас]',
+    'cell' => 'phoneTypes [гар утас]',
+    'workcell' => 'phoneTypes [ажилын утас]',
     'fax' => 'phoneTypes [факс]',
     'workfax' => 'phoneTypes [workfax]',
   ),

@@ -374,7 +374,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			{
 				title: t("Date"),
 				collapsible: true,
-				collapsed: true,
+				collapsed: false,
 				listeners: {
 					expand: () => {
 						//renders invalid when collapsed
@@ -413,7 +413,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 
 			this.descriptionFieldset = new Ext.form.FieldSet({
-				collapsed: true,
+				collapsed: false,
 				collapsible: true,
 				title: t("Description"),
 				xtype: "fieldset",
@@ -433,7 +433,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			}),
 
 			{
-				collapsed: true,
+				collapsed: false,
 				collapsible: true,
 				xtype: "fieldset",
 				title: t("Alerts"),

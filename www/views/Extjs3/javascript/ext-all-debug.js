@@ -44550,10 +44550,14 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
 
     
     createLink : function() {
-        var url = prompt(this.createLinkText, this.defaultLinkValue);
-        if(url && url != 'http:/'+'/'){
-            this.relayCmd('createlink', url);
-        }
+				this.focus();
+				this.updateToolbar();
+				setTimeout(() => {
+					var url = prompt(this.createLinkText, this.defaultLinkValue);
+					if(url && url != 'http:/'+'/'){
+							this.relayCmd('createlink', url);
+					}
+				}, 10)
     },
 
     

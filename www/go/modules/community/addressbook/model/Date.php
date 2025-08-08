@@ -24,7 +24,7 @@ class Date extends Property {
 
 	public ?string $type = self::TYPE_BIRTHDAY;
 
-	public \DateTime $date;
+	public ?\DateTime $date;
 
 	protected static function defineMapping(): Mapping
 	{

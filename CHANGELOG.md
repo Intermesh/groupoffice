@@ -1,6 +1,47 @@
+08-08-2025: 25.0.39
+- Addressbook / Carddav: Fixed: CardDAV / vcard: Improve compatibility by changing type=mobile to type=cell #1283
+- Caldav: Fixed caldav not found error
+
+07-08-2025: 25.0.38
+- Maildomains: Fixed domains with no mailboxes not showing
+- Calendar: Added confirm dialog to delete event
+- Core: Fixed external function handlers like mailto: links
+- Tasks: expand description, date and alert panels
+- Files: Raise max filename size to 260 characters
+- Calendar: Allow same date with full day
+- ActiveSync: Fixed empty reminder issue
+- ActiveSync: Sends scheduling messages now
+- ActiveSync: Improved exception handling
+- Timeregistration2: Fixed timer button
+
+04-08-2025: 25.0.37
+- Calendar: added customfields for calendar entity.
+- GOUI: when SelectField was set to null the option item was not selected.
+- GOUI: DateTime object will respect the users language and first day of the week.
+- Calendar: ics export filename will be calendar+date+title instead of uid
+- Finance: Payment should be verified / checked by default
+- Core: Improved setting link on image in htmleditor
+- ldapauthenticator: Fixed ErrorException in /usr/share/groupoffice/go/modules/community/ldapauthenticator/cli/controller/Sync.php at line 443: Trying to access array offset on value of type null
+- caldav: Fixed: ErrorException in /usr/share/groupoffice/go/modules/community/calendar/model/CalDAVBackend.php at line 131: Undefined array key "color"
+- caldav: Fixed: InvalidArgumentException in /usr/share/groupoffice/vendor/sabre/dav/lib/CalDAV/CalendarObject.php at line 58: The objectData argument must contain an 'uri' property
+- maildomains: Fixed install error on mysql Database exception: SQLSTATE[42000]: Syntax error or access violation: 1101 BLOB, TEXT, GEOMETRY or JSON column 'publicKey' can't have a default value
+
+14-07-2025: 25.0.36
+- OTP: dialog would not popup when OTP setup is required.
+- OTP: Code would not verify during setup of a new OTP token.
+- Calendar: Event dialog will only make writeable calendars selectable.
+- Calendar: The create first calendar dialog will popup if there are no writable calendars.
+- Calendar: mayChangeCalendar is named "Create/Delete calendars", edit is allowed based on permissions. 
+    A user with owner permission must also have create/delete permission on the module to delete a calendar
+- Calendar: Fixed error when caldav server had acknowledged alerts
+- Calendar: Fixed wrong day headers when your timezone is west from UTC
+- GOUI: Implemented custom time picker to support 12 hour time format
 - Tasks: Fixed are you sure close message on save
-- Files: Fixed invalid deletion of file acl's in garbage collection
-- Core: Fixed bug in garbage collection stopping on api keys 
+- Files: Fixed invalid deletion of file acl's in garbage co llection
+- Core: Fixed bug in garbage collection stopping on api keys
+- Projects3: Fixed migration of billed status from projects2
+- Projects3: Reset registrations billed state when invoice is removed
+- Timeregistration2: fix timer button
 
 08-07-2025: 25.0.35
 - Core: Small fonts issue

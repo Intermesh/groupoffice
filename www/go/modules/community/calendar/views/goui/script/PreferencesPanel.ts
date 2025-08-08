@@ -36,6 +36,14 @@ export class PreferencesPanel extends Component {
 							{value:'30',name:  '30 '+t('minutes')},
 							{value:'60',name:  '1 '+t('hour')}
 						]}),
+					select({name:'weekViewGridSize', label: t('Height for day/week view'),
+						hint: t('The height of a single day'),options: [
+							{value:'4', name: t('Extra small')},
+							{value:'5',name:  t('Small')},
+							{value:'7',name:  t('Regular')},
+							{value:'8',name:  t('Medium')},
+							{value:'9',name:  t('Large')}
+						]}),
 					select({name:'startView', label:t('Default view when opening the calendar'),options: [
 							{value:'day', name: t('Day')},
 							{value:'week',name:  t('Week')},

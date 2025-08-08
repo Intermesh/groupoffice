@@ -197,7 +197,6 @@ CREATE TABLE IF NOT EXISTS `calendar_participant` (
 	`rolesMask` INT NOT NULL DEFAULT 0,
 	`language` VARCHAR(20),
 	`participationStatus` ENUM('needs-action', 'tentative', 'accepted', 'declined', 'delegated') NULL DEFAULT 'needs-action',
-	`scheduleAgent` ENUM('server', 'client', 'none') DEFAULT 'server',
 	`expectReply` TINYINT(1) NOT NULL DEFAULT 0,
 	`scheduleUpdated` DATETIME NULL,
 	`scheduleStatus` varchar(255) DEFAULT NULL,
@@ -508,14 +507,14 @@ INSERT INTO calendar_event_user
 -- skip per-user properties of events without organizer
 
 INSERT INTO calendar_participant
-	(id, eventId, name, email, kind, rolesMask, participationStatus, scheduleAgent, expectReply, scheduleUpdated) SELECT
-	id, event_id, name, email, 'individual', IF(role='REQ-PARTICIPANT',2,0)+is_organizer, LOWER(p.status),'server',1,FROM_UNIXTIME(IF(last_modified='',0, last_modified)) FROM cal_participants p JOIN calendar_event ce ON ce.eventId = event_id;
+	(id, eventId, name, email, kind, rolesMask, participationStatus, expectReply, scheduleUpdated) SELECT
+	id, event_id, name, email, 'individual', IF(role='REQ-PARTICIPANT',2,0)+is_organizer, LOWER(p.status),1,FROM_UNIXTIME(IF(last_modified='',0, last_modified)) FROM cal_participants p JOIN calendar_event ce ON ce.eventId = event_id;
 
 
 INSERT INTO calendar_participant
-(id, eventId, name, email, kind, rolesMask, participationStatus, scheduleAgent, expectReply, scheduleUpdated) SELECT
+(id, eventId, name, email, kind, rolesMask, participationStatus, expectReply, scheduleUpdated) SELECT
 CONCAT('Calendar:',c.id), r.id as eventId, c.name,u.email , 'resource', 0 ,
-IF(MIN(e.status) = 'CONFIRMED', 'accepted', LOWER(MIN(e.status))), 'server',1,
+IF(MIN(e.status) = 'CONFIRMED', 'accepted', LOWER(MIN(e.status))), 1,
 FROM_UNIXTIME(IF(MAX(e.mtime)='',0, MAX(e.mtime))) FROM cal_events e
 	 JOIN cal_calendars c ON e.calendar_id = c.id
 	 JOIN core_user u ON c.user_id = u.id

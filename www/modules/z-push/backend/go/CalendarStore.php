@@ -112,6 +112,8 @@ class CalendarStore extends Store {
 
 		$event = CalendarEvent::findById($id);
 
+		CalendarEvent::$sendSchedulingMessages = true;
+
 		if (!$event) {
 			$event = new CalendarEvent();
 			$event->prodId = 'GroupOffice (EAS)';
@@ -120,22 +122,41 @@ class CalendarStore extends Store {
 			return $this->StatMessage($folderid, $id);
 		}
 
+		// what if it's already in this calendar ???? ticket #36205
+		// Can't replicate it with an iphone as it's impossible to move an event that is in multiple calendars. Perhaps
+		// with android. I hope the exception handling below will catch the error and will undo the change.
 		$event->calendarId = $folderid;
-
 
 		try {
 			$event = CalendarConvertor::toCalendarEvent($message, $event);
+
+			if(!$event->save()){
+				ZLog::Write(LOGLEVEL_WARN, "Failed to save event: " . var_export($event->getValidationErrors(), true));
+				return false;
+			}
+
 		} catch(Exception $e) {
 			ZLog::Write(LOGLEVEL_FATAL, $e->getMessage());
 			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 		}
 
-		if(!$event->save()){
-			ZLog::Write(LOGLEVEL_WARN, "Failed to save event: " . var_export($event->getValidationErrors(), true));
-			return false;
-		} else {
-			return $this->StatMessage($folderid, $event->id);
-		}
+		return $this->StatMessage($folderid, $event->id);
+	}
+
+	/**
+	 * Resolves recipients
+	 *
+	 * @todo
+	 *
+	 * @param SyncObject        $resolveRecipients
+	 *
+	 * @access public
+	 * @return SyncObject       $resolveRecipients
+	 */
+	public function ResolveRecipients($resolveRecipients) {
+		$r = new SyncResolveRecipients();
+		$r->status = SYNC_RESOLVERECIPSSTATUS_PROTOCOLERROR;
+		return $r;
 	}
 
 	public function MeetingResponse($requestid, $folderid, $response, $instanceId) {
@@ -186,7 +207,14 @@ class CalendarStore extends Store {
 			return true;
 		}
 
-		return CalendarEvent::delete(['id'=>$event->id]);
+		try {
+			return CalendarEvent::delete(['id'=>$event->id]);
+		} catch (Exception $e) {
+			ZLog::Write(LOGLEVEL_FATAL, 'Calender::EXCEPTION ~~ ' .  $e->getMessage());
+			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
+			throw new StatusException("Access denied", SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+		}
+
 	}
 
 	public function MoveMessage($folderid, $id, $newfolderid, $contentParameters) {

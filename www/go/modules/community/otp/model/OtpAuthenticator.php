@@ -27,7 +27,7 @@ class OtpAuthenticator extends Property {
 
 	protected bool $verified = false;
 	
-	private bool $verify = false;
+	private ?string $verify = null;
 	public static bool $requestSecret = false;
 
 	protected int $codeLength = 6;

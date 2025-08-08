@@ -378,7 +378,7 @@ class CalendarConvertor
 			}
 		}
 
-		if (isset($message->reminder)){
+		if (!empty($message->reminder)){
 			$event->alerts = [(new Alert($event))->setValues([
 				'action' => 'display',
 				'trigger' => ['offset' => '-PT'.$message->reminder.'M', 'relativeTo' => 'start']

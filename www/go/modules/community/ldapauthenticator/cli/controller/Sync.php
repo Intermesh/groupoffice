@@ -352,11 +352,14 @@ class Sync extends Controller
 			// Clear existing users
 			$group->users = [];
 
-
 			$members = $this->getGroupMembers($record, $connection, $server);
 
 			foreach ($members as $u) {
-				$user = User::find(['id'])->where(['username' => $u['username']])->orWhere(['email' => $u['email']])->single();
+				$userQuery = User::find(['id'])->where(['username' => $u['username']]);
+				if(!empty($u['email'])) {
+					$userQuery->orWhere(['email' => $u['email']]);
+				}
+				$user = $userQuery->single();
 				if (!$user) {
 					$this->output("Error: user '" . $u['username'] . "' does not exist in Group-Office");
 				} else {
@@ -440,7 +443,7 @@ class Sync extends Controller
 			foreach ($record->memberuid as $uid) {
 				$accountResult = Record::find($ldapConn, $server->peopleDN, 'uid=' . $uid);
 				if ($r = $accountResult->fetch()) {
-					$members[] = ['username' => $this->getGOUserName($r, $server), 'email' => $r->mail[0]];
+					$members[] = ['username' => $this->getGOUserName($r, $server), 'email' => $r->mail[0] ?? null];
 				}
 
 			}

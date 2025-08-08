@@ -102,18 +102,20 @@ $updates['202402221543'][] = function(){ // insert event overrides
 
 $updates['202402221543'][] = function(){ // migrate recurrence rules and fix lastOccurrence and firstOccurrence
 
-	$stmt = go()->getDbConnection()->query("SELECT eventId, recurrenceRule,`start`,`timeZone`,`duration` FROM calendar_event WHERE recurrenceRule IS NOT NULL AND recurrenceRule != ''");
+	$stmt = go()->getDbConnection()->query("SELECT eventId, recurrenceRule,`start`,`timeZone`,`duration`,`showWithoutTime` FROM calendar_event WHERE recurrenceRule IS NOT NULL AND recurrenceRule != ''");
 
 	while($row = $stmt->fetch()) {
 
 		if($row['recurrenceRule'][0] == '{')
 			continue; // already done
+		$tz = $row['timeZone'] ? new DateTimeZone($row['timeZone']) : null;
 
-		$start = new DateTime($row["start"]);
+
+		$start = new DateTime($row["start"], $tz);
 		try {
 			$rrule = \go\core\util\Recurrence::fromString($row['recurrenceRule'], $start);
 
-			$recurrenceRule = json_encode($rrule->toArray());
+			$recurrenceRule = json_encode($rrule->toArray($row['showWithoutTime']));
 			$data = ['recurrenceRule' => $recurrenceRule];
 			if(isset($rrule->until)) {
 				$data['lastOccurrence'] = clone $rrule->until;
@@ -307,6 +309,8 @@ $updates['202506130832'][] = "CREATE TABLE IF NOT EXISTS calendar_schedule_objec
                                    etag VARBINARY(32),
                                    size INT(11) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+$updates["202507221653"][] = "alter table `calendar_preferences` add column weekViewGridSize	INT DEFAULT 8 NOT NULL AFTER weekViewGridSnap;";
 
 // TODO: calendar views -> custom filters
 
