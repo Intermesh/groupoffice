@@ -1,3 +1,7 @@
+08-08-2025: 25.0.39
+- Addressbook / Carddav: Fixed: CardDAV / vcard: Improve compatibility by changing type=mobile to type=cell #1283
+- Caldav: Fixed caldav not found error
+
 07-08-2025: 25.0.38
 - Maildomains: Fixed domains with no mailboxes not showing
 - Calendar: Added confirm dialog to delete event
