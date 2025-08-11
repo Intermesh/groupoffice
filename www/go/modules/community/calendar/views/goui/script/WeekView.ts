@@ -17,8 +17,15 @@ export class WeekView extends CalendarView {
 	dayItems : CalendarDayItem[] = []
 	alldayCtr!: HTMLElement
 	baseCls = 'cal week';
+	private nowbar: HTMLElement | undefined;
 
 	protected internalRender() {
+
+		setInterval(() => {
+			// update the now line every minute
+			this.updateNowBar();
+		}, 60000);
+
 		this.makeDraggable();
 		this.el.tabIndex = 0;
 
@@ -238,6 +245,18 @@ export class WeekView extends CalendarView {
 		this.updateItems();
 	}
 
+	updateNowBar() {
+		if(!this.nowbar) {
+			return;
+		}
+
+		const now = new DateTime(), top = now.getMinuteOfDay() / 60, // 1296 = TOTAL HEIGHT of DAY
+			left = 100 / this.days * (now.getWeekDay() - this.day.getWeekDay());
+		this.nowbar.attr('style', `top: calc(var(--hour-height) * ${top});`);
+		(this.nowbar.childNodes[1] as Element).attr('style', `left: ${left}%;`);
+	}
+
+
 	renderView() {
 		const oldScrollTop = this.el.lastElementChild?.scrollTop;
 		this.el.innerHTML = ''; // clear
@@ -245,7 +264,7 @@ export class WeekView extends CalendarView {
 			hour, day = this.day.clone();
 		//day.setWeekDay(0);
 
-		let heads = [], days = [],fullDays = [], hours = [], showNowBar=false ,nowbar;
+		let heads = [], days = [],fullDays = [], hours = [], showNowBar=false;
 		const fnTime = /[Aa]$/.test(Format.timeFormat) ?  ((h:number) => h < 12 ? h+'am' : (h-12) + 'pm') : ((h: number) => h+':00');
 		for (hour = 1; hour < 24; hour++) {
 			hours.push(E('em', fnTime(hour)));
@@ -271,17 +290,19 @@ export class WeekView extends CalendarView {
 			// an hour is 8vh
 			const top = now.getMinuteOfDay() / 60, // 1296 = TOTAL HEIGHT of DAY
 				left = 100 / this.days * (now.getWeekDay() - this.day.getWeekDay());
-			nowbar = E('div', E('hr'),
+			this.nowbar = E('div', E('hr'),
 				E('b').attr('style', `left: ${left}%;`),
 				E('span', Format.time(now))
 			).cls('now').attr('style', `top: calc(var(--hour-height) * ${top});`)
+		} else {
+			this.nowbar = undefined;
 		}
 		let ol: HTMLElement;
 
 		this.el.append(
 			E('ul',E('li',t('Wk')+' '+this.day.getWeekOfYear()).cls('current',showNowBar), ...heads),
 			E('ul',E('li', t('All day')), this.alldayCtr = E('li').cls('all-days'), ...fullDays),
-			ol = E('dl',E('dt', nowbar || '', E('em'), ...hours), ...days)
+			ol = E('dl',E('dt', this.nowbar || '', E('em'), ...hours), ...days)
 				.attr('style','--hour-height: '+(client.user.calendarPreferences.weekViewGridSize??8)+'vh')
 		);
 		setTimeout(() => ol.scrollTop = oldScrollTop || (ol.scrollHeight / 4)); // = scroll 6hours down (1/4 of day)
