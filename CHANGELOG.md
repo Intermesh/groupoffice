@@ -1,3 +1,5 @@
+- Core: restored submodules groupoffice-core and z-push
+
 22-08-2025: 25.0.40
 - Calendar: Only subscribe personal calendars in new calendar migration to avoid an excessive list of calendars
 - Calendar: Sanitize invalid URI's
@@ -50,7 +52,7 @@
 - Calendar: Fixed wrong day headers when your timezone is west from UTC
 - GOUI: Implemented custom time picker to support 12 hour time format
 - Tasks: Fixed are you sure close message on save
-- Files: Fixed invalid deletion of file acl's in garbage co llection
+- Files: Fixed invalid deletion of file acl's in garbage collection
 - Core: Fixed bug in garbage collection stopping on api keys
 - Projects3: Fixed migration of billed status from projects2
 - Projects3: Reset registrations billed state when invoice is removed

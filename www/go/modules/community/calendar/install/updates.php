@@ -258,12 +258,12 @@ $updates['202503111342'][] = function(){
 	\go\modules\community\calendar\cron\ScanEmailForInvites::install("*/5 * * * *");
 };
 
-$updates['202503131043'][] = "UPDATE core_link l
+$updates['202503131043'][] = "UPDATE IGNORE core_link l
 	JOIN core_entity et ON et.id = l.fromEntityTypeId
 	JOIN calendar_calendar_event e on e.eventId = l.fromId AND et.name = 'CalendarEvent'
 	SET l.fromId = e.id;";
 
-$updates['202503131043'][] = "UPDATE core_link l
+$updates['202503131043'][] = "UPDATE IGNORE core_link l
 	JOIN core_entity et ON et.id = l.toEntityTypeId
 	JOIN calendar_calendar_event e on e.eventId = l.toId AND et.name = 'CalendarEvent'
 	SET l.toId = e.id;";
