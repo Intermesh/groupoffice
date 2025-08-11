@@ -1,3 +1,4 @@
+11-08-2025: 6.8.133
 - Studio: several fixes in custom field code
 
 07-08-2025: 6.8.132
