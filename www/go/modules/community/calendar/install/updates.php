@@ -312,6 +312,8 @@ $updates['202506130832'][] = "CREATE TABLE IF NOT EXISTS calendar_schedule_objec
 
 $updates["202507221653"][] = "alter table `calendar_preferences` add column weekViewGridSize	INT DEFAULT 8 NOT NULL AFTER weekViewGridSnap;";
 
+$updates["202508111058"][] = "update calendar_event set uri = REPLACE(REPLACE(REPLACE(uri, '/', '_'), '+', '-'), '=', '.');";
+
 // TODO: calendar views -> custom filters
 
 
