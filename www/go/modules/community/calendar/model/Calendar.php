@@ -138,18 +138,23 @@ class Calendar extends AclOwnerEntity {
 
 	protected static function defineFilters(): Filters
 	{
-		return parent::defineFilters()->add('isSubscribed', function(Criteria $criteria, $value, Query $query) {
+		return parent::defineFilters()
+			->add('isSubscribedFor', function(Criteria $criteria, $value, Query $query) {
+				$query->join("calendar_calendar_user", "for", "for.id = calendar_calendar.id and for.userId = :forUserId")->bind(":forUserId", $value);
+				$criteria->where('for.isSubscribed', '=', true);
+			})
+			->add('isSubscribed', function(Criteria $criteria, $value, Query $query) {
 			$criteria->where('isSubscribed','=', $value);
 				if($value === false) {
 					$criteria->orWhere('isSubscribed', 'IS', null);
 				}
-		})->add('isResource', function(Criteria $criteria, $value, Query $query) {
-			$criteria->where('groupId',$value?'IS NOT':'IS', null);
-		})->add('groupId', function(Criteria $criteria, $value, Query $query) {
-			$criteria->where('groupId','=', $value);
-		})->add('davaccountId', function(Criteria $criteria, $value, Query $query) {
-			//$criteria->where('davc.davaccountId','=', $value);
-		});
+			})->add('isResource', function(Criteria $criteria, $value, Query $query) {
+				$criteria->where('groupId',$value?'IS NOT':'IS', null);
+			})->add('groupId', function(Criteria $criteria, $value, Query $query) {
+				$criteria->where('groupId','=', $value);
+			})->add('davaccountId', function(Criteria $criteria, $value, Query $query) {
+				//$criteria->where('davc.davaccountId','=', $value);
+			});
 	}
 
 	/**
