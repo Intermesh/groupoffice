@@ -2,6 +2,7 @@
 - Calendar: Sanitize invalid URI's
 - Newsletters: Fixed Error in /usr/local/share/src/www/go/core/acl/model/AclOwnerEntity.php at line 218: Typed property go\core\acl\model\AclOwnerEntity::$aclId must not be accessed before initialization
   when sending with an account from the e-mail module
+- CalDAV: Sanitize event URI's in database.
 
 08-08-2025: 25.0.39
 - Addressbook / Carddav: Fixed: CardDAV / vcard: Improve compatibility by changing type=mobile to type=cell #1283
