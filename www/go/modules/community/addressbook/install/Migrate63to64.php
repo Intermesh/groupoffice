@@ -282,6 +282,9 @@ class Migrate63to64 {
 			if($this->shrink && ($col->dbType == 'varchar' || $col->dbType == 'char')) {
 				//prevent max row size error by shrinking column to fit
 				$length = go()->getDbConnection()->selectSingleValue("max(length(`" . $col->name . "`))")->from("cf_ab_companies")->single();
+				if(!$length) {
+					$length = 10;
+				}
 				$col->dataType = $col->dbType . '(' . $length . ')';
 			}
 			
