@@ -1,3 +1,5 @@
+- Core: restored submodules groupoffice-core and z-push
+
 22-08-2025: 25.0.40
 - Calendar: Only subscribe personal calendars in new calendar migration to avoid an excessive list of calendars
 - Calendar: Sanitize invalid URI's
