@@ -3,6 +3,12 @@
 - Newsletters: Fixed Error in /usr/local/share/src/www/go/core/acl/model/AclOwnerEntity.php at line 218: Typed property go\core\acl\model\AclOwnerEntity::$aclId must not be accessed before initialization
   when sending with an account from the e-mail module
 - CalDAV: Sanitize event URI's in database.
+- Calendar: Use correct date format in links
+- Calendar: Print shows wrong week when week starts on sunday
+- Calendar: Load correct calendars for user in system settings
+- Calendar: 12am -> 12pm
+- Calendar: updated time indicator every minute
+
 
 08-08-2025: 25.0.39
 - Addressbook / Carddav: Fixed: CardDAV / vcard: Improve compatibility by changing type=mobile to type=cell #1283
