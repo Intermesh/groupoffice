@@ -1,3 +1,5 @@
+- Addressbook: Don't shink fields to 0 on migration but to a minimum of 10 chars.
+
 03-11-2023 6.4.248
 - Core: Fixed security issue
 
