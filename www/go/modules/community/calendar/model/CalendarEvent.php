@@ -998,7 +998,10 @@ class CalendarEvent extends AclItemEntity {
 	{
 		$calendar = Calendar::findById($this->calendarId, ['name'], true);
 
-		return $calendar->name .': '. $this->title . ' - '. $this->start->format('Y-m-d');
+		$u = go()->getAuthState()->getUser();
+		$format = $u ? $u->dateFormat : "d-m-Y";
+
+		return $calendar->name .': '. $this->title . ' - '. $this->start->format($format);
 	}
 
 	/**
