@@ -168,8 +168,10 @@ class Module extends core\Module
 
 		$report = new reports\Week();
 
-		$dayName = $report->firstWeekday===1 ? 'Monday' : 'Sunday';
-		$start = (new \DateTime($date))->modify($dayName.' this week');
+		$date = (new \DateTime($date));
+		$dayDiff = (int) $date->format('w') + $report->firstWeekday;
+
+		$start = $date->sub(new DateInterval("P" . $dayDiff . "D"));
 		$end = (clone $start)->modify('+'.$span.' days');
 
 
