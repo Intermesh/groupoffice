@@ -1,3 +1,4 @@
+22-08-2025: 25.0.40
 - Calendar: Only subscribe personal calendars in new calendar migration to avoid an excessive list of calendars
 - Calendar: Sanitize invalid URI's
 - Newsletters: Fixed Error in /usr/local/share/src/www/go/core/acl/model/AclOwnerEntity.php at line 218: Typed property go\core\acl\model\AclOwnerEntity::$aclId must not be accessed before initialization
