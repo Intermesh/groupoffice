@@ -246,7 +246,7 @@ export class WeekView extends CalendarView {
 		//day.setWeekDay(0);
 
 		let heads = [], days = [],fullDays = [], hours = [], showNowBar=false ,nowbar;
-		const fnTime = /[Aa]$/.test(Format.timeFormat) ?  ((h:number) => h<=12?h+'am':(h-12)+'pm') : ((h: number) => h+':00');
+		const fnTime = /[Aa]$/.test(Format.timeFormat) ?  ((h:number) => h < 12 ? h+'am' : (h-12) + 'pm') : ((h: number) => h+':00');
 		for (hour = 1; hour < 24; hour++) {
 			hours.push(E('em', fnTime(hour)));
 		}
