@@ -442,7 +442,7 @@ class Scheduler {
 	}
 
 
-	public static function updateRecurrenceStatus(CalendarEvent $existingEvent, string $recurId, string $email, string $status, DateTime $replyStamp): void
+	public static function updateRecurrenceStatus(CalendarEvent $existingEvent, string $recurId, string $email, string $status, \DateTimeInterface $replyStamp): void
 	{
 		if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
 			// TODO: check if the given RECURRENCE-ID is valid for $existingEvent->recurrenceRule
@@ -462,7 +462,7 @@ class Scheduler {
 				}
 				if (empty($p->scheduleUpdated) || $p->scheduleUpdated < $replyStamp) {
 
-					$p->scheduleUpdated = $replyStamp->format("Y-m-d\TH:i:s");
+					$p->scheduleUpdated = new DateTime($replyStamp->format("Y-m-d H:i:s"), $replyStamp->getTimezone());;
 					$p->participationStatus = $status;
 
 					$modified = true;

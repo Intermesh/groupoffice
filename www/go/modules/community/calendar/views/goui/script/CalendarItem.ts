@@ -570,7 +570,7 @@ export class CalendarItem {
 			});
 		} else if(this.isOverride) {
 			this.patchOccurrence(modified, onFinish);
-		} else if(skipAsk) {
+		} else if(skipAsk || !this.recurrenceId) {
 			// always patch series
 			this.patchSeries(modified, onFinish)
 		} else {
@@ -595,6 +595,7 @@ export class CalendarItem {
 						hidden: modified.recurrenceRule, // user must change future if rrule is modified
 						cls:'primary',
 						handler: _b => {
+							debugger;
 							this.patchOccurrence(modified, onFinish); w.close();
 						}
 					}),
