@@ -302,17 +302,19 @@ class CalDAVBackend extends AbstractBackend implements
 	 */
 	public function getCalendarObject($calendarId, $objectUri)
 	{
+		go()->debug("CalDAVBackend::getCalendarObject($calendarId, $objectUri)");
 		list($type, $id) = explode('-', $calendarId,2);
 
 		switch($type) {
 			case 'c': // calendar
 				$component = 'vevent';
-				$q = CalendarEvent::find()->filter(['hideSecret'=>1])->where(['cce.calendarId'=> $id, 'eventdata.uri'=>$objectUri]);
+				$q = CalendarEvent::find()->filter(['hideSecret'=>1, 'inCalendars' => $id])->where([ 'eventdata.uri'=>$objectUri]);
+				go()->debug($q);
 				$object = $q->single();
 				break;
 			case 't': // tasklist
 				$component = 'vtodo';
-				$object = Task::find()->where(['task.tasklistId'=> $id, 'task.uri' => $objectUri])->single();
+				$object = Task::find()->filter(['tasklistId' => $id])->where(['task.uri' => $objectUri])->single();
 				break;
 			default:
 				go()->log("incorrect calendarId ".$calendarId. ' for '.$objectUri);
@@ -592,7 +594,11 @@ class CalDAVBackend extends AbstractBackend implements
 	 */
 	public function getCalendarObjectByUID($principalUri, $uid)
 	{
+
 		go()->debug("getCalendarObjectByUID($principalUri, $uid)");
+		$path =  parent::getCalendarObjectByUID($principalUri,$uid);
+		go()->debug($path);
+		return $path;
 
 		$username = str_replace("principals/", "", $principalUri);
 

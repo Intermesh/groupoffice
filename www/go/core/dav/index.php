@@ -60,6 +60,9 @@ $server->addPlugin(new CardDAV\Plugin());
 $server->addPlugin(new CalDAV\Plugin());
 $aclPlugin = new DAVACL\Plugin();
 $aclPlugin->allowUnauthenticatedAccess = false;
+$aclPlugin->hideNodesFromListings = true;
+//$aclPlugin->adminPrincipals = ['principals/admin'];
+
 $server->addPlugin($aclPlugin);
 $server->addPlugin(new CalDAV\Schedule\Plugin());
 $server->addPlugin(new go\core\dav\schedule\IMipPlugin(go()->getSettings()->systemEmail));
