@@ -262,9 +262,6 @@ export class WeekView extends CalendarView {
 		this.el.innerHTML = ''; // clear
 		let now = new DateTime(),
 			hour, day = this.day.clone();
-		//day.setWeekDay(0);
-
-		console.log(now.timezone);
 
 		const hrs = now.clone();
 		hrs.setMinutes(0);
