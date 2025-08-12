@@ -1,3 +1,8 @@
+- Calendar: bug with 12pm times becoming 12 hr later
+- Calendar: Fixed some problems when GO timezone didn't match system timezone
+- Calendar: 0pm -> 12pm
+- Calendar: Some hyperlinks could be malformed
+
 12-08-2025: 25.0.41
 - Core: restored submodules groupoffice-core and z-push
 
