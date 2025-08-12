@@ -4,6 +4,8 @@
 - Calendar: 0pm -> 12pm
 - Calendar: Some hyperlinks could be malformed
 - Caldav: Fixed scheduling issue with recurring events
+- Calendar: Private event shows as private in z-push 
+- ActiveSync: avoid generating an organizer when there are no attendees
 
 12-08-2025: 25.0.41
 - Core: restored submodules groupoffice-core and z-push
