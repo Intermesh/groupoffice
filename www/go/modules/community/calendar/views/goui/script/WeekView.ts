@@ -264,10 +264,15 @@ export class WeekView extends CalendarView {
 			hour, day = this.day.clone();
 		//day.setWeekDay(0);
 
+		console.log(now.timezone);
+
+		const hrs = now.clone();
+		hrs.setMinutes(0);
 		let heads = [], days = [],fullDays = [], hours = [], showNowBar=false;
-		const fnTime = /[Aa]$/.test(Format.timeFormat) ?  ((h:number) => h < 12 ? h+'am' : (h-12) + 'pm') : ((h: number) => h+':00');
+		// const fnTime = /[Aa]$/.test(Format.timeFormat) ?  ((h:number) => h < 12 ? h+'am' : (h-12) + 'pm') : ((h: number) => h+':00');
 		for (hour = 1; hour < 24; hour++) {
-			hours.push(E('em', fnTime(hour)));
+			hrs.setHours(hour)
+			hours.push(E('em',hrs.format(Format.timeFormat)));
 		}
 
 		this.dayCols = {};

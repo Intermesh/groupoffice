@@ -96,7 +96,6 @@ export class CalendarItem {
 	constructor(obj:CalendarItemConfig) {
 		Object.assign(this,obj);
 
-
 		this.patched = ObjectUtil.patch(structuredClone(obj.data), obj.override) as CalendarEvent;
 		 if(obj.recurrenceId && (!obj.override || !obj.override.start))
 		 	this.patched.start = obj.recurrenceId;
@@ -174,7 +173,8 @@ export class CalendarItem {
 					}
 				}
 			}
-			const r = new Recurrence({dtstart: new Date(e.start), timeZone:e.timeZone, rule: e.recurrenceRule});
+
+			const r = new Recurrence({dtstart: new DateTime(e.start, e.timeZone), rule: e.recurrenceRule});
 			for(const date of r.loop(from, until)){
 				const recurrenceId = date.format('Y-m-d\TH:i:s');
 
@@ -498,8 +498,8 @@ export class CalendarItem {
 		if(this.isRecurring && this.data.recurrenceRule) {
 			const e = this.data;
 			if(e.recurrenceRule.count) {
-				const r = new Recurrence({dtstart: new Date(e.start), timeZone:e.timeZone, rule: e.recurrenceRule});
-				for(const date of r.loop(new DateTime(), new DateTime('2058-01-01'), (_d,i) => i < 1)){
+				const r = new Recurrence({dtstart: new DateTime(e.start, e.timeZone), rule: e.recurrenceRule});
+				for(const date of r.loop(new DateTime(), new DateTime('2058-01-01'), (_d,i) => i < 1)) {
 					lastOccurrence = date.clone().add(new DateInterval(e.duration));
 				}
 			} else if(e.recurrenceRule.until) {
