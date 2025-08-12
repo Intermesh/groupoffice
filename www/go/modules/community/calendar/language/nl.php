@@ -69,7 +69,7 @@ return [
 	'End' => 'Einde',
 	'Invite people'=>'Gasten toevoegen',
 	'Public'=>'Openbaar',
-	'Private' => 'Privee',
+	'Private' => 'Privé',
 	'Secret'=> 'Geheim',
 	'Location'=>'Locatie',
 	'Awaiting reply' => 'Wacht op antwoord',

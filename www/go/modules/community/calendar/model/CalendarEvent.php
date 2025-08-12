@@ -666,10 +666,7 @@ class CalendarEvent extends AclItemEntity {
 		$this->start->isLocal = true;
 
 		$arr =  parent::toArray($properties);
-		$showAsPrivate = $this->isPrivate() && $this->getPermissionLevel() <= 30/*Write own*/;
-		if($this->getPermissionLevel() === 30 && $this->currentUserIsOwner()) {
-			$showAsPrivate = false;
-		}
+		$showAsPrivate = $this->isPrivate() && !$this->currentUserIsOwner();
 		if($showAsPrivate) {
 			$arr['title'] = '';
 			$arr['description'] = '';
