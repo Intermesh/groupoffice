@@ -249,21 +249,24 @@ class Scheduler {
 			'event' => $event,
 			'recurrenceId' => empty($vevent->{"RECURRENCE-ID"}) ? null : $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s')
 		];
-		if($method ==='REPLY' && isset($event)) {
+		if(isset($event)) {
 
-			if(!empty($itip['recurrenceId'])) {
+			if (!empty($itip['recurrenceId'])) {
 				$event = $event->patchedInstance($itip['recurrenceId']);
 			}
 
-			$p = $event->participantByScheduleId($from['email']);
-			if($p) {
-				$lang = go()->t('replyImipBody', 'community', 'calendar');
-				$itip['status'] = $p->participationStatus;
-				$itip['feedback'] = strtr($lang[$p->participationStatus], [
-					'{name}' => $p->name ?? '',
-					'{title}' => $event->title,
-					'{date}' => implode(' ', $event->humanReadableDate()),
-				]);
+			if ($method === 'REPLY') {
+
+				$p = $event->participantByScheduleId($from['email']);
+				if ($p) {
+					$lang = go()->t('replyImipBody', 'community', 'calendar');
+					$itip['status'] = $p->participationStatus;
+					$itip['feedback'] = strtr($lang[$p->participationStatus], [
+						'{name}' => $p->name ?? '',
+						'{title}' => $event->title,
+						'{date}' => implode(' ', $event->humanReadableDate()),
+					]);
+				}
 			}
 		}
 		return $itip;
@@ -352,10 +355,12 @@ class Scheduler {
 	}
 
 	private static function processRequest(VCalendar $vcalendar, ?CalendarEvent $event) {
-		if($event->isNew()) {
+		// recurce id not added to overrides here???
+//		if($event->isNew()) {
+		//MS: removed the if above because a REQUEST with an recurrence-id wasn't processed
 			$event = ICalendarHelper::parseVObject($vcalendar, $event);
 			$event->save(); // we may need to save existing event to if we are not the origin
-		}
+//		}
 //		if(isset($event->participants)) {
 //			foreach ($event->participants as $p) {
 //				if ($p->email == $receiver && $p->kind == 'resource') {
