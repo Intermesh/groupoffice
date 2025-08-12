@@ -652,7 +652,7 @@ class CalendarEvent extends AclItemEntity {
 		return $success;
 	}
 
-	private function currentUserIsOwner() {
+	public function currentUserIsOwner() {
 		return $this->ownerId === go()->getUserId() ||
 		 ($this->ownerId === null && $this->createdBy === go()->getUserId());
 	}
