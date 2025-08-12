@@ -659,6 +659,12 @@ class CalendarEvent extends AclItemEntity {
 
 	public function toArray(array|null $properties = null): array|null
 	{
+		if(!($this->start instanceof DateTime)) {
+			//make sure timezone info is not sent by setting isLocal below. We can't be sure this datetime is a go\core\util\DateTime
+			$this->start = new DateTime($this->start);
+		}
+		$this->start->isLocal = true;
+
 		$arr =  parent::toArray($properties);
 		$showAsPrivate = $this->isPrivate() && $this->getPermissionLevel() <= 30/*Write own*/;
 		if($this->getPermissionLevel() === 30 && $this->currentUserIsOwner()) {

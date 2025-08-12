@@ -380,6 +380,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
 			}
 			return $arr;
 		} else if($value instanceof DateTime) {
+			// this will support DateTime::$isLocal
 			return (string) $value;
 		} else if($value instanceof \DateTimeInterface) {
 			return $value->format(DateTime::FORMAT_API);
