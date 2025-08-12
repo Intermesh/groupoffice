@@ -439,7 +439,7 @@ export class CalendarItem {
 			lines.push('<hr>'+t('Participants'));
 			for(const key in this.participants) {
 				const p = this.participants[key],
-					icon = statusIcons[p.participationStatus],
+					icon = statusIcons[p.participationStatus] ? statusIcons[p.participationStatus] : statusIcons["needs-action"] ,
 					 i= '<i class="icon '+icon[2]+'" title="'+icon[1]+'">'+icon[0]+'</i>' ;
 				lines.push(i+' '+(p.name ?? p.email));
 			}
