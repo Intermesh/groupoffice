@@ -105,6 +105,10 @@ class Principal extends AclOwnerEntity
 						->orWhere('e.quitAt','>',new DateTime())
 				);
 			})
+			->add("preferUser", function (Criteria $criteria, $value, Query $query){
+				$query->groupBy(['email'])
+					->orderby([new Expression("max(entityTypeId=".User::entityType()->getId().") DESC, name ASC")]);
+			})
 			->add('groupId', function (Criteria $criteria, $value, Query $query){
 				$query->join('core_user_group', 'ug', 'ug.userId = principal.id')->andWhere(['ug.groupId' => $value]);
 			})

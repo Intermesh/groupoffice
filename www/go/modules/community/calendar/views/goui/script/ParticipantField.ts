@@ -109,7 +109,12 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 					style:{minWidth:'100%'},
 					headers: false,
 					store: datasourcestore({
-						dataSource: jmapds('Principal')
+						dataSource: jmapds('Principal'),
+						filters: {
+							default: {
+								preferUser: true
+							}
+						}
 						//properties: ['id', 'displayName', 'email']
 					}),
 					columns: [
