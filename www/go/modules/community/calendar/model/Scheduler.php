@@ -251,25 +251,23 @@ class Scheduler {
 			'event' => $event,
 			'recurrenceId' => empty($vevent->{"RECURRENCE-ID"}) ? null : $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s')
 		];
-		if(isset($event)) {
+		if($method === 'REPLY' && isset($event)) {
 
 			if (!empty($itip['recurrenceId'])) {
 				$event = $event->patchedInstance($itip['recurrenceId']);
 			}
 
-			if ($method === 'REPLY') {
-
-				$p = $event->participantByScheduleId($from['email']);
-				if ($p) {
-					$lang = go()->t('replyImipBody', 'community', 'calendar');
-					$itip['status'] = $p->participationStatus;
-					$itip['feedback'] = strtr($lang[$p->participationStatus], [
-						'{name}' => $p->name ?? '',
-						'{title}' => $event->title,
-						'{date}' => implode(' ', $event->humanReadableDate()),
-					]);
-				}
+			$p = $event->participantByScheduleId($from['email']);
+			if ($p) {
+				$lang = go()->t('replyImipBody', 'community', 'calendar');
+				$itip['status'] = $p->participationStatus;
+				$itip['feedback'] = strtr($lang[$p->participationStatus], [
+					'{name}' => $p->name ?? '',
+					'{title}' => $event->title,
+					'{date}' => implode(' ', $event->humanReadableDate()),
+				]);
 			}
+
 		}
 		return $itip;
 	}
@@ -358,10 +356,7 @@ class Scheduler {
 	}
 
 	private static function processRequest(VCalendar $vcalendar, ?CalendarEvent $event, bool &$alreadyProcessed) {
-
-		// If the event already exists then We already processed the request. But it could be a REQUEST with an update
-		// for a series' instance with a recurrence-id
-		if($event->isNew() || (!empty($vevent->{'RECURRENCE-ID'}) && !isset($event->recurrenceOverrides[$vevent->{'RECURRENCE-ID'}]))) {
+		if(static::requestIsNew($vcalendar, $event)) {
 			$event = ICalendarHelper::parseVObject($vcalendar, $event);
 			if (!$event->save()) {
 				throw new SaveException($event);
@@ -370,6 +365,35 @@ class Scheduler {
 			$alreadyProcessed = true;
 		}
 		return $event;
+	}
+
+	/**
+	 * // If the event already exists then We already processed the request. But it could be a REQUEST with an update
+	 * // for a series' instance with a recurrence-id
+	 *
+	 * @param VCalendar $vcalendar
+	 * @param CalendarEvent|null $event
+	 * @return bool
+	 */
+	private static function requestIsNew(VCalendar $vcalendar, ?CalendarEvent $event) : bool {
+		if($event->isNew()) {
+			return true;
+		}
+
+		if(!$event->isRecurring()) {
+			return false;
+		}
+
+		foreach($vcalendar->VEVENT as $vevent) {
+			if(!empty($vevent->{'RECURRENCE-ID'})) {
+				$recurrenceId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
+				if(!isset($event->recurrenceOverrides[$recurrenceId])){
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	private static function processCancel(VCalendar $vcalendar, CalendarEvent $existingEvent, bool &$alreadyProcessed) : CalendarEvent {
