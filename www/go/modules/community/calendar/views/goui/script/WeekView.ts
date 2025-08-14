@@ -254,6 +254,7 @@ export class WeekView extends CalendarView {
 			left = 100 / this.days * (now.getWeekDay() - this.day.getWeekDay());
 		this.nowbar.attr('style', `top: calc(var(--hour-height) * ${top});`);
 		(this.nowbar.childNodes[1] as Element).attr('style', `left: ${left}%;`);
+		(this.nowbar.childNodes[2] as Element).innerHTML = Format.time(now);
 	}
 
 
