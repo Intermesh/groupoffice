@@ -48,6 +48,23 @@ export class CalendarList extends Component<CalendarListEventMap> {
 			comp({tagName: 'h3', html: t('Calendars')}),
 			//btn({icon: 'done_all', handler: () => { this.calendarList.rowSelection!.selectAll();}}),
 			btn({
+				icon: "home",
+				handler:() => {
+					const defaultId = client.user.calendarPreferences?.defaultCalendarId;
+					if(defaultId) {
+
+						const defaultCal = this.list!.store.findById(defaultId);
+
+						if(defaultCal) {
+							this.list!.rowSelection!.replace(defaultCal);
+							const i = this.list!.store.findIndexById(defaultId);
+							this.select(i);
+
+						}
+					}
+				}
+			}),
+			btn({
 				icon: 'more_vert', menu: menu({},
 					btn({
 						hidden: !rights.mayChangeCalendars,
