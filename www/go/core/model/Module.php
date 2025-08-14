@@ -438,7 +438,8 @@ class Module extends Entity {
 	
 	protected static function internalDelete(Query $query): bool
 	{
-		$query->andWhere('package != "core"');
+		//prevent core module from being removed
+		$query->andWhere('`name` != "core"');
 
 		return parent::internalDelete($query);
 	}
