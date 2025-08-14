@@ -1,5 +1,6 @@
 - Calendar: Fixed notifications that come from the cronjob and fixed that the cronjob and mail reading reprocesses invites every time.
 - Calendar: Update time in now indicator
+- Newsletters / Core: Speed up newsletter sending and saving of models with large "map" properties
 
 12-08-2025: 25.0.42
 - Calendar: bug with 12pm times becoming 12 hr later
