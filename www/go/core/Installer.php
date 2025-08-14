@@ -618,7 +618,7 @@ class Installer {
 		foreach ($modules as $module) {
 
 			if (!$module->isAvailable()) {
-				echo "Skipping module " . $module->name . " because it's not available.\n";
+				//echo "Skipping module " . $module->name . " because it's not available.\n";
 				continue;
 			}
 			
@@ -680,7 +680,7 @@ class Installer {
 		foreach ($modules as $module) {
 
 			if (!$module->isAvailable()) {
-				echo "Skipping module " . $module->name . " because it's not available.\n";
+				//echo "Skipping module " . $module->name . " because it's not available.\n";
 				continue;
 			}
 
