@@ -741,9 +741,9 @@ abstract class Property extends Model {
 	 * @return string|int|null eg. 1 or with multiple keys: "1-2"
 	 */
 	public function id() : string|int|null {
-//		if(property_exists($this, 'id')) {
-//			return isset($this->id) ? (string) $this->id : null;
-//		}
+		if(property_exists($this, 'id')) {
+			return isset($this->id) ? (string) $this->id : null;
+		}
 		$keys = $this->primaryKeyValues();
 		if(empty($keys)) {
 			// can we ever get here?
