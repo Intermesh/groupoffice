@@ -4,6 +4,7 @@
 - Core: Show unavailable modules so they can be removed
 - Core: Convert mail addresses too in html editor
 - Calendar: Added "Home" button
+- Core: Use TEXT values for custom fields with lengths greater than 255 characters
 
 12-08-2025: 25.0.42
 - Calendar: bug with 12pm times becoming 12 hr later
