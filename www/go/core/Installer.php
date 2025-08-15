@@ -437,7 +437,7 @@ class Installer {
 
 			$where = (new Query);
 			foreach($unavailable as $m) {
-				$where->orWhere($m);
+				$where->orWhere(['id' => $m['id']]);
 			}
 			$stmt = go()->getDbConnection()->update("core_module", ['enabled' => false], $where);
 			$stmt->execute();
