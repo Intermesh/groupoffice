@@ -14,7 +14,7 @@ class Text extends Base {
 	 * @return string
 	 * @throws Exception
 	 */
-	protected function getFieldSQL(): string
+	protected function getFieldSQL()
 	{
 		$maxLength = $this->field->getOption('maxLength') ?? 190;
 
