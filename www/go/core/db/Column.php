@@ -72,6 +72,8 @@ class Column {
 
 	/**
 	 * Length of the column
+	 *
+	 * @see Table::init()
 	 * 
 	 * @var int
 	 */
