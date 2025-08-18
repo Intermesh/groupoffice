@@ -19,6 +19,9 @@ import * as esbuild from 'esbuild';
 
 const watch = (process.argv.length > 2 && process.argv[2] == "watch");
 
+// Are we building from a legacy module in www/modules/NAME ??
+const legacy = process.env.INIT_CWD.indexOf('go/modules') === -1;
+
 const entryPoints = process.argv.length > 3 ? process.argv[3].split(",") : ['script/Index.ts'];
 
 //First I used this plugin to resolve paths: https://github.com/Awalgawe/esbuild-typescript-paths-plugin/tree/main/src
@@ -31,10 +34,11 @@ const moduleResolverPlugin = {
 		build.onResolve({ filter: new RegExp("@intermesh\/.*")}, args => {
 				const parts = args.path.split("/");
 
+
 				if(parts.length === 3) {
 
 					// import is a module. eg. @intermesh/community/calendar
-					const pkg = parts[1], module = parts[2];
+					const pkg = legacy ? "go/modules/" + parts[1] : parts[1], module = parts[2];
 
 					return {
 						external: true,
