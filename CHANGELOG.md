@@ -1,5 +1,7 @@
 - Core: Updated German translations. Danke Christopher K.
-- Newslatters: prevent unhelpful Javascript error when a newsletter neither has a smtp or email account ID
+- Newsletters: prevent unhelpful Javascript error when a newsletter neither has a smtp or email account ID
+- Calendar: fixed showing edit dialog when the user has writeall permission to the calendar but the calendar owner / current user is not the organizer.
+- Calendar: Show regional holidays
 
 17-08-2025: 25.0.43
 - Calendar: Fixed notifications that come from the cronjob and fixed that the cronjob and mail reading reprocesses invites every time.
