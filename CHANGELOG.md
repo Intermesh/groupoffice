@@ -1,3 +1,4 @@
+18-08-2025: 6.8.134
 - Core: Convert mail addresses too in html editor
 - Newsletters / Core: Speed up newsletter sending and saving of models with large "map" properties
 
