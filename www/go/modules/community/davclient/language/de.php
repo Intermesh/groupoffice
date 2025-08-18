@@ -14,4 +14,9 @@ return array (
   'Every quarter' => 'Jede Viertelstunde',
   'Every hour' => 'Jede Stunde',
   'Calendar' => 'Kalender',
+  'Collections' => 'Collections',
+  'Connect' => 'Connect',
+  'Server' => 'Server',
+  'Sync now' => 'Jetzt sync\'en',
+  'Remove from sync' => 'Vom Sync entfernen',
 );

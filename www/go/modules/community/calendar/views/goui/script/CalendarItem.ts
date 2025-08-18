@@ -414,7 +414,6 @@ export class CalendarItem {
 
 	get mayChange() {
 		return this.isNew() ||
-			this.cal.myRights.mayWriteAll ||
 			(this.cal.myRights.mayWriteOwn && this.isOwner);
 	}
 
@@ -825,7 +824,7 @@ export class CalendarItem {
 	}
 
 	remove() {
-		if(!this.mayChange)
+		if(!this.isOwner && !this.cal.myRights.mayWriteAll)
 			return;
 		if(!this.isRecurring) {
 			this.confirmScheduleMessage(false, () => {
