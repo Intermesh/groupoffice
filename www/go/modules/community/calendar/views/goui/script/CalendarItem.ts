@@ -73,6 +73,14 @@ export class CalendarItem {
 
 	static clipboard?: CalendarItem;
 
+	/**
+	 * Provider index type
+	 * eg. "event", "birthday", "task" etc.
+	 *
+	 * @see CalendarAdapter.providers
+	 */
+	provider!: string
+
 	key!: string|null // id/recurrenceId
 	recurrenceId?:string
 	data!: CalendarEvent

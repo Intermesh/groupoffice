@@ -1,19 +1,25 @@
-import {datasourcestore, DateTime, DefaultEntity,t} from "@intermesh/goui";
+import {datasourcestore, DateTime, DefaultEntity, Observable, t, Window} from "@intermesh/goui";
 import {client, jmapds} from "@intermesh/groupoffice-core";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 
-interface CalendarProvider {
+export interface CalendarProvider {
 	[key:string]:any
 	enabled: boolean
 	load(start:DateTime,end:DateTime): Promise<void | DefaultEntity[]>
 	items(start:DateTime,end:DateTime): Generator<CalendarItem, void>
 }
-export class CalendarAdapter {
+
+export interface CalendarAdapterEventMap {
+	load: {start:DateTime, end: DateTime}
+}
+
+export class CalendarAdapter extends Observable<CalendarAdapterEventMap> {
 
 	private start!: DateTime
 	private end!: DateTime
 
 	constructor() {
+		super();
 		for(const type in this.providers) {
 			const p = this.providers[type];
 			if(p.watch) {
@@ -41,7 +47,12 @@ export class CalendarAdapter {
 				promises.push(p.load(start, end));
 			}
 		}
-		Promise.all(promises).then(this.onLoad);
+		Promise.all(promises).then(() => {
+			this.onLoad()
+
+			this.fire("load", {start, end});
+
+		}).catch(e => Window.error(e))
 	}
 
 	private *generator() {
@@ -49,6 +60,7 @@ export class CalendarAdapter {
 			const p = this.providers[type];
 			if(!p.enabled) continue;
 			for (const item of p.items(this.start, this.end)) {
+				item.provider = type;
 				yield item;
 			}
 		}
@@ -60,6 +72,10 @@ export class CalendarAdapter {
 
 	byType(type: string) {
 		return this.providers[type];
+	}
+
+	public registerProvider(type:string, provider:CalendarProvider) {
+		this.providers[type] = provider;
 	}
 
 	private providers: {[type:string] : CalendarProvider} = {

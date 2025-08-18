@@ -73,7 +73,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 	);
 
 	protected selected: CalendarItem[] = []
-	protected viewModel: CalendarItem[] = []
+	public viewModel: CalendarItem[] = []
 
 	protected adapter: CalendarAdapter
 

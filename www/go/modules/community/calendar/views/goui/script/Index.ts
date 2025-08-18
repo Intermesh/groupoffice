@@ -12,6 +12,9 @@ export * from "./Main.js";
 export * from "./CalendarList.js";
 export * from "./CalendarView.js";
 export * from "./CalendarItem.js";
+export * from "./MonthView.js";
+export * from "./WeekView.js";
+export * from "./CalendarAdapter.js"
 
 export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list';
 export const calendarStore = datasourcestore({
