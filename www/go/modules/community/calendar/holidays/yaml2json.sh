@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# git clone https://github.com/commenthol/date-holidays
 # Specify the directory containing the YAML files
 directory="/Users/michaeldehart/Projects/date-holidays/data/countries"
 

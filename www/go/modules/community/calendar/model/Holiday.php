@@ -76,9 +76,11 @@ class Holiday {
 		if(!$data || !$data->holidays || !$data->holidays->$set || !is_object($data->holidays->$set->days))
 			throw new \Exception('error processing file '.$file);
 
-		foreach(self::generateYear($set,$data,$from, $till, $from->format('Y')) as $item) yield $item;
+		foreach(self::generateYear($set,$data,$from, $till, $from->format('Y')) as $item)
+			yield $item;
 		if($from->format('Y') !== $till->format('Y')) {
-			foreach(self::generateYear($set,$data,$from, $till, $till->format('Y')) as $item) yield $item;
+			foreach(self::generateYear($set,$data,$from, $till, $till->format('Y')) as $item)
+				yield $item;
 		}
 
 	}
@@ -91,7 +93,21 @@ class Holiday {
 				yield $holiday;
 			}
 		}
-
+		if(isset($data->holidays->{$set}->states)) {
+			foreach((array)$data->holidays->{$set}->states as $obj) {
+				foreach($obj->days as $rule => $entry) {
+					if($entry === false) {
+						continue; // we do not remove substitutes for regions.
+					}
+					$holiday = new self($rule, $entry, $year);
+					$holiday->title .= ' ('.$obj->name.')';
+					if($holiday->start !== null && $holiday->start >= $from && $holiday->start <= $till) {
+						$holiday->start = $holiday->start->format('Y-m-d');
+						yield $holiday;
+					}
+				}
+			}
+		}
 	}
 
 	/**
