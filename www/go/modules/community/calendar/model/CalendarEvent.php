@@ -521,7 +521,7 @@ class CalendarEvent extends AclItemEntity {
 	 * @throws Exception
 	 */
 	public function patchedInstance(string $recurrenceId) : CalendarEvent {
-		$patchArray = $this->recurrenceOverrides[$recurrenceId]->toArray();
+		$patchArray = isset($this->recurrenceOverrides[$recurrenceId]) ? $this->recurrenceOverrides[$recurrenceId]->toArray() : [];
 
 		//if start is not patched then we must set the recurrence ID to set the right time
 		if(!isset($patchArray['start'])) {
