@@ -170,14 +170,14 @@ export class WeekView extends CalendarView {
 				if(!ev) {
 					// find full day
 					ev = this.viewModel.find(m => m.key == event.dataset.key)!;
-					if(ev && ev.isOwner) {
+					if(ev && ev.mayChange) {
 						this.el.on('mousemove', mouseAllDayMove);
 						this.el.cls('+resizing');
 						window.addEventListener('mouseup', mouseUp,{once:true});
 						return;
 					}
 				}
-				if(!ev || !ev.isOwner) return;
+				if(!ev || !ev.mayChange) return;
 				action = resize;
 				this.el.cls('+resizing');
 				// 4 pixels for the resize handle on top and bottom of event
