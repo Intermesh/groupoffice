@@ -30,6 +30,7 @@ use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\{ArrayObject, DateTime, Recurrence, StringUtil, Time, UUID};
 use go\core\validate\ErrorCode;
+use go\modules\business\kanban\model\Board;
 use go\modules\business\projects3\model\Project3;
 use go\modules\community\comments\model\Comment;
 use go\modules\community\tasks\convert\Spreadsheet;
@@ -434,10 +435,7 @@ class Task extends AclItemEntity {
 		$this->incrementTasklistModSeq();
 		$this->createSystemAlerts();
 
-		// update kanban boards tracking this task's tasklist
-		if (Module::isInstalled('business', 'kanban')) {
-			\go\modules\business\kanban\model\Board::updateBoards(EntityType::findByClassName(TaskList::class)->getId(), $this->tasklistId);
-		}
+
 
 		// if alert can be based on start / due of task check those properties as well
 		$modified = $this->getModified('alerts');
