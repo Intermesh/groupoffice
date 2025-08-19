@@ -60,7 +60,7 @@ class Calendar extends AclOwnerEntity {
 	/** @var ?string default for event. If NULL client will use the Users default timeZone  */
 	public ?string $timeZone = null;
 
-	public bool $syncToDevice = true;
+	public ?bool $syncToDevice = true;
 
 	protected ?string $defaultColor = null;
 
