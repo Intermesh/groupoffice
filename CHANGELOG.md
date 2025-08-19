@@ -1,3 +1,4 @@
+19-08-2025: 25.0.44
 - Core: Updated German translations. Danke Christopher K.
 - Newsletters: prevent unhelpful Javascript error when a newsletter neither has a smtp or email account ID
 - Calendar: fixed showing edit dialog when the user has writeall permission to the calendar but the calendar owner / current user is not the organizer.
