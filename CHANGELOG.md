@@ -3,6 +3,9 @@
 - Newsletters: prevent unhelpful Javascript error when a newsletter neither has a smtp or email account ID
 - Calendar: fixed showing edit dialog when the user has writeall permission to the calendar but the calendar owner / current user is not the organizer.
 - Calendar: Show regional holidays
+- Calendar: Visible category filter depend on visible calendars instead of subscribed calendar.
+- Calendar: New checkbox "Sync to device" on calendar edit dialog. To prevent syncing all subscribed calendars.
+- Calendar: Affecting availability is now a checkbox. Events in shared calendars will only affect availability if the user is a participant. 
 
 17-08-2025: 25.0.43
 - Calendar: Fixed notifications that come from the cronjob and fixed that the cronjob and mail reading reprocesses invites every time.
