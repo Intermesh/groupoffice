@@ -8,11 +8,11 @@ import {
 	FunctionUtil,
 	hr, List,
 	list,
-	menu, ObservableListenerOpts, RowRenderer,
+	menu,
 	select,
 	tbar, win, Window
 } from "@intermesh/goui";
-import {calendarStore, categoryStore, Main, t} from "./Index.js";
+import {calendarStore, Main, t} from "./Index.js";
 import {CalendarView} from "./CalendarView.js";
 import {ResourceWindow} from "./ResourcesWindow.js";
 import {CalendarWindow} from "./CalendarWindow.js";
@@ -223,7 +223,6 @@ export class CalendarList extends Component<CalendarListEventMap> {
 		for(const id in this.visibleChanges) {
 			jmapds('Calendar').update(id, {isVisible:this.visibleChanges[id]});
 		}
-		//categoryStore.setFilter('calendars', {calendarId: this.visibleChanges}).load();
 		this.visibleChanges = {};
 	})
 
