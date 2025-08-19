@@ -59,7 +59,8 @@ interface CalendarItemConfig {
 	start?: DateTime
 	end?: DateTime
 	open?:() => void
-	defaultColor?: string
+	defaultColor?: string,
+	cal?: any
 }
 
 /**
@@ -122,7 +123,9 @@ export class CalendarItem {
 		//if(!obj.end) {
 			this.end = this.start.clone().add(new DateInterval(this.patched.duration!));
 		//}
-		this.cal = calendarStore.find((c:any) => c.id == this.patched.calendarId);
+		if(!this.cal) {
+			this.cal = calendarStore.find((c: any) => c.id == this.patched.calendarId);
+		}
 		if(this.patched.categoryIds)
 		for(const id of this.patched.categoryIds) {
 			const cat = categoryStore.find((c:any) => c.id == id);
@@ -470,7 +473,9 @@ export class CalendarItem {
 	private humanReadableDate() {
 		const start = this.start;
 		const end = this.end.clone();
-		const oneDay = start.format('Ymd') === end.format('Ymd');
+		const oneDay = this.data.duration = "P1D";
+
+		console.log(oneDay, start, end);
 
 		let line1 = start.format('l j F Y');
 

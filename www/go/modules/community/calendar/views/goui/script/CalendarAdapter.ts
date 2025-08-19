@@ -133,6 +133,9 @@ export class CalendarAdapter extends Observable<CalendarAdapterEventMap> {
 							title: o.title,
 							duration: o.duration,
 							showWithoutTime: true,
+						},
+						cal: {
+							name: t("Holidays")
 						}
 					});
 				}
@@ -157,7 +160,6 @@ export class CalendarAdapter extends Observable<CalendarAdapterEventMap> {
 						date = task.due || task.start || (new DateTime()).format('Y-m-d');
 					}
 
-
 //if(task.title =='test taak met bogus timezone') debugger;
 					const start = DateTime.createFromFormat(date.substring(0,10), 'Y-m-d');
 
@@ -179,7 +181,10 @@ export class CalendarAdapter extends Observable<CalendarAdapterEventMap> {
 							},
 							extraIcons: [task.progress == 'completed' ? 'task_alt' : 'radio_button_unchecked'],
 							defaultColor: '7e472a',
-							data: task
+							data: task,
+							cal: {
+								name: t("Tasks")
+							}
 						});
 					}
 				}
@@ -232,6 +237,9 @@ export class CalendarAdapter extends Observable<CalendarAdapterEventMap> {
 							title: t('{name}\'s birthday').replace('{name}',b.name),
 							duration: 'P1D',
 							showWithoutTime:true,
+						},
+						cal: {
+							name: t("Birthdays")
 						}
 					});
 				}
