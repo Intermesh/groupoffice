@@ -90,6 +90,7 @@ export class CalendarItem {
 	start!: DateTime
 	end!: DateTime
 	patched: CalendarEvent
+	readonly readOnly?: boolean
 	readonly extraIcons;
 	//color!: string
 
@@ -140,6 +141,11 @@ export class CalendarItem {
 			this.title = this.patched.title!;
 		}
 		this.extraIcons = obj.extraIcons || [];
+		if(obj.key && obj.key[0] === 'L') {
+			this.extraIcons.push('logout');
+			this.readOnly = true; //no dragging
+			this.open = async (_c)=>{};
+		}
 		this.divs = {};
 	}
 
@@ -424,8 +430,8 @@ export class CalendarItem {
 	}
 
 	get mayChange() {
-		return this.isNew() ||
-			(this.cal.myRights.mayWriteOwn && this.isOwner);
+		return (this.isNew() ||
+			(this.cal.myRights.mayWriteOwn && this.isOwner)) && !this.readOnly;
 	}
 
 	get calendarPrincipal() {

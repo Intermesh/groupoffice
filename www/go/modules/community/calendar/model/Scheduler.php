@@ -163,7 +163,7 @@ class Scheduler {
 		return $success;
 	}
 
-	private static function mailBody($event, $method, $participant, $title) {
+	private static function mailBody($event, $method, Participant $participant, $title) {
 		if(!$event) {
 			return false;
 		}

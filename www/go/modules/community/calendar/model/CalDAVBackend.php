@@ -44,7 +44,7 @@ class CalDAVBackend extends AbstractBackend implements
 		$u = User::find(['id'])->where(['username'=>$username])->single();
 
 		$calendars = Calendar::findFor($u->id)
-			->where(['isSubscribed'=>1, 'groupId'=>null]);
+			->where(['isSubscribed'=>1,'syncToDevice'=>1, 'groupId'=>null]);
 
 
 		foreach($calendars as $calendar) {

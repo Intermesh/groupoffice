@@ -34,7 +34,7 @@ class Calendar extends AclOwnerEntity {
 	const Attending = 'attending';
 	const None = 'none';
 
-	const UserProperties = ['color', 'sortOrder', 'isVisible', 'isSubscribed', 'includeInAvailability'];
+	const UserProperties = ['color', 'sortOrder', 'isVisible', 'isSubscribed', 'syncToDevice', 'includeInAvailability'];
 
 	public ?string $id;
 	/** @var string The user-visible name of the calendar */
@@ -59,6 +59,8 @@ class Calendar extends AclOwnerEntity {
 
 	/** @var ?string default for event. If NULL client will use the Users default timeZone  */
 	public ?string $timeZone = null;
+
+	public bool $syncToDevice = true;
 
 	protected ?string $defaultColor = null;
 
