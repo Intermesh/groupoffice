@@ -59,7 +59,7 @@ const moduleResolverPlugin = {
 const opts = {
 	entryPoints: entryPoints,
 	bundle: true,
-	sourcemap: watch,
+	sourcemap: true,
 	format: "esm",
 	target: "esnext",
 	minify: !watch,
