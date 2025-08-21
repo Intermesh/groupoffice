@@ -314,6 +314,8 @@ $updates["202507221653"][] = "alter table `calendar_preferences` add column week
 
 $updates["202508111058"][] = "update calendar_event set uri = REPLACE(REPLACE(REPLACE(uri, '/', '_'), '+', '-'), '=', '.');";
 
+$updates["202508191124"][] = "alter table calendar_calendar_user add column syncToDevice tinyint default 1 not null after `timeZone`";
+
 // TODO: calendar views -> custom filters
 
 
