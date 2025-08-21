@@ -9,8 +9,9 @@ go.users.CreateUserWizard = Ext.extend(go.Wizard, {
 		this.user = {};
 
 		var groups = go.util.clone(go.Modules.get('core', 'core').settings.defaultGroups);
-		if(groups.indexOf(2) === -1) {
-			groups.push(2); //add everyone
+
+		if(groups.indexOf("2") === -1) {
+			groups.push("2"); //add everyone
 		}
 		
 		this.groupsGrid = new go.users.UserGroupGrid({
