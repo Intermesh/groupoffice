@@ -32,7 +32,7 @@ class Module extends Entity {
 	/**
 	 * @var Permission[]
 	 */
-	public array $permissions = [];
+	public array|null $permissions = [];
 
 	public static function sort(Query $query, ArrayObject $sort): Query
 	{
