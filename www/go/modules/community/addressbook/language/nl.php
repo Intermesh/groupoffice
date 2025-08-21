@@ -6,7 +6,7 @@ return array (
   'mayExportContacts' => 'Contacten exporteren',
   'salutationTemplate' => 'Geachte [if {{contact.prefixes}}]{{contact.prefixes}}[else][if !{{contact.gender}}]heer/mevrouw[else][if {{contact.gender}}=="M"]heer[else]mevrouw[/if][/if][/if][if {{contact.middleName}}] {{contact.middleName}}[/if] {{contact.lastName}}',
   'Contact' => 'Contactpersoon',
-  'Job title' => 'Titel',
+  'Job title' => 'Functie',
   'Gender' => 'Geslacht',
   'Organizations' => 'Organisaties',
   'Communication' => 'Communiceren',
