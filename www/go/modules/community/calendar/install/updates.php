@@ -317,6 +317,13 @@ $updates["202508111058"][] = "update calendar_event set uri = REPLACE(REPLACE(RE
 $updates["202508191124"][] = "alter table calendar_calendar_user add column syncToDevice tinyint default 1 not null after `timeZone`";
 
 $updates["202508211118"][] = "update ignore calendar_participant p inner join core_user u on u.email = p.email set p.id = u.id;";
+$updates["202508211118"][] = "update calendar_preferences set defaultCalendarId=null where defaultCalendarId not in (select id from calendar_calendar);";
+
+$updates["202508211118"][] = "alter table calendar_preferences
+    add constraint calendar_preferences_calendar_calendar_id_fk
+        foreign key (defaultCalendarId) references calendar_calendar (id)
+            on delete set null;";
+
 
 
 // TODO: calendar views -> custom filters

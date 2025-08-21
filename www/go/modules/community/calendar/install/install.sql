@@ -389,6 +389,11 @@ CREATE TABLE calendar_preferences (
 		REFERENCES core_user (id) ON DELETE CASCADE
 ) COLLATE = utf8mb4_unicode_ci;
 
+alter table calendar_preferences
+    add constraint calendar_preferences_calendar_calendar_id_fk
+        foreign key (defaultCalendarId) references calendar_calendar (id)
+            on delete set null;
+
 
 CREATE TABLE IF NOT EXISTS `calendar_event_custom_fields` (
 	`id` INT UNSIGNED NOT NULL,
