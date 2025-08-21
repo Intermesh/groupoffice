@@ -101,6 +101,7 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 		foreach($events as $event) {
 			if($event->isRecurring()) {
 				foreach(RecurrenceRule::expand($event, $start->format('Y-m-d'), $this->end->format('Y-m-d')) as $rId => $instance) {
+					$instance->start =$instance->utcStart;
 					$this->add($rId.'-'.$event->id, $instance);
 				}
 			} else {

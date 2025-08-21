@@ -139,7 +139,21 @@ class Module extends core\Module
 			case 'days': $this->printWeek($date, $calendarIds, 5);break;
 			case 'week' : $this->printWeek($date, $calendarIds, 7);break;
 			case 'month' : $this->printMonth(new \DateTime($date), $calendarIds);break;
+			case 'list' : $this->printList(new \DateTime($date), $calendarIds);break;
 		}
+	}
+
+	private function printList($date, $calendarIds) {
+		$start = (clone $date)->modify('first day of this month');
+		$end = (clone $start)->modify('+3 months');
+
+		$report = new reports\ListView();
+		$report->day = $start;
+		$report->end = $end;
+		$report->calendarIds = $calendarIds;
+		$report->render();
+
+		$report->Output('list.pdf');
 	}
 
 	private function printDay($start, $calendarIds){

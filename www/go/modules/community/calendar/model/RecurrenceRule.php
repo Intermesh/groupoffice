@@ -120,9 +120,9 @@ class RecurrenceRule {
 				}
 				$nthDay = '';
 				if (isset($day->nthOfPeriod)) {
-					$nthDay = $t('the') . ' ' . ($suffix[$day->nthOfPeriod] || $t('last')) . ' ';
+					$nthDay = $t('the') . ' ' . (isset($suffix[$day->nthOfPeriod]) ? $suffix[$day->nthOfPeriod] : $t('last')) . ' ';
 				}
-				$days[] = $nthDay . $t('full_days')[$dayNumbers[$day->day]];
+				$days[] = $nthDay . $t('full_days')[$dayNumbers[strtolower($day->day)]];
 			}
 			if ($workdays) {
 				$days = [$t('Workdays')];

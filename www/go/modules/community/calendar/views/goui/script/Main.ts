@@ -251,11 +251,12 @@ export class Main extends Component {
 							icon: 'print', text:t('Print'), menu: menu({},
 								this.printCurrentBtn = btn({icon: 'print', text: t('Current view'), handler:() => {
 									let view = this.timeSpan;
-									if(['day', 'week', 'month'].includes(view)) {
+									if(['day', 'week', 'month', 'list'].includes(view)) {
 										this.openPDF(view);
 									}
 								}}),
 								//'-',
+								btn({icon: 'view_list', text: t('List'), handler:() => { this.openPDF('list'); }}),
 								btn({icon: 'view_day', text: t('Day'), handler:() => { this.openPDF('day'); }}),
 								btn({icon: 'view_week', text: t('Workweek'), handler:() => { this.openPDF('days'); }}),
 								btn({icon: 'view_week', text: t('Week'), handler:() => { this.openPDF('week'); }}),
