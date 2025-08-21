@@ -430,6 +430,7 @@ export class CalendarItem {
 	}
 
 	get mayChange() {
+		debugger
 		return (this.isNew() ||
 			(this.cal.myRights.mayWriteOwn && this.isOwner)) && !this.readOnly;
 	}
@@ -439,7 +440,7 @@ export class CalendarItem {
 			return this.participants[this.principalId];
 	}
 	get principalId() {
-		return (this.cal && this.cal.ownerId) ? this.cal.ownerId+'' : go.User.id+''
+		return (this.cal && this.cal.ownerId) ? this.cal.ownerId+'' : client.user.id+''
 	}
 
 	get quickText(): string {
