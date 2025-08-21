@@ -1,18 +1,21 @@
-import {br, btn, comp, Component, h1, h3, hr, menu, t} from "@intermesh/goui";
+import {br, btn, Button, comp, Component, h3, hr, menu, t} from "@intermesh/goui";
 import {
+	AclLevel,
 	addbutton,
 	DetailPanel,
 	filesbutton,
 	Image,
-	jmapds,
 	linkbrowserbutton,
 	modules
 } from "@intermesh/groupoffice-core";
 import {NoteDialog} from "./NoteDialog";
 import {CommentsPanel} from "@intermesh/community/comments";
+import {Note, noteDS} from "./Index";
 
-export class NoteDetail extends DetailPanel {
+export class NoteDetail extends DetailPanel<Note> {
 	private content: Component;
+	private editBtn: Button;
+	private deleteBtn: Button;
 
 	constructor() {
 		super("Note");
@@ -25,16 +28,15 @@ export class NoteDetail extends DetailPanel {
 		this.scroller.items.add(new CommentsPanel(this.entityName));
 		this.addCustomFields();
 
-
 		this.addFiles();
 		this.addLinks();
 		this.addHistory();
 
 		this.toolbar.items.add(
-			btn({
+			this.editBtn = btn({
 				icon: "edit",
 				title: t("Edit"),
-				handler: (button, ev) => {
+				handler: () => {
 					const dlg = new NoteDialog();
 					void dlg.load(this.entity!.id);
 					dlg.show();
@@ -53,11 +55,11 @@ export class NoteDetail extends DetailPanel {
 						}
 					}),
 					hr(),
-					btn({
+					this.deleteBtn = btn({
 						icon: "delete",
 						text: "Delete",
 						handler: () => {
-							jmapds("Note").confirmDestroy([this.entity!.id]);
+							void noteDS.confirmDestroy([this.entity!.id]);
 						}
 					})
 				)
@@ -68,8 +70,11 @@ export class NoteDetail extends DetailPanel {
 			this.toolbar.items.insert(-1, filesbutton());
 		}
 
-		this.on("load", (detailPanel, entity) => {
+		this.on("load", ( {entity}) => {
 			this.title = entity.name;
+
+			this.deleteBtn.disabled = entity.permissionLevel < AclLevel.DELETE;
+			this.editBtn.disabled = entity.permissionLevel < AclLevel.WRITE;
 
 			this.content.items.clear();
 			this.content.items.add(h3({

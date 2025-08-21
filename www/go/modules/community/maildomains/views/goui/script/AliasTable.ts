@@ -1,11 +1,14 @@
 import {
+	btn,
 	column, DataSourceStore, datasourcestore,
-	datecolumn, DefaultEntity,
+	datecolumn, DefaultEntity, hr, menu,
 	Notifier, store,
 	t,
 	Table
 } from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
+import {MailboxDialog} from "./MailboxDialog";
+import {AliasDialog} from "./AliasDialog";
 
 export class AliasTable extends Table<DataSourceStore> {
 
@@ -69,6 +72,38 @@ export class AliasTable extends Table<DataSourceStore> {
 					return v ? t("Yes"): t("No");
 				}
 
+			}),
+			column({
+				width: 48,
+				id: "btn",
+				sticky: true,
+				renderer: (columnValue: any, record, td, table, rowIndex) => {
+					return btn({
+						icon: "more_vert",
+						menu: menu({},
+							btn({
+								icon: "edit",
+								text: t("Edit"),
+								handler: async (btn) => {
+									const book = table.store.get(rowIndex)!;
+									const d = new AliasDialog();
+									await d.load(book.id);
+									d.show();
+								}
+							}),
+							hr(),
+							btn({
+								icon: "delete",
+								text: t("Delete"),
+								handler: async (btn) => {
+									const book = table.store.get(rowIndex)!;
+									jmapds("MailAlias").confirmDestroy([book.id]);
+								}
+							})
+
+						)
+					})
+				}
 			}),
 		];
 

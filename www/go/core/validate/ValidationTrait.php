@@ -7,7 +7,7 @@ use Exception;
 
 trait ValidationTrait {
 
-	private $validationErrors = [];
+	private array $validationErrors = [];
 
 	/**
 	 * You can override this function to implement validation in your model.

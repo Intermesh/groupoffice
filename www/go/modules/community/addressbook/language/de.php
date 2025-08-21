@@ -28,8 +28,8 @@ return array (
   array (
     'work' => 'Arbeit',
     'home' => 'Privat',
-    'mobile' => 'Mobil',
-    'workmobile' => 'Arbeit Mobil',
+    'cell' => 'Mobil',
+    'workcell' => 'Arbeit Mobil',
     'fax' => 'Fax',
     'workfax' => 'Arbeit Fax',
   ),
@@ -142,7 +142,7 @@ return array (
   'The selected contacts will be merged into one contact. Are you sure?' => 'Die ausgewählten Kontakte werden zu einem Kontakt zusammengefasst. Sind Sie sicher?',
   'Multiple Contacts' => 'Mehrfachkontakte',
   'Could not find this user in the address book for you.' => 'Dieser Nutzer konnte im Adressbuch nicht gefunden werden',
-  'Automatic linking' => 'Automatische Verknüpfung',
+  'Automatic e-mail linking' => 'Automatische e-mail Verknüpfung',
   'Don\'t link automatically to contacts' => 'Nicht automatisch mit Kontakten verknüpfen',
   'Link to all contacts' => 'Verknüpfen zu allen Kontakten',
   'Exclude contacts from the address books below' => 'Kontakte von folgenden Adressbüchern ausschließen',
@@ -160,4 +160,6 @@ return array (
   'ICD' => 'ICD',
   'UUID' => 'UUID',
   'URL\'s' => 'URL\'s',
+  'No address' => 'Keine Adresse',
+  'Please add an address with a country' => 'Bitte fügen Sie eine Adresse mit einem Land hinzu',
 );

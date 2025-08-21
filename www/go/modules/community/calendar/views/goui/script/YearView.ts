@@ -1,23 +1,15 @@
 import {CalendarView} from "./CalendarView.js";
-import {ComponentEventMap, DateTime, E, ObservableListenerOpts} from "@intermesh/goui";
+import {ComponentEventMap, DateTime, E, Format, ObservableListenerOpts} from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {client} from "@intermesh/groupoffice-core";
 
-export interface YearViewEventMap<Type> extends ComponentEventMap<Type> {
-
-	weekclick: (me: Type, week: any) => void
-	monthclick: (me: Type, month: any) => void
-	dayclick: (me: Type, day: any) => void
-
+export interface YearViewEventMap extends ComponentEventMap {
+	weekclick: { week: any}
+	monthclick: {month: any}
+	dayclick: {day: any}
 }
 
-
-export interface YearView extends CalendarView {
-	on<K extends keyof YearViewEventMap<this>, L extends Function>(eventName: K, listener: Partial<YearViewEventMap<this>>[K], options?: ObservableListenerOpts): L;
-	fire<K extends keyof YearViewEventMap<this>>(eventName: K, ...args: Parameters<YearViewEventMap<any>[K]>): boolean
-}
-
-export class YearView extends CalendarView {
+export class YearView extends CalendarView<YearViewEventMap> {
 
 	baseCls = 'yearview'
 
@@ -26,12 +18,6 @@ export class YearView extends CalendarView {
 		const endYear = this.day.clone().addYears(1);
 
 		this.adapter.goto(this.day, endYear)
-		// Object.assign(this.store.queryParams.filter ||= {}, {
-		// 	after: this.day.format('Y-m-d'),
-		// 	before: endYear.format('Y-m-d')
-		// });
-		// this.store.load()
-		//this.populateViewModel();
 	}
 
 	update = (data?: any) => {
@@ -70,7 +56,7 @@ export class YearView extends CalendarView {
 				.cls('current', day.format('mY') == now.format('mY'))
 				.attr('data-month', m)
 				.on('click', ev =>  {
-					this.fire('monthclick', this, monthDay)
+					this.fire('monthclick', {month: monthDay})
 				});
 
 		const header = E('tr', client.user.calendarPreferences.showWeekNumbers ?E('td') : '');
@@ -89,7 +75,7 @@ export class YearView extends CalendarView {
 				//if(+day.format('m') === m) {
 				if(client.user.calendarPreferences.showWeekNumbers) {
 					row.append(E('td', weekDay.getWeekOfYear()).cls('weeknb').on('click', ev => {
-						this.fire('weekclick', this, weekDay);
+						this.fire('weekclick', {week: weekDay});
 					}))
 				}
 
@@ -111,7 +97,7 @@ export class YearView extends CalendarView {
 
 			const cDay = day.clone();
 			const td = E('td').on('click',ev => {
-				this.fire('dayclick', this, cDay);
+				this.fire('dayclick', {day:cDay});
 			});
 			if(+day.format('m') === m) {
 				td.cls('today', day.format('Ymd') === now.format('Ymd'))
@@ -141,7 +127,7 @@ export class YearView extends CalendarView {
 			return; // ff
 		}
 		container.append(E('p')
-			.attr('title', e.title+' - '+e.start.format('H:i'))
+			.attr('title', e.title+' - '+Format.time(e.start))
 			.css({backgroundColor: '#'+e.color})
 		);
 

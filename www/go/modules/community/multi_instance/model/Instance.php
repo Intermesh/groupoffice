@@ -25,8 +25,8 @@ use GO\Base\Module as BaseModule;
 
 class Instance extends Entity {
 	
-	public $id;	
-	public $hostname;	
+	public ?string $id;
+	public string $hostname;
 	public $createdAt;
 	
 	/**

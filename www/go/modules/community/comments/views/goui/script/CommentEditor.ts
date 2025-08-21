@@ -3,13 +3,13 @@ import {
 	ArrayField,
 	btn, Button,
 	Component, ContainerField, containerfield, datasourcestore, DataSourceStore, displayfield,
-	fieldset, Format,
+	fieldset, Format, hr,
 	htmlfield, menu,
 	Notifier,
 	root,
 	t
 } from "@intermesh/goui";
-import {client, jmapds} from "@intermesh/groupoffice-core";
+import {client, jmapds, HtmlFieldMentionPlugin} from "@intermesh/groupoffice-core";
 
 export class CommentEditor extends Component {
 	public labels: ArrayField;
@@ -38,7 +38,23 @@ export class CommentEditor extends Component {
 					name: "text",
 					required: true,
 					listeners: {
-						insertimage: (htmlfield, file, img) => {
+
+						beforerender:ev => {
+							new HtmlFieldMentionPlugin(ev.target, async (text) => {
+								const r = await jmapds("Principal").query({
+									filter: {
+										entity: "User",
+										text: text
+									}
+								});
+								const get = await jmapds("Principal").get(r.ids);
+								return get.list.map(p => {return {value:p.description, display:p.name}});
+							}, 5);
+
+							ev.target.getToolbar().items.insert(6, hr());
+						},
+
+						insertimage: ( {file, img}) => {
 							root.mask();
 
 							client.upload(file).then(r => {
@@ -113,13 +129,13 @@ export class CommentEditor extends Component {
 		this.store = datasourcestore({
 			dataSource: jmapds("CommentLabel"),
 			listeners: {
-				load: (store, labels) => {
-					if (labels) {
+				load: ( {records}) => {
+					if (records) {
 						this.addBtn.disabled = false;
 
 						let labelButtons: string | Component | Button[] = [];
 
-						labels.forEach((label) => {
+						records.forEach((label) => {
 							labelButtons.push(
 								btn({
 									icon: "label",

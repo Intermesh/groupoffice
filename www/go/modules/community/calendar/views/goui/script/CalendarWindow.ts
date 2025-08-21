@@ -1,6 +1,6 @@
 import {
 	colorfield, combobox,
-	comp,
+	comp, radio,
 	textarea,
 	textfield,
 } from "@intermesh/goui";
@@ -15,7 +15,7 @@ export class CalendarWindow extends FormWindow {
 		super('Calendar');
 		this.title = 'calendar';
 		this.width = 460;
-		this.height = 650;
+		this.height = 710;
 
 		this.on('beforerender', () => {
 			this.title = t(this.form.currentId ? 'Edit calendar' : 'Create calendar');
@@ -37,6 +37,11 @@ export class CalendarWindow extends FormWindow {
 					dataSource: jmapds("Principal"), placeholder: t('Shared'),displayProperty: 'name', filter: {entity: 'User'},
 					label: t("Owner"), name: "ownerId", filterName: "text", flex:'1 0', clearable:true
 				}),
+				radio({type:'button',label: t('Availability'), value: 'all', name: 'includeInAvailability', options: [
+					{value:'all',text: t('All')},
+					{value:'attending',text: t('Attending')},
+					{value:'none',text: t('None')}
+				]}),
 				comp({tagName:'h3',flex:'1 0 100%',text:t('Default notifications') }),
 				alertField,
 				fdAlertField
@@ -46,10 +51,6 @@ export class CalendarWindow extends FormWindow {
 
 		alertField.drawOptions();
 		fdAlertField.drawOptions();
-
-		// this.form.on('load', (me, data) => {
-		// 	unsubscribeBtn.hidden = !data.id;
-		// })
 		//
 		// this.cards.items.add(comp({title: t('Categories')},
 		// 	table({
@@ -68,11 +69,8 @@ export class CalendarWindow extends FormWindow {
 			{value: 25,name: t("RSVP")},
 			{value: 30,name: t("Write own")},
 			{value: 35,name: t("Write all")},
+			{value: 40,name: t("Delete")},
 			{value: 50,name: t("Manage")}
 		]);
-		// tbar({},
-		// 	'->',
-		// 	btn({text:t('Save'), handler: _ => this.form.submit()})
-		// ));
 	}
 }

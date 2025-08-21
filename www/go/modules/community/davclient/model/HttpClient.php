@@ -70,13 +70,13 @@ class HttpClient extends \go\core\http\Client
 		// skip namespace complexity
 		$body = $this->body();
 		if ($this->statusCode() === 401) {
-			throw new \RuntimeException('Dav Authentication failed');
+			throw new \RuntimeException('DAV server: Authentication failed');
 		}
 		if ($this->statusCode() === 403) {
-			throw new \RuntimeException('Dav Forbidden');
+			throw new \RuntimeException('DAV server: Forbidden');
 		}
 		if (!$body) {
-			throw new \OutOfBoundsException('No response for: ' . '[PAYLOAD HERE]');
+			throw new \RuntimeException('No response from DAV server');
 		}
 //		$xml = str_ireplace(['<d:','<cal:','<ical:','<cs:','<card:'], '<', $body);
 //		$xml = str_ireplace(['</d:','</cal:','</ical:','</cs:','</ard:'], '</', $xml);

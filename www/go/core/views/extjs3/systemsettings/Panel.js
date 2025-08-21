@@ -24,6 +24,8 @@ go.systemsettings.Panel = Ext.extend(Ext.form.FormPanel, {
 			return;
 		}
 
+		console.log(module.settings);
+
 		const v = module.settings, f = this.getForm();
 		let hasReadOnlyFields = false;
 

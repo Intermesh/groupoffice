@@ -7,7 +7,7 @@ import {
 	Component, datasourcestore,
 	DatePicker,
 	datepicker,
-	DateTime,
+	DateTime, Format,
 	FunctionUtil, h3, hr, List,
 	list,
 	menu, router,
@@ -81,20 +81,20 @@ export class Main extends Component {
 			splitView = new SplitView(this.adapter),
 			listView = new ListView(this.adapter);
 
-		monthView.on('selectweek', (me, day) => {
+		monthView.on('selectweek', ( {day}) => {
 			this.routeTo('week', day);
 		});
-		monthView.on('dayclick', (me,day) => {
+		monthView.on('dayclick', ({day}) => {
 			this.routeTo('day', day);
 		});
-		yearView.on('dayclick', (me,day) => {
+		yearView.on('dayclick', ({day}) => {
 			this.routeTo('day', day);
 		})
-		yearView.on('weekclick', (me,weekDay) => {
-			this.routeTo('week', weekDay);
+		yearView.on('weekclick', ({week}) => {
+			this.routeTo('week', week);
 		});
-		yearView.on('monthclick', (me,day) => {
-			this.routeTo('month', day);
+		yearView.on('monthclick', ({month}) => {
+			this.routeTo('month', month);
 		});
 		const rights = modules.get("community", "calendar")!.userRights;
 
@@ -115,11 +115,11 @@ export class Main extends Component {
 					showWeekNbs: false, // Wk nbs in datepicker are broken // client.user.calendarPreferences.showWeekNumbers,
 					enableRangeSelect: true,
 					listeners: {
-						'select': (_dp, date) => {
+						'select': ({date}) => {
 							this.date = date!;
 							this.updateView();
 						},
-						'select-range': (_dp, start, end) => {
+						'select-range': ( {start, end}) => {
 							const days = Math.round((end!.clone().setHours(12).getTime() - start!.clone().setHours(12).getTime()) / 8.64e7) + 1;
 							this.date = start!;
 							if (days < 8) {
@@ -136,7 +136,6 @@ export class Main extends Component {
 				}),
 				comp({cls:'scroll'},
 					this.calendarList = new CalendarList(),
-					//this.stuffThatShouldGoIntoTheDavClientModuleWhenOverridesArePossible(),
 					tbar({cls: 'dense'},comp({tagName: 'h3', html: t('Other')})),
 					comp({tagName:'ul', cls:'goui check-list'}, ...this.renderAdapterBoxes()),
 					tbar({cls: 'dense'},
@@ -164,7 +163,7 @@ export class Main extends Component {
 			),
 			splitter({
 				stateId: "calendar-splitter-west",
-				resizeComponentPredicate: this.west
+				resizeComponent: this.west
 			}),
 			comp({cls: 'vbox active', flex: 1},
 				tbar({},
@@ -203,7 +202,7 @@ export class Main extends Component {
 								return [
 									comp({cls:'pad'},
 										comp({html:'<i style="color:#'+item.color+'">&bull;</i> <strong>'+r.title+'</strong><br><small>'+(owner?.name ?? owner?.email ?? t('Unknown owner'))+'</small>' }),
-										h3({html: item.start.format('D j M')+' '+t('at')+' '+item.start.format('H:i')}),
+										h3({html: item.start.format('D j M')+' '+t('at')+' '+Format.time(item.start)}),
 									comp({cls:'group'},
 										btn({itemId: 'accepted', text:t('Accept'), handler:b=>press(b,'accepted')}),
 										btn({itemId: 'tentative', text:t('Maybe'), handler:b=>press(b,'tentative')}),
@@ -266,7 +265,7 @@ export class Main extends Component {
 						btn({icon:'meeting_room',hidden: !rights.mayChangeResources, text:t('Resources')+'…', handler: _ => { (new ResourcesWindow()).show()}})
 					)})
 				),
-				this.cards = cards({flex: 1, activeItem:1, listeners: {render: m => this.applySwipeEvents(m)}},
+				this.cards = cards({flex: 1, activeItem:1, listeners: {render: ({target}) => this.applySwipeEvents(target)}},
 					weekView,
 					monthView,
 					yearView,
@@ -279,7 +278,7 @@ export class Main extends Component {
 		this.date = new DateTime();
 		// NOPE:router will call setSpan and render
 		// calendar store load will call first view update
-		this.calendarList.on('changevisible', (_,ids) => {
+		this.calendarList.on('changevisible', ({ids}) => {
 			if(!this.initialized) {
 				// after initial load. check for changed
 				calendarStore.on('load', () => {
@@ -308,55 +307,6 @@ export class Main extends Component {
 				this.forward();
 			} else {
 				this.backward();
-			}
-		})
-	}
-
-	private stuffThatShouldGoIntoTheDavClientModuleWhenOverridesArePossible() {
-
-		return list({
-			store: datasourcestore({
-				dataSource: jmapds('DavAccount'),
-			}),
-			listeners:{
-				'render': (m)=>{
-					m.store.load();
-				}
-			},
-			renderer: (a) => {
-				const list = new CalendarList(datasourcestore({
-					dataSource: jmapds('Calendar'),
-					queryParams: {filter: {isSubscribed: true, davaccountId: a.id}},
-					sort: [{property: 'sortOrder'}, {property: 'name'}]
-				}));
-
-				list.on('changevisible', (l,ids) => {
-					if(!this.initialized) {
-						// after initial load. check for changed
-						l.store.on('load', () => {
-							this.view.update();
-						});
-						this.initialized = true;
-					}
-					this.applyInCalendarFilter(ids);
-					this.updateView();
-				});
-				return [comp({},
-					tbar({tagName: 'li', cls: 'dense'},
-						comp({tagName: 'h3', html: a.name}),
-						btn({icon: 'more_vert', menu: menu({},
-							btn({icon: 'edit', text: t('Edit') + '…', handler: () => {
-									// todo
-								}
-							}),
-							btn({icon: 'sync', text: t('Sync'), handler: () => {
-									client.jmap('DavAccount/sync', {accountId: a.id});
-								}
-							}))
-						})
-					),
-					list
-				)];
 			}
 		})
 	}
@@ -396,9 +346,9 @@ export class Main extends Component {
 		return Object.keys(boxes).map(key => comp({tagName:'li'}, checkbox({
 			color: boxes[key][0], label: boxes[key][1], value: this.adapter.byType(key).enabled,
 			listeners: {
-				'change': (_p, enabled) => {
-					this.adapter.byType(key).enabled = enabled;
-					jmapds('User').update(client.user.id, {calendarPreferences: {[key+'sAreVisible']: enabled}});
+				'change': ({newValue}) => {
+					this.adapter.byType(key).enabled = newValue;
+					jmapds('User').update(client.user.id, {calendarPreferences: {[key+'sAreVisible']: newValue}});
 					this.updateView();
 				}
 			}
@@ -424,13 +374,13 @@ export class Main extends Component {
 		return list({
 			store: categoryStore,
 			cls: 'check-list',
-			listeners: {'render': me => { me.store.load() }},
+			listeners: {'render': ({target}) => { void target.store.load() }},
 			renderer: (data) => {
 				return [checkbox({
 					color: '#' + data.color,
 					label: data.name,
 					listeners: {
-						'change': (p, newValue) => {
+						'change': ({newValue}) => {
 							if (newValue) {
 								selected[data.id] = true;
 							} else {

@@ -30,17 +30,24 @@ class Alert extends SingleOwnerEntity
 {
 	public static bool $enabled = true;
 
-	public ?int $id;
+	public ?string $id;
 
 	protected ?int $entityTypeId;
 
-	public ?int $entityId;
+	public ?string $entityId;
 
 	public ?\DateTimeInterface $triggerAt;
 	public ?\DateTimeInterface $staleAt;
 
 	public $recurrenceId;
 	public ?string $tag;
+
+	/**
+	 * The principal who created it
+	 *
+	 * @var string|null
+	 */
+	public ?string $createdBy;
 
 	protected ?string $data;
 

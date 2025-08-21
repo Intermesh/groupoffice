@@ -44,6 +44,16 @@ class ArrayObject extends CoreArrayObject implements JsonSerializable {
 		
 		return false;
 	}
+
+	public function findBy(callable $fn) {
+		foreach($this as $key => $value) {
+			if(call_user_func($fn, $value)) {
+				return $value;
+			}
+		}
+
+		return false;
+	}
 	
 	/**
 	 * Similar to getArrayCopy() but it is recursive when there are children that

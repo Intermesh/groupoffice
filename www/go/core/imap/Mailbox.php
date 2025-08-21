@@ -246,7 +246,7 @@ class Mailbox extends Model {
 		//eg. "* LIST (\HasNoChildren) "/" Trash"
 		// * LSUB () "." "Ongewenste e-mail"
 
-		$lineParts = str_getcsv($responseLine, ' ', '"');
+		$lineParts = str_getcsv($responseLine, ' ', '"', "");
 
 //		var_dump($lineParts);
 
@@ -927,7 +927,7 @@ Content-type: multipart/mixed; boundary="Boundary_(ID_OF/cBsTfVK4gbVsbFd1O1Q)"
 		$line = trim(substr($response, $start, $end - $start ));
 		
 		
-		$arr = str_getcsv($line, ' ');
+		$arr = str_getcsv($line, ' ', '"', "");
 
 
 		for ($i = 0, $c = count($arr); $i < $c; $i++) {
@@ -1356,7 +1356,7 @@ Content-type: multipart/mixed; boundary="Boundary_(ID_OF/cBsTfVK4gbVsbFd1O1Q)"
 	 * @param string $flags {@see setFlags()}
 	 * @return boolean
 	 */
-	public function appendMessage(\go\core\mail\Message $message, array $flags = null) {
+	public function appendMessage(\go\core\mail\Message $message, array|null $flags = null) {
 
 		$tmpfile = IFW::app()->getAuth()->getTempFolder()->getFile(uniqid(time()));
 
@@ -1424,7 +1424,7 @@ Content-type: multipart/mixed; boundary="Boundary_(ID_OF/cBsTfVK4gbVsbFd1O1Q)"
 	 * @param array $flags eg. ["\Seen"]
 	 * @return boolean
 	 */
-	private function appendStart($size, array $flags = null) {
+	private function appendStart($size, array|null $flags = null) {
 		//Select mailbox first so we can predict the UID.
 		$this->select();
 

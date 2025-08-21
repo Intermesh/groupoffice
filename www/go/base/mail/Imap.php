@@ -2959,7 +2959,7 @@ class Imap extends ImapBodyStruct
 	 * @return bool
 	 * @throws Exception
 	 */
-	public function append_start($mailbox, $size, $flags = "", \DateTimeInterface $internalDate = null) :bool
+	public function append_start($mailbox, $size, $flags = "", \DateTimeInterface|null $internalDate = null) :bool
 	{
 		//Select mailbox first so we can predict the UID.
 		$this->select_mailbox($mailbox);
@@ -2991,7 +2991,7 @@ class Imap extends ImapBodyStruct
 	 * @return boolean
 	 * @throws Exception
 	 */
-	public function append_message($mailbox, $data, $flags="", \DateTimeInterface $internalDate = null) :bool
+	public function append_message($mailbox, $data, $flags="", \DateTimeInterface|null $internalDate = null) :bool
 	{
 		if ($data instanceof File) {
 

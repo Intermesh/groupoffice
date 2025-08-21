@@ -14,8 +14,8 @@ return [
 		"phoneTypes" => [
 				"work" => "Work",
 				"home" => "Home",
-				"mobile" => "Mobile",
-				"workmobile" => "Work Mobile",
+				"cell" => "Mobile",
+				"workcell" => "Work Mobile",
 				"fax" => "Fax",
 				"workfax" => "Work fax"
 		],

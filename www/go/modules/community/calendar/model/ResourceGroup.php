@@ -10,12 +10,12 @@ use go\modules\business\projects3\model\ProjectResource;
 class ResourceGroup extends Entity
 {
 	// Omit for the default alerts (with or without time)
-	public $id;
+	public ?string $id;
 	/** @var string The user-visible name of the calendar */
-	public $name;
-	public $description;
-	/** @var int Will be set to any resource calendar that is created without owner.*/
-	public $defaultOwnerId;
+	public string $name;
+	public ?string $description;
+	/** @var ?string Will be set to any resource calendar that is created without owner.*/
+	public ?string $defaultOwnerId;
 
 	protected static function defineMapping(): Mapping
 	{

@@ -7,7 +7,7 @@ modules.register({
 	package: "community",
 	name: "history",
 	async init() {
-		client.on("authenticated", (client, session) => {
+		client.on("authenticated", ( {session}) => {
 			if (!session.capabilities["go:community:history"]) {
 				return;
 			}

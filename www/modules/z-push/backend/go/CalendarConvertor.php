@@ -54,12 +54,28 @@ class CalendarConvertor
 	static function toSyncAppointment(CalendarEvent $event, ?SyncAppointment $exception, $params): SyncAppointment
 	{
 		$message = $exception ?? new SyncAppointment();
-		if(!$exception && !empty($event->timeZone))
-			$message->timezone =  self::mstzFromTZID($event->timeZone);
-		$message->alldayevent = empty($event->showWithoutTime) ? 0 : 1;
+
 		if(!empty($event->createdAt))
 			$message->dtstamp = $event->createdAt->getTimestamp();
-		$message->starttime = $event->start()->getTimestamp();
+
+		if($event->showWithoutTime) {
+			$message->alldayevent = 1;
+
+			$start = (new \DateTime($event->start->format("Y-m-d") . " 00:00:00" , new \DateTimeZone("UTC")));
+			$message->starttime = $start->getTimestamp();
+			if (!empty($event->duration))
+				$message->endtime = $start->add(new \DateInterval($event->duration))->getTimestamp();
+
+		} else {
+			$message->alldayevent = 0;
+			$message->starttime = $event->start()->getTimestamp();
+			if (!empty($event->duration))
+				$message->endtime = $event->end()->getTimeStamp();
+
+			if(!$exception && !empty($event->timeZone))
+				$message->timezone =  self::mstzFromTZID($event->timeZone);
+		}
+
 		$message->uid = $event->uid;
 
 		if(!$event->isPrivate() || $event->getPermissionLevel() > \go\core\model\Acl::LEVEL_READ) {
@@ -68,10 +84,8 @@ class CalendarConvertor
 			$message->asbody = GoSyncUtils::createASBody($event->description, $params);
 		}
 
-		if(!empty($event->duration))
-		$message->endtime = $event->end()->getTimeStamp();
 		if(!empty($event->privacy))
-		$message->sensitivity = ['public'=> '0', 'private' => '2', 'secret'=> '3'][$event->privacy];
+			$message->sensitivity = ['public'=> '0', 'private' => '2', 'secret'=> '3'][$event->privacy];
 		if(!empty($event->freeBusyStatus))
 		$message->busystatus = $event->freeBusyStatus == 'busy' ? "2" : "0";
 		$message->meetingstatus = 0;
@@ -137,20 +151,24 @@ class CalendarConvertor
 			}
 		}
 		//$message->reminder = 0; // timestamp or 0
+
+
 		$alerts = $event->alerts();
+
 		if(!empty($alerts)) {
 			$firstAlert = array_shift($alerts);
 
+			// TODO $alert->setEntity() failes on recurring items because id is null in that case becuase of a $event->patchedInstance();
 			$coreAlert = $firstAlert->buildCoreAlert($event);
-			if($coreAlert) {
+			if ($coreAlert) {
 				$triggerU = $coreAlert->triggerAt->format("U");
 				$message->reminder = ($message->starttime - $triggerU) / 60; // Reminder is in minutes before start
 
-				if($message->reminder < 0) {
+				if ($message->reminder < 0) {
 					//iphone and GO allows a reminder after the start time when using an all day event.
 					//EAS does not support this. We'll set a reminder at 9:00 the day before so it's not
 					//completely lost.
-					if($event->showWithoutTime) {
+					if ($event->showWithoutTime) {
 						$message->reminder = 900;
 					} else {
 						$message->reminder = 30;
@@ -158,6 +176,7 @@ class CalendarConvertor
 				}
 			}
 		}
+
 		return $message;
 	}
 
@@ -359,7 +378,7 @@ class CalendarConvertor
 			}
 		}
 
-		if (isset($message->reminder)){
+		if (!empty($message->reminder)){
 			$event->alerts = [(new Alert($event))->setValues([
 				'action' => 'display',
 				'trigger' => ['offset' => '-PT'.$message->reminder.'M', 'relativeTo' => 'start']

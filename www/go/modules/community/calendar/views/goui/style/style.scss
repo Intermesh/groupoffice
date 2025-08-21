@@ -395,8 +395,6 @@
 	}
 }
 
-$hourHeight: 8vh;
-$halfHour: 4vh;
 $timeMargin: dp(72);
 
 %weekhead {
@@ -423,6 +421,7 @@ $timeMargin: dp(72);
 }
 
 .cal.week {
+	--hour-height: 5vh;
 	height:100%;
 	display: flex;
 	flex-direction: column;
@@ -483,17 +482,24 @@ $timeMargin: dp(72);
 		> dd { // day column
 			position: relative;
 			overflow: hidden;
-			height: 24*$hourHeight;
+			height: calc(24 * var(--hour-height));
 			//max-height: 1680px;
-			background: linear-gradient(180deg, $colorLine 1px, transparent 1px) repeat-y;
-			background-size: 100% $hourHeight;
-			border-right: 1px solid $colorDivider;
+			//background: linear-gradient(180deg, $colorLine 1px, transparent 1px) repeat-y;
+			background-image: repeating-linear-gradient(
+				to bottom,
+				$colorLine 0px,
+				$colorLine 1px,
+				transparent 1px,
+				transparent var(--hour-height)
+			);
+			//background-size: 100% $hourHeight;
+			border-right: 1px solid $colorLine;
 			&:last-child { border-right: 0;}
 		}
 		> dt { // time display
 			position: initial;
-			background-size: 8px $hourHeight;
-			background-position: top right;
+			//background-size: 8px $hourHeight;
+			//background-position: top right;
 			border-right: 0;
 
 			> em { //time
@@ -501,7 +507,7 @@ $timeMargin: dp(72);
 				font-style: normal;
 				display: block;
 				font-size: .8em;
-				height: $hourHeight;
+				height: var(--hour-height);
 				//max-height: 70px; // 1680 / 24
 				color: $colorTextSecondary;
 				text-align: right;
@@ -557,6 +563,7 @@ $timeMargin: dp(72);
 		pointer-events:none;
 		transition: height 84ms ease-out, top 84ms ease-out;
 	}
+	li.all-days { pointer-events:none; }
 }
 
 .cal.split {
@@ -638,7 +645,7 @@ $timeMargin: dp(72);
 			}
 			span:first-of-type { // time
 				margin-left:dp(8);
-				width: dp(176);
+				width: dp(198);
 			}
 		}
 	}

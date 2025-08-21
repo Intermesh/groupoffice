@@ -1,8 +1,9 @@
 import {fieldset, htmlfield, Notifier, root, t, textfield} from "@intermesh/goui";
 import {client, FormWindow, Image} from "@intermesh/groupoffice-core";
 import {notebookcombo} from "./NoteBookCombo";
+import {Note} from "./Index";
 
-export class NoteDialog extends FormWindow {
+export class NoteDialog extends FormWindow<Note> {
 	constructor() {
 		super("Note");
 
@@ -31,10 +32,10 @@ export class NoteDialog extends FormWindow {
 				htmlfield({
 					name: "content",
 					listeners: {
-						setvalue: (field, newValue, oldValue) => {
-							Image.replaceImages(field.el);
+						setvalue: ({target}) => {
+							void Image.replaceImages(target.el);
 						},
-						insertimage: (htmlfield, file, img) => {
+						insertimage: ({file, img}) => {
 							root.mask();
 
 							client.upload(file).then(r => {

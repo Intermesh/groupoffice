@@ -9,14 +9,11 @@ use go\core\orm\Property;
 
 final class AddressBookPortletBirthday extends Property
 {
-	/** @var int */
-	public $id;
+	public ?int $id;
 
-	/** @var int */
-	public $userId;
+	public string $userId;
 
-	/** @var int */
-	public $addressBookId;
+	public string $addressBookId;
 
 	protected static function defineMapping(): Mapping
 	{

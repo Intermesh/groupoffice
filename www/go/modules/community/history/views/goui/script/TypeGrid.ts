@@ -19,8 +19,8 @@ export class TypeGrid extends List {
 					itemId: v.name,
 					label: t(v.name),
 					listeners: {
-						change: (field, newValue, oldValue) => {
-							const record = this.typeStore.find((t) => t.name === field.itemId);
+						change: ({target, newValue}) => {
+							const record = this.typeStore.find((t) => t.name === target.itemId);
 
 							if (newValue) {
 								this.selectedTypes.push(record!.name);

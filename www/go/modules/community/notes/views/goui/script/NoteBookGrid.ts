@@ -1,5 +1,4 @@
 import {
-	BaseEntity,
 	column,
 	Config,
 	createComponent,
@@ -8,19 +7,16 @@ import {
 	t,
 	Table
 } from "@intermesh/goui";
-import {client, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
-
-interface NoteBook extends BaseEntity {
-	name: string
-}
+import {AclLevel, client} from "@intermesh/groupoffice-core";
+import {noteBookDS} from "./Index.js";
 
 export class NoteBookGrid extends Table<DataSourceStore> {
 
 	constructor() {
-		const store = datasourcestore<JmapDataSource<NoteBook>>({
-			dataSource: jmapds("NoteBook"),
+		const store = datasourcestore({
+			dataSource: noteBookDS,
 			listeners: {
-				load: (store, records, append) => {
+				load: () => {
 					const defaultNoteBookIds: any[] = [];
 
 					if (!client.user.notesSettings.rememberLastItems) {
@@ -38,11 +34,11 @@ export class NoteBookGrid extends Table<DataSourceStore> {
 					});
 				}
 			},
+			filters: {
+				permissionLevel: {permissionLevel: AclLevel.READ}
+			},
 			queryParams: {
-				limit: 0,
-				filter: {
-					permissionLevel: 5
-				}
+				limit: 0
 			},
 			sort: [{
 				property: "name"
@@ -56,10 +52,8 @@ export class NoteBookGrid extends Table<DataSourceStore> {
 				sortable: true,
 			})
 		];
-
 		super(store, columns);
 	}
-
 }
 
 export const notebookgrid = (config: Config<NoteBookGrid>) => createComponent(new NoteBookGrid(), config);

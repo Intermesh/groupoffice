@@ -1,3 +1,5 @@
+@use "utils";
+
 html,body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,p,blockquote,th,td{margin:0;padding:0;}img,body,html{border:0;}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal;}ol,ul {list-style:none;}caption,th {text-align:left;}q:before,q:after{content:'';}
 
 .ext-el-mask {
@@ -388,7 +390,7 @@ ul.x-tab-strip li.x-tab-edge {
 }
 
 .x-tab-strip-closable .x-tab-left {
-    padding-right:dp(24);
+    padding-right:utils.dp(24);
 }
 
 .x-tab-strip .x-tab-strip-closable a.x-tab-strip-close {
@@ -396,7 +398,7 @@ ul.x-tab-strip li.x-tab-edge {
    display:block;
    position:absolute;
    top:0;
-   right:dp(8);
+   right:utils.dp(8);
    cursor:pointer;
    z-index:2;
 }
@@ -1444,20 +1446,20 @@ div.x-toolbar-no-items {
 .x-tree-elbow-end-plus, 
 .x-tree-elbow-end-minus {
 	border: 0 none;
-	height: dp(24);
+	height: utils.dp(24);
 	margin: 0;
 	padding: 0;
 	vertical-align: top;
-	width: dp(24);
+	width: utils.dp(24);
 }
 
 .x-tree-node-collapsed .x-tree-node-icon, .x-tree-node-expanded .x-tree-node-icon, .x-tree-node-leaf .x-tree-node-icon{
 	border: 0 none;
-	height: dp(24);
+	height: utils.dp(24);
 	margin: 0;
 	padding: 0;
 	vertical-align: top;
-	width: dp(24);
+	width: utils.dp(24);
 }
 
 
@@ -1964,7 +1966,7 @@ a.x-menu-item {
 }
 
 .x-panel-tl .x-panel-icon, .x-window-tl .x-panel-icon {
-    padding-left:dp(16);
+    padding-left:utils.dp(16);
 }
 
 .x-panel-inline-icon {
@@ -2201,7 +2203,7 @@ body.ext-ie6.x-body-masked .x-window select {
 
 .x-tool-expand-north, .x-tool-expand-south,.x-tool-expand-east, .x-tool-expand-west {
     float:none;
-    margin:dp(8) dp(16);
+    margin:utils.dp(8) utils.dp(16);
 }
 
 .x-accordion-hd {
@@ -2353,7 +2355,7 @@ body.ext-ie6.x-body-masked .x-window select {
 }
 
 .x-progress-bar {
-    height:dp(32);
+    height:utils.dp(32);
     float:left;
     width:0;
 }
@@ -2461,11 +2463,11 @@ body.ext-ie6.x-body-masked .x-window select {
 
 /* Horizontal styles */
 .x-slider-horz {
-    padding-left:dp(8);
+    padding-left:utils.dp(8);
 }
 
 .x-slider-horz .x-slider-end {
-    padding-right:dp(8);
+    padding-right:utils.dp(8);
 }
 
 .x-slider-horz .x-slider-thumb {
@@ -2496,7 +2498,7 @@ body.ext-ie6.x-body-masked .x-window select {
 .x-window-dlg .x-window-body {
     border:0 none !important;
     padding:5px 10px;
-    padding: dp(8) dp(16);
+    padding: utils.dp(8) utils.dp(16);
     overflow:hidden !important;
 }
 

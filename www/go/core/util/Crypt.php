@@ -20,7 +20,7 @@ class Crypt {
 	 * @return string
 	 * @throws EnvironmentIsBrokenException
 	 */
-	public static function encrypt(string $plaintext, string $password = null): string
+	public static function encrypt(string $plaintext, string|null $password = null): string
 	{
 		if (!isset($password)) {
 			$key = self::getKey();
@@ -189,7 +189,7 @@ class Crypt {
 		$key_file = go()->getDataFolder()->getFile('key.txt');
 
 		if ($key_file->exists()) {
-			$key = $key_file->getContents();
+			$key = trim($key_file->getContents());
 		} else {
 			throw new Exception("Encryoption key for old method not found!");
 		}

@@ -750,6 +750,14 @@ GO.files.FileBrowser = function(config){
 				new Ext.Toolbar({
 					hidden: true,
 					items: [
+						{
+							cls: 'go-narrow',
+							iconCls: "ic-menu",
+							handler: function () {
+								this.westPanel.show();
+							},
+							scope: this
+						},
 						"->",
 						new Ext.Button({
 							iconCls: 'ic-delete',
@@ -1591,8 +1599,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 							delete treeNode.attributes.children;
 							treeNode.reload();
 						}
-						this.gridStore.reload();
-						this.trashGridStore.reload();
+						this.gridStore.load();
+						this.trashGridStore.load();
 					},
 					scope: this
 				});
@@ -1605,8 +1613,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 							delete treeNode.attributes.children;
 							treeNode.reload();
 						}
-						this.gridStore.reload();
-						this.trashGridStore.reload();
+						this.gridStore.load();
+						this.trashGridStore.load();
 					},
 					scope: this
 				});
@@ -1649,8 +1657,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 						delete treeNode.attributes.children;
 						treeNode.reload();
 					}
-					this.gridStore.reload();
-					this.trashGridStore.reload();
+					this.gridStore.load();
+					this.trashGridStore.load();
 
 				},
 				scope:this
@@ -1686,8 +1694,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 					ids: ids.join(",")
 				},
 				success:function(action, response, result){
-					this.gridStore.reload();
-					this.trashGridStore.reload();
+					this.gridStore.load();
+					this.trashGridStore.load();
 				},
 				scope:this
 			})

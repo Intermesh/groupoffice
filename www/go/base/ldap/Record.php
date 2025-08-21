@@ -22,7 +22,7 @@ class Record extends Model{
 	
 	protected static $_mapping = false;
 	
-	public function __construct(Connection $ldapConn = null, $entryId= null) {
+	public function __construct(Connection|null $ldapConn = null, $entryId= null) {
 
 		$this->_entryId=$entryId;
 		$this->_ldapConn= ($ldapConn!==null) ? $ldapConn : Connection::getDefault();

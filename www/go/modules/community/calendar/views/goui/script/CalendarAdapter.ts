@@ -66,7 +66,12 @@ export class CalendarAdapter {
 		'event': {
 			enabled: true,
 			watch:true,
-			store:datasourcestore({dataSource:jmapds('CalendarEvent')}),
+			store:datasourcestore({
+				dataSource:jmapds('CalendarEvent'),
+				relations: {
+					modifier: {dataSource: jmapds("Principal"), path: "modifiedBy"},
+					creator: {dataSource: jmapds("Principal"), path:'createdBy'}
+				}}),
 			*items(start:DateTime,end:DateTime) {
 				for (const e of this.store!.items) {
 					for(const item of CalendarItem.expand(e as CalendarEvent, start, end))
@@ -92,10 +97,9 @@ export class CalendarAdapter {
 				}
 				let [lang,country] = client.user.holidayset.split('_');
 				if(!country) country = lang;
-				if(country=='uk') country ='gb';
-
-				console.log(client.user, country);
-				return client.jmap("community/calendar/Holiday/fetch",{
+				if(country=='uk')
+					country ='gb';
+				return client.jmap("core/Holiday/fetch",{
 					set: country.toUpperCase(), lang: client.user.holidayset.replace("_", "-"),from:start.format('Y-m-d'),till:end.format('Y-m-d')
 				}).then(r => {
 					this.list = r.list;
@@ -120,7 +124,13 @@ export class CalendarAdapter {
 		},
 		'task': {
 			enabled: client.user.calendarPreferences?.tasksAreVisible,
-			store: datasourcestore({dataSource: jmapds('Task')}),
+			store: datasourcestore({
+				dataSource: jmapds('Task'),
+				relations: {
+					modifier: {dataSource: jmapds("Principal"), path: "modifiedBy"},
+					creator: {dataSource: jmapds("Principal"), path:'createdBy'}
+				}
+			}),
 			*items(from:DateTime,until:DateTime) {
 				for(const task of this.store!.items) {
 					let date;
@@ -141,6 +151,8 @@ export class CalendarAdapter {
 
 					if(start.date <= until.date && start.date >= from.date) {
 						// console.log(task.progress, date, start, task.title, task);
+						task.duration = 'PT1H';
+						task.showWithoutTime = true;
 						yield new CalendarItem({
 							key: '-',
 							start,
@@ -151,11 +163,7 @@ export class CalendarAdapter {
 							},
 							extraIcons: [task.progress == 'completed' ? 'task_alt' : 'radio_button_unchecked'],
 							defaultColor: '7e472a',
-							data: {
-								title: task.title,
-								duration: 'P1D',
-								showWithoutTime: true,
-							}
+							data: task
 						});
 					}
 				}
@@ -180,7 +188,13 @@ export class CalendarAdapter {
 		},
 		'birthday': {
 			enabled: client.user.calendarPreferences?.birthdaysAreVisible,
-			store: datasourcestore({dataSource: jmapds('Contact')}),
+			store: datasourcestore({
+				dataSource: jmapds('Contact'),
+				relations: {
+					modifier: {dataSource: jmapds("Principal"), path: "modifiedBy"},
+					creator: {dataSource: jmapds("Principal"), path:'createdBy'}
+				}
+			}),
 			*items(from:DateTime,end:DateTime) {
 				const sy= from.getYear(),
 					ey= end.getYear();

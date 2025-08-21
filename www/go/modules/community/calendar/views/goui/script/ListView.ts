@@ -1,5 +1,5 @@
 import {CalendarView} from "./CalendarView.js";
-import {DateTime, E, splitter, t} from "@intermesh/goui";
+import {DateTime, E, Format, splitter, t} from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 import {EventDetail} from "./EventDetail.js";
@@ -21,7 +21,7 @@ export class ListView extends CalendarView {
 		this.detail = new EventDetail();
 		this.detail.width = 440;
 		this.items.add(
-			splitter({resizeComponentPredicate: this.detail}),
+			splitter({resizeComponent: this.detail}),
 			this.detail
 		);
 	}
@@ -98,7 +98,7 @@ export class ListView extends CalendarView {
 		}
 
 		const time = E('span', e.data.showWithoutTime ? t('Full day') :
-			e.start.format('G:i') + e.end.format(' - G:i')),
+			Format.time(e.start) + ' - ' + Format.time(e.end)),
 			title = E('span', e.title);
 		e.divs[0] = super.eventHtml(e,E('div',
 			E('i','fiber_manual_record').cls('icon'),

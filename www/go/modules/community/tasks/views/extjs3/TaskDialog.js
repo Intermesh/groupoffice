@@ -20,6 +20,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 
 		if (!this.currentId && this.commentComposer) {//} && this.role == "support") {
+
+			this.closeOnSubmit = false;
+
 			this.commentComposer.show();
 			this.commentComposer.editor.allowBlank = this.role !== "support";
 			if(this.role === "support") {
@@ -31,8 +34,17 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			})
 
 			this.on("submit", () => {
-				if(this.commentComposer.editor.getValue() != "")
-					this.commentComposer.save(this.role == "support" ? "SupportTicket" : "Task", this.currentId);
+				if(this.commentComposer.editor.getValue() != "") {
+					// we need to use setTimeout otherwise the change event of the Comment entity fires during the store load and
+					// it won't be reloaded.
+					setTimeout(() => {
+						this.commentComposer.save(this.role == "support" ? "SupportTicket" : "Task", this.currentId);
+						this.close();
+					});
+				}else {
+					this.closeWithModifications = true;
+					this.close();
+				}
 			}, {single:true})
 		} else {
 			this.commentComposer.hide();
@@ -277,15 +289,13 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						]
 					},
 
-
-
-					this.customerCombo = new go.users.UserCombo({
+					this.customerCombo = new go.PrincipalCombo({
 						flex: 1,
 						disabled: this.role != "support",
 						hidden: this.role != "support",
 						anchor: "100%",
 						fieldLabel: t('Customer'),
-						hiddenName: 'createdBy',
+						hiddenName: 'customerId',
 						allowBlank: false,
 						value: null
 					}),
@@ -364,7 +374,13 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			{
 				title: t("Date"),
 				collapsible: true,
-				collapsed: true,
+				collapsed: false,
+				listeners: {
+					expand: () => {
+						//renders invalid when collapsed
+						percentComplete.slider.moveThumb(0, percentComplete.slider.translateValue(percentComplete.getValue()))
+					}
+				},
 				xtype: 'fieldset',
 				defaults: {
 					layout: 'form',
@@ -397,9 +413,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 
 			this.descriptionFieldset = new Ext.form.FieldSet({
-				collapsed: true,
+				collapsed: false,
 				collapsible: true,
-				title: t("Description") + " / " + t("Location"),
+				title: t("Description"),
 				xtype: "fieldset",
 				defaults: {
 					anchor: '100%'
@@ -412,19 +428,12 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						fieldLabel: t("Description"),
 						grow: true
 
-					}, {
-						xtype: 'textarea',
-						name: 'location',
-						allowBlank: true,
-						fieldLabel: t("Location"),
-						grow: true
-
 					}
 				]
 			}),
 
 			{
-				collapsed: true,
+				collapsed: false,
 				collapsible: true,
 				xtype: "fieldset",
 				title: t("Alerts"),

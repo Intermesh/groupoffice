@@ -23,40 +23,36 @@ class Group extends AclOwnerEntity {
 	const ID_EVERYONE = 2;
 	const ID_INTERNAL = 3;
 
-	/**
-	 *
-	 * @var int
-	 */
-	public $id;
+	public ?string $id = null;
 	
 	/**
 	 *
 	 * @var string
 	 */
-	public $name;
+	public string $name;
 
 	/**
 	 * When this is set this group is the personal group for this user. And only
 	 * that user will be member of this group. It's used for granting permissions
 	 * to single users but keeping the database simple.
 	 * 
-	 * @var int
+	 * @var ?string
 	 */
-	public $isUserGroupFor;
+	public ?string $isUserGroupFor = null;
 	
 	/**
 	 * Created by user ID 
 	 * 
-	 * @var int
+	 * @var ?string
 	 */
-	public $createdBy;
+	public ?string $createdBy;
 	
 	/**
 	 * The users in this group
 	 * 
 	 * @var int[]
 	 */
-	public $users;	
+	public array $users = [];
 
 	protected static function defineMapping(): Mapping
 	{

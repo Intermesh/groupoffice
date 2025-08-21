@@ -287,7 +287,7 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 	 * @return void
 	 */
 
-	public function smimeSign(string $certificate, string $privateKey, string $password, string $extraCertsFile = null) {
+	public function smimeSign(string $certificate, string $privateKey, string $password, string|null $extraCertsFile = null) {
 		$this->smimeCertificate = $certificate;
 		$this->smimePrivateKey = $privateKey;
 		$this->smimeExtraCertsFile = $extraCertsFile;

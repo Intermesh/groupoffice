@@ -2,6 +2,7 @@
 
 namespace go\modules\community\otp\model;
 
+use DateTime;
 use Exception;
 use go\core\exception\Forbidden;
 use go\core\fs\Blob;
@@ -20,16 +21,16 @@ require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY
  */
 class OtpAuthenticator extends Property {
 		
-	public $userId;
+	public int $userId;
 	protected $secret;
-	public $createdAt;
+	public ?\DateTimeInterface $createdAt = null;
 
-	protected $verified = false;
+	protected bool $verified = false;
 	
-	private $verify = false;
+	private ?string $verify = null;
 	public static bool $requestSecret = false;
 
-	protected $codeLength = 6;
+	protected int $codeLength = 6;
 	
 	protected static function defineMapping(): Mapping
 	{
@@ -190,7 +191,7 @@ class OtpAuthenticator extends Property {
 	 * @param null $title
 	 * @param array $params
 	 */
-	public function outputQr(string $name=null, $secret=null, $title = null, $params = array()) {
+	public function outputQr(string|null $name=null, $secret=null, $title = null, $params = array()) {
 
 		
 		$name = empty($name) ? $this->owner->username . '@' . File::stripInvalidChars(go()->getSettings()->title) : $name;

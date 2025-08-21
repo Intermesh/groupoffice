@@ -42,8 +42,8 @@ return array (
   array (
 		"work" => "Werk",
 		"home" => "Thuis",
-		"mobile" => "Mobiel",
-		"workmobile" => "Mobiel werk",
+		"cell" => "Mobiel",
+		"workcell" => "Mobiel werk",
 		"fax" => "Fax",
 		"workfax" => "Fax werl"
   ),
@@ -150,7 +150,7 @@ return array (
   'Display options for address books' => 'Weergave instellingen voor adresboeken',
   'Start in' => 'Beginnen',
   'Last selected address book' => 'Laatst geselecteerde adresboek',
-  'Automatic linking' => 'Automatisch koppelen',
+  'Automatic e-mail linking' => 'Automatisch e-mail koppelen',
   'Don\'t link automatically to contacts' => 'Email niet automatisch aan contacten koppelen',
   'Link to all contacts' => 'Koppel aan alle contacten',
   'Exclude contacts from the address books below' => 'Contacten uit onderstaand adresboek uitsluiten',

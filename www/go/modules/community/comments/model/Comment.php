@@ -6,6 +6,9 @@ use GO\Base\Exception\AccessDenied;
 use go\core\acl\model\AclItemEntity;
 use go\core\fs\Blob;
 use go\core\model\Acl;
+use go\core\model\Alert;
+use go\core\model\Principal;
+use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\model\Search;
 use go\core\orm\Filters;
@@ -23,31 +26,28 @@ use go\core\db\Criteria;
 
 class Comment extends AclItemEntity {
 
-	public $id;
+	public ?string $id;
 	
-	public $text;
-	public $entityId;
+	public string $text;
+	public string $entityId;
 	protected $entity;
 	
-	public $entityTypeId;
-	
-	/** @var DateTime */
-	public $createdAt;
-	/** @var DateTime */
-	public $modifiedAt;
-	public $createdBy;
-	public $modifiedBy;
-	/** @var DateTime */
-	public $date;
+	public int $entityTypeId;
 
-	public $validateXSS = true;
+	public ?\DateTimeInterface $createdAt = null;
+
+	public ?\DateTimeInterface $modifiedAt = null;
+	public ?string $createdBy = null;
+	public ?string $modifiedBy = null;
+	public ?\DateTimeInterface $date;
+	public bool $validateXSS = true;
 
 	/**
 	 * Label ID's
 	 * 
 	 * @var int[]
 	 */
-	public $labels;
+	public array $labels = [];
 	
 	/**
 	 * By default the section is NULL. This property can be used to create multiple comment blocks per entity. 
@@ -55,26 +55,24 @@ class Comment extends AclItemEntity {
 	 * 
 	 * @var string
 	 */
-	public $section;
+	public ?string $section = null;
 
 	/**
 	 *
 	 * @var string[]
 	 */
-	protected $images = [];
+	protected array $images = [];
 
 	/**
 	 * @var CommentAttachment[]
 	 */
-	public $attachments = [];
+	public array $attachments = [];
 
 
 	/**
 	 * The MIME message ID from the outgoing or incoming email (used in support module)
-	 *
-	 * @var string
 	 */
-	public $mimeMessageId;
+	public ?string $mimeMessageId = null;
 
 	use SearchableTrait;
 
@@ -232,7 +230,7 @@ class Comment extends AclItemEntity {
 	 * @param array|null $groups
 	 * @return Query $query;
 	 */
-	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
+	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int|null $userId = null, array|null $groups = null): Query
 	{
 		return $query;
 	}
@@ -256,7 +254,10 @@ class Comment extends AclItemEntity {
 
 	protected function internalSave(): bool
 	{
-		$this->images = Blob::parseFromHtml($this->text, true);
+		if($this->isModified('text')) {
+			$this->images = Blob::parseFromHtml($this->text, true);
+			$this->findMentions();
+		}
 
 		if(!parent::internalSave()) {
 			return false;
@@ -359,5 +360,53 @@ class Comment extends AclItemEntity {
 	protected function getSearchKeywords(): ?array
 	{
 		return [$this->getAsText()];
+	}
+
+	private static function parseMentions(string|null $text) : array {
+		if(empty($text)) {
+			return [];
+		}
+		$regex = "/(?<![\w.])@([\w-]+)/";
+		preg_match_all($regex, $text, $matches, PREG_PATTERN_ORDER );
+		return $matches[1];
+	}
+
+	private function findMentions()
+	{
+
+		$old = $this->getOldValue('text');
+		$oldMentions = self::parseMentions($old);
+		$newMentions = self::parseMentions($this->text);
+
+		$new = array_diff($newMentions, $oldMentions);
+
+		if(!count($new)) {
+			return;
+		}
+
+		$entity = $this->findEntity();
+
+		foreach($new as $username) {
+			$userId = User::find(['id'])->selectSingleValue('id')->where('username', '=', $username)->single();
+
+			$entity->createAlert(
+				new DateTime(),
+				'mention',
+				$userId
+			)->setData(['excerpt' => $this->getExcerpt($username)])->save();
+		}
+
+	}
+
+	private function getExcerpt(string $username) : string {
+		$text = strip_tags($this->text);
+		$start = strrpos($text, "@".$username);
+
+		if($start) {
+			$text = substr($text, $start);
+		}
+
+		return StringUtil::cutString($text, 50);
+
 	}
 }

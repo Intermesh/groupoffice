@@ -9,6 +9,7 @@ use LogicException;
 use PDO;
 use PDOException;
 use PDOStatement;
+use Throwable;
 
 /**
  * The database connection object. It uses PDO to connect to the database.
@@ -49,7 +50,12 @@ class Connection {
 		$this->password = $password;
 		$this->options = [
 				PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
-				PDO::MYSQL_ATTR_INIT_COMMAND => "SET sql_mode='STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION',time_zone = '+00:00',lc_messages = 'en_US'",
+				PDO::MYSQL_ATTR_INIT_COMMAND => "SET character_set_client = utf8mb4,
+				  character_set_connection = utf8mb4,
+				  character_set_results = utf8mb4,
+				  sql_mode = 'STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION',
+				  time_zone = '+00:00',
+				  lc_messages = 'en_US'",
 				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 				PDO::ATTR_PERSISTENT => false, // Unit test on closing DB connection fails. We need this to work for long running processes
 				PDO::ATTR_EMULATE_PREPARES => false, //for native data types int, bool etc.
@@ -160,7 +166,8 @@ class Connection {
 	 * @param Statement $statement
 	 * @return void
 	 */
-	public function cacheStatement(string $name, Statement $statement) {
+	public function cacheStatement(string $name, Statement $statement): void
+	{
 		self::$cachedStatements[$name] = $statement;
 	}
 
@@ -474,7 +481,7 @@ class Connection {
    * ```
    * App::get()->getDbConnection()
    *  ->update("core_state", new \go\core\db\Expression("highestModSeq = highestModSeq + 1"), $query);
-   * ````
+   * ```
    *
    */
 	public function insert(string $tableName, $data, array $columns = []): Statement
@@ -499,7 +506,7 @@ class Connection {
    * @throws DbException
    * @see insert()
    */
-	public function insertIgnore(string $tableName, $data, array $columns = []): Statement
+	public function insertIgnore(string $tableName, Query|array $data, array $columns = []): Statement
 	{
 
 		$queryBuilder = new QueryBuilder($this);
@@ -518,10 +525,10 @@ class Connection {
    *  selected in the correct order.
    *
    * @return Statement
-   * @throws DbException
+   * @throws Throwable
    * @see insert()
    */
-	public function replace(string $tableName, $data, array $columns = []): Statement
+	public function replace(string $tableName, Query|array $data, array $columns = []): Statement
 	{
 
 		$queryBuilder = new QueryBuilder($this);
@@ -535,7 +542,7 @@ class Connection {
    *
    * @param string $tableName
    * @param $data
-   * @param Query|string|array $query {@see Query::normalize()}
+   * @param Query|string|array|null $query {@see Query::normalize()}
    * @return Statement
    * @throws PDOException
    * @example with join
@@ -561,10 +568,10 @@ class Connection {
    *
    * $stmt = App::get()->getDbConnection()->update("test_a", $data, ['id' => 1]);
    * $stmt->execute();
-   * ````
+   * ```
    *
    */
-	public function update(string $tableName, $data, $query = null): Statement
+	public function update(string $tableName, $data, Criteria|array|string|null $query = null): Statement
 	{
 		$query = Query::normalize($query);
 
@@ -574,17 +581,17 @@ class Connection {
 		return $this->createStatement($build);
 	}
 
-  /**
-   * Update but with ignore
-   *
-   * @param $tableName
-   * @param $data
-   * @param null $query
-   * @return Statement
-   * @throws Exception
-   * @see update()
-   */
-	public function updateIgnore($tableName, $data, $query = null): Statement
+	/**
+	 * Update but with ignore
+	 *
+	 * @param $tableName
+	 * @param $data
+	 * @param Criteria|array|string|null $query
+	 * @return Statement
+	 * @throws Exception
+	 * @see update()
+	 */
+	public function updateIgnore($tableName, $data, Criteria|array|string|null $query = null): Statement
 	{
 		$query = Query::normalize($query);
 
@@ -612,7 +619,7 @@ class Connection {
    *
    * @see Query
    */
-	public function select($select = "*"): Query
+	public function select(array|string $select = "*"): Query
 	{
 		$query = new Query();
 		return $query->setDbConnection($this)->select($select);
@@ -640,7 +647,7 @@ class Connection {
 	 *
 	 * @param array $build
 	 * @return Statement
-	 * @throws DbException
+	 * @throws Exception
 	 */
 	public function createStatement(array &$build): Statement
 	{

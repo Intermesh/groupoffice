@@ -15,16 +15,14 @@ class AuthAllowGroup extends Entity
   /**
    * Primary key
    *
-   * @var int
    */
-  public $id;
+  public ?string $id;
 
   /**
    * Group ID
    *
-   * @var int
    */
-  public $groupId;
+  public string $groupId;
 
   /**
    * IP Address. Wildcards can be used where * matches anything and ? matches exactly one character.

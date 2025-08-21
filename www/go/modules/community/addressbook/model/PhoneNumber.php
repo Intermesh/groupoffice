@@ -15,29 +15,15 @@ use go\core\orm\Property;
 class PhoneNumber extends Property {
 	
 	const TYPE_HOME = "home";
-	const TYPE_MOBILE = "mobile";
-	const TYPE_WORK_MOBILE = "workmobile";
+	const TYPE_MOBILE = "cell";
+	const TYPE_WORK_MOBILE = "workcell";
 	const TYPE_WORK = "work";
 	const TYPE_FAX = "fax";
 	const TYPE_WORK_FAX = "workfax";
 
-	/**
-	 * 
-	 * @var int
-	 */							
-	protected $contactId;
-
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $type = 'mobile';
-
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $number;
+	protected int $contactId;
+	public ?string $type = 'cell';
+	public string $number;
 
 	protected static function defineMapping(): Mapping
 	{

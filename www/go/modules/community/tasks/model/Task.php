@@ -49,162 +49,107 @@ class Task extends AclItemEntity {
 
 	use SearchableTrait;
 	use CustomFieldsTrait;
-	
-	/** @var int PK in the database */
-	public $id;
 
-	/** @var string global unique id for invites and sync  */
-	protected $uid = '';
+	public ?string $id = null;
+
+	/** @var ?string global unique id for invites and sync  */
+	protected ?string $uid = '';
 
 //	protected $userId;
 
-	/** @var int The list this Task belongs to */
-	public $tasklistId;
+	/** @var string The list this Task belongs to */
+	public string $tasklistId;
 
-	/** @var int id of user responsible for completing this tasks  */
-	public $responsibleUserId;
+	/** @var ?string id of user responsible for completing this tasks  */
+	public ?string $responsibleUserId = null;
 
-	/** @var int used for the kanban groups */
-	public $groupId;
+	/** @var ?int used for the kanban groups */
+	public ?int $groupId;
 
 	public ?int $projectId ;
 	public ?int $mileStoneId ;
 
-	/** @var int */
-	public $createdBy;
+	public ?string $createdBy;
 
-	/** @var DateTime */
-	public $createdAt;
+	public ?DateTimeInterface $createdAt = null;
 
-	/** @var DateTime */
-	public $modifiedAt;
+	public ?DateTimeInterface $modifiedAt = null;
 
-	/** @var int */
-	public $modifiedBy;
+	public ?string $modifiedBy;
 
 	/** @var int */
 	public $filesFolderId;
 
-	/** @var DateTime due date (when this should be finished) */
-	public $due;
+	/** @var ?DateTimeInterface due date (when this should be finished) */
+	public ?DateTimeInterface $due;
 
-	/** @var DateTime local date when this task will be started */
-	public $start;
+	/** @var ?DateTimeInterface local date when this task will be started */
+	public ?DateTimeInterface $start;
 
-	/** @var int Duration Estimated duration in seconds the task takes to complete. */
-	public $estimatedDuration;
+	/** @var ?int Duration Estimated duration in seconds the task takes to complete. */
+	public ?int $estimatedDuration;
 
 	/** @var int Progress Defines the progress of this task */
-	protected $progress = Progress::NeedsAction;
+	protected int $progress = Progress::NeedsAction;
 
-	/** @var DateTime When the "progress" of either the task or a specific participant was last updated. */
-	public $progressUpdated;
+	/** @var ?DateTimeInterface When the "progress" of either the task or a specific participant was last updated. */
+	public ?DateTimeInterface $progressUpdated;
+	public string $title;
 
-	/** @var string */
-	public $title;
+	public ?string $description;
 
-	/** @var string */
-	public $description;
-
-	/** @var string */
-	public $location;
+	public ?string $location;
 
 	//public $keywords; // only in jmap
 
 	/** @var int[] */
-	public $categories;
+	public array $categories= [];
 
-	public $color;
+	public ?string $color;
 
 	/**
 	 * Start time in H:m
 	 *
-	 * @var string
+	 * @var ?string
 	 */
-	public $startTime;
+	public ?string $startTime;
 
-	/**
-	 * @var float
-	 */
-	public $latitude;
+	public ?float $latitude;
 
-	/**
-	 * @var float
-	 */
-	public $longitude;
+	public ?float $longitude;
 
-	/**
-	 * @var string
-	 * @todo this is an override for Humble. This is probably not the right spot for this. Discuss interanlly
-	 */
-	protected $displayName;
-	/**
-	 * @var string
-	 * @todo this is an override for Humble. This is probably not the right spot for this. Discuss internally.
-	 */
-	protected $projectName;
-
-	//The scheduling status
-	//public $status = 'confirmed';
-
-	/**
-     * If present, this object represents one occurrence of a
-     * recurring object.  If present the "recurrenceRule" and
-     * "recurrenceOverrides" properties MUST NOT be present.
-     *
-     * The value is a date-time either produced by the "recurrenceRules" of
-     * the master event, or added as a key to the "recurrenceOverrides"
-     * property of the master event.
-     * @var DateTime
-     */
-	//public $recurrenceId;
-
-  /** @var string */
-  protected $recurrenceRule;
-
-  /** @var DateTime[PatchObject] map of recurrenceId => Task */
-  //protected $recurrenceOverrides;
-
-  /** @var boolean only set in recurrenceOverrides */
-  //protected $excluded;
+  protected ?string $recurrenceRule;
 
 	/** @var int [0-9] 1 = highest priority, 9 = lowest, 0 = undefined */
-	public $priority = self::PRIORITY_NORMAL;
+	public int $priority = self::PRIORITY_NORMAL;
 
 	/** @var string free or busy */
-	public $freeBusyStatus = 'free';
+	public string $freeBusyStatus = 'free';
 
 	/** @var string public , private, secret */
-	public $privacy = 'public';
-
-   public $replyTo;
-   public $participants;
+	public string $privacy = 'public';
 
 	/** @var int between 0 and 100 */
-	public $percentComplete = 0;
+	public int $percentComplete = 0;
 
-	protected $uri;
-
-	/** @var bool If true, use the user's default alerts and ignore the value of the "alerts" property. */
-	public $useDefaultAlerts = false;
+	protected ?string $uri;
 
     /** @var Alert[] List of notification alerts when $useDefaultAlerts is not set */
-	public $alerts = [];
+	public array $alerts = [];
 
-	/** @var int */
-	public $vcalendarBlobId;
+	public ?string $vcalendarBlobId;
 
 	/**
-	 * Time booked in seconds
+	 * Time booked in seconds. Filled by timeregistration2 module.
 	 *
-	 * @var int
+	 * @var ?int
 	 */
-	protected $timeBooked;
+	protected ?int $timeBooked = 0;
 
 	/**
 	 * @var TaskListGroup[]
 	 */
-	public $group = [];
+	public array $group = [];
 
 
 	protected static function aclEntityClass(): string
@@ -296,7 +241,10 @@ class Task extends AclItemEntity {
 
 	protected function getSearchKeywords(): ?array
 	{
-		$keywords = [$this->title, $this->description];
+		$keywords = [$this->title];
+		if(isset($this->description)) {
+			$keywords[] = $this->description;
+		}
 		if($this->responsibleUserId) {
 			$responsible = Principal::findById($this->responsibleUserId);
 			$keywords[] = $responsible->name;
@@ -321,8 +269,8 @@ class Task extends AclItemEntity {
 	{
 		$tasklist = TaskList::findById($this->tasklistId);
 		$desc = $tasklist->name;
-		if(!empty($this->responsibleUserId) && ($user = User::findById($this->responsibleUserId, ['displayName']))) {
-			$desc .= ' - '.$user->displayName;
+		if(!empty($this->responsibleUserId) && ($user = Principal::findById($this->responsibleUserId, ['name']))) {
+			$desc .= ' - '.$user->name;
 		} else{
 			$desc .= ' - ' . go()->t("Unassigned", "community", "tasks");
 		}
@@ -353,6 +301,18 @@ class Task extends AclItemEntity {
 			}, "subscribedOnly")
 			->addColumn('mileStoneId')
 			->addColumn('projectId')
+			->add('projectId', function(Criteria $criteria, $value, Query $query) {
+				if(!empty($value)) {
+					if(go()->getModule("business", "projects3")) {
+						$criteria->where('projectId','=', $value);
+					} else {
+						if (!$query->isJoined("tasks_tasklist", "tasklist")) {
+							$query->join("tasks_tasklist", "tasklist", "task.tasklistId = tasklist.id");
+						}
+						$criteria->where(['tasklist.projectId' => $value]);
+					}
+				}
+			})
 			->add('role', function(Criteria $criteria, $value, Query $query) {
 				if(!$query->isJoined("tasks_tasklist", "tasklist") ){
 					$query->join("tasks_tasklist", "tasklist", "task.tasklistId = tasklist.id");
@@ -428,6 +388,9 @@ class Task extends AclItemEntity {
 	{
 		if ($this->isNew() && empty($this->uid)) {
 			$this->uid = UUID::v4();
+		}
+		if(!isset($this->uri)) {
+			$this->uri = $this->uid . ".ics";
 		}
 
 		if ($this->progress == Progress::Completed) {
@@ -706,6 +669,10 @@ class Task extends AclItemEntity {
 
 	public function icsBlob() {
 		$blob = isset($this->vcalendarBlobId) ? Blob::findById($this->vcalendarBlobId) : null;
+
+		if(str_starts_with($this->title, "Verify backups"))
+			go()->debug("ICS: !!!! " . $this->title . " " . $this->vcalendarBlobId . " - " . ($blob ? $blob->modifiedAt : "null") ." < " . $this->modifiedAt);
+
 		if(!$blob || $blob->modifiedAt < $this->modifiedAt || !$blob->getFile()->exists()) {
 			$this->modifiedAt = new DateTime();
 			$blob = self::makeBlob($this);
@@ -731,7 +698,7 @@ class Task extends AclItemEntity {
 
 	private function incrementTasklistModSeq() {
 		// all() is needed because tasklist might be joined and is also changed
-		TaskList::updateHighestModSeq(self::find()->select('tasklistId')->distinct()->where(['uid'=>$this->uid])->all());
+		TaskList::updateHighestModSeq(self::find()->selectSingleValue('tasklistId')->distinct()->where(['uid'=>$this->uid])->all());
 		if($this->isModified('tasklistId')) {
 			// Event is put in a different calendar so update both modseqs
 			TaskList::updateHighestModSeq($this->getOldValue('tasklistId'));
@@ -759,33 +726,13 @@ class Task extends AclItemEntity {
 
 	public function getUri(): string
 	{
-		if(!isset($this->uri)) {
-			$this->uri = $this->getUid() . '.ics';
-		}
-
 		return $this->uri;
 	}
 
-	public function setUri(string $uri) {
+	public function setUri(string $uri): void
+	{
 		$this->uri = $uri;
 	}
-
-	// TODO: Refactor these functions into proper property classes within Humble Planner
-	public function getUserDisplayName(): ?string
-	{
-		return $this->displayName;
-	}
-
-	public function getProjectName(): ?string
-	{
-		return $this->projectName;
-	}
-
-	public function getProjectId(): ?int
-	{
-		return $this->projectId;
-	}
-	// END TODO
 
 	/**
 	 * Try to find conflicting tasks.
@@ -852,14 +799,19 @@ class Task extends AclItemEntity {
 			return;
 		}
 
+		//createdBy can also be a contact principal
+		$createdByUser = is_numeric($comment->createdBy);
+
 		if($this->createdBy != $comment->createdBy) {
 			//agent makes this message
 			if($this->responsibleUserId == null) {
 				// auto assign task on first comment, check if the comment creator is an agent.
 				// this is the case when the permission level is write or greater.
 				$tasklist = TaskList::findById($this->tasklistId,['aclId']);
-				if(Acl::getUserPermissionLevel($tasklist->aclId, $comment->createdBy) >= Acl::LEVEL_WRITE) {
-					$this->responsibleUserId = $comment->createdBy;
+				if($createdByUser){
+					if (Acl::getUserPermissionLevel($tasklist->aclId, (int) $comment->createdBy) >= Acl::LEVEL_WRITE) {
+						$this->responsibleUserId = $comment->createdBy;
+					}
 				}
 			}
 		}
@@ -874,43 +826,45 @@ class Task extends AclItemEntity {
 		$this->modifiedAt = new DateTime();
 		$this->save();
 
-		$excerpt = StringUtil::cutString(strip_tags($comment->text), 50);
+//		$excerpt = StringUtil::cutString(strip_tags($comment->text), 50);
 
-		$commenters = Comment::findForEntity($this)->selectSingleValue("createdBy")->distinct()->all();
-		if($this->responsibleUserId && !in_array($this->responsibleUserId, $commenters)) {
-			$commenters[] = $this->responsibleUserId;
-		}
+//		$commenters = Comment::findForEntity($this)->selectSingleValue("createdBy")->distinct()->all();
+//		if($this->responsibleUserId && !in_array($this->responsibleUserId, $commenters)) {
+//			$commenters[] = $this->responsibleUserId;
+//		}
 
-		$isPrivate = $comment->section == "private";
+//		$isPrivate = $comment->section == "private";
 
 		//add creator too
-		if(!$isPrivate && !in_array($this->createdBy, $commenters)) {
-			$commenters[] = $this->createdBy;
-		}
+//		if($createdByUser && !$isPrivate && !in_array($this->createdBy, $commenters)) {
+//			$commenters[] = $this->createdBy;
+//		}
 
 		//remove creator of this comment
-		$commenters = array_filter($commenters, function($c) use($comment, $isPrivate) {
-			return $c != $comment->createdBy && (!$isPrivate || $c != $this->createdBy);
-		});
+//		$commenters = array_filter($commenters, function($c) use($comment, $isPrivate) {
+//			return is_numeric($c) &&  $c != $comment->createdBy && (!$isPrivate || $c != $this->createdBy);
+//		});
 
-		// Remove alert for creator of this comment. Other users will get a replaced alert below.
-		CoreAlert::deleteByEntity($this, "comment", $comment->createdBy);
+		if($createdByUser) {
+			// Remove alert for creator of this comment. Other users will get a replaced alert below.
+//			CoreAlert::deleteByEntity($this, "comment", $comment->createdBy);
 
-		// remove you were assigned to alert when commenting
-		CoreAlert::deleteByEntity($this, "assigned", $comment->createdBy);
-
-		foreach($commenters as $userId) {
-			$alert = $this->createAlert(new DateTime(), 'comment', $userId)
-				->setData([
-					'type' => 'comment',
-					'createdBy' => $comment->createdBy,
-					'excerpt' => $excerpt
-				]);
-
-			if (!$alert->save()) {
-				throw new SaveException($alert);
-			}
+			// remove you were assigned to alert when commenting
+			CoreAlert::deleteByEntity($this, "assigned", $comment->createdBy);
 		}
+
+//		foreach($commenters as $userId) {
+//			$alert = $this->createAlert(new DateTime(), 'comment', (int) $userId)
+//				->setData([
+//					'type' => 'comment',
+//					'createdBy' => $comment->createdBy,
+//					'excerpt' => $excerpt
+//				]);
+//
+//			if (!$alert->save()) {
+//				throw new SaveException($alert);
+//			}
+//		}
 
 
 	}

@@ -11,28 +11,19 @@ use go\core\validate\ErrorCode;
 
 class SmtpAccount extends AclOwnerEntity
 {
-	/**
-	 * @var int
-	 */
-	public $id;
+	public ?string $id;
 	protected $moduleId;
-	public $hostname;
-	public $port;
-	public $username;
-	protected $password;
-	public $encryption; // null, 'tls' or 'ssl'
-	public $verifyCertificate;
-	public $fromName;
-	public $fromEmail;
+	public string $hostname;
+	public int $port = 587;
+	public ?string $username;
+	protected ?string $password;
+	public ?string $encryption = "tls"; // null, 'tls' or 'ssl'
+	public bool $verifyCertificate = true;
+	public string $fromName;
+	public string $fromEmail;
 
-	/**
-	 * @var int
-	 */
-	public $maxMessagesPerMinute = 0;
+	public int $maxMessagesPerMinute = 0;
 
-	/**
-	 * @return Mapping
-	 */
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()

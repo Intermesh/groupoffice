@@ -20,6 +20,7 @@ use go\core\model\Acl;
 use go\core\model\Search;
 use go\core\orm\exception\SaveException;
 use go\core\util\Lock;
+use GO\Files\Model\Folder;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
@@ -185,8 +186,8 @@ class EntityType implements ArrayableInterface {
 	 * @return int
 	 * @throws PDOException
 	 */
-	public function getHighestModSeq(): int
-	{
+	public function getHighestModSeq(): int{
+
 		if(isset($this->highestModSeq)) {
 			return $this->highestModSeq;
 		}
@@ -207,6 +208,8 @@ class EntityType implements ArrayableInterface {
 		$stmt->bindValue(':id' , $this->id);
 		$stmt->execute();
 		$this->highestModSeq = $stmt->fetch();
+
+		$stmt->closeCursor();
 
 		return $this->highestModSeq ?? 0;
 	}
@@ -255,13 +258,33 @@ class EntityType implements ArrayableInterface {
 	 * @return static[]
 	 * @throws PDOException
 	 */
-	public static function findAll(Query $query = null): array
+	public static function findAll(Query|null $query = null): array
 	{
 		if(!isset($query)) {
 			return array_values(static::getCache()['models']);
 		}
 
 		$records = $query
+			->select('e.id')
+			->from('core_entity', 'e')
+			->join('core_module', 'm', 'm.id = e.moduleId')
+//						->where(['m.enabled' => true])
+			->all();
+
+		$i = [];
+		foreach($records as $record) {
+			$et = self::findById($record['id']);
+			if($et) {
+				$i[] = $et;
+			}
+		}
+
+		return $i;
+	}
+
+	private static function findFromDb(): array
+	{
+		$records = go()->getDbConnection()
 			->select('e.*, m.name AS moduleName, m.package AS modulePackage, m.enabled')
 			->from('core_entity', 'e')
 			->join('core_module', 'm', 'm.id = e.moduleId')
@@ -298,7 +321,7 @@ class EntityType implements ArrayableInterface {
 			$cache= [
 				'id' => [],
 				'name' => [],
-				'models' => self::findAll(new Query)
+				'models' => self::findFromDb()
 			];
 
 			for($i = 0, $c = count($cache['models']); $i < $c; $i++) {
@@ -897,7 +920,7 @@ class EntityType implements ArrayableInterface {
 		return $cls != Search::class &&
 			(
 				is_subclass_of($cls, AclOwnerEntity::class) ||
-				(is_subclass_of($cls, ActiveRecord::class) && $cls::model()->aclField() && !$cls::model()->isJoinedAclField)
+				(is_subclass_of($cls, ActiveRecord::class) && $cls::model()->aclField() && (!$cls::model()->isJoinedAclField || $cls == Folder::class))
 			);
 	}
 

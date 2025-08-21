@@ -254,13 +254,13 @@ abstract class Entity extends Property {
 	 * $models = ModelWithDoublePK::findById("1-1");
 	 * ```
 	 *
-	 * @param string|null $id
+	 * @param string|int|null $id
 	 * @param string[] $properties
 	 * @param bool $readOnly
 	 * @return ?static
 	 * @throws Exception
 	 */
-	public static final function findById(?string $id, array $properties = [], bool $readOnly = false): ?Entity
+	public static final function findById(string|int|null $id, array $properties = [], bool $readOnly = false): ?Entity
 	{
 		if($id == null) {
 			return null;
@@ -1501,7 +1501,8 @@ abstract class Entity extends Property {
 
 
   /**
-   * Find's all tables that reference this items primary changesdt
+   * Find's all tables that reference this items primary table
+	 *
    * @return array [['column'=>'contactId', 'table'=>'foo']]
    * @throws Exception
    */
@@ -1558,7 +1559,7 @@ abstract class Entity extends Property {
 	/**
 	 * @var array
 	 */
-	protected $attachments = [];
+	protected array $attachments = [];
 
 	public function setAttachments(array $attachments)
 	{

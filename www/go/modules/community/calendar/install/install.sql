@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_user` (
     `color` VARCHAR(21) NOT NULL,
     `sortOrder` INT NOT NULL DEFAULT 0,
     `timeZone` VARCHAR(45) NULL,
-    `includeInAvailability` ENUM('all', 'attending', 'none') NOT NULL,
+    `includeInAvailability` ENUM('all', 'attending', 'none') NOT NULL DEFAULT 'none',
 		`modSeq` INT NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`, `userId`),
     CONSTRAINT `fk_calendar_calendar_user_calendar_calendar1`
@@ -185,7 +185,6 @@ CREATE TABLE IF NOT EXISTS `calendar_participant` (
     `rolesMask` INT NOT NULL DEFAULT 0,
 	  `language` VARCHAR(20),
     `participationStatus` ENUM('needs-action', 'tentative', 'accepted', 'declined', 'delegated') NULL DEFAULT 'needs-action',
-    `scheduleAgent` ENUM('server', 'client', 'none') DEFAULT 'server',
     `expectReply` TINYINT(1) NOT NULL DEFAULT 0,
     `scheduleUpdated` DATETIME NULL,
 		`scheduleStatus` varchar(255) DEFAULT NULL,
@@ -370,6 +369,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event_category` (
 CREATE TABLE calendar_preferences (
 	userId                INT NOT NULL PRIMARY KEY,
 	weekViewGridSnap      INT NULL,
+	weekViewGridSize      INT DEFAULT 8 NOT NULL,
 	defaultDuration       VARCHAR(32) NULL,
 	autoUpdateInvitations TINYINT(1) DEFAULT 0 NOT NULL,
 	autoAddInvitations    TINYINT(1) DEFAULT 0 NOT NULL,
@@ -382,6 +382,7 @@ CREATE TABLE calendar_preferences (
 	birthdaysAreVisible   TINYINT(1) DEFAULT 0 NOT NULL,
 	tasksAreVisible       TINYINT(1) DEFAULT 0 NOT NULL,
 	holidaysAreVisible    TINYINT(1)  DEFAULT 0 NOT NULL,
+	showTooltips			    TINYINT(1)  DEFAULT 1 NOT NULL,
 	defaultCalendarId     INT UNSIGNED NULL,
 	startView             ENUM ('week', 'month', 'year', 'list') DEFAULT 'month' NULL,
 	CONSTRAINT calendar_preferences_core_user_id_fk FOREIGN KEY (userId)

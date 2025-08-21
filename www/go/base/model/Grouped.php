@@ -53,7 +53,7 @@ class Grouped extends \GO\Base\Model {
 	 * @param \GO\Base\Db\FindParams $findParams
 	 * @return \GO\Base\Db\ActiveStatement
 	 */
-	public function load($modelName, $groupBy, $selectFields, \GO\Base\Db\FindParams $findParams=null){
+	public function load($modelName, $groupBy, $selectFields, \GO\Base\Db\FindParams|null $findParams=null){
 		
 		if(!isset($findParams))
 			$findParams = \GO\Base\Db\FindParams::newInstance ();

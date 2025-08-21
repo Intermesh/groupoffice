@@ -199,7 +199,7 @@ class MimeDecode
 	 * @return stdClass Decoded results
 	 * @access public
 	 */
-	public function decode(array $params = null) : stdClass
+	public function decode(array|null $params = null) : stdClass
 	{
 
 		$this->coreDecode->includeBodies = $params['include_bodies'] ?? false;

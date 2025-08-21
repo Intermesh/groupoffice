@@ -8,7 +8,7 @@ use go\core\validate\ErrorCode;
 
 final class DkimKey extends Property
 {
-	public int $domainId;
+	public string $domainId;
 
 	public string $selector;
 

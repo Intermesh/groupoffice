@@ -5,6 +5,7 @@ namespace go\modules\community\calendar\controller;
 use go\core\exception\Forbidden;
 use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
+use go\core\model\Acl;
 use go\modules\community\calendar\model;
 
 
@@ -34,6 +35,10 @@ class Category extends EntityController {
 
 	protected function canCreate(Entity $entity): bool
 	{
+		if($entity->calendarId) {
+			$cal = model\Calendar::findById($entity->calendarId);
+			return $cal->hasPermissionLevel(Acl::LEVEL_MANAGE);
+		}
 		return $this->rights->mayChangeCategories;
 	}
 }

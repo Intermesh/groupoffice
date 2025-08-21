@@ -128,7 +128,7 @@ abstract class Part extends Model {
 	 * @param \go\core\imap\Streamer $streamer
 	 * @param string|boolean Returns boolean if streamer is given and operation was successful
 	 */
-	public function getData($peek = true, Streamer $streamer = null) {
+	public function getData($peek = true, Streamer|null $streamer = null) {
 		return $this->message->fetchPartData($this->partNumber, $peek, $streamer);
 	}
 	

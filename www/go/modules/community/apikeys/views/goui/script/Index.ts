@@ -6,7 +6,7 @@ modules.register({
 	package: "community",
 	name: "apikeys",
 	async init() {
-		client.on("authenticated", (client, session) => {
+		client.on("authenticated", ( {session}) => {
 			if (!session.capabilities["go:community:apikeys"]) {
 				return;
 			}

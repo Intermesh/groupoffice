@@ -1,4 +1,16 @@
-import {btn, column, comp, datasourcestore, DataSourceStore, t, table, Table, tbar, Window} from "@intermesh/goui";
+import {
+	btn,
+	column,
+	comp,
+	datasourcestore,
+	DataSourceStore,
+	list,
+	t,
+	table,
+	Table,
+	tbar,
+	Window
+} from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
 import {CategoryDialog} from "./CategoryDialog.js";
 
@@ -53,12 +65,10 @@ export class ManageCategoriesWindow extends Window {
 				})
 			],
 			listeners: {
-				rowdblclick: (list, storeIndex) => {
+				rowdblclick: ( {target, storeIndex}) => {
 					const dlg = new CategoryDialog();
-
 					dlg.show();
-
-					void dlg.load(list.store.get(storeIndex)!.id);
+					void dlg.load(target.store.get(storeIndex)!.id);
 				}
 			},
 			store: this.store

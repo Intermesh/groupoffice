@@ -2,7 +2,6 @@
 go.Modules.register("community", "otp");
 
 GO.mainLayout.on('authenticated', (mainLayout, user, password) => {
-
 	if(!go.Modules.isAvailable("community", "otp")) {
 		return;
 	}
@@ -23,7 +22,7 @@ GO.mainLayout.on('authenticated', (mainLayout, user, password) => {
 
 
 go.modules.community.otp.isEnforced = (user) => {
-	const enforceForGroupId = parseInt(go.Modules.get("community", "otp").settings.enforceForGroupId);
+	const enforceForGroupId = go.Modules.get("community", "otp").settings.enforceForGroupId+'';
 
 	return enforceForGroupId && user.groups.indexOf(enforceForGroupId) > -1;
 }

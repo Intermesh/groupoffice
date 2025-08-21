@@ -77,8 +77,9 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'<div class="em-contact-link-container"><span id="'+this.linkMessageId+'" class="em-contact-link"></span></div>'+
 			'<tpl if="attachments.length">'+
 			'<div style="clear:both;"></div>'+
-			'<table>'+
-			'<tr><td><h5>'+t("Attachments", "email")+'</h5></td></tr><tr><td id="'+this.attachmentsId+'">'+
+			// '<table>'+
+			// '<tr><tr><td id="'+this.attachmentsId+'">'+
+			'<div class="em-attachments" id="'+this.attachmentsId+'">'+
 			'<tpl for="attachments">'+
 				'<tpl if="extension==\'vcf\'">';
 				templateStr += '<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a> ';
@@ -92,18 +93,18 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'<i class="icon ic-more-vert" id="downloadAllMenu-'+this.downloadAllMenuId +'"></i>'+
 			'</tpl>'+
 							
-			'</td></tr>'+
-			'</table>'+
+			// '</td></tr>'+
+			// '</table>'+
+					'</div>'+
 			'</tpl>'+			
 			'<div style="clear:both;"></div>'+
 			
 			'<tpl if="links.length">'+
-				'<h5 class="em-links-header">'+t("Links")+'</h5>'+
 				'<div class="em-links">'+
 				'<tpl for="links">'+
-					'<div class="go-icon-list"><p><i class="label entity {[this.linkIconCls(values)]}"></i> ' +
+					'<div class="go-icon-list"><p class="more-btn"><i class="label entity {[this.linkIconCls(values)]}"></i> ' +
 					'<a href="#email"  onclick="const win = new go.links.LinkDetailWindow({entity\:\'{entity}\'});win.load({model_id});">'+
-					'{name}</a> <label>{description}</label>' +
+					'{name:htmlEncode}</a> <label>{description:htmlEncode}</label>' +
 					'{[this.addDeleteBtn(values)]}</p>' +
 					'</div>' +
 				'</tpl>'+
@@ -170,7 +171,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 			},
 			addDeleteBtn: function(link) {
-				return '<a class="simple-link" onclick="GO.email.unlink('+link.link_id+');">'+t('Delete') + '</a>';
+				return '<a class="icon" onclick="GO.email.unlink('+link.link_id+');">delete</a>';
 			},
 			addSlashes : function(str)
 			{
@@ -399,14 +400,19 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		}
 
 		this.actions = this.body.dom.querySelector('ul.actions');
-		GO.email.handleITIP(this.actions, data); // function is defined in calendar module
+		try {
+			GO.email.handleITIP(this.actions, data); // function is defined in calendar module
+		} catch(e) {
+			GO.errorDialog.show(t("Failed to process invitation"))
+			console.error(e);
+		}
 
 		this.body.scrollTo('top',0);
 
 		if(GO.savemailas && this.data.sender_contact_id){
 			this.linkMessageCB = new Ext.form.Checkbox({
 				name:'link',
-				boxLabel:t("Link e-mail conversation to contact %s", "savemailas").replace('%s', this.data.contact_name),
+				boxLabel:t("Link e-mail conversation to contact %s", "savemailas").replace('%s', Ext.util.Format.htmlEncode(this.data.contact_name)),
 				hideLabel:true,
 				renderTo:this.linkMessageId,
 				checked:this.data.contact_linked_message_id>0,
@@ -453,7 +459,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		if(GO.savemailas && this.data.sender_company_id){
 			this.linkCompanyMessageCB = new Ext.form.Checkbox({
 				name:'link',
-				boxLabel:t("Link e-mail conversation to company %s", "savemailas").replace('%s', this.data.company_name),
+				boxLabel:t("Link e-mail conversation to company %s", "savemailas").replace('%s', Ext.util.Format.htmlEncode(this.data.company_name)),
 				hideLabel:true,
 				renderTo:this.linkMessageId,
 				checked:this.data.company_linked_message_id>0,

@@ -27,10 +27,10 @@ export class SystemSettings extends Component {
 				fitParent:true,
 				store,
 				columns: [
-					// column({id:'id', header:'id'}),
+					column({id:'active',width:40, header:' ', renderer: (v, record) => '<i class="icon">'+(record.lastError ? 'warning' : (v?'check':'close'))+'</i>'}),
 					column({id:'name', header: t("Name")}),
 					column({id:'lastSync', header: t('Last Sync'),renderer: (date: string) => Format.smartDateTime(date, true)}),
-
+					column({id:'collections', header: t('Collections'), renderer: v => v ? Object.keys(v).length+'' : '0'}),
 					column({
 						sticky: true,
 						width: 32,
@@ -85,17 +85,17 @@ export class SystemSettings extends Component {
 					multiSelect: false,
 				},
 				listeners: {
-					rowdblclick:(tbl, storeIndex) => {
+					rowdblclick:( {target, storeIndex}) => {
 						const d = new AccountWindow();
 						d.show();
-						void d.load(tbl.store.get(storeIndex)!.id!);
+						void d.load(target.store.get(storeIndex)!.id!);
 					},
 
-					delete: async (tbl) => {
-						const ids: string[] = tbl.rowSelection!.getSelected().map(row => row.id);
+					delete: async ({target}) => {
+						const ids: string[] = target.rowSelection!.getSelected().map(row => row.id);
 						this.deleteAccounts(ids);
 					},
-					render: tbl => { tbl.store.load(); }
+					render: ({target}) => { void target.store.load(); }
 				}
 			})
 		));
@@ -108,8 +108,8 @@ export class SystemSettings extends Component {
 				title: t('Keep calendar data?'),
 				closable: false,
 				width: 600,
-				listeners: {focus: (w) => {
-						w.findChild("yes")!.focus();
+				listeners: {focus: ({target}) => {
+						target.findChild("yes")!.focus();
 					}}
 			},
 
@@ -125,7 +125,6 @@ export class SystemSettings extends Component {
 						w.close();
 					}
 				}),
-
 				btn({itemId: "yes", text: t("Delete all"), cls: "filled primary", handler: () => {
 						jmapds("DavAccount").setParams = {keepData:false};
 						ids.map(id => jmapds("DavAccount").destroy(id));

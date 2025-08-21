@@ -13,6 +13,7 @@ use PDO;
 use PDOException;
 use PDOStatement;
 use stdClass;
+use Throwable;
 
 /**
  * PDO Statement
@@ -145,7 +146,7 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, Iter
 
 		try {
 			return $this->pdoStmt->bindValue($param, $value, $type);
-		} catch(\Throwable $e) {
+		} catch(PDOException $e) {
 			ErrorHandler::logException($e, "Invalid value for '" . $param . "'" . var_export($value, true));
 			throw $e;
 		}
@@ -163,7 +164,7 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, Iter
 	 * @return bool Always returns true but must be compatible with PHP function
 	 * @throws DbException
 	 */
-	public function execute(array $params = null): bool
+	public function execute(array|null $params = null): bool
 	{
 		try {
 
@@ -244,7 +245,7 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, Iter
 	 * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
 	 */
 
-	public function setFetchMode(int $mode, null|string|object|int $className = null, array $params = null): bool
+	public function setFetchMode(int $mode, null|string|object|int $className = null, array|null $params = null): bool
 	{
 		$args = [$mode];
 		if(isset($className)) {
@@ -351,7 +352,7 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, Iter
 		int|string $param,
 		mixed &$var,
 		int $type = PDO::PARAM_STR,
-		int $maxLength = null,
+		int|null $maxLength = null,
 		mixed $driverOptions = null
 	): bool {
 		return $this->pdoStmt->bindParam($param, $var, $type, $maxLength, $driverOptions);

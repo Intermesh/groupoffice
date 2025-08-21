@@ -1,5 +1,4 @@
 <?php
-
 namespace go\core\orm;
 
 use DateTimeImmutable;
@@ -14,6 +13,7 @@ use go\core\db\DbException;
 use go\core\db\Statement;
 use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
+use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
 use DateTime as CoreDateTime;
@@ -26,6 +26,7 @@ use PDO;
 use PDOException;
 use ReflectionClass;
 use ReflectionProperty;
+use Throwable;
 use function GO;
 use go\core\db\Table;
 use go\core\ErrorHandler;
@@ -189,7 +190,7 @@ abstract class Property extends Model {
 	 *
 	 * @param array $record
 	 * @return $this
-	 * @throws Exception
+	 * @throws Throwable
 	 */
 	public function populate(array $record): static
 	{
@@ -203,19 +204,39 @@ abstract class Property extends Model {
 		return $this;
 	}
 
+	/**
+	 * @throws Throwable
+	 */
 	private function populateTableRecord(array $record) : void {
 		$m = static::getMapping();
 		foreach($record as $colName => $value) {
-			if(str_contains($colName, '.')) {
-				$this->setPrimaryKey($colName, $value);
-			} else {
-				$col = $m->getColumn($colName);
-				if($col) {
-					$value = $col->castFromDb($value);
+			try {
+				if (str_contains($colName, '.')) {
+					$this->setPrimaryKey($colName, $value);
+				} else {
+					$this->$colName = $this->castProperty($colName, $value);
 				}
-				$this->$colName = $value;
+			} catch(Throwable $e) {
+				ErrorHandler::logException($e, "Failed to populate property ' " .static::class. ":{$colName}' with value '" . var_export($value, true) . "'");
+				throw $e;
 			}
 		}
+	}
+
+	/**
+	 * Casts a property to the right type based on the database column type
+	 *
+	 * @param string $colName
+	 * @param $value
+	 * @return mixed
+	 * @throws Exception
+	 */
+	protected function castProperty(string $colName, $value) : mixed {
+		$col = static::getMapping()->getColumn($colName);
+		if ($col) {
+			$value = $col->castFromDb($value);
+		}
+		return $value;
 	}
 
 	/**
@@ -389,7 +410,8 @@ abstract class Property extends Model {
 				if(!$prop && $relation->autoCreate) {
 					$prop = new $cls($this, true, [], $this->readOnly);
 
-					$this->applyRelationKeys($relation, $prop);
+					if(!$this->isNew())
+						$this->applyRelationKeys($relation, $prop);
 				}
 				$this->{$relation->name} = $prop;
 				break;
@@ -477,9 +499,6 @@ abstract class Property extends Model {
 		return $stmt;
 	}
 
-
-
-
 	/**
 	 * Needed to close the database connection
 	 *
@@ -489,7 +508,6 @@ abstract class Property extends Model {
 	{
 		self::$cachedRelationStmts = [];
 	}
-
 
 	private static function queryRelation($cls, array $where, Relation $relation, $readOnly, $owner): Statement
 	{
@@ -521,12 +539,8 @@ abstract class Property extends Model {
 				$stmt->bindValue(':'.$field, $value);
 			}
 		}
-
-
 		$stmt->execute();
-
 		return $stmt;
-
 	}
 
 	/**
@@ -541,6 +555,11 @@ abstract class Property extends Model {
 		foreach ($relation->keys as $from => $to) {
 			$where[$to] = $this->$from ?? null;
 		}
+
+		if(is_a($relation->propertyName, UserProperty::class, true)) {
+			$where['userId'] = $this->forUserId();
+		}
+
 		foreach ($relation->constants as $name => $value) {
 			$where[$name] = $value;
 		}
@@ -935,10 +954,10 @@ abstract class Property extends Model {
 	/**
 	 * Changes the string key "1-2" into ['primaryKey1' => 1', 'primaryKey2' => '2]
 	 *
-	 * @param string $id eg. "1-2"
+	 * @param string|int $id eg. "1-2"
 	 * @return array eg. ['primaryKey1' => 1', 'primaryKey2' => '2]
 	 */
-	public static function idToPrimaryKeys(string $id): array
+	public static function idToPrimaryKeys(string|int $id): array
 	{
 		$primaryTable = static::getMapping()->getPrimaryTable();
 
@@ -1372,7 +1391,7 @@ abstract class Property extends Model {
 	 *
 	 * @var bool
 	 */
-	public $dontChangeModifiedAt = false;
+	public bool $dontChangeModifiedAt = false;
 
 	/**
 	 * Sets some default values such as modifiedAt and modifiedBy
@@ -1842,7 +1861,8 @@ abstract class Property extends Model {
 		$stmt->execute();
 	}
 
-	public function forUserId(){
+	public function forUserId(): ?int
+	{
 		return $this->_forUserId ?? go()->getUserId();
 	}
 
@@ -2157,7 +2177,7 @@ abstract class Property extends Model {
 					return;
 				}
 
-				$enumValues = str_getcsv(strtolower($matches[1]), ',' , "'");
+				$enumValues = str_getcsv(strtolower($matches[1]), ',' , "'", "");
 
 				if(!in_array(strtolower($value), $enumValues)) {
 					$this->setValidationError($column->name, ErrorCode::MALFORMED, "Invalid value (".$value.") for " . $column->dataType);
@@ -2536,7 +2556,7 @@ abstract class Property extends Model {
 		$keys = static::getPrimaryKey();
 		$v = [];
 		foreach($keys as $key) {
-			$v[$key] = $this->$key;
+			$v[$key] = $this->$key ?? null;
 		}
 
 		return $v;
@@ -2706,7 +2726,9 @@ abstract class Property extends Model {
 					if(is_object($v)) {
 						$copy->$name = clone $v;
 					}	else {
-						$copy->$name = $v;
+						if(isset($v) || isset($this->$name) ) {
+							$copy->$name = $v;
+						}
 					}
 				}
 			} else {
@@ -2721,7 +2743,9 @@ abstract class Property extends Model {
 					}
 				} else {
 					// protected prop that's neither a column or relation
-					$copy->$name = $this->$name;
+					if(isset($copy->$name) || isset($this->$name) ) {
+						$copy->$name = $this->$name ?? null;
+					}
 				}
 			}
 		}

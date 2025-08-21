@@ -2,6 +2,7 @@
 
 namespace go\modules\community\calendar\model;
 
+use GO\Base\Html\Error;
 use go\core\auth\TemporaryState;
 use go\core\db\Column;
 use go\core\ErrorHandler;
@@ -84,7 +85,7 @@ class CalDAVBackend extends AbstractBackend implements
 				'principaluri' => $principalUri, // echo back
 				'{DAV:}displayname' => $tasklist->name,
 				//'{http://apple.com/ns/ical/}refreshrate' => '0',
-				'{http://apple.com/ns/ical/}calendar-order' => $tasklist->sortOrder,
+				'{http://apple.com/ns/ical/}calendar-order' => $tasklist->sortOrder ?: $tasklist->id,
 				'{http://apple.com/ns/ical/}calendar-color' => '#'.$tasklist->color,
 				'{urn:ietf:params:xml:ns:caldav}calendar-description' => $tasklist->description,
 				'{urn:ietf:params:xml:ns:caldav}calendar-timezone' => "BEGIN:VCALENDAR\r\n" . $tz->serialize() . "END:VCALENDAR",
@@ -127,7 +128,7 @@ class CalDAVBackend extends AbstractBackend implements
 				$values[$dbName] = $properties[$xmlName];
 			}
 		}
-		if($values['color']) {
+		if(isset($values['color'])) {
 			$values['color'] = substr($values['color'], 1); // remove #
 		}
 		switch($type[0]) {
@@ -183,7 +184,6 @@ class CalDAVBackend extends AbstractBackend implements
 					break;
 				case 't':
 					$cal = Tasklist::findById($id);
-					unset($newValues['sortOrder']); // not supported for tasklist
 					break;
 			}
 			$cal->setValues($newValues);
@@ -216,36 +216,85 @@ class CalDAVBackend extends AbstractBackend implements
 
 		switch($type) {
 			case 'c': $component = 'vevent';
-				$stmt = CalendarEvent::find(['id', 'modifiedAt', 'uid'])
-					->select(['cce.id as id','uid','eventdata.modifiedAt as modified', 'uri'])
-					->filter(['inCalendars'=>$id, 'before'=> $end, 'after' => $start])
-					->fetchMode(\PDO::FETCH_OBJ);
+				$stmt = CalendarEvent::find()
+					->filter(['hideSecret' => 1, 'inCalendars' => $id, 'before' => $end, 'after' => $start]);
 				break;
 			case 't' : $component = 'vtodo';
-				$stmt =  Task::find(['id', 'modifiedAt', 'uid'])
-					->select(['task.id as id','task.uid','task.modifiedAt as modified','uri'])
-					->filter(['tasklistId' => $id])->fetchMode(\PDO::FETCH_OBJ);
+				$stmt =  Task::find()
+					->filter(['tasklistId' => $id]);
 				break;
 			default: return $result;
 		}
-
-		go()->debug($stmt);
-
 		foreach ($stmt as $object) {
-			$lastModified = strtotime($object->modified);
-			$result[] = [
-				'id' => $object->id,
-				'calendarid' => $type.'-'.$id, // needed for bug in local delivery scheduler
-				'uri' => $object->uri ?? (strtr($object->uid, '+/=', '-_.') . '.ics'),
-				'lastmodified' => $lastModified,
-				'etag' => '"' . $lastModified . '"',
-				'component' => $component
-			];
+			$result[] = $this->toCalendarObject($object, $calendarId, $this->getObjectUri($object, $component), $component);
 		}
 
-		go()->debug($result);
-
 		return $result;
+	}
+
+	private function getObjectUri($object, $component) : string {
+		if($component == 'vtodo') {
+			return $object->getUri();
+		} else {
+			return $object->uri();
+		}
+	}
+
+//	TODO, this function does not use uri's parent function could be optimized
+//	public function getMultipleCalendarObjects($calendarId, array $uris)
+//	{
+//		go()->debug("CalDAVBackend::getMultipleCalendarObjects($calendarId)");
+//
+//		list($type, $id) = explode('-', $calendarId,2);
+//
+//		switch($type) {
+//			case 'c': // calendar
+//				$component = 'vevent';
+//				$objects = CalendarEvent::find()->filter(['hideSecret'=>1])
+//					->where(['cce.calendarId'=> $id]);
+//
+//				break;
+//			case 't': // tasklist
+//				$component = 'vtodo';
+//				$objects = Task::find()
+//					->where(['task.tasklistId'=> $id]);
+//				break;
+//			default:
+//				go()->log("incorrect calendarId ".$calendarId);
+//				return null;
+//		}
+//
+//		$result = [];
+//		foreach($objects as $object) {
+//			$result[] = $this->toCalendarObject($object, $calendarId, $this->getObjectUri($object, $component), $component);
+//		}
+//
+//		return $result;
+//	}
+
+	/**
+	 * Returns a list of calendar objects.
+	 *
+	 * This method should work identical to getCalendarObject, but instead
+	 * return all the calendar objects in the list as an array.
+	 *
+	 * If the backend supports this, it may allow for some speed-ups.
+	 *
+	 * @param mixed $calendarId
+	 *
+	 * @return array
+	 */
+	public function getMultipleCalendarObjects($calendarId, array $uris)
+	{
+		$o = [];
+		foreach($uris as $uri) {
+			$obj = $this->getCalendarObject($calendarId, $uri);
+			if($obj) {
+				$o[] = $obj;
+			}
+		}
+
+		return $o;
 	}
 
 	/**
@@ -253,7 +302,6 @@ class CalDAVBackend extends AbstractBackend implements
 	 */
 	public function getCalendarObject($calendarId, $objectUri)
 	{
-		$uid = pathinfo($objectUri, PATHINFO_FILENAME);
 		list($type, $id) = explode('-', $calendarId,2);
 
 		switch($type) {
@@ -264,42 +312,19 @@ class CalDAVBackend extends AbstractBackend implements
 				break;
 			case 't': // tasklist
 				$component = 'vtodo';
-				$object = Task::find()->where(['task.tasklistId'=> $id, 'task.uid'=>$uid])->single();
+				$object = Task::find()->where(['task.tasklistId'=> $id, 'task.uri' => $objectUri])->single();
 				break;
 			default:
 				go()->log("incorrect calendarId ".$calendarId. ' for '.$objectUri);
 				return null;
 		}
 
-
 		if (!$object) {
 			go()->log($component. " $objectUri not found in calendar $calendarId!");
 			return null;
 		}
 
-		$blob = $object->icsBlob();
-		try {
-			$data = $blob->getFile()->getContents();
-		} catch(\Exception$e) {
-			ErrorHandler::logException($e);
-			$blob = $object->icsBlob();
-			$data = $blob->getFile()->getContents();
-		}
-
-		go()->debug("CalDAVBackend::getCalendarObject($calendarId, $objectUri, ");
-		go()->debug($data);
-		go()->debug(")");
-
-		$lastModified = strtotime($object->modifiedAt);
-		return [
-			'id' => $object->id,
-			'uri' => $objectUri,
-			'lastmodified' => $lastModified,
-			'etag' => '"' . $lastModified . '"',
-			'size' => $blob->size,
-			'calendardata' => $data,
-			'component' => $component,
-		];
+		return $this->toCalendarObject($object, $calendarId, $objectUri, $component);
 	}
 
 	private static function eventByVEvent($vcalendar, $calendarId) {
@@ -356,6 +381,7 @@ class CalDAVBackend extends AbstractBackend implements
 			case 't': // tasklist
 				$object = new Task();
 				$object = (new VCalendar)->vtodoToTask($vCalendar, $id, $object);
+				$object->setUri($objectUri);
 
 				break;
 			default:
@@ -365,8 +391,6 @@ class CalDAVBackend extends AbstractBackend implements
 		if(!$object->save()) {
 			throw new SaveException($object);
 		}
-
-		go()->debug("URI: " . $object->uri());
 
 		$etag = $object->modifiedAt->getTimestamp();
 
@@ -588,7 +612,43 @@ class CalDAVBackend extends AbstractBackend implements
 		} else {
 			return null;
 		}
+	}
 
+	/**
+	 * @param mixed $object
+	 * @param mixed $calendarId
+	 * @param string $objectUri
+	 * @param string $component
+	 * @return array
+	 */
+	private function toCalendarObject(mixed $object, mixed $calendarId, string $objectUri, string $component): array
+	{
+		$blob = $object->icsBlob();
+		try {
+			$data = $blob->getFile()->getContents();
+		} catch (\Exception $e) {
+			ErrorHandler::logException($e);
+			$blob = $object->icsBlob();
+			$data = $blob->getFile()->getContents();
+		}
 
+		if(empty($objectUri)) {
+			ErrorHandler::log("Object URI is empty of ". $object->id ."  in calendar  ". $calendarId);
+		}
+
+//		go()->debug("CalDAVBackend::getCalendarObject($calendarId, $objectUri, ");
+//		go()->debug($data);
+//		go()->debug(")");
+
+		$lastModified = strtotime($object->modifiedAt);
+		return [
+			'id' => $object->id,
+			'uri' => $objectUri,
+			'lastmodified' => $lastModified,
+			'etag' => '"' . $lastModified . '"',
+			'size' => $blob->size,
+			'calendardata' => $data,
+			'component' => $component,
+		];
 	}
 }

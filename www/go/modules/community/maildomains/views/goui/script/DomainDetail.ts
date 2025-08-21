@@ -179,7 +179,7 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 			})
 		)
 
-		this.on("load",(detailPanel, entity) => {
+		this.on("load",({entity}) => {
 			void this.form.load(entity.id);
 
 			this.mailboxTable.store.setFilter("domainId", {domainId: entity.id})
@@ -200,8 +200,14 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 	private createMailboxesTab() {
 		const mailboxTable = new MailboxTable();
 
-		mailboxTable.on("rowdblclick", async (table, rowIndex, _ev) => {
-			await this.openMailboxDlg(table.store.get(rowIndex)!.id);
+		mailboxTable.on("rowdblclick", async ( {storeIndex}) => {
+			await this.openMailboxDlg(mailboxTable.store.get(storeIndex)!.id);
+		});
+
+		mailboxTable.on("delete", async ({target}) => {
+			const ids = target.rowSelection!.getSelected().map(row => row.id);
+			await jmapds("MailBox")
+				.confirmDestroy(ids);
 		});
 
 		this.mailboxTable = mailboxTable;
@@ -215,9 +221,9 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 				'->',
 				searchbtn({
 					listeners: {
-						input: (_sender, text) => {
+						input: ({text}) => {
 							(mailboxTable!.store.queryParams.filter as Filter).text = text;
-							mailboxTable!.store.load();
+							void mailboxTable!.store.load();
 						}
 					}
 				}),
@@ -229,17 +235,6 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 						await this.openMailboxDlg();
 					}
 				}),
-				// btn({
-				// 	icon: "delete",
-				// 	title: t("Delete"),
-				// 	handler: async (_btn) => {
-				// 		const ids = mailboxTable!.rowSelection!.selected.map(index => mailboxTable!.store.get(index)!.id);
-				// 		await jmapds("MailBox")
-				// 			.confirmDestroy(ids);
-				// 	}
-				// }),
-
-
 
 				mstbar({table: mailboxTable},
 					"->",
@@ -288,8 +283,14 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 	private createAliasTab() {
 
 		const aliasTable = new AliasTable();
-		aliasTable.on("rowdblclick", async (table, rowIndex, _ev) => {
-			await this.openAliasDlg(table.store.get(rowIndex)!.id);
+		aliasTable.on("rowdblclick", async ({storeIndex}) => {
+			await this.openAliasDlg(aliasTable.store.get(storeIndex)!.id);
+		});
+
+		aliasTable.on("delete", async ({target}) => {
+			const ids = target.rowSelection!.getSelected().map(row => row.id);
+			await jmapds("MailAlias")
+				.confirmDestroy(ids);
 		});
 
 		this.aliasTable = aliasTable;
@@ -302,7 +303,7 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 				'->',
 				searchbtn({
 					listeners: {
-						input: (_sender, text) => {
+						input: ( {text}) => {
 							(aliasTable!.store.queryParams.filter as Filter).text = text;
 							aliasTable!.store.load();
 						}

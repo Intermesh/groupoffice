@@ -14,36 +14,12 @@ use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
 
 final class Oauth2Client extends Entity
 {
-
-	/**
-	 * @var int
-	 */
-	public $id;
-
-	/**
-	 * @var string
-	 */
-	public $name;
-
-	/**
-	 * @var int
-	 */
-	public $defaultClientId;
-
-	/**
-	 * @var string
-	 */
-	public $clientSecret;
-
-	/**
-	 * @var string
-	 */
-	public $clientId;
-
-	/**
-	 * @var string
-	 */
-	public $projectId;
+	public ?string $id;
+	public string $name;
+	public ?string $defaultClientId;
+	public string $clientSecret;
+	public string $clientId;
+	public ?string $projectId;
 
 
 	/**
@@ -67,7 +43,7 @@ final class Oauth2Client extends Entity
 	 * @return ?AbstractProvider
 	 * @throws NotFound
 	 */
-	public function getProvider(array $scopes = null): ?AbstractProvider
+	public function getProvider(array|null $scopes = null): ?AbstractProvider
 	{
 		$defaultClient = DefaultClient::findById($this->defaultClientId);
 		$url = rtrim(go()->getSettings()->URL, '/');

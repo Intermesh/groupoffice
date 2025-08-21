@@ -11,17 +11,12 @@ import {
 import {statusIcons, t} from "./Index.js";
 import {client, jmapds, validateEmail} from "@intermesh/groupoffice-core";
 
-interface ParticipantFieldEventMap<Type> extends FieldEventMap<Type> {
-	beforeadd: (me:Type, principal: any) => void
+interface ParticipantFieldEventMap extends FieldEventMap {
+	beforeadd: {principal: any}
 }
-export const participantfield = (config?: Config<ParticipantField, ParticipantFieldEventMap<ParticipantField>>) => createComponent(new ParticipantField(), config);
+export const participantfield = (config?: Config<ParticipantField>) => createComponent(new ParticipantField(), config);
 
-export interface ParticipantField extends Component {
-	on<K extends keyof ParticipantFieldEventMap<this>, L extends Function>(eventName: K, listener: Partial<ParticipantFieldEventMap<this>>[K], options?: ObservableListenerOpts): L;
-	un<K extends keyof ParticipantFieldEventMap<this>>(eventName: K, listener: Partial<ParticipantFieldEventMap<this>>[K]): boolean;
-	fire<K extends keyof ParticipantFieldEventMap<this>>(eventName: K, ...args: Parameters<ParticipantFieldEventMap<any>[K]>): boolean;
-}
-export class ParticipantField extends Component {
+export class ParticipantField extends Component<ParticipantFieldEventMap> {
 
 	list!: MapField
 	btnFreeBusy!: Button
@@ -35,8 +30,8 @@ export class ParticipantField extends Component {
 		this.items.add(
 			this.list = mapfield({name: 'participants', cls:'goui-pit',
 				listeners: {
-					'change': (me,v) => {
-						this.fire('change', this, v, null);
+					'change': (newValue) => {
+						this.fire('change', {newValue, oldValue:null});
 					}
 				},
 				buildField: (v: any) => {
@@ -56,8 +51,8 @@ export class ParticipantField extends Component {
 						btn({icon:'more_vert', menu: menu({},
 								btn({text: v.email, disabled: true}),
 								hr(),
-								checkbox({label:'Optioneel',listeners: {'change': (cb) => {
-									if(cb.value) {
+								checkbox({label:'Optioneel',listeners: {'change': ({target}) => {
+									if(target.value) {
 										delete v.roles.attendee; // make optional (non-required)
 									} else {
 										v.roles.attendee = true;
@@ -65,7 +60,7 @@ export class ParticipantField extends Component {
 								} }}),
 								btn({icon:'delete',text:t('Delete'), handler: _ => {
 										f.remove();
-										this.fire('change', this, this.list.value, null);
+										this.fire('change', {newValue: this.list.value, oldValue:null});
 									}
 								}),
 								hr(),
@@ -77,37 +72,37 @@ export class ParticipantField extends Component {
 				}
 			}),
 			autocomplete({
-				placeholder:t('Invite people'),
+				placeholder:t('Invite people') + ' / ' + t('Resource request'),
 				//valueProperty: "id",
 				listeners: {
-					'autocomplete': async (field, input) => {
-						field.list.store.setFilter('text', {text: input})
-						field.list.store.queryParams.limit = 20;
-						field.list.store.sort = [{property: "name"}];
-						await field.list.store.load();
-						if(field.list.store.count() == 0) {
-							field.menu.hide();
+					'autocomplete': async ({target, input}) => {
+						target.list.store.setFilter('text', {text: input})
+						target.list.store.queryParams.limit = 20;
+						target.list.store.sort = [{property: "name"}];
+						await target.list.store.load();
+						if(target.list.store.count() == 0) {
+							target.menu.hide();
 						}
 					},
-					'render' : (me) => {
-						me.el.on('keydown' , ev => {
+					'render' : ({target}) => {
+						target.el.on('keydown' , ev => {
 							if(ev.key === 'Enter') {
 								ev.preventDefault();
-								if(validateEmail(me.input!.value)) {
-									const email = me.input!.value;
+								if(validateEmail(target.input!.value)) {
+									const email = target.input!.value;
 									this.addParticipant({id:email,email});
-									me.menu.hide();
-									me.value = "";
+									target.menu.hide();
+									target.value = "";
 								}
 							}
 						});
 					},
-					'select': (me, record) => {
+					'select': ({target, record}) => {
 
 						if(record)
 							this.addParticipant(record);
 
-						me.value = "";
+						target.value = "";
 					}
 				},
 				list:table({
@@ -138,9 +133,9 @@ export class ParticipantField extends Component {
 						})
 					],
 					listeners: {
-						render: table => {
+						render: ({target}) => {
 							// register the parent element to load store on scroll down
-							table.store.addScrollLoader(table.findAncestorByType(Menu)!.el);
+							target.store.addScrollLoader(target.findAncestorByType(Menu)!.el);
 						}
 					}
 				})
@@ -166,13 +161,12 @@ export class ParticipantField extends Component {
 	}
 
 	addParticipant(principal: any) {
-		this.fire('beforeadd', this, principal);
+		this.fire('beforeadd', {principal});
 
 		this.list.add({
 			email:principal.email,
 			name: principal.name || principal.email,
 			roles: {attendee:true},
-			scheduleAgent: principal.id ? 'server' : 'server',
 			kind: principal.type ?? 'individual',
 			participationStatus:"needs-action",
 			expectReply:true

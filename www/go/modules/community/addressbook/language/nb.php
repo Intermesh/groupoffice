@@ -70,8 +70,8 @@ return array (
   array (
     'work' => 'Arbeid',
     'home' => 'Hjem',
-    'mobile' => 'Mobil',
-    'workmobile' => 'Jobbmobil',
+    'cell' => 'Mobil',
+    'workcell' => 'Jobbmobil',
     'fax' => 'Faks privat',
     'workfax' => 'Faks arbeid',
   ),

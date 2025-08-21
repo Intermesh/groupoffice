@@ -14,16 +14,12 @@ import {client, jmapds} from '@intermesh/groupoffice-core';
 import {CalendarItem} from "./CalendarItem.js";
 import {t} from "./Index.js";
 
-export interface AvailabilityWindowEventMap<Type> extends WindowEventMap<Type> {
-	changetime: (me: Type, start: DateTime, end:DateTime) => void
+export interface AvailabilityWindowEventMap extends WindowEventMap {
+	changetime: {start: DateTime, end:DateTime}
 }
 
-export interface AvailabilityWindow extends Window {
-	on<K extends keyof AvailabilityWindowEventMap<this>, L extends Function>(eventName: K, listener: Partial<AvailabilityWindowEventMap<this>>[K], options?: ObservableListenerOpts): L;
-	fire<K extends keyof AvailabilityWindowEventMap<this>>(eventName: K, ...args: Parameters<AvailabilityWindowEventMap<any>[K]>): boolean
-}
 
-export class AvailabilityWindow extends Window {
+export class AvailabilityWindow extends Window<AvailabilityWindowEventMap> {
 
 	date!: DateTime
 	dateCmp:Component
@@ -78,9 +74,10 @@ export class AvailabilityWindow extends Window {
 		},mouseUp = (e: MouseEvent) => {
 			el.un('mousemove', mouseMove);
 			window.removeEventListener('mouseup', mouseUp);
-			this.fire('changetime',this,
-				this.date.clone().setHours(0, startM),
-				this.date.clone().setHours(0, endM)
+			this.fire('changetime', {
+					start: this.date.clone().setHours(0, startM),
+					end: this.date.clone().setHours(0, endM)
+				}
 			);
 		};
 		el.on('mousedown', (e) => {
@@ -111,7 +108,7 @@ export class AvailabilityWindow extends Window {
 		jmapds('Principal').get(this.principalIds).then(response => {
 			for(const p of response.list) {
 
-				let available = p.id == go.User.id ? 'Organizer' : 'Beschikbaar' ;
+				let available = t(p.id == go.User.id ? 'Organizer' : 'Available') ;
 				const mAvatar = avatar({cls:"",displayName: p.name, backgroundImage: p.avatarId ? client.downloadUrl(p.avatarId) : undefined});
 
 				this.scheduleContainers[p.id!] = E('dd');

@@ -102,18 +102,20 @@ $updates['202402221543'][] = function(){ // insert event overrides
 
 $updates['202402221543'][] = function(){ // migrate recurrence rules and fix lastOccurrence and firstOccurrence
 
-	$stmt = go()->getDbConnection()->query("SELECT eventId, recurrenceRule,`start`,`timeZone`,`duration` FROM calendar_event WHERE recurrenceRule IS NOT NULL AND recurrenceRule != ''");
+	$stmt = go()->getDbConnection()->query("SELECT eventId, recurrenceRule,`start`,`timeZone`,`duration`,`showWithoutTime` FROM calendar_event WHERE recurrenceRule IS NOT NULL AND recurrenceRule != ''");
 
 	while($row = $stmt->fetch()) {
 
 		if($row['recurrenceRule'][0] == '{')
 			continue; // already done
+		$tz = $row['timeZone'] ? new DateTimeZone($row['timeZone']) : null;
 
-		$start = new DateTime($row["start"]);
+
+		$start = new DateTime($row["start"], $tz);
 		try {
 			$rrule = \go\core\util\Recurrence::fromString($row['recurrenceRule'], $start);
 
-			$recurrenceRule = json_encode($rrule->toArray());
+			$recurrenceRule = json_encode($rrule->toArray($row['showWithoutTime']));
 			$data = ['recurrenceRule' => $recurrenceRule];
 			if(isset($rrule->until)) {
 				$data['lastOccurrence'] = clone $rrule->until;
@@ -265,8 +267,11 @@ $updates['202503131043'][] = "UPDATE core_link l
 	JOIN core_entity et ON et.id = l.toEntityTypeId
 	JOIN calendar_calendar_event e on e.eventId = l.toId AND et.name = 'CalendarEvent'
 	SET l.toId = e.id;";
-// fixed missing global calendars because it had calendar_id=0 in the old database
-$updates['202504070955'][] = "";
+// new migrations will update the alerts. Others will have dismissed those in the last 3 months.
+$updates['202504070955'][] = "UPDATE IGNORE core_alert a
+	JOIN core_entity et ON et.id = a.entityTypeId
+	JOIN calendar_calendar_event e on e.eventId = a.entityId AND et.name = 'CalendarEvent'
+	SET a.entityId = e.id;";
 
 $updates['202504071345'][] = "ALTER TABLE `calendar_event` CHANGE COLUMN `location` `location` TEXT NULL;";
 // replace existing resource into core_participants
@@ -288,4 +293,25 @@ $updates["202505011057"][] = "ALTER TABLE `calendar_calendar_event` ADD UNIQUE I
 $updates["202505061137"][] = "ALTER TABLE `calendar_event` ADD INDEX `fk_calendar_event_uid_index` (`uid` ASC);";
 $updates["202505071158"][] = "ALTER TABLE `calendar_calendar` ADD COLUMN `webcalUri` VARCHAR(512) NULL DEFAULT NULL AFTER `timeZone`;";
 
+$updates["202506061051"][] = "alter table calendar_calendar_user
+    alter column includeInAvailability set default 'none';";
+
+
+$updates["202506121207"][] = "alter table `calendar_preferences` add column showTooltips	TINYINT(1)  DEFAULT 1 NOT NULL AFTER holidaysAreVisible;";
+
+
+$updates['202506130832'][] = "CREATE TABLE IF NOT EXISTS calendar_schedule_object (
+                                   id INT(11) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                   principaluri VARBINARY(255),
+                                   calendardata MEDIUMBLOB,
+                                   uri VARBINARY(200),
+                                   lastmodified INT(11) UNSIGNED,
+                                   etag VARBINARY(32),
+                                   size INT(11) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+$updates["202507221653"][] = "alter table `calendar_preferences` add column weekViewGridSize	INT DEFAULT 8 NOT NULL AFTER weekViewGridSnap;";
+
 // TODO: calendar views -> custom filters
+
+

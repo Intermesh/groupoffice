@@ -166,8 +166,9 @@ class Extjs3 {
 
 			$str .= 'GO.lang = ' . json_encode($l) . ";\n";
 			
-			$str .= "GO.lang.holidaySets = " . json_encode(\GO\Base\Model\Holiday::getAvailableHolidayFiles()) .";\n";
-			
+//			$str .= "GO.lang.holidaySets = " . json_encode(\GO\Base\Model\Holiday::getAvailableHolidayFiles()) .";\n";
+			$str .= "GO.lang.holidaySets = " . json_encode(\go\core\model\Holiday::getHolidaySets()) .";\n";
+
 			$cacheFile->putContents($str);
 		}
 		
@@ -238,7 +239,7 @@ class Extjs3 {
 		return $themes;
 	}
 
-	private $theme;
+	private $theme = 'Paper';
 
 	public function getTheme() {
 		if(!isset($this->theme)) {
@@ -357,7 +358,24 @@ class Extjs3 {
 			echo '<script src="' . GO::view()->getTheme()->getUrl() . 'MainLayout.js" type="text/javascript"></script>';
 			echo "\n";
 		}
-		echo '<script>Ext.onReady(GO.mainLayout.boot, GO.mainLayout);</script>';
+		echo '<script>';
+
+		//these parameter are passed by dialog.php. These are used to directly link to
+//a dialog.
+		if (isset($_REQUEST['f'])) {
+			if (substr($_REQUEST['f'], 0, 9) == '{GOCRYPT}')
+				$fp = Crypt::decrypt($_REQUEST['f']);
+			else
+				$fp = json_decode(base64_decode($_REQUEST['f']), true);
+
+			GO::debug("External function parameters:");
+			GO::debug($fp);
+
+			echo 'if (GO.' . $fp['m'] .'){GO.mainLayout.on("render", function () {GO. '. $fp['m'] . '.' . $fp['f'] . '.call(this,  '. json_encode($fp['p']) .');});}';
+		}
+
+
+		echo 'Ext.onReady(GO.mainLayout.boot, GO.mainLayout);</script>';
 	}
 
 	private function clientSettings(){

@@ -75,8 +75,8 @@ return array (
   array (
     'work' => 'Trabalho',
     'home' => 'Residência',
-    'mobile' => 'Telemóvel',
-    'workmobile' => 'Telemóvel de trabalho',
+    'cell' => 'Telemóvel',
+    'workcell' => 'Telemóvel de trabalho',
     'fax' => 'Fax',
     'workfax' => 'Fax de trabalho',
   ),

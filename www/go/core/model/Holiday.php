@@ -1,6 +1,10 @@
 <?php
-namespace go\modules\community\calendar\model;
+namespace go\core\model;
+use go\core\Environment;
 use go\core\ErrorHandler;
+use go\core\fs\File;
+use go\core\fs\Folder;
+use go\core\util\DateTime;
 
 class Holiday {
 
@@ -13,6 +17,7 @@ class Holiday {
 	private static $days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 	private static $months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
+	static $set;
 	static $lang;
 	static $names;
 
@@ -27,6 +32,15 @@ class Holiday {
 	public $type = 'public';
 
 	public $duration = 'P1D';
+
+	public static $mapping = array(
+		'at'=>'de-at',
+		'ch'=>'de-ch',
+		'au'=>'en-au',
+		'uk'=>'en_UK',
+		'us'=>'en-US',
+	);
+
 
 	public function __construct(string $rule, $data,$year) {
 		$this->year = $year;
@@ -46,7 +60,7 @@ class Holiday {
 					self::$lang = 'en';
 				}
 			}
-			$this->title = $data->name->{self::$lang};
+			$this->title = $data->name->{self::$lang} ?? $data->name->{self::$set};
 
 		}
 		if(isset($data->type)) {
@@ -61,8 +75,9 @@ class Holiday {
 	}
 
 
-	static function generate($set, $lang, $from, $till) {
-		$dir = __DIR__.'/../holidays/';
+	static function generate(string $set, string $lang, DateTime $from, DateTime $till) {
+		$dir = __DIR__ . '/../language/holidays/';
+		self::$set = strtolower($set);
 		self::$lang = $lang;
 		self::$names = \json_decode(file_get_contents($dir.'names.json'))->names;
 		$file = $dir.'countries/'.strtolower($set).'.json';
@@ -191,5 +206,67 @@ class Holiday {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Retrieve known holiday sets
+	 *
+	 * @param void
+	 * @return array
+	 */
+	public static function getHolidaySets(): array
+	{
+		$holidaySets = [];
+		$availableLanguages = go()->getLanguage()->getLanguages();
+
+//		$folderPath = Environment::get()->getInstallFolder() . '/go/core/language/holidays/countries';
+		// For now, we let the old holidays fol[der be. There is no 1 to 1 relationship with languge, country and locale
+		// and it is a friday afternoon
+		$folderPath = Environment::get()->getInstallFolder() . '/language/holidays/';
+
+
+		$countriesFolder = new Folder($folderPath);
+		foreach ($countriesFolder->getFiles() as $f) {
+			$isoCode = strtolower($f->getNameWithoutExtension());
+			if (!array_key_exists($isoCode, $availableLanguages)) {
+				continue;
+			}
+			$label = $availableLanguages[$isoCode];
+			$holidaySets[$label] = [
+				'ise' => $isoCode,
+				'label' => $label
+			];
+		}
+
+
+		ksort($holidaySets);
+		return array_values($holidaySets);
+	}
+
+	/**
+	 * Get the holiday locale from the $countryCode that is provided.
+	 *
+	 * If no match can be found then the self::$systemDefaultLocale variable is used.
+	 *
+	 * @param string $countryCode
+	 * @return mixed the locale for the holidays or false when none found
+	 */
+	public static function getHolidaySet(string $countryCode): ?string
+	{
+		if (key_exists($countryCode, self::$mapping)) {
+			$countryCode = self::$mapping[$countryCode];
+		} else if (key_exists(strtolower($countryCode), self::$mapping)) {
+			$countryCode = self::$mapping[strtolower($countryCode)];
+		}
+		$countryCode = strtolower($countryCode);
+
+		$languageFolderPath = Environment::get()->getInstallFolder() . '/language/holidays/';
+
+		$file = new File($languageFolderPath . $countryCode . '.php');
+		if ($file->exists()) {
+			return $countryCode;
+		}
+
+		return null;
 	}
 }

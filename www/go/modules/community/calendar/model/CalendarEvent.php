@@ -31,7 +31,10 @@ use go\core\util\DateTime;
 
 class CalendarEvent extends AclItemEntity {
 
-	use CustomFieldsTrait;
+	use CustomFieldsTrait {
+		customFieldsModelId as traitCustomFieldModelId;
+	}
+
 	use SearchableTrait;
 
 	const PROD = '-//Intermesh//Group Office {VERSION}//EN';
@@ -51,16 +54,16 @@ class CalendarEvent extends AclItemEntity {
 //	const PrivateProperties = ['created', 'due', 'duration', 'estimatedDuration', 'freeBusyStatus', 'privacy',
 //		'recurrenceOverrides', 'sequence', 'showWithoutTime', 'start', 'timeZone', 'timeZones', 'uid','updated'];
 
-const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','description','locale','location', 'showWithoutTime',
-'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule'
+	const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','description','locale','location', 'showWithoutTime',
+	'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule'
 
-];
+	];
 
 	const EventProperties = ['uid','isOrigin','replyTo', 'prodId', 'sequence','title','description','locale','location', 'showWithoutTime',
 		'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule','createdAt','modifiedAt',
 		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag','uri', 'eventId', 'recurrenceId'];
 
-	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'alerts', 'veventBlobId'];
+	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'veventBlobId'];
 
 //	// If any of this properties is in the recurrenceOverrides the Object most be ignored
 //	const IgnoredPropertiesInException = [
@@ -69,41 +72,34 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 //		'relatedTo','replyTo','sentBy','timeZones'];
 
 
-	static $sendSchedulingMessages = false;
-	static $fromClient = false;
+	static bool $sendSchedulingMessages = false;
+	static bool $fromClient = false;
 
-	public $calendarId;
-	protected $eventId;
+	public string $calendarId;
+	protected ?int $eventId = null;
 	/**
 	 * @var boolean true when this event is created by this calendar system
 	 * false if the event is imported from an invitation and the organizer is in another system
 	 */
-	public $isOrigin;
+	public bool $isOrigin;
 	/**
 	 * When isOrigin is false this is the organizers email
-	 * @var string email
+	 * @var ?string email
 	 */
-	public $replyTo;
-	/**
-	 * @var string status is set after a scheduling action like sending a REPLY iTip to the organizer
-	 */
-	public $responseStatus;
+	public ?string $replyTo;
 
-	public $role;
-	public $email;
+	public ?string $id = null;
+	public ?string $prodId = null;
+	public ?string $timeZone;
+	public ?string $locale;
+	public int $priority = 0;
+	public ?string $color;
+	public ?bool $useDefaultAlerts = true;
 
-	public $id;
-	public $prodId;
-	public $timeZone;
-	public $locale;
-	public $priority;
-	public $color;
-	public $useDefaultAlerts;
 	/**
 	 * A unique identifier for the object.
-	 * @var string
 	 */
-	public $uid;
+	public ?string $uid;
 
 	/**
 	 * This is only set when somebody is invited to a single occurrence of a series.
@@ -121,19 +117,19 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	 * makes a change (except when only the "participants" property is changed)
 	 * @var int
 	 */
-	public $sequence = 0;
+	public int $sequence = 0;
 
 	/**
 	 * Time is ignored for this event when true
 	 * @var bool
 	 */
-	public $showWithoutTime = false;
+	public bool $showWithoutTime = false;
 
 	/**
 	 * The start time of the event
-	 * @var DateTime
+	 * @var ?\DateTimeInterface|null
 	 */
-	public $start;
+	public ?\DateTimeInterface $start;
 
 	public $utcStart;
 	public $utcEnd;
@@ -141,33 +137,29 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	/**
 	 * The duration of the event (or the occurence)
 	 * (optional, default: PT0S)
-	 * @var string
+	 *
 	 */
-	public $duration;
+	public ?string $duration;
 
 	/**
 	 * The title
-	 * @var string
 	 */
-	public $title = '';
+	public ?string $title = '';
 
 	/**
 	 * free text that would describe the event
-	 * @var string
 	 */
-	public $description = '';
+	public ?string $description = '';
 
 	/**
 	 * The location where the event takes place
-	 * @var string
 	 */
-	public $location;
+	public ?string $location;
 
 	/**
 	 * Status of event (confirmed, canceled, tentative)
-	 * @var int
 	 */
-	public $status = self::Confirmed;
+	public string $status = self::Confirmed;
 
 	/**
 	 * auto tagging to give the event some flair. See Resource folder
@@ -235,6 +227,20 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 		return 'calendar_event_custom_fields';
 	}
 
+	public function customFieldsModelId() : string|int|null {
+		return $this->eventId;
+	}
+
+	protected function internalGetPermissionLevel(): int
+	{
+		// Sometimes this model is used in an email invite without a calendarId.
+		if(!isset($this->calendarId)) {
+			return Acl::LEVEL_READ;
+		} else {
+			return parent::internalGetPermissionLevel(); // TODO: Change the autogenerated stub
+		}
+	}
+
 	protected static function defineMapping(): Mapping {
 		return parent::defineMapping()
 			->addTable('calendar_calendar_event', 'cce', ['eventId' => 'eventId'], ['id', 'calendarId'])
@@ -270,6 +276,12 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 
 		return $query;
 
+	}
+
+	static function findForUser($uid, $userId) {
+		return self::find()->join('core_user', 'u', 'u.id = cal.ownerId')
+			->where(['cal.ownerId' => $userId, 'eventdata.uid'=>$uid])
+			->filter(['permissionLevel' => 25]); // rsvp
 	}
 
 	public function isPrivate(){
@@ -346,10 +358,10 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 
 		$blob = isset($this->veventBlobId) ? Blob::findById($this->veventBlobId) : null;
 		if(!$blob || $blob->modifiedAt < $this->modifiedAt || !$blob->getFile()->exists()) {
+			$this->modifiedAt = new DateTime(); // important to set here so blob will get the same modifiedAt
 			$blob = ICalendarHelper::makeBlob($this);
 			$this->veventBlobId = $blob->id;
 			if(!$this->isNew()) {
-//				$this->save();
 				$this->saveTables();
 			}
 		}
@@ -465,7 +477,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 			$this->uri = $uri;
 		}
 
-		return $this->uri;
+		return $this->uri ?? strtr($this->uid, '+/=', '-_.') . '.ics';
 	}
 
 	public function etag($v = null) {
@@ -541,13 +553,13 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 			'failureReasons'=>[]
 		];
 		foreach($blobIds as $blobId) {
-			foreach(ICalendarHelper::calendarEventFromFile($blobId) as $ev) {
+			foreach(ICalendarHelper::calendarEventFromFile($blobId, ['calendarId' => $calendarId]) as $ev) {
 				if(is_array($ev)){
 					$r->failureReasons[$r->failed] = 'Parse error '.$ev['vevent']->VEVENT[0]->UID. ': '. $ev['error']->getMessage();
 					$r->failed++;
 					continue;
 				}
-				$ev->calendarId = $calendarId;
+
 				if($uid === 'new') {
 					$ev->uid = UUID::v4();
 				} else if($uid === 'check' && self::find()->selectSingleValue('cce.id')->where(['uid'=>$ev->uid])->single() !== null) {
@@ -609,6 +621,9 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 				CoreAlert::deleteByEntity($this);
 			}
 		}
+		if(!empty($this->alerts)) {
+			$this->useDefaultAlerts = false;
+		}
 
 		if(!empty($this->participants) && empty($this->replyTo)) {
 			$owner = $this->organizer();
@@ -637,10 +652,19 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 		return $success;
 	}
 
+	private function currentUserIsOwner() {
+		return $this->ownerId === go()->getUserId() ||
+		 ($this->ownerId === null && $this->createdBy === go()->getUserId());
+	}
+
 	public function toArray(array|null $properties = null): array|null
 	{
 		$arr =  parent::toArray($properties);
-		if($this->isPrivate() && $this->getPermissionLevel() <= Acl::LEVEL_READ && $this->ownerId !== go()->getUserId()) {
+		$showAsPrivate = $this->isPrivate() && $this->getPermissionLevel() <= 30/*Write own*/;
+		if($this->getPermissionLevel() === 30 && $this->currentUserIsOwner()) {
+			$showAsPrivate = false;
+		}
+		if($showAsPrivate) {
 			$arr['title'] = '';
 			$arr['description'] = '';
 			$arr['location'] = '';
@@ -737,7 +761,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	public function calendarParticipant() {
 		if($this->calendarParticipant === null && !empty($this->participants)) {
 			$scheduleId = Calendar::find()
-				->join('core_user', 'u', 'calendar_calendar.ownerId = u.id')
+				->join('core_user', 'u', 'IFNULL(calendar_calendar.ownerId, '.go()->getUserId().') = u.id')
 				->where(['id' => $this->calendarId])
 				->selectSingleValue('u.email')->single();
 			$this->calendarParticipant = $this->participantByScheduleId($scheduleId);
@@ -843,7 +867,7 @@ const OwnerOnlyProperties = ['uid','isOrigin','replyTo', 'prodId', 'title','desc
 	public function timeZone(): ?DateTimeZone
 	{
 		try {
-			return $this->timeZone ? new DateTimeZone($this->timeZone) : null;
+			return !empty($this->timeZone) ? new DateTimeZone($this->timeZone) : null;
 		}catch(Exception $e) {
 			ErrorHandler::logException($e, "Failed to set timezone " . $this->timeZone. " for event" . $this->id);
 

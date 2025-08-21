@@ -185,9 +185,9 @@ IMG;
 	private function _fix_segments($xml) {
 
 		$reg = '@\[!--\sBEGIN\s[^\]]*--\]@smU';
-		$xml = preg_replace_callback($reg, "self::_fix_segments_callback", $xml);
+		$xml = preg_replace_callback($reg, self::class . "::_fix_segments_callback", $xml);
 		$reg = '@\[!--\sEND\s[^\]]*--\]@smU';
-		$xml = preg_replace_callback($reg, "self::_fix_segments_callback", $xml);
+		$xml = preg_replace_callback($reg, self::class . "::_fix_segments_callback", $xml);
 		return $xml;
 	}
 

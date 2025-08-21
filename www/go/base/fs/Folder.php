@@ -291,6 +291,10 @@ class Folder extends Base {
 				throw new \Exception("Could not create folder " . $this->path);
 			}
 		} catch(\Exception $e) {
+			if(is_dir($this->path)){
+				//perhaps race condition
+				return true;
+			}
 			throw new \Exception("Could not create folder '" . $this->path . "' " .$e->getMessage());
 		}
 	}

@@ -3184,8 +3184,12 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			
 			//change ACL owner
 			if($this->aclField() && !$this->getIsJoinedAclField() && $this->isModified('user_id')) {
-				$this->acl->ownedBy = $this->user_id;
-				$this->acl->save();
+				$acl = $this->acl;
+				if($acl) {
+					$acl->ownedBy = $this->user_id;
+					$acl->save();
+				}
+
 			}
 
 
@@ -4392,7 +4396,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if((!$this->hasLinks() && !$isSearchCacheModel) || $linksDisabled)
 			throw new \Exception("Links not supported by ".$this->className ());
 
-		Link::create($this, $model);
+		Link::create($this, $model, $description);
 
 		$this->fireEvent('link', array($this, $model, $description, $this_folder_id, $model_folder_id));
 		return true;

@@ -6,6 +6,7 @@ use go\core\db\Query;
 use go\core\exception\Forbidden;
 use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
+use go\core\model\Acl;
 use go\modules\community\calendar\model;
 
 
@@ -99,5 +100,10 @@ class Calendar extends EntityController {
 	protected function canCreate(Entity $entity): bool
 	{
 		return $this->rights->mayChangeCalendars;
+	}
+
+	protected function canDestroy(Entity $entity): bool
+	{
+		return $this->rights->mayChangeCalendars && $entity->hasPermissionLevel(Acl::LEVEL_DELETE);
 	}
 }

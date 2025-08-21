@@ -15,19 +15,18 @@ use go\core\orm\Query;
  */
 class Category extends Entity {
 
-	/** @var int */
-	public $id;
+	public ?string $id;
 
 	/** @var string */
-	public $name;
+	public string $name;
 
-	/** @var int could be NULL for global categories */
-	protected $ownerId;
+	/** @var ?int could be NULL for global categories */
+	protected ?int $ownerId = null;
 
-	public $color;
+	public ?string $color;
 
-	/** @var int when not null this category is only visible when the tasklist is selected (no ACL checking allowed)  */
-	public $calendarId;
+	/** @var ?string When not null this category is only visible when the tasklist is selected (no ACL checking allowed)  */
+	public ?string $calendarId = null;
 
 	protected static function defineMapping(): Mapping
 	{

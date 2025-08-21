@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
   `vcalendarBlobId` BINARY(40) NULL,
   `latitude` decimal(10,8) DEFAULT NULL,
   `longitude` decimal(11,8) DEFAULT NULL,
+    `location` TEXT DEFAULT NULL,
 	`projectId` INT UNSIGNED NULL,
 	`mileStoneId` INT UNSIGNED NULL,
   PRIMARY KEY (`id`),

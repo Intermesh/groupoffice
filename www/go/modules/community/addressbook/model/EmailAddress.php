@@ -23,19 +23,19 @@ class EmailAddress extends Property {
 	 * 
 	 * @var int
 	 */							
-	protected $contactId;
+	protected int $contactId;
+
+	/**
+	 * 
+	 * @var ?string
+	 */							
+	public ?string $type = 'work';
 
 	/**
 	 * 
 	 * @var string
 	 */							
-	public $type = 'work';
-
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $email;
+	public string $email;
 
 	protected static function defineMapping(): Mapping
 	{
