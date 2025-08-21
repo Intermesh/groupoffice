@@ -1,3 +1,5 @@
+- Calendar: Fixed holidays appeared every year
+
 19-08-2025: 25.0.45
 - Calendar: Visible category filter depend on visible calendars instead of subscribed calendar.
 
