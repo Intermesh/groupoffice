@@ -150,7 +150,7 @@ class Holiday {
 	private function parseFixed($monthDay) {
 		$year = $this->year;
 		if(strlen($monthDay) === 10) { // has year
-			$year = max($this->year, intval(substr($monthDay,0,4)));
+			$year = intval(substr($monthDay,0,4));
 			$monthDay = substr($monthDay, 5);
 		}
 		if($month = array_search($monthDay, self::$months)) {
