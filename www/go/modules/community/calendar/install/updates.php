@@ -316,6 +316,7 @@ $updates["202508111058"][] = "update calendar_event set uri = REPLACE(REPLACE(RE
 
 $updates["202508191124"][] = "alter table calendar_calendar_user add column syncToDevice tinyint default 1 not null after `timeZone`";
 
+$updates["202508211118"][] = "update ignore calendar_participant p inner join core_user u on u.email = p.email set p.id = u.id;";
+
+
 // TODO: calendar views -> custom filters
-
-
