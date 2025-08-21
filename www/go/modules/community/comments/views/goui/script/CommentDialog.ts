@@ -2,7 +2,7 @@ import {
 	arrayfield, btn,
 	ContainerField,
 	containerfield,
-	datefield,
+	datetimefield,
 	displayfield,
 	fieldset,
 	Format,
@@ -25,7 +25,7 @@ export class CommentDialog extends FormWindow {
 		this.height = 400;
 
 		this.generalTab.items.add(fieldset({},
-			datefield({
+			datetimefield({
 				name: "date",
 				label: t("Date"),
 				withTime: true,
