@@ -1,6 +1,6 @@
 import {btn, column, Filter, searchbtn, t, tbar, Window} from "@intermesh/goui";
 import {TasklistGrid, tasklistgrid} from "./TasklistGrid.js";
-import {jmapds} from "@intermesh/groupoffice-core";
+import {tasklistDS} from "./Index.js";
 
 export class SubscribeWindow extends Window {
 	private tasklistGrid: TasklistGrid;
@@ -22,7 +22,7 @@ export class SubscribeWindow extends Window {
 				"->",
 				searchbtn({
 					listeners: {
-						input: (sender, text) => {
+						input: ({text}) => {
 							(this.tasklistGrid.store.queryParams.filter as Filter).text = text;
 							void this.tasklistGrid.store.load();
 						}
@@ -47,7 +47,7 @@ export class SubscribeWindow extends Window {
 								text: t("Subscribe"),
 								handler: () => {
 									if (record) {
-										jmapds("TaskList").update(record.id, {isSubscribed: true});
+										tasklistDS.update(record.id, {isSubscribed: true});
 									}
 								}
 							})

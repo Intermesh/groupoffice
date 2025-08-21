@@ -1,9 +1,9 @@
 import {ComboBox, ComboBoxConfig, createComponent, t} from "@intermesh/goui";
-import {jmapds} from "@intermesh/groupoffice-core";
+import {tasklistGroupingDS} from "./Index.js";
 
 export class TasklistGroupCombo extends ComboBox {
 	constructor() {
-		super(jmapds("TaskListGrouping"));
+		super(tasklistGroupingDS);
 
 		this.label = t("Group");
 		this.name = "groupingId";

@@ -1,4 +1,4 @@
-import {addbutton, client, DetailPanel, img, jmapds, modules} from "@intermesh/groupoffice-core";
+import {addbutton, client, DetailPanel, img, modules, principalDS} from "@intermesh/groupoffice-core";
 import {
 	avatar,
 	btn, Button,
@@ -15,6 +15,7 @@ import {ProgressType} from "./Main.js";
 import {ContinueTaskDialog} from "./ContinueTaskDialog.js";
 import {TaskDialog} from "./TaskDialog.js";
 import {CommentsPanel} from "@intermesh/community/comments";
+import {taskCategoryDS, taskDS, tasklistDS} from "./Index.js";
 
 export class TaskDetail extends DetailPanel {
 	private form: DataSourceForm;
@@ -28,7 +29,7 @@ export class TaskDetail extends DetailPanel {
 
 		this.scroller.items.add(
 			this.form = datasourceform({
-					dataSource: jmapds("Task")
+					dataSource: taskDS
 				},
 				comp({cls: "card", flex: 1},
 					tbar({},
@@ -42,8 +43,8 @@ export class TaskDetail extends DetailPanel {
 									cls: "status tasks-status-" + v,
 									html: ProgressType[v as keyof typeof ProgressType],
 									listeners: {
-										render: (cmp) => {
-											cmp.el.addEventListener("click", ev => {
+										render: ({target}) => {
+											target.el.addEventListener("click", ev => {
 												ev.preventDefault();
 
 												const changeMenu = menu({isDropdown: true});
@@ -54,7 +55,7 @@ export class TaskDetail extends DetailPanel {
 															text: t(value),
 															handler: async () => {
 																if (this.form.currentId)
-																	await jmapds("Task").update(this.form.currentId, {progress: key});
+																	await taskDS.update(this.form.currentId, {progress: key});
 															}
 														})
 													)
@@ -82,7 +83,7 @@ export class TaskDetail extends DetailPanel {
 										return "";
 									}
 
-									const t = await jmapds("TaskList").single(v);
+									const t = await tasklistDS.single(v);
 
 									return t ? t.name : "";
 								}
@@ -101,7 +102,7 @@ export class TaskDetail extends DetailPanel {
 										return comp();
 									}
 
-									const r = await jmapds("Principal").single(v);
+									const r = await principalDS.single(v);
 
 									return r ? comp({cls: "hbox"},
 											r.avatarId ?
@@ -141,7 +142,7 @@ export class TaskDetail extends DetailPanel {
 						name: "categories",
 						label: t("Categories"),
 						renderer: async (categoryIds: string[]) => {
-							const response = await jmapds("TaskCategory").get(categoryIds);
+							const response = await taskCategoryDS.get(categoryIds);
 
 							if (response.list) {
 								return response.list.map(record => record.name).join(", ");
@@ -180,7 +181,7 @@ export class TaskDetail extends DetailPanel {
 			)
 		);
 
-		this.on("load", (detailPanel, entity) => {
+		this.on("load", ({entity}) => {
 			this.title = entity.title;
 
 			this.editBtn.disabled = (entity.permissionLevel < go.permissionLevels.write);
@@ -226,7 +227,7 @@ export class TaskDetail extends DetailPanel {
 						icon: "delete",
 						text: t("Delete"),
 						handler: () => {
-							void jmapds("Task").confirmDestroy([this.form.currentId!]);
+							void taskDS.confirmDestroy([this.form.currentId!]);
 						}
 					})
 				)
@@ -238,7 +239,7 @@ export class TaskDetail extends DetailPanel {
 				text: t("Assign me"),
 				handler: async () => {
 					this.mask();
-					await jmapds("Task").update(this.form.currentId!, {
+					await taskDS.update(this.form.currentId!, {
 						responsibleUserId: client.user.id
 					});
 					this.unmask();

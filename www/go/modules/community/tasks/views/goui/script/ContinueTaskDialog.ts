@@ -1,4 +1,4 @@
-import {FormWindow, jmapds} from "@intermesh/groupoffice-core";
+import {FormWindow} from "@intermesh/groupoffice-core";
 import {
 	comp,
 	DatePicker,
@@ -13,6 +13,7 @@ import {
 } from "@intermesh/goui";
 import {progresscombo} from "./ProgressCombo.js";
 import {tasklistcombo} from "./TasklistCombo.js";
+import {commentDS} from "./Index.js";
 
 export class ContinueTaskDialog extends FormWindow {
 	private alertDatePicker: DatePicker;
@@ -89,14 +90,14 @@ export class ContinueTaskDialog extends FormWindow {
 			)
 		);
 
-		this.form.on("beforesave", (form, data) => {
+		this.form.on("beforesave", ({data}) => {
 			data.alerts = [{
 				trigger: {when: this.alertDatePicker.value.format("Y-m-d") + " " + this.alertTime.value}
 			}];
 			data.due = this.alertDatePicker.value.format("Y-m-d");
 
 			if (this.commentArea.value) {
-				jmapds("Comment").create({
+				commentDS.create({
 					text: this.commentArea.value,
 					entity: "Task",
 					entityId: this.form.currentId

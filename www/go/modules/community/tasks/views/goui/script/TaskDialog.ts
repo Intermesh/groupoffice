@@ -1,7 +1,6 @@
 import {
 	client,
 	FormWindow,
-	jmapds,
 	PrincipalCombo,
 	principalcombo,
 	RecurrenceField,
@@ -10,23 +9,33 @@ import {
 import {
 	ArrayField,
 	arrayfield,
-	btn, Button, collapsebtn, CollapseButton,
+	btn,
+	collapsebtn,
 	colorfield,
 	combobox,
-	comp, Component, ContainerField, containerfield, DateField,
-	datefield, DateInterval, DateTime, durationfield,
+	comp,
+	ContainerField,
+	containerfield,
+	DateField,
+	datefield,
+	DateInterval,
+	DateTime, datetimefield,
+	durationfield,
 	fieldset,
 	h4,
-	hr,
-	htmlfield, rangefield, router,
+	htmlfield,
+	rangefield,
+	router,
 	t,
-	tbar, textarea,
-	textfield, timefield
+	tbar,
+	textarea,
+	textfield
 } from "@intermesh/goui";
 import {tasklistcombo} from "./TasklistCombo.js";
 import {TaskCategoryChips, taskcategorychips} from "./TaskCategoryChips.js";
 import {progresscombo} from "./ProgressCombo.js";
 import {prioritycombo} from "./PriorityCombo.js";
+import {projectDS, tasklistDS} from "./Index.js";
 
 export class TaskDialog extends FormWindow {
 	private responsibleCombo: PrincipalCombo;
@@ -47,7 +56,7 @@ export class TaskDialog extends FormWindow {
 		this.collapsible = true;
 		this.resizable = true;
 
-		this.form.on("save", (form, data, isNew) => {
+		this.form.on("save", ({data}) => {
 			router.goto("tasks/" + data.id)
 		});
 
@@ -79,12 +88,12 @@ export class TaskDialog extends FormWindow {
 						name: "tasklistId",
 						required: true,
 						listeners: {
-							change: async (field, newValue, oldValue) => {
+							change: async ({newValue}) => {
 								if (!newValue) {
 									return
 								}
 
-								const tasklist = await jmapds("TaskList").single(newValue);
+								const tasklist = await tasklistDS.single(newValue);
 
 								void this.categoryChips.list.store.setFilter("tasklistId", {
 									operator: "OR",
@@ -108,9 +117,7 @@ export class TaskDialog extends FormWindow {
 					flex: 1,
 					cls: "flow border-top"
 				},
-				tbar({
-
-					},
+				tbar({},
 					h4({
 						text: t("Message")
 					})
@@ -130,7 +137,7 @@ export class TaskDialog extends FormWindow {
 				combobox({
 					name: "projectId",
 					label: t("Project"),
-					dataSource: jmapds("Project3"),
+					dataSource: projectDS,
 					displayProperty: "number",
 					valueProperty: "id"
 				})
@@ -139,9 +146,7 @@ export class TaskDialog extends FormWindow {
 					flex: 1,
 					cls: "flow border-top"
 				},
-				tbar({
-
-					},
+				tbar({},
 					h4({
 						text: t("Date")
 					}),
@@ -162,7 +167,7 @@ export class TaskDialog extends FormWindow {
 							name: "start",
 							flex: 1,
 							listeners: {
-								change: (field, newValue, oldValue) => {
+								change: ({newValue}) => {
 
 									if (!newValue) {
 										this.recurrenceField.disabled = true;
@@ -222,9 +227,7 @@ export class TaskDialog extends FormWindow {
 					flex: 1,
 					cls: "flow border-top"
 				},
-				tbar({
-
-					},
+				tbar({},
 					h4({
 						text: t("Description") + " / " + t("Location")
 					}),
@@ -255,9 +258,7 @@ export class TaskDialog extends FormWindow {
 					flex: 1,
 					cls: "flow border-top"
 				},
-				tbar({
-
-					},
+				tbar({},
 					h4({
 						text: t("Alerts")
 					}),
@@ -279,14 +280,14 @@ export class TaskDialog extends FormWindow {
 									name: "trigger",
 									cls: "group"
 								},
-								datefield({
+								datetimefield({
 									name: "when",
 									withTime: true,
 									flex: 2,
 									listeners: {
-										render: (field) => {
-											if (!field.value && this.startDate.value) {
-												field.value = this.startDate.value;
+										render: ({target}) => {
+											if (!target.value && this.startDate.value) {
+												target.value = this.startDate.value;
 											}
 										}
 									}

@@ -4,12 +4,12 @@ import {
 	DataSourceStore, t,
 	Table
 } from "@intermesh/goui";
-import {jmapds} from "@intermesh/groupoffice-core";
+import {taskCategoryDS} from "./Index.js";
 
 export class TaskCategoryGrid extends Table<DataSourceStore> {
 	constructor() {
 		const store = datasourcestore({
-			dataSource: jmapds("TaskCategory")
+			dataSource: taskCategoryDS
 		});
 
 		const columns = [

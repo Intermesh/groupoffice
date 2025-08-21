@@ -1,5 +1,5 @@
 import {checkbox, Component, containerfield, datasourceform, DataSourceForm, fieldset, radio, t} from "@intermesh/goui";
-import {jmapds, User} from "@intermesh/groupoffice-core";
+import {User, userDS} from "@intermesh/groupoffice-core";
 import {tasklistcombo} from "./TasklistCombo.js";
 
 export class SettingsPanel extends Component {
@@ -9,7 +9,7 @@ export class SettingsPanel extends Component {
 		super();
 
 		this.form = datasourceform({
-				dataSource: jmapds("User")
+				dataSource: userDS
 			},
 			fieldset({
 					legend: t("Dislay options for lists")

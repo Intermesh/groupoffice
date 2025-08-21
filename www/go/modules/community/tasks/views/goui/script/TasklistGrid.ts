@@ -5,12 +5,12 @@ import {
 	DataSourceStore,
 	t, Table,
 } from "@intermesh/goui";
-import {jmapds} from "@intermesh/groupoffice-core";
+import {tasklistDS} from "./Index.js";
 
 export class TasklistGrid extends Table<DataSourceStore> {
 	constructor() {
 		const store = datasourcestore({
-			dataSource: jmapds("TaskList"),
+			dataSource: tasklistDS,
 			filters: {
 				role: {
 					role: "list"

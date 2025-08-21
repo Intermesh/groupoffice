@@ -5,7 +5,7 @@ import {
 	datasourcestore, FieldConfig, Filter, Table,
 	table
 } from "@intermesh/goui";
-import {jmapds} from "@intermesh/groupoffice-core";
+import {taskCategoryDS} from "./Index.js";
 
 export class TaskCategoryChips extends AutocompleteChips<Table<DataSourceStore>> {
 	constructor() {
@@ -14,7 +14,7 @@ export class TaskCategoryChips extends AutocompleteChips<Table<DataSourceStore>>
 				headers: false,
 				fitParent: true,
 				store: datasourcestore({
-					dataSource: jmapds("TaskCategory"),
+					dataSource: taskCategoryDS,
 					queryParams: {
 						limit: 0
 					}
@@ -35,17 +35,17 @@ export class TaskCategoryChips extends AutocompleteChips<Table<DataSourceStore>>
 		);
 
 		this.chipRenderer = async (chip, value) => {
-			const record = await jmapds("TaskCategory").single(value);
+			const record = await taskCategoryDS.single(value);
 			chip.text = record!.name;
 		};
 
-		this.on("autocomplete", (field, input) => {
-			(field.list.store.filter as Filter).text = input;
-			void field.list.store.load();
+		this.on("autocomplete", ({target, input}) => {
+			(target.list.store.filter as Filter).text = input;
+			void target.list.store.load();
 		});
 
-		this.on("render", (field) => {
-			void field.list.store.load();
+		this.on("render", ({target}) => {
+			void target.list.store.load();
 		});
 	}
 }

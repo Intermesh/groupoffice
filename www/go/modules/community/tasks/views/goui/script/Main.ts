@@ -1,16 +1,24 @@
-import {client, filterpanel, jmapds, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
+import {client, filterpanel, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
 import {
-	btn, checkbox, CheckboxField,
+	btn,
+	checkbox,
+	CheckboxField,
 	checkboxselectcolumn,
 	column,
-	comp, EntityID,
+	comp,
+	EntityID,
 	Filter,
 	h3,
 	hr,
-	menu, mstbar, MultiSelectToolbar, router,
+	menu,
+	mstbar,
+	router,
 	searchbtn,
-	t, Table,
-	tbar, Toolbar, Window
+	t,
+	Table,
+	tbar,
+	Toolbar,
+	Window
 } from "@intermesh/goui";
 import {tasklistgrid, TasklistGrid} from "./TasklistGrid.js";
 import {TaskGrid} from "./TaskGrid.js";
@@ -22,6 +30,7 @@ import {TaskCategoryDialog} from "./TaskCategoryDialog.js";
 import {TaskDialog} from "./TaskDialog.js";
 import {schedulefilter} from "./ScheduleFilter.js";
 import {ImportTaskDialog} from "./ImportTaskDialog.js";
+import {taskCategoryDS, taskDS, tasklistDS} from "./Index.js";
 
 export enum ProgressType {
 	'needs-action' = 'Needs action',
@@ -74,7 +83,7 @@ export class Main extends MainThreeColumnPanel {
 					multiSelect: false,
 					listeners: {
 						selectionchange: (rowSelect) => {
-							const value = rowSelect.getSelected().map((row) => row.record.value)[0];
+							const value = rowSelect.selected.map((row) => row.record.value)[0];
 
 							const filters: Record<string, Filter> = {
 								today: {start: "<=now"},
@@ -100,7 +109,7 @@ export class Main extends MainThreeColumnPanel {
 					value: true,
 					label: t("Show completed"),
 					listeners: {
-						change: (field, newValue, oldValue) => {
+						change: ({newValue}) => {
 							this.taskGrid.store.setFilter("completed", newValue ? {} : {complete: false});
 							void this.taskGrid.store.load();
 						}
@@ -129,7 +138,7 @@ export class Main extends MainThreeColumnPanel {
 				},
 				checkbox({
 					listeners: {
-						change: (field, newValue, oldValue) => {
+						change: ({newValue}) => {
 							const rs = this.taskListGrid.rowSelection!;
 							newValue ? rs.selectAll() : rs.clear();
 						}
@@ -141,7 +150,7 @@ export class Main extends MainThreeColumnPanel {
 				"->",
 				searchbtn({
 					listeners: {
-						input: (sender, text) => {
+						input: ({text}) => {
 							(this.taskListGrid.store.queryParams.filter as Filter).text = text;
 							void this.taskListGrid.store.load();
 						}
@@ -182,7 +191,7 @@ export class Main extends MainThreeColumnPanel {
 						multiSelect: true,
 						listeners: {
 							selectionchange: (tableRowSelect) => {
-								const taskListIds = tableRowSelect.getSelected().map((row) => row.record.id);
+								const taskListIds = tableRowSelect.selected.map((row) => row.record.id);
 
 								this.taskGrid.store.queryParams.filter = {
 									taskListId: taskListIds
@@ -196,7 +205,7 @@ export class Main extends MainThreeColumnPanel {
 						checkboxselectcolumn({
 							id: "check",
 							listeners: {
-								render: (column1, result, record, storeIndex, td) => {
+								render: ({result, record}) => {
 									const checkbox = result as CheckboxField;
 									checkbox.color = "#" + record.color;
 								}
@@ -229,7 +238,7 @@ export class Main extends MainThreeColumnPanel {
 											icon: "delete",
 											text: t("Delete..."),
 											handler: () => {
-												void jmapds("TaskList").confirmDestroy([record.id]);
+												tasklistDS.confirmDestroy([record.id]);
 											}
 										}),
 										hr(),
@@ -237,7 +246,7 @@ export class Main extends MainThreeColumnPanel {
 											icon: "remove_circle",
 											text: t("Unsubscribe"),
 											handler: async () => {
-												await jmapds("TaskList").update(record.id, {isSubscribed: false});
+												tasklistDS.update(record.id, {isSubscribed: false});
 											}
 										})
 									)
@@ -253,7 +262,7 @@ export class Main extends MainThreeColumnPanel {
 				},
 				checkbox({
 					listeners: {
-						change: (field, newValue, oldValue) => {
+						change: ({newValue}) => {
 							const rs = this.taskCategoryGrid.rowSelection!;
 							newValue ? rs.selectAll() : rs.clear();
 						}
@@ -282,7 +291,7 @@ export class Main extends MainThreeColumnPanel {
 						multiSelect: true,
 						listeners: {
 							selectionchange: (tableRowSelect) => {
-								const categoryIds = tableRowSelect.getSelected().map((row) => row.record.id);
+								const categoryIds = tableRowSelect.selected.map((row) => row.record.id);
 
 								this.taskGrid.store.queryParams.filter = {
 									categories: categoryIds
@@ -320,7 +329,7 @@ export class Main extends MainThreeColumnPanel {
 											icon: "delete",
 											text: t("Delete"),
 											handler: async () => {
-												await jmapds("TaskCategory").confirmDestroy([record.id]);
+												taskCategoryDS.confirmDestroy([record.id]);
 											}
 										})
 									)
@@ -336,14 +345,14 @@ export class Main extends MainThreeColumnPanel {
 			})
 		);
 
-		this.taskListGrid.on("drop", async (toComponent, toIndex, fromIndex, droppedOn, fromComp, dragDataSet) => {
-			const fromTable = fromComp as Table;
+		this.taskListGrid.on("drop", async ({target, toIndex, fromIndex, source}) => {
+			const fromTable = source as Table;
 
-			const tasklist = toComponent.store.get(toIndex);
+			const tasklist = target.store.get(toIndex);
 			const task = fromTable.store.get(fromIndex);
 
 			if (tasklist && task) {
-				void jmapds("Task").update(task.id, {tasklistId: tasklist.id});
+				taskDS.update(task.id, {tasklistId: tasklist.id});
 				void fromTable.store.load();
 			}
 		});
@@ -362,7 +371,7 @@ export class Main extends MainThreeColumnPanel {
 			multiSelect: true,
 			listeners: {
 				selectionchange: (tableRowSelect) => {
-					const taskIds = tableRowSelect.getSelected().map((row) => row.record.id);
+					const taskIds = tableRowSelect.selected.map((row) => row.record.id);
 
 					if (taskIds[0]) {
 						router.goto("tasks/" + taskIds[0]);
@@ -384,7 +393,7 @@ export class Main extends MainThreeColumnPanel {
 				"->",
 				searchbtn({
 					listeners: {
-						input: (sender, text) => {
+						input: ({text}) => {
 							(this.taskGrid.store.queryParams.filter as Filter).text = text;
 							void this.taskGrid.store.load();
 						}
@@ -466,7 +475,7 @@ export class Main extends MainThreeColumnPanel {
 							handler: () => {
 								const taskIds = this.taskGrid.rowSelection!.getSelected().map((row) => row.record.id);
 
-								jmapds("Task").confirmDestroy(taskIds);
+								taskDS.confirmDestroy(taskIds);
 							}
 						})
 					)
@@ -488,7 +497,7 @@ export class Main extends MainThreeColumnPanel {
 
 							if (confirmed) {
 								try {
-									const result = await jmapds("Task").merge(taskIds);
+									const result = await taskDS.merge(taskIds);
 
 									const dlg = new TaskDialog();
 									await dlg.load(result.id);
@@ -505,7 +514,7 @@ export class Main extends MainThreeColumnPanel {
 					handler: () => {
 						const taskIds = this.taskGrid.rowSelection!.getSelected().map((row) => row.record.id);
 
-						jmapds("Task").confirmDestroy(taskIds);
+						taskDS.confirmDestroy(taskIds);
 					}
 				})
 			),

@@ -2,43 +2,47 @@ import {
 	avatar,
 	checkboxcolumn,
 	column,
-	comp, DataSourceStore,
+	comp,
+	DataSourceStore,
 	datasourcestore,
 	datecolumn,
-	Format, span, StoreRecord,
+	Format,
+	StoreRecord,
 	t,
-	Table, Window
+	Table,
+	Window
 } from "@intermesh/goui";
-import {img, jmapds} from "@intermesh/groupoffice-core";
+import {img, principalDS} from "@intermesh/groupoffice-core";
 import {ProgressType} from "./Main.js";
 import {TaskDialog} from "./TaskDialog.js";
+import {taskCategoryDS, taskDS, tasklistDS} from "./Index.js";
 
 export class TaskGrid extends Table<DataSourceStore> {
 	constructor() {
 		super(
 			datasourcestore({
-				dataSource: jmapds("Task"),
+				dataSource: taskDS,
 				sort: [{property: "tasklist", isAscending: true}, {property: "start", isAscending: true}],
 				relations: {
 					responsible: {
 						path: "responsibleUserId",
-						dataSource: jmapds("Principal")
+						dataSource: principalDS
 					},
 					creator: {
 						path: "createdBy",
-						dataSource: jmapds("Principal")
+						dataSource: principalDS
 					},
 					modifier: {
 						path: "modifiedBy",
-						dataSource: jmapds("Principal")
+						dataSource: principalDS
 					},
 					tasklist: {
 						path: "tasklistId",
-						dataSource: jmapds("TaskList")
+						dataSource: tasklistDS
 					},
 					categories: {
 						path: "categories",
-						dataSource: jmapds("TaskCategory")
+						dataSource: taskCategoryDS
 					}
 				},
 				queryParams: {
@@ -53,10 +57,10 @@ export class TaskGrid extends Table<DataSourceStore> {
 					id: "complete",
 					hidable: false,
 					listeners: {
-						change: async (col, checkbox, value, record, storeIndex) => {
+						change: async ({checked, record}) => {
 							this.mask();
 							try {
-								await jmapds("Task").update(record.id, {progress: (value ? 'completed' : 'needs-action')})
+								await taskDS.update(record.id, {progress: (checked ? 'completed' : 'needs-action')})
 							} catch (e) {
 								void Window.error(e);
 							} finally {
@@ -270,7 +274,7 @@ export class TaskGrid extends Table<DataSourceStore> {
 					width: 100,
 					renderer: (columnValue) => {
 						if (parseInt(columnValue) > 0) {
-							return Format.duration(columnValue, false);
+							return Format.duration(columnValue);
 						}
 						return "";
 					},
@@ -280,9 +284,9 @@ export class TaskGrid extends Table<DataSourceStore> {
 			]
 		);
 
-		this.on("rowdblclick", async (table, rowIndex, ev) => {
+		this.on("rowdblclick", async ({target, storeIndex}) => {
 			const dlg = new TaskDialog();
-			await dlg.load(table.store.get(rowIndex)!.id);
+			await dlg.load(target.store.get(storeIndex)!.id);
 			dlg.show();
 		});
 
