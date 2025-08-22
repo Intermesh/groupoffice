@@ -51,7 +51,7 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 						btn({icon:'more_vert', menu: menu({},
 								btn({text: v.email, disabled: true}),
 								hr(),
-								checkbox({label:'Optioneel',listeners: {'change': ({target}) => {
+								checkbox({label: t('Optional'),listeners: {'change': ({target}) => {
 									if(target.value) {
 										delete v.roles.attendee; // make optional (non-required)
 									} else {

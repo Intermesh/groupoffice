@@ -614,7 +614,6 @@ export class CalendarItem {
 						hidden: modified.recurrenceRule, // user must change future if rrule is modified
 						cls:'primary',
 						handler: _b => {
-							debugger;
 							this.patchOccurrence(modified, onFinish); w.close();
 						}
 					}),
