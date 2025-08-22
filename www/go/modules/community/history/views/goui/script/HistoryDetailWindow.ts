@@ -18,11 +18,11 @@ export class HistoryDetailWindow extends Window {
 
 		this.items.add(
 			comp({cls: "pad scroll"},
-				this.dateComp = comp({}),
+				this.dateComp = comp(),
 				comp({tagName: "h4", text: t("Changes")}),
-				this.changesComp = comp({})
+				this.changesComp = comp()
 			)
-		)
+		);
 	}
 
 	public async load(logEntryId: EntityID) {
@@ -48,7 +48,7 @@ export class HistoryDetailWindow extends Window {
 						comp({
 							html: `<b>${key}: </b> ${value!.toString()}`
 						})
-					)
+					);
 				}
 
 				break;
@@ -73,8 +73,8 @@ export class HistoryDetailWindow extends Window {
 						}).join("");
 					}
 
-					newStr = !isNaN(new Date(newStr).getTime()) ?  Format.dateTime(newStr) : newStr;
-					oldStr = !isNaN(new Date(oldStr).getTime()) ?  Format.dateTime(oldStr) : oldStr;
+					newStr = !isNaN(new Date(newStr).getTime()) ? Format.dateTime(newStr) : newStr;
+					oldStr = !isNaN(new Date(oldStr).getTime()) ? Format.dateTime(oldStr) : oldStr;
 
 					tableData.push({
 						name: change[0],
@@ -93,8 +93,7 @@ export class HistoryDetailWindow extends Window {
 							}),
 							column({
 								id: "old",
-								header: t("Old"),
-
+								header: t("Old")
 							}),
 							column({
 								id: "new",
@@ -108,7 +107,7 @@ export class HistoryDetailWindow extends Window {
 						},
 						flex: 1
 					})
-				)
+				);
 
 				break;
 		}
