@@ -95,6 +95,7 @@ $server->addPlugin($icsPlugin);
 // ACL plugin
 $aclPlugin = new Sabre\DAVACL\Plugin();
 $aclPlugin->allowUnauthenticatedAccess = false;
+$aclPlugin->hideNodesFromListings = true;
 //$aclPlugin->adminPrincipals = ['principals/admin'];
 $server->addPlugin($aclPlugin);
 
