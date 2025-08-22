@@ -61,7 +61,7 @@ class Module extends core\Module
 	 */
 	public static function onSaveUser(User $user): void
 	{
-		if ($user->isNew()) {
+		if ($user->isNew() || !$user->isModified(['username', 'password'])) {
 			return;
 		}
 
