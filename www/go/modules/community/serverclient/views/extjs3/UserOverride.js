@@ -1,8 +1,8 @@
 Ext.onReady(function(){
 	Ext.override(go.users.CreateUserAccountPanel, {
 		initComponent : go.users.CreateUserAccountPanel.prototype.initComponent.createSequence(function(){
-			if(GO.serverclient && GO.serverclient.domains) {				
-				
+			if(GO.serverclient && GO.serverclient.domains) {
+
 
 				for(var i=0;i<GO.serverclient.domains.length;i++)
 				{
@@ -16,12 +16,12 @@ Ext.onReady(function(){
 
 					this.serverclientDomainCheckboxes[i].on('check', this.setDefaultEmail, this);
 				}
-				
+
 				var items = this.serverclientDomainCheckboxes;
 //				items.shift(new GO.form.HtmlComponent({
 //					html:'<p class="go-form-text">'+t('Create a mailbox for domain')+':</p>'
 //				}));
-//				
+//
 				this.serverclientFieldSet = new Ext.form.FieldSet({
 					title: t('Mailboxes'), 
 					autoHeight:true,
@@ -40,19 +40,22 @@ Ext.onReady(function(){
 				this.on('render',function(){
 					this.form.findField('username').on('change', this.setDefaultEmail, this);
 				},this);
-			
+
 
 			}
 		}),
 		
 		onSubmitStart : function(values) {
-			//remove the domainvlaue from user
-			this.serverDomains = values.serverDomains;
-			if(!Ext.isArray(this.serverDomains)) {
-				this.serverDomains = [this.serverDomains];
+
+			if("serverDomains" in values) {
+				// if the first attempt failes the domains have been deleted so we copy them once here
+				this.serverDomains = values.serverDomains;
+				if (!Ext.isArray(this.serverDomains)) {
+					this.serverDomains = [this.serverDomains];
+				}
+				delete values.serverDomains;
 			}
 			this.lastPassword = values.password;
-			delete values.serverDomains;
 		},
 		
 		onSubmitComplete : function(user, result) {
