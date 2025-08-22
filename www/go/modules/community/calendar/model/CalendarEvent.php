@@ -749,7 +749,7 @@ class CalendarEvent extends AclItemEntity {
 
 		foreach($changes as $change) {
 			if($change->getPermissionLevel()) {
-				\go\modules\community\calendar\controller\CalendarEvent::onEntitySave($change, false);
+				\go\modules\community\calendar\controller\CalendarEvent::onEntitySave($change);
 			}
 			CalendarEvent::entityType()->change($change);
 		}
