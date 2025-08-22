@@ -327,5 +327,43 @@ $updates["202508211118"][] = "alter table calendar_preferences
             on delete set null;";
 
 
+$updates["202508211118"][] = function() {
+	$overrides = go()->getDbConnection()->select ()
+		->from("calendar_recurrence_override")
+		->where("patch", "like", '%participants%');
+
+	foreach($overrides as $o) {
+		$patch = json_decode($o['patch']);
+		if(!isset($patch->participants) || !is_array($patch->participants)) {
+			continue;
+		}
+
+		$participants = [];
+
+		$index = 0;
+		foreach ($patch->participants as $participant) {
+			$userId = go()->getDbConnection()
+				->selectSingleValue('id')
+				->from("core_user")
+				->where("email", '=', $participant->email)
+				->single();
+
+			$id = $userId ? $userId : "index_" . $index++;
+			$participants[$id] = $participant;
+		}
+
+		$patch->participants = (object) $participants;
+
+		unset($o['patch']);
+
+		go()->getDbConnection()
+			->update(
+				"calendar_recurrence_override",
+		['patch' => json_encode($patch)],
+			$o)
+			->execute();
+	}
+
+};
 
 // TODO: calendar views -> custom filters
