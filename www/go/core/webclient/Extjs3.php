@@ -324,7 +324,7 @@ class Extjs3 {
 				'GO.calltoTemplate = "' . GO::config()->callto_template . '";' .
 				'GO.calltoOpenWindow = ' . (GO::config()->callto_open_window ? "true" : "false") . ';' .
 				'window.name="' . GO::getId() . '";' .
-				"var BaseHref = '" . $baseUri . "';";
+				"var BaseHref = '" . $baseUri . "';GO.version='".go()->getVersion()."';";
 			if (isset(GO::session()->values['security_token'])) {
 				echo 'GO.securityToken="' . GO::session()->values['security_token'] . '";' .
 					'Ext.Ajax.extraParams={security_token:"' . GO::session()->values['security_token'] . '"};';
@@ -354,7 +354,7 @@ class Extjs3 {
 
 		// gouiScripts array is loaded from apcu when not debugging
 		foreach($this->gouiScripts as $script) {
-			echo '<script type="module" src="'.str_replace($rootPath, $baseUri, $script->getPath()). '"></script>' . "\n";
+			echo '<script type="module" src="'.str_replace($rootPath, $baseUri, $script->getPath()). '?v='.go()->getVersion().'"></script>' . "\n";
 		}
 		if (file_exists(GO::view()->getTheme()->getPath() . 'MainLayout.js')) {
 			echo '<script src="' . GO::view()->getTheme()->getUrl() . 'MainLayout.js" type="text/javascript"></script>';
@@ -413,7 +413,8 @@ class Extjs3 {
 			],
 			'state_index' => 'go',
 			'language' => go()->getLanguage()->getIsoCode(),
-			'show_contact_cf_tabs' => []
+			'show_contact_cf_tabs' => [],
+			'version' => go()->getVersion()
 		];
 	}
 

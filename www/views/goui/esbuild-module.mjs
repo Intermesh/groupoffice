@@ -1,5 +1,5 @@
 import * as esbuild from 'esbuild';
-
+import fs from 'node:fs';
 /**
  * Usage:
  *
@@ -24,6 +24,18 @@ const legacy = process.env.INIT_CWD.indexOf('go/modules') === -1;
 
 const entryPoints = process.argv.length > 3 ? process.argv[3].split(",") : ['script/Index.ts'];
 
+
+let version, chdir = legacy ? "../../../../" : "../../../../../../";
+await fs.readFile(chdir + "version.php", 'utf8', (err, data) => {
+	if (err) {
+		console.error(err);
+		throw err;
+	}
+
+	version = data.match(/\d+\.\d+\.\d+/)
+	console.log(version[0]);
+});
+
 //First I used this plugin to resolve paths: https://github.com/Awalgawe/esbuild-typescript-paths-plugin/tree/main/src
 //But this seems much simpler and give more control. It must align with tsconfig.module.js though.
 const moduleResolverPlugin = {
@@ -42,13 +54,13 @@ const moduleResolverPlugin = {
 
 					return {
 						external: true,
-						path: "../../../../../" + pkg + "/" + module + "/views/goui/dist/Index.js"
+						path: "../../../../../" + pkg + "/" + module + "/views/goui/dist/Index.js?v=" + version[0]
 					}
 				} else {
 					// import is a core. eg. @intermesh/goui or @intermesh/groupoffice-core
 					return {
 						external: true,
-						path: "../../../../../../../views/goui/dist/" + parts[1] + "/script/index.js"
+						path: "../../../../../../../views/goui/dist/" + parts[1] + "/script/index.js?v=" + version[0]
 					}
 				}
 
