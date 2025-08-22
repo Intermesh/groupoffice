@@ -943,6 +943,12 @@ public function historyLog(): bool|array
 		return true;
 	}
 
+	protected function commit(): bool
+	{
+		$this->plainPassword = null;
+		return parent::commit();
+	}
+
 
 	protected function internalGetModified(array|string &$properties = [], bool $forIsModified = false): bool|array
 	{
