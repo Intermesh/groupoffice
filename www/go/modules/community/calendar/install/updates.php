@@ -348,7 +348,19 @@ $updates["202508211118"][] = function() {
 				->where("email", '=', $participant->email)
 				->single();
 
-			$id = $userId ? $userId : "index_" . $index++;
+			if($userId) {
+				$id = $userId;
+			} else {
+				$participantId = go()->getDbConnection()
+					->selectSingleValue('id')
+					->from("calendar_participant")
+					->where("email", '=', $participant->email)
+					->where("eventId", '=', $o['fk'])
+					->single();
+
+				$id = $participantId ? $participantId : "index_" . $index++;
+			}
+
 			$participants[$id] = $participant;
 		}
 
