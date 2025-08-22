@@ -478,7 +478,7 @@ SELECT
 FROM cal_events WHERE exception_for_event_id = -1 GROUP BY uuid;
 
 
-INSERT INTO calendar_calendar_event
+INSERT IGNORE INTO calendar_calendar_event
 (id, eventId, calendarId)
 SELECT null, ce.eventId, e.calendar_id
 FROM cal_events e
@@ -486,7 +486,7 @@ inner join calendar_event ce on ce.uid = e.uuid
 WHERE e.exception_for_event_id = 0 and ce.recurrenceId is null;
 
 
-INSERT INTO calendar_calendar_event
+INSERT IGNORE INTO calendar_calendar_event
 (id, eventId, calendarId)
 SELECT null, ce.eventId, e.calendar_id
 FROM cal_events e

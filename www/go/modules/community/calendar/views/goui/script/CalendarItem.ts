@@ -426,6 +426,7 @@ export class CalendarItem {
 	}
 
 	get isOwner() {
+		console.log(this);
 		return !this.participants || this.calendarPrincipal?.roles?.owner || false;
 	}
 

@@ -75,7 +75,7 @@ $updates['202402221543'][] = function(){ // insert event overrides
 		$participantsStmt->execute([$row['id']]);
 		$exParticipants = $participantsStmt->fetchAll();
 		if(count($exParticipants) > 1) {
-			$patch->participants = [];
+			$participants = [];
 			foreach($exParticipants as $i => $p) {
 				$roles = [];
 				if($p['role']=='REQ-PARTICIPANT'){
@@ -84,7 +84,7 @@ $updates['202402221543'][] = function(){ // insert event overrides
 				if($p['is_organizer']) {
 					$roles['owner'] = true;
 				}
-				$patch->participants[$i] = (object)[
+				$participants[$p['user_id'] ? $p['user_id'] : $p['id']] = (object)[
 					'name' => $p['name'],
 					'kind' => 'individual',
 					'email' => $p['email'],
@@ -92,6 +92,8 @@ $updates['202402221543'][] = function(){ // insert event overrides
 					'participationStatus' => strtolower($p['status'])
 				];
 			}
+
+			$patch->participants = (object) $participants;
 		}
 
 		// add patch to calendar_recurrence_override
@@ -255,7 +257,7 @@ $updates['202502261353'][] = "DELETE cat FROM calendar_category cat LEFT JOIN ca
 // fix: set duration at 1 hour if duration is negative
 $updates['202503101510'][] = "UPDATE calendar_event SET duration = 'PT1H' WHERE duration LIKE 'PT-%';";
 $updates['202503111342'][] = function(){
-	\go\modules\community\calendar\cron\ScanEmailForInvites::install("*/5 * * * *");
+	\go\modules\community\calendar\cron\ScanEmailForInvites::install("*/5 * * * *", true);
 };
 
 $updates['202503131043'][] = "UPDATE IGNORE core_link l
