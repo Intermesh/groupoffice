@@ -3,7 +3,7 @@ import {User, userDS} from "@intermesh/groupoffice-core";
 import {tasklistcombo} from "./TasklistCombo.js";
 
 export class SettingsPanel extends Component {
-	private form: DataSourceForm;
+	private readonly form: DataSourceForm;
 
 	constructor() {
 		super();

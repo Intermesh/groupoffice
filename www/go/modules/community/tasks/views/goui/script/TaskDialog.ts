@@ -19,7 +19,8 @@ import {
 	DateField,
 	datefield,
 	DateInterval,
-	DateTime, datetimefield,
+	DateTime,
+	datetimefield,
 	durationfield,
 	fieldset,
 	h4,
@@ -57,7 +58,7 @@ export class TaskDialog extends FormWindow {
 		this.resizable = true;
 
 		this.form.on("save", ({data}) => {
-			router.goto("tasks/" + data.id)
+			router.goto("tasks/" + data.id);
 		});
 
 		this.generalTab.items.add(
@@ -88,6 +89,15 @@ export class TaskDialog extends FormWindow {
 						name: "tasklistId",
 						required: true,
 						listeners: {
+							render: async ({target}) => {
+								if (!target.value) {
+									const records = await target.list.store.load();
+
+									if (records.length) {
+										target.value = records[0].id;
+									}
+								}
+							},
 							change: async ({newValue}) => {
 								if (!newValue) {
 									return
