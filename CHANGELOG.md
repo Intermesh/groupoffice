@@ -1,4 +1,5 @@
 - Email: Don't match <link@domain.com> as xss threat
+- Serverclient: Fixed creating mailbox if first attempt of creating user failed with validation error
 
 18-08-2025: 6.8.134
 - Core: Convert mail addresses too in html editor
