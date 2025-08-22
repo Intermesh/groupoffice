@@ -1,5 +1,5 @@
-import {column, comp, Component, DateTime, EntityID, Format, store, t, table, Window} from "@intermesh/goui";
-import {jmapds} from "@intermesh/groupoffice-core";
+import {column, comp, Component, EntityID, Format, store, t, table, Window} from "@intermesh/goui";
+import {logEntryDS} from "./Index";
 
 export class HistoryDetailWindow extends Window {
 	private dateComp: Component;
@@ -26,7 +26,7 @@ export class HistoryDetailWindow extends Window {
 	}
 
 	public async load(logEntryId: EntityID) {
-		const logEntry = await jmapds("LogEntry").single(logEntryId);
+		const logEntry = await logEntryDS.single(logEntryId);
 
 		if (!logEntry)
 			return

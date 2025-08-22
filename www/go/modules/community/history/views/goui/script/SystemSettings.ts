@@ -1,5 +1,6 @@
 import {Component, containerfield, datasourceform, datasourcestore, fieldset, numberfield, t} from "@intermesh/goui";
-import {jmapds, modules} from "@intermesh/groupoffice-core";
+import {modules} from "@intermesh/groupoffice-core";
+import {moduleDS} from "./Index";
 
 export class SystemSettings extends Component {
 	private form;
@@ -8,7 +9,7 @@ export class SystemSettings extends Component {
 		super();
 
 		this.form = datasourceform({
-				dataSource: jmapds("Module")
+				dataSource: moduleDS
 			},
 			fieldset({},
 

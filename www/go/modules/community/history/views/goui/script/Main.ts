@@ -1,17 +1,20 @@
 import {
-	checkbox, CheckboxField,
+	checkbox,
 	comp,
-	Component, daterangefield, Filter,
+	Component,
+	daterangefield,
 	h3,
-	hr, List,
-	list, p,
+	hr,
+	List,
+	list,
+	p,
 	searchbtn,
 	splitter,
 	store,
 	t,
 	tbar
 } from "@intermesh/goui";
-import {modules, principalcombo} from "@intermesh/groupoffice-core";
+import {principalcombo} from "@intermesh/groupoffice-core";
 import {LogEntryGrid} from "./LogEntryGrid.js";
 import {TypeGrid} from "./TypeGrid.js";
 
@@ -72,7 +75,7 @@ export class Main extends Component {
 					required: false,
 					listeners: {
 						select: ({target, record}) => {
-							this.logEntryGrid.store.setFilter("user", {createdBy:target.value});
+							this.logEntryGrid.store.setFilter("user", {createdBy: target.value});
 							void this.logEntryGrid.store.load();
 						}
 					}
