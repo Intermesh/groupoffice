@@ -62,12 +62,8 @@ class Module extends core\Module
 		GarbageCollection::on(GarbageCollection::EVENT_RUN, static::class, 'onGarbageCollection');
 	}
 
-	static function onUserSave(User $user, bool $wasNew) {
-		if($wasNew) {
-			if(core\model\Module::isAvailableFor("community", "calendar", $user->id)) {
-				Calendar::createDefault($user);
-			}
-		}else if ($user->isModified('email')) {
+	static function onUserSave(User $user) {
+		if (!$user->isNew() && $user->isModified('email')) {
 			$pIds = go()->getDbConnection()->selectSingleValue('CONCAT("Calendar:",id)')->from('calendar_calendar')
 				->where('groupId', 'IS NOT', null)
 				->andWhere('ownerId', '=', $user->id)->all();

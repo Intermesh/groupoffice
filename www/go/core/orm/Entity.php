@@ -24,7 +24,6 @@ use go\core\validate\ErrorCode;
 use go\core\model\Module;
 use GO\Files\Model\Folder;
 use InvalidArgumentException;
-use Throwable;
 use function go;
 use go\core\db\Query as DbQuery;
 use go\core\util\ArrayObject;
@@ -60,18 +59,17 @@ abstract class Entity extends Property {
 	const EVENT_VALIDATE = 'validate';
 
 	/**
-	 * Fires just before the entity will be saved. If you return false the save will cancel.
+	 * Fires just before the entity will be saved
 	 * 
 	 * @param Entity $entity The entity that will be saved
 	 */
 	const EVENT_BEFORE_SAVE = 'beforesave';
 
 	/**
-	 * Fires after the entity has been successfully saved and committed.
-	 *
+	 * Fires after the entity has been saved
+	 * 
 	 * @param Entity $entity The entity that has been saved
-	 * @param bool $wasNew indicates if the entity was new before save
- */
+	 */
 	const EVENT_SAVE = 'save';
 
 	/**
@@ -384,18 +382,15 @@ abstract class Entity extends Property {
 				go()->warn(static::class .'::internalSave() returned false');
 				$this->rollback();
 				return false;
+			}		
+			
+			if ($this->fireEvent(self::EVENT_SAVE, $this) === false) {
+				$this->rollback();
+				return false;
 			}
 
-			$wasNew = $this->isNew();
-
-			$success =  $this->commit() && !$this->hasValidationErrors();
-
-			if($success) {
-				$this->fireEvent(self::EVENT_SAVE, $this, $wasNew);
-			}
-
-			return $success;
-		} catch(Throwable $e) {
+			return $this->commit() && !$this->hasValidationErrors();
+		} catch(\Throwable $e) {
 			ErrorHandler::logException($e);
 			$this->rollback();
 			throw $e;
@@ -583,7 +578,7 @@ abstract class Entity extends Property {
 			}
 
 			return true;
-		} catch(Throwable $e) {
+		} catch(\Throwable $e) {
 			if(go()->getDbConnection()->inTransaction()) {
 				go()->getDbConnection()->rollBack();
 			}

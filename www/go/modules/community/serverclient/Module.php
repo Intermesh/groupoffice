@@ -59,9 +59,9 @@ class Module extends core\Module
 	 * @return void
 	 * @throws \Exception
 	 */
-	public static function onSaveUser(User $user, bool $wasNew): void
+	public static function onSaveUser(User $user): void
 	{
-		if ($wasNew) {
+		if ($user->isNew()) {
 			return;
 		}
 
