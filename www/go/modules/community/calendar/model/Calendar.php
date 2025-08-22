@@ -6,9 +6,11 @@ use go\core\App;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\http;
+use go\core\model\Acl;
 use go\core\model\Principal;
 use go\core\model\User;
 use go\core\orm\CustomFieldsTrait;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\PrincipalTrait;
@@ -356,5 +358,34 @@ class Calendar extends AclOwnerEntity {
 
 	protected function principalType(): string {
 		return Principal::Resource;
+	}
+
+	public static function createDefault(User $user) : Calendar {
+
+		$calendar = Calendar::find()->where(['ownerId' => $user->id])->filter(['permissionLevel' => Acl::LEVEL_MANAGE])->single();
+
+		if (empty($calendar)) {
+			$calendar = Calendar::createFor($user->id);
+			$calendar->forUserId();
+			$calendar->setValues([
+				'name' => $user->displayName,
+				'ownerId' => $user->id,
+				'color' => Calendar::randomColor($user->displayName),
+				'isSubscribed'=>true,
+				'includeInAvailability'=>'all'
+			]);
+
+			if(!$calendar->save()) {
+				throw new SaveException($calendar);
+			}
+		}
+
+		$user->calendarPreferences->defaultCalendarId = $calendar->id;
+
+		if(!$user->save()) {
+			throw new SaveException($user);
+		}
+
+		return $calendar;
 	}
 }
