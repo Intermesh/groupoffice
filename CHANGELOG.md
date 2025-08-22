@@ -1,6 +1,7 @@
 - Core: Cache busting for GOUI modules
 - Calendar: Fixed holidays appeared every year
 - Calendar: New users gets personal calendar if he has permissions for the calendar module
+- Projects2: Custom column is sortable
 
 19-08-2025: 25.0.45
 - Calendar: Visible category filter depend on visible calendars instead of subscribed calendar.
