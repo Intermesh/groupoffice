@@ -430,7 +430,6 @@ export class CalendarItem {
 	}
 
 	get mayChange() {
-		debugger
 		return (this.isNew() ||
 			(this.cal.myRights.mayWriteOwn && this.isOwner)) && !this.readOnly;
 	}
