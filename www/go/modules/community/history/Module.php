@@ -111,8 +111,8 @@ class Module extends core\Module
 	/**
 	 * @throws Exception
 	 */
-	public static function onEntitySave(Entity $entity) {
-		self::logEntity($entity, $entity->isNew() ? 'create' : 'update');
+	public static function onEntitySave(Entity $entity, bool $wasNew) {
+		self::logEntity($entity, $wasNew ? 'create' : 'update');
 	}
 
 	/**

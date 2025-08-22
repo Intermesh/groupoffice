@@ -590,9 +590,9 @@ abstract class EntityController extends Controller {
 	public static $createdEntitities = [];
 	public static $updatedEntitities = [];
 
-	public static function onEntitySave(Entity $entity) {
+	public static function onEntitySave(Entity $entity, bool $wasNew) {
 		//Server should sent modified only but it's hard to check with getters and setters. So we just send all.
-		if($entity->isNew()) {
+		if($wasNew) {
 			static::$createdEntitities[$entity->id()] = $entity->toArray();
 		} else {
 			static::$updatedEntitities[$entity->id()] = $entity->toArray();
