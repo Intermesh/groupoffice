@@ -81,38 +81,10 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 * @returns {Promise}
 	 */
 	all : function(cb, scope) {
-
-		return this.getState().then(()  => {
-			if(this.isComplete) {
-				return this.query().then((response) => {
-					return this.get(response.ids).then( (result) => {
-						if(cb) {
-							cb.call(scope, true, result.entities);
-						}
-	
-						return result.entities
-					});				
-				});
-			} else
-			{
-				return go.Jmap.request({
-					method: this.entity.name + "/get"
-				}).then((response) => {
-
-					// this.metaStore.setItem('isComplete', true);
-					this.isComplete = true;
-					
-					if(cb) {
-						cb.call(scope, true, response.list);
-					}
-
-					return response.list;
-				}).catch((response) => {
-					if(cb) {
-						cb.call(scope, false, response);
-					}
-				});
-			}
+		return window.groupofficeCore.jmapds(this.entity.name).get().then((result) => {
+				if(cb) {
+					cb.call(scope, true, result.list);
+				}
 		});
 	},
 
