@@ -9,10 +9,12 @@ import {
 	h3,
 	hr,
 	menu,
+	mstbar,
 	router,
 	searchbtn,
 	t,
-	tbar
+	tbar,
+	Toolbar
 } from "@intermesh/goui";
 import {AclLevel, client, filterpanel, jmapds, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
 import {notebookgrid, NoteBookGrid} from "./NoteBookGrid";
@@ -20,11 +22,12 @@ import {NoteBookDialog} from "./NoteBookDialog";
 import {NoteGrid} from "./NoteGrid";
 import {NoteDetail} from "./NoteDetail";
 import {NoteDialog} from "./NoteDialog";
-import {NoteBook, noteBookDS} from "./Index.js";
+import {NoteBook, noteBookDS, noteDS} from "./Index.js";
 
 export class Main extends MainThreeColumnPanel {
 	private noteBookGrid!: NoteBookGrid;
 	private noteGrid!: NoteGrid;
+	private noteGridToolbar!: Toolbar;
 	protected east!: NoteDetail;
 	private addButton!: Button;
 
@@ -46,7 +49,7 @@ export class Main extends MainThreeColumnPanel {
 				},
 				checkbox({
 					listeners: {
-						change: ( {newValue}) => {
+						change: ({newValue}) => {
 							const rs = this.noteBookGrid.rowSelection!
 							newValue ? rs.selectAll() : rs.clear();
 						}
@@ -56,7 +59,7 @@ export class Main extends MainThreeColumnPanel {
 				"->",
 				searchbtn({
 					listeners: {
-						input: ( {text}) => {
+						input: ({text}) => {
 							this.noteBookGrid.store.setFilter("search", {text});
 							void this.noteBookGrid.store.load();
 						}
@@ -114,7 +117,7 @@ export class Main extends MainThreeColumnPanel {
 					column({
 						width: 48,
 						id: "btn",
-						renderer: (columnValue: any, record:NoteBook, td, table, rowIndex) => {
+						renderer: (columnValue: any, record: NoteBook, td, table, rowIndex) => {
 							return btn({
 								icon: "more_vert",
 								menu: menu({},
@@ -164,13 +167,13 @@ export class Main extends MainThreeColumnPanel {
 			multiSelect: true,
 			listeners: {
 				selectionchange: ({selected}) => {
-					if (selected.length == 1) {
-						const record = selected[0].record;
+					const noteIds = selected.map((row) => row.record.id);
 
-						if (record) {
-							router.goto("note/" + record.id);
-						}
+					if (noteIds[0]) {
+						router.goto("note/" + noteIds[0]);
 					}
+
+					noteIds.length > 1 ? this.noteGridToolbar.hide() : this.noteGridToolbar.show();
 				}
 			}
 		};
@@ -193,17 +196,17 @@ export class Main extends MainThreeColumnPanel {
 		});
 
 		return comp({
-				cls: "vbox",
+				cls: "vbox bg-lowest",
 				flex: 1
 			},
-			tbar({
-					cls: "border-bottom"
+			this.noteGridToolbar = tbar({
+					cls: "bg-mid border-bottom"
 				},
 				this.showWestButton(),
 				"->",
 				searchbtn({
 					listeners: {
-						input: ( {text}) => {
+						input: ({text}) => {
 							this.noteGrid.store.setFilter("search", {text});
 							void this.noteGrid.store.load();
 						}
@@ -273,6 +276,20 @@ export class Main extends MainThreeColumnPanel {
 							)
 						})
 					)
+				})
+			),
+			mstbar({
+					cls: "border-bottom",
+					table: this.noteGrid
+				},
+				"->",
+				btn({
+					icon: "delete",
+					handler: async () => {
+						const noteIds = this.noteGrid!.rowSelection!.getSelected().map((row) => row.record.id);
+
+						await noteDS.confirmDestroy(noteIds);
+					}
 				})
 			),
 			comp({

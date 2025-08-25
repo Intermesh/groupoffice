@@ -31,6 +31,12 @@ export class NoteGrid extends Table<DataSourceStore> {
 			await dlg.load(target.store.get(storeIndex)!.id);
 		});
 
+		this.on("delete", async ({target}) => {
+			const ids = this.rowSelection!.getSelected()!.map(row => row.record.id);
+
+			await noteDS.confirmDestroy(ids);
+		});
+
 		this.fitParent = true;
 	}
 }
