@@ -30,25 +30,11 @@ class Holiday {
 
 	public function __construct(string $rule, $data,$year) {
 		$this->year = $year;
-
-		if(isset($data->_name)) {
-			$lang = self::$names->{$data->_name}->name;
-			if(isset($lang->{self::$lang}))
-				$this->title = $lang->{self::$lang};
-			else if(isset($lang->en))
-				$this->title = $lang->en;
-			else
-				$this->title = var_export($data->_name,true);
-		} else if($data->name) {
-			if(!isset($data->name->{self::$lang})) {
-				self::$lang = substr(self::$lang,0,2);
-				if(!isset($data->name->{self::$lang})) {
-					self::$lang = 'en';
-				}
-			}
-			$this->title = $data->name->{self::$lang};
-
+		if(!isset($data->_name) && !isset($data->name)) {
+			$data->_name = $rule;
 		}
+		$this->title = self::findTitle($data);
+
 		if(isset($data->type)) {
 			$this->type = $data->type;
 		}
@@ -58,6 +44,42 @@ class Holiday {
 		if($this->substitutes) {
 			$this->title ='(*)'.$this->title;
 		}
+	}
+
+	static private function findTitle($data) {
+		if(isset($data->_name)) {
+			if(!isset(self::$names->{$data->_name}))
+				return null;
+			$lang = self::$names->{$data->_name}->name;
+		} else if(isset($data->name)) {
+			$lang = $data->name;
+		} else {
+			return null;
+		}
+		if(isset($lang->{self::$lang}))
+			return $lang->{self::$lang};
+		$la = substr(self::$lang,0,2);
+		if(isset($lang->{$la}))
+			return $lang->{$la};
+		if(isset($lang->en))
+			return $lang->en;
+
+		return null;
+	}
+
+	static private function findRegionName($obj) {
+		if(isset($obj->name))
+			return $obj->name;
+
+		if(isset($obj->names->{self::$lang}))
+			return $obj->names->{self::$lang};
+
+		$la = substr(self::$lang,0,2);
+		if(isset($obj->names->{$la}))
+			return $obj->names->{$la};
+		if(isset($obj->names->en))
+			return $obj->names->en;
+		return '';
 	}
 
 
@@ -100,7 +122,7 @@ class Holiday {
 						continue; // we do not remove substitutes for regions.
 					}
 					$holiday = new self($rule, $entry, $year);
-					$holiday->title .= ' ('.$obj->name.')';
+					$holiday->title .= ' ('.self::findRegionName($obj).')';
 					if($holiday->start !== null && $holiday->start >= $from && $holiday->start <= $till) {
 						$holiday->start = $holiday->start->format('Y-m-d');
 						yield $holiday;
@@ -118,19 +140,19 @@ class Holiday {
 	 */
 	private function parseDateRule($rule) {
 
-		$date = array_shift($rule);
-		if($date === 'substitutes') {
+		$part = array_shift($rule);
+		if($part === 'substitutes') {
 			$this->substitutes = true;
-			$date = array_shift($rule);
+			$part = array_shift($rule);
 		}
-		if(preg_match('/\d{2}-\d{2}/', $date) || in_array($date, self::$months)) {
-			$this->parseFixed($date);
-		} else if($date === 'easter') {
+		if(preg_match('/\d{2}-\d{2}/', $part) || in_array($part, self::$months)) {
+			$this->parseFixed($part);
+		} else if($part === 'easter') {
 			$this->parseEaster(array_shift($rule));
-		} else if(preg_match('/\d+(st|nd|rd|th)/', $date)) {
-			$this->parseCount($date, $rule);
-		} else if(in_array(strtolower($date), self::$days)) {
-			array_unshift($rule, $date);
+		} else if(preg_match('/\d+(st|nd|rd|th)/', $part)) {
+			$this->parseCount($part, $rule);
+		} else if(in_array(strtolower($part), self::$days)) {
+			array_unshift($rule, $part);
 			$this->parseCount(1, $rule);
 		} else {
 			return false;
@@ -181,12 +203,11 @@ class Holiday {
 	private function parseCount($count, $rule) {
 		$weekday = array_shift($rule);
 		$before = array_shift($rule)=='before'; // before|after|in
-		$this->parseFixed(array_shift($rule));
-		for($i=0;$i<intval($count); $i++) {
-			$this->start->modify(($before?'previous':'next'). ' '.$weekday);
-		}
 		if(!empty($rule)) {
 			$this->parseDateRule($rule); // endlessly chainable
+		}
+		for($i=0;$i<intval($count); $i++) {
+			$this->start->modify(($before?'previous':'next'). ' '.$weekday);
 		}
 	}
 

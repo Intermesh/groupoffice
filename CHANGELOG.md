@@ -10,6 +10,7 @@
 - Serverclient: Fixed creating mailbox if first attempt of creating user failed with validation error
 - DAV: Don't list all principals for privacy reasons
 - Leavedays: fix manager check in user panel
+- Core: Fixed duplicate request bugs on initital load of UI
 
 19-08-2025: 25.0.45
 - Calendar: Visible category filter depend on visible calendars instead of subscribed calendar.
