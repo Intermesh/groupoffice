@@ -81,7 +81,15 @@ class Scheduler {
 			'{date}' => implode(' ',$event->humanReadableDate()),
 		]);
 
-		go()->getMailer()->compose()
+		$mailer = go()->getUserMailer($participant->email);
+		if($mailer) {
+			$msg = $mailer->compose()
+				->setFrom($participant->email, $participant->name);
+		} else{
+			$msg = go()->getMailer()->compose()->setFrom(go()->getSettings()->systemEmail, $participant->name)->setReplyTo($participant->email);
+		}
+
+		$msg
 			->setSubject($subject)
 			->setFrom($participant->email, $participant->name)
 			//->setReplyTo($participant->email)
@@ -140,10 +148,15 @@ class Scheduler {
 			}
 
 			try {
-				go()->getMailer()->compose()
-						->setSubject($subject . ': ' . $event->title)
-						->setFrom(go()->getSettings()->systemEmail, $organizer->name)
-						->setReplyTo($organizer->email)
+				$mailer = go()->getUserMailer($organizer->email);
+				if($mailer) {
+					$msg = $mailer->compose()
+						->setFrom($organizer->email, $organizer->name);
+				} else{
+					$msg = go()->getMailer()->compose()->setFrom(go()->getSettings()->systemEmail, $organizer->name)->setReplyTo($organizer->email);
+				}
+
+				$msg->setSubject($subject . ': ' . $event->title)
 						->setTo(new Address($participant->email, $participant->name))
 						->attach(Attachment::fromString($ics->serialize(),
 							'invite.ics',

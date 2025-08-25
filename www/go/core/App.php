@@ -121,6 +121,13 @@ namespace go\core {
 		const EVENT_SCRIPTS = 'scripts';
 
 		/**
+		 * Fires when a user mailer is requested.
+		 *
+		 * @param $mailer array{mailer}
+		 */
+		const EVENT_USER_MAILER = 'usermailer';
+
+		/**
 		 *
 		 * @var Connection
 		 */
@@ -263,6 +270,17 @@ namespace go\core {
 				$this->mailer = new Mailer();
 			}
 			return $this->mailer;
+		}
+
+		/**
+		 * Get mailer that can send with the user e-mail as from address
+		 *
+		 * @param string $email
+		 * @return Mailer|null
+		 */
+
+		public function getUserMailer(string $email) : Mailer|null {
+			return App::fireEvent(self::EVENT_USER_MAILER, $email);
 		}
 
 		/**

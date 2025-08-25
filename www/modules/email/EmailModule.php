@@ -22,6 +22,8 @@
 namespace GO\Email;
 
 use GO;
+use go\core\App;
+use go\core\mail\Mailer;
 use go\core\model\User;
 use go\core\Module;
 use go\core\orm\Mapping;
@@ -52,11 +54,29 @@ class EmailModule extends \GO\Base\Module{
 
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 
+		App::on(App::EVENT_USER_MAILER, static::class, 'getUserMailer');
+
 	}
 
 	public function depends()
 	{
 		return ['community/addressbook'];
+	}
+
+	public static function getUserMailer(string $email): ?Mailer
+	{
+		return null;
+
+		$account = Account::model()->findByEmail($email);
+		if(!$account) {
+			return null;
+		}
+
+		$mailer = new Mailer();
+		$mailer->setEmailAccount($account);
+
+		return $mailer;
+
 	}
 
 	public static function onMap(Mapping $mapping) {
