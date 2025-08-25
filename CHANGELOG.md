@@ -8,6 +8,7 @@
 - Core/Support: Fixed incremental HTML encoding issue
 - Serverclient: Fixed creating mailbox if first attempt of creating user failed with validation error
 - DAV: Don't list all principals for privacy reasons
+- Leavedays: fix manager check in user panel
 
 19-08-2025: 25.0.45
 - Calendar: Visible category filter depend on visible calendars instead of subscribed calendar.
