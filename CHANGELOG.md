@@ -1,4 +1,4 @@
-25-08-2025: 20.0.46
+25-08-2025: 25.0.46
 - Core: Cache busting for GOUI modules
 - Calendar: Fixed holidays appeared every year
 - Calendar: New users gets personal calendar if he has permissions for the calendar module
