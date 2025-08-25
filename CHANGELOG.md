@@ -1,3 +1,4 @@
+25-08-2025: 6.8.135
 - Email: Don't match <link@domain.com> as xss threat
 - Serverclient: Fixed creating mailbox if first attempt of creating user failed with validation error
 - DAV: Don't list all principals for privacy reasons
