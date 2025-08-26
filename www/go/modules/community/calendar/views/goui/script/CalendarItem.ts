@@ -685,11 +685,11 @@ export class CalendarItem {
 							for(const prop in p) {
 
 								if(prop == "roles") {
-									//roles is an object and therefore always different with !=. Maybe
-									// just skip here as it never changes in an override.
-									continue;
-								}
-								if(p[prop] != original.participants[key][prop]) {
+									//roles is an object and therefore always different with !=.
+									if(p.roles?.optional != original.participants[key].roles?.optional){
+										patch['participants/'+key+'/'+prop] = p[prop];
+									}
+								} else if(p[prop] != original.participants[key][prop]) {
 									patch['participants/'+key+'/'+prop] = p[prop];
 								}
 							}
