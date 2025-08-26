@@ -91,8 +91,6 @@ class Scheduler {
 
 		$msg
 			->setSubject($subject)
-			->setFrom($participant->email, $participant->name)
-			//->setReplyTo($participant->email)
 			->setTo(new Address($event->replyTo, !empty($organizer) ? $organizer->name : null))
 			->attach(Attachment::fromString($ics->serialize(),'reply.ics', 'text/calendar;method=REPLY;charset=utf-8',Attachment::ENCODING_8BIT))
 			->setBody($body)
