@@ -37,6 +37,12 @@ class Mailer {
 	 */
 	private bool $sent = false;
 
+	public string $fromEmail;
+
+	public string $fromName;
+
+	public string $replyTo;
+
 	/**
 	 * Create a new mail message
 	 * @return Message
@@ -44,23 +50,22 @@ class Mailer {
 	public function compose(): Message
 	{
 		$message = new Message();
+
+		if(!isset($this->fromEmail)) {
+			if(isset($this->emailAccount)) {
+				$alias = $this->emailAccount->getDefaultAlias();
+				$this->fromEmail = $alias->email;
+				$this->fromName = $alias->name;
+			} else if(isset($this->smtpAccount)){
+				$this->fromEmail = $this->smtpAccount->fromEmail;
+				$this->fromName = $this->smtpAccount->fromName;
+			}
+		}
+
 		$message->setMailer($this);
 
-		if($this->emailAccount) {
-			$alias = $this->emailAccount->getDefaultAlias();
-			$message->setFrom($alias->email, $alias->name);
-		}
 		return $message;
 	}
-
-	public function getSender() {
-		if(!empty($this->emailAccount)) {
-			return $this->emailAccount->getDefaultAlias()->email;
-		} else if ($this->smtpAccount) {
-			return $this->smtpAccount->fromEmail;
-		}
-	}
-
 	/**
 	 * Provide SMTP account. If omited the system notification settings will be used.
 	 * 

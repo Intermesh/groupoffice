@@ -65,8 +65,6 @@ class EmailModule extends \GO\Base\Module{
 
 	public static function getUserMailer(string $email): ?Mailer
 	{
-		return null;
-
 		$account = Account::model()->findByEmail($email);
 		if(!$account) {
 			return null;

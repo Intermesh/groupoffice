@@ -81,15 +81,8 @@ class Scheduler {
 			'{date}' => implode(' ',$event->humanReadableDate()),
 		]);
 
-		$mailer = go()->getUserMailer($participant->email);
-		if($mailer) {
-			$msg = $mailer->compose()
-				->setFrom($participant->email, $participant->name);
-		} else{
-			$msg = go()->getMailer()->compose()->setFrom(go()->getSettings()->systemEmail, $participant->name)->setReplyTo($participant->email);
-		}
-
-		$msg
+		$mailer = go()->getMailer($participant->email, $participant->name);
+		$mailer->compose()
 			->setSubject($subject)
 			->setTo(new Address($event->replyTo, !empty($organizer) ? $organizer->name : null))
 			->attach(Attachment::fromString($ics->serialize(),'reply.ics', 'text/calendar;method=REPLY;charset=utf-8',Attachment::ENCODING_8BIT))
@@ -146,13 +139,8 @@ class Scheduler {
 			}
 
 			try {
-				$mailer = go()->getUserMailer($organizer->email);
-				if($mailer) {
-					$msg = $mailer->compose()
-						->setFrom($organizer->email, $organizer->name);
-				} else{
-					$msg = go()->getMailer()->compose()->setFrom(go()->getSettings()->systemEmail, $organizer->name)->setReplyTo($organizer->email);
-				}
+				$mailer = go()->getMailer($organizer->email, $organizer->name);
+				$msg = $mailer->compose();
 
 				if($participant->kind !== 'resource') {
 					$msg->attach(Attachment::fromString($ics->serialize(),
