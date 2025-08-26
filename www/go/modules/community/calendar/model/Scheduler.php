@@ -154,12 +154,15 @@ class Scheduler {
 					$msg = go()->getMailer()->compose()->setFrom(go()->getSettings()->systemEmail, $organizer->name)->setReplyTo($organizer->email);
 				}
 
+				if($participant->kind !== 'resource') {
+					$msg->attach(Attachment::fromString($ics->serialize(),
+						'invite.ics',
+						'text/calendar;method=' . $method . ';charset=utf-8', Attachment::ENCODING_8BIT)
+					);
+				}
+
 				$msg->setSubject($subject . ': ' . $event->title)
 						->setTo(new Address($participant->email, $participant->name))
-						->attach(Attachment::fromString($ics->serialize(),
-							'invite.ics',
-							'text/calendar;method=' . $method . ';charset=utf-8', Attachment::ENCODING_8BIT)
-						)
 						->setBody(self::mailBody($event, $method, $participant, $subject), 'text/html')
 						->send();
 			} catch(\Exception $e) {

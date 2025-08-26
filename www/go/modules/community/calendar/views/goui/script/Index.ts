@@ -24,7 +24,7 @@ export const calendarStore = datasourcestore({
 });
 export const writeableCalendarStore = datasourcestore({
 	dataSource:jmapds('Calendar'),
-	queryParams:{filter:{isSubscribed: true, davaccountId : null, permissionLevel:30/*writeOwn*/}},
+	queryParams:{filter:{isSubscribed: true, davaccountId : null, isResource:false, permissionLevel:30/*writeOwn*/}},
 	sort: [{property:'sortOrder'},{property:'name'}]
 })
 

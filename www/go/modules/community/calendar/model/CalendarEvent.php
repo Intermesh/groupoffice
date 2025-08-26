@@ -624,16 +624,24 @@ class CalendarEvent extends AclItemEntity {
 		if(!empty($this->alerts)) {
 			$this->useDefaultAlerts = false;
 		}
-
-		if(!empty($this->participants) && empty($this->replyTo)) {
-			$owner = $this->organizer();
-			if(!empty($owner)) {
-				$this->replyTo = $owner->email;
-			}
-		}
-
 		if(empty($this->prodId) || $this->prodId === 'Unknown') {
 			$this->prodId = str_replace('{VERSION}', go()->getVersion(),self::PROD);
+		}
+
+		if(!empty($this->participants)) {
+			// reset participation status if event changes "materially"
+			if($this->isModified(['start', 'duration', 'recurrenceRule', 'location'])) {
+				foreach ($this->participants as $participant) {
+					if (!$participant->isNew() && !$participant->isOwner())
+						$participant->participationStatus = Participant::NeedsAction;
+				}
+			}
+			if (empty($this->replyTo)) {
+				$owner = $this->organizer();
+				if (!empty($owner)) {
+					$this->replyTo = $owner->email;
+				}
+			}
 		}
 
 

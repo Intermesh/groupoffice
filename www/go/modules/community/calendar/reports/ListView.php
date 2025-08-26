@@ -40,8 +40,8 @@ class ListView extends Calendar {
 			'before'=>$this->end->format('Y-m-d')
 		]));
 
-		$this->SetMargins(10,10,10)
-;		$this->setAutoPageBreak(true, 25);
+		$this->SetMargins(10,10,10);
+		$this->setAutoPageBreak(true, 25);
 		$this->AddPage();
 
 		$this->drawItems();
