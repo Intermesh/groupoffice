@@ -378,4 +378,11 @@ $updates["202508211118"][] = function() {
 
 };
 
+$updates["202508281104"][] = "alter table calendar_preferences add personalCalendarId INT UNSIGNED NULL AFTER defaultCalendarId;";
+$updates["202508281104"][] = "alter table calendar_preferences
+    add constraint calendar_preferences_calendar_personal_calendar_id_fk
+        foreign key (personalCalendarId) references calendar_calendar (id)
+            on delete set null;";
+
+$updates["202508281104"][] = "UPDATE calendar_preferences set personalCalendarId = defaultCalendarId where defaultCalendarId is not null;";
 // TODO: calendar views -> custom filters

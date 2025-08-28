@@ -278,6 +278,12 @@ class CalendarEvent extends AclItemEntity {
 
 	}
 
+	/**
+	 * Find the event in a calendar the user owns and has at least rsvp permission
+	 *
+	 * @param $uid string UID of the event
+	 * @param $userId int id of owner
+	 */
 	static function findForUser($uid, $userId) {
 		return self::find()->join('core_user', 'u', 'u.id = cal.ownerId')
 			->where(['cal.ownerId' => $userId, 'eventdata.uid'=>$uid])

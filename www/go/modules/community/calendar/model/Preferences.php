@@ -35,6 +35,9 @@ class Preferences extends Property
 	/** @var ?string The id of the user's default calendar. */
 	public ?string $defaultCalendarId = null;
 
+	/** @var ?string The id of the calendar where the user's invite go into  */
+	public ?string $personalCalendarId = null;
+
 	/**
 	 * If true, whenever an event invitation is received, add the event to the
 	 * user's calendar with the id given in *autoAddCalendarId*.
