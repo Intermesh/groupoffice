@@ -81,11 +81,12 @@ class Principal extends AclOwnerEntity
 			})->add('permissionLevel', function(Criteria $criteria, $value, Query $query) {
 				Acl::applyToQuery($query, 'principal.aclId', $value);
 			}, Acl::LEVEL_READ)
-//			->add('showDisabled', function (Criteria $criteria, $value){
-//				if($value === false) {
-//					$criteria->andWhere('enabled', '=', 1);
-//				}
-//			}, false)
+			->add('showDisabledUsers', function (Criteria $criteria, $value, Query $query){
+				if($value === false) {
+					$query->join("core_user", "u", "u.id = principal.id", "left");
+					$criteria->andWhere('(u.enabled IS NULL or u.enabled = 1)');
+				}
+			}, false)
 			->add('email', function (Criteria $criteria, $value, Query $query){
 				$criteria->where('email', '=', $value);
 			})
