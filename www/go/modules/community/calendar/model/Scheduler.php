@@ -340,10 +340,10 @@ class Scheduler {
 				->join('calendar_calendar_event', 'c', 'c.eventId = t.eventId', 'LEFT')
 				->where(['uid'=>$uid, 'recurrenceId' => $recurId])->single();
 		}
-		$calendarId = Calendar::fetchDefault($userId);
+		$calendarId = Calendar::fetchPersonal($userId);
 		if(!empty($eventCalendars['eventId'])) {
-			// add it to the current receivers default calendar
-			$added = go()->getDbConnection()->insert('calendar_calendar_event', [
+			// add it to the current receivers personal calendar
+			$added = go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
 				['calendarId'=>$calendarId, 'eventId'=>$eventCalendars['eventId']]
 			])->execute();
 			// if added then

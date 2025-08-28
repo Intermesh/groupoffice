@@ -14,6 +14,7 @@ import {t} from "./Index.js";
 export class PreferencesPanel extends Component {
 	private form: DataSourceForm<User>;
 	private calendarStore: DataSourceStore<JmapDataSource<DefaultEntity>>;
+	private personalCalendarStore: DataSourceStore<JmapDataSource<DefaultEntity>>;
 
 	constructor() {
 		super();
@@ -26,6 +27,14 @@ export class PreferencesPanel extends Component {
 
 			sort: [{property:'sortOrder'},{property:'name'}]
 		});
+		this.personalCalendarStore = datasourcestore({
+			dataSource:jmapds('Calendar'),
+			filters:{
+				default:{isSubscribed: true, davaccountId : null, isResource:false, permissionLevel:30/*writeOwn*/},
+				owner:{ownerId:client.user.id}
+			},
+			sort: [{property:'sortOrder'},{property:'name'}]
+		})
 
 		this.form = datasourceform<User>(
 			{
@@ -41,6 +50,8 @@ export class PreferencesPanel extends Component {
 					checkbox({name:'showTooltips', label:t('Show pop-up info when hovering over appointments')}),
 					checkbox({name:'showDeclined', label: t('Show events that you have declined')}),
 					select({name:'defaultCalendarId', label: t('Default calendar'), store: this.calendarStore, valueField: 'id',
+						hint: t('Start with this calendar selected')}),
+					select({name:'personalCalendarId', label: t('Personal calendar'), store: this.personalCalendarStore, valueField: 'id',
 						hint: t('Invitation to event will be added into this calendar')}),
 					select({name:'weekViewGridSnap', label: t('Raster size for day/week view'),
 						hint: t('The duration adjustment when resizing an event'),options: [
@@ -101,6 +112,9 @@ export class PreferencesPanel extends Component {
 	onLoad(user:User) {
 		this.form.value = user;
 		this.form.currentId = user.id;
+
+		this.personalCalendarStore.setFilter('owner', {ownerId: user.id});
+		this.personalCalendarStore.load().catch(e => Notifier.error(e))
 
 		this.calendarStore.setFilter("sub", {isSubscribedFor: user.id});
 		this.calendarStore.load().catch(e => Notifier.error(e))

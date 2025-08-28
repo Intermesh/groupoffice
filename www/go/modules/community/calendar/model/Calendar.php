@@ -106,13 +106,13 @@ class Calendar extends AclOwnerEntity {
 	}
 
 	/** @return int */
-	public static function fetchDefault($userId) {
+	public static function fetchPersonal($userId) {
 		$user = User::findById($userId, ['calendarPreferences'], true);
 		if(!empty($user)) {
 			/** @var Preferences $pref */
 			$pref = $user->calendarPreferences;
-			if (!empty($pref->defaultCalendarId)) {
-				return $pref->defaultCalendarId;
+			if (!empty($pref->personalCalendarId)) {
+				return $pref->personalCalendarId;
 			}
 		}
 		// If default preference is empty use the first owned calendar
@@ -154,6 +154,8 @@ class Calendar extends AclOwnerEntity {
 				}
 			})->add('isResource', function(Criteria $criteria, $value, Query $query) {
 				$criteria->where('groupId',$value?'IS NOT':'IS', null);
+			})->add('ownerId', function(Criteria $criteria, $value, Query $query) {
+				$criteria->where('ownerId','=', $value);
 			})->add('groupId', function(Criteria $criteria, $value, Query $query) {
 				$criteria->where('groupId','=', $value);
 			})->add('davaccountId', function(Criteria $criteria, $value, Query $query) {
@@ -380,6 +382,7 @@ class Calendar extends AclOwnerEntity {
 			}
 		}
 
+		$user->calendarPreferences->personalCalendarId = $calendar->id;
 		$user->calendarPreferences->defaultCalendarId = $calendar->id;
 
 		if(!$user->save()) {
