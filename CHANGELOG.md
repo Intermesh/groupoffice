@@ -1,5 +1,6 @@
 - Core: App::USER_MAILER event so calendar can send scheduling mails with user from address
 - Core: Contacts showed in group member grid
+- Core: Hide disabled users from Principal queries by default
 
 25-08-2025: 25.0.46
 - Core: Cache busting for GOUI modules
