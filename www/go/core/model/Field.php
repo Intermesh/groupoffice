@@ -204,7 +204,7 @@ class Field extends AclItemEntity {
 			$c = Table::getInstance($this->tableName())->getColumn($this->databaseName);
 		}
 		if(empty($c)) {
-			go()->debug("Column for custom field ".$this->databaseName." not found in ". $this->tableName());
+			go()->debug("Column for custom field ".($this->databaseName ?? "(empty)")." not found in ". $this->tableName());
 			return null;
 		}
 		
