@@ -59,7 +59,8 @@ interface CalendarItemConfig {
 	start?: DateTime
 	end?: DateTime
 	open?:() => void
-	defaultColor?: string
+	defaultColor?: string,
+	cal?: any
 }
 
 /**
@@ -73,6 +74,14 @@ export class CalendarItem {
 
 	static clipboard?: CalendarItem;
 
+	/**
+	 * Provider index type
+	 * eg. "event", "birthday", "task" etc.
+	 *
+	 * @see CalendarAdapter.providers
+	 */
+	provider!: string
+
 	key!: string|null // id/recurrenceId
 	recurrenceId?:string
 	data!: CalendarEvent
@@ -81,6 +90,7 @@ export class CalendarItem {
 	start!: DateTime
 	end!: DateTime
 	patched: CalendarEvent
+	readonly readOnly?: boolean
 	readonly extraIcons;
 	//color!: string
 
@@ -95,7 +105,6 @@ export class CalendarItem {
 
 	constructor(obj:CalendarItemConfig) {
 		Object.assign(this,obj);
-
 
 		this.patched = ObjectUtil.patch(structuredClone(obj.data), obj.override) as CalendarEvent;
 		 if(obj.recurrenceId && (!obj.override || !obj.override.start))
@@ -115,7 +124,9 @@ export class CalendarItem {
 		//if(!obj.end) {
 			this.end = this.start.clone().add(new DateInterval(this.patched.duration!));
 		//}
-		this.cal = calendarStore.find((c:any) => c.id == this.patched.calendarId);
+		if(!this.cal) {
+			this.cal = calendarStore.find((c: any) => c.id == this.patched.calendarId);
+		}
 		if(this.patched.categoryIds)
 		for(const id of this.patched.categoryIds) {
 			const cat = categoryStore.find((c:any) => c.id == id);
@@ -130,6 +141,11 @@ export class CalendarItem {
 			this.title = this.patched.title!;
 		}
 		this.extraIcons = obj.extraIcons || [];
+		if(obj.key && obj.key[0] === 'L') {
+			this.extraIcons.push('logout');
+			this.readOnly = true; //no dragging
+			this.open = async (_c)=>{};
+		}
 		this.divs = {};
 	}
 
@@ -174,7 +190,8 @@ export class CalendarItem {
 					}
 				}
 			}
-			const r = new Recurrence({dtstart: new Date(e.start), timeZone:e.timeZone, rule: e.recurrenceRule});
+
+			const r = new Recurrence({dtstart: new DateTime(e.start, e.timeZone), rule: e.recurrenceRule});
 			for(const date of r.loop(from, until)){
 				const recurrenceId = date.format('Y-m-d\TH:i:s');
 
@@ -409,13 +426,13 @@ export class CalendarItem {
 	}
 
 	get isOwner() {
+		console.log(this);
 		return !this.participants || this.calendarPrincipal?.roles?.owner || false;
 	}
 
 	get mayChange() {
-		return this.isNew() ||
-			this.cal.myRights.mayWriteAll ||
-			(this.cal.myRights.mayWriteOwn && this.isOwner);
+		return (this.isNew() ||
+			(this.cal.myRights.mayWriteOwn && this.isOwner)) && !this.readOnly;
 	}
 
 	get calendarPrincipal() {
@@ -423,7 +440,7 @@ export class CalendarItem {
 			return this.participants[this.principalId];
 	}
 	get principalId() {
-		return (this.cal && this.cal.ownerId) ? this.cal.ownerId+'' : go.User.id+''
+		return (this.cal && this.cal.ownerId) ? this.cal.ownerId+'' : client.user.id+''
 	}
 
 	get quickText(): string {
@@ -439,7 +456,7 @@ export class CalendarItem {
 			lines.push('<hr>'+t('Participants'));
 			for(const key in this.participants) {
 				const p = this.participants[key],
-					icon = statusIcons[p.participationStatus],
+					icon = statusIcons[p.participationStatus] ? statusIcons[p.participationStatus] : statusIcons["needs-action"] ,
 					 i= '<i class="icon '+icon[2]+'" title="'+icon[1]+'">'+icon[0]+'</i>' ;
 				lines.push(i+' '+(p.name ?? p.email));
 			}
@@ -463,7 +480,9 @@ export class CalendarItem {
 	private humanReadableDate() {
 		const start = this.start;
 		const end = this.end.clone();
-		const oneDay = start.format('Ymd') === end.format('Ymd');
+		const oneDay = this.data.duration = "P1D";
+
+		console.log(oneDay, start, end);
 
 		let line1 = start.format('l j F Y');
 
@@ -498,8 +517,8 @@ export class CalendarItem {
 		if(this.isRecurring && this.data.recurrenceRule) {
 			const e = this.data;
 			if(e.recurrenceRule.count) {
-				const r = new Recurrence({dtstart: new Date(e.start), timeZone:e.timeZone, rule: e.recurrenceRule});
-				for(const date of r.loop(new DateTime(), new DateTime('2058-01-01'), (_d,i) => i < 1)){
+				const r = new Recurrence({dtstart: new DateTime(e.start, e.timeZone), rule: e.recurrenceRule});
+				for(const date of r.loop(new DateTime(), new DateTime('2058-01-01'), (_d,i) => i < 1)) {
 					lastOccurrence = date.clone().add(new DateInterval(e.duration));
 				}
 			} else if(e.recurrenceRule.until) {
@@ -570,7 +589,7 @@ export class CalendarItem {
 			});
 		} else if(this.isOverride) {
 			this.patchOccurrence(modified, onFinish);
-		} else if(skipAsk) {
+		} else if(skipAsk || !this.recurrenceId) {
 			// always patch series
 			this.patchSeries(modified, onFinish)
 		} else {
@@ -666,11 +685,11 @@ export class CalendarItem {
 							for(const prop in p) {
 
 								if(prop == "roles") {
-									//roles is an object and therefore always different with !=. Maybe
-									// just skip here as it never changes in an override.
-									continue;
-								}
-								if(p[prop] != original.participants[key][prop]) {
+									//roles is an object and therefore always different with !=.
+									if(p.roles?.optional != original.participants[key].roles?.optional){
+										patch['participants/'+key+'/'+prop] = p[prop];
+									}
+								} else if(p[prop] != original.participants[key][prop]) {
 									patch['participants/'+key+'/'+prop] = p[prop];
 								}
 							}
@@ -824,7 +843,7 @@ export class CalendarItem {
 	}
 
 	remove() {
-		if(!this.mayChange)
+		if(!this.isOwner && !this.cal.myRights.mayWriteAll)
 			return;
 		if(!this.isRecurring) {
 			this.confirmScheduleMessage(false, () => {

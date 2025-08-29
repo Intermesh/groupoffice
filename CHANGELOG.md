@@ -1,3 +1,69 @@
+28-08-2025 25.0.47
+- Core: App::USER_MAILER event so calendar can send scheduling mails with user from address
+- Core: Contacts showed in group member grid
+- Core: Hide disabled users from Principal queries by default
+- Core: Jumping scroll position on scroll load in autocomplete fields
+- Core: Safer way to execute custom field functions
+
+25-08-2025: 25.0.46
+- Core: Cache busting for GOUI modules
+- Calendar: Fixed holidays appeared every year
+- Calendar: New users gets personal calendar if he has permissions for the calendar module
+- Projects2: Custom column is sortable
+- Projects2: Include sub projects in project report
+- Calendar: Fix incorrect participants patch after migration
+- Email: Don't match <link@domain.com> as xss threat
+- Core/Support: Fixed incremental HTML encoding issue
+- Serverclient: Fixed creating mailbox if first attempt of creating user failed with validation error
+- DAV: Don't list all principals for privacy reasons
+- Leavedays: fix manager check in user panel
+- Core: Fixed duplicate request bugs on initital load of UI
+
+19-08-2025: 25.0.45
+- Calendar: Visible category filter depend on visible calendars instead of subscribed calendar.
+
+19-08-2025: 25.0.44
+- Core: Updated German translations. Danke Christopher K.
+- Newsletters: prevent unhelpful Javascript error when a newsletter neither has a smtp or email account ID
+- Calendar: fixed showing edit dialog when the user has writeall permission to the calendar but the calendar owner / current user is not the organizer.
+- Calendar: Show regional holidays
+- Calendar: New checkbox "Sync to device" on calendar edit dialog. To prevent syncing all subscribed calendars.
+- Calendar: Affecting availability is now a checkbox. Events in shared calendars will only affect availability if the user is a participant. 
+
+17-08-2025: 25.0.43
+- Calendar: Fixed notifications that come from the cronjob and fixed that the cronjob and mail reading reprocesses invites every time.
+- Calendar: Update time in now indicator
+- Newsletters / Core: Speed up newsletter sending and saving of models with large "map" properties
+- Core: Show unavailable modules so they can be removed
+- Core: Convert mail addresses too in html editor
+- Calendar: Added "Home" button
+- Core: Use TEXT values for custom fields with lengths greater than 255 characters
+
+12-08-2025: 25.0.42
+- Calendar: bug with 12pm times becoming 12 hr later
+- Calendar: Fixed some problems when GO timezone didn't match system timezone
+- Calendar: 0pm -> 12pm
+- Calendar: Some hyperlinks could be malformed
+- Caldav: Fixed scheduling issue with recurring events
+- Calendar: Private event shows as private in z-push 
+- ActiveSync: avoid generating an organizer when there are no attendees
+
+12-08-2025: 25.0.41
+- Core: restored submodules groupoffice-core and z-push
+
+11-08-2025: 25.0.40
+- Calendar: Only subscribe personal calendars in new calendar migration to avoid an excessive list of calendars
+- Calendar: Sanitize invalid URI's
+- Newsletters: Fixed Error in /usr/local/share/src/www/go/core/acl/model/AclOwnerEntity.php at line 218: Typed property go\core\acl\model\AclOwnerEntity::$aclId must not be accessed before initialization
+  when sending with an account from the e-mail module
+- CalDAV: Sanitize event URI's in database.
+- Calendar: Use correct date format in links
+- Calendar: Print shows wrong week when week starts on sunday
+- Calendar: Load correct calendars for user in system settings
+- Calendar: 12am -> 12pm
+- Calendar: updated time indicator every minute
+
+
 08-08-2025: 25.0.39
 - Addressbook / Carddav: Fixed: CardDAV / vcard: Improve compatibility by changing type=mobile to type=cell #1283
 - Caldav: Fixed caldav not found error
@@ -37,7 +103,7 @@
 - Calendar: Fixed wrong day headers when your timezone is west from UTC
 - GOUI: Implemented custom time picker to support 12 hour time format
 - Tasks: Fixed are you sure close message on save
-- Files: Fixed invalid deletion of file acl's in garbage co llection
+- Files: Fixed invalid deletion of file acl's in garbage collection
 - Core: Fixed bug in garbage collection stopping on api keys
 - Projects3: Fixed migration of billed status from projects2
 - Projects3: Reset registrations billed state when invoice is removed

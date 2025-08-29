@@ -670,9 +670,6 @@ class Task extends AclItemEntity {
 	public function icsBlob() {
 		$blob = isset($this->vcalendarBlobId) ? Blob::findById($this->vcalendarBlobId) : null;
 
-		if(str_starts_with($this->title, "Verify backups"))
-			go()->debug("ICS: !!!! " . $this->title . " " . $this->vcalendarBlobId . " - " . ($blob ? $blob->modifiedAt : "null") ." < " . $this->modifiedAt);
-
 		if(!$blob || $blob->modifiedAt < $this->modifiedAt || !$blob->getFile()->exists()) {
 			$this->modifiedAt = new DateTime();
 			$blob = self::makeBlob($this);

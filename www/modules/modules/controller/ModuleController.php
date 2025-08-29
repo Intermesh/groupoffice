@@ -11,6 +11,7 @@ use GO\Base\Model\Acl;
 //use GO\Base\Data\ColumnModel;
 //use GO\Base\Db\FindParams;
 use GO\Base\Data\JsonResponse;
+use go\core\Installer;
 
 class ModuleController extends AbstractJsonController{
 
@@ -112,11 +113,8 @@ class ModuleController extends AbstractJsonController{
 					'localizedName' => $module->getTitle(),
 					'author'=>$module->getAuthor(),
 					'description'=>$module->getDescription(),
-					//'icon'=>$module->getIcon(),
 					'rights'=>array_keys($module->getRights()),
 					"status" => $module->getStatus(),
-					//'aclId'=>$model ? $model->getAclId() : 0,
-
 					'localizedPackage'=> $module->getLocalizedPackage(),
 					'package'=>$module->getPackage(),
 					'enabled'=>$model && $model->enabled,
@@ -147,12 +145,8 @@ class ModuleController extends AbstractJsonController{
 					'localizedName' => $module->localizedName(),
 					'author'=>$module->author(),
 					'description'=>$module->description(),
-//					'icon'=>$module->icon(),
 					"status" => $module->getStatus(),
-					//'aclId'=>$model ? $model->getAcl_id() : 0,
 					'rights'=> array_keys($module->getRights()),
-//					'buyEnabled'=>!GO::scriptCanBeDecoded() || 
-//							($module->appCenter() && (\GO\Professional\License::isTrial() || \GO\Professional\License::moduleIsRestricted($module->name())!==false)),
 					'package' => 'legacy',
 					'localizedPackage'=>$module->package(),
 					'enabled'=>$model && $model->enabled,
@@ -161,8 +155,31 @@ class ModuleController extends AbstractJsonController{
 				);
 			}
 		}
-		
+
+		$installer = new Installer();
+		foreach($installer->getUnavailableModules(null) as $unavailableModule) {
+			if(empty($unavailableModule['package'])) {
+				$unavailableModule['package'] = 'legacy';
+			}
+			$availableModules[$unavailableModule['package'].$unavailableModule['name']] = [
+				'id' =>$unavailableModule['id'],
+				'name'=>$unavailableModule['name'],
+				'nameWithPackage' => $unavailableModule['package'] .$unavailableModule['name'],
+				'localizedName' => $unavailableModule['name'],
+				'author'=> "Unknown",
+				'description'=> "",
+				'rights'=> [],
+				"status" => "unavailable",
+				'localizedPackage'=> go()->t("Unavailable"),
+				'package'=>$unavailableModule['package'],
+				'enabled'=>$unavailableModule['enabled'],
+				'isRefactored' => true,
+				'not_installable'=> true,
+				'sort_order' => $unavailableModule['sort_order']
+			];
+		}
 		ksort($availableModules);
+
 
 
 		$response['has_license']=go()->getSettings()->license != null || GO::config()->product_name!='GroupOffice';

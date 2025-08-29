@@ -58,7 +58,7 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 					direction: 'ASC'
 				},
 				entityStore: "Principal",
-				filter: {
+				filters: {
 					default: {entity: 'User'}
 				}
 			});

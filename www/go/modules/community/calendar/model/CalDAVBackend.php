@@ -44,7 +44,7 @@ class CalDAVBackend extends AbstractBackend implements
 		$u = User::find(['id'])->where(['username'=>$username])->single();
 
 		$calendars = Calendar::findFor($u->id)
-			->where(['isSubscribed'=>1, 'groupId'=>null]);
+			->where(['isSubscribed'=>1,'syncToDevice'=>1, 'groupId'=>null]);
 
 
 		foreach($calendars as $calendar) {
@@ -91,7 +91,7 @@ class CalDAVBackend extends AbstractBackend implements
 				'{urn:ietf:params:xml:ns:caldav}calendar-timezone' => "BEGIN:VCALENDAR\r\n" . $tz->serialize() . "END:VCALENDAR",
 				'{urn:ietf:params:xml:ns:caldav}supported-calendar-component-set' => new CalDAV\Xml\Property\SupportedCalendarComponentSet(['VTODO']),
 				// free when calendar does not belong to the user
-				'{urn:ietf:params:xml:ns:caldav}schedule-calendar-transp' => new CalDAV\Xml\Property\ScheduleCalendarTransp($tasklist->ownerId == $u->id ? 'opaque' : 'transparent'),
+				'{urn:ietf:params:xml:ns:caldav}schedule-calendar-transp' => new CalDAV\Xml\Property\ScheduleCalendarTransp('transparent'),
 
 				'{http://calendarserver.org/ns/}getctag' => 'GroupOffice/calendar/'.self::VERSION.'/'.$tasklist->highestItemModSeq(),
 				//'{http://calendarserver.org/ns/}subscribed-strip-todos' => '0',
@@ -195,6 +195,7 @@ class CalDAVBackend extends AbstractBackend implements
 
 	public function deleteCalendar($calendarId)
 	{
+		go()->debug("CalDAVBackend::deleteCalendar($calendarId)");
 		list($type, $id) = explode('-', $calendarId,2);
 		switch($type) {
 			case 'c': Calendar::delete(['id' => $id]); break;
@@ -204,7 +205,7 @@ class CalDAVBackend extends AbstractBackend implements
 
 	public function getCalendarObjects($calendarId)
 	{
-		go()->debug("getCalendarObjects($calendarId)");
+		go()->debug("CalDAVBackend::getCalendarObjects($calendarId)");
 		//id, uri, lastmodified, etag, calendarid, size, componenttype
 		list($type, $id) = explode('-', $calendarId,2);
 
@@ -226,7 +227,7 @@ class CalDAVBackend extends AbstractBackend implements
 			default: return $result;
 		}
 		foreach ($stmt as $object) {
-			$result[] = $this->toCalendarObject($object, $calendarId, $this->getObjectUri($object, $component), $component);
+			$result[] = $this->toCalendarObject($object, $calendarId, $this->getObjectUri($object, $component), $component, false);
 		}
 
 		return $result;
@@ -302,17 +303,19 @@ class CalDAVBackend extends AbstractBackend implements
 	 */
 	public function getCalendarObject($calendarId, $objectUri)
 	{
+		go()->debug("CalDAVBackend::getCalendarObject($calendarId, $objectUri)");
 		list($type, $id) = explode('-', $calendarId,2);
 
 		switch($type) {
 			case 'c': // calendar
 				$component = 'vevent';
-				$q = CalendarEvent::find()->filter(['hideSecret'=>1])->where(['cce.calendarId'=> $id, 'eventdata.uri'=>$objectUri]);
+				$q = CalendarEvent::find()->filter(['hideSecret'=>1, 'inCalendars' => $id])->where([ 'eventdata.uri'=>$objectUri]);
+				go()->debug($q);
 				$object = $q->single();
 				break;
 			case 't': // tasklist
 				$component = 'vtodo';
-				$object = Task::find()->where(['task.tasklistId'=> $id, 'task.uri' => $objectUri])->single();
+				$object = Task::find()->filter(['tasklistId' => $id])->where(['task.uri' => $objectUri])->single();
 				break;
 			default:
 				go()->log("incorrect calendarId ".$calendarId. ' for '.$objectUri);
@@ -592,7 +595,11 @@ class CalDAVBackend extends AbstractBackend implements
 	 */
 	public function getCalendarObjectByUID($principalUri, $uid)
 	{
+
 		go()->debug("getCalendarObjectByUID($principalUri, $uid)");
+		$path =  parent::getCalendarObjectByUID($principalUri,$uid);
+		go()->debug($path);
+		return $path;
 
 		$username = str_replace("principals/", "", $principalUri);
 
@@ -619,19 +626,11 @@ class CalDAVBackend extends AbstractBackend implements
 	 * @param mixed $calendarId
 	 * @param string $objectUri
 	 * @param string $component
+	 * @param bool $returnCalendarData To optimize performance data is not included in getCalendarObjects() so the client can determine if the full data is needed after fetching etags.
 	 * @return array
 	 */
-	private function toCalendarObject(mixed $object, mixed $calendarId, string $objectUri, string $component): array
+	private function toCalendarObject(mixed $object, mixed $calendarId, string $objectUri, string $component, bool $returnCalendarData = true): array
 	{
-		$blob = $object->icsBlob();
-		try {
-			$data = $blob->getFile()->getContents();
-		} catch (\Exception $e) {
-			ErrorHandler::logException($e);
-			$blob = $object->icsBlob();
-			$data = $blob->getFile()->getContents();
-		}
-
 		if(empty($objectUri)) {
 			ErrorHandler::log("Object URI is empty of ". $object->id ."  in calendar  ". $calendarId);
 		}
@@ -641,14 +640,30 @@ class CalDAVBackend extends AbstractBackend implements
 //		go()->debug(")");
 
 		$lastModified = strtotime($object->modifiedAt);
-		return [
+		$obj = [
 			'id' => $object->id,
 			'uri' => $objectUri,
 			'lastmodified' => $lastModified,
 			'etag' => '"' . $lastModified . '"',
-			'size' => $blob->size,
-			'calendardata' => $data,
+			'calendarid' => $calendarId,
 			'component' => $component,
 		];
+
+		if($returnCalendarData) {
+
+			$blob = $object->icsBlob();
+			try {
+				$data = $blob->getFile()->getContents();
+			} catch (\Exception $e) {
+				ErrorHandler::logException($e);
+				$blob = $object->icsBlob();
+				$data = $blob->getFile()->getContents();
+			}
+
+			$obj['size'] = $blob->size;
+			$obj['calendardata'] = $data;
+		}
+
+		return $obj;
 	}
 }

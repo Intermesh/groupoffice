@@ -157,12 +157,15 @@ class Module extends EntityController {
 		}
 		
 		$cls = "go\\modules\\" . $params['package'] . "\\" . $params['name'] . "\Module";
-		if(!class_exists($cls)) {
-			throw new NotFound();
+		if(class_exists($cls)) {
+
+			$mod = $cls::get();
+			$success = $mod->uninstall();
+		} else {
+			//remove from modules without uninstall
+			$success = model\Module::delete(['package' => $params['package'] == 'legacy' ? null : $params['package'], 'name' => $params['name']]);
+			go()->debug(model\Module::$lastDeleteStmt);
 		}
-		
-		$mod = $cls::get();
-		$success = $mod->uninstall();
 		
 		return ['success' => $success];
 	}

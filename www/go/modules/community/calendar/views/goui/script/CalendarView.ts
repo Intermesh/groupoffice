@@ -73,7 +73,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 	);
 
 	protected selected: CalendarItem[] = []
-	protected viewModel: CalendarItem[] = []
+	public viewModel: CalendarItem[] = []
 
 	protected adapter: CalendarAdapter
 
@@ -111,12 +111,15 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 		}
 		if(item.key) {
 			div.dataset.key = item.key;
-			if(client.user.calendarPreferences?.showTooltips)
-				tooltip({
-					listeners: { 'render': ({target}) => {target.html = item.quickText}},
-					target:div
-				});
+
 		}
+
+		if(client.user.calendarPreferences?.showTooltips)
+			tooltip({
+				listeners: { 'render': ({target}) => {target.html = item.quickText}},
+				target:div
+			});
+
 		return div.cls('allday',e.showWithoutTime)
 			.cls('declined', item.isDeclined || item.isCancelled)
 			.cls('undecided', item.needsAction)

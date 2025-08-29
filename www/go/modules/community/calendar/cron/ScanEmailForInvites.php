@@ -8,6 +8,9 @@ use go\core\model\CronJob;
 use go\core\model\CronJobSchedule;
 use go\modules\community\calendar\model\Scheduler;
 
+/**
+ * docker compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=calendar --package=community --name=ScanEmailForInvites --debug
+ */
 class ScanEmailForInvites extends CronJob {
 	
 	public function enableUserAndGroupSupport(){ return false; }
@@ -45,7 +48,7 @@ class ScanEmailForInvites extends CronJob {
 
 		foreach($settings as $setting) {
 
-			$ifMethod = !$setting->autoUpdateInvitations ? 'REQUEST' : (!$setting->autoAddInvitations ? 'UPDATE' : null);
+			$ifMethod = !$setting->autoUpdateInvitations ? 'REQUEST' : (!$setting->autoAddInvitations ? 'REPLY' : null);
 			$account = Account::model()->findSingleByAttributes(['user_id'=>$setting->userId, 'username' => $setting->email]);
 
 			if(!$account) continue; // the user its email address is not found or not owned by the user
@@ -55,8 +58,9 @@ class ScanEmailForInvites extends CronJob {
 				go()->getDbConnection()->update('calendar_preferences',['lastProcessed' => $setting->lastProcessed], ['userId'=>$setting->userId]);
 			}
 
+			//only find unseen messages since the last process date
 			$messages = \GO\Email\Model\ImapMessage::model()
-				->find($account,'INBOX',0,50,'ARRIVAL',false,'SINCE "' . $setting->lastProcessed . '"');
+				->find($account,'INBOX',0,50,'ARRIVAL',false,'SINCE "' . $setting->lastProcessed . '" UNSEEN');
 
 
 			foreach($messages as $message) {
@@ -65,13 +69,21 @@ class ScanEmailForInvites extends CronJob {
 				}
 
 				$itip = Scheduler::handleIMIP($message, $ifMethod);
-				if(!empty($itip['event'])) {
+
+				if(!$itip) {
+					// skip message without invite
+					continue;
+				}
+
+				if($itip['alreadyProcessed']) {
+					go()->log('ALREADY processed: '.$itip['event']->title);
+				} else if(!empty($itip['event'])) {
 					go()->log('invite processed: '.$itip['event']->title);
 					$this->updateAlerts($itip, $setting->userId, $message->from->getAddress());
 				}
-				if($itip && !empty($itip['event']) &&
+				if(!empty($itip['event']) &&
 					(($setting->markReadAndFileAutoAdd && $itip['method'] === 'REQUEST') ||
-					($setting->markReadAndFileAutoUpdate && $itip['method'] === 'UPDATE'))
+					($setting->markReadAndFileAutoUpdate && $itip['method'] === 'REPLY'))
 				) {
 					// handled! now check if needs archiving.
 					$this->markReadAndArchive($account,$message);
@@ -82,7 +94,8 @@ class ScanEmailForInvites extends CronJob {
 				go()->getDbConnection()->update('calendar_preferences',[
 					'lastProcessed' => explode(' ', $message->internal_date, 2)[0],
 					'lastProcessedUid' => $message->uid
-				], ['userId'=>$setting	->userId]);
+				], ['userId'=>$setting->userId])
+					->execute();
 			}
 		}
 	}

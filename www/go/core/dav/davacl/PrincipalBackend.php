@@ -59,16 +59,19 @@ class PrincipalBackend extends AbstractBackend {
 	 */
 	public function getPrincipalsByPrefix($prefixPath) {
 
-		go()->debug('GO\DAV\Auth\Backend::getUsers()');
+		go()->debug('PrincipalBackend::getPrincipalsByPrefix('.$prefixPath.')');
 
 		if (!isset($this->users)) {
-			$this->users = [];
-			 $users = User::find(['id', 'username', 'displayName', 'email'])
-				 ->filter(['permissionLevel' => Acl::LEVEL_READ]);
+//			$this->users = [];
+//			 $users = User::find(['id', 'username', 'displayName', 'email'])
+//				 ->filter(['permissionLevel' => Acl::LEVEL_READ]);
+//
+//			 foreach($users as $user) {
+//				$this->users[] = $this->modelToDAVUser($user);
+//			 }
 
-			 foreach($users as $user) {
-				$this->users[] = $this->modelToDAVUser($user);
-			 }
+			// don't list all users for privacy reasons
+			$this->users = [$this->modelToDAVUser(go()->getAuthState()->getUser(['id', 'username', 'displayName', 'email']))];
 		}
 		return $this->users;
 	}
@@ -82,6 +85,8 @@ class PrincipalBackend extends AbstractBackend {
 	 * @return array | void
 	 */
 	public function getPrincipalByPath($path) {
+
+		go()->debug('PrincipalBackend::getPrincipalByPath('.$path.')');
 
 		// path can be principals/username or
 		// principals/username/calendar-proxy-write
@@ -114,7 +119,7 @@ class PrincipalBackend extends AbstractBackend {
 	 * @return array 
 	 */
 	public function getGroupMemberSet($principal) {
-		go()->debug("getGroupMemberSet($principal)");
+		go()->debug("PrincipalBackend::getGroupMemberSet($principal)");
 		return [];
 	}
 
@@ -125,7 +130,7 @@ class PrincipalBackend extends AbstractBackend {
 	 * @return array 
 	 */
 	public function getGroupMembership($principal) {
-		go()->debug("getGroupMemberSet($principal)");
+		go()->debug("PrincipalBackend::getGroupMemberSet($principal)");
 		return [];
 	}
 
@@ -139,7 +144,7 @@ class PrincipalBackend extends AbstractBackend {
 	 * @return void
 	 */
 	public function setGroupMemberSet($principal, array $members) {
-		go()->debug("setGroupMemberSet($principal)");
+		go()->debug("PrincipalBackend::setGroupMemberSet($principal)");
 	}
 
 	function updatePrincipal($path, PropPatch $mutations) {
@@ -148,7 +153,7 @@ class PrincipalBackend extends AbstractBackend {
 
 	function searchPrincipals($prefixPath, array $searchProperties, $test = 'allof') {
 
-		go()->debug("searchPrincipals($prefixPath, ". var_export($searchProperties, true) . ', ' . $test .')');
+		go()->debug("PrincipalBackend::searchPrincipals($prefixPath, ". var_export($searchProperties, true) . ', ' . $test .')');
 
 		if($prefixPath != "principals") {
 			return [];
@@ -173,6 +178,8 @@ class PrincipalBackend extends AbstractBackend {
 					return [];
 			}
 		}
+
+//		go()->debug($query);
 		
 		$principals = [];
 		foreach($query as $username) {			

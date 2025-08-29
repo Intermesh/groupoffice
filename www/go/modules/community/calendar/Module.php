@@ -57,13 +57,17 @@ class Module extends core\Module
 	public function defineListeners()
 	{
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
-		User::on(User::EVENT_SAVE, static::class, 'onUserSave');
+		User::on(User::EVENT_AFTER_SAVE, static::class, 'onUserSave');
 		User::on(User::EVENT_ARCHIVE, static::class, 'onUserArchive');
 		GarbageCollection::on(GarbageCollection::EVENT_RUN, static::class, 'onGarbageCollection');
 	}
 
-	static function onUserSave(User $user) {
-		if (!$user->isNew() && $user->isModified('email')) {
+	static function onUserSave(User $user, bool $wasNew) {
+		if($wasNew) {
+			if(core\model\Module::isAvailableFor("community", "calendar", $user->id)) {
+				Calendar::createDefault($user);
+			}
+		}else if (!$user->isNew() && $user->isModified('email')) {
 			$pIds = go()->getDbConnection()->selectSingleValue('CONCAT("Calendar:",id)')->from('calendar_calendar')
 				->where('groupId', 'IS NOT', null)
 				->andWhere('ownerId', '=', $user->id)->all();
@@ -139,7 +143,21 @@ class Module extends core\Module
 			case 'days': $this->printWeek($date, $calendarIds, 5);break;
 			case 'week' : $this->printWeek($date, $calendarIds, 7);break;
 			case 'month' : $this->printMonth(new \DateTime($date), $calendarIds);break;
+			case 'list' : $this->printList(new \DateTime($date), $calendarIds);break;
 		}
+	}
+
+	private function printList($date, $calendarIds) {
+		$start = (clone $date)->modify('first day of this month');
+		$end = (clone $start)->modify('+3 months');
+
+		$report = new reports\ListView();
+		$report->day = $start;
+		$report->end = $end;
+		$report->calendarIds = $calendarIds;
+		$report->render();
+
+		$report->Output('list.pdf');
 	}
 
 	private function printDay($start, $calendarIds){
@@ -168,8 +186,10 @@ class Module extends core\Module
 
 		$report = new reports\Week();
 
-		$dayName = $report->firstWeekday===1 ? 'Monday' : 'Sunday';
-		$start = (new \DateTime($date))->modify($dayName.' this week');
+		$date = (new \DateTime($date));
+		$dayDiff = (int) $date->format('w') + $report->firstWeekday;
+
+		$start = $date->sub(new DateInterval("P" . $dayDiff . "D"));
 		$end = (clone $start)->modify('+'.$span.' days');
 
 

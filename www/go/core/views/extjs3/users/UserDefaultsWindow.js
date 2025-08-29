@@ -144,9 +144,8 @@ go.users.UserDefaultsWindow = Ext.extend(go.Window, {
 							entityStore: "Group",
 
 							fieldLabel: t("Groups"),
-							storeBaseParams: {
-								filter: {hideUsers: true, excludeEveryone: true}
-							}
+							storeConfig: {filters: {default: {hideUsers: true, excludeEveryone: true} }}
+
 						})]
 				})
 			]

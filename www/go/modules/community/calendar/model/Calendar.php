@@ -6,9 +6,11 @@ use go\core\App;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\http;
+use go\core\model\Acl;
 use go\core\model\Principal;
 use go\core\model\User;
 use go\core\orm\CustomFieldsTrait;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\PrincipalTrait;
@@ -34,7 +36,7 @@ class Calendar extends AclOwnerEntity {
 	const Attending = 'attending';
 	const None = 'none';
 
-	const UserProperties = ['color', 'sortOrder', 'isVisible', 'isSubscribed', 'includeInAvailability'];
+	const UserProperties = ['color', 'sortOrder', 'isVisible', 'isSubscribed', 'syncToDevice', 'includeInAvailability'];
 
 	public ?string $id;
 	/** @var string The user-visible name of the calendar */
@@ -59,6 +61,8 @@ class Calendar extends AclOwnerEntity {
 
 	/** @var ?string default for event. If NULL client will use the Users default timeZone  */
 	public ?string $timeZone = null;
+
+	public ?bool $syncToDevice = true;
 
 	protected ?string $defaultColor = null;
 
@@ -102,13 +106,13 @@ class Calendar extends AclOwnerEntity {
 	}
 
 	/** @return int */
-	public static function fetchDefault($userId) {
+	public static function fetchPersonal($userId) {
 		$user = User::findById($userId, ['calendarPreferences'], true);
 		if(!empty($user)) {
 			/** @var Preferences $pref */
 			$pref = $user->calendarPreferences;
-			if (!empty($pref->defaultCalendarId)) {
-				return $pref->defaultCalendarId;
+			if (!empty($pref->personalCalendarId)) {
+				return $pref->personalCalendarId;
 			}
 		}
 		// If default preference is empty use the first owned calendar
@@ -138,18 +142,25 @@ class Calendar extends AclOwnerEntity {
 
 	protected static function defineFilters(): Filters
 	{
-		return parent::defineFilters()->add('isSubscribed', function(Criteria $criteria, $value, Query $query) {
+		return parent::defineFilters()
+			->add('isSubscribedFor', function(Criteria $criteria, $value, Query $query) {
+				$query->join("calendar_calendar_user", "for", "for.id = calendar_calendar.id and for.userId = :forUserId")->bind(":forUserId", $value);
+				$criteria->where('for.isSubscribed', '=', true);
+			})
+			->add('isSubscribed', function(Criteria $criteria, $value, Query $query) {
 			$criteria->where('isSubscribed','=', $value);
 				if($value === false) {
 					$criteria->orWhere('isSubscribed', 'IS', null);
 				}
-		})->add('isResource', function(Criteria $criteria, $value, Query $query) {
-			$criteria->where('groupId',$value?'IS NOT':'IS', null);
-		})->add('groupId', function(Criteria $criteria, $value, Query $query) {
-			$criteria->where('groupId','=', $value);
-		})->add('davaccountId', function(Criteria $criteria, $value, Query $query) {
-			//$criteria->where('davc.davaccountId','=', $value);
-		});
+			})->add('isResource', function(Criteria $criteria, $value, Query $query) {
+				$criteria->where('groupId',$value?'IS NOT':'IS', null);
+			})->add('ownerId', function(Criteria $criteria, $value, Query $query) {
+				$criteria->where('ownerId','=', $value);
+			})->add('groupId', function(Criteria $criteria, $value, Query $query) {
+				$criteria->where('groupId','=', $value);
+			})->add('davaccountId', function(Criteria $criteria, $value, Query $query) {
+				//$criteria->where('davc.davaccountId','=', $value);
+			});
 	}
 
 	/**
@@ -349,5 +360,35 @@ class Calendar extends AclOwnerEntity {
 
 	protected function principalType(): string {
 		return Principal::Resource;
+	}
+
+	public static function createDefault(User $user) : Calendar {
+
+		$calendar = Calendar::find()->where(['ownerId' => $user->id])->filter(['permissionLevel' => Acl::LEVEL_MANAGE])->single();
+
+		if (empty($calendar)) {
+			$calendar = Calendar::createFor($user->id);
+			$calendar->forUserId();
+			$calendar->setValues([
+				'name' => $user->displayName,
+				'ownerId' => $user->id,
+				'color' => Calendar::randomColor($user->displayName),
+				'isSubscribed'=>true,
+				'includeInAvailability'=>'all'
+			]);
+
+			if(!$calendar->save()) {
+				throw new SaveException($calendar);
+			}
+		}
+
+		$user->calendarPreferences->personalCalendarId = $calendar->id;
+		$user->calendarPreferences->defaultCalendarId = $calendar->id;
+
+		if(!$user->save()) {
+			throw new SaveException($user);
+		}
+
+		return $calendar;
 	}
 }

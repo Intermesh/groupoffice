@@ -738,7 +738,7 @@ abstract class Property extends Model {
 	 *
 	 * Note: if this logic ever changes it must be changed here too: {@see \go\core\jmap\Entity::changesQuery()}
 	 *
-	 * @return string|null eg. 1 or with multiple keys: "1-2"
+	 * @return string|int|null eg. 1 or with multiple keys: "1-2"
 	 */
 	public function id() : string|int|null {
 		if(property_exists($this, 'id')) {
@@ -1631,8 +1631,13 @@ abstract class Property extends Model {
 		$removeKeys = new Criteria();
 		$pk = $cls::getPrimaryKey();
 
+		// generate an array of id's to do a fast comparison below when checking if a model must be removed
+		$modelIds = array_map(function($model) {
+			return $model->id();
+		}, $models);
+
 		foreach($oldModels as $model) {
-			if(self::arrayContains($models, $model)) {
+			if(in_array($model->id(), $modelIds)) {
 				//if object is still present then don't remove
 				continue;
 			}
@@ -1652,24 +1657,6 @@ abstract class Property extends Model {
 		$query->andWhere($removeKeys);
 
 		return $cls::internalDelete($query);
-	}
-
-	/**
-	 * Check if an array of models contains a given property
-	 * Also works for cloned objects because it checks class name and primary key
-	 *
-	 * @param Property[] $models
-	 * @param Property $model
-	 * @throws Exception
-	 */
-	private static function arrayContains(array $models, self $model): bool
-	{
-		foreach($models as $m) {
-			if($m->equals($model)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
   /**

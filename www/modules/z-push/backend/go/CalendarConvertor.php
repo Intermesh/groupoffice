@@ -78,10 +78,12 @@ class CalendarConvertor
 
 		$message->uid = $event->uid;
 
-		if(!$event->isPrivate() || $event->getPermissionLevel() > \go\core\model\Acl::LEVEL_READ) {
+		if(!$event->isPrivate() || $event->currentUserIsOwner()) {
 			$message->subject = $event->title;
 			$message->location = $event->location;
 			$message->asbody = GoSyncUtils::createASBody($event->description, $params);
+		} else {
+			$message->subject = "Private";
 		}
 
 		if(!empty($event->privacy))
@@ -328,7 +330,9 @@ class CalendarConvertor
 
 		$principal = Principal::currentUser();
 
-		if (isset($message->attendees)) {
+
+		//todo remove attendee?
+		if (!empty($message->attendees)) {
 			if($event->isNew() || !$event->organizer()) {
 				$organizer = $event->generatedOrganizer($principal);
 				if (!empty($message->organizeremail) && Util::validateEmail($message->organizeremail)) $organizer->email = $message->organizeremail;

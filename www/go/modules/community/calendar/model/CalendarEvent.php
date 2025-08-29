@@ -278,6 +278,12 @@ class CalendarEvent extends AclItemEntity {
 
 	}
 
+	/**
+	 * Find the event in a calendar the user owns and has at least rsvp permission
+	 *
+	 * @param $uid string UID of the event
+	 * @param $userId int id of owner
+	 */
 	static function findForUser($uid, $userId) {
 		return self::find()->join('core_user', 'u', 'u.id = cal.ownerId')
 			->where(['cal.ownerId' => $userId, 'eventdata.uid'=>$uid])
@@ -521,7 +527,7 @@ class CalendarEvent extends AclItemEntity {
 	 * @throws Exception
 	 */
 	public function patchedInstance(string $recurrenceId) : CalendarEvent {
-		$patchArray = $this->recurrenceOverrides[$recurrenceId]->toArray();
+		$patchArray = isset($this->recurrenceOverrides[$recurrenceId]) ? $this->recurrenceOverrides[$recurrenceId]->toArray() : [];
 
 		//if start is not patched then we must set the recurrence ID to set the right time
 		if(!isset($patchArray['start'])) {
@@ -624,16 +630,24 @@ class CalendarEvent extends AclItemEntity {
 		if(!empty($this->alerts)) {
 			$this->useDefaultAlerts = false;
 		}
-
-		if(!empty($this->participants) && empty($this->replyTo)) {
-			$owner = $this->organizer();
-			if(!empty($owner)) {
-				$this->replyTo = $owner->email;
-			}
-		}
-
 		if(empty($this->prodId) || $this->prodId === 'Unknown') {
 			$this->prodId = str_replace('{VERSION}', go()->getVersion(),self::PROD);
+		}
+
+		if(!empty($this->participants)) {
+			// reset participation status if event changes "materially"
+			if($this->isModified(['start', 'duration', 'recurrenceRule', 'location'])) {
+				foreach ($this->participants as $participant) {
+					if (!$participant->isNew() && !$participant->isOwner())
+						$participant->participationStatus = Participant::NeedsAction;
+				}
+			}
+			if (empty($this->replyTo)) {
+				$owner = $this->organizer();
+				if (!empty($owner)) {
+					$this->replyTo = $owner->email;
+				}
+			}
 		}
 
 
@@ -652,18 +666,21 @@ class CalendarEvent extends AclItemEntity {
 		return $success;
 	}
 
-	private function currentUserIsOwner() {
+	public function currentUserIsOwner() {
 		return $this->ownerId === go()->getUserId() ||
 		 ($this->ownerId === null && $this->createdBy === go()->getUserId());
 	}
 
 	public function toArray(array|null $properties = null): array|null
 	{
-		$arr =  parent::toArray($properties);
-		$showAsPrivate = $this->isPrivate() && $this->getPermissionLevel() <= 30/*Write own*/;
-		if($this->getPermissionLevel() === 30 && $this->currentUserIsOwner()) {
-			$showAsPrivate = false;
+		if(!($this->start instanceof DateTime)) {
+			//make sure timezone info is not sent by setting isLocal below. We can't be sure this datetime is a go\core\util\DateTime
+			$this->start = new DateTime($this->start);
 		}
+		$this->start->isLocal = true;
+
+		$arr =  parent::toArray($properties);
+		$showAsPrivate = $this->isPrivate() && !$this->currentUserIsOwner();
 		if($showAsPrivate) {
 			$arr['title'] = '';
 			$arr['description'] = '';
@@ -998,7 +1015,10 @@ class CalendarEvent extends AclItemEntity {
 	{
 		$calendar = Calendar::findById($this->calendarId, ['name'], true);
 
-		return $calendar->name .': '. $this->title . ' - '. $this->start->format('Y-m-d');
+		$u = go()->getAuthState()->getUser();
+		$format = $u ? $u->dateFormat : "d-m-Y";
+
+		return $calendar->name .': '. $this->title . ' - '. $this->start->format($format);
 	}
 
 	/**

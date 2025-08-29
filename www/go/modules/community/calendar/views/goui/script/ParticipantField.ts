@@ -51,11 +51,11 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 						btn({icon:'more_vert', menu: menu({},
 								btn({text: v.email, disabled: true}),
 								hr(),
-								checkbox({label:'Optioneel',listeners: {'change': ({target}) => {
-									if(target.value) {
-										delete v.roles.attendee; // make optional (non-required)
+								checkbox({label: t('Optional'),value:!!v.roles?.optional, listeners: {'change': ({target}) => {
+									if(!target.value) {
+										delete v.roles.optional; // make optional (non-required)
 									} else {
-										v.roles.attendee = true;
+										v.roles.optional = true;
 									}
 								} }}),
 								btn({icon:'delete',text:t('Delete'), handler: _ => {
@@ -109,7 +109,12 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 					style:{minWidth:'100%'},
 					headers: false,
 					store: datasourcestore({
-						dataSource: jmapds('Principal')
+						dataSource: jmapds('Principal'),
+						filters: {
+							default: {
+								preferUser: true
+							}
+						}
 						//properties: ['id', 'displayName', 'email']
 					}),
 					columns: [

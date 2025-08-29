@@ -648,6 +648,14 @@ class Message {
 	public function setMailer(Mailer $mailer): Message
 	{
 		$this->mailer = $mailer;
+
+		if(isset($mailer->fromEmail)) {
+			$this->setFrom($mailer->fromEmail, $mailer->fromName);
+		}
+
+		if(isset($mailer->replyTo)) {
+			$this->setReplyTo($mailer->replyTo);
+		}
 		return $this;
 	}
 

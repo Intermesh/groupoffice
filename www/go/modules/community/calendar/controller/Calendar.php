@@ -47,40 +47,10 @@ class Calendar extends EntityController {
 	public function first($params)
 	{
 		$user = go()->getAuthState()->getUser(['id', 'displayName', 'calendarPreferences']);
-		if (!empty($user->calendarPreferences->defaultCalendarId)) {
-			$calendar = model\Calendar::findById($user->calendarPreferences->defaultCalendarId);
-		}
-		if (empty($calendar)) {
-			$calendar = model\Calendar::find()->where(['ownerId' => $user->id])->single();
-			if (!empty($calendar)) {
-				if ($calendar->getPermissionLevel() < 50) {
-					$calendar = null;
-				}
-			}
-		}
-		if (empty($calendar)) {
-			$calendar = new model\Calendar();
-			$calendar->setValues([
-				'name' => $user->displayName,
-				'ownerId' => $user->id,
-				'color' => model\Calendar::randomColor($user->displayName)
-			]);
-			$calendar->save();
-		}
-
-		//subscribe user
-		go()->getDbConnection()->replace('calendar_calendar_user', [
-			'userId'=>$user->id,
-			'id'=>$calendar->id,
-			'isSubscribed'=>true,
-			'includeInAvailability'=>'all',
-			'color'=>$calendar->getColor()
-		])->execute();
-
-		$user->calendarPreferences->defaultCalendarId = $calendar->id;
+		$calendar = model\Calendar::createDefault($user);
 
 		return [
-			'success'=>$user->save(),
+			'success'=> true,
 			'calendarId'=>$calendar->id
 		];
 

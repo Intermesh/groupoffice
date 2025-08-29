@@ -258,7 +258,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 					return;
 				}
 
-				if (node.textContent && node.textContent.indexOf("http") > -1) {
+				if (node.textContent && (node.textContent.indexOf("http") > -1 || node.textContent.indexOf('@') > -1)) {
 					const anchored = this.replaceUriWithAnchor(node.textContent);
 					if (anchored != node.textContent) {
 						const tmp = document.createElement("span");
@@ -277,9 +277,18 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		const uriRegex = /(https?:\/\/[^\s]+|ftp:\/\/[^\s]+)/ig;
 
 		// Replace matched URIs with anchor tags
-		return html.replace(uriRegex, (url) => {
+		html = html.replace(uriRegex, (url) => {
 			return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
 		});
+
+		html = html.replace(
+			/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
+			function(match) {
+				return '<a href="mailto:' + match + '">' + match + '</a>';
+			}
+		);
+
+		return html;
 	},
 
 	onDrop: function(e) {

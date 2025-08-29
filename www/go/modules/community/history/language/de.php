@@ -9,7 +9,7 @@ return array (
   'Changes' => 'Änderungen',
   'Action' => 'Aktion',
   'Entity' => 'Entität',
-  'Item was never modified' => 'Eintrag wurde nie geändert',
+  'Item was never modified' => 'Eintrag wurde noch nie geändert',
   'Delete entries after' => 'Einträge löschen nach',
   'Request ID' => 'Request ID',
   'Entity ID' => 'Entity ID',

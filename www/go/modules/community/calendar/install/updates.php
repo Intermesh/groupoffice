@@ -75,7 +75,7 @@ $updates['202402221543'][] = function(){ // insert event overrides
 		$participantsStmt->execute([$row['id']]);
 		$exParticipants = $participantsStmt->fetchAll();
 		if(count($exParticipants) > 1) {
-			$patch->participants = [];
+			$participants = [];
 			foreach($exParticipants as $i => $p) {
 				$roles = [];
 				if($p['role']=='REQ-PARTICIPANT'){
@@ -84,7 +84,7 @@ $updates['202402221543'][] = function(){ // insert event overrides
 				if($p['is_organizer']) {
 					$roles['owner'] = true;
 				}
-				$patch->participants[$i] = (object)[
+				$participants[$p['user_id'] ? $p['user_id'] : $p['id']] = (object)[
 					'name' => $p['name'],
 					'kind' => 'individual',
 					'email' => $p['email'],
@@ -92,6 +92,8 @@ $updates['202402221543'][] = function(){ // insert event overrides
 					'participationStatus' => strtolower($p['status'])
 				];
 			}
+
+			$patch->participants = (object) $participants;
 		}
 
 		// add patch to calendar_recurrence_override
@@ -255,15 +257,15 @@ $updates['202502261353'][] = "DELETE cat FROM calendar_category cat LEFT JOIN ca
 // fix: set duration at 1 hour if duration is negative
 $updates['202503101510'][] = "UPDATE calendar_event SET duration = 'PT1H' WHERE duration LIKE 'PT-%';";
 $updates['202503111342'][] = function(){
-	\go\modules\community\calendar\cron\ScanEmailForInvites::install("*/5 * * * *");
+	\go\modules\community\calendar\cron\ScanEmailForInvites::install("*/5 * * * *", true);
 };
 
-$updates['202503131043'][] = "UPDATE core_link l
+$updates['202503131043'][] = "UPDATE IGNORE core_link l
 	JOIN core_entity et ON et.id = l.fromEntityTypeId
 	JOIN calendar_calendar_event e on e.eventId = l.fromId AND et.name = 'CalendarEvent'
 	SET l.fromId = e.id;";
 
-$updates['202503131043'][] = "UPDATE core_link l
+$updates['202503131043'][] = "UPDATE IGNORE core_link l
 	JOIN core_entity et ON et.id = l.toEntityTypeId
 	JOIN calendar_calendar_event e on e.eventId = l.toId AND et.name = 'CalendarEvent'
 	SET l.toId = e.id;";
@@ -312,6 +314,75 @@ $updates['202506130832'][] = "CREATE TABLE IF NOT EXISTS calendar_schedule_objec
 
 $updates["202507221653"][] = "alter table `calendar_preferences` add column weekViewGridSize	INT DEFAULT 8 NOT NULL AFTER weekViewGridSnap;";
 
+$updates["202508111058"][] = "update calendar_event set uri = REPLACE(REPLACE(REPLACE(uri, '/', '_'), '+', '-'), '=', '.');";
+
+$updates["202508191124"][] = "alter table calendar_calendar_user add column syncToDevice tinyint default 1 not null after `timeZone`";
+
+$updates["202508211118"][] = "update ignore calendar_participant p inner join core_user u on u.email = p.email set p.id = u.id;";
+$updates["202508211118"][] = "update calendar_preferences set defaultCalendarId=null where defaultCalendarId not in (select id from calendar_calendar);";
+
+$updates["202508211118"][] = "alter table calendar_preferences
+    add constraint calendar_preferences_calendar_calendar_id_fk
+        foreign key (defaultCalendarId) references calendar_calendar (id)
+            on delete set null;";
+
+
+$updates["202508211118"][] = function() {
+	$overrides = go()->getDbConnection()->select ()
+		->from("calendar_recurrence_override")
+		->where("patch", "like", '%participants%');
+
+	foreach($overrides as $o) {
+		$patch = json_decode($o['patch']);
+		if(!isset($patch->participants) || !is_array($patch->participants)) {
+			continue;
+		}
+
+		$participants = [];
+
+		$index = 0;
+		foreach ($patch->participants as $participant) {
+			$userId = go()->getDbConnection()
+				->selectSingleValue('id')
+				->from("core_user")
+				->where("email", '=', $participant->email)
+				->single();
+
+			if($userId) {
+				$id = $userId;
+			} else {
+				$participantId = go()->getDbConnection()
+					->selectSingleValue('id')
+					->from("calendar_participant")
+					->where("email", '=', $participant->email)
+					->where("eventId", '=', $o['fk'])
+					->single();
+
+				$id = $participantId ? $participantId : "index_" . $index++;
+			}
+
+			$participants[$id] = $participant;
+		}
+
+		$patch->participants = (object) $participants;
+
+		unset($o['patch']);
+
+		go()->getDbConnection()
+			->update(
+				"calendar_recurrence_override",
+		['patch' => json_encode($patch)],
+			$o)
+			->execute();
+	}
+
+};
+
+$updates["202508281104"][] = "alter table calendar_preferences add personalCalendarId INT UNSIGNED NULL AFTER defaultCalendarId;";
+$updates["202508281104"][] = "alter table calendar_preferences
+    add constraint calendar_preferences_calendar_personal_calendar_id_fk
+        foreign key (personalCalendarId) references calendar_calendar (id)
+            on delete set null;";
+
+$updates["202508281104"][] = "UPDATE calendar_preferences set personalCalendarId = defaultCalendarId where defaultCalendarId is not null;";
 // TODO: calendar views -> custom filters
-
-
