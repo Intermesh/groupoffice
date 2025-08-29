@@ -41,7 +41,7 @@ class FunctionField extends Number
 		return "decimal(19,$decimals) DEFAULT " . $d;
 	}
 
-	public function dbToApi($value, \go\core\orm\CustomFieldsModel $values, $entity): ?string
+	public function dbToApi($value, \go\core\orm\CustomFieldsModel $values, $entity): null|string|float
 	{
 
 		$f = $this->field->getOption("function");
