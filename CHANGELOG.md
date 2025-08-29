@@ -3,6 +3,7 @@
 - Core: Contacts showed in group member grid
 - Core: Hide disabled users from Principal queries by default
 - Core: Jumping scroll position on scroll load in autocomplete fields
+- Core: Safer way to execute custom field functions
 
 25-08-2025: 25.0.46
 - Core: Cache busting for GOUI modules
