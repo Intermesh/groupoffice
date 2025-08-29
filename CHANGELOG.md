@@ -1,3 +1,5 @@
+- Core: Safer way to execute custom field functions
+
 25-08-2025: 6.8.135
 - Email: Don't match <link@domain.com> as xss threat
 - Serverclient: Fixed creating mailbox if first attempt of creating user failed with validation error
