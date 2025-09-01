@@ -385,4 +385,8 @@ $updates["202508281104"][] = "alter table calendar_preferences
             on delete set null;";
 
 $updates["202508281104"][] = "UPDATE calendar_preferences set personalCalendarId = defaultCalendarId where defaultCalendarId is not null;";
+
+$updates["202509011354"][] = "alter table calendar_calendar_user add column syncToDevice tinyint default 1 not null after `timeZone`";
+
+
 // TODO: calendar views -> custom filters
