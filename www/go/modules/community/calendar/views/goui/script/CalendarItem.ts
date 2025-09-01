@@ -480,9 +480,7 @@ export class CalendarItem {
 	private humanReadableDate() {
 		const start = this.start;
 		const end = this.end.clone();
-		const oneDay = this.data.duration = "P1D";
-
-		console.log(oneDay, start, end);
+		const oneDay = this.data.duration === "P1D";
 
 		let line1 = start.format('l j F Y');
 
