@@ -208,7 +208,7 @@ abstract class Property extends Model {
 	 * @throws Throwable
 	 */
 	private function populateTableRecord(array $record) : void {
-		$m = static::getMapping();
+
 		foreach($record as $colName => $value) {
 			try {
 				if (str_contains($colName, '.')) {
