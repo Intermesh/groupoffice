@@ -185,7 +185,7 @@ export class Main extends Component {
 						}})).save()
 					}),
 					this.inboxBtn = btn({
-						cls:'not-medium-device',
+						cls:'not-medium-device accent filled',
 						icon: 'inbox',
 						title: t('Invitations'),
 						menu: menu({}, list({
