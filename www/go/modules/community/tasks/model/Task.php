@@ -731,6 +731,10 @@ class Task extends AclItemEntity {
 		$this->uri = $uri;
 	}
 
+	public function uri(){
+		return $this->uri;
+	}
+
 	/**
 	 * Try to find conflicting tasks.
 	 *
