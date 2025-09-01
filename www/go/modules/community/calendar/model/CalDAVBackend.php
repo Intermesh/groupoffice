@@ -227,7 +227,12 @@ class CalDAVBackend extends AbstractBackend implements
 			default: return $result;
 		}
 		foreach ($stmt as $object) {
-			$result[] = $this->toCalendarObject($object, $calendarId, $this->getObjectUri($object, $component), $component, false);
+			try {
+				$result[] = $this->toCalendarObject($object, $calendarId, $this->getObjectUri($object, $component), $component, false);
+			} catch (\Exception $e) {
+				// event that cannot be converted will not go into the result array. Sync will continue, error is logged.
+				ErrorHandler::logException($e);
+			}
 		}
 
 		return $result;
@@ -651,13 +656,15 @@ class CalDAVBackend extends AbstractBackend implements
 
 		if($returnCalendarData) {
 
-			$blob = $object->icsBlob();
 			try {
+				$blob = $object->icsBlob();
 				$data = $blob->getFile()->getContents();
 			} catch (\Exception $e) {
 				ErrorHandler::logException($e);
-				$blob = $object->icsBlob();
-				$data = $blob->getFile()->getContents();
+				// log error and send back empty calendardata te prevent client errors
+				$obj['size'] = 0;
+				$obj['calendardata'] = '';
+				return $obj;
 			}
 
 			$obj['size'] = $blob->size;
