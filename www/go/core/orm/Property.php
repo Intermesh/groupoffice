@@ -961,7 +961,7 @@ abstract class Property extends Model {
 	{
 		$primaryTable = static::getMapping()->getPrimaryTable();
 
-		//Used count check here because a customer managed to get negative ID's in the database.
+		//Used count check here because a customer managed to get negative ID's in the database and key might be a string like an email that contains a "-".
 		$keys = $primaryTable->getPrimaryKey();
 		$ids = count($keys) == 1 ? [$id] : explode('-', $id);
 		return array_combine($keys, $ids);
@@ -2076,15 +2076,20 @@ abstract class Property extends Model {
 	{
 		$primaryTable = static::getMapping()->getPrimaryTable();
 		$pk = $primaryTable->getPrimaryKey();
+		$pkCount = count($pk);
 
-		$props = [];
-		$keys = explode('-', $id);
+		if($pkCount > 1) {
+			$props = [];
+			$keys = explode('-', $id);
 
-		if(count($keys)  != count($pk)) {
-			throw new InvalidArguments("Invalid ID given for " . static::class.' : '.$id);
-		}
-		foreach ($pk as $key) {
-			$props['`' . $primaryTable->getAlias() . '`.`' . $key . '`'] = array_shift($keys);
+			if (count($keys) != $pkCount) {
+				throw new InvalidArguments("Invalid ID given for " . static::class . ' : ' . $id);
+			}
+			foreach ($pk as $key) {
+				$props['`' . $primaryTable->getAlias() . '`.`' . $key . '`'] = array_shift($keys);
+			}
+		} else {
+			$props['`' . $primaryTable->getAlias() . '`.`' . $pk[0] . '`'] = $id;
 		}
 
 		return $props;
