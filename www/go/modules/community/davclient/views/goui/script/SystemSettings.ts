@@ -27,7 +27,7 @@ export class SystemSettings extends Component {
 				fitParent:true,
 				store,
 				columns: [
-					column({id:'active',width:40, header:' ', renderer: (v, record) => '<i class="icon">'+(record.lastError ? 'warning' : (v?'check':'close'))+'</i>'}),
+					column({id:'active',width:40, header:' ',htmlEncode:false, renderer: (v, record) => '<i class="icon">'+(record.lastError ? 'warning' : (v?'check':'close'))+'</i>'}),
 					column({id:'name', header: t("Name")}),
 					column({id:'lastSync', header: t('Last Sync'),renderer: (date: string) => Format.smartDateTime(date, true)}),
 					column({id:'collections', header: t('Collections'), renderer: v => v ? Object.keys(v).length+'' : '0'}),
