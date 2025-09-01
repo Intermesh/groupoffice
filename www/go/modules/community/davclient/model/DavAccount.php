@@ -236,16 +236,17 @@ class DavAccount extends AclOwnerEntity {
 			}
 
 			$this->lastSync = new \DateTime();
-//			if(!$this->save()) {
-//				go()->log('Could not save last sync '. $homesetUri);
-//				//go()->getDbConnection()->rollBack();
-//			} else
+			if(!$this->save()) {
+				go()->log('Could not save last sync '. $homesetUri);
+				throw new SaveException($this);
+			}
 			if (!empty($deletedCalendars)) {
 				\go\modules\community\calendar\model\Calendar::delete((new Query())->where('id', 'IN', $deletedCalendars));
 			}
 			return true;
 		} catch(\Exception $e) {
 			$this->lastError = $e->getMessage();
+			$this->saveTables();
 		}
 		return false;
 	}
