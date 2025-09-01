@@ -2713,7 +2713,11 @@ abstract class Property extends Model {
 					if(is_object($v)) {
 						$copy->$name = clone $v;
 					}	else {
-						$copy->$name = $v;
+						// we can't set null to all values because we don't know if it's an uninitialized property that is not
+						// nullable
+						if(isset($v) || isset($this->$name) ) {
+							$copy->$name = $v;
+						}
 					}
 				}
 			} else {
