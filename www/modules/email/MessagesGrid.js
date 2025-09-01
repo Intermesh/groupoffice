@@ -203,7 +203,7 @@ GO.email.MessagesGrid = function(config){
 					group: "searchIn",
 					value: 'current',
 					text:  t("Current folder", "email"),
-					iconCls: 'ic-folder',
+					// iconCls: 'ic-folder',
 					checked: true,
 					listeners: {
 						scope: this,
@@ -222,7 +222,6 @@ GO.email.MessagesGrid = function(config){
 					group: "searchIn",
 					value: 'all',
 					text:  t("All folders", "email"),
-					iconCls: 'ic-folder',
 					listeners: {
 						scope: this,
 						checkchange: function(cb, checked) {

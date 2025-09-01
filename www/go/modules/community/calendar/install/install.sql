@@ -53,8 +53,9 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_user` (
     `color` VARCHAR(21) NOT NULL,
     `sortOrder` INT NOT NULL DEFAULT 0,
     `timeZone` VARCHAR(45) NULL,
+    `syncToDevice` TINYINT(1) NOT NULL DEFAULT 1,
     `includeInAvailability` ENUM('all', 'attending', 'none') NOT NULL DEFAULT 'none',
-		`modSeq` INT NOT NULL DEFAULT 0,
+	`modSeq` INT NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`, `userId`),
     CONSTRAINT `fk_calendar_calendar_user_calendar_calendar1`
     FOREIGN KEY (`id`)
