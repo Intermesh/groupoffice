@@ -1,3 +1,4 @@
+01-09-2025:6.8.136
 - Core: Safer way to execute custom field functions
 
 25-08-2025: 6.8.135
