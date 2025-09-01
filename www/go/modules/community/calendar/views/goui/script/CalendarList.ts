@@ -193,7 +193,7 @@ export class CalendarList extends Component<CalendarListEventMap> {
 							});
 						}
 					}}),
-					btn({icon:'edit', text: t('Edit')+'…', hidden: data.davaccountId || (data.groupId && !rights.mayChangeResources), disabled:!data.myRights.mayAdmin, handler: async _ => {
+					btn({icon:'edit', text: t('Edit')+'…', hidden: data.davaccountId || (data.groupId && !rights.mayChangeResources), disabled:!data.myRights.mayReadItems, handler: async _ => {
 							const dlg = data.groupId ? new ResourceWindow() : new CalendarWindow();
 							await dlg.load(data.id);
 							dlg.show();
