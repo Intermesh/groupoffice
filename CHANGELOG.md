@@ -1,3 +1,4 @@
+01-09-2025: 25.0.49
 - ActiveSync: Fix error in scheduling request via mail and z-push. Fixes z-push sync email iOS more than one month
   #1324
 
