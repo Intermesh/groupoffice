@@ -288,9 +288,9 @@ class ICalendarHelper {
 	/**
 	 * Parse a VObject to an Event object
 	 * @param VCalendar|string $vcalendar
-	 * @param int $calendarId
 	 * @param CalendarEvent $event the event to insert the data into
 	 * @return CalendarEvent updated or new Event if not found
+	 * @throws \Exception
 	 */
 	static public function parseVObject($vcalendar, CalendarEvent $event): CalendarEvent
 	{

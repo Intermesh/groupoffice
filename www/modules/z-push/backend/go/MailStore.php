@@ -73,7 +73,7 @@ class MailStore extends Store implements ISearchProvider {
 				return $this->StatFolder($newname);
 			} else
 				return false;
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2MAIL::EXCEPTION ~~ ' .  $e->getMessage());
 			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 			return false;
@@ -271,7 +271,12 @@ class MailStore extends Store implements ISearchProvider {
 				}
 
 				if($imapMessage->mailbox != $imapAccount->sent) {
-					$this->processCalendarInvite($message, $imapMessage);
+					try {
+						$this->processCalendarInvite($message, $imapMessage);
+					}catch (Exception $e) {
+						ZLog::Write(LOGLEVEL_ERROR, 'ZPUSH2MAIL::EXCEPTION In handling scheduling ~~ ' .  $e->getMessage());
+						ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
+					}
 				}
 
 				$imapMessage->autoLink();
@@ -283,7 +288,7 @@ class MailStore extends Store implements ISearchProvider {
 			//ZLog::Write(LOGLEVEL_DEBUG, 'goMail->GetMessage::MESSAGE = '.var_export($message,true));
 
 			return $message;
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2MAIL::EXCEPTION ~~ ' .  $e->getMessage());
 			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 			return false;
@@ -562,7 +567,7 @@ class MailStore extends Store implements ISearchProvider {
 			   }
 		   }
 
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2MAIL::EXCEPTION ~~ ' .  $e->getMessage());
 			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 		}
@@ -749,7 +754,7 @@ class MailStore extends Store implements ISearchProvider {
 				}
 			}
 			return $messages;
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2MAIL::EXCEPTION ~~ ' .  $e->getMessage());
 			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 			return [];

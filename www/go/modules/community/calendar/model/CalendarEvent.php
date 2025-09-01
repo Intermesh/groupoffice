@@ -335,21 +335,33 @@ class CalendarEvent extends AclItemEntity {
 			},1);
 	}
 
-
-	public function categoryNames() {
-			return go()->getDbConnection()
-				->select('name')
-				->from('calendar_category')
-				->where('id','IN', $this->categoryIds)
-			->fetchMode(\PDO::FETCH_COLUMN, 0)->all();
+	public function categoryNames(): array
+	{
+		return go()->getDbConnection()
+			->select('name')
+			->from('calendar_category')
+			->where('id','IN', $this->categoryIds)
+			->fetchMode(\PDO::FETCH_COLUMN, 0)
+			->all();
 	}
-	public function categoryIdsByName($names) {
+	public function categoryIdsByName($names): void
+	{
 		$this->categoryIds = [];
 		foreach($names as $name) {
-			$id = go()->getDbConnection()->selectSingleValue('id')->from('calendar_category')
+			$idsQuery = go()->getDbConnection()
+				->selectSingleValue('id')
+				->from('calendar_category')
 				->where('name', '=', $name)
-				->andWhere((new Criteria())->where('ownerId','=', go()->getUserId())->orWhere('ownerId','IS', null))
-				->andWhere((new Criteria())->where('calendarId', '=', $this->calendarId)->orWhere('calendarId', 'IS', null))->single();
+				->andWhere(
+					(new Criteria())
+						->where('ownerId','=', go()->getUserId())->orWhere('ownerId','IS', null));
+
+			// sometimes not set for new events.
+			if(isset($this->calendarId)) {
+				$idsQuery->andWhere((new Criteria())->where('calendarId', '=', $this->calendarId)->orWhere('calendarId', 'IS', null));
+			}
+
+			$id = $idsQuery->single();
 			if(!empty($id)) {
 				$this->categoryIds[] = $id;
 			}
