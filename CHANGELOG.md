@@ -1,6 +1,7 @@
 01-09-2025: 25.0.49
 - ActiveSync: Fix error in scheduling request via mail and z-push. Fixes z-push sync email iOS more than one month
   #1324
+- CalDAV: Optimized calendar query performance
 
 01-09-2025: 25.0.48
 - Calendar: Map cutype room to location. Fixes database error when cutype was 'room' in an invitation.
