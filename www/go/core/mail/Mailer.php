@@ -41,25 +41,22 @@ class Mailer {
 	 * From e-mail that will be used when you use {@see compose()}
 	 *
 	 * This is set when you use {@see App::getMailer()}
-	 * @var string
 	 */
-	public string $fromEmail;
+	public string|null $fromEmail;
 
 	/**
 	 * From name that will be used when you use {@see compose()}
 	 *
 	 * This is set when you use {@see App::getMailer()}
-	 * @var string
 	 */
-	public string $fromName;
+	public string|null $fromName;
 
 	/**
 	 * Reply-To header that will be used when you use {@see compose()}
 	 *
 	 * This is set when you use {@see App::getMailer()}
-	 * @var string
 	 */
-	public string $replyTo;
+	public string|null $replyTo;
 
 	/**
 	 * Create a new mail message
