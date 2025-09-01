@@ -2713,9 +2713,7 @@ abstract class Property extends Model {
 					if(is_object($v)) {
 						$copy->$name = clone $v;
 					}	else {
-						if(isset($v) || isset($this->$name) ) {
-							$copy->$name = $v;
-						}
+						$copy->$name = $v;
 					}
 				}
 			} else {
