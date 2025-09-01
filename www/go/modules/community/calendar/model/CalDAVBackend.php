@@ -577,55 +577,6 @@ class CalDAVBackend extends AbstractBackend implements
 		$stmt->execute([$principalUri, $objectData, $objectUri, time(), md5($objectData), strlen($objectData)]);
 	}
 
-
-	/**
-	 * Searches through all of a users calendars and calendar objects to find
-	 * an object with a specific UID.
-	 *
-	 * This method should return the path to this object, relative to the
-	 * calendar home, so this path usually only contains two parts:
-	 *
-	 * calendarpath/objectpath.ics
-	 *
-	 * If the uid is not found, return null.
-	 *
-	 * This method should only consider * objects that the principal owns, so
-	 * any calendars owned by other principals that also appear in this
-	 * collection should be ignored.
-	 *
-	 * @param string $principalUri
-	 * @param string $uid
-	 *
-	 * @return string|null
-	 */
-	public function getCalendarObjectByUID($principalUri, $uid)
-	{
-
-		go()->debug("getCalendarObjectByUID($principalUri, $uid)");
-		$path =  parent::getCalendarObjectByUID($principalUri,$uid);
-		go()->debug($path);
-		return $path;
-
-		$username = str_replace("principals/", "", $principalUri);
-
-		$userId = User::find()->selectSingleValue("id")->where('username', '=', $username)->single();
-
-		$event = CalendarEvent::find()
-			->select('cce.calendarId, uri')
-			->where(['uid' => $uid, 'cal.ownerId'=>$userId])
-			->fetchMode(\PDO::FETCH_OBJ)
-			->single();
-
-
-		if($event) {
-			$path = "c-" . $event->calendarId . "/" . $event->uri;
-				go()->debug($path);
-			return $path;
-		} else {
-			return null;
-		}
-	}
-
 	/**
 	 * @param mixed $object
 	 * @param mixed $calendarId
