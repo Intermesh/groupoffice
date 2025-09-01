@@ -213,13 +213,15 @@ class ICalendarHelper {
 		'COUNT' => 'count',
 		'UNTIL' => 'until',
 		'INTERVAL' => 'interval',
-		'BYSETPOS' => 'bySetPos',
+		'BYSETPOS' => 'bySetPosition',
 		'BYSECOND' => 'bySecond',
 		'BYMINUTE' => 'byMinute',
 		'BYHOUR' => 'byHour',
 		'BYDAY' => 'byDay',
-		'BYMONTHDAY' => 'byMonthday',
+		'BYMONTHDAY' => 'byMonthDay',
 		'BYMONTH' => 'byMonth',
+		'BYWEEKNO' => 'byWeekNo',
+		'BYYEARDAY' => 'byYearDay'
 	];
 
 	/**
@@ -516,7 +518,7 @@ class ICalendarHelper {
 		if(isset($parts['WKST'])) $values->firstDayOfWeek = strtolower($parts['WKST']);
 		if(!empty($parts['BYDAY'])) {
 			$values->byDay = [];
-			$days =array_map('trim',explode(",", $parts['BYDAY']));
+			$days =array_map('trim',(array) $parts['BYDAY']);
 			foreach($days as $day) {
 				$bd = (object)['day' => strtolower(substr($day, -2))];
 				if(strlen($day) > 2) {
@@ -525,12 +527,12 @@ class ICalendarHelper {
 				$values->byDay[] = $bd;
 			}
 		}
-		if(isset($parts['BYMONTHDAY'])) $values->byMonthDay = array_map('intval',explode(',', $parts['BYMONTHDAY']));
-		if(isset($patrs['BYMONTH'])) $values->byMonth = explode(',', $parts['BYMONTH']); // is string, could have L suffix
-		if(isset($patrs['BYYEARDAY'])) $values->byYearDay = array_map('intval',explode(',', $parts['BYYEARDAY']));
-		if(isset($patrs['BYWEEKNO'])) $values->byWeekNo = array_map('intval',explode(',', $parts['BYWEEKNO']));
+		if(isset($parts['BYMONTHDAY'])) $values->byMonthDay = array_map('intval', (array) $parts['BYMONTHDAY']);
+		if(isset($parts['BYMONTH'])) $values->byMonth = (array) $parts['BYMONTH']; // is string, could have L suffix
+		if(isset($parts['BYYEARDAY'])) $values->byYearDay = array_map('intval', (array) $parts['BYYEARDAY']);
+		if(isset($parts['BYWEEKNO'])) $values->byWeekNo = array_map('intval', (array) $parts['BYWEEKNO']);
 		// skip byHour, byMinute, bySecond
-		if(isset($patrs['BYSETPOS'])) $values->bySetPosition = array_map('intval',explode(',', $parts['BYSETPOS']));
+		if(isset($parts['BYSETPOS'])) $values->bySetPosition = array_map('intval', (array) $parts['BYSETPOS']);
 		if(isset($parts['COUNT'])) {
 			$values->count = intval($parts['COUNT']);
 		} elseif(isset($parts['UNTIL'])) {
