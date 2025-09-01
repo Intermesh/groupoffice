@@ -1,3 +1,6 @@
+- ActiveSync: Fix error in scheduling request via mail and z-push. Fixes z-push sync email iOS more than one month
+  #1324
+
 01-09-2025: 25.0.48
 - Calendar: Map cutype room to location. Fixes database error when cutype was 'room' in an invitation.
 - Calendar: Sometimes events lost duration and suddenly spanned 2 days in the view.
