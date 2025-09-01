@@ -3,6 +3,7 @@ namespace go\modules\community\davclient\model;
 
 use go\core\acl\model\AclOwnerEntity;
 use go\core\model\Module;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\util\Crypt;
@@ -223,6 +224,10 @@ class DavAccount extends AclOwnerEntity {
 						go()->log('Synchronizing ' . $calendar->uri . ' ctag mismatch [' . $calendar->ctag . ' != ' . $collection->getctag . ']');
 						if ($calendar->sync()) {
 							$calendar->ctag = (string)$collection->getctag;
+						}
+						if(!$this->save()) {
+							go()->getDbConnection()->rollBack();
+							throw new SaveException($this);
 						}
 						go()->getDbConnection()->commit();
 					}
