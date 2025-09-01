@@ -99,7 +99,7 @@ class CalendarEvent extends AclItemEntity {
 	/**
 	 * A unique identifier for the object.
 	 */
-	public ?string $uid;
+	public ?string $uid = null;
 
 	/**
 	 * This is only set when somebody is invited to a single occurrence of a series.
@@ -139,7 +139,7 @@ class CalendarEvent extends AclItemEntity {
 	 * (optional, default: PT0S)
 	 *
 	 */
-	public ?string $duration;
+	public ?string $duration =  null;
 
 	/**
 	 * The title
@@ -154,7 +154,7 @@ class CalendarEvent extends AclItemEntity {
 	/**
 	 * The location where the event takes place
 	 */
-	public ?string $location;
+	public ?string $location = null;
 
 	/**
 	 * Status of event (confirmed, canceled, tentative)
