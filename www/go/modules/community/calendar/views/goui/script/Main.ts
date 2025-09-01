@@ -44,6 +44,8 @@ export class Main extends Component {
 	timeSpan: ValidTimeSpan
 	printCurrentBtn: Button
 
+	inboxBtn: Button
+
 	picker: DatePicker
 	spanAmount?: number = 31 // 2-7, 14, 21, 28
 
@@ -182,11 +184,10 @@ export class Main extends Component {
 							calendarId: CalendarView.selectedCalendarId
 						}})).save()
 					}),
-					btn({
+					this.inboxBtn = btn({
 						cls:'not-medium-device',
 						icon: 'inbox',
 						title: t('Invitations'),
-						hidden: !client.user.calendarPreferences?.autoAddInvitations,
 						menu: menu({}, list({
 							store:inviteStore,
 							renderer: (r, row) => {

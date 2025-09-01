@@ -217,6 +217,7 @@ modules.register(  {
 			// OLD CODE
 			async function showBadge() {
 				const count = await go.Jmap.request({method: "CalendarEvent/countMine"});
+				ui.inboxBtn.hidden = count<1;
 				GO.mainLayout.setNotification('calendar', count, 'orange');
 			}
 			go.Db.store("CalendarEvent").on("changes", () => {
