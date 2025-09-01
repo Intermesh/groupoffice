@@ -37,6 +37,10 @@ class ICalendarHelper {
       'informational' => 'NON-PARTICIPANT',
 	];
 
+	const kinds = [
+		'individual', 'group', 'location', 'resource','unknown'
+	];
+
 	/**
 	 * Parse an Event object to a VObject
 	 * @param CalendarEvent $event
@@ -188,7 +192,8 @@ class ICalendarHelper {
 			$attr['RSVP'] = 'TRUE';
 		}
 		if($participant->kind) {
-			$attr['CUTYPE'] = strtoupper($participant->kind);
+			//ENUM('individual', 'group', 'location', 'resource','unknown') NOT NULL,
+			$attr['CUTYPE'] = $participant->kind == 'location' ? "ROOM" : strtoupper($participant->kind);
 		}
 		foreach ($participant->getRoles() as $role => $true) {
 			if (in_array($role, self::$roleMap)) {
@@ -415,7 +420,18 @@ class ICalendarHelper {
 
 		$p = (object)['email' => $key];
 		if(!empty($vattendee['EMAIL'])) $p->email = (string)$vattendee['EMAIL'];
-		$p->kind = !empty($vattendee['CUTYPE']) ? strtolower($vattendee['CUTYPE']) : 'individual';
+
+		if(!empty($vattendee['CUTYPE'])) {
+			$k = strtolower($vattendee['CUTYPE']);
+			if($k == 'room') {
+				$p->kind = 'location';
+			} else {
+				$p->kind = in_array($k, self::kinds) ? $k : 'individual';
+			}
+		}else {
+			$p->kind = 'individual';
+		}
+
 		if(!empty($vattendee['CN'])) $p->name = (string)$vattendee['CN'];
 		if(!empty($vattendee['RSVP'])) $p->expectReply = $vattendee['RSVP']->getValue() ? 1: 0; // bool
 		$p->participationStatus = !empty($vattendee['PARTSTAT']) ? strtolower($vattendee['PARTSTAT']) : 'needs-action';
