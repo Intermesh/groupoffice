@@ -1,4 +1,7 @@
 - Calendar: Map cutype room to location. Fixes database error when cutype was 'room' in an invitation.
+- Calendar: Sometimes events lost duration and suddenly spanned 2 days in the view.
+- Caldav: Fixed sync issue with participants without name in recurring events
+
 
 28-08-2025 25.0.47
 - Core: App::USER_MAILER event so calendar can send scheduling mails with user from address
