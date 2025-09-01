@@ -150,7 +150,7 @@ export class CalendarItem {
 	}
 
 	private isNew() {
-		return this.key==='';
+		return this.key === '';
 	}
 
 	private isTimeModified() {
@@ -158,7 +158,6 @@ export class CalendarItem {
 	}
 
 	patchedInstance(recurrenceId:string) {
-		// debugger;
 		if(!this.data.recurrenceRule || !this.data.recurrenceOverrides || !this.data.recurrenceOverrides[recurrenceId]) {
 			throw "Not found";
 		}
@@ -807,7 +806,7 @@ export class CalendarItem {
 
 		CalendarItem.clipboard = new CalendarItem({
 			data,
-			key:null,
+			key: "",
 			open(this: CalendarItem) { // when opening the copy. just save
 				this.confirmScheduleMessage(data, () => {
 					root.mask();
