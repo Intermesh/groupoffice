@@ -48,16 +48,17 @@ class TaskList extends AclOwnerEntity
 	protected int $role = self::List;
 
 	/** if a longer description then name s needed */
-	public ?string $description;
+	public ?string $description = null;
 
 	public ?int $createdBy;
 	public ?int $ownerId;
 
 	protected string $defaultColor;
-	public ?string $color;
-	public ?int $sortOrder;
-	public ?bool $isVisible;
-	public ?bool $isSubscribed;
+
+	public ?string $color = null;
+	public ?int $sortOrder = null;
+	public ?bool $isVisible= null;
+	public ?bool $isSubscribed= null;
 	public ?bool $syncToDevice = true;
 
 	protected $highestItemModSeq;
