@@ -1,3 +1,4 @@
+02-09-2025: 25.0.50
 - ActiveSync: Fixed Error in modules/z-push/backend/go/TaskStore.php at line 237: Typed property 
   go\modules\community\tasks\model\Task::$start must not be accessed before initialization
 - Tasks: Added "Sync to device" option for ActiveSync and CalDAV sync
