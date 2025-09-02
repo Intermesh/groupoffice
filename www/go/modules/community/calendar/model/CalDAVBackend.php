@@ -74,7 +74,7 @@ class CalDAVBackend extends AbstractBackend implements
 				'share-access' => $calendar->getPermissionLevel() == Acl::LEVEL_MANAGE ? 1 : (($calendar->getPermissionLevel() >= Acl::LEVEL_WRITE && empty($calendar->webcalUri)) ? 3 : 2),
 			];
 		}
-		$tasklists = TaskList::find()->where(['isSubscribed'=>1, 'role'=>1])
+		$tasklists = TaskList::find()->where(['isSubscribed'=>1,'syncToDevice'=>1, 'role'=>1])
 			->filter(["permissionLevel" => Acl::LEVEL_READ]);
 		foreach($tasklists as $tasklist) {
 
@@ -278,18 +278,6 @@ class CalDAVBackend extends AbstractBackend implements
 			}
 		}
 	}
-//	public function getMultipleCalendarObjects($calendarId, array $uris)
-//	{
-//		$o = [];
-//		foreach($uris as $uri) {
-//			$obj = $this->getCalendarObject($calendarId, $uri);
-//			if($obj) {
-//				$o[] = $obj;
-//			}
-//		}
-//
-//		return $o;
-//	}
 
 	/**
 	 * Check if this is only called when the getCalendarObjects does not provide the calendardata

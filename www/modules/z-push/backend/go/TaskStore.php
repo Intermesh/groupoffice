@@ -333,7 +333,7 @@ class TaskStore extends Store {
 		ZLog::Write(LOGLEVEL_DEBUG, "GetFolder($id)");
 
 		$tasklist = TaskList::findById($id);
-		if(!$tasklist || !$tasklist->hasPermissionLevel(Acl::LEVEL_READ)) {
+		if(!$tasklist || !$tasklist->hasPermissionLevel(Acl::LEVEL_READ) || !$tasklist->syncToDevice) {
 			ZLog::Write(LOGLEVEL_WARN, "GetFolder($id) not found or no permissions");
 			return false;
 		}
@@ -358,7 +358,8 @@ class TaskStore extends Store {
 		$tasklists = TaskList::find()
 			->selectSingleValue('tasklist.id')
 			->andWhere('role', '=',1)
-			->andWhere('isSubscribed', '=', 1);
+			->andWhere('isSubscribed', '=', 1)
+			->andWhere('syncToDevice', '=', 1);
 
 		foreach($tasklists as $tasklistId) {
 			$folder = $this->StatFolder($tasklistId);

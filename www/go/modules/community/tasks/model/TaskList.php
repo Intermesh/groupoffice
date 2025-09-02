@@ -26,7 +26,7 @@ use GO\Projects2\Model\ProjectEntity;
  */
 class TaskList extends AclOwnerEntity
 {
-	const UserProperties = ['color', 'sortOrder', 'isVisible', 'isSubscribed'];
+	const UserProperties = ['color', 'sortOrder', 'isVisible', 'isSubscribed', 'syncToDevice'];
 
 	const List = 1;
 	const Board = 2;
@@ -47,38 +47,18 @@ class TaskList extends AclOwnerEntity
 
 	protected int $role = self::List;
 
-	/** @var string What kind of list: 'list', 'board' */
-	public function getRole() : string {
-		return self::Roles[$this->role] ?? 'list';
-	}
+	/** if a longer description then name s needed */
+	public ?string $description;
 
+	public ?int $createdBy;
+	public ?int $ownerId;
 
-	/**
-	 *
-	 * @param string $value ['list'|'board'|'project']
-	 */
-	public function setRole(string $value) {
-		$key = array_search($value, self::Roles, true);
-		if($key === false) {
-			$this->setValidationError('role', 10, 'Incorrect role value for tasklist');
-		} else
-			$this->role = $key;
-	}
-
-	/** @var string if a longer description then name s needed */
-	public $description;
-
-	/** @var int */
-	public $createdBy;
-
-	/** @var int */
-	public $ownerId;
-
-	protected $defaultColor;
-	public $color;
-	public $sortOrder;
-	public $isVisible;
-	public $isSubscribed;
+	protected string $defaultColor;
+	public ?string $color;
+	public ?int $sortOrder;
+	public ?bool $isVisible;
+	public ?bool $isSubscribed;
+	public ?bool $syncToDevice = true;
 
 	protected $highestItemModSeq;
 
@@ -104,6 +84,23 @@ class TaskList extends AclOwnerEntity
 				$criteria->where(['projectId' => $value]);
 			});
 
+	}
+
+	/** @var string What kind of list: 'list', 'board' */
+	public function getRole() : string {
+		return self::Roles[$this->role] ?? 'list';
+	}
+
+	/**
+	 *
+	 * @param string $value ['list'|'board'|'project']
+	 */
+	public function setRole(string $value) {
+		$key = array_search($value, self::Roles, true);
+		if($key === false) {
+			$this->setValidationError('role', 10, 'Incorrect role value for tasklist');
+		} else
+			$this->role = $key;
 	}
 
 	protected static function textFilterColumns(): array
