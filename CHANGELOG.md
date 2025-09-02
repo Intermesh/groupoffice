@@ -1,5 +1,6 @@
 - ActiveSync: Fixed Error in modules/z-push/backend/go/TaskStore.php at line 237: Typed property 
   go\modules\community\tasks\model\Task::$start must not be accessed before initialization
+- Tasks: Added "Sync to device" option for ActiveSync and CalDAV sync
 
 01-09-2025: 25.0.49
 - ActiveSync: Fix error in scheduling request via mail and z-push. Fixes z-push sync email iOS more than one month
