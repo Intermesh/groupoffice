@@ -224,17 +224,8 @@ class TaskStore extends Store {
 				}
 			}
 
-			//		$message->utcduedate;
-			//    $message->regenerate;
-			//    $message->deadoccur;
-			//    $message->reminderset;
-			//    $message->sensitivity;
-			//    $message->utcstartdate;
-			//    $message->rtf;
-			//    $message->categories;
-
 			// When a task is created on today, then the start time needs to be fixed.
-			if ($task->start > $task->due) {
+			if (isset($task->due) && isset($task->start) && $task->start > $task->due) {
 				$task->start = $task->due;
 			}
 
