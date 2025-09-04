@@ -27,7 +27,7 @@ const watch = (process.argv.length > 2 && process.argv[2] == "watch");
 const opts = {
 	entryPoints: ['goui/script/index.ts', 'groupoffice-core/script/index.ts'],
 	bundle: true,
-	sourcemap: watch,
+	sourcemap: true,
 	format: "esm",
 	target: "esnext",
 	minify: !watch,
