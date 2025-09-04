@@ -124,13 +124,18 @@ export class CalendarAdapter extends Observable<CalendarAdapterEventMap> {
 			*items(start: DateTime, end: DateTime) {
 				for(const o of this.list) {
 					const start = DateTime.createFromFormat(o.start,'Y-m-d')!;
+
+					let title  = o.title;
+					if(o.region) {
+						title += " (" + o.region + ")";
+					}
 					yield new CalendarItem({
 						key: '',
 						start,
 						extraIcons: ['family_star'],
 						defaultColor: '025d7b',
 						data: {
-							title: o.title,
+							title: title,
 							duration: o.duration,
 							showWithoutTime: true,
 						},

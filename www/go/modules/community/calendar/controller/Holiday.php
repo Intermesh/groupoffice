@@ -13,10 +13,15 @@ class Holiday extends Controller
 		$till = new \DateTime($params['till']);
 		$list = [];
 		foreach(model\Holiday::generate($params['set'],$params['lang'],$from, $till) as $holiday){
-			$list[] = $holiday;
+			$key = $holiday->title .'-'.$holiday->start;
+			if(isset($list[$key])) {
+				$list[$key]->region .= ', ' . $holiday->region;
+			} else {
+				$list[$key] = $holiday;
+			}
 		}
 		return [
-			'list'=> $list
+			'list'=> array_values($list)
 		];
 	}
 }

@@ -18,15 +18,17 @@ class Holiday {
 
 	private $year;
 
-	public $title;
+	public string $title;
 
 	public $start;
 
+	public ?string $region;
+
 	private $substitutes;
 
-	public $type = 'public';
+	public string $type = 'public';
 
-	public $duration = 'P1D';
+	public string  $duration = 'P1D';
 
 	public function __construct(string $rule, $data,$year) {
 		$this->year = $year;
@@ -122,7 +124,8 @@ class Holiday {
 						continue; // we do not remove substitutes for regions.
 					}
 					$holiday = new self($rule, $entry, $year);
-					$holiday->title .= ' ('.self::findRegionName($obj).')';
+					//$holiday->title .= ' ('.self::findRegionName($obj).')';
+					$holiday->region = self::findRegionName($obj);
 					if($holiday->start !== null && $holiday->start >= $from && $holiday->start <= $till) {
 						$holiday->start = $holiday->start->format('Y-m-d');
 						yield $holiday;
