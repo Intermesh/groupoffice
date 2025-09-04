@@ -95,6 +95,7 @@ function addEmailAction() {
 								E('div',
 									...['accepted', 'tentative', 'declined'].map(s => E('button', names[s])
 										.cls('goui-button')
+										.cls('disabled', item.calendarPrincipal?.participationStatus == s)
 										.cls('pressed', item.calendarPrincipal?.participationStatus == s)
 										.on('click', _ => {
 											item.updateParticipation(s as 'accepted'|'declined'|'tentative',() => {

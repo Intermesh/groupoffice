@@ -224,9 +224,12 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 	private pressButton(v:'accepted'|'declined'|'tentative') {
 		this.statusTbar.items.forEach(btn => {
 			btn.el.cls('pressed', btn.itemId === v);
+			btn.disabled = btn.itemId === v;
 		});
-
 	}
+
+
+
 	private updateStatus(v:'accepted'|'declined'|'tentative') {
 		this.item!.updateParticipation(v);
 		this.pressButton(v);
@@ -285,7 +288,8 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 			// await super.load(ev.data.id);
 
 			this.toolbar.show();
-
+			debugger;
+			this.pressButton(ev.calendarPrincipal?.participationStatus);
 			this.form.findField('alerts')!.hidden = false;
 			this.form.load(ev.data.id).then(() => {
 				if(ev.recurrenceId) {
