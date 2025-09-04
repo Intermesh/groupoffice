@@ -288,7 +288,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 			// await super.load(ev.data.id);
 
 			this.toolbar.show();
-			debugger;
+
 			this.pressButton(ev.calendarPrincipal?.participationStatus);
 			this.form.findField('alerts')!.hidden = false;
 			this.form.load(ev.data.id).then(() => {
