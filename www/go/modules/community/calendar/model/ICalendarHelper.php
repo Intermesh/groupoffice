@@ -442,12 +442,7 @@ class ICalendarHelper {
 
 	static private function parseAttendee($vattendee) {
 		$key = str_ireplace('mailto:', '',(string)$vattendee);
-		$principalId = Principal::find()
-			->join("core_entity", "e", "e.id=principal.entityTypeId")
-			->selectSingleValue('principal.id')
-			->where('email','=',$key)
-			->orderBy([new Expression("(e.name='User') DESC")])
-			->single();
+		$principalId = Principal::findIdByEmail($key);
 
 		$p = (object)['email' => $key];
 		if(!empty($vattendee['EMAIL'])) $p->email = (string)$vattendee['EMAIL'];

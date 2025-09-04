@@ -54,6 +54,16 @@ class Principal extends AclOwnerEntity
 			->addTable('core_principal', 'principal');
 	}
 
+	static function findIdByEmail($email, $preferUser = true) {
+		$stmt = self::find()->selectSingleValue('principal.id')
+			->where('email','=',$email);
+		if($preferUser) {
+			$stmt->join("core_entity", "e", "e.id=principal.entityTypeId")
+				->orderBy([new Expression("(e.name='User') DESC")]);
+		}
+		return $stmt->single();
+	}
+
 	static function currentUser() {
 		return self::find()->where('id','=',go()->getUserId())->single();
 	}

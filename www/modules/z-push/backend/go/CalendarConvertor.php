@@ -1,5 +1,6 @@
 <?php
 
+use go\core\db\Expression;
 use go\core\ErrorHandler;
 use go\core\mail\Util;
 use go\core\model\Principal;
@@ -346,7 +347,7 @@ class CalendarConvertor
 				$key = $attendee->email;
 				if(!Util::validateEmail($key))
 					continue; // do not att attendee if client does not send a valid email address (TBSync uses login name)
-				$principalId = Principal::find()->selectSingleValue('id')->where('email','=',$key)->orderBy(['entityTypeId'=>'ASC'])->single();
+				$principalId = Principal::findIdByEmail($key);
 				if(!isset($event->participants[$principalId ?? $key])) {
 					$p = new Participant($event);
 					$p->email = $attendee->email;
