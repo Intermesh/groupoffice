@@ -1,3 +1,5 @@
+- Caldav: Sort personal calendar on top as Sabredav picks the first in the list for invites.
+
 01-09-2025:6.8.136
 - Core: Safer way to execute custom field functions
 
