@@ -358,7 +358,7 @@ class Scheduler {
 	}
 
 	private static function processRequest(VCalendar $vcalendar, ?CalendarEvent $event, bool &$alreadyProcessed) {
-		if(!static::requestIsProcesses($vcalendar, $event)) {
+		if(!static::requestIsProcessed($vcalendar, $event)) {
 			$event = ICalendarHelper::parseVObject($vcalendar, $event);
 			if (!$event->save()) {
 				throw new SaveException($event);
@@ -377,7 +377,7 @@ class Scheduler {
 	 * @param CalendarEvent|null $event
 	 * @return bool
 	 */
-	private static function requestIsProcesses(VCalendar $vcalendar, ?CalendarEvent $event) : bool {
+	private static function requestIsProcessed(VCalendar $vcalendar, ?CalendarEvent $event) : bool {
 		if($event->isNew() || $event->sequence < (int)$vcalendar->VEVENT[0]->SEQUENCE->getValue()) {
 			return false;
 		}
