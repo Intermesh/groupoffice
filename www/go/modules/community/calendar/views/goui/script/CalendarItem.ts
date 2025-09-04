@@ -479,8 +479,8 @@ export class CalendarItem {
 	private humanReadableDate() {
 		const start = this.start;
 		const end = this.end.clone();
-		const oneDay = this.data.duration === "P1D";
-
+		const fullDay = this.data.duration === "P1D";
+		const oneDay = fullDay || this.start.format('Ymd') == this.end.format('Ymd');
 		let line1 = start.format('l j F Y');
 
 		if (!oneDay) {
@@ -491,7 +491,9 @@ export class CalendarItem {
 		}
 
 		let line2;
-		if (oneDay) {
+		if(fullDay) {
+			line2 = t('All day');
+		} else if (oneDay) {
 			if(!this.data.showWithoutTime) {
 				line2 = `${Format.time(start)} - ${Format.time(end)}`;
 			}
