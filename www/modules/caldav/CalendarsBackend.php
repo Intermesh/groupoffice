@@ -110,6 +110,9 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				))
 				->criteria(FindCriteria::newInstance()->addCondition('user_id', $user->id, '=', 'l'));
 
+			// For scheduling plugin as it takes the first calendar for invites
+			$findParams->order('default_calendar', 'DESC');
+
 			$stmt = Calendar::model()->find($findParams);
 
 			if(!$stmt->rowCount()){
@@ -179,6 +182,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			// Also, the create-only permission would have to be checked manually is made available
 			'{http://sabredav.org/ns}read-only' => $level <= Acl::LEVEL_CREATE,
 			// 1 = owner, 2 = readonly, 3 = readwrite
+			// unused? Sharing plugin is not enabled
 			'share-access' => $level == Acl::LEVEL_MANAGE ? 1 : ($level >= Acl::LEVEL_WRITE ? 3 : 2),
 			//'access'=> $calendar->getPermissionLevel() < Acl::LEVEL_CREATE ? \Sabre\DAV\Sharing\Plugin::ACCESS_READ : \Sabre\DAV\Sharing\Plugin::ACCESS_READWRITE
 //			'{http://apple.com/ns/ical/}calendar-order' => $calendar->id,
@@ -501,7 +505,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				'size' => strlen($data),
 				'component' => 'vevent'
 			);
-			\GO::debug($object);
+//			\GO::debug($object);
 			return $object;
 		}
 		else {
