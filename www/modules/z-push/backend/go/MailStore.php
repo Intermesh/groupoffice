@@ -1213,6 +1213,8 @@ class MailStore extends Store implements ISearchProvider {
 
 	private function processCalendarInvite(SyncMail $message, \GO\Email\Model\ImapMessage $imapMessage)
 	{
+
+		// TODO this is inefficient because it reads the icalendar twice
 		$vcalendar = $imapMessage->getInvitationVcalendar();
 		if(!$vcalendar) {
 			return;
