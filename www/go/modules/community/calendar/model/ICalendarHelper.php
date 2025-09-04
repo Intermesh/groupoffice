@@ -6,20 +6,32 @@
  */
 namespace go\modules\community\calendar\model;
 
+use DateTimeZone;
 use go\core\db\Expression;
 use go\core\ErrorHandler;
 use go\core\exception\JsonPointerException;
 use go\core\fs\Blob;
-use go\core\mail\Address;
-use go\core\mail\Attachment;
-use go\core\model\Acl;
 use go\core\model\Principal;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use Sabre\VObject;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Component\VEvent;
+use Sabre\VObject\Component\VTimeZone;
 use stdClass;
+
+class UserTimezoneGuesser implements VObject\TimezoneGuesser\TimezoneGuesser {
+
+	public function guess(VTimeZone $vtimezone, bool $failIfUncertain = false): ?DateTimeZone
+	{
+		if(!go()->getAuthState()) {
+			return null;
+		}
+		return new DateTimeZone(go()->getAuthState()->getUser(['timezone'])->timezone);
+	}
+}
+
+VObject\TimeZoneUtil::addTimezoneGuesser('gouser', new UserTimezoneGuesser());
 
 class ICalendarHelper {
 
@@ -260,7 +272,16 @@ class ICalendarHelper {
 		return implode(';',$rule);
 	}
 
+	/**
+	 * Generates CalendarEvent models from an icalendar file
+	 *
+	 * @param string $blobId
+	 * @param array|null $values
+	 * @return \Generator
+	 * @throws VObject\ParseException
+	 */
 	static function calendarEventFromFile(string $blobId, array|null $values = null) {
+
 		$data = file_get_contents(Blob::buildPath($blobId));
 		$splitter = new VObject\Splitter\ICalendar(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING + VObject\Reader::OPTION_IGNORE_INVALID_LINES);
 		while($vevent = $splitter->getNext()) {
@@ -277,6 +298,14 @@ class ICalendarHelper {
 		}
 	}
 
+	/**
+	 * Returns the first vobject from icalendar data
+	 *
+	 * @param string $data
+	 * @param $event
+	 * @return false|CalendarEvent
+	 * @throws VObject\ParseException
+	 */
 	static function fromICal(string $data, $event = null) {
 	//	$vcalendar = VObject\Reader::read(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING);
 		$splitter = new VObject\Splitter\ICalendar(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING + VObject\Reader::OPTION_IGNORE_INVALID_LINES);

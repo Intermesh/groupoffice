@@ -189,6 +189,9 @@ class Scheduler {
 	 */
 	static function handleIMIP(ImapMessage $imapMessage, $ifMethod=null): bool|array
 	{
+		// old framework sets user timezone :(
+		date_default_timezone_set("UTC");
+
 		$vcalendar = $imapMessage->getInvitationVcalendar();
 		if(!$vcalendar) {
 			return false;
@@ -287,9 +290,6 @@ class Scheduler {
 	 * @throws SaveException
 	 */
 	private static function processMessage(VCalendar $vcalendar, int $userId, object $sender, bool &$alreadyProcessed) : ?CalendarEvent{
-
-		// old framework sets user timezone :(
-		date_default_timezone_set("UTC");
 
 		if(!isset($vcalendar->method)) {
 			return null;
