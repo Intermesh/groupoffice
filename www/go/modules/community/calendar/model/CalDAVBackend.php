@@ -41,7 +41,11 @@ class CalDAVBackend extends AbstractBackend implements
 		$tz = new \GO\Base\VObject\VTimezone();
 
 		$username = basename($principalUri);
-		$u = User::find(['id'])->where(['username'=>$username])->single();
+		$u = User::find(['id', 'calendarPreferences'])->where(['username'=>$username])->single();
+
+		// We want to sort the personal calendar on top for caldav scheduling as it takes the first one for invites
+		// See schedule-default-calendar-URL handling in  Sabre\CalDAV\Schedule\Plugin line 222
+		$personalCalendarId = $u->calendarPreferences->personalCalendarId;
 
 		$calendars = Calendar::findFor($u->id)
 			->where(['isSubscribed'=>1,'syncToDevice'=>1, 'groupId'=>null]);
@@ -50,7 +54,7 @@ class CalDAVBackend extends AbstractBackend implements
 		foreach($calendars as $calendar) {
 
 			$uri = 'c-'.$calendar->id;
-			$result[] = [
+			$record = [
 				'id' => $uri,
 				'uri' => $uri,
 				'principaluri' => $principalUri, // echo back
@@ -70,9 +74,15 @@ class CalDAVBackend extends AbstractBackend implements
 				//'{http://calendarserver.org/ns/}subscribed-strip-attachments' => '0',
 				'{http://sabredav.org/ns}sync-token' => self::VERSION.'-'.$calendar->highestItemModSeq(),
 				'share-resource-uri' => '/ns/share/'.$uri,
-				// 1 = owner, 2 = readonly, 3 = readwrite
-				'share-access' => $calendar->getPermissionLevel() == Acl::LEVEL_MANAGE ? 1 : (($calendar->getPermissionLevel() >= Acl::LEVEL_WRITE && empty($calendar->webcalUri)) ? 3 : 2),
+				// 1 = owner, 2 = readonly, 3 = readwrite: Unused as we don't have the sharing plugin enabled
+				'share-access' => $calendar->getOwnerId() == $u->id ? 1 : (($calendar->getPermissionLevel() >= Acl::LEVEL_WRITE && empty($calendar->webcalUri)) ? 3 : 2),
 			];
+
+			if($calendar->id == $personalCalendarId) {
+				array_unshift($result, $record);
+			} else {
+				$result[] = $record;
+			}
 		}
 		$tasklists = TaskList::find()->where(['isSubscribed'=>1,'syncToDevice'=>1, 'role'=>1])
 			->filter(["permissionLevel" => Acl::LEVEL_READ]);
