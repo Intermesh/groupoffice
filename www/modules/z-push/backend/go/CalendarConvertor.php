@@ -292,8 +292,11 @@ class CalendarConvertor
 			$event->uid = $message->uid;
 		//if (!empty($message->timezone))
 			$event->timeZone = self::tzid(); // ActiveSync timezone is guessable but for now we expect it to be the same as in GroupOffice
-		if ($event->isNew())
-			$event->createdAt = new DateTime('@'.$message->dtstamp);
+
+		if ($event->isNew() & !empty($message->dtstamp)) {
+			$event->createdAt = new DateTime('@' . $message->dtstamp);
+		}
+
 		$event->showWithoutTime = $message->alldayevent;
 		$event->title = $message->subject ?? "No subject";
 		$event->description = GoSyncUtils::getBodyFromMessage($message);
