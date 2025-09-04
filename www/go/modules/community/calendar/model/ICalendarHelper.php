@@ -296,7 +296,7 @@ class ICalendarHelper {
 	{
 
 		if(is_string($vcalendar)) {
-			$vcalendar = VObject\Reader::read($vcalendar, VObject\Reader::OPTION_FORGIVING);
+			$vcalendar = VObject\Reader::read($vcalendar, VObject\Reader::OPTION_FORGIVING + VObject\Reader::OPTION_IGNORE_INVALID_LINES);
 		}
 
 		$exceptions = [];
@@ -567,7 +567,7 @@ class ICalendarHelper {
 		if($data instanceof Blob && $data->contentType === 'text/calendar') {
 			$data = file_get_contents($data->path());
 		}
-		return VObject\Reader::read(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING);
+		return VObject\Reader::read(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING + VObject\Reader::OPTION_IGNORE_INVALID_LINES);
 	}
 
 }

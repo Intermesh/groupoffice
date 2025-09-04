@@ -351,7 +351,7 @@ class CalDAVBackend extends AbstractBackend implements
 		go()->debug($calendarData);
 		go()->debug(")");
 
-		$vCalendar = VObject\Reader::read($calendarData, VObject\Reader::OPTION_FORGIVING);
+		$vCalendar = VObject\Reader::read($calendarData, VObject\Reader::OPTION_FORGIVING + VObject\Reader::OPTION_IGNORE_INVALID_LINES);
 
 		switch($type) {
 			case 'c': // calendar
