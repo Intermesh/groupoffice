@@ -358,7 +358,7 @@ class Scheduler {
 	}
 
 	private static function processRequest(VCalendar $vcalendar, ?CalendarEvent $event, bool &$alreadyProcessed) {
-		if(static::requestIsNew($vcalendar, $event)) {
+		if(!static::requestIsProcesses($vcalendar, $event)) {
 			$event = ICalendarHelper::parseVObject($vcalendar, $event);
 			if (!$event->save()) {
 				throw new SaveException($event);
@@ -377,25 +377,11 @@ class Scheduler {
 	 * @param CalendarEvent|null $event
 	 * @return bool
 	 */
-	private static function requestIsNew(VCalendar $vcalendar, ?CalendarEvent $event) : bool {
-		if($event->isNew()) {
-			return true;
-		}
-
-		if(!$event->isRecurring()) {
+	private static function requestIsProcesses(VCalendar $vcalendar, ?CalendarEvent $event) : bool {
+		if($event->isNew() || $event->sequence < (int)$vcalendar->VEVENT[0]->SEQUENCE->getValue()) {
 			return false;
 		}
-
-		foreach($vcalendar->VEVENT as $vevent) {
-			if(!empty($vevent->{'RECURRENCE-ID'})) {
-				$recurrenceId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
-				if(!isset($event->recurrenceOverrides[$recurrenceId])){
-					return true;
-				}
-			}
-		}
-
-		return false;
+		return true;
 	}
 
 	private static function processCancel(VCalendar $vcalendar, CalendarEvent $existingEvent, bool &$alreadyProcessed) : CalendarEvent {
