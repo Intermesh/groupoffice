@@ -2,8 +2,9 @@
 - Caldav: When scheduling via caldav the event could end up in the wrong calendar if the invited
   e-mail matched another e-mail address using wild cards. eg. "bar@foo.com" could find 
   "foobar@foo.com" because it searched using %bar@foo.com%.
+- Core: fix deprecation in Xls import / Export
 
-01-09-2025:6.8.136
+01-09-2025: 6.8.136
 - Core: Safer way to execute custom field functions
 
 25-08-2025: 6.8.135
