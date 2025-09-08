@@ -418,6 +418,10 @@ class Mailer {
 			$this->mail->AltBody = $message->getAlternateBody();
 		}
 
+		if($message->getIcalendar()) {
+			$this->mail->Ical = $message->getIcalendar();
+		}
+
 		foreach ($message->getHeaders() as $name => $value) {
 			$this->mail->addCustomHeader($name, $value);
 		}
