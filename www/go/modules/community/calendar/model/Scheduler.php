@@ -57,6 +57,7 @@ class Scheduler {
 		}
 
 		$participant->participationStatus = $status;
+		$participant->expectReply = false;
 		// needed so organizer can find last response
 		$event->createdAt = new DateTime();
 		$event->modifiedAt = new DateTime();
