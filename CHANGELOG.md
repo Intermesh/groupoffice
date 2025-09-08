@@ -6,7 +6,8 @@
 - Files: make trash sortable by name, path, deletion date, deletedBy user
 - Calendar: Background of unaccepted events not white but with opacity
 - Calendar: Only show one calendar item of a meeting to avoid a very crowded view
-
+- Time registration: Fix task list refresh when switching projects
+ 
 02-09-2025: 25.0.50
 - ActiveSync: Fixed Error in modules/z-push/backend/go/TaskStore.php at line 237: Typed property 
   go\modules\community\tasks\model\Task::$start must not be accessed before initialization
