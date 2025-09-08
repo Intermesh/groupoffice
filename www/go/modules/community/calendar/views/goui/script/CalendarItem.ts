@@ -18,6 +18,7 @@ export type RecurrenceOverride = (Partial<CalendarEvent> & {excluded?:boolean});
 export type RecurrenceOverrides = {[recurrenceId:string]: RecurrenceOverride};
 export interface CalendarEvent extends BaseEntity {
 	id: EntityID
+	uid:string
 	recurrenceRule?: any
 	recurrenceOverrides?: RecurrenceOverrides
 	links?: any
