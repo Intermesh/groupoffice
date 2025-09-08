@@ -124,6 +124,8 @@ class Scheduler {
 		// participant could have been added as well.
 		$ics = ICalendarHelper::toInvite($method,$event);
 
+		$mailer = go()->getMailer($organizer->email, $organizer->name);
+
 		foreach($event->participants as $participant) {
 			/** @var $participant Participant */
 			if(($newOnly && !$participant->isNew()) || $participant->isOwner())
@@ -139,7 +141,6 @@ class Scheduler {
 			}
 
 			try {
-				$mailer = go()->getMailer($organizer->email, $organizer->name);
 				$msg = $mailer->compose();
 
 				if($participant->kind !== 'resource') {
@@ -153,6 +154,7 @@ class Scheduler {
 						->setTo(new Address($participant->email, $participant->name))
 						->setBody(self::mailBody($event, $method, $participant, $subject), 'text/html')
 						->send();
+
 			} catch(\Exception $e) {
 				go()->log($e->getMessage());
 				$success=false;

@@ -430,6 +430,15 @@ export class EventWindow extends FormWindow {
 		} else {
 			this.item!.confirmScheduleMessage(this.parseSavedData(this.form.modified), () => {
 				this.confirmedScheduleMessage = true;
+
+				// allow long timeout for sending invitations
+				const oldTimeout = client.requestTimeout;
+				client.requestTimeout = 180000;
+				this.form.on("submit", () => {
+					// reset after submit
+					client.requestTimeout = oldTimeout;
+				}, {once: true});
+
 				this.form.submit();
 				this.confirmedScheduleMessage = false;
 			});
@@ -438,6 +447,8 @@ export class EventWindow extends FormWindow {
 			return false;
 		}
 	}
+
+
 
 	private attachFile() {
 		 browser.pickLocalFiles(true).then(files => {
