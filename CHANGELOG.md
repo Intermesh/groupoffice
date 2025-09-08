@@ -13,7 +13,10 @@
 - Calendar: Fixed: go\modules\community\calendar\model\Scheduler::handle(): Argument #1 ($event) must be of type 
   go\modules\community\calendar\model\CalendarEvent, go\modules\community\calendar\model\RecurrenceOverride given, 
   called in /usr/local/share/src/www/go/modules/community/calendar/model/Scheduler.php on line 46
-  
+- Calendar: reuse mailer for invites and allow 180s timeout. Improve error message ion screen if timeout occurs
+
+
+
 02-09-2025: 25.0.50
 - ActiveSync: Fixed Error in modules/z-push/backend/go/TaskStore.php at line 237: Typed property 
   go\modules\community\tasks\model\Task::$start must not be accessed before initialization
