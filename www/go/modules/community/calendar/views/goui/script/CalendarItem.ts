@@ -251,7 +251,6 @@ export class CalendarItem {
 	/** amount of days this event is spanning */
 	get dayLength() {
 		// 1 day + the distance in days between start and end. - 1 second of end = 00:00:00
-		//console.log(this.title, this.start.diff(this.end.clone().addSeconds(-1)));
 		return 1 + this.start.diff(this.end.clone().addSeconds(-1)).getTotalDays()!;
 	}
 
@@ -425,7 +424,6 @@ export class CalendarItem {
 	}
 
 	get isOwner() {
-		console.log(this);
 		return !this.participants || this.calendarPrincipal?.roles?.owner || false;
 	}
 
