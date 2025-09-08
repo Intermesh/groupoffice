@@ -6,6 +6,9 @@
 - Files: make trash sortable by name, path, deletion date, deletedBy user
 - Calendar: Background of unaccepted events not white but with opacity
 - Calendar: Only show one calendar item of a meeting to avoid a very crowded view
+- Caldav: When scheduling via caldav the event could end up in the wrong calendar if the invited
+  e-mail matched another e-mail address using wild cards. eg. "bar@foo.com" could find
+  "foobar@foo.com" because it searched using %bar@foo.com%.
 
 02-09-2025: 25.0.50
 - ActiveSync: Fixed Error in modules/z-push/backend/go/TaskStore.php at line 237: Typed property 
