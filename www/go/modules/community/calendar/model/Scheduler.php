@@ -89,7 +89,8 @@ class Scheduler {
 			->setSubject($subject)
 			->setTo(new Address($event->replyTo, !empty($organizer) ? $organizer->name : null))
 			->attach(Attachment::fromString($icsStr,'reply.ics', 'text/calendar;method=REPLY;charset=utf-8',Attachment::ENCODING_8BIT))
-			->setBody($body)
+			->setBody(nl2br($body), 'text/html')
+			->setAlternateBody($body)
 			->setIcalendar($icsStr)
 			->send();
 
