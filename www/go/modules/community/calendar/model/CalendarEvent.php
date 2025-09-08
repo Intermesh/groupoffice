@@ -9,6 +9,7 @@ namespace go\modules\community\calendar\model;
 
 use DateTimeZone;
 use Exception;
+use Generator;
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
 use go\core\ErrorHandler;
@@ -110,6 +111,11 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	public ?string $recurrenceId = null;
 
+	/**
+	 * Used for recurring series when an override excludes this instance
+	 *
+	 * @var bool|null
+	 */
 	public ?bool $excluded = false;
 
 	/**
@@ -515,7 +521,8 @@ class CalendarEvent extends AclItemEntity {
 	/**
 	 * Will create Psuedo CalendarEvent objects from a recurring event.
 	 * All recurrence exceptions will be patched copies with the recurrenceId set
-	 * @return \Generator | [recurrenceId:string]:CalendarEvent
+	 * @return Generator<string, CalendarEvent>
+	 * @throws JsonPointerException
 	 */
 	public function overrides($modifiedOnly = false) {
 		if($this->isInstance()) {
@@ -525,10 +532,7 @@ class CalendarEvent extends AclItemEntity {
 		if(isset($this->recurrenceOverrides)) {
 			foreach ($this->recurrenceOverrides as $recurrenceId => $override) {
 				if (!$modifiedOnly || $override->isModified()) {
-					if($override->excluded) {
-						yield $recurrenceId => $override;
-					} else
-						yield $recurrenceId => $this->patchedInstance($recurrenceId);
+					yield $recurrenceId => $this->patchedInstance($recurrenceId);
 				}
 			}
 		}
@@ -548,6 +552,7 @@ class CalendarEvent extends AclItemEntity {
 
 		$e = JSON::patch($this->copy(), $patchArray);
 		$e->recurrenceId = $recurrenceId;
+		$e->excluded = $this->recurrenceOverrides[$recurrenceId] && $this->recurrenceOverrides[$recurrenceId]->excluded;
 		unset($e->recurrenceRule, $e->recurrenceOverrides); // , $e->sentBy, $e->relatedTo,
 		return $e;
 		//return (new self())->setValues(array_merge($this->toArray(), $patch->toArray()));
