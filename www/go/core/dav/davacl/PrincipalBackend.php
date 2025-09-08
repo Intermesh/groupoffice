@@ -157,7 +157,6 @@ class PrincipalBackend extends AbstractBackend {
 	function searchPrincipals($prefixPath, array $searchProperties, $test = 'allof') {
 
 		go()->debug("PrincipalBackend::searchPrincipals($prefixPath, ". var_export($searchProperties, true) . ', ' . $test .')');
-		go()->getDebugger()->debugCalledFrom();
 
 		if($prefixPath != "principals") {
 			return [];
