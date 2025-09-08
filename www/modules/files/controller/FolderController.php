@@ -1007,7 +1007,13 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		$findParams = \GO\Base\Db\FindParams::newInstance()
 			->order(new \go\core\db\Expression('name COLLATE utf8mb4_unicode_ci ASC'));
-
+		if (isset($params['sort'])) {
+			if($params['sort'] == 'deletedByUser') {
+				$findParams->order("t.deletedBy", $params['dir']);
+			} else {
+				$findParams->order("t." . $params['sort'], $params['dir']);
+			}
+		}
 		$store = new \GO\Base\Data\DbStore('GO\Files\Model\TrashedItem',$cm, $params, $findParams);
 		$response = $store->getData();
 		$response['permission_level'] = \GO\Base\Model\Acl::READ_PERMISSION;
