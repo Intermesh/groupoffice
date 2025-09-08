@@ -65,7 +65,8 @@
 	&.undecided {
 		border: 1px dashed $colorText;
 		color: $colorText;
-		background-color:transparent;
+		//background-color:transparent;
+		opacity: .6;
 	}
 
 	&.tentative {
