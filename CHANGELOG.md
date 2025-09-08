@@ -1,8 +1,11 @@
 - Calendar: Added fallback to user timezone if the timezone can't be determined
 - Caldav: Sort personal calendar on top as Sabredav picks the first in the list for invites.
 - Projects: Fixed issue where files and comments wouldn't display on project
+- Calendar: Merge multiple regional holidays into one
 - Newsletters: fix error in smtp workflow
 - Files: make trash sortable by name, path, deletion date, deletedBy user
+- Calendar: Background of unaccepted events not white but with opacity
+- Calendar: Only show one calendar item of a meeting to avoid a very crowded view
 
 02-09-2025: 25.0.50
 - ActiveSync: Fixed Error in modules/z-push/backend/go/TaskStore.php at line 237: Typed property 

@@ -343,7 +343,7 @@ export class EventWindow extends FormWindow {
 				fitParent:true,
 				store: exceptionStore,
 				columns: [
-					column({id: "recurrenceId", header:t('Start'), renderer(v,record) {
+					column({id: "recurrenceId",htmlEncode:false, header:t('Start'), renderer(v,record) {
 						return Format.dateTime(v)+ '<br><small>'+t(record.excluded ? 'Excluded' : 'Override')+'</small>';
 					}}),
 					column({id: "excluded", header: '', width:90, renderer: (v,r) => btn({icon:'delete',handler:()=>{

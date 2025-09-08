@@ -89,10 +89,18 @@ export class CalendarAdapter extends Observable<CalendarAdapterEventMap> {
 					creator: {dataSource: jmapds("Principal"), path:'createdBy'}
 				}}),
 			*items(start:DateTime,end:DateTime) {
+
+				// Only show one item of a meeting to avoid a very crowded view
+				const meetingkeys:string[] = [];
+
 				for (const e of this.store!.items) {
-					for(const item of CalendarItem.expand(e as CalendarEvent, start, end))
-						if(!item.isDeclined || client.user.calendarPreferences.showDeclined)
+					for(const item of CalendarItem.expand(e as CalendarEvent, start, end)) {
+						const meetingkey = item.data.uid + "-" + item.start.format("Ymd");
+						if ((!item.isDeclined || client.user.calendarPreferences.showDeclined) && meetingkeys.indexOf(meetingkey) === -1) {
+							meetingkeys.push(meetingkey);
 							yield item;
+						}
+					}
 				}
 			},
 			load(start:DateTime,end:DateTime) {
