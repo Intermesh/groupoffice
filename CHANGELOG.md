@@ -1,3 +1,4 @@
+08-09-2025: 25.0.51
 - Calendar: Added fallback to user timezone if the timezone can't be determined
 - Caldav: Sort personal calendar on top as Sabredav picks the first in the list for invites.
 - Projects: Fixed issue where files and comments wouldn't display on project
@@ -14,7 +15,6 @@
   go\modules\community\calendar\model\CalendarEvent, go\modules\community\calendar\model\RecurrenceOverride given, 
   called in /usr/local/share/src/www/go/modules/community/calendar/model/Scheduler.php on line 46
 - Calendar: reuse mailer for invites and allow 180s timeout. Improve error message ion screen if timeout occurs
-
 
 
 02-09-2025: 25.0.50
