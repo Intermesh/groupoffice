@@ -1,6 +1,7 @@
 - Calendar: Added fallback to user timezone if the timezone can't be determined
 - Caldav: Sort personal calendar on top as Sabredav picks the first in the list for invites.
 - Projects: Fixed issue where files and comments wouldn't display on project
+- Newsletters: fix error in smtp workflow
 
 02-09-2025: 25.0.50
 - ActiveSync: Fixed Error in modules/z-push/backend/go/TaskStore.php at line 237: Typed property 
