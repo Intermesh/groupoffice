@@ -343,19 +343,24 @@ class Scheduler {
 				->where(['uid'=>$uid, 'recurrenceId' => $recurId])->single();
 		}
 		$calendarId = Calendar::fetchPersonal($userId);
-		if(!empty($eventCalendars['eventId'])) {
+
+		if(!empty($eventCalendars['eventId']) && $calendarId) {
 			// add it to the current receivers personal calendar
-			$added = go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
+			go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
 				['calendarId'=>$calendarId, 'eventId'=>$eventCalendars['eventId']]
 			])->execute();
 			// if added then
 			$event = CalendarEvent::findById(go()->getDbConnection()->getPDO()->lastInsertId());
-		} else {
-			$event = new CalendarEvent();
-			$event->calendarId = $calendarId;
-			$event->isOrigin = false;
-			$event->replyTo = str_replace('mailto:', '',(string)$vcalendar->VEVENT[0]->{'ORGANIZER'});
+			if($event) {
+				return $event;
+			}
 		}
+
+		$event = new CalendarEvent();
+		$event->calendarId = $calendarId;
+		$event->isOrigin = false;
+		$event->replyTo = str_replace('mailto:', '',(string)$vcalendar->VEVENT[0]->{'ORGANIZER'});
+
 		return $event;
 	}
 
