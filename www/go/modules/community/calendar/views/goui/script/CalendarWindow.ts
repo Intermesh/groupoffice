@@ -44,7 +44,7 @@ export class CalendarWindow extends FormWindow {
 		this.generalTab.items.add(
 			comp({cls:'flow pad'},
 				nameFld,
-				colorfield({name: 'color', label: t('Color'), width: 100}),
+				colorfield({name: 'color', label: t('Color'), width: 100, required: true}),
 				descriptionFld,
 				// radio({style:{'width':'auto'}, type:'button',itemId:'type', value: 'personal', options: [
 				// 	{text:t('Personal'), value: 'personal'},

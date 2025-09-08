@@ -248,8 +248,8 @@ class Calendar extends AclOwnerEntity {
 	static function randomColor(string $seed): string
 	{
 		srand(crc32($seed));
-		$nb = rand(0,17);
-		return substr('#CDAD00#E74C3C#9B59B6#8E44AD#2980B9#3498DB#1ABC9C#16A085#27AE60#2ECC71#F1C40F#F39C12#E67E22#D35400#95A5A6#34495E#808B96#1652a1',
+		$nb = rand(0,8);
+		return substr('#E91E63#FF9800#FFEB3B#CDDC39#2ECC71#009BC9#E1BEE7#7E5627#BDBDBD',
 			($nb*7)+1,6);
 	}
 
