@@ -5,6 +5,7 @@ namespace go\modules\community\calendar\model;
 use Exception;
 use GO\Base\Db\FindCriteria;
 use GO\Base\Db\FindParams;
+use go\core\ErrorHandler;
 use go\core\exception\JsonPointerException;
 use go\core\mail\Address;
 use go\core\mail\Attachment;
@@ -244,11 +245,17 @@ class Scheduler {
 				'event' => ICalendarHelper::parseVObject($vcalendar, new CalendarEvent())
 			];
 		} else {
-			$from = $imapMessage->from->getAddress();
-			$event = Scheduler::processMessage($vcalendar, $imapMessage->account->user_id, (object)[
-				'email'=>$from['email'],
-				'name'=>$from['personal']
-			], $alreadyProcessed);
+			try {
+				$from = $imapMessage->from->getAddress();
+				$event = Scheduler::processMessage($vcalendar, $imapMessage->account->user_id, (object)[
+					'email' => $from['email'],
+					'name' => $from['personal']
+				], $alreadyProcessed);
+			}catch(Exception $e) {
+				ErrorHandler::logException($e, "Failed to process invitation");
+				return ['method' => $method,
+					'feedback' => $e->getMessage()];
+			}
 		}
 
 		$itip = [
@@ -343,8 +350,11 @@ class Scheduler {
 				->where(['uid'=>$uid, 'recurrenceId' => $recurId])->single();
 		}
 		$calendarId = Calendar::fetchPersonal($userId);
+		if(!$calendarId) {
+			throw new Exception("No personal calendar yet");
+		}
 
-		if(!empty($eventCalendars['eventId']) && $calendarId) {
+		if(!empty($eventCalendars['eventId'])) {
 			// add it to the current receivers personal calendar
 			go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
 				['calendarId'=>$calendarId, 'eventId'=>$eventCalendars['eventId']]

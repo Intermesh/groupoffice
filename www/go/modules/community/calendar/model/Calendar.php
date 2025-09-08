@@ -107,7 +107,7 @@ class Calendar extends AclOwnerEntity {
 
 	/** @return int */
 	public static function fetchPersonal($userId) {
-		$user = User::findById($userId, ['calendarPreferences'], true);
+		$user = User::findById($userId, ['id','displayName','calendarPreferences']);
 		if(!empty($user)) {
 			/** @var Preferences $pref */
 			$pref = $user->calendarPreferences;
@@ -116,11 +116,20 @@ class Calendar extends AclOwnerEntity {
 			}
 		}
 		// If default preference is empty use the first owned calendar
-		return self::find()->selectSingleValue('calendar_calendar.id')
+		$firstId = self::find()->selectSingleValue('calendar_calendar.id')
 			->where(['calendar_calendar.ownerId' => $userId])
 			->andWhere(['groupId'=>null])
 			->orderBy(['sortOrder'=>'ASC'])
 			->single();
+
+		if($firstId) {
+			return $firstId;
+		}
+
+		// create default
+		$cal = Calendar::createDefault($user);
+		return $cal->id;
+
 	}
 
 	public function getColor() {
