@@ -27,6 +27,11 @@ class Module extends core\Module
 		Calendar::on(Calendar::EVENT_MAPPING, self::class, 'onCalendarMap');
 	}
 
+	public function autoInstall(): bool
+	{
+		return true;
+	}
+
 	public static function onCalendarMap(Mapping $mapping) {
 		$mapping->addScalarProperty('davaccountId','int')->addQuery((new Query())
 			->select("davc.davaccountId")
