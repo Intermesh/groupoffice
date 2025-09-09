@@ -1,3 +1,4 @@
+09-09-2025: 6.8.137
 - Caldav: Sort personal calendar on top as Sabredav picks the first in the list for invites.
 - Caldav: When scheduling via caldav the event could end up in the wrong calendar if the invited
   e-mail matched another e-mail address using wild cards. eg. "bar@foo.com" could find 
