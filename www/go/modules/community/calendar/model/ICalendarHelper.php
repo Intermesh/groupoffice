@@ -120,7 +120,7 @@ class ICalendarHelper {
 	}
 
 	static function toInvite(string $method, CalendarEvent &$event) : VCalendar {
-		$c = new VCalendar(['PRODID' => $event->prodId, 'METHOD' => $method]);
+		$c = new VCalendar(['PRODID' => CalendarEvent::prodId(), 'METHOD' => $method]);
 		$forBody = $event;
 		$baseVEvent = null;
 		if($method == 'CANCEL' || $event->isModified(array_merge(CalendarEvent::EventProperties,['participants']))) {
