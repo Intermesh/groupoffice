@@ -77,8 +77,12 @@ function addEmailAction() {
 		};
 
 
-		if(GO.email) GO.email.handleITIP = (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent|string, feedback?:string, recurrenceId?:string}} ) => {
+		if(GO.email) GO.email.handleITIP = async (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent|string, feedback?:string, recurrenceId?:string}} ) => {
 			if(msg.itip) {
+				if(!calendarStore.loaded) {
+					// CalendarItem depends on the store being loaded
+					await calendarStore.load();
+				}
 				const event = msg.itip.event,
 					btns = E('div').cls('btns'),
 					names: any = {accepted: t("Accept"), tentative: t("Maybe"), declined: t("Decline")},
