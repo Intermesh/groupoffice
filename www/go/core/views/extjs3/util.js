@@ -657,8 +657,6 @@ go.util =  (function () {
 
 				return BaseHref + "views/Extjs3/themes/Paper/img/broken-image.svg";
 			});
-
-		return this.blobCache[blobId];
 	},
 
 		/**
