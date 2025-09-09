@@ -66,7 +66,12 @@ class ICalendarHelper {
 
 		if($vcalendar === null) {
 			$vcalendar = new VCalendar(['PRODID' => $event->prodId]);
+		} else {
+			$vcalendar->PRODID = CalendarEvent::prodId();
 		}
+
+		//TODO prodid always GO??? gmail doesn't process our reply but it does work with the sabre imipplugin
+
 
 		$vevent = $vcalendar->add(self::toVEvent($vcalendar->createComponent('VEVENT'),$event));
 

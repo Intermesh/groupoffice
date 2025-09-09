@@ -7,6 +7,7 @@
 
 namespace go\modules\community\calendar\model;
 
+use DateTimeInterface;
 use DateTimeZone;
 use Exception;
 use Generator;
@@ -133,9 +134,9 @@ class CalendarEvent extends AclItemEntity {
 
 	/**
 	 * The start time of the event
-	 * @var ?\DateTimeInterface|null
+	 * @var ?DateTimeInterface|null
 	 */
-	public ?\DateTimeInterface $start;
+	public ?DateTimeInterface $start;
 
 	public $utcStart;
 	public $utcEnd;
@@ -648,7 +649,7 @@ class CalendarEvent extends AclItemEntity {
 			$this->useDefaultAlerts = false;
 		}
 		if(empty($this->prodId) || $this->prodId === 'Unknown') {
-			$this->prodId = str_replace('{VERSION}', go()->getVersion(),self::PROD);
+			$this->prodId = self::prodId();
 		}
 
 		if(!empty($this->participants)) {
@@ -681,6 +682,10 @@ class CalendarEvent extends AclItemEntity {
 			$this->incrementCalendarModSeq();
 		}
 		return $success;
+	}
+
+	public static function prodId() : string {
+		return str_replace('{VERSION}', go()->getVersion(),self::PROD);
 	}
 
 	public function currentUserIsOwner() {
