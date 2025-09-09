@@ -347,7 +347,6 @@
 								let tgtXtype = tgtEntity + "relationgrid";
 								if (!Ext.ComponentMgr.isRegistered(tgtXtype)) {
 									return; // TODO: implement generic grid?
-									tgtXtype = "customfieldrelationgrid";
 								}
 								rels.push({
 									title: fld.options.informationPanelTitle,
