@@ -120,6 +120,7 @@ class ICalendarHelper {
 	}
 
 	static function toInvite(string $method, CalendarEvent &$event) : VCalendar {
+		// Prodid must be set to Group-Office's otherwise gmail won't process the reply
 		$c = new VCalendar(['PRODID' => CalendarEvent::prodId(), 'METHOD' => $method]);
 		$forBody = $event;
 		$baseVEvent = null;
