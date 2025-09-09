@@ -1,3 +1,6 @@
+- Calendar: Fix Typed property go\\modules\\community\\calendar\\model\\Holiday::$region must not be accessed before initialization
+- Calendar: Fix reply not being processed by gmail because prodid must be set to Group-Office's.
+
 08-09-2025: 25.0.51
 - Calendar: Added fallback to user timezone if the timezone can't be determined
 - Caldav: Sort personal calendar on top as Sabredav picks the first in the list for invites.
