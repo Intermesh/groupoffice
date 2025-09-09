@@ -1,5 +1,14 @@
-import {datasourcestore, DateTime, DefaultEntity, Observable, t, Window} from "@intermesh/goui";
-import {client, jmapds} from "@intermesh/groupoffice-core";
+import {
+	ArrayUtil,
+	DataSourceStore,
+	datasourcestore,
+	DateTime,
+	DefaultEntity,
+	Observable,
+	t,
+	Window
+} from "@intermesh/goui";
+import {client, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 
 export interface CalendarProvider {
@@ -90,10 +99,25 @@ export class CalendarAdapter extends Observable<CalendarAdapterEventMap> {
 				}}),
 			*items(start:DateTime,end:DateTime) {
 
+				// Sort personal calendar events on top so merged events will favor the personal one over shared items.
+				const personalCalendarId = client.user.calendarPreferences?.personalCalendarId;
+
+				const events = (this.store as DataSourceStore<JmapDataSource<CalendarEvent>>).data.sort((a,b) => {
+					if(a.calendarId == personalCalendarId) {
+						return -1;
+					}
+
+					if(b.calendarId == personalCalendarId) {
+						return 1;
+					}
+
+					return 0;
+				});
+
 				// Only show one item of a meeting to avoid a very crowded view
 				const meetingkeys:string[] = [];
 
-				for (const e of this.store!.items) {
+				for (const e of events) {
 					for(const item of CalendarItem.expand(e as CalendarEvent, start, end)) {
 						const meetingkey = item.data.uid + "-" + item.start.format("Ymd");
 						if ((!item.isDeclined || client.user.calendarPreferences.showDeclined) && meetingkeys.indexOf(meetingkey) === -1) {
