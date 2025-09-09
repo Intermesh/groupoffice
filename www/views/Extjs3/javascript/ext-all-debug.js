@@ -28022,13 +28022,13 @@ Ext.Window = Ext.extend(Ext.Panel, {
 			// MOD: This will disable extJs it's drag ghost for dialogs
 			return this.getEl();
 
-        var ghost = this.createGhost(cls);
-        var box = this.getBox(true);
-        ghost.setLeftTop(box.x, box.y);
-        ghost.setWidth(box.width);
-        this.el.hide();
-        this.activeGhost = ghost;
-        return ghost;
+        // var ghost = this.createGhost(cls);
+        // var box = this.getBox(true);
+        // ghost.setLeftTop(box.x, box.y);
+        // ghost.setWidth(box.width);
+        // this.el.hide();
+        // this.activeGhost = ghost;
+        // return ghost;
     },
 
     
