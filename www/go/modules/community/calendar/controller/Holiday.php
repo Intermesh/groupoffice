@@ -15,7 +15,9 @@ class Holiday extends Controller
 		foreach(model\Holiday::generate($params['set'],$params['lang'],$from, $till) as $holiday){
 			$key = $holiday->title .'-'.$holiday->start;
 			if(isset($list[$key])) {
-				$list[$key]->region .= ', ' . $holiday->region;
+				if(isset($list[$key]->region)) {
+					$list[$key]->region .= ', ' . $holiday->region;
+				}
 			} else {
 				$list[$key] = $holiday;
 			}
