@@ -1,5 +1,8 @@
-- Calendar: Fix Typed property go\\modules\\community\\calendar\\model\\Holiday::$region must not be accessed before initialization
+- Calendar: Fix Typed property go\\modules\\community\\calendar\\model\\Holiday::$region must not be accessed before
+  initialization
 - Calendar: Fix reply not being processed by gmail because prodid must be set to Group-Office's.
+- Calendar: Calendar: Make sure calendar store is loaded when handling invitations. Otherwise the status buttons 
+  didn't appear or you could change status for the wrong participant
 
 08-09-2025: 25.0.51
 - Calendar: Added fallback to user timezone if the timezone can't be determined
