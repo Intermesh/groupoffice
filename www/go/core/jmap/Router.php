@@ -8,6 +8,7 @@ use go\core\ErrorHandler;
 use go\core\exception\JsonPointerException;
 use go\core\fs\File;
 use go\core\http\Exception;
+use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\jmap\exception\InvalidResultReference;
 use go\core\orm\EntityType;
 use go\core\util\ArrayObject;
@@ -117,7 +118,9 @@ class Router {
 			
 		} catch (Throwable $e) {
 
-			$debugMessage = ErrorHandler::logException($e);
+			if(!($e instanceof CannotCalculateChanges)) {
+				$debugMessage = ErrorHandler::logException($e);
+			}
 
 			$msg = $e->getMessage();
 
@@ -146,7 +149,7 @@ class Router {
 				"type" => $type
 			];
 			
-			if(go()->getDebugger()->enabled) {
+			if(isset($debugMessage) && go()->getDebugger()->enabled) {
 				//only in debug mode, may contain sensitive information
 				$error["debugMessage"] = $debugMessage;
 				$previous = $e->getPrevious();
