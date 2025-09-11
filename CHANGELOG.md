@@ -2,6 +2,10 @@
 - Calendar: Fix jistimeet JWT Authentication
 - Core: Fixed handling of outlook invites in z-push / ActiveSync
 - Email: Fixed issue: Sieve working with Docker-Mailserver? #1338
+- ActiveSync: Send message MIME without processing if smime signed. Fixes: Users cannot maintain S/mime certificates / 
+  Sending Smime from IOS broken #1337
+- ActiveSync: Fixed Duplicate Entries via ZPush #1333
+
 
 09-09-2025: 25.0.52
 - Calendar: Fix Typed property go\\modules\\community\\calendar\\model\\Holiday::$region must not be accessed before
