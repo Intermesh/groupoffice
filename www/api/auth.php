@@ -121,7 +121,16 @@ try {
 			$user = new User();
 			$user->setValues($data['user']);
 			if(!$user->save()) {
-				throw new SaveException($user);
+				$errors = $user->getValidationErrors();
+				$first = array_shift($errors);
+
+				if(!$first) {
+					$first = "Could not save user";
+				}
+
+				output([], 422, $first );
+
+
 			}
 
 			$token = new Token();
