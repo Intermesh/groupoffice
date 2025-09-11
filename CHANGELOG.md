@@ -1,3 +1,4 @@
+09-09-2025: 25.0.53
 - Core: Don't log cannotcalulatechanges exception as it's not a problem
 - Calendar: Fix jistimeet JWT Authentication
 - Core: Fixed handling of outlook invites in z-push / ActiveSync
