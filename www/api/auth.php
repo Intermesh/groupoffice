@@ -126,6 +126,8 @@ try {
 
 				if(!$first) {
 					$first = "Could not save user";
+				} else {
+					$first = $first['description'];
 				}
 
 				output([], 422, $first );
