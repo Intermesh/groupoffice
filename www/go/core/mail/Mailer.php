@@ -463,4 +463,10 @@ class Mailer {
 			ErrorHandler::log("Failed to write e-mail log");
 		}
 	}
+
+
+	public function sendMime(string $mime) : bool {
+		$this->initTransport();
+		return $this->mail->sendMime($mime);
+	}
 }

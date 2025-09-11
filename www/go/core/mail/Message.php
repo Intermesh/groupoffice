@@ -701,6 +701,11 @@ class Message {
 		return $this->getMailer()->toString($this);
 	}
 
+	public function __toString(): string
+	{
+		return $this->toString();
+	}
+
 	/**
 	 * Sign the message using SMIME
 	 * @param string $certificate The X.509 certificate used to digitally sign input_filename.

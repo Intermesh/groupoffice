@@ -533,6 +533,17 @@ class Account extends \GO\Base\Db\ActiveRecord
 		}
 		return $success;
 	}
+
+	public function saveStrToSentItems(string $message, $params = []) {
+		//if a sent items folder is set in the account then save it to the imap folder
+		if(!$this->sent || !$this->save_sent)
+			return true;
+		GO::debug("Sent");
+		$imap = $this->openImapConnection($this->sent);
+		$success = $imap->append_message($this->sent, $message, "\Seen");
+
+		return $success;
+	}
 	
 	/**
 	 * Get an array of mailboxes that should be checked periodically for new mail
