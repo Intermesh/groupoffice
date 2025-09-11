@@ -30,7 +30,11 @@ class Settings extends core\Settings
 	private static function createJwtToken($appId, $room, $secret): string {
 		$jwt=[
 			self::encode(json_encode(['typ' => 'JWT', 'alg' => 'HS256'])), //header
-			self::encode(json_encode(['aud' => $appId, 'iss' => $appId, 'room' => $room])) //payload
+			self::encode(json_encode(['aud' => $appId, 'iss' => $appId, 'room' => $room, 'exp' => time() + 3600, 'context' => [
+				'user' => [
+					'name' => 'groupoffice',
+				],
+			]])) //payload
 		];
 		$jwt[] = self::encode(hash_hmac('sha256', implode('.',$jwt), $secret, true)); // sign
 		return implode('.',$jwt);
