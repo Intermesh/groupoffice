@@ -647,7 +647,7 @@ class MailStore extends Store implements ISearchProvider {
 		if(!$imap)
 			return false;
 
-		$uidnext = $imap->get_uidnext();
+		$uidnext = $imap->get_uidnext($this->_replaceDotWithServerDelimiter($newfolderid));
 		
 		if(!$imap->move(array($id), $this->_replaceDotWithServerDelimiter($newfolderid))) {
 			return false;
