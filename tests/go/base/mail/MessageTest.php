@@ -6,7 +6,7 @@ use go\core\mail\Util;
 use PHPUnit\Framework\TestCase;
 
 class MessageTest extends TestCase {
-	public function testLoadMime() {
+	public function testLoadMimeGroupOffice() {
 
 		$mime = file_get_contents(dirname(__DIR__,3) . '/static/invite.eml');
 		$message = new \GO\Base\Mail\Message();
@@ -19,7 +19,7 @@ class MessageTest extends TestCase {
 
 	}
 
-	public function testLoadMime2() {
+	public function testLoadMimeIOSInvite() {
 
 		$mime = file_get_contents(dirname(__DIR__,3) . '/static/ios-invite.eml');
 		$message = new \GO\Base\Mail\Message();
@@ -29,6 +29,17 @@ class MessageTest extends TestCase {
 
 //		echo $message->toString();
 
+	}
+
+	public function testLoadMimeOutlookInvite() {
+
+		$mime = file_get_contents(dirname(__DIR__,3) . '/static/outlook-invite.eml');
+		$message = new \GO\Base\Mail\Message();
+		$message->loadMimeMessage($mime);
+
+		$this->assertEquals("000d01dc22f6$18684ca0$4938e5e0$@example.com", $message->getId());
+
+//		echo $message->toString();
 	}
 
 	public function testMimeWords() {
