@@ -1,6 +1,7 @@
 - Core: Don't log cannotcalulatechanges exception as it's not a problem
 - Calendar: Fix jistimeet JWT Authentication
 - Core: Fixed handling of outlook invites in z-push / ActiveSync
+- Email: Fixed issue: Sieve working with Docker-Mailserver? #1338
 
 09-09-2025: 25.0.52
 - Calendar: Fix Typed property go\\modules\\community\\calendar\\model\\Holiday::$region must not be accessed before
