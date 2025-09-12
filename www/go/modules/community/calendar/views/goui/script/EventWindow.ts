@@ -193,7 +193,7 @@ export class EventWindow extends FormWindow {
 									this.participantFld.addOrganiser(p);
 									this.participantFld.list.trackReset();
 								}).catch(e => {
-									void Window.error(t("Could not read the calendar principal from the server. Do you have permissions?"));
+									void Window.error(t("CCould not add organizer because the calendar principal could not be read from the server. Do you have permissions?"));
 								})
 							}
 						});
@@ -242,7 +242,7 @@ export class EventWindow extends FormWindow {
 							principalDS.single(this.item!.principalId).then(p=>{
 								target.addOrganiser(p);
 							}).catch(e => {
-								void Window.error(t("Could not read the calendar principal from the server. Do you have permissions?"));
+								void Window.error(t("Could not add organizer because the calendar principal could not be read from the server. Do you have permissions?"));
 							})
 						}
 					}
