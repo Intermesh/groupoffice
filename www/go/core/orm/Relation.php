@@ -116,6 +116,8 @@ class Relation {
 	/**
 	 * Set the primaryKey => foreignKey to define this relation
 	 *
+	 * If you need this relation to be per user then use a {@see UserProperty}.
+	 *
 	 * @todo We could adapt a default of ['pk'=>'fk'] for identifying relations in our database schema so this method becomes optional
 	 * @param array $keys The keys of the relation. eg. ['id' => 'articleId']
 	 * @return $this
