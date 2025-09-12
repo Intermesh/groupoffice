@@ -399,7 +399,7 @@ class Scheduler {
 	 * @return bool
 	 */
 	private static function requestIsProcessed(VCalendar $vcalendar, ?CalendarEvent $event) : bool {
-		if($event->isNew() || $event->sequence < (int)$vcalendar->VEVENT[0]->SEQUENCE->getValue()) {
+		if($event->isNew() || $event->sequence < (isset($vcalendar->VEVENT[0]->SEQUENCE) ? (int)$vcalendar->VEVENT[0]->SEQUENCE->getValue() : 0)) {
 			return false;
 		}
 		return true;
