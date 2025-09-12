@@ -1,11 +1,5 @@
-import {
-	checkbox,
-	colorfield, combobox,
-	comp, hiddenfield,
-	textarea,
-	textfield,
-} from "@intermesh/goui";
-import {client, FormWindow, jmapds} from "@intermesh/groupoffice-core";
+import {checkbox, colorfield, combobox, comp, hiddenfield, textarea, textfield,} from "@intermesh/goui";
+import {client, FormWindow, principalDS} from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
 import {t} from "./Index.js";
 
@@ -26,7 +20,7 @@ export class CalendarWindow extends FormWindow {
 			fdAlertField = alertfield({name: 'defaultAlertsWithoutTime',isForDefault:true, fullDay:true, label:t('Events without time (Full-day)')});
 
 		const ownerIdField = combobox({
-				dataSource: jmapds("Principal"), placeholder: t('Shared'),displayProperty: 'name', filter: {entity: 'User'},
+				dataSource: principalDS, placeholder: t('Shared'),displayProperty: 'name', filter: {entity: 'User'},
 				label: t("Owner"), name: "ownerId", filterName: "text", flex:'1 0', clearable:true
 			}).on('setvalue', (e) => {
 				includeInAvailability.value = !availabilityAffectCb.value ? 'none' : e.newValue == client.user.id ? 'all' : 'attending';

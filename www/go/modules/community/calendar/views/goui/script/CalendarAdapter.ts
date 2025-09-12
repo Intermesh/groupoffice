@@ -1,14 +1,5 @@
-import {
-	ArrayUtil,
-	DataSourceStore,
-	datasourcestore,
-	DateTime,
-	DefaultEntity,
-	Observable,
-	t,
-	Window
-} from "@intermesh/goui";
-import {client, JmapDataSource, jmapds} from "@intermesh/groupoffice-core";
+import {DataSourceStore, datasourcestore, DateTime, DefaultEntity, Observable, t, Window} from "@intermesh/goui";
+import {client, JmapDataSource, jmapds, principalDS} from "@intermesh/groupoffice-core";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 
 export interface CalendarProvider {
@@ -94,8 +85,8 @@ export class CalendarAdapter extends Observable<CalendarAdapterEventMap> {
 			store:datasourcestore({
 				dataSource:jmapds('CalendarEvent'),
 				relations: {
-					modifier: {dataSource: jmapds("Principal"), path: "modifiedBy"},
-					creator: {dataSource: jmapds("Principal"), path:'createdBy'}
+					modifier: {dataSource: principalDS, path: "modifiedBy"},
+					creator: {dataSource: principalDS, path:'createdBy'}
 				}}),
 			*items(start:DateTime,end:DateTime) {
 
@@ -183,8 +174,8 @@ export class CalendarAdapter extends Observable<CalendarAdapterEventMap> {
 			store: datasourcestore({
 				dataSource: jmapds('Task'),
 				relations: {
-					modifier: {dataSource: jmapds("Principal"), path: "modifiedBy"},
-					creator: {dataSource: jmapds("Principal"), path:'createdBy'}
+					modifier: {dataSource: principalDS, path: "modifiedBy"},
+					creator: {dataSource: principalDS, path:'createdBy'}
 				}
 			}),
 			*items(from:DateTime,until:DateTime) {
@@ -249,8 +240,8 @@ export class CalendarAdapter extends Observable<CalendarAdapterEventMap> {
 			store: datasourcestore({
 				dataSource: jmapds('Contact'),
 				relations: {
-					modifier: {dataSource: jmapds("Principal"), path: "modifiedBy"},
-					creator: {dataSource: jmapds("Principal"), path:'createdBy'}
+					modifier: {dataSource: principalDS, path: "modifiedBy"},
+					creator: {dataSource: principalDS, path:'createdBy'}
 				}
 			}),
 			*items(from:DateTime,end:DateTime) {

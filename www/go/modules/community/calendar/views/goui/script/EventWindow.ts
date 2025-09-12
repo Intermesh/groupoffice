@@ -1,14 +1,24 @@
 import {
 	autocompletechips,
 	browser,
-	btn, Button,
-	checkbox, CheckboxField, checkboxselectcolumn,
+	btn,
+	Button,
+	checkbox,
+	CheckboxField,
+	checkboxselectcolumn,
 	column,
-	comp, containerfield,
+	comp,
+	containerfield,
 	datasourcestore,
 	DateInterval,
-	DateTime, datetimefield, DateTimeField,
-	Format, MapField, mapfield, Notifier, numberfield,
+	DateTime,
+	datetimefield,
+	DateTimeField,
+	Format,
+	MapField,
+	mapfield,
+	Notifier,
+	numberfield,
 	radio,
 	select,
 	store,
@@ -17,8 +27,9 @@ import {
 	textfield,
 	TextField,
 	win,
+	Window,
 } from "@intermesh/goui";
-import {client, FormWindow, JmapDataSource, jmapds, recurrencefield} from "@intermesh/groupoffice-core";
+import {client, FormWindow, JmapDataSource, principalDS, recurrencefield} from "@intermesh/groupoffice-core";
 import {categoryStore, t, writeableCalendarStore} from "./Index.js";
 import {ParticipantField, participantfield} from "./ParticipantField.js";
 import {AlertField, alertfield} from "./AlertField.js";
@@ -178,11 +189,12 @@ export class EventWindow extends FormWindow {
 							this.alertField.setDefaultLabel(d)
 							if(!this.item?.key && !this.participantFld.list.isEmpty()) {
 								// calendar changed and event is new, check if organizer needs to change as well
-								jmapds('Principal').single(this.item!.principalId).then(p=>{
-									if(p)
-										this.participantFld.addOrganiser(p);
-										this.participantFld.list.trackReset();
-								});
+								principalDS.single(this.item!.principalId).then(p=> {
+									this.participantFld.addOrganiser(p);
+									this.participantFld.list.trackReset();
+								}).catch(e => {
+									void Window.error(t("Could not read the calendar principal from the server. Do you have permissions?"));
+								})
 							}
 						});
 
@@ -227,10 +239,11 @@ export class EventWindow extends FormWindow {
 					},
 					'beforeadd': ({target}) => {
 						if(target.list.isEmpty()) {
-							jmapds('Principal').single(this.item!.principalId).then(p=>{
-								if(p)
-									target.addOrganiser(p);
-							});
+							principalDS.single(this.item!.principalId).then(p=>{
+								target.addOrganiser(p);
+							}).catch(e => {
+								void Window.error(t("Could not read the calendar principal from the server. Do you have permissions?"));
+							})
 						}
 					}
 				}
