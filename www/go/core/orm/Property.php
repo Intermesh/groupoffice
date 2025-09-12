@@ -588,7 +588,9 @@ abstract class Property extends Model {
 
 		$id = [];
 		foreach($diff as $field) {
-			$id[] = $v->$field;
+			// we wan't to hide the userId from user properties
+			if($field != 'userId' || !($v instanceof UserProperty))
+				$id[] = $v->$field;
 		}
 
 		return implode('-', $id);
@@ -2482,7 +2484,13 @@ abstract class Property extends Model {
 
 		$pk = $cls::getPrimaryKey();
 
-		$diff = array_diff($pk, array_values($relation->keys));
+		// The map key is the primary key minus the relation keys.
+		$relKeys = array_values($relation->keys);
+		if(is_a($cls, UserProperty::class, true)) {
+			$relKeys[] = "userId";
+		}
+
+		$diff = array_diff($pk, $relKeys);
 		$values = explode("-", $id, count($diff));
 
 		$id = [];
