@@ -1757,3 +1757,33 @@ $updates['202505301440'][] = function() {
 	}
 
 };
+
+
+
+$updates['202509121219'][] = "update core_group set createdBy=isUserGroupFor where isUserGroupFor is not null;";
+
+$updates['202509121219'][] = "update core_acl a inner join core_group g on a.id=g.aclId set a.ownedBy=g.isUserGroupFor where g.isUserGroupFor is not null;";
+
+$updates['202509121219'][] = "insert ignore into core_acl_group select a.id,g.id, '50' from core_acl a inner join core_group g on g.isUserGroupFor = a.ownedBy  where ownedBy > 1;";
+
+$updates['202509121219'][] = function() {
+
+	echo "Fixing duplicate user groups..\n";
+	$stmt = go()->getDbConnection()
+		->select("id,isUserGroupFor")
+		->from('core_group')
+		->where('isUserGroupFor is not null');
+
+	$lastIsUserGroupFor = null;
+	foreach($stmt as $g) {
+		if($g['isUserGroupFor'] == $lastIsUserGroupFor) {
+			go()->getDbConnection()
+				->update('core_group', ['isUserGroupFor' => null], ['id' => $g['id']])
+				->execute();
+		}
+
+		$lastIsUserGroupFor = $g['isUserGroupFor'];
+	}
+
+
+};
