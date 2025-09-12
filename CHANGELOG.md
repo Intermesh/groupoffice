@@ -1,4 +1,5 @@
 - Calendar: Handle missing sequence
+- Core: Fixed duplicate user groups issue
 
 09-09-2025: 25.0.53
 - Core: Don't log cannotcalulatechanges exception as it's not a problem
