@@ -164,8 +164,9 @@ class XlsFile extends File
 		for ($row=1;$row<=$this->maxRows && $this->_maxEmptyCellsNotExceeded($row,$HIGHEST_ROW_WITH_VALUE);$row++) {		
 			for ($col=0;$col<=$this->maxColNr && $this->_maxEmptyCellsNotExceeded($col,$HIGHEST_COLUMN_WITH_VALUE);$col++) {
 								
-				$value = $this->phpExcelObj->getSheet($this->sheetNr)->getCellByColumnAndRow($col,$row)->getCalculatedValue();
-				
+//				$value = $this->phpExcelObj->getSheet($this->sheetNr)->getCellByColumnAndRow($col,$row)->getCalculatedValue();
+				$value = $this->phpExcelObj->getSheet($this->sheetNr)->getCell([$col,$row])->getCalculatedValue();
+
 				if ( isset($value) && $value!==NULL && $value!==false ) {
 					
 					// Keep track of the highest column nr that had a value in the cell.
@@ -205,7 +206,7 @@ class XlsFile extends File
 				
 		$rowRecord = array();
 		for ($col=0;$col<=$this->rightEndOfFileColNr;$col++) {
-			$rowRecord[] = $this->phpExcelObj->getSheet($this->sheetNr)->getCellByColumnAndRow($col,$this->nextRowNr)->getCalculatedValue();
+			$rowRecord[] = $this->phpExcelObj->getSheet($this->sheetNr)->getCell([$col,$this->nextRowNr])->getCalculatedValue();
 		}
 		$this->nextRowNr++;
 		

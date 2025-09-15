@@ -21,7 +21,7 @@ https://github.com/Intermesh/docker-groupoffice
 
 ### Development
 If you'd like to get started with Group-Office development please have a look at
-our docker-compose project. You can get started in minutes with just a few commands:
+our docker compose project. You can get started in minutes with just a few commands:
 
 https://github.com/Intermesh/docker-groupoffice-development
 
