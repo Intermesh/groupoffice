@@ -95,7 +95,7 @@ if (!empty($_POST)) {
 			}
 			if ($moduleController->autoInstall() && $moduleController->isInstallable()) {
 			    try {
-                    Module::install($moduleController->name());
+                    Module::install($moduleController->name(), false, $moduleController::getDefaultSortOrder());
                 }
                 catch(Exception $e) {
 			        //could be a license error due to an unlicensed module depending

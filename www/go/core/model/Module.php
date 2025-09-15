@@ -25,7 +25,7 @@ class Module extends Entity {
 	public ?string $id;
 	public string $name;
 	public ?string $package;
-	public int $sort_order;
+	public ?int $sort_order = null;
 	public int $version;
 	public bool $enabled = true;
 
@@ -96,7 +96,7 @@ class Module extends Entity {
 			}
 		}
 		
-		if($this->isNew() || $this->sort_order < 1) {
+		if(empty($this->sort_order) || $this->sort_order < 1) {
 			$this->sort_order = $this->nextSortOrder();			
 		}
 

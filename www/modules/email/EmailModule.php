@@ -46,6 +46,15 @@ class EmailModule extends \GO\Base\Module{
 
 		return parent::initListeners();
 	}
+
+	/**
+	 * Default sort order when installing. If null it will be auto generated.
+	 * @return int|null
+	 */
+	public static function getDefaultSortOrder() : ?int{
+		return 10;
+	}
+
 	public function autoInstall() {
 		return true;
 	}

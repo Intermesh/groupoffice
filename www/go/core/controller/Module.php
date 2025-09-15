@@ -99,7 +99,7 @@ class Module extends EntityController {
 							$moduleController->install();
 						}
 					} else {
-						if ($moduleController->appCenter() && !\GO\Base\Model\Module::install($moduleController->name())) {
+						if ($moduleController->appCenter() && !\GO\Base\Model\Module::install($moduleController->name(), false, $moduleController::getDefaultSortOrder())) {
 							throw new \Exception("Could not save module " . $moduleController->name());
 						}
 					}

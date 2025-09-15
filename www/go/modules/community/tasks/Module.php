@@ -43,6 +43,14 @@ class Module extends core\Module {
 		return true;
 	}
 
+	/**
+	 * Default sort order when installing. If null it will be auto generated.
+	 * @return int|null
+	 */
+	public static function getDefaultSortOrder() : ?int{
+		return 25;
+	}
+
 	public function defineListeners()
 	{
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');

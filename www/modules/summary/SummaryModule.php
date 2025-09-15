@@ -28,5 +28,14 @@ class SummaryModule extends \GO\Base\Module{
 	public function autoInstall() {
 		return true;
 	}
+
+	/**
+	 * Default sort order when installing. If null it will be auto generated.
+	 * @return int|null
+	 */
+	public static function getDefaultSortOrder() : ?int{
+		return 5;
+	}
+
 	
 }
