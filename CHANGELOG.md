@@ -2,6 +2,8 @@
 - Core: Fixed duplicate user groups issue
 - Core: fix deprecated error in ActiveRecord Excel Import/Export (#1336)
 - Support: (cherry pick from 6.8) more helpful email message upon failed IMAP import
+- OnlyOffice: fix JWT error message
+- OnlyOffice: fix stylesheet
 
 09-09-2025: 25.0.53
 - Core: Don't log cannotcalulatechanges exception as it's not a problem
