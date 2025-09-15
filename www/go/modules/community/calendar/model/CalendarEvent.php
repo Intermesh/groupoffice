@@ -19,6 +19,7 @@ use go\core\exception\JsonPointerException;
 use go\core\fs\Blob;
 use go\core\model\Acl;
 use go\core\model\Alert as CoreAlert;
+use go\core\model\Principal;
 use go\core\model\User;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\exception\SaveException;
@@ -311,6 +312,9 @@ class CalendarEvent extends AclItemEntity {
 						->where('ucal.isSubscribed','=', true);
 				} else if(!empty($value)) {
 					$query->andWhere('cce.calendarId', '=', $value);
+				} else {
+					// empty inCalendars filter will return no CalendarEvents
+					$query->andWhere('cce.calendarId', '=', 0);
 				}
 			}, 'subscribedOnly')
 			->add('inCategories', function(Criteria $criteria, $value, Query $query) {
