@@ -327,19 +327,15 @@ class Scheduler {
 		$uid = (string)$vevent->uid;
 		$recurId = !empty($vevent->{'RECURRENCE-ID'}) ? $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s') : null;
 
-		$existingEventQ = CalendarEvent::findForUser($uid, $userId)
-			->andWhere('recurrenceId','=', null);
-
-		go()->debug($existingEventQ);
-
-		$existingEvent = $existingEventQ->single();
+		$existingEvent = CalendarEvent::findForUser($uid, $userId)
+			->andWhere('recurrenceId','=', null)
+			->single();
 
 		// if the current user doesn't have the main event of a recurrence we might have it saved for a single recurrence ID
 		if(!$existingEvent && $recurId !== null) {
 			$existingEvent = CalendarEvent::findForUser($uid, $userId)
 				->andWhere('recurrenceId','=', $recurId)->single();
 		}
-
 
 		if($existingEvent) {
 			go()->debug("Found event ID" . $existingEvent->id);

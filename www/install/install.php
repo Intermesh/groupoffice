@@ -95,7 +95,7 @@ if (!empty($_POST)) {
 			}
 			if ($moduleController->autoInstall() && $moduleController->isInstallable()) {
 			    try {
-                    Module::install($moduleController->name());
+                    Module::install($moduleController->name(), false, $moduleController::getDefaultSortOrder());
                 }
                 catch(Exception $e) {
 			        //could be a license error due to an unlicensed module depending
@@ -146,7 +146,11 @@ if (!empty($_POST)) {
 
 		User::findById(1)->legacyOnSave();
 
-		header("Location: finished.php");
+        if(\go\modules\business\license\model\License::isValid()) {
+            header("Location: finished.php");
+        } else {
+            header("Location: license.php?install=true");
+        }
 		exit();
 	}
 	catch(Exception $e) {

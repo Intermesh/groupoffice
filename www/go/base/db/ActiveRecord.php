@@ -3115,7 +3115,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if($this->isNew){
 
 			//automatically set sort order column
-			if($this->getSortOrderColumn())
+			if($this->getSortOrderColumn() && empty($this->{$this->getSortOrderColumn()}))
 				$this->{$this->getSortOrderColumn()}=$this->nextSortOrder();
 
 			$wasNew=true;

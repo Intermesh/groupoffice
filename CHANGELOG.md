@@ -1,3 +1,5 @@
+- Calendar: cron job could add duplicate event because it didn't find the event already created by other means like 
+  ActiveSync or the e-mail module.
 - Calendar: Handle missing sequence
 - Core: Fixed duplicate user groups issue
 - Core: fix deprecated error in ActiveRecord Excel Import/Export (#1336)

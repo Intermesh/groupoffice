@@ -48,7 +48,17 @@ if (!empty($_POST)) {
     try {
 	    go()->getSettings()->save();
 
-	    header("Location: upgrade.php");
+        if($_POST['install']) {
+
+            if( !go()->getSettings()->licenseDenied) {
+                License::installModules();
+                go()->rebuildCache();
+            }
+
+            header("Location: finished.php");
+        } else {
+            header("Location: upgrade.php");
+        }
 	    exit();
     }
     catch(Exception $e) {
@@ -75,6 +85,12 @@ function noThanks() {
 </script>
 	<section>
 		<form method="POST" action="" onsubmit="submitButton.disabled = true;">
+            <?php if(!empty($_GET['install'])) {
+                echo  '<input type="hidden" name="install" value="1" />';
+            }
+            ?>
+
+
 			<fieldset>
 				<h2>Install license</h2>
 				<p>Try the extra features for free and obtain a 60 day trial license from  <a target="_blank" class="normal-link" href="https://www.group-office.com">www.group-office.com</a>. Register for an account and get your license now. By purchasing a license you will get support and extra features. Find out more on our website.</p>
