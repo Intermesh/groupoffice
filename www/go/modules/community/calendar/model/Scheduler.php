@@ -327,8 +327,12 @@ class Scheduler {
 		$uid = (string)$vevent->uid;
 		$recurId = !empty($vevent->{'RECURRENCE-ID'}) ? $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s') : null;
 
-		$existingEvent = CalendarEvent::findForUser($uid, $userId)
-			->andWhere('recurrenceId','=', null)->single();
+		$existingEventQ = CalendarEvent::findForUser($uid, $userId)
+			->andWhere('recurrenceId','=', null);
+
+		go()->debug($existingEventQ);
+
+		$existingEvent = $existingEventQ->single();
 
 		// if the current user doesn't have the main event of a recurrence we might have it saved for a single recurrence ID
 		if(!$existingEvent && $recurId !== null) {
@@ -336,9 +340,13 @@ class Scheduler {
 				->andWhere('recurrenceId','=', $recurId)->single();
 		}
 
+
 		if($existingEvent) {
+			go()->debug("Found event ID" . $existingEvent->id);
 			return $existingEvent;
 		}
+
+		go()->debug("NOT Found");
 
 		// still not found. See if an event with the same UID exists in someone else its calendar and add it to ours
 		$eventCalendars = go()->getDbConnection()->select(['t.eventId, GROUP_CONCAT(calendarId) as calendarIds'])
