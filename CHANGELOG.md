@@ -1,3 +1,4 @@
+15-09-2025: 6.8.138 
 - Support: more helpful error mail when imap import fails
 
 09-09-2025: 6.8.137
