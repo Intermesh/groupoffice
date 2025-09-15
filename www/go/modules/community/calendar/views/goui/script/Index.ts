@@ -22,6 +22,12 @@ export const calendarStore = datasourcestore({
 	queryParams:{filter:{isSubscribed: true, davaccountId : null}},
 	sort: [{property:'sortOrder'},{property:'name'}]
 });
+
+export const allCalendarStore = datasourcestore({
+	dataSource:jmapds('Calendar'),
+	queryParams:{filter:{}},
+	sort: [{property:'sortOrder'},{property:'name'}]
+});
 export const writeableCalendarStore = datasourcestore({
 	dataSource:jmapds('Calendar'),
 	queryParams:{filter:{isSubscribed: true, davaccountId : null, isResource:false, permissionLevel:30/*writeOwn*/}},
@@ -32,6 +38,12 @@ export const categoryStore = datasourcestore({
 	dataSource:jmapds('CalendarCategory'),
 	sort: [{property:'name'}]
 })
+
+export const viewStore = datasourcestore({
+	dataSource:jmapds('CalendarView'),
+	sort: [{property:'name'}]
+})
+
 
 export const t = (key:string,p='community',m='calendar') => coreT(key, p,m);
 export const statusIcons = {

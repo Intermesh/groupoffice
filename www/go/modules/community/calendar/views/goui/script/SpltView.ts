@@ -1,6 +1,6 @@
 import {CalendarView} from "./CalendarView.js";
 import {DateTime, E} from "@intermesh/goui";
-import {calendarStore} from "./Index.js";
+import {allCalendarStore, calendarStore} from "./Index.js";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 
@@ -13,10 +13,13 @@ export class SplitView extends CalendarView {
 
 	constructor(adapter: CalendarAdapter) {
 		super(adapter);
-		calendarStore.on('load', () => { if(this.el.innerHTML !== '') {
+
+		allCalendarStore.on('load', () => { if(this.el.innerHTML !== '') {
 			this.renderView()
 			this.updateItems();
 		} })
+		if(!allCalendarStore.loaded)
+			allCalendarStore.load();
 	}
 
 	goto(day: DateTime, amount: number) {
@@ -41,16 +44,19 @@ export class SplitView extends CalendarView {
 
 	protected populateViewModel() {
 		this.clear()
+
+		const activeFilter = this.adapter.byType('event').store.queryParams.filter.inCalendars;
 		//const viewEnd = this.start.clone().addDays(this.days);
-		for (let calendar of calendarStore) {
-			this.calViewModel[calendar.id] = [];
+		for (let calendarId of activeFilter) {
+			this.calViewModel[calendarId] = [];
 		}
 		for (const e of this.adapter.items) {
-			if(e.data.calendarId)
+			if(e.data.calendarId && this.calViewModel[e.data.calendarId])
 				this.calViewModel[e.data.calendarId].push(e);
 		}
 		for(let calId in this.calViewModel) {
-			this.calViewModel[calId].sort((a,b) => a.start.date < b.start.date ? -1 : 1);
+			if(this.calViewModel[calId])
+				this.calViewModel[calId].sort((a,b) => a.start.date < b.start.date ? -1 : 1);
 		}
 
 		this.updateItems();
@@ -73,8 +79,11 @@ export class SplitView extends CalendarView {
 		this.el.append(E('ul', ...headers)); // headers
 
 		this.calRows = [];
-		for (let calendar of calendarStore) {
-			if(!calendar.isVisible) continue;
+		const activeFilter = this.adapter.byType('event').store.queryParams.filter.inCalendars;
+
+		for (let calendar of allCalendarStore) {
+
+			if(activeFilter.indexOf(calendar.id) === -1) continue;
 			day = this.start.clone();
 			const eventContainer = E('li', ...this.drawCal(calendar.id)).cls('events'),
 				row = E('ol',
