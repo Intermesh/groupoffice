@@ -293,8 +293,10 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	static function findForUser($uid, $userId) {
 		return self::findFor($userId)
-			->where(['cal.ownerId' => $userId, 'eventdata.uid'=>$uid])
-			->filter(['permissionLevel' => 25]); // rsvp
+			->where([
+				'cal.ownerId' => $userId,
+				'eventdata.uid' => $uid
+			]);
 	}
 
 	public function isPrivate(){
