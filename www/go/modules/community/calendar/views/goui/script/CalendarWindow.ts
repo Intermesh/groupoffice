@@ -82,6 +82,9 @@ export class CalendarWindow extends FormWindow {
 		this.form.on('load', ({data}) => {
 			const editable = !data.id || data.myRights.mayAdmin;
 			this.sharePanel!.disabled = !editable;
+			this.generalTab!.disabled = !data.isSubscribed;
+			if(!data.isSubscribed)
+				this.sharePanel!.show();
 			ownerIdField.hidden = !editable;
 			descriptionFld.hidden = !editable;
 			nameFld.readOnly = !editable;
