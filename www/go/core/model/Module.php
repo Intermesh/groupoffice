@@ -135,7 +135,7 @@ class Module extends Entity {
 				->where('package', '!=', "core");
 		}
 
-		return $query->single();
+		return max($query->single(), 100);
 	}
 	
 

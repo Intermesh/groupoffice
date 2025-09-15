@@ -162,7 +162,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 				->where('package', '!=', "core");
 		}
 
-		return $query->single();
+		return max($query->single(), 100);
 	}
 	
 	/**

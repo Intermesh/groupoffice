@@ -11,6 +11,7 @@ use go\core\jmap\Response;
 use go\core\model;
 use go\core\orm\Query;
 use go\core\util\ArrayObject;
+use go\modules\business\license\model\License;
 
 
 class Module extends EntityController {
@@ -77,35 +78,7 @@ class Module extends EntityController {
 
 	public function installLicensed(): array
 	{
-		$modules = \GO::modules()->getAvailableModules();
-
-		foreach ($modules as $moduleClass) {
-
-			$moduleController = $moduleClass::get();
-
-			if ($moduleController->autoInstall() && $moduleController->isInstallable()) {
-				if($moduleController->isInstalled()) {
-					$model = $moduleController->getModel();
-					$model->enabled = true;
-					try {
-						$model->save();
-					} catch(\Throwable $e) {
-						go()->log($e);
-					}
-
-				} else {
-					if ($moduleController instanceof \go\core\Module) {
-						if ($moduleController->requiredLicense()) {
-							$moduleController->install();
-						}
-					} else {
-						if ($moduleController->appCenter() && !\GO\Base\Model\Module::install($moduleController->name(), false, $moduleController::getDefaultSortOrder())) {
-							throw new \Exception("Could not save module " . $moduleController->name());
-						}
-					}
-				}
-			}
-		}
+		License::installModules();
 
 		return ['success' => true];
 	}

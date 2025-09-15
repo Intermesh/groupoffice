@@ -146,7 +146,11 @@ if (!empty($_POST)) {
 
 		User::findById(1)->legacyOnSave();
 
-		header("Location: finished.php");
+        if(\go\modules\business\license\model\License::isValid()) {
+            header("Location: finished.php");
+        } else {
+            header("Location: license.php?install=true");
+        }
 		exit();
 	}
 	catch(Exception $e) {
