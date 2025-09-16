@@ -386,7 +386,7 @@ CREATE TABLE calendar_preferences (
 	showTooltips			    TINYINT(1)  DEFAULT 1 NOT NULL,
 	defaultCalendarId     INT UNSIGNED NULL,
 	personalCalendarId    INT UNSIGNED NULL,
-	startView             ENUM ('week', 'month', 'year', 'list') DEFAULT 'month' NULL,
+	startView             VARCHAR(20) DEFAULT 'month' NULL,
 	CONSTRAINT calendar_preferences_core_user_id_fk FOREIGN KEY (userId)
 		REFERENCES core_user (id) ON DELETE CASCADE
 ) COLLATE = utf8mb4_unicode_ci;

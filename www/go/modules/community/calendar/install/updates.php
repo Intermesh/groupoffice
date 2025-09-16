@@ -432,3 +432,5 @@ $updates["202509151158"][] = function() {
 		$groupsUpdateStmt->execute([json_encode($ids), $row['view_id']]);
 	}
 };
+
+$updates["202509161101"][] = "ALTER TABLE `calendar_preferences` CHANGE COLUMN `startView` `startView` VARCHAR(20) NULL DEFAULT 'month';";

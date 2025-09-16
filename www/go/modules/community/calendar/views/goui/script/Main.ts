@@ -279,7 +279,12 @@ export class Main extends Component {
 				)
 			)
 		);
-		this.timeSpan = client.user.calendarPreferences?.startView || 'month';
+		if(client.user.calendarPreferences?.startView) {
+			const parts = client.user.calendarPreferences?.startView.split('-');
+			this.setSpan(parts[0], parseInt(parts[1] ?? 0));
+		} else {
+			this.setSpan('month', 0);
+		}
 		this.date = new DateTime();
 		// NOPE:router will call setSpan and render
 		// calendar store load will call first view update
@@ -357,7 +362,7 @@ export class Main extends Component {
 
 								const parts = selected[0].record.defaultView.split('-');
 								if(!parts[1]) parts[1] = 0;
-								this.setSpan(parts[0], parts[1]);
+								this.setSpan(parts[0], parseInt(parts[1] ?? 0));
 							}
 							this.updateView();
 						}
@@ -491,7 +496,10 @@ export class Main extends Component {
 			case 'days':
 			case 'weeks':
 				route += '-'+this.spanAmount;
-				this.date.addDays(value * this.spanAmount!);
+				if(this.spanAmount === 5) // workweek
+					this.date.addDays(value * 7);
+				else
+					this.date.addDays(value * this.spanAmount!);
 				break;
 			case 'split':
 				route += '-'+this.spanAmount;
@@ -568,6 +576,9 @@ export class Main extends Component {
 				this.currentText.text = 'W' + start.format('W') + ' - W' + end.format('W');
 				break;
 			case 'days':
+				if(this.spanAmount === 5) {
+					start.setWeekDay(0); // workweek. start monday
+				}
 				end = start.clone().addDays(this.spanAmount! - 1);
 				this.currentText.text = start.format('j M') + ' - ' + end.format('j M');
 				break;
