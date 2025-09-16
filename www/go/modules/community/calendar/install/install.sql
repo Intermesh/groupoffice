@@ -420,3 +420,15 @@ CREATE TABLE IF NOT EXISTS calendar_schedule_object (
                                    etag VARBINARY(32),
                                    size INT(11) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE  IF NOT EXISTS `calendar_view` (
+	`id` int NOT NULL AUTO_INCREMENT,
+	`ownerId` int NOT NULL DEFAULT '0',
+	`name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+	`aclId` int NOT NULL DEFAULT '0',
+	`calendarIds` MEDIUMTEXT,
+	`groupIds` MEDIUMTEXT,
+	`defaultView` varchar(20) NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	KEY `ownerId` (`ownerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

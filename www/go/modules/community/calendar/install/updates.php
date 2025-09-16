@@ -388,5 +388,34 @@ $updates["202508281104"][] = "UPDATE calendar_preferences set personalCalendarId
 
 $updates["202509011354"][] = "alter table calendar_calendar_user add column syncToDevice tinyint default 1 not null after `timeZone`";
 
+$updates["202509151158"][] = "CREATE TABLE  IF NOT EXISTS `calendar_view` (
+	`id` int NOT NULL AUTO_INCREMENT,
+	`ownerId` int NOT NULL DEFAULT '0',
+	`name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+	`aclId` int NOT NULL DEFAULT '0',
+	`calendarIds` MEDIUMTEXT,
+	`groupIds` MEDIUMTEXT,
+	`defaultView` varchar(20) NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	KEY `ownerId` (`ownerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
-// TODO: calendar views -> custom filters
+$updates["202509151158"][] = function() {
+	$hasOldViewTable = go()->getDbConnection()->query("SHOW TABLES LIKE 'cal_views'")->fetch();
+	if(empty($hasOldViewTable))
+		return;
+
+	$rows = go()->getDbConnection()->exec("INSERT IGNORE INTO calendar_view (id,ownerId, name, aclId, defaultView) SELECT id, user_id, name, acl_id, if(merge=1, null, 'split-5') from cal_views");
+
+	$calendarsUpdateStmt = go()->getDbConnection()->getPDO()->prepare("UPDATE calendar_view SET calendarIds = CONCAT('[',?,']') WHERE id = ?");
+	$calendarsStmt = go()->getDbConnection()->query("SELECT view_id, GROUP_CONCAT(calendar_id) as ids from cal_views_calendars");
+	foreach($calendarsStmt as $row) {
+		$calendarsUpdateStmt->execute([$row['ids'], $row['view_id']]);
+	}
+
+	$groupsUpdateStmt = go()->getDbConnection()->getPDO()->prepare("UPDATE calendar_view SET groupIds = CONCAT('[',?,']') WHERE id = ?");
+	$groupsStmt = go()->getDbConnection()->query("SELECT view_id, GROUP_CONCAT(group_id) as ids from cal_views_groups");
+	foreach($groupsStmt as $row) {
+		$groupsUpdateStmt->execute([$row['ids'], $row['view_id']]);
+	}
+};

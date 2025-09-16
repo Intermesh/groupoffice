@@ -2,7 +2,7 @@ import {
 	btn, Button,
 	CardContainer,
 	cards,
-	checkbox,
+	checkbox, column,
 	comp,
 	Component, datasourcestore,
 	DatePicker,
@@ -11,12 +11,12 @@ import {
 	FunctionUtil, h3, hr, List,
 	list,
 	menu, router,
-	splitter,
+	splitter, table,
 	tbar,
 } from "@intermesh/goui";
 import {MonthView} from "./MonthView.js";
 import {WeekView} from "./WeekView.js";
-import {calendarStore, categoryStore, t, ValidTimeSpan} from "./Index.js";
+import {calendarStore, categoryStore, t, ValidTimeSpan, viewStore} from "./Index.js";
 import {YearView} from "./YearView.js";
 import {SplitView} from "./SpltView.js";
 import {client, filterpanel, jmapds, modules} from "@intermesh/groupoffice-core";
@@ -28,6 +28,7 @@ import {CalendarAdapter} from "./CalendarAdapter.js";
 import {ListView} from "./ListView.js";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarList} from "./CalendarList.js";
+import {ViewWindow} from "./ViewWindow";
 
 export class Main extends Component {
 
@@ -137,6 +138,7 @@ export class Main extends Component {
 					}
 				}),
 				comp({cls:'scroll'},
+					this.renderViews(),
 					this.calendarList = new CalendarList(),
 					tbar({cls: 'dense'},comp({tagName: 'h3', html: t('Other')})),
 					comp({tagName:'ul', cls:'goui check-list'}, ...this.renderAdapterBoxes()),
@@ -195,6 +197,7 @@ export class Main extends Component {
 									owner = item.owner,
 									press = function(b:Button,s:'accepted'|'tentative'|'declined') {
 										b.el.cls('+pressed');
+										b.disabled;
 										item.updateParticipation(s,() => {
 											inviteStore.reload();
 										});
@@ -322,13 +325,11 @@ export class Main extends Component {
 		const store = this.adapter.byType('event').store;
 
 		//const calendarIds = Object.keys(this.inCalendars).filter(key => this.inCalendars[key])
-		if(calendarIds.length) {
-			Object.assign(store.queryParams.filter ||= {}, {
-				inCalendars: calendarIds
-			});
-		} else {
-			delete store.queryParams.filter?.inCalendars;
-		}
+
+		Object.assign(store.queryParams.filter ||= {}, {
+			inCalendars: calendarIds
+		});
+
 	}
 
 	private openPDF(type:string) {
@@ -337,6 +338,63 @@ export class Main extends Component {
 
 	private get view() : CalendarView {
 		return this.cards.items.get(this.cards.activeItem) as CalendarView;
+	}
+
+	private renderViews() {
+		const rights = modules.get("community", "calendar")!.userRights;
+		return table({
+			store: viewStore,
+			fitParent: true,
+			rowSelectionConfig: {
+				multiSelect: false,
+				listeners: {
+					'selectionchange': ({selected}) => {
+						if(selected[0]) {
+							this.applyInCalendarFilter(selected[0].record.calendarIds);
+							if(selected[0].record.defaultView) {
+
+								const parts = selected[0].record.defaultView.split('-');
+								if(!parts[1]) parts[1] = 0;
+								this.setSpan(parts[0], parts[1]);
+							}
+							this.updateView();
+						}
+					}
+				}
+			},
+			listeners: {
+				'render': ({target}) => {
+					void target.store.load();
+					this.calendarList.on('changevisible', () => { target.rowSelection?.clear() })
+				},
+			},
+			columns:[
+				column({
+					id: "icon",
+					width: 40,
+					renderer: (value, record) => comp({tagName: "i", cls: "icon", text:'group'})
+				}),
+				column({id:'name'}),
+				column({ width: 50,
+					id: '-', renderer: (v, data) => btn({
+						//hidden: !rights.mayChangeViews,
+						icon: 'more_horiz', menu: menu({},
+							btn({
+								icon: 'edit', text: t('Edit'), disabled: !data.myRights.mayAdmin, handler: async _ => {
+									const dlg = new ViewWindow();
+									await dlg.load(data.id);
+									dlg.show();
+								}
+							}),
+							btn({
+								icon: 'delete', text: t('Delete'), disabled: !data.myRights.mayAdmin, handler: async _ => {
+									viewStore.dataSource.confirmDestroy([data.id]);
+								}
+							})
+						)
+					})
+				})]
+		});
 	}
 
 	private renderAdapterBoxes() {
