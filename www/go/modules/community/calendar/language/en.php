@@ -8,6 +8,7 @@ return [
 	'mayChangeCalendars'=> 'Create/Delete Calendars',
 	'mayChangeCategories' => 'Change Categories',
 	'mayChangeResources' => 'Change Resource',
+	'mayChangeViews' => 'Change Views',
 
 	'newScheduleTitle' => 'Do you want to invite the participants?',
 	'newScheduleText' => 'You have created an event with participants. By saving this even an invite will be sent to notify the participants.',

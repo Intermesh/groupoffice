@@ -344,7 +344,9 @@ export class Main extends Component {
 		const rights = modules.get("community", "calendar")!.userRights;
 		return table({
 			store: viewStore,
+			emptyStateHtml:'',
 			fitParent: true,
+			headers:false,
 			rowSelectionConfig: {
 				multiSelect: false,
 				listeners: {

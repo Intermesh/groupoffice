@@ -389,7 +389,7 @@ $updates["202508281104"][] = "UPDATE calendar_preferences set personalCalendarId
 $updates["202509011354"][] = "alter table calendar_calendar_user add column syncToDevice tinyint default 1 not null after `timeZone`";
 
 $updates["202509151158"][] = "CREATE TABLE  IF NOT EXISTS `calendar_view` (
-	`id` int NOT NULL AUTO_INCREMENT,
+	`id` int UNSIGNED NOT NULL AUTO_INCREMENT,
 	`ownerId` int NOT NULL DEFAULT '0',
 	`name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
 	`aclId` int NOT NULL DEFAULT '0',

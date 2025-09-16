@@ -422,7 +422,7 @@ CREATE TABLE IF NOT EXISTS calendar_schedule_object (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE  IF NOT EXISTS `calendar_view` (
-	`id` int NOT NULL AUTO_INCREMENT,
+	`id` int UNSIGNED NOT NULL AUTO_INCREMENT,
 	`ownerId` int NOT NULL DEFAULT '0',
 	`name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
 	`aclId` int NOT NULL DEFAULT '0',
