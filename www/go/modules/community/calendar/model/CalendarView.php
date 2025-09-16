@@ -2,19 +2,14 @@
 
 namespace go\modules\community\calendar\model;
 
-use go\core\acl\model\AclOwnerEntity;
-use go\core\db\Criteria;
-use go\core\jmap\Entity;
-use go\core\model\Acl;
-use go\core\model\Module;
-use go\core\orm\Filters;
+use go\core\acl\model\AclEntity;
+use go\core\acl\model\AclItemEntity;
 use go\core\orm\Mapping;
-use go\core\orm\Query;
 
 /**
  * View model
  */
-class CalendarView extends AclOwnerEntity {
+class CalendarView extends AclEntity {
 
 	public ?string $id;
 
@@ -70,5 +65,15 @@ class CalendarView extends AclOwnerEntity {
 	public static function getClientName(): string
 	{
 		return "CalendarView";
+	}
+
+	protected function isAclChanged()
+	{
+		return false;
+	}
+
+	public static function getAclEntityTableAlias()
+	{
+		return 'view';
 	}
 }
