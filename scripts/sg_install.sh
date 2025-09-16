@@ -35,7 +35,7 @@ echo "zend_extension=/usr/local/sourceguardian/ixed.${PHP_VERSION}.lin" \
     > "/etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini"
 
 echo "Enabling sourceguardian module"
-phpenmod sourceguardian
+/usr/sbin/phpenmod sourceguardian
 
 echo "Reloading apache"
 
