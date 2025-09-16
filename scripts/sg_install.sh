@@ -34,8 +34,11 @@ echo Detected PHP version $PHP_VERSION;
 echo "zend_extension=/usr/local/sourceguardian/ixed.${PHP_VERSION}.lin" \
     > "/etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini"
 
+
 echo "Enabling sourceguardian module"
-/usr/sbin/phpenmod sourceguardian
+# Make sure /usr/sbin is in the path or phpenmod will not work
+export PATH=$PATH:/usr/sbin
+phpenmod sourceguardian
 
 echo "Reloading apache"
 
