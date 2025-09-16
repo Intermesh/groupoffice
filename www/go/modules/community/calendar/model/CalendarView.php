@@ -2,14 +2,13 @@
 
 namespace go\modules\community\calendar\model;
 
-use go\core\acl\model\AclEntity;
-use go\core\acl\model\AclItemEntity;
+use go\core\acl\model\AclOwnerEntity;
 use go\core\orm\Mapping;
 
 /**
  * View model
  */
-class CalendarView extends AclEntity {
+class CalendarView extends AclOwnerEntity {
 
 	public ?string $id;
 
@@ -67,13 +66,4 @@ class CalendarView extends AclEntity {
 		return "CalendarView";
 	}
 
-	protected function isAclChanged()
-	{
-		return false;
-	}
-
-	public static function getAclEntityTableAlias()
-	{
-		return 'view';
-	}
 }

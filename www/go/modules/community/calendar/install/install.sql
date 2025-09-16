@@ -430,5 +430,17 @@ CREATE TABLE  IF NOT EXISTS `calendar_view` (
 	`groupIds` MEDIUMTEXT,
 	`defaultView` varchar(20) NULL DEFAULT NULL,
 	PRIMARY KEY (`id`),
-	KEY `ownerId` (`ownerId`)
+	INDEX `calendar_view_aclId_idx` (`aclId` ASC),
+	INDEX `ownerId` (`ownerId` ASC),
+	CONSTRAINT `calendar_view_aclId`
+		FOREIGN KEY (`aclId`)
+			REFERENCES `core_acl` (`id`)
+			ON DELETE RESTRICT
+			ON UPDATE RESTRICT,
+	CONSTRAINT `calendar_View_ownerId`
+		FOREIGN KEY (`ownerId`)
+		REFERENCES `core_user` (`id`)
+		ON DELETE RESTRICT
+		ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
