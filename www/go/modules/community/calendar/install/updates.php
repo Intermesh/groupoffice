@@ -419,14 +419,14 @@ $updates["202509151158"][] = function() {
 	$rows = go()->getDbConnection()->exec("INSERT IGNORE INTO calendar_view (id,ownerId, name, aclId, defaultView) SELECT id, user_id, name, acl_id, if(merge=1, null, 'split-5') from cal_views");
 
 	$calendarsUpdateStmt = go()->getDbConnection()->getPDO()->prepare("UPDATE calendar_view SET calendarIds = ? WHERE id = ?");
-	$calendarsStmt = go()->getDbConnection()->query("SELECT view_id, GROUP_CONCAT(calendar_id) as ids from cal_views_calendars");
+	$calendarsStmt = go()->getDbConnection()->query("SELECT view_id, GROUP_CONCAT(calendar_id) as ids from cal_views_calendars GROUP BY view_id");
 	foreach($calendarsStmt as $row) {
 		$ids = array_map(fn($id) => (string)$id, explode(',', $row['ids']));
 		$calendarsUpdateStmt->execute([json_encode($ids), $row['view_id']]);
 	}
 
 	$groupsUpdateStmt = go()->getDbConnection()->getPDO()->prepare("UPDATE calendar_view SET groupIds = ? WHERE id = ?");
-	$groupsStmt = go()->getDbConnection()->query("SELECT view_id, GROUP_CONCAT(group_id) as ids from cal_views_groups");
+	$groupsStmt = go()->getDbConnection()->query("SELECT view_id, GROUP_CONCAT(group_id) as ids from cal_views_groups GROUP BY view_id");
 	foreach($groupsStmt as $row) {
 		$ids = array_map(fn($id) => (string)$id, explode(',', $row['ids']));
 		$groupsUpdateStmt->execute([json_encode($ids), $row['view_id']]);
