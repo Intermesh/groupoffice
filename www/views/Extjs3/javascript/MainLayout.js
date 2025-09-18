@@ -118,7 +118,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 
 	getOpenModules: function () {
-        debugger;
 		var openModules = [];
 		this.tabPanel.items.each(function (p) {
 			var tabEl = this.tabPanel.getTabEl(p);
@@ -638,8 +637,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		var menuItemConfig;
 
 		this.state = Ext.state.Manager.get('open-modules');
-        // if(!this.state) {
-		// 	this.state = go.Modules.getAvailable().filter(m => m.sort_order < 100).map(m => m.name);
+		// if(!this.state) {
+		// 	this.state = go.Modules.getAvailable().filter(m => m.showByDefault).map(m => m.name);
 		// }
 
 		for (var i = 0, l = allPanels.length; i < l; i++) {
