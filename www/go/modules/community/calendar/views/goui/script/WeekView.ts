@@ -354,8 +354,8 @@ export class WeekView extends CalendarView {
 			this.iter++;
 
 			// find same uid at same time to stack events
-			let prev = this.continues.length-1;
-			while((prev -= 1) >= 0 && e.start.getTime() === this.continues[prev].start.getTime()) {
+			let prev = this.continues.length;
+			while(--prev >= 0 && e.start.getTime() === this.continues[prev].start.getTime()) {
 				if(e.data.uid === this.continues[prev]?.data.uid) {
 					this.continues[prev].calendarIds[e.data.calendarId] = true;
 					continue outer;
