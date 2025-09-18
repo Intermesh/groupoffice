@@ -71,7 +71,11 @@ export class PreferencesPanel extends Component {
 					select({name:'startView', label:t('Default view when opening the calendar'),options: [
 							{value:'day', name: t('Day')},
 							{value:'week',name:  t('Week')},
+							{value:'days-5',name:  t('Workweek')},
+							{value:'weeks-14',name:  '2 ' +t('Weeks')},
+							{value:'weeks-21',name:  '3 ' +t('Weeks')},
 							{value:'month',name:  t('Month')},
+							{value:'split-5',name:  t('Split')},
 							{value:'year',name:  t('Year')},
 							{value:'list',name:  t('List')}
 						]}),

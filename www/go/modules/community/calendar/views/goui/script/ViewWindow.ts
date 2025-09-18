@@ -1,15 +1,13 @@
-import {client, FormWindow, jmapds} from "@intermesh/groupoffice-core";
+import {client, FormWindow} from "@intermesh/groupoffice-core";
 import {
 	btn,
-	checkbox, checkboxcolumn, CheckboxField, checkboxselectcolumn, column,
+	CheckboxField, checkboxselectcolumn, column,
 	comp,
-	containerfield,
-	List, list, MapField,
-	mapfield, menu,
+	List, menu,
 	select, table,
 	textfield
 } from "@intermesh/goui";
-import {allCalendarStore, CalendarView, t} from "./Index.js";
+import {allCalendarStore, t} from "./Index.js";
 
 export class ViewWindow extends FormWindow {
 	//groupIdsFld: MapField
@@ -98,7 +96,12 @@ export class ViewWindow extends FormWindow {
 			)
 		);
 
-		this.addSharePanel();
+		this.addSharePanel([
+			{value: "",name: ""},
+			{value: 10,name: t("Read")},
+			{value: 30,name: t("Write")},
+			{value: 50,name: t("Manage")}
+		]);
 
 	}
 }

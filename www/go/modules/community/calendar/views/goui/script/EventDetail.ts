@@ -231,7 +231,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 
 	private updateStatus(v:'accepted'|'declined'|'tentative') {
-		this.item!.updateParticipation(v);
+		this.item!.updateParticipation(v, () => {void this.loadEvent(this.item!)});
 		this.pressButton(v);
 	}
 

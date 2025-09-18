@@ -87,8 +87,11 @@ export class CalendarList extends Component<CalendarListEventMap> {
 						const d = new SubscribeWebCalWindow();
 						d.show();
 					}}),
-					hr(),
-					btn({icon: 'calendar_view_month', text: t('Compose new view')+ '…', handler: () => {
+					hr({hidden: !rights.mayChangeViews}),
+					btn({hidden: !rights.mayChangeViews,
+						icon: 'calendar_view_month',
+						text: t('Compose new view')+ '…',
+						handler: () => {
 						const d = new ViewWindow();
 						d.show();
 					}})
