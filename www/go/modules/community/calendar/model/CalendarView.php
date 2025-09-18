@@ -13,7 +13,6 @@ class CalendarView extends AclOwnerEntity {
 	public ?string $id;
 
 	public string $name;
-	public int $aclId;
 
 	/** @var ?int could be NULL for global categories */
 	protected ?int $ownerId = null;
