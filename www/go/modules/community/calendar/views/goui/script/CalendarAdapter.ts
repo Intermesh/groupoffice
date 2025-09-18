@@ -105,14 +105,9 @@ export class CalendarAdapter extends Observable<CalendarAdapterEventMap> {
 					return 0;
 				});
 
-				// Only show one item of a meeting to avoid a very crowded view
-				const meetingkeys:string[] = [];
-
 				for (const e of events) {
 					for(const item of CalendarItem.expand(e as CalendarEvent, start, end)) {
-						const meetingkey = item.data.uid + "-" + item.start.format("Ymd");
-						if ((!item.isDeclined || client.user.calendarPreferences.showDeclined) && meetingkeys.indexOf(meetingkey) === -1) {
-							meetingkeys.push(meetingkey);
+						if ((!item.isDeclined || client.user.calendarPreferences.showDeclined) ) {
 							yield item;
 						}
 					}

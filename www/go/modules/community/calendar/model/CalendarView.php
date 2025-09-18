@@ -3,6 +3,7 @@
 namespace go\modules\community\calendar\model;
 
 use go\core\acl\model\AclOwnerEntity;
+use go\core\model\Module;
 use go\core\orm\Mapping;
 
 /**
@@ -51,18 +52,18 @@ class CalendarView extends AclOwnerEntity {
 		}
 	}
 
+	protected function canCreate(): bool
+	{
+		return Module::findByName('community', 'calendar')->getUserRights()->mayChangeViews;
+	}
 
 	public function getMyRights() {
 		$lvl = $this->getPermissionLevel();
 		return [
 			'mayRead' => $lvl >= 10,
+			'mayWrite' => $lvl >= 30,
 			'mayAdmin' => $lvl >= 50
 		];
-	}
-
-	public static function getClientName(): string
-	{
-		return "CalendarView";
 	}
 
 }

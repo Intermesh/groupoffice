@@ -2,7 +2,7 @@ import {CalendarView} from "./CalendarView.js";
 import {DateInterval, DateTime, E, Format} from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {client} from "@intermesh/groupoffice-core";
-import {t} from "./Index.js";
+import {allCalendarStore, t} from "./Index.js";
 
 class CalendarDayItem extends CalendarItem {
 	pos!: number
@@ -345,21 +345,31 @@ export class WeekView extends CalendarView {
 	iter!: number
 	continues: CalendarDayItem[] = []
 
-	private drawDay(dayStart: DateTime, dd: HTMLElement) {
+	private drawDay(dayStart: DateTime, dayColumn: HTMLElement) {
 		let stillContinueing = [],
 			e: any,
 			eventEls = [],
 			end = dayStart.clone().addDays(1);
-		while((e = this.dayItems[this.iter]) && e.start.format('Ymd') < end.format('Ymd')) {
+		outer: while((e = this.dayItems[this.iter]) && e.start.format('Ymd') < end.format('Ymd')) {
+			this.iter++;
+
+			// find same uid at same time to stack events
+			let prev = this.continues.length;
+			while(--prev >= 0 && e.start.getTime() === this.continues[prev].start.getTime()) {
+				if(e.data.uid === this.continues[prev]?.data.uid) {
+					this.continues[prev].calendarIds[e.data.calendarId] = true;
+					continue outer;
+				}
+			}
+
 			if(e.end.date > dayStart.date) {
 				this.continues.push(e);
 			}
-			this.iter++;
 		}
 		if(this.continues.length)
 			this.calculateOverlap(this.continues, dayStart);
 		while(e = this.continues.shift()) {
-			eventEls.push(this.drawEvent(e, dayStart, dd));
+			eventEls.push(this.drawEvent(e, dayStart, dayColumn));
 			if(e.end.date > end.date) {
 				stillContinueing.push(e); // push it back for next week
 			}
@@ -404,15 +414,37 @@ export class WeekView extends CalendarView {
 		if(!e.divs[i]) {
 			e.divs[i] = super.eventHtml(e);
 		}
+
+		const [backgroundImage, paddingLeft] = this.stackedCalendars(e);
+
 		if(!e.divs[i].isConnected)
 			dd.append(e.divs[i]);
 		return e.divs[i].css({
 			color: '#'+e.color,
 			top: (100 / 1440 * e.startM)+'%',
 			left: (e.pos * (100 / e.lanes))+'%',
-			width: (100 / e.lanes) +'%',
-			height: (100 / 1440 * (e.endM - e.startM))+'%'
+			width: 'calc('+(100 / e.lanes) +'% - 1px)',
+			height: 'calc('+(100 / 1440 * (e.endM - e.startM))+'% - 1px)',
+			backgroundImage, paddingLeft, borderLeft:'0'
 		});
+	}
+
+	private stackedCalendars(e: CalendarDayItem) {
+		let backgroundImage = 'linear-gradient(to right, ',
+			padding = 0;
+
+		for(const key in e.calendarIds) {
+			if(key !== e.cal.id) {
+				const cal = allCalendarStore.findById(key);
+				if(cal) {
+					backgroundImage += '#'+cal.color+' '+(padding/10)+'rem '+((padding+=6)/10)+'rem, ';
+				}
+			}
+		}
+
+		padding += 6;
+		backgroundImage += 'currentColor '+((padding-6)/10)+'rem '+(padding/10)+'rem, transparent '+(padding/10)+'rem 100%)';
+		return [backgroundImage, ((padding+6)/10)+'rem'];
 	}
 
 }

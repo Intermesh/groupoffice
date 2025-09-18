@@ -390,9 +390,9 @@ $updates["202509011354"][] = "alter table calendar_calendar_user add column sync
 
 $updates["202509151158"][] = "CREATE TABLE  IF NOT EXISTS `calendar_view` (
 	`id` int UNSIGNED NOT NULL AUTO_INCREMENT,
-	`ownerId` int NOT NULL DEFAULT '0',
+	`ownerId` int NOT NULL,
 	`name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-	`aclId` int NOT NULL DEFAULT '0',
+	`aclId` int NOT NULL,
 	`calendarIds` MEDIUMTEXT,
 	`groupIds` MEDIUMTEXT,
 	`defaultView` varchar(20) NULL DEFAULT NULL,
