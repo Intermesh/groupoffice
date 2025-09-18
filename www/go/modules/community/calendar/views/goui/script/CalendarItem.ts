@@ -97,6 +97,7 @@ export class CalendarItem {
 
 	readonly initStart: string
 	readonly initEnd: string
+	calendarIds: {[id:string]:boolean} = {}
 
 	cal: any
 	categories : CalendarCategory[] = []
@@ -125,6 +126,7 @@ export class CalendarItem {
 		//if(!obj.end) {
 			this.end = this.start.clone().add(new DateInterval(this.patched.duration!));
 		//}
+		this.calendarIds[this.patched.calendarId] = true;
 		if(!this.cal) {
 			this.cal = calendarStore.find((c: any) => c.id == this.patched.calendarId);
 		}
