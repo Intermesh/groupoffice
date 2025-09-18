@@ -1,3 +1,6 @@
+- wopi: allow co-editing when file is locked
+- onlyoffice: allow co-editing when file is locked
+
 15-09-2025: 25.0.54
 - Calendar: cron job could add duplicate event because it didn't find the event already created by other means like 
   ActiveSync or the e-mail module.
