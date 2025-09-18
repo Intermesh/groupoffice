@@ -381,7 +381,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 			}
 		}
 
-		if($this->isModified('locked_user_id')){
+		if(!$this->ignoreLockChange && $this->isModified('locked_user_id')){
 			$old_locked_user_id = $this->getOldAttributeValue('locked_user_id');
 			if(!empty($old_locked_user_id) && $old_locked_user_id != \GO::user()->id && !\GO::user()->isAdmin())
 				throw new \GO\Files\Exception\FileLocked();
@@ -402,6 +402,8 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 
 		return parent::beforeSave();
 	}
+
+	public bool $ignoreLockChange = false;
 
 	protected function getPath() {
 		return $this->folder ? $this->folder->path . '/' . $this->name : $this->name;
