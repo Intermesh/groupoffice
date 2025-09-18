@@ -434,7 +434,7 @@ export class WeekView extends CalendarView {
 			padding = 0;
 
 		for(const key in e.calendarIds) {
-			if(key !== e.cal.id) {
+			if(key !== e.data.calendarId) {
 				const cal = allCalendarStore.findById(key);
 				if(cal) {
 					backgroundImage += '#'+cal.color+' '+(padding/10)+'rem '+((padding+=6)/10)+'rem, ';
