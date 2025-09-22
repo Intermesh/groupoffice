@@ -42,7 +42,7 @@ export class Main extends Component {
 
 	date: DateTime
 
-	timeSpan: ValidTimeSpan
+	timeSpan!: ValidTimeSpan
 	printCurrentBtn: Button
 
 	inboxBtn: Button
@@ -307,7 +307,7 @@ export class Main extends Component {
 		let initX = 0, initY = 0;
 		cards.el.on('touchstart', e => {
 			console.log('touchstart');
-			initX = e.changedTouches[0].screenX,
+			initX = e.changedTouches[0].screenX;
 			initY = e.changedTouches[0].screenY;
 		}).on('touchend', e => {
 			const diffX = initX - e.changedTouches[0].screenX,
@@ -319,10 +319,6 @@ export class Main extends Component {
 				this.backward();
 			}
 		})
-	}
-
-	private export(calId: number) {
-
 	}
 
 
@@ -359,10 +355,10 @@ export class Main extends Component {
 						if(selected[0]) {
 							this.applyInCalendarFilter(selected[0].record.calendarIds);
 							if(selected[0].record.defaultView) {
-
-								const parts = selected[0].record.defaultView.split('-');
-								if(!parts[1]) parts[1] = 0;
-								this.setSpan(parts[0], parseInt(parts[1] ?? 0));
+								this.routeTo(selected[0].record.defaultView, this.date);
+								// const parts = selected[0].record.defaultView.split('-');
+								// if(!parts[1]) parts[1] = 0;
+								// this.setSpan(parts[0], parseInt(parts[1] ?? 0));
 							}
 							this.updateView();
 						}

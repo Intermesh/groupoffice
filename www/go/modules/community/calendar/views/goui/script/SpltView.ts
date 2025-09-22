@@ -1,8 +1,9 @@
 import {CalendarView} from "./CalendarView.js";
-import {DateTime, E} from "@intermesh/goui";
+import {DateTime, E, store, Store} from "@intermesh/goui";
 import {allCalendarStore, calendarStore} from "./Index.js";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
+import {jmapds} from "@intermesh/groupoffice-core";
 
 export class SplitView extends CalendarView {
 
@@ -10,16 +11,9 @@ export class SplitView extends CalendarView {
 	calRows: [string, HTMLElement][] = []
 	calViewModel : {[calId:string]: CalendarItem[]} = {}
 	baseCls = 'cal split'
-
+	calendars: any[] = []
 	constructor(adapter: CalendarAdapter) {
 		super(adapter);
-
-		allCalendarStore.on('load', () => { if(this.el.innerHTML !== '') {
-			this.renderView()
-			this.updateItems();
-		} })
-		if(!allCalendarStore.loaded)
-			allCalendarStore.load();
 	}
 
 	goto(day: DateTime, amount: number) {
@@ -29,6 +23,7 @@ export class SplitView extends CalendarView {
 		this.day = day.setHours(0,0,0,0);
 		this.start = this.day.clone().setWeekDay(0);
 		const end = this.start.clone().addDays(amount);
+
 		this.renderView();
 		this.adapter.goto(this.start, end);
 	}
@@ -80,29 +75,31 @@ export class SplitView extends CalendarView {
 
 		this.calRows = [];
 		const activeFilter = this.adapter.byType('event').store.queryParams.filter.inCalendars;
+		jmapds('Calendar').get(activeFilter).then((resp) => {
+			this.calendars = resp.list;
+			for (let calendar of this.calendars) {
 
-		for (let calendar of allCalendarStore) {
+				if(activeFilter.indexOf(calendar.id) === -1) continue;
+				day = this.start.clone();
+				const eventContainer = E('li', ...this.drawCal(calendar.id)).cls('events'),
+					row = E('ol',
+						eventContainer,
+						//E('li', E('i', 'event').cls('icon').css({color:'#'+calendar.color}), calendar.name)
+					);
+				for (i = 0; i < this.days; i++) {
+					row.append(E('li').attr('data-date', day.format('Y-m-d'))
+						.cls('today', day.format('Ymd') === now.format('Ymd'))
+						.cls('past', day.format('Ymd') < now.format('Ymd'))
+						.cls('other', day.getDay()%6==0))
 
-			if(activeFilter.indexOf(calendar.id) === -1) continue;
-			day = this.start.clone();
-			const eventContainer = E('li', ...this.drawCal(calendar.id)).cls('events'),
-				row = E('ol',
-					eventContainer,
-					//E('li', E('i', 'event').cls('icon').css({color:'#'+calendar.color}), calendar.name)
-				);
-			for (i = 0; i < this.days; i++) {
-				row.append(E('li').attr('data-date', day.format('Y-m-d'))
-					.cls('today', day.format('Ymd') === now.format('Ymd'))
-					.cls('past', day.format('Ymd') < now.format('Ymd'))
-					.cls('other', day.getDay()%6==0))
-
-				day.addDays(1);
-				//it++;
+					day.addDays(1);
+					//it++;
+				}
+				this.calRows.push([calendar.id, eventContainer]);
+				this.el.append(E('div',E('i', 'event').cls('icon').css({color:'#'+calendar.color}), calendar.name), row);
 			}
-			this.calRows.push([calendar.id, eventContainer]);
-			this.el.append(E('div',E('i', 'event').cls('icon').css({color:'#'+calendar.color}), calendar.name), row);
-		}
-
+			this.populateViewModel();
+		});
 	}
 
 	private updateItems() {
