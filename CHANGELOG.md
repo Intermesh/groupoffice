@@ -1,3 +1,4 @@
+22-09-2025: 25.0.55
 - Calendar: Added Views (selection of calendars in a choisen period with 1-click)
 - Calendar: If the same event occurs in multiple selected calendars the week view will show them stacked.
 - wopi: allow co-editing when file is locked
