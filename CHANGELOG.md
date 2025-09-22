@@ -2,6 +2,7 @@
 - Calendar: If the same event occurs in multiple selected calendars the week view will show them stacked.
 - wopi: allow co-editing when file is locked
 - onlyoffice: allow co-editing when file is locked
+- Address book: replace deprecated maps: uri with geo: uri
 
 15-09-2025: 25.0.54
 - Calendar: cron job could add duplicate event because it didn't find the event already created by other means like 

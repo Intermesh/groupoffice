@@ -252,7 +252,7 @@ go.util =  (function () {
 			}
 
 			// https://en.wikipedia.org/wiki/Geo_URI_scheme
-			const uri = "maps:q=" + adr;
+			const uri = "geo:q=" + adr;
 
 			const a = document.createElement("a");
 			a.setAttribute("target", "_blank");
