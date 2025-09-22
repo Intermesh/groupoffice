@@ -3,6 +3,7 @@
 - wopi: allow co-editing when file is locked
 - onlyoffice: allow co-editing when file is locked
 - Address book: replace deprecated maps: uri with geo: uri
+- Calendar: Add Polish translations #1343 - Thanks Krzysztof!
 
 15-09-2025: 25.0.54
 - Calendar: cron job could add duplicate event because it didn't find the event already created by other means like 
