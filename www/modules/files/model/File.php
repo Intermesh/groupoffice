@@ -445,10 +445,8 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 
 	}
 	
-	public function checkPermissionLevel($level) {
-			
-//			var_dump($this->acl->description);
-		
+	public function checkPermissionLevel($level): bool
+	{
 		//If this folder belongs to a contact or project etc. then we only need write permission to delete it.
 		if($level == \GO\Base\Model\Acl::DELETE_PERMISSION && $this->folder->acl->usedIn != 'fs_folders.acl_id') {
 			$level = \GO\Base\Model\Acl::WRITE_PERMISSION;
