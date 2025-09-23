@@ -1,3 +1,5 @@
+- E-mail: Missing "None" label for in email composer templates menu. Related to issue #1343
+
 15-09-2025: 6.8.138 
 - Support: more helpful error mail when imap import fails
 
