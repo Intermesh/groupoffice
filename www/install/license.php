@@ -48,7 +48,7 @@ if (!empty($_POST)) {
     try {
 	    go()->getSettings()->save();
 
-        if($_POST['install']) {
+        if(!empty($_POST['install'])) {
 
             if( !go()->getSettings()->licenseDenied) {
                 License::installModules();
