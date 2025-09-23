@@ -451,9 +451,6 @@ class Scheduler {
 				continue;
 			}
 			$status = strtolower($vevent->ATTENDEE['PARTSTAT']->getValue());
-//			if (isset($vevent->{'REQUEST-STATUS'})) {
-//				$responseStatus = strtok((string)$vevent->{'REQUEST-STATUS'}, ";");
-//			}
 
 			$replyStamp = $vevent->DTSTAMP->getDateTime();
 
@@ -473,8 +470,6 @@ class Scheduler {
 				if (empty($p->scheduleUpdated) || $p->scheduleUpdated < $replyStamp) {
 					$p->participationStatus = $status;
 					$p->scheduleUpdated = new DateTime($replyStamp->format("Y-m-d H:i:s"), $replyStamp->getTimezone());
-//					if (isset($responseStatus))
-//						$p->scheduleStatus = $responseStatus;
 				} else {
 					$alreadyProcessed = true;
 					return $existingEvent;

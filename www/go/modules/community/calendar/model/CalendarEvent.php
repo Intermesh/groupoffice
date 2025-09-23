@@ -830,8 +830,11 @@ class CalendarEvent extends AclItemEntity {
 	public function participantByScheduleId($email) {
 		if(empty($this->participants))
 			return false;
+
+		$email = strtolower($email);
+
 		foreach($this->participants as $participant) {
-			if($participant->email === $email) { // todo Use scheduleId when ParticipantIdentity is implemented
+			if(strtolower($participant->email) === $email) { // todo Use scheduleId when ParticipantIdentity is implemented
 				return $participant;
 			}
 		}
