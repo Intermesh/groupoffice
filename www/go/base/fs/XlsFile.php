@@ -163,8 +163,7 @@ class XlsFile extends File
 		// First ascertain the dimensions of the worksheet.
 		for ($row=1;$row<=$this->maxRows && $this->_maxEmptyCellsNotExceeded($row,$HIGHEST_ROW_WITH_VALUE);$row++) {		
 			for ($col=0;$col<=$this->maxColNr && $this->_maxEmptyCellsNotExceeded($col,$HIGHEST_COLUMN_WITH_VALUE);$col++) {
-								
-//				$value = $this->phpExcelObj->getSheet($this->sheetNr)->getCellByColumnAndRow($col,$row)->getCalculatedValue();
+
 				$value = $this->phpExcelObj->getSheet($this->sheetNr)->getCell([$col,$row])->getCalculatedValue();
 
 				if ( isset($value) && $value!==NULL && $value!==false ) {
