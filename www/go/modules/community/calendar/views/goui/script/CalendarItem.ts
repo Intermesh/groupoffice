@@ -129,6 +129,10 @@ export class CalendarItem {
 		this.calendarIds[this.patched.calendarId] = true;
 		if(!this.cal) {
 			this.cal = calendarStore.find((c: any) => c.id == this.patched.calendarId);
+			if(!this.cal) {
+				this.readOnly = true;
+				this.cal = {id: this.patched.calendarId, isVisible:true, myRights: {}}; // readonly when not subscribed
+			}
 		}
 		if(this.patched.categoryIds)
 		for(const id of this.patched.categoryIds) {
