@@ -220,16 +220,10 @@ class Scheduler {
 		$alreadyProcessed = false;
 		$accountEmail = false;
 		if($method ==='REPLY') {
-			if (isset($vevent->ORGANIZER)) {
-				$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vevent->ORGANIZER));
-				if ($attendeeEmail === $accountUserEmail) {
-					$accountEmail = $attendeeEmail;
-				}
-			} else { // Find event data's replyTo by UID when organizer is missing in VEVENT
-				$replyTo = go()->getDbConnection()->selectSingleValue('replyTo')->from('calendar_event')->where('uid', '=', (string) $vevent->UID)->single();
-				if ($replyTo === $accountUserEmail) {
-					$accountEmail = $replyTo;
-				}
+			// Find event data's replyTo by UID, we don't trust the organizer in the VEVENT
+			$replyTo = go()->getDbConnection()->selectSingleValue('replyTo')->from('calendar_event')->where('uid', '=', (string) $vevent->UID)->single();
+			if ($replyTo === $accountUserEmail) {
+				$accountEmail = $replyTo;
 			}
 		} else {
 			if (isset($vevent->attendee)) {
