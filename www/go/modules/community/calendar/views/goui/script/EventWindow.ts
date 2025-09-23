@@ -50,7 +50,7 @@ export class EventWindow extends FormWindow {
 	private attachments:MapField
 	private btnFreeBusy: Button
 	private locationField: TextField
-	private participantFld: ParticipantField
+	public readonly participantFld: ParticipantField
 
 	private titleField: TextField
 	private alertField: AlertField

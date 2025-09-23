@@ -86,6 +86,8 @@ function addEmailAction() {
 				data.calendarId = data.calendarId ?? client.user.calendarPreferences?.defaultCalendarId;
 			dlg.loadEvent(new CalendarItem({data:data, key: data.id ? data.id + "" : null}));
 			dlg.show();
+
+			return dlg;
 		};
 
 
