@@ -118,7 +118,8 @@ class Principal extends AclOwnerEntity
 			})
 			->add("preferUser", function (Criteria $criteria, $value, Query $query){
 				$query->groupBy(['email'])
-					->orderby([new Expression("max(entityTypeId=".User::entityType()->getId().") DESC, name ASC")]);
+					//->orderby([new Expression("max(entityTypeId=".User::entityType()->getId().") DESC, name ASC")]);
+					->orderby([new Expression("CASE WHEN entityTypeId = ".User::entityType()->getId()." THEN 0 ELSE 1 END, name ASC")]);
 			})
 			->add('groupId', function (Criteria $criteria, $value, Query $query){
 				$query->join('core_user_group', 'ug', 'ug.userId = principal.id')->andWhere(['ug.groupId' => $value]);
