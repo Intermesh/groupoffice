@@ -1,11 +1,12 @@
 import {
-	checkbox, chips,
-	comp,
-	DefaultEntity, fieldset,
-	t, textarea, TextField,
+	autocompletechips,
+	checkbox, chips, column,
+	comp, datasourcestore,
+	DefaultEntity, fieldset, listStoreType, storeRecordType,
+	t, table, textarea, TextField,
 	textfield
 } from "@intermesh/goui";
-import {FormWindow} from "@intermesh/groupoffice-core";
+import {FormWindow, jmapds} from "@intermesh/groupoffice-core";
 
 export class AliasDialog extends FormWindow {
 	private domainFld: TextField;
@@ -36,10 +37,42 @@ export class AliasDialog extends FormWindow {
 						icon: "alternate_email"
 					}),
 				),
-				chips({
+				autocompletechips({
 					name: "recipients",
 					id: "recipients",
-					label: t("Goto")
+					label: t("Goto"),
+					listeners: {
+						autocomplete: ({target, input}) => {
+							target.list.store.setFilter("search", {text: input});
+							void target.list.store.load();
+						}
+					},
+
+					textInputToValue: async text => {
+						return text;
+					},
+
+					pickerRecordToValue (field, record) : any {
+						return record.username;
+					},
+
+					list: table({
+						fitParent: true,
+						headers: false,
+						store: datasourcestore({
+							dataSource: jmapds("MailBox"),
+							queryParams: {
+								limit: 50
+							},
+							sort: [{property: "username", isAscending: true}]
+						}),
+						columns: [
+							column({
+								header: t("Username"),
+								id: "username"
+							})
+						]
+					})
 				}),
 				checkbox({
 					label: t("Active"),
