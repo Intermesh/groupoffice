@@ -18,7 +18,7 @@ import {MonthView} from "./MonthView.js";
 import {WeekView} from "./WeekView.js";
 import {calendarStore, categoryStore, t, ValidTimeSpan, viewStore} from "./Index.js";
 import {YearView} from "./YearView.js";
-import {SplitView} from "./SpltView.js";
+import {SplitView} from "./SplitView.js";
 import {client, filterpanel, jmapds, modules} from "@intermesh/groupoffice-core";
 import {CalendarView} from "./CalendarView.js";
 import {CategoryWindow} from "./CategoryWindow.js";
