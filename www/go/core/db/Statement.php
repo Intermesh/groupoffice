@@ -34,6 +34,7 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, Iter
 	 */
 	private string|null $modelClassName = null;
 	private array|null $modelConstructorArgs = null;
+	private ?int $forUserId;
 
 	public function __construct(PDOStatement $stmt)
 	{
@@ -263,11 +264,12 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, Iter
 	/**
 	 * @param class-string<Model>  $modelClassName
 	 */
-	public function fetchTypedModel(string $modelClassName, array $constructorArgs = []): static
+	public function fetchTypedModel(string $modelClassName, array $constructorArgs = [], int|null $forUserId = null): static
 	{
 		$this->setFetchMode(PDO::FETCH_ASSOC);
 		$this->modelClassName = $modelClassName;
 		$this->modelConstructorArgs = $constructorArgs;
+		$this->forUserId = $forUserId;
 		return $this;
 	}
 
@@ -312,6 +314,9 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, Iter
 			//todo correct constuctor args
 			$model = new $this->modelClassName(...$this->modelConstructorArgs);
 			$model->populate($arr);
+			if(isset($this->forUserId)) {
+				$model->forUserId($this->forUserId);
+			}
 
 			return $model;
 		}

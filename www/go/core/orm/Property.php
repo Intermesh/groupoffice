@@ -937,7 +937,7 @@ abstract class Property extends Model {
 
 		$query = (new Query())
 						->from($tables[$mainTableName]->getName(), $tables[$mainTableName]->getAlias())
-						->setModel(static::class, $fetchProperties, $readOnly, $owner);
+						->setModel(static::class, $fetchProperties, $readOnly, $owner, $userId);
 
 
 		$mappedQuery = static::getMapping()->getQuery();
@@ -1850,8 +1850,11 @@ abstract class Property extends Model {
 		$stmt->execute();
 	}
 
-	public function forUserId(): ?int
+	public function forUserId(int|null $forUserId = null): ?int
 	{
+		if(isset($forUserId)) {
+			$this->_forUserId = $forUserId;
+		}
 		return $this->_forUserId ?? go()->getUserId();
 	}
 
