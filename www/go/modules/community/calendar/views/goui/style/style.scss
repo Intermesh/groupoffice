@@ -59,7 +59,9 @@
 		> *, &:not(.allday)::before {color:white; }
 	}
 	&.declined {
-		text-decoration: line-through;
+		em {
+			text-decoration: line-through;
+		}
 	}
 
 	&.undecided {
