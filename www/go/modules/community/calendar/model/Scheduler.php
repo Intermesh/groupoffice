@@ -424,7 +424,7 @@ class Scheduler {
 			$existingEvent->sequence = (int) $vcalendar->SEQUENCE;
 		}
 
-		if($existingEvent->isModified())
+		if(!$existingEvent->isModified())
 		{
 			$alreadyProcessed = true;
 			return $existingEvent;
