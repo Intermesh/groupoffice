@@ -1,5 +1,5 @@
 import {
-	checkbox,
+	checkbox, chips,
 	comp,
 	DefaultEntity, fieldset,
 	t, textarea, TextField,
@@ -36,12 +36,10 @@ export class AliasDialog extends FormWindow {
 						icon: "alternate_email"
 					}),
 				),
-				textarea({
-					autoHeight: true,
-					name: "goto",
-					id: "goto",
-					label: t("Goto"),
-					hint: t("For multiple recipients use a comma separated list eg. alias1@domain.com,alias2@domain.com")
+				chips({
+					name: "recipients",
+					id: "recipients",
+					label: t("Goto")
 				}),
 				checkbox({
 					label: t("Active"),
