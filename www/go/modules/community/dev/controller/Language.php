@@ -12,6 +12,9 @@ use go\core\jmap\Response;
 use go\core\Language as LangModel;
 use function GO;
 
+/**
+ *
+ */
 class Language extends Controller {
 
 	private $handle;
@@ -44,6 +47,25 @@ class Language extends Controller {
 		$this->nl->setLanguage("nl");
 	}
 
+	/**
+	 * Export language from source files
+	 *
+	 * Run this command to export language. LibreTranslate runs locally and
+	 * will be used to machine translate the missing string:
+	 *
+	 * ```
+	 * docker compose exec groupoffice php www/cli.php community/dev/Language/export --language=nl --translate --missingOnly | tee nl-missing.csv
+	 * ```
+	 *
+	 * Import language file:
+	 * ```
+	 * docker compose exec groupoffice php www/cli.php community/dev/Language/import --path=lang.csv
+	 * ```
+	 *
+	 * @param $params
+	 * @return void
+	 * @throws \Exception
+	 */
 	public function export($params) {
 
 		$this->translate = !empty($params['translate']);
