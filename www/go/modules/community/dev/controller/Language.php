@@ -94,7 +94,10 @@ class Language extends Controller {
 				"module",
 				"EN",
 				go()->getLanguage()->getIsoCode()
-		], self::DELIMITER, self::ENCLOSURE);
+		], self::DELIMITER,
+			self::ENCLOSURE,
+		""
+		);
 
 		$core = [];
 		foreach ($coreFiles as $file) {
