@@ -189,7 +189,7 @@ class Language extends Controller {
 							!isset($translatedItem) ? $this->translateAPI($stringItem) : $translatedItem
 					];
 					if(!$this->missingOnly || !isset($translatedItem) ) {
-						fputcsv($this->handle, $fields, self::DELIMITER, self::ENCLOSURE);
+						fputcsv($this->handle, $fields, self::DELIMITER, self::ENCLOSURE, "");
 					}
 				}
 			} else {
@@ -205,7 +205,7 @@ class Language extends Controller {
 				];
 
 				if(!$this->missingOnly || $translated == null) {
-					fputcsv($this->handle, $fields, self::DELIMITER, self::ENCLOSURE);
+					fputcsv($this->handle, $fields, self::DELIMITER, self::ENCLOSURE, "");
 				}
 			}
 		}
