@@ -3,7 +3,8 @@
 - Calendar: Reply sometimes wasn't processed because of a case senstive match
 - Calendar: Add sender as participant when saving email as appointment
 - Project3: Save email as project fixed
-- PL translations. Again: many thanks Krzysztof!
+- Calendar: Hide cancelled events
+- Core: PL translations. Again: many thanks Krzysztof!
 
 22-09-2025: 25.0.55
 - Calendar: Added Views (selection of calendars in a choisen period with 1-click)
