@@ -51,12 +51,19 @@ go.form.multiselect.Window = Ext.extend(go.Window, {
 			autoExpandColumn: "name",
 			listeners: {
 				rowdblclick : function(grid, rowIndex, e) {
-					
+                    /*
 					var r = {}, selected = grid.store.getAt(rowIndex);
 					r[this.field.idField] = selected.data.id;
 					this.field.store.loadData({records: [r]}, true);
-				
-					this.field._isDirty = true;
+                    */
+                    const r = this.field.getValue(), selected = grid.store.getAt(rowIndex);
+                    if(this.field.valueIsId) {
+                        r.push(selected.id);
+                    } else {
+                        r.push({[this.field.idField] : selected.id})
+                    }
+                    this.field.setValue(r);
+                    this.field._isDirty = true;
 					this.close();
 				},
 				scope: this
@@ -70,15 +77,21 @@ go.form.multiselect.Window = Ext.extend(go.Window, {
 			{
 				text: t("Ok"),
 				handler: function() {
-					var records = [], selected = this.grid.getSelectionModel().getSelections();
-					selected.forEach((r) => {
-						records.push({[this.field.idField] : r.data.id})
+                    const records = this.field.getValue(), selected = this.grid.getSelectionModel().getSelections();
+                    selected.forEach((r) => {
+                        if(this.field.valueIsId) {
+                            records.push(r.data.id);
+                        } else {
+                            records.push({[this.field.idField] : r.id})
+                        }
 					})
-
-					this.field.store.loadData({records: records}, true);
-
-					this.field._isDirty = true;
-					this.close();
+                    this.field.setValue(records);
+                    this.field._isDirty = true;
+                    this.close();
+					// this.field.store.loadData({records: records}, true);
+                    //
+					// this.field._isDirty = true;
+					// this.close();
 				},
 				scope: this
 			}

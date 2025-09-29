@@ -37,26 +37,33 @@ class Holiday {
 		}
 		$this->title = self::findTitle($data);
 
+		if($this->title === 'Día de Castilla-La Mancha'){
+			$this->title .= '1';
+		}
 		if(isset($data->type)) {
 			$this->type = $data->type;
 		}
 		if(!$this->parseDateRule(explode(' ', $rule))){
-			throw new \Exception('unparsable rule '.$rule);
+			if(go()->getConfig()['debug']) {
+				throw new \Exception('unparsable rule ' . $rule);
+			} else {
+				go()->error('unparsable rule ' . $rule);
+			}
 		}
 		if($this->substitutes) {
 			$this->title ='(*)'.$this->title;
 		}
 	}
 
-	static private function findTitle($data) {
+	static private function findTitle($data): string {
 		if(isset($data->_name)) {
 			if(!isset(self::$names->{$data->_name}))
-				return null;
+				return $data->_name ?? $data->name;
 			$lang = self::$names->{$data->_name}->name;
 		} else if(isset($data->name)) {
 			$lang = $data->name;
 		} else {
-			return null;
+			return $data->_name ?? $data->name;
 		}
 		if(isset($lang->{self::$lang}))
 			return $lang->{self::$lang};
@@ -66,7 +73,7 @@ class Holiday {
 		if(isset($lang->en))
 			return $lang->en;
 
-		return null;
+		return $data->_name ?? $data->name;
 	}
 
 	static private function findRegionName($obj) {
@@ -119,14 +126,17 @@ class Holiday {
 		}
 		if(isset($data->holidays->{$set}->states)) {
 			foreach((array)$data->holidays->{$set}->states as $obj) {
+				if(!isset($obj->days))
+					continue;
 				foreach($obj->days as $rule => $entry) {
 					if($entry === false) {
 						continue; // we do not remove substitutes for regions.
 					}
 					$holiday = new self($rule, $entry, $year);
 					//$holiday->title .= ' ('.self::findRegionName($obj).')';
-					$holiday->region = self::findRegionName($obj);
+
 					if($holiday->start !== null && $holiday->start >= $from && $holiday->start <= $till) {
+						$holiday->region = self::findRegionName($obj);
 						$holiday->start = $holiday->start->format('Y-m-d');
 						yield $holiday;
 					}
@@ -148,10 +158,14 @@ class Holiday {
 			$this->substitutes = true;
 			$part = array_shift($rule);
 		}
+		if(in_array($part, ['chinese', 'bengali-revised'])) {
+			return false;
+		}
+
 		if(preg_match('/\d{2}-\d{2}/', $part) || in_array($part, self::$months)) {
 			$this->parseFixed($part);
-		} else if($part === 'easter') {
-			$this->parseEaster(array_shift($rule));
+		} else if($this->isMovable($part, $rule)) {
+			$this->parseMovable($part, $rule);
 		} else if(preg_match('/\d+(st|nd|rd|th)/', $part)) {
 			$this->parseCount($part, $rule);
 		} else if(in_array(strtolower($part), self::$days)) {
@@ -165,7 +179,7 @@ class Holiday {
 			array_shift($rule);
 			$this->parseCondition($rule);
 		}
-		if (@$rule[0] === 'since') {
+		if ($this->start !== null && @$rule[0] === 'since') {
 			array_shift($rule);
 			$this->parseSince($rule);
 		}
@@ -184,12 +198,133 @@ class Holiday {
 		$this->start = new \DateTime($year.'-'.$monthDay);
 	}
 
-	private function parseEaster($nb) {
-		$ed = easter_days($this->year);
-		$ed += intval($nb);
-		$this->start = new \DateTime($this->year.'-03-21');
-		$this->start->modify(($ed>=0?'+':'').$ed. ' days');
+	private function isMovable($part, $rule) {
+		if(in_array($part, ['easter', 'persian'])) {
+			return true;
+		}
+		// $part would be the dayOfMonth number if we are here
+		if(empty($rule)) {
+			return false;
+		}
+		return preg_match('/^(Muharram|Safar|Rabi al-awwal|Rabi al-thani|Jumada al-awwal|Jumada al-thani|Rajab|Shaban|Ramadan|Shawwal|Dhu al-Qidah|Dhu al-Hijjah)/', $rule[0]. (isset($rule[1]) ? ' '.$rule[1] : '')) ||
+			preg_match('/^(Nisan|Iyyar|Sivan|Tammuz|Av|Elul|Tishrei|Cheshvan|Kislev|Tevet|Shevat|Adar)$/', $rule[0]) ||
+			preg_match('/^(Farvardin|Ordibehesht|Khordad|Tir|Mordad|Shahrivar|Mehr|Aban|Azar|Dey|Bahman|Esfand)$/', $rule[0]);
 	}
+
+	/**
+	 * @param string $type either easter | orthodox or the month number for other movable dates
+	 * @param string[] $rule the rest of the rule or there might be spaces in islamic month names
+	 */
+	private function parseMovable($type, $rule): void {
+		if ($type === 'easter' || $type === 'orthodox') {
+			$ed = easter_days($this->year);
+			$days = array_shift($rule);
+			$ed += intval($days);
+			$this->start = new \DateTime($this->year . '-03-21');
+			$this->start->modify(($ed >= 0 ? '+' : '') . $ed . ' days');
+			return;
+		}
+		if(!is_numeric($type)){
+			return; // we expected numeric at this point because of the isMovable() check
+		}
+		$dayOfMonth = (int)$type;
+		// Islamic (Hijri)
+		if (preg_match('/^(Muharram|Safar|Rabi al-awwal|Rabi al-thani|Jumada al-awwal|Jumada al-thani|Rajab|Shaban|Ramadan|Shawwal|Dhu al-Qidah|Dhu al-Hijjah)/', $rule[0]. (isset($rule[1]) ? ' '.$rule[1] : ''), $m)) {
+			$this->parseIntl('islamic', self::islamicMonths[$m[1]], $dayOfMonth);
+		}
+		// Hebrew
+		elseif (preg_match('/^(Nisan|Iyyar|Sivan|Tammuz|Av|Elul|Tishrei|Cheshvan|Kislev|Tevet|Shevat|Adar)$/', $rule[0], $m)) {
+			$month = self::hebrewMonths[$m[0]];
+			$jd = jewishtojd($month, $dayOfMonth, $this->year + ($month >= 7 ? 3761 : 3762));
+			$this->start = new \DateTime(jdtogregorian($jd));
+		}
+		// Persian
+		elseif (preg_match('/^(Farvardin|Ordibehesht|Khordad|Tir|Mordad|Shahrivar|Mehr|Aban|Azar|Dey|Bahman|Esfand)$/', $rule[0], $m)) {
+			$this->parseIntl('persian', self::persianMonths[$m[1]], $dayOfMonth);
+		}
+	}
+
+	private function parseIntl($calendar, $month, $dayOfMonth) {
+		$gregorianCalendar = \IntlCalendar::createInstance(null, '@calendar=gregorian');
+		$gregorianCalendar->set($this->year, 0, 1); // January 1, current year
+
+		$otherCalendar = \IntlCalendar::createInstance(null, '@calendar='.$calendar);
+		$otherCalendar->setTime($gregorianCalendar->getTime());
+
+		$otherYear = $otherCalendar->get(\IntlCalendar::FIELD_YEAR);
+
+		$otherCalendar->set(\IntlCalendar::FIELD_YEAR, $otherYear);
+		$otherCalendar->set(\IntlCalendar::FIELD_MONTH, $month); // Months are 0-indexed
+		$otherCalendar->set(\IntlCalendar::FIELD_DAY_OF_MONTH, $dayOfMonth);
+
+		$timestamp = (int)($otherCalendar->getTime() / 1000);
+		// Check if this date falls in the target Gregorian year
+		$resultYear = date('Y', $timestamp);
+		if ($resultYear != $this->year) {
+			// Try the next Hijri year
+			$otherCalendar->set(\IntlCalendar::FIELD_YEAR, $otherYear + 1);
+			$timestamp = $otherCalendar->getTime() / 1000;
+		}
+		$this->start = (new \DateTime())->setTimestamp($timestamp);
+	}
+
+
+
+	private function yearConvert($gregorian, $type) {
+		// get timestamp (ms) for Jan 1 of the Gregorian year
+		$gCal = \IntlCalendar::createInstance(null, 'gregorian');
+		$gCal->set($gregorian, 0, 1, 0, 0, 0);
+		$gCal->set(\IntlCalendar::FIELD_MILLISECOND, 0);
+		$ts_ms = $gCal->getTime();
+
+		// create an Islamic calendar and read which Islamic year corresponds to that timestamp
+		$hCal = \IntlCalendar::createInstance(null, $type);
+		$hCal->setTime($ts_ms);
+		return $hCal->get(\IntlCalendar::FIELD_YEAR); // Hijri
+	}
+
+	const persianMonths = [
+		'Farvardin'   => 0,
+		'Ordibehesht' => 1,
+		'Khordad'     => 2,
+		'Tir'         => 3,
+		'Mordad'      => 4,
+		'Shahrivar'   => 5,
+		'Mehr'        => 6,
+		'Aban'        => 7,
+		'Azar'        => 8,
+		'Dey'         => 9,
+		'Bahman'      => 10,
+		'Esfand'      => 11,
+	];
+	const hebrewMonths = [
+		 'Nisan'   => 1,
+		 'Iyyar'   => 2,
+		 'Sivan'   => 3,
+		 'Tamuz'   => 4,
+		 'Av'      => 5,
+		 'Elul'    => 6,
+		 'Tishrei' => 7,
+		 'Cheshvan'=> 8,
+		 'Kislev'  => 9,
+		 'Tevet'   => 10,
+		 'Shvat'   => 11,
+		 'Adar'    => 12, // Adar I/II complication ignored
+	];
+	const islamicMonths = [
+		'Muharram'      => 0,
+		'Safar'         => 1,
+		'Rabi al-awwal' => 2,
+		'Rabi al-thani' => 3,
+		'Jumada al-awwal'=> 4,
+		'Jumada al-thani'=> 5,
+		'Rajab'         => 6,
+		'Shaban'        => 7,
+		'Ramadan'       => 8,
+		'Shawwal'       => 9,
+		'Dhu al-Qidah'  => 10,
+		'Dhu al-Hijjah' => 11,
+	];
 
 	private function parseCondition(&$rule) {
 		$day = array_shift($rule);
