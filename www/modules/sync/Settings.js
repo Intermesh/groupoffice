@@ -130,9 +130,6 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 					model_id: GO.settings.user_id,
 					title: t("name", module)					
 				});
-//				this['panel'+name].getTopToolbar().insert(0,"->");
-//				this['panel'+name].getTopToolbar().insert(0,t("name", module));
-				
 				this.items.push(this['panel'+name]);
 			}
 		}

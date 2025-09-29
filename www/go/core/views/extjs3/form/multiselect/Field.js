@@ -157,11 +157,9 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 	
 
 	setValue: function (records) {
-		
 		if(GO.util.empty(records)) {
 			return;
 		}
-		
 		this._isDirty = false; //todo this is not right but works for our use case
 		var ids;
 		if(this.valueIsId) {
@@ -173,8 +171,7 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 				record[this.idField] = id;
 				records.push(record);
 			}, this);
-		} else
-		{
+		} else {
 			ids = [];
 			records.forEach(function (n) {
 				ids.push(n[this.idField]);
