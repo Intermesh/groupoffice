@@ -1,3 +1,4 @@
+- Calendar: Find participant by e-mail so that scheduling works better when you invite a contact that's also a user
 - E-mail: Missing "None" label for in email composer templates menu. Related to issue #1343
 - Calendar: Reply sometimes wasn't processed because of a case senstive match
 - Calendar: Add sender as participant when saving email as appointment
