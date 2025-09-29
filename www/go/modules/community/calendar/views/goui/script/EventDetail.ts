@@ -143,7 +143,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 								let type = '';
 								if(v.email == this.item?.calendarPrincipal?.email) {
-									type = ' ('+(this.item!.principalId === client.user.id ? t('You') : t('This'))+')';
+									type = ' ('+(this.item!.calendarPrincipal?.email === client.user.email ? t('You') : t('This'))+')';
 								}
 								let name = v.name ? v.name + (v.email ? type+'<br>' + v.email :'') : v.email+type;
 

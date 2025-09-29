@@ -365,16 +365,16 @@ export class CalendarItem {
 		}
 	}
 
-	private randomColor(seed: string) {
-		const colors = [
-			"CDAD00", "E74C3C", "9B59B6", "8E44AD", "2980B9", "3498DB",
-			"1ABC9C", "16A085", "27AE60", "2ECC71", "F1C40F", "F39C12",
-			"E67E22", "D35400", "95A5A6", "34495E", "808B96", "1652A1"
-		];
-
-		let hash = [...seed].reduce((acc, char) => acc + char.charCodeAt(0), 0);
-		return colors[hash % colors.length];
-	}
+	// private randomColor(seed: string) {
+	// 	const colors = [
+	// 		"CDAD00", "E74C3C", "9B59B6", "8E44AD", "2980B9", "3498DB",
+	// 		"1ABC9C", "16A085", "27AE60", "2ECC71", "F1C40F", "F39C12",
+	// 		"E67E22", "D35400", "95A5A6", "34495E", "808B96", "1652A1"
+	// 	];
+	//
+	// 	let hash = [...seed].reduce((acc, char) => acc + char.charCodeAt(0), 0);
+	// 	return colors[hash % colors.length];
+	// }
 
 	downloadIcs(){
 		client.downloadBlobId('community/calendar/ics/'+this.key, this.cal.name + '_'+this.start.format('Y-m-dTHi')+'_'+this.title+'.ics');
@@ -439,12 +439,35 @@ export class CalendarItem {
 			(this.cal.myRights.mayWriteOwn && this.isOwner)) && !this.readOnly;
 	}
 
-	get calendarPrincipal() {
-		if(this.participants && this.principalId)
-			return this.participants[this.principalId];
+	/**
+	 * Finds the participant which e-mail matches the e-mail of the calendar owner.
+	 */
+	get calendarPrincipal() : {[key:string]: any} | undefined {
+		const email = this.principalEmail;
+		if(this.participants) {
+			for(let id in this.participants) {
+				if(this.participants[id].email == email) {
+					return this.participants[id];
+				}
+			}
+		}
+
+		return undefined;
 	}
-	get principalId() {
+
+	/**
+	 * The owner user ID of the calendar item. Shared calendars don't have an owner. In that case it will return the current
+	 * user ID
+	 */
+	get ownerId() {
 		return (this.cal && this.cal.ownerId) ? this.cal.ownerId+'' : client.user.id+''
+	}
+
+	/**
+	 * The e-mail address of the calendar owner of this item
+	 */
+	get principalEmail() : string {
+		return (this.cal && this.cal.owner) ? this.cal.owner.email : client.user.email!;
 	}
 
 	get quickText(): string {

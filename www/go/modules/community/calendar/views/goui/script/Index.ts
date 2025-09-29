@@ -1,4 +1,4 @@
-import {client, jmapds, modules} from "@intermesh/groupoffice-core";
+import {client, jmapds, modules, principalDS} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {router} from "@intermesh/groupoffice-core";
 import {datasourcestore, t as coreT, E, translate, DateTime, Window, h3, Button} from "@intermesh/goui";
@@ -20,7 +20,13 @@ export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year'
 export const calendarStore = datasourcestore({
 	dataSource:jmapds('Calendar'),
 	queryParams:{filter:{isSubscribed: true, davaccountId : null}},
-	sort: [{property:'sortOrder'},{property:'name'}]
+	sort: [{property:'sortOrder'},{property:'name'}],
+	relations: {
+		owner: {
+			path: "ownerId",
+			dataSource: principalDS
+		}
+	}
 });
 
 export const allCalendarStore = datasourcestore({
