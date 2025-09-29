@@ -2,7 +2,7 @@ import {CalendarView} from "./CalendarView.js";
 import {DateInterval, DateTime, E, Format} from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {client} from "@intermesh/groupoffice-core";
-import {allCalendarStore, t} from "./Index.js";
+import {calendarStore, t} from "./Index.js";
 
 class CalendarDayItem extends CalendarItem {
 	pos!: number
@@ -435,7 +435,7 @@ export class WeekView extends CalendarView {
 
 		for(const key in e.calendarIds) {
 			if(key !== e.data.calendarId) {
-				const cal = allCalendarStore.findById(key);
+				const cal = calendarStore.findById(key);
 				if(cal) {
 					backgroundImage += '#'+cal.color+' '+(padding/10)+'rem '+((padding+=6)/10)+'rem, ';
 				}

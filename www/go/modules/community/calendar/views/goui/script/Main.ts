@@ -353,7 +353,7 @@ export class Main extends Component {
 				listeners: {
 					'selectionchange': ({selected}) => {
 						if(selected[0]) {
-							this.applyInCalendarFilter(selected[0].record.calendarIds);
+							this.applyInCalendarFilter(selected[0].record.calendarIds??[]);
 							if(selected[0].record.defaultView) {
 								this.routeTo(selected[0].record.defaultView, this.date);
 								// const parts = selected[0].record.defaultView.split('-');
