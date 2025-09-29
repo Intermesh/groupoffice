@@ -317,6 +317,11 @@ class CalendarEvent extends AclItemEntity {
 					$query->andWhere('cce.calendarId', '=', 0);
 				}
 			}, 'subscribedOnly')
+			->add("hideCancelled",  function(Criteria $criteria, $value, Query $query) {
+				if($value) {
+					$query->andWhere('status', '!=', self::Cancelled);
+				}
+			},true)
 			->add('inCategories', function(Criteria $criteria, $value, Query $query) {
 				if(!empty($value)) {
 					$query->join('calendar_event_category', 'cat', 'cat.eventId = cce.eventId')
