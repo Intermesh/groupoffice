@@ -66,4 +66,5 @@ return array (
   'Create menu item from content' => 'Utwórz element menu z zawartości ',
   'Are you sure that you want to create a menu item from this content item?' => 'Czy na pewno chcesz utworzyć element menu z tego elementu zawartości?',
   'Menu' => 'Menu',
+  'Slug' => 'Slug',
 );
