@@ -1,11 +1,5 @@
-import {
-	checkbox,
-	colorfield, combobox,
-	comp, hiddenfield,
-	textarea,
-	textfield,
-} from "@intermesh/goui";
-import {client, FormWindow, jmapds} from "@intermesh/groupoffice-core";
+import {checkbox, colorfield, combobox, comp, hiddenfield, textarea, textfield,} from "@intermesh/goui";
+import {client, FormWindow, principalDS} from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
 import {t} from "./Index.js";
 
@@ -26,7 +20,7 @@ export class CalendarWindow extends FormWindow {
 			fdAlertField = alertfield({name: 'defaultAlertsWithoutTime',isForDefault:true, fullDay:true, label:t('Events without time (Full-day)')});
 
 		const ownerIdField = combobox({
-				dataSource: jmapds("Principal"), placeholder: t('Shared'),displayProperty: 'name', filter: {entity: 'User'},
+				dataSource: principalDS, placeholder: t('Shared'),displayProperty: 'name', filter: {entity: 'User'},
 				label: t("Owner"), name: "ownerId", filterName: "text", flex:'1 0', clearable:true
 			}).on('setvalue', (e) => {
 				includeInAvailability.value = !availabilityAffectCb.value ? 'none' : e.newValue == client.user.id ? 'all' : 'attending';
@@ -37,13 +31,15 @@ export class CalendarWindow extends FormWindow {
 			}),
 			includeInAvailability = hiddenfield({name: 'includeInAvailability'}).on('setvalue', (e) => {
 				availabilityAffectCb.value = e.newValue!=='none'
-			})
+			}),
+			descriptionFld = textarea({name:'description', label: t('Description'), autoHeight:true}),
+				nameFld = textfield({name: 'name', label: t('Name'), flex:1});
 
 		this.generalTab.items.add(
 			comp({cls:'flow pad'},
-				textfield({name: 'name', label: t('Name'), flex:1}),
-				colorfield({name: 'color', label: t('Color'), width: 100}),
-				textarea({name:'description', label: t('Description'), autoHeight:true}),
+				nameFld,
+				colorfield({name: 'color', label: t('Color'), width: 100, required: true}),
+				descriptionFld,
 				// radio({style:{'width':'auto'}, type:'button',itemId:'type', value: 'personal', options: [
 				// 	{text:t('Personal'), value: 'personal'},
 				// 	{text:t('Shared'), value: 'shared'}
@@ -82,5 +78,16 @@ export class CalendarWindow extends FormWindow {
 			{value: 40,name: t("Delete")},
 			{value: 50,name: t("Manage")}
 		]);
+
+		this.form.on('load', ({data}) => {
+			const editable = !data.id || data.myRights.mayAdmin;
+			this.sharePanel!.disabled = !editable;
+			this.generalTab!.disabled = !data.isSubscribed;
+			if(!data.isSubscribed)
+				this.sharePanel!.show();
+			ownerIdField.hidden = !editable;
+			descriptionFld.hidden = !editable;
+			nameFld.readOnly = !editable;
+		})
 	}
 }

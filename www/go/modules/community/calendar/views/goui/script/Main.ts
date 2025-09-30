@@ -2,7 +2,7 @@ import {
 	btn, Button,
 	CardContainer,
 	cards,
-	checkbox,
+	checkbox, column,
 	comp,
 	Component, datasourcestore,
 	DatePicker,
@@ -11,14 +11,14 @@ import {
 	FunctionUtil, h3, hr, List,
 	list,
 	menu, router,
-	splitter,
+	splitter, table,
 	tbar,
 } from "@intermesh/goui";
 import {MonthView} from "./MonthView.js";
 import {WeekView} from "./WeekView.js";
-import {calendarStore, categoryStore, t, ValidTimeSpan} from "./Index.js";
+import {calendarStore, categoryStore, t, ValidTimeSpan, viewStore} from "./Index.js";
 import {YearView} from "./YearView.js";
-import {SplitView} from "./SpltView.js";
+import {SplitView} from "./SplitView.js";
 import {client, filterpanel, jmapds, modules} from "@intermesh/groupoffice-core";
 import {CalendarView} from "./CalendarView.js";
 import {CategoryWindow} from "./CategoryWindow.js";
@@ -28,6 +28,7 @@ import {CalendarAdapter} from "./CalendarAdapter.js";
 import {ListView} from "./ListView.js";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarList} from "./CalendarList.js";
+import {ViewWindow} from "./ViewWindow";
 
 export class Main extends Component {
 
@@ -41,8 +42,10 @@ export class Main extends Component {
 
 	date: DateTime
 
-	timeSpan: ValidTimeSpan
+	timeSpan!: ValidTimeSpan
 	printCurrentBtn: Button
+
+	inboxBtn: Button
 
 	picker: DatePicker
 	spanAmount?: number = 31 // 2-7, 14, 21, 28
@@ -135,6 +138,7 @@ export class Main extends Component {
 					}
 				}),
 				comp({cls:'scroll'},
+					this.renderViews(),
 					this.calendarList = new CalendarList(),
 					tbar({cls: 'dense'},comp({tagName: 'h3', html: t('Other')})),
 					comp({tagName:'ul', cls:'goui check-list'}, ...this.renderAdapterBoxes()),
@@ -182,11 +186,10 @@ export class Main extends Component {
 							calendarId: CalendarView.selectedCalendarId
 						}})).save()
 					}),
-					btn({
-						cls:'not-medium-device',
+					this.inboxBtn = btn({
+						cls:'not-medium-device accent filled',
 						icon: 'inbox',
 						title: t('Invitations'),
-						hidden: !client.user.calendarPreferences?.autoAddInvitations,
 						menu: menu({}, list({
 							store:inviteStore,
 							renderer: (r, row) => {
@@ -194,6 +197,7 @@ export class Main extends Component {
 									owner = item.owner,
 									press = function(b:Button,s:'accepted'|'tentative'|'declined') {
 										b.el.cls('+pressed');
+										b.disabled;
 										item.updateParticipation(s,() => {
 											inviteStore.reload();
 										});
@@ -275,7 +279,12 @@ export class Main extends Component {
 				)
 			)
 		);
-		this.timeSpan = client.user.calendarPreferences?.startView || 'month';
+		if(client.user.calendarPreferences?.startView) {
+			const parts = client.user.calendarPreferences?.startView.split('-');
+			this.setSpan(parts[0], parseInt(parts[1] ?? 0));
+		} else {
+			this.setSpan('month', 0);
+		}
 		this.date = new DateTime();
 		// NOPE:router will call setSpan and render
 		// calendar store load will call first view update
@@ -298,7 +307,7 @@ export class Main extends Component {
 		let initX = 0, initY = 0;
 		cards.el.on('touchstart', e => {
 			console.log('touchstart');
-			initX = e.changedTouches[0].screenX,
+			initX = e.changedTouches[0].screenX;
 			initY = e.changedTouches[0].screenY;
 		}).on('touchend', e => {
 			const diffX = initX - e.changedTouches[0].screenX,
@@ -312,22 +321,16 @@ export class Main extends Component {
 		})
 	}
 
-	private export(calId: number) {
-
-	}
-
 
 	private applyInCalendarFilter(calendarIds: string[]) {
 		const store = this.adapter.byType('event').store;
 
 		//const calendarIds = Object.keys(this.inCalendars).filter(key => this.inCalendars[key])
-		if(calendarIds.length) {
-			Object.assign(store.queryParams.filter ||= {}, {
-				inCalendars: calendarIds
-			});
-		} else {
-			delete store.queryParams.filter?.inCalendars;
-		}
+
+		Object.assign(store.queryParams.filter ||= {}, {
+			inCalendars: calendarIds
+		});
+
 	}
 
 	private openPDF(type:string) {
@@ -336,6 +339,65 @@ export class Main extends Component {
 
 	private get view() : CalendarView {
 		return this.cards.items.get(this.cards.activeItem) as CalendarView;
+	}
+
+	private renderViews() {
+		const rights = modules.get("community", "calendar")!.userRights;
+		return table({
+			store: viewStore,
+			emptyStateHtml:'',
+			fitParent: true,
+			headers:false,
+			rowSelectionConfig: {
+				multiSelect: false,
+				listeners: {
+					'selectionchange': ({selected}) => {
+						if(selected[0]) {
+							this.applyInCalendarFilter(selected[0].record.calendarIds??[]);
+							if(selected[0].record.defaultView) {
+								this.routeTo(selected[0].record.defaultView, this.date);
+								// const parts = selected[0].record.defaultView.split('-');
+								// if(!parts[1]) parts[1] = 0;
+								// this.setSpan(parts[0], parseInt(parts[1] ?? 0));
+							}
+							this.updateView();
+						}
+					}
+				}
+			},
+			listeners: {
+				'render': ({target}) => {
+					void target.store.load();
+					this.calendarList.on('changevisible', () => { target.rowSelection?.clear() })
+				},
+			},
+			columns:[
+				column({
+					id: "icon",
+					width: 40,
+					renderer: (value, record) => comp({tagName: "i", cls: "icon", text:'group'})
+				}),
+				column({id:'name'}),
+				column({ width: 50,
+					id: '-', renderer: (v, data) => btn({
+						//hidden: !rights.mayChangeViews,
+						icon: 'more_horiz', menu: menu({},
+							btn({
+								icon: 'edit', text: t('Edit'), disabled: !data.myRights.mayAdmin, handler: async _ => {
+									const dlg = new ViewWindow();
+									await dlg.load(data.id);
+									dlg.show();
+								}
+							}),
+							btn({
+								icon: 'delete', text: t('Delete'), disabled: !data.myRights.mayAdmin, handler: async _ => {
+									viewStore.dataSource.confirmDestroy([data.id]);
+								}
+							})
+						)
+					})
+				})]
+		});
 	}
 
 	private renderAdapterBoxes() {
@@ -430,7 +492,10 @@ export class Main extends Component {
 			case 'days':
 			case 'weeks':
 				route += '-'+this.spanAmount;
-				this.date.addDays(value * this.spanAmount!);
+				if(this.spanAmount === 5) // workweek
+					this.date.addDays(value * 7);
+				else
+					this.date.addDays(value * this.spanAmount!);
 				break;
 			case 'split':
 				route += '-'+this.spanAmount;
@@ -507,6 +572,9 @@ export class Main extends Component {
 				this.currentText.text = 'W' + start.format('W') + ' - W' + end.format('W');
 				break;
 			case 'days':
+				if(this.spanAmount === 5) {
+					start.setWeekDay(0); // workweek. start monday
+				}
 				end = start.clone().addDays(this.spanAmount! - 1);
 				this.currentText.text = start.format('j M') + ' - ' + end.format('j M');
 				break;

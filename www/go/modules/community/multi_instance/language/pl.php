@@ -22,4 +22,5 @@ return array (
   'Instance' => 'Instancja',
   'Maximum number of users' => 'Maksymalna liczba użytkowników',
   'Multi instance' => 'Wiele instancji',
+  'Is trial' => 'Wersja próbna',
 );

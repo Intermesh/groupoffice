@@ -1106,6 +1106,7 @@ public function historyLog(): bool|array
 	private function createPersonalGroup(): Group
 	{
 		$personalGroup = new Group();
+		$personalGroup->createdBy = $this->id;
 		$personalGroup->name = $this->username;
 		$personalGroup->isUserGroupFor = $this->id;
 		$personalGroup->users[] = $this->id;

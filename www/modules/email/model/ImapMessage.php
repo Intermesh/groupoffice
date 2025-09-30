@@ -8,6 +8,7 @@ use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\Settings;
+use go\modules\community\calendar\model\ICalendarHelper;
 use GO\Savemailas\Model\LinkedEmail;
 use GO\Savemailas\SavemailasModule;
 
@@ -754,7 +755,7 @@ class ImapMessage extends ComposerMessage {
 				$data = $this->getImapConnection()->get_message_part_decoded($this->uid, $attachment->number, $attachment->encoding, $attachment->charset, true);
 				$data = trim(StringUtil::normalizeCrlf($data));
 				try {
-					$vcalendar = \GO\Base\VObject\Reader::read($data);
+					$vcalendar = ICalendarHelper::read($data);
 					if($vcalendar && isset($vcalendar->vevent[0]))
 						return $vcalendar;
 				}

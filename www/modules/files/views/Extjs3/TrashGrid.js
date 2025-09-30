@@ -20,6 +20,7 @@ GO.files.TrashGrid = function (config = {}) {
         }, {
             header: t("Type"),
             name: "entity",
+            sortable: false,
             width: 50,
             renderer: function(v) {
                 let cls = "filetype ";
@@ -31,16 +32,22 @@ GO.files.TrashGrid = function (config = {}) {
             }
         }, {
             header: t("Name"),
+            id: "name",
+            dataIndex: "name",
             name: "name"
         }, {
             header: t("Path"),
+            id: "fullPath",
+            dataIndex: "fullPath",
             name: "fullPath"
         }, {
             header: t("Deleted by"),
             name: "deletedByUser",
+            dataIndex: "deletedByUser"
         }, {
             header: t("Deleted at"),
             name: "deletedAt",
+            dataIndex: "deletedAt",
             renderer: function(v) {
                 const dt = new Date(v);
                 return dt.format(go.User.dateFormat);

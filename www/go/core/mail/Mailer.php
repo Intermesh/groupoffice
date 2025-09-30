@@ -41,25 +41,22 @@ class Mailer {
 	 * From e-mail that will be used when you use {@see compose()}
 	 *
 	 * This is set when you use {@see App::getMailer()}
-	 * @var string
 	 */
-	public string $fromEmail;
+	public string|null $fromEmail;
 
 	/**
 	 * From name that will be used when you use {@see compose()}
 	 *
 	 * This is set when you use {@see App::getMailer()}
-	 * @var string
 	 */
-	public string $fromName;
+	public string|null $fromName;
 
 	/**
 	 * Reply-To header that will be used when you use {@see compose()}
 	 *
 	 * This is set when you use {@see App::getMailer()}
-	 * @var string
 	 */
-	public string $replyTo;
+	public string|null $replyTo;
 
 	/**
 	 * Create a new mail message
@@ -423,6 +420,10 @@ class Mailer {
 			$this->mail->AltBody = $message->getAlternateBody();
 		}
 
+		if($message->getIcalendar()) {
+			$this->mail->Ical = $message->getIcalendar();
+		}
+
 		foreach ($message->getHeaders() as $name => $value) {
 			$this->mail->addCustomHeader($name, $value);
 		}
@@ -463,5 +464,11 @@ class Mailer {
 		if(!$log->save()){
 			ErrorHandler::log("Failed to write e-mail log");
 		}
+	}
+
+
+	public function sendMime(string $mime) : bool {
+		$this->initTransport();
+		return $this->mail->sendMime($mime);
 	}
 }

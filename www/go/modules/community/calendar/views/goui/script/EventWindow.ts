@@ -1,14 +1,24 @@
 import {
 	autocompletechips,
 	browser,
-	btn, Button,
-	checkbox, CheckboxField, checkboxselectcolumn,
+	btn,
+	Button,
+	checkbox,
+	CheckboxField,
+	checkboxselectcolumn,
 	column,
-	comp, containerfield,
+	comp,
+	containerfield,
 	datasourcestore,
 	DateInterval,
-	DateTime, datetimefield, DateTimeField,
-	Format, MapField, mapfield, Notifier, numberfield,
+	DateTime,
+	datetimefield,
+	DateTimeField,
+	Format,
+	MapField,
+	mapfield,
+	Notifier,
+	numberfield,
 	radio,
 	select,
 	store,
@@ -17,8 +27,9 @@ import {
 	textfield,
 	TextField,
 	win,
+	Window,
 } from "@intermesh/goui";
-import {client, FormWindow, JmapDataSource, jmapds, recurrencefield} from "@intermesh/groupoffice-core";
+import {client, FormWindow, JmapDataSource, principalDS, recurrencefield} from "@intermesh/groupoffice-core";
 import {categoryStore, t, writeableCalendarStore} from "./Index.js";
 import {ParticipantField, participantfield} from "./ParticipantField.js";
 import {AlertField, alertfield} from "./AlertField.js";
@@ -39,7 +50,7 @@ export class EventWindow extends FormWindow {
 	private attachments:MapField
 	private btnFreeBusy: Button
 	private locationField: TextField
-	private participantFld: ParticipantField
+	public readonly participantFld: ParticipantField
 
 	private titleField: TextField
 	private alertField: AlertField
@@ -178,11 +189,12 @@ export class EventWindow extends FormWindow {
 							this.alertField.setDefaultLabel(d)
 							if(!this.item?.key && !this.participantFld.list.isEmpty()) {
 								// calendar changed and event is new, check if organizer needs to change as well
-								jmapds('Principal').single(this.item!.principalId).then(p=>{
-									if(p)
-										this.participantFld.addOrganiser(p);
-										this.participantFld.list.trackReset();
-								});
+								principalDS.single(this.item!.ownerId).then(p=> {
+									this.participantFld.addOrganiser(p);
+									// this.participantFld.list.trackReset();
+								}).catch(e => {
+									void Window.error(t("Could not add organizer because the calendar principal could not be read from the server. Do you have permissions?"));
+								})
 							}
 						});
 
@@ -227,10 +239,11 @@ export class EventWindow extends FormWindow {
 					},
 					'beforeadd': ({target}) => {
 						if(target.list.isEmpty()) {
-							jmapds('Principal').single(this.item!.principalId).then(p=>{
-								if(p)
-									target.addOrganiser(p);
-							});
+							principalDS.single(this.item!.ownerId).then(p=>{
+								target.addOrganiser(p);
+							}).catch(e => {
+								void Window.error(t("Could not add organizer because the calendar principal could not be read from the server. Do you have permissions?"));
+							})
 						}
 					}
 				}
@@ -343,7 +356,7 @@ export class EventWindow extends FormWindow {
 				fitParent:true,
 				store: exceptionStore,
 				columns: [
-					column({id: "recurrenceId", header:t('Start'), renderer(v,record) {
+					column({id: "recurrenceId",htmlEncode:false, header:t('Start'), renderer(v,record) {
 						return Format.dateTime(v)+ '<br><small>'+t(record.excluded ? 'Excluded' : 'Override')+'</small>';
 					}}),
 					column({id: "excluded", header: '', width:90, renderer: (v,r) => btn({icon:'delete',handler:()=>{
@@ -430,6 +443,15 @@ export class EventWindow extends FormWindow {
 		} else {
 			this.item!.confirmScheduleMessage(this.parseSavedData(this.form.modified), () => {
 				this.confirmedScheduleMessage = true;
+
+				// allow long timeout for sending invitations
+				const oldTimeout = client.requestTimeout;
+				client.requestTimeout = 180000;
+				this.form.on("submit", () => {
+					// reset after submit
+					client.requestTimeout = oldTimeout;
+				}, {once: true});
+
 				this.form.submit();
 				this.confirmedScheduleMessage = false;
 			});
@@ -438,6 +460,8 @@ export class EventWindow extends FormWindow {
 			return false;
 		}
 	}
+
+
 
 	private attachFile() {
 		 browser.pickLocalFiles(true).then(files => {

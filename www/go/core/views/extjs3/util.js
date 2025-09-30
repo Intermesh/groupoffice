@@ -252,7 +252,7 @@ go.util =  (function () {
 			}
 
 			// https://en.wikipedia.org/wiki/Geo_URI_scheme
-			const uri = "maps:q=" + adr;
+			const uri = "geo:q=" + adr;
 
 			const a = document.createElement("a");
 			a.setAttribute("target", "_blank");
@@ -657,8 +657,6 @@ go.util =  (function () {
 
 				return BaseHref + "views/Extjs3/themes/Paper/img/broken-image.svg";
 			});
-
-		return this.blobCache[blobId];
 	},
 
 		/**

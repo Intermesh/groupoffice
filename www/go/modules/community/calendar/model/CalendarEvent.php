@@ -7,8 +7,10 @@
 
 namespace go\modules\community\calendar\model;
 
+use DateTimeInterface;
 use DateTimeZone;
 use Exception;
+use Generator;
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
 use go\core\ErrorHandler;
@@ -17,6 +19,7 @@ use go\core\exception\JsonPointerException;
 use go\core\fs\Blob;
 use go\core\model\Acl;
 use go\core\model\Alert as CoreAlert;
+use go\core\model\Principal;
 use go\core\model\User;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\exception\SaveException;
@@ -99,7 +102,7 @@ class CalendarEvent extends AclItemEntity {
 	/**
 	 * A unique identifier for the object.
 	 */
-	public ?string $uid;
+	public ?string $uid = null;
 
 	/**
 	 * This is only set when somebody is invited to a single occurrence of a series.
@@ -110,6 +113,11 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	public ?string $recurrenceId = null;
 
+	/**
+	 * Used for recurring series when an override excludes this instance
+	 *
+	 * @var bool|null
+	 */
 	public ?bool $excluded = false;
 
 	/**
@@ -127,9 +135,9 @@ class CalendarEvent extends AclItemEntity {
 
 	/**
 	 * The start time of the event
-	 * @var ?\DateTimeInterface|null
+	 * @var ?DateTimeInterface|null
 	 */
-	public ?\DateTimeInterface $start;
+	public ?DateTimeInterface $start;
 
 	public $utcStart;
 	public $utcEnd;
@@ -139,7 +147,7 @@ class CalendarEvent extends AclItemEntity {
 	 * (optional, default: PT0S)
 	 *
 	 */
-	public ?string $duration;
+	public ?string $duration =  null;
 
 	/**
 	 * The title
@@ -154,7 +162,7 @@ class CalendarEvent extends AclItemEntity {
 	/**
 	 * The location where the event takes place
 	 */
-	public ?string $location;
+	public ?string $location = null;
 
 	/**
 	 * Status of event (confirmed, canceled, tentative)
@@ -285,9 +293,11 @@ class CalendarEvent extends AclItemEntity {
 	 * @param $userId int id of owner
 	 */
 	static function findForUser($uid, $userId) {
-		return self::find()->join('core_user', 'u', 'u.id = cal.ownerId')
-			->where(['cal.ownerId' => $userId, 'eventdata.uid'=>$uid])
-			->filter(['permissionLevel' => 25]); // rsvp
+		return self::findFor($userId)
+			->where([
+				'cal.ownerId' => $userId,
+				'eventdata.uid' => $uid
+			]);
 	}
 
 	public function isPrivate(){
@@ -302,8 +312,16 @@ class CalendarEvent extends AclItemEntity {
 						->where('ucal.isSubscribed','=', true);
 				} else if(!empty($value)) {
 					$query->andWhere('cce.calendarId', '=', $value);
+				} else {
+					// empty inCalendars filter will return no CalendarEvents
+					$query->andWhere('cce.calendarId', '=', 0);
 				}
 			}, 'subscribedOnly')
+			->add("hideCancelled",  function(Criteria $criteria, $value, Query $query) {
+				if($value) {
+					$query->andWhere('status', '!=', self::Cancelled);
+				}
+			},true)
 			->add('inCategories', function(Criteria $criteria, $value, Query $query) {
 				if(!empty($value)) {
 					$query->join('calendar_event_category', 'cat', 'cat.eventId = cce.eventId')
@@ -335,21 +353,33 @@ class CalendarEvent extends AclItemEntity {
 			},1);
 	}
 
-
-	public function categoryNames() {
-			return go()->getDbConnection()
-				->select('name')
-				->from('calendar_category')
-				->where('id','IN', $this->categoryIds)
-			->fetchMode(\PDO::FETCH_COLUMN, 0)->all();
+	public function categoryNames(): array
+	{
+		return go()->getDbConnection()
+			->select('name')
+			->from('calendar_category')
+			->where('id','IN', $this->categoryIds)
+			->fetchMode(\PDO::FETCH_COLUMN, 0)
+			->all();
 	}
-	public function categoryIdsByName($names) {
+	public function categoryIdsByName($names): void
+	{
 		$this->categoryIds = [];
 		foreach($names as $name) {
-			$id = go()->getDbConnection()->selectSingleValue('id')->from('calendar_category')
+			$idsQuery = go()->getDbConnection()
+				->selectSingleValue('id')
+				->from('calendar_category')
 				->where('name', '=', $name)
-				->andWhere((new Criteria())->where('ownerId','=', go()->getUserId())->orWhere('ownerId','IS', null))
-				->andWhere((new Criteria())->where('calendarId', '=', $this->calendarId)->orWhere('calendarId', 'IS', null))->single();
+				->andWhere(
+					(new Criteria())
+						->where('ownerId','=', go()->getUserId())->orWhere('ownerId','IS', null));
+
+			// sometimes not set for new events.
+			if(isset($this->calendarId)) {
+				$idsQuery->andWhere((new Criteria())->where('calendarId', '=', $this->calendarId)->orWhere('calendarId', 'IS', null));
+			}
+
+			$id = $idsQuery->single();
 			if(!empty($id)) {
 				$this->categoryIds[] = $id;
 			}
@@ -426,7 +456,7 @@ class CalendarEvent extends AclItemEntity {
 		if(empty($this->start)) {
 			$end = new DateTime();
 		} else {
-			$end = new DateTime($this->start->format("Y-m-d" . ($withoutTime ? '' : " H:i:s")), $this->timeZone());
+			$end = $this->start();
 		}
 		if(!empty($this->duration))
 			$end->add(new \DateInterval($this->duration));
@@ -503,7 +533,8 @@ class CalendarEvent extends AclItemEntity {
 	/**
 	 * Will create Psuedo CalendarEvent objects from a recurring event.
 	 * All recurrence exceptions will be patched copies with the recurrenceId set
-	 * @return \Generator | [recurrenceId:string]:CalendarEvent
+	 * @return Generator<string, CalendarEvent>
+	 * @throws JsonPointerException
 	 */
 	public function overrides($modifiedOnly = false) {
 		if($this->isInstance()) {
@@ -513,10 +544,7 @@ class CalendarEvent extends AclItemEntity {
 		if(isset($this->recurrenceOverrides)) {
 			foreach ($this->recurrenceOverrides as $recurrenceId => $override) {
 				if (!$modifiedOnly || $override->isModified()) {
-					if($override->excluded) {
-						yield $recurrenceId => $override;
-					} else
-						yield $recurrenceId => $this->patchedInstance($recurrenceId);
+					yield $recurrenceId => $this->patchedInstance($recurrenceId);
 				}
 			}
 		}
@@ -536,6 +564,7 @@ class CalendarEvent extends AclItemEntity {
 
 		$e = JSON::patch($this->copy(), $patchArray);
 		$e->recurrenceId = $recurrenceId;
+		$e->excluded = isset($this->recurrenceOverrides[$recurrenceId]) && $this->recurrenceOverrides[$recurrenceId]->excluded;
 		unset($e->recurrenceRule, $e->recurrenceOverrides); // , $e->sentBy, $e->relatedTo,
 		return $e;
 		//return (new self())->setValues(array_merge($this->toArray(), $patch->toArray()));
@@ -631,7 +660,7 @@ class CalendarEvent extends AclItemEntity {
 			$this->useDefaultAlerts = false;
 		}
 		if(empty($this->prodId) || $this->prodId === 'Unknown') {
-			$this->prodId = str_replace('{VERSION}', go()->getVersion(),self::PROD);
+			$this->prodId = self::prodId();
 		}
 
 		if(!empty($this->participants)) {
@@ -664,6 +693,10 @@ class CalendarEvent extends AclItemEntity {
 			$this->incrementCalendarModSeq();
 		}
 		return $success;
+	}
+
+	public static function prodId() : string {
+		return str_replace('{VERSION}', go()->getVersion(),self::PROD);
 	}
 
 	public function currentUserIsOwner() {
@@ -799,11 +832,15 @@ class CalendarEvent extends AclItemEntity {
 	 * @param $email string the scheduleId
 	 * @return false|Participant
 	 */
-	public function participantByScheduleId($email) {
+	public function participantByScheduleId(string $email): bool|Participant
+	{
 		if(empty($this->participants))
 			return false;
+
+		$email = strtolower($email);
+
 		foreach($this->participants as $participant) {
-			if($participant->email === $email) { // todo Use scheduleId when ParticipantIdentity is implemented
+			if(strtolower($participant->email) === $email) {
 				return $participant;
 			}
 		}

@@ -118,7 +118,7 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 						//properties: ['id', 'displayName', 'email']
 					}),
 					columns: [
-						column({id:'type',width:50, renderer: (v, r) => {
+						column({id:'type',htmlEncode: false,width:50, renderer: (v, r) => {
 								if(r.avatarId) {
 									return avatar({backgroundImage: client.downloadUrl(r.avatarId)});
 								}
@@ -127,6 +127,7 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 							} }),
 						column({
 							id: "name",
+							htmlEncode: false,
 							renderer: (v, record) => {
 								let name = Format.escapeHTML(v);
 								if(!isNaN(record.id)) {

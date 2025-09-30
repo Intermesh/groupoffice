@@ -192,6 +192,7 @@ export class DomainTable extends Table<DataSourceStore> {
 				id: "mxStatus",
 				resizable: false,
 				width: 80,
+				htmlEncode: false,
 				renderer: (v, record) => {
 
 					return mailDomainStatus(record);

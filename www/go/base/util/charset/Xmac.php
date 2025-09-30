@@ -162,42 +162,32 @@ class Xmac {
 			"FB" => array(0x00A9), // COPYRIGHT SIGN
 	);
 
-	public static function uniord($c) {
-		$ord0 = ord($c{0});
+	/**
+	 * @param array $c
+	 * @return float|int|null
+	 * @deprecated
+	 */
+	public static function uniord(array $c): int|float|null
+	{
+		$ord0 = ord($c[0]);
 		if ($ord0 >= 0 && $ord0 <= 127)
 			return $ord0;
-		$ord1 = ord($c{1});
+		$ord1 = ord($c[1]);
 		if ($ord0 >= 192 && $ord0 <= 223)
 			return ($ord0 - 192) * 64 + ($ord1 - 128);
-		$ord2 = ord($c{2});
+		$ord2 = ord($c[2]);
 		if ($ord0 >= 224 && $ord0 <= 239)
 			return ($ord0 - 224) * 4096 + ($ord1 - 128) * 64 + ($ord2 - 128);
-		$ord3 = ord($c{3});
+		$ord3 = ord($c[3]);
 		if ($ord0 >= 240 && $ord0 <= 247)
 			return ($ord0 - 240) * 262144 + ($ord1 - 128) * 4096 + ($ord2 - 128) * 64 + ($ord3 - 128);
-		return false;
+		return null;
 	}
 
 	public static function toUtf8($string, $charset) {
 
 		if(!\GO\Base\Util\StringHelper::is8bit($string,$charset))
 			return $string;
-		
-//		$searches = array();
-//		$replaces = array();
-//		foreach (self::$map as $key => $values) {
-////			if($key!='C1')
-////				continue;
-//			
-//			$replace = '';
-//			foreach ($values as $val)
-//				$replace.=self::unicodeToUtf8($val);
-//			
-//			 $searches[] = chr(hexdec($key));
-//			//echo hexdec($key).' ';
-//			$replaces[] = $replace;
-//		}
-//		return str_replace($searches, $replaces, $string);
 
 		$out = '';
 		$len = strlen($string);

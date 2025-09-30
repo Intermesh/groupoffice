@@ -203,7 +203,7 @@ th {
 
 				break;
 			case 'csv':
-				fputcsv($this->fp, $array, $this->delimiter, $this->enclosure);
+				fputcsv($this->fp, $array, $this->delimiter, $this->enclosure, "");
 				break;
 			default:
 

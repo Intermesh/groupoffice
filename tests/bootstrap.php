@@ -110,7 +110,7 @@ try {
 				continue;
 			}
 			if ($moduleController->autoInstall() && $moduleController->isInstallable()) {
-				Module::install($moduleController->name());
+				Module::install($moduleController->name(), false, $moduleController::getDefaultSortOrder());
 			}
 		}
 

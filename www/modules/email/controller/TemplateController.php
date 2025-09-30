@@ -135,6 +135,7 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 			'group' => 'templates',
 			'checked'=>isset($this->_defaultTemplate->template_id) && $this->_defaultTemplate->template_id==0,
 			'name' => \GO::t("None", "legacy", "email"),
+			'text' => \GO::t("None", "legacy", "email"),
 			'template_id'=>0
 		));
 

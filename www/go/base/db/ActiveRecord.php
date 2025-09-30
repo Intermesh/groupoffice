@@ -636,10 +636,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 *
 	 * This function can be overridden in the model.
 	 *
-	 * @param type $attribute
-	 * @param type $label
+	 * @param string $attribute
+	 * @param string $label
 	 */
-	public function setAttributeLabel($attribute,$label) {
+	public function setAttributeLabel(string $attribute, string $label) {
 			$this->columns[$attribute]['label'] = $label;
 	}
 
@@ -652,7 +652,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	}
 
 	/**
-	 * Can be overriden to initialize the model. Useful for setting attribute
+	 * Can be overridden to initialize the model. Useful for setting attribute
 	 * validators in the columns property for example.
 	 */
 	protected function init(){}
@@ -3115,7 +3115,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if($this->isNew){
 
 			//automatically set sort order column
-			if($this->getSortOrderColumn())
+			if($this->getSortOrderColumn() && empty($this->{$this->getSortOrderColumn()}))
 				$this->{$this->getSortOrderColumn()}=$this->nextSortOrder();
 
 			$wasNew=true;

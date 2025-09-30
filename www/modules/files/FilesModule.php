@@ -47,6 +47,14 @@ class FilesModule extends \GO\Base\Module{
 		$c->addListener('store', "GO\Files\FilesModule", "afterBatchEditStore");
 
 	}
+
+	/**
+	 * Default sort order when installing. If null it will be auto generated.
+	 * @return int|null
+	 */
+	public static function getDefaultSortOrder() : ?int{
+		return 30;
+	}
 	
 
 	public function checkDatabase(&$response) {

@@ -97,6 +97,8 @@ class ScanEmailForInvites extends CronJob {
 				], ['userId'=>$setting->userId])
 					->execute();
 			}
+
+			go()->debug("Finished scanning for invites");
 		}
 	}
 

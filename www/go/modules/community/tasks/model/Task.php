@@ -64,10 +64,10 @@ class Task extends AclItemEntity {
 	public ?string $responsibleUserId = null;
 
 	/** @var ?int used for the kanban groups */
-	public ?int $groupId;
+	public ?int $groupId = null;
 
-	public ?int $projectId ;
-	public ?int $mileStoneId ;
+	public ?int $projectId = null ;
+	public ?int $mileStoneId= null;
 
 	public ?string $createdBy;
 
@@ -81,13 +81,13 @@ class Task extends AclItemEntity {
 	public $filesFolderId;
 
 	/** @var ?DateTimeInterface due date (when this should be finished) */
-	public ?DateTimeInterface $due;
+	public ?DateTimeInterface $due = null;
 
 	/** @var ?DateTimeInterface local date when this task will be started */
-	public ?DateTimeInterface $start;
+	public ?DateTimeInterface $start = null;
 
 	/** @var ?int Duration Estimated duration in seconds the task takes to complete. */
-	public ?int $estimatedDuration;
+	public ?int $estimatedDuration = null;
 
 	/** @var int Progress Defines the progress of this task */
 	protected int $progress = Progress::NeedsAction;
@@ -96,29 +96,29 @@ class Task extends AclItemEntity {
 	public ?DateTimeInterface $progressUpdated;
 	public string $title;
 
-	public ?string $description;
+	public ?string $description = null;
 
-	public ?string $location;
+	public ?string $location = null;
 
 	//public $keywords; // only in jmap
 
 	/** @var int[] */
 	public array $categories= [];
 
-	public ?string $color;
+	public ?string $color = null;
 
 	/**
 	 * Start time in H:m
 	 *
 	 * @var ?string
 	 */
-	public ?string $startTime;
+	public ?string $startTime = null;
 
-	public ?float $latitude;
+	public ?float $latitude = null;
 
-	public ?float $longitude;
+	public ?float $longitude = null;
 
-  protected ?string $recurrenceRule;
+  protected ?string $recurrenceRule = null;
 
 	/** @var int [0-9] 1 = highest priority, 9 = lowest, 0 = undefined */
 	public int $priority = self::PRIORITY_NORMAL;
@@ -132,12 +132,12 @@ class Task extends AclItemEntity {
 	/** @var int between 0 and 100 */
 	public int $percentComplete = 0;
 
-	protected ?string $uri;
+	protected ?string $uri = null;
 
     /** @var Alert[] List of notification alerts when $useDefaultAlerts is not set */
 	public array $alerts = [];
 
-	public ?string $vcalendarBlobId;
+	public ?string $vcalendarBlobId = null;
 
 	/**
 	 * Time booked in seconds. Filled by timeregistration2 module.
@@ -729,6 +729,10 @@ class Task extends AclItemEntity {
 	public function setUri(string $uri): void
 	{
 		$this->uri = $uri;
+	}
+
+	public function uri(){
+		return $this->uri;
 	}
 
 	/**

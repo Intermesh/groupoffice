@@ -174,7 +174,7 @@ class RecurrenceOverride extends Property
 
 	public function toArray(array|null $properties = null): array|null
 	{
-		if(empty($this->props)) return null;
+		if(empty($this->props) || !isset($this->patch)) return null;
 		return json_decode($this->patch,true);
 	}
 

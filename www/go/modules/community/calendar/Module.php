@@ -5,7 +5,10 @@ use DateInterval;
 use Faker\Generator;
 use go\core;
 use go\core\cron\GarbageCollection;
+use go\core\model\Group;
 use go\core\model\Link;
+use go\core\model\Module as GoModule;
+use go\core\model\Permission;
 use go\core\model\User;
 use go\core\orm\Property;
 use go\core\orm\Query;
@@ -31,6 +34,14 @@ class Module extends core\Module
 		return self::STATUS_STABLE;
 	}
 
+	/**
+	 * Default sort order when installing. If null it will be auto generated.
+	 * @return int|null
+	 */
+	public static function getDefaultSortOrder() : ?int{
+		return 20;
+	}
+
 
 	public function getAuthor(): string
 	{
@@ -47,6 +58,7 @@ class Module extends core\Module
 			'mayChangeCalendars', // allows Calendar/set (hide ui elements that use this)
 			'mayChangeCategories', // allows creating global categories for everyone. Personal cats can always be created.
 			'mayChangeResources',
+			'mayChangeViews'
 		];
 	}
 
@@ -267,6 +279,15 @@ class Module extends core\Module
 		include __DIR__.'/views/imip.php'; // use same html as email because why not
 		require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageFooter.php');
 
+	}
+
+	protected function beforeInstall(GoModule $model): bool
+	{
+		// Share module with Internal group
+		$model->permissions[Group::ID_INTERNAL] = (new Permission($model))
+			->setRights(['mayRead' => true]);
+
+		return parent::beforeInstall($model);
 	}
 
 	protected function afterInstall(CoreModule $model): bool {

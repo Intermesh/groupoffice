@@ -1,3 +1,87 @@
+29-09-2025: 25.0.56
+- Calendar: Find participant by e-mail so that scheduling works better when you invite a contact that's also a user
+- E-mail: Missing "None" label for in email composer templates menu. Related to issue #1343
+- Calendar: Reply sometimes wasn't processed because of a case sensitive match
+- Calendar: Add sender as participant when saving email as appointment 
+- Project3: Save email as project fixed
+- Core: Fix render bug in Ext multiselect fields #1345
+- Calendar: Hide cancelled events
+- Core: PL translations. Again: many thanks Krzysztof!
+
+22-09-2025: 25.0.55
+- Calendar: Added Views (selection of calendars in a choisen period with 1-click)
+- Calendar: If the same event occurs in multiple selected calendars the week view will show them stacked.
+- wopi: allow co-editing when file is locked
+- onlyoffice: allow co-editing when file is locked
+- Address book: replace deprecated maps: uri with geo: uri
+- Calendar: Add Polish translations #1343 - Thanks Krzysztof!
+
+15-09-2025: 25.0.54
+- Calendar: cron job could add duplicate event because it didn't find the event already created by other means like 
+  ActiveSync or the e-mail module.
+- Calendar: Handle missing sequence
+- Core: Fixed duplicate user groups issue
+- Core: fix deprecated error in ActiveRecord Excel Import/Export (#1336)
+- Support: (cherry pick from 6.8) more helpful email message upon failed IMAP import
+- OnlyOffice: fix JWT error message
+- OnlyOffice: fix stylesheet
+
+09-09-2025: 25.0.53
+- Core: Don't log cannotcalulatechanges exception as it's not a problem
+- Calendar: Fix jistimeet JWT Authentication
+- Core: Fixed handling of outlook invites in z-push / ActiveSync
+- Email: Fixed issue: Sieve working with Docker-Mailserver? #1338
+- ActiveSync: Send message MIME without processing if smime signed. Fixes: Users cannot maintain S/mime certificates / 
+  Sending Smime from IOS broken #1337
+- ActiveSync: Fixed Duplicate Entries via ZPush #1333
+
+
+09-09-2025: 25.0.52
+- Calendar: Fix Typed property go\\modules\\community\\calendar\\model\\Holiday::$region must not be accessed before
+  initialization
+- Calendar: Fix reply not being processed by gmail because prodid must be set to Group-Office's.
+- Calendar: Make sure calendar store is loaded when handling invitations. Otherwise the status buttons 
+  didn't appear or you could change status for the wrong participant
+- Calendar: Favor the personal item over the shared ones when only displaying meetings merged
+- Calendar: Respect freebusy permissions
+
+08-09-2025: 25.0.51
+- Calendar: Added fallback to user timezone if the timezone can't be determined
+- Caldav: Sort personal calendar on top as Sabredav picks the first in the list for invites.
+- Projects: Fixed issue where files and comments wouldn't display on project
+- Calendar: Merge multiple regional holidays into one
+- Newsletters: fix error in smtp workflow
+- Files: make trash sortable by name, path, deletion date, deletedBy user
+- Calendar: Background of unaccepted events not white but with opacity
+- Calendar: Only show one calendar item of a meeting to avoid a very crowded view
+- Time registration: Fix task list refresh when switching projects
+- Caldav: When scheduling via caldav the event could end up in the wrong calendar if the invited
+  e-mail matched another e-mail address using wild cards. eg. "bar@foo.com" could find
+  "foobar@foo.com" because it searched using %bar@foo.com%.
+- Calendar: Fixed: go\modules\community\calendar\model\Scheduler::handle(): Argument #1 ($event) must be of type 
+  go\modules\community\calendar\model\CalendarEvent, go\modules\community\calendar\model\RecurrenceOverride given, 
+  called in /usr/local/share/src/www/go/modules/community/calendar/model/Scheduler.php on line 46
+- Calendar: reuse mailer for invites and allow 180s timeout. Improve error message ion screen if timeout occurs
+
+
+02-09-2025: 25.0.50
+- ActiveSync: Fixed Error in modules/z-push/backend/go/TaskStore.php at line 237: Typed property 
+  go\modules\community\tasks\model\Task::$start must not be accessed before initialization
+- Tasks: Added "Sync to device" option for ActiveSync and CalDAV sync
+
+01-09-2025: 25.0.49
+- ActiveSync: Fix error in scheduling request via mail and z-push. Fixes z-push sync email iOS more than one month
+  #1324
+- CalDAV: Optimized calendar query performance
+
+01-09-2025: 25.0.48
+- Calendar: Map cutype room to location. Fixes database error when cutype was 'room' in an invitation.
+- Calendar: Sometimes events lost duration and suddenly spanned 2 days in the view.
+- Caldav: Fixed sync issue with participants without name in recurring events
+- Caldav: Be more forgiving with broken events. Omit broken event instead of complete failure. 
+- Calendar: Required ActiveSync database columns are not created, no sync possible - after 25.0.41 #1327
+- Calendar: Fixed copy & paste on the same day
+
 28-08-2025 25.0.47
 - Core: App::USER_MAILER event so calendar can send scheduling mails with user from address
 - Core: Contacts showed in group member grid

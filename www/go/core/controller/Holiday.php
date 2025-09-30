@@ -3,6 +3,7 @@
 namespace go\core\controller;
 
 use go\core\Controller;
+use go\modules\community\calendar\model;
 
 class Holiday extends Controller
 {
@@ -12,11 +13,18 @@ class Holiday extends Controller
 		$from = new \DateTime($params['from']);
 		$till = new \DateTime($params['till']);
 		$list = [];
-		foreach(\go\core\model\Holiday::generate($params['set'],$params['lang'],$from, $till) as $holiday){
-			$list[] = $holiday;
+		foreach(model\Holiday::generate($params['set'],$params['lang'],$from, $till) as $holiday){
+			$key = $holiday->title .'-'.$holiday->start;
+			if(isset($list[$key])) {
+				if(isset($list[$key]->region)) {
+					$list[$key]->region .= ', ' . $holiday->region;
+				}
+			} else {
+				$list[$key] = $holiday;
+			}
 		}
 		return [
-			'list'=> $list
+			'list'=> array_values($list)
 		];
 	}
 }

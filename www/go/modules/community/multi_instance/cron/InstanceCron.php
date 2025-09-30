@@ -11,7 +11,7 @@ use Throwable;
 class InstanceCron extends CronJob {
 
 	/**
-	 * docker-compose exec -u www-data groupoffice ./www/cli.php core/System/runCron --name=InstanceCron --module=multi_instance --package=community
+	 * docker compose exec -u www-data groupoffice ./www/cli.php core/System/runCron --name=InstanceCron --module=multi_instance --package=community
 	 */
 	public function run(CronJobSchedule $schedule) {
 		//The server manager calls cron via HTTP because it doesn't know the document root when running

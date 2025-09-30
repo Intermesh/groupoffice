@@ -40,9 +40,9 @@ class Writer extends Reader{
 
     try {
       if (isset($this->enclosure)) {
-        return fputcsv($this->fp, $fields, $this->delimiter, $this->enclosure);
+        return fputcsv($this->fp, $fields, $this->delimiter, $this->enclosure, "");
       } else {
-        return fputcsv($this->fp, $fields, $this->delimiter);
+        return fputcsv($this->fp, $fields, $this->delimiter, "", "");
       }
     }catch(Exception $e) {
       echo "Error writing record: \n\n<br /><br /><pre>";

@@ -116,6 +116,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 
 		if(client.user.calendarPreferences?.showTooltips)
 			tooltip({
+				style:{maxWidth:'60rem' ,wordBreak: 'break-word'},
 				listeners: { 'render': ({target}) => {target.html = item.quickText}},
 				target:div
 			});

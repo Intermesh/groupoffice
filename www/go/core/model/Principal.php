@@ -54,6 +54,16 @@ class Principal extends AclOwnerEntity
 			->addTable('core_principal', 'principal');
 	}
 
+	static function findIdByEmail($email, $preferUser = true) {
+		$stmt = self::find()->selectSingleValue('principal.id')
+			->where('email','=',$email);
+		if($preferUser) {
+			$stmt->join("core_entity", "e", "e.id=principal.entityTypeId")
+				->orderBy([new Expression("(e.name='User') DESC")]);
+		}
+		return $stmt->single();
+	}
+
 	static function currentUser() {
 		return self::find()->where('id','=',go()->getUserId())->single();
 	}
@@ -108,7 +118,8 @@ class Principal extends AclOwnerEntity
 			})
 			->add("preferUser", function (Criteria $criteria, $value, Query $query){
 				$query->groupBy(['email'])
-					->orderby([new Expression("max(entityTypeId=".User::entityType()->getId().") DESC, name ASC")]);
+					//->orderby([new Expression("max(entityTypeId=".User::entityType()->getId().") DESC, name ASC")]);
+					->orderby([new Expression("CASE WHEN entityTypeId = ".User::entityType()->getId()." THEN 0 ELSE 1 END, name ASC")]);
 			})
 			->add('groupId', function (Criteria $criteria, $value, Query $query){
 				$query->join('core_user_group', 'ug', 'ug.userId = principal.id')->andWhere(['ug.groupId' => $value]);

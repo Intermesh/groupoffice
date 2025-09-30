@@ -12,4 +12,6 @@ return array (
   'Client Id' => 'ID klienta',
   'API Project Id' => 'ID projektu API',
   'OAuth2 client' => 'Klient OAuth2',
+  'Project Id' => 'Project Id',
+  'Use this connection for single signon with OpenID Connect' => 'Użyj tego połączenia do logowania jednokrotnego (SSO) przez OpenID Connect',
 );

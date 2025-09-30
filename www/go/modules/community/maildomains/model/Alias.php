@@ -2,25 +2,24 @@
 
 namespace go\modules\community\maildomains\model;
 
+use DateTimeInterface;
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
 use go\core\exception\Forbidden;
+use go\core\mail\AddressList;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
-use go\core\orm\SearchableTrait;
-use go\core\util\DateTime;
-use go\core\validate\ErrorCode;
 
 final class Alias extends AclItemEntity
 {
 	public ?string $id;
 	public ?string $domainId;
 	public string $address;
-	public string $goto;
+	protected string $goto;
 	public ?string $createdBy;
-	public ?\DateTimeInterface $createdAt;
+	public ?DateTimeInterface $createdAt;
 	public ?string $modifiedBy;
-	public ?\DateTimeInterface $modifiedAt;
+	public ?DateTimeInterface $modifiedAt;
 	public bool $active = true;
 	private ?Domain $domain = null;
 
@@ -31,6 +30,14 @@ final class Alias extends AclItemEntity
 	{
 		return parent::defineMapping()
 			->addTable("community_maildomains_alias");
+	}
+
+	public function getRecipients() : array {
+		return array_map("strval", (new AddressList($this->goto))->toArray());
+	}
+
+	public function setRecipients(array $recipients) {
+		$this->goto = (new AddressList())->addString(...$recipients)->toString();
 	}
 
 	protected static function aclEntityClass(): string

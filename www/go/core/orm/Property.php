@@ -208,7 +208,7 @@ abstract class Property extends Model {
 	 * @throws Throwable
 	 */
 	private function populateTableRecord(array $record) : void {
-		$m = static::getMapping();
+
 		foreach($record as $colName => $value) {
 			try {
 				if (str_contains($colName, '.')) {
@@ -588,7 +588,9 @@ abstract class Property extends Model {
 
 		$id = [];
 		foreach($diff as $field) {
-			$id[] = $v->$field;
+			// we wan't to hide the userId from user properties
+			if($field != 'userId' || !($v instanceof UserProperty))
+				$id[] = $v->$field;
 		}
 
 		return implode('-', $id);
@@ -935,7 +937,7 @@ abstract class Property extends Model {
 
 		$query = (new Query())
 						->from($tables[$mainTableName]->getName(), $tables[$mainTableName]->getAlias())
-						->setModel(static::class, $fetchProperties, $readOnly, $owner);
+						->setModel(static::class, $fetchProperties, $readOnly, $owner, $userId);
 
 
 		$mappedQuery = static::getMapping()->getQuery();
@@ -961,7 +963,7 @@ abstract class Property extends Model {
 	{
 		$primaryTable = static::getMapping()->getPrimaryTable();
 
-		//Used count check here because a customer managed to get negative ID's in the database.
+		//Used count check here because a customer managed to get negative ID's in the database and key might be a string like an email that contains a "-".
 		$keys = $primaryTable->getPrimaryKey();
 		$ids = count($keys) == 1 ? [$id] : explode('-', $id);
 		return array_combine($keys, $ids);
@@ -1848,8 +1850,11 @@ abstract class Property extends Model {
 		$stmt->execute();
 	}
 
-	public function forUserId(): ?int
+	public function forUserId(int|null $forUserId = null): ?int
 	{
+		if(isset($forUserId)) {
+			$this->_forUserId = $forUserId;
+		}
 		return $this->_forUserId ?? go()->getUserId();
 	}
 
@@ -2076,15 +2081,20 @@ abstract class Property extends Model {
 	{
 		$primaryTable = static::getMapping()->getPrimaryTable();
 		$pk = $primaryTable->getPrimaryKey();
+		$pkCount = count($pk);
 
-		$props = [];
-		$keys = explode('-', $id);
+		if($pkCount > 1) {
+			$props = [];
+			$keys = explode('-', $id);
 
-		if(count($keys)  != count($pk)) {
-			throw new InvalidArguments("Invalid ID given for " . static::class.' : '.$id);
-		}
-		foreach ($pk as $key) {
-			$props['`' . $primaryTable->getAlias() . '`.`' . $key . '`'] = array_shift($keys);
+			if (count($keys) != $pkCount) {
+				throw new InvalidArguments("Invalid ID given for " . static::class . ' : ' . $id);
+			}
+			foreach ($pk as $key) {
+				$props['`' . $primaryTable->getAlias() . '`.`' . $key . '`'] = array_shift($keys);
+			}
+		} else {
+			$props['`' . $primaryTable->getAlias() . '`.`' . $pk[0] . '`'] = $id;
 		}
 
 		return $props;
@@ -2477,7 +2487,13 @@ abstract class Property extends Model {
 
 		$pk = $cls::getPrimaryKey();
 
-		$diff = array_diff($pk, array_values($relation->keys));
+		// The map key is the primary key minus the relation keys.
+		$relKeys = array_values($relation->keys);
+		if(is_a($cls, UserProperty::class, true)) {
+			$relKeys[] = "userId";
+		}
+
+		$diff = array_diff($pk, $relKeys);
 		$values = explode("-", $id, count($diff));
 
 		$id = [];
@@ -2713,6 +2729,8 @@ abstract class Property extends Model {
 					if(is_object($v)) {
 						$copy->$name = clone $v;
 					}	else {
+						// we can't set null to all values because we don't know if it's an uninitialized property that is not
+						// nullable
 						if(isset($v) || isset($this->$name) ) {
 							$copy->$name = $v;
 						}

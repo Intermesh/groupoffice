@@ -1,4 +1,4 @@
-import {client, jmapds, modules} from "@intermesh/groupoffice-core";
+import {client, jmapds, modules, principalDS} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {router} from "@intermesh/groupoffice-core";
 import {datasourcestore, t as coreT, E, translate, DateTime, Window, h3, Button} from "@intermesh/goui";
@@ -20,6 +20,18 @@ export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year'
 export const calendarStore = datasourcestore({
 	dataSource:jmapds('Calendar'),
 	queryParams:{filter:{isSubscribed: true, davaccountId : null}},
+	sort: [{property:'sortOrder'},{property:'name'}],
+	relations: {
+		owner: {
+			path: "ownerId",
+			dataSource: principalDS
+		}
+	}
+});
+
+export const allCalendarStore = datasourcestore({
+	dataSource:jmapds('Calendar'),
+	queryParams:{filter:{}},
 	sort: [{property:'sortOrder'},{property:'name'}]
 });
 export const writeableCalendarStore = datasourcestore({
@@ -32,6 +44,12 @@ export const categoryStore = datasourcestore({
 	dataSource:jmapds('CalendarCategory'),
 	sort: [{property:'name'}]
 })
+
+export const viewStore = datasourcestore({
+	dataSource:jmapds('CalendarView'),
+	sort: [{property:'name'}]
+})
+
 
 export const t = (key:string,p='community',m='calendar') => coreT(key, p,m);
 export const statusIcons = {
@@ -74,11 +92,17 @@ function addEmailAction() {
 				data.calendarId = data.calendarId ?? client.user.calendarPreferences?.defaultCalendarId;
 			dlg.loadEvent(new CalendarItem({data:data, key: data.id ? data.id + "" : null}));
 			dlg.show();
+
+			return dlg;
 		};
 
 
-		if(GO.email) GO.email.handleITIP = (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent|string, feedback?:string, recurrenceId?:string}} ) => {
+		if(GO.email) GO.email.handleITIP = async (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent|string, feedback?:string, recurrenceId?:string}} ) => {
 			if(msg.itip) {
+				if(!calendarStore.loaded) {
+					// CalendarItem depends on the store being loaded
+					await calendarStore.load();
+				}
 				const event = msg.itip.event,
 					btns = E('div').cls('btns'),
 					names: any = {accepted: t("Accept"), tentative: t("Maybe"), declined: t("Decline")},
@@ -95,6 +119,7 @@ function addEmailAction() {
 								E('div',
 									...['accepted', 'tentative', 'declined'].map(s => E('button', names[s])
 										.cls('goui-button')
+										.cls('disabled', item.calendarPrincipal?.participationStatus == s)
 										.cls('pressed', item.calendarPrincipal?.participationStatus == s)
 										.on('click', _ => {
 											item.updateParticipation(s as 'accepted'|'declined'|'tentative',() => {
@@ -217,6 +242,7 @@ modules.register(  {
 			// OLD CODE
 			async function showBadge() {
 				const count = await go.Jmap.request({method: "CalendarEvent/countMine"});
+				ui.inboxBtn.hidden = count<1;
 				GO.mainLayout.setNotification('calendar', count, 'orange');
 			}
 			go.Db.store("CalendarEvent").on("changes", () => {

@@ -96,10 +96,12 @@ class Acl extends Entity {
 		if($this->ownedBy != User::ID_SUPER_ADMIN) {
 
 			$groupId = Group::findPersonalGroupID($this->ownedBy);
-			$ownerLevel = $this->hasGroup($groupId);
-			if($ownerLevel < self::LEVEL_MANAGE) {
-				$this->removeGroup($groupId);
-				$this->addGroup($groupId, self::LEVEL_MANAGE);				
+			if($groupId) {
+				$ownerLevel = $this->hasGroup($groupId);
+				if ($ownerLevel < self::LEVEL_MANAGE) {
+					$this->removeGroup($groupId);
+					$this->addGroup($groupId, self::LEVEL_MANAGE);
+				}
 			}
 		}		
 		
@@ -258,7 +260,7 @@ class Acl extends Entity {
 	 * @param int[]|null $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
 	 * @throws Forbidden
 	 */
-	public static function applyToQuery(Query $query, string $column, int $level = self::LEVEL_READ, int|null $userId = null, array|null $groups = null): void
+	public static function applyToQuery(\go\core\db\Query $query, string $column, int $level = self::LEVEL_READ, int|null $userId = null, array|null $groups = null): void
 	{
 
 		if(!isset($userId)) {

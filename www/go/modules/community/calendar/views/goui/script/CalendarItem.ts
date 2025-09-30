@@ -18,6 +18,7 @@ export type RecurrenceOverride = (Partial<CalendarEvent> & {excluded?:boolean});
 export type RecurrenceOverrides = {[recurrenceId:string]: RecurrenceOverride};
 export interface CalendarEvent extends BaseEntity {
 	id: EntityID
+	uid:string
 	recurrenceRule?: any
 	recurrenceOverrides?: RecurrenceOverrides
 	links?: any
@@ -96,6 +97,7 @@ export class CalendarItem {
 
 	readonly initStart: string
 	readonly initEnd: string
+	calendarIds: {[id:string]:boolean} = {}
 
 	cal: any
 	categories : CalendarCategory[] = []
@@ -124,8 +126,13 @@ export class CalendarItem {
 		//if(!obj.end) {
 			this.end = this.start.clone().add(new DateInterval(this.patched.duration!));
 		//}
+		this.calendarIds[this.patched.calendarId] = true;
 		if(!this.cal) {
 			this.cal = calendarStore.find((c: any) => c.id == this.patched.calendarId);
+			if(!this.cal) {
+				this.readOnly = true;
+				this.cal = {id: this.patched.calendarId, isVisible:true, myRights: {}}; // readonly when not subscribed
+			}
 		}
 		if(this.patched.categoryIds)
 		for(const id of this.patched.categoryIds) {
@@ -150,7 +157,7 @@ export class CalendarItem {
 	}
 
 	private isNew() {
-		return this.key==='';
+		return this.key === '';
 	}
 
 	private isTimeModified() {
@@ -158,7 +165,6 @@ export class CalendarItem {
 	}
 
 	patchedInstance(recurrenceId:string) {
-		// debugger;
 		if(!this.data.recurrenceRule || !this.data.recurrenceOverrides || !this.data.recurrenceOverrides[recurrenceId]) {
 			throw "Not found";
 		}
@@ -252,7 +258,6 @@ export class CalendarItem {
 	/** amount of days this event is spanning */
 	get dayLength() {
 		// 1 day + the distance in days between start and end. - 1 second of end = 00:00:00
-		//console.log(this.title, this.start.diff(this.end.clone().addSeconds(-1)));
 		return 1 + this.start.diff(this.end.clone().addSeconds(-1)).getTotalDays()!;
 	}
 
@@ -360,16 +365,16 @@ export class CalendarItem {
 		}
 	}
 
-	private randomColor(seed: string) {
-		const colors = [
-			"CDAD00", "E74C3C", "9B59B6", "8E44AD", "2980B9", "3498DB",
-			"1ABC9C", "16A085", "27AE60", "2ECC71", "F1C40F", "F39C12",
-			"E67E22", "D35400", "95A5A6", "34495E", "808B96", "1652A1"
-		];
-
-		let hash = [...seed].reduce((acc, char) => acc + char.charCodeAt(0), 0);
-		return colors[hash % colors.length];
-	}
+	// private randomColor(seed: string) {
+	// 	const colors = [
+	// 		"CDAD00", "E74C3C", "9B59B6", "8E44AD", "2980B9", "3498DB",
+	// 		"1ABC9C", "16A085", "27AE60", "2ECC71", "F1C40F", "F39C12",
+	// 		"E67E22", "D35400", "95A5A6", "34495E", "808B96", "1652A1"
+	// 	];
+	//
+	// 	let hash = [...seed].reduce((acc, char) => acc + char.charCodeAt(0), 0);
+	// 	return colors[hash % colors.length];
+	// }
 
 	downloadIcs(){
 		client.downloadBlobId('community/calendar/ics/'+this.key, this.cal.name + '_'+this.start.format('Y-m-dTHi')+'_'+this.title+'.ics');
@@ -426,7 +431,6 @@ export class CalendarItem {
 	}
 
 	get isOwner() {
-		console.log(this);
 		return !this.participants || this.calendarPrincipal?.roles?.owner || false;
 	}
 
@@ -435,12 +439,35 @@ export class CalendarItem {
 			(this.cal.myRights.mayWriteOwn && this.isOwner)) && !this.readOnly;
 	}
 
-	get calendarPrincipal() {
-		if(this.participants && this.principalId)
-			return this.participants[this.principalId];
+	/**
+	 * Finds the participant which e-mail matches the e-mail of the calendar owner.
+	 */
+	get calendarPrincipal() : {[key:string]: any} | undefined {
+		const email = this.principalEmail;
+		if(this.participants) {
+			for(let id in this.participants) {
+				if(this.participants[id].email == email) {
+					return this.participants[id];
+				}
+			}
+		}
+
+		return undefined;
 	}
-	get principalId() {
+
+	/**
+	 * The owner user ID of the calendar item. Shared calendars don't have an owner. In that case it will return the current
+	 * user ID
+	 */
+	get ownerId() {
 		return (this.cal && this.cal.ownerId) ? this.cal.ownerId+'' : client.user.id+''
+	}
+
+	/**
+	 * The e-mail address of the calendar owner of this item
+	 */
+	get principalEmail() : string {
+		return (this.cal && this.cal.owner) ? this.cal.owner.email : client.user.email!;
 	}
 
 	get quickText(): string {
@@ -480,10 +507,8 @@ export class CalendarItem {
 	private humanReadableDate() {
 		const start = this.start;
 		const end = this.end.clone();
-		const oneDay = this.data.duration = "P1D";
-
-		console.log(oneDay, start, end);
-
+		const fullDay = this.data.duration === "P1D";
+		const oneDay = fullDay || this.start.format('Ymd') == this.end.format('Ymd');
 		let line1 = start.format('l j F Y');
 
 		if (!oneDay) {
@@ -494,7 +519,9 @@ export class CalendarItem {
 		}
 
 		let line2;
-		if (oneDay) {
+		if(fullDay) {
+			line2 = t('All day');
+		} else if (oneDay) {
 			if(!this.data.showWithoutTime) {
 				line2 = `${Format.time(start)} - ${Format.time(end)}`;
 			}
@@ -809,7 +836,7 @@ export class CalendarItem {
 
 		CalendarItem.clipboard = new CalendarItem({
 			data,
-			key:null,
+			key: "",
 			open(this: CalendarItem) { // when opening the copy. just save
 				this.confirmScheduleMessage(data, () => {
 					root.mask();

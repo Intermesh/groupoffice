@@ -19,6 +19,7 @@ import {CalendarWindow} from "./CalendarWindow.js";
 import {client, jmapds, modules} from "@intermesh/groupoffice-core";
 import {SubscribeWindow} from "./SubscribeWindow.js";
 import {SubscribeWebCalWindow} from "./SubscribeWebCalWindow";
+import {ViewWindow} from "./ViewWindow";
 
 export interface CalendarListEventMap extends ComponentEventMap {
 	changevisible: {ids: string[]}
@@ -84,6 +85,14 @@ export class CalendarList extends Component<CalendarListEventMap> {
 					}),
 					btn({icon: 'travel_explore',text: t('Add calendar from link') + '…', handler: () => {
 						const d = new SubscribeWebCalWindow();
+						d.show();
+					}}),
+					hr({hidden: !rights.mayChangeViews}),
+					btn({hidden: !rights.mayChangeViews,
+						icon: 'calendar_view_month',
+						text: t('Compose new view')+ '…',
+						handler: () => {
+						const d = new ViewWindow();
 						d.show();
 					}})
 				)
@@ -193,7 +202,7 @@ export class CalendarList extends Component<CalendarListEventMap> {
 							});
 						}
 					}}),
-					btn({icon:'edit', text: t('Edit')+'…', hidden: data.davaccountId || (data.groupId && !rights.mayChangeResources), disabled:!data.myRights.mayAdmin, handler: async _ => {
+					btn({icon:'edit', text: t('Edit')+'…', hidden: data.davaccountId || (data.groupId && !rights.mayChangeResources), disabled:!data.myRights.mayReadItems, handler: async _ => {
 							const dlg = data.groupId ? new ResourceWindow() : new CalendarWindow();
 							await dlg.load(data.id);
 							dlg.show();
@@ -208,11 +217,11 @@ export class CalendarList extends Component<CalendarListEventMap> {
 					hr({hidden:data.groupId}),
 					btn({icon:'file_save',hidden:data.groupId, text: t('Export','core','core'), handler: _ => { client.getBlobURL('community/calendar/calendar/'+data.id).then(window.open) }}),
 					btn({icon:'upload_file',hidden:data.groupId, text:t('Import','core','core')+'…', handler: async ()=> {
-							const files = await browser.pickLocalFiles(false,false,'text/calendar');
-							const blob = await client.upload(files[0]);
+						const files = await browser.pickLocalFiles(false,false,'text/calendar');
+						const blob = await client.upload(files[0]);
 
-							this.importIcs(blob, data);
-						}})
+						this.importIcs(blob, data);
+					}})
 				)
 			})]
 		})];

@@ -41,7 +41,7 @@ class Participant extends Property
 	protected ?string $id;
 	protected int $eventId;
 	/** display name of participant */
-	public ?string $name;
+	public ?string $name = null;
 
 	/** @var string email address for the participant */
 	public string $email;

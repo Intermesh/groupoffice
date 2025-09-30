@@ -2,6 +2,7 @@
 
 namespace go\modules\community\davclient\model;
 
+use go\core\ErrorHandler;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\orm\Query;
@@ -47,6 +48,7 @@ class Calendar extends Property
 			}
 			return $success;
 		} catch(\Exception $e) {
+			ErrorHandler::logException($e);
 			$this->lastError = $e->getMessage();
 			return false;
 		}
@@ -186,13 +188,18 @@ XML;
 					$event->calendarId = $this->id;
 					$event->useDefaultAlerts = true;
 				}
-				$event = ICalendarHelper::parseVObject((string)$response->{'calendar-data'}, $event);
-				$event->etag((string)$response->getetag);
-				$event->uri(basename($href));
-				if(!$event->save()){
-					$success = false;
-					$this->lastError = 'cannot sync event '.print_r($event->getValidationErrors(), true);
-					go()->log($this->lastError);
+				try {
+					$event = ICalendarHelper::parseVObject((string)$response->{'calendar-data'}, $event);
+					$event->etag((string)$response->getetag);
+					$event->uri(basename($href));
+					if (!$event->save()) {
+						$success = false;
+						$this->lastError = 'cannot sync event ' . print_r($event->getValidationErrors(), true);
+						go()->log($this->lastError);
+					}
+				}catch(\Exception $e) {
+					ErrorHandler::logException($e, "Failed to sync event " . $href);
+					go()->debug((string)$response->{'calendar-data'});
 				}
 				$event = null;
 			}

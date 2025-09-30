@@ -93,7 +93,11 @@ class AddressList implements ArrayAccess, Countable {
 	}
 
 	/**
-	 * Get an array of formatted address:
+	 * Get an array of Address objects:
+	 *
+	 * to get strings you could use:
+	 *
+	 * array_map("strval", (new AddressList('"John Doe" <john@domain.com>'))->toArray())
 	 * 
 	 * $a[] = '"John Doe" <john@domain.com>';
 	 * 
@@ -160,12 +164,19 @@ class AddressList implements ArrayAccess, Countable {
 	 *
 	 * "Merijn Schering" <mschering@intermesh.nl>,someone@somedomain.com,Pete <pete@pete.com
 	 *
-	 * @param string $addressStr
+	 * @param string[] $addressStr
 	 * @return AddressList
 	 * @throws Exception
 	 */
-	public function addString(string $addressStr): AddressList
+	public function addString(string ...$addressStr): AddressList
 	{
+		foreach($addressStr as $a) {
+			$this->addSingleStr($a);
+		}
+		return $this;
+	}
+
+	private function addSingleStr(string $addressStr) {
 		$addressStr = trim($addressStr, ',; ');
 
 		for ($i = 0; $i < strlen($addressStr); $i++) {

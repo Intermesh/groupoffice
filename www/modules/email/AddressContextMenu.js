@@ -144,7 +144,7 @@ GO.email.AddressContextMenu = function(config)
 							});
 							dlg.setValues({
 								emailAddresses: a
-							});
+							}, false);
 						});
 						dlg.load(ids[0]).show();
 

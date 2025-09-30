@@ -2,6 +2,7 @@
 namespace go\core\mail;
 
 
+use GO\Base\Mail\MimeDecode;
 use go\core\util\StringUtil;
 use PHPMailer\PHPMailer\Exception;
 
@@ -507,6 +508,95 @@ class PHPMailer extends \PHPMailer\PHPMailer\PHPMailer {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Send raw mime message
+	 *
+	 * @param string $mime
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function sendMime(string $mime) : bool {
+		$splitter = static::$LE . static::$LE;
+		$headerEndPos = strpos($mime, $splitter);
+		if($headerEndPos === false) {
+			throw new \Exception("Can't find headers");
+		}
+
+		$this->MIMEHeader = substr($mime, 0, $headerEndPos);
+		$this->MIMEBody = trim(substr($mime, $headerEndPos));
+
+
+		$decoder = new MimeDecode($mime);
+		$structure = $decoder->decode(array(
+			'include_bodies'=>false,
+			'decode_headers'=>true,
+			'decode_bodies'=>false,
+		));
+
+		if(!$structure)
+			throw new \Exception("Could not decode mime data");
+
+
+		$to = isset($structure->headers['to']) && strpos($structure->headers['to'],'undisclosed')===false ? $structure->headers['to'] : '';
+		$cc = isset($structure->headers['cc']) && strpos($structure->headers['cc'],'undisclosed')===false ? $structure->headers['cc'] : '';
+		$bcc = isset($structure->headers['bcc']) && strpos($structure->headers['bcc'],'undisclosed')===false ? $structure->headers['bcc'] : '';
+
+		//workaround activesync problem where 'mailto:' is included in the mail address.
+		$to = str_replace('mailto:','', $to);
+		$cc = str_replace('mailto:','', $cc);
+		$bcc = str_replace('mailto:','', $bcc);
+
+		$toList = new AddressList($to);
+		foreach($toList->toArray() as $a) {
+			$this->addAddress($a->getEmail(), $a->getName());
+		}
+
+		$bccList = new AddressList($bcc);
+		foreach($bccList->toArray() as $a) {
+			$this->addBCC($a->getEmail(), $a->getName());
+		}
+		$ccList = new AddressList($cc);
+		foreach($ccList->toArray() as $a) {
+			$this->addCC($a->getEmail(), $a->getName());
+		}
+
+
+		$this->Subject = $structure->headers['subject'] ?? "";
+
+
+		if(isset($structure->headers['from'])) {
+
+			$fromList = new AddressList(str_replace('mailto:','',$structure->headers['from']));
+			if(isset($fromList[0])){
+				$from = $fromList[0];
+				try {
+					$this->From = $from->getEmail();
+					$this->FromName = $from->getName();
+
+				} catch(Exception $e)  {
+					\GO::debug('Failed to add from address: '.$e);
+				}
+			}
+		}
+
+		unset($mime);
+
+		try {
+			$this->error_count = 0; //Reset errors
+			$this->mailHeader = '';
+
+			return $this->postSend();
+		} catch (Exception $exc) {
+			$this->mailHeader = '';
+			$this->setError($exc->getMessage());
+			if ($this->exceptions) {
+				throw $exc;
+			}
+
+			return false;
+		}
 	}
 
 }

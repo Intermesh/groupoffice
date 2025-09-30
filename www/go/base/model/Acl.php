@@ -108,7 +108,7 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Return the permission level that a user has for this ACL.
 	 *  
-	 * @param in $acl_id The ID of the acl to check
+	 * @param int $acl_id The ID of the acl to check
 	 * @param int $userId If omitted then it will check the currently logged in user and return manage permission if \GO::$ignoreAclPermissions is set.
 	 * @param bool $checkGroupPermissionOnly
 	 * @return int Permission level. See constants in Acl for values. 
@@ -307,7 +307,7 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 	 * @params Array $callback Call a function with the user as argument. 
 	 * This was added to save memory so that not all users have to be in memory. 
 	 * If you pass this argument this function will return void.
-	 * @return Array of User 
+	 * @return array of User
 	 */
 	public static function getAuthorizedUsers($aclId, $level=Acl::READ_PERMISSION, $callback=false, $callbackArguments=array()){
 		
