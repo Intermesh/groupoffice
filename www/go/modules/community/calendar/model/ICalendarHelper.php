@@ -364,11 +364,14 @@ class ICalendarHelper {
 			$event->setValues((array)$obj); // title, description, start, duration, location, status, privacy
 			$event->prodId = $prodId;
 			$baseEvents[$event->uid] = $event;
-			if($event->isNew())
-			if(isset($vevent->{'DTSTAMP'}))
-				$event->createdAt = $vevent->DTSTAMP->getDateTime();
-			if(isset($vevent->{'LAST-MODIFIED'}))
-				$event->modifiedAt = $vevent->{'LAST-MODIFIED'}->getDateTime();
+			if($event->isNew() && isset($vevent->{'DTSTAMP'})) {
+				try {$event->createdAt = $vevent->DTSTAMP->getDateTime();}
+				catch(VObject\InvalidDataException $e) {$event->createdAt = new \DateTime();}
+			}
+			if(isset($vevent->{'LAST-MODIFIED'})) {
+				try{$event->modifiedAt = $vevent->{'LAST-MODIFIED'}->getDateTime();}
+				catch(VObject\InvalidDataException $e) {$event->modifiedAt = new \DateTime(); }
+			}
 			$event->showWithoutTime = !$vevent->DTSTART->hasTime();
 			if(isset($vevent->SEQUENCE))
 				$event->sequence = (int)$vevent->SEQUENCE->getValue();
