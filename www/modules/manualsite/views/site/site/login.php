@@ -24,9 +24,9 @@
 				</tr>
 			<?php endif; ?>
 				
-			<tr>
+			<td>
 				<td><label><?php echo \GO::t("Remember me", "defaultsite"); ?></label></td>
-				<td><input type="checkbox" name="rememberMe" value="rememberMe"></tr>
+				<td><input type="checkbox" name="rememberMe" value="rememberMe"></td>
 			</tr>
 		</table>
 			
