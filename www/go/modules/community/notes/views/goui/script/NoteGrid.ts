@@ -1,6 +1,7 @@
 import {column, datasourcestore, DataSourceStore, datetimecolumn, t, Table} from "@intermesh/goui";
 import {NoteDialog} from "./NoteDialog";
 import {noteDS} from "./Index.js";
+import {customFields} from "@intermesh/groupoffice-core";
 
 export class NoteGrid extends Table<DataSourceStore> {
 	constructor() {
@@ -22,7 +23,7 @@ export class NoteGrid extends Table<DataSourceStore> {
 					id: "createdAt",
 					sortable: true
 				})
-			]
+			].concat(...customFields.getTableColumns("Note"))
 		);
 
 		this.on("rowdblclick", async ({target, storeIndex}) => {

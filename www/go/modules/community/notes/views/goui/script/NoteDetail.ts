@@ -1,7 +1,21 @@
-import {br, btn, Button, comp, Component, h3, hr, menu, t} from "@intermesh/goui";
+import {
+	br,
+	btn,
+	Button,
+	comp,
+	Component,
+	datasourceform,
+	DataSourceForm,
+	Form,
+	form,
+	h3,
+	hr,
+	menu,
+	t
+} from "@intermesh/goui";
 import {
 	AclLevel,
-	addbutton,
+	addbutton, customFields, DetailFieldset,
 	DetailPanel,
 	filesbutton,
 	Image,
@@ -16,6 +30,7 @@ export class NoteDetail extends DetailPanel<Note> {
 	private content: Component;
 	private editBtn: Button;
 	private deleteBtn: Button;
+	private form: DataSourceForm;
 
 	constructor() {
 		super("Note");
@@ -25,8 +40,11 @@ export class NoteDetail extends DetailPanel<Note> {
 				cls: "normalize card pad"
 			})
 		);
+
+		this.scroller.items.add(this.form = datasourceform({dataSource: noteDS}, ...customFields.getFieldSets("Note").map(fs => new DetailFieldset(fs))))
+
 		this.scroller.items.add(new CommentsPanel(this.entityName));
-		this.addCustomFields();
+
 
 		this.addFiles();
 		this.addLinks();
@@ -82,6 +100,8 @@ export class NoteDetail extends DetailPanel<Note> {
 			}));
 			this.content.items.add(br());
 			this.content.items.add(Image.replace(entity.content));
+
+			void this.form.load(entity.id);
 		});
 	}
 }
