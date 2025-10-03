@@ -27,20 +27,16 @@ class Settings extends core\Settings
 		return strtr(base64_encode($data), ['+'=>'-', '/'=>'_', '='=>'']);
 	}
 
-	private static function createJwtToken($appId, $room, $secret): string {
+	public function createJwtToken( string $room): string {
 		$jwt=[
 			self::encode(json_encode(['typ' => 'JWT', 'alg' => 'HS256'])), //header
-			self::encode(json_encode(['aud' => $appId, 'iss' => $appId, 'room' => $room])) //payload
+			self::encode(json_encode(['aud' => $this->videoJwtAppId, 'iss' => $this->videoJwtAppId, 'room' => $room, 'exp' => strtotime('+30 days')])) //payload
 		];
-		$jwt[] = self::encode(hash_hmac('sha256', implode('.',$jwt), $secret, true)); // sign
+		$jwt[] = self::encode(hash_hmac('sha256', implode('.',$jwt), $this->videoJwtSecret, true)); // sign
 		return implode('.',$jwt);
 	}
 
-	static function generateRoom(): string {
-		$settings = self::get();
-		$room =  bin2hex(random_bytes(5));
-		return $room . ($settings->videoJwtEnabled ? '?jwt=' .self::createJwtToken($settings->videoJwtAppId, $room, $settings->videoJwtSecret) :'');
-	}
+
 
 	public function save(): bool
 	{

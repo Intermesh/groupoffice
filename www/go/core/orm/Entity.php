@@ -66,11 +66,19 @@ abstract class Entity extends Property {
 	const EVENT_BEFORE_SAVE = 'beforesave';
 
 	/**
-	 * Fires after the entity has been saved
+	 * Fires after the entity has been saved but before commit. So you can still use getModified() and isNew()
 	 * 
 	 * @param Entity $entity The entity that has been saved
 	 */
 	const EVENT_SAVE = 'save';
+
+	/**
+	 * Fires after save and commit
+	 *
+	 * @param Entity $entity The entity that has been saved
+	 * @param boolean $wasNew
+	 */
+	CONST EVENT_AFTER_SAVE = 'aftersave';
 
 	/**
 	 * Fires before the entity has been deleted
@@ -389,7 +397,15 @@ abstract class Entity extends Property {
 				return false;
 			}
 
-			return $this->commit() && !$this->hasValidationErrors();
+			$wasNew = $this->isNew();
+
+			$success = $this->commit() && !$this->hasValidationErrors();
+
+			if($success) {
+				$this->fireEvent(self::EVENT_AFTER_SAVE, $this, $wasNew);
+			}
+
+			return $success;
 		} catch(\Throwable $e) {
 			ErrorHandler::logException($e);
 			$this->rollback();

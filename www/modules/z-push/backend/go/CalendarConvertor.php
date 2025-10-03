@@ -1,5 +1,6 @@
 <?php
 
+use go\core\db\Expression;
 use go\core\ErrorHandler;
 use go\core\mail\Util;
 use go\core\model\Principal;
@@ -78,10 +79,12 @@ class CalendarConvertor
 
 		$message->uid = $event->uid;
 
-		if(!$event->isPrivate() || $event->getPermissionLevel() > \go\core\model\Acl::LEVEL_READ) {
+		if(!$event->isPrivate() || $event->currentUserIsOwner()) {
 			$message->subject = $event->title;
 			$message->location = $event->location;
 			$message->asbody = GoSyncUtils::createASBody($event->description, $params);
+		} else {
+			$message->subject = "Private";
 		}
 
 		if(!empty($event->privacy))
@@ -290,8 +293,11 @@ class CalendarConvertor
 			$event->uid = $message->uid;
 		//if (!empty($message->timezone))
 			$event->timeZone = self::tzid(); // ActiveSync timezone is guessable but for now we expect it to be the same as in GroupOffice
-		if ($event->isNew())
-			$event->createdAt = new DateTime('@'.$message->dtstamp);
+
+		if ($event->isNew() & !empty($message->dtstamp)) {
+			$event->createdAt = new DateTime('@' . $message->dtstamp);
+		}
+
 		$event->showWithoutTime = $message->alldayevent;
 		$event->title = $message->subject ?? "No subject";
 		$event->description = GoSyncUtils::getBodyFromMessage($message);
@@ -328,7 +334,9 @@ class CalendarConvertor
 
 		$principal = Principal::currentUser();
 
-		if (isset($message->attendees)) {
+
+		//todo remove attendee?
+		if (!empty($message->attendees)) {
 			if($event->isNew() || !$event->organizer()) {
 				$organizer = $event->generatedOrganizer($principal);
 				if (!empty($message->organizeremail) && Util::validateEmail($message->organizeremail)) $organizer->email = $message->organizeremail;
@@ -339,7 +347,7 @@ class CalendarConvertor
 				$key = $attendee->email;
 				if(!Util::validateEmail($key))
 					continue; // do not att attendee if client does not send a valid email address (TBSync uses login name)
-				$principalId = Principal::find()->selectSingleValue('id')->where('email','=',$key)->orderBy(['entityTypeId'=>'ASC'])->single();
+				$principalId = Principal::findIdByEmail($key);
 				if(!isset($event->participants[$principalId ?? $key])) {
 					$p = new Participant($event);
 					$p->email = $attendee->email;

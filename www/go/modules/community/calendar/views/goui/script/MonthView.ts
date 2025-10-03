@@ -151,7 +151,7 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 			const event = e.target.up('div[data-key]');
 			if(event) {
 				ev = this.viewModel.find(m => m.key == event.dataset.key)!;
-				if(!ev || !ev.isOwner) return;
+				if(!ev || !ev.mayChange) return;
 				action = move;
 				el.on('mousemove', mouseMove);
 				window.addEventListener('mouseup', mouseUp, {once:true});

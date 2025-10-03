@@ -162,7 +162,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 				->where('package', '!=', "core");
 		}
 
-		return $query->single();
+		return max($query->single(), 100);
 	}
 	
 	/**
@@ -172,7 +172,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	 * @return \GO\Base\Model\Module
 	 * @throws \GO\Base\Exception\Save
 	 */
-	public static function install($name,$ignoreDependentModule=false){
+	public static function install($name,$ignoreDependentModule=false, $sort_order = null){
 		
 		
 		GO::debug("install($name,$ignoreDependentModule)");
@@ -180,6 +180,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		if(!($module = Module::model()->findByName($name))){
 			$module = new Module();
 			$module->name=$name;
+			$module->sort_order = $sort_order;
 
 			if(!$ignoreDependentModule) {
 

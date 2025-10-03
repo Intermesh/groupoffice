@@ -142,6 +142,14 @@ class Module extends Observable {
 	public function getIcon() {
 		return $this->icon();
 	}
+
+	/**
+	 * Default sort order when installing. If null it will be auto generated.
+	 * @return int|null
+	 */
+	public static function getDefaultSortOrder() : ?int{
+		return null;
+	}
 	
 	/**
 	 * Get URL to module icon

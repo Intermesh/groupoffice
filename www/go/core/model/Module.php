@@ -25,14 +25,14 @@ class Module extends Entity {
 	public ?string $id;
 	public string $name;
 	public ?string $package;
-	public int $sort_order;
+	public ?int $sort_order = null;
 	public int $version;
 	public bool $enabled = true;
 
 	/**
 	 * @var Permission[]
 	 */
-	public array $permissions = [];
+	public array|null $permissions = [];
 
 	public static function sort(Query $query, ArrayObject $sort): Query
 	{
@@ -96,7 +96,7 @@ class Module extends Entity {
 			}
 		}
 		
-		if($this->isNew() || $this->sort_order < 1) {
+		if(empty($this->sort_order) || $this->sort_order < 1) {
 			$this->sort_order = $this->nextSortOrder();			
 		}
 
@@ -135,7 +135,7 @@ class Module extends Entity {
 				->where('package', '!=', "core");
 		}
 
-		return $query->single();
+		return max($query->single(), 100);
 	}
 	
 
@@ -438,7 +438,8 @@ class Module extends Entity {
 	
 	protected static function internalDelete(Query $query): bool
 	{
-		$query->andWhere('package != "core"');
+		//prevent core module from being removed
+		$query->andWhere('`name` != "core"');
 
 		return parent::internalDelete($query);
 	}

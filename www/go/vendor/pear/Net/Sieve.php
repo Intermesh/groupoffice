@@ -1184,12 +1184,22 @@ class Net_Sieve
         if (PEAR::isError($res = $this->_doCmd('STARTTLS'))) {
             return $res;
         }
-		stream_context_set_option($this->_sock->fp, array( //since PHP 5.6 (strict CA checking)
-			'ssl' => array(
-				'verify_peer' => false,
-				'verify_peer_name' => false,
-			),
-		));
+
+			if (version_compare(phpversion(), "8.3.0", ">=")) {
+				stream_context_set_options($this->_sock->fp, array( //since PHP 5.6 (strict CA checking)
+					'ssl' => array(
+						'verify_peer' => false,
+						'verify_peer_name' => false,
+					),
+				));
+			} else {
+				stream_context_set_option($this->_sock->fp, array( //since PHP 5.6 (strict CA checking)
+					'ssl' => array(
+						'verify_peer' => false,
+						'verify_peer_name' => false,
+					),
+				));
+			}
 			$crypto_method = STREAM_CRYPTO_METHOD_TLS_CLIENT;
 			if (defined('STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT')) {
 				$crypto_method |= STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;

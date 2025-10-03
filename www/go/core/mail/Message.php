@@ -33,6 +33,8 @@ class Message {
 	private ?int $priority = null;
 	private string $body = "";
 	private ?string $alternateBody = null;
+
+	private ?string $icalendarBody = null;
 	private string $subject = "";
 	private array $to = [];
 	private array $cc = [];
@@ -532,6 +534,7 @@ class Message {
 		return $this;
 	}
 
+
 	/**
 	 * Get alternate plain text body
 	 *
@@ -540,6 +543,25 @@ class Message {
 	public function getAlternateBody(): ?string
 	{
 		return $this->alternateBody;
+	}
+
+
+
+	/**
+	 * The plain-text message body. This body can be read by mail clients that can't display the normal body.
+	 *
+	 * @param string $body
+	 * @return $this
+	 */
+	public function setIcalendar(string $body): Message
+	{
+		$this->icalendarBody = $body;
+		return $this;
+	}
+
+	public function getIcalendar(): ?string
+	{
+		return $this->icalendarBody;
 	}
 
 	/**
@@ -648,6 +670,14 @@ class Message {
 	public function setMailer(Mailer $mailer): Message
 	{
 		$this->mailer = $mailer;
+
+		if(isset($mailer->fromEmail)) {
+			$this->setFrom($mailer->fromEmail, $mailer->fromName);
+		}
+
+		if(isset($mailer->replyTo)) {
+			$this->setReplyTo($mailer->replyTo);
+		}
 		return $this;
 	}
 
@@ -669,6 +699,11 @@ class Message {
 	public function toString(): string
 	{
 		return $this->getMailer()->toString($this);
+	}
+
+	public function __toString(): string
+	{
+		return $this->toString();
 	}
 
 	/**

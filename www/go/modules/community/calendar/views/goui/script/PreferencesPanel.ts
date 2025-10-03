@@ -1,18 +1,40 @@
-import {checkbox, Component, containerfield, DataSourceForm, datasourceform, fieldset, select} from "@intermesh/goui";
-import {client, jmapds, User} from "@intermesh/groupoffice-core";
-import {calendarStore, t} from "./Index.js";
+import {
+	checkbox,
+	Component,
+	containerfield,
+	DataSourceForm,
+	datasourceform, DataSourceStore,
+	datasourcestore, DefaultEntity,
+	fieldset, Notifier,
+	select
+} from "@intermesh/goui";
+import {client, JmapDataSource, jmapds, User} from "@intermesh/groupoffice-core";
+import {t} from "./Index.js";
 
 export class PreferencesPanel extends Component {
 	private form: DataSourceForm<User>;
+	private calendarStore: DataSourceStore<JmapDataSource<DefaultEntity>>;
+	private personalCalendarStore: DataSourceStore<JmapDataSource<DefaultEntity>>;
 
 	constructor() {
 		super();
 		this.title = t('Preferences');
 		this.cls = 'fit scroll';
 
-		if(!calendarStore.loaded) {
-			calendarStore.load();
-		}
+		this.calendarStore = datasourcestore({
+			dataSource: jmapds('Calendar'),
+			filters: {default: {davaccountId: null}},
+
+			sort: [{property:'sortOrder'},{property:'name'}]
+		});
+		this.personalCalendarStore = datasourcestore({
+			dataSource:jmapds('Calendar'),
+			filters:{
+				default:{isSubscribed: true, davaccountId : null, isResource:false, permissionLevel:30/*writeOwn*/},
+				owner:{ownerId:client.user.id}
+			},
+			sort: [{property:'sortOrder'},{property:'name'}]
+		})
 
 		this.form = datasourceform<User>(
 			{
@@ -27,7 +49,9 @@ export class PreferencesPanel extends Component {
 					checkbox({name:'showWeekNumbers', label:t('Show week numbers in calendar')}),
 					checkbox({name:'showTooltips', label:t('Show pop-up info when hovering over appointments')}),
 					checkbox({name:'showDeclined', label: t('Show events that you have declined')}),
-					select({name:'defaultCalendarId', label: t('Default calendar'), store: calendarStore, valueField: 'id',
+					select({name:'defaultCalendarId', label: t('Default calendar'), store: this.calendarStore, valueField: 'id',
+						hint: t('Start with this calendar selected')}),
+					select({name:'personalCalendarId', label: t('Personal calendar'), store: this.personalCalendarStore, valueField: 'id',
 						hint: t('Invitation to event will be added into this calendar')}),
 					select({name:'weekViewGridSnap', label: t('Raster size for day/week view'),
 						hint: t('The duration adjustment when resizing an event'),options: [
@@ -47,7 +71,11 @@ export class PreferencesPanel extends Component {
 					select({name:'startView', label:t('Default view when opening the calendar'),options: [
 							{value:'day', name: t('Day')},
 							{value:'week',name:  t('Week')},
+							{value:'days-5',name:  t('Workweek')},
+							{value:'weeks-14',name:  '2 ' +t('Weeks')},
+							{value:'weeks-21',name:  '3 ' +t('Weeks')},
 							{value:'month',name:  t('Month')},
+							{value:'split-5',name:  t('Split')},
 							{value:'year',name:  t('Year')},
 							{value:'list',name:  t('List')}
 						]}),
@@ -88,6 +116,12 @@ export class PreferencesPanel extends Component {
 	onLoad(user:User) {
 		this.form.value = user;
 		this.form.currentId = user.id;
+
+		this.personalCalendarStore.setFilter('owner', {ownerId: user.id});
+		this.personalCalendarStore.load().catch(e => Notifier.error(e))
+
+		this.calendarStore.setFilter("sub", {isSubscribedFor: user.id});
+		this.calendarStore.load().catch(e => Notifier.error(e))
 	}
 
 	onSubmit() {

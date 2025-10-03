@@ -6,18 +6,15 @@ use Exception;
 use Faker\Generator;
 use GO\Base\Model\Module as LegacyModuleModel;
 use GO\Base\Module as LegacyModule;
-use go\core\model\Group;
-use go\core\model\Module as GoModule;
-use go\core\model\Permission;
-use go\core\Module as CoreModule;
-use go\core\orm\EntityType;
-use go\core\orm\Query;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Utils;
 use go\core\exception\NotFound;
 use go\core\fs\File;
 use go\core\fs\Folder;
 use go\core\jmap\Entity;
+use go\core\Module as CoreModule;
+use go\core\orm\EntityType;
+use go\core\orm\Query;
 use go\core\util\ClassFinder;
 use go\modules\business\license\exception\LicenseException;
 use go\modules\business\license\model\License;
@@ -155,6 +152,7 @@ abstract class Module extends Singleton {
 			$model->package = static::getPackage();
 			$model->version = $this->getUpdateCount();
 			$model->checkDepencencies = false;
+			$model->sort_order = static::getDefaultSortOrder();
 
 			if(!$this->beforeInstall($model)) {
 				go()->warn(static::class .'::beforeInstall returned false');
@@ -604,7 +602,7 @@ abstract class Module extends Singleton {
 						throw new Exception("Could not install '" . get_class($dependency) . "'");
 					}
 				} else{
-					if (!LegacyModuleModel::install($dependency->getName(), true)) {
+					if (!LegacyModuleModel::install($dependency->getName(), true, $dependency::getDefaultSortOrder())) {
 						throw new Exception("Could not install '" . get_class($dependency) . "'");
 					}
 				}
@@ -701,6 +699,18 @@ abstract class Module extends Singleton {
 		
 		return $parts[3];
 	}
+
+
+	/**
+	 * Default sort order when installing. If null it will be auto generated.
+	 * Modules wit a sort under below 100 will be shown by default. Otherwise they can be opened from the menu.
+	 *
+	 * @return int|null
+	 */
+	public static function getDefaultSortOrder() : ?int{
+		return null;
+	}
+
 	
 	/**
 	 * // backwards compatible 6.2

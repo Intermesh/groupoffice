@@ -203,13 +203,14 @@ GO.email.MessagesGrid = function(config){
 					group: "searchIn",
 					value: 'current',
 					text:  t("Current folder", "email"),
-					iconCls: 'ic-folder',
+					// iconCls: 'ic-folder',
 					checked: true,
 					listeners: {
 						scope: this,
 						checkchange: function(cb, checked) {
 							if(checked) {
 								GO.email.search_in = "current";
+								this.emailClient.mailbox = this.currentMailbox||this.emailClient.mailbox;
 
 								if(this.searchField && this.searchField.getValue()) {
 									this.searchField.search();
@@ -222,12 +223,14 @@ GO.email.MessagesGrid = function(config){
 					group: "searchIn",
 					value: 'all',
 					text:  t("All folders", "email"),
-					iconCls: 'ic-folder',
 					listeners: {
 						scope: this,
 						checkchange: function(cb, checked) {
 							if(checked) {
 								GO.email.search_in = "all";
+								if(this.emailClient.mailbox !== 'virtual/All')
+									this.currentMailbox = this.emailClient.mailbox;
+								this.emailClient.mailbox = 'virtual/All';
 
 								if(this.searchField && this.searchField.getValue()) {
 									this.searchField.search();

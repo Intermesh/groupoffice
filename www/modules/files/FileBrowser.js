@@ -252,7 +252,7 @@ GO.files.FileBrowser = function(config){
 
 	this.trashGridStore = new GO.data.JsonStore({
 		url: GO.url("files/folder/trash"),
-		id: 'type_id',
+		id: 'trash_type_id',
 		fields: ['id', 'entity', 'name', 'fullPath', 'deletedByUser', 'deletedAt'],
 		remoteSort: true
 	});

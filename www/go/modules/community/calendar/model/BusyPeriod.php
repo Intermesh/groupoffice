@@ -3,6 +3,7 @@ namespace go\modules\community\calendar\model;
 
 
 use go\core\db\Criteria;
+use go\core\model\Acl;
 use go\core\util\DateTime;
 
 class BusyPeriod {
@@ -22,7 +23,7 @@ class BusyPeriod {
 	}
 
 	/**
-	 * Relevent events expanding recurring events and where the following is TRUE
+	 * Relevant events expanding recurring events and where the following is TRUE
 	 *
 	 * The principal is subscribed to the calendar.
 	 * The “includeInAvailability” property of the calendar for the principal is “all” or “attending”.
@@ -42,6 +43,8 @@ class BusyPeriod {
 			->from('calendar_calendar_event', 'cce')
 			->join('calendar_event', 'e', 'cce.eventId = e.eventId')
 			->join('calendar_calendar', 'cal', 'cal.id = cce.calendarId');
+
+		Acl::applyToQuery($query, 'cal.aclId', 5); // read free busy
 
 		if(substr($id, 0, 9) == 'Calendar:') {
 			$calendarId = str_replace('Calendar:', '', $id);

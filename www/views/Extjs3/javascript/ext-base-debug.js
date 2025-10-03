@@ -2424,6 +2424,7 @@ Ext.lib.Ajax = function() {
 
             o.conn.addEventListener('error', function(err) {
                 console.error("Connection error", err);
+								console.error(o);
                 handleTransactionResponse(o, callback, false, false);
             });
             

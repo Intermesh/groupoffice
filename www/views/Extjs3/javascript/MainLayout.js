@@ -81,8 +81,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	 */
 	boot : async function() {
 
-		window.GOUI = await import(BaseHref + "views/goui/dist/goui/script/index.js");
-		window.groupofficeCore = await import(BaseHref + "views/goui/dist/groupoffice-core/script/index.js");
+		window.GOUI = await import(BaseHref + "views/goui/dist/goui/script/index.js?v=" + GO.version);
+		window.groupofficeCore = await import(BaseHref + "views/goui/dist/groupoffice-core/script/index.js?v=" + GO.version);
 
 		var me = this;
 		go.browserStorage.connect().finally(function() {
@@ -637,6 +637,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		var menuItemConfig;
 
 		this.state = Ext.state.Manager.get('open-modules');
+		// if(!this.state) {
+		// 	this.state = go.Modules.getAvailable().filter(m => m.showByDefault).map(m => m.name);
+		// }
 
 		for (var i = 0, l = allPanels.length; i < l; i++) {
 

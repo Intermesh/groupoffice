@@ -22,7 +22,7 @@ use function str_split;
  * Or with Docker Compose:
  * 
  * ```
- * docker-compose exec --user www-data groupoffice php cli.php community/addressbook/migrate/run
+ * docker compose exec --user www-data groupoffice php cli.php community/addressbook/migrate/run
  * ```
  * 
  * Core controllers can be accessed with core/ControllerName

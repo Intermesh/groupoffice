@@ -46,11 +46,8 @@ go.defaultpermissions.ShareWindow = Ext.extend(go.form.Dialog, {
 								entity: me.forEntityStore
 							}
 						});
-					}).catch(function(){
-						if (!success) {
-							Ext.getBody().unmask();
-							Ext.MessageBox.alert(t("Error"), t("Failed to save default permissions"));
-						}
+					}).catch(function(e){
+						GO.errorDialog.show(e);
 					}).finally(function(){
 						Ext.getBody().unmask();
 					});
@@ -82,11 +79,8 @@ go.defaultpermissions.ShareWindow = Ext.extend(go.form.Dialog, {
 								entity: me.forEntityStore
 							}
 						});
-					}).catch(function(){
-						if (!success) {
-							Ext.getBody().unmask();
-							Ext.MessageBox.alert(t("Error"), t("Failed to save default permissions"));
-						}
+					}).catch(function(e){
+						GO.errorDialog.show(e);
 					}).finally(function(){
 						Ext.getBody().unmask();
 					})

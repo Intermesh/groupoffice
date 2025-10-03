@@ -114,4 +114,8 @@ return array (
   'Autoreply is active for' => 'Odpowiedź automatyczna jest aktywna dla',
   'Reply every' => 'Odpowiadaj co',
   'To folder' => 'Do folderu',
+  'autoReplyMessage' => 'autoReplyMessage',
+  'Mailing list' => 'Mailing list',
+  'Is from mailing list' => 'Is from mailing list',
+  'exist' => 'exist',
 );

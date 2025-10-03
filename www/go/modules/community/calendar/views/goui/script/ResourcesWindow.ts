@@ -1,19 +1,26 @@
 import {
-	arrayfield,
-	btn, checkbox, colorfield,
-	column, combobox,
-	comp, containerfield,
+	btn,
+	colorfield,
+	column,
+	combobox,
+	comp,
 	DataSourceStore,
-	datasourcestore, displayfield, durationfield,
-	h3, hiddenfield,
-	hr, mapfield,
-	menu, numberfield,
-	searchbtn, select, splitter,
+	datasourcestore,
+	h3,
+	hiddenfield,
+	hr,
+	menu,
+	searchbtn,
+	select,
+	splitter,
 	Table,
 	table,
-	tbar, textarea, textfield, Window
+	tbar,
+	textarea,
+	textfield,
+	Window
 } from "@intermesh/goui";
-import {FormWindow, jmapds, principalcombo} from "@intermesh/groupoffice-core";
+import {FormWindow, jmapds, principalDS} from "@intermesh/groupoffice-core";
 import {t} from "./Index.js";
 
 class ResourceGroupWindow extends FormWindow {
@@ -27,7 +34,7 @@ class ResourceGroupWindow extends FormWindow {
 			textfield({name:'name', label: t('Name')}),
 			textarea({name:'description', label: t('Description')}),
 			combobox({
-				dataSource: jmapds("Principal"), displayProperty: 'name', filter: {entity: 'User'},
+				dataSource: principalDS, displayProperty: 'name', filter: {entity: 'User'},
 				label: t("Default admin"), name: "defaultOwnerId", filterName: "text", flex:'1 0', required:true
 			})
 		);

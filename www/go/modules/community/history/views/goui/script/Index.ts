@@ -1,4 +1,4 @@
-import {client, modules, router} from "@intermesh/groupoffice-core";
+import {client, JmapDataSource, modules, router} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {t} from "@intermesh/goui";
 import {SystemSettings} from "./SystemSettings.js";
@@ -26,3 +26,6 @@ modules.register({
 		});
 	}
 });
+
+export const logEntryDS = new JmapDataSource("LogEntry");
+export const moduleDS = new JmapDataSource("Module");

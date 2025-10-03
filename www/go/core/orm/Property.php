@@ -208,7 +208,7 @@ abstract class Property extends Model {
 	 * @throws Throwable
 	 */
 	private function populateTableRecord(array $record) : void {
-		$m = static::getMapping();
+
 		foreach($record as $colName => $value) {
 			try {
 				if (str_contains($colName, '.')) {
@@ -588,7 +588,9 @@ abstract class Property extends Model {
 
 		$id = [];
 		foreach($diff as $field) {
-			$id[] = $v->$field;
+			// we wan't to hide the userId from user properties
+			if($field != 'userId' || !($v instanceof UserProperty))
+				$id[] = $v->$field;
 		}
 
 		return implode('-', $id);
@@ -738,7 +740,7 @@ abstract class Property extends Model {
 	 *
 	 * Note: if this logic ever changes it must be changed here too: {@see \go\core\jmap\Entity::changesQuery()}
 	 *
-	 * @return string|null eg. 1 or with multiple keys: "1-2"
+	 * @return string|int|null eg. 1 or with multiple keys: "1-2"
 	 */
 	public function id() : string|int|null {
 		if(property_exists($this, 'id')) {
@@ -935,7 +937,7 @@ abstract class Property extends Model {
 
 		$query = (new Query())
 						->from($tables[$mainTableName]->getName(), $tables[$mainTableName]->getAlias())
-						->setModel(static::class, $fetchProperties, $readOnly, $owner);
+						->setModel(static::class, $fetchProperties, $readOnly, $owner, $userId);
 
 
 		$mappedQuery = static::getMapping()->getQuery();
@@ -961,7 +963,7 @@ abstract class Property extends Model {
 	{
 		$primaryTable = static::getMapping()->getPrimaryTable();
 
-		//Used count check here because a customer managed to get negative ID's in the database.
+		//Used count check here because a customer managed to get negative ID's in the database and key might be a string like an email that contains a "-".
 		$keys = $primaryTable->getPrimaryKey();
 		$ids = count($keys) == 1 ? [$id] : explode('-', $id);
 		return array_combine($keys, $ids);
@@ -1631,8 +1633,13 @@ abstract class Property extends Model {
 		$removeKeys = new Criteria();
 		$pk = $cls::getPrimaryKey();
 
+		// generate an array of id's to do a fast comparison below when checking if a model must be removed
+		$modelIds = array_map(function($model) {
+			return $model->id();
+		}, $models);
+
 		foreach($oldModels as $model) {
-			if(self::arrayContains($models, $model)) {
+			if(in_array($model->id(), $modelIds)) {
 				//if object is still present then don't remove
 				continue;
 			}
@@ -1652,24 +1659,6 @@ abstract class Property extends Model {
 		$query->andWhere($removeKeys);
 
 		return $cls::internalDelete($query);
-	}
-
-	/**
-	 * Check if an array of models contains a given property
-	 * Also works for cloned objects because it checks class name and primary key
-	 *
-	 * @param Property[] $models
-	 * @param Property $model
-	 * @throws Exception
-	 */
-	private static function arrayContains(array $models, self $model): bool
-	{
-		foreach($models as $m) {
-			if($m->equals($model)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
   /**
@@ -1861,8 +1850,11 @@ abstract class Property extends Model {
 		$stmt->execute();
 	}
 
-	public function forUserId(): ?int
+	public function forUserId(int|null $forUserId = null): ?int
 	{
+		if(isset($forUserId)) {
+			$this->_forUserId = $forUserId;
+		}
 		return $this->_forUserId ?? go()->getUserId();
 	}
 
@@ -2089,15 +2081,20 @@ abstract class Property extends Model {
 	{
 		$primaryTable = static::getMapping()->getPrimaryTable();
 		$pk = $primaryTable->getPrimaryKey();
+		$pkCount = count($pk);
 
-		$props = [];
-		$keys = explode('-', $id);
+		if($pkCount > 1) {
+			$props = [];
+			$keys = explode('-', $id);
 
-		if(count($keys)  != count($pk)) {
-			throw new InvalidArguments("Invalid ID given for " . static::class.' : '.$id);
-		}
-		foreach ($pk as $key) {
-			$props['`' . $primaryTable->getAlias() . '`.`' . $key . '`'] = array_shift($keys);
+			if (count($keys) != $pkCount) {
+				throw new InvalidArguments("Invalid ID given for " . static::class . ' : ' . $id);
+			}
+			foreach ($pk as $key) {
+				$props['`' . $primaryTable->getAlias() . '`.`' . $key . '`'] = array_shift($keys);
+			}
+		} else {
+			$props['`' . $primaryTable->getAlias() . '`.`' . $pk[0] . '`'] = $id;
 		}
 
 		return $props;
@@ -2490,7 +2487,13 @@ abstract class Property extends Model {
 
 		$pk = $cls::getPrimaryKey();
 
-		$diff = array_diff($pk, array_values($relation->keys));
+		// The map key is the primary key minus the relation keys.
+		$relKeys = array_values($relation->keys);
+		if(is_a($cls, UserProperty::class, true)) {
+			$relKeys[] = "userId";
+		}
+
+		$diff = array_diff($pk, $relKeys);
 		$values = explode("-", $id, count($diff));
 
 		$id = [];
@@ -2726,6 +2729,8 @@ abstract class Property extends Model {
 					if(is_object($v)) {
 						$copy->$name = clone $v;
 					}	else {
+						// we can't set null to all values because we don't know if it's an uninitialized property that is not
+						// nullable
 						if(isset($v) || isset($this->$name) ) {
 							$copy->$name = $v;
 						}

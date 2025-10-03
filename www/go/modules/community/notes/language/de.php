@@ -20,7 +20,7 @@ return array (
   'Filters' => 'Filter',
   'Has links to...' => 'Hat Verknüpfungen mit…',
   'Encrypted data' => 'Verschlüsselte Daten',
-  'Enter password to decrypt' => 'Passwort eingeben zum entschlüsseln',
+  'Enter password to decrypt' => 'Passwort eingeben zum Entschlüsseln',
   'Display options for notebooks' => 'Optionen für Notizbücher anzeigen',
   'Remember last selected note book' => 'Das zuletzt ausgewählte Notizbuch merken',
   'Content' => 'Inhalt',

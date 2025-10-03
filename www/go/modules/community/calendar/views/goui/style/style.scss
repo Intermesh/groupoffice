@@ -59,13 +59,16 @@
 		> *, &:not(.allday)::before {color:white; }
 	}
 	&.declined {
-		text-decoration: line-through;
+		em {
+			text-decoration: line-through;
+		}
 	}
 
 	&.undecided {
 		border: 1px dashed $colorText;
 		color: $colorText;
-		background-color:transparent;
+		//background-color:transparent;
+		opacity: .6;
 	}
 
 	&.tentative {
@@ -189,14 +192,14 @@
 	li {
 
 		&.today {
-			 em {
+			em {
 				font-weight: 600;
 				border-radius: 999px;
 				display:inline-block;
 				margin-left:dp(8);
-				 min-width: dp(36);
-				//float: right;
+				min-width: dp(36);
 				line-height: dp(18);
+				color: white !important;
 				background-color:$colorPrimary !important;
 			}
 		}

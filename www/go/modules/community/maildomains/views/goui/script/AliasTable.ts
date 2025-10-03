@@ -46,10 +46,13 @@ export class AliasTable extends Table<DataSourceStore> {
 				}
 			}),
 			column({
-				id: "goto",
+				id: "recipients",
 				resizable: true,
 				header: t("Goto"),
-				sortable: true
+				sortable: true,
+				renderer: columnValue => {
+					return columnValue.join(", ");
+				}
 			}),
 
 			datecolumn({

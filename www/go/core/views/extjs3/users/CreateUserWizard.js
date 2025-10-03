@@ -9,8 +9,9 @@ go.users.CreateUserWizard = Ext.extend(go.Wizard, {
 		this.user = {};
 
 		var groups = go.util.clone(go.Modules.get('core', 'core').settings.defaultGroups);
-		if(groups.indexOf(2) === -1) {
-			groups.push(2); //add everyone
+
+		if(groups.indexOf("2") === -1) {
+			groups.push("2"); //add everyone
 		}
 		
 		this.groupsGrid = new go.users.UserGroupGrid({
@@ -79,7 +80,7 @@ go.users.CreateUserWizard = Ext.extend(go.Wizard, {
 		var id = Ext.id(), params = {};
 		params.create = {};
 		params.create[id] = this.user;
-		
+
 		go.Db.store("User").set(params, function (options, success, response) {
 
 			if (response.created && response.created[id]) {				
@@ -115,9 +116,17 @@ go.users.CreateUserWizard = Ext.extend(go.Wizard, {
 								field[0].markInvalid(notSaved[id].validationErrors[name].description);
 							}
 						}
-						
-						//Ext.MessageBox.alert(t("Error"), t("Sorry, something went wrong. Please try again."));
-						Ext.MessageBox.alert("Error",notSaved[id].validationErrors[name].description);
+
+						let msg = t("Sorry, something went wrong. Please try again.")
+						if(notSaved[id]) {
+							if (notSaved[id].validationErrors && notSaved[id].validationErrors[name]) {
+								msg = notSaved[id].validationErrors[name].description;
+							} else if (notSaved[id].message) {
+								msg = notSaved[id].message
+							}
+						}
+
+						GO.errorDialog.show(msg);
 						break;
 				}
 

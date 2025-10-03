@@ -30,6 +30,7 @@ class Acl extends Controller {
 		}
 		
 		$defaultAcl = $entityType->getDefaultAcl();
+
 		$cls = $entityType->getClassName();
 
 		if(is_a($cls, ActiveRecord::class, true) ) {
@@ -76,20 +77,22 @@ class Acl extends Controller {
 			$stmt->execute();
 		}
 
-		foreach ($defaultAcl as $groupId => $level) {
+		if(isset($defaultAcl)) {
+			foreach ($defaultAcl as $groupId => $level) {
 
-			$stmt = go()->getDbConnection()
-				->insertIgnore(
-					'core_acl_group',
-					go()->getDbConnection()
-						->select($col . ', "' . $groupId . '", "' . $level . '"')
-						->from($table, 't')
-						->join("core_acl", "acl", "acl.id = t.$col")
-						->where("acl.usedIn = '$fullAclCol'"),
-					['aclId', 'groupId', 'level']
-				);
+				$stmt = go()->getDbConnection()
+					->insertIgnore(
+						'core_acl_group',
+						go()->getDbConnection()
+							->select($col . ', "' . $groupId . '", "' . $level . '"')
+							->from($table, 't')
+							->join("core_acl", "acl", "acl.id = t.$col")
+							->where("acl.usedIn = '$fullAclCol'"),
+						['aclId', 'groupId', 'level']
+					);
 
-			$stmt->execute();
+				$stmt->execute();
+			}
 		}
 
 		if($cls::entityType()->getName() == "Group") {

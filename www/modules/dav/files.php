@@ -76,7 +76,9 @@ $server->addPlugin($browser);
 // Automatically guess (some) contenttypes, based on extesion
 $server->addPlugin(new \Sabre\DAV\Browser\GuessContentType());
 
-$auth = new AuthPlugin($authBackend,\GO::config()->product_name);
+//$server->addPlugin(new \Sabre\DAV\TemporaryFileFilterPlugin((string) go()->getTmpFolder()->getFolder('sabredav')));
+
+$auth = new AuthPlugin($authBackend);
 $server->addPlugin($auth);
 
 if(go()->getDebugger()->enabled) {

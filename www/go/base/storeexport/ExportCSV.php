@@ -38,7 +38,7 @@ class ExportCSV extends AbstractExport {
 		if(!isset($this->_fp)){
 			$this->_fp=fopen('php://output','w+');		
 		}		
-		fputcsv($this->_fp, $data, \GO::user()->list_separator, \GO::user()->text_separator);
+		fputcsv($this->_fp, $data, \GO::user()->list_separator, \GO::user()->text_separator, "");
 	}	
 	
 	public function output(){

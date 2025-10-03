@@ -1,19 +1,25 @@
-import {datasourcestore, DateTime, DefaultEntity,t} from "@intermesh/goui";
-import {client, jmapds} from "@intermesh/groupoffice-core";
+import {DataSourceStore, datasourcestore, DateTime, DefaultEntity, Observable, t, Window} from "@intermesh/goui";
+import {client, JmapDataSource, jmapds, principalDS} from "@intermesh/groupoffice-core";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 
-interface CalendarProvider {
+export interface CalendarProvider {
 	[key:string]:any
 	enabled: boolean
 	load(start:DateTime,end:DateTime): Promise<void | DefaultEntity[]>
 	items(start:DateTime,end:DateTime): Generator<CalendarItem, void>
 }
-export class CalendarAdapter {
+
+export interface CalendarAdapterEventMap {
+	load: {start:DateTime, end: DateTime}
+}
+
+export class CalendarAdapter extends Observable<CalendarAdapterEventMap> {
 
 	private start!: DateTime
 	private end!: DateTime
 
 	constructor() {
+		super();
 		for(const type in this.providers) {
 			const p = this.providers[type];
 			if(p.watch) {
@@ -41,7 +47,12 @@ export class CalendarAdapter {
 				promises.push(p.load(start, end));
 			}
 		}
-		Promise.all(promises).then(this.onLoad);
+		Promise.all(promises).then(() => {
+			this.onLoad()
+
+			this.fire("load", {start, end});
+
+		}).catch(e => Window.error(e))
 	}
 
 	private *generator() {
@@ -49,6 +60,7 @@ export class CalendarAdapter {
 			const p = this.providers[type];
 			if(!p.enabled) continue;
 			for (const item of p.items(this.start, this.end)) {
+				item.provider = type;
 				yield item;
 			}
 		}
@@ -62,6 +74,10 @@ export class CalendarAdapter {
 		return this.providers[type];
 	}
 
+	public registerProvider(type:string, provider:CalendarProvider) {
+		this.providers[type] = provider;
+	}
+
 	private providers: {[type:string] : CalendarProvider} = {
 		'event': {
 			enabled: true,
@@ -69,14 +85,32 @@ export class CalendarAdapter {
 			store:datasourcestore({
 				dataSource:jmapds('CalendarEvent'),
 				relations: {
-					modifier: {dataSource: jmapds("Principal"), path: "modifiedBy"},
-					creator: {dataSource: jmapds("Principal"), path:'createdBy'}
+					modifier: {dataSource: principalDS, path: "modifiedBy"},
+					creator: {dataSource: principalDS, path:'createdBy'}
 				}}),
 			*items(start:DateTime,end:DateTime) {
-				for (const e of this.store!.items) {
-					for(const item of CalendarItem.expand(e as CalendarEvent, start, end))
-						if(!item.isDeclined || client.user.calendarPreferences.showDeclined)
+
+				// Sort personal calendar events on top so merged events will favor the personal one over shared items.
+				const personalCalendarId = client.user.calendarPreferences?.personalCalendarId;
+
+				const events = (this.store as DataSourceStore<JmapDataSource<CalendarEvent>>).data.sort((a,b) => {
+					if(a.calendarId == personalCalendarId) {
+						return -1;
+					}
+
+					if(b.calendarId == personalCalendarId) {
+						return 1;
+					}
+
+					return 0;
+				});
+
+				for (const e of events) {
+					for(const item of CalendarItem.expand(e as CalendarEvent, start, end)) {
+						if ((!item.isDeclined || client.user.calendarPreferences.showDeclined) ) {
 							yield item;
+						}
+					}
 				}
 			},
 			load(start:DateTime,end:DateTime) {
@@ -108,15 +142,23 @@ export class CalendarAdapter {
 			*items(start: DateTime, end: DateTime) {
 				for(const o of this.list) {
 					const start = DateTime.createFromFormat(o.start,'Y-m-d')!;
+
+					let title  = o.title;
+					if(o.region) {
+						title += " (" + o.region + ")";
+					}
 					yield new CalendarItem({
 						key: '',
 						start,
 						extraIcons: ['family_star'],
 						defaultColor: '025d7b',
 						data: {
-							title: o.title,
+							title: title,
 							duration: o.duration,
 							showWithoutTime: true,
+						},
+						cal: {
+							name: t("Holidays")
 						}
 					});
 				}
@@ -127,8 +169,8 @@ export class CalendarAdapter {
 			store: datasourcestore({
 				dataSource: jmapds('Task'),
 				relations: {
-					modifier: {dataSource: jmapds("Principal"), path: "modifiedBy"},
-					creator: {dataSource: jmapds("Principal"), path:'createdBy'}
+					modifier: {dataSource: principalDS, path: "modifiedBy"},
+					creator: {dataSource: principalDS, path:'createdBy'}
 				}
 			}),
 			*items(from:DateTime,until:DateTime) {
@@ -140,7 +182,6 @@ export class CalendarAdapter {
 					} else {
 						date = task.due || task.start || (new DateTime()).format('Y-m-d');
 					}
-
 
 //if(task.title =='test taak met bogus timezone') debugger;
 					const start = DateTime.createFromFormat(date.substring(0,10), 'Y-m-d');
@@ -163,7 +204,10 @@ export class CalendarAdapter {
 							},
 							extraIcons: [task.progress == 'completed' ? 'task_alt' : 'radio_button_unchecked'],
 							defaultColor: '7e472a',
-							data: task
+							data: task,
+							cal: {
+								name: t("Tasks")
+							}
 						});
 					}
 				}
@@ -191,8 +235,8 @@ export class CalendarAdapter {
 			store: datasourcestore({
 				dataSource: jmapds('Contact'),
 				relations: {
-					modifier: {dataSource: jmapds("Principal"), path: "modifiedBy"},
-					creator: {dataSource: jmapds("Principal"), path:'createdBy'}
+					modifier: {dataSource: principalDS, path: "modifiedBy"},
+					creator: {dataSource: principalDS, path:'createdBy'}
 				}
 			}),
 			*items(from:DateTime,end:DateTime) {
@@ -216,6 +260,9 @@ export class CalendarAdapter {
 							title: t('{name}\'s birthday').replace('{name}',b.name),
 							duration: 'P1D',
 							showWithoutTime:true,
+						},
+						cal: {
+							name: t("Birthdays")
 						}
 					});
 				}

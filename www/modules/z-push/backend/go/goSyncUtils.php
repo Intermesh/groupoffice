@@ -608,17 +608,17 @@ class GoSyncUtils {
 			$freq = "";
 			switch ($rec->type) {
 				case "0":
-					$freq = "DAILY";
+					$freq = "daily";
 					break;
 				case "1":
-					$freq = "WEEKLY";
+					$freq = "weekly";
 					break;
 				case "2":
 				case "3":
-					$freq = "MONTHLY";
+					$freq = "monthly";
 					break;
 				case "5":
-					$freq = "YEARLY";
+					$freq = "yearly";
 					break;
 			}
 			$rrule['frequency'] = $freq;
@@ -639,19 +639,19 @@ class GoSyncUtils {
 			}
 			$days = [];
 			if (($rec->dayofweek & 1) == 1)
-				$days[] = $week . "SU";
+				$days[] = $week . "su";
 			if (($rec->dayofweek & 2) == 2)
-				$days[] = $week . "MO";
+				$days[] = $week . "mo";
 			if (($rec->dayofweek & 4) == 4)
-				$days[] = $week . "TU";
+				$days[] = $week . "tu";
 			if (($rec->dayofweek & 8) == 8)
-				$days[] = $week . "WE";
+				$days[] = $week . "we";
 			if (($rec->dayofweek & 16) == 16)
-				$days[] = $week . "TH";
+				$days[] = $week . "th";
 			if (($rec->dayofweek & 32) == 32)
-				$days[] = $week . "FR";
+				$days[] = $week . "fr";
 			if (($rec->dayofweek & 64) == 64)
-				$days[] = $week . "SA";
+				$days[] = $week . "sa";
 			$rrule['byDay'] = $days;
 		}
 		if (isset($rec->dayofmonth)) {

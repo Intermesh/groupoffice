@@ -54,6 +54,16 @@ class Principal extends AclOwnerEntity
 			->addTable('core_principal', 'principal');
 	}
 
+	static function findIdByEmail($email, $preferUser = true) {
+		$stmt = self::find()->selectSingleValue('principal.id')
+			->where('email','=',$email);
+		if($preferUser) {
+			$stmt->join("core_entity", "e", "e.id=principal.entityTypeId")
+				->orderBy([new Expression("(e.name='User') DESC")]);
+		}
+		return $stmt->single();
+	}
+
 	static function currentUser() {
 		return self::find()->where('id','=',go()->getUserId())->single();
 	}
@@ -81,11 +91,12 @@ class Principal extends AclOwnerEntity
 			})->add('permissionLevel', function(Criteria $criteria, $value, Query $query) {
 				Acl::applyToQuery($query, 'principal.aclId', $value);
 			}, Acl::LEVEL_READ)
-//			->add('showDisabled', function (Criteria $criteria, $value){
-//				if($value === false) {
-//					$criteria->andWhere('enabled', '=', 1);
-//				}
-//			}, false)
+			->add('showDisabledUsers', function (Criteria $criteria, $value, Query $query){
+				if($value === false) {
+					$query->join("core_user", "u", "u.id = principal.id", "left");
+					$criteria->andWhere('(u.enabled IS NULL or u.enabled = 1)');
+				}
+			}, false)
 			->add('email', function (Criteria $criteria, $value, Query $query){
 				$criteria->where('email', '=', $value);
 			})
@@ -104,6 +115,11 @@ class Principal extends AclOwnerEntity
 						->andWhere('e.quitAt', 'IS', NULL)
 						->orWhere('e.quitAt','>',new DateTime())
 				);
+			})
+			->add("preferUser", function (Criteria $criteria, $value, Query $query){
+				$query->groupBy(['email'])
+					//->orderby([new Expression("max(entityTypeId=".User::entityType()->getId().") DESC, name ASC")]);
+					->orderby([new Expression("CASE WHEN entityTypeId = ".User::entityType()->getId()." THEN 0 ELSE 1 END, name ASC")]);
 			})
 			->add('groupId', function (Criteria $criteria, $value, Query $query){
 				$query->join('core_user_group', 'ug', 'ug.userId = principal.id')->andWhere(['ug.groupId' => $value]);

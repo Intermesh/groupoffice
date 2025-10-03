@@ -41,7 +41,7 @@ class Participant extends Property
 	protected ?string $id;
 	protected int $eventId;
 	/** display name of participant */
-	public ?string $name;
+	public ?string $name = null;
 
 	/** @var string email address for the participant */
 	public string $email;
@@ -113,17 +113,6 @@ class Participant extends Property
 		// scheduler needs this after finding participant by scheduleId
 		return $this->id;
 	}
-//
-//	/**
-//	 * A client may set the property on a participant to true to request that the server send a scheduling message to
-//	 * the participant when it would not normally do so (e.g., if no significant change is made the object). The property MUST NOT be stored in the JSCalendar object on the server or appear
-//	 * in a scheduling message.
-//	 *
-//	 * @todo this doesn't seem to do anytning?
-//	 */
-//	public function setScheduleForceSend($val) {
-//		$this->_sendTheSchedulingMessageAnyway = $val;
-//	}
 
 	public function expectReply(bool $v) {
 		$this->expectReply = $v;

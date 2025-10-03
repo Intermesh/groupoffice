@@ -11,7 +11,7 @@ use go\core\orm\Query;
 
 class Group extends Base {
 
-	protected function getFieldSQL(): bool
+	protected function getFieldSQL()
 	{
 		$d = $this->field->getDefault();
 		$d = isset($d) ? (int) $d : "NULL";

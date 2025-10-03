@@ -1,7 +1,7 @@
-import {client, jmapds, modules} from "@intermesh/groupoffice-core";
+import {client, jmapds, modules, principalDS} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {router} from "@intermesh/groupoffice-core";
-import {datasourcestore, t as coreT, E, translate, DateTime, Window, h3} from "@intermesh/goui";
+import {datasourcestore, t as coreT, E, translate, DateTime, Window, h3, Button} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {EventDetail, EventDetailWindow} from "./EventDetail.js";
 import {PreferencesPanel} from "./PreferencesPanel";
@@ -12,16 +12,31 @@ export * from "./Main.js";
 export * from "./CalendarList.js";
 export * from "./CalendarView.js";
 export * from "./CalendarItem.js";
+export * from "./MonthView.js";
+export * from "./WeekView.js";
+export * from "./CalendarAdapter.js"
 
 export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list';
 export const calendarStore = datasourcestore({
 	dataSource:jmapds('Calendar'),
 	queryParams:{filter:{isSubscribed: true, davaccountId : null}},
+	sort: [{property:'sortOrder'},{property:'name'}],
+	relations: {
+		owner: {
+			path: "ownerId",
+			dataSource: principalDS
+		}
+	}
+});
+
+export const allCalendarStore = datasourcestore({
+	dataSource:jmapds('Calendar'),
+	queryParams:{filter:{}},
 	sort: [{property:'sortOrder'},{property:'name'}]
 });
 export const writeableCalendarStore = datasourcestore({
 	dataSource:jmapds('Calendar'),
-	queryParams:{filter:{isSubscribed: true, davaccountId : null, permissionLevel:30/*writeOwn*/}},
+	queryParams:{filter:{isSubscribed: true, davaccountId : null, isResource:false, permissionLevel:30/*writeOwn*/}},
 	sort: [{property:'sortOrder'},{property:'name'}]
 })
 
@@ -29,6 +44,12 @@ export const categoryStore = datasourcestore({
 	dataSource:jmapds('CalendarCategory'),
 	sort: [{property:'name'}]
 })
+
+export const viewStore = datasourcestore({
+	dataSource:jmapds('CalendarView'),
+	sort: [{property:'name'}]
+})
+
 
 export const t = (key:string,p='community',m='calendar') => coreT(key, p,m);
 export const statusIcons = {
@@ -71,11 +92,17 @@ function addEmailAction() {
 				data.calendarId = data.calendarId ?? client.user.calendarPreferences?.defaultCalendarId;
 			dlg.loadEvent(new CalendarItem({data:data, key: data.id ? data.id + "" : null}));
 			dlg.show();
+
+			return dlg;
 		};
 
 
-		if(GO.email) GO.email.handleITIP = (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent|string, feedback?:string, recurrenceId?:string}} ) => {
+		if(GO.email) GO.email.handleITIP = async (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent|string, feedback?:string, recurrenceId?:string}} ) => {
 			if(msg.itip) {
+				if(!calendarStore.loaded) {
+					// CalendarItem depends on the store being loaded
+					await calendarStore.load();
+				}
 				const event = msg.itip.event,
 					btns = E('div').cls('btns'),
 					names: any = {accepted: t("Accept"), tentative: t("Maybe"), declined: t("Decline")},
@@ -92,6 +119,7 @@ function addEmailAction() {
 								E('div',
 									...['accepted', 'tentative', 'declined'].map(s => E('button', names[s])
 										.cls('goui-button')
+										.cls('disabled', item.calendarPrincipal?.participationStatus == s)
 										.cls('pressed', item.calendarPrincipal?.participationStatus == s)
 										.on('click', _ => {
 											item.updateParticipation(s as 'accepted'|'declined'|'tentative',() => {
@@ -214,6 +242,7 @@ modules.register(  {
 			// OLD CODE
 			async function showBadge() {
 				const count = await go.Jmap.request({method: "CalendarEvent/countMine"});
+				ui.inboxBtn.hidden = count<1;
 				GO.mainLayout.setNotification('calendar', count, 'orange');
 			}
 			go.Db.store("CalendarEvent").on("changes", () => {
@@ -246,10 +275,11 @@ modules.register(  {
 			modules.addMainPanel("community", "Calendar", 'calendar', t('Calendar'), () => ui);
 
 			go.Alerts.on("beforeshow", function(alerts: any, alertConfig: any) {
+
 				const alert = alertConfig.alert,
 					msgs: {[key:string]: string} = {
-						request: t('New invitation from {organizer}'),
-						update: t("Invitation updated by {organizer}"),
+						request: t('New invitation from {from}'),
+						reply: t("Invitation updated by {from}"),
 						created: t("New event created by {creator}")
 					};
 				//debugger;
@@ -257,23 +287,42 @@ modules.register(  {
 
 					alertConfig.panelPromise = alertConfig.panelPromise.then(async (panelCfg: any) => {
 
-						const msg: string = msgs[alert.tag] || '',
+						let msg: string = msgs[alert.tag] || '',
 							time = go.util.Format.shortDateTime(alert.triggerAt);
 
 						if(alert.tag === 'created'){
-							msg.replace('{creator}', alert.data.creator);
+							msg = msg.replace('{creator}', alert.data.creator);
 						}
-						if(alert.tag === 'update' || alert.tag === 'request') {
-							msg.replace('{organizer}', alert.data.organizer);
-							panelCfg.buttons = [
-								{text:t('Accept')},
-								{text:t('Maybe')},
-								{text:t('Decline')}
-							];
+						if(alert.tag === 'reply' || alert.tag === 'request') {
+							msg = msg.replace('{from}', alert.data.from?.personal ?? t("Unknown"));
+
+							if(alert.tag === 'request') {
+								const event = await jmapds("CalendarEvent").single(alert.entityId);
+								if (event) {
+									const item = new CalendarItem({key: alert.entityId + "", data: event});
+									panelCfg.buttons = [
+										{
+											text: t('Accept'), handler: (btn: any) => {
+												item.updateParticipation("accepted", () => btn.findParentByType("panel").destroy());
+											}
+										},
+										{
+											text: t('Maybe'), handler: (btn: any) => {
+												item.updateParticipation("tentative", () => btn.findParentByType("panel").destroy())
+											}
+										},
+										{
+											text: t('Decline'), handler: (btn: any) => {
+												item.updateParticipation("declined", () => btn.findParentByType("panel").destroy())
+											}
+										}
+									];
+								}
+							}
 						}
 
-						panelCfg.items = [{html: msg+'<br>'+time }];
-						panelCfg.notificationBody = msg+"\n"+time; // for desktop notifications (no html)
+						panelCfg.items = [{html: msg + '<br>'+time }];
+						panelCfg.notificationBody = msg + "\n"+time; // for desktop notifications (no html)
 						return panelCfg;
 					});
 

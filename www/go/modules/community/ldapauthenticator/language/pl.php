@@ -20,10 +20,11 @@ return array (
   'Enable this if the SMTP server credentials are identical to the IMAP server.' => 'Włącz tę opcję, jeśli poświadczenia SMTP są identyczne do poświadczeń IMAP.',
   'Synchronization' => 'Synchronizacja',
   'Synchronize users' => 'Zsynchronizuj użytkowników',
-  'Delete users' => 'Usuń użytkowników ',
+  'Delete users' => 'Usuń użytkowników',
   'Max delete percentage' => 'Maksymalny procent usuniętych',
   'Synchronize groups' => 'Zsynchronizuj grupy',
   'Delete groups' => 'Usuń grupy',
   'Group query' => 'Zapytania grupy',
   'For Microsoft ActiveDirectory use \'(objectCategory=group)\'' => 'Dla Microsoft ActiveDirectory użyj \'(objectCategory=group)\'',
+  'Enter the domains this ldap server should be used to authenticate. Users must login with their e-mail address and if the domain matches this profile it will be used.' => 'Podaj domeny, dla których ten serwer LDAP ma być używany do uwierzytelniania. Użytkownicy muszą logować się swoim adresem e‑mail, a jeśli domena pasuje do tego profilu, zostanie on użyty.',
 );

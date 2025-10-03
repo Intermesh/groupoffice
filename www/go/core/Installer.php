@@ -379,15 +379,18 @@ class Installer {
 
 	}
 
-	public function getUnavailableModules(): array
+	public function getUnavailableModules(bool|null $enabled = true): array
 	{
 		$this->removeObsoleteModules();
 
 		$modules = (new Query)
-						->select('name, package')
-						->from('core_module')
-						->where('enabled', '=', true)
-						->all();
+						->select('*')
+						->from('core_module')					;
+
+
+		if(isset($enabled)) {
+			$modules->where('enabled', '=', $enabled);
+		}
 
 
 		$unavailable = [];
@@ -405,14 +408,14 @@ class Installer {
 				$moduleCls = "GO\\" . ucfirst($module['name']) . "\\" . ucfirst($module['name']) . "Module";
 			}
 			if (!class_exists($moduleCls)) {
-				$unavailable[] = ["package" => $module['package'], "name" => $module['name']];
+				$unavailable[] = $module;
 				continue;
 			}
 
 			$mod = $moduleCls::get();
 
 			if (!$mod->isAvailable()) {
-				$unavailable[] = ["package" => $module['package'], "name" => $module['name']];
+				$unavailable[] = $module;
 			}
 		}
 		
@@ -434,7 +437,7 @@ class Installer {
 
 			$where = (new Query);
 			foreach($unavailable as $m) {
-				$where->orWhere($m);
+				$where->orWhere(['id' => $m['id']]);
 			}
 			$stmt = go()->getDbConnection()->update("core_module", ['enabled' => false], $where);
 			$stmt->execute();
@@ -618,7 +621,7 @@ class Installer {
 		foreach ($modules as $module) {
 
 			if (!$module->isAvailable()) {
-				echo "Skipping module " . $module->name . " because it's not available.\n";
+				//echo "Skipping module " . $module->name . " because it's not available.\n";
 				continue;
 			}
 			
@@ -680,7 +683,7 @@ class Installer {
 		foreach ($modules as $module) {
 
 			if (!$module->isAvailable()) {
-				echo "Skipping module " . $module->name . " because it's not available.\n";
+				//echo "Skipping module " . $module->name . " because it's not available.\n";
 				continue;
 			}
 

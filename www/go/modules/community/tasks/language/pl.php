@@ -67,4 +67,10 @@ return array (
   'Set today for start and due date when creating new tasks' => 'Ustal obecną datę jako datę rozpoczęcia i termin zakończenia podczas tworzenia nowych zadań',
   'Unknown user' => 'Nieznany użytkownik',
   'CC' => 'DW',
+  'Create tasklist' => 'Utwórz listę zadań',
+  'Subscribe to task list' => 'Subskrybuj listę zadań',
+  'Project' => 'Project',
+  'Sync to device' => 'Synchronizuj z urządzeniem',
+  'Make tasklist available in CalDAV and ActiveSync' => 'Udostępnij listę zadań w CalDAV i ActiveSync',
+  'Subscribe to Tasklist' => 'Subskrybuj listę zadań',
 );

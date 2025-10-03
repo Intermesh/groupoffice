@@ -121,6 +121,13 @@ namespace go\core {
 		const EVENT_SCRIPTS = 'scripts';
 
 		/**
+		 * Fires when a user mailer is requested.
+		 *
+		 * @param $mailer array{mailer}
+		 */
+		const EVENT_USER_MAILER = 'usermailer';
+
+		/**
 		 *
 		 * @var Connection
 		 */
@@ -255,14 +262,30 @@ namespace go\core {
 		 * $message = App::getMailer()->compose();
 		 * $message->setTo()->setFrom()->setBody()->send();
 		 * ```
+		 * @param string|null $fromEmail If given it will attempt to find an account that matches this sender e-mail. If
+		 * 	not found it will use the system mailer with the system from address and this address as Reply-To header.
+		 * @param string|null $fromName The from name to use in combination with the $fromEmail
+		 *
 		 * @return Mailer
 		 */
-		public function getMailer(): Mailer
+		public function getMailer(string|null $fromEmail = null, string|null $fromName = null): Mailer
 		{
-			if (!isset($this->mailer)) {
-				$this->mailer = new Mailer();
+			if(!isset($fromEmail)) {
+				return new Mailer();
+			} else {
+				$mailer = App::fireEvent(self::EVENT_USER_MAILER, $fromEmail);
+				if($mailer instanceof Mailer) {
+					$mailer->fromEmail = $fromEmail;
+					$mailer->fromName = $fromName;
+					return $mailer;
+				} else {
+					$mailer = new Mailer();
+					$mailer->fromEmail = go()->getSettings()->systemEmail;
+					$mailer->fromName = $fromName;
+					$mailer->replyTo = $fromEmail;
+					return $mailer;
+				}
 			}
-			return $this->mailer;
 		}
 
 		/**

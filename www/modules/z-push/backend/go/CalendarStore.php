@@ -11,7 +11,7 @@ class CalendarStore extends Store {
 	public function GetFolder($id)
 	{
 		$calendar = Calendar::findById($id);
-		if (!$calendar || !$calendar->isSubscribed) {
+		if (!$calendar || !$calendar->isSubscribed || !$calendar->syncToDevice) {
 			return false;
 		}
 
@@ -51,6 +51,7 @@ class CalendarStore extends Store {
 	{
 		return Calendar::find()->select('caluser.id, name as "mod", "0" as parent')
 			->andWhere('isSubscribed', '=', 1)
+			->andWhere('syncToDevice', '=', 1)
 			->fetchMode(\PDO::FETCH_ASSOC)
 			->all();
 	}

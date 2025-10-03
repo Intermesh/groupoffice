@@ -293,6 +293,9 @@ final class Mailbox extends AclItemEntity
 		$d = $this->getDomain();
 		$totalQuota = $d->totalQuota;
 		if (!empty($totalQuota)) {
+			if(empty($this->quota)) {
+				$this->quota = $d->defaultQuota;
+			}
 			if (empty($this->quota)) {
 				$this->setValidationError('quota', ErrorCode::FORBIDDEN,
 					'You are not allowed to disable mailbox quota');

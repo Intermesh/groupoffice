@@ -143,7 +143,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 								let type = '';
 								if(v.email == this.item?.calendarPrincipal?.email) {
-									type = ' ('+(this.item!.principalId === client.user.id ? t('You') : t('This'))+')';
+									type = ' ('+(this.item!.calendarPrincipal?.email === client.user.email ? t('You') : t('This'))+')';
 								}
 								let name = v.name ? v.name + (v.email ? type+'<br>' + v.email :'') : v.email+type;
 
@@ -224,11 +224,14 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 	private pressButton(v:'accepted'|'declined'|'tentative') {
 		this.statusTbar.items.forEach(btn => {
 			btn.el.cls('pressed', btn.itemId === v);
+			btn.disabled = btn.itemId === v;
 		});
-
 	}
+
+
+
 	private updateStatus(v:'accepted'|'declined'|'tentative') {
-		this.item!.updateParticipation(v);
+		this.item!.updateParticipation(v, () => {void this.loadEvent(this.item!)});
 		this.pressButton(v);
 	}
 
@@ -286,6 +289,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 			this.toolbar.show();
 
+			this.pressButton(ev.calendarPrincipal?.participationStatus);
 			this.form.findField('alerts')!.hidden = false;
 			this.form.load(ev.data.id).then(() => {
 				if(ev.recurrenceId) {

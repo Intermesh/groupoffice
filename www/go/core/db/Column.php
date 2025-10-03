@@ -72,6 +72,8 @@ class Column {
 
 	/**
 	 * Length of the column
+	 *
+	 * @see Table::init()
 	 * 
 	 * @var int
 	 */
@@ -292,10 +294,10 @@ class Column {
 		switch ($this->dbType) {
 			case 'localdatetime':
 			case 'datetime':
-				return $value->format(self::DATETIME_FORMAT);
+				return is_string($value ) ? $value : $value->format(self::DATETIME_FORMAT);
 
 			case 'date':
-				return $value->format(self::DATE_FORMAT);
+				return is_string($value ) ? $value : $value->format(self::DATE_FORMAT);
 
 			case 'json':
 				return empty($value) ? null : JSON::encode($value);

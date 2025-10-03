@@ -1,8 +1,9 @@
 import {CalendarView} from "./CalendarView.js";
-import {DateTime, E} from "@intermesh/goui";
-import {calendarStore} from "./Index.js";
+import {DateTime, E, store, Store} from "@intermesh/goui";
+import {allCalendarStore, calendarStore} from "./Index.js";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
+import {jmapds} from "@intermesh/groupoffice-core";
 
 export class SplitView extends CalendarView {
 
@@ -10,13 +11,9 @@ export class SplitView extends CalendarView {
 	calRows: [string, HTMLElement][] = []
 	calViewModel : {[calId:string]: CalendarItem[]} = {}
 	baseCls = 'cal split'
-
+	calendars: any[] = []
 	constructor(adapter: CalendarAdapter) {
 		super(adapter);
-		calendarStore.on('load', () => { if(this.el.innerHTML !== '') {
-			this.renderView()
-			this.updateItems();
-		} })
 	}
 
 	goto(day: DateTime, amount: number) {
@@ -26,6 +23,7 @@ export class SplitView extends CalendarView {
 		this.day = day.setHours(0,0,0,0);
 		this.start = this.day.clone().setWeekDay(0);
 		const end = this.start.clone().addDays(amount);
+
 		this.renderView();
 		this.adapter.goto(this.start, end);
 	}
@@ -41,16 +39,19 @@ export class SplitView extends CalendarView {
 
 	protected populateViewModel() {
 		this.clear()
+
+		const activeFilter = this.adapter.byType('event').store.queryParams.filter.inCalendars;
 		//const viewEnd = this.start.clone().addDays(this.days);
-		for (let calendar of calendarStore) {
-			this.calViewModel[calendar.id] = [];
+		for (let calendarId of activeFilter) {
+			this.calViewModel[calendarId] = [];
 		}
 		for (const e of this.adapter.items) {
-			if(e.data.calendarId)
+			if(e.data.calendarId && this.calViewModel[e.data.calendarId])
 				this.calViewModel[e.data.calendarId].push(e);
 		}
 		for(let calId in this.calViewModel) {
-			this.calViewModel[calId].sort((a,b) => a.start.date < b.start.date ? -1 : 1);
+			if(this.calViewModel[calId])
+				this.calViewModel[calId].sort((a,b) => a.start.date < b.start.date ? -1 : 1);
 		}
 
 		this.updateItems();
@@ -73,27 +74,32 @@ export class SplitView extends CalendarView {
 		this.el.append(E('ul', ...headers)); // headers
 
 		this.calRows = [];
-		for (let calendar of calendarStore) {
-			if(!calendar.isVisible) continue;
-			day = this.start.clone();
-			const eventContainer = E('li', ...this.drawCal(calendar.id)).cls('events'),
-				row = E('ol',
-					eventContainer,
-					//E('li', E('i', 'event').cls('icon').css({color:'#'+calendar.color}), calendar.name)
-				);
-			for (i = 0; i < this.days; i++) {
-				row.append(E('li').attr('data-date', day.format('Y-m-d'))
-					.cls('today', day.format('Ymd') === now.format('Ymd'))
-					.cls('past', day.format('Ymd') < now.format('Ymd'))
-					.cls('other', day.getDay()%6==0))
+		const activeFilter = this.adapter.byType('event').store.queryParams.filter.inCalendars;
+		jmapds('Calendar').get(activeFilter).then((resp) => {
+			this.calendars = resp.list;
+			for (let calendar of this.calendars) {
 
-				day.addDays(1);
-				//it++;
+				if(activeFilter.indexOf(calendar.id) === -1) continue;
+				day = this.start.clone();
+				const eventContainer = E('li', ...this.drawCal(calendar.id)).cls('events'),
+					row = E('ol',
+						eventContainer,
+						//E('li', E('i', 'event').cls('icon').css({color:'#'+calendar.color}), calendar.name)
+					);
+				for (i = 0; i < this.days; i++) {
+					row.append(E('li').attr('data-date', day.format('Y-m-d'))
+						.cls('today', day.format('Ymd') === now.format('Ymd'))
+						.cls('past', day.format('Ymd') < now.format('Ymd'))
+						.cls('other', day.getDay()%6==0))
+
+					day.addDays(1);
+					//it++;
+				}
+				this.calRows.push([calendar.id, eventContainer]);
+				this.el.append(E('div',E('i', 'event').cls('icon').css({color:'#'+calendar.color}), calendar.name), row);
 			}
-			this.calRows.push([calendar.id, eventContainer]);
-			this.el.append(E('div',E('i', 'event').cls('icon').css({color:'#'+calendar.color}), calendar.name), row);
-		}
-
+			this.populateViewModel();
+		});
 	}
 
 	private updateItems() {

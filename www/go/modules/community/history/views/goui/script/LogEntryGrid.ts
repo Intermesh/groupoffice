@@ -1,19 +1,20 @@
 import {avatar, btn, column, comp, datasourcestore, DataSourceStore, datecolumn, t, Table} from "@intermesh/goui";
-import {jmapds, img, client} from "@intermesh/groupoffice-core";
+import {client, principalDS} from "@intermesh/groupoffice-core";
 import {HistoryDetailWindow} from "./HistoryDetailWindow.js";
+import {logEntryDS} from "./Index.js";
 
 export class LogEntryGrid extends Table<DataSourceStore> {
 	constructor() {
 		super(
 			datasourcestore({
-				dataSource: jmapds("LogEntry"),
+				dataSource: logEntryDS,
 				sort: [{
 					property: "id",
 					isAscending: false
 				}],
 				relations: {
 					creator: {
-						dataSource: jmapds("Principal"),
+						dataSource: principalDS,
 						path: "createdBy"
 					}
 				},
