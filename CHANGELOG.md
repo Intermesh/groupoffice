@@ -1,3 +1,5 @@
+- Calendartimetracking: set required modules
+
 29-09-2025: 25.0.56
 - Calendar: Find participant by e-mail so that scheduling works better when you invite a contact that's also a user
 - E-mail: Missing "None" label for in email composer templates menu. Related to issue #1343
