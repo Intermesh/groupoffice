@@ -342,7 +342,7 @@ GO.email.MessagesGrid = function(config){
 				tools: [
 					this.moveAllButton = new Ext.Button({
 						iconCls: 'ic-move-to-inbox',
-						tooltip: t('Move all'),
+						tooltip: t('Move all', 'email'),
 						disabled: true,
 						handler: function (b) {
 
@@ -358,7 +358,7 @@ GO.email.MessagesGrid = function(config){
 					}),
 					this.deleteAllButton = new Ext.Button({
 						iconCls: 'ic-delete-sweep',
-						tooltip: t('Delete all'),
+						tooltip: t('Delete all', 'email'),
 						disabled: true,
 						handler: function (b) {
 

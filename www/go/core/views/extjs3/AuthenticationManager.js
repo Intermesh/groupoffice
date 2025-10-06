@@ -98,7 +98,7 @@ go.AuthenticationManager = (function () {
 								
 							case 403:
 								// Not allowed by IP filter AllowGroup or user not enabled.
-								Ext.MessageBox.alert(t("Account disabled"), response.statusText);
+								Ext.MessageBox.alert(t("Account disabled"), t(response.statusText));
 								break;
 								
 							case 401: //Bad login
