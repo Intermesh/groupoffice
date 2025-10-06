@@ -18,6 +18,7 @@ use GO\Base\Util\StringHelper;
 use go\core\ErrorHandler;
 use go\core\http\Client;
 use go\core\util\JSON;
+use Maestroerror\HeicToJpg;
 
 
 class CoreController extends \GO\Base\Controller\AbstractController {
@@ -323,7 +324,6 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 //		} else {
 
 			switch (strtolower($file->extension())) {
-
 				case 'svg':
 				case 'ico':
 				case 'jpg':
@@ -331,6 +331,8 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 				case 'png':
 				case 'gif':
 				case 'xmind':
+				case 'heic':
+				case 'heif':
 					$src = GO::config()->file_storage_path . $params['src'];
 					break;
 
@@ -440,7 +442,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		GO::debug("Thumb mtime: ".$thumbMtime." (".$cacheFilename.")");
 
 		if (!empty($params['nocache']) || !$thumbExists || $thumbMtime < $file->mtime() || $thumbMtime < $file->ctime()) {
-			
+
 			GO::debug("Resizing image");
 			$image = new \go\core\util\Image($file->path());
 
@@ -477,7 +479,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 						$image->resize($w, $h);
 					} elseif ($w) {
 						$image->resizeToWidth($w);
-					} else {
+					} else if($h) {
 						$image->resizeToHeight($h);
 					}
 				}

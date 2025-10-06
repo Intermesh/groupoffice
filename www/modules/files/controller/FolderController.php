@@ -1887,9 +1887,12 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 				$index++;
 
+				$isHeic = $file->extension == 'heic' || $file->extension == 'heif';
+				$downloadUrl = $file->getDownloadURL(false);
 				$response['images'][]=array(
 					"name"=>$file->name,
-					"download_path"=>$file->getDownloadURL(false),
+					"download_path"=> $downloadUrl,
+					"full_size_url"=> !$isHeic ? $downloadUrl : $file->getThumbUrl(['noop' => true]),
 					"src"=>$file->getThumbUrl($thumbParams)
 				);
 			}

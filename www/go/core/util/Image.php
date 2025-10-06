@@ -4,7 +4,9 @@ namespace go\core\util;
 use Exception;
 use go\core\App;
 use go\core\ErrorHandler;
+use go\core\fs\File;
 use go\core\http\Response;
+use Maestroerror\HeicToJpg;
 
 /**
  * Image resizer
@@ -36,8 +38,14 @@ class Image {
 	 */
 	public function getImageType(): int
 	{
+		if(!isset($this->originalImage)) {
+			$this->createOriginalImage();
+		}
+
 		return $this->imageType;
 	}
+
+	const supportedExtensions = ['svg','ico','jpg','jpeg','png','gif','xmind','heic','heif'];
 
 	/**
 	 * Load an image file
@@ -52,21 +60,34 @@ class Image {
 			return false;
 		}
 
-		$image_info = getimagesize($filename);
+		if(str_ends_with($filename, ".heic") || str_ends_with($filename, ".heif")) {
+			$tmpFile = File::tempFile("jpg");
+			HeicToJpg::convert($filename)->saveAs($tmpFile->getPath());
+			$filename = $tmpFile->getPath();
+		}
+
+
+
+		$this->originalFilename = $filename;
+
+		return true;
+	}
+
+
+	private function createOriginalImage() {
+		$image_info = getimagesize($this->originalFilename);
 		if(!$image_info) {
 			return false;
 		}
 
 		$this->imageType = $image_info[2];
 
-		$this->originalFilename = $filename;
-
 		if ($this->imageType == IMAGETYPE_JPEG) {
-			$this->originalImage = imagecreatefromjpeg($filename);
+			$this->originalImage = imagecreatefromjpeg($this->originalFilename);
 		} elseif ($this->imageType == IMAGETYPE_GIF) {
-			$this->originalImage = imagecreatefromgif($filename);
+			$this->originalImage = imagecreatefromgif($this->originalFilename);
 		} elseif ($this->imageType == IMAGETYPE_PNG) {
-			$this->originalImage = imagecreatefrompng($filename);
+			$this->originalImage = imagecreatefrompng($this->originalFilename);
 		} else {
 			return false;
 		}
@@ -77,6 +98,7 @@ class Image {
 	 * Set a transparent background for GIF or PNG images
 	 */
 	private function transperancy() {
+
 		if ($this->imageType == IMAGETYPE_GIF || $this->imageType == IMAGETYPE_PNG) {
 			$trnprt_indx = imagecolortransparent($this->originalImage);
 
@@ -173,11 +195,21 @@ class Image {
 	}
 
 	private function getImage() {
+
+		if(!isset($this->originalImage)) {
+			$this->createOriginalImage();
+		}
+
 		return $this->resizedImage ?? $this->originalImage;
 	}
 
 	public function contents() {
 		ob_start();
+
+		if(!isset($this->originalImage)) {
+			$this->createOriginalImage();
+		}
+
 		switch($this->imageType) {
 			case IMAGETYPE_JPEG: 
 				imagejpeg($this->getImage(), null, $this->jpegCompression); break;

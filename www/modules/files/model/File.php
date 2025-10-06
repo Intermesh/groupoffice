@@ -735,20 +735,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	 * @return boolean
 	 */
 	public function isImage(){
-		switch(strtolower($this->extension)){
-			case 'ico':
-			case 'jpg':
-			case 'jpeg':
-			case 'png':
-			case 'gif':
-			case 'bmp':
-			case 'xmind':
-			case 'svg':
-
-				return true;
-			default:
-				return false;
-		}
+		return $this->fsFile->isImage();
 	}
 
 
