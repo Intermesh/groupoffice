@@ -1,6 +1,8 @@
 - Calendartimetracking: set required modules
 - Core: More PL translations and corrections
 - Finance/mollie: Setup SEPA mandates manually
+- Calendar: Improve meeting selection clarity by changing button text and hide body buttons inside group-office 
+  (except for resources).
 
 29-09-2025: 25.0.56
 - Calendar: Find participant by e-mail so that scheduling works better when you invite a contact that's also a user
