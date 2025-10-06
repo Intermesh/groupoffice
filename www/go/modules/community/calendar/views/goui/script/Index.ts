@@ -106,6 +106,7 @@ function addEmailAction() {
 				const event = msg.itip.event,
 					btns = E('div').cls('btns'),
 					names: any = {accepted: t("Accept"), tentative: t("Maybe"), declined: t("Decline")},
+					pressedNames: any = {accepted: t("Accepted"), tentative: t("Maybe"), declined: t("Declined")},
 					updateBtns = (item: CalendarItem) => {
 
 						btns.innerHTML = '';
@@ -117,7 +118,7 @@ function addEmailAction() {
 						} else {
 							btns.append(
 								E('div',
-									...['accepted', 'tentative', 'declined'].map(s => E('button', names[s])
+									...['accepted', 'tentative', 'declined'].map(s => E('button', item.calendarPrincipal?.participationStatus == s ? pressedNames[s] : names[s])
 										.cls('goui-button')
 										.cls('disabled', item.calendarPrincipal?.participationStatus == s)
 										.cls('pressed', item.calendarPrincipal?.participationStatus == s)
