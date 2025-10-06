@@ -1,3 +1,4 @@
+06-10-2025: 25.0.57
 - Calendartimetracking: set required modules
 - Core: More PL translations and corrections
 - Finance/mollie: Setup SEPA mandates manually
