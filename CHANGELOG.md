@@ -1,5 +1,6 @@
 - Calendartimetracking: set required modules
-- More PL translations and corrections
+- Core: More PL translations and corrections
+- Finance/mollie: Setup SEPA mandates manually
 
 29-09-2025: 25.0.56
 - Calendar: Find participant by e-mail so that scheduling works better when you invite a contact that's also a user
