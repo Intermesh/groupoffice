@@ -3,6 +3,7 @@
 - Finance/mollie: Setup SEPA mandates manually
 - Calendar: Improve meeting selection clarity by changing button text and hide body buttons inside group-office 
   (except for resources).
+- Files: heic support in image viewer
 
 29-09-2025: 25.0.56
 - Calendar: Find participant by e-mail so that scheduling works better when you invite a contact that's also a user

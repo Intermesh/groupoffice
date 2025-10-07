@@ -62,7 +62,7 @@ class Calendar extends AclOwnerEntity {
 	/** @var ?string default for event. If NULL client will use the Users default timeZone  */
 	public ?string $timeZone = null;
 
-	public ?bool $syncToDevice = true;
+	public ?bool $syncToDevice = null;
 
 	protected ?string $defaultColor = null;
 
@@ -220,6 +220,7 @@ class Calendar extends AclOwnerEntity {
 		}
 		if($this->isNew()) {
 			$this->isSubscribed = true; // auto subscribe the creator.
+			$this->syncToDevice = true;
 			$this->isVisible = true;
 			$this->defaultColor = $this->color;
 		} else if($this->ownerId === go()->getUserId() && !empty($this->color)) {
@@ -382,8 +383,9 @@ class Calendar extends AclOwnerEntity {
 				'name' => $user->displayName,
 				'ownerId' => $user->id,
 				'color' => Calendar::randomColor($user->displayName),
-				'isSubscribed'=>true,
-				'includeInAvailability'=>'all'
+				'isSubscribed' => true,
+				'syncToDevice' => true,
+				'includeInAvailability' => 'all'
 			]);
 
 			if(!$calendar->save()) {
