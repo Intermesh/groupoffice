@@ -2,6 +2,8 @@
 - Calendar: Enable syncToDevice by default only for calendars you own / create.
 - Email: Save messages to computer in this format: YYYY-MM-DD_HHMM_MAILADDRESS_SUBJECT.eml so you can sort them easily
 - Support: grid column name title => subject and created by => customer
+- Calendar: Fix new event from item dialog not loading editable dialog
+
 06-10-2025: 25.0.57
 - Calendartimetracking: set required modules
 - Core: More PL translations and corrections
