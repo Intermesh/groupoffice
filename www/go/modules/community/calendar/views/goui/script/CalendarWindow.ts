@@ -1,4 +1,13 @@
-import {checkbox, colorfield, combobox, comp, hiddenfield, textarea, textfield,} from "@intermesh/goui";
+import {
+	btn,
+	checkbox,
+	colorfield,
+	combobox,
+	comp,
+	hiddenfield,
+	textarea, TextField,
+	textfield,
+} from "@intermesh/goui";
 import {client, FormWindow, modules, principalDS} from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
 import {t} from "./Index.js";
@@ -10,7 +19,7 @@ export class CalendarWindow extends FormWindow {
 		super('Calendar');
 		this.title = 'calendar';
 		this.width = 460;
-		this.height = 710;
+		this.height = 856;
 
 		this.on('beforerender', () => {
 			this.title = t(this.form.currentId ? 'Edit calendar' : 'Create calendar');
@@ -33,7 +42,13 @@ export class CalendarWindow extends FormWindow {
 				availabilityAffectCb.value = e.newValue!=='none'
 			}),
 			descriptionFld = textarea({name:'description', label: t('Description'), autoHeight:true}),
-				nameFld = textfield({name: 'name', label: t('Name'), flex:1});
+				nameFld = textfield({name: 'name', label: t('Name'), flex:1}),
+			publishField = checkbox({type:'switch', name: 'publish',label: t('Publish calendar as ICS file')}).on('change', (e) => {
+				this.closeOnSave = false;
+				this.form.submit().then(_ => {
+					this.form.load(this.form.currentId!);
+				});
+			});
 
 		this.generalTab.items.add(
 			comp({cls:'flow pad'},
@@ -50,7 +65,18 @@ export class CalendarWindow extends FormWindow {
 				checkbox({name: 'syncToDevice', label: t('Sync to device'), hint: t('Make calendar available in CalDAV and ActiveSync')}),
 				comp({tagName:'h3',flex:'1 0 100%',text:t('Default notifications') }),
 				alertField,
-				fdAlertField
+				fdAlertField,
+				publishField,
+				textfield({hidden:true, readOnly:true,buttons:[
+					btn({icon:'copy_all', title:t('Copy')})
+						.on('click',e=>{ navigator.clipboard.writeText((e.target.parent!.parent! as TextField).value);})
+				]}),
+				hiddenfield({name: 'publishKey'}).on('setvalue', (e) => {
+					const f = e.target.previousSibling()! as TextField;
+					f.hidden = !e.newValue;
+					publishField.value = !! e.newValue;
+					f.value = client.pageUrl('community/calendar/ics/'+e.newValue);
+				})
 				//unsubscribeBtn
 			),
 		);
@@ -80,6 +106,9 @@ export class CalendarWindow extends FormWindow {
 		]);
 
 		this.form.on('load', ({data}) => {
+			// becasue this may be set to false during publish
+			this.closeOnSave = true;
+
 			const rights = modules.get("community", "calendar")!.userRights;
 			const editable = data.id ? data.myRights.mayAdmin :rights.mayChangeCalendars,
 				unsubscribed = ('id' in data && !data.isSubscribed);
@@ -89,6 +118,7 @@ export class CalendarWindow extends FormWindow {
 				this.sharePanel!.show();
 			ownerIdField.hidden = !editable;
 			descriptionFld.hidden = !editable;
+			publishField.hidden = !editable || !data.id; // no publish button for new calendars
 			nameFld.readOnly = !editable;
 		})
 	}

@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar` (
     `createdBy` INT NULL,
     `ownerId` INT NULL,
     `highestItemModSeq` VARCHAR(32) NULL DEFAULT 0,
+	  `publishKey` CHAR(20) NULL,
     PRIMARY KEY (`id`),
 	  INDEX `fk_calendar_calendar_calendar_resource_group_idx` (`groupId` ASC),
 	 CONSTRAINT `fk_calendar_calendar_calendar_resource_group`
