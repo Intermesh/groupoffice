@@ -434,3 +434,5 @@ $updates["202509151158"][] = function() {
 };
 
 $updates["202509161101"][] = "ALTER TABLE `calendar_preferences` CHANGE COLUMN `startView` `startView` VARCHAR(20) NULL DEFAULT 'month';";
+
+$updates['202510071214'][] = "ALTER TABLE `calendar_calendar` ADD COLUMN `publishKey` CHAR(20) NULL AFTER `highestItemModSeq`;";

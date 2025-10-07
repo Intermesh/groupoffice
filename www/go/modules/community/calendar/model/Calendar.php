@@ -81,6 +81,8 @@ class Calendar extends AclOwnerEntity {
 	public ?string $webcalUri = null;
 
 	public ?string $groupId;
+
+	public ?string $publishKey;
 	protected ?string $highestItemModSeq;
 
 	protected static function defineMapping(): Mapping
@@ -95,6 +97,15 @@ class Calendar extends AclOwnerEntity {
 	protected static function textFilterColumns(): array
 	{
 		return ['name'];
+	}
+
+	private function generateSecret() {
+		$bits = openssl_random_pseudo_bytes(15); // 6bits per char, 120bits = 20 chars
+		return strtr(base64_encode($bits), '+/', '-_'); // translate to make url-safe
+	}
+
+	public function setPublish($val) {
+		$this->publishKey = $val ? $this->generateSecret() : null;
 	}
 
 	public function setOwnerId($v) {
