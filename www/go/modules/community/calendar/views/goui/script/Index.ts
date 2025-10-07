@@ -218,7 +218,12 @@ modules.register(  {
 			],
 			links: [{
 				iconCls: 'entity ic-event red',
-				linkWindow:(entity:string, entityId) => {
+				linkWindow: async (entity:string, entityId) => {
+					if(!calendarStore.loaded) {
+						// CalendarItem depends on the store being loaded
+						await calendarStore.load();
+					}
+
 					return (new CalendarItem({key:'',data:{
 							start:(new DateTime).format('Y-m-d\TH:00:00.000'),
 							title: t('New event'),
