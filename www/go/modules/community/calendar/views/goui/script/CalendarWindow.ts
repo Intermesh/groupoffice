@@ -1,5 +1,5 @@
 import {checkbox, colorfield, combobox, comp, hiddenfield, textarea, textfield,} from "@intermesh/goui";
-import {client, FormWindow, principalDS} from "@intermesh/groupoffice-core";
+import {client, FormWindow, modules, principalDS} from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
 import {t} from "./Index.js";
 
@@ -80,10 +80,12 @@ export class CalendarWindow extends FormWindow {
 		]);
 
 		this.form.on('load', ({data}) => {
-			const editable = !data.id || data.myRights.mayAdmin;
+			const rights = modules.get("community", "calendar")!.userRights;
+			const editable = data.id ? data.myRights.mayAdmin :rights.mayChangeCalendars,
+				unsubscribed = ('id' in data && !data.isSubscribed);
 			this.sharePanel!.disabled = !editable;
-			this.generalTab!.disabled = !data.isSubscribed;
-			if(!data.isSubscribed)
+			this.generalTab!.disabled = unsubscribed;
+			if(unsubscribed)
 				this.sharePanel!.show();
 			ownerIdField.hidden = !editable;
 			descriptionFld.hidden = !editable;
