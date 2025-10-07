@@ -1,6 +1,7 @@
-
+- Address book: Add zipcode and street in grid
 - Calendar: Enable syncToDevice by default only for calendars you own / create.
-
+- Email: Save messages to computer in this format: YYYY-MM-DD_HHMM_MAILADDRESS_SUBJECT.eml so you can sort them easily
+- 
 06-10-2025: 25.0.57
 - Calendartimetracking: set required modules
 - Core: More PL translations and corrections
