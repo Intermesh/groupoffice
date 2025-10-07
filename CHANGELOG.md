@@ -1,5 +1,6 @@
 - E-mail: Missing "None" label for in email composer templates menu. Related to issue #1343
 - Email: Save messages to computer in this format: YYYY-MM-DD_HHMM_MAILADDRESS_SUBJECT.eml so you can sort them easily
+- Support: grid column name title => subject and created by => customer
 
 15-09-2025: 6.8.138 
 - Support: more helpful error mail when imap import fails
