@@ -1,3 +1,6 @@
+
+- Calendar: Enable syncToDevice by default only for calendars you own / create.
+
 06-10-2025: 25.0.57
 - Calendartimetracking: set required modules
 - Core: More PL translations and corrections
