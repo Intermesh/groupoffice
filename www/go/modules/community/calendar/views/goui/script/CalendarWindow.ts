@@ -3,8 +3,7 @@ import {
 	checkbox,
 	colorfield,
 	combobox,
-	comp, DisplayField,
-	displayfield,
+	comp,
 	hiddenfield,
 	textarea, TextField,
 	textfield,
@@ -20,7 +19,7 @@ export class CalendarWindow extends FormWindow {
 		super('Calendar');
 		this.title = 'calendar';
 		this.width = 460;
-		this.height = 830;
+		this.height = 856;
 
 		this.on('beforerender', () => {
 			this.title = t(this.form.currentId ? 'Edit calendar' : 'Create calendar');
