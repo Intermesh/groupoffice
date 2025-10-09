@@ -508,9 +508,7 @@ export class CalendarItem {
 		}
 		if(this.data.description)
 			lines.push('<p style="max-width:360px;">'+Format.textToHtml(this.data.description)+'</p>');
-		// status
 
-		console.log(lines);
 		return lines.join('<br>');
 	}
 
