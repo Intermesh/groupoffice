@@ -1,5 +1,6 @@
 import {
-	autocompletechips,
+	autocomplete,
+	autocompletechips, AutocompleteField,
 	browser,
 	btn,
 	Button,
@@ -14,27 +15,28 @@ import {
 	DateTime,
 	datetimefield,
 	DateTimeField,
-	Format,
+	Format, listStoreType,
 	MapField,
 	mapfield,
 	Notifier,
 	numberfield,
 	radio,
 	select,
-	store,
-	table,
+	store, storeRecordType,
+	table, TableColumn,
 	textarea,
 	textfield,
 	TextField,
 	win,
 	Window,
 } from "@intermesh/goui";
-import {client, FormWindow, JmapDataSource, principalDS, recurrencefield} from "@intermesh/groupoffice-core";
+import {client, FormWindow, JmapDataSource, jmapds, principalDS, recurrencefield} from "@intermesh/groupoffice-core";
 import {categoryStore, t, writeableCalendarStore} from "./Index.js";
 import {ParticipantField, participantfield} from "./ParticipantField.js";
 import {AlertField, alertfield} from "./AlertField.js";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {AvailabilityWindow} from "./AvailabilityWindow.js";
+import {locationfield, LocationField} from "./LocationField";
 
 
 export class EventWindow extends FormWindow {
@@ -49,7 +51,7 @@ export class EventWindow extends FormWindow {
 
 	private attachments:MapField
 	private btnFreeBusy: Button
-	private locationField: TextField
+	private locationField: LocationField
 	public readonly participantFld: ParticipantField
 
 	private titleField: TextField
@@ -201,12 +203,9 @@ export class EventWindow extends FormWindow {
 					}
 				}
 			}),
-			this.locationField = textfield({name: 'location',flex:1, label:t('Location'), style:{minWidth:'80%'},
-				listeners: {'setvalue': ({target, newValue}) => { target.buttons![0].hidden = !/^https?:\/\//.test(newValue); }},
-				buttons:[btn({hidden:true,icon: 'open_in_browser', handler:(_b)=>{window.open(this.locationField.value as string)}})]
-			}),
+			this.locationField = locationfield({flex:1, style:{minWidth:'80%'}}),
 			btn({icon:'video_call', hidden: !m?.settings?.videoUri, cls:'filled', width:50, handler: async (btn) => {
-					(btn.previousSibling() as TextField)!.value = await this.createVideoLink(m?.settings);
+					(btn.previousSibling() as AutocompleteField)!.value = await this.createVideoLink(m?.settings);
 			}}),
 			this.withoutTimeToggle = checkbox({type:'switch',value:undefined, name: 'showWithoutTime', label: t('All day'), style:{width:'auto'},
 				listeners: {'setvalue':({newValue}) => {
