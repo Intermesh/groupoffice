@@ -3,6 +3,9 @@
 - Email: Save messages to computer in this format: YYYY-MM-DD_HHMM_MAILADDRESS_SUBJECT.eml so you can sort them easily
 - Support: grid column name title => subject and created by => customer
 - Calendar: Fix new event from item dialog not loading editable dialog
+- Calendar: Add info option to context menu to show read only view with links and comments. It's also printable.
+- Calendar: Show counter on link button in edit dialog so it's visible that there are links
+- 
 
 06-10-2025: 25.0.57
 - Calendartimetracking: set required modules
