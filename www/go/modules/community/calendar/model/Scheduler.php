@@ -412,7 +412,7 @@ class Scheduler {
 					if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
 						$existingEvent->recurrenceOverrides[$recurId] = (new RecurrenceOverride($existingEvent));
 					}
-					$existingEvent->recurrenceOverrides[$recurId]->patchProps((object)['status' => CalendarEvent::Cancelled]);
+					$existingEvent->recurrenceOverrides[$recurId]->patchProps((object)['excluded' => true]);
 				} else {
 					$existingEvent->status = CalendarEvent::Cancelled;
 				}

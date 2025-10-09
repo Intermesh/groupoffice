@@ -436,3 +436,7 @@ $updates["202509151158"][] = function() {
 $updates["202509161101"][] = "ALTER TABLE `calendar_preferences` CHANGE COLUMN `startView` `startView` VARCHAR(20) NULL DEFAULT 'month';";
 
 $updates['202510071214'][] = "ALTER TABLE `calendar_calendar` ADD COLUMN `publishKey` CHAR(20) NULL AFTER `highestItemModSeq`;";
+
+
+$updates['202510091209'][] = 'update calendar_recurrence_override set patch = replace(patch, \'"status":"cancelled"\', \'"excluded":true\')
+where patch like \'%"status":"cancelled"%\'';
