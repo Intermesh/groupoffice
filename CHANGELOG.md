@@ -5,7 +5,7 @@
 - Calendar: Fix new event from item dialog not loading editable dialog
 - Calendar: Add info option to context menu to show read only view with links and comments. It's also printable.
 - Calendar: Show counter on link button in edit dialog so it's visible that there are links
-- 
+- Calendar: Cancellation of occurrences in a recurring series showed as strike-through instead of removed.
 
 06-10-2025: 25.0.57
 - Calendartimetracking: set required modules
