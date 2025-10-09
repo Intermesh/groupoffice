@@ -300,6 +300,14 @@ export class CalendarItem {
 		}
 	}
 
+	info() {
+		const dlg = new EventDetailWindow();
+		dlg.show();
+		dlg.loadEvent(this);
+
+		return dlg;
+	}
+
 	async open(onCancel?: Function) {
 
 		const internalOpen = () => {

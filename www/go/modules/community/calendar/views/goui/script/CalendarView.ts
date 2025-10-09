@@ -28,6 +28,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 		btn({icon:'content_cut', text: t('Cut','core'), handler: _ => this.current!.cut() }),
 		btn({icon:'content_copy', text: t('Copy','core'), handler: _ => this.current!.copy() }),
 		hr(),
+		btn({icon:'info', text: t('Info','core','core'), handler: _ => this.current!.info()}),
 		btn({icon:'email', text: t('E-mail participants'), handler: _ => {
 				if (this.current!.data.participants){
 					go.showComposer({to: Object.values(this.current!.data.participants).map((p:any) => p.email)});
@@ -121,22 +122,20 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 				target:div
 			});
 
+
 		return div.cls('allday',e.showWithoutTime)
 			.cls('declined', item.isDeclined || item.isCancelled)
 			.cls('undecided', item.needsAction)
 			.cls('multiday', !e.showWithoutTime && item.dayLength > 1)
 			.attr('tabIndex', 0)
 			.on('click',(_ev)=> {
-				this.focus(); // for catching keydown event
-				// if not holding ctrl or shift, deselect
-				while(this.selected.length) {
-					Object.values(this.selected.shift()!.divs).forEach(el => el.cls('-selected'));
-				}
-				Object.values(item.divs).forEach(d => d.cls('+selected'));
-				this.selected.push(item);
+				this.selectItem(item);
 			})
 			//.on('mousedown', ev => ev.stopPropagation()) /* when enabled cant drag event in monthview */
 			.on('contextmenu', ev => {
+
+				this.selectItem(item);
+
 				// todo: set id first
 				if(!item.key) return;
 				this.current = item;
@@ -208,6 +207,17 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 			//.attr('style',this.makestyle(e, weekstart))
 			.cls('continues', weekstart.diff(e.start).getTotalDays()! < 0)
 	}
+
+	private selectItem (item:CalendarItem) {
+		this.focus(); // for catching keydown event
+		// if not holding ctrl or shift, deselect
+		while(this.selected.length) {
+			Object.values(this.selected.shift()!.divs).forEach(el => el.cls('-selected'));
+		}
+		Object.values(item.divs).forEach(d => d.cls('+selected'));
+		this.selected.push(item);
+	}
+
 
 	abstract renderView(): void;
 
