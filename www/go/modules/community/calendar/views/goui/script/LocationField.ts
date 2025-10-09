@@ -1,4 +1,4 @@
-import {AutocompleteField, btn, Button, column, Config, createComponent, List, store, table} from "@intermesh/goui";
+import {AutocompleteField, btn, Button, column, Config, createComponent, List, store, t, table} from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
 
 export class LocationField extends AutocompleteField {
@@ -38,6 +38,9 @@ export class LocationField extends AutocompleteField {
 			}),
 		}));
 
+		this.name = "location";
+		this.label = t("Location")
+
 		this.baseCls = "goui-form-field textarea autocomplete";
 
 		this.on("autocomplete", ev => {
@@ -76,11 +79,12 @@ export class LocationField extends AutocompleteField {
 		control.rows = 1;
 		control.style.overflowY = 'hidden';
 		control.on('input',(ev) => {
+			this._value = this.input.value;
 			this.resize(control);
 		});
 		this.on("render", ()=>{this.resize(control);});
 		this.on("show", ()=>{this.resize(control);});
-		this.on('setvalue', ()=>{this.resize(control);});
+		this.on('setvalue', ()=>{setTimeout(() => this.resize(control));});
 
 
 		if (this.invalidMsg) {
@@ -92,10 +96,6 @@ export class LocationField extends AutocompleteField {
 	public pickerRecordToValue (field: this, record:any) : any {
 		return record.address;
 	}
-
-
-
-
 	private resize(input: HTMLTextAreaElement) {
 		input.style.height = "0";
 		input.style.height = (input.scrollHeight) + "px";
