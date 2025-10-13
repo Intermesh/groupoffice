@@ -297,6 +297,8 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 		this.usernameField.setDisabled(!visible);
 		this.passwordField1.setDisabled(!visible);
 		this.passwordField2.setDisabled(!visible);
+
+		this.passwordFieldset.setVisible(visible);
 	},
 	
 	onValidate : function() {
