@@ -493,7 +493,7 @@ export class CalendarItem {
 				const p = this.participants[key],
 					icon = statusIcons[p.participationStatus] ? statusIcons[p.participationStatus] : statusIcons["needs-action"] ,
 					 i= '<i class="icon '+icon[2]+'" title="'+icon[1]+'">'+icon[0]+'</i>' ;
-				lines.push(i+' '+(p.name?.htmlEncode() ?? p.email.htmlEncode()));
+				lines.push(i+' '+(p.name || p.email).htmlEncode());
 			}
 
 		}
