@@ -224,13 +224,26 @@ modules.register(  {
 						await calendarStore.load();
 					}
 
-					return (new CalendarItem({key:'',data:{
-							start:(new DateTime).format('Y-m-d\TH:00:00.000'),
+					const dlg = go.openEventWindow({
+							start:(new DateTime).addDays(1).format('Y-m-d\TH:00:00.000'),
 							title: t('New event'),
 							showWithoutTime: client.user.calendarPreferences?.defaultDuration == null,
 							duration: client.user.calendarPreferences?.defaultDuration ?? "P1D",
 							calendarId: client.user.calendarPreferences?.defaultCalendarId
-						}})).open()
+						}, true);
+
+					if(entity == "Contact") {
+						try {
+							const p = await principalDS.single("Contact:" + entityId);
+							dlg.participantFld.addParticipant(p);
+						} catch(e) {
+							debugger;
+							console.error(e);
+
+						}
+					}
+
+					return dlg;
 				},
 				linkDetail:() =>  new EventDetail()
 			}]

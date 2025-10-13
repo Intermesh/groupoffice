@@ -52,8 +52,8 @@ class GarbageCollection extends CronJob {
 	 * @throws Exception
 	 */
 	public function run(CronJobSchedule $schedule) {
-		$this->blobs();
 		$this->change();
+		$this->blobs();
 		$this->links();
 		$this->acls();
 		$this->alerts();
@@ -86,21 +86,24 @@ class GarbageCollection extends CronJob {
 
 	private function alerts() {
 		go()->debug("Cleaning up stale Alerts");
-		Alert::delete(Alert::findStale());
+		Alert::delete(Alert::findStale()->limit(200));
+		EntityType::push();
 		go()->debug("Deleted " . (isset(Alert::$lastDeleteStmt) ? Alert::$lastDeleteStmt->rowCount() : 0) . " stale alerts");
 	}
 
 	private function blobs() {
 		go()->debug("Cleaning up BLOB's");
-		$query = Blob::findStale();
+		$query = Blob::findStale()->limit(200);
 		go()->debug($query);
 		Blob::delete($query);
+		EntityType::push();
 		go()->debug("Deleted " . (isset(Blob::$lastDeleteStmt) ? Blob::$lastDeleteStmt->rowCount() : 0) . " stale blobs");
 	}
 
 	private function acls() {
 		go()->debug("Cleaning up ACL's");
-		Acl::delete(Acl::findStale());
+		Acl::delete(Acl::findStale()->limit(200));
+		EntityType::push();
 		go()->debug("Deleted " .  (isset(Acl::$lastDeleteStmt) ? Acl::$lastDeleteStmt->rowCount() : 0). " stale ACL's");
 	}
 

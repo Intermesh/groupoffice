@@ -7,6 +7,8 @@
 - Calendar: Show counter on link button in edit dialog so it's visible that there are links
 - Calendar: Cancellation of occurrences in a recurring series showed as strike-through instead of removed.
 - Files: direct route to folder will open actual folder instead of parent
+- Ldapauthenticator: Push entity changes while deleting users and groups in LDAP sync
+- Core: Limit garbage collection operations and push changes between actions
 
 06-10-2025: 25.0.57
 - Calendartimetracking: set required modules
