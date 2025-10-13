@@ -844,7 +844,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				return $this->_listShares($params);
 			} elseif ($params['folder_id'] == 'trash') {
 				return $this->listTrash($params);
-//				$folder = Folder::model()->findByPath('trash');
 			} else {
 				$folder = Folder::model()->findByPk($params['folder_id']);
 			}
@@ -865,7 +864,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$user = $folder->quotaUser;
 		$this->_listFolderPermissionLevel=$folder->permissionLevel;
 
-		$response['permission_level']=$folder->permissionLevel;//$folder->readonly ? \GO\Base\Model\Acl::READ_PERMISSION : $folder->permissionLevel;
+		$response['permission_level']=$folder->permissionLevel;
 
 		if(empty($params['skip_fs_sync']) && empty(GO::config()->files_disable_filesystem_sync))
 			$folder->checkFsSync();
