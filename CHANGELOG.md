@@ -10,6 +10,7 @@
 - Ldapauthenticator: Push entity changes while deleting users and groups in LDAP sync
 - Core: Limit garbage collection operations and push changes between actions
 - Core: Hide password fieldset when it can't be changed when using an authenticator method like ldap or imap
+- Calendar: Include VTimezone info for outlook in meeting requests
 
 06-10-2025: 25.0.57
 - Calendartimetracking: set required modules
