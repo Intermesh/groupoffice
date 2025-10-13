@@ -276,6 +276,9 @@ class Sync extends Controller
 				$this->output("Deleting: " . $u[1]);
 				if (!$dryRun) {
 					User::delete(['id' => $u[0]]);
+
+					//push changes after each user
+					EntityType::push();
 				}
 			}
 		}
@@ -426,6 +429,9 @@ class Sync extends Controller
 
 				if (!$dryRun) {
 					Group::delete(['id' => $g['id']]);
+
+					//push changes after each user
+					EntityType::push();
 				}
 			}
 		}
