@@ -247,7 +247,7 @@ class CalendarConvertor
 			case 'monthly':
 				if (isset($rule->byDay[0])) {
 					$recur->type = "3";
-					$recur->weekofmonth = $rule->bySetPosition ?? $rule->byDay[0]->nthOfPeriod;
+					$recur->weekofmonth = $rule->bySetPosition[0] ?? $rule->byDay[0]->nthOfPeriod;
 					if($recur->weekofmonth == -1) { // last of month is supported by EAS but using 5.
 						$recur->weekofmonth = 5;
 					}
