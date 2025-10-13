@@ -3,6 +3,7 @@
 - Support: grid column name title => subject and created by => customer
 - Ldapauthenticator: Push entity changes while deleting users and groups in LDAP sync
 - Core: Limit garbage collection operations and push changes between actions
+- Files: when opening a folder through routing, open the actual folder instead of its parent.
 
 15-09-2025: 6.8.138 
 - Support: more helpful error mail when imap import fails
