@@ -9,6 +9,7 @@
 - Files: direct route to folder will open actual folder instead of parent
 - Ldapauthenticator: Push entity changes while deleting users and groups in LDAP sync
 - Core: Limit garbage collection operations and push changes between actions
+- Core: Hide password fieldset when it can't be changed when using an authenticator method like ldap or imap
 
 06-10-2025: 25.0.57
 - Calendartimetracking: set required modules
