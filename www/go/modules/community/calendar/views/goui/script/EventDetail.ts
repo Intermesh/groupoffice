@@ -335,6 +335,6 @@ export class EventDetailWindow extends Window {
 	}
 
 	loadEvent(ev: CalendarItem) {
-		this.view.loadEvent(ev);
+		return this.view.loadEvent(ev);
 	}
 }
