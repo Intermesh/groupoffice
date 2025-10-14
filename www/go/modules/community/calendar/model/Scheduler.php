@@ -222,6 +222,9 @@ class Scheduler {
 		if($method ==='REPLY') {
 			// Find event data's replyTo by UID, we don't trust the organizer in the VEVENT
 			$replyTo = go()->getDbConnection()->selectSingleValue('replyTo')->from('calendar_event')->where('uid', '=', (string) $vevent->UID)->single();
+
+			go()->debug("Testing if you are the organizer: " . $replyTo .' == ' .$accountUserEmail);
+
 			if ($replyTo === $accountUserEmail) {
 				$accountEmail = $replyTo;
 			}
@@ -239,7 +242,7 @@ class Scheduler {
 		if (!$accountEmail || $method === 'NONE') {
 			return [
 				'method' => $method,
-				'feedback' => $accountEmail ? "" : go()->t('You are not an invited to this event', "email"),
+				'feedback' => $accountEmail ? "" : go()->t('You are not invited to this event', "email"),
 				'event' => ICalendarHelper::parseVObject($vcalendar, new CalendarEvent())
 			];
 		} else {

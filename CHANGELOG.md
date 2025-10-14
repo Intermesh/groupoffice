@@ -1,3 +1,5 @@
+- Email: Corrected save as filename
+
 13-10-2025: 25.0.58
 - Address book: Add zipcode and street in grid
 - Calendar: Enable syncToDevice by default only for calendars you own / create.
