@@ -1796,7 +1796,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$message = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
 		
-		$filename = GO\Base\Fs\File::stripInvalidChars(date("Y-m-d_Hi")."_".$message->subject);
+		$filename = GO\Base\Fs\File::stripInvalidChars(date("Y-m-d_Hi", $message->udate) . "_". $message->from->getAddress()['email'] . "_" .$message->subject);
 		$filename .= empty($params['download']) ? ".txt" :".eml";
 		
 		\GO\Base\Util\Http::outputDownloadHeaders(new \GO\Base\Fs\File($filename), empty($params['download']));
