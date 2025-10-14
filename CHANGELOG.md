@@ -1,3 +1,5 @@
+- Email: Corrected save as filename
+
 13-10-2025: 6.8.139
 - E-mail: Missing "None" label for in email composer templates menu. Related to issue #1343
 - Email: Save messages to computer in this format: YYYY-MM-DD_HHMM_MAILADDRESS_SUBJECT.eml so you can sort them easily
