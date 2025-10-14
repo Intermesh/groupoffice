@@ -224,7 +224,7 @@ export class Main extends Component {
 					//'->',
 					this.cardMenu = comp({cls: 'group not-medium-device', flex:'0 0 auto'},
 						btn({icon: 'view_day', text: t('Day'), handler: _b => this.routeTo('day', this.date)}),
-						btn({icon: 'view_week', text: t('5 days'), handler: _b => this.routeTo('days-5', this.date)}),
+						btn({icon: 'view_week', text: t('5 Days'), handler: _b => this.routeTo('days-5', this.date)}),
 						btn({icon: 'view_week', text: t('Week'), handler: _b => this.routeTo('week', this.date)}),
 						btn({icon: 'view_module', text: t('Month'), handler: _b => this.routeTo('month', this.date)}),
 						btn({icon: 'view_compact', text: t('Year'), handler: _b => this.routeTo('year', this.date)}),
