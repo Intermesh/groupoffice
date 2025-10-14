@@ -135,7 +135,7 @@ class Task extends AclItemEntity {
 	protected ?string $uri = null;
 
     /** @var Alert[] List of notification alerts when $useDefaultAlerts is not set */
-	public array $alerts = [];
+	public ?array $alerts = [];
 
 	public ?string $vcalendarBlobId = null;
 
