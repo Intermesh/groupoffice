@@ -1859,7 +1859,6 @@ abstract class Property extends Model {
 				$this->updateTableRecord($table, $modifiedForTable, $query);
 			}
 		} catch (DbException $e) {
-			ErrorHandler::logException($e);
 			$uniqueKey = $e->isUniqueKeyException();
 
 			if ($uniqueKey) {
