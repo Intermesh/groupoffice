@@ -17,12 +17,14 @@ use go\core\App;
 use go\core\db\Criteria;
 use go\core\model\Search;
 use go\core\orm\exception\SaveException;
+use go\core\db\DbException;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
 use GO\Files\Model\Folder;
 use InvalidArgumentException;
+use Throwable;
 use function go;
 use go\core\db\Query as DbQuery;
 use go\core\util\ArrayObject;
@@ -363,7 +365,7 @@ abstract class Entity extends Property {
 			}
 
 			return $this->commit() && !$this->hasValidationErrors();
-		} catch(\Throwable $e) {
+		} catch(Throwable $e) {
 			ErrorHandler::logException($e);
 			$this->rollback();
 			throw $e;
@@ -489,7 +491,8 @@ abstract class Entity extends Property {
 	 *
 	 *
 	 * @return boolean
-	 * @throws Exception
+	 * @throws Throwable
+	 * @throws DbException
 	 */
 	public static final function delete($query): bool
 	{
@@ -535,7 +538,7 @@ abstract class Entity extends Property {
 			}
 
 			return true;
-		} catch(\Throwable $e) {
+		} catch(Throwable $e) {
 			if(go()->getDbConnection()->inTransaction()) {
 				go()->getDbConnection()->rollBack();
 			}

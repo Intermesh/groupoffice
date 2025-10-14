@@ -38,6 +38,7 @@ class OauthAccessToken extends Entity implements AccessTokenEntityInterface
     }
 
 		public static function collectGarbage() {
+			go()->debug("GC: OauthAccessToken");
 			return static::delete((new Query)->where('expiryDateTime', '<', new DateTime()));
 		}
 }

@@ -7,6 +7,7 @@ use Exception;
 use go\core\auth\BaseAuthenticator;
 use go\core\auth\SecondaryAuthenticator;
 use go\core\cron\GarbageCollection;
+use go\core\db\DbException;
 use go\core\Environment;
 use go\core\ErrorHandler;
 use go\core\jmap\State;
@@ -17,6 +18,7 @@ use go\core\http\Response;
 use go\core\orm\Query;
 use go\core\orm\Entity;
 use go\core\util\DateTime;
+use Throwable;
 
 class Token extends Entity {
 	
@@ -480,16 +482,30 @@ class Token extends Entity {
 	/**
 	 * Called by GarbageCollection cron job
 	 *
-	 * @see GarbageCollection
 	 * @return bool
-	 * @throws Exception
+	 * @throws Throwable
+	 * @see GarbageCollection
 	 */
 	public static function collectGarbage(): bool
 	{
-		return static::delete(
-			(new Query)
-				->where('expiresAt', '!=', null)
-				->andWhere('expiresAt', '<', new DateTime("now", new DateTimeZone("UTC"))));
+
+		go()->debug("GC: Tokens");
+		try {
+			do {
+				// delete in batches to keep transaction small
+				static::delete(
+					(new Query)
+						->where('expiresAt', '!=', null)
+						->andWhere('expiresAt', '<', new DateTime("now", new DateTimeZone("UTC")))
+						->limit(1000)
+				);
+			} while (self::$lastDeleteStmt->rowCount() > 0);
+		} catch(DbException $e) {
+			// Just log exceptions here but continue
+			ErrorHandler::logException($e);
+		}
+
+		return true;
 	}
 
 	/**
