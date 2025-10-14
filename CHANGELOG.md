@@ -2,6 +2,8 @@
 - Tasks: TypeError in /usr/share/groupoffice/go/core/orm/Property.php at line 1771: Cannot assign null to property go\\modules\\community\\tasks\\model\\Task::$alerts of type array
 - Core: Retry jmap call on network failure (not extjs)
 - Calendar: Added workweek / 5 days button
+- Finance: Put date range on invoice when billing time
+- Finance: Option to group line items by employee when billing time
 
 13-10-2025: 25.0.58
 - Address book: Add zipcode and street in grid
