@@ -220,10 +220,11 @@ class Scheduler {
 		$alreadyProcessed = false;
 		$accountEmail = false;
 		if($method ==='REPLY') {
+			$uid =(string) $vevent->UID;
 			// Find event data's replyTo by UID, we don't trust the organizer in the VEVENT
-			$replyTo = go()->getDbConnection()->selectSingleValue('replyTo')->from('calendar_event')->where('uid', '=', (string) $vevent->UID)->single();
+			$replyTo = go()->getDbConnection()->selectSingleValue('replyTo')->from('calendar_event')->where('uid', '=', $uid)->single();
 
-			go()->debug("Testing if you are the organizer: " . $replyTo .' == ' .$accountUserEmail);
+			go()->debug("Testing if you are the organizer for event with UID: ". $uid. " ". $replyTo .' == ' .$accountUserEmail);
 
 			if ($replyTo === $accountUserEmail) {
 				$accountEmail = $replyTo;
