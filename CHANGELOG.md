@@ -1,4 +1,6 @@
 - Email: Corrected save as filename
+- Tasks: TypeError in /usr/share/groupoffice/go/core/orm/Property.php at line 1771: Cannot assign null to property go\\modules\\community\\tasks\\model\\Task::$alerts of type array
+- Core: Retry jmap call on network failure (not extjs)
 
 13-10-2025: 25.0.58
 - Address book: Add zipcode and street in grid
