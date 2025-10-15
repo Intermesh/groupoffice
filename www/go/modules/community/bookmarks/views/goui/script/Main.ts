@@ -1,20 +1,10 @@
-import {
-	btn,
-	combobox,
-	comp,
-	Component,
-	datasourcestore,
-	DataSourceStore,
-	Filter,
-	searchbtn,
-	t,
-	tbar
-} from "@intermesh/goui";
+import {btn, combobox, comp, Component, datasourcestore, DataSourceStore, searchbtn, t, tbar} from "@intermesh/goui";
 import {BookmarksGridView} from "./BookmarksGridView.js";
-import {jmapds} from "@intermesh/groupoffice-core";
+import {principalDS} from "@intermesh/groupoffice-core";
 import {BookmarksDialog} from "./BookmarksDialog.js";
 import {ManageCategoriesWindow} from "./ManageCategoriesWindow.js";
 import {BookmarksColumnView} from "./BookmarksColumnView.js";
+import {bookmarkDS, bookmarksCategoryDS} from "./Index.js";
 
 export class Main extends Component {
 	private isGridView: boolean = true;
@@ -24,7 +14,7 @@ export class Main extends Component {
 		super();
 
 		this.store = datasourcestore({
-			dataSource: jmapds("Bookmark"),
+			dataSource: bookmarkDS,
 			sort: [{property: "category", isAscending: true}, {property: "name"}],
 			queryParams: {
 				limit: 0,
@@ -35,11 +25,11 @@ export class Main extends Component {
 			relations: {
 				category: {
 					path: "categoryId",
-					dataSource: jmapds("BookmarksCategory")
+					dataSource: bookmarksCategoryDS
 				},
 				creator: {
 					path: "createdBy",
-					dataSource: jmapds("Principal")
+					dataSource: principalDS
 				}
 			}
 		});
@@ -66,7 +56,7 @@ export class Main extends Component {
 			}),
 			btn({
 				icon: "view_module",
-				text: t("Toggle view"),
+				text: t("Toggle view", "community", "bookmarks"),
 				handler: () => {
 					this.isGridView = !this.isGridView;
 
@@ -76,7 +66,7 @@ export class Main extends Component {
 			}),
 			btn({
 				icon: "settings",
-				text: t("Administrate categories"),
+				text: t("Manage categories"),
 				handler: () => {
 					const manageCategoriesGrid = new ManageCategoriesWindow();
 
@@ -85,12 +75,16 @@ export class Main extends Component {
 			}),
 			comp({tagName: "h5", text: t("Category")}),
 			combobox({
-				dataSource: jmapds("BookmarksCategory"),
+				dataSource: bookmarksCategoryDS,
 				name: "category",
 				placeholder: t("Show all"),
 				listeners: {
-					setvalue: ( {newValue}) => {
-						this.store.setFilter("categoryId", {categoryId: newValue});
+					setvalue: ({newValue}) => {
+						if (!newValue) {
+							this.store.clearFilter("categoryId");
+						} else {
+							this.store.setFilter("categoryId", {categoryId: newValue});
+						}
 
 						void this.store.load();
 					},
@@ -107,14 +101,13 @@ export class Main extends Component {
 			'->',
 			searchbtn({
 				listeners: {
-					input: ( {text}) => {
+					input: ({text}) => {
 						this.store.setFilter("search", {text: text});
 						void this.store.load();
 					}
 				}
 			})
 		);
-
 		this.items.add(toolbar);
 		this.items.add(gridView);
 		this.items.add(columnView);

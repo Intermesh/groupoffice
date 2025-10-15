@@ -125,19 +125,6 @@ export class BookmarksDialog extends FormWindow {
 					disabled: false,
 					name: "openExtern",
 					label: t("Open in new browser tab")
-				}),
-				checkbox({
-					name: "behaveAsModule",
-					label: t("Behave as a module (Browser reload required)"),
-					listeners: {
-						change: ( {newValue}) => {
-							this.newTabCheckbox["disabled"] = newValue;
-
-							if (newValue) {
-								this.newTabCheckbox.value = false;
-							}
-						}
-					}
 				})
 			)
 		);
