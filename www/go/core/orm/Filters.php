@@ -438,7 +438,7 @@ class Filters {
 		} else
 		{
 			if($value == null) {
-				return [];
+				return [['comparator' => '=', 'date' => null]];
 			} else {
 				$v = self::parseNumericValue($value);
 				return [['comparator' => $v['comparator'], 'date' => new DateTime($v["query"])]];
