@@ -13,6 +13,7 @@ import {
 import {NoteDialog} from "./NoteDialog";
 import {CommentsPanel} from "@intermesh/community/comments";
 import {Note, noteDS} from "./Index";
+import {HistoryDetailPanel} from '@intermesh/community/history';
 
 export class NoteDetail extends DetailPanel<Note> {
 	private content: Component;
@@ -36,7 +37,7 @@ export class NoteDetail extends DetailPanel<Note> {
 
 		this.addFiles();
 		this.addLinks();
-		this.addHistory();
+
 
 		this.toolbar.items.add(
 			this.editBtn = btn({
@@ -90,6 +91,8 @@ export class NoteDetail extends DetailPanel<Note> {
 			this.content.items.add(Image.replace(entity.content));
 
 			void this.form.load(entity.id);
+
+			this.scroller.items.add(new HistoryDetailPanel(this.entityName, entity!.id));
 		});
 	}
 }

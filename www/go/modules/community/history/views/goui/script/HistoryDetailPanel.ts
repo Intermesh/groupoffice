@@ -4,7 +4,7 @@ import {collapsebtn, comp, Component, EntityID, t, tbar} from "@intermesh/goui";
 export class HistoryDetailPanel extends Component {
 	private readonly grid: LogEntryGrid;
 
-	constructor() {
+	constructor(type: string, entityId: EntityID) {
 		super();
 
 		this.stateId = "history-detail";
@@ -21,13 +21,16 @@ export class HistoryDetailPanel extends Component {
 						text: t("History")
 					}),
 					"->",
-					collapsebtn({collapseEl: this.grid}))
-			),
-			this.grid
+					collapsebtn({collapseEl: this.grid})
+				),
+				comp({
+						cls: "fit scroll"
+					},
+					this.grid
+				)
+			)
 		);
-	}
 
-	public load(type:string, entityId:EntityID) {
 		this.grid.store.setFilter("entity", {
 			entity: type,
 			entityId: entityId

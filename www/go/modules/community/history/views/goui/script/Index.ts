@@ -31,3 +31,5 @@ modules.register({
 
 export const logEntryDS = new JmapDataSource("LogEntry");
 export const moduleDS = new JmapDataSource("Module");
+
+export {HistoryDetailPanel} from "./HistoryDetailPanel.js";
