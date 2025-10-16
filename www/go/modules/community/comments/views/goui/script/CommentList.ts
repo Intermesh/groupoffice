@@ -8,8 +8,9 @@ import {
 	Format, menu, Notifier, router,
 	t, win
 } from "@intermesh/goui";
-import {Image, client, img, jmapds} from "@intermesh/groupoffice-core";
+import {Image, client, img, principalDS} from "@intermesh/groupoffice-core";
 import {CommentDialog} from "./CommentDialog.js";
+import {commentDS} from "./Index.js";
 
 export class CommentList extends Component {
 	public store!: DataSourceStore
@@ -19,7 +20,7 @@ export class CommentList extends Component {
 		super()
 
 		this.store = datasourcestore({
-			dataSource: jmapds("Comment"),
+			dataSource: commentDS,
 			sort: [{property: "date", isAscending: true}],
 			listeners: {
 				load: ( {records}) => {
@@ -172,7 +173,7 @@ export class CommentList extends Component {
 												disabled: client.user.isAdmin ? false : !writtenByUser,
 												handler: () => {
 													if (client.user.isAdmin || writtenByUser) {
-														jmapds("Comment").confirmDestroy([comment.id]);
+														commentDS.confirmDestroy([comment.id]);
 													}
 												}
 											})
@@ -274,15 +275,15 @@ export class CommentList extends Component {
 			relations: {
 				creator: {
 					path: "createdBy",
-					dataSource: jmapds("Principal")
+					dataSource: principalDS
 				},
 				modifier: {
 					path: "modifiedBy",
-					dataSource: jmapds("Principal")
+					dataSource: principalDS
 				},
 				labelEntities: {
 					path: "labels",
-					dataSource: jmapds("CommentLabel")
+					dataSource: commentDS
 				}
 			}
 		});

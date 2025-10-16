@@ -1,4 +1,3 @@
-import {jmapds} from "@intermesh/groupoffice-core";
 import {
 	Window,
 	btn,
@@ -12,10 +11,11 @@ import {
 	textfield,
 	comp
 } from "@intermesh/goui";
+import {commentLabelDS} from "./Index.js";
 
 export class LabelDialog extends Window {
 	public store!: DataSourceStore
-	private table: any
+	private readonly table: any
 
 	constructor() {
 		super();
@@ -29,7 +29,7 @@ export class LabelDialog extends Window {
 		this.height = 600;
 		this.width = 300;
 
-		this.store = datasourcestore({dataSource: jmapds("CommentLabel")});
+		this.store = datasourcestore({dataSource: commentLabelDS});
 
 		this.table = table({
 			cls: "bg-lowest",
@@ -50,7 +50,7 @@ export class LabelDialog extends Window {
 							value: value,
 							listeners: {
 								change: ({newValue}) => {
-									jmapds("CommentLabel").update(record.id, {name: newValue});
+									commentLabelDS.update(record.id, {name: newValue});
 								}
 							}
 						})
@@ -67,7 +67,7 @@ export class LabelDialog extends Window {
 							value: value,
 							listeners: {
 								change: ({newValue}) =>{
-									jmapds("CommentLabel").update(record.id, {color: newValue});
+									commentLabelDS.update(record.id, {color: newValue});
 								}
 
 							}
@@ -86,7 +86,7 @@ export class LabelDialog extends Window {
 					icon: "add",
 					text: t("Add"),
 					handler: () => {
-						jmapds("CommentLabel").create(
+						commentLabelDS.create(
 							Object.assign({
 								name: t("Label"),
 								color: "fff"
@@ -99,7 +99,7 @@ export class LabelDialog extends Window {
 					text: t("Delete"),
 					handler: () => {
 						if (this.table.rowSelection.getSelected()[0]) {
-							jmapds("CommentLabel").confirmDestroy([this.table.rowSelection.getSelected()[0].record.id]);
+							commentLabelDS.confirmDestroy([this.table.rowSelection.getSelected()[0].record.id]);
 						}
 					}
 				})

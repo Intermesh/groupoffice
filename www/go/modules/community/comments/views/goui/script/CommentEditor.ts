@@ -9,7 +9,8 @@ import {
 	root,
 	t
 } from "@intermesh/goui";
-import {client, jmapds, HtmlFieldMentionPlugin} from "@intermesh/groupoffice-core";
+import {client, HtmlFieldMentionPlugin, principalDS} from "@intermesh/groupoffice-core";
+import {commentLabelDS} from "./Index.js";
 
 export class CommentEditor extends Component {
 	public labels: ArrayField;
@@ -41,13 +42,13 @@ export class CommentEditor extends Component {
 
 						beforerender:ev => {
 							new HtmlFieldMentionPlugin(ev.target, async (text) => {
-								const r = await jmapds("Principal").query({
+								const r = await principalDS.query({
 									filter: {
 										entity: "User",
 										text: text
 									}
 								});
-								const get = await jmapds("Principal").get(r.ids);
+								const get = await principalDS.get(r.ids);
 								return get.list.map(p => {return {value:p.description, display:p.name}});
 							}, 5);
 
@@ -127,7 +128,7 @@ export class CommentEditor extends Component {
 		);
 
 		this.store = datasourcestore({
-			dataSource: jmapds("CommentLabel"),
+			dataSource: commentLabelDS,
 			listeners: {
 				load: ( {records}) => {
 					if (records) {

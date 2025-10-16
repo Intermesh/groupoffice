@@ -1,4 +1,4 @@
-import {client, modules} from "@intermesh/groupoffice-core";
+import {client, JmapDataSource, modules} from "@intermesh/groupoffice-core";
 import {t} from "@intermesh/goui";
 import {CommentDetail} from "./CommentDetail";
 import {CommentsPanel} from "./CommentsPanel";
@@ -16,18 +16,18 @@ modules.register({
 			CommentsPanel
 		}
 
-		client.on("authenticated", ( {session}) => {
+		client.on("authenticated", ({session}) => {
 			if (!session.capabilities["go:community:comments"]) {
 				// User does not have access to this module
 				return;
 			}
 		});
 
-		go.Alerts.on("beforeshow", function(alerts:any, alertConfig:any) {
+		go.Alerts.on("beforeshow", function (alerts: any, alertConfig: any) {
 			const alert = alertConfig.alert;
-			if(alert.tag == "mention") {
+			if (alert.tag == "mention") {
 				//replace panel promise
-				alertConfig.panelPromise = alertConfig.panelPromise.then(async (panelCfg:any) => {
+				alertConfig.panelPromise = alertConfig.panelPromise.then(async (panelCfg: any) => {
 
 					let creator;
 					try {
@@ -36,12 +36,12 @@ modules.register({
 
 					}
 
-					if(!creator) {
+					if (!creator) {
 						creator = {name: t("Unknown user")};
 					}
 
-					panelCfg.html = go.util.Format.dateTime(alert.triggerAt) + ": " + t("You were mentioned in a comment by {creator}.", "comments", "community").replace("{creator}", creator.name) + "<br /><br /><i>"+alert.data.excerpt+"</i>";
-					panelCfg.notificationBody = go.util.Format.dateTime(alert.triggerAt) + ": " + t("You were mentioned in a comment by  {creator}.", "comments", "community").replace("{creator}", creator.name) + "\n\n"+alert.data.excerpt;
+					panelCfg.html = go.util.Format.dateTime(alert.triggerAt) + ": " + t("You were mentioned in a comment by {creator}.", "comments", "community").replace("{creator}", creator.name) + "<br /><br /><i>" + alert.data.excerpt + "</i>";
+					panelCfg.notificationBody = go.util.Format.dateTime(alert.triggerAt) + ": " + t("You were mentioned in a comment by  {creator}.", "comments", "community").replace("{creator}", creator.name) + "\n\n" + alert.data.excerpt;
 					return panelCfg;
 
 				});
@@ -65,4 +65,7 @@ modules.register({
 	},
 		"CommentLabel"
 	]
-})
+});
+
+export const commentDS = new JmapDataSource("Comment");
+export const commentLabelDS = new JmapDataSource("CommentLabel");

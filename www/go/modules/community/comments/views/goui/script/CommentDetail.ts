@@ -3,10 +3,10 @@ import {
 	addbutton,
 	DetailPanel,
 	Image,
-	jmapds,
 	linkbrowserbutton,
 } from "@intermesh/groupoffice-core";
 import {CommentDialog} from "./CommentDialog";
+import {commentDS} from "./Index.js";
 
 export class CommentDetail extends DetailPanel {
 	private content: Component;
@@ -49,7 +49,7 @@ export class CommentDetail extends DetailPanel {
 						icon: "delete",
 						text: "Delete",
 						handler: () => {
-							jmapds("Comment").confirmDestroy([this.entity!.id]);
+							commentDS.confirmDestroy([this.entity!.id]);
 						}
 					})
 				)

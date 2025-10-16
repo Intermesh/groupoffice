@@ -10,18 +10,19 @@ import {
 } from "@intermesh/goui";
 import {CommentList} from "./CommentList.js";
 import {CommentEditor} from "./CommentEditor.js";
-import {client, DetailPanel, jmapds} from "@intermesh/groupoffice-core";
+import {client, DetailPanel} from "@intermesh/groupoffice-core";
 import {LabelDialog} from "./LabelDialog.js";
+import {commentDS} from "./Index.js";
 
 export class CommentsPanel extends Component {
-	private commentList!: CommentList;
-	private commentEditor!: CommentEditor;
-	private countBadge!: Component;
+	private readonly commentList!: CommentList;
+	private readonly commentEditor!: CommentEditor;
+	private readonly countBadge!: Component;
 
 	private entityId: EntityID | undefined;
 
 	private _title!:string
-	private titleCmp: Component;
+	private readonly titleCmp: Component;
 	set title(title: string) {
 		if(this.titleCmp) {
 			this.titleCmp.html = title;
@@ -100,7 +101,7 @@ export class CommentsPanel extends Component {
 						if (form.value.text.length > 0) {
 							const labelIds = form.value.labels.map((l: { id: number; }) => l.id);
 
-							jmapds("Comment").create(
+							commentDS.create(
 								Object.assign({
 									entity: this.entityName,
 									entityId: this.entityId!,
