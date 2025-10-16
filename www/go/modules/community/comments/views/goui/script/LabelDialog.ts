@@ -53,7 +53,7 @@ export class LabelDialog extends Window {
 									commentLabelDS.update(record.id, {name: newValue});
 								}
 							}
-						})
+						});
 					}
 				}),
 				column({
@@ -69,7 +69,6 @@ export class LabelDialog extends Window {
 								change: ({newValue}) =>{
 									commentLabelDS.update(record.id, {color: newValue});
 								}
-
 							}
 						})
 					}

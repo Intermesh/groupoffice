@@ -8,7 +8,7 @@ import {
 	Format, menu, Notifier, router,
 	t, win
 } from "@intermesh/goui";
-import {Image, client, img, principalDS} from "@intermesh/groupoffice-core";
+import {Image, client, img, principalDS, AclLevel} from "@intermesh/groupoffice-core";
 import {CommentDialog} from "./CommentDialog.js";
 import {commentDS} from "./Index.js";
 
@@ -270,7 +270,10 @@ export class CommentList extends Component {
 				}
 			},
 			queryParams: {
-				limit: 0
+				limit: 0,
+				filter: {
+					permissionLevel: AclLevel.READ
+				}
 			},
 			relations: {
 				creator: {

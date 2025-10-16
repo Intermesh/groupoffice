@@ -1,10 +1,19 @@
 import {
 	arrayfield,
 	ArrayField,
-	btn, Button,
-	Component, ContainerField, containerfield, datasourcestore, DataSourceStore, displayfield,
-	fieldset, Format, hr,
-	htmlfield, menu,
+	btn,
+	Button,
+	Component,
+	ContainerField,
+	containerfield,
+	datasourcestore,
+	DataSourceStore,
+	displayfield,
+	fieldset,
+	Format,
+	hr,
+	htmlfield,
+	menu,
 	Notifier,
 	root,
 	t
@@ -26,7 +35,7 @@ export class CommentEditor extends Component {
 
 		this.items.add(
 			fieldset({
-					cls: "group"
+					cls: "group comment-editor-fieldset"
 				},
 				this.addBtn = btn({
 					disabled: true,
@@ -39,8 +48,7 @@ export class CommentEditor extends Component {
 					name: "text",
 					required: true,
 					listeners: {
-
-						beforerender:ev => {
+						beforerender: ev => {
 							new HtmlFieldMentionPlugin(ev.target, async (text) => {
 								const r = await principalDS.query({
 									filter: {
@@ -49,13 +57,15 @@ export class CommentEditor extends Component {
 									}
 								});
 								const get = await principalDS.get(r.ids);
-								return get.list.map(p => {return {value:p.description, display:p.name}});
+								return get.list.map(p => {
+									return {value: p.description, display: p.name}
+								});
 							}, 5);
 
 							ev.target.getToolbar().items.insert(6, hr());
 						},
 
-						insertimage: ( {file, img}) => {
+						insertimage: ({file, img}) => {
 							root.mask();
 
 							client.upload(file).then(r => {
@@ -130,8 +140,8 @@ export class CommentEditor extends Component {
 		this.store = datasourcestore({
 			dataSource: commentLabelDS,
 			listeners: {
-				load: ( {records}) => {
-					if (records) {
+				load: ({records}) => {
+					if (records.length > 0) {
 						this.addBtn.disabled = false;
 
 						let labelButtons: string | Component | Button[] = [];
