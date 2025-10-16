@@ -1,21 +1,9 @@
-import {
-	br,
-	btn,
-	Button,
-	comp,
-	Component,
-	datasourceform,
-	DataSourceForm,
-	Form,
-	form,
-	h3,
-	hr,
-	menu,
-	t
-} from "@intermesh/goui";
+import {br, btn, Button, comp, Component, datasourceform, DataSourceForm, h3, hr, menu, t} from "@intermesh/goui";
 import {
 	AclLevel,
-	addbutton, customFields, DetailFieldset,
+	addbutton,
+	customFields,
+	DetailFieldset,
 	DetailPanel,
 	filesbutton,
 	Image,
@@ -88,7 +76,7 @@ export class NoteDetail extends DetailPanel<Note> {
 			this.toolbar.items.insert(-1, filesbutton());
 		}
 
-		this.on("load", ( {entity}) => {
+		this.on("load", ({entity}) => {
 			this.title = entity.name;
 
 			this.deleteBtn.disabled = entity.permissionLevel < AclLevel.DELETE;

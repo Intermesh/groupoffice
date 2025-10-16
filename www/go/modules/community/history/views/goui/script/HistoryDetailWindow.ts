@@ -17,7 +17,7 @@ export class HistoryDetailWindow extends Window {
 		this.resizable = true;
 
 		this.items.add(
-			comp({cls: "pad scroll"},
+			comp({cls: "pad scroll fit", flex: 1},
 				this.dateComp = comp(),
 				comp({tagName: "h4", text: t("Changes")}),
 				this.changesComp = comp()
@@ -85,7 +85,7 @@ export class HistoryDetailWindow extends Window {
 
 				this.changesComp.items.add(
 					table({
-						cls: "history-changes-table scroll",
+						cls: "history-changes-table",
 						columns: [
 							column({
 								id: "name",
@@ -104,8 +104,7 @@ export class HistoryDetailWindow extends Window {
 						fitParent: true,
 						rowSelectionConfig: {
 							multiSelect: false
-						},
-						flex: 1
+						}
 					})
 				);
 

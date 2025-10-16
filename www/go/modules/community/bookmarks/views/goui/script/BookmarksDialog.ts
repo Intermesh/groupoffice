@@ -10,6 +10,7 @@ import {
 	TextField,
 	textfield
 } from "@intermesh/goui";
+import {bookmarksCategoryDS} from "./Index.js";
 
 export class BookmarksDialog extends FormWindow {
 	private readonly newTabCheckbox: CheckboxField
@@ -78,7 +79,7 @@ export class BookmarksDialog extends FormWindow {
 				}),
 
 				combobox({
-					dataSource: jmapds("BookmarksCategory"),
+					dataSource: bookmarksCategoryDS,
 					storeConfig: {
 						sort: [{property: "name"}]
 					},

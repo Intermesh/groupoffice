@@ -1,6 +1,6 @@
 import {AclItemEntity, AclOwnerEntity, client, JmapDataSource, modules, router} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
-import {EntityID, t} from "@intermesh/goui";
+import {EntityID, t, translate} from "@intermesh/goui";
 import {SettingsPanel} from "./SettingsPanel.js";
 import {NoteDialog} from "./NoteDialog";
 import {NoteDetail} from "./NoteDetail";
@@ -17,6 +17,8 @@ modules.register({
 				// User has no access to this module
 				return;
 			}
+
+			translate.load(GO.lang.community.notes, "community", "notes");
 
 			router.add(/^note\/(\d+)$/, (noteId) => {
 				modules.openMainPanel("notes");

@@ -73,10 +73,18 @@ export class Main extends Component {
 					label: t("Users"),
 					placeholder: t("All users"),
 					required: false,
+					clearable: true,
 					listeners: {
 						select: ({target, record}) => {
 							this.logEntryGrid.store.setFilter("user", {createdBy: target.value});
 							void this.logEntryGrid.store.load();
+						},
+						change: ({newValue}) => {
+							if (!newValue) {
+								this.logEntryGrid.store.clearFilter("user");
+
+								void this.logEntryGrid.store.load();
+							}
 						}
 					}
 				})

@@ -1,6 +1,6 @@
 import {client, JmapDataSource, modules, router} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
-import {t} from "@intermesh/goui";
+import {t, translate} from "@intermesh/goui";
 import {SystemSettings} from "./SystemSettings.js";
 
 modules.register({
@@ -11,6 +11,8 @@ modules.register({
 			if (!session.capabilities["go:community:history"]) {
 				return;
 			}
+
+			translate.load(GO.lang.community.history, "community", "History");
 
 			router.add(/^history\/(\d+)$/, () => {
 				modules.openMainPanel("history");

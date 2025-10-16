@@ -36,7 +36,8 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 				column({
 					id: "description",
 					header: t("Name"),
-					resizable: true
+					resizable: true,
+					width: 60
 				}),
 				column({
 					id: "entity",
@@ -112,6 +113,8 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 				})
 			]
 		);
+
+		this.stateId = "history-logentry-grid";
 
 		this.fitParent = true;
 	}
