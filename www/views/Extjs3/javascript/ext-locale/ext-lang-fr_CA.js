@@ -18,7 +18,7 @@ at http://www.sencha.com/contact.
 
 Build date: 2013-04-03 15:07:25
 */
-﻿/*
+/*
  * France (Canadian) translation
  * By BernardChhun
  * 04-08-2007, 03:07 AM

@@ -67,7 +67,7 @@ return array (
   'Accepted' => 'Akzeptiert',
   'Declined' => 'Abgelehnt',
   'Awaiting reply' => 'Noch keine Antwort',
-  'You are not an invited to this event' => 'Sie sind zu diesem Termin nicht eingeladen',
+  'You are not invited to this event' => 'Sie sind zu diesem Termin nicht eingeladen',
   'Open Calendar' => 'Kalender öffnen',
   'Cancellation' => 'Absage',
   'Invitation' => 'Einladung',

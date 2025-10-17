@@ -261,7 +261,11 @@ class Holiday {
 
 	private function parseIntl($calendar, $month, $dayOfMonth) {
 		$gregorianCalendar = \IntlCalendar::createInstance(null, '@calendar=gregorian');
-		$gregorianCalendar->set($this->year, 0, 1); // January 1, current year
+		if (version_compare(PHP_VERSION, '8.3.0') >= 0) { // 8.3 or up
+			$gregorianCalendar->setDate($this->year, 0, 1);
+		} else { // calling set with more then 2 parameters became deprecated in php 8.4
+			$gregorianCalendar->set($this->year, 0, 1); // January 1, current year
+		}
 
 		$otherCalendar = \IntlCalendar::createInstance(null, '@calendar='.$calendar);
 		$otherCalendar->setTime($gregorianCalendar->getTime());
@@ -288,7 +292,11 @@ class Holiday {
 	private function yearConvert($gregorian, $type) {
 		// get timestamp (ms) for Jan 1 of the Gregorian year
 		$gCal = \IntlCalendar::createInstance(null, 'gregorian');
-		$gCal->set($gregorian, 0, 1, 0, 0, 0);
+		if (version_compare(PHP_VERSION, '8.3.0') >= 0) {
+			$gCal->setDateTime($gregorian, 0, 1, 0, 0, 0);
+		} else {
+			$gCal->set($gregorian, 0, 1, 0, 0, 0);
+		}
 		$gCal->set(\IntlCalendar::FIELD_MILLISECOND, 0);
 		$ts_ms = $gCal->getTime();
 

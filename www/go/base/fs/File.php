@@ -326,6 +326,8 @@ class File extends Base{
 			case 'gif':
 			case 'xmind':
 			case 'svg':
+			case 'heif':
+			case 'heic':
 
 				return true;
 			default:

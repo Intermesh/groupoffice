@@ -2,6 +2,7 @@
 namespace go\core\orm;
 
 use DateInterval;
+use DateTimeZone;
 use Exception;
 use go\core\db\Criteria;
 use go\core\jmap\exception\UnsupportedFilter;
@@ -229,22 +230,9 @@ class Filters {
 
 				case 'datetime':
 				case 'date':					
-					$range = $this->checkDateRange($value, $filterConfig['type']=='datetime');
-					if($range) {
-						call_user_func($filterConfig['fn'], $criteria, '>=', $range[0], $query, $filter, $this);
-						call_user_func($filterConfig['fn'], $criteria, $range['endHasTime'] ? '<=' : '<', $range[1], $query, $filter, $this);
-					} else
-					{
-						if($value == null) {
-							$v = [
-								'comparator' => '=',
-								'query' => null
-							];
-						} else {
-							$v = self::parseNumericValue($value);
-							$v["query"] = new DateTime($v["query"]);
-						}
-						call_user_func($filterConfig['fn'], $criteria, $v['comparator'], $v["query"], $query, $filter, $this);
+					$range = static::parseDateRange($value, $filterConfig['type']=='datetime');
+					foreach($range as $rule) {
+						call_user_func($filterConfig['fn'], $criteria, $rule['comparator'], $rule['date'], $query, $filter, $this);
 					}
 					break;
 					
@@ -434,14 +422,70 @@ class Filters {
 	}
 
 	/**
-	 * @throws Exception
+	 * Parse a date range value
+	 *
+	 * now...2025-01-01 will return [['comparator' => '>=', 'date' => DateTime('now')], ['comparator' => '<', 'date' => new DateTime('2025-01-02')]]
+	 *
+	 * @param string|null $value
+	 * @param bool $convertTimeZone
+	 * @return array<int, array{comparator: string, date: DateTime}>
+	 * @throws \DateMalformedStringException
 	 */
-	private function checkDateRange(?string $value, bool $convertTimezone = true): array|false{
+	public static function parseDateRange(?string $value, bool $convertTimeZone = true): array  {
+		$range = static::checkDateRange($value, $convertTimeZone);
+		if($range) {
+			return $range;
+		} else
+		{
+			if($value == null) {
+				return [['comparator' => '=', 'date' => null]];
+			} else {
+				$v = self::parseNumericValue($value);
+				return [['comparator' => $v['comparator'], 'date' => new DateTime($v["query"])]];
+			}
+		}
+	}
+
+	/**
+	 * @param array<int, array{comparator: string, date: DateTime}> $range
+	 * @return string
+	 * @throws \DateInvalidOperationException
+	 */
+	public static function dateRangeToString(array $range) : string {
+		if(count($range) == 2) {
+			return $range[0]['date']->toUserFormat() .' - ' .$range[01]['date']->toUserFormat();
+		} else {
+			switch($range[0]['comparator']) {
+				case '>':
+					return go()->t("from") .' ' . $range[0]['date']->add(new DateInterval("P1D"))->toUserFormat() ;
+				case '>=':
+					return go()->t("from") .' ' . $range[0]['date']->toUserFormat() ;
+
+				case '<':
+					return go()->t("until") .' ' . $range[0]['date']->sub(new DateInterval("P1D"))->toUserFormat() ;
+				case '<=':
+					return go()->t("until") .' ' . $range[0]['date']->toUserFormat() ;
+			}
+
+			return $range[0]['comparator'].' '.$range[0]['date']->toUserFormat();
+		}
+	}
+
+	/**
+	 * @throws Exception
+	 * @return array<int, array{comparator: string, date: DateTime}>
+	 */
+	private static function checkDateRange(?string $value, bool $convertTimezone = true): array {
 		//Operators >, <, =, !=,
 		//Range ..
 
+		$range = [
+			['comparator' => '>=', 'date' => null],
+			['comparator' => '<=', 'date' => null]
+		];
+
 		if($value == null) {
-			return false;
+			return [];
 		}
 
 		$parts = array_map('trim', explode('..', $value));
@@ -451,29 +495,32 @@ class Filters {
 
 		if(count($parts) == 1) {
 			//no range given
-			return false;
+			return [];
 		}
 
-		$endHasTime = strpos($parts[1], ':') !== false;
+		$endHasTime = str_contains($parts[1], ':');
 
 		if($convertTimezone) {
 			$tz = go()->getAuthState()->getUser()->timezone;
 
-			$parts[0] = new DateTime($parts[0], new \DateTimeZone($tz));
-			$parts[0]->setTimezone(new \DateTimeZone('UTC'));
+			$parts[0] = new DateTime($parts[0], new DateTimeZone($tz));
+			$parts[0]->setTimezone(new DateTimeZone('UTC'));
 
-			$parts[1] = new DateTime($parts[1], new \DateTimeZone($tz));
-			$parts[1]->setTimezone(new \DateTimeZone('UTC'));
+			$parts[1] = new DateTime($parts[1], new DateTimeZone($tz));
+			$parts[1]->setTimezone(new DateTimeZone('UTC'));
 		} else {
-			$parts[0] = new DateTime($parts[0], new \DateTimeZone('UTC'));
-			$parts[1] = new DateTime($parts[1], new \DateTimeZone('UTC'));
+			$parts[0] = new DateTime($parts[0], new DateTimeZone('UTC'));
+			$parts[1] = new DateTime($parts[1], new DateTimeZone('UTC'));
 		}
 
-		$parts['endHasTime'] = $endHasTime;
 		if(!$endHasTime) {
 			$parts[1]->modify('+1 day');
+			$range[1]['comparator'] = '<';
 		}
 
-		return $parts;
+		$range[0]['date'] = $parts[0];
+		$range[1]['date'] = $parts[1];
+
+		return $range;
 	}
 }

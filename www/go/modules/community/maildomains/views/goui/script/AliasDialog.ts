@@ -43,7 +43,8 @@ export class AliasDialog extends FormWindow {
 					label: t("Goto"),
 					listeners: {
 						autocomplete: ({target, input}) => {
-							target.list.store.setFilter("search", {text: input});
+
+							target.list.store.setFilter("search", {text: input, domainId: this.form.value.domainId});
 							void target.list.store.load();
 						}
 					},

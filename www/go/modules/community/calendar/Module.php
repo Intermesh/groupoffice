@@ -117,12 +117,17 @@ class Module extends core\Module
 		$mapping->addHasOne('calendarPreferences', Preferences::class, ['id' => 'userId'], true);
 	}
 
+	// https://uri/path/api/download.php?blob=community/calendar/calendar/1
 	public function downloadCalendar($id) {
 		$calendar = Calendar::findById($id);
 		if($calendar->getPermissionLevel() < 50) {
 			throw new core\exception\Forbidden('You need manage permission to export this calendar');
 		}
-		$events = CalendarEvent::find()->where(['calendarId' => $id]);
+		$this->outputIcs($calendar);
+	}
+
+	private function outputIcs(Calendar $calendar) {
+		$events = CalendarEvent::find()->where(['calendarId' => $calendar->id]);
 		header('Content-Type: text/calendar; charset=UTF-8; component=vcalendar');
 		header('Content-Disposition: attachment; filename="'.$calendar->name.'export_'.$calendar->id.'_'.date('Y-m-d').'.ics"');
 		$vcalendar = new VCalendar([
@@ -135,6 +140,17 @@ class Module extends core\Module
 			ICalendarHelper::toVObject($ev, $vcalendar);
 		}
 		echo $vcalendar->serialize();
+	}
+
+	// https://uri/path/api/page.php/community/calendar/ics/key
+	public function pageIcs($key) {
+		// No auth needed but publishKey most be known to read
+		$calendar = Calendar::find()->where(['publishKey' => $key])->single();
+		if($calendar) {
+			$this->outputIcs($calendar);
+		} else {
+			throw new core\exception\Forbidden("Unauthorized");
+		}
 	}
 
 	public function downloadIcs($key) {

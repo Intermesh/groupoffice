@@ -108,7 +108,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 				},
 				{
 					id: 'title',
-					header: t('Title'),
+					header: this.support ? t("Subject") : t('Title'),
 					width: dp(300),
 					sortable: true,
 					dataIndex: 'title',
@@ -237,7 +237,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					groupable: false
 				},
 				{	
-					header: t('Created by'),
+					header:  this.support ? t("Customer") : t('Created by'),
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'creator',

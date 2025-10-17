@@ -6,6 +6,7 @@
  */
 namespace go\modules\community\calendar\model;
 
+use DateMalformedStringException;
 use DateTimeZone;
 use go\core\db\Expression;
 use go\core\ErrorHandler;
@@ -59,7 +60,7 @@ class ICalendarHelper {
 	 * @param VCalendar|null $vcalendar The original vcalendar to sync to
 	 * @return VCalendar
 	 * @throws \DateInvalidTimeZoneException
-	 * @throws \DateMalformedStringException
+	 * @throws DateMalformedStringException
 	 */
 	static function toVObject(CalendarEvent $event, ?VCalendar $vcalendar = null): VCalendar
 	{
@@ -122,6 +123,8 @@ class ICalendarHelper {
 	static function toInvite(string $method, CalendarEvent &$event) : VCalendar {
 		// Prodid must be set to Group-Office's otherwise gmail won't process the reply
 		$c = new VCalendar(['PRODID' => CalendarEvent::prodId(), 'METHOD' => $method]);
+		if(isset($event->timeZone))
+			$c->add(new \go\modules\community\calendar\model\VTimezone($event->timeZone));
 		$forBody = $event;
 		$baseVEvent = null;
 		if($method == 'CANCEL' || $event->isModified(array_merge(CalendarEvent::EventProperties,['participants']))) {
@@ -154,12 +157,11 @@ class ICalendarHelper {
 	 * @param VEvent $vevent
 	 * @param CalendarEvent $event
 	 * @param ?string $recurrenceId
-
-	 * @throws \DateMalformedStringException
+	 * @return VEvent
+	 * @throws DateMalformedStringException
 	 */
 	static function toVEvent(VEvent $vevent, CalendarEvent $event, ?string $recurrenceId = null): VEvent
 	{
-
 		if(!$recurrenceId) {
 			$recurrenceId = $event->recurrenceId;
 		}
@@ -247,7 +249,7 @@ class ICalendarHelper {
 	 * @param CalendarEvent $event
 	 * @return string \Sabre\VObject\Property\ICalendar\Recur $rule
 	 * @throws \DateInvalidTimeZoneException
-	 * @throws \DateMalformedStringException
+	 * @throws DateMalformedStringException
 	 */
 	static private function toRrule(CalendarEvent $event) {
 		$recurrenceRule = $event->getRecurrenceRule();

@@ -2161,7 +2161,11 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		const entityId = (entity.name === "File" ? "f": "d")+":"+id;
 		const detailViewName = entity.name.toLowerCase() + "Panel";
 		this[detailViewName].on("load", function(dv){
-			this.setFolderID(dv.data.folder_id || dv.data.parent_id, true);
+            if(entity.name === "Folder") {
+                this.setFolderID(dv.data.id, true);
+            } else {
+                this.setFolderID(dv.data.folder_id || dv.data.parent_id, true);
+            }
 		}, this, {single: true});
 		
 		this.gridStore.on("load", function(a,b,c) {

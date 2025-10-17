@@ -115,7 +115,7 @@ export class Main extends Component {
 				),
 				this.picker = datepicker({
 					cls:'not-medium-device',
-					showWeekNbs: false, // Wk nbs in datepicker are broken // client.user.calendarPreferences.showWeekNumbers,
+					showWeekNbs: client.user.calendarPreferences.showWeekNumbers,
 					enableRangeSelect: true,
 					listeners: {
 						'select': ({date}) => {
@@ -224,6 +224,7 @@ export class Main extends Component {
 					//'->',
 					this.cardMenu = comp({cls: 'group not-medium-device', flex:'0 0 auto'},
 						btn({icon: 'view_day', text: t('Day'), handler: _b => this.routeTo('day', this.date)}),
+						btn({icon: 'view_week', text: t('5 Days'), handler: _b => this.routeTo('days-5', this.date)}),
 						btn({icon: 'view_week', text: t('Week'), handler: _b => this.routeTo('week', this.date)}),
 						btn({icon: 'view_module', text: t('Month'), handler: _b => this.routeTo('month', this.date)}),
 						btn({icon: 'view_compact', text: t('Year'), handler: _b => this.routeTo('year', this.date)}),
@@ -232,6 +233,7 @@ export class Main extends Component {
 					),
 					btn({icon:'view_agenda',cls: 'for-medium-device', flex:'0 0 auto', menu:menu({},
 						btn({icon: 'view_day', text: t('Day'), handler: _b => this.routeTo('day', this.date)}),
+						btn({icon: 'view_week', text: t('5 days'), handler: _b => this.routeTo('days-5', this.date)}),
 						btn({icon: 'view_week', text: t('Week'), handler: _b => this.routeTo('week', this.date)}),
 						btn({icon: 'view_module', text: t('Month'), handler: _b => this.routeTo('month', this.date)}),
 						btn({icon: 'view_compact', text: t('Year'), handler: _b => this.routeTo('year', this.date)}),
@@ -533,12 +535,12 @@ export class Main extends Component {
 			// timeSpan : [cardIndex, cardnameIndex]
 			'day': [0, 0],
 			'days': [0, -1],
-			'week': [0, 1],
+			'week': [0, 2],
 			'weeks': [1, -1],
-			'month': [1, 2],
-			'year': [2, 3],
-			'split': [3,4],
-			'list': [4,5]
+			'month': [1, 3],
+			'year': [2, 4],
+			'split': [3,5],
+			'list': [4,6]
 		})[this.timeSpan];
 
 		this.cardMenu.items.forEach(i => i.el.cls('-active'));
@@ -573,6 +575,7 @@ export class Main extends Component {
 				break;
 			case 'days':
 				if(this.spanAmount === 5) {
+					this.cardMenu.items.get(1)!.el.cls('+active');
 					start.setWeekDay(0); // workweek. start monday
 				}
 				end = start.clone().addDays(this.spanAmount! - 1);

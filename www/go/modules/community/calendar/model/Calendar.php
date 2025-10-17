@@ -62,7 +62,7 @@ class Calendar extends AclOwnerEntity {
 	/** @var ?string default for event. If NULL client will use the Users default timeZone  */
 	public ?string $timeZone = null;
 
-	public ?bool $syncToDevice = true;
+	public ?bool $syncToDevice = null;
 
 	protected ?string $defaultColor = null;
 
@@ -81,6 +81,8 @@ class Calendar extends AclOwnerEntity {
 	public ?string $webcalUri = null;
 
 	public ?string $groupId;
+
+	public ?string $publishKey;
 	protected ?string $highestItemModSeq;
 
 	protected static function defineMapping(): Mapping
@@ -95,6 +97,15 @@ class Calendar extends AclOwnerEntity {
 	protected static function textFilterColumns(): array
 	{
 		return ['name'];
+	}
+
+	private function generateSecret() {
+		$bits = openssl_random_pseudo_bytes(15); // 6bits per char, 120bits = 20 chars
+		return strtr(base64_encode($bits), '+/', '-_'); // translate to make url-safe
+	}
+
+	public function setPublish($val) {
+		$this->publishKey = $val ? $this->generateSecret() : null;
 	}
 
 	public function setOwnerId($v) {
@@ -220,6 +231,7 @@ class Calendar extends AclOwnerEntity {
 		}
 		if($this->isNew()) {
 			$this->isSubscribed = true; // auto subscribe the creator.
+			$this->syncToDevice = true;
 			$this->isVisible = true;
 			$this->defaultColor = $this->color;
 		} else if($this->ownerId === go()->getUserId() && !empty($this->color)) {
@@ -382,8 +394,9 @@ class Calendar extends AclOwnerEntity {
 				'name' => $user->displayName,
 				'ownerId' => $user->id,
 				'color' => Calendar::randomColor($user->displayName),
-				'isSubscribed'=>true,
-				'includeInAvailability'=>'all'
+				'isSubscribed' => true,
+				'syncToDevice' => true,
+				'includeInAvailability' => 'all'
 			]);
 
 			if(!$calendar->save()) {

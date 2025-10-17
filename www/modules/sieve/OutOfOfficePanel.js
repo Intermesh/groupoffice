@@ -1,19 +1,19 @@
 GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
-	
+
 	title:t("Out of office", "sieve"),
 	layout:'form',
 	autoScroll:true,
 	hideMode: "offsets",
-	
+
 	accountId:0,
-		
+
 	initComponent : function(config){
-		
+
 		this.scheduleText = new GO.form.HtmlComponent({
 			html:t("In here you can schedule when the \"Out of office\" message needs to be activated.", "sieve"),
 			style:'padding:5px 0px'
 		});
-		
+
 		this.scheduleActivateField = new Ext.form.DateField({
 			name : 'ooo_activate',
 			format : GO.settings['date_format'],
@@ -22,7 +22,7 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 			fieldLabel: t("Activate at", "sieve"),
 			isChanged:false,
 			listeners : {
-				
+
 				focus : {
 					fn : function(field){
 						this.scheduleActivateField.setMinValue(new Date());
@@ -30,7 +30,7 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 					},
 					scope : this
 				},
-				
+
 				change : {
 					fn : function(field,newVal,oldVal){
 						this.scheduleActivateField.isChanged=true;
@@ -41,7 +41,7 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 				}
 			}
 		});
-		
+
 		this.scheduleDeactivateField = new Ext.form.DateField({
 			name : 'ooo_deactivate',
 			format : GO.settings['date_format'],
@@ -60,7 +60,7 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 				}
 			}
 		});
-		
+
 		this.scheduleFieldset = new Ext.form.FieldSet({
 			title: t("Schedule", "sieve"),
 			autoHeight: true,
@@ -68,29 +68,29 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 			labelWidth: 180,
 			items:[this.scheduleText,this.scheduleActivateField,this.scheduleDeactivateField]
 		});
-		
+
 		this.activateText = new GO.form.HtmlComponent({
 			html:t("Activate this filter by checking the checkbox below.", "sieve"),
 			style:'padding:5px 0px'
 		});
-		
+
 		this.activateCheck = new Ext.ux.form.XCheckbox({
 				hideLabel: true,
 				boxLabel: t("Activate", "sieve") + " " + t("Out of office"),
 				name: 'ooo_script_active'
 			});
-		
+
 		this.activateFieldset = new Ext.form.FieldSet({
 			title: t("Activate filterset", "sieve"),
 			collapsed: false,
 			items:[this.activateText,this.activateCheck]
 		});
-		
+
 		this.messageText = new GO.form.HtmlComponent({
 			html:t("Fill in your message in the field below.", "sieve"),
 			style:'padding:5px 0px'
 		});
-		
+
 		this.messageField = new Ext.form.TextArea({
 			name: 'ooo_message',
 			allowBlank:true,
@@ -103,7 +103,7 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 				Ext.form.TextArea.prototype.setValue.call(this,GO.util.HtmlDecode(Ext.util.Format.htmlDecode(v)));
 			}
 		});
-		
+
 		this.messageFieldset = new Ext.form.FieldSet({
 			title: t("Message", "sieve"),
 			autoHeight: true,
@@ -112,13 +112,24 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 //				this.subjectText,this.subjectField,
 				this.messageText,this.messageField]
 		});
-		
-		
+
+		this.subjectText = new GO.form.HtmlComponent({
+			html: t("Set a custom subject"),
+			style: 'padding: 5px 0px'
+		});
+
+		this.subjectField = new Ext.form.TextField({
+			name: "ooo_subject",
+			allowBlank: true,
+			anchor: '100%',
+			width: 300
+		});
+
 		this.aliassesText = new GO.form.HtmlComponent({
 			html:t("Fill in the aliasses on which this message also needs to apply to. If you have multiple aliasses, then separate each alias with a comma (,).", "sieve"),
 			style:'padding:5px 0px'
 		});
-		
+
 		this.aliassesField = new Ext.form.TextArea({
 			name: 'ooo_aliasses',
 			allowBlank:true,
@@ -127,12 +138,12 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 			width: 300,
 			hideLabel: true
 		});
-			
+
 		this.nDaysText = new GO.form.HtmlComponent({
 			html:t("Senders will only be notified periodically. You can set the number of days below.", "sieve"),
 			style:'padding:5px 0px'
 		});
-		
+
 		this.nDaysField = new GO.form.NumberField({
 			name: 'ooo_days',
 			value: 3,
@@ -141,7 +152,7 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 			decimals:0,
 			fieldLabel:t("Reply every x days", "sieve")
 		});
-		
+
 		this.advancedFieldset = new Ext.form.FieldSet({
 			title: t("Advanced options", "sieve"),
 			autoHeight: true,
@@ -149,21 +160,21 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 			collapsed: true,
 			collapsible: true,
 			labelWidth: 180,
-			items:[this.aliassesText,this.aliassesField,this.nDaysText,this.nDaysField]
+			items:[this.subjectText,this.subjectField,this.aliassesText,this.aliassesField,this.nDaysText,this.nDaysField]
 		});
-			
+
 		this.scriptNameField = new Ext.form.Hidden({
 			name: 'ooo_script_name'
 		});
-		
+
 		this.ruleNameField = new Ext.form.Hidden({
 			name: 'ooo_rule_name'
 		});
-					
+
 		this.indexField = new Ext.form.Hidden({
 			name: 'ooo_script_index'
 		});
-			
+
 		this.items = [
 			this.scriptNameField,
 			this.ruleNameField,
@@ -182,7 +193,7 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 
 		GO.sieve.OutOfOfficePanel.superclass.initComponent.call(this,config);
 	},
-	
+
 	disableFields : function(disable){
 		this.scheduleActivateField.setDisabled(disable);
 		this.scheduleDeactivateField.setDisabled(disable);
@@ -201,7 +212,7 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 //		}
 
 	},
-		
+
 	setAccountId : function(account_id){
 		this.setDisabled(!account_id);
 		this.accountId=account_id;

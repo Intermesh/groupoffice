@@ -1,3 +1,33 @@
+- Email: Corrected save as filename
+- Tasks: TypeError in /usr/share/groupoffice/go/core/orm/Property.php at line 1771: Cannot assign null to property go\\modules\\community\\tasks\\model\\Task::$alerts of type array
+- Core: Retry jmap call on network failure (not extjs)
+- Calendar: Added workweek / 5 days button
+- Finance: Put date range on invoice when billing time
+- Finance: Option to group line items by employee when billing time
+
+13-10-2025: 25.0.58
+- Address book: Add zipcode and street in grid
+- Calendar: Enable syncToDevice by default only for calendars you own / create.
+- Email: Save messages to computer in this format: YYYY-MM-DD_HHMM_MAILADDRESS_SUBJECT.eml so you can sort them easily
+- Support: grid column name title => subject and created by => customer
+- Calendar: Fix new event from item dialog not loading editable dialog
+- Calendar: Add info option to context menu to show read only view with links and comments. It's also printable.
+- Calendar: Show counter on link button in edit dialog so it's visible that there are links
+- Calendar: Cancellation of occurrences in a recurring series showed as strike-through instead of removed.
+- Files: direct route to folder will open actual folder instead of parent
+- Ldapauthenticator: Push entity changes while deleting users and groups in LDAP sync
+- Core: Limit garbage collection operations and push changes between actions
+- Core: Hide password fieldset when it can't be changed when using an authenticator method like ldap or imap
+- Calendar: Include VTimezone info for outlook in meeting requests
+
+06-10-2025: 25.0.57
+- Calendartimetracking: set required modules
+- Core: More PL translations and corrections
+- Finance/mollie: Setup SEPA mandates manually
+- Calendar: Improve meeting selection clarity by changing button text and hide body buttons inside group-office 
+  (except for resources).
+- Files: heic support in image viewer
+
 29-09-2025: 25.0.56
 - Calendar: Find participant by e-mail so that scheduling works better when you invite a contact that's also a user
 - E-mail: Missing "None" label for in email composer templates menu. Related to issue #1343

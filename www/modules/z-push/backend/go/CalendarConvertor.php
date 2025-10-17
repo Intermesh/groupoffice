@@ -81,7 +81,12 @@ class CalendarConvertor
 
 		if(!$event->isPrivate() || $event->currentUserIsOwner()) {
 			$message->subject = $event->title;
-			$message->location = $event->location;
+			if(isset($event->location)) {
+				$message->location = $event->location;//str_replace("\n", ", ", $event->location);
+				$message->location2 = new SyncLocation();
+				$message->location2->displayname = $event->location;
+			}
+
 			$message->asbody = GoSyncUtils::createASBody($event->description, $params);
 		} else {
 			$message->subject = "Private";
@@ -191,9 +196,11 @@ class CalendarConvertor
 
 	private static function toSyncAttendee(CalendarEvent $event, &$message, $me = null) {
 
-		$message->organizername = '';
-		if(!empty($event->replyTo))
+
+		if(!empty($event->replyTo)) {
+			$message->organizername = $event->replyTo;
 			$message->organizeremail = $event->replyTo;
+		}
 
 		if($me)
 			$message->responsetype = self::$participationStatusMap[$me->participationStatus] ?? 0;
@@ -207,13 +214,13 @@ class CalendarConvertor
 		foreach($event->participants as $k => $participant) {
 			/** @var $participant Participant */
 			if ($participant->isOwner()) {
-				$message->organizername = $participant->name;
+				$message->organizername = $participant->name ?? $participant->email;
 				$message->organizeremail = $participant->email;
 				//continue;
 			}
 
 			$att = new SyncAttendee();
-			$att->name = $participant->name;
+			$att->name = $participant->name ?? $participant->email;
 			$att->email = $participant->email;
 			$att->attendeetype = 1; // 1=required, 2=optional, 3=resource
 			$att->attendeestatus = self::$participationStatusMap[$participant->participationStatus] ?? 0;
@@ -247,7 +254,7 @@ class CalendarConvertor
 			case 'monthly':
 				if (isset($rule->byDay[0])) {
 					$recur->type = "3";
-					$recur->weekofmonth = $rule->bySetPosition ?? $rule->byDay[0]->nthOfPeriod;
+					$recur->weekofmonth = $rule->bySetPosition[0] ?? $rule->byDay[0]->nthOfPeriod;
 					if($recur->weekofmonth == -1) { // last of month is supported by EAS but using 5.
 						$recur->weekofmonth = 5;
 					}
@@ -327,6 +334,16 @@ class CalendarConvertor
 		$event->start = $dtstart;
 		if (isset($message->location))
 			$event->location = $message->location;
+		elseif(isset($message->location2)) {
+			$aslocation = $message->location2;
+			if (isset($aslocation->displayname)) {
+				$event->location = $aslocation->displayname;
+			}
+			elseif($aslocation->street) {
+				$event->location = $aslocation->street .", ". $aslocation->city ."-". $aslocation->state .",". $aslocation->country .",". $aslocation->postalcode;
+			}
+		}
+
 		if (isset($message->busystatus))
 			$event->freeBusyStatus = empty($message->busystatus) ? 'free' : 'busy';
 		if (isset($message->sensitivity))

@@ -292,6 +292,9 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 			this.pressButton(ev.calendarPrincipal?.participationStatus);
 			this.form.findField('alerts')!.hidden = false;
+
+			this.legacyOnLoad(ev.data.id);
+
 			this.form.load(ev.data.id).then(() => {
 				if(ev.recurrenceId) {
 					const start = this.form.findField('start')!,
@@ -333,6 +336,6 @@ export class EventDetailWindow extends Window {
 	}
 
 	loadEvent(ev: CalendarItem) {
-		this.view.loadEvent(ev);
+		return this.view.loadEvent(ev);
 	}
 }

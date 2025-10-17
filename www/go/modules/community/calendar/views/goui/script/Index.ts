@@ -106,6 +106,7 @@ function addEmailAction() {
 				const event = msg.itip.event,
 					btns = E('div').cls('btns'),
 					names: any = {accepted: t("Accept"), tentative: t("Maybe"), declined: t("Decline")},
+					pressedNames: any = {accepted: t("Accepted"), tentative: t("Maybe"), declined: t("Declined")},
 					updateBtns = (item: CalendarItem) => {
 
 						btns.innerHTML = '';
@@ -117,7 +118,7 @@ function addEmailAction() {
 						} else {
 							btns.append(
 								E('div',
-									...['accepted', 'tentative', 'declined'].map(s => E('button', names[s])
+									...['accepted', 'tentative', 'declined'].map(s => E('button', item.calendarPrincipal?.participationStatus == s ? pressedNames[s] : names[s])
 										.cls('goui-button')
 										.cls('disabled', item.calendarPrincipal?.participationStatus == s)
 										.cls('pressed', item.calendarPrincipal?.participationStatus == s)
@@ -217,14 +218,32 @@ modules.register(  {
 			],
 			links: [{
 				iconCls: 'entity ic-event red',
-				linkWindow:(entity:string, entityId) => {
-					return (new CalendarItem({key:'',data:{
-							start:(new DateTime).format('Y-m-d\TH:00:00.000'),
+				linkWindow: async (entity:string, entityId) => {
+					if(!calendarStore.loaded) {
+						// CalendarItem depends on the store being loaded
+						await calendarStore.load();
+					}
+
+					const dlg = go.openEventWindow({
+							start:(new DateTime).addDays(1).format('Y-m-d\TH:00:00.000'),
 							title: t('New event'),
 							showWithoutTime: client.user.calendarPreferences?.defaultDuration == null,
 							duration: client.user.calendarPreferences?.defaultDuration ?? "P1D",
 							calendarId: client.user.calendarPreferences?.defaultCalendarId
-						}})).open()
+						}, true);
+
+					if(entity == "Contact") {
+						try {
+							const p = await principalDS.single("Contact:" + entityId);
+							dlg.participantFld.addParticipant(p);
+						} catch(e) {
+							debugger;
+							console.error(e);
+
+						}
+					}
+
+					return dlg;
 				},
 				linkDetail:() =>  new EventDetail()
 			}]

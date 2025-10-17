@@ -220,8 +220,12 @@ class Scheduler {
 		$alreadyProcessed = false;
 		$accountEmail = false;
 		if($method ==='REPLY') {
+			$uid =(string) $vevent->UID;
 			// Find event data's replyTo by UID, we don't trust the organizer in the VEVENT
-			$replyTo = go()->getDbConnection()->selectSingleValue('replyTo')->from('calendar_event')->where('uid', '=', (string) $vevent->UID)->single();
+			$replyTo = go()->getDbConnection()->selectSingleValue('replyTo')->from('calendar_event')->where('uid', '=', $uid)->single();
+
+			go()->debug("Testing if you are the organizer for event with UID: ". $uid. " ". $replyTo .' == ' .$accountUserEmail);
+
 			if ($replyTo === $accountUserEmail) {
 				$accountEmail = $replyTo;
 			}
@@ -239,7 +243,7 @@ class Scheduler {
 		if (!$accountEmail || $method === 'NONE') {
 			return [
 				'method' => $method,
-				'feedback' => $accountEmail ? "" : go()->t('You are not an invited to this event', "email"),
+				'feedback' => $accountEmail ? "" : go()->t('You are not invited to this event', "email"),
 				'event' => ICalendarHelper::parseVObject($vcalendar, new CalendarEvent())
 			];
 		} else {
@@ -412,7 +416,7 @@ class Scheduler {
 					if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
 						$existingEvent->recurrenceOverrides[$recurId] = (new RecurrenceOverride($existingEvent));
 					}
-					$existingEvent->recurrenceOverrides[$recurId]->patchProps((object)['status' => CalendarEvent::Cancelled]);
+					$existingEvent->recurrenceOverrides[$recurId]->patchProps((object)['excluded' => true]);
 				} else {
 					$existingEvent->status = CalendarEvent::Cancelled;
 				}

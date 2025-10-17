@@ -716,6 +716,14 @@ class Contact extends AclItemEntity {
 			$query->join('addressbook_addressbook', 'abSort', 'abSort.id = c.addressBookId', 'INNER');
 			$sort->renameKey('addressBook', 'abSort.name');
 		}
+		if(isset($sort['address'])) {
+			$query->joinIf('addressbook_address', 'abAddressSort', 'abAddressSort.contactId = c.id', 'LEFT');
+			$sort->renameKey('address', 'abAddressSort.address');
+		}
+		if(isset($sort['zipCode'])) {
+			$query->joinIf('addressbook_address', 'abAddressSort', 'abAddressSort.contactId = c.id', 'LEFT');
+			$sort->renameKey('zipCode', 'abAddressSort.zipCode');
+		}
 
 		if(isset($sort['city'])) {
 			$query->joinIf('addressbook_address', 'abAddressSort', 'abAddressSort.contactId = c.id', 'LEFT');

@@ -42,7 +42,17 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				"isOrganization",
 				"emailAddresses",
 				"phoneNumbers",
-
+				{
+					name: "address",
+					convert: function(v, data) {
+						return data.addresses ? data.addresses.column("address").filter(i => !go.util.empty(i)).unique().join(", ") : "";
+					}
+				},{
+					name: "zipCode",
+					convert: function(v, data) {
+						return data.addresses ? data.addresses.column("zipCode").filter(i => !go.util.empty(i)).unique().join(", ") : "";
+					}
+				},
 				{
 					name: "city",
 					convert: function(v, data) {
@@ -314,6 +324,22 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function (phoneNumbers, meta, record) {
 						return Ext.util.Format.htmlEncode(phoneNumbers.column("number").join(", "));
 					}
+				},
+				{
+					id: 'address',
+					header: t('Addrees'),
+					sortable: true,
+					dataIndex: "address",
+					width: dp(300),
+					hidden: true
+				},
+				{
+					id: 'zipCode',
+					header: t('ZIP code'),
+					sortable: true,
+					dataIndex: "zipCode",
+					width: dp(300),
+					hidden: true
 				},
 				{
 					id: 'city',

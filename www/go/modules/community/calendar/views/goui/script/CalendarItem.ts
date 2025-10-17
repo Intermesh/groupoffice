@@ -300,6 +300,14 @@ export class CalendarItem {
 		}
 	}
 
+	info() {
+		const dlg = new EventDetailWindow();
+		dlg.show();
+		dlg.loadEvent(this);
+
+		return dlg;
+	}
+
 	async open(onCancel?: Function) {
 
 		const internalOpen = () => {
@@ -473,7 +481,7 @@ export class CalendarItem {
 	get quickText(): string {
 		const cal = this.cal ? ('<sup style="color:#'+this.cal.color+';">'+this.cal.name+'</sup>') : '';
 		const lines = [
-			'<h2 style="padding:0;margin:0;">'+this.title+'</h2>'+cal,
+			'<h2 style="padding:0;margin:0;">'+this.title.htmlEncode()+'</h2>'+cal,
 			...this.humanReadableDate(),
 		];
 		if(this.isRecurring) {
@@ -485,23 +493,34 @@ export class CalendarItem {
 				const p = this.participants[key],
 					icon = statusIcons[p.participationStatus] ? statusIcons[p.participationStatus] : statusIcons["needs-action"] ,
 					 i= '<i class="icon '+icon[2]+'" title="'+icon[1]+'">'+icon[0]+'</i>' ;
-				lines.push(i+' '+(p.name ?? p.email));
+				lines.push(i+' '+(p.name || p.email).htmlEncode());
 			}
 
 		}
 		if(this.data.creator && this.data.modifier) {
 			lines.push(
-				'<hr>' + t('Created at') + ': ' + Format.smartDateTime(this.data.createdAt) + ' ' + t('by') + ' ' + this.data.creator.name,
-				t('Modified at') + ': ' + Format.smartDateTime(this.data.modifiedAt) + ' ' + t('by') + ' ' + this.data.modifier.name
+				'<hr>' + t('Created at') + ': ' + Format.smartDateTime(this.data.createdAt) + ' ' + t('by') + ' ' + this.data.creator.name.htmlEncode(),
+				t('Modified at') + ': ' + Format.smartDateTime(this.data.modifiedAt) + ' ' + t('by') + ' ' + this.data.modifier.name.htmlEncode()
 			);
 		}
 		if(this.data.location) {
-			lines.push(t('Location')+ ': ' + Format.convertUrisToAnchors(this.data.location));
+			lines.push('<div style="white-space: pre">' + t('Location')+ ': ' + this.formatLocation(this.data.location)) + '</div>';
 		}
 		if(this.data.description)
 			lines.push('<p style="max-width:360px;">'+Format.textToHtml(this.data.description)+'</p>');
-		// status
+
 		return lines.join('<br>');
+	}
+
+	private formatLocation(l:string) {
+		l = l.htmlEncode();
+		const withUris = Format.convertUrisToAnchors(l);
+
+		if(withUris != l) {
+			return withUris;
+		} else {
+			return `<a rel="noopener noreferrer" href="maps:q=${l}">${l}</a>`;
+		}
 	}
 
 	private humanReadableDate() {
