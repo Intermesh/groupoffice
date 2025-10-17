@@ -171,8 +171,8 @@ final class Mailbox extends AclItemEntity
 		if ($this->isNew() || empty($this->homedir)) {
 			$d = $this->getDomain();
 			$parts = explode('@', $this->username);
-			$this->homedir = $d->domain . '/' . $parts[0] . '/';
-			$this->maildir = $d->domain . '/' . $parts[0] . '/Maildir/';
+			$this->homedir = $d->domain . '/' . $parts[0];
+			$this->maildir = $d->domain . '/' . $parts[0] . '/Maildir';
 		}
 
 		return parent::internalSave();
