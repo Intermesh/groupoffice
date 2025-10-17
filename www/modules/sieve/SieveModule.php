@@ -8,35 +8,35 @@ use PHPUnit\Event\Code\Throwable;
 
 
 class SieveModule extends Module{
-	
+
 	public function autoInstall() {
 		return true;
 	}
-	
+
 	public function depends() {
 		return array("email");
 	}
-	
+
 	public function package() {
 		return self::PACKAGE_COMMUNITY;
 	}
-	
+
 	public static function initListeners() {
 		// Add trigger
 		$c = new AccountController();
 		$c->addListener('submit', 'GO\Sieve\SieveModule', 'saveOutOfOfficeMessage');
 		$c->addListener('load', 'GO\Sieve\SieveModule', 'loadOutOfOfficeMessage');
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * Load the outofoffice message when it's available
-	 * 
+	 *
 	 * @param SieveModule $this
 	 * @param array $response
 	 * @param Account $model
 	 * @param array $params
-	 * 
+	 *
 	 */
 	public static function loadOutOfOfficeMessage($self,&$response,&$model,&$params){
 		try {
@@ -99,10 +99,8 @@ class SieveModule extends Module{
 						foreach($outOfOfficeRule['actions'] as $action){
 							if($action['type'] === "vacation"){
 
-								
-								
 								$rule['ooo_days'] = isset($action['days'])?$action['days']:3;
-//								$rule['ooo_subject'] = isset($action['subject'])?$action['subject']:\GO::t("I am away", "sieve");
+								$rule['ooo_subject'] = $action['subject'] ?? null;
 								$rule['ooo_message'] = $action['reason'];
 
 								if(!empty($action['addresses'])){
@@ -131,7 +129,7 @@ class SieveModule extends Module{
 					'ooo_activate'=>date(\GO::user()->completeDateFormat),
 					'ooo_deactivate'=>date(\GO::user()->completeDateFormat),
 					'ooo_message'=> \GO::t("I am on vacation", "sieve"),
-//					'ooo_subject'=> \GO::t("I am away", "sieve"),
+					'ooo_subject'=> null,
 					'ooo_aliasses'=>'',
 					'ooo_days' =>	3
 				));
@@ -144,10 +142,10 @@ class SieveModule extends Module{
 			return;
 		}
 	}
-	
+
 	/**
 	 * Save the outofoffice message when it's data is posted.
-	 * 
+	 *
 	 * @param SieveModule $this
 	 * @param array $response
 	 * @param Account $model
@@ -255,7 +253,7 @@ class SieveModule extends Module{
 							"type" => "vacation",
 							"reason" => $params['ooo_message'],
 							"days" => $params['ooo_days'],
-//						"subject"=>$params['ooo_subject'],
+							"subject"=>$params['ooo_subject'],
 							"addresses" => $params['ooo_aliasses']
 //					),
 //					1=>array(
