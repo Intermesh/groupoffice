@@ -1,11 +1,13 @@
 import {LogEntryGrid} from "./LogEntryGrid.js";
-import {collapsebtn, comp, Component, EntityID, t, tbar} from "@intermesh/goui";
+import {BaseEntity, collapsebtn, comp, Component, EntityID, t, tbar} from "@intermesh/goui";
 
 export class HistoryDetailPanel extends Component {
 	private readonly grid: LogEntryGrid;
+	private readonly type: string;
 
-	constructor(type: string, entityId: EntityID) {
+	constructor(type: string) {
 		super();
+		this.type = type;
 
 		this.stateId = "history-detail";
 
@@ -30,10 +32,12 @@ export class HistoryDetailPanel extends Component {
 				)
 			)
 		);
+	}
 
+	public onLoad(entity: BaseEntity) {
 		this.grid.store.setFilter("entity", {
-			entity: type,
-			entityId: entityId
+			entity: this.type,
+			entityId: entity.id
 		});
 
 		void this.grid.store.load();

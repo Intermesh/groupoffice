@@ -21,6 +21,7 @@ import {alertfield} from "./AlertField.js";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {calendarStore, statusIcons, t} from "./Index.js";
 import {EventWindow} from "./EventWindow.js";
+import {CommentsPanel} from "@intermesh/community/comments";
 
 
 export class EventDetail extends DetailPanel<CalendarEvent> {
@@ -177,7 +178,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 
 		this.addLinks();
-		this.addComments();
+		this.scroller.items.add(new CommentsPanel(this.entityName));
 		this.addCustomFields();
 
 

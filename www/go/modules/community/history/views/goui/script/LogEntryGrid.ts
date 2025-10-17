@@ -21,7 +21,8 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 				queryParams: {
 					filter: {
 						actions: {}
-					}
+					},
+					permissionLevel: 5
 				}
 			}),
 			[
