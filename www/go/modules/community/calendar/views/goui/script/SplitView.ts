@@ -18,23 +18,6 @@ export class SplitView extends MonthView {
 
 	protected internalRender() {
 
-		// this.el.on('keydown', (e: KeyboardEvent) => {
-		// 	if(e.key == 'Delete') {
-		// 		this.selected.forEach(item => {
-		// 			const i = this.viewModel.indexOf(item);
-		// 			if(i > -1) {
-		// 				item.remove();
-		// 			}
-		// 		});
-		// 	}
-		// }).on('contextmenu', e =>{
-		// 	e.preventDefault();
-		// 	const day = e.target.up('li[data-date]');
-		// 	if(day) {
-		// 		this.contextMenuEmpty.dataSet.date = day.dataset.date;
-		// 		this.contextMenuEmpty.showAt(e);
-		// 	}
-		// });
 		this.el.on('mousedown', (e) => {
 			const found = e.target.up('ol[data-calid]', this.el);
 			if(found) {
