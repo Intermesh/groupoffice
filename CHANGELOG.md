@@ -10,6 +10,7 @@
 - Calendar: Fixed never ending loop in month print view
 - Files: remove delete buttons
 - Files: Fixed broken icons in thumb view
+- Core: enable users with mayChangeUsers permission to add new users (backport from 6.8)
 
 13-10-2025: 25.0.58
 - Address book: Add zipcode and street in grid
