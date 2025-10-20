@@ -1,3 +1,4 @@
+20-10-2025: 6.8.140
 - Email: Corrected save as filename
 - Core: Enable users/groups with "Change users" permissions to add new users 
 
