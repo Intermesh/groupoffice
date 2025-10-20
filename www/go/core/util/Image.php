@@ -36,7 +36,7 @@ class Image {
 	 *
 	 * @return int
 	 */
-	public function getImageType(): int
+	public function getImageType(): ?int
 	{
 		if(!isset($this->originalImage)) {
 			$this->createOriginalImage();
