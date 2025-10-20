@@ -340,8 +340,6 @@ export class Main extends Component {
 
 			let start = this.picker.value, end = start.clone();
 
-			debugger;
-
 			switch (this.timeSpan) {
 
 				case 'days':
