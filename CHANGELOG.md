@@ -5,6 +5,7 @@
 - Finance: Put date range on invoice when billing time
 - Finance: Option to group line items by employee when billing time
 - Calendar: tooltip always showed series description and location and not the patched one.
+- Email: Out of office subject is configurable
 
 13-10-2025: 25.0.58
 - Address book: Add zipcode and street in grid
