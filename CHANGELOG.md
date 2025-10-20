@@ -6,6 +6,8 @@
 - Finance: Option to group line items by employee when billing time
 - Calendar: tooltip always showed series description and location and not the patched one.
 - Email: Out of office subject is configurable
+- Calendar: List option prints current time period.
+- Calendar: Fixed never ending loop in month print view
 
 13-10-2025: 25.0.58
 - Address book: Add zipcode and street in grid
