@@ -19,6 +19,8 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 
 	weekRows: [DateTime, HTMLElement][] = []
 
+	protected wdays = 7
+
 	protected internalRender() {
 		this.makeDraggable(this.el);
 
@@ -76,7 +78,7 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 		this.adapter.goto(this.start, endMonth);
 	}
 
-	private makeDraggable(el: HTMLElement) {
+	protected makeDraggable(el: HTMLElement) {
 		let from : HTMLElement,
 			till: HTMLElement,
 			last: HTMLElement,
@@ -243,14 +245,14 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 		}
 	}
 
-	private updateItems() {
+	protected updateItems() {
 		this.continues = [];
 		this.iterator = 0;
 		this.viewModel.sort((a,b) => a.start.date < b.start.date ? -1 : 1);
 		for(const [ws, container] of this.weekRows) {
 			container.append(...this.drawWeek(ws));
 			this.slots.forEach((v, i) => {
-				container.parentElement!.children[i+1]!.setAttribute('amount', ''+Object.keys(v).length);
+				container.parentElement!.children[i+1]?.setAttribute('amount', ''+Object.keys(v).length);
 			})
 		}
 
@@ -261,10 +263,10 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 	continues: CalendarItem[] = []
 
 	private drawWeek(wstart: DateTime) {
-		let end = wstart.clone().addDays(7),
+		let end = wstart.clone().addDays(this.wdays),
 			e: any;
 		let eventEls = [];
-		this.slots = [{},{},{},{},{},{},{}];
+		this.slots = Array.from({length: this.wdays}, _ => ({}) );
 		let stillContinueing = [];
 		while(e = this.continues.shift()) {
 			eventEls.push(this.drawEventLine(e, wstart));

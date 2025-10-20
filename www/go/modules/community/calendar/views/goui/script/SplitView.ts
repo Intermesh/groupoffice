@@ -1,11 +1,11 @@
 import {CalendarView} from "./CalendarView.js";
 import {DateTime, E, store, Store} from "@intermesh/goui";
-import {allCalendarStore, calendarStore} from "./Index.js";
+import {allCalendarStore, calendarStore, MonthView} from "./Index.js";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 import {jmapds} from "@intermesh/groupoffice-core";
 
-export class SplitView extends CalendarView {
+export class SplitView extends MonthView {
 
 	start!: DateTime
 	calRows: [string, HTMLElement][] = []
@@ -16,10 +16,45 @@ export class SplitView extends CalendarView {
 		super(adapter);
 	}
 
+	protected internalRender() {
+
+		// this.el.on('keydown', (e: KeyboardEvent) => {
+		// 	if(e.key == 'Delete') {
+		// 		this.selected.forEach(item => {
+		// 			const i = this.viewModel.indexOf(item);
+		// 			if(i > -1) {
+		// 				item.remove();
+		// 			}
+		// 		});
+		// 	}
+		// }).on('contextmenu', e =>{
+		// 	e.preventDefault();
+		// 	const day = e.target.up('li[data-date]');
+		// 	if(day) {
+		// 		this.contextMenuEmpty.dataSet.date = day.dataset.date;
+		// 		this.contextMenuEmpty.showAt(e);
+		// 	}
+		// });
+		this.el.on('mousedown', (e) => {
+			const found = e.target.up('ol[data-calid]', this.el);
+			if(found) {
+				this.setActiveCalendar(found.dataset.calid!);
+			}
+		});
+
+		return super.internalRender();
+	}
+
+	private setActiveCalendar(id: string) {
+		CalendarView.selectedCalendarId = id;
+		this.viewModel = this.calViewModel[id];
+	}
+
+
 	goto(day: DateTime, amount: number) {
 		day ||= new DateTime();
 
-		this.days = amount;
+		this.wdays = amount;
 		this.day = day.setHours(0,0,0,0);
 		this.start = this.day.clone().setWeekDay(0);
 		const end = this.start.clone().addDays(amount);
@@ -41,7 +76,7 @@ export class SplitView extends CalendarView {
 		this.clear()
 
 		const activeFilter = this.adapter.byType('event').store.queryParams.filter.inCalendars;
-		//const viewEnd = this.start.clone().addDays(this.days);
+		//const viewEnd = this.start.clone().addDays(this.wdays);
 		for (let calendarId of activeFilter) {
 			this.calViewModel[calendarId] = [];
 		}
@@ -67,7 +102,7 @@ export class SplitView extends CalendarView {
 		//this.el.cls(['+cal','+month']);
 		const headDay = this.start.clone();
 		const headers=[];
-		for (i = 0; i < this.days; i++) {
+		for (i = 0; i < this.wdays; i++) {
 			headers.push(E('li', headDay.format('D'), E('em', headDay.format('j'))).cls('today', headDay.format('Ymd') == now.format('Ymd')));
 			headDay.addDays(1);
 		}
@@ -81,12 +116,12 @@ export class SplitView extends CalendarView {
 
 				if(activeFilter.indexOf(calendar.id) === -1) continue;
 				day = this.start.clone();
-				const eventContainer = E('li', ...this.drawCal(calendar.id)).cls('events'),
+				const eventContainer = E('li').cls('events'),
 					row = E('ol',
 						eventContainer,
 						//E('li', E('i', 'event').cls('icon').css({color:'#'+calendar.color}), calendar.name)
-					);
-				for (i = 0; i < this.days; i++) {
+					).attr('data-calid',calendar.id);
+				for (i = 0; i < this.wdays; i++) {
 					row.append(E('li').attr('data-date', day.format('Y-m-d'))
 						.cls('today', day.format('Ymd') === now.format('Ymd'))
 						.cls('past', day.format('Ymd') < now.format('Ymd'))
@@ -102,40 +137,14 @@ export class SplitView extends CalendarView {
 		});
 	}
 
-	private updateItems() {
+	protected updateItems() {
 
 		for(const [calId, container] of this.calRows) {
-			this.iterator = 0;
-			container.append(...this.drawCal(calId));
+			this.weekRows = [[this.start.clone(), container]];
+			this.viewModel = this.calViewModel[calId];
+			super.updateItems();
+			//container.append(...this.drawCal(calId));
 		}
 		// call draw week but re-use divs only set style ignore the return value
-	}
-
-	private drawCal(calId: string) {
-		const wstart = this.start.clone();
-		let end = this.start.clone().addDays(this.days);
-		let eventEls = [];
-		this.slots = Array.from({length: this.days}, _ => ({}) )
-
-		while(true) {
-			const e = this.calViewModel[calId] && this.calViewModel[calId][this.iterator];
-			if(!e || e.start.format('YW') > end.format('YW')) {
-				break;
-			}
-			eventEls.push(this.drawEvent(e, wstart));
-			this.iterator++;
-		}
-
-		return eventEls;
-	}
-
-	iterator!: number
-
-	drawEvent(e: CalendarItem, weekstart: DateTime) {
-		if(!e.divs[weekstart.format('YW')]) {
-			e.divs[weekstart.format('YW')] = super.eventHtml(e);
-		}
-		return e.divs[weekstart.format('YW')]
-			.css(this.makestyle(e, weekstart))
 	}
 }
