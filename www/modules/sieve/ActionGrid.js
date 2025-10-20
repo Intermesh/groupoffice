@@ -22,7 +22,7 @@ GO.sieve.ActionGrid = function(config){
 	config.border=true;
 	config.cls = 'go-grid3-hide-headers';
 	var fields ={
-		fields:['type','copy','target','days','addresses','reason','vacationStart','vacationEnd','text'],
+		fields:['type','copy','target','days','addresses','reason', 'subject','vacationStart','vacationEnd','text'],
 		header: false,
 		columns:[{
 				header:false,
