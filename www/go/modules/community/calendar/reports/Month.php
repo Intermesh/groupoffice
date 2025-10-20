@@ -67,7 +67,7 @@ class Month extends Calendar {
 		$end = min($this->end, $instance->utcEnd);
 		while($itr <= $end) {
 			$this->events[$itr->format('Ymd')][$key] = $instance;
-			$itr->modify('+1 day');
+			$itr = $itr->modify('+1 day');
 		}
 	}
 	
