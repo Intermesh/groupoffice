@@ -308,10 +308,10 @@ export class CalendarItem {
 		return dlg;
 	}
 
-	async open(onCancel?: Function) {
+	async open(onCancel?: Function, forceWrite?: boolean) {
 
 		const internalOpen = () => {
-			const dlg = !this.mayChange ? new EventDetailWindow() : new EventWindow();
+			const dlg = !forceWrite && !this.mayChange  ? new EventDetailWindow() : new EventWindow();
 			if (dlg instanceof EventWindow) {
 				dlg.on('close', () => {
 					// cancel ?
