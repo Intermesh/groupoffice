@@ -497,17 +497,19 @@ export class CalendarItem {
 			}
 
 		}
-		if(this.data.creator && this.data.modifier) {
+		if(this.patched.creator && this.patched.modifier) {
 			lines.push(
 				'<hr>' + t('Created at') + ': ' + Format.smartDateTime(this.data.createdAt) + ' ' + t('by') + ' ' + this.data.creator.name.htmlEncode(),
 				t('Modified at') + ': ' + Format.smartDateTime(this.data.modifiedAt) + ' ' + t('by') + ' ' + this.data.modifier.name.htmlEncode()
 			);
 		}
-		if(this.data.location) {
-			lines.push('<div style="white-space: pre">' + t('Location')+ ': ' + this.formatLocation(this.data.location)) + '</div>';
+
+		if(this.patched.location) {
+			lines.push('<div style="white-space: pre">' + t('Location')+ ': ' + this.formatLocation(this.patched.location)) + '</div>';
 		}
-		if(this.data.description)
-			lines.push('<p style="max-width:360px;">'+Format.textToHtml(this.data.description)+'</p>');
+
+		if(this.patched.description)
+			lines.push('<p style="max-width:360px;">'+Format.textToHtml(this.patched.description)+'</p>');
 
 		return lines.join('<br>');
 	}
