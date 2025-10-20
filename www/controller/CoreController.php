@@ -318,16 +318,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 			
 			$src = $dir . $params['foldericon'].'.svg';
 
-			$file = new \GO\Base\Fs\File($src);
-			header("Expires: " . date("D, j M Y G:i:s ", time() + (86400 * 365)) . 'GMT'); //expires in 1 year
-			header('Cache-Control: cache');
-			header('Pragma: cache');
-			header('Content-Type: ' . $file->mimeType());
-			header('Content-Disposition: inline; filename="' . $file->name() . '"');
-			header('Content-Transfer-Encoding: binary');
 
-			$file->output();
-			exit();
 		} else {
 		
 //		if (is_dir(GO::config()->file_storage_path . $params['src'])) {
@@ -402,6 +393,19 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		
 		if($file->size() > \GO::config()->max_thumbnail_size*1024*1024){
 			throw new \Exception("Image may not be larger than " . Number::formatSize(\GO::config()->max_thumbnail_size*1024*1024));
+		}
+
+		if($file->extension() == 'svg')
+		{
+			header("Expires: " . date("D, j M Y G:i:s ", time() + (86400 * 365)) . 'GMT'); //expires in 1 year
+			header('Cache-Control: cache');
+			header('Pragma: cache');
+			header('Content-Type: ' . $file->mimeType());
+			header('Content-Disposition: inline; filename="' . $file->name() . '"');
+			header('Content-Transfer-Encoding: binary');
+
+			$file->output();
+			exit();
 		}
 		
 
