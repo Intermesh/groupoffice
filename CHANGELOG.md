@@ -10,6 +10,7 @@
 - Calendar: Fixed never ending loop in month print view
 - Files: remove delete buttons
 - Files: Fixed broken icons in thumb view
+- Core: Disable email profile field when an authenticator is used
 - Core: enable users with mayChangeUsers permission to add new users (backport from 6.8)
 
 13-10-2025: 25.0.58
