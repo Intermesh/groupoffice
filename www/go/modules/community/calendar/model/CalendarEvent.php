@@ -641,7 +641,7 @@ class CalendarEvent extends AclItemEntity {
 				}
 
 				$currPart = $this->calendarParticipant();
-				if ($currPart && !$currPart->isOwner()) { // not owner
+				if ($currPart && !$currPart->isOwner() && $this->ownerId !== null) { // not owner, not shared
 					if ($this->isModified(self::OwnerOnlyProperties)) {
 						throw new Forbidden('Trying to change properties but not the organizer');
 					} else if ($this->isModified(['participants'])) {
