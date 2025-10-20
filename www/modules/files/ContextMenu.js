@@ -89,14 +89,14 @@ GO.files.FilesContextMenu = function(config)
 		scope: this
 	});
 
-	this.deleteButton = new Ext.menu.Item({
-		iconCls: 'ic-delete',
-		text: t("Delete"),
-		handler: function(){
-			this.fireEvent('delete', this, this.records, this.clickedAt);
-		},
-		scope: this
-	});
+	// this.deleteButton = new Ext.menu.Item({
+	// 	iconCls: 'ic-delete',
+	// 	text: t("Delete"),
+	// 	handler: function(){
+	// 		this.fireEvent('delete', this, this.records, this.clickedAt);
+	// 	},
+	// 	scope: this
+	// });
 
 	this.moveToTrashButton = new Ext.menu.Item({
 		iconCls: "ic-delete",
@@ -258,7 +258,7 @@ GO.files.FilesContextMenu = function(config)
 	config['items'].push(this.copyButton);
 	//this.pasteButton,
 	config['items'].push(this.deleteSeparator = new Ext.menu.Separator());
-	config['items'].push(this.deleteButton);
+	// config['items'].push(this.deleteButton);
 	config['items'].push(this.moveToTrashButton);
 	config['items'].push(this.batchEditButton);
 	config['items'].push(this.compressSeparator = new Ext.menu.Separator());
