@@ -8,6 +8,7 @@
 - Email: Out of office subject is configurable
 - Calendar: List option prints current time period.
 - Calendar: Fixed never ending loop in month print view
+- Files: remove delete buttons
 
 13-10-2025: 25.0.58
 - Address book: Add zipcode and street in grid
