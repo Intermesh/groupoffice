@@ -3,6 +3,8 @@ import {Main} from "./Main.js";
 import {t, translate} from "@intermesh/goui";
 import {SystemSettings} from "./SystemSettings.js";
 
+export * from "./HistoryDetailPanel.js";
+
 modules.register({
 	package: "community",
 	name: "history",
