@@ -187,7 +187,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 				icon: "edit",
 				title: t("Edit"),
 				handler: (button, ev) => {
-					void this.item!.open();
+					void this.item!.open(()=>{},true);
 				},
 			}),
 
@@ -313,6 +313,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 					}
 				}
 				this.item = ev;
+				this.editBtn.hidden = !this.item.data.isOrigin || !this.item.cal.myRights.writeAll
 			});
 		}
 		this.scroller.hidden = false;
