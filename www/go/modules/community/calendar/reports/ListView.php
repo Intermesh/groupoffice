@@ -37,7 +37,7 @@ class ListView extends Calendar {
 		$this->setEvents(model\CalendarEvent::find()->filter([
 			'inCalendars' => $this->calendarIds,
 			'after'=>$this->day->format('Y-m-d'),
-			'before'=>$this->end->format('Y-m-d')
+			'before'=>$this->end->add(new \DateInterval("P1D"))->format('Y-m-d')
 		]));
 
 		$this->SetMargins(10,10,10);

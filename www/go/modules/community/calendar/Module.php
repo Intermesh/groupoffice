@@ -13,6 +13,7 @@ use go\core\model\User;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\model\Module as CoreModule;
+use go\core\util\DateTime;
 use go\modules\community\calendar\model\Calendar;
 use go\modules\community\calendar\model\Participant;
 use go\modules\community\calendar\model\Preferences;
@@ -171,21 +172,23 @@ class Module extends core\Module
 			case 'days': $this->printWeek($date, $calendarIds, 5);break;
 			case 'week' : $this->printWeek($date, $calendarIds, 7);break;
 			case 'month' : $this->printMonth(new \DateTime($date), $calendarIds);break;
-			case 'list' : $this->printList(new \DateTime($date), $calendarIds);break;
+			//case 'list' : $this->printList(new \DateTime($date), new DateTime($end), $calendarIds);break;
 		}
 	}
 
-	private function printList($date, $calendarIds) {
-		$start = (clone $date)->modify('first day of this month');
-		$end = (clone $start)->modify('+3 months');
+	public function pagePrintList($start, $end) {
+
+		go()->setAuthState(new core\jmap\State());
+		$calendarIds = Calendar::find()->selectSingleValue('calendar_calendar.id')
+			->where('caluser.isVisible', '=',1)->andWhere('caluser.isSubscribed','=', true)->all();
 
 		$report = new reports\ListView();
-		$report->day = $start;
-		$report->end = $end;
+		$report->day = new DateTime($start);;
+		$report->end = new DateTime($end);;
 		$report->calendarIds = $calendarIds;
 		$report->render();
 
-		$report->Output('list.pdf');
+		$report->Output('calendar_list_'.$start.'_'.$end.'.pdf');
 	}
 
 	private function printDay($start, $calendarIds){
@@ -207,7 +210,7 @@ class Module extends core\Module
 			$report->render();
 			$report->calendarName = Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
 		}
-		$report->Output('day.pdf');
+		$report->Output('calendar_day_'.$start->format('Y-m-d').'.pdf');
 	}
 
 	private function printWeek($date, $calendarIds, $span){
@@ -215,7 +218,7 @@ class Module extends core\Module
 		$report = new reports\Week();
 
 		$date = (new \DateTime($date));
-		$dayDiff = (int) $date->format('w') + $report->firstWeekday;
+		$dayDiff = (int) $date->format('w') - $report->firstWeekday;
 
 		$start = $date->sub(new DateInterval("P" . $dayDiff . "D"));
 		$end = (clone $start)->modify('+'.$span.' days');
@@ -236,7 +239,7 @@ class Module extends core\Module
 			$report->render();
 			$report->calendarName = Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
 		}
-		$report->Output('week.pdf');
+		$report->Output($report->Output('calendar_week_'.$start->format('Y-m-d').'_'.$end->format('Y-m-d').'.pdf'));
 	}
 
 	private function printMonth($date, $calendarIds) {
@@ -259,7 +262,7 @@ class Module extends core\Module
 			$report->render();
 			$report->calendarName = Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
 		}
-		$report->Output('month.pdf');
+		$report->Output($report->Output('calendar_month_'.$start->format('Y-m-d').'_'.$end->format('Y-m-d').'.pdf'));
 	}
 
 

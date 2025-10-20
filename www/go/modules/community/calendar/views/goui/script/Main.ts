@@ -4,7 +4,7 @@ import {
 	cards,
 	checkbox, column,
 	comp,
-	Component, datasourcestore,
+	Component, datasourcestore, DateInterval,
 	DatePicker,
 	datepicker,
 	DateTime, Format,
@@ -336,7 +336,43 @@ export class Main extends Component {
 	}
 
 	private openPDF(type:string) {
-		window.open(client.pageUrl('community/calendar/print/'+type+'/'+this.date.format('Y-m-d')));
+		if(type == "list") {
+
+			let start = this.picker.value, end = start.clone();
+
+			debugger;
+
+			switch (this.timeSpan) {
+
+				case 'days':
+				case 'weeks':
+					end.addDays(this.spanAmount!);
+					break;
+
+				case 'split':
+					end.addDays(this.spanAmount!);
+					break;
+				/** @fallthough */
+				case 'week':
+					end.addDays(7);
+					break;
+				case 'month':
+				case 'list':
+					start.setDate(1);
+					end.setDate(1).addMonths(1).addDays(-1);
+					break;
+				case 'year':
+					start.setDate(1);
+					start.setMonth(1);
+					end = start.clone().addYears(1).addDays(-1);
+					break;
+			}
+
+
+			window.open(client.pageUrl('community/calendar/printList/' + start.format('Y-m-d') + "/" + end.format('Y-m-d')));
+		} else {
+			window.open(client.pageUrl('community/calendar/print/' + type + '/' + this.date.format('Y-m-d')));
+		}
 	}
 
 	private get view() : CalendarView {
