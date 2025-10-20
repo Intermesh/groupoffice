@@ -317,6 +317,17 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		if(isset($params['foldericon'])){
 			
 			$src = $dir . $params['foldericon'].'.svg';
+
+			$file = new \GO\Base\Fs\File($src);
+			header("Expires: " . date("D, j M Y G:i:s ", time() + (86400 * 365)) . 'GMT'); //expires in 1 year
+			header('Cache-Control: cache');
+			header('Pragma: cache');
+			header('Content-Type: ' . $file->mimeType());
+			header('Content-Disposition: inline; filename="' . $file->name() . '"');
+			header('Content-Transfer-Encoding: binary');
+
+			$file->output();
+			exit();
 		} else {
 		
 //		if (is_dir(GO::config()->file_storage_path . $params['src'])) {
