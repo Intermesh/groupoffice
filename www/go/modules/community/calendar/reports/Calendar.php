@@ -41,13 +41,9 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 	protected $months_long= array();
 	
 	public $calendarName;
-	
-	/**
-	 *
-	 * @var \DateTime A unixtimestamp of the day to display
-	 */
-	public $day;
-	public $end;
+
+	public \DateTimeInterface $day;
+	public \DateTimeInterface $end;
 	protected $currentDay;
 
 	/**
