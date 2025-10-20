@@ -504,16 +504,6 @@ GO.files.FileBrowser = function(config){
 		}
 	});
 
-	this.deleteButton = new Ext.menu.Item({
-		iconCls: 'ic-delete',
-		text: t("Delete"),
-		overflowText:t("Delete"),
-		handler: function(){
-			this.onDelete('grid');
-		},
-		scope: this
-	});
-
 	this.cutButton= new Ext.Button({
 		iconCls: 'ic-content-cut',
 		tooltip: t("Cut"),
@@ -624,7 +614,7 @@ GO.files.FileBrowser = function(config){
 	}));
 
 	if(!config.hideActionButtons) {
-		this.moreBtn.menu.add(this.deleteButton, this.moveToTrashButton);
+		this.moreBtn.menu.add(this.moveToTrashButton);
 	}
 
 
@@ -2058,7 +2048,6 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		var createPermission=permissionLevel>=GO.permissionLevels.create;
 
 		this.newButton.setDisabled(!createPermission);
-		this.deleteButton.setDisabled(!deletePermission);
 		this.moveToTrashButton.setDisabled(!deletePermission);
 
 		this.cutButton.setDisabled(!deletePermission);
