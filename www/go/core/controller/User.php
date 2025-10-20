@@ -43,7 +43,7 @@ class User extends EntityController {
 
 	protected function canCreate(Entity $entity): bool
 	{
-		return go()->getAuthState()->isAdmin();
+		return $this->rights->mayChangeUsers;//go()->getAuthState()->isAdmin();
 	}
 	
 	/**
