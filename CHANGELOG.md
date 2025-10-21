@@ -1,3 +1,6 @@
+20-10-2025: 25.0.50
+- Core: Fix dirty merge
+
 20-10-2025: 25.0.59
 - Calendar: User with writeAll permission to shared calendar can edit event they did not organize but are internal
 - Calendar: Split view is now writeable (drag, drop, copy, paste, click-to-add)
