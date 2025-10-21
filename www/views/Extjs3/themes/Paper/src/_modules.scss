@@ -337,7 +337,7 @@ i.icon.em-low_priority {
 
 	.go-detail-view & {
 		//float:left; ?? why?
-		margin-top:utils.dp(4);
+		margin-top: utils.dp(4);
 		margin-right: utils.dp(16);
 	}
 	
@@ -351,4 +351,12 @@ i.icon.em-low_priority {
 		}
 		background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));	
 	}
+}
+
+
+.business-finance-article-info-btn {
+	background-color:var(--bg-input);
+	border: 1px solid var(--fg-outline);
+	margin: utils.dp(8) 0 utils.dp(6);
+	padding-top: 0;
 }
