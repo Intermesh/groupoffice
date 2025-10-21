@@ -378,7 +378,7 @@ export class Main extends Component {
 	}
 
 	private renderViews() {
-		const rights = modules.get("community", "calendar")!.userRights;
+
 		return table({
 			store: viewStore,
 			emptyStateHtml:'',

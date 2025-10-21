@@ -99,6 +99,15 @@ export class CalendarList extends Component<CalendarListEventMap> {
 			})
 		), this.list = list({
 			tagName: 'div',
+			groupBy: "group",
+			groupByCollapsible: false,
+			groupByRenderer: (groupBy, record, list1) => {
+				if(groupBy) {
+					return `<h3>${groupBy.name.htmlEncode()}</h3>`;
+				} else {
+					return "";
+				}
+			},
 			store,
 			cls: 'check-list',
 			rowSelectionConfig: {

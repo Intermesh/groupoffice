@@ -18,13 +18,17 @@ export * from "./CalendarAdapter.js"
 
 export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list';
 export const calendarStore = datasourcestore({
-	dataSource:jmapds('Calendar'),
+	dataSource: jmapds<any>('Calendar'),
 	queryParams:{filter:{isSubscribed: true, davaccountId : null}},
-	sort: [{property:'sortOrder'},{property:'name'}],
+	sort: [{property:'groupId'},{property:'sortOrder'},{property:'name'}],
 	relations: {
 		owner: {
 			path: "ownerId",
 			dataSource: principalDS
+		},
+		group: {
+			path: "groupId",
+			dataSource:jmapds('ResourceGroup')
 		}
 	}
 });
