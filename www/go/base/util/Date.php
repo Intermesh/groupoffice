@@ -23,6 +23,8 @@
 namespace GO\Base\Util;
 
 
+use go\core\util\Time;
+
 class Date {
 
 
@@ -49,15 +51,15 @@ class Date {
 		
 		return $hours*60+$minutes;
 	}
-	
+
+	/**
+	 * @param $minutes
+	 * @return string
+	 * @deprecated
+	 * @use \go\core\util\Time
+	 */
 	public static function minutesToTimeString($minutes){
-		$hours = floor($minutes/60);
-		$minutes = $minutes % 60;
-		
-		if(strlen($minutes)==1)
-			$minutes = '0'.$minutes;
-		
-		return $hours.':'.$minutes;
+		return Time::minutesToTimeString($minutes);
 	}
 	
 	
@@ -86,13 +88,6 @@ class Date {
 		$startDate = \DateTime::createFromFormat('Y-m-d', $year.'-01-01');
 		$endDate = \DateTime::createFromFormat('Y-m-d', $year.'-12-31');
 		if (!isset(self::$holidays[$region][$year])){
-			/*
-			$hstmt = \GO\Base\Model\Holiday::model()->getHolidaysInPeriod($year.'-01-01', $year.'-12-31', $region);
-			if($hstmt) {
-				foreach($hstmt as $h){
-					self::$holidays[$region][$year][$h->date]=$h->name;
-				}
-			}*/
 			foreach (\go\core\model\Holiday::generate($region, \GO::config()->language, $startDate, $endDate) as $h) {
 				self::$holidays[$region][$year][$h->start] = $h->title;
 			}
