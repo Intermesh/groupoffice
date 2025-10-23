@@ -451,11 +451,16 @@ export class CalendarItem {
 	 * Finds the participant which e-mail matches the e-mail of the calendar owner.
 	 */
 	get calendarPrincipal() : {[key:string]: any} | undefined {
-		const email = this.principalEmail;
 		if(this.participants) {
+			const email = this.principalEmail;
 			for(let id in this.participants) {
-				if(this.participants[id].email == email) {
-					return this.participants[id];
+				const p = this.participants[id];
+				if(this.cal.groupId){
+					if(p.kind==='resource' && id.slice("Calendar:".length) == this.cal.id) {
+						return p
+					}
+				} else if (p.kind!=='resource' && this.participants[id].email == email) {
+					return p;
 				}
 			}
 		}

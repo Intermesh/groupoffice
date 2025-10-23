@@ -2,7 +2,7 @@ import {
 	autocomplete, avatar, btn, Button, checkbox,
 	column,
 	comp,
-	Component, Config, containerfield, createComponent, datasourcestore, FieldEventMap, Format,
+	Component, Config, containerfield, createComponent, datasourcestore, DateTime, FieldEventMap, Format,
 	hr,
 	MapField,
 	mapfield, Menu, menu, ObservableListenerOpts,
@@ -19,7 +19,6 @@ export const participantfield = (config?: Config<ParticipantField>) => createCom
 export class ParticipantField extends Component<ParticipantFieldEventMap> {
 
 	list!: MapField
-	btnFreeBusy!: Button
 
 	constructor() {
 		super();
@@ -30,8 +29,10 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 		this.items.add(
 			this.list = mapfield({name: 'participants', cls:'goui-pit',
 				listeners: {
-					'change': (newValue) => {
-						this.fire('change', {newValue, oldValue:null});
+					'setvalue': (e) => {
+						this.fire('setvalue', e);
+					},'change': (e) => {
+						this.fire('change', e);
 					}
 				},
 				buildField: (v: any) => {
@@ -41,9 +42,11 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 									'person' : 'contact_mail')
 							) ,
 						statusIcon = statusIcons[v.participationStatus] || v.participationStatus;
+
 					const f = containerfield({cls:'hbox', style: {alignItems: 'center', cursor:'default'}},
 						comp({tagName:'i',cls:'icon',html:userIcon, style:{margin:'0 8px'}}),
 						comp({
+							itemId: 'name',
 							flex: '1 0 60%',
 							html: v.name ? v.name + (v.email ? '<br>' + v.email :'') : v.email
 						}),
@@ -149,6 +152,25 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 		);
 
 		return super.internalRender();
+	}
+
+	private pendingAvailabilityIds : {[id:string]:true} = {};
+	checkAvailability(start: DateTime, end: DateTime, allDay: boolean) {
+		if(allDay)
+			end = end.clone().addDays(1);
+
+		const fm = allDay ? 'Y-m-d' : 'Y-m-d H:i:s';
+		for (const id in this.list.value) {
+			if(!this.pendingAvailabilityIds[id] && (id.startsWith('Calendar:') || !isNaN(+id)))
+			client.jmap('Principal/getAvailability', {start:start.format(fm),end:end.format(fm),id}).then((response)=> {
+				const f = this.list.items?.find(v => v.dataSet.key === id);
+				if(f)
+					f.findChild(f => f.itemId === 'name')!.style.color = response.list.length > 0 ?  'red' : 'inherit';
+
+				this.pendingAvailabilityIds = {};
+			})
+			this.pendingAvailabilityIds[id]=true;
+		}
 	}
 
 	private organizerId?: string;

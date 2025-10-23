@@ -117,6 +117,7 @@ export class EventWindow extends FormWindow {
 							.add(di)
 							.format(format);
 					}
+					this.participantFld.checkAvailability(this.startDate.getValueAsDateTime()!, this.endDate.getValueAsDateTime()!, !!this.withoutTimeToggle.value);
 				},
 			'setvalue': ({target}) => {
 				const d = target.getValueAsDateTime();
@@ -146,6 +147,7 @@ export class EventWindow extends FormWindow {
 					if(newEndDate && this.item) {
 						this.item.end = newEndDate; // for isInPast
 					}
+					this.participantFld.checkAvailability(this.startDate.getValueAsDateTime()!, this.endDate.getValueAsDateTime()!, !!this.withoutTimeToggle.value);
 				},
 				validate: ev => {
 
@@ -182,23 +184,24 @@ export class EventWindow extends FormWindow {
 						}
 					},
 					'setvalue': ({newValue}) => {
-						if(newValue)
-							writeableCalendarStore.dataSource.single(newValue).then(r => {
-							if(!r) return;
-							this.item!.cal = r;
+						if(newValue) {
+							const r = writeableCalendarStore.findById(newValue);
+							if (!r) return;
+							if(this.item)
+								this.item.cal = r;
 
 							const d = this.form.value.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
 							this.alertField.setDefaultLabel(d)
-							if(!this.item?.key && !this.participantFld.list.isEmpty()) {
+							if (!this.item?.key && !this.participantFld.list.isEmpty()) {
 								// calendar changed and event is new, check if organizer needs to change as well
-								principalDS.single(this.item!.ownerId).then(p=> {
+								principalDS.single(this.item!.ownerId).then(p => {
 									this.participantFld.addOrganiser(p);
 									// this.participantFld.list.trackReset();
 								}).catch(e => {
 									void Window.error(t("Could not add organizer because the calendar principal could not be read from the server. Do you have permissions?"));
 								})
 							}
-						});
+						}
 
 					}
 				}
@@ -230,13 +233,17 @@ export class EventWindow extends FormWindow {
 			),
 			this.participantFld = participantfield({
 				listeners: {
-					'change': ({newValue}) => {
+					'setvalue': ({newValue}) => {
+						const count = (newValue && Object.keys(newValue).length);
+						this.btnFreeBusy.hidden = !count;
+					},
+					'change' :({newValue}) => {
 						const count = (newValue && Object.keys(newValue).length);
 						this.submitBtn.text = t(count && (this.endDate.getValueAsDateTime()!.date > new Date()) ? 'Send' : 'Save');
-						this.btnFreeBusy.hidden = !count;
 
+						this.participantFld.checkAvailability(this.startDate.getValueAsDateTime()!, this.endDate.getValueAsDateTime()!, !!this.withoutTimeToggle.value);
 					},
-					'beforeadd': ({target}) => {
+					'beforeadd': ({target, principal}) => {
 						if(target.list.isEmpty()) {
 							principalDS.single(this.item!.ownerId).then(p=>{
 								target.addOrganiser(p);
@@ -252,6 +259,7 @@ export class EventWindow extends FormWindow {
 				dlg.on('changetime', ({start, end}) => {
 					this.startDate.value = start.format('Y-m-dTH:i');
 					this.endDate.value = end.format('Y-m-dTH:i');
+					this.participantFld.checkAvailability(this.startDate.getValueAsDateTime()!, this.endDate.getValueAsDateTime()!, !!this.withoutTimeToggle.value);
 				});
 				dlg.show(this.item, this.form.modified);
 			} }),
