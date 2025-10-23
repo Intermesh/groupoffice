@@ -1,5 +1,6 @@
 - Finance: Added article info button and discount option
 - Calender: group calendar list by resource group name
+- Serverclient: User adding didn't work anymore because of change in aliases
 
 20-10-2025: 25.0.50
 - Core: Fix dirty merge
