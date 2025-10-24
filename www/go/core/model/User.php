@@ -1502,13 +1502,38 @@ public function historyLog(): bool|array
 
 		if(go()->getModule("legacy", "email")) {
 
-			$scheduleIds = array_unique(array_merge($scheduleIds, go()->getDbConnection()
+			$scheduleIds = array_values(array_unique(array_merge($scheduleIds, go()->getDbConnection()
 				->selectSingleValue("LOWER(al.email)")
 				->from("em_accounts", "a")
 				->join("em_aliases", "al", "al.account_id = a.id")
 				->where("a.user_id", "=", $userId)
-				->all()));
+				->all())));
 		}
+		return $scheduleIds;
+	}
+
+	/**
+	 * All email aliases this user is known to use
+	 *
+	 * The users' email accounts are used for this too if the email module is installed.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getEmailAliases() : array {
+
+		$scheduleIds = [strtolower($this->email)];
+
+		if(go()->getModule("legacy", "email")) {
+
+			$scheduleIds = array_values(array_unique(array_merge($scheduleIds, go()->getDbConnection()
+				->selectSingleValue("LOWER(al.email)")
+				->from("em_accounts", "a")
+				->join("em_aliases", "al", "al.account_id = a.id")
+				->where("a.user_id", "=", $this->id)
+				->all())));
+		}
+
 		return $scheduleIds;
 	}
 

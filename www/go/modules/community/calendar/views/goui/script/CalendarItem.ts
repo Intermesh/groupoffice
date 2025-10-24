@@ -9,7 +9,7 @@ import {
 	win, Window
 } from "@intermesh/goui";
 import {calendarStore, CalendarView, categoryStore, statusIcons, t, writeableCalendarStore} from "./Index.js";
-import {client, jmapds, Recurrence, RecurrenceField} from "@intermesh/groupoffice-core";
+import {client, jmapds, Principal, Recurrence, RecurrenceField} from "@intermesh/groupoffice-core";
 import {EventWindow} from "./EventWindow.js";
 import {EventDetailWindow} from "./EventDetail.js";
 import {SubscribeWindow} from "./SubscribeWindow";
@@ -447,20 +447,27 @@ export class CalendarItem {
 			(this.cal.myRights.mayWriteOwn && this.isOwner)) && !this.readOnly;
 	}
 
+	private _calendarPrincipal:Principal|undefined;
+
 	/**
 	 * Finds the participant which e-mail matches the e-mail of the calendar owner.
 	 */
 	get calendarPrincipal() : {[key:string]: any} | undefined {
+		if(this._calendarPrincipal) {
+			return this._calendarPrincipal;
+		}
 		if(this.participants) {
-			const email = this.principalEmail;
+			const emailAliases = this.ownerAliases;
 			for(let id in this.participants) {
 				const p = this.participants[id];
 				if(this.cal.groupId){
 					if(p.kind==='resource' && id.slice("Calendar:".length) == this.cal.id) {
-						return p
+						this._calendarPrincipal = p
+						return this._calendarPrincipal;
 					}
-				} else if (p.kind!=='resource' && this.participants[id].email == email) {
-					return p;
+				} else if (p.kind!=='resource' && emailAliases.indexOf(this.participants[id].email.toLowerCase()) > -1) {
+					this._calendarPrincipal = p;
+					return this._calendarPrincipal;
 				}
 			}
 		}
@@ -479,8 +486,8 @@ export class CalendarItem {
 	/**
 	 * The e-mail address of the calendar owner of this item
 	 */
-	get principalEmail() : string {
-		return (this.cal && this.cal.owner) ? this.cal.owner.email : client.user.email!;
+	get ownerAliases() : string {
+		return (this.cal && this.cal.owner) ? this.cal.owner.emailAliases : client.user.emailAliases!;
 	}
 
 	get quickText(): string {

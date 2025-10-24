@@ -186,4 +186,14 @@ class Principal extends AclOwnerEntity
 		$this->entityTypeId = $entityType->getId();
 	}
 
+
+	public function getEmailAliases() {
+		switch($this->entityTypeId) {
+			case User::entityType()->getId():
+					return User::findEmailAliases($this->id);
+				break;
+		}
+		return [];
+	}
+
 }
