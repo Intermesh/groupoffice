@@ -242,9 +242,7 @@ modules.register(  {
 							const p = await principalDS.single("Contact:" + entityId);
 							dlg.participantFld.addParticipant(p);
 						} catch(e) {
-							debugger;
 							console.error(e);
-
 						}
 					}
 
