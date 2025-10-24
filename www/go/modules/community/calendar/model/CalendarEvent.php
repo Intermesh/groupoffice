@@ -245,6 +245,14 @@ class CalendarEvent extends AclItemEntity {
 		return $this->eventId;
 	}
 
+	/**
+	 * List of columns to ignore when determining if modifiedAt or modifiedBy should be set.
+	 * @return array
+	 */
+	protected static function ignorePropertiesForModifiedAt() : array {
+		return ['veventBlobId', 'uri', 'uid'];
+	}
+
 	protected function internalGetPermissionLevel(): int
 	{
 		// Sometimes this model is used in an email invite without a calendarId.

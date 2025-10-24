@@ -59,7 +59,11 @@ abstract class Entity  extends OrmEntity {
 	 */
 	public function historyLog(): bool|array
 	{
-		return $this->getModified();
+		$modified =  $this->getModified();
+		foreach(static::ignorePropertiesForModifiedAt() as $col) {
+			unset($modified[$col]);
+		}
+		return $modified;
 	}
 
 
