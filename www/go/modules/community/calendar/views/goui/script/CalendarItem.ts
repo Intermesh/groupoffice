@@ -416,6 +416,8 @@ export class CalendarItem {
 					}),
 					btn({
 						text: t('Send'), cls:'primary', handler: () => {
+							// allow long timeout for sending invitations
+							client.raiseNextRequestTimeout(180000);
 							eventDS.setParams.sendSchedulingMessages = true;
 							Object.assign(this.data, modified);
 							onAccept();
@@ -636,6 +638,8 @@ export class CalendarItem {
 
 				root.mask();
 
+				// allow long timeout for sending invitations
+				client.raiseNextRequestTimeout(180000);
 				const p = eventDS.update(this.data.id, modified).catch(e => {
 					void Window.error(e);
 					throw e;
@@ -703,6 +707,7 @@ export class CalendarItem {
 		this.confirmScheduleMessage(modified, () => {
 
 			root.mask();
+
 			const p = eventDS.update(this.data.id, modified)
 				.catch(e => {
 					void Window.error(e);
@@ -779,7 +784,8 @@ export class CalendarItem {
 					data['recurrenceOverrides'] = {[this.recurrenceId!] : patch };
 				}
 
-
+				// allow long timeout for sending invitations
+				client.raiseNextRequestTimeout(180000);
 				const prom = eventDS.update(this.data.id, data)
 					.catch(e => {
 					void Window.error(e);
@@ -833,6 +839,8 @@ export class CalendarItem {
 				update.recurrenceOverrides = patchRecurrenceOverrides;
 			}
 
+			// allow long timeout for sending invitations
+			client.raiseNextRequestTimeout(180000);
 			eventDS.update(this.data.id, update); // set until on original
 
 			const next = Object.assign({},
@@ -940,6 +948,8 @@ export class CalendarItem {
 	private removeFutureEvents() {
 		this.confirmScheduleMessage(false, () => {
 			this.data.recurrenceRule.until = (new DateTime(this.recurrenceId)).addDays(-1).format('Y-m-d'); // could be minus 1 seconds, but we don't recur within day
+			// allow long timeout for sending invitations
+			client.raiseNextRequestTimeout(180000);
 			eventDS.update(this.data.id,{recurrenceRule: this.data.recurrenceRule}).catch(e => Window.error(e))
 		});
 	}
@@ -950,6 +960,8 @@ export class CalendarItem {
 
 				this.data.recurrenceOverrides ??= {};
 				this.data.recurrenceOverrides[this.recurrenceId!] = {excluded: true};
+				// allow long timeout for sending invitations
+				client.raiseNextRequestTimeout(180000);
 				eventDS.update(this.data.id, {recurrenceOverrides: this.data.recurrenceOverrides}).catch(e => Window.error(e))
 			} else {
 				// set status to not participating
@@ -959,12 +971,16 @@ export class CalendarItem {
 
 	private removeSeries() {
 		this.confirmScheduleMessage(false, () => {
+			// allow long timeout for sending invitations
+			client.raiseNextRequestTimeout(180000);
 			eventDS.destroy(this.data.id).catch(e => Window.error(e))
 		});
 	}
 
 	undoException(recurrenceId: string) {
 		delete this.data.recurrenceOverrides![recurrenceId];
+		// allow long timeout for sending invitations
+		client.raiseNextRequestTimeout(180000);
 		return eventDS.update(this.data.id, {recurrenceOverrides:this.data.recurrenceOverrides}).catch(e => Window.error(e))
 	}
 }
