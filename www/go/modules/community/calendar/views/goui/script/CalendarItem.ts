@@ -388,7 +388,7 @@ export class CalendarItem {
 		client.downloadBlobId('community/calendar/ics/'+this.key, this.cal.name + '_'+this.start.format('Y-m-dTHi')+'_'+this.title+'.ics');
 	}
 
-	confirmScheduleMessage(modified: Partial<CalendarEvent>|false, onAccept: ()=>void) {
+	confirmScheduleMessage(modified: Partial<CalendarEvent>|false, onAccept: ()=>void, onCancel?: ()=>void) {
 		const type = this.shouldSchedule(modified);
 		if(type) {
 			const askScheduleWin = win({
@@ -396,6 +396,13 @@ export class CalendarItem {
 					modal: true,
 					closable: false,
 					title: t(type+'ScheduleTitle'),
+					listeners: {
+						close: ({byUser}) => {
+							if(byUser && onCancel) {
+								onCancel();
+							}
+						}
+					}
 				},
 				comp({cls: 'pad flow'},
 					comp({tagName:'i',cls:'icon',html:'email', width:100, style:{fontSize:'3em'}}),
@@ -404,6 +411,9 @@ export class CalendarItem {
 				tbar({},
 					btn({
 						text: t('Cancel'), handler: () => {
+							if(onCancel) {
+								onCancel();
+							}
 							askScheduleWin.close()
 						}
 					}),'->',
@@ -597,11 +607,14 @@ export class CalendarItem {
 
 		if(!this.calendarPrincipal)
 			throw new Error('Not a participant');
+		const oldStatus = this.calendarPrincipal.participationStatus;
 		this.calendarPrincipal.participationStatus = status;
 
 		//eventDS.setParams.sendSchedulingMessages = true;
 		// should we notify a reply is sent?
-		this.patch({participants: this.participants}, onFinish,undefined,false);
+		this.patch({participants: this.participants}, onFinish,() => {
+			this.calendarPrincipal!.participationStatus = oldStatus;
+		},false);
 	}
 
 	shouldSchedule(modified: Partial<CalendarEvent>|false) {
@@ -646,12 +659,12 @@ export class CalendarItem {
 				if(onFinish)
 					p.then(onFinish)
 
-			});
+			}, onCancel);
 		} else if(this.isOverride) {
-			this.patchOccurrence(modified, onFinish);
+			this.patchOccurrence(modified, onFinish, onCancel);
 		} else if(skipAsk || !this.recurrenceId) {
 			// always patch series
-			this.patchSeries(modified, onFinish)
+			this.patchSeries(modified, onFinish, onCancel)
 		} else {
 			// if(modified.recurrenceRule) {
 			// 	eventDS.update(this.data.id, {recurrenceRule:modified.recurrenceRule});
@@ -674,7 +687,7 @@ export class CalendarItem {
 						hidden: modified.recurrenceRule, // user must change future if rrule is modified
 						cls:'primary',
 						handler: _b => {
-							this.patchOccurrence(modified, onFinish); w.close();
+							this.patchOccurrence(modified, onFinish, onCancel); w.close();
 						}
 					}),
 					btn({
@@ -682,7 +695,7 @@ export class CalendarItem {
 						hidden : isFirstInSeries || !this.isOwner,
 						handler: _b => {
 							w.close();
-							this.patchThisAndFuture(modified, onFinish);
+							this.patchThisAndFuture(modified, onFinish, onCancel);
 						}
 					}),
 					btn({
@@ -690,7 +703,7 @@ export class CalendarItem {
 						hidden: !isFirstInSeries && this.isOwner,
 						handler: _b => {
 							w.close();
-							this.patchSeries(modified, onFinish);
+							this.patchSeries(modified, onFinish, onCancel);
 						}
 					})
 				)
@@ -699,7 +712,7 @@ export class CalendarItem {
 		}
 	}
 
-	private patchSeries(modified: any, onFinish?: () => void) {
+	private patchSeries(modified: any, onFinish?: () => void, onCancel?: () => void) {
 		this.confirmScheduleMessage(modified, () => {
 
 			root.mask();
@@ -713,12 +726,12 @@ export class CalendarItem {
 				})
 
 			if(onFinish) p.then(onFinish);
-		})
+		}, onCancel)
 	}
 
 	// todo: per-user -per-override properties ['alert']
 
-	private patchOccurrence(modified: any, onFinish?: () => void) {
+	private patchOccurrence(modified: any, onFinish?: () => void,  onCancel?: () => void) {
 		//this.data.recurrenceOverrides ??= {};
 
 		let patch: any = this.isOverride ? this.data.recurrenceOverrides && this.data.recurrenceOverrides[this.recurrenceId!] : {}
@@ -788,7 +801,7 @@ export class CalendarItem {
 						root.unmask();
 					})
 				if(onFinish) prom.then(onFinish)
-			});
+			}, onCancel);
 		});
 	}
 
@@ -816,7 +829,7 @@ export class CalendarItem {
 	/**
 	 * @see  https://www.ietf.org/archive/id/draft-ietf-jmap-calendars-10.html#section-5.5
 	 */
-	private patchThisAndFuture(modified: any, onFinish?: () => void) {
+	private patchThisAndFuture(modified: any, onFinish?: () => void, onCancel?: () => void) {
 		//if(!ev.data.participants) { // is not scheduled ( split event)
 		// todo: add first and next relation in relatedTo property as per https://www.ietf.org/archive/id/draft-ietf-jmap-calendars-11.html#name-splitting-an-event
 		const rule = structuredClone(this.data.recurrenceRule);
@@ -852,7 +865,7 @@ export class CalendarItem {
 					throw e;
 				}); // create duplicate
 			if (onFinish) p.then(onFinish);
-		});
+		}, onCancel);
 	}
 
 	cut() {
@@ -902,9 +915,17 @@ export class CalendarItem {
 		item.save();
 	}
 
+
+
 	remove() {
-		if(!this.isOwner && !this.cal.myRights.mayWriteAll)
+		if(!this.mayChange) {
+			if(this.cal.myRights.mayWriteAll && !this.isOwner) {
+				// this is an invite
+				this.updateParticipation("declined");
+			}
 			return;
+		}
+
 		if(!this.isRecurring) {
 			this.confirmScheduleMessage(false, () => {
 				eventDS.destroy(this.data.id).catch(e => Window.error(e))
@@ -953,6 +974,9 @@ export class CalendarItem {
 				eventDS.update(this.data.id, {recurrenceOverrides: this.data.recurrenceOverrides}).catch(e => Window.error(e))
 			} else {
 				// set status to not participating
+
+				Window.alert("Not participate!");
+
 			}
 		});
 	}
