@@ -5,6 +5,7 @@
 - Calendar: Invitation mails are sent after closing client connection so the client continues faster and there are no timeouts.
 - Core: Don't unset auth token cache on garbage collection because they are expired anyway
 - Calendar: Decline when not organizer when deleting. Update participation status from context menu
+- Calendar: Toggle visibility of declined events from main view
 
 20-10-2025: 25.0.50
 - Core: Fix dirty merge
