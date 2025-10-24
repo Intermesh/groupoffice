@@ -463,6 +463,7 @@ class Mailer {
 		} else if($this->emailAccount) {
 			$log->setEntity($this->emailAccount);
 		} else {
+			if(go()->getAuthState() === null) return;
 			$user = go()->getAuthState()->getUser();
 			if(isset($user)) {
 				$log->setEntity($user);
