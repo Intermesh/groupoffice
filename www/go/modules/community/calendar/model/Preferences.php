@@ -23,7 +23,7 @@ class Preferences extends Property
 	public bool $showTooltips = true;
 
 	/** @var bool If true, show events that you have RSVPed "no" to */
-	public bool $showDeclined = true;
+	public bool $showDeclined = false;
 
 	/** @var bool Show birthdays on the calendar */
 	public bool $birthdaysAreVisible = false;
