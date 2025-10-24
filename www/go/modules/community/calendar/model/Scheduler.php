@@ -121,6 +121,8 @@ class Scheduler {
 	private static function organizeImip(CalendarEvent $event, $organizer, $method, $newOnly = false) {
 		$success=true;
 
+		// allow lots of time for sending invites
+		go()->getEnvironment()->setMaxExecutionTime(300);
 
 		// This does not only build the ics file but also changes event to an occurence if an occurence was modified. A
 		// participant could have been added as well.
