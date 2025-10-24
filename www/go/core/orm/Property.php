@@ -2338,6 +2338,10 @@ abstract class Property extends Model {
 
 				case Relation::TYPE_HAS_ONE:
 					if(isset($value) && isset($this->$propName)) {
+						// When JSON patching it might set the same object again via JSON::patch();
+						if(is_object($value) && $value === $this->$propName) {
+							return $this->$propName;
+						}
 						//if a has one relation exists then apply the new values to the existing property instead of creating a new one.
 						return $this->$propName->setValues($value);
 					} else {
