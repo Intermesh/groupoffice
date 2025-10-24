@@ -76,6 +76,11 @@ class CalendarEvent extends AclItemEntity {
 
 
 	static bool $sendSchedulingMessages = false;
+
+	/**
+	 * Only true when saving from JMAP controller
+	 * @var bool
+	 */
 	static bool $fromClient = false;
 
 	public string $calendarId;
@@ -663,6 +668,19 @@ class CalendarEvent extends AclItemEntity {
 			$this->prodId = self::prodId();
 		}
 
+//		if($this->isModified(['participants'])) {
+//			//if the principal ID is not numeric it's not a user. We'll try to find a user for it.
+//			foreach($this->participants as $pid => $participant) {
+//				if ($participant->isNew() && !is_numeric($pid) && $participant->kind == 'individual') {
+//					$principalId = User::findIdByEmail($participant->email);
+//					if ($principalId) {
+//						// Override ID with user ID
+//						$this->participants[$pid]->pid($principalId);
+//					}
+//				}
+//			}
+//		}
+
 		if(!empty($this->participants)) {
 			// reset participation status if event changes "materially"
 			if($this->isModified(['start', 'duration', 'recurrenceRule', 'location'])) {
@@ -858,20 +876,24 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	public function calendarParticipant() {
 		if($this->calendarParticipant === null && !empty($this->participants)) {
-			$scheduleId = Calendar::find()
-				->join('core_user', 'u', 'IFNULL(calendar_calendar.ownerId, '.go()->getUserId().') = u.id')
-				->where(['id' => $this->calendarId])
-				->selectSingleValue('u.email')->single();
-			$this->calendarParticipant = $this->participantByScheduleId($scheduleId);
-//			foreach ($this->participants as $p) {
-//				if ($scheduleId == $p->email) {
-//					$this->calendarParticipant = $p;
-//					break;
-//				}
-//			}
-//			if (!isset($this->calendarParticipant)) {
-//				$this->calendarParticipant = false;
-//			}
+
+			$ownerId = go()->getDbConnection()
+				->selectSingleValue("ownerId")
+				->from("calendar_calendar")
+				->where('id', '=', $this->calendarId)
+				->single() ?? go()->getUserId();
+
+			$scheduleIds = User::findEmailAliases($ownerId);
+
+			foreach ($this->participants as $p) {
+				if (in_array(strtolower($p->email), $scheduleIds)) {
+					$this->calendarParticipant = $p;
+					break;
+				}
+			}
+			if (!isset($this->calendarParticipant)) {
+				$this->calendarParticipant = false;
+			}
 		}
 		return $this->calendarParticipant;
 	}

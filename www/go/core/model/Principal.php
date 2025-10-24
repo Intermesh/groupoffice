@@ -55,6 +55,10 @@ class Principal extends AclOwnerEntity
 	}
 
 	static function findIdByEmail($email, $preferUser = true) {
+		$id = User::findIdByEmailAliases($email);
+		if($id) {
+			return $id;
+		}
 		$stmt = self::find()->selectSingleValue('principal.id')
 			->where('email','=',$email);
 		if($preferUser) {

@@ -108,8 +108,19 @@ class Participant extends Property
 		}
 		return (object)$roles;
 	}
-	public function pid() {
-		// scheduler needs this after finding participant by scheduleId
+
+	/**
+	 * Get or set the ID
+	 *
+	 * scheduler needs this after finding participant by scheduleId
+	 *
+	 * @param int|null $id
+	 * @return int|string|null
+	 */
+	public function pid(int|null $id = null) {
+		if(isset($id)) {
+			$this->id = $id;
+		}
 		return $this->id;
 	}
 

@@ -17,6 +17,7 @@ use go\core\convert\UserSpreadsheet;
 use go\core\data\Model;
 use go\core\db\Column;
 use go\core\db\Criteria;
+use go\core\db\Expression;
 use go\core\Environment;
 use go\core\exception\ConfigurationException;
 use go\core\exception\NotFound;
@@ -1470,6 +1471,66 @@ public function historyLog(): bool|array
 	public function findAclId(): ?int
 	{
 		return $this->getPersonalGroup()->findAclId();
+	}
+
+	static function findIdByEmailAliases(string $email) :?int{
+		if(!go()->getModule("legacy", "email")) {
+			return null;
+		}
+		return go()->getDbConnection()
+			->selectSingleValue("user_id")
+			->from("em_accounts", "a")
+			->join("em_aliases", "al", "al.account_id = a.id")
+			->where("al.email", "LIKE", $email)
+			->single();
+	}
+
+
+	/**
+	 * Find all known e-mail aliases in lower case for a user ID
+	 *
+	 * @param int $userId
+	 * @return string[]
+	 * @throws Exception
+	 */
+	static function findEmailAliases(int $userId) : array {
+		$scheduleIds = [go()->getDbConnection()
+			->selectSingleValue('LOWER(email)')
+			->from("core_user")
+			->where("id", "=" , $userId)
+			->single()];
+
+		if(go()->getModule("legacy", "email")) {
+
+			$scheduleIds = array_unique(array_merge($scheduleIds, go()->getDbConnection()
+				->selectSingleValue("LOWER(al.email)")
+				->from("em_accounts", "a")
+				->join("em_aliases", "al", "al.account_id = a.id")
+				->where("a.user_id", "=", $userId)
+				->all()));
+		}
+		return $scheduleIds;
+	}
+
+	/**
+	 * Finds a user ID by email. Also uses e-mail aliases if evailable.
+	 *
+	 * @param string $email
+	 * @return int|null
+	 * @throws Exception
+	 */
+	static function findIdByEmail(string $email) : ?int {
+
+		$stmt = self::find()->selectSingleValue('id')
+			->where('email','LIKE',$email);
+
+		$id = $stmt->single();
+		if($id) {
+			return $id;
+		}
+		return self::findIdByEmailAliases($email);
+
+
 	}
 
 

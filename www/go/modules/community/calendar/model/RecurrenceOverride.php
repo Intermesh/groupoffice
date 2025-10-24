@@ -7,7 +7,6 @@ use go\core\data\Model;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use DateTime;
-use go\modules\community\addressbook\model\Date;
 use stdClass;
 
 /**
