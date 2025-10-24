@@ -1,7 +1,9 @@
+- Core: Don't unset auth token cache on garbage collection because they are expired anyway
+
 20-10-2025: 6.8.140
 - Email: Corrected save as filename
 - Core: Enable users/groups with "Change users" permissions to add new users 
-
+ 
 13-10-2025: 6.8.139
 - E-mail: Missing "None" label for in email composer templates menu. Related to issue #1343
 - Email: Save messages to computer in this format: YYYY-MM-DD_HHMM_MAILADDRESS_SUBJECT.eml so you can sort them easily
