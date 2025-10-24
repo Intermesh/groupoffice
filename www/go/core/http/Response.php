@@ -380,18 +380,46 @@ class Response extends Singleton{
 
 				try {
 					$data = JSON::encode($data, $this->jsonOptions);
-
 				} catch(\Throwable $e) {
 					$error = new ProblemDetails(SetError::ERROR_SERVER_FAIL, 500, $e->getMessage());
 					$data = JSON::encode($error, $this->jsonOptions);
 				}
 			}
-			if(!headers_sent())
+
+			if(!headers_sent()) {
 				$this->sendHeaders();
+			}
+
+			if($this->continueAfterOutput) {
+				ob_start();
+				ignore_user_abort(true);
+			}
+
 			echo $data;
+
+			if($this->continueAfterOutput) {
+				header('Connection: close');
+				header('Content-Length: '.ob_get_length());
+				ob_end_flush();
+				@ob_flush();
+				flush();
+				// Close the connection with the client
+				if (function_exists('fastcgi_finish_request')) {
+					fastcgi_finish_request(); // For Nginx with FastCGI
+				}
+			}
+
 		} else if(!headers_sent()){
 			$this->sendHeaders();
 		}
 	}
+
+	/**
+	 * Enable to close the connection but keep the process running.
+	 *
+	 * @see PostResponseProcessor
+	 * @var bool
+	 */
+	public bool $continueAfterOutput = false;
 
 }

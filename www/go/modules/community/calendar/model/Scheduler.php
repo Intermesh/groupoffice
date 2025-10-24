@@ -3,8 +3,6 @@
 namespace go\modules\community\calendar\model;
 
 use Exception;
-use GO\Base\Db\FindCriteria;
-use GO\Base\Db\FindParams;
 use go\core\ErrorHandler;
 use go\core\exception\JsonPointerException;
 use go\core\mail\Address;
@@ -12,9 +10,7 @@ use go\core\mail\Attachment;
 use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
-use GO\Email\Model\Alias;
 use GO\Email\Model\ImapMessage;
-use PDO;
 use Sabre\VObject\Component\VCalendar;
 
 class Scheduler {
@@ -156,10 +152,11 @@ class Scheduler {
 					);
 				}
 
+				// Message will be sent after closing client connection to avoid timeouts.
 				$msg->setSubject($subject . ': ' . $event->title)
 						->setTo(new Address($participant->email, $participant->name))
 						->setBody(self::mailBody($event, $method, $participant, $subject), 'text/html')
-						->send();
+						->sendAfterResponse();
 
 			} catch(\Exception $e) {
 				go()->log($e->getMessage());

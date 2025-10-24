@@ -17,6 +17,7 @@ use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
 use go\core\exception\JsonPointerException;
 use go\core\fs\Blob;
+use go\core\http\PostResponseProcessor;
 use go\core\model\Acl;
 use go\core\model\Alert as CoreAlert;
 use go\core\model\Principal;

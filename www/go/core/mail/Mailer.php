@@ -3,6 +3,7 @@
 namespace go\core\mail;
 
 use go\core\ErrorHandler;
+use go\core\http\PostResponseProcessor;
 use go\core\http\Request;
 use go\core\model\SmtpAccount;
 use go\core\model\User;
@@ -166,6 +167,21 @@ class Mailer {
 
 		$this->mail->send();
 		$this->sent = true;
+	}
+
+	/**
+	 * Send the message after the response has been sent and the client connection has been closed.
+	 *
+	 * @see PostResponseProcessor
+	 *
+	 * @param Message $message
+	 * @return void
+	 */
+	public function sendAfterResponse(Message $message) {
+		PostResponseProcessor::get()->addTask(function() use ($message){
+			go()->debug("Post response sending message");
+			$this->send($message);
+		});
 	}
 
 	/**
