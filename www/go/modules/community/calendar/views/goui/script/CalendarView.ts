@@ -32,7 +32,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 
 					const participationStatus = target.findChild("participationStatus") as Radiofield;
 					participationStatus.hidden = this.current!.isOwner ?? !this.current!.cal.myRights?.mayWriteAll;
-					console.log(this.current?.calendarPrincipal?.participationStatus);
+
 					participationStatus.value = this.current?.calendarPrincipal?.participationStatus;
 				}
 			}
@@ -53,6 +53,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 				],
 				listeners: {
 					change: ev => {
+						ev.target.parent!.hide();
 						this.current!.updateParticipation(ev.newValue, () => {
 							ev.target.value = this.current?.calendarPrincipal?.participationStatus;
 						});
