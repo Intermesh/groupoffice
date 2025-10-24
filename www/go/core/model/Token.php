@@ -498,6 +498,7 @@ class Token extends Entity {
 						->where('expiresAt', '!=', null)
 						->andWhere('expiresAt', '<', new DateTime("now", new DateTimeZone("UTC")))
 						->limit(1000)
+						->setData(['gc' => true])
 				);
 			} while (self::$lastDeleteStmt->rowCount() > 0);
 		} catch(DbException $e) {
@@ -513,11 +514,13 @@ class Token extends Entity {
 	 */
 	protected static function internalDelete(Query $query): bool
 	{
-		$deleteQuery = self::find()->mergeWith($query)->selectSingleValue('accessToken') ;
+		if(empty($query->getData()['gc'])) {
+			$deleteQuery = self::find()->mergeWith($query)->selectSingleValue('accessToken');
 
-		foreach($deleteQuery as $accessToken) {
-			go()->debug("Delete token: " . $accessToken);
-			go()->getCache()->delete('token-' . $accessToken);
+			foreach ($deleteQuery as $accessToken) {
+				go()->debug("Delete token: " . $accessToken);
+				go()->getCache()->delete('token-' . $accessToken);
+			}
 		}
 
 		return parent::internalDelete($query);
