@@ -2,6 +2,7 @@
 - Calender: group calendar list by resource group name
 - Serverclient: User adding didn't work anymore because of change in aliases
 - Calendar: E-mail aliases from email accounts used for scheduling
+- Calendar: Invitation mails are sent after closing client connection so the client continues faster and there are no timeouts.
 
 20-10-2025: 25.0.50
 - Core: Fix dirty merge
