@@ -191,7 +191,9 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 
 								try {
 									Ext.getBody().mask(t("Loading..."));
-									await go.Db.store("AddressBook").set({destroy: [this.addressBookMoreMenu.data.id]});
+									await go.Db.store("AddressBook").destroy(this.addressBookMoreMenu.data.id);
+								}catch(e) {
+									GO.errorDialog.show(e)
 								} finally {
 									Ext.getBody().unmask();
 								}
