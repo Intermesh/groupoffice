@@ -1,4 +1,7 @@
-27-10-2025: 25.0.61
+27-10-2024: 25.0.62
+- Support: hotfix install script 
+
+- 27-10-2025: 25.0.61
 - Finance: Added article info button and discount option
 - Calender: group calendar list by resource group name
 - Serverclient: User adding didn't work anymore because of change in aliases
