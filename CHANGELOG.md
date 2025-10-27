@@ -7,6 +7,7 @@
 - Calendar: Decline when not organizer when deleting. Update participation status from context menu
 - Calendar: Toggle visibility of declined events from main view
 - Core: Fixed: Addressbook CSV import shows fgetcsv(): $escape parameter error #1362
+- Calendar: Hide other calendars if you don't have module access. Related to https://github.com/Intermesh/groupoffice/discussions/1364
 
 20-10-2025: 25.0.50
 - Core: Fix dirty merge
