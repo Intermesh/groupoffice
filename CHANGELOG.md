@@ -1,3 +1,4 @@
+27-10-2025: 25.0.61
 - Finance: Added article info button and discount option
 - Calender: group calendar list by resource group name
 - Serverclient: User adding didn't work anymore because of change in aliases
@@ -10,7 +11,7 @@
 - Calendar: Hide other calendars if you don't have module access. Related to https://github.com/Intermesh/groupoffice/discussions/1364
 - Projects3 /Tasks: Add link to project from task detail
 
-20-10-2025: 25.0.50
+20-10-2025: 25.0.60
 - Core: Fix dirty merge
  
 20-10-2025: 25.0.59
