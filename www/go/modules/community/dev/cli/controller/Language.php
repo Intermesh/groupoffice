@@ -64,7 +64,7 @@ class Language extends Controller {
 			throw new \Exception("Could not open " . $path);
 		}
 
-		$headers = fgetcsv($this->handle,0, $this->delimiter, self::ENCLOSURE);
+		$headers = fgetcsv($this->handle,0, $this->delimiter, self::ENCLOSURE, "");
 
 
 		if (!$headers) {
@@ -79,7 +79,7 @@ class Language extends Controller {
 		$data = [];
 
 		
-		while ($record = fgetcsv($this->handle, 0, $this->delimiter, self::ENCLOSURE)) {
+		while ($record = fgetcsv($this->handle, 0, $this->delimiter, self::ENCLOSURE, "")) {
 			
 			try {
 				list($package, $module, $en, $translation) = $record;
