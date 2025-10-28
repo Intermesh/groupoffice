@@ -246,7 +246,9 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 
 		this.assignMeBtn.setVisible(!this.data.responsibleUserId);
 
-		this.privateComments.load(this.data.id);
+		if(this.privateComments) {
+			this.privateComments.load(this.data.id);
+		}
 
 		go.modules.community.tasks.TaskDetail.superclass.onLoad.call(this);
 	},
