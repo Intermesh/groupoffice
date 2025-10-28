@@ -1,4 +1,7 @@
+28-10-2024: 25.0.63
+- Calendar: Grouping bug in calendar fixed
 - Calendar: Do not check availability for existing participants in existing events. They would also show as busy in the current event
+- Tasks: Sort alphabetically in subscribe tasklist dialog
 
 27-10-2024: 25.0.62
 - Support: hotfix install script 
