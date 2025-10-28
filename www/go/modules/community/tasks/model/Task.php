@@ -162,6 +162,15 @@ class Task extends AclItemEntity {
 		return ['tasklistId' => 'id'];
 	}
 
+
+	/**
+	 * List of columns to ignore when determining if modifiedAt or modifiedBy should be set.
+	 * @return array
+	 */
+	protected static function ignorePropertiesForModifiedAt() : array {
+		return ['vcalendarBlobId', 'uri', 'uid'];
+	}
+
 	protected static function internalRequiredProperties() : array
 	{
 		//Needed for support module permissions

@@ -7,7 +7,9 @@ go.modules.community.tasks.SubscribeWindow = Ext.extend(Ext.Window, {
 		const store = new go.data.Store({
 			filters:{subscribed: {isSubscribed: false}, "role": {role: this.support ? "support" : "list"}},
 			fields: ['id', 'name', 'isSubscribed'],
-			sort:[{property:'name',isAscending:true}],
+			sortInfo: {
+				field: "name"
+			},
 			entityStore: this.support ? 'SupportList' : 'TaskList',
 		});
 

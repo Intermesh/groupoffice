@@ -3,6 +3,7 @@ namespace go\core\model;
 
 use DateInterval;
 use Exception;
+use go\core\db\DbException;
 use go\core\ErrorHandler;
 use go\core\exception\RememberMeTheft;
 use go\core\http\Request;
@@ -245,15 +246,29 @@ class RememberMe extends Entity {
 	/**
 	 * Called by GarbageCollection cron job
 	 *
-	 * @see GarbageCollection
 	 * @return bool
-	 * @throws Exception
+	 * @throws DbException|\Throwable
+	 * @see GarbageCollection
 	 */
 	public static function collectGarbage(): bool
 	{
-		return static::delete(
-			(new Query)
-				->andWhere('expiresAt', '<', new DateTime()));
+		go()->debug("GC: RememberMe");
+		try {
+			do {
+				// delete in batches to keep transaction small
+				static::delete(
+					(new Query)
+						->andWhere('expiresAt', '<', new DateTime())
+						->limit(1000)
+				);
+			} while (self::$lastDeleteStmt->rowCount() > 0);
+		} catch(DbException $e) {
+			// Just log exceptions here but continue
+			ErrorHandler::logException($e);
+		}
+
+		return true;
+
 	}
 
 	

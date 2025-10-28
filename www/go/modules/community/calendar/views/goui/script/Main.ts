@@ -19,7 +19,7 @@ import {WeekView} from "./WeekView.js";
 import {calendarStore, categoryStore, t, ValidTimeSpan, viewStore} from "./Index.js";
 import {YearView} from "./YearView.js";
 import {SplitView} from "./SplitView.js";
-import {client, filterpanel, jmapds, modules} from "@intermesh/groupoffice-core";
+import {client, filterpanel, jmapds, modules, userDS} from "@intermesh/groupoffice-core";
 import {CalendarView} from "./CalendarView.js";
 import {CategoryWindow} from "./CategoryWindow.js";
 import {Settings} from "./Settings.js";
@@ -269,7 +269,17 @@ export class Main extends Component {
 								btn({icon: 'view_module', text: t('Month'), handler:() => { this.openPDF('month'); }})
 							)
 						}),
-						btn({icon:'meeting_room',hidden: !rights.mayChangeResources, text:t('Resources')+'…', handler: _ => { (new ResourcesWindow()).show()}})
+						btn({icon:'meeting_room',hidden: !rights.mayChangeResources, text:t('Resources')+'…', handler: _ => { (new ResourcesWindow()).show()}}),
+						checkbox({
+							name:'showDeclined',
+							label: t('Show events that you have declined'),
+							listeners: {
+								change: async ({newValue}) => {
+									await userDS.update(client.user.id, {"calendarPreferences/showDeclined": newValue});
+									this.updateView();
+								}
+							}
+						}),
 					)})
 				),
 				this.cards = cards({flex: 1, activeItem:1, listeners: {render: ({target}) => this.applySwipeEvents(target)}},
@@ -378,7 +388,7 @@ export class Main extends Component {
 	}
 
 	private renderViews() {
-		const rights = modules.get("community", "calendar")!.userRights;
+
 		return table({
 			store: viewStore,
 			emptyStateHtml:'',
@@ -438,10 +448,19 @@ export class Main extends Component {
 
 	private renderAdapterBoxes() {
 		const boxes: any = {
-			birthday:['#009c63', t('Birthdays')],
-			task: 	['#7e472a',	t('Tasks')],
+
 			holiday: ['#025d7b', t('Holidays')]
 		};
+
+		if(modules.isAvailable("community", "tasks")) {
+			boxes.task = ['#7e472a',	t('Tasks', 'community', 'tasks')];
+		}
+
+		if(modules.isAvailable("community", "addressbook")) {
+			boxes.birthday = ['#7e472a',	t('Birthdays')];
+		}
+
+
 		return Object.keys(boxes).map(key => comp({tagName:'li'}, checkbox({
 			color: boxes[key][0], label: boxes[key][1], value: this.adapter.byType(key).enabled,
 			listeners: {

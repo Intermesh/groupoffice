@@ -1,6 +1,6 @@
 import {CalendarView} from "./CalendarView.js";
-import {DateTime, E, store, Store} from "@intermesh/goui";
-import {allCalendarStore, calendarStore, MonthView} from "./Index.js";
+import {DateTime, E} from "@intermesh/goui";
+import {MonthView} from "./Index.js";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 import {jmapds} from "@intermesh/groupoffice-core";
@@ -97,7 +97,7 @@ export class SplitView extends MonthView {
 			this.calendars = resp.list;
 			for (let calendar of this.calendars) {
 
-				if(activeFilter.indexOf(calendar.id) === -1) continue;
+				if (activeFilter.indexOf(calendar.id) === -1) continue;
 				day = this.start.clone();
 				const eventContainer = E('li').cls('events'),
 					row = E('ol',
@@ -108,13 +108,13 @@ export class SplitView extends MonthView {
 					row.append(E('li').attr('data-date', day.format('Y-m-d'))
 						.cls('today', day.format('Ymd') === now.format('Ymd'))
 						.cls('past', day.format('Ymd') < now.format('Ymd'))
-						.cls('other', day.getDay()%6==0))
+						.cls('other', day.getDay() % 6 == 0))
 
 					day.addDays(1);
 					//it++;
 				}
 				this.calRows.push([calendar.id, eventContainer]);
-				this.el.append(E('div',E('i', 'event').cls('icon').css({color:'#'+calendar.color}), calendar.name), row);
+				this.el.append(E('div', E('i', 'event').cls('icon').css({color: '#' + calendar.color}), calendar.name), row);
 			}
 			this.populateViewModel();
 		});

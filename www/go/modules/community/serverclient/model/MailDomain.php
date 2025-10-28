@@ -91,7 +91,7 @@ class MailDomain
 					'ma' => [
 						'active' => true,
 						'address' => $user->email,
-						'goto' => $user->email
+						'recipients' => [$user->email]
 					]]],
 				'clientCallId-2'
 			];

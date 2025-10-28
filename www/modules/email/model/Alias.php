@@ -27,6 +27,9 @@
 namespace GO\Email\Model;
 
 
+use go\core\model\Principal;
+use go\core\model\User;
+
 class Alias extends \GO\Base\Db\ActiveRecord {
 
 	/**
@@ -60,6 +63,16 @@ class Alias extends \GO\Base\Db\ActiveRecord {
 	public function aclField() {
 		return 'account.acl_id';
 	}
-	
+
+	protected function afterSave($wasNew)
+	{
+		$userId = $this->account->user_id;
+		$user = User::findById($userId, ['id', 'aclId']);
+		User::entityType()->change($user);
+		Principal::entityType()->change($user);
+
+		return parent::afterSave($wasNew);
+	}
+
 
 }

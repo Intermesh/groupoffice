@@ -753,7 +753,7 @@ th {
 			}
 			return $cells;
 		} else{
-			return fgetcsv($this->fp, 0, $this->delimiter, $this->enclosure);
+			return fgetcsv($this->fp, 0, $this->delimiter, $this->enclosure, "");
 		}
 	}
 
@@ -972,7 +972,7 @@ th {
 	private static function tryDelimiter(File $file, string $delimiter): bool
 	{
 		$fp = $file->open('r');
-		$headers = fgetcsv($fp, 0, $delimiter, '"');
+		$headers = fgetcsv($fp, 0, $delimiter, '"', "");
 
 		$success = $headers && count($headers) > 1;
 		fclose($fp);

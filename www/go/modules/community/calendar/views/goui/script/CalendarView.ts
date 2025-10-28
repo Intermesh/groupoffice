@@ -4,7 +4,7 @@ import {
 	DateTime,
 	E,
 	tooltip,
-	menu, Format, hr, ComponentEventMap
+	menu, Format, hr, ComponentEventMap, radio, Radiofield
 } from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
@@ -20,15 +20,55 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 	protected days: number = 1
 	protected firstDay?: DateTime
 	protected recur?: {[id:string]: Recurrence}
-	protected contextMenu = menu({removeOnClose:false, isDropdown: true},
-		//btn({icon:'open_with', text: t('Show'), handler:_ =>alert(this.current!.data.id)}),
-		btn({icon:'edit', text: t('Edit','core','core'), handler: _ => this.current!.open()}),
+	protected contextMenu = menu({
+			removeOnClose:false,
+			isDropdown: true,
+			listeners: {
+				show:( {target}) => {
+
+					const mayWrite = this.current!.mayChange;
+					target.findChild("delete")!.disabled = !mayWrite;
+					target.findChild("edit")!.hidden = !mayWrite;
+
+					const participationStatus = target.findChild("participationStatus") as Radiofield;
+					participationStatus.hidden = this.current!.isOwner ?? !this.current!.cal.myRights?.mayWriteAll;
+
+					participationStatus.value = this.current?.calendarPrincipal?.participationStatus;
+				}
+			}
+		},
+		btn({itemId: "edit", icon:'edit', text: t('Edit','core','core'), handler: _ => this.current!.open()}),
+		btn({itemId: "info", icon:'info', text: t('Info','core','core'), handler: _ => this.current!.info()}),
 		hr(),
-		btn({icon:'delete', text: t('Delete','core'), handler: _ => this.current!.remove() }),
+
+		radio({
+			itemId: "participationStatus",
+				type: "list",
+				flex: 1,
+				name: "participationStatus",
+				options: [
+					{icon:'check', text: t('Accept'), value: "accepted"},
+					{icon:'question_mark', text: t('Maybe'), value: "tentative"},
+					{icon:'remove_circle', text: t('Decline'), value: "declined"},
+				],
+				listeners: {
+					change: ev => {
+						ev.target.parent!.hide();
+						this.current!.updateParticipation(ev.newValue, () => {
+							ev.target.value = this.current?.calendarPrincipal?.participationStatus;
+						});
+					}
+				}
+			}
+		),
+
+		hr(),
+
+		btn({itemId: "delete", icon:'delete', text: t('Delete','core'), handler: _ => this.current!.remove() }),
 		btn({icon:'content_cut', text: t('Cut','core'), handler: _ => this.current!.cut() }),
 		btn({icon:'content_copy', text: t('Copy','core'), handler: _ => this.current!.copy() }),
 		hr(),
-		btn({icon:'info', text: t('Info','core','core'), handler: _ => this.current!.info()}),
+
 		btn({icon:'email', text: t('E-mail participants'), handler: _ => {
 				if (this.current!.data.participants){
 					go.showComposer({to: Object.values(this.current!.data.participants).map((p:any) => p.email)});

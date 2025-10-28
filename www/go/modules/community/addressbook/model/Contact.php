@@ -692,13 +692,12 @@ class Contact extends AclItemEntity {
 										
 	}
 
-	public function historyLog(): bool|array
-	{
-		$log = parent::historyLog();
-
-		unset($log['vcardBlobId']);
-
-		return $log;
+	/**
+	 * List of columns to ignore when determining if modifiedAt or modifiedBy should be set.
+	 * @return array
+	 */
+	protected static function ignorePropertiesForModifiedAt() : array {
+		return ['vcardBlobId', 'uri', 'uid'];
 	}
 
 	public static function sort(Query $query, ArrayObject $sort): Query

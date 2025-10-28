@@ -8,6 +8,7 @@ use Exception;
 use go\core\auth\BaseAuthenticator;
 use go\core\auth\SecondaryAuthenticator;
 use go\core\cron\GarbageCollection;
+use go\core\db\DbException;
 use go\core\Environment;
 use go\core\ErrorHandler;
 use go\core\jmap\State;
@@ -18,6 +19,7 @@ use go\core\http\Response;
 use go\core\orm\Query;
 use go\core\orm\Entity;
 use go\core\util\DateTime;
+use Throwable;
 
 class Token extends Entity {
 	
@@ -480,16 +482,31 @@ class Token extends Entity {
 	/**
 	 * Called by GarbageCollection cron job
 	 *
-	 * @see GarbageCollection
 	 * @return bool
-	 * @throws Exception
+	 * @throws Throwable
+	 * @see GarbageCollection
 	 */
 	public static function collectGarbage(): bool
 	{
-		return static::delete(
-			(new Query)
-				->where('expiresAt', '!=', null)
-				->andWhere('expiresAt', '<', new DateTime("now", new DateTimeZone("UTC"))));
+
+		go()->debug("GC: Tokens");
+		try {
+			do {
+				// delete in batches to keep transaction small
+				static::delete(
+					(new Query)
+						->where('expiresAt', '!=', null)
+						->andWhere('expiresAt', '<', new DateTime("now", new DateTimeZone("UTC")))
+						->limit(1000)
+						->setData(['gc' => true])
+				);
+			} while (self::$lastDeleteStmt->rowCount() > 0);
+		} catch(DbException $e) {
+			// Just log exceptions here but continue
+			ErrorHandler::logException($e);
+		}
+
+		return true;
 	}
 
 	/**
@@ -497,11 +514,13 @@ class Token extends Entity {
 	 */
 	protected static function internalDelete(Query $query): bool
 	{
-		$deleteQuery = self::find()->mergeWith($query)->selectSingleValue('accessToken') ;
+		if(empty($query->getData()['gc'])) {
+			$deleteQuery = self::find()->mergeWith($query)->selectSingleValue('accessToken');
 
-		foreach($deleteQuery as $accessToken) {
-			go()->debug("Delete token: " . $accessToken);
-			go()->getCache()->delete('token-' . $accessToken);
+			foreach ($deleteQuery as $accessToken) {
+				go()->debug("Delete token: " . $accessToken);
+				go()->getCache()->delete('token-' . $accessToken);
+			}
 		}
 
 		return parent::internalDelete($query);

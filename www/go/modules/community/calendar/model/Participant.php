@@ -5,7 +5,6 @@ namespace go\modules\community\calendar\model;
 use DateTimeInterface;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
-use go\core\util\DateTime;
 
 /**
  * Class Participant
@@ -109,8 +108,19 @@ class Participant extends Property
 		}
 		return (object)$roles;
 	}
-	public function pid() {
-		// scheduler needs this after finding participant by scheduleId
+
+	/**
+	 * Get or set the ID
+	 *
+	 * scheduler needs this after finding participant by scheduleId
+	 *
+	 * @param int|null $id
+	 * @return int|string|null
+	 */
+	public function pid(int|null $id = null) {
+		if(isset($id)) {
+			$this->id = $id;
+		}
 		return $this->id;
 	}
 
@@ -138,6 +148,11 @@ class Participant extends Property
 	public function hasRole($name) {
 		$bitPosition = self::ValidRoles[$name];
 		return ($this->rolesMask & (1 << $bitPosition)) !== 0;
+	}
+
+	public function isFree(\DateTimeInterface $start, \DateTimeInterface $end) : bool {
+		$result = BusyPeriod::fetch($this->id, $start->format('c'), $end->format('c'));
+		return empty($result['list']);
 	}
 
 	public function setRoles(array|\stdClass $roles) {

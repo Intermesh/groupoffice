@@ -3,17 +3,14 @@
 namespace go\modules\community\calendar\model;
 
 use Exception;
-use GO\Base\Db\FindCriteria;
-use GO\Base\Db\FindParams;
 use go\core\ErrorHandler;
 use go\core\exception\JsonPointerException;
 use go\core\mail\Address;
 use go\core\mail\Attachment;
+use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
-use GO\Email\Model\Alias;
 use GO\Email\Model\ImapMessage;
-use PDO;
 use Sabre\VObject\Component\VCalendar;
 
 class Scheduler {
@@ -124,6 +121,8 @@ class Scheduler {
 	private static function organizeImip(CalendarEvent $event, $organizer, $method, $newOnly = false) {
 		$success=true;
 
+		// allow lots of time for sending invites
+		go()->getEnvironment()->setMaxExecutionTime(300);
 
 		// This does not only build the ics file but also changes event to an occurence if an occurence was modified. A
 		// participant could have been added as well.
@@ -155,10 +154,11 @@ class Scheduler {
 					);
 				}
 
+				// Message will be sent after closing client connection to avoid timeouts.
 				$msg->setSubject($subject . ': ' . $event->title)
 						->setTo(new Address($participant->email, $participant->name))
 						->setBody(self::mailBody($event, $method, $participant, $subject), 'text/html')
-						->send();
+						->sendAfterResponse();
 
 			} catch(\Exception $e) {
 				go()->log($e->getMessage());
@@ -209,31 +209,23 @@ class Scheduler {
 		}
 		$vevent = $vcalendar->VEVENT[0];
 
-		$accountUserEmail = go()->getDbConnection()
-			->selectSingleValue("email")
-			->from("core_user", "u")
-			->where('id', '=', $imapMessage->account->user_id)
-			->single();
-
-		$accountUserEmail = strtolower($accountUserEmail);
-
 		$alreadyProcessed = false;
 		$accountEmail = false;
 		if($method ==='REPLY') {
 			$uid =(string) $vevent->UID;
 			// Find event data's replyTo by UID, we don't trust the organizer in the VEVENT
 			$replyTo = go()->getDbConnection()->selectSingleValue('replyTo')->from('calendar_event')->where('uid', '=', $uid)->single();
-
-			go()->debug("Testing if you are the organizer for event with UID: ". $uid. " ". $replyTo .' == ' .$accountUserEmail);
-
-			if ($replyTo === $accountUserEmail) {
+			$userId = User::findIdByEmail($replyTo);
+			if ($userId == $imapMessage->account->user_id) {
 				$accountEmail = $replyTo;
 			}
 		} else {
 			if (isset($vevent->attendee)) {
 				foreach ($vevent->attendee as $vattendee) {
 					$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vattendee));
-					if ($attendeeEmail === $accountUserEmail) {
+					$userId = User::findIdByEmail($attendeeEmail);
+
+					if ($userId == $imapMessage->account->user_id) {
 						$accountEmail = $attendeeEmail;
 					}
 				}

@@ -75,6 +75,7 @@ class Client extends Property
 	}
 	public static function collectGarbage(): bool
 	{
+		go()->debug("GC: Clients");
 		$threeMonthsAgo = (new DateTime())->sub(new \DateInterval('P1M'));
 		return static::internalDelete(
 			(new Query)

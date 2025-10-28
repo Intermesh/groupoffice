@@ -1396,6 +1396,14 @@ abstract class Property extends Model {
 	public bool $dontChangeModifiedAt = false;
 
 	/**
+	 * List of columns to ignore when determining if modifiedAt or modifiedBy should be set.
+	 * @return array
+	 */
+	protected static function ignorePropertiesForModifiedAt() : array {
+		return [];
+	}
+
+	/**
 	 * Sets some default values such as modifiedAt and modifiedBy
 	 * @throws Exception
 	 */
@@ -1858,6 +1866,16 @@ abstract class Property extends Model {
 		return $this->_forUserId ?? go()->getUserId();
 	}
 
+	private function shouldSetSaveProps(array $modified): bool
+	{
+		if(empty($modified)) {
+			return false;
+		}
+
+		$diff = array_diff(array_keys($modified), static::ignorePropertiesForModifiedAt());
+		return !empty($diff);
+	}
+
 	/**
 	 * Saves properties to the mapped table
 	 *
@@ -1876,7 +1894,7 @@ abstract class Property extends Model {
 
 		$modifiedForTable = $this->extractModifiedForTable($table, $modified);
 		$recordIsNew = $this->recordIsNew($table);
-		if(!empty($modified) || $recordIsNew) {
+		if($recordIsNew || $this->shouldSetSaveProps($modified)) {
 			$modifiedForTable = $this->setSaveProps($table, $modifiedForTable);
 		}
 
@@ -1945,7 +1963,6 @@ abstract class Property extends Model {
 				$this->updateTableRecord($table, $modifiedForTable, $query);
 			}
 		} catch (DbException $e) {
-			ErrorHandler::logException($e);
 			$uniqueKey = $e->isUniqueKeyException();
 
 			if ($uniqueKey) {
@@ -2321,6 +2338,10 @@ abstract class Property extends Model {
 
 				case Relation::TYPE_HAS_ONE:
 					if(isset($value) && isset($this->$propName)) {
+						// When JSON patching it might set the same object again via JSON::patch();
+						if(is_object($value) && $value === $this->$propName) {
+							return $this->$propName;
+						}
 						//if a has one relation exists then apply the new values to the existing property instead of creating a new one.
 						return $this->$propName->setValues($value);
 					} else {

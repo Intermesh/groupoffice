@@ -26,7 +26,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	 *
 	 * @var int
 	 */
-	protected int $aclId;
+	protected ?int $aclId;
 
 
 	public static string $aclColumnName = 'aclId';

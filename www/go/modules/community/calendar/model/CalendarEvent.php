@@ -17,6 +17,7 @@ use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
 use go\core\exception\JsonPointerException;
 use go\core\fs\Blob;
+use go\core\http\PostResponseProcessor;
 use go\core\model\Acl;
 use go\core\model\Alert as CoreAlert;
 use go\core\model\Principal;
@@ -76,6 +77,11 @@ class CalendarEvent extends AclItemEntity {
 
 
 	static bool $sendSchedulingMessages = false;
+
+	/**
+	 * Only true when saving from JMAP controller
+	 * @var bool
+	 */
 	static bool $fromClient = false;
 
 	public string $calendarId;
@@ -237,6 +243,14 @@ class CalendarEvent extends AclItemEntity {
 
 	public function customFieldsModelId() : string|int|null {
 		return $this->eventId;
+	}
+
+	/**
+	 * List of columns to ignore when determining if modifiedAt or modifiedBy should be set.
+	 * @return array
+	 */
+	protected static function ignorePropertiesForModifiedAt() : array {
+		return ['veventBlobId', 'uri', 'uid'];
 	}
 
 	protected function internalGetPermissionLevel(): int
@@ -663,12 +677,28 @@ class CalendarEvent extends AclItemEntity {
 			$this->prodId = self::prodId();
 		}
 
+//		if($this->isModified(['participants'])) {
+//			//if the principal ID is not numeric it's not a user. We'll try to find a user for it.
+//			foreach($this->participants as $pid => $participant) {
+//				if ($participant->isNew() && !is_numeric($pid) && $participant->kind == 'individual') {
+//					$principalId = User::findIdByEmail($participant->email);
+//					if ($principalId) {
+//						// Override ID with user ID
+//						$this->participants[$pid]->pid($principalId);
+//					}
+//				}
+//			}
+//		}
+
 		if(!empty($this->participants)) {
 			// reset participation status if event changes "materially"
 			if($this->isModified(['start', 'duration', 'recurrenceRule', 'location'])) {
 				foreach ($this->participants as $participant) {
 					if (!$participant->isNew() && !$participant->isOwner())
 						$participant->participationStatus = Participant::NeedsAction;
+					if($participant->kind === 'resource' && $participant->isFree($this->start(), $this->end())) {
+						$participant->participationStatus = Participant::Accepted;
+					}
 				}
 			}
 			if (empty($this->replyTo)) {
@@ -678,7 +708,6 @@ class CalendarEvent extends AclItemEntity {
 				}
 			}
 		}
-
 
 		if(self::$sendSchedulingMessages) {
 			Scheduler::handle($this);
@@ -691,6 +720,52 @@ class CalendarEvent extends AclItemEntity {
 			$this->updateAlerts(go()->getUserId());
 			$this->changeEventsWithSameUID();
 			$this->incrementCalendarModSeq();
+		}
+		return $success;
+	}
+
+	protected static function internalDelete(Query $query): bool
+	{
+
+		$events = CalendarEvent::find()->mergeWith(clone $query);
+		foreach ($events as $event) {
+			if(!empty($event->participants)) {
+				$current = $event->calendarParticipant();
+				if(!empty($current) && $current->isOwner()) {
+					// when owner deletes, free resources
+					foreach ($event->participants as $participant) {
+						if ($participant->kind === 'resource') {
+							$calId = str_replace( 'Calendar:', '', $participant->pid());
+							go()->getDbConnection()->delete('calendar_calendar_event', [
+								'calendarId' => $calId, 'eventId' => $event->eventId
+							])->execute();
+						}
+					}
+				}
+				if(self::$sendSchedulingMessages) {
+					Scheduler::handle($event, true);
+				}
+			}
+
+		}
+
+		//$q->andWhere(['isOrigin' => 1]);
+
+		//$ids = $q->all();
+//		self::$lastDeleteStmt = go()->getDbConnection()->delete('calendar_event_user', (new Query)
+//			->where('userId', '=', go()->getUserId())
+//			->where('eventId', 'in', $q)
+//		);
+//		if(!self::$lastDeleteStmt->execute()) {
+//			return false;
+//		}
+//		return true;
+		$calendarModSeq = clone $query;
+		$calIds = $calendarModSeq->selectSingleValue('calendarId')->distinct()->all();
+		// Garbage collector will delete event when last user instance is removed
+		$success =  parent::internalDelete($query); // delete none recurring or complete series
+		if($success && !empty($calIds)) {
+			Calendar::updateHighestModSeq($calIds);
 		}
 		return $success;
 	}
@@ -810,20 +885,24 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	public function calendarParticipant() {
 		if($this->calendarParticipant === null && !empty($this->participants)) {
-			$scheduleId = Calendar::find()
-				->join('core_user', 'u', 'IFNULL(calendar_calendar.ownerId, '.go()->getUserId().') = u.id')
-				->where(['id' => $this->calendarId])
-				->selectSingleValue('u.email')->single();
-			$this->calendarParticipant = $this->participantByScheduleId($scheduleId);
-//			foreach ($this->participants as $p) {
-//				if ($scheduleId == $p->email) {
-//					$this->calendarParticipant = $p;
-//					break;
-//				}
-//			}
-//			if (!isset($this->calendarParticipant)) {
-//				$this->calendarParticipant = false;
-//			}
+
+			$ownerId = go()->getDbConnection()
+				->selectSingleValue("ownerId")
+				->from("calendar_calendar")
+				->where('id', '=', $this->calendarId)
+				->single() ?? go()->getUserId();
+
+			$scheduleIds = User::findEmailAliases($ownerId);
+
+			foreach ($this->participants as $p) {
+				if (in_array(strtolower($p->email), $scheduleIds)) {
+					$this->calendarParticipant = $p;
+					break;
+				}
+			}
+			if (!isset($this->calendarParticipant)) {
+				$this->calendarParticipant = false;
+			}
 		}
 		return $this->calendarParticipant;
 	}
@@ -877,35 +956,6 @@ class CalendarEvent extends AclItemEntity {
 				$this->veventBlobId = null;
 			}
 		}
-	}
-
-	protected static function internalDelete(Query $query): bool
-	{
-		if(self::$sendSchedulingMessages) {
-			$events = CalendarEvent::find()->mergeWith(clone $query);
-			foreach ($events as $event) {
-				Scheduler::handle($event, true);
-			}
-		}
-		//$q->andWhere(['isOrigin' => 1]);
-
-		//$ids = $q->all();
-//		self::$lastDeleteStmt = go()->getDbConnection()->delete('calendar_event_user', (new Query)
-//			->where('userId', '=', go()->getUserId())
-//			->where('eventId', 'in', $q)
-//		);
-//		if(!self::$lastDeleteStmt->execute()) {
-//			return false;
-//		}
-//		return true;
-		$calendarModSeq = clone $query;
-		$calIds = $calendarModSeq->selectSingleValue('calendarId')->distinct()->all();
-		// Garbage collector will delete event when last user instance is removed
-		$success =  parent::internalDelete($query); // delete none recurring or complete series
-		if($success && !empty($calIds)) {
-			Calendar::updateHighestModSeq($calIds);
-		}
-		return $success;
 	}
 
 	public function isInPast() {

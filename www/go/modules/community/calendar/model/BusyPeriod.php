@@ -93,7 +93,7 @@ class BusyPeriod {
 		//ksort($list);
 
 		return [
-			//'sql' => (string)$stmt,
+			'sql' => (string)$stmt,
 			'list' => array_values($list)
 		];
 	}

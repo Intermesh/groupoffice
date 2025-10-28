@@ -4,7 +4,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 	
 	entityStore: "Task",
 	stateId: 'ta-tasks-detail',
-	relations: ["tasklist", "responsible", 'categories'],
+	relations: ["tasklist", "responsible", 'categories', 'project'],
 	cls: "go-detail-view tasks-task",
 
 	support: false,
@@ -55,6 +55,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 				<p class="s6 pad">\
 					<label>'+t("Start at")+'</label><span>{[go.util.Format.date(values.start) || "-"]}</span><br><br>\
 					<label>'+t("Tasklist")+'</label><span><tpl for="tasklist">{name}</tpl></span><br><br>\
+					<tpl if="values.project"><label>'+t("Project")+'</label><span><tpl for="project"><a class="normal-link" href="#project3/{id}">{number}: {name}</a></tpl></span><br><br></tpl>\
 					<tpl if="values.recurrenceRule"><label>'+t('Recurrence')+'</label><span>{[this.rruleToText(values.recurrenceRule)]}</span><br><br></tpl>\
 				</p>\
 				<p class="s6">\

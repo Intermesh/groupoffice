@@ -60,6 +60,14 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			}
 		});
 
+		if(this.items) {
+			this.items.each(item => {
+				if (item.hiddenOnInit === undefined) {
+					item.hiddenOnInit = item.hidden;
+				}
+			})
+		}
+
 		this.on('afterrender', function() {
 
 			this.internalReset();

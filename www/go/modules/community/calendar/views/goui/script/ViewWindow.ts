@@ -1,13 +1,19 @@
-import {client, FormWindow} from "@intermesh/groupoffice-core";
+import {client, FormWindow, jmapds} from "@intermesh/groupoffice-core";
 import {
 	btn,
 	CheckboxField, checkboxselectcolumn, column,
-	comp,
+	comp, datasourcestore,
 	List, menu,
 	select, table,
 	textfield
 } from "@intermesh/goui";
-import {allCalendarStore, t} from "./Index.js";
+import {t} from "./Index.js";
+
+const allCalendarStore = datasourcestore({
+	dataSource:jmapds('Calendar'),
+	queryParams:{filter:{}},
+	sort: [{property:'sortOrder'},{property:'name'}]
+});
 
 export class ViewWindow extends FormWindow {
 	//groupIdsFld: MapField

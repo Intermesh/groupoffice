@@ -8,6 +8,7 @@ use GO\Base\Mail\EmailRecipients;
 use GO\Base\Mail\MimeDecode;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
+use go\core\http\PostResponseProcessor;
 use go\core\http\Request;
 use go\core\util\DateTime;
 
@@ -573,6 +574,20 @@ class Message {
 	public function send() : void
 	{
 		$this->getMailer()->send($this);
+	}
+
+
+	/**
+	 * Send the message after the response has been sent and the client connection has been closed.
+	 *
+	 * @see PostResponseProcessor
+	 *
+	 * Throws exception on failure.
+	 * @throws \PHPMailer\PHPMailer\Exception
+	 */
+	public function sendAfterResponse() : void
+	{
+		$this->getMailer()->sendAfterResponse($this);
 	}
 
 	/**

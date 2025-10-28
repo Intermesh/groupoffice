@@ -43,7 +43,7 @@ class TaskList extends AclOwnerEntity
 	public ?string $id;
 	public string $name;
 
-	public int $aclId;
+	public ?int $aclId;
 
 	protected int $role = self::List;
 

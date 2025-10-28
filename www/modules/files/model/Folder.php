@@ -1012,10 +1012,11 @@ class Folder extends \GO\Base\Db\ActiveRecord {
     /**
     * Check if a user receives notifications about changes in the folder.
     *
-    * @param type $user_id
-    * @return FolderNotification or false
+    * @param $user_id
+    * @return bool
     */
-    public function hasNotifyUser($user_id){
+    public function hasNotifyUser($user_id): bool
+    {
         return FolderNotification::model()->findByPk(
             array('user_id'=>$user_id, 'folder_id'=>$this->pk)
         ) !== false;
@@ -1028,11 +1029,12 @@ class Folder extends \GO\Base\Db\ActiveRecord {
     * @param type $arg1
     * @param type $arg2
     */
-    public function notifyUsers($folder_id, $type, $arg1, $arg2 = '') {
-			if(GO::user()) {
-        FolderNotification::model()->storeNotification($folder_id, $type, $arg1, $arg2);
-			}
-    }
+	public function notifyUsers($folder_id, $type, $arg1, $arg2 = '')
+	{
+		if (GO::user()) {
+			FolderNotification::model()->storeNotification($folder_id, $type, $arg1, $arg2);
+		}
+	}
 
 
 	/**
