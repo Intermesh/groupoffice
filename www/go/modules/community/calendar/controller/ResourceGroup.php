@@ -36,8 +36,6 @@ class ResourceGroup extends EntityController {
 	 * @see https://jmap.io/spec-core.html#/get
 	 */
 	public function get($params) {
-		if(!$this->rights->mayChangeResources)
-			throw new Forbidden('Permission denied');
 		return $this->defaultGet($params);
 	}
 	
