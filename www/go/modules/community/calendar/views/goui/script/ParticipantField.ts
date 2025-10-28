@@ -2,7 +2,7 @@ import {
 	autocomplete, avatar, btn, Button, checkbox,
 	column,
 	comp,
-	Component, Config, containerfield, createComponent, datasourcestore, DateTime, FieldEventMap, Format,
+	Component, Config, ContainerField, containerfield, createComponent, datasourcestore, DateTime, FieldEventMap, Format,
 	hr,
 	MapField,
 	mapfield, Menu, menu, ObservableListenerOpts,
@@ -48,7 +48,7 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 						comp({
 							itemId: 'name',
 							flex: '1 0 60%',
-							html: v.name ? v.name + (v.email ? '<br>' + v.email :'') : v.email
+							html: v.name.htmlEncode() ? v.name.htmlEncode() + (v.email ? '<br>' + v.email :'') : v.email
 						}),
 						comp({tagName:'i',cls:'icon '+statusIcon[2],html:statusIcon[0],title:statusIcon[1], style:{margin:'0 8px'}}),
 						btn({icon:'more_vert', menu: menu({},
@@ -159,9 +159,12 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 		if(allDay)
 			end = end.clone().addDays(1);
 
-		const fm = allDay ? 'Y-m-d' : 'Y-m-d H:i:s';
-		for (const id in this.list.value) {
-			if(!this.pendingAvailabilityIds[id] && (id.startsWith('Calendar:') || !isNaN(+id)))
+		const fm = allDay ? 'Y-m-d' : 'Y-m-d H:i:s',
+			rows = this.list.value;
+
+		for (const id in rows) {
+			// not already pending and is user or resource
+			if(this.shouldCheckAvailability(id))
 			client.jmap('Principal/getAvailability', {start:start.format(fm),end:end.format(fm),id}).then((response)=> {
 				const f = this.list.items?.find(v => v.dataSet.key === id);
 				if(f)
@@ -171,6 +174,13 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 			})
 			this.pendingAvailabilityIds[id]=true;
 		}
+	}
+
+	private shouldCheckAvailability(id:string) : boolean {
+		const existingKeys = Object.keys(this.list.getOldValue());
+		if(existingKeys.indexOf(id)!==-1) return false;
+		if(this.pendingAvailabilityIds[id]) return false;
+		return id.startsWith('Calendar:') || !isNaN(+id); // Resource or User
 	}
 
 	private organizerId?: string;
