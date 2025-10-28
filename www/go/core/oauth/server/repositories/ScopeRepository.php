@@ -27,6 +27,9 @@ class ScopeRepository implements ScopeRepositoryInterface
             'email' => [
                 'description' => 'Your email address',
             ],
+            'phone' => [
+                'description' => 'Your phone number',
+            ],
 		        'openid' => [
 			          'description' => 'OpenID Connect support',
 		        ],
