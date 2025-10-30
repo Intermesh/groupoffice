@@ -616,6 +616,14 @@ class Imap extends ImapBodyStruct
 		//sometimes shared folders like "Other user.shared" are in the folder list
 		//but there's no "Other user" parent folder. We create a dummy folder here.
 		if(!isset($folders['INBOX']) && $isRoot){
+
+
+			if (!$listSubscribed && $namespace == "" && $pattern == "%" && empty($folders) && $this->has_capability("LIST-EXTENDED")) {
+				// unfortunately there are some buggy servers around that don't respond well to list-extended commands (eg. strato since 2025).
+				\GO::session()->values['imap_disable_capabilites_'.$this->server]='LIST-EXTENDED';
+				return $this->list_folders($listSubscribed, $withStatus, $namespace, $pattern, $isRoot);
+			}
+
 			$folders["INBOX"]=array(
 						'delimiter' => $delim,
 						'name' => 'INBOX',
@@ -650,6 +658,9 @@ class Imap extends ImapBodyStruct
 				}
 			}
 		}
+
+
+
 
 		\GO\Base\Util\ArrayUtil::caseInsensitiveSort($folders);
 
