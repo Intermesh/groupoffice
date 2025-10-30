@@ -1,5 +1,6 @@
 - Core: Don't unset auth token cache on garbage collection because they are expired anyway
 - Support: Fixed security issue where users could add comments to other people's tickets
+- Email: Auto disable list-extended when command fails (Happens on strato recently).
 
 20-10-2025: 6.8.140
 - Email: Corrected save as filename
