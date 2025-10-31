@@ -59,7 +59,7 @@ export class CommentEditor extends Component {
 								});
 								const get = await principalDS.get(r.ids);
 								return get.list.map(p => {
-									return {value: p.description!, display: p.name}
+									return {value: p.description!, display: p.description + " (" + p.name + ")"}
 								});
 							}, 5);
 
