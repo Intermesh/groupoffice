@@ -104,6 +104,7 @@
 					},
 					handler: () => {
 						go.Entities.get(alert.entity).goto(alert.entityId);
+						go.Db.store("Alert").destroy(alert.id);
 					},
 					// buttons: [{
 					// 	text: t("Open"),
