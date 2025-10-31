@@ -8,7 +8,7 @@ import {
 	Format, menu, Notifier, router,
 	t, win
 } from "@intermesh/goui";
-import {Image, client, img, principalDS, AclLevel} from "@intermesh/groupoffice-core";
+import {Image, client, img, principalDS, AclLevel, entities} from "@intermesh/groupoffice-core";
 import {CommentDialog} from "./CommentDialog.js";
 import {commentDS, commentLabelDS} from "./Index.js";
 
@@ -64,7 +64,12 @@ export class CommentList extends Component {
 								listeners: {
 									render: ({target}) => {
 										target.el.onclick = () => {
-											go.modules.community.addressbook.lookUpUserContact(comment.creator.id)
+											const parts = comment.creator.id.split(":");
+											if(parts.length == 1) {
+												go.modules.community.addressbook.lookUpUserContact(comment.creator.id)
+											} else {
+												entities.get("Contact").goto(parts[1]);
+											}
 										}
 									}
 								}
