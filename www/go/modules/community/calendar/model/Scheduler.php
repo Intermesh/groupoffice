@@ -215,9 +215,11 @@ class Scheduler {
 			$uid =(string) $vevent->UID;
 			// Find event data's replyTo by UID, we don't trust the organizer in the VEVENT
 			$replyTo = go()->getDbConnection()->selectSingleValue('replyTo')->from('calendar_event')->where('uid', '=', $uid)->single();
-			$userId = User::findIdByEmail($replyTo);
-			if ($userId == $imapMessage->account->user_id) {
-				$accountEmail = $replyTo;
+			if($replyTo) {
+				$userId = User::findIdByEmail($replyTo);
+				if ($userId == $imapMessage->account->user_id) {
+					$accountEmail = $replyTo;
+				}
 			}
 		} else {
 			if (isset($vevent->attendee)) {
@@ -235,7 +237,7 @@ class Scheduler {
 		if (!$accountEmail || $method === 'NONE') {
 			return [
 				'method' => $method,
-				'feedback' => $accountEmail ? "" : go()->t('You are not invited to this event', "email"),
+				'feedback' => $accountEmail ? "" : ($method ==='REPLY' ? go()->t('Event not found', "email") : go()->t('You are not invited to this event', "email")),
 				'event' => ICalendarHelper::parseVObject($vcalendar, new CalendarEvent())
 			];
 		} else {
