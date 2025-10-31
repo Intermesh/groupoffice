@@ -2,6 +2,7 @@ import {client, JmapDataSource, modules} from "@intermesh/groupoffice-core";
 import {t} from "@intermesh/goui";
 import {CommentDetail} from "./CommentDetail";
 import {CommentsPanel} from "./CommentsPanel";
+import {CommentEditor} from "./CommentEditor";
 
 export * from "./CommentsPanel.js";
 
@@ -11,9 +12,9 @@ modules.register({
 	async init() {
 
 		// make available in legacy extjs modules
-
 		GO.comments = {
-			CommentsPanel
+			CommentsPanel,
+			CommentEditor
 		}
 
 		client.on("authenticated", ({session}) => {

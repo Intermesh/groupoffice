@@ -168,7 +168,6 @@ export class CommentsPanel extends Component {
 	public async load(id: EntityID) {
 		this.entityId = id;
 
-		void this.commentEditor.store.load();
 
 		this.commentList.store.setFilter("entity", {
 			entityId: id

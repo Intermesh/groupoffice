@@ -10,7 +10,7 @@ import {
 } from "@intermesh/goui";
 import {Image, client, img, principalDS, AclLevel} from "@intermesh/groupoffice-core";
 import {CommentDialog} from "./CommentDialog.js";
-import {commentDS} from "./Index.js";
+import {commentDS, commentLabelDS} from "./Index.js";
 
 export class CommentList extends Component {
 	public store!: DataSourceStore
@@ -286,7 +286,7 @@ export class CommentList extends Component {
 				},
 				labelEntities: {
 					path: "labels",
-					dataSource: commentDS
+					dataSource: commentLabelDS
 				}
 			}
 		});

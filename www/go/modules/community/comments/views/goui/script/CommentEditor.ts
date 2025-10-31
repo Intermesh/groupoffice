@@ -10,8 +10,7 @@ import {
 	DataSourceStore,
 	displayfield,
 	fieldset,
-	Format,
-	hr,
+	hr, HtmlField,
 	htmlfield,
 	menu,
 	Notifier,
@@ -22,16 +21,22 @@ import {client, HtmlFieldMentionPlugin, principalDS} from "@intermesh/groupoffic
 import {commentLabelDS} from "./Index.js";
 
 export class CommentEditor extends Component {
-	public labels: ArrayField;
-	public attachments: ArrayField;
-	public store: DataSourceStore;
+	public readonly labels: ArrayField;
+	public readonly attachments: ArrayField;
+	public readonly store: DataSourceStore;
 
-	public addBtn!: Button;
+	public readonly addBtn!: Button;
+	public readonly editor: HtmlField;
 
-	constructor() {
+
+	constructor(submitButton = true) {
 		super();
 
 		this.title = t("Comment");
+
+		this.on("render",  () => {
+			void this.store.load();
+		})
 
 		this.items.add(
 			fieldset({
@@ -43,7 +48,7 @@ export class CommentEditor extends Component {
 					title: t("Add labels"),
 					menu: menu({})
 				}),
-				htmlfield({
+				this.editor = htmlfield({
 					flex: 1,
 					name: "text",
 					cls: "frame-hint",
@@ -84,10 +89,10 @@ export class CommentEditor extends Component {
 						}
 					}
 				}),
-				btn({
+				...(submitButton ? [btn({
 					icon: "send",
 					type: "submit"
-				})
+				})] : [])
 			),
 
 			this.attachments = arrayfield({
@@ -99,13 +104,13 @@ export class CommentEditor extends Component {
 							cls: "hbox comment-editor-attachment"
 						},
 						displayfield({
-							escapeValue: false,
+							htmlEncode: false,
 							flex: 1,
-							value: `<i class="icon">description</i> ${Format.escapeHTML(v!.name)}`,
+							value: `<i class="icon">description</i> ${v!.name.htmlEncode()}`,
 						}),
 						btn({
 							icon: "delete",
-							handler: (button, ev) => {
+							handler: (button) => {
 								button.findAncestorByType(ContainerField)!.remove()
 							}
 						})
@@ -122,14 +127,14 @@ export class CommentEditor extends Component {
 							cls: "hbox comment-editor-label"
 						},
 						displayfield({
-							escapeValue: false,
+							htmlEncode: false,
 							flex: 1,
-							value: `<i class="icon" style="color: #${v!.color}">label</i> ${v!.name}`,
+							value: `<i class="icon" style="color: #${v!.color}">label</i> ${v!.name.htmlEncode()}`,
 							style: {color: `#${v!.color}`}
 						}),
 						btn({
 							icon: "cancel",
-							handler: (button, ev) => {
+							handler: (button) => {
 								button.findAncestorByType(ContainerField)!.remove()
 							}
 						})
