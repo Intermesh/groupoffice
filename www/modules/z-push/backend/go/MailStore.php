@@ -1340,7 +1340,7 @@ class MailStore extends Store implements ISearchProvider {
 			$message->meetingrequest->endtime = $vevent->dtend->getDateTime()->format("U");
 		} else if(isset($vevent->duration)) {
 			try {
-				$message->meetingrequest->endtime = $vevent->dtstart->getDateTime()->add(new DateInterval($vevent->duration));
+				$message->meetingrequest->endtime = (clone $vevent->dtstart->getDateTime())->add(new DateInterval($vevent->duration))->format("U");
 			} catch(Exception $e) {
 				ZLog::Write(LOGLEVEL_WARN, "Failed to add duration: " . $vevent->duration ." :" . $e->getMessage());
 				$message->meetingrequest->endtime = $message->meetingrequest->starttime + 3600;
