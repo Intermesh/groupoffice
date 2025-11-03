@@ -121,7 +121,7 @@ class Principal extends AclOwnerEntity
 				);
 			})
 			->add("preferUser", function (Criteria $criteria, $value, Query $query){
-				$query->groupBy(['email'])
+				$query
 					//->orderby([new Expression("max(entityTypeId=".User::entityType()->getId().") DESC, name ASC")]);
 					->orderby([new Expression("CASE WHEN entityTypeId = ".User::entityType()->getId()." THEN 0 ELSE 1 END, name ASC")]);
 			})
