@@ -1,3 +1,6 @@
+- Calendar: Send event reminders by email when enabled in Notification settings.
+- Calendar: fixed removal of scheduled reminders when event is deleted.
+- Principals: when searching for principal they are no longer grouped by same email address
 - Support: Fixed security issue where users could add comments to other people's tickets
 - Email: Auto disable list-extended when command fails (Happens on strato recently).
 - Core: consistent casting when trying to determine current userId
