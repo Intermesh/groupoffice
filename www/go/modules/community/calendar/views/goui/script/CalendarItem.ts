@@ -8,7 +8,15 @@ import {
 	tbar, Timezone,
 	win, Window
 } from "@intermesh/goui";
-import {calendarStore, CalendarView, categoryStore, statusIcons, t, writeableCalendarStore} from "./Index.js";
+import {
+	calendarStore,
+	CalendarView,
+	categoryStore,
+	getParticipantStatusIcon,
+	statusIcons,
+	t,
+	writeableCalendarStore
+} from "./Index.js";
 import {client, jmapds, Principal, Recurrence, RecurrenceField} from "@intermesh/groupoffice-core";
 import {EventWindow} from "./EventWindow.js";
 import {EventDetailWindow} from "./EventDetail.js";
@@ -16,6 +24,17 @@ import {SubscribeWindow} from "./SubscribeWindow";
 
 export type RecurrenceOverride = (Partial<CalendarEvent> & {excluded?:boolean});
 export type RecurrenceOverrides = {[recurrenceId:string]: RecurrenceOverride};
+
+export interface Participant {
+	id: string,
+	eventId: EntityID,
+	name: string | undefined,
+	email: string
+	participationStatus: 'accepted' |'tentative' | 'declined' | 'needs-action',
+	scheduleStatus: string,
+	kind: "resource" | "person",
+	roles: any
+}
 export interface CalendarEvent extends BaseEntity {
 	id: EntityID
 	uid:string
@@ -33,7 +52,7 @@ export interface CalendarEvent extends BaseEntity {
 	categoryIds: string[]
 	status?: string
 	isOrigin: boolean
-	participants?: {[key:string]: any}
+	participants?: {[key:string]: Participant}
 	calendarId: string
 	modifier: any
 	creator: any
@@ -457,7 +476,7 @@ export class CalendarItem {
 			(this.cal.myRights.mayWriteOwn && this.isOwner)) && !this.readOnly;
 	}
 
-	private _calendarPrincipal:Principal|undefined;
+	private _calendarPrincipal:Participant|undefined;
 
 	/**
 	 * Finds the participant which e-mail matches the e-mail of the calendar owner.
@@ -503,7 +522,7 @@ export class CalendarItem {
 	get quickText(): string {
 		const cal = this.cal ? ('<sup style="color:#'+this.cal.color+';">'+this.cal.name+'</sup>') : '';
 		const lines = [
-			'<h2 style="padding:0;margin:0;">'+this.title.htmlEncode()+'</h2>'+cal,
+			'<h2 style="padding:0;margin:0;">' + this.title.htmlEncode() + '</h2>' + cal,
 			...this.humanReadableDate(),
 		];
 		if(this.isRecurring) {
@@ -513,8 +532,9 @@ export class CalendarItem {
 			lines.push('<hr>'+t('Participants'));
 			for(const key in this.participants) {
 				const p = this.participants[key],
-					icon = statusIcons[p.participationStatus] ? statusIcons[p.participationStatus] : statusIcons["needs-action"] ,
-					 i= '<i class="icon '+icon[2]+'" title="'+icon[1]+'">'+icon[0]+'</i>' ;
+					icon = getParticipantStatusIcon(p);
+
+				const i = '<i class="icon '+icon[2]+'" title="'+icon[1]+'">'+icon[0]+'</i>' ;
 				lines.push(i+' '+(p.name || p.email).htmlEncode());
 			}
 
@@ -618,8 +638,6 @@ export class CalendarItem {
 	}
 
 	shouldSchedule(modified: Partial<CalendarEvent>|false) {
-		if(this.isInPast) // todo: use this.calendarPrincipal.expectReply if not owner ??
-			return;
 
 		if(modified === false) {
 			if(this.participants && !this.isCancelled) {

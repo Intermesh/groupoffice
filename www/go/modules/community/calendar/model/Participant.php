@@ -11,6 +11,8 @@ use go\core\orm\Property;
  *
  * This is unused, originally written for the task module but we decided to take
  * a simpler approach for task participants.
+ *
+ * @link https://www.rfc-editor.org/rfc/rfc8984.html#name-participants
  */
 class Participant extends Property
 {
@@ -77,7 +79,10 @@ class Participant extends Property
 	/** @var ?DateTimeInterface The timestamp for the most recent response from this participant. */
 	public ?DateTimeInterface $scheduleUpdated = null;
 
-	/** @var ?string The requestStatus received when the participant sends an REPLY iTip */
+	/**
+   * @var ?string The requestStatus received when the participant sends an REPLY iTip
+	 * @link https://www.rfc-editor.org/rfc/rfc5545#section-3.8.8.3
+	 */
 	public ?string  $scheduleStatus = null;
 	/** @var ?string used for access to the invite page to accept/decline */
 	protected ?string $scheduleSecret = null;

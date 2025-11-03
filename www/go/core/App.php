@@ -16,6 +16,7 @@ namespace go\core {
 	use go\core\event\Listeners;
 	use go\core\fs\Blob;
 	use go\core\fs\Folder;
+	use go\core\http\PostResponseProcessor;
 	use go\core\jmap\Request;
 	use go\core\mail\Mailer;
 	use go\core\model\Group;
@@ -745,6 +746,8 @@ namespace go\core {
 		public function __destruct() {
 
 			try {
+				PostResponseProcessor::get()->runTasks();
+
 				EntityType::push();
 
 				if ($this->rebuildCacheOnDestruct) {

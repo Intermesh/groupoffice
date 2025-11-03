@@ -19,7 +19,7 @@ import {
 } from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
-import {calendarStore, statusIcons, t} from "./Index.js";
+import {calendarStore, getParticipantStatusIcon, statusIcons, t} from "./Index.js";
 import {EventWindow} from "./EventWindow.js";
 
 
@@ -139,7 +139,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 												'meeting_room' : (v.name ?
 													'person' : 'contact_mail')
 										),
-									statusIcon = statusIcons[v.participationStatus] || v.participationStatus;
+									statusIcon = getParticipantStatusIcon(v);
 
 								let type = '';
 								if(v.email == this.item?.calendarPrincipal?.email) {

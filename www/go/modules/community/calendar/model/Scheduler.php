@@ -8,6 +8,7 @@ use go\core\exception\JsonPointerException;
 use go\core\mail\Address;
 use go\core\mail\Attachment;
 use go\core\model\User;
+use go\core\orm\EntityType;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
 use GO\Email\Model\ImapMessage;
@@ -24,9 +25,6 @@ class Scheduler {
 	 * @parma bool $delete if the event is about to be deleted
 	 */
 	static public function handle(CalendarEvent $event, bool $willDelete = false) {
-
-		if($event->isInPast())
-			return;
 
 		$current = $event->calendarParticipant();
 		if(!empty($current) && ($willDelete || $event->isModified('participants') || $event->isModified(self::EssentialScheduleProps))) {
@@ -154,15 +152,43 @@ class Scheduler {
 					);
 				}
 
+				$participant->scheduleStatus = "1.0";
+
 				// Message will be sent after closing client connection to avoid timeouts.
 				$msg->setSubject($subject . ': ' . $event->title)
 						->setTo(new Address($participant->email, $participant->name))
 						->setBody(self::mailBody($event, $method, $participant, $subject), 'text/html')
-						->sendAfterResponse();
+						->sendAfterResponse(
+							function($message) use ($participant, $event) {
+
+								go()->getDbConnection()
+									->update("calendar_participant",
+										['scheduleStatus' => '1.1;Successfully sent'],
+										$participant->primaryKeyValues()
+									)
+									->execute();
+
+								CalendarEvent::entityType()->change($event);
+							},
+							function($message, $exception) use ($participant,$event) {
+
+								go()->getDbConnection()
+									->update("calendar_participant",
+										['scheduleStatus' => "3.7;".$exception->getMessage()],
+										$participant->primaryKeyValues()
+									)
+									->execute();
+
+
+								CalendarEvent::entityType()->change($event);
+
+								ErrorHandler::logException($exception);
+							}
+						);
 
 			} catch(\Exception $e) {
 				go()->log($e->getMessage());
-				$success=false;
+				$success = false;
 			}
 			if(isset($old)) {
 				go()->getLanguage()->setLanguage($old);

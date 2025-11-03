@@ -8,7 +8,7 @@ import {
 	mapfield, Menu, menu, ObservableListenerOpts,
 	table
 } from "@intermesh/goui";
-import {statusIcons, t} from "./Index.js";
+import {getParticipantStatusIcon, statusIcons, t} from "./Index.js";
 import {client, jmapds, validateEmail} from "@intermesh/groupoffice-core";
 
 interface ParticipantFieldEventMap extends FieldEventMap {
@@ -40,8 +40,8 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 							'manage_accounts' : (v.kind=='resource' ?
 								'meeting_room' : (v.name ?
 									'person' : 'contact_mail')
-							) ,
-						statusIcon = statusIcons[v.participationStatus] || v.participationStatus;
+							),
+						statusIcon = getParticipantStatusIcon(v);
 
 					const f = containerfield({cls:'hbox', style: {alignItems: 'center', cursor:'default'}},
 						comp({tagName:'i',cls:'icon',html:userIcon, style:{margin:'0 8px'}}),
