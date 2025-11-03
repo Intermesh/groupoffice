@@ -1,5 +1,6 @@
 - Support: Fixed security issue where users could add comments to other people's tickets
 - Email: Auto disable list-extended when command fails (Happens on strato recently).
+- Core: consistent casting when trying to determine current userId
 
 28-10-2024: 25.0.63
 - Calendar: Grouping bug in calendar fixed

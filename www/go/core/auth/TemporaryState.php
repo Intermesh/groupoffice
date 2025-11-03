@@ -40,7 +40,7 @@ class TemporaryState extends AbstractState {
 		return !empty($this->userId);
 	}
 
-	public function getUserId(): ?int
+	public function getUserId(): ?string
 	{
 		return $this->userId;
 	}

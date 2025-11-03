@@ -849,9 +849,9 @@ namespace go\core {
 		 * ```
 		 * go()->getAuthState()->getUser();
 		 * ```
-		 * @return int
+		 * @return ?string
 		 */
-		public function getUserId(): ?int
+		public function getUserId(): ?string
 		{
 			if ($this->getAuthState() instanceof AuthState) {
 				return $this->authState->getUserId();
