@@ -21,10 +21,13 @@ class EmailAlerts extends CronJob {
 
 		$alerts = Alert::find()->filter(['toBeEmailed'=>true])->where(['tag'=>'1']);
 		go()->debug('sending email alerts');
-		go()->debug((string)$alerts);
 		foreach($alerts as $alert) {
-			$success = $alert->sendMail();
-			go()->debug($success ? 'Message send' : 'Not send');
+			try {
+				$alert->sendMail();
+				go()->debug('Message send');
+			} catch(\Exception $e) {
+				go()->debug('Not send');
+			}
 		}
 
 	}
