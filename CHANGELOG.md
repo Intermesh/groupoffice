@@ -5,8 +5,10 @@
 - Email: Auto disable list-extended when command fails (Happens on strato recently).
 - Core: consistent casting when trying to determine current userId
 - Addressbook: address link will open OpenStreetMap instead of generating an inconsistently supported geo: URI
+<<<<<<< Updated upstream
 - Calendar: Send scheduling messages in the past.
 - Calendar: Update participant scheduleStatus property and show it in the UI
+- Core / Files: fix upload in FilesDetailPanel in case an entity was newly created.
 
 28-10-2024: 25.0.63
 - Calendar: Grouping bug in calendar fixed
