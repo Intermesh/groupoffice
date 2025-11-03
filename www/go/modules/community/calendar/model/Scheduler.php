@@ -5,6 +5,7 @@ namespace go\modules\community\calendar\model;
 use Exception;
 use go\core\ErrorHandler;
 use go\core\exception\JsonPointerException;
+use go\core\http\PostResponseProcessor;
 use go\core\mail\Address;
 use go\core\mail\Attachment;
 use go\core\model\User;
@@ -167,8 +168,6 @@ class Scheduler {
 										$participant->primaryKeyValues()
 									)
 									->execute();
-
-								CalendarEvent::entityType()->change($event);
 							},
 							function($message, $exception) use ($participant,$event) {
 
@@ -178,14 +177,9 @@ class Scheduler {
 										$participant->primaryKeyValues()
 									)
 									->execute();
-
-
-								CalendarEvent::entityType()->change($event);
-
 								ErrorHandler::logException($exception);
 							}
 						);
-
 			} catch(\Exception $e) {
 				go()->log($e->getMessage());
 				$success = false;
@@ -195,6 +189,12 @@ class Scheduler {
 				unset($old);
 			}
 		}
+
+		// register a change because the participants have been updated
+		PostResponseProcessor::get()->addTask(function() use ($event) {
+			CalendarEvent::entityType()->change($event);
+		});
+
 		return $success;
 	}
 
