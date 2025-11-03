@@ -242,17 +242,21 @@ go.util =  (function () {
 		},
 
 		streetAddress: function (config) {
-
-			var adr = config.address;
-			if(config.zipCode) {
+			let adr = config.address;
+			if (config.zipCode) {
 				adr += ", " + config.zipCode.replace(/ /g, '');
 			}
-			if(config.country) {
+			if (config.city) {
+				adr += ", " + config.city;
+			}
+			if (config.country) {
 				adr += ", " + config.country;
 			}
 
+			const uri = "https://www.openstreetmap.org/search?query=" + encodeURIComponent(adr).replace(/%20/g, "+");
+
 			// https://en.wikipedia.org/wiki/Geo_URI_scheme
-			const uri = "geo:q=" + adr;
+			// const uri = "geo:0,0?q=" + encodeURIComponent(adr).replace(/%20/g, "+");
 
 			const a = document.createElement("a");
 			a.setAttribute("target", "_blank");
