@@ -1,3 +1,4 @@
+03-11-2025: 25.0.64  
 - Calendar: Send event reminders by email when enabled in Notification settings.
 - Calendar: fixed removal of scheduled reminders when event is deleted.
 - Principals: when searching for principal they are no longer grouped by same email address
@@ -5,17 +6,16 @@
 - Email: Auto disable list-extended when command fails (Happens on strato recently).
 - Core: consistent casting when trying to determine current userId
 - Addressbook: address link will open OpenStreetMap instead of generating an inconsistently supported geo: URI
-<<<<<<< Updated upstream
 - Calendar: Send scheduling messages in the past.
 - Calendar: Update participant scheduleStatus property and show it in the UI
 - Core / Files: fix upload in FilesDetailPanel in case an entity was newly created.
 
-28-10-2024: 25.0.63
+28-10-2025: 25.0.63
 - Calendar: Grouping bug in calendar fixed
 - Calendar: Do not check availability for existing participants in existing events. They would also show as busy in the current event
 - Tasks: Sort alphabetically in subscribe tasklist dialog
 
-27-10-2024: 25.0.62
+27-10-2025: 25.0.62
 - Support: hotfix install script 
 
 - 27-10-2025: 25.0.61
