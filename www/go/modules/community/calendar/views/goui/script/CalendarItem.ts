@@ -425,8 +425,13 @@ export class CalendarItem {
 				},
 				comp({cls: 'pad flow'},
 					comp({tagName:'i',cls:'icon',html:'email', width:100, style:{fontSize:'3em'}}),
-					comp({html: t(type+'ScheduleText'), flex:1}),
+					comp({flex:1},
+						comp({html: t(type+'ScheduleText')}),
+						comp({html: `<br /><i class="icon danger">warning</i> ${t('This event is in the past!')}`, flex:1, hidden: !this.isInPast}),
+					)
 				),
+
+
 				tbar({},
 					btn({
 						text: t('Cancel'), handler: () => {
