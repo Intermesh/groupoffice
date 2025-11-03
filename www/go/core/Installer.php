@@ -99,6 +99,21 @@ class Installer {
 		return $cron;
 	}
 
+	private function createEmailReminderCron() {
+
+		$module = model\Module::findByName("core", "core");
+
+		$cron = new model\CronJobSchedule();
+		$cron->moduleId = $module->id;
+		$cron->name = "EmailAlerts";
+		$cron->expression = "* * * * *";
+		$cron->description = "Email alerts";
+
+		if(!$cron->save()) {
+			throw new Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
+		}
+	}
+
 	/**
 	 * 
 	 * @param array $adminValues
@@ -257,6 +272,7 @@ class Installer {
 
 
 		$this->createGarbageCollection();
+		$this->createEmailReminderCron();
 
 		if(!Password::register()) {
 			throw new Exception("Failed to register Password authenticator");
