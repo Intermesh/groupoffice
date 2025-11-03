@@ -746,6 +746,7 @@ class CalendarEvent extends AclItemEntity {
 					Scheduler::handle($event, true);
 				}
 			}
+			CoreAlert::deleteByEntity($event);
 
 		}
 

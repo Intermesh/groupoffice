@@ -1787,3 +1787,6 @@ $updates['202509121219'][] = function() {
 
 
 };
+
+$updates['202510301100'][] = "insert into core_cron_job (moduleId,name, expression, description) values ((select id from core_module where name='core'), 'EmailAlerts', '* * * * *', 'Email alerts')";
+$updates['202510301100'][] = "ALTER TABLE `core_alert` ADD COLUMN `isSent` TINYINT(1) NOT NULL DEFAULT 0 AFTER `sendMail`;";
