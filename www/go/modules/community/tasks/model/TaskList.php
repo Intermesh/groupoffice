@@ -131,7 +131,14 @@ class TaskList extends AclOwnerEntity
 				$this->aclId = $project->acl_id;
 			}
 		}
-		return parent::internalSave();
+		if( parent::internalSave() && !$this->isNew() ) {
+			// 2025-1513 : make sure that the search description is updated accordingly.
+			$tasks = Task::find(['tasklistId' => $this->id]);
+			foreach ($tasks as $task) {
+				$task->saveSearch();
+			}
+		}
+		return true;
 	}
 
 
