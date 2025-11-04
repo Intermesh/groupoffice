@@ -17,7 +17,7 @@ class PostResponseProcessor extends Singleton {
 		$this->tasks[] = $callable;
 	}
 
-	public function __destruct()
+	public function runTasks() : void
 	{
 		if (empty($this->tasks)) {
 			return;

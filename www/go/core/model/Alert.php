@@ -15,6 +15,7 @@ use go\core\orm\EntityType;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
+use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
 use go\core\util\JSON;
 use go\modules\community\comments\model\Comment;
@@ -59,6 +60,12 @@ class Alert extends SingleOwnerEntity
 	 * @var bool
 	 */
 	public $sendMail = false;
+
+	/**
+	 * If the User has Email alerts turn on this keeps track of the alert already being sent
+	 * @var bool
+	 */
+	public $isSent = false;
 
 	protected static function defineMapping(): Mapping
 	{
@@ -139,7 +146,31 @@ class Alert extends SingleOwnerEntity
 		return parent::defineFilters()
 			->add('userId', function(Criteria $criteria, $value) {
 				$criteria->where('userId', '=', $value);
+			})->add('toBeEmailed', function(Criteria $crit, $value) {
+				$now = new DateTime();
+				$now->setTimezone(new \DateTimeZone("UTC"));
+				$crit->where('triggerAt', '<=', $now->format('Y-m-d H:i'))
+					->andWhere('staleAt', '>', $now->format('Y-m-d H:i')) // it must be stale at some point
+					->andWhere('isSent','=',0);
+				// join user and see if mail_reminders is on
 			});
+	}
+
+	public function sendMail(): void {
+		if($this->isSent) return;
+		$this->isSent = true;
+
+		$searchRecord = Search::find()->where(['entityTypeId'=>$this->entityTypeId, 'entityId'=>$this->entityId])->single();
+		//$entity = $entityType->getClassName()::findById($this->entityId);
+		$user = User::find(['displayName', 'email', 'mail_reminders'])->where(['id'=> $this->userId])->single();
+		if($user->mail_reminders) {
+			$this->save(); // isSent was set
+			go()->getMailer()->compose()
+				->setTo($user->email)
+				->setSubject('⏰ ' . $searchRecord->name)
+				->setBody($searchRecord->description)
+				->send();
+		}
 	}
 
 	/**

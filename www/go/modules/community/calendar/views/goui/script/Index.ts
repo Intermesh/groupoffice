@@ -64,6 +64,21 @@ export const statusIcons = {
 	'needs-action':['schedule', t('Awaiting reply'), 'orange']
 } as {[status:string]: string[]}
 
+export function getParticipantStatusIcon(p:any): string[] {
+	// error sending mail
+	if(p.scheduleStatus) {
+		if(p.scheduleStatus == "1.0") {
+			return ['pending', t("Invite not send yet"), 'orange'];
+		}
+
+		if(p.scheduleStatus.substring(0, 1) != "1") {
+			return ['error', p.scheduleStatus, 'danger'];
+		}
+	}
+
+	return statusIcons[p.participationStatus] ? statusIcons[p.participationStatus] : statusIcons["needs-action"];
+}
+
 function addEmailAction() {
 	if(go) {
 		go.openIcs = (p: any) => {

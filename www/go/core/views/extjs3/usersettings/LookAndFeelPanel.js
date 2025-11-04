@@ -323,56 +323,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					}
 			]
 		});
-		
-		this.soundsFieldset = new Ext.form.FieldSet({
-			labelWidth:dp(160),
-			title: t('Sounds','users','core'),
-			items:[
-				
-				this.cbMuteAll = new Ext.ux.form.XCheckbox({
-					hideLabel: true,
-					boxLabel: t("Mute all sounds", "users", "core"),
-					name: 'mute_sound',
-					listeners:{
-						check: function(cb, val){
-							if(val)	{
-								this.cbMuteNewMailSound.disable();
-								this.cbMuteReminderSound.disable();
-							}	else {
-								this.cbMuteNewMailSound.enable();
-								this.cbMuteReminderSound.enable();
-							}
-						},scope:this
-					}
-				}),
-				
-				this.cbMuteReminderSound = new Ext.ux.form.XCheckbox({
-					hideLabel:true,
-					boxLabel: t("Mute reminder sounds", "users", "core"),
-					name: 'mute_reminder_sound'
-				}),
 
-				this.cbMuteNewMailSound = new Ext.ux.form.XCheckbox({
-					hideLabel: true,
-					boxLabel: t("Mute new mail sounds", "users", "core"),
-					name: 'mute_new_mail_sound'
-				})
-			]
-		});
-		
-		this.notificationsFieldset = new Ext.form.FieldSet({
-			labelWidth:dp(160),
-			title: t('Notifications','users','core'),
-			items:[
-
-				this.cbEmailReminders = new Ext.ux.form.XCheckbox({
-					hideLabel: true,
-					boxLabel: t("Mail reminders", "users", "core"),
-					name: 'mail_reminders'
-				})
-				
-			]
-		});
 	
 		Ext.apply(this,{
 			title:t('Look & feel','users','core'),
@@ -385,7 +336,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					mobile: {
 						columnWidth: 1
 					},
-					items:[this.globalFieldset,this.regionFieldset
+					items:[this.globalFieldset
 						
 						,{
 						xtype:'button',
@@ -401,7 +352,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					mobile: {
 						columnWidth: 1
 					},
-					items: [this.formattingFieldset,this.soundsFieldset,this.notificationsFieldset]
+					items: [this.formattingFieldset,this.regionFieldset]
 				}
 			]
 		});

@@ -746,6 +746,7 @@ class CalendarEvent extends AclItemEntity {
 					Scheduler::handle($event, true);
 				}
 			}
+			CoreAlert::deleteByEntity($event);
 
 		}
 
@@ -958,7 +959,8 @@ class CalendarEvent extends AclItemEntity {
 		}
 	}
 
-	public function isInPast() {
+	public function isInPast(): bool
+	{
 		if($this->lastOccurrence === null)
 			return false;
 		return $this->lastOccurrence <= new DateTime();

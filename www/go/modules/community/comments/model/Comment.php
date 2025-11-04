@@ -52,8 +52,6 @@ class Comment extends AclItemEntity {
 	/**
 	 * By default the section is NULL. This property can be used to create multiple comment blocks per entity. 
 	 * This works with a 'section' filter that defaults to NULL.
-	 * 
-	 * @var string
 	 */
 	public ?string $section = null;
 

@@ -1788,13 +1788,16 @@ $updates['202509121219'][] = function() {
 
 };
 
+$updates['202510301100'][] = "insert into core_cron_job (moduleId,name, expression, description) values ((select id from core_module where name='core'), 'EmailAlerts', '* * * * *', 'Email alerts')";
+$updates['202510301100'][] = "ALTER TABLE `core_alert` ADD COLUMN `isSent` TINYINT(1) NOT NULL DEFAULT 0 AFTER `sendMail`;";
+
 
 // 25.1 starts here
 
-$updates['202507031141'][] = "alter table core_alert
+$updates['202510301100'][] = "alter table core_alert
                          add createdBy varchar(60) null after entityId";
 
-$updates['202507031141'][] = "alter table core_alert
+$updates['202510301100'][] = "alter table core_alert
                          add constraint core_alert_core_principal_id_fk
                              foreign key (createdBy) references core_principal (id)
                                  on delete set null";

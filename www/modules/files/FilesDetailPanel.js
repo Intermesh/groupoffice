@@ -331,11 +331,15 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 			success: function (response, options, result) {
 				this.folderId = result.files_folder_id;
 
-				//hack to update entity store, detailview and legacy DisplayPanel
-				var store = go.Db.store(modelName);
-				if (store) {
-					store.data[dv.data.id].filesFolderId = dv.data.filesFolderId = dv.data.files_folder_id = result.files_folder_id;
+				// hack to update entity store, detailview and legacy DisplayPanel
+				const store = go.Db.store(modelName);
+				if (store && store.data && store.data[dv.data.id]) {
+                    storeData[dv.data.id].filesFolderId = result.files_folder_id;
 				}
+                if (dv.data) {
+                    dv.data.filesFolderId = result.files_folder_id;
+                    dv.data.files_folder_id = result.files_folder_id;
+                }
 
 				cb();
 			},

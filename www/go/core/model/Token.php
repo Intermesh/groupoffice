@@ -48,7 +48,7 @@ class Token extends Entity {
 
 	/**
 	 * 
-	 * @var int
+	 * @var ?string
 	 */							
 	public ?string $userId;
 

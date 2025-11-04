@@ -92,7 +92,7 @@ class Note extends EntityController {
 	 */
 	protected function canDestroy(Entity $entity): bool
 	{
-		if($entity->createdBy === go()->getUserId()) {
+		if($entity->createdBy == go()->getUserId()) {
 			return true; // Anyone should be able to remove their own notes, regardless of people allowed to change noteBOOKs
 		}
 		if(!$this->rights->mayChangeNoteBooks) {

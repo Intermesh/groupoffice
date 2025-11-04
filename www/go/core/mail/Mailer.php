@@ -2,6 +2,7 @@
 
 namespace go\core\mail;
 
+use GO\Base\Html\Error;
 use go\core\ErrorHandler;
 use go\core\http\PostResponseProcessor;
 use go\core\http\Request;
@@ -172,15 +173,28 @@ class Mailer {
 	/**
 	 * Send the message after the response has been sent and the client connection has been closed.
 	 *
+	 * @param Message $message
+	 * @param callable|null $onSuccess Called on success with message as parameter
+	 * @param callable|null $onError Called on error with message and exception as parameter
+	 * @return void
 	 * @see PostResponseProcessor
 	 *
-	 * @param Message $message
-	 * @return void
 	 */
-	public function sendAfterResponse(Message $message) {
-		PostResponseProcessor::get()->addTask(function() use ($message){
+	public function sendAfterResponse(Message $message, callable|null $onSuccess = null, callable|null $onError = null) {
+		PostResponseProcessor::get()->addTask(function() use ($message, $onSuccess, $onError){
 			go()->debug("Post response sending message");
-			$this->send($message);
+			try {
+				$this->send($message);
+				if(isset($onError)) {
+					call_user_func($onSuccess, $message);
+				}
+			} catch(\Throwable $e) {
+				if(isset($onError)) {
+					call_user_func($onError, $message, $e);
+				} else {
+					ErrorHandler::logException($e, "Failed to send message");
+				}
+			}
 		});
 	}
 

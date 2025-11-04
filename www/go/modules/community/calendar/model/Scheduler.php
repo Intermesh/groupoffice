@@ -5,9 +5,11 @@ namespace go\modules\community\calendar\model;
 use Exception;
 use go\core\ErrorHandler;
 use go\core\exception\JsonPointerException;
+use go\core\http\PostResponseProcessor;
 use go\core\mail\Address;
 use go\core\mail\Attachment;
 use go\core\model\User;
+use go\core\orm\EntityType;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
 use GO\Email\Model\ImapMessage;
@@ -24,9 +26,6 @@ class Scheduler {
 	 * @parma bool $delete if the event is about to be deleted
 	 */
 	static public function handle(CalendarEvent $event, bool $willDelete = false) {
-
-		if($event->isInPast())
-			return;
 
 		$current = $event->calendarParticipant();
 		if(!empty($current) && ($willDelete || $event->isModified('participants') || $event->isModified(self::EssentialScheduleProps))) {
@@ -154,21 +153,48 @@ class Scheduler {
 					);
 				}
 
+				$participant->scheduleStatus = "1.0";
+
 				// Message will be sent after closing client connection to avoid timeouts.
 				$msg->setSubject($subject . ': ' . $event->title)
 						->setTo(new Address($participant->email, $participant->name))
 						->setBody(self::mailBody($event, $method, $participant, $subject), 'text/html')
-						->sendAfterResponse();
+						->sendAfterResponse(
+							function($message) use ($participant, $event) {
 
+								go()->getDbConnection()
+									->update("calendar_participant",
+										['scheduleStatus' => '1.1;Successfully sent'],
+										$participant->primaryKeyValues()
+									)
+									->execute();
+							},
+							function($message, $exception) use ($participant,$event) {
+
+								go()->getDbConnection()
+									->update("calendar_participant",
+										['scheduleStatus' => "3.7;".$exception->getMessage()],
+										$participant->primaryKeyValues()
+									)
+									->execute();
+								ErrorHandler::logException($exception);
+							}
+						);
 			} catch(\Exception $e) {
 				go()->log($e->getMessage());
-				$success=false;
+				$success = false;
 			}
 			if(isset($old)) {
 				go()->getLanguage()->setLanguage($old);
 				unset($old);
 			}
 		}
+
+		// register a change because the participants have been updated
+		PostResponseProcessor::get()->addTask(function() use ($event) {
+			CalendarEvent::entityType()->change($event);
+		});
+
 		return $success;
 	}
 
@@ -215,9 +241,11 @@ class Scheduler {
 			$uid =(string) $vevent->UID;
 			// Find event data's replyTo by UID, we don't trust the organizer in the VEVENT
 			$replyTo = go()->getDbConnection()->selectSingleValue('replyTo')->from('calendar_event')->where('uid', '=', $uid)->single();
-			$userId = User::findIdByEmail($replyTo);
-			if ($userId == $imapMessage->account->user_id) {
-				$accountEmail = $replyTo;
+			if($replyTo) {
+				$userId = User::findIdByEmail($replyTo);
+				if ($userId == $imapMessage->account->user_id) {
+					$accountEmail = $replyTo;
+				}
 			}
 		} else {
 			if (isset($vevent->attendee)) {
@@ -235,7 +263,7 @@ class Scheduler {
 		if (!$accountEmail || $method === 'NONE') {
 			return [
 				'method' => $method,
-				'feedback' => $accountEmail ? "" : go()->t('You are not invited to this event', "email"),
+				'feedback' => $accountEmail ? "" : ($method ==='REPLY' ? go()->t('Event not found', "email") : go()->t('You are not invited to this event', "email")),
 				'event' => ICalendarHelper::parseVObject($vcalendar, new CalendarEvent())
 			];
 		} else {

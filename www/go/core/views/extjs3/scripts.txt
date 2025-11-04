@@ -142,6 +142,7 @@ permissions/AclOverviewGrid.js
 usersettings/VisibleToPanel.js
 usersettings/AccountSettingsPanel.js
 usersettings/LookAndFeelPanel.js
+usersettings/NotificationPanel.js
 usersettings/UserSettingsDialog.js
 
 systemsettings/Panel.js
