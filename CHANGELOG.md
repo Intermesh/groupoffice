@@ -1,3 +1,5 @@
+- Registration: Allow time registration on read only projects
+
 03-11-2025: 25.0.64  
 - Calendar: Send event reminders by email when enabled in Notification settings.
 - Calendar: fixed removal of scheduled reminders when event is deleted.
