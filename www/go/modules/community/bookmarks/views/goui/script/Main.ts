@@ -56,7 +56,7 @@ export class Main extends Component {
 			}),
 			btn({
 				icon: "view_module",
-				text: t("Toggle view", "community", "bookmarks"),
+				text: t("Toggle view"),
 				handler: () => {
 					this.isGridView = !this.isGridView;
 

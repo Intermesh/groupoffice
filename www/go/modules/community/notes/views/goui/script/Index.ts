@@ -25,7 +25,7 @@ modules.register({
 				notes.showNote(noteId);
 			});
 
-			modules.addMainPanel("community", "notes", "notes", "Notes", () => {
+			modules.addMainPanel("community", "notes", "notes", t("Notes"), () => {
 				notes = new Main();
 				return notes;
 			});

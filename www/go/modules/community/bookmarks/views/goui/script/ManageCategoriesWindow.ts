@@ -25,7 +25,7 @@ export class ManageCategoriesWindow extends Window {
 	constructor() {
 		super();
 
-		this.title = t("Administrate categories");
+		this.title = t("Manage categories");
 		this.width = 600;
 		this.height = 500;
 
