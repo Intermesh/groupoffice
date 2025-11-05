@@ -1944,10 +1944,11 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$account = Account::model()->findByPk($params['account_id']);
 		$response = ['success' => true];
 		$message = ImapMessage::model()->findByUid($account, $params["mailbox"], $params["uid"]);
+		$nextUid = $message->getImapConnection()->get_uidnext();
 		if ($message->deleteAttachments()) {
 			$message->delete();
 			$message->getImapConnection()->expunge();
-			$response['uid'] = $message->getImapConnection()->get_uidnext();
+			$response['uid'] = $nextUid;
 		}
 
 		return $response;
