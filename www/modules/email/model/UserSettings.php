@@ -28,6 +28,8 @@ class UserSettings extends Property {
 	public $font_size;
 	public $sort_email_addresses_by_time;
 	public $defaultTemplateId;
+
+	public $email_show_linked_tasks;
 	
 	protected static function defineMapping(): Mapping
 	{
@@ -58,6 +60,7 @@ class UserSettings extends Property {
 		$this->always_request_notification = !!\GO::config()->get_setting("email_always_request_notification", $this->id);
 		$this->always_respond_to_notifications = !!\GO::config()->get_setting("email_always_respond_to_notifications", $this->id);
 		$this->font_size = \GO::config()->get_setting("email_font_size", $this->id);
+		$this->email_show_linked_tasks = \GO::config()->get_setting("email_show_linked_tasks", $this->id, 0);
 		if(!$this->font_size) {
 			$this->font_size = "14px";
 		}
@@ -96,6 +99,7 @@ class UserSettings extends Property {
 		\GO::config()->save_setting('email_always_respond_to_notifications', !empty($this->always_respond_to_notifications) ? '1' : '0', $this->id);
 		\GO::config()->save_setting('email_sort_email_addresses_by_time', !empty($this->sort_email_addresses_by_time) ? '1' : '0', $this->id);
 		\GO::config()->save_setting('email_font_size', $this->font_size, $this->id);
+		\GO::config()->save_setting('email_show_linked_tasks', !empty($this->email_show_linked_tasks) ? 1 : 0, $this->id);
 
 		return true;
 	}
