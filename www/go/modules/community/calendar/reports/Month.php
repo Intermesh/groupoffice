@@ -67,7 +67,7 @@ class Month extends Calendar {
 		$end = min($this->end, $instance->utcEnd);
 		while($itr <= $end) {
 			$this->events[$itr->format('Ymd')][$key] = $instance;
-			$itr->modify('+1 day');
+			$itr = $itr->modify('+1 day');
 		}
 	}
 	
@@ -106,7 +106,8 @@ class Month extends Calendar {
 		$dateh = 5;
 		$rowh = $h/$weeks;
 		$colw = $w/7;
-		$day = (clone $this->day)->modify('Monday this week');
+		$dayName = $this->firstWeekday===1 ? 'Monday' : 'Sunday';
+		$day = (clone $this->day)->modify('last '.$dayName);
 		for($r = 0; $r < $weeks; $r++){
 			//Draw vertical dates
 			$this->StartTransform();

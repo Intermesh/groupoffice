@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
   `vcalendarBlobId` BINARY(40) NULL,
   `latitude` decimal(10,8) DEFAULT NULL,
   `longitude` decimal(11,8) DEFAULT NULL,
+    `location` TEXT DEFAULT NULL,
 	`projectId` INT UNSIGNED NULL,
 	`mileStoneId` INT UNSIGNED NULL,
   PRIMARY KEY (`id`),
@@ -257,6 +258,7 @@ CREATE TABLE IF NOT EXISTS `tasks_tasklist_user` (
   `sortOrder` INT NULL,
   `isVisible` TINYINT(1) NOT NULL DEFAULT 0,
   `isSubscribed` TINYINT(1) NOT NULL DEFAULT 0,
+	`syncToDevice` tinyint default 1 not null,
   PRIMARY KEY (`tasklistId`, `userId`),
   INDEX `fk_tasks_tasklist_user_tasks_tasklist1_idx` (`tasklistId` ASC),
   CONSTRAINT `fk_tasks_tasklist_user_tasks_tasklist1`

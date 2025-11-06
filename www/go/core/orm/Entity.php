@@ -18,12 +18,14 @@ use go\core\db\Criteria;
 use go\core\model\Link;
 use go\core\model\Search;
 use go\core\orm\exception\SaveException;
+use go\core\db\DbException;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
 use GO\Files\Model\Folder;
 use InvalidArgumentException;
+use Throwable;
 use function go;
 use go\core\db\Query as DbQuery;
 use go\core\util\ArrayObject;
@@ -66,11 +68,19 @@ abstract class Entity extends Property {
 	const EVENT_BEFORE_SAVE = 'beforesave';
 
 	/**
-	 * Fires after the entity has been saved
+	 * Fires after the entity has been saved but before commit. So you can still use getModified() and isNew()
 	 * 
 	 * @param Entity $entity The entity that has been saved
 	 */
 	const EVENT_SAVE = 'save';
+
+	/**
+	 * Fires after save and commit
+	 *
+	 * @param Entity $entity The entity that has been saved
+	 * @param boolean $wasNew
+	 */
+	CONST EVENT_AFTER_SAVE = 'aftersave';
 
 	/**
 	 * Fires before the entity has been deleted
@@ -254,13 +264,13 @@ abstract class Entity extends Property {
 	 * $models = ModelWithDoublePK::findById("1-1");
 	 * ```
 	 *
-	 * @param string|null $id
+	 * @param string|int|null $id
 	 * @param string[] $properties
 	 * @param bool $readOnly
 	 * @return ?static
 	 * @throws Exception
 	 */
-	public static final function findById(?string $id, array $properties = [], bool $readOnly = false): ?Entity
+	public static final function findById(string|int|null $id, array $properties = [], bool $readOnly = false): ?Entity
 	{
 		if($id == null) {
 			return null;
@@ -389,8 +399,16 @@ abstract class Entity extends Property {
 				return false;
 			}
 
-			return $this->commit() && !$this->hasValidationErrors();
-		} catch(\Throwable $e) {
+			$wasNew = $this->isNew();
+
+			$success = $this->commit() && !$this->hasValidationErrors();
+
+			if($success) {
+				$this->fireEvent(self::EVENT_AFTER_SAVE, $this, $wasNew);
+			}
+
+			return $success;
+		} catch(Throwable $e) {
 			ErrorHandler::logException($e);
 			$this->rollback();
 			throw $e;
@@ -524,7 +542,8 @@ abstract class Entity extends Property {
 	 *
 	 *
 	 * @return boolean
-	 * @throws Exception
+	 * @throws Throwable
+	 * @throws DbException
 	 */
 	public static final function delete($query): bool
 	{
@@ -578,7 +597,7 @@ abstract class Entity extends Property {
 			}
 
 			return true;
-		} catch(\Throwable $e) {
+		} catch(Throwable $e) {
 			if(go()->getDbConnection()->inTransaction()) {
 				go()->getDbConnection()->rollBack();
 			}
@@ -1501,7 +1520,8 @@ abstract class Entity extends Property {
 
 
   /**
-   * Find's all tables that reference this items primary changesdt
+   * Find's all tables that reference this items primary table
+	 *
    * @return array [['column'=>'contactId', 'table'=>'foo']]
    * @throws Exception
    */
@@ -1558,7 +1578,7 @@ abstract class Entity extends Property {
 	/**
 	 * @var array
 	 */
-	private $_attachments = [];
+	protected array $_attachments = [];
 
 	public function setAttachments(array $attachments)
 	{

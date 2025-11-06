@@ -8,6 +8,7 @@ use GO\Base\Mail\EmailRecipients;
 use GO\Base\Mail\MimeDecode;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
+use go\core\http\PostResponseProcessor;
 use go\core\http\Request;
 use go\core\util\DateTime;
 
@@ -33,6 +34,8 @@ class Message {
 	private ?int $priority = null;
 	private string $body = "";
 	private ?string $alternateBody = null;
+
+	private ?string $icalendarBody = null;
 	private string $subject = "";
 	private array $to = [];
 	private array $cc = [];
@@ -532,6 +535,7 @@ class Message {
 		return $this;
 	}
 
+
 	/**
 	 * Get alternate plain text body
 	 *
@@ -540,6 +544,25 @@ class Message {
 	public function getAlternateBody(): ?string
 	{
 		return $this->alternateBody;
+	}
+
+
+
+	/**
+	 * The plain-text message body. This body can be read by mail clients that can't display the normal body.
+	 *
+	 * @param string $body
+	 * @return $this
+	 */
+	public function setIcalendar(string $body): Message
+	{
+		$this->icalendarBody = $body;
+		return $this;
+	}
+
+	public function getIcalendar(): ?string
+	{
+		return $this->icalendarBody;
 	}
 
 	/**
@@ -551,6 +574,19 @@ class Message {
 	public function send() : void
 	{
 		$this->getMailer()->send($this);
+	}
+
+
+	/**
+	 * Send the message after the response has been sent and the client connection has been closed.
+	 *
+	 * @param callable|null $onSuccess Called on success with message as parameter
+	 * @param callable|null $onError Called on error with message and exception as parameter
+   * @see PostResponseProcessor
+	 */
+	public function sendAfterResponse(callable|null $onSuccess = null, callable|null $onError = null) : void
+	{
+		$this->getMailer()->sendAfterResponse($this, $onSuccess, $onError);
 	}
 
 	/**
@@ -648,6 +684,14 @@ class Message {
 	public function setMailer(Mailer $mailer): Message
 	{
 		$this->mailer = $mailer;
+
+		if(isset($mailer->fromEmail)) {
+			$this->setFrom($mailer->fromEmail, $mailer->fromName);
+		}
+
+		if(isset($mailer->replyTo)) {
+			$this->setReplyTo($mailer->replyTo);
+		}
 		return $this;
 	}
 
@@ -671,6 +715,11 @@ class Message {
 		return $this->getMailer()->toString($this);
 	}
 
+	public function __toString(): string
+	{
+		return $this->toString();
+	}
+
 	/**
 	 * Sign the message using SMIME
 	 * @param string $certificate The X.509 certificate used to digitally sign input_filename.
@@ -680,7 +729,7 @@ class Message {
 	 *
 	 * @return void
 	 */
-	public function smimeSign(string $certificate, string $privateKey, string $password, string $extraCertsFile = null) {
+	public function smimeSign(string $certificate, string $privateKey, string $password, string|null $extraCertsFile = null) {
 		$this->smimeCertificate = $certificate;
 		$this->smimePrivateKey = $privateKey;
 		$this->smimePassword = $password;

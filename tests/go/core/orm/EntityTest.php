@@ -105,7 +105,11 @@ class EntityTest extends TestCase {
 
 		$this->assertEquals(true, $success);
 
-		$a1->setValues(['map' => [$a2->id => ['anotherAId' => $a2->id, 'description' => 'link to a2'], $a3->id => ['anotherAId' => $a3->id,'description' => 'link to a3']]]);
+		$a1->setValues([
+			'map' => [
+				$a2->id => ['anotherAId' => $a2->id, 'description' => 'link to a2'],
+				$a3->id => ['anotherAId' => $a3->id,'description' => 'link to a3']]
+		]);
 
 		$success = $a1->save();
 
@@ -126,6 +130,18 @@ class EntityTest extends TestCase {
 		$a1 = A::findById($a1->id);
 
 		$this->assertEquals(1, count($a1->map));
+
+
+		$a1->map[$a3->id]['description'] = 'link to a3 (updated)';
+		$success = $a1->save();
+
+		$this->assertEquals(true, $success);
+
+		$a1 = A::findById($a1->id);
+		$this->assertEquals(1, count($a1->map));
+
+		$this->assertEquals('link to a3 (updated)', $a1->map[$a3->id]['description']);
+
 
 		return $a1;
 

@@ -43,6 +43,14 @@ class Module extends core\Module {
 		return true;
 	}
 
+	/**
+	 * Default sort order when installing. If null it will be auto generated.
+	 * @return int|null
+	 */
+	public static function getDefaultSortOrder() : ?int{
+		return 25;
+	}
+
 	public function defineListeners()
 	{
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
@@ -118,7 +126,7 @@ class Module extends core\Module {
 	 * @throws SaveException
 	 * @throws Exception
 	 */
-	public function demoTasks(Generator $faker, TaskList $tasklist, bool $withLinks = true, $titles = null, $count = 5) {
+	public function demoTasks(Generator $faker, TaskList $tasklist, bool $withLinks = true, $titles = null, $count = 5, ?int $projectId = null, ?int $milestoneId = null) {
 
 		if(!isset($titles)) {
 			$titles = [
@@ -162,6 +170,8 @@ class Module extends core\Module {
 		for($i = 0; $i < $count; $i ++ ) {
 			echo ".";
 			$task = new Task();
+			$task->projectId = $projectId;
+			$task->mileStoneId = $milestoneId;
 			$task->title = $titles[$faker->numberBetween(0, $titleCount - 1)];
 			$task->createdBy = $userIds[$faker->numberBetween(0, $maxUserIndex)];
 			$task->responsibleUserId = $userIds[$faker->numberBetween(0, $maxUserIndex)];

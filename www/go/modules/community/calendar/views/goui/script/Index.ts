@@ -1,7 +1,7 @@
-import {client, jmapds, modules} from "@intermesh/groupoffice-core";
+import {client, jmapds, modules, principalDS} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {router} from "@intermesh/groupoffice-core";
-import {datasourcestore, t as coreT, E, translate, DateTime, Window, h3} from "@intermesh/goui";
+import {datasourcestore, t as coreT, E, translate, DateTime, Window, h3, Button} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {EventDetail, EventDetailWindow} from "./EventDetail.js";
 import {PreferencesPanel} from "./PreferencesPanel";
@@ -12,18 +12,49 @@ export * from "./Main.js";
 export * from "./CalendarList.js";
 export * from "./CalendarView.js";
 export * from "./CalendarItem.js";
+export * from "./MonthView.js";
+export * from "./WeekView.js";
+export * from "./CalendarAdapter.js"
 
 export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list';
 export const calendarStore = datasourcestore({
-	dataSource:jmapds('Calendar'),
+	dataSource: jmapds<any>('Calendar'),
 	queryParams:{filter:{isSubscribed: true, davaccountId : null}},
-	sort: [{property:'sortOrder'},{property:'name'}]
+	sort: [{property:'groupId'},{property:'sortOrder'},{property:'name'}],
+	relations: {
+		owner: {
+			path: "ownerId",
+			dataSource: principalDS
+		},
+		group: {
+			path: "groupId",
+			dataSource:jmapds('ResourceGroup')
+		}
+	}
 });
+
+export const writeableCalendarStore = datasourcestore({
+	dataSource:jmapds('Calendar'),
+	queryParams:{filter:{isSubscribed: true, davaccountId : null, isResource:false, permissionLevel:30/*writeOwn*/}},
+	sort: [{property:'sortOrder'},{property:'name'}],
+	relations: {
+		owner: {
+			path: "ownerId",
+			dataSource: principalDS
+		}
+	}
+})
 
 export const categoryStore = datasourcestore({
 	dataSource:jmapds('CalendarCategory'),
 	sort: [{property:'name'}]
 })
+
+export const viewStore = datasourcestore({
+	dataSource:jmapds('CalendarView'),
+	sort: [{property:'name'}]
+})
+
 
 export const t = (key:string,p='community',m='calendar') => coreT(key, p,m);
 export const statusIcons = {
@@ -32,6 +63,21 @@ export const statusIcons = {
 	'declined':		['block', t('Declined'), 'red'],
 	'needs-action':['schedule', t('Awaiting reply'), 'orange']
 } as {[status:string]: string[]}
+
+export function getParticipantStatusIcon(p:any): string[] {
+	// error sending mail
+	if(p.scheduleStatus) {
+		if(p.scheduleStatus == "1.0") {
+			return ['pending', t("Invite not send yet"), 'orange'];
+		}
+
+		if(p.scheduleStatus.substring(0, 1) != "1") {
+			return ['error', p.scheduleStatus, 'danger'];
+		}
+	}
+
+	return statusIcons[p.participationStatus] ? statusIcons[p.participationStatus] : statusIcons["needs-action"];
+}
 
 function addEmailAction() {
 	if(go) {
@@ -66,24 +112,35 @@ function addEmailAction() {
 				data.calendarId = data.calendarId ?? client.user.calendarPreferences?.defaultCalendarId;
 			dlg.loadEvent(new CalendarItem({data:data, key: data.id ? data.id + "" : null}));
 			dlg.show();
+
+			return dlg;
 		};
 
 
-		if(GO.email) GO.email.handleITIP = (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent|string, feedback?:string, recurrenceId?:string}} ) => {
+		if(GO.email) GO.email.handleITIP = async (container: HTMLUListElement, msg:{itip: {method:string, event: CalendarEvent|string, feedback?:string, recurrenceId?:string}} ) => {
 			if(msg.itip) {
+				if(!calendarStore.loaded) {
+					// CalendarItem depends on the store being loaded
+					await calendarStore.load();
+				}
 				const event = msg.itip.event,
 					btns = E('div').cls('btns'),
 					names: any = {accepted: t("Accept"), tentative: t("Maybe"), declined: t("Decline")},
+					pressedNames: any = {accepted: t("Accepted"), tentative: t("Maybe"), declined: t("Declined")},
 					updateBtns = (item: CalendarItem) => {
 
 						btns.innerHTML = '';
 						if(!item.calendarPrincipal){
-							btns.append(t('You are not an invited to this event'));
+							btns.append(
+								E('button', t("Import")).cls('goui-button').on('click', _ => {
+									item.save();
+								}));
 						} else {
 							btns.append(
 								E('div',
-									...['accepted', 'tentative', 'declined'].map(s => E('button', names[s])
+									...['accepted', 'tentative', 'declined'].map(s => E('button', item.calendarPrincipal?.participationStatus == s ? pressedNames[s] : names[s])
 										.cls('goui-button')
+										.cls('disabled', item.calendarPrincipal?.participationStatus == s)
 										.cls('pressed', item.calendarPrincipal?.participationStatus == s)
 										.on('click', _ => {
 											item.updateParticipation(s as 'accepted'|'declined'|'tentative',() => {
@@ -91,27 +148,33 @@ function addEmailAction() {
 											});
 										})
 									)
-								).cls('goui group'),
-								E('button', t("Open Calendar")).cls('goui-button').on('click', _ => {
-									router.goto("calendar/day/" + item.start.format('Y-m-d'));
-								})
+								).cls('goui group')
+
 							);
 						}
 					};
-				let text = msg.itip.feedback || {
+				let text = {
 					CANCEL: t("Cancellation"),
-					REQUEST: t("Invitation")
+					REQUEST: t("Invitation"),
+					NONE: t('Event'),
+					REPLY: t('Reply'),
 				}[msg.itip.method] || "Unable to process appointment information.";
 
 
 				if(event && typeof event !== 'string') {
-					let item = new CalendarItem({data:event, key:event.id + ""});
+					let item = new CalendarItem({data:event, key:event.id ? event.id + "" : ''});
 
 					if(msg.itip.recurrenceId && item.isRecurring) {
 						item = item.patchedInstance(msg.itip.recurrenceId);
 					}
-					if(msg.itip.method === 'REQUEST')
+					if(msg.itip.method === 'REQUEST' || msg.itip.method === 'NONE')
 						updateBtns(item);
+
+					if(item.start) {
+						btns.append(E('button', t("Open Calendar")).cls('goui-button').on('click', _ => {
+							router.goto("calendar/day/" + item.start.format('Y-m-d'));
+						}));
+					}
 
 					if(msg.itip.method !== 'REPLY') {
 
@@ -124,9 +187,14 @@ function addEmailAction() {
 					text += ', '+ (event ?? t('Unexisting event'));
 				}
 
+				const items = [text];
+
+				if(msg.itip.feedback) {
+					items.push(msg.itip.method != "REPLY" ? E("br") : ": ", msg.itip.feedback);
+				}
 
 				container.append(
-					E('li', E('i', 'event').cls('icon'), text, btns).cls('goui-toolbar')
+					E('li', E('i', 'event').cls('icon'), E("div",  ...items).css({flex: "1"}), btns).cls('goui-toolbar')
 				);
 			}
 		};
@@ -170,14 +238,30 @@ modules.register(  {
 			],
 			links: [{
 				iconCls: 'entity ic-event red',
-				linkWindow:(entity:string, entityId) => {
-					return (new CalendarItem({key:'',data:{
-							start:(new DateTime).format('Y-m-d\TH:00:00.000'),
+				linkWindow: async (entity:string, entityId) => {
+					if(!calendarStore.loaded) {
+						// CalendarItem depends on the store being loaded
+						await calendarStore.load();
+					}
+
+					const dlg = go.openEventWindow({
+							start:(new DateTime).addDays(1).format('Y-m-d\TH:00:00.000'),
 							title: t('New event'),
 							showWithoutTime: client.user.calendarPreferences?.defaultDuration == null,
 							duration: client.user.calendarPreferences?.defaultDuration ?? "P1D",
 							calendarId: client.user.calendarPreferences?.defaultCalendarId
-						}})).open()
+						}, true);
+
+					if(entity == "Contact") {
+						try {
+							const p = await principalDS.single("Contact:" + entityId);
+							dlg.participantFld.addParticipant(p);
+						} catch(e) {
+							console.error(e);
+						}
+					}
+
+					return dlg;
 				},
 				linkDetail:() =>  new EventDetail()
 			}]
@@ -190,11 +274,12 @@ modules.register(  {
 
 		addEmailAction();
 
-		client.on("authenticated",  (client, session) => {
+		client.on("authenticated",  ({session}) => {
 
 			// OLD CODE
 			async function showBadge() {
 				const count = await go.Jmap.request({method: "CalendarEvent/countMine"});
+				ui.inboxBtn.hidden = count<1;
 				GO.mainLayout.setNotification('calendar', count, 'orange');
 			}
 			go.Db.store("CalendarEvent").on("changes", () => {
@@ -227,10 +312,11 @@ modules.register(  {
 			modules.addMainPanel("community", "Calendar", 'calendar', t('Calendar'), () => ui);
 
 			go.Alerts.on("beforeshow", function(alerts: any, alertConfig: any) {
+
 				const alert = alertConfig.alert,
 					msgs: {[key:string]: string} = {
-						request: t('New invitation from {organizer}'),
-						update: t("Invitation updated by {organizer}"),
+						request: t('New invitation from {from}'),
+						reply: t("Invitation updated by {from}"),
 						created: t("New event created by {creator}")
 					};
 				//debugger;
@@ -238,23 +324,42 @@ modules.register(  {
 
 					alertConfig.panelPromise = alertConfig.panelPromise.then(async (panelCfg: any) => {
 
-						const msg: string = msgs[alert.tag] || '',
+						let msg: string = msgs[alert.tag] || '',
 							time = go.util.Format.shortDateTime(alert.triggerAt);
 
 						if(alert.tag === 'created'){
-							msg.replace('{creator}', alert.data.creator);
+							msg = msg.replace('{creator}', alert.data.creator);
 						}
-						if(alert.tag === 'update' || alert.tag === 'request') {
-							msg.replace('{organizer}', alert.data.organizer);
-							panelCfg.buttons = [
-								{text:t('Accept')},
-								{text:t('Maybe')},
-								{text:t('Decline')}
-							];
+						if(alert.tag === 'reply' || alert.tag === 'request') {
+							msg = msg.replace('{from}', alert.data.from?.personal ?? t("Unknown"));
+
+							if(alert.tag === 'request') {
+								const event = await jmapds("CalendarEvent").single(alert.entityId);
+								if (event) {
+									const item = new CalendarItem({key: alert.entityId + "", data: event});
+									panelCfg.buttons = [
+										{
+											text: t('Accept'), handler: (btn: any) => {
+												item.updateParticipation("accepted", () => btn.findParentByType("panel").destroy());
+											}
+										},
+										{
+											text: t('Maybe'), handler: (btn: any) => {
+												item.updateParticipation("tentative", () => btn.findParentByType("panel").destroy())
+											}
+										},
+										{
+											text: t('Decline'), handler: (btn: any) => {
+												item.updateParticipation("declined", () => btn.findParentByType("panel").destroy())
+											}
+										}
+									];
+								}
+							}
 						}
 
-						panelCfg.items = [{html: msg+'<br>'+time }];
-						panelCfg.notificationBody = msg+"\n"+time; // for desktop notifications (no html)
+						panelCfg.items = [{html: msg + '<br>'+time }];
+						panelCfg.notificationBody = msg + "\n"+time; // for desktop notifications (no html)
 						return panelCfg;
 					});
 

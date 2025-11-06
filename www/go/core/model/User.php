@@ -17,6 +17,7 @@ use go\core\convert\UserSpreadsheet;
 use go\core\data\Model;
 use go\core\db\Column;
 use go\core\db\Criteria;
+use go\core\db\Expression;
 use go\core\Environment;
 use go\core\exception\ConfigurationException;
 use go\core\exception\NotFound;
@@ -109,7 +110,7 @@ class User extends AclItemEntity {
 	 * @param bool|null $enabled Supply if you want to change the setting
 	 * @return bool
 	 */
-	public function validatePasswordEnabled(bool $enabled = null) {
+	public function validatePasswordEnabled(bool|null $enabled = null) {
 
 		$old = $this->validatePassword;
 
@@ -122,156 +123,146 @@ class User extends AclItemEntity {
 
 	/**
 	 * The ID
-	 * 
-	 * @var int
 	 */
-	public $id;
+	public ?string $id = null;
 
 	/**
 	 * Username eg. "john"
 	 * @var string
 	 */
-	public $username;
+	public string $username;
 
 	/**
 	 * Display name eg. "John Smith"
 	 * @var string
 	 */
-	public $displayName;
+	public string $displayName;
 
 	/**
 	 * User profile picture blob ID. Can be downloaded via the download endpoint.
 	 *
-	 * @var string
+	 * @var ?string
 	 */
-	public $avatarId;
+	public ?string $avatarId = null;
 
 	/**
 	 * Enabled for login
 	 *
 	 * @var bool
 	 */
-	public $enabled;
+	public bool $enabled = true;
+
 	/**
 	 * E-mail address
 	 * 
 	 * @var string
 	 */
-	public $email;
-
+	public string $email;
 
 	/**
 	 * Flag indicating if the user is allowed to receive newsletters
 	 *
 	 * @var bool
 	 */
-	public $newsletterAllowed = true;
+	public bool $newsletterAllowed = true;
 
 	/**
 	 * Alternative e-mail address for password reset
 	 * 
 	 * @var string
 	 */
-	public $recoveryEmail;
-	protected $recoveryHash;
-	protected $recoverySendAt;
+	public ?string $recoveryEmail;
+	protected ?string $recoveryHash;
+	protected ?DateTime $recoverySendAt;
 	
 	/**
 	 * Login count
 	 * 
 	 * @var int
 	 */
-	public $loginCount;
+	public int $loginCount = 0;
 	
 	/**
 	 * Last login time
 	 * 
-	 * @var DateTime
+	 * @var ?DateTime
 	 */
-	public $lastLogin;
-	
-	/**
-	 *
-	 * @var DateTime
-	 */
-	public $modifiedAt;
-	
-	/**
-	 *
-	 * @var DateTime
-	 */
-	public $createdAt;
+	public ?\DateTimeInterface $lastLogin = null;
+
+	public ?\DateTimeInterface $modifiedAt;
+
+	public ?\DateTimeInterface $createdAt;
 	
 	/**
 	 * Date format
 	 * @var string
 	 */
-	public $dateFormat;
+	public string $dateFormat = "d-m-Y";
 	
 	/**
 	 * Display dates short in lists.
 	 * 
 	 * @var bool
 	 */
-	public $shortDateInList = true;
+	public bool $shortDateInList = true;
 	
 	/**
 	 * Time format
 	 * 
 	 * @var string
 	 */
-	public $timeFormat;
+	public string $timeFormat = "H:i";
 	
 	/**
 	 * char to separate thousands in numbers
 	 * 
 	 * @var string
 	 */
-	public $thousandsSeparator;
+	public string $thousandsSeparator = ".";
 	
 	/**
 	 * Char to separate decimals in numbers
 	 * @var string
 	 */
-	public $decimalSeparator;
+	public string $decimalSeparator = ",";
 	
 	/**
 	 * Currency char
 	 * 
 	 * @var string
 	 */
-	public $currency;
+	public string $currency = "€";
 	
 	/**
 	 * Separator for CSV lists. eg. ; or ,
 	 * @var string
 	 */
-	public $listSeparator;
+	public string $listSeparator = ",";
 	
 	/**
 	 * Separator for text in CSV. eg. '"'
 	 * 
 	 * @var string
 	 */
-	public $textSeparator;
+	public string $textSeparator = '"';
 
 	/**
 	 * Home directory of the user
 	 *
 	 * eg. users/admin
 	 *
-	 * @var string
+	 * @var ?string
 	 */
-	public $homeDir;
+	public ?string $homeDir;
 
 	/**
 	 * When true the user interface will show a confirm dialog before moving item with drag and drop
 	 * @var bool
 	 */
-	public $confirmOnMove;
+	public bool $confirmOnMove = false;
 	
 	
-	public $max_rows_list;
+	public int $max_rows_list = 50;
 
 	/**
 	 *
@@ -282,9 +273,9 @@ class User extends AclItemEntity {
 	/**
 	 * The user timezone
 	 * 
-	 * @var string eg. europe/amsterdam
+	 * @var ?string eg. europe/amsterdam
 	 */
-	public $timezone;
+	public ?string $timezone;
 	public $start_module;
 	public $language;
 	public $theme;
@@ -326,7 +317,7 @@ class User extends AclItemEntity {
 	public $sort_email_Addresses_by_time;
 	public $no_reminders;
 	
-	protected ?DateTime $passwordModifiedAt;
+	protected ?DateTime $passwordModifiedAt = null;
 	public bool $forcePasswordChange = false;
 
 	public function getDateTimeFormat(): string
@@ -953,6 +944,12 @@ public function historyLog(): bool|array
 		return true;
 	}
 
+	protected function commit(): bool
+	{
+		$this->plainPassword = null;
+		return parent::commit();
+	}
+
 
 	protected function internalGetModified(array|string &$properties = [], bool $forIsModified = false): bool|array
 	{
@@ -1086,15 +1083,11 @@ public function historyLog(): bool|array
 	private function checkPersonalGroup()
 	{
 		if ($this->isNew() || $this->isModified(['groups', 'username'])) {
-			if ($this->isNew()) {// !in_array($this->getPersonalGroup()->id, $groupIds)) {
-				$personalGroup = $this->createPersonalGroup();
-			} else {
-				$personalGroup = $this->getPersonalGroup();
-				if ($this->isModified('username')) {
-					$personalGroup->name = $this->username;
-					if (!$this->appendNumberToGroupNameIfExists($personalGroup)) {
-						throw new SaveException($personalGroup);
-					}
+			$personalGroup = $this->getPersonalGroup();
+			if (!$this->isNew() && $this->isModified('username')) {
+				$personalGroup->name = $this->username;
+				if (!$this->appendNumberToGroupNameIfExists($personalGroup)) {
+					throw new SaveException($personalGroup);
 				}
 			}
 
@@ -1107,6 +1100,7 @@ public function historyLog(): bool|array
 	private function createPersonalGroup(): Group
 	{
 		$personalGroup = new Group();
+		$personalGroup->createdBy = $this->id;
 		$personalGroup->name = $this->username;
 		$personalGroup->isUserGroupFor = $this->id;
 		$personalGroup->users[] = $this->id;
@@ -1477,6 +1471,91 @@ public function historyLog(): bool|array
 	public function findAclId(): ?int
 	{
 		return $this->getPersonalGroup()->findAclId();
+	}
+
+	static function findIdByEmailAliases(string $email) :?int{
+		if(!go()->getModule("legacy", "email")) {
+			return null;
+		}
+		return go()->getDbConnection()
+			->selectSingleValue("user_id")
+			->from("em_accounts", "a")
+			->join("em_aliases", "al", "al.account_id = a.id")
+			->where("al.email", "LIKE", $email)
+			->single();
+	}
+
+
+	/**
+	 * Find all known e-mail aliases in lower case for a user ID
+	 *
+	 * @param int $userId
+	 * @return string[]
+	 * @throws Exception
+	 */
+	static function findEmailAliases(int $userId) : array {
+		$scheduleIds = [go()->getDbConnection()
+			->selectSingleValue('LOWER(email)')
+			->from("core_user")
+			->where("id", "=" , $userId)
+			->single()];
+
+		if(go()->getModule("legacy", "email")) {
+
+			$scheduleIds = array_values(array_unique(array_merge($scheduleIds, go()->getDbConnection()
+				->selectSingleValue("LOWER(al.email)")
+				->from("em_accounts", "a")
+				->join("em_aliases", "al", "al.account_id = a.id")
+				->where("a.user_id", "=", $userId)
+				->all())));
+		}
+		return $scheduleIds;
+	}
+
+	/**
+	 * All email aliases this user is known to use
+	 *
+	 * The users' email accounts are used for this too if the email module is installed.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getEmailAliases() : array {
+
+		$scheduleIds = [strtolower($this->email)];
+
+		if(go()->getModule("legacy", "email")) {
+
+			$scheduleIds = array_values(array_unique(array_merge($scheduleIds, go()->getDbConnection()
+				->selectSingleValue("LOWER(al.email)")
+				->from("em_accounts", "a")
+				->join("em_aliases", "al", "al.account_id = a.id")
+				->where("a.user_id", "=", $this->id)
+				->all())));
+		}
+
+		return $scheduleIds;
+	}
+
+	/**
+	 * Finds a user ID by email. Also uses e-mail aliases if evailable.
+	 *
+	 * @param string $email
+	 * @return int|null
+	 * @throws Exception
+	 */
+	static function findIdByEmail(string $email) : ?int {
+
+		$stmt = self::find()->selectSingleValue('id')
+			->where('email','LIKE',$email);
+
+		$id = $stmt->single();
+		if($id) {
+			return $id;
+		}
+		return self::findIdByEmailAliases($email);
+
+
 	}
 
 

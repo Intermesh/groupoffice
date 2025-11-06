@@ -2,29 +2,23 @@ import {
 	autocomplete, avatar, btn, Button, checkbox,
 	column,
 	comp,
-	Component, Config, containerfield, createComponent, datasourcestore, FieldEventMap, Format,
+	Component, Config, ContainerField, containerfield, createComponent, datasourcestore, DateTime, FieldEventMap, Format,
 	hr,
 	MapField,
 	mapfield, Menu, menu, ObservableListenerOpts,
 	table
 } from "@intermesh/goui";
-import {statusIcons, t} from "./Index.js";
+import {getParticipantStatusIcon, statusIcons, t} from "./Index.js";
 import {client, jmapds, validateEmail} from "@intermesh/groupoffice-core";
 
-interface ParticipantFieldEventMap<Type> extends FieldEventMap<Type> {
-	beforeadd: (me:Type, principal: any) => void
+interface ParticipantFieldEventMap extends FieldEventMap {
+	beforeadd: {principal: any}
 }
-export const participantfield = (config?: Config<ParticipantField, ParticipantFieldEventMap<ParticipantField>>) => createComponent(new ParticipantField(), config);
+export const participantfield = (config?: Config<ParticipantField>) => createComponent(new ParticipantField(), config);
 
-export interface ParticipantField extends Component {
-	on<K extends keyof ParticipantFieldEventMap<this>, L extends Function>(eventName: K, listener: Partial<ParticipantFieldEventMap<this>>[K], options?: ObservableListenerOpts): L;
-	un<K extends keyof ParticipantFieldEventMap<this>>(eventName: K, listener: Partial<ParticipantFieldEventMap<this>>[K]): boolean;
-	fire<K extends keyof ParticipantFieldEventMap<this>>(eventName: K, ...args: Parameters<ParticipantFieldEventMap<any>[K]>): boolean;
-}
-export class ParticipantField extends Component {
+export class ParticipantField extends Component<ParticipantFieldEventMap> {
 
 	list!: MapField
-	btnFreeBusy!: Button
 
 	constructor() {
 		super();
@@ -35,8 +29,10 @@ export class ParticipantField extends Component {
 		this.items.add(
 			this.list = mapfield({name: 'participants', cls:'goui-pit',
 				listeners: {
-					'change': (me,v) => {
-						this.fire('change', this, v, null);
+					'setvalue': (e) => {
+						this.fire('setvalue', e);
+					},'change': (e) => {
+						this.fire('change', e);
 					}
 				},
 				buildField: (v: any) => {
@@ -44,28 +40,30 @@ export class ParticipantField extends Component {
 							'manage_accounts' : (v.kind=='resource' ?
 								'meeting_room' : (v.name ?
 									'person' : 'contact_mail')
-							) ,
-						statusIcon = statusIcons[v.participationStatus] || v.participationStatus;
+							),
+						statusIcon = getParticipantStatusIcon(v);
+
 					const f = containerfield({cls:'hbox', style: {alignItems: 'center', cursor:'default'}},
 						comp({tagName:'i',cls:'icon',html:userIcon, style:{margin:'0 8px'}}),
 						comp({
+							itemId: 'name',
 							flex: '1 0 60%',
-							html: v.name ? v.name + (v.email ? '<br>' + v.email :'') : v.email
+							html: v.name.htmlEncode() ? v.name.htmlEncode() + (v.email ? '<br>' + v.email :'') : v.email
 						}),
 						comp({tagName:'i',cls:'icon '+statusIcon[2],html:statusIcon[0],title:statusIcon[1], style:{margin:'0 8px'}}),
 						btn({icon:'more_vert', menu: menu({},
 								btn({text: v.email, disabled: true}),
 								hr(),
-								checkbox({label:'Optioneel',listeners: {'change': (cb) => {
-									if(cb.value) {
-										delete v.roles.attendee; // make optional (non-required)
+								checkbox({label: t('Optional'),value:!!v.roles?.optional, listeners: {'change': ({target}) => {
+									if(!target.value) {
+										delete v.roles.optional; // make optional (non-required)
 									} else {
-										v.roles.attendee = true;
+										v.roles.optional = true;
 									}
 								} }}),
 								btn({icon:'delete',text:t('Delete'), handler: _ => {
 										f.remove();
-										this.fire('change', this, this.list.value, null);
+										this.fire('change', {newValue: this.list.value, oldValue:null});
 									}
 								}),
 								hr(),
@@ -77,48 +75,53 @@ export class ParticipantField extends Component {
 				}
 			}),
 			autocomplete({
-				placeholder:t('Invite people'),
+				placeholder:t('Invite people') + ' / ' + t('Resource request'),
 				//valueProperty: "id",
 				listeners: {
-					'autocomplete': async (field, input) => {
-						field.list.store.setFilter('text', {text: input})
-						field.list.store.queryParams.limit = 20;
-						field.list.store.sort = [{property: "name"}];
-						await field.list.store.load();
-						if(field.list.store.count() == 0) {
-							field.menu.hide();
+					'autocomplete': async ({target, input}) => {
+						target.list.store.setFilter('text', {text: input})
+						target.list.store.queryParams.limit = 20;
+						target.list.store.sort = [{property: "name"}];
+						await target.list.store.load();
+						if(target.list.store.count() == 0) {
+							target.menu.hide();
 						}
 					},
-					'render' : (me) => {
-						me.el.on('keydown' , ev => {
+					'render' : ({target}) => {
+						target.el.on('keydown' , ev => {
 							if(ev.key === 'Enter') {
 								ev.preventDefault();
-								if(validateEmail(me.input!.value)) {
-									const email = me.input!.value;
+								if(validateEmail(target.input!.value)) {
+									const email = target.input!.value;
 									this.addParticipant({id:email,email});
-									me.menu.hide();
-									me.value = "";
+									target.menu.hide();
+									target.value = "";
 								}
 							}
 						});
 					},
-					'select': (me, record) => {
+					'select': ({target, record}) => {
 
 						if(record)
 							this.addParticipant(record);
 
-						me.value = "";
+						target.value = "";
 					}
 				},
 				list:table({
 					style:{minWidth:'100%'},
 					headers: false,
 					store: datasourcestore({
-						dataSource: jmapds('Principal')
+						dataSource: jmapds('Principal'),
+						filters: {
+							default: {
+								preferUser: true
+							}
+						}
 						//properties: ['id', 'displayName', 'email']
 					}),
 					columns: [
-						column({id:'type',width:50, renderer: (v, r) => {
+						column({id:'type',htmlEncode: false,width:50, renderer: (v, r) => {
 								if(r.avatarId) {
 									return avatar({backgroundImage: client.downloadUrl(r.avatarId)});
 								}
@@ -127,6 +130,7 @@ export class ParticipantField extends Component {
 							} }),
 						column({
 							id: "name",
+							htmlEncode: false,
 							renderer: (v, record) => {
 								let name = Format.escapeHTML(v);
 								if(!isNaN(record.id)) {
@@ -138,9 +142,9 @@ export class ParticipantField extends Component {
 						})
 					],
 					listeners: {
-						render: table => {
+						render: ({target}) => {
 							// register the parent element to load store on scroll down
-							table.store.addScrollLoader(table.findAncestorByType(Menu)!.el);
+							target.store.addScrollLoader(target.findAncestorByType(Menu)!.el);
 						}
 					}
 				})
@@ -148,6 +152,35 @@ export class ParticipantField extends Component {
 		);
 
 		return super.internalRender();
+	}
+
+	private pendingAvailabilityIds : {[id:string]:true} = {};
+	checkAvailability(start: DateTime, end: DateTime, allDay: boolean) {
+		if(allDay)
+			end = end.clone().addDays(1);
+
+		const fm = allDay ? 'Y-m-d' : 'Y-m-d H:i:s',
+			rows = this.list.value;
+
+		for (const id in rows) {
+			// not already pending and is user or resource
+			if(this.shouldCheckAvailability(id))
+			client.jmap('Principal/getAvailability', {start:start.format(fm),end:end.format(fm),id}).then((response)=> {
+				const f = this.list.items?.find(v => v.dataSet.key === id);
+				if(f)
+					f.findChild(f => f.itemId === 'name')!.style.color = response.list.length > 0 ?  'red' : 'inherit';
+
+				this.pendingAvailabilityIds = {};
+			})
+			this.pendingAvailabilityIds[id]=true;
+		}
+	}
+
+	private shouldCheckAvailability(id:string) : boolean {
+		const existingKeys = Object.keys(this.list.getOldValue());
+		if(existingKeys.indexOf(id)!==-1) return false;
+		if(this.pendingAvailabilityIds[id]) return false;
+		return id.startsWith('Calendar:') || !isNaN(+id); // Resource or User
 	}
 
 	private organizerId?: string;
@@ -166,13 +199,12 @@ export class ParticipantField extends Component {
 	}
 
 	addParticipant(principal: any) {
-		this.fire('beforeadd', this, principal);
+		this.fire('beforeadd', {principal});
 
 		this.list.add({
 			email:principal.email,
 			name: principal.name || principal.email,
 			roles: {attendee:true},
-			scheduleAgent: principal.id ? 'server' : 'server',
 			kind: principal.type ?? 'individual',
 			participationStatus:"needs-action",
 			expectReply:true

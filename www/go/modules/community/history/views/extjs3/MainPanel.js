@@ -99,9 +99,10 @@ Ext.define('go.modules.community.history.MainPanel', {
 		});
 
 		//Requested by jonny History user search #202223667
-		this.selectUser.store.setFilter("default", {
-			showDisabled: true
-		});
+		// no longer working with Principals
+		// this.selectUser.store.setFilter("default", {
+		// 	showDisabled: true
+		// });
 
 		return new Ext.Container({
 			region: "center",

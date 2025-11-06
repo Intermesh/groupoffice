@@ -44,10 +44,10 @@ export class MainPanel extends MainThreeColumnPanel {
 			this.tbl.stateId = "maildomains-table";
 			this.tbl!.store.setFilter("active", {active: true});
 
-			this.tbl.rowSelection!.on("rowselect", rowSelect => {
-			    if(rowSelect.getSelected().length) {
-				    router.goto("maildomains/" + rowSelect.getSelected()[0].record.id);
-			    }
+			this.tbl.rowSelection!.on("rowselect", ({target}) => {
+				if(target.getSelected().length) {
+					router.goto("maildomains/" + target.getSelected()[0].record.id);
+				}
 	    })
 
 	    return comp({
@@ -60,8 +60,8 @@ export class MainPanel extends MainThreeColumnPanel {
 						type: "switch",
 						label: t("Show inactive"),
 						listeners: {
-							change: (cb, checked) => {
-								this.tbl!.store.setFilter("active", checked ? undefined : {active: true});
+							change: ({newValue}) => {
+								this.tbl!.store.setFilter("active", newValue ? undefined : {active: true});
 								this.tbl!.store.load();
 							}
 						}
@@ -70,7 +70,7 @@ export class MainPanel extends MainThreeColumnPanel {
 			    this.ptrStatus = comp({html: ""}),
 			    searchbtn({
 				    listeners: {
-					    input: (sender, text) => {
+					    input: ({text}) => {
 						    this.tbl!.store.setFilter("search", {text: text});
 						    this.tbl!.store.load(false);
 					    }

@@ -99,6 +99,21 @@ class Installer {
 		return $cron;
 	}
 
+	private function createEmailReminderCron() {
+
+		$module = model\Module::findByName("core", "core");
+
+		$cron = new model\CronJobSchedule();
+		$cron->moduleId = $module->id;
+		$cron->name = "EmailAlerts";
+		$cron->expression = "* * * * *";
+		$cron->description = "Email alerts";
+
+		if(!$cron->save()) {
+			throw new Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
+		}
+	}
+
 	/**
 	 * 
 	 * @param array $adminValues
@@ -257,6 +272,7 @@ class Installer {
 
 
 		$this->createGarbageCollection();
+		$this->createEmailReminderCron();
 
 		if(!Password::register()) {
 			throw new Exception("Failed to register Password authenticator");
@@ -379,15 +395,18 @@ class Installer {
 
 	}
 
-	public function getUnavailableModules(): array
+	public function getUnavailableModules(bool|null $enabled = true): array
 	{
 		$this->removeObsoleteModules();
 
 		$modules = (new Query)
-						->select('name, package')
-						->from('core_module')
-						->where('enabled', '=', true)
-						->all();
+						->select('*')
+						->from('core_module')					;
+
+
+		if(isset($enabled)) {
+			$modules->where('enabled', '=', $enabled);
+		}
 
 
 		$unavailable = [];
@@ -405,14 +424,14 @@ class Installer {
 				$moduleCls = "GO\\" . ucfirst($module['name']) . "\\" . ucfirst($module['name']) . "Module";
 			}
 			if (!class_exists($moduleCls)) {
-				$unavailable[] = ["package" => $module['package'], "name" => $module['name']];
+				$unavailable[] = $module;
 				continue;
 			}
 
 			$mod = $moduleCls::get();
 
 			if (!$mod->isAvailable()) {
-				$unavailable[] = ["package" => $module['package'], "name" => $module['name']];
+				$unavailable[] = $module;
 			}
 		}
 		
@@ -434,7 +453,7 @@ class Installer {
 
 			$where = (new Query);
 			foreach($unavailable as $m) {
-				$where->orWhere($m);
+				$where->orWhere(['id' => $m['id']]);
 			}
 			$stmt = go()->getDbConnection()->update("core_module", ['enabled' => false], $where);
 			$stmt->execute();
@@ -618,7 +637,7 @@ class Installer {
 		foreach ($modules as $module) {
 
 			if (!$module->isAvailable()) {
-				echo "Skipping module " . $module->name . " because it's not available.\n";
+				//echo "Skipping module " . $module->name . " because it's not available.\n";
 				continue;
 			}
 			
@@ -680,7 +699,7 @@ class Installer {
 		foreach ($modules as $module) {
 
 			if (!$module->isAvailable()) {
-				echo "Skipping module " . $module->name . " because it's not available.\n";
+				//echo "Skipping module " . $module->name . " because it's not available.\n";
 				continue;
 			}
 

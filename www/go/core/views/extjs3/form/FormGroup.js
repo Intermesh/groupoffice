@@ -345,9 +345,10 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	nextMapId : function () {
 		return "_NEW_" + (go.form.FormGroup._nextMapId++);
 	},
-	
-	addPanel : function(auto, index) {
-		var formField = this.createNewItem(auto), me = this, items = [formField], delBtn = new Ext.Button({
+
+	createDeleteButton : function(index) {
+		var me = this;
+		return new Ext.Button({
 			//disabled: formField.disabled,
 			itemId: 'del-btn',
 			xtype: "button",
@@ -363,7 +364,11 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 				me.fireEvent("change", me, me.getValue());
 			}
-		}),
+		})
+	},
+	
+	addPanel : function(auto, index) {
+		var formField = this.createNewItem(auto),  items = [formField], delBtn = this.createDeleteButton(index !== undefined ? index : this.items ? this.items.getCount() : 0),
 			rowId  = Ext.id();
 
 		if(this.startWithItem) {
@@ -401,7 +406,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 		var wrap = new go.form.FormGroupItemContainer({
 			id: rowId,
-			rowIndex: this.items ? this.items.getCount() : 0,
+			rowIndex: index !== undefined ? index : this.items ? this.items.getCount() : 0,
 
 			formField: formField,
 			style: this.pad ?  "padding-top: " + dp(16) + "px" : "",

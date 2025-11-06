@@ -13,6 +13,7 @@ use Jasny\PhpdocParser\Tag\Summery;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionMethod;
+use ReflectionUnionType;
 
 
 /**
@@ -167,7 +168,12 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
 				if($forDocs) {
 					$type = $prop->getType();
 					if(isset($type)) {
-						$arr[$propName]['type'] = $type->getName();
+						if($type instanceof ReflectionUnionType) {
+							$types = $type->getTypes();
+						} else {
+							$types = [$type];
+						}
+						$arr[$propName]['type'] = implode(" | ", array_map(function($type) { return $type->getName();}, $types));
 					}
 					$meta = $parser->parse($prop->getDocComment());
 					$arr[$propName]['description'] = $meta['description'] ?? null;
@@ -380,6 +386,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
 			}
 			return $arr;
 		} else if($value instanceof DateTime) {
+			// this will support DateTime::$isLocal
 			return (string) $value;
 		} else if($value instanceof \DateTimeInterface) {
 			return $value->format(DateTime::FORMAT_API);

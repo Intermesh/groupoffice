@@ -5,7 +5,7 @@ return [
 	'description' => 'Een krachtige agenda voor teams en individuen. Het helpt je om afspraken te organiseren, beschikbaarheid te beheren en in realtime met anderen te coördineren. Met ondersteuning voor terugkerende afspraken, gedeelde agenda\'s en automatische verwerking van uitnodigingen maakt het plannen over tijdzones en organisaties heen eenvoudig. De snelle, moderne webinterface biedt meerdere weergaven, zodat je volledige controle hebt over het bijhouden van persoonlijke afspraken of het beheren van teamagenda\'s. Met slimme filters en aangepaste weergaven kun je makkelijk navigeren door drukke agenda\'s.',
 
 
-	'mayChangeCalendars'=> 'Wijzig Agenda\'s',
+	'mayChangeCalendars'=> 'Agenda\'s maken/verwijderen',
 	'mayChangeCategories' => 'Wijzig Categorieën',
 	'mayChangeResources' => 'Wijzig Faciliteiten',
 
@@ -28,7 +28,9 @@ return [
 	'New event' => 'Nieuwe afspraak',
 	'Event' => 'Afspraak',
 	'All day' => 'Hele dag',
-
+	'Attending' => 'Aanwezig',
+	'Include in availability' => 'Invloed op beschikbaarheid',
+	'Check availability' => 'Beschikbaarheid controleren',
 	'Events with time' => 'Afspraken met tijd',
 	'Events without time (Full-day)' => 'Afspraken zonder tijd (Hele dag)',
 	'Default notifications' => 'Standaard meldingen',
@@ -36,6 +38,7 @@ return [
 	'Override' => 'Overschreven',
 
 	'Create calendar' => 'Nieuwe agenda maken',
+	'Edit calendar' => 'Agenda bewerken',
 	'Subscribe to calendar' => 'Aanmelden bij agenda',
 	'Add calendar from link' => 'Agenda toevoegen via link',
 
@@ -66,7 +69,7 @@ return [
 	'End' => 'Einde',
 	'Invite people'=>'Gasten toevoegen',
 	'Public'=>'Openbaar',
-	'Private' => 'Privee',
+	'Private' => 'Privé',
 	'Secret'=> 'Geheim',
 	'Location'=>'Locatie',
 	'Awaiting reply' => 'Wacht op antwoord',
@@ -111,6 +114,7 @@ return [
 	'Preferences' => 'Voorkeuren',
 	'Show week numbers in calendar' => 'Toon weeknummers in de agenda',
 	'Show events that you have declined' => 'Toon afspraken die je hebt afgewezen',
+	'Show pop-up info when hovering over appointments' => 'Toon pop-up info bij aanwijzen van afspraken',
 	'Default calendar' => 'Standaard agenda',
 	'Process e-mail in' => 'Verwerk e-mail in',
 	'Archive folder' => 'Archief map',

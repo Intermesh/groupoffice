@@ -1,5 +1,6 @@
 <?php
 
+use go\core\db\Expression;
 use go\core\ErrorHandler;
 use go\core\mail\Util;
 use go\core\model\Principal;
@@ -54,24 +55,45 @@ class CalendarConvertor
 	static function toSyncAppointment(CalendarEvent $event, ?SyncAppointment $exception, $params): SyncAppointment
 	{
 		$message = $exception ?? new SyncAppointment();
-		if(!$exception && !empty($event->timeZone))
-			$message->timezone =  self::mstzFromTZID($event->timeZone);
-		$message->alldayevent = empty($event->showWithoutTime) ? 0 : 1;
+
 		if(!empty($event->createdAt))
 			$message->dtstamp = $event->createdAt->getTimestamp();
-		$message->starttime = $event->start()->getTimestamp();
-		$message->uid = $event->uid;
 
-		if(!$event->isPrivate() || $event->getPermissionLevel() > \go\core\model\Acl::LEVEL_READ) {
-			$message->subject = $event->title;
-			$message->location = $event->location;
-			$message->asbody = GoSyncUtils::createASBody($event->description, $params);
+		if($event->showWithoutTime) {
+			$message->alldayevent = 1;
+
+			$start = (new \DateTime($event->start->format("Y-m-d") . " 00:00:00" , new \DateTimeZone("UTC")));
+			$message->starttime = $start->getTimestamp();
+			if (!empty($event->duration))
+				$message->endtime = $start->add(new \DateInterval($event->duration))->getTimestamp();
+
+		} else {
+			$message->alldayevent = 0;
+			$message->starttime = $event->start()->getTimestamp();
+			if (!empty($event->duration))
+				$message->endtime = $event->end()->getTimeStamp();
+
+			if(!$exception && !empty($event->timeZone))
+				$message->timezone =  self::mstzFromTZID($event->timeZone);
 		}
 
-		if(!empty($event->duration))
-		$message->endtime = $event->end()->getTimeStamp();
+		$message->uid = $event->uid;
+
+		if(!$event->isPrivate() || $event->currentUserIsOwner()) {
+			$message->subject = $event->title;
+			if(isset($event->location)) {
+				$message->location = $event->location;//str_replace("\n", ", ", $event->location);
+				$message->location2 = new SyncLocation();
+				$message->location2->displayname = $event->location;
+			}
+
+			$message->asbody = GoSyncUtils::createASBody($event->description, $params);
+		} else {
+			$message->subject = "Private";
+		}
+
 		if(!empty($event->privacy))
-		$message->sensitivity = ['public'=> '0', 'private' => '2', 'secret'=> '3'][$event->privacy];
+			$message->sensitivity = ['public'=> '0', 'private' => '2', 'secret'=> '3'][$event->privacy];
 		if(!empty($event->freeBusyStatus))
 		$message->busystatus = $event->freeBusyStatus == 'busy' ? "2" : "0";
 		$message->meetingstatus = 0;
@@ -137,20 +159,24 @@ class CalendarConvertor
 			}
 		}
 		//$message->reminder = 0; // timestamp or 0
+
+
 		$alerts = $event->alerts();
+
 		if(!empty($alerts)) {
 			$firstAlert = array_shift($alerts);
 
+			// TODO $alert->setEntity() failes on recurring items because id is null in that case becuase of a $event->patchedInstance();
 			$coreAlert = $firstAlert->buildCoreAlert($event);
-			if($coreAlert) {
+			if ($coreAlert) {
 				$triggerU = $coreAlert->triggerAt->format("U");
 				$message->reminder = ($message->starttime - $triggerU) / 60; // Reminder is in minutes before start
 
-				if($message->reminder < 0) {
+				if ($message->reminder < 0) {
 					//iphone and GO allows a reminder after the start time when using an all day event.
 					//EAS does not support this. We'll set a reminder at 9:00 the day before so it's not
 					//completely lost.
-					if($event->showWithoutTime) {
+					if ($event->showWithoutTime) {
 						$message->reminder = 900;
 					} else {
 						$message->reminder = 30;
@@ -158,6 +184,7 @@ class CalendarConvertor
 				}
 			}
 		}
+
 		return $message;
 	}
 
@@ -169,9 +196,11 @@ class CalendarConvertor
 
 	private static function toSyncAttendee(CalendarEvent $event, &$message, $me = null) {
 
-		$message->organizername = '';
-		if(!empty($event->replyTo))
+
+		if(!empty($event->replyTo)) {
+			$message->organizername = $event->replyTo;
 			$message->organizeremail = $event->replyTo;
+		}
 
 		if($me)
 			$message->responsetype = self::$participationStatusMap[$me->participationStatus] ?? 0;
@@ -185,13 +214,13 @@ class CalendarConvertor
 		foreach($event->participants as $k => $participant) {
 			/** @var $participant Participant */
 			if ($participant->isOwner()) {
-				$message->organizername = $participant->name;
+				$message->organizername = $participant->name ?? $participant->email;
 				$message->organizeremail = $participant->email;
 				//continue;
 			}
 
 			$att = new SyncAttendee();
-			$att->name = $participant->name;
+			$att->name = $participant->name ?? $participant->email;
 			$att->email = $participant->email;
 			$att->attendeetype = 1; // 1=required, 2=optional, 3=resource
 			$att->attendeestatus = self::$participationStatusMap[$participant->participationStatus] ?? 0;
@@ -225,7 +254,7 @@ class CalendarConvertor
 			case 'monthly':
 				if (isset($rule->byDay[0])) {
 					$recur->type = "3";
-					$recur->weekofmonth = $rule->bySetPosition ?? $rule->byDay[0]->nthOfPeriod;
+					$recur->weekofmonth = $rule->bySetPosition[0] ?? $rule->byDay[0]->nthOfPeriod;
 					if($recur->weekofmonth == -1) { // last of month is supported by EAS but using 5.
 						$recur->weekofmonth = 5;
 					}
@@ -271,8 +300,11 @@ class CalendarConvertor
 			$event->uid = $message->uid;
 		//if (!empty($message->timezone))
 			$event->timeZone = self::tzid(); // ActiveSync timezone is guessable but for now we expect it to be the same as in GroupOffice
-		if ($event->isNew())
-			$event->createdAt = new DateTime('@'.$message->dtstamp);
+
+		if ($event->isNew() & !empty($message->dtstamp)) {
+			$event->createdAt = new DateTime('@' . $message->dtstamp);
+		}
+
 		$event->showWithoutTime = $message->alldayevent;
 		$event->title = $message->subject ?? "No subject";
 		$event->description = GoSyncUtils::getBodyFromMessage($message);
@@ -302,6 +334,16 @@ class CalendarConvertor
 		$event->start = $dtstart;
 		if (isset($message->location))
 			$event->location = $message->location;
+		elseif(isset($message->location2)) {
+			$aslocation = $message->location2;
+			if (isset($aslocation->displayname)) {
+				$event->location = $aslocation->displayname;
+			}
+			elseif($aslocation->street) {
+				$event->location = $aslocation->street .", ". $aslocation->city ."-". $aslocation->state .",". $aslocation->country .",". $aslocation->postalcode;
+			}
+		}
+
 		if (isset($message->busystatus))
 			$event->freeBusyStatus = empty($message->busystatus) ? 'free' : 'busy';
 		if (isset($message->sensitivity))
@@ -309,7 +351,9 @@ class CalendarConvertor
 
 		$principal = Principal::currentUser();
 
-		if (isset($message->attendees)) {
+
+		//todo remove attendee?
+		if (!empty($message->attendees)) {
 			if($event->isNew() || !$event->organizer()) {
 				$organizer = $event->generatedOrganizer($principal);
 				if (!empty($message->organizeremail) && Util::validateEmail($message->organizeremail)) $organizer->email = $message->organizeremail;
@@ -320,7 +364,7 @@ class CalendarConvertor
 				$key = $attendee->email;
 				if(!Util::validateEmail($key))
 					continue; // do not att attendee if client does not send a valid email address (TBSync uses login name)
-				$principalId = Principal::find()->selectSingleValue('id')->where('email','=',$key)->orderBy(['entityTypeId'=>'ASC'])->single();
+				$principalId = Principal::findIdByEmail($key);
 				if(!isset($event->participants[$principalId ?? $key])) {
 					$p = new Participant($event);
 					$p->email = $attendee->email;
@@ -359,7 +403,7 @@ class CalendarConvertor
 			}
 		}
 
-		if (isset($message->reminder)){
+		if (!empty($message->reminder)){
 			$event->alerts = [(new Alert($event))->setValues([
 				'action' => 'display',
 				'trigger' => ['offset' => '-PT'.$message->reminder.'M', 'relativeTo' => 'start']

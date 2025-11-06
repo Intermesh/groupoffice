@@ -39,7 +39,10 @@ $cacheFolder->create();
 class Message extends \go\core\mail\Message {
 	
 	private $_loadedBody;
-	
+	private $_loadedBodyType; //plain, html, calendar
+
+	private array| null $_loadedBodyTypeParams = null;
+
 	/**
 	 * The path in where the temporary attachments are stored
 	 * 
@@ -179,7 +182,18 @@ class Message extends \go\core\mail\Message {
 			$this->setDate($udate);
 		}
 
-		$this->setHtmlAlternateBody($this->_loadedBody);
+		if($this->_loadedBodyType == 'calendar') {
+			$contentType = 'text/calendar';
+			if(!empty($this->_loadedBodyTypeParams)) {
+				unset($this->_loadedBodyTypeParams['charset']);
+				foreach($this->_loadedBodyTypeParams as $key => $value) {
+					$contentType .= '; '.$key.'='.$value;
+				}
+			}
+			$this->setBody($this->_loadedBody, $contentType);
+		} else {
+			$this->setHtmlAlternateBody($this->_loadedBody);
+		}
 		
 		return $this;
 	}
@@ -261,7 +275,11 @@ class Message extends \go\core\mail\Message {
 					{
 						$content_part = $part->body;
 					}
+					$this->_loadedBodyTypeParams = $part->ctype_parameters ?? null;
+					$this->_loadedBodyType = $part->ctype_secondary;
 					$this->_loadedBody .= $content_part;
+
+
 				}elseif($part->ctype_primary=='multipart')
 				{
 
@@ -332,6 +350,8 @@ class Message extends \go\core\mail\Message {
 			{
 				$text_part = $structure->body;
 			}
+			$this->_loadedBodyType = $structure->ctype_secondary;
+			$this->_loadedBodyTypeParams = $structure->ctype_parameters ?? null;
 			$this->_loadedBody .= $text_part;
 		}
 

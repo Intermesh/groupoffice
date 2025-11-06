@@ -84,7 +84,13 @@ class Recurrence extends RRuleIterator {
 			$data['bySetPosition'] = array_map("intval", $this->bySetPos);
 		}
 		if(!empty($this->until)) {
-			$data['until'] = $this->until->format($allDay ? "Y-m-d" : "Y-m-d\TH:i:s\Z");
+			if($this->until->getTimezone()->getName() === 'UTC'){
+				$date= new DateTime($this->until->format("c"));
+				$date->setTimezone($this->startDate->getTimezone());
+				$data['until'] = $date->format("Y-m-d\TH:i:s");
+			} else {
+				$data['until'] = $this->until->format($allDay ? "Y-m-d" : "Y-m-d\TH:i:s");
+			}
 		}
 		if ($this->byDay) {
 			$data['byDay'] = [];

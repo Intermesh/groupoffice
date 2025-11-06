@@ -20,23 +20,11 @@ class Date extends Property {
 
 	const TYPE_ACTION = 'action';
 
-	/**
-	 * 
-	 * @var int
-	 */							
-	protected $contactId;
+	protected int $contactId;
 
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $type = self::TYPE_BIRTHDAY;
+	public ?string $type = self::TYPE_BIRTHDAY;
 
-	/**
-	 * 
-	 * @var \go\core\util\DateTime
-	 */							
-	public $date;
+	public ?\DateTime $date;
 
 	protected static function defineMapping(): Mapping
 	{

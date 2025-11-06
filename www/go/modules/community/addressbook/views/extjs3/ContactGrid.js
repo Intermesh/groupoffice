@@ -42,12 +42,43 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				"isOrganization",
 				"emailAddresses",
 				"phoneNumbers",
+				{
+					name: "address",
+					convert: function(v, data) {
+						return data.addresses ? data.addresses.column("address").filter(i => !go.util.empty(i)).unique().join(", ") : "";
+					}
+				},{
+					name: "zipCode",
+					convert: function(v, data) {
+						return data.addresses ? data.addresses.column("zipCode").filter(i => !go.util.empty(i)).unique().join(", ") : "";
+					}
+				},
+				{
+					name: "city",
+					convert: function(v, data) {
+						return data.addresses ? data.addresses.column("city").filter(i => !go.util.empty(i)).unique().join(", ") : "";
+					}
+				},
+
+				{
+					name: "state",
+					convert: function(v, data) {
+						return data.addresses ? data.addresses.column("state").filter(i => !go.util.empty(i)).unique().join(", ") : "";
+					}
+				},
+
+				{
+					name: "country",
+					convert: function(v, data) {
+						return data.addresses ? data.addresses.column("country").filter(i => !go.util.empty(i)).unique().join(", ") : "";
+					}
+				},
+
 				"dates",
 				'starred',
 				"birthday",
 				"age",
 				"gender",
-				"streetAddresses",
 				{name: 'organizations', type: "relation"},
 				"jobTitle",
 				"department",
@@ -154,7 +185,13 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(220),
 					sortable: true,
 					dataIndex: 'name',
-					hidden: this.enabledColumns.indexOf('name') == -1
+					hidden: this.enabledColumns.indexOf('name') == -1,
+					renderer: function (v, meta, record) {
+						if(record.get("color")) {
+							meta.attr = 'style="color: #' + record.get("color") + ';"';
+						}
+						return v;
+					}
 				},
 				{
 					hidden: this.enabledColumns.indexOf('gender') == -1,
@@ -289,6 +326,48 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					}
 				},
 				{
+					id: 'address',
+					header: t('Addrees'),
+					sortable: true,
+					dataIndex: "address",
+					width: dp(300),
+					hidden: true
+				},
+				{
+					id: 'zipCode',
+					header: t('ZIP code'),
+					sortable: true,
+					dataIndex: "zipCode",
+					width: dp(300),
+					hidden: true
+				},
+				{
+					id: 'city',
+					header: t('City'),
+					sortable: true,
+					dataIndex: "city",
+					width: dp(300),
+					hidden: true
+				},
+
+				{
+					id: 'state',
+					header: t('State'),
+					sortable: true,
+					dataIndex: "state",
+					width: dp(300),
+					hidden: true
+				},
+
+				{
+					id: 'country',
+					header: t('Country'),
+					sortable: true,
+					dataIndex: "country",
+					width: dp(300),
+					hidden: true
+				},
+				{
 					id: 'emailAddresses',
 					header: t('E-mail addresses'),
 					sortable: false,
@@ -343,6 +422,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					hidden: this.enabledColumns.indexOf('age') == -1,
 				},{
 					id: 'actionAt',
+					dateOnly: true,
 					xtype: "datecolumn",
 					header: t('Action date'),
 					sortable: true,

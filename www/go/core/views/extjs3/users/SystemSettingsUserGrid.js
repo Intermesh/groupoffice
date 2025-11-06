@@ -144,7 +144,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				iconCls: 'ic-add',
 				cls: "accent",
 				text: t('Add'),
-				disabled: !go.User.isAdmin,
+				// disabled: !go.User.isAdmin,
 				handler: function (e, toolEl) {
 					var dlg = new go.users.CreateUserWizard();
 					dlg.show();

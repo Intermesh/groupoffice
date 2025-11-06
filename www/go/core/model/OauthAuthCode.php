@@ -22,7 +22,7 @@ class OauthAuthCode extends Entity implements AuthCodeEntityInterface
 {
     use EntityTrait, TokenEntityTrait, AuthCodeTrait;
 
-    public $id;
+    public ?string $id;
 
     /**
      * @return Mapping

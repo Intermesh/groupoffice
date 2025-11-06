@@ -203,7 +203,7 @@ th {
 
 				break;
 			case 'csv':
-				fputcsv($this->fp, $array, $this->delimiter, $this->enclosure);
+				fputcsv($this->fp, $array, $this->delimiter, $this->enclosure, "");
 				break;
 			default:
 
@@ -715,7 +715,7 @@ th {
 		$mapping->thousandsSeparator = $this->clientParams['thousandsSeparator'] ?? null;
 		$mapping->decimalSeparator = $this->clientParams['decimalSeparator'] ?? null;
 		$mapping->dateFormat = $this->clientParams['dateFormat'] ?? null;
-		$mapping->name = $this->saveName;
+		$mapping->name = $this->saveName ?? "";
 		$mapping->save();
 
 	}
@@ -764,7 +764,7 @@ th {
 			}
 			return $cells;
 		} else{
-			return fgetcsv($this->fp, 0, $this->delimiter, $this->enclosure);
+			return fgetcsv($this->fp, 0, $this->delimiter, $this->enclosure, "");
 		}
 	}
 
@@ -983,7 +983,7 @@ th {
 	private static function tryDelimiter(File $file, string $delimiter): bool
 	{
 		$fp = $file->open('r');
-		$headers = fgetcsv($fp, 0, $delimiter, '"');
+		$headers = fgetcsv($fp, 0, $delimiter, '"', "");
 
 		$success = $headers && count($headers) > 1;
 		fclose($fp);

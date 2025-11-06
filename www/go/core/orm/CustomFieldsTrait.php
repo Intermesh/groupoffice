@@ -39,7 +39,7 @@ trait CustomFieldsTrait {
    * @return CustomFieldsModel
    * @throws Exception
    */
-	public function getCustomFields(bool $asText = null): CustomFieldsModel
+	public function getCustomFields(bool|null $asText = null): CustomFieldsModel
 	{
 
 		if(!isset($asText)) {
@@ -53,6 +53,10 @@ trait CustomFieldsTrait {
 		$this->customFieldsModel->returnAsText($asText);
 
 		return $this->customFieldsModel;
+	}
+
+	public function customFieldsModelId() : string|int|null {
+		return $this->id();
 	}
 
   /**

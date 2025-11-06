@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_user` (
 	`color` VARCHAR(21) NOT NULL,
 	`sortOrder` INT NOT NULL DEFAULT 0,
 	`timeZone` VARCHAR(45) NULL,
+	`syncToDevice` TINYINT(1) NOT NULL DEFAULT 1,
 	`includeInAvailability` ENUM('all', 'attending', 'none') NOT NULL,
 	`modSeq` INT NOT NULL DEFAULT 0,
 	PRIMARY KEY (`id`, `userId`),
@@ -197,7 +198,6 @@ CREATE TABLE IF NOT EXISTS `calendar_participant` (
 	`rolesMask` INT NOT NULL DEFAULT 0,
 	`language` VARCHAR(20),
 	`participationStatus` ENUM('needs-action', 'tentative', 'accepted', 'declined', 'delegated') NULL DEFAULT 'needs-action',
-	`scheduleAgent` ENUM('server', 'client', 'none') DEFAULT 'server',
 	`expectReply` TINYINT(1) NOT NULL DEFAULT 0,
 	`scheduleUpdated` DATETIME NULL,
 	`scheduleStatus` varchar(255) DEFAULT NULL,
@@ -425,17 +425,22 @@ INSERT INTO calendar_calendar
   cal_calendars cal LEFT JOIN cal_calendar_user_colors cu ON cal.id = cu.calendar_id GROUP BY cal.id;
 
 -- subscribe to calendars user has access to
+-- INSERT IGNORE INTO calendar_calendar_user
+-- (id, userId, isSubscribed, isVisible, color, sortOrder, timeZone, includeInAvailability, modSeq)
+-- SELECT
+--     cal.id, ug.userId, 1, 1, IFNULL(background,SUBSTRING('#CDAD00#E74C3C#9B59B6#8E44AD#2980B9#3498DB#1ABC9C#16A085#27AE60#2ECC71#F1C40F#F39C12#E67E22#D35400#95A5A6#34495E#808B96#1652a1', (cal.id MOD 18) * 7 + 2 ,6)), 0, null, 'all', 1
+-- from core_acl_group ag
+--          inner join core_user_group ug on ug.groupId = ag.groupId
+--          inner join cal_calendars cal on cal.acl_id = ag.aclId
+-- where cal.group_id=1
+-- group by cal.id,ug.userId;
+
+-- subscribe only personal calendars
 INSERT IGNORE INTO calendar_calendar_user
 (id, userId, isSubscribed, isVisible, color, sortOrder, timeZone, includeInAvailability, modSeq)
 SELECT
-    cal.id, ug.userId, 1, 1, IFNULL(background,SUBSTRING('#CDAD00#E74C3C#9B59B6#8E44AD#2980B9#3498DB#1ABC9C#16A085#27AE60#2ECC71#F1C40F#F39C12#E67E22#D35400#95A5A6#34495E#808B96#1652a1', (cal.id MOD 18) * 7 + 2 ,6)), 0, null, 'all', 1
-from core_acl_group ag
-         inner join core_user_group ug on ug.groupId = ag.groupId
-         inner join cal_calendars cal on cal.acl_id = ag.aclId
-where cal.group_id=1
-group by cal.id,ug.userId;
-
-
+    cal.id, cal.user_id, 1, 1, IFNULL(background,SUBSTRING('#E91E63#FF9800#FFEB3B#CDDC39#2ECC71#009BC9#E1BEE7#7E5627#BDBDBD', (cal.id MOD 9) * 7 + 2 ,6)), 0, null, 'all', 1
+    from cal_calendars cal where cal.group_id=1;
 
 
 INSERT IGNORE INTO calendar_default_alert_with_time
@@ -473,7 +478,7 @@ SELECT
 FROM cal_events WHERE exception_for_event_id = -1 GROUP BY uuid;
 
 
-INSERT INTO calendar_calendar_event
+INSERT IGNORE INTO calendar_calendar_event
 (id, eventId, calendarId)
 SELECT null, ce.eventId, e.calendar_id
 FROM cal_events e
@@ -481,7 +486,7 @@ inner join calendar_event ce on ce.uid = e.uuid
 WHERE e.exception_for_event_id = 0 and ce.recurrenceId is null;
 
 
-INSERT INTO calendar_calendar_event
+INSERT IGNORE INTO calendar_calendar_event
 (id, eventId, calendarId)
 SELECT null, ce.eventId, e.calendar_id
 FROM cal_events e
@@ -490,7 +495,7 @@ WHERE e.exception_for_event_id = -1 and ce.recurrenceId is not null;
 
 INSERT INTO calendar_event_alert
 	(id, `offset`, relativeTo, fk, userId) SELECT
-	1, CONCAT('PT',reminder,'S'), 'start', id, user_id FROM cal_events WHERE (start_time > unix_timestamp() or repeat_end_time > unix_timestamp()) AND exception_for_event_id = 0 AND reminder IS NOT NULL;
+	1, CONCAT('-PT',reminder,'S'), 'start', id, user_id FROM cal_events WHERE (start_time > unix_timestamp() or repeat_end_time > unix_timestamp()) AND exception_for_event_id = 0 AND reminder IS NOT NULL;
 
 INSERT INTO calendar_event_category
 	(eventId, categoryId) SELECT
@@ -508,14 +513,14 @@ INSERT INTO calendar_event_user
 -- skip per-user properties of events without organizer
 
 INSERT INTO calendar_participant
-	(id, eventId, name, email, kind, rolesMask, participationStatus, scheduleAgent, expectReply, scheduleUpdated) SELECT
-	id, event_id, name, email, 'individual', IF(role='REQ-PARTICIPANT',2,0)+is_organizer, LOWER(p.status),'server',1,FROM_UNIXTIME(IF(last_modified='',0, last_modified)) FROM cal_participants p JOIN calendar_event ce ON ce.eventId = event_id;
+	(id, eventId, name, email, kind, rolesMask, participationStatus, expectReply, scheduleUpdated) SELECT
+	id, event_id, name, email, 'individual', IF(role='REQ-PARTICIPANT',2,0)+is_organizer, LOWER(p.status),1,FROM_UNIXTIME(IF(last_modified='',0, last_modified)) FROM cal_participants p JOIN calendar_event ce ON ce.eventId = event_id;
 
 
 INSERT INTO calendar_participant
-(id, eventId, name, email, kind, rolesMask, participationStatus, scheduleAgent, expectReply, scheduleUpdated) SELECT
+(id, eventId, name, email, kind, rolesMask, participationStatus, expectReply, scheduleUpdated) SELECT
 CONCAT('Calendar:',c.id), r.id as eventId, c.name,u.email , 'resource', 0 ,
-IF(MIN(e.status) = 'CONFIRMED', 'accepted', LOWER(MIN(e.status))), 'server',1,
+IF(MIN(e.status) = 'CONFIRMED', 'accepted', LOWER(MIN(e.status))), 1,
 FROM_UNIXTIME(IF(MAX(e.mtime)='',0, MAX(e.mtime))) FROM cal_events e
 	 JOIN cal_calendars c ON e.calendar_id = c.id
 	 JOIN core_user u ON c.user_id = u.id
@@ -533,3 +538,8 @@ DELETE l FROM core_link l
 DELETE l FROM core_link l
 	JOIN core_entity et ON et.id = l.toEntityTypeId AND et.name = 'CalendarEvent'
 	LEFT JOIN cal_events e on e.id = l.toId WHERE e.id IS NULL;
+
+-- set new entity id for existing alerts
+DELETE a FROM core_alert a
+	JOIN core_entity et ON et.id = a.entityTypeId AND et.name = 'CalendarEvent'
+	LEFT JOIN cal_events e on e.id = a.entityId WHERE e.id IS NULL;

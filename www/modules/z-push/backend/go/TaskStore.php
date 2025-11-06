@@ -224,17 +224,8 @@ class TaskStore extends Store {
 				}
 			}
 
-			//		$message->utcduedate;
-			//    $message->regenerate;
-			//    $message->deadoccur;
-			//    $message->reminderset;
-			//    $message->sensitivity;
-			//    $message->utcstartdate;
-			//    $message->rtf;
-			//    $message->categories;
-
 			// When a task is created on today, then the start time needs to be fixed.
-			if ($task->start > $task->due) {
+			if (isset($task->due) && isset($task->start) && $task->start > $task->due) {
 				$task->start = $task->due;
 			}
 
@@ -284,8 +275,7 @@ class TaskStore extends Store {
 		$tasks =  Task::find()
 			->select('task.id, UNIX_TIMESTAMP(task.modifiedAt) AS `mod`, "1" AS flags')
 			->fetchMode(PDO::FETCH_ASSOC)
-			->filter(["permissionLevel" => Acl::LEVEL_READ])
-			->where('tasklistId','=', $folderid);
+			->filter(["permissionLevel" => Acl::LEVEL_READ, "tasklistId" => $folderid]);
 
 		if (!empty($cutoffdate)) {
 			ZLog::Write(LOGLEVEL_DEBUG, 'Client sent cutoff date for tasks: ' . \GO\Base\Util\Date::get_timestamp($cutoffdate));
@@ -343,7 +333,7 @@ class TaskStore extends Store {
 		ZLog::Write(LOGLEVEL_DEBUG, "GetFolder($id)");
 
 		$tasklist = TaskList::findById($id);
-		if(!$tasklist || !$tasklist->hasPermissionLevel(Acl::LEVEL_READ)) {
+		if(!$tasklist || !$tasklist->hasPermissionLevel(Acl::LEVEL_READ) || !$tasklist->syncToDevice) {
 			ZLog::Write(LOGLEVEL_WARN, "GetFolder($id) not found or no permissions");
 			return false;
 		}
@@ -367,11 +357,9 @@ class TaskStore extends Store {
 
 		$tasklists = TaskList::find()
 			->selectSingleValue('tasklist.id')
-			->join("sync_tasklist_user", "u", "u.tasklistId = tasklist.id")
-			->andWhere('u.userId', '=', go()->getAuthState()->getUserId())
-			->filter([
-				"permissionLevel" => Acl::LEVEL_READ
-			]);
+			->andWhere('role', '=',1)
+			->andWhere('isSubscribed', '=', 1)
+			->andWhere('syncToDevice', '=', 1);
 
 		foreach($tasklists as $tasklistId) {
 			$folder = $this->StatFolder($tasklistId);
@@ -382,7 +370,6 @@ class TaskStore extends Store {
 		return $folders;
 	}
 
-	private $notificationStmt;
 
 	public function getNotification($folder = null) {
 

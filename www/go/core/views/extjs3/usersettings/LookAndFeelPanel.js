@@ -31,6 +31,12 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				{xtype:'radiogroup',
 				name:'theme',
 				value: GO.settings.config.theme,
+				// live update theme can be used when ExtJs is fased out.
+				// listeners: {
+				// 	'change':(me, selectedItem) => {
+				// 		document.documentElement.cls('compact',selectedItem.inputValue === 'Compact');
+				// 	}
+				// },
 				items: [
 					{inputValue: 'Paper', boxLabel: t('Paper')},
 					{inputValue: 'Compact', boxLabel: t('Compact')}
@@ -55,17 +61,18 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					}
 					}},
 				{xtype:'container', cls: 'go-theme-color', defaults: {
-					enableToggle:true,
-					handler: function(me,ev) {
-						const hiddenField = this.ownerCt.previousSibling();
-						hiddenField.setValue(me.inputValue);
-					}
+						enableToggle:true,
+						handler: function(me,ev) {
+							const hiddenField = this.ownerCt.previousSibling();
+							hiddenField.setValue(me.inputValue);
+						}
+					},
+					items: [
+						{xtype:'button', inputValue: 'light', cls:'mode-light', tooltip:t('Light')},
+						{xtype:'button', inputValue: 'dark', cls:'mode-dark', tooltip:t('Dark')},
+						{xtype:'button', inputValue: 'system', cls:'mode-system', tooltip:t('System default')}
+					]
 				},
-				items: [
-					{xtype:'button', inputValue: 'light', cls:'mode-light', tooltip:t('Light')},
-					{xtype:'button', inputValue: 'dark', cls:'mode-dark', tooltip:t('Dark')},
-					{xtype:'button', inputValue: 'system', cls:'mode-system', tooltip:t('System default')}
-				]},
 				{xtype:'container',layout: 'hbox',defaults: {style:'width:33%;text-align:center;'},items:[
 						{html: t('Light')},
 						{html: t('Dark')},
@@ -316,56 +323,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					}
 			]
 		});
-		
-		this.soundsFieldset = new Ext.form.FieldSet({
-			labelWidth:dp(160),
-			title: t('Sounds','users','core'),
-			items:[
-				
-				this.cbMuteAll = new Ext.ux.form.XCheckbox({
-					hideLabel: true,
-					boxLabel: t("Mute all sounds", "users", "core"),
-					name: 'mute_sound',
-					listeners:{
-						check: function(cb, val){
-							if(val)	{
-								this.cbMuteNewMailSound.disable();
-								this.cbMuteReminderSound.disable();
-							}	else {
-								this.cbMuteNewMailSound.enable();
-								this.cbMuteReminderSound.enable();
-							}
-						},scope:this
-					}
-				}),
-				
-				this.cbMuteReminderSound = new Ext.ux.form.XCheckbox({
-					hideLabel:true,
-					boxLabel: t("Mute reminder sounds", "users", "core"),
-					name: 'mute_reminder_sound'
-				}),
 
-				this.cbMuteNewMailSound = new Ext.ux.form.XCheckbox({
-					hideLabel: true,
-					boxLabel: t("Mute new mail sounds", "users", "core"),
-					name: 'mute_new_mail_sound'
-				})
-			]
-		});
-		
-		this.notificationsFieldset = new Ext.form.FieldSet({
-			labelWidth:dp(160),
-			title: t('Notifications','users','core'),
-			items:[
-
-				this.cbEmailReminders = new Ext.ux.form.XCheckbox({
-					hideLabel: true,
-					boxLabel: t("Mail reminders", "users", "core"),
-					name: 'mail_reminders'
-				})
-				
-			]
-		});
 	
 		Ext.apply(this,{
 			title:t('Look & feel','users','core'),
@@ -378,7 +336,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					mobile: {
 						columnWidth: 1
 					},
-					items:[this.globalFieldset,this.regionFieldset
+					items:[this.globalFieldset
 						
 						,{
 						xtype:'button',
@@ -394,7 +352,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					mobile: {
 						columnWidth: 1
 					},
-					items: [this.formattingFieldset,this.soundsFieldset,this.notificationsFieldset]
+					items: [this.formattingFieldset,this.regionFieldset]
 				}
 			]
 		});

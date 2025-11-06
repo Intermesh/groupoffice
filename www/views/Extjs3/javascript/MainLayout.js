@@ -81,8 +81,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	 */
 	boot : async function() {
 
-		window.GOUI = await import(BaseHref + "views/goui/dist/goui/script/index.js");
-		window.groupofficeCore = await import(BaseHref + "views/goui/dist/groupoffice-core/script/index.js");
+		window.GOUI = await import(BaseHref + "views/goui/dist/goui/script/index.js?v=" + GO.version);
+		window.groupofficeCore = await import(BaseHref + "views/goui/dist/groupoffice-core/script/index.js?v=" + GO.version);
 
 		var me = this;
 		go.browserStorage.connect().finally(function() {
@@ -311,6 +311,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				expires: new Date(new Date().getTime()+(1000*60*60*24*30)), //30 days
 			}));
 		}
+		document.documentElement.cls('compact',go.User.theme === 'Compact');
+		window.GOUI.DateTime.staticInit(go.User.language.substring(0,2), go.User.firstWeekday);
+
+		GO.util.density = parseFloat(window.getComputedStyle(document.documentElement).fontSize) / 10;
 
 		var me = this;
 
@@ -633,6 +637,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		var menuItemConfig;
 
 		this.state = Ext.state.Manager.get('open-modules');
+		// if(!this.state) {
+		// 	this.state = go.Modules.getAvailable().filter(m => m.showByDefault).map(m => m.name);
+		// }
 
 		for (var i = 0, l = allPanels.length; i < l; i++) {
 

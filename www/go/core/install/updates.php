@@ -1736,3 +1736,57 @@ group by u.id;');
 $updates['202503271129'][] = "alter table core_module drop key name;";
 $updates['202503271129'][] = "alter table core_module add constraint name unique (name, package);";
 $updates['202503271129'][] = "ALTER TABLE `core_alert` ADD COLUMN `staleAt` DATETIME NULL AFTER `triggerAt`;";
+
+
+$updates['202505301440'][] = function() {
+	$stmt = go()->getDbConnection()
+		->select("id,name,isUserGroupFor")
+		->from("core_group")
+		->where('isUserGroupFor', '!=', null)
+		->orderBy(['isUserGroupFor' => 'ASC', 'name' => 'ASC']);
+
+	$lastIsUserGroupFor = -1;
+	foreach($stmt as $row) {
+		if($lastIsUserGroupFor == $row['isUserGroupFor']) {
+			go()->getDbConnection()
+				->delete("core_group", (new Query())->where('id', '=', $row['id']))
+				->execute();
+		}
+
+		$lastIsUserGroupFor  = $row['isUserGroupFor'];
+	}
+
+};
+
+
+
+$updates['202509121219'][] = "update core_group set createdBy=isUserGroupFor where isUserGroupFor is not null;";
+
+$updates['202509121219'][] = "update core_acl a inner join core_group g on a.id=g.aclId set a.ownedBy=g.isUserGroupFor where g.isUserGroupFor is not null;";
+
+$updates['202509121219'][] = "insert ignore into core_acl_group select a.id,g.id, '50' from core_acl a inner join core_group g on g.isUserGroupFor = a.ownedBy  where ownedBy > 1;";
+
+$updates['202509121219'][] = function() {
+
+	echo "Fixing duplicate user groups..\n";
+	$stmt = go()->getDbConnection()
+		->select("id,isUserGroupFor")
+		->from('core_group')
+		->where('isUserGroupFor is not null');
+
+	$lastIsUserGroupFor = null;
+	foreach($stmt as $g) {
+		if($g['isUserGroupFor'] == $lastIsUserGroupFor) {
+			go()->getDbConnection()
+				->update('core_group', ['isUserGroupFor' => null], ['id' => $g['id']])
+				->execute();
+		}
+
+		$lastIsUserGroupFor = $g['isUserGroupFor'];
+	}
+
+
+};
+
+$updates['202510301100'][] = "insert into core_cron_job (moduleId,name, expression, description) values ((select id from core_module where name='core'), 'EmailAlerts', '* * * * *', 'Email alerts')";
+$updates['202510301100'][] = "ALTER TABLE `core_alert` ADD COLUMN `isSent` TINYINT(1) NOT NULL DEFAULT 0 AFTER `sendMail`;";

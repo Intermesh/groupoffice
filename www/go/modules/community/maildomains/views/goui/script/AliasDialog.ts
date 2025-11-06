@@ -1,11 +1,12 @@
 import {
-	checkbox,
-	comp,
-	DefaultEntity, fieldset,
-	t, textarea, TextField,
+	autocompletechips,
+	checkbox, chips, column,
+	comp, datasourcestore,
+	DefaultEntity, fieldset, listStoreType, storeRecordType,
+	t, table, textarea, TextField,
 	textfield
 } from "@intermesh/goui";
-import {FormWindow} from "@intermesh/groupoffice-core";
+import {FormWindow, jmapds} from "@intermesh/groupoffice-core";
 
 export class AliasDialog extends FormWindow {
 	private domainFld: TextField;
@@ -36,12 +37,43 @@ export class AliasDialog extends FormWindow {
 						icon: "alternate_email"
 					}),
 				),
-				textarea({
-					autoHeight: true,
-					name: "goto",
-					id: "goto",
+				autocompletechips({
+					name: "recipients",
+					id: "recipients",
 					label: t("Goto"),
-					hint: t("For multiple recipients use a comma separated list eg. alias1@domain.com,alias2@domain.com")
+					listeners: {
+						autocomplete: ({target, input}) => {
+
+							target.list.store.setFilter("search", {text: input, domainId: this.form.value.domainId});
+							void target.list.store.load();
+						}
+					},
+
+					textInputToValue: async text => {
+						return text;
+					},
+
+					pickerRecordToValue (field, record) : any {
+						return record.username;
+					},
+
+					list: table({
+						fitParent: true,
+						headers: false,
+						store: datasourcestore({
+							dataSource: jmapds("MailBox"),
+							queryParams: {
+								limit: 50
+							},
+							sort: [{property: "username", isAscending: true}]
+						}),
+						columns: [
+							column({
+								header: t("Username"),
+								id: "username"
+							})
+						]
+					})
 				}),
 				checkbox({
 					label: t("Active"),
@@ -75,9 +107,9 @@ export class AliasDialog extends FormWindow {
 			}
 		});
 
-		this.form.on("beforesave", (f, v) => {
+		this.form.on("beforesave", ({data}) => {
 			if(!this.form.currentId) {
-				v.address = v.address + "@" + this.form.findField("domain")!.value;
+				data.address = data.address + "@" + this.form.findField("domain")!.value;
 			}
 		});
 	}

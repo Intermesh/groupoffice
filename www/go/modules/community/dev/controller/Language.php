@@ -12,6 +12,9 @@ use go\core\jmap\Response;
 use go\core\Language as LangModel;
 use function GO;
 
+/**
+ *
+ */
 class Language extends Controller {
 
 	private $handle;
@@ -44,6 +47,25 @@ class Language extends Controller {
 		$this->nl->setLanguage("nl");
 	}
 
+	/**
+	 * Export language from source files
+	 *
+	 * Run this command to export language. LibreTranslate runs locally and
+	 * will be used to machine translate the missing string:
+	 *
+	 * ```
+	 * docker compose exec groupoffice php www/cli.php community/dev/Language/export --language=nl --translate --missingOnly | tee nl-missing.csv
+	 * ```
+	 *
+	 * Import language file:
+	 * ```
+	 * docker compose exec groupoffice php www/cli.php community/dev/Language/import --path=lang.csv
+	 * ```
+	 *
+	 * @param $params
+	 * @return void
+	 * @throws \Exception
+	 */
 	public function export($params) {
 
 		$this->translate = !empty($params['translate']);
@@ -72,7 +94,10 @@ class Language extends Controller {
 				"module",
 				"EN",
 				go()->getLanguage()->getIsoCode()
-		], self::DELIMITER, self::ENCLOSURE);
+		], self::DELIMITER,
+			self::ENCLOSURE,
+		""
+		);
 
 		$core = [];
 		foreach ($coreFiles as $file) {
@@ -164,7 +189,7 @@ class Language extends Controller {
 							!isset($translatedItem) ? $this->translateAPI($stringItem) : $translatedItem
 					];
 					if(!$this->missingOnly || !isset($translatedItem) ) {
-						fputcsv($this->handle, $fields, self::DELIMITER, self::ENCLOSURE);
+						fputcsv($this->handle, $fields, self::DELIMITER, self::ENCLOSURE, "");
 					}
 				}
 			} else {
@@ -180,7 +205,7 @@ class Language extends Controller {
 				];
 
 				if(!$this->missingOnly || $translated == null) {
-					fputcsv($this->handle, $fields, self::DELIMITER, self::ENCLOSURE);
+					fputcsv($this->handle, $fields, self::DELIMITER, self::ENCLOSURE, "");
 				}
 			}
 		}

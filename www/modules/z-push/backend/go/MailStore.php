@@ -37,6 +37,9 @@ class MailStore extends Store implements ISearchProvider {
 			//$this->imap_reopenFolder($folderid);
 
 			$imap = $this->_imapLogon();
+			if(!$imap) {
+				return false;
+			}
 
 			//remove m/ from the combined stuff
 			if (!empty($folderid)) {
@@ -70,7 +73,7 @@ class MailStore extends Store implements ISearchProvider {
 				return $this->StatFolder($newname);
 			} else
 				return false;
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2MAIL::EXCEPTION ~~ ' .  $e->getMessage());
 			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 			return false;
@@ -268,7 +271,12 @@ class MailStore extends Store implements ISearchProvider {
 				}
 
 				if($imapMessage->mailbox != $imapAccount->sent) {
-					$this->processCalendarInvite($message, $imapMessage);
+					try {
+						$this->processCalendarInvite($message, $imapMessage);
+					}catch (Exception $e) {
+						ZLog::Write(LOGLEVEL_ERROR, 'ZPUSH2MAIL::EXCEPTION In handling scheduling ~~ ' .  $e->getMessage());
+						ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
+					}
 				}
 
 				$imapMessage->autoLink();
@@ -280,7 +288,7 @@ class MailStore extends Store implements ISearchProvider {
 			//ZLog::Write(LOGLEVEL_DEBUG, 'goMail->GetMessage::MESSAGE = '.var_export($message,true));
 
 			return $message;
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2MAIL::EXCEPTION ~~ ' .  $e->getMessage());
 			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 			return false;
@@ -559,7 +567,7 @@ class MailStore extends Store implements ISearchProvider {
 			   }
 		   }
 
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2MAIL::EXCEPTION ~~ ' .  $e->getMessage());
 			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 		}
@@ -639,7 +647,7 @@ class MailStore extends Store implements ISearchProvider {
 		if(!$imap)
 			return false;
 
-		$uidnext = $imap->get_uidnext();
+		$uidnext = $imap->get_uidnext($this->_replaceDotWithServerDelimiter($newfolderid));
 		
 		if(!$imap->move(array($id), $this->_replaceDotWithServerDelimiter($newfolderid))) {
 			return false;
@@ -746,7 +754,7 @@ class MailStore extends Store implements ISearchProvider {
 				}
 			}
 			return $messages;
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2MAIL::EXCEPTION ~~ ' .  $e->getMessage());
 			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 			return [];
@@ -896,7 +904,7 @@ class MailStore extends Store implements ISearchProvider {
 	* @throws StatusException
 	*/
 	public function SendMail($sm){
-		
+
 		$success=false;
 		
 		ZLog::Write(LOGLEVEL_DEBUG, 'goMail->SendMail()');
@@ -927,12 +935,7 @@ class MailStore extends Store implements ISearchProvider {
 				return true; //if we throuw status exception here then iphone will fail with a wbxmlexception
 			}
 			
-			ZLog::Write(LOGLEVEL_DEBUG, 'beforeloadmime');
-//			ZLog::Write(LOGLEVEL_DEBUG, var_export($sm->mime, true));
-			$sendMessage = \GO\Base\Mail\Message::newInstance()->loadMimeMessage($sm->mime);
-			
-			//free up memory
-			unset($sm->mime);
+
 			
 			// Mark old mail as Forwarded
 			if($forward){
@@ -949,61 +952,21 @@ class MailStore extends Store implements ISearchProvider {
 			}
 			
 			ZLog::Write(LOGLEVEL_DEBUG, 'afterforwardreply');
-			
-			$refImapMessage = false;
-			if($oldMessageUID && $oldMessageFolderID) {
-				ZLog::Write(LOGLEVEL_DEBUG, 'goMail->SendMail()~~INCLUDE OLD MESSAGE');
-				$refImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($imapAccount, $oldMessageFolderID, $oldMessageUID);
-				
-				if($refImapMessage) {
-					$sendMessage->setInReplyTo($refImapMessage->message_id);
-					$sendMessage->setReferences($refImapMessage->message_id);
-				}
+
+
+			preg_match('/^content-type: \s*([^\s;]+)/i', $sm->mime, $matches);
+
+			$contentType = $matches[1] ?? "unknown";
+			ZLog::Write(LOGLEVEL_DEBUG, 'Content-Type: ' . $contentType);
+			switch($contentType) {
+				case 'multipart/signed':
+				case 'multipart/encrypted':
+				case 'application/pkcs7-mime':
+				case 'application/x-pkcs7-mime':
+					$this->rawSend($sm, $imapAccount);
+				default:
+					$this->loadMime($oldMessageUID, $oldMessageFolderID, $sm, $imapAccount, $smart, $forward);
 			}
-			
-	//		// Include the old message to this new one./
-			if($refImapMessage && !$smart) {
-				ZLog::Write(LOGLEVEL_DEBUG, 'goMail->SendMail()~~INCLUDE OLD MESSAGE');
-				$refImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($imapAccount, $oldMessageFolderID, $oldMessageUID);
-				
-				if($refImapMessage){
-					$refImapMessage->createTempFilesForAttachments();
-
-					$body = $sendMessage->getBody();
-					$body .= "\r\n\r\n";
-					$body .= $refImapMessage->getHtmlBody();
-
-					$sendMessage->setHtmlAlternateBody($body);
-
-					// Only attach the attachments of the old message when we forward the mail
-					if($forward){
-						ZLog::Write(LOGLEVEL_DEBUG, 'goMail->SendMail()~~ATTACH OLD ATTACHMENTS');
-						$attachments = $refImapMessage->getAttachments();
-						//re-attach attachments
-						foreach ($attachments as $attachment) {		
-							$file = new \GO\Base\Fs\File(GO::config()->tmpdir.$attachment->getTempFile());				
-							$att = \go\core\mail\Attachment::fromPath($file->path(),$file->mimeType());
-							$sendMessage->attach($att);			
-						}
-					}
-				}else
-				{
-					ZLog::Write(LOGLEVEL_WARN, 'Could not find IMAP message for reply or forward!');
-				}
-			}
-		
-			// Implement to always set the GO alias to sent emails
-			$alias = $imapAccount->getDefaultAlias();
-			$sendMessage->setFrom($alias->email, $alias->name);
-			$sendMessage->getMailer()->setEmailAccount($imapAccount);
-			ZLog::Write(LOGLEVEL_DEBUG, 'beforesend');
-			$sendMessage->send();
-			ZLog::Write(LOGLEVEL_DEBUG, 'goMail->SendMail()~~SEND~~'.$success);
-			//if a sent items folder is set in the account then save it to the imap folder
-
-			$imapAccount->saveToSentItems($sendMessage);
-
-			ZLog::Write(LOGLEVEL_DEBUG, 'MAIL IS SENT SUCCESSFULLY::::::::'.$success);
 		}
 		catch (Exception $e){
 			ZLog::Write(LOGLEVEL_FATAL, 'goMail->SendMail() ~~ ERROR:'.$e);
@@ -1014,6 +977,85 @@ class MailStore extends Store implements ISearchProvider {
 		ZLog::Write(LOGLEVEL_DEBUG, 'endsend: '.var_export($success, true));
 		
 		return true;
+	}
+
+
+	private function loadMime($oldMessageUID, $oldMessageFolderID, $sm, $imapAccount, $smart, $forward) {
+		ZLog::Write(LOGLEVEL_DEBUG, 'beforeloadmime');
+//			ZLog::Write(LOGLEVEL_DEBUG, var_export($sm->mime, true));
+		$sendMessage = \GO\Base\Mail\Message::newInstance()->loadMimeMessage($sm->mime);
+
+		//free up memory
+		unset($sm->mime);
+
+		$refImapMessage = false;
+		if($oldMessageUID && $oldMessageFolderID) {
+			ZLog::Write(LOGLEVEL_DEBUG, 'goMail->SendMail()~~INCLUDE OLD MESSAGE');
+			$refImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($imapAccount, $oldMessageFolderID, $oldMessageUID);
+
+			if($refImapMessage) {
+				$sendMessage->setInReplyTo($refImapMessage->message_id);
+				$sendMessage->setReferences($refImapMessage->message_id);
+			}
+		}
+
+		//		// Include the old message to this new one./
+		if($refImapMessage && !$smart) {
+			ZLog::Write(LOGLEVEL_DEBUG, 'goMail->SendMail()~~INCLUDE OLD MESSAGE');
+			$refImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($imapAccount, $oldMessageFolderID, $oldMessageUID);
+
+			if($refImapMessage){
+				$refImapMessage->createTempFilesForAttachments();
+
+				$body = $sendMessage->getBody();
+				$body .= "\r\n\r\n";
+				$body .= $refImapMessage->getHtmlBody();
+
+				$sendMessage->setHtmlAlternateBody($body);
+
+				// Only attach the attachments of the old message when we forward the mail
+				if($forward){
+					ZLog::Write(LOGLEVEL_DEBUG, 'goMail->SendMail()~~ATTACH OLD ATTACHMENTS');
+					$attachments = $refImapMessage->getAttachments();
+					//re-attach attachments
+					foreach ($attachments as $attachment) {
+						$file = new \GO\Base\Fs\File(GO::config()->tmpdir.$attachment->getTempFile());
+						$att = \go\core\mail\Attachment::fromPath($file->path(),$file->mimeType());
+						$sendMessage->attach($att);
+					}
+				}
+			}else
+			{
+				ZLog::Write(LOGLEVEL_WARN, 'Could not find IMAP message for reply or forward!');
+			}
+		}
+
+		// Implement to always set the GO alias to sent emails
+		$alias = $imapAccount->getDefaultAlias();
+		$sendMessage->setFrom($alias->email, $alias->name);
+		$sendMessage->getMailer()->setEmailAccount($imapAccount);
+		ZLog::Write(LOGLEVEL_DEBUG, 'beforesend');
+		$sendMessage->send();
+		ZLog::Write(LOGLEVEL_DEBUG, 'goMail->SendMail()~~SEND~~');
+		//if a sent items folder is set in the account then save it to the imap folder
+
+		$imapAccount->saveToSentItems($sendMessage);
+
+		ZLog::Write(LOGLEVEL_DEBUG, 'MAIL IS SENT SUCCESSFULLY::::::::');
+	}
+
+	private function rawSend($sm, \GO\Email\Model\Account $imapAccount) {
+
+		ZLog::Write(LOGLEVEL_DEBUG, 'SEND MIME AS IS...');
+
+		$mailer = new \go\core\mail\Mailer();
+		$mailer->setEmailAccount($imapAccount);
+		if($mailer->sendMime($sm->mime)) {
+			$imapAccount->saveStrToSentItems($sm->mime);
+		}
+
+		ZLog::Write(LOGLEVEL_DEBUG, 'MAIL IS SENT SUCCESSFULLY::::::::');
+
 	}
 
 
@@ -1205,6 +1247,10 @@ class MailStore extends Store implements ISearchProvider {
 
 	private function processCalendarInvite(SyncMail $message, \GO\Email\Model\ImapMessage $imapMessage)
 	{
+		// old framework sets user timezone :(
+		date_default_timezone_set("UTC");
+
+		// TODO this is inefficient because it reads the icalendar twice
 		$vcalendar = $imapMessage->getInvitationVcalendar();
 		if(!$vcalendar) {
 			return;
@@ -1294,7 +1340,7 @@ class MailStore extends Store implements ISearchProvider {
 			$message->meetingrequest->endtime = $vevent->dtend->getDateTime()->format("U");
 		} else if(isset($vevent->duration)) {
 			try {
-				$message->meetingrequest->endtime = $vevent->dtstart->getDateTime()->add(new DateInterval($vevent->duration));
+				$message->meetingrequest->endtime = (clone $vevent->dtstart->getDateTime())->add(new DateInterval($vevent->duration))->format("U");
 			} catch(Exception $e) {
 				ZLog::Write(LOGLEVEL_WARN, "Failed to add duration: " . $vevent->duration ." :" . $e->getMessage());
 				$message->meetingrequest->endtime = $message->meetingrequest->starttime + 3600;

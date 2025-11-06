@@ -13,6 +13,8 @@ GO.mainLayout.onReady(function(){
 				GO.debug = true;
 				
 				Ext.Ajax.defaultHeaders['X-Debug'] = "1";
+
+				window.groupofficeCore.client.defaultHeaders["X-Debug"] = "1";
 			}
 		});
 });

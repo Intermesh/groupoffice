@@ -143,6 +143,14 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 
 		this.templateConfig.panel=this;
 
+
+		this.on("add", (dp, item) => {
+
+			if (item.hiddenOnInit === undefined) {
+				item.hiddenOnInit = !!item.hidden;
+			}
+		});
+
 		/*
 		 * id is the dom id of the element that needs to hidden or showed
 		 * dataKey is a reference name for the data that needs to be fetched from
@@ -170,6 +178,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		
 		
 		this.mainItem = new Ext.Panel({
+			hiddenOnInit: false,
 			listeners: {
 				render: function() {
 					this.mainItem.body.on('click', this.onBodyClick, this);
@@ -234,12 +243,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		
 		
 		this.items.each(function (item, index, length) {
-
-			if (item.hiddenOnInit === undefined) {
-				item.hiddenOnInit = item.hidden;
-			}
-
-			this.hide();
+			item.hide();
 		}, this);
 		
 

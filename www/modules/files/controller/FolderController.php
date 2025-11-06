@@ -154,10 +154,12 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		\GO\Files\Model\SharedRootFolder::model()->rebuildCache(\GO::user()->id);
 	}
 
-	protected function actionSyncFilesystem($params){	
+	protected function actionSyncFilesystem(array $params)
+	{
 		
-		if(!$this->isCli() && !\GO::user()->isAdmin())
+		if(!$this->isCli() && !\GO::user()->isAdmin()) {
 			throw new \GO\Base\Exception\AccessDenied();
+		}
 		
 		$oldAllowDeletes = \GO\Base\Fs\File::setAllowDeletes(false);
 
@@ -175,7 +177,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 			$folders = go()->getDbConnection()->selectSingleValue('name')
 				->from('fs_folders')
-				->where('(parent_id=0 OR parent_id is null) and name != "billing" and name != "email"')
+				->where('(parent_id=0 OR parent_id is null) and name != "billing" and name != "email" and name != "trash"')
 				->all();
 
 			$billingFolder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path.'billing');
@@ -842,7 +844,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				return $this->_listShares($params);
 			} elseif ($params['folder_id'] == 'trash') {
 				return $this->listTrash($params);
-//				$folder = Folder::model()->findByPath('trash');
 			} else {
 				$folder = Folder::model()->findByPk($params['folder_id']);
 			}
@@ -863,7 +864,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$user = $folder->quotaUser;
 		$this->_listFolderPermissionLevel=$folder->permissionLevel;
 
-		$response['permission_level']=$folder->permissionLevel;//$folder->readonly ? \GO\Base\Model\Acl::READ_PERMISSION : $folder->permissionLevel;
+		$response['permission_level']=$folder->permissionLevel;
 
 		if(empty($params['skip_fs_sync']) && empty(GO::config()->files_disable_filesystem_sync))
 			$folder->checkFsSync();
@@ -1005,7 +1006,13 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		$findParams = \GO\Base\Db\FindParams::newInstance()
 			->order(new \go\core\db\Expression('name COLLATE utf8mb4_unicode_ci ASC'));
-
+		if (isset($params['sort'])) {
+			if($params['sort'] == 'deletedByUser') {
+				$findParams->order("t.deletedBy", $params['dir']);
+			} else {
+				$findParams->order("t." . $params['sort'], $params['dir']);
+			}
+		}
 		$store = new \GO\Base\Data\DbStore('GO\Files\Model\TrashedItem',$cm, $params, $findParams);
 		$response = $store->getData();
 		$response['permission_level'] = \GO\Base\Model\Acl::READ_PERMISSION;
@@ -1879,9 +1886,12 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 				$index++;
 
+				$isHeic = $file->extension == 'heic' || $file->extension == 'heif';
+				$downloadUrl = $file->getDownloadURL(false);
 				$response['images'][]=array(
 					"name"=>$file->name,
-					"download_path"=>$file->getDownloadURL(false),
+					"download_path"=> $downloadUrl,
+					"full_size_url"=> !$isHeic ? $downloadUrl : $file->getThumbUrl(['noop' => true]),
 					"src"=>$file->getThumbUrl($thumbParams)
 				);
 			}

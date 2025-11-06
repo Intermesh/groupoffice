@@ -113,7 +113,7 @@ go.Modules = (function () {
 				{
 					allow = true;
 				}
-				if(allow && user.groups.indexOf(parseInt(groupId)) != -1) {
+				if(allow && user.groups.indexOf(groupId) != -1) {
 					return true;
 				}
 			}
@@ -199,7 +199,6 @@ go.Modules = (function () {
 
 			const store = go.Db.store("Module");
 
-			store.on("changes", this.onModuleChanges, this);
 
 			return store.query({
 				filter: {enabled: true}
@@ -262,6 +261,10 @@ go.Modules = (function () {
 				}
 
 				return Promise.all(promises).then(() => {
+
+
+					store.on("changes", this.onModuleChanges, this);
+
 					return this.entities;
 				});
 			});

@@ -30,7 +30,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			layout: 'hbox',
 			items:[
 				{
-					width: 150,					
+					width: dp(152),
 					items: [
 						this.avatarComp = new go.form.ImageField({			
 							name: 'avatarId'										
@@ -107,13 +107,14 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			title: t('Disk space'),
 			items: [{
 				xtype: 'compositefield',
+
+				hint: t("Setting '0' will disable uploads for this user. Leave this field empty to allow unlimited space."),
 				items: [{
 						xtype: 'numberfield',
 						name: 'disk_quota',
 						fieldLabel: t('Disk quota'),
 						decimals: 0,
-						width: dp(300),
-						hint: t("Setting '0' will disable uploads for this user. Leave this field empty to allow unlimited space.")
+						width: dp(180)
 					},{
 						xtype: 'displayfield',
 						value: 'MB'
@@ -297,6 +298,9 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 		this.usernameField.setDisabled(!visible);
 		this.passwordField1.setDisabled(!visible);
 		this.passwordField2.setDisabled(!visible);
+		this.emailField.setDisabled(!visible);
+
+		this.passwordFieldset.setVisible(visible);
 	},
 	
 	onValidate : function() {

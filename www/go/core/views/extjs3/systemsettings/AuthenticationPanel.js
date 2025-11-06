@@ -103,7 +103,8 @@ go.systemsettings.AuthenticationPanel = Ext.extend(go.systemsettings.Panel, {
 						}, {
 							xtype: "checkbox",
 							hideLabel: true,
-							boxLabel: t("Allow user registration requests by everyone. Be careful!"),
+							boxLabel: t("Allow creation of users through the API"),
+							hint: t("When enabled, you should restrict access for the 'Everyone' group as much as possible. Use with caution."),
 							name: "allowRegistration"
 						}
 					]

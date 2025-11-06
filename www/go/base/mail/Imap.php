@@ -616,6 +616,14 @@ class Imap extends ImapBodyStruct
 		//sometimes shared folders like "Other user.shared" are in the folder list
 		//but there's no "Other user" parent folder. We create a dummy folder here.
 		if(!isset($folders['INBOX']) && $isRoot){
+
+
+			if (!$listSubscribed && $namespace == "" && $pattern == "%" && empty($folders) && $this->has_capability("LIST-EXTENDED")) {
+				// unfortunately there are some buggy servers around that don't respond well to list-extended commands (eg. strato since 2025).
+				\GO::session()->values['imap_disable_capabilites_'.$this->server]='LIST-EXTENDED';
+				return $this->list_folders($listSubscribed, $withStatus, $namespace, $pattern, $isRoot);
+			}
+
 			$folders["INBOX"]=array(
 						'delimiter' => $delim,
 						'name' => 'INBOX',
@@ -650,6 +658,9 @@ class Imap extends ImapBodyStruct
 				}
 			}
 		}
+
+
+
 
 		\GO\Base\Util\ArrayUtil::caseInsensitiveSort($folders);
 
@@ -2685,9 +2696,9 @@ class Imap extends ImapBodyStruct
 
 		$this->clean($mailbox, 'mailbox');
 
-	    $command = "UID MOVE %s \"".$this->addslashes($this->utf7_encode($mailbox))."\"\r\n";
-	    $status = $this->_runInChunks($command, $uids);
-	    return $status;
+		$command = "UID MOVE %s \"".$this->addslashes($this->utf7_encode($mailbox))."\"\r\n";
+		$status = $this->_runInChunks($command, $uids);
+		return $status;
 
 	}
 
@@ -2862,24 +2873,22 @@ class Imap extends ImapBodyStruct
 	 * @return string the next UID on the IMAP server
 	 */
 
-	public function get_uidnext(){
+	public function get_uidnext($mailbox = null){
 
-		if(empty($this->selected_mailbox['uidnext'])){
-			$command = 'STATUS "'.$this->addslashes($this->utf7_encode($this->selected_mailbox['name'])).'" (UIDNEXT)'."\r\n";
-			$this->send_command($command);
-			$result = $this->get_response(false, true);
+		$command = 'STATUS "'.$this->addslashes($this->utf7_encode($mailbox ?? $this->selected_mailbox['name'])).'" (UIDNEXT)'."\r\n";
+		$this->send_command($command);
+		$result = $this->get_response(false, true);
 
-			$vals = array_shift($result);
-			if($vals){
-				foreach ($vals as $i => $v) {
-					if (intval($v) && isset($vals[($i - 1)]) && $vals[($i - 1)] == 'UIDNEXT') {
-						$this->selected_mailbox['uidnext'] = $v;
-					}
+		$vals = array_shift($result);
+		if($vals){
+			foreach ($vals as $i => $v) {
+				if (intval($v) && isset($vals[($i - 1)]) && $vals[($i - 1)] == 'UIDNEXT') {
+					return $v;
 				}
 			}
 		}
 
-		return $this->selected_mailbox['uidnext'];
+		return false;
 	}
 
 	/**
@@ -2959,7 +2968,7 @@ class Imap extends ImapBodyStruct
 	 * @return bool
 	 * @throws Exception
 	 */
-	public function append_start($mailbox, $size, $flags = "", \DateTimeInterface $internalDate = null) :bool
+	public function append_start($mailbox, $size, $flags = "", \DateTimeInterface|null $internalDate = null) :bool
 	{
 		//Select mailbox first so we can predict the UID.
 		$this->select_mailbox($mailbox);
@@ -2991,7 +3000,7 @@ class Imap extends ImapBodyStruct
 	 * @return boolean
 	 * @throws Exception
 	 */
-	public function append_message($mailbox, $data, $flags="", \DateTimeInterface $internalDate = null) :bool
+	public function append_message($mailbox, $data, $flags="", \DateTimeInterface|null $internalDate = null) :bool
 	{
 		if ($data instanceof File) {
 

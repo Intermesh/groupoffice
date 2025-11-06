@@ -38,13 +38,16 @@ Ext.onReady(function(){
 		}),
 		
 		onSubmitStart : function(values) {
-			//remove the domain value from user
-			this.serverDomains = values.serverDomains;
-			if(!Ext.isArray(this.serverDomains)) {
-				this.serverDomains = [this.serverDomains];
+
+			if("serverDomains" in values) {
+				// if the first attempt failes the domains have been deleted so we copy them once here
+				this.serverDomains = values.serverDomains;
+				if (!Ext.isArray(this.serverDomains)) {
+					this.serverDomains = [this.serverDomains];
+				}
+				delete values.serverDomains;
 			}
 			this.lastPassword = values.password;
-			delete values.serverDomains;
 		},
 		
 		onSubmitComplete : function(user, result) {

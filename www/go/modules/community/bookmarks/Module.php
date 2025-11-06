@@ -33,6 +33,14 @@ class Module extends core\Module {
 		return true;
 	}
 
+	/**
+	 * Default sort order when installing. If null it will be auto generated.
+	 * @return int|null
+	 */
+	public static function getDefaultSortOrder() : ?int{
+		return 38;
+	}
+
 
 	protected function beforeInstall(\go\core\model\Module $model): bool
 	{

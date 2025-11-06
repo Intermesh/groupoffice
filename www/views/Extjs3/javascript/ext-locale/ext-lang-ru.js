@@ -18,7 +18,7 @@ at http://www.sencha.com/contact.
 
 Build date: 2013-04-03 15:07:25
 */
-﻿/*
+/*
  * Russian translation
  * By ZooKeeper (utf-8 encoding)
  * 6 November 2007

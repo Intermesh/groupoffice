@@ -14,12 +14,12 @@ export class CategoryWindow extends FormWindow {
 			this.title = t(this.form.currentId ? 'Edit category' : 'Create category');
 		});
 
-		this.form.on('beforesave', (frm,data) => {
+		this.form.on('beforesave', ( {data}) => {
 			data.ownerId = data.isGlobal ? null : client.user.id;
 			delete data.isGlobal;
 			return data;
 		});
-		this.form.on('load', (_, data) => {
+		this.form.on('load', ( {data}) => {
 			data.isGlobal = data.ownerId === null;
 		});
 
@@ -32,6 +32,9 @@ export class CategoryWindow extends FormWindow {
 					placeholder:t("All"),
 					dataSource: jmapds("Calendar"),
 					displayProperty: 'name',
+					storeConfig: {
+						filters: {manageOnly: {permissionLevel: go.permissionLevels.manage}}
+					}
 				}),
 				checkbox({hidden: !client.user.isAdmin,name:'isGlobal', label: t('Global category')})
 			)

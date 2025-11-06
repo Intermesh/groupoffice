@@ -237,86 +237,58 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		this.debounceTimeout = setTimeout( () => {
 			clearTimeout(this.debounceTimeout);
 			this.debounceTimeout = undefined;
-
-			this.storeCursorPosition();
-			var h = this.getEditorBody().innerHTML;
-			var anchored = Autolinker.link(h, {
-				stripPrefix: false,
-				stripTrailingSlash: false,
-				className: "normal-link",
-				newWindow: true,
-				phone: false,
-				urls: {
-					schemeMatches : true,
-					wwwMatches    : false,
-					tldMatches    : false
-				}
-			});
-
-			console.warn(h != anchored);
-			if(h != anchored) {
-
-				this.getEditorBody().innerHTML = anchored;
-				this.restoreCursorPosition();
-			}else
-			{
-				this.forgetCursorPosition();
-			}
-
-			console.warn("autolink");
-
+			this.convertUrisToAnchors();
 		}, 500);
 	},
 
-	storeCursorPosition : function() {
 
-		var win = this.getWin(),
-			doc = this.getDoc(),
-			sel, range, el, frag, node, lastNode, firstNode;
+	convertUrisToAnchors: function() {
+		const walk = (node) => {
 
-		sel = win.getSelection();
-		if (sel.getRangeAt && sel.rangeCount) {
-			range = sel.getRangeAt(0);
-
-			el = doc.createElement("div");
-			el.innerHTML = "<span style='display:none' id='go-stored-cursor'></span>";
-			frag = doc.createDocumentFragment();
-			while ((node = el.firstChild)) {
-				lastNode = frag.appendChild(node);
+			if(node.nodeType == Node.ELEMENT_NODE && node.tagName == "A") {
+				// don't traverse into anchor tags
+				return;
 			}
-			firstNode = frag.firstChild;
-			range.insertNode(frag);
 
-			if (lastNode) {
-				range = range.cloneRange();
-				range.setStartAfter(lastNode);
-				range.setStartBefore(firstNode);
-				// range.collapse(true);
-				sel.removeAllRanges();
-				sel.addRange(range);
+			//walk nodes recursively
+			node.childNodes.forEach(walk);
+
+			if(node.nodeType == Node.TEXT_NODE) {
+				if(node == this.getDoc().getSelection().anchorNode) {
+					return;
+				}
+
+				if (node.textContent && (node.textContent.indexOf("http") > -1 || node.textContent.indexOf('@') > -1)) {
+					const anchored = this.replaceUriWithAnchor(node.textContent);
+					if (anchored != node.textContent) {
+						const tmp = document.createElement("span");
+						tmp.innerHTML = anchored;
+						node.replaceWith(tmp);
+					}
+				}
 			}
 		}
+
+		walk(this.getEditorBody());
 	},
 
-	forgetCursorPosition: function() {
-		var cursor = this.getDoc().getElementById("go-stored-cursor");
-		if(cursor) {
-			cursor.remove();
-		}
-	},
+	replaceUriWithAnchor : function(html) {
+		// Regular expression to match URIs that are not inside anchor tags
+		const uriRegex = /(https?:\/\/[^\s]+|ftp:\/\/[^\s]+)/ig;
 
-	restoreCursorPosition : function() {
-		var doc = this.getDoc(), sel = this.getWin().getSelection();
-		var cursor = doc.getElementById("go-stored-cursor");
-		if(!cursor) {
-			return false;
-		}
-		var range = new Range();
-		range.setStart(cursor, 0);
-		range.collapse(true);
-		sel.removeAllRanges();
-		sel.addRange(range);
-		cursor.remove();
+		// Replace matched URIs with anchor tags
+		html = html.replace(uriRegex, (url) => {
+			return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+		});
+
+		html = html.replace(
+			/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
+			function(match) {
+				return '<a href="mailto:' + match + '">' + match + '</a>';
+			}
+		);
+
+		return html;
 	},
 
 	onDrop: function(e) {
@@ -497,29 +469,6 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		return loader.src = src;
 	},
 
-	/**
-	 * Executes a Midas editor command directly on the editor document.
-	 * For visual commands, you should use {@link #relayCmd} instead.
-	 * <b>This should only be called after the editor is initialized.</b>
-	 * @param {String} cmd The Midas command
-	 * @param {String/Boolean} value (optional) The value to pass to the command (defaults to null)
-	 */
-	execCmd: function (cmd, value) {
-		var doc = this.getDoc();
-
-		if (cmd === 'createlink' && Ext.isGecko) {
-			// If firefox is used, then manually add the "a" tag to the text
-			var t = this.getSelectedText();
-			if (t.length < 1) {
-				value = '<a href="' + value + '" target="_blank">' + value + "</a>";
-				this.insertAtCursor(value);
-			}
-		}
-
-		doc.execCommand(cmd, false, value === undefined ? null : value);
-
-		this.syncValue();
-	},
 
 	getSelectedText: function () {
 
@@ -705,23 +654,6 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			v = Math.max(1, v + adjust);
 		}
 		this.execCmd('FontSize', v);
-	},
-
-	createLink: function () {
-		var url = prompt(this.createLinkText, this.defaultLinkValue);
-		if (url && url != 'https:/' + '/') {
-			if (Ext.isSafari) {
-				this.execCmd("createlink", url);
-				this.updateToolbar();
-			} else {
-				// this.relayCmd("createlink", url);
-				let t = this.getSelectedText();
-				if (t.length < 1) {
-					t = url;
-				}
-				this.insertAtCursor('<a href="' + url + '" target="_blank">' + t + "</a>");
-			}
-		}
 	},
 
 	setDesignMode : function(readOnly){

@@ -4,20 +4,40 @@ import {
 	comp,
 	DateInterval,
 	DateTime,
-	E, EntityID, MaterialIcon, ObjectUtil, root,
+	E, EntityID, Format, MaterialIcon, ObjectUtil, root,
 	tbar, Timezone,
 	win, Window
 } from "@intermesh/goui";
-import {calendarStore, categoryStore, t} from "./Index.js";
-import {client, jmapds, Recurrence} from "@intermesh/groupoffice-core";
+import {
+	calendarStore,
+	CalendarView,
+	categoryStore,
+	getParticipantStatusIcon,
+	statusIcons,
+	t,
+	writeableCalendarStore
+} from "./Index.js";
+import {client, jmapds, Principal, Recurrence, RecurrenceField} from "@intermesh/groupoffice-core";
 import {EventWindow} from "./EventWindow.js";
 import {EventDetailWindow} from "./EventDetail.js";
 import {SubscribeWindow} from "./SubscribeWindow";
 
 export type RecurrenceOverride = (Partial<CalendarEvent> & {excluded?:boolean});
 export type RecurrenceOverrides = {[recurrenceId:string]: RecurrenceOverride};
+
+export interface Participant {
+	id: string,
+	eventId: EntityID,
+	name: string | undefined,
+	email: string
+	participationStatus: 'accepted' |'tentative' | 'declined' | 'needs-action',
+	scheduleStatus: string,
+	kind: "resource" | "person",
+	roles: any
+}
 export interface CalendarEvent extends BaseEntity {
 	id: EntityID
+	uid:string
 	recurrenceRule?: any
 	recurrenceOverrides?: RecurrenceOverrides
 	links?: any
@@ -32,8 +52,14 @@ export interface CalendarEvent extends BaseEntity {
 	categoryIds: string[]
 	status?: string
 	isOrigin: boolean
-	participants?: {[key:string]: any}
+	participants?: {[key:string]: Participant}
 	calendarId: string
+	modifier: any
+	creator: any
+	createdAt: string
+	modifiedAt: string
+	location?:string
+	description?:string
 }
 
 export interface CalendarCategory extends BaseEntity {
@@ -53,7 +79,8 @@ interface CalendarItemConfig {
 	start?: DateTime
 	end?: DateTime
 	open?:() => void
-	defaultColor?: string
+	defaultColor?: string,
+	cal?: any
 }
 
 /**
@@ -65,6 +92,16 @@ interface CalendarItemConfig {
  */
 export class CalendarItem {
 
+	static clipboard?: CalendarItem;
+
+	/**
+	 * Provider index type
+	 * eg. "event", "birthday", "task" etc.
+	 *
+	 * @see CalendarAdapter.providers
+	 */
+	provider!: string
+
 	key!: string|null // id/recurrenceId
 	recurrenceId?:string
 	data!: CalendarEvent
@@ -73,11 +110,13 @@ export class CalendarItem {
 	start!: DateTime
 	end!: DateTime
 	patched: CalendarEvent
+	readonly readOnly?: boolean
 	readonly extraIcons;
 	//color!: string
 
 	readonly initStart: string
 	readonly initEnd: string
+	calendarIds: {[id:string]:boolean} = {}
 
 	cal: any
 	categories : CalendarCategory[] = []
@@ -87,7 +126,6 @@ export class CalendarItem {
 
 	constructor(obj:CalendarItemConfig) {
 		Object.assign(this,obj);
-
 
 		this.patched = ObjectUtil.patch(structuredClone(obj.data), obj.override) as CalendarEvent;
 		 if(obj.recurrenceId && (!obj.override || !obj.override.start))
@@ -107,7 +145,14 @@ export class CalendarItem {
 		//if(!obj.end) {
 			this.end = this.start.clone().add(new DateInterval(this.patched.duration!));
 		//}
-		this.cal = calendarStore.find((c:any) => c.id == this.patched.calendarId);
+		this.calendarIds[this.patched.calendarId] = true;
+		if(!this.cal) {
+			this.cal = calendarStore.find((c: any) => c.id == this.patched.calendarId);
+			if(!this.cal) {
+				this.readOnly = true;
+				this.cal = {id: this.patched.calendarId, isVisible:true, myRights: {}}; // readonly when not subscribed
+			}
+		}
 		if(this.patched.categoryIds)
 		for(const id of this.patched.categoryIds) {
 			const cat = categoryStore.find((c:any) => c.id == id);
@@ -122,11 +167,16 @@ export class CalendarItem {
 			this.title = this.patched.title!;
 		}
 		this.extraIcons = obj.extraIcons || [];
+		if(obj.key && obj.key[0] === 'L') {
+			this.extraIcons.push('logout');
+			this.readOnly = true; //no dragging
+			this.open = async (_c)=>{};
+		}
 		this.divs = {};
 	}
 
 	private isNew() {
-		return this.key==='';
+		return this.key === '';
 	}
 
 	private isTimeModified() {
@@ -134,7 +184,6 @@ export class CalendarItem {
 	}
 
 	patchedInstance(recurrenceId:string) {
-		// debugger;
 		if(!this.data.recurrenceRule || !this.data.recurrenceOverrides || !this.data.recurrenceOverrides[recurrenceId]) {
 			throw "Not found";
 		}
@@ -166,7 +215,8 @@ export class CalendarItem {
 					}
 				}
 			}
-			const r = new Recurrence({dtstart: new Date(e.start), timeZone:e.timeZone, rule: e.recurrenceRule});
+
+			const r = new Recurrence({dtstart: new DateTime(e.start, e.timeZone), rule: e.recurrenceRule});
 			for(const date of r.loop(from, until)){
 				const recurrenceId = date.format('Y-m-d\TH:i:s');
 
@@ -227,15 +277,15 @@ export class CalendarItem {
 	/** amount of days this event is spanning */
 	get dayLength() {
 		// 1 day + the distance in days between start and end. - 1 second of end = 00:00:00
-		//console.log(this.title, this.start.diff(this.end.clone().addSeconds(-1)));
 		return 1 + this.start.diff(this.end.clone().addSeconds(-1)).getTotalDays()!;
 	}
 
 	get categoryDots() {
+		const dots = [];
 		for (const cat of this.categories) {
-			return [E('i').cls('cat').attr('title',cat.name).css({color: '#'+cat.color})];
+			dots.push(E('i').cls('cat').attr('title',cat.name).css({color: '#'+cat.color}));
 		}
-		return [];
+		return dots;
 	}
 	get icons() {
 		const e = this.data;
@@ -261,14 +311,26 @@ export class CalendarItem {
 				this.data.start = start;
 				this.data.duration = duration;
 				this.open(onCancel); // open dialog
+				// add to invisible calendar
+				if(!this.cal.isVisible) {
+					jmapds('Calendar').update(this.cal.id, {isVisible:true});
+				}
 			}
 		}
 	}
 
-	async open(onCancel?: Function) {
+	info() {
+		const dlg = new EventDetailWindow();
+		dlg.show();
+		dlg.loadEvent(this);
+
+		return dlg;
+	}
+
+	async open(onCancel?: Function, forceWrite?: boolean) {
 
 		const internalOpen = () => {
-			const dlg = !this.mayChange ? new EventDetailWindow() : new EventWindow();
+			const dlg = !forceWrite && !this.mayChange  ? new EventDetailWindow() : new EventWindow();
 			if (dlg instanceof EventWindow) {
 				dlg.on('close', () => {
 					// cancel ?
@@ -285,10 +347,10 @@ export class CalendarItem {
 			return dlg;
 		}
 
-		if(!calendarStore.loaded) {
-			await calendarStore.load();
+		if(!writeableCalendarStore.loaded) {
+			await writeableCalendarStore.load();
 		}
-		const cals = calendarStore.all()
+		const cals = writeableCalendarStore.all()
 		if(!cals.length) {
 			return new Promise(resolve => {
 				const w = win({
@@ -305,7 +367,8 @@ export class CalendarItem {
 						}}),
 						btn({text: t('Create personal calendar'), handler:() => {
 							client.jmap("Calendar/first", {}, 'pFirst').then(r => {
-								calendarStore.reload().then(r2 => {
+								calendarStore.reload();
+								writeableCalendarStore.reload().then(r2 => {
 									this.data.calendarId = r.calendarId;
 									resolve(internalOpen());
 								});
@@ -329,22 +392,22 @@ export class CalendarItem {
 		}
 	}
 
-	private randomColor(seed: string) {
-		const colors = [
-			"CDAD00", "E74C3C", "9B59B6", "8E44AD", "2980B9", "3498DB",
-			"1ABC9C", "16A085", "27AE60", "2ECC71", "F1C40F", "F39C12",
-			"E67E22", "D35400", "95A5A6", "34495E", "808B96", "1652A1"
-		];
-
-		let hash = [...seed].reduce((acc, char) => acc + char.charCodeAt(0), 0);
-		return colors[hash % colors.length];
-	}
+	// private randomColor(seed: string) {
+	// 	const colors = [
+	// 		"CDAD00", "E74C3C", "9B59B6", "8E44AD", "2980B9", "3498DB",
+	// 		"1ABC9C", "16A085", "27AE60", "2ECC71", "F1C40F", "F39C12",
+	// 		"E67E22", "D35400", "95A5A6", "34495E", "808B96", "1652A1"
+	// 	];
+	//
+	// 	let hash = [...seed].reduce((acc, char) => acc + char.charCodeAt(0), 0);
+	// 	return colors[hash % colors.length];
+	// }
 
 	downloadIcs(){
-		client.getBlobURL('community/calendar/ics/'+this.key).then(window.open)
+		client.downloadBlobId('community/calendar/ics/'+this.key, this.cal.name + '_'+this.start.format('Y-m-dTHi')+'_'+this.title+'.ics');
 	}
 
-	confirmScheduleMessage(modified: Partial<CalendarEvent>|false, onAccept: ()=>void) {
+	confirmScheduleMessage(modified: Partial<CalendarEvent>|false, onAccept: ()=>void, onCancel?: ()=>void) {
 		const type = this.shouldSchedule(modified);
 		if(type) {
 			const askScheduleWin = win({
@@ -352,14 +415,29 @@ export class CalendarItem {
 					modal: true,
 					closable: false,
 					title: t(type+'ScheduleTitle'),
+					listeners: {
+						close: ({byUser}) => {
+							if(byUser && onCancel) {
+								onCancel();
+							}
+						}
+					}
 				},
 				comp({cls: 'pad flow'},
 					comp({tagName:'i',cls:'icon',html:'email', width:100, style:{fontSize:'3em'}}),
-					comp({html: t(type+'ScheduleText'), flex:1}),
+					comp({flex:1},
+						comp({html: t(type+'ScheduleText')}),
+						comp({html: `<br /><i class="icon danger">warning</i> ${t('This event is in the past!')}`, flex:1, hidden: !this.isInPast}),
+					)
 				),
+
+
 				tbar({},
 					btn({
 						text: t('Cancel'), handler: () => {
+							if(onCancel) {
+								onCancel();
+							}
 							askScheduleWin.close()
 						}
 					}),'->',
@@ -381,8 +459,16 @@ export class CalendarItem {
 				));
 			askScheduleWin.show();
 		} else {
-			Object.assign(this.data, modified);
-			onAccept();
+			if(modified) {
+				Object.assign(this.data, modified);
+				onAccept();
+			} else {
+				Window.confirm(t("Are you sure you want to delete the selected item?")).then((confirmed) => {
+					if(confirmed) {
+						onAccept();
+					}
+				})
+			}
 		}
 	}
 
@@ -391,15 +477,134 @@ export class CalendarItem {
 	}
 
 	get mayChange() {
-		return this.isOwner && this.cal.myRights.mayWriteAll;
+		return (this.isNew() ||
+			(this.cal.myRights.mayWriteOwn && this.isOwner)) && !this.readOnly;
 	}
 
-	get calendarPrincipal() {
-		if(this.participants && this.principalId)
-			return this.participants[this.principalId];
+	private _calendarPrincipal:Participant|undefined;
+
+	/**
+	 * Finds the participant which e-mail matches the e-mail of the calendar owner.
+	 */
+	get calendarPrincipal() : {[key:string]: any} | undefined {
+		if(this._calendarPrincipal) {
+			return this._calendarPrincipal;
+		}
+		if(this.participants) {
+			const emailAliases = this.ownerAliases;
+			for(let id in this.participants) {
+				const p = this.participants[id];
+				if(this.cal.groupId){
+					if(p.kind==='resource' && id.slice("Calendar:".length) == this.cal.id) {
+						this._calendarPrincipal = p
+						return this._calendarPrincipal;
+					}
+				} else if (p.kind!=='resource' && emailAliases.indexOf(this.participants[id].email.toLowerCase()) > -1) {
+					this._calendarPrincipal = p;
+					return this._calendarPrincipal;
+				}
+			}
+		}
+
+		return undefined;
 	}
-	get principalId() {
-		return (this.cal && this.cal.ownerId) ? this.cal.ownerId+'' : go.User.id+''
+
+	/**
+	 * The owner user ID of the calendar item. Shared calendars don't have an owner. In that case it will return the current
+	 * user ID
+	 */
+	get ownerId() {
+		return (this.cal && this.cal.ownerId) ? this.cal.ownerId+'' : client.user.id+''
+	}
+
+	/**
+	 * The e-mail address of the calendar owner of this item
+	 */
+	get ownerAliases() : string {
+		return (this.cal && this.cal.owner) ? this.cal.owner.emailAliases : client.user.emailAliases!;
+	}
+
+	get quickText(): string {
+		const cal = this.cal ? ('<sup style="color:#'+this.cal.color+';">'+this.cal.name+'</sup>') : '';
+		const lines = [
+			'<h2 style="padding:0;margin:0;">' + this.title.htmlEncode() + '</h2>' + cal,
+			...this.humanReadableDate(),
+		];
+		if(this.isRecurring) {
+			lines.push(RecurrenceField.toText(this.data.recurrenceRule,this.start));
+		}
+		if(this.participants) {
+			lines.push('<hr>'+t('Participants'));
+			for(const key in this.participants) {
+				const p = this.participants[key],
+					icon = getParticipantStatusIcon(p);
+
+				const i = '<i class="icon '+icon[2]+'" title="'+icon[1]+'">'+icon[0]+'</i>' ;
+				lines.push(i+' '+(p.name || p.email).htmlEncode());
+			}
+
+		}
+		if(this.patched.creator && this.patched.modifier) {
+			lines.push(
+				'<hr>' + t('Created at') + ': ' + Format.smartDateTime(this.data.createdAt) + ' ' + t('by') + ' ' + this.data.creator.name.htmlEncode(),
+				t('Modified at') + ': ' + Format.smartDateTime(this.data.modifiedAt) + ' ' + t('by') + ' ' + this.data.modifier.name.htmlEncode()
+			);
+		}
+
+		if(this.patched.location) {
+			lines.push('<div style="white-space: pre">' + t('Location')+ ': ' + this.formatLocation(this.patched.location)) + '</div>';
+		}
+
+		if(this.patched.description)
+			lines.push('<p style="max-width:360px;">'+Format.textToHtml(this.patched.description)+'</p>');
+
+		return lines.join('<br>');
+	}
+
+	private formatLocation(l:string) {
+		l = l.htmlEncode();
+		const withUris = Format.convertUrisToAnchors(l);
+
+		if(withUris != l) {
+			return withUris;
+		} else {
+			return `<a rel="noopener noreferrer" href="maps:q=${l}">${l}</a>`;
+		}
+	}
+
+	private humanReadableDate() {
+		const start = this.start;
+		const end = this.end.clone();
+		const fullDay = this.data.duration === "P1D";
+		const oneDay = fullDay || this.start.format('Ymd') == this.end.format('Ymd');
+		let line1 = start.format('l j F Y');
+
+		if (!oneDay) {
+			if (!this.data.showWithoutTime) {
+				line1 += ', '+Format.time(start);
+			}
+			line1 += ' '+t('until');
+		}
+
+		let line2;
+		if(fullDay) {
+			line2 = t('All day');
+		} else if (oneDay) {
+			if(!this.data.showWithoutTime) {
+				line2 = `${Format.time(start)} - ${Format.time(end)}`;
+			}
+		} else {
+			if(this.data.showWithoutTime) {
+				// if more then 1 day and without time. the day in inclusieve so we remove the last one
+				end.addSeconds(-1);
+			}
+			line2 = end.format('l j F Y');
+			if (!this.data.showWithoutTime) {
+				line2 += `, ${Format.time(end)}`;
+			}
+		}
+
+		return [line1, line2];
 	}
 
 	private get isInPast() {
@@ -407,8 +612,8 @@ export class CalendarItem {
 		if(this.isRecurring && this.data.recurrenceRule) {
 			const e = this.data;
 			if(e.recurrenceRule.count) {
-				const r = new Recurrence({dtstart: new Date(e.start), timeZone:e.timeZone, rule: e.recurrenceRule});
-				for(const date of r.loop(new DateTime(), new DateTime('2058-01-01'), (_d,i) => i < 1)){
+				const r = new Recurrence({dtstart: new DateTime(e.start, e.timeZone), rule: e.recurrenceRule});
+				for(const date of r.loop(new DateTime(), new DateTime('2058-01-01'), (_d,i) => i < 1)) {
 					lastOccurrence = date.clone().add(new DateInterval(e.duration));
 				}
 			} else if(e.recurrenceRule.until) {
@@ -427,16 +632,17 @@ export class CalendarItem {
 
 		if(!this.calendarPrincipal)
 			throw new Error('Not a participant');
+		const oldStatus = this.calendarPrincipal.participationStatus;
 		this.calendarPrincipal.participationStatus = status;
 
 		//eventDS.setParams.sendSchedulingMessages = true;
 		// should we notify a reply is sent?
-		this.patch({participants: this.participants}, onFinish,undefined,false);
+		this.patch({participants: this.participants}, onFinish,() => {
+			this.calendarPrincipal!.participationStatus = oldStatus;
+		},false);
 	}
 
 	shouldSchedule(modified: Partial<CalendarEvent>|false) {
-		if(this.isInPast) // todo: use this.calendarPrincipal.expectReply if not owner ??
-			return;
 
 		if(modified === false) {
 			if(this.participants && !this.isCancelled) {
@@ -476,12 +682,12 @@ export class CalendarItem {
 				if(onFinish)
 					p.then(onFinish)
 
-			});
+			}, onCancel);
 		} else if(this.isOverride) {
-			this.patchOccurrence(modified, onFinish);
-		} else if(skipAsk) {
+			this.patchOccurrence(modified, onFinish, onCancel);
+		} else if(skipAsk || !this.recurrenceId) {
 			// always patch series
-			this.patchSeries(modified, onFinish)
+			this.patchSeries(modified, onFinish, onCancel)
 		} else {
 			// if(modified.recurrenceRule) {
 			// 	eventDS.update(this.data.id, {recurrenceRule:modified.recurrenceRule});
@@ -494,7 +700,7 @@ export class CalendarItem {
 					title: t('Do you want to edit a recurring event?'),
 					width:550,
 					modal: true,
-					listeners: {'close': (_me,byUser) => { if(byUser && onCancel) onCancel();  }}
+					listeners: {'close': ({byUser}) => { if(byUser && onCancel) onCancel();  }}
 				},comp({cls: 'pad flow'},
 					comp({tagName:'i',cls:'icon',html:'event_repeat', width:100, style:{fontSize:'3em'}}),
 					comp({html: t('You will be editing a recurring event. Do you want to edit this occurrence only or all future occurrences?'), flex:1}),
@@ -504,7 +710,7 @@ export class CalendarItem {
 						hidden: modified.recurrenceRule, // user must change future if rrule is modified
 						cls:'primary',
 						handler: _b => {
-							this.patchOccurrence(modified, onFinish); w.close();
+							this.patchOccurrence(modified, onFinish, onCancel); w.close();
 						}
 					}),
 					btn({
@@ -512,7 +718,7 @@ export class CalendarItem {
 						hidden : isFirstInSeries || !this.isOwner,
 						handler: _b => {
 							w.close();
-							this.patchThisAndFuture(modified, onFinish);
+							this.patchThisAndFuture(modified, onFinish, onCancel);
 						}
 					}),
 					btn({
@@ -520,7 +726,7 @@ export class CalendarItem {
 						hidden: !isFirstInSeries && this.isOwner,
 						handler: _b => {
 							w.close();
-							this.patchSeries(modified, onFinish);
+							this.patchSeries(modified, onFinish, onCancel);
 						}
 					})
 				)
@@ -529,10 +735,11 @@ export class CalendarItem {
 		}
 	}
 
-	private patchSeries(modified: any, onFinish?: () => void) {
+	private patchSeries(modified: any, onFinish?: () => void, onCancel?: () => void) {
 		this.confirmScheduleMessage(modified, () => {
 
 			root.mask();
+
 			const p = eventDS.update(this.data.id, modified)
 				.catch(e => {
 					void Window.error(e);
@@ -542,12 +749,12 @@ export class CalendarItem {
 				})
 
 			if(onFinish) p.then(onFinish);
-		})
+		}, onCancel)
 	}
 
 	// todo: per-user -per-override properties ['alert']
 
-	private patchOccurrence(modified: any, onFinish?: () => void) {
+	private patchOccurrence(modified: any, onFinish?: () => void,  onCancel?: () => void) {
 		//this.data.recurrenceOverrides ??= {};
 
 		let patch: any = this.isOverride ? this.data.recurrenceOverrides && this.data.recurrenceOverrides[this.recurrenceId!] : {}
@@ -575,11 +782,11 @@ export class CalendarItem {
 							for(const prop in p) {
 
 								if(prop == "roles") {
-									//roles is an object and therefore always different with !=. Maybe
-									// just skip here as it never changes in an override.
-									continue;
-								}
-								if(p[prop] != original.participants[key][prop]) {
+									//roles is an object and therefore always different with !=.
+									if(p.roles?.optional != original.participants[key].roles?.optional){
+										patch['participants/'+key+'/'+prop] = p[prop];
+									}
+								} else if(p[prop] != original.participants[key][prop]) {
 									patch['participants/'+key+'/'+prop] = p[prop];
 								}
 							}
@@ -609,7 +816,6 @@ export class CalendarItem {
 					data['recurrenceOverrides'] = {[this.recurrenceId!] : patch };
 				}
 
-
 				const prom = eventDS.update(this.data.id, data)
 					.catch(e => {
 					void Window.error(e);
@@ -618,7 +824,7 @@ export class CalendarItem {
 						root.unmask();
 					})
 				if(onFinish) prom.then(onFinish)
-			});
+			}, onCancel);
 		});
 	}
 
@@ -646,7 +852,7 @@ export class CalendarItem {
 	/**
 	 * @see  https://www.ietf.org/archive/id/draft-ietf-jmap-calendars-10.html#section-5.5
 	 */
-	private patchThisAndFuture(modified: any, onFinish?: () => void) {
+	private patchThisAndFuture(modified: any, onFinish?: () => void, onCancel?: () => void) {
 		//if(!ev.data.participants) { // is not scheduled ( split event)
 		// todo: add first and next relation in relatedTo property as per https://www.ietf.org/archive/id/draft-ietf-jmap-calendars-11.html#name-splitting-an-event
 		const rule = structuredClone(this.data.recurrenceRule);
@@ -670,7 +876,8 @@ export class CalendarItem {
 				{start: this.recurrenceId!},
 				modified
 			);
-
+			delete next.modifier;
+			delete next.creator;
 			delete next.id;
 			delete next.uid;
 			delete next.recurrenceOverrides;
@@ -681,15 +888,70 @@ export class CalendarItem {
 					throw e;
 				}); // create duplicate
 			if (onFinish) p.then(onFinish);
+		}, onCancel);
+	}
+
+	cut() {
+		CalendarItem.clipboard = this;
+	}
+
+	copy() {
+		const data: any = {};
+		const copyKeys = ['alerts','categoryIds','duration','description', 'freeBusyStatus','location','participants','privacy',
+			'showWithoutTime','start','status','timeZone','title','useDefaultAlerts'];
+		for (const key of copyKeys) { // @ts-ignore
+			data[key] = this.data[key];
+		}
+
+		CalendarItem.clipboard = new CalendarItem({
+			data,
+			key: "",
+			open(this: CalendarItem) { // when opening the copy. just save
+				this.confirmScheduleMessage(data, () => {
+					root.mask();
+					eventDS.create(data).catch(e => {
+						void Window.error(e);
+						throw e;
+					}).then(r => {
+						// to copy again keep the id empty
+						this.data.id = '';
+					}).finally(() => {
+						root.unmask();
+					});
+				});
+			}
 		});
 	}
 
+	static paste(calendarId: string, date: string) {
+		if (!CalendarItem.clipboard!) return;
+		const withoutTime = date.length === 10;
+		let item = CalendarItem.clipboard;
+		if (withoutTime) { // keep orig time
+			const [y, m, d] = date.split('-').map(Number);
+			item.start.setYear(y).setMonth(m).setDate(d);
+		} else {
+			item.start = new DateTime(date);
+		}
+		item.end = item.start.clone().add(new DateInterval(item.data.duration));
+		item.data.calendarId = calendarId;
+		item.save();
+	}
+
+
+
 	remove() {
-		if(!this.mayChange)
+		if(!this.mayChange) {
+			if(this.cal.myRights.mayWriteAll && !this.isOwner) {
+				// this is an invite
+				this.updateParticipation("declined");
+			}
 			return;
+		}
+
 		if(!this.isRecurring) {
 			this.confirmScheduleMessage(false, () => {
-				eventDS.destroy(this.data.id);
+				eventDS.destroy(this.data.id).catch(e => Window.error(e))
 				Object.values(this.divs).forEach(d => d.remove())
 			});
 		} else {
@@ -722,7 +984,7 @@ export class CalendarItem {
 	private removeFutureEvents() {
 		this.confirmScheduleMessage(false, () => {
 			this.data.recurrenceRule.until = (new DateTime(this.recurrenceId)).addDays(-1).format('Y-m-d'); // could be minus 1 seconds, but we don't recur within day
-			eventDS.update(this.data.id,{recurrenceRule: this.data.recurrenceRule});
+			eventDS.update(this.data.id,{recurrenceRule: this.data.recurrenceRule}).catch(e => Window.error(e))
 		});
 	}
 
@@ -732,21 +994,24 @@ export class CalendarItem {
 
 				this.data.recurrenceOverrides ??= {};
 				this.data.recurrenceOverrides[this.recurrenceId!] = {excluded: true};
-				eventDS.update(this.data.id, {recurrenceOverrides: this.data.recurrenceOverrides});
+				eventDS.update(this.data.id, {recurrenceOverrides: this.data.recurrenceOverrides}).catch(e => Window.error(e))
 			} else {
 				// set status to not participating
+
+				Window.alert("Not participate!");
+
 			}
 		});
 	}
 
 	private removeSeries() {
 		this.confirmScheduleMessage(false, () => {
-			eventDS.destroy(this.data.id);
+			eventDS.destroy(this.data.id).catch(e => Window.error(e))
 		});
 	}
 
 	undoException(recurrenceId: string) {
 		delete this.data.recurrenceOverrides![recurrenceId];
-		return eventDS.update(this.data.id, {recurrenceOverrides:this.data.recurrenceOverrides});
+		return eventDS.update(this.data.id, {recurrenceOverrides:this.data.recurrenceOverrides}).catch(e => Window.error(e))
 	}
 }

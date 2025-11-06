@@ -23,40 +23,36 @@ class Group extends AclOwnerEntity {
 	const ID_EVERYONE = 2;
 	const ID_INTERNAL = 3;
 
-	/**
-	 *
-	 * @var int
-	 */
-	public $id;
+	public ?string $id = null;
 	
 	/**
 	 *
 	 * @var string
 	 */
-	public $name;
+	public string $name;
 
 	/**
 	 * When this is set this group is the personal group for this user. And only
 	 * that user will be member of this group. It's used for granting permissions
 	 * to single users but keeping the database simple.
 	 * 
-	 * @var int
+	 * @var ?string
 	 */
-	public $isUserGroupFor;
+	public ?string $isUserGroupFor = null;
 	
 	/**
 	 * Created by user ID 
 	 * 
-	 * @var int
+	 * @var ?string
 	 */
-	public $createdBy;
+	public ?string $createdBy;
 	
 	/**
 	 * The users in this group
 	 * 
 	 * @var int[]
 	 */
-	public $users;	
+	public array $users = [];
 
 	protected static function defineMapping(): Mapping
 	{
@@ -238,34 +234,20 @@ class Group extends AclOwnerEntity {
 	}
 	
 	/**
-	 * Get the group ID that is used for granting permissions for the given user ID
+	 * Get the group ID that is used for granting permissions for the given user ID.
+	 * If it doesn't exist it must return null because we might be creating the group in this process.
 	 *
 	 * @param int $userId
-	 * @return int
+	 * @return ?int
 	 * @throws Exception
 	 */
-	public static function findPersonalGroupID(int $userId) : int {
+	public static function findPersonalGroupID(int $userId) : ?int {
 		$groupId = Group::find()
 							->where(['isUserGroupFor' => $userId])
 							->selectSingleValue('id')
 							->single();
-		if($groupId) {
-			return $groupId;
-		}
-		$user = User::findById($userId, ['username']);
-		if(!$user) {
-			throw new Exception("Invalid userId given");
-		}
-		$personalGroup = new Group();
-		$personalGroup->name = $user->username;
-		$personalGroup->isUserGroupFor = $userId;
-		$personalGroup->users[] = $userId;
-		
-		if(!$personalGroup->save()) {
-			throw new Exception("Could not create personal group");
-		}
 
-		return $personalGroup->id;
+		return $groupId;
 		
 	}
 

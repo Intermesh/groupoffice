@@ -61,7 +61,7 @@ go.data.StoreTrait = {
 					if (!GO.debug) {
 						store.reload();
 					} else {
-						GO.errorDialog.show(response.description);
+						GO.errorDialog.show(response.message);
 					}
 
 					//cancel further exception handling
@@ -73,7 +73,7 @@ go.data.StoreTrait = {
 				{
 					console.error(response);
 
-					GO.errorDialog.show(response.description || t("Failed to send the request to the server. Please check your internet connection."));
+					GO.errorDialog.show(response.message || t("Failed to send the request to the server. Please check your internet connection."));
 				}
 			}
 			,this);

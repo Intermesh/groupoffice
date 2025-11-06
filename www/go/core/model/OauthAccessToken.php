@@ -23,7 +23,7 @@ class OauthAccessToken extends Entity implements AccessTokenEntityInterface
 {
     use AccessTokenTrait, TokenEntityTrait, EntityTrait;
 
-    protected $clientId;
+    protected int $clientId;
 
     protected static function defineMapping(): Mapping
     {
@@ -38,6 +38,7 @@ class OauthAccessToken extends Entity implements AccessTokenEntityInterface
     }
 
 		public static function collectGarbage() {
+			go()->debug("GC: OauthAccessToken");
 			return static::delete((new Query)->where('expiryDateTime', '<', new DateTime()));
 		}
 }

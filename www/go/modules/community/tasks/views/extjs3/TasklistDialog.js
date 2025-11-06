@@ -40,7 +40,9 @@ go.modules.community.tasks.TasklistDialog = Ext.extend(go.form.Dialog, {
 				name: 'color',
 				fieldLabel: t('Color')
 			}
-			, new go.modules.community.tasks.TaskListGroupingCombo()]
+			, new go.modules.community.tasks.TaskListGroupingCombo(),
+			{xtype:'checkbox', name: 'syncToDevice', boxLabel: t('Sync to device'), hint: t('Make tasklist available in CalDAV and ActiveSync')}
+			]
 		}];
 	}
 });

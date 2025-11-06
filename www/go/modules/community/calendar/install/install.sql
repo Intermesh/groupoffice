@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar` (
     `createdBy` INT NULL,
     `ownerId` INT NULL,
     `highestItemModSeq` VARCHAR(32) NULL DEFAULT 0,
+	  `publishKey` CHAR(20) NULL,
     PRIMARY KEY (`id`),
 	  INDEX `fk_calendar_calendar_calendar_resource_group_idx` (`groupId` ASC),
 	 CONSTRAINT `fk_calendar_calendar_calendar_resource_group`
@@ -53,8 +54,9 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_user` (
     `color` VARCHAR(21) NOT NULL,
     `sortOrder` INT NOT NULL DEFAULT 0,
     `timeZone` VARCHAR(45) NULL,
-    `includeInAvailability` ENUM('all', 'attending', 'none') NOT NULL,
-		`modSeq` INT NOT NULL DEFAULT 0,
+    `syncToDevice` TINYINT(1) NOT NULL DEFAULT 1,
+    `includeInAvailability` ENUM('all', 'attending', 'none') NOT NULL DEFAULT 'none',
+	`modSeq` INT NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`, `userId`),
     CONSTRAINT `fk_calendar_calendar_user_calendar_calendar1`
     FOREIGN KEY (`id`)
@@ -185,7 +187,6 @@ CREATE TABLE IF NOT EXISTS `calendar_participant` (
     `rolesMask` INT NOT NULL DEFAULT 0,
 	  `language` VARCHAR(20),
     `participationStatus` ENUM('needs-action', 'tentative', 'accepted', 'declined', 'delegated') NULL DEFAULT 'needs-action',
-    `scheduleAgent` ENUM('server', 'client', 'none') DEFAULT 'server',
     `expectReply` TINYINT(1) NOT NULL DEFAULT 0,
     `scheduleUpdated` DATETIME NULL,
 		`scheduleStatus` varchar(255) DEFAULT NULL,
@@ -370,6 +371,7 @@ CREATE TABLE IF NOT EXISTS `calendar_event_category` (
 CREATE TABLE calendar_preferences (
 	userId                INT NOT NULL PRIMARY KEY,
 	weekViewGridSnap      INT NULL,
+	weekViewGridSize      INT DEFAULT 8 NOT NULL,
 	defaultDuration       VARCHAR(32) NULL,
 	autoUpdateInvitations TINYINT(1) DEFAULT 0 NOT NULL,
 	autoAddInvitations    TINYINT(1) DEFAULT 0 NOT NULL,
@@ -382,11 +384,18 @@ CREATE TABLE calendar_preferences (
 	birthdaysAreVisible   TINYINT(1) DEFAULT 0 NOT NULL,
 	tasksAreVisible       TINYINT(1) DEFAULT 0 NOT NULL,
 	holidaysAreVisible    TINYINT(1)  DEFAULT 0 NOT NULL,
+	showTooltips			    TINYINT(1)  DEFAULT 1 NOT NULL,
 	defaultCalendarId     INT UNSIGNED NULL,
-	startView             ENUM ('week', 'month', 'year', 'list') DEFAULT 'month' NULL,
+	personalCalendarId    INT UNSIGNED NULL,
+	startView             VARCHAR(20) DEFAULT 'month' NULL,
 	CONSTRAINT calendar_preferences_core_user_id_fk FOREIGN KEY (userId)
 		REFERENCES core_user (id) ON DELETE CASCADE
 ) COLLATE = utf8mb4_unicode_ci;
+
+alter table calendar_preferences
+    add constraint calendar_preferences_calendar_calendar_id_fk
+        foreign key (defaultCalendarId) references calendar_calendar (id)
+            on delete set null;
 
 
 CREATE TABLE IF NOT EXISTS `calendar_event_custom_fields` (
@@ -412,3 +421,27 @@ CREATE TABLE IF NOT EXISTS calendar_schedule_object (
                                    etag VARBINARY(32),
                                    size INT(11) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE  IF NOT EXISTS `calendar_view` (
+	`id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+	`ownerId` int NOT NULL,
+	`name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+	`aclId` int NOT NULL,
+	`calendarIds` MEDIUMTEXT,
+	`groupIds` MEDIUMTEXT,
+	`defaultView` varchar(20) NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	INDEX `calendar_view_aclId_idx` (`aclId` ASC),
+	INDEX `ownerId` (`ownerId` ASC),
+	CONSTRAINT `calendar_view_aclId`
+		FOREIGN KEY (`aclId`)
+			REFERENCES `core_acl` (`id`)
+			ON DELETE RESTRICT
+			ON UPDATE RESTRICT,
+	CONSTRAINT `calendar_View_ownerId`
+		FOREIGN KEY (`ownerId`)
+		REFERENCES `core_user` (`id`)
+		ON DELETE RESTRICT
+		ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+

@@ -26,25 +26,25 @@ class Principal extends AclOwnerEntity
 	protected $entityTypeId;
 
 	/** @var string generated use from clientName-entityId */
-	public $id;
+	public string $id;
 
 	/** @var string One of the type constants */
-	public $type;
+	public string $type;
 
 	/** @var string The name of the principal, e.g. “Jane Doe”, or “Room 4B”. */
-	public $name;
+	public string $name;
 
 	/** @var ?string 40char hex hash of file */
-	public $avatarId;
+	public ?string $avatarId;
 
 	/** @var ?string A longer description of the principal, for example details about the facilities of a resource, or null if no description available. */
-	public $description;
+	public ?string $description;
 
 	/** @var ?string An email address for the principal, or null if no email is available */
-	public $email;
+	public ?string $email;
 
 	/** @var ?string The time zone for this principal, if known. If not null, the value MUST be a time zone id from the IANA Time Zone Database */
-	public $timeZone;
+	public ?string $timeZone;
 
 	protected $clientName;
 
@@ -52,6 +52,20 @@ class Principal extends AclOwnerEntity
 	{
 		return parent::defineMapping()
 			->addTable('core_principal', 'principal');
+	}
+
+	static function findIdByEmail($email, $preferUser = true) {
+		$id = User::findIdByEmailAliases($email);
+		if($id) {
+			return $id;
+		}
+		$stmt = self::find()->selectSingleValue('principal.id')
+			->where('email','=',$email);
+		if($preferUser) {
+			$stmt->join("core_entity", "e", "e.id=principal.entityTypeId")
+				->orderBy([new Expression("(e.name='User') DESC")]);
+		}
+		return $stmt->single();
 	}
 
 	static function currentUser() {
@@ -81,11 +95,12 @@ class Principal extends AclOwnerEntity
 			})->add('permissionLevel', function(Criteria $criteria, $value, Query $query) {
 				Acl::applyToQuery($query, 'principal.aclId', $value);
 			}, Acl::LEVEL_READ)
-//			->add('showDisabled', function (Criteria $criteria, $value){
-//				if($value === false) {
-//					$criteria->andWhere('enabled', '=', 1);
-//				}
-//			}, false)
+			->add('showDisabledUsers', function (Criteria $criteria, $value, Query $query){
+				if($value === false) {
+					$query->join("core_user", "u", "u.id = principal.id", "left");
+					$criteria->andWhere('(u.enabled IS NULL or u.enabled = 1)');
+				}
+			}, false)
 			->add('email', function (Criteria $criteria, $value, Query $query){
 				$criteria->where('email', '=', $value);
 			})
@@ -104,6 +119,11 @@ class Principal extends AclOwnerEntity
 						->andWhere('e.quitAt', 'IS', NULL)
 						->orWhere('e.quitAt','>',new DateTime())
 				);
+			})
+			->add("preferUser", function (Criteria $criteria, $value, Query $query){
+				$query
+					//->orderby([new Expression("max(entityTypeId=".User::entityType()->getId().") DESC, name ASC")]);
+					->orderby([new Expression("CASE WHEN entityTypeId = ".User::entityType()->getId()." THEN 0 ELSE 1 END, name ASC")]);
 			})
 			->add('groupId', function (Criteria $criteria, $value, Query $query){
 				$query->join('core_user_group', 'ug', 'ug.userId = principal.id')->andWhere(['ug.groupId' => $value]);
@@ -164,6 +184,16 @@ class Principal extends AclOwnerEntity
 		}
 		$this->entityId = $id;
 		$this->entityTypeId = $entityType->getId();
+	}
+
+
+	public function getEmailAliases() {
+		switch($this->entityTypeId) {
+			case User::entityType()->getId():
+					return User::findEmailAliases($this->id);
+				break;
+		}
+		return [];
 	}
 
 }

@@ -31,7 +31,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		
 		this.addEvents({changes:true, error:true});
 
-		window.groupofficeCore.jmapds(this.entity.name).on('change', (store, changes) => {
+		window.groupofficeCore.jmapds(this.entity.name).on('change', ({changes}) => {
 			this.fireEvent('changes', this, changes.created, changes.updated, changes.destroyed);
 		})
 	},
@@ -81,38 +81,11 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 * @returns {Promise}
 	 */
 	all : function(cb, scope) {
-
-		return this.getState().then(()  => {
-			if(this.isComplete) {
-				return this.query().then((response) => {
-					return this.get(response.ids).then( (result) => {
-						if(cb) {
-							cb.call(scope, true, result.entities);
-						}
-	
-						return result.entities
-					});				
-				});
-			} else
-			{
-				return go.Jmap.request({
-					method: this.entity.name + "/get"
-				}).then((response) => {
-
-					// this.metaStore.setItem('isComplete', true);
-					this.isComplete = true;
-					
-					if(cb) {
-						cb.call(scope, true, response.list);
-					}
-
-					return response.list;
-				}).catch((response) => {
-					if(cb) {
-						cb.call(scope, false, response);
-					}
-				});
-			}
+		return window.groupofficeCore.jmapds(this.entity.name).get().then((result) => {
+				if(cb) {
+					cb.call(scope, true, result.list);
+				}
+				return result.list;
 		});
 	},
 
@@ -179,11 +152,15 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		
 	},
 
+	data() {
+		return window.groupofficeCore.jmapds(this.entity.name).data;
+	},
+
 
 	// TODO
 	findBy : function(fn, scope, startIndex) {
 		startIndex = startIndex || 0;
-		const data = Object.values(this.data);
+		const data = Object.values(this.data());
 		for(let i = startIndex, l = data.length; i < l; i++) {
 			if(fn.call(scope || this, data[i])) {
 				return data[i];
@@ -350,7 +327,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 						})
 						.catch(setError => {
 							if(!response.notDestroyed) {
-								response.notUpdated = {};
+								response.notDestroyed = {};
 							}
 							response.notDestroyed[id] = setError;
 						})

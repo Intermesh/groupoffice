@@ -23,58 +23,51 @@ use go\core\db\Criteria;
 
 class Comment extends AclItemEntity {
 
-	public $id;
+	public ?string $id;
 	
-	public $text;
-	public $entityId;
+	public string $text;
+	public string $entityId;
 	protected $entity;
 	
-	public $entityTypeId;
-	
-	/** @var DateTime */
-	public $createdAt;
-	/** @var DateTime */
-	public $modifiedAt;
-	public $createdBy;
-	public $modifiedBy;
-	/** @var DateTime */
-	public $date;
+	public int $entityTypeId;
 
-	public $validateXSS = true;
+	public ?\DateTimeInterface $createdAt = null;
+
+	public ?\DateTimeInterface $modifiedAt = null;
+	public ?string $createdBy = null;
+	public ?string $modifiedBy = null;
+	public ?\DateTimeInterface $date;
+	public bool $validateXSS = true;
 
 	/**
 	 * Label ID's
 	 * 
 	 * @var int[]
 	 */
-	public $labels;
+	public array $labels = [];
 	
 	/**
 	 * By default the section is NULL. This property can be used to create multiple comment blocks per entity. 
 	 * This works with a 'section' filter that defaults to NULL.
-	 * 
-	 * @var string
 	 */
-	public $section;
+	public ?string $section = null;
 
 	/**
 	 *
 	 * @var string[]
 	 */
-	protected $images = [];
+	protected array $images = [];
 
 	/**
 	 * @var CommentAttachment[]
 	 */
-	public $attachments = [];
+	public array $attachments = [];
 
 
 	/**
 	 * The MIME message ID from the outgoing or incoming email (used in support module)
-	 *
-	 * @var string
 	 */
-	public $mimeMessageId;
+	public ?string $mimeMessageId = null;
 
 	use SearchableTrait;
 
@@ -232,7 +225,7 @@ class Comment extends AclItemEntity {
 	 * @param array|null $groups
 	 * @return Query $query;
 	 */
-	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
+	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int|null $userId = null, array|null $groups = null): Query
 	{
 		return $query;
 	}

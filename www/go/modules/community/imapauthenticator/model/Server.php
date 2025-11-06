@@ -7,25 +7,25 @@ use go\core\jmap\Entity;
 
 class Server extends Entity {
 	
-	public $id;
-	public $imapHostname;
-	public $imapPort;
-	public $imapEncryption;
+	public ?string $id;
+	public string $imapHostname;
+	public int $imapPort = 143;
+	public ?string $imapEncryption = "tls";
 	
-	public $imapValidateCertificate = true;
+	public bool $imapValidateCertificate = true;
 
-	public $removeDomainFromUsername = false;
+	public bool $removeDomainFromUsername = false;
 
-	public $smtpHostname;
-	public $smtpPort;
-	public $smtpUsername;
+	public ?string $smtpHostname;
+	public ?int $smtpPort;
+	public ?string $smtpUsername;
 	
 	/**
 	 * SMTP Password
 	 * 
-	 * @var string
+	 * @var ?string
 	 */
-	protected $smtpPassword = null;
+	protected ?string $smtpPassword = null;
 
 
 	public function historyLog(): bool|array

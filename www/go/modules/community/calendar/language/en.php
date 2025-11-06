@@ -5,9 +5,10 @@ return [
 	'CalendarEvent' => 'Event',
 
 
-	'mayChangeCalendars'=> 'Change Calendars',
+	'mayChangeCalendars'=> 'Create/Delete Calendars',
 	'mayChangeCategories' => 'Change Categories',
 	'mayChangeResources' => 'Change Resource',
+	'mayChangeViews' => 'Change Views',
 
 	'newScheduleTitle' => 'Do you want to invite the participants?',
 	'newScheduleText' => 'You have created an event with participants. By saving this even an invite will be sent to notify the participants.',
@@ -31,8 +32,8 @@ return [
 		'tentative' => '{name} is tentative about event "{title}" {date}',
 	],
 	'replyPageMessage' => [
-		'accepted' => 'U have accepted the event',
-		'declined' => 'U have declined the event',
-		'tentative' => 'U are tentative about the event',
+		'accepted' => 'You have accepted the event',
+		'declined' => 'You have declined the event',
+		'tentative' => 'You are tentative about the event',
 	],
 ];

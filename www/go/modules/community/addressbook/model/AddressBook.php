@@ -21,53 +21,21 @@ use go\modules\community\addressbook\Module;
  */
 
 class AddressBook extends AclOwnerEntity {
-	
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $id;
 
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $name;
-
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $aclId;
-
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $createdBy;
-
-	/**
-	 * 
-	 * @var int
-	 */
-	public $filesFolderId;
-
-
-	/**
-	 * 
-	 * @var string
-	 */
-	public $salutationTemplate;
+	public ?string $id;
+	public string $name;
+	public ?string $createdBy;
+	public ?string $filesFolderId;
+	public ?string $salutationTemplate;
 
 	/**
 	 * 
 	 * @var int[]
 	 */
-	public $groups;
+	public array $groups;
 
 	protected function init()
 	{
-		
 		if(empty($this->salutationTemplate)) {
 			$this->salutationTemplate = go()->t("salutationTemplate", "community", "addressbook");
 		}
@@ -90,7 +58,6 @@ class AddressBook extends AclOwnerEntity {
 
 	public function buildFilesPath(): string
 	{
-
 		Module::checkRootFolder();
 
 		return "addressbook/" . File::stripInvalidChars($this->name);
@@ -135,7 +102,7 @@ class AddressBook extends AclOwnerEntity {
 	 * @return \go\modules\community\addressbook\model\AddressBook
 	 * @throws \Exception
 	 */
-	public static function getDefault(\go\core\model\User $user = null) {
+	public static function getDefault(\go\core\model\User|null $user = null) {
 		
 		if(!isset($user)) {
 			$user = go()->getAuthState()->getUser(['addressBookSettings']);

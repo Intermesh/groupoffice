@@ -50,7 +50,7 @@ class System extends Controller {
 
 	/**
 	 *
-	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/addPDFFont --file=/root/Downloads/Lato/Lato-Regular.ttf
+	 * docker compose exec --user www-data groupoffice ./www/cli.php  core/System/addPDFFont --file=/root/Downloads/Lato/Lato-Regular.ttf
 	 * @param string $file
 	 * @return void
 	 */
@@ -85,7 +85,7 @@ class System extends Controller {
 	}
 
 	/**
-	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/deleteGroup --id=29
+	 * docker compose exec --user www-data groupoffice ./www/cli.php  core/System/deleteGroup --id=29
 	 */
 	public function deleteGroup($params) {
 		$json = <<<JSON
@@ -109,7 +109,7 @@ JSON;
 	}
 
 	/**
-	 * docker-compose exec --user www-data groupoffice ./www/cli.php  core/System/deleteUser --id=1
+	 * docker compose exec --user www-data groupoffice ./www/cli.php  core/System/deleteUser --id=1
 	 */
 	public function deleteUser($params) {
 		$json = <<<JSON
@@ -149,13 +149,17 @@ JSON;
 	}
 
 	/**
-	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=ldapauthenticator --package=community --name=Sync
+	 * docker compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=ldapauthenticator --package=community --name=Sync
 	 *
-	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=contracts --package=business --name=CreateInvoices
+	 * docker compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=contracts --package=business --name=CreateInvoices
 	 *
-	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=core --package=core --name=GarbageCollection
+	 * docker compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=core --package=core --name=GarbageCollection
 	 *
-	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=calendar --package=community --name=ScanEmailForInvites
+	 * docker compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=calendar --package=community --name=ScanEmailForInvites
+	 *
+	 * docker compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=newsletters --package=business --name=Mailer
+	 *
+	 * docker compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=automation --package=business --name=AutomationCron
 	 * @throws NotFound
 	 */
 	public function runCron($params) {
@@ -187,7 +191,7 @@ JSON;
 	}
 
 	/**
-	 * docker-compose exec --user www-data groupoffice-master php ./www/cli.php core/System/upgrade
+	 * docker compose exec --user www-data groupoffice-master php ./www/cli.php core/System/upgrade
 	 * @throws Exception
 	 */
 	public function upgrade() {
@@ -226,7 +230,7 @@ JSON;
 
 
 	/**
-	 *  docker-compose exec --user www-data groupoffice php ./www/cli.php core/System/cleanup
+	 *  docker compose exec --user www-data groupoffice php ./www/cli.php core/System/cleanup
 	 */
 	public function cleanup() {
 
@@ -348,9 +352,9 @@ JSON;
 	 * @throws Forbidden
 	 * @example
 	 * ```
-	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/demo
+	 * docker compose exec --user www-data groupoffice ./www/cli.php core/System/demo
 	 *
-	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/demo --package=business --module=catalog
+	 * docker compose exec --user www-data groupoffice ./www/cli.php core/System/demo --package=business --module=catalog
 	 * ```
 	 */
 	public function demo($params = []) {

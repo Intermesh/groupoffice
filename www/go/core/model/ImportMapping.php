@@ -13,12 +13,12 @@ use go\core\util\JSON;
 
 class ImportMapping extends Entity {
 
-	public $id;
-	public $entityTypeId;
-	public $checksum;
-	public $name;
-	protected $mapping;
-	public $updateBy;
+	public ?string $id;
+	public int $entityTypeId;
+	public ?string $checksum;
+	public string $name;
+	protected ?string $mapping;
+	public ?string $updateBy;
 
 	public ?string $thousandsSeparator = null;
 	public ?string $decimalSeparator = null;

@@ -16,6 +16,7 @@ namespace go\core {
 	use go\core\event\Listeners;
 	use go\core\fs\Blob;
 	use go\core\fs\Folder;
+	use go\core\http\PostResponseProcessor;
 	use go\core\jmap\Request;
 	use go\core\mail\Mailer;
 	use go\core\model\Group;
@@ -119,6 +120,13 @@ namespace go\core {
 		 * Fires after all scripts have been loaded
 		 */
 		const EVENT_SCRIPTS = 'scripts';
+
+		/**
+		 * Fires when a user mailer is requested.
+		 *
+		 * @param $mailer array{mailer}
+		 */
+		const EVENT_USER_MAILER = 'usermailer';
 
 		/**
 		 *
@@ -255,14 +263,30 @@ namespace go\core {
 		 * $message = App::getMailer()->compose();
 		 * $message->setTo()->setFrom()->setBody()->send();
 		 * ```
+		 * @param string|null $fromEmail If given it will attempt to find an account that matches this sender e-mail. If
+		 * 	not found it will use the system mailer with the system from address and this address as Reply-To header.
+		 * @param string|null $fromName The from name to use in combination with the $fromEmail
+		 *
 		 * @return Mailer
 		 */
-		public function getMailer(): Mailer
+		public function getMailer(string|null $fromEmail = null, string|null $fromName = null): Mailer
 		{
-			if (!isset($this->mailer)) {
-				$this->mailer = new Mailer();
+			if(!isset($fromEmail)) {
+				return new Mailer();
+			} else {
+				$mailer = App::fireEvent(self::EVENT_USER_MAILER, $fromEmail);
+				if($mailer instanceof Mailer) {
+					$mailer->fromEmail = $fromEmail;
+					$mailer->fromName = $fromName;
+					return $mailer;
+				} else {
+					$mailer = new Mailer();
+					$mailer->fromEmail = go()->getSettings()->systemEmail;
+					$mailer->fromName = $fromName;
+					$mailer->replyTo = $fromEmail;
+					return $mailer;
+				}
 			}
-			return $this->mailer;
 		}
 
 		/**
@@ -449,7 +473,7 @@ namespace go\core {
 				"frameAncestors" => "",
 				"theme" => "Paper",
 				"allow_themes" => true,
-				"file_storage_path" => '/home/groupoffice',
+				"file_storage_path" => '/var/lib/groupoffice',
 				"tmpdir" => sys_get_temp_dir() . '/groupoffice',
 				"debug" => false,
 				"debugEmail" => false,
@@ -722,6 +746,8 @@ namespace go\core {
 		public function __destruct() {
 
 			try {
+				PostResponseProcessor::get()->runTasks();
+
 				EntityType::push();
 
 				if ($this->rebuildCacheOnDestruct) {
@@ -826,9 +852,9 @@ namespace go\core {
 		 * ```
 		 * go()->getAuthState()->getUser();
 		 * ```
-		 * @return int
+		 * @return ?string
 		 */
-		public function getUserId(): ?int
+		public function getUserId(): ?string
 		{
 			if ($this->getAuthState() instanceof AuthState) {
 				return $this->authState->getUserId();

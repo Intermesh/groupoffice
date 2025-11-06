@@ -636,10 +636,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 *
 	 * This function can be overridden in the model.
 	 *
-	 * @param type $attribute
-	 * @param type $label
+	 * @param string $attribute
+	 * @param string $label
 	 */
-	public function setAttributeLabel($attribute,$label) {
+	public function setAttributeLabel(string $attribute, string $label) {
 			$this->columns[$attribute]['label'] = $label;
 	}
 
@@ -652,7 +652,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	}
 
 	/**
-	 * Can be overriden to initialize the model. Useful for setting attribute
+	 * Can be overridden to initialize the model. Useful for setting attribute
 	 * validators in the columns property for example.
 	 */
 	protected function init(){}
@@ -3115,7 +3115,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if($this->isNew){
 
 			//automatically set sort order column
-			if($this->getSortOrderColumn())
+			if($this->getSortOrderColumn() && empty($this->{$this->getSortOrderColumn()}))
 				$this->{$this->getSortOrderColumn()}=$this->nextSortOrder();
 
 			$wasNew=true;
@@ -3184,8 +3184,12 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			
 			//change ACL owner
 			if($this->aclField() && !$this->getIsJoinedAclField() && $this->isModified('user_id')) {
-				$this->acl->ownedBy = $this->user_id;
-				$this->acl->save();
+				$acl = $this->acl;
+				if($acl) {
+					$acl->ownedBy = $this->user_id;
+					$acl->save();
+				}
+
 			}
 
 
@@ -4392,7 +4396,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if((!$this->hasLinks() && !$isSearchCacheModel) || $linksDisabled)
 			throw new \Exception("Links not supported by ".$this->className ());
 
-		Link::create($this, $model);
+		Link::create($this, $model, $description);
 
 		$this->fireEvent('link', array($this, $model, $description, $this_folder_id, $model_folder_id));
 		return true;

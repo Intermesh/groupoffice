@@ -24,6 +24,7 @@ use go\core\model\Module;
 use GO\Files\Model\TrashedItem;
 use go\modules\community\history\model\LogEntry;
 use go\core\exception\NotFound;
+use setasign\Fpdi\PdfParser\Type\PdfBoolean;
 
 /**
  * The File model
@@ -240,7 +241,9 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		if($this->isModified('folder_id')){
 			//file will be moved so we need the old folder path.
 			$oldFolderId = $this->getOldAttributeValue('folder_id');
-			$oldFolder = Folder::model()->findByPk($oldFolderId);
+			// Ignore ACL when in trash - A user should not have direct access to the trash folder
+			//, but should be able to move a file to its original location.
+			$oldFolder = Folder::model()->findByPk($oldFolderId, false, $this->isTrashed());
 			$oldRelPath = $oldFolder->path;
 			$oldPath = \GO::config()->file_storage_path . $oldRelPath . '/' . $filename;
 
@@ -363,8 +366,8 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 					throw new \Exception("Could not rename folder on the filesystem");
 
 				//get old folder objekt
-                                $oldFolderId = $this->getOldAttributeValue('folder_id');
-				$oldFolder = Folder::model()->findByPk($oldFolderId);
+                $oldFolderId = $this->getOldAttributeValue('folder_id');
+				$oldFolder = Folder::model()->findByPk($oldFolderId, false, $this->isTrashed());
 
 				$this->notifyUsers(
 					array(
@@ -378,7 +381,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 			}
 		}
 
-		if($this->isModified('locked_user_id')){
+		if(!$this->ignoreLockChange && $this->isModified('locked_user_id')){
 			$old_locked_user_id = $this->getOldAttributeValue('locked_user_id');
 			if(!empty($old_locked_user_id) && $old_locked_user_id != \GO::user()->id && !\GO::user()->isAdmin())
 				throw new \GO\Files\Exception\FileLocked();
@@ -399,6 +402,8 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 
 		return parent::beforeSave();
 	}
+
+	public bool $ignoreLockChange = false;
 
 	protected function getPath() {
 		return $this->folder ? $this->folder->path . '/' . $this->name : $this->name;
@@ -440,10 +445,8 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 
 	}
 	
-	public function checkPermissionLevel($level) {
-			
-//			var_dump($this->acl->description);
-		
+	public function checkPermissionLevel($level): bool
+	{
 		//If this folder belongs to a contact or project etc. then we only need write permission to delete it.
 		if($level == \GO\Base\Model\Acl::DELETE_PERMISSION && $this->folder->acl->usedIn != 'fs_folders.acl_id') {
 			$level = \GO\Base\Model\Acl::WRITE_PERMISSION;
@@ -458,6 +461,12 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	
 	
 	public function checkOldPermissionLevel($level) {
+		// Moving out of trash is allowed, even if the end user has no permissions to the trash folder
+		$trashFolder = Folder::model()->findByPath("trash");
+		if($this->getOldAttributeValue('folder_id') === $trashFolder->id){
+			return true;
+		}
+
 		//If this folder belongs to a contact or project etc. then we only need write permission to delete it.
 		if($level == \GO\Base\Model\Acl::DELETE_PERMISSION && $this->getOldFolder()->acl->usedIn != 'fs_folders.acl_id') {
 			$level = \GO\Base\Model\Acl::WRITE_PERMISSION;
@@ -492,7 +501,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 			GO::debug("touching parent");
 			$this->folder->touch();
 
-			$oldParent = \GO\Files\Model\Folder::model()->findByPk($this->getOldAttributeValue('folder_id'));
+			$oldParent = \GO\Files\Model\Folder::model()->findByPk($this->getOldAttributeValue('folder_id'), false, $this->isTrashed());
 
 			if($oldParent){
 				GO::debug("touching old parent");
@@ -714,12 +723,10 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	 */
 	public function findByPath($relpath){
 		$folder = Folder::model()->findByPath(dirname($relpath),false,array());
-		if(!$folder)
+		if (!$folder) {
 			return false;
-		else
-		{
-			return $folder->hasFile(\GO\Base\Fs\File::utf8Basename($relpath));
 		}
+		return $folder->hasFile(\GO\Base\Fs\File::utf8Basename($relpath));
 	}
 
 	/**
@@ -728,20 +735,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	 * @return boolean
 	 */
 	public function isImage(){
-		switch(strtolower($this->extension)){
-			case 'ico':
-			case 'jpg':
-			case 'jpeg':
-			case 'png':
-			case 'gif':
-			case 'bmp':
-			case 'xmind':
-			case 'svg':
-
-				return true;
-			default:
-				return false;
-		}
+		return $this->fsFile->isImage();
 	}
 
 
@@ -928,4 +922,15 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		$this->move($trashFolder, true);
 	}
 
+	/**
+	 * Simple check whether the file was originally in trash
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	private function isTrashed(): bool
+	{
+		$trashFolder = Folder::model()->findByPath('trash');
+		return $this->getOldAttributeValue("folder_id") === $trashFolder->id;
+	}
 }

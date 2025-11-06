@@ -1796,7 +1796,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$message = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
 		
-		$filename = GO\Base\Fs\File::stripInvalidChars($message->subject.' - '.\GO\Base\Util\Date::get_timestamp($message->udate));
+		$filename = GO\Base\Fs\File::stripInvalidChars(date("Y-m-d_Hi", $message->udate) . "_". $message->from->getAddress()['email'] . "_" .$message->subject);
 		$filename .= empty($params['download']) ? ".txt" :".eml";
 		
 		\GO\Base\Util\Http::outputDownloadHeaders(new \GO\Base\Fs\File($filename), empty($params['download']));
@@ -1944,10 +1944,11 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$account = Account::model()->findByPk($params['account_id']);
 		$response = ['success' => true];
 		$message = ImapMessage::model()->findByUid($account, $params["mailbox"], $params["uid"]);
+		$nextUid = $message->getImapConnection()->get_uidnext();
 		if ($message->deleteAttachments()) {
 			$message->delete();
 			$message->getImapConnection()->expunge();
-			$response['uid'] = $message->getImapConnection()->get_uidnext();
+			$response['uid'] = $nextUid;
 		}
 
 		return $response;

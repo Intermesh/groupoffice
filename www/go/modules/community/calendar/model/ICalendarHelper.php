@@ -6,20 +6,33 @@
  */
 namespace go\modules\community\calendar\model;
 
+use DateMalformedStringException;
+use DateTimeZone;
 use go\core\db\Expression;
 use go\core\ErrorHandler;
 use go\core\exception\JsonPointerException;
 use go\core\fs\Blob;
-use go\core\mail\Address;
-use go\core\mail\Attachment;
-use go\core\model\Acl;
 use go\core\model\Principal;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use Sabre\VObject;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Component\VEvent;
+use Sabre\VObject\Component\VTimeZone;
 use stdClass;
+
+class UserTimezoneGuesser implements VObject\TimezoneGuesser\TimezoneGuesser {
+
+	public function guess(VTimeZone $vtimezone, bool $failIfUncertain = false): ?DateTimeZone
+	{
+		if(!go()->getAuthState()) {
+			return null;
+		}
+		return new DateTimeZone(go()->getAuthState()->getUser(['timezone'])->timezone);
+	}
+}
+
+VObject\TimeZoneUtil::addTimezoneGuesser('gouser', new UserTimezoneGuesser());
 
 class ICalendarHelper {
 
@@ -37,20 +50,29 @@ class ICalendarHelper {
       'informational' => 'NON-PARTICIPANT',
 	];
 
+	const kinds = [
+		'individual', 'group', 'location', 'resource','unknown'
+	];
+
 	/**
 	 * Parse an Event object to a VObject
 	 * @param CalendarEvent $event
 	 * @param VCalendar|null $vcalendar The original vcalendar to sync to
 	 * @return VCalendar
 	 * @throws \DateInvalidTimeZoneException
-	 * @throws \DateMalformedStringException
+	 * @throws DateMalformedStringException
 	 */
 	static function toVObject(CalendarEvent $event, ?VCalendar $vcalendar = null): VCalendar
 	{
 
 		if($vcalendar === null) {
-			$vcalendar = new VCalendar(['PRODID' => $event->prodId]);
+			$vcalendar = new VCalendar();
 		}
+
+		$vcalendar->PRODID = CalendarEvent::prodId();
+
+		//TODO prodid always GO??? gmail doesn't process our reply but it does work with the sabre imipplugin
+
 
 		$vevent = $vcalendar->add(self::toVEvent($vcalendar->createComponent('VEVENT'),$event));
 
@@ -99,7 +121,10 @@ class ICalendarHelper {
 	}
 
 	static function toInvite(string $method, CalendarEvent &$event) : VCalendar {
-		$c = new VCalendar(['PRODID' => $event->prodId, 'METHOD' => $method]);
+		// Prodid must be set to Group-Office's otherwise gmail won't process the reply
+		$c = new VCalendar(['PRODID' => CalendarEvent::prodId(), 'METHOD' => $method]);
+		if(isset($event->timeZone))
+			$c->add(new \go\modules\community\calendar\model\VTimezone($event->timeZone));
 		$forBody = $event;
 		$baseVEvent = null;
 		if($method == 'CANCEL' || $event->isModified(array_merge(CalendarEvent::EventProperties,['participants']))) {
@@ -132,19 +157,18 @@ class ICalendarHelper {
 	 * @param VEvent $vevent
 	 * @param CalendarEvent $event
 	 * @param ?string $recurrenceId
-
-	 * @throws \DateMalformedStringException
+	 * @return VEvent
+	 * @throws DateMalformedStringException
 	 */
 	static function toVEvent(VEvent $vevent, CalendarEvent $event, ?string $recurrenceId = null): VEvent
 	{
-
 		if(!$recurrenceId) {
 			$recurrenceId = $event->recurrenceId;
 		}
 
 		if(!$recurrenceId) {
 			if(!empty($event->privacy) && $event->privacy !== 'public') $vevent->CLASS = self::$privacyMap[$event->privacy];
-			if(!empty($event->modifiedAt)) $vevent->{'LAST-MODIFIED'} = $event->modifiedAt->format('Ymd\THis\Z'); // @todo: check if datetime must be UTC
+			if(!empty($event->modifiedAt)) $vevent->{'LAST-MODIFIED'} = $event->modifiedAt->format('Ymd\THis\Z');
 			$vevent->DTSTAMP = new DateTime();
 		} else {
 			$rId = $vevent->add('RECURRENCE-ID', new DateTime($recurrenceId, $event->timeZone()));
@@ -188,7 +212,8 @@ class ICalendarHelper {
 			$attr['RSVP'] = 'TRUE';
 		}
 		if($participant->kind) {
-			$attr['CUTYPE'] = strtoupper($participant->kind);
+			//ENUM('individual', 'group', 'location', 'resource','unknown') NOT NULL,
+			$attr['CUTYPE'] = $participant->kind == 'location' ? "ROOM" : strtoupper($participant->kind);
 		}
 		foreach ($participant->getRoles() as $role => $true) {
 			if (in_array($role, self::$roleMap)) {
@@ -208,13 +233,15 @@ class ICalendarHelper {
 		'COUNT' => 'count',
 		'UNTIL' => 'until',
 		'INTERVAL' => 'interval',
-		'BYSETPOS' => 'bySetPos',
+		'BYSETPOS' => 'bySetPosition',
 		'BYSECOND' => 'bySecond',
 		'BYMINUTE' => 'byMinute',
 		'BYHOUR' => 'byHour',
 		'BYDAY' => 'byDay',
-		'BYMONTHDAY' => 'byMonthday',
+		'BYMONTHDAY' => 'byMonthDay',
 		'BYMONTH' => 'byMonth',
+		'BYWEEKNO' => 'byWeekNo',
+		'BYYEARDAY' => 'byYearDay'
 	];
 
 	/**
@@ -222,7 +249,7 @@ class ICalendarHelper {
 	 * @param CalendarEvent $event
 	 * @return string \Sabre\VObject\Property\ICalendar\Recur $rule
 	 * @throws \DateInvalidTimeZoneException
-	 * @throws \DateMalformedStringException
+	 * @throws DateMalformedStringException
 	 */
 	static private function toRrule(CalendarEvent $event) {
 		$recurrenceRule = $event->getRecurrenceRule();
@@ -253,18 +280,40 @@ class ICalendarHelper {
 		return implode(';',$rule);
 	}
 
-	static function calendarEventFromFile(string $blobId) {
+	/**
+	 * Generates CalendarEvent models from an icalendar file
+	 *
+	 * @param string $blobId
+	 * @param array|null $values
+	 * @return \Generator
+	 * @throws VObject\ParseException
+	 */
+	static function calendarEventFromFile(string $blobId, array|null $values = null) {
+
 		$data = file_get_contents(Blob::buildPath($blobId));
 		$splitter = new VObject\Splitter\ICalendar(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING + VObject\Reader::OPTION_IGNORE_INVALID_LINES);
 		while($vevent = $splitter->getNext()) {
 			try {
-				yield self::parseVObject($vevent, new CalendarEvent());
+				$event = new CalendarEvent();
+				if(isset($values)) {
+					$event->setValues($values);
+				}
+				yield self::parseVObject($vevent, $event);
 			} catch(\Throwable $e) {
+				ErrorHandler::logException($e, "Failed to import event");
 				yield ['error'=>$e, 'vevent'=>$vevent];
 			}
 		}
 	}
 
+	/**
+	 * Returns the first vobject from icalendar data
+	 *
+	 * @param string $data
+	 * @param $event
+	 * @return false|CalendarEvent
+	 * @throws VObject\ParseException
+	 */
 	static function fromICal(string $data, $event = null) {
 	//	$vcalendar = VObject\Reader::read(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING);
 		$splitter = new VObject\Splitter\ICalendar(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING + VObject\Reader::OPTION_IGNORE_INVALID_LINES);
@@ -276,15 +325,15 @@ class ICalendarHelper {
 	/**
 	 * Parse a VObject to an Event object
 	 * @param VCalendar|string $vcalendar
-	 * @param int $calendarId
 	 * @param CalendarEvent $event the event to insert the data into
 	 * @return CalendarEvent updated or new Event if not found
+	 * @throws \Exception
 	 */
 	static public function parseVObject($vcalendar, CalendarEvent $event): CalendarEvent
 	{
 
 		if(is_string($vcalendar)) {
-			$vcalendar = VObject\Reader::read($vcalendar, VObject\Reader::OPTION_FORGIVING);
+			$vcalendar = VObject\Reader::read($vcalendar, VObject\Reader::OPTION_FORGIVING + VObject\Reader::OPTION_IGNORE_INVALID_LINES);
 		}
 
 		$exceptions = [];
@@ -317,11 +366,14 @@ class ICalendarHelper {
 			$event->setValues((array)$obj); // title, description, start, duration, location, status, privacy
 			$event->prodId = $prodId;
 			$baseEvents[$event->uid] = $event;
-			if($event->isNew())
-			if(isset($vevent->{'DTSTAMP'}))
-				$event->createdAt = $vevent->DTSTAMP->getDateTime();
-			if(isset($vevent->{'LAST-MODIFIED'}))
-				$event->modifiedAt = $vevent->{'LAST-MODIFIED'}->getDateTime();
+			if($event->isNew() && isset($vevent->{'DTSTAMP'})) {
+				try {$event->createdAt = $vevent->DTSTAMP->getDateTime();}
+				catch(VObject\InvalidDataException $e) {$event->createdAt = new \DateTime();}
+			}
+			if(isset($vevent->{'LAST-MODIFIED'})) {
+				try{$event->modifiedAt = $vevent->{'LAST-MODIFIED'}->getDateTime();}
+				catch(VObject\InvalidDataException $e) {$event->modifiedAt = new \DateTime(); }
+			}
 			$event->showWithoutTime = !$vevent->DTSTART->hasTime();
 			if(isset($vevent->SEQUENCE))
 				$event->sequence = (int)$vevent->SEQUENCE->getValue();
@@ -355,7 +407,7 @@ class ICalendarHelper {
 							['offset' => (string)$valarm->TRIGGER, 'relativeTo' => 'start']
 					]);
 					if(isset($valarm->ACKNOWLEDGED))
-						$a->acknowledged = !!$valarm->ACKNOWLEDGED;
+						$a->acknowledged = $valarm->ACKNOWLEDGED->getDateTime();
 					$event->alerts[] = $a;
 				}
 			}
@@ -385,7 +437,7 @@ class ICalendarHelper {
 		return $event;
 	}
 
-	static function makeBlob(CalendarEvent $event, string $data = null): Blob
+	static function makeBlob(CalendarEvent $event, string|null $data = null): Blob
 	{
 		$blob = Blob::fromString($data ?? $event->toVObject());
 		$blob->type = 'text/calendar';
@@ -401,16 +453,22 @@ class ICalendarHelper {
 
 	static private function parseAttendee($vattendee) {
 		$key = str_ireplace('mailto:', '',(string)$vattendee);
-		$principalId = Principal::find()
-			->join("core_entity", "e", "e.id=principal.entityTypeId")
-			->selectSingleValue('principal.id')
-			->where('email','=',$key)
-			->orderBy([new Expression("(e.name='User') DESC")])
-			->single();
+		$principalId = Principal::findIdByEmail($key);
 
 		$p = (object)['email' => $key];
 		if(!empty($vattendee['EMAIL'])) $p->email = (string)$vattendee['EMAIL'];
-		$p->kind = !empty($vattendee['CUTYPE']) ? strtolower($vattendee['CUTYPE']) : 'individual';
+
+		if(!empty($vattendee['CUTYPE'])) {
+			$k = strtolower($vattendee['CUTYPE']);
+			if($k == 'room') {
+				$p->kind = 'location';
+			} else {
+				$p->kind = in_array($k, self::kinds) ? $k : 'individual';
+			}
+		}else {
+			$p->kind = 'individual';
+		}
+
 		if(!empty($vattendee['CN'])) $p->name = (string)$vattendee['CN'];
 		if(!empty($vattendee['RSVP'])) $p->expectReply = $vattendee['RSVP']->getValue() ? 1: 0; // bool
 		$p->participationStatus = !empty($vattendee['PARTSTAT']) ? strtolower($vattendee['PARTSTAT']) : 'needs-action';
@@ -495,7 +553,7 @@ class ICalendarHelper {
 		if(isset($parts['WKST'])) $values->firstDayOfWeek = strtolower($parts['WKST']);
 		if(!empty($parts['BYDAY'])) {
 			$values->byDay = [];
-			$days =array_map('trim',explode(",", $parts['BYDAY']));
+			$days =array_map('trim',(array) $parts['BYDAY']);
 			foreach($days as $day) {
 				$bd = (object)['day' => strtolower(substr($day, -2))];
 				if(strlen($day) > 2) {
@@ -504,12 +562,12 @@ class ICalendarHelper {
 				$values->byDay[] = $bd;
 			}
 		}
-		if(isset($parts['BYMONTHDAY'])) $values->byMonthDay = array_map('intval',explode(',', $parts['BYMONTHDAY']));
-		if(isset($patrs['BYMONTH'])) $values->byMonth = explode(',', $parts['BYMONTH']); // is string, could have L suffix
-		if(isset($patrs['BYYEARDAY'])) $values->byYearDay = array_map('intval',explode(',', $parts['BYYEARDAY']));
-		if(isset($patrs['BYWEEKNO'])) $values->byWeekNo = array_map('intval',explode(',', $parts['BYWEEKNO']));
+		if(isset($parts['BYMONTHDAY'])) $values->byMonthDay = array_map('intval', (array) $parts['BYMONTHDAY']);
+		if(isset($parts['BYMONTH'])) $values->byMonth = (array) $parts['BYMONTH']; // is string, could have L suffix
+		if(isset($parts['BYYEARDAY'])) $values->byYearDay = array_map('intval', (array) $parts['BYYEARDAY']);
+		if(isset($parts['BYWEEKNO'])) $values->byWeekNo = array_map('intval', (array) $parts['BYWEEKNO']);
 		// skip byHour, byMinute, bySecond
-		if(isset($patrs['BYSETPOS'])) $values->bySetPosition = array_map('intval',explode(',', $parts['BYSETPOS']));
+		if(isset($parts['BYSETPOS'])) $values->bySetPosition = array_map('intval', (array) $parts['BYSETPOS']);
 		if(isset($parts['COUNT'])) {
 			$values->count = intval($parts['COUNT']);
 		} elseif(isset($parts['UNTIL'])) {
@@ -544,7 +602,7 @@ class ICalendarHelper {
 		if($data instanceof Blob && $data->contentType === 'text/calendar') {
 			$data = file_get_contents($data->path());
 		}
-		return VObject\Reader::read(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING);
+		return VObject\Reader::read(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING + VObject\Reader::OPTION_IGNORE_INVALID_LINES);
 	}
 
 }

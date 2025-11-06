@@ -1,11 +1,23 @@
 import * as esbuild from 'esbuild';
+import fs from 'node:fs';
+
+let version;
+await fs.readFile("../../version.php", 'utf8', (err, data) => {
+	if (err) {
+		console.error(err);
+		throw err;
+	}
+
+	version = data.match(/\d+\.\d+\.\d+/)
+	console.log(version[0]);
+});
 
 // mark GOUI lib as external and map the path to the main lib
 let importPathPlugin = {
 	name: 'import-path',
 	setup(build) {
 		build.onResolve({ filter: /@intermesh\/goui/ }, args => {
-			return { path: "../../goui/script/index.js", external: true }
+			return { path: "../../goui/script/index.js?v=" + version, external: true }
 		})
 	},
 }
@@ -15,7 +27,7 @@ const watch = (process.argv.length > 2 && process.argv[2] == "watch");
 const opts = {
 	entryPoints: ['goui/script/index.ts', 'groupoffice-core/script/index.ts'],
 	bundle: true,
-	sourcemap: watch,
+	sourcemap: true,
 	format: "esm",
 	target: "esnext",
 	minify: !watch,

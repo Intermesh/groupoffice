@@ -14,4 +14,5 @@ return array (
   'OAuth2 Connections' => 'OAuth2 Verbindungen',
   'Client ID' => 'Client ID',
   'Project ID' => 'Project ID',
+  'Project Id' => 'Project Id',
 );

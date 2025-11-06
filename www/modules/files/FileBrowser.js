@@ -252,7 +252,7 @@ GO.files.FileBrowser = function(config){
 
 	this.trashGridStore = new GO.data.JsonStore({
 		url: GO.url("files/folder/trash"),
-		id: 'type_id',
+		id: 'trash_type_id',
 		fields: ['id', 'entity', 'name', 'fullPath', 'deletedByUser', 'deletedAt'],
 		remoteSort: true
 	});
@@ -504,16 +504,6 @@ GO.files.FileBrowser = function(config){
 		}
 	});
 
-	this.deleteButton = new Ext.menu.Item({
-		iconCls: 'ic-delete',
-		text: t("Delete"),
-		overflowText:t("Delete"),
-		handler: function(){
-			this.onDelete('grid');
-		},
-		scope: this
-	});
-
 	this.cutButton= new Ext.Button({
 		iconCls: 'ic-content-cut',
 		tooltip: t("Cut"),
@@ -624,7 +614,7 @@ GO.files.FileBrowser = function(config){
 	}));
 
 	if(!config.hideActionButtons) {
-		this.moreBtn.menu.add(this.deleteButton, this.moveToTrashButton);
+		this.moreBtn.menu.add(this.moveToTrashButton);
 	}
 
 
@@ -750,6 +740,14 @@ GO.files.FileBrowser = function(config){
 				new Ext.Toolbar({
 					hidden: true,
 					items: [
+						{
+							cls: 'go-narrow',
+							iconCls: "ic-menu",
+							handler: function () {
+								this.westPanel.show();
+							},
+							scope: this
+						},
 						"->",
 						new Ext.Button({
 							iconCls: 'ic-delete',
@@ -1591,8 +1589,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 							delete treeNode.attributes.children;
 							treeNode.reload();
 						}
-						this.gridStore.reload();
-						this.trashGridStore.reload();
+						this.gridStore.load();
+						this.trashGridStore.load();
 					},
 					scope: this
 				});
@@ -1605,8 +1603,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 							delete treeNode.attributes.children;
 							treeNode.reload();
 						}
-						this.gridStore.reload();
-						this.trashGridStore.reload();
+						this.gridStore.load();
+						this.trashGridStore.load();
 					},
 					scope: this
 				});
@@ -1649,8 +1647,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 						delete treeNode.attributes.children;
 						treeNode.reload();
 					}
-					this.gridStore.reload();
-					this.trashGridStore.reload();
+					this.gridStore.load();
+					this.trashGridStore.load();
 
 				},
 				scope:this
@@ -1686,8 +1684,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 					ids: ids.join(",")
 				},
 				success:function(action, response, result){
-					this.gridStore.reload();
-					this.trashGridStore.reload();
+					this.gridStore.load();
+					this.trashGridStore.load();
 				},
 				scope:this
 			})
@@ -2050,7 +2048,6 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		var createPermission=permissionLevel>=GO.permissionLevels.create;
 
 		this.newButton.setDisabled(!createPermission);
-		this.deleteButton.setDisabled(!deletePermission);
 		this.moveToTrashButton.setDisabled(!deletePermission);
 
 		this.cutButton.setDisabled(!deletePermission);
@@ -2153,7 +2150,11 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		const entityId = (entity.name === "File" ? "f": "d")+":"+id;
 		const detailViewName = entity.name.toLowerCase() + "Panel";
 		this[detailViewName].on("load", function(dv){
-			this.setFolderID(dv.data.folder_id || dv.data.parent_id, true);
+            if(entity.name === "Folder") {
+                this.setFolderID(dv.data.id, true);
+            } else {
+                this.setFolderID(dv.data.folder_id || dv.data.parent_id, true);
+            }
 		}, this, {single: true});
 		
 		this.gridStore.on("load", function(a,b,c) {

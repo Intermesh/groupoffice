@@ -120,6 +120,7 @@ class PushDispatcher
 		for($i = 0; $i < self::MAX_LIFE_TIME; $i += self::CHECK_INTERVAL) {
 			// break the loop if the client aborted the connection (closed the page)
 			if(connection_aborted()) {
+				go()->debug("SSE connection aborted by client");
 				break;
 			}
 
@@ -130,6 +131,7 @@ class PushDispatcher
 			}
 
 			$new = $this->checkChanges();
+//			go()->debug($new);
 			$diff = $this->diff($changes, $new);
 			if(!empty($diff)) {
 				$sleeping = 0;

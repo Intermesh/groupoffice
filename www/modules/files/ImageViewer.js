@@ -142,7 +142,7 @@ GO.files.ImageViewer = Ext.extend(go.Window, {
 		this.originalImgSize=false;
 		this.imgEl = this.body.createChild({
 			tag:'img',
-			src: fullSize ? this.viewerImages[index].download_path : this.viewerImages[index].src,
+			src: fullSize ? this.viewerImages[index].full_size_url ?? this.viewerImages[index].download_path : this.viewerImages[index].src,
 			cls:'fs-img-viewer'
 		});
 

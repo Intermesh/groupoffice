@@ -266,8 +266,9 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 *
 	 * @return string
 	 */
-	public function getExternalURL(){
-		return \GO::createExternalUrl("files", "showFolder", array($this->id));
+	public function getExternalURL(): string
+	{
+		return \GO::config()->orig_full_url . '#folder/' .$this->id;
 	}
 
 	public function getFolderIdsInPath($folder_id){
@@ -765,7 +766,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		if($file->save($ignoreAcl))
 			return $file;
 		else
-			throw new \Exception("Could not add file. Validation errors: ". implode( ", ", $file->getValidationErrors()));
+			throw new \Exception("Could not add file: ".$file->path." Validation errors: ". implode( ", ", $file->getValidationErrors()));
 	}
 
 	/**
@@ -864,18 +865,14 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * Adds missing files and folders from the filesystem to the database and
 	 * removes files and folders from the database that are not on the filesystem.
 	 *
-	 * @param boolean $recurseAll
-	 * @param boolean $recurseOneLevel
+	 * @param bool $recurseAll
+	 * @param bool $recurseOneLevel
 	 */
-	public function syncFilesystem($recurseAll=false, $recurseOneLevel=true) {
+	public function syncFilesystem(bool $recurseAll=false, bool $recurseOneLevel=true) {
 
-		if(\GO::config()->debug)
-			\GO::debug("syncFilesystem ".$this->path);
-
-		//this outputted in cronjobs (LDAP sync) and we don't want that
-//		if(\GO::environment()->isCli()){
-//			echo $this->path."\n";
-//		}
+		if(\GO::config()->debug) {
+			\GO::debug("syncFilesystem " . $this->path);
+		}
 
 		$oldIgnoreAcl = \GO::setIgnoreAclPermissions(true);
 
@@ -883,42 +880,39 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		GO::$disableModelCache=$recurseAll;
 
-//		if(class_exists("GO\Filesearch\FilesearchModule"))
-//			\GO\Filesearch\FilesearchModule::$disableIndexing=true;
-
-		if($this->fsFolder->exists()){
+		if ($this->fsFolder->exists()) {
 			$items = $this->fsFolder->ls();
 
 			foreach ($items as $item) {
-					if ($item->isFile()) {
-						$file = $this->hasFile($item->name());
-						if (!$file){
-							$this->addFile($item->name());
-						}else {
-							//this will update timestamp and size of file
+				if ($item->isFile()) {
+					$file = $this->hasFile($item->name());
+					if (!$file) {
+						$this->addFile($item->name());
+					} else {
+						//this will update timestamp and size of file
 
-							//todo: how can it be that $file->fsFile->exists() is needed here?
-							// it happens when the file on disk has a trailing space and the db name doesn't.
-							if($file->fsFile->exists() && $file->mtime != $file->fsFile->mtime()){
-								$file->save();
-							}
+						//todo: how can it be that $file->fsFile->exists() is needed here?
+						// it happens when the file on disk has a trailing space and the db name doesn't.
+						if ($file->fsFile->exists() && $file->mtime != $file->fsFile->mtime()) {
+							$file->save();
 						}
-
-					}else {
-
-						$willSync = $recurseOneLevel || $recurseAll;
-
-						$folder = $this->hasFolder($item->name());
-						if(!$folder) {
-							$folder = $this->addFolder($item->name(), false, !$willSync);
-						}
-
-						if($willSync)
-							$folder->syncFilesystem($recurseAll, false);
 					}
-//				}
+
+				} else {
+
+					$willSync = $recurseOneLevel || $recurseAll;
+
+					$folder = $this->hasFolder($item->name());
+					if (!$folder) {
+						$folder = $this->addFolder($item->name(), false, !$willSync);
+					}
+
+					if ($willSync) {
+						$folder->syncFilesystem($recurseAll, false);
+					}
+				}
 			}
-		}else {
+		} else {
 			$this->fsFolder->create();
 		}
 
@@ -1018,10 +1012,11 @@ class Folder extends \GO\Base\Db\ActiveRecord {
     /**
     * Check if a user receives notifications about changes in the folder.
     *
-    * @param type $user_id
-    * @return FolderNotification or false
+    * @param $user_id
+    * @return bool
     */
-    public function hasNotifyUser($user_id){
+    public function hasNotifyUser($user_id): bool
+    {
         return FolderNotification::model()->findByPk(
             array('user_id'=>$user_id, 'folder_id'=>$this->pk)
         ) !== false;
@@ -1034,11 +1029,12 @@ class Folder extends \GO\Base\Db\ActiveRecord {
     * @param type $arg1
     * @param type $arg2
     */
-    public function notifyUsers($folder_id, $type, $arg1, $arg2 = '') {
-			if(GO::user()) {
-        FolderNotification::model()->storeNotification($folder_id, $type, $arg1, $arg2);
-			}
-    }
+	public function notifyUsers($folder_id, $type, $arg1, $arg2 = '')
+	{
+		if (GO::user()) {
+			FolderNotification::model()->storeNotification($folder_id, $type, $arg1, $arg2);
+		}
+	}
 
 
 	/**

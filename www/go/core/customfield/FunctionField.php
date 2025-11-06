@@ -41,7 +41,7 @@ class FunctionField extends Number
 		return "decimal(19,$decimals) DEFAULT " . $d;
 	}
 
-	public function dbToApi($value, \go\core\orm\CustomFieldsModel $values, $entity): ?string
+	public function dbToApi($value, \go\core\orm\CustomFieldsModel $values, $entity): null|string|float
 	{
 
 		$f = $this->field->getOption("function");
@@ -60,9 +60,31 @@ class FunctionField extends Number
 			return "∞";
 		}
 
-		$result = null;
+		return $this->runMath($f);
+	}
+
+	private function runMath(string $math) {
+		$tokens = token_get_all("<?php {$math}");
+		$expr = '';
+
+		foreach($tokens as $token){
+
+			if(is_string($token)){
+
+				if(in_array($token, array('(', ')', '+', '-', '/', '*'), true))
+					$expr .= $token;
+
+				continue;
+			}
+
+			list($id, $text) = $token;
+
+			if(in_array($id, array(T_DNUMBER, T_LNUMBER)))
+				$expr .= $text;
+		}
+
 		try {
-			eval("\$result = " . $f . ";");
+			eval("\$result = {$expr};");
 		} catch (\Error $e) {
 			$result = null;
 		} catch(Exception $e) {
@@ -70,6 +92,7 @@ class FunctionField extends Number
 		}
 
 		return $result;
+
 	}
 
 	public function beforeSave($value, \go\core\orm\CustomFieldsModel $model, $entity, &$record): bool	{

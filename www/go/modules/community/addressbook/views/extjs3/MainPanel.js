@@ -405,7 +405,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 														"Business Phone": {field: "phoneNumbers[].number", fixed: {"type": "work"}},
 														"Business Phone 2": {field: "phoneNumbers[].number", fixed: {"type": "work"}},
 
-														"Mobile Phone": {field: "phoneNumbers[].number", fixed: {"type": "mobile"}},
+														"Mobile Phone": {field: "phoneNumbers[].number", fixed: {"type": "cell"}},
 														"Pager": {field: "phoneNumbers[].number", fixed: {"type": "other"}},
 														"Home Fax": {field: "phoneNumbers[].number", fixed: {"type": "fax"}},
 

@@ -1,19 +1,26 @@
 import {
-	arrayfield,
-	btn, checkbox, colorfield,
-	column, combobox,
-	comp, containerfield,
+	btn,
+	colorfield,
+	column,
+	combobox,
+	comp,
 	DataSourceStore,
-	datasourcestore, displayfield, durationfield,
+	datasourcestore,
 	h3,
-	hr, mapfield,
-	menu, numberfield,
-	searchbtn, select, splitter,
+	hiddenfield,
+	hr,
+	menu,
+	searchbtn,
+	select,
+	splitter,
 	Table,
 	table,
-	tbar, textarea, textfield, Window
+	tbar,
+	textarea,
+	textfield,
+	Window
 } from "@intermesh/goui";
-import {FormWindow, jmapds, principalcombo} from "@intermesh/groupoffice-core";
+import {FormWindow, jmapds, principalDS} from "@intermesh/groupoffice-core";
 import {t} from "./Index.js";
 
 class ResourceGroupWindow extends FormWindow {
@@ -27,7 +34,7 @@ class ResourceGroupWindow extends FormWindow {
 			textfield({name:'name', label: t('Name')}),
 			textarea({name:'description', label: t('Description')}),
 			combobox({
-				dataSource: jmapds("Principal"), displayProperty: 'name', filter: {entity: 'User'},
+				dataSource: principalDS, displayProperty: 'name', filter: {entity: 'User'},
 				label: t("Default admin"), name: "defaultOwnerId", filterName: "text", flex:'1 0', required:true
 			})
 		);
@@ -56,7 +63,8 @@ export class ResourceWindow extends FormWindow {
 			select({name:'groupId', required:true,label:t('Group'), 	store: resourceGroupStore, valueField: 'id', textRenderer: (r: any) => r.name}),
 			textfield({name:'name', flex:1,label: t('Name')}),
 			colorfield({name:'color',width:100, value: '69554f'}),
-			textarea({name:'description', label: t('Description')})
+			textarea({name:'description', label: t('Description')}),
+			hiddenfield({name:'includeInAvailability', value: 'all'})
 			//checkbox({disabled:true, name:'needsApproval', label: t('Needs approval')})
 		);
 
@@ -106,11 +114,10 @@ export class ResourcesWindow extends Window {
 					rowSelectionConfig: {
 						multiSelect: false,
 						listeners: {
-							selectionchange: (tableRowSelect) => {
-								const groupIds = tableRowSelect.getSelected().map((row) => row.record.id);
+							selectionchange: ({selected}) => {
+								const groupIds = selected.map((row) => row.record.id);
 								this.resourceTable!.store.setFilter("group", {groupId: groupIds[0]})
 								void this.resourceTable!.store.load();
-
 							}
 						}
 					},
@@ -160,14 +167,14 @@ export class ResourcesWindow extends Window {
 		this.items.add(
 			comp({cls:'hbox', flex:1},
 				aside,
-				splitter({stateId:'resource-splitter',resizeComponentPredicate:aside}),
+				splitter({stateId:'resource-splitter',resizeComponent:aside}),
 				comp({flex:1, cls:'vbox', style:{backgroundColor: 'var(--bg-low)'}},
 					tbar({cls: "border-bottom"},
 						h3(t("Resources")),
 						'->',
 						searchbtn({
 							listeners: {
-								input: (searchBtn, text) => {
+								input: ( {text}) => {
 									this.resourceTable!.store.setFilter("search", {text: text})
 								}
 							}
@@ -190,9 +197,9 @@ export class ResourcesWindow extends Window {
 					this.resourceTable = table({
 						fitParent: true,
 						store: resourceStore,
-						columns: [column({header: t("ID"), id:"id", sortable: true, width: 60}),
+						columns: [column({header: t("ID"), id:"id", sortable: true, hidden:true, width: 60}),
+							column({header: t("Color"), id:"color", width: 40, renderer: v => comp({text:'-',style:{backgroundColor:'#'+v}}) }),
 							column({header: t("Name"), id:"name", resizable: true, sortable: true, width: 180}),
-							column({header: t("Needs approval"),hidden:true, id: "needsApproval"}),
 							column({id: "btn", width: 48,renderer: (columnValue: any, record, td, table, rowIndex) =>
 									btn({
 										icon: "more_vert",
@@ -222,10 +229,10 @@ export class ResourcesWindow extends Window {
 							})
 						],
 						listeners: {
-							rowdblclick:(list, storeIndex) => {
+							rowdblclick:( {target, storeIndex}) => {
 								const d = new ResourceWindow();
 								d.show();
-								void d.load(list.store.get(storeIndex)!.id!);
+								void d.load(target.store.get(storeIndex)!.id!);
 							},
 
 							delete: async (_tbl) => {

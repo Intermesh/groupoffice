@@ -1,15 +1,21 @@
 <?php
 namespace go\modules\community\calendar;
 
-use GO\Base\Exception\AccessDenied;
+use DateInterval;
+use Faker\Generator;
 use go\core;
 use go\core\cron\GarbageCollection;
+use go\core\model\Group;
+use go\core\model\Link;
+use go\core\model\Module as GoModule;
+use go\core\model\Permission;
 use go\core\model\User;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\model\Module as CoreModule;
-use go\modules\community\calendar\cron;
+use go\core\util\DateTime;
 use go\modules\community\calendar\model\Calendar;
+use go\modules\community\calendar\model\Participant;
 use go\modules\community\calendar\model\Preferences;
 use go\modules\community\calendar\model\BusyPeriod;
 use go\modules\community\calendar\model\CalendarEvent;
@@ -29,6 +35,14 @@ class Module extends core\Module
 		return self::STATUS_STABLE;
 	}
 
+	/**
+	 * Default sort order when installing. If null it will be auto generated.
+	 * @return int|null
+	 */
+	public static function getDefaultSortOrder() : ?int{
+		return 20;
+	}
+
 
 	public function getAuthor(): string
 	{
@@ -45,6 +59,7 @@ class Module extends core\Module
 			'mayChangeCalendars', // allows Calendar/set (hide ui elements that use this)
 			'mayChangeCategories', // allows creating global categories for everyone. Personal cats can always be created.
 			'mayChangeResources',
+			'mayChangeViews'
 		];
 	}
 
@@ -55,13 +70,17 @@ class Module extends core\Module
 	public function defineListeners()
 	{
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
-		User::on(User::EVENT_SAVE, static::class, 'onUserSave');
+		User::on(User::EVENT_AFTER_SAVE, static::class, 'onUserSave');
 		User::on(User::EVENT_ARCHIVE, static::class, 'onUserArchive');
 		GarbageCollection::on(GarbageCollection::EVENT_RUN, static::class, 'onGarbageCollection');
 	}
 
-	static function onUserSave(User $user) {
-		if (!$user->isNew() && $user->isModified('email')) {
+	static function onUserSave(User $user, bool $wasNew) {
+		if($wasNew) {
+			if(core\model\Module::isAvailableFor("community", "calendar", $user->id)) {
+				Calendar::createDefault($user);
+			}
+		}else if (!$user->isNew() && $user->isModified('email')) {
 			$pIds = go()->getDbConnection()->selectSingleValue('CONCAT("Calendar:",id)')->from('calendar_calendar')
 				->where('groupId', 'IS NOT', null)
 				->andWhere('ownerId', '=', $user->id)->all();
@@ -99,12 +118,17 @@ class Module extends core\Module
 		$mapping->addHasOne('calendarPreferences', Preferences::class, ['id' => 'userId'], true);
 	}
 
+	// https://uri/path/api/download.php?blob=community/calendar/calendar/1
 	public function downloadCalendar($id) {
 		$calendar = Calendar::findById($id);
 		if($calendar->getPermissionLevel() < 50) {
 			throw new core\exception\Forbidden('You need manage permission to export this calendar');
 		}
-		$events = CalendarEvent::find()->where(['calendarId' => $id]);
+		$this->outputIcs($calendar);
+	}
+
+	private function outputIcs(Calendar $calendar) {
+		$events = CalendarEvent::find()->where(['calendarId' => $calendar->id]);
 		header('Content-Type: text/calendar; charset=UTF-8; component=vcalendar');
 		header('Content-Disposition: attachment; filename="'.$calendar->name.'export_'.$calendar->id.'_'.date('Y-m-d').'.ics"');
 		$vcalendar = new VCalendar([
@@ -117,6 +141,17 @@ class Module extends core\Module
 			ICalendarHelper::toVObject($ev, $vcalendar);
 		}
 		echo $vcalendar->serialize();
+	}
+
+	// https://uri/path/api/page.php/community/calendar/ics/key
+	public function pageIcs($key) {
+		// No auth needed but publishKey most be known to read
+		$calendar = Calendar::find()->where(['publishKey' => $key])->single();
+		if($calendar) {
+			$this->outputIcs($calendar);
+		} else {
+			throw new core\exception\Forbidden("Unauthorized");
+		}
 	}
 
 	public function downloadIcs($key) {
@@ -137,7 +172,23 @@ class Module extends core\Module
 			case 'days': $this->printWeek($date, $calendarIds, 5);break;
 			case 'week' : $this->printWeek($date, $calendarIds, 7);break;
 			case 'month' : $this->printMonth(new \DateTime($date), $calendarIds);break;
+			//case 'list' : $this->printList(new \DateTime($date), new DateTime($end), $calendarIds);break;
 		}
+	}
+
+	public function pagePrintList($start, $end) {
+
+		go()->setAuthState(new core\jmap\State());
+		$calendarIds = Calendar::find()->selectSingleValue('calendar_calendar.id')
+			->where('caluser.isVisible', '=',1)->andWhere('caluser.isSubscribed','=', true)->all();
+
+		$report = new reports\ListView();
+		$report->day = new DateTime($start);;
+		$report->end = new DateTime($end);;
+		$report->calendarIds = $calendarIds;
+		$report->render();
+
+		$report->Output('calendar_list_'.$start.'_'.$end.'.pdf');
 	}
 
 	private function printDay($start, $calendarIds){
@@ -159,15 +210,20 @@ class Module extends core\Module
 			$report->render();
 			$report->calendarName = Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
 		}
-		$report->Output('day.pdf');
+		$report->Output('calendar_day_'.$start->format('Y-m-d').'.pdf');
 	}
 
 	private function printWeek($date, $calendarIds, $span){
 
-		$start = (new \DateTime($date))->modify('Monday this week');
+		$report = new reports\Week();
+
+		$date = (new \DateTime($date));
+		$dayDiff = (int) $date->format('w') - $report->firstWeekday;
+
+		$start = $date->sub(new DateInterval("P" . $dayDiff . "D"));
 		$end = (clone $start)->modify('+'.$span.' days');
 
-		$report = new reports\Week();
+
 		$report->dayCount = $span;
 		$report->day = $start;
 		$report->end = $end;
@@ -183,7 +239,7 @@ class Module extends core\Module
 			$report->render();
 			$report->calendarName = Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
 		}
-		$report->Output('week.pdf');
+		$report->Output($report->Output('calendar_week_'.$start->format('Y-m-d').'_'.$end->format('Y-m-d').'.pdf'));
 	}
 
 	private function printMonth($date, $calendarIds) {
@@ -206,7 +262,7 @@ class Module extends core\Module
 			$report->render();
 			$report->calendarName = Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
 		}
-		$report->Output('month.pdf');
+		$report->Output($report->Output('calendar_month_'.$start->format('Y-m-d').'_'.$end->format('Y-m-d').'.pdf'));
 	}
 
 
@@ -218,7 +274,7 @@ class Module extends core\Module
 			->join('calendar_participant', 'p', 'p.eventId = eventdata.eventId', 'LEFT')
 			->where(['p.scheduleSecret' => $secret, 'eventdata.uid'=>$uid])->single();
 		if(!$event) {
-			throw new AccessDenied();
+			throw new core\exception\Forbidden();
 		}
 		$title = go()->t('Event page', 'community', 'calendar');
 		$method = 'PAGE'; // will show participation statusses or other participants
@@ -229,7 +285,7 @@ class Module extends core\Module
 			}
 		}
 		if(!$participant) {
-			throw new AccessDenied();
+			throw new core\exception\Forbidden();
 		}
 		if(isset($_GET['reply']) && in_array($_GET['reply'], ['accepted', 'tentative', 'declined'])) {
 			$participant->participationStatus = $_GET['reply'];
@@ -242,6 +298,15 @@ class Module extends core\Module
 		include __DIR__.'/views/imip.php'; // use same html as email because why not
 		require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageFooter.php');
 
+	}
+
+	protected function beforeInstall(GoModule $model): bool
+	{
+		// Share module with Internal group
+		$model->permissions[Group::ID_INTERNAL] = (new Permission($model))
+			->setRights(['mayRead' => true]);
+
+		return parent::beforeInstall($model);
 	}
 
 	protected function afterInstall(CoreModule $model): bool {
@@ -259,4 +324,84 @@ class Module extends core\Module
 //			'mayExportItems', // Allows users to export contacts
 //		];
 //	}
+
+
+	public function demo(Generator $faker)
+	{
+		$users = User::find(['id', 'displayName', 'email', 'timezone'])->limit(10)->all();
+		$userCount = count($users) - 1;
+
+		$locations = ['Online', 'Office', 'Customer', ''];
+
+		foreach($users as $user) {
+
+			$calendar = Calendar::find()->where('name', '=', $user->displayName)->single();
+			if(!$calendar) {
+				$calendar = Calendar::createFor($user->id);
+				$calendar->name = $user->displayName;
+				$calendar->timeZone = $user->timezone;
+				$calendar->setOwnerId($user->id);
+				$calendar->createdBy = $user->id; // This will make the ACL owned by the user too
+				$calendar->setAcl([
+					core\model\Group::ID_INTERNAL => core\model\Acl::LEVEL_READ
+				]);
+				if(!$calendar->save()) {
+					throw new core\orm\exception\SaveException($calendar);
+				}
+			}
+
+			for($i = 0; $i < 5; $i++) {
+
+				$time = new core\util\DateTime("-8 days");
+				$time->setTime(6,0,0);
+				$di = new DateInterval("P" . $faker->numberBetween(1, 14) ."D");
+				$time->add($di);
+
+				$event = new CalendarEvent();
+				$event->timeZone = $calendar->timeZone;
+				$event->start = (clone $time)->add(new DateInterval("PT" . $faker->numberBetween(1, 9) ."H"));
+				$event->duration = "PT30M";
+				$event->location = $locations[$faker->numberBetween(0, 3)];
+				$event->title = $faker->company;
+				$event->calendarId = $calendar->id;
+
+
+				$participant = new Participant($event);
+				$participant->email = $user->email;
+				$participant->name = $user->displayName;
+				$participant->setRoles(["owner" => true, 'attendee'=>true]); //organizer
+				$participant->participationStatus = Participant::Accepted;
+				$event->participants[$user->id] = $participant;
+
+				$user2 = $users[$faker->numberBetween(0, $userCount)];
+				$user3 = $users[$faker->numberBetween(0, $userCount)];
+
+				if($user2->id != $user->id) {
+					$participant = new Participant($event);
+					$participant->setRoles(['attendee'=>true]); //organizer
+					$participant->email = $user2->email;
+					$participant->name = $user2->displayName;
+					$participant->expectReply = true;
+					$event->participants[$user2->id ] = $participant;
+				}
+
+				if($user3->id != $user->id) {
+					$participant = new Participant($event);
+					$participant->setRoles(['attendee'=>true]); //organizer
+					$participant->email = $user3->email;
+					$participant->name = $user3->displayName;
+					$participant->expectReply = true;
+					$event->participants[$user3->id] = $participant;
+				}
+				if(!$event->save()) {
+					throw new core\orm\exception\SaveException($event);
+				}
+
+				Link::demo($faker, $event);
+
+				echo ".";
+			}
+		}
+
+	}
 }

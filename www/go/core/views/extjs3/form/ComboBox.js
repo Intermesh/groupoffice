@@ -324,15 +324,21 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 			}
 
 			if(!value) {
-				resolve(me);
 				go.form.ComboBox.superclass.setValue.call(me, value);
 				me.clearInvalid();
+				resolve(me);
 
 				return;
 			}
 
 			//create record from entity store if not exists
-			if (me.store && me.store.entityStore && me.store.entityStore.entity && !me.findRecord(me.valueField, value)) {
+			if (me.store && me.store.entityStore && me.store.entityStore.entity) {
+
+				if(me.findRecord(me.valueField, value)) {
+					go.form.ComboBox.superclass.setValue.call(me, value);
+					resolve(me);
+					return;
+				}
 
 				me.resolveEntity(value).then(function (entity) {
 					//this prevents the list to expand on loading the value
@@ -405,6 +411,8 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 				if(me.hiddenField){
 					 me.hiddenField.value = Ext.value(value, '');
 				}
+
+				// Not sure if this will cause an unpexpected change event with the text instead of the value
 				Ext.form.ComboBox.superclass.setValue.call(me, text);
 				me.value = value;
 				me.clearInvalid();

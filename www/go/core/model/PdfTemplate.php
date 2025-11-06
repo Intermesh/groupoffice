@@ -25,92 +25,79 @@ use go\core\validate\ErrorCode;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 class PdfTemplate extends Entity {
-	
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $id;
 
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $moduleId;
+	public ?string$id;
+
+	public string $moduleId;
 
 	/**
 	 * Arbitrary string to identity where the template belongs to. For exampkle a bussinessId in the
 	 * quote module
 	 *
-	 * @var string
 	 */
-	public $key;
+	public ?string $key = null;
 
 	/**
 	 * 
 	 * @var string
 	 */							
-	public $language;
+	public string $language;
 
 	/**
 	 * 
 	 * @var string
 	 */							
-	public $name;
+	public string $name;
 
-	/**
-	 * 
-	 * @var string
-	 */							
-	protected $stationaryBlobId;
+	protected ?string $stationaryBlobId = null;
 
 	/**
 	 *
 	 * @var string
 	 */
-	protected $logoBlobId;
+	protected ?string $logoBlobId = null;
 
 	/**
 	 * 
 	 * @var double
 	 */							
-	public $marginLeft = 10.0;
+	public float $marginLeft = 10.0;
 
 	/**
 	 * 
 	 * @var double
 	 */							
-	public $marginRight = 10.0;
+	public float $marginRight = 10.0;
 
 	/**
 	 * 
 	 * @var double
 	 */							
-	public $marginTop = 10.0;
+	public float $marginTop = 10.0;
 
 	/**
 	 * 
 	 * @var double
 	 */							
-	public $marginBottom = 10.0;
+	public float $marginBottom = 10.0;
 
 	/**
 	 * 
 	 * @var bool
 	 */							
-	public $landscape = false;
+	public bool $landscape = false;
 
 	/**
 	 * Defaults to A4
 	 * @var string
 	 */							
-	public $pageSize = 'A4';
+	public string $pageSize = 'A4';
 
 	/**
 	 * Defaults to mm
 	 * @var string
 	 */							
-	public $measureUnit = 'mm';
+	public string $measureUnit = 'mm';
 
 	public string $fontFamily = "dejavusans";
 
@@ -119,18 +106,18 @@ class PdfTemplate extends Entity {
 	/**
 	 * @var PdfBlock[]
 	 */
-	public $blocks = [];
+	public array $blocks = [];
 
 
-	public $footer = "";
-	public $header = "";
+	public ?string $footer = null;
+	public ?string $header = null;
 
-	public $headerX = 0;
-	public $headerY = 20;
+	public float $headerX = 0;
+	public float $headerY = 20;
 
 
-	public $footerX = 0;
-	public $footerY = -10;
+	public float $footerX = 0;
+	public float $footerY = -10;
 
 	protected static function defineMapping(): Mapping
 	{
@@ -170,7 +157,7 @@ class PdfTemplate extends Entity {
 	 * @param string|null $key
 	 * @return PdfTemplate|null
 	 */
-	public static function findByModule(string $package, string $name, ?string $preferredLanguage = null, string $key = null) : ?PdfTemplate {
+	public static function findByModule(string $package, string $name, ?string $preferredLanguage = null, string|null $key = null) : ?PdfTemplate {
 		$moduleModel = ModuleModel::findByName($package, $name);
 
 		$template = isset($preferredLanguage) ? static::find()->where(['moduleId' => $moduleModel->id, 'key'=> $key, 'language' => $preferredLanguage])->single() : null;

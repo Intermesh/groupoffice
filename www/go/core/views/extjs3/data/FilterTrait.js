@@ -22,7 +22,7 @@ go.data.FilterTrait = {
 	 * @returns {this}
 	 */
 	setFilter: function (cmpId, filter) {
-		if (filter === null) {
+		if (filter === null || filter === undefined) {
 			delete this.filters[cmpId];
 		} else {
 			this.filters[cmpId] = filter;

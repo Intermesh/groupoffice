@@ -58,3 +58,4 @@ cd $DIR;
 echo "DONE";
 
 buildGOUI "./www/go/modules"
+buildGOUI "./www/promodules"

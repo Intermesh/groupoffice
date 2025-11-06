@@ -310,11 +310,8 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 					idField: "groupId",
 					displayField: "name",
 					entityStore: "Group",
-
 					fieldLabel: t("Groups"),
-					storeBaseParams: {
-						filter: {"hideUsers": true}
-					}
+					storeConfig: {filters: {default: {hideUsers: true}}}
 				})
 			]
 		}, {

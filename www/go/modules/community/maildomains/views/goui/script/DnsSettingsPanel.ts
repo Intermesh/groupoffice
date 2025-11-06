@@ -11,7 +11,7 @@ import {
 	textarea, TextAreaField, TextField,
 	textfield, Window
 } from "@intermesh/goui";
-import {jmapds} from "@intermesh/groupoffice-core";
+import {jmapds, modules} from "@intermesh/groupoffice-core";
 import {MailDomain} from "./MailDomain.js";
 import {ImportDkimKeyDialog} from "./ImportDkimKeyDialog.js";
 
@@ -158,12 +158,12 @@ export class DnsSettingsPanel extends Component {
 					value: false,
 					style: {alignSelf: "start"},
 					renderer: (v, field) => {
-
+						const mod = modules.get("community", "maildomains")!;
 						if(!v) {
 							if(!this.spfFld.value) {
 								this.spfFld.setInvalid(t("Your SPF record is not set"));
 							} else {
-								this.spfFld.setInvalid(t("Your SPF record does not allow this server"));
+								this.spfFld.setInvalid(t("Your SPF record does not allow '{mailhost}'").replace("{mailhost}", mod.settings.mailHost));
 							}
 						} else {
 							this.spfFld.clearInvalid();

@@ -49,7 +49,7 @@ class ErrorHandler {
 	 * @param string|null $context Extra information about where the exception occurred
 	 * @return string The string that was logged. This contains sensitive information like the server path so use only for debugging!
 	 */
-	public static function logException(Throwable $e, string $context = null): string
+	public static function logException(Throwable $e, string|null $context = null): string
 	{
 		$cls = get_class($e);
 		

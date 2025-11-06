@@ -13,7 +13,7 @@ use go\core\model\User;
  */
 class TemporaryState extends AbstractState {
 
-	public function __construct(int $userId = null)
+	public function __construct(int|null $userId = null)
 	{
 		if(isset($userId)) {
 			$this->setUserId($userId);
@@ -40,7 +40,7 @@ class TemporaryState extends AbstractState {
 		return !empty($this->userId);
 	}
 
-	public function getUserId(): ?int
+	public function getUserId(): ?string
 	{
 		return $this->userId;
 	}

@@ -65,6 +65,7 @@ $server->addPlugin(new AuthPlugin($authBackend));
 $server->addPlugin(new CardDAVPlugin());
 $aclPlugin = new AclPlugin();
 $aclPlugin->allowUnauthenticatedAccess = false;
+$aclPlugin->hideNodesFromListings = true;
 $server->addPlugin($aclPlugin);
 
 //baseUri can also be /carddav/ with:

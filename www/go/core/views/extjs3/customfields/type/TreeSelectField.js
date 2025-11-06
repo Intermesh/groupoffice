@@ -238,6 +238,15 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 
 		return valid;
 	},
+
+	isModified: function() {
+		return this.isDirty()
+	},
+
+
+	trackReset: function() {
+		this._isDirty = false;
+	}
 });
 
 

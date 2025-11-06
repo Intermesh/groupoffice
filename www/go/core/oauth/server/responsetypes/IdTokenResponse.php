@@ -88,7 +88,7 @@ class IdTokenResponse extends BaseIdTokenResponse
      * @param AccessTokenEntityInterface $accessToken
      * @return array
      */
-    public function getExtraParams(AccessTokenEntityInterface $accessToken, AuthorizationRequest $authorizationRequest = null)
+    public function getExtraParams(AccessTokenEntityInterface $accessToken, AuthorizationRequest|null $authorizationRequest = null)
     {
         if (false === $this->isOpenIDRequest($accessToken->getScopes())) {
             return [];

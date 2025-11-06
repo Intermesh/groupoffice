@@ -15,7 +15,7 @@
         font-size:14px;
         margin: 24px auto;
     }
-    .foot { margin-top: 32px; padding: 8px 0; border-top: 1px solid #e0e0e0; background-color: #fafafa; }
+    .foot { padding: 8px 0; border-top: 1px solid #e0e0e0; background-color: #fafafa; }
     a.bord {
         display:inline-block;
         min-width:123px;
@@ -50,7 +50,7 @@
         font-size: 10px;
         line-height: 18px;
     }
-    .center { margin-left: 112px; width: 456px;}
+    .center { margin-left: 112px; width: 456px; padding-bottom: 32px;}
     .accepted {color:green;}
     .declined {color: red;}
     .tentative {color: blue;}
@@ -97,6 +97,7 @@ $icon = [
     <div class="center">
         <h4 <?=$method==='CANCEL'?'style="color:red;"':''?>><?=$title?></h4>
         <h1  <?=$method==='CANCEL'?'style="text-decoration: line-through;"':''?>><?=htmlentities($event->title)?></h1>
+        <?= !empty($event->location) ? '<h2>'.htmlentities($event->location).'</h2>':''?>
         <div>
             <?php $timeLines = $event->humanReadableDate();?>
             <h3><?=$timeLines[0];?></h3>
@@ -125,10 +126,10 @@ $icon = [
        ?>
     </div>
     <?php endif; ?>
-    <div class="foot"><?php if($method!=='CANCEL'): ?>
-        <a class="bord <?=$status['accepted']??''?>"  target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=accepted" style="margin-left:112px; margin-top:0;" ><?=go()->t('Akkoord')?></a>
-        <a class="bord <?=$status['tentative']??''?>" target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=tentative"><?=go()->t('Misschien')?></a>
-        <a class="bord <?=$status['declined']??''?>" target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=declined"><?=go()->t('Afwijzen')?></a>
+    <div class="foot <?= $participant->kind === 'resource' ? "" : 'go-hidden' ?>"><?php if($method!=='CANCEL'): ?>
+        <a class="bord <?=$status['accepted']??''?>"  target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=accepted" style="margin-left:112px; margin-top:0;" ><?=go()->t('Accept')?></a>
+        <a class="bord <?=$status['tentative']??''?>" target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=tentative"><?=go()->t('Maybe')?></a>
+        <a class="bord <?=$status['declined']??''?>" target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=declined"><?=go()->t('Decline')?></a>
 		<?php endif; ?>
     </div>
 

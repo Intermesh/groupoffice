@@ -278,3 +278,10 @@ $updates['202504101121'][] = "alter table tasks_task
 $updates['202504101121'][] = "";
 
 $updates['202504101121'][] = 'update tasks_task set start = due where start > due;';
+
+
+$updates['202504101121'][] = "ALTER TABLE `tasks_task` ADD COLUMN `location` TEXT DEFAULT NULL;";
+
+$updates['202506200940'][] = "update tasks_task set uri = concat(uid, '.ics') where uri is null;";
+
+$updates["202509020925"][] = "alter table tasks_tasklist_user add column syncToDevice tinyint default 1 not null after `isSubscribed`";

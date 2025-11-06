@@ -82,7 +82,8 @@
 			const store = go.Db.store(alert.entity);
 
 			if(!store) {
-				console.error("Alert for unknown entity " + alert.entity);
+				console.error("Dismissing alert for unknown entity:", alert);
+				void go.Db.store("Alert").destroy(alert.id);
 				return;
 			}
 

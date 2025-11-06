@@ -62,7 +62,7 @@ if (!class_exists('GOHolidaysUK')) {
 			return self::substitute($date);
 		}
 
-		private static function substitute(DateTime $date, int $moveDays = null) : ?string {
+		private static function substitute(DateTime $date, int|null $moveDays = null) : ?string {
 			$dayOfWeek = $date->format("w");
 			if($dayOfWeek == 0 || $dayOfWeek == 6) {
 				if(!isset($moveDays)) {

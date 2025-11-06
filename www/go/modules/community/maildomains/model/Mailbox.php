@@ -19,8 +19,8 @@ final class Mailbox extends AclItemEntity
 {
 	const EVENT_PASSWORD_VERIFIED = 'passwordverified';
 
-	public ?int $id;
-	public int $domainId;
+	public ?string $id;
+	public string $domainId;
 	public string $username;
 	protected ?string $password;
 
@@ -50,10 +50,8 @@ final class Mailbox extends AclItemEntity
 
 	/**
 	 * Quota in bytes
-	 *
-	 * @var int
 	 */
-	public int $quota;
+	public float $quota;
 
 	/**
 	 * Auto expunge in this period.
@@ -65,9 +63,9 @@ final class Mailbox extends AclItemEntity
 	 */
 	public string $autoExpunge = "30d";
 	public int $createdBy;
-	public DateTime $createdAt;
+	public \DateTimeInterface $createdAt;
 	public ?int $modifiedBy;
-	public ?DateTime $modifiedAt;
+	public ?\DateTimeInterface $modifiedAt;
 	public bool $active = true;
 
 	/**
@@ -173,8 +171,8 @@ final class Mailbox extends AclItemEntity
 		if ($this->isNew() || empty($this->homedir)) {
 			$d = $this->getDomain();
 			$parts = explode('@', $this->username);
-			$this->homedir = $d->domain . '/' . $parts[0] . '/';
-			$this->maildir = $d->domain . '/' . $parts[0] . '/Maildir/';
+			$this->homedir = $d->domain . '/' . $parts[0];
+			$this->maildir = $d->domain . '/' . $parts[0] . '/Maildir';
 		}
 
 		return parent::internalSave();
@@ -295,6 +293,9 @@ final class Mailbox extends AclItemEntity
 		$d = $this->getDomain();
 		$totalQuota = $d->totalQuota;
 		if (!empty($totalQuota)) {
+			if(empty($this->quota)) {
+				$this->quota = $d->defaultQuota;
+			}
 			if (empty($this->quota)) {
 				$this->setValidationError('quota', ErrorCode::FORBIDDEN,
 					'You are not allowed to disable mailbox quota');

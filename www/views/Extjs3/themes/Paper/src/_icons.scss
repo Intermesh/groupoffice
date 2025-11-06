@@ -1,3 +1,9 @@
+@use "sass:meta";
+@use "sass:string";
+@use "compat";
+@use "theme";
+@use "utils";
+
 @font-face {
 	font-family: 'Icons';
 	font-style: normal;
@@ -5,16 +11,16 @@
 	//src: url(#{$resourcePath}fonts/MaterialIcons-Regular.eot);// IE9 compat modes
 	src: local("Material Icons"),
 	local("MaterialIcons-Regular"),
-	url(#{$resourcePath}fonts/icons.woff2) format("woff2"), // Super Modern
+	url(#{theme.$resourcePath}fonts/icons.woff2) format("woff2"), // Super Modern
 		//url(#{$resourcePath}fonts/MaterialIcons-Regular.woff) format("woff"),  // Pretty Modern
-	url(#{$resourcePath}fonts/icons.ttf) format("truetype"); // Android, Safari, iOS
+	url(#{theme.$resourcePath}fonts/icons.ttf) format("truetype"); // Android, Safari, iOS
 }
 
 i.icon {
 	@extend %icon;
 	background-size: contain;
-	width:dp(24);
-	height: dp(24);
+	width:utils.dp(24);
+	height: utils.dp(24);
 }
 
 .email-grid-icon {
@@ -24,7 +30,7 @@ i.icon {
 
 %x-icon-btn {
   position:absolute;
-  margin: dp(-6) 0 0 dp(-32);
+  margin: utils.dp(-6) 0 0 utils.dp(-32);
   @extend %icon;
 }
 .x-icon-btn-ok:before  { @extend %x-icon-btn; content: 'check'; }
@@ -32,15 +38,15 @@ i.icon {
 .icon {
   color:inherit;
   &.s6 {
-	  @include var(color, fg-main); // only used in files thumbgrid
+	  @include compat.var(color, fg-main); // only used in files thumbgrid
 	  font-size: 6em;
-	  max-height: dp(6*24);
-	  max-width: dp(6*24);
+	  max-height: utils.dp(6*24);
+	  max-width: utils.dp(6*24);
   }
   &.small {
-	  font-size: dp(16);
-	  max-height: dp(16);
-	  max-width: dp(16);
+	  font-size: utils.dp(16);
+	  max-height: utils.dp(16);
+	  max-width: utils.dp(16);
   }
 }
 
@@ -48,12 +54,12 @@ i.icon {
 
 .x-menu-item-icon {
   position:relative;
-  padding: dp(4) dp(16) 0 0;
+  padding: utils.dp(4) utils.dp(16) 0 0;
   background-repeat:no-repeat !important;
   background-position:left center !important;
 	
 	&:before {
-		margin-top: dp(-3);//to correct top: 16 for old icons.
+		margin-top: utils.dp(-3);//to correct top: 16 for old icons.
 		@extend %icon;
 	}
 }
@@ -64,7 +70,7 @@ i.icon {
 	.x-tree-node-collapsed & {content: 'folder'}
 	.x-tree-node-loading & {
 		content: 'loop';
-		animation: rotate 0.8s infinite $curve-deceleration;
+		animation: rotate 0.8s infinite compat.$curve-deceleration;
 	}
 }
 
@@ -294,10 +300,10 @@ $filetype: (
 );
 
 @each $img, $extensions in $filetype {
-	@if type-of($extensions) == 'list' {
+	@if meta.type-of($extensions) == 'list' {
 		@each $extension in $extensions {
 			.filetype-#{$extension} {
-				background-image:url('#{$resourcePath}img/filetype/#{$img}.svg') !important;
+				background-image:url('#{theme.$resourcePath}img/filetype/#{$img}.svg') !important;
 				&.x-tree-node-icon:before  {
 						content: none;
 				}
@@ -305,7 +311,7 @@ $filetype: (
 		}
 	} @else {
 		.filetype-#{$extensions} {
-			background-image:url('#{$resourcePath}img/filetype/#{$img}.svg') !important;
+			background-image:url('#{theme.$resourcePath}img/filetype/#{$img}.svg') !important;
 			&.x-tree-node-icon:before  {
 				content: none;
 			}
@@ -315,21 +321,21 @@ $filetype: (
 
 .filetype {
 	display: inline-block;
-	min-height: dp(24);
-	min-width: dp(24);
+	min-height: utils.dp(24);
+	min-width: utils.dp(24);
 	vertical-align: middle;
 	background-size: contain;
 	background-position: center center;
-	background-image:url(#{$resourcePath}img/filetype/unknown.svg);
+	background-image:url(#{theme.$resourcePath}img/filetype/unknown.svg);
 	background-repeat: no-repeat;
 	&-link {
-		background-size: dp(24) dp(24);
-		background-position: dp(8) dp(8);
-		background-image:url(#{$resourcePath}img/filetype/unknown.svg);
+		background-size: utils.dp(24) utils.dp(24);
+		background-position: utils.dp(8) utils.dp(8);
+		background-image:url(#{theme.$resourcePath}img/filetype/unknown.svg);
 		background-repeat: no-repeat;
 		white-space: nowrap;
-		line-height: dp(24);
-		padding: dp(8) dp(16) dp(8) dp(40);
+		line-height: utils.dp(24);
+		padding: utils.dp(8) utils.dp(16) utils.dp(8) utils.dp(40);
 	}
 }
 
@@ -770,6 +776,7 @@ $material-icons : (
 	insert_invitation,
 	insert_link,
 	insert_photo,
+	inventory,
 	invert_colors,
 	invert_colors_off,
 	iso,
@@ -1158,6 +1165,7 @@ $material-icons : (
 	subway,
 	supervisor_account,
 	support,
+	support_agent,
 	surround_sound,
 	swap_calls,
 	swap_horiz,
@@ -1281,10 +1289,10 @@ $material-icons : (
 	zoom_out_map
 );
 @function str-replace($string, $search, $replace: '') {
-	$index: str-index($string, $search);
+	$index: string.index($string, $search);
 
 	@if $index {
-		@return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+		@return string.slice($string, 1, $index - 1) + $replace + str-replace(string.slice($string, $index + string.length($search)), $search, $replace);
 	}
 
 	@return $string;
@@ -1300,7 +1308,7 @@ $material-icons : (
 	&:before {
 		@extend %icon;
 		content: 'check';
-		margin-right: dp(8);
+		margin-right: utils.dp(8);
 	}
 }
 
@@ -1308,7 +1316,7 @@ $material-icons : (
 	&:before {
 		@extend %icon;
 		content: 'close';
-		margin-right: dp(8);
+		margin-right: utils.dp(8);
 	}
 }
 
@@ -1316,7 +1324,7 @@ $material-icons : (
 	&:before {
 		@extend %icon;
 		content: 'help';
-		margin-right: dp(8);
+		margin-right: utils.dp(8);
 	}
 }
 
@@ -1324,14 +1332,14 @@ $material-icons : (
 	&:before {
 		@extend %icon;
 		content: '';
-		margin-right: dp(32);
+		margin-right: utils.dp(32);
 	}
 }
 .go-icon-warning .x-grid3-cell-inner{
 	&:before {
 		@extend %icon;
 		content: 'warning';
-		margin-right: dp(8);
+		margin-right: utils.dp(8);
 	}
 }
 
@@ -1339,39 +1347,39 @@ $material-icons : (
 	&:before {
 		@extend %icon;
 		content: 'error';
-		margin-right: dp(8);
+		margin-right: utils.dp(8);
 	}
 }
 .go-icon-print .x-grid3-cell-inner{
 	&:before {
 		@extend %icon;
 		content: 'print';
-		margin-right: dp(8);
+		margin-right: utils.dp(8);
 	}
 }
 
 .ic-gender-male {
 	display: inline-block;
-	height: dp(24);
-	width: dp(24);
+	height: utils.dp(24);
+	width: utils.dp(24);
 
 	//background-size: contain;
 	//background-repeat: no-repeat;
 	background-color: var(--fg-icon);
-	mask-image: url(#{$resourcePath}img/icon/gender-male.svg);
-	-webkit-mask-image: url(#{$resourcePath}img/icon/gender-male.svg);
+	mask-image: url(#{theme.$resourcePath}img/icon/gender-male.svg);
+	-webkit-mask-image: url(#{theme.$resourcePath}img/icon/gender-male.svg);
 }
 
 
 .ic-gender-female {
 	display: inline-block;
-	height: dp(24);
-	width: dp(24);
+	height: utils.dp(24);
+	width: utils.dp(24);
 	//background-image: url(#{$resourcePath}img/icon/gender-female.svg);
 	//background-size: contain;
 	//background-repeat: no-repeat;
 	background-color: var(--fg-icon);
 
-	mask-image: url(#{$resourcePath}img/icon/gender-female.svg);
-	-webkit-mask-image: url(#{$resourcePath}img/icon/gender-female.svg);
+	mask-image: url(#{theme.$resourcePath}img/icon/gender-female.svg);
+	-webkit-mask-image: url(#{theme.$resourcePath}img/icon/gender-female.svg);
 }

@@ -194,7 +194,7 @@ class Utils {
   public static function parseDSN(string $dsn): array
   {
     $dsn = substr($dsn, 6); //strip mysql:
-    $parts = str_getcsv($dsn, ';');
+    $parts = str_getcsv($dsn, ';', '"', "");
     $options = [];
     foreach($parts as $part) {
       $is = strpos($part, '=');

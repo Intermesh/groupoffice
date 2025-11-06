@@ -106,7 +106,7 @@ class StringUtil {
    * @param string|null $sourceCharset
    * @return string
    */
-	public static function cleanUtf8(?string $str, string $sourceCharset = null): string
+	public static function cleanUtf8(?string $str, string|null $sourceCharset = null): string
 	{
 		if(empty($str)) {
 			return $str;
@@ -643,7 +643,7 @@ END;
 // Strip whitespace characters
 		$string = preg_replace('!\s!', '', $string);
 
-		$tags = 'applet|meta|xml|blink|link|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base';
+		$tags = 'applet|meta|xml|blink|link\s|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base';
 
 		if($withStyle) {
 			$tags .= '|style';
@@ -668,6 +668,7 @@ END;
 // Test both the original string and clean string
 			if (preg_match($pattern, $string, $matches) || preg_match($pattern, $orig, $matches)) {
 				go()->debug("XSS detected: ");
+				go()->debug($pattern);
 				go()->debug($matches);
 				return true;
 			}
@@ -1011,7 +1012,7 @@ END;
 			"'<body[^>]*>'usi",
 			"'</body>'usi",
 			"'<meta[^>]*>'usi",
-			"'<link[^>]*>'usi",
+			"'<link\s[^>]*>'usi",
 			"'<title[^>]*>.*?</title>'usi",
 //		"'<head[^>]*>.*?</head>'usi", //Amazon had body inside the head !?
 			"'<head[^>]*>'usi",
@@ -1259,7 +1260,7 @@ END;
 	 * @access public
 	 * @return float|null|bool
 	 */
-	public static function unlocalizeNumber(string $number = "", string $decimalSeparator = null, string $thousandsSeparator = null)
+	public static function unlocalizeNumber(string $number = "", string|null $decimalSeparator = null, string|null $thousandsSeparator = null)
 	{
 		if ($number == "") {
 			return null;

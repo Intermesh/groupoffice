@@ -3,7 +3,9 @@
 namespace go\modules\community\calendar\controller;
 
 use go\core\fs\Blob;
+use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
+use go\core\model\Acl;
 use go\core\util\StringUtil;
 use go\core\util\UUID;
 use GO\Email\Model\Account;
@@ -27,7 +29,12 @@ class CalendarEvent extends EntityController {
 	protected function entityClass(): string
 	{
 		return model\CalendarEvent::class;
-	}	
+	}
+
+	protected function canCreate(Entity $entity): bool
+	{
+		return $entity->hasPermissionLevel(30 /* writeown */);
+	}
 	
 	/**
 	 * @param array $params
@@ -95,22 +102,9 @@ class CalendarEvent extends EntityController {
 
 	public function generateJWT(array $params) : array {
 		$s = Module::get()->getSettings();
-
-		$header = $this->b64UrlEncode(json_encode(['typ' => 'JWT', 'alg' => 'HS512']));
-		$payload = $this->b64UrlEncode(json_encode([
-//			"context" => [],
-			'aud' => $s['videoJwtAppId'],
-			'iss' => $s['videoJwtAppId'],
-			'room' => $params['room'],
-			'sub' => '*',
-			'exp' => strtotime('+30 days'),
-		]));
-
-		$signature = hash_hmac('sha512', "$header.$payload", $s['videoJwtSecret'], true);
-
 		return [
 			'success' => true,
-			'jwt' => "$header.$payload." . $this->b64UrlEncode($signature)
+			'jwt' => $s->createJwtToken($params['room'])
 		];
 	}
 

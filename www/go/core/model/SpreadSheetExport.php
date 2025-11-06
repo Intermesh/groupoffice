@@ -12,9 +12,9 @@ use go\core\util\JSON;
 
 class SpreadSheetExport extends Entity
 {
-	public $id;
-	public $userId;
-	public $name;
+	public ?string $id;
+	public string $userId;
+	public string $name;
 	protected $columns;
 	protected $entityTypeId;
 

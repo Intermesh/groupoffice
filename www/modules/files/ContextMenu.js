@@ -89,14 +89,14 @@ GO.files.FilesContextMenu = function(config)
 		scope: this
 	});
 
-	this.deleteButton = new Ext.menu.Item({
-		iconCls: 'ic-delete',
-		text: t("Delete"),
-		handler: function(){
-			this.fireEvent('delete', this, this.records, this.clickedAt);
-		},
-		scope: this
-	});
+	// this.deleteButton = new Ext.menu.Item({
+	// 	iconCls: 'ic-delete',
+	// 	text: t("Delete"),
+	// 	handler: function(){
+	// 		this.fireEvent('delete', this, this.records, this.clickedAt);
+	// 	},
+	// 	scope: this
+	// });
 
 	this.moveToTrashButton = new Ext.menu.Item({
 		iconCls: "ic-delete",
@@ -258,7 +258,7 @@ GO.files.FilesContextMenu = function(config)
 	config['items'].push(this.copyButton);
 	//this.pasteButton,
 	config['items'].push(this.deleteSeparator = new Ext.menu.Separator());
-	config['items'].push(this.deleteButton);
+	// config['items'].push(this.deleteButton);
 	config['items'].push(this.moveToTrashButton);
 	config['items'].push(this.batchEditButton);
 	config['items'].push(this.compressSeparator = new Ext.menu.Separator());
@@ -316,6 +316,7 @@ GO.files.FilesContextMenu = function(config)
 	}
 
 	config['items'].push(this.shareMenuButton);
+
 	// Download selected (As Zip)
 	this.downloadSelectedFilesButton = new Ext.menu.Item({
 			iconCls: 'ic-cloud-download',
@@ -377,13 +378,12 @@ Ext.extend(GO.files.FilesContextMenu, Ext.menu.Menu,{
 			}
 
 		} else {
-		
 			if(clickedAt)
 				this.clickedAt = clickedAt;
 
 			var extension = '';
-			
-			if(records.length=='1') {
+
+			if(records.length === 1) {
 				extension = records[0].data.extension;
 
 				switch (extension) {
@@ -520,6 +520,21 @@ Ext.extend(GO.files.FilesContextMenu, Ext.menu.Menu,{
 
 			}
 
+			// Hide the share button if none of its child items are visible
+			let doHideShareMenuButton = true;
+			this.shareMenuButton.menu.items.each((item) => {
+				if(!item.hidden) {
+					doHideShareMenuButton = false;
+					return false;
+				}
+				return true
+			});
+
+			if (doHideShareMenuButton) {
+				this.shareMenuButton.hide();
+			} else {
+				this.shareMenuButton.show();
+			}
 		}
 
 		GO.files.FilesContextMenu.superclass.showAt.call(this, xy);

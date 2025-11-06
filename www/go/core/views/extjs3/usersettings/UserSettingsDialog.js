@@ -124,6 +124,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		this.addPanel(go.usersettings.AccountSettingsPanel);
 		this.addPanel(go.usersettings.LookAndFeelPanel);
+		this.addPanel(go.usersettings.NoticiationPanel);
 
 		if(go.Modules.get("core", "core").userRights.mayChangeUsers) {
 			this.addPanel(go.usersettings.VisibleToPanel);
@@ -397,7 +398,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 						}
 						var field = this.formPanel.getForm().findField(name);
 						if (field) {
-							field.markInvalid(response.notUpdated[id].validationErrors[name].description);
+							field.markInvalid(Ext.util.Format.htmlEncode(response.notUpdated[id].validationErrors[name].description));
 						}
 					}
 

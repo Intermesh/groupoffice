@@ -22,17 +22,17 @@ use stdClass;
 use Throwable;
 
 class Module extends Entity {
-	public $id;
-	public $name;
-	public $package;
-	public $sort_order;
-	public $version;
-	public $enabled;
+	public ?string $id;
+	public string $name;
+	public ?string $package;
+	public ?int $sort_order = null;
+	public int $version;
+	public bool $enabled = true;
 
 	/**
 	 * @var Permission[]
 	 */
-	public $permissions = [];
+	public array|null $permissions = [];
 
 	public static function sort(Query $query, ArrayObject $sort): Query
 	{
@@ -96,7 +96,7 @@ class Module extends Entity {
 			}
 		}
 		
-		if($this->isNew() || $this->sort_order < 1) {
+		if(empty($this->sort_order) || $this->sort_order < 1) {
 			$this->sort_order = $this->nextSortOrder();			
 		}
 
@@ -135,7 +135,7 @@ class Module extends Entity {
 				->where('package', '!=', "core");
 		}
 
-		return $query->single();
+		return max($query->single(), 100);
 	}
 	
 
@@ -163,7 +163,7 @@ class Module extends Entity {
 	 * @return stdClass For example ['mayRead' => true, 'mayManage'=> true, 'mayHaveSuperCowPowers' => true]
 	 * @noinspection DuplicatedCode
 	 */
-	public function getUserRights(int $userId = null) : stdClass
+	public function getUserRights(int|null $userId = null) : stdClass
 	{
 		if(!isset($userId)) {
 			$userId = go()->getAuthState()->getUserId();
@@ -438,7 +438,8 @@ class Module extends Entity {
 	
 	protected static function internalDelete(Query $query): bool
 	{
-		$query->andWhere('package != "core"');
+		//prevent core module from being removed
+		$query->andWhere('`name` != "core"');
 
 		return parent::internalDelete($query);
 	}
@@ -499,7 +500,7 @@ class Module extends Entity {
 	 * @param int $level
 	 * @return boolean
 	 */
-	public static function isAvailableFor(string $package, string $name, int $userId = null, int $level = Acl::LEVEL_READ): bool
+	public static function isAvailableFor(string $package, string $name, int|null $userId = null, int $level = Acl::LEVEL_READ): bool
 	{
 
 		if($package == "legacy") {
@@ -596,7 +597,7 @@ class Module extends Entity {
 	 * @param null|boolean $enabled If set, then the module's enabled flag will be matched
 	 * @return bool
 	 */
-	public static function isInstalled(string $package, string $name, bool $enabled = null): bool
+	public static function isInstalled(string $package, string $name, bool|null $enabled = null): bool
 	{
 		if($package == "legacy") {
 			$package = null;

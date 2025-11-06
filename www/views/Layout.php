@@ -47,22 +47,17 @@ $lang = go()->getLanguage()->getIsoCode();
     <link rel="stylesheet" media="print, screen"  href="<?= $themeUrl;?>style.css?v=<?=$cssMtime ?>">
     <link rel="stylesheet" href="<?= $webclient->getBaseUrl();?>views/goui/dist/groupoffice-core/style/<?= $webclient->gouiStyleSheet ?>">
 
-<?php if($webclient->loadExt):
+<?php if($webclient->loadExt) {
 	$webclient->drawScripts();
-    go()->fireEvent(App::EVENT_SCRIPTS);
+	go()->fireEvent(App::EVENT_SCRIPTS);
 	$authController->fireEvent('head');
-    go()->fireEvent(App::EVENT_HEAD);
-?>
+	go()->fireEvent(App::EVENT_HEAD);
+	if (!\go\core\Installer::isInstalling()):?>
+		<link rel="stylesheet" href="<?= GO::view()->getUrl()?>css.php?theme=<?=$themeUrl; ?>&v=<?=$webclient->getCSSFile(\GO::view()->getTheme()->getName())->getModifiedAt()->format("U"); ?>" />
+	<?php endif;
+}
 
-	<script type="text/javascript">
-		GO.util.density = GO.util.isMobileOrTablet() ? 160 :  <?= $webclient->density?>;
-	</script>
-    <?php if (!\go\core\Installer::isInstalling()): ?>
-    <link rel="stylesheet" href="<?= GO::view()->getUrl()?>css.php?theme=<?=$themeUrl; ?>&v=<?=$webclient->getCSSFile(\GO::view()->getTheme()->getName())->getModifiedAt()->format("U"); ?>"  />
-	<?php endif;?>
-<?php endif;?>
-
-<?php if(!empty(GO()->getConfig()['custom_css_url'])): ?>
+if(!empty(GO()->getConfig()['custom_css_url'])): ?>
     <link rel="stylesheet" href="<?=GO::config()->custom_css_url?>">
 <?php endif; ?>
 

@@ -75,7 +75,7 @@ $updates['202402221543'][] = function(){ // insert event overrides
 		$participantsStmt->execute([$row['id']]);
 		$exParticipants = $participantsStmt->fetchAll();
 		if(count($exParticipants) > 1) {
-			$patch->participants = [];
+			$participants = [];
 			foreach($exParticipants as $i => $p) {
 				$roles = [];
 				if($p['role']=='REQ-PARTICIPANT'){
@@ -84,7 +84,7 @@ $updates['202402221543'][] = function(){ // insert event overrides
 				if($p['is_organizer']) {
 					$roles['owner'] = true;
 				}
-				$patch->participants[$i] = (object)[
+				$participants[$p['user_id'] ? $p['user_id'] : $p['id']] = (object)[
 					'name' => $p['name'],
 					'kind' => 'individual',
 					'email' => $p['email'],
@@ -92,6 +92,8 @@ $updates['202402221543'][] = function(){ // insert event overrides
 					'participationStatus' => strtolower($p['status'])
 				];
 			}
+
+			$patch->participants = (object) $participants;
 		}
 
 		// add patch to calendar_recurrence_override
@@ -102,18 +104,20 @@ $updates['202402221543'][] = function(){ // insert event overrides
 
 $updates['202402221543'][] = function(){ // migrate recurrence rules and fix lastOccurrence and firstOccurrence
 
-	$stmt = go()->getDbConnection()->query("SELECT eventId, recurrenceRule,`start`,`timeZone`,`duration` FROM calendar_event WHERE recurrenceRule IS NOT NULL AND recurrenceRule != ''");
+	$stmt = go()->getDbConnection()->query("SELECT eventId, recurrenceRule,`start`,`timeZone`,`duration`,`showWithoutTime` FROM calendar_event WHERE recurrenceRule IS NOT NULL AND recurrenceRule != ''");
 
 	while($row = $stmt->fetch()) {
 
 		if($row['recurrenceRule'][0] == '{')
 			continue; // already done
+		$tz = $row['timeZone'] ? new DateTimeZone($row['timeZone']) : null;
 
-		$start = new DateTime($row["start"]);
+
+		$start = new DateTime($row["start"], $tz);
 		try {
 			$rrule = \go\core\util\Recurrence::fromString($row['recurrenceRule'], $start);
 
-			$recurrenceRule = json_encode($rrule->toArray());
+			$recurrenceRule = json_encode($rrule->toArray($row['showWithoutTime']));
 			$data = ['recurrenceRule' => $recurrenceRule];
 			if(isset($rrule->until)) {
 				$data['lastOccurrence'] = clone $rrule->until;
@@ -249,24 +253,27 @@ $updates['202404071212'][] = function() {
 // after timezone conversion make all full day event floating-time
 $updates['202404071212'][] = "UPDATE calendar_event SET timeZone = NULL WHERE showWithoutTime = 1;";
 // remove orphan categories
-$updates['202502261353'][] = "DELETE cat FROM calendar_category cat LEFT JOIN calendar_calendar c on c.id = cat.calendarId WHERE c.id IS NOT NULL;";
+$updates['202502261353'][] = "DELETE cat FROM calendar_category cat LEFT JOIN calendar_calendar c on c.id = cat.calendarId WHERE cat.calendarId IS NOT NULL AND c.id IS NULL;";
 // fix: set duration at 1 hour if duration is negative
 $updates['202503101510'][] = "UPDATE calendar_event SET duration = 'PT1H' WHERE duration LIKE 'PT-%';";
 $updates['202503111342'][] = function(){
-	\go\modules\community\calendar\cron\ScanEmailForInvites::install("*/5 * * * *");
+	\go\modules\community\calendar\cron\ScanEmailForInvites::install("*/5 * * * *", true);
 };
 
-$updates['202503131043'][] = "UPDATE core_link l
+$updates['202503131043'][] = "UPDATE IGNORE core_link l
 	JOIN core_entity et ON et.id = l.fromEntityTypeId
 	JOIN calendar_calendar_event e on e.eventId = l.fromId AND et.name = 'CalendarEvent'
 	SET l.fromId = e.id;";
 
-$updates['202503131043'][] = "UPDATE core_link l
+$updates['202503131043'][] = "UPDATE IGNORE core_link l
 	JOIN core_entity et ON et.id = l.toEntityTypeId
 	JOIN calendar_calendar_event e on e.eventId = l.toId AND et.name = 'CalendarEvent'
 	SET l.toId = e.id;";
-// fixed missing global calendars because it had calendar_id=0 in the old database
-$updates['202504070955'][] = "";
+// new migrations will update the alerts. Others will have dismissed those in the last 3 months.
+$updates['202504070955'][] = "UPDATE IGNORE core_alert a
+	JOIN core_entity et ON et.id = a.entityTypeId
+	JOIN calendar_calendar_event e on e.eventId = a.entityId AND et.name = 'CalendarEvent'
+	SET a.entityId = e.id;";
 
 $updates['202504071345'][] = "ALTER TABLE `calendar_event` CHANGE COLUMN `location` `location` TEXT NULL;";
 // replace existing resource into core_participants
@@ -288,4 +295,148 @@ $updates["202505011057"][] = "ALTER TABLE `calendar_calendar_event` ADD UNIQUE I
 $updates["202505061137"][] = "ALTER TABLE `calendar_event` ADD INDEX `fk_calendar_event_uid_index` (`uid` ASC);";
 $updates["202505071158"][] = "ALTER TABLE `calendar_calendar` ADD COLUMN `webcalUri` VARCHAR(512) NULL DEFAULT NULL AFTER `timeZone`;";
 
-// TODO: calendar views -> custom filters
+$updates["202506061051"][] = "alter table calendar_calendar_user
+    alter column includeInAvailability set default 'none';";
+
+
+$updates["202506121207"][] = "alter table `calendar_preferences` add column showTooltips	TINYINT(1)  DEFAULT 1 NOT NULL AFTER holidaysAreVisible;";
+
+
+$updates['202506130832'][] = "CREATE TABLE IF NOT EXISTS calendar_schedule_object (
+                                   id INT(11) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                   principaluri VARBINARY(255),
+                                   calendardata MEDIUMBLOB,
+                                   uri VARBINARY(200),
+                                   lastmodified INT(11) UNSIGNED,
+                                   etag VARBINARY(32),
+                                   size INT(11) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+$updates["202507221653"][] = "alter table `calendar_preferences` add column weekViewGridSize	INT DEFAULT 8 NOT NULL AFTER weekViewGridSnap;";
+
+$updates["202508111058"][] = "update calendar_event set uri = REPLACE(REPLACE(REPLACE(uri, '/', '_'), '+', '-'), '=', '.');";
+
+$updates["202508191124"][] = "alter table calendar_calendar_user add column syncToDevice tinyint default 1 not null after `timeZone`";
+
+$updates["202508211118"][] = "update ignore calendar_participant p inner join core_user u on u.email = p.email set p.id = u.id;";
+$updates["202508211118"][] = "update calendar_preferences set defaultCalendarId=null where defaultCalendarId not in (select id from calendar_calendar);";
+
+$updates["202508211118"][] = "alter table calendar_preferences
+    add constraint calendar_preferences_calendar_calendar_id_fk
+        foreign key (defaultCalendarId) references calendar_calendar (id)
+            on delete set null;";
+
+
+$updates["202508211118"][] = function() {
+	$overrides = go()->getDbConnection()->select ()
+		->from("calendar_recurrence_override")
+		->where("patch", "like", '%participants%');
+
+	foreach($overrides as $o) {
+		$patch = json_decode($o['patch']);
+		if(!isset($patch->participants) || !is_array($patch->participants)) {
+			continue;
+		}
+
+		$participants = [];
+
+		$index = 0;
+		foreach ($patch->participants as $participant) {
+			$userId = go()->getDbConnection()
+				->selectSingleValue('id')
+				->from("core_user")
+				->where("email", '=', $participant->email)
+				->single();
+
+			if($userId) {
+				$id = $userId;
+			} else {
+				$participantId = go()->getDbConnection()
+					->selectSingleValue('id')
+					->from("calendar_participant")
+					->where("email", '=', $participant->email)
+					->where("eventId", '=', $o['fk'])
+					->single();
+
+				$id = $participantId ? $participantId : "index_" . $index++;
+			}
+
+			$participants[$id] = $participant;
+		}
+
+		$patch->participants = (object) $participants;
+
+		unset($o['patch']);
+
+		go()->getDbConnection()
+			->update(
+				"calendar_recurrence_override",
+		['patch' => json_encode($patch)],
+			$o)
+			->execute();
+	}
+
+};
+
+$updates["202508281104"][] = "alter table calendar_preferences add personalCalendarId INT UNSIGNED NULL AFTER defaultCalendarId;";
+$updates["202508281104"][] = "alter table calendar_preferences
+    add constraint calendar_preferences_calendar_personal_calendar_id_fk
+        foreign key (personalCalendarId) references calendar_calendar (id)
+            on delete set null;";
+
+$updates["202508281104"][] = "UPDATE calendar_preferences set personalCalendarId = defaultCalendarId where defaultCalendarId is not null;";
+
+$updates["202509011354"][] = "alter table calendar_calendar_user add column syncToDevice tinyint default 1 not null after `timeZone`";
+
+$updates["202509151158"][] = "CREATE TABLE  IF NOT EXISTS `calendar_view` (
+	`id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+	`ownerId` int NOT NULL,
+	`name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+	`aclId` int NOT NULL,
+	`calendarIds` MEDIUMTEXT,
+	`groupIds` MEDIUMTEXT,
+	`defaultView` varchar(20) NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	INDEX `calendar_view_aclId_idx` (`aclId` ASC),
+	INDEX `ownerId` (`ownerId` ASC),
+	CONSTRAINT `calendar_view_aclId`
+		FOREIGN KEY (`aclId`)
+			REFERENCES `core_acl` (`id`)
+			ON DELETE RESTRICT
+			ON UPDATE RESTRICT,
+	CONSTRAINT `calendar_View_ownerId`
+		FOREIGN KEY (`ownerId`)
+		REFERENCES `core_user` (`id`)
+		ON DELETE RESTRICT
+		ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+$updates["202509151158"][] = function() {
+	$hasOldViewTable = go()->getDbConnection()->query("SHOW TABLES LIKE 'cal_views'")->fetch();
+	if(empty($hasOldViewTable))
+		return;
+
+	$rows = go()->getDbConnection()->exec("INSERT IGNORE INTO calendar_view (id,ownerId, name, aclId, defaultView) SELECT id, user_id, name, acl_id, if(merge=1, null, 'split-5') from cal_views");
+
+	$calendarsUpdateStmt = go()->getDbConnection()->getPDO()->prepare("UPDATE calendar_view SET calendarIds = ? WHERE id = ?");
+	$calendarsStmt = go()->getDbConnection()->query("SELECT view_id, GROUP_CONCAT(calendar_id) as ids from cal_views_calendars GROUP BY view_id");
+	foreach($calendarsStmt as $row) {
+		$ids = array_map(fn($id) => (string)$id, explode(',', $row['ids']));
+		$calendarsUpdateStmt->execute([json_encode($ids), $row['view_id']]);
+	}
+
+	$groupsUpdateStmt = go()->getDbConnection()->getPDO()->prepare("UPDATE calendar_view SET groupIds = ? WHERE id = ?");
+	$groupsStmt = go()->getDbConnection()->query("SELECT view_id, GROUP_CONCAT(group_id) as ids from cal_views_groups GROUP BY view_id");
+	foreach($groupsStmt as $row) {
+		$ids = array_map(fn($id) => (string)$id, explode(',', $row['ids']));
+		$groupsUpdateStmt->execute([json_encode($ids), $row['view_id']]);
+	}
+};
+
+$updates["202509161101"][] = "ALTER TABLE `calendar_preferences` CHANGE COLUMN `startView` `startView` VARCHAR(20) NULL DEFAULT 'month';";
+
+$updates['202510071214'][] = "ALTER TABLE `calendar_calendar` ADD COLUMN `publishKey` CHAR(20) NULL AFTER `highestItemModSeq`;";
+
+
+$updates['202510091209'][] = 'update calendar_recurrence_override set patch = replace(patch, \'"status":"cancelled"\', \'"excluded":true\')
+where patch like \'%"status":"cancelled"%\'';

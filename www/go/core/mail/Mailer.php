@@ -2,7 +2,9 @@
 
 namespace go\core\mail;
 
+use GO\Base\Html\Error;
 use go\core\ErrorHandler;
+use go\core\http\PostResponseProcessor;
 use go\core\http\Request;
 use go\core\model\SmtpAccount;
 use go\core\model\User;
@@ -38,29 +40,49 @@ class Mailer {
 	private bool $sent = false;
 
 	/**
+	 * From e-mail that will be used when you use {@see compose()}
+	 *
+	 * This is set when you use {@see App::getMailer()}
+	 */
+	public string|null $fromEmail;
+
+	/**
+	 * From name that will be used when you use {@see compose()}
+	 *
+	 * This is set when you use {@see App::getMailer()}
+	 */
+	public string|null $fromName;
+
+	/**
+	 * Reply-To header that will be used when you use {@see compose()}
+	 *
+	 * This is set when you use {@see App::getMailer()}
+	 */
+	public string|null $replyTo;
+
+	/**
 	 * Create a new mail message
 	 * @return Message
 	 */
 	public function compose(): Message
 	{
 		$message = new Message();
+
+		if(!isset($this->fromEmail)) {
+			if(isset($this->emailAccount)) {
+				$alias = $this->emailAccount->getDefaultAlias();
+				$this->fromEmail = $alias->email;
+				$this->fromName = $alias->name;
+			} else if(isset($this->smtpAccount)){
+				$this->fromEmail = $this->smtpAccount->fromEmail;
+				$this->fromName = $this->smtpAccount->fromName;
+			}
+		}
+
 		$message->setMailer($this);
 
-		if($this->emailAccount) {
-			$alias = $this->emailAccount->getDefaultAlias();
-			$message->setFrom($alias->email, $alias->name);
-		}
 		return $message;
 	}
-
-	public function getSender() {
-		if(!empty($this->emailAccount)) {
-			return $this->emailAccount->getDefaultAlias()->email;
-		} else if ($this->smtpAccount) {
-			return $this->smtpAccount->fromEmail;
-		}
-	}
-
 	/**
 	 * Provide SMTP account. If omited the system notification settings will be used.
 	 * 
@@ -138,6 +160,7 @@ class Mailer {
 	 */
 	public function send(Message $message) : void
 	{
+
 		$message->setMailer($this);
 		$this->prepareMessage($message);
 
@@ -147,6 +170,33 @@ class Mailer {
 		$this->sent = true;
 	}
 
+	/**
+	 * Send the message after the response has been sent and the client connection has been closed.
+	 *
+	 * @param Message $message
+	 * @param callable|null $onSuccess Called on success with message as parameter
+	 * @param callable|null $onError Called on error with message and exception as parameter
+	 * @return void
+	 * @see PostResponseProcessor
+	 *
+	 */
+	public function sendAfterResponse(Message $message, callable|null $onSuccess = null, callable|null $onError = null) {
+		PostResponseProcessor::get()->addTask(function() use ($message, $onSuccess, $onError){
+			go()->debug("Post response sending message");
+			try {
+				$this->send($message);
+				if(isset($onError)) {
+					call_user_func($onSuccess, $message);
+				}
+			} catch(\Throwable $e) {
+				if(isset($onError)) {
+					call_user_func($onError, $message, $e);
+				} else {
+					ErrorHandler::logException($e, "Failed to send message");
+				}
+			}
+		});
+	}
 
 	/**
 	 * Output message to a readable stream
@@ -295,6 +345,9 @@ class Mailer {
 
 		$this->mail->getSMTPInstance()->setTimeout(go()->getSettings()->smtpTimeout);
 
+		//speeds up multiple sends.
+		$this->mail->SMTPKeepAlive = true;
+
 	}
 
 	private function disableSSLVerification() {
@@ -395,6 +448,10 @@ class Mailer {
 			$this->mail->AltBody = $message->getAlternateBody();
 		}
 
+		if($message->getIcalendar()) {
+			$this->mail->Ical = $message->getIcalendar();
+		}
+
 		foreach ($message->getHeaders() as $name => $value) {
 			$this->mail->addCustomHeader($name, $value);
 		}
@@ -420,6 +477,7 @@ class Mailer {
 		} else if($this->emailAccount) {
 			$log->setEntity($this->emailAccount);
 		} else {
+			if(go()->getAuthState() === null) return;
 			$user = go()->getAuthState()->getUser();
 			if(isset($user)) {
 				$log->setEntity($user);
@@ -435,5 +493,11 @@ class Mailer {
 		if(!$log->save()){
 			ErrorHandler::log("Failed to write e-mail log");
 		}
+	}
+
+
+	public function sendMime(string $mime) : bool {
+		$this->initTransport();
+		return $this->mail->sendMime($mime);
 	}
 }

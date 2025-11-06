@@ -14,60 +14,52 @@ use go\core\orm\Property;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 class PdfBlock extends Property {
-	
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $id;
 
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $pdfTemplateId;
+	public ?int $id;
+
+	public string $pdfTemplateId;
 
 	/**
 	 * 
 	 * @var string
 	 */							
-	public $type = 'text';
+	public string $type = 'text';
 
 	/**
 	 * If x is null then the left margin will be used
 	 * @var double
 	 */							
-	public $x;
+	public ?float $x;
 
 	/**
 	 * If y is null then it will continue on where last block had the highest y
 	 * @var double
 	 */							
-	public $y;
+	public ?float $y;
 
 	/**
 	 * If null then the full page width will be used
 	 * @var double
 	 */							
-	public $width;
+	public ?float $width;
 
 	/**
 	 * If null then the height will be automatic depending on the content.
 	 * @var double
 	 */							
-	public $height;
+	public ?float $height;
 
 	/**
 	 * See tcpdf align. Default to L for left.
 	 * @var string
 	 */							
-	public $align = 'L';
+	public string $align = 'L';
 
 	/**
 	 * JSON content
 	 * @var string
 	 */							
-	public $content;
+	public string $content;
 
 	protected static function defineMapping(): Mapping
 	{

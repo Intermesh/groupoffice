@@ -28022,13 +28022,13 @@ Ext.Window = Ext.extend(Ext.Panel, {
 			// MOD: This will disable extJs it's drag ghost for dialogs
 			return this.getEl();
 
-        var ghost = this.createGhost(cls);
-        var box = this.getBox(true);
-        ghost.setLeftTop(box.x, box.y);
-        ghost.setWidth(box.width);
-        this.el.hide();
-        this.activeGhost = ghost;
-        return ghost;
+        // var ghost = this.createGhost(cls);
+        // var box = this.getBox(true);
+        // ghost.setLeftTop(box.x, box.y);
+        // ghost.setWidth(box.width);
+        // this.el.hide();
+        // this.activeGhost = ghost;
+        // return ghost;
     },
 
     
@@ -44343,8 +44343,7 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
     
     getDocMarkup : function(){
         var h = Ext.fly(this.iframe).getHeight() - this.iframePad * 2;
-        var theme = go.User ? go.User.theme : "Paper";
-        return String.format('<html><head><link rel="stylesheet" href="' + BaseHref + 'views/Extjs3/themes/' + theme + '/htmleditor.css"> <style type="text/css">body{border: 0; margin: 0; padding: {0}px; height: {1}px; cursor: text}</style></head><body></body></html>', this.iframePad, h);
+        return String.format('<html><head><link rel="stylesheet" href="' + BaseHref + 'views/Extjs3/themes/Paper/htmleditor.css"> <style type="text/css">body{border: 0; margin: 0; padding: {0}px; height: {1}px; cursor: text}</style></head><body></body></html>', this.iframePad, h);
     },
 
     
@@ -44355,12 +44354,12 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
 
     
     getDoc : function(){
-        return Ext.isIE ? this.getWin().document : (this.iframe.contentDocument || this.getWin().document);
+        return (this.iframe.contentDocument || this.getWin().document);
     },
 
     
     getWin : function(){
-        return Ext.isIE ? this.iframe.contentWindow : window.frames[this.iframe.name];
+        return window.frames[this.iframe.name];
     },
 
     
@@ -44550,10 +44549,14 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
 
     
     createLink : function() {
-        var url = prompt(this.createLinkText, this.defaultLinkValue);
-        if(url && url != 'http:/'+'/'){
-            this.relayCmd('createlink', url);
-        }
+				this.focus();
+				this.updateToolbar();
+				setTimeout(() => {
+					var url = prompt(this.createLinkText, this.defaultLinkValue);
+					if(url && url != 'http:/'+'/'){
+							this.relayCmd('createlink', url);
+					}
+				}, 10)
     },
 
     

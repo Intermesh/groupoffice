@@ -3,6 +3,7 @@ namespace go\core\model;
 
 use DateInterval;
 use Exception;
+use go\core\db\DbException;
 use go\core\ErrorHandler;
 use go\core\exception\RememberMeTheft;
 use go\core\http\Request;
@@ -31,41 +32,31 @@ class RememberMe extends Entity {
 	 * The token that identifies the user in the login process.
 	 * @var string
 	 */							
-	public $id;
+	public ?string $id;
 	
 	/**
 	 * The token that identifies the user. Sent in HTTPOnly cookie.
 	 * @var string
 	 */							
-	public $token;
+	public string $token;
 
 	private $unhashedToken;
 
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $userId;
+	public ?string $userId;
 
 	/**
 	 * Time this token expires. Defaults to one day after the token was created {@see LIFETIME}
-	 * @var DateTime
+	 * @var ?DateTime
 	 */							
-	public $expiresAt;
-	
-	/**
-	 *
-	 * @var DateTime
-	 */
-	public $series;
+	public ?\DateTimeInterface $expiresAt = null;
+
+	public string $series;
 
 
 	/**
 	 * FK to the core_client table
-	 *
-	 * @var int
 	 */
-	public $clientId;
+	public string $clientId;
 
 	/**
 	 * A date interval for the lifetime of a token
@@ -89,7 +80,8 @@ class RememberMe extends Entity {
 		->addTable('core_auth_remember_me', 'r');
 	}
 	
-	protected function init() {
+	protected function init(): void
+	{
 		parent::init();
 		
 		if($this->isNew()) {	
@@ -100,7 +92,8 @@ class RememberMe extends Entity {
 		}
 	}
 
-	private function setClient() {
+	private function setClient(): void
+	{
 
 		if(empty($this->clientId)) {
 			// must exists. because created with token
@@ -129,7 +122,8 @@ class RememberMe extends Entity {
 	/**
 	 * @throws Exception
 	 */
-	private function setNewToken() {
+	private function setNewToken(): void
+	{
 		$this->unhashedToken = static::generateToken();
 		$this->token = password_hash($this->unhashedToken, PASSWORD_DEFAULT);
 	}
@@ -148,7 +142,8 @@ class RememberMe extends Entity {
 		return $this->expiresAt < new DateTime();
 	}
 
-	private function setExpiryDate() {
+	private function setExpiryDate(): void
+	{
 		$expireDate = new DateTime();
 		$expireDate->add(new DateInterval(self::LIFETIME));
 		$this->expiresAt = $expireDate;		
@@ -171,7 +166,8 @@ class RememberMe extends Entity {
 	/**
 	 * @throws Exception
 	 */
-	public function setCookie() {
+	public function setCookie(): void
+	{
 		Response::get()->setCookie('goRememberMe', $this->getToken(), [
 			'expires' => $this->expiresAt->format("U"),
 			"path" => "/",
@@ -181,7 +177,8 @@ class RememberMe extends Entity {
 		]);
 	}
 
-	public static function unsetCookie() {
+	public static function unsetCookie(): void
+	{
 		Response::get()->setCookie('goRememberMe', "", [
 			'expires' => time() - 3600,
 			"path" => "/",
@@ -195,10 +192,12 @@ class RememberMe extends Entity {
 	/**
 	 * Verify remember me cookie
 	 *
+	 * @param ?string $value - the rememberMe token to be verified
 	 * @return bool|static
-	 * @throws Exception
+	 * @throws Exception|RememberMeTheft|SaveException|\Throwable
 	 */
-	public static function verify($value = null) {
+	public static function verify(?string $value = null): bool|static
+	{
 
 		if(!isset($value)) {
 			if(!isset($_COOKIE['goRememberMe'])) {
@@ -255,15 +254,29 @@ class RememberMe extends Entity {
 	/**
 	 * Called by GarbageCollection cron job
 	 *
-	 * @see GarbageCollection
 	 * @return bool
-	 * @throws Exception
+	 * @throws DbException|\Throwable
+	 * @see GarbageCollection
 	 */
 	public static function collectGarbage(): bool
 	{
-		return static::delete(
-			(new Query)
-				->andWhere('expiresAt', '<', new DateTime()));
+		go()->debug("GC: RememberMe");
+		try {
+			do {
+				// delete in batches to keep transaction small
+				static::delete(
+					(new Query)
+						->andWhere('expiresAt', '<', new DateTime())
+						->limit(1000)
+				);
+			} while (self::$lastDeleteStmt->rowCount() > 0);
+		} catch(DbException $e) {
+			// Just log exceptions here but continue
+			ErrorHandler::logException($e);
+		}
+
+		return true;
+
 	}
 
 	

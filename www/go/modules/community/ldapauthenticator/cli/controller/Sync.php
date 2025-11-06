@@ -79,7 +79,7 @@ class Sync extends Controller
 
 
 	/**
-	 * docker-compose exec --user www-data groupoffice php /usr/local/share/src/www/cli.php community/ldapauthenticator/Sync/users --id=1 --dryRun=1 --delete=1 --maxDeletePercentage=50
+	 * docker compose exec --user www-data groupoffice php /usr/local/share/src/www/cli.php community/ldapauthenticator/Sync/users --id=1 --dryRun=1 --delete=1 --maxDeletePercentage=50
 	 * @throws NotFound
 	 * @throws Exception
 	 */
@@ -276,6 +276,9 @@ class Sync extends Controller
 				$this->output("Deleting: " . $u[1]);
 				if (!$dryRun) {
 					User::delete(['id' => $u[0]]);
+
+					//push changes after each user
+					EntityType::push();
 				}
 			}
 		}
@@ -293,7 +296,7 @@ class Sync extends Controller
 	}
 
 	/**
-	 * docker-compose exec --user www-data groupoffice php /usr/local/share/groupoffice/cli.php community/ldapauthenticator/Sync/groups --id=2 --dryRun=1 --delete=1 --maxDeletePercentage=50
+	 * docker compose exec --user www-data groupoffice php /usr/local/share/groupoffice/cli.php community/ldapauthenticator/Sync/groups --id=2 --dryRun=1 --delete=1 --maxDeletePercentage=50
 	 * @throws Exception
 	 */
 	public function groups($params)
@@ -352,11 +355,14 @@ class Sync extends Controller
 			// Clear existing users
 			$group->users = [];
 
-
 			$members = $this->getGroupMembers($record, $connection, $server);
 
 			foreach ($members as $u) {
-				$user = User::find(['id'])->where(['username' => $u['username']])->orWhere(['email' => $u['email']])->single();
+				$userQuery = User::find(['id'])->where(['username' => $u['username']]);
+				if(!empty($u['email'])) {
+					$userQuery->orWhere(['email' => $u['email']]);
+				}
+				$user = $userQuery->single();
 				if (!$user) {
 					$this->output("Error: user '" . $u['username'] . "' does not exist in Group-Office");
 				} else {
@@ -426,6 +432,9 @@ class Sync extends Controller
 
 				if (!$dryRun) {
 					Group::delete(['id' => $g['id']]);
+
+					//push changes after each user
+					EntityType::push();
 				}
 			}
 		}
@@ -440,7 +449,7 @@ class Sync extends Controller
 			foreach ($record->memberuid as $uid) {
 				$accountResult = Record::find($ldapConn, $server->peopleDN, 'uid=' . $uid);
 				if ($r = $accountResult->fetch()) {
-					$members[] = ['username' => $this->getGOUserName($r, $server), 'email' => $r->mail[0]];
+					$members[] = ['username' => $this->getGOUserName($r, $server), 'email' => $r->mail[0] ?? null];
 				}
 
 			}

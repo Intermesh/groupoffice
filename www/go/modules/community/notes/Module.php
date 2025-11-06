@@ -35,6 +35,14 @@ class Module extends core\Module {
 		return "Intermesh BV";
 	}
 
+	/**
+	 * Default sort order when installing. If null it will be auto generated.
+	 * @return int|null
+	 */
+	public static function getDefaultSortOrder() : ?int{
+		return 35;
+	}
+
 	protected function rights(): array
 	{
 		return [

@@ -18,6 +18,7 @@ use GO\Base\Util\StringHelper;
 use go\core\ErrorHandler;
 use go\core\http\Client;
 use go\core\util\JSON;
+use Maestroerror\HeicToJpg;
 
 
 class CoreController extends \GO\Base\Controller\AbstractController {
@@ -316,6 +317,8 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		if(isset($params['foldericon'])){
 			
 			$src = $dir . $params['foldericon'].'.svg';
+
+
 		} else {
 		
 //		if (is_dir(GO::config()->file_storage_path . $params['src'])) {
@@ -323,7 +326,6 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 //		} else {
 
 			switch (strtolower($file->extension())) {
-
 				case 'svg':
 				case 'ico':
 				case 'jpg':
@@ -331,6 +333,8 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 				case 'png':
 				case 'gif':
 				case 'xmind':
+				case 'heic':
+				case 'heif':
 					$src = GO::config()->file_storage_path . $params['src'];
 					break;
 
@@ -390,6 +394,19 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		if($file->size() > \GO::config()->max_thumbnail_size*1024*1024){
 			throw new \Exception("Image may not be larger than " . Number::formatSize(\GO::config()->max_thumbnail_size*1024*1024));
 		}
+
+		if($file->extension() == 'svg')
+		{
+			header("Expires: " . date("D, j M Y G:i:s ", time() + (86400 * 365)) . 'GMT'); //expires in 1 year
+			header('Cache-Control: cache');
+			header('Pragma: cache');
+			header('Content-Type: ' . $file->mimeType());
+			header('Content-Disposition: inline; filename="' . $file->name() . '"');
+			header('Content-Transfer-Encoding: binary');
+
+			$file->output();
+			exit();
+		}
 		
 
 		$w = isset($params['w']) ? intval($params['w']) : 0;
@@ -440,7 +457,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		GO::debug("Thumb mtime: ".$thumbMtime." (".$cacheFilename.")");
 
 		if (!empty($params['nocache']) || !$thumbExists || $thumbMtime < $file->mtime() || $thumbMtime < $file->ctime()) {
-			
+
 			GO::debug("Resizing image");
 			$image = new \go\core\util\Image($file->path());
 
@@ -477,7 +494,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 						$image->resize($w, $h);
 					} elseif ($w) {
 						$image->resizeToWidth($w);
-					} else {
+					} else if($h) {
 						$image->resizeToHeight($h);
 					}
 				}

@@ -54,15 +54,23 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		this.watchRelations = {};
 
 		this.cls += " go-detail-view-" + this.entityStore.entity.name.toLowerCase();
-		
-		this.on('afterrender', function() {
 
-			this.items.each(function (item, index, length) {
+		this.on("add", (dp, item) => {
+			if (item.hiddenOnInit === undefined) {
+				item.hiddenOnInit = item.hidden;
+			}
+		});
 
+		if(this.items) {
+			this.items.each(item => {
 				if (item.hiddenOnInit === undefined) {
 					item.hiddenOnInit = item.hidden;
 				}
-			});
+			})
+		}
+		
+		this.on('afterrender', function() {
+
 			this.internalReset();
 
 			this.body.on("click", this.onBodyClick, this);

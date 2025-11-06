@@ -1,11 +1,11 @@
-@import 'utils';
+@use 'utils';
 
 $font-scale: 1 !default;
 $resourcePath: './' !default;
 //@import '../../../../goui/groupoffice-core/style/_theme.scss';
-@import 'theme';
+@use 'theme' with ($resourcePath: $resourcePath);
 
 
-@import 'compat';
-@import 'config';
-@import 'typography';
+@use 'compat';
+@use 'config';
+@use 'typography';

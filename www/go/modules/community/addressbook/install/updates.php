@@ -241,3 +241,6 @@ $updates['202412031558'][] = "create index addressbook_contact_actionAt_index
 
 $updates['202412031558'][] = "update addressbook_contact c
 set c.actionAt = (select max(date) from addressbook_date where contactId = c.id);";
+
+$updates['202508081003'][] = "update `addressbook_phone_number` set type='cell' where type='mobile';";
+$updates['202508081003'][] = "update `addressbook_phone_number` set type='workcell' where type='workmobile';";

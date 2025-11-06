@@ -6,11 +6,11 @@ use go\core\orm\Mapping;
 
 class Label extends Entity {
 
-	public $id; // was removed from jmap\Entity?
+	public ?string $id; // was removed from jmap\Entity?
 	
-	public $name;
-	public $color;
-	public $createdBy;
+	public string $name;
+	public ?string $color = null;
+	public ?string $createdBy = null;
 
 	protected static function defineMapping(): Mapping
 	{

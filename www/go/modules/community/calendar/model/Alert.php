@@ -6,6 +6,8 @@
  */
 namespace go\modules\community\calendar\model;
 
+use DateTimeInterface;
+use go\core\ErrorHandler;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Mapping;
 use go\core\orm\UserProperty;
@@ -27,29 +29,26 @@ class Alert extends UserProperty {
 	const Email = 'email';
 	const Display = 'display';
 
-	/** @var int auto increment primary key */
-	public $id;
+	/** @var ?int auto increment primary key */
+	public ?int $id;
 
-	/** @var string ISO 8061 signed duration */
-	protected $offset;
+	/** @var ?string ISO 8061 signed duration */
+	protected ?string $offset;
 
-	/** @var \DateTime Time to trigger the alarm. */
-	protected $when;
+	/** Time to trigger the alarm. */
+	protected DateTimeInterface|null $when;
 
 	/** @var string 'start' | 'end' of the startdate of the event */
-	protected $relatedTo = self::Start;
+	protected string $relatedTo = self::Start;
 
-	/** @var \DateTime when to user has dismissed the alert or when the server has carried out sending the email */
-	public $acknowledged;
+	/** when to user has dismissed the alert or when the server has carried out sending the email */
+	public DateTimeInterface|null $acknowledged;
 
 	/** @var string 'email' | 'display'  */
-	public $action;
+	public string $action = 'display';
 
 	/** @var int PK of the event this alarm is set on */
-	protected $fk;
-
-	/** @var int */
-	protected $userId;
+	protected int $fk;
 
 	protected static function defineMapping(): Mapping
 	{
@@ -133,15 +132,19 @@ class Alert extends UserProperty {
 			}
 
 			$date->setTimezone(new \DateTimeZone("UTC"));
-			if ($offset[0] == '-') {
-				$date->sub(new \DateInterval(substr($offset, 1)));
-				$coreAlert->triggerAt = $date;
-				return $coreAlert;
+
+			try {
+				if ($offset[0] == '-') {
+					$date->sub(new \DateInterval(substr($offset, 1)));
+				} else {
+					if ($offset[0] == '+') {
+						$offset = substr($offset, 1);
+					}
+					$date->add(new \DateInterval($offset));
+				}
+			} catch(\Exception $e) {
+				ErrorHandler::logException($e, "Invalid alert offset " . $offset);
 			}
-			if ($offset[0] == '+') {
-				$offset = substr($offset, 1);
-			}
-			$date->add(new \DateInterval($offset));
 			$coreAlert->triggerAt =  $date;
 		} else if (isset($this->when)) {
 			$coreAlert->triggerAt = $this->when;

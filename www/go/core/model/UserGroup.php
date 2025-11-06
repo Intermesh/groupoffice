@@ -5,17 +5,8 @@ use go\core\orm\Mapping;
 
 class UserGroup extends \go\core\orm\Property {
 	
-	/**
-	 *
-	 * @var int
-	 */
-	public $userId;
-	
-	/**
-	 *
-	 * @var int
-	 */
-	public $groupId;
+	public int $userId;
+	public int $groupId;
 	
 	protected static function defineMapping(): Mapping
 	{

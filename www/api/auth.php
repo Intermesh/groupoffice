@@ -22,7 +22,7 @@ use go\core\util\JSON;
  * @param int $status
  * @param ?string $statusMsg
  */
-function output(array $data = [], int $status = 200, string $statusMsg = null) {
+function output(array $data = [], int $status = 200, string|null $statusMsg = null) {
 
 	Response::get()->setHeader('Content-Type', 'application/json;charset=utf-8');
 	Response::get()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -49,7 +49,7 @@ function output(array $data = [], int $status = 200, string $statusMsg = null) {
 	exit();
 }
 
-function finishLogin(Token $token, string $rememberMeToken = null) {
+function finishLogin(Token $token, string|null $rememberMeToken = null) {
 	$authState = new State();
 	$authState->setToken($token);
 	go()->setAuthState($authState);
@@ -121,7 +121,18 @@ try {
 			$user = new User();
 			$user->setValues($data['user']);
 			if(!$user->save()) {
-				throw new SaveException($user);
+				$errors = $user->getValidationErrors();
+				$first = array_shift($errors);
+
+				if(!$first) {
+					$first = "Could not save user";
+				} else {
+					$first = $first['description'];
+				}
+
+				output([], 422, $first );
+
+
 			}
 
 			$token = new Token();

@@ -91,7 +91,7 @@ class MailDomain
 					'ma' => [
 						'active' => true,
 						'address' => $user->email,
-						'goto' => $user->email
+						'recipients' => [$user->email]
 					]]],
 				'clientCallId-2'
 			];
@@ -362,15 +362,15 @@ class MailDomain
 		$error = null;
 
 		foreach($responses as $key => $response) {
-			$callId = $data[$key][2];
+//			$callId = $data[$key][2];
 			if (isset($response[0]) && $response[0]== 'error') {
 				$error = 'Error: ' . $response[1]['debugMessage'] ?? $response[1]['message'];
 			} else if (!empty($response[1]['notCreated'])) {
-				$error = 'Error: ' . var_export($response[1]['notCreated'][$callId]['validationErrors'], true);
+				$error = 'Error: ' . var_export($response[1]['notCreated'], true);
 			} else if (!empty($response[1]['notUpdated'])) {
-				$error = 'Error: ' . var_export($response[1]['notUpdated'][$callId]['validationErrors'], true);
+				$error = 'Error: ' . var_export($response[1]['notUpdated'], true);
 			} else if (!empty($response[1]['notDestroyed'])) {
-				$error = 'Error: ' . var_export($response[1]['notDestroyed'][$callId]['validationErrors'], true);
+				$error = 'Error: ' . var_export($response[1]['notDestroyed'], true);
 			}
 			if ($error) {
 				throw new Exception($error);
