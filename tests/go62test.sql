@@ -3857,34 +3857,6 @@ INSERT INTO `go_groups` VALUES (1,'Admins',1,1,0),(2,'Everyone',1,2,0),(3,'Inter
 UNLOCK TABLES;
 
 --
--- Table structure for table `go_holidays`
---
-
-DROP TABLE IF EXISTS `go_holidays`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `go_holidays` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `date` date NOT NULL,
-  `name` varchar(100) NOT NULL DEFAULT '',
-  `region` varchar(10) NOT NULL DEFAULT '',
-  `free_day` tinyint(1) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`id`),
-  KEY `region` (`region`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `go_holidays`
---
-
-LOCK TABLES `go_holidays` WRITE;
-/*!40000 ALTER TABLE `go_holidays` DISABLE KEYS */;
-INSERT INTO `go_holidays` VALUES (1,'2020-01-01','New Years Day','en',1),(2,'2020-01-06','Twelfth Day','en',1),(3,'2020-05-01','May Day','en',1),(4,'2020-08-15','Assumption Day','en',1),(5,'2020-10-03','German Unification Day','en',1),(6,'2020-10-31','Reformation Day','en',1),(7,'2020-11-01','All Saints\' Day','en',1),(8,'2020-12-25','Christmas Day','en',1),(9,'2020-12-26','Boxing Day','en',1),(10,'2020-02-24','Shrove Monday','en',1),(11,'2020-02-25','Shrove Tuesday','en',1),(12,'2020-02-26','Ash Wednesday','en',1),(13,'2020-04-10','Good Friday','en',1),(14,'2020-04-12','Easter Sunday','en',1),(15,'2020-04-13','Easter Monday','en',1),(16,'2020-05-21','Ascension Day','en',1),(17,'2020-05-31','Whit Sunday','en',1),(18,'2020-06-01','Whit Monday','en',1),(19,'2020-06-11','Feast of Corpus Christi','en',1),(20,'2020-11-18','Penance Day','en',1);
-/*!40000 ALTER TABLE `go_holidays` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `go_link_descriptions`
 --
 

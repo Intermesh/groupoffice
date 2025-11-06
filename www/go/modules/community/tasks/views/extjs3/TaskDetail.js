@@ -135,11 +135,18 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 
 		if(this.support) {
 
-			this.add(new go.modules.comments.CommentsDetailPanel({
-				large: false,
-				title: t("Private notes"),
-				section: "private"
-			}));
+			if (go.Modules.isAvailable("community", "comments")) {
+				const wrapper = new go.GOUIWrapper({
+					cls: ""
+				});
+
+				this.add(wrapper);
+				this.privateComments = new GO.comments.CommentsPanel(this.entityStore.entity.name);
+				this.privateComments.title = t("Private notes");
+				this.privateComments.section = "private";
+
+				wrapper.comp = this.privateComments;
+			}
 
 			this.addContracts();
 		}
@@ -238,6 +245,10 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		this.deleteItem.setDisabled(this.data.permissionLevel < go.permissionLevels.writeAndDelete);
 
 		this.assignMeBtn.setVisible(!this.data.responsibleUserId);
+
+		if(this.privateComments) {
+			this.privateComments.load(this.data.id);
+		}
 
 		go.modules.community.tasks.TaskDetail.superclass.onLoad.call(this);
 	},

@@ -909,6 +909,13 @@ public function historyLog(): bool|array
 			}
 		}
 
+		if ($this->isNew()) {
+			$holiday = Holiday::getHolidaySet($this->language);
+			if ($holiday) {
+				$this->holidayset = $holiday;
+			}
+		}
+
 		if($this->isModified(['password'])) {
 			$this->passwordModifiedAt = new DateTime();
 		}

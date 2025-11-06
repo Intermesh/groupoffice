@@ -117,4 +117,7 @@ DROP TABLE IF EXISTS `go_links_pr2_projects`, `go_links_ta_tasks`, `go_links_ti_
 DROP TABLE IF EXISTS `go_links_go_users`, `go_links_no_notes`, `go_links_pm_projects`, `go_link_pm_report_templates`, `go_link_pr2_report_templates`;
 DROP TABLE IF EXISTS cf_select_tree_options, cf_tree_select_options;
 
+-- 25.1+
+DROP TABLE IF EXISTS go_holidays;
+
 SET SESSION foreign_key_checks=1;

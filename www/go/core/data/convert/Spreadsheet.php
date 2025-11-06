@@ -3,7 +3,6 @@
 namespace go\core\data\convert;
 
 use Exception;
-use go\core\db\Column;
 use go\core\event\EventEmitterTrait;
 use go\core\fs\Blob;
 use go\core\fs\File;
@@ -13,23 +12,13 @@ use go\core\model\FieldSet;
 use go\core\model\ImportMapping;
 use go\core\orm\Entity;
 use go\core\orm\exception\SaveException;
-use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\orm\Relation;
-use go\core\util\ArrayObject;
-use go\core\util\DateTime as GoDateTime;
 use go\core\util\StringUtil;
-use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet as PhpSpreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\Color;
-use PhpOffice\PhpSpreadsheet\Style\Font;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 use PhpOffice\PhpSpreadsheet\Worksheet\RowIterator;
-use Sabre\VObject\Property\VCard\DateTime;
-use function go\core\util\sorter;
-
 
 /**
  * CSV converter.
@@ -216,7 +205,7 @@ th {
 	{
 
 		if ($this->index == 0) {
-			$this->writeRecord(array_column($this->getHeaders(), 'name'), true);
+			$this->writeRecord(array_column($this->getHeaders(), 'label'), true);
 		}
 
 		$headers = $this->getHeaders();
