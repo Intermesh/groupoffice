@@ -133,7 +133,7 @@ abstract class Property extends Model {
 	/**
 	 * @var int|null When the entity has a user table this is the user we want to join or save that record for
 	 */
-	protected ?int $_forUserId = null;
+	private ?int $_forUserId = null;
 
 	/**
 	 * Constructor
@@ -662,7 +662,7 @@ abstract class Property extends Model {
 
 			if(is_object($v)) {
 				$this->oldProps[$propName] = clone $v;
-			} else if(is_array($v) && isset($v[0]) && $v[0] instanceof self) {
+			} else if(is_array($v) && (($firstKey = array_key_first($v)) && isset($v[$firstKey]) && $v[$firstKey] instanceof self)) {
 				$this->oldProps[$propName] = array_map(function($i) {return clone $i;}, $v);
 			} else {
 				$this->oldProps[$propName] = $v;
@@ -1858,6 +1858,13 @@ abstract class Property extends Model {
 		$stmt->execute();
 	}
 
+	/**
+	 *
+	 * When the entity has a user table or per user relations this is the user we want to join or save that record for
+	 *
+	 * @param int|null $forUserId
+	 * @return int|null
+	 */
 	public function forUserId(int|null $forUserId = null): ?int
 	{
 		if(isset($forUserId)) {
