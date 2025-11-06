@@ -208,7 +208,7 @@ abstract class Entity extends Property {
 
 	public static final function createFor(int $userId): static {
 		$instance = new static();
-		$instance->_forUserId = $userId;
+		$instance->forUserId($userId);
 		return $instance;
 	}
 	/**

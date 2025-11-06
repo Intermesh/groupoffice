@@ -543,7 +543,8 @@ class Scheduler {
 			}
 			if ($modified) {
 				$existingEvent->recurrenceOverrides[$recurId]->patchProps(
-					(object)['participants' => $modifiedParticipants]
+					(object)['participants' => $modifiedParticipants],
+					false
 				);
 			}
 		}
