@@ -1422,7 +1422,7 @@ public function historyLog(): bool|array
 			}
 		}
 
-		if(Module::isInstalled("legacy", "calendar")) {
+		if(Module::isInstalled("legacy", "calendar") && isset($this->calendarSettings)) {
 			if (($calendarId = $this->calendarSettings->calendar_id) && ($calendar = Calendar::model()->findByPk($calendarId))) {
 				$aclIds[] = $calendar->findAclId();
 			}
