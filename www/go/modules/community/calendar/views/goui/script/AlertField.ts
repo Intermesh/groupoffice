@@ -39,12 +39,15 @@ export class AlertField extends SelectField {
 			{value: '-P2D', name: '2 '+ t('days')+' '+t('before')+ " (9:00)"},
 			{value: '-P7D', name: '1 '+ t('week')+' '+t('before')+ " (9:00)"},
 		] : [
+			{value: 'P0D', name: t('At the start')},
 			{value: '-PT5M', name: '5 '+ t('minutes')+' '+t('before')},
 			{value: '-PT10M', name: '10 '+ t('minutes')+' '+t('before')},
 			{value: '-PT15M', name: '15 '+ t('minutes')+' '+t('before')},
 			{value: '-PT1H', name: '1 '+ t('hour')+' '+t('before')},
 			{value: '-PT2H', name: '2 '+ t('hours')+' '+t('before')},
-			{value: 'P0D', name: t('At the start')},
+			{value: '-P1D', name: '1 '+ t('day')+' '+t('before')},
+			{value: '-P2D', name: '2 '+ t('days')+' '+t('before')},
+			{value: '-P7D', name: '1 '+ t('week')+' '+t('before')},
 		];
 		if(!this.isForDefault) {
 			this.options.unshift({value: 'default', name: t('Default')});
