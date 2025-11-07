@@ -55,7 +55,7 @@ return array (
   'Unscheduled' => 'Ongepland',
   'Scheduled' => 'Gepland',
   'Show completed' => 'Toon voltooide',
-  'Completed tasks' => 'Volotooide taken',
+  'Completed tasks' => 'Voltooide taken',
   'You were assigned to this task by {assignedBy}' => 'Deze taak is aan u toegewezen door {assignedBy}',
   'Visible lists' => 'Zichtbare lijsten',
   'Display options for lists' => 'Weergave instellingen voor lijsten',
