@@ -2,6 +2,8 @@
 - Core: Fixed history checking for map relations (like recurrenceOverrides in calendar events)
 - Calendar: Exception in recurring event was reset to it's original date when the organizer received a status reply from a participant
 - Calendar: Add more reminder options 1,2 and 7 days
+- Core: Update material icons (Cherry-pick from 6.8)
+- Email: add optional icon for linked email to message grid  (Cherry-pick from 6.8)
 
 03-11-2025: 25.0.64  
 - Calendar: Send event reminders by email when enabled in Notification settings.

@@ -543,9 +543,30 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 		if(record.data['flagged'] == 1){
 			icons.push('flag');
 		}
+        let numTasks = 0, numFinishedTasks = 0;
+        if (go.Modules.isAvailable("legacy","savemailas")) {
+            if(record.json['numTasks'] !== undefined) {
+                icons.push('task');
+                numTasks = record.json['numTasks'];
+                numFinishedTasks = record.json['numFinishedTasks'];
+            }
+        }
 
-		return unseen + icons.map(function(i) {
-			return '<i class="icon '+(i!=='flag'?'c-primary':'red')+'">' + i + '</i>';
+
+        return unseen + icons.map(function(i) {
+            let secondaryCls, title= "";
+            switch(i) {
+                case 'flag':
+                    secondaryCls = 'red';
+                    break
+                case 'task':
+                    secondaryCls = numFinishedTasks === numTasks ? 'green' : 'bluegrey';
+                    title = ` title = "${numFinishedTasks} / ${numTasks} ${t("Completed tasks", "tasks")}"`;
+                    break;
+                default:
+                    secondaryCls = 'c-secondary';
+            }
+			return `<i class="icon ${secondaryCls}"${title}>${i}</i>`;
 		}).join("");
 		
 	},

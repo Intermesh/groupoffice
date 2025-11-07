@@ -392,8 +392,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		//deletes must be confirmed if no trash folder is used or when we are in the trash folder to delete permanently
 		$response['deleteConfirm'] = empty($account->trash) || $account->trash==$params['mailbox'];
 
-
-		//$response['allowFTS'] =
+		$this->fireEvent('emailStoreLoaded', [&$response]);
 
 		return $response;
 	}
