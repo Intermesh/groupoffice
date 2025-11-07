@@ -1,5 +1,8 @@
 <?php
 namespace GO\Base\Ldap;
+/**
+ * @depcreated - use go\core\ldap\* instead
+ */
 
 use GO;
 use GO\Base\Model;

@@ -2,14 +2,9 @@
 namespace go\modules\community\otp;
 
 use go\core;
-use go\core\fs\Blob;
-use go\core\fs\File;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
-use go\core\Settings;
-use go\core\util\QRcode;
 use go\core\validate\ErrorCode;
-use go\modules\community\otp\model;
 use go\core\model\Group;
 use go\core\model\Module as ModuleModel;
 use go\core\model\User;
@@ -33,12 +28,13 @@ class Module extends core\Module {
 		return true;
 	}
 	
-	public function defineListeners() {
+	public function defineListeners(): void
+	{
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 		User::on(core\jmap\Entity::EVENT_VALIDATE, static::class, 'onUserValidate');
 	}
 
-	public static function onUserValidate(User $user)
+	public static function onUserValidate(User $user): void
 	{
         /** @phpstan-ignore-next-line */
 		if($user->isModified(['otp']) && !$user->otp) {
@@ -58,7 +54,8 @@ class Module extends core\Module {
 		}
 	}
 
-	public static function onMap(Mapping $mapping) {		
+	public static function onMap(Mapping $mapping): bool
+	{
 		$mapping->addHasOne("otp", model\OtpAuthenticator::class, ['id' => 'userId'], false);
 		return true;
 	}
@@ -94,7 +91,8 @@ class Module extends core\Module {
 	 *
 	 * @return void
 	 */
-	public function downloadQr() {
+	public function downloadQr(): void
+	{
 
 		$user = go()->getAuthState()->getUser();
 

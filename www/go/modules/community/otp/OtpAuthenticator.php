@@ -10,7 +10,8 @@ use go\core\model\User;
 
 class OtpAuthenticator extends SecondaryAuthenticator {
 
-	public function authenticate(Token $token, array $data) {
+	public function authenticate(Token $token, array $data): bool
+	{
 		
 		if(!isset($data['otp_code'])){
 			$this->setValidationError('otp_code', ErrorCode::REQUIRED);

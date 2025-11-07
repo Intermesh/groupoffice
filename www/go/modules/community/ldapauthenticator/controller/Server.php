@@ -3,6 +3,7 @@ namespace go\modules\community\ldapauthenticator\controller;
 
 use go\core\controller;
 use go\core\jmap\Response;
+use go\core\util\ArrayObject;
 use go\modules\community\ldapauthenticator\model;
 
 class Server extends \go\core\jmap\EntityController {
@@ -18,7 +19,8 @@ class Server extends \go\core\jmap\EntityController {
 	 * @param array $params
 	 * @see https://jmap.io/spec-core.html#/query
 	 */
-	public function query($params) {
+	public function query(array $params): ArrayObject
+	{
 		return $this->defaultQuery($params);
 	}
 	
@@ -28,7 +30,8 @@ class Server extends \go\core\jmap\EntityController {
 	 * @param array $params
 	 * @see https://jmap.io/spec-core.html#/get
 	 */
-	public function get($params) {
+	public function get(array $params): ArrayObject
+	{
 		return $this->defaultGet($params);
 	}
 	
@@ -38,7 +41,8 @@ class Server extends \go\core\jmap\EntityController {
 	 * @see https://jmap.io/spec-core.html#/set
 	 * @param array $params
 	 */
-	public function set($params) {
+	public function set(array $params): ArrayObject
+	{
 		return $this->defaultSet($params);
 	}
 	
@@ -49,7 +53,8 @@ class Server extends \go\core\jmap\EntityController {
 	 * @param array $params
 	 * @see https://jmap.io/spec-core.html#/changes
 	 */
-	public function changes($params) {
+	public function changes(array $params): ArrayObject
+	{
 		return $this->defaultChanges($params);
 	}
 	

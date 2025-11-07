@@ -6,7 +6,8 @@ use go\modules\community\ldapauthenticator\cli\controller\Sync as SyncCtrl;
 
 class Sync extends CronJob {
   
-	public function run(\go\core\model\CronJobSchedule $schedule) {
+	public function run(\go\core\model\CronJobSchedule $schedule): void
+	{
     $records = go()->getDbConnection()
     ->select('id,syncGroups,syncUsers,syncUsersDelete,syncGroupsDelete,syncUsersMaxDeletePercentage,syncGroupsMaxDeletePercentage')
     ->from('ldapauth_server')
