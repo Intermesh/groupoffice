@@ -12,6 +12,7 @@ modules.register({
 				return;
 			}
 
+			translate.load(GO.lang.community.bookmarks, "community", "bookmarks");
 
 			router.add(/^bookmarks\/(\d+)$/, (bookmarkId) => {
 				modules.openMainPanel("bookmarks")

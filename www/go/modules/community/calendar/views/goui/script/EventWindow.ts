@@ -451,6 +451,8 @@ export class EventWindow extends FormWindow {
 			this.item!.confirmScheduleMessage(this.parseSavedData(this.form.modified), () => {
 				this.confirmedScheduleMessage = true;
 
+				// allow long timeout for sending invitations
+				client.raiseNextRequestTimeout(180000);
 				this.form.submit();
 				this.confirmedScheduleMessage = false;
 			});

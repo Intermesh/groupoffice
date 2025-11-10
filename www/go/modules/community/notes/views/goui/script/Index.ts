@@ -18,6 +18,8 @@ modules.register({
 				return;
 			}
 
+			translate.load(GO.lang.community.notes, "community", "notes");
+
 			router.add(/^note\/(\d+)$/, (noteId) => {
 				modules.openMainPanel("notes");
 				notes.showNote(noteId);

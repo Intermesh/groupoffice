@@ -11,12 +11,6 @@ modules.register({
 	name: "comments",
 	async init() {
 
-
-		if(!window.GO) {
-			// TODO alert handling
-			return;
-		}
-
 		// make available in legacy extjs modules
 		GO.comments = {
 			CommentsPanel,

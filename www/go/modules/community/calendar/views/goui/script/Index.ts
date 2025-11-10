@@ -1,4 +1,4 @@
-import {AclLevel, client, jmapds, modules, principalDS} from "@intermesh/groupoffice-core";
+import {client, jmapds, modules, principalDS} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {router} from "@intermesh/groupoffice-core";
 import {datasourcestore, t as coreT, E, translate, DateTime, Window, h3, Button} from "@intermesh/goui";
@@ -80,7 +80,7 @@ export function getParticipantStatusIcon(p:any): string[] {
 }
 
 function addEmailAction() {
-	if(window.go) {
+	if(go) {
 		go.openIcs = (p: any) => {
 			const params = p.id ? {
 				fileId:p.id
@@ -230,7 +230,7 @@ modules.register(  {
 							entityStore: "Calendar",
 							filters: {
 								default: {
-									permissionLevel: AclLevel.WRITE
+									permissionLevel: go.permissionLevels.write
 								}
 							}
 						}
@@ -268,24 +268,24 @@ modules.register(  {
 		}
 	],
 	init () {
+		//const user = client.user;
+		translate.load(GO.lang.core.core, "core", "core");
+		translate.load(GO.lang.community.calendar, "community", "calendar");
 
 		addEmailAction();
 
 		client.on("authenticated",  ({session}) => {
 
 			// OLD CODE
-			if(window.GO) {
-				async function showBadge() {
-					const count = await go.Jmap.request({method: "CalendarEvent/countMine"});
-					ui.inboxBtn.hidden = count < 1;
-					GO.mainLayout.setNotification('calendar', count, 'orange');
-				}
-
-				go.Db.store("CalendarEvent").on("changes", () => {
-					showBadge();
-				});
-				showBadge();
+			async function showBadge() {
+				const count = await go.Jmap.request({method: "CalendarEvent/countMine"});
+				ui.inboxBtn.hidden = count<1;
+				GO.mainLayout.setNotification('calendar', count, 'orange');
 			}
+			go.Db.store("CalendarEvent").on("changes", () => {
+				showBadge();
+			});
+			showBadge();
 			// END OLD CODE
 			client.user.calendarPreferences ||= {};
 			if(!session.capabilities["go:community:calendar"]) {

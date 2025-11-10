@@ -9,6 +9,8 @@ modules.register(  {
 		"DavAccount"
 	],
 	init () {
+		//const user = client.user;
+		translate.load(GO.lang.community.davclient, "community", "davclient");
 
 		client.on("authenticated",  ( {session}) => {
 
