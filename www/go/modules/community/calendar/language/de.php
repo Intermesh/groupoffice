@@ -94,7 +94,7 @@ return array (
   'Resource request' => 'Ressourcenanfrage',
   'Preferences' => 'Präferenzen',
   'Show week numbers in calendar' => 'Zeige Wochennummern im Kalender',
-  'Show events that you have declined' => 'Zeige abgelehnte Termine',
+  'Show declined events' => 'Zeige abgelehnte Termine',
   'Show pop-up info when hovering over appointments' => 'Pop-up-Informationen beim Zeigen auf Termine anzeigen',
   'Default calendar' => 'Standardkalender',
   'Invitation to event will be added into this calendar' => 'Termineinladungen werden in diesen Kalender eingetragen',

@@ -272,7 +272,7 @@ export class Main extends Component {
 						btn({icon:'meeting_room',hidden: !rights.mayChangeResources, text:t('Resources')+'…', handler: _ => { (new ResourcesWindow()).show()}}),
 						checkbox({
 							name:'showDeclined',
-							label: t('Show events that you have declined'),
+							label: t('Show declined events'),
 							listeners: {
 								change: async ({newValue}) => {
 									await userDS.update(client.user.id, {"calendarPreferences/showDeclined": newValue});
