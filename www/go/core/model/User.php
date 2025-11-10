@@ -566,22 +566,6 @@ public function historyLog(): bool|array
 		return null;
 	}
 
-  /**
-   * Make sure to call this when changing the password with a recovery hash
-   * @param string $hash
-   * @return bool
-   * @depcreated Please remove after some time as the recovery hash check was refactored in the API auth script
-	public function checkRecoveryHash(string $hash): bool
-	{
-		if($hash === $this->recoveryHash) {
-			$this->passwordVerified = true;
-			$this->recoveryHash = null;
-			return true;
-		}
-		return false;
-	}
-  */
-
 	private function validatePasswordChange(): bool
 	{
 

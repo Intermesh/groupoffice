@@ -336,10 +336,10 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
   /**
    * Convert model into array for API output.
    *
-   * @param string[]|null $properties
-   * @return array|null
+   * @param ?array $properties
+   * @return ?array
    */
-	public function toArray(array|null $properties = null): array|null
+	public function toArray(?array $properties = null): ?array
 	{
 		$arr = [];
 		

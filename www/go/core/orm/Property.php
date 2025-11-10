@@ -2308,7 +2308,7 @@ abstract class Property extends Model {
 		}
 	}
 
-	public function toArray(array|null $properties = null): array|null
+	public function toArray(?array $properties = null): ?array
 	{
 		if (empty($properties)) {
 			$properties = $this->fetchProperties;
