@@ -457,7 +457,7 @@ export class Main extends Component {
 		}
 
 		if(modules.isAvailable("community", "addressbook")) {
-			boxes.birthday = ['#7e472a',	t('Birthdays')];
+			boxes.birthday = ['#009c63',	t('Birthdays')];
 		}
 
 
