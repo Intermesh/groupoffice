@@ -14,7 +14,6 @@ modules.register({
 				return;
 			}
 
-			translate.load(GO.lang.community.history, "community", "History");
 
 			router.add(/^history\/(\d+)$/, () => {
 				modules.openMainPanel("history");

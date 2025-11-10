@@ -46,7 +46,6 @@ const moduleResolverPlugin = {
 		build.onResolve({ filter: new RegExp("@intermesh\/.*")}, args => {
 				const parts = args.path.split("/");
 
-
 				if(parts.length === 3) {
 
 					// import is a module. eg. @intermesh/community/calendar

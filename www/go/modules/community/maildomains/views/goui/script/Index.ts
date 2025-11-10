@@ -13,8 +13,6 @@ modules.register(  {
 				return;
 			}
 
-			translate.load(GO.lang.core.core, "core", "core");
-			translate.load(GO.lang.community.maildomains, "community", "maildomains");
 
 			const mainPanel = new MainPanel();
 
