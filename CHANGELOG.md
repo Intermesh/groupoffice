@@ -3,6 +3,8 @@
 - Email: Auto disable list-extended when command fails (Happens on strato recently).
 - Core: Update material icons
 - Email: add optional icon for linked email to message grid
+- Core: allow users/groups with "Change users" permissions to update passwords
+- Core: Harden API with relation to user updates
 
 20-10-2025: 6.8.140
 - Email: Corrected save as filename
