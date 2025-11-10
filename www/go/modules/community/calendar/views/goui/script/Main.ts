@@ -272,7 +272,7 @@ export class Main extends Component {
 						btn({icon:'meeting_room',hidden: !rights.mayChangeResources, text:t('Resources')+'…', handler: _ => { (new ResourcesWindow()).show()}}),
 						checkbox({
 							name:'showDeclined',
-							label: t('Show events that you have declined'),
+							label: t('Show declined events'),
 							listeners: {
 								change: async ({newValue}) => {
 									await userDS.update(client.user.id, {"calendarPreferences/showDeclined": newValue});
@@ -447,19 +447,14 @@ export class Main extends Component {
 	}
 
 	private renderAdapterBoxes() {
-		const boxes: any = {
-
-			holiday: ['#025d7b', t('Holidays')]
-		};
-
+		const boxes: any = {};
+		if(modules.isAvailable("community", "addressbook")) {
+			boxes.birthday = ['#009c63',	t('Birthdays')];
+		}
 		if(modules.isAvailable("community", "tasks")) {
 			boxes.task = ['#7e472a',	t('Tasks', 'community', 'tasks')];
 		}
-
-		if(modules.isAvailable("community", "addressbook")) {
-			boxes.birthday = ['#7e472a',	t('Birthdays')];
-		}
-
+		boxes.holiday = ['#025d7b', t('Holidays')];
 
 		return Object.keys(boxes).map(key => comp({tagName:'li'}, checkbox({
 			color: boxes[key][0], label: boxes[key][1], value: this.adapter.byType(key).enabled,

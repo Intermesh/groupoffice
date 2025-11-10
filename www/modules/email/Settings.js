@@ -44,7 +44,12 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 							boxLabel:t("Show BCC field by default", "email"),
 							hideLabel:true,
 							name:'emailSettings.show_bcc'
-						})
+						}),this.showLinkedTasks = new Ext.form.Checkbox({
+                            hidden: true,
+                            boxLabel:t("Display linked Tasks in messages list", "email"),
+                            hideLabel: true,
+                            name: 'emailSettings.email_show_linked_tasks'
+                        })
 					]
 				},
 
@@ -87,6 +92,10 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 		];
 
 		this.templateCombo.store.baseParams.permissionLevel = go.permissionLevels.read;
+
+        if (go.Modules.isAvailable("legacy","savemailas")) {
+            this.showLinkedTasks.hidden = false;
+        }
 		
 		GO.email.SettingsPanel.superclass.initComponent.call(this);
 	},

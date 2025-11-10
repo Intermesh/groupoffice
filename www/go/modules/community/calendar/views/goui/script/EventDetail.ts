@@ -214,7 +214,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 						icon: "delete",
 						text: t("Delete"),
 						handler: () => {
-							jmapds("CalendarEvent").confirmDestroy([this.entity!.id]);
+							this.item?.remove();
 						}
 					})
 				)
