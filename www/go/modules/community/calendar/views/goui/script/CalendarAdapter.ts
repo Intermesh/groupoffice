@@ -107,7 +107,7 @@ export class CalendarAdapter extends Observable<CalendarAdapterEventMap> {
 
 				for (const e of events) {
 					for(const item of CalendarItem.expand(e as CalendarEvent, start, end)) {
-						if ((!item.isDeclined || client.user.calendarPreferences.showDeclined) ) {
+						if ((!item.isDeclined || client.user.calendarPreferences.showDeclined!==false) ) {
 							yield item;
 						}
 					}
