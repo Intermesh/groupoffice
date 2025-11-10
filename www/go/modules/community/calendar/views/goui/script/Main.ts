@@ -447,19 +447,14 @@ export class Main extends Component {
 	}
 
 	private renderAdapterBoxes() {
-		const boxes: any = {
-
-			holiday: ['#025d7b', t('Holidays')]
-		};
-
-		if(modules.isAvailable("community", "tasks")) {
-			boxes.task = ['#7e472a',	t('Tasks', 'community', 'tasks')];
-		}
-
+		const boxes: any = {};
 		if(modules.isAvailable("community", "addressbook")) {
 			boxes.birthday = ['#009c63',	t('Birthdays')];
 		}
-
+		if(modules.isAvailable("community", "tasks")) {
+			boxes.task = ['#7e472a',	t('Tasks', 'community', 'tasks')];
+		}
+		boxes.holiday = ['#025d7b', t('Holidays')];
 
 		return Object.keys(boxes).map(key => comp({tagName:'li'}, checkbox({
 			color: boxes[key][0], label: boxes[key][1], value: this.adapter.byType(key).enabled,
