@@ -59,6 +59,8 @@ class Comment extends AclItemEntity {
 	protected array $images = [];
 
 	/**
+	 * File attachments
+	 *
 	 * @var CommentAttachment[]
 	 */
 	public array $attachments = [];
