@@ -1,3 +1,4 @@
+10-11-2025: 25.0.65
 - Registration: Allow time registration on read only projects
 - Core: Fixed history checking for map relations (like recurrenceOverrides in calendar events)
 - Calendar: Exception in recurring event was reset to it's original date when the organizer received a status reply from a participant
