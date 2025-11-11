@@ -48,7 +48,7 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 						comp({
 							itemId: 'name',
 							flex: '1 0 60%',
-							html: v.name.htmlEncode() ? v.name.htmlEncode() + (v.email ? '<br>' + v.email :'') : v.email
+							html: v.name ? v.name.htmlEncode() + (v.email ? '<br>' + v.email :'') : v.email
 						}),
 						comp({tagName:'i',cls:'icon '+statusIcon[2],html:statusIcon[0],title:statusIcon[1], style:{margin:'0 8px'}}),
 						btn({icon:'more_vert', menu: menu({},
