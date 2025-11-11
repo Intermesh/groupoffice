@@ -477,13 +477,20 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 				url += "?SET_LANGUAGE=" + langField.getValue();
 			}
 
-			this.reloading = true;
+			this.reload(url);
 
-			document.location = url;
-		} else
-		{
+		} else {
 			this.close();
 		}
+	},
+
+	reload: function(url) {
+		if(window.groupofficeCore.client.isBusy() || Ext.Ajax.isLoading()) {
+			console.log("deferring...");
+			return this.reload.defer(300, this,[url]);
+		}
+
+		document.location = url;
 	},
 		
 	/**
