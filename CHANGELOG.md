@@ -1,4 +1,11 @@
+xx-11-2025: 25.0.66
+- Calendar: Read private events as owner of the calendars (Fixed)
+- 
+
 10-11-2025: 25.0.65
+- Calendar: Showing or hiding declined events. text label changed and work the first time. (without turning off and on)
+- Calendar: The color of the birthday calendar was the same as tasks.
+- Calender: The delete button in the EventDetail windows will decline if it is an invite
 - Registration: Allow time registration on read only projects
 - Core: Fixed history checking for map relations (like recurrenceOverrides in calendar events)
 - Calendar: Exception in recurring event was reset to it's original date when the organizer received a status reply from a participant
