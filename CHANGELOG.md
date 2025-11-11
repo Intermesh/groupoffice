@@ -3,6 +3,8 @@ xx-11-2025: 25.0.66
 - Leavedays: single day leave days with time will show with time in the calendar.
 - Calendar: Read only calendar items (leave days) do not have a context menu anymore.
 - History: Remove entityId from search columns to prevent invalid mix of collation error when searching in the history log. Happened when searching on a non-ascii charater like ö.
+- Support client: ~Ticket lists were not shown if you only had "Submit as customer" permission
+- Support: Simplify setup by creating "Customer support" user group
 
 10-11-2025: 25.0.65
 - Calendar: Showing or hiding declined events. text label changed and work the first time. (without turning off and on)
