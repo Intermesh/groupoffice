@@ -30,6 +30,16 @@ class Module extends Entity {
 	public bool $enabled = true;
 
 	/**
+	 *
+	 * @example
+	 * ```
+	 * if(!isset($module->permissions[Group::ID_EVERYONE])) {
+	 *    $everyone = new model\Permission($module);
+	 *    $module->permissions[Group::ID_EVERYONE] = $everyone;
+	 *    $module->save();
+	 * }
+	 * ```
+	 *
 	 * @var Permission[]
 	 */
 	public array|null $permissions = [];
