@@ -220,7 +220,7 @@ export class Main extends Component {
 						}))
 
 					}),
-					this.currentText = comp({tagName: 'h3', text: t('Today'), flex: '1 1 50%', style: {minWidth: '100px', fontSize: '1.8em'}}),
+					this.currentText = comp({cls: "cal period-title", tagName: 'h3', text: t('Today')}),
 					//'->',
 					this.cardMenu = comp({cls: 'group not-medium-device', flex:'0 0 auto'},
 						btn({icon: 'view_day', text: t('Day'), handler: _b => this.routeTo('day', this.date)}),
