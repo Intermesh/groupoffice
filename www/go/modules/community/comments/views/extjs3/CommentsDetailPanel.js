@@ -321,9 +321,10 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			});
 
 			const qs = new go.util.QuoteStripper(r.get("text")
-					// remove black text style fro dark mode compatibility
-					.replace(/\s*style\s*=\s*"(?:\s*color\s*:\s*(?:black|#000(?:000)?\b|rgb\(\s*0\s*,\s*0\s*,\s*0\s*\))\s*;?\s*)"/gi, '')
-					.replace(/<font\b([^>]*?)\s+\bcolor\s*=\s*(['"]?)(?:black|#000(?:000)?\b|rgb\(\s*0\s*,\s*0\s*,\s*0\s*\))\2([^>]*)>/gi, '<font$1$3>')),
+					// remove black text style for dark mode compatibility
+					.replace(/style="([^"]*)"/gi, (_, s) =>
+						`style="${s.replace(/(?:\s*;\s*)?color\s*:\s*(?:black|#000(?:000)?\b|rgb\(\s*0\s*,\s*0\s*,\s*0\s*\))\s*(?=;|$)/gi, '').replace(/;;+/g,';')}"`
+					).replace(/<font\b([^>]*?)\s+\bcolor\s*=\s*(['"]?)(?:black|#000(?:000)?\b|rgb\(\s*0\s*,\s*0\s*,\s*0\s*\))\2([^>]*)>/gi, '<font$1$3>')),
 				quote = qs.getQuote(), quoteId = Ext.id();
 
 			let quoteLess = qs.getBodyWithoutQuote();
