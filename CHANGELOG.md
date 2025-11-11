@@ -5,6 +5,7 @@ xx-11-2025: 25.0.66
 - History: Remove entityId from search columns to prevent invalid mix of collation error when searching in the history log. Happened when searching on a non-ascii charater like ö.
 - Support client: ~Ticket lists were not shown if you only had "Submit as customer" permission
 - Support: Simplify setup by creating "Customer support" user group
+- Finance: Fixed bug that finance didn't work without catalog and moved unit cost back to main row
 
 10-11-2025: 25.0.65
 - Calendar: Showing or hiding declined events. text label changed and work the first time. (without turning off and on)
