@@ -241,8 +241,12 @@ class Scheduler {
 			$uid =(string) $vevent->UID;
 			// Find event data's replyTo by UID, we don't trust the organizer in the VEVENT
 			$replyTo = go()->getDbConnection()->selectSingleValue('replyTo')->from('calendar_event')->where('uid', '=', $uid)->single();
+
+			go()->debug("Reply to:  ".$replyTo);
 			if($replyTo) {
 				$userId = User::findIdByEmail($replyTo);
+
+				go()->debug($userId . ' == '. $imapMessage->account->user_id);
 				if ($userId == $imapMessage->account->user_id) {
 					$accountEmail = $replyTo;
 				}
@@ -252,6 +256,8 @@ class Scheduler {
 				foreach ($vevent->attendee as $vattendee) {
 					$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vattendee));
 					$userId = User::findIdByEmail($attendeeEmail);
+
+					go()->debug("Find user for " . $attendeeEmail ." : " . $userId . ' == '. $imapMessage->account->user_id);
 
 					if ($userId == $imapMessage->account->user_id) {
 						$accountEmail = $attendeeEmail;
