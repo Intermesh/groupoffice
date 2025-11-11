@@ -94,4 +94,10 @@ return array (
   'Status' => 'Status',
   'Show project tasks' => 'Projecttaken tonen',
   'Web page' => 'Webpagina',
+  'Subscribe to Tasklist' => 'Abonneren op takenlijst',
+  'Project' => 'Project',
+  'Sync to device' => 'Synchroniseren naar apparaat',
+  'Make tasklist available in CalDAV and ActiveSync' => 'Taaklijst beschikbaar maken in CalDAV en ActiveSync',
+  'Create tasklist' => 'Takenlijst aanmaken',
+  'Subscribe to task list' => 'Abonneren op takenlijst',
 );
