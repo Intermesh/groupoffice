@@ -36,21 +36,22 @@ class Key extends Entity {
 		
 		return parent::internalSave();
 	}
-	
+
 	protected static function internalDelete(Query $query): bool
 	{
 		$q = clone $query;
 		$q->select('accessToken');
+		$qq = $q->single();
 
-		if(!parent::internalDelete($query)) {
-		  return false;
-    }
+		if (!parent::internalDelete($query)) {
+			return false;
+		}
 
-    if(!Token::delete(['accessToken' => $q])) {
-      throw new \Exception("Could not delete access token");
-    }
+		if ($qq && !Token::delete(['accessToken' => $qq['accessToken']])) {
+			throw new \Exception("Could not delete access token");
+		}
 
-    return true;
+		return true;
 	}
 
 	private int $userId;

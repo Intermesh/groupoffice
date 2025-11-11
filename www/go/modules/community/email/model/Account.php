@@ -77,4 +77,9 @@ class Account extends AclOwnerEntity
 		}
 		return parent::internalSave();
 	}
+
+	public function title(): string
+	{
+		return $this->username;
+	}
 }
