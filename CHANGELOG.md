@@ -1,3 +1,5 @@
+- Apikeys: bugfix - delete access token upon key deletion
+ 
 11-11-2025: 6.8.141
 - Core: Don't unset auth token cache on garbage collection because they are expired anyway
 - Support: Fixed security issue where users could add comments to other people's tickets
