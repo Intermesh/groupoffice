@@ -107,14 +107,14 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		this.store = new go.data.Store({
 			fields: [
 				'id', 
-				'categoryId', 
+				'categoryId',
 				'categoryName',
-				'entityId', 
+				'entityId',
 				{name: 'createdAt', type: 'date'},
 				{name: 'date', type: 'date'},
 				{name: 'modifiedAt', type: 'date'}, 
 				'modifiedBy',
-				'createdBy', 
+				'createdBy',
 				{name: "creator", type: "relation"},
 				{name: "modifier", type: "relation"},
 				'text',
@@ -320,8 +320,10 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				cls: 'go-html-formatted ' + mineCls
 			});
 
-			const qs = new go.util.QuoteStripper(r.get("text")),
-
+			const qs = new go.util.QuoteStripper(r.get("text")
+					// remove black text style fro dark mode compatibility
+					.replace(/\s*style\s*=\s*"(?:\s*color\s*:\s*(?:black|#000(?:000)?\b|rgb\(\s*0\s*,\s*0\s*,\s*0\s*\))\s*;?\s*)"/gi, '')
+					.replace(/<font\b([^>]*?)\s+\bcolor\s*=\s*(['"]?)(?:black|#000(?:000)?\b|rgb\(\s*0\s*,\s*0\s*,\s*0\s*\))\2([^>]*)>/gi, '<font$1$3>')),
 				quote = qs.getQuote(), quoteId = Ext.id();
 
 			let quoteLess = qs.getBodyWithoutQuote();
