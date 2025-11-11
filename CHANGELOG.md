@@ -1,3 +1,4 @@
+11-11-2025: 6.8.141
 - Core: Don't unset auth token cache on garbage collection because they are expired anyway
 - Support: Fixed security issue where users could add comments to other people's tickets
 - Email: Auto disable list-extended when command fails (Happens on strato recently).
@@ -5,6 +6,7 @@
 - Email: add optional icon for linked email to message grid
 - Core: allow users/groups with "Change users" permissions to update passwords
 - Core: Harden API with relation to user updates
+- Email: New API endpoint to automatically update account passwords
 
 20-10-2025: 6.8.140
 - Email: Corrected save as filename
