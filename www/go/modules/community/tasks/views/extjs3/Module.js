@@ -11,7 +11,7 @@ go.Modules.register("community", "tasks", {
 	}, {
 		name: "Task",
 		links: [{
-			iconCls: "entity ic-task",
+			iconCls: "entity ic-assignment",
 			linkWindow: function (entity, entityId) {
 				return new go.modules.community.tasks.TaskDialog();
 			},
