@@ -227,14 +227,14 @@ class CalendarEvent extends AclItemEntity {
 
 	public $modifiedAt;
 	public $createdAt;
-	public $modifiedBy;
-	public $createdBy;
+	public ?string $modifiedBy;
+	public ?string $createdBy;
 
 	/** The end time of the last occurrence in the series. or end time if not recurring */
 	protected $lastOccurrence;
 	/** The start time of the first occurence in the series, or start time if not recurring */
 	protected $firstOccurrence;
-	protected $ownerId; // find calendar owner to see if Private events needs to be altered
+	protected ?string  $ownerId; // find calendar owner to see if Private events needs to be altered
 
 	public static function customFieldsTableName(): string
 	{
@@ -776,8 +776,8 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	public function currentUserIsOwner() {
-		return $this->ownerId == go()->getUserId() ||
-		 ($this->ownerId === null && $this->createdBy == go()->getUserId());
+		return $this->ownerId === go()->getUserId() ||
+		 ($this->ownerId === null && $this->createdBy === go()->getUserId());
 	}
 
 	public function toArray(array|null $properties = null): array|null
