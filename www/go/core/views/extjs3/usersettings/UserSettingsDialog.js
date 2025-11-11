@@ -202,7 +202,6 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			if(!config.userSettingsPanels) {
 				continue;			
 			}
-			
 			for(i1 = 0, l2 = config.userSettingsPanels.length; i1 < l2; i1++) {
 				pnlCls = eval(config.userSettingsPanels[i1]);
 				pnl = new pnlCls({header: false, loaded: false, submitted: false});
@@ -477,6 +476,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			if(langField.isDirty()) {
 				url += "?SET_LANGUAGE=" + langField.getValue();
 			}
+
+			this.reloading = true;
 
 			document.location = url;
 		} else
