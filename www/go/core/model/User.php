@@ -574,19 +574,23 @@ public function historyLog(): bool|array
 
 	private function validatePasswordChange(): bool
 	{
-
-		if($this->passwordVerified || (go()->getAuthState() && go()->getAuthState()->isAdmin())) {
+		if ($this->passwordVerified) {
+			// Own user, logged in as themselves -> OK
+			return true;
+		} elseif (!$this->isModified(['password']) || $this->getOldValue('password') == null) {
+			// New password from scratch: OK
+			return true;
+		} elseif (App::get()->getInstaller()->isInProgress()) {
+			// System is still installing: OK
+			return true;
+		} elseif (go()->getAuthState()->isAdmin()) {
+			// Either the logged in user is an admin...
+			return true;
+		} elseif (!$this->isAdmin()) {
+			// ...or the currently editor user is NOT an admin: OK
 			return true;
 		}
-
-		if(!$this->isModified(['password']) || $this->getOldValue('password') == null) {
-			return true;
-		}
-
-		if(App::get()->getInstaller()->isInProgress()) {
-			return true;
-		}
-
+		// Big NOPE
 		return false;
 	}
 
@@ -1422,7 +1426,7 @@ public function historyLog(): bool|array
 			}
 		}
 
-		if(Module::isInstalled("legacy", "calendar")) {
+		if(Module::isInstalled("legacy", "calendar") && isset($this->calendarSettings)) {
 			if (($calendarId = $this->calendarSettings->calendar_id) && ($calendar = Calendar::model()->findByPk($calendarId))) {
 				$aclIds[] = $calendar->findAclId();
 			}

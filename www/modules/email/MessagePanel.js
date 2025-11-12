@@ -103,7 +103,8 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'<tpl for="links">'+
 					'<div class="go-icon-list"><p><i class="label entity {[this.linkIconCls(values)]}"></i> ' +
 					'<a href="#email"  onclick="const win = new go.links.LinkDetailWindow({entity\:\'{entity}\'});win.load({model_id});">'+
-					'{name}</a> <label>{description}</label>' +
+					// '{name}</a> <label>{description}</label>' +
+					'{name}</a> <label>{[this.getLabel(values)]}</label>' +
 					'{[this.addDeleteBtn(values)]}</p>' +
 					'</div>' +
 				'</tpl>'+
@@ -221,6 +222,17 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				return go.Entities.getLinkIcon(link.entity, link.filter);
 
 			},
+            getLabel: function (link) {
+                // 2025-1513: make task list and assignee more visible if linked item is a task
+                if(link.entity === "Task") {
+                    const arDesc = link.description.split(":");
+                    if(!arDesc.length) {
+                        return link.description; // We always return something
+                    }
+                    return "<strong>"+arDesc[0]+"</strong>:"+arDesc[1]; // Let's not bother with more than one colon
+                }
+                return link.description;
+            },
 			addDeleteBtn: function(link) {
 				return '<a class="simple-link" onclick="GO.email.unlink('+link.link_id+');">'+t('Delete') + '</a>';
 			},
