@@ -2,6 +2,7 @@
 
 namespace go\core\model;
 
+use Exception;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\db\Expression;
@@ -54,18 +55,22 @@ class Principal extends AclOwnerEntity
 			->addTable('core_principal', 'principal');
 	}
 
-	static function findIdByEmail($email, $preferUser = true) {
-		$id = User::findIdByEmailAliases($email);
-		if($id) {
-			return $id;
-		}
+	/**
+	 * @param string $email
+	 * @param bool $preferUser
+	 * @return (string|int)[]
+	 * @throws Exception
+	 */
+	static function findIdsByEmail(string $email, bool $preferUser = true) : array {
+		$ids = User::findIdsByEmailAliases($email);
+
 		$stmt = self::find()->selectSingleValue('principal.id')
 			->where('email','=',$email);
 		if($preferUser) {
 			$stmt->join("core_entity", "e", "e.id=principal.entityTypeId")
 				->orderBy([new Expression("(e.name='User') DESC")]);
 		}
-		return $stmt->single();
+		return array_unique(array_merge($ids , $stmt->all()));
 	}
 
 	static function currentUser() {

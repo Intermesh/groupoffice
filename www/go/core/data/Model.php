@@ -177,7 +177,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
 					}
 					$meta = $parser->parse($prop->getDocComment());
 					$arr[$propName]['description'] = $meta['description'] ?? null;
-					if(!isset($arr[$propName]['type']) && isset($meta['var']['type'])) {
+					if(isset($meta['var']['type'])) {
 						$arr[$propName]['type'] = $meta['var']['type'];
 					}
 				}

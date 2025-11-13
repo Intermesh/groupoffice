@@ -227,14 +227,14 @@ class CalendarEvent extends AclItemEntity {
 
 	public $modifiedAt;
 	public $createdAt;
-	public $modifiedBy;
-	public $createdBy;
+	public ?string $modifiedBy;
+	public ?string $createdBy;
 
 	/** The end time of the last occurrence in the series. or end time if not recurring */
 	protected $lastOccurrence;
 	/** The start time of the first occurence in the series, or start time if not recurring */
 	protected $firstOccurrence;
-	protected $ownerId; // find calendar owner to see if Private events needs to be altered
+	protected ?string  $ownerId; // find calendar owner to see if Private events needs to be altered
 
 	public static function customFieldsTableName(): string
 	{
@@ -1059,25 +1059,27 @@ class CalendarEvent extends AclItemEntity {
 			}
 			return;
 		}
-
-		$r = $this->getRecurrenceRule();
-		if(isset($r->until)) {
-			$until = (new DateTime($r->until,$this->timeZone()))->add(new \DateInterval($this->duration));
-			if($this->lastOccurrence === null || $until > $this->lastOccurrence) {
-				$this->lastOccurrence = $until;
+		if($this->isModified('recurrenceRule')) {
+			$r = $this->getRecurrenceRule();
+			if (isset($r->until)) {
+				$until = (new DateTime($r->until, $this->timeZone()))->add(new \DateInterval($this->duration));
+				if ($this->lastOccurrence === null || $until > $this->lastOccurrence) {
+					$this->lastOccurrence = $until;
+				}
+			} else  {
+				$this->lastOccurrence = null;
+				if (isset($r->count)) {
+					$it = ICalendarHelper::makeRecurrenceIterator($this);
+					$maxDate = new \DateTime(self::MAX_RECUR);
+					while ($it->valid()) {
+						$dt = $it->current(); // will clone :(
+						if ($dt > $maxDate) break;
+						if ($dt > $this->lastOccurrence) $this->lastOccurrence = $dt;
+						$it->next();
+					}
+					$this->lastOccurrence->add(new \DateInterval($this->duration));
+				}
 			}
-		} else if(isset($r->count)) {
-			$it = ICalendarHelper::makeRecurrenceIterator($this);
-			$maxDate = new \DateTime(self::MAX_RECUR);
-			while ($it->valid()) {
-				$dt = $it->current(); // will clone :(
-				if($dt > $maxDate) break;
-				if($dt > $this->lastOccurrence) $this->lastOccurrence = $dt;
-				$it->next();
-			}
-			$this->lastOccurrence->add(new \DateInterval($this->duration));
-		} else {
-			$this->lastOccurrence = null;
 		}
 
 		if($this->isModified('recurrenceOverrides')) {

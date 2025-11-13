@@ -264,6 +264,15 @@
 	}
 }
 
+.cal {
+	&.period-title {
+		text-transform: capitalize;
+		flex: 1 1 50%;
+		min-width: 100px;
+		font-size: 1.8em;
+	}
+}
+
 .cal.month {
 	display: flex;
 	flex-direction: column;

@@ -177,7 +177,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 				this.selectItem(item);
 
 				// todo: set id first
-				if(!item.key) return;
+				if(!item.key || item.readOnly) return;
 				this.current = item;
 				this.contextMenu.showAt(ev);
 				ev.preventDefault();

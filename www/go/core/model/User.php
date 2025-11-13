@@ -568,19 +568,23 @@ public function historyLog(): bool|array
 
 	private function validatePasswordChange(): bool
 	{
-
-		if($this->passwordVerified || (go()->getAuthState() && go()->getAuthState()->isAdmin())) {
+		if ($this->passwordVerified) {
+			// Own user, logged in as themselves -> OK
+			return true;
+		} elseif (!$this->isModified(['password']) || $this->getOldValue('password') == null) {
+			// New password from scratch: OK
+			return true;
+		} elseif (App::get()->getInstaller()->isInProgress()) {
+			// System is still installing: OK
+			return true;
+		} elseif (go()->getAuthState()->isAdmin()) {
+			// Either the logged in user is an admin...
+			return true;
+		} elseif (!$this->isAdmin()) {
+			// ...or the currently editor user is NOT an admin: OK
 			return true;
 		}
-
-		if(!$this->isModified(['password']) || $this->getOldValue('password') == null) {
-			return true;
-		}
-
-		if(App::get()->getInstaller()->isInProgress()) {
-			return true;
-		}
-
+		// Big NOPE
 		return false;
 	}
 
@@ -1464,16 +1468,21 @@ public function historyLog(): bool|array
 		return $this->getPersonalGroup()->findAclId();
 	}
 
-	static function findIdByEmailAliases(string $email) :?int{
+	/**
+	 * @param string $email
+	 * @return int[]
+	 * @throws Exception
+	 */
+	static function findIdsByEmailAliases(string $email) :array{
 		if(!go()->getModule("legacy", "email")) {
-			return null;
+			return [];
 		}
 		return go()->getDbConnection()
 			->selectSingleValue("user_id")
 			->from("em_accounts", "a")
 			->join("em_aliases", "al", "al.account_id = a.id")
 			->where("al.email", "LIKE", $email)
-			->single();
+			->all();
 	}
 
 
@@ -1532,21 +1541,16 @@ public function historyLog(): bool|array
 	 * Finds a user ID by email. Also uses e-mail aliases if evailable.
 	 *
 	 * @param string $email
-	 * @return int|null
+	 * @return int[]
 	 * @throws Exception
 	 */
-	static function findIdByEmail(string $email) : ?int {
+	static function findIdsByEmail(string $email) : array {
 
 		$stmt = self::find()->selectSingleValue('id')
 			->where('email','LIKE',$email);
 
-		$id = $stmt->single();
-		if($id) {
-			return $id;
-		}
-		return self::findIdByEmailAliases($email);
-
-
+		$ids = $stmt->all();
+		return array_unique(array_merge($ids, self::findIdsByEmailAliases($email)));
 	}
 
 

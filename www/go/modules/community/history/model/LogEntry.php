@@ -116,7 +116,7 @@ class LogEntry extends AclOwnerEntity {
 
 	protected static function textFilterColumns(): array
 	{
-		return ['description', 'entityId'];
+		return ['description'];
 	}
 
 	protected static function search(Criteria $criteria, string $expression, DbQuery $query): Criteria
