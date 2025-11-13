@@ -1477,16 +1477,21 @@ public function historyLog(): bool|array
 		return $this->getPersonalGroup()->findAclId();
 	}
 
-	static function findIdByEmailAliases(string $email) :?int{
+	/**
+	 * @param string $email
+	 * @return int[]
+	 * @throws Exception
+	 */
+	static function findIdsByEmailAliases(string $email) :array{
 		if(!go()->getModule("legacy", "email")) {
-			return null;
+			return [];
 		}
 		return go()->getDbConnection()
 			->selectSingleValue("user_id")
 			->from("em_accounts", "a")
 			->join("em_aliases", "al", "al.account_id = a.id")
 			->where("al.email", "LIKE", $email)
-			->single();
+			->all();
 	}
 
 
@@ -1545,21 +1550,16 @@ public function historyLog(): bool|array
 	 * Finds a user ID by email. Also uses e-mail aliases if evailable.
 	 *
 	 * @param string $email
-	 * @return int|null
+	 * @return int[]
 	 * @throws Exception
 	 */
-	static function findIdByEmail(string $email) : ?int {
+	static function findIdsByEmail(string $email) : array {
 
 		$stmt = self::find()->selectSingleValue('id')
 			->where('email','LIKE',$email);
 
-		$id = $stmt->single();
-		if($id) {
-			return $id;
-		}
-		return self::findIdByEmailAliases($email);
-
-
+		$ids = $stmt->all();
+		return array_unique(array_merge($ids, self::findIdsByEmailAliases($email)));
 	}
 
 

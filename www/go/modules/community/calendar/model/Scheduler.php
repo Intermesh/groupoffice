@@ -244,22 +244,24 @@ class Scheduler {
 
 			go()->debug("Reply to:  ".$replyTo);
 			if($replyTo) {
-				$userId = User::findIdByEmail($replyTo);
+				$userIds = User::findIdsByEmail($replyTo);
 
-				go()->debug($userId . ' == '. $imapMessage->account->user_id);
-				if ($userId == $imapMessage->account->user_id) {
+				go()->debug(implode(', ', $userIds) . ' == '. $imapMessage->account->user_id);
+
+				if (in_array($imapMessage->account->user_id, $userIds)) {
 					$accountEmail = $replyTo;
 				}
 			}
 		} else {
 			if (isset($vevent->attendee)) {
 				foreach ($vevent->attendee as $vattendee) {
+					// todo, it could bne te that more than 1 user has this email...
 					$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vattendee));
-					$userId = User::findIdByEmail($attendeeEmail);
+					$userIds = User::findIdsByEmail($attendeeEmail);
 
-					go()->debug("Find user for " . $attendeeEmail ." : " . $userId . ' == '. $imapMessage->account->user_id);
+					go()->debug("Find user for " . $attendeeEmail ." : " . implode(', ', $userIds) . ' == '. $imapMessage->account->user_id);
 
-					if ($userId == $imapMessage->account->user_id) {
+					if (in_array($imapMessage->account->user_id, $userIds)) {
 						$accountEmail = $attendeeEmail;
 					}
 				}

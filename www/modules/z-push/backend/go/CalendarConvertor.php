@@ -364,16 +364,17 @@ class CalendarConvertor
 				$key = $attendee->email;
 				if(!Util::validateEmail($key))
 					continue; // do not att attendee if client does not send a valid email address (TBSync uses login name)
-				$principalId = Principal::findIdByEmail($key);
-				if(!isset($event->participants[$principalId ?? $key])) {
+				$principalIds = Principal::findIdsByEmail($key);
+				$principalId = $principalIds[0] ?? $key;
+				if(!isset($event->participants[$principalId])) {
 					$p = new Participant($event);
 					$p->email = $attendee->email;
 					$p->name = $attendee->name;
 					$p->expectReply = true;
 					$p->kind = Participant::Individual; // todo: read from $attendee->attendeetype
-					$event->participants[$principalId ?? $key] = $p;
+					$event->participants[$principalId] = $p;
 				} else {
-					$p = &$event->participants[$principalId ?? $key];
+					$p = &$event->participants[$principalId];
 				}
 
 				if(isset($attendee->attendeestatus)) {
