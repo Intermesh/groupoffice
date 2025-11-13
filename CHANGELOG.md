@@ -8,6 +8,7 @@ xx-11-2025: 25.0.66
 - Finance: Fixed bug that finance didn't work without catalog and moved unit cost back to main row
 - Core: Admins couldn't change user groups
 - Core / Finance: Fixed if statement failing in templates when a string was quoted
+- Calendar: Added new timezone finder that uses IntlTimezone::getIDForWindowsID()
 
 10-11-2025: 25.0.65
 - Calendar: Showing or hiding declined events. text label changed and work the first time. (without turning off and on)
