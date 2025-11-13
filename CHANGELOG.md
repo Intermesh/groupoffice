@@ -1,4 +1,4 @@
-xx-11-2025: 25.0.66
+13-11-2025: 25.0.66
 - Calendar: Read private events as owner of the calendars (Fixed)
 - Leavedays: single day leave days with time will show with time in the calendar.
 - Calendar: Read only calendar items (leave days) do not have a context menu anymore.
