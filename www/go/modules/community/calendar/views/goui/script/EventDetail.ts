@@ -13,7 +13,7 @@ import {
 	DetailPanel,
 	JmapDataSource,
 	jmapds,
-	linkbrowserbutton,
+	linkbrowsebutton,
 	RecurrenceField,
 	entities
 } from "@intermesh/groupoffice-core";
@@ -195,7 +195,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 			addbutton(),
 
-			linkbrowserbutton(),
+			linkbrowsebutton(),
 
 			btn({
 				icon: "more_vert",

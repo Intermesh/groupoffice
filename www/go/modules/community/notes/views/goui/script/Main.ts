@@ -8,11 +8,11 @@ import {
 	EntityID,
 	h3,
 	hr,
-	menu,
+	menu, menucolumn,
 	mstbar,
 	router,
 	searchbtn,
-	t,
+	t, table,
 	tbar,
 	Toolbar
 } from "@intermesh/goui";
@@ -114,40 +114,47 @@ export class Main extends MainThreeColumnPanel {
 						sortable: true,
 						resizable: false
 					}),
-					column({
-						width: 48,
-						id: "btn",
-						renderer: (columnValue: any, record: NoteBook, td, table, rowIndex) => {
-							return btn({
-								icon: "more_vert",
-								menu: menu({},
-									btn({
-										disabled: record.permissionLevel < AclLevel.MANAGE,
-										icon: "edit",
-										text: t("Edit"),
-										handler: () => {
-											const record = table.store.get(rowIndex)!;
 
-											const dlg = new NoteBookDialog();
-											void dlg.load(record.id);
-											dlg.show();
+					menucolumn({
+						menu: menu({
+								listeners: {
+									show: ({target}) => {
+										const record = this.noteBookGrid.store.get(target.dataSet.rowIndex)!;
 
-										}
-									}),
+										target.findChild("edit")!.disabled = record.permissionLevel < AclLevel.MANAGE;
+										target.findChild("delete")!.disabled = !go.Modules.get("community", 'notes').userRights.mayChangeNoteBooks || record.permissionLevel < AclLevel.MANAGE;
 
-									btn({
-										disabled: !go.Modules.get("community", 'notes').userRights.mayChangeNoteBooks || record.permissionLevel < AclLevel.MANAGE,
-										icon: "delete",
-										text: t("Delete"),
-										handler: () => {
-											const record = table.store.get(rowIndex)!;
-											void noteBookDS.confirmDestroy([record.id]);
-										}
-									})
-								)
-							})
+									}
+								}
+							},
+								btn({
+									itemId: "edit",
+									icon: "edit",
+									text: t("Edit"),
+									handler: (btn) => {
+										const record = this.noteBookGrid.store.get(btn.parent!.dataSet.rowIndex)!
+
+										const dlg = new NoteBookDialog();
+										void dlg.load(record.id);
+										dlg.show();
+
+									}
+								}),
+
+								btn({
+									itemId: "delete",
+									icon: "delete",
+									text: t("Delete"),
+									handler: (btn) => {
+										const record = this.noteBookGrid.store.get(btn.parent!.dataSet.rowIndex)!
+										void noteBookDS.confirmDestroy([record.id]);
+									}
+								})
+							)
 						}
-					})
+					),
+
+
 				]
 			})),
 			filterpanel({

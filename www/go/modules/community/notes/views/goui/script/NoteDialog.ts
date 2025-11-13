@@ -12,6 +12,7 @@ export class NoteDialog extends FormWindow<Note> {
 		this.stateId = "note-dialog";
 		this.maximizable = true;
 		this.resizable = true;
+		this.hasLinks = true;
 
 		this.width = 800;
 		this.height = 800;

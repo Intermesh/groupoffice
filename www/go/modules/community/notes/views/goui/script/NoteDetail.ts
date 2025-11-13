@@ -7,7 +7,7 @@ import {
 	DetailPanel,
 	filesbutton,
 	Image,
-	linkbrowserbutton,
+	linkbrowsebutton, LinkDetail,
 	modules
 } from "@intermesh/groupoffice-core";
 import {NoteDialog} from "./NoteDialog";
@@ -35,7 +35,9 @@ export class NoteDetail extends DetailPanel<Note> {
 		this.scroller.items.add(new CommentsPanel(this.entityName));
 
 		this.addFiles();
-		this.addLinks();
+		// this.addLinks();
+
+		this.scroller.items.add(...LinkDetail.getAll());
 
 		this.scroller.items.add(new HistoryDetailPanel(this.entityName));
 
@@ -50,7 +52,7 @@ export class NoteDetail extends DetailPanel<Note> {
 				}
 			}),
 			addbutton(),
-			linkbrowserbutton(),
+			linkbrowsebutton(),
 			btn({
 				icon: "more_vert",
 				menu: menu({},

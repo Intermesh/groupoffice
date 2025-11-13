@@ -51,7 +51,6 @@ export class CommentEditor extends Component {
 				this.editor = htmlfield({
 					flex: 1,
 					name: "text",
-					cls: "frame-hint",
 					required: true,
 					listeners: {
 						beforerender: ev => {

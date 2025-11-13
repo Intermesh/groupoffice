@@ -3,7 +3,7 @@ import {
 	addbutton,
 	DetailPanel,
 	Image,
-	linkbrowserbutton,
+	linkbrowsebutton,
 } from "@intermesh/groupoffice-core";
 import {CommentDialog} from "./CommentDialog";
 import {commentDS} from "./Index.js";
@@ -33,7 +33,7 @@ export class CommentDetail extends DetailPanel {
 				}
 			}),
 			addbutton(),
-			linkbrowserbutton(),
+			linkbrowsebutton(),
 			btn({
 				icon: "more_vert",
 				menu: menu({},
