@@ -996,6 +996,8 @@ class TemplateParser {
 	}
 
 	/**
+	 * Validates and transforms template expressions to PHP code that's safe for eval().
+	 *
 	 * @throws Exception
 	 */
 	private function validateExpression($expression): string
@@ -1065,7 +1067,7 @@ class TemplateParser {
 
 			$value = is_scalar($value) ||
 			!isset($value) ||
-			(is_object($value) && method_exists($value, '__toString')) ? '"' . str_replace('"', '\\"', (string) $value) . '"' : !empty($value);
+			(is_object($value) && method_exists($value, '__toString')) ? '"' . str_replace('"', '""', (string) $value) . '"' : !empty($value);
 
 		}
 
