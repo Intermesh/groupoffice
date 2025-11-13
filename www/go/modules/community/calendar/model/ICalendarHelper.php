@@ -15,6 +15,7 @@ use go\core\fs\Blob;
 use go\core\model\Principal;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
+use IntlTimeZone;
 use Sabre\VObject;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Component\VEvent;
@@ -33,6 +34,25 @@ class UserTimezoneGuesser implements VObject\TimezoneGuesser\TimezoneGuesser {
 }
 
 VObject\TimeZoneUtil::addTimezoneGuesser('gouser', new UserTimezoneGuesser());
+
+class IntlTimezoneFinder implements VObject\TimezoneGuesser\TimezoneFinder {
+
+	public function find(string $tzid, bool $failIfUncertain = false): ?DateTimeZone
+	{
+		if (!class_exists(IntlTimeZone::class)) {
+			return null;
+		}
+
+		$iana =  IntlTimeZone::getIDForWindowsID($tzid);
+		if(!$iana) {
+			return null;
+		}
+
+		return new DateTimeZone($iana);
+	}
+}
+
+VObject\TimeZoneUtil::addTimezoneFinder('intltimezone', new IntlTimezoneFinder());
 
 class ICalendarHelper {
 
