@@ -26,15 +26,9 @@ const entryPoints = process.argv.length > 3 ? process.argv[3].split(",") : ['scr
 
 
 let version, chdir = legacy ? "../../../../" : "../../../../../../";
-await fs.readFile(chdir + "version.php", 'utf8', (err, data) => {
-	if (err) {
-		console.error(err);
-		throw err;
-	}
-
-	version = data.match(/\d+\.\d+\.\d+/)
-	console.log(version[0]);
-});
+const data = fs.readFileSync(chdir + "version.php", 'utf8');
+version = data.match(/\d+\.\d+\.\d+/)
+console.log(version[0]);
 
 //First I used this plugin to resolve paths: https://github.com/Awalgawe/esbuild-typescript-paths-plugin/tree/main/src
 //But this seems much simpler and give more control. It must align with tsconfig.module.js though.
