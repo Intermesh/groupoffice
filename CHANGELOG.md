@@ -1,3 +1,65 @@
+13-11-2025: 25.0.66
+- Calendar: Read private events as owner of the calendars (Fixed)
+- Leavedays: single day leave days with time will show with time in the calendar.
+- Calendar: Read only calendar items (leave days) do not have a context menu anymore.
+- History: Remove entityId from search columns to prevent invalid mix of collation error when searching in the history log. Happened when searching on a non-ascii charater like ö.
+- Support client: ~Ticket lists were not shown if you only had "Submit as customer" permission
+- Support: Simplify setup by creating "Customer support" user group
+- Finance: Fixed bug that finance didn't work without catalog and moved unit cost back to main row
+- Core: Admins couldn't change user groups
+- Core / Finance: Fixed if statement failing in templates when a string was quoted
+- Calendar: Added new timezone finder that uses IntlTimezone::getIDForWindowsID()
+
+10-11-2025: 25.0.65
+- Calendar: Showing or hiding declined events. text label changed and work the first time. (without turning off and on)
+- Calendar: The color of the birthday calendar was the same as tasks.
+- Calender: The delete button in the EventDetail windows will decline if it is an invite
+- Registration: Allow time registration on read only projects
+- Core: Fixed history checking for map relations (like recurrenceOverrides in calendar events)
+- Calendar: Exception in recurring event was reset to it's original date when the organizer received a status reply from a participant
+- Calendar: Add more reminder options 1,2 and 7 days
+- Core: Update material icons (Cherry-pick from 6.8)
+- Email: add optional icon for linked email to message grid  (Cherry-pick from 6.8)
+- Finance: Status report
+- Finance: New executed at date
+- Finance: Better label for invoicing 100% of order / quote
+
+03-11-2025: 25.0.64  
+- Calendar: Send event reminders by email when enabled in Notification settings.
+- Calendar: fixed removal of scheduled reminders when event is deleted.
+- Principals: when searching for principal they are no longer grouped by same email address
+- Support: Fixed security issue where users could add comments to other people's tickets
+- Email: Auto disable list-extended when command fails (Happens on strato recently).
+- Core: consistent casting when trying to determine current userId
+- Addressbook: address link will open OpenStreetMap instead of generating an inconsistently supported geo: URI
+- Calendar: Send scheduling messages in the past.
+- Calendar: Update participant scheduleStatus property and show it in the UI
+- Core / Files: fix upload in FilesDetailPanel in case an entity was newly created.
+
+28-10-2025: 25.0.63
+- Calendar: Grouping bug in calendar fixed
+- Calendar: Do not check availability for existing participants in existing events. They would also show as busy in the current event
+- Tasks: Sort alphabetically in subscribe tasklist dialog
+
+27-10-2025: 25.0.62
+- Support: hotfix install script 
+
+- 27-10-2025: 25.0.61
+- Calendar: Resources request will be inserted and -if free- accepted uppon event creation
+- Calendar: Fixed finding the organizer when the event dialog is opened the second time.
+- Calendar: Allow event editing when user has WriteAll permissions but is not the organizer.
+- Finance: Added article info button and discount option
+- Calender: group calendar list by resource group name
+- Serverclient: User adding didn't work anymore because of change in aliases
+- Calendar: E-mail aliases from email accounts used for scheduling
+- Calendar: Invitation mails are sent after closing client connection so the client continues faster and there are no timeouts.
+- Core: Don't unset auth token cache on garbage collection because they are expired anyway
+- Calendar: Decline when not organizer when deleting. Update participation status from context menu
+- Calendar: Toggle visibility of declined events from main view
+- Core: Fixed: Addressbook CSV import shows fgetcsv(): $escape parameter error #1362
+- Calendar: Hide other calendars if you don't have module access. Related to https://github.com/Intermesh/groupoffice/discussions/1364
+- Projects3 /Tasks: Add link to project from task detail
+
 20-10-2025: 25.0.60
 - Core: Fix dirty merge
 
