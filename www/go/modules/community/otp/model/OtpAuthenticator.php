@@ -29,6 +29,8 @@ class OtpAuthenticator extends Property {
 	private $verify = false;
 	public static bool $requestSecret = false;
 
+	public $expiresAt = null;
+
 	protected $codeLength = 6;
 	
 	protected static function defineMapping(): Mapping
@@ -83,6 +85,12 @@ class OtpAuthenticator extends Property {
 			}
 		}
 
+		// Temporary secrets need not be validated against currently verified password
+		if(!empty($this->expiresAt)) {
+			parent::internalValidate();
+			return;
+		}
+
 		if($this->isModified("secret")) {
 			if((!go()->getAuthState() || !go()->getAuthState()->isAdmin()) && !$this->owner->isPasswordVerified()) {
 				$this->owner->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
@@ -90,13 +98,18 @@ class OtpAuthenticator extends Property {
 			}
 		}
 		
-		return parent::internalValidate();
+		parent::internalValidate();
 	}
 	
 	protected function internalSave(): bool
 	{
 		if(empty($this->secret)) {
 			$this->secret = $this->createSecret();
+		}
+
+		// When saving a temporary secret, e,g. from LDAP, the secret is verified by definition
+		if($this->isNew() && !empty($this->expiresAt)) {
+			$this->verified = true;
 		}
 				
 		return parent::internalSave();

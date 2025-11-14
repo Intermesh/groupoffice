@@ -12,3 +12,5 @@ $updates['202209191423'][] = "update googleauth_secret
 $updates['202211211602'][] = "rename table googleauth_secret to otp_secret;";
 $updates['202211211602'][] = "UPDATE core_auth_method t SET t.id = 'otpauthenticator' WHERE t.id LIKE 'googleauthenticator'";
 $updates['202211211602'][] = "UPDATE core_module t SET t.name = 'otp', version=0 WHERE t.name = 'googleauthenticator';";
+
+$updates['202511131130'][] = "ALTER TABLE `otp_secret` ADD `expiresAt` DATETIME NULL DEFAULT NULL;";

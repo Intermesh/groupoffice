@@ -250,7 +250,7 @@ class Sync extends Controller
 	/**
 	 * @throws Exception
 	 */
-	private function deleteUsers($usersInLDAP, $maxDeletePercentage, $dryRun): void
+	private function deleteUsers(array $usersInLDAP, int $maxDeletePercentage, bool $dryRun): void
 	{
 		$users = User::find(['id', 'username'])
 			->join('ldapauth_server_user_sync', 's', 's.userId = u.id')
@@ -401,7 +401,7 @@ class Sync extends Controller
 	/**
 	 * @throws Exception
 	 */
-	private function deleteGroups($groupsInLDAP, $maxDeletePercentage, bool $dryRun): void
+	private function deleteGroups(array $groupsInLDAP, int $maxDeletePercentage, bool $dryRun): void
 	{
 		$groups = Group::find(['id', 'name'])
 			->join('ldapauth_server_group_sync', 's', 's.groupId = g.id')
@@ -470,7 +470,7 @@ class Sync extends Controller
 		return $members;
 	}
 
-	private function queryActiveDirectoryUser(Connection $ldapConn, $groupMember, Server $server): ?array
+	private function queryActiveDirectoryUser(Connection $ldapConn, string $groupMember, Server $server): ?array
 	{
 		$parts = preg_split('~(?<!\\\),~', $groupMember);
 		$query = str_replace('\\,', ',', array_shift($parts));
@@ -493,12 +493,12 @@ class Sync extends Controller
 	/**
 	 * @param array $deleteIds
 	 * @param int $totalInLDAP
-	 * @param $maxDeletePercentage
+	 * @param int $maxDeletePercentage
 	 * @param int $totalInGO
 	 * @return void
 	 * @throws Exception
 	 */
-	private function logDeletes(array $deleteIds, int $totalInLDAP, $maxDeletePercentage, int $totalInGO): void
+	private function logDeletes(array $deleteIds, int $totalInLDAP, int $maxDeletePercentage, int $totalInGO): void
 	{
 		$deleteCount = count($deleteIds);
 
