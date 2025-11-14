@@ -1,3 +1,4 @@
+14-11-2025: 6.8.142
 - Apikeys: bugfix - delete access token upon key deletion
  
 11-11-2025: 6.8.141
