@@ -379,4 +379,5 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Ihre Mailbox ist v
   '\'"You didn\'\'t fill in a subject. Are you sure you want to send this message without a subject?"\'' => 'Sie haben keinen Betreff eingetragen. Sind Sie sicher, dass Ihre Nachricht ohne Betreff gesendet werden soll?',
   'Processing...' => 'Processing...',
   'Server' => 'Server',
+  'Display linked Tasks in messages list' => 'Verlinkte Aufgaben in der Nachrichtenliste anzeigen',
 );

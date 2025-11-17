@@ -1817,4 +1817,6 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Categories' => 'Categories',
   'Labels' => 'Labels',
   'N/A' => 'N/A',
+  'Allow creation of users through the API' => 'Allow creation of users through the API',
+  'When enabled, you should restrict access for the \'Everyone\' group as much as possible. Use with caution.' => 'When enabled, you should restrict access for the \'Everyone\' group as much as possible. Use with caution.',
 );
