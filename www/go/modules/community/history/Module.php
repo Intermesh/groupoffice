@@ -159,15 +159,9 @@ class Module extends core\Module
 		if($action !== 'delete') {
 			$changes = $entity->historyLog();
 
-//			unset($changes['filesFolderId']);
-
 			$cfChanges = self::getCustomFieldChanges($entity);
 			if(!empty($cfChanges)) {
 				$changes['customFields'] = $cfChanges;
-			}
-
-			if(empty($changes)) {
-				return;
 			}
 
 			if($action == 'create') {

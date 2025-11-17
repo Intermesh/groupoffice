@@ -187,11 +187,14 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	public $privacy = self::Public;
 
+	const string FREEBUSY_BUSY = 'busy';
+	const string FREEBUSY_FREE = 'free';
+
 	/**
 	 * Is event Transparent or Opaque
-	 * @var boolean
+	 * @var ?string
 	 */
-	public $freeBusyStatus = 'busy';
+	public ?string $freeBusyStatus = self::FREEBUSY_BUSY;
 
 	/**
 	 * @var string
@@ -463,6 +466,9 @@ class CalendarEvent extends AclItemEntity {
 //	}
 
 	public function start($withoutTime = false) {
+		if(!isset($this->start)) {
+			$this->start = new \DateTime();
+		}
 		return new \DateTime($this->start->format("Y-m-d". ($withoutTime?'':" H:i:s")), $this->timeZone());
 	}
 
