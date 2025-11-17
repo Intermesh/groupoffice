@@ -20,6 +20,14 @@ class EventTest extends TestCase {
     return $calendar;
   }
 
+
+	/**
+	 * @depends \go\core\UserTest::testCreate()
+	 *
+	 * @return void
+	 * @throws \Exception
+	 */
+
   public function testEvent() {
     $calendar = $this->getCalendar();
 
