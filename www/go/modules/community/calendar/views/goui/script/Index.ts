@@ -208,6 +208,7 @@ modules.register(  {
 	name: "calendar",
 	entities: [
 		"Calendar",
+		"CalendarView",
 		{
 			name:"CalendarEvent",
 			filters: [
