@@ -1,3 +1,4 @@
+17-11-2025: 25.0.67
 - Calendar: Select tasks for the calendar view if the due date is in the selected range.
 - Maildomains: fix error when adding new maildomain, mailbox or alias #1382
 
