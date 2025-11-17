@@ -1,3 +1,6 @@
+- Calendar: Select tasks for the calendar view if the due date is in the selected range.
+- Maildomains: fix error when adding new maildomain, mailbox or alias #1382
+
 13-11-2025: 25.0.66
 - Calendar: Read private events as owner of the calendars (Fixed)
 - Leavedays: single day leave days with time will show with time in the calendar.

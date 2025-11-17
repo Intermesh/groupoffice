@@ -36,68 +36,60 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 		
 		return $response;
 	}
-	
-	protected function actionSubscribe($params){
+
+	protected function actionSubscribe(array $params)
+	{
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
-			$response = array();
-			
-			
-			$rawMail = json_decode($params["mailboxs"]);
-			if(is_array($rawMail)) {
-				$mailboxs = $rawMail;
-			} else {
-				$mailboxs = array($rawMail);
-			}
-	
+		$response = array();
+
+		$rawMail = json_decode($params["mailboxs"]);
+		if (is_array($rawMail)) {
+			$mailboxs = $rawMail;
+		} else {
+			$mailboxs = array($rawMail);
+		}
+
 		foreach ($mailboxs as $mailboxName) {
-			
-			$mailbox = new \GO\Email\Model\ImapMailbox($account, array("name"=>$mailboxName));
+
+			$mailbox = new \GO\Email\Model\ImapMailbox($account, array("name" => $mailboxName));
 			$mailbox->subscribe();
-			
-//			$response['success'] = $mailbox->subscribe();
-			
-//			if(!$mailbox->subscribe()) {
-//				$response['success'] = false;
-//				
-//				break;
-//			}
+
 			$response['success'] = true;
 		}
-		
-		if(!$response['success'])
-			$response['feedback']="Failed to subscribe to ".$params['mailbox'];
-//		return $response;
-		
+
+		if (!$response['success']) {
+			$response['feedback'] = "Failed to subscribe to " . $params['mailbox'];
+		}
+
 		echo $this->render('json', array('success' => true));
 	}
-	
-	protected function actionUnsubscribe($params){
+
+	protected function actionUnsubscribe(array $params): array
+	{
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
-				
+
 		$response = array();
 		$rawMail = json_decode($params["mailboxs"]);
-		
-			if(is_array($rawMail)) {
-				$mailboxs = $rawMail;
-			} else {
-				$mailboxs = array($rawMail);
-			}
-			
+
+		if (is_array($rawMail)) {
+			$mailboxs = $rawMail;
+		} else {
+			$mailboxs = array($rawMail);
+		}
+
 		foreach ($mailboxs as $mailboxName) {
-			
-			$mailbox = new \GO\Email\Model\ImapMailbox($account, array("name"=>$mailboxName));
-			
-			
-			if(!$mailbox->unsubscribe()) {
+			$mailbox = new \GO\Email\Model\ImapMailbox($account, array("name" => $mailboxName));
+			if (!$mailbox->unsubscribe()) {
 				$response['success'] = false;
 				break;
 			}
 			$response['success'] = true;
 		}
-		
-		if(!$response['success'])
-			$response['feedback']="Failed to unsubscribe from ".$params['mailbox'];
-		
+
+		if (!$response['success']) {
+			$response['feedback'] = "Failed to unsubscribe from " . $params['mailbox'];
+		}
+
 		return $response;
 	}
 	
