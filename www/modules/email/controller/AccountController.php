@@ -356,9 +356,9 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 	 *
 	 * @param type $mailboxes
 	 * @param boolean $fetchAllWithSubscribedFlag Get all children with the "Subscribed" flag
-	 * @return type
+	 * @return array
 	 */
-	private function _getMailboxTreeNodes($mailboxes, $fetchAllWithSubscribedFlag=false) {
+	private function _getMailboxTreeNodes($mailboxes, $fetchAllWithSubscribedFlag=false): array {
 		$nodes = array();
 		foreach ($mailboxes as $mailbox) {
 
