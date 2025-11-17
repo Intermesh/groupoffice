@@ -34,7 +34,7 @@ class EventTest extends TestCase {
     $event = new CalendarEvent();
     $event->calendarId = $calendar->id;
     $event->title = "Test";
-		$event->start = new DateTime()->setTime(12,0,0,0);
+		$event->start = (new DateTime())->setTime(12,0,0,0);
 		$event->duration = "PT1H";
 		$event->freeBusyStatus = CalendarEvent::FREEBUSY_FREE;
 
