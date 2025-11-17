@@ -187,8 +187,8 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	public $privacy = self::Public;
 
-	const string FREEBUSY_BUSY = 'busy';
-	const string FREEBUSY_FREE = 'free';
+	const FREEBUSY_BUSY = 'busy';
+	const FREEBUSY_FREE = 'free';
 
 	/**
 	 * Is event Transparent or Opaque
