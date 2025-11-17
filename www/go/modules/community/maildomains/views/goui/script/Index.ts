@@ -6,6 +6,11 @@ import {SystemSettings} from "./SystemSettings.js";
 modules.register(  {
 	package: "community",
 	name: "maildomains",
+	entities: [
+		"MailDomain",
+		"MailAlias",
+		"MailBox"
+	],
 	async init () {
 		client.on("authenticated",  ({session}) => {
 			if(!session.capabilities["go:community:maildomains"]) {
