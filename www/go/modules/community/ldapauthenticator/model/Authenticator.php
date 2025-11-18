@@ -114,7 +114,7 @@ class Authenticator extends PrimaryAuthenticator
 		}
 
 		Module::ldapRecordToUser($username, $record, $user);
-		
+
 		if (go()->getModule('community', 'otp') && isset($mappedValues['otpSecret'])) {
 			$o = new OtpAuthenticator($user);
 			$o->setSecret($mappedValues['otpSecret']);
