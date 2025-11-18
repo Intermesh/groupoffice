@@ -1,3 +1,5 @@
+- More DE translations. Danke Daniel!
+
 17-11-2025: 6.8.143
 - Core: Revert search cache fix as it's too heavy on large db's.
 - Updated DE translations. Danke Daniel!
