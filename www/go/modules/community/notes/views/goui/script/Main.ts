@@ -8,11 +8,12 @@ import {
 	EntityID,
 	h3,
 	hr,
-	menu, menucolumn,
+	menu,
+	menucolumn,
 	mstbar,
 	router,
 	searchbtn,
-	t, table,
+	t,
 	tbar,
 	Toolbar
 } from "@intermesh/goui";
@@ -22,7 +23,7 @@ import {NoteBookDialog} from "./NoteBookDialog";
 import {NoteGrid} from "./NoteGrid";
 import {NoteDetail} from "./NoteDetail";
 import {NoteDialog} from "./NoteDialog";
-import {NoteBook, noteBookDS, noteDS} from "./Index.js";
+import {noteBookDS, noteDS} from "./Index.js";
 
 export class Main extends MainThreeColumnPanel {
 	private noteBookGrid!: NoteBookGrid;
@@ -42,7 +43,7 @@ export class Main extends MainThreeColumnPanel {
 	protected createWest() {
 		return comp({
 				cls: "vbox",
-				width: 300
+				width: 300,
 			},
 			tbar({
 					cls: "border-bottom"
@@ -167,8 +168,6 @@ export class Main extends MainThreeColumnPanel {
 
 	protected createCenter() {
 		this.noteGrid = new NoteGrid();
-
-		this.noteGrid.title = "Notes";
 
 		this.noteGrid.rowSelectionConfig = {
 			multiSelect: true,
