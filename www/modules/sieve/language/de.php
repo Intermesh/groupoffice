@@ -164,5 +164,5 @@ return array (
   '\'"Recipient doesn\'\'t exist"\'' => 'Empfänger vorhanden',
   '\'"Please click \'\'add\'\' to add a criterium"\'' => '\'"Klicken Sie bitte \'\'Hinzufügen\'\', um eine Bedingung hinzuzufügen"\'',
   'Sieve' => 'Sieve',
-  'Set a custom subject' => 'Set a custom subject',
+  'Set a custom subject' => 'Einen benutzerdefinierten Betreff setzen',
 );
