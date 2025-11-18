@@ -114,15 +114,13 @@ class Authenticator extends PrimaryAuthenticator
 		}
 
 		Module::ldapRecordToUser($username, $record, $user);
-		$mappedValues['otpSecret'] = 'ZVXRSTRQEI63JU2V'; // Cheat the system - Remove when done...
-
+		
 		if (go()->getModule('community', 'otp') && isset($mappedValues['otpSecret'])) {
 			$o = new OtpAuthenticator($user);
 			$o->setSecret($mappedValues['otpSecret']);
-			$o->expiresAt = (new DateTime())->add(new DateInterval('PT1M'));
+			$o->expiresAt = (new DateTime())->add(new DateInterval('PT10M'));
 			$o->userId = $user->id;
 			$user->otp = $o;
-//			go()->getCache()->set(md5('otp-' . $username ), $mappedValues['otpSecret'], true, Authenticate::CACHE_PASSWORD_LOGIN);
 		}
 
 		foreach ($server->groups as $group) {

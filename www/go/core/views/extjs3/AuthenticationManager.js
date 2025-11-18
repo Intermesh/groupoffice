@@ -144,20 +144,17 @@ go.AuthenticationManager = (function () {
 		},
 
 		doAuthentication: function (authenticators, cb, scope) {
-debugger;
 			const loginData = {
 				loginToken: this.loginToken, //while the user is authenticating only loginToken is set 
 				rememberLogin: this.rememberLogin,
 				authenticators: authenticators
 			};
-const url = this.getAuthUrl();
 
 			Ext.Ajax.request({
 				url: this.getAuthUrl(),
 				jsonData: loginData,
 				callback: function (options, success, response) {
 					const result = response.responseText ? Ext.decode(response.responseText) : {}, me = this;
-					debugger;
 					if(!success) {
 						switch(response.status) {
 							case 503:
