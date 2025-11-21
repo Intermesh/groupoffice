@@ -378,7 +378,7 @@ class Extjs3 {
 		echo 'Ext.onReady(GO.mainLayout.boot, GO.mainLayout);</script>';
 	}
 
-	private function clientSettings(){
+	public function clientSettings(){
 		return [
 			'max_row_list' => 50,
 			'config' => [

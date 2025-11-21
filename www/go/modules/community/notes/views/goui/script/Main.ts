@@ -46,7 +46,6 @@ export class Main extends MainThreeColumnPanel {
 				width: 300,
 			},
 			tbar({
-					cls: "border-bottom"
 				},
 				checkbox({
 					listeners: {

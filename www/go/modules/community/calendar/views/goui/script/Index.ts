@@ -277,15 +277,15 @@ modules.register(  {
 		client.on("authenticated",  ({session}) => {
 
 			// OLD CODE
-			async function showBadge() {
-				const count = await go.Jmap.request({method: "CalendarEvent/countMine"});
-				ui.inboxBtn.hidden = count<1;
-				GO.mainLayout.setNotification('calendar', count, 'orange');
-			}
-			go.Db.store("CalendarEvent").on("changes", () => {
-				showBadge();
-			});
-			showBadge();
+			// async function showBadge() {
+			// 	const count = await go.Jmap.request({method: "CalendarEvent/countMine"});
+			// 	ui.inboxBtn.hidden = count<1;
+			// 	GO.mainLayout.setNotification('calendar', count, 'orange');
+			// }
+			// go.Db.store("CalendarEvent").on("changes", () => {
+			// 	showBadge();
+			// });
+			// showBadge();
 			// END OLD CODE
 			client.user.calendarPreferences ||= {};
 			if(!session.capabilities["go:community:calendar"]) {
