@@ -7,6 +7,7 @@
 - Calendar: Fixed personal calendar combo not loading correctly when opened as admin
 - Projects3: Show mine filter set too late
 - Calendar: Improved month view
+- Core: Fixed bug in search with names and - or _ in them.
 
 17-11-2025: 25.0.67
 - Calendar: Select tasks for the calendar view if the due date is in the selected range.
