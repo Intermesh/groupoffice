@@ -1,32 +1,44 @@
-import {btn, comp, Component, menu, root, Menu} from "@intermesh/goui";
+import {btn, comp, Component, menu, root, Menu, CardMenu, cardmenu, cards} from "@intermesh/goui";
 import {authManager, modules, client} from "@intermesh/groupoffice-core";
 
 export class Main extends Component {
-	private menu: Menu;
+	private menu: CardMenu;
 	private container: Component;
 	constructor() {
 		super();
-		this.menu = menu();
-		this.container = comp();
+
+		this.cls = "fit vbox";
+		this.menu = cardmenu({
+			cls: "main-menu"
+		});
+		this.container = cards({
+			flex: 1
+		});
+
 		this.items.add(this.menu, this.container);
 
 		modules.getMainPanels().forEach(async (m) => {
 
-			if(m.module == "notes") {
+			const itemId =  m.package + "/" +m.module;
 
-				const cmp = await m.callback();
-				this.container.items.replace(cmp);
+			this.menu.items.add(
+					btn({
+						itemId,
+						text: m.title,
+						handler: async () => {
 
-				// this.menu.items.add(
-				// 	btn({
-				// 		text: m.title,
-				// 		handler: async () => {
-				// 			const cmp = await m.callback();
-				// 			this.container.items.replace(cmp);
-				// 		}
-				// 	})
-				// );
-			}
+							let cmp = this.container.findChild(itemId);
+							if(!cmp) {
+								cmp = await m.callback();
+								cmp.itemId = itemId;
+								this.container.items.add(cmp);
+							}
+							cmp.show();
+
+						}
+					})
+				);
+			// }
 		});
 	}
 
@@ -37,20 +49,14 @@ export class Main extends Component {
 client.uri = "/api/"
 
 
-await modules.loadModule("community", "notes");
+await Promise.all(
+	[
+		modules.loadModule("community", "notes"),
+		modules.loadModule("community", "calendar"),
+		modules.loadLegacy()
+	]
+);
 
 authManager.requireLogin().then(async () => {
-
-	// root.items.add(new Main());
-	root.cls = "fit";
-
-	modules.getMainPanels().forEach(async (m) => {
-
-		if (m.module == "notes") {
-
-			const cmp = await m.callback();
-			root.items.add(cmp);
-		}
-	});
-
+	root.items.add(new Main());
 });

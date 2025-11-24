@@ -10,7 +10,7 @@
   "scripts": {
     "electron": "npm run build && electron dist/Electron.js",
 
-    "start": "npm run build:clean && concurrently --kill-others \"npm run start:ts\"  \"npm run start:sass\"",
+    "start main": "npm run build:clean && concurrently --kill-others \"npm run start:ts\"  \"npm run start:sass\"",
     "start:ts": "node ../../../../../../views/goui/esbuild-module.mjs watch",
     "start:sass": "npx sass --watch style:dist",
 
