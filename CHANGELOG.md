@@ -1,4 +1,7 @@
+24-11-2025: 6.8.144
 - More DE translations. Danke Daniel!
+- #1365 Add phone scope, extend user's attributes Thanks @michalcharvat
+- #1368 set default editTB container width Thanks @michalcharvat
 
 17-11-2025: 6.8.143
 - Core: Revert search cache fix as it's too heavy on large db's.
