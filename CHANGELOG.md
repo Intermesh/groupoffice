@@ -1,6 +1,7 @@
 - Calendar: show private events as "Private" in caldav
--  Calendar: permission check for deleting calendars in caldav
+- Calendar: permission check for deleting calendars in caldav
 - Calendar: Enable syncToDevice only when it's your own calendar
+- Calendar: Add event to calendars of invitees who are in the same system immediately
 - Core: Serve insecure types (html, svg) as plain text to prevent Stored XSS
 - Maildomains: Automatic mailbox creation not working (Issue #1384)
 - Calendar: Fixed personal calendar combo not loading correctly when opened as admin
