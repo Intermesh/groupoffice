@@ -63,6 +63,7 @@ try {
 		// prevent html to render on same domain having access to all global JS stuff
 		if(in_array($blob->type, INSECURE_MIME_TYPES)) {
 			$inline = false;
+			$blob->type = 'text/plain';
 		}
 
 		try {
