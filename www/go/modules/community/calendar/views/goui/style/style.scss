@@ -357,12 +357,16 @@
 			> div.more {
 				bottom:0;
 				position:absolute;
-				padding-left:dp(26);
+				padding: 0.6rem 2rem 0;
 				width: 14.2%;
 				background-color: $surfaceLowest;
-				color: $colorText;
 				display:none;
 				mask-image: linear-gradient(to top, white 80%, transparent);
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				overflow: hidden;
+				color: $colorTextSecondary;
+				font-size: sp(12);
 
 			}
 			&:first-child,
