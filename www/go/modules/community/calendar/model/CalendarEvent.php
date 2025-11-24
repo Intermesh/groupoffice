@@ -237,7 +237,7 @@ class CalendarEvent extends AclItemEntity {
 	protected $lastOccurrence;
 	/** The start time of the first occurence in the series, or start time if not recurring */
 	protected $firstOccurrence;
-	protected ?string  $ownerId; // find calendar owner to see if Private events needs to be altered
+	protected ?string  $ownerId = null; // find calendar owner to see if Private events needs to be altered
 
 	public static function customFieldsTableName(): string
 	{
@@ -782,7 +782,7 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	public function currentUserIsOwner() {
-		return $this->ownerId === go()->getUserId() ||
+		return $this->isNew() || $this->ownerId === go()->getUserId() ||
 		 ($this->ownerId === null && $this->createdBy === go()->getUserId());
 	}
 

@@ -197,7 +197,6 @@ class ICalendarHelper {
 			}
 		}
 		if(!empty($event->uid)) $vevent->UID = $event->uid;
-		if(!empty($event->title)) $vevent->SUMMARY = $event->title;
 		//$vevent->add('DTSTART', $event->start($event->showWithoutTime)->format("Ymd\THis"), ['value' => $event->showWithoutTime ? 'DATE' : 'DATE-TIME']);
 		if(!empty($event->start)) $vevent->DTSTART = $event->start($event->showWithoutTime);
 		if(!empty($event->duration)) $vevent->DTEND = $event->end($event->showWithoutTime);
@@ -209,8 +208,12 @@ class ICalendarHelper {
 		if(!empty($event->status)) $vevent->STATUS = strtoupper($event->status);
 		// Sequence is for updates on the event it's used for ITIP
 		if(isset($event->sequence)) $vevent->SEQUENCE = $event->sequence;
-		if(!empty($event->description)) $vevent->DESCRIPTION = $event->description;
-		if(!empty($event->location)) $vevent->LOCATION = $event->location;
+
+		$showAsPrivate = $event->isPrivate() && !$event->currentUserIsOwner();
+		if(!empty($event->title)) $vevent->SUMMARY = $showAsPrivate ? '('.go()->t('Private', 'community', 'calendar').')' : $event->title;
+		if(!empty($event->description) && !$showAsPrivate) $vevent->DESCRIPTION = $event->description;
+		if(!empty($event->location) && !$showAsPrivate) $vevent->LOCATION = $event->location;
+
 		if(!empty($event->color)) $vevent->COLOR = $event->color;
 		if(!empty($event->categoryIds)) $vevent->CATEGORIES = implode(',',$event->categoryNames());
 
