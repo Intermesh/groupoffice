@@ -60,8 +60,11 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 		return super.internalRender();
 	}
 
+	private month?:number;
+
 	goto(date: DateTime, days?: number) {
 		//this.el.cls('reverse',(day < this.day));
+		this.month = date.getMonth();
 		this.day = date.setHours(0,0,0, 0);
 		this.start = date.clone()
 		const endMonth = this.start.clone();
@@ -194,13 +197,19 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 		))); // headers
 
 		this.weekRows = [];
-		// while (it < this.days) {
-		for(let row = 0; row < 5; row++) {
+		while (it < this.days) {
 			const weekStart = day.clone(),
 				eventContainer = E('li').cls('events'),
 				row = E('ol',eventContainer);
 			for (i = 0; i < 7; i++) {
+
 				const cDay = day.clone();
+
+				if(it > 20 && i == 0 && cDay.getMonth() != this.month!) {
+					// stop if we're starting a new row with the next month
+					return;
+				}
+
 				row.append(E('li',
 					(i==0 && client.user.calendarPreferences.showWeekNumbers) ? E('sub','W '+day.getWeekOfYear()).cls('weeknb').cls('not-small-device')
 						.on('click',_e => this.fire('selectweek', {day: weekStart}))
