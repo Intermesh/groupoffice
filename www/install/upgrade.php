@@ -8,8 +8,7 @@ use go\core\model\Module;
 use go\modules\business\license\model\License;
 use go\modules\business\studio\Module as StudioModule;
 
-ini_set('zlib.output_compression', 0);
-ini_set('implicit_flush', 1);
+
 
 try {
 
