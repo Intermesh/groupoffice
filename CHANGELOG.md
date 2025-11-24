@@ -5,6 +5,7 @@
 - Maildomains: Automatic mailbox creation not working (Issue #1384)
 - Calendar: Fixed personal calendar combo not loading correctly when opened as admin
 - Projects3: Show mine filter set too late
+- Calendar: Improved month view
 
 17-11-2025: 25.0.67
 - Calendar: Select tasks for the calendar view if the due date is in the selected range.
