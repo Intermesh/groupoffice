@@ -194,7 +194,8 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 		))); // headers
 
 		this.weekRows = [];
-		while (it < this.days) {
+		// while (it < this.days) {
+		for(let row = 0; row < 5; row++) {
 			const weekStart = day.clone(),
 				eventContainer = E('li').cls('events'),
 				row = E('ol',eventContainer);
@@ -269,7 +270,7 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 		this.slots = Array.from({length: this.wdays}, _ => ({}) );
 		let stillContinueing = [];
 		while(e = this.continues.shift()) {
-			eventEls.push(this.drawEventLine(e, wstart));
+			eventEls.push(this.drawEventLine(e, wstart, false));
 			if(e.end.date > end.date) {
 				stillContinueing.push(e); // push it back for next week
 			}
@@ -277,7 +278,7 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 		this.continues = stillContinueing;
 
 		while((e = this.viewModel[this.iterator]) && e.start.format('Ymd') < end.format('Ymd')) {
-			eventEls.push(this.drawEventLine(e, wstart));
+			eventEls.push(this.drawEventLine(e, wstart, false));
 			if(e.end.date > end.date) {
 				this.continues.push(e);
 			}

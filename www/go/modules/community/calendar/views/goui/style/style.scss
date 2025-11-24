@@ -23,8 +23,8 @@
 		color: $colorText;
 	}
 	> em {
-		mask-image: linear-gradient(to right, white 80%, transparent);
-		//text-overflow:ellipsis; // this is ugly
+		//mask-image: linear-gradient(to right, white 80%, transparent);
+		text-overflow:ellipsis; // this is ugly
 		overflow:hidden;
 		flex: 1 1 auto;
 	}
@@ -34,6 +34,9 @@
 		font-weight: 400;
 		font-size: .85em;
 		color:$colorTextSecondary;
+		padding-left: .4rem;
+		padding-right: .4rem;
+
 	}
 	&::first-letter {
 		text-transform: capitalize;
@@ -66,6 +69,7 @@
 
 	&.undecided {
 		border: 1px dashed $colorText;
+		margin-left: -1px; //for border alignment
 		color: $colorText;
 		//background-color:transparent;
 		opacity: .6;
@@ -392,7 +396,7 @@
 						&::before {
 							content: '';
 							border-radius: 999px;
-							width:dp(6);
+							min-width:dp(4);
 							height:dp(16);
 							margin: dp(5); // same width as white-space in allday events
 							background-color: currentColor;
