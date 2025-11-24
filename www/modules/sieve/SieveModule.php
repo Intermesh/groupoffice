@@ -17,6 +17,11 @@ class SieveModule extends Module{
 		return array("email");
 	}
 
+	public function getStatus(): string
+	{
+		return \go\core\Module::STATUS_DEPRECATED;
+	}
+
 	public function package() {
 		return self::PACKAGE_COMMUNITY;
 	}

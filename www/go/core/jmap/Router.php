@@ -185,11 +185,14 @@ class Router {
 			//Very ugly hack
 			if($entityType->getName() == "Project") {
 				// JH Added to the ugly hack. Need a bit of JMAP for the old projects as well
-				if(go()->getModule('business', 'projects')) {
+				if (go()->getModule('business', 'projects')) {
 					$controllerClass = "go\\modules\\business\\projects\\controller\\Project";
 				} else {
 					$controllerClass = 'GO\\Projects2\\Controller\\ProjectEntityController';
 				}
+			}elseif($entityType->getName() == "Account") {
+				// TODO: HACK! Please remove when merged with email branch!
+				$controllerClass = "go\\modules\\community\\email\\controller\\Account";
 			} else {
 				$controllerClass = str_ireplace("model", "controller", $entityType->getClassName());
 			}

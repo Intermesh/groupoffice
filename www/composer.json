@@ -46,7 +46,8 @@
     "phpmailer/phpmailer": "@stable",
     "jasny/phpdoc-parser": "^1.0",
     "stevenmaguire/oauth2-keycloak": "^5.1",
-    "maestroerror/php-heic-to-jpg": "^1.0"
+    "maestroerror/php-heic-to-jpg": "^1.0",
+    "pear/net_sieve": "^1.4"
   },
   "license": "AGPL",
   "authors": [
