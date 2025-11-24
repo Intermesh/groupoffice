@@ -722,7 +722,7 @@ class CalendarEvent extends AclItemEntity {
 		$success = parent::internalSave();
 
 		if($success) {
-			$this->addToResourceCalendars();
+			$this->addToKnownCalendars();
 			$this->updateAlerts(go()->getUserId());
 			$this->changeEventsWithSameUID();
 			$this->incrementCalendarModSeq();
@@ -805,7 +805,7 @@ class CalendarEvent extends AclItemEntity {
 		return $arr;
 	}
 
-	private function addToResourceCalendars() {
+	private function addToKnownCalendars() {
 		if(empty($this->participants)) return;
 		foreach($this->participants as $pid => $participant) {
 			if($participant->kind == 'resource') {
@@ -813,6 +813,14 @@ class CalendarEvent extends AclItemEntity {
 				if(!empty($resourceCalendar)) {
 					 go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
 						['calendarId'=>$resourceCalendar->id, 'eventId'=>$this->eventId]
+					])->execute();
+				}
+			}
+			if($participant->kind == 'individual' && is_numeric($pid)) {
+				$personalCalendarId = Calendar::fetchPersonal($pid);
+				if ($personalCalendarId) {
+					go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
+						['calendarId'=>$personalCalendarId, 'eventId'=>$this->eventId]
 					])->execute();
 				}
 			}
