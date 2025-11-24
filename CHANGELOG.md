@@ -1,3 +1,4 @@
+- Calendar: Enable syncToDevice only when it's your own calendar
 - Core: Serve insecure types (html, svg) as plain text to prevent Stored XSS
 - Maildomains: Automatic mailbox creation not working (Issue #1384)
 - Calendar: Fixed personal calendar combo not loading correctly when opened as admin
