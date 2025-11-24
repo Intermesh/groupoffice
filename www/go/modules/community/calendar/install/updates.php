@@ -316,7 +316,7 @@ $updates["202507221653"][] = "alter table `calendar_preferences` add column week
 
 $updates["202508111058"][] = "update calendar_event set uri = REPLACE(REPLACE(REPLACE(uri, '/', '_'), '+', '-'), '=', '.');";
 
-$updates["202508191124"][] = "alter table calendar_calendar_user add column syncToDevice tinyint default 1 not null after `timeZone`";
+$updates["202508191124"][] = "alter table calendar_calendar_user add column syncToDevice tinyint default 0 not null after `timeZone`";
 
 $updates["202508211118"][] = "update ignore calendar_participant p inner join core_user u on u.email = p.email set p.id = u.id;";
 $updates["202508211118"][] = "update calendar_preferences set defaultCalendarId=null where defaultCalendarId not in (select id from calendar_calendar);";
@@ -440,3 +440,7 @@ $updates['202510071214'][] = "ALTER TABLE `calendar_calendar` ADD COLUMN `publis
 
 $updates['202510091209'][] = 'update calendar_recurrence_override set patch = replace(patch, \'"status":"cancelled"\', \'"excluded":true\')
 where patch like \'%"status":"cancelled"%\'';
+
+$updates['202511241214'][] = 'alter table calendar_calendar_user
+    alter column syncToDevice set default 0;';
+

@@ -71,7 +71,7 @@ export class SubscribeWindow extends Window {
 				column({id:'id', width:160, renderer: v=> btn({
 						text: t("Subscribe"),
 						cls:'primary',
-						handler: () => { store.dataSource.update(v, {isSubscribed: true, syncToDevice: false}); }
+						handler: () => { store.dataSource.update(v, {isSubscribed: true}); }
 					})
 				}),
 				column({id: 'more', width:60, renderer: (_, data)=> btn({
