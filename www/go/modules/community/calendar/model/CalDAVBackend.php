@@ -210,8 +210,18 @@ class CalDAVBackend extends AbstractBackend implements
 		go()->debug("CalDAVBackend::deleteCalendar($calendarId)");
 		list($type, $id) = explode('-', $calendarId,2);
 		switch($type) {
-			case 'c': Calendar::delete(['id' => $id]); break;
-			case 't': TaskList::delete(['id' => $id]); break;
+			case 'c':
+				$e = Calendar::findById($id, []);
+				if($e && $e->hasPermissionLevel(Acl::LEVEL_DELETE)){
+					Calendar::delete(['id' => $id]);
+				}
+				break;
+			case 't':
+				$e = TaskList::findById($id, []);
+				if($e && $e->hasPermissionLevel(Acl::LEVEL_DELETE)) {
+					TaskList::delete(['id' => $id]);
+				}
+				break;
 		}
 	}
 

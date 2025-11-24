@@ -97,7 +97,7 @@ export class ResourcesWindow extends Window {
 		this.on('render', async () => {
 			resourceStore.load();
 			await resourceGroupStore.load();
-			const first = resourceStore.first();
+			const first = resourceGroupStore.first();
 			if(first) {
 				this.resourceGroupTable.rowSelection!.add(first);
 			}
@@ -175,7 +175,7 @@ export class ResourcesWindow extends Window {
 						searchbtn({
 							listeners: {
 								input: ( {text}) => {
-									this.resourceTable!.store.setFilter("search", {text: text})
+									this.resourceTable!.store.setFilter("search", {text: text}).load()
 								}
 							}
 						}),

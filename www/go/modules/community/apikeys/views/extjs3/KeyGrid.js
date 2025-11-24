@@ -126,7 +126,7 @@ go.modules.community.apikeys.KeyGrid = Ext.extend(go.grid.GridPanel, {
 				items: [
 					{
 						itemId: "copy",
-						iconCls: 'ic-clip',
+						iconCls: 'ic-content-copy',
 						text: t("Copy token to clipboard"),
 						handler: function() {
 							go.util.copyTextToClipboard(this.moreMenu.record.get('accessToken'));
@@ -139,18 +139,10 @@ go.modules.community.apikeys.KeyGrid = Ext.extend(go.grid.GridPanel, {
 						handler: function() {
 							alert(this.moreMenu.record.get('accessToken'));
 						},
-						scope: this
-					},{
-						itemId: "view",
-						iconCls: 'ic-search',
-						text: t("View access token"),
-						handler: function() {
-							alert(this.moreMenu.record.get('accessToken'));
-						},
 						scope: this						
 					},{
 						itemId:"delete",
-						iconCls: 'ic-share',
+						iconCls: 'ic-delete',
 						text: t("Delete"),
 						handler: function() {
 							this.getSelectionModel().selectRecords([this.moreMenu.record]);

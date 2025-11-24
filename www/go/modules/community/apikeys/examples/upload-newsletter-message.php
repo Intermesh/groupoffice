@@ -11,7 +11,7 @@ ini_set('display_errors', 'on');
 error_reporting(E_ALL);
 
 
-$apiKey = "63e601fab29f86187a7af84898b3e0d93bae150b209a2";
+$apiKey = "your-api-key";
 function fetch($data) {
     global $apiKey;
 	//Adjust these variables for your installation
