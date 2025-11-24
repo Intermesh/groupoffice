@@ -723,6 +723,7 @@ class CalendarEvent extends AclItemEntity {
 
 		if($success) {
 			$this->addToResourceCalendars();
+			$this->addToParticipantCalendars();
 			$this->updateAlerts(go()->getUserId());
 			$this->changeEventsWithSameUID();
 			$this->incrementCalendarModSeq();
@@ -805,6 +806,26 @@ class CalendarEvent extends AclItemEntity {
 		return $arr;
 	}
 
+	private function addToParticipantCalendars() {
+		if(empty($this->participants)) return;
+		
+		foreach($this->participants as $pid => $participant) {
+			if($participant->kind == 'individual' && !$participant->isOwner()) {
+				$personalCalendar = Calendar::fetchPersonal($pid);
+				if($personalCalendar) {
+					$user = User::findById(str_replace('User:', '', $pid), ['id','displayName','calendarPreferences']);
+					// ignore if user has enabled automatic adding of invitations
+					if (!$user || $user->calendarPreferences->autoAddInvitations == true) {
+						continue;
+					}
+					go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
+						['calendarId'=>$personalCalendar, 'eventId'=>$this->eventId]
+					])->execute();
+				}
+			}
+		}
+	}
+
 	private function addToResourceCalendars() {
 		if(empty($this->participants)) return;
 		foreach($this->participants as $pid => $participant) {
@@ -818,6 +839,7 @@ class CalendarEvent extends AclItemEntity {
 			}
 		}
 	}
+
 	private function updateAlerts($userId) {
 		if(!CoreAlert::$enabled) {
 			return;
