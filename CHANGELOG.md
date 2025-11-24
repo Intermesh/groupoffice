@@ -1,3 +1,4 @@
+- DE translations. Danke Daniel!
 - Calendar: show private events as "Private" in caldav
 - Calendar: permission check for deleting calendars in caldav
 - Calendar: Enable syncToDevice only when it's your own calendar
@@ -8,6 +9,8 @@
 - Projects3: Show mine filter set too late
 - Calendar: Improved month view
 - Core: Fixed bug in search with names and - or _ in them.
+- #1365 Add phone scope, extend user's attributes Thanks @michalcharvat
+- #1368 set default editTB container width Thanks @michalcharvat
 
 17-11-2025: 25.0.67
 - Calendar: Select tasks for the calendar view if the due date is in the selected range.

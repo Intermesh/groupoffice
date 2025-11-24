@@ -11,7 +11,7 @@ return array (
   'Client Secret' => 'Client Secret',
   'API Project Id' => 'API Project Id',
   'Use this connection for single signon with OpenID Connect' => 'Diese Verbindung für Single SignOn mit OpenID Connect verwenden',
-  'OAuth2 Connections' => 'OAuth2 Verbindungen',
+  'OAuth2 Connections' => 'OAuth2-Verbindungen',
   'Client ID' => 'Client ID',
   'Project ID' => 'Project ID',
   'Project Id' => 'Project Id',

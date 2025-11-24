@@ -34,18 +34,9 @@ use Throwable;
  * 
  * http://jmap.io/spec-core.html#making-an-api-request
  */
-class Router {
-//	public function error($type, $status, $detail) {
-//		$r = http\Response::get();
-//		$r->setStatus($status, $detail);
-//		$r->sendHeaders();
-//		$r->output([
-//			"type" => $type,
-//			"status" => $status,
-//			"detail" => $detail
-//		]);
-//		exit();
-//	}
+class Router
+{
+
 	/**
 	 * @var File
 	 */
@@ -183,16 +174,28 @@ class Router {
 			}
 
 			//Very ugly hack
+
 			if($entityType->getName() == "Project") {
 				// JH Added to the ugly hack. Need a bit of JMAP for the old projects as well
-				if(go()->getModule('business', 'projects')) {
+				if (go()->getModule('business', 'projects')) {
 					$controllerClass = "go\\modules\\business\\projects\\controller\\Project";
 				} else {
 					$controllerClass = 'GO\\Projects2\\Controller\\ProjectEntityController';
 				}
+			} elseif ($entityType->getName() == "Account") {
+				$controllerClass = "go\\modules\\community\\email\\controller\\Account";
 			} else {
 				$controllerClass = str_ireplace("model", "controller", $entityType->getClassName());
 			}
+
+			// Slightly less ugly hack. In a few cases we need Jmap controllers for non-JMAP modules
+			// Works well in 6.8, but 25.0 has multiple projects modules. 
+			/*
+			$controllerClass = match ($entityType->getName()) {
+				'Project' => 'GO\\Projects2\\Controller\\ProjectEntityController',
+				'Account' => 'go\\modules\\community\\email\\controller\\Account',
+				default => str_ireplace("model", "controller", $entityType->getClassName()),
+			};*/
 			$controllerMethod = $parts[1];
 		} else if($parts[0] == "core") {
 			$controllerMethod = array_pop($parts);
