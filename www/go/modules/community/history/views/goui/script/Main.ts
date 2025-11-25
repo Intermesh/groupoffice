@@ -12,7 +12,8 @@ import {
 	splitter,
 	store,
 	t,
-	tbar
+	tbar,
+	DateRangeField
 } from "@intermesh/goui";
 import {principalcombo} from "@intermesh/groupoffice-core";
 import {LogEntryGrid} from "./LogEntryGrid.js";
@@ -26,6 +27,7 @@ export class Main extends Component {
 	private typeGrid!: TypeGrid;
 
 	private selectedActions!: String[];
+	private dateRangeField!: DateRangeField;
 
 	constructor() {
 		super();
@@ -44,7 +46,7 @@ export class Main extends Component {
 
 		this.on("render", () => {
 			void this.typeGrid.load();
-			void this.logEntryGrid.store.load();
+			this.dateRangeField.setThisWeek();
 		})
 	}
 
@@ -56,14 +58,14 @@ export class Main extends Component {
 		return comp({
 				itemId: "west",
 				cls: "scroll ",
-				width: 320
+				width: 340
 			},
 			fieldset({},
 
-				daterangefield({
+				this.dateRangeField = daterangefield({
 					label: t("Date"),
 					listeners: {
-						change: ({newValue}) => {
+						setvalue: ({newValue}) => {
 							void this.logEntryGrid.store.setFilter("createdAt", {createdAt: newValue}).load();
 						}
 					}
@@ -89,10 +91,12 @@ export class Main extends Component {
 					}
 				})
 			),
-			hr(),
-			h3({
-				text: t("Actions")
-			}),
+
+			tbar({},
+				h3({
+					text: t("Actions")
+				})
+			),
 			list({
 				store: store({
 					data: [
@@ -107,7 +111,7 @@ export class Main extends Component {
 					]
 				}),
 				renderer: (v, el, list: List) => {
-					return [comp({}, checkbox({
+					return [checkbox({
 							label: v.label,
 							listeners: {
 								change: ({target, newValue}) => {
@@ -124,17 +128,18 @@ export class Main extends Component {
 									void this.logEntryGrid.store.load();
 								}
 							}
-						})
-					)];
+						})]
 				},
 				rowSelectionConfig: {
 					multiSelect: true
 				}
 			}),
-			hr(),
-			h3({
-				text: t("Types")
-			}),
+
+			tbar({} ,
+				h3({
+					text: t("Types")
+				})
+			),
 			this.typeGrid
 		)
 	}
