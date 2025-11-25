@@ -7,7 +7,7 @@ import {
 	hr,
 	List,
 	list,
-	p,
+	fieldset,
 	searchbtn,
 	splitter,
 	store,
@@ -34,8 +34,6 @@ export class Main extends Component {
 
 		this.logEntryGrid = new LogEntryGrid();
 
-		void this.logEntryGrid.store.load();
-
 		this.items.add(
 			this.west = this.createWest(),
 			splitter({
@@ -43,22 +41,25 @@ export class Main extends Component {
 			}),
 			this.center = this.createCenter()
 		)
+
+		this.on("render", () => {
+			void this.typeGrid.load();
+			void this.logEntryGrid.store.load();
+		})
 	}
 
 	private createWest() {
 		this.typeGrid = new TypeGrid(this.logEntryGrid.store);
-		void this.typeGrid.load();
 
 		this.selectedActions = [];
 
 		return comp({
 				itemId: "west",
-				cls: "pad bg-low scroll ",
+				cls: "scroll ",
 				width: 320
 			},
-			comp({
-					cls: "vbox"
-				},
+			fieldset({},
+
 				daterangefield({
 					label: t("Date"),
 					listeners: {
@@ -67,7 +68,6 @@ export class Main extends Component {
 						}
 					}
 				}),
-				p(),
 				principalcombo({
 					entity: "user",
 					label: t("Users"),
@@ -142,7 +142,7 @@ export class Main extends Component {
 	private createCenter() {
 		return comp({
 				itemId: "center",
-				cls: "vbox bg-low",
+				cls: "vbox",
 				flex: 1
 			},
 			tbar({

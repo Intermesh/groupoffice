@@ -1,4 +1,4 @@
-import {addbutton, client, DetailPanel, filesbutton, img, jmapds, linkbrowserbutton} from "@intermesh/groupoffice-core";
+import {addbutton, client, DetailPanel, img, jmapds} from "@intermesh/groupoffice-core";
 import {
 	avatar,
 	btn, Button,
