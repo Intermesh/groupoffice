@@ -116,7 +116,7 @@ class Calendar extends AclOwnerEntity {
 		return !empty($this->groupId) ? ('Calendar:'.$this->id) : $this->ownerId;
 	}
 
-	/** @return int */
+
 	public static function fetchPersonal($userId) {
 		$user = User::findById($userId, ['id','displayName','calendarPreferences']);
 		if(!empty($user)) {
@@ -138,8 +138,12 @@ class Calendar extends AclOwnerEntity {
 		}
 
 		// create default
-		$cal = Calendar::createDefault($user);
-		return $cal->id;
+		if(!empty($user)) {
+			$cal = Calendar::createDefault($user);
+			if($cal)
+				return $cal->id;
+		}
+		return null;
 
 	}
 

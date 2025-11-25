@@ -262,7 +262,7 @@ class MailboxController extends \GO\Base\Controller\AbstractModelController {
 		if(!empty($params['alias'])) {
 			$alias = new Alias();
 			$alias->address = $params['alias'];
-			$alias->goto = $params['username'];
+			$alias->setRecipients([$params['username']]);
 			if(!$alias->save()) {
 				throw new SaveException($alias);
 			}

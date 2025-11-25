@@ -31,8 +31,8 @@ class Account extends AclOwnerEntity
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
-			->addTable('em_accounts');
-//			->addQuery((new \go\core\db\Query)->select('acl_id AS aclId')); //temporary hack
+			->addTable("em_accounts")
+			->addQuery((new \go\core\db\Query)->select('acl_id AS aclId')); //temporary hack
 	}
 
 	protected static function defineFilters(): Filters
@@ -66,15 +66,15 @@ class Account extends AclOwnerEntity
 	{
 		if ($this->isModified('password')) {
 			$encrypted = \GO\Base\Util\Crypt::encrypt($this->password);
-			if ($encrypted) {
+			if($encrypted){
 				$this->password = $encrypted;
-				$this->password_encrypted = 2;//deprecated. remove when email is mvc style.
+				$this->password_encrypted=2;//deprecated. remove when email is mvc style.
 			}
 		}
 
 		if ($this->isModified('smtp_password') && strlen($this->smtp_password) > 0) {
 			$encrypted = \GO\Base\Util\Crypt::encrypt($this->smtp_password);
-			if ($encrypted) {
+			if($encrypted) {
 				$this->smtp_password = $encrypted;
 			}
 		}

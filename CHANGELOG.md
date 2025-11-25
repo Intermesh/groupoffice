@@ -1,3 +1,21 @@
+24-11-2025: 25.0.68
+- Core: fix composer dependency error
+
+24-11-2025: 25.0.68
+- DE translations. Danke Daniel!
+- Calendar: show private events as "Private" in caldav
+- Calendar: permission check for deleting calendars in caldav
+- Calendar: Enable syncToDevice only when it's your own calendar
+- Calendar: Add event to calendars of invitees who are in the same system immediately
+- Core: Serve insecure types (html, svg) as plain text to prevent Stored XSS
+- Maildomains: Automatic mailbox creation not working (Issue #1384)
+- Calendar: Fixed personal calendar combo not loading correctly when opened as admin
+- Projects3: Show mine filter set too late
+- Calendar: Improved month view
+- Core: Fixed bug in search with names and - or _ in them.
+- #1365 Add phone scope, extend user's attributes Thanks @michalcharvat
+- #1368 set default editTB container width Thanks @michalcharvat
+
 17-11-2025: 25.0.67
 - Calendar: Select tasks for the calendar view if the due date is in the selected range.
 - Maildomains: fix error when adding new maildomain, mailbox or alias #1382
@@ -66,7 +84,7 @@
 
 20-10-2025: 25.0.60
 - Core: Fix dirty merge
-
+ 
 20-10-2025: 25.0.59
 - Calendar: User with writeAll permission to shared calendar can edit event they did not organize but are internal
 - Calendar: Split view is now writeable (drag, drop, copy, paste, click-to-add)
@@ -82,8 +100,8 @@
 - Calendar: Fixed never ending loop in month print view
 - Files: remove delete buttons
 - Files: Fixed broken icons in thumb view
-- Core: Disable email profile field when an authenticator is used
 - Core: enable users with mayChangeUsers permission to add new users (backport from 6.8)
+- Core: Disable email profile field when an authenticator is used
 
 13-10-2025: 25.0.58
 - Address book: Add zipcode and street in grid
