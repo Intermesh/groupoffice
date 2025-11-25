@@ -15,7 +15,6 @@ import {
 import {client, jmapds} from "@intermesh/groupoffice-core";
 import {AccountWindow} from "./AccountWindow";
 import {IdentityWindow} from "./IdentityWindow";
-import {SettingsWindow} from "./SettingsWindow";
 import {accountStore} from "./Index";
 
 export interface AccountListEventMap extends ComponentEventMap {
@@ -43,7 +42,6 @@ export class AccountList extends Component<AccountListEventMap> {
 		const mailboxDS = jmapds('Mailbox');
 
 		const identityDialog = new IdentityWindow(),
-			settingsDialog = new SettingsWindow(),
 			accountMenu = menu({cls:'dropdown'},
 
 			);
@@ -151,7 +149,6 @@ export class AccountList extends Component<AccountListEventMap> {
 					//style: 'padding: 0 8px',
 					text: account.name,
 					menu: menu({},
-						btn({icon: 'settings',text: t('Settings'), handler: function() {settingsDialog.show(); }}), // hidden: !$.auth.roles.admin,
 						btn({icon: 'badge', 	text: t('Identities'), handler: function() {identityDialog.show();}}),
 						btn({icon: 'refresh', text: 'Refetch all', handler: () => { this.imapFill(account.id, mboxTree) }}),
 						'-',

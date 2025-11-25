@@ -245,3 +245,23 @@ CREATE TABLE IF NOT EXISTS `email_mailbox_user` (
 			ON DELETE NO ACTION
 			ON UPDATE NO ACTION)
 	ENGINE = InnoDB;
+
+
+CREATE TABLE IF NOT EXISTS `email_preferences` (
+	userId									INT NOT NULL PRIMARY KEY,
+	defaultIdentityId				INT NULL,
+	enableConversations			TINYINT(1) DEFAULT 0 NULL,
+	loadExternalContent			ENUM('always', 'knownOnly','ask') DEFAULT 'knownOnly' NOT NULL,
+	messageStructure  			ENUM('html','plain') DEFAULT 'html' NULL,
+	quoteOriginal 					TINYINT(1) DEFAULT 1 NOT NULL,
+	structureAsOriginal			TINYINT(1) DEFAULT 0 NOT NULL,
+	showNewOnTop		  			TINYINT(1) DEFAULT 0 NOT NULL,
+	showPreview							TINYINT(1) DEFAULT 1 NOT NULL,
+	showAvatar							TINYINT(1) DEFAULT 1 NOT NULL,
+	delaySentSeconds				MEDIUMINT UNSIGNED DEFAULT 15 NOT NULL,
+	saveUnknownRecipient   	TINYINT(1) DEFAULT 0 NOT NULL,
+	defaultReplyAll					TINYINT(1) DEFAULT 1 NOT NULL,
+	showReadReceipts				TINYINT(1) DEFAULT 0 NOT NULL,
+	CONSTRAINT email_preferences_core_user_id_fk FOREIGN KEY (userId)
+		REFERENCES core_user (id) ON DELETE CASCADE
+);

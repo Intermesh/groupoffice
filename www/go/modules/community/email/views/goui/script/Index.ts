@@ -1,8 +1,11 @@
 import {client, jmapds, modules, router} from "@intermesh/groupoffice-core";
-import {datasourcestore, t, translate} from "@intermesh/goui";
+import {datasourcestore, t as coreT, translate} from "@intermesh/goui";
 import {Main} from "./Main";
 import {EmailView} from "./EmailView";
+import {PreferencesPanel} from "./PreferencesPanel";
 //export * from "./Main.js";
+
+export const t = (key:string,p='community',m='email') => coreT(key, p,m);
 
 export const accountStore = datasourcestore({
 	dataSource:jmapds('EmailAccount')
@@ -59,7 +62,9 @@ modules.register(  {
 			});
 
 			modules.addMainPanel("community", "email", 'email', t('Email'), () => ui);
-
+			modules.addAccountSettingsPanel("community", "email", "email", t("Email"), "email", () => {
+				return new PreferencesPanel();
+			});
 		});
 	}
 });
