@@ -111,7 +111,7 @@ export class MailCtlr {
 					html = html.replace(/src="cid:(.*?)"/g, function(_:string, p1:string) {
 						for(const a of data.attachments) {
 							if(a.cid === p1) {
-								p1 = client.downloadBlobId(a.blobId, a.name) || '';
+								p1 = client.downloadUrl(a.blobId) || '';
 								break;
 							}
 						}

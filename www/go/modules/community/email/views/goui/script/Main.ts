@@ -1,8 +1,7 @@
 import {
 	btn, CardContainer, cards, comp,
-	Component, DefaultEntity, hr, List, menu, router, splitter, tbar
+	Component, DefaultEntity, hr, List, menu, router, splitter, tbar, t
 } from "@intermesh/goui";
-import {CalendarList, calendarStore, t} from "@intermesh/community/calendar";
 import {AccountList} from "./AccountList";
 import {ListView} from "./ListView";
 import {IdentityWindow} from "./IdentityWindow";
@@ -77,10 +76,10 @@ export class Main extends Component {
 		// tableView.on('selectmails', (me, day) => {
 		// 	this.routeTo('email', day);
 		// });
-		this.listView.on('selectmail', (me,row) => {
+		this.listView.on('selectmail', ({row}) => {
 			this.routeTo(row.record.accountId, this.currentMailbox, row.record.threadId);
 		});
-		accountList.on('selectmailbox', (me,account, mailbox) => {
+		accountList.on('selectmailbox', ({account,mailbox}) => {
 			this.routeTo(account.id,mailbox.id);
 		})
 
@@ -90,11 +89,11 @@ export class Main extends Component {
 			this.west = this.westPanel(accountList),
 			splitter({
 				stateId: "email-splitter-west",
-				resizeComponentPredicate: this.west
+				resizeComponent: this.west
 			}),
 			center=comp({cls: 'vbox active' ,width: 400},
 				tbar({},
-					btn({icon: 'add', text: t('Compose'),cls:'primary filled',
+					btn({icon: 'edit', title: t('Compose'),cls:'primary filled',
 						handler: _ => {
 							const c = new Composer();
 							c.show();
@@ -125,7 +124,7 @@ export class Main extends Component {
 			),
 			splitter({
 				stateId: "email-splitter-east",
-				resizeComponentPredicate: center
+				resizeComponent: center
 			}),
 			this.threadView
 		);
@@ -135,7 +134,7 @@ export class Main extends Component {
 
 	private westPanel(accountList: AccountList) {
 
-		return comp({tagName: 'aside', width: 274, cls:'scroll',style: {paddingTop:'1.2rem', minWidth: '27.4rem'}},
+		return comp({tagName: 'aside', width: 274, cls:'scroll',style: {minWidth: '27.4rem'}},
 			tbar({cls: "for-medium-device"},
 				'->',
 				btn({title: t("Back"), icon: "arrow_back",

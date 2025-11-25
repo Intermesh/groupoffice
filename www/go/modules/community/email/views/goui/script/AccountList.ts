@@ -10,25 +10,20 @@ import {
 	t,
 	tree,
 	treecolumn,
-	TreeRecord, ComponentEventMap, DateTime, ObservableListenerOpts, Tree
+	TreeRecord, ComponentEventMap, Tree
 } from "@intermesh/goui";
 import {client, jmapds} from "@intermesh/groupoffice-core";
 import {AccountWindow} from "./AccountWindow";
-import {accountStore} from "@intermesh/community/email";
 import {IdentityWindow} from "./IdentityWindow";
 import {SettingsWindow} from "./SettingsWindow";
+import {accountStore} from "./Index";
 
-export interface AccountListEventMap<Type> extends ComponentEventMap<Type> {
-	selectaccount: (me: Type, account: any) => false | void
-	selectmailbox: (me: Type, account: any, mailbox:any) => void
+export interface AccountListEventMap extends ComponentEventMap {
+	selectaccount: { account: any}
+	selectmailbox: {account: any, mailbox:any}
 }
 
-export interface AccountList extends Component {
-	on<K extends keyof AccountListEventMap<this>, L extends Function>(eventName: K, listener: Partial<AccountListEventMap<this>>[K], options?: ObservableListenerOpts): L
-	fire<K extends keyof AccountListEventMap<this>>(eventName: K, ...args: Parameters<AccountListEventMap<any>[K]>): boolean
-}
-
-export class AccountList extends Component {
+export class AccountList extends Component<AccountListEventMap> {
 
 	list:List
 
@@ -76,7 +71,7 @@ export class AccountList extends Component {
 			})
 		), this.list = list({
 			tagName: 'div',
-			store:accountStore,
+			store: accountStore,
 			cls: 'check-list',
 			rowSelectionConfig: {
 				multiSelect: false,
@@ -86,8 +81,8 @@ export class AccountList extends Component {
 					}
 				}
 			},
-			listeners: {'render': me => {
-					me.store.load();
+			listeners: {'render': ({target}) => {
+					target.store.load();
 				}},
 			renderer: (account: any, _row: HTMLElement, _list: List, _storeIndex: number) => {
 				// if(data.isVisible) {
@@ -106,9 +101,9 @@ export class AccountList extends Component {
 					rowSelectionConfig: {
 						multiSelect:false,
 						listeners:{
-							'rowselect':(me, mailboxRow)=> {
+							'rowselect':({row})=> {
 
-								this.fire('selectmailbox',this, account, mailboxRow);
+								this.fire('selectmailbox',{account, mailbox:row});
 							}
 						}
 					},

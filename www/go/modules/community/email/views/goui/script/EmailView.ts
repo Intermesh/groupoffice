@@ -13,7 +13,7 @@ import {
 import {MailCtlr} from "./MailCtlr";
 import {client, jmapds} from "@intermesh/groupoffice-core";
 
-const emailChips = (emailAddresses: any) => {
+const emailChips = (emailAddresses: any[]) => {
 	if(!emailAddresses.length)
 		return [btn({cls:'chip', text:'No sender'})];
 	return emailAddresses.map(emailAddress => btn({cls:'chip', text: emailAddress.name ?? emailAddress.email, menu:menu({},
@@ -52,7 +52,7 @@ export class EmailView extends DataSourceForm {
 				),
 				comp({cls: 'group', flex:'1'},
 					btn({icon: 'archive', title: t('Archive')}),
-					btn({icon: 'delete', title:t('Delete'), handler: () => { this.destroy(); }})
+					btn({icon: 'delete', title:t('Delete'), handler: () => { MailCtlr.destroy(this.value); }})
 				),
 				btn({icon: 'more_vert', menu: menu({},
 					btn({icon: 'print', text: t('Print'), handler: () => {
@@ -64,12 +64,12 @@ export class EmailView extends DataSourceForm {
 					btn({icon: 'report', text: t('Report spam')}),
 					'-',
 					btn({icon: 'code', text: t('View source'),handler: () => {
-						openBlob({blobId:'mail.src.'+this.value.id, type: 'text/plain', name: 'mailtje.eml'});
+						//openBlob({blobId:'mail.src.'+this.value.id, type: 'text/plain', name: 'mailtje.eml'});
 					}})
 				)})
 			),
 
-			comp({cls:'pad',flex:'1'},
+			comp({style:{padding: '0 1.8rem'},flex:'1'},
 				comp({cls: 'card pad'},
 					comp({cls:'hbox',style:{marginTop:'1.6rem'}},
 						this.avatar = avatar({
@@ -110,8 +110,8 @@ export class EmailView extends DataSourceForm {
 		}</style>`;
 		this.shadowRoot.append(E('div').cls('textbox'));
 
-		this.on('setvalue', (ne,record) => {
-
+		this.on('setvalue', ({newValue}) => {
+			const record = newValue;
 			this.avatar.displayName = record.from.length ? (record.from[0].name ?? record.from[0].email) : '?';
 			this.subject.text = record.subject ?? t('No subject');
 			this.from.items.add(...emailChips(record.from));
@@ -126,9 +126,9 @@ export class EmailView extends DataSourceForm {
 					attachment.name ??= 'unnamed';
 					return comp({
 							tagName: 'a', listeners: {
-								'render': (me) => {
-									me.el.on('click', _e => {
-										openFile(attachment);
+								'render': ({target}) => {
+									target.el.on('click', _e => {
+										//openFile(attachment);
 									})
 								}
 							}

@@ -1,7 +1,8 @@
 import {client, jmapds, modules, router} from "@intermesh/groupoffice-core";
 import {datasourcestore, t, translate} from "@intermesh/goui";
 import {Main} from "./Main";
-export * from "./Main.js";
+import {EmailView} from "./EmailView";
+//export * from "./Main.js";
 
 export const accountStore = datasourcestore({
 	dataSource:jmapds('EmailAccount')
@@ -26,7 +27,7 @@ modules.register(  {
 					//todo
 				},
 				linkDetail:() =>  {
-					//todo
+					return new EmailView();
 				}
 			}]
 		}
@@ -35,7 +36,7 @@ modules.register(  {
 		//const user = client.user;
 		translate.load(GO.lang.community.email, "community", "email");
 
-		client.on("authenticated",  (client, session) => {
+		client.on("authenticated",  ({session}) => {
 
 			const ui = new Main(),
 				nav = (accountId:string, mailboxId: string, threadId: string = '') => {

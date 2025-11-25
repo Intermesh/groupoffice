@@ -42,12 +42,12 @@ export class Composer extends Window {
 				flex:1,
 					dataSource: jmapds('Email'),
 					listeners: {
-						'load': me => {
-							const id: string = me.findField('identityId')!.value;
+						'load': ({target}) => {
+							const id = target.findField('identityId')!.value;
 							if(id)
-								jmapds('Identity').single(id).then(r => {
+								jmapds('Identity').single(id as string).then(r => {
 									// could have reply quote
-									me.findField('htmlBody')!.value = r.htmlSignature + me.findField('htmlBody')!.value;
+									target.findField('htmlBody')!.value = r.htmlSignature + target.findField('htmlBody')!.value;
 								});
 						}
 					}
@@ -61,8 +61,8 @@ export class Composer extends Window {
 						buildField: (data) => containerfield({
 								tagName: 'a',
 								listeners: {
-									render(me) {
-										me.el.on('click', () => {
+									render({target}) {
+										target.el.on('click', () => {
 											// todo : .file(data);
 										})
 									}

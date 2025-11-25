@@ -8,13 +8,13 @@ import {
 	t,
 	E,
 	DateTime,
-	ObservableListenerOpts, ListEventMap
+	ListEventMap, Store, StoreRecord
 } from "@intermesh/goui";
 import {client, jmapds} from "@intermesh/groupoffice-core";
 import {MailCtlr} from "./MailCtlr";
 import {ThreadView} from "./ThreadView";
 
-const listitem = function(mail) {
+const listitem = function(mail: any) {
 	const abbr =  comp({tagName:'abbr'}),
 		text = comp({tagName:'div', cls:'line'});
 	const tr = {emailIds:[]}; //fake thread
@@ -37,16 +37,11 @@ const listitem = function(mail) {
 	return [abbr,text];
 }
 
-export interface ListViewEventMap<Type> extends ListEventMap<Type> {
-	selectmail: (me: Type, row: any) => false | void
+export interface ListViewEventMap extends ListEventMap {
+	selectmail: {row: any}
 }
 
-export interface ListView extends List {
-	on<K extends keyof ListViewEventMap<this>, L extends Function>(eventName: K, listener: Partial<ListViewEventMap<this>>[K], options?: ObservableListenerOpts): L
-	fire<K extends keyof ListViewEventMap<this>>(eventName: K, ...args: Parameters<ListViewEventMap<any>[K]>): boolean
-}
-
-export class ListView extends List {
+export class ListView extends List<Store, ListViewEventMap> {
 
 	constructor() {
 		super(
@@ -59,13 +54,13 @@ export class ListView extends List {
 		this.rowSelectionConfig = {
 			multiSelect:false,
 			listeners: {
-				'rowselect':(me,row)=> {
-					this.fire('selectmail', this, row);
+				'rowselect': ({row})=> {
+					this.fire('selectmail', {row});
 				}
 			}
 		};
 
-		let clickedItem = null;
+		let clickedItem: StoreRecord | undefined;
 
 		const rowContextMenu = menu({isDropdown: true, removeOnClose: false},
 			btn({icon: 'send', text: t('Send again'), handler: (btn) => { MailCtlr.resend(clickedItem).show(); }}),
@@ -83,12 +78,12 @@ export class ListView extends List {
 			btn({icon: 'folder_open', text: t('Move')+'...', disabled: true}),
 			btn({icon: 'folder_open', text: t('Copy')+'...', disabled: true}),
 			hr(),
-			btn({icon: 'code', text: t('View source'), handler: () => {window.open(client.downloadBlobId('mail.src.todo'))}})
+			btn({icon: 'code', text: t('View source'), handler: () => {window.open(client.downloadUrl('mail.src.todo'))}})
 		);
 
-		this.on('rowcontextmenu',(_me, index, row, ev) =>{
+		this.on('rowcontextmenu',({ev, storeIndex}) =>{
 			ev.preventDefault();
-			clickedItem = this.store.get(index);
+			clickedItem = this.store.get(storeIndex);
 			rowContextMenu.showAt(ev);
 		})
 
