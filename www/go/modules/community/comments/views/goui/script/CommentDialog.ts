@@ -24,7 +24,7 @@ export class CommentDialog extends FormWindow {
 		this.width = 600;
 		this.height = 400;
 
-		this.generalTab.items.add(fieldset({},
+		this.generalTab.items.add(fieldset({cls: "vbox gap fit"},
 			datetimefield({
 				name: "date",
 				label: t("Date"),
@@ -32,8 +32,8 @@ export class CommentDialog extends FormWindow {
 				required: true
 			}),
 			htmlfield({
+				flex: 1,
 				name: "text",
-				label: t("Text"),
 				required: true,
 			}),
 			arrayfield({
