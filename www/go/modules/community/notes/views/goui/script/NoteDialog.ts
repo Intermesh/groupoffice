@@ -1,5 +1,5 @@
-import {fieldset, htmlfield, Notifier, root, t, textfield} from "@intermesh/goui";
-import {client, FormWindow, Image} from "@intermesh/groupoffice-core";
+import {comp, fieldset, htmlfield, Notifier, root, t, textfield} from "@intermesh/goui";
+import {client, customFields, FormFieldset, FormWindow, Image} from "@intermesh/groupoffice-core";
 import {notebookcombo} from "./NoteBookCombo";
 import {Note} from "./Index";
 
@@ -17,21 +17,25 @@ export class NoteDialog extends FormWindow<Note> {
 		this.width = 800;
 		this.height = 800;
 
+		this.generalTab.cls = "fit";
 		this.generalTab.items.add(
-			fieldset({},
-				textfield({
-					flex: 1,
-					name: "name",
-					label: t("Name"),
-					required: true
-				}),
+			fieldset({cls: " fit vbox gap"},
+				comp({cls: "hbox gap"},
+					textfield({
+						flex: 1,
+						name: "name",
+						label: t("Name"),
+						required: true
+					}),
 
-				notebookcombo({
-					width: 240
-				}),
+					notebookcombo({
+						width: 240
+					})
+				),
 
 				htmlfield({
 					name: "content",
+					flex: 1,
 					listeners: {
 						setvalue: ({target}) => {
 							void Image.replaceImages(target.el);
@@ -59,5 +63,17 @@ export class NoteDialog extends FormWindow<Note> {
 		)
 
 		this.addCustomFields();
+	}
+
+	protected addCustomFields() {
+		//for notes all are tabs
+		const fieldsets = customFields.getFieldSets(this.entityName).map(fs => new FormFieldset(fs))
+
+		fieldsets.forEach((fs) => {
+			//if (fs.fieldSet.isTab) {
+				fs.title = fs.fieldSet.name;
+				fs.legend = "";
+				this.cards.items.add(fs);
+		}, this);
 	}
 }

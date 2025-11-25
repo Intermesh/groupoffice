@@ -1,6 +1,5 @@
 import {checkbox, comp, DataSourceStore, List, Store, store, t} from "@intermesh/goui";
-import {modules} from "@intermesh/groupoffice-core";
-import {Entity} from "../../../../../../../views/goui/dist/groupoffice-core/script/Entities";
+import {Entity, modules} from "@intermesh/groupoffice-core";
 
 export class TypeGrid extends List {
 	private typeStore: Store;
