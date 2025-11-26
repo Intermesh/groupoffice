@@ -28,6 +28,7 @@ final class Sieve
 
 	private PEAR $_PEAR;
 
+
 	/**
 	 * Object constructor
 	 *
@@ -441,20 +442,21 @@ final class Sieve
 	/**
 	 * Loads script by name
 	 */
-	public function load($name): bool
+	public function load(string $name): bool
 	{
 		if (!$this->sieve) {
 			return $this->setError(self::SIEVE_ERROR_INTERNAL);
 		}
 
-		if ($this->current == $name) {
+		if (isset($this->current) && $this->current === $name) {
 			return true;
 		}
 
 		$script = $this->sieve->getScript($name);
 
-		if ($this->_PEAR->isError($script))
+		if ($this->_PEAR->isError($script)) {
 			return $this->setError(self::SIEVE_ERROR_OTHER);
+		}
 
 		// try to parse from Roundcube format
 		$this->script = $this->parse($script);
@@ -483,12 +485,12 @@ final class Sieve
 	private function parse(string $txt)
 	{
 		// try to parse from Roundcube format
-		$script = new go_sieve_script($txt, $this->disabled, $this, true);
+		$script = new SieveRuleAdapter($txt, $this, $this->disabled, true);
 
 		// ... else try to import from different formats
 		if (empty($script->content)) {
 			$script = $this->importRules($txt);
-			$script = new go_sieve_script($script, $this->disabled, $this, true);
+			$script = new SieveRuleAdapter($script, $this, $this->disabled, true);
 		}
 
 		return $script;

@@ -1,6 +1,23 @@
 import {client, modules, router} from "@intermesh/groupoffice-core";
 import {MainPanel} from "./MainPanel.js";
-import {t, translate} from "@intermesh/goui";
+import {
+	DefaultEntity,
+	t,
+	translate
+} from "@intermesh/goui";
+
+export interface SieveRuleEntity extends DefaultEntity {
+	name: string,
+	index: number,
+	script_name: string,
+	active: boolean
+}
+
+export interface SieveScriptEntity extends DefaultEntity {
+	name: string,
+	script_name: string,
+	active: boolean
+}
 
 modules.register(  {
 	package: "community",
@@ -25,7 +42,6 @@ modules.register(  {
 
 			router.add(/^tempsieve$/, () => {
 				modules.openMainPanel("tempsieve");
-				// mainPanel.setTaskId();
 			});
 
 			modules.addMainPanel( "community", "tempsieve", "tempsieve", t("TempSieve"), () => {
