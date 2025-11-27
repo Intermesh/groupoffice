@@ -133,13 +133,13 @@ export class CalendarItem {
  		// if(obj.override)
 		 // 	debugger;
 		if(!obj.start) {
-			this.start = new DateTime(this.patched.start);
+			this.start = DateTime.createFromFormat(this.patched.start, "Y-m-dTH:i:s", this.patched.timeZone)!; // ignore stored timezone
 			if(this.data.showWithoutTime) {
 				this.start.setHours(0,0,0,0);
 			}
 		}
+
 		if(obj.data.timeZone) {
-			this.start.timezone = this.patched.timeZone;
 			this.start = this.start.toTimezone(client.user.timezone as Timezone);
 		}
 		//if(!obj.end) {
