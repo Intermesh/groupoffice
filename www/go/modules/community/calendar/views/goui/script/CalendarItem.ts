@@ -133,7 +133,10 @@ export class CalendarItem {
  		// if(obj.override)
 		 // 	debugger;
 		if(!obj.start) {
-			this.start = DateTime.createFromFormat(this.patched.start, "Y-m-dTH:i:s", this.patched.timeZone)!; // ignore stored timezone
+			this.start = DateTime.createFromFormat(this.patched.start, "Y-m-d\TH:i:s", this.patched.timeZone)!; // ignore stored timezone
+			if(!this.start) {
+				debugger;
+			}
 			if(this.data.showWithoutTime) {
 				this.start.setHours(0,0,0,0);
 			}
