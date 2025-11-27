@@ -1,3 +1,5 @@
+- Leavedays: prevent approved leave budgets and budgets with registrations from being deleted
+
 24-11-2025: 6.8.144
 - More DE translations. Danke Daniel!
 - #1365 Add phone scope, extend user's attributes Thanks @michalcharvat
