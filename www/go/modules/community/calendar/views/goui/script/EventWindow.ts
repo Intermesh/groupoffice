@@ -99,8 +99,15 @@ export class EventWindow extends FormWindow {
 		this.form.on("beforesubmit", this.onBeforeSubmit, {bind:this});
 
 		this.generalTab.cls = 'flow fit scroll pad';
-		this.startDate = datetimefield({label: t('Start'), name:'start',flex:1, defaultTime: now.format('H')+':00',
-			listeners:{'change': ({target, oldValue}) => {
+
+		this.startDate = datetimefield({
+			label: t('Start'),
+			withTimeZone: false,
+			name: 'start',
+			flex: 1,
+			defaultTime: now.format('H')+':00',
+			listeners:{
+				change: ({target, oldValue}) => {
 
 					const newStartDate = target.getValueAsDateTime(),
 						endDate = this.endDate.getValueAsDateTime(),
@@ -119,15 +126,17 @@ export class EventWindow extends FormWindow {
 					}
 					this.participantFld.checkAvailability(this.startDate.getValueAsDateTime()!, this.endDate.getValueAsDateTime()!, !!this.withoutTimeToggle.value);
 				},
-			'setvalue': ({target}) => {
+			setvalue: ({target}) => {
 				const d = target.getValueAsDateTime();
 				if(d){
 					recurrenceField.setStartDate(d);
 				}
 			}}
 		});
+
 		this.endDate = datetimefield({
 			label: t('End'),
+			withTimeZone: false,
 			name: 'end',
 			flex:1,
 			defaultTime: (now.getHours()+1 )+':00',
