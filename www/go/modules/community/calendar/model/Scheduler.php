@@ -12,6 +12,7 @@ use go\core\model\User;
 use go\core\orm\EntityType;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
+use go\core\validate\ErrorCode;
 use GO\Email\Model\ImapMessage;
 use Sabre\VObject\Component\VCalendar;
 
@@ -293,7 +294,7 @@ class Scheduler {
 			'method' => $method,
 			'scheduleId' => $accountEmail,
 			'event' => $event,
-			'recurrenceId' => empty($vevent->{"RECURRENCE-ID"}) ? null : $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s')
+			'recurrenceId' => empty($vevent->{"RECURRENCE-ID"}) ? null : Scheduler::fixRecurrenceId($event, $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s'))
 		];
 		if($method === 'REPLY' && isset($event)) {
 
@@ -441,6 +442,8 @@ class Scheduler {
 			foreach($vcalendar->VEVENT as $vevent) {
 				if(!empty($vevent->{'RECURRENCE-ID'})) {
 					$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
+					$recurId = self::fixRecurrenceId($existingEvent, $recurId);
+
 					if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
 						$existingEvent->recurrenceOverrides[$recurId] = (new RecurrenceOverride($existingEvent));
 					}
@@ -510,6 +513,27 @@ class Scheduler {
 	}
 
 
+	public static function fixRecurrenceId(CalendarEvent $existingEvent, string $recurId) : string {
+		if(isset($existingEvent->recurrenceOverrides[$recurId])) {
+			// already present so assume it's valid
+			return $recurId;
+		}
+
+		if(RecurrenceRule::validateRecurrenceId($existingEvent, $recurId)) {
+			return $recurId;
+		}
+		$origRecurId = $recurId;
+
+		// Microsoft Exchange Server 2010 sends a string with zero time: 20251125T000000. Attempt to fix that.
+		$recurId = RecurrenceRule::fixRecurrenceId($existingEvent, $recurId);
+		if(!RecurrenceRule::validateRecurrenceId($existingEvent, $recurId)) {
+			throw new Exception("Invalid recurrence ID given $origRecurId");
+		}
+
+		return $recurId;
+	}
+
+
 	/**
 	 * Update participant status in a recurring series instance
 	 *
@@ -523,9 +547,9 @@ class Scheduler {
 	 */
 	public static function updateRecurrenceStatus(CalendarEvent $existingEvent, string $recurId, string $email, string $status, \DateTimeInterface $replyStamp): bool
 	{
+		$recurId = self::fixRecurrenceId($existingEvent, $recurId);
+
 		if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
-			// TODO: check if the given RECURRENCE-ID is valid for $existingEvent->recurrenceRule
-			// If it is not valid an extra instance would be created (RDATE in iCal) GroupOffice does not display these at the moment.
 			$existingEvent->recurrenceOverrides[$recurId] = new RecurrenceOverride($existingEvent);
 			$exEvent = $existingEvent->patchedInstance($recurId);
 		} else {

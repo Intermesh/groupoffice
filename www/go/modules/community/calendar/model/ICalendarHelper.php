@@ -379,7 +379,7 @@ class ICalendarHelper {
 			]);
 
 			if(!empty($vevent->{'RECURRENCE-ID'})) {
-				$obj->recurrenceId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
+				$obj->recurrenceId = Scheduler::fixRecurrenceId($event, $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s'));
 				$exceptions[] = $obj;
 				continue;
 			}
