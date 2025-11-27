@@ -1,3 +1,7 @@
+24-11-2025: 25.0.68
+- Core: fix composer dependency error
+
+24-11-2025: 25.0.68
 - DE translations. Danke Daniel!
 - Calendar: show private events as "Private" in caldav
 - Calendar: permission check for deleting calendars in caldav
