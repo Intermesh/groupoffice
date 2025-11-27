@@ -1,3 +1,5 @@
+- Calendar: Workaround Microsoft Exchange Server 2010 sending an invalid recurrenceID
+
 24-11-2025: 25.0.68
 - Core: fix composer dependency error
 
