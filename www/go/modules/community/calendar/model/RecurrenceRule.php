@@ -7,7 +7,9 @@
  */
 namespace go\modules\community\calendar\model;
 
+use Exception;
 use go\core\util\DateTime;
+use go\modules\community\addressbook\model\Date;
 
 class RecurrenceRule {
 
@@ -49,6 +51,44 @@ class RecurrenceRule {
 
 	/** @var string LocalDate */
 	public $until = null;
+
+	static function validateRecurrenceId(CalendarEvent $event, string $recurrenceId): bool
+	{
+		try {
+			$ridDT = new \DateTimeImmutable($recurrenceId);
+		} catch (Exception $e) {
+			return false;
+		}
+		$ridDT->setTime(0,0,0);
+
+		$from = $ridDT->modify("-1 day");
+		$until = $ridDT->modify("+1 day");
+
+		$it = ICalendarHelper::makeRecurrenceIterator($event);
+		$it->fastForward($from);
+
+		while ($it->valid() && $it->current() < $until) {
+			if($recurrenceId == $it->current()->format("Y-m-d\TH:i:s")) {
+				return true;
+			}
+			$it->next();
+		}
+
+		return false;
+	}
+
+	static function fixRecurrenceId(CalendarEvent $event, string $recurrenceId): string
+	{
+		try {
+			$ridDT = new \DateTime($recurrenceId);
+		} catch (Exception $e) {
+			return false;
+		}
+		$s = $event->start();
+		$ridDT->setTime($s->format("H"),$s->format("i"),0);
+
+		return $ridDT->format("Y-m-d\TH:i:s");
+	}
 
 	static function expand(CalendarEvent $p, string $from, string $until) {
 		$it = ICalendarHelper::makeRecurrenceIterator($p);
