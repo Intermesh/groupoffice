@@ -20,7 +20,6 @@ use go\modules\community\calendar\model\Preferences;
 use go\modules\community\calendar\model\BusyPeriod;
 use go\modules\community\calendar\model\CalendarEvent;
 use go\modules\community\calendar\model\ICalendarHelper;
-use go\modules\community\calendar\model\Settings;
 use Sabre\VObject\Component\VCalendar;
 
 class Module extends core\Module
@@ -47,10 +46,6 @@ class Module extends core\Module
 	public function getAuthor(): string
 	{
 		return "Intermesh BV <mdhart@intermesh.nl>";
-	}
-
-	public function getSettings() {
-		return Settings::get();
 	}
 
 	protected function rights(): array

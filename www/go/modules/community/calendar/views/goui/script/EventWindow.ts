@@ -30,8 +30,16 @@ import {
 	win,
 	Window,
 } from "@intermesh/goui";
-import {client, FormWindow, JmapDataSource, jmapds, principalDS, recurrencefield} from "@intermesh/groupoffice-core";
-import {categoryStore, t, writeableCalendarStore} from "./Index.js";
+import {
+	client,
+	FormWindow,
+	JmapDataSource,
+	jmapds,
+	modules,
+	principalDS,
+	recurrencefield
+} from "@intermesh/groupoffice-core";
+import {categoryStore, OnlineMeetingButton, t, writeableCalendarStore} from "./Index.js";
 import {ParticipantField, participantfield} from "./ParticipantField.js";
 import {AlertField, alertfield} from "./AlertField.js";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
@@ -39,7 +47,7 @@ import {AvailabilityWindow} from "./AvailabilityWindow.js";
 import {locationfield, LocationField} from "./LocationField";
 
 
-export class EventWindow extends FormWindow {
+export class EventWindow extends FormWindow<CalendarEvent> {
 
 	private item?: CalendarItem
 
@@ -61,14 +69,14 @@ export class EventWindow extends FormWindow {
 	constructor() {
 		super("CalendarEvent");
 
-		const m = go.Modules.get('community','calendar');
+		const m = modules.get('community','calendar');
 		this.title = t('Event');
 		this.width = 620;
 		this.stateId = "calendar-event-window";
 		this.height = 840;
 		this.resizable = true;
 		this.hasLinks = true;
-		this.store = this.form.dataSource as JmapDataSource; //jmapds("CalendarEvent");
+		this.store = this.form.dataSource as JmapDataSource<CalendarEvent>; //jmapds("CalendarEvent");
 		// this.startTime = textfield({type:'time',value: '12:00', width: 128})
 		// this.endTime = textfield({type:'time',value: '13:00', width: 128})
 		var recurrenceField = recurrencefield({name: 'recurrenceRule',flex:1});
@@ -216,9 +224,7 @@ export class EventWindow extends FormWindow {
 				}
 			}),
 			this.locationField = locationfield({flex:1, style:{minWidth:'80%'}}),
-			btn({icon:'video_call', hidden: !m?.settings?.videoUri, cls:'filled', width:50, handler: async (btn) => {
-					(btn.previousSibling() as AutocompleteField)!.value = await this.createVideoLink(m?.settings);
-			}}),
+			new OnlineMeetingButton(this.locationField, this.form),
 			this.withoutTimeToggle = checkbox({type:'switch',value:undefined, name: 'showWithoutTime', label: t('All day'), style:{width:'auto'},
 				listeners: {'setvalue':({newValue}) => {
 					this.alertField.fullDay = newValue;
@@ -334,29 +340,7 @@ export class EventWindow extends FormWindow {
 		this.addCustomFields();
 	}
 
-	private b64UrlEncode(data:string) {
-		const base64 = btoa(data);
-		return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-	}
 
-	private async createVideoLink(s: any) {
-		const room = this.b64UrlEncode(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(8))));
-
-		if(!s.videoJwtEnabled) {
-			return s.videoUri+room;
-		}
-
-		const response = await client.jmap("CalendarEvent/generateJWT", {room}, 'pJwt');
-
-		return  s.videoUri+room+'?jwt='+response.jwt;
-		// const id = s.videoJwtAppId,
-		// 	head= this.b64UrlEncode(JSON.stringify({alg: 'HS256', typ: 'JWT'})),
-		// 	load = this.b64UrlEncode(JSON.stringify({aud: id, iss: id, room})),
-		// 	key = await crypto.subtle.importKey('raw', (new TextEncoder()).encode(s.videoJwtSecret),
-		// 		{ name: 'HMAC', hash: 'SHA-256' }, false, ['sign']),
-		// 	sign = await window.crypto.subtle.sign("HMAC", key, (new TextEncoder()).encode(`${head}.${load}`));
-		// return  s.videoUri+room+'?jwt='+`${head}.${load}.${this.b64UrlEncode(String.fromCharCode(...new Uint8Array(sign)))}`;
-	}
 
 	private openExceptionsWindow() {
 		const o = this.form.value.recurrenceOverrides;
