@@ -22,7 +22,6 @@ import {SplitView} from "./SplitView.js";
 import {client, filterpanel, jmapds, modules, userDS} from "@intermesh/groupoffice-core";
 import {CalendarView} from "./CalendarView.js";
 import {CategoryWindow} from "./CategoryWindow.js";
-import {Settings} from "./Settings.js";
 import {ResourcesWindow} from "./ResourcesWindow.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 import {ListView} from "./ListView.js";
@@ -252,7 +251,6 @@ export class Main extends Component {
 						btn({icon: 'keyboard_arrow_right', title: t('Next'), allowFastClick:true, handler: b => this.forward()}),
 					),
 					btn({icon:'more_vert',cls: 'not-small-device', menu:menu({},
-						btn({icon:'video_call',hidden:!client.user.isAdmin,text:t('Video meeting')+'…', handler: _ => {(new Settings()).openLoad()}}),
 						btn({
 							icon: 'print', text:t('Print'), menu: menu({},
 								this.printCurrentBtn = btn({icon: 'print', text: t('Current view'), handler:() => {

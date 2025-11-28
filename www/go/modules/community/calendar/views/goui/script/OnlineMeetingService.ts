@@ -38,7 +38,7 @@ export class OnlineMeetingButton extends Button {
 			this.menu = menu({},
 				...onlineMeetingServices.services.map(s => {
 					return btn({text: s.title, handler: async ()=> {
-							locationField.value = await onlineMeetingServices.services[0].fn(form.value);
+							locationField.value = await s.fn(form.value);
 						}})
 				})
 				)
