@@ -87,27 +87,6 @@ class CalendarEvent extends EntityController {
 		return $this->defaultChanges($params);
 	}
 
-	/**
-	 * Parse an iCalendar blobId to an CalendarEvent object
-	 * @param $params [ blobId ]
-	 * @return void
-	 */
-	public function parse($params) {
-
-	}
-
-	private function b64UrlEncode(string $data) : string{
-		return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($data));
-	}
-
-	public function generateJWT(array $params) : array {
-		$s = Module::get()->getSettings();
-		return [
-			'success' => true,
-			'jwt' => $s->createJwtToken($params['room'])
-		];
-	}
-
 
 	public function loadICS( array $params) :array
 	{
