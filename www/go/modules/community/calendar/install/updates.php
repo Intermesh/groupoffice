@@ -444,3 +444,28 @@ where patch like \'%"status":"cancelled"%\'';
 $updates['202511241214'][] = 'alter table calendar_calendar_user
     alter column syncToDevice set default 0;';
 
+$updates['202511280942'][] = function() {
+	// move jitsi settings into own module
+	go()->getDbConnection()->exec("update core_module set package='community' where name='jitisimeet'");
+
+	$modId = go()->getDbConnection()->selectSingleValue("id")->from("core_module")->where(['name' => 'jitsimeet'])->single();
+
+	if(!$modId) {
+		$mod = \go\modules\community\jitsimeet\Module::get()->install();
+		$modId = $mod->id;
+	}
+
+	if(!$modId) {
+		throw new Exception("Failed to install jitsimeet");
+	}
+
+	$calendarModId = go()->getDbConnection()->selectSingleValue("id")->from("core_module")->where(['package'=>'community', 'name' => 'calendar'])->single();
+
+	if(!$calendarModId) {
+		throw new Exception("Failed to get calendar module ID");
+	}
+
+	go()->getDbConnection()->update("core_setting", ['moduleId' => $modId], ['moduleId' => $calendarModId])->execute();
+
+
+};
