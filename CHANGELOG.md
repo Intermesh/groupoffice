@@ -1,5 +1,8 @@
 - Calendar: Workaround Microsoft Exchange Server 2010 sending an invalid recurrenceID
 - Finance: Fix shoddy NL translation
+- Calendar: Made it possible to integrate differnt video meeting providers
+- Jitsimeet: Put into own module
+- Microsoft Teams: New pro module to add MS teams links to calendar events
 
 24-11-2025: 25.0.68
 - Core: fix composer dependency error
