@@ -446,7 +446,7 @@ $updates['202511241214'][] = 'alter table calendar_calendar_user
 
 $updates['202511280942'][] = function() {
 	// move jitsi settings into own module
-	go()->getDbConnection()->exec("update core_module set package='community' where name='jitisimeet'");
+	go()->getDbConnection()->exec("update core_module set package='community', enabled=1 where name='jitsimeet'");
 
 	$modId = go()->getDbConnection()->selectSingleValue("id")->from("core_module")->where(['name' => 'jitsimeet'])->single();
 
