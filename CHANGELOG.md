@@ -1,5 +1,6 @@
 24-11-2025: 25.0.68
 - Core: fix composer dependency error
+- Leavedays: fixed several errors in special leave budget flow
 
 24-11-2025: 25.0.68
 - DE translations. Danke Daniel!
