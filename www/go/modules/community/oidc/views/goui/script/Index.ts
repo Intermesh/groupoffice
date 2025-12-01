@@ -7,7 +7,7 @@ modules.register({
 	package: "community",
 	name: "oidc",
 	init: () => {
-		modules.addSystemSettingsPanel("community", "oidc", "oidc", "OIDC", "star", () => {
+		modules.addSystemSettingsPanel("community", "oidc", "oidc", "OIDC", "app_registration", () => {
 			return new Settings();
 		});
 	},
