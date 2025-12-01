@@ -31,4 +31,9 @@ class Module extends core\Module
 	{
 		return Settings::get();
 	}
+
+	public function autoInstall(): bool
+	{
+		return true;
+	}
 }
