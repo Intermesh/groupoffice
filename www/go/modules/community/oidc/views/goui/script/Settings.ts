@@ -3,7 +3,7 @@ import {
 	column,
 	Component,
 	datasourcestore,
-	EntityID,
+	EntityID, h3,
 	hr,
 	menu,
 	mstbar,
@@ -84,14 +84,15 @@ export class Settings extends Component {
 
 		this.items.add(
 			tbar({},
+				h3(t("OpenID Connect clients")),
 				'->',
-				searchbtn({
-					listeners: {
-						input: ( {text}) => {
-							tbl!.store.setFilter("text", {text}).load()
-						}
-					}
-				}),
+				// searchbtn({
+				// 	listeners: {
+				// 		input: ( {text}) => {
+				// 			tbl!.store.setFilter("text", {text}).load()
+				// 		}
+				// 	}
+				// }),
 				btn({
 					cls: "primary filled",
 					icon: "add",
