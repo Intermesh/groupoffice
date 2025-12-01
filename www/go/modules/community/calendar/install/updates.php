@@ -465,7 +465,7 @@ $updates['202511280942'][] = function() {
 		throw new Exception("Failed to get calendar module ID");
 	}
 
-	go()->getDbConnection()->update("core_setting", ['moduleId' => $modId], ['moduleId' => $calendarModId])->execute();
+	go()->getDbConnection()->updateIgnore("core_setting", ['moduleId' => $modId], ['moduleId' => $calendarModId])->execute();
 
 
 };
