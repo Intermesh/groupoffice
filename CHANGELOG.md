@@ -1,3 +1,4 @@
+01-12-2025: 6.8.145
 - Leavedays: prevent approved leave budgets and budgets with registrations from being deleted
 - Finance: fix shoddy NL translation
 
