@@ -19,6 +19,14 @@ export interface SieveScriptEntity extends DefaultEntity {
 	active: boolean
 }
 
+export interface SieveCriteriumEntity extends DefaultEntity {
+	test: string,
+	not: string,
+	type: string,
+	arg1: string,
+	arg2: string
+}
+
 modules.register(  {
 	package: "community",
 	name: "tempsieve",
