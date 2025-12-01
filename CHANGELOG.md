@@ -5,6 +5,7 @@
 - Jitsimeet: Put into own module
 - Microsoft Teams: New pro module to add MS teams links to calendar events
 - Finance: Fixed margin not calculating in some rare cases
+- OIDC: New open ID connect module that is suitable for any open ID server- 
 
 24-11-2025: 25.0.69
 - Core: fix composer dependency error
