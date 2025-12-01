@@ -49,7 +49,7 @@ export class CommentDetail extends DetailPanel {
 						icon: "delete",
 						text: "Delete",
 						handler: () => {
-							commentDS.confirmDestroy([this.entity!.id]);
+							void commentDS.confirmDestroy([this.entity!.id]);
 						}
 					})
 				)

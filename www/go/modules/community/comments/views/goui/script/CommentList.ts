@@ -1,14 +1,17 @@
 import {
-	a,
-	avatar, browser, btn,
+	avatar,
+	btn,
 	comp,
 	Component,
 	datasourcestore,
 	DataSourceStore,
-	Format, menu, Notifier, router,
-	t, win
+	Format,
+	menu,
+	Notifier,
+	t,
+	win
 } from "@intermesh/goui";
-import {Image, client, img, principalDS, AclLevel, entities} from "@intermesh/groupoffice-core";
+import {AclLevel, client, entities, Image, img, principalDS} from "@intermesh/groupoffice-core";
 import {CommentDialog} from "./CommentDialog.js";
 import {commentDS, commentLabelDS} from "./Index.js";
 
@@ -23,7 +26,7 @@ export class CommentList extends Component {
 			dataSource: commentDS,
 			sort: [{property: "date", isAscending: true}],
 			listeners: {
-				load: ( {records}) => {
+				load: ({records}) => {
 					this.items.clear();
 
 					this.scroller = comp({
@@ -52,7 +55,7 @@ export class CommentList extends Component {
 							lastDate = currentDate;
 						}
 
-						if(!comment.creator) {
+						if (!comment.creator) {
 							comment.creator = {
 								name: t("Unknown user")
 							};
@@ -65,7 +68,7 @@ export class CommentList extends Component {
 									render: ({target}) => {
 										target.el.onclick = () => {
 											const parts = comment.creator.id.split(":");
-											if(parts.length == 1) {
+											if (parts.length == 1) {
 												go.modules.community.addressbook.lookUpUserContact(comment.creator.id)
 											} else {
 												entities.get("Contact").goto(parts[1]);
