@@ -81,7 +81,7 @@ class Module extends \go\core\Module
 
 
 	public static function onHead() {
-		$clients = Client::find()->all();
+		$clients = Client::find()->orderBy(['name' => 'DESC'])->all();
 		if(!count($clients)) {
 			return;
 		}
