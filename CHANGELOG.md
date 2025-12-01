@@ -3,10 +3,12 @@
 - Calendar: Made it possible to integrate differnt video meeting providers
 - Jitsimeet: Put into own module
 - Microsoft Teams: New pro module to add MS teams links to calendar events
+- Finance: Fixed margin not calculating in some rare cases
 
 24-11-2025: 25.0.68
 - Core: fix composer dependency error
 - Leavedays: fixed several errors in special leave budget flow
+- Core: Fixed Stored XSS in Contacts Comments Section via Malicious SVG File Upload
 
 24-11-2025: 25.0.68
 - DE translations. Danke Daniel!
