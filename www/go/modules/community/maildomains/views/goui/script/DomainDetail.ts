@@ -317,16 +317,6 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 						await this.openAliasDlg();
 					}
 				}),
-				// btn({
-				// 	icon: "delete",
-				// 	title: t("Delete"),
-				// 	handler: async (_btn) => {
-				// 		const ids = aliasTable!.rowSelection!.selected.map(index => aliasTable!.store.get(index)!.id);
-				// 		await jmapds("MailAlias")
-				// 			.confirmDestroy(ids);
-				//
-				// 	}
-				// }),
 
 				mstbar({table: aliasTable},
 					"->",

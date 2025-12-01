@@ -29,6 +29,11 @@ class Client extends Entity {
 			->addTable("oidc_client");
 	}
 
+	public static function getClientName(): string
+	{
+		return "OIDConnectClient";
+	}
+
 	private function getClient(): OpenIDConnectClient
 	{
 		if(!isset($this->oidc)) {
