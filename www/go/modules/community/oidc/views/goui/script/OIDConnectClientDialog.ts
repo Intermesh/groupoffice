@@ -31,7 +31,8 @@ export class OIDConnectClientDialog extends FormWindow {
 				textfield({
 					name: "url",
 					id: "url",
-					label: t("Configuration URL")
+					label: t("Configuration URL"),
+					hint: t("The Open ID endpoint that implements the .well-known/openid-configuration path")
 				}),
 
 				textfield({
