@@ -1,3 +1,6 @@
+01-12-2025: 25.0.71
+- Calendar: bug in update script
+
 01-12-2025: 25.0.70
 - Calendar: Workaround Microsoft Exchange Server 2010 sending an invalid recurrenceID
 - Finance: Fix shoddy NL translation
