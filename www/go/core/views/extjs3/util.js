@@ -30,7 +30,7 @@ go.print = function(tmpl, data) {
 };
 
 go.reload = function() {
-	window.location.replace(window.location.pathname);
+	window.location.reload();
 };
 
 go.Colors = [
