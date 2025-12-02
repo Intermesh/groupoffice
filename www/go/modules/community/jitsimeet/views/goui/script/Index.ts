@@ -13,22 +13,32 @@ modules.register({
 	package: "community",
 	name: "jitsimeet",
 	init: () => {
-		modules.addSystemSettingsPanel("community", "jitsimeet", "jitsimeet", "Jitsi Meet", "video_call", () => {
-			return new Settings();
-		});
 
-		onlineMeetingServices.register("Jitsi Meet", async (calendarEvent) => {
-			const m = modules.get('community','jitsimeet')!;
-
-			const room = b64UrlEncode(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(8))));
-
-			if(!m.settings.videoJwtEnabled) {
-				return m.settings.videoUri+room;
+		client.on("authenticated",  ({session}) => {
+			if(!session.capabilities["go:community:jitsimeet"]) {
+				// User has no access to this module
+				return;
 			}
 
-			const response = await client.jmap("community/jitsimeet/Auth/generateJWT", {room}, 'pJwt');
+			if(session.capabilities["go:community:jitsimeet"].mayManage) {
+				modules.addSystemSettingsPanel("community", "jitsimeet", "jitsimeet", "Jitsi Meet", "video_call", () => {
+					return new Settings();
+				});
+			}
 
-			return  m.settings.videoUri + room + '?jwt=' + response.jwt;
+			onlineMeetingServices.register("Jitsi Meet", async (calendarEvent) => {
+				const m = modules.get('community', 'jitsimeet')!;
+
+				const room = b64UrlEncode(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(8))));
+
+				if (!m.settings.videoJwtEnabled) {
+					return m.settings.videoUri + room;
+				}
+
+				const response = await client.jmap("community/jitsimeet/Auth/generateJWT", {room}, 'pJwt');
+
+				return m.settings.videoUri + room + '?jwt=' + response.jwt;
+			});
 		});
 	}
 })
