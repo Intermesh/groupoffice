@@ -7,8 +7,18 @@ modules.register({
 	package: "community",
 	name: "oidc",
 	init: () => {
-		modules.addSystemSettingsPanel("community", "oidc", "oidc", "OIDC", "app_registration", () => {
-			return new Settings();
+
+		client.on("authenticated",  ({session}) => {
+			if (!session.capabilities["go:community:oidc"]) {
+				// User has no access to this module
+				return;
+			}
+
+			if (session.capabilities["go:community:oidc"].mayManage) {
+				modules.addSystemSettingsPanel("community", "oidc", "oidc", "OIDC", "app_registration", () => {
+					return new Settings();
+				});
+			}
 		});
 	},
 	entities: [
