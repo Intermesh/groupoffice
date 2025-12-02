@@ -19,8 +19,8 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function persistNewAccessToken(AccessTokenEntityInterface $accessTokenEntity)
-    {
+    public function persistNewAccessToken(AccessTokenEntityInterface $accessTokenEntity): void
+		{
         // Some logic here to save the access token to a database
 	    if(!$accessTokenEntity->save()) {
 	    	throw new \Exception("Could not save access token");
@@ -31,8 +31,8 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function revokeAccessToken($tokenId)
-    {
+    public function revokeAccessToken($tokenId): void
+		{
         // Some logic here to revoke the access token
 	    OauthAccessToken::delete(['identifier' => $tokenId]);
     }
@@ -40,8 +40,8 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function isAccessTokenRevoked($tokenId)
-    {
+    public function isAccessTokenRevoked($tokenId): bool
+		{
         $token = OauthAccessToken::findById($tokenId);
         return $token === false || $token->getExpiryDateTime() < (new \DateTime());
     }
@@ -49,8 +49,8 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getNewToken(ClientEntityInterface $clientEntity, array $scopes, $userIdentifier = null)
-    {
+    public function getNewToken(ClientEntityInterface $clientEntity, array $scopes, $userIdentifier = null): AccessTokenEntityInterface
+		{
         $accessToken = new OauthAccessToken();
         $accessToken->setClient($clientEntity);
         foreach ($scopes as $scope) {
