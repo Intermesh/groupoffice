@@ -12,7 +12,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 	initComponent: function () {
 
 		if(this.support) {
-			this.relations.push("customer");
+			this.relations = [...this.relations, "customer"];
 		}
 
 
