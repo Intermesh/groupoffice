@@ -28,12 +28,12 @@ class OauthUser implements UserEntityInterface, ClaimSetInterface
 	 *
 	 * @return mixed
 	 */
-	public function getIdentifier()
+	public function getIdentifier(): string
 	{
 		return $this->user->id();
 	}
 
-	public function getClaims()
+	public function getClaims(): array
 	{
 		$parts = explode(' ', $this->user->displayName);
 		$firstName = array_shift($parts);

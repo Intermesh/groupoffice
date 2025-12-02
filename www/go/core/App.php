@@ -17,6 +17,7 @@ namespace go\core {
 	use go\core\fs\Blob;
 	use go\core\fs\Folder;
 	use go\core\http\PostResponseProcessor;
+	use go\core\http\Response;
 	use go\core\jmap\Request;
 	use go\core\mail\Mailer;
 	use go\core\model\Group;
@@ -1103,6 +1104,43 @@ namespace go\core {
 
 			parent::checkAcls();
 		}
+
+
+		/**
+		 * Start session
+		 *
+		 * @return void
+		 */
+		public function sessionStart() {
+
+			//without cookie_httponly the cookie can be accessed by malicious scripts
+			//injected to the site and its value can be stolen. Any information stored in
+			//session tokens may be stolen and used later for identity theft or
+			//user impersonation.
+			ini_set("session.cookie_httponly",1);
+
+			//Avoid session id in url's to prevent session hijacking.
+			ini_set('session.use_only_cookies',1);
+
+			session_set_cookie_params([
+				'httponly' => true,
+				'samesite' => 'Lax'
+			]);
+
+			ini_set('session.cookie_secure', \go\core\http\Request::get()->isHttps());
+
+			session_name('groupoffice');
+
+			// prevents altering headers. This caused a security issue where the expires header would be different on lost
+			// password requests when a valid email address was used.
+			session_cache_limiter("");
+			header('Cache-Control: no-cache, no-store, must-revalidate');
+			header('Pragma: no-cache');
+			header('Expires: 01-07-2003 12:00:00 GMT');
+			session_start();
+		}
+
+
 	}
 
 

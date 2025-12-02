@@ -31,8 +31,8 @@ class OauthAccessToken extends Entity implements AccessTokenEntityInterface
 		    ->addTable('core_oauth_access_token');
     }
 
-    public function setClient(ClientEntityInterface $client)
-    {
+    public function setClient(ClientEntityInterface $client): void
+		{
 	    $this->client = $client;
 	    $this->clientId = $client->id;
     }

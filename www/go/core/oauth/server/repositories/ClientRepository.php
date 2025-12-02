@@ -17,8 +17,8 @@ class ClientRepository implements ClientRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getClientEntity($clientIdentifier)
-    {
+    public function getClientEntity(string $clientIdentifier): ?\League\OAuth2\Server\Entities\ClientEntityInterface
+		{
         $client = OauthClient::find()->where('identifier', '=',  $clientIdentifier)->single();
         if(!$client) {
         	go()->debug("Could not get client '" . $clientIdentifier . "'");
@@ -32,8 +32,8 @@ class ClientRepository implements ClientRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function validateClient($clientIdentifier, $clientSecret, $grantType)
-    {
+    public function validateClient(string $clientIdentifier, ?string $clientSecret, ?string $grantType): bool
+		{
         $client = $this->getClientEntity($clientIdentifier);
         if(!$client) {
 					return false;
