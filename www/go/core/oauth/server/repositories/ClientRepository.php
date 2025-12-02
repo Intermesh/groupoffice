@@ -22,9 +22,9 @@ class ClientRepository implements ClientRepositoryInterface
         $client = OauthClient::find()->where('identifier', '=',  $clientIdentifier)->single();
         if(!$client) {
         	go()->debug("Could not get client '" . $clientIdentifier . "'");
-        }
-				
-				go()->debug($client->toArray());
+        } else {
+					go()->debug($client->toArray());
+				}
 
         return $client;
     }
