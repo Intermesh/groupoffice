@@ -170,6 +170,7 @@ export class CommentsPanel extends Component {
 
 
 		this.commentList.store.setFilter("entity", {
+			entity:	this.entityName,
 			entityId: id
 		});
 
