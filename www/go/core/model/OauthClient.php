@@ -21,8 +21,9 @@ class OauthClient extends \go\core\jmap\Entity implements ClientEntityInterface
 
 	}
 
-	public function setSecret(string|null $secret) {
-		$this->secret = isset($string) ?  password_hash($secret, CRYPT_BLOWFISH) : null;
+	public function setSecret(string|null $secret): void
+	{
+		$this->secret = isset($secret) ? password_hash($secret, CRYPT_BLOWFISH) : null;
 	}
 
 	public function checkSecret(string $secret): bool
