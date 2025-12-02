@@ -1,5 +1,5 @@
-import {checkbox, comp, DataSourceStore, List, Store, store, t} from "@intermesh/goui";
-import {Entity, modules} from "@intermesh/groupoffice-core";
+import {ArrayUtil, checkbox, comp, DataSourceStore, List, Store, store, t} from "@intermesh/goui";
+import {entities, Entity, modules} from "@intermesh/groupoffice-core";
 
 export class TypeGrid extends List {
 	private typeStore: Store;
@@ -13,10 +13,11 @@ export class TypeGrid extends List {
 		});
 
 		const renderer = (v: any) => {
+			console.log(v);
 			return [comp({}, checkbox(
 				{
 					itemId: v.name,
-					label: t(v.name),
+					label: v.title,
 					listeners: {
 						change: ({target, newValue}) => {
 							const record = this.typeStore.find((t) => t.name === target.itemId);
@@ -44,17 +45,13 @@ export class TypeGrid extends List {
 	}
 
 	public async load() {
-		let entities: Entity[] = [];
+		let entities1: Entity[] = [];
 
-		const mods = await modules.getAll();
+		const e = await entities.getAll();
 
-		mods.forEach(m => {
-			Object.values(m.entities).forEach(entity => {
-				entities.push(entity);
-			});
-		});
+		ArrayUtil.multiSort(e, [{property: "title"}]);
 
-		this.typeStore.add(...entities);
+		this.typeStore.add(...e);
 		void this.typeStore.load();
 	}
 }
