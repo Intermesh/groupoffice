@@ -1,3 +1,5 @@
+- Core: OpenID server packages upgraded and added discovery to docker
+
 01-12-2025: 25.0.71
 - Calendar: bug in update script
 
