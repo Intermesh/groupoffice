@@ -105,7 +105,6 @@ class OAuthController {
 
 			if(!go()->getAuthState()->isAuthenticated()) {
 				$_SESSION['authRequest'] = $authRequest;
-				$authRedirectUrl = $_SERVER['PHP_SELF'] . '/authorize';
 
 				$loginUrl = dirname($_SERVER['PHP_SELF'], 3) . '?oauthAuthorize=1';
 				return $response->withStatus(302)->withHeader('Location', $loginUrl);
@@ -113,11 +112,6 @@ class OAuthController {
 
 			$user = go()->getAuthState()->getUser(['username', 'displayName', 'id', 'email', 'modifiedAt']);
 			$authRequest->setUser(new UserAlias($user));
-
-
-//			$userRepository = new repositories\UserRepository();
-//			$userEntity = $userRepository->getUserEntityByIdentifier(2);
-//			$authRequest->setUser($userEntity);
 
 			// Once the user has approved or denied the client update the status
 			// (true = approved, false = denied)
