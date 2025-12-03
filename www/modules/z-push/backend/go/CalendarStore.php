@@ -61,7 +61,6 @@ class CalendarStore extends Store {
 		$query = CalendarEvent::find()->select(['cce.id', 'UNIX_TIMESTAMP(modifiedAt) as "mod"', '1 as flags']);
 		$filter = [
 			'inCalendars'=>$folderid,
-			'after' => date('Y-m-d H:i:s', $cutoffdate),
 			'hideSecret'=>1
 		];
 		if (!empty($cutoffdate)) {
