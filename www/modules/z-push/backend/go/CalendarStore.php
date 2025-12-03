@@ -67,6 +67,8 @@ class CalendarStore extends Store {
 			$filter['after'] = date('Y-m-d H:i:s', $cutoffdate);
 		}
 		$query->filter($filter);
+
+		ZLog::Write(LOGLEVEL_DEBUG, (string) $query);
 		ZLog::Write(LOGLEVEL_INFO, "GetMessageList ".$folderid. ' '. $cutoffdate);
 		return $query->fetchMode(\PDO::FETCH_ASSOC)->all();
 	}
