@@ -12,7 +12,7 @@ class OauthClient extends \go\core\jmap\Entity implements ClientEntityInterface
 
 	public ?string $id;
 
-	protected $secret;
+	protected ?string $secret;
 
 	protected static function defineMapping(): Mapping
 	{
@@ -21,35 +21,38 @@ class OauthClient extends \go\core\jmap\Entity implements ClientEntityInterface
 
 	}
 
-	public function setSecret($secret) {
-		$this->secret = password_hash($secret, CRYPT_BLOWFISH);
+	public function setSecret(string|null $secret): void
+	{
+		$this->secret = isset($secret) ? password_hash($secret, CRYPT_BLOWFISH) : null;
 	}
 
-	public function checkSecret($secret) {
+	public function checkSecret(string $secret): bool
+	{
 		return password_verify($secret, $this->secret);
 	}
 
-	public function setName($name)
+	public function setName(string $name): void
 	{
 		$this->name = $name;
 	}
 
-	public function setRedirectUri($uri)
+	public function setRedirectUri(string|array $uri): void
 	{
 		$this->redirectUri = $uri;
 	}
 
-	public function getRedirectUri()
+	public function getRedirectUri(): array|string
 	{
 		return $this->redirectUri;
 	}
 
-	public function setIsConfidential($value = true)
+	public function setIsConfidential(bool $value = true): void
 	{
 		$this->isConfidential = $value;
 	}
 
-	public function getIsConfidential() {
+	public function getIsConfidential(): bool
+	{
 		return $this->isConfidential();
 	}
 }

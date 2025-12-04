@@ -132,7 +132,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 	}
 
 	private current?: CalendarItem
-	protected eventHtml(item: CalendarItem, div?:HTMLElement) {
+	protected eventHtml(item: CalendarItem, div?:HTMLElement, withIcons = true) {
 		const e = item.data;
 
 		if(!div) { // default
@@ -146,7 +146,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 			div = E('div',
 				E('em', item.title || '('+t(item.data.privacy!='public' ? 'Private' :'Nameless')+')'),
 				...item.categoryDots,
-				...item.icons,
+				...(withIcons ? item.icons : []),
 				time
 			)
 		}
@@ -231,16 +231,16 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 			left = pos * (100 / this.slots.length),
 			top = row * this.ROWHEIGHT;
 		return {
-			width: (width-.6).toFixed(2)+'%',
+			width: (width-.2).toFixed(2)+'%',
 			left : (left+(dayDiff.invert?0:.3)).toFixed(2)+'%',
 			top: top.toFixed(2)+'rem',
 			color: '#'+e.color
 		};
 	}
 
-	protected drawEventLine(e: CalendarItem, weekstart: DateTime) {
+	protected drawEventLine(e: CalendarItem, weekstart: DateTime, withIcons = true) {
 		if(!e.divs[weekstart.format('YW')]) {
-			e.divs[weekstart.format('YW')] = this.eventHtml(e);
+			e.divs[weekstart.format('YW')] = this.eventHtml(e, undefined, withIcons);
 		}
 		return e.divs[weekstart.format('YW')]
 			.css(this.makestyle(e, weekstart))

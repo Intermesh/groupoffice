@@ -150,14 +150,8 @@ class TaskList extends AclOwnerEntity
 		if(empty($this->color)) {
 			$this->color = $this->defaultColor;
 		}
-		if( parent::internalSave() && !$this->isNew() && $this->isModified('name')) {
-			// 2025-1513 : make sure that the search description is updated accordingly.
-			$tasks = Task::find(['tasklistId' => $this->id]);
-			foreach ($tasks as $task) {
-				$task->saveSearch();
-			}
-		}
-		return true;
+
+		return parent::internalSave();
 	}
 
 

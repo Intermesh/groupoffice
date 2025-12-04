@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_user` (
     `color` VARCHAR(21) NOT NULL,
     `sortOrder` INT NOT NULL DEFAULT 0,
     `timeZone` VARCHAR(45) NULL,
-    `syncToDevice` TINYINT(1) NOT NULL DEFAULT 1,
+    `syncToDevice` TINYINT(1) NOT NULL DEFAULT 0,
     `includeInAvailability` ENUM('all', 'attending', 'none') NOT NULL DEFAULT 'none',
 	`modSeq` INT NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`, `userId`),
@@ -444,4 +444,7 @@ CREATE TABLE  IF NOT EXISTS `calendar_view` (
 		ON DELETE RESTRICT
 		ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+create index calendar_event_status_index
+    on calendar_event (status);
 

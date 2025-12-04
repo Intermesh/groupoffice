@@ -683,6 +683,10 @@ abstract class Entity extends Property {
 	/**
 	 * Check if the current user is allowed to create new entities
 	 *
+	 * Override to implement permission logic. Eg.:
+	 * ```
+	 * return Module::findByName('community', 'calendar')->getUserRights()->mayChangeViews;
+	 * ```
 	 * @return boolean
 	 */
 	protected function canCreate(): bool

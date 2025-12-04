@@ -1250,13 +1250,10 @@ class MailStore extends Store implements ISearchProvider {
 		// old framework sets user timezone :(
 		date_default_timezone_set("UTC");
 
-		// TODO this is inefficient because it reads the icalendar twice
 		$vcalendar = $imapMessage->getInvitationVcalendar();
 		if(!$vcalendar) {
 			return;
 		}
-
-		Scheduler::handleIMIP($imapMessage);
 
 		$message->meetingrequest = new SyncMeetingRequest();
 		$method = $vcalendar->method ? strtolower($vcalendar->method->getValue()) : "request";

@@ -21,6 +21,7 @@ use go\core\model\Principal;
 use go\core\model\User;
 use go\core\model\Module;
 use go\core\orm\CustomFieldsTrait;
+use go\core\orm\EntityType;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
@@ -29,6 +30,7 @@ use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\{ArrayObject, DateTime, Recurrence, StringUtil, Time, UUID};
 use go\core\validate\ErrorCode;
+use go\modules\business\kanban\model\Board;
 use go\modules\business\projects3\model\Project3;
 use go\modules\community\comments\model\Comment;
 use go\modules\community\tasks\convert\Spreadsheet;
@@ -442,6 +444,8 @@ class Task extends AclItemEntity {
 		$this->incrementTasklistModSeq();
 		$this->createSystemAlerts();
 
+
+
 		// if alert can be based on start / due of task check those properties as well
 		$modified = $this->getModified('alerts');
 		if (!empty($modified)) {
@@ -585,7 +589,7 @@ class Task extends AclItemEntity {
 		$nextTask->freeBusyStatus = 'free';
 
 		$rrule = $this->getRecurrenceRule();
-			
+
 		if(!empty($rrule->count)) {
 			$rrule->count--;
 			$nextTask->setRecurrenceRule($rrule->count > 0 ? $rrule : null);
@@ -718,7 +722,7 @@ class Task extends AclItemEntity {
 
 	public function getUid(): string
 	{
-		return $this->uid;		
+		return $this->uid;
 	}
 
 	public function setUid(string $uid) {

@@ -28,38 +28,101 @@ class OauthUser implements UserEntityInterface, ClaimSetInterface
 	 *
 	 * @return mixed
 	 */
-	public function getIdentifier()
+	public function getIdentifier(): string
 	{
 		return $this->user->id();
 	}
 
-	public function getClaims()
+	public function getClaims(): array
 	{
+		$parts = explode(' ', $this->user->displayName);
+		$firstName = array_shift($parts);
+		$middleName = '';
+		$lastName = implode(' ', $parts);
+
+		$gender = '';
+		$locale = go()->getSettings()->getLocale();
+		$birthdate = '';
+		$organization = '';
+		$department = '';
+		$address = [];
+		$phoneNumber = '';
+
+		$userProfile = $this->user->getProfile();
+		if ($userProfile !== null) {
+			//convert to match in 25.x
+			switch ($userProfile->gender) {
+				case 'M':
+					$gender = 'M';
+					break;
+				case 'F':
+					$gender = 'F';
+					break;
+				default:
+					$gender = '?';
+					break;
+			}
+
+			if ( $userProfile->language) {
+				$locale =  $userProfile->language;
+			}
+
+			$userProfileBirthDay = $userProfile->getBirthday();
+			if (!empty($userProfileBirthDay)) {
+				$birthdate = $userProfileBirthDay->format('Y-m-d');
+			}
+
+			$department = $userProfile->department;
+			$organizations = $userProfile->getOrganizations();
+			if (count($organizations) > 0) {
+				$organization = $organizations[0]->name;
+			}
+
+			if (count($userProfile->addresses)) {
+				$userProfileAddress = $userProfile->addresses[0];
+				$address = [
+					'formatted' => $userProfileAddress->getFormatted(),
+					'street_address' => $userProfileAddress->address,
+					'locality' => $userProfileAddress->city,
+					'region' => $userProfileAddress->state,
+					'postal_code' => $userProfileAddress->zipCode,
+					'country' => $userProfileAddress->country,
+				];
+			}
+
+			if (count($userProfile->phoneNumbers)) {
+				$phoneNumber = $userProfile->phoneNumbers[0]->number;
+			}
+		}
+
 		return [
 			"id" => $this->user->id(),
 			"profile" => go()->getSettings()->URL,
 			'name' => $this->user->displayName,
-			'family_name' => '',
-			'given_name' => '',
-			'middle_name' => '',
+			'family_name' => $lastName,
+			'given_name' => $firstName,
+			'middle_name' => $middleName,
 			'nickname' => $this->user->displayName,
 			'preferred_username' => $this->user->username,
 			'picture' => '',
 			'website' => '',
-			'gender' => '',
-//			'birthdate' => '01/01/1990',
-//			'zoneinfo' => '',
-//			'locale' => 'US',
+			'gender' => $gender,
+			'birthdate' => $birthdate,
+			'zoneinfo' => $this->user->timezone ?? go()->getSettings()->defaultTimezone,
+			'locale' => $locale,
 			'updated_at' => $this->user->modifiedAt->format('c'),
 			// email
 			'email' => $this->user->email,
 			'email_verified' => true,
 			// phone
-			'phone_number' => '',
+			'phone_number' => $phoneNumber,
 			'phone_number_verified' => true,
 			// address
-			'address' => '',
-			'roles' => $this->user->isAdmin() ? ['admin'] : ['user']
+			'address' => $address,
+			'roles' => $this->user->isAdmin() ? ['admin'] : ['user'],
+			// custom business claims
+			'department' => $department,
+			'organization' => $organization,
 		];
 	}
 }

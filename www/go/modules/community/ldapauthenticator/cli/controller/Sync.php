@@ -507,6 +507,10 @@ class Sync extends Controller
 
 		$this->output("Delete count: " . $deleteCount);
 
+		if(!$deleteCount || !$totalInGO) {
+			return;
+		}
+
 		$percentageToDelete = $totalInLDAP > 0 ? round(($deleteCount / $totalInGO) * 100, 2) : 0;
 
 		$this->output("Delete percentage: " . $percentageToDelete . "%, Max: " . $maxDeletePercentage . '%');

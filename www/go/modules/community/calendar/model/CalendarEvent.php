@@ -187,11 +187,14 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	public $privacy = self::Public;
 
+	const FREEBUSY_BUSY = 'busy';
+	const FREEBUSY_FREE = 'free';
+
 	/**
 	 * Is event Transparent or Opaque
-	 * @var boolean
+	 * @var ?string
 	 */
-	public $freeBusyStatus = 'busy';
+	public ?string $freeBusyStatus = self::FREEBUSY_BUSY;
 
 	/**
 	 * @var string
@@ -234,7 +237,7 @@ class CalendarEvent extends AclItemEntity {
 	protected $lastOccurrence;
 	/** The start time of the first occurence in the series, or start time if not recurring */
 	protected $firstOccurrence;
-	protected ?string  $ownerId; // find calendar owner to see if Private events needs to be altered
+	protected ?string  $ownerId = null; // find calendar owner to see if Private events needs to be altered
 
 	public static function customFieldsTableName(): string
 	{
@@ -463,6 +466,9 @@ class CalendarEvent extends AclItemEntity {
 //	}
 
 	public function start($withoutTime = false) {
+		if(!isset($this->start)) {
+			$this->start = new \DateTime();
+		}
 		return new \DateTime($this->start->format("Y-m-d". ($withoutTime?'':" H:i:s")), $this->timeZone());
 	}
 
@@ -716,7 +722,7 @@ class CalendarEvent extends AclItemEntity {
 		$success = parent::internalSave();
 
 		if($success) {
-			$this->addToResourceCalendars();
+			$this->addToKnownCalendars();
 			$this->updateAlerts(go()->getUserId());
 			$this->changeEventsWithSameUID();
 			$this->incrementCalendarModSeq();
@@ -733,12 +739,20 @@ class CalendarEvent extends AclItemEntity {
 				$current = $event->calendarParticipant();
 				if(!empty($current) && $current->isOwner()) {
 					// when owner deletes, free resources
-					foreach ($event->participants as $participant) {
+					foreach ($event->participants as $pid => $participant) {
 						if ($participant->kind === 'resource') {
 							$calId = str_replace( 'Calendar:', '', $participant->pid());
 							go()->getDbConnection()->delete('calendar_calendar_event', [
 								'calendarId' => $calId, 'eventId' => $event->eventId
 							])->execute();
+						}
+						if($participant->kind == 'individual' && is_numeric($pid)) {
+							$personalCalendarId = Calendar::fetchPersonal($pid);
+							if ($personalCalendarId) {
+								go()->getDbConnection()->delete('calendar_calendar_event', [
+									'calendarId'=>$personalCalendarId, 'eventId'=>$event->eventId
+								])->execute();
+							}
 						}
 					}
 				}
@@ -776,7 +790,7 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	public function currentUserIsOwner() {
-		return $this->ownerId === go()->getUserId() ||
+		return $this->isNew() || $this->ownerId === go()->getUserId() ||
 		 ($this->ownerId === null && $this->createdBy === go()->getUserId());
 	}
 
@@ -799,7 +813,7 @@ class CalendarEvent extends AclItemEntity {
 		return $arr;
 	}
 
-	private function addToResourceCalendars() {
+	private function addToKnownCalendars() {
 		if(empty($this->participants)) return;
 		foreach($this->participants as $pid => $participant) {
 			if($participant->kind == 'resource') {
@@ -807,6 +821,14 @@ class CalendarEvent extends AclItemEntity {
 				if(!empty($resourceCalendar)) {
 					 go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
 						['calendarId'=>$resourceCalendar->id, 'eventId'=>$this->eventId]
+					])->execute();
+				}
+			}
+			if($participant->kind == 'individual' && is_numeric($pid)) {
+				$personalCalendarId = Calendar::fetchPersonal($pid);
+				if ($personalCalendarId) {
+					go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
+						['calendarId'=>$personalCalendarId, 'eventId'=>$this->eventId]
 					])->execute();
 				}
 			}

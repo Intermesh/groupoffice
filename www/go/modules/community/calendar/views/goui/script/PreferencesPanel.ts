@@ -30,8 +30,9 @@ export class PreferencesPanel extends Component {
 		this.personalCalendarStore = datasourcestore({
 			dataSource:jmapds('Calendar'),
 			filters:{
-				default:{isSubscribed: true, davaccountId : null, isResource:false, permissionLevel:30/*writeOwn*/},
-				owner:{ownerId:client.user.id}
+				default:{davaccountId : null, isResource:false, permissionLevel:30/*writeOwn*/},
+				owner:{ownerId:client.user.id},
+				sub: {isSubscribedFor: client.user.id}
 			},
 			sort: [{property:'sortOrder'},{property:'name'}]
 		})
@@ -117,14 +118,16 @@ export class PreferencesPanel extends Component {
 		this.form.value = user;
 		this.form.currentId = user.id;
 
-		this.personalCalendarStore.setFilter('owner', {ownerId: user.id});
-		this.personalCalendarStore.load().catch(e => Notifier.error(e))
+		this.personalCalendarStore
+			.setFilter('owner', {ownerId: user.id})
+			.setFilter("sub", {isSubscribedFor: user.id})
+			.load().catch(e => Notifier.error(e))
 
 		this.calendarStore.setFilter("sub", {isSubscribedFor: user.id});
 		this.calendarStore.load().catch(e => Notifier.error(e))
 	}
 
-	onSubmit() {
-		return this.form.submit()
-	}
+	// onSubmit() {
+	// 	return this.form.submit()
+	// }
 }

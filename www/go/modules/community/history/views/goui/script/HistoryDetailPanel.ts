@@ -13,10 +13,11 @@ export class HistoryDetailPanel extends Component {
 
 		this.grid = new LogEntryGrid();
 
+		this.style.maxHeight = "40rem";
+		this.cls = "card vbox";
+
 		this.items.add(
-			comp({
-					cls: "card"
-				},
+
 				tbar({},
 					comp({
 						tagName: "h3",
@@ -26,11 +27,12 @@ export class HistoryDetailPanel extends Component {
 					collapsebtn({collapseEl: this.grid})
 				),
 				comp({
-						cls: "fit scroll"
+					cls: "scroll",
+					flex: 1
 					},
 					this.grid
 				)
-			)
+
 		);
 	}
 

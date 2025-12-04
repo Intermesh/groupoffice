@@ -9,11 +9,11 @@ use go\core\http\PostResponseProcessor;
 use go\core\mail\Address;
 use go\core\mail\Attachment;
 use go\core\model\User;
-use go\core\orm\EntityType;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
 use GO\Email\Model\ImapMessage;
 use Sabre\VObject\Component\VCalendar;
+use Sabre\VObject\Component\VEvent;
 
 class Scheduler {
 
@@ -440,7 +440,11 @@ class Scheduler {
 		if ($existingEvent->isRecurring()) {
 			foreach($vcalendar->VEVENT as $vevent) {
 				if(!empty($vevent->{'RECURRENCE-ID'})) {
+
+					self::fixRecurrenceId($existingEvent, $vevent);
+
 					$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
+
 					if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
 						$existingEvent->recurrenceOverrides[$recurId] = (new RecurrenceOverride($existingEvent));
 					}
@@ -482,6 +486,8 @@ class Scheduler {
 
 			// MAKE PATCH
 			if(isset($vevent->{'RECURRENCE-ID'})) {// occurrence
+
+				Scheduler::fixRecurrenceId($existingEvent, $vevent);
 				$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
 
 				$alreadyProcessed = !self::updateRecurrenceStatus($existingEvent, $recurId, $sender->email, $status, $replyStamp);
@@ -510,6 +516,42 @@ class Scheduler {
 	}
 
 
+	public static function fixRecurrenceId(CalendarEvent $existingEvent, VEvent $vevent) {
+
+
+		$recurId = $vevent->{'RECURRENCE-ID'}->getValue();
+
+		// Microsoft Exchange Server 2010 sends a string with zero time: 20251125T000000. Attempt to fix that.
+		if(!str_ends_with($recurId, "T000000")) {
+			return;
+		}
+
+		// put original time in recurrence ID
+		$recurId = substr($recurId, 0, -6) . $existingEvent->start()->format("His");
+		$vevent->{'RECURRENCE-ID'}->setValue($recurId);
+
+		//this code is too heavy and killed servers:
+
+//		if(isset($existingEvent->recurrenceOverrides[$recurId])) {
+//			// already present so assume it's valid
+//			return $recurId;
+//		}
+//
+//		if(RecurrenceRule::validateRecurrenceId($existingEvent, $recurId)) {
+//			return $recurId;
+//		}
+//		$origRecurId = $recurId;
+//
+//		// Microsoft Exchange Server 2010 sends a string with zero time: 20251125T000000. Attempt to fix that.
+//		$recurId = RecurrenceRule::fixRecurrenceId($existingEvent, $recurId);
+//		if(!RecurrenceRule::validateRecurrenceId($existingEvent, $recurId)) {
+//			throw new Exception("Invalid recurrence ID given $origRecurId");
+//		}
+
+//		return $recurId;
+	}
+
+
 	/**
 	 * Update participant status in a recurring series instance
 	 *
@@ -523,9 +565,8 @@ class Scheduler {
 	 */
 	public static function updateRecurrenceStatus(CalendarEvent $existingEvent, string $recurId, string $email, string $status, \DateTimeInterface $replyStamp): bool
 	{
+
 		if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
-			// TODO: check if the given RECURRENCE-ID is valid for $existingEvent->recurrenceRule
-			// If it is not valid an extra instance would be created (RDATE in iCal) GroupOffice does not display these at the moment.
 			$existingEvent->recurrenceOverrides[$recurId] = new RecurrenceOverride($existingEvent);
 			$exEvent = $existingEvent->patchedInstance($recurId);
 		} else {

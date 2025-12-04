@@ -14,7 +14,8 @@ export * from "./CalendarView.js";
 export * from "./CalendarItem.js";
 export * from "./MonthView.js";
 export * from "./WeekView.js";
-export * from "./CalendarAdapter.js"
+export * from "./CalendarAdapter.js";
+export * from "./OnlineMeetingService.js";
 
 export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list';
 export const calendarStore = datasourcestore({
@@ -208,6 +209,7 @@ modules.register(  {
 	name: "calendar",
 	entities: [
 		"Calendar",
+		"CalendarView",
 		{
 			name:"CalendarEvent",
 			filters: [

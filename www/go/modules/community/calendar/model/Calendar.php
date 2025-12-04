@@ -116,7 +116,7 @@ class Calendar extends AclOwnerEntity {
 		return !empty($this->groupId) ? ('Calendar:'.$this->id) : $this->ownerId;
 	}
 
-	/** @return int */
+
 	public static function fetchPersonal($userId) {
 		$user = User::findById($userId, ['id','displayName','calendarPreferences']);
 		if(!empty($user)) {
@@ -138,8 +138,12 @@ class Calendar extends AclOwnerEntity {
 		}
 
 		// create default
-		$cal = Calendar::createDefault($user);
-		return $cal->id;
+		if(!empty($user)) {
+			$cal = Calendar::createDefault($user);
+			if($cal)
+				return $cal->id;
+		}
+		return null;
 
 	}
 
@@ -385,7 +389,10 @@ class Calendar extends AclOwnerEntity {
 
 	public static function createDefault(User $user) : Calendar {
 
-		$calendar = Calendar::find()->where(['ownerId' => $user->id])->filter(['permissionLevel' => Acl::LEVEL_MANAGE])->single();
+		$calendar = Calendar::findFor($user->id)
+			->where(['ownerId' => $user->id])
+//			->filter(['permissionLevel' => Acl::LEVEL_MANAGE]) // can't be used when not logged in
+			->single();
 
 		if (empty($calendar)) {
 			$calendar = Calendar::createFor($user->id);

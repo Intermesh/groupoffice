@@ -1,0 +1,17 @@
+@use '../../../../../../../views/goui/goui/style/_util.scss'  as *;
+@use '../../../../../../../views/goui/goui/style/_config.scss' as *;
+
+.go-module-icon-openid {
+	content: " ";
+	margin-top: 0 !important;
+	float: left;
+	background-image:url('../resources/openid.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+	height: 21px !important;
+	width: 21px !important;
+}
+
+.oidc-signin-btn {
+	margin-top: 24px;
+}

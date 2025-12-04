@@ -45,7 +45,9 @@ export interface CalendarEvent extends BaseEntity {
 	showWithoutTime?: boolean // isAllDay
 	duration: string
 	privacy: 'public' | 'private' | 'secret'
-	start: string
+	start: string,
+	end: string,
+	useDefaultAlerts: boolean,
 	timeZone:Timezone
 	title: string
 	color?: string
@@ -133,13 +135,16 @@ export class CalendarItem {
  		// if(obj.override)
 		 // 	debugger;
 		if(!obj.start) {
-			this.start = new DateTime(this.patched.start);
+			this.start = DateTime.createFromFormat(this.patched.start, "Y-m-d\TH:i:s", this.patched.timeZone)!; // ignore stored timezone
+			if(!this.start) {
+				debugger;
+			}
 			if(this.data.showWithoutTime) {
 				this.start.setHours(0,0,0,0);
 			}
 		}
+
 		if(obj.data.timeZone) {
-			this.start.timezone = this.patched.timeZone;
 			this.start = this.start.toTimezone(client.user.timezone as Timezone);
 		}
 		//if(!obj.end) {

@@ -546,7 +546,7 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
         let numTasks = 0, numFinishedTasks = 0;
         if (go.Modules.isAvailable("legacy","savemailas")) {
             if(record.json['numTasks'] !== undefined) {
-                icons.push('task');
+                icons.push('assignment');
                 numTasks = record.json['numTasks'];
                 numFinishedTasks = record.json['numFinishedTasks'];
             }
@@ -559,7 +559,7 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
                 case 'flag':
                     secondaryCls = 'red';
                     break
-                case 'task':
+                case 'assignment':
                     secondaryCls = numFinishedTasks === numTasks ? 'green' : 'bluegrey';
                     title = ` title = "${numFinishedTasks} / ${numTasks} ${t("Completed tasks", "tasks")}"`;
                     break;

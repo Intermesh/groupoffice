@@ -201,8 +201,7 @@ export class Main extends MainThreeColumnPanel {
 		});
 
 		return comp({
-				cls: "vbox bg-lowest",
-				flex: 1
+				cls: "vbox bg-lowest"
 			},
 			this.noteGridToolbar = tbar({
 					cls: "bg-mid border-bottom"
