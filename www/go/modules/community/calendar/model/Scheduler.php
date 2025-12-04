@@ -9,12 +9,11 @@ use go\core\http\PostResponseProcessor;
 use go\core\mail\Address;
 use go\core\mail\Attachment;
 use go\core\model\User;
-use go\core\orm\EntityType;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
-use go\core\validate\ErrorCode;
 use GO\Email\Model\ImapMessage;
 use Sabre\VObject\Component\VCalendar;
+use Sabre\VObject\Component\VEvent;
 
 class Scheduler {
 
@@ -294,7 +293,7 @@ class Scheduler {
 			'method' => $method,
 			'scheduleId' => $accountEmail,
 			'event' => $event,
-			'recurrenceId' => empty($vevent->{"RECURRENCE-ID"}) ? null : Scheduler::fixRecurrenceId($event, $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s'))
+			'recurrenceId' => empty($vevent->{"RECURRENCE-ID"}) ? null : $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s')
 		];
 		if($method === 'REPLY' && isset($event)) {
 
@@ -441,8 +440,10 @@ class Scheduler {
 		if ($existingEvent->isRecurring()) {
 			foreach($vcalendar->VEVENT as $vevent) {
 				if(!empty($vevent->{'RECURRENCE-ID'})) {
+
+					self::fixRecurrenceId($existingEvent, $vevent);
+
 					$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
-					$recurId = self::fixRecurrenceId($existingEvent, $recurId);
 
 					if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
 						$existingEvent->recurrenceOverrides[$recurId] = (new RecurrenceOverride($existingEvent));
@@ -485,6 +486,8 @@ class Scheduler {
 
 			// MAKE PATCH
 			if(isset($vevent->{'RECURRENCE-ID'})) {// occurrence
+
+				Scheduler::fixRecurrenceId($existingEvent, $vevent);
 				$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
 
 				$alreadyProcessed = !self::updateRecurrenceStatus($existingEvent, $recurId, $sender->email, $status, $replyStamp);
@@ -513,24 +516,39 @@ class Scheduler {
 	}
 
 
-	public static function fixRecurrenceId(CalendarEvent $existingEvent, string $recurId) : string {
-		if(isset($existingEvent->recurrenceOverrides[$recurId])) {
-			// already present so assume it's valid
-			return $recurId;
-		}
+	public static function fixRecurrenceId(CalendarEvent $existingEvent, VEvent $vevent) {
 
-		if(RecurrenceRule::validateRecurrenceId($existingEvent, $recurId)) {
-			return $recurId;
-		}
-		$origRecurId = $recurId;
+
+		$recurId = $vevent->{'RECURRENCE-ID'}->getValue();
 
 		// Microsoft Exchange Server 2010 sends a string with zero time: 20251125T000000. Attempt to fix that.
-		$recurId = RecurrenceRule::fixRecurrenceId($existingEvent, $recurId);
-		if(!RecurrenceRule::validateRecurrenceId($existingEvent, $recurId)) {
-			throw new Exception("Invalid recurrence ID given $origRecurId");
+		if(!str_ends_with($recurId, "T000000")) {
+			return;
 		}
 
-		return $recurId;
+		// put original time in recurrence ID
+		$recurId = substr($recurId, 0, -6) . $existingEvent->start()->format("His");
+		$vevent->{'RECURRENCE-ID'}->setValue($recurId);
+
+		//this code is too heavy and killed servers:
+
+//		if(isset($existingEvent->recurrenceOverrides[$recurId])) {
+//			// already present so assume it's valid
+//			return $recurId;
+//		}
+//
+//		if(RecurrenceRule::validateRecurrenceId($existingEvent, $recurId)) {
+//			return $recurId;
+//		}
+//		$origRecurId = $recurId;
+//
+//		// Microsoft Exchange Server 2010 sends a string with zero time: 20251125T000000. Attempt to fix that.
+//		$recurId = RecurrenceRule::fixRecurrenceId($existingEvent, $recurId);
+//		if(!RecurrenceRule::validateRecurrenceId($existingEvent, $recurId)) {
+//			throw new Exception("Invalid recurrence ID given $origRecurId");
+//		}
+
+//		return $recurId;
 	}
 
 
@@ -547,7 +565,6 @@ class Scheduler {
 	 */
 	public static function updateRecurrenceStatus(CalendarEvent $existingEvent, string $recurId, string $email, string $status, \DateTimeInterface $replyStamp): bool
 	{
-		$recurId = self::fixRecurrenceId($existingEvent, $recurId);
 
 		if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
 			$existingEvent->recurrenceOverrides[$recurId] = new RecurrenceOverride($existingEvent);

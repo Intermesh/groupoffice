@@ -378,8 +378,11 @@ class ICalendarHelper {
 				'uid' => (string) $vevent->UID // unset after merge
 			]);
 
+
 			if(!empty($vevent->{'RECURRENCE-ID'})) {
-				$obj->recurrenceId = Scheduler::fixRecurrenceId($event, $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s'));
+				Scheduler::fixRecurrenceId($event, $vevent);
+
+				$obj->recurrenceId =$vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
 				$exceptions[] = $obj;
 				continue;
 			}
