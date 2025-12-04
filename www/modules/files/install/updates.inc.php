@@ -379,5 +379,12 @@ $updates['202504141045'][] = function() {
 	}
 };
 
+
+$updates['202504141045'][] = "delete s from core_search s inner join fs_folders f on f.id=s.entityId where entityTypeId=(select id from core_entity where name='Folder') and f.visible=0;";
+
 $updates['202508051525'][] = "alter table fs_files
     modify name varchar(260) collate utf8mb4_bin not null;";
+
+
+$updates['202508051525'][] = "delete s from core_search s inner join fs_folders f on f.id=s.entityId where entityTypeId=(select id from core_entity where name='Folder') and f.visible=0;";
+
