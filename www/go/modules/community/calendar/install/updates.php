@@ -469,3 +469,7 @@ $updates['202511280942'][] = function() {
 
 
 };
+
+$updates['202512030900'][] = 'create index calendar_event_status_index
+    on calendar_event (status);';
+
