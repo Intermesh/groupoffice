@@ -1,4 +1,5 @@
 - Files: Don't put folders with visible=false in the search results and correct root folders with invalid acl's in the db check
+- Email: get correct mime type for blobs. Not text/plain for text/csv for example.
 
 01-12-2025: 6.8.145
 - Leavedays: prevent approved leave budgets and budgets with registrations from being deleted
