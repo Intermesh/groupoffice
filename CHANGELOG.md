@@ -1,3 +1,4 @@
+- Email: get correct mime type for blobs. Not text/plain for text/csv for example.
 - Core: OpenID server packages upgraded and added discovery to docker
 - Newsletters: Fixed problem where mail wouldn't send with account from email module
 - Files: Don't put folders with visible=false in the search results and correct root folders with invalid acl's in the db check
