@@ -81,6 +81,10 @@ class FilesModule extends \GO\Base\Module{
 
 		go()->getDbConnection()->exec("update fs_folders set acl_id = 0 where acl_id not in (select id from core_acl);");
 
+		$mod = \go\core\model\Module::findByName(null, "files", null);
+		go()->getDbConnection()->exec("update fs_folders set readonly=1, acl_id = ".$mod->getShadowAclId()." where acl_id=0 and parent_id=0;");
+		go()->getDbConnection()->exec("delete s from core_search s inner join fs_folders f on f.id=s.entityId where entityTypeId=(select id from core_entity where name='Folder') and f.visible=0;");
+
 		parent::checkDatabase($response);
 	}
 
