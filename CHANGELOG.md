@@ -1,3 +1,5 @@
+- Calendar: remove empty language file
+
 04-12-2025: 25.0.72
 - Email: get correct mime type for blobs. Not text/plain for text/csv for example.
 - Core: OpenID server packages upgraded and added discovery to docker
