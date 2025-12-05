@@ -389,7 +389,10 @@ class Calendar extends AclOwnerEntity {
 
 	public static function createDefault(User $user) : Calendar {
 
-		$calendar = Calendar::find()->where(['ownerId' => $user->id])->filter(['permissionLevel' => Acl::LEVEL_MANAGE])->single();
+		$calendar = Calendar::findFor($user->id)
+			->where(['ownerId' => $user->id])
+//			->filter(['permissionLevel' => Acl::LEVEL_MANAGE]) // can't be used when not logged in
+			->single();
 
 		if (empty($calendar)) {
 			$calendar = Calendar::createFor($user->id);

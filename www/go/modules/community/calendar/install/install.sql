@@ -445,3 +445,6 @@ CREATE TABLE  IF NOT EXISTS `calendar_view` (
 		ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+create index calendar_event_status_index
+    on calendar_event (status);
+

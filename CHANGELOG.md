@@ -1,5 +1,26 @@
-24-11-2025: 25.0.68
+04-12-2025: 25.0.72
+- Email: get correct mime type for blobs. Not text/plain for text/csv for example.
+- Core: OpenID server packages upgraded and added discovery to docker
+- Newsletters: Fixed problem where mail wouldn't send with account from email module
+- Files: Don't put folders with visible=false in the search results and correct root folders with invalid acl's in the db check
+- Calendar: Replaced recurrenceID validation with quick fix for invalid recurenceId's from MS Exchange 2010
+
+01-12-2025: 25.0.71
+- Calendar: bug in update script
+
+01-12-2025: 25.0.70
+- Calendar: Workaround Microsoft Exchange Server 2010 sending an invalid recurrenceID
+- Finance: Fix shoddy NL translation
+- Calendar: Made it possible to integrate differnt video meeting providers
+- Jitsimeet: Put into own module
+- Microsoft Teams: New pro module to add MS teams links to calendar events
+- Finance: Fixed margin not calculating in some rare cases
+- OIDC: New open ID connect module that is suitable for any open ID server- 
+
+24-11-2025: 25.0.69
 - Core: fix composer dependency error
+- Leavedays: fixed several errors in special leave budget flow
+- Core: Fixed Stored XSS in Contacts Comments Section via Malicious SVG File Upload
 
 24-11-2025: 25.0.68
 - DE translations. Danke Daniel!

@@ -1,4 +1,14 @@
 
+go.lookupPrincipal = function(id) {
+	const parts = id.split(":");
+	if(parts.length == 1) {
+		go.modules.community.addressbook.lookUpUserContact(id);
+	} else {
+		go.Entities.get("Contact").goto(parts[1]);
+	}
+
+}
+
 go.print = function(tmpl, data) {
 	var paper = document.getElementById('paper');
 
@@ -20,7 +30,7 @@ go.print = function(tmpl, data) {
 };
 
 go.reload = function() {
-	window.location.replace(window.location.pathname);
+	window.location.reload();
 };
 
 go.Colors = [

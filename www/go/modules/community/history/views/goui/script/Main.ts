@@ -7,12 +7,13 @@ import {
 	hr,
 	List,
 	list,
-	p,
+	fieldset,
 	searchbtn,
 	splitter,
 	store,
 	t,
-	tbar
+	tbar,
+	DateRangeField
 } from "@intermesh/goui";
 import {principalcombo} from "@intermesh/groupoffice-core";
 import {LogEntryGrid} from "./LogEntryGrid.js";
@@ -26,6 +27,7 @@ export class Main extends Component {
 	private typeGrid!: TypeGrid;
 
 	private selectedActions!: String[];
+	private dateRangeField!: DateRangeField;
 
 	constructor() {
 		super();
@@ -34,8 +36,6 @@ export class Main extends Component {
 
 		this.logEntryGrid = new LogEntryGrid();
 
-		void this.logEntryGrid.store.load();
-
 		this.items.add(
 			this.west = this.createWest(),
 			splitter({
@@ -43,31 +43,33 @@ export class Main extends Component {
 			}),
 			this.center = this.createCenter()
 		)
+
+		this.on("render", () => {
+			void this.typeGrid.load();
+			this.dateRangeField.setThisWeek();
+		})
 	}
 
 	private createWest() {
 		this.typeGrid = new TypeGrid(this.logEntryGrid.store);
-		void this.typeGrid.load();
 
 		this.selectedActions = [];
 
 		return comp({
 				itemId: "west",
-				cls: "pad bg-low scroll ",
-				width: 320
+				cls: "scroll ",
+				width: 340
 			},
-			comp({
-					cls: "vbox"
-				},
-				daterangefield({
+			fieldset({},
+
+				this.dateRangeField = daterangefield({
 					label: t("Date"),
 					listeners: {
-						change: ({newValue}) => {
+						setvalue: ({newValue}) => {
 							void this.logEntryGrid.store.setFilter("createdAt", {createdAt: newValue}).load();
 						}
 					}
 				}),
-				p(),
 				principalcombo({
 					entity: "user",
 					label: t("Users"),
@@ -89,10 +91,12 @@ export class Main extends Component {
 					}
 				})
 			),
-			hr(),
-			h3({
-				text: t("Actions")
-			}),
+
+			tbar({},
+				h3({
+					text: t("Actions")
+				})
+			),
 			list({
 				store: store({
 					data: [
@@ -107,7 +111,7 @@ export class Main extends Component {
 					]
 				}),
 				renderer: (v, el, list: List) => {
-					return [comp({}, checkbox({
+					return [checkbox({
 							label: v.label,
 							listeners: {
 								change: ({target, newValue}) => {
@@ -124,17 +128,18 @@ export class Main extends Component {
 									void this.logEntryGrid.store.load();
 								}
 							}
-						})
-					)];
+						})]
 				},
 				rowSelectionConfig: {
 					multiSelect: true
 				}
 			}),
-			hr(),
-			h3({
-				text: t("Types")
-			}),
+
+			tbar({} ,
+				h3({
+					text: t("Types")
+				})
+			),
 			this.typeGrid
 		)
 	}
@@ -142,7 +147,7 @@ export class Main extends Component {
 	private createCenter() {
 		return comp({
 				itemId: "center",
-				cls: "vbox bg-low",
+				cls: "vbox",
 				flex: 1
 			},
 			tbar({

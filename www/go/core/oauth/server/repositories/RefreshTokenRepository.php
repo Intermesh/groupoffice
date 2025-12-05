@@ -18,32 +18,32 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function persistNewRefreshToken(RefreshTokenEntityInterface $refreshTokenEntity)
-    {
+    public function persistNewRefreshToken(RefreshTokenEntityInterface $refreshTokenEntity): void
+		{
         // Some logic to persist the refresh token in a database
     }
 
     /**
      * {@inheritdoc}
      */
-    public function revokeRefreshToken($tokenId)
-    {
+    public function revokeRefreshToken(string $tokenId): void
+		{
         // Some logic to revoke the refresh token in a database
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isRefreshTokenRevoked($tokenId)
-    {
+    public function isRefreshTokenRevoked(string $tokenId): bool
+		{
         return false; // The refresh token has not been revoked
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getNewRefreshToken()
-    {
+    public function getNewRefreshToken(): ?RefreshTokenEntityInterface
+		{
         return new OauthRefreshToken();
     }
 }

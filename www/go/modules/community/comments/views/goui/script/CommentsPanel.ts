@@ -101,7 +101,7 @@ export class CommentsPanel extends Component {
 						if (form.value.text.length > 0) {
 							const labelIds = form.value.labels.map((l: { id: number; }) => l.id);
 
-							commentDS.create(
+							return commentDS.create(
 								Object.assign({
 									entity: this.entityName,
 									entityId: this.entityId!,
@@ -170,6 +170,7 @@ export class CommentsPanel extends Component {
 
 
 		this.commentList.store.setFilter("entity", {
+			entity:	this.entityName,
 			entityId: id
 		});
 

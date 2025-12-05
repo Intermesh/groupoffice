@@ -59,7 +59,8 @@ export class CommentEditor extends Component {
 									filter: {
 										entity: "User",
 										text: text
-									}
+									},
+									limit: 10
 								});
 								const get = await principalDS.get(r.ids);
 								return get.list.map(p => {

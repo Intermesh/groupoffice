@@ -1,6 +1,6 @@
 <?php
 
-namespace go\modules\community\calendar\model;
+namespace go\modules\community\jitsimeet\model;
 
 use go\core;
 
