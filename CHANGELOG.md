@@ -1,3 +1,46 @@
+04-12-2025: 25.0.72
+- Email: get correct mime type for blobs. Not text/plain for text/csv for example.
+- Core: OpenID server packages upgraded and added discovery to docker
+- Newsletters: Fixed problem where mail wouldn't send with account from email module
+- Files: Don't put folders with visible=false in the search results and correct root folders with invalid acl's in the db check
+- Calendar: Replaced recurrenceID validation with quick fix for invalid recurenceId's from MS Exchange 2010
+
+01-12-2025: 25.0.71
+- Calendar: bug in update script
+
+01-12-2025: 25.0.70
+- Calendar: Workaround Microsoft Exchange Server 2010 sending an invalid recurrenceID
+- Finance: Fix shoddy NL translation
+- Calendar: Made it possible to integrate differnt video meeting providers
+- Jitsimeet: Put into own module
+- Microsoft Teams: New pro module to add MS teams links to calendar events
+- Finance: Fixed margin not calculating in some rare cases
+- OIDC: New open ID connect module that is suitable for any open ID server- 
+
+24-11-2025: 25.0.69
+- Core: fix composer dependency error
+- Leavedays: fixed several errors in special leave budget flow
+- Core: Fixed Stored XSS in Contacts Comments Section via Malicious SVG File Upload
+
+24-11-2025: 25.0.68
+- DE translations. Danke Daniel!
+- Calendar: show private events as "Private" in caldav
+- Calendar: permission check for deleting calendars in caldav
+- Calendar: Enable syncToDevice only when it's your own calendar
+- Calendar: Add event to calendars of invitees who are in the same system immediately
+- Core: Serve insecure types (html, svg) as plain text to prevent Stored XSS
+- Maildomains: Automatic mailbox creation not working (Issue #1384)
+- Calendar: Fixed personal calendar combo not loading correctly when opened as admin
+- Projects3: Show mine filter set too late
+- Calendar: Improved month view
+- Core: Fixed bug in search with names and - or _ in them.
+- #1365 Add phone scope, extend user's attributes Thanks @michalcharvat
+- #1368 set default editTB container width Thanks @michalcharvat
+
+17-11-2025: 25.0.67
+- Calendar: Select tasks for the calendar view if the due date is in the selected range.
+- Maildomains: fix error when adding new maildomain, mailbox or alias #1382
+
 13-11-2025: 25.0.66
 - Calendar: Read private events as owner of the calendars (Fixed)
 - Leavedays: single day leave days with time will show with time in the calendar.
@@ -62,7 +105,7 @@
 
 20-10-2025: 25.0.60
 - Core: Fix dirty merge
-
+ 
 20-10-2025: 25.0.59
 - Calendar: User with writeAll permission to shared calendar can edit event they did not organize but are internal
 - Calendar: Split view is now writeable (drag, drop, copy, paste, click-to-add)
@@ -78,8 +121,8 @@
 - Calendar: Fixed never ending loop in month print view
 - Files: remove delete buttons
 - Files: Fixed broken icons in thumb view
-- Core: Disable email profile field when an authenticator is used
 - Core: enable users with mayChangeUsers permission to add new users (backport from 6.8)
+- Core: Disable email profile field when an authenticator is used
 
 13-10-2025: 25.0.58
 - Address book: Add zipcode and street in grid
