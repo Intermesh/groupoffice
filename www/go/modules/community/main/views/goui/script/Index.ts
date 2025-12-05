@@ -49,14 +49,14 @@ export class Main extends Component {
 client.uri = "/api/"
 
 
-await Promise.all(
-	[
-		modules.loadModule("community", "notes"),
-		modules.loadModule("community", "calendar"),
-		modules.loadLegacy()
-	]
-);
+
 
 authManager.requireLogin().then(async () => {
+
+	await modules.loadAll();
+
+	//todo this was already fired before loading the modules. Change init() functions or load before firing?
+	client.fireAuth();
+
 	root.items.add(new Main());
 });

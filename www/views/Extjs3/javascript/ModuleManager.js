@@ -91,7 +91,7 @@ GO.ModuleManager = Ext.extend(function(){
 	 * @returns {undefined}
 	 */
 	_addModule : function(moduleName, panelClass, panelConfig, subMenuConfig)
-	{		
+	{
 		//this.modules[moduleName]=true;
 		if(panelClass)
 		{			
@@ -167,6 +167,7 @@ GO.ModuleManager = Ext.extend(function(){
 	},
 	
 	getPanel : function(moduleName) {
+
 		if(this.modulePanels[moduleName]){
 			Ext.reg("module-main-"+moduleName, this.modulePanels[moduleName]);
 			this.panelConfigs[moduleName].xtype = "module-main-"+moduleName;
@@ -199,6 +200,5 @@ GO.ModuleManager = Ext.extend(function(){
 		return this.subMenus;
 	}	
 });
-
 
 GO.moduleManager = new GO.ModuleManager();
