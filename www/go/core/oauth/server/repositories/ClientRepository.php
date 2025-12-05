@@ -17,7 +17,7 @@ class ClientRepository implements ClientRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getClientEntity(string $clientIdentifier): ?\League\OAuth2\Server\Entities\ClientEntityInterface
+    public function getClientEntity($clientIdentifier): ?\League\OAuth2\Server\Entities\ClientEntityInterface
 		{
         $client = OauthClient::find()->where('identifier', '=',  $clientIdentifier)->single();
         if(!$client) {
@@ -32,7 +32,7 @@ class ClientRepository implements ClientRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function validateClient(string $clientIdentifier, ?string $clientSecret, ?string $grantType): bool
+    public function validateClient($clientIdentifier, $clientSecret, $grantType): bool
 		{
         $client = $this->getClientEntity($clientIdentifier);
         if(!$client) {

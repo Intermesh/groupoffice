@@ -12,7 +12,7 @@ import {
 	form,
 	h3,
 	radio,
-	select,
+	select, store,
 	Store,
 	t,
 	table,
@@ -22,6 +22,7 @@ import {
 	Window
 } from "@intermesh/goui";
 import {SieveRuleEntity} from "./Index";
+import {SieveCriteriumWindow} from "./SieveCriteriumWindow";
 
 export class SieveRuleWindow extends Window {
 	private accountId: string;
@@ -58,11 +59,10 @@ export class SieveRuleWindow extends Window {
 			],
 			listeners: {
 				rowdblclick: ({storeIndex}) => {
-					void Window.alert("Edit criterium", "TODO")
 					const record: any = this.criteriaGrid.store.get(storeIndex);
-					console.log(record);
-					// const win = new SieveCriteriumWindow(this.accountId!);
-					// void win.load(record);
+					const win = new SieveCriteriumWindow(this.accountId!);
+					void win.load(record, storeIndex);
+					win.show();
 				}
 			}
 		});

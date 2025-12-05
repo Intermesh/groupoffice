@@ -20,8 +20,9 @@ export interface SieveScriptEntity extends DefaultEntity {
 }
 
 export interface SieveCriteriumEntity extends DefaultEntity {
+	index?: number,
 	test: string,
-	not: string,
+	not: boolean,
 	type: string,
 	arg1: string,
 	arg2: string

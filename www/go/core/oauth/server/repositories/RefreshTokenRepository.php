@@ -26,7 +26,7 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function revokeRefreshToken(string $tokenId): void
+    public function revokeRefreshToken($tokenId): void
 		{
         // Some logic to revoke the refresh token in a database
     }
@@ -34,7 +34,7 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function isRefreshTokenRevoked(string $tokenId): bool
+    public function isRefreshTokenRevoked($tokenId): bool
 		{
         return false; // The refresh token has not been revoked
     }

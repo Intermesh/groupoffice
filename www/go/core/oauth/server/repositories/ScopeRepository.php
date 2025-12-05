@@ -18,7 +18,7 @@ class ScopeRepository implements ScopeRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getScopeEntityByIdentifier(string $identifier): ?\League\OAuth2\Server\Entities\ScopeEntityInterface
+    public function getScopeEntityByIdentifier($identifier): ?\League\OAuth2\Server\Entities\ScopeEntityInterface
 		{
         $scopes = [
             'basic' => [
@@ -56,7 +56,7 @@ class ScopeRepository implements ScopeRepositoryInterface
 		 * @param null $userIdentifier
 		 * @param string|null $authCodeId
 		 */
-    public function finalizeScopes(array $scopes, string $grantType, ClientEntityInterface $clientEntity, $userIdentifier = null, ?string $authCodeId = null): array
+    public function finalizeScopes(array $scopes, $grantType, ClientEntityInterface $clientEntity, $userIdentifier = null, ?string $authCodeId = null): array
 		{
         $scope = new OauthScope();
         $scope->setIdentifier('openid');
