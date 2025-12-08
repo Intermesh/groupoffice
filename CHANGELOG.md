@@ -1,3 +1,4 @@
+08-12-2025: 25.0.73
 - Calendar: Fixed various print issues
 - Notifications: removed open_settings panel config. and do not open the panel when checker.js find a notification on boot
 - Calendar: Add both created as Resource Group owner to the ACL of a newly created Resource
