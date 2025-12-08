@@ -1,4 +1,5 @@
 - Calendar: remove empty language file
+- Maildomains: optimize migration script
 
 04-12-2025: 25.0.72
 - Email: get correct mime type for blobs. Not text/plain for text/csv for example.
