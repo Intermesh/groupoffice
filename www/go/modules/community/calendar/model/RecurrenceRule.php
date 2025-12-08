@@ -91,46 +91,69 @@ class RecurrenceRule {
 	}
 
 	static function expand(CalendarEvent $p, string $from, string $until) {
-		$it = ICalendarHelper::makeRecurrenceIterator($p);
-		$it->fastForward(new DateTime($from));
+
+		$fromDt = new DateTime($from);
+
 		if(!empty($p->lastOccurrence)) {
 			$until = min($until, $p->lastOccurrence->format('Y-m-d'));
 		}
-		$maxDate = new \DateTime($until);
+
+		$maxDate = new DateTime($until);
+		if(isset($p->recurrenceOverrides)) {
+			foreach($p->recurrenceOverrides as $recurrenceId => $o) {
+				if($o->excluded) {
+					continue;
+				}
+				$instance = self::patch(clone $p, $o);
+				if($instance->start() <  $maxDate && $instance->end() > $fromDt) {
+					yield $instance;
+				}
+			}
+		}
+
+		$it = ICalendarHelper::makeRecurrenceIterator($p);
+		$it->fastForward($fromDt);
+
 		while ($it->valid() && $it->current() < $maxDate) {
-			$recurrenceId = $it->current();
+			$recurrenceId = $it->current()->format('Y-m-d\TH:i:s');
 			$instance = clone $p;
-			$instance->utcStart = $recurrenceId;
-			$o = @$p->recurrenceOverrides[$recurrenceId->format('Y-m-d\TH:i:s')];
-			$duration = $p->duration;
+			$o = $p->recurrenceOverrides[$recurrenceId] ?? null;
 			if(isset($o)) {
 				if($o->excluded) {
 					$it->next();
 					continue;
 				}
-				if(isset($o->start)) {
-					$instance->utcStart = new \DateTime($o->start);
-				}
-				if(isset($o->duration)) {
-					$duration = $o->duration;
-				}
-
-				if(isset($o->description)) {
-					$instance->description = $o->description;
-				}
-
-				if(isset($o->title)) {
-					$instance->title = $o->title;
-				}
+				$instance = self::patch($instance, $o);
+			}else {
+				$instance->start = new \DateTime($recurrenceId, $p->timeZone());
 			}
 
-			$end = clone $instance->utcStart;
-			$end->add(new \DateInterval($duration));
-			$instance->utcEnd = $end;
+//			$end = clone $instance->start;
+//			$end->add(new \DateInterval($duration));
+//			$instance->utcEnd = $end;
 
-			yield $recurrenceId->format('Y-m-d\TH:i:s') => $instance;
+			yield $instance;
 			$it->next();
 		}
+	}
+
+	private static function patch(CalendarEvent $instance, RecurrenceOverride $o) {
+		if(isset($o->start)) {
+			$instance->start = new \DateTime($o->start, $instance->timeZone());
+		}
+		if(isset($o->duration)) {
+			$instance->duration = $o->duration;
+		}
+
+		if(isset($o->description)) {
+			$instance->description = $o->description;
+		}
+
+		if(isset($o->title)) {
+			$instance->title = $o->title;
+		}
+
+		return $instance;
 	}
 
 	static function humanReadable(CalendarEvent $event) {

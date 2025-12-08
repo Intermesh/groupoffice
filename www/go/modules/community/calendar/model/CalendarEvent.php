@@ -145,9 +145,6 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	public ?DateTimeInterface $start;
 
-	public $utcStart;
-	public $utcEnd;
-
 	/**
 	 * The duration of the event (or the occurence)
 	 * (optional, default: PT0S)
@@ -465,14 +462,18 @@ class CalendarEvent extends AclItemEntity {
 //		$this->title = $value;
 //	}
 
-	public function start($withoutTime = false) {
+	public function start($withoutTime = false, string|null $setimeZoneTo = null) {
 		if(!isset($this->start)) {
 			$this->start = new \DateTime();
 		}
-		return new \DateTime($this->start->format("Y-m-d". ($withoutTime?'':" H:i:s")), $this->timeZone());
+		$dt = new \DateTime($this->start->format("Y-m-d". ($withoutTime?'':" H:i:s")), $this->timeZone());
+		if(isset($setimeZoneTo)) {
+			$dt->setTimezone(new \DateTimeZone($setimeZoneTo));
+		}
+		return $dt;
 	}
 
-	public function end($withoutTime = false) {
+	public function end($withoutTime = false, string|null $setimeZoneTo = null) {
 		if(empty($this->start)) {
 			$end = new DateTime();
 		} else {
@@ -480,6 +481,12 @@ class CalendarEvent extends AclItemEntity {
 		}
 		if(!empty($this->duration))
 			$end->add(new \DateInterval($this->duration));
+
+
+		if(isset($setimeZoneTo)) {
+			$end->setTimezone(new \DateTimeZone($setimeZoneTo));
+		}
+
 		return $end;
 	}
 
@@ -488,9 +495,10 @@ class CalendarEvent extends AclItemEntity {
 	 * Would be 2 datetimes, 1 date and 2 times if same day, or just 1 or 2 dates when full-day(s)
 	 * @return string[] 2 lines of human readable text
 	 */
-	public function humanReadableDate()
+	public function humanReadableDate(string|null $setTimeZoneTo = null)
 	{
-		$start = $this->start;
+		$start = $this->start(false, $setTimeZoneTo);
+
 		$end = $this->end();
 		$oneDay = $start->format('Ymd') === $end->format('Ymd');
 		$line1 = go()->t($oneDay ? 'At' : 'From') . ' ' .
