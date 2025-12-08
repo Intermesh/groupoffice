@@ -20,7 +20,7 @@ final class Migrator
 		go()->getDbConnection()->beginTransaction();
 
 		go()->getDbConnection()->exec("INSERT INTO community_maildomains_domain (id, userId, domain, description, maxAliases, maxMailboxes,totalQuota,defaultQuota,transport,backupMx,active,aclId, createdBy, modifiedBy, createdAt) 
-SELECT id, user_id, domain, description, max_aliases, max_mailboxes, total_quota, default_quota,transport,backupmx, active, acl_id, 1, 1, NOW() FROM pa_domains;");
+SELECT id, user_id, domain, description, max_aliases, max_mailboxes, (1024 * total_quota), (1024 * default_quota),transport,backupmx, active, acl_id, 1, 1, NOW() FROM pa_domains;");
 		go()->getDbConnection()->exec("INSERT INTO community_maildomains_mailbox (id, domainId, username, password, smtpAllowed, description, maildir, homedir, quota, createdBy, createdAt, modifiedBy, modifiedAt , active, autoExpunge)
 SELECT id, domain_id, username, password, smtpAllowed, name, maildir, homedir, (1024 * quota), 1, NOW(), 1, NOW(), active, 0 FROM pa_mailboxes;");
 		go()->getDbConnection()->exec("INSERT INTO community_maildomains_alias (id, domainId, address, goto, createdBy, createdAt, modifiedBy, modifiedAt, active) SELECT id, domain_id, address, goto, 1, NOW(), 1, NOW(), active FROM pa_aliases;");

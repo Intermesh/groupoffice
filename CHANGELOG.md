@@ -1,3 +1,5 @@
+- Notifications: removed open_settings panel config. and do not open the panel when checker.js find a notification on boot
+- Calendar: Add both created as Resource Group owner to the ACL of a newly created Resource
 - Calendar: remove empty language file
 - Maildomains: optimize migration script
 
