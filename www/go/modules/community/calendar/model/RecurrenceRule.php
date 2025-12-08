@@ -108,11 +108,19 @@ class RecurrenceRule {
 					$it->next();
 					continue;
 				}
-				if($o->start) {
+				if(isset($o->start)) {
 					$instance->utcStart = new \DateTime($o->start);
 				}
-				if($o->duration) {
+				if(isset($o->duration)) {
 					$duration = $o->duration;
+				}
+
+				if(isset($o->description)) {
+					$instance->description = $o->description;
+				}
+
+				if(isset($o->title)) {
+					$instance->title = $o->title;
 				}
 			}
 
@@ -134,7 +142,7 @@ class RecurrenceRule {
 			'monthly' => [$t("month"), $t('months'), $t('Monthly')],
 			'yearly' => [$t("year"), $t('years'), $t('Annually')]
 		];
-		$suffix = [$t("first"),$t("second"),$t("third"),$t("fourth")];
+		$suffix = [1 => $t("first"),2 => $t("second"),3 => $t("third"),4=> $t("fourth")];
 		$dayNumbers = ['su'=>0,'mo'=>1,'tu'=>2,'we'=>3,'th'=>4,'fr'=>5,'sa'=>6];
 
 		$rr = $event->getRecurrenceRule();

@@ -614,12 +614,15 @@ $timeMargin: dp(72);
 		}
 	}
 }
-
+.cal.list-container {
+	border-top: $borderWidth solid $colorBorder;
+}
 .cal.list {
 	height:100%;
-	background-color: $surfaceLow;
+	background-color: $surfaceLowest;
 	overflow-y:scroll;
 	list-style: none;
+
 	li {
 		width:100%;
 		overflow: hidden;
@@ -814,7 +817,7 @@ $timeMargin: dp(72);
 	//.cal.week > ul:first-child em {
 	//	display:inline-block !important;
 	//}
-	.cal.lijst {
+	.cal.list-container {
 		.detail { display:none;}
 	}
 	.goui.cal {
