@@ -19,7 +19,12 @@ final class Migrator
 	{
 		$data = [];
 		go()->getDbConnection()->beginTransaction();
-		$ds = go()->getDbConnection()->select("*")->from('pa_domains')->orderBy(['id' => 'ASC']);
+		$ds = go()->getDbConnection()->select(
+			[
+				"id",
+				"user_id"
+			]
+		)->from('pa_domains')->orderBy(['id' => 'ASC']);
 		foreach($ds->all() as $d) {
 			$data[] = [
 				'id' => $d['id'],
