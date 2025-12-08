@@ -22,7 +22,6 @@ class EventTest extends TestCase {
 
 
 	/**
-	 * @depends \go\core\UserTest::testCreate()
 	 *
 	 * @return void
 	 * @throws \Exception
