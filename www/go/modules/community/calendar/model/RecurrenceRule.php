@@ -108,11 +108,19 @@ class RecurrenceRule {
 					$it->next();
 					continue;
 				}
-				if($o->start) {
+				if(isset($o->start)) {
 					$instance->utcStart = new \DateTime($o->start);
 				}
-				if($o->duration) {
+				if(isset($o->duration)) {
 					$duration = $o->duration;
+				}
+
+				if(isset($o->description)) {
+					$instance->description = $o->description;
+				}
+
+				if(isset($o->title)) {
+					$instance->title = $o->title;
 				}
 			}
 
