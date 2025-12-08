@@ -134,7 +134,7 @@ class RecurrenceRule {
 			'monthly' => [$t("month"), $t('months'), $t('Monthly')],
 			'yearly' => [$t("year"), $t('years'), $t('Annually')]
 		];
-		$suffix = [$t("first"),$t("second"),$t("third"),$t("fourth")];
+		$suffix = [1 => $t("first"),2 => $t("second"),3 => $t("third"),4=> $t("fourth")];
 		$dayNumbers = ['su'=>0,'mo'=>1,'tu'=>2,'we'=>3,'th'=>4,'fr'=>5,'sa'=>6];
 
 		$rr = $event->getRecurrenceRule();
