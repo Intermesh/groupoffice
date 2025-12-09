@@ -1,9 +1,9 @@
 @use '../../../../../../../views/goui/goui/style/_util.scss'  as *;
 @use '../../../../../../../views/goui/goui/style/_config.scss' as *;
 
-.main-menu {
+.goui-toolbar.goui-cardmenu.main-menu {
 	background-color: $colorMain;
-	.goui-button {
+	button.goui-button {
 		color: white;
 	}
 }

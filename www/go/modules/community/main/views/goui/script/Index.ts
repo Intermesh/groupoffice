@@ -1,29 +1,54 @@
-import {btn, CardMenu, cardmenu, cards, Component, root, router} from "@intermesh/goui";
+import {btn, CardMenu, cardmenu, cards, comp, Component, root, router, searchbtn, tbar, Toolbar} from "@intermesh/goui";
 import {authManager, client, entities, ExtJSWrapper, MainPanel, modules} from "@intermesh/groupoffice-core";
 
 
 
 
 export class Main extends Component {
-	private readonly menu: CardMenu;
-	private readonly container: Component;
+	private readonly menu;
+	private readonly container;
 	constructor() {
 		super();
 
-		this.cls = "fit vbox";
-		this.menu = cardmenu({
-			cls: "main-menu"
-		});
+		this.cls = "fit vbox main-container";
+
 		this.container = cards({
 			flex: 1
 		});
+
+		this.menu = cardmenu({
+			flex: 1,
+			cls: "main-menu",
+			overflowMenu: true,
+			cardContainer: this.container
+		});
+
+
 	}
 
 	/**
 	 * Load all module panels and sets up routes
 	 */
 	public load() {
-		this.items.add(this.menu, this.container);
+		this.items.add(
+			comp({
+				cls: "header hbox"
+			},
+				this.menu,
+				tbar({},
+					btn({
+						icon: "notifications"
+					}),
+					searchbtn({
+						icon: "search"
+					}),
+					btn({
+						icon: "settings"
+					})
+				)
+			),
+			this.container
+		);
 
 		// Get all registered panels
 		modules.getMainPanels().forEach(async (m) => {
