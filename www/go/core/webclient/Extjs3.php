@@ -106,7 +106,7 @@ class Extjs3 {
 	
 	private function replaceCssUrl($css, File $file){
 
-		$css .= "\n\n/*".$file->getPath() ." */\n\n";
+//		$css .= "\n\n/*".$file->getPath() ." */\n\n";
 		
 		$baseurl = str_replace(Environment::get()->getInstallFolder()->getPath() . '/', $this->getRelativeUrl(), $file->getFolder()->getPath()).'/';
 		
