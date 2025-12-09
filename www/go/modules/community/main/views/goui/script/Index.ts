@@ -1,9 +1,12 @@
-import {btn, comp, Component, menu, root, Menu, CardMenu, cardmenu, cards, router} from "@intermesh/goui";
-import {authManager, modules, client, MainPanel} from "@intermesh/groupoffice-core";
+import {btn, CardMenu, cardmenu, cards, Component, root, router} from "@intermesh/goui";
+import {authManager, client, entities, ExtJSWrapper, MainPanel, modules} from "@intermesh/groupoffice-core";
+
+
+
 
 export class Main extends Component {
-	private menu: CardMenu;
-	private container: Component;
+	private readonly menu: CardMenu;
+	private readonly container: Component;
 	constructor() {
 		super();
 
@@ -14,49 +17,103 @@ export class Main extends Component {
 		this.container = cards({
 			flex: 1
 		});
+	}
 
+	/**
+	 * Load all module panels and sets up routes
+	 */
+	public load() {
 		this.items.add(this.menu, this.container);
 
 		// Get all registered panels
 		modules.getMainPanels().forEach(async (m) => {
 
-			const itemId =  m.package + "/" +m.module;
-
 			// Add route to the panel
-			router.add(new RegExp(`^${m.package}/${m.module}$`), () => {
-				return this.openPanel(m)
+			router.add(new RegExp(`^${RegExp.escape(m.id)}$`), () => {
+				return this.openPanel(m.id)
 			});
 
 			// Add button to the route
 			this.menu.items.add(
-					btn({
-						itemId,
-						text: m.title,
-						handler: () => {
-							router.goto(itemId);
-						}
-					})
-				);
+				btn({
+					itemId: m.id,
+					text: m.title,
+					handler: () => {
+						router.goto(m.id);
+					}
+				})
+			);
 			// }
+		});
+
+		this.addLegacyDefaultRoutes();
+	}
+
+	/**
+	 * Support default routes to legacy detail panels in extjs3
+	 * @private
+	 */
+	private addLegacyDefaultRoutes() {
+		router.add(/([a-zA-Z0-9]*)\/([0-9]*)/, async (entity, id) => {
+
+			const entityObj = entities.get(entity);
+			if(!entityObj) {
+				console.log("Entity ("+entity+") not found in default entity route")
+				return false;
+			}
+
+			const detailViewName = entity.charAt(0).toLowerCase() + entity.slice(1) + "Detail";
+
+			const mainPanelCmp = await this.openPanel(entityObj.package + "/" + entityObj.module) as ExtJSWrapper;
+
+			if(!mainPanelCmp) {
+				console.error("mainpanel not found!");
+				return;
+			}
+
+			if (mainPanelCmp.extJSComp.route) {
+				mainPanelCmp.extJSComp.route(id, entityObj);
+			} else if(mainPanelCmp.extJSComp[detailViewName]) {
+				mainPanelCmp.show();
+				mainPanelCmp.extJSComp[detailViewName].load(id);
+				mainPanelCmp.extJSComp[detailViewName].show();
+			} else {
+				console.log("Default entity route failed because " + detailViewName + " or 'route' function not found in mainpanel of " + entityObj.module + ":", mainPanelCmp);
+				console.log(arguments);
+			}
 		});
 	}
 
-	private async openPanel(m:MainPanel) {
-		const itemId =  m.package + "/" +m.module;
+	public async openPanel(panelId:string) {
+		const m = modules.getPanelById(panelId);
+		if(!m) {
+			throw "notfound";
+		}
 
-		let cmp = this.container.findChild(itemId);
+		let cmp = this.container.findChild(panelId);
 		if(!cmp) {
 			cmp = await m.callback();
-			cmp.itemId = itemId;
+			cmp.itemId = panelId;
 			this.container.items.add(cmp);
 		}
+
+
+		//extjs3 panels have this func
+		//@ts-ignore
+		if(cmp.routeDefault) {
+			//@ts-ignore
+			cmp.routeDefault();
+		}
 		cmp.show();
+
+		return cmp;
 	}
 }
 
 // Todo, make this configurable or auto load?
 client.uri = "/api/";
 
+export const main = new Main();
 // Authenticate
 authManager.requireLogin().then(async () => {
 
@@ -66,8 +123,11 @@ authManager.requireLogin().then(async () => {
 	//todo this was already fired before loading the modules. Change init() functions or load before firing?
 	client.fireAuth();
 
+	// Loads all panels
+	main.load();
+
 	// Add the Main component holding all the module panels
-	root.items.add(new Main());
+	root.items.add(main);
 
 	// fire off the router
 	void router.start();
