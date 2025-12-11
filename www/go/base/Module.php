@@ -2,6 +2,7 @@
 namespace GO\Base;
 
 use Faker\Generator;
+use go\core\fs\Folder;
 use go\core\Installer;
 use go\core\orm\EntityType;
 
@@ -112,6 +113,16 @@ class Module extends Observable {
 	 */
 	public function path(){
 		return \GO::config()->root_path . 'modules/' . $this->name() . '/';
+	}
+
+	/**
+	 * Get the folder of this module
+	 *
+	 * @return Folder
+	 */
+	public function getFolder(): Folder
+	{
+		return new Folder($this->path());
 	}
 
 	/**
