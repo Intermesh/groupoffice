@@ -28,6 +28,8 @@ go.Modules = (function () {
 		register: function (package, name, config) {	
 			
 			Ext.ns('go.modules.' + package + '.' + name);
+
+			// console.log('register ' + package + '.' + name);
 			
 			config = config || {};
 
@@ -215,20 +217,22 @@ go.Modules = (function () {
 				let id, mod, pkg, config,initModulePromise;
 
 				for (id in this.entities) {
-					
 					mod = this.entities[id];
 					
 					// for (name in this.registered[package]) {	
 						pkg = mod.package || "legacy";
 						if(!this.registered[pkg]) {
+							console.log(`Skipping module init for package ${pkg} because it's not registered`)
 							continue;
 						}
 						config = this.registered[pkg][mod.name];
 						if(!config){
+							console.log(`Skipping module init for package ${pkg} / ${mod.name} because it's not registered`)
 							continue;
 						}
 					
 						if (config.requiredPermissionLevel > mod.permissionLevel) {
+							console.log(`Skipping module init for package ${pkg} / ${mod.name} because there's no permission`)
 							continue;
 						}
 						

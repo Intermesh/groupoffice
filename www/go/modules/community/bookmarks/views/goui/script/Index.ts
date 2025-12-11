@@ -1,5 +1,5 @@
-import {client, JmapDataSource, modules} from "@intermesh/groupoffice-core";
-import {router, t, translate} from "@intermesh/goui";
+import {client, JmapDataSource, modules, router} from "@intermesh/groupoffice-core";
+import {t, translate} from "@intermesh/goui";
 import {Main} from "./Main.js";
 
 modules.register({
