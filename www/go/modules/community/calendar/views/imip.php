@@ -127,9 +127,9 @@ $icon = [
     </div>
     <?php endif; ?>
     <div class="foot <?= $participant->kind === 'resource' ? "" : 'go-hidden' ?>"><?php if($method!=='CANCEL'): ?>
-        <a class="bord <?=$status['accepted']??''?>"  target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=accepted" style="margin-left:112px; margin-top:0;" ><?=go()->t('Accept')?></a>
-        <a class="bord <?=$status['tentative']??''?>" target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=tentative"><?=go()->t('Maybe')?></a>
-        <a class="bord <?=$status['declined']??''?>" target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=declined"><?=go()->t('Decline')?></a>
+        <a class="bord <?=$status['accepted']??''?>"  target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=accepted" style="margin-left:112px; margin-top:0;" ><?=go()->t('Accept', 'community', 'calendar')?></a>
+        <a class="bord <?=$status['tentative']??''?>" target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=tentative"><?=go()->t('Maybe', 'community', 'calendar')?></a>
+        <a class="bord <?=$status['declined']??''?>" target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=declined"><?=go()->t('Decline', 'community', 'calendar')?></a>
 		<?php endif; ?>
     </div>
 

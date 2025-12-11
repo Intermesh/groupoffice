@@ -501,14 +501,14 @@ class CalendarEvent extends AclItemEntity {
 
 		$end = $this->end();
 		$oneDay = $start->format('Ymd') === $end->format('Ymd');
-		$line1 = go()->t($oneDay ? 'At' : 'From') . ' ' .
+		$line1 = go()->t($oneDay ? 'At' : 'From', 'community', 'calendar') . ' ' .
 			go()->t($start->format('l')) .
 			$start->format(' j ') . go()->t('full_months')[$start->format('n')] .
 			$start->format(' Y');
 		if (!$oneDay) {
 			if (!$this->showWithoutTime)
 				$line1 .= ', ' . $start->format('H:i');
-			$line1 .= ' ' . go()->t('until');
+			$line1 .= ' ' . go()->t('until', 'community', 'calendar');
 		}
 		if ($oneDay) {
 			$line2 = $start->format('H:i') . ' - ' . $end->format('H:i');
