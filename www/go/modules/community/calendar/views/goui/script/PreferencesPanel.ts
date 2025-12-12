@@ -1,25 +1,27 @@
 import {
 	checkbox,
-	Component,
 	containerfield,
 	DataSourceForm,
-	datasourceform, DataSourceStore,
-	datasourcestore, DefaultEntity,
-	fieldset, Notifier,
+	datasourceform,
+	DataSourceStore,
+	datasourcestore,
+	DefaultEntity,
+	fieldset,
+	Notifier,
 	select
 } from "@intermesh/goui";
-import {client, JmapDataSource, jmapds, User} from "@intermesh/groupoffice-core";
+import {AppSettingsPanel, client, JmapDataSource, jmapds, User} from "@intermesh/groupoffice-core";
 import {t} from "./Index.js";
 
-export class PreferencesPanel extends Component {
+export class PreferencesPanel extends AppSettingsPanel {
 	private form: DataSourceForm<User>;
 	private calendarStore: DataSourceStore<JmapDataSource<DefaultEntity>>;
 	private personalCalendarStore: DataSourceStore<JmapDataSource<DefaultEntity>>;
 
 	constructor() {
 		super();
-		this.title = t('Preferences');
-		this.cls = 'fit scroll';
+		this.title = t('Calendar');
+		// this.cls = 'fit scroll';
 
 		this.calendarStore = datasourcestore({
 			dataSource: jmapds('Calendar'),
@@ -114,7 +116,7 @@ export class PreferencesPanel extends Component {
 		this.items.add(this.form);
 	}
 
-	onLoad(user:User) {
+	async load(user:User) {
 		this.form.value = user;
 		this.form.currentId = user.id;
 
@@ -126,6 +128,11 @@ export class PreferencesPanel extends Component {
 		this.calendarStore.setFilter("sub", {isSubscribedFor: user.id});
 		this.calendarStore.load().catch(e => Notifier.error(e))
 	}
+
+	async save(): Promise<any> {
+		return this.form.submit();
+	}
+
 
 	// onSubmit() {
 	// 	return this.form.submit()
