@@ -1,4 +1,5 @@
 - Files: Make sure log files folder is protected
+- Projects2: add set method to entity controller in order to edit custom fieldstets.
 
 04-12-2025: 6.8.146
 - Files: Don't put folders with visible=false in the search results and correct root folders with invalid acl's in the db check
