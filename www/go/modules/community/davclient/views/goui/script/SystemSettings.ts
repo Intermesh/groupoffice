@@ -5,14 +5,16 @@ import {
 	h3,
 	t, table, tbar, Window, win, hr, menu, EntityID
 } from "@intermesh/goui";
-import {client, jmapds} from "@intermesh/groupoffice-core";
+import {AppSettingsPanel, client, jmapds} from "@intermesh/groupoffice-core";
 import {AccountWindow} from "./AccountWindow.js";
 
-export class SystemSettings extends Component {
+export class SystemSettings extends AppSettingsPanel {
 
 
 	constructor() {
 		super();
+
+		this.title = t('DAV Accounts')
 
 		const store = datasourcestore({
 			dataSource: jmapds('DavAccount'),

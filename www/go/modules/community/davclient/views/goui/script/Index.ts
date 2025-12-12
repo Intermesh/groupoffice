@@ -1,4 +1,4 @@
-import {client, modules} from "@intermesh/groupoffice-core";
+import {appSettings, client, modules} from "@intermesh/groupoffice-core";
 import {t, translate} from "@intermesh/goui";
 import {SystemSettings} from "./SystemSettings.js";
 
@@ -20,10 +20,12 @@ modules.register(  {
 			}
 
 			//const ui = new Main();
-			modules.addAccountSettingsPanel("community", "davclient", "davclient", t("DAV Accounts"), "manage_accounts", () => {
-				return new SystemSettings();
-			});
+			// modules.addAccountSettingsPanel("community", "davclient", "davclient", t("DAV Accounts"), "manage_accounts", () => {
+			// 	return new SystemSettings();
+			// });
 			//modules.addMainPanel("calendar", "Calendar", 'calendar', t('Calendar'), () => ui);
+
+			appSettings.addPanel(SystemSettings)
 
 		});
 	}

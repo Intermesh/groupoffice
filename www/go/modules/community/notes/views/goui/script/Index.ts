@@ -1,4 +1,12 @@
-import {AclItemEntity, AclOwnerEntity, client, JmapDataSource, modules, router} from "@intermesh/groupoffice-core";
+import {
+	AclItemEntity,
+	AclOwnerEntity,
+	appSettings,
+	client,
+	JmapDataSource,
+	modules,
+	router
+} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {EntityID, t, translate} from "@intermesh/goui";
 import {SettingsPanel} from "./SettingsPanel.js";
@@ -30,9 +38,11 @@ modules.register({
 				return notes;
 			});
 
-			modules.addAccountSettingsPanel("community", "notes", "notes", t("Notes"), "note", () => {
-				return new SettingsPanel();
-			});
+			// modules.addAccountSettingsPanel("community", "notes", "notes", t("Notes"), "note", () => {
+			// 	return new SettingsPanel();
+			// });
+
+			appSettings.addPanel(SettingsPanel);
 
 		});
 	},
