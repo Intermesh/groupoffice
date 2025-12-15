@@ -42,6 +42,8 @@ export class TypeGrid extends List {
 		this.typeStore = typeStore;
 		this.logEntryStore = logEntryStore;
 		this.selectedTypes = [];
+
+		this.cls = "checkbox-list";
 	}
 
 	public async load() {
