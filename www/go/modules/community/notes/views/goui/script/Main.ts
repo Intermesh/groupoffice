@@ -166,7 +166,7 @@ export class Main extends MainThreeColumnPanel {
 
 	protected createCenter() {
 		this.noteGrid = new NoteGrid();
-
+		this.noteGrid.stateId = "notes-noteGrid";
 		this.noteGrid.rowSelectionConfig = {
 			multiSelect: true,
 			listeners: {
