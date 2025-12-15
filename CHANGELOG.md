@@ -1,3 +1,4 @@
+Email: fixed reading email with a large base64 encoded resource while blocking external images
 - Core: somewhat more helpful error reporting when user cannot be automatically imported from email
 - Leavedays: will be shown in calendar again. broken since 25.0.67
 - Calendar: save calendar user preferences, broken since 25.0.72
