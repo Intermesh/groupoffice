@@ -70,7 +70,12 @@ class Folder extends FileSystemObject {
 	 */
 	public static function tempFolder(): Folder
 	{
-		return go()->getTmpFolder()->getFolder(uniqid(time()));
+		$folder = go()->getTmpFolder()->getFolder(uniqid(time()));
+		while($folder->exists()) {
+			$folder = go()->getTmpFolder()->getFolder(uniqid(time()));
+		}
+		$folder->create();
+		return $folder;
 	}
 
 	/**
