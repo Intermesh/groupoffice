@@ -14,6 +14,7 @@
 namespace go\modules\community\calendar\reports;
 
 
+use go\core\util\DateTime;
 use go\modules\community\calendar\model\CalendarEvent;
 use go\modules\community\calendar\model\RecurrenceRule;
 
@@ -64,7 +65,7 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 		$this->months_short = go()->t("short_months");
 		$this->months_long = go()->t("full_months");
 		$this->days_short = go()->t("short_days");
-		if(\GO::user()->first_weekday==1) { // place sunday at the end
+		if(go()->getAuthState()->getUser()->firstWeekday==1) { // place sunday at the end
 			$this->days_long[] = array_shift($this->days_long);
 			$this->days_short[] = array_shift($this->days_short);
 		}
@@ -86,7 +87,7 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 		$this->SetX($x);
 		$this->Cell($width, 5, $this->GetPage(), 0,0,'C');
 		$this->SetX($x);
-		$this->Cell($width, 5, \GO\Base\Util\Date::format(date('Y-m-d H:i')), 0,0,'R');
+		$this->Cell($width, 5, (new DateTime())->toUserFormat(true), 0,0,'R');
 	}
 
 	public function setEvents($events){
@@ -96,20 +97,15 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 		$this->events = [];
 		foreach($events as $event) {
 			if($event->isRecurring()) {
-				foreach(RecurrenceRule::expand($event, $start->format('Y-m-d'), $this->end->format('Y-m-d')) as $rId => $instance) {
-					$instance->start =$instance->utcStart;
-					$this->add($rId.'-'.$event->id, $instance);
+				foreach(RecurrenceRule::expand($event, $start->format('Y-m-d'), $this->end->format('Y-m-d')) as $instance) {
+					$this->add($instance->start(false, go()->getAuthState()->getUser()->timezone)->format('Y-m-d\TH:i:s').'-'.$event->id, $instance);
 				}
 			} else {
-				$event->utcStart = $event->start();
-				$event->utcEnd = $event->end();
-				$this->add($event->start()->format('Y-m-d\TH:i:s').'-'.$event->id, $event);
+				$this->add($event->start(false, go()->getAuthState()->getUser()->timezone)->format('Y-m-d\TH:i:s').'-'.$event->id, $event);
 			}
 		}
-
 		ksort($this->events);
 
-		//$this->events = $this->orderEvents($events);
 	}
 
 	protected function add($key, $instance) {

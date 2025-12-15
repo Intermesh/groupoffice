@@ -7,6 +7,7 @@ use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\http;
 use go\core\model\Acl;
+use go\core\model\Group;
 use go\core\model\Principal;
 use go\core\model\User;
 use go\core\orm\CustomFieldsTrait;
@@ -155,13 +156,13 @@ class Calendar extends AclOwnerEntity {
 		$this->color = $value;
 	}
 
-	protected function getDefaultCreatedBy(): ?int
-	{
-		if(!empty($this->ownerId)) {
-			return $this->ownerId;
-		}
-		return parent::getDefaultCreatedBy();
-	}
+//	protected function getDefaultCreatedBy(): ?int
+//	{
+//		if(!empty($this->ownerId)) {
+//			return $this->ownerId;
+//		}
+//		return parent::getDefaultCreatedBy();
+//	}
 
 
 	protected static function defineFilters(): Filters
@@ -249,6 +250,11 @@ class Calendar extends AclOwnerEntity {
 				->selectSingleValue('defaultOwnerId')
 				->where('id', '=', $this->groupId)
 				->single();
+			$groupId = Group::findPersonalGroupID($this->ownerId);
+			if($groupId) {
+				$this->createAcl();
+				$this->findAcl()->addGroup($groupId, Acl::LEVEL_MANAGE);
+			}
 		}
 		if($this->isModified('defaultAlertsWithTime')) {
 			$this->updateEventAlerts($this->defaultAlertsWithTime);

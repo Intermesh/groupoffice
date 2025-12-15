@@ -7,6 +7,7 @@
 
 namespace go\modules\community\calendar\model;
 
+use DateInterval;
 use DateTimeInterface;
 use DateTimeZone;
 use Exception;
@@ -144,9 +145,6 @@ class CalendarEvent extends AclItemEntity {
 	 * @var ?DateTimeInterface|null
 	 */
 	public ?DateTimeInterface $start;
-
-	public $utcStart;
-	public $utcEnd;
 
 	/**
 	 * The duration of the event (or the occurence)
@@ -465,21 +463,33 @@ class CalendarEvent extends AclItemEntity {
 //		$this->title = $value;
 //	}
 
-	public function start($withoutTime = false) {
+	public function start($withoutTime = false, string|null $setTimeZoneTo = null): DateTime
+	{
 		if(!isset($this->start)) {
-			$this->start = new \DateTime();
+			$this->start = new DateTime();
 		}
-		return new \DateTime($this->start->format("Y-m-d". ($withoutTime?'':" H:i:s")), $this->timeZone());
+		$dt = new DateTime($this->start->format("Y-m-d". ($withoutTime?'':" H:i:s")), $this->timeZone());
+		if(isset($setTimeZoneTo)) {
+			$dt->setTimezone(new DateTimeZone($setTimeZoneTo));
+		}
+		return $dt;
 	}
 
-	public function end($withoutTime = false) {
+	public function end($withoutTime = false, string|null $setTimeZoneTo = null): DateTime
+	{
 		if(empty($this->start)) {
 			$end = new DateTime();
 		} else {
 			$end = $this->start();
 		}
 		if(!empty($this->duration))
-			$end->add(new \DateInterval($this->duration));
+			$end->add(new DateInterval($this->duration));
+
+
+		if(isset($setTimeZoneTo)) {
+			$end->setTimezone(new DateTimeZone($setTimeZoneTo));
+		}
+
 		return $end;
 	}
 
@@ -488,19 +498,20 @@ class CalendarEvent extends AclItemEntity {
 	 * Would be 2 datetimes, 1 date and 2 times if same day, or just 1 or 2 dates when full-day(s)
 	 * @return string[] 2 lines of human readable text
 	 */
-	public function humanReadableDate()
+	public function humanReadableDate(string|null $setTimeZoneTo = null): array
 	{
-		$start = $this->start;
+		$start = $this->start(false, $setTimeZoneTo);
+
 		$end = $this->end();
 		$oneDay = $start->format('Ymd') === $end->format('Ymd');
-		$line1 = go()->t($oneDay ? 'At' : 'From') . ' ' .
+		$line1 = go()->t($oneDay ? 'At' : 'From', 'community', 'calendar') . ' ' .
 			go()->t($start->format('l')) .
 			$start->format(' j ') . go()->t('full_months')[$start->format('n')] .
 			$start->format(' Y');
 		if (!$oneDay) {
 			if (!$this->showWithoutTime)
 				$line1 .= ', ' . $start->format('H:i');
-			$line1 .= ' ' . go()->t('until');
+			$line1 .= ' ' . go()->t('until', 'community', 'calendar');
 		}
 		if ($oneDay) {
 			$line2 = $start->format('H:i') . ' - ' . $end->format('H:i');
@@ -1084,7 +1095,7 @@ class CalendarEvent extends AclItemEntity {
 		if($this->isModified('recurrenceRule')) {
 			$r = $this->getRecurrenceRule();
 			if (isset($r->until)) {
-				$until = (new DateTime($r->until, $this->timeZone()))->add(new \DateInterval($this->duration));
+				$until = (new DateTime($r->until, $this->timeZone()))->add(new DateInterval($this->duration));
 				if ($this->lastOccurrence === null || $until > $this->lastOccurrence) {
 					$this->lastOccurrence = $until;
 				}
@@ -1099,7 +1110,7 @@ class CalendarEvent extends AclItemEntity {
 						if ($dt > $this->lastOccurrence) $this->lastOccurrence = $dt;
 						$it->next();
 					}
-					$this->lastOccurrence->add(new \DateInterval($this->duration));
+					$this->lastOccurrence->add(new DateInterval($this->duration));
 				}
 			}
 		}
@@ -1124,6 +1135,12 @@ class CalendarEvent extends AclItemEntity {
 		return ['calendarId' => 'id'];
 	}
 
+	protected function getSearchModifiedAt(): DateTimeInterface
+	{
+		return $this->start();
+	}
+
+
 	protected function getSearchDescription(): string
 	{
 		$calendar = Calendar::findById($this->calendarId, ['name'], true);
@@ -1138,7 +1155,7 @@ class CalendarEvent extends AclItemEntity {
 	 * When the series start time changes all the recurrence id's must be recreated.
 	 *
 	 * @return void
-	 * @throws \DateMalformedStringException
+	 * @throws Exception
 	 */
 	private function reindexRecurrenceOverrides(): void
 	{

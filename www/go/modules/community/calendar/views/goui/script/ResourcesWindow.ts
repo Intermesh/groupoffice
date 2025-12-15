@@ -76,8 +76,9 @@ export class ResourceWindow extends FormWindow {
 			{value: 10,name: t("Read items")},
 			//{value: 20,name: t("Update private")},
 			{value: 25,name: t("Approve / Disapprove")}, // RSVP
-			//{value: 30,name: t("Write own")},
-			//{value: 35,name: t("Write all")},
+			{value: 30,name: t("Write own")},
+			{value: 35,name: t("Write all")},
+			{value: 40,name: t("Write / Delete")},
 			{value: 50,name: t("Manage")}
 		]);
 	}

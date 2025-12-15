@@ -73,9 +73,9 @@ class Week extends Calendar {
 	protected function add($key, $instance) {
 		if($instance->showWithoutTime) {
 			$this->early[$key] = $instance;
-		} else if($this->getMinuteOfDay($instance->utcEnd) > 1140) { // 19:00
+		} else if($this->getMinuteOfDay($instance->end(false, go()->getAuthState()->getUser()->timezone)) > 1140) { // 19:00
 			$this->late[$key] = $instance;
-		} else if($this->getMinuteOfDay($instance->utcStart) < 420) { // 7:00
+		} else if($this->getMinuteOfDay($instance->start(false, go()->getAuthState()->getUser()->timezone)) < 420) { // 7:00
 			$this->early[$key] = $instance;
 		} else {
 			$this->events[$key] = $instance;
@@ -154,13 +154,13 @@ class Week extends Calendar {
 		$i=0;
 		foreach($this->early as $event) {
 			if($this->dayCount == 1 && $event->showWithoutTime) continue; // don't show fullday here in day view
-			if ($event->utcStart->format('Ymd') <= $dayStart && $event->utcEnd->format('Ymd') >= $dayStart) {
+			if ($event->start(false, go()->getAuthState()->getUser()->timezone)->format('Ymd') <= $dayStart && $event->start(false, go()->getAuthState()->getUser()->timezone)->format('Ymd') >= $dayStart) {
 				if ($i > 2) { //stop after 3 full day events and draw a triangle
 					$this->Image(self::IMG_PATH . 'arrow_down.png', $left + ($w + 1) * $width - 4, 48 + 5 * $i, 3, 3, 'PNG');
 					break;
 				}
 				$this->SetXY($x, 48 + 5 * $i);
-				$time = $event->showWithoutTime ? '' : $event->utcStart->format('G:i') . ' - ' . $event->utcEnd->format('G:i') . ' ';
+				$time = $event->showWithoutTime ? '' : $event->start(false, go()->getAuthState()->getUser()->timezone)->format('G:i') . ' - ' . $event->end(false, go()->getAuthState()->getUser()->timezone)->format('G:i') . ' ';
 				$this->EventCell($time . $event->title, $width, 5);
 				//$this->Cell($colWidth, 5 , $event->name, 1, 1, 'L', true);
 				$i++;
@@ -175,13 +175,13 @@ class Week extends Calendar {
 		$this->SetXY($x ,$this->headerHeight+209);
 		$i=0;
 		foreach($this->late as $event) {
-			if ($event->utcStart->format('Ymd') <= $dayStart && $event->utcEnd->format('Ymd') >= $dayStart) {
+			if ($event->start()->format('Ymd') <= $dayStart && $event->end()->format('Ymd') >= $dayStart) {
 				if ($i > 2) { //stop after 3 full day events and draw a triangle
 					$this->Image(self::IMG_PATH . 'arrow_down.png', $left + ($w + 1) * $width - 4, 252 + $this->rowHeight * $i, 3, 3, 'PNG');
 					break;
 				}
 				$this->SetXY($left + $w * $width, 255 + $this->rowHeight * $i);
-				$this->EventCell($event->utcStart->format('G:i') . ' - ' . $event->utcEnd->format('G:i') . ' ' . $event->title, $width, $this->rowHeight);
+				$this->EventCell($event->start(false, go()->getAuthState()->getUser()->timezone)->format('G:i') . ' - ' . $event->end(false, go()->getAuthState()->getUser()->timezone)->format('G:i') . ' ' . $event->title, $width, $this->rowHeight);
 				$i++;
 			}
 		}
@@ -203,11 +203,11 @@ class Week extends Calendar {
 
 		while (isset($this->events[$this->iter])) {
 			$e = $this->events[$this->iter];
-			if($e->utcStart >= $end) {
+			if($e->start(false, go()->getAuthState()->getUser()->timezone) >= $end) {
 				break;
 			}
 			$this->iter++;
-			if ($e->utcEnd > $dayStart) {
+			if ($e->end(false, go()->getAuthState()->getUser()->timezone) > $dayStart) {
 				$this->continues[] = $e;
 			}
 		}
@@ -218,7 +218,7 @@ class Week extends Calendar {
 		$this->SetLineWidth(0.3);
 		while ($e = array_shift($this->continues)) {
 			$this->drawEvent($w*$width, $width, $e);
-			if ($e->utcEnd > $end) {
+			if ($e->end(false, go()->getAuthState()->getUser()->timezone) > $end) {
 				$stillContinuing[] = $e; // push it back for next week
 			}
 		}
@@ -246,7 +246,7 @@ class Week extends Calendar {
 			break;
 		}
 		for ($i = $first; $i < count($events); $i++) {
-			$this->eventOptions[$events[$i]->id.'-'.$this->currentDay] = ['start'=>$events[$i]->utcStart, 'end'=>$events[$i]->utcEnd, 'lanes'=>1]; // current item
+			$this->eventOptions[$events[$i]->id.'-'.$this->currentDay] = ['start'=>$events[$i]->start(false, go()->getAuthState()->getUser()->timezone), 'end'=>$events[$i]->end(false, go()->getAuthState()->getUser()->timezone), 'lanes'=>1]; // current item
 			$a =& $this->eventOptions[$events[$i]->id.'-'.$this->currentDay];
 			$a['startM'] = $a['start']->format('Ymd') < $dayStart->format('Ymd') ? 0 : $this->getMinuteOfDay($a['start']);
 			$a['endM'] = $a['end']->format('Ymd') > $dayStart->format('Ymd') ? 1440 : $this->getMinuteOfDay($a['end']);
