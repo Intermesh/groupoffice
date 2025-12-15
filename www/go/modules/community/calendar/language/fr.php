@@ -67,6 +67,7 @@ return [
 	'Year'=>'Année',
 	'Workweek' =>'Semaine de travail',
     'Wk' => 'Sem',
+    'W ' => 'S ',
     'year' => 'année',
 
     // Recuring field
