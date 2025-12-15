@@ -1,4 +1,5 @@
 15-12-2025: 6.8.147 
+- Email: fixed reading email with a large base64 encoded resource while blocking external images
 - Files: Make sure log files folder is protected
 - Projects2: add set method to entity controller in order to edit custom fieldstets.
 
