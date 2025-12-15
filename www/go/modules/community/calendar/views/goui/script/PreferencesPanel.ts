@@ -127,7 +127,7 @@ export class PreferencesPanel extends Component {
 		this.calendarStore.load().catch(e => Notifier.error(e))
 	}
 
-	// onSubmit() {
-	// 	return this.form.submit()
-	// }
+	onSubmit() {
+		return this.form.submit()
+	}
 }
