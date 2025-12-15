@@ -1,3 +1,4 @@
+- Core: somewhat more helpful error reporting when user cannot be automatically imported from email
 - Projects3: Correctly uninstall projects3 and overwrite when reinstalling.
 
 08-12-2025: 25.0.73

@@ -1572,7 +1572,7 @@ public function historyLog(): bool|array
 		if (!$user) {
 
 			if(!go()->getSettings()->allowRegistration) {
-				throw new NotFound("User not found and registration not allowed");
+				throw new NotFound("User $username not found and registration not allowed");
 			}
 
 			$user = new User();
