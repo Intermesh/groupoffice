@@ -669,7 +669,7 @@ a {
 }
 
 
-.go-search-panel {
+.go-search-panel:not(.x-panel-collapsed) {
 	//border: 1px solid var(--fg-line);
 	@extend .z24
 }

@@ -23,7 +23,7 @@ class Authenticator extends PrimaryAuthenticator
 
 	public static function isAvailableFor(string $username): bool
 	{
-		if(Module::isInstalled("community", "ldapauth") && \go\modules\community\ldapauthenticator\model\Authenticator::isAvailableFor($username)) {
+		if(Module::isInstalled("community", "ldapauthenticator") && \go\modules\community\ldapauthenticator\model\Authenticator::isAvailableFor($username)) {
 			return false;
 		}
 
