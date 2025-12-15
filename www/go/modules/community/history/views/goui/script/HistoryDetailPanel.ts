@@ -24,7 +24,7 @@ export class HistoryDetailPanel extends Component {
 						text: t("History")
 					}),
 					"->",
-					collapsebtn({collapseEl: this.grid})
+					collapsebtn({target: this.grid})
 				),
 				comp({
 					cls: "scroll",

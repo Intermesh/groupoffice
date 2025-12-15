@@ -78,6 +78,7 @@ export class Main extends MainThreeColumnPanel {
 			}, this.noteBookGrid = notebookgrid({
 				headers: false,
 				fitParent: true,
+				stateId: "notes-noteBookGrid",
 				cls: "no-row-lines",
 				rowSelectionConfig: {
 					multiSelect: true,
