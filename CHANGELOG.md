@@ -1,3 +1,5 @@
+- Projects3: Correctly uninstall projects3 and overwrite when reinstalling.
+
 08-12-2025: 25.0.73
 - Calendar: Fixed various print issues
 - Notifications: removed open_settings panel config. and do not open the panel when checker.js find a notification on boot
