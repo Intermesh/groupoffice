@@ -174,12 +174,13 @@ class Module extends core\Module
 	public function pagePrintList($start, $end) {
 
 		go()->setAuthState(new core\jmap\State());
+
 		$calendarIds = Calendar::find()->selectSingleValue('calendar_calendar.id')
 			->where('caluser.isVisible', '=',1)->andWhere('caluser.isSubscribed','=', true)->all();
 
 		$report = new reports\ListView();
 		$report->day = new DateTime($start);;
-		$report->end = new DateTime($end);;
+		$report->end = new DateTime($end);
 		$report->calendarIds = $calendarIds;
 		$report->render();
 

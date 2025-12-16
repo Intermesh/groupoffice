@@ -22,9 +22,14 @@ class ListView extends Calendar {
 
 		$this->Write(12, implode(' & ', array_map(fn($c) => $c->name, $this->calendars)));									// Print the name of the calendars that are printed in the view.
 
-		$range = $this->day->format('d-m-Y') . ' - ' . $this->end->format('d-m-Y');
-		$this->Cell($this->getPageWidth() - $this->getX() - $this->rMargin, 12, $range, 0, 0, 'R');
+		$range = $this->day->toUserFormat();
 
+		$end = (clone $this->end)->sub(new \DateInterval("P1D"))->toUserFormat();
+
+		if($range != $end) {
+			$range .= " - ". $end;
+			$this->Cell($this->getPageWidth() - $this->getX() - $this->rMargin, 12, $range, 0, 0, 'R');
+		}
 	}
 
 	public function render() {
@@ -54,9 +59,10 @@ class ListView extends Calendar {
 
 		$curDate = null;
 		foreach($this->events as $event) {
-			$date = $event->utcStart->format('Y-m-d');
+			$start = $event->start();
+			$date = $start->format('Y-m-d');
 			if($curDate !== $date) {
-				$this->WriteHtml('<h2>'.$fullDays[$event->utcStart->format('w')] . ', ' . $event->utcStart->format(go()->getAuthState()->getUser()->dateFormat).'</h2>');
+				$this->WriteHtml('<h2>'.$fullDays[$start->format('w')] . ', ' . $start->format(go()->getAuthState()->getUser()->dateFormat).'</h2>');
 				$curDate = $date;
 			}
 			$this->WriteHtml($this->quickText($event), false);
@@ -77,7 +83,7 @@ class ListView extends Calendar {
 		$lines[] = '<b>' . $event->title . '</b><br>' . $cal;
 
 		// Assuming humanReadableDate() returns an array of strings
-		$lines[] =  implode(' ',$event->humanReadableDate());
+		$lines[] =  implode(' ',$event->humanReadableDate(go()->getAuthState()->getUser()->timezone));
 
 		if ($event->isRecurring()) {
 			$lines[] = model\RecurrenceRule::humanReadable($event);
