@@ -1146,7 +1146,11 @@ class CalendarEvent extends AclItemEntity {
 		$calendar = Calendar::findById($this->calendarId, ['name'], true);
 
 		$u = go()->getAuthState()->getUser();
-		$format = $u ? $u->dateFormat : "d-m-Y";
+		if($this->showWithoutTime) {
+			$format = $u ? $u->dateFormat : "d-m-Y";
+		} else {
+			$format = $u ? $u->dateFormat . ' '. $u->timeFormat : "d-m-Y H:i";
+		}
 
 		return $calendar->name .': '. $this->title . ' - '. $this->start->format($format);
 	}
