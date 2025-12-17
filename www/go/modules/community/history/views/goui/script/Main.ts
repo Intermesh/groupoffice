@@ -98,6 +98,7 @@ export class Main extends Component {
 				})
 			),
 			list({
+				cls: "checkbox-list",
 				store: store({
 					data: [
 						{id: "create", label: t("Create")},

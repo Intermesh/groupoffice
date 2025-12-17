@@ -42,7 +42,7 @@ export class Main extends MainThreeColumnPanel {
 
 	protected createWest() {
 		return comp({
-				cls: "vbox",
+				cls: "scroll",
 				width: 300,
 			},
 			tbar({},
@@ -74,11 +74,11 @@ export class Main extends MainThreeColumnPanel {
 				this.showCenterButton()
 			),
 			comp({
-				flex: 1,
-				cls: "scroll"
+				flex: 1
 			}, this.noteBookGrid = notebookgrid({
 				headers: false,
 				fitParent: true,
+				stateId: "notes-noteBookGrid",
 				cls: "no-row-lines",
 				rowSelectionConfig: {
 					multiSelect: true,
@@ -115,17 +115,17 @@ export class Main extends MainThreeColumnPanel {
 					}),
 
 					menucolumn({
-						menu: menu({
-								listeners: {
-									show: ({target}) => {
-										const record = this.noteBookGrid.store.get(target.dataSet.rowIndex)!;
+							menu: menu({
+									listeners: {
+										show: ({target}) => {
+											const record = this.noteBookGrid.store.get(target.dataSet.rowIndex)!;
 
-										target.findChild("edit")!.disabled = record.permissionLevel < AclLevel.MANAGE;
-										target.findChild("delete")!.disabled = !go.Modules.get("community", 'notes').userRights.mayChangeNoteBooks || record.permissionLevel < AclLevel.MANAGE;
+											target.findChild("edit")!.disabled = record.permissionLevel < AclLevel.MANAGE;
+											target.findChild("delete")!.disabled = !go.Modules.get("community", 'notes').userRights.mayChangeNoteBooks || record.permissionLevel < AclLevel.MANAGE;
 
+										}
 									}
-								}
-							},
+								},
 								btn({
 									itemId: "edit",
 									icon: "edit",
@@ -166,7 +166,7 @@ export class Main extends MainThreeColumnPanel {
 
 	protected createCenter() {
 		this.noteGrid = new NoteGrid();
-
+		this.noteGrid.stateId = "notes-noteGrid";
 		this.noteGrid.rowSelectionConfig = {
 			multiSelect: true,
 			listeners: {

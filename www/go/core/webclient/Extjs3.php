@@ -286,7 +286,7 @@ class Extjs3 {
 
 	public $density = 140;
 
-	private $gouiScripts;
+	private $gouiScripts = [];
 	private $goScripts = [];
 	private $cacheFile = null; // stays null when debugging
 

@@ -90,7 +90,7 @@ export class CommentsPanel extends Component {
 				}),
 				collapsebtn({
 					stateId: "comments-collapser",
-					collapseEl: b => b.parent!.nextSibling()!
+					target: b => b.parent!.nextSibling()!
 				}),
 			),
 			comp({},

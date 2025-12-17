@@ -1,30 +1,38 @@
 <?php
+
 namespace go\modules\community\oidc\model;
 
 use go\core\auth\PrimaryAuthenticator;
+use go\core\model\Module;
 
 /**
  * OIDC Authenticator
- * 
+ *
  * @license AGPL/Proprietary http://www.group-office.com/LICENSE.TXT
  * @link http://www.group-office.com
  * @copyright Copyright Intermesh BV
- * @author Merijn Schering <mschering@intermesh.nl> 
+ * @author Merijn Schering <mschering@intermesh.nl>
  */
-class Authenticator extends PrimaryAuthenticator {
-	
-	public static function id() : string {
+class Authenticator extends PrimaryAuthenticator
+{
+
+	public static function id(): string
+	{
 		return "oidc";
 	}
 
-	public static function isAvailableFor(string $username) : bool
+	public static function isAvailableFor(string $username): bool
 	{
+		if(Module::isInstalled("community", "ldapauthenticator") && \go\modules\community\ldapauthenticator\model\Authenticator::isAvailableFor($username)) {
+			return false;
+		}
+
 		return go()->getDbConnection()
-			->select("username")
-			->from("oidc_user", 'o')
-			->join('core_user', 'u', 'u.id = o.userId')
+				->select("username")
+				->from("oidc_user", 'o')
+				->join('core_user', 'u', 'u.id = o.userId')
 				->where('username', '=', $username)
-			->single() !== null;
+				->single() !== null;
 	}
 
 }
