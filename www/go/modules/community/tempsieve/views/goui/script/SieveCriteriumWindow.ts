@@ -23,7 +23,7 @@ import {SieveRuleWindow} from "./SieveRuleWindow";
 
 export class SieveCriteriumWindow extends Window {
 
-	private form: Form;
+	public form: Form;
 	private formFs: Fieldset;
 	private testFld: TextField;
 	private cmbField: SelectField;
@@ -51,10 +51,6 @@ export class SieveCriteriumWindow extends Window {
 		this.accountId = accountId;
 		this.form = form({
 				cls: "flow",
-				handler: form1 => {
-					const crit = this.mangleCriterium(form1.value);
-
-				}
 			},
 			this.formFs = fieldset({}),
 			tbar({
@@ -228,6 +224,7 @@ export class SieveCriteriumWindow extends Window {
 				this.setOperator(record);
 				break;
 			case "body":
+				this.cmbField.value = "body";
 				this.txtCriteriumFld.value = record.arg;
 				this.setOperator(record);
 				break;
@@ -293,7 +290,7 @@ export class SieveCriteriumWindow extends Window {
 	 * @param values
 	 * @private
 	 */
-	private mangleCriterium(values: any): SieveCriteriumEntity {
+	public mangleCriterium(values: any): SieveCriteriumEntity {
 		const crit: SieveCriteriumEntity = {
 			id: "crit_" + this.itemIndex,
 			not: false,

@@ -9,13 +9,13 @@ import {
 export interface SieveRuleEntity extends DefaultEntity {
 	name: string,
 	index: number,
-	script_name: string,
+	scriptName: string,
 	active: boolean
 }
 
 export interface SieveScriptEntity extends DefaultEntity {
-	name: string,
-	script_name: string,
+	// name: string,
+	// script_name: string,
 	active: boolean
 }
 
@@ -26,6 +26,15 @@ export interface SieveCriteriumEntity extends DefaultEntity {
 	type: string,
 	arg1: string,
 	arg2: string
+}
+export interface SieveActionEntity extends DefaultEntity {
+	type: string,
+	// copy: string,
+	target: string,
+	days: string,
+	addresses: string,
+	reason: string,
+	subject: string|null
 }
 
 modules.register(  {

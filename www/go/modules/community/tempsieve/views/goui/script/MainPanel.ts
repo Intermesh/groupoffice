@@ -15,14 +15,14 @@ import {
 	tbar,
 	datasourcestore,
 	Window,
-	select
+	select, combobox, ComboBox, autocomplete, AutocompleteField, store
 } from "@intermesh/goui";
 import {
 	jmapds,
 	MainThreeColumnPanel,
 	User
 } from "@intermesh/groupoffice-core";
-import {SieveRuleEntity} from "./Index";
+import {SieveRuleEntity, SieveScriptEntity} from "./Index";
 import {SieveRuleWindow} from "./SieveRuleWindow";
 
 
@@ -31,7 +31,7 @@ export class MainPanel extends MainThreeColumnPanel {
 	private accountId: string | undefined;
 	private successCmp: Component | undefined;
 	private warningCmp: Component | undefined;
-	private scriptsCombo: SelectField | undefined;
+	private scriptsCombo: AutocompleteField | undefined;
 	private rulesGrid: Component | undefined;
 	private oooPanel: Component | undefined;
 
@@ -120,35 +120,70 @@ export class MainPanel extends MainThreeColumnPanel {
 		}
 
 		const p1 = go.Jmap.request({
-				method: "community/tempsieve/Sieve/rules",
-				params: {accountId: id},
+				method: "community/tempsieve/SieveScript/get",
+				params: {
+					accountId: id
+				},
 			}),
 			p2 = go.Jmap.request({
-				method: "community/tempsieve/Sieve/ooo",
-				params: {accountId: id},
-			}),
-			p3 = go.Jmap.request({
-				method: "community/tempsieve/Sieve/scripts",
-				params: {accountId: id},
-			});
-		Promise.all([p1, p2, p3]).then(arResult => {
-			if (arResult[0].success) {
-				this.renderRulesTable(arResult[0].rules);
-				this.scriptsCombo!.options = arResult[2].results;
-				this.scriptsCombo!.value = arResult[2].active;
-				// console.log(arResult[0].rules);
-			}
-			if (arResult[1].success) {
-				this.oooPanel!.html = arResult[1].ooo;
-			}
+					method: "community/tempsieve/VacationResponse/get",
+					params: {
+						filter: {
+							accountId: id
+						}
+					}
+				}
+			);
+		Promise.all([p1, p2]).then(arResult => {
+			const activeRuleSet = arResult[0].list.find((i: any) => i.active);
+			this.renderRulesTable(activeRuleSet);
+			this.scriptsCombo!.list.store.loadData(arResult[0].list);
+			this.scriptsCombo!.value = activeRuleSet.id;
+			this.oooPanel!.html = "TODO: Out of Office / vacation";
 		});
 	}
 
-	private renderRulesTable(result: SieveRuleEntity[]) {
-		this.scriptsCombo = select({
+	private renderRulesTable(script: SieveScriptEntity) {
+		this.scriptsCombo = autocomplete({
 			label: t("Filterset"),
 			name: "filterset",
-			options: []
+
+			pickerRecordToValue: (field, record) => {
+				return record.id;
+			},
+
+			async valueToTextField(field, value: any): Promise<string> {
+				const record = field.list.store.find(r => r.id == value);
+				let r = "";
+				if (record) {
+					r = value;
+					if (record.active) {
+						r += " (" + t("Active") + ")";
+					}
+				}
+				return r;
+			},
+
+			list: table({
+				headers: false,
+				fitParent: true,
+				store: store(),
+				columns: [
+					column({
+						header: "id",
+						id: "id",
+						sortable: true,
+						resizable: true,
+						renderer: (v, record) => {
+							let r = v;
+							if (record.active) {
+								r += " (" + t("Active") + ")";
+							}
+							return r;
+						}
+					})
+				]
+			})
 		});
 		const tbl = table({
 			fitParent: false,
@@ -160,12 +195,12 @@ export class MainPanel extends MainThreeColumnPanel {
 					header: t("Sieve rule"),
 				}),
 				column({
-					id: "active",
+					id: "disabled",
 					header: t("Active"),
 					width: 120,
 					align: "right",
 					renderer: (v) => {
-						return v ? t("Yes") : t("No");
+						return v ? t("No") : t("Yes");
 					}
 				}),
 				column({
@@ -180,13 +215,13 @@ export class MainPanel extends MainThreeColumnPanel {
 			listeners: {
 				rowdblclick: ({storeIndex}) => {
 					const record: SieveRuleEntity = tbl.store.get(storeIndex) as SieveRuleEntity;
+					record.index = storeIndex;
 					const win = new SieveRuleWindow(this.accountId!);
 					void win.load(record);
 					win.show();
 				}
 			}
 		});
-		tbl.store.loadData(result, false);
 		this.rulesGrid!.items.add(comp({
 				cls: "vbox pad",
 			},
@@ -194,6 +229,7 @@ export class MainPanel extends MainThreeColumnPanel {
 				this.scriptsCombo,
 				btn({
 					text: t("Activate"),
+					disabled: true, // TODO
 					handler: async () => {
 						const c = await Window.confirm(t("Are you sure you want to activate this Sieve script?"), t("Confirm"));
 						if (c) {
@@ -210,11 +246,27 @@ export class MainPanel extends MainThreeColumnPanel {
 				btn({
 					cls: "primary filled",
 					icon: "add",
-					handler: async () => {}
+					disabled: true,
+					handler: async () => {
+					}
 				})
 			),
 			tbl
 		));
+		// TODO: Parse rules for current script from BLOB
+		// go.Jmap.request({
+		// 	method: "community/tempsieve/Rule/get",
+		// 	params: {
+		// 		filter: {
+		// 			accountId: this.accountId,
+		// 			scriptName: script.id
+		// 		}
+		// 	}
+		// }).then((result: any) => {
+		// 	console.log(result.list);
+		// 	tbl.store.loadData(result.list, false);
+		// });
+
 	}
 
 	private renderActions(record: SieveRuleEntity) {
@@ -229,6 +281,7 @@ export class MainPanel extends MainThreeColumnPanel {
 		}), deleteBtn = btn({
 			text: "Delete",
 			icon: "delete",
+			disabled: true, // TODO
 			handler: async () => {
 				const c = await Window.confirm(t("Are you sure that you want to delete this rule?"), t("Confirm"));
 				if (c) {

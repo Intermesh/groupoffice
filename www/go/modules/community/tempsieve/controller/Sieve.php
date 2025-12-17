@@ -10,54 +10,21 @@ use go\modules\community\tempsieve\util\Sieve as SieveUtil;
 
 final class Sieve extends Controller
 {
+	use SieveControllerTrait;
 
-	private ?string $sieveError;
-	private SieveUtil $sieve;
-
-	public function __construct()
-	{
-		parent::__construct();
-		$this->sieve = new SieveUtil();
-	}
-
-	/**
-	 * @return bool
-	 * @throws \Exception
-	 * @throws Unauthorized
-	 */
-	private function connect(string $accountId): bool
-	{
-		$accountModel = Account::findById($accountId);
-
-		if (!empty($accountModel)) {
-			$connectResponse = $this->sieve->connect(
-				$accountModel->username,
-				$accountModel->decryptPassword(),
-				$accountModel->host,
-				$accountModel->sieve_port,
-				null,
-				!empty($accountModel->sieve_usetls)
-			);
-		}
-		if (empty($connectResponse)) {
-			$this->sieveError = 'Sorry, manage sieve filtering not supported on ' . $accountModel->host . ' using port ' . $accountModel->sieve_port;
-			return false;
-		}
-
-		return true;
-
-	}
 
 	/**
 	 * @param array $params
 	 * @return true[]
 	 * @throws Exception
+	 * @throws Unauthorized
 	 */
 	public function isSupported(array $params): array
 	{
 		if (!isset($params['accountId'])) {
 			throw new Exception(412, "Required 'accountId' parameter missing");
 		}
+
 		$isSupported = $this->connect($params['accountId']);
 
 		return ['success' => true, 'isSupported' => $isSupported, 'message' => $this->sieveError ?? null];
@@ -70,7 +37,7 @@ final class Sieve extends Controller
 	 * @return array
 	 * @throws Exception
 	 * @throws Unauthorized
-	 */
+	 * /
 	public function rule(array $params): array
 	{
 		$this->checkInput($params);
@@ -103,7 +70,7 @@ final class Sieve extends Controller
 			switch ($action['type']) {
 				case 'addflag':
 					if ($action['target'] == '\\Seen') {
-						$action['text'] = go()->t("Mark message as read", "sieve");
+						$action['text'] = "Mark message as read";
 					}
 					break;
 				case 'set_read':
@@ -154,7 +121,7 @@ final class Sieve extends Controller
 		}
 		return $response;
 	}
-
+*/
 	/**
 	 * Retrieve sieve rules for currently selected account
 	 *
@@ -163,7 +130,7 @@ final class Sieve extends Controller
 	 * @throws Exception
 	 * @throws Unauthorized
 	 * @throws \Exception
-	 */
+	 * /
 	public function rules(array $params): array
 	{
 		$this->checkInput($params);
@@ -183,8 +150,9 @@ final class Sieve extends Controller
 				$keys = json_decode($params['delete_keys']);
 
 				foreach ($keys as $key) {
-					if ($this->sieve->script->delete_rule($key))
+					if ($this->sieve->script->delete_rule($key)) {
 						$this->sieve->save();
+					}
 				}
 				$response['deleteSuccess'] = true;
 			} catch (\Exception $e) {
@@ -209,71 +177,5 @@ final class Sieve extends Controller
 		$response['success'] = true;
 		return $response;
 	}
-
-	/**
-	 * Get known Sieve scripts for account
-	 *
-	 * @param array $params
-	 * @return array
-	 * @throws Exception
-	 */
-	public function scripts(array $params): array
-	{
-		$this->checkInput($params);
-
-		$response = [];
-		if (!empty($params['activateScriptName'])) {
-			$this->sieve->activate($params['activateScriptName']);
-		}
-
-		$response['active'] = $this->sieve->getActive($params['accountId']);
-		$all_scripts = $this->sieve->getSieveScripts();
-
-		$response['results'] = array();
-		foreach ($all_scripts as $script) {
-			$name = $script;
-
-			if ($script == $response['active']) {
-				$name .= ' (' . go()->t("Active", "sieve") . ')';
-			}
-
-			$response['results'][] = [
-				'value' => $script,
-				'name' => $name,
-				'active' => $script === $response['active']
-			];
-		}
-
-		$response['success'] = true;
-
-		return $response;
-	}
-
-
-	public function ooo(array $params): array
-	{
-		$this->checkInput($params);
-		return ['success' => true, 'ooo' => $params['accountId'] . ': Oooooooohh!']; // @TODO
-	}
-
-
-	/**
-	 * Simple validator for incoming parameters
-	 *
-	 * Check whether at least an account is given. Also try to log in using said account.
-	 *
-	 * @param array $params
-	 * @return void
-	 * @throws Exception
-	 * @throws Unauthorized
-	 */
-	private function checkInput(array $params): void
-	{
-		if (!isset($params['accountId'])) {
-			throw new Exception(412, "Required 'accountId' parameter missing");
-		}
-		if (!$this->connect($params['accountId'])) {
-			throw new Exception(412, "Failed to connect to account '{$params['accountId']}'");
-		}
-	}
+*/
 }

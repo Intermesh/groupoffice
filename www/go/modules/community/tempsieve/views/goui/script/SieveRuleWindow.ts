@@ -1,18 +1,14 @@
 import {
-	arrayfield,
 	btn,
 	checkbox,
 	column,
 	comp,
 	containerfield,
-	Field,
 	Fieldset,
 	fieldset,
 	Form,
 	form,
-	h3,
-	radio,
-	select, store,
+	select,
 	Store,
 	t,
 	table,
@@ -21,11 +17,13 @@ import {
 	textfield,
 	Window
 } from "@intermesh/goui";
-import {SieveRuleEntity} from "./Index";
+import {SieveCriteriumEntity, SieveRuleEntity} from "./Index";
 import {SieveCriteriumWindow} from "./SieveCriteriumWindow";
+import {SieveActionWindow} from "./SieveActionWindow";
 
 export class SieveRuleWindow extends Window {
 	private accountId: string;
+	private idx: number|undefined;
 	private frm: Form;
 	private criteriaFs: Fieldset;
 	private criteriaGrid: Table;
@@ -62,6 +60,10 @@ export class SieveRuleWindow extends Window {
 					const record: any = this.criteriaGrid.store.get(storeIndex);
 					const win = new SieveCriteriumWindow(this.accountId!);
 					void win.load(record, storeIndex);
+					win.form.on("submit",  ({target})=> {
+						this.criteriaGrid.store.replaceAt(storeIndex, win.mangleCriterium(target.value));
+						win.close();
+					});
 					win.show();
 				}
 			}
@@ -76,14 +78,31 @@ export class SieveRuleWindow extends Window {
 					icon: "add",
 					cls: "primary filled",
 					handler: () => {
-						Window.alert("open new criterium window", "TODO")
+						const idx = this.criteriaGrid.store.count()
+						const record: SieveCriteriumEntity = {
+							id: String(idx),
+							index: idx,
+							test: "body",
+							type: "contains",
+							arg: "",
+							arg1: "",
+							arg2: "",
+							not: false
+						}
+						const win = new SieveCriteriumWindow(this.accountId);
+						win.load(record, idx);
+						win.form.on("submit",  ({target})=> {
+							this.criteriaGrid.store.replaceAt(idx, win.mangleCriterium(target.value));
+							win.close();
+						});
+						win.show();
 					}
 				}),
 				btn({
 					icon: "delete",
 					cls: "secondary",
 					handler: () => {
-						Window.alert("delete selected criteria", "TODO");
+						this.deleteFromGrid(this.criteriaGrid);
 					}
 				})
 			),
@@ -105,11 +124,14 @@ export class SieveRuleWindow extends Window {
 			draggable: true,
 			listeners: {
 				rowdblclick: ({storeIndex}) => {
-					void Window.alert("Edit action", "TODO")
 					const record: any = this.actionsGrid.store.get(storeIndex);
-					console.log(record);
-					// const win = new SieveActionWindow(this.accountId!);
-					// void win.load(record);
+					const win = new SieveActionWindow(this.accountId!);
+					void win.load(record, storeIndex);
+					win.form.on("submit",  ({target})=> {
+						this.actionsGrid.store.replaceAt(storeIndex, win.mangleAction(target.value));
+						win.close();
+					});
+					win.show();
 				}
 			}
 		});
@@ -121,14 +143,22 @@ export class SieveRuleWindow extends Window {
 					icon: "add",
 					cls: "primary filled",
 					handler: () => {
-						Window.alert("open new action window", "TODO")
+						const idx = this.actionsGrid.store.count()
+						const win = new SieveActionWindow(this.accountId);
+						win.form.on("submit",  ({target})=> {
+							const record = win.mangleAction(target.value);
+							record.id = String(idx);
+							this.actionsGrid.store.replaceAt(idx, win.mangleAction(target.value));
+							win.close();
+						});
+						win.show();
 					}
 				}),
 				btn({
 					icon: "delete",
 					cls: "secondary",
 					handler: () => {
-						Window.alert("delete selected actions", "TODO");
+						this.deleteFromGrid(this.actionsGrid);
 					}
 				})
 			),
@@ -136,16 +166,16 @@ export class SieveRuleWindow extends Window {
 		);
 		this.frm = form({},
 			fieldset({},
-				containerfield({
-						name: 'data',
-					},
+				// containerfield({
+				// 		name: 'data',
+				// 	},
 					checkbox({
 						type: "switch",
-						label: t("Activate this filter"),
-						name: "active"
+						label: t("Deactivate this filter"),
+						name: "disabled"
 					}),
 					textfield({
-						name: "rule_name",
+						name: "name",
 						label: t("Name"),
 						required: true
 					}),
@@ -166,7 +196,7 @@ export class SieveRuleWindow extends Window {
 							}
 						}
 					})
-				)
+				// )
 			),
 			this.criteriaFs,
 			this.actionsFs,
@@ -184,21 +214,22 @@ export class SieveRuleWindow extends Window {
 	}
 
 	public load(record: SieveRuleEntity) {
-		// console.log(record);
-		go.Jmap.request({
-			method: "community/tempsieve/Sieve/rule",
-			params: {
-				accountId: this.accountId,
-				index: record.index,
-				scriptName: record.script_name
-			}
-		}).then((res: any) => { // TODO
-			// console.log(res);
-			this.frm.value = res;
-			this.criteriaGrid.store.loadData(res.criteria);
-			this.actionsGrid.store.loadData(res.actions);
-			this.title = t("Edit rule") + ": " + res.data.rule_name;
-		})
+		debugger;
+		console.log(record);
+		this.idx = record.index;
+		// go.Jmap.request({
+		// 	method: "community/tempsieve/Sieve/rule",
+		// 	params: {
+		// 		accountId: this.accountId,
+		// 		index: record.index,
+		// 		scriptName: record.script_name
+		// 	}
+		// }).then((res: any) => {
+			this.frm.value = record;
+			this.criteriaGrid.store.loadData(record.tests);
+			this.actionsGrid.store.loadData(record.actions);
+			this.title = `${t("Edit rule")} ${record.index}: ${record.rule_name}`;
+		// })
 	}
 
 	private renderCriterium(record: any) {
@@ -327,7 +358,14 @@ export class SieveRuleWindow extends Window {
 		return  t("Size is bigger than", "sieve") + ' ' + arg;
 	}
 
-	private renderAction(record: SieveRuleEntity) {
-		return JSON.stringify(record);
+	private deleteFromGrid(c: Table)
+	{
+		const selectedRows = c.rowSelection?.getSelected();
+		if (selectedRows?.length === 0 ) {
+			return;
+		}
+		for (const item of selectedRows!) {
+			c.store.remove(item.record);
+		}
 	}
 }

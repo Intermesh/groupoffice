@@ -228,9 +228,7 @@ final class Sieve
 			return $this->setError(self::SIEVE_ERROR_INTERNAL);
 		}
 
-		if (!$name) {
-			$name = $this->current;
-		}
+		$name = $name ?? $this->current;
 
 		if ($this->_PEAR->isError($this->sieve->setActive($name))) {
 			return $this->setError(self::SIEVE_ERROR_ACTIVATE);
