@@ -1,9 +1,6 @@
 import {root} from "@intermesh/goui";
 import {authManager, client, main,  modules, router} from "@intermesh/groupoffice-core";
 
-
-router.newMainLayout = true;
-
 // Todo, make this configurable or auto load?
 client.uri = "/api/";
 
