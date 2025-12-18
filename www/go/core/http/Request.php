@@ -321,7 +321,7 @@ class Request extends Singleton{
 				}
 			}
 
-			$this->host = trim($this->host);
+			$this->host = trim($this->host ?? "");
 		}
 
     // Remove port number from host
