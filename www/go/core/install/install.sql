@@ -1019,41 +1019,6 @@ ALTER TABLE `core_oauth_access_token`
   ADD CONSTRAINT `core_oauth_access_token_ibfk_3` FOREIGN KEY (`clientId`) REFERENCES `core_oauth_client` (`id`) ON DELETE CASCADE;
 
 
-
-CREATE TABLE `core_alert` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `entityTypeId` INT NOT NULL,
-  `entityId` INT NOT NULL,
-  createdBy varchar(60) null,
-  `userId` INT NOT NULL,
-  `triggerAt` DATETIME NOT NULL,
-  `staleAt` DATETIME NULL,
-    tag varchar(50) null,
-  `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
-  `data` text null,
-  sendMail boolean default false not null,
-  isSent boolean default false not null,
-  PRIMARY KEY (`id`),
-  INDEX `dk_alert_entityType_idx` (`entityTypeId` ASC),
-  INDEX `fk_alert_user_idx` (`userId` ASC),
-  CONSTRAINT `fk_alert_entityType`
-    FOREIGN KEY (`entityTypeId`)
-    REFERENCES `core_entity` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_alert_user`
-    FOREIGN KEY (`userId`)
-    REFERENCES `core_user` (`id`)
-    ON DELETE cascade
-    ON UPDATE NO ACTION),
-    constraint core_alert_core_principal_id_fk
-                             foreign key (createdBy) references core_principal (id)
-                                 on delete set null
-    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-create unique index core_alert_entityTypeId_entityId_tag_userId_uindex
-    on core_alert (entityTypeId, entityId, tag, userId);
-
 CREATE TABLE `core_pdf_block` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `pdfTemplateId` bigint(20) UNSIGNED NOT NULL,
@@ -1241,28 +1206,67 @@ alter table core_module
         foreign key (shadowAclId) references core_acl (id);
 
 CREATE TABLE `core_principal`(
-	`id` VARCHAR(60) NOT NULL,
-	`name` VARCHAR(100) NOT NULL,
-	`email` VARCHAR(255) NULL,
-	`type` ENUM('individual', 'group', 'resource', 'location', 'other'),
-	`description` VARCHAR(255) NOT NULL,
-	`timeZone` VARCHAR(129) NULL,
-	`entityTypeId` INT NOT NULL,
-	`avatarId` BINARY(40) NULL,
-	`entityId` INT UNSIGNED NOT NULL,
-	`aclId` INT NOT NULL,
-	PRIMARY KEY (`id`),
-	INDEX `index_core_entity_id` ( `entityTypeId` ),
-	INDEX `index_core_blob_id` ( `avatarId` ),
-	CONSTRAINT `fk_core_principal_core_acl1`
-		FOREIGN KEY (`aclId`)
-			REFERENCES `core_acl` (`id`),
-	CONSTRAINT `lnk_core_entity_core_principal` FOREIGN KEY ( `entityTypeId` )
-		REFERENCES `core_entity`( `id` )
-		ON DELETE Cascade
-		ON UPDATE Cascade,
-	CONSTRAINT `lnk_core_blob_core_principal` FOREIGN KEY ( `avatarId` )
-		REFERENCES `core_blob`( `id` )
-		ON DELETE Restrict
-		ON UPDATE No Action
+                                 `id` VARCHAR(60) NOT NULL,
+                                 `name` VARCHAR(100) NOT NULL,
+                                 `email` VARCHAR(255) NULL,
+                                 `type` ENUM('individual', 'group', 'resource', 'location', 'other'),
+                                 `description` VARCHAR(255) NOT NULL,
+                                 `timeZone` VARCHAR(129) NULL,
+                                 `entityTypeId` INT NOT NULL,
+                                 `avatarId` BINARY(40) NULL,
+                                 `entityId` INT UNSIGNED NOT NULL,
+                                 `aclId` INT NOT NULL,
+                                 PRIMARY KEY (`id`),
+                                 INDEX `index_core_entity_id` ( `entityTypeId` ),
+                                 INDEX `index_core_blob_id` ( `avatarId` ),
+                                 CONSTRAINT `fk_core_principal_core_acl1`
+                                     FOREIGN KEY (`aclId`)
+                                         REFERENCES `core_acl` (`id`),
+                                 CONSTRAINT `lnk_core_entity_core_principal` FOREIGN KEY ( `entityTypeId` )
+                                     REFERENCES `core_entity`( `id` )
+                                     ON DELETE Cascade
+                                     ON UPDATE Cascade,
+                                 CONSTRAINT `lnk_core_blob_core_principal` FOREIGN KEY ( `avatarId` )
+                                     REFERENCES `core_blob`( `id` )
+                                     ON DELETE Restrict
+                                     ON UPDATE No Action
 ) ENGINE = InnoDB;
+
+
+
+
+CREATE TABLE `core_alert`
+(
+    `id`           INT                   NOT NULL AUTO_INCREMENT,
+    `entityTypeId` INT                   NOT NULL,
+    `entityId`     INT                   NOT NULL,
+    createdBy      varchar(60) null,
+    `userId`       INT                   NOT NULL,
+    `triggerAt`    DATETIME              NOT NULL,
+    `staleAt`      DATETIME NULL,
+    tag            varchar(50) null,
+    `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
+    `data`         text null,
+    sendMail       boolean default false not null,
+    isSent         boolean default false not null,
+    PRIMARY KEY (`id`),
+    INDEX          `dk_alert_entityType_idx` (`entityTypeId` ASC),
+    INDEX          `fk_alert_user_idx` (`userId` ASC),
+    CONSTRAINT `fk_alert_entityType`
+        FOREIGN KEY (`entityTypeId`)
+            REFERENCES `core_entity` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE NO ACTION,
+    CONSTRAINT `fk_alert_user`
+        FOREIGN KEY (`userId`)
+            REFERENCES `core_user` (`id`)
+            ON DELETE cascade
+            ON UPDATE NO ACTION,
+    constraint core_alert_core_principal_id_fk
+        foreign key (createdBy) references core_principal (id)
+            on delete set null
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE =utf8mb4_unicode_ci;
+
+create unique index core_alert_entityTypeId_entityId_tag_userId_uindex
+    on core_alert (entityTypeId, entityId, tag, userId);
