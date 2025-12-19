@@ -1,4 +1,7 @@
 <?php
+/**
+ * @deprecated - Rewrite into TypeScript using current RFCs
+ */
 
 namespace go\modules\community\tempsieve\util;
 

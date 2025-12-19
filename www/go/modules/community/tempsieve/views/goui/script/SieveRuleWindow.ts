@@ -17,18 +17,21 @@ import {
 	textfield,
 	Window
 } from "@intermesh/goui";
-import {SieveCriteriumEntity, SieveRuleEntity} from "./Index";
+import {SieveActionEntity, SieveCriteriumEntity, SieveRuleEntity} from "./Index";
 import {SieveCriteriumWindow} from "./SieveCriteriumWindow";
 import {SieveActionWindow} from "./SieveActionWindow";
 
 export class SieveRuleWindow extends Window {
 	private accountId: string;
-	private idx: number|undefined;
+	private index: number | undefined;
 	private frm: Form;
 	private criteriaFs: Fieldset;
 	private criteriaGrid: Table;
 	private actionsFs: Fieldset;
 	private actionsGrid: Table;
+	private tests: SieveCriteriumEntity[] | undefined;
+	private actions: SieveActionEntity[] | undefined;
+
 
 	constructor(accountId: string) {
 		super();
@@ -60,7 +63,7 @@ export class SieveRuleWindow extends Window {
 					const record: any = this.criteriaGrid.store.get(storeIndex);
 					const win = new SieveCriteriumWindow(this.accountId!);
 					void win.load(record, storeIndex);
-					win.form.on("submit",  ({target})=> {
+					win.form.on("submit", ({target}) => {
 						this.criteriaGrid.store.replaceAt(storeIndex, win.mangleCriterium(target.value));
 						win.close();
 					});
@@ -91,7 +94,7 @@ export class SieveRuleWindow extends Window {
 						}
 						const win = new SieveCriteriumWindow(this.accountId);
 						win.load(record, idx);
-						win.form.on("submit",  ({target})=> {
+						win.form.on("submit", ({target}) => {
 							this.criteriaGrid.store.replaceAt(idx, win.mangleCriterium(target.value));
 							win.close();
 						});
@@ -127,7 +130,7 @@ export class SieveRuleWindow extends Window {
 					const record: any = this.actionsGrid.store.get(storeIndex);
 					const win = new SieveActionWindow(this.accountId!);
 					void win.load(record, storeIndex);
-					win.form.on("submit",  ({target})=> {
+					win.form.on("submit", ({target}) => {
 						this.actionsGrid.store.replaceAt(storeIndex, win.mangleAction(target.value));
 						win.close();
 					});
@@ -145,7 +148,7 @@ export class SieveRuleWindow extends Window {
 					handler: () => {
 						const idx = this.actionsGrid.store.count()
 						const win = new SieveActionWindow(this.accountId);
-						win.form.on("submit",  ({target})=> {
+						win.form.on("submit", ({target}) => {
 							const record = win.mangleAction(target.value);
 							record.id = String(idx);
 							this.actionsGrid.store.replaceAt(idx, win.mangleAction(target.value));
@@ -166,37 +169,33 @@ export class SieveRuleWindow extends Window {
 		);
 		this.frm = form({},
 			fieldset({},
-				// containerfield({
-				// 		name: 'data',
-				// 	},
-					checkbox({
-						type: "switch",
-						label: t("Deactivate this filter"),
-						name: "disabled"
-					}),
-					textfield({
-						name: "name",
-						label: t("Name"),
-						required: true
-					}),
-					select({
-						label: t("For incoming emails"),
-						name: "join",
-						options: [
-							{name: t("that meet the following criteria"), value: "allof"},
-							{name: t("that meets at least one of the following criteria"), value: "anyof"},
-							{name: t("all incoming emails"), value: "any"}
-						],
-						listeners: {
-							setvalue: ({newValue}) => {
-								this.criteriaFs.hide()
-								if (newValue !== "any") {
-									this.criteriaFs.show();
-								}
+				checkbox({
+					type: "switch",
+					label: t("Deactivate this filter"),
+					name: "disabled"
+				}),
+				textfield({
+					name: "name",
+					label: t("Name"),
+					required: true
+				}),
+				select({
+					label: t("For incoming emails"),
+					name: "join",
+					options: [
+						{name: t("that meet the following criteria"), value: "allof"},
+						{name: t("that meets at least one of the following criteria"), value: "anyof"},
+						{name: t("all incoming emails"), value: "any"}
+					],
+					listeners: {
+						setvalue: ({newValue}) => {
+							this.criteriaFs.hide()
+							if (newValue !== "any") {
+								this.criteriaFs.show();
 							}
 						}
-					})
-				// )
+					}
+				})
 			),
 			this.criteriaFs,
 			this.actionsFs,
@@ -216,20 +215,14 @@ export class SieveRuleWindow extends Window {
 	public load(record: SieveRuleEntity) {
 		debugger;
 		console.log(record);
-		this.idx = record.index;
-		// go.Jmap.request({
-		// 	method: "community/tempsieve/Sieve/rule",
-		// 	params: {
-		// 		accountId: this.accountId,
-		// 		index: record.index,
-		// 		scriptName: record.script_name
-		// 	}
-		// }).then((res: any) => {
-			this.frm.value = record;
-			this.criteriaGrid.store.loadData(record.tests);
-			this.actionsGrid.store.loadData(record.actions);
-			this.title = `${t("Edit rule")} ${record.index}: ${record.rule_name}`;
-		// })
+		this.index = record.index;
+
+		this.frm.value = record;
+		this.parseTests(record.raw);
+		this.parseActions(record.raw);
+		this.criteriaGrid.store.loadData(record.tests);
+		this.actionsGrid.store.loadData(record.actions);
+		this.title = `${t("Edit rule")} ${record.index}: ${record.rule_name}`;
 	}
 
 	private renderCriterium(record: any) {
@@ -279,7 +272,7 @@ export class SieveRuleWindow extends Window {
 			case "contains":
 				switch (record.arg1) {
 					case "Subject":
-						return record.not ? t("Subject doesn't contain", "sieve") + ' ' + record.arg2:
+						return record.not ? t("Subject doesn't contain", "sieve") + ' ' + record.arg2 :
 							t("Subject contains", "sieve") + ' ' + record.arg2;
 					case "From":
 						return record.not ? t("Sender doesn't contain", "sieve") + ' ' + record.arg2 :
@@ -290,7 +283,7 @@ export class SieveRuleWindow extends Window {
 					case "X-Spam-Flag":
 						return t("Marked as spam", "sieve");
 					default:
-						return record.not ? t("Mailheader:", "sieve") + " " + record.arg1 + " " + t("doesn't contain", "sieve") + " " + record.arg2:
+						return record.not ? t("Mailheader:", "sieve") + " " + record.arg1 + " " + t("doesn't contain", "sieve") + " " + record.arg2 :
 							t("Mailheader:", "sieve") + " " + record.arg1 + " " + t("contains", "sieve") + " " + record.arg2
 				}
 			case "is":
@@ -332,9 +325,9 @@ export class SieveRuleWindow extends Window {
 		if (not) {
 			if (arg == 'Subject') {
 				return t("Subject doesn't exist", "sieve");
-			} else if (arg == 'From'){
+			} else if (arg == 'From') {
 				return t("Sender doesn't exist", "sieve");
-			} else if (arg == 'To'){
+			} else if (arg == 'To') {
 				return t("Recipient doesn't exist", "sieve");
 			}
 			return t("Mailheader:", "sieve") + " " + arg + " " + t("doesn't exist", "sieve");
@@ -355,13 +348,12 @@ export class SieveRuleWindow extends Window {
 		if (type == 'under') {
 			return t("Size is smaller than", "sieve") + ' ' + arg;
 		}
-		return  t("Size is bigger than", "sieve") + ' ' + arg;
+		return t("Size is bigger than", "sieve") + ' ' + arg;
 	}
 
-	private deleteFromGrid(c: Table)
-	{
+	private deleteFromGrid(c: Table) {
 		const selectedRows = c.rowSelection?.getSelected();
-		if (selectedRows?.length === 0 ) {
+		if (selectedRows?.length === 0) {
 			return;
 		}
 		for (const item of selectedRows!) {

@@ -10,7 +10,8 @@ export interface SieveRuleEntity extends DefaultEntity {
 	name: string,
 	index: number,
 	scriptName: string,
-	active: boolean
+	active: boolean,
+	raw: string
 }
 
 export interface SieveScriptEntity extends DefaultEntity {

@@ -22,12 +22,12 @@ final class Sieve
 	private Net_Sieve $sieve;                 // Net_Sieve object
 	private $error = false;         // error flag
 	private array $list = array();        // scripts list
-	public $script;                 // go_sieve_script object
+	public $rawScript;                 // go_sieve_script object
+	public $script; // temporary
 	public ?string $current;                // name of currently loaded script
 	private array $disabled;              // array of disabled extensions
 
 	private PEAR $_PEAR;
-
 
 	/**
 	 * Object constructor
@@ -45,7 +45,7 @@ final class Sieve
 	public function __construct()
 	{
 		$this->sieve = new Net_Sieve();
-		$this->sieve->setDebug(true, array($this, 'debugHandler'));
+		$this->sieve->setDebug(go()->getConfig()['debug'], array($this, 'debugHandler'));
 		$this->_PEAR = new PEAR();
 	}
 
@@ -57,24 +57,6 @@ final class Sieve
 			//ignore in production
 			go()->warn($e);
 		}
-	}
-
-	private function rewriteHost($host)
-	{
-		if (isset(go()->getConfig()->sieve_rewrite_hosts)) {
-
-			$maps = explode(',', go()->getConfig()->sieve_rewrite_hosts);
-
-			foreach ($maps as $map) {
-				$pair = explode('=', $map);
-
-				if ($pair[0] == $host && isset($pair[1])) {
-					return $pair[1];
-				}
-			}
-		}
-
-		return $host;
 	}
 
 	/**
@@ -93,13 +75,22 @@ final class Sieve
 		if (empty($password)) {
 			throw new Unauthorized('Wrong password');
 		}
-		$host = $this->rewriteHost($host);
 
-		go()->debug("sieve::connect($username, ***, $host, $port, $auth_type, $usetls)");
+		if (isset(go()->getConfig()->sieve_rewrite_hosts)) {
+			$maps = explode(',', go()->getConfig()->sieve_rewrite_hosts);
+			foreach ($maps as $map) {
+				$pair = explode('=', $map);
+				if ($pair[0] == $host && isset($pair[1])) {
+					$host = $pair[1];
+				}
+			}
+		}
+
+//		go()->debug("sieve::connect($username, ***, $host, $port, $auth_type, $usetls)");
 
 		$options = null;
 		// Hackish solution
-		if(go()->getConfig()['debug']) {
+		if (go()->getConfig()['debug']) {
 			$options['ssl']['verify_peer'] = false;
 			$options['ssl']['verify_peer_name'] = false;
 			$options['ssl']['allow_self_signed'] = true;
@@ -120,79 +111,81 @@ final class Sieve
 
 	/**
 	 * Getter for error code
-	 */
-	public function error()
-	{
-		return $this->error || false;
-	}
+	 * /
+	 * public function error()
+	 * {
+	 * return $this->error || false;
+	 * }*/
 
 	/**
 	 * Check if an extension is available on the server
 	 *
 	 * @param string $extension
 	 * @return boolean
-	 */
-	public function hasExtension(string $extension): bool
-	{
-		return $this->sieve->hasExtension($extension);
-	}
+	 * /
+	 * public function hasExtension(string $extension): bool
+	 * {
+	 * return $this->sieve->hasExtension($extension);
+	 * }*/
 
 	/**
 	 * Saves current script into server
 	 *
 	 * @param ?string $name
+	 * @return bool
+	 * /
+	 * public function save(?string $name = null): bool
+	 * {
+	 * if (!$this->sieve) {
+	 * return $this->setError(self::SIEVE_ERROR_INTERNAL);
+	 * }
+	 *
+	 * if (!$this->script) {
+	 * return $this->setError(self::SIEVE_ERROR_INTERNAL);
+	 * }
+	 *
+	 * if (!$name) {
+	 * $name = $this->current;
+	 * }
+	 *
+	 * $this->_moveOutOfOfficeToEnd();
+	 *
+	 * $script = $this->script->as_text();
+	 *
+	 * if (!$script) {
+	 * $script = '/ * empty script * /';
+	 * }
+	 *
+	 * $res = $this->sieve->installScript($name, $script, true);
+	 * if ($this->_PEAR->isError($res)) {
+	 *
+	 * go()->debug("ERROR: " . $res);
+	 *
+	 * return $this->setError(self::SIEVE_ERROR_INSTALL . '<br/>Error message:</br>' . $res);
+	 * }
+	 *
+	 * return true;
+	 * }
+	 * @deprecated: to be shot into Sieve using managesieve in the JMAP controller. Somehow.
 	 */
-	public function save(?string $name = null): bool
-	{
-		if (!$this->sieve) {
-			return $this->setError(self::SIEVE_ERROR_INTERNAL);
-		}
-
-		if (!$this->script) {
-			return $this->setError(self::SIEVE_ERROR_INTERNAL);
-		}
-
-		if (!$name) {
-			$name = $this->current;
-		}
-
-		$this->_moveOutOfOfficeToEnd();
-
-		$script = $this->script->as_text();
-
-		if (!$script) {
-			$script = '/* empty script */';
-		}
-
-		$res = $this->sieve->installScript($name, $script, true);
-		if ($this->_PEAR->isError($res)) {
-
-			go()->debug("ERROR: " . $res);
-
-			return $this->setError(self::SIEVE_ERROR_INSTALL . '<br/>Error message:</br>' . $res);
-		}
-
-		return true;
-	}
-
 	/**
 	 * Move the "Out of office" rule to the end of the sieve file.
-	 */
-	private function _moveOutOfOfficeToEnd(): void
-	{
-
-
-		// De out of office rule altijd als laatste.
-		foreach ($this->script->content as $key => $val) {
-
-			if (isset($val['name']) && $val['name'] == 'Out of office') {
-				$item = $this->script->content[$key];
-				unset($this->script->content[$key]);
-				array_push($this->script->content, $item);
-				break;
-			}
-		}
-	}
+	 * /
+	 * private function _moveOutOfOfficeToEnd(): void
+	 * {
+	 *
+	 *
+	 * // De out of office rule altijd als laatste.
+	 * foreach ($this->script->content as $key => $val) {
+	 *
+	 * if (isset($val['name']) && $val['name'] == 'Out of office') {
+	 * $item = $this->script->content[$key];
+	 * unset($this->script->content[$key]);
+	 * array_push($this->script->content, $item);
+	 * break;
+	 * }
+	 * }
+	 * }*/
 
 	/**
 	 * Saves text script into server
@@ -200,34 +193,31 @@ final class Sieve
 	 * @param string $name
 	 * @param string|null $content
 	 * @return bool
-	 */
-	public function saveScript(string $name, ?string $content = null): bool
-	{
-		if (!$this->sieve) {
-			return $this->setError(self::SIEVE_ERROR_INTERNAL);
-		}
-
-		if (!$content) {
-			$content = '/* empty script */';
-		}
-
-		$res = $this->sieve->installScript($name, $content);
-		if ($this->_PEAR->isError($res)) {
-			return $this->setError(self::SIEVE_ERROR_INSTALL);
-		}
-
-		return true;
-	}
+	 * /
+	 * public function saveScript(string $name, ?string $content = null): bool
+	 * {
+	 * if (!$this->sieve) {
+	 * return $this->setError(self::SIEVE_ERROR_INTERNAL);
+	 * }
+	 *
+	 * if (!$content) {
+	 * $content = '/ * empty script * /';
+	 * }
+	 *
+	 * $res = $this->sieve->installScript($name, $content);
+	 * if ($this->_PEAR->isError($res)) {
+	 * return $this->setError(self::SIEVE_ERROR_INSTALL);
+	 * }
+	 *
+	 * return true;
+	 * }*/
 
 	/**
 	 * Activates specified script
+	 * @TODO? Refactor into JMAP
 	 */
 	public function activate(?string $name = null): bool
 	{
-		if (!$this->sieve) {
-			return $this->setError(self::SIEVE_ERROR_INTERNAL);
-		}
-
 		$name = $name ?? $this->current;
 
 		if ($this->_PEAR->isError($this->sieve->setActive($name))) {
@@ -239,13 +229,10 @@ final class Sieve
 
 	/**
 	 * De-activates specified script
+	 * @TODO? Refactor into JMAP
 	 */
 	public function deactivate(): bool
 	{
-		if (!$this->sieve) {
-			return $this->setError(self::SIEVE_ERROR_INTERNAL);
-		}
-
 		if ($this->_PEAR->isError($this->sieve->setActive(''))) {
 			return $this->setError(self::SIEVE_ERROR_DEACTIVATE);
 		}
@@ -255,30 +242,30 @@ final class Sieve
 
 	/**
 	 * Removes specified script
-	 */
-	public function remove(?string $name = null)
-	{
-		if (!$this->sieve) {
-			return $this->setError(self::SIEVE_ERROR_INTERNAL);
-		}
-
-		if (!$name) {
-			$name = $this->current;
-		}
-
-		// script must be deactivated first
-		if ($name == $this->sieve->getActive())
-			if ($this->_PEAR->isError($this->sieve->setActive('')))
-				return $this->setError(self::SIEVE_ERROR_DELETE);
-
-		if ($this->_PEAR->isError($this->sieve->removeScript($name)))
-			return $this->setError(self::SIEVE_ERROR_DELETE);
-
-		if ($name == $this->current)
-			$this->current = null;
-
-		return true;
-	}
+	 * /
+	 * public function remove(?string $name = null)
+	 * {
+	 * if (!$this->sieve) {
+	 * return $this->setError(self::SIEVE_ERROR_INTERNAL);
+	 * }
+	 *
+	 * if (!$name) {
+	 * $name = $this->current;
+	 * }
+	 *
+	 * // script must be deactivated first
+	 * if ($name == $this->sieve->getActive())
+	 * if ($this->_PEAR->isError($this->sieve->setActive('')))
+	 * return $this->setError(self::SIEVE_ERROR_DELETE);
+	 *
+	 * if ($this->_PEAR->isError($this->sieve->removeScript($name)))
+	 * return $this->setError(self::SIEVE_ERROR_DELETE);
+	 *
+	 * if ($name == $this->current)
+	 * $this->current = null;
+	 *
+	 * return true;
+	 * }*/
 
 	/**
 	 * Gets list of supported by server Sieve extensions
@@ -308,14 +295,9 @@ final class Sieve
 	/**
 	 * Gets list of scripts from server
 	 */
-	public function getSieveScripts()
+	public function getSieveScripts(): array|bool
 	{
 		if (!$this->list) {
-
-			if (!$this->sieve) {
-				return $this->setError(self::SIEVE_ERROR_INTERNAL);
-			}
-
 			$this->list = $this->sieve->listScripts();
 
 			if ($this->_PEAR->isError($this->list)) {
@@ -329,8 +311,13 @@ final class Sieve
 	/**
 	 * Returns active script name
 	 */
-	public function getActive(string $accountId)
+	public function getActive(string $accountId): ?string
 	{
+		return  $this->sieve->getActive();
+
+		/**
+		 * TODO: Refactor the rest of this function into TS using ManageSieve protocol
+		 */
 		$aliasEmails = array();
 		$aliasesStmt = \GO\Email\Model\Alias::model()->findByAttribute('account_id', $accountId);
 
@@ -351,34 +338,29 @@ final class Sieve
 			return $this->setError(self::SIEVE_ERROR_INTERNAL);
 		}
 
-		$active = $this->sieve->getActive();
+		$all_scripts = $this->getSieveScripts();
 
+		if (empty($all_scripts)) {
 
-		if (!$active) {
+			$createFlag = '';
+			$require = array('fileinto', 'imap4flags', 'include');
 
-			$all_scripts = $this->getSieveScripts();
+			if ($this->sieve->hasExtension('vacation')) {
+				$require[] = 'vacation';
+			}
 
-			if (empty($all_scripts)) {
+			// Check if the "mailbox" extension is supported
+			if ($this->sieve->hasExtension('mailbox')) {
+				$require[] = 'mailbox';
+				$createFlag = ':create';
+			}
 
-				$createFlag = '';
-				$require = array('fileinto', 'imap4flags', 'include');
+			$requireString = 'require ["' . implode('","', $require) . '"];';
 
-				if ($this->sieve->hasExtension('vacation')) {
-					$require[] = 'vacation';
-				}
+			// If vacation is available then add that rule to the default sieve script.
+			if ($this->sieve->hasExtension('vacation')) {
 
-				// Check if the "mailbox" extension is supported
-				if ($this->sieve->hasExtension('mailbox')) {
-					$require[] = 'mailbox';
-					$createFlag = ':create';
-				}
-
-				$requireString = 'require ["' . implode('","', $require) . '"];';
-
-				// If vacation is available then add that rule to the default sieve script.
-				if ($this->sieve->hasExtension('vacation')) {
-
-					$content = $requireString . "
+				$content = $requireString . "
 
 	# rule:[includeGlobal]
 	if false # anyof (true)
@@ -402,8 +384,8 @@ final class Sieve
 		fileinto " . $createFlag . " \"" . $spamFolder . "\";
 		stop;
 	}";
-				} else {
-					$content = $requireString . "
+			} else {
+				$content = $requireString . "
 
 	# rule:[includeGlobal]
 	if false # anyof (true)
@@ -420,20 +402,18 @@ final class Sieve
 		fileinto " . $createFlag . " \"" . $spamFolder . "\";
 		stop;
 	}";
-				}
-
-
-				if (!$this->saveScript('default', $content)) {
-					throw new \Exception("Could not create default sieve script: " . $this->error());
-				}
-				$this->activate('default');
-				$active = 'default';
-			} else {
-				$this->activate($all_scripts[0]);
-				$active = $all_scripts[0];
 			}
 
+			if (!$this->saveScript('default', $content)) {
+				throw new \Exception("Could not create default sieve script: " . $this->error());
+			}
+			$this->activate('default');
+			$active = 'default';
+		} else {
+			$this->activate($all_scripts[0]);
+			$active = $all_scripts[0];
 		}
+
 		return $active;
 	}
 
@@ -456,8 +436,8 @@ final class Sieve
 			return $this->setError(self::SIEVE_ERROR_OTHER);
 		}
 
-		// try to parse from Roundcube format
-		$this->script = $this->parse($script);
+		$this->rawScript = $script;
+//		$this->script = $this->parse($script); // Parsing is to be done in the client
 
 		$this->current = $name;
 
@@ -466,7 +446,7 @@ final class Sieve
 
 	/**
 	 * Loads script from text content
-	 */
+	 * /
 	public function loadScript($script)
 	{
 		if (!$this->sieve) {
@@ -476,10 +456,10 @@ final class Sieve
 		// try to parse from Roundcube format
 		$this->script = $this->parse($script);
 	}
-
+*/
 	/**
 	 * Creates go_sieve_script object from text script
-	 */
+	 * /
 	private function parse(string $txt)
 	{
 		// try to parse from Roundcube format
@@ -493,30 +473,11 @@ final class Sieve
 
 		return $script;
 	}
-
-	/**
-	 * Gets specified script as text
-	 */
-	public function getSieveScriet(string $name)
-	{
-		if (!$this->sieve) {
-			return $this->setError(self::SIEVE_ERROR_INTERNAL);
-		}
-
-		$content = $this->sieve->getScript($name);
-
-		//var_dump($content);
-
-		if ($this->_PEAR->isError($content)) {
-			return $this->setError(self::SIEVE_ERROR_OTHER);
-		}
-
-		return $content;
-	}
+	 **/
 
 	/**
 	 * Creates empty script or copy of other script
-	 */
+	 * /
 	public function copy($name, $copy)
 	{
 		if (!$this->sieve) {
@@ -533,7 +494,9 @@ final class Sieve
 
 		return $this->saveScript($name, $content);
 	}
+	*/
 
+	/*
 	private function importRules($script)
 	{
 		$i = 0;
@@ -543,7 +506,7 @@ final class Sieve
 		// Squirrelmail (Avelsieve)
 		if ($tokens = preg_split('/(#START_SIEVE_RULE.*END_SIEVE_RULE)\n/', $script, -1, PREG_SPLIT_DELIM_CAPTURE)) {
 			foreach ($tokens as $token) {
-				if (preg_match('/^#START_SIEVE_RULE.*/', $token, $matches)) {
+				if (preg_match('/^#START_SIEVE_RULE.* /', $token, $matches)) {
 					$name[$i] = "unnamed rule " . ($i + 1);
 					$content .= "# rule:[" . $name[$i] . "]\n";
 				} elseif (isset($name[$i])) {
@@ -570,9 +533,9 @@ final class Sieve
 		}
 
 		return $content;
-	}
+	}*/
 
-	private function setError($error)
+	private function setError(string $error): bool
 	{
 		$this->error = 'Errorcode: ' . $error;
 		go()->debug("SIEVE ERROR: " . $error);

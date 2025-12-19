@@ -15,7 +15,7 @@ import {
 	tbar,
 	datasourcestore,
 	Window,
-	select, combobox, ComboBox, autocomplete, AutocompleteField, store
+	select, combobox, ComboBox, autocomplete, AutocompleteField, store, TextAreaField, textarea
 } from "@intermesh/goui";
 import {
 	jmapds,
@@ -24,6 +24,7 @@ import {
 } from "@intermesh/groupoffice-core";
 import {SieveRuleEntity, SieveScriptEntity} from "./Index";
 import {SieveRuleWindow} from "./SieveRuleWindow";
+import {SieveParser} from "./SieveParser";
 
 
 export class MainPanel extends MainThreeColumnPanel {
@@ -34,6 +35,7 @@ export class MainPanel extends MainThreeColumnPanel {
 	private scriptsCombo: AutocompleteField | undefined;
 	private rulesGrid: Component | undefined;
 	private oooPanel: Component | undefined;
+	private rawEditor: TextAreaField|undefined;
 
 	protected createWest(): Component {
 		return comp({
@@ -64,6 +66,7 @@ export class MainPanel extends MainThreeColumnPanel {
 			this.successCmp = comp({cls: "success", hidden: true, html: t("This account supports Sieve!")}),
 			this.warningCmp = comp({cls: "warning", hidden: true}),
 			this.rulesGrid = comp({hidden: true}),
+			this.rawEditor = textarea({hidden: true, name: "raw", height: 800}),
 			this.oooPanel = comp({html: "TODO: Out of office panel", hidden: true})
 		);
 	}
@@ -135,10 +138,12 @@ export class MainPanel extends MainThreeColumnPanel {
 				}
 			);
 		Promise.all([p1, p2]).then(arResult => {
-			const activeRuleSet = arResult[0].list.find((i: any) => i.active);
+			const activeRuleSet = arResult[0].list.find((i: any) => i.isActive);
 			this.renderRulesTable(activeRuleSet);
 			this.scriptsCombo!.list.store.loadData(arResult[0].list);
 			this.scriptsCombo!.value = activeRuleSet.id;
+			this.rawEditor!.hidden = false;
+			this.rawEditor!.value = activeRuleSet.script;
 			this.oooPanel!.html = "TODO: Out of Office / vacation";
 		});
 	}
@@ -195,12 +200,12 @@ export class MainPanel extends MainThreeColumnPanel {
 					header: t("Sieve rule"),
 				}),
 				column({
-					id: "disabled",
+					id: "active",
 					header: t("Active"),
 					width: 120,
 					align: "right",
 					renderer: (v) => {
-						return v ? t("No") : t("Yes");
+						return v ? t("Yes") : t("No");
 					}
 				}),
 				column({
@@ -253,20 +258,10 @@ export class MainPanel extends MainThreeColumnPanel {
 			),
 			tbl
 		));
-		// TODO: Parse rules for current script from BLOB
-		// go.Jmap.request({
-		// 	method: "community/tempsieve/Rule/get",
-		// 	params: {
-		// 		filter: {
-		// 			accountId: this.accountId,
-		// 			scriptName: script.id
-		// 		}
-		// 	}
-		// }).then((result: any) => {
-		// 	console.log(result.list);
-		// 	tbl.store.loadData(result.list, false);
-		// });
-
+		const parser = new SieveParser(script);
+		console.log(parser.requirements);
+		console.log(parser.rules);
+		tbl.store.loadData(parser.rules, false);
 	}
 
 	private renderActions(record: SieveRuleEntity) {

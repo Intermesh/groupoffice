@@ -81,14 +81,15 @@ final class SieveScript extends EntityController
 		foreach($p['ids'] as $currentScript) {
 			$this->sieve->load($currentScript);
 
-			$curr = $this->sieve->script->content[$params['index']];
-
 			// make sure the entity result has an ID property. Otherwise it's difficult to identify objects in the "list" array.
 			$m = new model\SieveScript();
-			$m->id = $currentScript;
-			$m->name = $currentScript;
-			$m->blobId =  $curr; // TODO: Save as a blob
-			$m->isActive =$currentScript === $activeScript;
+			$m->setValues([
+				'id' => $currentScript,
+				'name' => $currentScript,
+				'script' => $this->sieve->rawScript,
+				'isActive' => $currentScript == $activeScript,
+				'extensions'=> $this->sieve->getSieveExtensions()
+			]);
 			$unsorted[] = $m;
 			$foundIds[] = $currentScript;
 		}
@@ -101,6 +102,8 @@ final class SieveScript extends EntityController
 	/**
 	 * @throws StateMismatch
 	 * @throws InvalidArguments
+	 * @TODO: Override using ManageSieve protocol
+	 * @see https://datatracker.ietf.org/doc/html/rfc5804
 	 */
 	public function set(array $params): \go\core\util\ArrayObject
 	{
