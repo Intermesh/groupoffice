@@ -1,3 +1,7 @@
+19-12-2025: 25.0.75
+- Calendar: Handle when the calendar item's start date can't be parsed.
+- Calendar: Problem with events from the holoidays module.
+
 15-12-2025: 25.0.74 
 - Email: fixed reading email with a large base64 encoded resource while blocking external images
 - Core: somewhat more helpful error reporting when user cannot be automatically imported from email
