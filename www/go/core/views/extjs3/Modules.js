@@ -201,7 +201,6 @@ go.Modules = (function () {
 
 			const store = go.Db.store("Module");
 
-
 			return store.query({
 				filter: {enabled: true}
 			}).then((response) => {
@@ -265,8 +264,6 @@ go.Modules = (function () {
 				}
 
 				return Promise.all(promises).then(() => {
-
-
 					store.on("changes", this.onModuleChanges, this);
 
 					return this.entities;

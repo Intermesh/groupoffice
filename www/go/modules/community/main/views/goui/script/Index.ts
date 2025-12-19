@@ -1,17 +1,24 @@
 import {root} from "@intermesh/goui";
-import {authManager, client, main,  modules, router} from "@intermesh/groupoffice-core";
+import {authManager, client, customFields, main, modules, router} from "@intermesh/groupoffice-core";
 
 // Todo, make this configurable or auto load?
 client.uri = "/api/";
 
+
+// Loads all module scripts before authentication
+await modules.loadUI();
+
 // Authenticate
 authManager.requireLogin().then(async () => {
 
-	// Load modules
-	await modules.loadAll();
+	// Load custom fields and server modules
+	await Promise.all([
+		customFields.init(),
+		modules.init()
+	])
 
-	//todo this was already fired before loading the modules. Change init() functions or load before firing?
-	client.fireAuth();
+	// loads legacy module panels. We need to be authenticated for that.
+	modules.loadLegacyUI();
 
 	// Loads all panels
 	main.load();

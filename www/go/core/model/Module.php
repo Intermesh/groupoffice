@@ -738,12 +738,12 @@ class Module extends Entity {
 	}
 
 
-	public function getViews() :array {
-		$viewsFolder = $this->module()->getFolder()->getFolder("views");
-		if(!$viewsFolder->exists()) {
-			return [];
-		}
-
-		return array_map(function($f) {return $f->getName();}, $viewsFolder->getChildren(false));
-	}
+//	public function getViews() :array {
+//		$viewsFolder = $this->module()->getFolder()->getFolder("views");
+//		if(!$viewsFolder->exists()) {
+//			return [];
+//		}
+//
+//		return array_map(function($f) {return $f->getName();}, $viewsFolder->getChildren(false));
+//	}
 }

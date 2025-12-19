@@ -294,16 +294,15 @@ modules.register(  {
 			if(!session.capabilities["go:community:calendar"]) {
 				return; // User has no access to this module
 			}
-			const ui = new Main(),
-				nav = (span:ValidTimeSpan, amount: number, ymd?: string) => {
-					modules.openMainPanel("calendar");
+			const nav = async (span:ValidTimeSpan, amount: number, ymd?: string) => {
+					const ui = await modules.openMainPanel("calendar") as Main;
 					ui.goto(new DateTime(ymd)).setSpan(span, amount);
 				};
 			router.add(/^calendar\/(month|list|week|day|year)\/(\d{4}-\d{2}-\d{2})$/, (span, ymd) => {
-					nav(span as ValidTimeSpan, 0, ymd);
+					void nav(span as ValidTimeSpan, 0, ymd);
 				})
 				.add(/^calendar\/(days|weeks|split)-(\d+)\/(\d{4}-\d{2}-\d{2})$/, (span, amount, ymd) => {
-					nav(span as ValidTimeSpan, Math.min(parseInt(amount),373), ymd); // it fits on my machine
+					void nav(span as ValidTimeSpan, Math.min(parseInt(amount),373), ymd); // it fits on my machine
 				}).add(/^calendarevent\/(\d+)$/, async (id) => {
 					// for notification clicks
 					const event = await jmapds('CalendarEvent').single(id);
@@ -312,7 +311,7 @@ modules.register(  {
 
 				});
 
-			modules.addMainPanel("community", "Calendar", 'calendar', t('Calendar'), () => ui);
+			modules.addMainPanel("community", "Calendar", 'calendar', t('Calendar'), () => new Main());
 
 			go.Alerts.on("beforeshow", function(alerts: any, alertConfig: any) {
 
