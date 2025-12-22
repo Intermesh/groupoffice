@@ -136,6 +136,10 @@ export class CalendarItem {
 		 // 	debugger;
 		if(!obj.start) {
 			this.start = DateTime.createFromFormat(this.patched.start, this.data.showWithoutTime ? "Y-m-d": "Y-m-dTH:i:s" , this.patched.timeZone)!; // ignore stored timezone
+			if(!this.start) {
+				console.error("Failed to create date time object from "+this.patched.start);
+				this.start = new DateTime();
+			}
 			if(this.data.showWithoutTime) {
 				this.start.setHours(0,0,0,0);
 			}

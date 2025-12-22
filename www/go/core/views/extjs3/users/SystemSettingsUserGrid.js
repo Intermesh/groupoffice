@@ -301,7 +301,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 									}
 
 									//reload client
-									go.reload();
+									document.location.replace(BaseHref)
 								}
 							});
 						});
