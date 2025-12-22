@@ -1,3 +1,6 @@
+- Calendar: New users got a calendar but it wasn't automatically subscribed
+- WOPI: Implement Save as for Collabora and Microsoft Office Online
+
 19-12-2025: 25.0.75
 - Calendar: Handle when the calendar item's start date can't be parsed.
 - Calendar: Problem with events from the holoidays module.
