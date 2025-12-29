@@ -53,7 +53,7 @@ class Account extends AclOwnerEntity
 	 * @return Query
 	 * @throws \go\core\exception\Forbidden
 	 */
-	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
+	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int|null $userId = null, array|null $groups = null): Query
 	{
 		$col = static::getMapping()->getColumn(static::$aclColumnName);
 		$tableAlias = $col->table->getAlias();

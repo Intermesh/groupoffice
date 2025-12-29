@@ -1894,7 +1894,7 @@ abstract class Property extends Model {
 	private function saveTable(MappedTable $table, array &$modified): bool
 	{
 
-		if($table->isUserTable && (!go()->getAuthState() || !go()->getAuthState()->isAuthenticated())) {
+		if($table->isUserTable && empty($this->_forUserId) && (!go()->getAuthState() || !go()->getAuthState()->isAuthenticated())) {
 			//ignore user tables when not logged in.
 			return true;
 		}
