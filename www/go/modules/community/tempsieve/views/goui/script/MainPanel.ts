@@ -8,23 +8,23 @@ import {
 	h3,
 	Menu,
 	menu,
-	SelectField,
 	Store,
 	t,
 	table,
 	tbar,
 	datasourcestore,
+	Table,
 	Window,
-	select, combobox, ComboBox, autocomplete, AutocompleteField, store, TextAreaField, textarea
+	autocomplete, AutocompleteField, store, TextAreaField, textarea
 } from "@intermesh/goui";
 import {
 	jmapds,
-	MainThreeColumnPanel,
-	User
+	MainThreeColumnPanel
 } from "@intermesh/groupoffice-core";
 import {SieveRuleEntity, SieveScriptEntity} from "./Index";
 import {SieveRuleWindow} from "./SieveRuleWindow";
 import {SieveScriptParser} from "./SieveScriptParser";
+import {SieveRuleParser} from "./SieveRuleParser";
 
 
 export class MainPanel extends MainThreeColumnPanel {
@@ -33,9 +33,11 @@ export class MainPanel extends MainThreeColumnPanel {
 	private successCmp: Component | undefined;
 	private warningCmp: Component | undefined;
 	private scriptsCombo: AutocompleteField | undefined;
-	private rulesGrid: Component | undefined;
+	private rulesPnl: Component | undefined;
+	private rulesGrid: Table | undefined;
 	private oooPanel: Component | undefined;
 	private rawEditor: TextAreaField|undefined;
+	private scriptParser: SieveScriptParser|undefined;
 
 	protected createWest(): Component {
 		return comp({
@@ -65,7 +67,7 @@ export class MainPanel extends MainThreeColumnPanel {
 			},
 			this.successCmp = comp({cls: "success", hidden: true, html: t("This account supports Sieve!")}),
 			this.warningCmp = comp({cls: "warning", hidden: true}),
-			this.rulesGrid = comp({hidden: true}),
+			this.rulesPnl = comp({hidden: true}),
 			this.rawEditor = textarea({hidden: true, name: "raw", height: 800}),
 			this.oooPanel = comp({html: "TODO: Out of office panel", hidden: true})
 		);
@@ -106,8 +108,8 @@ export class MainPanel extends MainThreeColumnPanel {
 	public async loadAccount(id: string) {
 		this.successCmp!.hidden = true;
 		this.warningCmp!.hidden = true;
-		this.rulesGrid!.hidden = true;
-		this.rulesGrid!.items.clear();
+		this.rulesPnl!.hidden = true;
+		this.rulesPnl!.items.clear();
 		this.oooPanel!.hidden = true;
 		const response = await go.Jmap.request({
 			method: "community/tempsieve/Sieve/isSupported",
@@ -115,7 +117,7 @@ export class MainPanel extends MainThreeColumnPanel {
 		});
 		if (response.isSupported) {
 			this.successCmp!.hidden = false;
-			this.rulesGrid!.hidden = false;
+			this.rulesPnl!.hidden = false;
 			this.oooPanel!.hidden = false;
 		} else {
 			this.warningCmp!.hidden = false;
@@ -190,7 +192,7 @@ export class MainPanel extends MainThreeColumnPanel {
 				]
 			})
 		});
-		const tbl = table({
+		this.rulesGrid = table({
 			fitParent: false,
 			store: new Store(),
 			cls: "border",
@@ -213,21 +215,19 @@ export class MainPanel extends MainThreeColumnPanel {
 					width: 30,
 					sticky: true,
 					renderer: (columnValue, record, td, table1, storeIndex) => {
-						return this.renderActions(record);
+						return this.renderActions(record, table1.store, storeIndex);
 					}
 				})
 			],
 			listeners: {
 				rowdblclick: ({storeIndex}) => {
-					const record: SieveRuleEntity = tbl.store.get(storeIndex) as SieveRuleEntity;
+					const record: SieveRuleEntity = this.rulesGrid!.store.get(storeIndex) as SieveRuleEntity;
 					record.index = storeIndex;
-					const win = new SieveRuleWindow(this.accountId!);
-					void win.load(record);
-					win.show();
+					this.openSieveRuleWindow(record, this.rulesGrid!.store, storeIndex);
 				}
 			}
 		});
-		this.rulesGrid!.items.add(comp({
+		this.rulesPnl!.items.add(comp({
 				cls: "vbox pad",
 			},
 			tbar({cls: "border-bottom"},
@@ -256,30 +256,27 @@ export class MainPanel extends MainThreeColumnPanel {
 					}
 				})
 			),
-			tbl
+			this.rulesGrid
 		));
-		const parser = new SieveScriptParser(script);
-		tbl.store.loadData(parser.rules, false);
+		this.scriptParser = new SieveScriptParser(script);
+		this.rulesGrid.store.loadData(this.scriptParser.rules, false);
 	}
 
-	private renderActions(record: SieveRuleEntity) {
+	private renderActions(record: SieveRuleEntity, store: Store, storeIndex: number) {
 		const editBtn = btn({
 			text: "Edit",
 			icon: "edit",
 			handler: () => {
-				const w = new SieveRuleWindow(this.accountId!);
-				void w.load(record);
-				w.show();
+				void this.openSieveRuleWindow(record, store, storeIndex);
 			}
 		}), deleteBtn = btn({
 			text: "Delete",
 			icon: "delete",
-			disabled: true, // TODO
 			handler: async () => {
 				const c = await Window.confirm(t("Are you sure that you want to delete this rule?"), t("Confirm"));
 				if (c) {
-					//void jmapds("Registration").destroy(record.id);
-					Window.alert("TODO");
+					store.removeAt(storeIndex);
+					this.updateRawScript();
 				}
 			}
 		});
@@ -291,5 +288,42 @@ export class MainPanel extends MainThreeColumnPanel {
 			)
 		});
 
+	}
+
+	/**
+	 * Generic method to open a rule window and handle form submits
+	 *
+	 * @param record
+	 * @param store
+	 * @param storeIndex
+	 * @private
+	 */
+	private openSieveRuleWindow(record: SieveRuleEntity, store: Store, storeIndex: number): void
+	{
+		const win = new SieveRuleWindow(this.accountId!);
+		void win.load(record);
+		win.frm.on("submit", ({target}) => {
+			Object.assign(record,target.value);
+			const scriptParser = new SieveRuleParser(record);
+			scriptParser.convert(win.tests, win.actions);
+			record.raw = scriptParser.raw;
+			store.replaceAt(storeIndex, record);
+			this.updateRawScript();
+			win.close();
+		});
+		win.show();
+	}
+
+	/**
+	 * Upon saving an individual rule, update the full script for sending into the JMAP API
+	 *
+	 * @private
+	 */
+	private updateRawScript(): void {
+		let r = `${this.scriptParser?.requirements}\n`;
+		for(const item of this.rulesGrid!.store.getArray()) {
+			r += item.raw + "\n";
+		}
+		this.rawEditor!.value = r;
 	}
 }

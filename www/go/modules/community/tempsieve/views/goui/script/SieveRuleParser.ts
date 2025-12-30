@@ -6,18 +6,17 @@ export class SieveRuleParser {
 	private _record: SieveRuleEntity;
 	private _tests: SieveCriteriumEntity[] = [];
 	private _actions: SieveActionEntity[] = [];
+	private _rawScript: string;
 
 	constructor(record: SieveRuleEntity) {
 		this._record = record;
-
-		this.parseTests();
-		this.parseActions();
+		this._rawScript = record.raw;
 	}
 
 	/**
 	 * Parse all criteria / tests from the currently loaded sieve script
 	 */
-	private parseTests(): void {
+	public parseTests(): void {
 		this._record.join = "anyof";
 		const lines = this._record.raw.split("\n");
 		for (const line of lines) {
@@ -132,7 +131,7 @@ export class SieveRuleParser {
 	/**
 	 * Parse all action for current script
 	 */
-	private parseActions(): void {
+	public parseActions(): void {
 		this._actions = [];
 		const paramsPattern = /[^{}]+(?=})/g;
 		const rawActions = this._record.raw.match(paramsPattern);
@@ -193,12 +192,13 @@ export class SieveRuleParser {
 			case "addflag":
 				const tgt = words[1].replace(/"/g, "");
 				action.target = tgt;
-				if (tgt.endsWith("Seen")) {
-					action.type = "set_read";
+				// Wake me up if there are any other addflag use cases...
+				// if (tgt.endsWith("Seen")) {
+					// action.type = "set_read";
 					action.text = t("Mark message as read", "community", "tempsieve");
-				} else {
+				// } else {
 					// ???
-				}
+				// }
 				break;
 			case "vacation":
 				action.text = t("Reply to message");
@@ -228,6 +228,127 @@ export class SieveRuleParser {
 	}
 
 	/**
+	 * Generate a raw sieve script from the sieve rule window, its tests and in- actions
+	 *
+	 * @return void
+	 * @param tests
+	 * @param actions
+	 */
+	public convert(tests: SieveCriteriumEntity[], actions: SieveActionEntity[]): void {
+		const oldRaw = this._rawScript;
+		let lines = [`#rule:[${this._record.name}]`];
+
+		let ifStr = "if " + (!this._record.active ? "false # ": "");
+		if(tests.length > 0) {
+			const arCond = [];
+			ifStr += this._record.join + " ";
+			for (const crit of tests) {
+				arCond.push(this.convertCriterium(crit));
+			}
+			ifStr += "("+arCond.join(", ")+")";
+		} else {
+			ifStr += "true"
+		}
+		lines.push(ifStr);
+		lines.push("{");
+		for(const actn of actions) {
+			lines.push(this.convertAction(actn));
+		}
+		lines.push("}");
+		this._rawScript = lines.join("\n");
+	}
+
+	/**
+	 * Convert a criterium to a raw snippet of Sieve script
+	 *
+	 * @param crit
+	 * @private
+	 * @todo: custom rules?
+	 */
+
+	private convertCriterium(crit: SieveCriteriumEntity): string {
+		let r = "";
+		switch(crit.test) {
+			case "body":
+				// not body :text :contains "woef"
+				if(crit.not) {
+					r += "not ";
+				}
+				r += `${crit.test} :${crit.part} :${crit.type} "${crit.arg}"`;
+				break;
+			case "currentdate":
+				// currentdate :value "ge" "date" "2025-12-01"
+				const arType = crit.type!.split("-");
+				r += `${crit.test} :${arType[0]} "${arType[1]}" "${crit.part}" "${crit.arg}"`;
+				break;
+			case "exists":
+				// exists "List-Unsubscribe"
+				r += `${crit.test} "${crit.arg}"`;
+				break;
+			case "header":
+				// header :contains "X-Spam-Flag" "YES"
+				r += `${crit.test} :${crit.type} "${crit.arg1}" "${crit.arg2}"`;
+				break;
+			case "size":
+				// size :over 25M
+				r += `${crit.test} :${crit.type} ${crit.arg}`;
+				break;
+			default:
+				r += "TODO";
+				break;
+		}
+		return r;
+	}
+
+	/**
+	 * Convert a Sieve action into a raw snippet of Sieve script
+	 * @param actn
+	 * @private
+	 */
+	private convertAction(actn: SieveActionEntity): string {
+		let r = "\t";
+		switch (actn.type) {
+			case "addflag":
+				// addflag "\\Seen"
+				r += `${actn.type} "\\${actn.target}"`;
+				break;
+			case "fileinto":
+			case "fileinto_copy":
+				// fileinto :copy "Spam"
+				r += "fileinto";
+				if(actn.copy) {
+					r += " :copy";
+				}
+				r += ` "${actn.target}"`;
+				break;
+			case "redirect":
+			case "redirect_copy":
+				// redirect :copy "info@examplo.com"
+				r += "redirect";
+				if(actn.copy) {
+					r += " :copy";
+				}
+				r += ` "${actn.target}"`;
+				break;
+			case "reject":
+				// reject "Piss off"
+				r += `${actn.type} "${actn.target}"`;
+				break;
+			case "vacation":
+				// vacation :days 3 :addresses "admin@intermesh.localhost" :subject "Sayonara, bitches!" "I am on vacation";
+				r += `${actn.type} :days ${actn.days} :addresses "${actn.addresses}" :subject "${actn.subject}" "${actn.reason}"`;
+				break;
+			default:
+				// stop
+				// discard
+				r += actn.type;
+				break;
+		}
+		r += ";"
+		return r;
+	}
+
+	/**
 	 * public getter for all criteria
 	 */
 	get tests(): SieveCriteriumEntity[] {
@@ -239,5 +360,9 @@ export class SieveRuleParser {
 	 */
 	get actions(): SieveActionEntity[] {
 		return this._actions;
+	}
+
+	get raw(): string {
+		return this._rawScript;
 	}
 }

@@ -180,8 +180,6 @@ export class SieveCriteriumWindow extends Window {
 	}
 
 	public load(record: SieveCriteriumEntity, idx: number) {
-		// console.log(record);
-		debugger;
 		this.origRecord = record;
 		this.itemIndex = idx;
 		this.buildForm(record.test === "header" ? record.arg1! : record.test);

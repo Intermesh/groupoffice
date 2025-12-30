@@ -10,6 +10,7 @@ export class SieveScriptParser {
 	public script: SieveScriptEntity;
 	public requirements: string[];
 	public rules: SieveRuleEntity[];
+	public oooRules: SieveRuleEntity[] = [];
 
 	constructor(s: SieveScriptEntity) {
 		this.script = s;
@@ -73,12 +74,16 @@ export class SieveScriptParser {
 				}
 				r.raw = arRaw.join("\n");
 				r.active = active;
-
-				ret.push(r);
-				idx++;
+				if(r.name !== "Out of office") {
+					ret.push(r);
+					idx++;
+				} else {
+					this.oooRules.push(r);
+				}
 			}
 		}
 
 		return ret;
 	}
+
 }

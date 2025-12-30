@@ -46,7 +46,7 @@ export class SieveActionWindow extends Window {
 					label: t("Action", "community", "email"),
 					required: true,
 					options: [
-						{name: t("Mark message as read",), value: 'set_read'},
+						{name: t("Mark message as read",), value: 'addflag'},
 						{name: t("Move email to selected folder"), value: 'fileinto'},
 						{name: t("Copy email to selected folder"), value: 'fileinto_copy'},
 						{name: t("Copy to e-mail"), value: 'redirect_copy'},
@@ -165,7 +165,7 @@ export class SieveActionWindow extends Window {
 			case 'vacation':
 				this.formFs.items.add(this.optionalEmailAddressFld, this.daysFld, this.subjectFld, this.messageFld);
 				break
-			case 'set_read':
+			case 'addflag':
 			case 'discard':
 			case 'stop':
 				break;
@@ -185,7 +185,8 @@ export class SieveActionWindow extends Window {
 			text = '';
 
 		switch (this.cmbAction.value) {
-			case 'set_read':
+			case 'addflag':
+				debugger;
 				type = 'addflag';
 				target = '\\Seen';
 				text = t("Mark message as read", "sieve");

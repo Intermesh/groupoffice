@@ -3,7 +3,6 @@ import {
 	checkbox,
 	column,
 	comp,
-	containerfield,
 	Fieldset,
 	fieldset,
 	Form,
@@ -25,13 +24,13 @@ import {SieveRuleParser} from "./SieveRuleParser";
 export class SieveRuleWindow extends Window {
 	private accountId: string;
 	private index: number | undefined;
-	private frm: Form;
+	public frm: Form;
 	private criteriaFs: Fieldset;
 	private criteriaGrid: Table;
 	private actionsFs: Fieldset;
 	private actionsGrid: Table;
-	private tests: SieveCriteriumEntity[] | undefined;
-	private actions: SieveActionEntity[] | undefined;
+	public tests: SieveCriteriumEntity[] = [];
+	public actions: SieveActionEntity[] = [];
 
 
 	constructor(accountId: string) {
@@ -65,8 +64,8 @@ export class SieveRuleWindow extends Window {
 					const win = new SieveCriteriumWindow(this.accountId!);
 					void win.load(record, storeIndex);
 					win.form.on("submit", ({target}) => {
-						console.log("ORIGINAL RECORD",record, "FORM VALUES", target.value);
 						this.criteriaGrid.store.replaceAt(storeIndex, win.mangleCriterium(target.value));
+						this.tests = this.criteriaGrid.store.data as SieveCriteriumEntity[];
 						win.close();
 					});
 					win.show();
@@ -98,6 +97,7 @@ export class SieveRuleWindow extends Window {
 						win.load(record, idx);
 						win.form.on("submit", ({target}) => {
 							this.criteriaGrid.store.replaceAt(idx, win.mangleCriterium(target.value));
+							this.tests = this.criteriaGrid.store.data as SieveCriteriumEntity[];
 							win.close();
 						});
 						win.show();
@@ -108,6 +108,7 @@ export class SieveRuleWindow extends Window {
 					cls: "secondary",
 					handler: () => {
 						this.deleteFromGrid(this.criteriaGrid);
+						this.tests = this.criteriaGrid.store.data as SieveCriteriumEntity[];
 					}
 				})
 			),
@@ -134,6 +135,7 @@ export class SieveRuleWindow extends Window {
 					void win.load(record, storeIndex);
 					win.form.on("submit", ({target}) => {
 						this.actionsGrid.store.replaceAt(storeIndex, win.mangleAction(target.value));
+						this.actions = this.actionsGrid.store.data as SieveActionEntity[];
 						win.close();
 					});
 					win.show();
@@ -154,6 +156,7 @@ export class SieveRuleWindow extends Window {
 							const record = win.mangleAction(target.value);
 							record.id = String(idx);
 							this.actionsGrid.store.replaceAt(idx, win.mangleAction(target.value));
+							this.actions = this.actionsGrid.store.data as SieveActionEntity[];
 							win.close();
 						});
 						win.show();
@@ -164,6 +167,7 @@ export class SieveRuleWindow extends Window {
 					cls: "secondary",
 					handler: () => {
 						this.deleteFromGrid(this.actionsGrid);
+						this.actions = this.actionsGrid.store.data as SieveActionEntity[];
 					}
 				})
 			),
@@ -216,11 +220,15 @@ export class SieveRuleWindow extends Window {
 
 	public load(record: SieveRuleEntity) {
 		const ruleParser = new SieveRuleParser(record);
+		ruleParser.parseTests();
+		ruleParser.parseActions();
 		this.index = record.idx;
 
 		this.frm.value = record;
 		this.criteriaGrid.store.loadData(ruleParser.tests);
 		this.actionsGrid.store.loadData(ruleParser.actions);
+		this.tests = ruleParser.tests;
+		this.actions = ruleParser.actions;
 		this.title = `${t("Edit rule")} ${record.idx}: ${record.name}`;
 	}
 
