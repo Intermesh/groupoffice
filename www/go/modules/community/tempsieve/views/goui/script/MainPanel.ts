@@ -251,8 +251,15 @@ export class MainPanel extends MainThreeColumnPanel {
 				btn({
 					cls: "primary filled",
 					icon: "add",
-					disabled: true,
 					handler: async () => {
+						const c = this.rulesGrid!.store.count();
+						const record: SieveRuleEntity = {
+							index: c,
+							name: "",
+							raw: "",
+							active: true
+						};
+						this.openSieveRuleWindow(record, this.rulesGrid!.store, c);
 					}
 				})
 			),

@@ -34,8 +34,8 @@ export class SieveScriptParser {
 			if (!line.startsWith("require")) {
 				break;
 			}
-			let l = line.substring(8).replaceAll(/[\[];"]/gi, "");
-			ret = ret + l.split(", ");
+			let l = line.substring(8).replace(/[\[];"]/gi, "");
+			ret = ret.concat(l.split(", "));
 		}
 		return ret;
 	}

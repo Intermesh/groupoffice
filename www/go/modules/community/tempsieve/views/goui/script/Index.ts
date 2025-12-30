@@ -6,17 +6,20 @@ import {
 	translate
 } from "@intermesh/goui";
 
-export interface SieveRuleEntity extends DefaultEntity {
-	name: string,
+export interface SieveRuleEntity {
+	name?: string,
 	index: number,
-	scriptName: string,
+	idx?: number,
+	scriptName?: string,
 	active: boolean,
+	join?: "any"|"anyof"|"allof",
 	raw: string
 }
 
-export interface SieveScriptEntity extends DefaultEntity {
-	// name: string,
-	// script_name: string,
+export interface SieveScriptEntity {
+	name?: string,
+	script_name?: string,
+	script: string,
 	active: boolean
 }
 
