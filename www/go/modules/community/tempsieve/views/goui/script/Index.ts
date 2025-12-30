@@ -20,22 +20,28 @@ export interface SieveScriptEntity extends DefaultEntity {
 	active: boolean
 }
 
-export interface SieveCriteriumEntity extends DefaultEntity {
+export interface SieveCriteriumEntity {
+	id?: string,
 	index?: number,
 	test: string,
 	not: boolean,
-	type: string,
-	arg1: string,
-	arg2: string
+	type?: string,
+	arg?: string,
+	arg1?: string,
+	arg2?: string,
+	part?: string
 }
-export interface SieveActionEntity extends DefaultEntity {
+export interface SieveActionEntity {
+	id?: string,
 	type: string,
 	// copy: string,
-	target: string,
-	days: string,
-	addresses: string,
-	reason: string,
-	subject: string|null
+	text: string,
+	target?: string,
+	days?: string,
+	addresses?: string,
+	reason?: string,
+	subject?: string|null,
+	copy?: boolean
 }
 
 modules.register(  {

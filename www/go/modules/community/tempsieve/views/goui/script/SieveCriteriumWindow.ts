@@ -180,20 +180,25 @@ export class SieveCriteriumWindow extends Window {
 	}
 
 	public load(record: SieveCriteriumEntity, idx: number) {
-		console.log(record);
+		// console.log(record);
+		debugger;
 		this.origRecord = record;
 		this.itemIndex = idx;
-		this.buildForm(record.test === "header" ? record.arg1 : record.test);
+		this.buildForm(record.test === "header" ? record.arg1! : record.test);
 
 		let hdrType;
 		switch (record.test) {
 			case 'currentdate':
+				this.cmbField.value = "currentdate";
+
 				this.cmbDateOperatorFld.value = record.type;
 				this.dateCriteriumFld.value = record.arg;
 				break;
 			case "size":
 				// Put the Kilo/Mega/Giga scalar in the right input field
-				const arg = record.arg;
+				this.cmbField.value = "size";
+
+				const arg = record.arg!;
 				let lastChar = arg.slice(-1),
 					everythingBeforeTheLastChar = arg.slice(0, arg.length - 1);
 				if (lastChar != 'K' && lastChar != 'M' && lastChar != 'G') {
@@ -201,11 +206,11 @@ export class SieveCriteriumWindow extends Window {
 					lastChar = 'B';
 				}
 				this.underOverFld.value = record.type;
-				this.numberCriteriumFld.value = everythingBeforeTheLastChar;
+				this.numberCriteriumFld.value = parseInt(everythingBeforeTheLastChar);
 				this.sizeGroup.value = lastChar;
 				break;
 			case "exists":
-				hdrType = record.arg;
+				hdrType = record.arg!;
 				if (["Subject", "From", "To", "X-Spam-Flag", "List-Unsubscribe"].includes(hdrType)) {
 					this.cmbField.value = hdrType;
 				} else {
@@ -214,18 +219,18 @@ export class SieveCriteriumWindow extends Window {
 				this.setOperator(record);
 				break;
 			case "header":
-				hdrType = record.arg1;
+				hdrType = record.arg1!;
 				if (["Subject", "From", "To", "X-Spam-Flag", "List-Unsubscribe"].includes(hdrType)) {
 					this.cmbField.value = hdrType;
 				} else {
 					this.cmbField.value = "custom";
 				}
-				this.txtCriteriumFld.value = record.arg2;
+				this.txtCriteriumFld.value = record.arg2!;
 				this.setOperator(record);
 				break;
 			case "body":
 				this.cmbField.value = "body";
-				this.txtCriteriumFld.value = record.arg;
+				this.txtCriteriumFld.value = record.arg!;
 				this.setOperator(record);
 				break;
 			default:
@@ -240,6 +245,7 @@ export class SieveCriteriumWindow extends Window {
 			case 'contains':
 				this.operatorFld.value = not ? "notcontains" : "contains";
 				this.cmbDateOperatorFld.value = not ? "notmatches" : "matches";
+				this.cmbBodyOperatorFld.value = not ? "notcontains" : "contains";
 				break;
 			case 'matches':
 				this.operatorFld.value = not ? "notmatches" : "matches";
@@ -310,80 +316,82 @@ export class SieveCriteriumWindow extends Window {
 		if (crit.arg2 !== '') {
 			switch (crit.arg1) {
 				case 'custom':
-					crit.not = crit.type.startsWith("not");
-					if (crit.type.endsWith("xists")) {
+					crit.not = crit.type!.startsWith("not");
+					if (crit.type!.endsWith("xists")) {
 						crit.test = 'exists';
 						crit.arg = this.txtCustomFld.value;
-						crit.arg1 = "";
-						crit.arg2 = "";
+						delete crit.arg1;
+						delete crit.arg2;
 					} else {
 						crit.test = 'header';
-						crit.arg = '';
+						delete crit.arg;
 						crit.arg1 = this.txtCustomFld.value;
 						crit.arg2 = this.txtCriteriumFld.value;
 					}
-					crit.type = this.parseTypeField(crit.type);
+					crit.type = this.parseTypeField(crit.type!);
 					break;
 				case 'List-Unsubscribe':
 					crit.test = 'exists';
 					crit.not = false;
 					// crit.type = this.cmbOperator.getValue(); // Should be sorted
 					crit.arg = 'List-Unsubscribe';
-					crit.arg1 = '';
-					crit.arg2 = '';
+					delete crit.arg1;
+					delete crit.arg2;
 					break;
 				case 'X-Spam-Flag':
 					crit.test = 'header';
 					crit.not = false;
-					// type	= this.cmbOperator.getValue();
-					crit.arg = '';
+					crit.type = "contains";
+					delete crit.arg;
 					crit.arg1 = 'X-Spam-Flag';
 					crit.arg2 = 'YES';
 					break;
 				case 'body':
 					crit.test = 'body';
-					crit.not = crit.type.startsWith("not");
-					crit.type = crit.type.indexOf("contains") ? "contains" : "matches";
+					crit.not = crit.type!.startsWith("not");
+					crit.type = crit.type!.indexOf("contains") ? "contains" : "matches";
 					crit.arg = crit.arg2;
-					crit.arg1 = '';
-					crit.arg2 = '';
+					delete crit.arg1;
+					delete crit.arg2;
+					break;
+				case "currentdate":
+					crit.test = 'currentdate';
+					crit.not = false;
+					crit.arg = crit.arg2;
+					crit.part = "date";
+					delete crit.arg1;
+					delete crit.arg2;
+					break;
+				case "size":
+						crit.test = 'size';
+						crit.type = this.underOverFld.value as string;
+						delete crit.arg1;
+						delete crit.arg2;
+						crit.arg = String(this.numberCriteriumFld.value);
+						if (this.sizeGroup.value !== "B") {
+							crit.arg += String(this.sizeGroup.value);
+						}
 					break;
 				default:
-					crit.not = crit.type.startsWith("not");
-					if (crit.type.endsWith("xists")) {
+					crit.not = crit.type!.startsWith("not");
+					if (crit.type!.endsWith("xists")) {
 						crit.test = 'exists';
 						crit.type = '';
 						crit.arg = crit.arg1;//this.cmbField.getValue();
-						crit.arg1 = '';
-						crit.arg2 = '';
+						delete crit.arg1;
+						delete crit.arg2;
 					} else {
 						crit.test = 'header';
 						crit.arg = '';
 						// crit.arg1 = this.cmbField.getValue();
 						// crit.arg2 = this.txtCriterium.getValue();
-						crit.type = this.parseTypeField(crit.type);
+						crit.type = this.parseTypeField(crit.type!);
 					}
 					break;
 			}
-		} else if (crit.arg1 == 'size') {
-			crit.test = 'size';
-			crit.type = this.sizeGroup.value as string;
-			crit.arg1 = '';
-			crit.arg2 = '';
-			crit.arg = this.numberCriteriumFld.value;
-			if (this.sizeGroup.value !== "B") {
-				crit.arg += String(this.sizeGroup.value);
-			}
-		} else if (crit.arg1 === "currentdate") {
-			crit.test = "currentdate";
-			crit.not = false;
-			crit.arg = this.dateCriteriumFld.value;
-			crit.part = "date";
-			crit.arg1 = '';
-			crit.arg2 = '';
-			crit.type = this.cmbDateOperatorFld.value! as string;
+		} else {
+			console.log("Unexpected",crit);
 		}
-		console.log(crit);
 
 		return crit;
 	}

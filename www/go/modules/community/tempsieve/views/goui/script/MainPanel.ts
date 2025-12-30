@@ -24,7 +24,7 @@ import {
 } from "@intermesh/groupoffice-core";
 import {SieveRuleEntity, SieveScriptEntity} from "./Index";
 import {SieveRuleWindow} from "./SieveRuleWindow";
-import {SieveParser} from "./SieveParser";
+import {SieveScriptParser} from "./SieveScriptParser";
 
 
 export class MainPanel extends MainThreeColumnPanel {
@@ -258,9 +258,7 @@ export class MainPanel extends MainThreeColumnPanel {
 			),
 			tbl
 		));
-		const parser = new SieveParser(script);
-		console.log(parser.requirements);
-		console.log(parser.rules);
+		const parser = new SieveScriptParser(script);
 		tbl.store.loadData(parser.rules, false);
 	}
 

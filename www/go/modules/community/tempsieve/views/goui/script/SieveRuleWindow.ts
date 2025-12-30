@@ -20,6 +20,7 @@ import {
 import {SieveActionEntity, SieveCriteriumEntity, SieveRuleEntity} from "./Index";
 import {SieveCriteriumWindow} from "./SieveCriteriumWindow";
 import {SieveActionWindow} from "./SieveActionWindow";
+import {SieveRuleParser} from "./SieveRuleParser";
 
 export class SieveRuleWindow extends Window {
 	private accountId: string;
@@ -64,6 +65,7 @@ export class SieveRuleWindow extends Window {
 					const win = new SieveCriteriumWindow(this.accountId!);
 					void win.load(record, storeIndex);
 					win.form.on("submit", ({target}) => {
+						console.log("ORIGINAL RECORD",record, "FORM VALUES", target.value);
 						this.criteriaGrid.store.replaceAt(storeIndex, win.mangleCriterium(target.value));
 						win.close();
 					});
@@ -171,8 +173,8 @@ export class SieveRuleWindow extends Window {
 			fieldset({},
 				checkbox({
 					type: "switch",
-					label: t("Deactivate this filter"),
-					name: "disabled"
+					label: t("Activate this filter"),
+					name: "active"
 				}),
 				textfield({
 					name: "name",
@@ -213,16 +215,13 @@ export class SieveRuleWindow extends Window {
 	}
 
 	public load(record: SieveRuleEntity) {
-		debugger;
-		console.log(record);
-		this.index = record.index;
+		const ruleParser = new SieveRuleParser(record);
+		this.index = record.idx;
 
 		this.frm.value = record;
-		this.parseTests(record.raw);
-		this.parseActions(record.raw);
-		this.criteriaGrid.store.loadData(record.tests);
-		this.actionsGrid.store.loadData(record.actions);
-		this.title = `${t("Edit rule")} ${record.index}: ${record.rule_name}`;
+		this.criteriaGrid.store.loadData(ruleParser.tests);
+		this.actionsGrid.store.loadData(ruleParser.actions);
+		this.title = `${t("Edit rule")} ${record.idx}: ${record.name}`;
 	}
 
 	private renderCriterium(record: any) {
@@ -238,7 +237,7 @@ export class SieveRuleWindow extends Window {
 			case 'true':
 				return 'Alle';
 			case 'size':
-				return this.renderSize(record.type, record.args);
+				return this.renderSize(record.type, record.arg);
 			default:
 				return t("Error while displaying test line", "sieve");
 		}

@@ -1,9 +1,12 @@
-import {SieveRuleEntity, SieveScriptEntity} from "@intermesh/community/tempsieve";
+import {
+	SieveRuleEntity,
+	SieveScriptEntity
+} from "@intermesh/community/tempsieve";
 
 /**
  * @see https://www.rfc-editor.org/rfc/rfc5228
  */
-export class SieveParser {
+export class SieveScriptParser {
 	public script: SieveScriptEntity;
 	public requirements: string[];
 	public rules: SieveRuleEntity[];
@@ -41,26 +44,26 @@ export class SieveParser {
 	 *
 	 * @private
 	 */
-	private parseRules():SieveRuleEntity[] {
-		let ret:SieveRuleEntity[] = [];
+	private parseRules(): SieveRuleEntity[] {
+		let ret: SieveRuleEntity[] = [];
 		let idx = 0;
 		const lines = this.script.script.split("\n");
-		for (let i=0,l = lines.length; i<l; i++) {
+		for (let i = 0, l = lines.length; i < l; i++) {
 			const line = lines[i];
-			if(line.startsWith("# rule")) {
-				const r:any  = {};
+			if (line.startsWith("# rule")) {
+				const r: any = {};
 				r.idx = idx;
-				r.name = line.substring(8, line.length-1);
+				r.name = line.substring(8, line.length - 1);
 				r.scriptName = this.script.name;
 				let active = false;
 				let arRaw = [];
 				arRaw.push(line);
 				let j = i + 1;
-				while(j < l) {
+				while (j < l) {
 					const currLine = lines[j];
 					arRaw.push(currLine);
 					const words = currLine.split(" ");
-					if(words[0] == "if") {
+					if (words[0] == "if") {
 						active = words[1] !== "false";
 					} else if (words[0] === "}") {
 						i = j;
@@ -73,12 +76,9 @@ export class SieveParser {
 
 				ret.push(r);
 				idx++;
-				console.log(r);
 			}
 		}
 
 		return ret;
 	}
-
-
 }
