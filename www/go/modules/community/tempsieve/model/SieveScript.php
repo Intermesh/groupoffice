@@ -12,8 +12,8 @@ final class SieveScript extends Entity
 	public string $blobId;
 	public bool $isActive;
 	public string $name;
-	public string $script;
-	public array $extensions = [];
-//	public string $parsedScript;
+
+	public string $script; // To be replaced by blobId
+	public array $extensions = []; // Do we actually use these?
 
 }

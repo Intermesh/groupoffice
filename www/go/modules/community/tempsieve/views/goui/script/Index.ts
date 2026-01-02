@@ -19,7 +19,8 @@ export interface SieveRuleEntity {
 export interface SieveScriptEntity {
 	name?: string,
 	script_name?: string,
-	script: string,
+	blobId?: string,
+	script?: string,
 	active: boolean
 }
 

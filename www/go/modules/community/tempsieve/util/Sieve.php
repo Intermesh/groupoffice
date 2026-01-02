@@ -3,6 +3,8 @@
 namespace go\modules\community\tempsieve\util;
 
 use go\core\exception\Unauthorized;
+use go\core\fs\Blob;
+use go\core\orm\exception\SaveException;
 use GO\Email\Model\Account;
 use \Net_Sieve;
 use PEAR;
@@ -27,20 +29,10 @@ final class Sieve
 	public ?string $current;                // name of currently loaded script
 	private array $disabled;              // array of disabled extensions
 
-	private PEAR $_PEAR;
+	public string $blobId; // For JMAP, Sieve scripts are to be saved into blobs.
 
-	/**
-	 * Object constructor
-	 *
-	 * @param string  Username (for managesieve login)
-	 * @param string  Password (for managesieve login)
-	 * @param string  Managesieve server hostname/address
-	 * @param string  Managesieve server port number
-	 * @param string  Managesieve authentication method
-	 * @param boolean Enable/disable TLS use
-	 * @param array   Disabled extensions
-	 * @param boolean Enable/disable debugging
-	 */
+	public string $accountId;
+	private PEAR $_PEAR;
 
 	public function __construct()
 	{
@@ -104,18 +96,10 @@ final class Sieve
 			return $this->setError(self::SIEVE_ERROR_LOGIN);
 		}
 		$this->disabled = $disabled;
+		$this->accountId = md5($username);
 
 		return true;
 	}
-
-
-	/**
-	 * Getter for error code
-	 * /
-	 * public function error()
-	 * {
-	 * return $this->error || false;
-	 * }*/
 
 	/**
 	 * Check if an extension is available on the server
@@ -314,111 +298,12 @@ final class Sieve
 	public function getActive(string $accountId): ?string
 	{
 		return  $this->sieve->getActive();
-
-		/**
-		 * TODO: Refactor the rest of this function into TS using ManageSieve protocol
-		 */
-		$aliasEmails = array();
-		$aliasesStmt = \GO\Email\Model\Alias::model()->findByAttribute('account_id', $accountId);
-
-		$account_model = array(
-			'account_id' => $accountId,
-		);
-		$account = Account::model()->findByPk($account_model['account_id']);
-		$spamFolder = go()->getConfig()->spam_folder ?? $account->spam;
-		if (empty($spamFolder)) {
-			$spamFolder = 'Spam';
-		}
-
-		while ($aliasModel = $aliasesStmt->fetch()) {
-			$aliasEmails[] = $aliasModel->email;
-		}
-
-		if (!$this->sieve) {
-			return $this->setError(self::SIEVE_ERROR_INTERNAL);
-		}
-
-		$all_scripts = $this->getSieveScripts();
-
-		if (empty($all_scripts)) {
-
-			$createFlag = '';
-			$require = array('fileinto', 'imap4flags', 'include');
-
-			if ($this->sieve->hasExtension('vacation')) {
-				$require[] = 'vacation';
-			}
-
-			// Check if the "mailbox" extension is supported
-			if ($this->sieve->hasExtension('mailbox')) {
-				$require[] = 'mailbox';
-				$createFlag = ':create';
-			}
-
-			$requireString = 'require ["' . implode('","', $require) . '"];';
-
-			// If vacation is available then add that rule to the default sieve script.
-			if ($this->sieve->hasExtension('vacation')) {
-
-				$content = $requireString . "
-
-	# rule:[includeGlobal]
-	if false # anyof (true)
-	{
-	### include global rule
-	## /etc/dovecot/sieve/default.sieve
-	include :global \"default\";
-	}
-
-	# rule:[" . GO::t("Standard vacation rule", "sieve") . "]
-	if false # anyof (true)
-	{
-	\tvacation :days 3 :addresses [\"" . implode('","', $aliasEmails) . "\"] \"" . GO::t("I am on vacation", "sieve") . "\";
-	\tstop;
-	}
-
-	# rule:[Spam]
-	if anyof (header :contains \"X-Spam-Flag\" \"YES\")
-	{
-		setflag \"\\\Seen\";
-		fileinto " . $createFlag . " \"" . $spamFolder . "\";
-		stop;
-	}";
-			} else {
-				$content = $requireString . "
-
-	# rule:[includeGlobal]
-	if false # anyof (true)
-	{
-	### include global rule
-	## /etc/dovecot/sieve/default.sieve
-	include :global \"default\";
-	}
-
-	# rule:[Spam]
-	if anyof (header :contains \"X-Spam-Flag\" \"YES\")
-	{
-		setflag \"\\\Seen\";
-		fileinto " . $createFlag . " \"" . $spamFolder . "\";
-		stop;
-	}";
-			}
-
-			if (!$this->saveScript('default', $content)) {
-				throw new \Exception("Could not create default sieve script: " . $this->error());
-			}
-			$this->activate('default');
-			$active = 'default';
-		} else {
-			$this->activate($all_scripts[0]);
-			$active = $all_scripts[0];
-		}
-
-		return $active;
 	}
 
 	/**
 	 * Loads script by name
+	 * @throws SaveException
+	 * @throws \Exception
 	 */
 	public function load(string $name): bool
 	{
@@ -435,9 +320,18 @@ final class Sieve
 		if ($this->_PEAR->isError($script)) {
 			return $this->setError(self::SIEVE_ERROR_OTHER);
 		}
+		// JMAP Sieve stuff requires a blobId to be saved or retrieved
+		// For non-JMAP sieve this does not make sense; the script is already retrieved.
+		// Both scenarios should probably be into separate classes, using the same interface
+
+		$blob = Blob::fromString($script);
+		$blob->name = $this->accountId . '_' . $name . '.siv';
+		$blob->type = 'application/sieve';
+		$blob->save();
+
+		$this->blobId = $blob->id;
 
 		$this->rawScript = $script;
-//		$this->script = $this->parse($script); // Parsing is to be done in the client
 
 		$this->current = $name;
 
@@ -445,36 +339,34 @@ final class Sieve
 	}
 
 	/**
-	 * Loads script from text content
-	 * /
-	public function loadScript($script)
+	 * @return bool
+	 */
+	public function validate(): bool
 	{
-		if (!$this->sieve) {
-			return $this->setError(self::SIEVE_ERROR_INTERNAL);
+		$stringLength = $this->sieve->_getLineLength($this->rawScript);
+		$command      = sprintf(
+			"CHECKSCRIPT {%d+}\r\n%s",
+			$stringLength,
+			$this->rawScript
+		);
+
+		$res = $this->sieve->_doCmd($command);
+		if (is_a($res, 'PEAR_Error')) {
+			go()->debug("ERROR: " . $res);
+			return $this->setError($res->code . '<br/>Error message:</br>' . $res->message);
 		}
 
-		// try to parse from Roundcube format
-		$this->script = $this->parse($script);
+		return true;
 	}
-*/
-	/**
-	 * Creates go_sieve_script object from text script
-	 * /
-	private function parse(string $txt)
+
+	public function setRawScript(string $script): void
 	{
-		// try to parse from Roundcube format
-		$script = new SieveRuleAdapter($txt, $this, $this->disabled, true);
-
-		// ... else try to import from different formats
-		if (empty($script->content)) {
-			$script = $this->importRules($txt);
-			$script = new SieveRuleAdapter($script, $this, $this->disabled, true);
-		}
-
-		return $script;
+		$this->rawScript = $script;
+		$blob = Blob::fromString($script);
+		$blob->name = $this->accountId . '_' . $this->getActive($this->accountId) . '.siv';
+		$blob->type = 'application/sieve';
+		$blob->save();
 	}
-	 **/
-
 	/**
 	 * Creates empty script or copy of other script
 	 * /
@@ -496,50 +388,17 @@ final class Sieve
 	}
 	*/
 
-	/*
-	private function importRules($script)
-	{
-		$i = 0;
-		$name = array();
-		$content = '';
-
-		// Squirrelmail (Avelsieve)
-		if ($tokens = preg_split('/(#START_SIEVE_RULE.*END_SIEVE_RULE)\n/', $script, -1, PREG_SPLIT_DELIM_CAPTURE)) {
-			foreach ($tokens as $token) {
-				if (preg_match('/^#START_SIEVE_RULE.* /', $token, $matches)) {
-					$name[$i] = "unnamed rule " . ($i + 1);
-					$content .= "# rule:[" . $name[$i] . "]\n";
-				} elseif (isset($name[$i])) {
-					// This preg_replace is added because I've found some Avelsieve scripts
-					// with rules containing "if" here. I'm not sure it was working
-					// before without this or not.
-					$token = preg_replace('/^if\s+/', '', trim($token));
-					$content .= "if $token\n";
-					$i++;
-				}
-			}
-		} // Horde (INGO)
-		else if ($tokens = preg_split('/(# .+)\r?\n/i', $script, -1, PREG_SPLIT_DELIM_CAPTURE)) {
-			foreach ($tokens as $token) {
-				if (preg_match('/^# (.+)/i', $token, $matches)) {
-					$name[$i] = $matches[1];
-					$content .= "# rule:[" . $name[$i] . "]\n";
-				} elseif (isset($name[$i])) {
-					$token = str_replace(":comparator \"i;ascii-casemap\" ", "", $token);
-					$content .= $token . "\n";
-					$i++;
-				}
-			}
-		}
-
-		return $content;
-	}*/
 
 	private function setError(string $error): bool
 	{
 		$this->error = 'Errorcode: ' . $error;
 		go()->debug("SIEVE ERROR: " . $error);
 		return false;
+	}
+
+	public function getError(): string
+	{
+		return $this->error;
 	}
 
 	/**

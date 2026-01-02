@@ -15,7 +15,7 @@ import {
 	datasourcestore,
 	Table,
 	Window,
-	autocomplete, AutocompleteField, store, TextAreaField, textarea
+	autocomplete, AutocompleteField, store, TextAreaField, textarea, Notifier
 } from "@intermesh/goui";
 import {
 	jmapds,
@@ -249,6 +249,23 @@ export class MainPanel extends MainThreeColumnPanel {
 				}),
 				"->",
 				btn({
+					cls: "filled",
+					icon: "data_check",
+					handler: async () => {
+						go.Jmap.request({
+							method: "community/tempsieve/SieveScript/validate",
+							params: {accountId: this.accountId, rawScript: this.rawEditor!.value}
+						}).then((res: {accountId: string, error: {description: string}|null}) => {
+							if(res.error) {
+								this.rawEditor!.setInvalid(res.error.description);
+								Notifier.error(res.error.description);
+							} else {
+								Notifier.success(t("Script validated successfully"));
+							}
+						});
+					}
+				}),
+				btn({
 					cls: "primary filled",
 					icon: "add",
 					handler: async () => {
@@ -327,7 +344,7 @@ export class MainPanel extends MainThreeColumnPanel {
 	 * @private
 	 */
 	private updateRawScript(): void {
-		let r = `${this.scriptParser?.requirements}\n`;
+		let r = `require ${this.scriptParser?.requirements}\n`;
 		for(const item of this.rulesGrid!.store.getArray()) {
 			r += item.raw + "\n";
 		}
