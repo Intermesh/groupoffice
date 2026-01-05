@@ -347,7 +347,12 @@ class Instance extends Entity {
 									'groupId' => 2,
 									'level' => 10
 							])->execute();
-			
+
+			// remove default announcement
+			$this->getInstanceDbConnection()
+				->delete("su_announcements")
+				->execute();
+
 			$this->getInstanceDbConnection()
 							->insert('su_announcements', [
 									'user_id' => 1,

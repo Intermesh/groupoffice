@@ -14,4 +14,8 @@ return array (
   'Rss Feeds' => 'Feeds RSS',
   'No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.' => 'Nenhum feed RSS foi adicionado.<br />Clique no botão de configuração localizado no canto superior direito desta janela para adicionar feeds RSS.',
   'Summary' => 'Resumo',
+  "welcomeTitle" => "Bem-vindo ao Group-Office!",
+  "welcomeContent" => "<p>Obrigado por instalar o Group-Office!</p>
+<p>Aqui está uma ligação para o ajudar a começar: {{link}}</p>
+<p>Esperamos que goste do Group-Office!</p>"
 );
