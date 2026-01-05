@@ -17,6 +17,9 @@ export * from "./WeekView.js";
 export * from "./CalendarAdapter.js";
 export * from "./OnlineMeetingService.js";
 
+translate.load(GO.lang.core.core, "core", "core");
+translate.load(GO.lang.community.calendar, "community", "calendar");
+
 export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list';
 export const calendarStore = datasourcestore({
 	dataSource: jmapds<any>('Calendar'),
@@ -272,8 +275,7 @@ modules.register(  {
 	],
 	init () {
 		//const user = client.user;
-		translate.load(GO.lang.core.core, "core", "core");
-		translate.load(GO.lang.community.calendar, "community", "calendar");
+
 
 		addEmailAction();
 
