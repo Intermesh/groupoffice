@@ -1,3 +1,5 @@
+- Leavedays: timing problem in user panel (cherry-pick from 25.0)
+
 15-12-2025: 6.8.147 
 - Email: fixed reading email with a large base64 encoded resource while blocking external images
 - Files: Make sure log files folder is protected
