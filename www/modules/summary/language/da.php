@@ -17,4 +17,8 @@ return array (
   'description' => 'Angiv en beskrivelse her',
   'Start page' => 'Overblik',
   'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml',
+  "welcomeTitle" => "Velkommen til Group-Office!",
+  "welcomeContent" => "<p>Tak for at installere Group-Office!</p>
+<p>Her er et link til at hjælpe dig i gang: {{link}}</p>
+<p>Vi håber du vil nyde Group-Office!</p>"
 );

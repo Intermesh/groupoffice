@@ -19,4 +19,8 @@ return array (
   'Summary' => 'Összefoglalás',
   'Rss Feeds' => 'RSS csatorna',
   'No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.' => 'Nincs RSS csatorna hozzáadva. <br /> Kattintson a Beállítások gombra a jobb felső sarokban csatorna hozzáadásához.',
+  "welcomeTitle" => "Üdvözöljük a Group-Office-ban!",
+  "welcomeContent" => "<p>Köszönjük, hogy telepítette a Group-Office-t!</p>
+<p>Itt van egy link, amely segít az indulásban: {{link}}</p>
+<p>Reméljük, hogy élvezni fogja a Group-Office-t!</p>"
 );
