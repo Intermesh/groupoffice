@@ -1,4 +1,5 @@
 - WOPI: Implement Save as for Collabora and Microsoft Office Online (didn't work on ssl with default port before)
+- Core: Error in API docs generate script
 
 22-12-2025: 25.0.76
 - Calendar: New users got a calendar but it wasn't automatically subscribed
