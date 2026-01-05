@@ -85,6 +85,7 @@ return array (
   'Video meeting' => 'Spotkanie wideo',
   'Current view' => 'Bieżący widok',
   'Workweek' => 'Tydzień roboczy',
+  'W' => 'T',
   'Resources' => 'Zasoby',
   'Sync' => 'Synchronizacja',
   'Birthdays' => 'Urodziny',
