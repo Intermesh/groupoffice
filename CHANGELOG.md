@@ -1,3 +1,4 @@
+05-01-2026: 25.0.77 
 - WOPI: Implement Save as for Collabora and Microsoft Office Online (didn't work on ssl with default port before)
 - Core: Error in API docs generate script
 - Email: Do not ask for oauth consent every time
