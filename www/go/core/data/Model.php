@@ -4,6 +4,7 @@ namespace go\core\data;
 
 use ArrayAccess;
 use go\core\App;
+use go\core\ErrorHandler;
 use go\core\util\ArrayObject;
 use go\core\util\DateTime;
 use InvalidArgumentException;
@@ -55,7 +56,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
 			if ($method->isStatic()) {
 				continue;
 			}
-if (strpos($method->getDocComment(), '@noapi') > 0) {
+			if (strpos($method->getDocComment(), '@noapi') > 0) {
 				continue;
 			}
 			if (substr($method->getName(), 0, 3) == 'get') {
@@ -132,7 +133,11 @@ if (strpos($method->getDocComment(), '@noapi') > 0) {
 						if (isset($params[0])) {
 							$type = $params[0]->getType();
 							if (isset($type)) {
-								$arr[$propName]['type'] = $type->getName();
+								if($type instanceof ReflectionUnionType) {
+									$arr[$propName]['type'] = implode(" | ",array_map(function($type) {return $type->getName();}, $type->getTypes()));
+								} else {
+									$arr[$propName]['type'] = $type->getName();
+								}
 							}
 						}
 					}
@@ -177,10 +182,14 @@ if (strpos($method->getDocComment(), '@noapi') > 0) {
 						}
 						$arr[$propName]['type'] = implode(" | ", array_map(function($type) { return $type->getName();}, $types));
 					}
-					$meta = $parser->parse($prop->getDocComment());
-					$arr[$propName]['description'] = $meta['description'] ?? null;
-					if(isset($meta['var']['type'])) {
-						$arr[$propName]['type'] = $meta['var']['type'];
+					try {
+						$meta = $parser->parse($prop->getDocComment());
+						$arr[$propName]['description'] = $meta['description'] ?? null;
+						if (isset($meta['var']['type'])) {
+							$arr[$propName]['type'] = $meta['var']['type'];
+						}
+					} catch(\Throwable $e) {
+						ErrorHandler::logException($e, "Failed to parse doc block: " . static::class . "::" . $propName);
 					}
 				}
 			}
