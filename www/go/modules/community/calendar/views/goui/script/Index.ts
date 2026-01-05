@@ -213,6 +213,7 @@ modules.register(  {
 	entities: [
 		"Calendar",
 		"CalendarView",
+		"CalendarCategory",
 		"ResourceGroup",
 		{
 			name:"CalendarEvent",
