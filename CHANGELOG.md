@@ -1,3 +1,4 @@
+06-01-2026: 25.0.78
 - Z-push: older version was accidentally included.
 - Tasks: Add projects3 filters only if the module is installed.
 
