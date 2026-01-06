@@ -105,7 +105,7 @@ export class CalendarWindow extends FormWindow {
 			{value: 50,name: t("Manage")}
 		]);
 
-		this.form.on('load', ({data}) => {
+		this.form.on('beforeload', ({data}) => {
 			// becasue this may be set to false during publish
 			this.closeOnSave = true;
 
