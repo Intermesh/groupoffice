@@ -294,7 +294,7 @@ class Task extends AclItemEntity {
 	protected static function defineFilters(): Filters
 	{
 
-		return parent::defineFilters()
+		$filters = parent::defineFilters()
 			->addText("title", function(Criteria $criteria, $comparator, $value, Query $query, array $filters){
 				$criteria->where('title', $comparator, $value);
 			})
@@ -308,8 +308,7 @@ class Task extends AclItemEntity {
 				}
 
 			}, "subscribedOnly")
-			->addColumn('mileStoneId')
-			->addColumn('projectId')
+
 			->add('projectId', function(Criteria $criteria, $value, Query $query) {
 				if(!empty($value)) {
 					if(go()->getModule("business", "projects3")) {
@@ -366,6 +365,13 @@ class Task extends AclItemEntity {
 					$criteria->where('progress', '=',$value);
 				}
 			});
+
+		if(go()->getModule("business", "projects3")) {
+			$filters->addColumn('mileStoneId')
+				->addColumn('projectId');
+		}
+
+		return $filters;
 
 	}
 
