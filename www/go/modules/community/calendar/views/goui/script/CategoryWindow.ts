@@ -19,7 +19,7 @@ export class CategoryWindow extends FormWindow {
 			delete data.isGlobal;
 			return data;
 		});
-		this.form.on('load', ( {data}) => {
+		this.form.on('beforeload', ( {data}) => {
 			data.isGlobal = data.ownerId === null;
 		});
 
