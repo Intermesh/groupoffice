@@ -30,8 +30,8 @@ class Module extends Entity {
 	public bool $enabled = true;
 
 	/**
+	 * The permissions of this module indexed per group
 	 *
-	 * @example
 	 * ```
 	 * if(!isset($module->permissions[Group::ID_EVERYONE])) {
 	 *    $everyone = new model\Permission($module);

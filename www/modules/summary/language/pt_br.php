@@ -22,4 +22,8 @@ return array (
   'description' => 'Coloque uma descrição aqui',
   'Start page' => 'Página Inicial',
   'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml',
+  "welcomeTitle" => "Bem-vindo ao Group-Office!",
+  "welcomeContent" => "<p>Obrigado por instalar o Group-Office!</p>
+<p>Aqui está um link para ajudá-lo a começar: {{link}}</p>
+<p>Esperamos que você goste do Group-Office!</p>"
 );

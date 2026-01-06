@@ -91,7 +91,7 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 		this.form.on('beforesave', ({data}) => {
 			this.parseSavedData(data);
 		});
-		this.form.on('load', ({data}) => {
+		this.form.on('beforeload', ({data}) => {
 			const start = new DateTime(data.start);
 			data.end = start.add(new DateInterval(data.duration))
 				.addDays(data.showWithoutTime? -1 : 0)

@@ -549,6 +549,7 @@ abstract class Entity extends Property {
 	{
 
 		$query = self::normalizeDeleteQuery($query);
+		$query->setModel(static::class);
 
 		go()->getDbConnection()->beginTransaction();
 

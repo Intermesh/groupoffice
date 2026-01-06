@@ -26,4 +26,8 @@ return array (
   'webfeeds' => 'Web-Feeds',
   'All users' => 'Alle Benutzer',
   '\'"You don\'\'t have any items on your start page."\'' => 'Sie haben keine Einträge auf Ihrer Startübersicht',
+  "welcomeTitle" => "Willkommen bei Group-Office!",
+  "welcomeContent" => "<p>Vielen Dank für die Installation von Group-Office!</p>
+<p>Hier ist ein Link, der Ihnen den Einstieg erleichtert: {{link}}</p>
+<p>Wir hoffen, dass Ihnen Group-Office gefallen wird!</p>"
 );

@@ -13,7 +13,7 @@ class Client extends Entity {
 	public string $url;
 	private ?OpenIDConnectClient $oidc;
 
-	public function getClientSecret(): null
+	public function getClientSecret(): null|string
 	{
 		return null;
 	}

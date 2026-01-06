@@ -17,4 +17,8 @@ return array (
   'description' => 'Εμφανίζει μια σύνοψη διαφορετικών πραγματικών στοιχείων',
   'Start page' => 'Σύνοψη',
   'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml',
+  "welcomeTitle" => "Καλώς ήρθατε στο Group-Office!",
+  "welcomeContent" => "<p>Ευχαριστούμε που εγκαταστήσατε το Group-Office!</p>
+<p>Εδώ είναι ένας σύνδεσμος για να σας βοηθήσει να ξεκινήσετε: {{link}}</p>
+<p>Ελπίζουμε να απολαύσετε το Group-Office!</p>"
 );

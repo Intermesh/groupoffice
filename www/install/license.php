@@ -12,8 +12,6 @@ use go\core\App;
 
 App::get();
 
-go()->setCache(new None());
-
 
 if(!go()->isInstalled()) {
 	header("Location: index.php");

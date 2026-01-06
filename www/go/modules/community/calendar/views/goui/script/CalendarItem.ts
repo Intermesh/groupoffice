@@ -112,7 +112,7 @@ export class CalendarItem {
 	start!: DateTime
 	end!: DateTime
 	patched: CalendarEvent
-	readonly readOnly?: boolean
+	public readOnly?: boolean
 	readonly extraIcons;
 	//color!: string
 
@@ -136,6 +136,10 @@ export class CalendarItem {
 		 // 	debugger;
 		if(!obj.start) {
 			this.start = DateTime.createFromFormat(this.patched.start, this.data.showWithoutTime ? "Y-m-d": "Y-m-dTH:i:s" , this.patched.timeZone)!; // ignore stored timezone
+			if(!this.start) {
+				console.error("Failed to create date time object from "+this.patched.start);
+				this.start = new DateTime();
+			}
 			if(this.data.showWithoutTime) {
 				this.start.setHours(0,0,0,0);
 			}
@@ -371,7 +375,9 @@ export class CalendarItem {
 							client.jmap("Calendar/first", {}, 'pFirst').then(r => {
 								calendarStore.reload();
 								writeableCalendarStore.reload().then(r2 => {
+									this.cal = r.calendar;
 									this.data.calendarId = r.calendarId;
+									this.readOnly = false;
 									resolve(internalOpen());
 								});
 
