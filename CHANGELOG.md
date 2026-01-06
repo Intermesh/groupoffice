@@ -1,3 +1,6 @@
+- Z-push: older version was accidentally included.
+- Tasks: Add projects3 filters only if the module is installed.
+
 05-01-2026: 25.0.77 
 - WOPI: Implement Save as for Collabora and Microsoft Office Online (didn't work on ssl with default port before)
 - Core: Error in API docs generate script
