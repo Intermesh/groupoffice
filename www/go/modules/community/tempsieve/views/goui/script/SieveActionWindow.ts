@@ -186,7 +186,6 @@ export class SieveActionWindow extends Window {
 
 		switch (this.cmbAction.value) {
 			case 'addflag':
-				debugger;
 				type = 'addflag';
 				target = '\\Seen';
 				text = t("Mark message as read", "sieve");

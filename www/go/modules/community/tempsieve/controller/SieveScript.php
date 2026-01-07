@@ -6,12 +6,14 @@
 
 namespace go\modules\community\tempsieve\controller;
 
+use go\core\fs\Blob;
 use go\core\http\Exception;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\StateMismatch;
 use go\core\jmap\EntityController;
 use go\core\jmap\SetError;
 use go\core\util\ArrayObject;
+use go\core\util\Lock;
 use go\modules\community\tempsieve\model;
 
 final class SieveScript extends EntityController
@@ -108,12 +110,88 @@ final class SieveScript extends EntityController
 	/**
 	 * @throws StateMismatch
 	 * @throws InvalidArguments
-	 * @TODO: Override using ManageSieve protocol
+	 * @throws \Exception
+	 *
 	 * @see https://datatracker.ietf.org/doc/html/rfc5804
 	 */
 	public function set(array $params): \go\core\util\ArrayObject
 	{
-		return $this->defaultSet($params);
+		$this->checkInput($params);
+
+		$p = $this->paramsSet($params);
+
+		// make sure there are no concurrent set request to avoid clients missing states
+		$lock = new Lock("jmap-set-lock");
+		if (!$lock->lock()) {
+			throw new Exception("Could not obtain lock");
+		}
+
+		static::fireEvent(self::EVENT_BEFORE_SET, $this, $p);
+
+		$oldState = $this->getState();
+
+		if (isset($p['ifInState']) && $p['ifInState'] != $oldState) {
+			throw new StateMismatch("State mismatch. The server state " . $oldState . ' does not match your state ' . $p['ifInState']);
+		}
+
+		$result = new ArrayObject([
+			'accountId' => $p['accountId'],
+			'created' => null,
+			'updated' => null,
+			'destroyed' => null,
+			'notCreated' => null,
+			'notUpdated' => null,
+			'notDestroyed' => null,
+		]);
+
+//		$this->createEntitites($p['create'], $result); TODO
+//		$this->destroyEntities($p['destroy'], $result); TODO
+		foreach ($p['update'] as $id => $properties) {
+			$loaded = $this->sieve->load($id);
+			if (!$loaded) {
+				$result['notUpdated'][$id] = new SetError('notFound', go()->t("Item not found"));
+				continue;
+			}
+			$entity = new model\SieveScript();
+			$entity->setValues($properties);
+			if (!$this->canUpdate($entity)) {
+				$result['notUpdated'][$id] = new SetError("forbidden", go()->t("Permission denied"));
+				continue;
+			}
+			$b = Blob::findById($properties['blobId']);
+			if (!$b) {
+				$result['notUpdated'][$id] = new SetError('notFound', go()->t("Blob not found"));
+				continue;
+			}
+
+			if (!$this->sieve->saveBlob($id, $b)) {
+				$result['notUpdated'][$id] = new SetError("invalidSieve");
+				$result['notUpdated'][$id]->properties = ['blobId'];
+				$result['notUpdated'][$id]->validationErrors = $this->sieve->getError();
+				continue;
+			}
+
+			//The server must return all properties that were changed during a create or update operation for the JMAP spec
+			$diff = ['blobId' => $properties['blobId']];
+			// RFC9661: if the onSuccessActivateScript parameter is set, explicitly activate the script and set the isActive property to true
+			if (isset($p['onSuccessActivateScript'])) {
+				$this->sieve->activate($p['onSuccessActivateScript']);
+				$diff['isActive'] = true;
+			} elseif(isset($p['onSuccessDeactivateScript'])) {
+				$this->sieve->deactivate(); // Iterate through all the sieve scriets?
+				$diff['isActive'] = false;
+			}
+
+			$result['updated'][$id] = empty($diff) ? null : $diff;
+		}
+
+
+		$result['oldState'] = $oldState;
+		$result['newState'] = $this->getState();
+
+		static::fireEvent(self::EVENT_SET, $this, $p, $result);
+		$lock->unlock();
+		return $result;
 	}
 
 	/**
@@ -144,7 +222,6 @@ final class SieveScript extends EntityController
 
 		$this->sieve->setRawScript($params['rawScript']);
 
-		// TODO: Do the actual validation
 		$setError = null;
 		if (!$this->sieve->validate()) {
 			$setError = new SetError('invalidSieve', $this->sieve->getError());
@@ -153,5 +230,16 @@ final class SieveScript extends EntityController
 			'accountId' => $p['accountId'],
 			'error' => $setError
 		]);
+	}
+
+	/**
+	 * For now, this is always possible, but it should be tied to the ACL of the account entity in the new email module
+	 *
+	 * @param $entity
+	 * @return bool
+	 */
+	protected function canUpdate($entity): bool
+	{
+		return true;
 	}
 }

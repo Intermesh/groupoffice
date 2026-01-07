@@ -112,6 +112,32 @@ final class Sieve
 	 * return $this->sieve->hasExtension($extension);
 	 * }*/
 
+
+	/**
+	 * In the JMAP scenario, a blob is being saved as the new sieve script.
+	 *
+	 * @param string|null $name
+	 * @param Blob $blob
+	 * @return bool
+	 * @throws \Exception
+	 */
+	public function saveBlob(?string $name, Blob $blob): bool
+	{
+		$name = $name ?? $this->getActive($this->accountId);
+		$file = $blob->getFile();
+		$script = $file->getContents();
+		if (!$script) {
+			$script = '/ * empty script * /';
+		}
+		$res = $this->sieve->installScript($name, $script, true);
+		if ($this->_PEAR->isError($res)) {
+		    go()->debug("ERROR: " . $res);
+
+		    return $this->setError(self::SIEVE_ERROR_INSTALL . '<br/>Error message:</br>' . $res);
+		}
+		return true;
+	}
+
 	/**
 	 * Saves current script into server
 	 *
@@ -339,6 +365,8 @@ final class Sieve
 	}
 
 	/**
+	 * Wrapper for the CHECKSCRIPT ManageSieve command.
+	 *
 	 * @return bool
 	 */
 	public function validate(): bool
@@ -359,6 +387,14 @@ final class Sieve
 		return true;
 	}
 
+	/**
+	 * Wrapper function to save both a raw script and a blob. As stated elsewhere, the JMAP way of Sieve-ing should
+	 * be separated from the non-JMAP way. We are not there yet.
+	 *
+	 * @param string $script
+	 * @return void
+	 * @throws \Exception
+	 */
 	public function setRawScript(string $script): void
 	{
 		$this->rawScript = $script;
@@ -366,7 +402,9 @@ final class Sieve
 		$blob->name = $this->accountId . '_' . $this->getActive($this->accountId) . '.siv';
 		$blob->type = 'application/sieve';
 		$blob->save();
+		$this->blobId = $blob->id;
 	}
+
 	/**
 	 * Creates empty script or copy of other script
 	 * /

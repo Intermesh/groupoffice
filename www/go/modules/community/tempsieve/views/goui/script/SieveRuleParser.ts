@@ -63,12 +63,12 @@ export class SieveRuleParser {
 				 * @see https://www.rfc-editor.org/rfc/rfc5260
 				 */
 				crit.test = test;
-				const comparator = words[startIdx].replace(":","");
-				if(comparator === "is") {
+				const comparator = words[startIdx].replace(":", "");
+				if (comparator === "is") {
 					crit.type = comparator;
 				} else {
 					startIdx++;
-					crit.type = (comparator+"-"+words[startIdx]).replace(/"/g, '');
+					crit.type = (comparator + "-" + words[startIdx]).replace(/"/g, '');
 				}
 				startIdx++;
 				crit.part = words[startIdx].replace(/"/g, '');
@@ -194,10 +194,10 @@ export class SieveRuleParser {
 				action.target = tgt;
 				// Wake me up if there are any other addflag use cases...
 				// if (tgt.endsWith("Seen")) {
-					// action.type = "set_read";
-					action.text = t("Mark message as read", "community", "tempsieve");
+				// action.type = "set_read";
+				action.text = t("Mark message as read", "community", "tempsieve");
 				// } else {
-					// ???
+				// ???
 				// }
 				break;
 			case "vacation":
@@ -236,22 +236,22 @@ export class SieveRuleParser {
 	 */
 	public convert(tests: SieveCriteriumEntity[], actions: SieveActionEntity[]): void {
 		const oldRaw = this._rawScript;
-		let lines = [`#rule:[${this._record.name}]`];
+		let lines = [`# rule:[${this._record.name}]`];
 
-		let ifStr = "if " + (!this._record.active ? "false # ": "");
-		if(tests.length > 0) {
+		let ifStr = "if " + (!this._record.active ? "false # " : "");
+		if (tests.length > 0) {
 			const arCond = [];
 			ifStr += this._record.join + " ";
 			for (const crit of tests) {
 				arCond.push(this.convertCriterium(crit));
 			}
-			ifStr += "("+arCond.join(", ")+")";
+			ifStr += "(" + arCond.join(", ") + ")";
 		} else {
 			ifStr += "true"
 		}
 		lines.push(ifStr);
 		lines.push("{");
-		for(const actn of actions) {
+		for (const actn of actions) {
 			lines.push(this.convertAction(actn));
 		}
 		lines.push("}");
@@ -268,13 +268,20 @@ export class SieveRuleParser {
 
 	private convertCriterium(crit: SieveCriteriumEntity): string {
 		let r = "";
-		switch(crit.test) {
+		switch (crit.test) {
 			case "body":
-				// not body :text :contains "woef"
-				if(crit.not) {
+				// not body :text :contains "meow"
+				if (crit.not) {
 					r += "not ";
 				}
-				r += `${crit.test} :${crit.part} :${crit.type} "${crit.arg}"`;
+				r += crit.test;
+				if (crit.part) {
+					r += ` :${crit.part}`;
+				}
+				if (crit.type) {
+					r += ` :${crit.type}`;
+				}
+				r += ` "${crit.arg}"`;
 				break;
 			case "currentdate":
 				// currentdate :value "ge" "date" "2025-12-01"
@@ -316,7 +323,7 @@ export class SieveRuleParser {
 			case "fileinto_copy":
 				// fileinto :copy "Spam"
 				r += "fileinto";
-				if(actn.copy) {
+				if (actn.copy) {
 					r += " :copy";
 				}
 				r += ` "${actn.target}"`;
@@ -325,7 +332,7 @@ export class SieveRuleParser {
 			case "redirect_copy":
 				// redirect :copy "info@examplo.com"
 				r += "redirect";
-				if(actn.copy) {
+				if (actn.copy) {
 					r += " :copy";
 				}
 				r += ` "${actn.target}"`;

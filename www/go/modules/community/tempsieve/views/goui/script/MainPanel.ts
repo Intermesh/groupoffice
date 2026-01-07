@@ -18,6 +18,7 @@ import {
 	autocomplete, AutocompleteField, store, TextAreaField, textarea, Notifier
 } from "@intermesh/goui";
 import {
+	client,
 	jmapds,
 	MainThreeColumnPanel
 } from "@intermesh/groupoffice-core";
@@ -36,8 +37,8 @@ export class MainPanel extends MainThreeColumnPanel {
 	private rulesPnl: Component | undefined;
 	private rulesGrid: Table | undefined;
 	private oooPanel: Component | undefined;
-	private rawEditor: TextAreaField|undefined;
-	private scriptParser: SieveScriptParser|undefined;
+	private rawEditor: TextAreaField | undefined;
+	private scriptParser: SieveScriptParser | undefined;
 
 	protected createWest(): Component {
 		return comp({
@@ -64,6 +65,7 @@ export class MainPanel extends MainThreeColumnPanel {
 	protected createCenter(): Component {
 		return comp({
 				cls: "vbox pad",
+				flex: 1
 			},
 			this.successCmp = comp({cls: "success", hidden: true, html: t("This account supports Sieve!")}),
 			this.warningCmp = comp({cls: "warning", hidden: true}),
@@ -111,6 +113,8 @@ export class MainPanel extends MainThreeColumnPanel {
 		this.rulesPnl!.hidden = true;
 		this.rulesPnl!.items.clear();
 		this.oooPanel!.hidden = true;
+		this.rawEditor!.value = undefined;
+		this.rawEditor!.hidden = true;
 		const response = await go.Jmap.request({
 			method: "community/tempsieve/Sieve/isSupported",
 			params: {accountId: id},
@@ -252,17 +256,31 @@ export class MainPanel extends MainThreeColumnPanel {
 					cls: "filled",
 					icon: "data_check",
 					handler: async () => {
-						go.Jmap.request({
-							method: "community/tempsieve/SieveScript/validate",
-							params: {accountId: this.accountId, rawScript: this.rawEditor!.value}
-						}).then((res: {accountId: string, error: {description: string}|null}) => {
-							if(res.error) {
-								this.rawEditor!.setInvalid(res.error.description);
-								Notifier.error(res.error.description);
-							} else {
-								Notifier.success(t("Script validated successfully"));
-							}
+						const activeScriptName = this.scriptsCombo!.value as string,
+							f = new File([this.rawEditor!.value as string], `${activeScriptName}_${this.accountId}.siv`, {type: "application/sieve"});
+						client.upload(f).then((response: any) => {
+							const updateParam: any = {};
+							updateParam[activeScriptName] = {blobId: response.blobId};
+							go.Jmap.request({
+								method: "community/tempsieve/SieveScript/set",
+								params: {
+									accountId: this.accountId,
+									onSuccessActivateScript: activeScriptName,
+									update: updateParam
+								}
+							}).
+							then((res: any) => {
+								if (res.notUpdated && res.notUpdated[activeScriptName]) {
+									const errorDescription = res.notUpdated[activeScriptName].type;
+									this.rawEditor!.setInvalid(errorDescription);
+									Notifier.error(errorDescription);
+								} else {
+									this.rawEditor!.clearInvalid();
+									Notifier.success(t("Script validated successfully"));
+								}
+							});
 						});
+						return;
 					}
 				}),
 				btn({
@@ -322,12 +340,11 @@ export class MainPanel extends MainThreeColumnPanel {
 	 * @param storeIndex
 	 * @private
 	 */
-	private openSieveRuleWindow(record: SieveRuleEntity, store: Store, storeIndex: number): void
-	{
+	private openSieveRuleWindow(record: SieveRuleEntity, store: Store, storeIndex: number): void {
 		const win = new SieveRuleWindow(this.accountId!);
 		void win.load(record);
 		win.frm.on("submit", ({target}) => {
-			Object.assign(record,target.value);
+			Object.assign(record, target.value);
 			const scriptParser = new SieveRuleParser(record);
 			scriptParser.convert(win.tests, win.actions);
 			record.raw = scriptParser.raw;
@@ -345,7 +362,7 @@ export class MainPanel extends MainThreeColumnPanel {
 	 */
 	private updateRawScript(): void {
 		let r = `require ${this.scriptParser?.requirements}\n`;
-		for(const item of this.rulesGrid!.store.getArray()) {
+		for (const item of this.rulesGrid!.store.getArray()) {
 			r += item.raw + "\n";
 		}
 		this.rawEditor!.value = r;
