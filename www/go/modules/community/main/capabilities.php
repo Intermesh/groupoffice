@@ -10,7 +10,7 @@ $mods = Module::find();
 
 $baseUrl = dirname(\go\core\http\Request::get()->getPath(), 5) . '/';
 
-$response = [];
+$response = ['modules' => []];
 foreach($mods as $mod) {
 	$gouiScript = $mod->module()->getFolder()->getFile("views/goui/dist/Index.js");
 
@@ -23,6 +23,9 @@ foreach($mods as $mod) {
 	if($gouiScript->exists()) {
 		$r['entry'] = $baseUrl . $gouiScript->getRelativePath(go()->getEnvironment()->getInstallFolder()) . '?v='. go()->getVersion();
 	}
-	$response[] = $r;
+	$response['modules'][] = $r;
 }
+
+$response['languages'] = go()->getLanguage()->getLanguages();
+
 Response::get()->output($response);
