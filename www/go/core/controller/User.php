@@ -22,6 +22,9 @@ class User extends EntityController {
 
 	protected function canUpdate(Entity $entity): bool
 	{
+		if(go()->getAuthState()->isAdmin()) {
+			return true;
+		}
 		
 		if($this->rights->mayChangeUsers) {
 			// Changing groups is a big no-no!
