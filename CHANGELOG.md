@@ -2,6 +2,7 @@
 - Leavedays: fix leaveday status rendering problem in very specific case 
 - Leavedays: timing problem in user panel (cherry-pick from 25.0)
 - Email: Do not ask for oauth consent every time
+- Core: Admins may change groups in user dialog
 
 15-12-2025: 6.8.147 
 - Email: fixed reading email with a large base64 encoded resource while blocking external images
