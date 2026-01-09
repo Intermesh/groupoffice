@@ -6,7 +6,7 @@ client.uri = "/api/";
 
 
 // Loads all module scripts before authentication
-await modules.loadUI();
+await modules.loadCapabilities();
 
 // Authenticate
 authManager.requireLogin().then(async () => {

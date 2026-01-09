@@ -10,7 +10,11 @@ $mods = Module::find();
 
 $baseUrl = dirname(\go\core\http\Request::get()->getPath(), 5) . '/';
 
-$response = ['modules' => []];
+$response = [
+	'title' => go()->getSettings()->title,
+	'modules' => []
+];
+
 foreach($mods as $mod) {
 	$gouiScript = $mod->module()->getFolder()->getFile("views/goui/dist/Index.js");
 
