@@ -88,6 +88,7 @@ try {
 	$package = array_shift($parts);
 	if ($package == "core") {
 		$c = GO();
+		$ctrlCls = "go\\core\\App";
 		$method = "download" . array_shift($parts);
 	} else {
 		$module = array_shift($parts);

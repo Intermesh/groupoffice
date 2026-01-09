@@ -2,6 +2,7 @@
 namespace GO\Base;
 
 use Faker\Generator;
+use go\core\data\ArrayableInterface;
 use go\core\fs\Folder;
 use go\core\Installer;
 use go\core\orm\EntityType;
@@ -35,7 +36,7 @@ use go\core\orm\EntityType;
  * @package GO.base 
  */
 
-class Module extends Observable {
+class Module extends Observable implements ArrayableInterface {
 	
 	const PACKAGE_UNSUPPORTED = '3rd party (Not supported by Intermesh)';
 	
@@ -763,4 +764,26 @@ class Module extends Observable {
 
 	}
 
+	public function toArray(?array $properties = null): array|null
+	{
+		$model = \go\core\model\Module::findByName(null, $this->name());
+
+		return array(
+			'id' => "legacy/" . $this->name(),
+			'name'=>$this->name(),
+			'package' => 'legacy',
+			'title' => $this->localizedName(),
+			'author'=>$this->author(),
+			'description'=>$this->description(),
+			'rights'=> array_keys($this->getRights()),
+			"status" => $this->getStatus(),
+
+			'packageTitle'=> $this->package(),
+			'enabled'=> $model && $model->enabled,
+			'installable'=> $this->isInstallable(),
+			'installed' => $model != false,
+
+			'model' => $model
+		);
+	}
 }

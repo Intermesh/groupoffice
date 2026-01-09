@@ -994,6 +994,11 @@ namespace go\core {
 			$file->output(true, true, ['Content-Disposition' => 'inline; filename="module.svg"']);
 		}
 
+		public function downloadModuleImg($package, $name) {
+			$file = go()->getEnvironment()->getInstallFolder()->getFile('go/modules/community/calendar/calendar.png');
+			$file->output(true, true, ['Content-Disposition' => 'inline; filename="module.svg"']);
+		}
+
 
 		/**
 		 * Display's logo without authentication via /api/page.php/core/logo
