@@ -9,8 +9,7 @@ cd $DIR/../;
 DIR="$(pwd)";
 
 cd "$DIR/www"
-npm install
-# npm ci --prefer-offline --audit=false --progress=false --fund=false
+npm ci --prefer-offline --audit=false --progress=false --fund=false
 
 echo "Building SASS"
 
@@ -40,7 +39,7 @@ function buildGOUI() {
 }
 
 function buildAndInstallGOUIExceptCommunityAndBusiness() {
-  echo BUILDING node modules inside "$1"...
+  echo BUILDING AND INSTALL node modules inside "$1"...
   cd $DIR;
   find "$1" \
       \( -path '*/community/*' -o -path '*/business/*' -o -path '*/node_modules/*' \) -prune -o \
@@ -49,7 +48,7 @@ function buildAndInstallGOUIExceptCommunityAndBusiness() {
     local NODE_DIR="$(dirname "${line}")";
     echo "BUILD:" $NODE_DIR;
     cd $NODE_DIR;
-    npm ci;
+    npm ci --prefer-offline --audit=false --progress=false --fund=false;
     npm run build;
     cd $DIR;
 
