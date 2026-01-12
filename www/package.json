@@ -1,0 +1,11 @@
+{
+  "name": "group-office",
+  "private": true,
+  "workspaces": [
+    "views/goui",
+    "views/goui/goui",
+    "views/goui/groupoffice-core",
+    "promodules/*/views/goui",
+    "go/modules/**/views/goui"
+  ]
+}
