@@ -6,6 +6,7 @@
     "views/goui/goui",
     "views/goui/groupoffice-core",
     "promodules/*/views/goui",
-    "go/modules/**/views/goui"
+    "go/modules/community/*/views/goui",
+    "go/modules/business/*/views/goui"
   ]
 }
