@@ -210,13 +210,13 @@ class Builder
 	{
 		cd($this->buildDir . "/" . $this->packageName);
 		cd("views/goui/goui");
-		run("npm ci");
+		run("npm ci --prefer-offline --audit=false --progress=false --fund=false");
 
         cd("../groupoffice-core");
-		run("npm ci");
+		run("npm ci --prefer-offline --audit=false --progress=false --fund=false");
 
         cd("../");
-        run("npm ci");
+        run("npm ci --prefer-offline --audit=false --progress=false --fund=false");
         run("npm run build");
 
 	}
@@ -246,7 +246,7 @@ class Builder
 		foreach ($packageFiles as $packageFile) {
 			$nodeDir = dirname($packageFile);
 			cd($nodeDir);
-			run("npm ci");
+			run("npm ci --prefer-offline --audit=false --progress=false --fund=false");
 			run("pwd");
 			run("npm run build");
 			run("npm prune --omit=dev");
