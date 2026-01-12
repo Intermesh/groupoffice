@@ -9,6 +9,7 @@ cd $DIR/../;
 DIR="$(pwd)";
 
 cd "$DIR/www"
+npm install
 
 echo "Building SASS"
 
@@ -29,8 +30,6 @@ function buildGOUI() {
     local NODE_DIR="$(dirname "${line}")";
     echo "BUILD:" $NODE_DIR;
     cd $NODE_DIR;
-    #rm -rf node_modules
-    npm ci;
     npm run build;
     cd $DIR;
 
@@ -41,17 +40,7 @@ function buildGOUI() {
 
 echo "Building GOUI shared libs"
 cd $DIR;
-cd ./www/views/goui/goui
-#rm -rf node_modules
-npm ci
-
-cd ../groupoffice-core
-#rm -rf node_modules
-npm ci
-
-cd ..
-#rm -rf node_modules
-npm ci
+cd ./www/views/goui
 npm run build
 
 cd $DIR;
@@ -59,3 +48,4 @@ echo "DONE";
 
 buildGOUI "./www/go/modules"
 buildGOUI "./www/promodules"
+echo $SECONDS;
