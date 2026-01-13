@@ -238,6 +238,14 @@ class Module extends Observable implements ArrayableInterface {
 	public function copyright(){
 		return 'Copyright Intermesh BV';
 	}
+
+	/**
+	 * Get URL to the documentation page
+	 * @return string|null
+	 */
+	public function getDocumentationURL(): ?string {
+		return null;
+	}
 	
 	/**
 	 * Return true if this module belongs in the admin menu.
@@ -766,7 +774,7 @@ class Module extends Observable implements ArrayableInterface {
 
 	public function toArray(?array $properties = null): array|null
 	{
-		$model = \go\core\model\Module::findByName(null, $this->name());
+		$model = \go\core\model\Module::findByName(null, $this->name(), null);
 
 		return array(
 			'id' => "legacy/" . $this->name(),
@@ -783,7 +791,9 @@ class Module extends Observable implements ArrayableInterface {
 			'installable'=> $this->isInstallable(),
 			'installed' => $model != false,
 
-			'model' => $model
+			'model' => $model,
+
+			'documentationUrl' => $this->getDocumentationURL()
 		);
 	}
 }

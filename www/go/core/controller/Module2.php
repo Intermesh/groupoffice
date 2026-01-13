@@ -32,7 +32,7 @@ class Module2 extends \go\core\Controller {
 			foreach($params['update'] as $id => $props) {
 				list($package, $name) = explode('/', $id);
 
-				$module = \go\core\model\Module::findByName($package, $name);
+				$module = \go\core\model\Module::findByName($package, $name, null);
 
 				if(!$module && !empty($props['installed'])) {
 					$module = $this->install($package, $name);
@@ -80,7 +80,7 @@ class Module2 extends \go\core\Controller {
 
 		} else {
 			\GO\Base\Model\Module::install($name);
-			return \go\core\model\Module::findByName($package, $name);
+			return \go\core\model\Module::findByName($package, $name, null);
 		}
 
 

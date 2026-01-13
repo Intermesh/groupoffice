@@ -505,6 +505,15 @@ abstract class Module extends Singleton implements ArrayableInterface {
 	 */
 	abstract function getAuthor(): string;
 
+
+	/**
+	 * Get URL to the documentation page
+	 * @return string|null
+	 */
+	public function getDocumentationURL(): ?string {
+		return null;
+	}
+
 	/**
 	 * The names of the properties that can be set as permission. The value will be a label (to be translated by client)
 	 * When this is not overriden there are no extra permissions. Groups van still be added
@@ -975,7 +984,8 @@ abstract class Module extends Singleton implements ArrayableInterface {
 			'enabled'=>$model && $model->enabled,
 			'installed' => $this->isInstalled(false),
 			'model' => $model,
-			'installable'=> !$this->isInstallable()
+			'installable'=> !$this->isInstallable(),
+			'documentationUrl' => $this->getDocumentationURL()
 		);
 	}
 }

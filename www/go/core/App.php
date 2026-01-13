@@ -989,9 +989,12 @@ namespace go\core {
 			}
 
 			if(!$file->exists()) {
-				$file = go()->getEnvironment()->getInstallFolder()->getFile('views/Extjs3/themes/Paper/img/default-avatar.svg');
+				$file = go()->getEnvironment()->getInstallFolder()->getFile('views/Extjs3/themes/Paper/img/default-app-icon.svg');
+				$file->output(true, true, ['Content-Disposition' => 'inline; filename="module.svg"']);
+			} else {
+				$file->output(true, true, ['Content-Disposition' => 'inline; filename="module.png"']);
 			}
-			$file->output(true, true, ['Content-Disposition' => 'inline; filename="module.svg"']);
+
 		}
 
 		public function downloadModuleImg($package, $name) {
