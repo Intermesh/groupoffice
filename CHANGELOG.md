@@ -1,3 +1,4 @@
+13-01-2026: 25.0.79
 - Serverclient: more foolproof method for generating base URL
 - Core: ModifiedBy should not be set when no relevant properties were modified. Solves invalid modifiedBy in the calendar 
   where caldav users would modify the event by generating the vcalendar object
