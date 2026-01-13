@@ -12,8 +12,21 @@ class Module2 extends \go\core\Controller {
 
 		$mods = $col->getAvailableModules(true);
 
-		return ["list" => array_map(function($m){return $m::get()->toArray();}, $mods)];
+		$list = array_map(function($m){return $m::get()->toArray();}, $mods);
 
+		if(!empty($params['ids'])) {
+			$list = array_filter($list, function($m) use ($params){return in_array($m['id'], $params['ids']);});
+		}
+
+		return ["list" => $list];
+	}
+
+	public function query($params) {
+		$col = new \GO\Base\ModuleCollection();
+
+		$mods = $col->getAvailableModules(true);
+
+		return ['ids' => array_map(function($m){$i = $m::get();return ($i->getPackage()) . "/" . $i->name() ;}, $mods)];
 	}
 
 	public function set($params) {

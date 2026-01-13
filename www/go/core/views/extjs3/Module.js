@@ -82,7 +82,7 @@ go.Modules.register("core", 'core', {
 			name: 'FieldSet', 
 			title: t("Custom field set")
 		}, 
-		'Module', 
+		'Module',
 		{
 			name: 'Link',
 			relations: {

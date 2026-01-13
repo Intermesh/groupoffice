@@ -119,6 +119,13 @@ class Group extends AclOwnerEntity {
 						$query->join('core_acl_group', 'ag_sort', 'ag_sort.groupId = g.id AND ag_sort.aclId = ' . (int) $aclId, 'LEFT');
 						$query->orderBy(array_merge([new Expression('ISNULL(ag_sort.groupId) ASC')], $query->getOrderBy()));
 						$query->groupBy(['g.id']);
+					})
+					->add('inModulePermissions',function (Criteria $criteria, $value, Query $query) {
+
+						//this filter doesn't actually filter but sorts the selected members on top
+						$query->join('core_permission', 'permission_sort', 'permission_sort.groupId = g.id AND permission_sort.moduleId = ' . (int) $value, 'LEFT');
+						$query->orderBy(array_merge([new Expression('ISNULL(permission_sort.groupId) ASC')], $query->getOrderBy()));
+						$query->groupBy(['g.id']);
 					});
 						
 	}
