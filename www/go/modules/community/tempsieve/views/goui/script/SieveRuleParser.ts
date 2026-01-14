@@ -21,7 +21,7 @@ export class SieveRuleParser {
 		const lines = this._record.raw.split("\n");
 		for (const line of lines) {
 			if (line.startsWith("if")) {
-				this.parseCriterium(line);
+				this.parseTest(line);
 			}
 		}
 		if (this._tests.length === 0) {
@@ -33,7 +33,7 @@ export class SieveRuleParser {
 	 * Parse individual criterium lines.
 	 * @param line
 	 */
-	private parseCriterium(line: string): SieveCriteriumEntity {
+	private parseTest(line: string): SieveCriteriumEntity {
 		const words = line.split(" ");
 		const test = words[0] === "if" ? words[1] : words[0];
 		let startIdx = words[0] === "if" ? 2 : 1;
@@ -48,7 +48,7 @@ export class SieveRuleParser {
 				this._record.join = test;
 				const rawSubCrits = words.slice(startIdx).join(" ").replace(/[()]/g, "");
 				for (const subCritLine of rawSubCrits.split(", ")) {
-					this.parseCriterium(subCritLine);
+					this.parseTest(subCritLine);
 				}
 
 				break;
@@ -86,11 +86,11 @@ export class SieveRuleParser {
 				// The rule is NOT active. The original criteria are parsed from word number three
 				startIdx++;
 				newLine = words.slice(startIdx);
-				this.parseCriterium(newLine.join(" "));
+				this.parseTest(newLine.join(" "));
 				break;
 			case "not":
 				newLine = words.slice(startIdx);
-				crit = this.parseCriterium(newLine.join(" "));
+				crit = this.parseTest(newLine.join(" "));
 				crit.not = true;
 				break;
 			case "header":
@@ -126,6 +126,14 @@ export class SieveRuleParser {
 				this._tests.push(crit);
 		}
 		return crit;
+	}
+
+	/**
+	 * Add a
+	 * @param c
+	 */
+	public addTest(c: SieveCriteriumEntity): void {
+		this._tests.push(c);
 	}
 
 	/**
@@ -225,6 +233,10 @@ export class SieveRuleParser {
 		}
 		this._actions.push(action);
 
+	}
+
+	public addAction(a: SieveActionEntity): void {
+		this._actions.push(a);
 	}
 
 	/**

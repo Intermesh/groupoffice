@@ -11,7 +11,7 @@ export class SieveScriptParser {
 	public script: SieveScriptEntity;
 	public requirements: string[];
 	public rules: SieveRuleEntity[];
-	public oooRules: SieveRuleEntity[] = [];
+	public oooRule: SieveRuleEntity | undefined;
 	private rawScript: string = "";
 
 	public supported = [     // Sieve extensions supported by class
@@ -33,8 +33,8 @@ export class SieveScriptParser {
 		'subaddress',               // RFC5233
 		'vacation',                 // RFC5230
 		'vacation-seconds',         // RFC6131
-		'variables',                                // RFC5229
-		'mailbox'                                        // RFC5490
+		'variables',                // RFC5229
+		'mailbox'                   // RFC5490
 	];
 
 	constructor(s: SieveScriptEntity) {
@@ -113,7 +113,7 @@ export class SieveScriptParser {
 					ret.push(r);
 					idx++;
 				} else {
-					this.oooRules.push(r);
+					this.oooRule = r;
 				}
 			}
 		}

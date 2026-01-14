@@ -6,7 +6,7 @@ use go\core\jmap\EntityController;
 use go\core\util\ArrayObject;
 use go\modules\community\tempsieve\model;
 
-class VacationResponse extends EntityController
+final class VacationResponse extends EntityController
 {
 	use SieveControllerTrait;
 	/**

@@ -15,7 +15,7 @@ import {
 	datasourcestore,
 	Table,
 	Window,
-	autocomplete, AutocompleteField, store, TextAreaField, textarea, Notifier
+	autocomplete, AutocompleteField, store, TextAreaField, textarea, Notifier, cardmenu, cards
 } from "@intermesh/goui";
 import {
 	client,
@@ -26,17 +26,19 @@ import {SieveRuleEntity, SieveScriptEntity} from "./Index";
 import {SieveRuleWindow} from "./SieveRuleWindow";
 import {SieveScriptParser} from "./SieveScriptParser";
 import {SieveRuleParser} from "./SieveRuleParser";
+import {OutOfOfficePanel} from "./OutOfOfficePanel";
 
 
 export class MainPanel extends MainThreeColumnPanel {
 	private accountsGrid: Menu<ComponentEventMap> | undefined;
 	private accountId: string | undefined;
+	private cardsCmp: Component | undefined;
 	private successCmp: Component | undefined;
 	private warningCmp: Component | undefined;
 	private scriptsCombo: AutocompleteField | undefined;
 	private rulesPnl: Component | undefined;
 	private rulesGrid: Table | undefined;
-	private oooPanel: Component | undefined;
+	private oooPanel: OutOfOfficePanel | undefined;
 	private rawEditor: TextAreaField | undefined;
 	private scriptParser: SieveScriptParser | undefined;
 
@@ -67,11 +69,30 @@ export class MainPanel extends MainThreeColumnPanel {
 				cls: "vbox pad",
 				flex: 1
 			},
-			this.successCmp = comp({cls: "success", hidden: true, html: t("This account supports Sieve!")}),
-			this.warningCmp = comp({cls: "warning", hidden: true}),
-			this.rulesPnl = comp({hidden: true}),
-			this.rawEditor = textarea({hidden: true, name: "raw", height: 800}),
-			this.oooPanel = comp({html: "TODO: Out of office panel", hidden: true})
+			this.cardsCmp = comp({
+				// cls: "frame"
+			},
+				cardmenu(),
+				cards({
+						activeItem: 0
+					},
+					comp({
+						title: t("Filters"),
+						cls: "pad",
+					},
+						this.successCmp = comp({cls: "success", hidden: true, html: t("This account supports Sieve!")}),
+						this.warningCmp = comp({cls: "warning", hidden: true}),
+						this.rulesPnl = comp({hidden: true}),
+						this.rawEditor = textarea({hidden: true, name: "raw", height: 800}),
+					),
+					comp({
+						title: t("Out of Office"),
+						cls: "pad"
+					},
+						this.oooPanel = new OutOfOfficePanel()
+					)
+				)
+			),
 		);
 	}
 
@@ -91,6 +112,9 @@ export class MainPanel extends MainThreeColumnPanel {
 			let accountBtns: Button[] = [];
 			store.load().then((v) => {
 				for (const curr of v) {
+					if (!this.accountId) {
+						this.accountId = curr.id;
+					}
 					accountBtns.push(btn({
 						text: curr.username,
 						cls: curr.id === this.accountId ? "pressed" : "",
@@ -102,27 +126,26 @@ export class MainPanel extends MainThreeColumnPanel {
 					}));
 				}
 				this.accountsGrid!.items.add(...accountBtns);
-			});
+			}).finally(() => this.loadAccount(this.accountId!));
 
 		});
 	}
 
 	public async loadAccount(id: string) {
+		this.cardsCmp!.hidden = true;
 		this.successCmp!.hidden = true;
 		this.warningCmp!.hidden = true;
 		this.rulesPnl!.hidden = true;
 		this.rulesPnl!.items.clear();
-		this.oooPanel!.hidden = true;
 		this.rawEditor!.value = undefined;
-		this.rawEditor!.hidden = true;
 		const response = await go.Jmap.request({
 			method: "community/tempsieve/Sieve/isSupported",
 			params: {accountId: id},
 		});
+		this.cardsCmp!.hidden = false;
 		if (response.isSupported) {
 			this.successCmp!.hidden = false;
 			this.rulesPnl!.hidden = false;
-			this.oooPanel!.hidden = false;
 		} else {
 			this.warningCmp!.hidden = false;
 			this.warningCmp!.html = response.message;
@@ -145,12 +168,18 @@ export class MainPanel extends MainThreeColumnPanel {
 			);
 		Promise.all([p1, p2]).then(arResult => {
 			const activeRuleSet = arResult[0].list.find((i: any) => i.isActive);
+			this.scriptParser = new SieveScriptParser(activeRuleSet);
 			this.renderRulesTable(activeRuleSet);
 			this.scriptsCombo!.list.store.loadData(arResult[0].list);
 			this.scriptsCombo!.value = activeRuleSet.id;
 			this.rawEditor!.hidden = false;
 			this.rawEditor!.value = activeRuleSet.script;
-			this.oooPanel!.html = "TODO: Out of Office / vacation";
+			if (this.scriptParser!.oooRule) {
+				this.oooPanel!.setValues(this.scriptParser!.oooRule!);
+			}
+			this.oooPanel!.on('ooosave', ({}) => {
+				this.updateRawScript();
+			});
 		});
 	}
 
@@ -276,7 +305,7 @@ export class MainPanel extends MainThreeColumnPanel {
 									Notifier.error(errorDescription);
 								} else {
 									this.rawEditor!.clearInvalid();
-									Notifier.success(t("Script validated successfully"));
+									Notifier.success(t("Script updated successfully"));
 								}
 							});
 						});
@@ -300,8 +329,7 @@ export class MainPanel extends MainThreeColumnPanel {
 			),
 			this.rulesGrid
 		));
-		this.scriptParser = new SieveScriptParser(script);
-		this.rulesGrid.store.loadData(this.scriptParser.rules, false);
+		this.rulesGrid.store.loadData(this.scriptParser!.rules, false);
 	}
 
 	private renderActions(record: SieveRuleEntity, store: Store, storeIndex: number) {
@@ -364,6 +392,10 @@ export class MainPanel extends MainThreeColumnPanel {
 		let r = `require ${this.scriptParser?.requirements}\n`;
 		for (const item of this.rulesGrid!.store.getArray()) {
 			r += item.raw + "\n";
+		}
+		debugger;
+		if(this.oooPanel && this.oooPanel.raw) {
+			r += this.oooPanel.raw + "\n";
 		}
 		this.rawEditor!.value = r;
 	}
