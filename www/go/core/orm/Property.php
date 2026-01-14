@@ -1873,13 +1873,16 @@ abstract class Property extends Model {
 		return $this->_forUserId ?? go()->getUserId();
 	}
 
+	/**
+	 * Checks if modifiedBy, modifiedAt, createdBy or createdAt should be set automatically.
+	 */
 	private function shouldSetSaveProps(array $modified): bool
 	{
 		if(empty($modified)) {
 			return false;
 		}
 
-		$diff = array_diff(array_keys($modified), static::ignorePropertiesForModifiedAt());
+		$diff = array_diff(array_keys($modified), static::ignorePropertiesForModifiedAt(), ['modifiedAt', 'modifiedBy', 'createdAt', 'createdBy']);
 		return !empty($diff);
 	}
 

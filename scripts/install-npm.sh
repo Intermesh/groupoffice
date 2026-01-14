@@ -9,6 +9,7 @@ cd $DIR/../;
 DIR="$(pwd)";
 
 cd "$DIR/www"
+npm ci --prefer-offline --audit=false --progress=false --fund=false
 
 echo "Building SASS"
 
@@ -29,8 +30,6 @@ function buildGOUI() {
     local NODE_DIR="$(dirname "${line}")";
     echo "BUILD:" $NODE_DIR;
     cd $NODE_DIR;
-    #rm -rf node_modules
-    npm ci;
     npm run build;
     cd $DIR;
 
@@ -39,23 +38,39 @@ function buildGOUI() {
   echo "DONE";
 }
 
+function buildAndInstallGOUIExceptCommunityAndBusiness() {
+  echo BUILDING AND INSTALL node modules inside "$1"...
+  cd $DIR;
+  find "$1" \
+      \( -path '*/community/*' -o -path '*/business/*' -o -path '*/node_modules/*' \) -prune -o \
+      -name package.json -print |
+    while IFS= read -r line; do
+    local NODE_DIR="$(dirname "${line}")";
+    echo "BUILD:" $NODE_DIR;
+    cd $NODE_DIR;
+    npm ci --prefer-offline --audit=false --progress=false --fund=false;
+    npm run build;
+    cd $DIR;
+
+  done
+
+  echo "DONE";
+}
+
+
 echo "Building GOUI shared libs"
 cd $DIR;
-cd ./www/views/goui/goui
-#rm -rf node_modules
-npm ci
-
-cd ../groupoffice-core
-#rm -rf node_modules
-npm ci
-
-cd ..
-#rm -rf node_modules
-npm ci
+cd ./www/views/goui
 npm run build
 
 cd $DIR;
 echo "DONE";
 
-buildGOUI "./www/go/modules"
+buildGOUI "./www/go/modules/community"
+buildGOUI "./www/go/modules/business"
 buildGOUI "./www/promodules"
+
+# =)
+buildAndInstallGOUIExceptCommunityAndBusiness "./www/go/modules"
+
+echo $SECONDS;

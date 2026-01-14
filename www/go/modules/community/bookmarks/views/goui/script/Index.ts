@@ -22,7 +22,8 @@ modules.register({
 				return new Main();
 			});
 		})
-	}
+	},
+	entities: ["Bookmark", "BookmarksCategory"]
 });
 
 export const bookmarkDS = new JmapDataSource("Bookmark");

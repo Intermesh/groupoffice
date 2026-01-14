@@ -246,7 +246,9 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						items: [
 							{boxLabel: t("Unknown"), inputValue: null},
 							{boxLabel: t("Male"), inputValue: 'M'},
-							{boxLabel: t("Female"), inputValue: 'F'}
+							{boxLabel: t("Female"), inputValue: 'F'},
+							{boxLabel: t("Non-binary"), inputValue: 'N'},
+							{boxLabel: t("Won't say"), inputValue: 'P'}
 						]
 					}),
 

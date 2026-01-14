@@ -1,9 +1,10 @@
-import {comp, fieldset, htmlfield, Notifier, root, t, textfield} from "@intermesh/goui";
+import {comp, fieldset, HtmlField, htmlfield, Notifier, root, t, textfield} from "@intermesh/goui";
 import {client, customFields, FormFieldset, FormWindow, Image} from "@intermesh/groupoffice-core";
 import {notebookcombo} from "./NoteBookCombo";
 import {Note} from "./Index";
 
 export class NoteDialog extends FormWindow<Note> {
+	private contentFld: HtmlField;
 	constructor() {
 		super("Note");
 
@@ -33,13 +34,11 @@ export class NoteDialog extends FormWindow<Note> {
 					})
 				),
 
-				htmlfield({
+				this.contentFld = htmlfield({
 					name: "content",
 					flex: 1,
 					listeners: {
-						setvalue: ({target}) => {
-							void Image.replaceImages(target.el);
-						},
+
 						insertimage: ({file, img}) => {
 							root.mask();
 
@@ -62,8 +61,15 @@ export class NoteDialog extends FormWindow<Note> {
 			)
 		)
 
+		this.form.on("load", () => {
+			void Image.replaceImages(this.contentFld.el).then(() => {
+				this.contentFld.trackReset();
+			})
+		})
+
 		this.addCustomFields();
 	}
+
 
 	protected addCustomFields() {
 		//for notes all are tabs

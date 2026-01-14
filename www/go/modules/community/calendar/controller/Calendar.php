@@ -51,7 +51,8 @@ class Calendar extends EntityController {
 
 		return [
 			'success'=> true,
-			'calendarId'=>$calendar->id
+			'calendarId'=>$calendar->id,
+			'calendar'=> $calendar->toArray()
 		];
 
 	}

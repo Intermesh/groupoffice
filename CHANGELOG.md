@@ -1,3 +1,84 @@
+13-01-2026: 25.0.79
+- Serverclient: more foolproof method for generating base URL
+- Core: ModifiedBy should not be set when no relevant properties were modified. Solves invalid modifiedBy in the calendar 
+  where caldav users would modify the event by generating the vcalendar object
+- Address book: More gender options in address book
+
+06-01-2026: 25.0.78
+- Z-push: older version was accidentally included.
+- Tasks: Add projects3 filters only if the module is installed.
+
+05-01-2026: 25.0.77 
+- WOPI: Implement Save as for Collabora and Microsoft Office Online (didn't work on ssl with default port before)
+- Core: Error in API docs generate script
+- Email: Do not ask for oauth consent every time
+- Core: Added welcome announcement with link to getting started guide
+
+22-12-2025: 25.0.76
+- Calendar: New users got a calendar but it wasn't automatically subscribed
+- WOPI: Implement Save as for Collabora and Microsoft Office Online
+
+19-12-2025: 25.0.75
+- Calendar: Handle when the calendar item's start date can't be parsed.
+- Calendar: Problem with events from the holoidays module.
+
+15-12-2025: 25.0.74 
+- Email: fixed reading email with a large base64 encoded resource while blocking external images
+- Core: somewhat more helpful error reporting when user cannot be automatically imported from email
+- Leavedays: will be shown in calendar again. broken since 25.0.67
+- Calendar: save calendar user preferences, broken since 25.0.72
+- Projects3: Correctly uninstall projects3 and overwrite when reinstalling.
+
+08-12-2025: 25.0.73
+- Calendar: Fixed various print issues
+- Notifications: removed open_settings panel config. and do not open the panel when checker.js find a notification on boot
+- Calendar: Add both created as Resource Group owner to the ACL of a newly created Resource
+- Calendar: remove empty language file
+- Maildomains: optimize migration script
+
+04-12-2025: 25.0.72
+- Email: get correct mime type for blobs. Not text/plain for text/csv for example.
+- Core: OpenID server packages upgraded and added discovery to docker
+- Newsletters: Fixed problem where mail wouldn't send with account from email module
+- Files: Don't put folders with visible=false in the search results and correct root folders with invalid acl's in the db check
+- Calendar: Replaced recurrenceID validation with quick fix for invalid recurenceId's from MS Exchange 2010
+
+01-12-2025: 25.0.71
+- Calendar: bug in update script
+
+01-12-2025: 25.0.70
+- Calendar: Workaround Microsoft Exchange Server 2010 sending an invalid recurrenceID
+- Finance: Fix shoddy NL translation
+- Calendar: Made it possible to integrate differnt video meeting providers
+- Jitsimeet: Put into own module
+- Microsoft Teams: New pro module to add MS teams links to calendar events
+- Finance: Fixed margin not calculating in some rare cases
+- OIDC: New open ID connect module that is suitable for any open ID server- 
+
+24-11-2025: 25.0.69
+- Core: fix composer dependency error
+- Leavedays: fixed several errors in special leave budget flow
+- Core: Fixed Stored XSS in Contacts Comments Section via Malicious SVG File Upload
+
+24-11-2025: 25.0.68
+- DE translations. Danke Daniel!
+- Calendar: show private events as "Private" in caldav
+- Calendar: permission check for deleting calendars in caldav
+- Calendar: Enable syncToDevice only when it's your own calendar
+- Calendar: Add event to calendars of invitees who are in the same system immediately
+- Core: Serve insecure types (html, svg) as plain text to prevent Stored XSS
+- Maildomains: Automatic mailbox creation not working (Issue #1384)
+- Calendar: Fixed personal calendar combo not loading correctly when opened as admin
+- Projects3: Show mine filter set too late
+- Calendar: Improved month view
+- Core: Fixed bug in search with names and - or _ in them.
+- #1365 Add phone scope, extend user's attributes Thanks @michalcharvat
+- #1368 set default editTB container width Thanks @michalcharvat
+
+17-11-2025: 25.0.67
+- Calendar: Select tasks for the calendar view if the due date is in the selected range.
+- Maildomains: fix error when adding new maildomain, mailbox or alias #1382
+
 13-11-2025: 25.0.66
 - Calendar: Read private events as owner of the calendars (Fixed)
 - Leavedays: single day leave days with time will show with time in the calendar.
