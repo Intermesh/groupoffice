@@ -1,5 +1,6 @@
 {
   "type": "module",
+  "name": "history",
   "devDependencies": {
     "concurrently": "latest",
     "esbuild": "latest",
