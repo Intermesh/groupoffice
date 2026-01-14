@@ -1,5 +1,6 @@
 {
   "type": "module",
+  "name": "comments",
   "devDependencies": {
     "concurrently": "latest",
     "esbuild": "latest",
