@@ -1,5 +1,6 @@
 {
   "type": "module",
+  "name": "davclient",
   "devDependencies": {
     "concurrently": "latest",
     "esbuild": "latest",

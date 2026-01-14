@@ -1,5 +1,6 @@
 {
   "type": "module",
+  "name": "jitsimeet",
   "devDependencies": {
     "concurrently": "latest",
     "esbuild": "latest",

@@ -62,7 +62,7 @@ const moduleResolverPlugin = {
 	}
 }
 
-const opts = {
+const ctx = await esbuild.context({
 	entryPoints: entryPoints,
 	bundle: true,
 	sourcemap: true,
@@ -72,13 +72,13 @@ const opts = {
 	outdir: "dist",
 	plugins: [moduleResolverPlugin],
 	logLevel: "info"
-}
+});
 
 if(watch) {
-	let ctx = await esbuild.context(opts);
 	await ctx.watch();
 	console.log('Watching...');
 } else {
-
-	await esbuild.build(opts);
+	await ctx.rebuild();
+	await ctx.dispose();
+	//await esbuild.build(opts);
 }
