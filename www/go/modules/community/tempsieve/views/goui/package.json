@@ -1,5 +1,6 @@
 {
   "type": "module",
+  "name": "tempsieve",
   "devDependencies": {
     "concurrently": "latest",
     "esbuild": "latest",
