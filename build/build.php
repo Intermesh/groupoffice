@@ -49,7 +49,7 @@ class Builder
 {
 	public $test = false;
 
-	private $majorVersion = "25.0";
+	private $majorVersion = "26.0";
 
 	private $gitBranch = 'master';
 
