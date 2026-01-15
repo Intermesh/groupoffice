@@ -5,7 +5,7 @@ use go\core\exception\NotFound;
 use go\core\orm\exception\SaveException;
 use go\core\util\ArrayObject;
 
-class Module2 extends \go\core\Controller {
+class ModuleInfo extends \go\core\Controller {
 	public function get($params) {
 
 		$col = new \GO\Base\ModuleCollection();
