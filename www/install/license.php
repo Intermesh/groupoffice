@@ -12,6 +12,9 @@ use go\core\App;
 
 App::get();
 
+$cache = go()->getCache();
+
+go()->setCache(new None());
 
 if(!go()->isInstalled()) {
 	header("Location: index.php");
@@ -50,6 +53,8 @@ if (!empty($_POST)) {
 
             if( !go()->getSettings()->licenseDenied) {
                 License::installModules();
+
+                go()->setCache($cache);
                 go()->rebuildCache();
             }
 
