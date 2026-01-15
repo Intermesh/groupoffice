@@ -169,7 +169,6 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 					const f = this.list.items?.find(v => v.dataSet.key === id) as ContainerField;
 					if(f) {
 						const name = f.findChild(f => f.itemId === 'name')!;
-						debugger;
 						if(response.list.length > 0) {
 							name.style.color = 'red';
 							if(id.startsWith('Calendar:')) {
