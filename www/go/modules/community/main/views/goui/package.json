@@ -1,4 +1,5 @@
 {
+  "name": "community-main",
   "type": "module",
   "devDependencies": {
     "concurrently": "latest",
