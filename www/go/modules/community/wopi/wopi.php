@@ -3,8 +3,8 @@ require('../../../../vendor/autoload.php');
 use go\core\App;
 use go\core\jmap\State;
 use go\core\http\Router;
-use go\modules\business\wopi\controller\Wopi;
-use go\modules\business\wopi\controller\Edit;
+use go\modules\community\wopi\controller\Wopi;
+use go\modules\community\wopi\controller\Edit;
 
 // MS https://ffc-onenote.officeapps.live.com/hosting/discovery
 

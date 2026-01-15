@@ -1,10 +1,10 @@
 <?php
-namespace go\modules\business\wopi;
+namespace go\modules\community\wopi;
 
 use go\core;
 use go\core\model;
 use go\core\model\Group;
-use go\modules\business\wopi\model\Service;
+use go\modules\community\wopi\model\Service;
 
 /**						
  * 

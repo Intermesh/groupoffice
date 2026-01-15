@@ -1,5 +1,5 @@
 <?php
-namespace go\modules\business\wopi\model;
+namespace go\modules\community\wopi\model;
 
 use go\core\acl\model\AclOwnerEntity;
 use go\core\http\Client;

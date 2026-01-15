@@ -1,9 +1,9 @@
 <?php
-namespace go\modules\business\wopi\controller;
+namespace go\modules\community\wopi\controller;
 
 use go\core\exception\Forbidden;
 use go\core\model\Acl;
-use go\modules\business\wopi\model;
+use go\modules\community\wopi\model;
 use go\modules\business\license\controller\Controller;
 use GO\Files\Model\File;
 

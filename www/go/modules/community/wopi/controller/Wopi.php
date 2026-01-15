@@ -1,7 +1,7 @@
 <?php
-namespace go\modules\business\wopi\controller;
+namespace go\modules\community\wopi\controller;
 
-use go\modules\business\wopi\model;
+use go\modules\community\wopi\model;
 use go\modules\business\license\controller\Controller;
 use go\core\http\Request;
 use go\core\exception\NotFound;
@@ -11,7 +11,7 @@ use go\core\exception\Forbidden;
 use go\core\http\Exception;
 use go\core\auth\TemporaryState;
 use go\core\http\Response;
-use go\modules\business\wopi\model\Lock;
+use go\modules\community\wopi\model\Lock;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use go\modules\community\history\Module;

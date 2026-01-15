@@ -1,5 +1,5 @@
 <?php
-namespace go\modules\business\wopi\model;
+namespace go\modules\community\wopi\model;
 
 use go\core\orm\Entity;
 use go\core\orm\Mapping;

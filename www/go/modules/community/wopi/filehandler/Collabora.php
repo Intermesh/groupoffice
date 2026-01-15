@@ -1,11 +1,11 @@
 <?php
 
-namespace go\modules\business\wopi\filehandler;
+namespace go\modules\community\wopi\filehandler;
 
 use GO;
 use GO\Files\Filehandler\FilehandlerInterface;
 use GO\Files\Model\File;
-use go\modules\business\wopi\model\Service ;
+use go\modules\community\wopi\model\Service ;
 
 class Collabora implements FilehandlerInterface{
 

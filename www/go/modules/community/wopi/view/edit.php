@@ -3,8 +3,8 @@
  * @var string $origin
  * @var string $action
  * @var \GO\Files\Model\File $file
- * @var \go\modules\business\wopi\model\Token $token
- * @var \go\modules\business\wopi\model\Service $service
+ * @var \go\modules\community\wopi\model\Token $token
+ * @var \go\modules\community\wopi\model\Service $service
  */
 ?><!doctype html>
 <html>
@@ -69,7 +69,7 @@
 
 	// The sandbox attribute is needed to allow automatic redirection to the O365 sign-in page in the business user flow
 	//Sandbox attribute breaks libreoffice online printing!
-  <?php if($service->type == \go\modules\business\wopi\model\Service::TYPE_OFFICE_ONLINE) { ?>
+  <?php if($service->type == \go\modules\community\wopi\model\Service::TYPE_OFFICE_ONLINE) { ?>
 	office_frame.setAttribute('sandbox', 'allow-downloads allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation allow-popups-to-escape-sandbox');
   <?php
   }

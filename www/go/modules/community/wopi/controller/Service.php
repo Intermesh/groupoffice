@@ -1,8 +1,8 @@
 <?php
-namespace go\modules\business\wopi\controller;
+namespace go\modules\community\wopi\controller;
 
 use go\modules\business\license\controller\EntityController;
-use go\modules\business\wopi\model;
+use go\modules\community\wopi\model;
 
 /**
  * The controller for the Service entity
