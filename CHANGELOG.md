@@ -5,3 +5,4 @@
     - Notes, Comments and Bookmarks in new GOUI framework
     - Hours approval for Projects 3 module
     - Support module can work without users
+    - Beta Forms module
