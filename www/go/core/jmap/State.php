@@ -243,6 +243,7 @@ class State extends AbstractState {
 			'uploadUrl' => $this->getUploadUrl(),
 			'eventSourceUrl' => $this->getEventSourceUrl(),
 			'userId' => $this->getUserId(),
+			'isAdmin' => $this->isAdmin()
 		];
 		$this->addModuleCapabilities($response);
 
