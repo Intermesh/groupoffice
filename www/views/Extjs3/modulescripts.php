@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Loads all legacy modules scripts.inc.php
+ * The user is authenticated when this loads
+ */
 use go\core\App;
 use go\core\http\Response;
 

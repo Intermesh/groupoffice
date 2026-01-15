@@ -105,6 +105,8 @@ class Extjs3 {
 	
 	
 	private function replaceCssUrl($css, File $file){
+
+//		$css .= "\n\n/*".$file->getPath() ." */\n\n";
 		
 		$baseurl = str_replace(Environment::get()->getInstallFolder()->getPath() . '/', $this->getRelativeUrl(), $file->getFolder()->getPath()).'/';
 		
@@ -378,7 +380,7 @@ class Extjs3 {
 		echo 'Ext.onReady(GO.mainLayout.boot, GO.mainLayout);</script>';
 	}
 
-	private function clientSettings(){
+	public function clientSettings(){
 		return [
 			'max_row_list' => 50,
 			'config' => [

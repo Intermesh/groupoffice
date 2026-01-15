@@ -208,7 +208,12 @@ class JSON {
 		if(empty($pointer)) {
 			$doc[$part] = $value;
 		} else {
-			$doc[$part] = self::patchProp($doc[$part], $pointer, $value);
+			$sub = self::patchProp($doc[$part], $pointer, $value);
+			// do not set the same object because this might cause problems with getters and setters. For example getSettings()
+			// returns a model but setSettings() does not expect this model.
+			if($sub !== $doc[$part]) {
+				$doc[$part] = $sub;
+			}
 		}
 
 		return $doc;

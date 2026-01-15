@@ -1,23 +1,25 @@
 {
   "type": "module",
-  "name": "maildomains",
   "devDependencies": {
     "concurrently": "latest",
     "esbuild": "latest",
     "sass": "latest",
-    "typescript": "latest"
+    "typescript": "latest",
+    "electron": "^39.1.1"
   },
   "scripts": {
-    "start": "npm run build:clean && concurrently --kill-others \"npm run start:ts\" \"npm run start:dts\"  \"npm run start:sass\"",
+    "electron": "npm run build && electron dist/Electron.js",
+
+    "start main": "npm run build:clean && concurrently --kill-others \"npm run start:ts\"  \"npm run start:sass\"",
     "start:ts": "node ../../../../../../views/goui/esbuild-module.mjs watch",
-    "start:dts": "npx tsc --declaration --emitDeclarationOnly --watch",
     "start:sass": "npx sass --watch style:dist",
 
-    "build": "npm run build:clean && npm run build:sass && npm run build:ts && npm run build:dts",
+    "build": "npm run build:clean && npm run build:sass && npm run build:ts && npm run build:electron",
     "build:clean": "rm -rf ./dist/*",
     "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
     "build:sass": "npx sass --style=compressed --no-source-map style:dist",
     "build:dts": "npx tsc --declaration --emitDeclarationOnly",
+    "build:electron": "npx esbuild ./script/Electron.ts --legal-comments=none --outdir=dist --platform=node",
 
     "test": "npx tsc --noEmit"
   }

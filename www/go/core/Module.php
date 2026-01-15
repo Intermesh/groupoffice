@@ -7,6 +7,7 @@ use Faker\Generator;
 use GO\Base\Model\Module as LegacyModuleModel;
 use GO\Base\Module as LegacyModule;
 use go\core\acl\model\AclOwnerEntity;
+use go\core\data\ArrayableInterface;
 use go\core\db\Utils;
 use go\core\exception\NotFound;
 use go\core\fs\File;
@@ -35,7 +36,7 @@ use function GO;
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
-abstract class Module extends Singleton {
+abstract class Module extends Singleton implements ArrayableInterface {
 
 	const STATUS_STABLE = "stable";
 	const STATUS_BETA = "beta";
@@ -504,6 +505,15 @@ abstract class Module extends Singleton {
 	 */
 	abstract function getAuthor(): string;
 
+
+	/**
+	 * Get URL to the documentation page
+	 * @return string|null
+	 */
+	public function getDocumentationURL(): ?string {
+		return null;
+	}
+
 	/**
 	 * The names of the properties that can be set as permission. The value will be a label (to be translated by client)
 	 * When this is not overriden there are no extra permissions. Groups van still be added
@@ -955,5 +965,27 @@ abstract class Module extends Singleton {
 	 */
 	public function demo(Generator $faker) {
 
+	}
+
+	public function toArray(?array $properties = null): array|null
+	{
+		$model = $this->getModel();
+		return array(
+			'id' => $this->getPackage() . "/" . $this->getName(),
+			'name'=>$this->getName(),
+			'package'=>$this->getPackage(),
+			'title' => $this->getTitle(),
+			'author'=>$this->getAuthor(),
+			'description'=>$this->getDescription(),
+			'rights'=>array_keys($this->getRights()),
+			"status" => $this->getStatus(),
+			'packageTitle'=> $this->getLocalizedPackage(),
+
+			'enabled'=>$model && $model->enabled,
+			'installed' => $this->isInstalled(false),
+			'model' => $model,
+			'installable'=> !$this->isInstallable(),
+			'documentationUrl' => $this->getDocumentationURL()
+		);
 	}
 }

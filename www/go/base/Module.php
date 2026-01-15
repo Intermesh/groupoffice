@@ -2,6 +2,8 @@
 namespace GO\Base;
 
 use Faker\Generator;
+use go\core\data\ArrayableInterface;
+use go\core\fs\Folder;
 use go\core\Installer;
 use go\core\orm\EntityType;
 
@@ -34,7 +36,7 @@ use go\core\orm\EntityType;
  * @package GO.base 
  */
 
-class Module extends Observable {
+class Module extends Observable implements ArrayableInterface {
 	
 	const PACKAGE_UNSUPPORTED = '3rd party (Not supported by Intermesh)';
 	
@@ -112,6 +114,16 @@ class Module extends Observable {
 	 */
 	public function path(){
 		return \GO::config()->root_path . 'modules/' . $this->name() . '/';
+	}
+
+	/**
+	 * Get the folder of this module
+	 *
+	 * @return Folder
+	 */
+	public function getFolder(): Folder
+	{
+		return new Folder($this->path());
 	}
 
 	/**
@@ -225,6 +237,14 @@ class Module extends Observable {
 	 */
 	public function copyright(){
 		return 'Copyright Intermesh BV';
+	}
+
+	/**
+	 * Get URL to the documentation page
+	 * @return string|null
+	 */
+	public function getDocumentationURL(): ?string {
+		return null;
 	}
 	
 	/**
@@ -752,4 +772,28 @@ class Module extends Observable {
 
 	}
 
+	public function toArray(?array $properties = null): array|null
+	{
+		$model = \go\core\model\Module::findByName(null, $this->name(), null);
+
+		return array(
+			'id' => "legacy/" . $this->name(),
+			'name'=>$this->name(),
+			'package' => 'legacy',
+			'title' => $this->localizedName(),
+			'author'=>$this->author(),
+			'description'=>$this->description(),
+			'rights'=> array_keys($this->getRights()),
+			"status" => $this->getStatus(),
+
+			'packageTitle'=> $this->package(),
+			'enabled'=> $model && $model->enabled,
+			'installable'=> $this->isInstallable(),
+			'installed' => $model != false,
+
+			'model' => $model,
+
+			'documentationUrl' => $this->getDocumentationURL()
+		);
+	}
 }

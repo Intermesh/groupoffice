@@ -48,6 +48,11 @@ class Module extends core\Module
 		return "Intermesh BV <mdhart@intermesh.nl>";
 	}
 
+	public function getDocumentationURL(): ?string
+	{
+		return "https://groupoffice.readthedocs.io/en/latest/using/calendar.html";
+	}
+
 	protected function rights(): array
 	{
 		return [

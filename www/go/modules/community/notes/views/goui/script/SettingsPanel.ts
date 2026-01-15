@@ -1,12 +1,14 @@
 import {Component, containerfield, datasourceform, fieldset, radio, t} from "@intermesh/goui";
 import {notebookcombo} from "./NoteBookCombo";
-import {User, userDS} from "@intermesh/groupoffice-core";
+import {AppSettingsPanel, User, userDS} from "@intermesh/groupoffice-core";
 
-export class SettingsPanel extends Component {
+export class SettingsPanel extends AppSettingsPanel {
 	private readonly form;
 
 	constructor() {
 		super();
+
+		this.title = t("Notes");
 
 		this.form = datasourceform({
 				dataSource: userDS
@@ -38,11 +40,11 @@ export class SettingsPanel extends Component {
 		this.items.add(this.form);
 	}
 
-	onSubmit() {
+	async save() {
 		return this.form.submit();
 	}
 
-	onLoad(user: User) {
+	async load(user: User) {
 		this.form.currentId = user.id;
 		this.form.value = user;
 	}

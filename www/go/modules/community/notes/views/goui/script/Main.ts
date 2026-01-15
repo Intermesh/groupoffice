@@ -45,7 +45,8 @@ export class Main extends MainThreeColumnPanel {
 				cls: "scroll",
 				width: 300,
 			},
-			tbar({},
+			tbar({
+				},
 				checkbox({
 					listeners: {
 						change: ({newValue}) => {

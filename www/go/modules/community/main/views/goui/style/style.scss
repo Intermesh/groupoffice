@@ -1,0 +1,9 @@
+@use '../../../../../../../views/goui/goui/style/_util.scss'  as *;
+@use '../../../../../../../views/goui/goui/style/_config.scss' as *;
+
+.goui-toolbar.goui-cardmenu.main-menu {
+	background-color: $colorMain;
+	button.goui-button {
+		color: white;
+	}
+}

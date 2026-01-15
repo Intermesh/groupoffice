@@ -101,14 +101,14 @@ class Settings extends core\Settings {
 	 * 
 	 * @var string  eg. "en"
 	 */
-	public $language;
+	public string $language;
 	
 	/**
 	 * The title of the Group-Office environment
 	 * 
 	 * @var string
 	 */
-	public $title = 'Group-Office';
+	public string $title = 'Group-Office';
 	
 	
 	/**
@@ -116,7 +116,7 @@ class Settings extends core\Settings {
 	 * 
 	 * @var string
 	 */
-	public $systemEmail = 'admin@intermesh.dev';
+	public string $systemEmail = 'admin@intermesh.dev';
 	
 	
 	/**
@@ -124,27 +124,22 @@ class Settings extends core\Settings {
 	 * 
 	 * @var string
 	 */
-	public $smtpHost = 'localhost';
+	public string $smtpHost = 'localhost';
 	
 	/**
 	 * SMTP port
-	 * 
-	 * @var string
 	 */
-	public $smtpPort = 587;
+	public int $smtpPort = 587;
 	
 	/**
 	 * SMTP username
-	 * @var string
 	 */
-	public $smtpUsername = null;
+	public string|null $smtpUsername = null;
 	
 	/**
 	 * SMTP Password
-	 * 
-	 * @var string
 	 */
-	protected $smtpPassword = null;
+	protected string|null $smtpPassword = null;
 
 	/**
 	 * Global SMTP timeout value in seconds
@@ -153,7 +148,7 @@ class Settings extends core\Settings {
 	 *
 	 * @var int
 	 */
-	public $smtpTimeout = 30;
+	public int $smtpTimeout = 30;
 
 
 	/**
@@ -234,36 +229,33 @@ class Settings extends core\Settings {
 
 	/**
 	 * Encryption to use for SMTP
-	 * @var string|bool
 	 */
-	public $smtpEncryption = self::SMTP_ENCRYPTION_TLS;
+	public string|null $smtpEncryption = self::SMTP_ENCRYPTION_TLS;
 	
 	/**
 	 * Set to false to ignore certificate errors. 
-	 * 
-	 * @var boolean
+	 *
 	 */
-	public $smtpEncryptionVerifyCertificate = true;
+	public bool $smtpEncryptionVerifyCertificate = true;
 	
 	/**
 	 * When maintenance mode is enabled, only admin users can login.
 	 * @var boolean 
 	 */
-	public $maintenanceMode = false;
+	public bool $maintenanceMode = false;
 
 	/**
 	 * When true the user interface will show a confirm dialog before moving item with drag and drop
 	 * @var bool
 	 */
-	public $defaultConfirmOnMove = false;
+	public bool $defaultConfirmOnMove = false;
 	
 	
 	/**
 	 * Enable HTML message that will show on the login screen.
-	 * 
-	 * @var string 
+	 *
 	 */
-	public $loginMessageEnabled = false;
+	public bool $loginMessageEnabled = false;
 	
 	/**
 	 * HTML message that will show on the login screen.
@@ -278,7 +270,7 @@ class Settings extends core\Settings {
 	 * 
 	 * @var int
 	 */
-	public $passwordMinLength = 6;
+	public int $passwordMinLength = 6;
 
 
 	/**
@@ -286,7 +278,7 @@ class Settings extends core\Settings {
 	 *
 	 * @var int
 	 */
-	public $passwordMaxLength = 255;
+	public int $passwordMaxLength = 255;
 
 
 	/**
@@ -294,22 +286,20 @@ class Settings extends core\Settings {
 	 * Also disables the "remember login" feature as it would make no sense.
 	 * @var int
 	 */
-	public $logoutWhenInactive = 0;
+	public int $logoutWhenInactive = 0;
 	
 	
 	/**
 	 * Default domain name to append to username for authentication
-	 * 
-	 * @var string
 	 */
-	public $defaultAuthenticationDomain;
+	public string|null $defaultAuthenticationDomain = null;
 
 	/**
 	 * An alternative URL to handle lost passwords
 	 *
 	 * @var string
 	 */
-	public $lostPasswordURL;
+	public string|null $lostPasswordURL = null;
 	
 	
 	/**
@@ -326,7 +316,7 @@ class Settings extends core\Settings {
 	 *
 	 * @var string
 	 */
-	public $URL;
+	public string $URL = "";
 
 	/**
 	 * @var string
@@ -351,7 +341,7 @@ class Settings extends core\Settings {
 
 
 	/** @var bool Allow registration via the auth.php endpoint */
-	public $allowRegistration = false;
+	public bool $allowRegistration = false;
 
 
 	/**
@@ -361,51 +351,49 @@ class Settings extends core\Settings {
 	 *
 	 * @var int
 	 */
-	public $syncChangesMaxAge = 30;
+	public int $syncChangesMaxAge = 30;
 
 	/**
 	 * This variable is checked against the code version.
 	 * If it doesn't match /install/upgrade.php will be executed.
-	 *
-	 * @var string
 	 */
-	public $databaseVersion;
+	public string|null $databaseVersion = null;
 
 
 	/** @var int Time the db cache was cleared. The client will invalidate it's indexeddb cache when this changes.
 	 */
-	public $cacheClearedAt;
+	public int|null $cacheClearedAt = null;
 	
-	/** @var string Primary color in html notation 000000; */
-	public $primaryColor;
+	/** Primary color in html notation 000000; */
+	public string|null $primaryColor = null;
 
-	/** @var string Secondary color in html notation 000000; */
-	public $secondaryColor;
+	/** Secondary color in html notation 000000; */
+	public string|null $secondaryColor = null;
 
-	/** @var string Secondary color in html notation 000000; */
-	public $tertiaryColor;
+	/** Secondary color in html notation 000000; */
+	public string|null $tertiaryColor = null;
 
-	/** @var string Secondary color in html notation 000000; */
-	public $accentColor;
+	/**  Secondary color in html notation 000000; */
+	public string|null $accentColor = null;
 	
-	/** @var string Blob ID for the logo */
-	public $logoId;
+	/** Blob ID for the logo */
+	public string|null $logoId = null;
 
 
-	/** @var string Primary color in html notation 000000; */
-	public $primaryDark;
+	/** Primary color in html notation 000000; */
+	public string|null $primaryDark = null;
 
-	/** @var string Secondary color in html notation 000000; */
-	public $secondaryDark;
+	/** Secondary color in html notation 000000; */
+	public string|null $secondaryDark = null;
 
-	/** @var string Secondary color in html notation 000000; */
-	public $tertiaryDark;
+	/** Secondary color in html notation 000000; */
+	public string|null $tertiaryDark = null;
 
-	/** @var string Secondary color in html notation 000000; */
-	public $accentDark;
+	/** Secondary color in html notation 000000; */
+	public string|null $accentDark = null;
 
-	/** @var string Blob ID for the logo */
-	public $logoIdDark;
+	/** Blob ID for the logo */
+	public string|null $logoIdDark = null;
 
 	/**
 	 * Get's the transparent color based on the primary color.
@@ -439,7 +427,7 @@ class Settings extends core\Settings {
 	 * 
 	 * @var string
 	 */
-	public $defaultTimezone = "Europe/Amsterdam";
+	public string $defaultTimezone = "Europe/Amsterdam";
 	
 	/**
 	 * Default date format for users
@@ -447,7 +435,7 @@ class Settings extends core\Settings {
 	 * @link https://secure.php.net/manual/en/function.date.php
 	 * @var string
 	 */
-	public $defaultDateFormat = "d-m-Y";
+	public string $defaultDateFormat = "d-m-Y";
 	
 	/**
 	 * Default time format for users
@@ -455,13 +443,13 @@ class Settings extends core\Settings {
 	 * @link https://secure.php.net/manual/en/function.date.php
 	 * @var string 
 	 */
-	public $defaultTimeFormat = "G:i";
+	public string $defaultTimeFormat = "G:i";
 	
 	/**
 	 * Default currency
 	 * @var string
 	 */
-	public $defaultCurrency = "€";
+	public string $defaultCurrency = "€";
 	
 	/**
 	 * Default first week day
@@ -471,14 +459,14 @@ class Settings extends core\Settings {
 	 * 
 	 * @var int 
 	 */
-	public $defaultFirstWeekday = 1;
+	public int $defaultFirstWeekday = 1;
 	
 	
 	/**
 	 * The default address book for new users
 	 * @var int 
 	 */
-	public $userAddressBookId = null;
+	public int|null $userAddressBookId = null;
 
 
 	private $userAddressBook;
@@ -527,7 +515,7 @@ class Settings extends core\Settings {
 	/**
 	 * @var int
 	 */
-	public $archivedUsersAddressBook;
+	public int|null $archivedUsersAddressBook;
 	/**
 	 * When archiving a user, move profile user
 	 *
@@ -570,33 +558,33 @@ class Settings extends core\Settings {
 	 * 
 	 * @var string
 	 */
-	public $defaultListSeparator = ';';
+	public string $defaultListSeparator = ';';
 	
 	/**
 	 * Default text separator for import and export
 	 * 
 	 * @var string
 	 */
-	public $defaultTextSeparator = '"';
+	public string $defaultTextSeparator = '"';
 	
 	/**
 	 * Default thousands separator for numbers
 	 * @var string
 	 */
-	public $defaultThousandSeparator = '.';
+	public string $defaultThousandSeparator = '.';
 	
 	/**
 	 * Default decimal separator for numbers
 	 * 
 	 * @var string
 	 */
-	public $defaultDecimalSeparator = ',';	
+	public string $defaultDecimalSeparator = ',';
 	
 	/**
 	 * Default setting for users to have short date and times in lists.
 	 * @var boolean
 	 */
-	public $defaultShortDateInList = true;
+	public bool $defaultShortDateInList = true;
 
 
 	/**
@@ -604,14 +592,14 @@ class Settings extends core\Settings {
 	 *
 	 * @var string
 	 */
-	public $license = null;
+	public string|null $license = null;
 
 	/**
 	 * Set to true when the license dialog has been presented and the user denied.
 	 *
 	 * @var bool
 	 */
-	public $licenseDenied = false;
+	public bool $licenseDenied = false;
 
 
 	/**
@@ -619,14 +607,14 @@ class Settings extends core\Settings {
 	 *
 	 * @var bool
 	 */
-	public $welcomeShown = false;
+	public bool $welcomeShown = false;
 
 
 	/**
 	 *
 	 * @var bool
 	 */
-	public $demoDataAsked = false;
+	public bool $demoDataAsked = false;
 
 
 	private $defaultGroups;
@@ -675,11 +663,11 @@ class Settings extends core\Settings {
 	/**
 	 * when true user will get popup to allow its own device.
 	 */
-	public $activeSyncEnable2FA = false;
+	public bool $activeSyncEnable2FA = false;
 	/**
 	 * When false administrator has to enable each new device
 	 */
-	public $activeSyncCanConnect = true;
+	public bool  $activeSyncCanConnect = true;
 	
 	
 	public function save(): bool

@@ -1,4 +1,4 @@
-import {client, jmapds, modules, principalDS} from "@intermesh/groupoffice-core";
+import {appSettings, client, jmapds, modules, principalDS} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {router} from "@intermesh/groupoffice-core";
 import {datasourcestore, t as coreT, E, translate, DateTime, Window, h3, Button} from "@intermesh/goui";
@@ -283,30 +283,29 @@ modules.register(  {
 		client.on("authenticated",  ({session}) => {
 
 			// OLD CODE
-			async function showBadge() {
-				const count = await go.Jmap.request({method: "CalendarEvent/countMine"});
-				ui.inboxBtn.hidden = count<1;
-				GO.mainLayout.setNotification('calendar', count, 'orange');
-			}
-			go.Db.store("CalendarEvent").on("changes", () => {
-				showBadge();
-			});
-			showBadge();
+			// async function showBadge() {
+			// 	const count = await go.Jmap.request({method: "CalendarEvent/countMine"});
+			// 	ui.inboxBtn.hidden = count<1;
+			// 	GO.mainLayout.setNotification('calendar', count, 'orange');
+			// }
+			// go.Db.store("CalendarEvent").on("changes", () => {
+			// 	showBadge();
+			// });
+			// showBadge();
 			// END OLD CODE
 			client.user.calendarPreferences ||= {};
 			if(!session.capabilities["go:community:calendar"]) {
 				return; // User has no access to this module
 			}
-			const ui = new Main(),
-				nav = (span:ValidTimeSpan, amount: number, ymd?: string) => {
-					modules.openMainPanel("calendar");
+			const nav = async (span:ValidTimeSpan, amount: number, ymd?: string) => {
+					const ui = await modules.openMainPanel("calendar") as Main;
 					ui.goto(new DateTime(ymd)).setSpan(span, amount);
 				};
 			router.add(/^calendar\/(month|list|week|day|year)\/(\d{4}-\d{2}-\d{2})$/, (span, ymd) => {
-					nav(span as ValidTimeSpan, 0, ymd);
+					void nav(span as ValidTimeSpan, 0, ymd);
 				})
 				.add(/^calendar\/(days|weeks|split)-(\d+)\/(\d{4}-\d{2}-\d{2})$/, (span, amount, ymd) => {
-					nav(span as ValidTimeSpan, Math.min(parseInt(amount),373), ymd); // it fits on my machine
+					void nav(span as ValidTimeSpan, Math.min(parseInt(amount),373), ymd); // it fits on my machine
 				}).add(/^calendarevent\/(\d+)$/, async (id) => {
 					// for notification clicks
 					const event = await jmapds('CalendarEvent').single(id);
@@ -315,7 +314,7 @@ modules.register(  {
 
 				});
 
-			modules.addMainPanel("community", "Calendar", 'calendar', t('Calendar'), () => ui);
+			modules.addMainPanel("community", "Calendar", 'calendar', t('Calendar'), () => new Main());
 
 			go.Alerts.on("beforeshow", function(alerts: any, alertConfig: any) {
 
@@ -374,8 +373,10 @@ modules.register(  {
 
 		});
 
-		modules.addAccountSettingsPanel("community", "calendar", "calendar", t("Calendar"), "today", () => {
-			return new PreferencesPanel();
-		});
+		// modules.addAccountSettingsPanel("community", "calendar", "calendar", t("Calendar"), "today", () => {
+		// 	return new PreferencesPanel();
+		// });
+
+		appSettings.addPanel(PreferencesPanel);
 	}
 });

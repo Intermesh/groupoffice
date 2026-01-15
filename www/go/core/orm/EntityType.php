@@ -38,7 +38,7 @@ use PDOException;
  * It's also used for routing short routes like "Note/get" instead of "community/notes/Note/get"
  *
  */
-class EntityType implements ArrayableInterface {
+class EntityType implements ArrayableInterface, \ArrayAccess {
 
 	private $className;
 	private $id;
@@ -1006,5 +1006,28 @@ class EntityType implements ArrayableInterface {
 			"supportsCustomFields" => $this->supportsCustomFields(),
 			"supportsFiles" => $this->supportsFiles()
 		];
+	}
+
+	public function offsetExists(mixed $offset): bool
+	{
+		// the only patchable property is the default ACL
+		return $offset == 'defaultAcl';
+	}
+
+	public function offsetGet(mixed $offset): mixed
+	{
+		return $offset == "defaultAcl" ? $this->getDefaultAcl() : null;
+	}
+
+	public function offsetSet(mixed $offset, mixed $value): void
+	{
+		if($offset == "defaultAcl") {
+			$this->setDefaultAcl($value);
+		}
+	}
+
+	public function offsetUnset(mixed $offset): void
+	{
+
 	}
 }

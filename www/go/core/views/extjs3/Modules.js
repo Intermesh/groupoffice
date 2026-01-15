@@ -28,6 +28,8 @@ go.Modules = (function () {
 		register: function (package, name, config) {	
 			
 			Ext.ns('go.modules.' + package + '.' + name);
+
+			// console.log('register ' + package + '.' + name);
 			
 			config = config || {};
 
@@ -199,7 +201,6 @@ go.Modules = (function () {
 
 			const store = go.Db.store("Module");
 
-
 			return store.query({
 				filter: {enabled: true}
 			}).then((response) => {
@@ -215,20 +216,22 @@ go.Modules = (function () {
 				let id, mod, pkg, config,initModulePromise;
 
 				for (id in this.entities) {
-					
 					mod = this.entities[id];
 					
 					// for (name in this.registered[package]) {	
 						pkg = mod.package || "legacy";
 						if(!this.registered[pkg]) {
+							console.log(`Skipping module init for package ${pkg} because it's not registered`)
 							continue;
 						}
 						config = this.registered[pkg][mod.name];
 						if(!config){
+							console.log(`Skipping module init for package ${pkg} / ${mod.name} because it's not registered`)
 							continue;
 						}
 					
 						if (config.requiredPermissionLevel > mod.permissionLevel) {
+							console.log(`Skipping module init for package ${pkg} / ${mod.name} because there's no permission`)
 							continue;
 						}
 						
@@ -261,8 +264,6 @@ go.Modules = (function () {
 				}
 
 				return Promise.all(promises).then(() => {
-
-
 					store.on("changes", this.onModuleChanges, this);
 
 					return this.entities;
