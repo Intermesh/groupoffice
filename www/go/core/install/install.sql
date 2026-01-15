@@ -413,14 +413,6 @@ CREATE TABLE `go_cron_users` (
   `user_id` int(11) NOT NULL
 ) ENGINE=InnoDB;
 
-CREATE TABLE `go_holidays` (
-  `id` int(11) NOT NULL,
-  `date` date NOT NULL,
-  `name` varchar(100) NOT NULL DEFAULT '',
-  `region` varchar(10) NOT NULL DEFAULT '',
-  `free_day` tinyint(1) NOT NULL DEFAULT 1
-) ENGINE=InnoDB;
-
 CREATE TABLE `go_reminders` (
   `id` int(11) NOT NULL,
   `model_id` int(11) NOT NULL,
@@ -634,10 +626,6 @@ ALTER TABLE `go_cron_groups`
 ALTER TABLE `go_cron_users`
   ADD PRIMARY KEY (`cronjob_id`,`user_id`);
 
-ALTER TABLE `go_holidays`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `region` (`region`);
-
 ALTER TABLE `go_reminders`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
@@ -708,9 +696,6 @@ ALTER TABLE `go_clients`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `go_cron`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE `go_holidays`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `go_reminders`
@@ -1039,6 +1024,7 @@ CREATE TABLE `core_alert` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `entityTypeId` INT NOT NULL,
   `entityId` INT NOT NULL,
+  createdBy varchar(60) null,
   `userId` INT NOT NULL,
   `triggerAt` DATETIME NOT NULL,
   `staleAt` DATETIME NULL,
@@ -1059,7 +1045,10 @@ CREATE TABLE `core_alert` (
     FOREIGN KEY (`userId`)
     REFERENCES `core_user` (`id`)
     ON DELETE cascade
-    ON UPDATE NO ACTION)
+    ON UPDATE NO ACTION),
+    constraint core_alert_core_principal_id_fk
+                             foreign key (createdBy) references core_principal (id)
+                                 on delete set null
     ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 create unique index core_alert_entityTypeId_entityId_tag_userId_uindex

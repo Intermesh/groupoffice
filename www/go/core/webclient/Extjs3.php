@@ -52,7 +52,6 @@ class Extjs3 {
             if($debug && $file->getModifiedAt() > $modifiedAt) {
             	$modifiedAt = $file->getModifiedAt();
             }
-            continue;
           }
 
 
@@ -63,7 +62,6 @@ class Extjs3 {
 						if($debug && $file->getModifiedAt() > $modifiedAt) {
 							$modifiedAt = $file->getModifiedAt();
 						}
-						continue;
 					}
 
 					$file = $folder->getFile('views/goui/dist/style.css');
@@ -73,7 +71,6 @@ class Extjs3 {
 						if($debug && $file->getModifiedAt() > $modifiedAt) {
 							$modifiedAt = $file->getModifiedAt();
 						}
-						continue;
 					}
 
 
@@ -169,8 +166,9 @@ class Extjs3 {
 
 			$str .= 'GO.lang = ' . json_encode($l) . ";\n";
 			
-			$str .= "GO.lang.holidaySets = " . json_encode(\GO\Base\Model\Holiday::getAvailableHolidayFiles()) .";\n";
-			
+//			$str .= "GO.lang.holidaySets = " . json_encode(\GO\Base\Model\Holiday::getAvailableHolidayFiles()) .";\n";
+			$str .= "GO.lang.holidaySets = " . json_encode(\go\core\model\Holiday::getHolidaySets()) .";\n";
+
 			$cacheFile->putContents($str);
 		}
 		

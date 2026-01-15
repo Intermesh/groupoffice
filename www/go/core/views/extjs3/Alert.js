@@ -18,7 +18,7 @@
 
 			this.store = new go.data.Store({
 				entityStore: "Alert",
-				fields: ['id', 'entity', 'entityId', 'data', 'tag', 'triggerAt', 'userId', 'title', 'body'],
+				fields: ['id', 'entity', 'entityId', 'data', 'tag', 'triggerAt', 'userId', 'title', 'body', 'createdBy'],
 				filters: {
 					user: {userId: go.User.id}
 				},
@@ -104,6 +104,7 @@
 					},
 					handler: () => {
 						go.Entities.get(alert.entity).goto(alert.entityId);
+						go.Db.store("Alert").destroy(alert.id);
 					},
 					// buttons: [{
 					// 	text: t("Open"),
@@ -182,6 +183,8 @@
 
 			}).catch((reason) => {
 				console.warn("Alert for unknown entity", reason, alert);
+
+				void go.Db.store("Alert").destroy(alert.id);
 			})
 		}
 	})

@@ -21,6 +21,7 @@ use go\core\model\Principal;
 use go\core\model\User;
 use go\core\model\Module;
 use go\core\orm\CustomFieldsTrait;
+use go\core\orm\EntityType;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
@@ -29,6 +30,7 @@ use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\{ArrayObject, DateTime, Recurrence, StringUtil, Time, UUID};
 use go\core\validate\ErrorCode;
+use go\modules\business\kanban\model\Board;
 use go\modules\business\projects3\model\Project3;
 use go\modules\community\comments\model\Comment;
 use go\modules\community\tasks\convert\Spreadsheet;
@@ -448,6 +450,8 @@ class Task extends AclItemEntity {
 		$this->incrementTasklistModSeq();
 		$this->createSystemAlerts();
 
+
+
 		// if alert can be based on start / due of task check those properties as well
 		$modified = $this->getModified('alerts');
 		if (!empty($modified)) {
@@ -591,7 +595,7 @@ class Task extends AclItemEntity {
 		$nextTask->freeBusyStatus = 'free';
 
 		$rrule = $this->getRecurrenceRule();
-			
+
 		if(!empty($rrule->count)) {
 			$rrule->count--;
 			$nextTask->setRecurrenceRule($rrule->count > 0 ? $rrule : null);
@@ -724,7 +728,7 @@ class Task extends AclItemEntity {
 
 	public function getUid(): string
 	{
-		return $this->uid;		
+		return $this->uid;
 	}
 
 	public function setUid(string $uid) {
@@ -815,14 +819,19 @@ class Task extends AclItemEntity {
 			return;
 		}
 
+		//createdBy can also be a contact principal
+		$createdByUser = is_numeric($comment->createdBy);
+
 		if($this->createdBy != $comment->createdBy) {
 			//agent makes this message
 			if($this->responsibleUserId == null) {
 				// auto assign task on first comment, check if the comment creator is an agent.
 				// this is the case when the permission level is write or greater.
 				$tasklist = TaskList::findById($this->tasklistId,['aclId']);
-				if(Acl::getUserPermissionLevel($tasklist->aclId, $comment->createdBy) >= Acl::LEVEL_WRITE) {
-					$this->responsibleUserId = $comment->createdBy;
+				if($createdByUser){
+					if (Acl::getUserPermissionLevel($tasklist->aclId, (int) $comment->createdBy) >= Acl::LEVEL_WRITE) {
+						$this->responsibleUserId = $comment->createdBy;
+					}
 				}
 			}
 		}
@@ -837,43 +846,45 @@ class Task extends AclItemEntity {
 		$this->modifiedAt = new DateTime();
 		$this->save();
 
-		$excerpt = StringUtil::cutString(strip_tags($comment->text), 50);
+//		$excerpt = StringUtil::cutString(strip_tags($comment->text), 50);
 
-		$commenters = Comment::findForEntity($this)->selectSingleValue("createdBy")->distinct()->all();
-		if($this->responsibleUserId && !in_array($this->responsibleUserId, $commenters)) {
-			$commenters[] = $this->responsibleUserId;
-		}
+//		$commenters = Comment::findForEntity($this)->selectSingleValue("createdBy")->distinct()->all();
+//		if($this->responsibleUserId && !in_array($this->responsibleUserId, $commenters)) {
+//			$commenters[] = $this->responsibleUserId;
+//		}
 
-		$isPrivate = $comment->section == "private";
+//		$isPrivate = $comment->section == "private";
 
 		//add creator too
-		if(!$isPrivate && !in_array($this->createdBy, $commenters)) {
-			$commenters[] = $this->createdBy;
-		}
+//		if($createdByUser && !$isPrivate && !in_array($this->createdBy, $commenters)) {
+//			$commenters[] = $this->createdBy;
+//		}
 
 		//remove creator of this comment
-		$commenters = array_filter($commenters, function($c) use($comment, $isPrivate) {
-			return $c != $comment->createdBy && (!$isPrivate || $c != $this->createdBy);
-		});
+//		$commenters = array_filter($commenters, function($c) use($comment, $isPrivate) {
+//			return is_numeric($c) &&  $c != $comment->createdBy && (!$isPrivate || $c != $this->createdBy);
+//		});
 
-		// Remove alert for creator of this comment. Other users will get a replaced alert below.
-		CoreAlert::deleteByEntity($this, "comment", $comment->createdBy);
+		if($createdByUser) {
+			// Remove alert for creator of this comment. Other users will get a replaced alert below.
+//			CoreAlert::deleteByEntity($this, "comment", $comment->createdBy);
 
-		// remove you were assigned to alert when commenting
-		CoreAlert::deleteByEntity($this, "assigned", $comment->createdBy);
-
-		foreach($commenters as $userId) {
-			$alert = $this->createAlert(new DateTime(), 'comment', $userId)
-				->setData([
-					'type' => 'comment',
-					'createdBy' => $comment->createdBy,
-					'excerpt' => $excerpt
-				]);
-
-			if (!$alert->save()) {
-				throw new SaveException($alert);
-			}
+			// remove you were assigned to alert when commenting
+			CoreAlert::deleteByEntity($this, "assigned", $comment->createdBy);
 		}
+
+//		foreach($commenters as $userId) {
+//			$alert = $this->createAlert(new DateTime(), 'comment', (int) $userId)
+//				->setData([
+//					'type' => 'comment',
+//					'createdBy' => $comment->createdBy,
+//					'excerpt' => $excerpt
+//				]);
+//
+//			if (!$alert->save()) {
+//				throw new SaveException($alert);
+//			}
+//		}
 
 
 	}

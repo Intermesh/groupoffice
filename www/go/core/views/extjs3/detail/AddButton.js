@@ -20,7 +20,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 		
 		go.detail.addButton.superclass.initComponent.call(this);
 
-		//TODO refactor
+		//TODO refactor. Move to filesdetailpanel
 		
 		if(!this.noFiles && this.documentTemplates) {
 

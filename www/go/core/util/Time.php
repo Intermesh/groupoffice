@@ -22,12 +22,12 @@ class Time
 	 * @param string $strTime
 	 * @return int
 	 */
-	public static function toSeconds(string $strTime) :int
+	public static function toSeconds(string $strTime): int
 	{
-		if(preg_match('/^\d{1,2}:\d{2}$/', $strTime)) {
+		if (preg_match('/^\d{1,2}:\d{2}$/', $strTime)) {
 			$strTime .= ':00';
 		}
-		if(!preg_match('/^\d{1,2}:\d{2}:\d{2}$/', $strTime)) {
+		if (!preg_match('/^\d{1,2}:\d{2}:\d{2}$/', $strTime)) {
 			throw new \InvalidArgumentException('Invalid time format');
 		}
 		$arTime = explode(":", $strTime);
@@ -49,14 +49,32 @@ class Time
 		$hours = floor($seconds / 3600);
 		$seconds -= ($hours * 3600);
 		$minutes = floor($seconds / 60);
-		if($includeSeconds) {
+		if ($includeSeconds) {
 			$seconds -= ($minutes * 60);
 		}
 
 		$ret = (($hours > 9 && $zeroPad) ? $hours : '0' . $hours) . ':' . ($minutes > 9 ? $minutes : '0' . $minutes);
-		if($includeSeconds) {
-			$ret .= ($seconds > 9 ? $seconds : '0'. $seconds);
+		if ($includeSeconds) {
+			$ret .= ($seconds > 9 ? $seconds : '0' . $seconds);
 		}
 		return $ret;
+	}
+
+	/**
+	 * Convert a number of minutes to HH:MM format
+	 *
+	 * @param int $minutes
+	 * @return string
+	 */
+	public static function minutesToTimeString(int $minutes): string
+	{
+		$hours = floor($minutes / 60);
+		$minutes = $minutes % 60;
+
+		if (strlen($minutes) == 1) {
+			$minutes = '0' . $minutes;
+		}
+
+		return $hours . ':' . $minutes;
 	}
 }

@@ -103,7 +103,7 @@ export class SplitView extends MonthView {
 					row = E('ol',
 						eventContainer,
 						//E('li', E('i', 'event').cls('icon').css({color:'#'+calendar.color}), calendar.name)
-					).attr('data-calid', calendar.id);
+					).attr('data-calid',calendar.id);
 				for (i = 0; i < this.wdays; i++) {
 					row.append(E('li').attr('data-date', day.format('Y-m-d'))
 						.cls('today', day.format('Ymd') === now.format('Ymd'))
