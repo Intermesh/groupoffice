@@ -1,7 +1,7 @@
 [submodule "www/views/Extjs3/groupoffice-core"]
 	path = www/views/goui/groupoffice-core
 	url = ../groupoffice-core.git
-	branch = develop
+	branch = main
 [submodule "www/views/goui/goui"]
 	path = www/views/goui/goui
 	url = ../goui.git

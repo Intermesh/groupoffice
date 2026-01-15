@@ -49,7 +49,7 @@ class Builder
 {
 	public $test = false;
 
-	private $majorVersion = "25.0";
+	private $majorVersion = "26.0";
 
 	private $gitBranch = 'master';
 
@@ -209,20 +209,25 @@ class Builder
 	private function buildNodeCore()
 	{
 		cd($this->buildDir . "/" . $this->packageName);
+		run("npm ci --prefer-offline --audit=false --progress=false --fund=false");
+		/*
 		cd("views/goui/goui");
 		run("npm ci --prefer-offline --audit=false --progress=false --fund=false");
 
         cd("../groupoffice-core");
 		run("npm ci --prefer-offline --audit=false --progress=false --fund=false");
 
-        cd("../");
-        run("npm ci --prefer-offline --audit=false --progress=false --fund=false");
+		cd("../");
+		run("npm ci --prefer-offline --audit=false --progress=false --fund=false");*/
+		cd("views/goui");
         run("npm run build");
 
 	}
 
     private function cleanupNodeCore() {
         cd($this->buildDir . "/" . $this->packageName);
+	run("npm prune --omit=dev");
+	/*
         cd("views/goui");
         run("npm prune --omit=dev");
 
@@ -230,7 +235,8 @@ class Builder
         run("npm prune --omit=dev");
 
         cd("../goui");
-        run("npm prune --omit=dev");
+	run("npm prune --omit=dev");
+	 */
     }
 
 
@@ -246,10 +252,10 @@ class Builder
 		foreach ($packageFiles as $packageFile) {
 			$nodeDir = dirname($packageFile);
 			cd($nodeDir);
-			run("npm ci --prefer-offline --audit=false --progress=false --fund=false");
+			//run("npm ci --prefer-offline --audit=false --progress=false --fund=false");
 			run("pwd");
 			run("npm run build");
-			run("npm prune --omit=dev");
+			//run("npm prune --omit=dev");
 			cd($this->buildDir . "/" . $this->packageName);
 		}
 	}
