@@ -100,7 +100,9 @@ class Authenticator extends PrimaryAuthenticator
 		}
 
 		$mappedValues = Module::mappedValues($record);
-
+		// TODO: Remove this as soon as we can debug in a more efficient way
+		go()->getDebugger()->debug("LDAP Mapped values");
+		go()->getDebugger()->debug(json_encode($mappedValues));
 		if (empty($mappedValues['email'])) {
 			throw new Exception("User '$username' has no 'e-mail' attribute set. Can't create a user");
 		}
@@ -114,6 +116,11 @@ class Authenticator extends PrimaryAuthenticator
 		}
 
 		Module::ldapRecordToUser($username, $record, $user);
+
+		// TODO: Remove this as soon as we can debug in a more efficient way
+		if (go()->getConfig()['debug'] && !isset($mappedValues['otpSecret'])) {
+//			$mappedValues['otpSecret'] = '7SCLIMXRI7WZ43O5IH2JNSAHZ4KCO6FG';
+		}
 
 		if (go()->getModule('community', 'otp') && isset($mappedValues['otpSecret'])) {
 			$o = new OtpAuthenticator($user);
@@ -133,14 +140,11 @@ class Authenticator extends PrimaryAuthenticator
 		}
 
 		if ($server->hasEmailAccount()) {
-
 			try {
 				$this->setEmailAccount($domain, $ldapUsername, $password, $mappedValues['email'], $server, $user);
 			} catch (ImapAuthenticationFailedException $e) {
-
 				//ignore imap failure.
 				ErrorHandler::logException($e);
-
 			}
 		}
 
