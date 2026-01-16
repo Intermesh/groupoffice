@@ -110,7 +110,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 
 		// Don't search these folders because it may show too much
-		if($this->parent_id == 0) {
+		if($this->parent_id == 0 || $this->visible=0) {
 			return false;
 		}
 

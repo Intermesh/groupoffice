@@ -378,3 +378,6 @@ $updates['202504141045'][] = function() {
 		$folder->acl->removeGroup(\GO::config()->group_everyone);
 	}
 };
+
+
+$updates['202504141045'][] = "delete s from core_search s inner join fs_folders f on f.id=s.entityId where entityTypeId=(select e.id from core_entity e inner join core_module m on m.id=e.moduleId where e.name='Folder' and m.name='files') and f.visible=0;";

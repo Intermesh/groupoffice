@@ -1,4 +1,26 @@
+09-01-2025: 6.8.148
+- Leavedays: fix leaveday status rendering problem in very specific case 
+- Leavedays: timing problem in user panel (cherry-pick from 25.0)
+- Email: Do not ask for oauth consent every time
+- Core: Admins may change groups in user dialog
+
+15-12-2025: 6.8.147 
+- Email: fixed reading email with a large base64 encoded resource while blocking external images
+- Files: Make sure log files folder is protected
+- Projects2: add set method to entity controller in order to edit custom fieldstets.
+
+04-12-2025: 6.8.146
+- Files: Don't put folders with visible=false in the search results and correct root folders with invalid acl's in the db check
+- Email: get correct mime type for blobs. Not text/plain for text/csv for example.
+
+01-12-2025: 6.8.145
+- Leavedays: prevent approved leave budgets and budgets with registrations from being deleted
+- Finance: fix shoddy NL translation
+
+24-11-2025: 6.8.144
 - More DE translations. Danke Daniel!
+- #1365 Add phone scope, extend user's attributes Thanks @michalcharvat
+- #1368 set default editTB container width Thanks @michalcharvat
 
 17-11-2025: 6.8.143
 - Core: Revert search cache fix as it's too heavy on large db's.
