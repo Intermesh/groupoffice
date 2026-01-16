@@ -134,7 +134,7 @@ export class Main extends MainThreeColumnPanel {
 				searchbtn({
 					listeners: {
 						input: ({text}) => {
-							(this.taskListGrid.store.queryParams.filter as Filter).text = text;
+							this.taskListGrid.store.setFilter("text", {text: text});
 							void this.taskListGrid.store.load();
 						}
 					}
@@ -175,9 +175,9 @@ export class Main extends MainThreeColumnPanel {
 							selectionchange: ({target}) => {
 								const taskListIds = target.getSelected().map((row) => row.record.id);
 
-								this.taskGrid.store.queryParams.filter = {
+								this.taskGrid.store.setFilter("tasklist", {
 									taskListId: taskListIds
-								}
+								});
 
 								void this.taskGrid.store.load();
 							}

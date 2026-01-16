@@ -1,6 +1,6 @@
 import {btn, combobox, comp, Component, datasourcestore, DataSourceStore, searchbtn, t, tbar} from "@intermesh/goui";
 import {BookmarksGridView} from "./BookmarksGridView.js";
-import {principalDS} from "@intermesh/groupoffice-core";
+import {AclLevel, principalDS} from "@intermesh/groupoffice-core";
 import {BookmarksDialog} from "./BookmarksDialog.js";
 import {ManageCategoriesWindow} from "./ManageCategoriesWindow.js";
 import {BookmarksColumnView} from "./BookmarksColumnView.js";
@@ -17,9 +17,11 @@ export class Main extends Component {
 			dataSource: bookmarkDS,
 			sort: [{property: "category", isAscending: true}, {property: "name"}],
 			queryParams: {
-				limit: 0,
-				filter: {
-					permissionLevel: 5
+				limit: 0
+			},
+			filters: {
+				permissionLevel: {
+					permissionLevel: AclLevel.READ
 				}
 			},
 			relations: {

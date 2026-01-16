@@ -43,7 +43,7 @@ export class ImportTaskDialog extends Window {
 				searchbtn({
 					listeners: {
 						input: ({text}) => {
-							(this.tasklistGrid.store.queryParams.filter as Filter).text = text;
+							this.taskListGrid.store.setFilter("text", {text: text});
 							void this.tasklistGrid.store.load();
 						}
 					}
