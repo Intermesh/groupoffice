@@ -220,6 +220,7 @@ export class SieveRuleWindow extends Window {
 
 	public load(record: SieveRuleEntity) {
 		const ruleParser = new SieveRuleParser(record);
+		ruleParser.record = record;
 		ruleParser.parseTests();
 		ruleParser.parseActions();
 		this.index = record.idx;

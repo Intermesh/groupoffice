@@ -25,10 +25,17 @@ export class OutOfOfficePanel extends Component<OutOfOfficeEventMap> {
 	private rule: SieveRuleEntity | undefined;
 	private scheduleActivateField: DateField;
 	private scheduleDeactivateField: DateField;
-	private ruleParser: SieveRuleParser | undefined;
+	private ruleParser: SieveRuleParser;
 
 	constructor() {
 		super();
+		this.rule = {
+			index: 0,
+			name: "Out of office",
+			active: true,
+			raw: "",
+		};
+		this.ruleParser = new SieveRuleParser();
 		this.form = form({},
 			comp({cls: "hbox"},
 				comp({flex: 0.5},
@@ -150,18 +157,28 @@ export class OutOfOfficePanel extends Component<OutOfOfficeEventMap> {
 			cls: "primary filled",
 			text: t("Apply"),
 			handler: () => {
-
 				const v = this.form.value;
-				for (const test of this.ruleParser!.tests) {
-					test.arg = v[test.type!];
-				}
-				for (const action of this.ruleParser!.actions) {
-					action.addresses = v.addresses;
-					action.days = v.days;
-					action.subject = v.subject
-					action.reason = v.reason;
-					break; // OOO always has one action
-				}
+				this.ruleParser.tests = [{
+					not: false,
+					test: "currentdate",
+					type: "value-ge",
+					part: "date",
+					arg: v["value-ge"]
+				}, {
+					not: false,
+					test: "currentdate",
+					type: "value-le",
+					part: "date",
+					arg: v["value-le"]
+				}];
+				this.ruleParser.actions = [{
+					addresses: v.addresses,
+					days: v.days,
+					subject: v.subject,
+					reason: v.reason,
+					type: "vacation",
+					text: ""
+				}];
 				this.rule!.active = v.active;
 				this.ruleParser?.convert(this.ruleParser.tests, this.ruleParser.actions);
 				this.rule!.raw = this.ruleParser?.raw!;
@@ -169,29 +186,28 @@ export class OutOfOfficePanel extends Component<OutOfOfficeEventMap> {
 			}
 		}))
 
-		this.items.add(this.form,tb);
+		this.items.add(this.form, tb);
 	}
 
 	public setValues(value: SieveRuleEntity): void {
 		this.rule = value;
-		this.ruleParser = new SieveRuleParser(value);
+		this.ruleParser.record = value;
 		this.ruleParser.parseTests();
 		this.ruleParser.parseActions();
 		const v: any = {
 			active: value.active
 		};
-		debugger;
 		if (!this.ruleParser.tests.length) {
 			const today = new DateTime().format("Y-m-d");
 			this.ruleParser.addTest({
-				not:  false,
+				not: false,
 				test: "currentdate",
 				type: "value-ge",
 				part: "date",
 				arg: today
 			});
 			this.ruleParser.addTest({
-				not:  false,
+				not: false,
 				test: "currentdate",
 				type: "value-le",
 				part: "date",
@@ -201,7 +217,7 @@ export class OutOfOfficePanel extends Component<OutOfOfficeEventMap> {
 		for (const test of this.ruleParser.tests) {
 			v[test.type!] = test.arg;
 		}
-		if(!this.ruleParser.actions.length) {
+		if (!this.ruleParser.actions.length) {
 			this.ruleParser.addAction({
 				type: "vacation",
 				days: "3",
@@ -214,7 +230,7 @@ export class OutOfOfficePanel extends Component<OutOfOfficeEventMap> {
 		this.form.value = v;
 	}
 
-	public get raw(): string|undefined {
+	public get raw(): string | undefined {
 		return this.rule?.raw;
 	}
 

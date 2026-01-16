@@ -3,20 +3,25 @@ import {t} from "@intermesh/goui";
 
 export class SieveRuleParser {
 
-	private _record: SieveRuleEntity;
+	private _record: SieveRuleEntity | undefined;
 	private _tests: SieveCriteriumEntity[] = [];
 	private _actions: SieveActionEntity[] = [];
-	private _rawScript: string;
+	private _rawScript: string | undefined;
 
-	constructor(record: SieveRuleEntity) {
-		this._record = record;
-		this._rawScript = record.raw;
+	constructor(record?: SieveRuleEntity) {
+		if (record) {
+			this._record = record;
+			this._rawScript = record.raw;
+		}
 	}
 
 	/**
 	 * Parse all criteria / tests from the currently loaded sieve script
 	 */
 	public parseTests(): void {
+		if (!this._record) {
+			return;
+		}
 		this._record.join = "anyof";
 		const lines = this._record.raw.split("\n");
 		for (const line of lines) {
@@ -33,7 +38,10 @@ export class SieveRuleParser {
 	 * Parse individual criterium lines.
 	 * @param line
 	 */
-	private parseTest(line: string): SieveCriteriumEntity {
+	private parseTest(line: string): SieveCriteriumEntity | undefined {
+		if (!this._record) {
+			return;
+		}
 		const words = line.split(" ");
 		const test = words[0] === "if" ? words[1] : words[0];
 		let startIdx = words[0] === "if" ? 2 : 1;
@@ -90,7 +98,7 @@ export class SieveRuleParser {
 				break;
 			case "not":
 				newLine = words.slice(startIdx);
-				crit = this.parseTest(newLine.join(" "));
+				crit = this.parseTest(newLine.join(" "))!;
 				crit.not = true;
 				break;
 			case "header":
@@ -140,6 +148,9 @@ export class SieveRuleParser {
 	 * Parse all action for current script
 	 */
 	public parseActions(): void {
+		if (!this._record) {
+			return;
+		}
 		this._actions = [];
 		const paramsPattern = /[^{}]+(?=})/g;
 		const rawActions = this._record.raw.match(paramsPattern);
@@ -247,6 +258,9 @@ export class SieveRuleParser {
 	 * @param actions
 	 */
 	public convert(tests: SieveCriteriumEntity[], actions: SieveActionEntity[]): void {
+		if (!this._record) {
+			return;
+		}
 		const oldRaw = this._rawScript;
 		let lines = [`# rule:[${this._record.name}]`];
 
@@ -277,7 +291,6 @@ export class SieveRuleParser {
 	 * @private
 	 * @todo: custom rules?
 	 */
-
 	private convertCriterium(crit: SieveCriteriumEntity): string {
 		let r = "";
 		switch (crit.test) {
@@ -375,13 +388,32 @@ export class SieveRuleParser {
 	}
 
 	/**
+	 * public setter for all criteria
+	 */
+	set tests(tsts: SieveCriteriumEntity[]) {
+		this._tests = tsts;
+	}
+
+	/**
 	 * Public getter for all actions
 	 */
 	get actions(): SieveActionEntity[] {
 		return this._actions;
 	}
 
+	/**
+	 * public setter for all criteria
+	 */
+	set actions(acts: SieveActionEntity[]) {
+		this._actions = acts;
+	}
+
+	set record(r: SieveRuleEntity) {
+		this._record = r;
+		this._rawScript = r.raw;
+	}
+
 	get raw(): string {
-		return this._rawScript;
+		return this._rawScript || "";
 	}
 }

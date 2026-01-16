@@ -78,8 +78,6 @@ final class Sieve
 			}
 		}
 
-//		go()->debug("sieve::connect($username, ***, $host, $port, $auth_type, $usetls)");
-
 		$options = null;
 		// Hackish solution
 		if (go()->getConfig()['debug']) {
@@ -139,90 +137,6 @@ final class Sieve
 	}
 
 	/**
-	 * Saves current script into server
-	 *
-	 * @param ?string $name
-	 * @return bool
-	 * /
-	 * public function save(?string $name = null): bool
-	 * {
-	 * if (!$this->sieve) {
-	 * return $this->setError(self::SIEVE_ERROR_INTERNAL);
-	 * }
-	 *
-	 * if (!$this->script) {
-	 * return $this->setError(self::SIEVE_ERROR_INTERNAL);
-	 * }
-	 *
-	 * if (!$name) {
-	 * $name = $this->current;
-	 * }
-	 *
-	 * $this->_moveOutOfOfficeToEnd();
-	 *
-	 * $script = $this->script->as_text();
-	 *
-	 * if (!$script) {
-	 * $script = '/ * empty script * /';
-	 * }
-	 *
-	 * $res = $this->sieve->installScript($name, $script, true);
-	 * if ($this->_PEAR->isError($res)) {
-	 *
-	 * go()->debug("ERROR: " . $res);
-	 *
-	 * return $this->setError(self::SIEVE_ERROR_INSTALL . '<br/>Error message:</br>' . $res);
-	 * }
-	 *
-	 * return true;
-	 * }
-	 * @deprecated: to be shot into Sieve using managesieve in the JMAP controller. Somehow.
-	 */
-	/**
-	 * Move the "Out of office" rule to the end of the sieve file.
-	 * /
-	 * private function _moveOutOfOfficeToEnd(): void
-	 * {
-	 *
-	 *
-	 * // De out of office rule altijd als laatste.
-	 * foreach ($this->script->content as $key => $val) {
-	 *
-	 * if (isset($val['name']) && $val['name'] == 'Out of office') {
-	 * $item = $this->script->content[$key];
-	 * unset($this->script->content[$key]);
-	 * array_push($this->script->content, $item);
-	 * break;
-	 * }
-	 * }
-	 * }*/
-
-	/**
-	 * Saves text script into server
-	 *
-	 * @param string $name
-	 * @param string|null $content
-	 * @return bool
-	 * /
-	 * public function saveScript(string $name, ?string $content = null): bool
-	 * {
-	 * if (!$this->sieve) {
-	 * return $this->setError(self::SIEVE_ERROR_INTERNAL);
-	 * }
-	 *
-	 * if (!$content) {
-	 * $content = '/ * empty script * /';
-	 * }
-	 *
-	 * $res = $this->sieve->installScript($name, $content);
-	 * if ($this->_PEAR->isError($res)) {
-	 * return $this->setError(self::SIEVE_ERROR_INSTALL);
-	 * }
-	 *
-	 * return true;
-	 * }*/
-
-	/**
 	 * Activates specified script
 	 * @TODO? Refactor into JMAP
 	 */
@@ -249,33 +163,6 @@ final class Sieve
 
 		return true;
 	}
-
-	/**
-	 * Removes specified script
-	 * /
-	 * public function remove(?string $name = null)
-	 * {
-	 * if (!$this->sieve) {
-	 * return $this->setError(self::SIEVE_ERROR_INTERNAL);
-	 * }
-	 *
-	 * if (!$name) {
-	 * $name = $this->current;
-	 * }
-	 *
-	 * // script must be deactivated first
-	 * if ($name == $this->sieve->getActive())
-	 * if ($this->_PEAR->isError($this->sieve->setActive('')))
-	 * return $this->setError(self::SIEVE_ERROR_DELETE);
-	 *
-	 * if ($this->_PEAR->isError($this->sieve->removeScript($name)))
-	 * return $this->setError(self::SIEVE_ERROR_DELETE);
-	 *
-	 * if ($name == $this->current)
-	 * $this->current = null;
-	 *
-	 * return true;
-	 * }*/
 
 	/**
 	 * Gets list of supported by server Sieve extensions
@@ -404,28 +291,6 @@ final class Sieve
 		$blob->save();
 		$this->blobId = $blob->id;
 	}
-
-	/**
-	 * Creates empty script or copy of other script
-	 * /
-	public function copy($name, $copy)
-	{
-		if (!$this->sieve) {
-			return $this->setError(self::SIEVE_ERROR_INTERNAL);
-		}
-
-		if ($copy) {
-			$content = $this->sieve->getScript($copy);
-
-			if ($this->_PEAR->isError($content)) {
-				return $this->setError(self::SIEVE_ERROR_OTHER);
-			}
-		}
-
-		return $this->saveScript($name, $content);
-	}
-	*/
-
 
 	private function setError(string $error): bool
 	{

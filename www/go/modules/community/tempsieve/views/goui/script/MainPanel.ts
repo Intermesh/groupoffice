@@ -174,6 +174,7 @@ export class MainPanel extends MainThreeColumnPanel {
 			this.scriptsCombo!.value = activeRuleSet.id;
 			this.rawEditor!.hidden = false;
 			this.rawEditor!.value = activeRuleSet.script;
+			console.log(this.scriptParser!.oooRule);
 			if (this.scriptParser!.oooRule) {
 				this.oooPanel!.setValues(this.scriptParser!.oooRule!);
 			}
@@ -374,6 +375,7 @@ export class MainPanel extends MainThreeColumnPanel {
 		win.frm.on("submit", ({target}) => {
 			Object.assign(record, target.value);
 			const scriptParser = new SieveRuleParser(record);
+			scriptParser.record = record;
 			scriptParser.convert(win.tests, win.actions);
 			record.raw = scriptParser.raw;
 			store.replaceAt(storeIndex, record);
@@ -393,7 +395,6 @@ export class MainPanel extends MainThreeColumnPanel {
 		for (const item of this.rulesGrid!.store.getArray()) {
 			r += item.raw + "\n";
 		}
-		debugger;
 		if(this.oooPanel && this.oooPanel.raw) {
 			r += this.oooPanel.raw + "\n";
 		}
