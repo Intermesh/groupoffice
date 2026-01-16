@@ -177,8 +177,6 @@ export class Main extends MainThreeColumnPanel {
 					if (noteIds[0]) {
 						router.goto("note/" + noteIds[0]);
 					}
-
-					noteIds.length > 1 ? this.noteGridToolbar.hide() : this.noteGridToolbar.show();
 				}
 			}
 		};
@@ -280,22 +278,22 @@ export class Main extends MainThreeColumnPanel {
 							)
 						})
 					)
-				})
+				}),
+				mstbar({
+						table: this.noteGrid
+					},
+					"->",
+					btn({
+						icon: "delete",
+						title: t("Delete"),
+						handler: (btn) => {
+							this.noteGrid!.delete();
+							btn.parent!.hide();
+						}
+					})
+				),
 			),
-			mstbar({
-					cls: "border-bottom",
-					table: this.noteGrid
-				},
-				"->",
-				btn({
-					icon: "delete",
-					handler: async () => {
-						const noteIds = this.noteGrid!.rowSelection!.getSelected().map((row) => row.record.id);
 
-						await noteDS.confirmDestroy(noteIds);
-					}
-				})
-			),
 			comp({
 					cls: "scroll bg-lowest",
 					flex: 1
