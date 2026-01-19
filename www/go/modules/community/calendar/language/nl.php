@@ -17,6 +17,7 @@ return array (
   'Participants' => 'Deelnemers',
   'You' => 'Jij',
   'Resources' => 'Faciliteiten',
+	'Resource already booked' => 'Faciliteit is al geboekt',
   'Resource' => 'Faciliteit',
   'Organizer' => 'Organisator',
   'Categories' => 'Categorieën',

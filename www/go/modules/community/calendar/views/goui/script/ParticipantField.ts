@@ -161,7 +161,7 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 
 		const fm = allDay ? 'Y-m-d' : 'Y-m-d H:i:s',
 			rows = this.list.value;
-
+		this.list.clearInvalid();
 		for (const id in rows) {
 			// not already pending and is user or resource
 			if(this.shouldCheckAvailability(id))
@@ -172,17 +172,16 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 						if(response.list.length > 0) {
 							name.style.color = 'red';
 							if(id.startsWith('Calendar:')) {
-								f.setInvalid(t('Resource already booked'))
+								this.list.setInvalid(t('Resource already booked'))
 							}
 						} else {
 							name.style.color = 'inherit';
-							f.clearInvalid();
 						}
 
 					}
 
 				this.pendingAvailabilityIds = {};
-			})
+			});
 			this.pendingAvailabilityIds[id]=true;
 		}
 	}

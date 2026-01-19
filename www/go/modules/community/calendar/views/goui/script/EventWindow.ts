@@ -436,9 +436,6 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 			this.close();
 			return false;
 		}
-		if(!this.form.isValid()) {
-			return false;
-		}
 		if(this.item!.isRecurring) {
 
 			this.item!.patch(this.parseSavedData(this.form.modified), () => {
