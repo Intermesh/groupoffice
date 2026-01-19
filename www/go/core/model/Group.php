@@ -163,20 +163,26 @@ class Group extends AclOwnerEntity {
 
 	public static function check()
 	{
+
+		$id = 1;
+		foreach (["Admins", "Everyone", "Internal"] as $groupName) {
+			$group = Group::findById($id);
+			if(!$group) {
+				$group = new Group();
+				$group->id = $id;
+				$group->name = go()->t($groupName);
+				if (!$group->save()) {
+					throw new Exception("Could not create group: " . $group->getValidationErrorsAsString());
+				}
+			}
+
+			$id++;
+		}
+
 		//make sure all users are in group everyone
 		go()->getDbConnection()->exec("INSERT IGNORE INTO core_user_group (SELECT " . self::ID_EVERYONE .", id from core_user)");
 
-		//share groups with themselves
-//		$stmt = go()->getDbConnection()
-//			->insertIgnore(
-//				'core_acl_group',
-//				go()->getDbConnection()->select('aclId, id, "' . Acl::LEVEL_READ .'"')->from("core_group"),
-//				['aclId', 'groupId', 'level']
-//			);
-//
-//		$stmt->execute();
-
-		return parent::check();
+		parent::check();
 	}
 
 	protected function internalSave(): bool

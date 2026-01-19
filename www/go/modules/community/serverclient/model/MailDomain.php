@@ -364,7 +364,11 @@ class MailDomain
 		foreach($responses as $key => $response) {
 //			$callId = $data[$key][2];
 			if (isset($response[0]) && $response[0]== 'error') {
-				$error = 'Error: ' . $response[1]['debugMessage'] ?? $response[1]['message'];
+				if (go()->getDebugger()->enabled) {
+					$error = 'Error: ' . $response[1]['debugMessage'];
+				} else{
+					$error = 'Error: ' . $response[1]['message'];
+				}
 			} else if (!empty($response[1]['notCreated'])) {
 				$error = 'Error: ' . var_export($response[1]['notCreated'], true);
 			} else if (!empty($response[1]['notUpdated'])) {

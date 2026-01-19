@@ -111,6 +111,7 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 		this.startDate = datetimefield({
 			label: t('Start'),
 			withTimeZone: false,
+			required: true,
 			name: 'start',
 			flex: 1,
 			defaultTime: now.format('H')+':00',
@@ -134,17 +135,19 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 					}
 					this.participantFld.checkAvailability(this.startDate.getValueAsDateTime()!, this.endDate.getValueAsDateTime()!, !!this.withoutTimeToggle.value);
 				},
-			setvalue: ({target}) => {
-				const d = target.getValueAsDateTime();
-				if(d){
-					recurrenceField.setStartDate(d);
+				setvalue: ({target}) => {
+					const d = target.getValueAsDateTime();
+					if(d){
+						recurrenceField.setStartDate(d);
+					}
 				}
-			}}
+			}
 		});
 
 		this.endDate = datetimefield({
 			label: t('End'),
 			withTimeZone: false,
+			required: true,
 			name: 'end',
 			flex:1,
 			defaultTime: (now.getHours()+1 )+':00',
@@ -458,15 +461,15 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 
 
 	private attachFile() {
-		 browser.pickLocalFiles(true).then(files => {
-			 this.attachments.mask();
-			 client.uploadMultiple(files).then(blobs => {
-				 for(const r of blobs)
-					 this.attachments.add({blobId:r.id, title:r.name, size:r.size, contentType:r.type}, );
-			 }).finally(() => {
-				 this.attachments.unmask();
-			 });
-		 });
+		browser.pickLocalFiles(true).then(files => {
+			this.attachments.mask();
+			client.uploadMultiple(files).then(blobs => {
+				for(const r of blobs)
+					this.attachments.add({blobId:r.id, title:r.name, size:r.size, contentType:r.type}, );
+			}).finally(() => {
+				this.attachments.unmask();
+			});
+		});
 	}
 
 }
