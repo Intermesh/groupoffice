@@ -1,3 +1,5 @@
+- Leavedays: display past hours of non-budgetable, non-expiring credit types 
+
 09-01-2025: 6.8.148
 - Leavedays: fix leaveday status rendering problem in very specific case 
 - Leavedays: timing problem in user panel (cherry-pick from 25.0)
