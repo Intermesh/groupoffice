@@ -1020,39 +1020,7 @@ ALTER TABLE `core_oauth_access_token`
 
 
 
-CREATE TABLE `core_alert` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `entityTypeId` INT NOT NULL,
-  `entityId` INT NOT NULL,
-  createdBy varchar(60) null,
-  `userId` INT NOT NULL,
-  `triggerAt` DATETIME NOT NULL,
-  `staleAt` DATETIME NULL,
-    tag varchar(50) null,
-  `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
-  `data` text null,
-  sendMail boolean default false not null,
-  isSent boolean default false not null,
-  PRIMARY KEY (`id`),
-  INDEX `dk_alert_entityType_idx` (`entityTypeId` ASC),
-  INDEX `fk_alert_user_idx` (`userId` ASC),
-  CONSTRAINT `fk_alert_entityType`
-    FOREIGN KEY (`entityTypeId`)
-    REFERENCES `core_entity` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_alert_user`
-    FOREIGN KEY (`userId`)
-    REFERENCES `core_user` (`id`)
-    ON DELETE cascade
-    ON UPDATE NO ACTION),
-    constraint core_alert_core_principal_id_fk
-                             foreign key (createdBy) references core_principal (id)
-                                 on delete set null
-    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create unique index core_alert_entityTypeId_entityId_tag_userId_uindex
-    on core_alert (entityTypeId, entityId, tag, userId);
 
 CREATE TABLE `core_pdf_block` (
   `id` bigint(20) UNSIGNED NOT NULL,
@@ -1266,3 +1234,39 @@ CREATE TABLE `core_principal`(
 		ON DELETE Restrict
 		ON UPDATE No Action
 ) ENGINE = InnoDB;
+
+CREATE TABLE `core_alert` (
+                              `id` INT NOT NULL AUTO_INCREMENT,
+                              `entityTypeId` INT NOT NULL,
+                              `entityId` INT NOT NULL,
+                              createdBy varchar(60) null,
+                              `userId` INT NOT NULL,
+                              `triggerAt` DATETIME NOT NULL,
+                              `staleAt` DATETIME NULL,
+                              tag varchar(50) null,
+                              `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
+                              `data` text null,
+                              sendMail boolean default false not null,
+                              isSent boolean default false not null,
+                              PRIMARY KEY (`id`),
+                              INDEX `dk_alert_entityType_idx` (`entityTypeId` ASC),
+                              INDEX `fk_alert_user_idx` (`userId` ASC),
+                              CONSTRAINT `fk_alert_entityType`
+                                  FOREIGN KEY (`entityTypeId`)
+                                      REFERENCES `core_entity` (`id`)
+                                      ON DELETE CASCADE
+                                      ON UPDATE NO ACTION,
+                              CONSTRAINT `fk_alert_user`
+                                  FOREIGN KEY (`userId`)
+                                      REFERENCES `core_user` (`id`)
+                                      ON DELETE cascade
+                                      ON UPDATE NO ACTION,
+                              constraint core_alert_core_principal_id_fk
+                                  foreign key (createdBy)
+                                      references core_principal (id)
+                                      on delete set null
+)
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+create unique index core_alert_entityTypeId_entityId_tag_userId_uindex
+    on core_alert (entityTypeId, entityId, tag, userId);

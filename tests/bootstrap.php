@@ -131,6 +131,9 @@ try {
 
 	  system('chown -R www-data:www-data ' . $dataFolder->getPath());
 
+		// for moving wopi module
+		go()->getDbConnection()->exec("update core_module set package='community' where name='wopi'");
+
 	  go()->getInstaller()->upgrade();
 
     $mod = \go\modules\community\test\Module::get();
