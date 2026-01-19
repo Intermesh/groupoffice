@@ -2,7 +2,8 @@
 - Calendar: Unavailable resources cannot be scheduled again.
 - Core: Make sure system groups exist
 - Files: Stored XSS via Filename during File Open
-
+- Maildomains / serverclient: play nice with each other
+ 
   13-01-2026: 25.0.79
 - Serverclient: more foolproof method for generating base URL
 - Core: ModifiedBy should not be set when no relevant properties were modified. Solves invalid modifiedBy in the calendar 
