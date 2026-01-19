@@ -1,3 +1,4 @@
+- Core: Fixed deleting old unused browser client data
 - Leavedays: display past hours of non-budgetable, non-expiring credit types 
 
 09-01-2025: 6.8.148
