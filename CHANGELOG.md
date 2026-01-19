@@ -3,6 +3,8 @@
 - Core: Make sure system groups exist
 - Files: Stored XSS via Filename during File Open
 - Maildomains / serverclient: play nice with each other
+- Leavedays: cherry pick several bug fixes from 6.8.x
+- Files: cherry pick from 6.8.x: allow file uploads through drag and drop when folder has create access
  
   13-01-2026: 25.0.79
 - Serverclient: more foolproof method for generating base URL
