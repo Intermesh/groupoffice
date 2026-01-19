@@ -1,9 +1,9 @@
-go.Modules.register("business", "wopi", {
-	// mainPanel: "go.modules.business.newsletters.MainPanel",
+go.Modules.register("community", "wopi", {
+	// mainPanel: "go.modules.community.newsletters.MainPanel",
 	title: t("Online Office"),
 	entities: [{
 			name: "WopiService"
 	}],
 	initModule: function () {},
-	systemSettingsPanels: ["go.modules.business.wopi.SystemSettingsPanel"]
+	systemSettingsPanels: ["go.modules.community.wopi.SystemSettingsPanel"]
 });

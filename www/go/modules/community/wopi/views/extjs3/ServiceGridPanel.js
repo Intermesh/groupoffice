@@ -1,5 +1,5 @@
 
-go.modules.business.wopi.ServiceGridPanel = Ext.extend(go.grid.GridPanel, {
+go.modules.community.wopi.ServiceGridPanel = Ext.extend(go.grid.GridPanel, {
 	viewConfig: {
 		forceFit: true,
 		autoFill: true,
@@ -23,7 +23,7 @@ go.modules.business.wopi.ServiceGridPanel = Ext.extend(go.grid.GridPanel, {
 				{
 					iconCls: 'ic-add',
 					handler: function() {
-						var dlg = new go.modules.business.wopi.ServiceDialog();
+						var dlg = new go.modules.community.wopi.ServiceDialog();
 						dlg.show();
 					},
 					scope: this
@@ -59,7 +59,7 @@ go.modules.business.wopi.ServiceGridPanel = Ext.extend(go.grid.GridPanel, {
 			}
 		});
 
-		go.modules.business.wopi.ServiceGridPanel.superclass.initComponent.call(this);
+		go.modules.community.wopi.ServiceGridPanel.superclass.initComponent.call(this);
 		
 		this.on("rowdblclick", function(grid, rowIndex, e) {
 			var record = grid.getStore().getAt(rowIndex);
@@ -132,7 +132,7 @@ go.modules.business.wopi.ServiceGridPanel = Ext.extend(go.grid.GridPanel, {
 	},
 	
 	edit: function(id) {
-		var dlg = new go.modules.business.wopi.ServiceDialog();
+		var dlg = new go.modules.community.wopi.ServiceDialog();
 		dlg.load(id).show();
 	}
 });

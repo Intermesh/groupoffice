@@ -1,6 +1,6 @@
 /* global go */
 
-go.modules.business.wopi.ServiceDialog = Ext.extend(go.form.Dialog, {
+go.modules.community.wopi.ServiceDialog = Ext.extend(go.form.Dialog, {
 	title: t('Service'),
 	entityStore: "WopiService",
 	width: dp(1000),
