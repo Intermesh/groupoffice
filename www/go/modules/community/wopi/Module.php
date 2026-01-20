@@ -42,12 +42,6 @@ class Module extends core\Module {
 		return ['legacy/files'];
 	}
 
-
-	public function requiredLicense(): ?string
-	{
-		return 'groupoffice-pro';
-	}
-
 	protected function afterInstall(model\Module $model): bool
 	{
 		self::configureIntermeshCloud();
@@ -85,7 +79,6 @@ class Module extends core\Module {
 			]);
 
 			$service->save();
-
 
 
 			$service = new Service();
