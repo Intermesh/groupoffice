@@ -1,3 +1,5 @@
+- Address book: Gender field less prominent
+
 19-01-2026: 25.0.80 
 - Core: Fixed deleting old unused browser client data
 - Calendar: Unavailable resources cannot be scheduled again.
