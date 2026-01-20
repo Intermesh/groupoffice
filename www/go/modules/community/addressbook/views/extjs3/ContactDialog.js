@@ -161,7 +161,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 
 		this.colorField = new GO.form.ColorField({
 			name: "color",
-			width: dp(120),
+			width: dp(160),
 			mobile: {
 				width: undefined
 			},
@@ -196,7 +196,6 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 												layout:"form",
 												items: [this.nameField]
 											},{
-												width: dp(8),
 												xtype: "box"
 											},
 											{
@@ -209,12 +208,44 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 									},
 
 
-									this.jobTitle = new Ext.form.TextField({
-										xtype: "textfield",
-										name: "jobTitle",
-										fieldLabel: t("Job title"),
-										anchor: "100%"
-									}),
+									{
+										xtype: "container",
+										flex: 1,
+										cls: "go-hbox",
+										items: [
+											{
+												flex: 1,
+												layout: "form",
+												items: [this.jobTitle = new Ext.form.TextField({
+													xtype: "textfield",
+													name: "jobTitle",
+													fieldLabel: t("Job title"),
+													anchor: "100%"
+												})]
+											}, {
+												xtype: "box"
+											},
+											{
+												layout: "form",
+												items: [
+													this.genderField = new go.form.SelectField({
+														width: dp(160),
+														xtype: 'radiogroup',
+														fieldLabel: t("Gender"),
+														name: "gender",
+														value: null,
+														options: [
+															[null, t("Unknown")],
+															['M', t("Male")],
+															['F', t("Female")],
+															['N', t("Non-binary")],
+															['P', t("Won't say")],
+														]
+													}),
+												]
+											}
+										]
+									},
 									this.departmentField = new Ext.form.TextField({
 										xtype: "textfield",
 										name: "department",
@@ -237,20 +268,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						]
 					},
 
-					this.genderField = new go.form.RadioGroup({
-						anchor: '100%',
-						xtype: 'radiogroup',
-						fieldLabel: t("Gender"),
-						name: "gender",
-						value: null,
-						items: [
-							{boxLabel: t("Unknown"), inputValue: null},
-							{boxLabel: t("Male"), inputValue: 'M'},
-							{boxLabel: t("Female"), inputValue: 'F'},
-							{boxLabel: t("Non-binary"), inputValue: 'N'},
-							{boxLabel: t("Won't say"), inputValue: 'P'}
-						]
-					}),
+
 
 					this.organizationsField = new go.form.Chips({
 						anchor: '100%',
