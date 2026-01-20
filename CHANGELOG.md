@@ -1,4 +1,4 @@
-- Address book: Gender field less prominent
+- Address book: Gender field less prominent and shown in grid
 
 19-01-2026: 25.0.80 
 - Core: Fixed deleting old unused browser client data
