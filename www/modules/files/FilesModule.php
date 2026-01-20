@@ -151,6 +151,15 @@ class FilesModule extends \GO\Base\Module{
 				$cf = new ClassFinder();
 				self::$fileHandlers = array_merge(self::$fileHandlers, $cf->findByParent(FilehandlerInterface::class));
 
+				// sort assistant last so that collabora and office are preferred over others
+				$firstValue = 'go\modules\community\wopi\filehandler\Collabora';
+
+				usort(self::$fileHandlers, function ($a, $b) use ($firstValue) {
+					if ($a === $firstValue) return -1;
+					if ($b === $firstValue) return 1;
+					return $a <=> $b; // normal sort
+				});
+
 				\GO::cache()->set('files-file-handlers', self::$fileHandlers);
 			}
 			
