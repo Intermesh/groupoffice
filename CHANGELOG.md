@@ -1,4 +1,6 @@
-20-01-2026: 26.0.3
+- calendar: Fixed create link field in event dialog
+
+- 20-01-2026: 26.0.3
 - wopi: Was still not available without a license
 
 19-01-2026: 26.0.2
