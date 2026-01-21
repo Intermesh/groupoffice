@@ -14,7 +14,7 @@ use go\modules\community\pwned\model\Pwned;
 final class Module extends core\Module
 {
 	public function getStatus() : string{
-		return self::STATUS_BETA;
+		return self::STATUS_STABLE;
 	}
 	public function getAuthor(): string
 	{

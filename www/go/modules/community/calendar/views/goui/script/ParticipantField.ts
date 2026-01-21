@@ -161,17 +161,27 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 
 		const fm = allDay ? 'Y-m-d' : 'Y-m-d H:i:s',
 			rows = this.list.value;
-
+		this.list.clearInvalid();
 		for (const id in rows) {
 			// not already pending and is user or resource
 			if(this.shouldCheckAvailability(id))
-			client.jmap('Principal/getAvailability', {start:start.format(fm),end:end.format(fm),id}).then((response)=> {
-				const f = this.list.items?.find(v => v.dataSet.key === id);
-				if(f)
-					f.findChild(f => f.itemId === 'name')!.style.color = response.list.length > 0 ?  'red' : 'inherit';
+				client.jmap('Principal/getAvailability', {start:start.format(fm),end:end.format(fm),id}).then((response)=> {
+					const f = this.list.items?.find(v => v.dataSet.key === id) as ContainerField;
+					if(f) {
+						const name = f.findChild(f => f.itemId === 'name')!;
+						if(response.list.length > 0) {
+							name.style.color = 'red';
+							if(id.startsWith('Calendar:')) {
+								this.list.setInvalid(t('Resource already booked'))
+							}
+						} else {
+							name.style.color = 'inherit';
+						}
+
+					}
 
 				this.pendingAvailabilityIds = {};
-			})
+			});
 			this.pendingAvailabilityIds[id]=true;
 		}
 	}

@@ -345,11 +345,12 @@ class MailDomain
 		$apiUrl = $this->getBaseUrl();
 
 		$apiKey = go()->getConfig()['serverclient_token'];
+		$token = go()->getAuthState()->getToken();
 		$this->http->setOption(CURLOPT_HTTPHEADER, array(
 			"Content-Type: application/json; charset=utf-8",
 			"Content-Length: " . strlen($dataStr),
-			"Authorization: Bearer " . $apiKey,
-//			"X-CSRF-Token" . go()->getAuthState()->getToken(),
+			"Authorization: Bearer " . $token->accessToken,
+			"X-CSRF-Token " . $token->CSRFToken,
 //			"COOKIE: XDEBUG_SESSION=PHPSTORM" // Uncomment to use XDebug to debug the API call
 		));
 
@@ -364,7 +365,11 @@ class MailDomain
 		foreach($responses as $key => $response) {
 //			$callId = $data[$key][2];
 			if (isset($response[0]) && $response[0]== 'error') {
-				$error = 'Error: ' . $response[1]['debugMessage'] ?? $response[1]['message'];
+				if (go()->getDebugger()->enabled) {
+					$error = 'Error: ' . $response[1]['debugMessage'];
+				} else{
+					$error = 'Error: ' . $response[1]['message'];
+				}
 			} else if (!empty($response[1]['notCreated'])) {
 				$error = 'Error: ' . var_export($response[1]['notCreated'], true);
 			} else if (!empty($response[1]['notUpdated'])) {

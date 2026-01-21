@@ -57,7 +57,7 @@ class Builder
 	 *
 	 * @var string sixsix, sixseven etc or testing
 	 */
-	public $distro = "twentyfivezero";
+	public $distro = "twentysixzero";
 
 
 	public $repreproDir = __DIR__ . "/deploy/reprepro";
