@@ -19,6 +19,15 @@ abstract class PrimaryAuthenticator extends BaseAuthenticator {
 	{
 		return false;
 	}
-	
+
+	/**
+	 * By default, the user / authenticator combination should be cached for a certain amount of time.
+	 *
+	 * @return bool
+	 */
+	public function needsCache(): bool
+	{
+		return true;
+	}
 }
 

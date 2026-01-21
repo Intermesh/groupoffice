@@ -5,7 +5,6 @@ namespace go\modules\community\ldapauthenticator\model;
 use DateInterval;
 use Exception;
 use GO\Base\Mail\Exception\ImapAuthenticationFailedException;
-use go\core\auth\Authenticate;
 use go\core\auth\PrimaryAuthenticator;
 use go\core\ErrorHandler;
 use go\core\ldap\Record;
@@ -31,6 +30,12 @@ class Authenticator extends PrimaryAuthenticator
 	{
 		return "ldap";
 	}
+
+	public function needsCache(): bool
+	{
+		return false;
+	}
+
 
 	public static function isAvailableFor(string $username): bool
 	{
@@ -61,7 +66,6 @@ class Authenticator extends PrimaryAuthenticator
 		return Server::find()
 			->join('ldapauth_server_domain', 'd', 's.id = d.serverId')
 			->where(['d.name' => $domain])
-			//->orWhere(['d.name' => '*'])
 			->single();
 	}
 
@@ -100,9 +104,7 @@ class Authenticator extends PrimaryAuthenticator
 		}
 
 		$mappedValues = Module::mappedValues($record);
-		// TODO: Remove this as soon as we can debug in a more efficient way
-		go()->getDebugger()->debug("LDAP Mapped values");
-		go()->getDebugger()->debug(json_encode($mappedValues));
+
 		if (empty($mappedValues['email'])) {
 			throw new Exception("User '$username' has no 'e-mail' attribute set. Can't create a user");
 		}
@@ -117,17 +119,24 @@ class Authenticator extends PrimaryAuthenticator
 
 		Module::ldapRecordToUser($username, $record, $user);
 
-		// TODO: Remove this as soon as we can debug in a more efficient way
-		if (go()->getConfig()['debug'] && !isset($mappedValues['otpSecret'])) {
-//			$mappedValues['otpSecret'] = '7SCLIMXRI7WZ43O5IH2JNSAHZ4KCO6FG';
-		}
-
-		if (go()->getModule('community', 'otp') && isset($mappedValues['otpSecret'])) {
-			$o = new OtpAuthenticator($user);
-			$o->setSecret($mappedValues['otpSecret']);
-			$o->expiresAt = (new DateTime())->add(new DateInterval('PT10M'));
-			$o->userId = $user->id;
-			$user->otp = $o;
+		if (go()->getModule('community', 'otp')) {
+			if (isset($mappedValues['otpSecret'])) {
+				$o = new OtpAuthenticator($user);
+				$o->setSecret($mappedValues['otpSecret']);
+				$o->expiresAt = (new DateTime())->add(new DateInterval('PT10M'));
+				$o->userId = $user->id;
+				$user->otp = $o;
+			} else {
+				$otpSettings = \go\modules\community\otp\model\Settings::get();
+				if ($otpSettings->enforceForGroupId && $otpSettings->block) {
+					foreach ($user->groups as $groupId) {
+						if ($groupId === $otpSettings->enforceForGroupId) {
+							go()->debug("OTP enforced, but no OTP secret available for user");
+							return false;
+						}
+					}
+				}
+			}
 		}
 
 		foreach ($server->groups as $group) {
