@@ -1,3 +1,5 @@
+- Email: fix sort error when searching
+
 19-01-2026: 6.8.149
 - Core: Fixed deleting old unused browser client data
 - Leavedays: display past hours of non-budgetable, non-expiring credit types 
