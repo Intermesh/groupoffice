@@ -1,4 +1,5 @@
 - Address book: Gender field less prominent and shown in grid
+- Core: Cron jobs no output buffering and debug memory
 
 19-01-2026: 25.0.80 
 - Core: Fixed deleting old unused browser client data
