@@ -1,5 +1,6 @@
 - Email: fix sort error when searching
 - Core: Cron jobs no output buffering and debug memory
+- Core: Exit with error immediately when config file can't be loaded. It hung endlessly on require.
 
 19-01-2026: 6.8.149
 - Core: Fixed deleting old unused browser client data
