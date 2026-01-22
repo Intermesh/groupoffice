@@ -1,7 +1,8 @@
-import {client, JmapDataSource, modules, router} from "@intermesh/groupoffice-core";
+import {appSystemSettings, client, JmapDataSource, modules, router} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {t, translate} from "@intermesh/goui";
-import {SystemSettings} from "./SystemSettings.js";
+import {Settings} from "./Settings";
+// import {SystemSettings} from "./SystemSettings.js";
 
 export * from "./HistoryDetailPanel.js";
 
@@ -24,10 +25,16 @@ modules.register({
 				return new Main();
 			});
 
-			modules.addSystemSettingsPanel("community", "history", "history", t("History"), "history", () => {
-				return new SystemSettings();
-			});
+			// modules.addSystemSettingsPanel("community", "history", "history", t("History"), "history", () => {
+			// 	return new SystemSettings();
+			// });
 		});
+	}
+});
+client.on("authenticated",  ({session}) => {
+
+	if (session.isAdmin) {
+		appSystemSettings.addPanel("community", "history", Settings);
 	}
 });
 
