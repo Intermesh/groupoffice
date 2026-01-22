@@ -1,4 +1,5 @@
 - Email: fix sort error when searching
+- Core: Cron jobs no output buffering and debug memory
 
 19-01-2026: 6.8.149
 - Core: Fixed deleting old unused browser client data
