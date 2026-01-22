@@ -8,7 +8,7 @@
     "typescript": "latest"
   },
   "scripts": {
-    "start": "concurrently --kill-others \"npm run start:ts\"",
+    "start davclient": "concurrently --kill-others \"npm run start:ts\"",
     "start:ts": "node ../../../../../../views/goui/esbuild-module.mjs watch",
 
     "build": "npm run build:ts",
