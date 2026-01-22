@@ -1,19 +1,16 @@
-import {btn, comp, Component, t, tbar} from "@intermesh/goui";
-import {KeyGrid} from "./KeyGrid.js";
-import {KeyDialog} from "./KeyDialog.js";
-// @deprecated -> to be replaced by App settings
-// @see Settings.js
-export class SystemSettingsPanel extends Component {
+import {btn, checkbox, comp, containerfield, fieldset, Fieldset, h3, t, tbar, textfield} from "@intermesh/goui";
+import {KeyGrid} from "./KeyGrid";
+import {KeyDialog} from "./KeyDialog";
+
+export class Settings extends Fieldset {
 	constructor() {
 		super();
-
-		this.title = t("API keys");
+		this.legend = t("API keys");
 
 		const keyGrid = new KeyGrid();
 		void keyGrid.store.load();
 
-		this.items.add(
-			comp({
+		this.items.add(comp({
 				cls: "pad",
 				text: t("API keys can be used for other services to connect to the API. A website feeding contact information for example.")
 			}),
@@ -30,6 +27,6 @@ export class SystemSettingsPanel extends Component {
 				})
 			),
 			keyGrid
-		)
+		);
 	}
 }
