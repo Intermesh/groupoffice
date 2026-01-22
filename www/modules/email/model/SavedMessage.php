@@ -131,7 +131,9 @@ class SavedMessage extends ComposerMessage
 			$this->_tmpDir=\GO::config()->tmpdir.'saved_messages/'.md5(serialize($this->attributes)).'/';
 
 			$dir = new \GO\Base\Fs\Folder($this->_tmpDir);
+			$old = File::setAllowDeletes(true);
 			$dir->delete();
+			File::setAllowDeletes($old);
 			$dir->create();
 		}
 		
