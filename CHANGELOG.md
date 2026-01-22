@@ -1,6 +1,10 @@
+- Email: fix sort error when searching
+
+19-01-2026: 6.8.149
 - Core: Fixed deleting old unused browser client data
 - Leavedays: display past hours of non-budgetable, non-expiring credit types 
 - Files: Stored XSS via Filename during File Open
+- Files: allow file uploads through drag&drop when folder has create permission
 
 09-01-2025: 6.8.148
 - Leavedays: fix leaveday status rendering problem in very specific case 
