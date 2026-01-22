@@ -203,6 +203,15 @@ export class CalendarItem {
 		return new CalendarItem({key: this.data.id + '/' + recurrenceId, recurrenceId, override: o, data: this.data});
 	}
 
+	/**
+	 * Expands a recurring calendar event into individual calendar items within a specific timeframe.
+	 * Handles recurrence rules, exceptions, and overrides while generating items.
+	 *
+	 * @param {CalendarEvent} e The calendar event to expand. This includes details such as start time, duration, recurrence rule, and overrides.
+	 * @param {DateTime} from The start of the timeframe for which to generate calendar items.
+	 * @param {DateTime} until The end of the timeframe for which to generate calendar items.
+	 * @return {Generator<CalendarItem>} A generator yielding individual calendar items that fall within the specified timeframe.
+	 */
 	static *expand(e: CalendarEvent, from: DateTime, until: DateTime) : Generator<CalendarItem> {
 		const start = new DateTime(e.start),
 			end = start.clone().add(new DateInterval(e.duration));
