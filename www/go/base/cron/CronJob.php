@@ -288,8 +288,6 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 		GO::session()->runAsRoot();
 		GO::debug('CRONJOB ('.$this->name.') START : '.date('d-m-Y H:i:s'));
 
-		ob_start();
-
 		if($this->_prepareRun()){
 
 			$failed = false;
@@ -349,15 +347,7 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 				
 				\GO\Base\Mail\AdminNotifier::sendMail("CronJob ".$this->name." failed at " . go()->getSettings()->URL, "EXCEPTION: ". $e->getMessage());
 
-				$this->error = date('c') . ": " .(string)$e;
-
-			}
-
-			$output = ob_get_contents();
-			ob_end_clean();
-
-			if(!empty($output)) {
-				echo get_class($this) . " output: \n\n" . $output . "\n---\n\n";
+				$this->error = date('c') . ": " . $e;
 			}
 			
 			$this->_finishRun($failed);
