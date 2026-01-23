@@ -1,0 +1,26 @@
+{
+  "type": "module",
+  "name": "wopi",
+  "devDependencies": {
+    "concurrently": "latest",
+    "esbuild": "latest",
+    "sass": "latest",
+    "typescript": "latest"
+  },
+  "scripts": {
+    "start wopi": "npm run build:clean && npm run build:assets && concurrently --kill-others \"npm run start:ts\"  \"npm run start:dts\"  \"npm run start:sass\"",
+    "start:ts": "node ../../../../../../views/goui/esbuild-module.mjs watch",
+    "start:dts": "npx tsc --declaration --emitDeclarationOnly --watch",
+    "start:sass": "npx sass --watch style:dist",
+    "build": "npm run build:clean && npm run build:assets && npm run build:ts && npm run build:dts",
+    "build:assets": "copyfiles -u 2 ./style/resources/*.* ./dist/resources",
+    "build:clean": "rm -rf ./dist/*",
+    "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
+    "build:dts": "npx tsc --declaration --emitDeclarationOnly",
+    "build:sass": "npx sass --style=compressed style:dist",
+    "test": "npx tsc --noEmit"
+  },
+  "dependencies": {
+    "copyfiles": "^2.4.1"
+  }
+}

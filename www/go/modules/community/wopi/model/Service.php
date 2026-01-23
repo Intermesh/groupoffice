@@ -1,4 +1,5 @@
 <?php
+
 namespace go\modules\community\wopi\model;
 
 use go\core\acl\model\AclOwnerEntity;
@@ -13,181 +14,186 @@ use PHPUnit\Framework\Error\Error;
 
 class Service extends AclOwnerEntity
 {
-  const TYPE_COLLABORA = 'collabora';
-  const TYPE_OFFICE_ONLINE = 'officeonline';
+	const TYPE_COLLABORA = 'collabora';
+	const TYPE_OFFICE_ONLINE = 'officeonline';
 
-  public ?string $id;
-  public string $name = "Office Online";
-  protected string $url;
+	public ?string $id;
+	public string $name = "Office Online";
+	protected string $url;
 
-  public string $type = self::TYPE_OFFICE_ONLINE;
+	public string $type = self::TYPE_OFFICE_ONLINE;
 
-  protected ?string $wopiClientUri;
+	protected ?string $wopiClientUri = null;
 
-  public static function getClientName(): string
-  {
-    return "WopiService";
-  }
+	public static function getClientName(): string
+	{
+		return "WopiService";
+	}
 
-  public function getWopiClientUri() {
-  	return $this->wopiClientUri;
-  }
+	public function getWopiClientUri(): ?string
+	{
+		return $this->wopiClientUri;
+	}
 
-  public function autoWopiClientUri() {
-	  if(isset($this->wopiClientUri)){
-	  	return $this->wopiClientUri;
-	  }
+	public function autoWopiClientUri(): ?string
+	{
+		if (isset($this->wopiClientUri)) {
+			return $this->wopiClientUri;
+		}
 
-	  $url = Request::get()->isHttps() ? 'https://' : 'http://';
-	  $url .= Request::get()->getHost(false) . '/wopi/';
-	  return $url;
-  }
+		$url = Request::get()->isHttps() ? 'https://' : 'http://';
+		$url .= Request::get()->getHost(false) . '/wopi/';
+		return $url;
+	}
 
-  public function setWopiClientUri($uri) {
-  	$this->wopiClientUri = !empty($uri) ? trim($uri, ' /') . '/' : null;
-  }
+	public function setWopiClientUri(?string $uri): void
+	{
+		$this->wopiClientUri = !empty($uri) ? trim($uri, ' /') . '/' : null;
+	}
 
-  protected static function defineMapping(): Mapping
-  {
-    return parent::defineMapping()->addTable('wopi_service', 's');
-  }
+	protected static function defineMapping(): Mapping
+	{
+		return parent::defineMapping()->addTable('wopi_service', 's');
+	}
 
-  public function getName() {
-    return $this->name;
-  }
+	public function getName(): string
+	{
+		return $this->name;
+	}
 
-  public function setUrl($url)
-  {
-    $this->url = trim($url, '/ ');
-  }
+	public function setUrl(string $url): void
+	{
+		$this->url = trim($url, '/ ');
+	}
 
-  public function getUrl()
-  {
-    return $this->url;
-  }
+	public function getUrl(): string
+	{
+		return $this->url;
+	}
 
-  private $actions;
+	private $actions;
 
-  protected function internalValidate()
-  {
-    try{
-			if($this->isNew() || $this->isModified(['url'])) {
+	protected function internalValidate(): void
+	{
+		try {
+			if ($this->isNew() || $this->isModified(['url'])) {
 				$this->discover();
 			}
-    } catch(\Exception $e) {
-      GoErrorHandler::logException($e);
-      $this->setValidationError('url', ErrorCode::INVALID_INPUT, go()->t("The given URL is not a valid WOPI client") . ": ". $e->getMessage());
-    }
+		} catch (\Exception $e) {
+			GoErrorHandler::logException($e);
+			$this->setValidationError('url', ErrorCode::INVALID_INPUT, go()->t("The given URL is not a valid WOPI client") . ": " . $e->getMessage());
+		}
 
-    return parent::internalValidate();
-  }
+		parent::internalValidate();
+	}
 
-  protected function internalSave(): bool
-  {
-    \GO::cache()->delete("files-file-handlers");
-    
-    if (!parent::internalSave()) {
+	protected function internalSave(): bool
+	{
+		\GO::cache()->delete("files-file-handlers");
 
-	    if($this->getValidationError('type')) {
-		    $this->setValidationError('type', ErrorCode::UNIQUE, go()->t("You can only add one service of the same type"));
-	    }
+		if (!parent::internalSave()) {
 
-      return false;
-    }
+			if ($this->getValidationError('type')) {
+				$this->setValidationError('type', ErrorCode::UNIQUE, go()->t("You can only add one service of the same type"));
+			}
 
-    return $this->saveActions();
-  }
+			return false;
+		}
 
-  protected static function internalDelete(Query $query): bool
-  {
-    \GO::cache()->delete("files-file-handlers");
-    return parent::internalDelete($query);
-  }
+		return $this->saveActions();
+	}
 
-  private function saveActions() {
+	protected static function internalDelete(Query $query): bool
+	{
+		\GO::cache()->delete("files-file-handlers");
+		return parent::internalDelete($query);
+	}
 
-    if(!isset($this->actions)) {
-      return true;
-    }
+	private function saveActions(): true
+	{
 
-     go()->getDbConnection()
-      ->delete('wopi_action', ['serviceId' => $this->id])
-      ->execute();
+		if (!isset($this->actions)) {
+			return true;
+		}
 
-    foreach($this->actions as $action) {
-      $action['serviceId'] = $this->id;
+		go()->getDbConnection()
+			->delete('wopi_action', ['serviceId' => $this->id])
+			->execute();
 
-      go()->getDbConnection()
-        ->insert('wopi_action', $action)->execute();
-    }
+		foreach ($this->actions as $action) {
+			$action['serviceId'] = $this->id;
 
-    return true;
-  }
+			go()->getDbConnection()
+				->insert('wopi_action', $action)->execute();
+		}
 
-  private function discover()
-  {
-    $c = new Client();
+		return true;
+	}
+
+	private function discover(): void
+	{
+		$c = new Client();
 		$c->setOption(CURLOPT_TIMEOUT, 10);
 
-    $result = $c->get($this->url . '/hosting/discovery');
+		$result = $c->get($this->url . '/hosting/discovery');
 
-    go()->debug($result);
-    $discoveryParsed = simplexml_load_string($result['body']);
+		go()->debug($result);
+		$discoveryParsed = simplexml_load_string($result['body']);
 
-    if (!$discoveryParsed) {
-      $this->setValidationError('url', ErrorCode::INVALID_INPUT, "The URL is not a valid WOPI source");
-      return false;
-    }
+		if (!$discoveryParsed) {
+			$this->setValidationError('url', ErrorCode::INVALID_INPUT, "The URL is not a valid WOPI source");
+			return;
+		}
 
-    $apps = $discoveryParsed->xpath('/wopi-discovery/net-zone/app');
+		$apps = $discoveryParsed->xpath('/wopi-discovery/net-zone/app');
 
-    $this->actions = [];
+		$this->actions = [];
 
-    $capabilitiesUrl = null;
+		$capabilitiesUrl = null;
 
-    foreach ($apps as $app) {
+		foreach ($apps as $app) {
 
-      $appName = (string) $app->attributes()->name;
+			$appName = (string)$app->attributes()->name;
 
-      foreach ($app->action as $action) {
-        $record = [
-          'app' => $appName,
-          'ext' => (string)$action->attributes()->ext,
-          'name' => (string)$action->attributes()->name,
-          'url' => (string)$action->attributes()->urlsrc
-        ];
-        $this->actions[] = $record;
+			foreach ($app->action as $action) {
+				$record = [
+					'app' => $appName,
+					'ext' => (string)$action->attributes()->ext,
+					'name' => (string)$action->attributes()->name,
+					'url' => (string)$action->attributes()->urlsrc
+				];
+				$this->actions[] = $record;
 
-        if($appName == 'Capabilities' && $record['name'] == 'getinfo') {
-          $capabilitiesResult = $c->get($record['url']);
-          $c = json_decode($capabilitiesResult['body']);
-          $this->name = $c->productName;
-          $this->type = self::TYPE_COLLABORA;
-        } else
-        {
-          $this->name = "Office Online";
-          $this->type = self::TYPE_OFFICE_ONLINE;
-        }
-       
-      }
-    }
-  }
+				if ($appName == 'Capabilities' && $record['name'] == 'getinfo') {
+					$capabilitiesResult = $c->get($record['url']);
+					$c = json_decode($capabilitiesResult['body']);
+					$this->name = $c->productName;
+					$this->type = self::TYPE_COLLABORA;
+				} else {
+					$this->name = "Office Online";
+					$this->type = self::TYPE_OFFICE_ONLINE;
+				}
 
-  /**
-   * Find's actions by file extension
-   * 
-   * @param string $ext
-   * @return array eg. [edit' => 'https://..']
-   */
-  public function findActions($ext) {
-    $a = [];
-    foreach(go()->getDbConnection()
-      ->select('name,url')
-      ->from('wopi_action')
-      ->where(['serviceId' => $this->id, 'ext' => $ext]) as $record) {
-        $a[$record['name']] = $record['url'];
-    }
+			}
+		}
+	}
 
-    return $a;
-  }
+	/**
+	 * Find's actions by file extension
+	 *
+	 * @param string $ext
+	 * @return array eg. [edit' => 'https://..']
+	 */
+	public function findActions(string $ext): array
+	{
+		$a = [];
+		foreach (go()->getDbConnection()
+			         ->select('name,url')
+			         ->from('wopi_action')
+			         ->where(['serviceId' => $this->id, 'ext' => $ext]) as $record) {
+			$a[$record['name']] = $record['url'];
+		}
+
+		return $a;
+	}
 }

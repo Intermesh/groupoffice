@@ -28,13 +28,11 @@ modules.register({
 			// modules.addSystemSettingsPanel("community", "history", "history", t("History"), "history", () => {
 			// 	return new SystemSettings();
 			// });
-		});
-	}
-});
-client.on("authenticated",  ({session}) => {
+			if (session.isAdmin) {
+				appSystemSettings.addPanel("community", "history", Settings);
+			}
 
-	if (session.isAdmin) {
-		appSystemSettings.addPanel("community", "history", Settings);
+		});
 	}
 });
 
