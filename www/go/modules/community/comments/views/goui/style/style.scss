@@ -65,4 +65,7 @@
 
 .goui .comment-editor-fieldset {
   align-items: unset;
+  .goui-form-field {
+    min-width: 0;
+  }
 }
