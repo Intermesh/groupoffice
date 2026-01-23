@@ -4,9 +4,9 @@ import {
 	containerfield,
 	DataSourceForm,
 	datasourceform, DataSourceStore,
-	datasourcestore, DefaultEntity,
-	fieldset, Notifier,
-	select
+	datasourcestore, DefaultEntity, displayfield, Fieldset,
+	fieldset, h3, Notifier,
+	select, span
 } from "@intermesh/goui";
 import {client, JmapDataSource, jmapds, User} from "@intermesh/groupoffice-core";
 import {t} from "./Index.js";
@@ -15,6 +15,7 @@ export class PreferencesPanel extends Component {
 	private form: DataSourceForm<User>;
 	private calendarStore: DataSourceStore<JmapDataSource<DefaultEntity>>;
 	private personalCalendarStore: DataSourceStore<JmapDataSource<DefaultEntity>>;
+	private processFieldSet: Fieldset;
 
 	constructor() {
 		super();
@@ -89,7 +90,8 @@ export class PreferencesPanel extends Component {
 						]})
 					//,checkbox({name:'useTimeZones', label: t('Enable multiple time zone support')}),
 				),
-				fieldset({legend:t('Process e-mail in')+': '+client.user.email},
+				this.processFieldSet = fieldset({legend:t('Process e-mail in')+': '+client.user.email},
+
 					checkbox({name:'autoAddInvitations',label:t('Automatically add invitation to your calendar'),
 						hint: t('Whenever an event invitation is received, add the event to your default calendar'),
 						listeners: {'setvalue': ({target}) => {target.nextSibling()!.hidden = !target.value}}}),
@@ -117,6 +119,8 @@ export class PreferencesPanel extends Component {
 	onLoad(user:User) {
 		this.form.value = user;
 		this.form.currentId = user.id;
+
+		this.processFieldSet.legend = t('Process e-mail in')+ ': '+user.email;
 
 		this.personalCalendarStore
 			.setFilter('owner', {ownerId: user.id})
