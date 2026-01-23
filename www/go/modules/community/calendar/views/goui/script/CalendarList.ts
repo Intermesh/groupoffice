@@ -176,7 +176,7 @@ export class CalendarList extends Component<CalendarListEventMap> {
 				'change': ( {newValue}) => {
 					this.inCalendars[data.id] = newValue; // update to make sure it doesn't fire changevisible twice
 					this.fire('changevisible', {ids:Object.keys(this.inCalendars).filter(key => this.inCalendars[key])});
-					console.log(this.inCalendars);
+
 					this.visibleChanges[data.id] = newValue;
 					this.saveSelectionChanges();
 				}
