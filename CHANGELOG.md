@@ -2,6 +2,8 @@
 - Core: Cron jobs no output buffering and debug memory
 - Core: Exit with error immediately when config file can't be loaded. It hung endlessly on require.
 - Core: New config options for mail debugging (mailerDebugHost and mailerDebugPort)
+- Calendar: Fixed calendar load problem if a relation with id="0" was fetched. In this case modifiedBy was '0' after]
+  migrating an ancient 4.0 version.
 
 19-01-2026: 25.0.80 
 - Core: Fixed deleting old unused browser client data
