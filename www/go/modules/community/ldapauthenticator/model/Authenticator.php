@@ -120,10 +120,17 @@ class Authenticator extends PrimaryAuthenticator
 		Module::ldapRecordToUser($username, $record, $user);
 
 		if (go()->getModule('community', 'otp')) {
+			// TODO: Remove this as soon as we can debug in a more efficient way
+			if (go()->getConfig()['debug'] && !isset($mappedValues['otpSecret'])) {
+				$mappedValues['otpSecret'] = '7SCLIMXRI7WZ43O5IH2JNSAHZ4KCO6FG';
+			}
 			if (isset($mappedValues['otpSecret'])) {
 				$o = new OtpAuthenticator($user);
 				$o->setSecret($mappedValues['otpSecret']);
-				$o->expiresAt = (new DateTime())->add(new DateInterval('PT10M'));
+				$dt = new DateTime();
+				$dt->setTimezone(new \DateTimeZone(go()->getSettings()->defaultTimezone));
+				$dt->add(new DateInterval('PT10M'));
+				$o->expiresAt = $dt;
 				$o->userId = $user->id;
 				$user->otp = $o;
 			} else {
