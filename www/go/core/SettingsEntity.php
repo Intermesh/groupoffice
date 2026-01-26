@@ -7,7 +7,6 @@ use go\core\data\Model;
 use go\core\db\Query;
 use go\core\exception\Forbidden;
 use go\core\orm\Entity;
-use go\modules\community\pdfeditor\Module;
 
 /**
  * Settings model
