@@ -22,8 +22,10 @@ return array (
   'description' => 'Inserisci qui una descrizione',
   'Start page' => 'Riepilogo',
   'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml',
-  "welcomeTitle" => "Benvenuto in Group-Office!",
-  "welcomeContent" => "<p>Grazie per aver installato Group-Office!</p>
+  'welcomeTitle' => 'Benvenuto in Group-Office!',
+  'welcomeContent' => '<p>Grazie per aver installato Group-Office!</p>
 <p>Ecco un link per aiutarti a iniziare: {{link}}</p>
-<p>Speriamo che ti piaccia Group-Office!</p>"
+<p>Speriamo che ti piaccia Group-Office!</p>',
+  'webfeeds' => 'webfeeds',
+  'All users' => 'All users',
 );
