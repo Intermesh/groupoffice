@@ -128,7 +128,11 @@ class Authenticator extends PrimaryAuthenticator
 				$user->otp = $o;
 			} else {
 				$otpSettings = \go\modules\community\otp\model\Settings::get();
-				if ($otpSettings->enforceForGroupId && $otpSettings->block) {
+				if ($otpSettings->block) {
+					if (!$otpSettings->enforceForGroupId) {
+						go()->debug("OTP enforced, but no OTP secret available for user");
+						return false;
+					}
 					foreach ($user->groups as $groupId) {
 						if ($groupId === $otpSettings->enforceForGroupId) {
 							go()->debug("OTP enforced, but no OTP secret available for user");
