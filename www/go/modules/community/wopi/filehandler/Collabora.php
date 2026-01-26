@@ -23,7 +23,7 @@ class Collabora implements FilehandlerInterface{
 			return $name;
 		}
 
-		return go()->t("Libre Office Online", 'business', 'wopi');
+		return go()->t("Libre Office Online", 'community', 'wopi');
 	}
 	
 	public function fileIsSupported(File $file) {    
