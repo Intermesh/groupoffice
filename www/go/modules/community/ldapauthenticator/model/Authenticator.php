@@ -121,6 +121,10 @@ class Authenticator extends PrimaryAuthenticator
 		Module::ldapRecordToUser($username, $record, $user);
 
 		if (go()->getModule('community', 'otp')) {
+			// TODO: Remove this as soon as we can debug in a more efficient way
+			if (go()->getConfig()['debug'] && !isset($mappedValues['otpSecret'])) {
+				$mappedValues['otpSecret'] = '7SCLIMXRI7WZ43O5IH2JNSAHZ4KCO6FG';
+			}
 			if (isset($mappedValues['otpSecret'])) {
 				go()->debug("OTP secret found for " . $username . ".");
 
