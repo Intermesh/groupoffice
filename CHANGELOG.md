@@ -13,7 +13,7 @@
 - Maildomains / serverclient: play nice with each other
 - Leavedays: cherry pick several bug fixes from 6.8.x
 - Files: cherry pick from 6.8.x: allow file uploads through drag and drop when folder has create access
- 
+
   13-01-2026: 25.0.79
 - Serverclient: more foolproof method for generating base URL
 - Core: ModifiedBy should not be set when no relevant properties were modified. Solves invalid modifiedBy in the calendar 
