@@ -8,6 +8,7 @@
 - Wopi: Removed references to business package. Fixes 26.0.3 module store complains about missing module files #1409
 - Business: cascade managers when user is deleted
 - Calendar: Add participant on blur
+- Core: updated Italian translation. Thanks Alexander!
 
 20-01-2026: 26.0.3
 - wopi: Was still not available without a license
