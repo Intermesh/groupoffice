@@ -6,6 +6,7 @@
   migrating an ancient 4.0 version.
 - Maildomains: rollback of permission changes in .80. Fixes issue #1411.
 - Business: cascade managers when user is deleted
+- Core: updated Italian translation. Thanks Alexander!
 
 19-01-2026: 25.0.80 
 - Core: Fixed deleting old unused browser client data
