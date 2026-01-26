@@ -256,11 +256,16 @@ abstract class Entity  extends OrmEntity {
 
 					// if filesFolderId is null then pickup from disk if it exists in the right way
 					$filesPath = $e->buildFilesPath();
+					go()->debug("Finding ". $filesPath);
 					if(go()->getDataFolder()->getFolder($filesPath)->exists()) {
+						go()->debug("FOUND");
 						$folder = Folder::model()->findForEntity($e);
 						$folder->syncFilesystem();
+					} else {
+						go()->debug("NOT FOUND");
 					}
 				} else {
+					go()->debug("CHecking existing files folder");
 					$e->checkFilesFolder(true);
 				}
 			}
