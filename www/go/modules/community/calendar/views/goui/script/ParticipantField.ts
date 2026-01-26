@@ -90,11 +90,11 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 					'render' : ({target}) => {
 
 						 const submitEMail = (target:AutocompleteField) => {
-							if(validateEmail(target.input!.value)) {
-								const email = target.input!.value;
+							if(validateEmail(target.input.value)) {
+								const email = target.input.value;
 								this.addParticipant({id:email,email});
 								target.menu.hide();
-								target.value = "";
+								target.input.value = "";
 							}
 						}
 
@@ -105,11 +105,15 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 							}
 						});
 
-						 target.input.on("blur", ev => {
-							 if(target.menu.hidden) {
-								 submitEMail(target);
-							 }
-						 });
+
+					},
+					'blur' : ({target}) => {
+						if(validateEmail(target.input!.value)) {
+							const email = target.input!.value;
+							this.addParticipant({id:email,email});
+							target.menu.hide();
+							target.input.value = "";
+						}
 					},
 					'select': ({target, record}) => {
 
