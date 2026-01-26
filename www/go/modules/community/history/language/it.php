@@ -12,4 +12,6 @@ return array (
   'Entity' => 'Entità',
   'Item was never modified' => 'Mai modificato',
   'Delete entries after' => 'Elimina gli inserimenti dopo',
+  'Entity ID' => 'ID Entità',
+  'Request ID' => 'ID Richiesta',
 );

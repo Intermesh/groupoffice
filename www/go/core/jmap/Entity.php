@@ -225,6 +225,7 @@ abstract class Entity  extends OrmEntity {
 						return false;
 					}
 				}
+				$folder->syncFilesystem();
 			}
 		}
 		return true;
