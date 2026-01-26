@@ -1,3 +1,4 @@
+26-01-2026: 25.0.81
 - Address book: Gender field less prominent and shown in grid
 - Core: Cron jobs no output buffering and debug memory
 - Core: Exit with error immediately when config file can't be loaded. It hung endlessly on require.
