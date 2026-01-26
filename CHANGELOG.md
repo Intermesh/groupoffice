@@ -5,6 +5,7 @@
 - Calendar: Fixed calendar load problem if a relation with id="0" was fetched. In this case modifiedBy was '0' after]
   migrating an ancient 4.0 version.
 - Maildomains: rollback of permission changes in .80. Fixes issue #1411.
+- Business: cascade managers when user is deleted
 
 19-01-2026: 25.0.80 
 - Core: Fixed deleting old unused browser client data
