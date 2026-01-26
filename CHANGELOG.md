@@ -2,6 +2,7 @@
 - Core: Cron jobs no output buffering and debug memory
 - Core: Exit with error immediately when config file can't be loaded. It hung endlessly on require.
 - Core: New config options for mail debugging (mailerDebugHost and mailerDebugPort)
+- Business: cascade managers when user is deleted
 
 19-01-2026: 6.8.149
 - Core: Fixed deleting old unused browser client data
