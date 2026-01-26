@@ -6,6 +6,7 @@ use Exception;
 use go\core\data\Model;
 use go\core\db\Query;
 use go\core\exception\Forbidden;
+use go\modules\community\pdfeditor\Module;
 
 /**
  * Settings model 
