@@ -9,6 +9,7 @@
 - Business: cascade managers when user is deleted
 - Calendar: Add participant on blur
 - Core: updated Italian translation. Thanks Alexander!
+- Kanban: was missing
 
 20-01-2026: 26.0.3
 - wopi: Was still not available without a license
