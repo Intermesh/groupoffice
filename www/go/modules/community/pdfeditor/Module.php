@@ -16,4 +16,9 @@ class Module extends core\Module {
 		return ['legacy/files'];
 	}
 
+	public function autoInstall(): bool
+	{
+		return true;
+	}
+
 }
