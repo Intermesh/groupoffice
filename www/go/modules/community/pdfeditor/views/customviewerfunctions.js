@@ -39,6 +39,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 			showSuccessIndicator(saveToGroupOfficeButton);
 
 
+			const app = PDFViewerApplication;
+
+// 1. Exit editor mode FIRST
+			app.eventBus.dispatch("switchannotationeditormode", {
+				source: app,
+				mode: 0, // NONE
+			});
+
+
+			app.pdfDocument.annotationStorage?.resetModified();
+			app._hasAnnotationEditors = false;
+			app.setTitle();
+
+// 4. Force UI sync
+			app.eventBus.dispatch("documentmodified", {
+				source: app,
+				modified: false,
+			});
+
+
+
 		} catch (error) {
 			console.error('Save error:', error);
 			showErrorIndicator(saveToGroupOfficeButton, error.message);
