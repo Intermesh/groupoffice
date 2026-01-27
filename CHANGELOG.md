@@ -1,3 +1,5 @@
+- Tasks: sort tasklist grid by name
+
 26-01-2026: 25.0.81
 - Address book: Gender field less prominent and shown in grid
 - Core: Cron jobs no output buffering and debug memory
