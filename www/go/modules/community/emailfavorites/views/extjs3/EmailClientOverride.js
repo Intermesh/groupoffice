@@ -65,10 +65,10 @@ GO.moduleManager.onModuleReady('email', function () {
 				style: "max-height: 30%; overflow-y: scroll;",
 				autoHeight: true,
 				viewConfig: {
-					forceFit: true,
 					scrollOffset: 0,
 					emptyText: ''
 				},
+				autoExpandColumn: 'name',
 				hideHeaders: true,
 				selectFirst: false,
 				plugins: [actions],
@@ -77,8 +77,9 @@ GO.moduleManager.onModuleReady('email', function () {
 					{
 						id: 'icon',
 						header: '',
-						width: dp(24),
-						renderer: function () {
+						width: dp(56),
+						renderer: function (v, meta) {
+							meta.style = 'text-align: right;';
 							return `<span style="color: var(--c-primary)" class="icon ic-star"></span>`
 						}
 					},
