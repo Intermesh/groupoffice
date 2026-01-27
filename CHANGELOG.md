@@ -12,6 +12,7 @@
 - Kanban: was missing
 - PDF Editor: New module for annotating PDF files
 - Email favorites: New module to bookmark email folders
+- Core: Only lock set operations for the same entity as it blocked serverclient requests to the same group-office instance.
 
 20-01-2026: 26.0.3
 - wopi: Was still not available without a license
