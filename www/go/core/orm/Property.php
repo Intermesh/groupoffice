@@ -1873,13 +1873,16 @@ abstract class Property extends Model {
 		return $this->_forUserId ?? go()->getUserId();
 	}
 
+	/**
+	 * Checks if modifiedBy, modifiedAt, createdBy or createdAt should be set automatically.
+	 */
 	private function shouldSetSaveProps(array $modified): bool
 	{
 		if(empty($modified)) {
 			return false;
 		}
 
-		$diff = array_diff(array_keys($modified), static::ignorePropertiesForModifiedAt());
+		$diff = array_diff(array_keys($modified), static::ignorePropertiesForModifiedAt(), ['modifiedAt', 'modifiedBy', 'createdAt', 'createdBy']);
 		return !empty($diff);
 	}
 
@@ -1894,7 +1897,7 @@ abstract class Property extends Model {
 	private function saveTable(MappedTable $table, array &$modified): bool
 	{
 
-		if($table->isUserTable && (!go()->getAuthState() || !go()->getAuthState()->isAuthenticated())) {
+		if($table->isUserTable && empty($this->_forUserId) && (!go()->getAuthState() || !go()->getAuthState()->isAuthenticated())) {
 			//ignore user tables when not logged in.
 			return true;
 		}
@@ -2308,7 +2311,7 @@ abstract class Property extends Model {
 		}
 	}
 
-	public function toArray(array|null $properties = null): array|null
+	public function toArray(?array $properties = null): ?array
 	{
 		if (empty($properties)) {
 			$properties = $this->fetchProperties;

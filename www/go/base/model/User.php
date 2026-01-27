@@ -171,10 +171,6 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 * @depcreated
 	 */
 	public static function sudo($callback) {
-		
-//		$usr = \GO::user();
-//		$currentUserId = !empty($usr) ? $usr->id : false; // when not logged in
-	
 		$oldIgnore = GO::setIgnoreAclPermissions();
 		
 		try {
@@ -354,11 +350,6 @@ class User extends \GO\Base\Db\ActiveRecord {
 				$prefixTable.".username"
 				);
 		
-		// if($withCustomFields && $this->customfieldsRecord)
-		// {
-		// 	$fields = array_merge($fields, $this->customfieldsRecord->getFindSearchQueryParamFields('cf'));
-		// }
-		
 		return $fields;
 	}
 
@@ -400,14 +391,16 @@ class User extends \GO\Base\Db\ActiveRecord {
 					))
 					->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('quota_user_id', $this->id, '=', 'd'));
 				$sumVersionsize = \GO\Files\Model\Version::model()->findSingle($fpVer);
-				//GO::debug($sumFilesize->total_size);
-				if ($sumFilesize)
+
+				if ($sumFilesize) {
 					$this->disk_usage = ($sumFilesize->total_size + $sumVersionsize->total_size);
+				}
 			} else {
 				$this->disk_usage+=$bytes;
 			}
-		} else
+		} else {
 			throw new \Exception('Can not calculated diskusage without the files module');
+		}
 		return $this;
 	}
 	
@@ -459,28 +452,22 @@ class User extends \GO\Base\Db\ActiveRecord {
 			$this->setValidationError('username', GO::t("Sorry, that username already exists", "users"));
 
 		$existingGroup = Group::model()->findSingleByAttribute('name', $this->username);
-		if (($this->isNew && $existingGroup) || $existingGroup && $existingGroup->id != $existingGroup->id )
+		if (($this->isNew && $existingGroup) || $existingGroup && $existingGroup->id != $existingGroup->id ) {
 			$this->setValidationError('username', GO::t("error_group_exists", "users"));
-
-//		$pwd = $this->getAttribute('password');
-//		if(empty($pwd) && $this->isNew) {
-//			$this->password = \GO\Base\Util\StringHelper::randomPassword();
-//			$this->generatedRandomPassword = true;
-//		}
+		}
 
 		return parent::validate();
 	}
 
 	
 	protected function beforeSave(){
-		
-		if($this->isNew){
-			$holiday = Holiday::localeFromCountry($this->language);
-			if($holiday !== false)
-				$this->holidayset = $holiday; 
-		}
+		// Moved to core/model/User@internalSave
+//		if($this->isNew){
+//			$holiday = Holiday::localeFromCountry($this->language);
+//			if($holiday !== false)
+//				$this->holidayset = $holiday;
+//		}
 
-		
 		$pwd = $this->getAttribute('password');
 		if($this->isModified('password') && !empty($pwd)){
 			$this->_unencryptedPassword=$this->getAttribute('password');
@@ -543,8 +530,9 @@ class User extends \GO\Base\Db\ActiveRecord {
 
 					$group = Group::model()->findByName($groupName);
 
-					if($group)
+					if($group) {
 						$group->addUser($this->id);
+					}
 				}
 			}
 		}
@@ -559,7 +547,6 @@ class User extends \GO\Base\Db\ActiveRecord {
 		
 		return parent::afterSave($wasNew);
 	}
-	
 
 	
 	/**
@@ -579,8 +566,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 			throw new \Exception(GO::t("You can't delete the primary administrator", "users"));
 		}elseif($this->id==GO::user()->id){
 			throw new \Exception(GO::t("You can't delete yourself", "users"));
-		}else
-		{
+		}else {
 			return parent::beforeDelete();
 		}
 	}
@@ -595,21 +581,14 @@ class User extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	protected function afterDelete() {
-		
-		
 		//delete all acl records
 		$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
 	
 		foreach($defaultModels as $model){
 			$model->deleteByAttribute('user_id',$this->id);
 		}
-//		deprecated. It's inefficient and can be done with listeners
-//		GO::modules()->callModuleMethod('deleteUser', array(&$this));
-
 		return parent::afterDelete();
 	}
-		
-	
 
 	/**
 	 *
@@ -934,12 +913,5 @@ Password: {password}", "users");
 	public function getSecurityToken(){
 		return md5($this->getAttribute('password').$this->email.$this->ctime.$this->lastlogin);
 	}
-	
-	
-//	protected function getCacheAttributes() {
-//		return array(
-//				'name' => $this->name
-//		);
-//	}
 }
 

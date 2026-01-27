@@ -24,4 +24,8 @@ return array (
   'description' => 'Introdu aici descrierea',
   'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml',
   'Start page' => 'Sumar',
+  "welcomeTitle" => "Bun venit la Group-Office!",
+  "welcomeContent" => "<p>Vă mulțumim pentru instalarea Group-Office!</p>
+<p>Iată un link care vă ajută să începeți: {{link}}</p>
+<p>Sperăm că vă va plăcea Group-Office!</p>"
 );

@@ -364,7 +364,11 @@ class MailDomain
 		foreach($responses as $key => $response) {
 //			$callId = $data[$key][2];
 			if (isset($response[0]) && $response[0]== 'error') {
-				$error = 'Error: ' . $response[1]['debugMessage'] ?? $response[1]['message'];
+				if (go()->getDebugger()->enabled) {
+					$error = 'Error: ' . $response[1]['debugMessage'];
+				} else{
+					$error = 'Error: ' . $response[1]['message'];
+				}
 			} else if (!empty($response[1]['notCreated'])) {
 				$error = 'Error: ' . var_export($response[1]['notCreated'], true);
 			} else if (!empty($response[1]['notUpdated'])) {
@@ -390,13 +394,14 @@ class MailDomain
 	 */
 	private function getBaseUrl(): string
 	{
-		if (empty(go()->getConfig()['serverclient_server_url'])) {
-			go()->getConfig()['serverclient_server_url'] = go()->getSettings()->URL;
+		$baseUrl = go()->getSettings()->URL;
+		if (!empty(go()->getConfig()['serverclient_server_url'])) {
+			$baseUrl = go()->getConfig()['serverclient_server_url'];
 		}
 		if (empty(go()->getConfig()['serverclient_token'])) {
 			throw new Exception("Could not connect to mailserver. Please set a strong password in /etc/groupoffice/globalconfig.inc.php.\n\nPlease remove serverclient_username and serverclient_password.\n\nPlease add:\n\n \$config['serverclient_token']='aStrongPasswordOfYourChoice';");
 		}
-		return rtrim(go()->getConfig()['serverclient_server_url'], "/") . "/api/jmap.php";
+		return rtrim($baseUrl, "/") . "/api/jmap.php";
 	}
 
 	/**

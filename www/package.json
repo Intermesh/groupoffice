@@ -1,0 +1,15 @@
+{
+  "name": "group-office",
+  "private": true,
+  "workspaces": [
+    "views/goui",
+    "views/goui/goui",
+    "views/goui/groupoffice-core",
+    "promodules/*/views/goui",
+    "go/modules/community/*/views/goui",
+    "go/modules/business/*/views/goui"
+  ],
+  "dependencies": {
+    "pdf.js": "^0.1.0"
+  }
+}

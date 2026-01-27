@@ -253,31 +253,6 @@ abstract class FileSystemObject {
 		return strpos($path, '/../') === false;
 	}
 
-//	/**
-//	 * Gets the filename from a path string and works with UTF8 characters
-//	 *
-//	 * @param string $path
-//	 * @return string
-//	 */
-//	public static function utf8Basename(string $path): string
-//	{
-//		if (!function_exists('mb_substr')) {
-//			return basename($path);
-//		}
-//		//$path = trim($path);
-//		if (substr($path, -1, 1) == '/') {
-//			$path = substr($path, 0, -1);
-//		}
-//		if (empty($path)) {
-//			return '';
-//		}
-//		$pos = mb_strrpos($path, '/');
-//		if ($pos === false) {
-//			return $path;
-//		} else {
-//			return mb_substr($path, $pos + 1);
-//		}
-//	}
 
 	/**
 	 * Remove unwanted characters from a string so it can safely be used as a filename.

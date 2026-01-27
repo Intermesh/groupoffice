@@ -1,4 +1,14 @@
 
+go.lookupPrincipal = function(id) {
+	const parts = id.split(":");
+	if(parts.length == 1) {
+		go.modules.community.addressbook.lookUpUserContact(id);
+	} else {
+		go.Entities.get("Contact").goto(parts[1]);
+	}
+
+}
+
 go.print = function(tmpl, data) {
 	var paper = document.getElementById('paper');
 
@@ -246,17 +256,21 @@ go.util =  (function () {
 			if (config.zipCode) {
 				adr += ", " + config.zipCode.replace(/ /g, '');
 			}
-			if (config.city) {
+			if (Ext.isWindows && config.city) {
 				adr += ", " + config.city;
 			}
 			if (config.country) {
 				adr += ", " + config.country;
 			}
-
-			const uri = "https://www.openstreetmap.org/search?query=" + encodeURIComponent(adr).replace(/%20/g, "+");
-
 			// https://en.wikipedia.org/wiki/Geo_URI_scheme
-			// const uri = "geo:0,0?q=" + encodeURIComponent(adr).replace(/%20/g, "+");
+			let proto = "geo:0,0?q=";
+			if(Ext.isWindows) {
+				proto = "https://www.openstreetmap.org/search?query=";
+			} else if (Ext.isMac) {
+				proto = "maps:q=";
+			}
+
+			const uri = proto + encodeURIComponent(adr).replace(/%20/g, "+")
 
 			const a = document.createElement("a");
 			a.setAttribute("target", "_blank");

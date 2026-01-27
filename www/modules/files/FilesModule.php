@@ -25,6 +25,7 @@ use Faker\Generator;
 use go\core\model\Acl;
 use go\core\model\Group;
 use go\core\model\User;
+use go\core\util\ArrayObject;
 use go\core\util\ClassFinder;
 use GO\Files\Filehandler\FilehandlerInterface;
 use GO\Base\Util\ReflectionClass;
@@ -79,9 +80,11 @@ class FilesModule extends \GO\Base\Module{
 			//$folder->syncFilesystem();		
 			
 		}
+
+		$mod = \go\core\model\Module::findByName(null, "files", null);
 		
 		$folder = Model\Folder::model()->findByPath("log", true);
-		if(!$folder->acl){
+		if(!$folder->acl || $folder->acl_id == $mod->getShadowAclId()){
 			$folder->setNewAcl();
 			$folder->readonly=1;
 			$folder->save();
@@ -89,7 +92,6 @@ class FilesModule extends \GO\Base\Module{
 
 		go()->getDbConnection()->exec("update fs_folders set acl_id = 0 where acl_id not in (select id from core_acl);");
 
-		$mod = \go\core\model\Module::findByName(null, "files", null);
 		go()->getDbConnection()->exec("update fs_folders set readonly=1, acl_id = ".$mod->getShadowAclId()." where acl_id=0 and parent_id=0;");
 		go()->getDbConnection()->exec("delete s from core_search s inner join fs_folders f on f.id=s.entityId where entityTypeId=(select id from core_entity where name='Folder') and f.visible=0;");
 
@@ -148,7 +150,12 @@ class FilesModule extends \GO\Base\Module{
 
 				//For new framework
 				$cf = new ClassFinder();
-				self::$fileHandlers = array_merge(self::$fileHandlers, $cf->findByParent(FilehandlerInterface::class));
+				$handlers = new ArrayObject(array_merge(self::$fileHandlers, $cf->findByParent(FilehandlerInterface::class)));
+
+				$handlers->sortValueOnTop('go\modules\community\wopi\filehandler\Collabora');
+				$handlers->sortValueOnTop('go\modules\community\pdfeditor\filehandler\PdfFileHandler');
+
+				self::$fileHandlers = $handlers->getArrayCopy();
 
 				\GO::cache()->set('files-file-handlers', self::$fileHandlers);
 			}

@@ -11,6 +11,10 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 
 	initComponent: function () {
 
+		if(this.support) {
+			this.relations = [...this.relations, "customer"];
+		}
+
 
 		this.tbar = this.initToolbar();
 
@@ -60,7 +64,8 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 				</p>\
 				<p class="s6">\
 					<label>'+t("Due at")+'</label><span>{[go.util.Format.date(values.due) || "-"]}</span><br><br>\
-					<tpl if="values.responsible"><label>'+t("Responsible")+'</label><span>{[go.util.avatar(values.responsible.name, values.responsible.avatarId)]} {[values.responsible.name]}</span><br><br></tpl>\
+					<tpl if="values.responsible"><label>'+t("Responsible")+'</label><a onclick="go.lookupPrincipal(\'{[values.responsible.id]}\')">{[go.util.avatar(values.responsible.name, values.responsible.avatarId)]} {[values.responsible.name]}</a><br><br></tpl>\
+					<tpl if="values.customer"><label>'+t("Customer")+'</label><a onclick="go.lookupPrincipal(\'{[values.customer.id]}\')">{[go.util.avatar(values.customer.name, values.customer.avatarId)]} {[values.customer.name]}</a><br><br></tpl>\
 				</p>\
 				<tpl if="values.percentComplete">\
 				<div class="s12 pad">\
@@ -135,11 +140,18 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 
 		if(this.support) {
 
-			this.add(new go.modules.comments.CommentsDetailPanel({
-				large: false,
-				title: t("Private notes"),
-				section: "private"
-			}));
+			if (go.Modules.isAvailable("community", "comments")) {
+				const wrapper = new go.GOUIWrapper({
+					cls: ""
+				});
+
+				this.add(wrapper);
+				this.privateComments = new GO.comments.CommentsPanel(this.entityStore.entity.name);
+				this.privateComments.title = t("Private notes");
+				this.privateComments.section = "private";
+
+				wrapper.comp = this.privateComments;
+			}
 
 			this.addContracts();
 		}
@@ -238,6 +250,10 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		this.deleteItem.setDisabled(this.data.permissionLevel < go.permissionLevels.writeAndDelete);
 
 		this.assignMeBtn.setVisible(!this.data.responsibleUserId);
+
+		if(this.privateComments) {
+			this.privateComments.load(this.data.id);
+		}
 
 		go.modules.community.tasks.TaskDetail.superclass.onLoad.call(this);
 	},

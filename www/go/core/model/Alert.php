@@ -43,6 +43,13 @@ class Alert extends SingleOwnerEntity
 	public $recurrenceId;
 	public ?string $tag;
 
+	/**
+	 * The principal who created it
+	 *
+	 * @var string|null
+	 */
+	public ?string $createdBy;
+
 	protected ?string $data;
 
 	/**

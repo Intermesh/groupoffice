@@ -192,3 +192,17 @@ $updates['202307031650'][] = function() {
 
 $updates['202308221033'][] = "create index comments_comment_mimeMessageId_index
     on comments_comment (mimeMessageId);";
+
+
+$updates['202507011010'][] = "alter table comments_comment
+    drop foreign key fk_comments_comment_core_user1;";
+
+$updates['202507011010'][] = "alter table comments_comment
+    modify createdBy varchar(60) null;";
+
+
+
+$updates['202507011010'][] = "alter table comments_comment
+    add constraint fk_comments_comment_core_user1
+        foreign key (createdBy) references core_principal (id)
+            on delete set null;";

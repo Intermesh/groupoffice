@@ -137,6 +137,14 @@ class Debugger {
 	}
 
 	/**
+	 * Output current memory usage in MB
+	 * @return void
+	 */
+	public function debugMemoryUsage() : void {
+		$this->log("Memory used: ". number_format(memory_get_usage() / (1024 * 1024), 2) .'MB');
+	}
+
+	/**
 	 * Get time in seconds with microseconds
 	 * 
 	 * @return float seconds

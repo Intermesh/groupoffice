@@ -257,96 +257,22 @@ class Mailer {
 		$this->mail->SMTPAutoTLS = false;
 		$this->mail->XMailer = 'Group-Office';
 
-		if(isset($this->smtpAccount)) {
-
-			$this->mail->Host = $this->smtpAccount->hostname;                     //Set the SMTP server to send through
-			$this->mail->SMTPSecure = $this->smtpAccount->encryption;
-			$this->mail->Port = $this->smtpAccount->port;
-
-			if (!empty($this->smtpAccount->username)) {
-				$this->mail->SMTPAuth = true;                                   //Enable SMTP authentication
-				$this->mail->Username = $this->smtpAccount->username;                     //SMTP username
-				$this->mail->Password = $this->smtpAccount->decryptPassword();                               //SMTP password
-			}
-			
-			if(!$this->smtpAccount->verifyCertificate) {
-				$this->disableSSLVerification();
-			}
+		if(!empty(go()->getConfig()['mailerDebugHost'])) {
+			$this->initTransportTesting();
+		} else	if(isset($this->smtpAccount)) {
+			$this->initTransportSmtpAccount();
 		} else if (isset($this->emailAccount)) {
-
-			if($this->emailAccount->smtp_allow_self_signed) {
-				$this->disableSSLVerification();
-			}
-
-			if($this->emailAccount->smtp_encryption == 'starttls') {
-				$this->emailAccount->smtp_encryption = 'tls';
-			}
-
-			$this->mail->SMTPSecure = $this->emailAccount->smtp_encryption;
-			$this->mail->Host = $this->emailAccount->smtp_host;
-			$this->mail->Port = $this->emailAccount->smtp_port;
-
-			$cltAcct = null;
-			if (go()->getModule('community', 'oauth2client')) {
-				$cltAcct = go()->getDbConnection()->select('refreshToken,oauth2ClientId')
-					->from('oauth2client_account', 'a')
-					->where(['accountId' => $this->emailAccount->id])
-					->single();
-
-			}
-			if ($cltAcct) {
-
-				$this->mail->SMTPAuth = true;
-				$this->mail->AuthType = 'XOAUTH2';
-
-				$client = Oauth2Client::findById($cltAcct['oauth2ClientId']);
-
-				$provider = $client->getProvider();
-
-				$username = !empty($this->emailAccount->smtp_username) ? $this->emailAccount->smtp_username : $this->emailAccount->username;
-
-				go()->debug("SMTP XOAUTH2 username: $username");
-
-				$this->mail->setOAuth(new OAuth([
-					'provider' => $provider,
-					'clientId' => $client->clientId,
-					'clientSecret' => $client->clientSecret,
-					'refreshToken' => $cltAcct['refreshToken'],
-					'userName' => $username,
-				]));
-
-			} else if (!empty($this->emailAccount->force_smtp_login)){
-				// weird name force_smtp_login but it means use the IMAP credentials
-				$this->mail->SMTPAuth = true;                                   //Enable SMTP authentication
-				$this->mail->Username = $this->emailAccount->username;                     //SMTP username
-				$this->mail->Password = $this->emailAccount->decryptPassword();
-
-			}else if (!empty($this->emailAccount->smtp_username)){
-				$this->mail->SMTPAuth = true;                                   //Enable SMTP authentication
-				$this->mail->Username = $this->emailAccount->smtp_username;                     //SMTP username
-				$this->mail->Password = $this->emailAccount->decryptSmtpPassword();
-			}
-
+			$this->initTransportEmailAccount();
 		} else {
-			$this->mail->Host = go()->getSettings()->smtpHost;                     //Set the SMTP server to send through
-			$this->mail->SMTPSecure = go()->getSettings()->smtpEncryption;
-			$this->mail->Port = go()->getSettings()->smtpPort;
-
-			if (!empty(go()->getSettings()->smtpUsername)) {
-				$this->mail->SMTPAuth = true;                                   //Enable SMTP authentication
-				$this->mail->Username = go()->getSettings()->smtpUsername;                     //SMTP username
-				$this->mail->Password = go()->getSettings()->decryptSmtpPassword();                               //SMTP password
-			}
-
-			if (!go()->getSettings()->smtpEncryptionVerifyCertificate) {
-				$this->disableSSLVerification();
-			}
+			$this->initTransportSystemSettings();
 		}
 
 		$this->mail->getSMTPInstance()->setTimeout(go()->getSettings()->smtpTimeout);
 
 		//speeds up multiple sends.
 		$this->mail->SMTPKeepAlive = true;
+
+		go()->debug("SMTP Host: ".$this->mail->Host);
 
 	}
 
@@ -358,6 +284,117 @@ class Mailer {
 				'allow_self_signed' => true
 			)
 		);
+	}
+
+	private function initTransportTesting(): void
+	{
+
+		go()->debug("Using " . go()->getConfig()['mailerDebugHost'] ." for testing");
+
+		$this->mail->Host = go()->getConfig()['mailerDebugHost'];
+		$this->mail->Port = go()->getConfig()['mailerDebugPort'] ?? 1025;
+	}
+
+
+	/**
+	 * @return void
+	 */
+	public function initTransportSmtpAccount(): void
+	{
+		$this->mail->Host = $this->smtpAccount->hostname;                     //Set the SMTP server to send through
+		$this->mail->SMTPSecure = $this->smtpAccount->encryption;
+		$this->mail->Port = $this->smtpAccount->port;
+
+		if (!empty($this->smtpAccount->username)) {
+			$this->mail->SMTPAuth = true;                                   //Enable SMTP authentication
+			$this->mail->Username = $this->smtpAccount->username;                     //SMTP username
+			$this->mail->Password = $this->smtpAccount->decryptPassword();                               //SMTP password
+		}
+
+		if (!$this->smtpAccount->verifyCertificate) {
+			$this->disableSSLVerification();
+		}
+	}
+
+	/**
+	 * @return void
+	 * @throws \go\core\exception\NotFound
+	 */
+	public function initTransportEmailAccount(): void
+	{
+		if ($this->emailAccount->smtp_allow_self_signed) {
+			$this->disableSSLVerification();
+		}
+
+		if ($this->emailAccount->smtp_encryption == 'starttls') {
+			$this->emailAccount->smtp_encryption = 'tls';
+		}
+
+		$this->mail->SMTPSecure = $this->emailAccount->smtp_encryption;
+		$this->mail->Host = $this->emailAccount->smtp_host;
+		$this->mail->Port = $this->emailAccount->smtp_port;
+
+		$cltAcct = null;
+		if (go()->getModule('community', 'oauth2client')) {
+			$cltAcct = go()->getDbConnection()->select('refreshToken,oauth2ClientId')
+				->from('oauth2client_account', 'a')
+				->where(['accountId' => $this->emailAccount->id])
+				->single();
+
+		}
+		if ($cltAcct) {
+
+			$this->mail->SMTPAuth = true;
+			$this->mail->AuthType = 'XOAUTH2';
+
+			$client = Oauth2Client::findById($cltAcct['oauth2ClientId']);
+
+			$provider = $client->getProvider();
+
+				$username = !empty($this->emailAccount->smtp_username) ? $this->emailAccount->smtp_username : $this->emailAccount->username;
+
+				go()->debug("SMTP XOAUTH2 username: $username");
+
+			$this->mail->setOAuth(new OAuth([
+				'provider' => $provider,
+				'clientId' => $client->clientId,
+				'clientSecret' => $client->clientSecret,
+				'refreshToken' => $cltAcct['refreshToken'],
+					'userName' => $username,
+			]));
+
+		} else if (!empty($this->emailAccount->force_smtp_login)) {
+			// weird name force_smtp_login but it means use the IMAP credentials
+			$this->mail->SMTPAuth = true;                                   //Enable SMTP authentication
+			$this->mail->Username = $this->emailAccount->username;                     //SMTP username
+			$this->mail->Password = $this->emailAccount->decryptPassword();
+
+		} else if (!empty($this->emailAccount->smtp_username)) {
+			$this->mail->SMTPAuth = true;                                   //Enable SMTP authentication
+			$this->mail->Username = $this->emailAccount->smtp_username;                     //SMTP username
+			$this->mail->Password = $this->emailAccount->decryptSmtpPassword();
+		}
+	}
+
+	/**
+	 * @return void
+	 * @throws \Exception
+	 */
+	public function initTransportSystemSettings(): void
+	{
+		$this->mail->Host = go()->getSettings()->smtpHost;                     //Set the SMTP server to send through
+		$this->mail->SMTPSecure = go()->getSettings()->smtpEncryption;
+		$this->mail->Port = go()->getSettings()->smtpPort;
+
+		if (!empty(go()->getSettings()->smtpUsername)) {
+			$this->mail->SMTPAuth = true;                                   //Enable SMTP authentication
+			$this->mail->Username = go()->getSettings()->smtpUsername;                     //SMTP username
+			$this->mail->Password = go()->getSettings()->decryptSmtpPassword();                               //SMTP password
+		}
+
+		if (!go()->getSettings()->smtpEncryptionVerifyCertificate) {
+			$this->disableSSLVerification();
+		}
 	}
 
 	/**

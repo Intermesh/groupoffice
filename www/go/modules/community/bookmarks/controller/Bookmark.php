@@ -142,10 +142,11 @@ class Bookmark extends EntityController {
 					$blob = Blob::fromString($contents);
 					$blob->name = $filename;
 					$blob->type = "image/x-icon";
-					if(!$blob->save()) {
-						$errors = $blob->getValidationErrors();
+					if($blob->save()) {
+//						$errors = $blob->getValidationErrors();
+						$response['logo'] = $blob->id;
 					}
-					$response['logo'] = $blob->id;
+
 				}
 			}
 			catch(\Exception $e){

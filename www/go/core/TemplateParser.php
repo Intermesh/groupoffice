@@ -239,6 +239,11 @@ class TemplateParser {
 			"title" => go()->getSettings()->title,
 			"url" => go()->getSettings()->URL
 		]);
+
+		if(go()->getAuthState()->isAuthenticated()) {
+			$this->addModel('user', $this->_currentUser());
+		}
+
 		$this->config = [
 			'decimals' => 2,
 			'decimalSeparator' => go()->getSettings()->defaultDecimalSeparator,
@@ -254,7 +259,7 @@ class TemplateParser {
 	protected function _currentUser(): ?User
 	{
 		if(!isset($this->_currentUser)) {
-			$this->_currentUser = go()->getAuthState()->getUser(['dateFormat', 'timezone' ]);
+			$this->_currentUser = go()->getAuthState()->getUser();
 		}
 		return $this->_currentUser;
 	}

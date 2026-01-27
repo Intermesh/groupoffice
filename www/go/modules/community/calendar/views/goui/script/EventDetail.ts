@@ -1,9 +1,9 @@
 import {
-	btn, Button, checkbox,
-	comp, Component, containerfield,
+	btn, Button,
+	comp,  containerfield,
 	DataSourceForm,
 	datasourceform, DateInterval,
-	DateTime, DisplayField, displayfield, EntityID, fieldset, Format, hr, mapfield, MaterialIcon, menu, Notifier,
+	DateTime, DisplayField, displayfield, EntityID, fieldset, Format, hr, mapfield, menu, Notifier,
 	tbar, Toolbar,
 	Window
 } from "@intermesh/goui";
@@ -13,14 +13,14 @@ import {
 	DetailPanel,
 	JmapDataSource,
 	jmapds,
-	linkbrowserbutton,
+	linkbrowsebutton,
 	RecurrenceField,
-	entities
 } from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {calendarStore, getParticipantStatusIcon, statusIcons, t} from "./Index.js";
 import {EventWindow} from "./EventWindow.js";
+import {CommentsPanel} from "@intermesh/community/comments";
 
 
 export class EventDetail extends DetailPanel<CalendarEvent> {
@@ -177,7 +177,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 
 		this.addLinks();
-		this.addComments();
+		this.scroller.items.add(new CommentsPanel(this.entityName));
 		this.addCustomFields();
 
 
@@ -194,7 +194,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 			addbutton(),
 
-			linkbrowserbutton(),
+			linkbrowsebutton(),
 
 			btn({
 				icon: "more_vert",

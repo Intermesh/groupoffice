@@ -441,13 +441,8 @@ namespace go\core {
 				return [];
 			}
 
-			try {
-				require($configFile);
-			} catch(Throwable $e) {
-				ErrorHandler::log("Failed to require config file: " . $configFile);
-				throw $e;
-			}
-			
+			require($configFile);
+
 			if(!isset($config)) {
 				$config = [];
 			}
@@ -985,11 +980,14 @@ namespace go\core {
 				
 
 			} else {
-				$file = go()->getEnvironment()->getInstallFolder()->getFile('go/modules/' . $package . '/' . $name .'/icon.png');	
+				$file = go()->getEnvironment()->getInstallFolder()->getFile('go/modules/' . $package . '/' . $name .'/icon.png');
+				if(!$file->exists()) {
+					$file = go()->getEnvironment()->getInstallFolder()->getFile('go/modules/' . $package . '/' . $name . '/icon.svg');
+				}
 			}
 
 			if(!$file->exists()) {
-				$file = go()->getEnvironment()->getInstallFolder()->getFile('views/Extjs3/themes/Paper/img/default-avatar.svg');
+				$file = go()->getEnvironment()->getInstallFolder()->getFile('views/Extjs3/themes/Paper/img/default-app-icon.svg');
 			}
 			$file->output(true, true, ['Content-Disposition' => 'inline; filename="module.svg"']);
 		}

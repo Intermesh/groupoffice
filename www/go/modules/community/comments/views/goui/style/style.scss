@@ -1,0 +1,71 @@
+@use '../../../../../../../views/goui/goui/style/_util.scss'  as *;
+@use '../../../../../../../views/goui/goui/style/_config.scss' as *;
+
+.goui .comment-comment {
+  border-radius: 0.8rem;
+  padding: 0.8rem 1.6rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.goui > .count-badge {
+  background-color: var(--fg-main-tp);
+  border-radius: 4rem;
+  text-align: center;
+  line-height: 2.5rem;
+  margin: 1rem 0.7rem;
+  font-weight: bold;
+}
+
+.goui > .comment-triangle {
+  margin-top: 1.2rem;
+  width: 0;
+  height: 0;
+}
+
+.goui .comment-triangle-left {
+  margin-left: 1.2rem;
+  border-left: 15px solid transparent;
+  border-top: 15px solid var(--bg-mid);
+}
+
+.goui .comment-triangle-right {
+  margin-right: 1.2rem;
+  border-right: 15px solid transparent;
+  border-top: 15px solid var(--fg-main-tp);
+}
+
+.goui .comment-attachment button{
+  padding: 0.2rem;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.goui .comment-editor-label {
+  border-radius: 2.5rem;
+  background-color: var(--bg-mid);
+  margin: 0.3rem;
+  max-width: 135px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.goui .comment-editor-label button, .goui .comment-editor-attachment button {
+  border-radius: 2.5rem;
+}
+
+.goui .comment-editor-attachment {
+  border-radius: 2.5rem;
+  background-color: var(--bg-mid);
+  margin: 0.3rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.goui .comment-editor-fieldset {
+  align-items: unset;
+  .goui-form-field {
+    min-width: 0;
+  }
+}

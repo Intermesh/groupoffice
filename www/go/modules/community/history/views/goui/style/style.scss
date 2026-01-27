@@ -1,0 +1,23 @@
+.history-created-by {
+  line-height: 2.6em;
+}
+
+.history-changes-button {
+  display: block;
+  margin: auto !important;
+}
+
+.history-changes-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  td,
+  th {
+    word-wrap: break-word;
+    white-space: normal;
+  }
+
+  tr {
+    height: auto;
+  }
+}

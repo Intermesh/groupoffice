@@ -251,5 +251,17 @@ class ArrayObject extends CoreArrayObject implements JsonSerializable {
 		);
 	}
 
+
+	public function sortValueOnTop($value): void
+	{
+		$array = array_filter($this->getArrayCopy(), function($item) use ($value){
+			return $item !== $value;
+		});
+
+		array_unshift($array, $value);
+
+		$this->exchangeArray($array);
+	}
+
 	
 }

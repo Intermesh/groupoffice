@@ -1,5 +1,5 @@
 import {
-	autocomplete, avatar, btn, Button, checkbox,
+	autocomplete, AutocompleteField, avatar, btn, Button, checkbox,
 	column,
 	comp,
 	Component, Config, ContainerField, containerfield, createComponent, datasourcestore, DateTime, FieldEventMap, Format,
@@ -88,17 +88,32 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 						}
 					},
 					'render' : ({target}) => {
+
+						 const submitEMail = (target:AutocompleteField) => {
+							if(validateEmail(target.input.value)) {
+								const email = target.input.value;
+								this.addParticipant({id:email,email});
+								target.menu.hide();
+								target.input.value = "";
+							}
+						}
+
 						target.el.on('keydown' , ev => {
 							if(ev.key === 'Enter') {
 								ev.preventDefault();
-								if(validateEmail(target.input!.value)) {
-									const email = target.input!.value;
-									this.addParticipant({id:email,email});
-									target.menu.hide();
-									target.value = "";
-								}
+								submitEMail(target);
 							}
 						});
+
+
+					},
+					'blur' : ({target}) => {
+						if(validateEmail(target.input!.value)) {
+							const email = target.input!.value;
+							this.addParticipant({id:email,email});
+							target.menu.hide();
+							target.input.value = "";
+						}
 					},
 					'select': ({target, record}) => {
 
@@ -161,17 +176,27 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 
 		const fm = allDay ? 'Y-m-d' : 'Y-m-d H:i:s',
 			rows = this.list.value;
-
+		this.list.clearInvalid();
 		for (const id in rows) {
 			// not already pending and is user or resource
 			if(this.shouldCheckAvailability(id))
-			client.jmap('Principal/getAvailability', {start:start.format(fm),end:end.format(fm),id}).then((response)=> {
-				const f = this.list.items?.find(v => v.dataSet.key === id);
-				if(f)
-					f.findChild(f => f.itemId === 'name')!.style.color = response.list.length > 0 ?  'red' : 'inherit';
+				client.jmap('Principal/getAvailability', {start:start.format(fm),end:end.format(fm),id}).then((response)=> {
+					const f = this.list.items?.find(v => v.dataSet.key === id) as ContainerField;
+					if(f) {
+						const name = f.findChild(f => f.itemId === 'name')!;
+						if(response.list.length > 0) {
+							name.style.color = 'red';
+							if(id.startsWith('Calendar:')) {
+								this.list.setInvalid(t('Resource already booked'))
+							}
+						} else {
+							name.style.color = 'inherit';
+						}
+
+					}
 
 				this.pendingAvailabilityIds = {};
-			})
+			});
 			this.pendingAvailabilityIds[id]=true;
 		}
 	}
