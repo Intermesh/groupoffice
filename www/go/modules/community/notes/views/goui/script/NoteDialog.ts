@@ -121,7 +121,6 @@ export class NoteDialog extends FormWindow<Note> {
 			const pw =  this.encryptTb.hidden ? null : (this.encryptTb.findChild("pw") as TextField)!.value;
 			if(pw && data.content) {
 				if (!Encrypt.isEncrypted(data.content)) {
-					debugger;
 					Encrypt.aesGcmEncrypt(data.content, pw).then(encryptedText => {
 						this.contentFld.value = encryptedText;
 
