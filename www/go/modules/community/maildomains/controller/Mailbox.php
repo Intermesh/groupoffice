@@ -2,12 +2,9 @@
 
 namespace go\modules\community\maildomains\controller;
 
-use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\StateMismatch;
-use go\core\model\Acl;
-use go\core\orm\Query;
 use go\core\util\ArrayObject;
 use go\modules\community\maildomains\model;
 
@@ -17,17 +14,6 @@ final class Mailbox extends EntityController
 	{
 		return model\Mailbox::class;
 	}
-
-	/**
-	 *
-	 *
-	 * @return bool
-	 */
-	protected function checkModulePermissions(): bool
-	{
-		return true;
-	}
-
 
 	/**
 	 * Handles the Domain entity's Domain/query command
@@ -118,45 +104,5 @@ final class Mailbox extends EntityController
 	{
 		return $this->defaultExportColumns($params);
 	}
-
-	protected function applyPermissionLevelToQueryQuery(Query $query)
-	{
-		$cls = $this->entityClass();
-		if (!$cls::getFilters()->hasFilter('username') && !$query->isFilterUsed('username')) {
-			parent::applyPermissionLevelToQueryQuery($query);
-		}
-	}
-
-	/**
-	 * Triggered when an end user tries to update their own password and the serverclient module is enabled
-	 *
-	 * @param Entity $entity
-	 * @return bool
-	 */
-	protected function canRead(Entity $entity): bool
-	{
-		if (!$entity->hasPermissionLevel(Acl::LEVEL_READ)) {
-			$user = go()->getAuthState()->getUser(['email']);
-			return $entity->username == $user->email;
-		}
-		return false;
-	}
-
-	/**
-	 * Triggered when an end user tries to update their own password and the serverclient module is enabled
-	 *
-	 * @param Entity $entity
-	 * @return bool
-	 */
-
-	protected function canUpdate(Entity $entity): bool
-	{
-		if (!$entity->hasPermissionLevel(Acl::LEVEL_WRITE)) {
-			$user = go()->getAuthState()->getUser(['email']);
-			return $entity->username == $user->email;
-		}
-		return parent::canUpdate($entity);
-	}
-
 
 }

@@ -18,4 +18,9 @@ return array (
   'Note book' => 'Blocco note',
   'Enter password to decrypt' => 'Inserisci password per decrittare',
   'Default note book' => 'Blocco note predefinito',
+  'Display options for notebooks' => 'Opzioni di visualizzazione per Notebooks',
+  'Start in' => 'Inizia da',
+  'Remember last selected note book' => 'Ricorda ultimo notebook selezionato ',
+  'Web page' => 'Pagina Web',
+  'Content' => 'Contenuto',
 );

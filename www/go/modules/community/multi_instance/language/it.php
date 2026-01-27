@@ -20,4 +20,7 @@ return array (
   'Download site config' => 'Scarica la configurazione del sito',
   'Version' => 'Versione',
   'Modules' => 'Moduli',
+  'Show trials' => 'Mostra dimostrativi',
+  'Trial' => 'Dimostrativo',
+  'Is trial' => 'Is trial',
 );

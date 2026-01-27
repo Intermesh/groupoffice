@@ -14,7 +14,7 @@ class Office365 implements FilehandlerInterface{
 	}
 	
 	public function getName(){
-		return go()->t("Office Online", 'business', 'wopi');
+		return go()->t("Office Online", 'community', 'wopi');
 	}
 	
 	public function fileIsSupported(File $file) {    

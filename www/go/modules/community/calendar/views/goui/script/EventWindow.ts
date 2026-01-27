@@ -281,13 +281,13 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 				});
 				dlg.show(this.item, this.form.modified);
 			} }),
-			this.alertField,
-
 			textarea({
 				name:'description',
 				label: t('Description'),
 				autoHeight: true
 			}),
+
+			this.alertField,
 
 			autocompletechips({
 				list: table({fitParent: true, headers: false, store: datasourcestore({dataSource:categoryStore.dataSource}),
