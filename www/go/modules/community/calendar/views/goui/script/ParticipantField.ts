@@ -1,5 +1,5 @@
 import {
-	autocomplete, avatar, btn, Button, checkbox,
+	autocomplete, AutocompleteField, avatar, btn, Button, checkbox,
 	column,
 	comp,
 	Component, Config, ContainerField, containerfield, createComponent, datasourcestore, DateTime, FieldEventMap, Format,
@@ -88,17 +88,32 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 						}
 					},
 					'render' : ({target}) => {
+
+						 const submitEMail = (target:AutocompleteField) => {
+							if(validateEmail(target.input.value)) {
+								const email = target.input.value;
+								this.addParticipant({id:email,email});
+								target.menu.hide();
+								target.input.value = "";
+							}
+						}
+
 						target.el.on('keydown' , ev => {
 							if(ev.key === 'Enter') {
 								ev.preventDefault();
-								if(validateEmail(target.input!.value)) {
-									const email = target.input!.value;
-									this.addParticipant({id:email,email});
-									target.menu.hide();
-									target.value = "";
-								}
+								submitEMail(target);
 							}
 						});
+
+
+					},
+					'blur' : ({target}) => {
+						if(validateEmail(target.input!.value)) {
+							const email = target.input!.value;
+							this.addParticipant({id:email,email});
+							target.menu.hide();
+							target.input.value = "";
+						}
 					},
 					'select': ({target, record}) => {
 

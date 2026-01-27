@@ -345,12 +345,11 @@ class MailDomain
 		$apiUrl = $this->getBaseUrl();
 
 		$apiKey = go()->getConfig()['serverclient_token'];
-		$token = go()->getAuthState()->getToken();
 		$this->http->setOption(CURLOPT_HTTPHEADER, array(
 			"Content-Type: application/json; charset=utf-8",
 			"Content-Length: " . strlen($dataStr),
-			"Authorization: Bearer " . $token->accessToken,
-			"X-CSRF-Token " . $token->CSRFToken,
+			"Authorization: Bearer " . $apiKey,
+//			"X-CSRF-Token" . go()->getAuthState()->getToken(),
 //			"COOKIE: XDEBUG_SESSION=PHPSTORM" // Uncomment to use XDebug to debug the API call
 		));
 
