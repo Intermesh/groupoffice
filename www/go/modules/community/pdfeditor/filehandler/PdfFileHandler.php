@@ -7,7 +7,7 @@ use GO\Files\Filehandler\FilehandlerInterface;
 class PdfFileHandler implements FilehandlerInterface {
 	public function getName()
 	{
-		return go()->t("Pdf editor", "pdfeditor");
+		return go()->t("PDF editor",  "community", "pdfeditor");
 	}
 
 	public function isDefault(\GO\Files\Model\File $file)
@@ -16,7 +16,7 @@ class PdfFileHandler implements FilehandlerInterface {
 	}
 
 	public function getIconCls() {
-		return '';
+		return 'fs-handler-icon pdfeditor-icon';
 	}
 
 	public function fileIsSupported(\GO\Files\Model\File $file)

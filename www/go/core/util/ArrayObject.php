@@ -251,5 +251,15 @@ class ArrayObject extends CoreArrayObject implements JsonSerializable {
 		);
 	}
 
+
+	public function sortValueOnTop($value): void
+	{
+		$this->uasort(function ($a, $b) use ($value) {
+			if ($a === $value) return -1;
+			if ($b === $value) return 1;
+			return $a <=> $b; // normal sort
+		});
+	}
+
 	
 }
