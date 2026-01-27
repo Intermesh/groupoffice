@@ -11,6 +11,7 @@
 - Core: updated Italian translation. Thanks Alexander!
 - Kanban: was missing
 - PDF Editor: New module for annotating PDF files
+- Email favorites: New module to bookmark email folders
 
 20-01-2026: 26.0.3
 - wopi: Was still not available without a license
