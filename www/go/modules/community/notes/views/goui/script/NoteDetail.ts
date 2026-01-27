@@ -14,6 +14,7 @@ import {NoteDialog} from "./NoteDialog";
 import {CommentsPanel} from "@intermesh/community/comments";
 import {Note, noteDS} from "./Index";
 import {HistoryDetailPanel} from "@intermesh/community/history";
+import {Encrypt} from "./Encrypt";
 
 export class NoteDetail extends DetailPanel<Note> {
 	private content: Component;
@@ -94,7 +95,14 @@ export class NoteDetail extends DetailPanel<Note> {
 				text: entity.name
 			}));
 			this.content.items.add(br());
-			this.content.items.add(Image.replace(entity.content));
+
+			if(Encrypt.isEncrypted(entity.content)) {
+				Encrypt.prompt(entity.content).then(decryptedText => {
+					this.content.items.add(Image.replace(decryptedText));
+				})
+			} else{
+				this.content.items.add(Image.replace(entity.content));
+			}
 
 			void this.form.load(entity.id);
 
