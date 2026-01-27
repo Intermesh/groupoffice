@@ -1,4 +1,4 @@
-import {Window} from "@intermesh/goui";
+import {Window,t} from "@intermesh/goui";
 export const Encrypt = {
 	lastPass: '',
 	async prompt(text: string): Promise<string> {
