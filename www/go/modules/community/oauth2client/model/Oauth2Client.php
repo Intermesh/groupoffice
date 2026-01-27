@@ -55,17 +55,6 @@ final class Oauth2Client extends Entity
 		];
 		switch ($defaultClient->name) {
 
-			case 'Keycloak':
-
-				// TODO: Make keycloak configurable
-				// https://medium.com/@buffetbenjamin/keycloak-essentials-openid-connect-c7fa87d3129d
-				// https://github.com/stevenmaguire/oauth2-keycloak
-
-				$params['authServerUrl'] = 'http://host.docker.internal:9081';
-				$params['realm'] = 'myrealm';
-				$params['scopes'] = $scopes ?? ['openid'];
-				return new Keycloak($params);
-
 			case 'Google':
 				// see https://developers.google.com/identity/protocols/oauth2/web-server
 				$params['accessType'] = 'offline';

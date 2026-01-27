@@ -94,7 +94,7 @@ return array (
   'Resource request' => 'Zażądaj zasobu',
   'Preferences' => 'Preferencje',
   'Show week numbers in calendar' => 'Pokaż numery tygodni w kalendarzu',
-  'Show events that you have declined' => 'Pokaż wydarzenia, które odrzuciłeś',
+  'Show declined events' => 'Pokaż wydarzenia, które odrzuciłeś',
   'Show pop-up info when hovering over appointments' => 'Pokaż informacje w okienku po najechaniu na spotkania',
   'Default calendar' => 'Domyślny kalendarz',
   'Invitation to event will be added into this calendar' => 'Zaproszenia na wydarzenia będą dodawane do tego kalendarza',

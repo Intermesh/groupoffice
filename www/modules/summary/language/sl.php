@@ -16,4 +16,8 @@ return array (
   'Manage announcements' => 'Upravljajte objave',
   'Select portlet' => 'Izberite Portlet',
   'Announcement' => 'Objava',
+  "welcomeTitle" => "Dobrodošli v Group-Office!",
+  "welcomeContent" => "<p>Hvala, da ste namestili Group-Office!</p>
+<p>Tukaj je povezava, ki vam bo pomagala začeti: {{link}}</p>
+<p>Upamo, da vam bo Group-Office všeč!</p>"
 );

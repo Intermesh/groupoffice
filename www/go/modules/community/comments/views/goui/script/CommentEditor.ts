@@ -51,7 +51,6 @@ export class CommentEditor extends Component {
 				this.editor = htmlfield({
 					flex: 1,
 					name: "text",
-					cls: "frame-hint",
 					required: true,
 					listeners: {
 						beforerender: ev => {
@@ -60,7 +59,8 @@ export class CommentEditor extends Component {
 									filter: {
 										entity: "User",
 										text: text
-									}
+									},
+									limit: 10
 								});
 								const get = await principalDS.get(r.ids);
 								return get.list.map(p => {

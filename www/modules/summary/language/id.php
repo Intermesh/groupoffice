@@ -16,4 +16,8 @@ return array (
   'Notes' => 'Catatan',
   'webfeeds' => 'umpanweb',
   'Summary' => 'Ringkasan',
+  "welcomeTitle" => "Selamat datang di Group-Office!",
+  "welcomeContent" => "<p>Terima kasih telah menginstal Group-Office!</p>
+<p>Berikut tautan untuk membantu Anda memulai: {{link}}</p>
+<p>Kami harap Anda menikmati Group-Office!</p>"
 );

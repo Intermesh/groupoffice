@@ -24,4 +24,8 @@ return array (
   'Start page' => 'Start',
   'webfeeds' => 'Strony sieciowe',
   'All users' => 'Wszyscy użytkownicy',
+  "welcomeTitle" => "Witamy w Group-Office!",
+  "welcomeContent" => "<p>Dziękujemy za zainstalowanie Group-Office!</p>
+<p>Oto link, który pomoże Ci zacząć: {{link}}</p>
+<p>Mamy nadzieję, że spodoba Ci się Group-Office!</p>"
 );

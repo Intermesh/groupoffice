@@ -22,4 +22,8 @@ return array (
   'description' => 'বিভিন্ন প্রকৃত উপকরণ এক নজরে প্রদর্শন করে ',
   'Start page' => 'সারাংশ',
   'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml',
+  "welcomeTitle" => "Group-Office এ স্বাগতম!",
+  "welcomeContent" => "<p>Group-Office ইনস্টল করার জন্য ধন্যবাদ!</p>
+<p>এখানে শুরু করতে আপনাকে সাহায্য করার জন্য একটি লিংক রয়েছে: {{link}}</p>
+<p>আমরা আশা করি আপনি Group-Office উপভোগ করবেন!</p>"
 );

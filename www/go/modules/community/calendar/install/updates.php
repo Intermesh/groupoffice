@@ -316,7 +316,7 @@ $updates["202507221653"][] = "alter table `calendar_preferences` add column week
 
 $updates["202508111058"][] = "update calendar_event set uri = REPLACE(REPLACE(REPLACE(uri, '/', '_'), '+', '-'), '=', '.');";
 
-$updates["202508191124"][] = "alter table calendar_calendar_user add column syncToDevice tinyint default 1 not null after `timeZone`";
+$updates["202508191124"][] = "alter table calendar_calendar_user add column syncToDevice tinyint default 0 not null after `timeZone`";
 
 $updates["202508211118"][] = "update ignore calendar_participant p inner join core_user u on u.email = p.email set p.id = u.id;";
 $updates["202508211118"][] = "update calendar_preferences set defaultCalendarId=null where defaultCalendarId not in (select id from calendar_calendar);";
@@ -440,3 +440,36 @@ $updates['202510071214'][] = "ALTER TABLE `calendar_calendar` ADD COLUMN `publis
 
 $updates['202510091209'][] = 'update calendar_recurrence_override set patch = replace(patch, \'"status":"cancelled"\', \'"excluded":true\')
 where patch like \'%"status":"cancelled"%\'';
+
+$updates['202511241214'][] = 'alter table calendar_calendar_user
+    alter column syncToDevice set default 0;';
+
+$updates['202511280942'][] = function() {
+	// move jitsi settings into own module
+	go()->getDbConnection()->exec("update core_module set package='community', enabled=1 where name='jitsimeet'");
+
+	$modId = go()->getDbConnection()->selectSingleValue("id")->from("core_module")->where(['name' => 'jitsimeet'])->single();
+
+	if(!$modId) {
+		$mod = \go\modules\community\jitsimeet\Module::get()->install();
+		$modId = $mod->id;
+	}
+
+	if(!$modId) {
+		throw new Exception("Failed to install jitsimeet");
+	}
+
+	$calendarModId = go()->getDbConnection()->selectSingleValue("id")->from("core_module")->where(['package'=>'community', 'name' => 'calendar'])->single();
+
+	if(!$calendarModId) {
+		throw new Exception("Failed to get calendar module ID");
+	}
+
+	go()->getDbConnection()->updateIgnore("core_setting", ['moduleId' => $modId], ['moduleId' => $calendarModId])->execute();
+
+
+};
+
+$updates['202512030900'][] = 'create index calendar_event_status_index
+    on calendar_event (status);';
+

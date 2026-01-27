@@ -42,6 +42,10 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 			storeFields.push({name: 'project', type: "relation"});
 		}
 
+		if(this.support) {
+			storeFields.push({name: 'customer', type: "relation"})
+		}
+
 		this.store = new go.data.GroupingStore({
 			groupField: this.support ? false : 'tasklist',
 			remoteGroup:true,
@@ -317,6 +321,18 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 				width: dp(160),
 				sortable: true,
 				dataIndex: 'project',
+				renderer: function(v) {
+					return v ? v.name : "-";
+				},
+				groupable: true
+			})
+		} else {
+			this.columns.splice(4, 0,	{
+				id: "customer",
+				header: t('Customer', "support", "business"),
+				width: dp(160),
+				sortable: true,
+				dataIndex: 'customer',
 				renderer: function(v) {
 					return v ? v.name : "-";
 				},

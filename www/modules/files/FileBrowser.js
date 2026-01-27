@@ -775,8 +775,7 @@ GO.files.FileBrowser = function(config){
 
 	this.cardPanel.on('afterrender', function() {
 		GO.files.DnDFileUpload(function (blobs, folder_id) {
-
-			if(this.permission_level < GO.permissionLevels.write) {
+			if(this.permission_level < GO.permissionLevels.create) {
 				GO.errorDialog.show(t("Access denied"));
 				return
 			}

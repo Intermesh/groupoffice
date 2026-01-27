@@ -1,0 +1,11 @@
+{
+  "require": {
+    "jumbojett/openid-connect-php": "@stable"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "platform": {
+      "php": "8.2"
+    }
+  }
+}

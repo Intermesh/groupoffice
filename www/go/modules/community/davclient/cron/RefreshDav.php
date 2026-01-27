@@ -33,7 +33,7 @@ class RefreshDav extends CronJob
 		foreach($accounts as $account){
 			if($account->needsSync()) {
 				go()->log("Refreshing ". $account->name.'...');
-				$account->sync();
+				$account->sync(true);
 			}
 		}
 

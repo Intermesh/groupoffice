@@ -77,6 +77,8 @@ class Mapping {
 	 * Note: If two tables both have a primary key column with a distinct value the name must be different. If they share
 	 * the same ID it's possible to use the same name.
 	 *
+	 * Note: Additional tables are left joined and might not always  be present. In that case the properties must be nullable.
+	 *
 	 * @param string $name The table name
 	 * @param string|null $alias The table alias to use in the queries
 	 * @param array|null $keys [thiscol => targetcol] If null then it's assumed the key name is identical in
@@ -114,22 +116,25 @@ class Mapping {
 		return $this->tables[$name];
 	}
 
-  /**
-   * Add a user table to the model
-   *
-   * A user table will be joined with AND userId = <CURRENTUSER>
-   *
-   * A user table must have an userId (int) and modSeq (int) column.
-   *
-   * The modSeq value will be used in the Entity::getState().
-   *
-   * @param string $name
-   * @param string $alias
-   * @param string[] $keys
-   * @param string[] $columns
-   * @param string[] $constantValues
-   * @return Mapping
-   */
+	/**
+	 * Add a user table to the model
+	 *
+	 * A user table will be joined with AND userId = <CURRENTUSER>
+	 *
+	 * A user table must have an userId (int) and modSeq (int) column.
+	 *
+	 * The modSeq value will be used in the Entity::getState().
+	 *
+	 * Note: this table is left joined and not always present. Therefore all these properties must be nullable.
+	 *
+	 * @param string $name
+	 * @param string $alias
+	 * @param string[] $keys
+	 * @param string[] $columns
+	 * @param string[] $constantValues
+	 * @param bool $required
+	 * @return Mapping
+	 */
 	public function addUserTable(string $name, string $alias, array|null $keys = null, array|null $columns = null, array $constantValues = [], $required = false): Mapping
 	{
 		$table = $this->internalAddTable($name, $alias, $keys, $columns, $constantValues, true);

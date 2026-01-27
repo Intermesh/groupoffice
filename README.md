@@ -1,6 +1,6 @@
 # Group Office groupware and CRM
 
-Group-Office is an enterprise CRM and groupware tool. 
+Group-Office is an open-source CRM and groupware tool for enterprises and the public sector.
 Share projects, calendars, files and e-mail online with co-workers and clients. 
 Easy to use and fully customizable.
 

@@ -7,6 +7,7 @@ use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\http;
 use go\core\model\Acl;
+use go\core\model\Group;
 use go\core\model\Principal;
 use go\core\model\User;
 use go\core\orm\CustomFieldsTrait;
@@ -116,7 +117,7 @@ class Calendar extends AclOwnerEntity {
 		return !empty($this->groupId) ? ('Calendar:'.$this->id) : $this->ownerId;
 	}
 
-	/** @return int */
+
 	public static function fetchPersonal($userId) {
 		$user = User::findById($userId, ['id','displayName','calendarPreferences']);
 		if(!empty($user)) {
@@ -138,8 +139,12 @@ class Calendar extends AclOwnerEntity {
 		}
 
 		// create default
-		$cal = Calendar::createDefault($user);
-		return $cal->id;
+		if(!empty($user)) {
+			$cal = Calendar::createDefault($user);
+			if($cal)
+				return $cal->id;
+		}
+		return null;
 
 	}
 
@@ -151,13 +156,13 @@ class Calendar extends AclOwnerEntity {
 		$this->color = $value;
 	}
 
-	protected function getDefaultCreatedBy(): ?int
-	{
-		if(!empty($this->ownerId)) {
-			return $this->ownerId;
-		}
-		return parent::getDefaultCreatedBy();
-	}
+//	protected function getDefaultCreatedBy(): ?int
+//	{
+//		if(!empty($this->ownerId)) {
+//			return $this->ownerId;
+//		}
+//		return parent::getDefaultCreatedBy();
+//	}
 
 
 	protected static function defineFilters(): Filters
@@ -245,6 +250,11 @@ class Calendar extends AclOwnerEntity {
 				->selectSingleValue('defaultOwnerId')
 				->where('id', '=', $this->groupId)
 				->single();
+			$groupId = Group::findPersonalGroupID($this->ownerId);
+			if($groupId) {
+				$this->createAcl();
+				$this->findAcl()->addGroup($groupId, Acl::LEVEL_MANAGE);
+			}
 		}
 		if($this->isModified('defaultAlertsWithTime')) {
 			$this->updateEventAlerts($this->defaultAlertsWithTime);
@@ -390,7 +400,10 @@ class Calendar extends AclOwnerEntity {
 
 	public static function createDefault(User $user) : Calendar {
 
-		$calendar = Calendar::find()->where(['ownerId' => $user->id])->filter(['permissionLevel' => Acl::LEVEL_MANAGE])->single();
+		$calendar = Calendar::findFor($user->id)
+			->where(['ownerId' => $user->id])
+//			->filter(['permissionLevel' => Acl::LEVEL_MANAGE]) // can't be used when not logged in
+			->single();
 
 		if (empty($calendar)) {
 			$calendar = Calendar::createFor($user->id);

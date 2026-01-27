@@ -30,6 +30,16 @@ class Module extends Entity {
 	public bool $enabled = true;
 
 	/**
+	 * The permissions of this module indexed per group
+	 *
+	 * ```
+	 * if(!isset($module->permissions[Group::ID_EVERYONE])) {
+	 *    $everyone = new model\Permission($module);
+	 *    $module->permissions[Group::ID_EVERYONE] = $everyone;
+	 *    $module->save();
+	 * }
+	 * ```
+	 *
 	 * @var Permission[]
 	 */
 	public array|null $permissions = [];
@@ -726,4 +736,14 @@ class Module extends Entity {
 			throw new SaveException($acl);
 		}
 	}
+
+
+//	public function getViews() :array {
+//		$viewsFolder = $this->module()->getFolder()->getFolder("views");
+//		if(!$viewsFolder->exists()) {
+//			return [];
+//		}
+//
+//		return array_map(function($f) {return $f->getName();}, $viewsFolder->getChildren(false));
+//	}
 }

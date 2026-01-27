@@ -15,9 +15,9 @@ go.defaultpermissions.SystemSettingsPanel = Ext.extend(Ext.Panel, {
 				autoHeight: true,
 				html: t("Select an entity to manage the default permissions when new items are created.")
 			}, 
-			new go.defaultpermissions.DefaultPermissionsPanel({
-				region:"center"
-			})
+			// new go.defaultpermissions.DefaultPermissionsPanel({
+			// 	region:"center"
+			// })
 		];
 		
 		go.defaultpermissions.SystemSettingsPanel.superclass.initComponent.call(this);

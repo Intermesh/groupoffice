@@ -20,7 +20,6 @@ use go\modules\community\calendar\model\Preferences;
 use go\modules\community\calendar\model\BusyPeriod;
 use go\modules\community\calendar\model\CalendarEvent;
 use go\modules\community\calendar\model\ICalendarHelper;
-use go\modules\community\calendar\model\Settings;
 use Sabre\VObject\Component\VCalendar;
 
 class Module extends core\Module
@@ -49,8 +48,9 @@ class Module extends core\Module
 		return "Intermesh BV <mdhart@intermesh.nl>";
 	}
 
-	public function getSettings() {
-		return Settings::get();
+	public function getDocumentationURL(): ?string
+	{
+		return "https://groupoffice.readthedocs.io/en/latest/using/calendar.html";
 	}
 
 	protected function rights(): array
@@ -179,12 +179,13 @@ class Module extends core\Module
 	public function pagePrintList($start, $end) {
 
 		go()->setAuthState(new core\jmap\State());
+
 		$calendarIds = Calendar::find()->selectSingleValue('calendar_calendar.id')
 			->where('caluser.isVisible', '=',1)->andWhere('caluser.isSubscribed','=', true)->all();
 
 		$report = new reports\ListView();
 		$report->day = new DateTime($start);;
-		$report->end = new DateTime($end);;
+		$report->end = new DateTime($end);
 		$report->calendarIds = $calendarIds;
 		$report->render();
 

@@ -939,7 +939,7 @@ class Contact extends AclItemEntity {
 	}
 	
 	private $organizationIds;
-	private $setOrganizationIds;
+	protected $setOrganizationIds;
 	
 	public function getOrganizationIds() {
 

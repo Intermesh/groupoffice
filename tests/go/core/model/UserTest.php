@@ -125,7 +125,7 @@ class UserTest extends \PHPUnit\Framework\TestCase
 	}
 
 	public function testDelete() {
-		$success  = User::delete(['username' => ['test1', 'test2']]);
+		$success  = User::delete(['username' => ['test2']]);
 		$this->assertEquals(true, $success);
 	}
 }

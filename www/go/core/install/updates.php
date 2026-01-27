@@ -1801,3 +1801,5 @@ $updates['202510301100'][] = "alter table core_alert
                          add constraint core_alert_core_principal_id_fk
                              foreign key (createdBy) references core_principal (id)
                                  on delete set null";
+
+$updates['202601151348'][] = "update core_email_template_attachment set attachment=0 where inline=1;";

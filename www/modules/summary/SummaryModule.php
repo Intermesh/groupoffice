@@ -22,7 +22,9 @@
 namespace GO\Summary;
 
 
-class SummaryModule extends \GO\Base\Module{	
+use GO\Summary\Model\Announcement;
+
+class SummaryModule extends \GO\Base\Module{
 
 	
 	public function autoInstall() {
@@ -37,5 +39,21 @@ class SummaryModule extends \GO\Base\Module{
 		return 5;
 	}
 
-	
+	public function install()
+	{
+		if(!parent::install()) {
+			return false;
+		}
+
+		$a = new Announcement();
+		$a->title = go()->t("welcomeTitle", "legacy", "summary");
+		$a->content = str_replace("{{link}}", "<a target=\"_blank\" href=\"https://groupoffice.readthedocs.io/en/latest/getting-started.html\">https://groupoffice.readthedocs.io/en/latest/getting-started.html</a>", go()->t("welcomeContent", "legacy", "summary"));
+		$a->save();
+
+		$a->getAcl()->addGroup(\GO::config()->group_everyone, \GO\Base\Model\Acl::READ_PERMISSION);
+
+
+		return true;
+	}
+
 }

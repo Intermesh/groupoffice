@@ -22,7 +22,6 @@ import {SplitView} from "./SplitView.js";
 import {client, filterpanel, jmapds, modules, userDS} from "@intermesh/groupoffice-core";
 import {CalendarView} from "./CalendarView.js";
 import {CategoryWindow} from "./CategoryWindow.js";
-import {Settings} from "./Settings.js";
 import {ResourcesWindow} from "./ResourcesWindow.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 import {ListView} from "./ListView.js";
@@ -220,7 +219,7 @@ export class Main extends Component {
 						}))
 
 					}),
-					this.currentText = comp({tagName: 'h3', text: t('Today'), flex: '1 1 50%', style: {minWidth: '100px', fontSize: '1.8em'}}),
+					this.currentText = comp({cls: "cal period-title", tagName: 'h3', text: t('Today')}),
 					//'->',
 					this.cardMenu = comp({cls: 'group not-medium-device', flex:'0 0 auto'},
 						btn({icon: 'view_day', text: t('Day'), handler: _b => this.routeTo('day', this.date)}),
@@ -252,7 +251,6 @@ export class Main extends Component {
 						btn({icon: 'keyboard_arrow_right', title: t('Next'), allowFastClick:true, handler: b => this.forward()}),
 					),
 					btn({icon:'more_vert',cls: 'not-small-device', menu:menu({},
-						btn({icon:'video_call',hidden:!client.user.isAdmin,text:t('Video meeting')+'…', handler: _ => {(new Settings()).openLoad()}}),
 						btn({
 							icon: 'print', text:t('Print'), menu: menu({},
 								this.printCurrentBtn = btn({icon: 'print', text: t('Current view'), handler:() => {
@@ -272,7 +270,7 @@ export class Main extends Component {
 						btn({icon:'meeting_room',hidden: !rights.mayChangeResources, text:t('Resources')+'…', handler: _ => { (new ResourcesWindow()).show()}}),
 						checkbox({
 							name:'showDeclined',
-							label: t('Show events that you have declined'),
+							label: t('Show declined events'),
 							listeners: {
 								change: async ({newValue}) => {
 									await userDS.update(client.user.id, {"calendarPreferences/showDeclined": newValue});
@@ -447,19 +445,14 @@ export class Main extends Component {
 	}
 
 	private renderAdapterBoxes() {
-		const boxes: any = {
-
-			holiday: ['#025d7b', t('Holidays')]
-		};
-
+		const boxes: any = {};
+		if(modules.isAvailable("community", "addressbook")) {
+			boxes.birthday = ['#009c63',	t('Birthdays')];
+		}
 		if(modules.isAvailable("community", "tasks")) {
 			boxes.task = ['#7e472a',	t('Tasks', 'community', 'tasks')];
 		}
-
-		if(modules.isAvailable("community", "addressbook")) {
-			boxes.birthday = ['#7e472a',	t('Birthdays')];
-		}
-
+		boxes.holiday = ['#025d7b', t('Holidays')];
 
 		return Object.keys(boxes).map(key => comp({tagName:'li'}, checkbox({
 			color: boxes[key][0], label: boxes[key][1], value: this.adapter.byType(key).enabled,

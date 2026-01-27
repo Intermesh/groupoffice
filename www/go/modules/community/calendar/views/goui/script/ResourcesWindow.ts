@@ -76,8 +76,9 @@ export class ResourceWindow extends FormWindow {
 			{value: 10,name: t("Read items")},
 			//{value: 20,name: t("Update private")},
 			{value: 25,name: t("Approve / Disapprove")}, // RSVP
-			//{value: 30,name: t("Write own")},
-			//{value: 35,name: t("Write all")},
+			{value: 30,name: t("Write own")},
+			{value: 35,name: t("Write all")},
+			{value: 40,name: t("Write / Delete")},
 			{value: 50,name: t("Manage")}
 		]);
 	}
@@ -97,7 +98,7 @@ export class ResourcesWindow extends Window {
 		this.on('render', async () => {
 			resourceStore.load();
 			await resourceGroupStore.load();
-			const first = resourceStore.first();
+			const first = resourceGroupStore.first();
 			if(first) {
 				this.resourceGroupTable.rowSelection!.add(first);
 			}
@@ -175,7 +176,7 @@ export class ResourcesWindow extends Window {
 						searchbtn({
 							listeners: {
 								input: ( {text}) => {
-									this.resourceTable!.store.setFilter("search", {text: text})
+									this.resourceTable!.store.setFilter("search", {text: text}).load()
 								}
 							}
 						}),

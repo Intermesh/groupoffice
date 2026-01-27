@@ -23,4 +23,8 @@ return array (
   'description' => 'Показва общ преглед на актуалните събития',
   'Start page' => 'Начална страница',
   'webfeeds' => 'уебфийдове',
+  "welcomeTitle" => "Добре дошли в Group-Office!",
+  "welcomeContent" => "<p>Благодарим ви, че инсталирахте Group-Office!</p>
+<p>Ето една връзка, която ще ви помогне да започнете: {{link}}</p>
+<p>Надяваме се, че ще харесате Group-Office!</p>"
 );

@@ -35,7 +35,7 @@ CREATE TABLE `addressbook_contact` (
   `lastName` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `suffixes` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Suffixes like ''Msc.''',
   `salutation` VARCHAR(382) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `gender` enum('M','F') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'M for Male, F for Female or null for unknown',
+  `gender` enum ('M', 'F', 'N', 'P') null comment 'M for Male, F for Female, N for non-binary, P for private or null for unknown',
   `notes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `isOrganization` tinyint(1) NOT NULL DEFAULT 0,
   `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'name field for companies and contacts. It should be the display name of first, middle and last name',

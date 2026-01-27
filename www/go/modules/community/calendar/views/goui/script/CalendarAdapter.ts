@@ -107,7 +107,7 @@ export class CalendarAdapter extends Observable<CalendarAdapterEventMap> {
 
 				for (const e of events) {
 					for(const item of CalendarItem.expand(e as CalendarEvent, start, end)) {
-						if ((!item.isDeclined || client.user.calendarPreferences.showDeclined) ) {
+						if ((!item.isDeclined || client.user.calendarPreferences.showDeclined!==false) ) {
 							yield item;
 						}
 					}
@@ -224,6 +224,7 @@ export class CalendarAdapter extends Observable<CalendarAdapterEventMap> {
 					conditions: [
 						{start:null,due:null},
 						{start: start.format('Y-m-d')+'..'+end.format('Y-m-d')},
+						{due: start.format('Y-m-d')+'..'+end.format('Y-m-d')},
 						{progressUpdated: start.format('Y-m-d')+'..'+end.format('Y-m-d')},
 					]
 				});

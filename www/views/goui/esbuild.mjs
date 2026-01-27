@@ -2,15 +2,9 @@ import * as esbuild from 'esbuild';
 import fs from 'node:fs';
 
 let version;
-await fs.readFile("../../version.php", 'utf8', (err, data) => {
-	if (err) {
-		console.error(err);
-		throw err;
-	}
-
-	version = data.match(/\d+\.\d+\.\d+/)
-	console.log(version[0]);
-});
+const data = fs.readFileSync("../../version.php", 'utf8');
+version = data.match(/\d+\.\d+\.\d+/)
+console.log(version[0]);
 
 // mark GOUI lib as external and map the path to the main lib
 let importPathPlugin = {

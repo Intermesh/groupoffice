@@ -256,7 +256,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 		this.lastCount = this.reminderStore.getCount();
 
-		go.Notifier.showNotifications();
+		//go.Notifier.showNotifications();
 		go.Notifier.playSound('message-new-email', 'reminder');
 
 	},

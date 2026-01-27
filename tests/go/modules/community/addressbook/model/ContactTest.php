@@ -90,7 +90,7 @@ class ContactTest extends TestCase {
   }
 
   public function testDelete() {
-    $contact = Contact::find()->single();
+    $contact = Contact::find()->orderBy(['id' => 'DESC'])->single();
     
     $success = Contact::delete(['id' => $contact->id]);
 

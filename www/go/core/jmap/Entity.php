@@ -63,6 +63,15 @@ abstract class Entity  extends OrmEntity {
 		foreach(static::ignorePropertiesForModifiedAt() as $col) {
 			unset($modified[$col]);
 		}
+
+		unset($modified['modifiedAt']);
+		unset($modified['acl']);
+		unset($modified['aclId']);
+		unset($modified['createdBy']);
+		unset($modified['createdAt']);
+		unset($modified['modifiedBy']);
+		unset($modified['permissionLevel']);
+
 		return $modified;
 	}
 

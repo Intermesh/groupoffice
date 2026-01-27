@@ -569,7 +569,13 @@ class Message extends \go\core\mail\Message {
 			$attachments = json_decode($params['attachments']);
 			foreach ($attachments as $att) {
 				if (!empty($att->blobId)) {
-					$path = Blob::buildPath($att->blobId);
+					// fetch blob to get correct mime type
+					$blob = Blob::findById($att->blobId);
+					$file = Attachment::fromblob($blob);
+					$file->setFilename($att->fileName);
+					$this->attach($file);
+					continue;
+
 				} else if (!empty($att->tmp_file) && empty($att->from_file_storage)) {
 					$path = \GO::config()->tmpdir . $att->tmp_file;
 				} else {

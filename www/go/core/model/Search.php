@@ -54,7 +54,7 @@ class Search extends AclOwnerEntity {
 	 * @param string $searchPhrase
 	 * @throws Exception
 	 */
-	public static function addCriteria(Criteria $criteria, Query $query, string $searchPhrase)
+	public static function addCriteria(Criteria $criteria, Query $query, string $searchPhrase): void
 	{
 
 		go()->setOptimizerSearchDepth();
@@ -74,6 +74,9 @@ class Search extends AclOwnerEntity {
 
 			$i++;
 		}
+
+		// joining the search can lead to duplicates so group by to onky return unique results
+		$query->groupBy(['id']);
 	}
 
 	protected function createAcl() : void

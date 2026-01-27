@@ -787,7 +787,7 @@ class Installer {
 							require_once($updateScript);
 						});
 					} else {
-						echo $modStr . 'Excuting query: ' . $query . "\n";
+						echo $modStr . 'Executing query: ' . $query . "\n";
 						flush();
 						try {
 							if (!empty($query))

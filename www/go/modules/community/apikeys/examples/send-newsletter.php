@@ -2,7 +2,7 @@
 //This example sends a newsletter via the Group-Office API
 
 //Adjust these variables for your installation
-$apiKey = "61bb0ed6515d2da17c95e073a0458bdb4421273784cc3";
+$apiKey = "your-api-key";
 $apiUrl = 'http://localhost/api/jmap.php';
 
 // make sure this list exists in Group-Office

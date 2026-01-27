@@ -201,6 +201,9 @@ th {
 		}
 	}
 
+	/**
+	 * Exports a single entity
+	 */
 	protected function exportEntity(Entity $entity): void
 	{
 

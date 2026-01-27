@@ -200,12 +200,19 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'gender',
 					renderer: function (v) {
-						if(v === 'M') {
-							return t("Male", 'addressbook');
-						} else if (v === 'F') {
-							return t("Female", 'addressbook');
+						switch(v) {
+							case'M':
+								return t("Male", 'addressbook');
+							case 'F':
+								return t("Female", 'addressbook');
+							case 'N':
+								return t("Non-binary", 'addressbook');
+							case 'P':
+								return t("Won't say", 'addressbook');
+
+							default:
+								return "";
 						}
-						return "";
 					}
 				},
 				{

@@ -2,9 +2,6 @@
 
 namespace go\modules\community\calendar\reports;
 
-use go\modules\community\calendar\model\CalendarEvent;
-use \GO\Base\Util\Date;
-
 /**
  * Copyright Intermesh
  *
@@ -18,10 +15,7 @@ use \GO\Base\Util\Date;
  * @author Michael de Hart <mdhart@intermesh.nl>
  */
 class Month extends Calendar {
-	
-	/**
-	 * @var CalendarEvent[]
-	 */
+
 	protected $events = array();
 	
 	private $right;
@@ -63,8 +57,8 @@ class Month extends Calendar {
 	}
 
 	protected function add($key, $instance) {
-		$itr = clone $instance->utcStart;
-		$end = min($this->end, $instance->utcEnd);
+		$itr = clone $instance->start();
+		$end = min($this->end, $instance->end());
 		while($itr <= $end) {
 			$this->events[$itr->format('Ymd')][$key] = $instance;
 			$itr = $itr->modify('+1 day');
@@ -130,12 +124,14 @@ class Month extends Calendar {
 				if($this->day->format('M')===$day->format('M')) {
 
 					if(isset($this->events[$day->format('Ymd')])) {
+
+						ksort($this->events[$day->format('Ymd')]);
 							
 						foreach($this->events[$day->format('Ymd')] as $event) {
 							if($event->showWithoutTime) {
 								$events .= '<br><font color="blue">' . substr($event->title, 0, 25) . '</font>';
 							} else {
-								$events .= "<br>".$event->start->format('G:i') .'-'. $event->end()->format('G:i') .' '. substr($event->title,0,25);
+								$events .= "<br>".$event->start(false, go()->getAuthState()->getUser()->timezone)->format('G:i') .'-'. $event->end(false, go()->getAuthState()->getUser()->timezone)->format('G:i') .' '. substr($event->title,0,25);
 							}
 							$amount++;
 						}

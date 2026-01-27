@@ -7,35 +7,30 @@ use go\core\fs\File as FileAlias;
 use go\core\http\Router;
 use go\core\jmap\State;
 use go\core\model\OauthUser as UserAlias;
-use go\core\oauth\server\AuthorizationServer;
-use go\core\oauth\server\grant\AuthCodeGrant;
 use go\core\oauth\server\repositories;
-use go\core\oauth\server\responsetypes\IdTokenResponse;
 use GuzzleHttp\Psr7\MessageTrait as MessageTraitAlias;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
 use GuzzleHttp\Psr7\Stream as StreamAlias;
+use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Exception\OAuthServerException;
+use League\OAuth2\Server\Grant\AuthCodeGrant;
 use League\OAuth2\Server\Grant\RefreshTokenGrant;
 use League\OAuth2\Server\ResourceServer;
 use OpenIDConnectServer\ClaimExtractor;
+use OpenIDConnectServer\IdTokenResponse;
 use Psr\Http\Message\ResponseInterface as ResponseInterfaceAlias;
-use function GuzzleHttp\json_encode;
 
 App::get();
-App::get()->setAuthState(new State());
+go()->setAuthState(new State());
 
 //for serializing authRequest
-session_name('groupoffice_oauth');
-session_start();
+go()->sessionStart();
 
 class OAuthController {
 
-	/**
-	 * @var  AuthorizationServer
-	 */
-	private $server;
+	private ?AuthorizationServer $server;
 
 	/**
 	 * @return AuthorizationServer
@@ -55,21 +50,20 @@ class OAuthController {
 			$privateKeyPath = 'file://' . $this->getPrivateKeyFile()->getPath();
 
 			// OpenID Connect Response Type
-			$responseType = new IdTokenResponse(new repositories\UserRepository(), new ClaimExtractor());
-			$responseType->setKid($this->getKid());
+			$responseType = new IdTokenResponse(new repositories\UserRepository(), new ClaimExtractor(), $this->getKid());
 
 			$this->server = new AuthorizationServer(
 				$clientRepository,
 				$accessTokenRepository,
 				$scopeRepository,
 				$privateKeyPath,
-				'lxZFUEsBCJ2Yb14IF2ygAHI5N4+ZAUXXaSeeJm6+twsUmIen',
+				'lxZFUEsBCJ2Yb14IF2ygAHI5N4+ZAUXXaSeeJm6+twsUmIen', //Public key
 				$responseType
 			);
 
 			// Enable the authentication code grant on the server with a token TTL of 1 hour
 			$this->server->enableGrantType(
-				new AuthCodeGrant(
+				new  AuthCodeGrant(
 					$authCodeRepository,
 					$refreshTokenRepository,
 					new DateInterval('PT10M')
@@ -111,7 +105,6 @@ class OAuthController {
 
 			if(!go()->getAuthState()->isAuthenticated()) {
 				$_SESSION['authRequest'] = $authRequest;
-				$authRedirectUrl = $_SERVER['PHP_SELF'] . '/authorize';
 
 				$loginUrl = dirname($_SERVER['PHP_SELF'], 3) . '?oauthAuthorize=1';
 				return $response->withStatus(302)->withHeader('Location', $loginUrl);
@@ -119,11 +112,6 @@ class OAuthController {
 
 			$user = go()->getAuthState()->getUser(['username', 'displayName', 'id', 'email', 'modifiedAt']);
 			$authRequest->setUser(new UserAlias($user));
-
-
-//			$userRepository = new repositories\UserRepository();
-//			$userEntity = $userRepository->getUserEntityByIdentifier(2);
-//			$authRequest->setUser($userEntity);
 
 			// Once the user has approved or denied the client update the status
 			// (true = approved, false = denied)
@@ -292,7 +280,7 @@ class OAuthController {
 		$signing_alg_values_supported = array('HS256', 'RS256');
 
 		$discovery = array(
-			'issuer' => AuthorizationServer::getIssuer(),
+			'issuer' => 'https://' . $_SERVER['HTTP_HOST'],
 			'authorization_endpoint' => $endpointBase . '/authorize',
 			'token_endpoint' => $endpointBase . '/token',
 			'userinfo_endpoint' => $endpointBase . '/userinfo',

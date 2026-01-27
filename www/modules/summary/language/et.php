@@ -22,4 +22,8 @@ return array (
   'name' => 'Ülevaade',
   'description' => 'Näita erinevate kirjete ülevaateid',
   'Start page' => 'Ülevaade',
+  "welcomeTitle" => "Tere tulemast Group-Office'isse!",
+  "welcomeContent" => "<p>Täname Group-Office'i installeerimise eest!</p>
+<p>Siin on link, mis aitab sul alustada: {{link}}</p>
+<p>Loodame, et sulle meeldib Group-Office!</p>"
 );

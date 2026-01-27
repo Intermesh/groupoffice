@@ -17,7 +17,8 @@ return array (
   'History' => 'Geschiedenis',
   'Entity' => 'Entitieit',
   'Bad login' => 'Verkeerd ingelogd',
-  'Delete entries after' => 'Verwijderer records na',
+  'Delete entries after' => 'Verwijder records na',
+  'Retention period of entries in days' => 'Bewaartermijn van records in dagen',
   'Request ID' => 'ID aanvragen',
   'Entity ID' => 'Identiteit van de entiteit',
 );

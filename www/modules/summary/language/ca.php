@@ -22,4 +22,8 @@ return array (
   'Start page' => 'Contingut',
   'Notes' => 'Notes',
   'Rss Feeds' => 'Rss Feeds',
+  "welcomeTitle" => "Benvingut a Group-Office!",
+  "welcomeContent" => "<p>Gràcies per instal·lar Group-Office!</p>
+<p>Aquí teniu un enllaç per ajudar-vos a començar: {{link}}</p>
+<p>Esperem que gaudiu de Group-Office!</p>"
 );

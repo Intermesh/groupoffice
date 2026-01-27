@@ -1,7 +1,8 @@
 import {btn, comp, Component, t, tbar} from "@intermesh/goui";
 import {KeyGrid} from "./KeyGrid.js";
 import {KeyDialog} from "./KeyDialog.js";
-
+// @deprecated -> to be replaced by App settings
+// @see Settings.js
 export class SystemSettingsPanel extends Component {
 	constructor() {
 		super();

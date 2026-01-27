@@ -52,10 +52,12 @@ $lang = go()->getLanguage()->getIsoCode();
 	go()->fireEvent(App::EVENT_SCRIPTS);
 	$authController->fireEvent('head');
 	go()->fireEvent(App::EVENT_HEAD);
-	if (!\go\core\Installer::isInstalling()):?>
-		<link rel="stylesheet" href="<?= GO::view()->getUrl()?>css.php?theme=<?=$themeUrl; ?>&v=<?=$webclient->getCSSFile(\GO::view()->getTheme()->getName())->getModifiedAt()->format("U"); ?>" />
-	<?php endif;
+
 }
+
+if (!\go\core\Installer::isInstalling()):?>
+    <link rel="stylesheet" href="<?= GO::view()->getUrl()?>css.php?theme=<?=$themeUrl; ?>&v=<?=$webclient->getCSSFile(\GO::view()->getTheme()->getName())->getModifiedAt()->format("U"); ?>" />
+<?php endif;
 
 if(!empty(GO()->getConfig()['custom_css_url'])): ?>
     <link rel="stylesheet" href="<?=GO::config()->custom_css_url?>">

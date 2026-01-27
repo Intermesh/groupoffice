@@ -19,6 +19,16 @@ use go\core\jmap\Response;
 use go\core\jmap\State;
 use go\core\http\Request;
 
+const INSECURE_MIME_TYPES = [
+	'text/html',
+	'image/svg+xml',
+	'application/xhtml+xml',
+	'text/xml',
+	'application/xml',
+	'text/xsl',
+	'application/xslt+xml'
+];
+
 App::get();
 if(Request::get()->getMethod() == 'OPTIONS') {
 	Response::get()->output();
@@ -51,8 +61,9 @@ try {
 		$inline = !empty($_GET['inline']);
 
 		// prevent html to render on same domain having access to all global JS stuff
-		if($blob->type == 'text/html') {
+		if(in_array($blob->type, INSECURE_MIME_TYPES)) {
 			$inline = false;
+			$blob->type = 'text/plain';
 		}
 
 		try {
@@ -66,13 +77,6 @@ try {
 			//ignore
 		}
 
-		$inline = !empty($_GET['inline']);
-
-		// prevent html to render on same domain having access to all global JS stuff
-		if($blob->type == 'text/html') {
-			$inline = false;
-		}
-
 		$blob->output($inline);
 		exit();
 	}
@@ -84,6 +88,7 @@ try {
 	$package = array_shift($parts);
 	if ($package == "core") {
 		$c = GO();
+		$ctrlCls = "go\\core\\App";
 		$method = "download" . array_shift($parts);
 	} else {
 		$module = array_shift($parts);

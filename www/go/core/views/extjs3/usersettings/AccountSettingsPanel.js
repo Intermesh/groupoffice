@@ -244,6 +244,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 					text: t("Logout all"),
 					handler : () => {
 						this.authorizedClients.setValue({});
+						this.authorizedClients.dirty = true;
 					}
 				}]
 		})

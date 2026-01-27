@@ -346,7 +346,7 @@ Instellingen -> Accounts -> Dubbelklik account -> Mappen.',
 
   'Search items' => 'Items zoeken',
   'Open with' => 'Open met',
-  'Copy image' => 'Afbeelding kopiﾃｫren',
+  'Copy image' => 'Afbeelding kopiëren',
   'Sory, this is not supported by Firefox' => 'Sorry, dit wordt niet ondersteund door Firefox',
   'Template group' => 'Sjabloongroep',
   'Refresh token' => 'Token verversen',

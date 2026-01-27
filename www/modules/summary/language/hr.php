@@ -23,4 +23,8 @@ return array (
   'description' => 'Prikazuje pregled različitih aktualnih stavki',
   'Start page' => 'Početna stranica',
   'webfeeds' => 'Web pretplate',
+  "welcomeTitle" => "Dobrodošli u Group-Office!",
+  "welcomeContent" => "<p>Hvala što ste instalirali Group-Office!</p>
+<p>Evo poveznice koja će vam pomoći da započnete: {{link}}</p>
+<p>Nadamo se da ćete uživati u Group-Office!</p>"
 );

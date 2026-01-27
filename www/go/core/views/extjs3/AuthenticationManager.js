@@ -123,12 +123,12 @@ go.AuthenticationManager = (function () {
 		},
 		
 		logout: function (first) {
-			if (Ext.Ajax.isLoading())
+			if (Ext.Ajax.isLoading() || window.groupofficeCore.client.isBusy())
 			{
 				if (first) {
 					Ext.getBody().mask(t("Loading..."));
 				}
-				this.logout.defer(500, this, [true]);
+				this.logout.defer(300, this, [true]);
 			} else
 			{
 				window.GOUI.browserStoreConnection.deleteDatabase().then(function() {

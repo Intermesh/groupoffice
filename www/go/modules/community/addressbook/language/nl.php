@@ -4,7 +4,7 @@ return array (
   'description' => 'Bewaar contacten en organisaties',
   'mayChangeAddressbooks' => 'Adresboeken wijzigen',
   'mayExportContacts' => 'Contacten exporteren',
-  'salutationTemplate' => 'Geachte [if {{contact.prefixes}}]{{contact.prefixes}}[else][if !{{contact.gender}}]heer/mevrouw[else][if {{contact.gender}}=="M"]heer[else]mevrouw[/if][/if][/if][if {{contact.middleName}}] {{contact.middleName}}[/if] {{contact.lastName}}',
+  'salutationTemplate' => 'Hallo {{contact.firstName}}',
   'Contact' => 'Contactpersoon',
   'Job title' => 'Functie',
   'Gender' => 'Geslacht',
@@ -40,12 +40,12 @@ return array (
   ),
   'phoneTypes' => 
   array (
-		"work" => "Werk",
-		"home" => "Thuis",
-		"cell" => "Mobiel",
-		"workcell" => "Mobiel werk",
-		"fax" => "Fax",
-		"workfax" => "Fax werl"
+    'work' => 'Werk',
+    'home' => 'Thuis',
+    'cell' => 'Mobiel',
+    'workcell' => 'Mobiel werk',
+    'fax' => 'Fax',
+    'workfax' => 'Fax werl',
   ),
   'Call' => 'Bellen',
   'addressTypes' => 
@@ -167,4 +167,9 @@ return array (
   'Web page' => 'Webpagina',
   'Add to group' => 'Aan groep toevoegen',
   'Delete %d items' => '%d items verwijderen',
+  'No address' => 'Geen adres',
+  'Please add an address with a country' => 'Voeg een adres toe aan een land',
+  'Index character' => 'Indexteken',
+  'Icon' => 'Pictogram',
+  'Addrees' => 'Address',
 );

@@ -1,11 +1,17 @@
-import {client, modules, router} from "@intermesh/groupoffice-core";
+import {appSystemSettings, client, modules, router} from "@intermesh/groupoffice-core";
 import {MainPanel} from "./MainPanel.js";
-import {comp, t, translate} from "@intermesh/goui";
+import {t, translate} from "@intermesh/goui";
 import {SystemSettings} from "./SystemSettings.js";
+import {Settings} from "./Settings.js";
 
 modules.register(  {
 	package: "community",
 	name: "maildomains",
+	entities: [
+		"MailDomain",
+		"MailAlias",
+		"MailBox"
+	],
 	async init () {
 		client.on("authenticated",  ({session}) => {
 			if(!session.capabilities["go:community:maildomains"]) {
@@ -33,9 +39,14 @@ modules.register(  {
 				return mainPanel;
 			});
 
+			// @deprecated - ExtJS System settings version
 			modules.addSystemSettingsPanel("community", "maildomains", "maildomains", t("Mail domains"), "email", () => {
 				return new SystemSettings();
 			});
+
+			if (session.isAdmin) {
+				appSystemSettings.addPanel("community", "maildomains", Settings);
+			}
 		});
 	}
 });

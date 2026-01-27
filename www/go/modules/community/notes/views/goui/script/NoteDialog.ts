@@ -1,9 +1,10 @@
-import {fieldset, htmlfield, Notifier, root, t, textfield} from "@intermesh/goui";
-import {client, FormWindow, Image} from "@intermesh/groupoffice-core";
+import {comp, fieldset, HtmlField, htmlfield, Notifier, root, t, textfield} from "@intermesh/goui";
+import {client, customFields, FormFieldset, FormWindow, Image} from "@intermesh/groupoffice-core";
 import {notebookcombo} from "./NoteBookCombo";
 import {Note} from "./Index";
 
 export class NoteDialog extends FormWindow<Note> {
+	private contentFld: HtmlField;
 	constructor() {
 		super("Note");
 
@@ -12,29 +13,32 @@ export class NoteDialog extends FormWindow<Note> {
 		this.stateId = "note-dialog";
 		this.maximizable = true;
 		this.resizable = true;
+		this.hasLinks = true;
 
 		this.width = 800;
 		this.height = 800;
 
+		this.generalTab.cls = "fit";
 		this.generalTab.items.add(
-			fieldset({},
-				textfield({
-					flex: 1,
-					name: "name",
-					label: t("Name"),
-					required: true
-				}),
+			fieldset({cls: " fit vbox gap"},
+				comp({cls: "hbox gap"},
+					textfield({
+						flex: 1,
+						name: "name",
+						label: t("Name"),
+						required: true
+					}),
 
-				notebookcombo({
-					width: 240
-				}),
+					notebookcombo({
+						width: 240
+					})
+				),
 
-				htmlfield({
+				this.contentFld = htmlfield({
 					name: "content",
+					flex: 1,
 					listeners: {
-						setvalue: ({target}) => {
-							void Image.replaceImages(target.el);
-						},
+
 						insertimage: ({file, img}) => {
 							root.mask();
 
@@ -57,6 +61,25 @@ export class NoteDialog extends FormWindow<Note> {
 			)
 		)
 
+		this.form.on("load", () => {
+			void Image.replaceImages(this.contentFld.el).then(() => {
+				this.contentFld.trackReset();
+			})
+		})
+
 		this.addCustomFields();
+	}
+
+
+	protected addCustomFields() {
+		//for notes all are tabs
+		const fieldsets = customFields.getFieldSets(this.entityName).map(fs => new FormFieldset(fs))
+
+		fieldsets.forEach((fs) => {
+			//if (fs.fieldSet.isTab) {
+				fs.title = fs.fieldSet.name;
+				fs.legend = "";
+				this.cards.items.add(fs);
+		}, this);
 	}
 }

@@ -244,3 +244,7 @@ set c.actionAt = (select max(date) from addressbook_date where contactId = c.id)
 
 $updates['202508081003'][] = "update `addressbook_phone_number` set type='cell' where type='mobile';";
 $updates['202508081003'][] = "update `addressbook_phone_number` set type='workcell' where type='workmobile';";
+
+$updates['202601130927'][] = "alter table addressbook_contact
+    modify gender enum ('M', 'F', 'N', 'P') null comment 'M for Male, F for Female, N for non-binary, P for private or null for unknown';
+";

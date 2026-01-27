@@ -78,10 +78,13 @@ class Module extends EntityController {
 
 	public function installLicensed(): array
 	{
-		License::installModules();
+		License::installModules()
+		;
 
 		return ['success' => true];
 	}
+
+
 	
 	public function install($params) {
 

@@ -6,7 +6,7 @@ ini_set('display_errors', 'on');
 error_reporting(E_ALL);
 function fetch($data) {
     //Adjust these variables for your installation
-	$apiKey = "63e601fab29f86187a7af84898b3e0d93bae150b209a2";
+	$apiKey = "your-api-key";
 	$apiUrl = 'http://go.localhost/groupoffice/www/api/jmap.php';
 
 	$dataStr = json_encode($data);

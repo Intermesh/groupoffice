@@ -2,6 +2,7 @@
 namespace go\core\orm;
 
 use DateTime;
+use DateTimeInterface;
 use Exception;
 use go\core\db\Criteria;
 use go\core\db\Query as OrmQuery;
@@ -121,7 +122,7 @@ trait SearchableTrait {
 		$search->name = $this->title();
 		$search->description = $this->getSearchDescription();
 		$search->filter = $this->getSearchFilter();
-		$search->modifiedAt = property_exists($this, 'modifiedAt') ? $this->modifiedAt : new DateTime();
+		$search->modifiedAt = $this->getSearchModifiedAt();
 		$search->rebuild = false;
 //		$search->createdAt = $this->createdAt;
 		
@@ -311,6 +312,17 @@ trait SearchableTrait {
 		go()->getDbConnection()->exec("commit");
 
 
+	}
+
+	/**
+	 * Returns the modified at date of the entity.
+	 * In some cases you might want to use another date like an invoice date or a calendar event date.
+	 *
+	 * @return DateTimeInterface
+	 */
+	protected function getSearchModifiedAt(): DateTimeInterface
+	{
+		return property_exists($this, 'modifiedAt') ? $this->modifiedAt : new DateTime();
 	}
 
 }

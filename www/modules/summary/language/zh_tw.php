@@ -17,4 +17,8 @@ return array (
   'Start page' => '摘要',
   'Loading Feed...' => 'Loading Feed...',
   'Go to Post' => 'Go to Post',
+  "welcomeTitle" => "歡迎使用Group-Office！",
+  "welcomeContent" => "<p>感謝您安裝Group-Office！</p>
+<p>這裡有一個連結可以幫助您入門：{{link}}</p>
+<p>我們希望您喜歡Group-Office！</p>"
 );

@@ -37,7 +37,7 @@ class UserRepository implements IdentityProviderInterface
 	 * @return bool|UserEntity
 	 * @throws Exception
 	 */
-		public function getUserEntityByIdentifier($identifier)
+		public function getUserEntityByIdentifier($identifier): bool|UserEntity
 		{
 			$user = User::findById($identifier, ['username', 'displayName', 'id', 'email', 'modifiedAt']);
 			if(!$user) {

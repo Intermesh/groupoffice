@@ -158,22 +158,10 @@ class Module extends core\Module
 
 		if($action !== 'delete') {
 			$changes = $entity->historyLog();
-			unset($changes['modifiedAt']);
-			unset($changes['acl']);
-			unset($changes['aclId']);
-			unset($changes['createdBy']);
-			unset($changes['createdAt']);
-			unset($changes['modifiedBy']);
-			unset($changes['permissionLevel']);
-//			unset($changes['filesFolderId']);
 
 			$cfChanges = self::getCustomFieldChanges($entity);
 			if(!empty($cfChanges)) {
 				$changes['customFields'] = $cfChanges;
-			}
-
-			if(empty($changes)) {
-				return;
 			}
 
 			if($action == 'create') {

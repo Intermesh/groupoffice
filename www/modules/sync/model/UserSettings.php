@@ -119,10 +119,11 @@ class UserSettings extends Property
 		}
 	}
 
-	public function toArray(array|null $properties = null): array|null
+	public function toArray(?array $properties = null): array
 	{
-		if($this->doSetup)
+		if($this->doSetup) {
 			$this->setup();
+		}
 
 		return parent::toArray($properties);
 	}

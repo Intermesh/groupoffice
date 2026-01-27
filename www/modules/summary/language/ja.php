@@ -15,4 +15,8 @@ return array (
   'No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.' => 'RSS フィードが追加されていません。<br />このウィンドウの右上隅にある設定ボタンをクリックして、フィードを追加してください。',
   'webfeeds' => 'ウェブフィード',
   'Summary' => 'まとめ',
+  "welcomeTitle" => "Group-Officeへようこそ！",
+  "welcomeContent" => "<p>Group-Officeをインストールしていただきありがとうございます！</p>
+<p>こちらのリンクを参考に始めてください: {{link}}</p>
+<p>Group-Officeをお楽しみください！</p>"
 );

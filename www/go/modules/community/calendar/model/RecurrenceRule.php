@@ -7,7 +7,9 @@
  */
 namespace go\modules\community\calendar\model;
 
+use Exception;
 use go\core\util\DateTime;
+use go\modules\community\addressbook\model\Date;
 
 class RecurrenceRule {
 
@@ -50,39 +52,108 @@ class RecurrenceRule {
 	/** @var string LocalDate */
 	public $until = null;
 
+	static function validateRecurrenceId(CalendarEvent $event, string $recurrenceId): bool
+	{
+		try {
+			$ridDT = new \DateTimeImmutable($recurrenceId);
+		} catch (Exception $e) {
+			return false;
+		}
+		$ridDT->setTime(0,0,0);
+
+		$from = $ridDT->modify("-1 day");
+		$until = $ridDT->modify("+1 day");
+
+		$it = ICalendarHelper::makeRecurrenceIterator($event);
+		$it->fastForward($from);
+
+		while ($it->valid() && $it->current() < $until) {
+			if($recurrenceId == $it->current()->format("Y-m-d\TH:i:s")) {
+				return true;
+			}
+			$it->next();
+		}
+
+		return false;
+	}
+
+	static function fixRecurrenceId(CalendarEvent $event, string $recurrenceId): string
+	{
+		try {
+			$ridDT = new \DateTime($recurrenceId);
+		} catch (Exception $e) {
+			return false;
+		}
+		$s = $event->start();
+		$ridDT->setTime($s->format("H"),$s->format("i"),0);
+
+		return $ridDT->format("Y-m-d\TH:i:s");
+	}
+
 	static function expand(CalendarEvent $p, string $from, string $until) {
-		$it = ICalendarHelper::makeRecurrenceIterator($p);
-		$it->fastForward(new DateTime($from));
+
+		$fromDt = new DateTime($from);
+
 		if(!empty($p->lastOccurrence)) {
 			$until = min($until, $p->lastOccurrence->format('Y-m-d'));
 		}
-		$maxDate = new \DateTime($until);
+
+		$maxDate = new DateTime($until);
+		if(isset($p->recurrenceOverrides)) {
+			foreach($p->recurrenceOverrides as $recurrenceId => $o) {
+				if($o->excluded) {
+					continue;
+				}
+				$instance = self::patch(clone $p, $o);
+				if($instance->start() <  $maxDate && $instance->end() > $fromDt) {
+					yield $instance;
+				}
+			}
+		}
+
+		$it = ICalendarHelper::makeRecurrenceIterator($p);
+		$it->fastForward($fromDt);
+
 		while ($it->valid() && $it->current() < $maxDate) {
-			$recurrenceId = $it->current();
+			$recurrenceId = $it->current()->format('Y-m-d\TH:i:s');
 			$instance = clone $p;
-			$instance->utcStart = $recurrenceId;
-			$o = @$p->recurrenceOverrides[$recurrenceId->format('Y-m-d\TH:i:s')];
-			$duration = $p->duration;
+			$o = $p->recurrenceOverrides[$recurrenceId] ?? null;
 			if(isset($o)) {
 				if($o->excluded) {
 					$it->next();
 					continue;
 				}
-				if($o->start) {
-					$instance->utcStart = new \DateTime($o->start);
-				}
-				if($o->duration) {
-					$duration = $o->duration;
-				}
+				$instance = self::patch($instance, $o);
+			}else {
+				$instance->start = new \DateTime($recurrenceId, $p->timeZone());
 			}
 
-			$end = clone $instance->utcStart;
-			$end->add(new \DateInterval($duration));
-			$instance->utcEnd = $end;
+//			$end = clone $instance->start;
+//			$end->add(new \DateInterval($duration));
+//			$instance->utcEnd = $end;
 
-			yield $recurrenceId->format('Y-m-d\TH:i:s') => $instance;
+			yield $instance;
 			$it->next();
 		}
+	}
+
+	private static function patch(CalendarEvent $instance, RecurrenceOverride $o) {
+		if(isset($o->start)) {
+			$instance->start = new \DateTime($o->start, $instance->timeZone());
+		}
+		if(isset($o->duration)) {
+			$instance->duration = $o->duration;
+		}
+
+		if(isset($o->description)) {
+			$instance->description = $o->description;
+		}
+
+		if(isset($o->title)) {
+			$instance->title = $o->title;
+		}
+
+		return $instance;
 	}
 
 	static function humanReadable(CalendarEvent $event) {
@@ -94,7 +165,7 @@ class RecurrenceRule {
 			'monthly' => [$t("month"), $t('months'), $t('Monthly')],
 			'yearly' => [$t("year"), $t('years'), $t('Annually')]
 		];
-		$suffix = [$t("first"),$t("second"),$t("third"),$t("fourth")];
+		$suffix = [1 => $t("first"),2 => $t("second"),3 => $t("third"),4=> $t("fourth")];
 		$dayNumbers = ['su'=>0,'mo'=>1,'tu'=>2,'we'=>3,'th'=>4,'fr'=>5,'sa'=>6];
 
 		$rr = $event->getRecurrenceRule();

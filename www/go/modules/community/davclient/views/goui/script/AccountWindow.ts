@@ -80,7 +80,7 @@ export class AccountWindow extends FormWindow {
 
 		this.addSharePanel();
 
-		this.form.on('load' , ({data}) => {
+		this.form.on('beforeload' , ({data}) => {
 			this.submitBtn.text = t(data.lastError  ? "Connect":"Save")
 			enabledCb.hidden = !!data.lastError;
 			if(!data.lastError){

@@ -150,6 +150,7 @@ class TaskList extends AclOwnerEntity
 		if(empty($this->color)) {
 			$this->color = $this->defaultColor;
 		}
+
 		return parent::internalSave();
 	}
 

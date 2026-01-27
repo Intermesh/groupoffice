@@ -392,8 +392,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		//deletes must be confirmed if no trash folder is used or when we are in the trash folder to delete permanently
 		$response['deleteConfirm'] = empty($account->trash) || $account->trash==$params['mailbox'];
 
-
-		//$response['allowFTS'] =
+		$this->fireEvent('emailStoreLoaded', [&$response]);
 
 		return $response;
 	}
@@ -1513,7 +1512,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$blockUrl = 'about:blank';
 			$response['htmlbody'] = preg_replace("/<([^a]{1})([^>]*)(https?:[^>'\"]*)/iu", "<$1$2" . $blockUrl, $response['htmlbody'], -1, $response['blocked_images']);
 			if($response['htmlbody'] === null) {
-				throw new \Exception("Could not block images: ". preg_last_error_msg());
+				$response['htmlbody'] ="Could not block images: ". preg_last_error_msg() . " you can only view without blocking external resources";
 			}
 		}
 

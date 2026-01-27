@@ -47,7 +47,7 @@ return array (
   'Are you sure you wan to reset all the passwords?' => 'Weet je zeker dat je alle wachtwoorden wilt resetten?',
   'Export domain' => 'Exporteer domein',
   'Reset passwords' => 'Wachtwoorden resetten',
-  'If you enable reset passwords then a new password will be generated and exported for each account. Warning! Existing client configuration will need to be updated after this action.' => 'Als u reset wachtwoorden inschakelt, wordt voor elk account een nieuw wachtwoord gegenereerd en geﾃｫxporteerd. Waarschuwing. Bestaande clientconfiguratie moet na deze actie worden bijgewerkt.',
+  'If you enable reset passwords then a new password will be generated and exported for each account. Warning! Existing client configuration will need to be updated after this action.' => 'Als u reset wachtwoorden inschakelt, wordt voor elk account een nieuw wachtwoord gegenereerd en geëxporteerd. Waarschuwing. Bestaande clientconfiguratie moet na deze actie worden bijgewerkt.',
   'Ok' => 'OK',
   'Allow external SMTP usage' => 'Extern SMTP-gebruik toestaan',
   'Enable Full Text Search' => 'Volledige tekst zoeken inschakelen',

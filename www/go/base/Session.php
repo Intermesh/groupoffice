@@ -55,39 +55,12 @@ class Session extends Observable{
 		//In some cases it doesn't make sense to use the session because the client is
 		//not capable. (WebDAV for example).
 		if(!defined("GO_NO_SESSION") && !$this->isActive() && !headers_sent()){		
-				
-			//without cookie_httponly the cookie can be accessed by malicious scripts 
-			//injected to the site and its value can be stolen. Any information stored in 
-			//session tokens may be stolen and used later for identity theft or
-			//user impersonation.
-			ini_set("session.cookie_httponly",1);
-
-			//Avoid session id in url's to prevent session hijacking.
-			ini_set('session.use_only_cookies',1);
-
-			if(version_compare(phpversion(), "7.3.0") > -1) {
-				session_set_cookie_params([
-					'httponly' => true,
-					'samesite' => 'Lax'
-				]);
-			}
-
-			ini_set('session.cookie_secure', Util\Http::isHttps());
-
 
 			if(isset($_REQUEST['GOSID'])){
 				session_id($_REQUEST['GOSID']);				
 			}
-	
-			session_name('groupoffice');
 
-			// prevents altering headers. This caused a security issue where the expires header would be different on lost
-			// password requests when a valid email address was used.
-			session_cache_limiter("");
-			header('Cache-Control: no-cache, no-store, must-revalidate');
-			header('Pragma: no-cache');
-			header('Expires: 01-07-2003 12:00:00 GMT');
-			session_start();				
+			go()->sessionStart();
 		}
 	
 		if(isset($_REQUEST['GOSID'])){

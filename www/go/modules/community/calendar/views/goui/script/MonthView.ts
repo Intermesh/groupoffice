@@ -60,8 +60,11 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 		return super.internalRender();
 	}
 
+	private month?:number;
+
 	goto(date: DateTime, days?: number) {
 		//this.el.cls('reverse',(day < this.day));
+		this.month = date.getMonth();
 		this.day = date.setHours(0,0,0, 0);
 		this.start = date.clone()
 		const endMonth = this.start.clone();
@@ -199,7 +202,14 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 				eventContainer = E('li').cls('events'),
 				row = E('ol',eventContainer);
 			for (i = 0; i < 7; i++) {
+
 				const cDay = day.clone();
+
+				if(it > 20 && i == 0 && cDay.getMonth() != this.month!) {
+					// stop if we're starting a new row with the next month
+					return;
+				}
+
 				row.append(E('li',
 					(i==0 && client.user.calendarPreferences.showWeekNumbers) ? E('sub','W '+day.getWeekOfYear()).cls('weeknb').cls('not-small-device')
 						.on('click',_e => this.fire('selectweek', {day: weekStart}))
@@ -269,7 +279,7 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 		this.slots = Array.from({length: this.wdays}, _ => ({}) );
 		let stillContinueing = [];
 		while(e = this.continues.shift()) {
-			eventEls.push(this.drawEventLine(e, wstart));
+			eventEls.push(this.drawEventLine(e, wstart, false));
 			if(e.end.date > end.date) {
 				stillContinueing.push(e); // push it back for next week
 			}
@@ -277,7 +287,7 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 		this.continues = stillContinueing;
 
 		while((e = this.viewModel[this.iterator]) && e.start.format('Ymd') < end.format('Ymd')) {
-			eventEls.push(this.drawEventLine(e, wstart));
+			eventEls.push(this.drawEventLine(e, wstart, false));
 			if(e.end.date > end.date) {
 				this.continues.push(e);
 			}

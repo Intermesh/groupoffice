@@ -15,6 +15,7 @@ use go\core\fs\Blob;
 use go\core\model\Principal;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
+use IntlTimeZone;
 use Sabre\VObject;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Component\VEvent;
@@ -33,6 +34,25 @@ class UserTimezoneGuesser implements VObject\TimezoneGuesser\TimezoneGuesser {
 }
 
 VObject\TimeZoneUtil::addTimezoneGuesser('gouser', new UserTimezoneGuesser());
+
+class IntlTimezoneFinder implements VObject\TimezoneGuesser\TimezoneFinder {
+
+	public function find(string $tzid, bool $failIfUncertain = false): ?DateTimeZone
+	{
+		if (!class_exists(IntlTimeZone::class)) {
+			return null;
+		}
+
+		$iana =  IntlTimeZone::getIDForWindowsID($tzid);
+		if(!$iana) {
+			return null;
+		}
+
+		return new DateTimeZone($iana);
+	}
+}
+
+VObject\TimeZoneUtil::addTimezoneFinder('intltimezone', new IntlTimezoneFinder());
 
 class ICalendarHelper {
 
@@ -177,7 +197,6 @@ class ICalendarHelper {
 			}
 		}
 		if(!empty($event->uid)) $vevent->UID = $event->uid;
-		if(!empty($event->title)) $vevent->SUMMARY = $event->title;
 		//$vevent->add('DTSTART', $event->start($event->showWithoutTime)->format("Ymd\THis"), ['value' => $event->showWithoutTime ? 'DATE' : 'DATE-TIME']);
 		if(!empty($event->start)) $vevent->DTSTART = $event->start($event->showWithoutTime);
 		if(!empty($event->duration)) $vevent->DTEND = $event->end($event->showWithoutTime);
@@ -189,8 +208,12 @@ class ICalendarHelper {
 		if(!empty($event->status)) $vevent->STATUS = strtoupper($event->status);
 		// Sequence is for updates on the event it's used for ITIP
 		if(isset($event->sequence)) $vevent->SEQUENCE = $event->sequence;
-		if(!empty($event->description)) $vevent->DESCRIPTION = $event->description;
-		if(!empty($event->location)) $vevent->LOCATION = $event->location;
+
+		$showAsPrivate = $event->isPrivate() && !$event->currentUserIsOwner();
+		if(!empty($event->title)) $vevent->SUMMARY = $showAsPrivate ? '('.go()->t('Private', 'community', 'calendar').')' : $event->title;
+		if(!empty($event->description) && !$showAsPrivate) $vevent->DESCRIPTION = $event->description;
+		if(!empty($event->location) && !$showAsPrivate) $vevent->LOCATION = $event->location;
+
 		if(!empty($event->color)) $vevent->COLOR = $event->color;
 		if(!empty($event->categoryIds)) $vevent->CATEGORIES = implode(',',$event->categoryNames());
 
@@ -355,8 +378,11 @@ class ICalendarHelper {
 				'uid' => (string) $vevent->UID // unset after merge
 			]);
 
+
 			if(!empty($vevent->{'RECURRENCE-ID'})) {
-				$obj->recurrenceId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
+				Scheduler::fixRecurrenceId($event, $vevent);
+
+				$obj->recurrenceId =$vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
 				$exceptions[] = $obj;
 				continue;
 			}
@@ -453,7 +479,7 @@ class ICalendarHelper {
 
 	static private function parseAttendee($vattendee) {
 		$key = str_ireplace('mailto:', '',(string)$vattendee);
-		$principalId = Principal::findIdByEmail($key);
+		$principalIds = Principal::findIdsByEmail($key);
 
 		$p = (object)['email' => $key];
 		if(!empty($vattendee['EMAIL'])) $p->email = (string)$vattendee['EMAIL'];
@@ -479,7 +505,7 @@ class ICalendarHelper {
 			}
 		}
 		return [
-			$principalId ?? $key,
+			$principalIds[0] ?? $key,
 			$p
 		];
 	}

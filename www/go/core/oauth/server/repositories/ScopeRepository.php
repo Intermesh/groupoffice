@@ -18,14 +18,17 @@ class ScopeRepository implements ScopeRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getScopeEntityByIdentifier($scopeIdentifier)
-    {
+    public function getScopeEntityByIdentifier(string $identifier): ?\League\OAuth2\Server\Entities\ScopeEntityInterface
+		{
         $scopes = [
             'basic' => [
                 'description' => 'Basic details about you',
             ],
             'email' => [
                 'description' => 'Your email address',
+            ],
+            'phone' => [
+                'description' => 'Your phone number',
             ],
 		        'openid' => [
 			          'description' => 'OpenID Connect support',
@@ -35,25 +38,26 @@ class ScopeRepository implements ScopeRepositoryInterface
 		        ]
         ];
 
-        if (\array_key_exists($scopeIdentifier, $scopes) === false) {
-            return;
+        if (array_key_exists($identifier, $scopes) === false) {
+            return null;
         }
 
         $scope = new OauthScope();
-        $scope->setIdentifier($scopeIdentifier);
+        $scope->setIdentifier($identifier);
 
         return $scope;
     }
 
     /**
      * {@inheritdoc}
-     */
-    public function finalizeScopes(
-        array $scopes,
-        $grantType,
-        ClientEntityInterface $clientEntity,
-        $userIdentifier = null
-    ) {
+		 * @param array $scopes
+		 * @param string $grantType
+		 * @param ClientEntityInterface $clientEntity
+		 * @param null $userIdentifier
+		 * @param string|null $authCodeId
+		 */
+    public function finalizeScopes(array $scopes, string $grantType, ClientEntityInterface $clientEntity, $userIdentifier = null, ?string $authCodeId = null): array
+		{
         $scope = new OauthScope();
         $scope->setIdentifier('openid');
         $scopes[] = $scope;

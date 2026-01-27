@@ -7,6 +7,7 @@
 
 namespace go\modules\community\calendar\model;
 
+use DateInterval;
 use DateTimeInterface;
 use DateTimeZone;
 use Exception;
@@ -145,9 +146,6 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	public ?DateTimeInterface $start;
 
-	public $utcStart;
-	public $utcEnd;
-
 	/**
 	 * The duration of the event (or the occurence)
 	 * (optional, default: PT0S)
@@ -187,11 +185,14 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	public $privacy = self::Public;
 
+	const FREEBUSY_BUSY = 'busy';
+	const FREEBUSY_FREE = 'free';
+
 	/**
 	 * Is event Transparent or Opaque
-	 * @var boolean
+	 * @var ?string
 	 */
-	public $freeBusyStatus = 'busy';
+	public ?string $freeBusyStatus = self::FREEBUSY_BUSY;
 
 	/**
 	 * @var string
@@ -227,14 +228,14 @@ class CalendarEvent extends AclItemEntity {
 
 	public $modifiedAt;
 	public $createdAt;
-	public $modifiedBy;
-	public $createdBy;
+	public ?string $modifiedBy;
+	public ?string $createdBy;
 
 	/** The end time of the last occurrence in the series. or end time if not recurring */
 	protected $lastOccurrence;
 	/** The start time of the first occurence in the series, or start time if not recurring */
 	protected $firstOccurrence;
-	protected $ownerId; // find calendar owner to see if Private events needs to be altered
+	protected ?string  $ownerId = null; // find calendar owner to see if Private events needs to be altered
 
 	public static function customFieldsTableName(): string
 	{
@@ -462,18 +463,33 @@ class CalendarEvent extends AclItemEntity {
 //		$this->title = $value;
 //	}
 
-	public function start($withoutTime = false) {
-		return new \DateTime($this->start->format("Y-m-d". ($withoutTime?'':" H:i:s")), $this->timeZone());
+	public function start($withoutTime = false, string|null $setTimeZoneTo = null): DateTime
+	{
+		if(!isset($this->start)) {
+			$this->start = new DateTime();
+		}
+		$dt = new DateTime($this->start->format("Y-m-d". ($withoutTime?'':" H:i:s")), $this->timeZone());
+		if(isset($setTimeZoneTo)) {
+			$dt->setTimezone(new DateTimeZone($setTimeZoneTo));
+		}
+		return $dt;
 	}
 
-	public function end($withoutTime = false) {
+	public function end($withoutTime = false, string|null $setTimeZoneTo = null): DateTime
+	{
 		if(empty($this->start)) {
 			$end = new DateTime();
 		} else {
 			$end = $this->start();
 		}
 		if(!empty($this->duration))
-			$end->add(new \DateInterval($this->duration));
+			$end->add(new DateInterval($this->duration));
+
+
+		if(isset($setTimeZoneTo)) {
+			$end->setTimezone(new DateTimeZone($setTimeZoneTo));
+		}
+
 		return $end;
 	}
 
@@ -482,19 +498,20 @@ class CalendarEvent extends AclItemEntity {
 	 * Would be 2 datetimes, 1 date and 2 times if same day, or just 1 or 2 dates when full-day(s)
 	 * @return string[] 2 lines of human readable text
 	 */
-	public function humanReadableDate()
+	public function humanReadableDate(string|null $setTimeZoneTo = null): array
 	{
-		$start = $this->start;
+		$start = $this->start(false, $setTimeZoneTo);
+
 		$end = $this->end();
 		$oneDay = $start->format('Ymd') === $end->format('Ymd');
-		$line1 = go()->t($oneDay ? 'At' : 'From') . ' ' .
+		$line1 = go()->t($oneDay ? 'At' : 'From', 'community', 'calendar') . ' ' .
 			go()->t($start->format('l')) .
 			$start->format(' j ') . go()->t('full_months')[$start->format('n')] .
 			$start->format(' Y');
 		if (!$oneDay) {
 			if (!$this->showWithoutTime)
 				$line1 .= ', ' . $start->format('H:i');
-			$line1 .= ' ' . go()->t('until');
+			$line1 .= ' ' . go()->t('until', 'community', 'calendar');
 		}
 		if ($oneDay) {
 			$line2 = $start->format('H:i') . ' - ' . $end->format('H:i');
@@ -716,7 +733,7 @@ class CalendarEvent extends AclItemEntity {
 		$success = parent::internalSave();
 
 		if($success) {
-			$this->addToResourceCalendars();
+			$this->addToKnownCalendars();
 			$this->updateAlerts(go()->getUserId());
 			$this->changeEventsWithSameUID();
 			$this->incrementCalendarModSeq();
@@ -733,12 +750,20 @@ class CalendarEvent extends AclItemEntity {
 				$current = $event->calendarParticipant();
 				if(!empty($current) && $current->isOwner()) {
 					// when owner deletes, free resources
-					foreach ($event->participants as $participant) {
+					foreach ($event->participants as $pid => $participant) {
 						if ($participant->kind === 'resource') {
 							$calId = str_replace( 'Calendar:', '', $participant->pid());
 							go()->getDbConnection()->delete('calendar_calendar_event', [
 								'calendarId' => $calId, 'eventId' => $event->eventId
 							])->execute();
+						}
+						if($participant->kind == 'individual' && is_numeric($pid)) {
+							$personalCalendarId = Calendar::fetchPersonal($pid);
+							if ($personalCalendarId) {
+								go()->getDbConnection()->delete('calendar_calendar_event', [
+									'calendarId'=>$personalCalendarId, 'eventId'=>$event->eventId
+								])->execute();
+							}
 						}
 					}
 				}
@@ -776,11 +801,11 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	public function currentUserIsOwner() {
-		return $this->ownerId === go()->getUserId() ||
+		return $this->isNew() || $this->ownerId === go()->getUserId() ||
 		 ($this->ownerId === null && $this->createdBy === go()->getUserId());
 	}
 
-	public function toArray(array|null $properties = null): array|null
+	public function toArray(?array $properties = null): array
 	{
 		if(!($this->start instanceof DateTime)) {
 			//make sure timezone info is not sent by setting isLocal below. We can't be sure this datetime is a go\core\util\DateTime
@@ -799,7 +824,7 @@ class CalendarEvent extends AclItemEntity {
 		return $arr;
 	}
 
-	private function addToResourceCalendars() {
+	private function addToKnownCalendars() {
 		if(empty($this->participants)) return;
 		foreach($this->participants as $pid => $participant) {
 			if($participant->kind == 'resource') {
@@ -807,6 +832,14 @@ class CalendarEvent extends AclItemEntity {
 				if(!empty($resourceCalendar)) {
 					 go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
 						['calendarId'=>$resourceCalendar->id, 'eventId'=>$this->eventId]
+					])->execute();
+				}
+			}
+			if($participant->kind == 'individual' && is_numeric($pid)) {
+				$personalCalendarId = Calendar::fetchPersonal($pid);
+				if ($personalCalendarId) {
+					go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
+						['calendarId'=>$personalCalendarId, 'eventId'=>$this->eventId]
 					])->execute();
 				}
 			}
@@ -1059,25 +1092,27 @@ class CalendarEvent extends AclItemEntity {
 			}
 			return;
 		}
-
-		$r = $this->getRecurrenceRule();
-		if(isset($r->until)) {
-			$until = (new DateTime($r->until,$this->timeZone()))->add(new \DateInterval($this->duration));
-			if($this->lastOccurrence === null || $until > $this->lastOccurrence) {
-				$this->lastOccurrence = $until;
+		if($this->isModified('recurrenceRule')) {
+			$r = $this->getRecurrenceRule();
+			if (isset($r->until)) {
+				$until = (new DateTime($r->until, $this->timeZone()))->add(new DateInterval($this->duration));
+				if ($this->lastOccurrence === null || $until > $this->lastOccurrence) {
+					$this->lastOccurrence = $until;
+				}
+			} else  {
+				$this->lastOccurrence = null;
+				if (isset($r->count)) {
+					$it = ICalendarHelper::makeRecurrenceIterator($this);
+					$maxDate = new \DateTime(self::MAX_RECUR);
+					while ($it->valid()) {
+						$dt = $it->current(); // will clone :(
+						if ($dt > $maxDate) break;
+						if ($dt > $this->lastOccurrence) $this->lastOccurrence = $dt;
+						$it->next();
+					}
+					$this->lastOccurrence->add(new DateInterval($this->duration));
+				}
 			}
-		} else if(isset($r->count)) {
-			$it = ICalendarHelper::makeRecurrenceIterator($this);
-			$maxDate = new \DateTime(self::MAX_RECUR);
-			while ($it->valid()) {
-				$dt = $it->current(); // will clone :(
-				if($dt > $maxDate) break;
-				if($dt > $this->lastOccurrence) $this->lastOccurrence = $dt;
-				$it->next();
-			}
-			$this->lastOccurrence->add(new \DateInterval($this->duration));
-		} else {
-			$this->lastOccurrence = null;
 		}
 
 		if($this->isModified('recurrenceOverrides')) {
@@ -1100,12 +1135,22 @@ class CalendarEvent extends AclItemEntity {
 		return ['calendarId' => 'id'];
 	}
 
+	protected function getSearchModifiedAt(): DateTimeInterface
+	{
+		return $this->start();
+	}
+
+
 	protected function getSearchDescription(): string
 	{
 		$calendar = Calendar::findById($this->calendarId, ['name'], true);
 
 		$u = go()->getAuthState()->getUser();
-		$format = $u ? $u->dateFormat : "d-m-Y";
+		if($this->showWithoutTime) {
+			$format = $u ? $u->dateFormat : "d-m-Y";
+		} else {
+			$format = $u ? $u->dateFormat . ' '. $u->timeFormat : "d-m-Y H:i";
+		}
 
 		return $calendar->name .': '. $this->title . ' - '. $this->start->format($format);
 	}
@@ -1114,7 +1159,7 @@ class CalendarEvent extends AclItemEntity {
 	 * When the series start time changes all the recurrence id's must be recreated.
 	 *
 	 * @return void
-	 * @throws \DateMalformedStringException
+	 * @throws Exception
 	 */
 	private function reindexRecurrenceOverrides(): void
 	{

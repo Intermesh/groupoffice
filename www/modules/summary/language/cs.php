@@ -24,4 +24,8 @@ return array (
   'description' => 'Stránka na které je uveden přehled činností.',
   'Start page' => 'Přehled',
   'webfeeds' => 'Webové zdroje',
+  "welcomeTitle" => "Vítejte v Group-Office!",
+  "welcomeContent" => "<p>Děkujeme za instalaci Group-Office!</p>
+<p>Zde je odkaz, který vám pomůže začít: {{link}}</p>
+<p>Doufáme, že se vám Group-Office bude líbit!</p>"
 );

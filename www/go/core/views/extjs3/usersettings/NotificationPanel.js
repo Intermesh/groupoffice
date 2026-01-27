@@ -20,10 +20,6 @@ go.usersettings.NoticiationPanel = Ext.extend(Ext.Panel, {
 				xtype:'xcheckbox',
 				boxLabel: t("Mail reminders", "users", "core"),
 				name: 'mail_reminders'
-			},{
-				xtype:'xcheckbox',
-				name: 'open_notifications',
-				boxLabel: t('Open notification panel on start', "users", "core")
 			}]
 		});
 

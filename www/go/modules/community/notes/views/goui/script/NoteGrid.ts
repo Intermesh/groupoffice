@@ -7,6 +7,7 @@ export class NoteGrid extends Table<DataSourceStore> {
 	constructor() {
 		super(
 			datasourcestore({
+				queryParams: {limit: 20},
 				dataSource:noteDS,
 				sort: [{
 					property: "name"
@@ -25,6 +26,8 @@ export class NoteGrid extends Table<DataSourceStore> {
 				})
 			].concat(...customFields.getTableColumns("Note"))
 		);
+
+		this.scrollLoad = true;
 
 		this.on("rowdblclick", async ({target, storeIndex}) => {
 			const dlg = new NoteDialog();

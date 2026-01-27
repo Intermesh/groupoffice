@@ -54,6 +54,9 @@ try {
 		$studioError = StudioModule::patch68to250();
 	}
 
+	// for moving wopi module
+	go()->getDbConnection()->exec("update core_module set package='community' where name='wopi'");
+
 	require('header.php');
 
 	echo "<section><div class=\"card\">";

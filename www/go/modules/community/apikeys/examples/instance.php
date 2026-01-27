@@ -2,7 +2,7 @@
 //This example creates a new Group-Office instance on a multi instance server.
 
 //Adjust these variables for your installation
-$apiKey = "5fdfc8b07892f471c5a63cb7de9e698df049a199155c2";
+$apiKey = "your-api-key";
 $apiUrl = 'http://localhost/api/jmap.php';
 $domain = 'example.local';
 

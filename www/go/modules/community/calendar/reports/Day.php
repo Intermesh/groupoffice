@@ -57,13 +57,9 @@ class Day extends Week {
 	 * Renders a page in the PDF with the given day parmeter
 	 * @param integer $day unixtimestamp of day you like to render
 	 */
-	public function render() { //$day
-		//$this->day = \GO\Base\Util\Date::clear_time($day);
+	public function render() {
 		$this->currentDay = $this->day;
-		//$this->events = $this->orderEvents($events);
 		$this->AddPage();
-		//$this->calculateOverlap();
-		
 		$this->drawEventsBackground();
 
 		$this->iter = 0;
