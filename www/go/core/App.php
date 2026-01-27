@@ -980,7 +980,10 @@ namespace go\core {
 				
 
 			} else {
-				$file = go()->getEnvironment()->getInstallFolder()->getFile('go/modules/' . $package . '/' . $name .'/icon.png');	
+				$file = go()->getEnvironment()->getInstallFolder()->getFile('go/modules/' . $package . '/' . $name .'/icon.png');
+				if(!$file->exists()) {
+					$file = go()->getEnvironment()->getInstallFolder()->getFile('go/modules/' . $package . '/' . $name . '/icon.svg');
+				}
 			}
 
 			if(!$file->exists()) {
