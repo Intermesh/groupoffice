@@ -101,7 +101,7 @@ class OtpAuthenticator extends Property {
 				
 		return parent::internalSave();
 	}
-	
+
 	/**
 	 * Create new secret.
 	 * 16 characters, randomly chosen from the allowed base32 characters.
@@ -110,7 +110,8 @@ class OtpAuthenticator extends Property {
 	 *
 	 * @return string
 	 */
-	private function createSecret($secretLength = 16) {
+	private function createSecret(int $secretLength = 32): string
+	{
 		$validChars = $this->_getBase32LookupTable();
 
 		// Valid secret lengths are 80 to 640 bits
@@ -150,12 +151,14 @@ class OtpAuthenticator extends Property {
 	 *
 	 * @return string
 	 */
-	public function getCode($secret, $timeSlice = null) {
+	public function getCode($secret, $timeSlice = null): string
+	{
 		return $this->internalGetCode($secret, $timeSlice);
 		
 	}
 	
-	private function internalGetCode($secret, $timeSlice = null) {
+	private function internalGetCode($secret, $timeSlice = null): string
+	{
 		if ($timeSlice === null) {
 			$timeSlice = floor(time() / 30);
 		}
@@ -190,9 +193,10 @@ class OtpAuthenticator extends Property {
 	 * @param null $title
 	 * @param array $params
 	 */
-	public function outputQr(string $name=null, $secret=null, $title = null, $params = array()) {
+	public function outputQr(string $name=null, $secret=null, $title = null, $params = array()): void
+	{
 
-		
+
 		$name = empty($name) ? $this->owner->username . '@' . File::stripInvalidChars(go()->getSettings()->title) : $name;
 		$secret = empty($secret)?$this->secret:$secret;
 
@@ -231,7 +235,8 @@ class OtpAuthenticator extends Property {
 	 *
 	 * @return bool
 	 */
-	public function verifyCode($code, $secret=null, $discrepancy = 1, $currentTimeSlice = null) {
+	public function verifyCode($code, $secret=null, $discrepancy = 1, $currentTimeSlice = null): bool
+	{
 
 		//replace spaces
 		$code = preg_replace('/\s+/', '', $code);
