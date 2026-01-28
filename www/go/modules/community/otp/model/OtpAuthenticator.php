@@ -124,7 +124,7 @@ class OtpAuthenticator extends Property {
 	 * @return string
 	 * @throws Exception
 	 */
-	private function createSecret(int $secretLength = 16): string
+	private function createSecret(int $secretLength = 32): string
 	{
 		$validChars = $this->_getBase32LookupTable();
 

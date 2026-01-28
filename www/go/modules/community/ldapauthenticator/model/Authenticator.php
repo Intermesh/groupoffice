@@ -10,6 +10,7 @@ use go\core\ErrorHandler;
 use go\core\ldap\Record;
 use go\core\model\User;
 use go\core\util\DateTime;
+use go\core\validate\ErrorCode;
 use GO\Email\Model\Account;
 use go\modules\community\ldapauthenticator\Module;
 use go\modules\community\otp\model\OtpAuthenticator;
@@ -133,12 +134,14 @@ class Authenticator extends PrimaryAuthenticator
 				$otpSettings = \go\modules\community\otp\model\Settings::get();
 				if ($otpSettings->block) {
 					if (!$otpSettings->enforceForGroupId) {
-						go()->debug("OTP enforced, but no OTP secret available for user");
+						$this->setErrorMessage('OTP is required for this account');
+						$this->setErrorCode(ErrorCode::REQUIRED);
 						return false;
 					}
 					foreach ($user->groups as $groupId) {
 						if ($groupId === $otpSettings->enforceForGroupId) {
-							go()->debug("OTP enforced, but no OTP secret available for user");
+							$this->setErrorMessage('OTP is required for this account');
+							$this->setErrorCode(ErrorCode::REQUIRED);
 							return false;
 						}
 					}
