@@ -15,7 +15,7 @@ echo "Running: " . $rsyncCmd . "\n";
 system($rsyncCmd);
 
 //CHANGE TO DIR WHERE MANAGER IS ON
-chdir("/usr/local/share/groupoffice-25.0/www/");
+chdir("/usr/local/share/groupoffice-26.0/www/");
 $upgradeCmd = "sudo -u www-data php cli.php core/System/upgrade -c=".$manageConfig;
 echo "Running: " . $upgradeCmd . "\n";
 system($upgradeCmd);

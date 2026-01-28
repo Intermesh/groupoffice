@@ -381,6 +381,8 @@ GO.email.MessagesGrid = function(config){
 				],
 				listeners: {
 					search: function (me, v) {
+						debugger;
+						v = v.replace(/[\"\']/g, '');
 						config.store.baseParams['search'] = v;
 						config.store.load();
 

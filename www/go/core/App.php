@@ -416,13 +416,8 @@ namespace go\core {
 				return [];
 			}
 
-			try {
-				require($configFile);
-			} catch(Throwable $e) {
-				ErrorHandler::log("Failed to require config file: " . $configFile);
-				throw $e;
-			}
-			
+			require($configFile);
+
 			if(!isset($config)) {
 				$config = [];
 			}
