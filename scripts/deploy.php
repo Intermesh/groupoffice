@@ -21,6 +21,9 @@ if($result !== 0) {
 	exit(1);
 }
 
+// for studio to create modules
+system("chown www-data:www-data ../www/go/modules", $result);
+
 $rsyncCmd = "rsync -av --delete --exclude=.git ../ " . $target;
 echo "Running: " . $rsyncCmd . "\n";
 system($rsyncCmd, $result);
