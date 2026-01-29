@@ -71,6 +71,19 @@ export class CommentEditor extends Component {
 							ev.target.getToolbar().items.insert(6, hr());
 						},
 
+						attach: async ({file}) => {
+							this.mask();
+							const blob = await client.upload(file);
+							this.unmask();
+
+							const attachments = this.attachments.value;
+							attachments.push({
+								name: blob.name,
+								blobId: blob.id
+							})
+							this.attachments.value = attachments;
+						},
+
 						insertimage: ({file, img}) => {
 							root.mask();
 
@@ -97,7 +110,7 @@ export class CommentEditor extends Component {
 
 			this.attachments = arrayfield({
 				style: {padding: "0 1.2rem"},
-				cls: "vbox",
+				itemContainerCls: "",
 				name: "attachments",
 				buildField: (v) => {
 					return containerfield({
