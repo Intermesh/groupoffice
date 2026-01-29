@@ -1,3 +1,4 @@
+29-01-2026: 26.0.4
 - calendar: Fixed create link field in event dialog
 - Core: Cron jobs no output buffering and debug memory
 - Core: New config options for mail debugging (mailerDebugHost and mailerDebugPort)
