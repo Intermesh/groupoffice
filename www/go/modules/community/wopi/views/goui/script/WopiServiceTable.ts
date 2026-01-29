@@ -1,8 +1,6 @@
 import {btn, column, comp, datasourcestore, DataSourceStore, menu, t, Table, Window} from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
 import {WopiServiceDialog} from "./WopiServiceDialog";
-import {WopiServiceDS} from "@intermesh/community/wopi";
-import {noteDS} from "@intermesh/community/notes";
 
 export class WopiServiceTable extends Table<DataSourceStore> {
 	constructor() {
