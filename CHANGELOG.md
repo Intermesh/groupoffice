@@ -1,3 +1,7 @@
+- Core: fixed Security vulnerability Remote Code Execution (RCE)
+- Core: Only allow http(s) protocols in httpclient for security reasons. Fixes SSRF and File Read in WOPI service discovery.
+- Core: Remove debug and info from client with ctrl+f7 for security reasons
+
 29-01-2026: 26.0.4
 - calendar: Fixed create link field in event dialog
 - Core: Cron jobs no output buffering and debug memory
