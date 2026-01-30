@@ -478,10 +478,6 @@ namespace go\core {
 				}
 			}
 
-			if(Request::get()->getHeader('X-Debug') == "1") {
-				$config['debug'] = true;
-			}
-
 			if(!isset($config['debug_log'])) {
 				$config['debug_log'] = true;
 			}

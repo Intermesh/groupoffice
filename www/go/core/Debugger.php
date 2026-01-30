@@ -14,8 +14,6 @@ use go\core\util\DateTime;
  * Debugger class. All entries are stored and the view can render them eventually.
  * The JSON view returns them all.
  * 
- * The client can enable by sending an HTTP header X-Debug=1 (Use CTRL + F7 in webclient)
- * 
  * Example:
  * 
  * ````````````````````````````````````````````````````````````````````````````
