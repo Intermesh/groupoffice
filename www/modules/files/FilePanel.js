@@ -224,11 +224,7 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 							'<tpl if="muser_id">{musername}</tpl>'+
 							'</td>'+
 					'</tr>'+
-					
-					'<tr>'+
-						'<td>URL (Authenticated):</td>'+
-						'<td><a target="_blank" href="{url}">'+t("Right click to copy", "files")+'</a></td>'+
-					'</tr>'+
+
 										
 					'<tpl if="!GO.util.empty(locked_user_name)">'+
 						'<tr>'+
