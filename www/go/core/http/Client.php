@@ -38,7 +38,9 @@ class Client
 				->setOption(CURLOPT_ENCODING, "UTF-8")
 				->setOption(CURLOPT_USERAGENT, "Group-Office HttpClient " . go()->getVersion() . " (curl)")
 				->setOption(CURLOPT_CONNECTTIMEOUT, 5)
-				->setOption(CURLOPT_TIMEOUT, 360);
+				->setOption(CURLOPT_TIMEOUT, 360)
+				->setOption( CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS) // Only allow HTTP(s) to prevent unsafe  protocols like file:///
+				->setOption(CURLOPT_REDIR_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
 		}
 		return $this->curl;
 	}
