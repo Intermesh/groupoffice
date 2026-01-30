@@ -72,6 +72,9 @@ class HttpClient{
 		$this->setCurlOption(CURLOPT_CONNECTTIMEOUT, 5);
 		$this->setCurlOption(CURLOPT_TIMEOUT, 60);
 
+		$this->setCurlOption( CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS); // Only allow HTTP(s) to prevent unsafe  protocols like file:///
+		$this->setCurlOption(CURLOPT_REDIR_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
+
 	}
 	
 	/**
