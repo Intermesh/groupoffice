@@ -25,6 +25,7 @@ use Faker\Generator;
 use go\core\model\Acl;
 use go\core\model\Group;
 use go\core\model\User;
+use go\core\util\ArrayObject;
 use go\core\util\ClassFinder;
 use GO\Files\Filehandler\FilehandlerInterface;
 use GO\Base\Util\ReflectionClass;
@@ -149,16 +150,12 @@ class FilesModule extends \GO\Base\Module{
 
 				//For new framework
 				$cf = new ClassFinder();
-				self::$fileHandlers = array_merge(self::$fileHandlers, $cf->findByParent(FilehandlerInterface::class));
+				$handlers = new ArrayObject(array_merge(self::$fileHandlers, $cf->findByParent(FilehandlerInterface::class)));
 
-				// sort assistant last so that collabora and office are preferred over others
-				$firstValue = 'go\modules\community\wopi\filehandler\Collabora';
+				$handlers->sortValueOnTop('go\modules\community\wopi\filehandler\Collabora');
+				$handlers->sortValueOnTop('go\modules\community\pdfeditor\filehandler\PdfFileHandler');
 
-				usort(self::$fileHandlers, function ($a, $b) use ($firstValue) {
-					if ($a === $firstValue) return -1;
-					if ($b === $firstValue) return 1;
-					return $a <=> $b; // normal sort
-				});
+				self::$fileHandlers = $handlers->getArrayCopy();
 
 				\GO::cache()->set('files-file-handlers', self::$fileHandlers);
 			}

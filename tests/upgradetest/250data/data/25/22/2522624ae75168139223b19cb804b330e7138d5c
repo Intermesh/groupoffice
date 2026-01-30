@@ -1,0 +1,415 @@
+Return-Path: <servicenow-mailer@kerry.com>
+Delivered-To: sales@dakram.com
+Received: from smtp.group-office.com
+	by smtp.group-office.com with LMTP
+	id YLlMDRsEZWnwFDkArr4amA
+	(envelope-from <servicenow-mailer@kerry.com>)
+	for <sales@dakram.com>; Mon, 12 Jan 2026 15:24:27 +0100
+Received: from de-smtp-delivery-122.mimecast.com (de-smtp-delivery-122.mimecast.com [194.104.109.122])
+	by smtp.group-office.com (Postfix) with ESMTPS id 8FF59BFF9E
+	for <sales@dakram.com>; Mon, 12 Jan 2026 15:24:25 +0100 (CET)
+Authentication-Results: smtp.group-office.com;
+	dkim=pass header.d=kerry.com header.s=mimecast20240502 header.b=KCc76UN5;
+	spf=pass (smtp.group-office.com: domain of servicenow-mailer@kerry.com designates 194.104.109.122 as permitted sender) smtp.mailfrom=servicenow-mailer@kerry.com;
+	dmarc=pass (policy=reject) header.from=kerry.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kerry.com;
+	s=mimecast20240502; t=1768227865;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:list-unsubscribe;
+	bh=1Ah0yWi6Ne7NCztd2IWlGfX1hxTCR9b54lb4sVPzIew=;
+	b=KCc76UN5s5BOZyD5PreyEnc8aU3dQUpR1FUHEN7m6hVJq3kiKZcxaLyIUmQaX77UbygF94
+	fJDwgqwoTcoX3R5VshbEX8kunlD9WfXmkABUxABrJ4KsuMmi3mv/gQ1SAe0mSED56LqYRr
+	0zS8ITSc428ZkIQNJAL2/4kML5u0Im0=
+Received: from AM0PR83CU005.outbound.protection.outlook.com
+ (mail-westeuropeazon11020088.outbound.protection.outlook.com
+ [52.101.69.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ de-mta-33-Wt2H5W_hMCesP0nxQR7JxQ-1; Mon, 12 Jan 2026 15:24:22 +0100
+X-MC-Unique: Wt2H5W_hMCesP0nxQR7JxQ-1
+X-Mimecast-MFC-AGG-ID: Wt2H5W_hMCesP0nxQR7JxQ_1768227862
+Received: from AM9P250CA0018.EURP250.PROD.OUTLOOK.COM (2603:10a6:20b:21c::23)
+ by PA2PR09MB7036.eurprd09.prod.outlook.com (2603:10a6:102:406::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Mon, 12 Jan
+ 2026 14:24:18 +0000
+Received: from AMS1EPF00000048.eurprd04.prod.outlook.com
+ (2603:10a6:20b:21c:cafe::61) by AM9P250CA0018.outlook.office365.com
+ (2603:10a6:20b:21c::23) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9499.7 via Frontend Transport; Mon,
+ 12 Jan 2026 14:24:15 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 12.71.144.143)
+ smtp.mailfrom=kerry.com; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=oreject header.from=kerry.com
+Received: from USBELSMTP03.ict.kerryad.com (12.71.144.143) by
+ AMS1EPF00000048.mail.protection.outlook.com (10.167.16.132) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9520.1 via Frontend Transport; Mon, 12 Jan 2026 14:24:17 +0000
+Received: from app128038.ams201.service-now.com ([172.16.67.13]) by USBELSMTP03.ict.kerryad.com with Microsoft SMTPSVC(10.0.17763.1697);
+	 Mon, 12 Jan 2026 08:24:15 -0600
+Date: Mon, 12 Jan 2026 06:24:00 -0800 (PST)
+From: Global ICT Service Desk <servicenow-mailer@kerry.com>
+Reply-To: Global ICT Service Desk <servicenow-mailer@kerry.com>
+Cc: "sinead@deltaq.ie" <sinead@deltaq.ie>,
+	"account-ie@ophardt.com" <account-ie@ophardt.com>,
+	"accounts.payable@srtechnics.com" <accounts.payable@srtechnics.com>,
+	"apgalway@freudenbergmedical.com" <apgalway@freudenbergmedical.com>,
+	"martina@walshengineering.com" <martina@walshengineering.com>,
+	"accounts@westcorkdistillers.com" <accounts@westcorkdistillers.com>,
+	"siwaccounts@b-f.com" <siwaccounts@b-f.com>,
+	"creaghmedap@surmodics.com" <creaghmedap@surmodics.com>,
+	"finance@phoenixhealthcare.ie" <finance@phoenixhealthcare.ie>,
+	"accounts@smartersurfaces.com" <accounts@smartersurfaces.com>,
+	"accounts@liranalytical.com" <accounts@liranalytical.com>,
+	"admin@concord.ie" <admin@concord.ie>,
+	"tadhg@thmp.ie" <tadhg@thmp.ie>,
+	"einkauf@aero-coating.de" <einkauf@aero-coating.de>,
+	"accounts@emeraldbeautysystems.com" <accounts@emeraldbeautysystems.com>,
+	"bmcnally@kildarechillingco.ie" <bmcnally@kildarechillingco.ie>,
+	"robyn@imf.ie" <robyn@imf.ie>,
+	"accounts@alpha-decal.ie" <accounts@alpha-decal.ie>,
+	"christopher.a.henny@diageo.com" <christopher.a.henny@diageo.com>,
+	"mira.mainerich@unilever.com" <mira.mainerich@unilever.com>,
+	"maeve.murphy@galco.ie" <maeve.murphy@galco.ie>,
+	"invoicesie@pipelife.com" <invoicesie@pipelife.com>,
+	"deirdre.gaffney@interchem.ie" <deirdre.gaffney@interchem.ie>,
+	"david.ross@completeleisure.ie" <david.ross@completeleisure.ie>,
+	"accounts@irishbiofuels.ie" <accounts@irishbiofuels.ie>,
+	"lisa.blair@anopol.com" <lisa.blair@anopol.com>,
+	"mel.hyde@cevalogistics.com" <mel.hyde@cevalogistics.com>,
+	"logistics.astech@basf.com" <logistics.astech@basf.com>,
+	"finance.uk@borregaard.com" <finance.uk@borregaard.com>,
+	"radosveta_mitrusheva@cargill.com" <radosveta_mitrusheva@cargill.com>,
+	"sales@chemco.ie" <sales@chemco.ie>,
+	"accounts@hazstock.com" <accounts@hazstock.com>,
+	"info@dinox.com" <info@dinox.com>,
+	"michele.oldroyd@uk.dsv.com" <michele.oldroyd@uk.dsv.com>,
+	"arlimerick@three.ie" <arlimerick@three.ie>,
+	"mnc_cm_ner@allianz-trade.com" <mnc_cm_ner@allianz-trade.com>,
+	"admin@hazcheck.com" <admin@hazcheck.com>,
+	"ann.fagan@brenntag.com" <ann.fagan@brenntag.com>,
+	"lorraine@firstindustrialtyres.ie" <lorraine@firstindustrialtyres.ie>,
+	"administracion@global-talke.com" <administracion@global-talke.com>,
+	"kellie.costello@brenntag.com" <kellie.costello@brenntag.com>,
+	"jordi.sauratroyo@salins.com" <jordi.sauratroyo@salins.com>,
+	"credit@mlc.com" <credit@mlc.com>,
+	"adhaene@monumentchemical.com" <adhaene@monumentchemical.com>,
+	"enquiries@opalbond.co.uk" <enquiries@opalbond.co.uk>,
+	"bgrogan@paycheckplus.ie" <bgrogan@paycheckplus.ie>,
+	"hello@packaginglaundry.ie" <hello@packaginglaundry.ie>,
+	"jemma@qlog.ie" <jemma@qlog.ie>,
+	"enquiries@rssl.com" <enquiries@rssl.com>,
+	"jason@safestorage.ie" <jason@safestorage.ie>,
+	"cashallocation.ie@univar.com" <cashallocation.ie@univar.com>,
+	"sunleijuan@shuangtafood.com" <sunleijuan@shuangtafood.com>,
+	"akale@acggp.com" <akale@acggp.com>,
+	"orders@saltexpress.co.uk" <orders@saltexpress.co.uk>,
+	"marco.trapp@bcd-chemie.de" <marco.trapp@bcd-chemie.de>,
+	"ar_fsc@cargill.com" <ar_fsc@cargill.com>,
+	"remittance@certags.co.uk" <remittance@certags.co.uk>,
+	"mayte.martin@chemcogroup.com" <mayte.martin@chemcogroup.com>,
+	"info@charterlink.co.uk" <info@charterlink.co.uk>,
+	"sales@clintychemicals.co.uk" <sales@clintychemicals.co.uk>,
+	"info@cosmecochemicals.com" <info@cosmecochemicals.com>,
+	"rob.koster@caprichem.com" <rob.koster@caprichem.com>,
+	"sales@dakram.com" <sales@dakram.com>,
+	"traffic@spec-tran.co.uk" <traffic@spec-tran.co.uk>,
+	"ulrike.hahn@evonik.com" <ulrike.hahn@evonik.com>,
+	"nick.pickering@gichemicals.co.uk" <nick.pickering@gichemicals.co.uk>,
+	"pinty@hy-pigment.com" <pinty@hy-pigment.com>,
+	"leonz@188.com" <leonz@188.com>,
+	"accounts@hibiscus-plc.com" <accounts@hibiscus-plc.com>,
+	"danielle.page@ineos.com" <danielle.page@ineos.com>,
+	"admin@iscauk.com" <admin@iscauk.com>,
+	"ukfmaccountsreceivable@kpmg.co.uk" <ukfmaccountsreceivable@kpmg.co.uk>,
+	"info@oqema.co.uk" <info@oqema.co.uk>,
+	"xu@lilychem.com" <xu@lilychem.com>,
+	"customerremittanceeu@lyondellbasell.com"
+ <customerremittanceeu@lyondellbasell.com>,
+	"gbr.remit@maersk.com" <gbr.remit@maersk.com>,
+	"accounts@molekula.com" <accounts@molekula.com>,
+	"sales@mosselman.be" <sales@mosselman.be>,
+	"wahab.shaikh@neelikon.co.uk" <wahab.shaikh@neelikon.co.uk>,
+	"cseurope@pmc-group-com" <cseurope@pmc-group-com>,
+	"info@silmaco.com" <info@silmaco.com>,
+	"finance.creditcontrol@solventis.net" <finance.creditcontrol@solventis.net>,
+	"anne.lawlor@mineralstech.com" <anne.lawlor@mineralstech.com>,
+	"spectraeu@groupmh.com" <spectraeu@groupmh.com>,
+	"accounts@thyme-it.com" <accounts@thyme-it.com>,
+	"info@louisfitzeraldhotel.com" <info@louisfitzeraldhotel.com>,
+	"zwl@longxinchem.cn" <zwl@longxinchem.cn>,
+	"salessupport@zepeurope.com" <salessupport@zepeurope.com>,
+	"transportexpressbookings@gmail.com" <transportexpressbookings@gmail.com>,
+	"antra.zake@brenntag.lv" <antra.zake@brenntag.lv>,
+	"faturas.fornecedores@brenntag.pt" <faturas.fornecedores@brenntag.pt>,
+	"grazina.krenciute@brenntag.lt" <grazina.krenciute@brenntag.lt>,
+	"rodica.marineci@brenntag.ro" <rodica.marineci@brenntag.ro>,
+	"main@brenntag-nordic.com" <main@brenntag-nordic.com>,
+	"wsutton@brenntag.com" <wsutton@brenntag.com>
+Message-ID: <1133756146.126232.1768227840430@app128038.ams201.service-now.com>
+Subject: A new inquiry ticket has been created.
+MIME-Version: 1.0
+X-KG-ServiceNow-Generated: true
+X-ServiceNow-Source: Notification-8669ab5feb2deed00747fb0dcad0cd5f
+List-Unsubscribe: <mailto:servicenow-mailer@kerry.com?body=Sending+this+email+with+the+predefined+content+in+the+subject+and+body+will+unsubscribe+you+from+the+notification.%0D%0A%0D%0AUnsubscribe%3A%7B%22id%22%3A%228669ab5feb2deed00747fb0dcad0cd5f%22%2C%22token%22%3A%22c797e62132%22%7D &subject=Unsubscribe+from+%22INTM%3A+APO+-+Notify+Vendor+on+INQ+with+attachment%22>
+X-ServiceNow-SysEmail-Version: 2
+Precedence: bulk
+Auto-Submitted: auto-generated
+X-ServiceNow-Generated: true
+X-OriginalArrivalTime: 12 Jan 2026 14:24:16.0196 (UTC) FILETIME=[21BFD040:01DC83CF]
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AMS1EPF00000048:EE_|PA2PR09MB7036:EE_
+X-MS-Office365-Filtering-Correlation-Id: e11a80e0-4be8-4b2e-95f7-08de51e6455c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|36860700013|1800799024|82310400026|4022899009|3613699012|4053099003|4076899003|8096899003|19033499003
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?TFcxdVh0Uk5zL3JBQ1VDR25kUVpJOER2eTdWMXlDSGZ3YmVER080eW93UzJx?=
+ =?utf-8?B?djZsdzZWdGUwRDhNNStpLzlkYU1qMzJsZEZrZU5Xc1daSjhtcFRGclM4NlNi?=
+ =?utf-8?B?aEEzM2tMT2pqSFNPaXpBTTNpY0RqS05YcW1HeHMwN3dsUHdsT1o1VW5hNWdl?=
+ =?utf-8?B?QTNFOFZsZFYrMzBxa2tBMjZXM285Q2xiMzlsQ1MyTzRmTGx4cWdDd2QxOEs1?=
+ =?utf-8?B?VVhuWmdkRmN4K1pLNFRqc0hRdlB1VnVJVjA3V0xyQS8yZE8ySy81UEs3ckI3?=
+ =?utf-8?B?WDd2MXNqR2xYeXBydFNHQlJkRXp1R285VGUwOXRROGJNM0dGVVhLRDhVUzFO?=
+ =?utf-8?B?Nm4xUUxRYWNMdXRDcGRyN0JjeHl2bmE2Z2RXQzM3T0hlWFN4a0V5QVU1U1hk?=
+ =?utf-8?B?Q2s0KzRrK25LeDRDU2xXYU5oamxGcURHWmc3V2JaSCtRNStPdmlkSlVTeXVO?=
+ =?utf-8?B?WVlvODk1VWYxamVzMExHa3d3YlJPU1REU2gxWW9qYXdjUW0zNys4UHkxZlRz?=
+ =?utf-8?B?SDFGMCttaVFxVWZjMEVEcWx2dk9kelJKS1A5NGU2ak9Sa3pwclNMUGVvRk1k?=
+ =?utf-8?B?TjRjTWxxZkJvaVNvNFpuQ0UzeXp5Y3Y2OVVjeGMxTzM5ZmQzdi8wZE5xendU?=
+ =?utf-8?B?RUdWWGJ1ekg4S2tGbXhYVDFVcWJzVWd0ekRueDlNRGc4aEYvdEY0TWVWSDhs?=
+ =?utf-8?B?L2U1WlNUbFYyRHAxZWpPU0xldms1RE9xM3I2NFBaNFpKdENvU1FUNlFzVzVM?=
+ =?utf-8?B?bXJ5MTVUV0VpeXhGVEx4eFZzZ3BFbkovUjFLQ1Qxek0xajg0bmYyS25EUjlH?=
+ =?utf-8?B?WnRuMXd5YTdneFZTQjFxWEFMOWFvRTZUN2ZoZWloZnJFZHFuUWpycE82a0NO?=
+ =?utf-8?B?RFE3RUZOKzlnZysydXNJQzByWVRvN0FKcVFBRk1FWEN0cGpxNUh4RHhxL2F4?=
+ =?utf-8?B?MFFSR0hPSDFzWkZhOWJuODBoc0o5dzNMVDFJelpoK3U3U1pNaDhCa3F0R3NW?=
+ =?utf-8?B?di9mellYTUlSWC9oTDkya1dBMWNjaUJBYkdlcWhBVFJiWThVWVZZQllzT1RN?=
+ =?utf-8?B?YWxHVHVFYVAwalhPMlc4eW9laXBtK0VrbVQ2eGJwbmpoQXJEWVZPbE1lZEZN?=
+ =?utf-8?B?enB0RFlIcEJuMVZWSXQwbmNtOHpnQmU5bWwvTnBYcTRIWnlwNno2K0UzUTV3?=
+ =?utf-8?B?L09JUWxManMvSEp0dElyRkJOTlZINjJMZjgvRzJsNUExbkdhVC92bkI5dEpC?=
+ =?utf-8?B?TmFQdG8rRlVad1BlUCsxTkt6M3NCL3VDd0xQQXhROTlVV3VQeFk1WEZrdzgx?=
+ =?utf-8?B?SjJidHo3b1lwNTgwNXgrZWQ2RjJBVFBkbUVQSGRDV1hMY2MrY0NDRDBUNTR0?=
+ =?utf-8?B?UG5ENnNDSHdxWmsyWnN0UzZMbUJObmw3L01zcHlQaU1YMmhUM1BRNjFUWWdK?=
+ =?utf-8?B?ZEdKUHZhbVlRQTFsMnNRWElYNVprekZrR014RUxqQUMwWkpDK2FXOWUrMVhR?=
+ =?utf-8?B?WHcrOFFkMWRkV1VNNlVZL3VMamdGTkFtZGVHL0pYTlcwdi9NeVp6RlAxaEpR?=
+ =?utf-8?B?WkpBOWs2SDVwcE93OFJzYUpFR3lPejNPdC9EL1I2bVBpK3dnNXdVWFlyazFV?=
+ =?utf-8?B?Y3NUeEw3dGwweWJrd0dBdGZTaHZlRXc1RFdzcGJHb1BhbEVjR1g2S0ZrNU1m?=
+ =?utf-8?B?UDdIcklLUUZVVE5GY1RTWWRpdFVybm8rU3JUSk13WU8raTNzMy9Jdm4wYzRh?=
+ =?utf-8?B?UVFYT3l1VGpWY0JSNXh5Q3o4QWp3Wkd2MHZQUGdUaTBaZ3pJYXlLT0t6N1o4?=
+ =?utf-8?B?QnVRMXFmbXlNcEhqb1Y5NWpCMmlGRDFpaG5CQlRLT240MDFzb0IzdklrdHQz?=
+ =?utf-8?B?T21SUGxPc3RENDY0blU5bnpCb2xvdi9NeTh1SjZCRm5SYkQ2Q09WSlFIOUpj?=
+ =?utf-8?B?Z2xXOUt5UHUrT09XUVNZUFJydlNWazhUMjNhVnpBeEExZzZpcTFRdmdWWUMx?=
+ =?utf-8?B?MTUzbDJSV3pHWTc1bGcvaVRrOHU0dDUrMHQ1clpsaGJOdis4RXlGWUZUVDJu?=
+ =?utf-8?B?cW51QXVlRVJWSS84Y2ZxR3N3aldZb25kRVIrUT09?=
+X-Forefront-Antispam-Report: CIP:12.71.144.143;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:USBELSMTP03.ict.kerryad.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700013)(1800799024)(82310400026)(4022899009)(3613699012)(4053099003)(4076899003)(8096899003)(19033499003);DIR:OUT;SFP:1102
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: Y3FqT2JYoRkVEj7PYH1HhOQ3g4WvWkN67VWS/wqMPHWVrZgjFjQhAXw8foeQK6lxBkO2awQ2Pj9nvGrJk3I32rXWlNNSayr2pvRUa2yb7z9NaYpEuX7IbWu02ExQXDc3ewKVbLqZA9P7QoXe0GEeLpd7FSaReuJj4pSV61WI03Ohr4V1n6LMKYxFK/Oup3RnNtIMRJ40D13RJJtn0X9hSp1xoMkPRi2Y0AAPyv/onn+gfKuJw8rjluN9F8nWdIIhpTuGUTBNhTNu2KAyOqEFG7G9Xurua6EKpy5jqx3C7BGaQFdYg8/M4MHdsJhUHtBnMUG4gKDFNvG2zlGIxcc3Yab7Fi0Y5OQOZEUgIuGdkMfY8U92kl3rdu/P79LQpWLkZsUPQZfvEZmvbfos9lMli/29EOzgvu7huqI6za4v/bLq/Pw9lQBSJDGNrdWsJsZZ4hZG28iYm+g2oufn2XakgXfnPPS41b8Ug+OeVM+9T9+TPwHN+tLSNdsqkogvc43hOAWoFwDD1g+3j3qD3uJ4rptwDm1bXuHdfaxbBUCMJ55vJC2kogzAHJSO3eF+yx2SZoggrjHO9ul0/egBOK/YpoRRtrFaAM2gqBpP3HpHcsuCGAqTJvh6AwlPP8REIYO5
+X-OriginatorOrg: kerry.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jan 2026 14:24:17.8312
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e11a80e0-4be8-4b2e-95f7-08de51e6455c
+X-MS-Exchange-CrossTenant-Id: 524eb200-d02f-44fd-af53-c96d477d1930
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=524eb200-d02f-44fd-af53-c96d477d1930;Ip=[12.71.144.143];Helo=[USBELSMTP03.ict.kerryad.com]
+X-MS-Exchange-CrossTenant-AuthSource: AMS1EPF00000048.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA2PR09MB7036
+X-Mimecast-Spam-Score: 1
+X-Mimecast-MFC-PROC-ID: Fhb9Fobtw7H-17wmWiDEOFkbXS6XSzjyZgqtbg11x3g_1768227862
+X-Mimecast-Originator: kerry.com
+Content-Type: multipart/related; 
+	boundary="----=_Part_126231_1572282612.1768227840420"
+X-Rspamd-Action: no action
+X-Rspamd-Server: smtp
+X-Rspamd-Queue-Id: 8FF59BFF9E
+X-Spamd-Result: default: False [0.39 / 20.00];
+	MISSING_TO(2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
+	DMARC_POLICY_ALLOW(-1.00)[kerry.com,reject];
+	R_DKIM_ALLOW(-1.00)[kerry.com:s=mimecast20240502];
+	R_SPF_ALLOW(-1.00)[+ip4:194.104.109.0/24];
+	MIME_HTML_ONLY(0.20)[];
+	RWL_MAILSPIKE_VERYGOOD(-0.20)[194.104.109.122:from];
+	MIME_GOOD(-0.10)[multipart/related];
+	HAS_LIST_UNSUB(-0.01)[];
+	TO_MATCH_ENVRCPT_SOME(0.00)[];
+	RCVD_IN_DNSWL_NONE(0.00)[194.104.109.122:from,52.101.69.88:received];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_EQ_ADDR_ALL(0.00)[];
+	REPLYTO_EQ_FROM(0.00)[];
+	FREEMAIL_CC(0.00)[deltaq.ie,ophardt.com,srtechnics.com,freudenbergmedical.com,walshengineering.com,westcorkdistillers.com,b-f.com,surmodics.com,phoenixhealthcare.ie,smartersurfaces.com,liranalytical.com,concord.ie,thmp.ie,aero-coating.de,emeraldbeautysystems.com,kildarechillingco.ie,imf.ie,alpha-decal.ie,diageo.com,unilever.com,galco.ie,pipelife.com,interchem.ie,completeleisure.ie,irishbiofuels.ie,anopol.com,cevalogistics.com,basf.com,borregaard.com,cargill.com,chemco.ie,hazstock.com,dinox.com,uk.dsv.com,three.ie,allianz-trade.com,hazcheck.com,brenntag.com,firstindustrialtyres.ie,global-talke.com,salins.com,mlc.com,monumentchemical.com,opalbond.co.uk,paycheckplus.ie,packaginglaundry.ie,qlog.ie,rssl.com,safestorage.ie,univar.com,shuangtafood.com,acggp.com,saltexpress.co.uk,bcd-chemie.de,certags.co.uk,chemcogroup.com,charterlink.co.uk,clintychemicals.co.uk,cosmecochemicals.com,caprichem.com,dakram.com,spec-tran.co.uk,evonik.com,gichemicals.co.uk,hy-pigment.com,188.com,hibiscus-plc.com
+ ,ineos.com,iscauk.com,kpmg.co.uk,oqema.co.uk,lilychem.com,lyondellbasell.com,maersk.com,molekula.com,mosselman.be,neelikon.co.uk,pmc-group-com,silmaco.com,solventis.net,mineralstech.com,groupmh.com,thyme-it.com,louisfitzeraldhotel.com,longxinchem.cn,zepeurope.com,gmail.com,brenntag.lv,brenntag.pt,brenntag.lt,brenntag.ro,brenntag-nordic.com];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[95];
+	DKIM_TRACE(0.00)[kerry.com:+];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:~,2:~];
+	ASN(0.00)[asn:39588, ipnet:194.104.108.0/23, country:GB];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	ARC_NA(0.00)[];
+	HAS_REPLYTO(0.00)[servicenow-mailer@kerry.com]
+
+
+
+------=_Part_126231_1572282612.1768227840420
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset=UTF-8
+
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8">
+</head>
+<body>
+<p><img src=3D"cid:kerry-logo.png@SNC.35a7bc4f94027f63" height=3D"50" alt=
+=3D"" data-library=3D"false"></p>
+<p><span style=3D"font-size: 12pt;"></span></p>
+<p>Hello,</p>
+<p></p>
+<p>Thank you for contacting Kerry's Accounts Payable team. Your email has b=
+een received.<br>
+Ticket number INVC0112092 has been created for this inquiry.</p>
+<p><strong>----------------------------------------------------------------=
+-------------------</strong></p>
+<p><strong>Ticket Updates</strong></p>
+<p><strong></strong></p>
+<div>
+<div><strong><span colspan=3D"2">
+<hr>
+</span></strong></div>
+<div style=3D""><strong><span class=3D"tdwrap"><strong>2026-01-12 14:21:13 =
+GMT - System</strong></span><span style=3D"float:right;"><sup> Additional c=
+omments</sup></span></strong></div>
+<div style=3D""><strong><span colspan=3D"2"><span style=3D"word-wrap:break-=
+word;display:block;">[EXTERNAL] Receipt Acknowledgement: 1787<br>
+<br>
+<div>Dear Customer,<br>
+<br>
+We thank you for your order, which we are working on, the delivery date<br>
+is being finalised, and we=E2=80=99ll confirm the most accurate schedule<br=
+>
+shortly to best meet your expectations. Please check all details<br>
+carefully and advise us if there are any discrepancies or errors.<br>
+If adjustments are necessary, please contact our Customer Service<br>
+colleague mentioned on the acknowledgement.<br>
+<br>
+Kind Regards,<br>
+Brenntag Team<br>
+<br>
+Attachment:<br>
+- Acknowledgement of Sales Order: 1787<br>
+- Brenntag Terms and Conditions of Sale<br>
+<br>
+<br>
+________________________________<br>
+<br>
+This e-mail and any files transmitted are confidential and may also be priv=
+ileged. This communication is intended solely for the use of the individual=
+ or entity to which it is addressed. If you are the intended recipient of t=
+his information, please treat it
+ as confidential information and take all necessary action to keep it secur=
+e. If you are not the intended recipient, you are hereby notified that any =
+use, dissemination, forwarding, or copying of this communication is strictl=
+y prohibited. If you have received
+ this communication in error, please notify the sender at once by reply e-m=
+ail and destroy all copies of the original message. Nothing in this message=
+ constitutes an offer, acceptance or legally binding obligation unless spec=
+ifically stated. This email may
+ be sent on behalf of Kerry Group plc or any of its subsidiaries (=E2=80=9C=
+Kerry=E2=80=9D). A list of principal subsidiaries is available in the lates=
+t annual report, available on our website. Kerry accepts no liability for a=
+ny loss or damage caused by viruses or for any inaccuracies
+ in the content or attachments of this e-mail.<br>
+<br>
+Kerry Group plc | Registered in Ireland | Company Number: 111471 | Register=
+ed Office: Prince's Street, Tralee, Co. Kerry, Ireland.<br>
+________________________________</div>
+</span></span></strong></div>
+</div>
+<p></p>
+<p><strong>----------------------------------------------------------------=
+-------------------</strong></p>
+<p>=E2=97=8F Kindly allow 2 working days for us to review and provide an up=
+date on your request.<br>
+=E2=97=8F If it is an invoice submission email, no response will be made. Y=
+our invoice will be processed in our system within 7 days if no other discr=
+epancies and payment will be scheduled according to agreed payment terms.<b=
+r>
+&nbsp;<br>
+**It is important to use the same ticket number INVC0112092 for the same in=
+voice /payment enquiry follow ups. The tickets will get closed automaticall=
+y if no responses are received within 7 days. Also, please do not use an ol=
+d ticket number or email trail to
+ submit a new request or query.&nbsp;</p>
+<p>Thanks,</p>
+<p>Accounts Payable Team</p>
+<p></p>
+<p></p>
+<div>&nbsp;</div>
+<div style=3D"display:inline">Ref:MSG83794864_B1REKomjW0fOTGZQPYa</div>
+<br>
+<br>
+<hr>
+<br>
+This e-mail and any files transmitted are confidential and may also be priv=
+ileged. This communication is intended solely for the use of the individual=
+ or entity to which it is addressed. If you are the intended recipient of t=
+his information, please treat it
+ as confidential information and take all necessary action to keep it secur=
+e. If you are not the intended recipient, you are hereby notified that any =
+use, dissemination, forwarding, or copying of this communication is strictl=
+y prohibited. If you have received
+ this communication in error, please notify the sender at once by reply e-m=
+ail and destroy all copies of the original message. Nothing in this message=
+ constitutes an offer, acceptance or legally binding obligation unless spec=
+ifically stated. This email may
+ be sent on behalf of Kerry Group plc or any of its subsidiaries (=E2=80=9C=
+Kerry=E2=80=9D). A list of principal subsidiaries is available in the lates=
+t annual report, available on our website. Kerry accepts no liability for a=
+ny loss or damage caused by viruses or for any inaccuracies
+ in the content or attachments of this e-mail.<br>
+<br>
+Kerry Group plc | Registered in Ireland | Company Number: 111471 | Register=
+ed Office: Prince's Street, Tralee, Co. Kerry, Ireland.
+<br>
+<hr>
+<br>
+</body>
+</html>
+
+------=_Part_126231_1572282612.1768227840420
+Content-Type: image/png; name=image
+Content-Transfer-Encoding: base64
+Content-Disposition: inline; filename=image
+Content-ID: <kerry-logo.png@SNC.35a7bc4f94027f63>
+
+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
+------=_Part_126231_1572282612.1768227840420--
+
+

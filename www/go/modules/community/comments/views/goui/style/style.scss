@@ -61,8 +61,19 @@
   margin: 0.3rem;
   overflow: hidden;
   text-overflow: ellipsis;
+  float: left;
+  .goui-display-field{
+
+    .wrap {
+      background-color: var(--bg-mid);
+    }
+
+  }
 }
 
 .goui .comment-editor-fieldset {
   align-items: unset;
+  .goui-form-field {
+    min-width: 0;
+  }
 }

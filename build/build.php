@@ -341,7 +341,6 @@ class Builder
 		}
 
 		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/.git*');
-		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/kanban');
 
 
 		//needs to be open source as it's used by Module files

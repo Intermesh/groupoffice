@@ -17,6 +17,7 @@ export class PreferencesPanel extends AppSettingsPanel {
 	private form: DataSourceForm<User>;
 	private calendarStore: DataSourceStore<JmapDataSource<DefaultEntity>>;
 	private personalCalendarStore: DataSourceStore<JmapDataSource<DefaultEntity>>;
+	private processFieldSet: Fieldset;
 
 	constructor() {
 		super();
@@ -91,7 +92,8 @@ export class PreferencesPanel extends AppSettingsPanel {
 						]})
 					//,checkbox({name:'useTimeZones', label: t('Enable multiple time zone support')}),
 				),
-				fieldset({legend:t('Process e-mail in')+': '+client.user.email},
+				this.processFieldSet = fieldset({legend:t('Process e-mail in')+': '+client.user.email},
+
 					checkbox({name:'autoAddInvitations',label:t('Automatically add invitation to your calendar'),
 						hint: t('Whenever an event invitation is received, add the event to your default calendar'),
 						listeners: {'setvalue': ({target}) => {target.nextSibling()!.hidden = !target.value}}}),
@@ -119,6 +121,8 @@ export class PreferencesPanel extends AppSettingsPanel {
 	async load(user:User) {
 		this.form.value = user;
 		this.form.currentId = user.id;
+
+		this.processFieldSet.legend = t('Process e-mail in')+ ': '+user.email;
 
 		this.personalCalendarStore
 			.setFilter('owner', {ownerId: user.id})

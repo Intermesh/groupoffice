@@ -1,7 +1,7 @@
 <?php
 namespace go\modules\community\wopi\controller;
 
-use go\modules\business\license\controller\EntityController;
+use go\core\jmap\EntityController;
 use go\modules\community\wopi\model;
 
 /**

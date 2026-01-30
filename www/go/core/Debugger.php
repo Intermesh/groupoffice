@@ -14,8 +14,6 @@ use go\core\util\DateTime;
  * Debugger class. All entries are stored and the view can render them eventually.
  * The JSON view returns them all.
  * 
- * The client can enable by sending an HTTP header X-Debug=1 (Use CTRL + F7 in webclient)
- * 
  * Example:
  * 
  * ````````````````````````````````````````````````````````````````````````````
@@ -134,6 +132,14 @@ class Debugger {
 		$this->currentGroup .= ", Peak memory usage: " . number_format(memory_get_peak_usage() / (1024 * 1024), 2) . 'MB';			
 
 		$this->entries[] = ['groupEnd', null];
+	}
+
+	/**
+	 * Output current memory usage in MB
+	 * @return void
+	 */
+	public function debugMemoryUsage() : void {
+		$this->log("Memory used: ". number_format(memory_get_usage() / (1024 * 1024), 2) .'MB');
 	}
 
 	/**

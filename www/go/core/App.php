@@ -441,13 +441,8 @@ namespace go\core {
 				return [];
 			}
 
-			try {
-				require($configFile);
-			} catch(Throwable $e) {
-				ErrorHandler::log("Failed to require config file: " . $configFile);
-				throw $e;
-			}
-			
+			require($configFile);
+
 			if(!isset($config)) {
 				$config = [];
 			}
@@ -506,10 +501,6 @@ namespace go\core {
 				{
 					$config['cache'] = cache\Disk::class;
 				}
-			}
-
-			if(Request::get()->getHeader('X-Debug') == "1") {
-				$config['debug'] = true;
 			}
 
 			if(!isset($config['debug_log'])) {
@@ -985,7 +976,10 @@ namespace go\core {
 				
 
 			} else {
-				$file = go()->getEnvironment()->getInstallFolder()->getFile('go/modules/' . $package . '/' . $name .'/icon.png');	
+				$file = go()->getEnvironment()->getInstallFolder()->getFile('go/modules/' . $package . '/' . $name .'/icon.png');
+				if(!$file->exists()) {
+					$file = go()->getEnvironment()->getInstallFolder()->getFile('go/modules/' . $package . '/' . $name . '/icon.svg');
+				}
 			}
 
 			if(!$file->exists()) {

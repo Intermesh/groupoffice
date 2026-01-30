@@ -137,7 +137,6 @@ class Service extends AclOwnerEntity
 
 		$result = $c->get($this->url . '/hosting/discovery');
 
-		go()->debug($result);
 		$discoveryParsed = simplexml_load_string($result['body']);
 
 		if (!$discoveryParsed) {
@@ -148,8 +147,6 @@ class Service extends AclOwnerEntity
 		$apps = $discoveryParsed->xpath('/wopi-discovery/net-zone/app');
 
 		$this->actions = [];
-
-		$capabilitiesUrl = null;
 
 		foreach ($apps as $app) {
 
@@ -173,7 +170,6 @@ class Service extends AclOwnerEntity
 					$this->name = "Office Online";
 					$this->type = self::TYPE_OFFICE_ONLINE;
 				}
-
 			}
 		}
 	}

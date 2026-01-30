@@ -219,12 +219,14 @@ GO.mainLayout.on('render', function () {
 		}
 		e.dataTransfer.dropEffect = "none";
 		e.preventDefault();
+		console.log("File over");
 	},false);
 	document.addEventListener("drop",function(e){
 		if(!e.dataTransfer || !e.dataTransfer.items.length || e.dataTransfer.items[0].kind != 'file') {
 			return;
 		}
 		e.preventDefault();
+		console.log("File dropped");
 	},false);
 
 

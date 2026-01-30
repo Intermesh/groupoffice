@@ -57,10 +57,14 @@ GO.base.email.EmailEditorPanel = function(config){
 	this.htmlEditor.on("initialize", () => {
 		setTimeout(() => {
 			this.htmlEditor.getDoc().addEventListener("dragenter", this.onDragEnter.createDelegate(this))
-			this.htmlEditor.getDoc().addEventListener("dragleave", () => {
-				this.onDropZone = false;
-				this.onDragLeave();
+			this.htmlEditor.getDoc().addEventListener("dragleave", (e) => {
+				this.onDragLeave(e);
 			})
+			this.htmlEditor.getDoc().addEventListener("dragover", (e) => {
+				e.dataTransfer.dropEffect = "copy";
+				e.preventDefault();
+				e.stopPropagation();
+			});
 
 			this.dropZone.getEl().dom.addEventListener("drop", this.onDrop.createDelegate(this));
 			this.dropZone.getEl().dom.addEventListener("dragover", (e) => {
@@ -68,16 +72,10 @@ GO.base.email.EmailEditorPanel = function(config){
 				e.preventDefault();
 				e.stopPropagation();
 			});
-			this.dropZone.getEl().dom.addEventListener("dragenter", (e) => {
-				e.preventDefault();
-				e.stopPropagation();
-				this.onDropZone = true;
-			});
 
-			this.dropZone.getEl().dom.addEventListener("dragleave", (e) => {
-				this.onDropZone = false;
+			this.body.dom.addEventListener("dragleave", (e) => {
 				e.preventDefault();
-				this.onDragLeave();
+				this.onDragLeave(e);
 			});
 		})
 	})
@@ -280,7 +278,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 
 	htmlEditorAttach : function(htmlEditor,blob, file, img) {
 		this.onDropZone = false;
-		this.onDragLeave();
+		this.closeDropZone();
 
 		if(img) {
 			//inline will be processed from body
@@ -511,7 +509,6 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	 * @returns {string}
 	 */
 	onNotifyOver(dd,e,data) {
-		console.log('onNotifyOver')
 		if(!this.dropZone.isVisible()) {
 			this.dropZone.show();
 			this.htmlEditor.hide();
@@ -529,7 +526,6 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	 * @returns {boolean}
 	 */
 	onNotifyOut: function(dd,e,data) {
-		console.log('onNotifyOut')
 		this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
 		this.dropZone.hide();
 		this.htmlEditor.show();
@@ -547,7 +543,6 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	 * @returns {boolean}
 	 */
 	onNotifyDrop: function(dd,e,data) {
-		console.log('onNotifyDrop')
 		if(!data.grid) {
 			this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
 			return false;
@@ -597,9 +592,6 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	 * @param e
 	 */
 	onDragEnter: function(e) {
-
-		this.onDropZone = true;
-
 		if (!e.dataTransfer || !e.dataTransfer.files) {
 			return;
 		}
@@ -611,7 +603,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 			this.setEditorHeight();
 
 			document.body.addEventListener("dragend", () => {
-				this.onDragLeave();
+				this.closeDropZone();
 			}, {once: true})
 		}
 	},
@@ -622,19 +614,18 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	 * @param e
 	 */
 	onDragLeave: function(e) {
+		e.preventDefault();
+		if(!this.htmlEditor.getDoc().contains(e.relatedTarget) && !this.body.dom.contains(e.relatedTarget)) {
 
-		if(e) {
-			e.preventDefault();
+			this.closeDropZone();
 		}
-		// e.stopPropagation();
-		setTimeout(() => {
-			if(!this.onDropZone) {
-				this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
-				this.dropZone.hide();
-				this.setEditorHeight();
-			}
-		}, 200)
 		return true;
+	},
+
+	closeDropZone: function() {
+		this.attachmentsView.fireEvent('attachmentschanged', this.attachmentsView);
+		this.dropZone.hide();
+		this.setEditorHeight();
 	},
 
 	/**
@@ -643,10 +634,8 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	 * @param e
 	 */
 	onDrop: function(e) {
-		this.onDropZone = false;
 		if (!e.dataTransfer || !e.dataTransfer.files) {
-			this.dropZone.hide();
-			this.setEditorHeight();
+			this.closeDropZone();
 			return;
 		}
 

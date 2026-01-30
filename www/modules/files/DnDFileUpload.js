@@ -51,25 +51,27 @@ GO.files.DnDFileUpload = function(doneCallback, element) {
 	}
 
 	return function(fb) {
-		var childCount = 0;
-		element.dom.addEventListener('dragenter', function (e) {
-			e.preventDefault();
-			e.stopPropagation();
-			childCount++;
-			element.addClass('x-dd-over');
-		});
-
-		element.dom.addEventListener('dragleave', function (e) {
-			e.preventDefault();
-			childCount--;
-			if (childCount === 0) {
-				element.removeClass('x-dd-over');
-			}
-		});
+		// element.dom.addEventListener('dragenter', function (e) {
+		// 	e.preventDefault();
+		// 	e.stopPropagation();
+		//
+		// 	element.addClass('x-dd-over');
+		// });
+		//
+		// element.dom.addEventListener('dragleave', function (e) {
+		// 	e.preventDefault();
+		//
+		//
+		// 	if (!element.dom.contains(e.relatedTarget)) {
+		// 		element.removeClass("x-dd-over");
+		// 	}
+		//
+		// });
 
 		element.dom.addEventListener('dragover', function (e) {
 			e.preventDefault(); // THIS IS NEEDED
 			e.stopPropagation();
+			e.dataTransfer.dropEffect = 'copy';
 		});
 
 		element.dom.addEventListener('drop', function (e) {

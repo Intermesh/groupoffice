@@ -162,7 +162,6 @@ views/Extjs3/javascript/base/model/ImportDialog.js
 views/Extjs3/javascript/Base64.js
 
 views/Extjs3/javascript/CreateModifyTemplate.js
-views/Extjs3/javascript/debug.js
 
 views/Extjs3/javascript/grids/GORowEditor.js
 views/Extjs3/javascript/SortableDataView.js
