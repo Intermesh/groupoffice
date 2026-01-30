@@ -1,4 +1,4 @@
-import {appSettings, appSystemSettings, client, modules} from "@intermesh/groupoffice-core";
+import {moduleSettings, appSystemSettings, client, modules} from "@intermesh/groupoffice-core";
 import {t, translate} from "@intermesh/goui";
 import {SystemSettings} from "./SystemSettings.js";
 import {Settings} from "./Settings.js";
@@ -26,7 +26,7 @@ modules.register(  {
 			// });
 			//modules.addMainPanel("calendar", "Calendar", 'calendar', t('Calendar'), () => ui);
 
-			appSettings.addPanel(SystemSettings)
+			moduleSettings.addPanel(SystemSettings)
 
 		});
 	}

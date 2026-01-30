@@ -1,4 +1,4 @@
-import {appSettings, client, jmapds, modules, principalDS} from "@intermesh/groupoffice-core";
+import {moduleSettings, client, jmapds, modules, principalDS} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {router} from "@intermesh/groupoffice-core";
 import {datasourcestore, t as coreT, E, translate, DateTime, Window, h3, Button} from "@intermesh/goui";
@@ -377,6 +377,6 @@ modules.register(  {
 		// 	return new PreferencesPanel();
 		// });
 
-		appSettings.addPanel(PreferencesPanel);
+		moduleSettings.addPanel(PreferencesPanel);
 	}
 });

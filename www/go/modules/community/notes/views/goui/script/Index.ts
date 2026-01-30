@@ -1,7 +1,7 @@
 import {
 	AclItemEntity,
 	AclOwnerEntity,
-	appSettings,
+	moduleSettings,
 	client,
 	JmapDataSource,
 	modules,
@@ -42,7 +42,7 @@ modules.register({
 			// 	return new SettingsPanel();
 			// });
 
-			appSettings.addPanel(SettingsPanel);
+			moduleSettings.addPanel(SettingsPanel);
 
 		});
 	},
