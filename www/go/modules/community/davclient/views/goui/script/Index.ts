@@ -1,6 +1,7 @@
-import {appSettings, client, modules} from "@intermesh/groupoffice-core";
+import {appSettings, appSystemSettings, client, modules} from "@intermesh/groupoffice-core";
 import {t, translate} from "@intermesh/goui";
 import {SystemSettings} from "./SystemSettings.js";
+import {Settings} from "./Settings.js";
 
 modules.register(  {
 	package: "community",
@@ -30,3 +31,10 @@ modules.register(  {
 		});
 	}
 });
+
+client.on("authenticated",  ({session}) => {
+	if (session.isAdmin) {
+		appSystemSettings.addPanel("community", "davclient", Settings);
+	}
+});
+

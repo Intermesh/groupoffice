@@ -1,6 +1,7 @@
-import {client, modules} from "@intermesh/groupoffice-core";
+import {appSystemSettings, client, modules} from "@intermesh/groupoffice-core";
 import {Settings} from "./Settings.js";
-import {CalendarEvent, CalendarItem, onlineMeetingServices} from "@intermesh/community/calendar";
+import {SystemSettings} from "./SystemSettings.js";
+import {onlineMeetingServices} from "@intermesh/community/calendar";
 
 
 
@@ -21,8 +22,9 @@ modules.register({
 			}
 
 			if(session.capabilities["go:community:jitsimeet"].mayManage) {
+				// @deprecated
 				modules.addSystemSettingsPanel("community", "jitsimeet", "jitsimeet", "Jitsi Meet", "video_call", () => {
-					return new Settings();
+					return new SystemSettings();
 				});
 			}
 
@@ -41,4 +43,11 @@ modules.register({
 			});
 		});
 	}
-})
+});
+
+client.on("authenticated",  ({session}) => {
+
+	if (session.isAdmin) {
+		appSystemSettings.addPanel("community", "jitsimeet", Settings);
+	}
+});

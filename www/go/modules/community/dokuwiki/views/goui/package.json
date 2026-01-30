@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "name": "maildomains",
+  "name": "dokuwiki",
   "devDependencies": {
     "concurrently": "latest",
     "esbuild": "latest",
@@ -8,7 +8,7 @@
     "typescript": "latest"
   },
   "scripts": {
-    "start maildomains": "npm run build:clean && concurrently --kill-others \"npm run start:ts\" \"npm run start:dts\"  \"npm run start:sass\"",
+    "start dokuwiki": "npm run build:clean && concurrently --kill-others \"npm run start:ts\" \"npm run start:dts\"  \"npm run start:sass\"",
     "start:ts": "node ../../../../../../views/goui/esbuild-module.mjs watch",
     "start:dts": "npx tsc --declaration --emitDeclarationOnly --watch",
     "start:sass": "npx sass --watch style:dist",

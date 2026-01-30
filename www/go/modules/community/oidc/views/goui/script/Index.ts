@@ -1,6 +1,7 @@
-import {client, JmapDataSource, modules} from "@intermesh/groupoffice-core";
+import {appSystemSettings, client, JmapDataSource, modules} from "@intermesh/groupoffice-core";
 import {Settings} from "./Settings.js";
 import {CalendarEvent, CalendarItem, onlineMeetingServices} from "@intermesh/community/calendar";
+import {SystemSettings} from "./SystemSettings";
 
 
 modules.register({
@@ -15,10 +16,16 @@ modules.register({
 			}
 
 			if (session.capabilities["go:community:oidc"].mayManage) {
+				// @deprecated
 				modules.addSystemSettingsPanel("community", "oidc", "oidc", "OIDC", "app_registration", () => {
-					return new Settings();
+					return new SystemSettings();
 				});
 			}
+
+			if (session.isAdmin) {
+				appSystemSettings.addPanel("community", "oidc", Settings);
+			}
+
 		});
 	},
 	entities: [

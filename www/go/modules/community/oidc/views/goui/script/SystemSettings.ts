@@ -3,7 +3,7 @@ import {
 	column,
 	Component,
 	datasourcestore,
-	EntityID, Fieldset, h3,
+	EntityID, h3,
 	hr,
 	menu,
 	mstbar,
@@ -15,17 +15,16 @@ import {
 import {OIDConnectClientDS} from "@intermesh/community/oidc";
 import {OIDConnectClientDialog} from "./OIDConnectClientDialog.js";
 import {jmapds} from "@intermesh/groupoffice-core";
-
-export class Settings extends Fieldset {
-
-
+/*
+@deprocated - the GOUI System settings will use Settings instead
+ */
+export class SystemSettings extends Component {
 
 	constructor() {
 		super();
 
-		this.legend =t("OpenID Connect clients");
 
-		this.cls = "vbox pad";
+		this.cls = "vbox";
 
 		const store = datasourcestore({
 			dataSource: OIDConnectClientDS,
@@ -87,8 +86,15 @@ export class Settings extends Fieldset {
 
 		this.items.add(
 			tbar({},
+				h3(t("OpenID Connect clients")),
 				'->',
-
+				// searchbtn({
+				// 	listeners: {
+				// 		input: ( {text}) => {
+				// 			tbl!.store.setFilter("text", {text}).load()
+				// 		}
+				// 	}
+				// }),
 				btn({
 					cls: "primary filled",
 					icon: "add",
