@@ -124,26 +124,23 @@ class Service extends AclOwnerEntity
     return true;
   }
 
-  private function discover()
-  {
+  private function discover(): void
+	{
     $c = new Client();
 		$c->setOption(CURLOPT_TIMEOUT, 10);
 
     $result = $c->get($this->url . '/hosting/discovery');
 
-    go()->debug($result);
     $discoveryParsed = simplexml_load_string($result['body']);
 
     if (!$discoveryParsed) {
       $this->setValidationError('url', ErrorCode::INVALID_INPUT, "The URL is not a valid WOPI source");
-      return false;
+			return;
     }
 
     $apps = $discoveryParsed->xpath('/wopi-discovery/net-zone/app');
 
     $this->actions = [];
-
-    $capabilitiesUrl = null;
 
     foreach ($apps as $app) {
 
@@ -168,7 +165,6 @@ class Service extends AclOwnerEntity
           $this->name = "Office Online";
           $this->type = self::TYPE_OFFICE_ONLINE;
         }
-       
       }
     }
   }
