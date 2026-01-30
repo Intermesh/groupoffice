@@ -34,6 +34,8 @@ class Client {
 
 	    $this->setOption(CURLOPT_CONNECTTIMEOUT, 5);
 	    $this->setOption(CURLOPT_TIMEOUT, 360);
+			$this->setOption( CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS) // Only allow HTTP(s) to prevent unsafe  protocols like file:///
+			$this->setOption(CURLOPT_REDIR_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
     }
     return $this->curl;
   }
