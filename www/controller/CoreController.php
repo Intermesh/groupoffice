@@ -36,78 +36,8 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		
 		return $response;
 	}
-	
-	protected function actionDebug($params){
-		
-		if(empty(GO::session()->values['debug'])){
-			// if(!GO::user()->isAdmin())
-			// 	throw new \GO\Base\Exception\AccessDenied("Debugging can only be enabled by an admin. Tip: You can enable it as admin and switch to any user with the 'Switch user' module.");
-		
-			GO::session()->values['debug']=true;
-		}
-		
-		GO::session()->values['debugSql']=!empty($params['debugSql']);
-		
-		// The default length of the tail command, when passing the "length" parameter this can be increased or decreased
-		$length = 300;
-		if(isset($params['length'])){
-			$length = $params['length'];
-		}
-		
-		$debugFile = new \GO\Base\Fs\File(GO::config()->file_storage_path.'log/debug.log');
-		if(!$debugFile->exists())
-			$debugFile->touch(true);
 
-		
-		return array(
-				'success'=>true, 
-				'debugLog'=>$debugFile->tail($length)
-				);
-	}
-	
-	protected function actionInfo($params){
-		
-		if(empty(GO::session()->values['debug'])){
-			throw new \GO\Base\Exception\AccessDenied("Debugging can only be enabled by an admin");
-		}
-			
-		$response = array('success'=>true, 'info'=>'');
-		
-		$info['username']=GO::user()->username;
-		$info['config']=GO::config()->get_config_file();
-		$info['db_name']=GO::config()->db_name;
-		$info['db_host']=GO::config()->db_host;
-		$info['db_type'] = go()->getDatabase()->isMariaDB() ? "MariaDB" : "MySQL";
-		$info['db_version']=go()->getDatabase()->getVersion();
-		
-		$modules = GO::modules()->getAllModules();		
-		foreach($modules as $module){
-			if(!isset($info['modules']))
-				$info['modules']=$module->name;
-			else
-				$info['modules'].=', '.$module->name;
-		}
-		
-		$info = array_merge($info,$_SERVER);
-		
-		
-		$response['info']='<table>';
-		
-		foreach($info as $key=>$value)
-			$response['info'] .= '<tr><td>'.$key.':</td><td>'.(is_scalar($value) ? $value : var_export($value, true)).'</td></tr>';
-		
-		$response['info'].='</table>';
-		
-		ob_start();
-		phpinfo();
-		$phpinfo = ob_get_contents();
-		ob_get_clean();
-		
-		$response['info'].= \GO\Base\Util\StringHelper::sanitizeHtml($phpinfo);
-		return $response;
-		
-	}
-	
+
 	protected function actionLink($params) {
 
 		$fromLinks = json_decode($params['fromLinks'], true);
