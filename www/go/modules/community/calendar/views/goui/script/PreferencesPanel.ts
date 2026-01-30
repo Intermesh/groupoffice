@@ -5,7 +5,7 @@ import {
 	datasourceform,
 	DataSourceStore,
 	datasourcestore,
-	DefaultEntity,
+	DefaultEntity, Fieldset,
 	fieldset,
 	Notifier,
 	select
