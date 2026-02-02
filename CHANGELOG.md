@@ -7,6 +7,7 @@
 - Core: Only allow http(s) protocols in httpclient for security reasons. Fixes SSRF and File Read in WOPI service discovery.
 - Core: Remove debug and info from client with ctrl+f7 for security reasons
 - Leavedays: manage leave requests of 'own' employees without manage permissions to the module
+- Email: Fixed  RCE - Command Injection via TNEF Attachment Handler
 
 19-01-2026: 6.8.149
 - Core: Fixed deleting old unused browser client data
