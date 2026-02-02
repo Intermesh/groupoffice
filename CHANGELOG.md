@@ -4,6 +4,7 @@
 - Core: Remove debug and info from client with ctrl+f7 for security reasons
 - Files: Remove url in link in FilePanel.js to avoid confusion with other links
 - Finance: FinanceStatus::$color can be null
+- Email: Fixed  RCE - Command Injection via TNEF Attachment Handler
 
 26-01-2026: 25.0.81
 - Address book: Gender field less prominent and shown in grid
