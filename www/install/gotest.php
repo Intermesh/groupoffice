@@ -668,7 +668,7 @@ function whereis(string $cmd)
 	if(strtoupper(substr(PHP_OS, 0, 3)) != 'WIN') {
 		$return = null;
 		try {
-			exec('whereis ' . $cmd, $return);
+			exec('whereis ' . escapeshellarg($cmd), $return);
 		}
 		catch(Throwable $e) {
 			return false;
