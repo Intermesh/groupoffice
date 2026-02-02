@@ -2,6 +2,8 @@
 - Core: fixed Security vulnerability Remote Code Execution (RCE)
 - Core: Only allow http(s) protocols in httpclient for security reasons. Fixes SSRF and File Read in WOPI service discovery.
 - Core: Remove debug and info from client with ctrl+f7 for security reasons
+- Files: Remove url in link in FilePanel.js to avoid confusion with other links
+- Finance: FinanceStatus::$color can be null
 
 26-01-2026: 25.0.81
 - Address book: Gender field less prominent and shown in grid
