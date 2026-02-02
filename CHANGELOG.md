@@ -4,8 +4,9 @@
 - Core: removed old code and restricted User access to admins or users with "mayChangeUser" permissions
 - Files: Remove url in link in FilePanel.js to avoid confusion with other links
 - Finance: FinanceStatus::$color can be null
+- Email: Fixed  RCE - Command Injection via TNEF Attachment Handler
 
-29-01-2026: 26.0.4
+ 29-01-2026: 26.0.4
 - calendar: Fixed create link field in event dialog
 - Core: Cron jobs no output buffering and debug memory
 - Core: New config options for mail debugging (mailerDebugHost and mailerDebugPort)
