@@ -2,6 +2,8 @@
 - Core: Only allow http(s) protocols in httpclient for security reasons. Fixes SSRF and File Read in WOPI service discovery.
 - Core: Remove debug and info from client with ctrl+f7 for security reasons
 - Core: removed old code and restricted User access to admins or users with "mayChangeUser" permissions
+- Files: Remove url in link in FilePanel.js to avoid confusion with other links
+- Finance: FinanceStatus::$color can be null
 
 29-01-2026: 26.0.4
 - calendar: Fixed create link field in event dialog
