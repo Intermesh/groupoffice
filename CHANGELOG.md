@@ -1,3 +1,4 @@
+02-02-2026: 25.0.82
 - Tasks: sort tasklist grid by name
 - Core: fixed Security vulnerability Remote Code Execution (RCE)
 - Core: Only allow http(s) protocols in httpclient for security reasons. Fixes SSRF and File Read in WOPI service discovery.
