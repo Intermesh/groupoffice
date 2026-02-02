@@ -1,3 +1,4 @@
+02-02-2026: 6.8.150
 - Email: fix sort error when searching
 - Core: Cron jobs no output buffering and debug memory
 - Core: Exit with error immediately when config file can't be loaded. It hung endlessly on require.
