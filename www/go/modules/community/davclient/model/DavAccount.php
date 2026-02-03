@@ -154,7 +154,7 @@ class DavAccount extends AclOwnerEntity {
 		while ($target === null) {
 			$result = dns_get_record("_{$this->service}$s._tcp.{$this->http()->baseUri}", DNS_SRV | DNS_TXT);
 			foreach ($result as $record) {
-				if ($record['type'] === 'SRV' && ($target === null || $target['pri'] < $record['pri'])) {
+				if ($record['type'] === 'SRV' && ($target === null || $target['pri'] > $record['pri'])) {
 					$host = $record['target'];
 					$port = $record['port'];
 					// $record['weight'] for picking chance when 'pri' is equal
@@ -171,12 +171,17 @@ class DavAccount extends AclOwnerEntity {
 
 		if (!isset($host)) {
 			// Thunderbird will do HEAD /, GET /, PROPFIND .well-known
-			$data = $this->http()->get("/.well-known/$this->service");
+			$path = "/.well-known/$this->service";
+			$data = $this->http()->get($path);
+			if($data['status'] === 404) {
+				$path = "/";
+				$data = $this->http()->get($path);
+			}
 			if(isset($data['headers']['location'])) {
 				$this->basePath = parse_url(rtrim($data['headers']['location'], '/'), PHP_URL_PATH) . '/';
 				$this->principalUri = $this->principalUri();
 			} else {
-				$responses = $this->propfind(['d:current-user-principal'], "/.well-known/$this->service");
+				$responses = $this->propfind(['d:current-user-principal'], $path);
 				foreach ($responses as $href => $response) {
 					if (isset($response->{'current-user-principal'})) {
 						$this->principalUri = $href;
