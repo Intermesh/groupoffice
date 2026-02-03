@@ -31,7 +31,7 @@ export class LocationField extends AutocompleteField {
 							if(!a.formatted) {
 								return;
 							}
-							store.add({name: c.name, address: a.formatted.replace("\n", ", ")});
+							store.add({name: c.name, address: a.formatted.replace(/\n/g, ", ")});
 						})
 					})
 				}
