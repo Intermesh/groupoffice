@@ -1,3 +1,5 @@
+- davclient: Add option to disable SSL validation
+
 02-02-2026: 26.0.5
 - Core: fixed Security vulnerability Remote Code Execution (RCE)
 - Core: Only allow http(s) protocols in httpclient for security reasons. Fixes SSRF and File Read in WOPI service discovery.
