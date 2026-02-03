@@ -8,3 +8,6 @@ $updates['202503111342'][] = function(){
 $updates['202506161040'][] = "alter table davclient_calendar
     add lastSync DATETIME null,
     add lastError text null";
+
+$updates['202602031051'][] = "alter table davclient_davaccount
+    add verifySSL bool default true not null;";

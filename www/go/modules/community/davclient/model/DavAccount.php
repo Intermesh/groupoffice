@@ -45,6 +45,12 @@ class DavAccount extends AclOwnerEntity {
 	/** @var Calendar[] the collections items with ctag and uri */
 	public $collections = [];
 
+	/**
+	 * Enables SSL host and peer verification
+	 * @var bool
+	 */
+	public bool $verifySSL = true;
+
 	public function setPassword($v) {
 		$this->password = Crypt::encrypt($v);
 	}
@@ -91,6 +97,11 @@ class DavAccount extends AclOwnerEntity {
 				'Content-Type' => 'application/xml; charset=utf-8',
 				'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->decryptPassword()),
 			]);
+
+			if(!$this->verifySSL) {
+				$this->http->setOption(CURLOPT_SSL_VERIFYPEER, false);
+				$this->http->setOption(CURLOPT_SSL_VERIFYHOST, false);
+			}
 		}
 		return $this->http;
 	}
