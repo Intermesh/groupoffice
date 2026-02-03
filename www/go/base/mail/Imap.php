@@ -1771,7 +1771,7 @@ class Imap extends ImapBodyStruct
 				return false;
 			}
 
-			if(preg_match('/INTERNALDATE ([^\s\)]+ [^\s\)]+ [^\s\)]+)/', $message, $dateMatches)) {
+			if(preg_match('/INTERNALDATE\s+([^\s\)]+ [^\s\)]+ [^\s\)]+)/', $message, $dateMatches)) {
 				$date = $dateMatches[1];
 			}else{
 				return false;
