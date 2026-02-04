@@ -111,7 +111,7 @@ class OtpAuthenticator extends Property {
 		if($this->isNew() && !empty($this->expiresAt)) {
 			$this->verified = true;
 		}
-				
+
 		return parent::internalSave();
 	}
 
@@ -250,6 +250,7 @@ class OtpAuthenticator extends Property {
 	 */
 	public function verifyCode(string $code, ?string $secret=null, int $discrepancy = 1, ?int $currentTimeSlice = null): bool
 	{
+
 		//replace spaces
 		$code = preg_replace('/\s+/', '', $code);
 		

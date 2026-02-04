@@ -134,12 +134,14 @@ class Authenticator extends PrimaryAuthenticator
 				$otpSettings = \go\modules\community\otp\model\Settings::get();
 				if ($otpSettings->block) {
 					if (!$otpSettings->enforceForGroupId) {
+						go()->debug('LDAP: OTP is required for account with user name '. $username);
 						$this->setErrorMessage('OTP is required for this account');
 						$this->setErrorCode(ErrorCode::REQUIRED);
 						return false;
 					}
 					foreach ($user->groups as $groupId) {
 						if ($groupId === $otpSettings->enforceForGroupId) {
+							go()->debug('LDAP: OTP is required for account with user name '. $username);
 							$this->setErrorMessage('OTP is required for this account');
 							$this->setErrorCode(ErrorCode::REQUIRED);
 							return false;

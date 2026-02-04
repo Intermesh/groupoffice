@@ -16,9 +16,11 @@ use go\core\App;
 use go\core\auth\TemporaryState;
 use go\core\db\Table;
 use go\core\db\Utils;
+use go\core\exception\NotFound;
 use go\core\orm\EntityType;
 use go\core\orm\SearchableTrait;
 use go\modules\community\history\Module;
+use http\Exception\InvalidArgumentException;
 use PDOException;
 use ReflectionClass;
 use go\core\util\ClassFinder;
@@ -451,320 +453,7 @@ class MaintenanceController extends AbstractController {
 			}
 		}
 	}
-	
-	
-	public static function ob_upgrade_log($buffer)
-	{
-		global $logFile;
 
-		file_put_contents($logFile, $buffer, FILE_APPEND);
-		return $buffer;
-	}
-	
-	protected function actionUpgrade($params) {
-		echo "Please run install/upgrade.php";
-	}
-		
-	
-	public function actionServermanagerReport($params){
-		$this->requireCli();
-		$this->fireEvent('servermanagerReport');
-	}
-	
-
-	
-	/**
-	 * Action to be called from browser address bar. It compares all the language
-	 * fields of lang1 and lang2 in the current Group-Office installation, and
-	 * echoes the fields that are in one language but not the other.
-	 * @param type $params MUST contain $params['lang1'] AND $params['lang2']
-	 */
-	protected function actionCheckLanguage($params){
-		
-		
-		header('Content-Type: text/html; charset=UTF-8');
-		
-		$lang1code = empty($params['lang1']) ? 'en' : $params['lang1'];
-		$lang2code = empty($params['lang2']) ? 'nl' : $params['lang2'];
-		
-		$commonLangFolder = new \GO\Base\Fs\Folder(GO::config()->root_path.'language/');
-		$commonLangFolderContentArr = $commonLangFolder->ls();
-		$moduleModelArr = GO::modules()->getAllModules();
-		
-		echo "<h1>Translate tool</h1>";
-				
-		echo '<p><a href="'. GO::url("maintenance/zipLanguage",array("lang"=>$lang2code)).'">Download zip file for '.$lang2code.'</a></p>';
-		
-		foreach ($commonLangFolderContentArr as $commonContentEl) {
-			if (get_class($commonContentEl)=='GO\Base\Fs\Folder') {
-				echo '<h3>'.$commonContentEl->path().'</h3>';
-				echo $this->_compareLangFiles($commonContentEl->path().'/'.$lang1code.'.php', $commonContentEl->path().'/'.$lang2code.'.php');
-				echo '<hr>';
-				
-			} else {
-//				$commonContentEl = new \GO\Base\Fs\File();
-//				$langFileContentString = $commonContentEl->getContents();
-			}
-		}
-		
-		foreach ($moduleModelArr as $moduleModel) {
-			echo '<h3>'.$moduleModel->path.'</h3>';
-			echo $this->_compareLangFiles($moduleModel->path.'language/'.$lang1code.'.php', $moduleModel->path.'language/'.$lang2code.'.php');
-			echo '<hr>';
-		}
-	}
-	
-	/**
-	 * Used in actionCheckLanguage. Compares the language contents of two language
-	 * files, and echoes the fields that are in one file but not the other as Html.
-	 * @param String $lang1Path Full path to first language file.
-	 * @param String $lang2Path Full path to second language file.
-	 * @return string Html string containing useful information for the user.
-	 */
-	private function _compareLangFiles($lang1Path,$lang2Path) {
-		$outputHtml = '';
-		$content1Arr = array();
-		$content2Arr = array();
-		
-		$outputHtml .= $this->_langFieldsToArray($lang1Path,$content1Arr);
-		$outputHtml .= $this->_langFieldsToArray($lang2Path,$content2Arr);				
-
-		if(!empty($content1Arr) && !empty($content2Arr))
-		{
-			$outputHtml .= '<i>Missing in '.$lang2Path.':</i><br />'
-							.$this->_getMissingFields($content1Arr, $content2Arr)
-							.'<br />';
-			$outputHtml .= '<i>Missing in '.$lang1Path.':</i><br />'
-							.$this->_getMissingFields($content2Arr, $content1Arr)
-							.'<br />';
-		}
-		
-		return $outputHtml;
-	}
-	
-	private function _replaceBOM($filePath){
-		$origStr = file_get_contents($filePath);
-		$str = str_replace("\xEF\xBB\xBF", '', $origStr);	
-//		$str = str_replace("ï»¿", '', $str);	
-		if($str!=$origStr){					
-			file_put_contents($filePath, $str);
-		}			
-		
-	}
-	
-	/**
-	 * Used in actionCheckLanguage. Parse the file, putting its language fields
-	 * into $contentArr.
-	 * @param String $filePath The full path to the file.
-	 * @param Array &$contentArr The array to put the language fields in.
-	 * @return string Output string, possibly containing warnings for the user.
-	 */
-	private function _langFieldsToArray($filePath,&$contentArr) {
-		$outputString = '';
-		$langFile = new \GO\Base\Fs\File($filePath);
-		
-		
-		
-		if(!file_exists($langFile->path())) {
-			$outputString .= '<i><font color="red">File not found: "'.$langFile->path().'"</font></i><br />';
-		} else {
-			$this->_replaceBOM($filePath);
-			$encodingName = $langFile->detectEncoding($langFile->getContents());
-			if ( $encodingName == 'UTF-8' || $encodingName == 'ASCII' || $langFile->convertToUtf8() ) {
-				$lines = file($langFile->path());
-				if (count($lines)) {
-					foreach($lines as $line)
-					{
-						$first_equal = strpos($line,'=');
-						if($first_equal != 0)
-						{
-							$key = str_replace('"','\'',trim(substr($line, 0, $first_equal)));
-							$contentArr[$key] = trim(substr($line, $first_equal, strlen($line)-1));
-						}
-					}
-				} else {
-					$outputString .= '<i><font color="red">Could not compare '.str_replace(GO::config()->root_path, '', $langFile->path()).', because it has no translation contents!</font></i><br />';
-				}
-			} else {
-				$outputString .= '<i><font color="red">Could not compare with '.str_replace(GO::config()->root_path, '', $langFile->path()).', because it cannot be made UTF-8!</font></i><br />';
-			}
-			
-			//for displaying errors
-			include($filePath);
-			
-			
-		}
-		return $outputString;
-	}
-	
-	/**
-	 * Used in actionCheckLanguage. Compares two arrays and returns as Html the
-	 * fields that is in one but not the other.
-	 * @param Array $array1
-	 * @param Array $array2
-	 * @return String 
-	 */
-	private function _getMissingFields($array1, $array2)
-	{
-		$outputString = '';
-		$diffs = array_diff_key($array1, $array2);
-		
-		if(!empty($diffs))
-		{
-			foreach($diffs as $key=>$diff)
-			{
-				if(!strpos($diff, '{}'))
-					$output[] = $key.$diff;
-			}
-			if(!empty($output))
-			{
-				foreach ($output as $out)
-					$outputString .= htmlentities($out,ENT_QUOTES,'UTF-8').'<br />';
-			}
-		}
-		return $outputString;
-	}
-	
-	
-	private function _getAllLanguageFiles(){
-		
-		$files=array();
-		
-		$languages = array_keys(GO::language()->getLanguages());
-		
-		$commonLangFolder = new \GO\Base\Fs\Folder(GO::config()->root_path.'language/');
-		$folders = $commonLangFolder->ls();
-		
-		$modules = GO::modules()->getAllModules();
-		foreach($modules as $module){
-			$folder = new \GO\Base\Fs\Folder($module->path.'language');
-			if($folder->exists())
-				$folders[]=$folder;
-		}
-		
-		foreach($folders as $folder){
-			foreach($languages as $language){
-				if($file = $folder->child($language.'.php')){
-					$files[]=$file;
-				}
-			}
-		}
-		
-		return $files;
-	
-	}
-	
-	
-	protected function actionRemoveOldLangKeys($params){
-		
-		if(!$this->isCli() && !GO::user()->isAdmin())
-			throw new \GO\Base\Exception\AccessDenied();
-		
-		$files = $this->_getAllLanguageFiles();
-		
-		foreach($files as $file){
-			
-			echo "Processing: ".$file->path()."\n";
-		
-			$data = $file->contents();
-
-			$entries = explode("\$l", $data);
-
-			//to find duplicate keys we'll reverse the lines because the last definition is used.
-			$entries = array_reverse($entries);
-
-			$processedKeys = array();
-
-			$newData=array();
-
-			foreach($entries as $entry){
-
-				if(preg_match('/^\[(\'|")([a-z_-]+)(\'|")\][^[]/i', $entry, $matches)){
-
-					$key = $matches[2];
-
-
-					if(!in_array($key, $processedKeys)){
-						$newData[]=$entry;
-						$processedKeys[]=$key;
-					}  else {
-						echo "Skipping duplicate key : ".$key."\n";
-					}
-
-				}else
-				{
-					$newData[] = $entry;
-				}			
-			}
-			
-			$newData = implode("\$l", array_reverse($newData));
-			
-//			echo $newData;
-			
-			if(eval(str_replace('<?php', '', $newData))===false)
-				throw new Exception("Parse error in generated data for ".$file->path());
-			
-			$file->putContents($newData);
-		}
-	}
-	
-	/**
-	 * Run from the browser's address bar. Collects all language files, and puts
-	 * them in a zip file in the file storage path, respecting the folder
-	 * structure. I.e., you can later unpack the file contents to the
-	 * Group-Office path.
-	 * @param type $params 
-	 */
-	protected function actionZipLanguage($params){
-		if (!empty($params['lang'])) {
-			$langCode = $params['lang'];
-		} else {
-			die('<font color="red"><i>The GET parameter lang is required for the zipLanguage action!</i></font>');
-		}
-		$fileNames = array();
-		
-		//gather file list in array
-		$commonLangFolder = new \GO\Base\Fs\Folder(GO::config()->root_path.'language/');
-		if($commonLangFolder->exists()){
-			$commonLangFolderContentArr = $commonLangFolder->ls();
-			$moduleModelArr = GO::modules()->getAllModules();
-
-			foreach ($commonLangFolderContentArr as $commonLangFolder) {
-				if (get_class($commonLangFolder)=='GO\Base\Fs\Folder') {
-					$commonLangFileArr = $commonLangFolder->ls();
-					foreach ($commonLangFileArr as $commonLangFile)
-						if (get_class($commonLangFile)=='GO\Base\Fs\File' && $commonLangFile->name()==$langCode.'.php') {
-							$fileNames[] = str_replace(GO::config()->root_path,'',$commonLangFile->path());
-						}
-				}
-			}
-		}
-		
-		foreach ($moduleModelArr as $moduleModel) {
-			$modLangFolder = new \GO\Base\Fs\Folder($moduleModel->path.'language/');
-			if($modLangFolder->exists()){
-				$modLangFiles = $modLangFolder->ls();
-				foreach ($modLangFiles as $modLangFile) {
-					if ($modLangFile->name()==$langCode.'.php')
-						$fileNames[] = str_replace(GO::config()->root_path,'',$modLangFile->path());
-				}
-			}
-		}
-		
-		$tmpFile = \GO\Base\Fs\File::tempFile($langCode.'-'.str_replace('.','-', GO::config()->version), 'zip');
-		
-		//exec zip
-		$cmdString = GO::config()->cmd_zip.' '.$tmpFile->path().' '.implode(" ", $fileNames);
-		exec($cmdString,$outputArr, $retVal);
-		
-		if($retVal>0)
-			trigger_error("Creating ZIP file failed! ".implode("<br />", $outputArr), E_USER_ERROR);
-		
-		\GO\Base\Util\Http::outputDownloadHeaders($tmpFile);
-		$tmpFile->output();
-		$tmpFile->delete();
-	}
-	
 	protected function actionCheckDefaultModels(){
 		
 		if(!$this->isCli() && !GO::user()->isAdmin())
@@ -793,30 +482,30 @@ class MaintenanceController extends AbstractController {
 
 		return array('success'=>true);
 	}
-	
-	
+
+
 	protected function actionRemoveEmptyStuff($params){
-		
+
 		if(!$this->isCli() && !GO::user()->isAdmin())
 			throw new \GO\Base\Exception\AccessDenied();
-		
+
 		GO::session()->closeWriting();
 
 		GO::setIgnoreAclPermissions(true);
-		
-		if(!$this->isCli())			
+
+		if(!$this->isCli())
 			echo '<pre>';
-		
-	
-		
+
+
+
 		if(GO::modules()->isInstalled("calendar")){
 			echo "\n\nProcessing calendar\n";
 			flush();
-			
+
 			$stmt = \GO\Calendar\Model\Calendar::model()->find();
 			while($calendar = $stmt->fetch()){
 				$eventStmt = $calendar->events();
-				
+
 				if(!$eventStmt->rowCount()){
 					echo "Removing ".$calendar->name."\n";
 					$calendar->delete();
@@ -825,10 +514,10 @@ class MaintenanceController extends AbstractController {
 			}
 		}
 
-		
-	}	
-	
-	
+
+	}
+
+
 	protected function actionConvertToInnoDB(){
 		GO::getDbConnection()->query("SET sql_mode = '';");
 		
@@ -845,8 +534,8 @@ class MaintenanceController extends AbstractController {
 				
 				GO::getDbConnection()->query($sql);
 			}
-			
-			
+
+
 		}
 	}
 	

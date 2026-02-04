@@ -1,8 +1,14 @@
+02-02-2026: 6.8.150
 - Email: fix sort error when searching
 - Core: Cron jobs no output buffering and debug memory
 - Core: Exit with error immediately when config file can't be loaded. It hung endlessly on require.
 - Core: New config options for mail debugging (mailerDebugHost and mailerDebugPort)
 - Business: cascade managers when user is deleted
+- Core: fixed Security vulnerability Remote Code Execution (RCE)
+- Core: Only allow http(s) protocols in httpclient for security reasons. Fixes SSRF and File Read in WOPI service discovery.
+- Core: Remove debug and info from client with ctrl+f7 for security reasons
+- Leavedays: manage leave requests of 'own' employees without manage permissions to the module
+- Email: Fixed  RCE - Command Injection via TNEF Attachment Handler
 
 19-01-2026: 6.8.149
 - Core: Fixed deleting old unused browser client data
