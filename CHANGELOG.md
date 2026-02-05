@@ -1,5 +1,6 @@
 - davclient: Add option to disable SSL validation
 - MS Teams: meeting gets decription with meeting id, passcode and meeting options link. Teams event is also set with subject and meeting time
+- Finance: Migrate from billinf didn't copy frontpage text to greeting and sometimes address was missing
 
 02-02-2026: 26.0.5
 - Core: fixed Security vulnerability Remote Code Execution (RCE)
