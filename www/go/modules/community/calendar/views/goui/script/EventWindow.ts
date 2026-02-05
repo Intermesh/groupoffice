@@ -226,8 +226,7 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 					}
 				}
 			}),
-			this.locationField = locationfield({flex:1, style:{minWidth:'80%'}}),
-			new OnlineMeetingButton(this.locationField, this.form),
+
 			this.withoutTimeToggle = checkbox({type:'switch',value:undefined, name: 'showWithoutTime', label: t('All day'), style:{width:'auto'},
 				listeners: {'setvalue':({newValue}) => {
 					this.alertField.fullDay = newValue;
@@ -249,6 +248,10 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 				recurrenceField,
 				exceptionsBtn,
 			),
+
+			this.locationField = locationfield({flex:1, style:{minWidth:'80%'}}),
+			new OnlineMeetingButton(this.locationField, this.form),
+
 			this.participantFld = participantfield({
 				listeners: {
 					'setvalue': ({newValue}) => {
