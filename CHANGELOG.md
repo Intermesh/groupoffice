@@ -1,3 +1,4 @@
+- jitsimeet: Add sub to jwt
 - davclient: Add option to disable SSL validation
 - MS Teams: meeting gets decription with meeting id, passcode and meeting options link. Teams event is also set with subject and meeting time
 - Finance: Migrate from billinf didn't copy frontpage text to greeting and sometimes address was missing
