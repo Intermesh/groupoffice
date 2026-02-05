@@ -167,6 +167,45 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			]
 		});
 
+		this.convertToLocalFieldset = new Ext.form.FieldSet({
+			title: t('Password','users','core'),
+			hidden: true,
+			items:[
+
+				{
+					xtype:"box",
+					autoEl:"p",
+					html: t("This user doesn't have a local password because it's authenticated using an external provider. Click the button below to set a password and convert it to a local user. The domain will be stripped off the username"),
+				},
+
+				{
+					xtype: "button",
+					text: t("Convert to local user"),
+					handler : function() {
+
+						this.usernameField.setDisabled(false);
+
+						const username = this.usernameField.getValue();
+						// strip off domain part
+						this.usernameField.setValue(username.split("@")[0]);
+
+						this.passwordField1.setDisabled(false);
+						this.passwordField2.setDisabled(false);
+						this.emailField.setDisabled(false);
+
+						this.passwordFieldset.setVisible(true);
+
+						this.convertToLocalFieldset.setVisible(false);
+
+						this.usernameField.el.focus();
+
+					},
+					scope: this
+				}
+
+			]
+		});
+
 		this.authorizedClientsFieldSet = new Ext.form.FieldSet({
 			title: t("Authorized clients"),
 			items: [
@@ -251,7 +290,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 		
 		
 		if(go.User.isAdmin) {
-			this.userFieldset.items.get(1).add( {
+			this.passwordFieldset.insert(0, {
 				xtype:"checkbox",
 				hideLabel: true,
 				boxLabel: t("Login enabled"),
@@ -271,6 +310,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				this.userFieldset,
 				this.quotaFieldset,
 				this.passwordFieldset,
+				this.convertToLocalFieldset,
 				this.authorizedClientsFieldSet
 			].concat(go.customfields.CustomFields.getFormFieldSets("User").filter(function(fs){return !fs.fieldSet.isTab;}))
 		});
@@ -302,6 +342,10 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 		this.emailField.setDisabled(!visible);
 
 		this.passwordFieldset.setVisible(visible);
+
+		if(go.User.isAdmin) {
+			this.convertToLocalFieldset.setVisible(!visible);
+		}
 	},
 	
 	onValidate : function() {
