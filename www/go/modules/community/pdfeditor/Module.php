@@ -11,6 +11,11 @@ class Module extends core\Module {
 		return "Intermesh BV <info@intermesh.nl>";
 	}
 
+	public static function getCategory(): string
+	{
+		return go()->t("Files", static::getPackage(), static::getName());
+	}
+
 	public function getDependencies(): array
 	{
 		return ['legacy/files'];

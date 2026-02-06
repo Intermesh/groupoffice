@@ -773,6 +773,11 @@ abstract class Module extends Singleton implements ArrayableInterface {
 		return go()->t("name", $pkg, $name);
 	
 	}
+
+	public static function getCategory(): string
+	{
+		return go()->t("Main", static::getPackage(), static::getName());
+	}
 	
 	
 	/**
@@ -985,7 +990,8 @@ abstract class Module extends Singleton implements ArrayableInterface {
 			'installed' => $this->isInstalled(false),
 			'model' => $model,
 			'installable'=> !$this->isInstallable(),
-			'documentationUrl' => $this->getDocumentationURL()
+			'documentationUrl' => $this->getDocumentationURL(),
+			'category' => $this->getCategory(),
 		);
 	}
 }

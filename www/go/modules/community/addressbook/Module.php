@@ -44,6 +44,11 @@ use GO\Savemailas\SavemailasModule;
 class Module extends core\Module
 {
 
+	public static function getCategory(): string
+	{
+		return go()->t("Address book", static::getPackage(), static::getName());
+	}
+
 	/**
 	 * The development status of this module
 	 * @return string

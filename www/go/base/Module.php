@@ -793,7 +793,15 @@ class Module extends Observable implements ArrayableInterface {
 
 			'model' => $model,
 
-			'documentationUrl' => $this->getDocumentationURL()
+			'documentationUrl' => $this->getDocumentationURL(),
+			'category' => $this->getCategory(),
 		);
+
 	}
+
+	public function getCategory() {
+		return go()->t("Main");
+	}
+
+
 }

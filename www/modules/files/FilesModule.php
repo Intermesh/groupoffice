@@ -40,6 +40,11 @@ class FilesModule extends \GO\Base\Module{
 	{
 		return ['mayManage' => 1, 'mayAccessMainPanel' => 2];
 	}
+
+	public function getCategory(): string
+	{
+		return go()->t("Files", $this->getPackage(), $this->getName());
+	}
 	
 	public static function initListeners() {
 

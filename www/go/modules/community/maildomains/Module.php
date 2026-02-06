@@ -21,6 +21,11 @@ final class Module extends core\Module
 		return "Intermesh BV";
 	}
 
+	public static function getCategory(): string
+	{
+		return go()->t("E-mail", static::getPackage(), static::getName());
+	}
+
 	public function defineListeners()
 	{
 		Mailbox::on(Mailbox::EVENT_VALIDATE, static::class, 'onMailboxValidate');

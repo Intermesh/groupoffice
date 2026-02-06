@@ -15,4 +15,9 @@ class Module extends \go\core\Module {
 		return "Intermesh BV";
 	}
 
+	public static function getCategory(): string
+	{
+		return go()->t("Authentication", static::getPackage(), static::getName());
+	}
+
 }

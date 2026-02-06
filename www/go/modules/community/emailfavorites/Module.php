@@ -12,4 +12,9 @@ class Module extends \go\core\Module {
 	{
 		return false;
 	}
+
+	public static function getCategory(): string
+	{
+		return go()->t("E-mail", static::getPackage(), static::getName());
+	}
 }

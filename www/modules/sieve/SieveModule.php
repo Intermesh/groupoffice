@@ -13,6 +13,11 @@ class SieveModule extends Module{
 		return true;
 	}
 
+	public function getCategory(): string
+	{
+		return go()->t("E-mail", $this->getPackage(), $this->getName());
+	}
+
 	public function depends() {
 		return array("email");
 	}

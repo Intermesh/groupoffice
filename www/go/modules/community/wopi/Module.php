@@ -27,6 +27,11 @@ class Module extends core\Module {
 		return self::STATUS_STABLE;
 	}
 
+	public static function getCategory(): string
+	{
+		return go()->t("Files", static::getPackage(), static::getName());
+	}
+
 	public function getAuthor(): string
 	{
 		return "Intermesh BV <info@intermesh.nl>";

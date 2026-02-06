@@ -24,7 +24,10 @@ use Sabre\VObject\Component\VCalendar;
 
 class Module extends core\Module
 {
-
+	public static function getCategory(): string
+	{
+		return go()->t("Calendar", static::getPackage(), static::getName());
+	}
 	public function autoInstall(): bool
 	{
 		return true;
