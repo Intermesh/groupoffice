@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "name": "otp",
+  "name": "imapauthenticator",
   "devDependencies": {
     "concurrently": "latest",
     "esbuild": "latest",
@@ -8,7 +8,7 @@
     "typescript": "latest"
   },
   "scripts": {
-    "start otp": "npm run build:clean && concurrently --kill-others \"npm run start:ts\"  \"npm run start:dts\"",
+    "start:imapauthenticator": "npm run build:clean && concurrently --kill-others \"npm run start:ts\"  \"npm run start:dts\"",
     "start:ts": "node ../../../../../../views/goui/esbuild-module.mjs watch",
     "start:dts": "npx tsc --declaration --emitDeclarationOnly --watch",
     "build": "npm run build:clean && npm run build:ts && npm run build:dts",
@@ -16,8 +16,5 @@
     "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
     "build:dts": "npx tsc --declaration --emitDeclarationOnly",
     "test": "npx tsc --noEmit"
-  },
-  "dependencies": {
-    "copyfiles": "^2.4.1"
   }
 }
