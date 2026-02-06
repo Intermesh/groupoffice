@@ -1,4 +1,5 @@
 - MS Teams: meeting gets decription with meeting id, passcode and meeting options link. Teams event is also set with subject and meeting time
+- Core: Fixed inserting links with Safari in email composer
 
 02-02-2026: 25.0.82
 - Tasks: sort tasklist grid by name
