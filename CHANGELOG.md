@@ -9,6 +9,7 @@
 - Core: Remove debug and info from client with ctrl+f7 for security reasons
 - Leavedays: manage leave requests of 'own' employees without manage permissions to the module
 - Email: Fixed  RCE - Command Injection via TNEF Attachment Handler
+- Core: Fixed inserting links with Safari in email composer
 
 19-01-2026: 6.8.149
 - Core: Fixed deleting old unused browser client data
