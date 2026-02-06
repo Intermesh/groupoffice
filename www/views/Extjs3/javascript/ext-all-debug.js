@@ -44548,14 +44548,14 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
 
     
     createLink : function() {
-				this.focus();
+				// this.focus();
 				this.updateToolbar();
-				setTimeout(() => {
+				// setTimeout(() => {
 					var url = prompt(this.createLinkText, this.defaultLinkValue);
 					if(url && url != 'http:/'+'/'){
 							this.relayCmd('createlink', url);
 					}
-				}, 10)
+				// }, 10)
     },
 
     
@@ -44857,11 +44857,11 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
 
     
     relayCmd : function(cmd, value){
-        (function(){
+        // (function(){
             this.focus();
             this.execCmd(cmd, value);
             this.updateToolbar();
-        }).defer(10, this);
+        // }).defer(10, this);
     },
 
     
