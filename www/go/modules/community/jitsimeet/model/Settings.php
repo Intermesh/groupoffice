@@ -30,7 +30,13 @@ class Settings extends core\Settings
 	public function createJwtToken( string $room): string {
 		$jwt=[
 			self::encode(json_encode(['typ' => 'JWT', 'alg' => 'HS256'])), //header
-			self::encode(json_encode(['aud' => $this->videoJwtAppId, 'iss' => $this->videoJwtAppId, 'room' => $room, 'exp' => strtotime('+30 days')])) //payload
+			self::encode(json_encode([
+				'aud' => $this->videoJwtAppId,
+				'iss' => $this->videoJwtAppId,
+				'room' => $room,
+				'exp' => strtotime('+30 days'),
+				'sub' => parse_url($this->videoUri, PHP_URL_HOST)
+			])) //payload
 		];
 		$jwt[] = self::encode(hash_hmac('sha256', implode('.',$jwt), $this->videoJwtSecret, true)); // sign
 		return implode('.',$jwt);

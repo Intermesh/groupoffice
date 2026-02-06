@@ -22,6 +22,7 @@ export class AccountWindow extends FormWindow {
 				enabledCb,
 				textfield({name:'name', label: t('Name')}),
 				textfield({name:'host', label: t('Host')}),
+				checkbox({name: 'verifySSL', label: t('Verify SSL certificate'), value: true}),
 				// textfield({name:'principalUri', label: t('Path')}),
 				textfield({name:'username', label: t('Username')}),
 				textfield({name:'password', label: t('Password'), type:'password'}),

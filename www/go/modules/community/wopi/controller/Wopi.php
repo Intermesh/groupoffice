@@ -206,7 +206,8 @@ class Wopi extends Controller
       'Size' => $file->size, // Required
       'UserId' => $user->username, // Required
       'Version' => (string) $file->version, // Required
-      'UserCanWrite' => $canWrite, // Required     
+      'UserCanWrite' => $canWrite, // Required
+			'IsAdminUser' => $user->isAdmin(),
       'ReadOnly' => !$canWrite, 
       'UserCanRename' => $canWrite,
       'UserCanNotWriteRelative' => !$canWrite,

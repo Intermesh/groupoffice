@@ -2,6 +2,7 @@ import {appSystemSettings, client, modules} from "@intermesh/groupoffice-core";
 import {Settings} from "./Settings.js";
 import {SystemSettings} from "./SystemSettings.js";
 import {onlineMeetingServices} from "@intermesh/community/calendar";
+import {t} from "@intermesh/goui";
 
 
 
@@ -28,18 +29,30 @@ modules.register({
 				});
 			}
 
-			onlineMeetingServices.register("Jitsi Meet", async (calendarEvent) => {
+			onlineMeetingServices.register("Jitsi Meet", async (calendarEventForm) => {
 				const m = modules.get('community', 'jitsimeet')!;
 
 				const room = b64UrlEncode(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(8))));
 
+				let uri;
 				if (!m.settings.videoJwtEnabled) {
-					return m.settings.videoUri + room;
+					uri = m.settings.videoUri + room;
+				}else {
+					const response = await client.jmap("community/jitsimeet/Auth/generateJWT", {room}, 'pJwt');
+					uri = m.settings.videoUri + room + '?jwt=' + response.jwt
 				}
 
-				const response = await client.jmap("community/jitsimeet/Auth/generateJWT", {room}, 'pJwt');
+				const calendarEvent = calendarEventForm.value;
 
-				return m.settings.videoUri + room + '?jwt=' + response.jwt;
+				let description = calendarEvent.description ?? "";
+
+				if(description.length > 0) {
+					description += "\n\n";
+				}
+
+				description += "--------------------------------\n" + t("Join the online meeting now") + ":\n\n" + uri + "\n--------------------------------\n\n";
+
+				calendarEventForm.patch({location: uri, description});
 			});
 		});
 	}

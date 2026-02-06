@@ -1,8 +1,19 @@
+- jitsimeet: Add sub to jwt
+- davclient: Add option to disable SSL validation
+- MS Teams: meeting gets decription with meeting id, passcode and meeting options link. Teams event is also set with subject and meeting time
+- Finance: Migrate from billing didn't copy frontpage text to greeting and sometimes address was missing
+- Finance: New book option to make items read only after they have been sent
+
+02-02-2026: 26.0.5
 - Core: fixed Security vulnerability Remote Code Execution (RCE)
 - Core: Only allow http(s) protocols in httpclient for security reasons. Fixes SSRF and File Read in WOPI service discovery.
 - Core: Remove debug and info from client with ctrl+f7 for security reasons
+- Core: removed old code and restricted User access to admins or users with "mayChangeUser" permissions
+- Files: Remove url in link in FilePanel.js to avoid confusion with other links
+- Finance: FinanceStatus::$color can be null
+- Email: Fixed  RCE - Command Injection via TNEF Attachment Handler
 
-29-01-2026: 26.0.4
+ 29-01-2026: 26.0.4
 - calendar: Fixed create link field in event dialog
 - Core: Cron jobs no output buffering and debug memory
 - Core: New config options for mail debugging (mailerDebugHost and mailerDebugPort)

@@ -1,16 +1,16 @@
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
-import {AutocompleteField, btn, Button, DataSourceForm, menu} from "@intermesh/goui";
+import {AutocompleteField, btn, Button, DataSourceForm, Form, menu} from "@intermesh/goui";
 import {LocationField} from "./LocationField.js";
 
 export type OnlineMeetingService = {
 	title:string,
-	fn: (calendarEvent:CalendarEvent) => Promise<string>
+	fn: (calendarEventForm:DataSourceForm<CalendarEvent>) => void
 }
 class OnlineMeetingServices {
 
 	public readonly services:OnlineMeetingService[]  = [];
 
-	public register(title:string, fn : (calendarEvent:CalendarEvent) => Promise<string>) {
+	public register(title:string, fn : (calendarEventForm:DataSourceForm<CalendarEvent>) => void) {
 		this.services.push({
 			title,
 			fn
@@ -32,13 +32,13 @@ export class OnlineMeetingButton extends Button {
 
 		if(onlineMeetingServices.services.length == 1) {
 			this.handler = async () => {
-				locationField.value = await onlineMeetingServices.services[0].fn(form.value);
+				await onlineMeetingServices.services[0].fn(form);
 			}
 		} else {
 			this.menu = menu({},
-				...onlineMeetingServices.services.map(s => {
-					return btn({text: s.title, handler: async ()=> {
-							locationField.value = await s.fn(form.value);
+				...onlineMeetingServices.services.map(service => {
+					return btn({text: service.title, handler: ()=> {
+							service.fn(form);
 						}})
 				})
 				)

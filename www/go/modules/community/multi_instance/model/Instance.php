@@ -784,7 +784,10 @@ class Instance extends Entity {
 		$file->delete();
 			
 	
-		$cmd = "mysqldump --force --opt --host=" . ($c['db_host'] ?? "localhost") . " --port=" . ($c['db_port'] ?? 3306) . " --user=" . $c['db_user'] . " --password=" . $c['db_pass'] . " " . $c['db_name'] . " > \"" . $file->getPath() . "\"";
+		$cmd = "mysqldump --force --opt --host=" . escapeshellarg($c['db_host'] ?? "localhost") . " --port=" .
+			escapeshellarg($c['db_port'] ?? 3306) . " --user=" . escapeshellarg($c['db_user']) . " --password=" .
+			escapeshellarg($c['db_pass'] ). " " . escapeshellarg($c['db_name']) . " > " . escapeshellarg($file->getPath() );
+
 		//go()->debug($cmd);
 		exec($cmd, $output, $retVar);
 		
@@ -804,7 +807,9 @@ class Instance extends Entity {
 	public function restoreDump(File $dumpFile): bool
 	{
 		$c = $this->getInstanceConfig();
-		$cmd = "mysql --host=" . ($c['db_host'] ?? "localhost") . " --port=" . ($c['db_port'] ?? 3306) . " --user=" . $c['db_user'] . " --password=" . $c['db_pass'] . " " . $c['db_name'] . " < \"" . $dumpFile->getPath() . "\"";
+		$cmd = "mysql --host=" . escapeshellarg($c['db_host'] ?? "localhost") . " --port=" .
+			escapeshellarg($c['db_port'] ?? 3306) . " --user=" . escapeshellarg($c['db_user']) . " --password=" .
+			escapeshellarg($c['db_pass']) . " " . escapeshellarg($c['db_name']) . " < " . escapeshellarg($dumpFile->getPath());
 		//go()->debug($cmd);
 		exec($cmd, $output, $retVar);
 

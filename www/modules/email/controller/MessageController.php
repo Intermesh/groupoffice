@@ -1612,8 +1612,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$tmpFolder = \GO\Base\Fs\Folder::tempFolder(uniqid(time()));
 		$tmpFile = new \GO\Base\Fs\File(GO::config()->tmpdir.$params['tmp_file']);
 
-				chdir($tmpFolder->path());
-		exec(GO::config()->cmd_tnef.' -C '.$tmpFolder->path().' '.$tmpFile->path(), $output, $retVar);
+		chdir($tmpFolder->path());
+		exec(GO::config()->cmd_tnef.' -C '.escapeshellarg($tmpFolder->path()).' '.escapeshellarg($tmpFile->path()), $output, $retVar);
+
 		if($retVar!=0)
 			throw new \Exception("TNEF extraction failed: ".implode("\n", $output));
 

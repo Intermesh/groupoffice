@@ -112,7 +112,7 @@ class CalendarEvent extends EntityController {
 	 * @throws \Exception
 	 */
 	public function import($params) {
-
+		set_time_limit(0);
 		return model\CalendarEvent::import(
 			$params['blobIds'],
 			$params['calendarId'],

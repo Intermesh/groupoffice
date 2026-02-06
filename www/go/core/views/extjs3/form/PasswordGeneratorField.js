@@ -23,7 +23,7 @@ go.form.PasswordGeneratorField = Ext.extend(Ext.form.TriggerField, {
 		});
 	},
 	onTriggerClick: function () {
-		const pass = this.generatePassword(go.Modules.get("core","core").settings.passwordMinLength);
+		const pass = this.generatePassword(12);
 		this.setValue(pass);
 		this.fireEvent('generated', this, pass);
 		
@@ -40,7 +40,7 @@ go.form.PasswordGeneratorField = Ext.extend(Ext.form.TriggerField, {
 			"abcdefghijklmnopqrstuvwxyz",
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
 			"1234567890",
-			"!@#$%^&*()<>,."];
+			"!@#$%^&*"];
 
 		var pass = "";
 		var i;
