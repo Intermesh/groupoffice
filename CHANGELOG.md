@@ -1,3 +1,4 @@
+09-02-2026: 25.0.83 
 - MS Teams: meeting gets decription with meeting id, passcode and meeting options link. Teams event is also set with subject and meeting time
 - Core: Fixed inserting links with Safari in email composer
 - Core: fix pesky error when testing SMTP configuration
