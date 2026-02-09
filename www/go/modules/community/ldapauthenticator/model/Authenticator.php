@@ -122,6 +122,8 @@ class Authenticator extends PrimaryAuthenticator
 
 		if (go()->getModule('community', 'otp')) {
 			if (isset($mappedValues['otpSecret'])) {
+				go()->debug("OTP secret found for " . $username . ".");
+
 				$o = new OtpAuthenticator($user);
 				$o->setSecret($mappedValues['otpSecret']);
 				$dt = new DateTime();
@@ -131,24 +133,23 @@ class Authenticator extends PrimaryAuthenticator
 				$o->userId = $user->id;
 				$user->otp = $o;
 			} else {
+				go()->debug("No OTP secret found for " . $username . ". Checking for OTP blocking.");
 				$otpSettings = \go\modules\community\otp\model\Settings::get();
 				if ($otpSettings->block) {
 					if (!$otpSettings->enforceForGroupId) {
-						go()->debug('LDAP: OTP is required for account with user name '. $username);
-						$this->setErrorMessage('OTP is required for this account');
-						$this->setErrorCode(ErrorCode::REQUIRED);
+						$this->handleOtpEnforceMessage($username);
 						return false;
 					}
 					foreach ($user->groups as $groupId) {
 						if ($groupId === $otpSettings->enforceForGroupId) {
-							go()->debug('LDAP: OTP is required for account with user name '. $username);
-							$this->setErrorMessage('OTP is required for this account');
-							$this->setErrorCode(ErrorCode::REQUIRED);
+							$this->handleOtpEnforceMessage($username);
 							return false;
 						}
 					}
 				}
 			}
+		} else {
+			go()->debug("OTP is not available. Not needed for user " . $username . ".");
 		}
 
 		foreach ($server->groups as $group) {
@@ -303,6 +304,18 @@ class Authenticator extends PrimaryAuthenticator
 			}
 		}
 
+	}
+
+	/**
+	 * @param string $username
+	 * @return void
+	 */
+	private function handleOtpEnforceMessage(string $username): void
+	{
+		go()->debug('LDAP: OTP is required for account with user name '. $username);
+		ErrorHandler::log('LDAP: OTP is required for account with user name '. $username);
+		$this->setErrorMessage('OTP is required for this account');
+		$this->setErrorCode(ErrorCode::REQUIRED);
 	}
 
 }
