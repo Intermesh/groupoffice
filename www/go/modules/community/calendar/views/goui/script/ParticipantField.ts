@@ -9,7 +9,7 @@ import {
 	table
 } from "@intermesh/goui";
 import {getParticipantStatusIcon, statusIcons, t} from "./Index.js";
-import {client, jmapds, validateEmail} from "@intermesh/groupoffice-core";
+import {client, jmapds, principalDS, RecipientPicker, validateEmail} from "@intermesh/groupoffice-core";
 
 interface ParticipantFieldEventMap extends FieldEventMap {
 	beforeadd: {principal: any}
@@ -75,6 +75,25 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 				}
 			}),
 			autocomplete({
+				buttons: [
+					btn({
+						icon: "person_add",
+						width: 48,
+						title: t('Add attendees'),
+						handler: () => {
+							const picker = new RecipientPicker();
+							picker.show();
+
+							picker.on("select",
+								async ({principalIds}) => {
+
+									const principals = await principalDS.get(principalIds);
+									principals.list.forEach(p => this.addParticipant(p));
+								}
+							)
+						}
+					})
+				],
 				placeholder:t('Invite people') + ' / ' + t('Resource request'),
 				//valueProperty: "id",
 				listeners: {
