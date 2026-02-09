@@ -1,3 +1,4 @@
+09-02-2026: 26.0.6
 - jitsimeet: Add sub to jwt
 - davclient: Add option to disable SSL validation
 - MS Teams: meeting gets decription with meeting id, passcode and meeting options link. Teams event is also set with subject and meeting time
