@@ -114,10 +114,12 @@ go.smtp.AccountDialog = Ext.extend(go.form.Dialog, {
 	sendTestMessage : function() {
 		this.getEl().mask(t("Sending..."));
 		var me = this;
+		const params = this.formPanel.getForm().getFieldValues();
+		params.id = this.currentId;
 		
 		go.Jmap.request({
 			method: "SmtpAccount/test",
-			params: this.formPanel.getForm().getFieldValues()
+			params: params
 		}).then(function() {
 			Ext.MessageBox.alert(
 				t("Success"),

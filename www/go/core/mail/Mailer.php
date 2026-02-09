@@ -510,11 +510,12 @@ class Mailer {
 		$log = new LogEntry();
 
 		if($this->smtpAccount) {
+			if(!$this->smtpAccount->id) { return; }
 			$log->setEntity($this->smtpAccount);
 		} else if($this->emailAccount) {
 			$log->setEntity($this->emailAccount);
 		} else {
-			if(go()->getAuthState() === null) return;
+			if(go()->getAuthState() === null) {return;}
 			$user = go()->getAuthState()->getUser();
 			if(isset($user)) {
 				$log->setEntity($user);
