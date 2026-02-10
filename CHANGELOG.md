@@ -1,3 +1,6 @@
+10-02-2026: 6.8.151
+- LDAPAuthenticator: allow and optionally enforce TOTP
+
 02-02-2026: 6.8.150
 - Email: fix sort error when searching
 - Core: Cron jobs no output buffering and debug memory
