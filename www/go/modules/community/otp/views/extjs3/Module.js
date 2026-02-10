@@ -14,6 +14,14 @@ GO.mainLayout.on('authenticated', (mainLayout, user, password) => {
 		return;
 	}
 
+	// LDAP enforces OTP on LDAP server level and is caught in the API authenticator class
+	// Therefore, it does not be enabled in Group-Office as well.
+	for(const a of user.authenticators) {
+		if (a === "ldap") {
+			return;
+		}
+	}
+
 	const s = go.Modules.get("community", "otp").settings;
 
 	go.modules.community.otp.enable(user, password, s.countDown, s.block);

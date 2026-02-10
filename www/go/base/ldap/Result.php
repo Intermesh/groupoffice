@@ -1,4 +1,7 @@
 <?php
+/**
+ * @depcreated - use go\core\ldap\* instead
+ */
 
 namespace GO\Base\Ldap;
 
