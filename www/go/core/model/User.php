@@ -609,7 +609,6 @@ public function historyLog(): bool|array
 
 			if(!in_array(Group::ID_EVERYONE, $this->groups)) {
 				$this->groups[] = Group::ID_EVERYONE;
-				// $this->setValidationError('groups', ErrorCode::INVALID_INPUT, go()->t("You can't remove group everyone"));
 			}
 
 			if(!$this->isNew()) {

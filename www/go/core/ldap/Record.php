@@ -6,16 +6,16 @@ use Exception;
 
 /**
  * LDAP record
- * 
+ *
  * @example
  * ````
  * $record = Record::find($connection, "ou=people,dc=planetexpress,dc=com", "uid=*");
  * foreach ($record as $record) {
- *	var_dump($record->getAttributes());
+ *    var_dump($record->getAttributes());
  * }
- * 
+ *
  * ```
- * 
+ *
  * @license AGPL/Proprietary http://www.group-office.com/LICENSE.TXT
  * @link http://www.group-office.com
  * @copyright Copyright Intermesh BV
@@ -23,22 +23,24 @@ use Exception;
  *
  * @property string $cn
  */
-class Record {
+class Record
+{
 
 	/**
 	 * The LDAP connection object holding the link
-	 * 
-	 * @var Connection 
+	 *
+	 * @var Connection
 	 */
 	private $connection;
 	private $entryId;
 	private array $attributes;
 
 	private $objectClass;
-	
+
 	protected static $_mapping = false;
 
-	public function __construct(Connection|null $connection = null, $entryId = null) {
+	public function __construct(Connection $connection = null, $entryId = null)
+	{
 		$this->entryId = $entryId;
 		$this->connection = $connection;
 	}
@@ -46,10 +48,11 @@ class Record {
 
 	/**
 	 * Get all attributes with values in a key value array
-	 * 
-	 * @return array 
+	 *
+	 * @return array
 	 */
-	public function getAttributes() {
+	public function getAttributes()
+	{
 
 		$keyToLowerCase = true;
 		if (!isset($this->attributes)) {
@@ -80,15 +83,17 @@ class Record {
 		return $this->attributes;
 	}
 
-	public function getObjectClass() {
-		if(!isset($this->objectClass)) {
+	public function getObjectClass()
+	{
+		if (!isset($this->objectClass)) {
 			$this->getAttributes();
 		}
 
 		return $this->objectClass;
 	}
 
-	private function convertUTF8($attr) {
+	private function convertUTF8($attr)
+	{
 		if (is_array($attr)) {
 			$new = array();
 			foreach ($attr as $key => $val) {
@@ -112,10 +117,10 @@ class Record {
 	 */
 	public static function find(Connection $connection, string $dn, string $query, int $sizeLimit = -1): Result
 	{
-		go()->debug('Find DN: "'.$dn.'", Query: "' . $query . '"');
+		go()->debug('Find DN: "' . $dn . '", Query: "' . $query . '"');
 
-		$oldHandler = set_error_handler(function($no, $message, $file, $line) use (&$oldHandler) {
-			if(str_contains($message, 'Partial search results returned: Sizelimit exceeded')) {
+		$oldHandler = set_error_handler(function ($no, $message, $file, $line) use (&$oldHandler) {
+			if (str_contains($message, 'Partial search results returned: Sizelimit exceeded')) {
 				return true;
 			}
 			$oldHandler($no, $message, $file, $line);
@@ -135,40 +140,26 @@ class Record {
 	 * Get the DN of this record.
 	 * @return string The distinguished name of an LDAP entity.
 	 */
-	public function getDn() {
+	public function getDn()
+	{
 		return ldap_get_dn($this->connection->getLink(), $this->entryId);
 	}
-	
+
 //	public function __set($name, $value) {
 //		$this->toArray();
 //		$this->_attributes[$name] = $value;
 //	}
 
-	public function __get($name) {
+	public function __get($name)
+	{
 		$this->getAttributes();
 		$name = strtolower($name);
 		return $this->attributes[$name] ?? null;
 	}
 
-	public function __isset($name) {
+	public function __isset($name)
+	{
 		$var = $this->$name;
 		return isset($var);
 	}
-//
-//	/**
-//	 * Save the attributes that are in the map or extraVar array to ldap dir
-//	 *
-//	 * @return Boolean true if there are any modifications done
-//	 */
-//	public function save() {
-//
-//		$entries = $this->toArray();
-//
-//		$link = $this->connection->getLink();
-//		$dn = $this->getDn();
-//
-//		GO::debug($entries);
-//		return @ldap_modify($link, $dn, $entries);
-//	}
-
 }

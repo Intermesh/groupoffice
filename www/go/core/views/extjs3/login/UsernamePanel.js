@@ -84,7 +84,6 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 	},
 
 	setErrors: function (errors) {
-
 		for (var key in errors) {
 			if (key === "password") {
 				switch (parseInt(errors[key].code)) {
@@ -99,10 +98,10 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 						this.passwordField.markInvalid(t('Invalid password'));
 						break;
 				}
-			} else
-			{
-				this.usernameField.markInvalid(t("Bad username or password"));
-				Ext.MessageBox.alert("Error",t("Bad username or password"));
+			} else {
+				const errorDescription = errors[key].description ?? "Bad username or password";
+				this.usernameField.markInvalid(t(errorDescription));
+				Ext.MessageBox.alert("Error",t(errorDescription));
 			}
 		}
 	},
