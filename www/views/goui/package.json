@@ -9,14 +9,14 @@
 
   "scripts": {
     "test": "mocha",
-    "start": "npm run build:clean && npm run build:assets && npm run build:goui-dts && npm run start:parallel",
+    "start": "npm run build:clean && npm run build:goui-assets && npm run build:goui-dts && npm run start:parallel",
     "start:parallel": "npx concurrently \"npm run start:watch\"  \"npm run start:watch-goui-dts\" \"npm run start:watch-groupoffice-core-dts\" \"npm run start:groupoffice-core-sass\"",
     "start:watch": "node esbuild.mjs watch",
     "start:groupoffice-core-sass": "npx sass --watch ./groupoffice-core/style:./dist/groupoffice-core/style ./goui/style:./goui/dist/",
     "start:watch-goui-dts": "npx tsc -w -p goui/tsconfig.json --emitDeclarationOnly --outDir ./dist/goui/script/",
     "start:watch-groupoffice-core-dts": "npx tsc -w -p groupoffice-core/tsconfig.json --emitDeclarationOnly --outDir ./dist/groupoffice-core/script/",
 
-    "build": "npm run build:clean  && npm run build:goui-sass && npm run build:assets && npm run build:groupoffice-core-sass && npm run build:ts  && npm run build:goui-dts && npm run build:groupoffice-core-dts",
+    "build": "npm run build:clean  && npm run build:goui-sass && npm run build:goui-assets && npm run build:groupoffice-core-sass && npm run build:ts  && npm run build:goui-dts && npm run build:groupoffice-core-dts",
     "build:clean": "rm -rf ./dist/*",
     "build:goui-sass": "npx sass --style=compressed ./goui/style:./dist/goui/style",
     "build:goui-assets" : "mkdir -p ./dist/goui && cp -r ./goui/resources ./dist/goui/resources",
