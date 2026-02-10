@@ -1,5 +1,5 @@
 10-02-2026: 6.8.151
-- LDAPAuthenticator: allow and optionally enforce TOTP
+- LDAPauthenticator: enable and optionally enforce TOTP workflow 
 
 02-02-2026: 6.8.150
 - Email: fix sort error when searching
