@@ -13,102 +13,108 @@ use go\core\orm\Property;
 use go\core\util\QRcode;
 use go\core\validate\ErrorCode;
 
-require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'core'.DIRECTORY_SEPARATOR.'util'.DIRECTORY_SEPARATOR.'QRcode.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'util' . DIRECTORY_SEPARATOR . 'QRcode.php';
 
 /**
  * @property User $owner
  */
-class OtpAuthenticator extends Property {
-		
+class OtpAuthenticator extends Property
+{
+
 	public $userId;
 	protected $secret;
 	public $createdAt;
 
 	protected $verified = false;
-	
+
 	private $verify = false;
 	public static bool $requestSecret = false;
 
 	public $expiresAt = null;
 
 	protected $codeLength = 6;
-	
+
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()->addTable("otp_secret");
 	}
 
-	public function getSecret() {
+	public function getSecret()
+	{
 
-		if(!self::$requestSecret) {
+		if (!self::$requestSecret) {
 			return null;
 		}
 
 
-		if(!$this->owner->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+		if (!$this->owner->hasPermissionLevel(Acl::LEVEL_WRITE)) {
 			throw new Forbidden();
 		}
 
 		return $this->secret;
 	}
-	
-	public function setRequestSecret($value){
-		if(!$value) {
+
+	public function setRequestSecret($value)
+	{
+		if (!$value) {
 			return;
 		}
 
-		if(!$this->owner->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+		if (!$this->owner->hasPermissionLevel(Acl::LEVEL_WRITE)) {
 			throw new Forbidden();
 		}
 		self::$requestSecret = true;
 		$this->secret = $this->createSecret();
 
 	}
-	
-	public function setVerify($code){
+
+	public function setVerify($code)
+	{
 		$this->verify = $code;
 	}
-	
-	public function setSecret($secret) {
+
+	public function setSecret($secret)
+	{
 		$this->secret = $secret;
 	}
-		
-	protected function internalValidate() {
-		
-		// When saving the new secret, the code needs to be verified first
-		if(!empty($this->verify)){
 
-			if(!$this->verifyCode($this->verify)) {
+	protected function internalValidate()
+	{
+
+		// When saving the new secret, the code needs to be verified first
+		if (!empty($this->verify)) {
+
+			if (!$this->verifyCode($this->verify)) {
 				$this->setValidationError('verify', \go\core\validate\ErrorCode::INVALID_INPUT, "The verify code is not correct.");
-			} else{
+			} else {
 				$this->verified = true;
 			}
 		}
 
 		// Temporary secrets need not be validated against currently verified password
-		if(!empty($this->expiresAt)) {
+		if (!empty($this->expiresAt)) {
 			parent::internalValidate();
 			return;
 		}
 
-		if($this->isModified("secret")) {
-			if((!go()->getAuthState() || !go()->getAuthState()->isAdmin()) && !$this->owner->isPasswordVerified()) {
+		if ($this->isModified("secret")) {
+			if ((!go()->getAuthState() || !go()->getAuthState()->isAdmin()) && !$this->owner->isPasswordVerified()) {
 				$this->owner->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
 				throw new Forbidden();
 			}
 		}
-		
+
 		parent::internalValidate();
 	}
-	
+
 	protected function internalSave(): bool
 	{
-		if(empty($this->secret)) {
+		if (empty($this->secret)) {
 			$this->secret = $this->createSecret();
 		}
 
 		// When saving a temporary secret, e,g. from LDAP, the secret is verified by definition
-		if($this->isNew() && !empty($this->expiresAt)) {
+		if ($this->isNew() && !empty($this->expiresAt)) {
 			$this->verified = true;
 		}
 
@@ -152,8 +158,8 @@ class OtpAuthenticator extends Property {
 
 		return $secret;
 	}
-	
-	public function getIsEnabled():bool
+
+	public function getIsEnabled(): bool
 	{
 		return $this->verified;
 	}
@@ -161,7 +167,7 @@ class OtpAuthenticator extends Property {
 	/**
 	 * Calculate the code, with given secret and point in time.
 	 *
-	 * @param string   $secret
+	 * @param string $secret
 	 * @param int|null $timeSlice
 	 *
 	 * @return string
@@ -169,9 +175,9 @@ class OtpAuthenticator extends Property {
 	public function getCode($secret, $timeSlice = null): string
 	{
 		return $this->internalGetCode($secret, $timeSlice);
-		
+
 	}
-	
+
 	private function internalGetCode($secret, $timeSlice = null): string
 	{
 		if ($timeSlice === null) {
@@ -208,15 +214,15 @@ class OtpAuthenticator extends Property {
 	 * @param null $title
 	 * @param array $params
 	 */
-	public function outputQr(string $name=null, $secret=null, $title = null, array $params = array()): void
+	public function outputQr(string $name = null, $secret = null, $title = null, array $params = array()): void
 	{
 		$name = empty($name) ? $this->owner->username . '@' . File::stripInvalidChars(go()->getSettings()->title) : $name;
-		$secret = empty($secret)?$this->secret:$secret;
+		$secret = empty($secret) ? $this->secret : $secret;
 
 		$level = QR_ECLEVEL_M;
 
-		if(!empty($params['level']) && array_search($params['level'], array('L', 'M', 'Q', 'H')) !== false){
-			switch($params['level']){
+		if (!empty($params['level']) && array_search($params['level'], array('L', 'M', 'Q', 'H')) !== false) {
+			switch ($params['level']) {
 				case 'L':
 					$level = QR_ECLEVEL_L;
 					break;
@@ -228,34 +234,34 @@ class OtpAuthenticator extends Property {
 					break;
 			}
 		}
-		
+
 		$otpUrl = 'otpauth://totp/' . rawurlencode($name) . '?secret=' . $secret . '';
 		if (isset($title)) {
-			$otpUrl .= '&issuer='.urlencode($title);
+			$otpUrl .= '&issuer=' . urlencode($title);
 		}
-		
 
-		QRcode::png($otpUrl, null ,$level,8);
+
+		QRcode::png($otpUrl, null, $level, 8);
 	}
 
 	/**
 	 * Check if the code is correct. This will accept codes starting from $discrepancy*30sec ago to $discrepancy*30sec from now.
 	 *
-	 * @param string   $secret
-	 * @param string   $code
-	 * @param int      $discrepancy      This is the allowed time drift in 30 second units (8 means 4 minutes before or after)
+	 * @param string $secret
+	 * @param string $code
+	 * @param int $discrepancy This is the allowed time drift in 30 second units (8 means 4 minutes before or after)
 	 * @param int|null $currentTimeSlice time slice if we want use other that time()
 	 *
 	 * @return bool
 	 */
-	public function verifyCode(string $code, ?string $secret=null, int $discrepancy = 1, ?int $currentTimeSlice = null): bool
+	public function verifyCode(string $code, ?string $secret = null, int $discrepancy = 1, ?int $currentTimeSlice = null): bool
 	{
 
 		//replace spaces
 		$code = preg_replace('/\s+/', '', $code);
-		
-		$secret = empty($secret)?$this->secret:$secret;
-		
+
+		$secret = empty($secret) ? $this->secret : $secret;
+
 		if ($currentTimeSlice === null) {
 			$currentTimeSlice = floor(time() / 30);
 		}
@@ -295,7 +301,8 @@ class OtpAuthenticator extends Property {
 	 *
 	 * @return bool|string
 	 */
-	protected function _base32Decode($secret) {
+	protected function _base32Decode($secret)
+	{
 		if (empty($secret)) {
 			return '';
 		}
@@ -310,7 +317,7 @@ class OtpAuthenticator extends Property {
 		}
 		for ($i = 0; $i < 4; ++$i) {
 			if ($paddingCharCount == $allowedValues[$i] &&
-							substr($secret, -($allowedValues[$i])) != str_repeat($base32chars[32], $allowedValues[$i])) {
+				substr($secret, -($allowedValues[$i])) != str_repeat($base32chars[32], $allowedValues[$i])) {
 				return false;
 			}
 		}
@@ -342,11 +349,11 @@ class OtpAuthenticator extends Property {
 	protected function _getBase32LookupTable(): array
 	{
 		return array(
-				'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', //  7
-				'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', // 15
-				'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', // 23
-				'Y', 'Z', '2', '3', '4', '5', '6', '7', // 31
-				'=', // padding char
+			'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', //  7
+			'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', // 15
+			'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', // 23
+			'Y', 'Z', '2', '3', '4', '5', '6', '7', // 31
+			'=', // padding char
 		);
 	}
 
