@@ -144,8 +144,7 @@ go.AuthenticationManager = (function () {
 		},
 
 		doAuthentication: function (authenticators, cb, scope) {
-
-			var loginData = {
+			const loginData = {
 				loginToken: this.loginToken, //while the user is authenticating only loginToken is set 
 				rememberLogin: this.rememberLogin,
 				authenticators: authenticators
@@ -155,8 +154,7 @@ go.AuthenticationManager = (function () {
 				url: this.getAuthUrl(),
 				jsonData: loginData,
 				callback: function (options, success, response) {
-					var result = response.responseText ? Ext.decode(response.responseText) : {}, me = this;
-					
+					const result = response.responseText ? Ext.decode(response.responseText) : {}, me = this;
 					if(!success) {
 						switch(response.status) {
 							case 503:
@@ -174,8 +172,7 @@ go.AuthenticationManager = (function () {
 						this.onAuthenticated(result).then(function() {
 							cb.call(scope || me, me, success, result);	
 						});
-					} else
-					{
+					} else {
 						cb.call(scope || me, me, success, result);
 					}
 

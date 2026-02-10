@@ -6,9 +6,10 @@
 
 CREATE TABLE `otp_secret` (
   `userId` int(11) NOT NULL,
-  `secret` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `secret` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `createdAt` datetime NOT NULL,
-  `verified` bool default false not null
+  `verified` bool default false not null,
+    `expiresAt` DATETIME NULL DEFAULT NULL
 ) ENGINE=InnoDB;
 
 --

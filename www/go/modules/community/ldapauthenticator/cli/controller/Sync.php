@@ -6,6 +6,7 @@ namespace go\modules\community\ldapauthenticator\cli\controller;
 
 use Exception;
 use go\core\Controller;
+use go\core\db\DbException;
 use go\core\event\EventEmitterTrait;
 use go\core\exception\NotFound;
 use go\core\ldap\Connection;
@@ -34,16 +35,15 @@ class Sync extends Controller
 	 * eg.
 	 * sudo -u www-data php /usr/share/groupoffice/cli.php community/ldapauthenticator/Sync/test --id=1 --username=john --debug
 	 *
-	 * @param $id
-	 * @param $username
+	 * @param array $params
 	 * @throws NotFound
 	 * @throws Exception
 	 */
-	public function test($params)
+	public function test(array $params): void
 	{
 
 		extract($this->checkParams($params, ['id', 'username']));
-		//objectClass	inetOrgPerson)
+
 		$server = Server::findById($id);
 		if (!$server) {
 			throw new NotFound("No LDAP config found with id = " . $id);
@@ -63,27 +63,23 @@ class Sync extends Controller
 
 		foreach ($records as $record) {
 
-//			var_dump($record->getAttributes());
-//
-//			var_dump($record->getObjectClass());
-
-
 			echo $record->getDn() . "\n";
-//
+
 			$user = $this->ldapRecordToUser($record, $server, false);
-//
+
 			echo "User: " . $user->username . "\n";
-//			var_dump($record->memberOf);
 		}
 	}
 
 
 	/**
 	 * docker compose exec --user www-data groupoffice php /usr/local/share/src/www/cli.php community/ldapauthenticator/Sync/users --id=1 --dryRun=1 --delete=1 --maxDeletePercentage=50
+	 *
+	 * @param array $params
 	 * @throws NotFound
 	 * @throws Exception
 	 */
-	public function users($params)
+	public function users(array $params): void
 	{
 		extract($this->checkParams($params, ['id', 'dryRun' => false, 'delete' => false, 'maxDeletePercentage' => 5]));
 		//objectClass	inetOrgPerson)
@@ -132,9 +128,13 @@ class Sync extends Controller
 	}
 
 	/**
-	 * @throws Exception
+	 * @param Record $record
+	 * @param Server $server
+	 * @param bool $dryRun
+	 * @return false|User|mixed|null
+	 * @throws DbException
 	 */
-	private function ldapRecordToUser(Record $record, Server $server, $dryRun)
+	private function ldapRecordToUser(Record $record, Server $server, bool $dryRun)
 	{
 
 		$username = $this->getGOUserName($record, $server);
@@ -185,7 +185,7 @@ class Sync extends Controller
 		return $user;
 	}
 
-	private function getGOUserName(Record $record, Server $server)
+	private function getGOUserName(Record $record, Server $server): bool|string
 	{
 		$username = $record->{$server->usernameAttribute}[0] ?? null;
 
@@ -250,7 +250,7 @@ class Sync extends Controller
 	/**
 	 * @throws Exception
 	 */
-	private function deleteUsers($usersInLDAP, $maxDeletePercentage, $dryRun)
+	private function deleteUsers(array $usersInLDAP, int $maxDeletePercentage, bool $dryRun): void
 	{
 		$users = User::find(['id', 'username'])
 			->join('ldapauth_server_user_sync', 's', 's.userId = u.id')
@@ -286,7 +286,7 @@ class Sync extends Controller
 
 	private $serverId;
 
-	private function output($str)
+	private function output(string $str): void
 	{
 		go()->debug($str);
 
@@ -299,7 +299,7 @@ class Sync extends Controller
 	 * docker compose exec --user www-data groupoffice php /usr/local/share/groupoffice/cli.php community/ldapauthenticator/Sync/groups --id=2 --dryRun=1 --delete=1 --maxDeletePercentage=50
 	 * @throws Exception
 	 */
-	public function groups($params)
+	public function groups(array $params)
 	{
 
 		extract($this->checkParams($params, ['id', 'dryRun' => false, 'delete' => false, 'maxDeletePercentage' => 5]));
@@ -401,7 +401,7 @@ class Sync extends Controller
 	/**
 	 * @throws Exception
 	 */
-	private function deleteGroups($groupsInLDAP, $maxDeletePercentage, $dryRun)
+	private function deleteGroups(array $groupsInLDAP, int $maxDeletePercentage, bool $dryRun): void
 	{
 		$groups = Group::find(['id', 'name'])
 			->join('ldapauth_server_group_sync', 's', 's.groupId = g.id')
@@ -470,7 +470,7 @@ class Sync extends Controller
 		return $members;
 	}
 
-	private function queryActiveDirectoryUser(Connection $ldapConn, $groupMember, Server $server): ?array
+	private function queryActiveDirectoryUser(Connection $ldapConn, string $groupMember, Server $server): ?array
 	{
 		$parts = preg_split('~(?<!\\\),~', $groupMember);
 		$query = str_replace('\\,', ',', array_shift($parts));
@@ -493,12 +493,12 @@ class Sync extends Controller
 	/**
 	 * @param array $deleteIds
 	 * @param int $totalInLDAP
-	 * @param $maxDeletePercentage
+	 * @param int $maxDeletePercentage
 	 * @param int $totalInGO
 	 * @return void
 	 * @throws Exception
 	 */
-	private function logDeletes(array $deleteIds, int $totalInLDAP, $maxDeletePercentage, int $totalInGO): void
+	private function logDeletes(array $deleteIds, int $totalInLDAP, int $maxDeletePercentage, int $totalInGO): void
 	{
 		$deleteCount = count($deleteIds);
 

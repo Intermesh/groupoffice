@@ -22,7 +22,8 @@ use go\core\util\JSON;
  * @param int $status
  * @param ?string $statusMsg
  */
-function output(array $data = [], int $status = 200, string $statusMsg = null) {
+function output(array $data = [], int $status = 200, string $statusMsg = null): void
+{
 
 	Response::get()->setHeader('Content-Type', 'application/json;charset=utf-8');
 	Response::get()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -206,11 +207,17 @@ try {
 
 				$user = $auth->passwordLogin($data['username'], $data['password']);
 				if (!$user) {
+					$errorDescription = 'Bad username or password';
+					$errorCode = ErrorCode::INVALID_INPUT;
+					if ($pwAuth = $auth->getUsedPasswordAuthenticator()) {
+						$errorDescription = $pwAuth->getErrorMessage();
+						$errorCode = $pwAuth->getErrorCode();
+					}
 					output([
 						'errors' => [
-							'username' => ["description" => "Bad username or password", "code" => ErrorCode::INVALID_INPUT]
+							'username' => ["description" => $errorDescription, "code" => $errorCode]
 						]
-					], 401, "Bad username or password");
+					], 401, $errorDescription);
 				}
 
 

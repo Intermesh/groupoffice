@@ -33,18 +33,6 @@ go.login.LoginPanel = Ext.extend(Ext.Container, {
 						items: menuItems
 					}
 				}),
-
-				// this.langCombo = new go.login.LanguageCombobox({
-				// 	emptyText: t("My selected language"),
-				// 	listeners: {
-				// 		select: function (cmb) {
-				// 			if (cmb.getValue() != '') {
-				// 				document.location = BaseHref + 'index.php?SET_LANGUAGE=' + cmb.getValue();
-				// 			}
-				// 		},
-				// 		scope: this
-				// 	}
-				// })
 			]
 		});
 

@@ -39,35 +39,20 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 	
 	protected function actionSubscribe($params){
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
-			$response = array();
-			
-			
-			$rawMail = json_decode($params["mailboxs"]);
-			if(is_array($rawMail)) {
-				$mailboxs = $rawMail;
-			} else {
-				$mailboxs = array($rawMail);
-			}
-	
-		foreach ($mailboxs as $mailboxName) {
-			
-			$mailbox = new \GO\Email\Model\ImapMailbox($account, array("name"=>$mailboxName));
-			$mailbox->subscribe();
-			
-//			$response['success'] = $mailbox->subscribe();
-			
-//			if(!$mailbox->subscribe()) {
-//				$response['success'] = false;
-//				
-//				break;
-//			}
-			$response['success'] = true;
+		$response = array();
+
+		$rawMail = json_decode($params["mailboxs"]);
+		if (is_array($rawMail)) {
+			$mailboxs = $rawMail;
+		} else {
+			$mailboxs = array($rawMail);
 		}
-		
-		if(!$response['success'])
-			$response['feedback']="Failed to subscribe to ".$params['mailbox'];
-//		return $response;
-		
+
+		foreach ($mailboxs as $mailboxName) {
+			$mailbox = new \GO\Email\Model\ImapMailbox($account, array("name" => $mailboxName));
+			$mailbox->subscribe();
+		}
+
 		echo $this->render('json', array('success' => true));
 	}
 	

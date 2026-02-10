@@ -29,6 +29,8 @@ class OtpAuthenticator extends Property {
 	private $verify = false;
 	public static bool $requestSecret = false;
 
+	public $expiresAt = null;
+
 	protected $codeLength = 6;
 	
 	protected static function defineMapping(): Mapping
@@ -83,6 +85,12 @@ class OtpAuthenticator extends Property {
 			}
 		}
 
+		// Temporary secrets need not be validated against currently verified password
+		if(!empty($this->expiresAt)) {
+			parent::internalValidate();
+			return;
+		}
+
 		if($this->isModified("secret")) {
 			if((!go()->getAuthState() || !go()->getAuthState()->isAdmin()) && !$this->owner->isPasswordVerified()) {
 				$this->owner->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
@@ -90,7 +98,7 @@ class OtpAuthenticator extends Property {
 			}
 		}
 		
-		return parent::internalValidate();
+		parent::internalValidate();
 	}
 	
 	protected function internalSave(): bool
@@ -98,7 +106,12 @@ class OtpAuthenticator extends Property {
 		if(empty($this->secret)) {
 			$this->secret = $this->createSecret();
 		}
-				
+
+		// When saving a temporary secret, e,g. from LDAP, the secret is verified by definition
+		if($this->isNew() && !empty($this->expiresAt)) {
+			$this->verified = true;
+		}
+
 		return parent::internalSave();
 	}
 
@@ -109,6 +122,7 @@ class OtpAuthenticator extends Property {
 	 * @param int $secretLength
 	 *
 	 * @return string
+	 * @throws Exception
 	 */
 	private function createSecret(int $secretLength = 32): string
 	{
@@ -139,7 +153,8 @@ class OtpAuthenticator extends Property {
 		return $secret;
 	}
 	
-	public function getIsEnabled() {
+	public function getIsEnabled():bool
+	{
 		return $this->verified;
 	}
 
@@ -193,10 +208,8 @@ class OtpAuthenticator extends Property {
 	 * @param null $title
 	 * @param array $params
 	 */
-	public function outputQr(string $name=null, $secret=null, $title = null, $params = array()): void
+	public function outputQr(string $name=null, $secret=null, $title = null, array $params = array()): void
 	{
-
-
 		$name = empty($name) ? $this->owner->username . '@' . File::stripInvalidChars(go()->getSettings()->title) : $name;
 		$secret = empty($secret)?$this->secret:$secret;
 
@@ -235,7 +248,7 @@ class OtpAuthenticator extends Property {
 	 *
 	 * @return bool
 	 */
-	public function verifyCode($code, $secret=null, $discrepancy = 1, $currentTimeSlice = null): bool
+	public function verifyCode(string $code, ?string $secret=null, int $discrepancy = 1, ?int $currentTimeSlice = null): bool
 	{
 
 		//replace spaces
@@ -268,7 +281,8 @@ class OtpAuthenticator extends Property {
 	 *
 	 * @return OtpAuthenticator
 	 */
-	public function setCodeLength($length) {
+	public function setCodeLength(int $length): static
+	{
 		$this->codeLength = $length;
 
 		return $this;
@@ -325,7 +339,8 @@ class OtpAuthenticator extends Property {
 	 *
 	 * @return array
 	 */
-	protected function _getBase32LookupTable() {
+	protected function _getBase32LookupTable(): array
+	{
 		return array(
 				'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', //  7
 				'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', // 15
@@ -344,7 +359,8 @@ class OtpAuthenticator extends Property {
 	 *
 	 * @return bool True if the two strings are identical
 	 */
-	private function timingSafeEquals($safeString, $userString) {
+	private function timingSafeEquals($safeString, $userString): bool
+	{
 		if (function_exists('hash_equals')) {
 			return hash_equals($safeString, $userString);
 		}
