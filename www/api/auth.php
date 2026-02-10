@@ -209,7 +209,7 @@ try {
 				if (!$user) {
 					$errorDescription = 'Bad username or password';
 					$errorCode = ErrorCode::INVALID_INPUT;
-					if ($pwAuth = $auth->getPrimaryAuthenticatorForUser($data['username'])) {
+					if ($pwAuth = $auth->getUsedPasswordAuthenticator()) {
 						$errorDescription = $pwAuth->getErrorMessage();
 						$errorCode = $pwAuth->getErrorCode();
 					}
