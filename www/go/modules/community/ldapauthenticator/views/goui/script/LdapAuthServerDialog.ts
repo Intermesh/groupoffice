@@ -6,8 +6,8 @@ import {
 	checkboxselectcolumn,
 	column,
 	comp, containerfield,
-	datasourcestore,
-	fieldset, NumberField, numberfield, select,
+	datasourcestore, Field,
+	fieldset, InputField, NumberField, numberfield, select,
 	t,
 	table, tbar, textarea, TextField, textfield
 } from "@intermesh/goui";
@@ -18,8 +18,6 @@ export class LdapAuthServerDialog extends FormWindow {
 	private ldapPasswordFld: TextField;
 	private ldapUseAuthCb: CheckboxField;
 	private createEmailCheckbox: CheckboxField;
-	private smtpUsernameFld: TextField;
-	private smtpPasswordFld: TextField;
 	private syncUsersDeleteCb: CheckboxField;
 	private syncUsersDelePercFld: NumberField;
 	private syncGroupsDelePercFld: NumberField;
@@ -47,6 +45,7 @@ export class LdapAuthServerDialog extends FormWindow {
 		});
 
 		const imapFs = fieldset({
+				hidden: true,
 				legend: t("IMAP Server", "community", "ldapauthenticator"),
 			},
 			checkbox({
@@ -56,8 +55,7 @@ export class LdapAuthServerDialog extends FormWindow {
 			}),
 			textfield({
 				name: "imapHostname",
-				label: t("Imap Hostname"),
-				required: true,
+				label: t("Imap Hostname")
 			}),
 			numberfield({
 				decimals: 0,
@@ -72,28 +70,25 @@ export class LdapAuthServerDialog extends FormWindow {
 				options: [
 					{value: "tls", name: "TLS"},
 					{value: "ssl", name: "SSL"},
-					{value: "", name: t("None")}
-				]
+					{value: null, name: t("None")}
+				],
+				listeners: {
+					change: ({newValue}) => {
+						this.form.findField("imapValidateCertificate")!.disabled = (newValue == null)
+					}
+				}
 			}),
 			checkbox({
 				type: "switch",
 				name: 'imapValidateCertificate',
-				label: t("Validate certicate"),
+				label: t("Validate certificate"),
 				value: true
-			}),
+			})
 		);
 
-		this.smtpUsernameFld = textfield({
-			name: "smtpUsername",
-			label: t("Username")
-		});
-		this.smtpPasswordFld = textfield({
-			name: "smtpPassword",
-			label: t("Password"),
-
-		})
 		const smtpFs = fieldset({
 				legend: t("SMTP Server", "community", "ldapauthenticator"),
+				hidden: true
 			},
 			textfield({
 				name: "smtpHostname",
@@ -112,17 +107,29 @@ export class LdapAuthServerDialog extends FormWindow {
 				hint: t("Enable this if the SMTP server credentials are identical to the IMAP server.", "community", "ldapauthenticator"),
 				listeners: {
 					setvalue: ({newValue, oldValue}) => {
-						this.smtpUsernameFld.hidden = !newValue;
-						this.smtpPasswordFld.hidden = !newValue;
-						this.smtpUsernameFld.required = newValue;
-						this.smtpPasswordFld.required = newValue;
-						this.smtpUsernameFld.disabled = !newValue;
-						this.smtpPasswordFld.disabled = !newValue;
+						const suf = this.form.findField("smtpUsername"),
+							spf = this.form.findField("smtpPassword");
+						if (spf && suf) {
+							suf.hidden = newValue;
+							spf.hidden = newValue;
+							suf.required = !newValue;
+							spf.required = !newValue;
+							suf.disabled = newValue;
+							spf.disabled = newValue;
+						}
 					}
 				}
 			}),
-			this.smtpUsernameFld,
-			this.smtpPasswordFld,
+			textfield({
+				name: "smtpUsername",
+				label: t("Username")
+			}),
+
+			textfield({
+				name: "smtpPassword",
+				label: t("Password"),
+
+			}),
 
 			select({
 				name: "smtpEncryption",
@@ -131,15 +138,21 @@ export class LdapAuthServerDialog extends FormWindow {
 				options: [
 					{value: "tls", name: "TLS"},
 					{value: "ssl", name: "SSL"},
-					{value: "", name: t("None")}
-				]
+					{value: null, name: t("None")}
+				],
+				listeners: {
+					change: ({newValue}) => {
+						this.form.findField("smtpValidateCertificate")!.disabled = (newValue == null)
+					}
+				}
 			}),
+
 			checkbox({
 				type: "switch",
 				name: 'smtpValidateCertificate',
 				label: t("Validate certicate"),
 				value: true
-			}),
+			})
 		);
 
 		const ldapServerFs = fieldset({
@@ -206,8 +219,13 @@ export class LdapAuthServerDialog extends FormWindow {
 				options: [
 					{value: "tls", name: "TLS"},
 					{value: "ssl", name: "SSL"},
-					{value: "", name: t("None")}
-				]
+					{value: null, name: t("None")}
+				],
+				listeners: {
+					change: ({newValue}) => {
+						this.form.findField("ldapVerifyCertificate")!.disabled = (newValue == null)
+					}
+				}
 			}),
 			checkbox({
 				type: "switch",
@@ -218,7 +236,7 @@ export class LdapAuthServerDialog extends FormWindow {
 			this.ldapUseAuthCb = checkbox({
 				type: "switch",
 				label: t('Use authentication', 'ldapauthenticator'),
-				name: 'ldapUseAuthentication',
+				// name: 'ldapUseAuthentication',
 				hint: t("Enable this if the LDAP server requires authentication to lookup users or groups"),
 				listeners: {
 					setvalue: ({newValue, oldValue}) => {
@@ -279,18 +297,18 @@ export class LdapAuthServerDialog extends FormWindow {
 				label: t("Create e-mail account for users"),
 				name: 'createUserEmail',
 				listeners: {
-					setvalue: ({newValue, oldValue}) => {
+					change: ({newValue, oldValue}) => {
 						imapFs.hidden = !newValue;
 						smtpFs.hidden = !newValue;
-
-						if (newValue) {
-							// TODO?
-						}
+						imapFs.findChildrenByType(InputField).forEach((fld) => {
+							if (!(fld instanceof CheckboxField)) {
+								fld.required = newValue;
+							}
+						});
 					}
 				}
 			})
 		);
-
 
 		const userOptionsFs = fieldset({
 				legend: t("User Options", "community", "ldapauthenticator"),
@@ -338,19 +356,6 @@ export class LdapAuthServerDialog extends FormWindow {
 				}
 			})
 		);
-
-		/*
-		 {
-					xtype: 'textarea',
-					grow: true,
-					name: 'syncGroupsQuery',
-					fieldLabel: t("Group query"),
-					required: true,
-					value: "(objectClass=Group)",
-					hint: t("For Microsoft ActiveDirectory use '(objectCategory=group)'")
-				}
-			]
-		 */
 		this.syncUsersDelePercFld = numberfield({
 			name: "syncUsersMaxDeletePercentage",
 			label: t("Max delete percentage", "community", "ldapauthenticator"),
@@ -378,7 +383,7 @@ export class LdapAuthServerDialog extends FormWindow {
 			label: t("Delete groups"),
 			name: "syncGroupsDelete",
 			listeners: {
-				setvalue: ({newValue, oldValue}) => {
+				change: ({newValue, oldValue}) => {
 					this.syncGroupsDelePercFld.hidden = !newValue;
 				}
 			}
@@ -391,11 +396,16 @@ export class LdapAuthServerDialog extends FormWindow {
 				type: "switch",
 				value: false,
 				label: t('Synchronize users'),
-				name: 'syncUsers',
+				name: "syncUsers",
 				listeners: {
 					setvalue: ({newValue, oldValue}) => {
-						this.syncUsersDeleteCb.value = !newValue;
-						this.syncUsersDeleteCb.hidden = !newValue;
+						if (!newValue) {
+							// this.syncUsersDeleteCb.value = false;
+						}
+						this.syncUsersDeleteCb.disabled = !newValue;
+						this.syncUsersDelePercFld.disabled = !newValue;
+						this.syncGroupsDelePercFld.hidden = !this.syncUsersDeleteCb.value;
+						// this.syncUsersDeleteCb.hidden = !newValue;
 					}
 				}
 			}),
@@ -407,7 +417,7 @@ export class LdapAuthServerDialog extends FormWindow {
 				label: t('Synchronize groups'),
 				name: 'syncGroups',
 				listeners: {
-					setvalue: ({newValue, oldValue}) => {
+					change: ({newValue, oldValue}) => {
 						this.syncGroupsDeleteCb.value = !newValue;
 						this.syncGroupsDeleteCb.hidden = !newValue
 					}
@@ -427,11 +437,29 @@ export class LdapAuthServerDialog extends FormWindow {
 		this.generalTab.items.add(ldapServerFs, userFs, imapFs, smtpFs, userOptionsFs, syncFs);
 
 		this.form.on("load", ({data}) => {
-			// debugger;
-			this.ldapUseAuthCb.value = true;
+			this.ldapUseAuthCb.value = false;
 			if (data.username && data.password) {
 				this.ldapUseAuthCb.value = true;
 			}
-		})
+			if (data.imapHostname && data.imapHostname.length > 0) {
+				this.createEmailCheckbox.value = true;
+			}
+			if (data.smtpUsername && data.smtpUsername.length > 0) {
+				this.form.findField("smtpUseUserCredentials")!.value = true;
+			}
+		});
+
+		this.form.on("beforesave", ({data}) => {
+			const currentId = this.form.currentId;
+
+			if (data.groups) {
+				const arGrp = data.groups;
+				delete data.groups;
+				data.groups = [];
+				for (const groupId of arGrp) {
+					data.groups.push({serverId: currentId, groupId: groupId});
+				}
+			}
+		});
 	}
 }

@@ -41,7 +41,7 @@ export class LdapAuthServerTable extends Table<DataSourceStore> {
 									dlg.on("close", () => {
 										void store.reload();
 									})
-									dlg.load(v).then(() => {
+									dlg.load(record.id).then(() => {
 										dlg.show();
 									})
 								}
@@ -50,7 +50,7 @@ export class LdapAuthServerTable extends Table<DataSourceStore> {
 								text: "Delete",
 								icon: "delete",
 								handler: () => {
-									void jmapds("LdapAuthServer").confirmDestroy([v]);
+									void jmapds("LdapAuthServer").confirmDestroy([record.id]);
 								}
 							}))
 					})

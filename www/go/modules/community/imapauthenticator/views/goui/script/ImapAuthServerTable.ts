@@ -19,6 +19,13 @@ export class ImapAuthServerTable extends Table<DataSourceStore> {
 			}),
 			column({
 				id: "id",
+				sortable: true,
+				hidable: true,
+				header: "ID",
+				width: 120,
+			}),
+			column({
+				id: "smtpHostname",
 				header: "",
 				width: 50,
 				sticky: true,
@@ -35,7 +42,7 @@ export class ImapAuthServerTable extends Table<DataSourceStore> {
 									dlg.on("close", () => {
 										void store.reload();
 									})
-									dlg.load(v).then(() => {
+									dlg.load(record.id).then(() => {
 										dlg.show();
 									})
 								}
@@ -44,7 +51,7 @@ export class ImapAuthServerTable extends Table<DataSourceStore> {
 								text: "Delete",
 								icon: "delete",
 								handler: () => {
-									void jmapds("ImapAuthServer").confirmDestroy([v]);
+									void jmapds("ImapAuthServer").confirmDestroy([record.id]);
 								}
 							}))
 					})
