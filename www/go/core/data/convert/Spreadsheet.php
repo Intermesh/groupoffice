@@ -208,7 +208,7 @@ th {
 	{
 
 		if ($this->index == 0) {
-			$this->writeRecord(array_column($this->getHeaders(), 'label'), true);
+			$this->writeRecord(array_column($this->getHeaders(), 'name'), true);
 		}
 
 		$headers = $this->getHeaders();
