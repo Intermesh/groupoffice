@@ -10,6 +10,7 @@ use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\SearchableTrait;
+use go\core\util\ArrayObject;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
@@ -125,5 +126,20 @@ class Note extends AclItemEntity {
 	public static function converters(): array
 	{
 		return array_merge(parent::converters(), [Spreadsheet::class]);
+	}
+
+	public static function sort(Query $query, ArrayObject $sort): Query
+	{
+		if (isset($sort['creator/name'])) {
+			$query->join('core_user', 'creator', 'creator.id = n.createdBy', 'LEFT');
+			$sort->renameKey('creator/name', 'creator.displayName');
+		}
+
+		if (isset($sort['modifier/name'])) {
+			$query->join('core_user', 'modifier', 'modifier.id = n.modifiedBy', 'LEFT');
+			$sort->renameKey('modifier/name', 'modifier.displayName');
+		}
+
+		return parent::sort($query, $sort);
 	}
 }

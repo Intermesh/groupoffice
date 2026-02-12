@@ -72,7 +72,7 @@ export class AliasTable extends Table<DataSourceStore> {
 				width: 100,
 				sortable: false,
 				renderer: (v, _record) => {
-					return v ? t("Yes"): t("No");
+					return v === 1 ? t("Yes"): t("No");
 				}
 
 			}),

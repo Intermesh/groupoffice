@@ -171,7 +171,8 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 				this.addressBookTree.getSelectionModel().select(abNode);
 			} else {
 				//when expand is done we'll select the first node. This will trigger a selection change. which will load the grid below.
-				this.addressBookTree.getSelectionModel().select(node.firstChild);
+				// this.addressBookTree.getSelectionModel().select(node.firstChild);
+				this.grid.store.load();
 			}
 		}, this);
 
@@ -334,12 +335,12 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 				filter: me.grid.store.baseParams.filter
 			}, function(response) {			
 				me.getEl().unmask();
-				Ext.MessageBox.confirm(t("Confirm"), t("Are you sure you want to select all {count} results?").replace('{count}', response.ids.length), function(btn) {
-					if(btn != 'yes') {
-						reject();
-					}
+				// Ext.MessageBox.confirm(t("Confirm"), t("Are you sure you want to select all {count} results?").replace('{count}', response.ids.length), function(btn) {
+				// 	if(btn != 'yes') {
+				// 		reject();
+				// 	}
 					resolve(response.ids);
-				}, me);
+				// }, me);
 				
 			}, me);
 		});

@@ -36,7 +36,7 @@ import {
 	JmapDataSource,
 	jmapds,
 	modules,
-	principalDS,
+	principalDS, RecipientPicker,
 	recurrencefield
 } from "@intermesh/groupoffice-core";
 import {categoryStore, OnlineMeetingButton, t, writeableCalendarStore} from "./Index.js";
@@ -243,7 +243,8 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 				}}
 			}),
 			comp({}),
-			this.startDate,this.endDate,
+			this.startDate,
+			this.endDate,
 			comp({cls:'hbox'},
 				recurrenceField,
 				exceptionsBtn,
@@ -253,6 +254,7 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 			new OnlineMeetingButton(this.locationField, this.form),
 
 			this.participantFld = participantfield({
+				style:{minWidth:'80%'},
 				listeners: {
 					'setvalue': ({newValue}) => {
 						const count = (newValue && Object.keys(newValue).length);
@@ -275,6 +277,9 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 					}
 				}
 			}),
+
+
+
 			this.btnFreeBusy = btn({hidden: true,text:t('Check availability'), handler: () => {
 				const dlg = new AvailabilityWindow();
 				dlg.on('changetime', ({start, end}) => {

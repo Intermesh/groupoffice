@@ -435,12 +435,21 @@ class Language {
 	/**
 	 * Get all countries
 	 * 
-	 * @return array array('nl'=>'The Netherlands');
+	 * @return array array('NL' => 'The Netherlands');
 	 */
-	public function getCountries() {
-		$this->loadSection('core', 'countries');
-		asort($this->data['core']['countries']);
-		return $this->data['core']['countries'];
+	public function getCountries() : array {
+		return go()->t('countries');
+	}
+
+	private array $countries = array();
+
+	public function getCountryName(string $countryCode) : string {
+		$iso = $this->getIsoCode();
+		if(!isset($this->countries[$iso])) {
+			$this->countries[$iso] = $this->getCountries();
+		}
+
+		return $this->countries[$iso][strtoupper($countryCode)] ?? $countryCode;
 	}
 
 	
