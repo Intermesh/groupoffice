@@ -15,7 +15,7 @@ export class UserSettingsPanel extends AppSettingsPanel {
 				name: "tasksSettings"
 				},
 				fieldset({
-						legend: t("Dislay options for lists")
+						legend: t("Display options for lists")
 					},
 					containerfield({
 							name: "tasksSettings"
