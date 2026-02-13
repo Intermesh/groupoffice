@@ -1,31 +1,30 @@
-import {btn, column, comp, datasourcestore, DataSourceStore, menu, t, Table, Window} from "@intermesh/goui";
+import {btn, column, datasourcestore, DataSourceStore, menu, t, Table} from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
-import {ImapAuthServerDialog} from "./ImapAuthServerDialog";
+import {LdapAuthServerDialog} from "./LdapAuthServerDialog";
 
-export class ImapAuthServerTable extends Table<DataSourceStore> {
+export class LdapAuthServerTable extends Table<DataSourceStore> {
 	constructor() {
 
 		const store = datasourcestore({
-			dataSource: jmapds("ImapAuthServer"),
-			sort: [{property: "imapHostName", isAscending: true}],
+			dataSource: jmapds("LdapAuthServer"),
+			sort: [{property: "hostname", isAscending: true}],
 		});
 
 		const columns = [
 
 			column({
-				id: "imapHostname",
-				header: t("Hostname", "community", "imapauthenticator"),
+				id: "hostname",
+				header: t("Hostname", "community", "ldapauthenticator"),
 				sortable: true
 			}),
 			column({
 				id: "id",
-				sortable: true,
-				hidable: true,
 				header: "ID",
+				hidable: true,
 				width: 120,
 			}),
 			column({
-				id: "smtpHostname",
+				id: "protocolVersion",
 				header: "",
 				width: 50,
 				sticky: true,
@@ -38,7 +37,7 @@ export class ImapAuthServerTable extends Table<DataSourceStore> {
 								text: "Edit",
 								icon: "edit",
 								handler: () => {
-									const dlg = new ImapAuthServerDialog();
+									const dlg = new LdapAuthServerDialog();
 									dlg.on("close", () => {
 										void store.reload();
 									})
@@ -51,7 +50,7 @@ export class ImapAuthServerTable extends Table<DataSourceStore> {
 								text: "Delete",
 								icon: "delete",
 								handler: () => {
-									void jmapds("ImapAuthServer").confirmDestroy([record.id]);
+									void jmapds("LdapAuthServer").confirmDestroy([record.id]);
 								}
 							}))
 					})
@@ -61,7 +60,7 @@ export class ImapAuthServerTable extends Table<DataSourceStore> {
 		super(store, columns);
 
 		this.on("rowdblclick", async ({storeIndex}) => {
-			const dlg = new ImapAuthServerDialog();
+			const dlg = new LdapAuthServerDialog();
 			dlg.show();
 			await dlg.load(this.store.get(storeIndex)!.id);
 		});

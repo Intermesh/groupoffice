@@ -89,8 +89,13 @@ export class ImapAuthServerDialog extends FormWindow {
 				options: [
 					{value: "tls", name: "TLS"},
 					{value: "ssl", name: "SSL"},
-					{value: "", name: t("None")}
-				]
+					{value: null, name: t("None")}
+				],
+				listeners: {
+					change: ({newValue}) => {
+						this.form.findField("imapValidateCertificate")!.disabled = (newValue == null)
+					}
+				}
 			}),
 			checkbox({
 				type: "switch",
@@ -135,8 +140,13 @@ export class ImapAuthServerDialog extends FormWindow {
 				options: [
 					{value: "tls", name: "TLS"},
 					{value: "ssl", name: "SSL"},
-					{value: "", name: t("None")}
-				]
+					{value: null, name: t("None")}
+				],
+				listeners: {
+					change: ({newValue}) => {
+						this.form.findField("smtpValidateCertificate")!.disabled = (newValue == null)
+					}
+				}
 			}),
 			checkbox({
 				type: "switch",

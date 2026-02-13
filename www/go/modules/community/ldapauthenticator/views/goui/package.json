@@ -1,0 +1,20 @@
+{
+  "type": "module",
+  "name": "ldapauthenticator",
+  "devDependencies": {
+    "concurrently": "latest",
+    "esbuild": "latest",
+    "sass": "latest",
+    "typescript": "latest"
+  },
+  "scripts": {
+    "start:ldapauthenticator": "npm run build:clean && concurrently --kill-others \"npm run start:ts\"  \"npm run start:dts\"",
+    "start:ts": "node ../../../../../../views/goui/esbuild-module.mjs watch",
+    "start:dts": "npx tsc --declaration --emitDeclarationOnly --watch",
+    "build": "npm run build:clean && npm run build:ts && npm run build:dts",
+    "build:clean": "rm -rf ./dist/*",
+    "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
+    "build:dts": "npx tsc --declaration --emitDeclarationOnly",
+    "test": "npx tsc --noEmit"
+  }
+}
