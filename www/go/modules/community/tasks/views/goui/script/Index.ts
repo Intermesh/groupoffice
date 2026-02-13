@@ -1,13 +1,11 @@
-import {client, modules, router} from "@intermesh/groupoffice-core";
+import {client, modules, moduleSettings, router} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
-import {t} from "@intermesh/goui";
-import {SettingsPanel} from "./SettingsPanel.js";
+import {UserSettingsPanel} from "./UserSettingsPanel.js";
 
 modules.register({
 	package: "community",
 	name: "tasks",
 	async init() {
-
 		let tasks: Main;
 		client.on("authenticated", ({session}) => {
 			if (!session.capabilities["go:community:tasks"]) {
@@ -24,9 +22,7 @@ modules.register({
 				return tasks;
 			});
 
-			modules.addAccountSettingsPanel("community", "tasks", "tasks", t("Tasks"), "check", () => {
-				return new SettingsPanel();
-			});
+			moduleSettings.addPanel(UserSettingsPanel);
 		});
 	}
 });
