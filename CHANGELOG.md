@@ -1,5 +1,6 @@
 - Core: Check if export is not empty.
 - LDAPAuthenticator enable and optionally enforce TOTP workflow (cherry-pick from 6.8)
+- Support: Implemented quote collapsing in support
 
 09-02-2026: 26.0.6
 - jitsimeet: Add sub to jwt
