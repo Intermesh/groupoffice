@@ -26,6 +26,7 @@ class Authenticate {
 
 	/**
 	 * Cache password logins for this number of seconds to
+	 * (JH: I hate it when people don't finish their)
 	 */
 	const CACHE_PASSWORD_LOGIN = 60;
 
@@ -220,7 +221,9 @@ class Authenticate {
 			throw new Unavailable(go()->t("Service unavailable. Maintenance mode is enabled."));
 		}
 
-		go()->getCache()->set($cacheKey, [$user, $authenticator], true, self::CACHE_PASSWORD_LOGIN);
+		if ($authenticator->needsCache()) {
+			go()->getCache()->set($cacheKey, [$user, $authenticator], true, self::CACHE_PASSWORD_LOGIN);
+		}
 
 		return $user;
 
