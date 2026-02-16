@@ -473,3 +473,6 @@ $updates['202511280942'][] = function() {
 $updates['202512030900'][] = 'create index calendar_event_status_index
     on calendar_event (status);';
 
+$updates['202602160945'][] = function() {
+	\go\modules\community\calendar\cron\ImportWebcalIcs::install("*/15 * * * *");
+};

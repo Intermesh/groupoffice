@@ -1,4 +1,5 @@
 - LDAPAuthenticator: enable and optionally enforce TOTP workflow (cherry-pick from 6.8.x)
+- Calendar: enable Webcal import cron job by default
 
 09-02-2026: 25.0.83 
 - MS Teams: meeting gets decription with meeting id, passcode and meeting options link. Teams event is also set with subject and meeting time
