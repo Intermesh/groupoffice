@@ -85,10 +85,9 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 							picker.show();
 
 							picker.on("select",
-								async ({principalIds}) => {
+								async ({recipients}) => {
 
-									const principals = await principalDS.get(principalIds);
-									principals.list.forEach(p => this.addParticipant(p));
+									recipients.forEach(r => this.addParticipant(r));
 								}
 							)
 						}
