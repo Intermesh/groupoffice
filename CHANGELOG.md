@@ -1,3 +1,4 @@
+- Core: Check if export is not empty.
 - LDAPAuthenticator enable and optionally enforce TOTP workflow (cherry-pick from 6.8)
 
 09-02-2026: 26.0.6
