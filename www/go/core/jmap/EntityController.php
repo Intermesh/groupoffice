@@ -1159,6 +1159,10 @@ abstract class EntityController extends Controller {
 		if(!go()->getEnvironment()->isCli()) {
 			go()->getEnvironment()->setMaxExecutionTime(10 * 60);
 		}
+
+		if(empty($params['ids'])) {
+			throw new Exception(go()->t("There's nothing to export"));
+		}
 		
 		$params = $this->paramsExport($params);
 
