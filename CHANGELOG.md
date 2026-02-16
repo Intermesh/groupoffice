@@ -1,3 +1,5 @@
+- Core: Check if export is not empty.
+
 09-02-2026: 26.0.6
 - jitsimeet: Add sub to jwt
 - davclient: Add option to disable SSL validation
