@@ -7,7 +7,7 @@ import {
 	DataSourceStore,
 	Format,
 	menu,
-	Notifier,
+	Notifier, QuoteStripper,
 	t,
 	win
 } from "@intermesh/goui";
@@ -18,6 +18,9 @@ import {commentDS, commentLabelDS} from "./Index.js";
 export class CommentList extends Component {
 	public store!: DataSourceStore
 	public scroller!: Component
+
+
+	public stripQuotes = false;
 
 	constructor() {
 		super()
@@ -106,6 +109,17 @@ export class CommentList extends Component {
 								.replace("{date}", Format.dateTime(comment.date));
 						}
 
+						let body:string, quote:string = "";
+						if(this.stripQuotes) {
+							const qs = new QuoteStripper(comment.text);
+
+							quote = qs.getQuote();
+
+							body = qs.getBodyWithoutQuote();
+						} else {
+							body = comment.text;
+						}
+
 						const commentComp = comp({
 							flex: 1,
 							cls: "comment-comment",
@@ -113,7 +127,7 @@ export class CommentList extends Component {
 								backgroundColor: writtenByUser ? "var(--fg-main-tp)" : "var(--bg-mid)"
 							},
 							title: commentTitle,
-							html: comment.text,
+							html: body,
 							listeners: {
 								beforerender: ({target}) => {
 									imgPromises.push(Image.replaceImages(target.el));
@@ -192,6 +206,21 @@ export class CommentList extends Component {
 								}
 							}
 						});
+
+						if(quote) {
+							commentComp.items.add(
+								btn({
+									cls: "raised",
+									text: t("More"),
+									handler: (btn) => {
+										commentComp.html = comment.text;
+
+										Image.replaceImages(commentComp.el);
+										btn.remove();
+									}
+								})
+							);
+						}
 
 						const labels = comp({
 							cls: "hbox"
