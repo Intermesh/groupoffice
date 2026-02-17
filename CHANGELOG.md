@@ -3,6 +3,7 @@
 - Support: Implemented quote collapsing in support
 - Assistant: When file is locked warn about it and download it read only.
 - Calendar: Added start page widget
+- Core: A bookmark with "Behave as module" could mess up sort order
 
 09-02-2026: 26.0.6
 - jitsimeet: Add sub to jwt
