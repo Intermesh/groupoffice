@@ -1,3 +1,5 @@
+- Oauth2: Correct username if it doesn't match oauth user
+
 10-02-2026: 6.8.151
 - LDAPauthenticator: enable and optionally enforce TOTP workflow 
 
