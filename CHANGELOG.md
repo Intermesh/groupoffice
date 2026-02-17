@@ -3,6 +3,7 @@
 - Leavedays: fix user panel manager view
 - ActiveSync: Fixed issue with TBSync creating events without organizer in shared calendars
 - Calendar: Added start page widget
+- Oauth: Correct wrong username in email account
 
 09-02-2026: 25.0.83 
 - MS Teams: meeting gets decription with meeting id, passcode and meeting options link. Teams event is also set with subject and meeting time
