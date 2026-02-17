@@ -807,7 +807,7 @@ class CalendarEvent extends AclItemEntity {
 
 	public function toArray(array|null $properties = null): array|null
 	{
-		if(!($this->start instanceof DateTime)) {
+		if(!($this->start instanceof DateTimeInterface)) {
 			//make sure timezone info is not sent by setting isLocal below. We can't be sure this datetime is a go\core\util\DateTime
 			$this->start = new DateTime($this->start);
 		}
