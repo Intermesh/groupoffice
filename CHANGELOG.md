@@ -1,5 +1,6 @@
 - LDAPAuthenticator: enable and optionally enforce TOTP workflow (cherry-pick from 6.8.x)
 - Calendar: enable Webcal import cron job by default
+- Leavedays: fix user panel manager view
 - ActiveSync: Fixed issue with TBSync creating events without organizer in shared calendars
 - Calendar: Added start page widget
 
