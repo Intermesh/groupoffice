@@ -74,8 +74,8 @@ final class Oauth2Client extends Entity
 					'openid',
 					'offline_access',
 					'email',
-					'https://outlook.office.com/IMAP.AccessAsUser.All',
-					'https://outlook.office.com/SMTP.Send'
+					'https://outlook.office365.com/IMAP.AccessAsUser.All',
+					'https://outlook.office365.com/SMTP.Send'
 				];
 				$params['defaultEndPointVersion'] = '2.0';
 
