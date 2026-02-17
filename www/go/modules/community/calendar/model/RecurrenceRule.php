@@ -117,6 +117,7 @@ class RecurrenceRule {
 		while ($it->valid() && $it->current() < $maxDate) {
 			$recurrenceId = $it->current()->format('Y-m-d\TH:i:s');
 			$instance = clone $p;
+			$instance->start = new DateTime($recurrenceId, $p->timeZone());
 			$o = $p->recurrenceOverrides[$recurrenceId] ?? null;
 			if(isset($o)) {
 				if($o->excluded) {
@@ -124,10 +125,7 @@ class RecurrenceRule {
 					continue;
 				}
 				$instance = self::patch($instance, $o);
-			}else {
-				$instance->start = new \DateTime($recurrenceId, $p->timeZone());
 			}
-
 //			$end = clone $instance->start;
 //			$end->add(new \DateInterval($duration));
 //			$instance->utcEnd = $end;
@@ -139,7 +137,7 @@ class RecurrenceRule {
 
 	private static function patch(CalendarEvent $instance, RecurrenceOverride $o) {
 		if(isset($o->start)) {
-			$instance->start = new \DateTime($o->start, $instance->timeZone());
+			$instance->start = new DateTime($o->start, $instance->timeZone());
 		}
 		if(isset($o->duration)) {
 			$instance->duration = $o->duration;
