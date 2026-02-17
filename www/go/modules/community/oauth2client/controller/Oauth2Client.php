@@ -4,6 +4,7 @@ namespace go\modules\community\oauth2client\controller;
 
 
 use go\core\auth\Authenticate;
+use go\core\ErrorHandler;
 use go\core\http\Exception;
 use go\core\jmap\EntityController;
 use go\core\model\User;
@@ -197,6 +198,7 @@ final class Oauth2Client extends EntityController
 
 		try {
 			$acct = Account::findById($accountId);
+
 			$acct->oauth2_account->token = $token->getToken();
 			$acct->oauth2_account->expires = $token->getExpires();
 
@@ -209,15 +211,25 @@ final class Oauth2Client extends EntityController
 			}
 
 			$account = \GO\Email\Model\Account::model()->findByPk($accountId);
-			$account->createDefaultFolders();
-			if(method_exists($token, "getIdTokenClaims") && isset($token->getIdTokenClaims()['email']) && $account->smtp_username != $token->getIdTokenClaims()['email']) {
+
+
+			if(method_exists($token, "getIdTokenClaims") && !empty($token->getIdTokenClaims()['email']) && $account->username != $token->getIdTokenClaims()['email']) {
+				$account->username = $token->getIdTokenClaims()['email'];
+				$account->save();
+			}
+
+			if(method_exists($token, "getIdTokenClaims") && !empty($token->getIdTokenClaims()['email']) && $account->smtp_username != $token->getIdTokenClaims()['email']) {
 				$account->smtp_username = $token->getIdTokenClaims()['email'];
 				$account->save();
 			}
+
+			$account->createDefaultFolders();
 			//$ownerDetails = $provider->getResourceOwner($token);
 		} catch (\Exception $e) {
 			// Failed to get user details
 			exit('Something went wrong: ' . $e->getMessage());
+
+			ErrorHandler::logException($e);
 		}
 		unset($_SESSION['oauth2state']);
 		unset($_SESSION['accountId']);
