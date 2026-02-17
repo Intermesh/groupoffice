@@ -55,6 +55,7 @@ class Exception extends CoreException
 		'416' => 'Requested Range Not Satisfiable',
 //		'417' => 'Expectation Failed',
 		'422' => 'Unprocessable Entity',
+		'423' => 'Locked',
 		'500' => 'Internal Server Error',
 		'501' => 'Not Implemented',
 //		'502' => 'Bad Gateway',
