@@ -182,8 +182,8 @@ GO.ModuleManager = Ext.extend(function(){
 		let p = Object.values(this.panelConfigs);
 
 		p.sort((a, b) => {
-			const sortA = go.Modules.get(a.package, a.moduleName, ).sort_order;
-			const sortB = go.Modules.get(b.package, b.moduleName, ).sort_order;
+			const sortA = go.Modules.get(a.package, a.moduleName).sort_order ?? 10000;
+			const sortB = go.Modules.get(b.package, b.moduleName).sort_order ?? 10000;
 
 			return sortA - sortB
 		})
