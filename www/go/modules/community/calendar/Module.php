@@ -307,6 +307,7 @@ class Module extends core\Module
 
 	protected function afterInstall(CoreModule $model): bool {
 		cron\ScanEmailForInvites::install("*/5 * * * *");
+		cron\ImportWebcalIcs::install("*/15 * * * *");
 
 		Calendar::entityType()->setDefaultAcl([core\model\Group::ID_INTERNAL => core\model\Acl::LEVEL_READ]);
 
