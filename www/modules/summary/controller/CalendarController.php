@@ -92,22 +92,25 @@ class CalendarController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 //			->join('calendar_calendar', FindCriteria::newInstance()
 //				->addCondition('calendarId', 'tl.id', '=', 't', true, true),'tl'), $periodStartTime, $periodEndTime);
 
+		$userTZ =  go()->getAuthState()->getUser()->timezone;
 		$data = [];
 		foreach($events as $event){
 			if($event->isRecurring()) {
 				foreach(RecurrenceRule::expand($event, $start->format('Y-m-d'), $end->format('Y-m-d')) as $instance) {
 					$arr = $instance->toArray();
 					$arr['calendar'] = $activeCalendars[$instance->calendarId];
-					$arr['end'] = $instance->end(true)->format('Y-m-d H:i');
-					$arr['day'] = $instance->start(true) <= $todayend ? \GO::t("Today") : \GO::t("Tomorrow");
-					$data[$instance->start(false, go()->getAuthState()->getUser()->timezone)->format('Y-m-d\TH:i:s').'-'.$event->id] = $arr;
+					$arr['start'] = $instance->start(false, $userTZ)->format('Y-m-d H:i');
+					$arr['end'] = $instance->end(false, $userTZ)->format('Y-m-d H:i');
+					$arr['day'] = $instance->start(true, $userTZ) <= $todayend ? \GO::t("Today") : \GO::t("Tomorrow");
+					$data[$instance->start(false, $userTZ)->format('Y-m-d\TH:i:s').'-'.$event->id] = $arr;
 				}
 			} else {
 				$arr =$event->toArray();
 				$arr['calendar'] = $activeCalendars[$event->calendarId];
-				$arr['end'] = $event->end(true)->format('Y-m-d H:i');
-				$arr['day'] = $event->start(true) <= $todayend ? \GO::t("Today") : \GO::t("Tomorrow");
-				$data[$event->start(false, go()->getAuthState()->getUser()->timezone)->format('Y-m-d\TH:i:s').'-'.$event->id] = $arr;
+				$arr['start'] = $event->start(false, $userTZ)->format('Y-m-d H:i');
+				$arr['end'] = $event->end(false, $userTZ)->format('Y-m-d H:i');
+				$arr['day'] = $event->start(true, $userTZ) <= $todayend ? \GO::t("Today") : \GO::t("Tomorrow");
+				$data[$event->start(false, $userTZ)->format('Y-m-d\TH:i:s').'-'.$event->id] = $arr;
 			}
 			//$record = $event->toArray();
 //			$record['day']=$event->end(true)->format('Y-m-d') > $start ? \GO::t("Today") : \GO::t("Tomorrow");
