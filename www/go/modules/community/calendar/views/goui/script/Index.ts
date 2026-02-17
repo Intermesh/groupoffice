@@ -315,7 +315,7 @@ modules.register(  {
 
 				});
 
-			modules.addMainPanel("community", "Calendar", 'calendar', t('Calendar'), () => ui);
+			modules.addMainPanel("community", "calendar", 'calendar', t('Calendar'), () => ui);
 
 			go.Alerts.on("beforeshow", function(alerts: any, alertConfig: any) {
 
