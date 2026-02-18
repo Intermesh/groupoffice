@@ -75,8 +75,6 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 
 		go.toolbar.SearchButton.superclass.constructor.call(this, config);
 			
-		//this.filters = go.util.Filters.normalize(config.filters || ['text']);
-		
 		if(this.ownerCt) {
 			this.lookupStore();
 		} else{
@@ -225,16 +223,6 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	hasActiveSearch : function(){
 
 		return this.triggerField.getValue() != "";
-		
-		// var isActive = false;
-		//
-		// if(this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore) {
-		// 	isActive = !GO.util.empty(this.store.filters.tbsearch);
-		// } else {
-		// 	isActive = !GO.util.empty(this.store.baseParams.query);
-		// }
-		//
-		// return isActive;
 	},
 	
 	/**
@@ -280,22 +268,11 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 
 				render : function(tb) {
 					tb.getEl().set({tabindex: 0});
-					// tb.getEl().on("focusout", function(e) {
-					//
-					// 	//hide toolbar if clicked outside. To allow a menu button we check if the target is not a menuy
-					// 	if(!e.browserEvent.relatedTarget || (!e.browserEvent.relatedTarget.classList.contains('x-menu-focus') && !this.searchToolBar.getEl().dom.contains(e.browserEvent.relatedTarget))) {
-					// 		this.back();
-					// 	}
-					// }, this);
 				}
 			}
 		});
 		var toolbar = this.findParentByType('toolbar');
 		this.searchToolBar.render(toolbar.el);
-		
-		// toolbar.ownerCt.on('resize', function (tb, adjWidth) {
-		// 	this.searchToolBar.setWidth(adjWidth);
-		// }, this);
 		
 		if(this.store && this.store.entityStore) {
 			
@@ -311,8 +288,6 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 			}
 
 			this.triggerField.store.sort('display', 'ASC');
-
-			// console.warn(this.store.entityStore.entity.filters);
 		}
 		
 		go.toolbar.SearchButton.superclass.onRender.call(this, ct, position);
@@ -350,7 +325,6 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		
 		this.fireEvent('search', this, v, filters);
 		this.updateView();
-		//this.onSearch.call(this.scope || this, v);
 	},
 
 	// search button handler

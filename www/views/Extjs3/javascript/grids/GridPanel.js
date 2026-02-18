@@ -112,8 +112,9 @@ GO.grid.GridPanel =Ext.extend(Ext.grid.GridPanel, {
 
 		function onDeleteKey(key, e){
 			//sometimes there's a search input in the grid, so dont delete when focus is on an input
-			if(e.target.tagName!='INPUT')
+			if(e.target.tagName!='INPUT') {
 				this.deleteSelected(this.deletethis);
+			}
 		}
 
 		if(!this.noDelete){
@@ -395,8 +396,6 @@ GO.grid.GridPanel =Ext.extend(Ext.grid.GridPanel, {
 
 		this.getView().scrollToTopOnLoad=false;
 		GO.deleteItems(deleteItemsConfig);
-		
-//		this.changed=true;
 	},
 
 	selectNextAfterDelete : function() {
@@ -466,8 +465,7 @@ GO.grid.GridPanel =Ext.extend(Ext.grid.GridPanel, {
 
 			this.editDialog.on('save', function(){   
 				this.store.reload();   
-//				this.changed=true;
-			}, this);	
+			}, this);
 		}
 		
 		if(Ext.isArray(this.primaryKey) && record) {
