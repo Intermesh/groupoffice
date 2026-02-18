@@ -12,6 +12,7 @@ import {UserProfileSettingsPanel} from "./UserProfileSettingsPanel.js";
 import {BaseEntity, translate} from "@intermesh/goui";
 
 export * from "./AddressBookCombo.js";
+export * from "./ContactCombo.js";
 
 translate.load(GO.lang.community.addressbook, "community", "addressbook");
 
@@ -69,3 +70,4 @@ client.on("authenticated", ({session}) => {
 });
 
 export const addressBookDS = new JmapDataSource<AddressBook>("AddressBook");
+export const contactDS = new JmapDataSource<Contact>("Contact");

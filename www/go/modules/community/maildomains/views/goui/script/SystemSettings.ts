@@ -1,11 +1,11 @@
+/**
+ * @deprecated - use App settings instead Temporary leaving as is until old system settings panel is gone
+ */
 import {
 	Component,
 	containerfield,
-	ContainerFieldValue,
 	datasourceform,
 	fieldset,
-	Form,
-	form,
 	t,
 	textfield
 } from "@intermesh/goui";
