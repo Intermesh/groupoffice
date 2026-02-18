@@ -1,3 +1,4 @@
+18-02-2025: 25.0.84
 - LDAPAuthenticator: enable and optionally enforce TOTP workflow (cherry-pick from 6.8.x)
 - Calendar: enable Webcal import cron job by default
 - Leavedays: fix user panel manager view
