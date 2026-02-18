@@ -138,3 +138,20 @@ ALTER TABLE `notes_note_image`
 ALTER TABLE `notes_note_book` ADD FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
 ALTER TABLE `notes_note` ADD FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
 ALTER TABLE `notes_note` ADD FOREIGN KEY (`modifiedBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
+
+CREATE TABLE IF NOT EXISTS `notes_note_book_user`
+(
+    `noteBookId`   INT(11) NOT NULL,
+    `userId`       INT(11) NOT NULL,
+    `syncToDevice` TINYINT(1)       DEFAULT 0 NOT NULL,
+    `modSeq`       INT     NOT NULL DEFAULT 0,
+    PRIMARY KEY (`noteBookId`, `userId`),
+    CONSTRAINT `fk_notes_note_book_user_notes_note_book1` FOREIGN KEY (`noteBookId`)
+        REFERENCES `notes_note_book` (`id`)
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION,
+    CONSTRAINT `fk_notes_note_book_user_core_user` FOREIGN KEY (`userId`)
+        REFERENCES `core_user` (`id`)
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION
+)

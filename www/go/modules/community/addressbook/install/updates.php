@@ -248,3 +248,22 @@ $updates['202508081003'][] = "update `addressbook_phone_number` set type='workce
 $updates['202601130927'][] = "alter table addressbook_contact
     modify gender enum ('M', 'F', 'N', 'P') null comment 'M for Male, F for Female, N for non-binary, P for private or null for unknown';
 ";
+
+$updates['202602171637'][] = "CREATE TABLE IF NOT EXISTS `addressbook_addressbook_user` (
+  								`addressBookId` INT(11) NOT NULL,
+  								`userId` INT(11) NOT NULL,
+  								`syncToDevice` TINYINT(1) DEFAULT 0 NOT NULL,
+  								`modSeq` INT NOT NULL DEFAULT 0,
+  								PRIMARY KEY (`addressBookId`, `userId`),
+  									CONSTRAINT `fk_addressbook_addressbook_user_addresbook_addressbook1` FOREIGN KEY (`addressBookId`)
+                                    REFERENCES `addressbook_addressbook` (`id`)   
+                                    ON DELETE CASCADE
+									ON UPDATE NO ACTION,
+									CONSTRAINT `fk_addressbook_addressbook_user_core_user` FOREIGN KEY (`userId`)
+                                    REFERENCES `core_user` (`id`)
+									ON DELETE CASCADE 
+									ON UPDATE NO ACTION);";
+
+$updates['202602181142'][] = "INSERT IGNORE INTO `addressbook_addressbook_user` (addressBookId, userId, syncToDevice)
+								SELECT addressBookId, userId, 1
+								FROM `sync_addressbook_user`;";

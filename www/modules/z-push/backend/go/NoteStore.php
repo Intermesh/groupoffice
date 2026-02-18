@@ -30,13 +30,13 @@ class NoteStore extends Store {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Get the item object that needs to be synced to the phone.
 	 * This information will be send to the phone.
-	 * 
+	 *
 	 * Direction: SERVER -> PHONE
-	 * 
+	 *
 	 * @param int $folderid
 	 * @param int $id
 	 * @param array $contentparameters
@@ -102,9 +102,9 @@ class NoteStore extends Store {
 
 	/**
 	 * Save the information from the phone to Group-Office.
-	 * 
+	 *
 	 * Direction: PHONE -> SERVER
-	 * 
+	 *
 	 * @param int $folderid
 	 * @param int $id
 	 * @param \SyncNote $message
@@ -170,31 +170,31 @@ class NoteStore extends Store {
 		return $this->StatMessage($folderid, $note->id);
 
 	}
-			
+
 	/**
 	 * Get the status of an item
-	 * 
+	 *
 	 * @param int $folderid
 	 * @param int $id
 	 * @return array
 	 */
 	public function StatMessage($folderid, $id) {
 		ZLog::Write(LOGLEVEL_DEBUG, 'goNote->StatMessage('.$folderid.','.$id.')');
-		
+
 		return Note::find()
 						->select('id,unix_timestamp(modifiedAt) AS `mod`, "1" AS `flags`')
 						->fetchMode(PDO::FETCH_ASSOC)
-						->where(['id' => $id])->single();	
+						->where(['id' => $id])->single();
 	}
-	
+
 	/**
 	 * Get the list of the items that need to be synced
-	 * 
+	 *
 	 * @param int $folderid
 	 * @param int $cutoffdate
 	 * @return array
 	 */
-	public function GetMessageList($folderid, $cutoffdate) {		
+	public function GetMessageList($folderid, $cutoffdate) {
 		ZLog::Write(LOGLEVEL_DEBUG, 'goNote->GetMessageList('.$folderid.','.$cutoffdate.')');
 		//if(!go()->getUser()->hasModule('notes')) {
 		//TODO refactor
@@ -208,25 +208,25 @@ class NoteStore extends Store {
 //						->join("sync_user_note_book", 's', 'n.noteBookId = s.noteBookId')
 //						->where(['s.userId' => go()->getUserId(), 'password' => ""]);
 //		ZLog::Write(LOGLEVEL_DEBUG, $query->debugQueryString);
-		$notes = $query->all();	
-		
-		
-		
+		$notes = $query->all();
+
+
+
 //		ZLog::Write(LOGLEVEL_DEBUG, var_export($notes, true));
-		
+
 		return $notes;
 	}
-	
+
 	/**
 	 * Get the syncFolder that is attached to the given id
-	 * 
+	 *
 	 * @param int $id
 	 * @return \SyncFolder
 	 */
 	public function GetFolder($id) {
 
 		$notebook = \go\modules\community\notes\model\NoteBook::findById($id);
-		if(!$notebook) {
+		if(!$notebook || !$notebook->syncToDevice) {
 			ZLog::Write(LOGLEVEL_WARN, "Note folder '$id' not found");
 			return false;
 		}
@@ -242,15 +242,16 @@ class NoteStore extends Store {
 
 	/**
 	 * Get a list of folders that are located in the current folder
-	 * 
+	 *
 	 * @return array
 	 */
 	public function GetFolderList() {
 		$folders = array();
 		$notebooks = \go\modules\community\notes\model\NoteBook::find()
 			->selectSingleValue('nb.id')
-			->join("sync_user_note_book", "u", "u.noteBookId = nb.id")
+			->join("notes_note_book_user", "u", "u.noteBookId = nb.id")
 			->andWhere('u.userId', '=', go()->getAuthState()->getUserId())
+			->andWhere('syncToDevice', '=', true)
 			->filter([
 				"permissionLevel" => Acl::LEVEL_READ
 			])->all();
@@ -262,7 +263,7 @@ class NoteStore extends Store {
 
 		return $folders;
 	}
-	
+
 	public function getNotification($folder=null) {
 		ZLog::Write(LOGLEVEL_DEBUG,'goNote->getNotification('.$folder.')');
 		$stmt = Note::find()
@@ -281,5 +282,5 @@ class NoteStore extends Store {
 
 		return $newstate;
 	}
-	
+
 }

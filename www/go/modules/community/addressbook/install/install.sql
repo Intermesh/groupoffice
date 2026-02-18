@@ -252,3 +252,20 @@ create index addressbook_contact_lastContactAt_index
 
 create index addressbook_contact_actionAt_index
     on addressbook_contact (actionAt);
+
+CREATE TABLE IF NOT EXISTS `addressbook_addressbook_user`
+(
+    `addressBookId` INT(11) NOT NULL,
+    `userId`        INT(11) NOT NULL,
+    `syncToDevice`  TINYINT(1)       DEFAULT 0 NOT NULL,
+    `modSeq`        INT     NOT NULL DEFAULT 0,
+    PRIMARY KEY (`addressBookId`, `userId`),
+    CONSTRAINT `fk_addressbook_addressbook_user_addresbook_addressbook1` FOREIGN KEY (`addressBookId`)
+        REFERENCES `addressbook_addressbook` (`id`)
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION,
+    CONSTRAINT `fk_addressbook_addressbook_user_core_user` FOREIGN KEY (`userId`)
+        REFERENCES `core_user` (`id`)
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION
+);
