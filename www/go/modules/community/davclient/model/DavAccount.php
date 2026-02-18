@@ -36,7 +36,7 @@ class DavAccount extends AclOwnerEntity {
 	public $username;
 	protected $password;
 	public $basePath;
-	public $principalUri;
+	public $principalUri = '';
 	public $capabilities;
 	public $name;
 	public $refreshInterval;
@@ -69,8 +69,11 @@ class DavAccount extends AclOwnerEntity {
 	{
 		if($this->isModified(['active', 'password', 'host', 'username']) && $this->active === true) {
 			// when account is new or reactivated. Trigger discovery and resync homeset.
-			if(!$this->sync()) {
-				$this->active = false;
+			if(!$this->isModified('lastSync')) {
+				$this->principalUri = '';
+				if(!$this->sync()) {
+					$this->active = false;
+				}
 			}
 		}
 		return parent::internalSave();// maybe again for lastError and lastSync
@@ -93,7 +96,7 @@ class DavAccount extends AclOwnerEntity {
 	public function http() {
 		if(empty($this->http)) {
 			$proto = substr($this->host, -2, 2) === '80' ? 'http://' : 'https://';
-			$this->http = new HttpClient($proto . $this->host, [
+			$this->http = new HttpClient($proto . preg_replace('#^https?://#i', '', $this->host), [
 				'Content-Type' => 'application/xml; charset=utf-8',
 				'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->decryptPassword()),
 			]);
@@ -151,16 +154,16 @@ class DavAccount extends AclOwnerEntity {
 		// fetch SRV record
 		$s = 's'; // secure first
 		$target = null;
+		$altPath = '/';
 		while ($target === null) {
 			$result = dns_get_record("_{$this->service}$s._tcp.{$this->http()->baseUri}", DNS_SRV | DNS_TXT);
 			foreach ($result as $record) {
 				if ($record['type'] === 'SRV' && ($target === null || $target['pri'] > $record['pri'])) {
-					$host = $record['target'];
-					$port = $record['port'];
+					$host = $record['target'] . (!empty($record['port']) ? ':'.$record['port'] : '');
 					// $record['weight'] for picking chance when 'pri' is equal
 					$target = $record;
 				} else if ($record['type'] === 'TXT' && strpos($record['txt'], 'path=') === 0) {
-					$path = substr($record['txt'], 5);
+					$altPath = substr($record['txt'], 5);
 				}
 			}
 			if ($s === '') {
@@ -168,29 +171,35 @@ class DavAccount extends AclOwnerEntity {
 			}
 			$s = '';
 		}
-
-		if (!isset($host)) {
-			// Thunderbird will do HEAD /, GET /, PROPFIND .well-known
-			$path = "/.well-known/$this->service";
-			$data = $this->http()->get($path);
-			if($data['status'] === 404) {
-				$path = "/";
-				$data = $this->http()->get($path);
-			}
-			if(isset($data['headers']['location'])) {
-				$this->basePath = parse_url(rtrim($data['headers']['location'], '/'), PHP_URL_PATH) . '/';
-				$this->principalUri = $this->principalUri();
-			} else {
-				$responses = $this->propfind(['d:current-user-principal'], $path);
-				foreach ($responses as $href => $response) {
-					if (isset($response->{'current-user-principal'})) {
-						$this->principalUri = $href;
-						return;
-					}
-				}
-				throw new \Exception("Could not find principalUri");
-			}
+		if (isset($host)) {
+			$this->http()->baseUri = $host;
 		}
+
+		// Thunderbird will do HEAD /, GET /, PROPFIND .well-known
+		$path = "/.well-known/$this->service";
+		try {
+			$data = $this->http()->get($path);
+		} catch(\Exception $e) {
+			// well-known not found, try path from SRV record or "/"
+		}
+		if(!isset($data) || $data['status'] === 404 || $data['status'] === 502) { //.well-known not found
+			$path = $altPath;
+			$data = $this->http()->get($path);
+		}
+		if(isset($data['headers']['location'])) {
+			$this->basePath = parse_url(rtrim($data['headers']['location'], '/'), PHP_URL_PATH) . '/';
+			$this->principalUri = $this->principalUri();
+		} else {
+			$responses = $this->propfind(['d:current-user-principal'], $path);
+			foreach ($responses as $href => $response) {
+				if (isset($response->{'current-user-principal'})) {
+					$this->principalUri = $href;
+					return;
+				}
+			}
+			throw new \Exception("Could not find principalUri");
+		}
+
 	}
 
 	// rfc6764
@@ -214,7 +223,14 @@ class DavAccount extends AclOwnerEntity {
 				parent::internalSave();
 			}
 //		if(!$this->isSetup()) {
-			$this->serviceDiscovery();
+			if(empty($this->principalUri))
+				$this->serviceDiscovery();
+			if($this->principalUri[0] === '/') {
+				$uri = $this->http()->baseUri;
+				$withoutPath = rtrim(parse_url($uri, PHP_URL_SCHEME) . '://' . parse_url($uri, PHP_URL_HOST) . (parse_url($uri, PHP_URL_PORT) ? ':' . parse_url($uri, PHP_URL_PORT) : ''), '/');
+				$this->http()->baseUri = $withoutPath;
+				$this->host = $withoutPath;
+			}
 //		}
 			$homesetUri = $this->homeSetUri($this->principalUri);
 			$responses = $this->syncCollections($homesetUri);
