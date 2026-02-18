@@ -34,7 +34,7 @@
     "guzzlehttp/guzzle": "@stable",
     "steverhoades/oauth2-openid-connect-server": "@stable",
     "phpoffice/phpspreadsheet": "@stable",
-    "firebase/php-jwt": "6.*",
+    "firebase/php-jwt": "7.*",
     "donatj/phpuseragentparser": "@stable",
     "league/oauth2-client": "@stable",
     "league/oauth2-google": "@stable",
