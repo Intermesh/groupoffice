@@ -354,11 +354,6 @@ class CalendarConvertor
 
 		//todo remove attendee?
 		if (!empty($message->attendees)) {
-			if($event->isNew() || !$event->organizer()) {
-				$organizer = $event->generatedOrganizer($principal);
-				if (!empty($message->organizeremail) && Util::validateEmail($message->organizeremail)) $organizer->email = $message->organizeremail;
-				if (!empty($message->organizername)) $organizer->name = $message->organizername;
-			}
 
 			foreach ($message->attendees as $attendee) {
 				$key = $attendee->email;
@@ -366,16 +361,19 @@ class CalendarConvertor
 					continue; // do not att attendee if client does not send a valid email address (TBSync uses login name)
 				$principalIds = Principal::findIdsByEmail($key);
 				$principalId = $principalIds[0] ?? $key;
-				if(!isset($event->participants[$principalId])) {
-					$p = new Participant($event);
-					$p->email = $attendee->email;
-					$p->name = $attendee->name;
-					$p->expectReply = true;
-					$p->kind = Participant::Individual; // todo: read from $attendee->attendeetype
-					$event->participants[$principalId] = $p;
-				} else {
-					$p = &$event->participants[$principalId];
+
+				$suffix = "";
+				while(isset($event->participants[$principalId.$suffix])) {
+					$suffix++;
 				}
+				$principalId .= $suffix;
+
+				$p = new Participant($event);
+				$p->email = $attendee->email;
+				$p->name = $attendee->name;
+				$p->expectReply = true;
+				$p->kind = Participant::Individual; // todo: read from $attendee->attendeetype
+				$event->participants[$principalId] = $p;
 
 				if(isset($attendee->attendeestatus)) {
 					$newStatus = array_search($attendee->attendeestatus, self::$participationStatusMap);
@@ -383,6 +381,12 @@ class CalendarConvertor
 						$p->participationStatus = $newStatus;
 					}
 				}
+			}
+
+			if(!$event->organizer()) {
+				$organizer = $event->generatedOrganizer($principal);
+				if (!empty($message->organizeremail) && Util::validateEmail($message->organizeremail)) $organizer->email = $message->organizeremail;
+				if (!empty($message->organizername)) $organizer->name = $message->organizername;
 			}
 		}
 

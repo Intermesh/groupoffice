@@ -137,6 +137,9 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		go.modules.community.tasks.TaskDetail.superclass.initComponent.call(this);
 		this.addCustomFields();
 		this.addComments(this.support);
+		if(this.support) {
+			this.comments.commentList.stripQuotes = true;
+		}
 
 		if(this.support) {
 

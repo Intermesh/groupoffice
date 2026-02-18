@@ -53,7 +53,14 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 
 			$mailbox = new \GO\Email\Model\ImapMailbox($account, array("name" => $mailboxName));
 			$mailbox->subscribe();
-
+			
+//			$response['success'] = $mailbox->subscribe();
+			
+//			if(!$mailbox->subscribe()) {
+//				$response['success'] = false;
+//				
+//				break;
+//			}
 			$response['success'] = true;
 		}
 

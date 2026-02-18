@@ -609,7 +609,6 @@ public function historyLog(): bool|array
 
 			if(!in_array(Group::ID_EVERYONE, $this->groups)) {
 				$this->groups[] = Group::ID_EVERYONE;
-				// $this->setValidationError('groups', ErrorCode::INVALID_INPUT, go()->t("You can't remove group everyone"));
 			}
 
 			if(!$this->isNew()) {
@@ -1258,8 +1257,10 @@ public function historyLog(): bool|array
 			//delete all acl records
 			$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
 
-			foreach($defaultModels as $model){
-				$model->deleteByAttribute('user_id',$pk['id']);
+			foreach ($defaultModels as $model) {
+				if ($model->hasAttribute('user_id')) {
+					$model->deleteByAttribute('user_id', $pk['id']);
+				}
 			}
 
 			LegacyUser::model()->fireEvent("delete", [$user, true]);
