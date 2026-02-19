@@ -1,3 +1,5 @@
+- Core: Allow archiving if you have "mayChangeUsers" permission
+
 18-02-2026: 26.0.7
 - Core: Check if export is not empty.
 - LDAPAuthenticator enable and optionally enforce TOTP workflow (cherry-pick from 6.8)
