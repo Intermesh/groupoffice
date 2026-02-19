@@ -8,7 +8,7 @@ import {
 	t,
 	tbar, Toolbar, Window
 } from "@intermesh/goui";
-import {CommentList} from "./CommentList.js";
+import CommentList from "./CommentList.js";
 import {CommentEditor} from "./CommentEditor.js";
 import {client, DetailPanel} from "@intermesh/groupoffice-core";
 import {LabelDialog} from "./LabelDialog.js";
@@ -94,7 +94,7 @@ export class CommentsPanel extends Component {
 				}),
 			),
 			comp({},
-				comp({}, this.commentList),
+				comp({cls: "pad"}, this.commentList),
 				form({
 					flex: 1,
 					handler: (form) => {
