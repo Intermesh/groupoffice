@@ -439,8 +439,8 @@ public function historyLog(): bool|array
 	 */
 	public function setArchive($v)
 	{
-		if(!go()->getAuthState()->isAdmin()) {
-			throw new Forbidden("Only admins can archive");
+		if(!go()->getModel()->getUserRights()->mayChangeUsers) {
+			throw new Forbidden();
 		}
 		$this->archive = $v;
 	}
