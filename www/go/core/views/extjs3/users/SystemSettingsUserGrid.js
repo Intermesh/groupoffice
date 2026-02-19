@@ -321,7 +321,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 						Ext.MessageBox.confirm(
 							t("Confirm"),
 							t("Archiving a user will disable them, revoke all group memberships and make their items invisible. Are you sure?"),
-							function(btn) {
+							async function(btn) {
 								if(btn !== 'yes') {
 									return;
 								}
@@ -334,12 +334,11 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 								params.update = {};
 								params.update[id] = {'enabled': false, 'archive': true};
 
-								go.Db.store("User").set(params, function(options, success, response) {
-									if (response.notUpdated && response.notUpdated[id] && response.notUpdated[id].validationErrors && response.notUpdated[id].validationErrors.currentPassword) {
-										Ext.MessageBox.alert(t('Error'), t('Error while saving the data'));
-										return;
-									}
-								});
+								try {
+									await go.Db.store("User").save({'enabled': false, 'archive': true}, id);
+								}catch(e) {
+									GO.errorDialog.show(e);
+								}
 							});
 					},
 					scope: this
