@@ -103,7 +103,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 
 		this.quotaFieldset = new Ext.form.FieldSet({
 			labelWidth:dp(152),		
-			hidden: !go.User.isAdmin,
+			hidden: !go.Modules.get("core", "core").userRights.mayChangeUsers,
 			title: t('Disk space'),
 			items: [{
 				xtype: 'compositefield',
@@ -289,7 +289,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 		})
 		
 		
-		if(go.User.isAdmin) {
+		if(go.Modules.get("core", "core").userRights.mayChangeUsers) {
 			this.passwordFieldset.insert(0, {
 				xtype:"checkbox",
 				hideLabel: true,
@@ -343,7 +343,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 
 		this.passwordFieldset.setVisible(visible);
 
-		if(go.User.isAdmin) {
+		if(!go.Modules.get("core", "core").userRights.mayChangeUsers) {
 			this.convertToLocalFieldset.setVisible(!visible);
 		}
 	},
