@@ -2316,6 +2316,7 @@ body.ext-ie6.x-body-masked .x-window select {
 .x-viewport, .x-viewport body {
     margin: 0;
     padding: 0;
+	padding-bottom: env(safe-area-inset-bottom);
     border: 0 none;
     overflow: hidden;
     height: 100%;
