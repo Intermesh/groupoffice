@@ -1,4 +1,5 @@
 - Core: Allow archiving if you have "mayChangeUsers" permission
+- Support: fixed "Save e-mail as ticket" function
 
 18-02-2026: 26.0.7
 - Core: Check if export is not empty.
