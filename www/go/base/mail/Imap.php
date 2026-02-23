@@ -2398,7 +2398,7 @@ class Imap extends ImapBodyStruct
 			}
 
 			$str = \GO\Base\Util\StringHelper::clean_utf8($str, $charset);
-			if($charset != 'utf-8') {
+			if(isset($charset) && $charset != 'utf-8') {
 				$str = str_replace($charset, 'utf-8', $str);
 			}
 		}
@@ -2418,7 +2418,7 @@ class Imap extends ImapBodyStruct
 			return $matches[1];
 		}
 
-		return 'windows-1252';
+		return null;
 	}
 
 

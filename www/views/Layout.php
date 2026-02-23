@@ -23,7 +23,7 @@ $lang = go()->getLanguage()->getIsoCode();
         $authController->fireEvent('headstart');
     }?>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 	<meta name="HandheldFriendly" content="true">
 	<meta http-equiv="x-ua-compatible" content="IE=edge">
 	<meta name="apple-mobile-web-app-capable" content="no">
@@ -38,7 +38,7 @@ $lang = go()->getLanguage()->getIsoCode();
     <link rel="icon" type="image/png" sizes="32x32" href="<?=$themeUrl?>img/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="<?=$themeUrl?>img/favicon/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="<?=$themeUrl;?>img/favicon/apple-touch-icon.png">
-    <link rel="manifest" href="<?=$themeUrl?>img/favicon/site.webmanifest">
+    <link rel="manifest" href="views/site.webmanifest">
     <link rel="mask-icon" href="<?=$themeUrl?>img/favicon/safari-pinned-tab.svg" color="#888888">
 <?php endif; ?>
     <title><?= $goTitle; ?><?= isset($title) ? ' - ' . $title : "" ?></title>
