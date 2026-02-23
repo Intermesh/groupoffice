@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS `tasks_tasklist` (
   `createdBy` INT(11) default NULL,
   `aclId` INT(11) NOT NULL,
   `version` INT(10) UNSIGNED NOT NULL DEFAULT 1,
-  `ownerId` INT(11) NOT NULL DEFAULT 1,
   `filesFolderId` INT(11) DEFAULT null,
   projectId int(11) null,
   groupingId int unsigned null,

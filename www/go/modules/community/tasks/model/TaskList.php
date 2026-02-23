@@ -67,8 +67,8 @@ class TaskList extends AclOwnerEntity
 	/** @var int */
 	public $createdBy;
 
-	/** @var int */
-	public $ownerId;
+//	/** @var int */∂
+//	public $ownerId;
 
 	/** @var int */
 	public $aclId;
@@ -94,6 +94,15 @@ class TaskList extends AclOwnerEntity
 				$criteria->where(['projectId' => $value]);
 			});
 
+	}
+
+	/**
+	 * Allow created by owner change. Todo create ownerId?
+	 * @return string[]
+	 */
+	public static function readOnlyProps(): array
+	{
+		return ["modifiedBy", "createdAt", "modifiedAt"];
 	}
 
 	protected static function textFilterColumns(): array

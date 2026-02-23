@@ -239,3 +239,5 @@ $updates['202412090921'][] = "alter table tasks_tasklist_group
 
 
 $updates['202504101121'][] = 'update tasks_task set start = due where start > due;';
+
+$updates['202602231535'][] = 'alter table tasks_tasklist drop column ownerId;';

@@ -35,7 +35,18 @@ go.modules.community.tasks.TasklistDialog = Ext.extend(go.form.Dialog, {
 				fieldLabel: t("Name"),
 				anchor: '100%',
 				allowBlank: false
-			}, new go.modules.community.tasks.TaskListGroupingCombo()]
+			},
+				this.selectUser = new go.users.UserCombo({
+					disabled: !go.User.isAdmin,
+					hidden: !go.User.isAdmin,
+					fieldLabel: t("Owner"),
+					hiddenName: "createdBy",
+					value: GO.settings.user_id,
+					anchor: '100%'
+				}),
+
+
+				new go.modules.community.tasks.TaskListGroupingCombo()]
 		}];
 	}
 });
