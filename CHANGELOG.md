@@ -1,3 +1,4 @@
+23-02-2026: 6.8.152
 - Oauth2: Correct username if it doesn't match oauth user
 
 10-02-2026: 6.8.151
