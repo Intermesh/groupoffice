@@ -1,3 +1,5 @@
+- Tasks: Allow admins to change tasklist owner
+
 23-02-2026: 6.8.152
 - Oauth2: Correct username if it doesn't match oauth user
 
