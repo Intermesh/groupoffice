@@ -1,5 +1,6 @@
 - Calendar: display correct time in linked event
 - Core / email: fix a nasty issue with encoding in certain email attachemnets
+- Startpage: Fix display of age in birthday portlet
 
 18-02-2025: 25.0.84
 - LDAPAuthenticator: enable and optionally enforce TOTP workflow (cherry-pick from 6.8.x)
