@@ -133,6 +133,14 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 							target.input.value = "";
 						}
 					},
+					'blur': ({target})=> {
+						if(validateEmail(target.input!.value)) {
+							const email = target.input!.value;
+							this.addParticipant({id:email,email});
+						}
+						target.input!.value = "";
+						target.value = "";
+					},
 					'select': ({target, record}) => {
 
 						if(record)
