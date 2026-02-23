@@ -11,11 +11,6 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-let commentsModule;
-
-import(BaseHref + "go/modules/community/comments/views/goui/dist/Index.js").then (m => {
-	commentsModule = m;
-})
 
 GO.DisplayPanel=function(config){
 	config = config || {};
