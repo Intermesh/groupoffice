@@ -362,7 +362,7 @@ modules.register(  {
 								}
 							}
 						}
-						panelCfg.title = alertConfig.entity.title+'<small style="color:var(--fg-secondary-text); line-height:4rem; float:right">'+time+'</small>';
+						panelCfg.title = alertConfig.entity.title;
 						panelCfg.items = [{html: msg  }];
 						panelCfg.notificationBody = msg ; // for desktop notifications (no html)
 						return panelCfg;
