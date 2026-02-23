@@ -1137,7 +1137,8 @@ class CalendarEvent extends AclItemEntity {
 
 	protected function getSearchModifiedAt(): DateTimeInterface
 	{
-		return $this->start();
+		// Link panel will convert to correct timezone. Maybe the GOUI link detail panel changes this?
+		return $this->start()->setTimeZone(new DateTimeZone("UTC"));
 	}
 
 
