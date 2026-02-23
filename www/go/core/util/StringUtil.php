@@ -112,7 +112,7 @@ class StringUtil {
 			return $str;
 		}
 		
-		if(!isset($sourceCharset)){
+		if (!isset($sourceCharset)) {
 			$sourceCharset = mb_detect_encoding($str);
 			if(!$sourceCharset){
 				$sourceCharset = 'UTF-8';
