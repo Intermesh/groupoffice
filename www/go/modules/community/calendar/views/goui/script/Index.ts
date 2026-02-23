@@ -329,7 +329,7 @@ modules.register(  {
 
 					alertConfig.panelPromise = alertConfig.panelPromise.then(async (panelCfg: any) => {
 
-						let msg: string = msgs[alert.tag] || '',
+						let msg: string = msgs[alert.tag] || go.util.Format.shortDateTime(alertConfig.entity.start, true),
 							time = go.util.Format.shortDateTime(alert.triggerAt);
 
 						if(alert.tag === 'created'){
@@ -362,9 +362,9 @@ modules.register(  {
 								}
 							}
 						}
-
-						panelCfg.items = [{html: msg + '<br>'+time }];
-						panelCfg.notificationBody = msg + "\n"+time; // for desktop notifications (no html)
+						panelCfg.title = alertConfig.entity.title+'<small style="color:var(--fg-secondary-text); line-height:4rem; float:right">'+time+'</small>';
+						panelCfg.items = [{html: msg  }];
+						panelCfg.notificationBody = msg ; // for desktop notifications (no html)
 						return panelCfg;
 					});
 
