@@ -67,8 +67,11 @@
 	// when using PowerPoint Online's 'view' action.
 	office_frame.setAttribute('allowfullscreen', 'true');
 
+    // needed for cross origin copy pasting: https://sdk.collaboraonline.com/docs/advanced_integration.html#allow-the-clipboard-permission-query
+    office_frame.setAttribute('allow', "clipboard-read *; clipboard-write *");
+
 	// The sandbox attribute is needed to allow automatic redirection to the O365 sign-in page in the business user flow
-	//Sandbox attribute breaks libreoffice online printing!
+    //Sandbox attribute breaks libreoffice online printing!
   <?php if($service->type == \go\modules\community\wopi\model\Service::TYPE_OFFICE_ONLINE) { ?>
 	office_frame.setAttribute('sandbox', 'allow-downloads allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation allow-popups-to-escape-sandbox');
   <?php
