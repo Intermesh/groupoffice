@@ -3,7 +3,8 @@
 - pdfeditor: Fixed GO 26.0.7 internal PDF-editor refuses saving #1428. It assumed GO is installed in the root.
 - Core: Fixed comments not reloading when edited
 - wopi: add clipboard-read and clipboard-write permissions
-
+- Contracts: remove redundant customer field
+- 
 18-02-2026: 26.0.7
 - Core: Check if export is not empty.
 - LDAPAuthenticator enable and optionally enforce TOTP workflow (cherry-pick from 6.8)
