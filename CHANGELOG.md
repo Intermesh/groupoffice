@@ -1,3 +1,5 @@
+- Calendar: Appointment notifications will show the start time of the event.
+- Calendar: Add participant field will auto add the email if it is valid but not entered yet. Invalid values will be cleated.
 - Calendar: display correct time in linked event
 - Core / email: fix a nasty issue with encoding in certain email attachemnets
 - Startpage: Fix display of age in birthday portlet
