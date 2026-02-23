@@ -1,14 +1,14 @@
 import {
-	autocomplete, avatar, btn, Button, checkbox,
+	autocomplete, avatar, btn,  checkbox,
 	column,
 	comp,
 	Component, Config, ContainerField, containerfield, createComponent, datasourcestore, DateTime, FieldEventMap, Format,
 	hr,
 	MapField,
-	mapfield, Menu, menu, ObservableListenerOpts,
+	mapfield, Menu, menu,
 	table
 } from "@intermesh/goui";
-import {getParticipantStatusIcon, statusIcons, t} from "./Index.js";
+import {getParticipantStatusIcon, t} from "./Index.js";
 import {client, jmapds, validateEmail} from "@intermesh/groupoffice-core";
 
 interface ParticipantFieldEventMap extends FieldEventMap {
