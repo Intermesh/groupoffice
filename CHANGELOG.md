@@ -6,6 +6,7 @@
 - Contracts: remove redundant customer field
 - ActiveSync: Fixed: Issues with Z-push and v16.0 instanceid handling. Fixes Error in Z-Push/src/lib/request/sync.php at line 559: Class "GSync" not found #1426
 - Calendar: Fixed display issue of read only events in the calendar
+- Core: Fixed SQL injection vulnerability in deprecated code that's removed now
 
 18-02-2026: 26.0.7
 - Core: Check if export is not empty.
