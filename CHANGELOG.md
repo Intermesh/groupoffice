@@ -4,7 +4,8 @@
 - Core: Fixed comments not reloading when edited
 - wopi: add clipboard-read and clipboard-write permissions
 - Contracts: remove redundant customer field
-- 
+- ActiveSync: Fixed: Issues with Z-push and v16.0 instanceid handling. Fixes Error in Z-Push/src/lib/request/sync.php at line 559: Class "GSync" not found #1426
+
 18-02-2026: 26.0.7
 - Core: Check if export is not empty.
 - LDAPAuthenticator enable and optionally enforce TOTP workflow (cherry-pick from 6.8)
