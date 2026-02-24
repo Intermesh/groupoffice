@@ -36,6 +36,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 	store: JmapDataSource
 	private statusTbar: Toolbar
 	private editBtn: Button;
+	private startField: DisplayField;
 
 	constructor() {
 		super("CalendarEvent");
@@ -46,8 +47,8 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 		const recurrenceField = displayfield({
 			hideWhenEmpty: false,
 			name: 'recurrenceRule', flex: 1,
-			renderer(this: DisplayField, v) {
-				return RecurrenceField.toText(v, this.dataSet.start);
+			renderer: ( v)=> {
+				return RecurrenceField.toText(v, new DateTime(this.startField.value as string));
 			}
 		});
 		this.statusTbar = tbar({hidden:true, style:{alignItems:'space-between'}, cls: "border-top"},
@@ -125,7 +126,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 							}
 						}  }),
 						comp({cls:'hbox'},
-							displayfield({label: t('Start'), name:'start',renderer:d=>Format.dateTime(d), flex:1}),
+							this.startField = displayfield({label: t('Start'), name:'start',renderer:d=>Format.dateTime(d), flex:1}),
 							displayfield({label:t('End'), name: 'end',renderer:d=>Format.dateTime(d), flex:1})
 						),
 						recurrenceField,
@@ -292,6 +293,8 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 			this.pressButton(ev.calendarPrincipal?.participationStatus);
 			this.form.findField('alerts')!.hidden = false;
 
+			// for custom fields panel
+			this.entity = ev.data;
 			this.legacyOnLoad(ev.data.id);
 
 			this.form.load(ev.data.id).then(() => {
