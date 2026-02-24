@@ -1,4 +1,5 @@
 - Tasks: Allow admins to change tasklist owner
+- Core: Fixed SQL injection vulnerability in deprecated code that's removed now
 
 23-02-2026: 6.8.152
 - Oauth2: Correct username if it doesn't match oauth user
