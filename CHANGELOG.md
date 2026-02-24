@@ -1,6 +1,7 @@
 - ActiveSync Fixed issues with Z-push and v16.0 instanceid handling. Fixes Error in Z-Push/src/lib/request/sync.php at line 559: Class "GSync" not found #1426
 - Calendar: Fixed display issue of read only events in the calendar
-- 
+- Core: Fixed SQL injection vulnerability in deprecated code that's removed now
+
 23-02-2025: 25.0.85
 - Calendar: Appointment notifications will show the start time of the event.
 - Calendar: Add participant field will auto add the email if it is valid but not entered yet. Invalid values will be cleated.
