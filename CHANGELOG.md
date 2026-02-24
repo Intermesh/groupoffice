@@ -1,3 +1,6 @@
+24-02-2026: 26.0.9
+- Core: Fixed RCE vulnerability.
+
 24-02-2026: 26.0.8
 - Core: Allow archiving if you have "mayChangeUsers" permission
 - Support: fixed "Save e-mail as ticket" function
