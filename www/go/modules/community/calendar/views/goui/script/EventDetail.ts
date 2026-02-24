@@ -1,9 +1,9 @@
 import {
 	btn, Button,
-	comp,  containerfield,
+	comp, containerfield,
 	DataSourceForm,
 	datasourceform, DateInterval,
-	DateTime, DisplayField, displayfield, EntityID, fieldset, Format, hr, mapfield, menu, Notifier,
+	DateTime, DisplayField, displayfield, EntityID, fieldset, Format, hr, mapfield, menu, Notifier, select, SelectField,
 	tbar, Toolbar,
 	Window
 } from "@intermesh/goui";
@@ -17,7 +17,7 @@ import {
 } from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
-import {calendarStore, getParticipantStatusIcon, statusIcons, t} from "./Index.js";
+import {calendarStore, getParticipantStatusIcon, statusIcons, t, writeableCalendarStore} from "./Index.js";
 import {EventWindow} from "./EventWindow.js";
 
 
@@ -34,7 +34,9 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 	store: JmapDataSource
 	private statusTbar: Toolbar
 	private editBtn: Button;
-	private startField: DisplayField;
+
+	private selectCalendar: SelectField
+	private showCalendar: DisplayField;
 
 	constructor() {
 		super("CalendarEvent");
@@ -45,8 +47,8 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 		const recurrenceField = displayfield({
 			hideWhenEmpty: false,
 			name: 'recurrenceRule', flex: 1,
-			renderer: ( v)=> {
-				return RecurrenceField.toText(v, new DateTime(this.startField.value as string));
+			renderer(this: DisplayField, v) {
+				return RecurrenceField.toText(v, this.dataSet.start);
 			}
 		});
 		this.statusTbar = tbar({hidden:true, style:{alignItems:'space-between'}, cls: "border-top"},
@@ -78,59 +80,96 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 
 		this.scroller.items.add(this.form = datasourceform({
-				flex:1,
-				dataSource: this.store,
-				listeners: {
-					'load': ( {data}) => {
-						const start = new DateTime(data.start);
-						data.end = start.add(new DateInterval(data.duration)).addDays(data.showWithoutTime? -1 : 0).format('c');
-						this.title = data.title;
-						if(!data.recurrenceRule)
-							recurrenceField.hidden = true;
-						else
-							recurrenceField.dataSet.start = start;
+					flex: 1,
+					dataSource: this.store,
+					listeners: {
+						'beforeload': ({data}) => {
+							const start = new DateTime(data.start);
+							data.end = start.add(new DateInterval(data.duration)).addDays(data.showWithoutTime ? -1 : 0).format('c');
+							this.title = data.title;
+							if (!data.recurrenceRule)
+								recurrenceField.hidden = true;
+							else
+								recurrenceField.dataSet.start = start;
 
-						if(data.participants && this.item!.calendarPrincipal) {
-							this.statusTbar.show();
-							this.pressButton(this.item!.calendarPrincipal.participationStatus);
-						}
-						if(data.useDefaultAlerts) {
-							alertField.useDefault = true;
-							delete data.alerts;
-						}
-					},
-					'beforesave':( {data}) => {
-						if(alertField.isModified() || !this.item?.data.id) {
-							data.useDefaultAlerts = alertField.useDefault;
+							if (data.participants && this.item!.calendarPrincipal) {
+								this.statusTbar.show();
+								this.pressButton(this.item!.calendarPrincipal.participationStatus);
+							}
+							if (data.useDefaultAlerts) {
+								alertField.useDefault = true;
+								delete data.alerts;
+							}
+						},
+						'beforesave': ({data}) => {
+							if (alertField.isModified() || !this.item?.data.id) {
+								data.useDefaultAlerts = alertField.useDefault;
+							}
 						}
 					}
-				}
-			},
+				},
 				comp({cls: "card flow"},
 					fieldset({},
-						displayfield({name: 'title',flex:1, label:t('Title')}),
-						displayfield({name: 'calendarId', width:160, label:t('Calendar'), renderer: async (v) => {
-							const c = await calendarStore.dataSource.single(v);
-							return c ? c.name : t('Unknown');
-						},listeners: {
-							'setvalue': ({newValue}) => {
-								if(newValue)
-									calendarStore.dataSource.single(newValue).then(r => {
-										if(!r) return;
-										this.item!.cal = r;
-										const d = this.item!.data.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
-										alertField.setDefaultLabel(d)
-									});
+						displayfield({name: 'title', flex: 1, label: t('Title')}),
+						this.showCalendar = displayfield({name: 'calendarId', width:160, hideWhenEmpty:false, label:t('Calendar'), renderer: async (v) => {
+								const c = await calendarStore.dataSource.single(v);
+								return c ? c.name : t('Unknown');
+							},listeners: {
+								'setvalue': ({newValue}) => {
+									if(newValue) {
+										calendarStore.dataSource.single(newValue).then(r => {
+											if (!r) return;
+											this.item!.cal = r;
+											const d = this.item!.data.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
+											alertField.setDefaultLabel(d)
+										});
+									}
+								}
+							}  }),
+						this.selectCalendar = select({
+							name: 'calendarId', width: 160, label: t('Calendar'),
+							required:true,
+							hidden:true,
+							valueField: 'id',
+							store: writeableCalendarStore,
+							textRenderer: (r: any) => r.name,
+							listeners: {
+								'render': () => {
+									if(!writeableCalendarStore.loaded) {
+										void writeableCalendarStore.load();
+									}
+								},
+								'setvalue': ({newValue}) => {
+									if (newValue) {
+										if (this.item!.data.calendarId != newValue) {
+											this.item!.data.calendarId = newValue;
+											this.item!.patch({calendarId: newValue});
+										}
+										writeableCalendarStore.dataSource.single(newValue).then(r => {
+											if (!r) return;
+											this.item!.cal = r;
+											const d = this.item!.data.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
+											alertField.setDefaultLabel(d)
+										});
+									}
+								}
 							}
-						}  }),
-						comp({cls:'hbox'},
-							this.startField = displayfield({label: t('Start'), name:'start',renderer:d=>Format.dateTime(d), flex:1}),
-							displayfield({label:t('End'), name: 'end',renderer:d=>Format.dateTime(d), flex:1})
+						}),
+						comp({cls: 'hbox'},
+							displayfield({label: t('Start'), name: 'start', renderer: d => Format.dateTime(d), flex: 1}),
+							displayfield({label: t('End'), name: 'end', renderer: d => Format.dateTime(d), flex: 1})
 						),
 						recurrenceField,
-						displayfield({name: 'location', label:t('Location')}),
-						displayfield({name:'description', tagName: "div", cls: "pad", escapeValue: false, renderer: (v, field) => Format.textToHtml(v)}),
-						mapfield({name: 'participants',
+						displayfield({name: 'location', label: t('Location')}),
+						displayfield({
+							name: 'description',
+							tagName: "div",
+							cls: "pad",
+							escapeValue: false,
+							renderer: (v, field) => Format.textToHtml(v)
+						}),
+						mapfield({
+							name: 'participants',
 
 							buildField: (v: any) => {
 								const userIcon = v.roles?.owner ?
@@ -141,37 +180,45 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 									statusIcon = getParticipantStatusIcon(v);
 
 								let type = '';
-								if(v.email == this.item?.calendarPrincipal?.email) {
-									type = ' ('+(this.item!.calendarPrincipal?.email === client.user.email ? t('You') : t('This'))+')';
+								if (v.email == this.item?.calendarPrincipal?.email) {
+									type = ' (' + (this.item!.calendarPrincipal?.email === client.user.email ? t('You') : t('This')) + ')';
 								}
-								let name = v.name ? v.name + (v.email ? type+'<br>' + v.email :'') : v.email+type;
+								let name = v.name ? v.name + (v.email ? type + '<br>' + v.email : '') : v.email + type;
 
-								return containerfield({cls:'hbox', style: {alignItems: 'center', cursor:'default'}},
-									comp({tagName:'i',cls:'icon',html:userIcon, style:{margin:'0 8px'}}),
+								return containerfield({cls: 'hbox', style: {alignItems: 'center', cursor: 'default'}},
+									comp({tagName: 'i', cls: 'icon', html: userIcon, style: {margin: '0 8px'}}),
 									comp({
 										flex: '1 0 60%',
 										html: name
 									}),
-									comp({tagName:'i',cls:'icon '+statusIcon[2],html:statusIcon[0],title:statusIcon[1], style:{margin:'0 8px'}}),
+									comp({
+										tagName: 'i',
+										cls: 'icon ' + statusIcon[2],
+										html: statusIcon[0],
+										title: statusIcon[1],
+										style: {margin: '0 8px'}
+									}),
 								);
 							}
 
 						}),
 						hr(),
 						alertField,
-						mapfield({name: 'links', cls:'goui-pit',
-							buildField: (v: any) => containerfield({flex:'1 0 100%',cls: 'flow'},
-								btn({icon: "description", text: v.title, flex:'1', style:{textAlign:'left'}, handler() {
-									client.downloadBlobId(v.blobId, v.title).catch((error) => {
-										Notifier.error(error);
-									})
-								}})
+						mapfield({
+							name: 'links', cls: 'goui-pit',
+							buildField: (v: any) => containerfield({flex: '1 0 100%', cls: 'flow'},
+								btn({
+									icon: "description", text: v.title, flex: '1', style: {textAlign: 'left'}, handler() {
+										client.downloadBlobId(v.blobId, v.title).catch((error) => {
+											Notifier.error(error);
+										})
+									}
+								})
 							)
 						})
 					)
 				)
 			)
-
 		);
 
 
@@ -277,8 +324,6 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 					const dlg = new EventWindow();
 					dlg.show();
 					dlg.loadEvent(this.item!);
-					console.log(dlg.form.value);
-					console.log(dlg.form.modified);
 				}
 			}))
 			this.statusTbar.show();
@@ -314,7 +359,10 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 					}
 				}
 				this.item = ev;
-				this.editBtn.hidden = !this.item.data.isOrigin || !this.item.cal.myRights.writeAll
+				this.editBtn.hidden = !this.item.mayChange;
+
+				this.showCalendar.hidden = this.item.mayMove
+				this.selectCalendar.hidden = !this.item.mayMove;
 			});
 		}
 		this.scroller.hidden = false;

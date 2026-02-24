@@ -835,7 +835,7 @@ class CalendarEvent extends AclItemEntity {
 					])->execute();
 				}
 			}
-			if($participant->kind == 'individual' && is_numeric($pid)) {
+			if($participant->isNew() && $participant->kind == 'individual' && is_numeric($pid)) {
 				$personalCalendarId = Calendar::fetchPersonal($pid);
 				if ($personalCalendarId) {
 					go()->getDbConnection()->insertIgnore('calendar_calendar_event', [

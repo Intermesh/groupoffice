@@ -498,6 +498,10 @@ export class CalendarItem {
 			(this.cal.myRights.mayWriteOwn && this.isOwner)) && !this.readOnly;
 	}
 
+	get mayMove() { // or remove
+		return this.cal.myRights.mayWriteAll && !this.readOnly; // change calendar or delete single instance/full series
+	}
+
 	private _calendarPrincipal:Participant|undefined;
 
 	/**
@@ -651,7 +655,6 @@ export class CalendarItem {
 			throw new Error('Not a participant');
 		const oldStatus = this.calendarPrincipal.participationStatus;
 		this.calendarPrincipal.participationStatus = status;
-
 		//eventDS.setParams.sendSchedulingMessages = true;
 		// should we notify a reply is sent?
 		this.patch({participants: this.participants}, onFinish,() => {
@@ -667,7 +670,7 @@ export class CalendarItem {
 			}
 			return undefined;
 		}
-		if(!this.isOwner) {
+		if(!this.isOwner && Object.keys(modified).some(k => k.startsWith('participants'))) {
 			return 'status';
 		}
 		if(modified.participants || this.participants) {
@@ -958,12 +961,33 @@ export class CalendarItem {
 
 
 	remove() {
-		if(!this.mayChange) {
+		if(!this.mayChange && !this.mayMove) {
 			if(this.cal.myRights.mayWriteAll && !this.isOwner) {
 				// this is an invite
 				this.updateParticipation("declined");
 			}
 			return;
+		}
+		if(!this.isOwner && this.mayMove && this.isRecurring) {
+			const w = win({title: t('This event is part of a recurring invite'), modal: true, width: 540,},
+				comp({cls:'pad',
+					html: t('Do you want to decline this occurrence or remove the entire series from your calendar?'),
+				}),tbar({},
+					btn({
+						text: t('Decline this instance'),
+						cls:'primary',
+						handler: _b => {
+							this.calendarPrincipal!.participationStatus = 'declined';
+							this.patchOccurrence({participants: this.participants});
+							w.close();
+						}
+					}),'->',btn({
+						text: t('Remove entire series'), // the series
+						handler: _b => { this.removeSeries(); w.close(); }
+					})
+				)
+			)
+			w.show();
 		}
 
 		if(!this.isRecurring) {
@@ -971,7 +995,7 @@ export class CalendarItem {
 				eventDS.destroy(this.data.id).catch(e => Window.error(e))
 				Object.values(this.divs).forEach(d => d.remove())
 			});
-		} else {
+		} else if (this.mayChange) {
 			const isFirstInSeries = this.data.start == this.recurrenceId;
 			const w = win({
 					title: t('Do you want to delete a recurring event?'),

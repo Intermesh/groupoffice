@@ -26,9 +26,8 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 			listeners: {
 				show:( {target}) => {
 
-					const mayWrite = this.current!.mayChange;
-					target.findChild("delete")!.disabled = !mayWrite;
-					target.findChild("edit")!.hidden = !mayWrite;
+					target.findChild("delete")!.disabled = !this.current!.mayMove;
+					target.findChild("edit")!.hidden = !this.current!.mayChange;
 
 					const participationStatus = target.findChild("participationStatus") as Radiofield;
 					participationStatus.hidden = this.current!.isOwner ?? !this.current!.cal.myRights?.mayWriteAll;
