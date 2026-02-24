@@ -330,12 +330,7 @@ class AbstractModelController extends AbstractController {
 	}
   
   /**
-   * The default grid action for the current model. This action also handles:
-	 * 
-	 * 1. Advanced queries. See _handleAdvancedQuery, the contacts advanced search
-	 * use case in Group-Office, and
-	 * \GO\Addressbook\Controller\Contact::beforeIntegrateRegularSql.
-	 * 2. Deleting models
+   * The default grid action for the current model. This action also handles deleting models.
    */
   protected function actionStore($params){	
     $modelName = $this->model;  
@@ -360,9 +355,7 @@ class AbstractModelController extends AbstractController {
 		$this->prepareStore($store);
 		
 		$storeParams = $store->getDefaultParams($params)->mergeWith($this->getStoreParams($params));
-		
-		if (!empty($params['advancedQueryData']))
-			$this->_handleAdvancedQuery($params['advancedQueryData'],$storeParams);
+
 		
 		$this->beforeStoreStatement($response, $params, $store, $storeParams);
 			
@@ -1062,127 +1055,9 @@ class AbstractModelController extends AbstractController {
 	//$attributes['companies.name']=\GO::t("Company", "addressbook");
 	//return parent::afterAttributes($attributes, $response, $params, $model);
 	}
-	
-	/**
-	 * Adds advanced query request parameters to a findCriteria object. 
-	 * The advanced query panel view can be found in GO.query.QueryPanel
-	 * 
-	 * @param String-or-array $advancedQueryData 
-	 * @param \GO\Base\Db\FindParams $storeParams
-	 */
-	private function _handleAdvancedQuery($advancedQueryData, &$storeParams){
-		$advancedQueryData = is_string($advancedQueryData) ? json_decode($advancedQueryData, true) : $advancedQueryData;
-		$findCriteria = $storeParams->getCriteria();
-		
-		$criteriaGroup = \GO\Base\Db\FindCriteria::newInstance();
-		$criteriaGroupAnd=true;
-		for($i=0,$count=count($advancedQueryData);$i<$count;$i++){
-			
-			$advQueryRecord=$advancedQueryData[$i];
-			
-			//change * into % wildcard
-			$advQueryRecord['value']=isset($advQueryRecord['value']) ? str_replace('*','%', $advQueryRecord['value']) : '';
-			
-			if($i==0 || $advQueryRecord['start_group']){
-				$findCriteria->mergeWith($criteriaGroup,$criteriaGroupAnd);
-				$criteriaGroupAnd=$advQueryRecord['andor']=='AND';
-				$criteriaGroup = \GO\Base\Db\FindCriteria::newInstance();
-			}
-			
-			if(!empty($advQueryRecord['field'])){	
-				// Give the record a unique id, to enable the programmers to
-				// discriminate between advanced search query records of the same field
-				// type.
-				$advQueryRecord['id'] = $i;
-				// Check if current adv. search record should be handled in the standard
-				// manner.
-				if($this->beforeHandleAdvancedQuery($advQueryRecord, $criteriaGroup ,$storeParams)){
-					
-					$fieldParts = explode('.',$advQueryRecord['field']);
-				
-					if(count($fieldParts)==2){
-						$field = $fieldParts[1];
-						$tableAlias=$fieldParts[0];
-					}else
-					{
-						$field = $fieldParts[0];
-						$tableAlias=false;
-					}
 
-					if($tableAlias=='t')
-						$advQueryRecord['value']=\GO::getModel($this->model)->formatInput($field, $advQueryRecord['value']);						
-					elseif($tableAlias=='cf'){
-						$advQueryRecord['value']=\GO::getModel(\GO::getModel($this->model)->customfieldsModel())->formatInput ($field, $advQueryRecord['value']);
-					}
-					
-					$cfRec = \GO::getModel($this->model)->getCustomfieldsRecord();
-					if($cfRec){
-						$cfColRecord = $cfRec->getColumn($field);
-					}
-					if (!empty($cfColRecord['customfield']->attributes['multiselect']))
-						$advQueryRecord['value']='%'.$advQueryRecord['value'].'%';
-					
-					$criteriaGroup->addCondition($field, $advQueryRecord['value'], $advQueryRecord['comparator'],$tableAlias,$advQueryRecord['andor']=='AND');
-				}
-			}
-		}
-			
-		$findCriteria->mergeWith($criteriaGroup,$criteriaGroupAnd);
-	}
 	
-	/**
-	 * If this function is not overridden in your controller, advanced search will
-	 * be only possible for model fields that correspond directly to fields in the
-	 * model's database table.
-	 * You can catch advanced search query records that have to be handled
-	 * differently by overriding this function. For example, if the purpose is to
-	 * search through fields of models related to the current model, such as
-	 * 'company name' for 'contacts', you can handle it here and return false. The
-	 * resulting overridden function should be a switch.
-	 * In your controller, this should be used in conjunction with
-	 * afterAttributes(). See for an example: the advanced search use case in
-	 * Group-Office, \GO\Addressbook\Controller\Contact::afterAttributes and
-	 * \GO\Addressbook\Controller\Contact::beforeIntegrateRegularSql().
-	 * @param Array $advQueryRecord
-	 * @param \GO\Base\Db\FindCriteria $findCriteria
-	 * @param \GO\Base\Db\FindParams $storeParams
-	 * @return boolean Return true if the current $advQueryRecord must be handled
-	 * in the regular way, return false after it has been handled differently.
-	 */
-	protected function beforeHandleAdvancedQuery($advQueryRecord, \GO\Base\Db\FindCriteria &$findCriteria, \GO\Base\Db\FindParams &$storeParams){
-		return true;
-	}
-	
-	/**
-	 * Checks if query data $advancedQueryData contains a field with name $fieldName,
-	 * and returns the record with that name, if any.
-	 * @param String $fieldName
-	 * @param Array $advancedQueryData
-	 * @return Array The advanced query record, or false if not found. 
-	 */
-//	protected function getAdvancedQueryRecord($fieldName, $advancedQueryData) {
-//		$advancedQueryData = json_decode($advancedQueryData, true);
-//		foreach ($advancedQueryData as $record) {
-//			if ($record['field']==$fieldName)
-//				return $record;
-//		}
-//		return false;
-//	}
-	
-		/**
-	 * Removes record with name $fieldName from $advancedQueryData contains.
-	 * @param String $fieldName
-	 * @param Array $advancedQueryData
-	 */
-//	protected function removeAdvancedQueryRecord($fieldName, &$advancedQueryData) {
-//		$advancedQueryData = json_decode($advancedQueryData, true);
-//		foreach ($advancedQueryData as $k=>$record) {
-//			if ($record['field']==$fieldName)
-//				unset($advancedQueryData[$k]);
-//		}
-//		$advancedQueryData = json_encode($advancedQueryData);
-//	}
-	
+
 	
 	/**
 	 * Checks for dates in the import model and performs an strtotime on it.
