@@ -116,10 +116,6 @@ views/Extjs3/javascript/panels/Portlet.js
 views/Extjs3/javascript/form/UploadPCForm.js
 views/Extjs3/javascript/Export.js
 
-views/Extjs3/javascript/advancedquery/AdvancedQueryPanel.js
-views/Extjs3/javascript/advancedquery/QueryPanel.js
-views/Extjs3/javascript/advancedquery/SavedQueriesGrid.js
-
 views/Extjs3/javascript/query/QueryPanel.js
 
 views/Extjs3/javascript/query/CriteriaFormPanel.js
