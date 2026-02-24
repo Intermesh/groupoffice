@@ -67,11 +67,11 @@
 	// when using PowerPoint Online's 'view' action.
 	office_frame.setAttribute('allowfullscreen', 'true');
 
-    // needed for cross origin copy pasting: https://sdk.collaboraonline.com/docs/advanced_integration.html#allow-the-clipboard-permission-query
-    office_frame.setAttribute('allow', "clipboard-read *; clipboard-write *");
+	// needed for cross origin copy pasting: https://sdk.collaboraonline.com/docs/advanced_integration.html#allow-the-clipboard-permission-query
+	office_frame.setAttribute('allow', "clipboard-read *; clipboard-write *");
 
 	// The sandbox attribute is needed to allow automatic redirection to the O365 sign-in page in the business user flow
-    //Sandbox attribute breaks libreoffice online printing!
+	//Sandbox attribute breaks libreoffice online printing!
   <?php if($service->type == \go\modules\community\wopi\model\Service::TYPE_OFFICE_ONLINE) { ?>
 	office_frame.setAttribute('sandbox', 'allow-downloads allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation allow-popups-to-escape-sandbox');
   <?php
@@ -82,7 +82,7 @@
 	document.getElementById('office_form').submit();
 
 
-	function post( msgId, Values) {
+	function post(msgId, Values) {
 		const msg = {
 			MessageId: msgId,
 			SendTime: Date.now()
@@ -95,7 +95,6 @@
 
 		office_frame.contentWindow.postMessage(JSON.stringify(msg), <?= json_encode($origin) ?>);
 	}
-
 
 
 	window.addEventListener("message", (event) => {
@@ -111,29 +110,46 @@
 		switch (msg.MessageId) {
 			case 'App_LoadingStatus':
 				if (msg.Values) {
-                    if (msg.Values.Status == 'Initialized') {
-                        post( 'Host_PostmessageReady');
-                    }
-                }
+					if (msg.Values.Status == 'Initialized') {
+						post('Host_PostmessageReady');
+                        // post('Insert_Button', {
+                        //     id: 'custom_close',
+                        //     imgurl: "icon.png",
+                        //     // mobile: true,
+                        //     // tablet: true,
+                        //     label: "Close",
+                        //     hint: "Close the document.",
+                        //     insertBefore: 'save'
+                        // });
+					}
+				}
 				break;
+          case "Clicked_Button":
+						switch(msg.Values.Id) {
+							case 'custom_close':
+							window.close();
+								break;
+                        }
 
-            case 'UI_SaveAs':
+						break;
+
+			case 'UI_SaveAs':
 
 
 				const extension = (msg.Values && msg.Values.format) ? msg.Values.format : <?= json_encode($file->fsFile->extension()); ?>;
-                // TODO make this a nice dialog
-                const filename = prompt("Please enter the filename you want to save as:", <?= json_encode($file->fsFile->nameWithoutExtension()); ?> + "." +extension);
+				// TODO make this a nice dialog
+				const filename = prompt("Please enter the filename you want to save as:", <?= json_encode($file->fsFile->nameWithoutExtension()); ?> + "." + extension);
 
-                post(
-                    'Action_SaveAs',
-                    {
-                        Filename: filename,
-                        Notify: true
-                    })
+				post(
+					'Action_SaveAs',
+					{
+						Filename: filename,
+						Notify: true
+					})
 
 
-                break;
-        }
+				break;
+		}
 
 	});
 </script>
