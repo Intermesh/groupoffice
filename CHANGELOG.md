@@ -1,3 +1,6 @@
+24-02-2026: 25.0.87
+- Core: Fixed RCE vulnerability.
+
 24-02-2026: 25.0.86
 - ActiveSync Fixed issues with Z-push and v16.0 instanceid handling. Fixes Error in Z-Push/src/lib/request/sync.php at line 559: Class "GSync" not found #1426
 - Calendar: Fixed display issue of read only events in the calendar
