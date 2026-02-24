@@ -1,12 +1,12 @@
-# Group Office groupware and CRM
+# GroupOffice groupware and CRM
 
-Group-Office is an open-source CRM and groupware tool for enterprises and the public sector.
+GroupOffice is an open-source CRM and groupware tool for enterprises and the public sector.
 Share projects, calendars, files and e-mail online with co-workers and clients. 
 Easy to use and fully customizable.
 
 # Install
 
-If you're not a developer and you wish to use Group-Office please visit:
+If you're not a developer and you wish to use GroupOffice please visit:
 
 https://www.group-office.com/documentation.html
 
@@ -20,7 +20,7 @@ Our Docker image can be found here:
 https://github.com/Intermesh/docker-groupoffice
 
 ### Development
-If you'd like to get started with Group-Office development please have a look at
+If you'd like to get started with GroupOffice development please have a look at
 our docker compose project. You can get started in minutes with just a few commands:
 
 https://github.com/Intermesh/docker-groupoffice-development
