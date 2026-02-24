@@ -1,3 +1,4 @@
+24-02-2026: 26.0.8
 - Core: Allow archiving if you have "mayChangeUsers" permission
 - Support: fixed "Save e-mail as ticket" function
 - pdfeditor: Fixed GO 26.0.7 internal PDF-editor refuses saving #1428. It assumed GO is installed in the root.
