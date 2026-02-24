@@ -39,10 +39,21 @@ go.modules.community.tasks.TasklistDialog = Ext.extend(go.form.Dialog, {
 				xtype:'colorfield',
 				name: 'color',
 				fieldLabel: t('Color')
-			}
-			, new go.modules.community.tasks.TaskListGroupingCombo(),
+			},
 			{xtype:'checkbox', name: 'syncToDevice', boxLabel: t('Sync to device'), hint: t('Make tasklist available in CalDAV and ActiveSync')}
-			]
+
+
+				this.selectUser = new go.users.UserCombo({
+					disabled: !go.User.isAdmin,
+					hidden: !go.User.isAdmin,
+					fieldLabel: t("Owner"),
+					hiddenName: "createdBy",
+					value: GO.settings.user_id,
+					anchor: '100%'
+				}),
+
+
+				new go.modules.community.tasks.TaskListGroupingCombo()]
 		}];
 	}
 });

@@ -160,7 +160,6 @@ class DbStore extends AbstractStore {
 	 * 'limit:integer'
 	 * 'query:string'
 	 * 'delete_keys:array'
-	 * 'advancedQueryData:array'
 	 * 'forEditing:boolean'
 	 */
 	private function _readRequestParams() {
@@ -194,67 +193,10 @@ class DbStore extends AbstractStore {
 			}
 		}
 
-		if (!empty($this->_requestParams['advancedQueryData']))
-			$this->_handleAdvancedQuery($this->_requestParams['advancedQueryData']);
-
 		if (!empty($this->_requestParams["forEditing"]))
 			$this->_columnModel->setModelFormatType("formatted");
 	}
 
-	/**
-	 * FIXME: this method was copied from ModelController and never tested
-	 * @param array $advancedQueryData the query data to be set to the store
-	 * @param array $storeParams store params to be modied by advancedQuery
-	 */
-	private function _handleAdvancedQuery($advancedQueryData) {
-		$advancedQueryData = is_string($advancedQueryData) ? json_decode($advancedQueryData, true) : $advancedQueryData;
-		$findCriteria = $this->_extraFindParams->getCriteria();
-
-		$criteriaGroup = \GO\Base\Db\FindCriteria::newInstance();
-		$criteriaGroupAnd = true;
-		for ($i = 0, $count = count($advancedQueryData); $i < $count; $i++) {
-
-			$advQueryRecord = $advancedQueryData[$i];
-
-			//change * into % wildcard
-			$advQueryRecord['value'] = isset($advQueryRecord['value']) ? str_replace('*', '%', $advQueryRecord['value']) : '';
-
-			if ($i == 0 || $advQueryRecord['start_group']) {
-				$findCriteria->mergeWith($criteriaGroup, $criteriaGroupAnd);
-				$criteriaGroupAnd = $advQueryRecord['andor'] == 'AND';
-				$criteriaGroup = \GO\Base\Db\FindCriteria::newInstance();
-			}
-
-			if (!empty($advQueryRecord['field'])) {
-				// Give the record a unique id, to enable the programmers to
-				// discriminate between advanced search query records of the same field
-				// type.
-				$advQueryRecord['id'] = $i;
-				// Check if current adv. search record should be handled in the standard
-				// manner.
-
-				$fieldParts = explode('.', $advQueryRecord['field']);
-
-				if (count($fieldParts) == 2) {
-					$field = $fieldParts[1];
-					$tableAlias = $fieldParts[0];
-				} else {
-					$field = $fieldParts[0];
-					$tableAlias = false;
-				}
-
-				if ($tableAlias == 't')
-					$advQueryRecord['value'] = \GO::getModel($this->_modelClass)->formatInput($field, $advQueryRecord['value']);
-				elseif ($tableAlias == 'cf') {
-					$advQueryRecord['value'] = \GO::getModel(\GO::getModel($this->_modelClass)->customfieldsModel())->formatInput($field, $advQueryRecord['value']);
-				}
-
-				$criteriaGroup->addCondition($field, $advQueryRecord['value'], $advQueryRecord['comparator'], $tableAlias, $advQueryRecord['andor'] == 'AND');
-			}
-		}
-
-		$findCriteria->mergeWith($criteriaGroup, $criteriaGroupAnd);
-	}
 
 	/**
 	 * Create the PDO statment that will query the results

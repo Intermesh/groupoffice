@@ -51,7 +51,7 @@ class TaskList extends AclOwnerEntity
 	public ?string $description = null;
 
 	public ?int $createdBy;
-	public ?int $ownerId;
+//	public ?int $ownerId;
 
 	protected string $defaultColor;
 
