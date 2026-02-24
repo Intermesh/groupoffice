@@ -40,7 +40,7 @@ go.modules.community.tasks.TasklistDialog = Ext.extend(go.form.Dialog, {
 				name: 'color',
 				fieldLabel: t('Color')
 			},
-			{xtype:'checkbox', name: 'syncToDevice', boxLabel: t('Sync to device'), hint: t('Make tasklist available in CalDAV and ActiveSync')}
+			{xtype:'checkbox', name: 'syncToDevice', boxLabel: t('Sync to device'), hint: t('Make tasklist available in CalDAV and ActiveSync')},
 
 
 				this.selectUser = new go.users.UserCombo({
