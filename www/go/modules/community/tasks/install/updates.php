@@ -240,48 +240,50 @@ $updates['202412090921'][] = "alter table tasks_tasklist_group
 
 $updates['202504101121'][] = 'update tasks_task set start = due where start > due;';
 
+$updates['202602231535'][] = 'alter table tasks_tasklist drop column ownerId;';
+
 // 6.9
 
 
 // Fix being able to delete the calendar module. because the tasklists acl's belonged to the TasklistCompat entity which belongs to Calendar
-$updates['202504101121'][] = "UPDATE core_acl a join core_entity e on a.entityTypeId = e.id 
+$updates['202602231535'][] = "UPDATE core_acl a join core_entity e on a.entityTypeId = e.id 
 SET a.entityTypeId = (SELECT id FROM core_entity WHERE clientName = 'Tasklist')
 WHERE e.clientName = 'TasklistCompat';";
 
-$updates['202504101121'][] = "ALTER TABLE `tasks_tasklist` 
+$updates['202602231535'][] = "ALTER TABLE `tasks_tasklist` 
 ADD COLUMN `defaultColor` VARCHAR(21) NOT NULL DEFAULT '' AFTER `createdBy`,
 ADD COLUMN `highestItemModSeq` VARCHAR(32) NOT NULL DEFAULT 0 AFTER `defaultColor`;";
 
-$updates['202504101121'][] = "ALTER TABLE `tasks_tasklist` DROP COLUMN `version`;";
-$updates['202504101121'][] = "ALTER TABLE `tasks_tasklist_user` CHANGE COLUMN `color` `color` VARCHAR(21) NULL DEFAULT NULL ;";
-$updates['202504101121'][] = "ALTER TABLE `tasks_tasklist_user` CHANGE COLUMN `modSeq` `modSeq` INT NOT NULL DEFAULT 0 ;";
+$updates['202602231535'][] = "ALTER TABLE `tasks_tasklist` DROP COLUMN `version`;";
+$updates['202602231535'][] = "ALTER TABLE `tasks_tasklist_user` CHANGE COLUMN `color` `color` VARCHAR(21) NULL DEFAULT NULL ;";
+$updates['202602231535'][] = "ALTER TABLE `tasks_tasklist_user` CHANGE COLUMN `modSeq` `modSeq` INT NOT NULL DEFAULT 0 ;";
 // set random default color for the color field
-$updates['202504101121'][] = "UPDATE tasks_tasklist SET defaultColor = SUBSTRING('#CDAD00#E74C3C#9B59B6#8E44AD#2980B9#3498DB#1ABC9C#16A085#27AE60#2ECC71#F1C40F#F39C12#E67E22#D35400#95A5A6#34495E#808B96#1652a1', (id MOD 18) * 7 + 2 ,6);";
+$updates['202602231535'][] = "UPDATE tasks_tasklist SET defaultColor = SUBSTRING('#CDAD00#E74C3C#9B59B6#8E44AD#2980B9#3498DB#1ABC9C#16A085#27AE60#2ECC71#F1C40F#F39C12#E67E22#D35400#95A5A6#34495E#808B96#1652a1', (id MOD 18) * 7 + 2 ,6);";
 // subscribe to the tasklists the user has access to
-$updates['202504101121'][] = "INSERT IGNORE INTO tasks_tasklist_user
+$updates['202602231535'][] = "INSERT IGNORE INTO tasks_tasklist_user
 (tasklistId, userId, isSubscribed, isVisible, color, sortOrder, modSeq)
 select tl.id, ug.userId, 1, 1, tl.defaultColor,0,1 from core_acl_group ag
 inner join core_user_group ug on ug.groupId = ag.groupId
 inner join tasks_tasklist tl on tl.aclId = ag.aclId where tl.projectId is not null group by tl.id,ug.userId";
 
-$updates['202504101121'][] = "update tasks_task set progressUpdated = modifiedAt where progressUpdated is null and progress = 3;";
+$updates['202602231535'][] = "update tasks_task set progressUpdated = modifiedAt where progressUpdated is null and progress = 3;";
 
-$updates['202504101121'][] = "alter table tasks_task
+$updates['202602231535'][] = "alter table tasks_task
     add projectId int unsigned null;";
 
-$updates['202504101121'][] = "";
+$updates['202602231535'][] = "";
 
 
-$updates['202504101121'][] = "alter table tasks_task
+$updates['202602231535'][] = "alter table tasks_task
     add mileStoneId int unsigned null;";
 
-$updates['202504101121'][] = "";
+$updates['202602231535'][] = "";
 
-$updates['202504101121'][] = 'update tasks_task set start = due where start > due;';
+$updates['202602231535'][] = 'update tasks_task set start = due where start > due;';
 
 
-$updates['202504101121'][] = "ALTER TABLE `tasks_task` ADD COLUMN `location` TEXT DEFAULT NULL;";
+$updates['202602231535'][] = "ALTER TABLE `tasks_task` ADD COLUMN `location` TEXT DEFAULT NULL;";
 
-$updates['202506200940'][] = "update tasks_task set uri = concat(uid, '.ics') where uri is null;";
+$updates['202602231535'][] = "update tasks_task set uri = concat(uid, '.ics') where uri is null;";
 
-$updates["202509020925"][] = "alter table tasks_tasklist_user add column syncToDevice tinyint default 1 not null after `isSubscribed`";
+$updates["202602231535"][] = "alter table tasks_tasklist_user add column syncToDevice tinyint default 1 not null after `isSubscribed`";
