@@ -36,7 +36,7 @@ go.login.LoginPanel = Ext.extend(Ext.Container, {
 			]
 		});
 
-		var htmlText = 'Powered by Group-Office <br /> <a target="_blank" href="https://www.group-office.com">https://www.group-office.com</a>';
+		var htmlText = 'Powered by GroupOffice <br /> <a target="_blank" href="https://www.group-office.com">https://www.group-office.com</a>';
 
 		this.items = [{
 				xtype: 'box',

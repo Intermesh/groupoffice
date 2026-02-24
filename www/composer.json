@@ -1,6 +1,6 @@
 {
   "name": "intermesh/groupoffice",
-  "description": "Group-Office",
+  "description": "GroupOffice",
   "require": {
     "php": ">=8.1",
     "ext-pcre": "*",

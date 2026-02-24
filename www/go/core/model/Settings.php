@@ -104,11 +104,11 @@ class Settings extends core\Settings {
 	public string $language;
 	
 	/**
-	 * The title of the Group-Office environment
+	 * The title of the GroupOffice environment
 	 * 
 	 * @var string
 	 */
-	public string $title = 'Group-Office';
+	public string $title = 'GroupOffice';
 	
 	
 	/**
