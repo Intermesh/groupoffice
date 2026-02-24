@@ -130,7 +130,18 @@ class CalendarStore extends Store {
 		$event->calendarId = $folderid;
 
 		try {
-			$event = CalendarConvertor::toCalendarEvent($message, $event);
+
+			// AS 16.1+ uses instanceid
+			if($message->instanceiddelete) {
+				$recurrenceId = (new \go\core\util\DateTime($message->instanceid))->setTimezone($event->timeZone())->format('Y-m-d\TH:i:s');
+				ZLog::Write(LOGLEVEL_DEBUG, "Deleting recurring event instance ".$id.' :: '. $recurrenceId);
+
+				$event->recurrenceOverrides[$recurrenceId] = (new RecurrenceOverride($event));
+				$event->recurrenceOverrides[$recurrenceId]->setValues(['excluded'=>true]);
+
+			} else {
+				$event = CalendarConvertor::toCalendarEvent($message, $event);
+			}
 
 			if(!$event->save()){
 				ZLog::Write(LOGLEVEL_WARN, "Failed to save event: " . var_export($event->getValidationErrors(), true));
