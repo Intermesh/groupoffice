@@ -136,7 +136,8 @@ class CalendarConvertor
 					}
 
 					$tz = $event->timeZone() ?? new DateTimeZone("UTC");
-					$msgException->exceptionstarttime = (new DateTime($recurrenceId, $tz))->getTimestamp();
+					// AS 16.0+ uses instanceid
+					$msgException->exceptionstarttime = $msgException->instanceid = (new DateTime($recurrenceId, $tz))->getTimestamp();
 					$message->exceptions[] = $msgException;
 				}
 			}
@@ -396,7 +397,10 @@ class CalendarConvertor
 		if (isset($message->exceptions)) {
 			$event->recurrenceOverrides = []; // empty first to delete what is not present
 			foreach ($message->exceptions as $v) {
-				$rDT = new DateTime('@'.$v->exceptionstarttime, new DateTimeZone('etc/UTC'));
+
+				$recurTime = $v->exceptionstarttime ?? $v->instanceid;
+
+				$rDT = new DateTime('@'.$recurTime, new DateTimeZone('etc/UTC'));
 				if($event->timeZone && !$event->showWithoutTime) {
 					$rDT->setTimezone($event->timeZone());
 				}
