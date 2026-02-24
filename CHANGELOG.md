@@ -1,3 +1,4 @@
+24-02-2026: 6.8.153
 - Tasks: Allow admins to change tasklist owner
 - Core: Fixed SQL injection vulnerability in deprecated code that's removed now
 
