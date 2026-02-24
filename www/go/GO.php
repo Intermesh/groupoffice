@@ -1,9 +1,9 @@
 <?php
 /**
- * Group-Office
+ * GroupOffice
  *
  * Copyright Intermesh BV.
- * This file is part of Group-Office. You should have received a copy of the
+ * This file is part of GroupOffice. You should have received a copy of the
  * Group-Office license along with Group-Office. See the file /LICENSE.TXT
  *
  * If you have questions write an e-mail to info@intermesh.nl
@@ -512,7 +512,7 @@ class GO{
 	public static function init() {
 
 		if(self::$initialized){
-			throw new \Exception("Group-Office was already initialized");
+			throw new \Exception("GroupOffice was already initialized");
 		}
 		self::$initialized=true;
 		
@@ -680,7 +680,7 @@ class GO{
 	}
 	
 	/**
-	 * Writes a string to the Group-Office error log
+	 * Writes a string to the GroupOffice error log
 	 * 
 	 * @param string $errorMsg
 	 */
@@ -872,7 +872,7 @@ class GO{
 	}
 
 	/**
-	 * Create a URL for an outside application. The URL will open Group-Office and
+	 * Create a URL for an outside application. The URL will open GroupOffice and
 	 * launch a function.
 	 * 
 	 * Controller external/index will be execured.
@@ -1024,7 +1024,7 @@ class GO{
 	
 	
 	/**
-	 * Checks if Group-Office is already installed. 
+	 * Checks if GroupOffice is already installed.
 	 * 
 	 * @return boolean
 	 */
