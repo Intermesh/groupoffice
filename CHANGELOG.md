@@ -1,15 +1,16 @@
+24-02-2026: 25.0.86
 - ActiveSync Fixed issues with Z-push and v16.0 instanceid handling. Fixes Error in Z-Push/src/lib/request/sync.php at line 559: Class "GSync" not found #1426
 - Calendar: Fixed display issue of read only events in the calendar
 - Core: Fixed SQL injection vulnerability in deprecated code that's removed now
 
-23-02-2025: 25.0.85
+23-02-2026: 25.0.85
 - Calendar: Appointment notifications will show the start time of the event.
 - Calendar: Add participant field will auto add the email if it is valid but not entered yet. Invalid values will be cleated.
 - Calendar: display correct time in linked event
 - Core / email: fix a nasty issue with encoding in certain email attachemnets
 - Startpage: Fix display of age in birthday portlet
 
-18-02-2025: 25.0.84
+18-02-2026: 25.0.84
 - LDAPAuthenticator: enable and optionally enforce TOTP workflow (cherry-pick from 6.8.x)
 - Calendar: enable Webcal import cron job by default
 - Leavedays: fix user panel manager view
