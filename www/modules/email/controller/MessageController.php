@@ -1566,12 +1566,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			exit();
 		}
 
-		exec(GO::config()->cmd_zip.' -r "winmail.zip" *', $output, $retVar);
-		if($retVar!=0) {
-			throw new \Exception("ZIP compression failed: " . implode("\n", $output));
-		}
-		
-		$zipFile = $tmpFolder->child('winmail.zip');
+		$zipFile = $tmpFolder->createChild('winmail.zip');
 		\GO\Base\Util\Http::outputDownloadHeaders($zipFile,false,true);
 		$zipFile->output();
 
@@ -1618,11 +1613,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if($retVar!=0)
 			throw new \Exception("TNEF extraction failed: ".implode("\n", $output));
 
-		exec(GO::config()->cmd_zip.' -r "winmail.zip" *', $output, $retVar);
-		if($retVar!=0)
-			throw new \Exception("ZIP compression failed: ".implode("\n", $output));
-		
-		$zipFile = $tmpFolder->child('winmail.zip');
+		$zipFile = $tmpFolder->createChild('winmail.zip');
+		\GO\Base\Fs\Zip::create($zipFile, $tmpFolder, $tmpFolder->ls());
 		\GO\Base\Util\Http::outputDownloadHeaders($zipFile,false,true);
 		$zipFile->output();
 
