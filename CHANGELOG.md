@@ -1,3 +1,4 @@
+25-02-2026: 6.8.154
 - Core: Fixed RCE vulnerability.
 
 24-02-2026: 6.8.153
