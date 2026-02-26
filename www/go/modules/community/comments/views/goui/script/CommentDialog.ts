@@ -38,7 +38,7 @@ export class CommentDialog extends FormWindow {
 
 		this.bbar.items.insert(0,
 			btn({
-				icon: "upload",
+				icon: "attach_file",
 				text: t("Attach file"),
 				handler: async () => {
 					const files = await browser.pickLocalFiles(true);

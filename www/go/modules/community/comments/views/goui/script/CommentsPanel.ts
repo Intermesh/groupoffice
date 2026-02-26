@@ -124,7 +124,7 @@ export class CommentsPanel extends Component {
 
 					tbar({},
 						btn({
-							icon: "upload",
+							icon: "attach_file",
 							text: t("Attach file"),
 							handler: async () => {
 								const files = await browser.pickLocalFiles(true);
