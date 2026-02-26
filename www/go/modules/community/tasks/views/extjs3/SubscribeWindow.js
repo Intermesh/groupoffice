@@ -40,7 +40,9 @@ go.modules.community.tasks.SubscribeWindow = Ext.extend(Ext.Window, {
 						text : t("Subscribe"),
 						handler: (me,row) => {
 							let record = me.store.getAt(row);
-							me.store.entityStore.save({isSubscribed: true}, record.data.id);
+							me.store.entityStore.save({isSubscribed: true}, record.data.id).catch(e => {
+								GO.errorDialog.show(e);
+							})
 						}
 					}]}
 
