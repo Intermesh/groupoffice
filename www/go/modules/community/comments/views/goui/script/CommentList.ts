@@ -166,7 +166,7 @@ class CommentList extends Component implements StoreComponent {
 
 			const commentComp = comp({
 				flex: 1,
-				cls: "comment-comment",
+				cls: "comment-comment normalize",
 				style: {
 					backgroundColor: writtenByUser ? "var(--fg-main-tp)" : "var(--bg-mid)"
 				},
