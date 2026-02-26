@@ -17,7 +17,7 @@ import {
 	root,
 	t
 } from "@intermesh/goui";
-import {client, HtmlFieldMentionPlugin, principalDS} from "@intermesh/groupoffice-core";
+import {client, HtmlFieldMentionPlugin, Image, principalDS} from "@intermesh/groupoffice-core";
 import {commentLabelDS} from "./Index.js";
 
 export class CommentEditor extends Component {
@@ -34,82 +34,75 @@ export class CommentEditor extends Component {
 
 		this.title = t("Comment");
 
+		this.cls = "vbox";
+
 		this.on("render",  () => {
 			void this.store.load();
 		})
 
 		this.items.add(
-			fieldset({
-					cls: "group comment-editor-fieldset"
-				},
-				this.addBtn = btn({
-					disabled: true,
-					icon: "add",
-					title: t("Add labels"),
-					menu: menu({})
-				}),
-				this.editor = htmlfield({
-					flex: 1,
-					name: "text",
-					required: true,
-					listeners: {
-						beforerender: ev => {
-							new HtmlFieldMentionPlugin(ev.target, async (text) => {
-								const r = await principalDS.query({
-									filter: {
-										entity: "User",
-										text: text
-									},
-									limit: 10
-								});
-								const get = await principalDS.get(r.ids);
-								return get.list.map(p => {
-									return {value: p.description!, display: p.description + " (" + p.name + ")"}
-								});
-							}, 5);
-
-							ev.target.getToolbar().items.insert(6, hr());
-						},
-
-						attach: async ({file}) => {
-							this.mask();
-							const blob = await client.upload(file);
-							this.unmask();
-
-							const attachments = this.attachments.value;
-							attachments.push({
-								name: blob.name,
-								blobId: blob.id
-							})
-							this.attachments.value = attachments;
-						},
-
-						insertimage: ({file, img}) => {
-							root.mask();
-
-							client.upload(file).then(r => {
-								if (img) {
-									img.dataset.blobId = r.id;
-									img.removeAttribute("id");
-								}
-								Notifier.success("Uploaded " + file.name + " successfully");
-							}).catch((err) => {
-								console.error(err);
-								Notifier.error("Failed to upload " + file.name);
-							}).finally(() => {
-								root.unmask();
+			this.editor = htmlfield({
+				flex: 1,
+				name: "text",
+				required: true,
+				listeners: {
+					beforerender: ev => {
+						new HtmlFieldMentionPlugin(ev.target, async (text) => {
+							const r = await principalDS.query({
+								filter: {
+									entity: "User",
+									text: text
+								},
+								limit: 10
 							});
-						}
+							const get = await principalDS.get(r.ids);
+							return get.list.map(p => {
+								return {value: p.description!, display: p.description + " (" + p.name + ")"}
+							});
+						}, 5);
+
+						ev.target.getToolbar().items.insert(6, hr());
+					},
+
+					setvalue: ({target}) => {
+						void Image.replaceImages(target.el);
+					},
+
+					attach: async ({file}) => {
+						this.mask();
+						const blob = await client.upload(file);
+						this.unmask();
+
+						const attachments = this.attachments.value;
+						attachments.push({
+							name: blob.name,
+							blobId: blob.id
+						})
+						this.attachments.value = attachments;
+					},
+
+					insertimage: ({file, img}) => {
+						root.mask();
+
+						client.upload(file).then(r => {
+							if (img) {
+								img.dataset.blobId = r.id;
+								img.removeAttribute("id");
+							}
+							Notifier.success("Uploaded " + file.name + " successfully");
+						}).catch((err) => {
+							console.error(err);
+							Notifier.error("Failed to upload " + file.name);
+						}).finally(() => {
+							root.unmask();
+						});
 					}
-				}),
-				...(submitButton ? [btn({
-					icon: "send",
-					type: "submit"
-				})] : [])
-			),
+				}
+			})
+			,
 
 			this.attachments = arrayfield({
-				style: {padding: "0 1.2rem"},
+				// style: {padding: "0 1.2rem"},
 				itemContainerCls: "",
 				name: "attachments",
 				buildField: (v) => {
@@ -132,12 +125,11 @@ export class CommentEditor extends Component {
 			}),
 
 			this.labels = arrayfield({
-				style: {padding: "0 1.2rem"},
-				cls: "hbox flow",
+				itemContainerCls: "",
 				name: "labels",
 				buildField: (v) => {
 					return containerfield({
-							cls: "hbox comment-editor-label"
+							cls: "hbox comment-editor-attachment"
 						},
 						displayfield({
 							htmlEncode: false,
@@ -146,7 +138,7 @@ export class CommentEditor extends Component {
 							style: {color: `#${v!.color}`}
 						}),
 						btn({
-							icon: "cancel",
+							icon: "delete",
 							handler: (button) => {
 								button.findAncestorByType(ContainerField)!.remove()
 							}
@@ -155,6 +147,16 @@ export class CommentEditor extends Component {
 				}
 			})
 		);
+
+
+		this.editor.getToolbar().items.insert(0,
+			this.addBtn = btn({
+				disabled: true,
+				icon: "label",
+				title: t("Add labels"),
+				menu: menu({})
+			})
+			)
 
 		this.store = datasourcestore({
 			dataSource: commentLabelDS,

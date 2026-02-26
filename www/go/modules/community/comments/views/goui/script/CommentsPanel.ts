@@ -3,7 +3,7 @@ import {
 	btn, collapsebtn,
 	comp,
 	Component, ComponentEventMap, DefaultEntity,
-	EntityID,
+	EntityID, fieldset,
 	form, section,
 	t,
 	tbar, Toolbar, Window
@@ -118,36 +118,44 @@ export class CommentsPanel extends Component {
 						}
 					}
 				},
-					this.commentEditor
-				),
-				tbar({},
-					btn({
-						icon: "upload",
-						text: t("Attach file"),
-						handler: async () => {
-							const files = await browser.pickLocalFiles(true);
-							this.mask();
-							const blobs = await client.uploadMultiple((files));
-							this.unmask();
+					fieldset({},
+						this.commentEditor
+					),
 
-							const attachments = this.commentEditor.attachments.value;
-							blobs.forEach((blob: any) => {
-								attachments.push({
-									name: blob.name,
-									blobId: blob.id
+					tbar({},
+						btn({
+							icon: "upload",
+							text: t("Attach file"),
+							handler: async () => {
+								const files = await browser.pickLocalFiles(true);
+								this.mask();
+								const blobs = await client.uploadMultiple((files));
+								this.unmask();
+
+								const attachments = this.commentEditor.attachments.value;
+								blobs.forEach((blob: any) => {
+									attachments.push({
+										name: blob.name,
+										blobId: blob.id
+									})
 								})
-							})
-							this.commentEditor.attachments.value = attachments;
-						}
-					}),
-					"->",
-					btn({
-						icon: "arrow_circle_up",
-						text: t("Scroll to top"),
-						handler: () => {
-							this.commentList.scroller.el.scrollTop = 0;
-						}
-					})
+								this.commentEditor.attachments.value = attachments;
+							}
+						}),
+						"->",
+						btn({
+							type:"submit",
+							text: t("Add comment"),
+							icon: "send"
+						})
+						// btn({
+						// 	icon: "arrow_circle_up",
+						// 	text: t("Scroll to top"),
+						// 	handler: () => {
+						// 		this.commentList.scroller.el.scrollTop = 0;
+						// 	}
+						// })
+					)
 				)
 			)
 		));
