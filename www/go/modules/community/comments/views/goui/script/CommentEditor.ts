@@ -59,7 +59,7 @@ export class CommentEditor extends Component {
 							return get.list.map(p => {
 								return {value: p.description!, display: p.description + " (" + p.name + ")"}
 							});
-						}, 5);
+						}, 6);
 
 						ev.target.getToolbar().items.insert(6, hr());
 					},
@@ -155,7 +155,8 @@ export class CommentEditor extends Component {
 				icon: "label",
 				title: t("Add labels"),
 				menu: menu({})
-			})
+			}),
+			hr()
 			)
 
 		this.store = datasourcestore({
