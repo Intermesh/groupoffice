@@ -1,6 +1,7 @@
 - Tasks: Fixed subscribe to task lists
 - Comments: Images didn't load in edit dialog
 - Comments: Fixed markup for lists
+- History: Fixed invalid formatting of changed details
 
 24-02-2026: 26.0.9
 - Core: Fixed RCE vulnerability.
