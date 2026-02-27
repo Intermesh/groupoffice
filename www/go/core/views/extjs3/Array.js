@@ -1,16 +1,26 @@
-Ext.applyIf(Array.prototype, {
-	
+Object.defineProperty(Array.prototype, 'unique', {
+	configurable: true,
+	writable: true,
+
+
 	/**
 	 * Return new array with unique values
-	 * 
+	 *
 	 * @returns {Array}
 	 */
-	unique : function() {				
-		return this.filter(function(value, index, self) { 
+	value: function() {
+		return this.filter(function(value, index, self) {
 			return self.indexOf(value) === index;
 		});
 	},
-	
+});
+
+
+
+Object.defineProperty(Array.prototype, 'diff', {
+	configurable: true,
+	writable: true,
+
 	/**
 	 * Get array of all values that are not present in the given array
 	 * Opposite of intersect()
@@ -18,11 +28,18 @@ Ext.applyIf(Array.prototype, {
 	 * @param {Array} a
 	 * @returns {Array}
 	 */
-	diff : function(a) {
-    return this.filter(function(i) {
+	value: function(a) {
+		return this.filter(function(i) {
 			return a.indexOf(i) === -1;
 		});
-	},
+	}
+});
+
+
+
+Object.defineProperty(Array.prototype, 'column', {
+	configurable: true,
+	writable: true,
 
 	/**
 	 * Get array of all values that are present in the given array
@@ -31,30 +48,43 @@ Ext.applyIf(Array.prototype, {
 	 * @param {Array} a
 	 * @returns {Array}
 	 */
-	intersect : function(a) {
+	intersect: function(a) {
 		return this.filter(function(i) {
 			return a.indexOf(i) !== -1;
 		});
-	},
-	
+	}
+});
+
+
+
+Object.defineProperty(Array.prototype, 'column', {
+	configurable: true,
+	writable: true,
+
 	/**
 	 * Turn an array of objects into an array of object property values.
-	 * 
-	 * eg. 
-	 * 
+	 *
+	 * eg.
+	 *
 	 * var arr = [{foo: 1}, {foo: 2}]
-	 * 
+	 *
 	 * arr.column("foo") == [1, 2]
-	 * 
+	 *
 	 * @param {type} name
 	 * @returns {Array}
 	 */
-	column : function(name) {
+	value: function(name) {
 		return this.map(function(i) {
 			return i[name];
 		});
-	},
+	}
+});
 
+
+
+Object.defineProperty(Array.prototype, 'columnSort', {
+	configurable: true,
+	writable: true,
 	/**
 	 * Sort array of objects by column values.
 	 *
@@ -68,9 +98,9 @@ Ext.applyIf(Array.prototype, {
 	 * @param {boolean} asc
 	 * @returns {Array}
 	 */
-	columnSort: function(col, asc) {
+	value: function(col, asc) {
 
-		if(!Ext.isDefined(asc)) {
+		if (!Ext.isDefined(asc)) {
 			asc = true;
 		}
 
@@ -87,26 +117,29 @@ Ext.applyIf(Array.prototype, {
 			}
 			return comparison;
 		})
+	}
+});
 
-	},
-	
+
+Object.defineProperty(Array.prototype, 'indexOfLoose', {
+	configurable: true,
+	writable: true,
 	/**
 	 * Same as indexOf but not strict. eg. "2" will be found in [2].
-	 * 
+	 *
 	 * @param {type} v
 	 * @returns {Number}
 	 */
-	indexOfLoose : function(v) {
+	value: function(v) {
 		for(var i = 0, l = this.length; i < l; i++) {
 			if(this[i] == v) {
 				return i;
 			}
 		}
-		
+
 		return -1;
 	}
 });
-
 
 
 // https://tc39.github.io/ecma262/#sec-array.prototype.findindex
