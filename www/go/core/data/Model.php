@@ -73,7 +73,11 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 			if ($method->isStatic()) {
 				continue;
 			}
-			
+
+			if (strpos($method->getDocComment(), '@noapi') > 0) {
+				continue;
+			}
+
 			if (substr($method->getName(), 0, 3) == 'get') {
 
 				$params = $method->getParameters();
