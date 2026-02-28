@@ -183,23 +183,23 @@ require('header.php');
 				?>
 				<p>
 					<label>Database user</label>
-					<input type="text" name="dbUsername" value="<?= htmlspecialchars($_POST['dbUsername']) ?? "groupoffice"; ?>" required />
+					<input type="text" name="dbUsername" value="<?= htmlspecialchars($_POST['dbUsername'] ?? "groupoffice"); ?>" required />
 				</p>
 				<p>
 					<label>Database password</label>
-					<input type="password" name="dbPassword" value="<?= htmlspecialchars($_POST['dbPassword']) ?? "";?>" required  />
+					<input type="password" name="dbPassword" value="<?= htmlspecialchars($_POST['dbPassword'] ?? "");?>" required  />
 				</p>
 				<p>
 					<label>Database name</label>
-					<input type="text" name="dbName" value="<?= htmlspecialchars($_POST['dbName']) ?? "groupoffice";?>" required />
+					<input type="text" name="dbName" value="<?= htmlspecialchars($_POST['dbName'] ?? "groupoffice");?>" required />
 				</p>
 				<p>
 					<label>Database hostname</label>
-					<input type="text" name="dbHostname" value="<?= htmlspecialchars($_POST['dbHostname']) ?? "localhost";?>"  required />
+					<input type="text" name="dbHostname" value="<?= htmlspecialchars($_POST['dbHostname'] ?? "localhost");?>"  required />
 				</p>
 				<p>
 					<label>Database port</label>
-					<input type="text" name="dbPort" value="<?= htmlspecialchars($_POST['dbPort']) ?? 3306; ?>" required />
+					<input type="text" name="dbPort" value="<?= htmlspecialchars($_POST['dbPort'] ?? 3306); ?>" required />
 				</p>
 
                 <button class="primary right" name="submitButton"><?= go()->t('Continue'); ?></button>
