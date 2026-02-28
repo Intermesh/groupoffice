@@ -1,3 +1,4 @@
+28-02-2026: 25.0.88
 - Core: Fixed xss vulnerability in external function handling
 - Core: Fixed xss in installer
 - Tasks: Fixed subscribe to task lists
