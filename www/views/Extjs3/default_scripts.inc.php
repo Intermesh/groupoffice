@@ -6,6 +6,7 @@ use go\core\fs\Folder;
 use go\core\jmap\Response;
 use go\core\Module;
 use go\core\webclient\Extjs3;
+use http\Exception\InvalidArgumentException;
 
 /**
  * Copyright Intermesh
@@ -265,6 +266,10 @@ if (isset($_REQUEST['f'])) {
 
 	GO::debug("External function parameters:");
 	GO::debug($fp);
+
+    if(preg_match("/[^a-z_]/", $fp['m']) || preg_match("/[^a-z]/i", $fp['f'])) {
+        throw new InvalidArgumentException("Invalid function given");
+    }
 	?>
 		if (GO.<?php echo $fp['m']; ?>)
 		{
