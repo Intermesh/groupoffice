@@ -157,7 +157,7 @@ require('header.php');
 				?>
 				
 				<p>
-					<input type="text" name="dataPath" value="<?=$dataFolder->getPath()?>" placeholder="" required />
+					<input type="text" name="dataPath" value="<?= htmlspecialchars($dataFolder->getPath()) ?>" placeholder="" required />
 					<label>Data folder</label>
 				</p>
 				
@@ -168,7 +168,7 @@ require('header.php');
 				}
 				?>
 				<p>
-					<input type="text" name="tmpPath" value="<?=$config['tmpdir'];?>" placeholder="Temp folder" required />
+					<input type="text" name="tmpPath" value="<?= htmlspecialchars($config['tmpdir']); ?>" placeholder="Temp folder" required />
 					<label>Temp folder</label>
 				</p>
 			</fieldset>
@@ -183,23 +183,23 @@ require('header.php');
 				?>
 				<p>
 					<label>Database user</label>
-					<input type="text" name="dbUsername" value="<?=$_POST['dbUsername'] ?? "groupoffice"; ?>" required />
+					<input type="text" name="dbUsername" value="<?= htmlspecialchars($_POST['dbUsername']) ?? "groupoffice"; ?>" required />
 				</p>
 				<p>
 					<label>Database password</label>
-					<input type="password" name="dbPassword" value="<?=$_POST['dbPassword'] ?? "";?>" required  />
+					<input type="password" name="dbPassword" value="<?= htmlspecialchars($_POST['dbPassword']) ?? "";?>" required  />
 				</p>
 				<p>
 					<label>Database name</label>
-					<input type="text" name="dbName" value="<?=$_POST['dbName'] ?? "groupoffice";?>" required />					
+					<input type="text" name="dbName" value="<?= htmlspecialchars($_POST['dbName']) ?? "groupoffice";?>" required />
 				</p>
 				<p>
 					<label>Database hostname</label>
-					<input type="text" name="dbHostname" value="<?=$_POST['dbHostname'] ?? "localhost";?>"  required />					
+					<input type="text" name="dbHostname" value="<?= htmlspecialchars($_POST['dbHostname']) ?? "localhost";?>"  required />
 				</p>
 				<p>
 					<label>Database port</label>
-					<input type="text" name="dbPort" value="<?=$_POST['dbPort'] ?? 3306;?>" required />					
+					<input type="text" name="dbPort" value="<?= htmlspecialchars($_POST['dbPort']) ?? 3306; ?>" required />
 				</p>
 
                 <button class="primary right" name="submitButton"><?= go()->t('Continue'); ?></button>
