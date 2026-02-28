@@ -1,3 +1,6 @@
+- Core: Fixed xss vulnerability in external function handling
+- Core: Fixed xss in installer
+
 25-02-2026: 6.8.154
 - Core: Fixed RCE vulnerability.
 
