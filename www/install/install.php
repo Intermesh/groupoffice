@@ -186,7 +186,7 @@ require('header.php');
 
 			<p>
 				<label>E-mail</label>
-				<input type="email" name="email" value="<?= htmlspecialchars($_POST['email']) ?? ""); ?>" required>
+				<input type="email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? ""); ?>" required>
 				
 			</p>
 			<p>
@@ -197,12 +197,12 @@ require('header.php');
 			
 			<p>
 				<label>Password</label>
-				<input type="password" name="password" autocomplete="new-password" pattern=".{6,}" value="<?= htmlspecialchars($_POST['password']) ?? ""); ?>" title="Minimum length is 6 chars" required>
+				<input type="password" name="password" autocomplete="new-password" pattern=".{6,}" value="<?= htmlspecialchars($_POST['password'] ?? ""); ?>" title="Minimum length is 6 chars" required>
 			</p>
 
 			<p>
 				<label>Confirm</label>
-				<input type="password" name="passwordConfirm" autocomplete="new-password" pattern=".{6,}" title="Minimum length is 6 chars"  value="<?= htmlspecialchars($_POST['passwordConfirm']) ?? ""); ?>" required>
+				<input type="password" name="passwordConfirm" autocomplete="new-password" pattern=".{6,}" title="Minimum length is 6 chars"  value="<?= htmlspecialchars($_POST['passwordConfirm'] ?? ""); ?>" required>
 			</p>
 
             <p>
