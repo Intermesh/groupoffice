@@ -4,6 +4,7 @@
 - Comments: Fixed markup for lists
 - History: Fixed invalid formatting of changed details
 - Core: Fixed xss vulnerability in external function handling
+- Core: Fixed xss in installer
 
 24-02-2026: 26.0.9
 - Core: Fixed RCE vulnerability.
