@@ -1,6 +1,14 @@
+02-03-2026: 26.0.11
+- Comments: Fixed comment routing from search
+- Support: Search in comments too 
+
+28-02-2026: 26.0.10
 - Tasks: Fixed subscribe to task lists
 - Comments: Images didn't load in edit dialog
 - Comments: Fixed markup for lists
+- History: Fixed invalid formatting of changed details
+- Core: Fixed xss vulnerability in external function handling
+- Core: Fixed xss in installer
 
 24-02-2026: 26.0.9
 - Core: Fixed RCE vulnerability.

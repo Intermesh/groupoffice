@@ -9,6 +9,7 @@ use go\core\fs\File;
 use go\core\jmap\Request;
 use go\core\model\Module;
 use go\core\SingletonTrait;
+use http\Exception\InvalidArgumentException;
 
 class Extjs3 {
 
@@ -370,6 +371,10 @@ class Extjs3 {
 
 			GO::debug("External function parameters:");
 			GO::debug($fp);
+
+			if(preg_match("/[^a-z_]/", $fp['m']) || preg_match("/[^a-z]/i", $fp['f'])) {
+				throw new InvalidArgumentException("Invalid function given");
+			}
 
 			echo 'if (GO.' . $fp['m'] .'){GO.mainLayout.on("render", function () {GO. '. $fp['m'] . '.' . $fp['f'] . '.call(this,  '. json_encode($fp['p']) .');});}';
 		}

@@ -456,7 +456,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 				comp: new GO.comments.CommentEditor(false)
 			});
 
-			items.splice(1,0, this.commentComposer);
+			items.splice(1,0, {xtype: "fieldset",items:this.commentComposer});
 		}
 
 		return items;

@@ -107,7 +107,7 @@ function noThanks() {
                 ?>
 				<p>
 					<label>License key</label>
-					<textarea style="height: 100px" name="license" required><?= $_POST['license'] ?? go()->getSettings()->license; ?></textarea>
+					<textarea style="height: 100px" name="license" required><?= htmlspecialchars($_POST['license'] ?? go()->getSettings()->license ?? ""); ?></textarea>
 				</p>
 
                 <input type="hidden" name="licenseDenied" value="0" />
