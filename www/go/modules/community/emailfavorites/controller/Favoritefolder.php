@@ -26,6 +26,7 @@ class Favoritefolder extends EntityController
 	{
 		return $this->defaultChanges($params);
 	}
+
 	protected function entityClass(): string
 	{
 		return \go\modules\community\emailfavorites\model\Favoritefolder::class;

@@ -2,9 +2,12 @@ GO.moduleManager.onModuleReady('email', function () {
 	Ext.override(GO.email.EmailClient, {
 		initComponent: GO.email.EmailClient.prototype.initComponent.createSequence(function () {
 			const store = new go.data.Store({
-				fields: ['id', 'name', 'mailbox', 'account_id'],
+				fields: ['id', 'userId', 'name', 'mailbox', 'account_id'],
 				entityStore: "Favoritefolder",
-				headers: false
+				headers: false,
+				filters: {
+					user: {userId: go.User.id}
+				}
 			});
 
 			const actions = new Ext.ux.grid.RowActions({
