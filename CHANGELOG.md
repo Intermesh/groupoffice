@@ -8,6 +8,8 @@
 - Tasks: Fixed subscribe to task lists
 
 24-02-2026: 25.0.87
+- Core: Fixed xss vulnerability in external function handling
+- Core: Fixed xss in installer
 - Core: Fixed RCE vulnerability.
 
 24-02-2026: 25.0.86
