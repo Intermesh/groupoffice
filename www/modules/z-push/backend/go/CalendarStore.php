@@ -64,7 +64,7 @@ class CalendarStore extends Store {
 
 	public function GetMessageList($folderid, $cutoffdate)
 	{
-		$query = CalendarEvent::find()->select(['cce.id', 'UNIX_TIMESTAMP(modifiedAt) as "mod"', '1 as flags']);
+		$query = CalendarEvent::find()->distinct()->select(['cce.id', 'UNIX_TIMESTAMP(modifiedAt) as "mod"', '1 as flags']);
 		$filter = [
 			'inCalendars'=>$folderid,
 			'hideSecret'=>1
