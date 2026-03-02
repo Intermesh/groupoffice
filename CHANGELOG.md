@@ -1,3 +1,5 @@
+- Comments: Fixed comment routing from search
+
 28-02-2026: 26.0.10
 - Tasks: Fixed subscribe to task lists
 - Comments: Images didn't load in edit dialog
