@@ -3,6 +3,7 @@
 - TimeTracking: calendar time tracking module would add wrong join resulting in dublicate changed during synchronization.
 
 28-02-2026: 25.0.88
+- Email: stay on same page when moving messages to spam (cherry-pick from 6.8)
 - Core: Fixed xss vulnerability in external function handling
 - Core: Fixed xss in installer
 - Tasks: Fixed subscribe to task lists
