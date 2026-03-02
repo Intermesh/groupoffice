@@ -158,7 +158,7 @@ abstract class Store extends \BackendDiff {
 	}
 
 	public function DeleteFolder($id, $parentid) {
-		return true;
+		return false;
 	}
 
 	public function SendMail($sm) {
