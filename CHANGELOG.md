@@ -1,3 +1,4 @@
+- Email: stay on same page when moving messages to spam
 - Core: Fixed xss vulnerability in external function handling
 - Core: Fixed xss in installer
 - Core: add apple-touch-icon to compact theme

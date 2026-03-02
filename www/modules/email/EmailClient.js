@@ -1563,8 +1563,8 @@ GO.email.moveToSpam = function(mailUid,mailboxName,fromAccountId) {
 		msg: t("Are you sure you want to classify this message as spam?", "email"),
 		buttons: Ext.Msg.YESNO,
 		fn: function(btn) {
-			if (btn=='yes') {
-				var me = this;
+			if (btn === 'yes') {
+				const me = this;
 				GO.request({
 					url: 'email/message/moveToSpam',
 					params: {
@@ -1572,14 +1572,29 @@ GO.email.moveToSpam = function(mailUid,mailboxName,fromAccountId) {
 						from_mailbox_name: mailboxName,
 						mail_uid: JSON.stringify(mailUid)
 					},
-					success: function() {
-						var records = me.messagesGrid.selModel.getSelections();
-						var lastItem = records.pop();
-						var index = me.messagesGrid.store.indexOfId(lastItem.id);
-						me.messagesGrid.selModel.selectRow(index + 1);
-						GO.email.emailClient.leftMessagesGrid.store.load();
+					success: function () {
+						const m = me.messagesGrid,
+							records = m.selModel.getSelections(),
+							lastItem = records.pop(),
+							limit = m.getBottomToolbar().pageSize,
+							startPos = m.store.lastOptions.params.start;
+						let index = m.store.indexOfId(lastItem.id);
+						GO.email.emailClient.leftMessagesGrid.store.load({
+							params: {
+								start: startPos,
+								limit: limit
+							},
+							callback: (r, options, success) => {
+								if (success) {
+									if (index > limit) {
+										index = limit;
+									}
+									m.selModel.selectRow(index);
+								}
+							}
+						});
 					},
-					failure: function(response,options,result) {
+					failure: function (response, options, result) {
 						console.log(response);
 						console.log(options);
 						console.log(result);
