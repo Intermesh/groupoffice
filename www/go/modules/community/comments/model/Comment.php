@@ -347,6 +347,11 @@ class Comment extends AclItemEntity {
 		return StringUtil::cutString($this->getAsText(), 100);
 	}
 
+
+	/**
+	 * Get plain text version of the comment. Useful for search indexing.
+	 * @return string
+	 */
 	private function getAsText() : string {
 		if(!isset($this->asText)) {
 			$this->asText = preg_replace("/<style>.*<\/style>/usi", "", $this->text);
