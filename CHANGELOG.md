@@ -1,4 +1,5 @@
 - Comments: Fixed comment routing from search
+- Support: Search in comments too 
 
 28-02-2026: 26.0.10
 - Tasks: Fixed subscribe to task lists
