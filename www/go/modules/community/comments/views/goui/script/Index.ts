@@ -1,5 +1,5 @@
-import {client, JmapDataSource, modules} from "@intermesh/groupoffice-core";
-import {t} from "@intermesh/goui";
+import {client, entities, JmapDataSource, modules, router} from "@intermesh/groupoffice-core";
+import {t, Window} from "@intermesh/goui";
 import {CommentDetail} from "./CommentDetail";
 import {CommentsPanel} from "./CommentsPanel";
 import {CommentEditor} from "./CommentEditor";
@@ -22,6 +22,18 @@ modules.register({
 				// User does not have access to this module
 				return;
 			}
+		});
+
+		// route to item where comment was made. Used for links and search results
+		router.add(/comment\/([0-9]+)/, async (commentId) => {
+			const comment = await commentDS.single(commentId);
+			const ent = entities.get(comment.entity);
+
+			if(!ent) {
+				void Window.error("Could not find entity " + comment.entity);
+			}
+
+			ent.goto(comment.entityId);
 		});
 
 		go.Alerts.on("beforeshow", function (alerts: any, alertConfig: any) {
