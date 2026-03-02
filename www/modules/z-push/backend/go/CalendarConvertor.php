@@ -223,7 +223,7 @@ class CalendarConvertor
 			$att = new SyncAttendee();
 			$att->name = $participant->name ?? $participant->email;
 			$att->email = $participant->email;
-			$att->attendeetype = 1; // 1=required, 2=optional, 3=resource
+			$att->attendeetype = $participant->kind==='resource' ? 3 : 1; // 1=required, 2=optional, 3=resource
 			$att->attendeestatus = self::$participationStatusMap[$participant->participationStatus] ?? 0;
 			$message->attendees[] = $att;
 			if($participant == $me) {
@@ -373,7 +373,7 @@ class CalendarConvertor
 				$p->email = $attendee->email;
 				$p->name = $attendee->name;
 				$p->expectReply = true;
-				$p->kind = Participant::Individual; // todo: read from $attendee->attendeetype
+				$p->kind = $attendee->attendeetype==3 ? Participant::Resource : Participant::Individual;
 				$event->participants[$principalId] = $p;
 
 				if(isset($attendee->attendeestatus)) {

@@ -47,6 +47,15 @@ class CalendarStore extends Store {
 		return !$calendar->save() ? false : $this->StatFolder($calendar->id);
 	}
 
+	public function DeleteFolder($id, $parentid) {
+		$calendar = Calendar::findById($id);
+		if(empty($calendar)) {
+			return true; // already gone!
+		}
+		$calendar->syncToDevice = 0;
+		return $calendar->save();
+	}
+
 	public function GetFolderList()
 	{
 		return Calendar::find()->select('caluser.id, name as "mod", "0" as parent')
@@ -58,7 +67,7 @@ class CalendarStore extends Store {
 
 	public function GetMessageList($folderid, $cutoffdate)
 	{
-		$query = CalendarEvent::find()->select(['cce.id', 'UNIX_TIMESTAMP(modifiedAt) as "mod"', '1 as flags']);
+		$query = CalendarEvent::find()->distinct()->select(['cce.id', 'UNIX_TIMESTAMP(modifiedAt) as "mod"', '1 as flags']);
 		$filter = [
 			'inCalendars'=>$folderid,
 			'hideSecret'=>1
