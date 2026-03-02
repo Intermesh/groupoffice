@@ -65,7 +65,8 @@ GO.moduleManager.onModuleReady('email', function () {
 			});
 
 			this.favoritesGrid = new go.grid.GridPanel({
-				style: "max-height: 30%; overflow-y: scroll;",
+				cls: "go-border-bottom",
+				style: "position: sticky; top: 0; z-index: 2; background-color: var(--bg-mid);",
 				autoHeight: true,
 				viewConfig: {
 					scrollOffset: 0,
