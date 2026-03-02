@@ -49,6 +49,9 @@ class CalendarStore extends Store {
 
 	public function DeleteFolder($id, $parentid) {
 		$calendar = Calendar::findById($id);
+		if(empty($calendar)) {
+			return true; // already gone!
+		}
 		$calendar->syncToDevice = 0;
 		return $calendar->save();
 	}
