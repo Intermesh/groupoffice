@@ -47,6 +47,12 @@ class CalendarStore extends Store {
 		return !$calendar->save() ? false : $this->StatFolder($calendar->id);
 	}
 
+	public function DeleteFolder($id, $parentid) {
+		$calendar = Calendar::findById($id);
+		$calendar->syncToDevice = 0;
+		return $calendar->save();
+	}
+
 	public function GetFolderList()
 	{
 		return Calendar::find()->select('caluser.id, name as "mod", "0" as parent')
