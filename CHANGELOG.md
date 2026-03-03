@@ -1,6 +1,8 @@
+- LDAP: Fixed LDAP authentication not work #1444
+
 02-03-2026: 26.0.11
 - Comments: Fixed comment routing from search
-- Support: Search in comments too 
+- Support: Search in comments too
 
 28-02-2026: 26.0.10
 - Tasks: Fixed subscribe to task lists
