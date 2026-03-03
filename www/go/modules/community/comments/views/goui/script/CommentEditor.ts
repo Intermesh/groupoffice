@@ -154,7 +154,8 @@ export class CommentEditor extends Component {
 				disabled: true,
 				icon: "label",
 				title: t("Add labels"),
-				menu: menu({})
+				menu: menu({}),
+				tabIndex: -1, // Skip toolbar in tabbing through forms
 			}),
 			hr()
 			)
