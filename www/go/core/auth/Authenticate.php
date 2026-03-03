@@ -232,9 +232,9 @@ class Authenticate {
 	private $usedPasswordAuthenticator;
 
 	/**
-	 * @return PrimaryAuthenticator
+	 * @return ?PrimaryAuthenticator
 	 */
-	public function getUsedPasswordAuthenticator(): PrimaryAuthenticator
+	public function getUsedPasswordAuthenticator(): ?PrimaryAuthenticator
 	{
 		return $this->usedPasswordAuthenticator;
 	}
