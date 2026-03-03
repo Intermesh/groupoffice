@@ -63,8 +63,6 @@ class NoteStore extends Store {
 			if (Request::GetProtocolVersion() >= 12.0) {
 				$sbBody = new SyncBaseBody();
 
-				$asBodyData = StringUtil::normalizeCrlf($note->content);
-
 				if ($bpReturnType == SYNC_BODYPREFERENCE_HTML) {
 					$sbBody->type = SYNC_BODYPREFERENCE_HTML;
 					$asBodyData = $note->content;
