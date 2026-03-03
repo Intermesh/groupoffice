@@ -47189,7 +47189,7 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
                 v = Ext.util.Format.htmlEncode(v);
             } else if(col.type.isRelation) {
                                         
-                v = go.util.Format.htmlEncode(v);                                    
+                v = go.util.Format.htmlEncode(structuredClone(v));
             }
         }
 
