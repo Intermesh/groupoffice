@@ -1,3 +1,5 @@
+- Core: Fixed encoding issue after moving grid columns
+
 02-02-2026: 6.8.155
 - Email: stay on same page when moving messages to spam
 - Core: Fixed xss vulnerability in external function handling
