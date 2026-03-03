@@ -481,6 +481,11 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 		}
 	}
 
+	textarea.x-form-field[readonly] {
+		background-color: var(--bg-readonly);
+	}
+
+
 	&-duration > input {
 		border:0;
 		background:transparent;
