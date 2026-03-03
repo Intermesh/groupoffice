@@ -12,11 +12,12 @@ Ext.onReady(function () {
 				const name = node.attributes.name;
 
 				if (account_id && mailbox && name) {
-					const record = go.Db.store("Favoritefolder").findBy(item => item.mailbox === mailbox && item.account_id === account_id);
+					const record = go.Db.store("Favoritefolder").findBy(item => item.mailbox === mailbox && item.account_id === account_id && item.userId == go.User.id);
 
-					if(!record) {
+					if (!record) {
 						go.Db.store("Favoritefolder").save({
 							account_id: account_id,
+							userId: go.User.id,
 							mailbox: mailbox,
 							name: name
 						});

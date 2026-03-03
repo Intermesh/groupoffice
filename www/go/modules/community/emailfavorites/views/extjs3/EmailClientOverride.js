@@ -2,9 +2,12 @@ GO.moduleManager.onModuleReady('email', function () {
 	Ext.override(GO.email.EmailClient, {
 		initComponent: GO.email.EmailClient.prototype.initComponent.createSequence(function () {
 			const store = new go.data.Store({
-				fields: ['id', 'name', 'mailbox', 'account_id'],
+				fields: ['id', 'userId', 'name', 'mailbox', 'account_id'],
 				entityStore: "Favoritefolder",
-				headers: false
+				headers: false,
+				filters: {
+					user: {userId: go.User.id}
+				}
 			});
 
 			const actions = new Ext.ux.grid.RowActions({
@@ -62,11 +65,17 @@ GO.moduleManager.onModuleReady('email', function () {
 			});
 
 			this.favoritesGrid = new go.grid.GridPanel({
-				style: "max-height: 30%; overflow-y: scroll;",
+				cls: "go-border-bottom",
+				style: "position: sticky;" +
+					"top: 0;" +
+					"z-index: 2;" +
+					"background-color: var(--bg-mid);",
 				autoHeight: true,
+				hidden: true,
 				viewConfig: {
 					scrollOffset: 0,
-					emptyText: ''
+					emptyText: '',
+					forceFit: true
 				},
 				autoExpandColumn: 'name',
 				hideHeaders: true,
@@ -77,16 +86,17 @@ GO.moduleManager.onModuleReady('email', function () {
 					{
 						id: 'icon',
 						header: '',
-						width: dp(56),
+						align: 'left',
+						width: dp(24),
 						renderer: function (v, meta) {
-							meta.style = 'text-align: right;';
 							return `<span style="color: var(--c-primary)" class="icon ic-star"></span>`
 						}
 					},
 					{
 						id: "name",
 						dataIndex: "name",
-						header: t("Name")
+						header: t("Name"),
+						align: 'left'
 					},
 					actions
 				]
@@ -120,7 +130,7 @@ GO.moduleManager.onModuleReady('email', function () {
 				}
 			}, this);
 
-			this.favoritesGrid.on('render', function () {
+			this.favoritesGrid.on('render', function (fg) {
 				const dropTarget = new Ext.dd.DropTarget(this.favoritesGrid.getView().mainBody, {
 					ddGroup: 'EmailDD',
 					notifyDrop: function (dd, e, data) {
@@ -159,6 +169,18 @@ GO.moduleManager.onModuleReady('email', function () {
 						return dd.dropNotAllowed;
 					}.bind(this)
 				});
+			}, this);
+
+			this.favoritesGrid.store.on('load', function (fg) {
+				if (fg.data.length > 0) {
+					this.favoritesGrid.show();
+				}
+			}, this);
+
+			this.favoritesGrid.store.on('changes', function (fg) {
+				if (fg.data.length === 0) {
+					this.favoritesGrid.hide();
+				}
 			}, this);
 
 			this.treePanel.on('resize', function (panel, adjWidth) {
