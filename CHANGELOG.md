@@ -1,4 +1,5 @@
 - LDAP: Fixed LDAP authentication not work #1444
+- Core: Fixed encoding issue after moving grid columns
 
 02-03-2026: 26.0.11
 - Comments: Fixed comment routing from search
