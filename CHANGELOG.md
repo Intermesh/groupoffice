@@ -1,4 +1,5 @@
 - LDAP: Fixed LDAP authentication not work #1444
+- Core: Fixed encoding issue after moving grid columns
 
 02-03-2026: 25.0.89
 - ActiveSync: Fixed battery drain issue caused by not being able to remove calendars.
