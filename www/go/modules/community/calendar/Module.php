@@ -5,6 +5,7 @@ use DateInterval;
 use Faker\Generator;
 use go\core;
 use go\core\cron\GarbageCollection;
+use go\core\http\PostResponseProcessor;
 use go\core\model\Group;
 use go\core\model\Link;
 use go\core\model\Module as GoModule;
@@ -20,6 +21,7 @@ use go\modules\community\calendar\model\Preferences;
 use go\modules\community\calendar\model\BusyPeriod;
 use go\modules\community\calendar\model\CalendarEvent;
 use go\modules\community\calendar\model\ICalendarHelper;
+use go\modules\community\calendar\model\Scheduler;
 use Sabre\VObject\Component\VCalendar;
 
 class Module extends core\Module
@@ -293,6 +295,10 @@ class Module extends core\Module
 		require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageHeader.php');
 		include __DIR__.'/views/imip.php'; // use same html as email because why not
 		require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageFooter.php');
+
+		PostResponseProcessor::get()->addTask(function() use ($event, $participant) {
+			Scheduler::replyImip($event, $participant);
+		});
 
 	}
 
