@@ -1,3 +1,5 @@
+- LDAP: Fixed LDAP authentication not work #1444
+
 02-03-2026: 25.0.89
 - ActiveSync: Fixed battery drain issue caused by not being able to remove calendars.
 - TimeTracking: calendar time tracking module would add wrong join resulting in duplicate changed during synchronization.
