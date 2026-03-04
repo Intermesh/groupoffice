@@ -119,6 +119,10 @@ class Acl extends Controller {
 
 	public function overview($params) {
 
+		if(!go()->getAuthState()->isAdmin()) {
+			throw new Forbidden();
+		}
+
 		//$level = "CASE ag.level WHEN 10 THEN 'Read' WHEN 20 THEN 'Read/Add' WHEN 30 THEN 'Write' WHEN 40 THEN 'Write/Delete' WHEN 50 THEN 'Manage' ELSE 'Other' END as level";
 		$statement = \go()->getDbConnection()
 			->select('ag.level, a.entityTypeId as typeId, e.name as type, a.entityId, m.name as module, IFNULL(g.isUserGroupFor, 0) as userGroup, g.name as username')

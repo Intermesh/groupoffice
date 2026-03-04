@@ -62,6 +62,14 @@ class Module extends core\Module
 		];
 	}
 
+	/**
+	 * Retrieves the availability for a given ID within the specified time range if the user has permissions.
+	 *
+	 * @param string $id The principal ID to check availability for.
+	 * @param mixed $start The start time of the availability range.
+	 * @param mixed $end The end time of the availability range.
+	 * @return mixed The availability information for the specified parameters.
+	 */
 	public static function getAvailability($id, $start, $end) {
 		return BusyPeriod::fetch($id, $start, $end);
 	}

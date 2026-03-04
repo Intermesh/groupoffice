@@ -12,17 +12,20 @@ use go\core\model;
 
 class Notify extends Controller {
 
+	/**
+	 * Notifies the system administrator via email
+	 *
+	 * @param $params
+	 * @return true[]
+	 * @throws \PHPMailer\PHPMailer\Exception
+	 */
 	public function mail($params) {		
 		
 		$settings = go()->getSettings();
-
-		if(empty($params['to'])) {
-			$params['to'] = new Address($settings->systemEmail, $settings->title);
-		}
 		
 		$message = go()->getMailer()->compose()
 						->setFrom($settings->systemEmail, $settings->title)
-						->setTo($params['to'])
+						->setTo(new Address($settings->systemEmail, $settings->title))
 						->setSubject($params['subject'] ?? "")
 						->setBody($params['body'] ?? "", $params['contentType'] ?? 'text/plain');
 
