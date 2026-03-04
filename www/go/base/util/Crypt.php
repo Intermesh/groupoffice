@@ -87,31 +87,5 @@ class Crypt {
 	public static function encryptPassword($password) {
 		return password_hash($password,PASSWORD_DEFAULT);		
 	}
-	
-	/**
-	 * Check an encrypted password for validity
-	 * @param string $password the password to check
-	 * @param string $encrypted_password the hash that was saved
-	 * @param string $type type of encryption (can be crypt or anything else)
-	 * @return boolean true if the password is valid
-	 */
-	public static function checkPassword($password, $encrypted_password, $type='crypt'){
-		
-		if ($type == 'crypt') {
-			
-			if(function_exists('password_verify')) {
-				if(!password_verify($password, $encrypted_password)){
-					return false;
-				}
-			} else if (crypt($password, $encrypted_password) != $encrypted_password) {
-				return false;
-			}
-			
-		} else if (md5($password) != $encrypted_password) {
-			return false;
-		}
-		
-		return true;
-	}
 
 }
