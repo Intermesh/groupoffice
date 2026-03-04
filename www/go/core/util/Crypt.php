@@ -142,7 +142,7 @@ class Crypt {
 			return false;
 
 		$msg = phpseclib_mdecrypt_generic($td, $msg);	 # decrypt
-		$msg = unserialize($msg);		# unserialize
+		$msg = unserialize($msg, ['allowed_classes' => false]);		# unserialize
 
 		phpseclib_mcrypt_generic_deinit($td);		# clear buffers
 		phpseclib_mcrypt_module_close($td);		# close cipher module

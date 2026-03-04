@@ -86,7 +86,8 @@ abstract class AbstractSettingsCollection extends \GO\Base\Model {
 		foreach($values as $property=>$value){
 			if(isset($value)){
 				if(substr($value,0,11)=='serialized:'){
-					$value = unserialize(substr($value,11));
+//					$value = unserialize(substr($value,11));
+					$value = unserialize(substr($value,11), ['allowed_classes' => false]);
 				}
 				$this->{substr($property,strlen($this->myPrefix()))} = $value;
 			}
