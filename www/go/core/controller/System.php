@@ -16,6 +16,10 @@ use go\core\model;
 class System extends Controller {
 	public function demo() {
 
+		if(!go()->getAuthState()->isAdmin()) {
+			throw new Forbidden();
+		}
+
 		go()->getEnvironment()->setMaxExecutionTime(240);
 
 		ob_start();
