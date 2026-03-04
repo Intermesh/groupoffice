@@ -2,6 +2,7 @@
 
 namespace go\core\controller;
 
+use go\core\exception\Forbidden;
 use go\core\jmap\EntityController;
 use go\core\model;
 use go\core\jmap\Response;
@@ -65,25 +66,38 @@ class SmtpAccount extends EntityController {
 
 
 	/**
-	 * @param $params
-	 * @throws \ReflectionException
+	 * @param array $params
 	 */
-	public function test($params) {
-		
-		$smtpAccount = new model\SmtpAccount();
+	public function test(array $params)
+	{
+		if(!go()->getAuthState()->isAdmin()) {
+			throw new Forbidden();
+		}
+
+		if (isset($params['id'])) {
+			$smtpAccount = $this->getEntity($params['id']);
+			// prevent 'empty' password from overriding the pre-existing
+			if (empty($params['password'])) {
+				unset($params['password']);
+			}
+		} else {
+			$smtpAccount = new model\SmtpAccount();
+		}
+
 		$smtpAccount->setValues($params);
 
 		$message = go()->getMailer()
-						->setSmtpAccount($smtpAccount)
-						->compose()
-						->setFrom($smtpAccount->fromEmail, $smtpAccount->fromName)
-						->setTo($smtpAccount->fromEmail)
-						->setSubject(go()->t('Test message'))
-						->setBody(go()->t("Your settings are correct.\n\nBest regards,\n\nGroup-Office"));
+			->setSmtpAccount($smtpAccount)
+			->compose()
+			->setFrom($smtpAccount->fromEmail, $smtpAccount->fromName)
+			->setTo($smtpAccount->fromEmail)
+			->setSubject(go()->t('Test message'))
+			->setBody(go()->t("Your settings are correct.\n\nBest regards,\n\nGroup-Office"));
 
 		$message->send();
-		
+
 		Response::get()->addResponse(['success' => true]);
 	}
+
 
 }
