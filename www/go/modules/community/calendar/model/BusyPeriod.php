@@ -3,6 +3,8 @@ namespace go\modules\community\calendar\model;
 
 
 use go\core\db\Criteria;
+use go\core\db\DbException;
+use go\core\exception\Forbidden;
 use go\core\model\Acl;
 use go\core\util\DateTime;
 
@@ -33,7 +35,12 @@ class BusyPeriod {
 	 * The “freeBusyStatus” property of the event is “busy” (or omitted, as this is the default).
 	 * The “status” property of the event is not “cancelled”.
 	 * If the “includeInAvailability” property of the calendar is “attending”, then the principal is a participant of the event, and has a “participationStatus” of “accepted” or “tentative”.
+	 * @param string $id Principal ID
+	 * @param string $start
+	 * @param string $end
 	 * @return BusyPeriod[]
+	 * @throws DbException
+	 * @throws Forbidden
 	 */
 	static function fetch($id, $start, $end) {
 //		$query = CalendarEvent::find();
