@@ -1,6 +1,9 @@
 - Core: Fixed encoding issue after moving grid columns
+- Core: Fixed Authorization bypass: IDOR in SmtpAccount/test, Calendar downloadIcs, DavAccount/sync + missing admin checks #1447
+- Core: Fixed Authenticated Remote Code Execution via PHP Insecure Deserialization in `AbstractSettingsCollection`
+- Core: Fixed Self XSS in GroupOffice Installer License Page (install/license.php)
 
-02-02-2026: 6.8.155
+  02-02-2026: 6.8.155
 - Email: stay on same page when moving messages to spam
 - Core: Fixed xss vulnerability in external function handling
 - Core: Fixed xss in installer
