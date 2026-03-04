@@ -1,5 +1,8 @@
 - LDAP: Fixed LDAP authentication not work #1444
 - Core: Fixed encoding issue after moving grid columns
+- Core: Fixed Authorization bypass: IDOR in SmtpAccount/test, Calendar downloadIcs, DavAccount/sync + missing admin checks #1447
+- Core: Fixed Authenticated Remote Code Execution via PHP Insecure Deserialization in `AbstractSettingsCollection`
+- Core: Fixed Self XSS in GroupOffice Installer License Page (install/license.php)
 
 02-03-2026: 25.0.89
 - ActiveSync: Fixed battery drain issue caused by not being able to remove calendars.
