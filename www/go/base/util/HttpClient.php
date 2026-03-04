@@ -56,8 +56,9 @@ class HttpClient{
 		curl_setopt($this->_curl, CURLOPT_COOKIEFILE, $this->_cookieFile);
 
 		//for self-signed certificates
-		curl_setopt($this->_curl, CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($this->_curl, CURLOPT_SSL_VERIFYHOST, false);
+//		curl_setopt($this->_curl, CURLOPT_SSL_VERIFYPEER, false);
+//		curl_setopt($this->_curl, CURLOPT_SSL_VERIFYHOST, false);
+
 		@curl_setopt($this->_curl, CURLOPT_FOLLOWLOCATION, TRUE);
 		curl_setopt($this->_curl, CURLOPT_ENCODING, "UTF-8");
 		
