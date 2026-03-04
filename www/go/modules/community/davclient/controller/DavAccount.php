@@ -33,7 +33,7 @@ class DavAccount extends EntityController {
 
 	public function sync($params) {
 		set_time_limit(600);
-		$account = model\DavAccount::findById($params['accountId']);
+		$account = $this->getEntity($params['accountId']);
 		$success = false;
 		$collection = null;
 		if(!empty($account)) {
