@@ -77,6 +77,10 @@ class Module extends EntityController {
 
 	public function installLicensed(): array
 	{
+		if(!go()->getAuthState()->isAdmin()) {
+			throw new Forbidden();
+		}
+
 		$modules = \GO::modules()->getAvailableModules();
 
 		foreach ($modules as $moduleClass) {
@@ -160,7 +164,7 @@ class Module extends EntityController {
 		if(!class_exists($cls)) {
 			throw new NotFound();
 		}
-		
+
 		$mod = $cls::get();
 		$success = $mod->uninstall();
 		

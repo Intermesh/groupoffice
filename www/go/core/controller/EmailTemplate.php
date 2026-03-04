@@ -2,6 +2,7 @@
 
 namespace go\core\controller;
 
+use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
@@ -44,6 +45,9 @@ class EmailTemplate extends EntityController {
 
 		if (!empty($blob)) {
 			$tpl = model\EmailTemplate::fromBlob($blob);
+			if(!$this->canCreate($tpl)) {
+				throw new Forbidden();
+			}
 			if (!empty($params['subject'])) {
 				$tpl->subject = $params['subject'];
 			}
