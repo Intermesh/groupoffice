@@ -5,7 +5,9 @@ use DateInterval;
 use Faker\Generator;
 use go\core;
 use go\core\cron\GarbageCollection;
+use go\core\exception\Forbidden;
 use go\core\http\PostResponseProcessor;
+use go\core\model\Acl;
 use go\core\model\Group;
 use go\core\model\Link;
 use go\core\model\Module as GoModule;
@@ -118,8 +120,8 @@ class Module extends core\Module
 	// https://uri/path/api/download.php?blob=community/calendar/calendar/1
 	public function downloadCalendar($id) {
 		$calendar = Calendar::findById($id);
-		if($calendar->getPermissionLevel() < 50) {
-			throw new core\exception\Forbidden('You need manage permission to export this calendar');
+		if($calendar->getPermissionLevel() < Acl::LEVEL_MANAGE) {
+			throw new Forbidden('You need manage permission to export this calendar');
 		}
 		$this->outputIcs($calendar);
 	}
@@ -147,12 +149,15 @@ class Module extends core\Module
 		if($calendar) {
 			$this->outputIcs($calendar);
 		} else {
-			throw new core\exception\Forbidden("Unauthorized");
+			throw new Forbidden("Unauthorized");
 		}
 	}
 
 	public function downloadIcs($key) {
 		$ev = CalendarEvent::findById($key);
+		if (!$ev->getPermissionLevel()) {
+			throw new Forbidden();
+		}
 
 		header('Content-Type: text/calendar; charset=UTF-8; component=vevent');
 		echo $ev->toVObject();
@@ -272,7 +277,7 @@ class Module extends core\Module
 			->join('calendar_participant', 'p', 'p.eventId = eventdata.eventId', 'LEFT')
 			->where(['p.scheduleSecret' => $secret, 'eventdata.uid'=>$uid])->single();
 		if(!$event) {
-			throw new core\exception\Forbidden();
+			throw new Forbidden();
 		}
 		$title = go()->t('Event page', 'community', 'calendar');
 		$method = 'PAGE'; // will show participation statusses or other participants
@@ -283,7 +288,7 @@ class Module extends core\Module
 			}
 		}
 		if(!$participant) {
-			throw new core\exception\Forbidden();
+			throw new Forbidden();
 		}
 		if(isset($_GET['reply']) && in_array($_GET['reply'], ['accepted', 'tentative', 'declined'])) {
 			$participant->participationStatus = $_GET['reply'];
@@ -315,7 +320,7 @@ class Module extends core\Module
 		cron\ScanEmailForInvites::install("*/5 * * * *");
 		cron\ImportWebcalIcs::install("*/15 * * * *");
 
-		Calendar::entityType()->setDefaultAcl([core\model\Group::ID_INTERNAL => core\model\Acl::LEVEL_READ]);
+		Calendar::entityType()->setDefaultAcl([core\model\Group::ID_INTERNAL => Acl::LEVEL_READ]);
 
 		return parent::afterInstall($model);
 	}
@@ -346,7 +351,7 @@ class Module extends core\Module
 				$calendar->setOwnerId($user->id);
 				$calendar->createdBy = $user->id; // This will make the ACL owned by the user too
 				$calendar->setAcl([
-					core\model\Group::ID_INTERNAL => core\model\Acl::LEVEL_READ
+					core\model\Group::ID_INTERNAL => Acl::LEVEL_READ
 				]);
 				if(!$calendar->save()) {
 					throw new core\orm\exception\SaveException($calendar);
