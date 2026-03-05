@@ -47,9 +47,11 @@
 <body>
 
 <form id="office_form" name="office_form" target="office_frame"
-      action="<?= $action; ?>" method="post">
+      action="<?= $action; ?>" enctype="multipart/form-data" method="post">
     <input name="access_token" value="<?= $token->getToken(); ?>" type="hidden"/>
-    <input name="access_token_ttl" value="<?= $token->getExpiresAt()->format('U') * 1000; ?>" type="hidden"/>
+<!--    <input name="access_token_ttl" value="--><?php //= $token->getExpiresAt()->format('U') * 1000; ?><!--" type="hidden"/>-->
+<!--    <input name="ui_defaults" value="UIMode=compact" type="hidden" />-->
+<!--    <input name="css_variables" value="--co-primary-element=#1652a1;" type="hidden"/>-->
 </form>
 
 <span id="frameholder"></span>
@@ -79,7 +81,6 @@
   ?>
 	frameholder.appendChild(office_frame);
 
-	document.getElementById('office_form').submit();
 
 
 	function post(msgId, Values) {
@@ -138,6 +139,8 @@
 		}
 
 	});
+
+		document.getElementById('office_form').requestSubmit();
 
 
 </script>
