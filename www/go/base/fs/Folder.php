@@ -367,25 +367,7 @@ class Folder extends Base {
 	 * @return int/false 
 	 */
 	public function calculateSize(){
-		$cmd = 'du -sbL "'.$this->path.'" 2>/dev/null';
 
-		$io = popen ($cmd, 'r' );
-
-		if($io){
-			$size = fgets ( $io, 4096);
-			if($size === false) {
-				pclose($io);
-				return false;
-			}
-
-			$size = preg_replace('/[\t\s]+/', ' ', trim($size));
-			$size = substr ( $size, 0, strpos ( $size, ' ' ) );
-			pclose($io);
-
-			return $size;
-		}else
-		{
-			return false;
-		}		
+		return (new \go\core\fs\Folder($this->path))->calculateSize();
 	}
 }
