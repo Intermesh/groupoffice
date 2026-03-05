@@ -112,29 +112,15 @@
 				if (msg.Values) {
 					if (msg.Values.Status == 'Initialized') {
 						post('Host_PostmessageReady');
-                        // post('Insert_Button', {
-                        //     id: 'custom_close',
-                        //     imgurl: "icon.png",
-                        //     // mobile: true,
-                        //     // tablet: true,
-                        //     label: "Close",
-                        //     hint: "Close the document.",
-                        //     insertBefore: 'save'
-                        // });
 					}
 				}
 				break;
-          case "Clicked_Button":
-						switch(msg.Values.Id) {
-							case 'custom_close':
-							window.close();
-								break;
-                        }
 
-						break;
+            case "UI_Close":
+			    window.close();
+            break;
 
 			case 'UI_SaveAs':
-
 
 				const extension = (msg.Values && msg.Values.format) ? msg.Values.format : <?= json_encode($file->fsFile->extension()); ?>;
 				// TODO make this a nice dialog
@@ -152,6 +138,8 @@
 		}
 
 	});
+
+
 </script>
 
 </body>

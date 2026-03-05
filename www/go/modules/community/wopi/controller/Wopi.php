@@ -216,16 +216,19 @@ class Wopi extends Controller
       'UserFriendlyName' => $user->displayName,
       'HostEditUrl' => Request::get()->getBaseUrl() . "/wopi/edit/" . $this->token->serviceId . "/". $file->id,
       'HostViewUrl' => Request::get()->getBaseUrl() . "/wopi/edit/" . $this->token->serviceId . "/". $file->id,
-      
-
-      //See https://wopi.readthedocs.io/en/latest/scenarios/business.html#business-editing
+//      //See https://wopi.readthedocs.io/en/latest/scenarios/business.html#business-editing
       'LicenseCheckForEditIsEnabled' => true,
       'DownloadUrl' => go()->getSettings()->URL . "index.php?r=files/file/download&id=" . $file->id,
+
+			"CloseUrl" => $origin, // must be provided: https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/online/scenarios/customization#closepostmessage
+			"ClosePostMessage" => true
     ];
 
+    $response = array_merge($response, self::CAPABILITIES);
+
 		go()->debug(json_encode($response, JSON_PRETTY_PRINT));
-    
-    return array_merge($response, self::CAPABILITIES);
+
+		return $response;
   }
 
   // TODO lock in GO and webdav too!
