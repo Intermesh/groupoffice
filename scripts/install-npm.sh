@@ -30,6 +30,7 @@ function buildGOUI() {
     local NODE_DIR="$(dirname "${line}")";
     echo "BUILD:" $NODE_DIR;
     cd $NODE_DIR;
+    #npm up
     npm run build;
     cd $DIR;
 
@@ -49,6 +50,7 @@ function buildAndInstallGOUIExceptCommunityAndBusiness() {
     echo "BUILD:" $NODE_DIR;
     cd $NODE_DIR;
     npm ci --prefer-offline --audit=false --progress=false --fund=false;
+    #npm up
     npm run build;
     cd $DIR;
 
