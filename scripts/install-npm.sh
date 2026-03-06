@@ -72,7 +72,4 @@ buildGOUI "./www/go/modules/community"
 buildGOUI "./www/go/modules/business"
 buildGOUI "./www/promodules"
 
-# =)
 buildAndInstallGOUIExceptCommunityAndBusiness "./www/go/modules"
-
-echo $SECONDS;
