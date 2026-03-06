@@ -2430,7 +2430,7 @@ abstract class Property extends Model {
 					$id = $i;
 				}
 
-				if (isset($mapped[$id])) {
+				if (isset($id) && isset($mapped[$id])) {
 					$mapped[$id]->setValues($patch);
 					$this->{$propName}[] = $mapped[$id];
 				} else {
