@@ -1,3 +1,5 @@
+- Core: Replaced unsafe MaestroError/php-heic-to-jpg lib with imagick PHP extension to support HEIF image files.
+
 06-03-2026: 26.0.12
 - LDAP: Fixed LDAP authentication not work #1444
 - Core: Fixed encoding issue after moving grid columns
