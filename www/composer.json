@@ -35,7 +35,7 @@
     "steverhoades/oauth2-openid-connect-server": "^2.3.0",
     "phpoffice/phpspreadsheet": "@stable",
     "lcobucci/jwt": "*",
-    "firebase/php-jwt": "@stable",
+    "firebase/php-jwt": "6.*",
     "donatj/phpuseragentparser": "@stable",
     "league/oauth2-client": "2.7.0",
     "league/oauth2-google": "@stable",
