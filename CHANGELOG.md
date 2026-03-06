@@ -1,3 +1,4 @@
+06-03-2026: 26.0.12
 - LDAP: Fixed LDAP authentication not work #1444
 - Core: Fixed encoding issue after moving grid columns
 - Calendar: Fixed issue: No email when a participant confirm or decline #1437
