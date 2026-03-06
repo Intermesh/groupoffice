@@ -45,23 +45,32 @@ class Connection {
 	public $debug = false;
 	
 	public function __construct($dsn, $username, $password) {
-		$this->dsn = $dsn;
-		$this->username = $username;
-		$this->password = $password;
-		$this->options = [
-				PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
-				PDO::MYSQL_ATTR_INIT_COMMAND => "SET character_set_client = utf8mb4,
+
+		$initCmd = "SET character_set_client = utf8mb4,
 				  character_set_connection = utf8mb4,
 				  character_set_results = utf8mb4,
 				  sql_mode = 'STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION',
 				  time_zone = '+00:00',
-				  lc_messages = 'en_US'",
+				  lc_messages = 'en_US'";
+
+		$this->dsn = $dsn;
+		$this->username = $username;
+		$this->password = $password;
+		$this->options = [
 				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 				PDO::ATTR_PERSISTENT => false, // Unit test on closing DB connection fails. We need this to work for long running processes
 				PDO::ATTR_EMULATE_PREPARES => false, //for native data types int, bool etc.
 				PDO::ATTR_STRINGIFY_FETCHES => false,
 				PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
 		];
+
+		if(version_compare(PHP_VERSION, '8.5.0') >= 0) {
+			$this->options[PDO\Mysql::ATTR_USE_BUFFERED_QUERY] = true;
+			$this->options[PDO\Mysql::ATTR_INIT_COMMAND] = $initCmd;
+		} else {
+			$this->options[PDO::MYSQL_ATTR_USE_BUFFERED_QUERY] = true;
+			$this->options[PDO::MYSQL_ATTR_INIT_COMMAND] = $initCmd;
+		}
 	}
 
 	public function getDsn() {
