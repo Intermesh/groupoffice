@@ -1,6 +1,16 @@
+- Core: Replaced unsafe MaestroError/php-heic-to-jpg lib with imagick PHP extension to support HEIF image files.
+
+06-03-2026: 26.0.12
+- LDAP: Fixed LDAP authentication not work #1444
+- Core: Fixed encoding issue after moving grid columns
+- Calendar: Fixed issue: No email when a participant confirm or decline #1437
+- Core: Fixed Authorization bypass: IDOR in SmtpAccount/test, Calendar downloadIcs, DavAccount/sync + missing admin checks #1447
+- Core: Fixed Authenticated Remote Code Execution via PHP Insecure Deserialization in `AbstractSettingsCollection`
+- Core: Fixed Self XSS in GroupOffice Installer License Page (install/license.php)
+
 02-03-2026: 26.0.11
 - Comments: Fixed comment routing from search
-- Support: Search in comments too 
+- Support: Search in comments too
 
 28-02-2026: 26.0.10
 - Tasks: Fixed subscribe to task lists

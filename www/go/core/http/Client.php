@@ -242,11 +242,12 @@ class Client
 	/**
 	 * Close the connection
 	 *
+	 * @deprecated
 	 * @return void
 	 */
 	public function close(): void
 	{
-		curl_close($this->curl);
+
 	}
 
 	protected function getHeadersForCurl(): array

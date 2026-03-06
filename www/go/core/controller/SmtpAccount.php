@@ -2,6 +2,7 @@
 
 namespace go\core\controller;
 
+use go\core\exception\Forbidden;
 use go\core\jmap\EntityController;
 use go\core\model;
 use go\core\jmap\Response;
@@ -77,8 +78,12 @@ class SmtpAccount extends EntityController
 	 */
 	public function test(array $params)
 	{
+		if(!go()->getAuthState()->isAdmin()) {
+			throw new Forbidden();
+		}
+
 		if (isset($params['id'])) {
-			$smtpAccount = model\SmtpAccount::findById($params['id']);
+			$smtpAccount = $this->getEntity($params['id']);
 			// prevent 'empty' password from overriding the pre-existing
 			if (empty($params['password'])) {
 				unset($params['password']);
