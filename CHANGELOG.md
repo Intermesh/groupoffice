@@ -1,5 +1,6 @@
 - Core: Replaced unsafe MaestroError/php-heic-to-jpg lib with imagick PHP extension to support HEIF image files.
 - Core: PHP 8.5 compatibility issues
+- Address book: Fixed contact sort order when showing names as  "lastname, firstname". Fixes #1219
 
 06-03-2026: 26.0.12
 - LDAP: Fixed LDAP authentication not work #1444
