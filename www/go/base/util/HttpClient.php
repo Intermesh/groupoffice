@@ -232,8 +232,6 @@ class HttpClient{
 	}
 	
 	public function __destruct(){
-		if($this->_curl)
-			curl_close($this->_curl);
 		
 		if(file_exists($this->_cookieFile))
 			unlink($this->_cookieFile);
