@@ -207,6 +207,16 @@ function test_system() :array
 	$tests[]=$test;
 
 
+	$test['name']='Imagick support';
+	$test['showSuccessFeedback'] = false;
+	$test['pass']=extension_loaded('imagick');
+	$test['feedback']='Warning: ImageMagick extension not loaded. Without Imagick Group-Office can\'t view *.heic and *.heif image files.';
+	$test['fatal']=false;
+
+	$tests[]=$test;
+
+
+
 	$test['name']='EXIF support';
 	$test['showSuccessFeedback'] = false;
 	$test['pass']=function_exists('exif_read_data');

@@ -2,11 +2,9 @@
 namespace go\core\util;
 
 use Exception;
-use go\core\App;
 use go\core\ErrorHandler;
 use go\core\fs\File;
 use go\core\http\Response;
-use Maestroerror\HeicToJpg;
 
 /**
  * Image resizer
@@ -62,11 +60,17 @@ class Image {
 
 		if(str_ends_with($filename, ".heic") || str_ends_with($filename, ".heif")) {
 			$tmpFile = File::tempFile("jpg");
-			HeicToJpg::convert($filename)->saveAs($tmpFile->getPath());
+
+			if(extension_loaded('imagick')){
+				$imagick = new \Imagick($filename);
+
+				$imagick->setImageFormat('jpeg');
+				$imagick->setImageCompressionQuality(90);
+				$imagick->writeImage($tmpFile);
+			}
+
 			$filename = $tmpFile->getPath();
 		}
-
-
 
 		$this->originalFilename = $filename;
 

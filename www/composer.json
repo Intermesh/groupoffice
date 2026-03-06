@@ -20,6 +20,7 @@
     "sabre/dav": "@stable",
     "ext-json": "*",
     "ext-openssl": "*",
+    "ext-imagick": "*",
     "michelf/php-markdown": "@stable",
     "tecnickcom/tcpdf": "@stable",
     "dragonmantank/cron-expression": "@stable",
@@ -43,8 +44,7 @@
     "thenetworg/oauth2-azure": "@stable",
     "erusev/parsedown": "@stable",
     "phpmailer/phpmailer": "@stable",
-    "jasny/phpdoc-parser": "^1.0",
-    "maestroerror/php-heic-to-jpg": "^1.0"
+    "jasny/phpdoc-parser": "^1.0"
   },
   "license": "AGPL",
   "authors": [
