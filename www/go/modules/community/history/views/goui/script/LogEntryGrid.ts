@@ -56,11 +56,11 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 
 							avatar({
 								cls: "inline",
-								displayName: v.name,
-								backgroundImage: v.avatarId ? client.downloadUrl(v.avatarId) : undefined
+								displayName: v ? v.name : t("Unknown user"),
+								backgroundImage: v?.avatarId ? client.downloadUrl(v.avatarId) : undefined
 							}),
 
-							comp({text: v.name, cls: "history-created-by"})
+							comp({text: v ? v.name : t("Unknown user"), cls: "history-created-by"})
 						)
 					}
 				}),
@@ -70,7 +70,7 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 					resizable: true,
 					width: 80,
 					align: "center",
-					renderer: (columnValue, record, td, table, storeIndex, column) => {
+					renderer: (columnValue, record) => {
 						if (columnValue) {
 							return btn({
 								cls: "history-changes-button",
