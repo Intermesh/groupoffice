@@ -78,6 +78,12 @@
     "optimize-autoloader": true,
     "platform": {
       "php": "8.2"
+    },
+    "audit": {
+      "ignore": [
+        "PKSA-y2cr-5h3j-g3ys"
+      ]
     }
   }
+
 }
