@@ -138,43 +138,6 @@ class Settings extends \GO\Base\Db\ActiveRecord{
 				}
 			}
 
-
-			//$newUser = User::findById($user->id, ['syncSettings', 'addressBookSettings', 'notesSettings']);
-			
-
-//			if (\GO::modules()->addressbook) {
-//				$stmt = $this->addressbooks();
-//				if (!$stmt->rowCount()) {
-//					$addressbook = \GO\Addressbook\Model\Addressbook::model()->findSingleByAttribute('user_id', $user->id);
-//					if ($addressbook) {
-//						$settings->addManyMany('addressbooks', $addressbook->id, array('default_addressbook' => 1));
-//					}
-//				}
-//			}
-// KAPOT MET 6.3 notes
-//			if (\GO::modules()->notes) {
-//				$stmt = $this->noteCategories();
-//				if (!$stmt->rowCount()) {
-//					$noteCategory = \GO\Notes\Model\Category::model()->findSingleByAttribute('user_id', $user->id);
-//					if ($noteCategory) {
-//						$settings->addManyMany('noteCategories', $noteCategory->id, array('default_category' => 1));
-//					}
-//				}
-//			}
-
-
-
-
-//			if (\GO::modules()->tasks) {
-//				$stmt = $this->tasklists();
-//				if (!$stmt->rowCount()) {
-//					$tasklist = \GO\Tasks\Model\Tasklist::model()->findSingleByAttribute('user_id', $user->id);
-//					if ($tasklist) {
-//						$settings->addManyMany('tasklists', $tasklist->id, array('default_tasklist' => 1));
-//					}
-//				}
-//			}
-
 			if ($save)
 				$settings->save();
 

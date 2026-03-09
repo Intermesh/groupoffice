@@ -1,3 +1,5 @@
+- Core / Sync: fix db exception when saving new user with sync enabled
+
 06-03-2026: 6.8.156
 - Core: Fixed encoding issue after moving grid columns
 - Core: Fixed Authorization bypass: IDOR in SmtpAccount/test, Calendar downloadIcs, DavAccount/sync + missing admin checks #1447
