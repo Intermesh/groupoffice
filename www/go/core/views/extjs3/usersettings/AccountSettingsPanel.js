@@ -343,7 +343,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 
 		this.passwordFieldset.setVisible(visible);
 
-		if(!go.Modules.get("core", "core").userRights.mayChangeUsers) {
+		if(go.Modules.get("core", "core").userRights.mayChangeUsers) {
 			this.convertToLocalFieldset.setVisible(!visible);
 		}
 	},
