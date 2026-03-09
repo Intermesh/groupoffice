@@ -1,3 +1,4 @@
+- Core: fix odd casting problem in imap class 
 - Core / Sync: fix db exception when saving new user with sync enabled
 
 06-03-2026: 6.8.156

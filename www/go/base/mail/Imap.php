@@ -1110,7 +1110,7 @@ class Imap extends ImapBodyStruct
 		$charset = $forceAscii || !\GO\Base\Util\StringHelper::isUtf8($filter) ? 'US-ASCII' : 'UTF-8';
 
 		$command = 'UID SORT ('.$sort.') '.$charset.' '.trim($filter)."\r\n";
-		
+
 		$this->send_command($command);
 		$speedup = true;
 
@@ -1182,7 +1182,7 @@ class Imap extends ImapBodyStruct
 		// Check if the imap_sort_on_date flag is set. Usually this can be set when 
 		// the mailserver is a Microsoft Exchange server that 
 		// does NOT support Server Side Sort
-		
+
 		if (!\GO::config()->imap_sort_on_date) {
 			\GO::debug("imap::Config::imap_sort_on_date(false)");
 			if ($sort == 'DATE' || $sort == 'R_DATE') {
@@ -1681,7 +1681,7 @@ class Imap extends ImapBodyStruct
 					$message['to']=$this->mime_header_decode($message['to']);
 					$message['reply_to']=$this->mime_header_decode($message['reply_to']);
 					$message['disposition_notification_to']=$this->mime_header_decode($message['disposition_notification_to']);
-					
+
 					//remove non ascii stuff. Incredimail likes iso encoded chars too :(
 					if(isset($message['message_id'])) {
 						$message['message_id']= preg_replace('/[[:^print:]]/', '', $message['message_id']);
@@ -1739,7 +1739,7 @@ class Imap extends ImapBodyStruct
 		}
 
 		$command = 'UID FETCH '.$uidRange.' (FLAGS INTERNALDATE)'."\r\n";
-		
+
 		$this->send_command($command);
 		$res = $this->get_response(false, false);
 
@@ -1750,9 +1750,9 @@ class Imap extends ImapBodyStruct
 
 		//remove status response
 		array_pop($res);
-		
+
 		$data = [];
-		
+
 		foreach($res as $message) {
 			//UID 17 FLAGS ( \Flagged \Seen ) INTERNALDATE 24-May-2018 13:02:43 +0000
 
@@ -1784,7 +1784,7 @@ class Imap extends ImapBodyStruct
 			];
 
 		}
-		
+
 		return $data;
 	}
 
@@ -1807,7 +1807,7 @@ class Imap extends ImapBodyStruct
 
 			$key = 'sort_cache_'.$this->selected_mailbox['name'].'_'.$this->server.'_'.$sort_field;
 			$key .= $reverse ? '_1' : '_0';
-			
+
 			$unseenCheck = $unseen['count'].':'.$this->selected_mailbox['messages'];
 			if(!empty($this->selected_mailbox['uidnext']))
 				$unseenCheck .= ':'.$this->selected_mailbox['uidnext'];
@@ -1832,11 +1832,15 @@ class Imap extends ImapBodyStruct
 
 		\GO::debug("Count uids: ".count($uids));
 
-		if(!is_array($uids))
+		if(!is_array($uids)) {
 			return array();
+		}
 
-		if($limit>0)
-			$uids=array_slice($uids,$start, $limit);
+		$limit = (int) $limit;
+		$start = (int) $start;
+		if ($limit>0) {
+			$uids = array_slice($uids, $start, $limit);
+		}
 
 		$chunks = array_chunk($uids, 1000);
 
@@ -2261,10 +2265,10 @@ class Imap extends ImapBodyStruct
 		}
 		return $str;
 	}
-	
+
 	/**
 	 * Decode an uuencoded attachment
-	 * 
+	 *
 	 * @param int $uid
 	 * @param int $part_no
 	 * @param boolean $peek
@@ -2275,7 +2279,7 @@ class Imap extends ImapBodyStruct
 	private function _uudecode(int $uid, int $part_no, bool $peek, $fp)
 	{
 		$regex = "/(begin ([0-7]{1,3}) (.+))\n/";
-		
+
 		$body = $this->get_message_part($uid, $part_no, $peek);
 
 		if (preg_match($regex, $body, $matches, PREG_OFFSET_CAPTURE)) {
@@ -2285,7 +2289,7 @@ class Imap extends ImapBodyStruct
 			$endpos = strpos($body, 'end', $offset) - $offset - 1;
 
 
-			if(!$endpos){					
+			if(!$endpos){
 				throw new Exception("Invalid UUEncoded attachment in uid: ".$uid);
 			}
 
@@ -2314,8 +2318,8 @@ class Imap extends ImapBodyStruct
 
 	public function get_message_part_decoded($uid, $part_no, $encoding, $charset=false, $peek=false, $cutofflength=false, $fp=false) {
 		\GO::debug("get_message_part_decoded($uid, $part_no, $encoding, $charset)");
-		
-		
+
+
 		if($encoding == 'uuencode') {
 			return $this->_uudecode($uid, $part_no, $peek, $fp);
 		}
@@ -2363,7 +2367,7 @@ class Imap extends ImapBodyStruct
 					}else{
 						fputs($fp, quoted_printable_decode($line));
 					}
-					break;				
+					break;
 				default:
 					if(!$fp){
 						$str .= $line;
@@ -2394,7 +2398,7 @@ class Imap extends ImapBodyStruct
 
 			//some clients don't send the charset.
 			if($charset=='us-ascii') {
-				$charset = $this->findCharsetInHtmlBody($str);				
+				$charset = $this->findCharsetInHtmlBody($str);
 			}
 
 			$str = \GO\Base\Util\StringHelper::clean_utf8($str, $charset);
@@ -2402,7 +2406,7 @@ class Imap extends ImapBodyStruct
 				$str = str_replace($charset, 'utf-8', $str);
 			}
 		}
-		
+
 
 		return $fp ? true : $str;
 	}
@@ -2475,7 +2479,7 @@ class Imap extends ImapBodyStruct
 		}
 		$this->send_command($command);
 		$result = fgets($this->handle);
-		
+
 		$size = false;
 		if (preg_match("/\{(\d+)\}\r\n/", $result, $matches)) {
 			$size = $matches[1];
@@ -2739,7 +2743,7 @@ class Imap extends ImapBodyStruct
 		if($this->delimiter == '\\') {
 			return str_replace('"', '\"', $mailbox);
 		}
-		
+
 		return $this->_escape( $mailbox);
 	}
 
@@ -2905,8 +2909,8 @@ class Imap extends ImapBodyStruct
 	{
 		$command = 'STATUS "'.$this->addslashes($this->utf7_encode($mailbox)).'" (MESSAGES UNSEEN)'."\r\n";
 		$this->send_command($command);
-		$result = $this->get_response(false, true);		
-		
+		$result = $this->get_response(false, true);
+
 		if($result[0][1] === 'NO'){
 			return false;
 		}
