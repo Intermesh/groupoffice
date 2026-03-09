@@ -1,3 +1,4 @@
+09-03-3036: 6.8.157
 - Core: fix odd casting problem in imap class 
 - Core / Sync: fix db exception when saving new user with sync enabled
 
