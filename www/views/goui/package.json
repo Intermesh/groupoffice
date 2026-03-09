@@ -26,7 +26,7 @@
     "build:groupoffice-core-dts": "npx tsc -p groupoffice-core/tsconfig.json --emitDeclarationOnly --outDir ./dist/groupoffice-core/script/",
     "prepublishOnly": "npm run build"
   },
-  "name": "goui",
+  "name": "groupoffice-goui",
   "description": "Bundles GOUI and groupofice-core for shared usage by goui modules",
   "version": "1.0.0",
   "author": "Intermesh",
