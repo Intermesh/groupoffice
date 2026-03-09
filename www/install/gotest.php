@@ -293,7 +293,7 @@ function test_system() :array
 	$test['name']='zlib compression';
 	$test['showSuccessFeedback'] = false;
 	$test['pass']=extension_loaded('zlib');
-	$test['feedback']='Warning: No zlib output compression support. You can increase the initial load time by installing this php extension.';
+	$test['feedback']='Warning: No zlib output compression support. You can decrease the initial load time by installing this php extension.';
 	$test['fatal']=false;
 
 	$tests[]=$test;
