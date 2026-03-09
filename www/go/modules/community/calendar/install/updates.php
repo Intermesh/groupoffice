@@ -476,3 +476,5 @@ $updates['202512030900'][] = 'create index calendar_event_status_index
 $updates['202602160945'][] = function() {
 	\go\modules\community\calendar\cron\ImportWebcalIcs::install("*/15 * * * *");
 };
+
+$updates['202602160945'][] = "ALTER TABLE `calendar_resource_group` ADD COLUMN `autoAccept` TINYINT(1) NOT NULL DEFAULT 1 AFTER `description`;";

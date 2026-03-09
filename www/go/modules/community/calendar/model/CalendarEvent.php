@@ -713,8 +713,16 @@ class CalendarEvent extends AclItemEntity {
 				foreach ($this->participants as $participant) {
 					if (!$participant->isNew() && !$participant->isOwner())
 						$participant->participationStatus = Participant::NeedsAction;
-					if($participant->kind === 'resource' && $participant->isFree($this->start(), $this->end())) {
-						$participant->participationStatus = Participant::Accepted;
+
+					// AUTO-ACCEPT resources if checkbox is on
+					if($participant->kind === 'resource') {
+						$resource = Calendar::findById(str_replace('Calendar:', '', $participant->pid()));
+						if($resource && !empty($resource->groupId)) {
+							$rgroup = ResourceGroup::findById($resource->groupId);
+							if ($rgroup && $rgroup->autoAccept && $participant->isFree($this->start(), $this->end())) {
+								$participant->participationStatus = Participant::Accepted;
+							}
+						}
 					}
 				}
 			}
