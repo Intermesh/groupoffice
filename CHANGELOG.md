@@ -2,6 +2,7 @@
 - Core: PHP 8.5 compatibility issues
 - Address book: Fixed contact sort order when showing names as  "lastname, firstname". Fixes #1219
 - Core: Also treat / and \ as white space in searching. Fixes Search in note title, is not contains string #1340
+- Core / Sync: fix database exception when saving new user
 
 06-03-2026: 26.0.12
 - LDAP: Fixed LDAP authentication not work #1444
