@@ -231,6 +231,16 @@ abstract class Entity  extends OrmEntity {
 		return true;
 	}
 
+	/**
+	 * Create a folder for the files of this entity.
+	 *
+	 * @return Folder
+	 * @throws AccessDenied
+	 */
+	public function createFilesFolder() : Folder {
+		return Folder::model()->findForEntity($this, true);
+	}
+
 	public static function check()
 	{
 		parent::check();
