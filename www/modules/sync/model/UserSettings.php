@@ -36,6 +36,8 @@ class UserSettings extends Property
 	 */
 	public $account_id;
 
+	public int $max_days_old = 0;
+
 	public $noteBooks = [];
 
 	public $addressBooks = [];
@@ -51,7 +53,7 @@ class UserSettings extends Property
 
 	private $doSetup = false;
 
-	protected function init()
+	protected function init(): void
 	{
 		if($this->isNew()) {
 			$this->doSetup = true;
@@ -77,16 +79,16 @@ class UserSettings extends Property
 	}
 
 
-	protected function setup() {
-
-	  if(empty($this->account_id)) {
-      if (Module::isInstalled('legacy', 'email')) {
-        $account = \GO\Email\Model\Account::model()->findSingleByAttribute('user_id', $this->user_id);
-        if ($account) {
-          $this->account_id = $account->id;
-        }
-      }
-	  }
+	protected function setup()
+	{
+		if (empty($this->account_id)) {
+			if (Module::isInstalled('legacy', 'email')) {
+				$account = \GO\Email\Model\Account::model()->findSingleByAttribute('user_id', $this->user_id);
+				if ($account) {
+					$this->account_id = $account->id;
+				}
+			}
+		}
 
 		if (empty($this->addressBooks) || empty($this->noteBooks)  || empty($this->tasklists)) {
 			$user = User::findById($this->user_id, ['addressBookSettings', 'notesSettings', 'syncSettings', 'tasksSettings']);
@@ -119,10 +121,11 @@ class UserSettings extends Property
 		}
 	}
 
-	public function toArray(array|null $properties = null): array|null
+	public function toArray(?array $properties = null): array
 	{
-		if($this->doSetup)
+		if($this->doSetup) {
 			$this->setup();
+		}
 
 		return parent::toArray($properties);
 	}
