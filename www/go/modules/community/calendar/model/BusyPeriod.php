@@ -42,7 +42,7 @@ class BusyPeriod {
 	 * @throws DbException
 	 * @throws Forbidden
 	 */
-	static function fetch($id, $start, $end) {
+	static function fetch($id, $start, $end, $excludedUid = null) {
 //		$query = CalendarEvent::find();
 //		$aclAlias = CalendarEvent::joinAclEntity($query); // if has ACL should have mayReadFreeBusy?
 		$query = go()->getDbConnection()->select(['cce.eventId', 'start','duration','lastOccurrence','recurrenceRule','e.timeZone',
@@ -62,6 +62,9 @@ class BusyPeriod {
 			$query->join('calendar_calendar_user', 'calu', 'cal.id = calu.id AND calu.userId = '.(int)$ownerId) // if not found, p not subscribed
 				->andWhere('calu.isSubscribed', '=', 1)
 				->select(['calu.includeInAvailability as includeInAvailability'], true);
+		}
+		if(!empty($excludedUid)) {
+			$query->andWhere('e.uid', '!=', $excludedUid);
 		}
 
 		$query

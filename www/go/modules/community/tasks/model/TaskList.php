@@ -185,6 +185,11 @@ class TaskList extends AclOwnerEntity
 			->getUserRights()->mayChangeTasklists;
 	}
 
+	public static function readOnlyProps(): array
+	{
+		return ["modifiedBy", "createdAt", "modifiedAt"];
+	}
+
 	protected static function checkAclJoinEntityTable()
 	{
 		return (new Query())

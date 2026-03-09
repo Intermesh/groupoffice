@@ -1832,11 +1832,15 @@ class Imap extends ImapBodyStruct
 
 		\GO::debug("Count uids: ".count($uids));
 
-		if(!is_array($uids))
+		if(!is_array($uids)) {
 			return array();
+		}
 
-		if($limit>0)
-			$uids=array_slice($uids,$start, $limit);
+		$limit = (int) $limit;
+		$start = (int) $start;
+		if ($limit>0) {
+			$uids = array_slice($uids, $start, $limit);
+		}
 
 		$chunks = array_chunk($uids, 1000);
 

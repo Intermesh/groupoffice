@@ -1,5 +1,5 @@
 import {
-	btn,
+	btn, checkbox,
 	colorfield,
 	column,
 	combobox,
@@ -33,6 +33,7 @@ class ResourceGroupWindow extends FormWindow {
 		this.generalTab.items.add(
 			textfield({name:'name', label: t('Name')}),
 			textarea({name:'description', label: t('Description')}),
+			checkbox({name:'autoAccept', label: t('Auto-accept available resources')}),
 			combobox({
 				dataSource: principalDS, displayProperty: 'name', filter: {entity: 'User'},
 				label: t("Default admin"), name: "defaultOwnerId", filterName: "text", flex:'1 0', required:true
