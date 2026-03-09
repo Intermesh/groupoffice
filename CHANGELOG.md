@@ -1,3 +1,4 @@
+- Projects2: fix editing single custom fieldset with template filter
 - Core: Replaced unsafe MaestroError/php-heic-to-jpg lib with imagick PHP extension to support HEIF image files.
 - Address book: Fixed contact sort order when showing names as  "lastname, firstname". Fixes #1219
 - Core / Sync: prevent database exception when saving new user (cherry-pick from 26.0)
