@@ -14,6 +14,8 @@ class ResourceGroup extends Entity
 	/** @var string The user-visible name of the calendar */
 	public string $name;
 	public ?string $description;
+	/* @var bool If true, all resources in this resource group will be automatically accepted if free. */
+	public ?bool $autoAccept;
 	/** @var ?string Will be set to any resource calendar that is created without owner.*/
 	public ?string $defaultOwnerId;
 
