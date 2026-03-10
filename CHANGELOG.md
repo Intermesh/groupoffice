@@ -1,3 +1,5 @@
+- Files: fix error when removing item from trash (cherry-pick from 26.x)
+ 
 09-03-3036: 6.8.157
 - Core: fix odd casting problem in imap class 
 - Core / Sync: fix db exception when saving new user with sync enabled
