@@ -497,7 +497,9 @@ class ICalendarHelper {
 
 		if(!empty($vattendee['CN'])) $p->name = (string)$vattendee['CN'];
 		if(!empty($vattendee['RSVP'])) $p->expectReply = $vattendee['RSVP']->getValue() ? 1: 0; // bool
-		$p->participationStatus = !empty($vattendee['PARTSTAT']) ? strtolower($vattendee['PARTSTAT']) : 'needs-action';
+		if(!empty($vattendee['PARTSTAT'])) {
+			$p->participationStatus = strtolower($vattendee['PARTSTAT']);
+		}
 		if(!empty($vattendee['ROLE'])) {
 			$map = array_flip(self::$roleMap);
 			if (in_array((string)$vattendee['ROLE'], $map)) {
