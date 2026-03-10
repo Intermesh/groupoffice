@@ -1170,7 +1170,7 @@ abstract class Property extends Model {
 			return true;
 		}
 
-		return $a->format('U') != $b->format('U');
+		return $a->format(Column::DATETIME_FORMAT) != $b->format(Column::DATETIME_FORMAT);
 	}
 
 	/**
