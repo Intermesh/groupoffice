@@ -6,6 +6,8 @@
 - Core: Replaced unsafe MaestroError/php-heic-to-jpg lib with imagick PHP extension to support HEIF image files.
 - Address book: Fixed contact sort order when showing names as  "lastname, firstname". Fixes #1219
 - Core / Sync: prevent database exception when saving new user (cherry-pick from 26.0)
+- Core / CalDAV: Compare dates with date time format for database. This fixes an issue with CalDAV where the datetime object is different in timezone but this has no effect in the database. Therefore the event wrongfully thought the start time was changed and the participant status was reset.
+- CalDAV: etag was always immediately changed for new events leading to a resync after a first accept
 
 06-03-2026: 25.0.90
 - LDAP: Fixed LDAP authentication not work #1444
