@@ -1,3 +1,5 @@
+- Core: Added LT translations.
+
 09-03-2026: 26.0.13
 - Core: Tooltip was not removed if the target's parent was removed
 - Core: Replaced unsafe MaestroError/php-heic-to-jpg lib with imagick PHP extension to support HEIF image files.
