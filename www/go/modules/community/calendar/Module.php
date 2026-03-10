@@ -126,6 +126,7 @@ class Module extends core\Module
 
 	// https://uri/path/api/download.php?blob=community/calendar/calendar/1
 	public function downloadCalendar($id) {
+
 		$calendar = Calendar::findById($id);
 		if($calendar->getPermissionLevel() < Acl::LEVEL_MANAGE) {
 			throw new Forbidden('You need manage permission to export this calendar');
@@ -134,19 +135,37 @@ class Module extends core\Module
 	}
 
 	private function outputIcs(Calendar $calendar) {
+		set_time_limit(0);
+
 		$events = CalendarEvent::find()->where(['calendarId' => $calendar->id]);
 		header('Content-Type: text/calendar; charset=UTF-8; component=vcalendar');
 		header('Content-Disposition: attachment; filename="'.$calendar->name.'export_'.$calendar->id.'_'.date('Y-m-d').'.ics"');
-		$vcalendar = new VCalendar([
-			'PRODID' => str_replace('{VERSION}', go()->getVersion(),CalendarEvent::PROD),
-			'METHOD' => 'PUBLISH'
-		]);
-		if($calendar->timeZone) $vcalendar->add("X-WR-TIMEZONE", $calendar->timeZone);
-		if($calendar->description) $vcalendar->add("X-WR-CALDESC", $calendar->description);
+
+		echo "BEGIN:VCALENDAR\r\n";
+		echo "VERSION:2.0\r\n";
+		echo "PRODID:".str_replace('{VERSION}', go()->getVersion(),CalendarEvent::PROD)."\r\n";
+		echo "METHOD:PUBLISH\r\n";
+
+		ob_end_flush();
+//		if($calendar->timeZone) echo "X-WR-TIMEZONE:" . $calendar->timeZone . "\r\n";
+//		if($calendar->description) echo "X-WR-CALDESC:". $calendar->description. "\r\n";
+//
+//		$vcalendar = new VCalendar([
+//			'PRODID' => str_replace('{VERSION}', go()->getVersion(),CalendarEvent::PROD),
+//			'METHOD' => 'PUBLISH'
+//		]);
+//		if($calendar->timeZone) $vcalendar->add("X-WR-TIMEZONE", $calendar->timeZone);
+//		if($calendar->description) $vcalendar->add("X-WR-CALDESC", $calendar->description);
 		foreach($events as $ev) {
-			ICalendarHelper::toVObject($ev, $vcalendar);
+			$vcal = ICalendarHelper::toVObject($ev);
+			foreach($vcal->VEVENT as $vevent) {
+				echo $vevent->serialize();
+			}
+			flush();
 		}
-		echo $vcalendar->serialize();
+
+		echo "END:VCALENDAR\r\n";
+		//echo $vcalendar->serialize();
 	}
 
 	// https://uri/path/api/page.php/community/calendar/ics/key
