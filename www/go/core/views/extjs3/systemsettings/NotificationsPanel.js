@@ -27,7 +27,8 @@ go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 							xtype: 'textfield',
 							name: 'systemEmail',
 							fieldLabel: t('System e-mail'),
-							allowBlank: false
+							allowBlank: false,
+							vtype:'emailAddress'
 						}, {
 							xtype: 'textfield',
 							name: 'smtpHost',
