@@ -24,6 +24,7 @@ use go\modules\community\calendar\model\BusyPeriod;
 use go\modules\community\calendar\model\CalendarEvent;
 use go\modules\community\calendar\model\ICalendarHelper;
 use Sabre\VObject\Component\VCalendar;
+use Sabre\VObject\TimeZoneUtil;
 
 class Module extends core\Module
 {
@@ -146,16 +147,15 @@ class Module extends core\Module
 		echo "PRODID:".str_replace('{VERSION}', go()->getVersion(),CalendarEvent::PROD)."\r\n";
 		echo "METHOD:PUBLISH\r\n";
 
+		if ($calendar->timeZone) {
+			echo "X-WR-TIMEZONE:" . $calendar->timeZone . "\r\n";
+			$tz = new model\VTimezone($calendar->timeZone);
+			echo $tz->serialize();
+		}
+
+		if($calendar->description) echo "X-WR-CALDESC:". $calendar->description. "\r\n";
 		ob_end_flush();
-//		if($calendar->timeZone) echo "X-WR-TIMEZONE:" . $calendar->timeZone . "\r\n";
-//		if($calendar->description) echo "X-WR-CALDESC:". $calendar->description. "\r\n";
-//
-//		$vcalendar = new VCalendar([
-//			'PRODID' => str_replace('{VERSION}', go()->getVersion(),CalendarEvent::PROD),
-//			'METHOD' => 'PUBLISH'
-//		]);
-//		if($calendar->timeZone) $vcalendar->add("X-WR-TIMEZONE", $calendar->timeZone);
-//		if($calendar->description) $vcalendar->add("X-WR-CALDESC", $calendar->description);
+
 		foreach($events as $ev) {
 			$vcal = ICalendarHelper::toVObject($ev);
 			foreach($vcal->VEVENT as $vevent) {
@@ -163,9 +163,7 @@ class Module extends core\Module
 			}
 			flush();
 		}
-
 		echo "END:VCALENDAR\r\n";
-		//echo $vcalendar->serialize();
 	}
 
 	// https://uri/path/api/page.php/community/calendar/ics/key
