@@ -1,4 +1,5 @@
 - Core: Lithuanian translations! Thank you Mindaugas
+- Files: fix error when removing from trash (cherry pick from 26.0)
 
 09-03-2026: 25.0.91
 - Projects2: fix editing single custom fieldset with template filter
