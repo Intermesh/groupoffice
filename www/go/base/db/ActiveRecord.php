@@ -1898,13 +1898,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 	public function findByPk($primaryKey, $findParams=false, $ignoreAcl=false, $noCache=false){
 
-		if(empty($primaryKey))
+		if(empty($primaryKey)) {
 			return false;
+		}
 
 		//Use cache so identical findByPk calls are only executed once per script request
 		if(!$noCache){
 			$cachedModel =  GO::modelCache()->get($this->className(), $primaryKey);
-//			GO::debug("Cached : ".$this->className()."::findByPk($primaryKey)");
 			if($cachedModel){
 
 				if($cachedModel && !$ignoreAcl && !$cachedModel->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)){
@@ -1920,15 +1920,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		$sql = $this->_appendPkSQL($sql, $primaryKey);
 
-//		GO::debug("DEBUG SQL: ".var_export($this->_debugSql, true));
 
-		if($this->_debugSql)
-				GO::debug($sql);
+		if($this->_debugSql) {
+			GO::debug($sql);
+		}
 
 		try{
 			$result = $this->getDbConnection()->query($sql);
-//			$result->model=$this;
-//			$result->findParams=$findParams;
 
 			$result->setFetchMode(PDO::FETCH_CLASS, $this->className(),array(false));
 
@@ -1943,8 +1941,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			throw new \GO\Base\Exception\AccessDenied($msg);
 		}
 
-		if($model)
+		if($model) {
 			GO::modelCache()->add($this->className(), $model);
+		}
 
 		return $model;
 	}

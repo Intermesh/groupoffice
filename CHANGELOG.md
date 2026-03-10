@@ -1,4 +1,5 @@
 - Core: Added LT translations.
+- Files: fix error when cleaning out the trash and a file or folder does not exist anymore in the database.
 
 09-03-2026: 26.0.13
 - Core: Tooltip was not removed if the target's parent was removed

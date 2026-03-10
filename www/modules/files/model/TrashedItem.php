@@ -141,11 +141,11 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 	{
 		$entityType = EntityType::findById($this->entityTypeId);
 		if ($entityType->getName() == 'File') {
-			$f = \GO\Files\Model\File::model()->findByPk($this->entityId, false, true);
+			$f = \GO\Files\Model\File::model()->findByPk($this->entityId, false, true, true);
 		} else {
-			$f = \GO\Files\Model\Folder::model()->findByPk($this->entityId, false, true);
+			$f = \GO\Files\Model\Folder::model()->findByPk($this->entityId, false, true, true);
 		}
-		if (isset($f)) {
+		if (!empty($f)) {
 			$f->delete(true);
 		}
 		$this->delete(true);
