@@ -518,8 +518,6 @@ class ICalendarHelper {
 				$props->timeZone = $props->start->getTimezone()->getName();
 			}
 		}
-		go()->log($vevent->DESCRIPTION);
-		//empty($vevent->DTSTART) ?: $props->start = $vevent->DTSTART->getDateTime()->format(DateTime::FORMAT_API_LOCAL);
 		if(!empty($vevent->SUMMARY)) $props->title = (string)$vevent->SUMMARY;
 		if(!empty($vevent->DESCRIPTION)) $props->description = str_replace('\n',"\n", $vevent->DESCRIPTION->getValue());
 		if(!empty($vevent->LOCATION)) $props->location = (string)$vevent->LOCATION;
