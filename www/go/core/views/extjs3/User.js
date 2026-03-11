@@ -50,7 +50,8 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 			this.checkForNewDevices(user);
 			document.body.classList.add(user.themeColorScheme);
 			changeTheme(prefersColorQuery);
-			if(document.body.classList.contains("dark")) {
+			// TODO: GOUI version has no meta theme-color declaration?
+			if(document.body.classList.contains("dark") && document.getElementsByTagName("meta")["theme-color"]) {
 				document.getElementsByTagName("meta")["theme-color"].content = "#202020";
 			}
 

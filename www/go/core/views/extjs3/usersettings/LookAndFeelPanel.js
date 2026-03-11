@@ -55,7 +55,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 							document.body.classList.add('dark');
 						}
 
-						if(document.body.classList.contains("dark")) {
+						if(document.body.classList.contains("dark") && document.getElementsByTagName("meta")["theme-color"]) {
 							document.getElementsByTagName("meta")["theme-color"].content = "#202020";
 						}
 					}
