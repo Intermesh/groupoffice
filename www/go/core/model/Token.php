@@ -6,6 +6,7 @@ use DateTimeInterface;
 use DateTimeZone;
 use Exception;
 use go\core\auth\BaseAuthenticator;
+use go\core\auth\ExternalAuthenticator;
 use go\core\auth\SecondaryAuthenticator;
 use go\core\cron\GarbageCollection;
 use go\core\db\DbException;
@@ -432,7 +433,7 @@ class Token extends Entity {
 		$finishedAuthMethods = $this->getPassedAuthenticators(); // array('password','googleauthenticator');
 		
 		foreach($authenticators as $authenticator){
-			if(!in_array($authenticator::id(), $finishedAuthMethods)){
+			if(!in_array($authenticator::id(), $finishedAuthMethods) && !($authenticator instanceof ExternalAuthenticator)){
 				$pending[] = $authenticator;
 			}	
 		}

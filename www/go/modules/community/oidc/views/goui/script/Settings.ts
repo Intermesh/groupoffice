@@ -1,20 +1,6 @@
-import {
-	btn,
-	column,
-	Component,
-	datasourcestore,
-	EntityID, h3,
-	hr,
-	menu,
-	mstbar,
-	searchbtn,
-	t,
-	table,
-	tbar
-} from "@intermesh/goui";
-import {OIDConnectClientDS} from "@intermesh/community/oidc";
+import {btn, column, Component, datasourcestore, EntityID, h3, hr, menu, mstbar, t, table, tbar} from "@intermesh/goui";
 import {OIDConnectClientDialog} from "./OIDConnectClientDialog.js";
-import {jmapds} from "@intermesh/groupoffice-core";
+import {OIDConnectClientDS} from "./Index.js";
 
 export class Settings extends Component {
 

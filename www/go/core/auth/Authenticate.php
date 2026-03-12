@@ -30,8 +30,10 @@ class Authenticate {
 	 */
 	const CACHE_PASSWORD_LOGIN = 60;
 
-	private $primaryAuthenticators;
-	private $secondaryAuthenticators;
+	private array $primaryAuthenticators;
+	private array $secondaryAuthenticators;
+
+	private array $externalAuthenticators;
 
 
 	/**
@@ -63,6 +65,19 @@ class Authenticate {
 
 	}
 
+	public function getExternalAuthenticatorsForUser($username): array
+	{
+		$auths = [];
+		foreach ($this->getExternalAuthenticators() as $authenticator) {
+			if ($authenticator->isAvailableFor($username)) {
+				$auths[] = $authenticator;
+			}
+		}
+
+		return $auths;
+
+	}
+
 	/**
 	 * Get all the primary authenticators
 	 *
@@ -76,16 +91,26 @@ class Authenticate {
 	}
 
 	/**
-	 * Get all the primary authenticators
+	 * Get all the secondary authenticators. For example OTP auth after the password login.
 	 *
 	 * @return SecondaryAuthenticator[]
 	 */
 	public function getSecondaryAuthenticators(): array
 	{
-
 		$this->populateAuthenticators();
 
 		return $this->secondaryAuthenticators;
+	}
+
+	/**
+	 * Get all the external authenticators. For example OpenID Connect.
+	 * @return array
+	 */
+	public function getExternalAuthenticators(): array
+	{
+		$this->populateAuthenticators();
+
+		return $this->externalAuthenticators;
 	}
 
 	private function populateAuthenticators() {
@@ -93,12 +118,15 @@ class Authenticate {
 			$authMethods = Method::find()->orderBy(['sortOrder' => 'DESC'])->all();
 			$this->secondaryAuthenticators = [];
 			$this->primaryAuthenticators = [];
+			$this->externalAuthenticators = [];
 			foreach ($authMethods as $method) {
 				$authenticator = $method->getAuthenticator();
 				if ($authenticator instanceof PrimaryAuthenticator) {
 					$this->primaryAuthenticators[] = $authenticator;
-				} else {
+				} else if ($authenticator instanceof SecondaryAuthenticator) {
 					$this->secondaryAuthenticators[] = $authenticator;
+				} else {
+					$this->externalAuthenticators[] = $authenticator;
 				}
 			}
 		}

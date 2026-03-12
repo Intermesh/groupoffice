@@ -1,12 +1,5 @@
-import {
-	autocompletechips, browser, btn,
-	checkbox, chips, column,
-	comp, datasourcestore,
-	DefaultEntity, fieldset, listStoreType, Notifier, storeRecordType,
-	t, table, textarea, TextField,
-	textfield
-} from "@intermesh/goui";
-import {client, FormWindow, jmapds} from "@intermesh/groupoffice-core";
+import {browser, btn, fieldset, Notifier, t, textfield} from "@intermesh/goui";
+import {client, FormWindow} from "@intermesh/groupoffice-core";
 
 export class OIDConnectClientDialog extends FormWindow {
 

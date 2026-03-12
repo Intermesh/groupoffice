@@ -1,8 +1,6 @@
 <?php
 namespace go\modules\community\oidc;
 
-require __DIR__ . '/vendor/autoload.php';
-
 use BadRequestException;
 use go\core\App;
 use go\core\auth\Authenticate;
@@ -58,14 +56,13 @@ class Module extends \go\core\Module
 
 		$info = $client->requestUserInfo();
 
-		if(empty($info->email)) {
-			var_dump($info);
+		if(empty($info['email'])) {
 			throw new \Exception("Could not get e-mail from openid provider");
 		}
 
 		go()->getSettings()->allowRegistration = true;
 
-		$user = User::findOrCreateByUsername($info->email, $info->email, $info->name);
+		$user = User::findOrCreateByUsername($info['email'], $info['email'], $info['name']);
 
 		//register as oauth user
 		go()->getDbConnection()->insertIgnore("oidc_user", ['userId' => $user->id, 'clientId' => $client->id])->execute();
