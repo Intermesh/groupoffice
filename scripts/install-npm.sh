@@ -68,6 +68,7 @@ npm run build
 cd $DIR;
 echo "DONE";
 
+buildGOUI "./www/go/modules/community/calendar"
 buildGOUI "./www/go/modules/community"
 buildGOUI "./www/go/modules/business"
 buildGOUI "./www/promodules"
