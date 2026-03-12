@@ -1,7 +1,7 @@
 @use '../../../../../../../views/goui/goui/style/_util.scss'  as *;
 @use '../../../../../../../views/goui/goui/style/_config.scss' as *;
 
-.go-module-icon-openid {
+.go-module-icon-oidc:before {
 	content: " ";
 	margin-top: 0 !important;
 	float: left;
