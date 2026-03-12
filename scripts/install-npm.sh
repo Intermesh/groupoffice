@@ -68,9 +68,14 @@ npm run build
 cd $DIR;
 echo "DONE";
 
+// Needed for jitsimeet first
 buildGOUI "./www/go/modules/community/calendar"
 buildGOUI "./www/go/modules/community"
+
+// Needed for registration first
+buildGOUI "./www/go/modules/business/business"
 buildGOUI "./www/go/modules/business"
+
 buildGOUI "./www/promodules"
 
 buildAndInstallGOUIExceptCommunityAndBusiness "./www/go/modules"
