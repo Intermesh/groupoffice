@@ -30,12 +30,12 @@
       ],
 
       "@intermesh/business/*": [
-        "../../../../../../go/modules/business/*/views/goui/script/Index.d.ts",
+        "../../../../../../go/modules/business/*/views/goui/dist/Index.d.ts",
         "../../../../../../go/modules/business/*/views/goui/script/Index.ts"
       ],
 
       "@intermesh/community/*": [
-        "../../../../../../go/modules/community/*/views/goui/script/Index.d.ts",
+        "../../../../../../go/modules/community/*/views/goui/dist/Index.d.ts",
         "../../../../../../go/modules/community/*/views/goui/script/Index.ts"
       ]
     }

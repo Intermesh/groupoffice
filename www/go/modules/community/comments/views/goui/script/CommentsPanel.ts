@@ -1,12 +1,16 @@
 import {
 	browser,
-	btn, collapsebtn,
+	btn,
+	collapsebtn,
 	comp,
-	Component, ComponentEventMap, DefaultEntity,
-	EntityID, fieldset,
-	form, section,
+	Component,
+	DefaultEntity,
+	EntityID,
+	fieldset,
+	form,
 	t,
-	tbar, Toolbar, Window
+	tbar,
+	Window
 } from "@intermesh/goui";
 import CommentList from "./CommentList.js";
 import {CommentEditor} from "./CommentEditor.js";
