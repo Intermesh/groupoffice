@@ -3,6 +3,7 @@
 - Core / CalDAV: Compare dates with date time format for database. This fixes an issue with CalDAV where the datetime object is different in timezone but this has no effect in the database. Therefore the event wrongfully thought the start time was changed and the participant status was reset.
 - CalDAV: etag was always immediately changed for new events leading to a resync after a first accept
 - Core: Fixed bug where SSE and z-push would constantly clear the cached database scheme
+- Files: Fixed issue where a sub folder could appear twice in the shares tree
 
 09-03-2026: 26.0.13
 - Core: Tooltip was not removed if the target's parent was removed
