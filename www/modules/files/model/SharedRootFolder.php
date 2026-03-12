@@ -146,10 +146,15 @@ class SharedRootFolder extends \GO\Base\Db\ActiveRecord {
 			
 			$parentPath = substr($parentPath, 0, strrpos($parentPath, '/'));
 
-			
 			if($parent->acl_id > 0) {
 				//if folder is shared but not in the current user's shared folder list return false.
-				return isset($shares[$parentPath]);
+				if(isset($shares[$parentPath])) {
+					return true;
+				} else {
+					if(!$parent->parent) {
+						return false;
+					}
+				}
 			}
 		}
 		
