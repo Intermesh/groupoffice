@@ -13,7 +13,7 @@
     "start:sass": "npx sass --watch style:dist",
     "start:dts": "npx tsc --declaration --emitDeclarationOnly --watch",
 
-    "build": "npm run build:clean && npm run build:sass && npm run build:ts",
+    "build": "npm run build:clean && npm run build:sass && npm run build:ts && npm run build:dts",
     "build:clean": "rm -rf ./dist/*",
     "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
     "build:sass": "npx sass --style=compressed --no-source-map style:dist",
