@@ -360,19 +360,7 @@ class Token extends Entity {
 		}		
 		
     if (session_status() == PHP_SESSION_NONE && !headers_sent()) {
-      //without cookie_httponly the cookie can be accessed by malicious scripts 
-      //injected to the site and its value can be stolen. Any information stored in 
-      //session tokens may be stolen and used later for identity theft or
-      //user impersonation.
-      ini_set("session.cookie_httponly",1);
-
-      //Avoid session id in url's to prevent session hijacking.
-      ini_set('session.use_only_cookies',1);
-
-      ini_set('session.cookie_secure', Request::get()->isHttps());
-   
-			session_name('groupoffice');
-      session_start();
+			go()->sessionStart();
     }
 		
 		if(!isset($_SESSION['GO_SESSION'])) {
