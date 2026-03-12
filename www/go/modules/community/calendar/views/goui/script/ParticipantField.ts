@@ -125,14 +125,6 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 
 
 					},
-					'blur' : ({target}) => {
-						if(validateEmail(target.input!.value)) {
-							const email = target.input!.value;
-							this.addParticipant({id:email,email});
-							target.menu.hide();
-							target.input.value = "";
-						}
-					},
 					'blur': ({target})=> {
 						if(validateEmail(target.input!.value)) {
 							const email = target.input!.value;
