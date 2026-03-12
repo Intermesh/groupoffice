@@ -16,7 +16,11 @@ use PDO;
  */
 class Table {
 
-	private static $cache = [];
+	/**
+	 * Cached instances of tables per database connection
+	 * @var Table[]
+	 */
+	private static array $cache = [];
 
 	private $name;
 	protected $columns;
@@ -53,24 +57,30 @@ class Table {
 		return self::$cache[$cacheKey];	
 	}
 
-	public static function destroyInstance($name, Connection|null $conn = null) {
-		if(!isset($conn)) {
-			$conn = go()->getDbConnection();
-		}
+//	public static function destroyInstance($name, Connection|null $conn = null) {
+//		if(!isset($conn)) {
+//			$conn = go()->getDbConnection();
+//		}
+//
+//		$cacheKey = $conn->getDsn() . '-' . $name;
+//		if(isset(self::$cache[$cacheKey])) {
+//			self::$cache[$cacheKey]->clearCache();
+//			unset(self::$cache[$cacheKey]);
+//		}
+//	}
 
-		$cacheKey = $conn->getDsn() . '-' . $name;
-		if(isset(self::$cache[$cacheKey])) {
-			self::$cache[$cacheKey]->clearCache();
-			unset(self::$cache[$cacheKey]);
-		}
-
-		App::get()->getCache()->delete('dbColumns_' . $name);
-		
-	}
-	
-	public static function destroyInstances() {
-		foreach(self::$cache as $i) {
-			$i->clearCache();
+	/**
+	 * Destroy cached instances
+	 *
+	 * @param bool $clearPersistent Also clear the persistaent cache that is reused on each request
+	 * @return void
+	 */
+	public static function destroyInstances(bool $clearPersistent = false): void
+	{
+		if($clearPersistent) {
+			foreach (self::$cache as $i) {
+				$i->clearCache();
+			}
 		}
 		self::$cache = [];
 	}
@@ -105,7 +115,8 @@ class Table {
 	/**
 	 * Clear the columns cache
 	 */
-	private function clearCache() {
+	private function clearCache(): void
+	{
 		go()->getCache()->delete($this->getCacheKey());
 	}
 
@@ -363,7 +374,7 @@ class Table {
 	
 	
 	/**
-	 * Check if column exists
+	 * Check if a column exists
 	 * 
 	 * @param string $name
 	 * @return boolean
@@ -377,7 +388,7 @@ class Table {
 	 * Get a column
 	 * 
 	 * @param string $name
-	 * @return Column
+	 * @return ?Column
 	 */
 	public function getColumn(string $name): ?Column
 	{
@@ -402,7 +413,7 @@ class Table {
 	}	
 	
 	/**
-	 * Get the auto incrementing column
+	 * Get the auto-incrementing column
 	 * 
 	 * @return Column|boolean
 	 */
@@ -428,7 +439,7 @@ class Table {
 	/**
 	 * The primary key columns
 	 * 
-	 * This value is auto detected from the database. 
+	 * This value is autodetected from the database.
 	 *
 	 * @return string[] eg. ['id']
 	 */
@@ -451,6 +462,7 @@ class Table {
 	 * ```
 	 * @link https://groupoffice-developer.readthedocs.io/en/latest/blob.html
 	 * @return array [['table'=>'foo', 'column' => 'blobId']]
+	 * @throws DbException
 	 */
 	public function getReferences(string $key = 'id'): array
 	{
@@ -482,27 +494,6 @@ class Table {
 		return $refs;
 	}
 
-
-//	public function __serialize()
-//	{
-//		return [
-//			'name' => $this->name,
-//			'columns' => $this->columns,
-//			'indexes' => $this->indexes,
-//			'pk' => $this->pk
-//		];
-//
-//	}
-//
-//	public function __unserialize($data)
-//	{
-//
-//		$this->name = $data['name'];
-//		$this->columns = $data['columns'];
-//		$this->indexes = $data['indexes'];
-//		$this->pk = $data['pk'];
-//
-//	}
 	private function isJSON(Column $c)
 	{
 		return str_contains($this->createTable, "json_valid(`".strtolower($c->name)."`)");
