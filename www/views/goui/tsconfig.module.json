@@ -10,7 +10,8 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "outDir": "./dist", //set this in the extended
-    "baseUrl": ".", //set this in the extended too
+    "baseUrl": ".", //set this in the extended too,
+    "skipLibCheck": true,
 
     "paths": {
       "@intermesh/goui": [
