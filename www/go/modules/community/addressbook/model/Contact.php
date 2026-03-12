@@ -76,11 +76,33 @@ class Contact extends AclItemEntity {
 	public ?string $suffixes = '';
 
 	/**
-	 * M for Male, F for Female or null for unknown
+	 * Gender
+	 *
+	 * [null, t("Unknown")],
+	 * ['M', t("Male")],
+	 * ['F', t("Female")],
+	 * ['N', t("Non-binary")],
+	 * ['P', t("Won't say")]
 	 */							
 	public ?string $gender;
 	public ?string $notes;
 	public bool $isOrganization = false;
+
+	public function genderAsText(): string {
+
+		switch($this->gender) {
+			case 'M':
+				return go()->t("Male", "community", "addressbook");
+			case 'F':
+				return go()->t("Female", "community", "addressbook");
+			case 'N':
+				return go()->t("Non-binary", "community", "addressbook");
+			case 'P':
+				return go()->t("Won't say", "community", "addressbook");
+			default:
+				return go()->t("Unknown", "community", "addressbook");
+		}
+	}
 	
 	/**
 	 * The job title
