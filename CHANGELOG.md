@@ -1,3 +1,4 @@
+13-03-2026: 26.0.14
 - Core: Added LT translations.
 - Files: fix error when cleaning out the trash and a file or folder does not exist anymore in the database.
 - Core / CalDAV: Compare dates with date time format for database. This fixes an issue with CalDAV where the datetime object is different in timezone but this has no effect in the database. Therefore the event wrongfully thought the start time was changed and the participant status was reset.
