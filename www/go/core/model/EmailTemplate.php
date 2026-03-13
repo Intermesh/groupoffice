@@ -118,20 +118,23 @@ class EmailTemplate extends Entity
 	}
 	
 	/**
-	 * @param $module array{package:string, module:string} | int
-	 */ 
-  public function setModule( $module) {
+	 * @param array|int|string $module array{package:string, module:string}
+	 *
+	 * @return void
+	 */
+	public function setModule(array|int|string $module): void
+	{
 
-	if(is_numeric($module)) {
-		$this->moduleId = (int) $module;
-		return;
+		if (is_numeric($module)) {
+			$this->moduleId = (int)$module;
+			return;
+		}
+		$module = Module::findByName($module['package'], $module['name']);
+		if (!$module) {
+			$this->setValidationError('module', ErrorCode::INVALID_INPUT, 'Module was not found');
+		}
+		$this->moduleId = $module->id;
 	}
-    $module = Module::findByName($module['package'], $module['name']);
-    if(!$module) {
-      $this->setValidationError('module', ErrorCode::INVALID_INPUT, 'Module was not found');
-    }
-    $this->moduleId = $module->id;
-  }
 
 	protected function internalSave(): bool
 	{		
