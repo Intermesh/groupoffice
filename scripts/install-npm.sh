@@ -3,6 +3,13 @@
 
 set -e
 
+IS_DEV=false
+[ "$1" == "dev" ] && IS_DEV=true
+
+if [ "$IS_DEV" == "true" ]; then
+  echo "DEV mode: Also building type definitions";
+fi
+
 SASS="sass --no-source-map --style=compressed"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd $DIR/../;
@@ -32,6 +39,9 @@ function buildGOUI() {
     cd $NODE_DIR;
     #npm up
     npm run build;
+    if [ "$IS_DEV" == "true" ]; then
+      npm run build:dts
+    fi
     cd $DIR;
 
   done
@@ -52,6 +62,9 @@ function buildAndInstallGOUIExceptCommunityAndBusiness() {
     npm ci --prefer-offline --audit=false --progress=false --fund=false;
     #npm up
     npm run build;
+    if [ "$IS_DEV" == "true" ]; then
+      npm run build:dts
+    fi
     cd $DIR;
 
   done
@@ -64,6 +77,9 @@ echo "Building GOUI shared libs"
 cd $DIR;
 cd ./www/views/goui
 npm run build
+if [ "$IS_DEV" == "true" ]; then
+  npm run build:dts
+fi
 
 cd $DIR;
 echo "DONE";
