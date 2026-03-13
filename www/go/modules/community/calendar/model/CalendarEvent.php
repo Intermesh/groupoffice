@@ -1149,6 +1149,13 @@ class CalendarEvent extends AclItemEntity {
 		return $this->start()->setTimeZone(new DateTimeZone("UTC"));
 	}
 
+	public function title(): string {
+		return $this->isPrivate() ? '' : $this->title;
+	}
+
+	protected function includeInSearch(): bool{
+		return !$this->isPrivate();
+	}
 
 	protected function getSearchDescription(): string
 	{
@@ -1161,7 +1168,7 @@ class CalendarEvent extends AclItemEntity {
 			$format = $u ? $u->dateFormat . ' '. $u->timeFormat : "d-m-Y H:i";
 		}
 
-		return $calendar->name .': '. $this->title . ' - '. $this->start->format($format);
+		return $calendar->name .': '. $this->title() . ' - '. $this->start->format($format);
 	}
 
 	/**
