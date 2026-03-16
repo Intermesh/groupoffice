@@ -9,7 +9,9 @@ parameters:
 
     paths:
         - ../www/api
+        - ../www/go
 
     excludePaths:
         - */vendor/*
+        - ../www/go/modules/community/activesync
 
