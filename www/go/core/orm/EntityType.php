@@ -269,8 +269,13 @@ class EntityType implements ArrayableInterface {
 
 		$i = [];
 		foreach($records as $record) {
-			$et = self::findById($record['id']);
-			$i[] = $et;
+			try {
+				$et = self::findById($record['id']);
+				$i[] = $et;
+			}
+			catch(Exception $e) {
+				ErrorHandler::logException($e, "Invalid entity in db with id ". $record['id']);
+			}
 		}
 
 		return $i;
