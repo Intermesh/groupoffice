@@ -1573,8 +1573,8 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		$trashFolder = Folder::model()->findByPath('trash');
 		\GO\Files\Model\TrashedItem::model()->saveForFolder($this);
 
-		$this->move($trashFolder);
-		if(!$this->fsFolder->move($trashFolder->fsFolder)) {
+		$this->move($trashFolder, true);
+		if(!$this->fsFolder->move($trashFolder->fsFolder, false, true)) {
 			throw new Exception("Unable to move current folder to trash");
 		}
 

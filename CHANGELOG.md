@@ -1,6 +1,7 @@
 - Files: fix error when removing item from trash (cherry-pick from 26.x)
 - Core: Fixed bug where SSE and z-push would constantly clear the cached database scheme
 - Core: Fixed client garbage collection causing api keys foreign key error
+- Files: allow folders with same name in trash (cherry-pick from 25.0)
 
 09-03-3036: 6.8.157
 - Core: fix odd casting problem in imap class 
