@@ -3,15 +3,14 @@ require('../vendor/autoload.php');
 
 use go\core\App;
 use go\core\ErrorHandler;
-use go\core\fs\File as FileAlias;
+use go\core\fs\File;
 use go\core\http\Router;
 use go\core\jmap\State;
-use go\core\model\OauthUser as UserAlias;
+use go\core\model\OauthUser;
 use go\core\oauth\server\repositories;
-use GuzzleHttp\Psr7\MessageTrait as MessageTraitAlias;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
-use GuzzleHttp\Psr7\Stream as StreamAlias;
+use GuzzleHttp\Psr7\Stream;
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Exception\OAuthServerException;
@@ -20,7 +19,7 @@ use League\OAuth2\Server\Grant\RefreshTokenGrant;
 use League\OAuth2\Server\ResourceServer;
 use OpenIDConnectServer\ClaimExtractor;
 use OpenIDConnectServer\IdTokenResponse;
-use Psr\Http\Message\ResponseInterface as ResponseInterfaceAlias;
+use Psr\Http\Message\ResponseInterface;
 
 App::get();
 go()->setAuthState(new State());
@@ -84,11 +83,7 @@ class OAuthController {
 		return $this->server;
 	}
 
-	/**
-	 * @return MessageTraitAlias|Response|ResponseInterfaceAlias
-	 * @throws Exception
-	 */
-	public function authorize() {
+	public function authorize() : ResponseInterface {
 		$server = $this->getServer();
 
 		$request = ServerRequest::fromGlobals();
@@ -111,7 +106,7 @@ class OAuthController {
 			}
 
 			$user = go()->getAuthState()->getUser(['username', 'displayName', 'id', 'email', 'modifiedAt']);
-			$authRequest->setUser(new UserAlias($user));
+			$authRequest->setUser(new OauthUser($user));
 
 			// Once the user has approved or denied the client update the status
 			// (true = approved, false = denied)
@@ -126,37 +121,18 @@ class OAuthController {
 			
 			ErrorHandler::logException($exception);
 
-			$body = new StreamAlias(fopen('php://temp', 'rb+'));
+			$body = new Stream(fopen('php://temp', 'rb+'));
 			$body->write($exception->getMessage());
 
 			return $response->withStatus(500)->withBody($body);
 		}
 	}
 
-//	private function validateResourceRequest(\Psr\Http\Message\RequestInterface $request, \Psr\Http\Message\ResponseInterface $response) {
-//
-//
-//		// Init our repositories
-//		$accessTokenRepository = new repositories\AccessTokenRepository(); // instance of AccessTokenRepositoryInterface
-//
-//// Path to authorization server's public key
-//		$publicKeyPath = 'file://' . go()->getEnvironment()->getInstallPath() . '/public.key';
-//
-//// Setup the authorization server
-//		$server = new \League\OAuth2\Server\ResourceServer(
-//			$accessTokenRepository,
-//			$publicKeyPath
-//		);
-//
-//		return $server->validateAuthenticatedRequest($request);
-//
-//	}
-
 	/**
-	 * @return FileAlias
+	 * @return File
 	 * @throws Exception
 	 */
-	private function getPrivateKeyFile(): FileAlias
+	private function getPrivateKeyFile(): File
 	{
 		$file = go()->getDataFolder()->getFile('oauth2/private.key');
 		if(!$file->exists()) {
@@ -178,17 +154,14 @@ class OAuthController {
 			}
 			$pubKeyFile->chmod(0600);
 		}
-
-
-
 		return $file;
 	}
 
 	/**
-	 * @return FileAlias
+	 * @return File
 	 * @throws Exception
 	 */
-	private function getPublicKeyFile(): FileAlias
+	private function getPublicKeyFile(): File
 	{
 		$file = go()->getDataFolder()->getFile('oauth2/public.key');
 		if(!$file->exists()) {
@@ -199,10 +172,10 @@ class OAuthController {
 
 
 	/**
-	 * @return Response
+	 * @return ResponseInterface
 	 * @throws Exception
 	 */
-	public function userinfo(): ResponseInterfaceAlias
+	public function userinfo(): ResponseInterface
 	{
 		$request = ServerRequest::fromGlobals();
 		$response = new Response();
@@ -244,10 +217,10 @@ class OAuthController {
 	}
 
 	/**
-	 * @return MessageTraitAlias|Response|ResponseInterfaceAlias
+	 * @return ResponseInterface
 	 * @throws Exception
 	 */
-	public function token()
+	public function token(): ResponseInterface
 	{
 		$server = $this->getServer();
 
@@ -261,7 +234,7 @@ class OAuthController {
 			return $exception->generateHttpResponse($response);
 		} catch (Exception $exception) {
 			ErrorHandler::logException($exception);
-			$body = new StreamAlias(fopen('php://temp', 'rb+'));
+			$body = new Stream(fopen('php://temp', 'rb+'));
 			$body->write($exception->getMessage());
 
 			return $response->withStatus(500)->withBody($body);
@@ -331,7 +304,7 @@ class OAuthController {
 	}
 
 	/**
-	 * @return MessageTraitAlias|Response
+	 * @return ResponseInterface
 	 */
 	public function certs()
 	{
@@ -366,7 +339,7 @@ class OAuthController {
 		} catch (Exception $exception) {
 
 			ErrorHandler::logException($exception);
-			$body = new StreamAlias(fopen('php://temp', 'rb+'));
+			$body = new Stream(fopen('php://temp', 'rb+'));
 			$body->write($exception->getMessage());
 
 			return $response->withStatus(500)->withBody($body);
