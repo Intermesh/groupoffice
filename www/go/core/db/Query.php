@@ -782,10 +782,10 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    * Convert all results of this query to arrays
    *
    * @param array|null $properties
-   * @return array|null
-   * @throws Exception
+   * @return array
+	 * @throws Exception
    */
-  public function toArray(array|null $properties = null): array|null
+  public function toArray(array|null $properties = null): array
   {
 		$arr = [];
 		foreach($this->execute() as $entity) {
