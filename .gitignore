@@ -88,3 +88,4 @@ dist
 /scripts/emaildomaincheck/result.json
 /scripts/ignore/
 /www/go/modules/community/activesync/Z-Push/vendor/
+tsconfig.tsbuildinfo

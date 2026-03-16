@@ -12,7 +12,7 @@
     "outDir": "./dist", //set this in the extended
     "baseUrl": ".", //set this in the extended too,
     "skipLibCheck": true,
-
+    "declaration": true,
     "paths": {
       "@intermesh/goui": [
         //d.ts files are also required for the typescript modules. Without them they will compile all GOUI files too
@@ -27,7 +27,7 @@
       ],
 
       "chart.js/auto": [
-        "../../../../../../views/goui/groupoffice-core/node_modules/chart.js/auto/auto.d.ts",
+        "../../../../../../views/goui/groupoffice-core/node_modules/chart.js/auto/auto.d.ts"
       ],
 
       "@intermesh/business/*": [

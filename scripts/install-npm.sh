@@ -3,11 +3,13 @@
 
 set -e
 
-IS_DEV=false
-[ "$1" == "dev" ] && IS_DEV=true
+IS_DEV=true
+[ "$1" == "nodev" ] && IS_DEV=false
 
 if [ "$IS_DEV" == "true" ]; then
   echo "DEV mode: Also building type definitions";
+else
+  echo "NODEV mode: Not building type definitions";
 fi
 
 SASS="sass --no-source-map --style=compressed"
@@ -83,6 +85,10 @@ fi
 
 cd $DIR;
 echo "DONE";
+
+if [ "$IS_DEV" == "true" ]; then
+  find ./www -name tsconfig.tsbuildinfo -delete
+fi
 
 buildGOUI "./www/go/modules/community"
 buildGOUI "./www/go/modules/business"
