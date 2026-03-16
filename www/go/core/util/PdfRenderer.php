@@ -45,6 +45,8 @@ class PdfRenderer extends Fpdi {
 
 		$this->SetFont($this->defaultFont, "", $this->defaultFontSize);
 
+		$this->setAuthor(go()->getSettings()->title);
+
 		//Set normal font
 		$this->normal();
 
