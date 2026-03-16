@@ -1,3 +1,4 @@
+16-03-2026: 25.0.92
 - Email: Possible to open ICS files without a personal calendar
 - Core: Lithuanian translations! Thank you Mindaugas
 - Files: fix error when removing from trash (cherry pick from 26.0)
