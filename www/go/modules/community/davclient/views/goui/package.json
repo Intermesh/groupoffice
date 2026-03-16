@@ -13,6 +13,7 @@
 
     "build": "npm run build:ts",
     "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
+    "build:dts": "npx tsc --declaration --emitDeclarationOnly",
 
     "test": "npx tsc --noEmit"
   }
