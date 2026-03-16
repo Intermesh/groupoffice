@@ -1,3 +1,4 @@
+- Email: Possible to open ICS files without a personal calendar
 - Core: Lithuanian translations! Thank you Mindaugas
 - Files: fix error when removing from trash (cherry pick from 26.0)
 - Files: make it possible to move folders with the same name to trash
