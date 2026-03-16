@@ -813,7 +813,7 @@ class CalendarEvent extends AclItemEntity {
 		 ($this->ownerId === null && $this->createdBy === go()->getUserId());
 	}
 
-	public function toArray(array|null $properties = null): array|null
+	public function toArray(array|null $properties = null): array
 	{
 		if(!($this->start instanceof DateTimeInterface)) {
 			//make sure timezone info is not sent by setting isLocal below. We can't be sure this datetime is a go\core\util\DateTime
