@@ -553,6 +553,11 @@ class ICalendarHelper {
 
 			list($key,$organizer) = self::parseAttendee($vevent->ORGANIZER);
 
+			// default value for organizer participation status is "accepted"
+			if(empty($vevent->ORGANIZER['PARTSTAT'])) {
+				$organizer->participationStatus = 'accepted';
+			}
+
 			if(!isset($props->participants[$key] )) {
 				// thunderbird sends organizer and participant but only the participants contains the correct "partstat".
 				$props->participants[$key] = (array)$organizer;

@@ -18,6 +18,7 @@ Depends:
 	php-xml (>= 8.1.0),
 	php-mbstring (>= 8.1.0),
 	php-intl (>= 8.1.0),
+	php-imagick (>= 8.1.0),
 	unzip,
 	tar,
 	zip,
@@ -33,10 +34,10 @@ Conflicts: groupoffice-com,
 	groupoffice-pro,
 	groupoffice-billing,
 	groupoffice-documents
-Description: Group-Office groupware and CRM
- Group-Office is a web based groupware and CRM application
+Description: GroupOffice groupware and CRM
+ GroupOffice is a web based groupware and CRM application
  Take your office online. Share projects, calendars, files and e-mail online 
- with co-workers and clients. Easy to use and fully customizable, Group-Office 
+ with co-workers and clients. Easy to use and fully customizable, GroupOffice
  takes online collaboration to the next level.
 
 
