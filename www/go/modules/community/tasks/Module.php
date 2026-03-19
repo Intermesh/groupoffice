@@ -95,7 +95,7 @@ class Module extends core\Module {
 	 */
 	public static function onBeforeProjectDelete(Project $project): bool
 	{
-		$query = (new core\orm\Query())->where(['role' => Tasklist::Project, 'projectId' => $project->id]);
+		$query = (new core\orm\Query())->where(['role' => TaskList::Project, 'projectId' => $project->id]);
 		$success = TaskList::delete($query);
 		return $success;
 	}

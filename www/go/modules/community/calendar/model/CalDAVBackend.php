@@ -177,7 +177,7 @@ class CalDAVBackend extends AbstractBackend implements
 					$cal = Calendar::findById($id);
 					break;
 				case 't':
-					$cal = Tasklist::findById($id);
+					$cal = TaskList::findById($id);
 					break;
 			}
 
