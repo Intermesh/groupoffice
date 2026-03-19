@@ -314,18 +314,23 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 
 
 	createFolderWhenNoneExist: function(cb) {
-		var dv = this.findParentByType("detailview"), entityId, entity;
+		let dv = this.findParentByType("detailview"), entityId, entity;
 		if(!dv) {
 			dv = this.findParentByType("displaypanel") || this.findParentByType("tmpdetailview"); //for legacy modules
 		}
-		var modelName = dv.model_name || dv.entity || dv.entityStore.entity.name;
+		// Old modules may give the full class name. This will distill the entity name from class name
+		let entityName = dv.entity || dv.model_name || dv.entityStore.entity.name;
+		if (entityName.indexOf("\\") > -1) {
+			const ar = entityName.split("\\");
+			entityName = ar.pop();
+		}
 		GO.request({
 			url: 'files/folder/checkModelFolder',
 			maskEl: dv.getEl(),
 			jsonData: {},
 			params: {
 				mustExist: true,
-				model: modelName,
+				model: entityName,
 				id: dv.data.id
 			},
 			success: function (response, options, result) {
