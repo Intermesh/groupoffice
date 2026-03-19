@@ -1,4 +1,5 @@
-Files: fix file browser button for older modules
+- Files: fix file browser button for older modules
+- Core: Convert dates to user timezone in spreadsheet export
 
 16-03-2026: 26.0.15
 - Oauth2client: Workaround MS bug where it returns 404 if http2 is used with alpn. This happened on Debian Trixie.
