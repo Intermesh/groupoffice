@@ -2,7 +2,9 @@
 
 namespace go\core\data\convert;
 
+use DateTimeZone;
 use Exception;
+use go\core\data\Model;
 use go\core\event\EventEmitterTrait;
 use go\core\fs\Blob;
 use go\core\fs\File;
@@ -104,6 +106,7 @@ class Spreadsheet extends AbstractConverter {
 	 */
 	protected $spreadsheetRowIterator;
 	private array $highest;
+	private DateTimeZone $timezone;
 
 	/**
 	 * @inheritDoc
@@ -117,9 +120,10 @@ class Spreadsheet extends AbstractConverter {
 	{
 		parent::init();
 
-		$user = go()->getAuthState()->getUser(['listSeparator', 'textSeparator']);
+		$user = go()->getAuthState()->getUser(['listSeparator', 'textSeparator', 'timezone']);
 		$this->delimiter = $user->listSeparator;
 		$this->enclosure = $user->textSeparator;
+		$this->timezone = new DateTimeZone($user->timezone);
 
 		//try to set high memory limit as phpoffice likes to eat RAM
 		go()->getEnvironment()->setMemoryLimit("2G");
@@ -216,7 +220,8 @@ th {
 		if(property_exists($entity, "returnAsText")) {
 			$entity->returnAsText = true;
 		}
-		$templateValues = $entity->toArray();
+		Model::$convertDatesToString = false;
+		$templateValues = $this->exportEntityToArray($entity);
 
 		$record = [];
 		foreach($headers as $header) {
@@ -224,6 +229,12 @@ th {
 		}
 
 		$this->writeRecord($record);
+	}
+
+
+	protected function exportEntityToArray(Entity $entity): array
+	{
+		return $entity->toArray();
 	}
 
 	/**
@@ -397,6 +408,12 @@ th {
 		}
 
 		try {
+
+			if($templateValues instanceof \DateTimeInterface) {
+				// Dates have UTC timezone. We'll set the user timezone to the date.
+				$templateValues->setTimezone($this->timezone);
+			}
+
 			return is_array($templateValues) ? implode(static::$multipleDelimiter, $templateValues) : $templateValues;
 		} catch(\Exception $e) {
 			return "error: ". $e->getMessage();
