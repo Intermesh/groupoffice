@@ -1,0 +1,25 @@
+{
+  "type": "module",
+  "name": "email",
+  "devDependencies": {
+    "concurrently": "latest",
+    "esbuild": "latest",
+    "sass": "latest",
+    "typescript": "latest"
+  },
+
+  "scripts": {
+    "start email": "npm run build:clean && concurrently --kill-others \"npm run start:ts\" \"npm run start:dts\"",
+    "start:ts": "node ../../../../views/goui/esbuild-module.mjs watch",
+    "start:sass": "npx sass --watch style:dist",
+    "start:dts": "npx tsc --emitDeclarationOnly --declaration --watch",
+
+    "build": "npm run build:clean && npm run build:ts",
+    "build:clean": "rm -rf ./dist/*",
+    "build:ts": "node ../../../../views/goui/esbuild-module.mjs",
+    "build:sass": "npx sass --style=compressed --no-source-map style:dist",
+    "build:dts": "npx tsc --emitDeclarationOnly --declaration",
+
+    "test": "npx tsc --noEmit"
+  }
+}
