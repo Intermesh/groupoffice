@@ -136,9 +136,9 @@ go.Router = (function () {
 				return this;
 			}
 
-			this.routing = true;
+			this.routing = window.groupofficeCore.router.routing = true;
 			route.handler.apply({}, match);
-			this.routing = false;
+			this.routing = window.groupofficeCore.router.routing = false;
 
 			this.fireEvent("change", this.getPath(), this.oldPath, route);
 			return this;
