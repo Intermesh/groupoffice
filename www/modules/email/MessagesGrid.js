@@ -44,7 +44,7 @@ GO.email.MessagesGrid = function(config){
 		},{
 			header: t("From", "email"),
 			dataIndex: 'from',
-			renderer:{ 
+			renderer:{
 				fn: this.renderMessage,
 				scope: this
 			},
@@ -106,7 +106,7 @@ GO.email.MessagesGrid = function(config){
 		totalDisplay: true,
 		getRowClass:function(row, index) {
 			return (row.data.seen == '0') ? 'ml-unseen-row' : 'ml-seen-row';
-		}		
+		}
 	});
 
 	config.sm=new Ext.grid.RowSelectionModel();
@@ -262,24 +262,34 @@ GO.email.MessagesGrid = function(config){
 		pressed:false,
 		text: t("Show flagged", "email")
 	});
-	
+
 	this.searchDialog = new GO.email.SearchDialog({
 		store:config.store,
 		grid: this
 	});
 
-	
-	
+
 	this.settingsMenu = new Ext.menu.Menu({
-		items:[{
-			iconCls: 'ic-account-box',
-			text: t("Accounts", "email"),
-			handler: function(){
-				this.emailClient.showAccountsDialog();
+		items: [
+			{
+				iconCls: 'ic-account-box',
+				text: t("Accounts", "email"),
+				handler: function () {
+					this.emailClient.showAccountsDialog();
+				},
+				scope: this
 			},
-			scope: this
-		},
-		this.showFlaggedButton
+			{
+				iconCls: 'ic-contact-mail',
+				text: t("Templates", "email"),
+				handler: function () {
+					var dlg = new GO.email.TemplatesSettingsDialog();
+
+					dlg.show();
+				},
+				scope: this
+			},
+			this.showFlaggedButton
 		]
 	});
 
@@ -487,11 +497,11 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 
 	createQtipTemplate: function(record){
 		var qtipTemplate = '';
-		
+
 		if(this.getStore().baseParams.query){
 			qtipTemplate = 'ext:qtitle="'+t('folder','email')+'" ext:qtip="' + record.data['mailbox'] + '"';
 		}
-		
+
 		return qtipTemplate;
 	},
 
@@ -570,7 +580,7 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
             }
 			return `<i class="icon ${secondaryCls}"${title}>${i}</i>`;
 		}).join("");
-		
+
 	},
 
 	showMoveMailToDialog : function() {

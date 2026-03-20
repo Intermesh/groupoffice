@@ -23,7 +23,7 @@ GO.email.TemplatesGrid = function(config)
 	config.sm= new Ext.grid.RowSelectionModel({
 		singleSelect:false
 	});
-	config.title= t("Templates");
+	// config.title= t("Templates");
 	config.store = new Ext.data.GroupingStore({
 		url:GO.url("email/template/store"),
 		sortInfo:{field: 'name',direction: "ASC"},
