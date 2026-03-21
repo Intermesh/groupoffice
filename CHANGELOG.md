@@ -3,6 +3,7 @@
 - Core: Lithuanian translations! Thank you Mindaugas
 - Files: fix error when removing from trash (cherry pick from 26.0)
 - Files: make it possible to move folders with the same name to trash
+- Addressbook: Fixed SQL Injection vulnerability in contact filters
 
 09-03-2026: 25.0.91
 - Projects2: fix editing single custom fieldset with template filter
