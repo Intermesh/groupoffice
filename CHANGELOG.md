@@ -1,3 +1,5 @@
+- Addressbook: Fixed SQL Injection vulnerability in contact filters
+
 20-03-2026: 26.0.16
 - Files: fix file browser button for older modules
 - Core: Convert dates to user timezone in spreadsheet export
