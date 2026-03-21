@@ -3,6 +3,7 @@
 - Core: Fixed bug where SSE and z-push would constantly clear the cached database scheme
 - Core: Fixed client garbage collection causing api keys foreign key error
 - Files: allow folders with same name in trash (cherry-pick from 25.0)
+- Addressbook: Fixed SQL Injection vulnerability in contact filters
 
 09-03-2026: 6.8.157
 - Core: fix odd casting problem in imap class 
