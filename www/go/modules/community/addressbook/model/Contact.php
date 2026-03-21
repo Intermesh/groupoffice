@@ -402,12 +402,6 @@ class Contact extends AclItemEntity {
 											$criteria->andWhere('starred', '=', $value);
 
 										})
-										->add("addressBookIds", function(Criteria $criteria, $value) {
-											if(count($value) > 0) {
-												$criteria->andWhere('addressBookId IN (' .  implode(',',$value). ')');
-
-											}
-										})
 
 										->add("groupId", function(Criteria $criteria, $value, Query $query) {
 											$query->join('addressbook_contact_group', 'g', 'g.contactId = c.id');
