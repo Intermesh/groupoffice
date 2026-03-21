@@ -24,7 +24,7 @@ go.modules.community.addressbook.BirthdaysPortlet = Ext.extend(go.grid.GridPanel
 			}
 		});
 
-		this.store.setFilter('addressBookIds', {addressBookIds: go.User.birthdayPortletAddressBooks})
+		this.store.setFilter('addressBookId', {addressBookId: go.User.birthdayPortletAddressBooks})
 			.setFilter('isOrganisation', {isOrganization: false})
 			.setFilter('birthday', {birthday: 'now..30 days'});
 
@@ -122,7 +122,7 @@ GO.mainLayout.onReady(function () {
 						listeners: {
 							hide: function () {
 								setTimeout(function() {
-									birthdaysGrid.store.setFilter('addressBookIds', {addressBookIds: go.User.birthdayPortletAddressBooks})
+									birthdaysGrid.store.setFilter('addressBookId', {addressBookId: go.User.birthdayPortletAddressBooks})
 									birthdaysGrid.store.reload();
 								})
 							},
