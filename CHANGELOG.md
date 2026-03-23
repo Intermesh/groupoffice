@@ -1,3 +1,4 @@
+23-03-2026: 25.0.93
 - Calendar: new default/personal calendar for (new) users will give manage permissions to this user
 - Calendar: events can be changed by users with `writeOwn` permission if there are participants but none of them is the owner
 
