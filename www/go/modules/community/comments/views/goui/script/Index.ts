@@ -1,10 +1,12 @@
+export * from "./CommentsPanel.js";
+
 import {client, entities, JmapDataSource, modules, router} from "@intermesh/groupoffice-core";
 import {t, Window} from "@intermesh/goui";
 import {CommentDetail} from "./CommentDetail";
 import {CommentsPanel} from "./CommentsPanel";
 import {CommentEditor} from "./CommentEditor";
 
-export * from "./CommentsPanel.js";
+
 
 modules.register({
 	package: "community",

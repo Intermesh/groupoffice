@@ -1,4 +1,5 @@
 - Addressbook: Fixed SQL Injection vulnerability in contact filters
+- Core: Fixed: Typed property SmtpAccount::$id must not be accessed before initialization #1462
 
 20-03-2026: 26.0.16
 - Files: fix file browser button for older modules

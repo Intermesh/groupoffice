@@ -2,15 +2,15 @@ import {
 	arrayfield,
 	ArrayField,
 	btn,
-	Button,
+	Button, comp,
 	Component,
 	ContainerField,
 	containerfield,
 	datasourcestore,
-	DataSourceStore,
-	displayfield,
-	fieldset,
-	hr, HtmlField,
+	DataSourceStore, DisplayField,
+	displayfield, EntityID,
+	hr,
+	HtmlField,
 	htmlfield,
 	menu,
 	Notifier,
@@ -21,12 +21,12 @@ import {client, HtmlFieldMentionPlugin, Image, principalDS} from "@intermesh/gro
 import {commentLabelDS} from "./Index.js";
 
 export class CommentEditor extends Component {
-	public readonly labels: ArrayField;
-	public readonly attachments: ArrayField;
-	public readonly store: DataSourceStore;
+	public readonly labels;
+	public readonly attachments;
+	public readonly store;
 
-	public readonly addBtn!: Button;
-	public readonly editor: HtmlField;
+	public readonly addBtn;
+	public readonly editor;
 
 
 	constructor(submitButton = true) {
@@ -124,26 +124,37 @@ export class CommentEditor extends Component {
 				}
 			}),
 
-			this.labels = arrayfield({
+			this.labels = arrayfield<EntityID>({
 				itemContainerCls: "",
 				name: "labels",
 				buildField: (v) => {
-					return containerfield({
-							cls: "hbox comment-editor-attachment"
-						},
-						displayfield({
-							htmlEncode: false,
-							flex: 1,
-							value: `<i class="icon" style="color: #${v!.color}">label</i> ${v!.name.htmlEncode()}`,
-							style: {color: `#${v!.color}`}
-						}),
-						btn({
-							icon: "delete",
-							handler: (button) => {
-								button.findAncestorByType(ContainerField)!.remove()
-							}
-						})
-					)
+
+					return	displayfield({
+						tagName: "div",
+						cls: "comment-editor-label",
+						htmlEncode: false,
+						flex: 1,
+						renderer: (value, record) => {
+
+							return commentLabelDS.single(value).then(lbl => {
+								return comp({
+									cls: "hbox fit",
+
+								},
+									comp({
+										html: `<i class="icon" style="color: #${lbl.color}">label</i> ${lbl.name.htmlEncode()}`,
+										flex: 1
+									}),
+									btn({
+										icon: "delete",
+										handler: (button) => {
+											button.findAncestorByType(DisplayField)!.remove()
+										}
+									}))
+
+								});
+						}
+					});
 				}
 			})
 		);
@@ -176,13 +187,13 @@ export class CommentEditor extends Component {
 									style: {color: "#" + label.color},
 									text: label.name,
 									handler: () => {
-										if (this.labels.value.some(l => l.id === label.id)) {
+										if (this.labels.value.some(l => l === label.id)) {
 											return
 										}
 
 										const labels = this.labels.value;
 
-										labels.push(label);
+										labels.push(label.id);
 
 										this.labels.value = labels;
 									}

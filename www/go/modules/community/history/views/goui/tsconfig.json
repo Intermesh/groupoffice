@@ -12,5 +12,8 @@
     // See notes/views/goui/tsconfig.json for an example of the references
     "composite": true,
     "rootDir": "./script"
-  }
+  },
+  "references": [
+    { "path": "../../../../../../views/goui/" },
+  ]
 }

@@ -13,33 +13,37 @@
     "baseUrl": ".", //set this in the extended too,
     "skipLibCheck": true,
     "declaration": true,
-    "paths": {
-      "@intermesh/goui": [
-        //d.ts files are also required for the GroupOffice modules in GOUI. Without them they will compile all GOUI files too
-//        "../../../../../../views/goui/dist/goui/script/index.d.ts",
-        "../../../../../../views/goui/goui/script/index.ts"
-      ],
-
-      "@intermesh/groupoffice-core": [
-//        "../../../../../../views/goui/dist/groupoffice-core/script/index.d.ts",
-        "../../../../../../views/goui/groupoffice-core/script/index.ts"
-      ],
-
-      "chart.js/auto": [
-        "../../../../../../views/goui/groupoffice-core/node_modules/chart.js/auto/auto.d.ts"
-      ],
-
-      "@intermesh/business/*": [
-//        "../../../../../../go/modules/business/*/views/goui/dist/Index.d.ts",
-        "../../../../../../go/modules/business/*/views/goui/script/Index.ts"
-      ],
-
-      "@intermesh/community/*": [
-//        "../../../../../../go/modules/community/*/views/goui/dist/Index.d.ts",
-        "../../../../../../go/modules/community/*/views/goui/script/Index.ts"
-      ]
-    }
+//    "paths": {
+//      "@intermesh/goui": [
+//        //d.ts files are also required for the GroupOffice modules in GOUI. Without them they will compile all GOUI files too
+////        "../../../../../../views/goui/dist/goui/script/index.d.ts",
+//        "../../../../../../views/goui/goui/script/index.ts"
+//      ],
+//
+//      "@intermesh/groupoffice-core": [
+////        "../../../../../../views/goui/dist/groupoffice-core/script/index.d.ts",
+//        "../../../../../../views/goui/groupoffice-core/script/index.ts"
+//      ],
+//
+//      "chart.js/auto": [
+//        "../../../../../../views/goui/groupoffice-core/node_modules/chart.js/auto/auto.d.ts"
+//      ],
+//
+//      "@intermesh/business/*": [
+////        "../../../../../../go/modules/business/*/views/goui/dist/Index.d.ts",
+//        "../../../../../../go/modules/business/*/views/goui/script/Index.ts"
+//      ],
+//
+//      "@intermesh/community/*": [
+////        "../../../../../../go/modules/community/*/views/goui/dist/Index.d.ts",
+//        "../../../../../../go/modules/community/*/views/goui/script/Index.ts"
+//      ]
+//    }
   },
+  "references": [
+    { "path": "./tsconfig.json" },
+    { "path": "../../../../../../views/goui/" }
+  ]
 
 //  "references": [
 //    { "path": "../../../../../../views/goui/goui" },

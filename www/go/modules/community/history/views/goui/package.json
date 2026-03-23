@@ -1,6 +1,9 @@
 {
   "type": "module",
-  "name": "history",
+  "name": "@intermesh/community-history",
+  "main": "./dist/Index.js",
+  "module": "./dist/Index.js",
+  "typings": "./dist/Index.d.ts",
   "devDependencies": {
     "concurrently": "latest",
     "esbuild": "latest",

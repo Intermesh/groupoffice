@@ -38,25 +38,29 @@ const moduleResolverPlugin = {
 
 	setup(build) {
 		build.onResolve({ filter: new RegExp("@intermesh\/.*")}, args => {
-				const parts = args.path.split("/");
 
-
-				if(parts.length === 3) {
-
-					// import is a module. eg. @intermesh/community/calendar
-					const pkg = legacy ? "go/modules/" + parts[1] : parts[1], module = parts[2];
-
+				if(args.path === "@intermesh/groupoffice-core") {
 					return {
 						external: true,
-						path: "../../../../../" + pkg + "/" + module + "/views/goui/dist/Index.js?v=" + version[0]
+						path: "../../../../../../../views/goui/dist/groupoffice-core/script/index.js?v=" + version[0]
 					}
-				} else {
-					// import is a core. eg. @intermesh/goui or @intermesh/groupoffice-core
+				} else if(args.path === "@intermesh/goui") {
 					return {
 						external: true,
-						path: "../../../../../../../views/goui/dist/" + parts[1] + "/script/index.js?v=" + version[0]
+						path: "../../../../../../../views/goui/dist/goui/script/index.js?v=" + version[0]
 					}
 				}
+
+			const parts = args.path.replace("-", "/").split("/");
+
+			// import is a module. eg. @intermesh/community/calendar
+			const pkg = legacy ? "go/modules/" + parts[1] : parts[1], module = parts[2];
+
+			return {
+				external: true,
+				path: "../../../../../" + pkg + "/" + module + "/views/goui/dist/Index.js?v=" + version[0]
+			}
+
 
 		});
 	}

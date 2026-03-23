@@ -1,6 +1,10 @@
 {
   "type": "module",
-  "name": "calendar",
+  "name": "@intermesh/community-calendar",
+  "main": "./dist/Index.js",
+  "module": "./dist/Index.js",
+  "typings": "./dist/Index.d.ts",
+
   "devDependencies": {
     "concurrently": "latest",
     "esbuild": "latest",
