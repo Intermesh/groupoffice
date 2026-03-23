@@ -1,3 +1,5 @@
+- Tasks / Address book: add some missing FR translations (#1464)
+
 16-03-2026: 6.8.158
 - Files: fix error when removing item from trash (cherry-pick from 26.x)
 - Core: Fixed bug where SSE and z-push would constantly clear the cached database scheme
