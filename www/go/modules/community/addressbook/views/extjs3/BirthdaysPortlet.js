@@ -24,9 +24,12 @@ go.modules.community.addressbook.BirthdaysPortlet = Ext.extend(go.grid.GridPanel
 			}
 		});
 
-		this.store.setFilter('addressBookId', {addressBookId: go.User.birthdayPortletAddressBooks})
-			.setFilter('isOrganisation', {isOrganization: false})
+		this.store.setFilter('isOrganisation', {isOrganization: false})
 			.setFilter('birthday', {birthday: 'now..30 days'});
+		if (go.User.birthdayPortletAddressBooks && go.User.birthdayPortletAddressBooks.length > 0) {
+			console.log("birthdayPortletAddressBooks " , go.User.birthdayPortletAddressBooks);
+			this.store.setFilter('addressBookId', {addressBookId: go.User.birthdayPortletAddressBooks})
+		}
 
 		this.paging = false;
 		this.autoExpandColumn = 'birthday-portlet-name-col';
@@ -135,7 +138,9 @@ GO.mainLayout.onReady(function () {
 						listeners: {
 							hide: function () {
 								setTimeout(function() {
-									birthdaysGrid.store.setFilter('addressBookId', {addressBookId: go.User.birthdayPortletAddressBooks})
+									if (go.User.birthdayPortletAddressBooks && go.User.birthdayPortletAddressBooks.length > 0) {
+										birthdaysGrid.store.setFilter('addressBookId', {addressBookId: go.User.birthdayPortletAddressBooks})
+									}
 									birthdaysGrid.store.reload();
 								})
 							},
