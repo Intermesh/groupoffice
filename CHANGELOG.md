@@ -1,3 +1,4 @@
+23-03-2026: 6.8.159
 - Tasks / Address book: add some missing FR translations (#1464)
 
 16-03-2026: 6.8.158
