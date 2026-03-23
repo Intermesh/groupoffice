@@ -2,32 +2,31 @@ import {
 	arrayfield,
 	ArrayField,
 	btn,
-	Button,
+	Button, comp,
 	Component,
-	comp,
 	ContainerField,
 	containerfield,
 	datasourcestore,
-	DataSourceStore,
-	displayfield,
-	fieldset,
-	hr, HtmlField,
+	DataSourceStore, DisplayField,
+	displayfield, EntityID,
+	hr,
+	HtmlField,
 	htmlfield,
 	menu,
 	Notifier,
 	root,
-	t, DisplayField
+	t
 } from "@intermesh/goui";
 import {client, HtmlFieldMentionPlugin, Image, principalDS} from "@intermesh/groupoffice-core";
 import {commentLabelDS} from "./Index.js";
 
 export class CommentEditor extends Component {
-	public readonly labels: ArrayField;
-	public readonly attachments: ArrayField;
-	public readonly store: DataSourceStore;
+	public readonly labels;
+	public readonly attachments;
+	public readonly store;
 
-	public readonly addBtn!: Button;
-	public readonly editor: HtmlField;
+	public readonly addBtn;
+	public readonly editor;
 
 
 	constructor(submitButton = true) {
@@ -125,47 +124,37 @@ export class CommentEditor extends Component {
 				}
 			}),
 
-			// TODO: Array field for scalar relation???
-
-			this.labels = arrayfield({
+			this.labels = arrayfield<EntityID>({
 				itemContainerCls: "",
 				name: "labels",
 				buildField: (v) => {
 
-					console.log(v);
-					let displayFld =	displayfield({
+					return	displayfield({
+						tagName: "div",
+						cls: "comment-editor-label",
 						htmlEncode: false,
 						flex: 1,
 						renderer: (value, record) => {
+
 							return commentLabelDS.single(value).then(lbl => {
-								return `<i class="icon" style="color: #${lbl.color}">label</i> ${lbl.name.htmlEncode()}`;
-							});
-						},
-						buttons: [
-							btn({
-								icon: "delete",
-								handler: (button) => {
-									button.findAncestorByType(DisplayField)!.remove()
-								}
-							})
-						]
-						// style: {color: `#${v!.color}`}
+								return comp({
+									cls: "hbox fit",
+
+								},
+									comp({
+										html: `<i class="icon" style="color: #${lbl.color}">label</i> ${lbl.name.htmlEncode()}`,
+										flex: 1
+									}),
+									btn({
+										icon: "delete",
+										handler: (button) => {
+											button.findAncestorByType(DisplayField)!.remove()
+										}
+									}))
+
+								});
+						}
 					});
-
-					return displayFld;
-
-
-					// return comp({
-					// 		cls: "hbox comment-editor-attachment"
-					// 	},
-					// 	displayFld,
-					// 	btn({
-					// 		icon: "delete",
-					// 		handler: (button) => {
-					// 			button.findAncestorByType(ContainerField)!.remove()
-					// 		}
-					// 	})
-					// )
 				}
 			})
 		);
@@ -198,13 +187,13 @@ export class CommentEditor extends Component {
 									style: {color: "#" + label.color},
 									text: label.name,
 									handler: () => {
-										if (this.labels.value.some(l => l.id === label.id)) {
+										if (this.labels.value.some(l => l === label.id)) {
 											return
 										}
 
 										const labels = this.labels.value;
 
-										labels.push(label);
+										labels.push(label.id);
 
 										this.labels.value = labels;
 									}
