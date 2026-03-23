@@ -10,7 +10,8 @@ import {
 	form,
 	t,
 	tbar,
-	Window
+	Window,
+	root
 } from "@intermesh/goui";
 import CommentList from "./CommentList.js";
 import {CommentEditor} from "./CommentEditor.js";

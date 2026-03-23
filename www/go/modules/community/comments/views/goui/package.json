@@ -1,6 +1,13 @@
 {
   "type": "module",
-  "name": "comments",
+  "name": "@intermesh/community-comments",
+  "main": "./dist/Index.js",
+  "module": "./dist/Index.js",
+  "typings": "./dist/Index.d.ts",
+  "description": "GroupOffice Comments module",
+  "exports": {
+    ".": "./dist/Index.js"
+  },
   "devDependencies": {
     "concurrently": "latest",
     "esbuild": "latest",

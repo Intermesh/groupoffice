@@ -20,7 +20,7 @@ import {alertfield} from "./AlertField.js";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {calendarStore, getParticipantStatusIcon, statusIcons, t, writeableCalendarStore} from "./Index.js";
 import {EventWindow} from "./EventWindow.js";
-import {CommentsPanel} from "@intermesh/community/comments";
+import {CommentsPanel} from "@intermesh/community-comments";
 
 
 export class EventDetail extends DetailPanel<CalendarEvent> {

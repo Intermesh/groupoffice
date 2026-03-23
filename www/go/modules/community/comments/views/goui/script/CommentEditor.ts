@@ -4,6 +4,7 @@ import {
 	btn,
 	Button,
 	Component,
+	comp,
 	ContainerField,
 	containerfield,
 	datasourcestore,
@@ -15,7 +16,7 @@ import {
 	menu,
 	Notifier,
 	root,
-	t
+	t, DisplayField
 } from "@intermesh/goui";
 import {client, HtmlFieldMentionPlugin, Image, principalDS} from "@intermesh/groupoffice-core";
 import {commentLabelDS} from "./Index.js";
@@ -124,26 +125,47 @@ export class CommentEditor extends Component {
 				}
 			}),
 
+			// TODO: Array field for scalar relation???
+
 			this.labels = arrayfield({
 				itemContainerCls: "",
 				name: "labels",
 				buildField: (v) => {
-					return containerfield({
-							cls: "hbox comment-editor-attachment"
+
+					console.log(v);
+					let displayFld =	displayfield({
+						htmlEncode: false,
+						flex: 1,
+						renderer: (value, record) => {
+							return commentLabelDS.single(value).then(lbl => {
+								return `<i class="icon" style="color: #${lbl.color}">label</i> ${lbl.name.htmlEncode()}`;
+							});
 						},
-						displayfield({
-							htmlEncode: false,
-							flex: 1,
-							value: `<i class="icon" style="color: #${v!.color}">label</i> ${v!.name.htmlEncode()}`,
-							style: {color: `#${v!.color}`}
-						}),
-						btn({
-							icon: "delete",
-							handler: (button) => {
-								button.findAncestorByType(ContainerField)!.remove()
-							}
-						})
-					)
+						buttons: [
+							btn({
+								icon: "delete",
+								handler: (button) => {
+									button.findAncestorByType(DisplayField)!.remove()
+								}
+							})
+						]
+						// style: {color: `#${v!.color}`}
+					});
+
+					return displayFld;
+
+
+					// return comp({
+					// 		cls: "hbox comment-editor-attachment"
+					// 	},
+					// 	displayFld,
+					// 	btn({
+					// 		icon: "delete",
+					// 		handler: (button) => {
+					// 			button.findAncestorByType(ContainerField)!.remove()
+					// 		}
+					// 	})
+					// )
 				}
 			})
 		);

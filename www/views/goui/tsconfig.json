@@ -3,6 +3,7 @@
     "composite": true,
     "declaration": true,
     "declarationMap": true,
+    "emitDeclarationOnly": true,
     "rootDir": ".",
     "outDir": "./dist",
     "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
