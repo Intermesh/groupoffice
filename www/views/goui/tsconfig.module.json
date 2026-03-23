@@ -15,14 +15,13 @@
     "declaration": true,
     "paths": {
       "@intermesh/goui": [
-        //d.ts files are also required for the typescript modules. Without them they will compile all GOUI files too
-        "../../../../../../views/goui/dist/goui/script/index.d.ts",
+        //d.ts files are also required for the GroupOffice modules in GOUI. Without them they will compile all GOUI files too
+//        "../../../../../../views/goui/dist/goui/script/index.d.ts",
         "../../../../../../views/goui/goui/script/index.ts"
-
       ],
 
       "@intermesh/groupoffice-core": [
-        "../../../../../../views/goui/dist/groupoffice-core/script/index.d.ts",
+//        "../../../../../../views/goui/dist/groupoffice-core/script/index.d.ts",
         "../../../../../../views/goui/groupoffice-core/script/index.ts"
       ],
 
@@ -31,12 +30,12 @@
       ],
 
       "@intermesh/business/*": [
-        "../../../../../../go/modules/business/*/views/goui/dist/Index.d.ts",
+//        "../../../../../../go/modules/business/*/views/goui/dist/Index.d.ts",
         "../../../../../../go/modules/business/*/views/goui/script/Index.ts"
       ],
 
       "@intermesh/community/*": [
-        "../../../../../../go/modules/community/*/views/goui/dist/Index.d.ts",
+//        "../../../../../../go/modules/community/*/views/goui/dist/Index.d.ts",
         "../../../../../../go/modules/community/*/views/goui/script/Index.ts"
       ]
     }
