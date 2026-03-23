@@ -27,7 +27,6 @@ go.modules.community.addressbook.BirthdaysPortlet = Ext.extend(go.grid.GridPanel
 		this.store.setFilter('isOrganisation', {isOrganization: false})
 			.setFilter('birthday', {birthday: 'now..30 days'});
 		if (go.User.birthdayPortletAddressBooks && go.User.birthdayPortletAddressBooks.length > 0) {
-			console.log("birthdayPortletAddressBooks " , go.User.birthdayPortletAddressBooks);
 			this.store.setFilter('addressBookId', {addressBookId: go.User.birthdayPortletAddressBooks})
 		}
 
