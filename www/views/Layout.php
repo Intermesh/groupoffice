@@ -45,7 +45,7 @@ $lang = go()->getLanguage()->getIsoCode();
 
     <link rel="preload" href="<?= $themeUrl;?>fonts/icons.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" media="print, screen"  href="<?= $themeUrl;?>style.css?v=<?=$cssMtime ?>">
-    <link rel="stylesheet" href="<?= $webclient->getBaseUrl();?>views/goui/groupoffice-core/dist/<?= $webclient->gouiStyleSheet ?>">
+    <link rel="stylesheet" href="<?= $webclient->getBaseUrl();?>views/goui/dist/groupoffice-core/style/<?= $webclient->gouiStyleSheet ?>">
 
 <?php if($webclient->loadExt) {
 	$webclient->drawScripts();
