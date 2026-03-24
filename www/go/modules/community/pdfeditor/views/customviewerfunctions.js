@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 			const app = PDFViewerApplication;
 
-// 1. Exit editor mode FIRST
+			// 1. Exit editor mode FIRST
 			app.eventBus.dispatch("switchannotationeditormode", {
 				source: app,
 				mode: 0, // NONE
@@ -52,12 +52,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 			app._hasAnnotationEditors = false;
 			app.setTitle();
 
-// 4. Force UI sync
+			// 4. Force UI sync
 			app.eventBus.dispatch("documentmodified", {
 				source: app,
 				modified: false,
 			});
-
 
 
 		} catch (error) {
