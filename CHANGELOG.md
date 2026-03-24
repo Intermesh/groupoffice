@@ -1,3 +1,5 @@
+- Savemailas: Tasks in email list function always queried all linked e-mails
+
 24-03-2026: 26.0.17
 - Addressbook: Fixed SQL Injection vulnerability in contact filters
 - Core: Fixed: Typed property SmtpAccount::$id must not be accessed before initialization #1462
