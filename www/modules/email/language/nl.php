@@ -373,4 +373,5 @@ Instellingen -> Accounts -> Dubbelklik account -> Mappen.',
   'No items found' => 'Geen items gevonden',
   'Addresslist group' => 'Adreslijstgroep',
   'This panel expects an address list ID that is positive, but did not receive one. Please contact the administrator.' => 'Dit panel verwacht een adreslijst ID dat positief is, maar er geen heeft ontvangen. Neem contact op met de beheerder.',
+	'Display linked tasks in messages list' => 'Gekoppelde taken in de lijst weergeven',
 );
