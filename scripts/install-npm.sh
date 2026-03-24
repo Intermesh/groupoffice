@@ -34,7 +34,7 @@ done
 function buildGOUI() {
   echo BUILDING node modules inside "$1"...
   cd $DIR;
-  for line in $(find $1 -name package.json -not -path '*/node_modules/*');
+  for line in $(find $1 -path */goui/package.json -not -path '*/node_modules/*');
   do
     local NODE_DIR="$(dirname "${line}")";
     echo "BUILD:" $NODE_DIR;
@@ -56,7 +56,7 @@ function buildAndInstallGOUIExceptCommunityAndBusiness() {
   cd $DIR;
   find "$1" \
       \( -path '*/community/*' -o -path '*/business/*' -o -path '*/node_modules/*' \) -prune -o \
-      -name package.json -print |
+      -path */goui/package.json -print |
     while IFS= read -r line; do
     local NODE_DIR="$(dirname "${line}")";
     echo "BUILD:" $NODE_DIR;
