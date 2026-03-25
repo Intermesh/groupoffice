@@ -383,6 +383,12 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	public function hasLinks(){return false;}
 
+	/**
+	 * Force ActiveRecord models to register as entities
+	 * @return bool
+	 */
+	public function doRegisterEntity():bool { return false;}
+
 
 	private $_filesFolder;
 
