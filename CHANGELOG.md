@@ -1,6 +1,10 @@
 - Savemailas: Tasks in email list function always queried all linked e-mails
 - Core: Reset entity store when opening account settings to avoid lots of changes requests
 - Core: When changing tasklist owner changes change ACL ownership and add owner with manage permissions
+- Core: add several filters to template parser
+- Core: explicitly enable ActiveRecord models to be registered as entities
+- Files: fix ACL error when trashing folder with subfolders (cherry pick from 26.0)
+- Studio: fix generation of AclItemEntityCombo fields (cherry pick from 26.0)
 
 23-03-2026: 25.0.93
 - Calendar: new default/personal calendar for (new) users will give manage permissions to this user
