@@ -1,6 +1,7 @@
 import {btn, DefaultEntity, Menu, t} from "@intermesh/goui";
 import {jmapds, User} from "@intermesh/groupoffice-core";
 import {BookmarksDialog} from "./BookmarksDialog.js";
+import {bookmarkDS} from "@intermesh/community/bookmarks";
 
 export class BookmarkContextMenu extends Menu {
 	constructor(user: User, bookmark: DefaultEntity) {
@@ -29,7 +30,7 @@ export class BookmarkContextMenu extends Menu {
 				disabled: user.isAdmin ? false : !writtenByUser,
 				handler: () => {
 					if (user.isAdmin || writtenByUser) {
-						void jmapds("Bookmark").confirmDestroy([bookmark.id]);
+						bookmarkDS.confirmDestroy([bookmark.id]);
 					}
 				}
 			})

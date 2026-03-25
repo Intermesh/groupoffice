@@ -1,5 +1,5 @@
 import {comp, Component, DataSourceStore} from "@intermesh/goui";
-import {img, client} from "@intermesh/groupoffice-core";
+import {client, img} from "@intermesh/groupoffice-core";
 import {BookmarkContextMenu} from "./BookmarkContextMenu.js";
 
 export class BookmarksGridView extends Component {
