@@ -1,3 +1,4 @@
+- MS Teams: Fix for MS bug when curl uses http2 and ALPN
 - Savemailas: Tasks in email list function always queried all linked e-mails
 
 24-03-2026: 26.0.17
