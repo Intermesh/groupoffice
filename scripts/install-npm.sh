@@ -12,7 +12,7 @@ else
   echo "NODEV mode: Not building type definitions";
 fi
 
-SASS="sass --no-source-map --style=compressed"
+SASS="npx sass --no-source-map --style=compressed"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd $DIR/../;
 DIR="$(pwd)";
