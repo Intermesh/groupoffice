@@ -507,7 +507,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			me.actionStart();
 			me.fireEvent('loadstart',me, me.currentUserId);
 
-			go.Db.store("User").getUpdates().then(() => {
+			go.Db.store("User").reset().then(() => {
 
 				go.Db.store("User").single(me.currentUserId).then(async function(user){
 					me.user = user;
