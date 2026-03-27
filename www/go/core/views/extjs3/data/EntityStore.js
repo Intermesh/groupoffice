@@ -58,6 +58,10 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		return window.groupofficeCore.jmapds(this.entity.name).reset();
 	},
 
+	reset : function() {
+		return this.clearState()
+	},
+
 	/**
 	 * Get updates for this entity
 	 * Does a Foo/changes request
