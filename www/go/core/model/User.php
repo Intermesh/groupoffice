@@ -1074,15 +1074,13 @@ public function historyLog(): bool|array
 	private function checkPersonalGroup()
 	{
 		if ($this->isNew() || $this->isModified(['groups', 'username'])) {
-			if ($this->isNew()) {// !in_array($this->getPersonalGroup()->id, $groupIds)) {
-				$personalGroup = $this->createPersonalGroup();
-			} else {
-				$personalGroup = $this->getPersonalGroup();
-				if ($this->isModified('username')) {
-					$personalGroup->name = $this->username;
-					if (!$this->appendNumberToGroupNameIfExists($personalGroup)) {
-						throw new SaveException($personalGroup);
-					}
+			// We need to check if the personal group is already there even when the
+			// user is new because it might have been created via {@see Group::findPersonalGroupID()}
+			$personalGroup = $this->getPersonalGroup();
+			if ($this->isModified('username')) {
+				$personalGroup->name = $this->username;
+				if (!$this->appendNumberToGroupNameIfExists($personalGroup)) {
+					throw new SaveException($personalGroup);
 				}
 			}
 
