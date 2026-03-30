@@ -3,7 +3,9 @@
 - MS Teams: Fix for MS bug when curl uses http2 and ALPN
 - Savemailas: Tasks in email list function always queried all linked e-mails
 - Core: Reset entity store when opening account settings to avoid lots of changes requests
-
+- Core: Set 'to' if you are an admin in core/Notify/mail controller
+ 
+ 
 24-03-2026: 26.0.17
 - Addressbook: Fixed SQL Injection vulnerability in contact filters
 - Core: Fixed: Typed property SmtpAccount::$id must not be accessed before initialization #1462
