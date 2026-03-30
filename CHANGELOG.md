@@ -1,3 +1,5 @@
+- Files: Trashed folders do no longer show in the tree
+
 30-03-2026: 26.0.18
 - Files: Fix ACL error when moving folder with subfolders as a normal user
 - Studio: fix bug in generating ActItemEntityCombo 
