@@ -72,8 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         ],
 		["core/Notify/mail", [
 			"subject" => "New contact created from website",
-			"body" =>  "Name: " .$_POST['firstName']. " ". $_POST['lastName'],
-			//"to" => ["admin@intermesh.localhost" => "Admin"] //Optional. If empty it will be sent to the system settings email.
+			"body" =>  "Name: " .$_POST['firstName']. " ". $_POST['lastName']
 		],
 			"clientCallId-1"]
 	];
