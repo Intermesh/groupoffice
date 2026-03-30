@@ -1,3 +1,4 @@
+30-03-2026: 6.8.160
 - Savemailas: Tasks in email list function always queried all linked e-mails
 - Core: Reset entity store when opening account settings to avoid lots of changes requests
 - LDAP: Fixed duplicate personal group creation via LDAP sync
