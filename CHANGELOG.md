@@ -1,5 +1,6 @@
 - Savemailas: Tasks in email list function always queried all linked e-mails
 - Core: Reset entity store when opening account settings to avoid lots of changes requests
+- Core: When changing tasklist owner changes change ACL ownership and add owner with manage permissions
 
 23-03-2026: 25.0.93
 - Calendar: new default/personal calendar for (new) users will give manage permissions to this user
