@@ -615,10 +615,13 @@ abstract class Entity extends Property {
 
 	protected function internalGetPermissionLevel(): int
 	{
+		if(go()->getAuthState() && go()->getAuthState()->isAdmin()) {
+			return Acl::LEVEL_MANAGE;
+		}
 		if($this->isNew()) {
 			return $this->canCreate() ? Acl::LEVEL_CREATE : 0;
 		}
-		return go()->getAuthState() && go()->getAuthState()->isAdmin() ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
+		return Acl::LEVEL_READ;
 	}
 
 	/**
