@@ -188,9 +188,9 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					hidden: this.enabledColumns.indexOf('name') == -1,
 					renderer: function (v, meta, record) {
 						if(record.get("color")) {
-							meta.attr = 'style="color: #' + record.get("color") + ';"';
+							meta.attr = 'style="color: #' + Ext.util.Format.htmlEncode(record.get("color")) + ';"';
 						}
-						return record.get('name');
+						return Ext.util.Format.htmlEncode(record.get('name'));
 					}
 				},
 				{
