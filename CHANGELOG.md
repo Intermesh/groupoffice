@@ -1,3 +1,4 @@
+30-03-2026: 26.0.18
 - Files: Fix ACL error when moving folder with subfolders as a normal user
 - Studio: fix bug in generating ActItemEntityCombo 
 - MS Teams: Fix for MS bug when curl uses http2 and ALPN
