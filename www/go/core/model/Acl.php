@@ -93,7 +93,11 @@ class Acl extends Entity {
 			$this->ownedBy = User::ID_SUPER_ADMIN;
 		}
 		
-		if($this->ownedBy != User::ID_SUPER_ADMIN) {
+		if(($this->isNew() || $this->isModified('ownedBy')) && $this->ownedBy != User::ID_SUPER_ADMIN) {
+
+			if($this->isModified('ownedBy') && !$this->hasPermissionLevel(Acl::LEVEL_MANAGE)) {
+				throw new Forbidden("You (".go()->getUserId().") are not allowed to change ownership");
+			}
 
 			$groupId = Group::findPersonalGroupID($this->ownedBy);
 			if($groupId) {
