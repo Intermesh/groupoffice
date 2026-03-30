@@ -435,4 +435,8 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 	public function getMtime() {
 		return strtotime($this->modifiedAt);
 	}
+
+	public function setMtime(int $mtime) {
+		$this->modifiedAt = date('c', $mtime);
+	}
 }

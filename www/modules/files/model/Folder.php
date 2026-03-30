@@ -1573,6 +1573,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	public function moveToTrash(): void
 	{
 		$trashFolder = Folder::model()->findByPath('trash');
+
 		\GO\Files\Model\TrashedItem::model()->saveForFolder($this);
 
 		$this->move($trashFolder, true, true);

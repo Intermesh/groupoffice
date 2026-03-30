@@ -74,6 +74,17 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 		$t->name = $folder->name;
 		$t->fullPath = $folder->parent->path;
 		$t->save(true);
+
+		$this->touchAcl($folder);
+	}
+
+	private function touchAcl(Folder $folder) {
+		$acl = $this->acl;
+		if(!empty($acl)) {
+			//quick hack so that shares folder is rebuilt in SHaredRootFolder::rebuildCache()
+			$acl->mtime = time();
+			$acl->save();
+		}
 	}
 
 	/**
@@ -131,6 +142,8 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 			if (!$f) {
 				throw new Exception(404, GO()->t("Folder not found."));
 			}
+
+			$this->touchAcl($f);
 		}
 		if ($f->move($parentFolder, true, true)) {
 			$this->delete();
