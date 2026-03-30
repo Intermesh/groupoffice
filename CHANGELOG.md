@@ -1,5 +1,6 @@
 - Savemailas: Tasks in email list function always queried all linked e-mails
 - Core: Reset entity store when opening account settings to avoid lots of changes requests
+- LDAP: Fixed duplicate personal group creation via LDAP sync
 
 23-03-2026: 6.8.159
 - Tasks / Address book: add some missing FR translations (#1464)
