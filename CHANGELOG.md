@@ -1,3 +1,4 @@
+- Files: Fix ACL error when moving folder with subfolders as a normal user
 - Studio: fix bug in generating ActItemEntityCombo 
 - MS Teams: Fix for MS bug when curl uses http2 and ALPN
 - Savemailas: Tasks in email list function always queried all linked e-mails
