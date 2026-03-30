@@ -87,7 +87,7 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 
 				new Ext.menu.Item({
 					iconCls: 'ic-email',
-					text: t("Email files", "email"),
+					text: t("Email file", "email"),
 					handler: function () {
 						if(this.data.folder_id) {
 							this.data.name = String(this.data.name).split('/').reverse()[0];
