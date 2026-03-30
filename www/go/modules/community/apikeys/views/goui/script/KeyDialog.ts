@@ -18,6 +18,7 @@ export class KeyDialog extends FormWindow {
 					required: true
 				}),
 				principalcombo({
+					entity: "User",
 					name: "userId",
 					label: t("User"),
 					required: true
