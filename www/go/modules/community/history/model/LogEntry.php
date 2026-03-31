@@ -215,7 +215,7 @@ class LogEntry extends AclOwnerEntity {
 		//don't update acl records usedin is history
 	}
 
-	protected function saveAcl()
+	protected function saveAcl() : void
 	{
 		// do nothing
 	}
