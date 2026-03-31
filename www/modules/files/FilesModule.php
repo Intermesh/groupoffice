@@ -95,6 +95,15 @@ class FilesModule extends \GO\Base\Module{
 			$folder->save();
 		}
 
+		$folder = Model\Folder::model()->findByPath("trash", true);
+		if(!$folder->acl) {
+			$folder->setNewAcl();
+			$folder->visible = 1;
+			$folder->readonly = 1;
+			$folder->save();
+			$folder->acl->addGroup(\GO::config()->group_root, \GO\Base\Model\Acl::MANAGE_PERMISSION);
+		}
+
 		go()->getDbConnection()->exec("update fs_folders set acl_id = 0 where acl_id not in (select id from core_acl);");
 
 		go()->getDbConnection()->exec("update fs_folders set readonly=1, acl_id = ".$mod->getShadowAclId()." where acl_id=0 and parent_id=0;");

@@ -28,15 +28,15 @@ Depends:
 	dbconfig-mysql,
 	ucf (>= 0.28)
 Recommends: apache2, libapache2-mod-php (>= 8.1.0), default-mysql-server
-Suggests: php-apcu
+Suggests: php-apcu, php-imagick
 Conflicts: groupoffice-com,
 	groupoffice-pro,
 	groupoffice-billing,
 	groupoffice-documents
-Description: Group-Office groupware and CRM
- Group-Office is a web based groupware and CRM application
+Description: GroupOffice groupware and CRM
+ GroupOffice is a web based groupware and CRM application
  Take your office online. Share projects, calendars, files and e-mail online 
- with co-workers and clients. Easy to use and fully customizable, Group-Office 
+ with co-workers and clients. Easy to use and fully customizable, GroupOffice
  takes online collaboration to the next level.
 
 

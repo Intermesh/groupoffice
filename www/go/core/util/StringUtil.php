@@ -112,7 +112,7 @@ class StringUtil {
 			return $str;
 		}
 		
-		if(!isset($sourceCharset)){
+		if (!isset($sourceCharset)) {
 			$sourceCharset = mb_detect_encoding($str);
 			if(!$sourceCharset){
 				$sourceCharset = 'UTF-8';
@@ -858,7 +858,7 @@ END;
 //		$text = StringUtil::toAscii($text);
 
 		//split on white space
-		$keywords = mb_split("[\s,;]+", $text);
+		$keywords = mb_split("[\s,;/\\\\]+", $text);
 
 		if($forSave) {
 			// Add words separated too when they are joined with -, /, \ or _. eg. Jansen-Pietersen or test/foo

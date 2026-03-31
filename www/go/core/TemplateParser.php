@@ -5,6 +5,7 @@ namespace go\core;
 use DateInterval;
 use DateTimeZone;
 use Exception;
+use GO\Base\Db\ActiveRecord;
 use go\core\data\Model;
 use go\core\fs\Blob;
 use go\core\model\User;
@@ -210,12 +211,17 @@ class TemplateParser {
 		$this->addFilter('sort', [$this, "filterSort"]);
 		$this->addFilter('rsort', [$this, "filterRsort"]);
 		$this->addFilter('count', [$this, "filterCount"]);
+		$this->addFilter('sum', [$this, "filterSum"]);
+		$this->addFilter('min', [$this, "filterMin"]);
+		$this->addFilter('max', [$this, "filterMax"]);
+		$this->addFilter('avg', [$this, "filterAvg"]);
 		$this->addFilter('multiply', [$this, "filterMultiply"]);
 		$this->addFilter('add', [$this, "filterAdd"]);
 		$this->addFilter('first', [$this, "filterFirst"]);
 		$this->addFilter('column', [$this, "filterColumn"]);
 		$this->addFilter('implode', [$this, "filterImplode"]);
 		$this->addFilter('entity', [$this, "filterEntity"]);
+		$this->addFilter('findEntity', [$this, "filterFindEntity"]);
 		$this->addFilter('links', [$this, "filterLinks"]);
 		$this->addFilter('prop', [$this, "filterProp"]);
 
@@ -380,6 +386,37 @@ class TemplateParser {
 	}
 
 	/**
+	 * Find related entities for current ID with seleceted key
+	 *
+	 * @param $id
+	 * @param string $entityName
+	 * @param string|null $key
+	 * @param $properties
+	 * @return array|false|GO\Base\Db\ActiveStatement|null
+	 * @throws Exception
+	 * @example: [assign entries = entity.id|findEntity:TimeEntry:project_id]{{entries | column:units | sum}}
+	 */
+	private function filterFindEntity($id, string $entityName, ?string $key = 'id', $properties = null)
+	{
+		if (empty($id)) {
+			return null;
+		}
+		$et = EntityType::findByName($entityName);
+		if (!$et) {
+			return null;
+		}
+		$cls = $et->getClassName();
+		if ($cls === "GO\Projects2\Model\Project") {
+			$cls .= "Entity";
+		}
+		if (is_a($cls, ActiveRecord::class, true)) {
+			return $cls::model()->findByAttribute($key, $id);
+		} else {
+			return $cls::find([$key => $id], true)->all();
+		}
+	}
+
+	/**
 	 * @param Entity|GO\Base\Db\ActiveRecord $entity
 	 * @param $entityName
 	 * @param $properties
@@ -512,6 +549,62 @@ class TemplateParser {
 		return implode($glue, $array);
 	}
 
+	private function filterSum($array) : float|int
+	{
+		if (!isset($array)) {
+			return 0;
+		}
+		return array_sum($array);
+	}
+
+	private function filterAvg($array) : float|int|null
+	{
+		if (!isset($array)) {
+			return null;
+		}
+		foreach($array as $item) {
+			if(!is_numeric($item)) {
+				return null;
+			}
+		}
+		return array_sum($array) / count($array);
+	}
+
+	private function filterMin($array): float|int|null
+	{
+		if (!isset($array)) {
+			return null;
+		}
+		$v = null;
+		foreach ($array as $val) {
+			if (!is_numeric($val)) {
+				return null;
+			}
+			if (is_null($v)) {
+				$v = $val;
+			}
+			$v = min($v, $val);
+		}
+		return $v;
+	}
+
+	private function filterMax($array): float|int|null
+	{
+		if (!isset($array)) {
+			return null;
+		}
+		$v = null;
+		foreach ($array as $val) {
+			if (!is_numeric($val)) {
+				return null;
+			}
+			if (is_null($v)) {
+				$v = $val;
+			}
+			$v = max($v, $val);
+		}
+		return $v;
+	}
 
 
 	private function filterCount($countable): int

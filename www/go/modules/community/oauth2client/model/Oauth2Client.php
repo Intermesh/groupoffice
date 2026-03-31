@@ -79,7 +79,15 @@ final class Oauth2Client extends Entity
 				];
 				$params['defaultEndPointVersion'] = '2.0';
 
-				return new Azure($params);
+				return new Azure($params, [
+					// workaround MS bug where it returns 404 if http2 is used with alpn
+					'httpClient' => new \GuzzleHttp\Client([
+						'curl' => [
+							CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+							CURLOPT_SSL_ENABLE_ALPN => false
+						]
+					])
+				]);
 
 			default:
 				throw new NotFound('Default client ' . $defaultClient->name . ' not supported');

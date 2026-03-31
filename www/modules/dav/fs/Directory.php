@@ -21,7 +21,7 @@ class Directory extends \Sabre\DAV\FS\Directory{
 	protected $_folder;
 	protected $relpath;
 
-	public function __construct($path) {
+	public function __construct($path, $overrideName = null) {
 
 		$path = rtrim($path, '/');
 
@@ -32,7 +32,7 @@ class Directory extends \Sabre\DAV\FS\Directory{
 //			\GO::debug("DAV: User ".\GO::user()->username." doesn't have write permission for ".$this->relpath);
 //			throw new Sabre\DAV\Exception\Forbidden ("DAV: User ".\GO::user()->username." doesn't have write permission for folder '".$this->relpath.'"');
 //		}
-		parent::__construct($path);
+		parent::__construct($path, $overrideName);
 	}
 
 	/**

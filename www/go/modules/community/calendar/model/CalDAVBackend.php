@@ -177,7 +177,7 @@ class CalDAVBackend extends AbstractBackend implements
 					$cal = Calendar::findById($id);
 					break;
 				case 't':
-					$cal = Tasklist::findById($id);
+					$cal = TaskList::findById($id);
 					break;
 			}
 
@@ -225,7 +225,7 @@ class CalDAVBackend extends AbstractBackend implements
 		}
 	}
 
-	public function getCalendarObjects($calendarId)
+	public function  getCalendarObjects($calendarId)
 	{
 		go()->debug("CalDAVBackend::getCalendarObjects($calendarId)");
 		//id, uri, lastmodified, etag, calendarid, size, componenttype
@@ -682,12 +682,10 @@ class CalDAVBackend extends AbstractBackend implements
 //		go()->debug($data);
 //		go()->debug(")");
 
-		$lastModified = strtotime($object->modifiedAt);
+
 		$obj = [
 			'id' => $object->id,
 			'uri' => $objectUri,
-			'lastmodified' => $lastModified,
-			'etag' => '"' . $lastModified . '"',
 			'calendarid' => $calendarId,
 			'component' => $component,
 		];
@@ -706,6 +704,11 @@ class CalDAVBackend extends AbstractBackend implements
 			$obj['size'] = $blob->size;
 			$obj['calendardata'] = $data;
 		}
+
+		// set these after generating icsBlob() because lastModified may change.
+		$lastModified = $object->modifiedAt->getTimestamp();
+		$obj['lastmodified'] = $lastModified;
+		$obj['etag'] = '"' . $lastModified . '"';
 
 		return $obj;
 	}

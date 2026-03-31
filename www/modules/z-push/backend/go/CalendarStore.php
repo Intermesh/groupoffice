@@ -58,7 +58,9 @@ class CalendarStore extends Store {
 
 	public function GetFolderList()
 	{
-		return Calendar::find()->select('caluser.id, name as "mod", "0" as parent')
+		return Calendar::find()
+			->select('caluser.id, name as "mod", "0" as parent')
+			->filter(['permissionLevel' => Acl::LEVEL_READ])
 			->andWhere('isSubscribed', '=', 1)
 			->andWhere('syncToDevice', '=', 1)
 			->fetchMode(\PDO::FETCH_ASSOC)

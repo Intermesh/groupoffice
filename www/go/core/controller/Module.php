@@ -78,14 +78,17 @@ class Module extends EntityController {
 
 	public function installLicensed(): array
 	{
-		License::installModules()
-		;
+		if(!go()->getAuthState()->isAdmin()) {
+			throw new Forbidden();
+		}
+
+		License::installModules();
 
 		return ['success' => true];
 	}
 
 
-	
+
 	public function install($params) {
 
 		if(!go()->getAuthState()->isAdmin()) {

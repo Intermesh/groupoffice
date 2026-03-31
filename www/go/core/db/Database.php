@@ -50,8 +50,9 @@ class Database {
 		return $this->version;
 	}
 
-	public function isMariaDB() {
-		return stristr($this->queryVersion(), 'mariadb');
+	public function isMariaDB(): bool
+	{
+		return str_contains($this->queryVersion(), 'mariadb');
 	}
 
 	/**
@@ -84,9 +85,15 @@ class Database {
 		return $this->tableNames;
 	}
 
-	public function clearCache() {
+	/**
+	 * Clear all persistent database cache
+	 *
+	 * @return void
+	 */
+	public function clearCache(): void
+	{
 		$this->tableNames = null;
-		Table::destroyInstances();
+		Table::destroyInstances(true);
 	}
 
 	/**
@@ -115,12 +122,13 @@ class Database {
 	public function getTable(string $name): Table
 	{
 		return Table::getInstance($name, $this->conn);
-	}	
-	
+	}
+
 	/**
 	 * Get database name
-	 * 
+	 *
 	 * @return string eg. "user@localhost"
+	 * @throws DbException
 	 */
 	public function getUser(): string
 	{
@@ -135,11 +143,11 @@ class Database {
 	}
 
 
-
 	/**
 	 * Get database name
-	 * 
+	 *
 	 * @return string
+	 * @throws DbException
 	 */
 	public function getName(): string
 	{
@@ -156,7 +164,8 @@ class Database {
 	/**
 	 * Set UTF8 collation
 	 */
-	public function setUtf8() {
+	public function setUtf8(): void
+	{
 		//Set utf8 as collation default
 		$sql = "ALTER DATABASE `" .$this->getName() . "` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";		
 		$this->conn->exec($sql);

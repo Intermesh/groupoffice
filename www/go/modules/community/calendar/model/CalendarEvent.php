@@ -713,8 +713,16 @@ class CalendarEvent extends AclItemEntity {
 				foreach ($this->participants as $participant) {
 					if (!$participant->isNew() && !$participant->isOwner())
 						$participant->participationStatus = Participant::NeedsAction;
-					if($participant->kind === 'resource' && $participant->isFree($this->start(), $this->end())) {
-						$participant->participationStatus = Participant::Accepted;
+
+					// AUTO-ACCEPT resources if checkbox is on
+					if($participant->kind === 'resource') {
+						$resource = Calendar::findById(str_replace('Calendar:', '', $participant->pid()));
+						if($resource && !empty($resource->groupId)) {
+							$rgroup = ResourceGroup::findById($resource->groupId);
+							if ($rgroup && $rgroup->autoAccept && $participant->isFree($this->start(), $this->end())) {
+								$participant->participationStatus = Participant::Accepted;
+							}
+						}
 					}
 				}
 			}
@@ -805,7 +813,7 @@ class CalendarEvent extends AclItemEntity {
 		 ($this->ownerId === null && $this->createdBy === go()->getUserId());
 	}
 
-	public function toArray(?array $properties = null): array
+	public function toArray(array|null $properties = null): array
 	{
 		if(!($this->start instanceof DateTimeInterface)) {
 			//make sure timezone info is not sent by setting isLocal below. We can't be sure this datetime is a go\core\util\DateTime
@@ -1141,6 +1149,13 @@ class CalendarEvent extends AclItemEntity {
 		return $this->start()->setTimeZone(new DateTimeZone("UTC"));
 	}
 
+	public function title(): string {
+		return $this->isPrivate() ? '' : $this->title;
+	}
+
+	protected function includeInSearch(): bool{
+		return !$this->isPrivate();
+	}
 
 	protected function getSearchDescription(): string
 	{
@@ -1153,7 +1168,7 @@ class CalendarEvent extends AclItemEntity {
 			$format = $u ? $u->dateFormat . ' '. $u->timeFormat : "d-m-Y H:i";
 		}
 
-		return $calendar->name .': '. $this->title . ' - '. $this->start->format($format);
+		return $calendar->name .': '. $this->title() . ' - '. $this->start->format($format);
 	}
 
 	/**

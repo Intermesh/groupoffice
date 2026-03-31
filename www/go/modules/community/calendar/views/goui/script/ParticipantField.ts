@@ -5,11 +5,11 @@ import {
 	Component, Config, ContainerField, containerfield, createComponent, datasourcestore, DateTime, FieldEventMap, Format,
 	hr,
 	MapField,
-	mapfield, Menu, menu, ObservableListenerOpts,
+	mapfield, Menu, menu,
 	table
 } from "@intermesh/goui";
 import {getParticipantStatusIcon, statusIcons, t} from "./Index.js";
-import {client, jmapds, principalDS, RecipientPicker, validateEmail} from "@intermesh/groupoffice-core";
+import {client, jmapds, principalDS, RecipientPicker,validateEmail} from "@intermesh/groupoffice-core";
 
 interface ParticipantFieldEventMap extends FieldEventMap {
 	beforeadd: {principal: any}
@@ -120,10 +120,14 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 							if(ev.key === 'Enter') {
 								ev.preventDefault();
 								submitEMail(target);
+								// if(validateEmail(target.input!.value)) {
+								// 	const email = target.input!.value;
+								// 	this.addParticipant({id:email,email});
+								// 	target.menu.hide();
+								// 	target.value = "";
+								// }
 							}
 						});
-
-
 					},
 					'blur': ({target})=> {
 						if(validateEmail(target.input!.value)) {

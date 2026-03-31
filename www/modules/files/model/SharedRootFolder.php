@@ -120,8 +120,9 @@ class SharedRootFolder extends \GO\Base\Db\ActiveRecord {
 			foreach ($shares as $path => $folder) {
 				
 				$isInHome = strpos($path . '/', $homeFolder . '/') === 0;
+				$isInTrash = strpos($path . '/',  'trash/') === 0;
 				
-				if (!$isInHome && !$this->isParentShared($path, $folder, $shares)) {
+				if (!$isInTrash && !$isInHome && !$this->isParentShared($path, $folder, $shares)) {
 
 					$sharedRoot = new SharedRootFolder();
 					$sharedRoot->user_id = $user_id;
@@ -146,10 +147,15 @@ class SharedRootFolder extends \GO\Base\Db\ActiveRecord {
 			
 			$parentPath = substr($parentPath, 0, strrpos($parentPath, '/'));
 
-			
 			if($parent->acl_id > 0) {
 				//if folder is shared but not in the current user's shared folder list return false.
-				return isset($shares[$parentPath]);
+				if(isset($shares[$parentPath])) {
+					return true;
+				} else {
+					if(!$parent->parent) {
+						return false;
+					}
+				}
 			}
 		}
 		

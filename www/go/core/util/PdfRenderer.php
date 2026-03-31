@@ -45,6 +45,8 @@ class PdfRenderer extends Fpdi {
 
 		$this->SetFont($this->defaultFont, "", $this->defaultFontSize);
 
+		$this->setAuthor(go()->getSettings()->title);
+
 		//Set normal font
 		$this->normal();
 
@@ -57,6 +59,53 @@ class PdfRenderer extends Fpdi {
 
 		$this->setCellHeightRatio(1.25);
 		$this->SetCellPadding(0);
+	}
+
+
+	public static function sanitize(string $text): string {
+//		// Fix encoding if not valid UTF-8
+//		if (!mb_check_encoding($text, 'UTF-8')) {
+//			$text = mb_convert_encoding($text, 'UTF-8', 'ISO-8859-1');
+//		}
+//
+//		// Normalize unicode to NFC form
+//		if (class_exists('Normalizer')) {
+//			$text = Normalizer::normalize($text, Normalizer::FORM_C);
+//		}
+//
+//		// Replace fancy punctuation and special characters
+//		$text = strtr($text, [
+//			"\u{2018}" => "'",  // left single quote
+//			"\u{2019}" => "'",  // right single quote
+//			"\u{201C}" => '"',  // left double quote
+//			"\u{201D}" => '"',  // right double quote
+//			"\u{2013}" => '-',  // en dash
+//			"\u{2014}" => '--', // em dash
+//			"\u{2026}" => '...', // ellipsis
+//			"\u{00A0}" => ' ',  // non-breaking space
+//			"\u{200B}" => '',   // zero-width space
+//			"\u{FEFF}" => '',   // BOM / zero-width no-break space
+//		]);
+//
+//		// Remove control characters (keep \n \r \t)
+//		$text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '?1?', $text);
+//
+//		// Remove 4-byte characters outside BMP (emoji, rare CJK, etc.)
+//		$text = preg_replace('/[\x{10000}-\x{10FFFF}]/u', '?2?', $text);
+//
+//		// Remove Private Use Area characters (U+E000–U+F8FF)
+//		$text = preg_replace('/[\x{E000}-\x{F8FF}]/u', '?3?', $text);
+//
+//		// Remove Specials block (U+FFF0–U+FFFF) including replacement char U+FFFD
+//		$text = preg_replace('/[\x{FFF0}-\x{FFFF}]/u', '?4?', $text);
+
+		// Remove zero-width and directional control characters
+		$text = preg_replace('/[\x{200B}-\x{200F}\x{202A}-\x{202E}\x{2060}-\x{2064}]/u', '?5?', $text);
+
+		// Remove combining diacritical marks DejaVu may lack glyphs for
+//		$text = preg_replace('/[\x{0300}-\x{036F}]/u', '?6?', $text);
+
+		return $text;
 	}
 
 	/**

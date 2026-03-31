@@ -1,6 +1,13 @@
 {
   "type": "module",
-  "name": "comments",
+  "name": "@intermesh/community-comments",
+  "main": "./dist/Index.js",
+  "module": "./dist/Index.js",
+  "typings": "./dist/Index.d.ts",
+  "description": "GroupOffice Comments module",
+  "exports": {
+    ".": "./dist/Index.js"
+  },
   "devDependencies": {
     "concurrently": "latest",
     "esbuild": "latest",
@@ -9,15 +16,16 @@
   },
 
   "scripts": {
-    "start comments": "concurrently --kill-others \"npm run start:esbuild\" \"npm run start:sass\" \"npm run start:dts\"",
+    "start comments": "npm run build:clean && concurrently --kill-others \"npm run start:esbuild\" \"npm run start:sass\" \"npm run start:dts\"",
     "start:esbuild": "node ../../../../../../views/goui/esbuild-module.mjs watch",
     "start:sass": "npx sass --watch style:dist",
     "start:dts": "npx tsc --declaration --emitDeclarationOnly --watch",
 
-    "build": "npm run build:sass && npm run build:ts && npm run build:dts",
+    "build": "npm run build:clean && npm run build:sass && npm run build:ts",
+    "build:clean": "rm -rf ./dist/*",
     "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
-    "build:sass": "npx sass --style=compressed style:dist",
-    "build:dts": "npx tsc --declaration --emitDeclarationOnly",
+    "build:sass": "npx sass --style=compressed --no-source-map style:dist",
+    "build:dts": "npx tsc -b --declaration --emitDeclarationOnly",
 
     "test": "npx tsc --noEmit"
   }

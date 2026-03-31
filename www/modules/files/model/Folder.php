@@ -1117,7 +1117,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			while($folder = $folders->fetch()){
 				$folder->quota_user_id = $quota_user_id;
 				$folderIds[] = $folder->id;
-				$folder->save();
+				$folder->save(true);
 				$recur($folder->folders(), $quota_user_id); // <- recursion implied
 			}
 		};
@@ -1573,13 +1573,12 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	public function moveToTrash(): void
 	{
 		$trashFolder = Folder::model()->findByPath('trash');
+
 		\GO\Files\Model\TrashedItem::model()->saveForFolder($this);
 
-		$this->move($trashFolder);
-		if(!$this->fsFolder->move($trashFolder->fsFolder)) {
+		$this->move($trashFolder, true, true);
+		if (!$this->fsFolder->move($trashFolder->fsFolder, false, false)) {
 			throw new Exception("Unable to move current folder to trash");
 		}
-
-
 	}
 }

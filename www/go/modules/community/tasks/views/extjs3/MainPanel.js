@@ -488,14 +488,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.tasklistsGrid.on('selectionchange', this.onTasklistSelectionChange, this); //add buffer because it clears selection first
 	},
 
-	// checkValues: function() {
-	// 	if(this.taskDateField.getValue() != null && this.taskNameTextField.getValue() != "") {
-	// 		this.addTaskButton.setDisabled(false);
-	// 	} else {
-	// 		this.addTaskButton.setDisabled(true);
-	// 	}
-	// },
-
 	canEditTaskLists: function() {
 		if(this.support) {
 			const modRights = go.Modules.get("business", "support").userRights;

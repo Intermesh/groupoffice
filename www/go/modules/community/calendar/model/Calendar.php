@@ -403,6 +403,7 @@ class Calendar extends AclOwnerEntity {
 		if (empty($calendar)) {
 			$calendar = Calendar::createFor($user->id);
 			$calendar->forUserId();
+			$calendar->createdBy = $user->id;
 			$calendar->setValues([
 				'name' => $user->displayName,
 				'ownerId' => $user->id,

@@ -6,6 +6,7 @@ use DateTimeInterface;
 use DateTimeZone;
 use Exception;
 use go\core\auth\BaseAuthenticator;
+use go\core\auth\ExternalAuthenticator;
 use go\core\auth\SecondaryAuthenticator;
 use go\core\cron\GarbageCollection;
 use go\core\db\DbException;
@@ -360,19 +361,7 @@ class Token extends Entity {
 		}		
 		
     if (session_status() == PHP_SESSION_NONE && !headers_sent()) {
-      //without cookie_httponly the cookie can be accessed by malicious scripts 
-      //injected to the site and its value can be stolen. Any information stored in 
-      //session tokens may be stolen and used later for identity theft or
-      //user impersonation.
-      ini_set("session.cookie_httponly",1);
-
-      //Avoid session id in url's to prevent session hijacking.
-      ini_set('session.use_only_cookies',1);
-
-      ini_set('session.cookie_secure', Request::get()->isHttps());
-   
-			session_name('groupoffice');
-      session_start();
+			go()->sessionStart();
     }
 		
 		if(!isset($_SESSION['GO_SESSION'])) {
@@ -444,7 +433,7 @@ class Token extends Entity {
 		$finishedAuthMethods = $this->getPassedAuthenticators(); // array('password','googleauthenticator');
 		
 		foreach($authenticators as $authenticator){
-			if(!in_array($authenticator::id(), $finishedAuthMethods)){
+			if(!in_array($authenticator::id(), $finishedAuthMethods) && !($authenticator instanceof ExternalAuthenticator)){
 				$pending[] = $authenticator;
 			}	
 		}

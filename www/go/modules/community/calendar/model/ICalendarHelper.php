@@ -497,7 +497,9 @@ class ICalendarHelper {
 
 		if(!empty($vattendee['CN'])) $p->name = (string)$vattendee['CN'];
 		if(!empty($vattendee['RSVP'])) $p->expectReply = $vattendee['RSVP']->getValue() ? 1: 0; // bool
-		$p->participationStatus = !empty($vattendee['PARTSTAT']) ? strtolower($vattendee['PARTSTAT']) : 'needs-action';
+		if(!empty($vattendee['PARTSTAT'])) {
+			$p->participationStatus = strtolower($vattendee['PARTSTAT']);
+		}
 		if(!empty($vattendee['ROLE'])) {
 			$map = array_flip(self::$roleMap);
 			if (in_array((string)$vattendee['ROLE'], $map)) {
@@ -518,8 +520,6 @@ class ICalendarHelper {
 				$props->timeZone = $props->start->getTimezone()->getName();
 			}
 		}
-		go()->log($vevent->DESCRIPTION);
-		//empty($vevent->DTSTART) ?: $props->start = $vevent->DTSTART->getDateTime()->format(DateTime::FORMAT_API_LOCAL);
 		if(!empty($vevent->SUMMARY)) $props->title = (string)$vevent->SUMMARY;
 		if(!empty($vevent->DESCRIPTION)) $props->description = str_replace('\n',"\n", $vevent->DESCRIPTION->getValue());
 		if(!empty($vevent->LOCATION)) $props->location = (string)$vevent->LOCATION;
@@ -552,6 +552,11 @@ class ICalendarHelper {
 			$props->replyTo = str_ireplace('mailto:', '',(string)$vevent->ORGANIZER);
 
 			list($key,$organizer) = self::parseAttendee($vevent->ORGANIZER);
+
+			// default value for organizer participation status is "accepted"
+			if(empty($vevent->ORGANIZER['PARTSTAT'])) {
+				$organizer->participationStatus = 'accepted';
+			}
 
 			if(!isset($props->participants[$key] )) {
 				// thunderbird sends organizer and participant but only the participants contains the correct "partstat".

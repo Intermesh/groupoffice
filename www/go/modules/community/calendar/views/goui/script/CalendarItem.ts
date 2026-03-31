@@ -490,12 +490,17 @@ export class CalendarItem {
 	}
 
 	get isOwner() {
-		return !this.participants || this.calendarPrincipal?.roles?.owner || false;
+		if(!this.participants) return true;
+		const hasOwner = Object.values(this.participants).some(p => p.roles?.owner);
+		return !hasOwner || this.calendarPrincipal?.roles?.owner || false;
 	}
 
 	get mayChange() {
-		return (this.isNew() ||
-			(this.cal.myRights.mayWriteOwn && this.isOwner)) && !this.readOnly;
+		return (this.isNew() || (this.cal.myRights.mayWriteOwn && this.isOwner)) && !this.readOnly;
+	}
+
+	get mayMove() { // or remove
+		return this.cal.myRights.mayWriteAll && !this.readOnly; // change calendar or delete single instance/full series
 	}
 
 	get mayMove() { // or remove

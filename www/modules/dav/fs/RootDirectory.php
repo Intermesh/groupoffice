@@ -14,6 +14,8 @@
 
 namespace GO\Dav\Fs;
 use GO;
+use go\modules\business\projects3\dav\ProjectBookDirectory;
+use go\modules\business\projects3\dav\ProjectRootDirectory;
 use Sabre;
 
 class RootDirectory extends Sabre\DAV\FS\Directory{
@@ -47,6 +49,9 @@ class RootDirectory extends Sabre\DAV\FS\Directory{
 
 		if(GO::modules()->projects2 && is_dir(GO::config()->file_storage_path . 'projects2'))
 			$children[] = new Directory('projects2');
+
+		if(GO::modules()->projects3 && is_dir(GO::config()->file_storage_path . 'projects3'))
+			$children[] = new ProjectRootDirectory();
 		
 		if(GO::modules()->billing && is_dir(GO::config()->file_storage_path . 'billing'))
 			$children[] = new Directory('billing');
@@ -85,6 +90,9 @@ class RootDirectory extends Sabre\DAV\FS\Directory{
 					if(GO::modules()->projects2)
 						return new Directory('projects2');
 					break;
+
+				case "Projects":
+					return new ProjectRootDirectory();
 					
 				case 'addressbook':
 					if(GO::modules()->addressbook)

@@ -40,28 +40,21 @@ use PDOException;
  */
 class EntityType implements ArrayableInterface, \ArrayAccess {
 
-	private $className;
-	private $id;
-	private $name;
-	private $moduleId;
-	private $clientName;
-	private $defaultAclId;
+	private string $className;
+	private int $id;
+	private string $name;
+	private int $moduleId;
+	private string $clientName;
+	private ?int $defaultAclId;
 
 	/**
 	 * The highest mod sequence used for JMAP data sync
-	 *
-	 * @var int
 	 */
-	protected $highestModSeq;
+	protected ?int $highestModSeq;
 
-	private $highestUserModSeq;
+	private ?int $highestUserModSeq;
 
-	private $modSeqIncremented = false;
-	/**
-	 * @var bool
-	 */
-	private $userModSeqIncremented = false;
-	private $enabled;
+	private bool $enabled;
 
 
 	/**
@@ -118,6 +111,7 @@ class EntityType implements ArrayableInterface, \ArrayAccess {
 	 *
 	 * @param array $props
 	 * @return Module
+	 * @throws Exception
 	 */
 	public function getModule(array $props = []): Module
 	{
@@ -128,10 +122,10 @@ class EntityType implements ArrayableInterface, \ArrayAccess {
 	 * Find by PHP API class name
 	 *
 	 * @param class-string<Entity> $className
-	 * @return ?EntityType
+	 * @return EntityType
 	 * @throws Exception
 	 */
-	public static function findByClassName(string $className) : ?EntityType {
+	public static function findByClassName(string $className) : EntityType {
 		$clientName = $className::getClientName();
 		$c = self::getCache();
 
@@ -174,7 +168,12 @@ class EntityType implements ArrayableInterface, \ArrayAccess {
 
 			self::$checkedClasses[] = $className;
 		}
-		return $c['models'][$c['name'][$clientName]] ?? null;
+
+		if(!isset($c['models'][$c['name'][$clientName]])) {
+			throw new Exception("Entity type with name $clientName not found");
+		}
+
+		return $c['models'][$c['name'][$clientName]];
 	}
 
 
@@ -184,7 +183,7 @@ class EntityType implements ArrayableInterface, \ArrayAccess {
 	 * The highest mod sequence used for JMAP data sync
 	 *
 	 * @return int
-	 * @throws PDOException
+	 * @throws Exception
 	 */
 	public function getHighestModSeq(): int{
 
@@ -226,8 +225,6 @@ class EntityType implements ArrayableInterface, \ArrayAccess {
 	{
 		$this->highestModSeq = null;
 		$this->highestUserModSeq = null;
-		$this->modSeqIncremented = false;
-		$this->userModSeqIncremented = false;
 
 		return $this;
 	}
@@ -256,7 +253,7 @@ class EntityType implements ArrayableInterface, \ArrayAccess {
 	 * Find all registered.
 	 *
 	 * @return static[]
-	 * @throws PDOException
+	 * @throws Exception
 	 */
 	public static function findAll(Query|null $query = null): array
 	{
@@ -268,14 +265,16 @@ class EntityType implements ArrayableInterface, \ArrayAccess {
 			->select('e.id')
 			->from('core_entity', 'e')
 			->join('core_module', 'm', 'm.id = e.moduleId')
-//						->where(['m.enabled' => true])
 			->all();
 
 		$i = [];
 		foreach($records as $record) {
-			$et = self::findById($record['id']);
-			if($et) {
+			try {
+				$et = self::findById($record['id']);
 				$i[] = $et;
+			}
+			catch(Exception $e) {
+				ErrorHandler::logException($e, "Invalid entity in db with id ". $record['id']);
 			}
 		}
 
@@ -343,30 +342,32 @@ class EntityType implements ArrayableInterface, \ArrayAccess {
 	 * Find by db id
 	 *
 	 * @param int $id
-	 * @return static|bool
+	 * @return static
+	 * @throws Exception
 	 */
-	public static function findById(int $id) {
+	public static function findById(int $id) : static {
 
 		$c = self::getCache();
-		if(!isset($c['id'][$id])) {
-			return false;
+		if(!isset($c['id'][$id]) || !isset($c['models'][$c['id'][$id]])) {
+			throw new Exception("Entity type with id $id not found");
 		}
-		return $c['models'][$c['id'][$id]] ?? false;
+		return $c['models'][$c['id'][$id]];
 	}
 
 	/**
 	 * Find by client API name
 	 *
 	 * @param string $name
-	 * @return static|bool
+	 * @return static
+	 * @throws Exception
 	 */
-	public static function findByName(string $name) {
+	public static function findByName(string $name) : static {
 
 		$c = self::getCache();
-		if(!isset($c['name'][$name])) {
-			return false;
+		if(!isset($c['name'][$name]) || !isset($c['models'][$c['name'][$name]])) {
+			throw new Exception("Entity type with name $name not found");
 		}
-		return $c['models'][$c['name'][$name]] ?? false;
+		return $c['models'][$c['name'][$name]];
 	}
 
 	/**
@@ -586,7 +587,8 @@ class EntityType implements ArrayableInterface, \ArrayAccess {
 		}
 	}
 
-	private static function pushRecords() {
+	private static function pushRecords(): void
+	{
 
 		if(empty(self::$changes)) {
 			return;
@@ -779,7 +781,6 @@ class EntityType implements ArrayableInterface, \ArrayAccess {
 			->query("SELECT LAST_INSERT_ID()")
 			->fetch(PDO::FETCH_COLUMN, 0);
 
-		$this->modSeqIncremented = true;
 		$this->highestModSeq = $modSeq;
 
 		return $modSeq;
@@ -821,7 +822,6 @@ class EntityType implements ArrayableInterface, \ArrayAccess {
 			->query("SELECT LAST_INSERT_ID()")
 			->fetch(PDO::FETCH_COLUMN, 0);
 
-		$this->userModSeqIncremented = true;
 		$this->highestUserModSeq = $modSeq;
 
 		return $modSeq;
@@ -848,7 +848,8 @@ class EntityType implements ArrayableInterface, \ArrayAccess {
 	/**
 	 * @throws SaveException|Exception
 	 */
-	public static function checkDatabase() {
+	public static function checkDatabase(): void
+	{
 
 		$all = static::findAll();
 
@@ -883,8 +884,7 @@ class EntityType implements ArrayableInterface, \ArrayAccess {
 	 * Get ACL id of ACL that holds default permissions
 	 *
 	 * @return int|null
-	 * @throws PDOException
-	 * @throws SaveException
+	 * @throws Exception
 	 */
 	public function getDefaultAclId(): ?int
 	{
@@ -948,8 +948,8 @@ class EntityType implements ArrayableInterface, \ArrayAccess {
 	/**
 	 * Returns an array with group ID as key and permission level as value.
 	 *
-	 * @return array eg. ["2" => 50, "3" => 10]
-	 * @throws SaveException
+	 * @return array|null eg. ["2" => 50, "3" => 10]
+	 * @throws Exception
 	 */
 	public function getDefaultAcl(): ?array
 	{
@@ -995,9 +995,9 @@ class EntityType implements ArrayableInterface, \ArrayAccess {
 	}
 
 	/**
-	 * @throws SaveException
+	 * @throws Exception
 	 */
-	public function toArray(array|null $properties = null): array|null
+	public function toArray(array|null $properties = null): array
 	{
 		return [
 			"name" => $this->getName(),

@@ -1,5 +1,5 @@
 import {LogEntryGrid} from "./LogEntryGrid.js";
-import {BaseEntity, collapsebtn, comp, Component, EntityID, t, tbar} from "@intermesh/goui";
+import {BaseEntity, collapsebtn, comp, Component, t, tbar} from "@intermesh/goui";
 
 export class HistoryDetailPanel extends Component {
 	private readonly grid: LogEntryGrid;

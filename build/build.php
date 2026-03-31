@@ -194,7 +194,7 @@ class Builder
 		$sassFiles = run("find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*'");
 
 		foreach ($sassFiles as $sassFile) {
-			run("sass --no-source-map $sassFile " . dirname(dirname($sassFile)) . '/' . str_replace('scss', 'css', basename($sassFile)));
+			run("sass --style=compressed --no-source-map $sassFile " . dirname(dirname($sassFile)) . '/' . str_replace('scss', 'css', basename($sassFile)));
 		}
 
 		// remove sensitive files OWASP WSTG - WSTG-INFO-05
@@ -226,7 +226,7 @@ class Builder
 
     private function cleanupNodeCore() {
         cd($this->buildDir . "/" . $this->packageName);
-	run("npm prune --omit=dev");
+	    run("npm prune --omit=dev");
 	/*
         cd("views/goui");
         run("npm prune --omit=dev");

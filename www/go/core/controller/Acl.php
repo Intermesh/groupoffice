@@ -6,6 +6,7 @@ use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Query;
+use go\core\exception\Forbidden;
 use go\core\exception\NotFound;
 use go\core\model;
 use go\core\orm\EntityType;
@@ -18,12 +19,17 @@ class Acl extends Controller {
 	 * Reset ACL permissions to the defaults
 	 */
 	public function reset($params) {
+
+		if(!go()->getAuthState()->isAdmin()) {
+			throw new Forbidden();
+		}
+
 		$params['add'] = $params['add'] ?? false;
 		if(!isset($params['entity'])) {
 			throw new InvalidArguments("The 'entity' param is required");
 		}
 		
-		$entityType = \go\core\orm\EntityType::findByName($params['entity']);
+		$entityType = EntityType::findByName($params['entity']);
 		
 		if(!$entityType) {
 			throw new NotFound("Could not find entity '" . $params['entity'] . "'");
@@ -45,11 +51,7 @@ class Acl extends Controller {
 			$col = $cls::$aclColumnName;
 		}
 
-
 		$fullAclCol = "$table.$col";
-
-		go()->getDbConnection()->debug = true;
-
 
 		if(!$params['add']) {
 			$stmt = go()->getDbConnection()->delete('core_acl_group',(new Query())
@@ -116,6 +118,10 @@ class Acl extends Controller {
 	}
 
 	public function overview($params) {
+
+		if(!go()->getAuthState()->isAdmin()) {
+			throw new Forbidden();
+		}
 
 		//$level = "CASE ag.level WHEN 10 THEN 'Read' WHEN 20 THEN 'Read/Add' WHEN 30 THEN 'Write' WHEN 40 THEN 'Write/Delete' WHEN 50 THEN 'Manage' ELSE 'Other' END as level";
 		$statement = \go()->getDbConnection()

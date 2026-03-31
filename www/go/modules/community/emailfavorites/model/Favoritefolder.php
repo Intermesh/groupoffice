@@ -4,7 +4,7 @@ namespace go\modules\community\emailfavorites\model;
 
 use go\core\db\Criteria;
 use go\core\jmap\Entity;
-use go\core\model\Module;
+use go\core\model\Acl;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 
@@ -30,10 +30,14 @@ class Favoritefolder extends Entity
 			});
 	}
 
+	protected function internalGetPermissionLevel(): int
+	{
+		return Acl::LEVEL_WRITE;
+	}
+
 	protected function canCreate(): bool
 	{
-		return Module::findByName('community', 'emailfavorites')
-			->getUserRights()->mayManage;
+		return true;
 	}
 
 	public function internalSave(): bool

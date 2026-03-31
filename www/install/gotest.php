@@ -207,6 +207,16 @@ function test_system() :array
 	$tests[]=$test;
 
 
+	$test['name']='Imagick support';
+	$test['showSuccessFeedback'] = false;
+	$test['pass']=extension_loaded('imagick');
+	$test['feedback']='Warning: ImageMagick extension not loaded. Without Imagick Group-Office can\'t view *.heic and *.heif image files.';
+	$test['fatal']=false;
+
+	$tests[]=$test;
+
+
+
 	$test['name']='EXIF support';
 	$test['showSuccessFeedback'] = false;
 	$test['pass']=function_exists('exif_read_data');
@@ -283,7 +293,7 @@ function test_system() :array
 	$test['name']='zlib compression';
 	$test['showSuccessFeedback'] = false;
 	$test['pass']=extension_loaded('zlib');
-	$test['feedback']='Warning: No zlib output compression support. You can increase the initial load time by installing this php extension.';
+	$test['feedback']='Warning: No zlib output compression support. You can decrease the initial load time by installing this php extension.';
 	$test['fatal']=false;
 
 	$tests[]=$test;

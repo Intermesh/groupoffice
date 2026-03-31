@@ -843,6 +843,10 @@ public function historyLog(): bool|array
 			$this->authenticators[] = $authenticator;
 		}
 
+		foreach ($auth->getExternalAuthenticatorsForUser($this->username) as $authenticator) {
+			$this->authenticators[] = $authenticator;
+		}
+
 		return $this->authenticators;
 	}
 

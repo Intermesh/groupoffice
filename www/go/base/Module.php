@@ -414,11 +414,6 @@ class Module extends Observable implements ArrayableInterface {
 			throw new \Exception("SQL query failed: ".$query."\n\n".$e->getMessage());
 		}
 		go()->rebuildCache(true);
-		//call saveUser for each user
-//		$stmt = Model\User::model()->find(array('ignoreAcl'=>true));		
-//		while($user = $stmt->fetch()){
-//			call_user_func(array(get_class($this),'saveUser'), $user, true);
-//		}
 		
 		$this->registerEntities();
 		
@@ -437,7 +432,7 @@ class Module extends Observable implements ArrayableInterface {
 		
 		foreach($records as $ar) {
 			$cls = $ar->getName();
-			if(is_a($cls, Db\ActiveRecord::class, true) && ($cls::model()->hasLinks() || method_exists($cls::model(), 'getCustomFields'))) {
+			if(is_a($cls, Db\ActiveRecord::class, true) && ($cls::model()->doRegisterEntity() || $cls::model()->hasLinks() || method_exists($cls::model(), 'getCustomFields'))) {
 				if(!$cls::entityType()) {
 					return false;
 				}
@@ -476,14 +471,7 @@ class Module extends Observable implements ArrayableInterface {
 	public function uninstall() {
 		
 		$oldIgnore = \GO::setIgnoreAclPermissions();
-		
-		
-//		//call deleteUser for each user
-//		$stmt = Model\User::model()->find(array('ignoreAcl'=>true));		
-//		while($user = $stmt->fetch()){
-//			call_user_func(array(get_class($this),'deleteUser'), $user);
-//		}
-		
+
 		//Uninstall cron jobs for this module
 		$cronClasses = $this->findClasses('cron');
 		foreach($cronClasses as $class){
@@ -511,7 +499,6 @@ class Module extends Observable implements ArrayableInterface {
 		}
 		
 		// \GO::clearCache();
-		// Observable::cacheListeners();
 		if(!Installer::isInstalling()) {
 			go()->rebuildCache(true);
 		}
@@ -551,9 +538,6 @@ class Module extends Observable implements ArrayableInterface {
 	 * @param array $response Array of output lines
 	 */
 	public function buildSearchCache(&$response){		
-		
-		//$response[]  = "Building search cache for ".$this->name()."\n";		
-				
 		$models=$this->getModels();
 
 		foreach($models as $model){

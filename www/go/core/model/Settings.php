@@ -6,6 +6,7 @@ use Exception;
 use go\core;
 use go\core\exception\Forbidden;
 use go\core\jmap\Request as JmapRequest;
+use go\core\mail\Util;
 use go\core\util\Crypt;
 use go\modules\business\license\model\License;
 use go\modules\community\addressbook\model\AddressBook;
@@ -711,6 +712,10 @@ class Settings extends core\Settings {
 	 */
 	protected function internalValidate()
 	{
+		if($this->isModified('systemEmail') && !Util::validateEmail($this->systemEmail)) {
+			$this->setValidationError('systemEmail', core\validate\ErrorCode::MALFORMED);
+		}
+
 		if($this->isModified('license')) {
 			if(isset($this->license)) {
 				if(!go()->getEnvironment()->hasIoncube()) {

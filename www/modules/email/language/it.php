@@ -347,6 +347,5 @@ Amministrazione -> Account -> Doppio clic su account -> Cartelle.',
   'You didn\'t fill in a subject. Are you sure you want to save this message without a subject?' => 'You didn\'t fill in a subject. Are you sure you want to save this message without a subject?',
   'Search items' => 'Search items',
   'Default template' => 'Default template',
-  'Display linked Tasks in messages list' => 'Display linked Tasks in messages list',
   'Use desktop email client to compose' => 'Use desktop email client to compose',
 );

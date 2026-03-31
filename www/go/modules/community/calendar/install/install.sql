@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS calendar_resource_group (
 	id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 	name           VARCHAR(200) NULL,
 	description    MEDIUMTEXT NULL,
+	autoAccept	TINYINT(1) NOT NULL DEFAULT 1,
 	defaultOwnerId INT NOT NULL,
 	`createdBy` INT NULL,
 	CONSTRAINT calendar_resource_group_core_user_id_fk FOREIGN KEY (defaultOwnerId)

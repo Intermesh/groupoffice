@@ -51,7 +51,7 @@ class TaskList extends AclOwnerEntity
 	public ?string $description = null;
 
 	public ?int $createdBy;
-	public ?int $ownerId;
+//	public ?int $ownerId;
 
 	protected string $defaultColor;
 
@@ -183,6 +183,11 @@ class TaskList extends AclOwnerEntity
 	{
 		return Module::findByName('community', 'tasks')
 			->getUserRights()->mayChangeTasklists;
+	}
+
+	public static function readOnlyProps(): array
+	{
+		return ["modifiedBy", "createdAt", "modifiedAt"];
 	}
 
 	protected static function checkAclJoinEntityTable()

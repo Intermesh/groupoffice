@@ -13,6 +13,7 @@ use go\core\orm\Property;
  * a simpler approach for task participants.
  *
  * @link https://www.rfc-editor.org/rfc/rfc8984.html#name-participants
+ * @property CalendarEvent $owner
  */
 class Participant extends Property
 {
@@ -156,7 +157,7 @@ class Participant extends Property
 	}
 
 	public function isFree(\DateTimeInterface $start, \DateTimeInterface $end) : bool {
-		$result = BusyPeriod::fetch($this->id, $start->format('c'), $end->format('c'));
+		$result = BusyPeriod::fetch($this->id, $start->format('c'), $end->format('c'),!empty($this->owner) ? $this->owner->uid : null);
 		return empty($result['list']);
 	}
 

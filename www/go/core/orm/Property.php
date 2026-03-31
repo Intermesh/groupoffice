@@ -1170,7 +1170,7 @@ abstract class Property extends Model {
 			return true;
 		}
 
-		return $a->format('U') != $b->format('U');
+		return $a->format(Column::DATETIME_FORMAT) != $b->format(Column::DATETIME_FORMAT);
 	}
 
 	/**
@@ -2311,7 +2311,7 @@ abstract class Property extends Model {
 		}
 	}
 
-	public function toArray(?array $properties = null): ?array
+	public function toArray(?array $properties = null): array
 	{
 		if (empty($properties)) {
 			$properties = $this->fetchProperties;
@@ -2430,7 +2430,7 @@ abstract class Property extends Model {
 					$id = $i;
 				}
 
-				if (isset($mapped[$id])) {
+				if (isset($id) && isset($mapped[$id])) {
 					$mapped[$id]->setValues($patch);
 					$this->{$propName}[] = $mapped[$id];
 				} else {

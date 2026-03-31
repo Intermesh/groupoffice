@@ -299,10 +299,12 @@ class File extends Base{
 		//if($this->exists()){ Don't use exists function because MemoryFile returns true but it does not exist on disk
 		if(file_exists($this->path())){
 			if(function_exists('finfo_open')){
-					$finfo    = finfo_open(FILEINFO_MIME);
-					$mimetype = finfo_file($finfo, $this->path());
+				$finfo    = finfo_open(FILEINFO_MIME);
+				$mimetype = finfo_file($finfo, $this->path());
+				if(version_compare(PHP_VERSION, '8.5.0') < 0) {
 					finfo_close($finfo);
-					return $mimetype;
+				}
+				return $mimetype;
 			}elseif(function_exists('mime_content_type'))
 			{
 				return mime_content_type($this->path());

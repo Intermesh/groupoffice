@@ -240,4 +240,5 @@ return array (
   'Could not delete non-empty resource group' => 'Kon niet-lege brongroep niet verwijderen',
   'New Event' => 'Nieuw evenement',
   'This' => 'Dit',
+	'Auto-accept available resources' => 'Beschikbare faciliteiten automatisch accepteren',
 );

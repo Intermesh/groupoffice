@@ -46,7 +46,7 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 							name:'emailSettings.show_bcc'
 						}),this.showLinkedTasks = new Ext.form.Checkbox({
                             hidden: true,
-                            boxLabel:t("Display linked Tasks in messages list", "email"),
+                            boxLabel:t("Display linked tasks in messages list", "email"),
                             hideLabel: true,
                             name: 'emailSettings.email_show_linked_tasks'
                         })

@@ -23,9 +23,13 @@ class Scheduler {
 	 * Send all the needed imip schedule messages
 	 *
 	 * @param CalendarEvent $event
+	 * @param bool $willDelete
+	 * @throws JsonPointerException
+	 * @throws \PHPMailer\PHPMailer\Exception
 	 * @parma bool $delete if the event is about to be deleted
 	 */
-	static public function handle(CalendarEvent $event, bool $willDelete = false) {
+	static public function handle(CalendarEvent $event, bool $willDelete = false): void
+	{
 
 		$current = $event->calendarParticipant();
 		if(!empty($current) && ($willDelete || $event->isModified('participants') || $event->isModified(self::EssentialScheduleProps))) {
@@ -34,8 +38,11 @@ class Scheduler {
 				$method = $willDelete ? 'CANCEL' : 'REQUEST';
 				self::organizeImip($event, $current, $method, $newOnly);
 			} else if (!empty($event->replyTo) && $current->isModified('participationStatus')) {
-				$status = $willDelete ? Participant::Declined : $current->participationStatus;
-				self::replyImip($event, $current, $status);
+
+				if($willDelete) {
+					$current->participationStatus  = Participant::Declined;
+				}
+				self::replyImip($event, $current);
 			}
 		}
 
@@ -45,14 +52,22 @@ class Scheduler {
 
 	}
 
-	private static function replyImip(CalendarEvent $event, $participant, $status) {
+	/**
+	 * Sends a status reply to the organizer
+	 *
+	 * @param CalendarEvent $event
+	 * @param $participant
+	 * @throws \PHPMailer\PHPMailer\Exception
+	 */
+	public static function replyImip(CalendarEvent $event, $participant): void
+	{
 
 		$organizer = $event->organizer();
 		if(!empty($participant->language)) {
 			$old = go()->getLanguage()->setLanguage($participant->language);
 		}
 
-		$participant->participationStatus = $status;
+
 		// needed so organizer can find last response
 		$event->createdAt = new DateTime();
 		$event->modifiedAt = new DateTime();
@@ -72,7 +87,7 @@ class Scheduler {
 		$subject = go()->t('Reply').': '.$event->title;
 		$lang = go()->t('replyImipBody', 'community', 'calendar');
 
-		$body = strtr($lang[$status], [
+		$body = strtr($lang[$participant->participationStatus], [
 			'{name}' => $participant->name??'',
 			'{title}' => $event->title,
 			'{date}' => implode(' ',$event->humanReadableDate()),
@@ -95,7 +110,6 @@ class Scheduler {
 			unset($old);
 		}
 
-		return true;
 	}
 
 	/**
@@ -117,7 +131,8 @@ class Scheduler {
 	 * @param $newOnly boolean Only send if participant was added
 	 * @return boolean
 	 */
-	private static function organizeImip(CalendarEvent $event, $organizer, $method, $newOnly = false) {
+	private static function organizeImip(CalendarEvent $event, $organizer, $method, $newOnly = false): bool
+	{
 		$success=true;
 
 		// allow lots of time for sending invites

@@ -100,7 +100,11 @@ class CalendarEvent extends EntityController {
 		}
 
 		$event = new model\CalendarEvent();
-		$event->calendarId = go()->getAuthState()->getUser(['calendarPreferences'])->calendarPreferences->defaultCalendarId;
+		$personalCalendar = go()->getAuthState()->getUser(['calendarPreferences'])->calendarPreferences->personalCalendarId;
+		if(!empty($personalCalendar)) {
+			$event->calendarId = $personalCalendar;
+		}
+
 		//$event = model\ICalendarHelper::fromICal($data, $event);
 		$event = ICalendarHelper::parseVObject($data, $event);
 		return ['success' => true, 'data' => $event];

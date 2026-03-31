@@ -12,12 +12,12 @@ use go\core\validate\ErrorCode;
 
 class SmtpAccount extends AclOwnerEntity
 {
-	public ?string $id;
+	public ?string $id = null;
 	protected $moduleId;
 	public string $hostname;
 	public int $port = 587;
-	public ?string $username;
-	protected ?string $password;
+	public ?string $username = null;
+	protected ?string $password = null;
 	public ?string $encryption = "tls"; // null, 'tls' or 'ssl'
 	public bool $verifyCertificate = true;
 	public string $fromName;

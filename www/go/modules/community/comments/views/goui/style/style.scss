@@ -46,9 +46,13 @@
   border-radius: 2.5rem;
   background-color: var(--bg-mid);
   margin: 0.3rem;
-  max-width: 135px;
+  //max-width: 135px;
+  float: left;
   overflow: hidden;
   text-overflow: ellipsis;
+  > div > div{
+    padding: 1.2rem 1.6rem
+  }
 }
 
 .goui .comment-editor-label button, .goui .comment-editor-attachment button {

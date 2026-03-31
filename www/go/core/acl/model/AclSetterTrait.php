@@ -2,6 +2,7 @@
 namespace go\core\acl\model;
 
 use Exception;
+use go\core\exception\Forbidden;
 use go\core\model\Acl;
 use go\core\orm\exception\SaveException;
 use go\core\util\ArrayObject;
@@ -40,7 +41,7 @@ trait AclSetterTrait {
 	 */
 	protected function saveAcl(): void
 	{
-		if(!isset($this->setAcl)) {
+		if(!isset($this->setAcl) && !isset($this->createdBy) && !$this->isModified('createdBy')) {
 			return;
 		}
 
@@ -50,8 +51,15 @@ trait AclSetterTrait {
 			throw new Exception("There's no ACL set for this entity");
 		}
 
-		foreach($this->setAcl as $groupId => $level) {
-			$a->addGroup($groupId, $level);
+		if(isset($this->setAcl)) {
+			foreach ($this->setAcl as $groupId => $level) {
+				$a->addGroup($groupId, $level);
+			}
+		}
+
+		if(isset($this->createdBy) && $a->ownedBy != $this->createdBy) {
+
+			$a->ownedBy = $this->createdBy;
 		}
 
 		if(!$a->save()) {

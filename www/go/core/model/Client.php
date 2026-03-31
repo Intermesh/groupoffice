@@ -81,7 +81,7 @@ class Client extends Property
 			(new Query)
 				->tableAlias("client")
 				->join("core_auth_token", "token", "token.clientId = client.id", 'LEFT')
-				->where("token.expiresAt", "=", null) // no token
+				->where("token.clientId", "=", null) // no token
 				->where('deviceId', '=', '-') // only browsers are without deviceId
 				->andWhere('lastSeen', '<', $threeMonthsAgo));
 	}

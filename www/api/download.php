@@ -87,9 +87,9 @@ try {
 
 	$package = array_shift($parts);
 	if ($package == "core") {
-		$c = GO();
-		$ctrlCls = "go\\core\\App";
+		$c = go();
 		$method = "download" . array_shift($parts);
+		$ctrlCls = App::class;
 	} else {
 		$module = array_shift($parts);
 		$method = "download" . array_shift($parts);

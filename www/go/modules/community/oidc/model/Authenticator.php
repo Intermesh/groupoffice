@@ -2,7 +2,7 @@
 
 namespace go\modules\community\oidc\model;
 
-use go\core\auth\PrimaryAuthenticator;
+use go\core\auth\ExternalAuthenticator;
 use go\core\model\Module;
 
 /**
@@ -13,7 +13,7 @@ use go\core\model\Module;
  * @copyright Copyright Intermesh BV
  * @author Merijn Schering <mschering@intermesh.nl>
  */
-class Authenticator extends PrimaryAuthenticator
+class Authenticator extends ExternalAuthenticator
 {
 
 	public static function id(): string

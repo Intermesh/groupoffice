@@ -15,8 +15,8 @@
 
     "build": "npm run build:sass && npm run build:ts",
     "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
-    "build:sass": "npx sass --style=compressed style:dist",
-    "build:dts": "npx tsc --declaration --emitDeclarationOnly",
+    "build:sass": "npx sass --style=compressed --no-source-map style:dist",
+    "build:dts": "npx tsc -b --declaration --emitDeclarationOnly",
 
     "test": "npx tsc --noEmit"
   }

@@ -348,9 +348,9 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
    * Convert model into array for API output.
    *
    * @param ?array $properties
-   * @return ?array
+   * @return array
    */
-	public function toArray(?array $properties = null): ?array
+	public function toArray(?array $properties = null): array
 	{
 		$arr = [];
 		
@@ -370,6 +370,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
 		$value = $this->getValue($name);
 		return $this->convertValueToArray($value);
 	}
+	public static bool $convertDatesToString = true;
 
 	/**
 	 * Converts value to an array if supported
@@ -396,10 +397,10 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
 				$arr[$key] = static::convertValueToArray($v);
 			}
 			return $arr;
-		} else if($value instanceof DateTime) {
+		} else if(self::$convertDatesToString && $value instanceof DateTime) {
 			// this will support DateTime::$isLocal
 			return (string) $value;
-		} else if($value instanceof \DateTimeInterface) {
+		} else if(self::$convertDatesToString && $value instanceof \DateTimeInterface) {
 			return $value->format(DateTime::FORMAT_API);
 		}else{
 			return $value;

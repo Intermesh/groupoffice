@@ -11,9 +11,9 @@ import {
 	modules
 } from "@intermesh/groupoffice-core";
 import {NoteDialog} from "./NoteDialog";
-import {CommentsPanel} from "@intermesh/community/comments";
+import {CommentsPanel} from "@intermesh/community-comments";
 import {Note, noteDS} from "./Index";
-import {HistoryDetailPanel} from "@intermesh/community/history";
+import {HistoryDetailPanel} from "@intermesh/community-history";
 import {Encrypt} from "./Encrypt";
 
 export class NoteDetail extends DetailPanel<Note> {

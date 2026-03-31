@@ -809,8 +809,6 @@ namespace go\core {
 		 */
 		public function setAuthState(AuthState $authState): App
 		{
-
-
 			$this->authState = $authState;
 			
 			return $this;
@@ -819,7 +817,7 @@ namespace go\core {
 		/**
 		 * Get the authentication handler
 		 * 
-		 * @return AuthState
+		 * @return ?AuthState
 		 */
 		public function getAuthState(): ?AuthState
 		{

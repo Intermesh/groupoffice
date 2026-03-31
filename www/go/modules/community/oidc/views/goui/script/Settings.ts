@@ -12,9 +12,8 @@ import {
 	table,
 	tbar
 } from "@intermesh/goui";
-import {OIDConnectClientDS} from "@intermesh/community/oidc";
 import {OIDConnectClientDialog} from "./OIDConnectClientDialog.js";
-import {jmapds} from "@intermesh/groupoffice-core";
+import {OIDConnectClientDS} from "./Index.js";
 
 export class Settings extends Fieldset {
 
