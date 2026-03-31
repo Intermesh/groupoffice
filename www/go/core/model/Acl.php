@@ -100,15 +100,15 @@ class Acl extends Entity {
 			}
 
 			$groupId = Group::findPersonalGroupID($this->ownedBy);
-			if($groupId) {
+			if ($groupId) {
 				$ownerLevel = $this->hasGroup($groupId);
 				if ($ownerLevel < self::LEVEL_MANAGE) {
 					$this->removeGroup($groupId);
 					$this->addGroup($groupId, self::LEVEL_MANAGE);
 				}
 			}
-		}		
-		
+		}
+
 		if(!parent::internalSave()) {
 			return false;
 		}
