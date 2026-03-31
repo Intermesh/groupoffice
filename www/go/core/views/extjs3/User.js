@@ -48,6 +48,7 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 			this.legacySettings(user);
 
 			this.checkForNewDevices(user);
+
 			document.body.classList.add(user.themeColorScheme);
 			changeTheme(prefersColorQuery);
 			// TODO: GOUI version has no meta theme-color declaration?

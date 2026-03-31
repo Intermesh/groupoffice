@@ -32,4 +32,6 @@ foreach($mods as $mod) {
 
 $response['languages'] = go()->getLanguage()->getLanguages();
 
+$response['settings'] = go()->getSettings()->toArray();
+
 Response::get()->output($response);
