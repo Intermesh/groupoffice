@@ -215,6 +215,11 @@ class LogEntry extends AclOwnerEntity {
 		//don't update acl records usedin is history
 	}
 
+	protected function saveAcl()
+	{
+		// do nothing
+	}
+
 	protected function internalSave(): bool
 	{
 		if(!isset($this->aclId)) {

@@ -1106,6 +1106,7 @@ public function historyLog(): bool|array
 		$personalGroup->createdBy = $this->id;
 		$personalGroup->name = $this->username;
 		$personalGroup->isUserGroupFor = $this->id;
+		$personalGroup->createdBy = $this->id;
 		$personalGroup->users[] = $this->id;
 
 		if (!$this->appendNumberToGroupNameIfExists($personalGroup)) {
