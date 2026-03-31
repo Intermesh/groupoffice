@@ -1,3 +1,5 @@
+31-03-2026: 26.0.19
+- Core: Fixed login problem with history and permission check on acl ownerr
 - Files: Trashed folders do no longer show in the tree
 
 30-03-2026: 26.0.18
