@@ -100,11 +100,15 @@ class Acl extends Entity {
 				throw new Forbidden("You (".go()->getUserId().") are not allowed to change ownership");
 			}
 
-			$groupId = Group::findPersonalGroupID($this->ownedBy);
-			$ownerLevel = $this->hasGroup($groupId);
-			if($ownerLevel < self::LEVEL_MANAGE) {
-				$this->removeGroup($groupId);
-				$this->addGroup($groupId, self::LEVEL_MANAGE);				
+			// don't do this for groups to prevent infinite loop on creating the personal
+			// groups
+			if($this->entityTypeId !== Group::entityType()->getId()) {
+				$groupId = Group::findPersonalGroupID($this->ownedBy);
+				$ownerLevel = $this->hasGroup($groupId);
+				if ($ownerLevel < self::LEVEL_MANAGE) {
+					$this->removeGroup($groupId);
+					$this->addGroup($groupId, self::LEVEL_MANAGE);
+				}
 			}
 		}		
 		

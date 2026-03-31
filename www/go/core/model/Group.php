@@ -259,6 +259,7 @@ class Group extends AclOwnerEntity {
 		$personalGroup = new Group();
 		$personalGroup->name = $user->username;
 		$personalGroup->isUserGroupFor = $userId;
+		$personalGroup->createdBy = $userId;
 		$personalGroup->users[] = $userId;
 		
 		if(!$personalGroup->save()) {
