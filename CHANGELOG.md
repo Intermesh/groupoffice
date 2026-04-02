@@ -1,3 +1,5 @@
+- imapauth: Fixed login problem for new users
+
 31-03-2026: 25.0.95
 - Core: Fixed login problem with history and permission check on acl ownerr
 
