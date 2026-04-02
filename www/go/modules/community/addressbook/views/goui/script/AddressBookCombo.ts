@@ -1,7 +1,6 @@
 import {AutocompleteField, Config, createComponent, listStoreType, storeRecordType, t} from "@intermesh/goui";
 import {AddressBookTable} from "./AddressBookTable.js";
-import {principalDS} from "@intermesh/groupoffice-core";
-import {addressBookDS} from "@intermesh/community/addressbook";
+import {addressBookDS} from "./Index";
 
 export class AddressBookCombo extends AutocompleteField<AddressBookTable> {
 

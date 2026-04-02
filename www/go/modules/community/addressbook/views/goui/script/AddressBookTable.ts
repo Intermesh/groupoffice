@@ -1,6 +1,6 @@
 import {avatar, column, comp, DataSourceStore, datasourcestore, t, Table} from "@intermesh/goui";
 import {img, JmapDataSource, Principal, principalDS} from "@intermesh/groupoffice-core";
-import {AddressBook, addressBookDS} from "@intermesh/community/addressbook";
+import {AddressBook, addressBookDS} from "./Index";
 
 export class AddressBookTable extends Table<DataSourceStore<JmapDataSource<AddressBook>, AddressBook>> {
 	constructor() {

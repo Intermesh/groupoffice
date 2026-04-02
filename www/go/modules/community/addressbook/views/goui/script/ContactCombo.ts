@@ -7,7 +7,7 @@ import {
 	t
 } from "@intermesh/goui";
 import {ContactTable} from "./ContactTable";
-import {contactDS} from "@intermesh/community/addressbook"
+import {contactDS} from "./Index"
 export class ContactCombo extends AutocompleteField<ContactTable> {
 	public isOrganization: boolean | undefined;
 

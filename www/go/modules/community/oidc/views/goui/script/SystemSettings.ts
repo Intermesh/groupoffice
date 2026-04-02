@@ -7,14 +7,13 @@ import {
 	hr,
 	menu,
 	mstbar,
-	searchbtn,
 	t,
 	table,
 	tbar
 } from "@intermesh/goui";
-import {OIDConnectClientDS} from "@intermesh/community/oidc";
+
 import {OIDConnectClientDialog} from "./OIDConnectClientDialog.js";
-import {jmapds} from "@intermesh/groupoffice-core";
+import {OIDConnectClientDS} from "./Index.js";
 /*
 @deprocated - the GOUI System settings will use Settings instead
  */

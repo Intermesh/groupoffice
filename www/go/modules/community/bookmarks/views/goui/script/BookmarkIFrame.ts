@@ -1,5 +1,5 @@
 import {comp, Component} from "@intermesh/goui";
-import {Bookmark} from "@intermesh/community/bookmarks";
+import {Bookmark} from "./Index";
 
 export class BookmarkIFrame extends Component {
 	constructor(bookmark: Bookmark) {

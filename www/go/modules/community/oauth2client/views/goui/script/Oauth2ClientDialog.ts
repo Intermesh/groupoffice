@@ -1,6 +1,6 @@
 import {FormWindow} from "@intermesh/groupoffice-core";
 import {checkbox, combobox, fieldset, t, textfield} from "@intermesh/goui";
-import {DefaultClientDS} from "@intermesh/community/oauth2client";
+import {DefaultClientDS} from "./Index";
 
 export class Oauth2ClientDialog extends FormWindow {
 

@@ -1,7 +1,6 @@
-import {btn, column, comp, datasourcestore, DataSourceStore, menu, t, Table} from "@intermesh/goui";
+import {btn, column, comp, datasourcestore, menu, t, Table} from "@intermesh/goui";
 import {Oauth2ClientDialog} from "./Oauth2ClientDialog";
-import {DefaultClientDS, Oauth2ClientDS} from "@intermesh/community/oauth2client";
-import {jmapds} from "@intermesh/groupoffice-core";
+import {Oauth2ClientDS} from "./Index";
 
 export class Oauth2ClientTable extends Table {
 	constructor() {

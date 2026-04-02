@@ -9,7 +9,7 @@
     "concurrently": "latest",
     "esbuild": "latest",
     "sass": "latest",
-    "typescript": "latest"
+    "typescript": "5.9.*"
   },
   "scripts": {
     "start": "npm run build:clean && concurrently --kill-others \"npm run start:ts\"  \"npm run start:dts\" \"npm run start:sass\"",

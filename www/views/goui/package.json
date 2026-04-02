@@ -4,7 +4,7 @@
     "concurrently": "latest",
     "esbuild": "latest",
     "sass": "latest",
-    "typescript": "latest"
+    "typescript": "5.9.*"
   },
   "scripts": {
     "test": "mocha",
@@ -18,7 +18,7 @@
     "build": "npm run build:clean  && npm run build:goui-sass && npm run build:assets && npm run build:groupoffice-core-sass && npm run build:ts",
     "build:clean": "rm -rf ./dist/*",
     "build:goui-sass": "npx sass --style=compressed --no-source-map ./goui/style:./dist/goui/style",
-    "build:assets": "mkdir -p ./dist/goui && cp -r ./goui/resources ./dist/goui/resources",
+    "build:assets": "mkdir -p ./dist/goui && cp -r ./goui/resources ./dist/goui/resources && mkdir -p ./dist/groupoffice-core/style && cp -r ./groupoffice-core/style/resources ./dist/groupoffice-core/style/resources",
     "build:groupoffice-core-sass": "npx sass --style=compressed --no-source-map ./groupoffice-core/style:./dist/groupoffice-core/style",
     "build:ts": "node esbuild.mjs",
 

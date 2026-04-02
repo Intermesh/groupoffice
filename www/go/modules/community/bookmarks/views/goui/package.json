@@ -1,11 +1,15 @@
 {
   "type": "module",
-  "name": "bookmarks",
+  "name": "@intermesh/community-bookmarks",
+  "main": "./dist/Index.js",
+  "module": "./dist/Index.js",
+  "typings": "./dist/Index.d.ts",
+  "description": "GroupOffice Bookmarks module",
   "devDependencies": {
     "concurrently": "latest",
     "esbuild": "latest",
     "sass": "latest",
-    "typescript": "latest"
+    "typescript": "5.9.*"
   },
 
   "scripts": {

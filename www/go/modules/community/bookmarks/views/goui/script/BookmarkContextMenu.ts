@@ -1,7 +1,7 @@
 import {btn, DefaultEntity, Menu, t} from "@intermesh/goui";
-import {jmapds, User} from "@intermesh/groupoffice-core";
+import {User} from "@intermesh/groupoffice-core";
 import {BookmarksDialog} from "./BookmarksDialog.js";
-import {bookmarkDS} from "@intermesh/community/bookmarks";
+import {bookmarkDS} from "./Index";
 
 export class BookmarkContextMenu extends Menu {
 	constructor(user: User, bookmark: DefaultEntity) {

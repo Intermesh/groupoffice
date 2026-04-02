@@ -1,6 +1,7 @@
-import {btn, comp, Fieldset, t, tbar} from "@intermesh/goui";
+import {btn, Fieldset, t, tbar} from "@intermesh/goui";
 import {Oauth2ClientTable} from "./Oauth2ClientTable";
 import {Oauth2ClientDialog} from "./Oauth2ClientDialog";
+
 export class Settings extends Fieldset {
 	constructor() {
 		super();

@@ -1,11 +1,15 @@
 {
   "type": "module",
-  "name": "community-addressbook",
+  "name": "@intermesh/community-addressbook",
+  "main": "./dist/Index.js",
+  "module": "./dist/Index.js",
+  "typings": "./dist/Index.d.ts",
+  "description": "GroupOffice Addressbook module",
   "devDependencies": {
     "concurrently": "latest",
     "esbuild": "latest",
     "sass": "latest",
-    "typescript": "latest"
+    "typescript": "5.9.*"
   },
   "scripts": {
     "start addressbook": "npm run build:clean && concurrently --kill-others \"npm run start:ts\"  \"npm run start:dts\"",

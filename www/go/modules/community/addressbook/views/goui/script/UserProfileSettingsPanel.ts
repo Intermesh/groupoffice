@@ -21,8 +21,7 @@ import {
 	textarea,
 	textfield
 } from "@intermesh/goui";
-import {contactDS} from "@intermesh/business/catalog";
-import {Contact} from "@intermesh/community/addressbook";
+import {Contact, contactDS} from "./Index";
 
 export class UserProfileSettingsPanel extends AppSettingsPanel {
 	private readonly form: DataSourceForm<Contact>;
@@ -81,7 +80,7 @@ export class UserProfileSettingsPanel extends AppSettingsPanel {
 					}),
 					chipRenderer: async (chip, value) => {
 						contactDS.single(value).then(record => {
-							chip.text = record.name;
+							chip.text = record.name!;
 						});
 					},
 					listeners: {

@@ -1,8 +1,6 @@
 import {appSystemSettings, client, JmapDataSource, modules} from "@intermesh/groupoffice-core";
 import {Settings} from "./Settings.js";
-import {CalendarEvent, CalendarItem, onlineMeetingServices} from "@intermesh/community/calendar";
 import {SystemSettings} from "./SystemSettings";
-
 
 modules.register({
 	package: "community",

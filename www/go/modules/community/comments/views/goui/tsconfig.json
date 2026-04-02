@@ -1,7 +1,6 @@
 {
   "extends": "../../../../../../views/goui/tsconfig.module.json",
   "compilerOptions": {
-    "baseUrl": ".",
     "outDir": "./dist",
     //needed to be inside dist because it must be cleaned up before building
     "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
