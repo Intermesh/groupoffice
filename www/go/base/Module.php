@@ -756,7 +756,7 @@ class Module extends Observable implements ArrayableInterface {
 
 	}
 
-	public function toArray(?array $properties = null): array|null
+	public function toArray(?array $properties = null): array
 	{
 		$model = \go\core\model\Module::findByName(null, $this->name(), null);
 

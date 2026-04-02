@@ -17,19 +17,21 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd $DIR/../;
 DIR="$(pwd)";
 
-cd "$DIR/www"
-npm ci --prefer-offline --audit=false --progress=false --fund=false
 
-echo "Building SASS"
-
-for line in $(find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*' | sort -r );
-do
-  replace1=${line/src\/style.scss/style.css};
-  replace2=${replace1/src\/style-mobile.scss/style-mobile.css};
-  replace3=${replace2/src\/htmleditor.scss/htmleditor.css};
-  echo $line - $replace3;
-	$SASS $line $replace3;
-done
+#echo Installing NPM packages
+#cd "$DIR/www"
+#npm ci --prefer-offline --audit=false --progress=false --fund=false
+#
+#echo "Building SASS"
+#
+#for line in $(find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*' | sort -r );
+#do
+#  replace1=${line/src\/style.scss/style.css};
+#  replace2=${replace1/src\/style-mobile.scss/style-mobile.css};
+#  replace3=${replace2/src\/htmleditor.scss/htmleditor.css};
+#  echo $line - $replace3;
+#	$SASS $line $replace3;
+#done
 
 function buildGOUI() {
   echo BUILDING node modules inside "$1"...
@@ -75,16 +77,16 @@ function buildAndInstallGOUIExceptCommunityAndBusiness() {
 }
 
 
-echo "Building GOUI shared libs"
-cd $DIR;
-cd ./www/views/goui
-npm run build
-if [ "$IS_DEV" == "true" ]; then
-  npm run build:dts
-fi
+#echo "Building GOUI shared libs"
+#cd $DIR;
+#cd ./www/views/goui
+#npm run build
+#if [ "$IS_DEV" == "true" ]; then
+#  npm run build:dts
+#fi
+#echo "DONE";
 
 cd $DIR;
-echo "DONE";
 
 if [ "$IS_DEV" == "true" ]; then
   find ./www -name tsconfig.tsbuildinfo -delete

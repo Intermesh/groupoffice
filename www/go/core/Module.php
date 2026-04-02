@@ -972,7 +972,7 @@ abstract class Module extends Singleton implements ArrayableInterface {
 
 	}
 
-	public function toArray(?array $properties = null): array|null
+	public function toArray(?array $properties = null): array
 	{
 		$model = $this->getModel();
 		return array(

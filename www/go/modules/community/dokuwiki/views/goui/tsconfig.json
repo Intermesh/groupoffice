@@ -2,6 +2,15 @@
   "extends": "../../../../../../views/goui/tsconfig.module.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    //needed to be inside dist because it must be cleaned up before building
+    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
+    // This is needed to make the composite project work when other modules use this one as a dependency in their tsconfig.json
+    // See notes/views/goui/tsconfig.json for an example of the references
+    "composite": true,
+    "rootDir": "script"
   },
+  "references": [
+    { "path": "../../../../../../views/goui/" },
+  ]
 }

@@ -503,10 +503,6 @@ export class CalendarItem {
 		return this.cal.myRights.mayWriteAll && !this.readOnly; // change calendar or delete single instance/full series
 	}
 
-	get mayMove() { // or remove
-		return this.cal.myRights.mayWriteAll && !this.readOnly; // change calendar or delete single instance/full series
-	}
-
 	private _calendarPrincipal:Participant|undefined;
 
 	/**
