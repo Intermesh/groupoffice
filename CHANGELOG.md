@@ -1,3 +1,4 @@
+02-04-2026: 6.8.162
 - imapauth: Fixed login problem for new users
 
 31-03-2026: 6.8.161
