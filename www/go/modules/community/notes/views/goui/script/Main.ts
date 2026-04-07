@@ -17,7 +17,7 @@ import {
 	tbar,
 	Toolbar
 } from "@intermesh/goui";
-import {AclLevel, client, filterpanel, jmapds, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
+import {AclLevel, client, entities, filterpanel, jmapds, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
 import {notebookgrid, NoteBookGrid} from "./NoteBookGrid";
 import {NoteBookDialog} from "./NoteBookDialog";
 import {NoteGrid} from "./NoteGrid";
@@ -189,13 +189,16 @@ export class Main extends MainThreeColumnPanel {
 			disabled: true,
 			handler: () => {
 				const dlg = new NoteDialog();
-
 				const noteBookId = this.noteBookGrid.rowSelection!.getSelected()[0].record.id;
-
 				dlg.form.value = {
 					noteBookId: noteBookId
 				};
 				dlg.show();
+				dlg.form.on("save", ({data, isNew}) => {
+					if (isNew) {
+						entities.get("Note").goto(data.id);
+					}
+				})
 			}
 		});
 

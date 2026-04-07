@@ -1,5 +1,6 @@
 import {
-	btn, Button,
+	btn,
+	Button,
 	comp,
 	fieldset,
 	HtmlField,
@@ -9,7 +10,8 @@ import {
 	t,
 	tbar,
 	TextField,
-	textfield, Toolbar, Window
+	textfield,
+	Toolbar
 } from "@intermesh/goui";
 import {client, customFields, FormFieldset, FormWindow, Image} from "@intermesh/groupoffice-core";
 import {notebookcombo} from "./NoteBookCombo";
