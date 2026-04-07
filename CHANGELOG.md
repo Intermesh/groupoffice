@@ -1,3 +1,8 @@
+- Comments / Core: Fixed some upgrade issues where table collation was incorrect
+- Savemailas: Fixed save as note
+- Tasks / Support: Set default task list when creating a new task/ticket from other modules
+- Notes: Open note when creating a new note
+
 02-04-2026: 26.0.20
 - imapauth: Fixed login problem for new users
 
