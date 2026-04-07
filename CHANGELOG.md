@@ -34,6 +34,7 @@
 - Files: fix 'Move to trash' in tree context menu
 
 02-04-2026: 25.0.96
+- Workflow: make permissions depend on mayManage
 - imapauth: Fixed login problem for new users
 
 31-03-2026: 25.0.95
