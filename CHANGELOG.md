@@ -1,3 +1,4 @@
+- Calendar: State mismatch for this and future will cancel the creation
 - Comments / Core: Fixed some upgrade issues where table collation was incorrect
 - Savemailas: Fixed save as note
 - Tasks / Support: Set default task list when creating a new task/ticket from other modules
