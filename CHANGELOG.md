@@ -2,6 +2,10 @@
 - Savemailas: Fixed save as note
 - Tasks / Support: Set default task list when creating a new task/ticket from other modules
 - Notes: Open note when creating a new note
+- Workflow: make permissions depend on mayManage
+- Core: log error in apache log when token invalid
+- Files: fix 'Move to trash' in tree context menu
+
 
 02-04-2026: 26.0.20
 - imapauth: Fixed login problem for new users
