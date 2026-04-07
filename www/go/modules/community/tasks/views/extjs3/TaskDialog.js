@@ -337,6 +337,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 								flex: 1,
 								anchor: undefined,
 								role: this.role,
+								value: go.User.tasksSettings.defaultTasklistId,
 								listeners: {
 									change: this.onTaskListChange,
 									setvalue: this.onTaskListChange,
