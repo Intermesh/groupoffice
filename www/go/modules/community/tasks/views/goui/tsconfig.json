@@ -7,6 +7,6 @@
     "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo"
   },
   "references": [
-    { "path": "../../../../../../views/goui/" }
+    { "path": "../../../../../../views/goui/groupoffice-core/tsconfig.json" }
   ]
 }

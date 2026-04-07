@@ -42,12 +42,12 @@ const moduleResolverPlugin = {
 				if(args.path === "@intermesh/groupoffice-core") {
 					return {
 						external: true,
-						path: "../../../../../../../views/goui/dist/groupoffice-core/script/index.js?v=" + version[0]
+						path: "../../../../../../../views/goui/groupoffice-core/dist/index.js?v=" + version[0]
 					}
 				} else if(args.path === "@intermesh/goui") {
 					return {
 						external: true,
-						path: "../../../../../../../views/goui/dist/goui/script/index.js?v=" + version[0]
+						path: "../../../../../../../node_modules/@intermesh/goui/dist/index.js?v=" + version[0]
 					}
 				}
 

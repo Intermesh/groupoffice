@@ -1,8 +1,7 @@
 import {appSystemSettings, client, JmapDataSource, modules, router} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
-import {t, translate} from "@intermesh/goui";
+import {translate} from "@intermesh/goui";
 import {Settings} from "./Settings";
-// import {SystemSettings} from "./SystemSettings.js";
 
 export * from "./HistoryDetailPanel.js";
 

@@ -17,7 +17,7 @@
     "build:clean": "rm -rf ./dist/*",
     "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
     "build:dts": "npx tsc -b --declaration --emitDeclarationOnly",
-    "build:sass": "npx sass --style=compressed --no-source-map style:dist",
+    "build:sass": "npx sass --load-path=$(npm root) --style=compressed --no-source-map style:dist",
 
     "test": "npx tsc --noEmit"
   }

@@ -1,5 +1,5 @@
-@use '../../../../../../../views/goui/goui/style/_util.scss'  as *;
-@use '../../../../../../../views/goui/goui/style/_config.scss' as *;
+@use '@intermesh/goui/style/util'  as *;
+@use '@intermesh/goui/style/config' as *;
 
 .goui-toolbar.goui-cardmenu.main-menu {
 	background-color: $colorMain;

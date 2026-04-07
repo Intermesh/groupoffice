@@ -42,7 +42,7 @@
   },
   "references": [
     { "path": "./tsconfig.json" },
-    { "path": "../../../../../../views/goui/" }
+    { "path": "../../../../../../views/goui/groupoffice-core/tsconfig.json" }
   ]
 
 //  "references": [
