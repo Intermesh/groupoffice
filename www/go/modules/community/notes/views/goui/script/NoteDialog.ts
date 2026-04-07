@@ -2,7 +2,7 @@ import {
 	btn,
 	Button,
 	comp,
-	fieldset,
+	fieldset, hiddenfield,
 	HtmlField,
 	htmlfield,
 	Notifier,
@@ -42,6 +42,7 @@ export class NoteDialog extends FormWindow<Note> {
 
 		this.generalTab.cls = "fit";
 		this.generalTab.items.add(
+			hiddenfield({name: "tmpFiles"}), //savemailas module uses this.
 			fieldset({cls: " fit vbox gap"},
 				comp({cls: "hbox gap"},
 					textfield({
@@ -52,7 +53,8 @@ export class NoteDialog extends FormWindow<Note> {
 					}),
 
 					notebookcombo({
-						width: 240
+						width: 240,
+						value: client.user.notesSettings.defaultNoteBookId,
 					}),
 					encryptBtn
 				),

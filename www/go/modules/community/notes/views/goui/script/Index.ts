@@ -5,6 +5,8 @@ import {SettingsPanel} from "./SettingsPanel.js";
 import {NoteDialog} from "./NoteDialog";
 import {NoteDetail} from "./NoteDetail";
 
+export * from "./NoteDialog";
+
 modules.register({
 	package: "community",
 	name: "notes",
