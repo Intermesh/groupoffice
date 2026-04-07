@@ -1,3 +1,4 @@
+07-04-2026: 6.8.163
 - Workflow: make permissions depend on mayManage
 - Core: log error in apache log when token invalid
 - Files: fix 'Move to trash' in tree context menu
