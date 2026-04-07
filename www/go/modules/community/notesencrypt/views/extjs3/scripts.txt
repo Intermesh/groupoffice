@@ -1,3 +1,0 @@
-Functions.js
-NoteDialogOverride.js
-NoteDetailOverride.js
