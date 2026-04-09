@@ -25,7 +25,7 @@ foreach($mods as $mod) {
 	];
 
 	if($gouiScript->exists()) {
-		$r['entry'] = $baseUrl . $gouiScript->getRelativePath(go()->getEnvironment()->getInstallFolder()) . '?v='. go()->getVersion();
+		$r['entry'] = $baseUrl . $gouiScript->getRelativePath(go()->getEnvironment()->getInstallFolder());
 	}
 	$response['modules'][] = $r;
 }

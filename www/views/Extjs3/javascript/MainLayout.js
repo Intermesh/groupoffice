@@ -81,8 +81,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	 */
 	boot : async function() {
 
-		window.GOUI = await import(BaseHref + "node_modules/@intermesh/goui/dist/index.js?v=" + GO.version);
-		window.groupofficeCore = await import(BaseHref + "views/goui/groupoffice-core/dist/index.js?v=" + GO.version);
+		window.GOUI = await import("@intermesh/goui");
+		window.groupofficeCore = await import("@intermesh/groupoffice-core");
 
 		var me = this;
 		go.browserStorage.connect().finally(function() {

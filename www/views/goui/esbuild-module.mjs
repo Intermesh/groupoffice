@@ -74,7 +74,8 @@ const ctx = await esbuild.context({
 	target: "esnext",
 	minify: !watch,
 	outdir: "dist",
-	plugins: [moduleResolverPlugin],
+	external: ["@intermesh/*"],
+	// plugins: [moduleResolverPlugin],
 	logLevel: "info"
 });
 

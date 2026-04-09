@@ -8,6 +8,27 @@
 			var BaseHref = "/";
     </script>
 
+<!--    <script type="importmap">-->
+<!--        {-->
+<!--            "imports": {-->
+<!--                "@intermesh/goui": "/node_modules/@intermesh/goui/dist/index.js?v=TODO",-->
+<!--                "@intermesh/groupoffice-core": "/node_modules/@intermesh/groupoffice-core/dist/index.js?v=TODO"-->
+<!--            }-->
+<!--        }-->
+<!--    </script>-->
+
+
+    <script>
+			fetch('go/modules/community/main/importmap.php')
+				.then(res => res.json())
+				.then(map => {
+					const script = document.createElement('script');
+					script.type = 'importmap';
+					script.textContent = JSON.stringify(map);
+					document.head.appendChild(script);
+				});
+    </script>
+
     <script src="views/Extjs3/javascript/ext-base-debug.js"></script>
     <script src="views/Extjs3/javascript/ext-all-debug.js"></script>
     <script src="views/Extjs3/lang.php"></script>
