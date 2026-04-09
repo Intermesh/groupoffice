@@ -29,11 +29,13 @@ sync_repo "git@github.com:Intermesh/groupoffice-core.git"
 cd  groupoffice-core
 git checkout develop
 npm install
+npm link @intermesh/goui
 npm link
 
 
 echo "Linking @intermesh/goui and @intermesh/groupoffice-core in groupoffice"
 cd ../../www
+npm ci
 npm link @intermesh/goui @intermesh/groupoffice-core
 
 echo Done
