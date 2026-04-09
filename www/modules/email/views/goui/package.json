@@ -11,7 +11,7 @@
   "scripts": {
     "start email": "npm run build:clean && concurrently --kill-others \"npm run start:ts\" \"npm run start:dts\"",
     "start:ts": "node ../../../../views/goui/esbuild-module.mjs watch",
-    "start:sass": "npx sass --watch style:dist",
+    "start:sass": "npx sass --load-path=$(npm root) --watch style:dist",
     "start:dts": "npx tsc --emitDeclarationOnly --declaration --watch",
 
     "build": "npm run build:clean && npm run build:ts",
