@@ -26,6 +26,13 @@
 					script.type = 'importmap';
 					script.textContent = JSON.stringify(map);
 					document.head.appendChild(script);
+
+
+                    const script2 = document.createElement('script');
+                    script2.type = 'module';
+                    script2.src = 'go/modules/community/main/views/goui/dist/Index.js';
+                    document.head.appendChild(script2);
+
 				});
     </script>
 
@@ -35,7 +42,7 @@
     <script src="go/modules/community/main/legacyscripts.php"></script>
 
 
-    <script type="module" src="go/modules/community/main/views/goui/dist/Index.js"></script>
+<!--    <script type="module" src="go/modules/community/main/views/goui/dist/Index.js"></script>-->
 
     <meta name="theme-color" content="#000">
     <meta name="viewport" content="width=device-width, initial-scale=1">
