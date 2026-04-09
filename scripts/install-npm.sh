@@ -35,7 +35,7 @@ done
 function buildGOUI() {
   echo BUILDING node modules inside "$1"...
   cd $DIR;
-  for line in $(find $1 -path */goui/package.json -not -path '*/node_modules/*');
+  for line in $(find $1 -path '*/goui/package.json' -not -path '*/node_modules/*');
   do
     local NODE_DIR="$(dirname "${line}")";
     echo "BUILD:" $NODE_DIR;

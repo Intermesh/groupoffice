@@ -8,12 +8,12 @@
     "typescript": "5.9.*"
   },
   "scripts": {
-    "start wopi": "npm run build:clean && npm run build:assets && concurrently --kill-others \"npm run start:ts\"  \"npm run start:dts\"  \"npm run start:sass\"",
+    "start wopi": "npm run build:assets && concurrently --kill-others \"npm run start:ts\"  \"npm run start:dts\"  \"npm run start:sass\"",
     "start:ts": "node ../../../../../../views/goui/esbuild-module.mjs watch",
     "start:dts": "npx tsc -b --declaration --emitDeclarationOnly --watch",
     "start:sass": "npx sass --load-path=$(npm root) --watch style:dist",
 
-    "build": "npm run build:clean && npm run build:assets && npm run build:ts",
+    "build": "npm run build:assets && npm run build:ts",
     "build:assets": "copyfiles -u 2 ./style/resources/*.* ./dist/resources",
     "build:clean": "rm -rf ./dist/*",
     "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",

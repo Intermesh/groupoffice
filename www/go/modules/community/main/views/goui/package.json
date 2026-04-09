@@ -11,11 +11,11 @@
   "scripts": {
     "electron": "npm run build && electron dist/Electron.js",
 
-    "start main": "npm run build:clean && concurrently --kill-others \"npm run start:ts\"  \"npm run start:sass\"",
+    "start main": "concurrently --kill-others \"npm run start:ts\"  \"npm run start:sass\"",
     "start:ts": "node ../../../../../../views/goui/esbuild-module.mjs watch",
     "start:sass": "npx sass --load-path=$(npm root) --watch style:dist",
 
-    "build": "npm run build:clean && npm run build:sass && npm run build:ts && npm run build:electron",
+    "build": "npm run build:sass && npm run build:ts && npm run build:electron",
     "build:clean": "rm -rf ./dist/*",
     "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
     "build:sass": "npx sass --update --load-path=$(npm root) --style=compressed --no-source-map style:dist",

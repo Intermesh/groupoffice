@@ -16,12 +16,12 @@
   },
 
   "scripts": {
-    "start comments": "npm run build:clean && concurrently --kill-others \"npm run start:esbuild\" \"npm run start:sass\" \"npm run start:dts\"",
+    "start comments": "concurrently --kill-others \"npm run start:esbuild\" \"npm run start:sass\" \"npm run start:dts\"",
     "start:esbuild": "node ../../../../../../views/goui/esbuild-module.mjs watch",
     "start:sass": "npx sass --load-path=$(npm root) --watch style:dist",
     "start:dts": "npx tsc --declaration --emitDeclarationOnly --watch",
 
-    "build": "npm run build:clean && npm run build:sass && npm run build:ts",
+    "build": "npm run build:sass && npm run build:ts",
     "build:clean": "rm -rf ./dist/*",
     "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
     "build:sass": "npx sass  --load-path=$(npm root) --style=compressed --no-source-map style:dist",
