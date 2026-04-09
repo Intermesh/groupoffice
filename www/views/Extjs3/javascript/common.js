@@ -204,7 +204,7 @@ GO.url = function(relativeUrl, params){
 	if(!relativeUrl && !params)
 		return BaseHref;
 	
-	var url = BaseHref+'index.php?r='+relativeUrl+'&security_token='+GO.securityToken;
+	var url = BaseHref+'legacy.php?r='+relativeUrl+'&security_token='+GO.securityToken;
 	if(params){
 		for(var name in params){
 			url += '&'+name+'='+encodeURIComponent(params[name]);

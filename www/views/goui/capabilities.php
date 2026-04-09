@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__DIR__, 4) . '/vendor/autoload.php');
+require_once(dirname(__DIR__, 2) . '/vendor/autoload.php');
 use go\core\App;
 use go\core\http\Response;
 use go\core\model\Module;
@@ -8,7 +8,7 @@ App::get();
 
 $mods = Module::find();
 
-$baseUrl = dirname(\go\core\http\Request::get()->getPath(), 5) . '/';
+$baseUrl = \go\core\http\Request::get()->getPath(). '/';
 
 $response = [
 	'title' => go()->getSettings()->title,

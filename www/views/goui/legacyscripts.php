@@ -1,8 +1,8 @@
 <?php
 
 
-$dir = dirname(__FILE__, 5) . DIRECTORY_SEPARATOR;
-require($dir . 'GO.php');
+//$dir = dirname(__FILE__, 5) . DIRECTORY_SEPARATOR;
+require('../../GO.php');
 
 \go\core\App::get();
 

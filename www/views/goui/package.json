@@ -1,23 +1,22 @@
 {
-  "name": "community-main",
+  "name": "goui-main",
   "type": "module",
   "devDependencies": {
     "concurrently": "latest",
     "esbuild": "latest",
     "sass": "latest",
-    "typescript": "5.9.*",
-    "electron": "^39.1.1"
+    "typescript": "5.9.*"
   },
   "scripts": {
     "electron": "npm run build && electron dist/Electron.js",
 
     "start main": "concurrently --kill-others \"npm run start:ts\"  \"npm run start:sass\"",
-    "start:ts": "node ../../../../../../views/goui/esbuild-module.mjs watch",
+    "start:ts": "node ./esbuild-module.mjs watch",
     "start:sass": "npx sass --load-path=$(npm root) --watch style:dist",
 
     "build": "npm run build:sass && npm run build:ts && npm run build:electron",
     "build:clean": "rm -rf ./dist/*",
-    "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
+    "build:ts": "node ./esbuild-module.mjs",
     "build:sass": "npx sass --update --load-path=$(npm root) --style=compressed style:dist",
     "build:dts": "npx tsc --declaration --emitDeclarationOnly",
     "build:electron": "npx esbuild ./script/Electron.ts --legal-comments=none --outdir=dist --platform=node",

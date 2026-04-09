@@ -2,6 +2,7 @@
   "name": "groupoffice",
   "private": true,
   "workspaces": [
+    "views/goui",
     "promodules/*/views/goui",
     "go/modules/community/*/views/goui",
     "go/modules/business/*/views/goui"

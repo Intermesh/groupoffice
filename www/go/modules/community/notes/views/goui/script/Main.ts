@@ -5,6 +5,7 @@ import {
 	checkboxselectcolumn,
 	column,
 	comp,
+	Component,
 	EntityID,
 	h3,
 	hr,
@@ -23,13 +24,12 @@ import {NoteBookDialog} from "./NoteBookDialog";
 import {NoteGrid} from "./NoteGrid";
 import {NoteDetail} from "./NoteDetail";
 import {NoteDialog} from "./NoteDialog";
-import {noteBookDS, noteDS} from "./Index.js";
+import {noteBookDS} from "./Index.js";
 
-export class Main extends MainThreeColumnPanel {
+export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail> {
 	private noteBookGrid!: NoteBookGrid;
 	private noteGrid!: NoteGrid;
 	private noteGridToolbar!: Toolbar;
-	protected east!: NoteDetail;
 	private addButton!: Button;
 
 	constructor() {

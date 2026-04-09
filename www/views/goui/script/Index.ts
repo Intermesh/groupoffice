@@ -1,8 +1,7 @@
 import {root} from "@intermesh/goui";
 import {authManager, client, customFields, main, modules, router} from "@intermesh/groupoffice-core";
 
-// Todo, make this configurable or auto load?
-client.uri = "/api/";
+client.uri = BaseHref + "api/";
 
 
 // Loads all module scripts before authentication
