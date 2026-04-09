@@ -20,6 +20,7 @@
     "build:sass": "npx sass --style=compressed style:dist",
     "build:dts": "npx tsc --emitDeclarationOnly --declaration",
 
-    "test": "npx tsc --noEmit"
+    "test": "npx tsc --noEmit",
+    "prepare": "npm run build"
   }
 }

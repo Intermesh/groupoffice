@@ -12,7 +12,8 @@ import fs from 'node:fs';
  *     "build:clean": "rm -rf ./dist/*",
  *     "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs build script/Index.ts,script/Participant.ts",
  *
- *     "test": "npx tsc --noEmit"
+ *     "test": "npx tsc --noEmit",
+    "prepare": "npm run build"
  *   }
  * @type {boolean}
  */

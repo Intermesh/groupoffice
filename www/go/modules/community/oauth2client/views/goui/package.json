@@ -19,7 +19,8 @@
     "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
     "build:dts": "npx tsc -b --declaration --emitDeclarationOnly",
     "build:sass": "npx sass --update --load-path=$(npm root) --style=compressed style:dist",
-    "test": "npx tsc --noEmit"
+    "test": "npx tsc --noEmit",
+    "prepare": "npm run build"
   },
   "dependencies": {
     "copyfiles": "^2.4.1"

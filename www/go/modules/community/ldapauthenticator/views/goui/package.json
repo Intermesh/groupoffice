@@ -16,6 +16,7 @@
     "build:clean": "rm -rf ./dist/*",
     "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
     "build:dts": "npx tsc -b --declaration --emitDeclarationOnly",
-    "test": "npx tsc --noEmit"
+    "test": "npx tsc --noEmit",
+    "prepare": "npm run build"
   }
 }

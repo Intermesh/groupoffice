@@ -20,11 +20,17 @@ mkdir -p links
 cd  links
 
 sync_repo "git@github.com:Intermesh/goui.git"
+cd goui
+npm link
+
+cd ..
 sync_repo "git@github.com:Intermesh/groupoffice-core.git"
+cd  groupoffice-core
+npm link
 
 
 echo "Linking @intermesh/goui and @intermesh/groupoffice-core in groupoffice"
-cd ../www
+cd ../../www
 npm link @intermesh/goui @intermesh/groupoffice-core
 
 echo Done

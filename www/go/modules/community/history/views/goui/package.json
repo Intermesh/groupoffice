@@ -16,12 +16,13 @@
     "start:esbuild": "node ../../../../../../views/goui/esbuild-module.mjs watch",
     "start:sass": "npx sass --load-path=$(npm root) --watch style:dist",
 
-    "build": "npm run build:sass && npm run build:ts",
+    "build": "npm run build:sass && npm run build:ts && npm run build:dts",
     "build:clean": "rm -rf ./dist/*",
     "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
     "build:sass": "npx sass --update --load-path=$(npm root) --style=compressed style:dist",
     "build:dts": "npx tsc -b --declaration --emitDeclarationOnly --verbose",
 
-    "test": "npx tsc --noEmit"
+    "test": "npx tsc --noEmit",
+    "prepare": "npm run build"
   }
 }
