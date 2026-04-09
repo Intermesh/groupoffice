@@ -5,8 +5,5 @@
     "outDir": "./dist",
     //needed to be inside dist because it must be cleaned up before building
     "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo"
-  },
-  "references": [
-    { "path": "../../../../../../views/goui/groupoffice-core/tsconfig.json" }
-  ]
+  }
 }
