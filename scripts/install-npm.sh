@@ -76,14 +76,14 @@ function buildAndInstallGOUIExceptCommunityAndBusiness() {
 }
 
 
-echo "Building GOUI shared libs"
-cd $DIR;
-cd ./www/views/goui/groupoffice-core
-npm run build
-if [ "$IS_DEV" == "true" ]; then
-  npm run build:dts
-fi
-echo "DONE";
+#echo "Building GOUI shared libs"
+#cd $DIR;
+#cd ./www/views/goui/groupoffice-core
+#npm run build
+#if [ "$IS_DEV" == "true" ]; then
+#  npm run build:dts
+#fi
+#echo "DONE";
 
 cd $DIR;
 

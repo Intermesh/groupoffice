@@ -11,6 +11,6 @@
     "rootDir": "script"
   },
   "references": [
-    { "path": "../../../../../../views/goui/groupoffice-core/tsconfig.json" },
+
   ]
 }

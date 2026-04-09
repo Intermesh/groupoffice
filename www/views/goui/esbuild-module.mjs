@@ -24,59 +24,59 @@ const legacy = process.env.INIT_CWD.indexOf('go/modules') === -1;
 
 const entryPoints = process.argv.length > 3 ? process.argv[3].split(",") : ['script/Index.ts'];
 
-
-let version, chdir = legacy ? "../../../../" : "../../../../../../";
-const data = fs.readFileSync(chdir + "version.php", 'utf8');
-version = data.match(/\d+\.\d+\.\d+/)
-console.log(version[0]);
-
-//First I used this plugin to resolve paths: https://github.com/Awalgawe/esbuild-typescript-paths-plugin/tree/main/src
-//But this seems much simpler and give more control. It must align with tsconfig.module.js though.
-const moduleResolverPlugin = {
-
- 	name: "module-resolve",
-
-	setup(build) {
-		build.onResolve({ filter: new RegExp("@intermesh\/.*")}, args => {
-
-				if(args.path === "@intermesh/groupoffice-core") {
-					return {
-						external: true,
-						path: "../../../../../../../views/goui/groupoffice-core/dist/index.js?v=" + version[0]
-					}
-				} else if(args.path === "@intermesh/goui") {
-					return {
-						external: true,
-						path: "../../../../../../../node_modules/@intermesh/goui/dist/index.js?v=" + version[0]
-					}
-				}
-
-			const parts = args.path.replace("-", "/").split("/");
-
-			// import is a module. eg. @intermesh/community/calendar
-			const pkg = legacy ? "go/modules/" + parts[1] : parts[1], module = parts[2];
-
-			return {
-				external: true,
-				path: "../../../../../" + pkg + "/" + module + "/views/goui/dist/Index.js?v=" + version[0]
-			}
-
-
-		});
-	}
-}
+//
+// let version, chdir = legacy ? "../../../../" : "../../../../../../";
+// const data = fs.readFileSync(chdir + "version.php", 'utf8');
+// version = data.match(/\d+\.\d+\.\d+/)
+// console.log(version[0]);
+//
+// //First I used this plugin to resolve paths: https://github.com/Awalgawe/esbuild-typescript-paths-plugin/tree/main/src
+// //But this seems much simpler and give more control. It must align with tsconfig.module.js though.
+// const moduleResolverPlugin = {
+//
+//  	name: "module-resolve",
+//
+// 	setup(build) {
+// 		build.onResolve({ filter: new RegExp("@intermesh\/.*")}, args => {
+//
+// 				if(args.path === "@intermesh/groupoffice-core") {
+// 					return {
+// 						external: true,
+// 						path: "../../../../../../../views/goui/groupoffice-core/dist/index.js?v=" + version[0]
+// 					}
+// 				} else if(args.path === "@intermesh/goui") {
+// 					return {
+// 						external: true,
+// 						path: "../../../../../../../node_modules/@intermesh/goui/dist/index.js?v=" + version[0]
+// 					}
+// 				}
+//
+// 			const parts = args.path.replace("-", "/").split("/");
+//
+// 			// import is a module. eg. @intermesh/community/calendar
+// 			const pkg = legacy ? "go/modules/" + parts[1] : parts[1], module = parts[2];
+//
+// 			return {
+// 				external: true,
+// 				path: "../../../../../" + pkg + "/" + module + "/views/goui/dist/Index.js?v=" + version[0]
+// 			}
+//
+//
+// 		});
+// 	}
+// }
 
 const ctx = await esbuild.context({
 	entryPoints: entryPoints,
 	bundle: true,
 	sourcemap: true,
 	format: "esm",
-	target: "esnext",
+	target: "es2022",
 	minify: !watch,
 	outdir: "dist",
 	external: ["@intermesh/*"],
 	// plugins: [moduleResolverPlugin],
-	logLevel: "info"
+	// logLevel: "info"
 });
 
 if(watch) {
