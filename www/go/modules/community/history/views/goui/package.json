@@ -8,7 +8,7 @@
     "concurrently": "latest",
     "esbuild": "latest",
     "sass": "latest",
-    "typescript": "latest"
+    "typescript": "5.9.x"
   },
 
   "scripts": {
