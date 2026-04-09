@@ -6,6 +6,7 @@
 - Workflow: make permissions depend on mayManage
 - Core: log error in apache log when token invalid
 - Files: fix 'Move to trash' in tree context menu
+- Billing: Fixed type error in billing when duplicating orders
 
 
 02-04-2026: 26.0.20
