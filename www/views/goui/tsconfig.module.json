@@ -1,54 +1,22 @@
 {
   "compilerOptions": {
-    "strict" : true,
+    "strict": true,
     "target": "es2020",
     "sourceMap": true,
-    "lib": ["es2020", "dom"],
+    "lib": [
+      "es2020",
+      "dom"
+    ],
     "moduleResolution": "bundler",
-    "module":"preserve",
+    "module": "preserve",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "outDir": "./dist", //set this in the extended
-    "baseUrl": ".", //set this in the extended too,
+    "outDir": "./dist",
+    //set this in the extended
+    "baseUrl": ".",
+    //set this in the extended too,
     "skipLibCheck": true,
-    "declaration": true,
-//    "paths": {
-//      "@intermesh/goui": [
-//        //d.ts files are also required for the GroupOffice modules in GOUI. Without them they will compile all GOUI files too
-////        "../../../../../../views/goui/dist/goui/script/index.d.ts",
-//        "../../../../../../views/goui/goui/script/index.ts"
-//      ],
-//
-//      "@intermesh/groupoffice-core": [
-////        "../../../../../../views/goui/dist/groupoffice-core/script/index.d.ts",
-//        "../../../../../../views/goui/groupoffice-core/script/index.ts"
-//      ],
-//
-//      "chart.js/auto": [
-//        "../../../../../../views/goui/groupoffice-core/node_modules/chart.js/auto/auto.d.ts"
-//      ],
-//
-//      "@intermesh/business/*": [
-////        "../../../../../../go/modules/business/*/views/goui/dist/Index.d.ts",
-//        "../../../../../../go/modules/business/*/views/goui/script/Index.ts"
-//      ],
-//
-//      "@intermesh/community/*": [
-////        "../../../../../../go/modules/community/*/views/goui/dist/Index.d.ts",
-//        "../../../../../../go/modules/community/*/views/goui/script/Index.ts"
-//      ]
-//    }
-  },
-  "references": [
-    { "path": "./tsconfig.json" },
-    { "path": "../../../../../../views/goui/groupoffice-core/tsconfig.json" }
-  ]
-
-//  "references": [
-//    { "path": "../../../../../../views/goui/goui" },
-//    { "path": "../../../../../../views/goui/groupoffice-core" },
-//    { "path": "../../../../../../go/modules/business/*/views/goui/script/Index.ts"},
-//    { "path": "../../../../../../go/modules/community/*/views/goui/script/Index.ts"}
-//  ]
+    "declaration": true
+  }
 }
