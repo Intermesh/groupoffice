@@ -25,7 +25,8 @@ foreach($mods as $mod) {
 	];
 
 	if($gouiScript->exists()) {
-		$r['entry'] = $baseUrl . $gouiScript->getRelativePath(go()->getEnvironment()->getInstallFolder());
+		// @intermesh/addressbook-main is revolved via an importmap
+		$r['entry'] =  "@intermesh/" . $mod->package . "-" . $mod->name; //$baseUrl . $gouiScript->getRelativePath(go()->getEnvironment()->getInstallFolder());
 	}
 	$response['modules'][] = $r;
 }

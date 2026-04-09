@@ -8,9 +8,11 @@ App::get();
 
 $baseUrl = dirname(\go\core\http\Request::get()->getPath(), 5) . '/';
 
+$gouiScript = $baseUrl . "node_modules/@intermesh/goui/dist/index.js";
+$coreScript = $baseUrl . "node_modules/@intermesh/groupoffice-core/dist/index.js";
 $importMap = [
-	"@intermesh/goui" => $baseUrl . "node_modules/@intermesh/goui/dist/index.js?v=TODO",
-	"@intermesh/groupoffice-core" => $baseUrl . "node_modules/@intermesh/groupoffice-core/dist/index.js?v=TODO"
+	"@intermesh/goui" => $gouiScript ."?v=" . filemtime("../../../.." . $gouiScript),
+	"@intermesh/groupoffice-core" => $coreScript . "?v=" . filemtime("../../../.." . $coreScript)
 ];
 
 $mods = Module::find();
@@ -19,7 +21,7 @@ foreach($mods as $mod) {
 	$gouiScript = $mod->module()->getFolder()->getFile("views/goui/dist/Index.js");
 
 	if($gouiScript->exists()) {
-		$importMap["@intermesh/" . $mod->package ."-" . $mod->name] = $baseUrl . $gouiScript->getRelativePath(go()->getEnvironment()->getInstallFolder());
+		$importMap["@intermesh/" . $mod->package ."-" . $mod->name] = $baseUrl . $gouiScript->getRelativePath(go()->getEnvironment()->getInstallFolder()) ."?v=" . $gouiScript->getModifiedAt()->format("U");
 	}
 }
 
