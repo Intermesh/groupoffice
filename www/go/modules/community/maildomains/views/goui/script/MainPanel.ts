@@ -17,9 +17,8 @@ import {DomainTable} from "./DomainTable.js";
 import {DomainDialog} from "./DomainDialog.js";
 import {DomainDetail} from "./DomainDetail.js";
 
-export class MainPanel extends MainThreeColumnPanel {
+export class MainPanel extends MainThreeColumnPanel<Component, DomainDetail> {
 
-		protected center!: DomainDetail;
     protected createEast(): Component {
 	    return comp({
 		    width: 260,
