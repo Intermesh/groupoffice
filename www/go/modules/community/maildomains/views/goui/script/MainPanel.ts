@@ -27,7 +27,7 @@ export class MainPanel extends MainThreeColumnPanel<Component, DomainDetail> {
 		    hidden: true
 	    })
     }
-    protected createCenter(): Component {
+    protected createCenter() {
 	    const detail = new DomainDetail();
 
 	    detail.itemId = "detail";
@@ -37,7 +37,7 @@ export class MainPanel extends MainThreeColumnPanel<Component, DomainDetail> {
 	    detail.toolbar.items.insert(0,this.showCenterButton());
 	    return detail;
     }
-    protected createWest(): Component {
+    protected createWest() {
 
 	    this.tbl = new DomainTable();
 			this.tbl.stateId = "maildomains-table";

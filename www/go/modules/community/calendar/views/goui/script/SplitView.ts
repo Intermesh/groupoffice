@@ -7,7 +7,6 @@ import {jmapds} from "@intermesh/groupoffice-core";
 
 export class SplitView extends MonthView {
 
-	start!: DateTime
 	calRows: [string, HTMLElement][] = []
 	calViewModel : {[calId:string]: CalendarItem[]} = {}
 	baseCls = 'cal split'
