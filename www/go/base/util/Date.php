@@ -68,13 +68,13 @@ class Date {
 	/**
 	 * Returns true if the time is a holiday or in the weekend
 	 *
-	 * @param Date $time
+	 * @param int $time
 	 * @param ?string $region
 	 * @return bool
 	 * @throws \Exception
 	 * @deprecated
 	 */
-	public static function is_on_free_day(Date $time, ?string $region=null): bool
+	public static function is_on_free_day(int $time, ?string $region=null): bool
 	{
 		$weekday = date('w', $time);
 		if ($weekday==6 || $weekday==0) {
