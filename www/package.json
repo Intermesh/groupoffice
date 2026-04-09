@@ -1,5 +1,5 @@
 {
-  "name": "group-office",
+  "name": "groupoffice",
   "private": true,
   "workspaces": [
     "views/goui",

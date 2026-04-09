@@ -1,7 +1,8 @@
 import {
-	btn, Button,
+	btn,
+	Button,
 	comp,
-	fieldset,
+	fieldset, hiddenfield,
 	HtmlField,
 	htmlfield,
 	Notifier,
@@ -9,7 +10,8 @@ import {
 	t,
 	tbar,
 	TextField,
-	textfield, Toolbar, Window
+	textfield,
+	Toolbar
 } from "@intermesh/goui";
 import {client, customFields, FormFieldset, FormWindow, Image} from "@intermesh/groupoffice-core";
 import {notebookcombo} from "./NoteBookCombo";
@@ -40,6 +42,7 @@ export class NoteDialog extends FormWindow<Note> {
 
 		this.generalTab.cls = "fit";
 		this.generalTab.items.add(
+			hiddenfield({name: "tmpFiles"}), //savemailas module uses this.
 			fieldset({cls: " fit vbox gap"},
 				comp({cls: "hbox gap"},
 					textfield({
@@ -50,7 +53,8 @@ export class NoteDialog extends FormWindow<Note> {
 					}),
 
 					notebookcombo({
-						width: 240
+						width: 240,
+						value: client.user.notesSettings.defaultNoteBookId,
 					}),
 					encryptBtn
 				),

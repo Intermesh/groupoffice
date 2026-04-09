@@ -1797,9 +1797,23 @@ $updates['202510301100'][] = "ALTER TABLE `core_alert` ADD COLUMN `isSent` TINYI
 $updates['202510301100'][] = "alter table core_alert
                          add createdBy varchar(60) null after entityId";
 
-$updates['202510301100'][] = "alter table core_alert
+
+
+$updates['202510301100'][] = function() {
+
+	go()->getDbConnection()->exec("ALTER TABLE core_alert 
+  CONVERT TO CHARACTER SET utf8mb4 
+  COLLATE utf8mb4_unicode_ci;");
+
+	try {
+
+		go()->getDbConnection()->exec("alter table core_alert
                          add constraint core_alert_core_principal_id_fk
                              foreign key (createdBy) references core_principal (id)
-                                 on delete set null";
+                                 on delete set null");
+	} catch(Throwable $e) {
+		echo "ERROR: " . $e->getMessage() ."\n\n";
+	}
+};
 
 $updates['202601151348'][] = "update core_email_template_attachment set attachment=0 where inline=1;";

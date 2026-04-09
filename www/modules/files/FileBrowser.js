@@ -1528,7 +1528,6 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 				},
 				count: 1,
 				callback: function (responseParams) {
-
 					if (responseParams.success) {
 						const treeNode = this.treePanel.getNodeById(records[0].data.id);
 						if (treeNode) {
@@ -1576,7 +1575,33 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 	onMoveToTrash: function (clickedAt) {
 		if (clickedAt === 'tree') {
-			// TODO?
+			const records = this.getSelectedTreeRecords(),
+
+				params = {
+				deleteParam: "trash_keys"
+			}, me = this;
+			params["trash_keys"] = Ext.encode([records[0].data.type_id]);
+
+			let deleteItemsConfig = {
+				store: this.gridStore,
+				params: params,
+				count: 1,
+				callback: function (responseParams) {
+					const treeNode = me.treePanel.getNodeById(records[0].data.id);
+					if (treeNode) {
+						//parentNode is destroyed after remove so keep it for later use
+						const parentNodeId = treeNode.parentNode.id;
+						treeNode.remove();
+
+						const activeTreenode = me.treePanel.getNodeById(me.folder_id);
+						if (!activeTreenode) {
+							//current folder must have been removed. Let's go up.
+							this.setFolderID(parentNodeId);
+						}
+					}
+				}
+			};
+			GO.deleteItems(deleteItemsConfig);
 		} else {
 			//detect grid on selModel. thumbs doesn't have that
 			if (this.cardPanel.getLayout().activeItem.id === this.gridPanel.id) {

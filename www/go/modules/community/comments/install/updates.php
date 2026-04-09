@@ -202,7 +202,19 @@ $updates['202507011010'][] = "alter table comments_comment
 
 
 
-$updates['202507011010'][] = "alter table comments_comment
+$updates['202507011010'][] = function() {
+
+	go()->getDbConnection()->exec("ALTER TABLE comments_comment 
+  CONVERT TO CHARACTER SET utf8mb4 
+  COLLATE utf8mb4_unicode_ci;");
+
+	try {
+
+		go()->getDbConnection()->exec("alter table comments_comment
     add constraint fk_comments_comment_core_user1
         foreign key (createdBy) references core_principal (id)
-            on delete set null;";
+            on delete set null;");
+	} catch(Throwable $e) {
+		echo "ERROR: " . $e->getMessage() ."\n\n";
+	}
+};

@@ -890,6 +890,11 @@ export class CalendarItem {
 				update.recurrenceOverrides = patchRecurrenceOverrides;
 			}
 
+			eventDS.on('statemismatch', p => {
+				onFinish?.()
+				return false;
+			},{once:true})
+
 			eventDS.update(this.data.id, update); // set until on original
 
 			const next = Object.assign({},

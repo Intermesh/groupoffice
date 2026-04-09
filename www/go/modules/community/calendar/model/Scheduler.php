@@ -69,7 +69,6 @@ class Scheduler {
 
 
 		// needed so organizer can find last response
-		$event->createdAt = new DateTime();
 		$event->modifiedAt = new DateTime();
 		$ics = ICalendarHelper::toInvite('REPLY', $event);
 
