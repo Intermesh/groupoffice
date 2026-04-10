@@ -3,18 +3,38 @@ import {
 	AclOwnerEntity,
 	appSystemSettings,
 	client,
-	JmapDataSource,
+	JmapDataSource, modules,
 	moduleSettings
 } from "@intermesh/groupoffice-core";
 import {Settings} from "./Settings.js";
 import {UserAddressbookSettingsPanel} from "./UserAddressbookSettingsPanel.js";
 import {UserProfileSettingsPanel} from "./UserProfileSettingsPanel.js";
-import {BaseEntity, translate} from "@intermesh/goui";
+import {BaseEntity, router, t, translate} from "@intermesh/goui";
+import {Main} from "./Main.js";
 
 export * from "./AddressBookCombo.js";
 export * from "./ContactCombo.js";
 
 translate.load(GO.lang.community.addressbook, "community", "addressbook");
+
+client.on("authenticated", ({session}) => {
+	if (session.isAdmin) {
+		appSystemSettings.addPanel("community", "addressbook", Settings);
+	}
+
+	router.add(/^addressbook\/(\d+)$/, () => {
+		modules.openMainPanel("addressbook");
+		// todo show contact
+	});
+
+	modules.addMainPanel("community", "addressbook", "addressbook", t("Address book"), () => {
+		return new Main();
+	});
+
+	moduleSettings.addPanel(UserAddressbookSettingsPanel);
+	moduleSettings.addPanel(UserProfileSettingsPanel);
+});
+
 
 export interface AddressBook extends AclOwnerEntity {
 	name: string;
@@ -58,16 +78,6 @@ interface ContactUrl {
 	type: string;
 	url: string;
 }
-
-client.on("authenticated", ({session}) => {
-
-	if (session.isAdmin) {
-		appSystemSettings.addPanel("community", "addressbook", Settings);
-	}
-
-	moduleSettings.addPanel(UserAddressbookSettingsPanel);
-	moduleSettings.addPanel(UserProfileSettingsPanel);
-});
 
 export const addressBookDS = new JmapDataSource<AddressBook>("AddressBook");
 export const contactDS = new JmapDataSource<Contact>("Contact");
