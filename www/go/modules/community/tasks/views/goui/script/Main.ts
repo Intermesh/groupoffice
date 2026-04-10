@@ -45,6 +45,8 @@ export class Main extends MainThreeColumnPanel {
 	constructor() {
 		super("tasks");
 
+		this.setup(this.createCenter(), this.createWest(), this.createEast());
+
 		this.on("render", () => {
 			void this.taskListGrid.store.load();
 			void this.taskCategoryGrid.store.load();

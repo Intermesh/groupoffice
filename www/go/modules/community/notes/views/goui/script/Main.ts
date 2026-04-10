@@ -35,6 +35,8 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 	constructor() {
 		super("notes");
 
+		this.setup(this.createCenter(), this.createWest(), this.createEast());
+
 		this.on("render", async () => {
 			void this.noteBookGrid.store.load();
 		});
