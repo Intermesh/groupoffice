@@ -9,12 +9,12 @@ import {
 	t,
 	table
 } from "@intermesh/goui";
-import {AddressBookTable} from "./AddressBookTable.js";
+import {AddressBookGrid} from "./AddressBookGrid.js";
 import {addressBookDS} from "./Index";
 
-export class AddressBookCombo extends AutocompleteField<AddressBookTable> {
+export class AddressBookCombo extends AutocompleteField<AddressBookGrid> {
 
-	pickerRecordToValue(field: this, record: storeRecordType<listStoreType<AddressBookTable>>) {
+	pickerRecordToValue(field: this, record: storeRecordType<listStoreType<AddressBookGrid>>) {
 		return record.id;
 	}
 
