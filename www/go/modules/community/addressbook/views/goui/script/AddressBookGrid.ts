@@ -33,13 +33,7 @@ export class AddressBookGrid extends Table<DataSourceStore<JmapDataSource<Addres
 				id: "name",
 				resizable: true,
 				width: 312,
-				sortable: true,
-				htmlEncode: false,
-
-				// ?
-				// renderer: (value, record) => {
-				// 	return `<div>${value.htmlEncode()}</div>`;
-				// }
+				sortable: true
 			})
 		];
 

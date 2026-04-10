@@ -3,18 +3,19 @@ import {
 	column,
 	Config,
 	createComponent,
+	DataSourceStore,
 	datasourcestore,
 	listStoreType,
 	storeRecordType,
 	t,
+	Table,
 	table
 } from "@intermesh/goui";
-import {AddressBookGrid} from "./AddressBookGrid.js";
 import {addressBookDS} from "./Index";
 
-export class AddressBookCombo extends AutocompleteField<AddressBookGrid> {
+export class AddressBookCombo extends AutocompleteField<Table<DataSourceStore>> {
 
-	pickerRecordToValue(field: this, record: storeRecordType<listStoreType<AddressBookGrid>>) {
+	pickerRecordToValue(field: this, record: storeRecordType<listStoreType<Table<DataSourceStore>>>) {
 		return record.id;
 	}
 
@@ -42,10 +43,7 @@ export class AddressBookCombo extends AutocompleteField<AddressBookGrid> {
 					resizable: true,
 					width: 312,
 					sortable: true,
-					htmlEncode: false,
-					renderer: (value, record) => {
-						return `<div>${value.htmlEncode()}</div>`;
-					}
+					htmlEncode: true
 				})
 			]
 		}));

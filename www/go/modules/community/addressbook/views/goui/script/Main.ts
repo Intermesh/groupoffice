@@ -1,15 +1,19 @@
 import {filterpanel, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
-import {btn, checkbox, comp, Component, h3, radio, searchbtn, t, tbar} from "@intermesh/goui";
+import {btn, checkbox, comp, Component, h3, hr, menu, radio, searchbtn, t, tbar} from "@intermesh/goui";
 import {AddressBookGrid, addressbookgrid} from "./AddressBookGrid.js";
+import {contactgrid, ContactGrid} from "./ContactGrid.js";
 
 export class Main extends MainThreeColumnPanel {
 	private addressBookGrid!: AddressBookGrid;
+	private contactGrid!: ContactGrid;
 
 	constructor() {
 		super("addressbook");
 
 		this.on("render", async () => {
 			void this.addressBookGrid.store.load();
+
+			void this.contactGrid.store.load();
 		});
 	}
 
@@ -33,8 +37,26 @@ export class Main extends MainThreeColumnPanel {
 					{value: "contacts", text: t("Contacts"), icon: "person"}
 				],
 				listeners: {
-					change: () => {
-						// todo
+					change: ({newValue}) => {
+						this.contactGrid.store.clearFilter("org");
+						this.contactGrid.store.clearFilter("starred");
+
+						switch (newValue) {
+							case "orgs":
+								this.contactGrid.store.setFilter("org", {isOrganization: true});
+								break;
+							case "contacts":
+								this.contactGrid.store.setFilter("org", {isOrganization: false});
+								break;
+							case 'starred':
+								this.contactGrid.store.setFilter("starred", {starred: true});
+								break;
+						}
+
+						this.contactGrid.store.load();
+					},
+					render: (ev) => {
+						ev.target.value = "all";
 					}
 				}
 			}),
@@ -64,28 +86,136 @@ export class Main extends MainThreeColumnPanel {
 					}
 				})
 			),
+			// todo allow drop from contactGrid
 			this.addressBookGrid = addressbookgrid({
 				flex: 1,
 				cls: "no-row-lines",
 				rowSelectionConfig: {
 					multiSelect: true,
 					listeners: {
-						selectionchange: () => {
-							// todo
+						selectionchange: ({selected}) => {
+							const addressBookIds = selected.map((row) => row.record.id);
+
+							this.contactGrid.store.setFilter("addressbook", {
+								addressBookId: addressBookIds
+							});
+
+							void this.contactGrid.store.load();
 						}
 					}
 				}
 			}),
 			filterpanel({
 				flex: 1,
-				// store: , todo
+				store: this.contactGrid.store,
 				entityName: "Contact"
 			})
 		);
 	}
 
 	protected createCenter(): Component {
-		return comp({});
+		return comp({
+				cls: "vbox bg-lowest"
+			},
+			tbar({},
+				this.showWestButton(),
+				'->',
+				searchbtn({
+					listeners: {
+						input: ({text}) => {
+							this.contactGrid.store.setFilter("search", {text});
+							void this.contactGrid.store.load();
+						}
+					}
+				}),
+				btn({
+					icon: "add",
+					text: t("Add"),
+					handler: () => {
+						//todo
+					}
+				}),
+				btn({
+					icon: "more_vert",
+					menu: menu({
+							isDropdown: true
+						},
+						btn({
+							icon: "cloud_upload",
+							text: t("Import")
+						}),
+						btn({
+							icon: "cloud_download",
+							text: t("Export"),
+							menu: menu({
+									isDropdown: true
+								},
+								btn({
+									icon: "contact_mail",
+									text: t("vCard (Virtual Contact File)"),
+									handler: () => {
+										//todo
+									}
+								}),
+								btn({
+									icon: "unknown_document",
+									text: t("Microsoft Excel"),
+									handler: () => {
+										//todo
+									}
+								}),
+								btn({
+									icon: "html",
+									text: t("Web page") + " (HTML)",
+									handler: () => {
+										//todo
+									}
+								}),
+								btn({
+									icon: "text_snippet",
+									text: "JSON",
+									handler: () => {
+										//todo
+									}
+								}),
+								hr(),
+								btn({
+									icon: "print",
+									text: t("Labels"),
+									handler: () => {
+										//todo
+									}
+								})
+							)
+						}),
+						hr(),
+						btn({
+							icon: "merge",
+							text: t("Look for duplicates"),
+							handler: () => {
+								// todo
+							}
+						})
+					)
+				})
+			),
+			comp({
+					cls: "scroll bg-lowest",
+					flex: 1,
+				},
+				this.contactGrid = contactgrid({
+					stateId: "addressbook-contactgrid",
+					rowSelectionConfig: {
+						multiSelect: true, //todo merge toolbar
+						listeners: {
+							selectionchange: () => {
+								//todo
+							}
+						}
+					}
+				})
+			)
+		);
 	}
 
 	protected createEast(): Component {
