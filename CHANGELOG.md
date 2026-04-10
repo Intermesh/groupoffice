@@ -1,3 +1,6 @@
+09-04-2026: 26.0.22
+- Update GOUI version
+
 09-04-2026: 26.0.21
 - Calendar: State mismatch for this and future will cancel the creation
 - Comments / Core: Fixed some upgrade issues where table collation was incorrect
