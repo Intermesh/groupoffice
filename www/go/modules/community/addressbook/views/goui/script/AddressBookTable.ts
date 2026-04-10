@@ -1,5 +1,5 @@
-import {avatar, column, comp, DataSourceStore, datasourcestore, t, Table} from "@intermesh/goui";
-import {img, JmapDataSource, Principal, principalDS} from "@intermesh/groupoffice-core";
+import {column, DataSourceStore, datasourcestore, t, Table} from "@intermesh/goui";
+import {JmapDataSource} from "@intermesh/groupoffice-core";
 import {AddressBook, addressBookDS} from "./Index";
 
 export class AddressBookTable extends Table<DataSourceStore<JmapDataSource<AddressBook>, AddressBook>> {
@@ -10,11 +10,6 @@ export class AddressBookTable extends Table<DataSourceStore<JmapDataSource<Addre
 				limit: 20
 			},
 			sort: [{property: "name", isAscending: true}]
-			// filters: {
-			// 	isEmployee: {
-			// 		isEmployee: true
-			// 	}
-			// }
 		});
 
 		const columns = [
