@@ -8,5 +8,8 @@
     "promodules/*/views/goui",
     "go/modules/community/*/views/goui",
     "go/modules/business/*/views/goui"
-  ]
+  ],
+  "dependencies": {
+    "pdfjs-dist": "5.6.205"
+  }
 }
