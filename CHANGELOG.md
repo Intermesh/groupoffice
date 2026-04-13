@@ -1,4 +1,6 @@
-09-04-2026: 25.0.98
+- Files: Better validator for folder names for Windows compatibility
+
+- 09-04-2026: 25.0.98
 - Update GOUI version
 
 07-04-2026: 25.0.97
