@@ -11,4 +11,7 @@ return array (
   'Enable this if the SMTP server credentials are identical to the IMAP server.' => 'SMTP přihlašovací údaje jsou stejné jako pro IMAP',
   'User options' => 'Uživatelská nastavení',
   'IMAP Authenticator' => 'Ověření IMAP',
+  'Use a \'*\' to match all domains.' => 'Použijte \'*\' pro výběr všech domén.',
+  'Users must login with their full e-mail adress. Enable this option if the IMAP expects. the username without domain.' => 'Uživatelé se musí přihlásit kompletní e-mailovou adresou. Povolit tuto volbu, pokud IMAP očekává uživatelské jméno bez domény.',
+  'Use IMAP credentials' => 'Použít IMAP přihlášení',
 );

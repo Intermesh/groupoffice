@@ -15,4 +15,12 @@ return array (
   'Secret key for manual input' => 'Tajný klíč pro manuální vstup',
   'Verify' => 'Ověřit',
   'Scan the QR code below with the OTP Authenticator app on your mobile device, after that fill in the field below with the code generated in the app.' => 'Naskenujte kód pomocí OTP Authenticator na Vašem mobilním zařízení, poté vyplňte Váš vygenerovaný kód',
+  'Two Factor Authentication' => 'Dvoufaktorové ověřování',
+  'Setup one-time password authentication using an OTP application which generates a unique PIN for each login.' => 'Nastavit jednorázové ověření pomocí aplikace OTP, která generuje unikátní PIN pro každé přihlášení.',
+  'Enforce two factor authentication for users in a specific group' => 'Vynutit dvoufaktorové ověřování pro uživatele ve vybrané skupině',
+  'Block Group-Office usage until setup is done' => 'Znepřístupnit Group-Office až do dokončení nastavení.',
+  'Count down' => 'Odpočítávejte',
+  'Count down this number of seconds until the user can cancel the setup' => 'Uživatel bude moci nastavení zrušit, až po nastaveném počtu sekund',
+  'Your system administrator requires you to setup two factor authentication' => 'Váš správce vyžaduje, abyste si nastavili dvoufaktorové ověřování',
+  'Setup later' => 'Nastavit později',
 );
