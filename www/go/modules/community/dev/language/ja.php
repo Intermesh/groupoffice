@@ -1,5 +1,5 @@
 <?php
 return array (
-  'Enter \'dummy\' to pass.' => 'パスするには"ダミー"と入力してください。',
+  'Enter \'dummy\' to pass.' => 'パスワードに"dummy"と入力してください。',
   'Code' => 'コード',
 );
