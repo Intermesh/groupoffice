@@ -34,7 +34,7 @@ class SmimeModule extends \GO\Base\Module{
 	 *
 	 * @param string $data
 	 * @param string $passphrase
-	 * @return string[]
+	 * @return array
 	 * @throws Exception
 	 */
 	public static function readPKCS12(string $data, string $passphrase): array
