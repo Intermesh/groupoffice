@@ -1,3 +1,5 @@
+- Files: Better check for folder names for Windows compatibility
+
 07-04-2026: 6.8.163
 - Workflow: make permissions depend on mayManage
 - Core: log error in apache log when token invalid
