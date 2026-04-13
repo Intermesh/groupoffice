@@ -1,4 +1,5 @@
 - Support: Threading issue when someone sent more than one email within the import interval (5 mins).
+- Files: Better validator for folder names for Windows compatibility (cherry-pick from 6.8)
 
 09-04-2026: 26.0.22
 - Update GOUI version
