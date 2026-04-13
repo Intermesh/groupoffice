@@ -699,7 +699,7 @@ GO.files.FileBrowser = function(config){
 		this.contextTreeID = node.id;
 
 		var coords = e.getXY();
-		this.filesContextMenu.showAt(coords, records);
+		this.filesContextMenu.showAt(coords, records, 'grid');
 
 	}, this);
 
