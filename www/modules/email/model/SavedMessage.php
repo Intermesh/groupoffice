@@ -202,50 +202,7 @@ class SavedMessage extends ComposerMessage
 					
 				} else {
 					//attachment
-
-					if (!empty($part->ctype_parameters['name'])) {
-						$filename = $part->ctype_parameters['name'];
-					} elseif (!empty($part->d_parameters['filename'])) {
-						$filename = $part->d_parameters['filename'];
-					} elseif (!empty($part->d_parameters['filename*'])) {
-						$filename = $part->d_parameters['filename*'];
-					} else {
-						$filename = uniqid(time());
-					}
-
-					$mime_type = $part->ctype_primary . '/' . $part->ctype_secondary;
-
-					if (isset($part->headers['content-id'])) {
-						$content_id = trim($part->headers['content-id']);
-						if (strpos($content_id, '>')) {
-							$content_id = substr($part->headers['content-id'], 1, strlen($part->headers['content-id']) - 2);
-						}
-					} else {
-						$content_id='';						
-					}
-
-					$filename = File::stripInvalidChars($filename);
-					
-					$f = new \GO\Base\Fs\File($filename);
-					
-					$a = new MessageAttachment();										
-					$a->name=$filename;
-					$a->number=$part_number_prefix.$part_number;
-					$a->content_id=$content_id;
-					$a->mime=$mime_type;
-					if(!empty($part->body)){
-						$tmp_file = new \GO\Base\Fs\File($this->_getTempDir(). \GO\Base\Fs\File::stripInvalidChars($filename));
-						$tmp_file->appendNumberToNameIfExists();						
-						$tmp_file->putContents($part->body);
-						
-						$a->setTempFile($tmp_file);
-					}					
-
-					$a->index=count($this->attachments);
-					$a->encoding = isset($part->headers['content-transfer-encoding']) ? $part->headers['content-transfer-encoding'] : '';
-					$a->disposition = isset($part->disposition) ? $part->disposition : '';
-		
-					$this->addAttachment($a);
+					$this->_parseAtachment($part, $part_number_prefix.$part_number);
 					
 				}
 
@@ -258,7 +215,10 @@ class SavedMessage extends ComposerMessage
 			$charset = isset($structure->ctype_parameters['charset']) ? $structure->ctype_parameters['charset'] : 'UTF-8';
 			$text_part = \GO\Base\Util\StringHelper::clean_utf8( $structure->body,$charset);
 			//convert text to html
-			if (stripos($structure->ctype_secondary, 'plain') !== false) {
+			if(stripos($structure->ctype_primary, 'text') === false){
+				$this->_parseAtachment($structure, '1');
+				$text_part = '';
+			} else if (stripos($structure->ctype_secondary, 'plain') !== false) {
 				$this->extractUuencodedAttachments($text_part);
 				$text_part = nl2br($text_part);
 			}else{
@@ -268,6 +228,52 @@ class SavedMessage extends ComposerMessage
 			
 			$this->_loadedBody .= $text_part;
 		}
+	}
+
+	private function _parseAtachment($part , $number) {
+		if (!empty($part->ctype_parameters['name'])) {
+			$filename = $part->ctype_parameters['name'];
+		} elseif (!empty($part->d_parameters['filename'])) {
+			$filename = $part->d_parameters['filename'];
+		} elseif (!empty($part->d_parameters['filename*'])) {
+			$filename = $part->d_parameters['filename*'];
+		} else {
+			$filename = uniqid(time());
+		}
+
+		$mime_type = $part->ctype_primary . '/' . $part->ctype_secondary;
+
+		if (isset($part->headers['content-id'])) {
+			$content_id = trim($part->headers['content-id']);
+			if (strpos($content_id, '>')) {
+				$content_id = substr($part->headers['content-id'], 1, strlen($part->headers['content-id']) - 2);
+			}
+		} else {
+			$content_id='';
+		}
+
+		$filename = File::stripInvalidChars($filename);
+
+		$f = new \GO\Base\Fs\File($filename);
+
+		$a = new MessageAttachment();
+		$a->name=$filename;
+		$a->number=$number;
+		$a->content_id=$content_id;
+		$a->mime=$mime_type;
+		if(!empty($part->body)){
+			$tmp_file = new \GO\Base\Fs\File($this->_getTempDir(). \GO\Base\Fs\File::stripInvalidChars($filename));
+			$tmp_file->appendNumberToNameIfExists();
+			$tmp_file->putContents($part->body);
+
+			$a->setTempFile($tmp_file);
+		}
+
+		$a->index=count($this->attachments);
+		$a->encoding = isset($part->headers['content-transfer-encoding']) ? $part->headers['content-transfer-encoding'] : '';
+		$a->disposition = isset($part->disposition) ? $part->disposition : '';
+
+		$this->addAttachment($a);
 	}
 
 	private function _hasHtmlPart($structure)
