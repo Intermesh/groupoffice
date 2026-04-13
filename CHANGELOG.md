@@ -1,4 +1,6 @@
 - Files: Better check for folder names for Windows compatibility
+- Files: Move to trash could accidentally remove selected tree folder instead of selection in the thumbnail view
+
 
 07-04-2026: 6.8.163
 - Workflow: make permissions depend on mayManage
