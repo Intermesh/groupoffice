@@ -1,3 +1,4 @@
+13-04s2026: 26.0.23
 - Support: Threading issue when someone sent more than one email within the import interval (5 mins).
 - Files: Better validator for folder names for Windows compatibility (cherry-pick from 6.8)
 - Updated Japanase translations. Arigato HIRA Shuichi
@@ -5,7 +6,7 @@
 - Calendar: Only process invitations for enabled users and don't fail if one user fails
 - Core: Cleanup some old entities
 - Files: Move to trash could accidentally remove selected tree folder instead of selection in the thumbnail view
-
+- Forms: set maximum length validation for label and hint fields
 
 09-04-2026: 26.0.22
 - Update GOUI version
