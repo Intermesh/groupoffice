@@ -2,6 +2,7 @@
 - Files: Better validator for folder names for Windows compatibility (cherry-pick from 6.8)
 - Updated Japanase translations. Arigato HIRA Shuichi
 - Updated Czech translations. Thanks to Mareg
+- Calendar: Only process invitations for enabled users and don't fail if one user fails
 
 09-04-2026: 26.0.22
 - Update GOUI version
