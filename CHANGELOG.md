@@ -3,6 +3,9 @@
 - Updated Japanase translations. Arigato HIRA Shuichi
 - Updated Czech translations. Thanks to Mareg
 - Calendar: Only process invitations for enabled users and don't fail if one user fails
+- Core: Cleanup some old entities
+- Files: Move to trash could accidentally remove selected tree folder instead of selection in the thumbnail view
+
 
 09-04-2026: 26.0.22
 - Update GOUI version
