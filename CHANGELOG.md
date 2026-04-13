@@ -1,6 +1,6 @@
-- Files: Move to trash could accidentally remove selected tree folder instead of selection in the thumbnail view
+13-04-2026: 25.0.99
 
-13-04-2026: 25.0.100
+- Files: Move to trash could accidentally remove selected tree folder instead of selection in the thumbnail view
 - Files: Better validator for folder names for Windows compatibility
 - Updated Japanese translations. Arigato HIRA Shuichi
 - Calendar: Made human readable date for full day event end at the day before the technical end at 00:00 
