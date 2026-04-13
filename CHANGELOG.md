@@ -1,7 +1,10 @@
+13-04-2026: 25.0.100
 - Files: Better validator for folder names for Windows compatibility
 - Updated Japanese translations. Arigato HIRA Shuichi
+- Calendar: Made human readable date for full day event end at the day before the technical end at 00:00 
+- SaveMailAs: Saved email with a main body part that is not text will be displayed at attachment correctly
 
-- 09-04-2026: 25.0.98
+09-04-2026: 25.0.98
 - Update GOUI version
 
 07-04-2026: 25.0.97
