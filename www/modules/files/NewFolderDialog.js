@@ -23,7 +23,7 @@ GO.files.NewFolderDialog = function(config){
 		allowBlank:false,
 		anchor:'100%',
 		validator:function(v){
-			return !v.match(/[&\/:\*\?"<>|\\]/);
+			return !v.match(/[&\/:\*\?"<>|\\]/)&& !v.match(/[\s.]$/);
 		}   
 	});
 	this.newFolderFormPanel = new Ext.form.FormPanel({
