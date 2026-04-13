@@ -8,7 +8,7 @@ return array (
   'Notebook' => 'ノート',
   'Content' => 'コンテンツ',
   'Note book' => '手帳',
-  'Enter password to decrypt' => '復号化するパスワードを入力してください',
+  'Enter password to decrypt' => '復号するパスワードを入力してください',
   'Notebooks' => 'ノートブック',
   'Web page' => 'ウェブページ',
 );

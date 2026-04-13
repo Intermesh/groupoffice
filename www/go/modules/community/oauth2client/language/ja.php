@@ -13,4 +13,7 @@ return array (
   'OAuth2 Client Settings' => 'OAuth2 クライアント設定',
   'Get a refresh token' => 'リフレッシュトークンを取得する',
   'Please press the button ""Refresh token"" to finish the OAuth2 connection' => 'トークンの更新"ボタンを押して OAuth2 接続を終了してください',
+  'Please press the button Refresh token" to finish the OAuth2 connection"' => 'Refresh token"ボタンを押すことでOAuth2接続を完了できます"',
+  'Project Id' => 'プロジェクトID',
+  'Use this connection for single signon with OpenID Connect' => 'この接続で、OpenID接続によるシングルサインオンを行う',
 );
