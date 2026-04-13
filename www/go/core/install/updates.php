@@ -1817,3 +1817,13 @@ $updates['202510301100'][] = function() {
 };
 
 $updates['202601151348'][] = "update core_email_template_attachment set attachment=0 where inline=1;";
+
+$updates['202604131511'][] ="delete from core_entity where clientName in (
+    'ContactStar',
+		'Filter',
+		'Log',
+		'View',
+		'Service',
+		'UserDisplay',
+		'TasklistCompat'
+    )";

@@ -274,7 +274,8 @@ class EntityType implements ArrayableInterface {
 				$i[] = $et;
 			}
 			catch(Exception $e) {
-				ErrorHandler::logException($e, "Invalid entity in db with id ". $record['id']);
+				go()->debug("Invalid entity in db with id ". $record['id']);
+				go()->debug($e);
 			}
 		}
 
