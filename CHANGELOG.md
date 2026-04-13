@@ -1,3 +1,5 @@
+- Files: Move to trash could accidentally remove selected tree folder instead of selection in the thumbnail view
+
 13-04-2026: 25.0.100
 - Files: Better validator for folder names for Windows compatibility
 - Updated Japanese translations. Arigato HIRA Shuichi
