@@ -106,7 +106,7 @@ class Holiday {
 	}
 
 
-	static function generate(string $set, string $lang, DateTime $from, DateTime $till) {
+	static function generate(string $set, string $lang, \DateTimeInterface $from, \DateTimeInterface $till) {
 		$dir = __DIR__ . '/../language/holidays/';
 		self::$set = strtolower($set);
 		self::$lang = $lang;
