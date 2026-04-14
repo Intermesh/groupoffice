@@ -14,12 +14,11 @@
     "start:ts": "node ./esbuild-module.mjs watch",
     "start:sass": "npx sass --load-path=$(npm root) --watch style:dist",
 
-    "build": "npm run build:sass && npm run build:ts && npm run build:electron",
+    "build": "npm run build:sass && npm run build:ts",
     "build:clean": "rm -rf ./dist/*",
     "build:ts": "node ./esbuild-module.mjs",
     "build:sass": "npx sass --update --load-path=$(npm root) --style=compressed style:dist",
     "build:dts": "npx tsc --declaration --emitDeclarationOnly",
-    "build:electron": "npx esbuild ./script/Electron.ts --legal-comments=none --outdir=dist --platform=node",
 
     "test": "npx tsc --noEmit",
     "prepare": "npm run build"
