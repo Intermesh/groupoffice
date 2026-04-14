@@ -14,6 +14,7 @@ class Spreadsheet extends convert\Spreadsheet
 	public static $excludeHeaders = [ 'password', 'images'];
 
 	protected function init() {
+		parent::init();
 		$this->addColumn('notebook', go()->t('Notebook', 'community', 'notes'));
 	}
 	protected function exportNotebook(Note $note) {
