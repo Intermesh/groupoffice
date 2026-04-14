@@ -45,9 +45,10 @@ GO.moduleManager.onModuleReady('email', function () {
 							const record = item.parentMenu.record;
 
 							Ext.MessageBox.confirm(t("Delete"), t("Are you sure you want to delete this item?"), function (btn) {
-								if (btn == "yes") {
+								if (btn === "yes") {
 									go.Db.store("Favoritefolder").destroy(record.data.id).catch((result) => {
-										GO.errorDialog.show(result.error.description);
+
+										GO.errorDialog.show(result.description);
 									});
 								}
 							}, this);

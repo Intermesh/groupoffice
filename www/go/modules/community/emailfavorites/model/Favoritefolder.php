@@ -32,7 +32,11 @@ class Favoritefolder extends Entity
 
 	protected function internalGetPermissionLevel(): int
 	{
-		return Acl::LEVEL_WRITE;
+		if ($this->userId == go()->getUserId()) {
+			return Acl::LEVEL_MANAGE;
+		} else {
+			return 0;
+		}
 	}
 
 	protected function canCreate(): bool
