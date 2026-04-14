@@ -32,7 +32,7 @@ $baseUrl = \go\core\http\Request::get()->getPath() . "/";
             $gouiScript = $mod->module()->getFolder()->getFile("views/goui/dist/Index.js");
 
             if($gouiScript->exists()) {
-                $importMap["@intermesh/" . $mod->package ."-" . $mod->name] = $baseUrl . $gouiScript->getRelativePath(go()->getEnvironment()->getInstallFolder()) ."?v=" . $gouiScript->getModifiedAt()->format("U");
+                $importMap["@intermesh/" . ($mod->package ?? "legacy") . "-" . $mod->name] = $baseUrl . $gouiScript->getRelativePath(go()->getEnvironment()->getInstallFolder()) ."?v=" . $gouiScript->getModifiedAt()->format("U");
             }
         }
 

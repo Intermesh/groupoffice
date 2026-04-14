@@ -15,8 +15,15 @@ return array (
   'No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.' => 'RSS フィードが追加されていません。<br />このウィンドウの右上隅にある設定ボタンをクリックして、フィードを追加してください。',
   'webfeeds' => 'ウェブフィード',
   'Summary' => 'まとめ',
-  "welcomeTitle" => "Group-Officeへようこそ！",
-  "welcomeContent" => "<p>Group-Officeをインストールしていただきありがとうございます！</p>
+  'welcomeTitle' => 'Group-Officeへようこそ！',
+  'welcomeContent' => '<p>Group-Officeをインストールしていただきありがとうございます！</p>
 <p>こちらのリンクを参考に始めてください: {{link}}</p>
-<p>Group-Officeをお楽しみください！</p>"
+<p>Group-Officeをお楽しみください！</p>',
+  'Visible' => '可視',
+  'All users' => 'すべてのユーザー',
+  'Calendar' => 'カレンダー',
+  'No appointments to display' => '表示する予定はありません',
+  'Timespan' => '期間',
+  'statuses' => 'ステータス',
+  'Visible calendars' => '表示可能なカレンダー',
 );

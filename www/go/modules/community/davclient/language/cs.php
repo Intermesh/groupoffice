@@ -1,0 +1,22 @@
+<?php
+return array (
+  'DAV Accounts' => 'Účty DAV',
+  'Calendar' => 'Kalendář',
+  'Host' => 'Hostitel',
+  'Path' => 'Cesta',
+  'Common name' => 'Obecný název',
+  'Refresh calendars' => 'Aktualizovat kalendáře',
+  'Every quarter' => 'Každé čtvrtletí',
+  'Every hour' => 'Každou hodinu',
+  'Connect' => 'Připojit',
+  'Server' => 'Server',
+  'Collections' => 'Sbírky',
+  'Sync now' => 'Synchronizovat',
+  'Remove from sync' => 'Odstranit ze synchronizace',
+  'Last Sync' => 'Poslední synchronizace',
+  'Keep calendar data?' => 'Zachovat data kalendáře?',
+  'Do you want to keep the synchronised calendars or delete those as well?' => 'Ponechat synchronizované kalendáře nebo je také smazat?',
+  'If only the account is deleted the calendars can still be deleted manually' => 'Pokud dojde pouze k odstranění účtu, kalendáře lze stále smazat ručně',
+  'Keep calendar data' => 'Uchovat data kalendáře',
+  'Delete all' => 'Smazat vše',
+);

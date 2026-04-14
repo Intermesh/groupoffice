@@ -9,12 +9,12 @@ import {
 	checkboxselectcolumn,
 	column,
 	comp,
-	containerfield,
+	containerfield, dataSourceEntityType, DataSourceStore,
 	datasourcestore,
 	DateInterval,
 	DateTime,
 	datetimefield,
-	DateTimeField,
+	DateTimeField, DefaultEntity,
 	Format, listStoreType,
 	MapField,
 	mapfield,
@@ -65,6 +65,7 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 	private titleField: TextField
 	private alertField: AlertField
 	private confirmedScheduleMessage: boolean = false;
+	private categoryStore: DataSourceStore;
 
 	constructor() {
 		super("CalendarEvent");
@@ -210,6 +211,9 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 							if(this.item)
 								this.item.cal = r;
 
+							debugger;
+							this.categoryStore.setFilter("calendar",  {calendarId: newValue});
+
 							const d = this.form.value.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
 							this.alertField.setDefaultLabel(d)
 							if (!this.item?.key && !this.participantFld.list.isEmpty()) {
@@ -298,7 +302,10 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 			this.alertField,
 
 			autocompletechips({
-				list: table({fitParent: true, headers: false, store: datasourcestore({dataSource:categoryStore.dataSource}),
+				list: table({fitParent: true, headers: false, store: this.categoryStore = datasourcestore({
+						dataSource:jmapds('CalendarCategory'),
+						sort: [{property:'name'}]
+					}),
 					rowSelectionConfig: {multiSelect: true},
 					columns: [
 						checkboxselectcolumn(),
@@ -308,11 +315,11 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 				label: t("Categories",'core','core'),
 				name: "categoryIds",
 				chipRenderer: async (chip, id) => {
-					categoryStore.dataSource.single(id).then(v => { chip.text = v?.name ?? '???'});
+					jmapds('CalendarCategory').single(id).then(v => { chip.text = v?.name ?? '???'});
 				},
 				listeners: {
 					autocomplete: ( {target, input}) => {
-						target.list.store.queryParams = {filter: {name: input}};
+						target.list.store.setFilter("name", {name: input});
 						target.list.store.load();
 					}
 				}

@@ -53,7 +53,7 @@ GO.files.FilePropertiesDialog = function(config){
 					name: 'name',
 					flex: 1,
 					validator:function(v){
-						return !v.match(/[\/\*\"<>|\\]/);
+						return !v.match(/[\/\*\"<>|\\]/) && !v.match(/[\.\s]$/);
 					}
 				}),{
 					xtype: 'textfield',
