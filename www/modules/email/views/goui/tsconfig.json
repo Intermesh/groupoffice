@@ -1,28 +1,13 @@
 {
-  "extends": "goui/tsconfig.module.json",
+  "extends": "../../../../views/goui/tsconfig.module.json",
   "compilerOptions": {
-    "baseUrl": "./",
+    "baseUrl": ".",
     "outDir": "./dist",
-    "paths": {
-      "@intermesh/goui": [
-        "../../../../views/goui/goui/script/index.ts"
-      ],
-
-      "@intermesh/groupoffice-core": [
-        "../../../../views/goui/groupoffice-core/script/index.ts"
-      ],
-
-      "chart.js/auto": [
-        "../../../../views/goui/groupoffice-core/node_modules/chart.js/auto/auto.d.ts",
-      ],
-
-      "@intermesh/business/*": [
-        "../../../../go/modules/business/*/views/goui/script/Index.ts"
-      ],
-
-      "@intermesh/community/*": [
-        "../../../../go/modules/community/*/views/goui/script/Index.ts"
-      ]
-    }
+    //needed to be inside dist because it must be cleaned up before building
+    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
+    // This is needed to make the composite project work when other modules use this one as a dependency in their tsconfig.json
+    // See notes/views/goui/tsconfig.json for an example of the references
+    "composite": true,
+    "rootDir": "script"
   }
 }
