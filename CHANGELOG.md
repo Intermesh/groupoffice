@@ -1,3 +1,4 @@
+14-04-2026: 26.0.24
 - Support: Mail sending was broken if SMIME was not configured
 - Notes: Fixed note dialog on mobiles
 - ActiveSync: Missing MSTZ function
