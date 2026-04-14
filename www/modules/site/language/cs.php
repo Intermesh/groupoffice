@@ -121,4 +121,5 @@ return array (
   'Website Manager' => 'Webové stránky',
   'moduleSettings' => 'Nastavení modulů',
   'globalProperties' => 'Globální vlastnosti',
+  'Global properties' => 'Globální vlastnosti',
 );

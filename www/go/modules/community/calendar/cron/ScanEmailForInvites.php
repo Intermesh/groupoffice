@@ -2,11 +2,13 @@
 
 namespace go\modules\community\calendar\cron;
 
+use go\core\ErrorHandler;
 use go\core\orm\exception\SaveException;
 use GO\Email\Model\Account;
 use go\core\model\CronJob;
 use go\core\model\CronJobSchedule;
 use go\modules\community\calendar\model\Scheduler;
+use Throwable;
 
 /**
  * docker compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=calendar --package=community --name=ScanEmailForInvites --debug
@@ -43,8 +45,9 @@ class ScanEmailForInvites extends CronJob {
 			->select('userId, autoUpdateInvitations, autoAddInvitations,lastProcessedUid,lastProcessed,markReadAndFileAutoAdd,markReadAndFileAutoUpdate, u.email')
 			->from('calendar_preferences', 't')
 			->join('core_user', 'u', 'u.id = t.userId')
-			->where('autoUpdateInvitations', '=',1)
-			->orWhere('autoAddInvitations', '=', 1)->fetchMode(\PDO::FETCH_OBJ);
+			->where('u.enabled', '=', 1)
+			->where('(t.autoUpdateInvitations = 1 OR t.autoAddInvitations = 1)')
+			->fetchMode(\PDO::FETCH_OBJ);
 
 		foreach($settings as $setting) {
 
@@ -68,25 +71,30 @@ class ScanEmailForInvites extends CronJob {
 					continue;
 				}
 
-				$itip = Scheduler::handleIMIP($message, $ifMethod);
+				try {
 
-				if(!$itip) {
-					// skip message without invite
-					continue;
-				}
+					$itip = Scheduler::handleIMIP($message, $ifMethod);
 
-				if($itip['alreadyProcessed']) {
-					go()->log('ALREADY processed: '.$itip['event']->title);
-				} else if(!empty($itip['event'])) {
-					go()->log('invite processed: '.$itip['event']->title);
-					$this->updateAlerts($itip, $setting->userId, $message->from->getAddress());
-				}
-				if(!empty($itip['event']) &&
-					(($setting->markReadAndFileAutoAdd && $itip['method'] === 'REQUEST') ||
-					($setting->markReadAndFileAutoUpdate && $itip['method'] === 'REPLY'))
-				) {
-					// handled! now check if needs archiving.
-					$this->markReadAndArchive($account,$message);
+					if (!$itip) {
+						// skip message without invite
+						continue;
+					}
+
+					if ($itip['alreadyProcessed']) {
+						go()->log('ALREADY processed: ' . $itip['event']->title);
+					} else if (!empty($itip['event'])) {
+						go()->log('invite processed: ' . $itip['event']->title);
+						$this->updateAlerts($itip, $setting->userId, $message->from->getAddress());
+					}
+					if (!empty($itip['event']) &&
+						(($setting->markReadAndFileAutoAdd && $itip['method'] === 'REQUEST') ||
+							($setting->markReadAndFileAutoUpdate && $itip['method'] === 'REPLY'))
+					) {
+						// handled! now check if needs archiving.
+						$this->markReadAndArchive($account, $message);
+					}
+				} catch (Throwable $e) {
+					ErrorHandler::logException($e, "Failed to process invite for message: " . $message->uid . " in account " . $account->username );
 				}
 			}
 

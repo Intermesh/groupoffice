@@ -43,13 +43,14 @@ export class NoteDialog extends FormWindow<Note> {
 		this.generalTab.cls = "fit";
 		this.generalTab.items.add(
 			hiddenfield({name: "tmpFiles"}), //savemailas module uses this.
-			fieldset({cls: " fit vbox gap"},
-				comp({cls: "hbox gap"},
+			fieldset({cls: "fit vbox gap"},
+				comp({cls: "hbox gap wrap"},
 					textfield({
 						flex: 1,
 						name: "name",
 						label: t("Name"),
-						required: true
+						required: true,
+						minWidth: 200
 					}),
 
 					notebookcombo({
