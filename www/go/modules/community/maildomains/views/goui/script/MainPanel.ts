@@ -104,6 +104,8 @@ export class MainPanel extends MainThreeColumnPanel<Component, DomainDetail> {
 	constructor() {
 		super("section");
 
+		this.setup(this.createCenter(), this.createWest(), this.createEast());
+
 		this.on("render", async () => {
 			try {
 				this.user = await authManager.requireLogin();

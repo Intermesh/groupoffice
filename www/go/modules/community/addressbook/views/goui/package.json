@@ -1,9 +1,12 @@
 {
   "type": "module",
   "name": "@intermesh/community-addressbook",
-  "main": "./dist/Index.js",
-  "module": "./dist/Index.js",
-  "typings": "./dist/Index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./script/Index.ts",
+      "default": "./dist/Index.js"
+    }
+  },
   "description": "GroupOffice Addressbook module",
   "devDependencies": {
     "concurrently": "latest",

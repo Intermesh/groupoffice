@@ -1,10 +1,5 @@
-import {br, btn, comp, Component, h1, h3, hr, menu, t} from "@intermesh/goui";
-import {
-	addbutton,
-	DetailPanel,
-	Image,
-	linkbrowsebutton,
-} from "@intermesh/groupoffice-core";
+import {btn, comp, Component, hr, menu, t} from "@intermesh/goui";
+import {addbutton, DetailPanel, Image, linkbrowsebutton,} from "@intermesh/groupoffice-core";
 import {CommentDialog} from "./CommentDialog";
 import {commentDS} from "./Index.js";
 
@@ -56,7 +51,7 @@ export class CommentDetail extends DetailPanel {
 			})
 		)
 
-		this.on("load", ( {entity}) => {
+		this.on("load", ({entity}) => {
 
 			this.content.items.replace(Image.replace(entity.text));
 		});

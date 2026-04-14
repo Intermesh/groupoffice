@@ -361,7 +361,7 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 	private async openExportDlg(): Promise<void> {
 		const ids = Array.from(this.mailboxTable.store.data, (m: DefaultEntity) => m.id);
 		const w = new MailboxExportDialog();
-		w.load(this.form.value, ids);
+		w.load(this.form.value as MailDomain, ids);
 		w.show();
 	}
 

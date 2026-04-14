@@ -9,6 +9,7 @@
   ],
   "dependencies": {
     "@intermesh/goui": "latest",
-    "@intermesh/groupoffice-core": "latest"
+    "@intermesh/groupoffice-core": "latest",
+    "pdfjs-dist": "5.6.205"
   }
 }

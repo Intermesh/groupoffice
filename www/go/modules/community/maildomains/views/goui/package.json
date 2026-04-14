@@ -13,7 +13,7 @@
     "start:dts": "npx tsc --declaration --emitDeclarationOnly --watch",
     "start:sass": "npx sass --load-path=$(npm root) --watch style:dist",
 
-    "build": "npm run build:sass && npm run build:ts && npm run build:dts",
+    "build": "npm run build:sass && npm run build:ts",
     "build:clean": "rm -rf ./dist/*",
     "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
     "build:sass": "npx sass --update --load-path=$(npm root) --style=compressed style:dist",

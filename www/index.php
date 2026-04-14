@@ -22,8 +22,8 @@ $baseUrl = \go\core\http\Request::get()->getPath() . "/";
         $gouiScript = "node_modules/@intermesh/goui/dist/index.js";
         $coreScript = "node_modules/@intermesh/groupoffice-core/dist/index.js";
         $importMap = [
-                "@intermesh/goui" => $baseUrl.$gouiScript ."?v=" . filemtime( $gouiScript),
-                "@intermesh/groupoffice-core" => $baseUrl.$coreScript . "?v=" . filemtime($coreScript)
+                "@intermesh/goui" => $baseUrl.$gouiScript ."?v=" . filemtime(__DIR__ . '/' . $gouiScript),
+                "@intermesh/groupoffice-core" => $baseUrl.$coreScript . "?v=" . filemtime(__DIR__ . '/' . $coreScript)
         ];
 
         $mods = Module::find();
