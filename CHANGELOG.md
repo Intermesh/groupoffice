@@ -1,5 +1,6 @@
 - Support: Mail sending was broken if SMIME was not configured
 - Notes: Fixed note dialog on mobiles
+- ActiveSync: Missing MSTZ function
 
 13-04-2026: 26.0.23
 - Support: Threading issue when someone sent more than one email within the import interval (5 mins).
