@@ -108,6 +108,7 @@ class Holiday {
 
 	static function generate(string $set, string $lang, \DateTimeInterface $from, \DateTimeInterface $till) {
 		$dir = __DIR__ . '/../language/holidays/';
+		$set = strtoupper($set);
 		self::$set = strtolower($set);
 		self::$lang = $lang;
 		self::$names = \json_decode(file_get_contents($dir.'names.json'))->names;
@@ -416,7 +417,7 @@ class Holiday {
 			}
 			$label = $availableLanguages[$isoCode];
 			$holidaySets[$label] = [
-				'ise' => $isoCode,
+				'iso' => $isoCode,
 				'label' => $label
 			];
 		}
