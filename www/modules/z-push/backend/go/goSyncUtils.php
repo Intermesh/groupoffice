@@ -341,6 +341,28 @@ class GoSyncUtils {
 	,"600/-60/0/0/0/0/0/0/0/0"=>"Pacific/Honolulu"
 	);
 
+	/*
+		* Calculate a unix timestamp for DST or STD start times in the MS time zone.
+		* @param array $mstz_parts
+		* @param string $prefix
+		* @param integer $bias
+		* @param string $year
+		* @return integer
+		*/
+	private static function timestampFromMSTZ($mstz_parts, $prefix, $bias, $year){
+		if($mstz_parts[$prefix."month"] == 0){return 0;} // If month is empty, there is no transition
+
+		$month = $mstz_parts[$prefix."month"];
+		$weeks = array('', 'first', 'second', 'third', 'fourth', 'last');
+		$week = $weeks[$mstz_parts[$prefix."week"]];
+		$days = array('Sunday', 'Monday', 'Tuesday', 'Wednesday','Thursday','Friday', 'Saturday');
+		$day = $days[$mstz_parts[$prefix."day"]];
+
+		$second = $mstz_parts[$prefix."hour"] * 3600 + $mstz_parts[$prefix."minute"] * 60 + $mstz_parts[$prefix."second"] + $bias * 60;
+
+		return date("U", strtotime("$week $day of $year-$month Z") + $second);
+	}
+
 	/**
 	 * Given the MS timezone find a matching tzid, for the year the event starts in.
 	 * @param string $mstz
