@@ -1,3 +1,5 @@
+- ActiveSync: Missing MSTZ function
+
 13-04-2026: 6.8.164
 - Files: Move to trash could accidentally remove selected tree folder instead of selection in the thumbnail view
 - Files: Better validator for folder names for Windows compatibility
