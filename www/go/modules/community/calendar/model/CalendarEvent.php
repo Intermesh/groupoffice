@@ -624,17 +624,26 @@ class CalendarEvent extends AclItemEntity {
 			'skipped'=>0,
 			'failureReasons'=>[]
 		];
+
+		ini_set('memory_limit', '1G');
+
+		$existing = self::find()
+			->select('uid')
+			->where(['calendarId' => $calendarId])
+			->fetchMode(\PDO::FETCH_COLUMN, 0)->all();
+		$existing = array_flip($existing);
+
 		foreach($blobIds as $blobId) {
 			foreach(ICalendarHelper::calendarEventFromFile($blobId, ['calendarId' => $calendarId]) as $ev) {
 				if(is_array($ev)){
-					$r->failureReasons[$r->failed] = 'Parse error '.$ev['vevent']->VEVENT[0]->UID. ': '. $ev['error']->getMessage();
+					$r->failureReasons[$r->failed] = 'Parse error '.$ev['uid']. ': '. $ev['error']->getMessage();
 					$r->failed++;
 					continue;
 				}
 
 				if($uid === 'new') {
 					$ev->uid = UUID::v4();
-				} else if($uid === 'check' && self::find()->selectSingleValue('cce.id')->where(['uid'=>$ev->uid])->single() !== null) {
+				} else if($uid === 'check' && isset($existing[$ev->uid])) {
 					$r->skipped++;
 					continue;
 					// check if exists
