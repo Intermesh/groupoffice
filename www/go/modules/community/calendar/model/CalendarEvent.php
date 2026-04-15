@@ -625,7 +625,7 @@ class CalendarEvent extends AclItemEntity {
 			'failureReasons'=>[]
 		];
 
-		ini_set('memory_limit', '1G');
+		set_time_limit(0);
 
 		$existing = self::find()
 			->select('uid')
