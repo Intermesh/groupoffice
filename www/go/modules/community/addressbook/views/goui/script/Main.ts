@@ -1,7 +1,22 @@
-import {filterpanel, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
-import {btn, checkbox, comp, Component, h3, hr, menu, radio, searchbtn, t, tbar} from "@intermesh/goui";
+import {DetailPanel, filterpanel, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
+import {
+	btn,
+	checkbox,
+	comp,
+	Component,
+	EntityID,
+	h3,
+	hr,
+	menu,
+	radio,
+	router,
+	searchbtn,
+	t,
+	tbar
+} from "@intermesh/goui";
 import {AddressBookGrid, addressbookgrid} from "./AddressBookGrid.js";
 import {contactgrid, ContactGrid} from "./ContactGrid.js";
+import {ContactDetail} from "./ContactDetail.js";
 
 export class Main extends MainThreeColumnPanel {
 	private addressBookGrid!: AddressBookGrid;
@@ -9,6 +24,8 @@ export class Main extends MainThreeColumnPanel {
 
 	constructor() {
 		super("addressbook");
+
+		this.setup(this.createCenter(), this.createWest(), this.createEast());
 
 		this.on("render", async () => {
 			void this.addressBookGrid.store.load();
@@ -208,8 +225,12 @@ export class Main extends MainThreeColumnPanel {
 					rowSelectionConfig: {
 						multiSelect: true, //todo merge toolbar
 						listeners: {
-							selectionchange: () => {
-								//todo
+							selectionchange: ({selected}) => {
+								const contactIds = selected.map((row) => row.record.id);
+
+								if (contactIds[0]) {
+									router.goto("contact/" + contactIds[0]);
+								}
 							}
 						}
 					}
@@ -219,6 +240,11 @@ export class Main extends MainThreeColumnPanel {
 	}
 
 	protected createEast(): Component {
-		return comp({});
+		return new ContactDetail();
+	}
+
+	public showContact(contactId: EntityID) {
+		this.activatePanel(this.east);
+		void (this.east as DetailPanel).load(contactId);
 	}
 }

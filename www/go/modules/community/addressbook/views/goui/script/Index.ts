@@ -1,9 +1,9 @@
 import {
-	AclItemEntity,
 	AclOwnerEntity,
 	appSystemSettings,
 	client,
-	JmapDataSource, modules,
+	JmapDataSource,
+	modules,
 	moduleSettings
 } from "@intermesh/groupoffice-core";
 import {Settings} from "./Settings.js";
@@ -17,22 +17,40 @@ export * from "./ContactCombo.js";
 
 translate.load(GO.lang.community.addressbook, "community", "addressbook");
 
-client.on("authenticated", ({session}) => {
-	if (session.isAdmin) {
-		appSystemSettings.addPanel("community", "addressbook", Settings);
+modules.register({
+	package: "community",
+	name: "addressboook",
+	entities: [
+		"Contact",
+		"AddressBook",
+		"AddressBookGroup"
+	],
+	async init() {
+		let addressbook: Main;
+		client.on("authenticated", ({session}) => {
+			if (session.isAdmin) {
+				appSystemSettings.addPanel("community", "addressbook", Settings);
+			}
+
+			router.add(/^addressbook\/(\d+)$/, () => {
+				modules.openMainPanel("addressbook");
+			});
+
+			router.add(/^contact\/(\d+)$/, (contactId) => {
+				modules.openMainPanel("addressbook");
+				addressbook.showContact(contactId);
+			});
+
+			modules.addMainPanel("community", "addressbook", "addressbook", t("Address book"), () => {
+				addressbook = new Main();
+
+				return addressbook;
+			});
+
+			moduleSettings.addPanel(UserAddressbookSettingsPanel);
+			moduleSettings.addPanel(UserProfileSettingsPanel);
+		});
 	}
-
-	router.add(/^addressbook\/(\d+)$/, () => {
-		modules.openMainPanel("addressbook");
-		// todo show contact
-	});
-
-	modules.addMainPanel("community", "addressbook", "addressbook", t("Address book"), () => {
-		return new Main();
-	});
-
-	moduleSettings.addPanel(UserAddressbookSettingsPanel);
-	moduleSettings.addPanel(UserProfileSettingsPanel);
 });
 
 
@@ -50,14 +68,26 @@ export interface Contact extends BaseEntity {
 	gender?: 'M' | 'F' | null;
 	organizationIds?: number[];
 	phoneNumbers?: PhoneNumber[];
+	emailAddresses?: EmailAddress[];
+	addressBookId: string;
 	addresses?: Address[];
 	dates?: ContactDate[];
 	urls?: ContactUrl[];
+	prefixes?: string,
+	suffixes?: string,
+	photoBlobId?: string,
+	color?: string,
+	actionAt?: string;
 }
 
 interface PhoneNumber {
 	type: string;
 	number: string;
+}
+
+interface EmailAddress {
+	type: string;
+	email: string;
 }
 
 interface Address {
@@ -74,7 +104,7 @@ interface ContactDate {
 	date: string;
 }
 
-interface ContactUrl {
+export interface ContactUrl {
 	type: string;
 	url: string;
 }

@@ -1,0 +1,44 @@
+@use '@intermesh/goui/style/icons' as *;
+
+.addressbook-url {
+  height: 20px;
+  width: 20px;
+  margin: 0 2px;
+  background-position: center;
+  background-size: contain;
+  display: inline-block;
+  border-radius: 1px;
+
+  &.linkedin {
+    background-image: url("../images/linkedin.png");
+  }
+
+  &.facebook {
+    background-image: url("../images/facebook.png");
+  }
+
+  &.twitter {
+    background-image: url("../images/twitter.png");
+  }
+
+  &.tiktok {
+    background-image: url("../images/tiktok.png");
+  }
+
+  &.instagram {
+    background-image: url("../images/instagram.png");
+  }
+
+  &.homepage {
+    background-color: var(--c-primary);
+    border-radius: 2px;
+
+    &:after {
+      @extend %icon;
+      content: "home";
+      vertical-align: baseline;
+      line-height: inherit;
+      color: white;
+    }
+  }
+}
