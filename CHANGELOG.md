@@ -1,4 +1,6 @@
 - ActiveSync: Missing MSTZ function
+- Email: Remove old code which had an authenticated stored XSS vulnerability
+- Core: Validate user ID param when saving settings
 
 13-04-2026: 6.8.164
 - Files: Move to trash could accidentally remove selected tree folder instead of selection in the thumbnail view
