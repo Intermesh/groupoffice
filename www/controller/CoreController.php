@@ -32,7 +32,14 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 	}
 	
 	protected function actionSaveSetting($params){
-		$response['success']=GO::config()->save_setting($params['name'], $params['value'], $params['user_id']);
+
+		if(go()->getModel()->getUserRights()->mayChangeUsers) {
+			$userId = $params['user_id'];
+		} else {
+			$userId = go()->getUserId();
+		}
+
+		$response['success']=GO::config()->save_setting($params['name'], $params['value'], $userId);
 		
 		return $response;
 	}
