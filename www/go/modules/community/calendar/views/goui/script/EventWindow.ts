@@ -211,7 +211,6 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 							if(this.item)
 								this.item.cal = r;
 
-							debugger;
 							this.categoryStore.setFilter("calendar",  {calendarId: newValue});
 
 							const d = this.form.value.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
