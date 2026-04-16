@@ -6,6 +6,7 @@ export class LocationField extends AutocompleteField {
 	constructor() {
 
 		super(table({
+			fitParent: true,
 			headers: false,
 			columns: [
 				column({
