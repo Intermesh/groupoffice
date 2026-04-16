@@ -498,31 +498,37 @@ class CalendarEvent extends AclItemEntity {
 	 * Would be 2 datetimes, 1 date and 2 times if same day, or just 1 or 2 dates when full-day(s)
 	 * @return string[] 2 lines of human readable text
 	 */
-	public function humanReadableDate(string|null $setTimeZoneTo = null): array
+	public function humanReadableDate(?string $tz = null): array
 	{
-		$start = $this->start(false, $setTimeZoneTo);
+		$fmtDate = fn($d) => go()->t($d->format('l')) . $d->format(' j ') .
+			go()->t('full_months')[$d->format('n')] . $d->format(' Y');
 
-		$end = $this->end();
-		$oneDay = $start->format('Ymd') === $end->format('Ymd');
-		$line1 = go()->t($oneDay ? 'At' : 'From', 'community', 'calendar') . ' ' .
-			go()->t($start->format('l')) .
-			$start->format(' j ') . go()->t('full_months')[$start->format('n')] .
-			$start->format(' Y');
-		if (!$oneDay) {
-			if (!$this->showWithoutTime)
+		$start = $this->start(false, $tz);
+		$end   = $this->end();
+
+		if ($this->showWithoutTime) {
+			$end->modify('-1 day');
+		}
+
+		$sameDay = $start->format('Ymd') === $end->format('Ymd');
+
+		if ($sameDay && $this->showWithoutTime) {
+			return [$fmtDate($start), ''];
+		}
+
+		$line1 = go()->t($sameDay ? 'At' : 'From', 'community', 'calendar') . ' ' . $fmtDate($start);
+
+		if (!$sameDay) {
+			if (!$this->showWithoutTime) {
 				$line1 .= ', ' . $start->format('H:i');
+			}
 			$line1 .= ' ' . go()->t('until', 'community', 'calendar');
 		}
-		if ($oneDay) {
-			$line2 = $start->format('H:i') . ' - ' . $end->format('H:i');
-		} else {
-			$line2 = go()->t($end->format('l')) .
-				$end->format(' j ') . go()->t('full_months')[$end->format('n')] .
-				$end->format(' Y');
-			if (!$this->showWithoutTime) {
-				$line2 .= ', ' . $end->format('H:i');
-			}
-		}
+
+		$line2 = $sameDay
+			? $start->format('H:i') . ' - ' . $end->format('H:i')
+			: $fmtDate($end) . (!$this->showWithoutTime ? ', ' . $end->format('H:i') : '');
+
 		return [$line1, $line2];
 	}
 
@@ -618,17 +624,26 @@ class CalendarEvent extends AclItemEntity {
 			'skipped'=>0,
 			'failureReasons'=>[]
 		];
+
+		set_time_limit(0);
+
+		$existing = self::find()
+			->select('uid')
+			->where(['calendarId' => $calendarId])
+			->fetchMode(\PDO::FETCH_COLUMN, 0)->all();
+		$existing = array_flip($existing);
+
 		foreach($blobIds as $blobId) {
 			foreach(ICalendarHelper::calendarEventFromFile($blobId, ['calendarId' => $calendarId]) as $ev) {
 				if(is_array($ev)){
-					$r->failureReasons[$r->failed] = 'Parse error '.$ev['vevent']->VEVENT[0]->UID. ': '. $ev['error']->getMessage();
+					$r->failureReasons[$r->failed] = 'Parse error '.$ev['uid']. ': '. $ev['error']->getMessage();
 					$r->failed++;
 					continue;
 				}
 
 				if($uid === 'new') {
 					$ev->uid = UUID::v4();
-				} else if($uid === 'check' && self::find()->selectSingleValue('cce.id')->where(['uid'=>$ev->uid])->single() !== null) {
+				} else if($uid === 'check' && isset($existing[$ev->uid])) {
 					$r->skipped++;
 					continue;
 					// check if exists

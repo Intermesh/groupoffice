@@ -312,19 +312,47 @@ class ICalendarHelper {
 	 * @throws VObject\ParseException
 	 */
 	static function calendarEventFromFile(string $blobId, array|null $values = null) {
+		$fp = fopen(Blob::buildPath($blobId), 'r');
+		$buffer = '';
+		$groups = []; // uid => [vevent strings]
+		$inEvent = false;
+		// sort the event by uid into different VCALENDARS
+		while (!feof($fp)) {
+			$line = fgets($fp);
 
-		$data = file_get_contents(Blob::buildPath($blobId));
-		$splitter = new VObject\Splitter\ICalendar(StringUtil::cleanUtf8($data), VObject\Reader::OPTION_FORGIVING + VObject\Reader::OPTION_IGNORE_INVALID_LINES);
-		while($vevent = $splitter->getNext()) {
+			if (trim($line) === 'BEGIN:VEVENT') {
+				$inEvent = true;
+				$buffer = '';
+			}
+
+			if ($inEvent) {
+				$buffer .= $line;
+			}
+
+			if (trim($line) === 'END:VEVENT') {
+				$inEvent = false;
+				preg_match('/^UID:(.+)$/m', $buffer, $matches);
+				$uid = trim($matches[1] ?? 'unknown');
+				$groups[$uid][] = $buffer;
+				$buffer = '';
+			}
+		}
+		fclose($fp);
+		foreach ($groups as $uid => $events) {
+			$ical = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//GO-importer//EN\r\n"
+				. implode('', $events)
+				. "END:VCALENDAR\r\n";
+			$vevent = VObject\Reader::read($ical, VObject\Reader::OPTION_FORGIVING + VObject\Reader::OPTION_IGNORE_INVALID_LINES);
 			try {
 				$event = new CalendarEvent();
 				if(isset($values)) {
 					$event->setValues($values);
 				}
 				yield self::parseVObject($vevent, $event);
+				unset($vevent);
 			} catch(\Throwable $e) {
 				ErrorHandler::logException($e, "Failed to import event");
-				yield ['error'=>$e, 'vevent'=>$vevent];
+				yield ['error'=>$e, 'uid'=>$uid];
 			}
 		}
 	}
