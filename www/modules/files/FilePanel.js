@@ -137,12 +137,12 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 
 		url = url.replace(/&amp;/g, '&');
 
-		var renderPdf = function () {
+		const renderPdf = function () {
 			window.pdfjsLib.getDocument(url).promise.then(function (pdf) {
 				pdf.getPage(1).then(function (page) {
-					let viewport = page.getViewport({scale: 1.5});
-
-					let scale = 450 / viewport.width;
+					let viewport = page.getViewport({scale: 1});
+					let containerWidth = (canvas.parentNode ? canvas.parentNode.clientWidth : canvas.offsetWidth) - 32;
+					let scale = containerWidth / viewport.width;
 					let scaledViewport = page.getViewport({scale: scale});
 
 					canvas.width = scaledViewport.width;
@@ -168,6 +168,10 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 				renderPdf();
 			});
 		}
+
+		this.on("resize", () => {
+			renderPdf();
+		});
 	},
 
 	initComponent : function(){
@@ -240,7 +244,7 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 				<figure style="background-image: url({thumbnail_url});" ></figure>\
 					</tpl>' +
 				'<tpl if="values.extension === \'pdf\'">' +
-					'<canvas id="pdf-preview-canvas" style="display:block;margin:0 auto; padding: 1rem;"></canvas>' +
+					'<canvas id="pdf-preview-canvas" style=display:block;width:100%;box-sizing:border-box;padding:1rem;></canvas>' +
 				'</tpl>'+
 
 				'<table class="display-panel" cellpadding="0" cellspacing="0" border="0">'+
