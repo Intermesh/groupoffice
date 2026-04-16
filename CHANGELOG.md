@@ -2,6 +2,7 @@
 - Core: Fixed holidays error in billing because of type and case problem in generate() function
 - Calendar: update category list according to selected calendar in event window
 - Email: Remove old code which had an authenticated stored XSS vulnerability
+- Core: Validate user ID param when saving settings
 
 14-04-2026: 26.0.24
 - Support: Mail sending was broken if SMIME was not configured
