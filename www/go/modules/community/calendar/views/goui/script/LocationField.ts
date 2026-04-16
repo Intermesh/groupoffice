@@ -40,7 +40,9 @@ export class LocationField extends AutocompleteField {
 		}));
 
 		this.name = "location";
-		this.label = t("Location")
+		this.label = t("Location");
+
+		this.freeInput = true;
 
 		this.baseCls = "goui-form-field textarea autocomplete";
 

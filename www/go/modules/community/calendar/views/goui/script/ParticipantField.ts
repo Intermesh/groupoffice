@@ -93,6 +93,7 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 						}
 					})
 				],
+				freeInput: true,
 				placeholder:t('Invite people') + ' / ' + t('Resource request'),
 				//valueProperty: "id",
 				listeners: {
@@ -138,13 +139,13 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 						target.value = "";
 					},
 					'select': ({target, record}) => {
-
 						if(record)
 							this.addParticipant(record);
 
 						target.value = "";
 					}
 				},
+				valueToTextField: async () => "",
 				list:table({
 					style:{minWidth:'100%'},
 					headers: false,
