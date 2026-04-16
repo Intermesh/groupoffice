@@ -1,3 +1,4 @@
+- Calendar: Event location field allows free text input
 - Core: Fixed holidays error in billing because of type and case problem in generate() function
 - Calendar: update category list according to selected calendar in event window
 
