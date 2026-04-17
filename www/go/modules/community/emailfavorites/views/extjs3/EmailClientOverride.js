@@ -1,4 +1,10 @@
-GO.moduleManager.onModuleReady('email', function () {
+// GO.moduleManager.onModuleReady('email', function () {
+
+GO.mainLayout.on('authenticated', (mainLayout, user, password) => {
+	if(!go.Modules.isAvailable("community", "emailfavorites") || !go.Modules.isAvailable("legacy", "email")) {
+		return;
+	}
+
 	Ext.override(GO.email.EmailClient, {
 		initComponent: GO.email.EmailClient.prototype.initComponent.createSequence(function () {
 			const store = new go.data.Store({
@@ -193,7 +199,9 @@ GO.moduleManager.onModuleReady('email', function () {
 
 			this.treePanel.insert(0, this.favoritesGrid);
 
-			store.load();
+			this.favoritesGrid.on('render', () => {
+				store.load();
+			});
 		})
 	});
 });

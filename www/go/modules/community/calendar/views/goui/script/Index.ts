@@ -372,10 +372,11 @@ modules.register(  {
 				}
 			});
 
+			modules.addAccountSettingsPanel("community", "calendar", "calendar", t("Calendar"), "today", () => {
+				return new PreferencesPanel();
+			});
 		});
 
-		modules.addAccountSettingsPanel("community", "calendar", "calendar", t("Calendar"), "today", () => {
-			return new PreferencesPanel();
-		});
+
 	}
 });
