@@ -164,7 +164,9 @@ export class Main extends MainThreeColumnPanel {
 							icon: "business",
 							text: t("Organization"),
 							handler: () => {
-								//todo
+								const dlg = new ContactDialog(true);
+
+								dlg.show();
 							}
 						})
 					)

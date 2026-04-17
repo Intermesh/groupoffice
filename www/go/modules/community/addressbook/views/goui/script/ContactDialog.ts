@@ -2,7 +2,7 @@ import {
 	ArrayField,
 	arrayfield,
 	autocompletechips,
-	btn,
+	btn, checkbox,
 	checkboxselectcolumn,
 	colorfield,
 	column,
@@ -13,6 +13,7 @@ import {
 	datefield,
 	fieldset,
 	h3,
+	hiddenfield,
 	hr,
 	select,
 	t,
@@ -22,9 +23,10 @@ import {
 } from "@intermesh/goui";
 import {client, FormWindow, imagefield, languagefield} from "@intermesh/groupoffice-core";
 import {addressbookcombo, contactDS, typeStoreData} from "./Index.js";
+import {icdselect, ICDSelectField} from "./ICDSelectField.js";
 
 export class ContactDialog extends FormWindow {
-	constructor() {
+	constructor(isOrganization: boolean = false) {
 		super("Contact");
 
 		this.title = t("Contact");
@@ -46,43 +48,15 @@ export class ContactDialog extends FormWindow {
 
 		this.generalTab.items.add(
 			fieldset({cls: "fit vbox gap"},
+				hiddenfield({
+					name: "isOrganization",
+					value: isOrganization
+				}),
 				comp({cls: "hbox"},
-					comp({cls: "vbox gap", flex: 1},
-						comp({cls: "hbox gap"},
-							textfield({
-								name: "firstName",
-								label: t("First name"),
-								flex: 1
-							}),
-							textfield({
-								name: "middleName",
-								label: t("Middle")
-							}),
-							textfield({
-								name: "lastName",
-								label: t("Last name"),
-								flex: 1
-							})
-						),
-						comp({cls: "hbox gap"},
-							textfield({
-								name: "prefixes",
-								label: t("Prefix"),
-								flex: 1
-							}),
-							textfield({
-								name: "suffixes",
-								label: t("Suffix"),
-								flex: 1
-							})
-						),
-						textfield({
-							name: "salutation",
-							label: t("Salutation")
-						})
-					),
+					isOrganization ? this.buildOrganizationNameFields() : this.buildContactNameFields(),
 					imagefield({
 						name: "photoBlobId",
+						icon: isOrganization ? "business" : "person"
 					})
 				),
 				comp({cls: "vbox gap",},
@@ -90,14 +64,18 @@ export class ContactDialog extends FormWindow {
 						colorfield({
 							name: "color",
 							label: t("Color"),
-							flex: 1
+							flex: 1,
+							hidden: isOrganization,
+							disabled: isOrganization
 						})
 					),
 					comp({cls: "hbox gap"},
 						textfield({
 							name: "jobTitle",
 							label: t("Job title"),
-							flex: 2
+							flex: 2,
+							hidden: isOrganization,
+							disabled: isOrganization
 						}),
 						select({
 							name: "gender",
@@ -109,18 +87,24 @@ export class ContactDialog extends FormWindow {
 								{value: "N", name: t("Non-binary")},
 								{value: "P", name: t("Won't say")}
 							],
-							flex: 1
+							flex: 1,
+							hidden: isOrganization,
+							disabled: isOrganization
 						})
 					),
 					textfield({
 						name: "department",
 						label: t("Department"),
-						flex: 1
+						flex: 1,
+						hidden: isOrganization,
+						disabled: isOrganization
 					})
 				),
 				autocompletechips({
 					name: "organizationIds",
 					label: t("Organizations"),
+					hidden: isOrganization,
+					disabled: isOrganization,
 					list: table({
 						fitParent: true,
 						headers: false,
@@ -160,7 +144,9 @@ export class ContactDialog extends FormWindow {
 				addressbookcombo({
 					name: "addressBookId",
 					label: t("Address book"),
-					value: client.user.addressBookSettings ? client.user.addressBookSettings.defaultAddressBookId : null
+					value: client.user.addressBookSettings ? client.user.addressBookSettings.defaultAddressBookId : null,
+					hidden: isOrganization,
+					disabled: isOrganization,
 				}),
 				hr(),
 				h3({text: t("Communications")}),
@@ -392,6 +378,67 @@ export class ContactDialog extends FormWindow {
 			)
 		);
 
+
+		if (isOrganization) {
+			this.cards.items.add(
+				fieldset({
+						title: t("Business"),
+					},
+					h3({text: t("Information")}),
+					icdselect({
+						name: "icd",
+						listeners: {
+							focus: (ev) => {
+								const addresses: Record<string, any>[] | undefined = this.form.value.addresses;
+
+								if (addresses) {
+									let countryCodes: string[] = [];
+
+									addresses.forEach((address) => {
+										if (address.countryCode) {
+											countryCodes.push(address.countryCode);
+										}
+									});
+
+									(ev.target as ICDSelectField).filterCountries(countryCodes);
+								}
+							}
+						}
+					}),
+					textfield({
+						name: "registrationNumber",
+						label: t("Registration number")
+					}),
+					textfield({
+						name: "debtorNumber",
+						label: t("Customer number")
+					}),
+					hr(),
+					h3({text: t("Bank details")}),
+					textfield({
+						name: "nameBank",
+						label: t("Name bank")
+					}),
+					textfield({
+						name: "IBAN",
+						label: t("IBAN")
+					}),
+					textfield({
+						name: "BIC",
+						label:t("BIC")
+					}),
+					checkbox({
+						name: "vatReverseCharge",
+						label: t("Reverse charge VAT")
+					}),
+					textfield({
+						name: "vatNo",
+						label: t("VAT number")
+					})
+				)
+			)
+		}
+
 		this.cards.items.add(
 			fieldset({
 					title: t("Notes"),
@@ -404,6 +451,72 @@ export class ContactDialog extends FormWindow {
 				})
 			)
 		);
+	}
 
+	private buildContactNameFields() {
+		return comp({cls: "vbox gap", flex: 1},
+			comp({cls: "hbox gap"},
+				textfield({
+					name: "firstName",
+					label: t("First name"),
+					flex: 1
+				}),
+				textfield({
+					name: "middleName",
+					label: t("Middle")
+				}),
+				textfield({
+					name: "lastName",
+					label: t("Last name"),
+					flex: 1
+				})
+			),
+			comp({cls: "hbox gap"},
+				textfield({
+					name: "prefixes",
+					label: t("Prefix"),
+					flex: 1
+				}),
+				textfield({
+					name: "suffixes",
+					label: t("Suffix"),
+					flex: 1
+				})
+			),
+			textfield({
+				name: "salutation",
+				label: t("Salutation")
+			})
+		);
+	}
+
+	private buildOrganizationNameFields() {
+		return comp({cls: "vbox gap", flex: 1},
+			comp({cls: "hbox gap"},
+				textfield({
+					name: "name",
+					label: t("Name"),
+					flex: 2
+				}),
+				colorfield({
+					name: "color",
+					label: t("Color"),
+					flex: 1
+				})
+			),
+			comp({cls: "hbox gap"},
+				textfield({
+					name: "jobTitle",
+					label: t("LOB"),
+					flex: 2
+				}),
+				comp({flex: 1})
+			),
+			addressbookcombo({
+				name: "addressBookId",
+				label: t("Address book"),
+				value: client.user.addressBookSettings ? client.user.addressBookSettings.defaultAddressBookId : null
+			}),
+		);
 	}
 }
