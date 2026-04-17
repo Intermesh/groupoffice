@@ -1,5 +1,7 @@
 # About GroupOffice
 
+![GroupOffice Calendar](https://github.com/Intermesh/groupoffice/raw/ee417a219bf63010f059039d3def36161689287f/media/screenshots/calendar.png)
+
 GroupOffice is an open-source groupware and CRM platform for enterprises and the public sector. It’s created and 
 maintained by the Dutch company Intermesh. You can self-host the software or run it on Intermesh’s secure cloud 
 infrastructure, where your data remains fully private.
