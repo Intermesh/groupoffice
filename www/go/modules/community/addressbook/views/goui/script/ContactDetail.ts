@@ -138,7 +138,7 @@ export class ContactDetail extends DetailPanel<Contact> {
 														entityId: this.entity!.id
 													});
 												});
-											},
+											}
 										}
 									},
 									comp({text: value.email}),

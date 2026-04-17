@@ -21,7 +21,7 @@ import {
 	textarea,
 	textfield
 } from "@intermesh/goui";
-import {Contact, contactDS} from "./Index";
+import {Contact, contactDS, typeStoreData} from "./Index";
 
 export class UserProfileSettingsPanel extends AppSettingsPanel {
 	private readonly form: DataSourceForm<Contact>;
@@ -105,7 +105,7 @@ export class UserProfileSettingsPanel extends AppSettingsPanel {
 								textRenderer: (t) => {
 									return t.name
 								},
-								options: this.getSelectTypes("phoneTypes"),
+								options: typeStoreData("phoneTypes"),
 								value: "work"
 							}),
 							textfield({
@@ -141,7 +141,7 @@ export class UserProfileSettingsPanel extends AppSettingsPanel {
 										textRenderer: (t) => {
 											return t.name
 										},
-										options: this.getSelectTypes("addressTypes"),
+										options: typeStoreData("addressTypes"),
 										value: "work"
 									}),
 									textarea({
@@ -204,7 +204,7 @@ export class UserProfileSettingsPanel extends AppSettingsPanel {
 									textRenderer: (t) => {
 										return t.name
 									},
-									options: this.getSelectTypes("dateTypes"),
+									options: typeStoreData("dateTypes"),
 									value: "birthday"
 								}),
 								datefield({
@@ -241,7 +241,7 @@ export class UserProfileSettingsPanel extends AppSettingsPanel {
 									textRenderer: (t) => {
 										return t.name
 									},
-									options: this.getSelectTypes("urlTypes"),
+									options: typeStoreData("urlTypes"),
 									value: "homepage"
 								}),
 								textfield({
@@ -287,15 +287,6 @@ export class UserProfileSettingsPanel extends AppSettingsPanel {
 		const countries = t("countries");
 
 		return Object.entries(countries).map(([value, name]) => ({
-			value,
-			name
-		}));
-	}
-
-	private getSelectTypes(translateKey: string) {
-		const types = t(translateKey, "community", "addressbook");
-
-		return Object.entries(types).map(([value, name]) => ({
 			value,
 			name
 		}));

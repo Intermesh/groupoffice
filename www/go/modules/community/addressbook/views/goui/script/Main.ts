@@ -17,6 +17,7 @@ import {
 import {AddressBookGrid, addressbookgrid} from "./AddressBookGrid.js";
 import {contactgrid, ContactGrid} from "./ContactGrid.js";
 import {ContactDetail} from "./ContactDetail.js";
+import {ContactDialog} from "./ContactDialog.js";
 
 export class Main extends MainThreeColumnPanel {
 	private addressBookGrid!: AddressBookGrid;
@@ -146,11 +147,27 @@ export class Main extends MainThreeColumnPanel {
 					}
 				}),
 				btn({
-					icon: "add",
 					text: t("Add"),
-					handler: () => {
-						//todo
-					}
+					menu: menu({
+							isDropdown: true
+						},
+						btn({
+							icon: "person",
+							text: t("Contact"),
+							handler: () => {
+								const dlg = new ContactDialog();
+
+								dlg.show();
+							}
+						}),
+						btn({
+							icon: "business",
+							text: t("Organization"),
+							handler: () => {
+								//todo
+							}
+						})
+					)
 				}),
 				btn({
 					icon: "more_vert",

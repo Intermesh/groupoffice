@@ -111,3 +111,12 @@ export interface ContactUrl {
 
 export const addressBookDS = new JmapDataSource<AddressBook>("AddressBook");
 export const contactDS = new JmapDataSource<Contact>("Contact");
+
+export const typeStoreData = function (langKey: string) {
+	const types = t(langKey, "community", "addressbook");
+
+	return Object.entries(types).map(([value, name]) => ({
+		value,
+		name
+	}));
+}
