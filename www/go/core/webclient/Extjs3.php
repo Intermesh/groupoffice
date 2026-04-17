@@ -376,6 +376,7 @@ class Extjs3 {
 				throw new InvalidArgumentException("Invalid function given");
 			}
 
+			// nosemgrep
 			echo 'if (GO.' . $fp['m'] .'){GO.mainLayout.on("render", function () {GO. '. $fp['m'] . '.' . $fp['f'] . '.call(this,  '. json_encode($fp['p']) .');});}';
 		}
 

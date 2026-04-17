@@ -411,7 +411,7 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 		var values = Ext.apply(this.formPanel.form.getFieldValues(),p);
 		values = Ext.apply(this.formPanel.form.getValues(),values);
 
-		var keys, JSON={}, currentJSONlevel;
+		var keys, JSON= Object.create(null), currentJSONlevel;
 		
 		for(var key in values){
 			

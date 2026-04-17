@@ -120,9 +120,9 @@ $icon = [
         </div>
     </div>
     <?php if($method==='PAGE' && isset($_GET['reply'])): ?>
-    <div class="center <?=$_GET['reply']?>"><br>
+    <div class="center <?=htmlentities($_GET['reply'])?>"><br>
        <?php $msg = go()->t('replyPageMessage', 'community', 'calendar');
-       if(array_key_exists($_GET['reply'], $msg)) echo $msg[$_GET['reply']];
+       if(array_key_exists($_GET['reply'], $msg)) echo htmlentities($msg[$_GET['reply']]);
        ?>
     </div>
     <?php endif; ?>

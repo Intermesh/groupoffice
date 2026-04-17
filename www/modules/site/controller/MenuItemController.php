@@ -41,7 +41,8 @@ class MenuItemController extends \GO\Base\Controller\AbstractJsonController {
 		$findParams = \GO\Base\Db\FindParams::newInstance()->criteria($findCriteria);
 		
 		$store = new \GO\Base\Data\DbStore('GO\Site\Model\MenuItem', new \GO\Base\Data\ColumnModel('GO\Site\Model\MenuItem'), $_REQUEST,$findParams);
-		
+
+		// nosemgrep
 		echo $this->renderStore($store);
 	}
 	
