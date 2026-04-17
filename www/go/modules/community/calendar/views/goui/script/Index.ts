@@ -282,6 +282,12 @@ modules.register(  {
 
 		client.on("authenticated",  ({session}) => {
 
+
+			client.user.calendarPreferences ||= {};
+			if(!session.capabilities["go:community:calendar"]) {
+				return; // User has no access to this module
+			}
+
 			// OLD CODE
 			async function showBadge() {
 				const count = await go.Jmap.request({method: "CalendarEvent/countMine"});
@@ -293,10 +299,7 @@ modules.register(  {
 			});
 			showBadge();
 			// END OLD CODE
-			client.user.calendarPreferences ||= {};
-			if(!session.capabilities["go:community:calendar"]) {
-				return; // User has no access to this module
-			}
+
 			const ui = new Main(),
 				nav = (span:ValidTimeSpan, amount: number, ymd?: string) => {
 					modules.openMainPanel("calendar");
