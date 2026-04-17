@@ -262,9 +262,8 @@ $updates['202602231535'][] = "UPDATE tasks_tasklist SET defaultColor = SUBSTRING
 // subscribe to the tasklists the user has access to
 $updates['202602231535'][] = "INSERT IGNORE INTO tasks_tasklist_user
 (tasklistId, userId, isSubscribed, isVisible, color, sortOrder, modSeq)
-select tl.id, ug.userId, 1, 1, tl.defaultColor,0,1 from core_acl_group ag
-inner join core_user_group ug on ug.groupId = ag.groupId
-inner join tasks_tasklist tl on tl.aclId = ag.aclId where tl.projectId is not null group by tl.id,ug.userId";
+select tl.id, tl.createdBy, 1, 1, tl.defaultColor,0,1 from tasks_tasklist tl
+where tl.role =1";
 
 $updates['202602231535'][] = "update tasks_task set progressUpdated = modifiedAt where progressUpdated is null and progress = 3;";
 
