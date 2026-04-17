@@ -378,6 +378,9 @@ class Comment extends AclItemEntity {
 
 	private function findMentions()
 	{
+		if(!Alert::$enabled) {
+			return;
+		}
 
 		$old = $this->getOldValue('text');
 		$oldMentions = self::parseMentions($old);
