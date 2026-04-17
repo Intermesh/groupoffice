@@ -1,8 +1,13 @@
-# GroupOffice groupware and CRM
+# About GroupOffice
 
-GroupOffice is an open-source CRM and groupware tool for enterprises and the public sector.
-Share projects, calendars, files and e-mail online with co-workers and clients. 
-Easy to use and fully customizable.
+GroupOffice is an open-source groupware and CRM platform for enterprises and the public sector. It’s created and 
+maintained by the Dutch company Intermesh. You can self-host the software or run it on Intermesh’s secure cloud 
+infrastructure, where your data remains fully private.
+
+Collaborate with integrated file sharing, video conferencing, E-mail, calendar and contact management, project and 
+time tracking, quoting and invoicing, support ticketing, and the Collabora Online office suite. By combining all these 
+tools in a single platform, GroupOffice eliminates the need for multiple separate systems and streamlines your workflow.
+GroupOffice is easily extensible with custom modules, allowing you to tailor the platform to your specific needs.
 
 # Install
 
