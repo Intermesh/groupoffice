@@ -6,6 +6,7 @@
 - Calendar: Fix error when in account dialog when you don't have permissions to the calendar.
 - Emailfavorites: Fix error when you don't have permissions
 - Tasks: On migration subscribe to tasklists owned by the user
+- Support: Don't process @mention on migration
 
 14-04-2026: 26.0.24
 - Support: Mail sending was broken if SMIME was not configured
