@@ -53,9 +53,11 @@ export class UserProfileSettingsPanel extends AppSettingsPanel {
 					type: "box",
 					value: null,
 					options: [
-						{text: t("Unknown"), value: null},
-						{text: t("Male"), value: 'M'},
-						{text: t("Female"), value: 'F'},
+						{value: null, text: t("Unknown")},
+						{value: "M", text: t("Male")},
+						{value: "F", text: t("Female")},
+						{value: "N", text: t("Non-binary")},
+						{value: "P", text: t("Won't say")}
 					]
 				}),
 				autocompletechips({
