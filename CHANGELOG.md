@@ -3,6 +3,8 @@
 - Calendar: update category list according to selected calendar in event window
 - Email: Remove old code which had an authenticated stored XSS vulnerability
 - Core: Validate user ID param when saving settings
+- Calendar: Fix error when in account dialog when you don't have permissions to the calendar.
+- Emailfavorites: Fix error when you don't have permissions
 
 14-04-2026: 26.0.24
 - Support: Mail sending was broken if SMIME was not configured
