@@ -2,7 +2,8 @@ import {
 	ArrayField,
 	arrayfield,
 	autocompletechips,
-	btn, checkbox,
+	btn,
+	checkbox,
 	checkboxselectcolumn,
 	colorfield,
 	column,
@@ -61,6 +62,13 @@ export class ContactDialog extends FormWindow {
 				),
 				comp({cls: "vbox gap",},
 					comp({cls: "hbox gap"},
+						textfield({
+							name: "jobTitle",
+							label: t("Job title"),
+							flex: 2,
+							hidden: isOrganization,
+							disabled: isOrganization
+						}),
 						colorfield({
 							name: "color",
 							label: t("Color"),
@@ -71,8 +79,8 @@ export class ContactDialog extends FormWindow {
 					),
 					comp({cls: "hbox gap"},
 						textfield({
-							name: "jobTitle",
-							label: t("Job title"),
+							name: "department",
+							label: t("Department"),
 							flex: 2,
 							hidden: isOrganization,
 							disabled: isOrganization
@@ -91,14 +99,7 @@ export class ContactDialog extends FormWindow {
 							hidden: isOrganization,
 							disabled: isOrganization
 						})
-					),
-					textfield({
-						name: "department",
-						label: t("Department"),
-						flex: 1,
-						hidden: isOrganization,
-						disabled: isOrganization
-					})
+					)
 				),
 				autocompletechips({
 					name: "organizationIds",
@@ -425,7 +426,7 @@ export class ContactDialog extends FormWindow {
 					}),
 					textfield({
 						name: "BIC",
-						label:t("BIC")
+						label: t("BIC")
 					}),
 					checkbox({
 						name: "vatReverseCharge",

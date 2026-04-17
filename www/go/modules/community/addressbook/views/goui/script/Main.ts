@@ -18,6 +18,7 @@ import {AddressBookGrid, addressbookgrid} from "./AddressBookGrid.js";
 import {contactgrid, ContactGrid} from "./ContactGrid.js";
 import {ContactDetail} from "./ContactDetail.js";
 import {ContactDialog} from "./ContactDialog.js";
+import {AddressBookDialog} from "./AddressBookDialog.js";
 
 export class Main extends MainThreeColumnPanel {
 	private addressBookGrid!: AddressBookGrid;
@@ -44,7 +45,6 @@ export class Main extends MainThreeColumnPanel {
 				'->',
 				this.showCenterButton()
 			),
-			// todo color on RadioOption?
 			radio({
 				flex: 1,
 				type: "list",
@@ -100,7 +100,9 @@ export class Main extends MainThreeColumnPanel {
 				btn({
 					icon: "add",
 					handler: () => {
-						// todo
+						const dlg = new AddressBookDialog();
+
+						dlg.show();
 					}
 				})
 			),
@@ -135,7 +137,7 @@ export class Main extends MainThreeColumnPanel {
 		return comp({
 				cls: "vbox bg-lowest"
 			},
-			tbar({},
+			tbar({cls: "bg-mid border-bottom"},
 				this.showWestButton(),
 				'->',
 				searchbtn({
@@ -157,6 +159,10 @@ export class Main extends MainThreeColumnPanel {
 							handler: () => {
 								const dlg = new ContactDialog();
 
+								dlg.form.on("submit", () => {
+									void this.contactGrid.store.load();
+								});
+
 								dlg.show();
 							}
 						}),
@@ -165,6 +171,10 @@ export class Main extends MainThreeColumnPanel {
 							text: t("Organization"),
 							handler: () => {
 								const dlg = new ContactDialog(true);
+
+								dlg.form.on("submit", () => {
+									void this.contactGrid.store.load();
+								});
 
 								dlg.show();
 							}
