@@ -782,7 +782,7 @@ $timeMargin: dp(72);
 		&.selected {
 			background-color: $colorSelectedRowInactive;
 		}
-		menu{width:0;}
+		menu{width:0;overflow:hidden;}
 		&:hover menu, &:focus-within menu{width:auto;}
 	}
 	.goui-form-field .wrap menu.goui-toolbar {
