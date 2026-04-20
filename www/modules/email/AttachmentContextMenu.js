@@ -53,8 +53,11 @@ GO.email.AttachmentContextMenu = function(config)
 					},
 					scope: this
 				});
-		config.items.push(this.saveButton);
-	
+		const fmur= go.Modules.get("legacy", "files").userRights;
+		if (fmur && fmur.mayAccessMainPanel) {
+			config.items.push(this.saveButton);
+		}
+
 		// Save to item button.
 		// Shows the link dialog so you can select an item to add the attachment to.
 		this.saveToItemButton = new Ext.menu.Item({

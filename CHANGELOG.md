@@ -2,6 +2,7 @@
 - Email: Remove old code which had an authenticated stored XSS vulnerability
 - Core: Validate user ID param when saving settings
 - OTP: explicitly log username and IP upon wrong authentication
+- Files: do not display attachment save to personal folder if files module not available
 
 13-04-2026: 6.8.164
 - Files: Move to trash could accidentally remove selected tree folder instead of selection in the thumbnail view
