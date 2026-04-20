@@ -2,6 +2,7 @@
 - Email: Remove old code which had an authenticated stored XSS vulnerability
 - Core: Validate user ID param when saving settings
 - OTP: explicitly log username and IP upon wrong authentication
+- Email: Do not show 'save to personal folder' button if no access to files module
 
 13-04-2026: 25.0.99
 
