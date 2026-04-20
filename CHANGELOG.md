@@ -8,6 +8,7 @@
 - Tasks: On migration subscribe to tasklists owned by the user
 - Support: Don't process @mention on migration
 - OTP: explicitly log username and IP upon wrong authentication
+- Email: Do not show 'save to personal folder' button if no access to files module
 
 14-04-2026: 26.0.24
 - Support: Mail sending was broken if SMIME was not configured
