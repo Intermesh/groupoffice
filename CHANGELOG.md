@@ -1,3 +1,4 @@
+20-04-2026: 6.8.165
 - ActiveSync: Missing MSTZ function
 - Email: Remove old code which had an authenticated stored XSS vulnerability
 - Core: Validate user ID param when saving settings
