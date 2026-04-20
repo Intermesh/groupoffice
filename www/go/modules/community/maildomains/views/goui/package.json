@@ -8,9 +8,8 @@
     "typescript": "5.9.x"
   },
   "scripts": {
-    "start": "npm run build:clean && concurrently --kill-others \"npm run start:ts\" \"npm run start:dts\\  \"npm run start:sass\"",
-    "start:ts": "node ../../../../../../views/goui/esbuild-module.mjs watch",
-    "start:dts": "npx tsc --declaration --emitDeclarationOnly --watch",
+    "start": "npm run build:clean && concurrently --kill-others \"npm run start:esbuild\"  \"npm run start:sass\"",
+    "start:esbuild": "node ../../../../../../views/goui/esbuild-module.mjs watch",
     "start:sass": "npx sass --watch style:dist",
 
     "build": "npm run build:clean && npm run build:sass && npm run build:ts",

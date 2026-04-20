@@ -1,3 +1,5 @@
+- Maildomains: fix display of active column in aliases table #1482
+
 20-04-2026: 26.0.25
 - Calendar: Event location field allows free text input
 - Core: Fixed holidays error in billing because of type and case problem in generate() function
