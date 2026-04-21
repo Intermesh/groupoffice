@@ -1,4 +1,5 @@
 - Tasks: On migration subscribe to tasklists owned by the user
+- Core: Fixed infinite loop when installation is disabled
 
 20-04-2026: 25.0.100
 - ActiveSync: Missing MSTZ function
