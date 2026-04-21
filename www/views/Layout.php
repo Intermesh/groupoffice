@@ -14,7 +14,7 @@ $goTitle = basename(dirname($_SERVER['PHP_SELF'])) == 'install' ? go()->t("Insta
 $primaryColor = go()->getSettings()->primaryColor ?? 'rgb(22, 82, 161)';
 $webclient = Extjs3::get();
 $themeUrl = $webclient->getThemeUrl();
-$authController = new \GO\Core\Controller\AuthController(); // for some reason the event listeners are in this class
+$authController = new \GO\Core\Controller\AuthController(false); // for some reason the event listeners are in this class
 $cssMtime = filemtime(GO::view()->getTheme()->getPath() . "style.css");
 $lang = go()->getLanguage()->getIsoCode();
 ?><!DOCTYPE html>
