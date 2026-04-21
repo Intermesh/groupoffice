@@ -1,6 +1,5 @@
 import {
-	autocomplete,
-	autocompletechips, AutocompleteField,
+	autocompletechips,
 	browser,
 	btn,
 	Button,
@@ -9,21 +8,22 @@ import {
 	checkboxselectcolumn,
 	column,
 	comp,
-	containerfield, dataSourceEntityType, DataSourceStore,
+	containerfield,
+	DataSourceStore,
 	datasourcestore,
 	DateInterval,
 	DateTime,
 	datetimefield,
-	DateTimeField, DefaultEntity,
-	Format, listStoreType,
+	DateTimeField,
+	Format,
 	MapField,
 	mapfield,
 	Notifier,
 	numberfield,
 	radio,
 	select,
-	store, storeRecordType,
-	table, TableColumn,
+	store,
+	table,
 	textarea,
 	textfield,
 	TextField,
@@ -36,10 +36,10 @@ import {
 	JmapDataSource,
 	jmapds,
 	modules,
-	principalDS, RecipientPicker,
+	principalDS,
 	recurrencefield
 } from "@intermesh/groupoffice-core";
-import {categoryStore, OnlineMeetingButton, t, writeableCalendarStore} from "./Index.js";
+import {OnlineMeetingButton, t, writeableCalendarStore} from "./Index.js";
 import {ParticipantField, participantfield} from "./ParticipantField.js";
 import {AlertField, alertfield} from "./AlertField.js";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
