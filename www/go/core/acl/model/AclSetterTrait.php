@@ -57,7 +57,7 @@ trait AclSetterTrait {
 			}
 		}
 
-		if(isset($this->createdBy) && $a->ownedBy != $this->createdBy) {
+		if(isset($this->createdBy) && $this->isModified('createdBy') && $a->ownedBy != $this->createdBy) {
 
 			$a->ownedBy = $this->createdBy;
 		}
