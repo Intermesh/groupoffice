@@ -78,14 +78,30 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 		$this->SetAutoPageBreak(false, 10);
 	}
 
-	public function Footer() {
-		$width = $this->getPageWidth()-$this->leftMargin*2;
-		$this->SetFont(null,'',$this->fSizeMedium);
-		$this->SetY($this->getPageHeight()-$this->footerY);
-		$x=$this->GetX();
-		$this->Cell($width, 5, $this->calendarName, 0, 0, 'L');
-		$this->SetX($x);
-		$this->Cell($width, 5, $this->GetPage(), 0,0,'C');
+	public function Footer()
+	{
+		$width = $this->getPageWidth() - $this->leftMargin * 2;
+		$this->SetFont(null, '', $this->fSizeMedium);
+		$this->SetY($this->getPageHeight() - $this->footerY);
+		$x = $this->GetX();
+		$y = $this->GetY();
+		if (!empty($this->calendarName)) {
+			$this->Cell($width, 5, $this->calendarName, 0, 0, 'L');
+			$this->SetX($x);
+			$this->Cell($width, 5, $this->GetPage(), 0, 0, 'C');
+		} else if($this->calendars) {
+			$currentX= $x;
+			foreach($this->calendars as $calendar) {
+				list($r, $g, $b) = sscanf($calendar['color'], "%02x%02x%02x");
+				$this->SetFillColor($r, $g, $b);
+				$textWidth = $this->GetStringWidth($calendar['name']);
+				$this->Rect($currentX, $y+1, 1, 3.2, 'F');
+				// move right for text
+				$this->SetX($currentX + 1.5);
+				$this->Cell($textWidth, 5, $calendar['name'], 0, 0, 'L');
+				$currentX += 3 + $textWidth + 4;
+			}
+		}
 		$this->SetX($x);
 		$this->Cell($width, 5, (new DateTime())->toUserFormat(true), 0,0,'R');
 	}
@@ -233,8 +249,8 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 	protected function wd($wd) {
 		if($this->firstWeekday==0)
 			return $wd;
-		if ($wd==7)
-			return 0;
+		if ($wd==0)
+			return 6;
 		else 
 			return $wd-1;
 	}

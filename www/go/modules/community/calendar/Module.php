@@ -203,6 +203,14 @@ class Module extends core\Module
 		}
 	}
 
+	public function pagePrintRange($type,$days, $date) {
+		go()->setAuthState(new core\jmap\State());
+		$calendarIds = Calendar::find()->selectSingleValue('calendar_calendar.id')
+			->where('caluser.isVisible', '=',1)->andWhere('caluser.isSubscribed','=', true)->all();
+
+		$this->printWeeks(new \DateTime($date),$days, $calendarIds);
+	}
+
 	public function pagePrintList($start, $end) {
 
 		go()->setAuthState(new core\jmap\State());
@@ -270,6 +278,35 @@ class Module extends core\Module
 		$report->Output($report->Output('calendar_week_'.$start->format('Y-m-d').'_'.$end->format('Y-m-d').'.pdf'));
 	}
 
+	private function printWeeks($date, $amount, $calendarIds) {
+		$start = clone $date;
+		$end = (clone $start)->modify("+$amount days");
+
+		$events = CalendarEvent::find()->filter([
+			'before'=>$end->format('Y-m-d'),
+			'after'=>$start->format('Y-m-d'),
+			'inCalendars'=>$calendarIds
+		])->all();
+
+		$days = $start->diff($end)->days;
+		$firstWd = go()->getAuthState()->getUser(['firstWeekday'])->firstWeekday;
+		$dayName = $firstWd===1 ? 'Monday' : 'Sunday';
+		if($days > 6 && $start->format('w') != $firstWd)
+			$start->modify('last '.$dayName);
+
+		$report = new reports\Month();
+		$report->day = $start;
+		$report->end = $end;
+
+
+		$rows = Calendar::find()->select(['calendar_calendar.id AS id', 'name', 'color'])->where(['id' => $calendarIds])->fetchMode(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE)->all();
+		$report->calendars = array_column($rows, null, 'id');
+		$report->setEvents($events);
+		$report->render();
+
+		$report->Output($report->Output('calendar_weeks_'.$start->format('Y-m-d').'_'.$end->format('Y-m-d').'.pdf'));
+	}
+
 	private function printMonth($date, $calendarIds) {
 		$start = (clone $date)->modify('first day of this month');
 		$end = (clone $start)->modify('+1 month');
@@ -277,18 +314,18 @@ class Module extends core\Module
 		$report = new reports\Month();
 		$report->day = $start;
 		$report->end = $end;
-		foreach($calendarIds as $id) {
+		$rows = Calendar::find()->select(['calendar_calendar.id AS id', 'name', 'color'])->where(['id' => $calendarIds])->fetchMode(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE)->all();
+		$report->calendars = array_column($rows, null, 'id');
+		foreach($report->calendars as $id => $attr) {
 
 			$events = CalendarEvent::find()->filter([
 				'before'=>$end->format('Y-m-d'),
 				'after'=>$start->format('Y-m-d'),
 				'inCalendars'=>[$id]
 			])->all();
-
-
 			$report->setEvents($events);
 			$report->render();
-			$report->calendarName = Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
+			$report->calendarName = $attr['name'];
 		}
 		$report->Output($report->Output('calendar_month_'.$start->format('Y-m-d').'_'.$end->format('Y-m-d').'.pdf'));
 	}

@@ -17,7 +17,7 @@ namespace go\modules\community\calendar\reports;
 class Month extends Calendar {
 
 	protected $events = array();
-	
+	public $calendars = [];
 	private $right;
 	
 	function normal() {
@@ -76,32 +76,36 @@ class Month extends Calendar {
 	}
 	
 	private function getWeeksInMonth() {
-		$firstDayOfMonth = strtotime($this->day->format('Y-m-01'));
-		$firstWeekDay = date('N',$firstDayOfMonth)-1;
-		$daysInMonth = $this->day->format('t');
-		return ceil(($daysInMonth+$firstWeekDay)/7);
+		return ceil($this->day->diff($this->end)->days/7);
+	}
+
+	private function getAmountOfDays() {
+		return $this->day->diff($this->end)->days;
 	}
 	
 	public function drawEventCalendar() {
 		
 		$w=$this->right-7;
 		$h=$this->getPageHeight()-$this->headerHeight-16;
-		
+		$days = min($this->getAmountOfDays(),7);
+
 		$this->SetY(36);
 		$this->SetFont(null,'',7.5);
 		$this->Cell(7);
-		for($d=0;$d<7;$d++) {
-			$this->Cell($w/7,6,$this->days_long[$d], $d!=0,0,'C');
+
+		$startDay = (int)$this->day->format('w');
+		for($d=$startDay;$d < $startDay+$days; $d++) {
+			// day naem
+			$this->Cell($w/$days,6,go()->t("full_days")[$d%7], $d!=0,0,'C');
 		}
 		$this->Ln();
-		
+
 		//$day='';
 		$weeks = $this->getWeeksInMonth();
 		$dateh = 5;
 		$rowh = $h/$weeks;
-		$colw = $w/7;
-		$dayName = $this->firstWeekday===1 ? 'Monday' : 'Sunday';
-		$day = (clone $this->day)->modify('last '.$dayName);
+		$colw = $w/$days;
+		$day = clone $this->day;
 		for($r = 0; $r < $weeks; $r++){
 			//Draw vertical dates
 			$this->StartTransform();
@@ -112,37 +116,26 @@ class Month extends Calendar {
 			$this->StopTransform();
 			
 			$this->setCellPaddings(1,1,0,0);
-			for($c=0;$c<7;$c++){ //toggle weekday
+			for($c=0;$c<$days;$c++){ //toggle weekday
 				$coord = [$this->GetX(), $this->GetY()];
 
 				$this->SetFont(null, 'B', $this->fSizeMedium-2);
 				$this->Cell($colw,5,$day->format($day->format('j') == 1 ? 'j M' : 'j'), 1,0,'L',false,'',0,false,'T','T');
 				$this->SetFont(null, '', $this->fSizeSmall);
 
-				$events = '';
-				$amount = 0;
+				$events = [];
 				if($this->day->format('M')===$day->format('M')) {
-
-					if(isset($this->events[$day->format('Ymd')])) {
-
-						ksort($this->events[$day->format('Ymd')]);
-							
-						foreach($this->events[$day->format('Ymd')] as $event) {
-							if($event->showWithoutTime) {
-								$events .= '<br><font color="blue">' . substr($event->title, 0, 25) . '</font>';
-							} else {
-								$events .= "<br>".$event->start(false, go()->getAuthState()->getUser()->timezone)->format('G:i') .'-'. $event->end(false, go()->getAuthState()->getUser()->timezone)->format('G:i') .' '. substr($event->title,0,25);
-							}
-							$amount++;
-						}
-					}
-						
 					$this->SetFillColor(255);
 				} else {
 					$this->SetFillColor(240);
 				}
 
-				$this->DayCell($events, $colw, $rowh-$dateh, $coord[0], $coord[1]+$dateh,$amount>5);
+				if(isset($this->events[$day->format('Ymd')])) {
+					ksort($this->events[$day->format('Ymd')]);
+					$events = $this->events[$day->format('Ymd')];
+				}
+
+				$this->DayCell($events, $colw, $rowh-$dateh, $coord[0], $coord[1]+$dateh);
 				
 				$this->SetXY($coord[0]+$colw,$coord[1]);
 				$day->modify('+1 day');
@@ -155,7 +148,8 @@ class Month extends Calendar {
 
 	}
 	
-	protected function DayCell($text, $width, $h, $x=null, $y=null, $more=false) {
+	protected function DayCell($events, $width, $h, $x=null, $y=null) {
+		$tz = go()->getAuthState()->getUser()->timezone;
 		if($x===null)
 			$x=$this->GetX();
 		if($y===null)
@@ -163,10 +157,49 @@ class Month extends Calendar {
 		$this->SetCellHeightRatio(1.45);
 		$this->Rect($x, $y, $width, $h, 'DF');
 		$this->StartTransform(); //will clip text in the Rectangle on the next line
-		$this->Rect($x, $y, $width-2, $h, 'CEO');
-		$this->writeHTMLCell($width+100,$h,$x,$y, mb_convert_encoding($text,'UTF-8', 'UTF-8'), 0,0,false,true,'L');
+		$this->Rect($x, $y, $width-1, $h, 'CEO');
+		$currentY = $y+0.3;
+		foreach ($events as $event) {
+
+			list($r, $g, $b) = sscanf($this->calendars[$event->calendarId]['color'], "%02x%02x%02x");
+
+			$pad = 0;
+			if(!$event->showWithoutTime) {
+				$pad =1.5;
+				$this->SetFillColor($r, $g, $b);
+				$this->Rect($x + 1, $currentY + 1, 1, 3.2, 'F');
+			} else {
+				$this->SetTextColor($r, $g, $b);
+			}
+			$this->SetXY($x + $pad, $currentY);
+
+			$title = substr($event->title, 0, 25);
+
+			if (!$event->showWithoutTime) {
+				$start = $event->start(false, $tz)->format('G:i');
+				$timeWidth = $this->GetStringWidth($start);
+				$this->SetTextColor(0, 0, 0);
+				$this->Cell($width - $timeWidth, 4, $title, 0, 0);
+
+				$this->SetFillColor(255, 255, 255);
+				$this->Rect($x + $width - $timeWidth - 1.5, $currentY+1, $timeWidth + 1.5, 4, 'F');
+
+				$this->SetTextColor(150, 150, 150);
+				$this->SetXY($x + $width - $timeWidth-1, $currentY);
+				$this->Cell($timeWidth, 4, $start, 0, 0, 'R');
+			} else {
+				$this->SetTextColor($r, $g, $b);
+				$this->Cell($width+10, 4, $title, 0, 0);
+			}
+			$this->SetTextColor(0, 0, 0);
+
+			$currentY += 4;
+		}
+
+		//$this->writeHTMLCell($width+100,$h,$x,$y, mb_convert_encoding($text,'UTF-8', 'UTF-8'), 0,0,false,true,'L');
 		$this->StopTransform();
-		if($more) {
+		$hasMore = $currentY - $y > $h;
+		if($hasMore) {
 			$this->SetXY($x+($width-4),$y+($h-4));
 			$this->SetCellHeightRatio(1);
 			$this->Image(self::IMG_PATH . 'arrow_down.png', null,null, 3, 3, 'PNG');
