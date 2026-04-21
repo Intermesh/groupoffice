@@ -2,6 +2,7 @@
 - Leavedays: Holidays type error fixed
 - Fixed: ACL bug related to 4519e840 #1485
 - Savemailas: Fixed eventwindow not opening a second time from save mail as
+- Finance: Fixed drag and drop in finance between groups
 
 20-04-2026: 26.0.25
 - Calendar: Event location field allows free text input
