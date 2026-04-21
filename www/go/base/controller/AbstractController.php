@@ -101,7 +101,7 @@ abstract class AbstractController extends Observable {
 	 */
 	protected $view = 'file';
 
-	public function __construct() {
+	public function __construct($checkEnabled = true) {
 		
 		
 		$this->init();
@@ -111,7 +111,7 @@ abstract class AbstractController extends Observable {
 			$this->view = new $name();
 		}
 		
-		if (!GO::config()->enabled) {
+		if ($checkEnabled && !GO::config()->enabled) {
 			$this->render('Disabled');
 			exit();
 		}	
