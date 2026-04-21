@@ -83,10 +83,15 @@ export class CalendarList extends Component<CalendarListEventMap> {
 							d.show();
 						}
 					}),
-					btn({icon: 'travel_explore',text: t('Add calendar from link') + '…', handler: () => {
-						const d = new SubscribeWebCalWindow();
-						d.show();
-					}}),
+					btn({
+						hidden:!rights.mayChangeCalendars,
+						icon: 'travel_explore',
+						text: t('Add calendar from link') + '…',
+						handler: () => {
+							const d = new SubscribeWebCalWindow();
+							d.show();
+						}
+					}),
 					hr({hidden: !rights.mayChangeViews}),
 					btn({hidden: !rights.mayChangeViews,
 						icon: 'calendar_view_month',
