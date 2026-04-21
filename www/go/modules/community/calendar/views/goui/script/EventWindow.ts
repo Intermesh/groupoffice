@@ -215,11 +215,10 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 
 							const d = this.form.value.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
 							this.alertField.setDefaultLabel(d)
-							if (!this.item?.key && !this.participantFld.list.isEmpty()) {
+							if (!this.item?.key && this.participantFld.list && !this.participantFld.list.isEmpty()) {
 								// calendar changed and event is new, check if organizer needs to change as well
 								principalDS.single(this.item!.ownerId).then(p => {
 									this.participantFld.addOrganiser(p);
-									// this.participantFld.list.trackReset();
 								}).catch(e => {
 									void Window.error(t("Could not add organizer because the calendar principal could not be read from the server. Do you have permissions?"));
 								})
