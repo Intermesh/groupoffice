@@ -1,3 +1,5 @@
+- Tasks: On migration subscribe to tasklists owned by the user
+
 20-04-2026: 25.0.100
 - ActiveSync: Missing MSTZ function
 - Email: Remove old code which had an authenticated stored XSS vulnerability
