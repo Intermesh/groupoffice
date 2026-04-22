@@ -1,4 +1,5 @@
 - Maildomains: fix display of active column in aliases table #1482
+- Core: increase max size of email template subject field
 
 20-04-2026: 26.0.25
 - Calendar: Event location field allows free text input

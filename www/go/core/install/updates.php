@@ -1827,3 +1827,5 @@ $updates['202604131511'][] ="delete from core_entity where clientName in (
 		'UserDisplay',
 		'TasklistCompat'
     )";
+
+$updates['202604221150'][] = "ALTER TABLE core_email_template CHANGE subject subject VARCHAR(255) CHARACTER SET utf8mb4 DEFAULT NULL COLLATE utf8mb4_unicode_ci";
