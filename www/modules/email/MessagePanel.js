@@ -77,6 +77,12 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'<div class="em-contact-link-container"><span id="'+this.linkMessageId+'" class="em-contact-link"></span></div>'+
 			'<tpl if="attachments.length">'+
 			'<div style="clear:both;"></div>'+
+
+			'<tpl if="attachments.length &gt; 1">'+
+			'<div class="goui hbox border-bottom"><h3 style="flex:1">Attachments</h3>' +
+			'<i style="align-self: center" class="icon ic-more-horiz" id="downloadAllMenu-'+this.downloadAllMenuId +'"></i>'+
+			'</div>'+
+			'</tpl>'+
 			// '<table>'+
 			// '<tr><tr><td id="'+this.attachmentsId+'">'+
 			'<div class="em-attachments" id="'+this.attachmentsId+'">'+
@@ -85,13 +91,13 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				templateStr += '<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a> ';
 				templateStr += '</tpl>'+
 				'<tpl if="extension!=\'vcf\'">'+
-				'<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a> '+
+				'<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a><i id="'+this.attachmentsId+'_more_{[xindex-1]}" class="icon ic-more-vert"></i> '+
 				'</tpl>'+
 			'</tpl>'+
 
-			'<tpl if="attachments.length&gt;0">'+
-				'<i class="icon ic-more-vert" id="downloadAllMenu-'+this.downloadAllMenuId +'"></i>'+
-			'</tpl>'+
+			// '<tpl if="attachments.length&gt;0">'+
+			// 	'<i class="icon ic-more-vert" id="downloadAllMenu-'+this.downloadAllMenuId +'"></i>'+
+			// '</tpl>'+
 							
 			// '</td></tr>'+
 			// '</table>'+
@@ -395,7 +401,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		}
 
 		// Add 'Delete all attachmennts' option to allAttachment Context menu
-		if(data.attachments.length && this.allAttachmentContextMenu) {
+		if(data.attachments.length > 1 && this.allAttachmentContextMenu) {
 			this.allAttachmentsMenuEl = Ext.get('downloadAllMenu-'+this.downloadAllMenuId);
 			const single = data.attachments.length === 1;
 			this.allAttachmentContextMenu.downloadButton.setVisible(!single);
@@ -565,7 +571,15 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			//prevent double clicking
 			return;
 		}
-		if(target.id.substr(0,this.attachmentsId.length)==this.attachmentsId)
+
+		if(target.id.indexOf(this.attachmentsId + "_more") > -1)
+		{
+			var attachment_no = target.id.substr(this.attachmentsId.length + 6);
+			// e.preventDefault();
+			var attachment = this.data.attachments[attachment_no];
+			this.attachmentContextMenu.showAt(e.getXY(), attachment);
+
+		} else if(target.id.substr(0,this.attachmentsId.length)==this.attachmentsId)
 		{
 			var attachment_no = target.id.substr(this.attachmentsId.length+1);
 

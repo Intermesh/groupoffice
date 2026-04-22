@@ -1,6 +1,7 @@
 .smi-sign-notification{
 	text-decoration:underline;
 	cursor:pointer;
+	margin-top: 1.2rem;
 }
 .smi-encrypt-notification i, .smi-sign-notification i {
 	margin-right: 6px;

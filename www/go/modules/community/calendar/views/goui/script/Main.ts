@@ -255,9 +255,11 @@ export class Main extends Component {
 							icon: 'print', text:t('Print'), menu: menu({},
 								this.printCurrentBtn = btn({icon: 'print', text: t('Current view'), handler:() => {
 									let view = this.timeSpan;
-									if(['day', 'week', 'month', 'list'].includes(view)) {
+									//if(['day', 'week', 'month', 'list'].includes(view)) {
 										this.openPDF(view);
-									}
+									// } else {
+									// 	this.openPDF(view);
+									// }
 								}}),
 								//'-',
 								btn({icon: 'view_list', text: t('List'), handler:() => { this.openPDF('list'); }}),
@@ -376,8 +378,10 @@ export class Main extends Component {
 
 
 			window.open(client.pageUrl('community/calendar/printList/' + start.format('Y-m-d') + "/" + end.format('Y-m-d')));
+		} else if(['day', 'week', 'month', 'list'].includes(type)) {
+			window.open(client.pageUrl('community/calendar/print/' + type + '/'+ this.date.format('Y-m-d')));
 		} else {
-			window.open(client.pageUrl('community/calendar/print/' + type + '/' + this.date.format('Y-m-d')));
+			window.open(client.pageUrl('community/calendar/printRange/' + type + '/' + this.spanAmount + '/' + this.date.format('Y-m-d')));
 		}
 	}
 
@@ -569,7 +573,7 @@ export class Main extends Component {
 
 	setSpan(value: ValidTimeSpan, amount: number) {
 		this.timeSpan = value;
-		this.printCurrentBtn.disabled = !['day', 'week', 'month'].includes(value);
+		//this.printCurrentBtn.disabled = !['day', 'week', 'month'].includes(value);
 		this.spanAmount = amount;
 
 		if(this.initialized)

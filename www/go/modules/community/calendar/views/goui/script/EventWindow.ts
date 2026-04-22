@@ -1,6 +1,5 @@
 import {
-	autocomplete,
-	autocompletechips, AutocompleteField,
+	autocompletechips,
 	browser,
 	btn,
 	Button,
@@ -9,21 +8,22 @@ import {
 	checkboxselectcolumn,
 	column,
 	comp,
-	containerfield, dataSourceEntityType, DataSourceStore,
+	containerfield,
+	DataSourceStore,
 	datasourcestore,
 	DateInterval,
 	DateTime,
 	datetimefield,
-	DateTimeField, DefaultEntity,
-	Format, listStoreType,
+	DateTimeField,
+	Format,
 	MapField,
 	mapfield,
 	Notifier,
 	numberfield,
 	radio,
 	select,
-	store, storeRecordType,
-	table, TableColumn,
+	store,
+	table,
 	textarea,
 	textfield,
 	TextField,
@@ -36,10 +36,10 @@ import {
 	JmapDataSource,
 	jmapds,
 	modules,
-	principalDS, RecipientPicker,
+	principalDS,
 	recurrencefield
 } from "@intermesh/groupoffice-core";
-import {categoryStore, OnlineMeetingButton, t, writeableCalendarStore} from "./Index.js";
+import {OnlineMeetingButton, t, writeableCalendarStore} from "./Index.js";
 import {ParticipantField, participantfield} from "./ParticipantField.js";
 import {AlertField, alertfield} from "./AlertField.js";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
@@ -215,11 +215,10 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 
 							const d = this.form.value.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
 							this.alertField.setDefaultLabel(d)
-							if (!this.item?.key && !this.participantFld.list.isEmpty()) {
+							if (!this.item?.key && this.participantFld.list && !this.participantFld.list.isEmpty()) {
 								// calendar changed and event is new, check if organizer needs to change as well
 								principalDS.single(this.item!.ownerId).then(p => {
 									this.participantFld.addOrganiser(p);
-									// this.participantFld.list.trackReset();
 								}).catch(e => {
 									void Window.error(t("Could not add organizer because the calendar principal could not be read from the server. Do you have permissions?"));
 								})
