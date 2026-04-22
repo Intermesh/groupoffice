@@ -59,6 +59,7 @@ export interface AddressBook extends AclOwnerEntity {
 	createdBy: string;
 	filesFolderId: string | null | undefined;
 	salutationTemplate: string;
+	groups: string[];
 }
 
 export interface Contact extends BaseEntity {
@@ -78,6 +79,7 @@ export interface Contact extends BaseEntity {
 	photoBlobId?: string,
 	color?: string,
 	actionAt?: string;
+	groups?: string[];
 }
 
 interface PhoneNumber {
@@ -111,6 +113,7 @@ export interface ContactUrl {
 
 export const addressBookDS = new JmapDataSource<AddressBook>("AddressBook");
 export const contactDS = new JmapDataSource<Contact>("Contact");
+export const addressBookGroupDS = new JmapDataSource("AddressBookGroup");
 
 export const typeStoreData = function (langKey: string) {
 	const types = t(langKey, "community", "addressbook");

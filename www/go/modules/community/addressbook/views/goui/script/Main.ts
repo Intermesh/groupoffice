@@ -1,4 +1,4 @@
-import {DetailPanel, filterpanel, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
+import {client, DetailPanel, filterpanel, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
 import {
 	btn,
 	checkbox,
@@ -8,20 +8,25 @@ import {
 	h3,
 	hr,
 	menu,
+	mstbar,
 	radio,
 	router,
 	searchbtn,
 	t,
-	tbar
+	tbar,
+	Window
 } from "@intermesh/goui";
-import {AddressBookGrid, addressbookgrid} from "./AddressBookGrid.js";
+import {AddressBookTree, addressbooktree} from "./AddressBookTree.js";
 import {contactgrid, ContactGrid} from "./ContactGrid.js";
 import {ContactDetail} from "./ContactDetail.js";
 import {ContactDialog} from "./ContactDialog.js";
 import {AddressBookDialog} from "./AddressBookDialog.js";
+import {contactDS} from "./Index.js";
+import {LabelsDialog} from "./LabelsDialog.js";
+import {DuplicateDialog} from "./DuplicateDialog.js";
 
 export class Main extends MainThreeColumnPanel {
-	private addressBookGrid!: AddressBookGrid;
+	private addressBookTree!: AddressBookTree;
 	private contactGrid!: ContactGrid;
 
 	constructor() {
@@ -30,7 +35,7 @@ export class Main extends MainThreeColumnPanel {
 		this.setup(this.createCenter(), this.createWest(), this.createEast());
 
 		this.on("render", async () => {
-			void this.addressBookGrid.store.load();
+			void this.addressBookTree.store.load();
 
 			void this.contactGrid.store.load();
 		});
@@ -82,7 +87,7 @@ export class Main extends MainThreeColumnPanel {
 				checkbox({
 					listeners: {
 						change: ({newValue}) => {
-							const rs = this.addressBookGrid.rowSelection!;
+							const rs = this.addressBookTree.rowSelection!;
 							newValue ? rs.selectAll() : rs.clear();
 						}
 					}
@@ -92,8 +97,7 @@ export class Main extends MainThreeColumnPanel {
 				searchbtn({
 					listeners: {
 						input: ({text}) => {
-							this.addressBookGrid.store.setFilter("search", {text});
-							void this.addressBookGrid.store.load();
+							this.addressBookTree.filter(text);
 						}
 					}
 				}),
@@ -106,22 +110,73 @@ export class Main extends MainThreeColumnPanel {
 					}
 				})
 			),
-			// todo allow drop from contactGrid
-			this.addressBookGrid = addressbookgrid({
-				flex: 1,
+			this.addressBookTree = addressbooktree({
 				cls: "no-row-lines",
+				dropOn: true,
+				sortableGroup: "contactgrid-addressbooktree",
 				rowSelectionConfig: {
 					multiSelect: true,
 					listeners: {
 						selectionchange: ({selected}) => {
-							const addressBookIds = selected.map((row) => row.record.id);
+							const records = selected.map((row) => row.record);
 
-							this.contactGrid.store.setFilter("addressbook", {
-								addressBookId: addressBookIds
-							});
+							const addressBookIds = records.filter(r => r.addressBookId === undefined).map((record) => record.id);
+							const groupIds = records.filter(r => r.addressBookId !== undefined).map((record) => record.id);
+
+							if (addressBookIds.length) {
+								this.contactGrid.store.setFilter("addressbook", {
+									addressBookId: addressBookIds
+								});
+							} else {
+								this.contactGrid.store.clearFilter("addressbook");
+							}
+
+							if (groupIds.length) {
+								this.contactGrid.store.setFilter("group", {
+									groupId: groupIds
+								});
+							} else {
+								this.contactGrid.store.clearFilter("group");
+							}
 
 							void this.contactGrid.store.load();
 						}
+					}
+				},
+				listeners: {
+					drop: async ({target, dragDataSet, droppedOn, fromIndex, source, toIndex}) => {
+						if (client.user.confirmOnMove) {
+							const confirm = await Window.confirm(t('Are you sure you want to move the item(s)?'), t("Confirm"));
+
+							if (!confirm) {
+								return
+							}
+						}
+
+						const contact = this.contactGrid.store.get(fromIndex)!;
+						const dropTarget = target.store.get(toIndex)!;
+
+						if (dropTarget.addressBookId === undefined) {
+							contactDS.update(contact.id, {
+								addressBookId: dropTarget.id,
+								groups: []
+							});
+						} else {
+							const groups = contact.groups ?? [];
+
+							if (groups.includes(dropTarget.id!)) {
+								return;
+							}
+
+							groups.push(dropTarget.id!);
+
+							contactDS.update(contact.id, {
+								addressBookId: dropTarget.addressBookId,
+								groups: groups
+							});
+						}
+
+						this.contactGrid.store.load();
 					}
 				}
 			}),
@@ -134,6 +189,24 @@ export class Main extends MainThreeColumnPanel {
 	}
 
 	protected createCenter(): Component {
+		this.contactGrid = contactgrid({
+			stateId: "addressbook-contactgrid",
+			draggable: true,
+			sortableGroup: "contactgrid-addressbooktree",
+			rowSelectionConfig: {
+				multiSelect: true,
+				listeners: {
+					selectionchange: ({selected}) => {
+						const contactIds = selected.map((row) => row.record.id);
+
+						if (contactIds[0]) {
+							router.goto("contact/" + contactIds[0]);
+						}
+					}
+				}
+			}
+		});
+
 		return comp({
 				cls: "vbox bg-lowest"
 			},
@@ -150,6 +223,7 @@ export class Main extends MainThreeColumnPanel {
 				}),
 				btn({
 					text: t("Add"),
+					cls: "primary filled",
 					menu: menu({
 							isDropdown: true
 						},
@@ -188,7 +262,180 @@ export class Main extends MainThreeColumnPanel {
 						},
 						btn({
 							icon: "cloud_upload",
-							text: t("Import")
+							text: t("Import"),
+							handler: () => {
+								go.util.importFile(
+									'Contact',
+									".csv, .vcf, text/vcard, .json, .xlsx",
+									{addressBookId: client.user.addressBookSettings.defaultAddressBookId},
+									{
+										// These fields can be selected to update contacts if ID or e-mail matches
+										lookupFields: {'id': "ID", 'email': 'E-mail'},
+
+										// This hash map is used to aid in auto selecting the right mappings. Key is possible header in CSV and value is property name in Group-Office
+										aliases: {
+											"Given name": "firstName",
+											"First name": "firstName",
+
+											"Middle name": "middleName",
+
+											"Family Name": "lastName",
+											"Last Name": "lastName",
+
+											"Job Title": "jobTitle",
+											"Suffix": "suffixes",
+											"Web page": {field: "urls[].url", fixed: {"type": "homepage"}},
+											"Birthday": {field: "dates[].date", fixed: {"type": "birthday"}},
+											"Anniversary": {field: "dates[].date", fixed: {"type": "anniversary"}},
+
+											"E-mail 1 - Value": {
+												field: "emailAddresses[].email",
+												related: {"type": "E-mail 1 - Type"}
+											},
+											"email": {field: "emailAddresses[].email", fixed: {"type": "work"}},
+											"E-mail Address": {
+												field: "emailAddresses[].email",
+												fixed: {"type": "work"}
+											},
+											"E-mail 2 Address": {
+												field: "emailAddresses[].email",
+												fixed: {"type": "work"}
+											},
+											"E-mail 3 Address": {
+												field: "emailAddresses[].email",
+												fixed: {"type": "work"}
+											},
+											"E-mail": {field: "emailAddresses[].email", fixed: {"type": "work"}},
+
+											"Primary Phone": {field: "phoneNumbers[].number", fixed: {"type": "work"}},
+											"Home Phone": {field: "phoneNumbers[].number", fixed: {"type": "home"}},
+											"Home Phone 2": {field: "phoneNumbers[].number", fixed: {"type": "home"}},
+
+											"Business Phone": {field: "phoneNumbers[].number", fixed: {"type": "work"}},
+											"Business Phone 2": {
+												field: "phoneNumbers[].number",
+												fixed: {"type": "work"}
+											},
+
+											"Mobile Phone": {field: "phoneNumbers[].number", fixed: {"type": "cell"}},
+											"Pager": {field: "phoneNumbers[].number", fixed: {"type": "other"}},
+											"Home Fax": {field: "phoneNumbers[].number", fixed: {"type": "fax"}},
+
+											"Other Phone": {field: "phoneNumbers[].number", fixed: {"type": "other"}},
+											"Other Fax": {field: "phoneNumbers[].number", fixed: {"type": "fax"}},
+
+											"Home Street": {
+												field: "addresses[].street",
+												fixed: {type: "home"},
+												related: {
+													city: "Home City",
+													state: "Home State",
+													zipCode: "Home Postal Code",
+													country: "Home Country"
+												}
+											},
+											"Business Street": {
+												field: "addresses[].street",
+												fixed: {type: "work"},
+												related: {
+													city: "Business City",
+													state: "Business State",
+													zipCode: "Business Postal Code",
+													country: "Business Country"
+
+												}
+											},
+											"Other Street": {
+												field: "addresses[].street",
+												fixed: {type: "other"},
+												related: {
+													city: "Other City",
+													state: "Other State",
+													zipCode: "Other Postal Code",
+													country: "Other Country"
+
+												}
+											},
+
+											"Company": "organizations"
+										},
+
+										// Fields with labels and possible subproperties.
+										// For example e-mail and type of an array of e-mail addresses should be grouped together.
+										fields: {
+											prefixes: {label: t("Prefixes")},
+											initials: {label: t("Initials")},
+											salutation: {label: t("Salutation")},
+											color: {label: t("Color")},
+											firstName: {label: t("First name")},
+											middleName: {label: t("Middle name")},
+											lastName: {label: t("Last name")},
+											name: {label: t("Name")},
+											suffixes: {label: t("Suffixes")},
+											gender: {label: t("Gender")},
+											notes: {label: t("Notes")},
+											isOrganization: {label: t("Is organization")},
+											IBAN: {label: t("IBAN")},
+											registrationNumber: {label: t("Registration number")},
+											vatNo: {label: t("VAT number")},
+											vatReverseCharge: {label: t("Reverse charge VAT")},
+											debtorNumber: {label: t("Debtor number")},
+											photoBlobId: {label: t("Photo blob ID")},
+											language: {label: t("Language")},
+											jobTitle: {label: t("Job title")},
+											uid: {label: t("UUID")},
+											//starred: {label: t("Starred")},
+
+											"emailAddresses": {
+												label: t("E-mail addresses"),
+												properties: {
+													"email": {label: "E-mail"},
+													"type": {label: t("Type")}
+												}
+											},
+
+											"dates": {
+												label: t("Dates"),
+												properties: {
+													"date": {label: "Date"},
+													"type": {label: t("Type")}
+												}
+											},
+
+											"phonenumbers": {
+												label: t("Phone numbers"),
+												properties: {
+													"number": {label: "Number"},
+													"type": {label: t("Type")}
+												}
+											},
+
+											"urls": {
+												label: t("URL's"),
+												properties: {
+													"url": {label: "URL"},
+													"type": {label: t("Type")}
+												}
+											},
+
+											"addresses": {
+												label: t("Addresses"),
+												properties: {
+													"type": {label: t("Type")},
+													"street": {label: t("Street")},
+													"street 2": {label: t("Street 2")},
+													"zipCode": {label: t("ZIP code")},
+													"city": {label: t("City")},
+													"state": {label: t("state")},
+													"country": {label: t("Country")},
+													"countryCode": {label: t("Country code")},
+													"latitude": {label: t("Latitude")},
+													"longitude": {label: t("Longitude")}
+												}
+											}
+										}
+									});
+							}
 						}),
 						btn({
 							icon: "cloud_download",
@@ -200,28 +447,55 @@ export class Main extends MainThreeColumnPanel {
 									icon: "contact_mail",
 									text: t("vCard (Virtual Contact File)"),
 									handler: () => {
-										//todo
+										go.util.exportToFile(
+											"Contact",
+											this.contactGrid.store.queryParams,
+											"vcf"
+										);
 									}
 								}),
 								btn({
 									icon: "unknown_document",
 									text: t("Microsoft Excel"),
 									handler: () => {
-										//todo
+										go.util.exportToFile(
+											"Contact",
+											this.contactGrid.store.queryParams,
+											"xlsx"
+										);
+									}
+								}),
+								btn({
+									icon: "csv",
+									text: "Comma Seperated Values",
+									handler: () => {
+										go.util.exportToFile(
+											"Contact",
+											this.contactGrid.store.queryParams,
+											"csv"
+										);
 									}
 								}),
 								btn({
 									icon: "html",
 									text: t("Web page") + " (HTML)",
 									handler: () => {
-										//todo
+										go.util.exportToFile(
+											"Contact",
+											this.contactGrid.store.queryParams,
+											"html"
+										);
 									}
 								}),
 								btn({
 									icon: "text_snippet",
 									text: "JSON",
 									handler: () => {
-										//todo
+										go.util.exportToFile(
+											"Contact",
+											this.contactGrid.store.queryParams,
+											"json"
+										);
 									}
 								}),
 								hr(),
@@ -229,7 +503,9 @@ export class Main extends MainThreeColumnPanel {
 									icon: "print",
 									text: t("Labels"),
 									handler: () => {
-										//todo
+										const dlg = new LabelsDialog(this.contactGrid.store.queryParams);
+
+										dlg.show();
 									}
 								})
 							)
@@ -239,31 +515,51 @@ export class Main extends MainThreeColumnPanel {
 							icon: "merge",
 							text: t("Look for duplicates"),
 							handler: () => {
-								// todo
+								const dlg = new DuplicateDialog();
+
+								dlg.show();
 							}
 						})
 					)
-				})
+				}),
+				mstbar({
+						table: this.contactGrid
+					},
+					"->",
+					btn({
+						icon: "merge",
+						title: t("Merge"),
+						handler: async (btn) => {
+							const confirm = await Window.confirm(t("Are you sure you want to merge the selected items? This can't be undone."), t("Confirm"));
+
+							if (!confirm) {
+								return
+							}
+
+							const ids = this.contactGrid!.rowSelection!.getSelected().map((row) => row.record.id);
+
+							contactDS.merge(ids);
+							btn.parent!.hide();
+						}
+					}),
+					btn({
+						icon: "delete",
+						title: t("Delete"),
+						handler: async (btn) => {
+							const ids = this.contactGrid!.rowSelection!.getSelected().map((row) => row.record.id);
+
+							await contactDS.confirmDestroy(ids);
+
+							btn.parent!.hide();
+						}
+					})
+				)
 			),
 			comp({
 					cls: "scroll bg-lowest",
 					flex: 1,
 				},
-				this.contactGrid = contactgrid({
-					stateId: "addressbook-contactgrid",
-					rowSelectionConfig: {
-						multiSelect: true, //todo merge toolbar
-						listeners: {
-							selectionchange: ({selected}) => {
-								const contactIds = selected.map((row) => row.record.id);
-
-								if (contactIds[0]) {
-									router.goto("contact/" + contactIds[0]);
-								}
-							}
-						}
-					}
-				})
+				this.contactGrid
 			)
 		);
 	}
