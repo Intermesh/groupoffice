@@ -64,8 +64,8 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 				</p>\
 				<p class="s6">\
 					<label>'+t("Due at")+'</label><span>{[go.util.Format.date(values.due) || "-"]}</span><br><br>\
-					<tpl if="values.responsible"><label>'+t("Responsible")+'</label><a onclick="go.lookupPrincipal(\'{[values.responsible.id]}\')">{[go.util.avatar(values.responsible.name, values.responsible.avatarId)]} {[values.responsible.name]}</a><br><br></tpl>\
-					<tpl if="values.customer"><label>'+t("Customer")+'</label><a onclick="go.lookupPrincipal(\'{[values.customer.id]}\')">{[go.util.avatar(values.customer.name, values.customer.avatarId)]} {[values.customer.name]}</a><br><br></tpl>\
+					<tpl if="values.responsible"><label>'+t("Responsible")+'</label><a onclick="go.lookupPrincipal(\'{[values.responsible.id]}\')">{[go.util.avatar(values.responsible.name, values.responsible.avatarId)]} {[Ext.util.Format.htmlEncode(values.responsible.name)]}</a><br><br></tpl>\
+					<tpl if="values.customer"><label>'+t("Customer")+'</label><a onclick="go.lookupPrincipal(\'{[values.customer.id]}\')">{[go.util.avatar(values.customer.name, values.customer.avatarId)]} {[Ext.util.Format.htmlEncode(values.customer.name)]}</a><br><br></tpl>\
 				</p>\
 				<tpl if="values.percentComplete">\
 				<div class="s12 pad">\
