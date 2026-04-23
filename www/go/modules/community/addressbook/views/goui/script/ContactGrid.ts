@@ -6,7 +6,7 @@ import {
 	createComponent,
 	datasourcestore,
 	DataSourceStore,
-	datecolumn,
+	datecolumn, h3,
 	t,
 	Table
 } from "@intermesh/goui";
@@ -49,6 +49,31 @@ export class ContactGrid extends Table<DataSourceStore<JmapDataSource<Contact>, 
 		});
 
 		const columns = [
+			column({
+				id: "index",
+				width: 48,
+				renderer: (columnValue, record, td, table, storeIndex, column) => {
+					if (table.store.sort[0] == undefined || table.store.sort[0].property !== "name" && table.store.sort[0].property !== "firstName" && table.store.sort[0].property !== "lastName")
+						return "";
+
+					const sortBy = record.isOrganization ? "name" : "firstName";
+
+					if (!record[sortBy])
+						return "";
+
+					const lastRecord = storeIndex > 0 ? table.store.get(storeIndex - 1) : false;
+					const lastSortBy = !lastRecord || !lastRecord.isOrganization ? "firstName" : "name";
+
+					const deaccentChar = (c: string) => c[0].toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+					const char = deaccentChar(record[sortBy]);
+					if (!lastRecord || !lastRecord[lastSortBy] || deaccentChar(lastRecord[lastSortBy]) !== char) {
+						return h3({text: char});
+					}
+
+					return "";
+				}
+			}),
 			column({
 				id: "id",
 				header: t("ID"),
