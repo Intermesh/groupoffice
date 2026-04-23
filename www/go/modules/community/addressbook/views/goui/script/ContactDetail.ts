@@ -69,7 +69,15 @@ export class ContactDetail extends DetailPanel<Contact> {
 									img({
 										cls: "goui-avatar",
 										blobId: this.entity!.photoBlobId,
-										title: this.entity!.name
+										title: this.entity!.name,
+										style: {cursor: "pointer"},
+										listeners: {
+											render: (({target}) => {
+												target.el.addEventListener("click", () => {
+													window.open(client.downloadUrl(this.entity!.photoBlobId!) + "&inline=1");
+												});
+											})
+										}
 									}) :
 									avatar({
 										displayName: this.entity!.name
