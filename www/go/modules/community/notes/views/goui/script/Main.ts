@@ -18,7 +18,15 @@ import {
 	tbar,
 	Toolbar
 } from "@intermesh/goui";
-import {AclLevel, client, entities, filterpanel, jmapds, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
+import {
+	AclLevel,
+	client,
+	entities,
+	Export,
+	filterpanel, Import,
+	jmapds,
+	MainThreeColumnPanel
+} from "@intermesh/groupoffice-core";
 import {notebookgrid, NoteBookGrid} from "./NoteBookGrid";
 import {NoteBookDialog} from "./NoteBookDialog";
 import {NoteGrid} from "./NoteGrid";
@@ -227,7 +235,7 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 							icon: "cloud_upload",
 							text: t("Import"),
 							handler: () => {
-								go.util.importFile(
+								Import.fromFile(
 									'Note',
 									'.csv, .xlsx, .json',
 									{},
@@ -244,7 +252,7 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 									icon: "unknown_document",
 									text: t("Microsoft Excel"),
 									handler: () => {
-										go.util.exportToFile(
+										Export.toFile(
 											'Note',
 											this.noteGrid.store.queryParams,
 											"xlsx");
@@ -254,7 +262,7 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 									icon: "csv",
 									text: "Comma Seperated Values",
 									handler: () => {
-										go.util.exportToFile(
+										Export.toFile(
 											'Note',
 											this.noteGrid.store.queryParams,
 											"csv");
@@ -264,7 +272,7 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 									icon: "html",
 									text: t("Web page") + " (HTML)",
 									handler: () => {
-										go.util.exportToFile(
+										Export.toFile(
 											'Note',
 											this.noteGrid.store.queryParams,
 											"html");
@@ -274,7 +282,7 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 									icon: "text_snippet",
 									text: "JSON",
 									handler: () => {
-										go.util.exportToFile(
+										Export.toFile(
 											'Note',
 											this.noteGrid.store.queryParams,
 											"json");
