@@ -14,10 +14,6 @@ import {AclLevel, img, JmapDataSource, principalDS} from "@intermesh/groupoffice
 import {addressBookDS, Contact, contactDS} from "./Index";
 
 export class ContactGrid extends Table<DataSourceStore<JmapDataSource<Contact>, Contact>> {
-	//todo
-	// group by and letter column
-	// stable width on columns
-
 	constructor() {
 		const store = datasourcestore({
 			dataSource: contactDS,
@@ -104,6 +100,7 @@ export class ContactGrid extends Table<DataSourceStore<JmapDataSource<Contact>, 
 			column({
 				header: t("Name"),
 				id: "name",
+				width: 220,
 				resizable: true,
 				sortable: true,
 				htmlEncode: false,
