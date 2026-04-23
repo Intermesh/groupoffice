@@ -1,4 +1,4 @@
-import {client, DetailPanel, filterpanel, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
+import {client, DetailPanel, Export, filterpanel, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
 import {
 	btn,
 	checkbox,
@@ -447,7 +447,7 @@ export class Main extends MainThreeColumnPanel {
 									icon: "contact_mail",
 									text: t("vCard (Virtual Contact File)"),
 									handler: () => {
-										go.util.exportToFile(
+										Export.toFile(
 											"Contact",
 											this.contactGrid.store.queryParams,
 											"vcf"
@@ -458,7 +458,7 @@ export class Main extends MainThreeColumnPanel {
 									icon: "unknown_document",
 									text: t("Microsoft Excel"),
 									handler: () => {
-										go.util.exportToFile(
+										Export.toFile(
 											"Contact",
 											this.contactGrid.store.queryParams,
 											"xlsx"
@@ -469,7 +469,7 @@ export class Main extends MainThreeColumnPanel {
 									icon: "csv",
 									text: "Comma Seperated Values",
 									handler: () => {
-										go.util.exportToFile(
+										Export.toFile(
 											"Contact",
 											this.contactGrid.store.queryParams,
 											"csv"
@@ -480,7 +480,7 @@ export class Main extends MainThreeColumnPanel {
 									icon: "html",
 									text: t("Web page") + " (HTML)",
 									handler: () => {
-										go.util.exportToFile(
+										Export.toFile(
 											"Contact",
 											this.contactGrid.store.queryParams,
 											"html"
@@ -491,7 +491,7 @@ export class Main extends MainThreeColumnPanel {
 									icon: "text_snippet",
 									text: "JSON",
 									handler: () => {
-										go.util.exportToFile(
+										Export.toFile(
 											"Contact",
 											this.contactGrid.store.queryParams,
 											"json"

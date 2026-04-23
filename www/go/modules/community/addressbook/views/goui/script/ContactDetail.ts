@@ -1,10 +1,20 @@
-import {addbutton, DetailPanel, filesbutton, img, linkbrowsebutton, modules} from "@intermesh/groupoffice-core";
-import {addressBookDS, Contact, contactDS, ContactUrl} from "./Index.js";
+import {
+	addbutton,
+	client,
+	DetailPanel,
+	Export,
+	filesbutton,
+	img,
+	linkbrowsebutton,
+	modules
+} from "@intermesh/groupoffice-core";
+import {addressBookDS, addressBookGroupDS, Contact, contactDS, ContactUrl} from "./Index.js";
 import {
 	a,
 	arrayfield,
 	avatar,
 	btn,
+	Button,
 	collapsebtn,
 	comp,
 	Component,
@@ -24,6 +34,7 @@ import {
 } from "@intermesh/goui";
 import {CommentsPanel} from "@intermesh/community-comments";
 import {HistoryDetailPanel} from "@intermesh/community-history";
+import {ContactDialog} from "./ContactDialog.js";
 
 export class ContactDetail extends DetailPanel<Contact> {
 	private readonly form: DataSourceForm;
@@ -37,6 +48,8 @@ export class ContactDetail extends DetailPanel<Contact> {
 	private addressBook?: Record<string, any>;
 	private actionAtField!: DateField;
 
+	private starButton: Button;
+	private removeFromGroupButton: Button;
 
 	constructor() {
 		super("Contact");
@@ -349,7 +362,6 @@ export class ContactDetail extends DetailPanel<Contact> {
 
 			this.addressBook = await addressBookDS.single(entity.addressBookId)
 
-			// todo move to comps themselves
 			this.phoneNumbersComp.hidden = !(entity.phoneNumbers && entity.phoneNumbers.length > 0);
 			this.emailAddressesComp.hidden = !(entity.emailAddresses && entity.emailAddresses.length > 0);
 			this.addressesComp.hidden = !(entity.addresses && entity.addresses.length > 0);
@@ -358,6 +370,41 @@ export class ContactDetail extends DetailPanel<Contact> {
 			this.addressBookComp.text = this.addressBook.name;
 
 			this.actionAtField.value = entity.actionAt ?? undefined;
+
+			this.starButton.text = this.entity!.starred ? t("Unstar") : t("Star");
+
+			this.removeFromGroupButton.menu = undefined;
+			this.removeFromGroupButton.disabled = true;
+
+			if (entity.groups && entity.groups.length) {
+				const groupMenu = menu();
+
+				const response = await addressBookGroupDS.get(entity.groups);
+
+				response.list.forEach((group) => {
+					groupMenu.items.add(
+						btn({
+							text: group.name,
+							handler: () => {
+								const updateGroups = entity.groups!;
+
+								let i = updateGroups.indexOf(group.id);
+
+								if (i > -1) {
+									updateGroups.splice(i, 1);
+								}
+
+								contactDS.update(entity.id, {
+									groups: updateGroups
+								});
+							}
+						})
+					)
+				});
+
+				this.removeFromGroupButton.menu = groupMenu;
+				this.removeFromGroupButton.disabled = false;
+			}
 		});
 
 		this.on("reset", () => {
@@ -384,7 +431,10 @@ export class ContactDetail extends DetailPanel<Contact> {
 				icon: "edit",
 				title: t("Edit"),
 				handler: () => {
-					//todo
+					const dlg = new ContactDialog();
+
+					dlg.load(this.entity!.id);
+					dlg.show();
 				}
 			}),
 			addbutton(),
@@ -392,70 +442,58 @@ export class ContactDetail extends DetailPanel<Contact> {
 			btn({
 				icon: "more_vert",
 				menu: menu({},
-					btn({
-						icon: "edit",
-						text: t("Edit"),
-						handler: () => {
-							//todo
-						}
-					}),
-					btn({
+					this.starButton = btn({
 						icon: "star",
-						text: t("Star"),
-						handler: () => {
-							//todo
+						handler: async () => {
+							contactDS.update(this.entity!.id, {
+								starred: !this.entity!.starred
+							}).then(() => {
+								this.load(this.entity!.id);
+							});
 						}
 					}),
 					hr(),
-					btn({
+					this.removeFromGroupButton = btn({
 						icon: "clear",
-						text: t("Remove from group"),
-						handler: () => {
-							//todo
-						}
+						text: t("Remove from group")
 					}),
 					hr(),
 					btn({
 						icon: "print",
 						text: t("Print"),
 						handler: () => {
-							//todo
+							this.print();
 						}
 					}),
 					btn({
 						icon: "cloud_download",
 						text: t("Export (vCard)"),
 						handler: () => {
-							//todo
+							Export.toFile(
+								"Contact",
+								{
+									id: this.entity!.id
+								},
+								"vcf"
+							);
 						}
 					}),
 					btn({
 						icon: "attach_file",
 						text: t("Send (vCard)"),
-						handler: () => {
-							//todo
-						}
-					}),
-					btn({
-						icon: "euro",
-						text: t("Download financial statement"),
-						handler: () => {
-							//todo
-						}
-					}),
-					btn({
-						icon: "euro",
-						text: t("Send financial statement"),
-						handler: () => {
-							//todo
+						handler: async () => {
+							client.jmap("Contact/export", {extension: "vcf", ids: [this.entity!.id]})
+								.then((result) => {
+									GO.email.showComposer({blobs: [result.blob]});
+								});
 						}
 					}),
 					hr(),
 					btn({
 						icon: "delete",
 						text: t("Delete"),
-						handler: () => {
-							//todo
+						handler: async () => {
+							await contactDS.confirmDestroy([this.entity!.id]);
 						}
 					})
 				)

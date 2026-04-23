@@ -80,6 +80,7 @@ export interface Contact extends BaseEntity {
 	color?: string,
 	actionAt?: string;
 	groups?: string[];
+	starred?: boolean | null;
 }
 
 interface PhoneNumber {
