@@ -54,11 +54,12 @@ export class Main extends MainThreeColumnPanel {
 				flex: 1,
 				type: "list",
 				options: [
-					{value: "all", text: t("All contacts"), icon: "select_all"},
+					{value: "allcontacts", text: t("All contacts"), icon: "select_all"},
 					{value: "starred", text: t("Starred"), icon: "star"},
 					{value: "orgs", text: t("Organization"), icon: "business"},
 					{value: "contacts", text: t("Contacts"), icon: "person"}
 				],
+
 				listeners: {
 					change: ({newValue}) => {
 						this.contactGrid.store.clearFilter("org");
@@ -78,8 +79,10 @@ export class Main extends MainThreeColumnPanel {
 
 						this.contactGrid.store.load();
 					},
-					render: (ev) => {
-						ev.target.value = "all";
+					render: ({target}) => {
+						if (client.user.addressBookSettings.startIn == "allcontacts" || client.user.addressBookSettings.startIn == "starred") {
+							target.value = client.user.addressBookSettings.startIn;
+						}
 					}
 				}
 			}),
@@ -177,6 +180,15 @@ export class Main extends MainThreeColumnPanel {
 						}
 
 						this.contactGrid.store.load();
+					},
+					render: ({target}) => {
+						if (client.user.addressBookSettings.startIn == "default" && client.user.addressBookSettings.defaultAddressBookId) {
+							const defaultAddressBook = target.store.findById(client.user.addressBookSettings.defaultAddressBookId);
+
+							if (defaultAddressBook) {
+								target.rowSelection!.selectIndex(target.store.indexOf(defaultAddressBook));
+							}
+						}
 					}
 				}
 			}),
