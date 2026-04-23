@@ -80,6 +80,7 @@ class Calendar extends AclOwnerEntity {
 	protected ?int $ownerId = null;
 	public ?string $createdBy;
 	public ?string $webcalUri = null;
+	protected ?string $webcalHash = null;
 
 	public ?string $groupId;
 
@@ -267,9 +268,10 @@ class Calendar extends AclOwnerEntity {
 			$this->includeInAvailability = $this->ownerId == go()->getUserId() ? 'all' :
 				(empty($this->ownerId) ? 'attending' : 'none');
 		}
+		$wasNew = $this->isNew();
 		$success = parent::internalSave();
 
-		if(!empty($this->webcalBlob)) {
+		if($wasNew && !empty($this->webcalBlob)) {
 			CalendarEvent::import([$this->webcalBlob], $this->id, 'ignore');
 		}
 
@@ -359,6 +361,36 @@ class Calendar extends AclOwnerEntity {
 		return false;
 	}
 
+	private function webcalFingerprint($path){
+
+		$events = [];
+		foreach(ICalendarHelper::veventSplitter($path) as $uid => $block) {
+
+			preg_match('/RECURRENCE-ID[^:]*:(.+)/', $block, $rid);
+			preg_match('/LAST-MODIFIED:(.+)/', $block, $lm);
+			preg_match('/DTSTART[^:]*:(.+)/', $block, $dtstart);
+			preg_match('/DTEND[^:]*:(.+)/', $block, $dtend);
+			preg_match('/SUMMARY:(.+)/', $block, $summary);
+			preg_match('/SEQUENCE:(.+)/', $block, $seq);
+
+			$key = trim($uid);
+			if (!empty($rid[1])) {
+				$key .= '|' . trim($rid[1]);
+			}
+
+			$events[$key] =
+				($dtstart[1] ?? '') . '|' .
+				($dtend[1] ?? '') . '|' .
+				($summary[1] ?? ''). '|'.
+				($seq[1] ?? '').'|'.
+				($lm[1] ?? '');
+		}
+
+		ksort($events);
+
+		return hash('sha1', implode("\n", $events));
+	}
+
 	public function importWebcal() {
 
 		if(!$this->webcalUri) {
@@ -369,10 +401,24 @@ class Calendar extends AclOwnerEntity {
 				return false;
 			}
 		}
+		$path = Blob::buildPath($this->webcalBlob);
+		if(!file_exists($path)) {
+			go()->log("File not found: ".$path);
+			return false;
+		}
+
+		$hash = $this->webcalFingerprint($path);
+		if(($hash === $this->webcalHash)) {
+			go()->log("Webcal not imported, no changes.");
+			return false;
+		}
+		$this->webcalHash = $hash;
 		// truncate
 		CalendarEvent::delete((new Query)->where(['calendarId'=>$this->id]));
 		// then insert
-		return CalendarEvent::import([$this->webcalBlob], $this->id, 'ignore');
+		$response =  ICalendarHelper::import([$this->webcalBlob], $this->id, 'ignore');
+		$this->save();
+		return $response;
 	}
 
 	protected function isPrincipal() : bool

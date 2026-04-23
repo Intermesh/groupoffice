@@ -15,6 +15,7 @@ use go\core\fs\Blob;
 use go\core\model\Principal;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
+use go\core\util\UUID;
 use IntlTimeZone;
 use Sabre\VObject;
 use Sabre\VObject\Component\VCalendar;
@@ -303,6 +304,33 @@ class ICalendarHelper {
 		return implode(';',$rule);
 	}
 
+	static function veventSplitter($path) {
+		$buffer = '';
+		$inEvent = false;
+		$fp = fopen($path, 'r');
+		while (!feof($fp)) {
+			$line = fgets($fp);
+
+			if (strpos($line, 'BEGIN:VEVENT') === 0) {
+				$inEvent = true;
+				$buffer = '';
+			}
+
+			if ($inEvent) {
+				$buffer .= $line;
+			}
+
+			if (strpos($line, 'END:VEVENT') === 0) {
+				$inEvent = false;
+				preg_match('/^UID:(.+)$/m', $buffer, $matches);
+				$uid = trim($matches[1] ?? 'unknown');
+				yield $uid => $buffer;
+				$buffer = '';
+			}
+		}
+		fclose($fp);
+	}
+
 	/**
 	 * Generates CalendarEvent models from an icalendar file
 	 *
@@ -313,31 +341,11 @@ class ICalendarHelper {
 	 */
 	static function calendarEventFromFile(string $blobId, array|null $values = null) {
 		$fp = fopen(Blob::buildPath($blobId), 'r');
-		$buffer = '';
 		$groups = []; // uid => [vevent strings]
-		$inEvent = false;
-		// sort the event by uid into different VCALENDARS
-		while (!feof($fp)) {
-			$line = fgets($fp);
-
-			if (trim($line) === 'BEGIN:VEVENT') {
-				$inEvent = true;
-				$buffer = '';
-			}
-
-			if ($inEvent) {
-				$buffer .= $line;
-			}
-
-			if (trim($line) === 'END:VEVENT') {
-				$inEvent = false;
-				preg_match('/^UID:(.+)$/m', $buffer, $matches);
-				$uid = trim($matches[1] ?? 'unknown');
-				$groups[$uid][] = $buffer;
-				$buffer = '';
-			}
+		foreach(self::veventSplitter($fp) as $uid => $vevent) {
+			$groups[$uid][] = $vevent;
 		}
-		fclose($fp);
+
 		foreach ($groups as $uid => $events) {
 			$ical = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//GO-importer//EN\r\n"
 				. implode('', $events)
@@ -355,6 +363,54 @@ class ICalendarHelper {
 				yield ['error'=>$e, 'uid'=>$uid];
 			}
 		}
+	}
+
+	/**
+	 * @param $blobIds
+	 * @param $calendarId
+	 * @param $uid string 'check', 'ignore', 'new'
+	 * @return object
+	 */
+	static function import($blobIds, $calendarId, $uid='check') {
+		$r = (object)[
+			'saved'=>0,
+			'failed'=>0,
+			'skipped'=>0,
+			'failureReasons'=>[]
+		];
+
+		set_time_limit(0);
+
+		$existing = CalendarEvent::find()
+			->select('uid')
+			->where(['calendarId' => $calendarId])
+			->fetchMode(\PDO::FETCH_COLUMN, 0)->all();
+		$existing = array_flip($existing);
+
+		foreach($blobIds as $blobId) {
+			foreach(self::calendarEventFromFile($blobId, ['calendarId' => $calendarId]) as $ev) {
+				if(is_array($ev)){
+					$r->failureReasons[$r->failed] = 'Parse error '.$ev['uid']. ': '. $ev['error']->getMessage();
+					$r->failed++;
+					continue;
+				}
+
+				if($uid === 'new') {
+					$ev->uid = UUID::v4();
+				} else if($uid === 'check' && isset($existing[$ev->uid])) {
+					$r->skipped++;
+					continue;
+					// check if exists
+				} // else use UID from ics file without checking.
+				if($ev->save()){ // will fail if UID exists. We dont want to modify existing events like this
+					$r->saved++;
+				} else {
+					$r->failureReasons[$r->failed] = 'Validate error '.$ev->uid. ': '. var_export($ev->getValidationErrors(),true);
+					$r->failed++;
+				}
+			}
+		}
+		return $r;
 	}
 
 	/**

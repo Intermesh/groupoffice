@@ -4,7 +4,7 @@ import {client, FormWindow} from "@intermesh/groupoffice-core";
 export class SubscribeWebCalWindow extends FormWindow {
 	constructor() {
 		super('Calendar');
-		this.title = 'Enter webcal address';
+		this.title = t('Enter webcal address');
 		this.width = 700;
 		this.height = 260;
 		this.maximizable = false;

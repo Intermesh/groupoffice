@@ -4,7 +4,7 @@ import {
 	cards,
 	checkbox, column,
 	comp,
-	Component, datasourcestore, DateInterval,
+	Component, DataSourceStore, datasourcestore, DateInterval,
 	DatePicker,
 	datepicker,
 	DateTime, Format,
@@ -16,10 +16,10 @@ import {
 } from "@intermesh/goui";
 import {MonthView} from "./MonthView.js";
 import {WeekView} from "./WeekView.js";
-import {calendarStore, categoryStore, t, ValidTimeSpan, viewStore} from "./Index.js";
+import {adapter, CalendarEvent, calendarStore, categoryStore, t, ValidTimeSpan, viewStore} from "./Index.js";
 import {YearView} from "./YearView.js";
 import {SplitView} from "./SplitView.js";
-import {client, filterpanel, jmapds, modules, userDS} from "@intermesh/groupoffice-core";
+import {client, filterpanel, JmapDataSource, jmapds, modules, principalDS, userDS} from "@intermesh/groupoffice-core";
 import {CalendarView} from "./CalendarView.js";
 import {CategoryWindow} from "./CategoryWindow.js";
 import {ResourcesWindow} from "./ResourcesWindow.js";
@@ -50,7 +50,7 @@ export class Main extends Component {
 	spanAmount?: number = 31 // 2-7, 14, 21, 28
 
 	//eventStore: DataSourceStore<JmapDataSource<CalendarEvent>>
-	adapter = new CalendarAdapter()
+	declare adapter
 
 	private calendarList: CalendarList
 	private categoryList: List
@@ -66,6 +66,9 @@ export class Main extends Component {
 	constructor() {
 		super();
 		this.cls = 'hbox fit tablet-cards';
+
+		this.registerProviders(adapter);
+		this.adapter = adapter;
 
 		this.adapter.onLoad = () => {
 			this.view.update();
@@ -99,6 +102,8 @@ export class Main extends Component {
 			this.routeTo('month', month);
 		});
 		const rights = modules.get("community", "calendar")!.userRights;
+
+
 
 		this.items.add(
 			this.west = comp({tagName: 'aside', width: 274, cls:'scroll',style: {paddingTop:'1.2rem', minWidth: '27.4rem'}},
@@ -448,28 +453,6 @@ export class Main extends Component {
 		});
 	}
 
-	private renderAdapterBoxes() {
-		const boxes: any = {};
-		if(modules.isAvailable("community", "addressbook")) {
-			boxes.birthday = ['#009c63',	t('Birthdays')];
-		}
-		if(modules.isAvailable("community", "tasks")) {
-			boxes.task = ['#7e472a',	t('Tasks', 'community', 'tasks')];
-		}
-		boxes.holiday = ['#025d7b', t('Holidays')];
-
-		return Object.keys(boxes).map(key => comp({tagName:'li'}, checkbox({
-			color: boxes[key][0], label: boxes[key][1], value: this.adapter.byType(key).enabled,
-			listeners: {
-				'change': ({newValue}) => {
-					this.adapter.byType(key).enabled = newValue;
-					jmapds('User').update(client.user.id, {calendarPreferences: {[key+'sAreVisible']: newValue}});
-					this.updateView();
-				}
-			}
-		})));
-	}
-
 	private buildCategoryFilter() {
 		const rights = modules.get("community", "calendar")!.userRights;
 		const selected: any = {},
@@ -649,4 +632,230 @@ export class Main extends Component {
 	private bufferedUpdate = FunctionUtil.buffer(200, (start: DateTime)=> {
 		this.view.goto(start, this.spanAmount!);
 	})
+
+	private renderAdapterBoxes() {
+		const boxes: Component[] = [];
+
+		for(const name in this.adapter.providers) {
+			const p = this.adapter.providers[name];
+			if(p.checkbox) {
+				boxes.push(comp({tagName:'li'}, checkbox({
+					color: p.checkbox.color,
+					label: p.checkbox.label,
+					value: p.enabled,
+					listeners: {
+						'change': (e => {
+							p.checkbox!.onChange?.(e.newValue, name);
+							this.updateView();
+						})
+					}
+				})));
+			}
+		}
+
+		return boxes;
+	}
+
+	private registerProviders(adapter: CalendarAdapter){
+
+		const onChange = (v: boolean, key: string) => {
+			this.adapter.byType(key).enabled = v;
+			jmapds('User').update(client.user.id, {calendarPreferences: {[key+'sAreVisible']: v}});
+		};
+
+		adapter.registerProvider('event', {
+			enabled: true,
+			watch:true,
+			store:datasourcestore({
+			dataSource:jmapds('CalendarEvent'),
+			relations: {
+				modifier: {dataSource: principalDS, path: "modifiedBy"},
+				creator: {dataSource: principalDS, path:'createdBy'}
+			}}),
+			*items(start:DateTime,end:DateTime) {
+				// Sort personal calendar events on top so merged events will favor the personal one over shared items.
+				const pId = client.user.calendarPreferences?.personalCalendarId;
+				const events = (this.store as DataSourceStore<JmapDataSource<CalendarEvent>>).data
+					.sort((a,b) => (b.calendarId === pId ? 1 : 0) - (a.calendarId === pId ? 1 : 0));
+
+				for (const e of events) {
+					for(const item of CalendarItem.expand(e as CalendarEvent, start, end)) {
+						if ((!item.isDeclined || client.user.calendarPreferences.showDeclined!==false) ) {
+							yield item;
+						}
+					}
+				}
+			},
+			load(start:DateTime,end:DateTime) {
+				Object.assign(this.store!.queryParams.filter ||= {}, {
+					after: start.format('Y-m-d'),
+					before: end.format('Y-m-d')
+				});
+				return this.store!.load();
+			}
+		});
+
+		adapter.registerProvider('holiday', {
+			enabled: client.user.calendarPreferences?.holidaysAreVisible,
+			checkbox: {color:'#025d7b', label: t('Holidays'), onChange},
+			list:[],
+			open(){},
+			load(start:DateTime,end:DateTime) {
+				if(!client.user.holidayset) {
+					client.user.holidayset = client.user.language;
+				}
+				let [lang,country] = client.user.holidayset.split('_');
+				if(!country) country = lang;
+				if(country=='uk')
+					country ='gb';
+				return client.jmap("community/calendar/Holiday/fetch",{
+					set: country.toUpperCase(), lang: client.user.holidayset.replace("_", "-"),from:start.format('Y-m-d'),till:end.format('Y-m-d')
+				}).then(r => {
+					this.list = r.list;
+				});
+			},
+			*items(start: DateTime, end: DateTime) {
+				for(const o of this.list) {
+					const start = DateTime.createFromFormat(o.start,'Y-m-d')!;
+
+					let title  = o.title;
+					if(o.region) {
+						title += " (" + o.region + ")";
+					}
+					yield new CalendarItem({
+						key: '',
+						start,
+						extraIcons: ['family_star'],
+						defaultColor: '025d7b',
+						data: {
+							title: title,
+							duration: o.duration,
+							showWithoutTime: true,
+						},
+						cal: {
+							name: t("Holidays")
+						}
+					});
+				}
+			}
+		});
+
+		if(modules.isAvailable("community", "tasks"))
+		adapter.registerProvider('task', {
+			enabled: client.user.calendarPreferences?.tasksAreVisible,
+			checkbox: {color:'#7e472a', label: t('Tasks', 'community', 'tasks'), onChange},
+			store: datasourcestore({
+				dataSource: jmapds('Task'),
+				relations: {
+					modifier: {dataSource: principalDS, path: "modifiedBy"},
+					creator: {dataSource: principalDS, path:'createdBy'}
+				}
+			}),
+			*items(from:DateTime,until:DateTime) {
+				for(const task of this.store!.items) {
+					let date;
+
+					if(task.progress == 'completed') {
+						date = task.progressUpdated || (new DateTime()).format('Y-m-d'); // slice date
+					} else {
+						date = task.due || task.start || (new DateTime()).format('Y-m-d');
+					}
+
+//if(task.title =='test taak met bogus timezone') debugger;
+					const start = DateTime.createFromFormat(date.substring(0,10), 'Y-m-d');
+
+					if(!start) {
+						continue;
+					}
+
+					if(start.date <= until.date && start.date >= from.date) {
+						// console.log(task.progress, date, start, task.title, task);
+						task.duration = 'PT1H';
+						task.showWithoutTime = true;
+						yield new CalendarItem({
+							key: '-',
+							start,
+							open() {
+								const dlg = new go.modules.community.tasks.TaskDialog();
+								dlg.show();
+								dlg.load(task.id);
+							},
+							extraIcons: [task.progress == 'completed' ? 'task_alt' : 'radio_button_unchecked'],
+							defaultColor: '7e472a',
+							data: task,
+							cal: {
+								name: t("Tasks")
+							}
+						});
+					}
+				}
+			},
+			load(start:DateTime,end:DateTime) {
+				// this.store!.setFilter("todo", {
+				// 	start: start.format('Y-m-d')+'..'+end.format('Y-m-d'),
+				// }).setFilter('done', {
+				// 	progressUpdated: start.format('Y-m-d')+'..'+end.format('Y-m-d'),
+				// 	//progress: 'NOT needs-action OR in-progress'
+				// });
+				this.store.setFilter('range',{
+					operator: "OR",
+					conditions: [
+						{start:null,due:null},
+						{start: start.format('Y-m-d')+'..'+end.format('Y-m-d')},
+						{due: start.format('Y-m-d')+'..'+end.format('Y-m-d')},
+						{progressUpdated: start.format('Y-m-d')+'..'+end.format('Y-m-d')},
+					]
+				});
+				return this.store!.load();
+			}
+		});
+
+		if(modules.isAvailable("community", "addressbook"))
+		adapter.registerProvider('birthday', {
+			enabled: client.user.calendarPreferences?.birthdaysAreVisible,
+			checkbox: {color:'#009c63', label: t('Birthdays'), onChange},
+			store: datasourcestore({
+				dataSource: jmapds('Contact'),
+				relations: {
+					modifier: {dataSource: principalDS, path: "modifiedBy"},
+					creator: {dataSource: principalDS, path:'createdBy'}
+				}
+			}),
+			*items(from:DateTime,end:DateTime) {
+				const sy= from.getYear(),
+					ey= end.getYear();
+				for(const b of this.store.items) {
+					const start = DateTime.createFromFormat(b.birthday,'Y-m-d')!;
+
+					start.setYear(b.birthday.split('-')[1]<7?ey:sy);
+					yield new CalendarItem({
+						key: "",
+						start,
+						open() {
+							const dlg = new go.modules.community.addressbook.ContactDialog();
+							dlg.show();
+							dlg.load(b.id);
+						},
+						extraIcons: ['cake'],
+						defaultColor: '009c63',
+						data:{
+							title: t('{name}\'s birthday').replace('{name}',b.name),
+							duration: 'P1D',
+							showWithoutTime:true,
+						},
+						cal: {
+							name: t("Birthdays")
+						}
+					});
+				}
+			},
+			load(start:DateTime,end:DateTime) {
+				start = start.clone().addDays(1);// birthday filter end date in inclusive
+				this.store! //.setFilter('addressBookIds', {addressBookIds: go.User.birthdayPortletAddressBooks})
+					.setFilter('isOrganisation', {isOrganization: false})
+					.setFilter('birthday', {birthday: start.format('Y-m-d')+'..'+end.format('Y-m-d')})
+				return this.store!.load();
+			}
+		});
+	}
 }

@@ -38,6 +38,7 @@ return array (
   'Edit calendar' => 'Agenda bewerken',
   'Subscribe to calendar' => 'Aanmelden bij agenda',
   'Add calendar from link' => 'Agenda toevoegen via link',
+  'Enter webcal address' => 'Webcal-adres invoeren',
   'There are no calendars to add an appointment.' => 'Er zijn geen calendar om afspraken aan toe te voegen',
   'Subscribe to an existing calendar or create a personal calendar.' => 'Abonneer op een bestaande agenda of maak een persoonlijk agenda.',
   'Show calendars' => 'Toon agenda\'s',

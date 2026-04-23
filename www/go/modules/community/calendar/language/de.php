@@ -241,4 +241,5 @@ return array (
 	'Make calendar available in CalDAV and ActiveSync' => 'Kalender in CalDAV und ActiveSync verfügbar machen',
 	'New invitation from {from}' => 'Neue Einladung von {from}',
 	'Invitation updated by {from}' => 'Einladung aktualisiert von {from}',
+	'Enter webcal address' => 'Webcal-Adresse eintragen'
 );
