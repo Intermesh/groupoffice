@@ -16,7 +16,6 @@ import {AddressBookDialog} from "./AddressBookDialog.js";
 import {AddressBookGroupDialog} from "./AddressBookGroupDialog.js";
 
 
-//todo no caret on addressbook with no groups
 export class AddressBookTree extends Tree {
 	private filterText?: string;
 
@@ -49,7 +48,7 @@ export class AddressBookTree extends Tree {
 					return {
 						id: r.id,
 						name: r.name,
-						children: childGroups.list.length ? childGroups.list : undefined
+						children: childGroups.list.map(l => Object.assign(l, {children: []}))
 					}
 				}));
 			},
