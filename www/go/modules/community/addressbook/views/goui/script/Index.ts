@@ -68,6 +68,7 @@ export interface Contact extends BaseEntity {
 	department?: string;
 	gender?: 'M' | 'F' | null;
 	organizationIds?: number[];
+	isOrganization: boolean;
 	phoneNumbers?: PhoneNumber[];
 	emailAddresses?: EmailAddress[];
 	addressBookId: string;

@@ -80,7 +80,10 @@ export class ContactDetail extends DetailPanel<Contact> {
 										}
 									}) :
 									avatar({
-										displayName: this.entity!.name
+										...(this.entity!.isOrganization ? {
+											displayName: this.entity!.name,
+											icon: "business"
+										} : {displayName: this.entity!.name})
 									})
 							);
 						}
