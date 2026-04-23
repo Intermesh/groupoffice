@@ -64,7 +64,7 @@ export class YearView extends CalendarView<YearViewEventMap> {
 			header.append(E('th',Object.values(DateTime.dayNames)[i][0]))
 		}
 		const rows = [];
-		day.setDate(1).setWeekDay(0);
+		day.setDate(1).setWeekDay(0).setHours(0,0,0,0);
 		let row,
 			e,
 			ce;
