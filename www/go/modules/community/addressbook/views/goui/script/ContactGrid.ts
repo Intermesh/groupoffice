@@ -68,9 +68,11 @@ export class ContactGrid extends Table<DataSourceStore<JmapDataSource<Contact>, 
 								blobId: value,
 								title: record.name
 							}) :
-
 							avatar({
-								displayName: record.name
+								...(record.isOrganization ? {
+									displayName: record.name,
+									icon: "business"
+								} : {displayName: record.name})
 							}));
 				}
 			}),
@@ -96,7 +98,7 @@ export class ContactGrid extends Table<DataSourceStore<JmapDataSource<Contact>, 
 				sortable: true,
 				renderer: (columnValue) => {
 					switch (columnValue) {
-						case'M':
+						case 'M':
 							return t("Male");
 						case 'F':
 							return t("Female");
@@ -104,7 +106,6 @@ export class ContactGrid extends Table<DataSourceStore<JmapDataSource<Contact>, 
 							return t("Non-binary");
 						case 'P':
 							return t("Won't say");
-
 						default:
 							return "";
 					}

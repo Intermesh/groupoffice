@@ -48,8 +48,10 @@ export class AddressBookTree extends Tree {
 					return {
 						id: r.id,
 						name: r.name,
-						children: childGroups.list.map(l => Object.assign(l, {children: []}))
-					}
+						children: childGroups.list.map(l => {
+							return {...l, children: []};
+						})
+					};
 				}));
 			},
 			[
