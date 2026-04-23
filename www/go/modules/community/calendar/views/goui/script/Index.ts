@@ -7,6 +7,7 @@ import {EventDetail, EventDetailWindow} from "./EventDetail.js";
 import {PreferencesPanel} from "./PreferencesPanel";
 import {EventWindow} from "./EventWindow";
 import {CalendarView} from "./CalendarView";
+import {CalendarAdapter} from "./CalendarAdapter";
 
 export * from "./Main.js";
 export * from "./CalendarList.js";
@@ -59,6 +60,7 @@ export const viewStore = datasourcestore({
 	sort: [{property:'name'}]
 })
 
+export const adapter = new CalendarAdapter();
 
 export const t = (key:string,p='community',m='calendar') => coreT(key, p,m);
 export const statusIcons = {
