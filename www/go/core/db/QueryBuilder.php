@@ -73,6 +73,8 @@ class QueryBuilder {
 	 */
 	private $conn;
 	/**
+	 * Contains the bind parameters that the where explicitly fiven via {@see Criteria::bind()}
+	 *
 	 * @var array
 	 */
 	private $namedParameters = [];
@@ -439,14 +441,16 @@ class QueryBuilder {
 	public static function debugBuild(array $build) {
 		$sql = $build['sql'];
 		if(isset($build['params'])) {
-			foreach ($build['params'] as $p) {
-				try {
-					$queryValue = var_export($p['value'], true);
-				} catch(Exception $e) {
-					$queryValue = "[FAILED_TO_STRING]";
-				}
-				$sql = preg_replace('/\?/', $queryValue, $sql, 1);
-			}
+//			foreach ($build['params'] as $p) {
+//				try {
+//					$queryValue = var_export($p['value'], true);
+//				} catch(Exception $e) {
+//					$queryValue = "[FAILED_TO_STRING]";
+//				}
+//				$sql = preg_replace('/\?/', $queryValue, $sql, 1);
+//			}
+
+			$sql .= ', ' . var_export($build['params'], true);
 		}
 
 		return $sql;
@@ -612,7 +616,7 @@ class QueryBuilder {
 			
 			if($token instanceof Criteria) {
 				$this->namedParameters = array_merge($this->namedParameters, $token->getBindParameters());
-				$this->buildBindParameters = array_merge($this->buildBindParameters, $token->getBindParameters());
+//				$this->buildBindParameters = array_merge($this->buildBindParameters, $token->getBindParameters());
 				$where = $this->buildWhere($token->getWhere(), $prefix . "\t");
 				
 				return "(" . $where  . "\n" . $prefix . ")";
