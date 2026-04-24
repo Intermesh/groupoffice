@@ -25,6 +25,7 @@ import {
 	datefield,
 	displayfield,
 	Format,
+	h3,
 	h4,
 	hr,
 	menu,
@@ -39,12 +40,6 @@ import {ContactDialog} from "./ContactDialog.js";
 export class ContactDetail extends DetailPanel<Contact> {
 	private readonly form: DataSourceForm;
 
-	private emailAddressesComp: Component;
-	private phoneNumbersComp: Component;
-	private addressesComp: Component;
-	private datesComp: Component;
-	private addressBookComp: Component;
-
 	private addressBook?: Record<string, any>;
 	private actionAtField!: DateField;
 
@@ -58,338 +53,255 @@ export class ContactDetail extends DetailPanel<Contact> {
 			dataSource: contactDS
 		});
 
-		this.form.items.add(
-			comp({cls: "normalized card pad"},
-				comp({cls: "hbox"},
-					displayfield({
-						name: "name",
-						renderer: (v) => {
-							return comp({cls: "meta"},
-								this.entity!.photoBlobId ?
-									img({
-										cls: "goui-avatar",
-										blobId: this.entity!.photoBlobId,
-										title: this.entity!.name,
-										style: {cursor: "pointer"},
-										listeners: {
-											render: (({target}) => {
-												target.el.addEventListener("click", () => {
-													window.open(client.downloadUrl(this.entity!.photoBlobId!) + "&inline=1");
-												});
-											})
-										}
-									}) :
-									avatar({
-										...(this.entity!.isOrganization ? {
-											displayName: this.entity!.name,
-											icon: "business"
-										} : {displayName: this.entity!.name})
-									})
-							);
-						}
-					}),
-					comp({cls: "vbox gap", style: {padding: "2.4rem 0"}, flex: 1},
-						displayfield({
-							tagName: "div",
-							name: "name",
-							renderer: (v) => {
-								let fullName = [this.entity!.prefixes, this.entity!.name, this.entity!.suffixes]
-									.filter(Boolean)
-									.join(" ");
-
-								if (this.entity!.color) {
-									return comp({style: {color: "#" + this.entity!.color}, text: fullName});
-								} else {
-									return fullName
-								}
-							}
-						}),
-						displayfield({
-							tagName: "div",
-							name: "jobTitle",
-							renderer: (v) => {
-								if (v && this.entity!.department) {
-									return `${v} - ${this.entity!.department}`;
-								}
-
-								return v ?? "";
-							}
-						})
-					),
-					displayfield({
-							name: "urls",
-							tagName: "div",
-							flex: 1,
-							renderer: (v) => {
-								let urls = this.buildUrlLinks(v);
-
-								return comp({}, ...urls);
-							}
-						},
-					)
-				),
-				this.emailAddressesComp = comp({cls: "hbox", flex: 1},
-					comp({
-						tagName: "i",
-						cls: "icon ic-email",
-						style: {
-							marginRight: "1.8rem"
-						}
-					}),
-					arrayfield({
-						flex: 1,
-						name: "emailAddresses",
-						buildField: (value) => {
-							return containerfield({},
-								comp({
-										style: {
-											cursor: "pointer",
-										},
-										cls: "vbox",
-										listeners: {
-											render: (ev) => {
-												ev.target.el.on('click', (clickEvent) => {
-													clickEvent.preventDefault();
-
-													if (window.getSelection()!.toString().length > 0) {
-														return;
-													}
-
-													go.showComposer({
-														to: value.email,
-														name: this.entity!.name,
-														entity: "Contact",
-														entityId: this.entity!.id
-													});
-												});
-											}
-										}
-									},
-									comp({text: value.email}),
-									comp({tagName: "h5", text: t("emailTypes", "community", "addressbook")[value.type]})
-								)
-							)
-						}
-					})
-				),
-				this.phoneNumbersComp = comp({cls: "hbox", flex: 1},
-					comp({
-						tagName: "i",
-						cls: "icon ic-phone",
-						style: {
-							marginRight: "1.8rem"
-						}
-					}),
-					arrayfield({
-						flex: 1,
-						name: "phoneNumbers",
-						buildField: (value) => {
-							return containerfield({},
-								comp({
-										style: {
-											cursor: "pointer",
-										},
-										cls: "vbox",
-										listeners: {
-											render: (ev) => {
-												ev.target.el.on('click', (clickEvent) => {
-													clickEvent.preventDefault();
-
-													window.location.href = `tel:${value.number.replace(/[^0-9+]/g, '')}`;
-												});
-											},
-										}
-									},
-									comp({text: value.number}),
-									comp({tagName: "h5", text: t("phoneTypes", "community", "addressbook")[value.type]})
-								)
-							)
-						}
-					})
-				),
-				this.addressesComp = comp({},
-					hr(),
-					comp({cls: "hbox", flex: 1},
-						comp({
-							tagName: "i",
-							cls: "icon ic-location-on",
-							style: {
-								marginRight: "1.8rem"
-							}
-						}),
-						arrayfield({
-							flex: 1,
-							name: "addresses",
-							buildField: (value) => {
-								return containerfield({},
-									comp({
-											style: {
-												cursor: "pointer",
-											},
-											cls: "vbox",
-											listeners: {
-												render: (ev) => {
-													ev.target.el.on('click', (clickEvent) => {
-														clickEvent.preventDefault();
-
-														if (window.getSelection()!.toString().length > 0) {
-															return;
-														}
-
-														go.util.streetAddress(value);
-													});
-												},
-											}
-										},
-										comp({text: value.formatted}),
-										comp({
-											tagName: "h5",
-											text: t("addressTypes", "community", "addressbook")[value.type] ?? value.type
-										})
-									)
-								)
-							}
-						})
-					)
-				),
-				this.datesComp = comp({},
-					hr(),
-					comp({cls: "hbox", flex: 1},
-						comp({
-							tagName: "i",
-							cls: "icon ic-cake",
-							style: {
-								marginRight: "1.8rem"
-							}
-						}),
-						arrayfield({
-							flex: 1,
-							name: "dates",
-							buildField: (value) => {
-								return containerfield({},
-									comp({
-											cls: "vbox",
-										},
-										comp({text: Format.date(value.date)}),
-										comp({
-											tagName: "h5",
-											text: t("dateTypes", "community", "addressbook")[value.type] ?? value.type
-										})
-									)
-								)
-							}
-						})
-					)
-				),
-				comp({},
-					hr(),
-					comp({cls: "hbox", flex: 1},
-						comp({
-							tagName: "i",
-							cls: "icon ic-import-contacts",
-							style: {
-								marginRight: "1.8rem"
-							}
-						}),
-						comp({
-								cls: "vbox",
-							},
-							this.addressBookComp = comp({}),
-							comp({
-								tagName: "h5",
-								text: t("Address book")
-							}),
-							displayfield({name: "gender", tagName: "div"}),
-							comp({
-								tagName: "h5",
-								text: t("Gender"),
-								hidden: (this.form.value.gender === undefined)
-							})
-						)
-					)
-				),
-				comp({
-						flex: 1,
-						hidden: (this.form.value.IBAN !== undefined) ||
-							(this.form.value.vatNo !== undefined) ||
-							(this.form.value.registrationNumber !== undefined) ||
-							(this.form.value.debtorNumber !== undefined)
-					},
-					tbar({cls: "border-top"},
-						h4({text: t("Company")}),
-						'->',
-						collapsebtn({
-							target: btn => {
-								return btn.parent!.nextSibling()!
-							}
-						})
-					),
-					comp({
-							cls: "vbox"
-						},
-						displayfield({name: "IBAN", tagName: "div"}),
-						comp({
-							tagName: "h5",
-							text: t("IBAN"),
-							hidden: (this.form.value.IBAN !== undefined)
-						}),
-						displayfield({name: "vatNo", tagName: "div"}),
-						comp({
-							tagName: "h5",
-							text: t("VAT number"),
-							hidden: (this.form.value.vatNo !== undefined)
-						}),
-						displayfield({
-							name: "vatReverseCharge", tagName: "div", renderer: (v) => {
-								return v ? t("Yes") : t("No");
-							}
-						}),
-						comp({
-							tagName: "h5",
-							text: t("Reverse charge VAT"),
-							hidden: (this.form.value.vatReverseCharge !== undefined)
-						}),
-						displayfield({name: "registrationNumber", tagName: "div"}),
-						comp({
-							tagName: "h5",
-							text: t("Registration number"),
-							hidden: (this.form.value.registrationNumber !== undefined)
-						}),
-						displayfield({name: "debtorNumber", tagName: "div"}),
-						comp({
-							tagName: "h5",
-							text: t("Debtor number"),
-							hidden: (this.form.value.debtorNumber !== undefined)
-						}),
-					)
-				)
-			)
-		);
-
 		this.scroller.items.add(this.form);
 
 		this.on("load", async ({entity}) => {
 			void this.form.load(entity.id);
 
-			this.addressBook = await addressBookDS.single(entity.addressBookId)
+			this.addressBook = await addressBookDS.single(entity.addressBookId);
 
-			this.phoneNumbersComp.hidden = !(entity.phoneNumbers && entity.phoneNumbers.length > 0);
-			this.emailAddressesComp.hidden = !(entity.emailAddresses && entity.emailAddresses.length > 0);
-			this.addressesComp.hidden = !(entity.addresses && entity.addresses.length > 0);
-			this.datesComp.hidden = !(entity.dates && entity.dates.length > 0);
+			this.form.items.clear();
 
-			this.addressBookComp.text = this.addressBook.name;
+			this.form.items.add(
+				comp({cls: "normalized card pad"},
+					comp({cls: "hbox"},
+						displayfield({
+							name: "name",
+							renderer: () => comp({cls: "meta"},
+								entity.photoBlobId
+									? img({
+										cls: "goui-avatar",
+										blobId: entity.photoBlobId,
+										title: entity.name,
+										style: {cursor: "pointer"},
+										listeners: {
+											render: ({target}) => {
+												target.el.addEventListener("click", () => {
+													window.open(client.downloadUrl(entity.photoBlobId!) + "&inline=1");
+												});
+											}
+										}
+									})
+									: avatar({
+										...(entity.isOrganization
+											? {displayName: entity.name, icon: "business"}
+											: {displayName: entity.name})
+									})
+							)
+						}),
+						comp({cls: "vbox gap", style: {padding: "2.4rem 0"}, flex: 1},
+							displayfield({
+								tagName: "div",
+								name: "name",
+								renderer: () => {
+									const fullName = [entity.prefixes, entity.name, entity.suffixes]
+										.filter(Boolean)
+										.join(" ");
+									return entity.color
+										? comp({style: {color: "#" + entity.color}, text: fullName})
+										: fullName;
+								}
+							}),
+							displayfield({
+								tagName: "div",
+								name: "jobTitle",
+								renderer: (v) => (v && entity.department) ? `${v} - ${entity.department}` : v ?? ""
+							})
+						),
+						displayfield({
+							name: "urls",
+							tagName: "div",
+							flex: 1,
+							renderer: (v) => comp({}, ...this.buildUrlLinks(v))
+						})
+					),
+
+					comp({cls: "hbox", flex: 1, hidden: !entity.emailAddresses?.length},
+						comp({tagName: "i", cls: "icon ic-email", style: {marginRight: "1.8rem"}}),
+						arrayfield({
+							flex: 1,
+							name: "emailAddresses",
+							buildField: (value) => containerfield({},
+								comp({
+										style: {cursor: "pointer"},
+										cls: "vbox",
+										listeners: {
+											render: (ev) => {
+												ev.target.el.on('click', (clickEvent) => {
+													clickEvent.preventDefault();
+													if (window.getSelection()!.toString().length > 0) return;
+													go.showComposer({
+														to: value.email,
+														name: entity.name,
+														entity: "Contact",
+														entityId: entity.id
+													});
+												});
+											}
+										}
+									},
+									comp({
+										tagName: "h5",
+										text: t("emailTypes", "community", "addressbook")[value.type]
+									}),
+									comp({text: value.email})
+								)
+							)
+						})
+					),
+
+					comp({cls: "hbox", flex: 1, hidden: !entity.phoneNumbers?.length},
+						comp({tagName: "i", cls: "icon ic-phone", style: {marginRight: "1.8rem"}}),
+						arrayfield({
+							flex: 1,
+							name: "phoneNumbers",
+							buildField: (value) => containerfield({},
+								comp({
+										style: {cursor: "pointer"},
+										cls: "vbox",
+										listeners: {
+											render: (ev) => {
+												ev.target.el.on('click', (clickEvent) => {
+													clickEvent.preventDefault();
+													window.location.href = `tel:${value.number.replace(/[^0-9+]/g, '')}`;
+												});
+											}
+										}
+									},
+									comp({
+										tagName: "h5",
+										text: t("phoneTypes", "community", "addressbook")[value.type]
+									}),
+									comp({text: value.number})
+								)
+							)
+						})
+					),
+
+					hr({hidden: !entity.addresses?.length}),
+					comp({cls: "hbox", flex: 1, hidden: !entity.addresses?.length},
+						comp({tagName: "i", cls: "icon ic-location-on", style: {marginRight: "1.8rem"}}),
+						arrayfield({
+							flex: 1,
+							name: "addresses",
+							buildField: (value) => containerfield({},
+								comp({
+										style: {cursor: "pointer"},
+										cls: "vbox",
+										listeners: {
+											render: (ev) => {
+												ev.target.el.on('click', (clickEvent) => {
+													clickEvent.preventDefault();
+													if (window.getSelection()!.toString().length > 0) return;
+													go.util.streetAddress(value);
+												});
+											}
+										}
+									},
+									comp({
+										tagName: "h5",
+										text: t("addressTypes", "community", "addressbook")[value.type] ?? value.type
+									}),
+									comp({text: value.formatted})
+								)
+							)
+						})
+					),
+
+					hr({hidden: !entity.dates?.length}),
+					comp({cls: "hbox", flex: 1, hidden: !entity.dates?.length},
+						comp({tagName: "i", cls: "icon ic-cake", style: {marginRight: "1.8rem"}}),
+						arrayfield({
+							flex: 1,
+							name: "dates",
+							buildField: (value) => containerfield({},
+								comp({cls: "vbox"},
+									comp({
+										tagName: "h5",
+										text: t("dateTypes", "community", "addressbook")[value.type] ?? value.type
+									}),
+									comp({text: Format.date(value.date)})
+								)
+							)
+						})
+					),
+
+					hr(),
+					comp({cls: "hbox", flex: 1},
+						comp({tagName: "i", cls: "icon ic-import-contacts", style: {marginRight: "1.8rem"}}),
+						comp({cls: "vbox"},
+							comp({tagName: "h5", text: t("Address book")}),
+							comp({text: this.addressBook.name}),
+							...(entity.gender !== undefined ? [
+								comp({tagName: "h5", text: t("Gender")}),
+								displayfield({
+									name: "gender",
+									tagName: "div",
+									renderer: v => {
+										switch (v) {
+											case 'M':
+												return t("Male");
+											case 'F':
+												return t("Female");
+											case 'N':
+												return t("Non-binary");
+											case 'P':
+												return t("Won't say");
+											default:
+												return "";
+										}
+									}
+								})
+							] : [])
+						)
+					),
+
+					...(entity.IBAN || entity.registrationNumber || entity.debtorNumber ? [
+						tbar({cls: "border-top"},
+							h4({text: t("Company")}),
+							'->',
+							collapsebtn({target: btn => btn.parent!.nextSibling()!})
+						),
+						comp({cls: "vbox"},
+							displayfield({name: "IBAN", label: t("IBAN"), hideWhenEmpty: true}),
+							displayfield({name: "vatNo", label: t("VAT number"), hideWhenEmpty: true}),
+							displayfield({
+								name: "vatReverseCharge",
+								label: t("Reverse charge VAT"),
+								renderer: (v) => v ? t("Yes") : t("No"),
+								hideWhenEmpty: true
+							}),
+							displayfield({
+								name: "registrationNumber",
+								label: t("Registration number"),
+								hideWhenEmpty: true
+							}),
+							displayfield({name: "debtorNumber", label: t("Debtor number"), hideWhenEmpty: true}),
+						)
+					] : []),
+				),
+
+				...(entity.notes ? [
+					comp({cls: "normalized card"},
+						tbar({}, h3({text: t("Notes")})),
+						displayfield({
+							name: "notes",
+							cls: "pad",
+							tagName: "div",
+							flex: 1
+						})
+					)
+				] : []),
+			);
 
 			this.actionAtField.value = entity.actionAt ?? undefined;
-
-			this.starButton.text = this.entity!.starred ? t("Unstar") : t("Star");
+			this.starButton.text = entity.starred ? t("Unstar") : t("Star");
 
 			this.removeFromGroupButton.menu = undefined;
 			this.removeFromGroupButton.disabled = true;
 
-			if (entity.groups && entity.groups.length) {
-				const groupMenu = menu();
-
+			if (entity.groups?.length) {
+				const groupMenu = menu({});
 				const response = await addressBookGroupDS.get(entity.groups);
 
 				response.list.forEach((group) => {
@@ -398,19 +310,12 @@ export class ContactDetail extends DetailPanel<Contact> {
 							text: group.name,
 							handler: () => {
 								const updateGroups = entity.groups!;
-
-								let i = updateGroups.indexOf(group.id);
-
-								if (i > -1) {
-									updateGroups.splice(i, 1);
-								}
-
-								contactDS.update(entity.id, {
-									groups: updateGroups
-								});
+								const i = updateGroups.indexOf(group.id);
+								if (i > -1) updateGroups.splice(i, 1);
+								contactDS.update(entity.id, {groups: updateGroups});
 							}
 						})
-					)
+					);
 				});
 
 				this.removeFromGroupButton.menu = groupMenu;
@@ -442,7 +347,7 @@ export class ContactDetail extends DetailPanel<Contact> {
 				icon: "edit",
 				title: t("Edit"),
 				handler: () => {
-					const dlg = new ContactDialog();
+					const dlg = new ContactDialog(this.entity!.isOrganization);
 
 					dlg.load(this.entity!.id);
 					dlg.show();

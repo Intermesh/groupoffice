@@ -59,7 +59,6 @@ export class Main extends MainThreeColumnPanel {
 					{value: "orgs", text: t("Organization"), icon: "business"},
 					{value: "contacts", text: t("Contacts"), icon: "person"}
 				],
-
 				listeners: {
 					change: ({newValue}) => {
 						this.contactGrid.store.clearFilter("org");

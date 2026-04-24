@@ -82,6 +82,11 @@ export interface Contact extends BaseEntity {
 	actionAt?: string;
 	groups?: string[];
 	starred?: boolean | null;
+	vatNo?: string;
+	IBAN?: string;
+	registrationNumber?: string;
+	debtorNumber?: string;
+	notes?: string;
 }
 
 interface PhoneNumber {

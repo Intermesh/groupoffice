@@ -1,16 +1,4 @@
-import {
-	btn,
-	checkboxselectcolumn,
-	column,
-	Config,
-	createComponent,
-	hr,
-	menu,
-	t,
-	Tree,
-	treecolumn,
-	TreeRecord
-} from "@intermesh/goui";
+import {btn, column, Config, createComponent, hr, menu, t, Tree, treecolumn, TreeRecord} from "@intermesh/goui";
 import {addressBookDS, addressBookGroupDS} from "./Index.js";
 import {AddressBookDialog} from "./AddressBookDialog.js";
 import {AddressBookGroupDialog} from "./AddressBookGroupDialog.js";
@@ -49,13 +37,13 @@ export class AddressBookTree extends Tree {
 						id: r.id,
 						name: r.name,
 						children: childGroups.list.map(l => {
-							return {...l, children: []};
-						})
+							return {...l, children: [], check: true};
+						}),
+						check: true
 					};
 				}));
 			},
 			[
-				checkboxselectcolumn(),
 				treecolumn({
 					id: "name"
 				}),
