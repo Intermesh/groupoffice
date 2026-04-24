@@ -383,7 +383,7 @@ export class Main extends Component {
 
 
 			window.open(client.pageUrl('community/calendar/printList/' + start.format('Y-m-d') + "/" + end.format('Y-m-d')));
-		} else if(['day', 'week', 'month', 'list'].includes(type)) {
+		} else if(['day', 'month', 'list'].includes(type)) {
 			window.open(client.pageUrl('community/calendar/print/' + type + '/'+ this.date.format('Y-m-d')));
 		} else {
 			window.open(client.pageUrl('community/calendar/printRange/' + type + '/' + this.spanAmount + '/' + this.date.format('Y-m-d')));
