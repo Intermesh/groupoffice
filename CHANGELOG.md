@@ -6,6 +6,7 @@
 - Finance: Fixed drag and drop in finance between groups
 - Core: Fixed infinite loop when installation is disabled
 - Supportclient: Show ticket ID in title in east panel
+- Support: When migrating find principal by email if not a user
 
 20-04-2026: 26.0.25
 - Calendar: Event location field allows free text input
