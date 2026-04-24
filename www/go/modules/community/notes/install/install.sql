@@ -154,4 +154,4 @@ CREATE TABLE IF NOT EXISTS `notes_note_book_user`
         REFERENCES `core_user` (`id`)
         ON DELETE CASCADE
         ON UPDATE NO ACTION
-)
+);
