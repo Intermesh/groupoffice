@@ -34,10 +34,10 @@ export class AddressBookTree extends Tree {
 					});
 
 					return {
-						id: r.id,
+						parentId: r.id,
 						name: r.name,
 						children: childGroups.list.map(l => {
-							return {...l, children: [], check: true};
+							return {...l, children: []};
 						}),
 						check: true
 					};

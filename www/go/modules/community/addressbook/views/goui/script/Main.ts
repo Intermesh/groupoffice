@@ -112,10 +112,12 @@ export class Main extends MainThreeColumnPanel {
 					}
 				})
 			),
+			//todo fix checkbox select
 			this.addressBookTree = addressbooktree({
 				cls: "no-row-lines",
 				dropOn: true,
 				sortableGroup: "contactgrid-addressbooktree",
+				fitParent:true,
 				rowSelectionConfig: {
 					multiSelect: true,
 					listeners: {
