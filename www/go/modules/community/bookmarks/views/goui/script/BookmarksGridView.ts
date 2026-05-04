@@ -47,7 +47,7 @@ export class BookmarksGridView extends Component {
 								target.el.addEventListener("contextmenu", ev => {
 									ev.preventDefault();
 
-									const contextMenu = new BookmarkContextMenu(client.user, bookmark);
+									const contextMenu = new BookmarkContextMenu(bookmark);
 
 									contextMenu.showAt(ev);
 								})

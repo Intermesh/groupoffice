@@ -11,6 +11,7 @@
 - Core: Updated German translation and fixed some typos.
 - Multi instance: Disconnect Mysql connection when checking if instance is installed.
 - Core: Fixed: Installer breaks on first load: htmlentities($_POST['username']) not null-safe in install/install.php #1496
+- Core: Hints for colors in System Settings -> Appearance
 
 20-04-2026: 26.0.25
 - Calendar: Event location field allows free text input

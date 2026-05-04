@@ -26,10 +26,6 @@ export class Main extends Component {
 				category: {
 					path: "categoryId",
 					dataSource: bookmarksCategoryDS
-				},
-				creator: {
-					path: "createdBy",
-					dataSource: principalDS
 				}
 			}
 		});

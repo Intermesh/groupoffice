@@ -65,11 +65,5 @@ class Category extends EntityController {
 		return $this->defaultChanges($params);
 	}
 
-	protected function canCreate(Entity $entity): bool
-	{
-		$r = $this->rights;
-		return $this->rights->mayManage;
-	}
-
 }
 

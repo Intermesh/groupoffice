@@ -1,36 +1,30 @@
-import {btn, DefaultEntity, Menu, t} from "@intermesh/goui";
-import {jmapds, User} from "@intermesh/groupoffice-core";
+import {btn, DefaultEntity, Menu, t, Window} from "@intermesh/goui";
+import {AclLevel, jmapds, User} from "@intermesh/groupoffice-core";
 import {BookmarksDialog} from "./BookmarksDialog.js";
 
 export class BookmarkContextMenu extends Menu {
-	constructor(user: User, bookmark: DefaultEntity) {
+	constructor(bookmark: DefaultEntity) {
 		super();
 
 		this.isDropdown = true;
-
-		const writtenByUser = (user.id == bookmark.creator.id);
 
 		this.items.add(
 			btn({
 				icon: "edit",
 				text: t("Edit"),
-				disabled: user.isAdmin ? false : !writtenByUser,
+				disabled: bookmark.permissionLevel < AclLevel.WRITE,
 				handler: () => {
-					if (user.isAdmin || writtenByUser) {
-						const dlg = new BookmarksDialog();
-						void dlg.load(bookmark.id);
-						dlg.show();
-					}
+					const dlg = new BookmarksDialog();
+					void dlg.load(bookmark.id);
+					dlg.show();
 				}
 			}),
 			btn({
 				icon: "delete",
 				text: t("Delete"),
-				disabled: user.isAdmin ? false : !writtenByUser,
+				disabled: bookmark.permissionLevel < AclLevel.DELETE,
 				handler: () => {
-					if (user.isAdmin || writtenByUser) {
-						void jmapds("Bookmark").confirmDestroy([bookmark.id]);
-					}
+					jmapds("Bookmark").confirmDestroy([bookmark.id]).catch(e => Window.error(e))
 				}
 			})
 		)

@@ -1,4 +1,4 @@
-import {FormWindow, jmapds, client} from "@intermesh/groupoffice-core";
+import {FormWindow, jmapds, client, AclLevel} from "@intermesh/groupoffice-core";
 import {
 	browser,
 	btn, Button,
@@ -83,6 +83,7 @@ export class BookmarksDialog extends FormWindow {
 					storeConfig: {
 						sort: [{property: "name"}]
 					},
+					filter: {permissionLevel: AclLevel.WRITE},
 					label: t("Category"),
 					name: "categoryId",
 					required: true,
