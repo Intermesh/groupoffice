@@ -1,3 +1,4 @@
+04-05-2026: 25.0.101
 - Tasks: On migration subscribe to tasklists owned by the user
 - Core: Fixed infinite loop when installation is disabled
 - Supportclient: only show lists in new ticket dialog with at least CREATE permission
