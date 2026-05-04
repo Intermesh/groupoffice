@@ -362,6 +362,9 @@ JSON;
 		$modules = Module::find();
 
 		if(isset($params['package'])) {
+			if($params['package'] == "legacy") {
+				$params['package'] = null;
+			}
 			$modules->andWhere('package', '=', $params['package']);
 		}
 
