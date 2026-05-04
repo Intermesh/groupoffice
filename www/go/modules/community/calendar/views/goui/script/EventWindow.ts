@@ -211,8 +211,10 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 								this.item.cal = r;
 
 							const d = this.form.value.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
-							this.alertField.setDefaultLabel(d)
-							if (!this.item?.key && !this.participantFld.list.isEmpty()) {
+							this.alertField.setDefaultLabel(d);
+
+							const hasParticipants = Object.keys(this.item?.participants || {}).length > 0;
+							if (!this.item?.key && hasParticipants) {
 								// calendar changed and event is new, check if organizer needs to change as well
 								principalDS.single(this.item!.ownerId).then(p => {
 									this.participantFld.addOrganiser(p);
