@@ -139,9 +139,9 @@ GO.email.EmailComposer = function(config) {
 
 			case "User":
 					go.Jmap.request({
-						method: "User/get",
+						method: "Principal/get",
 						params: {
-							properties: ["displayName", "email"],
+							properties: ["name", "email"],
 							ids: ids
 						}
 					}).then(function(result) {
@@ -153,7 +153,7 @@ GO.email.EmailComposer = function(config) {
 							if(!go.util.empty(v)) {
 								v += ", ";
 							}							
-							v += '"' + go.util.addSlashes(user.displayName) + '" <' + user.email + '>';
+							v += '"' + go.util.addSlashes(user.name) + '" <' + user.email + '>';
 							combo.setValue(v);
 						});
 					}).finally(function(){
