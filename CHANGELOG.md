@@ -1,3 +1,4 @@
+04-05-2026: 6.8.166
 - Core: Fixed infinite loop when installation is disabled
 
 20-04-2026: 6.8.165
