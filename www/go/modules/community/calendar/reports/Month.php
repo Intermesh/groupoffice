@@ -2,6 +2,8 @@
 
 namespace go\modules\community\calendar\reports;
 
+use go\modules\community\calendar\model\Category;
+
 /**
  * Copyright Intermesh
  *
@@ -18,6 +20,7 @@ class Month extends Calendar {
 
 	protected $events = array();
 	public $calendars = [];
+	private $categories = [];
 	private $right;
 	
 	function normal() {
@@ -52,14 +55,20 @@ class Month extends Calendar {
 		//$this->events = $this->orderEvents($events);
 		$this->AddPage('L');
 		$this->SetFont(null,'',$this->fSizeSmall);
+		$categories = Category::find()->filter(['operator'=>'OR', 'conditions'=>[
+			['inCalendars'=>array_keys($this->calendars)],
+			['mine'=>true]
+		]])->all();
+		$this->categories = array_column($categories, null, 'id');
 
 		$this->drawEventCalendar();
 	}
 
 	protected function add($key, $instance) {
 		$itr = clone $instance->start();
+
 		$end = min($this->end, $instance->end());
-		while($itr <= $end) {
+		while($itr < $end) {
 			$this->events[$itr->format('Ymd')][$key] = $instance;
 			$itr = $itr->modify('+1 day');
 		}
@@ -124,11 +133,7 @@ class Month extends Calendar {
 				$this->SetFont(null, '', $this->fSizeSmall);
 
 				$events = [];
-				if($this->day->format('M')===$day->format('M')) {
-					$this->SetFillColor(255);
-				} else {
-					$this->SetFillColor(240);
-				}
+				$this->SetFillColor($this->day->format('M')===$day->format('M') ? 255: 240);
 
 				if(isset($this->events[$day->format('Ymd')])) {
 					ksort($this->events[$day->format('Ymd')]);
@@ -179,7 +184,8 @@ class Month extends Calendar {
 				$start = $event->start(false, $tz)->format('G:i');
 				$timeWidth = $this->GetStringWidth($start);
 				$this->SetTextColor(0, 0, 0);
-				$this->Cell($width - $timeWidth, 4, $title, 0, 0);
+				$this->Cell($width - $timeWidth - 4, 4, $title, 0, 0);
+				$catX = $this->GetX();
 
 				$this->SetFillColor(255, 255, 255);
 				$this->Rect($x + $width - $timeWidth - 1.5, $currentY+1, $timeWidth + 1.5, 4, 'F');
@@ -187,10 +193,24 @@ class Month extends Calendar {
 				$this->SetTextColor(150, 150, 150);
 				$this->SetXY($x + $width - $timeWidth-1, $currentY);
 				$this->Cell($timeWidth, 4, $start, 0, 0, 'R');
+
+
 			} else {
 				$this->SetTextColor($r, $g, $b);
 				$this->Cell($width+10, 4, $title, 0, 0);
+				$catX = $this->GetX() - 11;
 			}
+			foreach ($event->categoryIds as $i => $id) {
+
+				if(!isset($this->categories[$id])) continue;
+				$cat = $this->categories[$id];
+				//var_dump($cat->color);
+				//...sscanf($cat->color, "%02x%02x%02x")
+				list($r, $g, $b) = sscanf($cat->color, "%02x%02x%02x");
+				$this->SetFillColor($r, $g, $b);
+				$this->RoundedRect($catX - (($i+1)*2.5), $currentY+1, 2, 3.2, .3,'1111','DF', []);
+			}
+
 			$this->SetTextColor(0, 0, 0);
 
 			$currentY += 4;

@@ -120,6 +120,7 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 				$this->add($event->start(false, go()->getAuthState()->getUser()->timezone)->format('Y-m-d\TH:i:s').'-'.$event->id, $event);
 			}
 		}
+
 		ksort($this->events);
 
 	}
