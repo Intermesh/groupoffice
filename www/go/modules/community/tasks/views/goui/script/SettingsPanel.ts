@@ -12,7 +12,7 @@ export class SettingsPanel extends Component {
 				dataSource: jmapds("User")
 			},
 			fieldset({
-					legend: t("Dislay options for lists")
+					legend: t("Display options for lists")
 				},
 				containerfield({
 					name: "tasksSettings"

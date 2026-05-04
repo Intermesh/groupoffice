@@ -73,5 +73,5 @@ return array (
   'Percent Complete' => 'Procent dokončeno',
   'List: None' => 'Seznam: žádný',
   'Message' => 'Zpráva',
-  'Dislay options for lists' => 'Zobraz možnosti pro seznamy',
+  'Display options for lists' => 'Zobraz možnosti pro seznamy',
 );

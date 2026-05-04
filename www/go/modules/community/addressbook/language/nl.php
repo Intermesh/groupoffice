@@ -171,5 +171,5 @@ return array (
   'Please add an address with a country' => 'Voeg een adres toe aan een land',
   'Index character' => 'Indexteken',
   'Icon' => 'Pictogram',
-  'Addrees' => 'Address',
+  'Address' => 'Address',
 );

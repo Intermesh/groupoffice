@@ -135,7 +135,7 @@ return array (
   'ICD' => 'ICD',
   'Index character' => 'Písmeno indexu',
   'Icon' => 'Ikona',
-  'Addrees' => 'Adresa',
+  'Address' => 'Adresa',
   'Dates' => 'Datumy',
   'URL\'s' => 'URL',
   'Addresses' => 'Adresy',
