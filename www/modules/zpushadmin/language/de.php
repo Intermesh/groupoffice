@@ -5,7 +5,7 @@ return array (
   'Device Type' => 'Gerätetyp',
   'Ip-Address' => 'IP-Adresse',
   'Can connect' => 'Kann sich verbinden',
-  'Last synchronisation attempt' => 'Letzter Synchronisationsversuch',
+  'Last synchronisation attempt' => 'Letzer Synchronisationsversuch',
   'First synchronisation attempt' => 'Erster Synchronisationsversuch',
   'Is new device' => 'Ist neues Gerät',
   'User' => 'Benutzer',
