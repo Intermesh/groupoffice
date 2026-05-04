@@ -279,6 +279,8 @@ class Instance extends Entity {
 	private function copySystemSettings() {
 		$core = go()->getSettings()->toArray();
 
+		$conn = $this->getInstanceDbConnection();
+
 		$valuesToCopy = array (
 			0 => 'locale',
 			4 => 'language',
@@ -307,16 +309,17 @@ class Instance extends Entity {
 		);
 
 		$coreModuleId = (new \go\core\db\Query)
-						->setDbConnection($this->getInstanceDbConnection())
+						->setDbConnection($conn)
 						->selectSingleValue('id')
 						->from('core_module')
 						->where(['package'=>'core', 'name'=>'core'])->single();
 		
 		foreach($valuesToCopy as $name) {
-
-			$this->getInstanceDbConnection()
-							->replace('core_setting', ['name' => $name, 'value' => $core[$name], "moduleId" => $coreModuleId])->execute();
+			$conn->replace('core_setting', ['name' => $name, 'value' => $core[$name], "moduleId" => $coreModuleId])->execute();
 		}
+
+		$conn->disconnect();
+
 	}
 
 	/**
@@ -674,7 +677,7 @@ class Instance extends Entity {
 			throw new Exception("Failed to create access token");
 		}
 
-        $this->getInstanceDbConnection()->disconnect();
+		$this->getInstanceDbConnection()->disconnect();
 		
 		return $data['accessToken'];	
 	}
@@ -685,11 +688,17 @@ class Instance extends Entity {
 	 * @return bool
 	 */
 	public function isInstalled() : bool {
+		$conn = null;
 		try {
-			return $this->getInstanceDbConnection()->getDatabase()->hasTable('core_module');
+			$conn = $this->getInstanceDbConnection();
+			return $conn->getDatabase()->hasTable('core_module');
 		} catch(Exception $e) {
 			ErrorHandler::logException($e);
 			return false;
+		} finally {
+			if ($conn) {
+				$conn->disconnect();
+			}
 		}
 	}
 	
