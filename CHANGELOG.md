@@ -2,6 +2,13 @@
 - Core: Fixed infinite loop when installation is disabled
 - Supportclient: only show lists in new ticket dialog with at least CREATE permission
 - Core: prevent ACL exception on saving tasklist that inherits ACL from another entity 
+- Calendar: web ics file will only re-import if the fingerprint of the file has changed.
+- Calendar: Option to add web calendar is only seen when the user is allowed to add / edit calendars
+- NL/De translations
+- Calendar: The event adapter is extensible from outside the Calendar module
+- Calendar: Bug in yearview were were event before 12:00 would not be shown.
+- Calendar: Added category block to mont /weeks print view
+- Email: Adding multiple users at once to composer would not work for non-admin users.
 
 20-04-2026: 25.0.100
 - ActiveSync: Missing MSTZ function
