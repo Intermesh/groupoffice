@@ -1,6 +1,7 @@
 - Tasks: On migration subscribe to tasklists owned by the user
 - Core: Fixed infinite loop when installation is disabled
 - Supportclient: only show lists in new ticket dialog with at least CREATE permission
+- Core: prevent ACL exception on saving tasklist that inherits ACL from another entity 
 
 20-04-2026: 25.0.100
 - ActiveSync: Missing MSTZ function
