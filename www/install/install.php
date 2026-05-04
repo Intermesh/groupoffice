@@ -191,7 +191,7 @@ require('header.php');
 			</p>
 			<p>
 				<label>Username</label>
-				<input type="text" autocomplete="username" name="username" pattern="[A-Za-z0-9\-_@\.]+" title="<?= htmlentities(go()->t("You have invalid characters in the username") . " (a-z, 0-9, -, _, ., @)"); ?>" value="<?= htmlentities($_POST['username']) ?? "admin"; ?>" required />
+				<input type="text" autocomplete="username" name="username" pattern="[A-Za-z0-9\-_@\.]+" title="<?= htmlentities(go()->t("You have invalid characters in the username") . " (a-z, 0-9, -, _, ., @)"); ?>" value="<?= htmlentities($_POST['username'] ?? "admin"); ?>" required />
 			</p>
 
 			
