@@ -19,22 +19,6 @@ export class CalendarAdapter extends Observable<CalendarAdapterEventMap> {
 	private start!: DateTime
 	private end!: DateTime
 
-	constructor() {
-		super();
-		for(const type in this.providers) {
-			const p = this.providers[type];
-			if(p.watch) {
-				p.store.on('load', (me: & {skipNextEvent:boolean}) => {
-					if(p.skipWatch) {
-						p.skipWatch = false; // skip only once
-					} else {
-						this.onLoad();
-					}
-				});
-			}
-		}
-	}
-
 	onLoad = () => {}
 
 	goto(start:DateTime,end:DateTime) {
@@ -77,6 +61,16 @@ export class CalendarAdapter extends Observable<CalendarAdapterEventMap> {
 
 	public registerProvider(type:string, provider:CalendarProvider) {
 		this.providers[type] = provider;
+		if(provider.watch && provider.store) {
+			provider.store.on('load', () => {
+				//debugger;
+				if (provider.skipWatch) {
+					provider.skipWatch = false; // skip only once
+				} else {
+					this.onLoad();
+				}
+			});
+		}
 	}
 
 	providers: {[type:string] : CalendarProvider} = {}
