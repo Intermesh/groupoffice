@@ -222,6 +222,8 @@ export class Main extends MainThreeColumnPanel {
 				btn({
 					icon: "more_vert",
 					menu: menu({},
+						this.noteGrid.getVisibleColumnButton(),
+						'-',
 						btn({
 							icon: "cloud_upload",
 							text: t("Import"),
