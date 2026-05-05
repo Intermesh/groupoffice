@@ -133,7 +133,7 @@
 
 					if(!panelCfg.title) {
 						//default title
-						panelCfg.title = alert.data && alert.data.title ? alert.data.title : entity.name || entity.title || entity.description || alert.entity;
+						panelCfg.title = Ext.util.Format.htmlEncode(alert.data && alert.data.title ? alert.data.title : entity.name || entity.title || entity.description || alert.entity);
 					}
 
 
