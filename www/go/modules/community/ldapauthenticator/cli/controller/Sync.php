@@ -171,9 +171,13 @@ class Sync extends Controller
 		$this->fireEvent(self::EVENT_SYNC_USER, $user, $record);
 
 		if (!$dryRun) {
-			if ($user->isModified() && !$user->save()) {
-				echo "Error saving user: " . var_export($user->getValidationErrors(), true);
-				return false;
+			try {
+				if ($user->isModified() && !$user->save()) {
+					echo "Error saving user: " . var_export($user->getValidationErrors(), true);
+					return false;
+				}
+			} catch(DbException $e) {
+				echo 'DbException while saving user: "' . $user->username .'":'. $e->getMessage() ."\n";
 			}
 
 			go()->getDbConnection()
@@ -376,8 +380,12 @@ class Sync extends Controller
 			$this->fireEvent(self::EVENT_SYNC_GROUP, $group, $record);
 
 			if (!$dryRun) {
-				if (!$group->save()) {
-					throw new Exception("Could not save group");
+				try {
+					if (!$group->save()) {
+						echo "Error saving group: " . var_export($group->getValidationErrors(), true);
+					}
+				} catch(DbException $e) {
+					echo 'DbException while saving group: "' . $group->name .'":'. $e->getMessage() ."\n";
 				}
 
 				go()->getDbConnection()
