@@ -184,7 +184,7 @@ export class Main extends MainThreeColumnPanel {
 
 		this.addButton = btn({
 			cls: "filled primary",
-			text: "Add",
+			title: t("Add"),
 			icon: "add",
 			disabled: true,
 			handler: () => {
