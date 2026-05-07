@@ -1,3 +1,5 @@
+- Support: Separate Support categories from task categories
+
 04-05-2026: 26.0.26
 - Maildomains: fix display of active column in aliases table #1482
 - Core: increase max size of email template subject field
