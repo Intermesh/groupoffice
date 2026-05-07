@@ -94,7 +94,7 @@ class GarbageCollection extends CronJob {
 	private function blobs() {
 		go()->debug("Cleaning up BLOB's");
 		$query = Blob::findStale()->limit(200);
-		go()->debug($query);
+//		go()->debug($query);
 		Blob::delete($query);
 		EntityType::push();
 		go()->debug("Deleted " . (isset(Blob::$lastDeleteStmt) ? Blob::$lastDeleteStmt->rowCount() : 0) . " stale blobs");
@@ -102,7 +102,9 @@ class GarbageCollection extends CronJob {
 
 	private function acls() {
 		go()->debug("Cleaning up ACL's");
-		Acl::delete(Acl::findStale()->limit(200));
+		$query = Acl::findStale()->limit(200);
+//		go()->debug($query);
+		Acl::delete($query);
 		EntityType::push();
 		go()->debug("Deleted " .  (isset(Acl::$lastDeleteStmt) ? Acl::$lastDeleteStmt->rowCount() : 0). " stale ACL's");
 	}
