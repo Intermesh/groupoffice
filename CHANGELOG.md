@@ -1,4 +1,6 @@
 - Support: Separate Support categories from task categories
+- Contracts: Enable exports for all users
+- Notes / Projects3: Add button UI consitency with other modules
 
 04-05-2026: 26.0.26
 - Maildomains: fix display of active column in aliases table #1482
