@@ -155,6 +155,7 @@ CREATE TABLE IF NOT EXISTS `tasks_category` (
   `name` VARCHAR(255) NOT NULL,
   `ownerId` INT(11) NULL,
   `tasklistId` INT(11) UNSIGNED NULL,
+  `role` tinyint default 1 not null,
   PRIMARY KEY (`id`),
   INDEX `user_id` (`ownerId` ASC),
   constraint tasks_category_ibfk_1
@@ -167,6 +168,8 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
+create index tasks_category_role_index
+    on tasks_category (role);
 
 
 -- -----------------------------------------------------

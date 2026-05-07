@@ -361,6 +361,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						entityStore: "TaskCategory",
 						comboStoreConfig: {
 							filters: {
+								role: {role: this.role},
 								tasklistId: {
 									operator: "OR",
 									conditions: [

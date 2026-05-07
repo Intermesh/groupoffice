@@ -286,3 +286,7 @@ $updates['202602231535'][] = "ALTER TABLE `tasks_task` ADD COLUMN `location` TEX
 $updates['202602231535'][] = "update tasks_task set uri = concat(uid, '.ics') where uri is null;";
 
 $updates["202602231535"][] = "alter table tasks_tasklist_user add column syncToDevice tinyint default 1 not null after `isSubscribed`";
+
+$updates["202605071140"][] = "alter table tasks_category add role tinyint default 1 not null;";
+$updates["202605071140"][] = "create index tasks_category_role_index
+    on tasks_category (role);";
