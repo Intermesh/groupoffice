@@ -3,6 +3,7 @@
 - Notes / Projects3: Add button UI consitency with other modules
 - Email: Delete attachments when there's only one
 - ldapauthenticator: Handle DbException in syncing LDAP users and groups
+- Core: Let GC delete ACL for folders
 
 04-05-2026: 26.0.26
 - Maildomains: fix display of active column in aliases table #1482
