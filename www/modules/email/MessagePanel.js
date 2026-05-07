@@ -78,8 +78,8 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'<tpl if="attachments.length">'+
 			'<div style="clear:both;"></div>'+
 
-			'<tpl if="attachments.length &gt; 1">'+
-			'<div class="goui hbox border-bottom"><h3 style="flex:1">Attachments</h3>' +
+			'<tpl if="attachments.length &gt; 0">'+
+			'<div class="goui hbox border-bottom"><h3 style="flex:1">' + t('Attachments') + '</h3>' +
 			'<i style="align-self: center" class="icon ic-more-horiz" id="downloadAllMenu-'+this.downloadAllMenuId +'"></i>'+
 			'</div>'+
 			'</tpl>'+
@@ -401,7 +401,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		}
 
 		// Add 'Delete all attachmennts' option to allAttachment Context menu
-		if(data.attachments.length > 1 && this.allAttachmentContextMenu) {
+		if(data.attachments.length > 0 && this.allAttachmentContextMenu) {
 			this.allAttachmentsMenuEl = Ext.get('downloadAllMenu-'+this.downloadAllMenuId);
 			const single = data.attachments.length === 1;
 			this.allAttachmentContextMenu.downloadButton.setVisible(!single);
