@@ -1,3 +1,5 @@
+- Tasks: don't auto subscribe all tasklists
+
 04-05-2026: 25.0.101
 - Tasks: On migration subscribe to tasklists owned by the user
 - Core: Fixed infinite loop when installation is disabled
