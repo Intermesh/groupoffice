@@ -228,7 +228,18 @@ class Sync extends Controller
 			}
 		}
 
-		$mailDomain = isset($record->mail[0]) ? explode('@', $record->mail[0])[1] : null;
+		// Try to determine mail domain from common LDAP attributes.
+		// Some directories (e.g. UCS) use non-standard attributes like "mailPrimaryAddress".
+		$mail = null;
+
+		foreach (['mail', 'mailprimaryaddress'] as $attr) {
+        		if (!empty($record->{$attr}[0]) && str_contains($record->{$attr}[0], '@')) {
+                		$mail = $record->{$attr}[0];
+                		break;
+        		}
+		}
+
+		$mailDomain = $mail ? explode('@', $mail, 2)[1] : null;
 
 		if (empty($domain) || !in_array($domain, $this->domains)) {
 			go()->info("Using domain from mail property for " . $username);
