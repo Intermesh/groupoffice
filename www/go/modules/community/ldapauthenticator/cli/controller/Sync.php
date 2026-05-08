@@ -228,18 +228,29 @@ class Sync extends Controller
 			}
 		}
 
-		// Try to determine mail domain from common LDAP attributes.
-		// Some directories (e.g. UCS) use non-standard attributes like "mailPrimaryAddress".
+		// Determine email using LDAP mapping if available
+		$config = go()->getConfig();
+		$mapping = $config['ldapMapping'] ?? null;
+
 		$mail = null;
 
-		foreach (['mail', 'mailprimaryaddress'] as $attr) {
-        		if (!empty($record->{$attr}[0]) && str_contains($record->{$attr}[0], '@')) {
-                		$mail = $record->{$attr}[0];
-                		break;
+		if (isset($mapping['email'])) {
+        		if (is_callable($mapping['email'])) {
+                		$mail = $mapping['email']($record);
+        		} else {
+                		$attr = strtolower($mapping['email']);
+                		$mail = $record->{$attr}[0] ?? null;
         		}
 		}
 
-		$mailDomain = $mail ? explode('@', $mail, 2)[1] : null;
+		// Fallback to default LDAP mail attribute
+		if (!$mail) {
+        		$mail = $record->mail[0] ?? null;
+		}
+
+		$mailDomain = $mail && str_contains($mail, '@')
+        		? explode('@', $mail, 2)[1]
+        		: null;
 
 		if (empty($domain) || !in_array($domain, $this->domains)) {
 			go()->info("Using domain from mail property for " . $username);
