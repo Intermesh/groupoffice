@@ -8,6 +8,7 @@
 - Support: Wrong label for created by resulting in duplicate Customer column
 - Support: An extra day was added to modified at
 - Core: Fixed race condition in combobox loading a related entity record
+- Finance: Migrate billing module statuses
 
 04-05-2026: 26.0.26
 - Maildomains: fix display of active column in aliases table #1482
