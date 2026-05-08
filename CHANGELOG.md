@@ -5,6 +5,9 @@
 - ldapauthenticator: Handle DbException in syncing LDAP users and groups
 - Core: Let GC delete ACL for folders
 - Tasks: Don't set syncToDevice when subscribing to task lists
+- Support: Wrong label for created by resulting in duplicate Customer column
+- Support: An extra day was added to modified at
+- Core: Fixed race condition in combobox loading a related entity record
 
 04-05-2026: 26.0.26
 - Maildomains: fix display of active column in aliases table #1482
