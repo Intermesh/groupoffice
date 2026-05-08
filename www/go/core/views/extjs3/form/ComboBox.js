@@ -307,6 +307,8 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	resolveEntity : function(value) {
 		return this.store.entityStore.single(value);
 	},
+
+	_setValueToken: 0,
 	
 	setValue: function (value) {
 		const me = this;
@@ -316,6 +318,11 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 		{
 			return go.form.ComboBox.superclass.setValue.call(me, value);
 		}
+
+		const token = ++this._setValueToken; // Claim this "slot"
+
+		console.log(this.hiddenName, token, value);
+
 
 		this.setValuePromise = new Promise(function(resolve, reject) {
 			//hack for old framework where relations are "0" instead of null.
@@ -343,7 +350,9 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 				me.resolveEntity(value).then(function (entity) {
 					//this prevents the list to expand on loading the value
 					const origHasFocus = me.hasFocus;
-					if(me.value != value) {
+					// make sure we only handle the last set value call
+					if (token !== me._setValueToken) {
+						console.warn("Aborting setValue() call for " + me.hiddenName + " because another setValue() call was made in between.");
 						// Abort another setValue() call was made in between. This can happen when fetching the default
 						// value takes longer then the setValue() call of loading a dialog value.
 						// Do resolve though
@@ -366,7 +375,7 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 				}).catch(function(e) {
 
-					if(me.isDestroyed) {
+					if(token !== me._setValueToken || me.isDestroyed) {
 						resolve(me);
 						return;
 
