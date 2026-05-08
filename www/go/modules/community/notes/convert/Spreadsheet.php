@@ -23,7 +23,7 @@ class Spreadsheet extends convert\Spreadsheet
 	}
 
 	protected function importNotebook(Note $note, $value, array $values) {
-		$nb = TaskList::find(['id'])->where('name', '=', $value);
+		$nb = NoteBook::find(['id'])->where('name', '=', $value)->single();
 		if($nb) {
 			$note->noteBookId = $nb->id;
 		}
