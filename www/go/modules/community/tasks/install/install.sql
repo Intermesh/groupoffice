@@ -261,7 +261,7 @@ CREATE TABLE IF NOT EXISTS `tasks_tasklist_user` (
   `sortOrder` INT NULL,
   `isVisible` TINYINT(1) NOT NULL DEFAULT 0,
   `isSubscribed` TINYINT(1) NOT NULL DEFAULT 0,
-	`syncToDevice` tinyint default 1 not null,
+	`syncToDevice` tinyint default 0 not null,
   PRIMARY KEY (`tasklistId`, `userId`),
   INDEX `fk_tasks_tasklist_user_tasks_tasklist1_idx` (`tasklistId` ASC),
   CONSTRAINT `fk_tasks_tasklist_user_tasks_tasklist1`
