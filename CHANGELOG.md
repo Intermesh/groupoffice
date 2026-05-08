@@ -4,6 +4,7 @@
 - Email: Delete attachments when there's only one
 - ldapauthenticator: Handle DbException in syncing LDAP users and groups
 - Core: Let GC delete ACL for folders
+- Tasks: Don't set syncToDevice when subscribing to task lists
 
 04-05-2026: 26.0.26
 - Maildomains: fix display of active column in aliases table #1482
