@@ -13,6 +13,7 @@
 - Savemailas: Disable saving file into Group-Office if no main access to files module 
 - Finance: Added 'credit note' book type
 - Email: Fixed bug where adding an email to an existing contact didn't save
+- Core: Replace eval() with an expression evalutator. Fixes RCE - GroupOffice TemplateParser eval() via Contact/labels
 
 04-05-2026: 26.0.26
 - Maildomains: fix display of active column in aliases table #1482
