@@ -1,4 +1,5 @@
 - Savemailas: disable 'save to GO' option when user has no main access to files module 
+- Core: Replace eval() with an expression evalutator. Fixes RCE - GroupOffice TemplateParser eval() via Contact/labels
 
 04-05-2026: 6.8.166
 - Core: Fixed infinite loop when installation is disabled
