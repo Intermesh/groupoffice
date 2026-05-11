@@ -13,6 +13,7 @@
 - Savemailas: Disable saving file into Group-Office if no main access to files module 
 - Finance: Added 'credit note' book type
 - Email: Fixed bug where adding an email to an existing contact didn't save
+- Comments: fix error in comments list with edited comments
 
 04-05-2026: 26.0.26
 - Maildomains: fix display of active column in aliases table #1482

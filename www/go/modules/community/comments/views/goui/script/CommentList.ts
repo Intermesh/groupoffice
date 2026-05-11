@@ -142,9 +142,9 @@ class CommentList extends Component implements StoreComponent {
 				.replace("{author}", comment.creator.name)
 				.replace("{date}", Format.dateTime(comment.createdAt));
 
-			if (comment.createdAt != comment.modifiedAt) {
+			if (comment.createdAt != comment.modifiedAt && comment.modifier) {
 				commentTitle += "\n" + t("Edited by {author} at {date}")
-					.replace("{author}", comment.modifier.name)
+					.replace("{author}", comment.modifier.name ?? t("Unknown user"))
 					.replace("{date}", Format.dateTime(comment.modifiedAt));
 			}
 
