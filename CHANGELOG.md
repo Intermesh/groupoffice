@@ -1,3 +1,5 @@
+- Core: fixed tick color for colored checkboxes
+- Calendar: Lock icon is visible in calendar view when event is not public
 - Tasks: don't auto subscribe all tasklists
 - Savemailas: Disable saving file into Group-Office if no main access to files module
 - Core: Replace eval() with an expression evalutator. Fixes RCE - GroupOffice TemplateParser eval() via Contact/labels
