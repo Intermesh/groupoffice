@@ -106,13 +106,7 @@ export class CalendarList extends Component<CalendarListEventMap> {
 			tagName: 'div',
 			groupBy: "group",
 			groupByCollapsible: false,
-			groupByRenderer: (groupBy, record, list1) => {
-				if(groupBy) {
-					return `<h3>${groupBy.name.htmlEncode()}</h3>`;
-				} else {
-					return "";
-				}
-			},
+			groupByRenderer: (groupBy) => groupBy ? `<h3>${groupBy.name.htmlEncode()}</h3>`:'',
 			store,
 			cls: 'check-list',
 			rowSelectionConfig: {
@@ -151,7 +145,7 @@ export class CalendarList extends Component<CalendarListEventMap> {
 			renderer: this.checkboxRenderer.bind(this)
 		}));
 	}
-	private davGroups: {[id:number]: HTMLElement} = {}
+
 	private localGroup!: HTMLElement;
 
 	checkboxRenderer(data: any, _row: HTMLElement, list: List, storeIndex: number) {
@@ -160,7 +154,6 @@ export class CalendarList extends Component<CalendarListEventMap> {
 		const icon = data.webcalUri ? ' <i class="icon">web</i>' : '';
 		return [checkbox({
 			color: '#' + data.color,
-			//style: 'padding: 0 8px',
 			value: data.isVisible,
 			label: data.name + icon,
 			listeners: {
