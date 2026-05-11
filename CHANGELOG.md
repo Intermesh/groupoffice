@@ -1,3 +1,5 @@
+- Savemailas: disable 'save to GO' option when user has no main access to files module 
+
 04-05-2026: 6.8.166
 - Core: Fixed infinite loop when installation is disabled
 
