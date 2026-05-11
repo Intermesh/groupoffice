@@ -1,3 +1,4 @@
+11-05-2026: 26.0.27
 - Support: Separate Support categories from task categories
 - Contracts: Enable exports for all users
 - Notes / Projects3: Add button UI consitency with other modules
