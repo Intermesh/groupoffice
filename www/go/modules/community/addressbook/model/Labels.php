@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\addressbook\model;
 
+use go\core\model\Acl;
 use go\core\TemplateParser;
 use setasign\Fpdi;
 
@@ -64,7 +65,8 @@ class Labels extends \TCPDF {
 		$this->labelWidth = ($this->getPageWidth() - $this->pageLeftMargin - $this->pageRightMargin) / $this->cols;
 		$this->labelHeight = ($this->getPageHeight() - $this->pageTopMargin - $this->pageBottomMargin) / $this->rows;
 
-		$contacts = Contact::find()->where('id', 'IN', $contactIds);
+		$contacts = Contact::find()->where('id', 'IN', $contactIds)
+			->filter(['permissionLevel' => Acl::LEVEL_READ]);
 
 		foreach($contacts as $contact) {
 			$this->addLabel($contact, $tpl);
