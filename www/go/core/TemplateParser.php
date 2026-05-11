@@ -18,6 +18,8 @@ use Throwable;
 use Traversable;
 use function GO;
 
+
+
 /**
  * Template parser
  *
@@ -963,10 +965,11 @@ class TemplateParser {
 			$sum = $this->parse($tag['expression']);
 
 			try{
-				$sum = $this->validateExpression($sum);
-				$value = eval($sum);
+				$evaluator = new TemplateExpressionEvaluator();
+				$value = $evaluator->evaluate($sum);
+
 			} catch(Throwable $e) {
-				$value = $e->getMessage();
+				$value = "Failed to evaluate expression: " .$e->getMessage();
 			}
 
 		} else {
@@ -1070,14 +1073,14 @@ class TemplateParser {
 		$parsed = $this->parse($tag['expression']);		
 		$this->varsForIfStatement = false;
 		$this->enableBlocks = true;
-		
-		$expression = $this->validateExpression($parsed);	
+
 		try {
-			$ret = eval($expression);
+			$evaluator = new TemplateExpressionEvaluator();
+			$ret = $evaluator->evaluate($parsed);
 		} catch(Throwable $e) {
-			go()->warn('eval() failed '. $e->getMessage());
+			go()->warn('Evaluating expression failed '. $e->getMessage());
 			go()->warn($tag['expression']);
-			go()->warn($expression);
+			go()->warn($parsed);
 			$ret = false;
 		}
 		if($ret){
@@ -1088,62 +1091,6 @@ class TemplateParser {
 		}
 		
 		return $tag;
-
-		
-//		return substr($str, 0, $block['offset']) . $replacement . substr($str, $block['close']['offset'] + $block['close']['tagLength']);
-	}
-
-	/**
-	 * Validates and transforms template expressions to PHP code that's safe for eval().
-	 *
-	 * @throws Exception
-	 */
-	private function validateExpression($expression): string
-	{
-		$expression = html_entity_decode(trim($expression));
-
-		//split string into tokens. See http://stackoverflow.com/questions/5475312/explode-string-into-tokens-keeping-quoted-substr-intact		
-		foreach(self::$tokens as $token) {
-			if($token == '-' || $token == '!') {
-				//skip for negative numbers
-				continue;
-			}
-			$expression = str_replace($token, ' '.$token.' ', $expression);
-		}
-		$expression = str_replace(';', ' ; ', $expression);
-		
-		//$parts = preg_split('#\s*((?<!\\\\)"[^"]*")\s*|\s+#', $expression, -1 , PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-		$parts = empty($expression) ? [] : str_getcsv($expression,' ','"', "");
-		$parts = array_map('trim', $parts);
-		
-		$str = '';
-		
-		foreach($parts as $part) {
-			
-			if($part == ';') {
-				throw new Exception('; not allowed in expression: ' . $expression);
-			}
-
-			if($part == "") {
-				continue;
-			}
-
-
-			if(
-							(is_numeric($part) && substr($part, 0, 1) != "0") ||
-							$part == 'true' ||
-							$part == 'false' ||
-							$part == 'null' ||
-							in_array($part, self::$tokens)
-							//$this->isString($part)
-				) {
-				$str .= $part.' ';
-			}else
-			{
-				$str .= '"'. addslashes($part) . '" ';
-			}			
-		}		
-		return empty($str) ? 'return false;' : 'return ('.$str.');';
 	}
 
 	/**

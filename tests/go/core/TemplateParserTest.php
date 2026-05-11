@@ -108,6 +108,87 @@ class TemplateParserTest extends \PHPUnit\Framework\TestCase
 		$tpl =  '{{contact.id | Entity:Contact | prop:emailAddresses | rsort:type:home | first | prop:type}}';
 		$home = $tplParser->parse($tpl);
 		$this->assertEquals(EmailAddress::TYPE_HOME, $home);
+
+
+
+
+	}
+
+
+	public function testIf() {
+
+		$tplParser = new TemplateParser();
+		$tplParser->addModel('contact', ['firstName' => 'Linda', 'lastName' => 'Smith']);
+
+		$tpl = '[if {{contact.firstName}} == "Linda"]yes[else]no[/if]';
+
+		$if = $tplParser->parse($tpl);
+		$this->assertEquals("yes", $if);
+
+
+		$tpl = '[if {{contact.firstName}} == "Linda" && {{contact.lastName}} == "Smith"]yes[else]no[/if]';
+
+		$if = $tplParser->parse($tpl);
+		$this->assertEquals("yes", $if);
+
+		$tpl = '[if {{contact.firstName}} == "not" && {{contact.lastName}} == "Smith"]yes[else]no[/if]';
+
+		$if = $tplParser->parse($tpl);
+		$this->assertEquals("no", $if);
+
+
+
+		$tpl = '[if !{{contact.firstName}} || !{{contact.lastName2}}]yes[else]no[/if]';
+
+		$if = $tplParser->parse($tpl);
+		$this->assertEquals("yes", $if);
+
+
+		$tplParser->parse('[assign foo = "bar"]');
+		$tpl = '[if foo != "bar"]no[else]yes[/if]';
+		$if = $tplParser->parse($tpl);
+		$this->assertEquals("yes", $if);
+	}
+
+	public function testMath() {
+
+		$tplParser = new TemplateParser();
+		$tplParser->addModel('mathVar1', 5);
+		$tplParser->addModel('mathVar2', 2);
+
+		$tplParser->parse('[assign mathVar2 = 2]');
+
+		$tpl = '[assign sum = ((5*2) + 15) / ({{mathVar1}} * {{mathVar2}})]{{sum}}';
+
+		$result = $tplParser->parse($tpl);
+		$this->assertEquals("2.5", $result);
+	}
+
+
+
+	public function testSalutation() {
+		$tpl = 'Dear [if {{contact.prefixes}}]{{contact.prefixes}}[else][if !{{contact.gender}}]Ms./Mr.[else][if {{contact.gender}}=="M"]Mr.[else]Ms.[/if][/if][/if] {{contact.lastName}}';
+
+
+		$tplParser = new TemplateParser();
+
+		$contact = new Contact();
+		$contact->gender = "M";
+		$contact->lastName = "Smith";
+
+		$contact->firstName = "John";
+		$tplParser->addModel('contact', $contact);
+
+		$result = $tplParser->parse($tpl);
+		$this->assertEquals("Dear Mr. Smith", $result);
+
+		$contact->gender = "F";
+		$result = $tplParser->parse($tpl);
+		$this->assertEquals("Dear Ms. Smith", $result);
+
+		$contact->prefixes = "Dr.";
+		$result = $tplParser->parse($tpl);
+		$this->assertEquals("Dear Dr. Smith", $result);
 	}
 
 
