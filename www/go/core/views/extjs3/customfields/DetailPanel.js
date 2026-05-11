@@ -60,17 +60,23 @@ go.customfields.DetailPanel = Ext.extend(Ext.Panel, {
 
     me.items.push(currentCol);
 
-		this.tools = [{
-			id: "edit",
-			handler: () => {
-				const win = new go.customfields.EditFieldSetDialog({
-					entityStore: this.fieldSet.entity,
-					fieldSetId: this.fieldSet.id
-				});
-				win.load(this.entityId);
-				win.show();
-			}
-		}]
+    this.tools = [{
+      id: "edit",
+      handler: async () => {
+        debugger;
+        if (this.fieldSet.entity === "Project") {
+          // await go.Db.store(this.fieldSet.entity).checkState();
+          // await go.Db.store(this.fieldSet.entity).getUpdates();
+          await go.Db.store(this.fieldSet.entity).reset();
+        }
+        const win = new go.customfields.EditFieldSetDialog({
+          entityStore: this.fieldSet.entity,
+          fieldSetId: this.fieldSet.id
+        });
+        win.load(this.entityId);
+        win.show();
+      }
+    }];
 
     this.supr().initComponent.call(this);
 

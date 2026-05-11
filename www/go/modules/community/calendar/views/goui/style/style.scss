@@ -771,10 +771,6 @@ $timeMargin: dp(72);
 	label {
 		pointer-events: none;
 		input, .goui-toolbar {pointer-events: all;}
-		input[style]:checked:before {
-			color:white !important;
-		}
-
 	}
 	li {
 		padding-left: 11px;

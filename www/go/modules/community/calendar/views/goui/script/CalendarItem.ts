@@ -310,6 +310,7 @@ export class CalendarItem {
 		if(e.alerts) icons.push('notifications');
 		if(this.isTentative) icons.push('question_mark');
 		if(!!e.participants) icons.push('group');
+		if(e.privacy !== 'public') icons.push('lock');
 
 		return icons.map(i=>E('i',i).cls('icon'));
 	}
