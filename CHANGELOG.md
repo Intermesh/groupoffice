@@ -1,5 +1,6 @@
 - Tasks: don't auto subscribe all tasklists
 - Savemailas: Disable saving file into Group-Office if no main access to files module
+- Core: Replace eval() with an expression evalutator. Fixes RCE - GroupOffice TemplateParser eval() via Contact/labels
 
 04-05-2026: 25.0.101
 - Tasks: On migration subscribe to tasklists owned by the user
