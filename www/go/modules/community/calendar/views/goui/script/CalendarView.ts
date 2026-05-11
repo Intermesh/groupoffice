@@ -143,7 +143,9 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 				}
 			}
 			div = E('div',
-				E('em', item.title || '('+t(item.data.privacy!='public' ? 'Private' :'Nameless')+')'),
+				E('em', item.title || '('+t(item.data.privacy!='public' ? 'Private' :'Nameless')+')',
+					item.data.location ? ' @ ' +item.data.location : ''
+				),
 				...item.categoryDots,
 				...(withIcons ? item.icons : []),
 				time
