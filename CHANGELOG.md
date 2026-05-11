@@ -10,6 +10,7 @@
 - Core: Fixed race condition in combobox loading a related entity record
 - Finance: Migrate billing module statuses and status history
 - Finance: New status history feature
+- Savemailas: Disable saving file into Group-Office if no main access to files module 
 
 04-05-2026: 26.0.26
 - Maildomains: fix display of active column in aliases table #1482
