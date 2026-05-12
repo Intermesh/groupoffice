@@ -14,6 +14,7 @@ use go\core\db\Query;
 use go\core\orm\Entity;
 use go\core\util\DateTime;
 use GO\Files\Model\Folder;
+use go\modules\community\comments\model\Comment;
 use Throwable;
 use Traversable;
 use function GO;
@@ -240,6 +241,7 @@ class TemplateParser {
 		$this->addFilter('blobUrl', [$this, "filterBlobUrl"]);
 		$this->addFilter('blobPath', [$this, "filterBlobPath"]);
 		$this->addFilter('newRow', [$this,'filterNewRow']);
+		$this->addFilter('comments', [$this, "filterComments"]);
 
 		$this->addModel('now', new DateTime());
 
@@ -675,6 +677,11 @@ class TemplateParser {
 	private function filterNewRow($idx, $numCols=2): string
 	{
 		return $idx % $numCols === 0 ? "1" : "0";
+	}
+
+	private function filterComments($entity): array
+	{
+		return Comment::findForEntity($entity)->all();
 	}
 	
 	/**
