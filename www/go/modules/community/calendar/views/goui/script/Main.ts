@@ -124,7 +124,8 @@ export class Main extends Component {
 					listeners: {
 						'select': ({date}) => {
 							this.date = date!;
-							this.updateView();
+							const span = this.timeSpan += (this.timeSpan.endsWith('s') ? '-'+this.spanAmount : '');
+							this.routeTo(span, this.date);
 						},
 						'select-range': ( {start, end}) => {
 							const days = Math.round((end!.clone().setHours(12).getTime() - start!.clone().setHours(12).getTime()) / 8.64e7) + 1;
@@ -351,9 +352,12 @@ export class Main extends Component {
 	}
 
 	private openPDF(type:string) {
-		if(type == "list") {
 
-			let start = this.picker.value, end = start.clone();
+		let start = this.picker.value;
+
+			if(type == "list") {
+
+			let end = start.clone();
 
 			switch (this.timeSpan) {
 
@@ -385,8 +389,11 @@ export class Main extends Component {
 			window.open(client.pageUrl('community/calendar/printList/' + start.format('Y-m-d') + "/" + end.format('Y-m-d')));
 		} else if(['day', 'month', 'list'].includes(type)) {
 			window.open(client.pageUrl('community/calendar/print/' + type + '/'+ this.date.format('Y-m-d')));
+		} else if(type ==='week') {
+			start.setDay(DateTime.firstWeekDay);
+			window.open(client.pageUrl('community/calendar/printRange/week/7/' + start.format('Y-m-d')));
 		} else {
-			window.open(client.pageUrl('community/calendar/printRange/' + type + '/' + this.spanAmount + '/' + this.date.format('Y-m-d')));
+			window.open(client.pageUrl('community/calendar/printRange/' + type + '/' + this.spanAmount + '/' + start.format('Y-m-d')));
 		}
 	}
 
