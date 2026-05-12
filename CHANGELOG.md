@@ -1,5 +1,6 @@
 12-05-2026: 26.0.28
 - Core: TemplateExpressionEvaluator in wrong place leading to incorrect PDF templates
+- Finance: fixed bug in status history logging
 
 11-05-2026: 26.0.27
 - Support: Separate Support categories from task categories
