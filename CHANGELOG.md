@@ -1,3 +1,5 @@
+- Core: TemplateExpressionEvaluator in wrong place leading to incorrect PDF templates
+
 11-05-2026: 25.0.102
 - Core: fixed tick color for colored checkboxes
 - Calendar: Lock icon is visible in calendar view when event is not public
