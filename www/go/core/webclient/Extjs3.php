@@ -48,6 +48,7 @@ class Extjs3 {
 
           $file = $folder->getFile('views/extjs3/themes/' . $theme . '/style.css');
           if ($file->exists()) {
+			  $css .= "\n\n/** ".$file->getRelativePath(go()->getEnvironment()->getInstallFolder())." */\n\n";
             $css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
 
             if($debug && $file->getModifiedAt() > $modifiedAt) {
@@ -58,6 +59,7 @@ class Extjs3 {
 
 					$file = $folder->getFile('views/extjs3/themes/default/style.css');
 					if ($file->exists()) {
+						$css .= "\n\n/** ".$file->getRelativePath(go()->getEnvironment()->getInstallFolder())." */\n\n";
 						$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
 
 						if($debug && $file->getModifiedAt() > $modifiedAt) {
@@ -67,6 +69,7 @@ class Extjs3 {
 
 					$file = $folder->getFile('views/goui/dist/style.css');
 					if ($file->exists()) {
+						$css .= "\n\n/** ".$file->getRelativePath(go()->getEnvironment()->getInstallFolder())." */\n\n";
 						$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
 
 						if($debug && $file->getModifiedAt() > $modifiedAt) {
@@ -81,6 +84,7 @@ class Extjs3 {
 				$folder = Environment::get()->getInstallFolder()->getFolder('modules/' . $module->name);
 				$file = $folder->getFile('themes/Default/style.css');
 				if ($file->exists()) {
+					$css .= "\n\n/** ".$file->getRelativePath(go()->getEnvironment()->getInstallFolder())." */\n\n";
 					$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
 					if($debug && $file->getModifiedAt() > $modifiedAt) {
 						$modifiedAt = $file->getModifiedAt();
@@ -89,6 +93,7 @@ class Extjs3 {
 
 				$file = $folder->getFile('themes/' . $theme . '/style.css');
 				if ($file->exists()) {
+					$css .= "\n\n/** ".$file->getRelativePath(go()->getEnvironment()->getInstallFolder())." */\n\n";
 					$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
 					if($debug && $file->getModifiedAt() > $modifiedAt) {
 						$modifiedAt = $file->getModifiedAt();
