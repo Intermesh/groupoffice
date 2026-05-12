@@ -182,7 +182,7 @@ class Month extends Calendar {
 
 			if (!$event->showWithoutTime) {
 				$start = $event->start(false, $tz)->format('G:i');
-				$timeWidth = $this->GetStringWidth($start);
+				$timeWidth = 5.5;//$this->GetStringWidth($start);
 				$this->SetTextColor(0, 0, 0);
 				$this->Cell($width - $timeWidth - 4, 4, $title, 0, 0);
 				$catX = $this->GetX();
