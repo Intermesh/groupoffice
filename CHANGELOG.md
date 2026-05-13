@@ -1,3 +1,8 @@
+- Supportclient: Fix toggle west panel 
+- Supportclient: set minimum permission level for support lists to custom 'Submit as customer' level
+- Supportclient: fix display of grouping in support lists
+- Files: fix DE translations, clean duplicate keys, make sure that some strings are actually being translated"
+
 12-05-2026: 26.0.28
 - Core: TemplateExpressionEvaluator in wrong place leading to incorrect PDF templates
 - Finance: fixed bug in status history logging
