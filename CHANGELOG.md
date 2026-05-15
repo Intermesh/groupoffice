@@ -1,4 +1,6 @@
-12-05-2026: 25.0.103§
+- Calendar: Fixed typeerror when importing ICS. Issue #1509
+
+12-05-2026: 25.0.103
 - Core: TemplateExpressionEvaluator in wrong place leading to incorrect PDF templates
 
 11-05-2026: 25.0.102
