@@ -115,6 +115,9 @@ export class CalendarList extends Component<CalendarListEventMap> {
 					'selectionchange': ({selected}) => {
 						if (selected[0] && selected[0].record.myRights.mayWriteAll) {
 							CalendarView.selectedCalendarId = selected[0].id;
+						} else if(selected.map(s => s.id).indexOf(CalendarView.selectedCalendarId) === -1) {
+							// CalendarView.selectedCalendarId = is no longer in selected list so fall back on users' default
+							CalendarView.selectedCalendarId = client.user.calendarPreferences?.defaultCalendarId;
 						}
 					}
 				}
@@ -125,12 +128,15 @@ export class CalendarList extends Component<CalendarListEventMap> {
 					list.el.append(this.localGroup);
 
 					list.store.on('load', ({target, records})=> {
-						let record = target.find(c => c.id == CalendarView.selectedCalendarId);
-						if(!record) {
-							record = target.first();
-						}
-						if(record) {
-							list.rowSelection!.add(record);
+
+						if(!list.rowSelection?.getSelected().length) {
+							let record = target.find(c => c.id == CalendarView.selectedCalendarId);
+							if (!record) {
+								record = target.first();
+							}
+							if (record) {
+								list.rowSelection!.add(record);
+							}
 						}
 						const oldLength = Object.values(this.inCalendars).filter(Boolean).length;
 						this.inCalendars = records.reduce((obj, item) => ({ ...obj, [item.id!]: item.isVisible }), {} as any);

@@ -13,6 +13,9 @@ import {t} from "./Index.js";
 
 export abstract class CalendarView<EventMap extends ComponentEventMap = ComponentEventMap> extends Component<EventMap> {
 
+	/**
+	 * This is set to the selected calendar ID but only if the user has writeAll permissions.
+	 */
 	static selectedCalendarId: string
 
 	protected currentCreation?: CalendarItem
