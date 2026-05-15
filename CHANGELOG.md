@@ -1,4 +1,5 @@
 - Core: Upload error fix in detail panels
+- Calendar: Fixed typeerror when importing ICS. Issue #1509
 
 13-05-2026: 26.0.29
 - Supportclient: Fix toggle west panel 
