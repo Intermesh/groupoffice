@@ -100,7 +100,7 @@ GO.files.FilesContextMenu = function(config)
 
 	this.moveToTrashButton = new Ext.menu.Item({
 		iconCls: "ic-delete",
-		text: t("Move to Trash"),
+		text: t("Move to Trash", "files"),
 		handler: function()  {
 			this.fireEvent("moveToTrash", this, this.records, this.clickedAt);
 		},

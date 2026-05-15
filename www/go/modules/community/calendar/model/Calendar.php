@@ -272,7 +272,7 @@ class Calendar extends AclOwnerEntity {
 		$success = parent::internalSave();
 
 		if($wasNew && !empty($this->webcalBlob)) {
-			CalendarEvent::import([$this->webcalBlob], $this->id, 'ignore');
+			ICalendarHelper::import([$this->webcalBlob], $this->id, 'ignore');
 		}
 
 		return $success;
