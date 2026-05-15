@@ -416,7 +416,7 @@ class TemplateParser {
 		if (is_a($cls, ActiveRecord::class, true)) {
 			return $cls::model()->findByAttribute($key, $id);
 		} else {
-			return $cls::find([$key => $id], true)->all();
+			return $cls::find()->where([$key => $id])->all();
 		}
 	}
 
@@ -976,7 +976,8 @@ class TemplateParser {
 				$value = $evaluator->evaluate($sum);
 
 			} catch(Throwable $e) {
-				$value = "Failed to evaluate expression: " .$e->getMessage();
+				$value = $sum;
+//				$value = "Failed to evaluate expression: " .$e->getMessage();
 			}
 
 		} else {
