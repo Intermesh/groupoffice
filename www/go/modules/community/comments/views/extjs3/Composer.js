@@ -34,14 +34,11 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			iframePad: 0,
 			grow: true,
 			growMin: dp(32),
-			//enableColors: false,
 			enableFont: false,
 			headingsMenu: false,
 			enableFontSize: false,
 			enableAlignments: false,
 			enableSourceEdit: true,
-			// toolbarHidden: true,
-			// emptyText: t('Add comment')+'...',
 			allowBlank: false,
 			plugins: [new GO.plugins.HtmlEditorImageInsert(), go.form.HtmlEditor.emojiPlugin],
 			height: this.minComposerHeight,
@@ -165,20 +162,6 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			this.setHeight(this.commentBox.getHeight() + this.chips.getHeight() + this.attachmentBox.getHeight());
 		}, 0);
 	},
-	
-	//grow: function(){
-
-		//this.setHeight(this.commentBox.getHeight() + this.chips.getHeight() + this.attachmentBox.getHeight());
-		// var totalHeight = this.commentBox.getHeight() + this.chips.getHeight() + this.attachmentBox.getHeight();
-		// this.setHeight(totalHeight);
-		// this.middleBox.setHeight(this.getHeight() + 4);
-		//var headerHeight = this.ownerCt.header ? dp(48) : 0;
-		// console.log(this.ownerCt.commentsContainer.getEl().dom.scrollHeight, this.getHeight(), headerHeight);
-		// var h = Math.min(this.ownerCt.growMaxHeight, this.ownerCt.commentsContainer.getEl().dom.scrollHeight + this.getHeight() + headerHeight + dp(8));
-		// this.ownerCt.setHeight(h);
-		// this.ownerCt.doLayout();
-		// this.ownerCt.scrollDown();
-	//},
 	
 	initEntity : function(entityId,entity, section) {
 		this.setValues({
