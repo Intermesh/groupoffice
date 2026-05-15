@@ -1,3 +1,5 @@
+- Core: Upload error fix in detail panels
+
 13-05-2026: 26.0.29
 - Supportclient: Fix toggle west panel 
 - Supportclient: set minimum permission level for support lists to custom 'Submit as customer' level
