@@ -8,6 +8,8 @@ namespace go\modules\community\calendar\model;
 
 use DateMalformedStringException;
 use DateTimeZone;
+use Exception;
+use Generator;
 use go\core\db\Expression;
 use go\core\ErrorHandler;
 use go\core\exception\JsonPointerException;
@@ -304,7 +306,8 @@ class ICalendarHelper {
 		return implode(';',$rule);
 	}
 
-	static function veventSplitter($path) {
+	static function veventSplitter(string $path): Generator
+	{
 		$buffer = '';
 		$inEvent = false;
 		$fp = fopen($path, 'r');
@@ -336,13 +339,13 @@ class ICalendarHelper {
 	 *
 	 * @param string $blobId
 	 * @param array|null $values
-	 * @return \Generator
-	 * @throws VObject\ParseException
+	 * @return Generator
+	 * @throws VObject\ParseException|Exception
 	 */
-	static function calendarEventFromFile(string $blobId, array|null $values = null) {
-		$fp = fopen(Blob::buildPath($blobId), 'r');
+	static function calendarEventFromFile(string $blobId, array|null $values = null): Generator
+	{
 		$groups = []; // uid => [vevent strings]
-		foreach(self::veventSplitter($fp) as $uid => $vevent) {
+		foreach(self::veventSplitter(Blob::buildPath($blobId)) as $uid => $vevent) {
 			$groups[$uid][] = $vevent;
 		}
 
@@ -434,7 +437,7 @@ class ICalendarHelper {
 	 * @param VCalendar|string $vcalendar
 	 * @param CalendarEvent $event the event to insert the data into
 	 * @return CalendarEvent updated or new Event if not found
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	static public function parseVObject($vcalendar, CalendarEvent $event): CalendarEvent
 	{
@@ -555,7 +558,7 @@ class ICalendarHelper {
 		$blob->modifiedAt = $event->modifiedAt;
 		$blob->name = $event->uid . '.ics';
 		if(!$blob->save()) {
-			throw new \Exception('could not save blob');
+			throw new Exception('could not save blob');
 		}
 
 		return $blob;
