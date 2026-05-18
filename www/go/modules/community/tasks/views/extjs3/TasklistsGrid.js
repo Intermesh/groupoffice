@@ -2,7 +2,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 	autoHeight: true,
 	scrollLoader: false,
 	showMoreLoader: true,
-	loadMorePageSize: 20,
+	loadMorePageSize: 50,
 	cls: "go-tasks-task-list",
 
 	initColumns: function() {
@@ -14,12 +14,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 			id: 'group',
 			header: t('Group'),
 			sortable: false,
-			dataIndex: 'group',
-			// groupRenderer: function(v, un, r, rowIndex, colIndex, ds) {
-			// 	if(!v) {
-			// 		return "";
-			// 	}
-			// }
+			dataIndex: 'group'
 		})
 
 	},
@@ -100,7 +95,4 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 			menu.getComponent("delete").setDisabled(!go.Modules.get("community", 'tasks').userRights.mayChangeTasklists || record.get("permissionLevel") < go.permissionLevels.manage);
 		});
 	},
-
-	
-
 });
