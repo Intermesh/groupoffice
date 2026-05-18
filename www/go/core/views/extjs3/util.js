@@ -273,7 +273,9 @@ go.util =  (function () {
 			const uri = proto + encodeURIComponent(adr).replace(/%20/g, "+")
 
 			const a = document.createElement("a");
-			a.setAttribute("target", "_blank");
+			if(Ext.isWindows) {
+				a.setAttribute("target", "_blank");
+			}
 			a.setAttribute("href", uri);
 			a.click();
 

@@ -1173,7 +1173,7 @@ button.filetype-pdf, button.filetype-doc {
 
 %go-icon-list {
 	p, > a {
-		width: 100%;
+		//width: 100%;
 		min-height: utils.dp(40);
 		box-sizing: border-box;
 		display:table;
@@ -1206,7 +1206,7 @@ button.filetype-pdf, button.filetype-doc {
 
 		.avatar {
 			left: 0;
-			top:utils.dp(4);
+			top: utils.dp(4);
 			position: absolute;
 		}
 
