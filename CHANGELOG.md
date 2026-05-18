@@ -1,3 +1,6 @@
+- Calendar: show icons in monthview
+- Calendar: removed extra hr in event context menu
+- Calendar: Event locations in overview are clickable "Web" links when they start with http(s)
 - Alerts: recurring events would show with the start date of the series instead of the occurrence
 - Core: Upload error fix in detail panels
 - Calendar: Fixed typeerror when importing ICS. Issue #1509
