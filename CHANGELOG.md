@@ -5,6 +5,7 @@
 - Comments: set comment editor in modal mode to prevent focus stealing
 - Supportclient: wider default width for center panel
 - Billing: Fixed some orders changing to status paid when migrating
+- Finance: Add shipping and invoice address to detail panel
 
 13-05-2026: 26.0.29
 - Supportclient: Fix toggle west panel 
