@@ -48,7 +48,8 @@ class CalDAVBackend extends AbstractBackend implements
 		$personalCalendarId = $u->calendarPreferences->personalCalendarId;
 
 		$calendars = Calendar::findFor($u->id)
-			->where(['isSubscribed'=>1,'syncToDevice'=>1, 'groupId'=>null]);
+			->where(['isSubscribed'=>1,'syncToDevice'=>1, 'groupId'=>null])
+			->filter(['permissionLevel' => Acl::LEVEL_READ]);
 
 
 		foreach($calendars as $calendar) {
