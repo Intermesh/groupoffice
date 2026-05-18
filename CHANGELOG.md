@@ -1,3 +1,4 @@
+- Alerts: recurring events would show with the start date of the series instead of the occurrence
 - Core: Upload error fix in detail panels
 - Calendar: Fixed typeerror when importing ICS. Issue #1509
 - Calendar: Fixed jumping calendar list when working with a read only calendar
@@ -16,6 +17,7 @@
 - Finance: fixed bug in status history logging
 
 11-05-2026: 26.0.27
+- Calendar: Added location in calendar views. (if any)
 - Support: Separate Support categories from task categories
 - Contracts: Enable exports for all users
 - Notes / Projects3: Add button UI consitency with other modules
