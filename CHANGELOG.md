@@ -1,3 +1,4 @@
+18-05-2026: 26.0.30
 - Calendar: show icons in monthview
 - Calendar: removed extra hr in event context menu
 - Calendar: Event locations in overview are clickable "Web" links when they start with http(s)
