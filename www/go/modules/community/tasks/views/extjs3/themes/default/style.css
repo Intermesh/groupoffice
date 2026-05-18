@@ -69,6 +69,11 @@
 
     .tasks-task > .x-panel-bwrap > .x-panel-body > div {
         width: 100% !important;
+        position: relative !important;
+        float: none !important;
+        clear: both !important;
+        overflow: visible !important;
+        page-break-inside: avoid;
     }
 
     .tasks-task .x-grid3,
