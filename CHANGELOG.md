@@ -1,3 +1,4 @@
+18-05-2026: 25.0.104
 - Calendar: Fixed typeerror when importing ICS. Issue #1509
 
 12-05-2026: 25.0.103
