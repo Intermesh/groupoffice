@@ -1,3 +1,5 @@
+- Support: Migrate categories to support module
+
 18-05-2026: 26.0.30
 - Calendar: show icons in monthview
 - Calendar: removed extra hr in event context menu
