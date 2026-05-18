@@ -335,7 +335,7 @@ modules.register(  {
 
 					alertConfig.panelPromise = alertConfig.panelPromise.then(async (panelCfg: any) => {
 
-						let msg: string = msgs[alert.tag] || go.util.Format.shortDateTime(alertConfig.entity.start, true),
+						let msg: string = msgs[alert.tag] || go.util.Format.shortDateTime(alertConfig.alert.recurrenceId || alertConfig.entity.start, true),
 							time = go.util.Format.shortDateTime(alert.triggerAt);
 
 						if(alert.tag === 'created'){
