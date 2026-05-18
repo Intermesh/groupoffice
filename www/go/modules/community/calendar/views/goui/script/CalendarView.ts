@@ -135,6 +135,12 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 	}
 
 	private current?: CalendarItem
+
+	private fmLocation(loc?: string) {
+		if(!loc) return [];
+		return [' @ ', /^https?:\/\//.test(loc) ? E('a', 'Web').attr('target','_blank').attr('href', loc) : loc];
+	}
+
 	protected eventHtml(item: CalendarItem, div?:HTMLElement, withIcons = true) {
 		const e = item.data;
 
@@ -148,7 +154,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 			}
 			div = E('div',
 				E('em', item.title || '('+t(item.data.privacy!='public' ? 'Private' :'Nameless')+')',
-					item.data.location ? ' @ ' +item.data.location : ''
+					...this.fmLocation(item.data.location)
 				),
 				...item.categoryDots,
 				...(withIcons ? item.icons : []),
