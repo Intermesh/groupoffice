@@ -92,6 +92,14 @@ final class Domain extends AclOwnerEntity
 			->addMap('dkim', DkimKey::class, ['id' => 'domainId']);
 	}
 
+	protected function init()
+	{
+		parent::init();
+		if($this->isNew()) {
+			$this->userId = go()->getUserId();
+		}
+	}
+
 	/**
 	 * Prevent conflict with the old Postfix Admin module
 	 *
