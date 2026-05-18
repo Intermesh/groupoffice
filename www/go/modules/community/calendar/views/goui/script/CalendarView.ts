@@ -33,7 +33,8 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 					target.findChild("edit")!.hidden = !this.current!.mayChange;
 
 					const participationStatus = target.findChild("participationStatus") as Radiofield;
-					participationStatus.hidden = this.current!.isOwner ?? !this.current!.cal.myRights?.mayWriteAll;
+					const hr =  participationStatus.nextSibling()!
+					participationStatus.hidden = hr.hidden = this.current!.isOwner ?? !this.current!.cal.myRights?.mayWriteAll;
 
 					participationStatus.value = this.current?.calendarPrincipal?.participationStatus;
 				}
