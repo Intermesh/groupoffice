@@ -2,6 +2,7 @@
 - Calendar: Fixed typeerror when importing ICS. Issue #1509
 - Calendar: Fixed jumping calendar list when working with a read only calendar
 - Comments: set comment editor in modal mode to prevent focus stealing
+- Supportclient: wider default width for center panel
 
 13-05-2026: 26.0.29
 - Supportclient: Fix toggle west panel 
