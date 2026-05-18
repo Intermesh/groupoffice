@@ -22,6 +22,7 @@ export class CommentDialog extends FormWindow {
 		this.stateId = "comment-dialog";
 		this.maximizable = true;
 		this.resizable = true;
+		this.modal = true;
 
 		this.width = 600;
 		this.height = 400;
