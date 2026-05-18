@@ -2085,6 +2085,18 @@ table[id^="comments-ext"] b {
 	pre {
 		white-space: pre-wrap; // to prevent horizontal scrolling
 	}
+
+
+	code {
+		font-family: monospace;
+		border: none;
+		background: none;
+		padding: 0;
+		margin: 0;
+		display: inline;
+		color: var(--fg-text);
+		overflow: visible;
+	}
 }
 
 .normal-link {
