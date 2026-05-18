@@ -4,6 +4,7 @@
 - Calendar: Fixed jumping calendar list when working with a read only calendar
 - Comments: set comment editor in modal mode to prevent focus stealing
 - Supportclient: wider default width for center panel
+- Tasks: paginate tasklist grid at 50
 - Billing: Fixed some orders changing to status paid when migrating
 - Finance: Add shipping and invoice address to detail panel
 

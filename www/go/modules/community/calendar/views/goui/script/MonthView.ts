@@ -279,7 +279,7 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 		this.slots = Array.from({length: this.wdays}, _ => ({}) );
 		let stillContinueing = [];
 		while(e = this.continues.shift()) {
-			eventEls.push(this.drawEventLine(e, wstart, false));
+			eventEls.push(this.drawEventLine(e, wstart, true));
 			if(e.end.date > end.date) {
 				stillContinueing.push(e); // push it back for next week
 			}
@@ -287,7 +287,7 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 		this.continues = stillContinueing;
 
 		while((e = this.viewModel[this.iterator]) && e.start.format('Ymd') < end.format('Ymd')) {
-			eventEls.push(this.drawEventLine(e, wstart, false));
+			eventEls.push(this.drawEventLine(e, wstart, true));
 			if(e.end.date > end.date) {
 				this.continues.push(e);
 			}
