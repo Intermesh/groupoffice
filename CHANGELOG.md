@@ -1,4 +1,5 @@
 - Support: Migrate categories to support module
+- Multi instance: Remove studio package creation as php fpm on debian is hardened and doesn't allow file creation in /usr/share/groupoffice
 
 18-05-2026: 26.0.30
 - Calendar: show icons in monthview
