@@ -5,17 +5,17 @@ namespace go\core;
 use DateTimeZone;
 use Exception;
 use go\core\data\Model;
+use GO\Base\Db\ActiveRecord;
+use go\core\db\Query;
 use go\core\fs\Blob;
 use go\core\model\User;
-use go\core\orm\EntityType;
-use go\core\db\Query;
 use go\core\orm\Entity;
+use go\core\orm\EntityType;
 use go\core\util\DateTime;
 use GO\Files\Model\Folder;
 use Throwable;
 use Traversable;
 use function GO;
-
 
 
 /**
@@ -842,6 +842,7 @@ class TemplateParser {
 
 			// Otherwise parse template and evaluate possible math expressions
 			$sum = $this->parse($tag['expression']);
+			$sum = html_entity_decode(trim($sum));
 
 			try {
 				$evaluator = new TemplateExpressionEvaluator();
@@ -948,6 +949,7 @@ class TemplateParser {
 		$this->varsForIfStatement = true;
 		$this->enableBlocks = false;
 		$parsed = $this->parse($tag['expression']);
+		$parsed = html_entity_decode(trim($parsed));
 		$this->varsForIfStatement = false;
 		$this->enableBlocks = true;
 
