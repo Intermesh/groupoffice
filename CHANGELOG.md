@@ -5,6 +5,7 @@
 - Core: Combobox list in GOUI misaligned
 - Core: Fixed header bug in range download causing Firefox not to play mp4 files
 - Core: Fixed template bug. html entity decode before evaluating expressions
+- Projects3: Added project templates
 
 18-05-2026: 26.0.30
 - Calendar: show icons in monthview
