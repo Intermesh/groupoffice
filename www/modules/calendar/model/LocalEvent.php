@@ -199,7 +199,7 @@ class LocalEvent extends \GO\Base\Model {
 			}
 		}
 		
-		$duration = $this->getDurationInMinutes();
+		$duration = (int) round($this->getDurationInMinutes()); // PHP8.1 and higher prefers for % to have integer than float...
 
 		if($duration >= 60){
 			$durationHours = floor($duration / 60);
