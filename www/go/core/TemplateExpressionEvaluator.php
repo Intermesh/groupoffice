@@ -38,6 +38,11 @@ class TemplateExpressionEvaluator
 	public function evaluate(string $expression): mixed
 	{
 		$this->input = trim($expression);
+
+		if(empty($this->input)) {
+			return false;
+		}
+
 		$this->pos = 0;
 		$this->len = strlen($this->input);
 

@@ -176,16 +176,16 @@ use function GO;
  */
 class TemplateParser {	
 
-	private $models = [];
+	private array $models = [];
 
 	/**
 	 * Values in IF expressions will returned as "false" or "true"
 	 *
 	 * @var bool
 	 */
-	private $varsForIfStatement = false;
+	private bool $varsForIfStatement = false;
 
-	private $enableBlocks = true;
+	private bool $enableBlocks = true;
 
 
 	/**
@@ -198,7 +198,7 @@ class TemplateParser {
 	 * ``
 	 * @var string[]
 	 */
-	public $config = [
+	public array $config = [
 		'decimals' => 2,
 		'decimalSeparator' => '.',
 		'thousandsSeparator' => ',',
@@ -220,6 +220,7 @@ class TemplateParser {
 		$this->addFilter('avg', [$this, "filterAvg"]);
 		$this->addFilter('multiply', [$this, "filterMultiply"]);
 		$this->addFilter('add', [$this, "filterAdd"]);
+		$this->addFilter('math', [$this, "filterMath"]);
 		$this->addFilter('first', [$this, "filterFirst"]);
 		$this->addFilter('column', [$this, "filterColumn"]);
 		$this->addFilter('implode', [$this, "filterImplode"]);
@@ -561,6 +562,20 @@ class TemplateParser {
 		return array_sum($array);
 	}
 
+
+	private function filterMath($expression) {
+		try{
+
+			$expression = html_entity_decode($expression);
+
+			$evaluator = new TemplateExpressionEvaluator();
+			return $evaluator->evaluate($expression);
+
+		} catch(Throwable $e) {
+			return "Failed to evaluate expression: " .$e->getMessage();
+		}
+	}
+
 	private function filterAvg($array) : float|int|null
 	{
 		if (!isset($array)) {
@@ -683,7 +698,7 @@ class TemplateParser {
 	{
 		return Comment::findForEntity($entity)->all();
 	}
-	
+
 	/**
 	 * Add a filter function
 	 * 
@@ -957,6 +972,9 @@ class TemplateParser {
 		return $tag;
 	}
 
+
+
+
 	/**
 	 * @throws Exception
 	 */
@@ -965,24 +983,25 @@ class TemplateParser {
 		//assign won't output
 		$tag['replacement'] = "";
 
-		if(is_numeric($tag['expression'])) {
-			//allow assigning a new numeric value for math operations
-			$value = $tag['expression'];
-		} else 	if(preg_match('/{{.*?}}/',$tag['expression'])) {
+
+		// check if this is a direct variable assignment from another model. eg. [assign foo = contact.addresses | first]
+		if($this->isVarExpression($tag['expression'])) {
+			$value = $this->getVarFiltered($tag['expression']);
+		} else {
+
+			// Otherwise parse template and evaluate possible math expressions
 			$sum = $this->parse($tag['expression']);
 
-			try{
+			try {
 				$evaluator = new TemplateExpressionEvaluator();
 				$value = $evaluator->evaluate($sum);
 
-			} catch(Throwable $e) {
+			} catch (Throwable $e) {
 				$value = $sum;
 //				$value = "Failed to evaluate expression: " .$e->getMessage();
 			}
-
-		} else {
-			$value = $this->getVarFiltered($tag['expression']);
 		}
+
 
 		$path = explode(".", $tag['varName']);
 		$this->applyAssignToModels($tag, $path, $value,$this->models);
@@ -1078,13 +1097,13 @@ class TemplateParser {
 		
 		$this->varsForIfStatement = true;
 		$this->enableBlocks = false;
-		$parsed = $this->parse($tag['expression']);		
+		$parsed = $this->parse($tag['expression']);
 		$this->varsForIfStatement = false;
 		$this->enableBlocks = true;
 
 		try {
 			$evaluator = new TemplateExpressionEvaluator();
-			$ret = $evaluator->evaluate($parsed);
+			$ret = (bool) $evaluator->evaluate($parsed);
 		} catch(Throwable $e) {
 			go()->warn('Evaluating expression failed '. $e->getMessage());
 			go()->warn($tag['expression']);
@@ -1120,11 +1139,24 @@ class TemplateParser {
 
 			$value = is_scalar($value) ||
 			!isset($value) ||
-			(is_object($value) && method_exists($value, '__toString')) ? '"' . str_replace('"', '""', (string) $value) . '"' : !empty($value);
+			(is_object($value) && method_exists($value, '__toString')) ? '"' . addslashes((string) $value) . '"' : !empty($value);
 
 		}
 
 		return $value;
+	}
+
+
+	private function isVarExpression($expression) : bool
+	{
+		if(is_numeric($expression)) {
+			return false;
+		}
+		$filters = explode('|', $expression);
+
+		$varPath = trim(array_shift($filters)); //eg "contact.name";
+
+		return preg_match('/^[a-z0-9A-Z_.]+$/', $varPath);
 	}
 
 	/**
@@ -1134,8 +1166,15 @@ class TemplateParser {
 		$filters = explode('|', $expression);
 		
 		$varPath = trim(array_shift($filters)); //eg "contact.name";		
-		
-		$value = $this->getVar($varPath);		
+
+		$value = $this->getVar($varPath);
+
+//		// if the var is enclosed with double quotes then treat it as a sting
+//		if(str_starts_with($varPath, '"') && str_ends_with($varPath, '"')) {
+//			$value = $this->parse(substr($varPath, 1, -1));
+//		} else {
+////			$value = $this->getVar($varPath);
+//		}
 		foreach($filters as $filter) {
 			
 			$args = array_map('trim', str_getcsv($filter, ':', '"', ""));
