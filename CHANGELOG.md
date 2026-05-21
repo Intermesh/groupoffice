@@ -7,6 +7,7 @@
 - Core: Fixed template bug. html entity decode before evaluating expressions
 - Core: Fixed template parser failing to handle some if statements with variables containing math operators
 - Projects3: Added project templates
+- Filesearch: Fixed results not being filtered when using it as an admin
 
 18-05-2026: 26.0.30
 - Calendar: show icons in monthview
