@@ -1,4 +1,5 @@
-_- Core: Fixed template parser failing to handle some if statements with variables containing math operators
+12-05-2026: 6.8.169
+- Core: Fixed template parser failing to handle some if statements with variables containing math operators
 - Filesearch: Fixed results not being filtered when using it as an admin_
 
 12-05-2026: 6.8.168
