@@ -996,8 +996,7 @@ class TemplateParser {
 				$value = $evaluator->evaluate($sum);
 
 			} catch (Throwable $e) {
-				$value = $sum;
-//				$value = "Failed to evaluate expression: " .$e->getMessage();
+				$value = "Failed to evaluate expression: " . $e->getMessage();
 			}
 		}
 
