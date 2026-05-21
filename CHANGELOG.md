@@ -5,6 +5,7 @@
 - Core: Combobox list in GOUI misaligned
 - Core: Fixed header bug in range download causing Firefox not to play mp4 files
 - Core: Fixed template bug. html entity decode before evaluating expressions
+- Core: Fixed template parser failing to handle some if statements with variables containing math operators
 - Projects3: Added project templates
 
 18-05-2026: 26.0.30
