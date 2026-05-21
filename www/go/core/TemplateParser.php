@@ -212,7 +212,6 @@ class TemplateParser {
 		$this->addFilter('count', [$this, "filterCount"]);
 		$this->addFilter('multiply', [$this, "filterMultiply"]);
 		$this->addFilter('add', [$this, "filterAdd"]);
-		$this->addFilter('math', [$this, "filterMath"]);
 		$this->addFilter('first', [$this, "filterFirst"]);
 		$this->addFilter('column', [$this, "filterColumn"]);
 		$this->addFilter('implode', [$this, "filterImplode"]);
