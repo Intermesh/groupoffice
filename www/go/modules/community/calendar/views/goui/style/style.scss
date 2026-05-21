@@ -771,17 +771,13 @@ $timeMargin: dp(72);
 	label {
 		pointer-events: none;
 		input, .goui-toolbar {pointer-events: all;}
-		input[style]:checked:before {
-			color:white !important;
-		}
-
 	}
 	li {
 		padding-left: 11px;
 		&.selected {
 			background-color: $colorSelectedRowInactive;
 		}
-		menu{width:0;}
+		menu{width:0;overflow:hidden;}
 		&:hover menu, &:focus-within menu{width:auto;}
 	}
 	.goui-form-field .wrap menu.goui-toolbar {

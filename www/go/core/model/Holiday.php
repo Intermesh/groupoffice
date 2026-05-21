@@ -87,7 +87,16 @@ class Holiday {
 		if(isset($lang->en))
 			return $lang->en;
 
-		return $data->_name ?? $data->name;
+		if(isset($data->_name)) {
+			return $data->_name;
+		}
+
+		if($data->name instanceof \stdClass) {
+			$firstKey = array_key_first((array) $data->name);
+			return $data->name->$firstKey;
+		}
+
+		return $data->name;
 	}
 
 	static private function findRegionName($obj) {

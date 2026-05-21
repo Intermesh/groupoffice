@@ -426,7 +426,7 @@ class File extends FileSystemObject {
 			if ($c_start > $c_end || $c_start > $size - 1 || $c_end >= $size) {
 
 				Response::get()->setStatus(416);
-				Response::get()->setHeader("Content-Range,", "bytes $start-$end/$size");
+				Response::get()->setHeader("Content-Range", "bytes $start-$end/$size");
 				Response::get()->sendHeaders();
 				exit;
 			}

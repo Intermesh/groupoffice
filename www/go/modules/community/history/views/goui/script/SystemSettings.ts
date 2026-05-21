@@ -17,8 +17,11 @@ export class SystemSettings extends Component {
 						name: "settings"
 					},
 					numberfield({
-						id: "deleteAfterDays",
-						label: t("Delete entries after how many days")
+						name: "deleteAfterDays",
+						decimals: 0,
+						width: 240,
+						label: t("Delete entries after"),
+						suffix: t("days")
 					})
 				)
 			)

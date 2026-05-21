@@ -235,7 +235,7 @@ Version 1.1 (2010-02-24)
 	Fixed issues with i18n support and added a Swedish and Danish language pack.
 	Fixed bug where the Flash runtime could do empty requests if the image was scaled down.
 	Fixed bug where uploading small images in Silverlight would produce an exception.
-	Fixed so the runtime list can include whitespace or missing runtimes. Patch contributed by Øyvind Sean Kinsey.
+	Fixed so the runtime list can include whitespace or missing runtimes. Patch contributed by ï¿½yvind Sean Kinsey.
 	Fixed so to large files are ignored and never dispatched to the FilesAdded event.
 Version 1.0 (2010-02-03)
 	First official release of Plupload.

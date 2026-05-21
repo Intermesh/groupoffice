@@ -6,17 +6,18 @@ use DateInterval;
 use DateTimeZone;
 use Exception;
 use GO\Base\Db\ActiveRecord;
-use go\core\data\Model;
+use go\core\db\Query;
 use go\core\fs\Blob;
 use go\core\model\User;
-use go\core\orm\EntityType;
-use go\core\db\Query;
 use go\core\orm\Entity;
+use go\core\orm\EntityType;
 use go\core\util\DateTime;
 use GO\Files\Model\Folder;
+use go\modules\community\comments\model\Comment;
 use Throwable;
 use Traversable;
 use function GO;
+
 
 /**
  * Template parser
@@ -173,16 +174,16 @@ use function GO;
  */
 class TemplateParser {	
 
-	private $models = [];
+	private array $models = [];
 
 	/**
 	 * Values in IF expressions will returned as "false" or "true"
 	 *
 	 * @var bool
 	 */
-	private $varsForIfStatement = false;
+	private bool $varsForIfStatement = false;
 
-	private $enableBlocks = true;
+	private bool $enableBlocks = true;
 
 
 	/**
@@ -195,7 +196,7 @@ class TemplateParser {
 	 * ``
 	 * @var string[]
 	 */
-	public $config = [
+	public array $config = [
 		'decimals' => 2,
 		'decimalSeparator' => '.',
 		'thousandsSeparator' => ',',
@@ -217,6 +218,7 @@ class TemplateParser {
 		$this->addFilter('avg', [$this, "filterAvg"]);
 		$this->addFilter('multiply', [$this, "filterMultiply"]);
 		$this->addFilter('add', [$this, "filterAdd"]);
+		$this->addFilter('math', [$this, "filterMath"]);
 		$this->addFilter('first', [$this, "filterFirst"]);
 		$this->addFilter('column', [$this, "filterColumn"]);
 		$this->addFilter('implode', [$this, "filterImplode"]);
@@ -238,6 +240,7 @@ class TemplateParser {
 		$this->addFilter('blobUrl', [$this, "filterBlobUrl"]);
 		$this->addFilter('blobPath', [$this, "filterBlobPath"]);
 		$this->addFilter('newRow', [$this,'filterNewRow']);
+		$this->addFilter('comments', [$this, "filterComments"]);
 
 		$this->addModel('now', new DateTime());
 
@@ -412,7 +415,7 @@ class TemplateParser {
 		if (is_a($cls, ActiveRecord::class, true)) {
 			return $cls::model()->findByAttribute($key, $id);
 		} else {
-			return $cls::find([$key => $id], true)->all();
+			return $cls::find()->where([$key => $id])->all();
 		}
 	}
 
@@ -557,6 +560,20 @@ class TemplateParser {
 		return array_sum($array);
 	}
 
+
+	private function filterMath($expression) {
+		try{
+
+			$expression = html_entity_decode($expression);
+
+			$evaluator = new TemplateExpressionEvaluator();
+			return $evaluator->evaluate($expression);
+
+		} catch(Throwable $e) {
+			return "Failed to evaluate expression: " .$e->getMessage();
+		}
+	}
+
 	private function filterAvg($array) : float|int|null
 	{
 		if (!isset($array)) {
@@ -674,7 +691,12 @@ class TemplateParser {
 	{
 		return $idx % $numCols === 0 ? "1" : "0";
 	}
-	
+
+	private function filterComments($entity): array
+	{
+		return Comment::findForEntity($entity)->all();
+	}
+
 	/**
 	 * Add a filter function
 	 * 
@@ -948,6 +970,9 @@ class TemplateParser {
 		return $tag;
 	}
 
+
+
+
 	/**
 	 * @throws Exception
 	 */
@@ -956,22 +981,25 @@ class TemplateParser {
 		//assign won't output
 		$tag['replacement'] = "";
 
-		if(is_numeric($tag['expression'])) {
-			//allow assigning a new numeric value for math operations
-			$value = $tag['expression'];
-		} else 	if(preg_match('/{{.*?}}/',$tag['expression'])) {
-			$sum = $this->parse($tag['expression']);
 
-			try{
-				$sum = $this->validateExpression($sum);
-				$value = eval($sum);
-			} catch(Throwable $e) {
-				$value = $e->getMessage();
-			}
-
-		} else {
+		// check if this is a direct variable assignment from another model. eg. [assign foo = contact.addresses | first]
+		if($this->isVarExpression($tag['expression'])) {
 			$value = $this->getVarFiltered($tag['expression']);
+		} else {
+
+			// Otherwise parse template and evaluate possible math expressions
+			$sum = $this->parse($tag['expression']);
+			$sum = html_entity_decode(trim($sum));
+
+			try {
+				$evaluator = new TemplateExpressionEvaluator();
+				$value = $evaluator->evaluate($sum);
+
+			} catch (Throwable $e) {
+				$value = "Failed to evaluate expression: " . $e->getMessage();
+			}
 		}
+
 
 		$path = explode(".", $tag['varName']);
 		$this->applyAssignToModels($tag, $path, $value,$this->models);
@@ -1067,17 +1095,18 @@ class TemplateParser {
 		
 		$this->varsForIfStatement = true;
 		$this->enableBlocks = false;
-		$parsed = $this->parse($tag['expression']);		
+		$parsed = $this->parse($tag['expression']);
+		$parsed = html_entity_decode(trim($parsed));
 		$this->varsForIfStatement = false;
 		$this->enableBlocks = true;
-		
-		$expression = $this->validateExpression($parsed);	
+
 		try {
-			$ret = eval($expression);
+			$evaluator = new TemplateExpressionEvaluator();
+			$ret = (bool) $evaluator->evaluate($parsed);
 		} catch(Throwable $e) {
-			go()->warn('eval() failed '. $e->getMessage());
+			go()->warn('Evaluating expression failed '. $e->getMessage());
 			go()->warn($tag['expression']);
-			go()->warn($expression);
+			go()->warn($parsed);
 			$ret = false;
 		}
 		if($ret){
@@ -1088,62 +1117,6 @@ class TemplateParser {
 		}
 		
 		return $tag;
-
-		
-//		return substr($str, 0, $block['offset']) . $replacement . substr($str, $block['close']['offset'] + $block['close']['tagLength']);
-	}
-
-	/**
-	 * Validates and transforms template expressions to PHP code that's safe for eval().
-	 *
-	 * @throws Exception
-	 */
-	private function validateExpression($expression): string
-	{
-		$expression = html_entity_decode(trim($expression));
-
-		//split string into tokens. See http://stackoverflow.com/questions/5475312/explode-string-into-tokens-keeping-quoted-substr-intact		
-		foreach(self::$tokens as $token) {
-			if($token == '-' || $token == '!') {
-				//skip for negative numbers
-				continue;
-			}
-			$expression = str_replace($token, ' '.$token.' ', $expression);
-		}
-		$expression = str_replace(';', ' ; ', $expression);
-		
-		//$parts = preg_split('#\s*((?<!\\\\)"[^"]*")\s*|\s+#', $expression, -1 , PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-		$parts = empty($expression) ? [] : str_getcsv($expression,' ','"', "");
-		$parts = array_map('trim', $parts);
-		
-		$str = '';
-		
-		foreach($parts as $part) {
-			
-			if($part == ';') {
-				throw new Exception('; not allowed in expression: ' . $expression);
-			}
-
-			if($part == "") {
-				continue;
-			}
-
-
-			if(
-							(is_numeric($part) && substr($part, 0, 1) != "0") ||
-							$part == 'true' ||
-							$part == 'false' ||
-							$part == 'null' ||
-							in_array($part, self::$tokens)
-							//$this->isString($part)
-				) {
-				$str .= $part.' ';
-			}else
-			{
-				$str .= '"'. addslashes($part) . '" ';
-			}			
-		}		
-		return empty($str) ? 'return false;' : 'return ('.$str.');';
 	}
 
 	/**
@@ -1165,11 +1138,24 @@ class TemplateParser {
 
 			$value = is_scalar($value) ||
 			!isset($value) ||
-			(is_object($value) && method_exists($value, '__toString')) ? '"' . str_replace('"', '""', (string) $value) . '"' : !empty($value);
+			(is_object($value) && method_exists($value, '__toString')) ? '"' . addslashes((string) $value) . '"' : !empty($value);
 
 		}
 
 		return $value;
+	}
+
+
+	private function isVarExpression($expression) : bool
+	{
+		if(is_numeric($expression)) {
+			return false;
+		}
+		$filters = explode('|', $expression);
+
+		$varPath = trim(array_shift($filters)); //eg "contact.name";
+
+		return preg_match('/^[a-z0-9A-Z_.]+$/', $varPath);
 	}
 
 	/**
@@ -1179,8 +1165,15 @@ class TemplateParser {
 		$filters = explode('|', $expression);
 		
 		$varPath = trim(array_shift($filters)); //eg "contact.name";		
-		
-		$value = $this->getVar($varPath);		
+
+		$value = $this->getVar($varPath);
+
+//		// if the var is enclosed with double quotes then treat it as a sting
+//		if(str_starts_with($varPath, '"') && str_ends_with($varPath, '"')) {
+//			$value = $this->parse(substr($varPath, 1, -1));
+//		} else {
+////			$value = $this->getVar($varPath);
+//		}
 		foreach($filters as $filter) {
 			
 			$args = array_map('trim', str_getcsv($filter, ':', '"', ""));

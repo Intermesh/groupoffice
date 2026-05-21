@@ -18,7 +18,7 @@ import {
 } from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
-import {calendarStore, getParticipantStatusIcon, statusIcons, t, writeableCalendarStore} from "./Index.js";
+import {calendarStore, getParticipantStatusIcon, t, writeableCalendarStore} from "./Index.js";
 import {EventWindow} from "./EventWindow.js";
 import {CommentsPanel} from "@intermesh/community-comments";
 
@@ -168,7 +168,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 							tagName: "div",
 							cls: "pad",
 							escapeValue: false,
-							renderer: (v, field) => Format.textToHtml(v)
+							renderer: (v) => Format.textToHtml(v)
 						}),
 						mapfield({
 							name: 'participants',
@@ -234,7 +234,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 			this.editBtn = btn({
 				icon: "edit",
 				title: t("Edit"),
-				handler: (button, ev) => {
+				handler: () => {
 					void this.item!.open(()=>{},true);
 				},
 			}),
@@ -322,7 +322,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 			this.statusTbar.items.replace(btn({
 				text: t("Add"),
-				handler: button => {
+				handler: () => {
 					const dlg = new EventWindow();
 					dlg.show();
 					dlg.loadEvent(this.item!);

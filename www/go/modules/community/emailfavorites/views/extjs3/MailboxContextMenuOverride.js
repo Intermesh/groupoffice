@@ -1,4 +1,7 @@
-Ext.onReady(function () {
+GO.mainLayout.on('authenticated', (mainLayout, user, password) => {
+	if(!go.Modules.isAvailable("community", "emailfavorites") || !go.Modules.isAvailable("legacy", "email")) {
+		return;
+	}
 	GO.email.extraTreeContextMenuItems.push(
 		'-',
 		new Ext.menu.Item({

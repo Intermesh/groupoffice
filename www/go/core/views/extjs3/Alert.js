@@ -18,7 +18,7 @@
 
 			this.store = new go.data.Store({
 				entityStore: "Alert",
-				fields: ['id', 'entity', 'entityId', 'data', 'tag', 'triggerAt', 'userId', 'title', 'body', 'createdBy'],
+				fields: ['id', 'entity', 'entityId', 'data', 'tag','recurrenceId', 'triggerAt', 'userId', 'title', 'body', 'createdBy'],
 				filters: {
 					user: {userId: go.User.id}
 				},
@@ -133,7 +133,7 @@
 
 					if(!panelCfg.title) {
 						//default title
-						panelCfg.title = alert.data && alert.data.title ? alert.data.title : entity.name || entity.title || entity.description || alert.entity;
+						panelCfg.title = Ext.util.Format.htmlEncode(alert.data && alert.data.title ? alert.data.title : entity.name || entity.title || entity.description || alert.entity);
 					}
 
 

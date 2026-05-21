@@ -916,15 +916,22 @@ namespace go\core {
 				//hack for wopi subdomain
 				$domain = str_replace('.wopi.', '.', $domain);
 
-				$workingFile = '/etc/groupoffice/multi_instance/' . $domain . '/' . $name;
+				$root = '/etc/groupoffice/multi_instance/';
+
+				// make sure HTTP_HOST is not doing path traversal
 				try {
-					if (file_exists($workingFile)) {
-						return $workingFile;
-					}
-				}
-				catch(Exception $e) {
+					$workingFile = realpath($root . $domain . '/' . $name);
+				}  catch(Exception $e) {
 					//ignore open_basedir error
 				}
+				if($workingFile) {
+					if (!str_starts_with($workingFile, $root)) {
+						throw new Exception("Invalid config file location: " . $workingFile . ' => ' . $root);
+					}
+
+					return $workingFile;
+				}
+
 			}
 			
 			$workingFile = dirname(__DIR__, 2) . '/' . $name;

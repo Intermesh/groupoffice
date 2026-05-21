@@ -123,7 +123,7 @@ return array (
   'Could not find this user in the address book for you.' => 'アドレス帳にこのユーザーが見つかりませんでした。 ',
   'Index character' => '見出し文字 ',
   'Icon' => 'アイコン',
-  'Addrees' => '住所',
+  'Address' => '住所',
   'IBAN' => 'IBAN',
   'ICD' => 'ICD',
   'Add to group' => 'グループに追加',

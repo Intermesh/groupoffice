@@ -262,9 +262,8 @@ $updates['202602231535'][] = "UPDATE tasks_tasklist SET defaultColor = SUBSTRING
 // subscribe to the tasklists the user has access to
 $updates['202602231535'][] = "INSERT IGNORE INTO tasks_tasklist_user
 (tasklistId, userId, isSubscribed, isVisible, color, sortOrder, modSeq)
-select tl.id, ug.userId, 1, 1, tl.defaultColor,0,1 from core_acl_group ag
-inner join core_user_group ug on ug.groupId = ag.groupId
-inner join tasks_tasklist tl on tl.aclId = ag.aclId where tl.projectId is not null group by tl.id,ug.userId";
+select tl.id, tl.createdBy, 1, 1, tl.defaultColor,0,1 from tasks_tasklist tl
+where tl.role =1";
 
 $updates['202602231535'][] = "update tasks_task set progressUpdated = modifiedAt where progressUpdated is null and progress = 3;";
 
@@ -286,4 +285,12 @@ $updates['202602231535'][] = "ALTER TABLE `tasks_task` ADD COLUMN `location` TEX
 
 $updates['202602231535'][] = "update tasks_task set uri = concat(uid, '.ics') where uri is null;";
 
-$updates["202602231535"][] = "alter table tasks_tasklist_user add column syncToDevice tinyint default 1 not null after `isSubscribed`";
+$updates["202602231535"][] = "alter table tasks_tasklist_user add column syncToDevice tinyint default 0 not null after `isSubscribed`";
+$updates["202602231535"][] = "update tasks_tasklist_user u inner join tasks_tasklist t on t.id=u.tasklistId set syncToDevice=1 where u.userId=t.createdBy;";
+
+$updates["202605071140"][] = "alter table tasks_category add role tinyint default 1 not null;";
+$updates["202605071140"][] = "create index tasks_category_role_index
+    on tasks_category (role);";
+
+$updates["202605081140"][] = "alter table tasks_tasklist_user
+    alter column syncToDevice set default 0;";

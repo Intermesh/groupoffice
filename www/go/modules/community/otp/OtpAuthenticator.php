@@ -2,6 +2,8 @@
 
 namespace go\modules\community\otp;
 
+use go\core\ErrorHandler;
+use go\core\http\Request;
 use go\core\model\Token;
 use go\core\auth\SecondaryAuthenticator;
 use go\core\db\Query;
@@ -21,9 +23,11 @@ class OtpAuthenticator extends SecondaryAuthenticator
 
 		/** @phpstan-ignore-next-line */
 		$otp = $token->getUser()->otp;
+		$user = $token->getUser();
 
 		if (!$otp) {
 			$this->setValidationError('otp_code', ErrorCode::NOT_FOUND);
+			ErrorHandler::log("Token authentication failed for user ". $user->username . " from IP: '" . Request::get()->getRemoteIpAddress() . "'");
 			return false;
 		}
 
@@ -31,12 +35,14 @@ class OtpAuthenticator extends SecondaryAuthenticator
 
 		if ($expiresAt && new DateTime($expiresAt) < new DateTime()) {
 			$this->setValidationError('otp_code', ErrorCode::NOT_FOUND);
+			ErrorHandler::log("Token authentication failed for user ". $user->username . " from IP: '" . Request::get()->getRemoteIpAddress() . "'");
 			return false;
 		}
 
 
 		if (!$otp->verifyCode($data['otp_code'])) {
 			$this->setValidationError('otp_code', ErrorCode::INVALID_INPUT);
+			ErrorHandler::log("Token authentication failed for user ". $user->username . " from IP: '" . Request::get()->getRemoteIpAddress() . "'");
 			return false;
 		}
 

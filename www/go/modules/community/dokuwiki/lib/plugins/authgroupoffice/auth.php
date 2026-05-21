@@ -88,7 +88,7 @@ class auth_plugin_authgroupoffice extends DokuWiki_Auth_Plugin
         $vars = preg_split('/([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff^|]*)\|/',
             $data, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
         for ($i = 0; isset($vars[$i]); $i++) {
-            $result[$vars[$i++]] = unserialize($vars[$i]);
+            $result[$vars[$i++]] = unserialize($vars[$i], ['allowed_classes' => false]);
         }
         return $result;
     }
@@ -117,7 +117,10 @@ class auth_plugin_authgroupoffice extends DokuWiki_Auth_Plugin
         if ($GO_SID) {
             if (empty(\GO::user()->id)) {
 
-                $fname = session_save_path() . "/sess_" . $GO_SID;
+                $fname = realpath(session_save_path() . "/sess_" . $GO_SID);
+								if(!str_starts_with($fname, session_save_path())) {
+									throw new InvalidArgumentException("Invalid session ID");
+								}
 
                 if (file_exists($fname)) {
                     $data = file_get_contents($fname);

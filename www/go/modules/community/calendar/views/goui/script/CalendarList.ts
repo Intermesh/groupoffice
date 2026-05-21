@@ -83,10 +83,15 @@ export class CalendarList extends Component<CalendarListEventMap> {
 							d.show();
 						}
 					}),
-					btn({icon: 'travel_explore',text: t('Add calendar from link') + '…', handler: () => {
-						const d = new SubscribeWebCalWindow();
-						d.show();
-					}}),
+					btn({
+						hidden:!rights.mayChangeCalendars,
+						icon: 'travel_explore',
+						text: t('Add calendar from link') + '…',
+						handler: () => {
+							const d = new SubscribeWebCalWindow();
+							d.show();
+						}
+					}),
 					hr({hidden: !rights.mayChangeViews}),
 					btn({hidden: !rights.mayChangeViews,
 						icon: 'calendar_view_month',
@@ -101,13 +106,7 @@ export class CalendarList extends Component<CalendarListEventMap> {
 			tagName: 'div',
 			groupBy: "group",
 			groupByCollapsible: false,
-			groupByRenderer: (groupBy, record, list1) => {
-				if(groupBy) {
-					return `<h3>${groupBy.name.htmlEncode()}</h3>`;
-				} else {
-					return "";
-				}
-			},
+			groupByRenderer: (groupBy) => groupBy ? `<h3>${groupBy.name.htmlEncode()}</h3>`:'',
 			store,
 			cls: 'check-list',
 			rowSelectionConfig: {
@@ -116,6 +115,9 @@ export class CalendarList extends Component<CalendarListEventMap> {
 					'selectionchange': ({selected}) => {
 						if (selected[0] && selected[0].record.myRights.mayWriteAll) {
 							CalendarView.selectedCalendarId = selected[0].id;
+						} else if(selected.map(s => s.id).indexOf(CalendarView.selectedCalendarId) === -1) {
+							// CalendarView.selectedCalendarId = is no longer in selected list so fall back on users' default
+							CalendarView.selectedCalendarId = client.user.calendarPreferences?.defaultCalendarId;
 						}
 					}
 				}
@@ -126,12 +128,15 @@ export class CalendarList extends Component<CalendarListEventMap> {
 					list.el.append(this.localGroup);
 
 					list.store.on('load', ({target, records})=> {
-						let record = target.find(c => c.id == CalendarView.selectedCalendarId);
-						if(!record) {
-							record = target.first();
-						}
-						if(record) {
-							list.rowSelection!.add(record);
+
+						if(!list.rowSelection?.getSelected().length) {
+							let record = target.find(c => c.id == CalendarView.selectedCalendarId);
+							if (!record) {
+								record = target.first();
+							}
+							if (record) {
+								list.rowSelection!.add(record);
+							}
 						}
 						const oldLength = Object.values(this.inCalendars).filter(Boolean).length;
 						this.inCalendars = records.reduce((obj, item) => ({ ...obj, [item.id!]: item.isVisible }), {} as any);
@@ -146,7 +151,7 @@ export class CalendarList extends Component<CalendarListEventMap> {
 			renderer: this.checkboxRenderer.bind(this)
 		}));
 	}
-	private davGroups: {[id:number]: HTMLElement} = {}
+
 	private localGroup!: HTMLElement;
 
 	checkboxRenderer(data: any, _row: HTMLElement, list: List, storeIndex: number) {
@@ -155,7 +160,6 @@ export class CalendarList extends Component<CalendarListEventMap> {
 		const icon = data.webcalUri ? ' <i class="icon">web</i>' : '';
 		return [checkbox({
 			color: '#' + data.color,
-			//style: 'padding: 0 8px',
 			value: data.isVisible,
 			label: data.name + icon,
 			listeners: {

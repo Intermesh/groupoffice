@@ -119,7 +119,7 @@ return array (
   'Index character' => 'Index character',
   'Icon' => 'Icon',
   'Last contact at' => 'Last contact at',
-  'Addrees' => 'Indirizzo',
+  'Address' => 'Indirizzo',
   'Action date' => 'Action date',
   'emailTypes' => 
   array (

@@ -51,8 +51,9 @@ class ImportWebcalIcs extends CronJob {
 	 */
 	public function run(CronJobSchedule $schedule) {
 
-		$calendars = Calendar::find()->where('webcalUri','IS NOT', null);
+		\go\modules\community\history\Module::$enabled = false;
 
+		$calendars = Calendar::find()->where('webcalUri','IS NOT', null);
 
 		foreach ($calendars as $calendar) {
 

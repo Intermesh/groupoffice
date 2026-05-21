@@ -8,6 +8,8 @@ namespace go\modules\community\calendar\model;
 
 use DateMalformedStringException;
 use DateTimeZone;
+use Exception;
+use Generator;
 use go\core\db\Expression;
 use go\core\ErrorHandler;
 use go\core\exception\JsonPointerException;
@@ -15,6 +17,7 @@ use go\core\fs\Blob;
 use go\core\model\Principal;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
+use go\core\util\UUID;
 use IntlTimeZone;
 use Sabre\VObject;
 use Sabre\VObject\Component\VCalendar;
@@ -303,24 +306,15 @@ class ICalendarHelper {
 		return implode(';',$rule);
 	}
 
-	/**
-	 * Generates CalendarEvent models from an icalendar file
-	 *
-	 * @param string $blobId
-	 * @param array|null $values
-	 * @return \Generator
-	 * @throws VObject\ParseException
-	 */
-	static function calendarEventFromFile(string $blobId, array|null $values = null) {
-		$fp = fopen(Blob::buildPath($blobId), 'r');
+	static function veventSplitter(string $path): Generator
+	{
 		$buffer = '';
-		$groups = []; // uid => [vevent strings]
 		$inEvent = false;
-		// sort the event by uid into different VCALENDARS
+		$fp = fopen($path, 'r');
 		while (!feof($fp)) {
 			$line = fgets($fp);
 
-			if (trim($line) === 'BEGIN:VEVENT') {
+			if (strpos($line, 'BEGIN:VEVENT') === 0) {
 				$inEvent = true;
 				$buffer = '';
 			}
@@ -329,15 +323,32 @@ class ICalendarHelper {
 				$buffer .= $line;
 			}
 
-			if (trim($line) === 'END:VEVENT') {
+			if (strpos($line, 'END:VEVENT') === 0) {
 				$inEvent = false;
 				preg_match('/^UID:(.+)$/m', $buffer, $matches);
 				$uid = trim($matches[1] ?? 'unknown');
-				$groups[$uid][] = $buffer;
+				yield $uid => $buffer;
 				$buffer = '';
 			}
 		}
 		fclose($fp);
+	}
+
+	/**
+	 * Generates CalendarEvent models from an icalendar file
+	 *
+	 * @param string $blobId
+	 * @param array|null $values
+	 * @return Generator
+	 * @throws VObject\ParseException|Exception
+	 */
+	static function calendarEventFromFile(string $blobId, array|null $values = null): Generator
+	{
+		$groups = []; // uid => [vevent strings]
+		foreach(self::veventSplitter(Blob::buildPath($blobId)) as $uid => $vevent) {
+			$groups[$uid][] = $vevent;
+		}
+
 		foreach ($groups as $uid => $events) {
 			$ical = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//GO-importer//EN\r\n"
 				. implode('', $events)
@@ -355,6 +366,54 @@ class ICalendarHelper {
 				yield ['error'=>$e, 'uid'=>$uid];
 			}
 		}
+	}
+
+	/**
+	 * @param $blobIds
+	 * @param $calendarId
+	 * @param $uid string 'check', 'ignore', 'new'
+	 * @return object
+	 */
+	static function import($blobIds, $calendarId, $uid='check') {
+		$r = (object)[
+			'saved'=>0,
+			'failed'=>0,
+			'skipped'=>0,
+			'failureReasons'=>[]
+		];
+
+		set_time_limit(0);
+
+		$existing = CalendarEvent::find()
+			->select('uid')
+			->where(['calendarId' => $calendarId])
+			->fetchMode(\PDO::FETCH_COLUMN, 0)->all();
+		$existing = array_flip($existing);
+
+		foreach($blobIds as $blobId) {
+			foreach(self::calendarEventFromFile($blobId, ['calendarId' => $calendarId]) as $ev) {
+				if(is_array($ev)){
+					$r->failureReasons[$r->failed] = 'Parse error '.$ev['uid']. ': '. $ev['error']->getMessage();
+					$r->failed++;
+					continue;
+				}
+
+				if($uid === 'new') {
+					$ev->uid = UUID::v4();
+				} else if($uid === 'check' && isset($existing[$ev->uid])) {
+					$r->skipped++;
+					continue;
+					// check if exists
+				} // else use UID from ics file without checking.
+				if($ev->save()){ // will fail if UID exists. We dont want to modify existing events like this
+					$r->saved++;
+				} else {
+					$r->failureReasons[$r->failed] = 'Validate error '.$ev->uid. ': '. var_export($ev->getValidationErrors(),true);
+					$r->failed++;
+				}
+			}
+		}
+		return $r;
 	}
 
 	/**
@@ -378,7 +437,7 @@ class ICalendarHelper {
 	 * @param VCalendar|string $vcalendar
 	 * @param CalendarEvent $event the event to insert the data into
 	 * @return CalendarEvent updated or new Event if not found
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	static public function parseVObject($vcalendar, CalendarEvent $event): CalendarEvent
 	{
@@ -499,7 +558,7 @@ class ICalendarHelper {
 		$blob->modifiedAt = $event->modifiedAt;
 		$blob->name = $event->uid . '.ics';
 		if(!$blob->save()) {
-			throw new \Exception('could not save blob');
+			throw new Exception('could not save blob');
 		}
 
 		return $blob;

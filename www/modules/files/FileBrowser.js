@@ -498,7 +498,7 @@ GO.files.FileBrowser = function(config){
 
 	this.moveToTrashButton = new Ext.menu.Item({
 		iconCls: "ic-delete",
-		text: t("Move to trash"),
+		text: t("Move to Trash", "files"),
 		handler: () => {
 			this.onMoveToTrash('grid');
 		}

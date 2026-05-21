@@ -49,10 +49,10 @@ go.systemsettings.AppearancePanel = Ext.extend(go.systemsettings.Panel, {
 							resetLogoButton
 						]
 					},
-					this.createColorField('primaryColor', "Primary color", '--fg-main', "1652A1"),
-					this.createColorField('secondaryColor', "Secondary color", '--c-primary', "00B0AD"),
-					this.createColorField('tertiaryColor', "Tertiary color", '--c-secondary', "F3DB00"),
-					this.createColorField('accentColor', "Accent color", '--c-accent', "FF7200")
+					this.createColorField('primaryColor', "Primary color", '--fg-main', "1652A1", t("Header bar, Input focus, Active elements, Links")),
+					this.createColorField('secondaryColor', "Secondary color", '--c-primary', "00B0AD", t("Primary actions, Save buttons")),
+					this.createColorField('tertiaryColor', "Tertiary color", '--c-secondary', "F3DB00", t("Active tab indication")),
+					this.createColorField('accentColor', "Accent color", '--c-accent', "FF7200", t("Badges, warnings"))
 				]
 			},{
 				xtype: "fieldset",
@@ -98,13 +98,14 @@ go.systemsettings.AppearancePanel = Ext.extend(go.systemsettings.Panel, {
 		this.supr().initComponent.call(this);
 	},
 
-	createColorField(name, label, property, defaultColor) {
+	createColorField(name, label, property, defaultColor, hint) {
 		return new GO.form.ColorField({
 			fieldLabel: t(label),
 			showHexValue: true,
 			value: null,
 			width: 180,
 			name: name,
+			hint: hint,
 			dark: true,
 			listeners: {
 				'change': (field, color) => {

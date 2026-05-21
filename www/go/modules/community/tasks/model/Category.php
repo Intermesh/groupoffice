@@ -31,6 +31,8 @@ class Category extends Entity {
 	/** @var int when not null this category is only visible when the tasklist is selected (no ACL checking allowed)  */
 	public $tasklistId;
 
+	protected int $role = TaskList::List;
+
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
@@ -83,6 +85,10 @@ class Category extends Entity {
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()
+			->add('role', function(Criteria $criteria, $value) {
+				$roleID = array_search($value, TaskList::Roles, true);
+				$criteria->where('role', '=', $roleID);
+			}, 'list')
 			->add('ownerId', function(Criteria $criteria, $value) {
 				$criteria->where('ownerId', '=', $value)
 					->andWhere('tasklistId' , '=', null);
@@ -95,6 +101,23 @@ class Category extends Entity {
 				$criteria->where('tasklistId', $op, null)
 					->andWhere('ownerId', $op, null);
 			});
+	}
+
+	/** @var string What kind of list: 'list', 'board' */
+	public function getRole() : string {
+		return TaskList::Roles[$this->role] ?? 'list';
+	}
+
+	/**
+	 *
+	 * @param string $value ['list'|'board'|'project']
+	 */
+	public function setRole(string $value) {
+		$key = array_search($value, TaskList::Roles, true);
+		if($key === false) {
+			$this->setValidationError('role', 10, 'Incorrect role value for tasklist');
+		} else
+			$this->role = $key;
 	}
 
 }

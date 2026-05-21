@@ -489,6 +489,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	 */
 	setNotDirty : function() {
 
+		this.dirty = false
+
 		var fn = function (i) {
 			i.originalValue = i.getValue();
 			i.dirty = false;
@@ -534,7 +536,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		if(!records) {
 			records = this.mapKey ? {} : [];
 		}
-		// this.dirty = true;
+		this.dirty = true;
 		this.removeAll();
 		if(records === null) return;
 		this.markDeleted = [];

@@ -630,6 +630,7 @@ function ic_system_info() :array
 	$php_ini_path = '';
 
 	ob_start();
+	// nosemgrep: phpinfo-use
 	phpinfo(INFO_GENERAL);
 	$php_info = ob_get_contents();
 	ob_end_clean();

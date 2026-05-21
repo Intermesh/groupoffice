@@ -880,7 +880,7 @@ create table core_email_template
     `key`    varchar(20) collate ascii_bin              null,
     language varchar(20) collate ascii_bin default 'en' not null,
     name     varchar(190)                               not null,
-    subject  varchar(190)                               null,
+    subject  varchar(255)                               null,
     body     mediumtext                                 not null,
     constraint core_email_template_ibfk_2
         foreign key (moduleId) references core_module (id)

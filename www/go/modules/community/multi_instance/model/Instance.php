@@ -159,6 +159,7 @@ class Instance extends Entity {
 			} elseif($this->isNew() && $this->getDataFolder()->exists()) {
 				$this->setValidationError('hostname', ErrorCode::UNIQUE, 'This hostname is not available (data folder exists).');
 			} elseif(!$this->getConfigFile()->isWritable()) {
+				ErrorHandler::log("Config file not writable: " . $this->getConfigFile()->getPath());
 				$this->setValidationError('hostname', ErrorCode::FORBIDDEN, 'The configuration file is not writable');
 			} elseif(!$this->getDataFolder()->isWritable()) {
 				$this->setValidationError('hostname', ErrorCode::FORBIDDEN, 'The data folder is not writable');
@@ -211,9 +212,9 @@ class Instance extends Entity {
 		return str_replace(['.','-'], '_', $this->hostname);
 	}
 
-	private function getStudioPackage() {
-		return str_replace('-', "", explode(".", $this->hostname)[0]);
-	}
+//	private function getStudioPackage() {
+//		return str_replace('-', "", explode(".", $this->hostname)[0]);
+//	}
 	
 	private function getDbUser() {
 		return substr($this->getDbName(), 0, 16);
@@ -232,20 +233,20 @@ class Instance extends Entity {
 
 
 		$instanceConfig = $this->getInstanceConfig();
-		$globalConfig = $this->getGlobalConfig();
-		$mergedConfig = array_merge($globalConfig, $instanceConfig);
+//		$globalConfig = $this->getGlobalConfig();
+//		$mergedConfig = array_merge($globalConfig, $instanceConfig);
 
-		$studioAllowed = ModuleCollection::isAllowed("studio", "business", $mergedConfig['allowed_modules'] ?? []);
-
-		if($studioAllowed) {
-			if(!$this->getModulePackageFolder()->create()) {
-				throw new Exception("Could not create module package folder in go/modules/*. Please make go/modules writable.");
-			}
-		} else{
-			if($this->getModulePackageFolder()->exists() && $this->getModulePackageFolder()->isEmpty()) {
-				$this->getModulePackageFolder()->delete();
-			}
-		}
+//		$studioAllowed = ModuleCollection::isAllowed("studio", "business", $mergedConfig['allowed_modules'] ?? []);
+//
+//		if($studioAllowed) {
+//			if(!$this->getModulePackageFolder()->create()) {
+//				throw new Exception("Could not create module package folder in go/modules/*. Please make go/modules writable.");
+//			}
+//		} else{
+//			if($this->getModulePackageFolder()->exists() && $this->getModulePackageFolder()->isEmpty()) {
+//				$this->getModulePackageFolder()->delete();
+//			}
+//		}
 		
 		if($this->isModified(['storageQuota', 'usersMax', 'enabled'])) {
 			$instanceConfig['quota'] = $this->storageQuota / 1024;
@@ -279,6 +280,8 @@ class Instance extends Entity {
 	private function copySystemSettings() {
 		$core = go()->getSettings()->toArray();
 
+		$conn = $this->getInstanceDbConnection();
+
 		$valuesToCopy = array (
 			0 => 'locale',
 			4 => 'language',
@@ -307,16 +310,17 @@ class Instance extends Entity {
 		);
 
 		$coreModuleId = (new \go\core\db\Query)
-						->setDbConnection($this->getInstanceDbConnection())
+						->setDbConnection($conn)
 						->selectSingleValue('id')
 						->from('core_module')
 						->where(['package'=>'core', 'name'=>'core'])->single();
 		
 		foreach($valuesToCopy as $name) {
-
-			$this->getInstanceDbConnection()
-							->replace('core_setting', ['name' => $name, 'value' => $core[$name], "moduleId" => $coreModuleId])->execute();
+			$conn->replace('core_setting', ['name' => $name, 'value' => $core[$name], "moduleId" => $coreModuleId])->execute();
 		}
+
+		$conn->disconnect();
+
 	}
 
 	/**
@@ -399,7 +403,7 @@ class Instance extends Entity {
 				throw new Exception("Could not create temporary files folder");
 			}
 
-            go()->getDbConnection()->pauseTransactions();
+			go()->getDbConnection()->pauseTransactions();
 
 			$this->createDatabase($instanceConfig['db_name']);
 			$databaseCreated = true;
@@ -415,14 +419,14 @@ class Instance extends Entity {
 			$instanceConfig['tmpdir'] = $tmpFolder->getPath();
 			$instanceConfig['file_storage_path'] = $dataFolder->getPath();
 			$instanceConfig['servermanager'] = go()->findConfigFile();
-			$instanceConfig['business'] = [
-				'studio' => [
-					'package' => $this->getStudioPackage()
-				]
-			];
+//			$instanceConfig['business'] = [
+//				'studio' => [
+//					'package' => $this->getStudioPackage()
+//				]
+//			];
 
 			$instanceConfig['allowed_modules'] = array_map(function($mod) {return $mod['package'].'/'.$mod['module'];}, array_filter($this->getAllowedModules(), function($mod) {return $mod['allowed'];}));
-			$instanceConfig['allowed_modules'][] = $this->getStudioPackage() . "/*";
+//			$instanceConfig['allowed_modules'][] = $this->getStudioPackage() . "/*";
 
 			$this->setInstanceConfig($instanceConfig);
 			$this->writeConfig();
@@ -443,7 +447,7 @@ class Instance extends Entity {
 				$this->dropDatabaseUser($instanceConfig['db_user']);
 			}
 
-			$this->getModulePackageFolder()->delete();
+//			$this->getModulePackageFolder()->delete();
 			
 			parent::internalDelete((new Query())->from(self::getMapping()->getPrimaryTable()->getName())->where(['id' => $this->id]));
 
@@ -457,13 +461,13 @@ class Instance extends Entity {
 		}
 	}
 
-	/**
-	 * @return Folder
-	 */
-	private function getModulePackageFolder(): Folder
-	{
-		return go()->getEnvironment()->getInstallFolder()->getFolder("go/modules/" . $this->getStudioPackage());
-	}
+//	/**
+//	 * @return Folder
+//	 */
+//	private function getModulePackageFolder(): Folder
+//	{
+//		return go()->getEnvironment()->getInstallFolder()->getFolder("go/modules/" . $this->getStudioPackage());
+//	}
 
 	private function dropDatabase($dbName): void
 	{
@@ -674,7 +678,7 @@ class Instance extends Entity {
 			throw new Exception("Failed to create access token");
 		}
 
-        $this->getInstanceDbConnection()->disconnect();
+		$this->getInstanceDbConnection()->disconnect();
 		
 		return $data['accessToken'];	
 	}
@@ -685,11 +689,17 @@ class Instance extends Entity {
 	 * @return bool
 	 */
 	public function isInstalled() : bool {
+		$conn = null;
 		try {
-			return $this->getInstanceDbConnection()->getDatabase()->hasTable('core_module');
+			$conn = $this->getInstanceDbConnection();
+			return $conn->getDatabase()->hasTable('core_module');
 		} catch(Exception $e) {
 			ErrorHandler::logException($e);
 			return false;
+		} finally {
+			if ($conn) {
+				$conn->disconnect();
+			}
 		}
 	}
 	
@@ -844,18 +854,18 @@ class Instance extends Entity {
 
 				$instance->mysqldump();
 
-				try {
-					$modPackageFolder = $instance->getModulePackageFolder();
-					if ($modPackageFolder->exists()) {
-						$dest = $instance->getDataFolder()->getFolder($instance->getStudioPackage() . '_MODULE_PACKAGE');
-						if ($dest->exists()) {
-							$dest = new Folder($dest->getPath() . '-' . uniqid());
-						}
-						$instance->getModulePackageFolder()->move($dest);
-					}
-				} catch(\Throwable $e) {
-					ErrorHandler::logException($e, "Error while deleting module folder for instance ". $instance->hostname);
-				}
+//				try {
+//					$modPackageFolder = $instance->getModulePackageFolder();
+//					if ($modPackageFolder->exists()) {
+//						$dest = $instance->getDataFolder()->getFolder($instance->getStudioPackage() . '_MODULE_PACKAGE');
+//						if ($dest->exists()) {
+//							$dest = new Folder($dest->getPath() . '-' . uniqid());
+//						}
+//						$instance->getModulePackageFolder()->move($dest);
+//					}
+//				} catch(\Throwable $e) {
+//					ErrorHandler::logException($e, "Error while deleting module folder for instance ". $instance->hostname);
+//				}
 
 				$instance->getConfigFile()->getFolder()->delete();
 
@@ -986,7 +996,7 @@ class Instance extends Entity {
 
 		$config = $this->getInstanceConfig();
 		$config['allowed_modules'] = $allowedModules;
-		$config['allowed_modules'][] = $this->getStudioPackage() . "/*";
+//		$config['allowed_modules'][] = $this->getStudioPackage() . "/*";
 		$this->setInstanceConfig($config);
 		$this->writeConfig();
 

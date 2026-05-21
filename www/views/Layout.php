@@ -12,7 +12,7 @@ $primaryColor = go()->getSettings()->primaryColor ?? 'rgb(22, 82, 161)';
 
 $webclient->loadScripts();
 $themeUrl = $webclient->getThemeUrl();
-$authController = new \GO\Core\Controller\AuthController(); // for some reason the event listeners are in this class
+$authController = new \GO\Core\Controller\AuthController(false); // for some reason the event listeners are in this class
 $cssMtime = filemtime(GO::view()->getTheme()->getPath() . "style.css");
 $lang = go()->getLanguage()->getIsoCode();
 ?><!DOCTYPE html>

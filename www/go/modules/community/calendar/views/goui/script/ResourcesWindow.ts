@@ -69,6 +69,10 @@ export class ResourceWindow extends FormWindow {
 			//checkbox({disabled:true, name:'needsApproval', label: t('Needs approval')})
 		);
 
+		this.on('render', async () => {
+			resourceGroupStore.load();
+		});
+
 		this.addCustomFields();
 
 		this.addSharePanel([

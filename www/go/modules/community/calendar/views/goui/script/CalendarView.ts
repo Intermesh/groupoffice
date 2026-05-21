@@ -13,6 +13,9 @@ import {t} from "./Index.js";
 
 export abstract class CalendarView<EventMap extends ComponentEventMap = ComponentEventMap> extends Component<EventMap> {
 
+	/**
+	 * This is set to the selected calendar ID but only if the user has writeAll permissions.
+	 */
 	static selectedCalendarId: string
 
 	protected currentCreation?: CalendarItem
@@ -30,7 +33,8 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 					target.findChild("edit")!.hidden = !this.current!.mayChange;
 
 					const participationStatus = target.findChild("participationStatus") as Radiofield;
-					participationStatus.hidden = this.current!.isOwner ?? !this.current!.cal.myRights?.mayWriteAll;
+					const hr =  participationStatus.nextSibling()!
+					participationStatus.hidden = hr.hidden = this.current!.isOwner ?? !this.current!.cal.myRights?.mayWriteAll;
 
 					participationStatus.value = this.current?.calendarPrincipal?.participationStatus;
 				}
@@ -131,6 +135,12 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 	}
 
 	private current?: CalendarItem
+
+	private fmLocation(loc?: string) {
+		if(!loc) return [];
+		return [' @ ', /^https?:\/\//.test(loc) ? E('a', 'Web').attr('target','_blank').attr('href', loc) : loc];
+	}
+
 	protected eventHtml(item: CalendarItem, div?:HTMLElement, withIcons = true) {
 		const e = item.data;
 
@@ -143,7 +153,9 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 				}
 			}
 			div = E('div',
-				E('em', item.title || '('+t(item.data.privacy!='public' ? 'Private' :'Nameless')+')'),
+				E('em', item.title || '('+t(item.data.privacy!='public' ? 'Private' :'Nameless')+')',
+					...this.fmLocation(item.data.location)
+				),
 				...item.categoryDots,
 				...(withIcons ? item.icons : []),
 				time

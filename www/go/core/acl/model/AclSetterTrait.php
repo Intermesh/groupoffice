@@ -56,8 +56,8 @@ trait AclSetterTrait {
 				$a->addGroup($groupId, $level);
 			}
 		}
-
-		if(isset($this->createdBy) && $a->ownedBy != $this->createdBy) {
+		// Prevent new tasklists that inherit ACLs from other modules to trigger exceptions later.
+		if(!$this->isNew() && $this->isModified('createdBy') && $a->ownedBy != $this->createdBy) {
 
 			$a->ownedBy = $this->createdBy;
 		}

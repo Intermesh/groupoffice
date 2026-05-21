@@ -571,14 +571,6 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		if(!Folder::$deleteInDatabaseOnly)
 			$this->fsFolder->delete();
 
-		//Read only flag is set for addressbooks, tasklists etc. They share the same acl so deleting it would make addressbooks inaccessible.
-		if(!$this->readonly){
-			//normally this is done automatically. But we overide $this->joinAclfield to prevent acl management.
-			$acl = \GO\Base\Model\Acl::model()->findByPk($this->{$this->aclField()});
-			if($acl)
-				$acl->delete();
-		}
-
 		if($this->parent){
 			$this->notifyUsers(
 				array($this->id, $this->parent->id),

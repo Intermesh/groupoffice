@@ -160,13 +160,13 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
 		if(isset($error)) {
 			?>
 			<div class="alert alert-danger">
-				<?= $error; ?>
+				<?= htmlentities($error); ?>
 			</div>
 			<?php
 		}
 		?>
         <?php if(isset($contact['name'])): ?>
-		<p class="lead">Below we are editing contact: <?=$contact['name']?></p>
+		<p class="lead">Below we are editing contact: <?=htmlentities($contact['name'])?></p>
         <?php endif; ?>
 	</div>
 
@@ -182,14 +182,14 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
 				<div class="row">
 					<div class="col-md-6 mb-3">
 						<label for="firstName">First name</label>
-						<input type="text" class="form-control" id="firstName" name="firstName" placeholder="" value="<?=$contact['firstName']?>" required="">
+						<input type="text" class="form-control" id="firstName" name="firstName" placeholder="" value="<?=htmlentities($contact['firstName'])?>" required="">
 						<div class="invalid-feedback">
 							Valid first name is required.
 						</div>
 					</div>
 					<div class="col-md-6 mb-3">
 						<label for="lastName">Last name</label>
-						<input type="text" class="form-control" id="lastName" name="lastName" placeholder="" value="<?=$contact['lastName']?>" required="">
+						<input type="text" class="form-control" id="lastName" name="lastName" placeholder="" value="<?=htmlentities($contact['lastName'])?>" required="">
 						<div class="invalid-feedback">
 							Valid last name is required.
 						</div>
@@ -200,7 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
 
 				<div class="mb-3">
 					<label for="email">Email <span class="text-muted">(Optional)</span></label>
-					<input type="email" class="form-control" id="email"  name="email" placeholder="you@example.com" value="<?=isset($contact['emailAddresses'][0]) ? $contact['emailAddresses'][0]['email'] : ''?>">
+					<input type="email" class="form-control" id="email"  name="email" placeholder="you@example.com" value="<?=isset($contact['emailAddresses'][0]) ? htmlentities($contact['emailAddresses'][0]['email']) : ''?>">
 					<div class="invalid-feedback">
 						Please enter a valid email address for shipping updates.
 					</div>
@@ -208,19 +208,19 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
 
 				<div class="mb-3">
 					<label for="homePhone">Home phone <span class="text-muted">(Optional)</span></label>
-					<input type="homePhone" class="form-control" id="homePhone"  name="homePhone" value="<?=isset($contact['phoneNumbers'][0]) ? $contact['phoneNumbers'][0]['number'] : ''?>">
+					<input type="homePhone" class="form-control" id="homePhone"  name="homePhone" value="<?=isset($contact['phoneNumbers'][0]) ? htmlentities($contact['phoneNumbers'][0]['number']) : ''?>">
 
 				</div>
 
 				<div class="mb-3">
 					<label for="mobilePhone">Mobile phone <span class="text-muted">(Optional)</span></label>
-					<input type="mobilePhone" class="form-control" id="mobilePhone"  name="mobilePhone" value="<?=isset($contact['phoneNumbers'][1]) ? $contact['phoneNumbers'][1]['number'] : ''?>">
+					<input type="mobilePhone" class="form-control" id="mobilePhone"  name="mobilePhone" value="<?=isset($contact['phoneNumbers'][1]) ? htmlentities($contact['phoneNumbers'][1]['number']) : ''?>">
 
 				</div>
 
 				<div class="mb-3">
 					<label for="address">Address</label>
-					<input type="text" class="form-control" id="address" name="address" placeholder="1234 Main St" value="<?=isset($contact['addresses'][0]) ? $contact['addresses'][0]['address'] : ''?>" required="">
+					<input type="text" class="form-control" id="address" name="address" placeholder="1234 Main St" value="<?=isset($contact['addresses'][0]) ? htmlentities($contact['addresses'][0]['address']) : ''?>" required="">
 					<div class="invalid-feedback">
 						Please enter your shipping address.
 					</div>
@@ -229,7 +229,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
 
 				<div class="mb-3">
 					<label for="city">City</label>
-					<input type="text" class="form-control" id="city" name="city"  placeholder="" value="<?=isset($contact['addresses'][0]) ? $contact['addresses'][0]['city'] : ''?>">
+					<input type="text" class="form-control" id="city" name="city"  placeholder="" value="<?=isset($contact['addresses'][0]) ? htmlentities($contact['addresses'][0]['city']) : ''?>">
 				</div>
 
 				<div class="row">
@@ -248,7 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
 
 					<div class="col-md-6 mb-3">
 						<label for="zipCode">Zip</label>
-						<input type="text" class="form-control" id="zipCode" name="zipCode" placeholder="" value="<?=isset($contact['addresses'][0]) ? $contact['addresses'][0]['zipCode'] : ''?>" required="">
+						<input type="text" class="form-control" id="zipCode" name="zipCode" placeholder="" value="<?=isset($contact['addresses'][0]) ? htmlentities($contact['addresses'][0]['zipCode']) : ''?>" required="">
 						<div class="invalid-feedback">
 							Zip code required.
 						</div>

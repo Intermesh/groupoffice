@@ -137,13 +137,11 @@ GO.email.AddressContextMenu = function(config)
 					selectMultiple: function (ids) {
 						var dlg = new go.modules.community.addressbook.ContactDialog();
 						dlg.on("load", function() {
-							var a = dlg.formPanel.entity.emailAddresses;
-							a.push({
-								type: "work",
-								email: me.address
-							});
 							dlg.setValues({
-								emailAddresses: a
+								emailAddresses: [...dlg.formPanel.entity.emailAddresses, {
+									type: "work",
+									email: me.address
+								}]
 							}, false);
 						});
 						dlg.load(ids[0]).show();

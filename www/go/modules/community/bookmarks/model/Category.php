@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\bookmarks\model;
 use \go\core\acl\model\AclOwnerEntity;
+use go\core\model\Module;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 
@@ -38,5 +39,11 @@ class Category extends AclOwnerEntity {
 		}
 
 		return parent::internalDelete($query);
+	}
+
+	protected function canCreate(): bool
+	{
+		return Module::findByName('community', 'bookmarks')
+			->getUserRights()->mayManage;
 	}
 }

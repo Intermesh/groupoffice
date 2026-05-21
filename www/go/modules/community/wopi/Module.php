@@ -88,7 +88,8 @@ class Module extends core\Module {
 
 			$service = new Service();
 			$service->name = "Collabora Office";
-			$service->setUrl('https://docs.groupoffice.net');
+//			$service->setUrl('https://docs.groupoffice.net');
+			$service->setUrl('https://demo.eu.collaboraonline.com/');
 
 			$service->setAcl([
 				model\Group::ID_INTERNAL => model\Acl::LEVEL_WRITE

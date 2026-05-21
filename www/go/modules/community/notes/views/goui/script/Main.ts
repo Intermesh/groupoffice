@@ -193,7 +193,7 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 
 		this.addButton = btn({
 			cls: "filled primary",
-			text: "Add",
+			title: t("Add"),
 			icon: "add",
 			disabled: true,
 			handler: () => {
@@ -231,6 +231,8 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 				btn({
 					icon: "more_vert",
 					menu: menu({},
+						this.noteGrid.getVisibleColumnButton(),
+						'-',
 						btn({
 							icon: "cloud_upload",
 							text: t("Import"),

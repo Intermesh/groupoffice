@@ -13,5 +13,7 @@ elseif (strtolower($_GET['Protocol']) == 'autodiscoverv1') {
 }
 else {
 	http_response_code(400);
+
+	// nosemgrep
 	echo '{"ErrorCode":"InvalidProtocol","ErrorMessage":"The given protocol value \u0027' . preg_replace("/[^\da-z]/i", '', $_GET['Protocol']) . '\u0027 is invalid. Supported values are \u0027ActiveSync,AutodiscoverV1\u0027"}';
 }

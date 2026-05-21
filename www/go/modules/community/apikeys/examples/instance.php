@@ -70,6 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	}
 
 	//All went well so redirect to installer.
+    // nosemgrep: php.lang.security.injection.tainted-url-host.tainted-url-host
 	header("Location: https://" . $hostname . "/install/install.php");
 	exit();
 }

@@ -611,53 +611,6 @@ class CalendarEvent extends AclItemEntity {
 		return !empty($this->recurrenceId);
 	}
 
-	/**
-	 * @param $blobIds
-	 * @param $calendarId
-	 * @param $uid string 'check', 'ignore', 'new'
-	 * @return object
-	 */
-	static function import($blobIds, $calendarId, $uid='check') {
-		$r = (object)[
-			'saved'=>0,
-			'failed'=>0,
-			'skipped'=>0,
-			'failureReasons'=>[]
-		];
-
-		set_time_limit(0);
-
-		$existing = self::find()
-			->select('uid')
-			->where(['calendarId' => $calendarId])
-			->fetchMode(\PDO::FETCH_COLUMN, 0)->all();
-		$existing = array_flip($existing);
-
-		foreach($blobIds as $blobId) {
-			foreach(ICalendarHelper::calendarEventFromFile($blobId, ['calendarId' => $calendarId]) as $ev) {
-				if(is_array($ev)){
-					$r->failureReasons[$r->failed] = 'Parse error '.$ev['uid']. ': '. $ev['error']->getMessage();
-					$r->failed++;
-					continue;
-				}
-
-				if($uid === 'new') {
-					$ev->uid = UUID::v4();
-				} else if($uid === 'check' && isset($existing[$ev->uid])) {
-					$r->skipped++;
-					continue;
-					// check if exists
-				} // else use UID from ics file without checking.
-				if($ev->save()){ // will fail if UID exists. We dont want to modify existing events like this
-					$r->saved++;
-				} else {
-					$r->failureReasons[$r->failed] = 'Validate error '.$ev->uid. ': '. var_export($ev->getValidationErrors(),true);
-					$r->failed++;
-				}
-			}
-		}
-		return $r;
-	}
 	protected function internalSave() : bool {
 
 		if(empty($this->uri)) {

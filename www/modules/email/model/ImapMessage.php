@@ -811,7 +811,7 @@ class ImapMessage extends ComposerMessage {
 		}
 		while ($att = array_shift($atts)) {
 			if ($att->disposition == 'attachment' || empty($att->content_id)) {
-				// Do not delete S/MINE certificate
+				// Do not log delete of S/MINE certificate
 				if ($att->mime === "application/x-pkcs7-signature") {
 					continue;
 				}
