@@ -136,16 +136,13 @@ class TemplateParserTest extends \PHPUnit\Framework\TestCase
 		$if = $tplParser->parse($tpl);
 		$this->assertEquals("no", $if);
 
-
-
 		$tpl = '[if !{{contact.firstName}} || !{{contact.lastName2}}]yes[else]no[/if]';
 
 		$if = $tplParser->parse($tpl);
 		$this->assertEquals("yes", $if);
 
-
 		$tplParser->parse('[assign foo = "bar"]');
-		$tpl = '[if foo != "bar"]no[else]yes[/if]';
+		$tpl = '[if {{foo}} != "bar"]no[else]yes[/if]';
 		$if = $tplParser->parse($tpl);
 		$this->assertEquals("yes", $if);
 	}
@@ -162,6 +159,18 @@ class TemplateParserTest extends \PHPUnit\Framework\TestCase
 
 		$result = $tplParser->parse($tpl);
 		$this->assertEquals("2.5", $result);
+
+		$result = $tplParser->parse('[if {{sum}} > 2]yes[/if]');
+		$this->assertEquals("yes", $result);
+
+		$result = $tplParser->parse('[if {{sum}} &gt; 2]yes[/if]');
+		$this->assertEquals("yes", $result);
+
+		$result = $tplParser->parse('[if {{sum}} >= 2.5]yes[/if]');
+		$this->assertEquals("yes", $result);
+
+		$result = $tplParser->parse('[if {{sum}} > 2.5]yes[/if]');
+		$this->assertEquals("", $result);
 	}
 
 
@@ -191,6 +200,116 @@ class TemplateParserTest extends \PHPUnit\Framework\TestCase
 		$this->assertEquals("Dear Dr. Smith", $result);
 	}
 
+
+	public function testLiteral() {
+
+		$str = <<<ID
+<!--StartFragment-->
+
+<p class="MsoNormal"><span style="mso-ansi-language:#2000">Podia RAI EMC3<o:p></o:p></span></p>
+
+<p class="MsoNormal"><span style="mso-ansi-language:#2000"><o:p>&nbsp;</o:p></span></p>
+
+<p class="MsoNormal"><span style="mso-ansi-language:#2000">RGBWW ledstrip met DMX
+drivers (18W/m RGB+2700K)<o:p></o:p></span></p>
+
+<p class="MsoNormal"><span style="mso-ansi-language:#2000"><o:p>&nbsp;</o:p></span></p>
+
+<p class="MsoNormal"><span style="mso-ansi-language:#2000">Sponning platen worden
+op het podium geschroefd!<o:p></o:p></span></p>
+
+<p class="MsoNormal"><span style="mso-ansi-language:#2000"><o:p>&nbsp;</o:p></span></p>
+
+<p class="MsoNormal"><b><span style="mso-ansi-language:#2000">Ronde tredes</span></b><span style="mso-ansi-language:#2000"><o:p></o:p></span></p>
+
+<ul style="margin-top:0cm" type="disc">
+ <li class="MsoNormal" style="mso-list:l4 level1 lfo1;tab-stops:list 36.0pt"><span style="mso-ansi-language:#2000">4x 2x10m led<o:p></o:p></span></li>
+ <li class="MsoNormal" style="mso-list:l4 level1 lfo1;tab-stops:list 36.0pt"><span style="mso-ansi-language:#2000">8x 3m sponning plaat (24m, 10 stuks)<o:p></o:p></span></li>
+ <li class="MsoNormal" style="mso-list:l4 level1 lfo1;tab-stops:list 36.0pt"><span style="mso-ansi-language:#2000">4x 8 ronde segmenten met sponning (1.25m
+     lang; 32 stuks) (ong 40m lengte)<o:p></o:p></span></li>
+</ul>
+
+<p class="MsoNormal"><span style="mso-ansi-language:#2000">.<o:p></o:p></span></p>
+
+<p class="MsoNormal"><b><span style="mso-ansi-language:#2000">Bovenrand podium</span></b><span style="mso-ansi-language:#2000"><o:p></o:p></span></p>
+
+<ul style="margin-top:0cm" type="disc">
+ <li class="MsoNormal" style="mso-list:l3 level1 lfo2;tab-stops:list 36.0pt"><span style="mso-ansi-language:#2000">22m led<o:p></o:p></span></li>
+ <li class="MsoNormal" style="mso-list:l3 level1 lfo2;tab-stops:list 36.0pt"><span style="mso-ansi-language:#2000">22m sponning plaat (10 stuks)<o:p></o:p></span></li>
+</ul>
+
+<p class="MsoNormal"><span style="mso-ansi-language:#2000">Totaal led meters: 86m<o:p></o:p></span></p>
+
+<p class="MsoNormal"><span style="mso-ansi-language:#2000">.<o:p></o:p></span></p>
+
+<p class="MsoNormal"><b><span style="mso-ansi-language:#2000">Afwerking</span></b><span style="mso-ansi-language:#2000"><o:p></o:p></span></p>
+
+<ul style="margin-top:0cm" type="disc">
+ <li class="MsoNormal" style="mso-list:l0 level1 lfo3;tab-stops:list 36.0pt"><span style="mso-ansi-language:#2000">63m met&nbsp;195mm&nbsp;hoogte;<o:p></o:p></span></li>
+ <li class="MsoNormal" style="mso-list:l0 level1 lfo3;tab-stops:list 36.0pt"><span style="mso-ansi-language:#2000">27x mdf zwart afdekplaat 2400x195mm,
+     vastgetacked aan de sponningplaten<o:p></o:p></span></li>
+ <li class="MsoNormal" style="mso-list:l0 level1 lfo3;tab-stops:list 36.0pt"><span style="mso-ansi-language:#2000">12m voorkant podium 1000mm hoog, af te
+     rokken (flanel geen onderdeel van de offerte)<o:p></o:p></span></li>
+</ul>
+
+<p class="MsoNormal"><span style="mso-ansi-language:#2000">.<o:p></o:p></span></p>
+
+<p class="MsoNormal"><b><span style="mso-ansi-language:#2000">Podium delen</span></b><span style="mso-ansi-language:#2000"><o:p></o:p></span></p>
+
+<ul style="margin-top:0cm" type="disc">
+ <li class="MsoNormal" style="mso-list:l2 level1 lfo4;tab-stops:list 36.0pt"><span style="mso-ansi-language:#2000">4 delen van 22mm Hardwood met frame en
+     voorzien poten voor 1000mm dekhoogte<o:p></o:p></span></li>
+</ul>
+
+<p class="MsoNormal"><span style="mso-ansi-language:#2000"><o:p>&nbsp;</o:p></span></p>
+
+<p class="MsoNormal"><b><span style="mso-ansi-language:#2000">Dek halve cirkel</span></b><span style="mso-ansi-language:#2000"><o:p></o:p></span></p>
+
+<ul style="margin-top:0cm" type="disc">
+ <li class="MsoNormal" style="mso-list:l5 level1 lfo5;tab-stops:list 36.0pt"><span style="mso-ansi-language:#2000">7000mm diameter (halve cirkel) uit 5 delen<o:p></o:p></span></li>
+ <li class="MsoNormal" style="mso-list:l5 level1 lfo5;tab-stops:list 36.0pt"><span style="mso-ansi-language:#2000">uit 21mm hardwood<o:p></o:p></span></li>
+ <li class="MsoNormal" style="mso-list:l5 level1 lfo5;tab-stops:list 36.0pt"><span style="mso-ansi-language:#2000">pootjes op 200mm<o:p></o:p></span></li>
+ <li class="MsoNormal" style="mso-list:l5 level1 lfo5;tab-stops:list 36.0pt"><span style="mso-ansi-language:#2000">diepte 500+30mm sponning<o:p></o:p></span></li>
+</ul>
+
+<p class="MsoNormal"><span style="mso-ansi-language:#2000">.<o:p></o:p></span></p>
+
+<p class="MsoNormal"><b><span style="mso-ansi-language:#2000">Installatie op
+locatie</span></b><span style="mso-ansi-language:#2000"><o:p></o:p></span></p>
+
+<ul style="margin-top:0cm" type="disc">
+ <li class="MsoNormal" style="mso-list:l1 level1 lfo6;tab-stops:list 36.0pt"><span style="mso-ansi-language:#2000">Transport met bus&nbsp;Maacken&nbsp;Inhuur<o:p></o:p></span></li>
+ <li class="MsoNormal" style="mso-list:l1 level1 lfo6;tab-stops:list 36.0pt"><span style="mso-ansi-language:#2000">2 pax op 30 mei vanaf 12:00<o:p></o:p></span></li>
+ <li class="MsoNormal" style="mso-list:l1 level1 lfo6;tab-stops:list 36.0pt"><span style="mso-ansi-language:#2000">1 pax op 31 mei vanaf 8:00-12:00<o:p></o:p></span></li>
+</ul>
+
+<p class="MsoNormal"><span lang="en-NL"><o:p>&nbsp;</o:p></span></p>
+
+<!--EndFragment--><br>
+ID;
+
+
+		$tplParser = new TemplateParser();
+		$tplParser->addModel('literal', $str);
+
+		$tpl = '[if {{literal}}]{{literal}}[/if]';
+		$result = $tplParser->parse($tpl);
+		$this->assertEquals($str, $result);
+
+	}
+
+
+	public function testAssign() {
+		$tplParser = new TemplateParser();
+
+		$this->assertEquals("bar", $tplParser->parse('[assign foo = "bar"]{{foo}}'));
+
+		$this->assertEquals("3", $tplParser->parse('[assign foo = 3]{{foo}}'));
+
+		$this->assertEquals("3", $tplParser->parse('[assign foo = 1 + 2]{{foo}}'));
+
+		$this->assertEquals("5", $tplParser->parse('[assign bar = {{foo}} + 2]{{bar}}'));
+	}
 
 
 }
