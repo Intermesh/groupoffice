@@ -1,3 +1,6 @@
+- Core: disable output_buffering for SSE
+- Core: Put export operations in a background process and notify when ready
+
 21-05-2026: 26.0.31
 - Support: Migrate categories to support module
 - Multi instance: Remove studio package creation as php fpm on debian is hardened and doesn't allow file creation in /usr/share/groupoffice
