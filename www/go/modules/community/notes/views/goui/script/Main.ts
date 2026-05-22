@@ -17,7 +17,15 @@ import {
 	tbar,
 	Toolbar
 } from "@intermesh/goui";
-import {AclLevel, client, entities, filterpanel, jmapds, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
+import {
+	AclLevel,
+	client,
+	entities,
+	filterpanel,
+	jmapds,
+	MainThreeColumnPanel, TableTitle,
+	tabletitle
+} from "@intermesh/groupoffice-core";
 import {notebookgrid, NoteBookGrid} from "./NoteBookGrid";
 import {NoteBookDialog} from "./NoteBookDialog";
 import {NoteGrid} from "./NoteGrid";
@@ -31,6 +39,7 @@ export class Main extends MainThreeColumnPanel {
 	private noteGridToolbar!: Toolbar;
 	protected east!: NoteDetail;
 	private addButton!: Button;
+	private tblTitle!: TableTitle;
 
 	constructor() {
 		super("notes");
@@ -85,7 +94,10 @@ export class Main extends MainThreeColumnPanel {
 					listeners: {
 						selectionchange: ({selected}) => {
 
-							const noteBookIds = selected.map((row) => row.record.id);
+							const noteBookIds = selected.map((row) => row.record.id),
+								title = selected.map(r => r.record.name);
+
+							this.tblTitle.title = title.join(", ");
 
 							this.noteGrid.store.setFilter("notebook", {
 								noteBookId: noteBookIds
@@ -209,6 +221,12 @@ export class Main extends MainThreeColumnPanel {
 					cls: "bg-mid border-bottom"
 				},
 				this.showWestButton(),
+
+				this.tblTitle = tabletitle({
+					store: this.noteGrid.store,
+					countEntityText: t("notes")
+				}),
+
 				"->",
 				searchbtn({
 					listeners: {
