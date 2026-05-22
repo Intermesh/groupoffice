@@ -504,7 +504,8 @@ go.util =  (function () {
 				method: entity + "/export",
 				params: params
 			}).then(function (response) {
-				go.util.downloadFile(go.Jmap.downloadUrl(response.blobId));
+				//go.util.downloadFile(go.Jmap.downloadUrl(response.blobId));
+				Ext.MessageBox.alert(t("Export in progress"), t("You will be notified when the export is complete. You can close this window now."));
 			}).catch(function(response) {
 				Ext.MessageBox.alert(t("Error"), response.message);
 			}).finally(function() {

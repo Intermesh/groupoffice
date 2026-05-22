@@ -154,10 +154,8 @@ abstract class AbstractConverter {
 		return $this->extension;
 	}
 
-	private function notifyStart() {
+	protected function notifyStart(bool $import = true) {
 		$this->alert = new Alert();
-
-		$cls = $this->entityClass;
 
 		$module = \go\core\model\Module::findByClass($this->entityClass, ['id', 'name', 'package']);
 
@@ -165,8 +163,8 @@ abstract class AbstractConverter {
 		$this->alert->userId = go()->getUserId();
 		$this->alert->triggerAt = new DateTime();
 		$this->alert->setData([
-				'title' => go()->t("Importing"),
-				'body' => go()->t("The import has started in the background")
+				'title' => $import ? go()->t("Importing") : go()->t("Exporting"),
+				'body' => $import ?  go()->t("The import has started in the background") : go()->t("The export has started in the background")
 			]
 		);
 
@@ -175,21 +173,32 @@ abstract class AbstractConverter {
 		}
 	}
 
-	private function notifyEnd(int $count, int $errorCount) {
-		$this->alert->setData([
-				'title' => go()->t("Import finished"),
-				'body' => go()->t("Imported") . ": ". $count ."\n". go()->t("Errors"). ": ".$errorCount
-			]
-		);
+	protected function notifyEnd(bool $import, int $count, int $errorCount, Blob $blob = null) {
+
+		if($import) {
+			$this->alert->setData([
+					'title' => go()->t("Import finished"),
+					'body' => go()->t("Imported") . ': ' . $count . "\n" . go()->t("Errors") . ": " . $errorCount
+				]
+			);
+		}else {
+			$url = go()->getAuthState()->getDownloadUrl($blob->id);
+
+			$this->alert->setData([
+					'title' =>  go()->t("Export finished"),
+					'body' =>   "<a href=\"" . $url . "\">" . go()->t("Download ") . $blob->name . "</a>"
+				]
+			);
+		}
 		if (!$this->alert->save()) {
 			throw new SaveException($this->alert);
 		}
 	}
 
-	private function notifyCount(int $count, int $errorCount) {
+	protected function notifyCount(bool $import, int $count, int $errorCount) {
 		$this->alert->setData([
-				'title' => go()->t("Import in progress"),
-				'body' => go()->t("Imported") . ": ". $count ."\n". go()->t("Errors"). ": ".$errorCount
+				'title' => $import ? go()->t("Import in progress") : go()->t("Export in progress"),
+				'body' =>  ($import ? go()->t("Imported") : go()->t("Exported")) . ": ". $count ."\n". go()->t("Errors"). ": ".$errorCount
 			]
 		);
 		if (!$this->alert->save()) {
@@ -204,7 +213,7 @@ abstract class AbstractConverter {
 	 * @throws \JsonException
 	 * @throws Exception
 	 */
-	private function notifyError(string $error)
+	protected function notifyError(bool $import, string $error)
 	{
 		$a = new Alert();
 
@@ -214,7 +223,7 @@ abstract class AbstractConverter {
 		$a->userId = go()->getUserId();
 		$a->triggerAt = new DateTime();
 		$a->setData([
-				'title' => go()->t("Import error"),
+				'title' => $import ? go()->t("Import error") : go()->t("Export error"),
 				'body' => $error
 			]
 		);
@@ -275,7 +284,7 @@ abstract class AbstractConverter {
 					$entity->save();
 				} else {
 					$msg = "Item ". $this->index . ": access denied";
-					$this->notifyError($msg);
+					$this->notifyError(true, $msg);
 
 					$response['errors'][] = $msg;
 					continue;
@@ -287,7 +296,7 @@ abstract class AbstractConverter {
 				if($entity->hasValidationErrors()) {
 					foreach ($entity->getValidationErrors() as $key =>  $validationError) {
 						$msg = "Validation error in item " . $this->index . ": " . $key . " - " . $validationError['description'];
-						$this->notifyError($msg);
+						$this->notifyError(true, $msg);
 
 						$response['errors'][] = $msg;
 
@@ -298,12 +307,12 @@ abstract class AbstractConverter {
 					$msg = "Item ". $this->index . ": Import afterSave returned false";
 					$response['errors'][] = $msg;
 
-					$this->notifyError($msg);
+					$this->notifyError(true, $msg);
 				}
 
 				EntityType::push();
 
-				$this->notifyCount($response['count'], count($response['errors']));
+				$this->notifyCount(true, $response['count'], count($response['errors']));
 			}
 			catch(Exception $e) {
 				ErrorHandler::logException($e);
@@ -315,7 +324,7 @@ abstract class AbstractConverter {
 
 		$this->finishImport();
 
-		$this->notifyEnd($response['count'], count($response['errors']));
+		$this->notifyEnd(true, $response['count'], count($response['errors']));
 		
 		return $response;
 	}
@@ -395,22 +404,31 @@ abstract class AbstractConverter {
 	 */
 	public function exportToBlob(Query $entities, array $params = []): Blob
 	{
+		$this->notifyStart(false);
 		$stmt = $entities->execute();
-		if($this->exportMaxItems > 0 && $stmt->rowCount() > $this->exportMaxItems) {
-			throw new Exception(go()->t("Too many items to export. Max is " . $this->exportMaxItems));
-		}
+//		if($this->exportMaxItems > 0 && $stmt->rowCount() > $this->exportMaxItems) {
+//			$this->notifyError(false, "Too many items to export. Limit is ". $this->exportMaxItems);
+//		}
 		$this->clientParams = $params;
 		$this->entitiesQuery = $entities;
+
 		$this->initExport();
-		//	$total = $entities->getIterator()->rowCount();
+
+//		$total = $stmt->rowCount();
 
 		$this->index = 0;
 		foreach($stmt as $entity) {
 			$this->exportEntity($entity);
 			$this->index++;
+
+			$this->notifyCount(false, $this->index, 0);
 		}
 
-		return $this->finishExport();
+		$blob = $this->finishExport();
+
+		$this->notifyEnd(false, $this->index, 0, $blob);
+
+		return $blob;
 
 	}
 

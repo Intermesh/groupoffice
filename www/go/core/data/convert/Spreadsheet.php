@@ -245,6 +245,8 @@ th {
 	 */
 	public function exportToBlob(Query $entities, array $params = []): Blob
 	{
+		$this->notifyStart(false);
+
 		$this->clientParams = $params;
 		$this->entitiesQuery = $entities;
 		$this->initExport();
@@ -253,11 +255,16 @@ th {
 		foreach($entities as $entity) {
 			$this->exportEntity($entity);
 			$this->index++;
+			$this->notifyCount(false, $this->index, 0);
 		}
 
 		$this->colorizeHeaders();
 
-		return $this->finishExport();
+		$blob = $this->finishExport();
+
+		$this->notifyEnd(false, $this->index, 0, $blob);
+
+		return $blob;
 	}
 
 	/**
