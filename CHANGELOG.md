@@ -1,5 +1,6 @@
 - Core: disable output_buffering for SSE
 - Core: Put export operations in a background process and notify when ready
+- Projects3: Added expense tracking and invoicing
 
 21-05-2026: 26.0.31
 - Support: Migrate categories to support module
