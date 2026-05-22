@@ -61,6 +61,9 @@ SSLCertificateFile /etc/letsencrypt/live/{tld}/fullchain.pem
 ## Increased timeout for long running requests (sse, activesync)
 #ProxyTimeout 86400
 #
+## flushpackets is required for SSE to work
+#ProxyPassMatch "^/sse.php.*$" "fcgi://localhost" flushpackets=on
+
 # For apache2 + php-fpm. This is required to make PUT request with chunked transfer encoding work. MacOS Finder uses this to upload with WebDAV.
 # SetEnv proxy-sendcl 1
 ##Pass authorization header
