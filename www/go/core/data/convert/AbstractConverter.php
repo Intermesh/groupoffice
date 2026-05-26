@@ -204,6 +204,7 @@ abstract class AbstractConverter {
 		if (!$this->alert->save()) {
 			throw new SaveException($this->alert);
 		}
+		EntityType::push();
 	}
 
 	/**
@@ -215,8 +216,6 @@ abstract class AbstractConverter {
 	 */
 	protected function notifyError(bool $import, string $error)
 	{
-
-
 		$this->alert->setData([
 				'title' => $import ? go()->t("Import error") : go()->t("Export error"),
 				'body' => $error
@@ -225,6 +224,7 @@ abstract class AbstractConverter {
 		if (!$this->alert->save()) {
 			throw new SaveException($this->alert);
 		}
+		EntityType::push();
 	}
 
 
