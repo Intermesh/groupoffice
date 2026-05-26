@@ -13,7 +13,18 @@ go.modules.community.otp.OtpPanel = Ext.extend(go.login.BaseLoginPanel, {
 			name: 'otp_code',
 			allowBlank: false,
 			anchor: '100%',
-			autocomplete: "one-time-code"
+			autocomplete: "one-time-code",
+			listeners: {'render': function (target) {
+				const dom = target.el.dom;
+				dom.inputMode = 'numeric';
+				dom.setAttribute('maxlength', '6');
+				dom.setAttribute('pattern', '[0-9]*');
+				dom.addEventListener('paste', e => {
+					e.preventDefault();
+					const text = e.clipboardData?.getData('text') || '';
+					target.setValue(text.replace(/\D/g, '').slice(0, 6));
+				})
+			}}
 		});
 
 		//nested panel is required so that submit button is inside form. 
