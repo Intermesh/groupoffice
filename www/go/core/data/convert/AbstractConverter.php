@@ -215,21 +215,15 @@ abstract class AbstractConverter {
 	 */
 	protected function notifyError(bool $import, string $error)
 	{
-		$a = new Alert();
 
-		$module = \go\core\model\Module::findByClass($this->entityClass, ['id', 'name', 'package']);
 
-		$a->setEntity($module);
-		$a->userId = go()->getUserId();
-		$a->triggerAt = new DateTime();
-		$a->setData([
+		$this->alert->setData([
 				'title' => $import ? go()->t("Import error") : go()->t("Export error"),
 				'body' => $error
 			]
 		);
-
-		if (!$a->save()) {
-			throw new SaveException($a);
+		if (!$this->alert->save()) {
+			throw new SaveException($this->alert);
 		}
 	}
 
@@ -397,55 +391,58 @@ abstract class AbstractConverter {
 	/**
 	 * Export entities to a blob
 	 *
-	 * @param Query $entities
+	 * @param string[] $entityIds
 	 * @param array $params
 	 * @return Blob
 	 * @throws DbException
+	 * @throws SaveException
+	 * @throws Exception
 	 */
-	public function exportToBlob(Query $entities, array $params = []): Blob
+	public function exportToBlob(array $entityIds, array $params = []): ?Blob
 	{
 		$this->notifyStart(false);
-		$stmt = $entities->execute();
-//		if($this->exportMaxItems > 0 && $stmt->rowCount() > $this->exportMaxItems) {
-//			$this->notifyError(false, "Too many items to export. Limit is ". $this->exportMaxItems);
-//		}
+
 		$this->clientParams = $params;
-		$this->entitiesQuery = $entities;
+		$this->exportEntityIds = $entityIds;
 
-		$this->initExport();
+		try {
+			$this->initExport();
 
-//		$total = $stmt->rowCount();
+			$errorCount = 0;
+			$this->index = 0;
+			foreach ($entityIds as $entityId) {
 
-		$this->index = 0;
-		foreach($stmt as $entity) {
-			$this->exportEntity($entity);
-			$this->index++;
+				try {
+					$entity = $this->entityClass::findById($entityId);
 
-			$this->notifyCount(false, $this->index, 0);
+					$this->exportEntity($entity);
+					$this->index++;
+
+				} catch (Exception $e) {
+					$errorCount++;
+					ErrorHandler::logException($e);
+				}
+
+				$this->notifyCount(false, $this->index, $errorCount);
+			}
+
+			$blob = $this->finishExport();
+
+			$this->notifyEnd(false, $this->index, 0, $blob);
+
+			return $blob;
+		} catch (\Throwable $e) {
+			ErrorHandler::logException($e);
+			$this->notifyError(false, $e->getMessage());
 		}
 
-		$blob = $this->finishExport();
-
-		$this->notifyEnd(false, $this->index, 0, $blob);
-
-		return $blob;
-
+		return null;
 	}
 
   /**
-   * @var Query
+   * @var string[]
    */
-  protected $entitiesQuery;
-
-  /**
-   * The query used for exporting entities
-   *
-   * @return Query
-   */
-	protected function getEntitiesQuery(): Query
-	{
-	  return $this->entitiesQuery;
-  }
+  protected array $exportEntityIds;
 
 	/**
 	 * Initialize the import. For example create temporary file and open it.

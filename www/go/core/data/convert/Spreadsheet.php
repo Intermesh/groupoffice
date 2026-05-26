@@ -5,6 +5,7 @@ namespace go\core\data\convert;
 use DateTimeZone;
 use Exception;
 use go\core\data\Model;
+use go\core\ErrorHandler;
 use go\core\event\EventEmitterTrait;
 use go\core\fs\Blob;
 use go\core\fs\File;
@@ -231,52 +232,27 @@ th {
 		$this->writeRecord($record);
 	}
 
-
 	protected function exportEntityToArray(Entity $entity): array
 	{
 		return $entity->toArray();
 	}
 
 	/**
-	 * @param \go\core\orm\Query $entities
-	 * @param array $params
 	 * @return \go\core\fs\Blob
+	 * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
 	 * @throws \go\core\orm\exception\SaveException
 	 */
-	public function exportToBlob(Query $entities, array $params = []): Blob
+	protected function finishExport(): Blob
 	{
-		$this->notifyStart(false);
-
-		$this->clientParams = $params;
-		$this->entitiesQuery = $entities;
-		$this->initExport();
-
-		$this->index = 0;
-		foreach($entities as $entity) {
-			$this->exportEntity($entity);
-			$this->index++;
-			$this->notifyCount(false, $this->index, 0);
-		}
-
-		$this->colorizeHeaders();
-
-		$blob = $this->finishExport();
-
-		$this->notifyEnd(false, $this->index, 0, $blob);
-
-		return $blob;
-	}
-
-	/**
-	 * @return void
-	 */
-	protected function colorizeHeaders(): void
-	{
-		switch ($this->extension) {
+		switch($this->extension) {
 			case 'html':
+				fputs($this->fp, "</table></body></html>");
+				break;
 			case 'csv':
+
 				break;
 			default:
+
 				$headerStyle = [
 					'font' => [
 						'bold' => true,
@@ -295,25 +271,7 @@ th {
 					$colDim = $this->spreadsheet->getActiveSheet()->getColumnDimension($col->getColumnIndex());
 					$colDim->setAutoSize(true);
 				}
-				break;
-		}
-	}
 
-	/**
-	 * @return \go\core\fs\Blob
-	 * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
-	 * @throws \go\core\orm\exception\SaveException
-	 */
-	protected function finishExport(): Blob
-	{
-		switch($this->extension) {
-			case 'html':
-				fputs($this->fp, "</table></body></html>");
-				break;
-			case 'csv':
-
-				break;
-			default:
 				$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->spreadsheet);
 				$writer->setPreCalculateFormulas(false);
 				$writer->save($this->tempFile->getPath());
@@ -650,34 +608,26 @@ th {
 	 * Returns the max count of a has many relation in the dataset to export
 	 *
 	 * @param Relation $relation
-	 * @return bool|int|mixed
+	 * @return int
 	 * @throws Exception
 	 */
-	private function countMaxRelated(Relation $relation) {
+	private function countMaxRelated(Relation $relation) : int {
     if($relation->type == Relation::TYPE_HAS_ONE){
       return 1;
     }
-
-    $key = key($relation->keys);
     $fk = current($relation->keys);
 
-    $entitiesSub = clone $this->getEntitiesQuery();
-    $entitiesSub->selectSingleValue($entitiesSub->getTableAlias() . '.' . $key);
-
-    return go()->getDbConnection()
+    return (int) go()->getDbConnection()
       ->selectSingleValue('coalesce(count(*), 0) AS count')
       ->from($relation->propertyName::getMapping()->getPrimaryTable()->getName(), 't')
-      ->where($fk, 'IN', $entitiesSub)
+      ->where($fk, 'IN', $this->exportEntityIds)
       ->groupBy(['t.' . $fk])
       ->orderBy(['count' => 'DESC'])
       ->single();
   }
-
-
-
-
 	
-	private function recordIsEmpty(array $record) {
+	private function recordIsEmpty(array $record): bool
+	{
 		foreach($record as $v) {
 			if(!empty($v)) {
 				return false;
@@ -685,8 +635,6 @@ th {
 		}
 		return true;
 	}
-
-
 
 	protected function initImport(File $file): void
 	{
