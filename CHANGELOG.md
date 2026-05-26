@@ -1,3 +1,6 @@
+- Calendar: Event category selection dropdown will show category colors.
+- Core: OTP field will show numeric keyboard on mobile and filter pasted codes
+- Calendar: fixed incorrectly showing the event is in the past when inviting others.
 - Core: disable output_buffering for SSE
 - Core: Put export operations in a background process and notify when ready
 - Projects3: Added expense tracking and invoicing
