@@ -102,9 +102,10 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 					resizable: true
 				}),
 				column({
-					id: "remoteIP",
+					id: "remoteIp",
 					header: "IP",
-					resizable: true
+					resizable: true,
+					width: 120
 				}),
 				column({
 					id: "requestId",
