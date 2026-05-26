@@ -69,7 +69,9 @@ SSLCertificateFile /etc/letsencrypt/live/{tld}/fullchain.pem
 ##Pass authorization header
 #SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
 #<FilesMatch \.php$>
+#  <If "-f %{REQUEST_FILENAME}">
 #    SetHandler "proxy:unix:/run/php/php8.2-fpm.sock|fcgi://localhost"
+#  </If>
 #</FilesMatch>
 
 </VirtualHost>
