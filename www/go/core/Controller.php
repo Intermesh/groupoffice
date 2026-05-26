@@ -21,11 +21,6 @@ abstract class Controller {
 	 */
 	protected function authenticate() {
 		if (!go()->getAuthState()->isAuthenticated()) {
-			if ($user = go()->getAuthState()->getUser()) {
-				ErrorHandler::log("Token authentication failed for user ". $user->displayName . " from IP: '" . Request::get()->getRemoteIpAddress() . "'");
-			} else {
-				ErrorHandler::log("Token authentication failed from IP: '" . Request::get()->getRemoteIpAddress() . "'");
-			}
 			throw new Exception(401, "Unauthorized");
 		}
 
