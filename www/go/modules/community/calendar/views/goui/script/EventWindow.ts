@@ -165,10 +165,14 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 							.add(di)
 							.format(format);
 					}
+
+					this.participantFld.checkAvailability(this.startDate.getValueAsDateTime()!, this.endDate.getValueAsDateTime()!, !!this.withoutTimeToggle.value);
+				},
+				setvalue: ev => {
+					const newEndDate = ev.target.getValueAsDateTime()
 					if(newEndDate && this.item) {
 						this.item.end = newEndDate; // for isInPast
 					}
-					this.participantFld.checkAvailability(this.startDate.getValueAsDateTime()!, this.endDate.getValueAsDateTime()!, !!this.withoutTimeToggle.value);
 				},
 				validate: ev => {
 
