@@ -3,6 +3,7 @@
 namespace go\core\model;
 
 use BadMethodCallException;
+use DateTimeInterface;
 use Exception;
 use GO\Base\Cron\EmailReminders;
 use GO\Base\Db\ActiveRecord;
@@ -37,10 +38,10 @@ class Alert extends SingleOwnerEntity
 
 	public ?string $entityId;
 
-	public ?\DateTimeInterface $triggerAt;
-	public ?\DateTimeInterface $staleAt;
+	public ?DateTimeInterface $triggerAt;
+	public ?DateTimeInterface $staleAt;
 
-	public $recurrenceId;
+	public ?string $recurrenceId;
 	public ?string $tag;
 
 	/**
@@ -219,13 +220,17 @@ class Alert extends SingleOwnerEntity
 	 * If this data contains a "title" and "description" property, then this will be
 	 * used as such.
 	 *
+	 * If an int progress (0-100) is added the client should show a progress bar
+	 *
+	 * "persistent" will make it non closable.
+	 *
 	 * @param array $data
 	 * @return Alert
 	 * @throws JsonException
 	 */
 	public function setData(array $data): Alert
 	{
-		$this->data = JSON::encode(array_merge((array) $this->getData(), $data));
+		$this->data = JSON::encode($data);
 
 		return $this;
 	}

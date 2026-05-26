@@ -99,6 +99,14 @@ abstract class AbstractConverter {
 	protected $extension;
 
 	protected Alert $alert;
+	private string $exportId;
+
+
+	/**
+	 * Total records to import or export. If not set progress can't be calculated.
+	 * @var int
+	 */
+	public int $total = 0;
 
 	/**
 	 * AbstractConverter constructor.
@@ -108,6 +116,8 @@ abstract class AbstractConverter {
 	public function __construct(string $extension, string $entityClass) {
 		$this->extension = strtolower($extension);
 		$this->entityClass = $entityClass;
+
+		$this->exportId = uniqid();
 		$this->init();
 	}
 	
@@ -154,6 +164,21 @@ abstract class AbstractConverter {
 		return $this->extension;
 	}
 
+	protected function getAlert() {
+
+		if(!$this->alert) {
+			$this->alert = new Alert();
+
+			$module = \go\core\model\Module::findByClass($this->entityClass, ['id', 'name', 'package']);
+
+			$this->alert->setEntity($module);
+			$this->alert->userId = go()->getUserId();
+			$this->alert->triggerAt = new DateTime();
+			$this->alert->tag = 'export-' . $this->exportId;
+		}
+
+	}
+
 	protected function notifyStart(bool $import = true) {
 		$this->alert = new Alert();
 
@@ -164,7 +189,9 @@ abstract class AbstractConverter {
 		$this->alert->triggerAt = new DateTime();
 		$this->alert->setData([
 				'title' => $import ? go()->t("Importing") : go()->t("Exporting"),
-				'body' => $import ?  go()->t("The import has started in the background") : go()->t("The export has started in the background")
+				'body' => $import ?  go()->t("The import has started in the background") : go()->t("The export has started in the background"),
+				'persistent' => true,
+				'progress' => 0
 			]
 		);
 
@@ -178,7 +205,8 @@ abstract class AbstractConverter {
 		if($import) {
 			$this->alert->setData([
 					'title' => go()->t("Import finished"),
-					'body' => go()->t("Imported") . ': ' . $count . "\n" . go()->t("Errors") . ": " . $errorCount
+					'body' => go()->t("Imported") . ': ' . $count . "\n" . go()->t("Errors") . ": " . $errorCount,
+					'persistent' => false
 				]
 			);
 		}else {
@@ -186,9 +214,11 @@ abstract class AbstractConverter {
 
 			$this->alert->setData([
 					'title' =>  go()->t("Export finished"),
-					'body' =>   "<a href=\"" . $url . "\">" . go()->t("Download ") . $blob->name . "</a>"
+					'body' =>   "<a class=\"normal-link\" href=\"" . $url . "\">" . go()->t("Download ") . $blob->name . "</a>",
+					'persistent' => false
 				]
 			);
+			$this->alert->sendMail = true;
 		}
 		if (!$this->alert->save()) {
 			throw new SaveException($this->alert);
@@ -198,7 +228,9 @@ abstract class AbstractConverter {
 	protected function notifyCount(bool $import, int $count, int $errorCount) {
 		$this->alert->setData([
 				'title' => $import ? go()->t("Import in progress") : go()->t("Export in progress"),
-				'body' =>  ($import ? go()->t("Imported") : go()->t("Exported")) . ": ". $count ."\n". go()->t("Errors"). ": ".$errorCount
+				'body' =>  ($import ? go()->t("Imported") : go()->t("Exported")) . ": ". $count ."\n". go()->t("Errors"). ": ".$errorCount,
+				'persistent' => true,
+				'progress' => $this->total ? ceil($count * 100 / $this->total) : 0 ,
 			]
 		);
 		if (!$this->alert->save()) {
@@ -218,7 +250,8 @@ abstract class AbstractConverter {
 	{
 		$this->alert->setData([
 				'title' => $import ? go()->t("Import error") : go()->t("Export error"),
-				'body' => $error
+				'body' => $error,
+				'persistent' => false,
 			]
 		);
 		if (!$this->alert->save()) {
@@ -400,6 +433,8 @@ abstract class AbstractConverter {
 	 */
 	public function exportToBlob(array $entityIds, array $params = []): ?Blob
 	{
+		$this->total = count($entityIds);
+
 		$this->notifyStart(false);
 
 		$this->clientParams = $params;

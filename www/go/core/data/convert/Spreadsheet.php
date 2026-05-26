@@ -641,6 +641,8 @@ th {
 		if($this->extension == 'csv') {
 			$this->fp = $file->open('r');
 			$this->delimiter = static::sniffDelimiter($file);
+
+			$this->total = 0;
 		} else{
 			$reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
 			$this->spreadsheet = $reader->load($file->getPath());
@@ -648,6 +650,8 @@ th {
 
 			$this->highest = $this->spreadsheet->getActiveSheet()->getHighestRowAndColumn();
 			$this->spreadsheetRowIterator = $this->spreadsheet->getActiveSheet()->getRowIterator();
+
+			$this->total =  $this->spreadsheet->getActiveSheet()->getHighestRow();
 		}
 
 		if(isset($this->clientParams['updateBy'])) {
