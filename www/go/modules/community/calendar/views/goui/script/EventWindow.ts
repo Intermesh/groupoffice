@@ -369,7 +369,13 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 		this.addCustomFields();
 	}
 
-
+	public addLinkOnSave(entityName:string, entityId:string) {
+		// Add name from linked entity to the title field when creating event with AddButton
+		const item = jmapds(entityName).single(entityId).then(e => {
+			if(e.name) this.titleField.value= e.name;
+		});
+		super.addLinkOnSave(entityName, entityId);
+	}
 
 	private openExceptionsWindow() {
 		const o = this.form.value.recurrenceOverrides;
