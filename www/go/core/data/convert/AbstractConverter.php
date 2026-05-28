@@ -200,7 +200,7 @@ abstract class AbstractConverter {
 		}
 	}
 
-	protected function notifyEnd(bool $import, int $count, int $errorCount, Blob $blob = null) {
+	protected function notifyEnd(bool $import, int $count, int $errorCount, Blob|null $blob = null) {
 
 		if($import) {
 			$this->alert->setData([
