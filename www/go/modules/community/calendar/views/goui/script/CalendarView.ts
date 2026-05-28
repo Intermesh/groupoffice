@@ -124,7 +124,11 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 	constructor(adapter: CalendarAdapter) {
 		super();
 		CalendarView.selectedCalendarId = client.user.calendarPreferences?.defaultCalendarId; // default
-		this.adapter = adapter
+		this.adapter = adapter;
+
+		if(client.user.calendarPreferences.multiLine) {
+			this.ROWHEIGHT = 4.2;
+		}
 	}
 
 	update = (_data?: any) => {
@@ -229,7 +233,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 		return 40;
 	}
 
-	protected ROWHEIGHT = 2.6;
+	protected ROWHEIGHT = 2.4
 
 	// for full day view
 	protected makestyle(e: CalendarItem, weekstart: DateTime, row?: number): Partial<CSSStyleDeclaration> {
@@ -245,7 +249,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 			top = row * this.ROWHEIGHT;
 		return {
 			width: (width-.2).toFixed(2)+'%',
-			left : (left+(dayDiff.invert?0:.3)).toFixed(2)+'%',
+			left : (left).toFixed(2)+'%',
 			top: top.toFixed(2)+'rem',
 			color: '#'+e.color
 		};

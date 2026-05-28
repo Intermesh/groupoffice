@@ -105,7 +105,7 @@ export class Main extends Component {
 		});
 		const rights = modules.get("community", "calendar")!.userRights;
 
-
+		const multiLine = client.user.calendarPreferences.multiLine ? 'multiline':'';
 
 		this.items.add(
 			this.west = comp({tagName: 'aside', width: 274, cls:'scroll', style: {paddingTop:'1.2rem', minWidth: '27.4rem'}},
@@ -305,7 +305,7 @@ export class Main extends Component {
 						}),
 					)})
 				),
-				this.cards = cards({flex: 1, activeItem:1, listeners: {render: ({target}) => this.applySwipeEvents(target)}},
+				this.cards = cards({cls: multiLine, flex: 1, activeItem:1, listeners: {render: ({target}) => this.applySwipeEvents(target)}},
 					weekView,
 					monthView,
 					yearView,

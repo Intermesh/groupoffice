@@ -242,4 +242,5 @@ return array (
   'New Event' => 'Nieuw evenement',
   'This' => 'Dit',
 	'Auto-accept available resources' => 'Beschikbare faciliteiten automatisch accepteren',
+	'Show multiline event blocks' => 'Toon afspraak blokken op meerdere regels',
 );
