@@ -6,6 +6,10 @@
 - Core: Put export operations in a background process and notify when ready
 - Projects3: Added expense tracking and invoicing
 - Core: Optimized export performance for large datasets
+- Support: Fixed sorting on customer
+- Core: Title texts can be copy pasted
+- Notes / Calendar / Projects3: Collapsible sidebar
+ 
 
 21-05-2026: 26.0.31
 - Support: Migrate categories to support module
