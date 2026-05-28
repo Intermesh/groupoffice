@@ -263,6 +263,9 @@ class Calendar extends AclOwnerEntity {
 		if($this->isModified('defaultAlertsWithoutTime')) {
 			$this->updateEventAlerts($this->defaultAlertsWithoutTime, false);
 		}
+		if($this->id === go()->getAuthState()->getUser(['calendarPreferences'])->calendarPreferences->personalCalendarId) {
+			$this->isSubscribed = true; // do not let users unsubscribe there personal calendar
+		}
 		if(empty($this->includeInAvailability) && !$this->isPrincipal()) {
 			// set sane default
 			$this->includeInAvailability = $this->ownerId == go()->getUserId() ? 'all' :
