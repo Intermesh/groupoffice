@@ -1,3 +1,4 @@
+- Core: Fixed summing up values in each loops. Also strip newline straight after template tag
 - Calendar: Event category selection dropdown will show category colors.
 - Core: OTP field will show numeric keyboard on mobile and filter pasted codes
 - Calendar: fixed incorrectly showing the event is in the past when inviting others.
