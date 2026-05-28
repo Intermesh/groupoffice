@@ -312,14 +312,21 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 					}),
 					rowSelectionConfig: {multiSelect: true},
 					columns: [
-						checkboxselectcolumn(),
+						checkboxselectcolumn().on('render', e => {
+							console.log(e.record);
+							(e.result as CheckboxField).color = '#'+e.record.color;
+						}),
 						column({id: "name"})
 					]
 				}),
 				label: t("Categories",'core','core'),
 				name: "categoryIds",
 				chipRenderer: async (chip, id) => {
-					jmapds('CalendarCategory').single(id).then(v => { chip.text = v?.name ?? '???'});
+					jmapds('CalendarCategory').single(id).then(v => {
+						chip.text = v?.name ?? '???';
+						if(v.color)
+							chip.el.style.color = '#'+v.color;
+					});
 				},
 				listeners: {
 					autocomplete: ( {target, input}) => {
