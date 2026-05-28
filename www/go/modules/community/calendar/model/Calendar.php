@@ -458,10 +458,12 @@ class Calendar extends AclOwnerEntity {
 				'syncToDevice' => true,
 				'includeInAvailability' => 'all'
 			]);
+		} else {
+			$calendar->isSubscribed = true;
+		}
 
-			if(!$calendar->save()) {
-				throw new SaveException($calendar);
-			}
+		if(!$calendar->save()) {
+			throw new SaveException($calendar);
 		}
 
 		$user->calendarPreferences->personalCalendarId = $calendar->id;
