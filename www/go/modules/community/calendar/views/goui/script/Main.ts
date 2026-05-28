@@ -2,9 +2,9 @@ import {
 	btn, Button,
 	CardContainer,
 	cards,
-	checkbox, column,
+	checkbox, collapsebtn, column,
 	comp,
-	Component, DataSourceStore, datasourcestore, DateInterval,
+	Component, DataSourceStore, datasourcestore,
 	DatePicker,
 	datepicker,
 	DateTime, Format,
@@ -106,7 +106,7 @@ export class Main extends Component {
 
 
 		this.items.add(
-			this.west = comp({tagName: 'aside', width: 274, cls:'scroll',style: {paddingTop:'1.2rem', minWidth: '27.4rem'}},
+			this.west = comp({tagName: 'aside', width: 274, cls:'scroll', style: {paddingTop:'1.2rem', minWidth: '27.4rem'}},
 				tbar({cls: "for-medium-device"},
 					'->',
 					btn({
@@ -119,7 +119,7 @@ export class Main extends Component {
 				),
 				this.picker = datepicker({
 					cls:'not-medium-device',
-					showWeekNbs: client.user.calendarPreferences.showWeekNumbers,
+					showWeekNbs: false,// client.user.calendarPreferences.showWeekNumbers,
 					enableRangeSelect: true,
 					listeners: {
 						'select': ({date}) => {
@@ -176,6 +176,11 @@ export class Main extends Component {
 			}),
 			comp({cls: 'vbox active', flex: 1},
 				tbar({},
+					btn({cls: "for-large-device", icon: "menu_open", handler: btn => {
+						const h = this.west.hidden;
+						this.west.hidden = !h;
+						btn.icon = !h ? 'menu' : 'menu_open';
+					}}),
 					btn({cls: "for-medium-device", icon: "menu", handler: _ => {
 						this.west.el.cls('!active');
 					}}),
