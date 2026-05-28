@@ -6,7 +6,7 @@ import {
 	column,
 	comp,
 	EntityID,
-	h3,
+	h3, h4,
 	hr,
 	menu,
 	menucolumn,
@@ -63,9 +63,10 @@ export class Main extends MainThreeColumnPanel {
 						}
 					}
 				}),
-				h3(t("Notebooks")),
+				h4(t("Notebooks")),
 				"->",
 				searchbtn({
+					cls: "small",
 					listeners: {
 						input: ({text}) => {
 							this.noteBookGrid.store.setFilter("search", {text});
@@ -74,6 +75,7 @@ export class Main extends MainThreeColumnPanel {
 					}
 				}),
 				btn({
+					cls: "small",
 					icon: "add",
 					handler: () => {
 						const dlg = new NoteBookDialog();
