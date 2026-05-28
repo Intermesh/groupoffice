@@ -312,4 +312,26 @@ ID;
 	}
 
 
+	public function testParentInEachLoop()
+	{
+
+		$tplParser = new TemplateParser();
+		$tplParser->addModel('invoices', [
+			['price' => 1.55],
+			['price' => 2.01],
+			['price' => 3.45],
+		]);
+
+		$tpl = <<<ID
+[assign total = 0]
+[each invoice in invoices]
+[assign parent.total = {{parent.total}} + {{invoice.price}}]
+[/each]
+{{total}}
+ID;
+
+		$this->assertEquals("7.01", $tplParser->parse($tpl));
+	}
+
+
 }
