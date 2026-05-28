@@ -25,7 +25,8 @@ import {
 	Export,
 	filterpanel, Import,
 	jmapds,
-	MainThreeColumnPanel
+	MainThreeColumnPanel,TableTitle,
+	tabletitle
 } from "@intermesh/groupoffice-core";
 import {notebookgrid, NoteBookGrid} from "./NoteBookGrid";
 import {NoteBookDialog} from "./NoteBookDialog";
@@ -39,6 +40,7 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 	private noteGrid!: NoteGrid;
 	private noteGridToolbar!: Toolbar;
 	private addButton!: Button;
+	private tblTitle!: TableTitle;
 
 	constructor() {
 		super("notes");
@@ -96,7 +98,10 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 					listeners: {
 						selectionchange: ({selected}) => {
 
-							const noteBookIds = selected.map((row) => row.record.id);
+							const noteBookIds = selected.map((row) => row.record.id),
+								title = selected.map(r => r.record.name);
+
+							this.tblTitle.title = title.join(", ");
 
 							this.noteGrid.store.setFilter("notebook", {
 								noteBookId: noteBookIds
@@ -218,6 +223,12 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 					cls: "bg-mid border-bottom"
 				},
 				this.showWestButton(),
+
+				this.tblTitle = tabletitle({
+					store: this.noteGrid.store,
+					countEntityText: t("notes")
+				}),
+
 				"->",
 				searchbtn({
 					listeners: {

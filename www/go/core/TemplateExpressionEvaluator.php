@@ -39,7 +39,7 @@ class TemplateExpressionEvaluator
 	{
 		$this->input = trim($expression);
 
-		if(empty($this->input)) {
+		if($this->input === "") {
 			return false;
 		}
 

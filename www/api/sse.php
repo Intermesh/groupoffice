@@ -55,14 +55,14 @@ if(!go()->getConfig()['sseEnabled']) {
 }
 
 
-
+ini_set('output_buffering', 'off');
 ini_set('zlib.output_compression', 0);
 ini_set('implicit_flush', 1);
 ini_set("max_execution_time", PushDispatcher::MAX_LIFE_TIME + 30);
 
 Response::get()
 	->setHeader("Cache-Control", "no-cache")
-	->setContentType(" text/event-stream")
+	->setContentType("text/event-stream")
 	->setHeader("Pragma", "no-cache")
 	->setHeader("Connection", "keep-alive")
 	->setHeader("X-Accel-Buffering", "no")

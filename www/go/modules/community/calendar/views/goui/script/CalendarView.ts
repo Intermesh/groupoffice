@@ -157,9 +157,11 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 					...this.fmLocation(item.data.location)
 				),
 				...item.categoryDots,
-				...(withIcons ? item.icons : []),
-				time
+				...(withIcons ? item.icons : [])
 			)
+			if(!e.showWithoutTime) {
+				div.append(time);
+			}
 		}
 		if(item.key) {
 			div.dataset.key = item.key;

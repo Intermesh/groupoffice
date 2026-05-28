@@ -9,6 +9,7 @@ use go\core\event\EventEmitterTrait;
 use go\core\exception\NotFound;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\fs\File;
+use go\core\http\PostResponseProcessor;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\jmap\exception\UnsupportedSort;
 use go\core\model\Acl;
@@ -1157,7 +1158,7 @@ abstract class EntityController extends Controller {
 	protected function defaultExport(array $params): ArrayObject
 	{
 		if(!go()->getEnvironment()->isCli()) {
-			go()->getEnvironment()->setMaxExecutionTime(10 * 60);
+			go()->getEnvironment()->setMaxExecutionTime(0);
 		}
 
 		if(empty($params['ids'])) {
@@ -1169,12 +1170,12 @@ abstract class EntityController extends Controller {
 		$cls = $this->entityClass();
 		
 		$convertor = $cls::findConverter($params['extension']);
-				
-		$entities = $this->getGetQuery($params);
 
-		$blob = $convertor->exportToBlob($entities, $params->getArray());
+		PostResponseProcessor::get()->addTask(function() use ($convertor, $params) {
+			$convertor->exportToBlob($params['ids'], $params->getArray());
+		});
 		
-		return new ArrayObject(['blobId' => $blob->id, 'blob' => $blob->toArray()]);
+		return new ArrayObject(['success' => true]);
 	}
 
   /**

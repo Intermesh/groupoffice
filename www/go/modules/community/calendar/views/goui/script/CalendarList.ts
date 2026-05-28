@@ -224,7 +224,7 @@ export class CalendarList extends Component<CalendarListEventMap> {
 						jmapds("Calendar").confirmDestroy([data.id]);
 					}}),
 					hr({hidden: !rights.mayChangeCalendars}),
-					btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
+					btn({icon: 'remove_circle', hidden: data.id === client.user.calendarPreferences?.personalCalendarId, text: t('Unsubscribe'), handler() {
 						jmapds('Calendar').update(data.id, {isSubscribed: false}).catch(e => Window.error(e))
 					}}),
 					hr({hidden:data.groupId}),

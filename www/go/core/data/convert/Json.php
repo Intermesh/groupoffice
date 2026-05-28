@@ -53,6 +53,7 @@ class Json extends AbstractConverter {
 	protected function initImport(File $file): void
 	{
 		$this->data = GoJSON::decode($file->getContents(), true);
+		$this->total = count($this->data);
 	}
 
 	protected function nextImportRecord(): bool

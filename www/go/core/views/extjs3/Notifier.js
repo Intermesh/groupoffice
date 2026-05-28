@@ -192,11 +192,10 @@
 
 			let msgPanel = Ext.create(msg, "panel");
 
-			if(!msgPanel.tools || !msgPanel.getTool('close')) {
+			if(!msg.persistent && (!msgPanel.tools || !msgPanel.getTool('close'))) {
 				msgPanel.addTool({
 					id: "close",
 					tooltip: t("Close"),
-					visible: !msg.persistent,
 					handler: function (e, toolEl, panel, tc) {
 						panel.fireEvent("close", panel);
 						panel.destroy();

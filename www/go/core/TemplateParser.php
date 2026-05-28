@@ -714,8 +714,8 @@ class TemplateParser {
 	{
 			
 		preg_match_all('/\[(each|if)/s', $str, $openMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
-		preg_match_all('/\[\/(each|if)\]/s', $str, $closeMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
-		preg_match_all('/\[else\]/s', $str, $elseMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
+		preg_match_all('/\[\/(each|if)\]\n?/s', $str, $closeMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
+		preg_match_all('/\[else\]\n?/s', $str, $elseMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\\[assign\s+([a-z0-9A-Z-_\.]+)\s*=\s*(.*?)(?<!\\\\)\\]\n?/', $str, $assignMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\\[config\s+([a-z0-9A-Z-_\.]+)\s*=\s*(.*?)(?<!\\\\)\\]\n?/', $str, $configMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 
@@ -727,7 +727,7 @@ class TemplateParser {
 		$tags = [];		
 		
 		for($i = 0; $i < $count; $i++) {
-			$offset = $openMatches[$i][0][1];
+			$offset = (int) $openMatches[$i][0][1];
 			$expression = $this->findExpression($offset + strlen($openMatches[$i][0][0]), $str);
 
 			$tags[$offset] = [
@@ -736,6 +736,12 @@ class TemplateParser {
 				'offset' => $offset, 
 				'expression' => $expression, 
 				'tagLength' => strlen($openMatches[$i][0][0]) + strlen($expression) + 1];
+
+			// strip new line if it is after the ']' in  [if ...]\n
+			$checkForNewLine = $offset + $tags[$offset]['tagLength'];
+			if(isset($str[$checkForNewLine]) && $str[$checkForNewLine] == "\n") {
+				$tags[$offset]['tagLength']++;
+			}
 		}
 		
 		

@@ -151,11 +151,11 @@
 
 						if(alert.data && "progress" in alert.data) {
 
-							if(!panelCfg.items) {
+							if (!panelCfg.items) {
 								panelCfg.items = [
 									{
 										xtype: "box",
-										html:panelCfg.html
+										html: panelCfg.html
 									}
 								];
 
@@ -165,6 +165,10 @@
 								text: t("Progress") + " " + alert.data.progress + "%",
 								value: alert.data.progress / 100
 							}))
+						}
+
+						if(alert.data && alert.data.persistent !== undefined) {
+							panelCfg.persistent = alert.data.persistent;
 						}
 					}
 

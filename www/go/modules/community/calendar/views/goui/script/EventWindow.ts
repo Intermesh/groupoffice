@@ -165,10 +165,14 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 							.add(di)
 							.format(format);
 					}
+
+					this.participantFld.checkAvailability(this.startDate.getValueAsDateTime()!, this.endDate.getValueAsDateTime()!, !!this.withoutTimeToggle.value);
+				},
+				setvalue: ev => {
+					const newEndDate = ev.target.getValueAsDateTime()
 					if(newEndDate && this.item) {
 						this.item.end = newEndDate; // for isInPast
 					}
-					this.participantFld.checkAvailability(this.startDate.getValueAsDateTime()!, this.endDate.getValueAsDateTime()!, !!this.withoutTimeToggle.value);
 				},
 				validate: ev => {
 
@@ -308,14 +312,21 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 					}),
 					rowSelectionConfig: {multiSelect: true},
 					columns: [
-						checkboxselectcolumn(),
+						checkboxselectcolumn().on('render', e => {
+							console.log(e.record);
+							(e.result as CheckboxField).color = '#'+e.record.color;
+						}),
 						column({id: "name"})
 					]
 				}),
 				label: t("Categories",'core','core'),
 				name: "categoryIds",
 				chipRenderer: async (chip, id) => {
-					jmapds('CalendarCategory').single(id).then(v => { chip.text = v?.name ?? '???'});
+					jmapds('CalendarCategory').single(id).then(v => {
+						chip.text = v?.name ?? '???';
+						if(v.color)
+							chip.el.style.color = '#'+v.color;
+					});
 				},
 				listeners: {
 					autocomplete: ( {target, input}) => {
@@ -358,7 +369,14 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 		this.addCustomFields();
 	}
 
-
+	public addLinkOnSave(entityName:string, entityId:string) {
+		// Add name from linked entity to the title field when creating event with AddButton
+		jmapds(entityName)?.single(entityId).then(e => {
+			if(e.name)
+				this.titleField.value = e.name;
+		});
+		super.addLinkOnSave(entityName, entityId);
+	}
 
 	private openExceptionsWindow() {
 		const o = this.form.value.recurrenceOverrides;
