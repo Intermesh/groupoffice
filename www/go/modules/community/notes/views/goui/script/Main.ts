@@ -12,7 +12,7 @@ import {
 	menucolumn,
 	mstbar,
 	router,
-	searchbtn,
+	searchbtn, selectallcheckboxfield,
 	t,
 	tbar,
 	Toolbar
@@ -50,19 +50,99 @@ export class Main extends MainThreeColumnPanel {
 	}
 
 	protected createWest() {
+
+		this.noteBookGrid = notebookgrid({
+			headers: false,
+			fitParent: true,
+			stateId: "notes-noteBookGrid",
+			cls: "no-row-lines",
+			rowSelectionConfig: {
+				multiSelect: true,
+				listeners: {
+					selectionchange: ({selected}) => {
+
+						const noteBookIds = selected.map((row) => row.record.id),
+							title = selected.map(r => r.record.name);
+
+						this.tblTitle.title = title.join(", ");
+
+						this.noteGrid.store.setFilter("notebook", {
+							noteBookId: noteBookIds
+						});
+
+						void this.noteGrid.store.load();
+
+						this.addButton.disabled = !noteBookIds[0];
+
+						if (client.user.notesSettings.rememberLastItems) {
+							void jmapds("User").update(client.user.id, {
+								notesSettings: {
+									lastNoteBookIds: noteBookIds
+								}
+							})
+						}
+					}
+				}
+			},
+			columns: [
+				checkboxselectcolumn(),
+				column({
+					header: t("Name"),
+					id: "name",
+					sortable: true,
+					resizable: false
+				}),
+
+				menucolumn({
+						menu: menu({
+								listeners: {
+									show: ({target}) => {
+										const record = this.noteBookGrid.store.get(target.dataSet.rowIndex)!;
+
+										target.findChild("edit")!.disabled = record.permissionLevel < AclLevel.MANAGE;
+										target.findChild("delete")!.disabled = !go.Modules.get("community", 'notes').userRights.mayChangeNoteBooks || record.permissionLevel < AclLevel.MANAGE;
+
+									}
+								}
+							},
+							btn({
+								itemId: "edit",
+								icon: "edit",
+								text: t("Edit"),
+								handler: (btn) => {
+									const record = this.noteBookGrid.store.get(btn.parent!.dataSet.rowIndex)!
+
+									const dlg = new NoteBookDialog();
+									void dlg.load(record.id);
+									dlg.show();
+
+								}
+							}),
+
+							btn({
+								itemId: "delete",
+								icon: "delete",
+								text: t("Delete"),
+								handler: (btn) => {
+									const record = this.noteBookGrid.store.get(btn.parent!.dataSet.rowIndex)!
+									void noteBookDS.confirmDestroy([record.id]);
+								}
+							})
+						)
+					}
+				),
+
+
+			]
+		});
+
 		return comp({
 				cls: "scroll",
 				width: 300,
 			},
 			tbar({},
-				checkbox({
-					listeners: {
-						change: ({newValue}) => {
-							const rs = this.noteBookGrid.rowSelection!
-							newValue ? rs.selectAll() : rs.clear();
-						}
-					}
-				}),
+				selectallcheckboxfield({list: this.noteBookGrid}),
+
 				h4(t("Notebooks")),
 				"->",
 				searchbtn({
@@ -86,90 +166,8 @@ export class Main extends MainThreeColumnPanel {
 			),
 			comp({
 				flex: 1
-			}, this.noteBookGrid = notebookgrid({
-				headers: false,
-				fitParent: true,
-				stateId: "notes-noteBookGrid",
-				cls: "no-row-lines",
-				rowSelectionConfig: {
-					multiSelect: true,
-					listeners: {
-						selectionchange: ({selected}) => {
-
-							const noteBookIds = selected.map((row) => row.record.id),
-								title = selected.map(r => r.record.name);
-
-							this.tblTitle.title = title.join(", ");
-
-							this.noteGrid.store.setFilter("notebook", {
-								noteBookId: noteBookIds
-							});
-
-							void this.noteGrid.store.load();
-
-							this.addButton.disabled = !noteBookIds[0];
-
-							if (client.user.notesSettings.rememberLastItems) {
-								void jmapds("User").update(client.user.id, {
-									notesSettings: {
-										lastNoteBookIds: noteBookIds
-									}
-								})
-							}
-						}
-					}
-				},
-				columns: [
-					checkboxselectcolumn(),
-					column({
-						header: t("Name"),
-						id: "name",
-						sortable: true,
-						resizable: false
-					}),
-
-					menucolumn({
-							menu: menu({
-									listeners: {
-										show: ({target}) => {
-											const record = this.noteBookGrid.store.get(target.dataSet.rowIndex)!;
-
-											target.findChild("edit")!.disabled = record.permissionLevel < AclLevel.MANAGE;
-											target.findChild("delete")!.disabled = !go.Modules.get("community", 'notes').userRights.mayChangeNoteBooks || record.permissionLevel < AclLevel.MANAGE;
-
-										}
-									}
-								},
-								btn({
-									itemId: "edit",
-									icon: "edit",
-									text: t("Edit"),
-									handler: (btn) => {
-										const record = this.noteBookGrid.store.get(btn.parent!.dataSet.rowIndex)!
-
-										const dlg = new NoteBookDialog();
-										void dlg.load(record.id);
-										dlg.show();
-
-									}
-								}),
-
-								btn({
-									itemId: "delete",
-									icon: "delete",
-									text: t("Delete"),
-									handler: (btn) => {
-										const record = this.noteBookGrid.store.get(btn.parent!.dataSet.rowIndex)!
-										void noteBookDS.confirmDestroy([record.id]);
-									}
-								})
-							)
-						}
-					),
-
-
-				]
-			})),
+			}, this.noteBookGrid
+			),
 			filterpanel({
 				flex: 1,
 				store: this.noteGrid.store,
