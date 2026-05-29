@@ -48,9 +48,9 @@ go.Modules = (function () {
 			}
 
 			if (config.mainPanel) {
-				go.Router.add(new RegExp("^" + name + "$"), function () {					
+				go.Router.add(new RegExp("^" + name + "$"), function () {
 					var pnl = GO.mainLayout.openModule(name);
-					
+
 					if(pnl.routeDefault) {
 						pnl.routeDefault();
 					}
