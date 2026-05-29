@@ -53,7 +53,8 @@ export class CommentEditor extends Component {
 									entity: "User",
 									text: text
 								},
-								limit: 10
+								limit: 10,
+								sort: [{property: "description"}]
 							});
 							const get = await principalDS.get(r.ids);
 							return get.list.map(p => {
