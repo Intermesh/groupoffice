@@ -27,6 +27,8 @@ class Preferences extends Property
 
 	/** @var bool Show birthdays on the calendar */
 	public bool $birthdaysAreVisible = false;
+
+	public bool $multiLine = false;
 	/** @var bool Show birthdays on the calendar */
 	public bool $tasksAreVisible = false;
 	/** @var bool Show birthdays on the calendar */

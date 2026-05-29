@@ -51,6 +51,7 @@ export class PreferencesPanel extends Component {
 					checkbox({name:'showWeekNumbers', label:t('Show week numbers in calendar')}),
 					checkbox({name:'showTooltips', label:t('Show pop-up info when hovering over appointments')}),
 					checkbox({name:'showDeclined', label: t('Show events that you have declined')}),
+					checkbox({name:'multiLine', label: t('Show multiline event blocks')+' (beta)'}),
 					select({name:'defaultCalendarId', label: t('Default calendar'), store: this.calendarStore, valueField: 'id',
 						hint: t('Start with this calendar selected')}),
 					select({name:'personalCalendarId', label: t('Personal calendar'), store: this.personalCalendarStore, valueField: 'id',

@@ -1,5 +1,5 @@
 import {CalendarView} from "./CalendarView.js";
-import {ComponentEventMap, DateInterval, DateTime, ObservableListenerOpts} from "@intermesh/goui";
+import {Component, ComponentEventMap, DateInterval, DateTime, ObservableListenerOpts} from "@intermesh/goui";
 import {E} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {client} from "@intermesh/groupoffice-core";
@@ -238,9 +238,8 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 	private updateHasMore() {
 		// height of the week row
 		const height = (this.el.clientHeight - this.el.firstElementChild!.clientHeight) / this.weekRows.length;
-		// how many event fit in the week row (todo: rem to pix != /10)
-		const fit = Math.floor((height/10) / this.ROWHEIGHT);
-
+		// how many event fit in the week row
+		const fit = Math.floor(((Component.pxToRem(height)/10) / this.ROWHEIGHT) - .4);
 		const ols = this.el.getElementsByTagName('ol');
 		for (let i = 0; i < ols.length; i++) {
 			const lis = ols[i].getElementsByTagName('li');

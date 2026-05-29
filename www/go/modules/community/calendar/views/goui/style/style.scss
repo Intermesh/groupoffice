@@ -8,6 +8,17 @@
 }
 
 %event {
+	.multiline & {
+		font-size: .9em;
+		height: dp(40);
+		> em { overflow: visible;
+			line-height: .9em;
+			max-height: dp(38);
+			font-weight: 500;
+			letter-spacing: -0.05em;
+			white-space: normal;
+		}
+	}
 	position: absolute;
 	cursor: pointer;
 	word-wrap: break-word;
