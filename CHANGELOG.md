@@ -9,7 +9,8 @@
 - Support: Fixed sorting on customer
 - Core: Title texts can be copy pasted
 - Notes / Calendar / Projects3: Collapsible sidebar
- 
+- Core: In comments sort mention results and show directly when @ is pressed. Escape cancels popup properly now.
+- Finance: Put invoice attachments before template attachments
 
 21-05-2026: 26.0.31
 - Support: Migrate categories to support module
