@@ -69,7 +69,7 @@ class Client extends Property
 	 *
 	 * @var int
 	 */
-	public int $userId;
+	public ?int $userId;
 
 	/**
 	 * Used for ActiveSync. When true the device will resynchronize all data
