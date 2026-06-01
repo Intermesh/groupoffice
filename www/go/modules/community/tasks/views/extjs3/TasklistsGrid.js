@@ -20,6 +20,13 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 	},
 
 	initComponent: function () {
+		let canEditTaskLists = false;
+		if(this.support) {
+			const modRights = go.Modules.get("business", "support").userRights;
+			canEditTaskLists =  modRights.mayChangeTasklists;
+		} else {
+			canEditTaskLists =  go.Modules.get("community", 'tasks') && go.Modules.get("community", 'tasks').userRights.mayChangeTasklists;
+		}
 
 		this.view = new go.grid.GroupingView({
 			showGroupName: false,
@@ -54,6 +61,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 				{
 					itemId: "edit",
 					iconCls: 'ic-edit',
+					hidden: !canEditTaskLists,
 					text: t("Edit")+'…',
 					handler: function() {
 						var dlg = new go.modules.community.tasks.TasklistDialog({entityStore: this.support ? "SupportList" : "TaskList"});
@@ -64,6 +72,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 					itemId: "delete",
 					iconCls: 'ic-delete',
 					text: t("Delete")+'…',
+					hidden: !canEditTaskLists,
 					handler: function() {
 						Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
 							if (btn != "yes") {
