@@ -179,7 +179,7 @@ return array (
   'The height of a single day' => 'De hoogte van één dag',
   'Extra small' => 'Extra klein',
   'Small' => 'Klein',
-  'Regular' => 'Regelmatig',
+  'Regular' => 'Normaal',
   'Medium' => 'Middel',
   'Large' => 'Groot',
   'Enable multiple time zone support' => 'Ondersteuning voor meerdere tijdzones inschakelen',
