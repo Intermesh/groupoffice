@@ -259,6 +259,8 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 			this.privateComments.load(this.data.id);
 		}
 
+
+
 		go.modules.community.tasks.TaskDetail.superclass.onLoad.call(this);
 	},
 

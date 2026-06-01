@@ -67,17 +67,13 @@ export class LocationField extends AutocompleteField {
 
 	}
 
-	protected createInput() : HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement{
-		const control = document.createElement("textarea");
+	protected createControl() : HTMLElement {
+		const control = this.createInput("textarea") as HTMLTextAreaElement
 
 		// select the text so users can type right away
 		control.addEventListener("focus", function() {
-			this.select();
+			control.select();
 		})
-
-		control.on("change", ()=> {
-			this.fireChange();
-		});
 
 		control.rows = 1;
 		control.style.overflowY = 'hidden';
@@ -89,11 +85,7 @@ export class LocationField extends AutocompleteField {
 		this.on("show", ()=>{this.resize(control);});
 		this.on('setvalue', ()=>{setTimeout(() => this.resize(control));});
 
-
-		if (this.invalidMsg) {
-			this.applyInvalidMsg();
-		}
-		return control;
+		return control
 	}
 
 	public pickerRecordToValue (field: this, record:any) : any {

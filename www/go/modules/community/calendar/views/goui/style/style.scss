@@ -30,6 +30,7 @@
 	text-align: left;
 	user-select: none;
 	> em, > span {
+		pointer-events: none;
 		color: $colorText;
 	}
 	> em {
