@@ -22,7 +22,6 @@ define("GO_NO_SESSION", true);
 //Create the app with the database connection
 App::get()->setAuthState(new State());
 
-
 if(Request::get()->getMethod() == "OPTIONS") {
 	Response::get()
 		->sendHeaders()
@@ -38,12 +37,6 @@ if(!App::get()->getAuthState()->isAuthenticated()) {
 	exit();
 }
 
-
-
-//for servers with session.autostart
-@session_write_close();
-
-
 //Check availability
 if(!go()->getConfig()['sseEnabled']) {
 	// Service Unavailable
@@ -54,11 +47,14 @@ if(!go()->getConfig()['sseEnabled']) {
 	exit();
 }
 
+//for servers with session.autostart
+@session_write_close();
 
 ini_set('output_buffering', 'off');
 ini_set('zlib.output_compression', 0);
 ini_set('implicit_flush', 1);
 ini_set("max_execution_time", PushDispatcher::MAX_LIFE_TIME + 30);
+@ob_end_flush();
 
 Response::get()
 	->setHeader("Cache-Control", "no-cache")
@@ -68,9 +64,11 @@ Response::get()
 	->setHeader("X-Accel-Buffering", "no")
 	->output();
 
+
 try {
 // Client may specify 'types' and a 'ping' interval
-	(new PushDispatcher(!empty($_GET['types']) ? explode(',', $_GET['types']) : []))->start($_GET['ping'] ?? 10);
+	(new PushDispatcher(!empty($_GET['types']) ? explode(',', $_GET['types']) : []))
+		->start();
 } catch(Throwable $e) {
 	echo "event: exception\n";
 	echo 'data: ' . get_class($e). "\n\n";

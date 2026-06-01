@@ -1,3 +1,6 @@
+- Core: SSE uses apcu if available to check changes every second. When an entity is modified a state counter is 
+  incremented and SSE will check if the change was relevant for the user via DB queries. This keeps to amount of DB 
+  queries for SSE to a minimum.
 - Core: Fixed summing up values in each loops. Also strip newline straight after template tag
 - Calendar: Event category selection dropdown will show category colors.
 - Core: OTP field will show numeric keyboard on mobile and filter pasted codes

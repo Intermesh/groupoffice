@@ -33,7 +33,17 @@ class PushDispatcher
 	/**
 	 * Interval in seconds between every check for changes to push
 	 */
-	const CHECK_INTERVAL = 15;
+	private int $CHECK_INTERVAL = 15;
+
+
+	/**
+	 * SSE uses apcu if available to check changes every second. When an entity is modified a state counter is
+	 * incremented and SSE will check if the change was relevant for the user via DB queries. This keeps to amount of
+	 * DB queries for SSE to a minimum
+	 *
+	 * @var bool
+	 */
+	private bool $apcuEnabled = false;
 
 	/**
 	 * @var EntityType[]
@@ -42,17 +52,22 @@ class PushDispatcher
 
 	public function __construct(array $types = [])
 	{
-		//Hard code debug to false to prevent spamming of log.
-//		go()->getDebugger()->enabled = false;
+		if(function_exists("apcu_fetch")) {
+			$this->apcuEnabled = true;
+			$this->CHECK_INTERVAL = 1;
+		}
+
+		// disable default disconnect checks
+		ignore_user_abort(true);
 
 		$query = new Query();
 
-		// Search and user get lots of updates. We only update them when needed,
+		// LogEntry, Search and user get lots of updates. We only update them when needed,
 		// On large systems getting the user updates caused very high load becuase it constantly changes.
 		// this lead to lots of User/changes calls per second while we almost never need the user entity to be up to date.
 		// only your own user when checking your account settings.
 		$types = array_filter($types, function($name) {
-			return $name != "User" && $name != "Search";
+			return $name != "User" && $name != "Search" && $name != 'LogEntry';
 		});
 
 		if(!empty($types)) {
@@ -84,18 +99,73 @@ class PushDispatcher
 		flush();
 	}
 
+	private function shouldCheckDB(string $name): bool
+	{
+		if(!$this->apcuEnabled) {
+			return true;
+		}
+
+		$current = $this->getStateCounter($name);
+
+		$check =  $current !== $this->counters[$name];
+
+		$this->counters[$name] = $current;
+
+		return $check;
+	}
+
 	private function checkChanges(): array
 	{
+		$closeDb = false;
 		$state = [];
 		foreach ($this->map as $name => $entityType) {
-			/** @var Entity $cls */
-			$entityType->clearCache();
-			$cls = $entityType->getClassName();
-			$state[$name] = $cls::getState();
+			if(!isset($this->counters[$name])) {
+				$this->counters[$name] = 0;
+			}
+
+			if($this->shouldCheckDB($name)) {
+				/** @var Entity $cls */
+				$entityType->clearCache();
+				$cls = $entityType->getClassName();
+				$state[$name] = $cls::getState();
+
+				$closeDb = true;
+			}
+		}
+
+		if($closeDb) {
+			//disconnect and free up memory
+			go()->getDbConnection()->disconnect();
+
+			Table::destroyInstances();
+			gc_collect_cycles();
 		}
 
 		return $state;
 	}
+
+	private function getStateCounter(string $name) : int {
+		$cnt =  apcu_fetch('state_sse_'. $name);
+		if($cnt === false) {
+			return self::incStateCounter($name);
+		}
+
+		return $cnt;
+	}
+
+	/**
+	 * Will cause all SSE connections to query the state from DB
+	 *
+	 * @param string $name
+	 * @return void
+	 */
+	public static function incStateCounter(string $name) : int {
+//		go()->debug("PushDispatcher::incStateCounter($name)");
+		return apcu_inc('state_sse_'. $name);
+	}
+
+
+	private array $counters = [];
 
 
 	private function diff(array $old, array $new): array
@@ -111,50 +181,44 @@ class PushDispatcher
 		return $diff;
 	}
 
-	public function start(int $ping = 10): void
+	public function start(int $ping = 5): void
 	{
+		// because there are always many sse requests simultaneously we must keep memory as low as possible.
+		go()->getCache()->disableMemory();
+
 		$sleeping = 0;
 		$changes = $this->checkChanges();
 		// send states on start so client can compare immediately
 		$this->sendMessage('state', $changes);
-		for($i = 0; $i < self::MAX_LIFE_TIME; $i += self::CHECK_INTERVAL) {
-			// break the loop if the client aborted the connection (closed the page)
-			if(connection_aborted()) {
-				go()->debug("SSE connection aborted by client");
-				break;
-			}
+		for($i = 0; $i < self::MAX_LIFE_TIME; $i += $this->CHECK_INTERVAL) {
 
-			// sendMessage('test', [$sleeping, $ping]);
 			if ($sleeping >= $ping) {
 				$sleeping = 0;
 				$this->sendMessage('ping', []);
 			}
 
+			// break the loop if the client aborted the connection (closed the page)
+			if(connection_aborted()) {
+				go()->debug("PushDispatcher::SSE connection aborted by client");
+				break;
+			}
+
 			$new = $this->checkChanges();
-//			go()->debug($new);
+
 			$diff = $this->diff($changes, $new);
 			if(!empty($diff)) {
 				$sleeping = 0;
 				$this->sendMessage('state', $diff);
-				$changes = $new;
+				$changes = array_merge($changes, $new);
 			}
 
 			self::fireEvent(self::EVENT_INTERVAL, $this);
 
-			//disconnect and free up memory
-			go()->getDebugger()->debug("Closing DB connection: " . go()->getDbConnection()->getId());
-			go()->getDbConnection()->disconnect();
+//			go()->debug("SSE Memory usage: " . memory_get_usage());
 
-			// because there are always many sse requests simultaneously we must keep memory as low as possible.
-			go()->getCache()->disableMemory();
-			Table::destroyInstances();
-			gc_collect_cycles();
+			$sleeping += $this->CHECK_INTERVAL;
 
-			go()->debug("SSE Memory usage: " . memory_get_usage());
-
-			$sleeping += self::CHECK_INTERVAL;
-
-			sleep(self::CHECK_INTERVAL);
+			sleep($this->CHECK_INTERVAL);
 		}
 	}
 }
