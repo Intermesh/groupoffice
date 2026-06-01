@@ -33,7 +33,7 @@ class PushDispatcher
 	/**
 	 * Interval in seconds between every check for changes to push
 	 */
-	private int $CHECK_INTERVAL = 15;
+	private int $CHECK_INTERVAL = 20;
 
 
 	/**
@@ -158,7 +158,11 @@ class PushDispatcher
 	 */
 	public static function incStateCounter(string $name) : int {
 //		go()->debug("PushDispatcher::incStateCounter($name)");
-		return apcu_inc('state_sse_'. $name);
+		if(function_exists("apcu_inc")) {
+			return apcu_inc('state_sse_' . $name);
+		}else {
+			return 0;
+		}
 	}
 
 
@@ -211,7 +215,7 @@ class PushDispatcher
 
 			self::fireEvent(self::EVENT_INTERVAL, $this);
 
-			go()->debug("SSE Memory usage: " . memory_get_usage());
+//			go()->debug("SSE Memory usage: " . memory_get_usage());
 
 			$sleeping += $this->CHECK_INTERVAL;
 
