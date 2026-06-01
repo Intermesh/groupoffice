@@ -17,6 +17,7 @@ use go\core\model\Client;
 use go\core\model\Module;
 use go\core\jmap;
 use go\core\model\Acl;
+use go\core\model\PushDispatcher;
 use go\core\model\Search;
 use go\core\orm\exception\SaveException;
 use go\core\util\Lock;
@@ -310,32 +311,43 @@ class EntityType implements ArrayableInterface {
 		return $i;
 	}
 
+
+	/**
+	 * Keep this in a private var for SSE.
+	 * We disable the memory in the go()->getCache() to keep memory low. But we do need tne EntityType instances to
+	 * remain singletons.
+	 * @var array|null
+	 */
+	private static array|null $cache = null;
+
 	/**
 	 * @return array
 	 */
 	private static function getCache() :array {
 
-		$cache = go()->getCache()->get('entity-types');
+		if(self::$cache === null) {
+			self::$cache = go()->getCache()->get('entity-types');
+		}
 
-		if($cache === null) {
-			$cache= [
+		if(self::$cache === null) {
+			self::$cache = [
 				'id' => [],
 				'name' => [],
 				'models' => self::findFromDb()
 			];
 
-			for($i = 0, $c = count($cache['models']); $i < $c; $i++) {
+			for($i = 0, $c = count(self::$cache['models']); $i < $c; $i++) {
 				/** @var self $t */
-				$t = $cache['models'][$i];
-				$cache['id'][$t->getId()] = $i;
-				$cache['name'][$t->getName()] = $i;
+				$t = self::$cache['models'][$i];
+				self::$cache['id'][$t->getId()] = $i;
+				self::$cache['name'][$t->getName()] = $i;
 			}
 			if(!go()->getInstaller()->isInProgress()) {
-				go()->getCache()->set('entity-types', $cache);
+				go()->getCache()->set('entity-types', self::$cache);
 			}
 		}
 
-		return $cache;
+		return self::$cache;
 	}
 
 
@@ -580,20 +592,26 @@ class EntityType implements ArrayableInterface {
 		}
 
 		go()->getDbConnection()->beginTransaction();
-		self::pushRecords();
+		$changedEntities = self::pushRecords();
 		go()->getDbConnection()->commit();
+
+		foreach($changedEntities as $changedEntity) {
+			PushDispatcher::incStateCounter($changedEntity);
+		}
 
 		if(isset($l)) {
 			$l->unlock();
 		}
 	}
 
-	private static function pushRecords(): void
+	private static function pushRecords(): array
 	{
 
 		if(empty(self::$changes)) {
-			return;
+			return [];
 		}
+
+		$changedEntities = [];
 		$now = new DateTime();
 		$allChanges = [];
 		foreach(self::$changes as $entityTypeId => $changes) {
@@ -601,6 +619,8 @@ class EntityType implements ArrayableInterface {
 				continue;
 			}
 			$type = self::findById($entityTypeId);
+
+			$changedEntities[] =$type->getName();
 
 			$modSeq = $type->nextModSeq();
 
@@ -624,6 +644,8 @@ class EntityType implements ArrayableInterface {
 		}
 
 		self::$changes = [];
+
+		return $changedEntities;
 	}
 
 	private static function splitRecords(array $allChanges) : array {
