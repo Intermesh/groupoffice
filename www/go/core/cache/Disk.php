@@ -70,6 +70,10 @@ class Disk implements CacheInterface {
 		}
 	}
 
+	public function freeMemory(array $preserveKeys = ['entity-types']):void {
+		$this->cache = array_filter($this->cache, function($key) use ($preserveKeys) {return in_array($key, $preserveKeys);});
+	}
+
 	/**
 	 * Get a value from the cache
 	 *

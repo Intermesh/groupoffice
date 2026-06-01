@@ -64,5 +64,16 @@ interface CacheInterface {
 	public static function isSupported(): bool;
 
 
+	/**
+	 * Stop using an internal variable to keep the results cached in memory
+	 * @return void
+	 */
 	public function disableMemory():void;
+
+	/**
+	 * Remove all local memory except the given keys
+	 * @param array $preserveKeys
+	 * @return void
+	 */
+	public function freeMemory(array $preserveKeys = []):void;
 }

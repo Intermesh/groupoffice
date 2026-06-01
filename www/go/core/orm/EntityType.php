@@ -312,42 +312,40 @@ class EntityType implements ArrayableInterface {
 	}
 
 
-	/**
-	 * Keep this in a private var for SSE.
-	 * We disable the memory in the go()->getCache() to keep memory low. But we do need tne EntityType instances to
-	 * remain singletons.
-	 * @var array|null
-	 */
-	private static array|null $cache = null;
+//	/**
+//	 * Keep this in a private var for SSE.
+//	 * We disable the memory in the go()->getCache() to keep memory low. But we do need tne EntityType instances to
+//	 * remain singletons.
+//	 * @var array|null
+//	 */
+//	private static array|null $cache = null;
 
 	/**
 	 * @return array
 	 */
 	private static function getCache() :array {
 
-		if(self::$cache === null) {
-			self::$cache = go()->getCache()->get('entity-types');
-		}
+		$cache = go()->getCache()->get('entity-types');
 
-		if(self::$cache === null) {
-			self::$cache = [
+		if($cache === null) {
+			$cache = [
 				'id' => [],
 				'name' => [],
 				'models' => self::findFromDb()
 			];
 
-			for($i = 0, $c = count(self::$cache['models']); $i < $c; $i++) {
+			for($i = 0, $c = count($cache['models']); $i < $c; $i++) {
 				/** @var self $t */
-				$t = self::$cache['models'][$i];
-				self::$cache['id'][$t->getId()] = $i;
-				self::$cache['name'][$t->getName()] = $i;
+				$t = $cache['models'][$i];
+				$cache['id'][$t->getId()] = $i;
+				$cache['name'][$t->getName()] = $i;
 			}
 			if(!go()->getInstaller()->isInProgress()) {
-				go()->getCache()->set('entity-types', self::$cache);
+				go()->getCache()->set('entity-types', $cache);
 			}
 		}
 
-		return self::$cache;
+		return $cache;
 	}
 
 

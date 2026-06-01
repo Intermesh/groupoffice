@@ -46,11 +46,11 @@ class PushDispatcher
 	private bool $apcuEnabled = false;
 
 	/**
-	 * @var EntityType[]
+	 * @var string[]
 	 */
-	private array $map = [];
+	private array $entities = [];
 
-	public function __construct(array $types = [])
+	public function __construct(array $entities = [])
 	{
 		if(function_exists("apcu_fetch")) {
 			$this->apcuEnabled = true;
@@ -60,26 +60,15 @@ class PushDispatcher
 		// disable default disconnect checks
 		ignore_user_abort(true);
 
-		$query = new Query();
 
 		// LogEntry, Search and user get lots of updates. We only update them when needed,
 		// On large systems getting the user updates caused very high load becuase it constantly changes.
 		// this lead to lots of User/changes calls per second while we almost never need the user entity to be up to date.
 		// only your own user when checking your account settings.
-		$types = array_filter($types, function($name) {
+		$this->entities = array_filter($entities, function($name) {
 			return $name != "User" && $name != "Search" && $name != 'LogEntry';
 		});
 
-		if(!empty($types)) {
-			$query->where('e.clientName', 'IN', $types);
-		}
-
-		$entities = EntityType::findAll($query);
-		foreach($entities as $e) {
-			if(is_a($e->getClassName(), Entity::class, true)) {
-				$this->map[$e->getName()] = $e;
-			}
-		}
 	}
 
 	/**
@@ -118,12 +107,17 @@ class PushDispatcher
 	{
 		$closeDb = false;
 		$state = [];
-		foreach ($this->map as $name => $entityType) {
+		foreach ($this->entities as $name) {
+
+			$entityType = EntityType::findByName($name);
+
 			if(!isset($this->counters[$name])) {
 				$this->counters[$name] = 0;
 			}
 
 			if($this->shouldCheckDB($name)) {
+
+				go()->debug('PushDispatcher::checkChanges() on DB for '. $name);
 				/** @var Entity $cls */
 				$entityType->clearCache();
 				$cls = $entityType->getClassName();
@@ -136,6 +130,9 @@ class PushDispatcher
 		if($closeDb) {
 			//disconnect and free up memory
 			go()->getDbConnection()->disconnect();
+
+			// We want to preserve the EntityType instances otherwise states won't be correctly checked
+			go()->getCache()->freeMemory(['entity-types']);
 
 			Table::destroyInstances();
 			gc_collect_cycles();
@@ -184,7 +181,7 @@ class PushDispatcher
 	public function start(int $ping = 5): void
 	{
 		// because there are always many sse requests simultaneously we must keep memory as low as possible.
-		go()->getCache()->disableMemory();
+		//go()->getCache()->disableMemory();
 
 		$sleeping = 0;
 		$changes = $this->checkChanges();
@@ -214,7 +211,7 @@ class PushDispatcher
 
 			self::fireEvent(self::EVENT_INTERVAL, $this);
 
-//			go()->debug("SSE Memory usage: " . memory_get_usage());
+			go()->debug("SSE Memory usage: " . memory_get_usage());
 
 			$sleeping += $this->CHECK_INTERVAL;
 

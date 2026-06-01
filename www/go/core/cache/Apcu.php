@@ -34,6 +34,10 @@ class Apcu implements CacheInterface {
 		$this->keepInMemory = false;
 		$this->getDiskCache()->disableMemory();
 	}
+
+	public function freeMemory(array $preserveKeys = ['entity-types']):void {
+		$this->cache = array_filter($this->cache, function($key) use ($preserveKeys) {return in_array($key, $preserveKeys);}, ARRAY_FILTER_USE_KEY);
+	}
 	
 	public function __construct() {
 		$this->prefix = go()->getConfig()['db_name'];
@@ -48,6 +52,7 @@ class Apcu implements CacheInterface {
 	{
 		if(!isset($this->disk)) {
 			$this->disk = new Disk();
+			$this->disk->disableMemory();
 		}
 
 		return $this->disk;

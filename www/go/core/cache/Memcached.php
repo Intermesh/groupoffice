@@ -42,6 +42,10 @@ class Memcached implements CacheInterface {
 		$this->cache = [];
 		$this->keepInMemory = false;
 	}
+
+	public function freeMemory(array $preserveKeys = ['entity-types']):void {
+		$this->cache = array_filter($this->cache, function($key) use ($preserveKeys) {return in_array($key, $preserveKeys);});
+	}
 	
 	public function __construct() {
 		$this->prefix = go()->getConfig()['db_name'];
