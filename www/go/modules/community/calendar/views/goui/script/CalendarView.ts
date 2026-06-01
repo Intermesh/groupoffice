@@ -149,22 +149,23 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 		const e = item.data;
 
 		if(!div) { // default
-			const time = E('span');
+			const timeAndIcons = E('span');
 			if(!e.showWithoutTime) {
-				time.append(Format.time(item.start));
+				timeAndIcons.append(...item.categoryDots,
+					...(withIcons ? item.icons : []),
+					Format.time(item.start));
 				if(item.dayLength > 1) {
-					time.append(' - ',Format.time(item.end));
+					timeAndIcons.append(' - ',Format.time(item.end),);
 				}
 			}
 			div = E('div',
 				E('em', item.title || '('+t(item.data.privacy!='public' ? 'Private' :'Nameless')+')',
 					...this.fmLocation(item.data.location)
 				),
-				...item.categoryDots,
-				...(withIcons ? item.icons : [])
+
 			)
-			if(!e.showWithoutTime) {
-				div.append(time);
+			if(!e.showWithoutTime || item.icons.length || item.categoryDots.length) {
+				div.prepend(timeAndIcons);
 			}
 		}
 		if(item.key) {
