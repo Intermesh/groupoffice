@@ -125,7 +125,7 @@ export class WeekView extends CalendarView {
 				ev.end.setHours(0, till);
 				const firstDiv = Object.values(ev.divs)[0];
 				if(firstDiv)
-					firstDiv.lastElementChild!.textContent = ev.start.format(Format.timeFormat) + ' - ' + ev.end.format(Format.timeFormat);
+					firstDiv.firstElementChild!.lastElementChild!.textContent = ev.start.format(Format.timeFormat) + ' - ' + ev.end.format(Format.timeFormat);
 				changed = true;
 				this.updateItems(ev.start.clone());
 			}
@@ -181,9 +181,9 @@ export class WeekView extends CalendarView {
 				action = resize;
 				this.el.cls('+resizing');
 				// 4 pixels for the resize handle on top and bottom of event
-				if (e.offsetY <= 4) {
+				if (e.offsetY < 4) {
 					anchor = ev.end.getMinuteOfDay();
-				} else if (e.offsetY >= event.offsetHeight - 4) {
+				} else if (e.offsetY > event.offsetHeight - 4) {
 					anchor = ev.start.getMinuteOfDay();
 					offset -= event.offsetHeight;
 				} else {
