@@ -15,6 +15,8 @@
 - Core: In comments sort mention results and show directly when @ is pressed. Escape cancels popup properly now.
 - Finance: Put invoice attachments before template attachments
 - Files: hide portlets if user has no main access
+- Tasks / Support: hide delete button if permissions do not allow deleting a task
+- Tasks / Support: hide tasklist context menu items if user has no manage task lists permissions
 
 21-05-2026: 26.0.31
 - Support: Migrate categories to support module
