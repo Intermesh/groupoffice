@@ -9,19 +9,73 @@ use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\util\DateTime;
 
+/**
+ * Client model
+ *
+ * The client is the device / browser the user uses to interact with the GroupOffice JMAP API.
+ */
 class Client extends Property
 {
 	public ?int $id;
-	public $deviceId = '-';
-	public $platform;
-	public $name;
-	public $version;
-	public $ip;
-	public $lastSeen;
-	public $createdAt;
-	public $status;
-	public $userId;
-	public $needResync;
+	public string $deviceId = '-';
+	/**
+	 * Device OS.
+	 *
+	 * eg. Macintosh, iPhone, iPad Windows, Android, Linux
+	 * @var string
+	 */
+	public string $platform;
+
+	/**
+	 * Browser or protocol name
+	 *
+	 * @var string
+	 */
+	public string $name;
+
+	/**
+	 * Version info
+	 *
+	 * Typically the user agent string
+	 * @var string
+	 */
+	public string $version;
+
+	/**
+	 * Ip Addresss
+	 * @var string
+	 */
+	public string $ip;
+	public ?\DateTimeInterface $lastSeen;
+	public ?\DateTimeInterface $createdAt;
+
+
+
+	const STATUS_NEW = 'new';
+	const STATUS_ALLOWED = 'allowed';
+	const STATUS_DENIED = 'denied';
+
+	/**
+	 * Client status
+	 *
+	 * can be 'new', 'allowed' or 'denied'
+	 *
+	 * @var string
+	 */
+	public string $status = self::STATUS_NEW;
+
+	/**
+	 * Owner of the client
+	 *
+	 * @var int
+	 */
+	public int $userId;
+
+	/**
+	 * Used for ActiveSync. When true the device will resynchronize all data
+	 * @var bool
+	 */
+	public bool $needResync = false;
 
 	protected static function defineMapping(): Mapping
 	{
@@ -68,8 +122,8 @@ class Client extends Property
 
 			}else if(Environment::get()->isCli()) {
 				$this->version = 'CLI';
-                $this->platform = 'CLI';
-                $this->name = 'CLI';
+				$this->platform = 'CLI';
+				$this->name = 'CLI';
 			}
 		}
 	}
