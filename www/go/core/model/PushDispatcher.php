@@ -142,7 +142,7 @@ class PushDispatcher
 	}
 
 	private function getStateCounter(string $name) : int {
-		$cnt =  apcu_fetch('state_sse_'. $name);
+		$cnt =  apcu_fetch(go()->getConfig()['db_name'] . '_state_sse_'. $name);
 		if($cnt === false) {
 			return self::incStateCounter($name);
 		}
@@ -159,7 +159,7 @@ class PushDispatcher
 	public static function incStateCounter(string $name) : int {
 //		go()->debug("PushDispatcher::incStateCounter($name)");
 		if(function_exists("apcu_inc")) {
-			return apcu_inc('state_sse_' . $name);
+			return apcu_inc(go()->getConfig()['db_name'] . '_state_sse_' . $name);
 		}else {
 			return 0;
 		}
