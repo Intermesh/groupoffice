@@ -47,7 +47,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			this._permissionDelegated = this.messagesGrid.store.reader.jsonData.permission_level == GO.email.permissionLevels.delegated;
 
 			this.permissionLevel = this.messagesGrid.store.reader.jsonData.permission_level;
-			
+
 			this.messagesGrid.deleteButton.setDisabled(this.readOnly);
 		}, this);
 		this.messagesStore.on('exception',
@@ -138,8 +138,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		//don't confirm delete to trashfolder
 		this.messagesGrid.deleteConfig.noConfirmation=!this.messagesGrid.store.reader.jsonData.deleteConfirm;
 	}, this);
-	
-	this.messagesGrid.store.on("beforeload", function(store) {	
+
+	this.messagesGrid.store.on("beforeload", function(store) {
 		this.getView().holdPosition = true;
 		if(store.baseParams['search'] != undefined) {
 			GO.email.search_query = store.baseParams['search'];
@@ -167,7 +167,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			if(GO.email.search_in) {
 				store.baseParams.searchIn = GO.email.search_in;
 			}
-			
+
 		} else if(!this.searchDialog.hasSearch && store.baseParams['query']) {
 			this.resetSearch();
 			delete(store.baseParams['query']);
@@ -310,6 +310,9 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		if(Ext.isEmpty(mbname)) {
 			mbname = 'INBOX';
 		}
+
+		go.Router.goto("email/" + node.attributes.account_id + "/" + mbname + "/" + usage);
+
 		this.setAccount(
 			node.attributes.account_id,
 			mbname,
@@ -480,7 +483,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		titlebar: false,
 		attachmentContextMenu: new GO.email.AttachmentContextMenu()
 	});
-	
+
 	this.westPanel = new Ext.Panel({
 		region:"west",
 		layout:'responsive',
@@ -491,7 +494,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		minWidth: dp(600),
 		narrowMinWidth: dp(300),
 		stateId: 'go-email-west',
-		items: [			
+		items: [
 			this.leftMessagesGrid,
 			this.treePanel
 		]
@@ -501,7 +504,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		this.westPanel,
 		this.messagePanel
 	];
-	
+
 
 	this.messagePanel.on('load', function(options, success, response, data, password){
 		if(!success)
@@ -577,7 +580,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	GO.email.searchSender = GO.email.searchSender.createDelegate(this);
 
 	GO.email.EmailClient.superclass.initComponent.call(this);
-	
+
 	GO.email.emailClient = this;
 	},
 
@@ -705,7 +708,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		}
 
 		this.messagesGrid.expand();
-		
+
 		this.account_id = account_id;
 		this.mailbox = mailbox;
 
@@ -959,6 +962,12 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	}
 });
 
+go.Router.add(/email\/([0-9]+)\/([^\/]+)\/?([a-z0-9-_]*)?/i, function (accountId, mailbox, usage) {
+	const ep = GO.mainLayout.openModule('email');
+	ep.account_id = parseInt(accountId, 10);
+	ep.mailbox = mailbox;
+});
+
 GO.mainLayout.onReady(function(){
 
 	let countEmailShown;
@@ -1030,9 +1039,9 @@ GO.email.aliasesStore = new GO.data.JsonStore({
 
 // Save all attachments of the given email panel to a selected GO folder
 GO.email.saveAllAttachments = function(panel){
-	
+
 	if(!this.selectFolderDialog){
-		
+
 		this.selectFolderDialog = new GO.files.SelectFolderDialog({
 			handler:function(fs, path, selectedFolderNode){
 				GO.request({
@@ -1262,7 +1271,7 @@ GO.email.unlink = function(linkId) {
 
 /**
  * Function that will open an email composer. If a composer is already open it will create a new one. Otherwise it will reuse an already created one.
- * 
+ *
  * {
  *	values: {to: "merijn@intermesh.nl"}
  * }
@@ -1364,6 +1373,9 @@ go.Modules.register("legacy", 'email', {
 
 	Ext.getBody().on('click', checkForMailto);
 })();
+
+
+
 
 GO.newMenuItems.push({
 	itemId : 'email-files',
