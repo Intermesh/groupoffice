@@ -1,3 +1,4 @@
+02-06-2026: 25.0.106
 - Files: do not display portlets if a user has no main_access permission (cherry-pick from 26.0.x)
 
 21-05-2026: 25.0.105
