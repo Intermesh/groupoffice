@@ -1,3 +1,5 @@
+- Core: Prefix SSE state counter key with database name so it won't conflict with multiple instances
+
 01-06-2026: 26.0.32
 - Core: SSE uses apcu if available to check changes every second. When an entity is modified a state counter is 
   incremented and SSE will check if the change was relevant for the user via DB queries. This keeps to amount of DB 
