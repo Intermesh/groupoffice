@@ -45,10 +45,14 @@ try {
 	]);
 
 } catch (Exception $e) {
+
+	go()->getDebugger()->enable(true);
+	\go\core\ErrorHandler::logException($e, "PDF Editor Upload error");
+
 	http_response_code(500);
+
 	echo json_encode([
 		'success' => false,
-		'error' => 'Exception: ' . $e->getMessage(),
-		'trace' => $e->getTraceAsString()
+		'error' => get_class($e)
 	]);
 }
