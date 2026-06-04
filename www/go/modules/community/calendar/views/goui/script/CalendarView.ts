@@ -127,7 +127,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 		this.adapter = adapter;
 
 		if(client.user.calendarPreferences.multiLine) {
-			this.ROWHEIGHT = 4.2;
+			this.ROWHEIGHT = 3.8;
 		}
 	}
 
@@ -149,15 +149,15 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 		const e = item.data;
 
 		if(!div) { // default
-			const timeAndIcons = E('span');
+			const timeAndIcons = E('span',
+				...item.categoryDots,
+				...(withIcons ? item.icons : []));
 			if(!e.showWithoutTime) {
 				const time = E('span', Format.time(item.start));
 				if(item.dayLength > 1) {
 					time.append(' - ',Format.time(item.end));
 				}
-				timeAndIcons.append(...item.categoryDots,
-					...(withIcons ? item.icons : []),
-					time);
+				timeAndIcons.append(time);
 			}
 			div = E('div',
 				E('em', item.title || '('+t(item.data.privacy!='public' ? 'Private' :'Nameless')+')',
