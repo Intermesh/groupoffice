@@ -103,6 +103,7 @@ class Alert extends UserProperty {
 		$coreAlert->setEntity($event);
 		$coreAlert->userId = go()->getUserId();
 		$coreAlert->tag = $this->id;
+		$utcTz = new \DateTimeZone("UTC");
 
 		if (isset($this->offset)) {
 			$offset = $this->offset;
@@ -115,15 +116,16 @@ class Alert extends UserProperty {
 				$date = clone $next;
 				$next->add(new \DateInterval($event->duration));
 				if ($this->relatedTo === self::End) {
+					// Todo: this is not finished/supported
 					$date = $next;
 				} else {
-					$coreAlert->staleAt = (clone $next)->setTimezone(new \DateTimeZone("UTC"));
+					$coreAlert->staleAt = (clone $next)->setTimezone($utcTz);
 				}
 
 			} else {
 				$date = clone ($this->relatedTo === self::End ? $event->end() : $event->start());
 				if($this->relatedTo === self::Start) // don't stale if event is set to trigger after the event
-					$coreAlert->staleAt = (clone $event->end())->setTimezone(new \DateTimeZone("UTC"));
+					$coreAlert->staleAt = (clone $event->end())->setTimezone($utcTz);
 			}
 
 			if($event->showWithoutTime) {
@@ -131,7 +133,7 @@ class Alert extends UserProperty {
 				$date->add(new \DateInterval("PT9H"));
 			}
 
-			$date->setTimezone(new \DateTimeZone("UTC"));
+			$date->setTimezone($utcTz);
 
 			try {
 				if ($offset[0] == '-') {
@@ -150,8 +152,8 @@ class Alert extends UserProperty {
 			$coreAlert->triggerAt = $this->when;
 		}
 
-		// don't create alerts in the past
-		if($coreAlert->triggerAt < new DateTime()) {
+		// don't create alerts that are already stale
+		if($coreAlert->staleAt < new DateTime('now', $utcTz)) {
 			return null;
 		}
 

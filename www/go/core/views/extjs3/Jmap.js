@@ -169,7 +169,16 @@ go.Jmap = {
 	},
 
 	upload : function(file, cfg) {
-		go.Uploader.addFile(file, cfg);
+		const p = window.groupofficeCore.client.upload(file);
+		if(cfg.success) {
+			p.then(ev => { cfg.success.call(cfg.scope || this, ev, ev.file, cfg) });
+		}
+		if(cfg.failure) {
+			p.catch(cfg.failure.bind(cfg.scope || this));
+		}
+		if(cfg.callback) {
+			p.finally(cfg.callback.bind(cfg.scope || this));
+		}
 	},
 
 

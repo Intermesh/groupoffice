@@ -1,6 +1,6 @@
 export * from "./CommentsPanel.js";
 
-import {client, entities, JmapDataSource, modules, router} from "@intermesh/groupoffice-core";
+import {client, entities, JmapDataSource, main, modules, router} from "@intermesh/groupoffice-core";
 import {t, Window} from "@intermesh/goui";
 import {CommentDetail} from "./CommentDetail";
 import {CommentsPanel} from "./CommentsPanel";
@@ -38,28 +38,19 @@ modules.register({
 			ent.goto(comment.entityId);
 		});
 
-		go.Alerts.on("beforeshow", function (alerts: any, alertConfig: any) {
-			const alert = alertConfig.alert;
+		main.notifier.regRenderer("Comment", (alert) => {
 			if (alert.tag == "mention") {
-				//replace panel promise
-				alertConfig.panelPromise = alertConfig.panelPromise.then(async (panelCfg: any) => {
+				const creator = alert.created.name || t("Unknown user");
 
-					let creator;
-					try {
-						creator = await go.Db.store("Principal").single(alert.createdBy);
-					} catch (e) {
-
-					}
-
-					if (!creator) {
-						creator = {name: t("Unknown user")};
-					}
-
-					panelCfg.html = go.util.Format.dateTime(alert.triggerAt) + ": " + t("You were mentioned in a comment by {creator}.", "comments", "community").replace("{creator}", creator.name) + "<br /><br /><i>" + alert.data.excerpt + "</i>";
-					panelCfg.notificationBody = go.util.Format.dateTime(alert.triggerAt) + ": " + t("You were mentioned in a comment by  {creator}.", "comments", "community").replace("{creator}", creator.name) + "\n\n" + alert.data.excerpt;
-					return panelCfg;
-
-				});
+				return {
+					title: alert.title,
+					icon: alert.icon,
+					category: 'event',
+					text: go.util.Format.dateTime(alert.triggerAt)+": " +
+						t("You were mentioned in a comment by {creator}.", "comments", "community")
+							.replace("{creator}", creator.name) +
+						"<br><br><i>"+alert.data.excerpt+"</i>"
+				}
 			}
 		});
 	},
@@ -68,12 +59,7 @@ modules.register({
 		links: [{
 			iconCls: "entity ic-note purple",
 			searchOnly: true,
-
-			/**
-			 * Return component for the detail view
-			 *
-			 */
-			linkDetail: function () {
+			linkDetail() {
 				return new CommentDetail();
 			}
 		}]

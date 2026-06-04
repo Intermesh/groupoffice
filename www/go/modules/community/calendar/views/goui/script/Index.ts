@@ -1,4 +1,4 @@
-import {moduleSettings, client, jmapds, modules, principalDS} from "@intermesh/groupoffice-core";
+import {moduleSettings, client, jmapds, modules, principalDS, main} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {router} from "@intermesh/groupoffice-core";
 import {datasourcestore, t as coreT, E, translate, DateTime, Window, h3, Button} from "@intermesh/goui";
@@ -324,59 +324,33 @@ modules.register(  {
 
 			modules.addMainPanel("community", "calendar", 'calendar', t('Calendar'), () => new Main());
 
-			go.Alerts.on("beforeshow", function(alerts: any, alertConfig: any) {
-
-				const alert = alertConfig.alert,
+			main.notifier.regRenderer('CalendarEvent', (alert, closeFn) => {
+				const entity = alert.entityData,
 					msgs: {[key:string]: string} = {
 						request: t('New invitation from {from}'),
 						reply: t("Invitation updated by {from}"),
 						created: t("New event created by {creator}")
 					};
-				//debugger;
-				if(alert.entity == "CalendarEvent" || alert.entity == "Calendar") {
+				let text= msgs[alert.tag] || go.util.Format.shortDateTime(alert.recurrenceId || entity.start, true);
+				const actions: any = {};
+				if(alert.tag === 'created')
+					text = text.replace('{creator}', alert.data.creator);
 
-					alertConfig.panelPromise = alertConfig.panelPromise.then(async (panelCfg: any) => {
+				if(alert.tag === 'reply' || alert.tag === 'request')
+					text = text.replace('{from}', alert.data.from?.personal ?? t("Unknown"));
 
-						let msg: string = msgs[alert.tag] || go.util.Format.shortDateTime(alertConfig.alert.recurrenceId || alertConfig.entity.start, true),
-							time = go.util.Format.shortDateTime(alert.triggerAt);
-
-						if(alert.tag === 'created'){
-							msg = msg.replace('{creator}', alert.data.creator);
-						}
-						if(alert.tag === 'reply' || alert.tag === 'request') {
-							msg = msg.replace('{from}', alert.data.from?.personal ?? t("Unknown"));
-
-							if(alert.tag === 'request') {
-								const event = await jmapds("CalendarEvent").single(alert.entityId);
-								if (event) {
-									const item = new CalendarItem({key: alert.entityId + "", data: event});
-									panelCfg.buttons = [
-										{
-											text: t('Accept'), handler: (btn: any) => {
-												item.updateParticipation("accepted", () => btn.findParentByType("panel").destroy());
-											}
-										},
-										{
-											text: t('Maybe'), handler: (btn: any) => {
-												item.updateParticipation("tentative", () => btn.findParentByType("panel").destroy())
-											}
-										},
-										{
-											text: t('Decline'), handler: (btn: any) => {
-												item.updateParticipation("declined", () => btn.findParentByType("panel").destroy())
-											}
-										}
-									];
-								}
-							}
-						}
-						panelCfg.title = alertConfig.entity.title;
-						panelCfg.items = [{html: msg  }];
-						panelCfg.notificationBody = msg ; // for desktop notifications (no html)
-						return panelCfg;
-					});
-
+				if(alert.tag === 'request') {
+					const item = new CalendarItem({key: alert.entityId + "", data: entity});
+					actions.primary = {run:() => { item.updateParticipation("accepted", () => closeFn()); }};
+					actions.secondary =  {run:() => { item.updateParticipation("declined", () => closeFn()); } };
 				}
+				return {
+					title: entity.title,
+					text,
+					icon: {name:'event', color: 'red'},
+					category: 'event',
+					actions
+				};
 			});
 
 		});
