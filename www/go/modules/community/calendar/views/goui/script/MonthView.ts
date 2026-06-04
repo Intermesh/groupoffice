@@ -237,9 +237,10 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 
 	private updateHasMore() {
 		// height of the week row
-		const height = (this.el.clientHeight - this.el.firstElementChild!.clientHeight) / this.weekRows.length;
+		const height = this.el.children[1].clientHeight;//(this.el.children[1].clientHeight - this.el.firstElementChild!.clientHeight) / this.weekRows.length;
 		// how many event fit in the week row
-		const fit = Math.floor(((Component.pxToRem(height)/10) / this.ROWHEIGHT) - .4);
+		const fit = Math.floor(((Component.pxToRem(height)/10 - 3.4) / this.ROWHEIGHT) - .5) ;
+
 		const ols = this.el.getElementsByTagName('ol');
 		for (let i = 0; i < ols.length; i++) {
 			const lis = ols[i].getElementsByTagName('li');
