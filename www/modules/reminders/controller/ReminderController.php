@@ -22,6 +22,8 @@
 namespace GO\Reminders\Controller;
 
 
+use go\core\util\StringUtil;
+
 class ReminderController extends \GO\Base\Controller\AbstractModelController{
 	
 	protected $model = 'GO\Base\Model\Reminder';
@@ -48,6 +50,12 @@ class ReminderController extends \GO\Base\Controller\AbstractModelController{
 		{
 			$params['model_id']=0;
 			$params['model_type_id']=0;
+		}
+
+		$params['text'] =  StringUtil::sanitizeHtml($params['text'], false);
+
+		if (StringUtil::detectXSS($params['text'], false)) {
+			throw new \Exception("Scripts are not allowed in the reminder text.");
 		}
 		
 		$params['manual'] = 1;
