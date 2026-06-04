@@ -235,7 +235,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 		return 40;
 	}
 
-	protected ROWHEIGHT = 2.4
+	protected ROWHEIGHT = 2.6
 
 	// for full day view
 	protected makestyle(e: CalendarItem, weekstart: DateTime, row?: number): Partial<CSSStyleDeclaration> {
