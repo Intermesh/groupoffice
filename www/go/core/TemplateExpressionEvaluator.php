@@ -39,7 +39,8 @@ class TemplateExpressionEvaluator
 	{
 		$this->input = trim($expression);
 
-		if(empty($this->input)) {
+		// empty will filter out all falsey strings, like "0" . In mathematical calculations, this will trigger errors.
+		if (strlen($this->input) === 0) {
 			return false;
 		}
 
