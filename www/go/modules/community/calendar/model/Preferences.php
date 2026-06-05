@@ -27,6 +27,8 @@ class Preferences extends Property
 
 	/** @var bool Show birthdays on the calendar */
 	public bool $birthdaysAreVisible = false;
+
+	public bool $multiLine = false;
 	/** @var bool Show birthdays on the calendar */
 	public bool $tasksAreVisible = false;
 	/** @var bool Show birthdays on the calendar */
@@ -78,7 +80,7 @@ class Preferences extends Property
 	public int $weekViewGridSnap = 15;
 
 	/** @var int a percentage of view height a single hour should be */
-	public int $weekViewGridSize = 8; //vh
+	public int $weekViewGridSize = 7; //vh
 
 	/** @var ?string Which view to show first when the user opens the calendar. */
 	public ?string $startView = null;

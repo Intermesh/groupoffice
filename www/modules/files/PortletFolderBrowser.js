@@ -1,13 +1,12 @@
 GO.mainLayout.onReady(function(){
-	if(go.Modules.isAvailable("legacy", "summary") && go.Modules.isAvailable("legacy", "files"))
-	{
+	const fmur= go.Modules.get("legacy", "files").userRights;
+	if(go.Modules.isAvailable("legacy", "summary") && go.Modules.isAvailable("legacy", "files") && fmur.mayAccessMainPanel) {
 		GO.summary.portlets['portlet-folder-browser']={
 			multiple:true,
 			settings:{
 				folderId:0,
 				folderPath:''
 			},
-//			folderBrowserTabPanel:folderBrowserTabPanel,
 			portletType: 'portlet-folder-browser',
 			title: t("Show folder", "files"),
 			layout:'fit',

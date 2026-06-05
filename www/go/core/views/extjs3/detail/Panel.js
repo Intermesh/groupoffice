@@ -294,6 +294,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 
 			this.add(wrapper);
 			this.comments = new GO.comments.CommentsPanel(this.entityStore.entity.name);
+			this.comments.focusEditorOnload = this.support;
 			wrapper.comp = this.comments;
 		}
 	},

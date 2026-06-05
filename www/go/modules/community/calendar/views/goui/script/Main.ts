@@ -4,7 +4,7 @@ import {
 	cards,
 	checkbox, collapsebtn, column,
 	comp,
-	Component, DataSourceStore, datasourcestore,
+	Component, ComponentState, DataSourceStore, datasourcestore,
 	DatePicker,
 	datepicker,
 	DateTime, Format,
@@ -67,6 +67,8 @@ export class Main extends Component {
 		super();
 		this.cls = 'hbox fit tablet-cards';
 
+		this.stateId = "calendar-main";
+
 		this.registerProviders(adapter);
 		this.adapter = adapter;
 
@@ -103,7 +105,7 @@ export class Main extends Component {
 		});
 		const rights = modules.get("community", "calendar")!.userRights;
 
-
+		const multiLine = client.user.calendarPreferences.multiLine ? 'multiline':'';
 
 		this.items.add(
 			this.west = comp({tagName: 'aside', width: 274, cls:'scroll', style: {paddingTop:'1.2rem', minWidth: '27.4rem'}},
@@ -176,11 +178,21 @@ export class Main extends Component {
 			}),
 			comp({cls: 'vbox active', flex: 1},
 				tbar({},
-					btn({cls: "for-large-device", icon: "menu_open", handler: btn => {
-						const h = this.west.hidden;
-						this.west.hidden = !h;
-						btn.icon = !h ? 'menu' : 'menu_open';
-					}}),
+					btn({
+						cls: "for-large-device",
+						listeners: {
+							render: ({target}) => {
+								target.icon = this.west.hidden ? "left_panel_open" : "left_panel_close";
+							}
+						},
+						icon: "left_panel_close",
+							handler: btn => {
+							const h = this.west.hidden;
+							this.west.hidden = !h;
+							btn.icon = h ? 'left_panel_close' : 'left_panel_open';
+							this.saveState();
+						}
+					}),
 					btn({cls: "for-medium-device", icon: "menu", handler: _ => {
 						this.west.el.cls('!active');
 					}}),
@@ -293,7 +305,7 @@ export class Main extends Component {
 						}),
 					)})
 				),
-				this.cards = cards({flex: 1, activeItem:1, listeners: {render: ({target}) => this.applySwipeEvents(target)}},
+				this.cards = cards({cls: multiLine, flex: 1, activeItem:1, listeners: {render: ({target}) => this.applySwipeEvents(target)}},
 					weekView,
 					monthView,
 					yearView,
@@ -463,6 +475,19 @@ export class Main extends Component {
 					})
 				})]
 		});
+	}
+
+	protected buildState(): ComponentState {
+		const s = super.buildState();
+
+		s.westHidden = this.west.hidden;
+		return s;
+	}
+
+	protected restoreState(state: ComponentState) {
+		super.restoreState(state);
+
+		this.west.hidden = state.westHidden;
 	}
 
 	private buildCategoryFilter() {

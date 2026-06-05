@@ -17,6 +17,7 @@ use go\core\model\Client;
 use go\core\model\Module;
 use go\core\jmap;
 use go\core\model\Acl;
+use go\core\model\PushDispatcher;
 use go\core\model\Search;
 use go\core\orm\exception\SaveException;
 use go\core\util\Lock;
@@ -310,6 +311,15 @@ class EntityType implements ArrayableInterface, \ArrayAccess {
 		return $i;
 	}
 
+
+//	/**
+//	 * Keep this in a private var for SSE.
+//	 * We disable the memory in the go()->getCache() to keep memory low. But we do need tne EntityType instances to
+//	 * remain singletons.
+//	 * @var array|null
+//	 */
+//	private static array|null $cache = null;
+
 	/**
 	 * @return array
 	 */
@@ -318,7 +328,7 @@ class EntityType implements ArrayableInterface, \ArrayAccess {
 		$cache = go()->getCache()->get('entity-types');
 
 		if($cache === null) {
-			$cache= [
+			$cache = [
 				'id' => [],
 				'name' => [],
 				'models' => self::findFromDb()
@@ -580,20 +590,26 @@ class EntityType implements ArrayableInterface, \ArrayAccess {
 		}
 
 		go()->getDbConnection()->beginTransaction();
-		self::pushRecords();
+		$changedEntities = self::pushRecords();
 		go()->getDbConnection()->commit();
+
+		foreach($changedEntities as $changedEntity) {
+			PushDispatcher::incStateCounter($changedEntity);
+		}
 
 		if(isset($l)) {
 			$l->unlock();
 		}
 	}
 
-	private static function pushRecords(): void
+	private static function pushRecords(): array
 	{
 
 		if(empty(self::$changes)) {
-			return;
+			return [];
 		}
+
+		$changedEntities = [];
 		$now = new DateTime();
 		$allChanges = [];
 		foreach(self::$changes as $entityTypeId => $changes) {
@@ -601,6 +617,8 @@ class EntityType implements ArrayableInterface, \ArrayAccess {
 				continue;
 			}
 			$type = self::findById($entityTypeId);
+
+			$changedEntities[] =$type->getName();
 
 			$modSeq = $type->nextModSeq();
 
@@ -624,6 +642,8 @@ class EntityType implements ArrayableInterface, \ArrayAccess {
 		}
 
 		self::$changes = [];
+
+		return $changedEntities;
 	}
 
 	private static function splitRecords(array $allChanges) : array {

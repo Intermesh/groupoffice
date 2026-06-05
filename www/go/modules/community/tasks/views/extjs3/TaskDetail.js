@@ -250,13 +250,16 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 
 	onLoad: function () {
 		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < go.permissionLevels.write);
-		this.deleteItem.setDisabled(this.data.permissionLevel < go.permissionLevels.writeAndDelete);
+		// this.deleteItem.setDisabled(this.data.permissionLevel < go.permissionLevels.writeAndDelete);
+		this.deleteItem.setVisible(this.data.permissionLevel >= go.permissionLevels.writeAndDelete);
 
 		this.assignMeBtn.setVisible(!this.data.responsibleUserId);
 
 		if (this.privateComments) {
 			this.privateComments.load(this.data.id);
 		}
+
+
 
 		go.modules.community.tasks.TaskDetail.superclass.onLoad.call(this);
 	},

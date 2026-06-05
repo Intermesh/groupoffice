@@ -34,6 +34,10 @@ class Apcu implements CacheInterface {
 		$this->keepInMemory = false;
 		$this->getDiskCache()->disableMemory();
 	}
+
+	public function freeMemory(array $preserveKeys = ['entity-types']):void {
+		$this->cache = array_intersect_key($this->cache, array_flip($preserveKeys));
+	}
 	
 	public function __construct() {
 		$this->prefix = go()->getConfig()['db_name'];
@@ -48,6 +52,7 @@ class Apcu implements CacheInterface {
 	{
 		if(!isset($this->disk)) {
 			$this->disk = new Disk();
+			$this->disk->disableMemory();
 		}
 
 		return $this->disk;
@@ -65,6 +70,9 @@ class Apcu implements CacheInterface {
 	 */
 	public function set(string $key, $value, bool $persist = true, int $ttl = 0):void
 	{
+		if($this->keepInMemory) {
+			$this->cache[$key] = $value;
+		}
 
 		if(!$this->apcuEnabled) {
 			$this->getDiskCache()->set($key, $value, $persist, $ttl);
@@ -72,10 +80,6 @@ class Apcu implements CacheInterface {
 		}
 		if($persist) {
 			apcu_store($this->prefix . '-' .$key, $value, $ttl);
-		}
-
-		if($this->keepInMemory) {
-			$this->cache[$key] = $value;
 		}
 	}
 
@@ -92,12 +96,12 @@ class Apcu implements CacheInterface {
 	 */
 	public function get(string $key) {
 
-		if(!$this->apcuEnabled) {
-			return $this->getDiskCache()->get($key);
-		}
-
 		if($this->keepInMemory && isset($this->cache[$key])) {
 			return $this->cache[$key];
+		}
+
+		if(!$this->apcuEnabled) {
+			return $this->getDiskCache()->get($key);
 		}
 
 		$success = false;

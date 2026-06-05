@@ -124,7 +124,11 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 	constructor(adapter: CalendarAdapter) {
 		super();
 		CalendarView.selectedCalendarId = client.user.calendarPreferences?.defaultCalendarId; // default
-		this.adapter = adapter
+		this.adapter = adapter;
+
+		if(client.user.calendarPreferences.multiLine) {
+			this.ROWHEIGHT = 3.8;
+		}
 	}
 
 	update = (_data?: any) => {
@@ -145,22 +149,24 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 		const e = item.data;
 
 		if(!div) { // default
-			const time = E('span');
+			const timeAndIcons = E('span',
+				...item.categoryDots,
+				...(withIcons ? item.icons : []));
 			if(!e.showWithoutTime) {
-				time.append(Format.time(item.start));
+				const time = E('span', Format.time(item.start));
 				if(item.dayLength > 1) {
 					time.append(' - ',Format.time(item.end));
 				}
+				timeAndIcons.append(time);
 			}
 			div = E('div',
 				E('em', item.title || '('+t(item.data.privacy!='public' ? 'Private' :'Nameless')+')',
 					...this.fmLocation(item.data.location)
 				),
-				...item.categoryDots,
-				...(withIcons ? item.icons : [])
+
 			)
-			if(!e.showWithoutTime) {
-				div.append(time);
+			if(!e.showWithoutTime || item.icons.length || item.categoryDots.length) {
+				div.prepend(timeAndIcons);
 			}
 		}
 		if(item.key) {
@@ -229,7 +235,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 		return 40;
 	}
 
-	protected ROWHEIGHT = 2.6;
+	protected ROWHEIGHT = 2.6
 
 	// for full day view
 	protected makestyle(e: CalendarItem, weekstart: DateTime, row?: number): Partial<CSSStyleDeclaration> {
@@ -245,7 +251,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 			top = row * this.ROWHEIGHT;
 		return {
 			width: (width-.2).toFixed(2)+'%',
-			left : (left+(dayDiff.invert?0:.3)).toFixed(2)+'%',
+			left : (left).toFixed(2)+'%',
 			top: top.toFixed(2)+'rem',
 			color: '#'+e.color
 		};

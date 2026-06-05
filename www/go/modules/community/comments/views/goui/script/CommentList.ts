@@ -1,8 +1,8 @@
 import {
 	avatar,
-	btn,
+	btn, CollectionEventMap,
 	comp,
-	Component,
+	Component, ComponentEventMap,
 	datasourcestore,
 	DataSourceStore,
 	Format,
@@ -16,7 +16,13 @@ import {AclLevel, client, entities, Image, img, principalDS} from "@intermesh/gr
 import {CommentDialog} from "./CommentDialog.js";
 import {commentDS, commentLabelDS} from "./Index.js";
 
-class CommentList extends Component implements StoreComponent {
+
+export interface CommentListEventMap extends ComponentEventMap {
+
+	listready: {}
+}
+
+class CommentList extends Component<CommentListEventMap>implements StoreComponent {
 	public store: DataSourceStore
 	public scroller: Component
 
@@ -345,10 +351,11 @@ class CommentList extends Component implements StoreComponent {
 			);
 		});
 
-
-		this.scroller.el.scrollTop = this.scroller.el.scrollHeight;
-
-		this.unmask();
+		Promise.all(imgPromises).then(() => {
+			this.scroller.el.scrollTop = this.scroller.el.scrollHeight;
+			this.unmask();
+			this.fire("listready", {});
+		})
 
 	}
 

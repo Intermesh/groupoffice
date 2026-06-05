@@ -94,7 +94,7 @@ GO.summary.CalendarPortlet = function(config)
 		scrollOffset: 2,
 		hideGroupedColumn:true,
 		groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "'+t("items")+'" : "'+t("item")+'"]})',
-		emptyText: t("No appointments to display", "calendar"),
+		emptyText: t("No appointments to display", "calendar", 'community'),
 		showGroupName:false
 	});
 	config.sm=new Ext.grid.RowSelectionModel();

@@ -8,6 +8,16 @@
 }
 
 %event {
+	.multiline & {
+		height: dp(36);
+		> em { overflow: visible;
+			line-height: 1em;
+			max-height: dp(32);
+			font-weight: 500;
+			letter-spacing: -0.05em;
+			white-space: normal;
+		}
+	}
 	position: absolute;
 	cursor: pointer;
 	word-wrap: break-word;
@@ -15,10 +25,11 @@
 	box-sizing: border-box;
 	border-radius: dp(4);
 	height:dp(24);
-	padding: dp(2) dp(6);
+	padding: dp(2) 1px dp(2) dp(6);
 	text-align: left;
 	user-select: none;
 	> em, > span {
+		pointer-events: none;
 		color: $colorText;
 	}
 	> em {
@@ -31,6 +42,7 @@
 		text-align:right;
 		white-space: nowrap;
 		font-weight: 400;
+		order: 2;
 		font-size: .85em;
 		color:$colorTextSecondary;
 		padding-left: .4rem;
@@ -199,7 +211,7 @@
 				font-weight: 600;
 				border-radius: 999px;
 				display:inline-block;
-				margin-left:dp(8);
+				text-align: center;
 				min-width: dp(36);
 				line-height: dp(18);
 				color: white !important;

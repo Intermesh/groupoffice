@@ -729,7 +729,7 @@ export class CalendarItem {
 				),tbar({},'->',
 					btn({
 						text: t('This event'),
-						hidden: modified.recurrenceRule, // user must change future if rrule is modified
+						hidden: modified.recurrenceRule || modified.privacy, // user must change future if rrule or privacy is modified
 						cls:'primary',
 						handler: _b => {
 							this.patchOccurrence(modified, onFinish, onCancel); w.close();

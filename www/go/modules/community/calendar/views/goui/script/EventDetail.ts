@@ -288,18 +288,11 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 	 * Load's an event from the data source without recurrenceId
 	 * @param id
 	 */
-	async load(id:EntityID): Promise<this> {
-		const r = await super.load(id);
-
-		const item = (new CalendarItem({
-			key: id + "",
-			data:this.entity!
-		}))
-
-		await this.loadEvent(item);
-
-		return r;
-	}
+	// async load(id:EntityID): Promise<this> {
+	//
+	// 	return await this.loadEvent(item);
+	//
+	// }
 
 	/**
 	 * Loads an event from the CalendarItem view model with recurrence info
@@ -362,13 +355,14 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 				}
 				this.item = ev;
 				this.editBtn.hidden = !this.item.mayChange;
-
 				this.showCalendar.hidden = this.item.mayMove
 				this.selectCalendar.hidden = !this.item.mayMove;
 			});
 		}
 		this.scroller.hidden = false;
 		this.disabled = false;
+
+		return await super.load(ev.data.id);
 	}
 
 }

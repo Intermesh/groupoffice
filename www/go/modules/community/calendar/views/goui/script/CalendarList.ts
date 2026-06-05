@@ -9,7 +9,7 @@ import {
 	hr, List,
 	list,
 	menu,
-	select,
+	select, selectallcheckboxfield,
 	tbar, win, Window
 } from "@intermesh/goui";
 import {calendarStore, Main, t} from "./Index.js";
@@ -38,9 +38,65 @@ export class CalendarList extends Component<CalendarListEventMap> {
 		this.store = store;
 		const rights = modules.get("community", "calendar")!.userRights;
 
+
+		this.list = list({
+			tagName: 'div',
+			groupBy: "group",
+			groupByCollapsible: false,
+			groupByRenderer: (groupBy) => groupBy ? `<h3>${groupBy.name.htmlEncode()}</h3>`:'',
+			store,
+			cls: 'check-list',
+			rowSelectionConfig: {
+				multiSelect: false,
+				listeners: {
+					'selectionchange': ({selected}) => {
+						if (selected[0] && selected[0].record.myRights.mayWriteAll) {
+							CalendarView.selectedCalendarId = selected[0].id;
+						} else if(selected.map(s => s.id).indexOf(CalendarView.selectedCalendarId) === -1) {
+							// CalendarView.selectedCalendarId = is no longer in selected list so fall back on users' default
+							CalendarView.selectedCalendarId = client.user.calendarPreferences?.defaultCalendarId;
+						}
+					}
+				}
+			},
+			listeners: {'render': ({target}) => {
+					const list = target;
+					this.localGroup = document.createElement('ul');
+					list.el.append(this.localGroup);
+
+					list.store.on('load', ({target, records})=> {
+
+						if(!list.rowSelection?.getSelected().length) {
+							let record = target.find(c => c.id == CalendarView.selectedCalendarId);
+							if (!record) {
+								record = target.first();
+							}
+							if (record) {
+								list.rowSelection!.add(record);
+							}
+						}
+						const oldLength = Object.values(this.inCalendars).filter(Boolean).length;
+						this.inCalendars = records.reduce((obj, item) => ({ ...obj, [item.id!]: item.isVisible }), {} as any);
+						const ids = Object.keys(this.inCalendars).filter(key => this.inCalendars[key]);
+						if(oldLength !== ids.length || oldLength === 0) {
+							this.fire('changevisible', {ids});
+						}
+					});
+					target.store.load()
+				}
+			},
+			renderer: this.checkboxRenderer.bind(this)
+		})
+
+
 		this.items.add(store !== calendarStore ? comp() :tbar({cls: 'dense'},
 			checkbox({
 				listeners: {
+					render: ({target}) => {
+						this.on("changevisible", ({ids}) => {
+							target.value = ids.length == store.count();
+						})
+					},
 					change: ( {newValue}) => {
 						this.select(-1,newValue);
 					}
@@ -102,54 +158,7 @@ export class CalendarList extends Component<CalendarListEventMap> {
 					}})
 				)
 			})
-		), this.list = list({
-			tagName: 'div',
-			groupBy: "group",
-			groupByCollapsible: false,
-			groupByRenderer: (groupBy) => groupBy ? `<h3>${groupBy.name.htmlEncode()}</h3>`:'',
-			store,
-			cls: 'check-list',
-			rowSelectionConfig: {
-				multiSelect: false,
-				listeners: {
-					'selectionchange': ({selected}) => {
-						if (selected[0] && selected[0].record.myRights.mayWriteAll) {
-							CalendarView.selectedCalendarId = selected[0].id;
-						} else if(selected.map(s => s.id).indexOf(CalendarView.selectedCalendarId) === -1) {
-							// CalendarView.selectedCalendarId = is no longer in selected list so fall back on users' default
-							CalendarView.selectedCalendarId = client.user.calendarPreferences?.defaultCalendarId;
-						}
-					}
-				}
-			},
-			listeners: {'render': ({target}) => {
-				const list = target;
-				this.localGroup = document.createElement('ul');
-					list.el.append(this.localGroup);
-
-					list.store.on('load', ({target, records})=> {
-
-						if(!list.rowSelection?.getSelected().length) {
-							let record = target.find(c => c.id == CalendarView.selectedCalendarId);
-							if (!record) {
-								record = target.first();
-							}
-							if (record) {
-								list.rowSelection!.add(record);
-							}
-						}
-						const oldLength = Object.values(this.inCalendars).filter(Boolean).length;
-						this.inCalendars = records.reduce((obj, item) => ({ ...obj, [item.id!]: item.isVisible }), {} as any);
-						const ids = Object.keys(this.inCalendars).filter(key => this.inCalendars[key]);
-						if(oldLength !== ids.length || oldLength === 0) {
-							this.fire('changevisible', {ids});
-						}
-					});
-					target.store.load()
-				}
-			},
-			renderer: this.checkboxRenderer.bind(this)
-		}));
+		), this.list);
 	}
 
 	private localGroup!: HTMLElement;

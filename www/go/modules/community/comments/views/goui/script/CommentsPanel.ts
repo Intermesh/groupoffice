@@ -22,6 +22,10 @@ import {LabelDialog} from "./LabelDialog.js";
 import {commentDS} from "./Index.js";
 
 export class CommentsPanel extends Component {
+
+
+	public focusEditorOnload = false
+
 	private readonly commentList!: CommentList;
 	private readonly commentEditor!: CommentEditor;
 	private readonly countBadge!: Component;
@@ -67,6 +71,13 @@ export class CommentsPanel extends Component {
 			text: "",
 			cls: "count-badge"
 		});
+
+		this.commentList.on("listready", () => {
+			if(this.focusEditorOnload) {
+				this.commentEditor.editor.focus();
+				this.commentEditor.editor.el.scrollIntoView(false);
+			}
+		})
 
 		this.items.add(comp({
 				cls: "vbox"

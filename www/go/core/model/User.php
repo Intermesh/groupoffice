@@ -1140,7 +1140,13 @@ public function historyLog(): bool|array
 			$model->getDefault($user);
 		}
 	}
-	
+
+	/**
+	 * Get the current client device / browser info
+	 *
+	 * @return Client|null
+	 * @throws Exception
+	 */
 	public function currentClient() : ?Client {
         if(Environment::get()->isCli()) {
             $where = [

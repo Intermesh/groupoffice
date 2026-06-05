@@ -480,3 +480,5 @@ $updates['202602160945'][] = function() {
 $updates['202602160945'][] = "ALTER TABLE `calendar_resource_group` ADD COLUMN `autoAccept` TINYINT(1) NOT NULL DEFAULT 1 AFTER `description`;";
 
 $updates['202604211050'][] = "ALTER TABLE `calendar_calendar` ADD COLUMN `webcalHash` CHAR(40) COLLATE ascii_bin NULL DEFAULT NULL AFTER `webcalUri`;";
+
+$updates['202605281632'][] = "ALTER TABLE `calendar_preferences` ADD COLUMN multiLine TINYINT(1) DEFAULT 0 NOT NULL AFTER `showDeclined`;";
