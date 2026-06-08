@@ -1,3 +1,6 @@
+01-06-2026: 6.8.170
+- Files: do not display portlets if a user has no main_access permission (cherry-pick from 26.0.x)
+
 21-05-2026: 6.8.169
 - Core: Fixed template parser failing to handle some if statements with variables containing math operators
 - Filesearch: Fixed results not being filtered when using it as an admin_
