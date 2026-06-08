@@ -7,6 +7,7 @@
 - Tasks: prevent exception when sorting by project without projects3 being installed
 - Comments: flickerless reload
 - core: html editor clears style attributes with clear formatting too
+- Kanban: smoother rendering and fixed reordering bug when dropping underneath the other cards
 - Tasks / Support: make priority sortable (cherry-pick from 6.8)
 
 
