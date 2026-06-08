@@ -1,3 +1,4 @@
+08-06-2026: 6.8.33
 - Core: Prefix SSE state counter key with database name so it won't conflict with multiple instances
 - Kanban: Collapse sidebar
 - pdfeditor: debug exceptions
