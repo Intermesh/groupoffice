@@ -13,11 +13,22 @@ go.defaultpermissions.ShareWindow = Ext.extend(go.form.Dialog, {
 	forEntityStore: null,
 
 	initFormItems : function() {
-		return [new go.permissions.SharePanel({
+		const cfg = {
 			title: null,
 			hideLabel: true,
 			name: 'entities.' + this.forEntityStore + '.defaultAcl'
-		})];
+		};
+		if(go.Entities.get(this.forEntityStore).permissions) {
+			const levels = [];
+			const levelLabels = {}
+			go.Entities.get(this.forEntityStore).permissions?.forEach(l => {
+				levels.push(l.value)
+				levelLabels[l.value] = l.name;
+			});
+			cfg.levels = levels;
+			cfg.levelLabels = levelLabels;
+		}
+		return [new go.permissions.SharePanel(cfg)];
 	},
 
 	initComponent: function () {

@@ -690,6 +690,14 @@ class Task extends AclItemEntity {
 			$sort->renameKey('categories', 'categorySort.name');
 		}
 
+		if (isset($sort['priority'])) {
+			$i = array_search('priority', $sort->keys());
+			$dir = strtolower($sort['priority']) == 'asc' ? 'DESC' : 'ASC';
+			$al = $query->getTableAlias();
+			$exp = new Expression("IF(" . $al . ".priority=9, -1, " . $al . ".priority) ". $dir);
+			$sort->insert($i, $exp);
+		}
+
 		return parent::sort($query, $sort);
 	}
 

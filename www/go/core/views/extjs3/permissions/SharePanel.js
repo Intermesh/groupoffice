@@ -299,7 +299,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 				go.permissionLevels.manage
 			];
 		}
-		
+
 		for(var i=0;i<this.levels.length;i++){			
 			if(!this.levelLabels[this.levels[i]]){
 				alert('Warning: you must define a label for permission level: '+this.levels[i]);
