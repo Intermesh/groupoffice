@@ -11,5 +11,10 @@
   ],
   "dependencies": {
     "pdfjs-dist": "5.6.205"
+  },
+  "allowScripts": {
+    "esbuild@0.28.0": true,
+    "@parcel/watcher@2.5.6": true,
+    "fsevents@2.3.3": true
   }
 }
