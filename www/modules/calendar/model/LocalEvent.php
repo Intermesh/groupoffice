@@ -411,9 +411,7 @@ class LocalEvent extends \GO\Base\Model {
 	 */
 	public function getDurationInMinutes(){
 		
-		$durationMinutes = ($this->_event->end_time-$this->_event->start_time)/60;
-
-		return $durationMinutes;
+		return (int) ceil(($this->_event->end_time-$this->_event->start_time)/60);
 	}
 
 	/**
