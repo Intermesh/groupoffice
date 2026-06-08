@@ -1,16 +1,20 @@
 import {
 	avatar,
-	btn, CollectionEventMap,
+	btn,
 	comp,
-	Component, ComponentEventMap,
+	Component,
+	ComponentEventMap,
 	datasourcestore,
 	DataSourceStore,
 	Format,
 	menu,
-	Notifier, QuoteStripper, Store, StoreComponent, StoreEventMap,
-	StoreRecord,
+	Notifier,
+	QuoteStripper,
+	StoreComponent,
+	StoreEventMap,
 	t,
-	win, Window
+	win,
+	Window
 } from "@intermesh/goui";
 import {AclLevel, client, entities, Image, img, principalDS} from "@intermesh/groupoffice-core";
 import {CommentDialog} from "./CommentDialog.js";
@@ -82,7 +86,7 @@ class CommentList extends Component<CommentListEventMap>implements StoreComponen
 
 	public onBeforeStoreLoad(ev:StoreEventMap['beforeload']) {
 		this.mask();
-		this.scroller.items.clear();
+
 	}
 
 	public onStoreLoad() {
@@ -92,7 +96,7 @@ class CommentList extends Component<CommentListEventMap>implements StoreComponen
 
 		const records = this.store.all();
 
-		records.forEach((comment) => {
+		const cmps = records.map((comment) => {
 			let currentDate = Format.date(comment.date);
 
 			if (!lastDate || currentDate !== lastDate) {
@@ -334,8 +338,7 @@ class CommentList extends Component<CommentListEventMap>implements StoreComponen
 				writtenByUser ? avatarCnt : triangle,
 			);
 
-			this.scroller.items.add(
-				comp({
+			return comp({
 						cls: "hbox",
 						style: {
 							marginBottom: "0.8rem",
@@ -348,8 +351,9 @@ class CommentList extends Component<CommentListEventMap>implements StoreComponen
 					writtenByUser ? commentComp : avatarComp,
 					writtenByUser ? avatarComp : commentComp,
 				)
-			);
 		});
+
+		this.scroller.items.replace(...cmps);
 
 		Promise.all(imgPromises).then(() => {
 			this.scroller.el.scrollTop = this.scroller.el.scrollHeight;

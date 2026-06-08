@@ -10,8 +10,7 @@ import {
 	form,
 	t,
 	tbar,
-	Window,
-	root
+	Window
 } from "@intermesh/goui";
 import CommentList from "./CommentList.js";
 import {CommentEditor} from "./CommentEditor.js";
@@ -91,6 +90,12 @@ export class CommentsPanel extends Component {
 					this.countBadge,
 				),
 				"->",
+				btn({
+					icon: "refresh",
+					handler: () => {
+						this.commentList.store.reload();
+					}
+				}),
 				btn({
 					hidden: !client.user.isAdmin,
 					icon: "settings",
