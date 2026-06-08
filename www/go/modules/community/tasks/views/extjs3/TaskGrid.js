@@ -28,6 +28,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 				{name: 'tasklist', type: "relation"},
 				{name: 'categories', type: "relation"},
 				'percentComplete',
+				'priority',
 				'progress',
 				{
 					name: "complete",
@@ -188,6 +189,22 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					},
 					hidden: this.forProject || this.support,
 					groupable: false
+				},{
+					hidden: true,
+					id: "priority",
+					sortable: true,
+					dataIndex: 'priority',
+					header: t('Priority', "tasks", "community"),
+					renderer: function(v) {
+						switch(parseInt(v)) {
+							case 1:
+								return t("High");
+							case 9:
+								return t("Low");
+							default:
+								return t("Normal");
+						}
+					}
 				},{
 					hidden: !this.support,
 					id:"progress",
