@@ -213,7 +213,19 @@ modules.register(  {
 	package: "community",
 	name: "calendar",
 	entities: [
-		"Calendar",
+		{
+			name:"Calendar",
+			permissions:[
+				{value: 5, name: t("Read free/busy")},
+				{value: 10,name: t("Read items")},
+				{value: 20,name: t("Update private")},
+				{value: 25,name: t("RSVP")},
+				{value: 30,name: t("Write own")},
+				{value: 35,name: t("Write all")},
+				{value: 40,name: t("Delete")},
+				{value: 50,name: t("Manage")}
+			]
+		},
 		"CalendarView",
 		"CalendarCategory",
 		"ResourceGroup",
