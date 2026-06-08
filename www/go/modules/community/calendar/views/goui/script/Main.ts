@@ -863,8 +863,9 @@ export class Main extends Component {
 					ey= end.getYear();
 				for(const b of this.store.items) {
 					const start = DateTime.createFromFormat(b.birthday,'Y-m-d')!;
-
+					const born = start.getYear();
 					start.setYear(b.birthday.split('-')[1]<7?ey:sy);
+					const age = start.getYear()- born;
 					yield new CalendarItem({
 						key: "",
 						start,
@@ -876,7 +877,7 @@ export class Main extends Component {
 						extraIcons: ['cake'],
 						defaultColor: '009c63',
 						data:{
-							title: t('{name}\'s birthday').replace('{name}',b.name),
+							title: t('{name}\'s birthday').replace('{name}',b.name)+ ' ('+age+')',
 							duration: 'P1D',
 							showWithoutTime:true,
 						},
