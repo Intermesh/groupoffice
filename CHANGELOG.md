@@ -1,4 +1,6 @@
+08-06-2026: 25.0.107
 - Tasks / Support: make priority sortable (cherry-pick from 6.8)
+
 02-06-2026: 25.0.106
 - Files: do not display portlets if a user has no main_access permission (cherry-pick from 26.0.x)
 
