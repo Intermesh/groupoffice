@@ -2,6 +2,7 @@
 - Kanban: Collapse sidebar
 - pdfeditor: debug exceptions
 - reminders: Sanitise reminder input (Fixes XSS security issue)
+- Tasks: prevent exception when sorting by project without projects3 being installed
 
 01-06-2026: 26.0.32
 - Core: SSE uses apcu if available to check changes every second. When an entity is modified a state counter is 
