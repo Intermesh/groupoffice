@@ -226,9 +226,28 @@ modules.register(  {
 				{value: 50,name: t("Manage")}
 			]
 		},
-		"CalendarView",
+		{
+			name: "CalendarView",
+			permissions: [
+				{value: 10,name: t("Read")},
+				{value: 30,name: t("Write")},
+				{value: 50,name: t("Manage")}
+			]
+		},
 		"CalendarCategory",
-		"ResourceGroup",
+		{
+			name: "ResourceGroup",
+			permissions: [
+				{value: 5, name: t("Read free/busy")},
+				{value: 10,name: t("Read items")},
+				//{value: 20,name: t("Update private")},
+				{value: 25,name: t("Approve / Disapprove")}, // RSVP
+				{value: 30,name: t("Write own")},
+				{value: 35,name: t("Write all")},
+				{value: 40,name: t("Write / Delete")},
+				{value: 50,name: t("Manage")}
+			]
+		},
 		{
 			name:"CalendarEvent",
 			filters: [

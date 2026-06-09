@@ -102,12 +102,7 @@ export class ViewWindow extends FormWindow {
 			)
 		);
 
-		this.addSharePanel([
-			{value: "",name: ""},
-			{value: 10,name: t("Read")},
-			{value: 30,name: t("Write")},
-			{value: 50,name: t("Manage")}
-		]);
+		this.addSharePanel();
 
 	}
 }
