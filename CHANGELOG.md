@@ -1,3 +1,5 @@
+- Core: prevent ACL exception on saving tasklist that inherits ACL from another entity
+
 08-06-2026: 6.8.171
 - Tasks / support: sort by priority
 
