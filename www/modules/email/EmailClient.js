@@ -311,7 +311,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				mbname = 'INBOX';
 			}
 
-			go.Router.goto("email/" + node.attributes.account_id + "/" + mbname + "/" + usage);
+			go.Router.goto("email/" + node.attributes.account_id + "/" + mbname);
 
 			this.setAccount(
 				node.attributes.account_id,
@@ -962,7 +962,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	}
 });
 
-go.Router.add(/email\/([0-9]+)\/([^\/]+)\/?([a-z0-9-_]*)?/i, function (accountId, mailbox, usage) {
+go.Router.add(/email\/([0-9]+)\/([^\/]+)\/?([a-z0-9-_]*)?/i, function (accountId, mailbox) {
 	const ep = GO.mainLayout.openModule('email');
 	ep.account_id = parseInt(accountId, 10);
 	ep.mailbox = mailbox;
@@ -1373,9 +1373,6 @@ go.Modules.register("legacy", 'email', {
 
 	Ext.getBody().on('click', checkForMailto);
 })();
-
-
-
 
 GO.newMenuItems.push({
 	itemId : 'email-files',
