@@ -851,7 +851,10 @@ class Task extends AclItemEntity {
 			}
 		}
 
-		if($comment->createdBy == $this->responsibleUserId) {
+		// don't set Ticket to in progress when support agent sent the e-mail
+		$existingComments = Comment::findForEntity($this)->all();
+
+		if($comment->createdBy == $this->responsibleUserId && count($existingComments) > 1) {
 			$this->progress = Progress::InProcess;
 		} else {
 			$this->progress = Progress::NeedsAction;
