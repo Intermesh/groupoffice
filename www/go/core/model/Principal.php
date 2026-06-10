@@ -62,6 +62,13 @@ class Principal extends AclOwnerEntity
 	 * @throws Exception
 	 */
 	static function findIdsByEmail(string $email, bool $preferUser = true) : array {
+		if(str_contains($email, 'r-')) {
+			// r-id-real@email.com
+			preg_match('/^r-(\d+)-/', $email, $matches);
+			if (isset($matches[1])) {
+				return ['Calendar:'.$matches[1]];
+			}
+		}
 		$ids = User::findIdsByEmailAliases($email);
 
 		$stmt = self::find()->selectSingleValue('principal.id')

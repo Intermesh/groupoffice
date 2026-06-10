@@ -41,6 +41,11 @@ class CalDAVBackend extends AbstractBackend implements
 		$tz = new \GO\Base\VObject\VTimezone();
 
 		$username = basename($principalUri);
+
+		if(str_starts_with($username, 'r-')) {
+			return []; // resource principal
+		}
+
 		$u = User::find(['id', 'calendarPreferences'])->where(['username'=>$username])->single();
 
 		// We want to sort the personal calendar on top for caldav scheduling as it takes the first one for invites

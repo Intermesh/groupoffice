@@ -727,7 +727,7 @@ class CalendarEvent extends AclItemEntity {
 				if(!empty($current) && $current->isOwner()) {
 					// when owner deletes, free resources
 					foreach ($event->participants as $pid => $participant) {
-						if ($participant->kind === 'resource') {
+						if ($participant->kind === 'resource' && str_starts_with( $participant->pid(), 'Calendar:') ) {
 							$calId = str_replace( 'Calendar:', '', $participant->pid());
 							go()->getDbConnection()->delete('calendar_calendar_event', [
 								'calendarId' => $calId, 'eventId' => $event->eventId

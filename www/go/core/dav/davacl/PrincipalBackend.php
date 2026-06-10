@@ -18,7 +18,9 @@
 
 namespace go\core\dav\davacl;
 
+use go\core\db\Criteria;
 use go\core\model\Acl;
+use go\core\model\Principal;
 use go\core\model\User;
 use Sabre\DAV\PropPatch;
 use Sabre\DAV\Xml\Property\Href;
@@ -27,16 +29,22 @@ use Sabre\Uri;
 
 class PrincipalBackend extends AbstractBackend {
 
-	private function modelToDAVUser(User $user) {
-		return [
-			'id' => $user->id,
-			'uri' => 'principals/' . $user->username,
-			'{DAV:}displayname' => $user->displayName,
-			'{http://sabredav.org/ns}email-address' => $user->email,
-			'{urn:ietf:params:xml:ns:caldav}calendar-home-set' => new Href('calendars/' . $user->username),
-			'{urn:ietf:params:xml:ns:caldav}schedule-inbox-URL' => new Href('principals/' . $user->username . '/inbox'),
-			'{urn:ietf:params:xml:ns:caldav}schedule-outbox-URL' => new Href('principals/' . $user->username . '/outbox')
+	private function modelToDAVUser($principal) {
+		$uri = $this->principalToUri($principal);
+		$result =  [
+			'id' => $principal->id,
+			'uri' => 'principals/' .$uri,
+			'{DAV:}displayname' => $principal->name,
+			'{urn:ietf:params:xml:ns:caldav}calendar-user-type' => strtoupper($principal->type),
 		];
+		if(strtoupper($principal->type) == 'INDIVIDUAL') {
+			$result['{http://sabredav.org/ns}email-address'] = $principal->email;
+			$result['{urn:ietf:params:xml:ns:caldav}calendar-home-set'] = new Href('calendars/' . $principal->description);
+		} else {
+			$result['{http://sabredav.org/ns}email-address'] = str_replace('Calendar:','r-',$principal->id).'-'.$principal->email;
+			//$result['{urn:ietf:params:xml:ns:caldav}calendar-user-address-set'] = new Href('urn:uuid:'.$uri);
+		}
+		return $result;
 	}
 	private $users;
 
@@ -70,7 +78,14 @@ class PrincipalBackend extends AbstractBackend {
 //			 }
 
 			// don't list all users for privacy reasons
-			$this->users = [$this->modelToDAVUser(go()->getAuthState()->getUser(['id', 'username', 'displayName', 'email']))];
+			$curr =go()->getAuthState()->getUser(['id', 'username', 'displayName', 'email', ]);
+			$this->users = [$this->modelToDAVUser((object)[
+				'id' => $curr->id,
+				'description' => $curr->username,
+				'name' => $curr->displayName,
+				'email' => $curr->email,
+				'type' => 'INDIVIDUAL',
+			])];
 		}
 		return $this->users;
 	}
@@ -93,12 +108,22 @@ class PrincipalBackend extends AbstractBackend {
 
 		$pathParts = explode('/', $path);
 
-		$username = $pathParts[1];
+		$id = $pathParts[1];
 
-		go()->debug("getPrincipalByPath($path)");
+		$q = Principal::find(['id', 'name', 'description', 'email', 'type'])->filter([
+			'permissionLevel' => Acl::LEVEL_READ,
+			'entity'=>['User','Calendar']
+		]);
+		if(str_starts_with($id, 'r-')) {
+			$q->where('id', '=', 'Calendar:'.substr($id, 2));
+		} else {
+			$q->where('description', '=', $id);
+		}
 
-		$user = User::find(['id', 'username', 'displayName', 'email'])->where('username', '=', $username)->single();
-		if (!$user) {
+
+		$principal = $q->single();
+
+		if (!$principal) {
 			return;
 		}
 		if (isset($pathParts[2])) {
@@ -107,7 +132,7 @@ class PrincipalBackend extends AbstractBackend {
 				'{DAV:}displayname' => $pathParts[2]
 			];
 		}
-		return $this->modelToDAVUser($user);
+		return $this->modelToDAVUser($principal);
 
 	}
 
@@ -158,26 +183,29 @@ class PrincipalBackend extends AbstractBackend {
 			return [];
 		}
 
-		$query = User::find(['username'])
-			->filter(['permissionLevel' => Acl::LEVEL_READ])
-			->selectSingleValue('username');
+		$query = Principal::find(['id', 'description','type'])
+			->filter([
+				'permissionLevel' => Acl::LEVEL_READ,
+				'entity'=>['User','Calendar']
+			]);
 
+		$criteria = new Criteria();
 		foreach ($searchProperties as $property => $value) {
 
 			switch ($property) {
 				case '{DAV:}displayname' :
 					if($test == "allof") {
-						$query->where('displayName', 'LIKE', '%' . $value . '%');
+						$criteria->where('name', 'LIKE', '%' . $value . '%');
 					} else {
-						$query->orWhere('displayName', 'LIKE', '%' . $value . '%');
+						$criteria->orWhere('name', 'LIKE', '%' . $value . '%');
 					}
 					break;
 
 				case '{http://sabredav.org/ns}email-address':
 					if($test == "allof") {
-						$query->where('email', 'LIKE', '%' . $value . '%');
+						$criteria->where('email', 'LIKE', '%' . $value . '%');
 					} else {
-						$query->orWhere('email', 'LIKE', '%' . $value . '%');
+						$criteria->orWhere('email', 'LIKE', '%' . $value . '%');
 					}
 					break;
 				default :
@@ -185,17 +213,20 @@ class PrincipalBackend extends AbstractBackend {
 					return [];
 			}
 		}
-
-//		go()->debug($query);
+		$query->andWhere($criteria);
 
 		$principals = [];
-		foreach($query as $username) {			
-			$principals[] = 'principals/' . $username;
+		foreach($query as $row) {
+			$principals[] = 'principals/' .$this->principalToUri($row);
 		}
 
 		go()->debug("Found ". count($principals) ." principals");
 
 		return $principals;
+	}
+
+	private function principalToUri($p) {
+		return  ($p->type==='resource' ? str_replace('Calendar:','r-',$p->id) : $p->description); // username or id
 	}
 
 
@@ -223,6 +254,7 @@ class PrincipalBackend extends AbstractBackend {
 	 */
 	public function findByUri($uri, $principalPrefix)
 	{
+
 		go()->debug("PrincipalBackend::findByUri($uri, $principalPrefix)");
 
 		if($principalPrefix != "principals") {
