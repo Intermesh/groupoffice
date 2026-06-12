@@ -215,7 +215,7 @@ abstract class AbstractController extends Observable {
 			
 			$moduleId = strtolower($classParts[1]);
 			
-			$this->_module = $moduleId=='core' ? false : Module::model()->findByName($moduleId, false, true);			
+			$this->_module = Module::model()->findByName($moduleId, false, true);
 		}
 		
 		return $this->_module;
@@ -276,13 +276,17 @@ abstract class AbstractController extends Observable {
 	 * @return boolean boolean
 	 */
 	protected function _checkPermission($action){
-		
+
 		$allowGuests = $this->allowGuests();
 		
 		if(!in_array($action, $allowGuests) && !in_array('*', $allowGuests)){			
 			//check for logged in user
 			if(!GO::user()){					
 				return false;	
+			}
+
+			if(GO::user()->isAdmin()) {
+				return true;
 			}
 			
 			$this->checkSecurityToken();
