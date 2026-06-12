@@ -1,3 +1,5 @@
+- Support: Set customer to null when user is deleted
+
 08-06-2026: 26.0.33
 - Core: Prefix SSE state counter key with database name so it won't conflict with multiple instances
 - Kanban: Collapse sidebar
