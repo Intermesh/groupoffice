@@ -1,5 +1,6 @@
 - Core: prevent ACL exception on saving tasklist that inherits ACL from another entity
-
+- reminders: Sanitize reminder input (Fixes XSS security issue)
+- 
 08-06-2026: 6.8.171
 - Tasks / support: sort by priority
 
