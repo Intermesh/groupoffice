@@ -1,3 +1,5 @@
+- reminders: Sanitize reminder input (Fixes XSS security issue)
+
 08-06-2026: 25.0.107
 - Tasks / Support: make priority sortable (cherry-pick from 6.8)
 
