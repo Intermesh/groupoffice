@@ -1,10 +1,12 @@
 - Support: Set customer to null when user is deleted
+- Finance: Missing quotes in content-disposition filename
+- Core: fixed problem where you could access controllers of not installed modules
 
 08-06-2026: 26.0.33
 - Core: Prefix SSE state counter key with database name so it won't conflict with multiple instances
 - Kanban: Collapse sidebar
 - pdfeditor: debug exceptions
-- reminders: Sanitize reminder input (Fixes XSS security issue
+- reminders: Sanitize reminder input (Fixes XSS security issue)
 - onlyoffice: better error message when URL provided by ONlyOffice is different from configured
 - reminders: Sanitise reminder input (Fixes XSS security issue)
 - Tasks: prevent exception when sorting by project without projects3 being installed
