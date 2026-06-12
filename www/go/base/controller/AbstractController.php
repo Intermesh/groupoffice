@@ -293,7 +293,7 @@ abstract class AbstractController extends Observable {
 			{
 				// return !!go()->getAuthState()->getClassPermissionLevel(static::class);
 				$module = $this->getModule();		
-				if($module && !$module->permissionLevel)
+				if(!$module || !$module->permissionLevel)
 					return false;
 			}
 		}
