@@ -22,7 +22,6 @@ import {commentDS, commentLabelDS} from "./Index.js";
 
 
 export interface CommentListEventMap extends ComponentEventMap {
-
 	listready: {}
 }
 
@@ -86,7 +85,6 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 
 	public onBeforeStoreLoad(ev: StoreEventMap['beforeload']) {
 		this.mask();
-
 	}
 
 	public onStoreLoad() {
@@ -363,7 +361,7 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 			this.scroller.el.scrollTop = this.scroller.el.scrollHeight;
 			this.unmask();
 			this.fire("listready", {});
-		})
+		});
 
 	}
 
