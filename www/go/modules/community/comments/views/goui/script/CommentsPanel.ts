@@ -121,13 +121,11 @@ export class CommentsPanel extends Component {
 						flex: 1,
 						handler: (form) => {
 							if (form.value.text.length > 0) {
-								const labelIds = form.value.labels.map((l: { id: number; }) => l);
-
 								return commentDS.create(
 									Object.assign({
 										entity: this.entityName,
 										entityId: this.entityId!,
-										labels: labelIds,
+										labels: form.value.labels,
 										text: form.value.text,
 										attachments: form.value.attachments,
 										section: this.section
