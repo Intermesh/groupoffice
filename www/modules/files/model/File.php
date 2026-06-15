@@ -18,6 +18,7 @@ namespace GO\Files\Model;
 use Exception;
 use GO;
 use GO\Base\Exception\AccessDenied;
+use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\mail\Attachment;
 use go\core\model\Module;
@@ -671,9 +672,18 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 //		for safety allow replace action
 		if(!$this->isNew)
 			$this->log("update");
-		$this->saveVersion();
 
-		if(!$fsFile->move($this->folder->fsFolder,$this->name, $isUploadedFile)){		
+		$oldPath = $this->saveVersion();
+
+		if(!$fsFile->move($this->folder->fsFolder,$this->name, $isUploadedFile) || !file_exists($this->fsFile->path())){
+
+			ErrorHandler::log("Move of file: ".$this->fsFile->path()." to ".$this->folder->fsFolder->path()." failed.");
+
+			// restore old file
+			if($oldPath != $this->fsFile->path()) {
+				$restore = new GO\Base\Fs\File($oldPath);
+				$restore->move($this->folder->fsFolder, $this->name);
+			}
 			return false;
 		}
 		$fsFile->setDefaultPermissions();
@@ -712,6 +722,10 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 			$version->file_id = $this->id;
 			$version->size_bytes = $this->size;
 			$version->save();
+
+			return $version->path;
+		} else {
+			return $this->fsFile->path();
 		}
 	}
 
