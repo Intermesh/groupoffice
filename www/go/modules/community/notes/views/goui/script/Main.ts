@@ -51,7 +51,6 @@ export class Main extends MainThreeColumnPanel {
 	}
 
 	protected createWest() {
-
 		this.noteBookGrid = notebookgrid({
 			headers: false,
 			fitParent: true,

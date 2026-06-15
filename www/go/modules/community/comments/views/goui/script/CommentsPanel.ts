@@ -121,7 +121,7 @@ export class CommentsPanel extends Component {
 						flex: 1,
 						handler: (form) => {
 							if (form.value.text.length > 0) {
-								const labelIds = form.value.labels.map((l: { id: number; }) => l.id);
+								const labelIds = form.value.labels.map((l: { id: number; }) => l);
 
 								return commentDS.create(
 									Object.assign({
@@ -143,7 +143,6 @@ export class CommentsPanel extends Component {
 					fieldset({},
 						this.commentEditor
 					),
-
 					tbar({},
 						btn({
 							icon: "attach_file",

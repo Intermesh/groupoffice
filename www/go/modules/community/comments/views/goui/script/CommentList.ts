@@ -29,7 +29,6 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 	public store: DataSourceStore
 	public scroller: Component
 
-
 	public stripQuotes = false;
 
 	constructor() {
@@ -220,7 +219,6 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 								);
 
 								imageWin.show();
-
 							}
 						});
 					},
