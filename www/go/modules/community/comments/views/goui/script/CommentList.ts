@@ -26,7 +26,7 @@ export interface CommentListEventMap extends ComponentEventMap {
 	listready: {}
 }
 
-class CommentList extends Component<CommentListEventMap>implements StoreComponent {
+class CommentList extends Component<CommentListEventMap> implements StoreComponent {
 	public store: DataSourceStore
 	public scroller: Component
 
@@ -72,19 +72,19 @@ class CommentList extends Component<CommentListEventMap>implements StoreComponen
 
 		this.on("render", () => {
 			this.scroller.style = {maxHeight: (document.body.offsetHeight * 0.7) + "px"};
-		})
+		});
 
 		this.items.add(this.scroller);
 	}
 
 
-	public onStoreLoadException(ev:StoreEventMap['loadexception']) {
+	public onStoreLoadException(ev: StoreEventMap['loadexception']) {
 		void Window.error(ev.reason);
 		this.unmask();
 	}
 
 
-	public onBeforeStoreLoad(ev:StoreEventMap['beforeload']) {
+	public onBeforeStoreLoad(ev: StoreEventMap['beforeload']) {
 		this.mask();
 
 	}
@@ -96,11 +96,13 @@ class CommentList extends Component<CommentListEventMap>implements StoreComponen
 
 		const records = this.store.all();
 
-		const cmps = records.map((comment) => {
+		const cmps: Component[] = []
+
+		records.forEach((comment) => {
 			let currentDate = Format.date(comment.date);
 
 			if (!lastDate || currentDate !== lastDate) {
-				this.scroller.items.add(comp({
+				cmps.push(comp({
 					tagName: "h5",
 					style: {
 						textAlign: "center",
@@ -338,7 +340,8 @@ class CommentList extends Component<CommentListEventMap>implements StoreComponen
 				writtenByUser ? avatarCnt : triangle,
 			);
 
-			return comp({
+			cmps.push(
+				comp({
 						cls: "hbox",
 						style: {
 							marginBottom: "0.8rem",
@@ -351,6 +354,7 @@ class CommentList extends Component<CommentListEventMap>implements StoreComponen
 					writtenByUser ? commentComp : avatarComp,
 					writtenByUser ? avatarComp : commentComp,
 				)
+			);
 		});
 
 		this.scroller.items.replace(...cmps);
@@ -363,10 +367,10 @@ class CommentList extends Component<CommentListEventMap>implements StoreComponen
 
 	}
 
-	public onRecordRemove(ev:StoreEventMap<any>['remove']) {
+	public onRecordRemove(ev: StoreEventMap<any>['remove']) {
 	}
 
-	public onRecordAdd(ev:any) {
+	public onRecordAdd(ev: any) {
 	}
 }
 
