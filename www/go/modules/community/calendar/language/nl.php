@@ -243,4 +243,6 @@ return array (
   'This' => 'Dit',
 	'Auto-accept available resources' => 'Beschikbare faciliteiten automatisch accepteren',
 	'Show multiline event blocks' => 'Toon afspraak blokken op meerdere regels',
+	'Past appointments' => 'Verlopen afspraken',
+	'Upcoming appointments' => 'Aankomende afspraken',
 );

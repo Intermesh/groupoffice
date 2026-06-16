@@ -299,7 +299,7 @@ modules.register(  {
 
 					var forth = new go.links.DetailPanel({
 						link: {
-							title: t("Forthcoming appointments"),
+							title: t("Upcoming appointments"),
 							iconCls: 'icon ic-event orange',
 							entity: "CalendarEvent",
 							filter: null
