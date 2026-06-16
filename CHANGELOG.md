@@ -1,3 +1,5 @@
+- Timeregistration: Added customer to export and made columns project and customer sortable
+
 15-06-2026: 26.0.34
 - Support: Set customer to null when user is deleted
 - Finance: Missing quotes in content-disposition filename
