@@ -859,12 +859,13 @@ class Instance extends Entity {
 					ErrorHandler::log("Could not delete temp folder: " . $e->getMessage());
 				}
 
-
-				$dest = self::getTrashFolder()->getFolder($instance->getDataFolder()->getName());
-				if ($dest->exists()) {
-					$dest = $dest->getParent()->getFolder($instance->getDataFolder()->getName() . '-' . uniqid());
+				if($instance->getDataFolder()->exists()) {
+					$dest = self::getTrashFolder()->getFolder($instance->getDataFolder()->getName());
+					if ($dest->exists()) {
+						$dest = $dest->getParent()->getFolder($instance->getDataFolder()->getName() . '-' . uniqid());
+					}
+					$instance->getDataFolder()->move($dest);
 				}
-				$instance->getDataFolder()->move($dest);
 
 				try {
 					$instance->dropDatabaseUser($instance->getDbUser());
