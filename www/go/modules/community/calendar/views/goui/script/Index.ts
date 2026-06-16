@@ -294,7 +294,33 @@ modules.register(  {
 
 					return dlg;
 				},
-				linkDetail:() =>  new EventDetail()
+				linkDetail:() =>  new EventDetail(),
+				linkDetailCards () {
+
+					var forth = new go.links.DetailPanel({
+						link: {
+							title: t("Forthcoming appointments"),
+							iconCls: 'icon ic-event orange',
+							entity: "CalendarEvent",
+							filter: null
+						}
+					});
+
+					forth.store.setFilter('date', {eventsAfter: true});
+
+					var past = new go.links.DetailPanel({
+						link: {
+							title: t("Past appointments"),
+							iconCls: 'icon ic-event orange',
+							entity: "CalendarEvent",
+							filter: null
+						}
+					});
+
+					past.store.setFilter('past', {eventsBefore: true});
+
+					return [forth, past];
+				}
 			}]
 		}
 	],

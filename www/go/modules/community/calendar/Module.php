@@ -5,14 +5,17 @@ use DateInterval;
 use Faker\Generator;
 use go\core;
 use go\core\cron\GarbageCollection;
+use go\core\db\Criteria;
 use go\core\exception\Forbidden;
 use go\core\http\PostResponseProcessor;
+use go\core\jmap\Entity;
 use go\core\model\Acl;
 use go\core\model\Group;
 use go\core\model\Link;
 use go\core\model\Module as GoModule;
 use go\core\model\Permission;
 use go\core\model\User;
+use go\core\orm\Filters;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\model\Module as CoreModule;
@@ -24,8 +27,6 @@ use go\modules\community\calendar\model\BusyPeriod;
 use go\modules\community\calendar\model\CalendarEvent;
 use go\modules\community\calendar\model\ICalendarHelper;
 use go\modules\community\calendar\model\Scheduler;
-use Sabre\VObject\Component\VCalendar;
-use Sabre\VObject\TimeZoneUtil;
 
 class Module extends core\Module
 {
@@ -79,8 +80,28 @@ class Module extends core\Module
 	{
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 		User::on(User::EVENT_AFTER_SAVE, static::class, 'onUserSave');
+		Link::on(Entity::EVENT_FILTER, static::class, 'onLinkFilter');
 		User::on(User::EVENT_ARCHIVE, static::class, 'onUserArchive');
 		GarbageCollection::on(GarbageCollection::EVENT_RUN, static::class, 'onGarbageCollection');
+	}
+
+	public static function onLinkFilter(Filters $filters) {
+		$filters->add('eventsBefore', function(Criteria $criteria, $value, \go\core\db\Query $query, array $filter){
+			$query->join('calendar_calendar_event', 'ce', 'search.entityId = ce.id')
+				->join('calendar_event', 'e', 'e.eventId = ce.eventId');
+			$criteria
+				->where('search.entityTypeId', '=', CalendarEvent::entityType()->getId())
+				->andWhere('e.start','<', date('Y-m-d'));
+		});
+
+		$filters->add('eventsAfter', function(Criteria $criteria, $value, Query $query, array $filter){
+			$query->join('calendar_calendar_event', 'ce', 'search.entityId = ce.id')
+				->join('calendar_event', 'e', 'e.eventId = ce.eventId');
+			$criteria
+				->where('search.entityTypeId', '=', CalendarEvent::entityType()->getId())
+				->andWhere('e.start','>=', date('Y-m-d'));
+		});
+		return true;
 	}
 
 	static function onUserSave(User $user, bool $wasNew) {
