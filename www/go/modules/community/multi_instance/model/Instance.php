@@ -471,28 +471,28 @@ class Instance extends Entity {
 
 	private function dropDatabase($dbName): void
 	{
-		go()->getDbConnection()->query("DROP DATABASE IF EXISTS `".$dbName."`");
+		go()->getDbConnection()->exec("DROP DATABASE IF EXISTS `".$dbName."`");
 	}
 
 
 	private function createDatabase($dbName): void
 	{
-		go()->getDbConnection()->query("CREATE DATABASE IF NOT EXISTS `".$dbName."`");
+		go()->getDbConnection()->exec("CREATE DATABASE IF NOT EXISTS `".$dbName."`");
 	}
 
 
 	private function dropDatabaseUser($dbUser) {
-		go()->getDbConnection()->query("DROP USER '" . $dbUser . "'@'%'");
+		go()->getDbConnection()->exec("DROP USER '" . $dbUser . "'@'%'");
 	}
 
 
 	private function createDatabaseUser($dbName, $dbUsername, $dbPassword)
 	{
 		$sql = "CREATE USER '" . $dbUsername . "' IDENTIFIED BY '" . $dbPassword . "'";
-		go()->getDbConnection()->query($sql);
+		go()->getDbConnection()->exec($sql);
 		$sql = "GRANT ALL PRIVILEGES ON `" . $dbName . "`.* TO '" . $dbUsername . "'@'%'";
-		go()->getDbConnection()->query($sql);
-		go()->getDbConnection()->query('FLUSH PRIVILEGES');
+		go()->getDbConnection()->exec($sql);
+		go()->getDbConnection()->exec('FLUSH PRIVILEGES');
 	}
 	
 //	private function createConfigFile($dbName, $dbUsername, $dbPassword, $tmpPath, $dataPath) {
@@ -865,9 +865,17 @@ class Instance extends Entity {
 					$dest = $dest->getParent()->getFolder($instance->getDataFolder()->getName() . '-' . uniqid());
 				}
 				$instance->getDataFolder()->move($dest);
-			
-				$instance->dropDatabaseUser($instance->getDbUser());
-				$instance->dropDatabase($instance->getDbName());
+
+				try {
+					$instance->dropDatabaseUser($instance->getDbUser());
+				} catch(Exception $e) {
+					ErrorHandler::logException($e, "Failed to drop database user: " . $instance->getDbUser());
+				}
+				try {
+					$instance->dropDatabase($instance->getDbName());
+				} catch(Exception $e) {
+					ErrorHandler::logException($e, "Failed to drop database: " . $instance->getDbName());
+				}
 			}catch(Exception $e) {
 				ErrorHandler::log("Error deleting instance: ". $instance->hostname);
 				ErrorHandler::logException($e);
