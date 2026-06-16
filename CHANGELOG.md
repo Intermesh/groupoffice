@@ -1,3 +1,5 @@
+- Email: Folders are now accessible via a direct URL
+
 16-06-2026: 26.0.35
 - Timeregistration: Added customer to export and made columns project and customer sortable
 - Notes: Display issue on small (mobile) screens
