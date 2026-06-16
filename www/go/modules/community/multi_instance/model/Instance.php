@@ -843,7 +843,14 @@ class Instance extends Entity {
 				//load instance config just before moving the config file. Moving the config file disables
 				// the installation and prevents further changes.
 				$instance->getInstanceConfig();
-				$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php')->appendNumberToNameIfExists());
+
+				if($instance->getConfigFile()->exists()) {
+					$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php')->appendNumberToNameIfExists());
+
+					$instance->mysqldump();
+
+					$instance->getConfigFile()->getFolder()->delete();
+				}
 
 				try {
 					$instance->getTempFolder()->delete();
@@ -852,22 +859,6 @@ class Instance extends Entity {
 					ErrorHandler::log("Could not delete temp folder: " . $e->getMessage());
 				}
 
-				$instance->mysqldump();
-
-//				try {
-//					$modPackageFolder = $instance->getModulePackageFolder();
-//					if ($modPackageFolder->exists()) {
-//						$dest = $instance->getDataFolder()->getFolder($instance->getStudioPackage() . '_MODULE_PACKAGE');
-//						if ($dest->exists()) {
-//							$dest = new Folder($dest->getPath() . '-' . uniqid());
-//						}
-//						$instance->getModulePackageFolder()->move($dest);
-//					}
-//				} catch(\Throwable $e) {
-//					ErrorHandler::logException($e, "Error while deleting module folder for instance ". $instance->hostname);
-//				}
-
-				$instance->getConfigFile()->getFolder()->delete();
 
 				$dest = self::getTrashFolder()->getFolder($instance->getDataFolder()->getName());
 				if ($dest->exists()) {
