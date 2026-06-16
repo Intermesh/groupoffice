@@ -105,7 +105,10 @@ export class SplitView extends MonthView {
 						//E('li', E('i', 'event').cls('icon').css({color:'#'+calendar.color}), calendar.name)
 					).attr('data-calid',calendar.id);
 				for (i = 0; i < this.wdays; i++) {
-					row.append(E('li').attr('data-date', day.format('Y-m-d'))
+					const cDay = day.clone();
+					row.append(E('li',E('div','+ 0 more').css({height:this.ROWHEIGHT+'rem'}).cls('more').on('click', _e => {
+						this.fire('dayclick', {day: cDay});
+					}).on('mousedown',e=>e.stopPropagation())).attr('data-date', day.format('Y-m-d'))
 						.cls('today', day.format('Ymd') === now.format('Ymd'))
 						.cls('past', day.format('Ymd') < now.format('Ymd'))
 						.cls('other', day.getDay() % 6 == 0))

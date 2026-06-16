@@ -1,6 +1,11 @@
+- Timeregistration: Added customer to export and made columns project and customer sortable
+
+15-06-2026: 26.0.34
 - Support: Set customer to null when user is deleted
 - Finance: Missing quotes in content-disposition filename
 - Core: fixed problem where you could access controllers of not installed modules
+- Files: Attempt to restore old version if moving new file somehow fails
+- Timeregistration3: Added customer column to list view
 
 08-06-2026: 26.0.33
 - Core: Prefix SSE state counter key with database name so it won't conflict with multiple instances

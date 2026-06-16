@@ -102,6 +102,16 @@
 		margin-right:dp(4);
 	}
 }
+.cal.plan li[data-date] > div {
+	@extend %event;
+	position: initial;
+	font-size: 1.1em;
+	height: auto !important;
+	overflow:visible;
+	margin-bottom: 2px;
+	background-color: color-mix(in srgb, currentColor 56%, transparent);
+	> span {float:right;}
+}
 
 .yearview {
 	background-color: $colorBackground;
@@ -204,7 +214,7 @@
 	i.icon {
 		display:inline-block !important;
 	}
-	li {
+	ul > li, &.month li {
 
 		&.today {
 			em {
@@ -213,7 +223,7 @@
 				display:inline-block;
 				text-align: center;
 				min-width: dp(36);
-				line-height: dp(18);
+				//line-height: dp(18);
 				color: white !important;
 				background-color:$colorPrimary !important;
 			}
@@ -425,6 +435,7 @@
 		}
 	}
 }
+.cal.split ol > li > div.more { width: 100%; }
 
 $timeMargin: dp(72);
 

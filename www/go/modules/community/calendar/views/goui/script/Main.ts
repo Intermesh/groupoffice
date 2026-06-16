@@ -105,8 +105,6 @@ export class Main extends Component {
 		});
 		const rights = modules.get("community", "calendar")!.userRights;
 
-		const multiLine = client.user.calendarPreferences.multiLine ? 'multiline':'';
-
 		this.items.add(
 			this.west = comp({tagName: 'aside', width: 274, cls:'scroll', style: {paddingTop:'1.2rem', minWidth: '27.4rem'}},
 				tbar({cls: "for-medium-device"},
@@ -305,7 +303,7 @@ export class Main extends Component {
 						}),
 					)})
 				),
-				this.cards = cards({cls: multiLine, flex: 1, activeItem:1, listeners: {render: ({target}) => this.applySwipeEvents(target)}},
+				this.cards = cards({flex: 1, activeItem:1, listeners: {render: ({target}) => this.applySwipeEvents(target)}},
 					weekView,
 					monthView,
 					yearView,
@@ -314,12 +312,7 @@ export class Main extends Component {
 				)
 			)
 		);
-		if(client.user.calendarPreferences?.startView) {
-			const parts = client.user.calendarPreferences?.startView.split('-');
-			this.setSpan(parts[0], parseInt(parts[1] ?? 0));
-		} else {
-			this.setSpan('month', 0);
-		}
+
 		this.date = new DateTime();
 		// NOPE:router will call setSpan and render
 		// calendar store load will call first view update
@@ -335,13 +328,22 @@ export class Main extends Component {
 			this.applyInCalendarFilter(ids);
 			this.updateView();
 		});
-		this.on('render', () => { inviteStore.load(); });
+		this.on('render', () => {
+			this.cards.cls = client.user.calendarPreferences.multiLine ? 'multiline':'';
+			if(client.user.calendarPreferences?.startView) {
+				const parts = client.user.calendarPreferences?.startView.split('-');
+				this.setSpan(parts[0], parseInt(parts[1] ?? 0));
+			} else {
+				this.setSpan('month', 0);
+			}
+
+			inviteStore.load();
+		});
 	}
 
 	private applySwipeEvents(cards: CardContainer) {
 		let initX = 0, initY = 0;
 		cards.el.on('touchstart', e => {
-			console.log('touchstart');
 			initX = e.changedTouches[0].screenX;
 			initY = e.changedTouches[0].screenY;
 		}).on('touchend', e => {
@@ -430,7 +432,14 @@ export class Main extends Component {
 				listeners: {
 					'selectionchange': ({selected}) => {
 						if(selected[0]) {
-							this.applyInCalendarFilter(selected[0].record.calendarIds??[]);
+							const calIds = selected[0].record.calendarIds;
+							if(calIds) {
+								for(const id in calIds) {
+									jmapds('Calendar').update(id, {isVisible: true});
+								}
+								this.applyInCalendarFilter(calIds);
+							}
+
 							if(selected[0].record.defaultView) {
 								this.routeTo(selected[0].record.defaultView, this.date);
 								// const parts = selected[0].record.defaultView.split('-');
@@ -582,6 +591,9 @@ export class Main extends Component {
 			case 'year':
 				this.date.addYears(value);
 				break;
+			default:
+				this.date.addDays(value * this.spanAmount!);
+				route += '-'+this.spanAmount;
 		}
 		// set path silent to buffer the update
 		//router.suspendEvent = true;
@@ -610,7 +622,8 @@ export class Main extends Component {
 			'month': [1, 3],
 			'year': [2, 4],
 			'split': [3,5],
-			'list': [4,6]
+			'list': [4,6],
+			'custom': [5,-1]
 		})[this.timeSpan];
 
 		this.cardMenu.items.forEach(i => i.el.cls('-active'));
