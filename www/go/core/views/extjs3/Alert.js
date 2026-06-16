@@ -172,13 +172,13 @@
 						}
 					}
 
-					if(!("notificationBody" in c)) {
-						c.notificationBody =  go.util.Format.dateTime(alert.triggerAt);
-
-						if(alert.data) {
-							c.notificationBody += ": " + JSON.stringify(alert.data, undefined, 1);
-						}
-					}
+					// if(!("notificationBody" in c)) {
+					// 	c.notificationBody =  go.util.Format.dateTime(alert.triggerAt);
+					//
+					// 	if(alert.data) {
+					// 		c.notificationBody += ": " + JSON.stringify(alert.data, undefined, 1);
+					// 	}
+					// }
 
 					go.Notifier.msg(panelCfg);
 				}).catch(reason => {
