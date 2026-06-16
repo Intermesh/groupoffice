@@ -243,4 +243,6 @@ return array (
   'Invitation updated by {from}' => 'Einladung aktualisiert von {from}',
   'Enter webcal address' => 'Webcal-Adresse eintragen',
   'You are not an invited to this event' => 'Sie sind zu diesem Termin nicht eingeladen',
+	'Past appointments' => 'Vergangene Termine',
+	'Upcoming appointments' => 'Kommende Termine',
 );

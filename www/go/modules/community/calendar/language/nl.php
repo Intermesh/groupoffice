@@ -172,7 +172,7 @@ return array (
     'tentative' => 'U weet nog niet of u de afspraak accepteert',
   ),
   'Global category' => 'Algemene categorie',
-  'Show events that you have declined' => 'Afsrpaken tonen die u hebt geweigerd',
+  'Show events that you have declined' => 'Afspraken tonen die u hebt geweigerd',
   'Start with this calendar selected' => 'Starten met deze agenda geselecteerd',
   'Personal calendar' => 'Persoonlijke agenda',
   'Height for day/week view' => 'Hoogte voor dag/weekweergave',
@@ -243,4 +243,6 @@ return array (
   'This' => 'Dit',
 	'Auto-accept available resources' => 'Beschikbare faciliteiten automatisch accepteren',
 	'Show multiline event blocks' => 'Toon afspraak blokken op meerdere regels',
+	'Past appointments' => 'Verlopen afspraken',
+	'Upcoming appointments' => 'Aankomende afspraken',
 );

@@ -74,12 +74,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			case "board":
 			case "project":
 				break;
-
-			default:
-				if(this.redirectOnSave) {
-					this.entityStore.entity.goto(this.currentId);
-				}
-				break;
 		}
 	},
 

@@ -645,11 +645,18 @@ class Task extends AclItemEntity {
 		}
 
 		if(isset($sort['project'])) {
-
-			if(!$query->isJoined("business_projects3_project3", "project")) {
-				$query->join("business_projects3_project3", "project", "project.id = task.projectId", "left");
+			if(go()->getModule("business", "projects3")) {
+				if (!$query->isJoined("business_projects3_project3", "project")) {
+					$query->join("business_projects3_project3", "project", "project.id = task.projectId", "left");
+				}
+				$sort->renameKey('project', 'project.number');
+			} else {
+				if (!$query->isJoined("tasks_tasklist", "tasklist")) {
+					$query->join("tasks_tasklist", "tasklist", "tasklist.id = task.tasklistId")
+						->join('pr2_projects', 'pr2', 'pr2_projects.id = tasklist.projectId', 'left');
+				}
+				$sort->renameKey('project', 'pr2.name');
 			}
-			$sort->renameKey('project','project.number');
 		}
 
 
@@ -681,6 +688,14 @@ class Task extends AclItemEntity {
 			$query->join('tasks_task_category', 'tc', 'tc.taskId = '.$query->getTableAlias() . '.id', 'LEFT');
 			$query->join('tasks_category', 'categorySort', 'tc.categoryId = categorySort.id', 'LEFT');
 			$sort->renameKey('categories', 'categorySort.name');
+		}
+
+		if (isset($sort['priority'])) {
+			$i = array_search('priority', $sort->keys());
+			$dir = strtolower($sort['priority']) == 'asc' ? 'DESC' : 'ASC';
+			$al = $query->getTableAlias();
+			$exp = new Expression("IF(" . $al . ".priority=9, -1, " . $al . ".priority) ". $dir);
+			$sort->insert($i, $exp);
 		}
 
 		return parent::sort($query, $sort);
@@ -836,7 +851,10 @@ class Task extends AclItemEntity {
 			}
 		}
 
-		if($comment->createdBy == $this->responsibleUserId) {
+		// don't set Ticket to in progress when support agent sent the e-mail
+		$existingComments = Comment::findForEntity($this)->all();
+
+		if($comment->createdBy == $this->responsibleUserId && count($existingComments) > 1) {
 			$this->progress = Progress::InProcess;
 		} else {
 			$this->progress = Progress::NeedsAction;

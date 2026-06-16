@@ -75,17 +75,7 @@ export class ResourceWindow extends FormWindow {
 
 		this.addCustomFields();
 
-		this.addSharePanel([
-			{value: "",name: ""},
-			{value: 5, name: t("Read free/busy")},
-			{value: 10,name: t("Read items")},
-			//{value: 20,name: t("Update private")},
-			{value: 25,name: t("Approve / Disapprove")}, // RSVP
-			{value: 30,name: t("Write own")},
-			{value: 35,name: t("Write all")},
-			{value: 40,name: t("Write / Delete")},
-			{value: 50,name: t("Manage")}
-		]);
+		this.addSharePanel();
 	}
 }
 export class ResourcesWindow extends Window {

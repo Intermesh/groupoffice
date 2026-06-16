@@ -15,6 +15,7 @@ use go\core\orm\exception\SaveException;
 use go\core\orm\Query;
 use go\core\util\DateTime;
 use go\modules\business\support\Module;
+use Throwable;
 
 /**
  * Abstract converter class
@@ -451,12 +452,14 @@ abstract class AbstractConverter {
 					$entity = $this->entityClass::findById($entityId);
 
 					$this->exportEntity($entity);
-					$this->index++;
 
-				} catch (Exception $e) {
+				} catch (Throwable $e) {
 					$errorCount++;
 					ErrorHandler::logException($e);
+					$this->writeExportError($e);
 				}
+
+				$this->index++;
 
 				$this->notifyCount(false, $this->index, $errorCount);
 			}
@@ -466,12 +469,16 @@ abstract class AbstractConverter {
 			$this->notifyEnd(false, $this->index, 0, $blob);
 
 			return $blob;
-		} catch (\Throwable $e) {
+		} catch (Throwable $e) {
 			ErrorHandler::logException($e);
 			$this->notifyError(false, $e->getMessage());
 		}
 
 		return null;
+	}
+
+	protected function writeExportError(Throwable $e) : void {
+
 	}
 
   /**

@@ -131,6 +131,16 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 		el.on('mousedown', (e) => {
 			if(e.button !== 0) return;
 			e.preventDefault(); // no text selection
+			const event = e.target.up('div[data-key]');
+			if(event) {
+				ev = this.viewModel.find(m => m.key == event.dataset.key)!;
+				if (ev && ev.mayChange) {
+					action = move;
+					el.on('mousemove', mouseMove);
+					window.addEventListener('mouseup', mouseUp, {once: true});
+				}
+				return;
+			}
 			const day = e.target.up('li[data-date]');
 			if(day) {
 				const dd = client.user.calendarPreferences.defaultDuration,
@@ -150,14 +160,6 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 				//eventsContainer.prepend(ev.divs[0]);
 				anchor = from = till = day;
 				action = create;
-				el.on('mousemove', mouseMove);
-				window.addEventListener('mouseup', mouseUp, {once:true});
-			}
-			const event = e.target.up('div[data-key]');
-			if(event) {
-				ev = this.viewModel.find(m => m.key == event.dataset.key)!;
-				if(!ev || !ev.mayChange) return;
-				action = move;
 				el.on('mousemove', mouseMove);
 				window.addEventListener('mouseup', mouseUp, {once:true});
 			}
@@ -217,7 +219,7 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 					E('span',E('em', day.format( 'j')), day.format( day.getDate() === 1 ?' M' :'')).on('click', _e => {
 						this.fire('dayclick', {day: cDay});
 					}).on('mousedown', e => { e.stopPropagation()}),
-					E('div','+ 0 more').cls('more').on('click', _e => {
+					E('div','+ 0 more').css({height:this.ROWHEIGHT+'rem'}).cls('more').on('click', _e => {
 						this.fire('dayclick', {day: cDay});
 					}).on('mousedown',e=>e.stopPropagation())
 				).attr('data-date', day.format('Y-m-d'))
@@ -235,12 +237,11 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 	}
 
 
-	private updateHasMore() {
+	protected updateHasMore() {
 		// height of the week row
-		const height = this.el.children[1].clientHeight;//(this.el.children[1].clientHeight - this.el.firstElementChild!.clientHeight) / this.weekRows.length;
+		const height = this.el.children[2].clientHeight;//(this.el.children[1].clientHeight - this.el.firstElementChild!.clientHeight) / this.weekRows.length;
 		// how many event fit in the week row
-		const fit = Math.floor(((Component.pxToRem(height)/10 - 3.4) / this.ROWHEIGHT) - .5) ;
-
+		const fit = Math.floor(((Component.pxToRem(height)/10 - 3.4) / this.ROWHEIGHT)) ;
 		const ols = this.el.getElementsByTagName('ol');
 		for (let i = 0; i < ols.length; i++) {
 			const lis = ols[i].getElementsByTagName('li');
@@ -272,7 +273,7 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 	iterator!: number
 	continues: CalendarItem[] = []
 
-	private drawWeek(wstart: DateTime) {
+	protected drawWeek(wstart: DateTime) {
 		let end = wstart.clone().addDays(this.wdays),
 			e: any;
 		let eventEls = [];

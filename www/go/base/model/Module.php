@@ -397,6 +397,6 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	 * @return self
 	 */
 	public function findByName($name) {
-		return $this->findSingleByAttributes(['name'=> $name, 'package' => null], (new \GO\Base\Db\FindParams())->ignoreAcl());
+		return $this->findSingleByAttributes(['name'=> $name, 'package' => $name == "core" ? "core" : null], (new \GO\Base\Db\FindParams())->ignoreAcl());
 	}
 }

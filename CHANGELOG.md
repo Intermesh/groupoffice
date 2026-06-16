@@ -1,7 +1,27 @@
+16-06-2026: 26.0.35
+- Timeregistration: Added customer to export and made columns project and customer sortable
+- Notes: Display issue on small (mobile) screens
+
+15-06-2026: 26.0.34
+- Support: Set customer to null when user is deleted
+- Finance: Missing quotes in content-disposition filename
+- Core: fixed problem where you could access controllers of not installed modules
+- Files: Attempt to restore old version if moving new file somehow fails
+- Timeregistration3: Added customer column to list view
+
+08-06-2026: 26.0.33
 - Core: Prefix SSE state counter key with database name so it won't conflict with multiple instances
 - Kanban: Collapse sidebar
 - pdfeditor: debug exceptions
+- reminders: Sanitize reminder input (Fixes XSS security issue)
+- onlyoffice: better error message when URL provided by ONlyOffice is different from configured
 - reminders: Sanitise reminder input (Fixes XSS security issue)
+- Tasks: prevent exception when sorting by project without projects3 being installed
+- Comments: flickerless reload
+- core: html editor clears style attributes with clear formatting too
+- Kanban: smoother rendering and fixed reordering bug when dropping underneath the other cards
+- Tasks / Support: make priority sortable (cherry-pick from 6.8)
+
 
 01-06-2026: 26.0.32
 - Core: SSE uses apcu if available to check changes every second. When an entity is modified a state counter is 

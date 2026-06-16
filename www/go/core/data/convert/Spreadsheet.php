@@ -22,6 +22,7 @@ use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet as PhpSpreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 use PhpOffice\PhpSpreadsheet\Worksheet\RowIterator;
+use Throwable;
 
 /**
  * CSV converter.
@@ -204,6 +205,11 @@ th {
 
 			$this->arrayToSpreadSheet($this->spreadSheetIndex++, $array);
 		}
+	}
+
+	protected function writeExportError(Throwable $e) : void
+	{
+		$this->writeRecord([$e->getMessage()]);
 	}
 
 	/**

@@ -1,16 +1,20 @@
 import {
 	avatar,
-	btn, CollectionEventMap,
+	btn,
 	comp,
-	Component, ComponentEventMap,
+	Component,
+	ComponentEventMap,
 	datasourcestore,
 	DataSourceStore,
 	Format,
 	menu,
-	Notifier, QuoteStripper, Store, StoreComponent, StoreEventMap,
-	StoreRecord,
+	Notifier,
+	QuoteStripper,
+	StoreComponent,
+	StoreEventMap,
 	t,
-	win, Window
+	win,
+	Window
 } from "@intermesh/goui";
 import {AclLevel, client, entities, Image, img, principalDS} from "@intermesh/groupoffice-core";
 import {CommentDialog} from "./CommentDialog.js";
@@ -18,14 +22,12 @@ import {commentDS, commentLabelDS} from "./Index.js";
 
 
 export interface CommentListEventMap extends ComponentEventMap {
-
 	listready: {}
 }
 
-class CommentList extends Component<CommentListEventMap>implements StoreComponent {
+class CommentList extends Component<CommentListEventMap> implements StoreComponent {
 	public store: DataSourceStore
 	public scroller: Component
-
 
 	public stripQuotes = false;
 
@@ -68,21 +70,20 @@ class CommentList extends Component<CommentListEventMap>implements StoreComponen
 
 		this.on("render", () => {
 			this.scroller.style = {maxHeight: (document.body.offsetHeight * 0.7) + "px"};
-		})
+		});
 
 		this.items.add(this.scroller);
 	}
 
 
-	public onStoreLoadException(ev:StoreEventMap['loadexception']) {
+	public onStoreLoadException(ev: StoreEventMap['loadexception']) {
 		void Window.error(ev.reason);
 		this.unmask();
 	}
 
 
-	public onBeforeStoreLoad(ev:StoreEventMap['beforeload']) {
+	public onBeforeStoreLoad(ev: StoreEventMap['beforeload']) {
 		this.mask();
-		this.scroller.items.clear();
 	}
 
 	public onStoreLoad() {
@@ -92,11 +93,13 @@ class CommentList extends Component<CommentListEventMap>implements StoreComponen
 
 		const records = this.store.all();
 
+		const cmps: Component[] = []
+
 		records.forEach((comment) => {
 			let currentDate = Format.date(comment.date);
 
 			if (!lastDate || currentDate !== lastDate) {
-				this.scroller.items.add(comp({
+				cmps.push(comp({
 					tagName: "h5",
 					style: {
 						textAlign: "center",
@@ -216,7 +219,6 @@ class CommentList extends Component<CommentListEventMap>implements StoreComponen
 								);
 
 								imageWin.show();
-
 							}
 						});
 					},
@@ -334,7 +336,7 @@ class CommentList extends Component<CommentListEventMap>implements StoreComponen
 				writtenByUser ? avatarCnt : triangle,
 			);
 
-			this.scroller.items.add(
+			cmps.push(
 				comp({
 						cls: "hbox",
 						style: {
@@ -351,18 +353,20 @@ class CommentList extends Component<CommentListEventMap>implements StoreComponen
 			);
 		});
 
+		this.scroller.items.replace(...cmps);
+
 		Promise.all(imgPromises).then(() => {
 			this.scroller.el.scrollTop = this.scroller.el.scrollHeight;
 			this.unmask();
 			this.fire("listready", {});
-		})
+		});
 
 	}
 
-	public onRecordRemove(ev:StoreEventMap<any>['remove']) {
+	public onRecordRemove(ev: StoreEventMap<any>['remove']) {
 	}
 
-	public onRecordAdd(ev:any) {
+	public onRecordAdd(ev: any) {
 	}
 }
 

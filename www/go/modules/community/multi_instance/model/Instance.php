@@ -471,28 +471,28 @@ class Instance extends Entity {
 
 	private function dropDatabase($dbName): void
 	{
-		go()->getDbConnection()->query("DROP DATABASE IF EXISTS `".$dbName."`");
+		go()->getDbConnection()->exec("DROP DATABASE IF EXISTS `".$dbName."`");
 	}
 
 
 	private function createDatabase($dbName): void
 	{
-		go()->getDbConnection()->query("CREATE DATABASE IF NOT EXISTS `".$dbName."`");
+		go()->getDbConnection()->exec("CREATE DATABASE IF NOT EXISTS `".$dbName."`");
 	}
 
 
 	private function dropDatabaseUser($dbUser) {
-		go()->getDbConnection()->query("DROP USER '" . $dbUser . "'@'%'");
+		go()->getDbConnection()->exec("DROP USER '" . $dbUser . "'@'%'");
 	}
 
 
 	private function createDatabaseUser($dbName, $dbUsername, $dbPassword)
 	{
 		$sql = "CREATE USER '" . $dbUsername . "' IDENTIFIED BY '" . $dbPassword . "'";
-		go()->getDbConnection()->query($sql);
+		go()->getDbConnection()->exec($sql);
 		$sql = "GRANT ALL PRIVILEGES ON `" . $dbName . "`.* TO '" . $dbUsername . "'@'%'";
-		go()->getDbConnection()->query($sql);
-		go()->getDbConnection()->query('FLUSH PRIVILEGES');
+		go()->getDbConnection()->exec($sql);
+		go()->getDbConnection()->exec('FLUSH PRIVILEGES');
 	}
 	
 //	private function createConfigFile($dbName, $dbUsername, $dbPassword, $tmpPath, $dataPath) {
@@ -843,7 +843,14 @@ class Instance extends Entity {
 				//load instance config just before moving the config file. Moving the config file disables
 				// the installation and prevents further changes.
 				$instance->getInstanceConfig();
-				$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php')->appendNumberToNameIfExists());
+
+				if($instance->getConfigFile()->exists()) {
+					$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php')->appendNumberToNameIfExists());
+
+					$instance->mysqldump();
+
+					$instance->getConfigFile()->getFolder()->delete();
+				}
 
 				try {
 					$instance->getTempFolder()->delete();
@@ -852,31 +859,24 @@ class Instance extends Entity {
 					ErrorHandler::log("Could not delete temp folder: " . $e->getMessage());
 				}
 
-				$instance->mysqldump();
-
-//				try {
-//					$modPackageFolder = $instance->getModulePackageFolder();
-//					if ($modPackageFolder->exists()) {
-//						$dest = $instance->getDataFolder()->getFolder($instance->getStudioPackage() . '_MODULE_PACKAGE');
-//						if ($dest->exists()) {
-//							$dest = new Folder($dest->getPath() . '-' . uniqid());
-//						}
-//						$instance->getModulePackageFolder()->move($dest);
-//					}
-//				} catch(\Throwable $e) {
-//					ErrorHandler::logException($e, "Error while deleting module folder for instance ". $instance->hostname);
-//				}
-
-				$instance->getConfigFile()->getFolder()->delete();
-
-				$dest = self::getTrashFolder()->getFolder($instance->getDataFolder()->getName());
-				if ($dest->exists()) {
-					$dest = $dest->getParent()->getFolder($instance->getDataFolder()->getName() . '-' . uniqid());
+				if($instance->getDataFolder()->exists()) {
+					$dest = self::getTrashFolder()->getFolder($instance->getDataFolder()->getName());
+					if ($dest->exists()) {
+						$dest = $dest->getParent()->getFolder($instance->getDataFolder()->getName() . '-' . uniqid());
+					}
+					$instance->getDataFolder()->move($dest);
 				}
-				$instance->getDataFolder()->move($dest);
-			
-				$instance->dropDatabaseUser($instance->getDbUser());
-				$instance->dropDatabase($instance->getDbName());
+
+				try {
+					$instance->dropDatabaseUser($instance->getDbUser());
+				} catch(Exception $e) {
+					ErrorHandler::logException($e, "Failed to drop database user: " . $instance->getDbUser());
+				}
+				try {
+					$instance->dropDatabase($instance->getDbName());
+				} catch(Exception $e) {
+					ErrorHandler::logException($e, "Failed to drop database: " . $instance->getDbName());
+				}
 			}catch(Exception $e) {
 				ErrorHandler::log("Error deleting instance: ". $instance->hostname);
 				ErrorHandler::logException($e);
