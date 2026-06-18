@@ -52,7 +52,7 @@ go.modules.community.tasks.TasklistDialog = Ext.extend(go.form.Dialog, {
 				}),
 
 
-				new go.modules.community.tasks.TaskListGroupingCombo()]
+				new go.modules.community.tasks.TaskListGroupingCombo({role: this.entityStore === "TaskList" ? 'list' : 'support'}),]
 		}];
 	}
 });

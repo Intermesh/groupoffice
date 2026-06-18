@@ -326,12 +326,16 @@ create table tasks_tasklist_grouping
     id      int unsigned auto_increment,
     name    varchar(190) not null,
     `order` int unsigned null,
+    role tinyint default 1 not null,
     constraint tasks_tasklist_grouping_pk
         primary key (id),
     constraint tasks_tasklist_grouping_name
         unique (name)
 );
 
+
+create index tasks_tasklist_grouping_role_index
+    on tasks_tasklist_grouping (role);
 
 
 

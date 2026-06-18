@@ -294,3 +294,11 @@ $updates["202605071140"][] = "create index tasks_category_role_index
 
 $updates["202605081140"][] = "alter table tasks_tasklist_user
     alter column syncToDevice set default 0;";
+
+
+
+$updates["202606181402"][] = "alter table tasks_tasklist_grouping add role tinyint default 1 not null;";
+$updates["202606181402"][] = "create index tasks_tasklist_grouping_role_index
+    on tasks_tasklist_grouping (role);";
+
+$updates["202606181402"][] = "update tasks_tasklist_grouping set role=4;";
