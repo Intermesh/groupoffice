@@ -178,8 +178,6 @@ CREATE TABLE `core_module` (
   `name` varchar(100) NOT NULL DEFAULT '',
   `package` varchar(100) DEFAULT NULL,
   `version` int(11) NOT NULL,
-  `sort_order` int(11) NOT NULL DEFAULT 0,
-  `admin_menu` tinyint(1) NOT NULL DEFAULT 0,
   `enabled` tinyint(1) NOT NULL DEFAULT 1,
   `modifiedAt` datetime DEFAULT NULL,
   `modSeq` int(11) DEFAULT NULL,
