@@ -1830,3 +1830,26 @@ $updates['202604131511'][] ="delete from core_entity where clientName in (
 
 $updates['202604221150'][] = "ALTER TABLE core_email_template CHANGE subject subject VARCHAR(255) CHARACTER SET utf8mb4 DEFAULT NULL COLLATE utf8mb4_unicode_ci";
 $updates['202604230937'][] = "delete from core_setting where name='primaryColorTransparent';";
+
+
+$updates['202606181535'][] = "alter table core_module
+    drop column sort_order;";
+
+$updates['202606181535'][] = "alter table core_module
+    drop column admin_menu;";
+
+
+$updates['202606181535'][] = "create table if not exists core_module_user
+(
+	userId   int          not null,
+    moduleId int          not null,
+    pinned   int unsigned null comment 'Pinned sort order, NULL if not pinned',
+    primary key (userId, moduleId),
+    constraint core_module_user_core_module_id_fk
+        foreign key (moduleId) references core_module (id)
+            on delete cascade,
+    constraint core_module_user_core_user_id_fk
+        foreign key (userId) references core_user (id)
+            on delete cascade
+);";
+

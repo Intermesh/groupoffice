@@ -233,7 +233,7 @@ class ModuleCollection extends Model\ModelCollection{
 			return $modules;
 		}
 		
-		$findParams = Db\FindParams::newInstance()->order("sort_order");
+		$findParams = Db\FindParams::newInstance();
 		
 		if($ignoreAcl)
 			$findParams->ignoreAcl ();

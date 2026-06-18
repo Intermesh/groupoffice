@@ -178,14 +178,29 @@ CREATE TABLE `core_module` (
   `name` varchar(100) NOT NULL DEFAULT '',
   `package` varchar(100) DEFAULT NULL,
   `version` int(11) NOT NULL,
-  `sort_order` int(11) NOT NULL DEFAULT 0,
-  `admin_menu` tinyint(1) NOT NULL DEFAULT 0,
   `enabled` tinyint(1) NOT NULL DEFAULT 1,
   `modifiedAt` datetime DEFAULT NULL,
   `modSeq` int(11) DEFAULT NULL,
   `deletedAt` datetime DEFAULT NULL,
   shadowAclId int null
 ) ENGINE=InnoDB;
+
+create table core_module_user
+(
+    userId   int          not null,
+    moduleId int          not null,
+    modSeq int unsigned,
+    pinned   int unsigned null comment 'Pinned sort order, NULL if not pinned',
+    primary key (userId, moduleId),
+    constraint core_module_user_core_module_id_fk
+        foreign key (moduleId) references core_module (id)
+            on delete cascade,
+    constraint core_module_user_core_user_id_fk
+        foreign key (userId) references core_user (id)
+            on delete cascade
+);
+
+
 
 CREATE TABLE `core_search` (
   `id` int(11) NOT NULL,
