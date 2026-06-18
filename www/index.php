@@ -45,7 +45,7 @@ $baseUrl = \go\core\http\Request::get()->getPath() . "/";
     <script src="views/Extjs3/javascript/ext-base-debug.js"></script>
     <script src="views/Extjs3/javascript/ext-all-debug.js"></script>
     <script src="views/Extjs3/lang.php"></script>
-    <script src="views/goui/legacyscripts.php"></script>
+<!--    <script src="views/goui/legacyscripts.php"></script>-->
 
     <script type="module" src="views/goui/dist/Index.js"></script>
 

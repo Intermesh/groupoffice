@@ -1,6 +1,6 @@
-import {BaseEntity} from "@intermesh/goui";
+import {BaseEntity, t} from "@intermesh/goui";
 import {UserSettingsPanel} from "./UserSettingsPanel.js";
-import {client, JmapDataSource, modules, moduleSettings} from "@intermesh/groupoffice-core";
+import {client, extjswrapper, JmapDataSource, modules, moduleSettings} from "@intermesh/groupoffice-core";
 
 modules.register({
 	package: "legacy",
@@ -12,6 +12,27 @@ modules.register({
 			}
 
 			moduleSettings.addPanel(UserSettingsPanel);
+			// const id = (m.package ?? "legacy") + "/" + m.moduleName;
+			//
+			// this.mainPanels[id] = {
+			// 	package: m.package,
+			// 	module: m.moduleName,
+			// 	id: id,
+			// 	title: m.title,
+			// 	callback: () => {
+			//
+			// 		const pnl = GO.moduleManager.getPanel(m.moduleName);
+			// 		pnl.header = false;
+			//
+			// 		return extjswrapper({
+			// 			cls: "fit",
+			// 			title: m.title,
+			// 			comp: Ext.create(pnl)
+			// 		});
+			// 	}
+			// };
+
+
 		});
 	}
 });

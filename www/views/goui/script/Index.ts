@@ -16,9 +16,6 @@ authManager.requireLogin().then(async () => {
 		modules.init()
 	])
 
-	// loads legacy module panels. We need to be authenticated for that.
-	modules.loadLegacyUI();
-
 	// Loads all panels
 	main.load();
 

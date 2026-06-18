@@ -11,68 +11,7 @@ go.Entities = (function () {
 
 	return {
 
-		/**
-		 * Populate some entity properties with server info.
-		 *
-		 * Called in mainlayout after authentication and loading of custom fields and modules.
-		 */
-		init: function () {
-			go.Entities.getAll().forEach(function (entity) {
-				var module = go.Modules.get(entity.package, entity.module),
-					serverInfo = module.entities[entity.name];
 
-				if (serverInfo) {
-					if (!entity.customFields) {
-						entity.customFields = serverInfo.supportsCustomFields;
-					}
-					entity.supportsFiles = serverInfo.supportsFiles;
-
-					entity.isAclOwner = serverInfo.isAclOwner;
-					entity.defaultAcl = serverInfo.defaultAcl;
-				} else {
-					 // Removing client entity  because it's not know by the server.
-					delete entities[entity.name.toLowerCase()];
-				}
-
-				if (entity.customFields) {
-					entity.applyCustomFieldFilters();
-				}
-
-				entity.filters = go.util.Filters.normalize(entity.filters);
-
-				entity.relations = entity.relations || {};
-				entity.relations.customFields = go.customfields.CustomFields.getRelations(entity.name);
-			});
-
-
-		},
-
-
-		/**
-		 * Register an entity
-		 *
-		 * this will create a global entity and store:
-		 *
-		 * go.Db.store("name")]
-		 * go.Entities.get(name)
-		 *
-		 * @param {object} cfg
-		 *
-		 * @returns {undefined}
-		 */
-		register: function (cfg) {
-			if (!cfg.name) {
-				throw "Invalid entity registered. 'name' property is required.";
-			}
-
-			var lcName = cfg.name.toLowerCase();
-
-			if (entities[lcName]) {
-				throw "Entity name is already registered by module " + entities[lcName]['package'] + "/" + entities[lcName]['module'];
-			}
-
-			entities[lcName] = new go.Entity(cfg);
-		},
 
 		/**
 		 * Get entity object
@@ -96,7 +35,7 @@ go.Entities = (function () {
 		 * @returns {go.Entity}
 		 */
 		get: function (name) {
-			return entities[name.toLowerCase()];
+			return window.groupofficeCore.entities.get(name);
 		},
 
 		/**
@@ -108,18 +47,11 @@ go.Entities = (function () {
 		 * @returns {Object[]}
 		 */
 		getAll: function () {
-			var e = [], entity;
-			for (entity in entities) {
-				if (go.Modules.isAvailable(entities[entity].package, entities[entity].module)) {
-					e.push(entities[entity]);
-				}
-			}
-
-			return e;
+			return window.groupofficeCore.entities.getAvailable();
 		},
 
 		getAllInstalled: function () {
-			return entities;
+			return window.groupofficeCore.entities.getAll();
 		},
 
 		/**
@@ -128,18 +60,7 @@ go.Entities = (function () {
 		 * @returns {Array}
 		 */
 		getLinkConfigs: function () {
-			var linkConfigs = [];
-
-
-			go.Entities.getAll().forEach(function (m) {
-				linkConfigs = linkConfigs.concat(m.links);
-			});
-
-			linkConfigs.sort(function (a, b) {
-				return a.title.localeCompare(b.title);
-			});
-
-			return linkConfigs;
+			return window.groupofficeCore.entities.getLinkConfigs();
 		},
 
 		getLinkIcon: function (entity, filter) {

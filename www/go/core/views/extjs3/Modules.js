@@ -6,12 +6,7 @@ go.Modules = (function () {
 		this.registered = {};
 	}, Ext.util.Observable, {
 
-		/**
-		 * Contains all registered modules including those the user has no permissions for.
-		 *
-		 * @var {Object}
-		 */
-		registered: null,
+
 
 		/**
 		 *
@@ -25,51 +20,24 @@ go.Modules = (function () {
 		 * @param {object} config
 		 * @returns {void}
 		 */
-		register: function (package, name, config) {	
-			
+		register: function (package, name, config ) {
 			Ext.ns('go.modules.' + package + '.' + name);
 
-			// console.log('register ' + package + '.' + name);
-			
 			config = config || {};
 
 			if (!this.registered[package]) {
 				this.registered[package] = {};
 			}
 
+			config.package = package;
+			config.name = name;
+
 			this.registered[package][name] = config;
 
-			if (!config.panelConfig) {
-				config.panelConfig = {title: config.title, admin: config.admin};
-			}
-
-			if (!config.requiredPermissionLevel) {
-				config.requiredPermissionLevel = go.permissionLevels.read;
-			}
-
-			if (config.mainPanel) {
-				go.Router.add(new RegExp("^" + name + "$"), function () {
-					var pnl = GO.mainLayout.openModule(name);
-
-					if(pnl.routeDefault) {
-						pnl.routeDefault();
-					}
-				});
-			}
-
-			if (config.entities) {
-				config.entities.forEach(function (entity) {
-					
-					if(Ext.isString(entity)) {
-						entity = {name: entity};
-					}
-					
-					entity.package = package;
-					entity.module = name;
-					
-					go.Entities.register(entity);
-				});
-			}
+			// for onmoduleready event
+			GO.moduleManager.onAddModule(name);
+			
+			window.groupofficeCore.modules.register(config);
 		},
 
 		/**
@@ -91,14 +59,12 @@ go.Modules = (function () {
 				package = "legacy";
 			}
 
-			if (!this.registered[package] || !this.registered[package][name]) {
+			const module = window.groupofficeCore.modules.get(package, name);
+
+			if(!module) {
 				return false;
 			}
 
-			const module = this.get(package, name);
-			if (!module) {
-				return false;
-			}
 
 			//for the logged in user we can simply check permissionLevel
 			if(!user || user.id == go.User.id) {
@@ -141,6 +107,10 @@ go.Modules = (function () {
 			return this.registered[package][name];
 		},
 
+		// getConfigs: function() {
+		// 	return this.registered;
+		// },
+
 		/**
 		 * Check if a module is installed
 		 *
@@ -161,20 +131,7 @@ go.Modules = (function () {
 		 */
 		get: function (package, name) {
 
-			if (!package) {
-				package = "legacy";
-			}
-			if (!this.registered[package] || !this.registered[package][name]) {
-				return false;
-			}
-			
-			for (var id in this.entities) {
-				if ((package === "legacy" || this.entities[id].package === package) && this.entities[id].name === name) {
-					return this.entities[id];
-				}
-			}
-
-			return false;
+			return window.groupofficeCore.modules.get(package, name);
 		},
 
 		/**
@@ -183,138 +140,7 @@ go.Modules = (function () {
 		 * @returns {Module[]}
 		 */
 		getAvailable: function () {
-			var available = [],all = this.entities, id;
-
-			for (id in all) {
-				if (this.isAvailable(all[id].package, all[id].name)) {
-					available.push(all[id]);
-				}
-			}
-
-			return available;
-		},
-		
-		
-
-		//will be called after login
-		init: function () {
-
-			const store = go.Db.store("Module");
-
-			return store.query({
-				filter: {enabled: true}
-			}).then((response) => {
-
-				return store.get(response.ids).then((result) => {
-					return result.entities
-				});
-
-			}).then((entities) => {
-
-				this.entities = entities;
-				const promises = [];
-				let id, mod, pkg, config,initModulePromise;
-
-				for (id in this.entities) {
-					mod = this.entities[id];
-					
-					// for (name in this.registered[package]) {	
-						pkg = mod.package || "legacy";
-						if(!this.registered[pkg]) {
-							console.log(`Skipping module init for package ${pkg} because it's not registered`)
-							continue;
-						}
-						config = this.registered[pkg][mod.name];
-						if(!config){
-							console.log(`Skipping module init for package ${pkg} / ${mod.name} because it's not registered`)
-							continue;
-						}
-					
-						if (config.requiredPermissionLevel > mod.permissionLevel) {
-							console.log(`Skipping module init for package ${pkg} / ${mod.name} because there's no permission`)
-							continue;
-						}
-						
-						if (config.initModule){
-							go.Translate.setModule(mod.package, mod.name);
-
-							initModulePromise = config.initModule.call(this, config);
-							if(initModulePromise) {
-								promises.push(initModulePromise);
-							}
-						}
-
-						if (config.mainPanel) {
-							if(Ext.isArray(config.mainPanel)) {
-								for(let i = 0; i < config.mainPanel.length; i++) {
-								
-									// //todo panel is only constructed to grab config.title/id
-									// moduleMainPanel = new config.mainPanel[i]();
-									// console.error("DO SOMETHING ABOUT THIS HORRIBLE THING HERE :)");
-									// //todo GO.moduleManager is deprecated
-									GO.moduleManager._addModule(config.mainPanel[i].prototype.id, config.mainPanel[i], {title:config.mainPanel[i].prototype.title, package: mod.package, sort_order:mod.sort_order}, config.subMenuConfig);
-								}
-							} else {
-								config.panelConfig.package = mod.package;
-								config.panelConfig.sort_order = mod.sort_order;
-								GO.moduleManager._addModule(mod.name, config.mainPanel, config.panelConfig, config.subMenuConfig);
-							}
-						}							
-					// }
-				}
-
-				return Promise.all(promises).then(() => {
-					store.on("changes", this.onModuleChanges, this);
-
-					return this.entities;
-				});
-			});
-
-			
-		},
-
-		onModuleChanges : function(entityStore, added, changed, destroyed) {
-			if(!changed) {
-				return;
-			}
-
-			changed.forEach((id) => {
-
-				const index = this.entities.findIndex(function(e) {
-					return e.id == id;
-				});
-
-				if(index > -1) {
-					entityStore.single(id).then((module) => {
-						this.entities[index] = module;
-					});
-				}
-			})
-		},
-		
-		addPanel : function(panels) {
-
-			if(!Ext.isArray(panels)) {
-				panels = [panels];
-			}
-			
-			panels.forEach(function(p) {
-				if(!p.prototype.id) {
-					throw "Module panel must have an 'id'";
-				}								
-				GO.mainLayout.addModulePanel(p.prototype.id, p);
-			}, this);
-
-		},
-
-		hasPermission: function(level) {
-			// @see line 241 this info should not be in Translate as it is usefull for other components as well
-			// todo create go.currentModule
-			var module = this.get(go.Translate.package, go.Translate.module);
-			if (!module) {
-				return false;
-			}
-			return module.permissionLevel >= level;
+			return window.groupofficeCore.modules.getAvailable();
 		}
 	});
 

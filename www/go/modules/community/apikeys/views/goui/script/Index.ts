@@ -11,11 +11,6 @@ modules.register({
 			if (!session.capabilities["go:community:apikeys"]) {
 				return;
 			}
-
-			modules.addSystemSettingsPanel("community", "apikeys", "apikeys", t("API Keys"), "lock", () => {
-				// @deprecated
-				return new SystemSettingsPanel();
-			});
 		})
 	}
 });

@@ -37,7 +37,7 @@ go.Relations = {
 			relName = c.name;
 		}
 
-		var relation = this.entityStore.entity.findRelation(relName);
+		var relation = window.groupofficeCore.entities.findRelation(this.entityStore.entity,relName);
 
 		if(!relation) {
 			return Promise.reject("Relation " + relName + " not found for " + this.entityStore.entity.name);

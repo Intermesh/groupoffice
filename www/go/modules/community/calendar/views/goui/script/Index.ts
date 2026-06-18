@@ -1,4 +1,4 @@
-import {moduleSettings, client, jmapds, modules, principalDS, main} from "@intermesh/groupoffice-core";
+import {moduleSettings, client, jmapds, modules, principalDS, main, AclLevel} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {router} from "@intermesh/groupoffice-core";
 import {datasourcestore, t as coreT, E, translate, DateTime, Window, h3, Button} from "@intermesh/goui";
@@ -86,7 +86,7 @@ export function getParticipantStatusIcon(p:any): string[] {
 }
 
 function addEmailAction() {
-	if(go) {
+	if(window.go) {
 		go.openIcs = (p: any) => {
 			const params = p.id ? {
 				fileId:p.id
@@ -239,7 +239,7 @@ modules.register(  {
 							entityStore: "Calendar",
 							filters: {
 								default: {
-									permissionLevel: go.permissionLevels.write
+									permissionLevel: AclLevel.WRITE
 								}
 							}
 						}

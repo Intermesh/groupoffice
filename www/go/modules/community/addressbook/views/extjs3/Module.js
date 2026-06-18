@@ -1,5 +1,4 @@
 /* global go */
-
 go.Modules.register("community", "addressbook", {
 	/**
 	 * Main panel is added to the UI when clicking address book in the start menu

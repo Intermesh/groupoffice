@@ -5087,7 +5087,7 @@ Ext.EventManager = function(){
     function initDocReady(){
         docReadyEvent || (docReadyEvent = new Ext.util.Event());
 //        if (DETECT_NATIVE) {
-            DOC.addEventListener(DOMCONTENTLOADED, fireDocReady, false);
+            //DOC.addEventListener(DOMCONTENTLOADED, fireDocReady, false);
 //        }
         
 //        if (Ext.isIE9m){
@@ -5409,6 +5409,10 @@ Ext.EventManager = function(){
     pub.un = pub.removeListener;
 
     pub.stoppedMouseDownEvent = new Ext.util.Event();
+
+	// for GOUI this is called in the legacy boot stuff in Modules.ts
+	Ext.fireDocReady = fireDocReady;
+
     return pub;
 }();
 

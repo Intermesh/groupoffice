@@ -1,6 +1,6 @@
 import {appSystemSettings, client, JmapDataSource, modules, router} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
-import {translate} from "@intermesh/goui";
+import {t, translate} from "@intermesh/goui";
 import {Settings} from "./Settings";
 
 export * from "./HistoryDetailPanel.js";
@@ -32,7 +32,27 @@ modules.register({
 			}
 
 		});
-	}
+	},
+	entities: [{
+		name:'LogEntry',
+		relations: {
+			creator: {store: 'Principal', fk:'createdBy'}
+		},
+		filters: [
+			{
+				wildcards: false,
+				name: 'text',
+				type: "string",
+				multiple: false,
+				title: t("Query")
+			},
+			{
+				title: t("Entity ID"),
+				name: 'entityId',
+				multiple: true,
+				type: 'number'
+			}]
+	}],
 });
 
 export const logEntryDS = new JmapDataSource("LogEntry");
