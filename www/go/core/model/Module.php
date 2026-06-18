@@ -115,7 +115,7 @@ class Module extends Entity {
 
 		return true;
 	}
-	
+
 
 	protected static function defineMapping(): Mapping
 	{

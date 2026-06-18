@@ -185,6 +185,23 @@ CREATE TABLE `core_module` (
   shadowAclId int null
 ) ENGINE=InnoDB;
 
+create table core_module_user
+(
+    userId   int          not null,
+    moduleId int          not null,
+    modSeq int unsigned,
+    pinned   int unsigned null comment 'Pinned sort order, NULL if not pinned',
+    primary key (userId, moduleId),
+    constraint core_module_user_core_module_id_fk
+        foreign key (moduleId) references core_module (id)
+            on delete cascade,
+    constraint core_module_user_core_user_id_fk
+        foreign key (userId) references core_user (id)
+            on delete cascade
+);
+
+
+
 CREATE TABLE `core_search` (
   `id` int(11) NOT NULL,
   `entityId` int(11) NOT NULL,
