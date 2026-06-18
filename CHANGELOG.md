@@ -1,6 +1,7 @@
 - Email: Folders are now accessible via a direct URL
 - Core: Don't notify desktop with JSON bodies
 - Files: Delete by path function for CLI
+- Support: tasklist grouping separated for support and tasks
 
 16-06-2026: 26.0.35
 - Timeregistration: Added customer to export and made columns project and customer sortable
