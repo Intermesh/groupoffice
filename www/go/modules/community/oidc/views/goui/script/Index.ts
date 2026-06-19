@@ -1,31 +1,11 @@
-import {appSystemSettings, client, JmapDataSource, modules} from "@intermesh/groupoffice-core";
+import {appSystemSettings, client, entities, JmapDataSource, modules} from "@intermesh/groupoffice-core";
 import {Settings} from "./Settings.js";
 import {SystemSettings} from "./SystemSettings";
 
 modules.register({
 	package: "community",
 	name: "oidc",
-	init: () => {
-
-		client.on("authenticated",  ({session}) => {
-			if (!session.capabilities["go:community:oidc"]) {
-				// User has no access to this module
-				return;
-			}
-
-			if (session.capabilities["go:community:oidc"].mayManage) {
-				// @deprecated
-				modules.addSystemSettingsPanel("community", "oidc", "oidc", "OIDC", "app_registration", () => {
-					return new SystemSettings();
-				});
-			}
-
-			if (session.isAdmin) {
-				appSystemSettings.addPanel("community", "oidc", Settings);
-			}
-
-		});
-	},
+	systemSettingsPanels: [Settings],
 	entities: [
 		{
 			name: "OIDConnectClient"

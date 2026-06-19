@@ -324,6 +324,35 @@ modules.register(  {
 			}]
 		}
 	],
+
+	panels: {
+		calendar: {
+			cmp: Main,
+			title: t("Calendar"),
+			routes: {
+				"^calendar\/(month|list|week|day|year)\/(\d{4}-\d{2}-\d{2})$"(span, ymd){
+					this.show();
+					this.goto(new DateTime(ymd)).setSpan(span as ValidTimeSpan, 0);
+				},
+				"^calendar\/(days|weeks|split|custom)-(\d+)\/(\d{4}-\d{2}-\d{2})$"(span, amount, ymd) {
+					this.show();
+					this.goto(new DateTime(ymd)).setSpan(span as ValidTimeSpan, Math.min(parseInt(amount),373));
+				},
+				async "^calendarevent\/(\d+)$" (id)  {
+					// for notification clicks
+					this.show();
+					const event = await jmapds('CalendarEvent').single(id);
+					if(event)
+						(new CalendarItem({data: event, key: id})).open();
+
+				}
+			}
+		}
+
+	},
+
+	settingsPanels: [PreferencesPanel],
+
 	init () {
 		//const user = client.user;
 
@@ -337,7 +366,6 @@ modules.register(  {
 			if(!session.capabilities["go:community:calendar"]) {
 				return; // User has no access to this module
 			}
-			mainPanel.ui = new Main()
 
 			// // OLD CODE
 			// async function showBadge() {
@@ -351,34 +379,8 @@ modules.register(  {
 			// showBadge();
 			// // END OLD CODE
 
-			const nav = (span:ValidTimeSpan, amount: number, ymd?: string) => {
-					modules.openMainPanel("calendar");
-					mainPanel.ui!.goto(new DateTime(ymd)).setSpan(span, amount);
-			client.user.calendarPreferences ||= {};
-			if(!session.capabilities["go:community:calendar"]) {
-				return; // User has no access to this module
-			}
-			const nav = async (span:ValidTimeSpan, amount: number, ymd?: string) => {
-					const ui = await modules.openMainPanel("calendar") as Main;
-					ui.goto(new DateTime(ymd)).setSpan(span, amount);
-				};
-			router.add(/^calendar\/(month|list|week|day|year)\/(\d{4}-\d{2}-\d{2})$/, (span, ymd) => {
-					void nav(span as ValidTimeSpan, 0, ymd);
-				})
-				.add(/^calendar\/(days|weeks|split)-(\d+)\/(\d{4}-\d{2}-\d{2})$/, (span, amount, ymd) => {
-					void nav(span as ValidTimeSpan, Math.min(parseInt(amount),373), ymd); // it fits on my machine
-				.add(/^calendar\/(days|weeks|split|custom)-(\d+)\/(\d{4}-\d{2}-\d{2})$/, (span, amount, ymd) => {
-					nav(span as ValidTimeSpan, Math.min(parseInt(amount),373), ymd); // it fits on my machine
-				}).add(/^calendarevent\/(\d+)$/, async (id) => {
-					// for notification clicks
-					const event = await jmapds('CalendarEvent').single(id);
-					if(event)
-						(new CalendarItem({data: event, key: id})).open();
 
-				});
-
-			modules.addMainPanel("community", "calendar", 'calendar', t('Calendar'), () => mainPanel.ui!);
-
+			// TODO: Move to entity register
 			main.notifier.regRenderer('CalendarEvent', (alert, closeFn) => {
 				const entity = alert.entityData,
 					msgs: {[key:string]: string} = {
@@ -410,10 +412,5 @@ modules.register(  {
 
 		});
 
-		// modules.addAccountSettingsPanel("community", "calendar", "calendar", t("Calendar"), "today", () => {
-		// 	return new PreferencesPanel();
-		// });
-
-		moduleSettings.addPanel(PreferencesPanel);
 	}
 });

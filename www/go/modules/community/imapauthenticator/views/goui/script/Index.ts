@@ -19,7 +19,6 @@ modules.register({
 				return;
 			}
 
-			translate.load(GO.lang.community.imapauthenticator, "community", "imapauthenticator");
 			if (session.isAdmin) {
 				authSystemSettings.addFieldset("community", "imapauthenticator", Settings);
 			}

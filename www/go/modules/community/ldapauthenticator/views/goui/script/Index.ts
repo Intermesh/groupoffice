@@ -19,7 +19,6 @@ modules.register({
 				return;
 			}
 
-			translate.load(GO.lang.community.ldapauthenticator, "community", "ldapauthenticator");
 			if (session.isAdmin) {
 				authSystemSettings.addFieldset("community", "ldapauthenticator", Settings);
 			}

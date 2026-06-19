@@ -16,7 +16,6 @@ modules.register({
 				return;
 			}
 
-			translate.load(GO.lang.community.otp, "community", "otp");
 			if (session.isAdmin) {
 				authSystemSettings.addFieldset("community", "otp", Settings);
 			}

@@ -15,19 +15,9 @@ modules.register({
 	// 	"DefaultClient",
 	// 	"Oauth2Client",
 	// ],
-	async init() {
-		client.on("authenticated", ( {session}) => {
-			if (!session.capabilities["go:community:oauth2client"]) {
-				return;
-			}
 
-			translate.load(GO.lang.community.oauth2client, "community", "oauth2client");
-			if (session.isAdmin) {
-				appSystemSettings.addPanel("community", "oauth2client", Settings);
-			}
+	systemSettingsPanels: [Settings]
 
-		});
-	}
 });
 
 export interface Oauth2Client extends BaseEntity {

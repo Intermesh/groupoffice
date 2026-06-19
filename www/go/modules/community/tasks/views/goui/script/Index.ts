@@ -1,28 +1,21 @@
-import {client, modules, moduleSettings, router} from "@intermesh/groupoffice-core";
+import {client, main, modules, moduleSettings, router} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {UserSettingsPanel} from "./UserSettingsPanel.js";
+import {t} from "@intermesh/goui";
 
 modules.register({
 	package: "community",
 	name: "tasks",
-	async init() {
-		let tasks: Main;
-		client.on("authenticated", ({session}) => {
-			if (!session.capabilities["go:community:tasks"]) {
-				return;
+	panels: {
+		tasks: {
+			cmp: Main,
+			title: t("Tasks"),
+			routes: {
+				"^tasks\/(\d+)$"(taskId) {
+					this.showTask(taskId);
+				}
 			}
-
-			router.add(/^tasks\/(\d+)$/, (taskId) => {
-				modules.openMainPanel("tasks");
-				tasks.showTask(taskId);
-			});
-
-			modules.addMainPanel("community", "tasks", "tasks", "Tasks", () => {
-				tasks = new Main();
-				return tasks;
-			});
-
-			moduleSettings.addPanel(UserSettingsPanel);
-		});
-	}
+		}
+	},
+	settingsPanels: [UserSettingsPanel]
 });

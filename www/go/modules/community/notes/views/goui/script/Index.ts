@@ -5,7 +5,7 @@ import {
 	client,
 	JmapDataSource,
 	modules,
-	router, main, entities
+	router, main, entities, settingsPanels
 } from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {EntityID, t, translate} from "@intermesh/goui";
@@ -18,19 +18,20 @@ export * from "./NoteDialog";
 modules.register({
 	package: "community",
 	name: "notes",
-	panels:[{
-		cmp: Main,
-		title: t("Notes"),
-		id: "notes",
-		routes: {
-			"^notes\/?(\d+)?$/"( noteId){
-				this.show();
-				if(noteId) {
-					this.showNote(noteId);
+	panels: {
+		notes: {
+			cmp: Main,
+			title: t("Notes"),
+			routes: {
+				"^notes\/?(\d+)?$/"(noteId) {
+					this.show();
+					if (noteId) {
+						this.showNote(noteId);
+					}
 				}
-			 }
+			}
 		}
-	}],
+	},
 	settingsPanels: [SettingsPanel],
 	entities: [{
 		name: "Note",

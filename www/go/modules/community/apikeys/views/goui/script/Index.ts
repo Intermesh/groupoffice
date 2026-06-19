@@ -5,14 +5,7 @@ import {Settings} from "./Settings.js";
 
 modules.register({
 	package: "community",
-	name: "apikeys",
-	async init() {
-		client.on("authenticated", ( {session}) => {
-			if (!session.capabilities["go:community:apikeys"]) {
-				return;
-			}
-		})
-	}
+	name: "apikeys"
 });
 
 client.on("authenticated",  ({session}) => {

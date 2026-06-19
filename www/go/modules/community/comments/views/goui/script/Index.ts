@@ -35,7 +35,7 @@ modules.register({
 				void Window.error("Could not find entity " + comment.entity);
 			}
 
-			ent.goto(comment.entityId);
+			ent!.goto(comment.entityId);
 		});
 
 		main.notifier.regRenderer("Comment", (alert) => {

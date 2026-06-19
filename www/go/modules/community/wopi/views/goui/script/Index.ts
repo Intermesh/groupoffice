@@ -9,19 +9,7 @@ modules.register({
 	entities: [
 		"WopiService",
 	],
-	async init() {
-		client.on("authenticated", ( {session}) => {
-			if (!session.capabilities["go:community:wopi"]) {
-				return;
-			}
-
-			translate.load(GO.lang.community.wopi, "community", "wopi");
-			if (session.isAdmin) {
-				appSystemSettings.addPanel("community", "wopi", Settings);
-			}
-
-		});
-	}
+	systemSettingsPanels: [Settings]
 });
 
 export interface WopiService extends AclOwnerEntity {

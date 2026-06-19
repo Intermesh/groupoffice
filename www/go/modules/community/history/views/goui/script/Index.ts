@@ -1,25 +1,21 @@
-import {JmapDataSource, modules} from "@intermesh/groupoffice-core";
+import {entities, JmapDataSource, modules} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {t} from "@intermesh/goui";
+import {Settings} from "./Settings.js";
 
 export * from "./HistoryDetailPanel.js";
 
 modules.register({
 	package: "community",
 	name: "history",
-	panels: [
-		{
+	panels: {
+		history: {
 			title: t("History"),
-			cmp: Main,
-			id: "history",
-			routes: {
-				"^history$"() {
-					this.show();
-				}
-			}
+			cmp: Main
+
 		}
-	],
-	// systemSettingsPanels: [Settings], TODO this aint right??
+	},
+	systemSettingsPanels: [Settings],
 	entities: [{
 		name:'LogEntry',
 		relations: {

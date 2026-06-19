@@ -1,4 +1,4 @@
-import {client, JmapDataSource, modules, router} from "@intermesh/groupoffice-core";
+import {client, entities, JmapDataSource, main, modules, router} from "@intermesh/groupoffice-core";
 import {BaseEntity, t, translate} from "@intermesh/goui";
 import {Main} from "./Main.js";
 import {BookmarkIFrame} from "./BookmarkIFrame.js";
@@ -6,6 +6,12 @@ import {BookmarkIFrame} from "./BookmarkIFrame.js";
 modules.register({
 	package: "community",
 	name: "bookmarks",
+	panels: {
+		bookmarks: {
+			title: t("Bookmarks"),
+			cmp: Main
+		}
+	},
 	async init() {
 		client.on("authenticated", async ({session}) => {
 			if (!session.capabilities["go:community:bookmarks"]) {
@@ -22,21 +28,16 @@ modules.register({
 				bookmarkModules.list.forEach((b) => {
 					const name = b.name.replace(/\s/g, '-');
 
-					modules.addMainPanel("community", "bookmarks", name, name, () => {
-						return new BookmarkIFrame(b);
+					main.addMainPanel("community", "bookmarks", {
+						id: name,
+						title: name,
+						callback: () => {
+							return new BookmarkIFrame(b);
+						}
 					});
 				});
 			}
 
-			translate.load(GO.lang.community.bookmarks, "community", "bookmarks");
-
-			router.add(/^bookmarks\/(\d+)$/, (bookmarkId) => {
-				modules.openMainPanel("bookmarks")
-			});
-
-			modules.addMainPanel("community", "bookmarks", "bookmarks", t("Bookmarks"), () => {
-				return new Main();
-			});
 		})
 	},
 	entities: ["Bookmark", "BookmarksCategory"]
