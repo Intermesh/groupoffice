@@ -12,8 +12,7 @@ import {
 	form,
 	t,
 	tbar,
-	Window,
-	root
+	Window
 } from "@intermesh/goui";
 import CommentList from "./CommentList.js";
 import {CommentEditor} from "./CommentEditor.js";
@@ -22,9 +21,7 @@ import {LabelDialog} from "./LabelDialog.js";
 import {commentDS} from "./Index.js";
 
 export class CommentsPanel extends Component {
-
-
-	public focusEditorOnload = false
+	public focusEditorOnload = false;
 
 	private readonly commentList!: CommentList;
 	private readonly commentEditor!: CommentEditor;
@@ -32,12 +29,14 @@ export class CommentsPanel extends Component {
 
 	private entityId: EntityID | undefined;
 
-	private _title!:string
+	private _title!: string
 	private readonly titleCmp: Component;
+
 	set title(title: string) {
-		if(this.titleCmp) {
+		if (this.titleCmp) {
 			this.titleCmp.html = title;
 		}
+
 		this._title = title;
 	}
 
@@ -45,13 +44,14 @@ export class CommentsPanel extends Component {
 		return this._title;
 	}
 
-	set section(section: string|undefined) {
+	set section(section: string | undefined) {
 		this.commentList.store.setFilter("section", {section: section})
 	}
 
 	get section() {
 		return this.commentList.store.getFilter("section")?.section
 	}
+
 	constructor(public entityName: string) {
 		super();
 
@@ -73,11 +73,11 @@ export class CommentsPanel extends Component {
 		});
 
 		this.commentList.on("listready", () => {
-			if(this.focusEditorOnload) {
+			if (this.focusEditorOnload) {
 				this.commentEditor.editor.focus();
 				this.commentEditor.editor.el.scrollIntoView(false);
 			}
-		})
+		});
 
 		this.items.add(comp({
 				cls: "vbox"
@@ -93,6 +93,12 @@ export class CommentsPanel extends Component {
 					this.countBadge,
 				),
 				"->",
+				btn({
+					icon: "refresh",
+					handler: () => {
+						this.commentList.store.reload();
+					}
+				}),
 				btn({
 					hidden: !client.user.isAdmin,
 					icon: "settings",
@@ -114,32 +120,29 @@ export class CommentsPanel extends Component {
 			comp({},
 				comp({cls: "pad"}, this.commentList),
 				form({
-					flex: 1,
-					handler: (form) => {
-						if (form.value.text.length > 0) {
-							const labelIds = form.value.labels.map((l: { id: number; }) => l.id);
-
-							return commentDS.create(
-								Object.assign({
-									entity: this.entityName,
-									entityId: this.entityId!,
-									labels: labelIds,
-									text: form.value.text,
-									attachments: form.value.attachments,
-									section: this.section
-								})
-							).then((r) => {
-								form.reset();
-							}).catch((err) => {
-								void Window.error(err);
-							})
+						flex: 1,
+						handler: (form) => {
+							if (form.value.text.length > 0) {
+								return commentDS.create(
+									Object.assign({
+										entity: this.entityName,
+										entityId: this.entityId!,
+										labels: form.value.labels,
+										text: form.value.text,
+										attachments: form.value.attachments,
+										section: this.section
+									})
+								).then((r) => {
+									form.reset();
+								}).catch((err) => {
+									void Window.error(err);
+								});
+							}
 						}
-					}
-				},
+					},
 					fieldset({},
 						this.commentEditor
 					),
-
 					tbar({},
 						btn({
 							icon: "attach_file",
@@ -162,41 +165,35 @@ export class CommentsPanel extends Component {
 						}),
 						"->",
 						btn({
-							type:"submit",
+							type: "submit",
 							text: t("Add comment"),
 							icon: "send"
 						})
-						// btn({
-						// 	icon: "arrow_circle_up",
-						// 	text: t("Scroll to top"),
-						// 	handler: () => {
-						// 		this.commentList.scroller.el.scrollTop = 0;
-						// 	}
-						// })
 					)
 				)
 			)
 		));
 	}
 
-	public static addToDetail(detailPanel:DetailPanel) {
+	public static addToDetail(detailPanel: DetailPanel) {
 		const comments = new CommentsPanel(detailPanel.entityName);
-		detailPanel.on("load", ( {entity}) => {
+
+		detailPanel.on("load", ({entity}) => {
 			comments.load(entity.id);
-		})
+		});
+
 		detailPanel.scroller.items.add(comments);
 	}
 
-	public onLoad(entity:DefaultEntity) {
+	public onLoad(entity: DefaultEntity) {
 		this.load(entity.id);
 	}
 
 	public async load(id: EntityID) {
 		this.entityId = id;
 
-
 		this.commentList.store.setFilter("entity", {
-			entity:	this.entityName,
+			entity: this.entityName,
 			entityId: id
 		});
 

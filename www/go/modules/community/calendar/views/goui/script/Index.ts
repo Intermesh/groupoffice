@@ -6,7 +6,6 @@ import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {EventDetail, EventDetailWindow} from "./EventDetail.js";
 import {PreferencesPanel} from "./PreferencesPanel";
 import {EventWindow} from "./EventWindow";
-import {CalendarView} from "./CalendarView";
 import {CalendarAdapter} from "./CalendarAdapter";
 
 export * from "./Main.js";
@@ -14,6 +13,7 @@ export * from "./CalendarList.js";
 export * from "./CalendarView.js";
 export * from "./CalendarItem.js";
 export * from "./MonthView.js";
+export * from "./SplitView.js";
 export * from "./WeekView.js";
 export * from "./CalendarAdapter.js";
 export * from "./OnlineMeetingService.js";
@@ -21,7 +21,7 @@ export * from "./OnlineMeetingService.js";
 translate.load(GO.lang.core.core, "core", "core");
 translate.load(GO.lang.community.calendar, "community", "calendar");
 
-export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list';
+export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list' | 'custom';
 export const calendarStore = datasourcestore({
 	dataSource: jmapds<any>('Calendar'),
 	queryParams:{filter:{isSubscribed: true, davaccountId : null}},
@@ -208,15 +208,37 @@ function addEmailAction() {
 	}
 }
 
+export const mainPanel: {ui?:Main} = {};
 
 modules.register(  {
 	package: "community",
 	name: "calendar",
 	entities: [
-		"Calendar",
-		"CalendarView",
+		{
+			name:"Calendar",
+			permissions:[
+				{value: 5, name: t("Read free/busy")},
+				{value: 10,name: t("Read items")},
+				{value: 20,name: t("Update private")},
+				{value: 25,name: t("RSVP")},
+				{value: 30,name: t("Write own")},
+				{value: 35,name: t("Write all")},
+				{value: 40,name: t("Delete")},
+				{value: 50,name: t("Manage")}
+			]
+		},
+		{
+			name: "CalendarView",
+			permissions: [
+				{value: 10,name: t("Read")},
+				{value: 30,name: t("Write")},
+				{value: 50,name: t("Manage")}
+			]
+		},
 		"CalendarCategory",
-		"ResourceGroup",
+		{
+			name: "ResourceGroup"
+		},
 		{
 			name:"CalendarEvent",
 			filters: [
@@ -272,7 +294,33 @@ modules.register(  {
 
 					return dlg;
 				},
-				linkDetail:() =>  new EventDetail()
+				linkDetail:() =>  new EventDetail(),
+				linkDetailCards () {
+
+					var forth = new go.links.DetailPanel({
+						link: {
+							title: t("Upcoming appointments"),
+							iconCls: 'icon ic-event orange',
+							entity: "CalendarEvent",
+							filter: null
+						}
+					});
+
+					forth.store.setFilter('date', {eventsAfter: true});
+
+					var past = new go.links.DetailPanel({
+						link: {
+							title: t("Past appointments"),
+							iconCls: 'icon ic-event orange',
+							entity: "CalendarEvent",
+							filter: null
+						}
+					});
+
+					past.store.setFilter('past', {eventsBefore: true});
+
+					return [forth, past];
+				}
 			}]
 		}
 	],
@@ -289,18 +337,23 @@ modules.register(  {
 			if(!session.capabilities["go:community:calendar"]) {
 				return; // User has no access to this module
 			}
+			mainPanel.ui = new Main()
 
-			// OLD CODE
+			// // OLD CODE
 			// async function showBadge() {
 			// 	const count = await go.Jmap.request({method: "CalendarEvent/countMine"});
-			// 	ui.inboxBtn.hidden = count<1;
+			// 	mainPanel.ui!.inboxBtn.hidden = count<1;
 			// 	GO.mainLayout.setNotification('calendar', count, 'orange');
 			// }
 			// go.Db.store("CalendarEvent").on("changes", () => {
 			// 	showBadge();
 			// });
 			// showBadge();
-			// END OLD CODE
+			// // END OLD CODE
+
+			const nav = (span:ValidTimeSpan, amount: number, ymd?: string) => {
+					modules.openMainPanel("calendar");
+					mainPanel.ui!.goto(new DateTime(ymd)).setSpan(span, amount);
 			client.user.calendarPreferences ||= {};
 			if(!session.capabilities["go:community:calendar"]) {
 				return; // User has no access to this module
@@ -314,6 +367,8 @@ modules.register(  {
 				})
 				.add(/^calendar\/(days|weeks|split)-(\d+)\/(\d{4}-\d{2}-\d{2})$/, (span, amount, ymd) => {
 					void nav(span as ValidTimeSpan, Math.min(parseInt(amount),373), ymd); // it fits on my machine
+				.add(/^calendar\/(days|weeks|split|custom)-(\d+)\/(\d{4}-\d{2}-\d{2})$/, (span, amount, ymd) => {
+					nav(span as ValidTimeSpan, Math.min(parseInt(amount),373), ymd); // it fits on my machine
 				}).add(/^calendarevent\/(\d+)$/, async (id) => {
 					// for notification clicks
 					const event = await jmapds('CalendarEvent').single(id);
@@ -322,7 +377,7 @@ modules.register(  {
 
 				});
 
-			modules.addMainPanel("community", "calendar", 'calendar', t('Calendar'), () => new Main());
+			modules.addMainPanel("community", "calendar", 'calendar', t('Calendar'), () => mainPanel.ui!);
 
 			main.notifier.regRenderer('CalendarEvent', (alert, closeFn) => {
 				const entity = alert.entityData,

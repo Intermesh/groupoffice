@@ -196,7 +196,7 @@ class Module extends Entity {
 			return (object) $rights;
 		}
 
-		$r = decbin($r);
+		$r = (int)$r;
 
 		$rights = ["mayRead" => true];
 

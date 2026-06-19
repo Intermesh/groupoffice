@@ -52,7 +52,6 @@ export class CommentDetail extends DetailPanel {
 		)
 
 		this.on("load", ({entity}) => {
-
 			this.content.items.replace(Image.replace(entity.text));
 		});
 	}

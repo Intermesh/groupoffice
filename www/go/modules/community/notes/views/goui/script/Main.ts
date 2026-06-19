@@ -1,19 +1,19 @@
 import {
 	btn,
 	Button,
-	checkbox,
 	checkboxselectcolumn,
 	column,
 	comp,
 	Component,
 	EntityID,
-	h3, h4,
+	h4,
 	hr,
 	menu,
 	menucolumn,
 	mstbar,
 	router,
-	searchbtn, selectallcheckboxfield,
+	searchbtn,
+	selectallcheckboxfield,
 	t,
 	tbar,
 	Toolbar
@@ -25,7 +25,8 @@ import {
 	Export,
 	filterpanel, Import,
 	jmapds,
-	MainThreeColumnPanel,TableTitle,
+	MainThreeColumnPanel,
+	TableTitle,
 	tabletitle
 } from "@intermesh/groupoffice-core";
 import {notebookgrid, NoteBookGrid} from "./NoteBookGrid";
@@ -53,7 +54,6 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 	}
 
 	protected createWest() {
-
 		this.noteBookGrid = notebookgrid({
 			headers: false,
 			fitParent: true,
@@ -168,8 +168,8 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 				this.showCenterButton()
 			),
 			comp({
-				flex: 1
-			}, this.noteBookGrid
+					flex: 1
+				}, this.noteBookGrid
 			),
 			filterpanel({
 				flex: 1,

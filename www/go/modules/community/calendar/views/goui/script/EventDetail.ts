@@ -286,13 +286,21 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 	/**
 	 * Load's an event from the data source without recurrenceId
+	 * It's used for opening links, but we cannot link instances
 	 * @param id
 	 */
-	// async load(id:EntityID): Promise<this> {
-	//
-	// 	return await this.loadEvent(item);
-	//
-	// }
+	async load(id:EntityID): Promise<this> {
+		const r = await super.load(id);
+
+		if(!calendarStore.loaded) await calendarStore.load();
+
+		const item = (new CalendarItem({
+			key: id + "",
+			data:this.entity!
+		}))
+		return await this.loadEvent(item);
+
+	}
 
 	/**
 	 * Loads an event from the CalendarItem view model with recurrence info
@@ -353,6 +361,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 						}
 					}
 				}
+				debugger;
 				this.item = ev;
 				this.editBtn.hidden = !this.item.mayChange;
 				this.showCalendar.hidden = this.item.mayMove

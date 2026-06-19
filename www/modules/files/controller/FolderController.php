@@ -10,6 +10,7 @@ use GO\Base\Exception\AccessDenied;
 use go\core\db\DbException;
 use go\core\exception\Forbidden;
 use go\core\fs\Blob;
+use go\core\fs\FileSystemObject;
 use go\core\jmap\Entity;
 use go\core\model\Acl;
 use go\core\model\Alert as CoreAlert;
@@ -27,7 +28,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 	protected function allowGuests() {
 		if($this->isCli())
-			return array('syncfilesystem', 'removeempty', 'cleanaddressbook');
+			return array('syncfilesystem', 'removeempty', 'cleanaddressbook', 'deletebypath');
 		else
 			return parent::allowGuests();
 	}
@@ -152,6 +153,40 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 	
 	protected function actionCache($params){
 		\GO\Files\Model\SharedRootFolder::model()->rebuildCache(\GO::user()->id);
+	}
+
+	/**
+	 * Delete folder
+	 *
+	 * docker compose exec -u www-data groupoffice ./www/groupofficecli.php -r=files/folder/deleteByPath --path=tmp
+	 *
+	 *
+	 * @param $params
+	 * @return void
+	 * @throws GO\Base\Exception\CliOnly
+	 */
+	protected function actionDeleteByPath($params){
+
+
+		$this->requireCli();
+		GO::session()->runAsRoot();
+
+		if(empty($params['path'])) {
+			throw new \Exception("No path given");
+		}
+
+		$folder = Folder::model()->findByPath($params['path']);
+
+
+		if(!$folder) {
+			throw new \Exception("Folder not found");
+		}
+
+		FileSystemObject::allowRootFolderDelete(true);
+
+		$folder->delete(true);
+
+		echo "Deleted ".$params['path']."\n";
 	}
 
 	protected function actionSyncFilesystem(array $params)

@@ -1,16 +1,16 @@
 import {
 	arrayfield,
-	ArrayField,
 	btn,
-	Button, comp,
+	Button,
+	comp,
 	Component,
 	ContainerField,
 	containerfield,
 	datasourcestore,
-	DataSourceStore, DisplayField,
-	displayfield, EntityID,
+	DisplayField,
+	displayfield,
+	EntityID,
 	hr,
-	HtmlField,
 	htmlfield,
 	menu,
 	Notifier,
@@ -29,16 +29,16 @@ export class CommentEditor extends Component {
 	public readonly editor;
 
 
-	constructor(submitButton = true) {
+	constructor() {
 		super();
 
 		this.title = t("Comment");
 
 		this.cls = "vbox";
 
-		this.on("render",  () => {
+		this.on("render", () => {
 			void this.store.load();
-		})
+		});
 
 		this.items.add(
 			this.editor = htmlfield({
@@ -99,11 +99,9 @@ export class CommentEditor extends Component {
 						});
 					}
 				}
-			})
-			,
+			}),
 
 			this.attachments = arrayfield({
-				// style: {padding: "0 1.2rem"},
 				itemContainerCls: "",
 				name: "attachments",
 				buildField: (v) => {
@@ -129,19 +127,16 @@ export class CommentEditor extends Component {
 				itemContainerCls: "",
 				name: "labels",
 				buildField: (v) => {
-
-					return	displayfield({
+					return displayfield({
 						tagName: "div",
 						cls: "comment-editor-label",
 						htmlEncode: false,
 						flex: 1,
-						renderer: (value, record) => {
-
+						renderer: (value) => {
 							return commentLabelDS.single(value).then(lbl => {
 								return comp({
-									cls: "hbox fit",
-
-								},
+										cls: "hbox fit",
+									},
 									comp({
 										html: `<i class="icon" style="color: #${lbl.color}">label</i> ${lbl.name.htmlEncode()}`,
 										flex: 1
@@ -151,9 +146,9 @@ export class CommentEditor extends Component {
 										handler: (button) => {
 											button.findAncestorByType(DisplayField)!.remove()
 										}
-									}))
-
-								});
+									})
+								);
+							});
 						}
 					});
 				}
@@ -170,7 +165,7 @@ export class CommentEditor extends Component {
 				tabIndex: -1, // Skip toolbar in tabbing through forms
 			}),
 			hr()
-			)
+		);
 
 
 		this.editor.getToolbar().items.insert(0,
@@ -218,6 +213,6 @@ export class CommentEditor extends Component {
 					}
 				}
 			}
-		})
+		});
 	}
 }

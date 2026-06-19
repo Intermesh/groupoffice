@@ -27,7 +27,7 @@ export class NoteDetail extends DetailPanel<Note> {
 
 		this.scroller.items.add(
 			this.content = comp({
-				cls: "normalize card pad"
+				cls: "normalize code-blocks card pad"
 			})
 		);
 

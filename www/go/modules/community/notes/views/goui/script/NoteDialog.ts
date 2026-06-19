@@ -35,8 +35,6 @@ export class NoteDialog extends FormWindow<Note> {
 
 		this.width = 800;
 		this.height = 800;
-		this.minHeight = 400;
-		this.minWidth = 600;
 
 		const encryptBtn = btn({icon:'lock', title: t('Encrypt'), hidden: !crypto.subtle}).on('click',e => {
 			this.toggleEncrypt(e.target);

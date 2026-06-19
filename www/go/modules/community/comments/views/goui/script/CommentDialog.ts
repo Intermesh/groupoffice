@@ -1,19 +1,10 @@
-import {
-	arrayfield, browser, btn,
-	ContainerField,
-	containerfield,
-	datetimefield,
-	displayfield,
-	fieldset,
-	Format,
-	htmlfield,
-	t
-} from "@intermesh/goui";
+import {browser, btn, datetimefield, fieldset, t} from "@intermesh/goui";
 import {client, FormWindow} from "@intermesh/groupoffice-core";
 import {CommentEditor} from "./CommentEditor.js";
 
 export class CommentDialog extends FormWindow {
 	private commentEditor: CommentEditor;
+
 	constructor() {
 		super("Comment");
 
