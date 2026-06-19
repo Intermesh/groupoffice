@@ -5,7 +5,7 @@ import {
 	client,
 	JmapDataSource,
 	modules,
-	router
+	router, main, entities
 } from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {EntityID, t, translate} from "@intermesh/goui";
@@ -18,36 +18,20 @@ export * from "./NoteDialog";
 modules.register({
 	package: "community",
 	name: "notes",
-	async init() {
-
-		let notes: Main;
-
-		client.on("authenticated", ( {session}) => {
-			if (!session.capabilities["go:community:notes"]) {
-				// User has no access to this module
-				return;
-			}
-
-			translate.load(GO.lang.community.notes, "community", "notes");
-
-			router.add(/^note\/(\d+)$/, (noteId) => {
-				modules.openMainPanel("notes");
-				notes.showNote(noteId);
-			});
-
-			modules.addMainPanel("community", "notes", "notes", t("Notes"), () => {
-				notes = new Main();
-				return notes;
-			});
-
-			// modules.addAccountSettingsPanel("community", "notes", "notes", t("Notes"), "note", () => {
-			// 	return new SettingsPanel();
-			// });
-
-			moduleSettings.addPanel(SettingsPanel);
-
-		});
-	},
+	panels:[{
+		cmp: Main,
+		title: t("Notes"),
+		id: "notes",
+		routes: {
+			"^notes\/?(\d+)?$/"( noteId){
+				this.show();
+				if(noteId) {
+					this.showNote(noteId);
+				}
+			 }
+		}
+	}],
+	settingsPanels: [SettingsPanel],
 	entities: [{
 		name: "Note",
 		filters: [

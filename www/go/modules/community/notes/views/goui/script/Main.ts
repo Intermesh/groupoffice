@@ -209,7 +209,7 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 				dlg.show();
 				dlg.form.on("save", ({data, isNew}) => {
 					if (isNew) {
-						entities.get("Note").goto(data.id);
+						entities.get("Note")!.goto(data.id);
 					}
 				})
 			}
