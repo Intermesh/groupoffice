@@ -331,17 +331,19 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 
 
 		if(!this.support) {
-			this.columns.splice(7, 0,	{
-				id: "project",
-				header: t('Project', "projects3", "business"),
-				width: dp(160),
-				sortable: true,
-				dataIndex: 'project',
-				renderer: function(v) {
-					return v ? v.name : "-";
-				},
-				groupable: true
-			})
+			if(go.Modules.isAvailable("business","projects3")) {
+				this.columns.splice(7, 0, {
+					id: "project",
+					header: t('Project', "projects3", "business"),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'project',
+					renderer: function (v) {
+						return v ? v.name : "-";
+					},
+					groupable: true
+				});
+			}
 		} else {
 			this.columns.splice(4, 0,	{
 				id: "customer",

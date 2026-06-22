@@ -3,6 +3,7 @@
 - Files: Delete by path function for CLI
 - Support: tasklist grouping separated for support and tasks
 - Core: Style selector in HTML field
+- Tasks: when projcets3 not available, do not show project column in grid
 
 16-06-2026: 26.0.35
 - Timeregistration: Added customer to export and made columns project and customer sortable
