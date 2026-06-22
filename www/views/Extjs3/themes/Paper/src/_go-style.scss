@@ -83,18 +83,18 @@ h6 {
 }
 
 
-code {
-	border: 1px solid var(--fg-line);
-	background-color: var(--bg-low);
-	padding: utils.dp(8);
-	margin: utils.dp(16) 0;
-	display: block;
-	font-family: "Courier New",Courier,monospace;
-	color: var(--fg-text);
-	border-radius: utils.dp(4);
-	overflow: auto;
-	white-space: pre-wrap;
-}
+//code {
+//	border: 1px solid var(--fg-line);
+//	background-color: var(--bg-low);
+//	padding: utils.dp(8);
+//	margin: utils.dp(16) 0;
+//	display: block;
+//	font-family: "Courier New",Courier,monospace;
+//	color: var(--fg-text);
+//	border-radius: utils.dp(4);
+//	overflow: auto;
+//	white-space: pre-wrap;
+//}
 
 p {
 	margin: utils.dp(16) 0;
