@@ -1,3 +1,4 @@
+22-06-2027: 26.0.36
 - Email: Folders are now accessible via a direct URL
 - Core: Don't notify desktop with JSON bodies
 - Files: Delete by path function for CLI
