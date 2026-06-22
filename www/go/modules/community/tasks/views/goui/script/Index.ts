@@ -1,4 +1,4 @@
-import {client, main, modules, moduleSettings, router} from "@intermesh/groupoffice-core";
+import {modules} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {UserSettingsPanel} from "./UserSettingsPanel.js";
 import {t} from "@intermesh/goui";

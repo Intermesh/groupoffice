@@ -1,5 +1,4 @@
-import {AclOwnerEntity, appSystemSettings, client, JmapDataSource, modules, router} from "@intermesh/groupoffice-core";
-import {t, translate} from "@intermesh/goui";
+import {AclOwnerEntity, JmapDataSource, modules,} from "@intermesh/groupoffice-core";
 import {Settings} from "./Settings";
 
 

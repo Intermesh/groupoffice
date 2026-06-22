@@ -1,18 +1,5 @@
-import {
-	btn,
-	checkbox,
-	comp,
-	Component,
-	EntityID,
-	Notifier,
-	paginator,
-	router,
-	searchbtn,
-	t,
-	tbar,
-	Window
-} from "@intermesh/goui";
-import {authManager, client, jmapds, MainThreeColumnPanel, User} from "@intermesh/groupoffice-core";
+import {btn, checkbox, comp, Component, EntityID, Notifier, router, searchbtn, t, tbar, Window} from "@intermesh/goui";
+import {authManager, client, MainThreeColumnPanel, User} from "@intermesh/groupoffice-core";
 import {DomainTable} from "./DomainTable.js";
 import {DomainDialog} from "./DomainDialog.js";
 import {DomainDetail} from "./DomainDetail.js";

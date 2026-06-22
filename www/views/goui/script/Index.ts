@@ -1,5 +1,5 @@
-import {root} from "@intermesh/goui";
-import {authManager, client, customFields, main, modules, router} from "@intermesh/groupoffice-core";
+import {root, router} from "@intermesh/goui";
+import {authManager, client, customFields, main, modules} from "@intermesh/groupoffice-core";
 
 client.uri = BaseHref + "api/";
 

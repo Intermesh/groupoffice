@@ -10,18 +10,28 @@ import {
 import {
 	ArrayField,
 	arrayfield,
-	btn, Button,
+	btn,
+	Button,
 	colorfield,
 	combobox,
-	comp, ContainerField, containerfield, DateField,
-	datefield, DateInterval, DateTime, durationfield,
+	comp,
+	ContainerField,
+	containerfield,
+	DateField,
+	datefield,
+	DateInterval,
+	DateTime,
+	durationfield,
 	fieldset,
 	h3,
 	hr,
-	htmlfield, rangefield, router,
+	htmlfield,
+	rangefield,
+	router,
 	t,
-	tbar, textarea,
-	textfield, timefield
+	tbar,
+	textarea,
+	textfield
 } from "@intermesh/goui";
 import {tasklistcombo} from "./TasklistCombo.js";
 import {TaskCategoryChips, taskcategorychips} from "./TaskCategoryChips.js";

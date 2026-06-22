@@ -1,16 +1,24 @@
 import {client, filterpanel, jmapds, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
 import {
-	btn, checkbox, CheckboxField,
+	btn,
+	checkbox,
+	CheckboxField,
 	checkboxselectcolumn,
 	column,
-	comp, EntityID,
+	comp,
+	EntityID,
 	Filter,
 	h3,
 	hr,
-	menu, mstbar, MultiSelectToolbar, router,
+	menu,
+	mstbar,
+	router,
 	searchbtn,
-	t, Table,
-	tbar, Toolbar, Window
+	t,
+	Table,
+	tbar,
+	Toolbar,
+	Window
 } from "@intermesh/goui";
 import {tasklistgrid, TasklistGrid} from "./TasklistGrid.js";
 import {TaskGrid} from "./TaskGrid.js";

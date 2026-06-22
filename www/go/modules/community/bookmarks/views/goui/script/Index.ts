@@ -1,5 +1,5 @@
-import {client, entities, JmapDataSource, main, modules, router} from "@intermesh/groupoffice-core";
-import {BaseEntity, t, translate} from "@intermesh/goui";
+import {client, JmapDataSource, main, modules} from "@intermesh/groupoffice-core";
+import {BaseEntity, t} from "@intermesh/goui";
 import {Main} from "./Main.js";
 import {BookmarkIFrame} from "./BookmarkIFrame.js";
 
