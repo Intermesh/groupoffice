@@ -1,14 +1,6 @@
-import {
-	AclItemEntity,
-	AclOwnerEntity,
-	moduleSettings,
-	client,
-	JmapDataSource,
-	modules,
-	router, main, entities, settingsPanels
-} from "@intermesh/groupoffice-core";
+import {AclItemEntity, AclOwnerEntity, JmapDataSource, modules} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
-import {EntityID, t, translate} from "@intermesh/goui";
+import {EntityID, t} from "@intermesh/goui";
 import {SettingsPanel} from "./SettingsPanel.js";
 import {NoteDialog} from "./NoteDialog";
 import {NoteDetail} from "./NoteDetail";
@@ -23,7 +15,7 @@ modules.register({
 			cmp: Main,
 			title: t("Notes"),
 			routes: {
-				"^notes\/?(\d+)?$/"(noteId) {
+				"^note\/([0-9]+)$"(noteId) {
 					this.show();
 					if (noteId) {
 						this.showNote(noteId);
