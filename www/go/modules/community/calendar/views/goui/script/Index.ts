@@ -1,6 +1,6 @@
 import {AclLevel, client, jmapds, main, modules, principalDS} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
-import {datasourcestore, DateTime, E, router, t as coreT, translate, Window,router} from "@intermesh/goui";
+import {datasourcestore, DateTime, E, router, t as coreT, translate, Window} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {EventDetail, EventDetailWindow} from "./EventDetail.js";
 import {PreferencesPanel} from "./PreferencesPanel";
