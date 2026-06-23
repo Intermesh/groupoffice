@@ -136,21 +136,23 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	 * @param {type} moduleName
 	 * @param {type} panelClass
 	 * @param {type} panelConfig
-	 * @returns {MainLayoutAnonym$1.initModule@pro;tabPanel@pro;items@arr;map|MainLayoutAnonym$1.initModule@pro;tabPanel@call;insert|MainLayoutAnonym$1.initModule.panel|Boolean}
+	 * @returns
 	 */
 	addModulePanel : function(moduleName, panelClass, panelConfig) {
 
 		panelConfig =panelConfig || {}
 		panelConfig.package = panelClass.prototype.package;
 
-		GO.moduleManager._addModule(moduleName, panelClass, panelConfig);
+		// GO.moduleManager._addModule(moduleName, panelClass, panelConfig);
 
-		go.Router.add(new RegExp('^(' + moduleName + ")$"), function (name) {
-			var pnl = GO.mainLayout.openModule(name);
-			if(pnl.routeDefault) {
-				pnl.routeDefault();
-			}
-		});
+		window.groupofficeCore.main.addLegacyMainpanel("legacy",moduleName, panelClass.prototype.title, panelClass,panelConfig);
+
+		// go.Router.add(new RegExp('^(' + moduleName + ")$"), function (name) {
+		// 	var pnl = GO.mainLayout.openModule(name);
+		// 	if(pnl.routeDefault) {
+		// 		pnl.routeDefault();
+		// 	}
+		// });
 	},
 
 

@@ -40,6 +40,21 @@ go.Modules = (function () {
 			window.groupofficeCore.modules.register(config);
 		},
 
+		addPanel : function(panels) {
+
+			if(!Ext.isArray(panels)) {
+				panels = [panels];
+			}
+
+			panels.forEach(function(p) {
+				if(!p.prototype.id) {
+					throw "Module panel must have an 'id'";
+				}
+				GO.mainLayout.addModulePanel(p.prototype.id, p);
+			}, this);
+
+		},
+
 		/**
 		 * Check if the current user has this module
 		 * 

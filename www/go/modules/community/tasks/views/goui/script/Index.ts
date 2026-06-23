@@ -11,7 +11,7 @@ modules.register({
 			cmp: Main,
 			title: t("Tasks"),
 			routes: {
-				"^tasks\/(\d+)$"(taskId) {
+				"^tasks/(\\d+)$"(taskId) {
 					this.showTask(taskId);
 				}
 			}

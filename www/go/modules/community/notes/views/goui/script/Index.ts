@@ -15,7 +15,7 @@ modules.register({
 			cmp: Main,
 			title: t("Notes"),
 			routes: {
-				"^note\/([0-9]+)$"(noteId) {
+				"^note/(\\d+)$"(noteId) {
 					this.show();
 					if (noteId) {
 						this.showNote(noteId);

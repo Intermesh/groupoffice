@@ -1,4 +1,4 @@
-import {AclLevel, client, jmapds, main, modules, principalDS} from "@intermesh/groupoffice-core";
+import {AclLevel, client, jmapds, main, modules, principalDS, settingsPanels} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {datasourcestore, DateTime, E, router, t as coreT, translate, Window} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
@@ -329,15 +329,15 @@ modules.register(  {
 			cmp: Main,
 			title: t("Calendar"),
 			routes: {
-				"^calendar\/(month|list|week|day|year)\/(\d{4}-\d{2}-\d{2})$"(span, ymd){
+				'^calendar/(month|list|week|day|year)/(\\d{4}-\\d{2}-\\d{2})$'(span, ymd){
 					this.show();
 					this.goto(new DateTime(ymd)).setSpan(span as ValidTimeSpan, 0);
 				},
-				"^calendar\/(days|weeks|split|custom)-(\d+)\/(\d{4}-\d{2}-\d{2})$"(span, amount, ymd) {
+				'^calendar/(days|weeks|split|custom)-(\\d+)/(\\d{4}-\\d{2}-\\d{2})$'(span, amount, ymd) {
 					this.show();
 					this.goto(new DateTime(ymd)).setSpan(span as ValidTimeSpan, Math.min(parseInt(amount),373));
 				},
-				async "^calendarevent\/(\d+)$" (id)  {
+				async '^calendarevent/(\d+)$' (id)  {
 					// for notification clicks
 					this.show();
 					const event = await jmapds('CalendarEvent').single(id);
