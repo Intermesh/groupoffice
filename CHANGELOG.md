@@ -1,3 +1,5 @@
+- Core: APCu cache only clears entries prefixed for the groupoffice instance
+
 22-06-2027: 26.0.36
 - Email: Folders are now accessible via a direct URL
 - Core: Don't notify desktop with JSON bodies
