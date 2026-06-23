@@ -28,7 +28,7 @@ modules.register({
 				bookmarkModules.list.forEach((b) => {
 					const name = b.name.replace(/\s/g, '-');
 
-					main.addMainPanel("community", "bookmarks", {
+					main.addPanel("community", "bookmarks", {
 						id: name,
 						title: name,
 						callback: () => {
