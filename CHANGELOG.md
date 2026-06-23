@@ -1,3 +1,5 @@
+- Core: APCu cache only clears entries prefixed for the groupoffice instance
+
 15-06-2026: 6.8.172
 - Core: prevent ACL exception on saving tasklist that inherits ACL from another entity
 - reminders: Sanitize reminder input (Fixes XSS security issue)
