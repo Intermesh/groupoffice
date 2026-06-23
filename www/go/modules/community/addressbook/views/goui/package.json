@@ -15,7 +15,7 @@
     "typescript": "5.9.*"
   },
   "scripts": {
-    "start addressbook": "concurrently --kill-others \"npm run start:ts\"  \"npm run start:dts\"",
+    "start addressbook": "concurrently --kill-others \"npm run start:ts\" ",
     "start:ts": "node ../../../../../../views/goui/esbuild-module.mjs watch",
     "start:dts": "npx tsc -b --declaration --emitDeclarationOnly --watch",
 

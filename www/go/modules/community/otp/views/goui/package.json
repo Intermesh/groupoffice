@@ -8,7 +8,7 @@
     "typescript": "5.9.*"
   },
   "scripts": {
-    "start otp": "concurrently --kill-others \"npm run start:ts\"  \"npm run start:dts\"",
+    "start otp": "concurrently --kill-others \"npm run start:ts\" ",
     "start:ts": "node ../../../../../../views/goui/esbuild-module.mjs watch",
     "start:dts": "npx tsc --declaration --emitDeclarationOnly --watch",
     "build": "npm run build:ts",
