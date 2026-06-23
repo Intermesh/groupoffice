@@ -3,6 +3,7 @@
 namespace go\core\cache;
 
 
+use APCUIterator;
 use Exception;
 
 /**
@@ -147,7 +148,8 @@ class Apcu implements CacheInterface {
 			return;
 		}
 		$this->cache = [];
-		apcu_clear_cache();
+		//		apcu_clear_cache();
+		apcu_delete(new APCUIterator('/^'.preg_quote($this->prefix, '/').'-/'));
 
 		$this->getDiskCache()->flush(false);
 	}
