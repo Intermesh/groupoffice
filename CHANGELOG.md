@@ -1,322 +1,782 @@
-- Calendar: allow booking into the resource calendars directly
 - Core: APCu cache only clears entries prefixed for the groupoffice instance
-- Core: Create links from new items in GOUI modules was broken
-- Projects2: Fixed problem where employee data could not be fetched by non-admins
-- ldapauthenticator: Don't empty the contact organizations if there are none in LDAP.
-- core: Don't empty contact avatarId if it's not set on it's user.
-- Core: updated german thanks to Daniel from Uni Greifswald!
-- Projects3: Upcoming filter included custom status
-- Automation: fix foreign keys in update scripts
-- projects2: sort on manager possible
-- core: CTRL + A to select all in GOUI
-- Core: CTRL + A in search fields sometimes selected all grid rows instead of the search text
-- Serverclient: Fixed cron error
-- Calendar / core: Fixed tooltips that would stick after moving an event
-- Calendar: Scan email for invites, don't fail completely if one account fails
-- Support / Core: stripping plain text quotes was broken
-- Support: Don't import SMIME signature attachments in email messages
-- Finance: Add paid stamp to template instead of css
-- Bookmarks / Core: Http client only allows requests to global IP ranges
 
-22-06-2027: 26.0.36
-- Core: Fixed bug where links would not be attached if creating an item from add button using a GOUI dialog
-- Email: Folders are now accessible via a direct URL
-- Core: Don't notify desktop with JSON bodies
-- Files: Delete by path function for CLI
-- Support: tasklist grouping separated for support and tasks
-- Core: Style selector in HTML field
-- Tasks: when projcets3 not available, do not show project column in grid
-
-16-06-2026: 26.0.35
-- Timeregistration: Added customer to export and made columns project and customer sortable
-- Notes: Display issue on small (mobile) screens
-
-15-06-2026: 26.0.34
-- Support: Set customer to null when user is deleted
-- Finance: Missing quotes in content-disposition filename
-- Core: fixed problem where you could access controllers of not installed modules
-- Files: Attempt to restore old version if moving new file somehow fails
-- Timeregistration3: Added customer column to list view
-
-08-06-2026: 26.0.33
-- Core: Prefix SSE state counter key with database name so it won't conflict with multiple instances
-- Kanban: Collapse sidebar
-- pdfeditor: debug exceptions
+15-06-2026: 25.0.108
 - reminders: Sanitize reminder input (Fixes XSS security issue)
-- onlyoffice: better error message when URL provided by ONlyOffice is different from configured
-- reminders: Sanitise reminder input (Fixes XSS security issue)
-- Tasks: prevent exception when sorting by project without projects3 being installed
-- Comments: flickerless reload
-- core: html editor clears style attributes with clear formatting too
-- Kanban: smoother rendering and fixed reordering bug when dropping underneath the other cards
+
+08-06-2026: 25.0.107
 - Tasks / Support: make priority sortable (cherry-pick from 6.8)
 
+02-06-2026: 25.0.106
+- Files: do not display portlets if a user has no main_access permission (cherry-pick from 26.0.x)
 
-01-06-2026: 26.0.32
-- Core: SSE uses apcu if available to check changes every second. When an entity is modified a state counter is 
-  incremented and SSE will check if the change was relevant for the user via DB queries. This keeps to amount of DB 
-  queries for SSE to a minimum.
-- Core: Fixed summing up values in each loops. Also strip newline straight after template tag
-- Calendar: Event category selection dropdown will show category colors.
-- Core: OTP field will show numeric keyboard on mobile and filter pasted codes
-- Calendar: fixed incorrectly showing the event is in the past when inviting others.
-- Core: disable output_buffering for SSE
-- Core: Put export operations in a background process and notify when ready
-- Projects3: Added expense tracking and invoicing
-- Core: Optimized export performance for large datasets
-- Support: Fixed sorting on customer
-- Core: Title texts can be copy pasted
-- Notes / Calendar / Projects3: Collapsible sidebar
-- Core: In comments sort mention results and show directly when @ is pressed. Escape cancels popup properly now.
-- Finance: Put invoice attachments before template attachments
-- Core: Fixed AutocompleteField not submitting when emptied because it didn't know it was modified if empty.
-- Files: hide portlets if user has no main access
-- Tasks / Support: hide delete button if permissions do not allow deleting a task
-- Tasks / Support: hide tasklist context menu items if user has no manage task lists permissions
-- Core: Fixed slow browser problem when making a lot of changes to the User (by selecting task lists or note books etc.)
-- Support / Supportclient: Focus editor when opening ticket
-
-21-05-2026: 26.0.31
-- Support: Migrate categories to support module
-- Multi instance: Remove studio package creation as php fpm on debian is hardened and doesn't allow file creation in /usr/share/groupoffice
-- Notes: Fixed overflow problem
-- Core: Combobox list in GOUI misaligned
-- Core: Fixed header bug in range download causing Firefox not to play mp4 files
-- Core: Fixed template bug. html entity decode before evaluating expressions
+21-05-2026: 25.0.105
 - Core: Fixed template parser failing to handle some if statements with variables containing math operators
-- Projects3: Added project templates
 - Filesearch: Fixed results not being filtered when using it as an admin
 
-18-05-2026: 26.0.30
-- Calendar: show icons in monthview
-- Calendar: removed extra hr in event context menu
-- Calendar: Event locations in overview are clickable "Web" links when they start with http(s)
-- Alerts: recurring events would show with the start date of the series instead of the occurrence
-- Core: Upload error fix in detail panels
+18-05-2026: 25.0.104
 - Calendar: Fixed typeerror when importing ICS. Issue #1509
-- Calendar: Fixed jumping calendar list when working with a read only calendar
-- Comments: set comment editor in modal mode to prevent focus stealing
-- Supportclient: wider default width for center panel
-- Tasks: paginate tasklist grid at 50
-- Billing: Fixed some orders changing to status paid when migrating
-- Finance: Add shipping and invoice address to detail panel
 
-13-05-2026: 26.0.29
-- Supportclient: Fix toggle west panel 
-- Supportclient: set minimum permission level for support lists to custom 'Submit as customer' level
-- Supportclient: fix display of grouping in support lists
-- Files: fix DE translations, clean duplicate keys, make sure that some strings are actually being translated"
-
-12-05-2026: 26.0.28
+12-05-2026: 25.0.103
 - Core: TemplateExpressionEvaluator in wrong place leading to incorrect PDF templates
-- Finance: fixed bug in status history logging
 
-11-05-2026: 26.0.27
-- Calendar: Added location in calendar views. (if any)
-- Support: Separate Support categories from task categories
-- Contracts: Enable exports for all users
-- Notes / Projects3: Add button UI consitency with other modules
-- Email: Delete attachments when there's only one
-- ldapauthenticator: Handle DbException in syncing LDAP users and groups
-- Core: Let GC delete ACL for folders
-- Tasks: Don't set syncToDevice when subscribing to task lists
-- Support: Wrong label for created by resulting in duplicate Customer column
-- Support: An extra day was added to modified at
-- Core: Fixed race condition in combobox loading a related entity record
-- Finance: Migrate billing module statuses and status history
-- Finance: New status history feature
-- Savemailas: Disable saving file into Group-Office if no main access to files module 
-- Finance: Added 'credit note' book type
-- Email: Fixed bug where adding an email to an existing contact didn't save
-- Comments: fix error in comments list with edited comments
+11-05-2026: 25.0.102
+- Core: fixed tick color for colored checkboxes
+- Calendar: Lock icon is visible in calendar view when event is not public
+- Tasks: don't auto subscribe all tasklists
+- Savemailas: Disable saving file into Group-Office if no main access to files module
 - Core: Replace eval() with an expression evalutator. Fixes RCE - GroupOffice TemplateParser eval() via Contact/labels
+- Core: force Entity store reset when editing custom fieldset for ActiveRecord entity 
 
-04-05-2026: 26.0.26
-- Maildomains: fix display of active column in aliases table #1482
-- Core: increase max size of email template subject field
-- Leavedays: Holidays type error fixed
-- Fixed: ACL bug related to 4519e840 #1485
-- Savemailas: Fixed eventwindow not opening a second time from save mail as
-- Finance: Fixed drag and drop in finance between groups
+04-05-2026: 25.0.101
+- Tasks: On migration subscribe to tasklists owned by the user
 - Core: Fixed infinite loop when installation is disabled
-- Supportclient: Show ticket ID in title in east panel
-- Support: When migrating find principal by email if not a user
-- Core: SQL build error when using bind parameters in nested subqueries. (Found in address book age filter)
-- Core: Updated German translation and fixed some typos.
-- Multi instance: Disconnect Mysql connection when checking if instance is installed.
-- Core: Fixed: Installer breaks on first load: htmlentities($_POST['username']) not null-safe in install/install.php #1496
-- Core: Hints for colors in System Settings -> Appearance
-- Bookmarks: Permissions were not implemented correctly. Fixes Unhandled Promise Rejection: [object Object] when trying to delete a bookmark. #1498
-- Forms: export sets labels as column names for fields
+- Supportclient: only show lists in new ticket dialog with at least CREATE permission
+- Core: prevent ACL exception on saving tasklist that inherits ACL from another entity 
+- Calendar: web ics file will only re-import if the fingerprint of the file has changed.
+- Calendar: Option to add web calendar is only seen when the user is allowed to add / edit calendars
+- NL/De translations
+- Calendar: The event adapter is extensible from outside the Calendar module
+- Calendar: Bug in yearview were were event before 12:00 would not be shown.
+- Calendar: Added category block to mont /weeks print view
+- Email: Adding multiple users at once to composer would not work for non-admin users.
 
-20-04-2026: 26.0.25
-- Calendar: Event location field allows free text input
-- Core: Fixed holidays error in billing because of type and case problem in generate() function
-- Calendar: update category list according to selected calendar in event window
+20-04-2026: 25.0.100
+- ActiveSync: Missing MSTZ function
 - Email: Remove old code which had an authenticated stored XSS vulnerability
 - Core: Validate user ID param when saving settings
-- Calendar: Fix error when in account dialog when you don't have permissions to the calendar.
-- Emailfavorites: Fix error when you don't have permissions
-- Tasks: On migration subscribe to tasklists owned by the user
-- Support: Don't process @mention on migration
 - OTP: explicitly log username and IP upon wrong authentication
 - Email: Do not show 'save to personal folder' button if no access to files module
-- Forms: increase maximum size of field length
 
-14-04-2026: 26.0.24
-- Support: Mail sending was broken if SMIME was not configured
-- Notes: Fixed note dialog on mobiles
-- ActiveSync: Missing MSTZ function
+13-04-2026: 25.0.99
 
-13-04-2026: 26.0.23
-- Support: Threading issue when someone sent more than one email within the import interval (5 mins).
-- Files: Better validator for folder names for Windows compatibility (cherry-pick from 6.8)
-- Updated Japanase translations. Arigato HIRA Shuichi
-- Updated Czech translations. Thanks to Mareg
-- Calendar: Only process invitations for enabled users and don't fail if one user fails
-- Core: Cleanup some old entities
 - Files: Move to trash could accidentally remove selected tree folder instead of selection in the thumbnail view
-- Forms: set maximum length validation for label and hint fields
+- Files: Better validator for folder names for Windows compatibility
+- Updated Japanese translations. Arigato HIRA Shuichi
+- Calendar: Made human readable date for full day event end at the day before the technical end at 00:00 
+- SaveMailAs: Saved email with a main body part that is not text will be displayed at attachment correctly
 
-09-04-2026: 26.0.22
+09-04-2026: 25.0.98
 - Update GOUI version
 
-09-04-2026: 26.0.21
-- Calendar: State mismatch for this and future will cancel the creation
-- Comments / Core: Fixed some upgrade issues where table collation was incorrect
-- Savemailas: Fixed save as note
-- Tasks / Support: Set default task list when creating a new task/ticket from other modules
-- Notes: Open note when creating a new note
+07-04-2026: 25.0.97
 - Workflow: make permissions depend on mayManage
 - Core: log error in apache log when token invalid
 - Files: fix 'Move to trash' in tree context menu
-- Billing: Fixed type error in billing when duplicating orders
 
-
-02-04-2026: 26.0.20
+02-04-2026: 25.0.96
+- Workflow: make permissions depend on mayManage
 - imapauth: Fixed login problem for new users
 
-31-03-2026: 26.0.19
+31-03-2026: 25.0.95
 - Core: Fixed login problem with history and permission check on acl ownerr
-- Files: Trashed folders do no longer show in the tree
 
-30-03-2026: 26.0.18
-- Files: Fix ACL error when moving folder with subfolders as a normal user
-- Studio: fix bug in generating ActItemEntityCombo 
-- MS Teams: Fix for MS bug when curl uses http2 and ALPN
+30-03-2026: 25.0.94
 - Savemailas: Tasks in email list function always queried all linked e-mails
 - Core: Reset entity store when opening account settings to avoid lots of changes requests
-- Core: Set 'to' if you are an admin in core/Notify/mail controller
- 
- 
-24-03-2026: 26.0.17
+- Core: When changing tasklist owner changes change ACL ownership and add owner with manage permissions
+- Core: add several filters to template parser
+- Core: explicitly enable ActiveRecord models to be registered as entities
+- Files: fix ACL error when trashing folder with subfolders (cherry pick from 26.0)
+- Studio: fix generation of AclItemEntityCombo fields (cherry pick from 26.0)
+
+23-03-2026: 25.0.93
+- Calendar: new default/personal calendar for (new) users will give manage permissions to this user
+- Calendar: events can be changed by users with `writeOwn` permission if there are participants but none of them is the owner
+
+16-03-2026: 25.0.92
+- Email: Possible to open ICS files without a personal calendar
+- Core: Lithuanian translations! Thank you Mindaugas
+- Files: fix error when removing from trash (cherry pick from 26.0)
+- Files: make it possible to move folders with the same name to trash
 - Addressbook: Fixed SQL Injection vulnerability in contact filters
-- Core: Fixed: Typed property SmtpAccount::$id must not be accessed before initialization #1462
 
-20-03-2026: 26.0.16
-- Files: fix file browser button for older modules
-- Core: Convert dates to user timezone in spreadsheet export
-
-16-03-2026: 26.0.15
-- Oauth2client: Workaround MS bug where it returns 404 if http2 is used with alpn. This happened on Debian Trixie.
-
-13-03-2026: 26.0.14
-- Core: Added LT translations.
-- Files: fix error when cleaning out the trash and a file or folder does not exist anymore in the database.
+09-03-2026: 25.0.91
+- Projects2: fix editing single custom fieldset with template filter
+- Core: Replaced unsafe MaestroError/php-heic-to-jpg lib with imagick PHP extension to support HEIF image files.
+- Address book: Fixed contact sort order when showing names as  "lastname, firstname". Fixes #1219
+- Core / Sync: prevent database exception when saving new user (cherry-pick from 26.0)
 - Core / CalDAV: Compare dates with date time format for database. This fixes an issue with CalDAV where the datetime object is different in timezone but this has no effect in the database. Therefore the event wrongfully thought the start time was changed and the participant status was reset.
 - CalDAV: etag was always immediately changed for new events leading to a resync after a first accept
 - Core: Fixed bug where SSE and z-push would constantly clear the cached database scheme
-- Files: Fixed issue where a sub folder could appear twice in the shares tree
 
-09-03-2026: 26.0.13
-- Core: Tooltip was not removed if the target's parent was removed
-- Core: Replaced unsafe MaestroError/php-heic-to-jpg lib with imagick PHP extension to support HEIF image files.
-- Core: PHP 8.5 compatibility issues
-- Address book: Fixed contact sort order when showing names as  "lastname, firstname". Fixes #1219
-- Core: Also treat / and \ as white space in searching. Fixes Search in note title, is not contains string #1340
-- Core / Sync: fix database exception when saving new user
-- Projects3: Webdav support for projects3
-
-06-03-2026: 26.0.12
+06-03-2026: 25.0.90
 - LDAP: Fixed LDAP authentication not work #1444
 - Core: Fixed encoding issue after moving grid columns
-- Calendar: Fixed issue: No email when a participant confirm or decline #1437
 - Core: Fixed Authorization bypass: IDOR in SmtpAccount/test, Calendar downloadIcs, DavAccount/sync + missing admin checks #1447
 - Core: Fixed Authenticated Remote Code Execution via PHP Insecure Deserialization in `AbstractSettingsCollection`
 - Core: Fixed Self XSS in GroupOffice Installer License Page (install/license.php)
 
-02-03-2026: 26.0.11
-- Comments: Fixed comment routing from search
-- Support: Search in comments too
+02-03-2026: 25.0.89
+- ActiveSync: Fixed battery drain issue caused by not being able to remove calendars.
+- TimeTracking: calendar time tracking module would add wrong join resulting in duplicate changed during synchronization.
+- Email: stay on same page when moving messages to spam (cherry-pick from 6.8)
 
-28-02-2026: 26.0.10
-- Tasks: Fixed subscribe to task lists
-- Comments: Images didn't load in edit dialog
-- Comments: Fixed markup for lists
-- History: Fixed invalid formatting of changed details
+28-02-2026: 25.0.88
 - Core: Fixed xss vulnerability in external function handling
 - Core: Fixed xss in installer
+- Tasks: Fixed subscribe to task lists
 
-24-02-2026: 26.0.9
+24-02-2026: 25.0.87
+- Core: Fixed xss vulnerability in external function handling
+- Core: Fixed xss in installer
 - Core: Fixed RCE vulnerability.
 
-24-02-2026: 26.0.8
-- Core: Allow archiving if you have "mayChangeUsers" permission
-- Support: fixed "Save e-mail as ticket" function
-- pdfeditor: Fixed GO 26.0.7 internal PDF-editor refuses saving #1428. It assumed GO is installed in the root.
-- Core: Fixed comments not reloading when edited
-- wopi: add clipboard-read and clipboard-write permissions
-- Contracts: remove redundant customer field
-- ActiveSync: Fixed: Issues with Z-push and v16.0 instanceid handling. Fixes Error in Z-Push/src/lib/request/sync.php at line 559: Class "GSync" not found #1426
+24-02-2026: 25.0.86
+- ActiveSync Fixed issues with Z-push and v16.0 instanceid handling. Fixes Error in Z-Push/src/lib/request/sync.php at line 559: Class "GSync" not found #1426
 - Calendar: Fixed display issue of read only events in the calendar
 - Core: Fixed SQL injection vulnerability in deprecated code that's removed now
 
-18-02-2026: 26.0.7
-- Core: Check if export is not empty.
-- LDAPAuthenticator enable and optionally enforce TOTP workflow (cherry-pick from 6.8)
-- Support: Implemented quote collapsing in support
-- Assistant: When file is locked warn about it and download it read only.
-- Calendar: Added start page widget
-- Core: A bookmark with "Behave as module" could mess up sort order
-- Oauth: Correct wrong username in email account
-- 
-09-02-2026: 26.0.6
-- jitsimeet: Add sub to jwt
-- davclient: Add option to disable SSL validation
-- MS Teams: meeting gets decription with meeting id, passcode and meeting options link. Teams event is also set with subject and meeting time
-- Finance: Migrate from billing didn't copy frontpage text to greeting and sometimes address was missing
-- Finance: New book option to make items read only after they have been sent
-- Core: Fixed inserting links with Safari in email composer
+23-02-2026: 25.0.85
+- Calendar: Appointment notifications will show the start time of the event.
+- Calendar: Add participant field will auto add the email if it is valid but not entered yet. Invalid values will be cleated.
+- Calendar: display correct time in linked event
+- Core / email: fix a nasty issue with encoding in certain email attachemnets
+- Startpage: Fix display of age in birthday portlet
 
-02-02-2026: 26.0.5
+18-02-2026: 25.0.84
+- LDAPAuthenticator: enable and optionally enforce TOTP workflow (cherry-pick from 6.8.x)
+- Calendar: enable Webcal import cron job by default
+- Leavedays: fix user panel manager view
+- ActiveSync: Fixed issue with TBSync creating events without organizer in shared calendars
+- Calendar: Added start page widget
+- Oauth: Correct wrong username in email account
+
+09-02-2026: 25.0.83 
+- MS Teams: meeting gets decription with meeting id, passcode and meeting options link. Teams event is also set with subject and meeting time
+- Core: Fixed inserting links with Safari in email composer
+- Core: fix pesky error when testing SMTP configuration
+
+02-02-2026: 25.0.82
+- Tasks: sort tasklist grid by name
 - Core: fixed Security vulnerability Remote Code Execution (RCE)
 - Core: Only allow http(s) protocols in httpclient for security reasons. Fixes SSRF and File Read in WOPI service discovery.
 - Core: Remove debug and info from client with ctrl+f7 for security reasons
-- Core: removed old code and restricted User access to admins or users with "mayChangeUser" permissions
 - Files: Remove url in link in FilePanel.js to avoid confusion with other links
 - Finance: FinanceStatus::$color can be null
 - Email: Fixed  RCE - Command Injection via TNEF Attachment Handler
 
- 29-01-2026: 26.0.4
-- calendar: Fixed create link field in event dialog
+26-01-2026: 25.0.81
+- Address book: Gender field less prominent and shown in grid
 - Core: Cron jobs no output buffering and debug memory
-- Core: New config options for mail debugging (mailerDebugHost and mailerDebugPort)
 - Core: Exit with error immediately when config file can't be loaded. It hung endlessly on require.
 - Core: New config options for mail debugging (mailerDebugHost and mailerDebugPort)
 - Calendar: Fixed calendar load problem if a relation with id="0" was fetched. In this case modifiedBy was '0' after]
   migrating an ancient 4.0 version.
-- Wopi: Removed references to business package. Fixes 26.0.3 module store complains about missing module files #1409
+- Maildomains: rollback of permission changes in .80. Fixes issue #1411.
 - Business: cascade managers when user is deleted
-- Calendar: Add participant on blur
 - Core: updated Italian translation. Thanks Alexander!
-- Kanban: was missing
-- PDF Editor: New module for annotating PDF files
-- Email favorites: New module to bookmark email folders
-- Core: Only lock set operations for the same entity as it blocked serverclient requests to the same group-office instance.
-- Email: Fixed dropzone flickering when dropping files
 
-20-01-2026: 26.0.3
-- wopi: Was still not available without a license
+19-01-2026: 25.0.80 
+- Core: Fixed deleting old unused browser client data
+- Calendar: Unavailable resources cannot be scheduled again.
+- Core: Make sure system groups exist
+- Files: Stored XSS via Filename during File Open
+- Maildomains / serverclient: play nice with each other
+- Leavedays: cherry pick several bug fixes from 6.8.x
+- Files: cherry pick from 6.8.x: allow file uploads through drag and drop when folder has create access
 
-19-01-2026: 26.0.2
-Initial release: https://www.group-office.com/blog/2026/01/groupoffice-26.0-released
+  13-01-2026: 25.0.79
+- Serverclient: more foolproof method for generating base URL
+- Core: ModifiedBy should not be set when no relevant properties were modified. Solves invalid modifiedBy in the calendar 
+  where caldav users would modify the event by generating the vcalendar object
+- Address book: More gender options in address book
+
+06-01-2026: 25.0.78
+- Z-push: older version was accidentally included.
+- Tasks: Add projects3 filters only if the module is installed.
+
+05-01-2026: 25.0.77 
+- WOPI: Implement Save as for Collabora and Microsoft Office Online (didn't work on ssl with default port before)
+- Core: Error in API docs generate script
+- Email: Do not ask for oauth consent every time
+- Core: Added welcome announcement with link to getting started guide
+
+22-12-2025: 25.0.76
+- Calendar: New users got a calendar but it wasn't automatically subscribed
+- WOPI: Implement Save as for Collabora and Microsoft Office Online
+
+19-12-2025: 25.0.75
+- Calendar: Handle when the calendar item's start date can't be parsed.
+- Calendar: Problem with events from the holoidays module.
+
+15-12-2025: 25.0.74 
+- Email: fixed reading email with a large base64 encoded resource while blocking external images
+- Core: somewhat more helpful error reporting when user cannot be automatically imported from email
+- Leavedays: will be shown in calendar again. broken since 25.0.67
+- Calendar: save calendar user preferences, broken since 25.0.72
+- Projects3: Correctly uninstall projects3 and overwrite when reinstalling.
+
+08-12-2025: 25.0.73
+- Calendar: Fixed various print issues
+- Notifications: removed open_settings panel config. and do not open the panel when checker.js find a notification on boot
+- Calendar: Add both created as Resource Group owner to the ACL of a newly created Resource
+- Calendar: remove empty language file
+- Maildomains: optimize migration script
+
+04-12-2025: 25.0.72
+- Email: get correct mime type for blobs. Not text/plain for text/csv for example.
+- Core: OpenID server packages upgraded and added discovery to docker
+- Newsletters: Fixed problem where mail wouldn't send with account from email module
+- Files: Don't put folders with visible=false in the search results and correct root folders with invalid acl's in the db check
+- Calendar: Replaced recurrenceID validation with quick fix for invalid recurenceId's from MS Exchange 2010
+
+01-12-2025: 25.0.71
+- Calendar: bug in update script
+
+01-12-2025: 25.0.70
+- Calendar: Workaround Microsoft Exchange Server 2010 sending an invalid recurrenceID
+- Finance: Fix shoddy NL translation
+- Calendar: Made it possible to integrate differnt video meeting providers
+- Jitsimeet: Put into own module
+- Microsoft Teams: New pro module to add MS teams links to calendar events
+- Finance: Fixed margin not calculating in some rare cases
+- OIDC: New open ID connect module that is suitable for any open ID server- 
+
+24-11-2025: 25.0.69
+- Core: fix composer dependency error
+- Leavedays: fixed several errors in special leave budget flow
+- Core: Fixed Stored XSS in Contacts Comments Section via Malicious SVG File Upload
+
+24-11-2025: 25.0.68
+- DE translations. Danke Daniel!
+- Calendar: show private events as "Private" in caldav
+- Calendar: permission check for deleting calendars in caldav
+- Calendar: Enable syncToDevice only when it's your own calendar
+- Calendar: Add event to calendars of invitees who are in the same system immediately
+- Core: Serve insecure types (html, svg) as plain text to prevent Stored XSS
+- Maildomains: Automatic mailbox creation not working (Issue #1384)
+- Calendar: Fixed personal calendar combo not loading correctly when opened as admin
+- Projects3: Show mine filter set too late
+- Calendar: Improved month view
+- Core: Fixed bug in search with names and - or _ in them.
+- #1365 Add phone scope, extend user's attributes Thanks @michalcharvat
+- #1368 set default editTB container width Thanks @michalcharvat
+
+17-11-2025: 25.0.67
+- Calendar: Select tasks for the calendar view if the due date is in the selected range.
+- Maildomains: fix error when adding new maildomain, mailbox or alias #1382
+
+13-11-2025: 25.0.66
+- Calendar: Read private events as owner of the calendars (Fixed)
+- Leavedays: single day leave days with time will show with time in the calendar.
+- Calendar: Read only calendar items (leave days) do not have a context menu anymore.
+- History: Remove entityId from search columns to prevent invalid mix of collation error when searching in the history log. Happened when searching on a non-ascii charater like ö.
+- Support client: ~Ticket lists were not shown if you only had "Submit as customer" permission
+- Support: Simplify setup by creating "Customer support" user group
+- Finance: Fixed bug that finance didn't work without catalog and moved unit cost back to main row
+- Core: Admins couldn't change user groups
+- Core / Finance: Fixed if statement failing in templates when a string was quoted
+- Calendar: Added new timezone finder that uses IntlTimezone::getIDForWindowsID()
+
+10-11-2025: 25.0.65
+- Calendar: Showing or hiding declined events. text label changed and work the first time. (without turning off and on)
+- Calendar: The color of the birthday calendar was the same as tasks.
+- Calender: The delete button in the EventDetail windows will decline if it is an invite
+- Registration: Allow time registration on read only projects
+- Core: Fixed history checking for map relations (like recurrenceOverrides in calendar events)
+- Calendar: Exception in recurring event was reset to it's original date when the organizer received a status reply from a participant
+- Calendar: Add more reminder options 1,2 and 7 days
+- Core: Update material icons (Cherry-pick from 6.8)
+- Email: add optional icon for linked email to message grid  (Cherry-pick from 6.8)
+- Finance: Status report
+- Finance: New executed at date
+- Finance: Better label for invoicing 100% of order / quote
+
+03-11-2025: 25.0.64  
+- Calendar: Send event reminders by email when enabled in Notification settings.
+- Calendar: fixed removal of scheduled reminders when event is deleted.
+- Principals: when searching for principal they are no longer grouped by same email address
+- Support: Fixed security issue where users could add comments to other people's tickets
+- Email: Auto disable list-extended when command fails (Happens on strato recently).
+- Core: consistent casting when trying to determine current userId
+- Addressbook: address link will open OpenStreetMap instead of generating an inconsistently supported geo: URI
+- Calendar: Send scheduling messages in the past.
+- Calendar: Update participant scheduleStatus property and show it in the UI
+- Core / Files: fix upload in FilesDetailPanel in case an entity was newly created.
+
+28-10-2025: 25.0.63
+- Calendar: Grouping bug in calendar fixed
+- Calendar: Do not check availability for existing participants in existing events. They would also show as busy in the current event
+- Tasks: Sort alphabetically in subscribe tasklist dialog
+
+27-10-2025: 25.0.62
+- Support: hotfix install script 
+
+- 27-10-2025: 25.0.61
+- Calendar: Resources request will be inserted and -if free- accepted uppon event creation
+- Calendar: Fixed finding the organizer when the event dialog is opened the second time.
+- Calendar: Allow event editing when user has WriteAll permissions but is not the organizer.
+- Finance: Added article info button and discount option
+- Calender: group calendar list by resource group name
+- Serverclient: User adding didn't work anymore because of change in aliases
+- Calendar: E-mail aliases from email accounts used for scheduling
+- Calendar: Invitation mails are sent after closing client connection so the client continues faster and there are no timeouts.
+- Core: Don't unset auth token cache on garbage collection because they are expired anyway
+- Calendar: Decline when not organizer when deleting. Update participation status from context menu
+- Calendar: Toggle visibility of declined events from main view
+- Core: Fixed: Addressbook CSV import shows fgetcsv(): $escape parameter error #1362
+- Calendar: Hide other calendars if you don't have module access. Related to https://github.com/Intermesh/groupoffice/discussions/1364
+- Projects3 /Tasks: Add link to project from task detail
+
+20-10-2025: 25.0.60
+- Core: Fix dirty merge
+ 
+20-10-2025: 25.0.59
+- Calendar: User with writeAll permission to shared calendar can edit event they did not organize but are internal
+- Calendar: Split view is now writeable (drag, drop, copy, paste, click-to-add)
+- Email: Corrected save as filename
+- Tasks: TypeError in /usr/share/groupoffice/go/core/orm/Property.php at line 1771: Cannot assign null to property go\\modules\\community\\tasks\\model\\Task::$alerts of type array
+- Core: Retry jmap call on network failure (not extjs)
+- Calendar: Added workweek / 5 days button
+- Finance: Put date range on invoice when billing time
+- Finance: Option to group line items by employee when billing time
+- Calendar: tooltip always showed series description and location and not the patched one.
+- Email: Out of office subject is configurable
+- Calendar: List option prints current time period.
+- Calendar: Fixed never ending loop in month print view
+- Files: remove delete buttons
+- Files: Fixed broken icons in thumb view
+- Core: enable users with mayChangeUsers permission to add new users (backport from 6.8)
+- Core: Disable email profile field when an authenticator is used
+
+13-10-2025: 25.0.58
+- Address book: Add zipcode and street in grid
+- Calendar: Enable syncToDevice by default only for calendars you own / create.
+- Email: Save messages to computer in this format: YYYY-MM-DD_HHMM_MAILADDRESS_SUBJECT.eml so you can sort them easily
+- Support: grid column name title => subject and created by => customer
+- Calendar: Fix new event from item dialog not loading editable dialog
+- Calendar: Add info option to context menu to show read only view with links and comments. It's also printable.
+- Calendar: Show counter on link button in edit dialog so it's visible that there are links
+- Calendar: Cancellation of occurrences in a recurring series showed as strike-through instead of removed.
+- Files: direct route to folder will open actual folder instead of parent
+- Ldapauthenticator: Push entity changes while deleting users and groups in LDAP sync
+- Core: Limit garbage collection operations and push changes between actions
+- Core: Hide password fieldset when it can't be changed when using an authenticator method like ldap or imap
+- Calendar: Include VTimezone info for outlook in meeting requests
+
+06-10-2025: 25.0.57
+- Calendartimetracking: set required modules
+- Core: More PL translations and corrections
+- Finance/mollie: Setup SEPA mandates manually
+- Calendar: Improve meeting selection clarity by changing button text and hide body buttons inside group-office 
+  (except for resources).
+- Files: heic support in image viewer
+
+29-09-2025: 25.0.56
+- Calendar: Find participant by e-mail so that scheduling works better when you invite a contact that's also a user
+- E-mail: Missing "None" label for in email composer templates menu. Related to issue #1343
+- Calendar: Reply sometimes wasn't processed because of a case sensitive match
+- Calendar: Add sender as participant when saving email as appointment 
+- Project3: Save email as project fixed
+- Core: Fix render bug in Ext multiselect fields #1345
+- Calendar: Hide cancelled events
+- Core: PL translations. Again: many thanks Krzysztof!
+
+22-09-2025: 25.0.55
+- Calendar: Added Views (selection of calendars in a choisen period with 1-click)
+- Calendar: If the same event occurs in multiple selected calendars the week view will show them stacked.
+- wopi: allow co-editing when file is locked
+- onlyoffice: allow co-editing when file is locked
+- Address book: replace deprecated maps: uri with geo: uri
+- Calendar: Add Polish translations #1343 - Thanks Krzysztof!
+
+15-09-2025: 25.0.54
+- Calendar: cron job could add duplicate event because it didn't find the event already created by other means like 
+  ActiveSync or the e-mail module.
+- Calendar: Handle missing sequence
+- Core: Fixed duplicate user groups issue
+- Core: fix deprecated error in ActiveRecord Excel Import/Export (#1336)
+- Support: (cherry pick from 6.8) more helpful email message upon failed IMAP import
+- OnlyOffice: fix JWT error message
+- OnlyOffice: fix stylesheet
+
+09-09-2025: 25.0.53
+- Core: Don't log cannotcalulatechanges exception as it's not a problem
+- Calendar: Fix jistimeet JWT Authentication
+- Core: Fixed handling of outlook invites in z-push / ActiveSync
+- Email: Fixed issue: Sieve working with Docker-Mailserver? #1338
+- ActiveSync: Send message MIME without processing if smime signed. Fixes: Users cannot maintain S/mime certificates / 
+  Sending Smime from IOS broken #1337
+- ActiveSync: Fixed Duplicate Entries via ZPush #1333
+
+
+09-09-2025: 25.0.52
+- Calendar: Fix Typed property go\\modules\\community\\calendar\\model\\Holiday::$region must not be accessed before
+  initialization
+- Calendar: Fix reply not being processed by gmail because prodid must be set to Group-Office's.
+- Calendar: Make sure calendar store is loaded when handling invitations. Otherwise the status buttons 
+  didn't appear or you could change status for the wrong participant
+- Calendar: Favor the personal item over the shared ones when only displaying meetings merged
+- Calendar: Respect freebusy permissions
+
+08-09-2025: 25.0.51
+- Calendar: Added fallback to user timezone if the timezone can't be determined
+- Caldav: Sort personal calendar on top as Sabredav picks the first in the list for invites.
+- Projects: Fixed issue where files and comments wouldn't display on project
+- Calendar: Merge multiple regional holidays into one
+- Newsletters: fix error in smtp workflow
+- Files: make trash sortable by name, path, deletion date, deletedBy user
+- Calendar: Background of unaccepted events not white but with opacity
+- Calendar: Only show one calendar item of a meeting to avoid a very crowded view
+- Time registration: Fix task list refresh when switching projects
+- Caldav: When scheduling via caldav the event could end up in the wrong calendar if the invited
+  e-mail matched another e-mail address using wild cards. eg. "bar@foo.com" could find
+  "foobar@foo.com" because it searched using %bar@foo.com%.
+- Calendar: Fixed: go\modules\community\calendar\model\Scheduler::handle(): Argument #1 ($event) must be of type 
+  go\modules\community\calendar\model\CalendarEvent, go\modules\community\calendar\model\RecurrenceOverride given, 
+  called in /usr/local/share/src/www/go/modules/community/calendar/model/Scheduler.php on line 46
+- Calendar: reuse mailer for invites and allow 180s timeout. Improve error message ion screen if timeout occurs
+
+
+02-09-2025: 25.0.50
+- ActiveSync: Fixed Error in modules/z-push/backend/go/TaskStore.php at line 237: Typed property 
+  go\modules\community\tasks\model\Task::$start must not be accessed before initialization
+- Tasks: Added "Sync to device" option for ActiveSync and CalDAV sync
+
+01-09-2025: 25.0.49
+- ActiveSync: Fix error in scheduling request via mail and z-push. Fixes z-push sync email iOS more than one month
+  #1324
+- CalDAV: Optimized calendar query performance
+
+01-09-2025: 25.0.48
+- Calendar: Map cutype room to location. Fixes database error when cutype was 'room' in an invitation.
+- Calendar: Sometimes events lost duration and suddenly spanned 2 days in the view.
+- Caldav: Fixed sync issue with participants without name in recurring events
+- Caldav: Be more forgiving with broken events. Omit broken event instead of complete failure. 
+- Calendar: Required ActiveSync database columns are not created, no sync possible - after 25.0.41 #1327
+- Calendar: Fixed copy & paste on the same day
+
+28-08-2025 25.0.47
+- Core: App::USER_MAILER event so calendar can send scheduling mails with user from address
+- Core: Contacts showed in group member grid
+- Core: Hide disabled users from Principal queries by default
+- Core: Jumping scroll position on scroll load in autocomplete fields
+- Core: Safer way to execute custom field functions
+
+25-08-2025: 25.0.46
+- Core: Cache busting for GOUI modules
+- Calendar: Fixed holidays appeared every year
+- Calendar: New users gets personal calendar if he has permissions for the calendar module
+- Projects2: Custom column is sortable
+- Projects2: Include sub projects in project report
+- Calendar: Fix incorrect participants patch after migration
+- Email: Don't match <link@domain.com> as xss threat
+- Core/Support: Fixed incremental HTML encoding issue
+- Serverclient: Fixed creating mailbox if first attempt of creating user failed with validation error
+- DAV: Don't list all principals for privacy reasons
+- Leavedays: fix manager check in user panel
+- Core: Fixed duplicate request bugs on initital load of UI
+
+19-08-2025: 25.0.45
+- Calendar: Visible category filter depend on visible calendars instead of subscribed calendar.
+
+19-08-2025: 25.0.44
+- Core: Updated German translations. Danke Christopher K.
+- Newsletters: prevent unhelpful Javascript error when a newsletter neither has a smtp or email account ID
+- Calendar: fixed showing edit dialog when the user has writeall permission to the calendar but the calendar owner / current user is not the organizer.
+- Calendar: Show regional holidays
+- Calendar: New checkbox "Sync to device" on calendar edit dialog. To prevent syncing all subscribed calendars.
+- Calendar: Affecting availability is now a checkbox. Events in shared calendars will only affect availability if the user is a participant. 
+
+17-08-2025: 25.0.43
+- Calendar: Fixed notifications that come from the cronjob and fixed that the cronjob and mail reading reprocesses invites every time.
+- Calendar: Update time in now indicator
+- Newsletters / Core: Speed up newsletter sending and saving of models with large "map" properties
+- Core: Show unavailable modules so they can be removed
+- Core: Convert mail addresses too in html editor
+- Calendar: Added "Home" button
+- Core: Use TEXT values for custom fields with lengths greater than 255 characters
+
+12-08-2025: 25.0.42
+- Calendar: bug with 12pm times becoming 12 hr later
+- Calendar: Fixed some problems when GO timezone didn't match system timezone
+- Calendar: 0pm -> 12pm
+- Calendar: Some hyperlinks could be malformed
+- Caldav: Fixed scheduling issue with recurring events
+- Calendar: Private event shows as private in z-push 
+- ActiveSync: avoid generating an organizer when there are no attendees
+
+12-08-2025: 25.0.41
+- Core: restored submodules groupoffice-core and z-push
+
+11-08-2025: 25.0.40
+- Calendar: Only subscribe personal calendars in new calendar migration to avoid an excessive list of calendars
+- Calendar: Sanitize invalid URI's
+- Newsletters: Fixed Error in /usr/local/share/src/www/go/core/acl/model/AclOwnerEntity.php at line 218: Typed property go\core\acl\model\AclOwnerEntity::$aclId must not be accessed before initialization
+  when sending with an account from the e-mail module
+- CalDAV: Sanitize event URI's in database.
+- Calendar: Use correct date format in links
+- Calendar: Print shows wrong week when week starts on sunday
+- Calendar: Load correct calendars for user in system settings
+- Calendar: 12am -> 12pm
+- Calendar: updated time indicator every minute
+
+
+08-08-2025: 25.0.39
+- Addressbook / Carddav: Fixed: CardDAV / vcard: Improve compatibility by changing type=mobile to type=cell #1283
+- Caldav: Fixed caldav not found error
+
+07-08-2025: 25.0.38
+- Maildomains: Fixed domains with no mailboxes not showing
+- Calendar: Added confirm dialog to delete event
+- Core: Fixed external function handlers like mailto: links
+- Tasks: expand description, date and alert panels
+- Files: Raise max filename size to 260 characters
+- Calendar: Allow same date with full day
+- ActiveSync: Fixed empty reminder issue
+- ActiveSync: Sends scheduling messages now
+- ActiveSync: Improved exception handling
+- Timeregistration2: Fixed timer button
+
+04-08-2025: 25.0.37
+- Calendar: added customfields for calendar entity.
+- GOUI: when SelectField was set to null the option item was not selected.
+- GOUI: DateTime object will respect the users language and first day of the week.
+- Calendar: ics export filename will be calendar+date+title instead of uid
+- Finance: Payment should be verified / checked by default
+- Core: Improved setting link on image in htmleditor
+- ldapauthenticator: Fixed ErrorException in /usr/share/groupoffice/go/modules/community/ldapauthenticator/cli/controller/Sync.php at line 443: Trying to access array offset on value of type null
+- caldav: Fixed: ErrorException in /usr/share/groupoffice/go/modules/community/calendar/model/CalDAVBackend.php at line 131: Undefined array key "color"
+- caldav: Fixed: InvalidArgumentException in /usr/share/groupoffice/vendor/sabre/dav/lib/CalDAV/CalendarObject.php at line 58: The objectData argument must contain an 'uri' property
+- maildomains: Fixed install error on mysql Database exception: SQLSTATE[42000]: Syntax error or access violation: 1101 BLOB, TEXT, GEOMETRY or JSON column 'publicKey' can't have a default value
+
+14-07-2025: 25.0.36
+- OTP: dialog would not popup when OTP setup is required.
+- OTP: Code would not verify during setup of a new OTP token.
+- Calendar: Event dialog will only make writeable calendars selectable.
+- Calendar: The create first calendar dialog will popup if there are no writable calendars.
+- Calendar: mayChangeCalendar is named "Create/Delete calendars", edit is allowed based on permissions. 
+    A user with owner permission must also have create/delete permission on the module to delete a calendar
+- Calendar: Fixed error when caldav server had acknowledged alerts
+- Calendar: Fixed wrong day headers when your timezone is west from UTC
+- GOUI: Implemented custom time picker to support 12 hour time format
+- Tasks: Fixed are you sure close message on save
+- Files: Fixed invalid deletion of file acl's in garbage collection
+- Core: Fixed bug in garbage collection stopping on api keys
+- Projects3: Fixed migration of billed status from projects2
+- Projects3: Reset registrations billed state when invoice is removed
+- Timeregistration2: fix timer button
+
+08-07-2025: 25.0.35
+- Core: Small fonts issue
+- Core: 32 bit support, (Issue quota / postfixverwaltung #1272)
+
+07-07-2025: 25.0.34
+- Calendar: fixed 12-hour time format
+- Calendar: fixed patchThisAndFuture trying to set modifier
+- Core: fix generic spreadsheet import
+- Newsletters: fix import new contacts
+
+30-06-2025: 25.0.33
+- Files: fix external link to folder in folder panel
+- Support: new icon for link to prevent confusion with old tickets module
+- Core / email: Improved converting url to anchors so text cursor won't jump to last line
+- Address book: Contact color back in grid
+- Calendar: Added copy/cut/paste to right-click menu of events
+- Calendar: Delete full day event from weekview with Delete key works
+- Calendar: Drag and drop full day event in weekview
+- Calendar: Make calendar visible when new event is created
+- Calendar: Fix weekview horizontal lines aligned for Safari.
+- Calendar: When invites are inserted the calendar of the email account owner will be used.
+- Calendar: If user has no default calendar selecter the invite will be safed in the first owned calendar
+- Calendar: When updating invites all the calendars owned by the user will be searched for the event.
+- Calendar: Added location to html of invite emails and fixed translation.
+
+23-06-2025: 25.0.32
+- LDAPServer: Fix primary key error
+
+20-06-2025: 25.0.31
+- Projects3: Improved finance integration
+- Core: Upgraded SourceGuardian encoder to fully support PHP 8.4
+- CalDAV: Fixed sync problem in tasks and calendar
+- CalDAV: Added collections to sync a single calendar.
+- CalDAV: Show sync error in the account dialog per account or per calendar.
+- Core: Fixed cursor jump in Firefox
+- Calendar: Fixed Windows scaling issues in weekview.
+
+16-06-2025: 25.0.30
+- Calendar: Fixed display issue in e-mail invite
+- Core: Auto dismiss alerts for entities no longer known
+- Timeregistration2: Tasks only querying in subscribed lists
+- Core: PHP 8.4 compatibility
+- Studio: patch generated models with type hinted attributes
+- Studio: generate new models with type hinted attributes
+- Files: Use load() instead of reload() otherwise it might retrash the files as it will send the last load param
+- Core: All model properties have types so keys will always be a string according to JMAP spec
+- Tasks/Core: Fixed invalid change event in tasklist combo where the tasklist name would be the value in the change event
+- Tasks: percent complete render error when hidden
+- Tasks/Support: Fixed comment load on new ticket / task
+- Addressbook: City, state and country in grid
+- Files: only display 'Share' button if any menu items available
+- Core: Clearer label for 'allowRegistration' system setting
+- Calendar: Added include in availability option for calendars with owner based default.
+- Calendar: Added popup windows with event details when hovering over the event and a setting to turn them off.
+- Calendar: Fixed render glitch when added new event in weekview before existing events.
+- Calendar: Participant field description is now "Add participant or resource"
+- Calendar: Added color column for calendar resources. remove add approve until it is supported.
+- Calendar: Resource group owner will have manage permission to the resources in the group by default.
+
+05-06-2025: 25.0.29
+- Tasks: Sync subscribed tasklists and remove sync settings
+- Comments: show principal name
+- Leavedays: refactor notification code
+- Core: module panels not visible to admins in user settings
+- Core: Fixed custom fields loading problem in system settings
+- Savemailas: Save link description when creating links
+- Maildomains: Return sums as int to hopefully fix issue quota / postfixverwaltung #1272
+- ActiveSync: Fix for all day events spanning an extra day
+
+02-06-2025: 25.0.28
+- Calendar: Custom fields not saved
+- Core: TreeSelect was broken in GOUI
+
+02-06-2025: 25.0.27
+- Leavedays: fix status loop when disapproving leave day requests
+- Leavedays: show number of open requests
+- Freebusy: Fix non editable free busy permissions after user creation
+- Supportclient: Fixed grouping in support lists
+- Core: XSS error fixed in my account -> sync
+- Core: Reflected XSS in Look and feel section of the application
+
+30-05-2025: 25.0.26
+- Core: Fixed store load error when using custom filters
+- Address book: Removed duplicate action date in detail
+- Calendar: removed displayfield() for description as it had some unexpected results when the description was overridden for an occurrence
+- Calendar: New event without any changes wouldn't save anymore
+- Calendar: all events disappeared in week view when deleting an event that has participants or is recurring
+- Core: Stretch custom date fields so larger labels don't run out of the field
+- Core: Fixed creating double user groups and duplicates will be removed.
+- Addressbook: filter hasemailaddresses and hasphonenumbers work with false too
+- Finance: Added "nextContractDate" to finance document model
+- Core: Added dateAdd() and subtr() function to template parser
+
+27-05-2025: 25.0.25
+- Calendar: Show import button if calendar event is not a valid scheduling object
+- Calendar: Show open calendar button on all invites
+- Projects2: Find project tasks in time registration window
+
+26-05-2025: 25.0.24
+- Files: fix permission error when restoring file as end user
+- ActiveSync: Z-Push problem fixed: z-push sync for notes and tasks #1289
+- Newsletters: When setting max messages per minute to 0 it will send as fast as possible and doesn't default to 120 messages per minute
+- Newsletters: When a sending limit is applied the sending time is now taken in to account too.
+
+20-05-2025: 25.0.23
+- Projects: Problem with loading project panel
+- Z-Push: Created new Z-Push repository
+
+19-05-2025: 25.0.22
+- Core: Z-Push upgraded to 2.7.5 (With some patches from us).
+- Files: Fixed opening file from link or search result
+
+12-05-2025: 25.0.21
+- Core: fix database error in disk space calculation cronjob
+- ActiveSync: Fixed error in calendar sync because ownerId was changed to getOwnerId()
+- CalDAV: Fixed error in calendar sync because ownerId was changed to getOwnerId()
+
+08-05-2025: 25.0.20
+- Core: Fixed: Blind Stored XSS in Phone Number Field Enables Forced Redirect and Unauthorized Actions
+- Core: Fixed:  DOM-Based XSS in all Date Input Fields Allow Arbitrary JavaScript Execution
+- Core: fixed Stored XSS in Tasks Comment Section
+- Files: Fixed: Group-Office vulnerable to path traversal Vulnerability ID: JVN#23673287
+- History: Fixed cross site scripting vulnerability JVN#30520482, JVN#87138325 and JVN#72111431
+- Email: fix deprecation error
+- ActiveSync: Fix broken utf-8 when recreating MIME for Z-push
+- Comments: use translations for tasks feedback
+- Core: Reset create link button on close so it won't fail when dialogs perform an async task before opening. This happened with documents in finance.
+- Finance: Add payment due date to Zugferd invoice
+- Addressbook: Filter ICD combo by selected country from address
+
+
+25-04-2025: 25.0.19
+- Maildomains: Wrong quota display and cleaned up code
+
+15-04-2024: 25.0.18
+- Files: Disable new webdav locking by default to test it more. can be enabled with $config['webdavEnableLocks'] = true;
+
+14-04-2024: 25.0.17
+- Files: If files on disk match the entity path eg. addressbook/Public/contacts/A/Albert Foo/ then it will be connected by the database check.
+- Address book: Option to hide index character and icon to show more contacts on screen
+- Address book: update action date form detail view
+- Core: Use geo: https://en.wikipedia.org/wiki/Geo_URI_scheme for address links so user can choose the maps app
+- sync: workaround for Z-push error SyncObject->Check(): object from type SyncMail: parameter 'to' contains an invalid email address 'undisclosed-recipients:'. Address is removed.
+- tasks: correct invalid state where due is before start date
+- Core: Updated German language thanks to the University of Greifswald
+
+08-04-2025: 25.0.16
+- Demo data: Longer timeout so it won't time out after 30s.
+- Tasks: Default color for task lists
+- Files: fs_trash folder was missing for some users
+
+08-04-2025: 25.0.15
+- Calendar: Upgrade errors if files not installed part 2
+
+08-04-2025: 25.0.14
+- Maildomains: Cannot create Alias #1255
+- Calendar: Upgrade errors if files not installed
+- ActiveSync: Was still not fixed.
+
+08-04-2025: 25.0.13
+- Files: If you had files module installed but disabled the upgrade failed
+- ActiveSync: Wrong lib included which made sync fail
+
+07-04-2025: 25.0.12
+- Maildomains: Fixed bug in dialogs not splitting user and domain
+- Maildomains: Fixed bug in checking max aliases and max mailboxes
+- Webdav: Creating new files was broken
+- Studio: fix creator and modifier names in grid
+- Core: refactor old calendar event models out of system tools
+
+01-04-2025: 25.0.11
+- Core: fix order of database migrations
+- Studio: automatically patch modules to 25.0 code base
+- Core: fix multiple upgrade errors
+- Core: fix theme colors
+
+25-03-2025: 25.0.10
+- Calendar: Fixed install on MySQL 8
+- Calendar: Auto install on fresh install
+- Core: Catch database exception in legacy session handler to catch the case where a session exists but the
+  database is not installed yet. Reported in issue #1242.
+- Fixed exception in database check. Reported in issue #1242.
+- Supportclient: add 'select all lists' checkbox to sidebar
+- Finance: When duplicating quotes or invoices etc. default to the same book
+- Finance: Optimized database index
+- Core: Optimized database indexes for core_change, search.
+- ActiveSync: Optimized notification queries
+- Core: Updated German translation thanks to University of Greifswald
+
+18-03-2025: 25.0.9
+- Core: Build error
+- Core: maximum call stack exceeded error
+
+18-03-2025: 25.0.8
+- E_mail: Save mail as project
+- E-mail: Save mail as appointment
+- Calendar: Create and browse links from event dialog
+- Calendar: Fixed unsubscribe from calendar
+- Core: Color picker render issue
+
+10-03-2025: 25.0.7
+- Calendar: fix cancellation event
+- Time zone fix
+- Phpstan
+- Create link button
+- several updated dependencies
+
+06-03-2025: 25.0.6
+- Calendar time tracking build problem fixed
+
+03-03-2025: 25.0.5
+- Calendar time tracking module
+- Tasks / Support: Easier task dialog
+
+18-02-2025: 25.0.4
+- Many bug fixes and tweaks
+ 
+27-01-2025: 25.0.3
+- Calendar: CalDAV Client module added so you can add external caldav calendars
+- Project3: Module was missing
+
+10-01-2025: 25.0.2
+- Calendar: Calendar didn't load in Docker version
