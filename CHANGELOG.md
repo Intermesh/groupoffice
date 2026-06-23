@@ -1,6 +1,8 @@
+- Calendar: allow booking into the resource calendars directly
 - Core: APCu cache only clears entries prefixed for the groupoffice instance
 
 22-06-2027: 26.0.36
+- Core: Fixed bug where links would not be attached if creating an item from add button using a GOUI dialog
 - Email: Folders are now accessible via a direct URL
 - Core: Don't notify desktop with JSON bodies
 - Files: Delete by path function for CLI
