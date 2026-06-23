@@ -175,7 +175,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 
 	panelIsVisible : function(panelId) {
-		return window.groupofficeCore.main.findChild(panelId) !== undefined;
+		const activeItemComponent = window.groupofficeCore.main.container.activeItemComponent;
+		return activeItemComponent && activeItemComponent.itemId === panelId;
 	},
 
 	openModule: function (moduleName) {
