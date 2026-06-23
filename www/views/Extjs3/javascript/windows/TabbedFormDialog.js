@@ -303,7 +303,12 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 	},
 	
 	refreshActiveDisplayPanels : function(){
-		var activeTab = GO.mainLayout.tabPanel.getActiveTab();
+
+		const wrapper = window.groupofficeCore.main.container.activeItemComponent;
+		if(!wrapper || !wrapper.extJSComp) {
+			return true;
+		}
+		var activeTab = wrapper.extJSComp;
 		if(!activeTab) {
 			return true;
 		}
