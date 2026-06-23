@@ -16,10 +16,10 @@ authManager.requireLogin().then(async () => {
 		modules.init()
 	])
 
-	// Loads all panels
+	// Loads all panels in the main view
 	main.load();
 
-	// Add the Main component holding all the module panels
+	// Add the Main view component holding all the module panels
 	root.items.add(main);
 
 	// fire off the router

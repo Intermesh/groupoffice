@@ -100,14 +100,11 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 
 	getModulePanel: function (moduleName, unhide = true) {
-
-		this.initModule(moduleName, unhide);
-		var panelId = 'go-module-panel-' + moduleName;
-		if (this.tabPanel.items.map[panelId]) {
-			return this.tabPanel.items.map[panelId];
+		const wrapper = groupofficeCore.main.getPanelById(moduleName);
+		if(!wrapper) {
+			return false;
 		}
-
-		return false;
+		return wrapper.extJSComp;
 	},
 
 
@@ -145,7 +142,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		// GO.moduleManager._addModule(moduleName, panelClass, panelConfig);
 
-		window.groupofficeCore.main.addLegacyMainpanel("legacy",moduleName, panelClass.prototype.title, panelClass,panelConfig);
+		window.groupofficeCore.main.addLegacyPanel("legacy",moduleName, panelClass.prototype.title, panelClass,panelConfig);
 
 		// go.Router.add(new RegExp('^(' + moduleName + ")$"), function (name) {
 		// 	var pnl = GO.mainLayout.openModule(name);
@@ -159,24 +156,26 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 
 	setNotification: function (moduleName, number, color) {
-		var panel = this.getModulePanel(moduleName, false);
-		if (panel) {
 
-			if (!panel.origTitle) {
-				panel.origTitle = panel.title;
-			}
-
-			var newTitle = number ? panel.origTitle + ' <div class="go-tab-notification" style="background-color:' + color + '">' + number + '</div>' : panel.origTitle;
-
-			panel.notification = number;
-
-			panel.setTitle(newTitle);
-		}
+		window.groupofficeCore.main.setPanelBadge(moduleName, number);
+		// var panel = this.getModulePanel(moduleName, false);
+		// if (panel) {
+		//
+		// 	if (!panel.origTitle) {
+		// 		panel.origTitle = panel.title;
+		// 	}
+		//
+		// 	var newTitle = number ? panel.origTitle + ' <div class="go-tab-notification" style="background-color:' + color + '">' + number + '</div>' : panel.origTitle;
+		//
+		// 	panel.notification = number;
+		//
+		// 	panel.setTitle(newTitle);
+		// }
 
 	},
 
 	panelIsVisible : function(panelId) {
-		return !this.state || this.state.indexOf(panelId) > -1;
+		return window.groupofficeCore.main.findChild(panelId) !== undefined;
 	},
 
 	openModule: function (moduleName) {
