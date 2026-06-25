@@ -10,7 +10,7 @@ import {Settings} from "./Settings";
 modules.register({
 	package: "community",
 	name: "otp",
-	async init() {
+	init() {
 		client.on("authenticated", ({session}) => {
 			if (!session.capabilities["go:community:otp"]) {
 				return;

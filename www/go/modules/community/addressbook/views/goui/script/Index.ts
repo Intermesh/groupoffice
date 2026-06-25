@@ -91,9 +91,9 @@ modules.register({
 		// /**
 		//  * Override the custom field set dialog when creating it for a contact in system settings
 		//  */
-		// customFields: {
-		// 	fieldSetDialog: "go.modules.community.addressbook.CustomFieldSetDialog"
-		// },
+		customFields: {
+			fieldSetDialog: "go.modules.community.addressbook.CustomFieldSetDialog"
+		},
 		/**
 		 * Relations that can be fetched in stores and detail views
 		 */
@@ -496,11 +496,20 @@ modules.register({
 		title: t("Address book")
 	}, "AddressBookGroup"],
 
-	// /**
-	//  * Extra custom field types this module offers
-	//  */
-	// customFieldTypes: [
-	// 	"go.modules.community.addressbook.customfield.Contact",
-	// 	"go.modules.community.addressbook.customfield.MultiContact"
-	// ]
+	/**
+	 * Extra custom field types this module offers
+	 */
+	customFieldTypes: [
+		"go.modules.community.addressbook.customfield.Contact",
+		"go.modules.community.addressbook.customfield.MultiContact"
+	],
+
+	/**
+	 * This panel will show in the select dialog for persons, e-mail addresses or phone numbers
+	 *
+	 * @see go.util.SelectDialog
+	 */
+	selectDialogPanels: [
+		"go.modules.community.addressbook.SelectDialogPanel",
+	],
 })

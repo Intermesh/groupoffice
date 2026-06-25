@@ -5,6 +5,7 @@ import {client, extjswrapper, JmapDataSource, modules, moduleSettings} from "@in
 modules.register({
 	package: "legacy",
 	name: "email",
+	mainPanel: "GO.email.EmailClient",
 	async init() {
 		client.on("authenticated", ({session}) => {
 			if (!session.capabilities['go:legacy:email']) {

@@ -1,6 +1,4 @@
 
-go.Modules.register("community", "otp");
-
 GO.mainLayout.on('authenticated', (mainLayout, user, password) => {
 	if(!go.Modules.isAvailable("community", "otp")) {
 		return;

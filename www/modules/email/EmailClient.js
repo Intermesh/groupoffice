@@ -1333,12 +1333,12 @@ GO.email.showComposer = function(config){
 }
 
 GO.email.extraTreeContextMenuItems = [];
-
-go.Modules.register("legacy", 'email', {
-	mainPanel: GO.email.EmailClient,
-	title: t("E-mail"),
-	userSettingsPanels: ["GO.email.SettingsPanel"]
-});
+//
+// go.Modules.register("legacy", 'email', {
+// 	mainPanel: GO.email.EmailClient,
+// 	title: t("E-mail"),
+// 	userSettingsPanels: ["GO.email.SettingsPanel"]
+// });
 
 (function() {
 
