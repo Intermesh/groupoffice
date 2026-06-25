@@ -153,7 +153,6 @@ abstract class Module extends Singleton implements ArrayableInterface {
 			$model->package = static::getPackage();
 			$model->version = $this->getUpdateCount();
 			$model->checkDepencencies = false;
-			$model->sort_order = static::getDefaultSortOrder();
 
 			if(!$this->beforeInstall($model)) {
 				go()->warn(static::class .'::beforeInstall returned false');
@@ -612,7 +611,7 @@ abstract class Module extends Singleton implements ArrayableInterface {
 						throw new Exception("Could not install '" . get_class($dependency) . "'");
 					}
 				} else{
-					if (!LegacyModuleModel::install($dependency->getName(), true, $dependency::getDefaultSortOrder())) {
+					if (!LegacyModuleModel::install($dependency->getName(), true)) {
 						throw new Exception("Could not install '" . get_class($dependency) . "'");
 					}
 				}
@@ -711,17 +710,6 @@ abstract class Module extends Singleton implements ArrayableInterface {
 	}
 
 
-	/**
-	 * Default sort order when installing. If null it will be auto generated.
-	 * Modules wit a sort under below 100 will be shown by default. Otherwise they can be opened from the menu.
-	 *
-	 * @return int|null
-	 */
-	public static function getDefaultSortOrder() : ?int{
-		return null;
-	}
-
-	
 	/**
 	 * // backwards compatible 6.2
 	 * 
