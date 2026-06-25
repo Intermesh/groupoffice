@@ -26,9 +26,10 @@ $baseUrl = \go\core\http\Request::get()->getPath() . "/";
                 "@intermesh/groupoffice-core" => $baseUrl.$coreScript . "?v=" . filemtime(__DIR__ . '/' . $coreScript)
         ];
 
-        $mods = Module::find();
+        $mods = Module::find()->where(['enabled' => true]);
 
         foreach($mods as $mod) {
+
             $gouiScript = $mod->module()->getFolder()->getFile("views/goui/dist/Index.js");
 
             if($gouiScript->exists()) {

@@ -395,6 +395,11 @@ class Installer {
 
 	}
 
+	/**
+	 *
+	 * @param bool|null $enabled
+	 * @return array {name:string, package:string, version:int, enabled:bool}[]
+	 */
 	public function getUnavailableModules(bool|null $enabled = true): array
 	{
 		$this->removeObsoleteModules();

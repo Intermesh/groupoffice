@@ -772,7 +772,7 @@ class Module extends Observable implements ArrayableInterface {
 
 			'packageTitle'=> $this->package(),
 			'enabled'=> $model && $model->enabled,
-			'installable'=> $this->isInstallable(),
+			'available'=> $this->isInstallable(),
 			'installed' => $model != false,
 
 			'model' => $model,

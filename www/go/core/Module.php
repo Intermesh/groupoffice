@@ -989,7 +989,7 @@ abstract class Module extends Singleton implements ArrayableInterface {
 			'enabled'=>$model && $model->enabled,
 			'installed' => $this->isInstalled(false),
 			'model' => $model,
-			'installable'=> !$this->isInstallable(),
+			'available'=> $this->isInstallable(),
 			'documentationUrl' => $this->getDocumentationURL(),
 			'category' => $this->getCategory(),
 		);

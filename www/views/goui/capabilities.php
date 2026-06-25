@@ -6,7 +6,7 @@ use go\core\model\Module;
 
 App::get();
 
-$mods = Module::find();
+$mods = Module::find()->where(['enabled' => true]);
 
 $baseUrl = \go\core\http\Request::get()->getPath(). '/';
 
