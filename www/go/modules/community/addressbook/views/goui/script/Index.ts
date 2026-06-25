@@ -1,7 +1,7 @@
 import {
 	AclItemEntity,
 	AclOwnerEntity,
-	appSystemSettings,
+	moduleSystemSettings,
 	client, entities,
 	JmapDataSource, modules,
 	moduleSettings

@@ -1,4 +1,4 @@
-import {appSystemSettings, client, modules} from "@intermesh/groupoffice-core";
+import {moduleSystemSettings, client, modules} from "@intermesh/groupoffice-core";
 import {Settings} from "./Settings.js";
 import {SystemSettings} from "./SystemSettings.js";
 import {CalendarEvent, CalendarItem, onlineMeetingServices} from "@intermesh/community-calendar";
@@ -61,6 +61,6 @@ modules.register({
 client.on("authenticated",  ({session}) => {
 
 	if (session.isAdmin) {
-		appSystemSettings.addPanel("community", "jitsimeet", Settings);
+		moduleSystemSettings.addPanel("community", "jitsimeet", Settings);
 	}
 });

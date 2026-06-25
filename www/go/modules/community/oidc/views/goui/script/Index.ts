@@ -1,4 +1,4 @@
-import {appSystemSettings, client, entities, JmapDataSource, modules} from "@intermesh/groupoffice-core";
+import {moduleSystemSettings, client, entities, JmapDataSource, modules} from "@intermesh/groupoffice-core";
 import {Settings} from "./Settings.js";
 import {SystemSettings} from "./SystemSettings";
 

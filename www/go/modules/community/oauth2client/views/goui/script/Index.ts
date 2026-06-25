@@ -1,5 +1,5 @@
 import {
-	appSystemSettings,
+	moduleSystemSettings,
 	client,
 	JmapDataSource,
 	modules,

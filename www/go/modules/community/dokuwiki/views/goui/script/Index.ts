@@ -1,4 +1,4 @@
-import {appSystemSettings, client, modules} from "@intermesh/groupoffice-core";
+import {moduleSystemSettings, client, modules} from "@intermesh/groupoffice-core";
 import {Settings} from "./Settings";
 
 modules.register({
@@ -11,7 +11,7 @@ modules.register({
 				return;
 			}
 			if (session.isAdmin) {
-				appSystemSettings.addPanel("community", "dokuwiki", Settings);
+				moduleSystemSettings.addPanel("community", "dokuwiki", Settings);
 			}
 		});
 	}
