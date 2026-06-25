@@ -316,7 +316,7 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 							btn.parent!.hide();
 						}
 					})
-				),
+				)
 			),
 
 			comp({
