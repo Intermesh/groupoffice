@@ -4,6 +4,8 @@ namespace go\core\cache;
 
 
 use Exception;
+use go\core\Environment;
+use go\core\http\Client;
 
 /**
  * Cache implementation that uses serialized objects in files on disk.
@@ -34,7 +36,7 @@ class Apcu implements CacheInterface {
 		$this->keepInMemory = false;
 		$this->getDiskCache()->disableMemory();
 	}
-	
+
 	public function __construct() {
 		$this->prefix = go()->getConfig()['db_name'];
 		$this->apcuEnabled = apcu_enabled();
@@ -143,7 +145,16 @@ class Apcu implements CacheInterface {
 			return;
 		}
 		$this->cache = [];
-		apcu_clear_cache();
+		//		apcu_clear_cache();
+		if(apcu_enabled()) {
+			apcu_delete(new APCUIterator('/^' . preg_quote($this->prefix, '/') . '-/'));
+		} else if(Environment::get()->isCli()) {
+			$http = new Client();
+			$http->setOption(CURLOPT_SSL_VERIFYHOST, false);
+			$http->setOption(CURLOPT_SSL_VERIFYPEER, false);
+
+			$http->get(go()->getSettings()->URL . '/install/clearcache.php');
+		}
 
 		$this->getDiskCache()->flush(false);
 	}
