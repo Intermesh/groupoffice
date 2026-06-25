@@ -36,7 +36,7 @@ go.Modules = (function () {
 
 			// for onmoduleready event
 			GO.moduleManager.onAddModule(name);
-			
+
 			window.groupofficeCore.modules.register(config);
 		},
 
@@ -116,10 +116,10 @@ go.Modules = (function () {
 				package = "legacy";
 			}
 			if (!this.registered[package] || !this.registered[package][name]) {
-				return false;
+				return window.groupofficeCore.modules.getConfig(package, name);
 			}
 
-			return this.registered[package][name];
+			return this.registered[package][name]
 		},
 
 		// getConfigs: function() {

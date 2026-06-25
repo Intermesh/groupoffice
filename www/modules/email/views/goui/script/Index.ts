@@ -6,6 +6,7 @@ modules.register({
 	package: "legacy",
 	name: "email",
 	mainPanel: "GO.email.EmailClient",
+	title: t("E-mail"),
 	async init() {
 		client.on("authenticated", ({session}) => {
 			if (!session.capabilities['go:legacy:email']) {
