@@ -17,22 +17,24 @@ export class HistoryDetailWindow extends Window {
 		this.resizable = true;
 
 		this.items.add(
-			comp({cls: "pad scroll fit", flex: 1},
-				this.dateComp = comp(),
-				comp({tagName: "h4", text: t("Changes")}),
-				this.changesComp = comp()
+			comp({cls: "scroll", flex: 1},
+				comp({cls: "pad fit", flex: 1},
+					this.dateComp = comp(),
+					comp({tagName: "h4", text: t("Changes")}),
+					this.changesComp = comp()
+				)
 			)
 		);
 	}
 
-	private formatValue(v:any): string {
+	private formatValue(v: any): string {
 
-		if(v === null || v === undefined) {
+		if (v === null || v === undefined) {
 			return '<i>null</i>';
 		}
 		switch (typeof v) {
 			case "string":
-				if(v.match(/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}/)) {
+				if (v.match(/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}/)) {
 					return Format.dateTime(v);
 				} else {
 					return v.htmlEncode();
@@ -40,7 +42,7 @@ export class HistoryDetailWindow extends Window {
 
 			case "object":
 				let str = "";
-				for(let key in v) {
+				for (let key in v) {
 					str += `${key}: ${this.formatValue(v[key])} \n`;
 				}
 				return str;
@@ -86,8 +88,8 @@ export class HistoryDetailWindow extends Window {
 
 					tableData.push({
 						name: change[0],
-						old: this.formatValue(change[1][0]),
-						new: this.formatValue(change[1][1])
+						old: this.formatValue(change[1][1]),
+						new: this.formatValue(change[1][0])
 					});
 				}
 
