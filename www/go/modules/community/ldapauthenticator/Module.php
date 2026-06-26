@@ -169,7 +169,8 @@ class Module extends core\Module implements DomainProvider
 			}
 			$user->avatarId = $blob->id;
 		} else {
-			$user->avatarId = null;
+			// leave field alone if not there.
+			//$user->avatarId = null;
 		}
 
 		$user->displayName = $record->cn[0];
@@ -241,7 +242,8 @@ class Module extends core\Module implements DomainProvider
 
 				$values['organizationIds'] = [$org->id];
 			} else {
-				$values['organizationIds'] = [];
+				// if empty then leave existing ones alone
+				//$values['organizationIds'] = [];
 			}
 
 			if (isset($values['userCustomFields'])) {

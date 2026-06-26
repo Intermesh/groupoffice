@@ -714,11 +714,13 @@ public function historyLog(): bool|array
 			return Acl::LEVEL_WRITE;
 		}
 
-		if(go()->getModel()->getUserRights()->mayChangeUsers) {
-			return parent::internalGetPermissionLevel();
-		} else {
-			return 0;
+		$level = parent::internalGetPermissionLevel();
+		if(!$level) {
+			return false;
 		}
+
+		return go()->getModel()->getUserRights()->mayChangeUsers ? $level : Acl::LEVEL_READ;
+
 	}
 
 	protected static function textFilterColumns(): array
@@ -1036,15 +1038,17 @@ public function historyLog(): bool|array
 	{
 		$contact = $this->getProfile();
 
-		if(!$contact) {
+		if (!$contact) {
 			return true;
 		}
 
-		if(!$this->isModified(['displayName', 'email', 'avatarId']) && !$contact->isModified()) {
+		if (!$this->isModified(['displayName', 'email', 'avatarId']) && !$contact->isModified()) {
 			return true;
 		}
 
-		$contact->photoBlobId = $this->avatarId;
+		if (isset($this->avatarId)) {
+			$contact->photoBlobId = $this->avatarId;
+		}
 
 		$compare = $this->isModified('email') ? $this->getOldValue("email") : $this->email;
 		if($this->isModified("email")) {
