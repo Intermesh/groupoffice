@@ -1,6 +1,7 @@
 - Calendar: allow booking into the resource calendars directly
 - Core: APCu cache only clears entries prefixed for the groupoffice instance
 - Core: Create links from new items in GOUI modules was broken
+- Projects2: Fixed problem where employee data could not be fetched by non-admins
 
 22-06-2027: 26.0.36
 - Core: Fixed bug where links would not be attached if creating an item from add button using a GOUI dialog
