@@ -7,6 +7,6 @@ modules.register(  {
 	entities: [
 		"DavAccount"
 	],
-	settingsPanels: [SystemSettings]
+	userSettingsPanels: [SystemSettings]
 });
 

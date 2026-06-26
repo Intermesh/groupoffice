@@ -1,9 +1,4 @@
-import {
-	authSystemSettings,
-	client,
-	modules,
-} from "@intermesh/groupoffice-core";
-import {translate} from "@intermesh/goui";
+import {modules,} from "@intermesh/groupoffice-core";
 import {Settings} from "./Settings";
 
 
@@ -13,16 +8,6 @@ modules.register({
 	entities: [
 		"LdapAuthServer"
 	],
-	async init() {
-		client.on("authenticated", ({session}) => {
-			if (!session.capabilities["go:community:ldapauthenticator"]) {
-				return;
-			}
+	systemSettingsPanels: [Settings]
 
-			if (session.isAdmin) {
-				authSystemSettings.addFieldset("community", "ldapauthenticator", Settings);
-			}
-
-		});
-	}
 });

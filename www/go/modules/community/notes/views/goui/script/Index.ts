@@ -24,7 +24,7 @@ modules.register({
 			}
 		}
 	},
-	settingsPanels: [SettingsPanel],
+	userSettingsPanels: [SettingsPanel],
 	entities: [{
 		name: "Note",
 		filters: [

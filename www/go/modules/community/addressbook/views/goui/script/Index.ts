@@ -67,7 +67,7 @@ modules.register({
 	name:  "addressbook",
 	package: "community",
 
-	settingsPanels: [UserAddressbookSettingsPanel, UserProfileSettingsPanel],
+	userSettingsPanels: [UserAddressbookSettingsPanel, UserProfileSettingsPanel],
 	systemSettingsPanels: [Settings],
 
 	/**

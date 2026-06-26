@@ -17,5 +17,5 @@ modules.register({
 			}
 		}
 	},
-	settingsPanels: [UserSettingsPanel]
+	userSettingsPanels: [UserSettingsPanel]
 });

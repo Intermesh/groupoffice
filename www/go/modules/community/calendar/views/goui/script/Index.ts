@@ -350,7 +350,7 @@ modules.register(  {
 
 	},
 
-	settingsPanels: [PreferencesPanel],
+	userSettingsPanels: [PreferencesPanel],
 
 	init () {
 		//const user = client.user;

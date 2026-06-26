@@ -1,5 +1,4 @@
 import {
-	authSystemSettings,
 	client,
 	modules,
 } from "@intermesh/groupoffice-core";
@@ -13,16 +12,5 @@ modules.register({
 	entities: [
 		"ImapAuthServer"
 	],
-	async init() {
-		client.on("authenticated", ({session}) => {
-			if (!session.capabilities["go:community:imapauthenticator"]) {
-				return;
-			}
-
-			if (session.isAdmin) {
-				authSystemSettings.addFieldset("community", "imapauthenticator", Settings);
-			}
-
-		});
-	}
+	systemSettingsPanels: [Settings]
 });

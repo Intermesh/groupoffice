@@ -1,15 +1,13 @@
-import {
-	btn,
-	t,
-	tbar
-} from "@intermesh/goui";
-import {ModuleSettingsFieldset} from "@intermesh/groupoffice-core";
+import {btn, Fieldset, t, tbar} from "@intermesh/goui";
 import {LdapAuthServerTable} from "./LdapAuthServerTable";
 import {LdapAuthServerDialog} from "./LdapAuthServerDialog";
 
-export class Settings extends ModuleSettingsFieldset {
+export class Settings extends Fieldset {
 	constructor() {
-		super("LDAP Authenticator", "community", "ldapauthenticator");
+		super();
+
+		this.legend = t("Profiles");
+
 		const tbl = new LdapAuthServerTable();
 		void tbl.store.load();
 

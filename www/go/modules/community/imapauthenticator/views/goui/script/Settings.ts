@@ -1,15 +1,13 @@
-import {
-	btn,
-	t,
-	tbar
-} from "@intermesh/goui";
-import {ModuleSettingsFieldset} from "@intermesh/groupoffice-core";
+import {btn, Fieldset, t, tbar} from "@intermesh/goui";
 import {ImapAuthServerTable} from "./ImapAuthServerTable";
 import {ImapAuthServerDialog} from "./ImapAuthServerDialog";
 
-export class Settings extends ModuleSettingsFieldset {
+export class Settings extends Fieldset {
 	constructor() {
-		super("IMAP Authenticator", "community", "imapauthenticator");
+		super();
+
+		this.legend = t("Profiles", "community", "imapauthenticator")
+
 		const tbl = new ImapAuthServerTable();
 		void tbl.store.load();
 
