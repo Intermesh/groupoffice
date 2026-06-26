@@ -214,9 +214,9 @@ go.Modules.register("community", "tasks", {
 	},
 
 
-	userSettingsPanels: [
-		"go.modules.community.tasks.SettingsPanel"
-	]
+	// userSettingsPanels: [
+	// 	"go.modules.community.tasks.SettingsPanel"
+	// ]
 });
 
 go.modules.community.tasks.progress = {
