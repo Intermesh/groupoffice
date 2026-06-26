@@ -1038,15 +1038,17 @@ public function historyLog(): bool|array
 	{
 		$contact = $this->getProfile();
 
-		if(!$contact) {
+		if (!$contact) {
 			return true;
 		}
 
-		if(!$this->isModified(['displayName', 'email', 'avatarId']) && !$contact->isModified()) {
+		if (!$this->isModified(['displayName', 'email', 'avatarId']) && !$contact->isModified()) {
 			return true;
 		}
 
-		$contact->photoBlobId = $this->avatarId;
+		if (isset($this->avatarId)) {
+			$contact->photoBlobId = $this->avatarId;
+		}
 
 		$compare = $this->isModified('email') ? $this->getOldValue("email") : $this->email;
 		if($this->isModified("email")) {
