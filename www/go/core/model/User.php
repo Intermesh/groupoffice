@@ -714,11 +714,13 @@ public function historyLog(): bool|array
 			return Acl::LEVEL_WRITE;
 		}
 
-		if(go()->getModel()->getUserRights()->mayChangeUsers) {
-			return parent::internalGetPermissionLevel();
-		} else {
-			return 0;
+		$level = parent::internalGetPermissionLevel();
+		if(!$level) {
+			return false;
 		}
+
+		return go()->getModel()->getUserRights()->mayChangeUsers ? $level : Acl::LEVEL_READ;
+
 	}
 
 	protected static function textFilterColumns(): array
