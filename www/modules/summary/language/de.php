@@ -30,4 +30,10 @@ return array (
   'welcomeContent' => '<p>Vielen Dank für die Installation von Group-Office!</p>
 <p>Hier ist ein Link, der Ihnen den Einstieg erleichtert: {{link}}</p>
 <p>Wir hoffen, dass Ihnen Group-Office gefallen wird!</p>',
+  'Calendar' => 'Kalender',
+  'No appointments to display' => 'Keine Termine vorhanden',
+  'Timespan' => 'Zeitspanne',
+  'statuses' => 'Status',
+  'Visible calendars' => 'Sichtbare Kalender',
+  'Visible' => 'Sichtbar',
 );
