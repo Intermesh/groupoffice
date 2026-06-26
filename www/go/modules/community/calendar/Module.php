@@ -375,7 +375,7 @@ class Module extends core\Module
 		}
 		if(isset($_GET['reply']) && $participant->participationStatus !== $_GET['reply'] && in_array($_GET['reply'], ['accepted', 'tentative', 'declined'])) {
 			$participant->participationStatus = $_GET['reply'];
-			CalendarEvent::$sendSchedulingMessages=true;
+			Scheduler::replyImip($event, $participant);
 			if(!$event->save()) {
 				throw new \Exception('Could not update participation status');
 			}
