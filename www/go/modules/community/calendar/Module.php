@@ -381,8 +381,9 @@ class Module extends core\Module
 		if(!$participant) {
 			throw new Forbidden();
 		}
-		if(isset($_GET['reply']) && in_array($_GET['reply'], ['accepted', 'tentative', 'declined'])) {
+		if(isset($_GET['reply']) && $participant->participationStatus !== $_GET['reply'] && in_array($_GET['reply'], ['accepted', 'tentative', 'declined'])) {
 			$participant->participationStatus = $_GET['reply'];
+			CalendarEvent::$sendSchedulingMessages=true;
 			if(!$event->save()) {
 				throw new \Exception('Could not update participation status');
 			}
@@ -391,11 +392,6 @@ class Module extends core\Module
 		require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageHeader.php');
 		include __DIR__.'/views/imip.php'; // use same html as email because why not
 		require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageFooter.php');
-
-		PostResponseProcessor::get()->addTask(function() use ($event, $participant) {
-			Scheduler::replyImip($event, $participant);
-		});
-
 	}
 
 	protected function beforeInstall(GoModule $model): bool
