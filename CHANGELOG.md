@@ -4,6 +4,7 @@
 - Projects2: Fixed problem where employee data could not be fetched by non-admins
 - ldapauthenticator: Don't empty the contact organizations if there are none in LDAP.
 - core: Don't empty contact avatarId if it's not set on it's user.
+- Core: updated german thanks to Daniel from Uni Greifswald!
 
 22-06-2027: 26.0.36
 - Core: Fixed bug where links would not be attached if creating an item from add button using a GOUI dialog
