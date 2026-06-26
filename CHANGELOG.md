@@ -2,6 +2,8 @@
 - Core: APCu cache only clears entries prefixed for the groupoffice instance
 - Core: Create links from new items in GOUI modules was broken
 - Projects2: Fixed problem where employee data could not be fetched by non-admins
+- ldapauthenticator: Don't empty the contact organizations if there are none in LDAP.
+- core: Don't empty contact avatarId if it's not set on it's user.
 
 22-06-2027: 26.0.36
 - Core: Fixed bug where links would not be attached if creating an item from add button using a GOUI dialog
