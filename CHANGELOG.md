@@ -1,3 +1,4 @@
+29-06-2026: 6.8.173
 - Core: APCu cache only clears entries prefixed for the groupoffice instance
 - projects2: sort on manager possible
 - core: CTRL + A to select all in GOUI
