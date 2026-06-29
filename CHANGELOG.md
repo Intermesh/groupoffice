@@ -1,6 +1,4 @@
 - Core: APCu cache only clears entries prefixed for the groupoffice instance
-- projects2: New setting for starting in "All projects"
-- 
 
 15-06-2026: 25.0.108
 - reminders: Sanitize reminder input (Fixes XSS security issue)
