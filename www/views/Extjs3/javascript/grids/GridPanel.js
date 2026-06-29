@@ -134,9 +134,12 @@ GO.grid.GridPanel =Ext.extend(Ext.grid.GridPanel, {
 		this.keys.push({
 			key: Ext.EventObject.A,
 			ctrl: true,
-			stopEvent: true,
-			fn: (e) => {
-				this.getSelectionModel().selectAll();
+			stopEvent: false,
+			fn: (key, e) => {
+				if(e.target.tagName!='INPUT') {
+					e.stopEvent();
+					this.getSelectionModel().selectAll();
+				}
 			},
 			scope:this
 		});
