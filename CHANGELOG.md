@@ -1,3 +1,5 @@
+29-06-2026: 6.8.174
+- Core: fix import in APCu cache class
 29-06-2026: 6.8.173
 - Core: APCu cache only clears entries prefixed for the groupoffice instance
 - projects2: sort on manager possible
