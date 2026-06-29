@@ -1,8 +1,6 @@
 - Core: APCu cache only clears entries prefixed for the groupoffice instance
 - projects2: New setting for starting in "All projects"
-- projects2: sort on manager possible
-- core: CTRL + A to select all in GOUI
-- Core: CTRL + A in search fields sometimes selected all grid rows instead of the search text
+- 
 
 15-06-2026: 25.0.108
 - reminders: Sanitize reminder input (Fixes XSS security issue)
