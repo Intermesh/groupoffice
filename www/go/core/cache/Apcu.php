@@ -153,7 +153,7 @@ class Apcu implements CacheInterface {
 		//		apcu_clear_cache();
 		if(apcu_enabled()) {
 			apcu_delete(new APCUIterator('/^' . preg_quote($this->prefix, '/') . '-/'));
-		} else if(Environment::get()->isCli()) {
+		} else if(Environment::get()->isCli() && go()->isInstalled() && !empty(go()->getSettings()->URL)) {
 			$http = new Client();
 			$http->setOption(CURLOPT_SSL_VERIFYHOST, false);
 			$http->setOption(CURLOPT_SSL_VERIFYPEER, false);
