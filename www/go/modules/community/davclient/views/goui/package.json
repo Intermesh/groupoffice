@@ -5,7 +5,7 @@
     "concurrently": "latest",
     "esbuild": "latest",
     "sass": "latest",
-    "typescript": "5.9.x"
+    "typescript": "5.9.*"
   },
   "scripts": {
     "start": "concurrently --kill-others \"npm run start:ts\"",
@@ -13,7 +13,6 @@
 
     "build": "npm run build:ts",
     "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
-    "build:dts": "npx tsc -b --declaration --emitDeclarationOnly",
 
     "test": "npx tsc --noEmit"
   }
