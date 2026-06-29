@@ -12,6 +12,7 @@
 - Serverclient: Fixed cron error
 - Calendar / core: Fixed tooltips that would stick after moving an event
 - Calendar: Scan email for invites, don't fail completely if one account fails
+- Support / Core: stripping plain text quotes was broken
 
 22-06-2027: 26.0.36
 - Core: Fixed bug where links would not be attached if creating an item from add button using a GOUI dialog
