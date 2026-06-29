@@ -336,7 +336,7 @@ export class Main extends MainThreeColumnPanel {
 	protected createCenter() {
 		this.taskGrid = new TaskGrid();
 		this.taskGrid.fitParent = true;
-		this.taskGrid.draagableRows = true;
+		this.taskGrid.draggableRows = true;
 		this.taskGrid.sortableGroup = "TaskToList";
 		void this.taskGrid.store.load();
 
