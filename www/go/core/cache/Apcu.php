@@ -6,6 +6,7 @@ namespace go\core\cache;
 use APCUIterator;
 use Exception;
 use go\core\Environment;
+use go\core\ErrorHandler;
 use go\core\http\Client;
 
 /**
@@ -154,7 +155,11 @@ class Apcu implements CacheInterface {
 			$http->setOption(CURLOPT_SSL_VERIFYHOST, false);
 			$http->setOption(CURLOPT_SSL_VERIFYPEER, false);
 
-			$http->get(go()->getSettings()->URL . '/install/clearcache.php');
+			try {
+				$http->get(go()->getSettings()->URL . '/install/clearcache.php');
+			}catch(\Throwable $e) {
+				ErrorHandler::logException($e, "Failed to clear APCu cache via http request");
+			}
 		}
 
 		$this->getDiskCache()->flush(false);
