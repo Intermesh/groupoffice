@@ -33,7 +33,7 @@ class Client
 	 * See https://www.php.net/manual/en/filter.constants.php#constant.filter-flag-global-range
 	 * @var bool
 	 */
-	public bool $globalRangeOnly = true;
+	public bool $globalRangeOnly = false;
 
 	/**
 	 * @return false|CurlHandle

@@ -79,6 +79,7 @@ class Bookmark extends EntityController {
 		if (function_exists('curl_init')) {
 			try{
 				$c = new \go\core\http\Client();
+				$c->globalRangeOnly = true;
 				$c->setOption(CURLOPT_CONNECTTIMEOUT, 2);
 				$c->setOption(CURLOPT_TIMEOUT, 5);
 				$c->setOption(CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
