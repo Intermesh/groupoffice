@@ -8,6 +8,7 @@
 - Projects3: Upcoming filter included custom status
 - projects2: sort on manager possible
 - core: CTRL + A to select all in GOUI
+- Core: CTRL + A in search fields sometimes selected all grid rows instead of the search text
 
 22-06-2027: 26.0.36
 - Core: Fixed bug where links would not be attached if creating an item from add button using a GOUI dialog
