@@ -569,6 +569,11 @@ public function historyLog(): bool|array
 	private function validatePasswordChange(): bool
 	{
 
+		// During install we don't verify
+		if(App::get()->getInstaller()->isInProgress()) {
+			return true;
+		}
+
 		// Current user is admin, always OK
 		if(go()->getAuthState() && go()->getAuthState()->isAdmin()) {
 			return true;
@@ -586,11 +591,6 @@ public function historyLog(): bool|array
 
 		// User didn't have a password yet, ok
 		if(!$this->isModified(['password']) || $this->getOldValue('password') == null) {
-			return true;
-		}
-
-		// During install we don't verify
-		if(App::get()->getInstaller()->isInProgress()) {
 			return true;
 		}
 
