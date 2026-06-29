@@ -3,7 +3,7 @@
   "devDependencies": {
     "concurrently": "latest",
     "esbuild": "latest",
-    "typescript": "latest",
+    "typescript": "5.9.*",
     "sass": "latest"
   },
 
