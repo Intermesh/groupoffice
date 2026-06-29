@@ -51,62 +51,67 @@ class ScanEmailForInvites extends CronJob {
 
 		foreach($settings as $setting) {
 
-			$ifMethod = !$setting->autoUpdateInvitations ? 'REQUEST' : (!$setting->autoAddInvitations ? 'REPLY' : null);
-			$account = Account::model()->findSingleByAttributes(['user_id'=>$setting->userId, 'username' => $setting->email]);
 
-			if(!$account) continue; // the user its email address is not found or not owned by the user
+			try {
+				$ifMethod = !$setting->autoUpdateInvitations ? 'REQUEST' : (!$setting->autoAddInvitations ? 'REPLY' : null);
+				$account = Account::model()->findSingleByAttributes(['user_id' => $setting->userId, 'username' => $setting->email]);
 
-			if(empty($setting->lastProcessed)) {
-				$setting->lastProcessed = date('d-M-Y');
-				go()->getDbConnection()->update('calendar_preferences',['lastProcessed' => $setting->lastProcessed], ['userId'=>$setting->userId]);
-			}
+				if (!$account) continue; // the user its email address is not found or not owned by the user
 
-			//only find unseen messages since the last process date
-			$messages = \GO\Email\Model\ImapMessage::model()
-				->find($account,'INBOX',0,50,'ARRIVAL',false,'SINCE "' . $setting->lastProcessed . '" UNSEEN');
-
-
-			foreach($messages as $message) {
-				if ($message->uid <= $setting->lastProcessedUid) {
-					continue;
+				if (empty($setting->lastProcessed)) {
+					$setting->lastProcessed = date('d-M-Y');
+					go()->getDbConnection()->update('calendar_preferences', ['lastProcessed' => $setting->lastProcessed], ['userId' => $setting->userId]);
 				}
 
-				try {
+				//only find unseen messages since the last process date
+				$messages = \GO\Email\Model\ImapMessage::model()
+					->find($account, 'INBOX', 0, 50, 'ARRIVAL', false, 'SINCE "' . $setting->lastProcessed . '" UNSEEN');
 
-					$itip = Scheduler::handleIMIP($message, $ifMethod);
 
-					if (!$itip) {
-						// skip message without invite
+				foreach ($messages as $message) {
+					if ($message->uid <= $setting->lastProcessedUid) {
 						continue;
 					}
 
-					if ($itip['alreadyProcessed']) {
-						go()->log('ALREADY processed: ' . $itip['event']->title);
-					} else if (!empty($itip['event'])) {
-						go()->log('invite processed: ' . $itip['event']->title);
-						$this->updateAlerts($itip, $setting->userId, $message->from->getAddress());
+					try {
+
+						$itip = Scheduler::handleIMIP($message, $ifMethod);
+
+						if (!$itip) {
+							// skip message without invite
+							continue;
+						}
+
+						if ($itip['alreadyProcessed']) {
+							go()->log('ALREADY processed: ' . $itip['event']->title);
+						} else if (!empty($itip['event'])) {
+							go()->log('invite processed: ' . $itip['event']->title);
+							$this->updateAlerts($itip, $setting->userId, $message->from->getAddress());
+						}
+						if (!empty($itip['event']) &&
+							(($setting->markReadAndFileAutoAdd && $itip['method'] === 'REQUEST') ||
+								($setting->markReadAndFileAutoUpdate && $itip['method'] === 'REPLY'))
+						) {
+							// handled! now check if needs archiving.
+							$this->markReadAndArchive($account, $message);
+						}
+					} catch (Throwable $e) {
+						ErrorHandler::logException($e, "Failed to process invite for message: " . $message->uid . " in account " . $account->username);
 					}
-					if (!empty($itip['event']) &&
-						(($setting->markReadAndFileAutoAdd && $itip['method'] === 'REQUEST') ||
-							($setting->markReadAndFileAutoUpdate && $itip['method'] === 'REPLY'))
-					) {
-						// handled! now check if needs archiving.
-						$this->markReadAndArchive($account, $message);
-					}
-				} catch (Throwable $e) {
-					ErrorHandler::logException($e, "Failed to process invite for message: " . $message->uid . " in account " . $account->username );
 				}
-			}
 
-			if(!empty($message)) { // if there is at least one message found
-				go()->getDbConnection()->update('calendar_preferences',[
-					'lastProcessed' => explode(' ', $message->internal_date, 2)[0],
-					'lastProcessedUid' => $message->uid
-				], ['userId'=>$setting->userId])
-					->execute();
-			}
+				if (!empty($message)) { // if there is at least one message found
+					go()->getDbConnection()->update('calendar_preferences', [
+						'lastProcessed' => explode(' ', $message->internal_date, 2)[0],
+						'lastProcessedUid' => $message->uid
+					], ['userId' => $setting->userId])
+						->execute();
+				}
 
-			go()->debug("Finished scanning for invites");
+				go()->debug("Finished scanning for invites for user: " . $setting->email);
+			}catch(Throwable $e) {
+				ErrorHandler::logException($e, "Failed to process invites for user: " . $setting->email);
+			}
 		}
 	}
 
