@@ -16,6 +16,7 @@
 - Support / Core: stripping plain text quotes was broken
 - Support: Don't import SMIME signature attachments in email messages
 - Finance: Add paid stamp to template instead of css
+- Bookmarks / Core: Http client only allows requests to global IP ranges
 
 22-06-2027: 26.0.36
 - Core: Fixed bug where links would not be attached if creating an item from add button using a GOUI dialog

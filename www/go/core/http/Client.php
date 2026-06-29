@@ -4,6 +4,7 @@ namespace go\core\http;
 
 use CurlHandle;
 use Exception as CoreException;
+use go\core\exception\Forbidden;
 use go\core\fs\File;
 use go\core\util\JSON;
 
@@ -112,7 +113,7 @@ class Client
 		$retVal = filter_var($ip, FILTER_VALIDATE_IP, ['flags' => FILTER_FLAG_GLOBAL_RANGE]);
 
 		if($retVal === false) {
-			throw new CoreException("Invalid URI: " . $uri);
+			throw new Forbidden("Invalid URI: " . $uri);
 		}
 	}
 
