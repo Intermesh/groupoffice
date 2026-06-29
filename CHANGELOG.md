@@ -6,6 +6,8 @@
 - core: Don't empty contact avatarId if it's not set on it's user.
 - Core: updated german thanks to Daniel from Uni Greifswald!
 - Projects3: Upcoming filter included custom status
+- projects2: sort on manager possible
+- core: CTRL + A to select all in GOUI
 
 22-06-2027: 26.0.36
 - Core: Fixed bug where links would not be attached if creating an item from add button using a GOUI dialog
