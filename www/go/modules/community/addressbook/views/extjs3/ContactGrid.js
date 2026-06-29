@@ -334,7 +334,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				},
 				{
 					id: 'address',
-					header: t('Addrees'),
+					header: t('Address'),
 					sortable: true,
 					dataIndex: "address",
 					width: dp(300),
