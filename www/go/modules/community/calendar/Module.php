@@ -157,10 +157,13 @@ class Module extends core\Module
 		$this->outputIcs($calendar);
 	}
 
-	private function outputIcs(Calendar $calendar) {
+	private function outputIcs(Calendar $calendar, $after = null) {
 		set_time_limit(0);
 
-		$events = CalendarEvent::find()->where(['calendarId' => $calendar->id]);
+		$events = CalendarEvent::find()->filter(['inCalendars' => $calendar->id]);
+		if($after !== null) {
+			$events->filter(['after' => $after]);
+		}
 		header('Content-Type: text/calendar; charset=UTF-8; component=vcalendar');
 		header('Content-Disposition: attachment; filename="'.$calendar->name.'export_'.$calendar->id.'_'.date('Y-m-d').'.ics"');
 
@@ -193,7 +196,7 @@ class Module extends core\Module
 		// No auth needed but publishKey most be known to read
 		$calendar = Calendar::find()->where(['publishKey' => $key])->single();
 		if($calendar) {
-			$this->outputIcs($calendar);
+			$this->outputIcs($calendar, date('Y-m-d', strtotime('first day of last month')));
 		} else {
 			throw new Forbidden("Unauthorized");
 		}
