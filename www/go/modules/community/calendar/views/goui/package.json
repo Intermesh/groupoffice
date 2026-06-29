@@ -1,11 +1,15 @@
 {
   "type": "module",
-  "name": "calendar",
+  "name": "@intermesh/community-calendar",
+  "main": "./dist/Index.js",
+  "module": "./dist/Index.js",
+  "typings": "./dist/Index.d.ts",
+
   "devDependencies": {
     "concurrently": "latest",
     "esbuild": "latest",
     "sass": "latest",
-    "typescript": "5.9.*"
+    "typescript": "5.9.x"
   },
   "scripts": {
     "start": "npm run build:clean && concurrently --kill-others \"npm run start:ts\"  \"npm run start:dts\" \"npm run start:sass\"",
@@ -17,7 +21,7 @@
     "build:clean": "rm -rf ./dist/*",
     "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
     "build:sass": "npx sass --style=compressed --no-source-map style:dist",
-    "build:dts": "npx tsc --declaration --emitDeclarationOnly",
+    "build:dts": "npx tsc -b --declaration --emitDeclarationOnly",
 
     "test": "npx tsc --noEmit"
   }
