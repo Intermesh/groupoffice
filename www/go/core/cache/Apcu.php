@@ -3,6 +3,7 @@
 namespace go\core\cache;
 
 
+use APCUIterator;
 use Exception;
 use go\core\Environment;
 use go\core\http\Client;
