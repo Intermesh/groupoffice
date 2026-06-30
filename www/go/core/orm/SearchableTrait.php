@@ -101,13 +101,6 @@ trait SearchableTrait {
 				->andWhere('entityId', '=', $this->id)->single()
 			: false;
 
-		if(!$this->includeInSearch()) {
-			if($search) {
-				Search::delete($search->primaryKeyValues());
-			}
-			return true;
-		}
-
 
 		if(!$search) {
 			$search = new Search();
@@ -126,52 +119,53 @@ trait SearchableTrait {
 		$search->modifiedAt = $this->getSearchModifiedAt();
 		$search->rebuild = false;
 //		$search->createdAt = $this->createdAt;
-		
-		$keywords = $this->getSearchKeywords();
 
-		if(!isset($keywords)) {
-			$keywords = [$search->name, $search->description];
-		}
+		if($this->includeInSearch()) {
+			$keywords = $this->getSearchKeywords();
+
+			if (!isset($keywords)) {
+				$keywords = [$search->name, $search->description];
+			}
 
 //		$keywords = $this->getCommentKeywords($keywords);
 
-		$links = (new Query())
-			->select('description')
-			->distinct()
-			->from('core_link')
-			->where('(toEntityTypeId = :e1 AND toId = :e2)')
-			//->orWhere('(fromEntityTypeId = :e3 AND fromId = :e4)')
-			->bind([':e1' => static::entityType()->getId(), ':e2' => $this->id]);
-				//':e3' => static::entityType()->getId(), ':e4' => $this->id ]);
-		foreach($links->all() as $link) {
-			if(!empty($link['description']) && is_string($link['description'])) {
-				$keywords[] = $link['description'];
+			$links = (new Query())
+				->select('description')
+				->distinct()
+				->from('core_link')
+				->where('(toEntityTypeId = :e1 AND toId = :e2)')
+				//->orWhere('(fromEntityTypeId = :e3 AND fromId = :e4)')
+				->bind([':e1' => static::entityType()->getId(), ':e2' => $this->id]);
+			//':e3' => static::entityType()->getId(), ':e4' => $this->id ]);
+			foreach ($links->all() as $link) {
+				if (!empty($link['description']) && is_string($link['description'])) {
+					$keywords[] = $link['description'];
+				}
+
 			}
 
+			if (method_exists($this, 'getCustomFields')) {
+				$keywords = array_merge($keywords, $this->getCustomFieldsSearchKeywords());
+			}
+
+			$arr = [];
+			foreach ($keywords as $keyword) {
+				$arr = array_merge($arr, StringUtil::splitTextKeywords($keyword));
+			}
+
+			$keywords = StringUtil::filterRedundantSearchWords($arr);
+
+			if (!empty($this->id) && !in_array($this->id, $keywords)) {
+				$keywords[] = $this->id;
+			}
 		}
 
-		if (method_exists($this, 'getCustomFields')) {
-			$keywords = array_merge($keywords, $this->getCustomFieldsSearchKeywords());
-		}
-
-		$arr = [];
-		foreach($keywords as $keyword) {
-			$arr = array_merge($arr, StringUtil::splitTextKeywords($keyword));
-		}
-
-		$keywords = StringUtil::filterRedundantSearchWords($arr);
-
-		if(!empty($this->id) && !in_array($this->id, $keywords)) {
-			$keywords[] = $this->id;
-		}
-
-		//$search->setKeywords(implode(' ', $keywords));
 		$isNew = $search->isNew();
 		if(!$search->internalSave()) {
 			throw new Exception("Could not save search cache: " . var_export($search->getValidationErrors(), true));
 		}
 
-		if(!$isNew) {
+		if(!$isNew || !$this->includeInSearch()) {
 			go()->getDbConnection()->delete('core_search_word', ['searchId' => $search->id])->execute();
 			$search->change(true);
 		}
