@@ -248,7 +248,7 @@ trait SearchableTrait {
 			->orWhere('search.rebuild = 1')
 			->limit($limit)
 			->offset($offset);
-		go()->getDebugger()->debug($query);
+
 		return $query->execute();
 	}
 
@@ -304,7 +304,7 @@ trait SearchableTrait {
 				}
 			}
 			echo "\n";
-			echo go()->getDebugger()->debugTiming('another 1000');
+			//echo go()->getDebugger()->debugTiming('another 1000');
 			go()->getDbConnection()->exec("commit");
 
 			$stmt = static::queryMissingSearchCache($offset);
