@@ -1,0 +1,6 @@
+@use '@intermesh/goui/style/util'  as *;
+@use '@intermesh/goui/style/config' as *;
+
+.go-auth-method-imap {
+	background-image:url('../resources/imap.png');
+}

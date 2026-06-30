@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "name": "ldapauthenticator",
+  "name": "@intermesh/community-ldapauthenticator",
   "devDependencies": {
     "concurrently": "latest",
     "esbuild": "latest",
