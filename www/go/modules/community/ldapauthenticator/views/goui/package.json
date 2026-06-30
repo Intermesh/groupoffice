@@ -8,14 +8,16 @@
     "typescript": "5.9.*"
   },
   "scripts": {
-    "start:ldapauthenticator": "concurrently --kill-others \"npm run start:ts\" ",
-    "start:ts": "node ../../../../../../views/goui/esbuild-module.mjs watch",
-    "start:dts": "npx tsc -b --declaration --emitDeclarationOnly --watch",
+    "start ldapauthenticator": "concurrently --kill-others \"npm run start:esbuild\"  \"npm run start:sass\"",
+    "start:esbuild": "node ../../../../../../views/goui/esbuild-module.mjs watch",
+    "start:sass": "npx sass --load-path=$(npm root) --watch style:dist",
 
-    "build": "npm run build:ts",
+    "build": "npm run build:sass && npm run build:ts",
     "build:clean": "rm -rf ./dist/*",
     "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
+    "build:sass": "npx sass --update --load-path=$(npm root) --style=compressed style:dist",
     "build:dts": "npx tsc -b --declaration --emitDeclarationOnly",
+
     "test": "npx tsc --noEmit",
     "prepare": "npm run build"
   }
