@@ -1,3 +1,4 @@
+30-06-2026: 26.0.37
 - Calendar: allow booking into the resource calendars directly
 - Core: APCu cache only clears entries prefixed for the groupoffice instance
 - Core: Create links from new items in GOUI modules was broken
