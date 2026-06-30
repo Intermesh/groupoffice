@@ -1,3 +1,4 @@
+30-06-2026: 25.0.109
 - Core: APCu cache only clears entries prefixed for the groupoffice instance
 - projects2: New setting for starting in "All projects"
 - projects2: sort on manager possible
