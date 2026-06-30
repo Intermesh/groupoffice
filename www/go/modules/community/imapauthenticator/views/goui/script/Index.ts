@@ -1,8 +1,4 @@
-import {
-	client,
-	modules,
-} from "@intermesh/groupoffice-core";
-import {t, translate} from "@intermesh/goui";
+import {modules,} from "@intermesh/groupoffice-core";
 import {Settings} from "./Settings";
 
 

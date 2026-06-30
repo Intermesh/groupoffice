@@ -23,6 +23,9 @@ export class ImapAuthServerDialog extends FormWindow {
 		this.closable = true;
 		this.maximizable = true;
 		this.width = 800
+		this.height = 1000;
+
+		this.title = t("Server")
 
 		const imapServerFs = fieldset({
 				legend: t("IMAP Server")
@@ -183,8 +186,8 @@ export class ImapAuthServerDialog extends FormWindow {
 					headers: false,
 					store: datasourcestore({
 						dataSource: groupDS,
-						queryParams: {
-							limit: 50
+						filters:{
+							default: {hideUsers: true, excludeEveryone: true}
 						}
 					}),
 					rowSelectionConfig: {

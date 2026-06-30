@@ -18,7 +18,7 @@ export class SystemSettingsPanel extends Fieldset {
 			p({text: t("API keys can be used for other services to connect to the API. A website feeding contact information for example.")}),
 
 			comp({cls: "card vbox"},
-				tbar({cls: "bg-low"},
+				tbar({cls: "bg-low border-bottom"},
 					"->",
 					btn({
 						icon: "add",
