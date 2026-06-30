@@ -1,4 +1,4 @@
-import {browser, btn, fieldset, Notifier, t, textfield} from "@intermesh/goui";
+import {browser, btn, fieldset, Notifier, passwordfield, t, textfield} from "@intermesh/goui";
 import {client, FormWindow} from "@intermesh/groupoffice-core";
 
 export class OIDConnectClientDialog extends FormWindow {
@@ -31,8 +31,8 @@ export class OIDConnectClientDialog extends FormWindow {
 					label: t("Client ID")
 				}),
 
-				textfield({
-					type: "password",
+				passwordfield({
+					autocomplete: "off",
 					name: "clientSecret",
 					label: t("Client secret")
 				}),

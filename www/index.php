@@ -4,7 +4,7 @@ use go\core\App;
 use go\core\model\Module;
 
 App::get();
-$baseUrl = \go\core\http\Request::get()->getPath() . "/";
+$baseUrl = \go\core\http\Request::get()->getFullUrl() . "/";
 
 ?>
 

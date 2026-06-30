@@ -237,6 +237,7 @@ class State extends AbstractState {
 						"domains" => User::getAuthenticationDomains()
 			],
 			'capabilities' => Capabilities::get(),
+			'baseUrl' => $this->getBaseUrl(),
 			'apiUrl' => $this->getApiUrl(),
 			'downloadUrl' => $this->getDownloadUrl("{blobId}"),
 			'pageUrl' => $this->getPageUrl(),

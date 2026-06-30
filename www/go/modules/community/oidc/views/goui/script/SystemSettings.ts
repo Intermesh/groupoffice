@@ -1,10 +1,10 @@
 import {
 	btn,
-	column, comp, Component,
+	column,
+	comp,
 	datasourcestore,
 	EntityID,
 	Fieldset,
-	h3, h4,
 	hr,
 	menu,
 	menucolumn,
@@ -17,9 +17,6 @@ import {
 import {OIDConnectClientDialog} from "./OIDConnectClientDialog.js";
 import {OIDConnectClientDS} from "./Index.js";
 
-/*
-@deprocated - the GOUI System settings will use Settings instead
- */
 export class SystemSettings extends Fieldset {
 
 	constructor() {
