@@ -19,6 +19,7 @@ use function go;
 trait SearchableTrait {
 
 	public static $updateSearch = true;
+	private static bool $isRebuilding = false;
 
 	/**
 	 * Function to determine if entities have search capabilities
@@ -90,7 +91,7 @@ trait SearchableTrait {
 	public function saveSearch(bool $checkExisting = true): bool
 	{
 
-		if(!static::$updateSearch || !$this->isFetchedComplete()) {
+		if(!static::$updateSearch || (!$this->isFetchedComplete() && !static::$isRebuilding)) {
 			return true;
 		}
 
@@ -250,10 +251,10 @@ trait SearchableTrait {
 		$query
 			->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . static::entityType()->getId(), "LEFT")
 			->andWhere('search.id IS NULL')
-			->orWhere('search.rebuild = true')
+			->orWhere('search.rebuild = 1')
 			->limit($limit)
 			->offset($offset);
-
+		go()->getDebugger()->debug($query);
 		return $query->execute();
 	}
 
@@ -281,7 +282,7 @@ trait SearchableTrait {
 		go()->getDbConnection()->exec("commit");
 
 		echo "Deleted ". $stmt->rowCount() . " entries\n";
-
+		self::$isRebuilding = true;
 		//In small batches to keep memory low
 		$stmt = static::queryMissingSearchCache();
 		
@@ -309,7 +310,7 @@ trait SearchableTrait {
 				}
 			}
 			echo "\n";
-			//echo go()->getDebugger()->debugTiming('another 1000');
+			echo go()->getDebugger()->debugTiming('another 1000');
 			go()->getDbConnection()->exec("commit");
 
 			$stmt = static::queryMissingSearchCache($offset);
