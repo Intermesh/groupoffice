@@ -227,6 +227,11 @@ trait SearchableTrait {
 		return true;
 	}
 
+	/* override to limit the selected field and relations for building the search cache */
+	protected static function neededSearchProperties() {
+		return [];
+	}
+
 
 	/**
 	 *
@@ -240,7 +245,7 @@ trait SearchableTrait {
 		$limit = 1000;
 
 
-		$query = static::find();
+		$query = static::find(static::neededSearchProperties(), true);
 		/* @var $query OrmQuery */
 		$query
 			->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . static::entityType()->getId(), "LEFT")
@@ -266,8 +271,9 @@ trait SearchableTrait {
 		echo "Deleting old values\n";
 
 		$stmt = go()->getDbConnection()->delete('core_search', (new Query)
-			->where('entityTypeId', '=', $cls::entityType()->getId())
-			->andWhere('entityId', 'NOT IN', $cls::find()->selectSingleValue($cls::getMapping()->getPrimaryTable()->getAlias() . '.id'))
+			->join($cls::getMapping()->getPrimaryTable()->getName(), 'e', 'e.id = t.entityId', 'LEFT')
+			->where('t.entityTypeId = '. $cls::entityType()->getId())
+			->andWhere('e.id', 'IS', null)
 		);
 
 		$stmt->execute();
@@ -303,6 +309,7 @@ trait SearchableTrait {
 				}
 			}
 			echo "\n";
+			//echo go()->getDebugger()->debugTiming('another 1000');
 			go()->getDbConnection()->exec("commit");
 
 			$stmt = static::queryMissingSearchCache($offset);

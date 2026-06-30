@@ -1125,9 +1125,17 @@ class CalendarEvent extends AclItemEntity {
 		return !$this->isPrivate();
 	}
 
+	protected static function neededSearchProperties(): array {
+		return ['id', 'showWithoutTime', 'start', 'timeZone', 'title','privacy', 'description', 'cal.name'];
+	}
+
+	private static $calNameCache = [];
+
 	protected function getSearchDescription(): string
 	{
-		$calendar = Calendar::findById($this->calendarId, ['name'], true);
+		if(!isset(self::$calNameCache[$this->calendarId])) {
+			self::$calNameCache[$this->calendarId] = Calendar::findById($this->calendarId, ['name'], true)->name;
+		}
 
 		$u = go()->getAuthState()->getUser();
 		if($this->showWithoutTime) {
@@ -1136,7 +1144,7 @@ class CalendarEvent extends AclItemEntity {
 			$format = $u ? $u->dateFormat . ' '. $u->timeFormat : "d-m-Y H:i";
 		}
 
-		return $calendar->name .': '. $this->title() . ' - '. $this->start->format($format);
+		return self::$calNameCache[$this->calendarId] .': '. $this->title() . ' - '. $this->start->format($format);
 	}
 
 	/**
