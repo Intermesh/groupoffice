@@ -16,7 +16,7 @@ modules.register(  {
 			title: t("Mail domains"),
 			cmp: MainPanel,
 			routes:{
-				"^maildomains\/(\d+)$"(domainId) {
+				"^maildomains/(\\d+)$"(domainId) {
 					this.show();
 					this.setDomainId(domainId)
 				}
