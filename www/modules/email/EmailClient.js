@@ -1014,15 +1014,15 @@ GO.mainLayout.onReady(function(){
 		var title = t("New email"),
 			text = t("You have %d unread email(s)").replace('%d', data.email_status.total_unseen);
 
-		go.Notifier.notify({
-			title: title,
-			description: text,
-			iconCls: 'ic-email',
-			icon: 'views/Extjs3/themes/Paper/img/notify/email.png',
-			tag: "email"
-		}).catch((e) => {
-			console.warn("Notification failed: " + e);
-		});
+		// go.Notifier.notify({
+		// 	title: title,
+		// 	description: text,
+		// 	iconCls: 'ic-email',
+		// 	icon: 'views/Extjs3/themes/Paper/img/notify/email.png',
+		// 	tag: "email"
+		// }).catch((e) => {
+		// 	console.warn("Notification failed: " + e);
+		// });
 
 		go.Notifier.playSound('message-new-email', 'email');
 

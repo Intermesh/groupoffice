@@ -52,12 +52,17 @@ class ErrorHandler {
 	public static function logException(Throwable $e, string|null $context = null): string
 	{
 		$cls = get_class($e);
-		
-		$errorString = $cls . " in " . $e->getFile() ." at line ". $e->getLine().': '.$e->getMessage();
+
 
 		if(isset($context)) {
-			$errorString .= ', ' . $context;
+			$errorString = $context . ", ";
+		} else {
+			$errorString = "";
 		}
+		
+		$errorString .= $cls . " in " . $e->getFile() ." at line ". $e->getLine().': '.$e->getMessage();
+
+
 
 		if(!Environment::get()->isCli()) {
 			error_log($errorString, 0);

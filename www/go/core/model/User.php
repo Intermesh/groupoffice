@@ -568,23 +568,32 @@ public function historyLog(): bool|array
 
 	private function validatePasswordChange(): bool
 	{
-		if ($this->passwordVerified) {
-			// Own user, logged in as themselves -> OK
-			return true;
-		} elseif (!$this->isModified(['password']) || $this->getOldValue('password') == null) {
-			// New password from scratch: OK
-			return true;
-		} elseif (App::get()->getInstaller()->isInProgress()) {
-			// System is still installing: OK
-			return true;
-		} elseif (go()->getAuthState()->isAdmin()) {
-			// Either the logged in user is an admin...
-			return true;
-		} elseif (!$this->isAdmin()) {
-			// ...or the currently editor user is NOT an admin: OK
+
+		// During install we don't verify
+		if(App::get()->getInstaller()->isInProgress()) {
 			return true;
 		}
-		// Big NOPE
+
+		// Current user is admin, always OK
+		if(go()->getAuthState() && go()->getAuthState()->isAdmin()) {
+			return true;
+		}
+
+		// current user mayChangeUsers and is not changing itself or an admin
+		if(go()->getModel()->getUserRights()->mayChangeUsers && $this->id != App::get()->getAuthState()->getUserId() && !$this->isAdmin()) {
+			return true;
+		}
+
+		// user entered correct password, OK
+		if($this->passwordVerified) {
+			return true;
+		}
+
+		// User didn't have a password yet, ok
+		if(!$this->isModified(['password']) || $this->getOldValue('password') == null) {
+			return true;
+		}
+
 		return false;
 	}
 

@@ -11,6 +11,7 @@ use go\core\cron\GarbageCollection;
 use go\core\ErrorHandler;
 use go\core\http\Request;
 use go\core\jmap\Entity;
+use go\core\model\Alert;
 use go\core\model\CronJobSchedule;
 use go\core\model\Group;
 use go\core\model\Search;
@@ -277,15 +278,27 @@ class Module extends core\Module
 	/**
 	 * @throws Exception
 	 */
-	public static function onGarbageCollection() {
+	public static function onGarbageCollection(): void
+	{
+
+
+
 		$days = (int) Module::get()->getSettings()->deleteAfterDays;
 
 		if(!empty($days)) {
+
+			go()->debug("Cleaning up stale history log entries older than " . $days ." days");
+
+
 			LogEntry::delete(
 				LogEntry::find()
 					->removeJoin('core_entity')
 					->where('createdAt', '<', (new core\util\DateTime("-" . $days . " days")))
 			);
+
+			go()->debug("Deleted " . (isset(LogEntry::$lastDeleteStmt) ? LogEntry::$lastDeleteStmt->rowCount() : 0) . " stale LogEntry rows");
+		} else {
+			go()->debug("History log cleanup is disabled");
 		}
 	}
 

@@ -271,23 +271,23 @@ final class Mailbox extends AclItemEntity
 	}
 
 
-	/**
-	 * Save mailbox usage from dovecot input
-	 *
-	 * @return bool
-	 * @throws \Exception
-	 */
-	public function cacheUsage()
-	{
-		$this->usage = $this->active ? $this->getUsageFromDovecot() : false;
-
-		if ($this->usage === false) {
-			$folder = $this->getMaildirFolder();
-			$this->usage = $folder->exists() ? $folder->calculateSize() / 1024 : 0;
-		}
-
-		return $this->save();
-	}
+//	/**
+//	 * Save mailbox usage from dovecot input
+//	 *
+//	 * @return bool
+//	 * @throws \Exception
+//	 */
+//	public function cacheUsage()
+//	{
+//		$this->usage = $this->active ? $this->getUsageFromDovecot() : false;
+//
+//		if ($this->usage === false) {
+//			$folder = $this->getMaildirFolder();
+//			$this->usage = $folder->exists() ? $folder->calculateSize() / 1024 : 0;
+//		}
+//
+//		return $this->save();
+//	}
 
 
 	/**

@@ -75,9 +75,12 @@ class BlobTest extends TestCase
 		// all blobs used?
 		$this->assertEquals(0, $blobsStmt->rowCount());
 
+		$contact= $admin->getProfile();
+
 		//remove avatar again
-		$admin->avatarId = null;
-		$success = $admin->save();
+		$admin->avatarId = $contact->photoBlobId  = null;
+
+		$success = $admin->save() && $contact->save();
 		$this->assertEquals(true, $success);
 
 		Blob::delete($blobsQuery);

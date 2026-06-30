@@ -4,6 +4,7 @@ namespace go\core\http;
 
 use CurlHandle;
 use Exception as CoreException;
+use go\core\exception\Forbidden;
 use go\core\fs\File;
 use go\core\util\JSON;
 
@@ -19,12 +20,20 @@ class Client
 
 	protected CurlHandle|false $curl;
 
-	public $baseUri;
-	protected $lastBody;
+	public string $baseUri = "";
+	protected ?string $lastBody;
 	public array $baseParams = [];
 
 	private array $lastHeaders = [];
-	protected $headers = [];
+	protected array $headers = [];
+
+	/**
+	 * Only allow URL's that resolve to a global IP address.
+	 *
+	 * See https://www.php.net/manual/en/filter.constants.php#constant.filter-flag-global-range
+	 * @var bool
+	 */
+	public bool $globalRangeOnly = false;
 
 	/**
 	 * @return false|CurlHandle
@@ -71,8 +80,12 @@ class Client
 
 	private function initRequest($path)
 	{
+		$url = $this->baseUri . $path;
+
+		$this->checkUri($url);
+
 		$this->lastHeaders = [];
-		$this->setOption(CURLOPT_URL, $this->baseUri.$path)
+		$this->setOption(CURLOPT_URL, $url)
 			->setOption(CURLOPT_RETURNTRANSFER, true)
 			->setOption(CURLOPT_HEADERFUNCTION, function ($curl, $header) {
 				if (preg_match('/([\w-]+): (.*)/i', $header, $matches)) {
@@ -87,10 +100,34 @@ class Client
 		}
 	}
 
+	private function checkUri($uri) : void {
+
+		if(!$this->globalRangeOnly) {
+			return;
+		}
+
+		$host = parse_url($uri, PHP_URL_HOST);
+
+		$ip = gethostbyname($host);
+
+		$retVal = filter_var($ip, FILTER_VALIDATE_IP, ['flags' => FILTER_FLAG_GLOBAL_RANGE]);
+
+		if($retVal === false) {
+			throw new Forbidden("Invalid URI: " . $uri);
+		}
+	}
+
 	/**
 	 * Perform GET request
 	 *
+	 *
+	 *
 	 * @return array{status: int, body:string, headers: array, requestHeaders: array, info:array}
+	 *  - status: HTTP status code
+	 *  - body: HTTP response body
+	 *  - headers: HTTP response headers. Key is header name in lower case, value is header value.
+	 *  - requestHeaders: HTTP request headers
+	 *  - info: cURL info array
 	 * @throws CoreException
 	 */
 	public function get(string $url): array

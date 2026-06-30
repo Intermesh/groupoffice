@@ -160,4 +160,5 @@ The following changes were made by %s:
   'Are you sure you want to restore the {count} items?' => 'Sind Sie sicher, dass Sie die {count} Elemente wiederherstellen möchten?',
   'Are you sure you want to delete the selected item permanently?' => 'Sind Sie sicher, dass Sie das ausgewählte Element dauerhaft löschen möchten?',
   'Are you sure you want to delete the {count} items permanently?' => 'Sind Sie sicher, dass Sie die {count} Elemente dauerhaft löschen möchten?',
+  'Move to trash' => 'In den Papierkorb verschieben',
 );

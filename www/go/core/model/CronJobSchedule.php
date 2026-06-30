@@ -14,6 +14,7 @@ use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
 use Exception;
 use go\core\db\Criteria;
+use Throwable;
 
 class CronJobSchedule extends Entity
 {
@@ -133,7 +134,7 @@ class CronJobSchedule extends Entity
 	 * Run the job or schedule it if it has not been scheduled yet.
 	 * @throws Exception
 	 */
-	public function run()
+	public function run(): void
 	{
 		//set runningSince to now
 		$this->runningSince = $this->getLocalDateTime();
@@ -149,8 +150,7 @@ class CronJobSchedule extends Entity
 		try {
 			$cron = new $cls;			
 			$cron->run($this);
-			
-		} catch (\Throwable $ex) {
+		} catch (Throwable $ex) {
 			ErrorHandler::logException($ex);
 			$this->lastError = $ex->getMessage();
 		}
@@ -176,15 +176,18 @@ class CronJobSchedule extends Entity
 	public static function runNext(): bool
 	{
 		$now = (new self)->getLocalDateTime();
-		$jobs = self::find()->where('enabled', '=', true)
+		$jobs = CronJobSchedule::find()->where('enabled', '=', true)
 						->andWhere((new Criteria())
 							->andWhere('nextRunAt', '<=', $now)
 							->orWhere('nextRunAt', 'IS', null)
 						)
-						->orderBy(['nextRunAt' => 'ASC'])->all();
+						->orderBy(['nextRunAt' => 'ASC'])
+						->all();
+
 		if(count($jobs) === 0) {
 			return false;
 		}
+
 		foreach($jobs as $job) {
 			go()->debug("Running " . $job->name);
 			$job->run();

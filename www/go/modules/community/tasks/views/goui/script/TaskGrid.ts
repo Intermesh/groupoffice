@@ -328,7 +328,7 @@ export class TaskGrid extends Table<DataSourceStore> {
 			return groupRow;
 		}
 
-		this.draggable = true;
+		this.draggableRows = true;
 	}
 
 	private startDueRenderer(columnValue: string, record: StoreRecord, td: HTMLTableCellElement) {

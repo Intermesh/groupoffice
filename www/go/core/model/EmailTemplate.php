@@ -47,9 +47,9 @@ class EmailTemplate extends Entity
 	public ?string $moduleId;
 	public ?string $key = null;
 	public string $language = "en";
-	public string $body;
+	public string $body = "";
 	public string $name;
-	public string $subject;
+	public string $subject = "";
 
 	/**
 	 * 

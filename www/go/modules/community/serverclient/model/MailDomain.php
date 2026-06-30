@@ -244,9 +244,7 @@ class MailDomain
 		}
 		$i = 0;
 		foreach (Domain::find()->where(['domain' => $domains])->all() as $d) {
-			foreach ($d->mailboxes as $mb) {
-				$i += $mb->usage;
-			}
+			$i += $d->getSumUsedQuota();
 		}
 		return $i;
 	}

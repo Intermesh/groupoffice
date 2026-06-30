@@ -160,11 +160,27 @@ final class Domain extends AclOwnerEntity
 		return $this->id;
 	}
 
+	/**
+	 * The total number of bytes of assigned quota
+	 * @return float
+	 */
+	public function getTotalQuota(): float
+	{
+		return $this->totalQuota;
+	}
+
+	/**
+	 * @return float
+	 */
 	public function getSumUsedQuota(): float
 	{
 		return $this->sumUsedQuota ?? 0;
 	}
 
+	/**
+	 * The real disk usage in bytes
+	 * @return float
+	 */
 	public function getSumUsage(): float
 	{
 		return $this->sumUsage;
