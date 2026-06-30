@@ -1,6 +1,6 @@
 import {
 	btn,
-	column, Component,
+	column, comp, Component,
 	datasourcestore,
 	EntityID,
 	Fieldset,
@@ -20,12 +20,14 @@ import {OIDConnectClientDS} from "./Index.js";
 /*
 @deprocated - the GOUI System settings will use Settings instead
  */
-export class SystemSettings extends Component {
+export class SystemSettings extends Fieldset {
 
 	constructor() {
 		super();
 
-		this.cls = "card vbox";
+		this.cls = "vbox";
+
+		this.legend = t("OpenID Connect clients")
 
 		const store = datasourcestore({
 			dataSource: OIDConnectClientDS,
@@ -59,6 +61,13 @@ export class SystemSettings extends Component {
 					sortable: true
 				}),
 
+				column({
+					id: "url",
+					resizable: true,
+					header: "URL",
+					sortable: true
+				}),
+
 				menucolumn({
 					menu: menu({},
 						btn({
@@ -84,34 +93,36 @@ export class SystemSettings extends Component {
 		})
 
 		this.items.add(
-			tbar({},
-				h4(t("OpenID Connect clients")),
-				'->',
+			comp({cls: "card vbox"},
+				tbar({cls: "bg-low border-bottom"},
 
-				btn({
-					cls: "primary filled",
-					icon: "add",
-					text: t("Add"),
-					handler: async () => {
-						this.openOIDConnectClientDialog();
-					}
-				}),
+					'->',
 
-				mstbar({table: tbl},
-					"->",
 					btn({
-						icon: "delete",
-						handler: async (btn) => {
-
-							tbl.delete();
-							btn.parent!.hide();
-
+						cls: "primary filled",
+						icon: "add",
+						text: t("Add"),
+						handler: async () => {
+							this.openOIDConnectClientDialog();
 						}
-					})
-				)
-			),
+					}),
 
-			tbl
+					mstbar({table: tbl},
+						"->",
+						btn({
+							icon: "delete",
+							handler: async (btn) => {
+
+								tbl.delete();
+								btn.parent!.hide();
+
+							}
+						})
+					)
+				),
+
+				tbl
+			)
 		);
 	}
 
