@@ -1,10 +1,10 @@
 import {JmapDataSource, modules} from "@intermesh/groupoffice-core";
-import {Settings} from "./Settings.js";
+import {SystemSettings} from "./SystemSettings.js";
 
 modules.register({
 	package: "community",
 	name: "oidc",
-	systemSettingsPanels: [Settings],
+	systemSettingsPanels: [SystemSettings],
 	entities: [
 		{
 			name: "OIDConnectClient"

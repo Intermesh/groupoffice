@@ -1,11 +1,13 @@
 import {
 	btn,
-	column,
-	Component,
+	column, Component,
 	datasourcestore,
-	EntityID, h3,
+	EntityID,
+	Fieldset,
+	h3, h4,
 	hr,
 	menu,
+	menucolumn,
 	mstbar,
 	t,
 	table,
@@ -14,6 +16,7 @@ import {
 
 import {OIDConnectClientDialog} from "./OIDConnectClientDialog.js";
 import {OIDConnectClientDS} from "./Index.js";
+
 /*
 @deprocated - the GOUI System settings will use Settings instead
  */
@@ -22,16 +25,10 @@ export class SystemSettings extends Component {
 	constructor() {
 		super();
 
-
-		this.cls = "vbox";
+		this.cls = "card vbox";
 
 		const store = datasourcestore({
 			dataSource: OIDConnectClientDS,
-			queryParams: {
-				limit: 50,
-				filter: {
-				}
-			},
 			sort: [{property: "name", isAscending: true}]
 		});
 
@@ -42,6 +39,18 @@ export class SystemSettings extends Component {
 		 	rowSelectionConfig: {
 				multiSelect: true
 		 	},
+			listeners: {
+				delete: async () =>  {
+					const ids = tbl.rowSelection!.getSelected()!.map(row => row.record.id);
+					await OIDConnectClientDS.confirmDestroy(ids);
+				},
+				rowdblclick: async ({storeIndex}) => {
+					this.openOIDConnectClientDialog(store.get(storeIndex)!.id);
+				},
+				render: () => {
+					void store.load();
+				}
+			},
 			columns: [
 				column({
 					id: "name",
@@ -50,56 +59,40 @@ export class SystemSettings extends Component {
 					sortable: true
 				}),
 
-				column({
-					width: 48,
-					id: "btn",
-					sticky: true,
-					renderer: (columnValue: any, record, td, table, rowIndex) => {
-						return btn({
-							icon: "more_vert",
-							menu: menu({},
-								btn({
-									icon: "edit",
-									text: t("Edit"),
-									handler: async (btn) => {
-										const book = table.store.get(rowIndex)!;
-										this.openOIDConnectClientDialog(book.id);
-									}
-								}),
-								hr(),
-								btn({
-									icon: "delete",
-									text: t("Delete"),
-									handler: async (btn) => {
-										const book = table.store.get(rowIndex)!;
-										void OIDConnectClientDS.confirmDestroy([book.id]);
-									}
-								})
-
-							)
+				menucolumn({
+					menu: menu({},
+						btn({
+							text: t("Open"),
+							icon: "open_in_new",
+							handler: (b) => {
+								const book = tbl.store.get(b.parent!.dataSet.rowIndex)!;
+								this.openOIDConnectClientDialog(book.id);
+							}
+						}),
+						hr(),
+						btn({
+							icon: "delete",
+							text: t("Delete"),
+							handler: async (b) => {
+								tbl.delete();
+							}
 						})
-					}
-				}),
+					)
+				})
 			]
 		})
 
 		this.items.add(
 			tbar({},
-				h3(t("OpenID Connect clients")),
+				h4(t("OpenID Connect clients")),
 				'->',
-				// searchbtn({
-				// 	listeners: {
-				// 		input: ( {text}) => {
-				// 			tbl!.store.setFilter("text", {text}).load()
-				// 		}
-				// 	}
-				// }),
+
 				btn({
 					cls: "primary filled",
 					icon: "add",
 					text: t("Add"),
-					handler: async (_btn) => {
-						await this.openOIDConnectClientDialog();
+					handler: async () => {
+						this.openOIDConnectClientDialog();
 					}
 				}),
 
@@ -109,44 +102,25 @@ export class SystemSettings extends Component {
 						icon: "delete",
 						handler: async (btn) => {
 
-							const ids = tbl.rowSelection!.getSelected().map(row => row.record.id);
-
-							const result = await OIDConnectClientDS.confirmDestroy(ids);
-
-							if(result != false) {
-								btn.parent!.hide();
-							}
+							tbl.delete();
+							btn.parent!.hide();
 
 						}
 					})
 				)
-
 			),
 
 			tbl
 		);
-
-		tbl.on("rowdblclick", async ({storeIndex}) => {
-			await this.openOIDConnectClientDialog(store.get(storeIndex)!.id);
-		});
-
-		tbl.on("delete", async ({target}) => {
-			const ids = target.rowSelection!.getSelected().map(row => row.id);
-			await OIDConnectClientDS
-				.confirmDestroy(ids);
-		});
-
-		this.on("render", () => {
-			store.load();
-		})
 	}
 
-	private async openOIDConnectClientDialog(id?: EntityID): Promise<void> {
+	private openOIDConnectClientDialog(id?: EntityID) {
 		const dlg = new OIDConnectClientDialog();
 		dlg.show();
 		if (id) {
-			await dlg.load(id);
+			void dlg.load(id);
 		}
+		return dlg;
 	}
 
 	onSubmit() {
