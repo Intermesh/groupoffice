@@ -62,8 +62,8 @@ export class SystemSettings extends Component {
 				menucolumn({
 					menu: menu({},
 						btn({
-							text: t("Open"),
-							icon: "open_in_new",
+							text: t("Edit"),
+							icon: "edit",
 							handler: (b) => {
 								const book = tbl.store.get(b.parent!.dataSet.rowIndex)!;
 								this.openOIDConnectClientDialog(book.id);
@@ -74,7 +74,8 @@ export class SystemSettings extends Component {
 							icon: "delete",
 							text: t("Delete"),
 							handler: async (b) => {
-								tbl.delete();
+								const book = tbl.store.get(b.parent!.dataSet.rowIndex)!;
+								void OIDConnectClientDS.confirmDestroy([book.id]);
 							}
 						})
 					)
