@@ -33,6 +33,6 @@ foreach($mods as $mod) {
 
 $response['languages'] = go()->getLanguage()->getLanguages();
 
-$response['settings'] = go()->getSettings()->toArray();
+$response['settings'] = go()->getSettings()->toArray(\go\core\model\Settings::CLIENT_SETTINGS);
 
 Response::get()->output($response);

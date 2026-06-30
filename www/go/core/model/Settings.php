@@ -15,6 +15,37 @@ class Settings extends core\Settings {
 
 	use core\validate\ValidationTrait;
 
+
+	/**
+	 * Settings provided to clients without authentication
+	 */
+
+	const CLIENT_SETTINGS = [
+		'title',
+		'language',
+		'maintenanceMode',
+		'loginMessageEnabled',
+		'loginMessage',
+		'lostPasswordURL',
+		'logoutWhenInactive',
+
+		'primaryColor',
+		'secondaryColor',
+		'tertiaryColor',
+		'accentColor',
+		'logoId',
+
+		'primaryDark',
+		'secondaryDark',
+		'tertiaryDark',
+		'accentDark',
+		'logoIdDark',
+
+		'defaultAuthenticationDomain',
+		'allowRegistration'
+
+	];
+
 	/**
 	 * @throws Exception
 	 */
