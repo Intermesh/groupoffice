@@ -7,7 +7,7 @@ import {
 	datecolumn,
 	menu,
 	t,
-	Table, browser
+	Table, browser, menucolumn
 } from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
 
@@ -54,38 +54,35 @@ export class KeyGrid extends Table<DataSourceStore> {
 					width: 160,
 					sortable: true
 				}),
-				column({
-					id: "more",
-					width: 30,
-					sticky: true,
-					renderer: (columnValue, record, td, table1, storeIndex) => {
-						return btn({
-							icon: "more_vert",
-							menu: menu({},
-								btn({
-									icon: "content_copy",
-									text: t("Copy token to clipboard"),
-									handler: (button, ev) => {
-										browser.copyTextToClipboard(record.accessToken, true);
-									}
-								}),
-								btn({
-									icon: "search",
-									text: t("View access token"),
-									handler: (button, ev) => {
-										Window.alert(record.accessToken, t("Access token"));
-									}
-								}),
-								btn({
-									icon: "delete",
-									text: t("Delete"),
-									handler: async (button, ev) => {
-										await jmapds("Key").confirmDestroy([record.id]);
-									}
-								})
-							)
+
+				menucolumn({
+					menu: menu({},
+
+						btn({
+							icon: "content_copy",
+							text: t("Copy token to clipboard"),
+							handler: (button, ev) => {
+								const record = this.store.get(button.parent!.dataSet.rowIndex)!;
+								browser.copyTextToClipboard(record.accessToken, true);
+							}
+						}),
+						btn({
+							icon: "search",
+							text: t("View access token"),
+							handler: (button, ev) => {
+								const record = this.store.get(button.parent!.dataSet.rowIndex)!;
+								Window.alert(record.accessToken, t("Access token"));
+							}
+						}),
+						btn({
+							icon: "delete",
+							text: t("Delete"),
+							handler: async (button, ev) => {
+								const record = this.store.get(button.parent!.dataSet.rowIndex)!;
+								await jmapds("Key").confirmDestroy([record.id]);
+							}
 						})
-					}
+						)
 				})
 			]
 		);

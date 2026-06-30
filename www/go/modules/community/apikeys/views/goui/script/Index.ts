@@ -1,16 +1,11 @@
-import {moduleSystemSettings, client, modules} from "@intermesh/groupoffice-core";
-import {t} from "@intermesh/goui";
+import {modules} from "@intermesh/groupoffice-core";
 import {SystemSettingsPanel} from "./SystemSettingsPanel.js";
-import {Settings} from "./Settings.js";
 
 modules.register({
 	package: "community",
-	name: "apikeys"
+	name: "apikeys",
+	entities: ['Key'],
+	systemSettingsPanels: [SystemSettingsPanel]
 });
 
-client.on("authenticated",  ({session}) => {
-	if (session.isAdmin) {
-		moduleSystemSettings.addPanel("community", "apikeys", Settings);
-	}
-});
 
