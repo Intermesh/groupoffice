@@ -193,7 +193,7 @@ class Server extends Entity
 			$query = $this->getAuthenticationQuery("*");
 			Record::find($connection, $this->peopleDN, $query)->fetch();
 		} catch (Exception $e) {
-			$this->setValidationError('general', ErrorCode::MALFORMED, go()->t("Failed to query user for authentication") . ": " . $e->getMessage());
+			$this->setValidationError('peopleDN', ErrorCode::MALFORMED, go()->t("Failed to query user for authentication") . ": " . $e->getMessage());
 		}
 
 
@@ -260,6 +260,10 @@ class Server extends Entity
 				throw new Exception("Invalid password given for '" . $this->username . "'");
 			} else {
 				go()->debug("Authenticated with user '" . $this->username . '"');
+			}
+		} else{
+			if(!$this->connection->bind()) {
+				throw new Exception("Could not bind to LDAP server: " . $this->connection->getError());
 			}
 		}
 

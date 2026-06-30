@@ -78,33 +78,45 @@ export class ImapAuthServerDialog extends FormWindow {
 				label: t("Hostname"),
 				required: true
 			}),
-			numberfield({
-				decimals: 0,
-				name: "imapPort",
-				label: t("Port"),
-				required: true,
-				value: 143
-			}),
-			select({
-				name: "imapEncryption",
-				label: t("Encryption"),
-				value: "tls",
-				options: [
-					{value: "tls", name: "TLS"},
-					{value: "ssl", name: "SSL"},
-					{value: null, name: t("None")}
-				],
-				listeners: {
-					change: ({newValue}) => {
-						this.form.findField("imapValidateCertificate")!.disabled = (newValue == null)
+
+			comp({cls: "flow"},
+				select({
+					flex: 1,
+					name: "imapEncryption",
+					label: t("Encryption"),
+					value: "tls",
+					options: [
+						{value: "tls", name: "TLS"},
+						{value: "ssl", name: "SSL"},
+						{value: null, name: t("None")}
+					],
+					listeners: {
+						setvalue: ({newValue}) => {
+							setTimeout(() => {
+								this.form.findField("imapValidateCertificate")!.disabled = (newValue == null)
+							})
+						}
 					}
-				}
-			}),
-			checkbox({
-				type: "switch",
-				name: "imapValidateCertificate",
-				label: t("Validate certificate")
-			}),
+				}),
+				checkbox({
+					flex: 2,
+					type: "switch",
+					name: "imapValidateCertificate",
+					label: t("Validate certificate")
+				}),
+
+				numberfield({
+					flex: 1,
+					decimals: 0,
+					name: "imapPort",
+					label: t("Port"),
+					required: true,
+					value: 143
+				}),
+			),
+
+
+
 			checkbox({
 				type: "switch",
 				name: "removeDomainFromUsername",
@@ -130,32 +142,42 @@ export class ImapAuthServerDialog extends FormWindow {
 				name: "smtpHostname",
 				label: t("Hostname"),
 			}),
-			numberfield({
-				decimals: 0,
-				name: "smtpPort",
-				label: t("Port"),
-				value: 587
-			}),
-			select({
-				name: "smtpEncryption",
-				label: t("Encryption"),
-				value: "tls",
-				options: [
-					{value: "tls", name: "TLS"},
-					{value: "ssl", name: "SSL"},
-					{value: null, name: t("None")}
-				],
-				listeners: {
-					change: ({newValue}) => {
-						this.form.findField("smtpValidateCertificate")!.disabled = (newValue == null)
+
+			comp({cls: "flow"},
+
+				select({
+					flex: 1,
+					name: "smtpEncryption",
+					label: t("Encryption"),
+					value: "tls",
+					options: [
+						{value: "tls", name: "TLS"},
+						{value: "ssl", name: "SSL"},
+						{value: null, name: t("None")}
+					],
+					listeners: {
+						setvalue: ({newValue}) => {
+							setTimeout(() => {
+								this.form.findField("smtpValidateCertificate")!.disabled = (newValue == null)
+							})
+						}
 					}
-				}
-			}),
-			checkbox({
-				type: "switch",
-				name: "smtpValidateCertificate",
-				label: t("Validate certificate")
-			}),
+				}),
+				checkbox({
+					flex: 2,
+					type: "switch",
+					name: "smtpValidateCertificate",
+					label: t("Validate certificate")
+				}),
+				numberfield({
+					flex: 1,
+					decimals: 0,
+					name: "smtpPort",
+					label: t("Port"),
+					value: 587
+				}),
+			),
+
 			checkbox({
 				type: "switch",
 				label: t("Use IMAP credentials"),

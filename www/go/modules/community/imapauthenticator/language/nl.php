@@ -10,5 +10,5 @@ return array (
   'Users must login with their full e-mail address. Enable this option if the IMAP expects the username without domain.' => 'Gebruikers moeten inloggen met het volledige e-mail adres. Schakel in als de IMAP server de gebruikersnaam zonder domein verwacht.',
   'Use a \'*\' to match all domains.' => 'Gebruik een \'*\' om alle domeinen te vinden.',
   'Users must login with their full e-mail adress. Enable this option if the IMAP expects. the username without domain.' => 'Gebruikers moeten inloggen met hun volledige e-mail adres. Schakel deze optie in als de IMAP server de gebruikersnaam zonder domein verwacht.',
-  'Use IMAP credentials' => 'IMAP-gegevens gebruiken',
+  'Use IMAP credentials' => 'IMAP inloggegeven gebruiken',
 );

@@ -7,7 +7,7 @@ import {
 	column,
 	comp, containerfield,
 	datasourcestore, Field,
-	fieldset, InputField, NumberField, numberfield, select,
+	fieldset, InputField, NumberField, numberfield, passwordfield, select,
 	t,
 	table, tbar, textarea, TextField, textfield
 } from "@intermesh/goui";
@@ -29,6 +29,8 @@ export class LdapAuthServerDialog extends FormWindow {
 		this.closable = true;
 		this.maximizable = true;
 		this.width = 800;
+		this.height = 800;
+		this.title = t("Server");
 
 		this.ldapUserNameFld = textfield({
 			name: 'username',
@@ -36,17 +38,16 @@ export class LdapAuthServerDialog extends FormWindow {
 			autocomplete: "new-password",
 			placeholder: "cn=Administrator,dc=com"
 		});
-		this.ldapPasswordFld = textfield({
+		this.ldapPasswordFld = passwordfield({
 			name: 'password',
 			disabled: true,
 			label: t('Password'),
-			type: "password",
-			autocomplete: "new-password"
+			autocomplete: "off"
 		});
 
 		const imapFs = fieldset({
 				hidden: true,
-				legend: t("IMAP Server", "community", "ldapauthenticator"),
+				legend: t("LDAP Server", "community", "ldapauthenticator"),
 			},
 			checkbox({
 				type: "switch",
@@ -57,33 +58,45 @@ export class LdapAuthServerDialog extends FormWindow {
 				name: "imapHostname",
 				label: t("Imap Hostname")
 			}),
-			numberfield({
-				decimals: 0,
-				name: "imapPort",
-				label: t("Port"),
-				value: 143
-			}),
-			select({
-				name: "imapEncryption",
-				label: t("Encryption"),
-				value: "tls",
-				options: [
-					{value: "tls", name: "TLS"},
-					{value: "ssl", name: "SSL"},
-					{value: null, name: t("None")}
-				],
-				listeners: {
-					change: ({newValue}) => {
-						this.form.findField("imapValidateCertificate")!.disabled = (newValue == null)
+
+			comp({
+				cls: "flow"
+			},
+
+				select({
+					flex: 1,
+					name: "imapEncryption",
+					label: t("Encryption"),
+					value: "tls",
+					options: [
+						{value: "tls", name: "TLS"},
+						{value: "ssl", name: "SSL"},
+						{value: null, name: t("None")}
+					],
+					listeners: {
+						setvalue: ({newValue}) => {
+							setTimeout(() => {
+								this.form.findField("imapValidateCertificate")!.disabled = (newValue == null)
+							})
+						}
 					}
-				}
-			}),
-			checkbox({
-				type: "switch",
-				name: 'imapValidateCertificate',
-				label: t("Validate certificate"),
-				value: true
-			})
+				}),
+				checkbox({
+					flex: 2,
+					type: "switch",
+					name: 'imapValidateCertificate',
+					label: t("Validate certificate"),
+					value: true
+				}),
+				numberfield({
+					flex: 1,
+					decimals: 0,
+					thousandsSeparator: "",
+					name: "imapPort",
+					label: t("Port"),
+					value: 143
+				}),
+			)
 		);
 
 		const smtpFs = fieldset({
@@ -94,12 +107,49 @@ export class LdapAuthServerDialog extends FormWindow {
 				name: "smtpHostname",
 				label: t("SMTP Hostname"),
 			}),
-			numberfield({
-				decimals: 0,
-				name: "smtpPort",
-				label: t("Port"),
-				value: 587
-			}),
+			comp({
+					cls: "flow"
+				},
+
+				select({
+					flex: 1,
+					name: "smtpEncryption",
+					label: t("Encryption"),
+					value: "tls",
+					options: [
+						{value: "tls", name: "TLS"},
+						{value: "ssl", name: "SSL"},
+						{value: null, name: t("None")}
+					],
+					listeners: {
+						change: ({newValue}) => {
+							setTimeout(()=>{
+								this.form.findField("smtpValidateCertificate")!.disabled = (newValue == null)
+							})
+						}
+					}
+				}),
+
+				checkbox({
+					flex: 2,
+					type: "switch",
+					name: 'smtpValidateCertificate',
+					label: t("Validate certicate"),
+					value: true
+				}),
+
+				numberfield({
+					flex: 1,
+					decimals: 0,
+					thousandsSeparator: "",
+					name: "smtpPort",
+					label: t("Port"),
+					value: 587
+				}),
+
+			),
+
+
 			checkbox({
 				type: "switch",
 				label: t("Use user credentials", "community", "ldapauthenticator"),
@@ -120,6 +170,7 @@ export class LdapAuthServerDialog extends FormWindow {
 					}
 				}
 			}),
+
 			textfield({
 				name: "smtpUsername",
 				label: t("Username")
@@ -131,28 +182,7 @@ export class LdapAuthServerDialog extends FormWindow {
 
 			}),
 
-			select({
-				name: "smtpEncryption",
-				label: t("Encryption"),
-				value: "tls",
-				options: [
-					{value: "tls", name: "TLS"},
-					{value: "ssl", name: "SSL"},
-					{value: null, name: t("None")}
-				],
-				listeners: {
-					change: ({newValue}) => {
-						this.form.findField("smtpValidateCertificate")!.disabled = (newValue == null)
-					}
-				}
-			}),
 
-			checkbox({
-				type: "switch",
-				name: 'smtpValidateCertificate',
-				label: t("Validate certicate"),
-				value: true
-			})
 		);
 
 		const ldapServerFs = fieldset({
@@ -205,34 +235,43 @@ export class LdapAuthServerDialog extends FormWindow {
 				label: t("Hostname"),
 				required: true
 			}),
-			numberfield({
-				required: true,
-				label: t("Port"),
-				name: "port",
-				value: 389,
-				decimals: 0
-			}),
-			select({
-				name: "encryption",
-				label: t("Encryption"),
-				value: "tls",
-				options: [
-					{value: "tls", name: "TLS"},
-					{value: "ssl", name: "SSL"},
-					{value: null, name: t("None")}
-				],
-				listeners: {
-					change: ({newValue}) => {
-						this.form.findField("ldapVerifyCertificate")!.disabled = (newValue == null)
+			comp({cls: "flow"},
+
+				select({
+					flex: 1,
+					name: "encryption",
+					label: t("Encryption"),
+					value: "tls",
+					options: [
+						{value: "tls", name: "TLS"},
+						{value: "ssl", name: "SSL"},
+						{value: null, name: t("None")}
+					],
+					listeners: {
+						setvalue: ({newValue}) => {
+							setTimeout(() => {
+								this.form.findField("ldapVerifyCertificate")!.disabled = (newValue == null)
+							})
+						}
 					}
-				}
-			}),
-			checkbox({
-				type: "switch",
-				name: 'ldapVerifyCertificate',
-				label: t("Verify SSL certicate"),
-				value: true
-			}),
+				}),
+				checkbox({
+					flex: 2,
+					type: "switch",
+					name: 'ldapVerifyCertificate',
+					label: t("Verify SSL certicate"),
+					value: true
+				}),
+				numberfield({
+					flex: 1,
+					required: true,
+					label: t("Port"),
+					thousandsSeparator: "",
+					name: "port",
+					value: 389,
+					decimals: 0
+				})
+			),
 			this.ldapUseAuthCb = checkbox({
 				type: "switch",
 				label: t('Use authentication', 'ldapauthenticator'),
@@ -295,7 +334,6 @@ export class LdapAuthServerDialog extends FormWindow {
 			this.createEmailCheckbox = checkbox({
 				type: "switch",
 				label: t("Create e-mail account for users"),
-				name: 'createUserEmail',
 				listeners: {
 					change: ({newValue, oldValue}) => {
 						imapFs.hidden = !newValue;
@@ -321,8 +359,8 @@ export class LdapAuthServerDialog extends FormWindow {
 					headers: false,
 					store: datasourcestore({
 						dataSource: groupDS,
-						queryParams: {
-							limit: 50
+						filters:{
+							default: {hideUsers: true, excludeEveryone: true}
 						}
 					}),
 					rowSelectionConfig: {
@@ -360,7 +398,8 @@ export class LdapAuthServerDialog extends FormWindow {
 			name: "syncUsersMaxDeletePercentage",
 			label: t("Max delete percentage", "community", "ldapauthenticator"),
 			value: 5,
-			decimals: 0
+			decimals: 0,
+			max: 100
 		});
 		this.syncUsersDeleteCb = checkbox({
 			type: "switch",
@@ -376,7 +415,8 @@ export class LdapAuthServerDialog extends FormWindow {
 			name: "syncGroupsMaxDeletePercentage",
 			label: t("Max delete percentage", "community", "ldapauthenticator"),
 			value: 5,
-			decimals: 0
+			decimals: 0,
+			max: 100
 		});
 		this.syncGroupsDeleteCb = checkbox({
 			type: "switch",
@@ -437,10 +477,8 @@ export class LdapAuthServerDialog extends FormWindow {
 		this.generalTab.items.add(ldapServerFs, userFs, imapFs, smtpFs, userOptionsFs, syncFs);
 
 		this.form.on("load", ({data}) => {
-			this.ldapUseAuthCb.value = false;
-			if (data.username && data.password) {
-				this.ldapUseAuthCb.value = true;
-			}
+
+			this.ldapUseAuthCb.value = !!(data.username && data.password);
 			if (data.imapHostname && data.imapHostname.length > 0) {
 				this.createEmailCheckbox.value = true;
 			}

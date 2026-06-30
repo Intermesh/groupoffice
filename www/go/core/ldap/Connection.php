@@ -103,16 +103,20 @@ class Connection {
 	/**
 	 * Bind to the LDAP directory
 	 *
-	 * @param string $bindRdn eg . cn=admin,dc=intermesh,dc=dev
-	 * @param string $password
+	 * @param string|null $bindRdn eg . cn=admin,dc=intermesh,dc=dev
+	 * @param string|null $password
 	 * @return boolean
 	 * @throws Exception
 	 */
-	public function bind(string $bindRdn, string $password): bool
+	public function bind(string|null $bindRdn = null, string|null $password = null): bool
 	{
 		try {
 			go()->debug("bind: " . $bindRdn);
-			return ldap_bind($this->link, $bindRdn, $password);
+			if(isset($bindRdn)) {
+				return ldap_bind($this->link, $bindRdn, $password);
+			} else {
+				return ldap_bind($this->link);
+			}
 		} catch (Exception $e) {
 
 			if($this->getErrorNo() == -1) {
