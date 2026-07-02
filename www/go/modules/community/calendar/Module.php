@@ -60,7 +60,8 @@ class Module extends core\Module
 			'mayChangeCalendars', // allows Calendar/set (hide ui elements that use this)
 			'mayChangeCategories', // allows creating global categories for everyone. Personal cats can always be created.
 			'mayChangeResources',
-			'mayChangeViews'
+			'mayChangeViews',
+			'mayChangeOrganizer'
 		];
 	}
 
