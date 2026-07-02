@@ -1113,8 +1113,13 @@ class CalendarEvent extends AclItemEntity {
 
 	protected function getSearchModifiedAt(): DateTimeInterface
 	{
-		// Link panel will convert to correct timezone. Maybe the GOUI link detail panel changes this?
-		return $this->start()->setTimeZone(new DateTimeZone("UTC"));
+		// Link panel modifiedAt is always saved as UTC
+		$date = $this->start()->setTimeZone(new DateTimeZone("UTC"));
+		$year = (int) $date->format('Y');
+		if( $year >= 1000 && $year <= 9999) //is valid year for mysql
+			return $date;
+		return new DateTime("1970-01-01 00:00:00");
+
 	}
 
 	public function title(): string {
