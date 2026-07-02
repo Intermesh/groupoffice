@@ -113,6 +113,9 @@ final class Oauth2Client extends EntityController
 	}
 
 	private function createUser(array $response, AccessTokenInterface $token, model\Oauth2Client $client) {
+
+		go()->getSettings()->allowRegistration = true;
+
 		$user = User::findOrCreateByUsername($response['email'], $response['email'], $response['name']);
 
 		//register as oauth user
@@ -188,7 +191,6 @@ final class Oauth2Client extends EntityController
 		}
 
 		$this->auth($account->id);
-//		header("Location: " . go()->getSettings()->URL);
 
 	}
 

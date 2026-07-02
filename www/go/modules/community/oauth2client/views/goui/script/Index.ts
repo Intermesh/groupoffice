@@ -1,20 +1,15 @@
-import {
-	moduleSystemSettings,
-	client,
-	JmapDataSource,
-	modules,
-} from "@intermesh/groupoffice-core";
-import {BaseEntity, translate} from "@intermesh/goui";
+import {authManager, JmapDataSource, modules,} from "@intermesh/groupoffice-core";
+import {BaseEntity, btn, t} from "@intermesh/goui";
 import {Settings} from "./Settings";
 
 
 modules.register({
 	package: "community",
 	name: "oauth2client",
-	// entities: [
-	// 	"DefaultClient",
-	// 	"Oauth2Client",
-	// ],
+	entities: [
+		"DefaultClient",
+		"Oauth2Client",
+	],
 
 	systemSettingsPanels: [Settings]
 
@@ -39,3 +34,33 @@ export interface DefaultClient extends BaseEntity {
 }
 export const Oauth2ClientDS = new JmapDataSource<Oauth2Client>("Oauth2Client");
 export const DefaultClientDS = new JmapDataSource<DefaultClient>("DefaultClient");
+
+
+
+authManager.on("login", async ({loginWindow}) => {
+
+	loginWindow.mask();
+	try {
+		const clientQuery = await Oauth2ClientDS.query({
+			sort: [{property: "name"}]
+		});
+
+		const clients = await Oauth2ClientDS.get(clientQuery.ids);
+
+		for (const c of clients.list) {
+
+			const defClient = await DefaultClientDS.single(c.defaultClientId!);
+
+			loginWindow.addSignInButton(btn({
+				iconCls: `oauth2client-login-${defClient.name}`,
+				text: t("Sign in with {name}").replace("{name}", c.name),
+				handler: () => {
+					document.location = BaseHref + 'go/modules/community/oauth2client/gauth.php/openid/' + c.id;
+				}
+			}))
+		}
+	}finally {
+		loginWindow.unmask();
+	}
+
+})
