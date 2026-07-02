@@ -853,7 +853,9 @@ END;
 		$text = preg_replace('/[^\w\-_+\\\\\/\s:@,;.]/u', '', mb_strtolower($text));
 
 		// TODO transliterate to ascii so utf8 chars can be found with their ascii
-		// counterparts too ???
+		// counterparts too ??? (NFKD)
+
+		// FNV-1a hash?
 		//
 //		$text = StringUtil::toAscii($text);
 
@@ -893,6 +895,31 @@ END;
 
 
 	}
+
+	// todo:
+//	private function normalizeToken(string $input): string
+//	{
+//		// 1. NFKD: decompose to base + combining marks, fold compatibility variants
+//		$normalized = Normalizer::normalize($input, Normalizer::FORM_KD);
+//		if ($normalized === false) {
+//			// normalize() returns false on invalid UTF-8 input
+//			$normalized = $input;
+//		}
+//
+//		// 2. Strip combining marks (Unicode category Mn = "Mark, nonspacing")
+//		//    These are what NFKD split OFF the base characters (accents, diacritics)
+//		$normalized = preg_replace('/\p{Mn}/u', '', $normalized);
+//
+//		// 3. Strip zero-width characters that don't get caught by \p{Mn}
+//		//    ZWSP, ZWNJ, ZWJ, BOM/ZWNBSP
+//		$normalized = preg_replace('/[\x{200B}\x{200C}\x{200D}\x{FEFF}]/u', '', $normalized);
+//
+//		// 4. Case-fold. mb_strtolower is close enough for practical purposes;
+//		//    true Unicode case-folding (mb_convert_case with MB_CASE_FOLD) is stricter
+//		$normalized = mb_convert_case($normalized, MB_CASE_FOLD, 'UTF-8');
+//
+//		return $normalized;
+//	}
 
 
 	/**
@@ -950,6 +977,9 @@ END;
 	 * this is faster then searching for
 	 *
 	 * %234 because it can't use an index
+	 *
+	 *
+	 * TODO: store/search it reversed and normal
 	 *
 	 * @param string|int|null $number
 	 * @param int $minSearchLength
