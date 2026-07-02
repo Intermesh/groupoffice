@@ -256,40 +256,30 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				return; //no accounts
 			}
 
-			accountNode.on("load", function() {
+			accountNode.on("load", function () {
+				this.messagesGrid.btnRefresh.setDisabled(false);
 
-				let mailboxNode;
-				//restore already selected mailbox
-				if(this.mailbox) {
-					const mailboxNodeId = btoa('f_' + this.account_id + "_" + this.mailbox);
-					mailboxNode = this.treePanel.getNodeById(mailboxNodeId);
-				}
-
-				if(!mailboxNode) {
-					mailboxNode = accountNode.childNodes[0];
-				}
-
-				if(mailboxNode) {
-					// mailboxNode.on('load', function(){
+				const doSelect = (mailboxNode) => {
+					if (!mailboxNode) {
+						this.messagesStore.removeAll();
+						return;
+					}
 					setTimeout(() => {
-						//don't know why but it doesn't work without a setTimeout
 						this.treePanel.getSelectionModel().select(mailboxNode);
-
-						if(this.treeScrollTop) {
-							//restore scroll position after refresh, dirty hack with 100ms delay to allow sub nodes to expand
+						if (this.treeScrollTop) {
 							setTimeout(() => {
 								this.treePanel.body.dom.scrollTop = this.treeScrollTop;
 								delete this.treeScrollTop;
 							}, 100);
 						}
-					}, 0)
+					}, 0);
+				};
 
-					// },this, {single: true, defer: 10});
+				if (this.mailbox) {
+					this.findMailboxNode(this.account_id, this.mailbox, accountNode, doSelect);
 				} else {
-					this.messagesStore.removeAll();
+					doSelect(accountNode.childNodes[0]);
 				}
-
-				this.messagesGrid.btnRefresh.setDisabled(false);
 
 			}, this, {single: true});
 
@@ -769,6 +759,75 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		return false;
 	},
 
+	findMailboxNode: function (account_id, mailboxPath, accountNode, callback) {
+		const directId = this.getFolderNodeId(account_id, mailboxPath);
+		const directNode = this.treePanel.getNodeById(directId);
+
+		if (directNode) {
+			callback(directNode);
+			return;
+		}
+
+		const parts = mailboxPath.split('/');
+
+		const walkDown = (depth) => {
+			const partialPath = parts.slice(0, depth + 1).join('/');
+			const partialId = this.getFolderNodeId(account_id, partialPath);
+			const node = this.treePanel.getNodeById(partialId);
+
+			if (!node) {
+				callback(accountNode.childNodes[0]);
+				return;
+			}
+
+			if (depth === parts.length - 1) {
+				callback(node);
+				return;
+			}
+
+			if (node.loaded) {
+				walkDown(depth + 1);
+			} else {
+				node.on('load', function () {
+					walkDown(depth + 1);
+				}, this, {single: true});
+				node.expand();
+			}
+		};
+
+		walkDown(0);
+	},
+
+	selectMailboxByPath: function (account_id, mailboxPath) {
+		const accountNodeId = btoa('account_' + account_id);
+		const accountNode = this.treePanel.getNodeById(accountNodeId);
+
+		if (!accountNode) {
+			return;
+		}
+
+		const doSelect = (mailboxNode) => {
+			if (!mailboxNode) {
+				return;
+			}
+
+			const already = this.treePanel.getSelectionModel().getSelectedNode();
+			if (already && already.id === mailboxNode.id) {
+				return;
+			}
+			this.treePanel.getSelectionModel().select(mailboxNode);
+		};
+
+		if (accountNode.loaded) {
+			this.findMailboxNode(account_id, mailboxPath, accountNode, doSelect);
+		} else {
+			accountNode.on('load', function () {
+				this.findMailboxNode(account_id, mailboxPath, accountNode, doSelect);
+			}, this, {single: true});
+			accountNode.expand();
+		}
+	},
+
 	incrementFolderStatus : function(mailbox, increment)
 	{
 		var statusElId = "status_"+this.getFolderNodeId(this.account_id, mailbox);
@@ -962,10 +1021,14 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	}
 });
 
-go.Router.add(/email\/([0-9]+)\/([^\/]+)\/?([a-z0-9-_]*)?/i, function (accountId, mailbox) {
+go.Router.add(/email\/([0-9]+)\/(.+?)\/?$/i, function (accountId, mailbox) {
 	const ep = GO.mainLayout.openModule('email');
 	ep.account_id = parseInt(accountId, 10);
 	ep.mailbox = mailbox;
+
+	if (ep.treePanel && ep.treePanel.getRootNode().loaded) {
+		ep.selectMailboxByPath(ep.account_id, ep.mailbox);
+	}
 });
 
 GO.mainLayout.onReady(function(){

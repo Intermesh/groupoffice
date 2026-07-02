@@ -1,6 +1,6 @@
 import {CalendarView} from "./CalendarView.js";
 import {DateTime, E} from "@intermesh/goui";
-import {MonthView} from "./Index.js";
+import {MonthView, t} from "./Index.js";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 import {jmapds} from "@intermesh/groupoffice-core";
@@ -84,12 +84,13 @@ export class SplitView extends MonthView {
 		this.el.style.height = '100%';
 		//this.el.cls(['+cal','+month']);
 		const headDay = this.start.clone();
-		const headers=[];
+		const headers= E('ul', E('li', t('Wk')+' '+day.getWeekOfYear()).cls('weeknb'));
+
 		for (i = 0; i < this.wdays; i++) {
-			headers.push(E('li', headDay.format('D'), E('em', headDay.format('j'))).cls('today', headDay.format('Ymd') == now.format('Ymd')));
+			headers.append(E('li', headDay.format('D'), E('em', headDay.format('j'))).cls('today', headDay.format('Ymd') == now.format('Ymd')));
 			headDay.addDays(1);
 		}
-		this.el.append(E('ul', ...headers)); // headers
+		this.el.append(headers);
 
 		this.calRows = [];
 		const activeFilter = this.adapter.byType('event').store.queryParams.filter.inCalendars;
