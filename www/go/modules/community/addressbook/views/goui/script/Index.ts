@@ -67,6 +67,9 @@ modules.register({
 	name:  "addressbook",
 	package: "community",
 
+	title: t("Addressbook"),
+	mainPanel: "go.modules.community.addressbook.MainPanel",
+
 	userSettingsPanels: [UserAddressbookSettingsPanel, UserProfileSettingsPanel],
 	systemSettingsPanels: [Settings],
 
