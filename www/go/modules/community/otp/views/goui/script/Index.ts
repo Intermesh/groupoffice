@@ -1,6 +1,6 @@
-import {main, modules,} from "@intermesh/groupoffice-core";
+import {Account, main, modules,} from "@intermesh/groupoffice-core";
 import {Settings} from "./Settings";
-import {p} from "@intermesh/goui";
+import {fieldset, p, t} from "@intermesh/goui";
 
 
 modules.register({
@@ -8,3 +8,15 @@ modules.register({
 	name: "otp",
 	systemSettingsPanels: [Settings],
 });
+
+main.on("openusersettings", ({userSettingsWindow}) => {
+
+	if(!modules.isAvailable("community", "otp")) {
+		return;
+	}
+
+
+	const account = userSettingsWindow.findChildByType(Account)!;
+	account.form!.items.add(fieldset({legend: t("Two Factor Authentication")}, p("TODO")));
+
+})
