@@ -13,7 +13,7 @@ import {
 	DetailPanel,
 	JmapDataSource,
 	jmapds,
-	linkbrowsebutton,
+	linkbrowsebutton, modules, Principal, PrincipalCombo, principalcombo,
 	RecurrenceField,
 } from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
@@ -39,6 +39,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 	private selectCalendar: SelectField
 	private showCalendar: DisplayField;
+	private changeOrganizerField: PrincipalCombo
 
 	constructor() {
 		super("CalendarEvent");
@@ -68,14 +69,6 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 				}
 			}
 		}});
-		// alertUseDefault = checkbox({
-		// 	hidden:true,
-		// 	name:'useDefaultAlerts',
-		// 	listeners: {
-		// 		'setvalue': (_, newV) => {
-		// 			if(newV) {alertField.useDefault = true;}
-		// 		}
-		// 	}})
 
 
 		this.items.add(this.statusTbar);
@@ -205,6 +198,12 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 						}),
 						hr(),
+						this.changeOrganizerField = principalcombo({
+							entity: "User",
+							label: t("Change organizer"),
+						}).on('select', ({target, record}) => {
+							this.changeOrganizer(record, target);
+						}),
 						alertField,
 						mapfield({
 							name: 'links', cls: 'goui-pit',
@@ -276,7 +275,25 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 		});
 	}
 
+	private changeOrganizer(p: Principal, fld: PrincipalCombo) {
+		const change:any = {};
 
+		for(const p in this.item!.participants) {
+			if (this.item!.participants[p].roles.owner) {
+				change['participants/'+p+'/roles'] = {attendee:true, owner: null};
+			}
+		}
+		change['participants/'+p.id] = {
+			email: p.email,
+			name: p.name,
+			roles: {attendee:true, owner:true},
+			kind: p.type,
+			participationStatus:"accepted",
+			expectReply:false
+		};
+
+		this.item!.patch(change, () => { this.reload();}, () => {fld.clear()}, true);
+	}
 
 	private updateStatus(v:'accepted'|'declined'|'tentative') {
 		this.item!.updateParticipation(v, () => {void this.loadEvent(this.item!)});
@@ -361,8 +378,8 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 						}
 					}
 				}
-				debugger;
 				this.item = ev;
+				this.changeOrganizerField.hidden = !this.item?.participants || !this.item?.data.isOrigin || !modules.get("community", "calendar")!.userRights.mayChangeOrganizer;
 				this.editBtn.hidden = !this.item.mayChange;
 				this.showCalendar.hidden = this.item.mayMove
 				this.selectCalendar.hidden = !this.item.mayMove;
