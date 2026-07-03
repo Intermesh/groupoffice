@@ -9,14 +9,6 @@ modules.register({
 	systemSettingsPanels: [Settings],
 });
 
-main.on("openusersettings", ({userSettingsWindow}) => {
-
-	if(!modules.isAvailable("community", "otp")) {
-		return;
-	}
-
-
-	const account = userSettingsWindow.findChildByType(Account)!;
-	account.form!.items.add(fieldset({legend: t("Two Factor Authentication")}, p("TODO")));
-
+Account.patch(function() {
+	this.form!.items.add(fieldset({legend: t("Two Factor Authentication")}, p("TODO")));
 })
