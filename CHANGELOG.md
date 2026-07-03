@@ -1,3 +1,6 @@
+- core: garbage collection only deleted 200 items per day. If there are more changes per day it the database will grow 
+  each day. Now it will run in batches of 200 till it's finished.
+
 30-06-2026: 26.0.37
 - Calendar: allow booking into the resource calendars directly
 - Core: APCu cache only clears entries prefixed for the groupoffice instance
