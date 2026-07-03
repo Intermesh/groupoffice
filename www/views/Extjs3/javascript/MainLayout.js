@@ -138,11 +138,11 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	addModulePanel : function(moduleName, panelClass, panelConfig) {
 
 		panelConfig =panelConfig || {}
-		panelConfig.package = panelClass.prototype.package;
+		panelConfig.package = panelClass.prototype.package ?? "legacy";
 
 		// GO.moduleManager._addModule(moduleName, panelClass, panelConfig);
 
-		window.groupofficeCore.main.addLegacyPanel("legacy",moduleName, panelClass.prototype.title, panelClass,panelConfig);
+		window.groupofficeCore.main.addLegacyPanel(panelConfig.package, moduleName, panelClass.prototype.title, panelClass,panelConfig);
 
 		// go.Router.add(new RegExp('^(' + moduleName + ")$"), function (name) {
 		// 	var pnl = GO.mainLayout.openModule(name);
