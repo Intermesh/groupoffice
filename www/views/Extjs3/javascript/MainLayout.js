@@ -281,6 +281,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		panelConfig =panelConfig || {}
 		panelConfig.package = panelClass.prototype.package;
+		//real module folder name for icon lookup. Set on every class by the Ext.extend override in overrides.js. May differ from moduleName which is the panel's id.
+		panelConfig.module = panelClass.prototype.module;
 
 		GO.moduleManager._addModule(moduleName, panelClass, panelConfig);
 				
@@ -648,7 +650,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				id: 'go-start-menu-' + allPanels[i].moduleName,
 				moduleName: allPanels[i].moduleName,
 				text: allPanels[i].title,
-				iconStyle: "background-position: center middle; background-image: url("+go.Jmap.downloadUrl('core/moduleIcon/' + (panel.package || "legacy") + "/" + allPanels[i].moduleName)+"&mtime="+go.User.session.cacheClearedAt+")",
+				iconStyle: "background-position: center middle; background-image: url("+go.Jmap.downloadUrl('core/moduleIcon/' + (panel.package || "legacy") + "/" + (panel.module || allPanels[i].moduleName))+"&mtime="+go.User.session.cacheClearedAt+")",
 				handler: function (item, e) {
 					this.openModule(item.moduleName);
 				},
