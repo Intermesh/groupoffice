@@ -548,6 +548,8 @@ abstract class Entity extends Property {
 	public static final function delete($query): bool
 	{
 
+		static::$lastDeleteCount = 0;
+
 		$query = self::normalizeDeleteQuery($query);
 		$query->setModel(static::class);
 
@@ -604,6 +606,16 @@ abstract class Entity extends Property {
 			}
 			throw $e;
 		}
+	}
+
+
+
+	/**
+	 * Number of models deleted in last {@see delete()} call.
+	 * @return int
+	 */
+	public static function deleteLastCount() : int {
+		return static::$lastDeleteCount;
 	}
 
 

@@ -2134,6 +2134,8 @@ abstract class Property extends Model {
 	 */
 	public static $lastDeleteStmt;
 
+	protected static int $lastDeleteCount = 0;
+
 	/**
 	 * Delete this model
 	 *
@@ -2147,8 +2149,12 @@ abstract class Property extends Model {
 	{
 		$primaryTable = static::getMapping()->getPrimaryTable();
 
-		self::$lastDeleteStmt = go()->getDbConnection()->delete($primaryTable->getName(), $query);
-		return self::$lastDeleteStmt->execute();
+		static::$lastDeleteStmt = go()->getDbConnection()->delete($primaryTable->getName(), $query);
+		$success = self::$lastDeleteStmt->execute();
+		if($success) {
+			static::$lastDeleteCount = static::$lastDeleteStmt->rowCount();
+		}
+		return $success;
 	}
 
 	private function validateTable(MappedTable $table) {
