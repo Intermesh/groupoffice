@@ -458,6 +458,18 @@ WHERE REFERENCED_TABLE_SCHEMA = DATABASE()
 
 		$rows = go()->getDbConnection()->query($genSql)->fetchAll(\PDO::FETCH_ASSOC);
 
+		$totalRefs = ['referencing_table' => 'REF TOTAL', 'refs' => 0, 'size' => 0];
+		foreach($rows as $row) {
+			$totalRefs['refs'] += $row['refs'];
+			$totalRefs['size'] += $row['size'];
+		}
+
+		$rows[] = $totalRefs;
+
+		$totals = go()->getDbConnection()->query("SELECT 'DISK TOTAL' as referencing_table, count(*) as refs, sum(size) as size from core_blob")->fetch(\PDO::FETCH_ASSOC);
+
+		$rows[] = $totals;
+
 		echo "\n" . Markdown::createTable($rows) . "\n";
 	}
 
