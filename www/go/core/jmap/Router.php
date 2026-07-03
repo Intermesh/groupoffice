@@ -204,6 +204,10 @@ class Router
 				case "Income":
 					$controllerClass = 'GO\\Projects2\\Controller\\IncomeEntityController';
 					break;
+				case "TimeEntry":
+					$controllerClass = 'GO\\Projects2\\Controller\\TimeEntryEntityController';
+					break;
+
 				default:
 					$controllerClass = str_ireplace("model", "controller", $entityType->getClassName());
 
