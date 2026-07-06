@@ -199,7 +199,10 @@ class FieldSet extends AclOwnerEntity {
 			foreach($fields as $field) {
 
 //				echo "Migrating field " . $field->databaseName . "\n";
-				$newField = \go\core\model\Field::find()->where('fieldSetId', '=', $newFieldSet->id)->where(['databaseName' => $field->databaseName])->single();
+				$newField = \go\core\model\Field::find()
+					->join("core_customfields_field_set", "fs", "fs.id = f.fieldSetId")
+					->where('fs.entityId', '=', $toEntityType->getId())
+					->where(['databaseName' => $field->databaseName])->single();
 
 				if(!$newField) {
 					$newField = $field->copy();
