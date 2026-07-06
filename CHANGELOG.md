@@ -1,3 +1,4 @@
+06-07-2026: 6.8.175
 - LDAP authenticator: hide secondary email field in account settings when logged in via LDAP
 - Calendar: morkaround for event store when no calendars in search paramaeters
 
