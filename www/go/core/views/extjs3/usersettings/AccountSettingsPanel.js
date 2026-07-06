@@ -68,26 +68,8 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						vtype:'emailAddress',
 						allowBlank:false,
 						hint: t('The recovery e-mail is used to send a forgotten password request to.','users','core')+'<br>'+t('Please use an email address that you can access from outside Group-Office.','users','core')
-					}),
-						// new Ext.form.DisplayField({
-						// 	name: "authenticators",
-						// 	height: dp(44),
-						// 	fieldLabel: t("Authenticators"),
-						// 	setValue: function(v) {
-						//
-						// 			var result = '';
-						//
-						// 			for(var i = 0, method; method = v[i]; i++) {
-						// 				result += '<div style="display:inline-block;margin-right: 16px"><i title="'+method+'" class="icon go-module-icon-'+method+'"></i> ' + method + '</div>';
-						// 			}
-						//
-						// 			this.setRawValue(result);
-						//
-						//
-						// 	}
-						// })
-					]
-				
+					})
+				]
 			}]
 		});
 
@@ -99,6 +81,12 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			});
 
 			this.userFieldset.insert(1, this.displayNameField);
+		}
+
+		if (go.Modules.isInstalled("community", "ldapauthenticator")) {
+			if (go.User && go.User.authenticators.indexOf("ldap") > -1) {
+				this.recoveryEmailField.hide();
+			}
 		}
 
 		this.quotaFieldset = new Ext.form.FieldSet({

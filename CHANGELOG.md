@@ -1,3 +1,5 @@
+- LDAP authenticator: hide secondary email field in account settings when logged in via LDAP
+
 29-06-2026: 6.8.174
 - Core: fix import in APCu cache class
 29-06-2026: 6.8.173
