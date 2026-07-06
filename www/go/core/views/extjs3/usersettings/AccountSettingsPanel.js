@@ -300,6 +300,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 		this.passwordField1.setDisabled(!visible);
 		this.passwordField2.setDisabled(!visible);
 		this.emailField.setDisabled(!visible);
+		this.recoveryEmailField.setDisabled(!visible);
 
 		this.passwordFieldset.setVisible(visible);
 	},
