@@ -5,6 +5,7 @@ use go\core\acl\model\AclOwnerEntity;
 use go\core\App;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
+use go\core\fs\File;
 use go\core\http;
 use go\core\model\Acl;
 use go\core\model\Group;
@@ -348,7 +349,9 @@ class Calendar extends AclOwnerEntity {
 			return false;
 		}
 		$httpClient = new http\Client();
-		$tmpFile = \go\core\fs\File::tempFile('ics');
+		$httpClient->globalRangeOnly = true;
+
+		$tmpFile = File::tempFile('ics');
 		$httpClient->download($this->webcalUri, $tmpFile);
 
 		if ($tmpFile->isFile()) {
