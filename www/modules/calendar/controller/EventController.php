@@ -914,10 +914,10 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				$this->overrideColors = false;
 			}
 		} else {
-			if(!isset($params['calendars'])) {
-				throw new \Exception("Missing parameter 'calendars'");
-			}
-			$calendars = json_decode($params['calendars']);
+			//if (!isset($params['calendars']) {
+//				throw new \Exception("Missing parameter 'calendars'");
+			// }
+			$calendars = isset($params['calendars']) ? json_decode($params['calendars']) : [];
 		}
 		
 		$categories = array();
