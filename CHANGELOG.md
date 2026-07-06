@@ -1,3 +1,5 @@
+- core / calendar: SSRF via webcal calendar subscription — fetchWebcalBlob() fetches user-supplied URL with no IP validation
+
 30-06-2026: 25.0.109
 - Core: APCu cache only clears entries prefixed for the groupoffice instance
 - projects2: New setting for starting in "All projects"
