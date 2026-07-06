@@ -2,6 +2,7 @@
   each day. Now it will run in batches of 200 till it's finished. 
 - core / calendar: SSRF via webcal calendar subscription — fetchWebcalBlob() fetches user-supplied URL with no IP validation
 - LDAPAuthenticator: also disable recovery email field when logged in using LDAP
+- Files: make sure /tmp is only for admins
 
 30-06-2026: 26.0.37
 - Calendar: allow booking into the resource calendars directly
