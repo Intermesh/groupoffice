@@ -8,7 +8,10 @@ use go\core\auth\DomainProvider;
 use go\core\db\Query;
 use go\core;
 use go\core\model\Module as CoreModelModule;
+use go\modules\community\addressbook\model\Address;
 use go\modules\community\addressbook\model\Contact;
+use go\modules\community\addressbook\model\EmailAddress;
+use go\modules\community\addressbook\model\PhoneNumber;
 use go\modules\community\ldapauthenticator\model\Authenticator;
 use go\core\model\Module as CoreModule;
 use go\core\ldap\Record;
@@ -188,32 +191,40 @@ class Module extends core\Module implements DomainProvider
 			$user->recoveryEmail = $user->email;
 		}
 
+		$contact = $user->getProfile();
+
 		if (CoreModelModule::isInstalled('community', 'addressbook')) {
 
 			$phoneNbs = [];
 			if (isset($values['homePhone'])) {
-				$phoneNbs[] = ['number' => $values['homePhone'], 'type' => 'work'];
+				if(!$contact->hasPhone($values['homePhone'])) {
+					$contact->phoneNumbers[] = (new PhoneNumber($contact))->setValues(['number' => $values['homePhone'], 'type' => 'home']);
+				}
 			}
 			if (isset($values['workPhone'])) {
-				$phoneNbs[] = ['number' => $values['workPhone'], 'type' => 'work'];
+				if(!$contact->hasPhone($values['workPhone'])) {
+					$contact->phoneNumbers[] = (new PhoneNumber($contact))->setValues(['number' => $values['workPhone'], 'type' => 'work']);
+				}
 			}
 			if (isset($values['mobile'])) {
-				$phoneNbs[] = ['number' => $values['mobile'], 'type' => 'mobile'];
+				if(!$contact->hasPhone($values['mobile'])) {
+					$contact->phoneNumbers[] = (new PhoneNumber($contact))->setValues(['number' => $values['mobile'], 'type' => 'mobile']);
+				}
 			}
 			if (isset($values['workFax'])) {
-				$phoneNbs[] = ['number' => $values['workFax'], 'type' => 'workfax'];
-			}
-
-			if (!empty($phoneNbs)) {
-				$values['phoneNumbers'] = $phoneNbs;
+				if(!$contact->hasPhone($values['workFax'])) {
+					$contact->phoneNumbers[] = (new PhoneNumber($contact))->setValues(['number' => $values['workFax'], 'type' => 'workfax']);
+				}
 			}
 
 			if (isset($values['email'])) {
-				$values['emailAddresses'] = [['email' => $values['email']]];
+				if(!$contact->hasEmail($values['email'])) {
+					$contact->emailAddresses[] = (new EmailAddress($contact))->setValues(['email' => $values['email'], 'type' => 'work']);
+				}
 			}
 
 			$addrAttrs = [];
-			if (!empty($values['street'])) $addrAttrs['street'] = $values['street'];
+			if (!empty($values['address'])) $addrAttrs['address'] = $values['address'];
 			if (!empty($values['zipCode'])) $addrAttrs['zipCode'] = $values['zipCode'];
 			if (!empty($values['city'])) $addrAttrs['city'] = $values['city'];
 			if (!empty($values['state'])) $addrAttrs['state'] = $values['state'];
@@ -221,7 +232,10 @@ class Module extends core\Module implements DomainProvider
 			if (!empty($values['countryCode'])) $addrAttrs['countryCode'] = $values['countryCode'];
 			if (!empty($values['type'])) $addrAttrs['type'] = $values['addressType'];
 			if (!empty($addrAttrs)) {
-				$values['addresses'] = [$addrAttrs];
+				//$values['addresses'] = [$addrAttrs];
+				if(!$contact->hasAddress($addrAttrs['address'])) {
+					$contact->addresses[] = (new Address($contact))->setValues($addrAttrs);
+				}
 			}
 
 			if (!empty($values['organization'])) {
@@ -240,7 +254,12 @@ class Module extends core\Module implements DomainProvider
 					}
 				}
 
-				$values['organizationIds'] = [$org->id];
+				$orgIds = $contact->getOrganizationIds();
+				if(!in_array($org->id, $orgIds)) {
+					$orgIds[] = $org->id;
+					$contact->setOrganizationIds($orgIds);
+				}
+
 			} else {
 				// if empty then leave existing ones alone
 				//$values['organizationIds'] = [];
@@ -251,19 +270,27 @@ class Module extends core\Module implements DomainProvider
 			}
 
 			if (isset($values['contactCustomFields'])) {
-				$values['customFields'] = $values['contactCustomFields'];
+				$contact->getCustomFields()->setValues($values['contactCustomFields']);
 			}
 
-			//strip out unsupported properties.
-			$props = Contact::getApiProperties();
-			$values = array_intersect_key($values, $props);
-
-			if (!empty($values)) {
-				if (isset($blob)) {
-					$values['photoBlobId'] = $blob->id;
-				}
-				$user->setProfile($values);
+			if (!isset($contact->photoBlobId) && isset($blob)) {
+				$contact->photoBlobId = $blob->id;
 			}
+
+			if(!$contact->save()) {
+				throw new core\orm\exception\SaveException($contact);
+			}
+
+//			//strip out unsupported properties.
+//			$props = Contact::getApiProperties();
+//			$values = array_intersect_key($values, $props);
+//
+//			if (!empty($values)) {
+//				if (isset($blob)) {
+//					$values['photoBlobId'] = $blob->id;
+//				}
+//				$user->setProfile($values);
+//			}
 		}
 
 		return $user;

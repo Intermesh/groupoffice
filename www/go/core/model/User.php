@@ -580,7 +580,7 @@ public function historyLog(): bool|array
 		}
 
 		// current user mayChangeUsers and is not changing itself or an admin
-		if(go()->getModel()->getUserRights()->mayChangeUsers && $this->id != App::get()->getAuthState()->getUserId() && !$this->isAdmin()) {
+		if(go()->getAuthState() && go()->getModel()->getUserRights()->mayChangeUsers && $this->id != App::get()->getAuthState()->getUserId() && !$this->isAdmin()) {
 			return true;
 		}
 

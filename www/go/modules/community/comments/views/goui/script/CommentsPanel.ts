@@ -93,12 +93,7 @@ export class CommentsPanel extends Component {
 					this.countBadge,
 				),
 				"->",
-				btn({
-					icon: "refresh",
-					handler: () => {
-						this.commentList.store.reload();
-					}
-				}),
+
 				btn({
 					hidden: !client.user.isAdmin,
 					icon: "settings",

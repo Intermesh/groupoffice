@@ -778,7 +778,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		$folder = $this->findByPath('tmp/' . $userId, true);
 		if(!$folder->acl_id || Acl::getUserPermissionLevel($folder->acl_id, $userId) != Acl::LEVEL_MANAGE) {
 			$folder->setNewAcl($userId);
-			if(!$folder->save()) {
+			if(!$folder->save(true)) {
 				throw new Exception("Could not create temporary folder");
 			}
 		}

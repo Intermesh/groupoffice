@@ -2,6 +2,7 @@
 namespace go\modules\community\bookmarks\controller;
 
 use go\core\ErrorHandler;
+use go\core\http\Client;
 use go\core\jmap\EntityController;
 use go\modules\community\bookmarks\model;
 use go\core\fs\Blob;
@@ -78,14 +79,11 @@ class Bookmark extends EntityController {
 				
 		if (function_exists('curl_init')) {
 			try{
-				$c = new \go\core\http\Client();
+				$c = new Client();
 				$c->globalRangeOnly = true;
 				$c->setOption(CURLOPT_CONNECTTIMEOUT, 2);
 				$c->setOption(CURLOPT_TIMEOUT, 5);
 				$c->setOption(CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
-
-
-
 
 				$r = $c->get($params['url']);
 

@@ -1283,6 +1283,36 @@ class Contact extends AclItemEntity {
 	public function findDateByType(string $type, bool $returnAny = true) {
 		return $this->findPropByType("dates", $type, $returnAny);
 	}
+
+	public function hasPhone(string $number): bool
+	{
+		foreach($this->phoneNumbers as $phone) {
+			if($phone->number == $number) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public function hasEmail(string $email): bool
+	{
+		foreach($this->emailAddresses as $emailAddress) {
+			if($emailAddress->email == $email) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public function hasAddress(string $address): bool
+	{
+		foreach($this->addresses as $address) {
+			if($address->address == $address) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	private function findPropByType($propName, $type, $returnAny) {
 		foreach($this->$propName as $prop) {

@@ -95,6 +95,13 @@ class FilesModule extends \GO\Base\Module{
 			$folder->save();
 		}
 
+		$folder = Model\Folder::model()->findByPath("tmp", true);
+		if(!$folder->acl || $folder->acl_id == $mod->getShadowAclId()){
+			$folder->setNewAcl();
+			$folder->readonly=1;
+			$folder->save();
+		}
+
 		$folder = Model\Folder::model()->findByPath("trash", true);
 		if(!$folder->acl) {
 			$folder->setNewAcl();
@@ -239,8 +246,21 @@ class FilesModule extends \GO\Base\Module{
 		$folder->setNewAcl();
 		$folder->visible = 1;
 		$folder->readonly = 1;
-		$folder->save();
+		$folder->save(true);
 		$folder->acl->addGroup(\GO::config()->group_root, \GO\Base\Model\Acl::MANAGE_PERMISSION);
+
+
+		$folder = Model\Folder::model()->findByPath("log", true);
+		$folder->setNewAcl();
+		$folder->readonly=1;
+		$folder->save(true);
+
+		$folder = Model\Folder::model()->findByPath("tmp", true);
+		$folder->setNewAcl();
+		$folder->readonly=1;
+		$folder->save(true);
+
+
 	}
 	
 	

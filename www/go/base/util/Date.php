@@ -82,7 +82,10 @@ class Date {
 		}
 		$date = date('Y-m-d', $time);
 
-		$region = $region ?? \GO::config()->language;
+		if(!isset($region)) {
+			$user = go()->getAuthState()->getUser();
+			$region = $user->holidayset ?? \GO::config()->language;
+		}
 
 		$year = date('Y', $time);
 		$startDate = \DateTime::createFromFormat('Y-m-d', $year.'-01-01');

@@ -239,7 +239,6 @@
 		}
 		&.other {
 			color: $colorTextPlaceholder;
-
 		}
 
 		// another month
@@ -287,9 +286,7 @@
 			clip-path: polygon(0 0, 80% 0, 100% 50%, 80% 100%, 0 100%);
 		}
 	}
-}
 
-.cal {
 	&.period-title {
 		text-transform: capitalize;
 		flex: 1 1 50%;
@@ -458,6 +455,12 @@ $timeMargin: dp(72);
 			font-size: 1.1em;
 			color: $colorText;
 			//border: 1px solid currentColor;
+		}
+		&.weeknb {
+			font-size: 0.9em;
+			position:absolute;
+			padding: dp(8) dp(16) ;
+			color: $colorPrimary;
 		}
 	}
 }

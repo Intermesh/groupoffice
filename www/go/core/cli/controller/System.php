@@ -26,6 +26,7 @@ use go\core\orm\exception\SaveException;
 use go\core\util\Cli;
 use go\core\util\DateTime;
 use go\core\util\JSON;
+use go\core\util\Markdown;
 use go\core\util\PdfRenderer;
 use go\modules\business\license\model\License;
 use go\modules\community\history\Module as HistoryModule;
@@ -426,6 +427,50 @@ JSON;
 	 */
 	public function checkBlobs() {
 		Blob::removeMissingFromFilesystem(!empty($params['delete']));
+	}
+
+
+	/**
+	 * Prints blob usage count per table and size on disk
+	 *
+	 * docker compose exec --user www-data groupoffice ./www/cli.php  core/System/blobReport
+	 *
+	 * @return void
+	 * @throws \go\core\db\DbException
+	 */
+	public function blobReport() {
+		$sql = "SELECT CONCAT(
+               GROUP_CONCAT(
+                       CONCAT(
+                               'SELECT ''', TABLE_NAME,
+                               ''' AS referencing_table, COUNT(b.id) as refs, IFNULL(sum(b.size),0) AS size FROM `',
+                               TABLE_NAME, '` INNER JOIN core_blob b on b.id = `', COLUMN_NAME, '`'
+                       )
+                       SEPARATOR ' UNION ALL '
+               ),
+           ' ORDER BY size DESC') AS generated_sql
+FROM information_schema.KEY_COLUMN_USAGE
+WHERE REFERENCED_TABLE_SCHEMA = DATABASE()
+  AND REFERENCED_TABLE_NAME = 'core_blob'
+  AND REFERENCED_COLUMN_NAME = 'id';";
+
+		$genSql = go()->getDbConnection()->query($sql)->fetch(\PDO::FETCH_COLUMN, 0);
+
+		$rows = go()->getDbConnection()->query($genSql)->fetchAll(\PDO::FETCH_ASSOC);
+
+		$totalRefs = ['referencing_table' => 'REF TOTAL', 'refs' => 0, 'size' => 0];
+		foreach($rows as $row) {
+			$totalRefs['refs'] += $row['refs'];
+			$totalRefs['size'] += $row['size'];
+		}
+
+		$rows[] = $totalRefs;
+
+		$totals = go()->getDbConnection()->query("SELECT 'DISK TOTAL' as referencing_table, count(*) as refs, sum(size) as size from core_blob")->fetch(\PDO::FETCH_ASSOC);
+
+		$rows[] = $totals;
+
+		echo "\n" . Markdown::createTable($rows) . "\n";
 	}
 
 	/**
