@@ -1,15 +1,12 @@
-import {
-	AclItemEntity,
-	AclOwnerEntity,
-	moduleSystemSettings,
-	client, entities,
-	JmapDataSource, modules,
-	moduleSettings
-} from "@intermesh/groupoffice-core";
+import {AclOwnerEntity, customFields, JmapDataSource, modules} from "@intermesh/groupoffice-core";
 import {Settings} from "./Settings.js";
 import {UserAddressbookSettingsPanel} from "./UserAddressbookSettingsPanel.js";
 import {UserProfileSettingsPanel} from "./UserProfileSettingsPanel.js";
 import {BaseEntity, t, translate} from "@intermesh/goui";
+import {ContactCustomField} from "./ContactCustomField.js";
+import {MultiContactCustomField} from "./MultiContactCustomField.js";
+
+
 
 export * from "./AddressBookCombo.js";
 export * from "./ContactCombo.js";
@@ -62,6 +59,8 @@ interface ContactUrl {
 export const addressBookDS = new JmapDataSource<AddressBook>("AddressBook");
 export const contactDS = new JmapDataSource<Contact>("Contact");
 
+customFields.registerType(new ContactCustomField());
+customFields.registerType(new MultiContactCustomField());
 
 modules.register({
 	name:  "addressbook",
