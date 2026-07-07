@@ -1,4 +1,5 @@
 - Forms: Add recipient picker
+- Comments: Context menu was not working anymore
 
 07-06-2026: 26.0.38
 - core: garbage collection only deleted 200 items per day. If there are more changes per day it the database will grow 
