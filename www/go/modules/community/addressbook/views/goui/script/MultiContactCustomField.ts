@@ -11,16 +11,16 @@ import {
 	t,
 	table
 } from "@intermesh/goui";
-import {Field, FieldDialog, jmapds, TextDialog, Type} from "@intermesh/groupoffice-core";
+import {CustomField, CustomFieldDialog, jmapds, CustomFieldTextDialog, CustomFieldType} from "@intermesh/groupoffice-core";
 
 
-export class MultiContactCustomField extends Type {
+export class MultiContactCustomField extends CustomFieldType {
 	constructor() {
 		super("MultiContact", "person", t("Contact") + " (Multiple)");
 	}
 
-	getDialog(): FieldDialog {
-		return new TextDialog();
+	getDialog(): CustomFieldDialog {
+		return new CustomFieldTextDialog();
 	}
 
 	private renderer = async (columnValue: any) => {
@@ -28,7 +28,7 @@ export class MultiContactCustomField extends Type {
 		const response = await jmapds("Contact").get(columnValue);
 		return comp({cls:"comma-list"}, ...response.list.map(c => comp({tagName: "a", text: c.name, attr: {href: `#contact/${c.id}`}})));
 	}
-	createTableColumField(field:Field) {
+	createTableColumField(field:CustomField) {
 		return column({
 			...this.getColumnConfig(field),
 			width: 100,
@@ -36,14 +36,14 @@ export class MultiContactCustomField extends Type {
 		})
 	}
 
-	createDetailField(field:Field) {
+	createDetailField(field:CustomField) {
 		return displayfield({
 			...this.getDetailFieldConfig(field),
 			renderer: this.renderer
 		});
 	}
 
-	createFormField(field:Field): FormField {
+	createFormField(field:CustomField): FormField {
 
 		const filter:any = {isOrganization: field.options.isOrganization};
 

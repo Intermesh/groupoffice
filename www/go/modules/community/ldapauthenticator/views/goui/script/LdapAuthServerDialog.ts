@@ -1,4 +1,4 @@
-import {Checkbox, FormWindow, groupDS} from "@intermesh/groupoffice-core";
+import {CustomFieldCheckbox, FormWindow, groupDS} from "@intermesh/groupoffice-core";
 import {
 	ArrayField,
 	arrayfield,

@@ -6,8 +6,6 @@ import {BaseEntity, t, translate} from "@intermesh/goui";
 import {ContactCustomField} from "./ContactCustomField.js";
 import {MultiContactCustomField} from "./MultiContactCustomField.js";
 
-
-
 export * from "./AddressBookCombo.js";
 export * from "./ContactCombo.js";
 

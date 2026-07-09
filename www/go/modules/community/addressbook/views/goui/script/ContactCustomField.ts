@@ -1,15 +1,15 @@
 import {btn, column, ComboBox, combobox, comp, displayfield, Field as FormField, t} from "@intermesh/goui";
-import {Field, FieldDialog, jmapds, TextDialog, Type} from "@intermesh/groupoffice-core";
+import {CustomField, CustomFieldDialog, jmapds, CustomFieldTextDialog, CustomFieldType} from "@intermesh/groupoffice-core";
 
-export class ContactCustomField extends Type {
+export class ContactCustomField extends CustomFieldType {
 	constructor() {
 		super(
 			"Contact", "person", t("Contact")
 		)
 	}
 
-	getDialog(): FieldDialog {
-		return new TextDialog();
+	getDialog(): CustomFieldDialog {
+		return new CustomFieldTextDialog();
 	}
 
 
@@ -20,7 +20,7 @@ export class ContactCustomField extends Type {
 		const u = await jmapds("Contact").single(columnValue);
 		return u ? comp({tagName: "a", text: u.name, attr: {href: `#contact/${columnValue}`}}) : "";
 	}
-	createTableColumField(field:Field) {
+	createTableColumField(field:CustomField) {
 		return column({
 			...this.getColumnConfig(field),
 			width: 100,
@@ -28,14 +28,14 @@ export class ContactCustomField extends Type {
 		})
 	}
 
-	createDetailField(field:Field) {
+	createDetailField(field:CustomField) {
 		return displayfield({
 			...this.getDetailFieldConfig(field),
 			renderer: this.renderer
 		});
 	}
 
-	createFormField(field:Field): FormField {
+	createFormField(field:CustomField): FormField {
 
 		const filter:any = {isOrganization: field.options.isOrganization};
 
