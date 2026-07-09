@@ -1,0 +1,26 @@
+{
+  "type": "module",
+  "name": "@intermesh/legacy-files",
+  "devDependencies": {
+    "concurrently": "latest",
+    "esbuild": "latest",
+    "sass": "latest",
+    "typescript": "5.9.*"
+  },
+
+  "scripts": {
+    "start projects2": "concurrently --kill-others \"npm run start:ts\"",
+    "start:ts": "node ../../../../views/goui/esbuild-module.mjs watch",
+    "start:sass": "npx sass --load-path=$(npm root) --watch style:dist",
+    "start:dts": "npx tsc --emitDeclarationOnly --declaration --watch",
+
+    "build": "npm run build:ts",
+    "build:clean": "rm -rf ./dist/*",
+    "build:ts": "node ../../../../views/goui/esbuild-module.mjs",
+    "build:sass": "npx sass --style=compressed style:dist",
+    "build:dts": "npx tsc -b --emitDeclarationOnly --declaration",
+
+    "test": "npx tsc --noEmit",
+    "prepare": "npm run build"
+  }
+}
