@@ -1,8 +1,9 @@
+09-07-2026: 26.0.39
 - Forms: Add recipient picker
 - Comments: Context menu was not working anymore
 - Finance: fixed billing migration when custom fields were changed between two migrations and fixed a failure when status no longer exists.
-CH
-07-06-2026: 26.0.38
+
+07-07-2026: 26.0.38
 - core: garbage collection only deleted 200 items per day. If there are more changes per day it the database will grow 
   each day. Now it will run in batches of 200 till it's finished. 
 - core / calendar: SSRF via webcal calendar subscription — fetchWebcalBlob() fetches user-supplied URL with no IP validation
