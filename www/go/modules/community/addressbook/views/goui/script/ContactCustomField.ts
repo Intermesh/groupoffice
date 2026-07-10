@@ -1,5 +1,6 @@
 import {btn, column, ComboBox, combobox, comp, displayfield, Field as FormField, t} from "@intermesh/goui";
 import {CustomField, CustomFieldDialog, jmapds, CustomFieldTextDialog, CustomFieldType} from "@intermesh/groupoffice-core";
+import {ContactCombo} from "./ContactCombo.js";
 
 export class ContactCustomField extends CustomFieldType {
 	constructor() {
@@ -10,6 +11,13 @@ export class ContactCustomField extends CustomFieldType {
 
 	getDialog(): CustomFieldDialog {
 		return new CustomFieldTextDialog();
+	}
+
+	getFilter(field: CustomField) {
+		const f =  super.getFilter(field)!;
+		f.type = ContactCombo;
+		f.multiple = false;
+		return f;
 	}
 
 

@@ -1,10 +1,11 @@
-import {AclOwnerEntity, customFields, JmapDataSource, modules} from "@intermesh/groupoffice-core";
+import {AclOwnerEntity, customFields, JmapDataSource, modules, GroupCombo} from "@intermesh/groupoffice-core";
 import {Settings} from "./Settings.js";
 import {UserAddressbookSettingsPanel} from "./UserAddressbookSettingsPanel.js";
 import {UserProfileSettingsPanel} from "./UserProfileSettingsPanel.js";
 import {BaseEntity, t, translate} from "@intermesh/goui";
 import {ContactCustomField} from "./ContactCustomField.js";
 import {MultiContactCustomField} from "./MultiContactCustomField.js";
+import {AddressBookCombo} from "./AddressBookCombo.js";
 
 export * from "./AddressBookCombo.js";
 export * from "./ContactCombo.js";
@@ -164,7 +165,7 @@ modules.register({
 				title: t("Address book"),
 				name: 'addressBookId',
 				multiple: false,
-				type: "go.modules.community.addressbook.AddresBookCombo"
+				type: AddressBookCombo
 			},{
 				title: t('Type'),
 				name:'isOrganization',
@@ -313,12 +314,12 @@ modules.register({
 				title: t("User group"),
 				name: 'usergroupid',
 				multiple: true,
-				type: 'go.groups.GroupCombo'
+				type: GroupCombo
 			}, {
 				title: t("Has links to..."),
 				name: 'link',
 				multiple: false,
-				type: 'go.links.FilterLinkEntityCombo'
+				type: 'link'
 			}, {
 				title: t("Is a user"),
 				name: 'isUser',
@@ -397,7 +398,7 @@ modules.register({
 			},{
 				title: t("VAT number"),
 				name: 'vatNo',
-				type:"text",
+				type: "string",
 				multiple: true
 			}
 		],
