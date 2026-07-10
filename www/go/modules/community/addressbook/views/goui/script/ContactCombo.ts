@@ -23,6 +23,8 @@ export class ContactCombo extends AutocompleteField<ContactTable> {
 	constructor(isOrganization: boolean | null | undefined) {
 		super(new ContactTable());
 
+		this.clearable = true;
+
 		if (!this.label) {
 			this.label = isOrganization ? t("Organization", "community", "addressbook"): t("Contact", "community", "addressbook");
 		}
