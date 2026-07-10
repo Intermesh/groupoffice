@@ -100,7 +100,10 @@ class FieldSet extends AclOwnerEntity {
 	{
 		return parent::defineMapping()
 						->addTable('core_customfields_field_set', 'fs')
-						->addQuery((new Query())->select("e.name AS entity")->join('core_entity', 'e', 'e.id = fs.entityId'));
+						// clientName, NOT name: EntityType::findByName() indexes by client
+						// name, so entities whose clientName differs from the raw name
+						// (module-prefixed ones) would break Field::tableName() otherwise.
+						->addQuery((new Query())->select("e.clientName AS entity")->join('core_entity', 'e', 'e.id = fs.entityId'));
 	}
 	
 	public function getEntity() {
@@ -122,7 +125,7 @@ class FieldSet extends AclOwnerEntity {
 	{
 		return parent::defineFilters()
 						->add('entities', function(Criteria $criteria, $value) {
-							$criteria->andWhere('e.name', 'IN', $value);
+							$criteria->andWhere('e.clientName', 'IN', $value);
 						})
 						->add('isTab', function(Criteria $criteria, $value) {
 							$criteria->andWhere('isTab', '=', $value);
