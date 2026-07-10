@@ -37,6 +37,20 @@ go.Modules = (function () {
 			// for onmoduleready event
 			GO.moduleManager.onAddModule(name);
 
+			if(config.entities) {
+				config.entities.forEach(function(e) {
+					if(e.filters) {
+						const filterMap = {};
+						e.filters.forEach(function(f) {
+							filterMap[f.name] = f;
+						})
+
+						e.filters = filterMap;
+					}
+
+				});
+			}
+
 			window.groupofficeCore.modules.register(config);
 		},
 

@@ -240,9 +240,15 @@ modules.register(  {
 		},
 		{
 			name:"CalendarEvent",
-			filters: [
-				{name: 'text', type: "string", multiple: false, title: t("Query")},
-				{name: 'calendarId', type: 'go.form.ComboBox', typeConfig: {
+			filters: {
+				text: {
+					type: "string",
+					multiple: false,
+					title: t("Query")
+				},
+				calendarId: {
+					type: 'go.form.ComboBox',
+					typeConfig: {
 						fieldLabel: t("Calendar"),
 						hiddenName: 'calendarId',
 						anchor: '100%',
@@ -264,8 +270,11 @@ modules.register(  {
 								}
 							}
 						}
-					}, multiple: true, title: t("Calendars")}
-			],
+					},
+					multiple: true,
+					title: t("Calendars")
+				}
+			},
 			links: [{
 				iconCls: 'entity ic-event red',
 				linkWindow: async (entity:string, entityId) => {

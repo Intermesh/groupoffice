@@ -27,58 +27,53 @@ modules.register({
 	userSettingsPanels: [SettingsPanel],
 	entities: [{
 		name: "Note",
-		filters: [
-			{
-				name: 'text',
+		filters: {
+			text: {
 				type: "string",
 				multiple: false,
 				title: t("Query")
 			},
-			{
-				name: 'name',
+			name: {
 				type: "string",
 				multiple: true,
 				title: t("Name")
 			},
-			{
-				name: 'content',
+			content: {
 				type: "string",
 				multiple: true,
 				title: t("Content")
 			},
-			{
+			link: {
 				title: t("Has links to..."),
-				name: 'link',
 				multiple: false,
-				type: 'go.links.FilterLinkEntityCombo'
+				type: 'link'
 			},
-			{
+			commentedat: {
 				title: t("Commented at"),
-				name: 'commentedat',
 				multiple: false,
 				type: 'date'
-			}, {
+			},
+			modifiedat: {
 				title: t("Modified at"),
-				name: 'modifiedat',
 				multiple: false,
 				type: 'date'
-			}, {
+			},
+			modifiedBy: {
 				title: t("Modified by"),
-				name: 'modifiedBy',
 				multiple: true,
 				type: 'string'
-			}, {
+			},
+			createdat: {
 				title: t("Created at"),
-				name: 'createdat',
 				multiple: false,
 				type: 'date'
-			}, {
+			},
+			createdby: {
 				title: t("Created by"),
-				name: 'createdby',
 				multiple: true,
 				type: 'string'
 			}
-		],
+		},
 		links: [{
 			iconCls: 'entity ic-note yellow',
 			/**

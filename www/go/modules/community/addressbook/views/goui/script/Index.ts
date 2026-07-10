@@ -115,166 +115,154 @@ modules.register({
 		 *
 		 * Or when adding custom saved filters.
 		 */
-		filters: [
-			{
+		filters: {
+			text: {
 				wildcards: false,
-				name: 'text',
 				type: "string",
 				multiple: false,
 				title: t("Query")
 			},
-			{
+			comment: {
 				title: t("Comment"),
-				name: 'comment',
 				multiple: true,
 				type: 'string'
 			},
-			{
+			lastcontactat: {
 				title: t("Last contact at"),
-				name: 'lastcontactat',
 				multiple: false,
 				type: 'date'
 			},
-			{
+			commentedat: {
 				title: t("Commented at"),
-				name: 'commentedat',
 				multiple: false,
 				type: 'date'
-			}, {
+			},
+			modifiedat: {
 				title: t("Modified at"),
-				name: 'modifiedat',
 				multiple: false,
 				type: 'date'
-			}, {
+			},
+			modifiedBy: {
 				title: t("Modified by"),
-				name: 'modifiedBy',
-				multiple: true,
-				type: 'string'
-			}, {
-				title: t("Created at"),
-				name: 'createdat',
-				multiple: false,
-				type: 'date'
-			}, {
-				title: t("Created by"),
-				name: 'createdby',
 				multiple: true,
 				type: 'string'
 			},
-			{
+			createdat: {
+				title: t("Created at"),
+				multiple: false,
+				type: 'date'
+			},
+			createdby: {
+				title: t("Created by"),
+				multiple: true,
+				type: 'string'
+			},
+			addressBookId: {
 				title: t("Address book"),
-				name: 'addressBookId',
 				multiple: false,
 				type: AddressBookCombo
-			},{
+			},
+			isOrganization: {
 				title: t('Type'),
-				name:'isOrganization',
-				multiple:false,
+				multiple: false,
 				type: 'select',
 				options: [
 					{
 						value: true,
-						title: t("Organization",'addressbook', 'community')
+						title: t("Organization", 'addressbook', 'community')
 					},
 					{
 						value: false,
-						title: t("Contact",'addressbook', 'community')
+						title: t("Contact", 'addressbook', 'community')
 					}
 				]
 			},
-			{
-				name: 'name',
+			name: {
 				title: t("Name"),
 				type: "string",
 				multiple: true
 			},
-			{
-				name: 'lastName',
+			lastName: {
 				title: t("Last name"),
 				type: "string",
 				multiple: true
 			},
-
-			{
-				name: 'firstName',
+			firstName: {
 				title: t("First name"),
 				type: "string",
 				multiple: true
 			},
-			{
+			notes: {
 				title: t("Notes"),
-				name: 'notes',
 				multiple: true,
 				type: 'string'
 			},
-
-			{
-				name: 'email',
+			email: {
 				title: t("E-mail"),
 				type: "string",
 				multiple: true
-			}, {
-				name: 'phone',
+			},
+			phone: {
 				title: t("Phone"),
 				type: "string",
 				multiple: true
-			}, {
-				name: 'country',
+			},
+			country: {
 				title: t("Country"),
 				type: "string",
 				multiple: true
-			}, {
-				name: 'zip',
+			},
+			zip: {
 				title: t("ZIP code"),
 				type: "string",
 				multiple: true
-			}, {
-				name: 'city',
+			},
+			city: {
 				title: t("City"),
 				type: "string",
 				multiple: true
-			}, {
-				name: 'state',
+			},
+			state: {
 				title: t("State"),
 				type: "string",
 				multiple: true
-			}, {
-				name: 'address',
+			},
+			address: {
 				title: t("Address"),
 				type: "string",
 				multiple: true
-			}, {
-				name: 'street', //deprecated. Alias for "address"
+			},
+			street: { //deprecated. Alias for "address"
 				title: t("Street"),
 				type: "string",
 				multiple: true
-			},  {
-				name: 'jobTitle',
-				title: t("Job title") + "/" +  t("LOB"),
+			},
+			jobTitle: {
+				title: t("Job title") + "/" + t("LOB"),
 				type: "string",
 				multiple: true
-			},  {
-				name: 'department',
+			},
+			department: {
 				title: t("Department"),
 				type: "string",
 				multiple: true
-			}, {
-				name: 'org',
+			},
+			org: {
 				title: t("Organization"),
 				type: "string",
 				multiple: true
-			}, {
-				name: 'orgCity',
-				title: t("Organization") + ": " + t ("City"),
+			},
+			orgCity: {
+				title: t("Organization") + ": " + t("City"),
 				type: "string",
 				multiple: true
-			}, {
-				name: 'orgCountry',
-				title: t("Organization") + ": " + t ("Country"),
+			},
+			orgCountry: {
+				title: t("Organization") + ": " + t("Country"),
 				type: "string",
 				multiple: true
-			}, {
-				name: 'gender',
+			},
+			gender: {
 				title: t("Gender"),
 				type: "select",
 				multiple: true,
@@ -289,40 +277,38 @@ modules.register({
 					title: t("Unknown")
 				}]
 			},
-			{
+			age: {
 				title: t("Age"),
-				name: 'age',
 				multiple: false,
 				type: 'number'
 			},
-			{
+			birthday: {
 				title: t("Birthday"),
-				name: 'birthday',
 				multiple: false,
 				type: 'date'
-			},{
+			},
+			actiondate: {
 				title: t("Action date"),
-				name: 'actiondate',
 				multiple: false,
 				type: 'date'
-			},{
+			},
+			dateofbirth: {
 				title: t("Date of birth"),
-				name: 'dateofbirth',
 				multiple: false,
 				type: 'date'
-			}, {
+			},
+			usergroupid: {
 				title: t("User group"),
-				name: 'usergroupid',
 				multiple: true,
 				type: GroupCombo
-			}, {
+			},
+			link: {
 				title: t("Has links to..."),
-				name: 'link',
 				multiple: false,
 				type: 'link'
-			}, {
+			},
+			isUser: {
 				title: t("Is a user"),
-				name: 'isUser',
 				multiple: false,
 				type: 'select',
 				options: [
@@ -335,9 +321,9 @@ modules.register({
 						title: t("No")
 					}
 				]
-			}, {
+			},
+			isInGroup: {
 				title: t("Is in a group"),
-				name: 'isInGroup',
 				multiple: false,
 				type: 'select',
 				options: [
@@ -350,9 +336,9 @@ modules.register({
 						title: t("No")
 					}
 				]
-			}, {
+			},
+			hasEmailAddresses: {
 				title: t("Has e-mail addresses"),
-				name: 'hasEmailAddresses',
 				multiple: false,
 				type: 'select',
 				options: [
@@ -365,9 +351,9 @@ modules.register({
 						title: t("No")
 					}
 				]
-			}, {
+			},
+			hasPhoneNumbers: {
 				title: t("Has phone numbers"),
-				name: 'hasPhoneNumbers',
 				multiple: false,
 				type: 'select',
 				options: [
@@ -380,9 +366,9 @@ modules.register({
 						title: t("No")
 					}
 				]
-			},  {
+			},
+			hasOrganizations: {
 				title: t("Has organizations"),
-				name: 'hasOrganizations',
 				multiple: false,
 				type: 'select',
 				options: [
@@ -395,14 +381,13 @@ modules.register({
 						title: t("No")
 					}
 				]
-			},{
+			},
+			vatNo: {
 				title: t("VAT number"),
-				name: 'vatNo',
 				type: "string",
 				multiple: true
 			}
-		],
-
+		},
 		/**
 		 * Link definitions
 		 */
