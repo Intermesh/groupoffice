@@ -89,17 +89,24 @@ go.tree.EntityLoader = Ext.extend(Ext.tree.TreeLoader, {
 		// 	params.sort = [params.sort + " " + params.dir];
 		// 	delete params.dir;
 		// }
-		
+
 		this.result = this.entityStore.query(params, function (response) {
 			this.entityStore.get(response.ids, function (entities) {
+				// Check if node was destroyed during async load
+				var node = options.node;
+				if (!node || !node.ui || !node.getOwnerTree()) {
+					this.loading = false;
+					return;
+				}
+
 				const result = {
-					argument: {callback: callback, node: options.node, scope: scope},
+					argument: {callback: callback, node: node, scope: scope},
 					responseData: entities.map(this.convertEntityToNode, this),
 					queryResponse: response
 				};
-				
+
 				this.handleResponse(result);
-				
+
 				this.loading = false;
 			},this);
 		}, this);
