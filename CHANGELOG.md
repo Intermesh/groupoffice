@@ -1,3 +1,5 @@
+- LDAPAuthenticator : fix login issue
+
 09-07-2026: 26.0.39
 - Forms: Add recipient picker
 - Comments: Context menu was not working anymore

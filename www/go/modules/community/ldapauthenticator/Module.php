@@ -226,7 +226,7 @@ class Module extends core\Module implements DomainProvider
 			if (!empty($values['country'])) $addrAttrs['country'] = $values['country'];
 			if (!empty($values['countryCode'])) $addrAttrs['countryCode'] = $values['countryCode'];
 			if (!empty($values['type'])) $addrAttrs['type'] = $values['addressType'];
-			if (!empty($addrAttrs)) {
+			if (!empty($addrAttrs) && isset($addrAttrs['address'])) {
 				//$values['addresses'] = [$addrAttrs];
 				if(!$contact->hasAddress($addrAttrs['address'])) {
 					$contact->addresses[] = (new Address($contact))->setValues($addrAttrs);
