@@ -98,7 +98,7 @@ return array (
   'Preferences' => 'Präferenzen',
   'Show week numbers in calendar' => 'Zeige Wochennummern im Kalender',
   'Show declined events' => 'Zeige abgelehnte Termine',
-  'Show pop-up info when hovering over appointments' => 'Pop-up-Informationen beim Zeigen auf Termine anzeigen',
+  'Show pop-up info when hovering over appointments' => 'Popup-Informationen beim Zeigen auf Termine anzeigen',
   'Default calendar' => 'Standardkalender',
   'Invitation to event will be added into this calendar' => 'Termineinladungen werden in diesen Kalender eingetragen',
   'Raster size for day/week view' => 'Rastergröße für Tag/Woche Ansicht',
@@ -253,4 +253,6 @@ return array (
   'Auto-accept available resources' => 'Verfügbare Ressourcen automatisch akzeptieren',
   'Write / Delete' => 'Schreiben / Löschen',
   'Display as' => 'Anzeigen als',
+  'Change organizer' => 'Organisator ändern',
+  'Show multiline event blocks' => 'Show multiline event blocks',
 );

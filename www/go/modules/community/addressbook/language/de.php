@@ -166,4 +166,5 @@ return array (
   'Icon' => 'Icon',
   'Automatic linking' => 'Automatische Verknüpfung',
   'Addrees' => 'Adresse',
+  'Please select at least two items to merge.' => 'Please select at least two items to merge.',
 );
