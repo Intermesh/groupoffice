@@ -1,5 +1,6 @@
 - LDAPAuthenticator : fix login issue
 - Tasks / Support: hide separator in tasklist grid when unnecessary
+- Support: import tasklist groupings from tickets module explicitly with support role
 
 09-07-2026: 26.0.39
 - Forms: Add recipient picker
