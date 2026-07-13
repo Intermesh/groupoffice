@@ -24,7 +24,7 @@ return array (
   'Subscribe to calendar' => 'Kalender abonnieren',
   'Add calendar from link' => 'Kalender über Link hinzufügen',
   'Synchronize' => 'Synchronisieren',
-  'Unsubscribe' => 'Deabonnieren',
+  'Unsubscribe' => 'Abbestellen',
   'Calendar' => 'Kalender',
   'Import events as new (Ignore UID)' => 'Termine als neu importieren (UID ignorieren)',
   'Imported %s events successful.' => '%s Termine erfolgreich importiert.',

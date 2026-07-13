@@ -82,7 +82,9 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 						}, this);
 					},
 					scope: this
-				},'-',
+				}, new Ext.menu.Separator({
+					hidden: !canEditTaskLists,
+				}),
 				{
 					text: t('Unsubscribe'),
 					iconCls: 'ic-remove-circle',

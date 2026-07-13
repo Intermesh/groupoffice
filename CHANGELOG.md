@@ -1,4 +1,5 @@
 - LDAPAuthenticator : fix login issue
+- Tasks / Support: hide separator in tasklist grid when unnecessary
 
 09-07-2026: 26.0.39
 - Forms: Add recipient picker
