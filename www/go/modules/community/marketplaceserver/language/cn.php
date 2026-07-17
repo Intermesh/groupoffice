@@ -2,7 +2,7 @@
 
 return [
     'name' => '应用市场服务器',
-    'description' => '为 SmartFlows 应用市场客户端提供模块目录、许可证和下载',
+    'description' => '为应用市场客户端提供模块目录、许可证和下载',
     'mayManage' => '管理应用市场',
     'Marketplace server' => '应用市场服务器',
     'Products' => '产品',

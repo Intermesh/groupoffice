@@ -2,7 +2,7 @@
 
 return [
     "name" => "Marktplatz-Server",
-    "description" => "Stellt Modulkatalog, Lizenzen und Downloads für SmartFlows-Marktplatz-Clients bereit",
+    "description" => "Stellt Modulkatalog, Lizenzen und Downloads für Marktplatz-Clients bereit",
     "mayManage" => "Marktplatz verwalten",
 
     "Marketplace server" => "Marktplatz-Server",

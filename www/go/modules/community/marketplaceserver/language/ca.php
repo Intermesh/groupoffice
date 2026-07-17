@@ -2,7 +2,7 @@
 
 return [
     'name' => 'Servidor del mercat',
-    'description' => 'Serveix el catàleg de mòduls, llicències i baixades als clients del mercat SmartFlows',
+    'description' => 'Serveix el catàleg de mòduls, llicències i baixades als clients del mercat',
     'mayManage' => 'Gestiona el mercat',
     'Marketplace server' => 'Servidor del mercat',
     'Products' => 'Productes',

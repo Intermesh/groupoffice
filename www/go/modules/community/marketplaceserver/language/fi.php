@@ -2,7 +2,7 @@
 
 return [
     'name' => 'Kauppapaikkapalvelin',
-    'description' => 'Tarjoaa moduulikatalogin, lisenssit ja lataukset SmartFlows-kauppapaikan asiakkaille',
+    'description' => 'Tarjoaa moduulikatalogin, lisenssit ja lataukset kauppapaikan asiakkaille',
     'mayManage' => 'Hallitse kauppapaikkaa',
     'Marketplace server' => 'Kauppapaikkapalvelin',
     'Products' => 'Tuotteet',

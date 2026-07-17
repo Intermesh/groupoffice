@@ -2,7 +2,7 @@
 
 return [
     'name' => '마켓플레이스 서버',
-    'description' => 'SmartFlows 마켓플레이스 클라이언트에 모듈 카탈로그, 라이선스 및 다운로드를 제공합니다',
+    'description' => '마켓플레이스 클라이언트에 모듈 카탈로그, 라이선스 및 다운로드를 제공합니다',
     'mayManage' => '마켓플레이스 관리',
     'Marketplace server' => '마켓플레이스 서버',
     'Products' => '제품',

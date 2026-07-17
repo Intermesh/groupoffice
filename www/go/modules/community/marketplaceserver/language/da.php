@@ -2,7 +2,7 @@
 
 return [
     'name' => 'Markedspladsserver',
-    'description' => 'Leverer modulkatalog, licenser og downloads til SmartFlows-markedspladsklienter',
+    'description' => 'Leverer modulkatalog, licenser og downloads til markedspladsklienter',
     'mayManage' => 'Administrer markedsplads',
     'Marketplace server' => 'Markedspladsserver',
     'Products' => 'Produkter',

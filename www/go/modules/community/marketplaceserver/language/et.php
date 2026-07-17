@@ -2,7 +2,7 @@
 
 return [
     'name' => 'Turu server',
-    'description' => 'Pakub moodulite kataloogi, litsentse ja allalaadimisi SmartFlowsi turu klientidele',
+    'description' => 'Pakub moodulite kataloogi, litsentse ja allalaadimisi turu klientidele',
     'mayManage' => 'Halda turgu',
     'Marketplace server' => 'Turu server',
     'Products' => 'Tooted',

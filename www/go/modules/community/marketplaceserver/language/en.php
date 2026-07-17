@@ -2,7 +2,7 @@
 
 return [
     "name" => "Marketplace Server",
-    "description" => "Serves module catalog, licenses and downloads to SmartFlows marketplace clients",
+    "description" => "Serves module catalog, licenses and downloads to marketplace clients",
     "mayManage" => "Manage marketplace",
 
     "Marketplace server" => "Marketplace Server",

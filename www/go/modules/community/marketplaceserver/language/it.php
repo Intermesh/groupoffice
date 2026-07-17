@@ -2,7 +2,7 @@
 
 return [
     'name' => 'Server del mercato',
-    'description' => 'Fornisce il catalogo dei moduli, le licenze e i download ai client del mercato SmartFlows',
+    'description' => 'Fornisce il catalogo dei moduli, le licenze e i download ai client del mercato',
     'mayManage' => 'Gestisci il mercato',
     'Marketplace server' => 'Server del mercato',
     'Products' => 'Prodotti',

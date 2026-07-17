@@ -2,7 +2,7 @@
 
 return [
     'name' => 'Server pasar',
-    'description' => 'Menyediakan katalog modul, lisensi, dan unduhan untuk klien pasar SmartFlows',
+    'description' => 'Menyediakan katalog modul, lisensi, dan unduhan untuk klien pasar',
     'mayManage' => 'Kelola pasar',
     'Marketplace server' => 'Server pasar',
     'Products' => 'Produk',

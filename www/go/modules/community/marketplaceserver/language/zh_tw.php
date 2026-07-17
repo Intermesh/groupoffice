@@ -2,7 +2,7 @@
 
 return [
     'name' => '應用市集伺服器',
-    'description' => '為 SmartFlows 應用市集用戶端提供模組目錄、授權與下載',
+    'description' => '為應用市集用戶端提供模組目錄、授權與下載',
     'mayManage' => '管理應用市集',
     'Marketplace server' => '應用市集伺服器',
     'Products' => '產品',

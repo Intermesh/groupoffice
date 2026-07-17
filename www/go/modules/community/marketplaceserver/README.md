@@ -1,6 +1,6 @@
 # marketplaceserver
 
-SmartFlows marketplace server — serves the module catalog, licenses and package
+marketplace server — serves the module catalog, licenses and package
 downloads to `community/marketplace` clients running on remote Group-Office instances.
 
 API base URL shape: `/api/page.php/community/marketplaceserver/...`

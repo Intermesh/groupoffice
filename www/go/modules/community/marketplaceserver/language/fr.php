@@ -2,7 +2,7 @@
 
 return [
     'name' => 'Serveur de place de marché',
-    'description' => 'Fournit le catalogue de modules, les licences et les téléchargements aux clients de la place de marché SmartFlows',
+    'description' => 'Fournit le catalogue de modules, les licences et les téléchargements aux clients de la place de marché',
     'mayManage' => 'Gérer la place de marché',
     'Marketplace server' => 'Serveur de place de marché',
     'Products' => 'Produits',

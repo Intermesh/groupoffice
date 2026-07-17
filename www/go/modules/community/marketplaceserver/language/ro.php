@@ -2,7 +2,7 @@
 
 return [
     'name' => 'Server de piață',
-    'description' => 'Oferă catalogul de module, licențele și descărcările clienților pieței SmartFlows',
+    'description' => 'Oferă catalogul de module, licențele și descărcările clienților pieței',
     'mayManage' => 'Gestionează piața',
     'Marketplace server' => 'Server de piață',
     'Products' => 'Produse',

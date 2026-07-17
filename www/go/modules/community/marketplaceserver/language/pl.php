@@ -2,7 +2,7 @@
 
 return [
     'name' => 'Serwer rynku',
-    'description' => 'Udostępnia katalog modułów, licencje i pobrania klientom rynku SmartFlows',
+    'description' => 'Udostępnia katalog modułów, licencje i pobrania klientom rynku',
     'mayManage' => 'Zarządzaj rynkiem',
     'Marketplace server' => 'Serwer rynku',
     'Products' => 'Produkty',

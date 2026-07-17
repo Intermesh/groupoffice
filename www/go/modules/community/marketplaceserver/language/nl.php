@@ -2,7 +2,7 @@
 
 return [
     'name' => 'Marktplaatsserver',
-    'description' => 'Levert modulecatalogus, licenties en downloads aan SmartFlows-marktplaatsclients',
+    'description' => 'Levert modulecatalogus, licenties en downloads aan marktplaatsclients',
     'mayManage' => 'Marktplaats beheren',
     'Marketplace server' => 'Marktplaatsserver',
     'Products' => 'Producten',

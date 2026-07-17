@@ -2,7 +2,7 @@
 
 return [
     'name' => 'Servidor do mercado',
-    'description' => 'Fornece o catálogo de módulos, licenças e transferências aos clientes do mercado SmartFlows',
+    'description' => 'Fornece o catálogo de módulos, licenças e transferências aos clientes do mercado',
     'mayManage' => 'Gerir o mercado',
     'Marketplace server' => 'Servidor do mercado',
     'Products' => 'Produtos',

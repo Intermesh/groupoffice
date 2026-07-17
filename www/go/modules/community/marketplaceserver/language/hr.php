@@ -2,7 +2,7 @@
 
 return [
     'name' => 'Poslužitelj tržnice',
-    'description' => 'Poslužuje katalog modula, licencije i preuzimanja klijentima tržnice SmartFlows',
+    'description' => 'Poslužuje katalog modula, licencije i preuzimanja klijentima tržnice',
     'mayManage' => 'Upravljaj tržnicom',
     'Marketplace server' => 'Poslužitelj tržnice',
     'Products' => 'Proizvodi',

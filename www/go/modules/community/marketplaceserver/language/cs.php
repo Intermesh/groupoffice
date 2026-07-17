@@ -2,7 +2,7 @@
 
 return [
     "name" => "Server tržiště",
-    "description" => "Poskytuje katalog modulů, licence a stahování klientům tržiště SmartFlows",
+    "description" => "Poskytuje katalog modulů, licence a stahování klientům tržiště",
     "mayManage" => "Správa tržiště",
 
     "Marketplace server" => "Server tržiště",

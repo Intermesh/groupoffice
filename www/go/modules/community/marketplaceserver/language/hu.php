@@ -2,7 +2,7 @@
 
 return [
     'name' => 'Piactér-kiszolgáló',
-    'description' => 'Modulkatalógust, licenceket és letöltéseket szolgál ki a SmartFlows piactér klienseinek',
+    'description' => 'Modulkatalógust, licenceket és letöltéseket szolgál ki a piactér klienseinek',
     'mayManage' => 'Piactér kezelése',
     'Marketplace server' => 'Piactér-kiszolgáló',
     'Products' => 'Termékek',

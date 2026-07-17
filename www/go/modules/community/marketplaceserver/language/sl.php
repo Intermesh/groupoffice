@@ -2,7 +2,7 @@
 
 return [
     'name' => 'Strežnik tržnice',
-    'description' => 'Streže katalog modulov, licence in prenose odjemalcem tržnice SmartFlows',
+    'description' => 'Streže katalog modulov, licence in prenose odjemalcem tržnice',
     'mayManage' => 'Upravljaj tržnico',
     'Marketplace server' => 'Strežnik tržnice',
     'Products' => 'Izdelki',

@@ -2,7 +2,7 @@
 
 return [
     'name' => 'Pazar yeri sunucusu',
-    'description' => 'SmartFlows pazar yeri istemcilerine modül kataloğu, lisanslar ve indirmeler sunar',
+    'description' => 'pazar yeri istemcilerine modül kataloğu, lisanslar ve indirmeler sunar',
     'mayManage' => 'Pazar yerini yönet',
     'Marketplace server' => 'Pazar yeri sunucusu',
     'Products' => 'Ürünler',
