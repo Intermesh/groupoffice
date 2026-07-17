@@ -1,6 +1,6 @@
-# marketplace (SmartFlows Marketplace client)
+# marketplace (Marketplace client)
 
-Client side of the SmartFlows module marketplace. Add one or more **repositories**
+Client side of the module marketplace. Add one or more **repositories**
 (a marketplace server URL + an API token), browse each repository's module
 catalog, download owned modules into `go/modules/{package}`, and enforce paid
 module licenses at runtime via an offline RS256-signed license JWT that a daily
