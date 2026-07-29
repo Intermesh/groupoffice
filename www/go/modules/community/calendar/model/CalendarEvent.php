@@ -1131,7 +1131,7 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	protected static function neededSearchProperties(): array {
-		return ['id', 'showWithoutTime', 'start', 'timeZone', 'title','privacy', 'description', 'cal.name'];
+		return ['id', 'showWithoutTime', 'start', 'timeZone','location', 'title','privacy', 'description'];
 	}
 
 	private static $calNameCache = [];
@@ -1150,6 +1150,14 @@ class CalendarEvent extends AclItemEntity {
 		}
 
 		return self::$calNameCache[$this->calendarId] .': '. $this->title() . ' - '. $this->start->format($format);
+	}
+
+	protected function getSearchKeywords(): ?array {
+		$kw = [$this->title, $this->description, $this->location, self::$calNameCache[$this->calendarId]];
+		if(!str_starts_with($this->location, 'http')) {
+			$kw[] = $this->location;
+		}
+		return $kw;
 	}
 
 	/**

@@ -121,7 +121,7 @@ class Calendar extends AclOwnerEntity {
 
 
 	public static function fetchPersonal($userId) {
-		$user = User::findById($userId, ['id','displayName','calendarPreferences']);
+		$user = User::findById($userId, ['id','displayName','email', 'calendarPreferences']);
 		if(!empty($user)) {
 			/** @var Preferences $pref */
 			$pref = $user->calendarPreferences;
