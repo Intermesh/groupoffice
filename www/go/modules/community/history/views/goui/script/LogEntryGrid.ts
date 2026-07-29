@@ -1,4 +1,14 @@
-import {avatar, btn, column, comp, datasourcestore, DataSourceStore, datecolumn, t, Table} from "@intermesh/goui";
+import {
+	avatar,
+	btn,
+	column,
+	comp,
+	datasourcestore,
+	DataSourceStore,
+	datetimecolumn,
+	t,
+	Table
+} from "@intermesh/goui";
 import {client, principalDS} from "@intermesh/groupoffice-core";
 import {HistoryDetailWindow} from "./HistoryDetailWindow.js";
 import {logEntryDS} from "./Index.js";
@@ -95,7 +105,7 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 						return t(v.charAt(0).toUpperCase() + v.slice(1));
 					}
 				}),
-				datecolumn({
+				datetimecolumn({
 					id: "createdAt",
 					header: t("Date"),
 					sortable: true,
