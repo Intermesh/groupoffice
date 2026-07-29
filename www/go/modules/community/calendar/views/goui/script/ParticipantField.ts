@@ -248,7 +248,7 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 
 	addParticipant(principal: any) {
 		this.fire('beforeadd', {principal});
-
+		if(principal.id !== this.organizerId)
 		this.list.add({
 			email:principal.email,
 			name: principal.name || principal.email,
