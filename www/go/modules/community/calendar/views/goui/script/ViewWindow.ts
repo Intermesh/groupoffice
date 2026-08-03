@@ -75,7 +75,7 @@ export class ViewWindow extends FormWindow {
 						checkboxselectcolumn({id:'checkbox', listeners: {
 							'change': ({checked, record}) => {this.calandarIds[record.id] = checked},
 							'render': ({td,result,record,storeIndex}) => {
-								(result as CheckboxField).color = '#'+record.color;
+								(result as CheckboxField).color = record.color ? '#' + record.color : record.color;
 									td.addEventListener("mousedown", (ev) => {
 										ev.stopPropagation(); // stop lists row selector event
 									});
