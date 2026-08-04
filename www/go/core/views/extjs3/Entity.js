@@ -22,6 +22,14 @@ go.Entity = function (cfg) {
 			l.iconCls = "entity " + l.entity;
 		}
 	}, this);
+
+	if(!this.permissions) {
+		this.permissions = [
+			{value: 10,name: t("Read")},
+			{value: 30,name: t("Write")},
+			{value: 50,name: t("Manage")}
+		];
+	}
 	
 	if(!this.filters) {
 		this.filters = [{
