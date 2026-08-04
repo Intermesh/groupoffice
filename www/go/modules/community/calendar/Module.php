@@ -166,7 +166,7 @@ class Module extends core\Module
 			$events->filter(['after' => $after]);
 		}
 		header('Content-Type: text/calendar; charset=UTF-8; component=vcalendar');
-		header('Content-Disposition: attachment; filename="'.$calendar->name.'export_'.$calendar->id.'_'.date('Y-m-d').'.ics"');
+		header('Content-Disposition: attachment; filename="'.$calendar->name.' ('.$calendar->id.') '.date('Y-m-d').'.ics"');
 
 		echo "BEGIN:VCALENDAR\r\n";
 		echo "VERSION:2.0\r\n";
