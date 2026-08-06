@@ -39,6 +39,8 @@ return array (
   'Create calendar' => 'Nieuwe agenda maken',
   'Change organizer' => 'Wijzig organizer',
   'Edit calendar' => 'Agenda bewerken',
+	'Create view' => 'Nieuwe weergave',
+	'Edit view' => 'Weergave bewerken',
   'Subscribe to calendar' => 'Aanmelden bij agenda',
   'Add calendar from link' => 'Agenda toevoegen via link',
   'Enter webcal address' => 'Webcal-adres invoeren',

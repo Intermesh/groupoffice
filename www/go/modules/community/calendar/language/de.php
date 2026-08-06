@@ -80,6 +80,8 @@ return array (
   'New event created by {creator}' => 'Neuer Termin erstellt von {creator}',
   'Full day' => 'Ganztägig',
   'Create category' => 'Kategorie erstellen',
+  'Create view' => 'Ansicht erstellen',
+  'Edit view' => 'Ansicht bearbeiten',
   'Invitations' => 'Einladungen',
   'Unknown owner' => 'Unbekannter Besitzer',
   'Split' => 'Geteilt',
