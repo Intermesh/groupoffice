@@ -537,7 +537,7 @@ class Message extends \go\core\mail\Message {
 							$contentId = $this->embed($img);
 
 							//$tmpFile->delete();
-							$params['htmlbody'] = \GO\Base\Util\StringHelper::replaceOnce($matches[1], $contentId, $params['htmlbody']);
+							$params['htmlbody'] = str_replace($matches[1], $contentId, $params['htmlbody']);
 						}
 					}
 				}
