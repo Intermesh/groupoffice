@@ -220,7 +220,7 @@ class ICalendarHelper {
 		if(!empty($event->color)) $vevent->COLOR = $event->color;
 		if(!empty($event->categoryIds)) $vevent->CATEGORIES = implode(',',$event->categoryNames());
 
-		if(!empty($event->freeBusyStatus) && $event->freeBusyStatus == "free") $vevent->TRANSP = "TRANSPARENT";
+		if(!empty($event->freeBusyStatus) && $event->freeBusyStatus == CalendarEvent::FREEBUSY_FREE) $vevent->TRANSP = "TRANSPARENT";
 
 		if($event->participants) {
 			foreach ($event->participants as $participant) {
