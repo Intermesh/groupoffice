@@ -1,4 +1,6 @@
-13-07-2026: 26.0.40
+- Calendar: default DE translation for 'Event' should be 'Termin'
+
+- 13-07-2026: 26.0.40
 - LDAPAuthenticator : fix login issue
 - Tasks / Support: hide separator in tasklist grid when unnecessary
 - Support: import tasklist groupings from tickets module explicitly with support role
