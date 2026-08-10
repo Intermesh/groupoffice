@@ -1,3 +1,7 @@
+10-08-2026: 25.0.111
+- PR/Fix: Tree EntityLoader crashes when a node is destroyed during async load #1536
+- PR/Fix: Custom fields broken for any entity whose clientName differs from its short class name #1534
+
 06-07-2026: 25.0.110
 - core / calendar: SSRF via webcal calendar subscription — fetchWebcalBlob() fetches user-supplied URL with no IP validation
 - LDAPAuthenticator: also disable recovery email field when logged in using LDAP
