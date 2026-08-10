@@ -1,3 +1,5 @@
+- Core: Implemented custom field type "Attachments" in GOUI. 
+
 10-08-2026: 26.0.41
 - Calendar: default DE translation for 'Event' should be 'Termin'
 - Core: In Ext, show group icon in share panel, in GOUI group user list to share panel
