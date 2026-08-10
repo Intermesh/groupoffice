@@ -170,7 +170,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 					width: dp(64),
 					dataIndex: "id",
 					renderer: function() {
-						return '<a class="show-on-hover" title="' + Ext.util.Format.htmlEncode(t("View members")) + '"><i class="icon">people</i></a>';
+						return '<a title="' + Ext.util.Format.htmlEncode(t("View members")) + '"><i class="icon">people</i></a>';
 					}
 				}
 			],
