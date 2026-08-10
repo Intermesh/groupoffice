@@ -1,6 +1,9 @@
 - Calendar: default DE translation for 'Event' should be 'Termin'
+- Email: Replace inline images contentId more than once as it could appear more than once.
+- Calendar: Add transparency property to vevent export
+- Calendar: Corrected created, dtstamp and last-modified dates in ics export/import
 
-- 13-07-2026: 26.0.40
+13-07-2026: 26.0.40
 - LDAPAuthenticator : fix login issue
 - Tasks / Support: hide separator in tasklist grid when unnecessary
 - Support: import tasklist groupings from tickets module explicitly with support role
