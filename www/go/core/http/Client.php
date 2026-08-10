@@ -144,16 +144,37 @@ class Client
 		}
 
 		$parsed = parse_url($uri);
-		$ip = gethostbyname($parsed['host']);
-		$retVal = filter_var($ip, FILTER_VALIDATE_IP, ['flags' => FILTER_FLAG_GLOBAL_RANGE]);
 
-		if($retVal === false) {
+		if(empty($parsed['host'])) {
 			throw new Forbidden("Invalid URI: " . $uri);
+		}
+
+		// check if the IP
+		$ips = $this->resolveHost($parsed['host']);
+		if(empty($ips)) {
+			throw new Forbidden("Can't resolve host for URI: " . $uri);
+		}
+		$firstIP = $ips[0];
+		foreach($ips as $ip) {
+			$retVal = filter_var($ip, FILTER_VALIDATE_IP, ['flags' => FILTER_FLAG_GLOBAL_RANGE]);
+
+			if ($retVal === false) {
+				throw new Forbidden("Invalid URI: " . $uri);
+			}
 		}
 
 		$port = $parsed['port'] ?? ($parsed['scheme'] === 'https' ? 443 : 80);
 
-		return $parsed['host'] . ":" . $port. ":" . $ip;
+		return $parsed['host'] . ":" . $port. ":" . $firstIP;
+	}
+
+
+	private function resolveHost(string $host): array {
+		$records = dns_get_record($host, DNS_A + DNS_AAAA);
+		if ($records === false) {
+			return [];
+		}
+		return array_map(fn($r) => $r['type'] === 'AAAA' ? $r['ipv6'] : $r['ip'], $records);
 	}
 
 	/**
