@@ -1,3 +1,7 @@
+10-08-2026: 6.8.176
+- PR/Fix: Tree EntityLoader crashes when a node is destroyed during async load #1536
+- PR/Fix: Custom fields broken for any entity whose clientName differs from its short class name #1534
+
 06-07-2026: 6.8.175
 - LDAP authenticator: hide secondary email field in account settings when logged in via LDAP
 - Calendar: morkaround for event store when no calendars in search paramaeters
