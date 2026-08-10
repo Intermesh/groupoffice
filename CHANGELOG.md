@@ -2,6 +2,8 @@
 - Email: Replace inline images contentId more than once as it could appear more than once.
 - Calendar: Add transparency property to vevent export
 - Calendar: Corrected created, dtstamp and last-modified dates in ics export/import
+- Core: Custom fields broken for any entity whose clientName differs from its short class name (Field::tableName() throws "EntityType not found") (Issue #1534)
+- Core: Tree EntityLoader crashes when a node is destroyed during async load #1536
 
 13-07-2026: 26.0.40
 - LDAPAuthenticator : fix login issue
