@@ -1153,8 +1153,8 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	protected function getSearchKeywords(): ?array {
-		$kw = [$this->title, $this->description, $this->location, self::$calNameCache[$this->calendarId]];
-		if(!str_starts_with($this->location, 'http')) {
+		$kw = [$this->title, $this->description, self::$calNameCache[$this->calendarId]];
+		if(!str_starts_with(($this->location ?? ''), 'http')) {
 			$kw[] = $this->location;
 		}
 		return $kw;
