@@ -46,6 +46,7 @@ return array (
   'Write own' => 'Eigene Termine schreiben',
   'Write all' => 'Global schreiben',
   'Global category' => 'Globale Kategorie',
+  'Event' => 'Termin',
   'New Event' => 'Neuer Termin',
   'Accept' => 'Akzeptieren',
   'Maybe' => 'Vielleicht',
