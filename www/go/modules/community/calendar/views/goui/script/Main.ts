@@ -167,7 +167,7 @@ export class Main extends Component {
 					filterpanel({
 						entityName: "CalendarEvent",
 						store: this.adapter!.byType('event').store
-					})
+					}).on('filterchange', (f) => {  })
 				)
 			),
 			splitter({
@@ -363,8 +363,7 @@ export class Main extends Component {
 		const store = this.adapter.byType('event').store;
 
 		//const calendarIds = Object.keys(this.inCalendars).filter(key => this.inCalendars[key])
-
-		Object.assign(store.queryParams.filter ||= {}, {
+		store.setFilter('inCalendars', {
 			inCalendars: calendarIds
 		});
 
@@ -506,13 +505,10 @@ export class Main extends Component {
 				const store = this.adapter.byType('event').store;
 				const categoryIds = Object.keys(selected);
 
-				if(categoryIds.length) {
-					Object.assign(store.queryParams.filter ||= {}, {
-						inCategories: categoryIds
-					});
-				} else {
-					delete store.queryParams.filter?.inCategories;
-				}
+				store.setFilter('inCategories', categoryIds.length ? {
+					inCategories: categoryIds
+				} : undefined)
+
 				this.updateView();
 			};
 		return list({
@@ -737,10 +733,11 @@ export class Main extends Component {
 				}
 			},
 			load(start:DateTime,end:DateTime) {
-				Object.assign(this.store!.queryParams.filter ||= {}, {
+				this.store!.setFilter('period', {
 					after: start.format('Y-m-d'),
 					before: end.format('Y-m-d')
 				});
+
 				return this.store!.load();
 			}
 		});
