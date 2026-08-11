@@ -58,7 +58,7 @@ export class SplitView extends MonthView {
 	protected populateViewModel() {
 		this.clear()
 
-		const activeFilter = this.adapter.byType('event').store.queryParams.filter.inCalendars;
+		const activeFilter = this.adapter.byType('event').store.filters.inCalendars.inCalendars;
 		//const viewEnd = this.start.clone().addDays(this.wdays);
 		for (let calendarId of activeFilter) {
 			this.calViewModel[calendarId] = [];

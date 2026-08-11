@@ -1,4 +1,4 @@
-import {client, FormWindow, jmapds} from "@intermesh/groupoffice-core";
+import {client, FormWindow, jmapds, SelectOption} from "@intermesh/groupoffice-core";
 import {
 	btn,
 	CheckboxField, checkboxselectcolumn, column,
@@ -19,6 +19,8 @@ export class ViewWindow extends FormWindow {
 	//groupIdsFld: MapField
 	calendarIdList: List
 	calandarIds: {[key:number]: boolean} = {}
+
+	static customViews: SelectOption[] = []
 	constructor() {
 		super('CalendarView');
 		this.title = 'view';
@@ -49,7 +51,7 @@ export class ViewWindow extends FormWindow {
 		this.generalTab.items.add(
 			comp({cls: 'flow pad'},
 				textfield({name: 'name', label: t('Name'), required: true, flex: 1}),
-				select({name: 'defaultView', label: t('Display as'), options:[
+				select({name: 'defaultView', label: t('Display as'), options:[...[
 					{value:null, name: t('Current ')},
 					{value:'day', name: t('Day')},
 					{value:'days-5', name: t('Workweek')},
@@ -58,7 +60,7 @@ export class ViewWindow extends FormWindow {
 					{value:'weeks-3',name:  '3 ' + t('Weeks')},
 					{value:'month',name:  t('Month')},
 					{value:'split-5',name:  t('Split')},
-				]}),
+				],...ViewWindow.customViews]}),
 				this.calendarIdList = table({
 					tagName: 'div',
 					headers: false,
