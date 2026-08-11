@@ -1,6 +1,6 @@
 - Core: Implemented custom field type "Attachments" in GOUI. 
 - Finance: Fixed switching from B2B to B2C in dialog
-- Catalog: Store price incl. and excl. and store price entered by user to solve rounding issues
+- Finance / Contracts / Catalog: Store price incl. and excl. and store price entered by user to solve rounding issues
 
 
 10-08-2026: 26.0.41
