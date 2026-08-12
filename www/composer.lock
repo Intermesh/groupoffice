@@ -5667,7 +5667,6 @@
         "phpseclib/mcrypt_compat": 0,
         "sabre/dav": 0,
         "sabre/vobject": 0,
-        "setasign/fpdi": 0,
         "steverhoades/oauth2-openid-connect-server": 0,
         "tecnickcom/tcpdf": 0,
         "thenetworg/oauth2-azure": 0
