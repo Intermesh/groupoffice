@@ -986,19 +986,38 @@ abstract class Entity extends Property {
 		*/
 		$filters->add("link", function (Criteria $criteria, $value, Query $query) {
 
-			if(!isset($value['entity']) || (count($value) > 1 && !isset($value['id']))) {
+			if(!isset($value['entity'])) {
 				throw new \LogicException("link filter must have 'entity' and an optional 'id' parameter");
 			}
 
+			$fromEntityTypeId = EntityType::findByName($value['entity'])->getId();
 
 			$linkAlias = 'link_' . uniqid();
-			$on = $query->getTableAlias() . '.id =  ' . $linkAlias . '.toId  AND ' . $linkAlias . '.toEntityTypeId = ' . static::entityType()->getId() . ' AND ' . $linkAlias . '.fromEntityTypeId = ' . EntityType::findByName($value['entity'])->getId();
+			$on = $query->getTableAlias() . '.id =  ' . $linkAlias . '.toId  AND ' .
+				$linkAlias . '.toEntityTypeId = ' . static::entityType()->getId() . ' AND ' .
+				$linkAlias . '.fromEntityTypeId = ' . $fromEntityTypeId;
 
 			$query->join('core_link', $linkAlias, $on, "LEFT");
-			$criteria->where('toId', '!=');
+
 
 			if (!empty($value['id'])) {
 				$criteria->andWhere('fromId', '=', $value['id']);
+			}
+
+			if(!empty($value['filter'])) {
+				//$criteria->andWhere($value['filter']);
+				$query->bind(':filter_'.$linkAlias, $value['filter']);
+
+				$query->join('core_search',
+					'search_' . $linkAlias,
+					'search_' . $linkAlias . '.entityId = ' . $linkAlias . '.fromId AND '.
+						'search_' . $linkAlias . '.entityTypeId=' . $fromEntityTypeId.' AND ' .
+						'search_' . $linkAlias . '.filter = :filter_'.$linkAlias,
+					'LEFT'
+				);
+				$criteria->where('search_' . $linkAlias.'.entityId', '!=', null);
+			} else {
+				$criteria->where($linkAlias . '.toId', '!=', null);
 			}
 
 			$query->groupBy([$query->getTableAlias() . '.id']);
