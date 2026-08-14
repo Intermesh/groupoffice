@@ -25,6 +25,10 @@ export class MultiContactCustomField extends CustomFieldType {
 
 	private renderer = async (columnValue: any) => {
 
+		if(!columnValue || !columnValue.length) {
+			return "";
+		}
+
 		const response = await jmapds("Contact").get(columnValue);
 		return comp({cls:"comma-list"}, ...response.list.map(c => comp({tagName: "a", text: c.name, attr: {href: `#contact/${c.id}`}})));
 	}
