@@ -4,6 +4,7 @@
 - Catalog: Made it easier to show all items again after filtering on category
 - Finance: Added 'paymentMeans' field to invoices for Zugferd and UBL
 - Finance: Autocomplete shipping addresses from address book
+- Finance: CAMT053 2019 payment import support
 - Core: make UX behavior Ext.ux icons consistent with newer Ext and GOUI implementations
 - Comments: Status icon for sent, received, pending and senderror added. Also improves UI because mail send happens in the background
 
