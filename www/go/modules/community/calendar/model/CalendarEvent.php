@@ -830,10 +830,25 @@ class CalendarEvent extends AclItemEntity {
 			$this->isModified(['useDefaultAlerts', 'alerts', 'start','duration','recurrenceOverrides']) ||
 			($this->useDefaultAlerts && $this->isModified('calendarId'))
 		) {
-			CoreAlert::deleteByEntity($this, '1', $userId); // this will reschedule if recurring and existing
-			foreach ($this->alerts() as $alert) {
-				$alert->schedule($this);
+			// loop all calendar subscribers
+			$subscribers = go()->getDbConnection()->query('select userId from calendar_calendar_user where id = '.$this->calendarId.' AND isSubscribed = 1')->fetchAll(\PDO::FETCH_COLUMN);
+			foreach($subscribers as $subscriber) {
+				CoreAlert::deleteByEntity($this, '1', $subscriber); // this will reschedule if recurring and existing
+
+				// string = int comparison
+				if($subscriber != $userId) { // find only default calendar alerts (if any)
+					$calendar = Calendar::findFor($subscriber, ['id', 'ownerId', $this->showWithoutTime?'defaultAlertsWithoutTime':'defaultAlertsWithTime'])
+						->where('id', '=', $this->calendarId)->single();
+					$alerts =  ($this->showWithoutTime ? $calendar->defaultAlertsWithoutTime : $calendar->defaultAlertsWithTime) ?? [];
+				} else {
+					$alerts = $this->alerts();
+				}
+
+				foreach ($alerts as $alert) {
+					$alert->schedule($this);
+				}
 			}
+
 		}
 
 	}

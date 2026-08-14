@@ -15,6 +15,7 @@ export * from "./CalendarItem.js";
 export * from "./MonthView.js";
 export * from "./SplitView.js";
 export * from "./WeekView.js";
+export * from "./ViewWindow.js";
 export * from "./CalendarAdapter.js";
 export * from "./OnlineMeetingService.js";
 
