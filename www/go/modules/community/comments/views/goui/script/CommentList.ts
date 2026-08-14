@@ -118,7 +118,6 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 			}
 
 			const avatarCnt = comp({
-					cls: "go-detail-view-avatar",
 					itemId: "avatar-container",
 					listeners: {
 						render: ({target}) => {
@@ -147,11 +146,7 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 
 			let writtenByUser = (client.user.id == comment.creator.id);
 
-			if (comment.mimeMessageId) {
-				const mimeTypeCmp = comp({tagName: "i", cls: "goui icon icon-comment-below-avatar", title: t("Imported from mail"), html: "email"})
-				const iconCntCls = writtenByUser ? "icon-cnt-below-avatar-creator": "icon-cnt-below-avatar";
-				avatarCnt.items.add(comp({cls: iconCntCls}, mimeTypeCmp));
-			}
+
 
 			let commentTitle = t("{author} wrote at {date}")
 				.replace("{author}", comment.creator.name)
@@ -278,6 +273,14 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 						}
 					})
 				);
+			}
+
+			if (comment.mailStatus) {
+				const mimeTypeCmp = comp({
+					tagName: "i",
+					cls: "goui icon comment-mail-status "+comment.mailStatus, title: comment.mailStatus
+				})
+				commentComp.items.add(mimeTypeCmp);
 			}
 
 			const labels = comp({
