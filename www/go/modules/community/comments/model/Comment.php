@@ -74,6 +74,14 @@ class Comment extends AclItemEntity {
 	 */
 	public ?string $mimeMessageId = null;
 
+
+	const MAIL_STATUS_RECEIVED = 'received';
+	const MAIL_STATUS_PENDING = 'pending';
+	const MAIL_STATUS_SENT = 'sent';
+	const MAIL_STATUS_SENDERROR = 'senderror';
+
+	public ?string $mailStatus = null;
+
 	use SearchableTrait;
 
 	protected static function defineMapping(): Mapping

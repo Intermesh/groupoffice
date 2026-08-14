@@ -12,6 +12,7 @@ create table comments_comment
     text          mediumtext charset utf8mb4     null,
     section       varchar(50)                    null,
     mimeMessageId varchar(255) collate ascii_bin null,
+    mailStatus enum ('received', 'pending', 'sent', 'senderror') null,
     constraint fk_comments_comment_core_user1
         foreign key (createdBy) references core_principal (id)
             on delete set null,

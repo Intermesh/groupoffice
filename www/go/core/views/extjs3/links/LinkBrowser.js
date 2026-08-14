@@ -272,8 +272,8 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 			keepSelection: true,
 
 			actions: [{
-					iconCls: 'btn-delete ux-row-action-on-hover',
-					qtip: t("Add")
+					iconCls: 'btn-delete',
+					qtip: t("Delete")
 				}]
 		});
 

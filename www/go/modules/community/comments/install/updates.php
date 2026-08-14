@@ -218,3 +218,7 @@ $updates['202507011010'][] = function() {
 		echo "ERROR: " . $e->getMessage() ."\n\n";
 	}
 };
+
+
+$updates['202608141358'][] = "alter table comments_comment
+    add mailStatus enum ('received', 'pending', 'sent', 'senderror') null;";

@@ -290,70 +290,78 @@ abstract class AbstractConverter {
 
 		$this->clientParams = $params;
 
-		$this->initImport($file);
-
 		$this->notifyStart();
 
-		$this->index = 0;
-		
-		while($this->nextImportRecord()) {
+		try {
 
-			try {
+			$this->initImport($file);
 
-				$entity = $this->importEntity();
-				
-				//ignore when false is returned. This is not an error. But intentional. Like CSV skipping a blank line for example.
-				if (is_null($entity)) {
-					$this->index++;
-					continue;
-				}
+			$this->index = 0;
 
-				if($entity->hasPermissionLevel(Acl::LEVEL_CREATE)) {
-					$entity->save();
-				} else {
-					$msg = "Item ". $this->index . ": access denied";
-					$this->notifyError(true, $msg);
+			while ($this->nextImportRecord()) {
 
-					$response['errors'][] = $msg;
-					continue;
-				}
+				try {
 
-				//push changes after each 100 imports
-				EntityType::push(100);
+					$entity = $this->importEntity();
 
-				if($entity->hasValidationErrors()) {
-					foreach ($entity->getValidationErrors() as $key =>  $validationError) {
-						$msg = "Validation error in item " . $this->index . ": " . $key . " - " . $validationError['description'];
+					//ignore when false is returned. This is not an error. But intentional. Like CSV skipping a blank line for example.
+					if (is_null($entity)) {
+						$this->index++;
+						continue;
+					}
+
+					if ($entity->hasPermissionLevel(Acl::LEVEL_CREATE)) {
+						$entity->save();
+					} else {
+						$msg = "Item " . $this->index . ": access denied";
 						$this->notifyError(true, $msg);
 
 						$response['errors'][] = $msg;
-
+						continue;
 					}
-				} elseif($this->afterSave($entity)) {
-					$response['count']++;
-				} else{
-					$msg = "Item ". $this->index . ": Import afterSave returned false";
-					$response['errors'][] = $msg;
 
-					$this->notifyError(true, $msg);
+					//push changes after each 100 imports
+					EntityType::push(100);
+
+					if ($entity->hasValidationErrors()) {
+						foreach ($entity->getValidationErrors() as $key => $validationError) {
+							$msg = "Validation error in item " . $this->index . ": " . $key . " - " . $validationError['description'];
+							$this->notifyError(true, $msg);
+
+							$response['errors'][] = $msg;
+
+						}
+					} elseif ($this->afterSave($entity)) {
+						$response['count']++;
+					} else {
+						$msg = "Item " . $this->index . ": Import afterSave returned false";
+						$response['errors'][] = $msg;
+
+						$this->notifyError(true, $msg);
+					}
+
+					EntityType::push();
+
+					$this->notifyCount(true, $response['count'], count($response['errors']));
+				} catch (Exception $e) {
+					ErrorHandler::logException($e);
+					$response['errors'][] = "Item " . $this->index . ": " . $e->getMessage();
 				}
 
-				EntityType::push();
-
-				$this->notifyCount(true, $response['count'], count($response['errors']));
-			}
-			catch(Exception $e) {
-				ErrorHandler::logException($e);
-				$response['errors'][] = "Item ". $this->index . ": ".$e->getMessage();
+				$this->index++;
 			}
 
-			$this->index++;
+			$this->finishImport();
+
+			$this->notifyEnd(true, $response['count'], count($response['errors']));
+
+		}catch(\Throwable $e) {
+
+			ErrorHandler::logException($e, "Failed to import file");
+
+			$this->notifyError(true, $e->getMessage());
 		}
 
-		$this->finishImport();
-
-		$this->notifyEnd(true, $response['count'], count($response['errors']));
-		
 		return $response;
 	}
 
