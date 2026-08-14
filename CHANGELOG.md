@@ -4,6 +4,7 @@
 - Catalog: Made it easier to show all items again after filtering on category
 - Finance: Added 'paymentMeans' field to invoices for Zugferd and UBL
 - Finance: Autocomplete shipping addresses from address book
+- Core: make UX behavior Ext.ux icons consistent with newer Ext and GOUI implementations
 
 10-08-2026: 26.0.41
 - Calendar: default DE translation for 'Event' should be 'Termin'
