@@ -1368,14 +1368,15 @@ span.x-tree-node-cb input:not(.x-tree-node-cb) { // email folder subscription
 		
 		&-alt{ // for strips
 			background-color:compat.$cHover;
-		}		
+		}
+		/*
 		.ux-row-action {
 			opacity: 0;
 			transition : opacity 90ms compat.$curve-standard;
 		}
 		&:hover .ux-row-action {
 			opacity: 1
-		}
+		}*/
 	}
 	&-col {
 		padding: utils.dp(4) 0;
