@@ -7,6 +7,7 @@
 - Finance: CAMT053 2019 payment import support
 - Core: make UX behavior Ext.ux icons consistent with newer Ext and GOUI implementations
 - Comments: Status icon for sent, received, pending and senderror added. Also improves UI because mail send happens in the background
+- Core: Report error when import fails on init
 
 10-08-2026: 26.0.41
 - Calendar: default DE translation for 'Event' should be 'Termin'
