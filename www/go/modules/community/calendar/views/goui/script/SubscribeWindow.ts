@@ -76,6 +76,7 @@ export class SubscribeWindow extends Window {
 				}),
 				column({id: 'more', width:60, renderer: (_, data)=> btn({
 						icon: "more_vert",
+						hidden: !rights.mayChangeResources && !rights.mayChangeCalendars && data.groupId,
 						menu: menu({},
 							btn({icon:'share', text: t('Permissions')+'…', hidden: data.davaccountId || (data.groupId && !rights.mayChangeResources), disabled:!data.myRights.mayReadItems, handler: async _ => {
 									const dlg = data.groupId ? new ResourceWindow() : new CalendarWindow();

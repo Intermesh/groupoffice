@@ -239,7 +239,7 @@ class EmailTemplate extends Entity
 	 */
 	public function toMessage(TemplateParser $templateParser): Message
 	{
-  	$message = go()->getMailer()->compose();
+  	    $message = go()->getMailer()->compose();
 		$subject = $templateParser->parse($this->subject);
 		$body = $templateParser->parse($this->body);
 

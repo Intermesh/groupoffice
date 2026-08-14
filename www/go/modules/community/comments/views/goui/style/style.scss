@@ -81,3 +81,24 @@
     min-width: 0;
   }
 }
+
+.goui .icon-comment-below-avatar {
+  color: var(--fg-secondary-text);
+  margin: dp(6) 0 0 0 ;
+  padding: 0;
+  font-size:  .85em !important;
+  min-height: dp(16);
+  height: dp(16);
+  width: dp(16);
+  min-width: dp(16);
+}
+.goui .icon-cnt-below-avatar {
+  display: flex;
+  justify-content: start;
+  align-items: start;
+}
+.goui .icon-cnt-below-avatar-creator {
+  display: flex;
+  justify-content: end;
+  align-items: end;
+}

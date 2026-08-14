@@ -26,17 +26,17 @@ use Throwable;
 
 /**
  * CSV converter.
- * 
+ *
  * Imports a CSV file to entities.
- * 
+ *
  * A mapping can be supplied to the JMAP controller or importFile() function. {@see importFile()}
- * 
- * The key is the CSV record index and value the 
+ *
+ * The key is the CSV record index and value the
  * 	property path. "propName" or "prop.name" if it's a relation.
  * 	If the relation is a has many values can be separated with " ::: ".
- * 
+ *
  * For example pass to the options:
- * 
+ *
  * [
  * 		"mapping" => [
  * 			"firstName",
@@ -49,16 +49,16 @@ class Spreadsheet extends AbstractConverter {
 	use EventEmitterTrait;
 
 	const EVENT_INIT = 0;
-	
+
 	/**
 	 *
 	 * @var array
 	 */
 	private $headers;
-	
+
 	/**
 	 * Delimits multiple values in single CSV field
-	 * 
+	 *
 	 * @var string
 	 */
 	public static $multipleDelimiter = '|';
@@ -66,7 +66,7 @@ class Spreadsheet extends AbstractConverter {
 	protected $delimiter = ',';
 
 	protected $enclosure = '"';
-	
+
 	/**
 	 * List headers to exclude
 	 * @var string[]
@@ -294,19 +294,19 @@ th {
 
 		return $blob;
 	}
-	
+
 	private $customColumns = [];
-	
+
 	/**
 	 * Add a custom column to the export and import
-	 * 
+	 *
 	 * @example
-	 * 
+	 *
 	 *	//override init
 	 * 	protected function init() {
 	 *		$this->addColumn('status', go()->t("Status", 'sony', 'assets'));
 	 *	}
-	 * 
+	 *
 	 * @param string $name Column name
 	 * @param string $label Column label
 	 * @param Callable $exportFunction Defaults to "export" . ucfirst($name) The function is called with Entity $entity, array $templateValues $columnName
@@ -319,30 +319,30 @@ th {
 		if(!isset($importFunction)) {
 			$importFunction = [$this, "import".ucfirst($name)];
 		}
-		
+
 		$this->customColumns[$name] = [
-				'name' => $name, 
+				'name' => $name,
 				'label' => $label,
 
-				'importFunction' => $importFunction, 
+				'importFunction' => $importFunction,
 				'exportFunction' => $exportFunction
 		];
 	}
-	
+
 	/**
 	 * Get a value for a header
-	 * 
+	 *
 	 * @param Entity $entity
 	 * @param array $templateValues
 	 * @param string $header Header name delimited with a . for sub properties. eg. "emailAddresses.email"
 	 * @return string
 	 */
 	protected function getValue(Entity $entity, $templateValues, $header) {
-		
+
 		if(isset($this->customColumns[$header])) {
 			return $this->getCustomColumnValue($entity, $templateValues, $header);
 		}
-				
+
 		$path = explode('.', $header);
 
 		while ($seg = array_shift($path)) {
@@ -412,20 +412,20 @@ th {
 
 		return $index;
 	}
-	
+
 	private function getCustomColumnValue(Entity $entity, $templateValues, $header) {
 		return call_user_func($this->customColumns[$header]['exportFunction'], $entity, $templateValues, $header);
 	}
-	
+
 	private function exportSubFields($record, $v) {
-		if(!is_array($v)) {			
+		if(!is_array($v)) {
 			$record[] = $v;
 			return $record;
 		}
 		foreach($v as $key => $subvalue) {
 			$record = $this->exportSubFields($record, $subvalue);
 		}
-		
+
 		return $record;
 	}
 
@@ -442,12 +442,12 @@ th {
    * @throws Exception
    */
 	public final function getHeaders() {
-		
+
 		if(!isset($this->headers)) {
 			$this->headers = $this->internalGetHeaders();
 		}
-		
-		return $this->headers;		
+
+		return $this->headers;
 	}
 
 	/**
@@ -540,7 +540,7 @@ th {
 				$headers["customFields"] = ['name' => 'customFields', 'label' => null, 'many' => false, 'grouped'=>true, 'properties' => $customFieldProps];
 			}
 		}
-		
+
 		if($forMapping) {
 			return array_merge($headers, $this->customColumns);
 		} else{
@@ -550,13 +550,13 @@ th {
 			}));
 		}
 	}
-	
+
 	private function addSubHeaders($headers, $header, $prop, $many = false, $forMapping = false) {
-		
+
 		if(in_array($header, static::$excludeHeaders)) {
 			return $headers;
 		}
-		
+
 		if(!($prop instanceof Relation)) {
 			if(!$prop->primary) {
 				//client will define labels if not given. Only custom fields provide label
@@ -606,7 +606,7 @@ th {
 				}
 			}
 		}
-		
+
 		return $headers;
 	}
 
@@ -631,7 +631,7 @@ th {
       ->orderBy(['count' => 'DESC'])
       ->single();
   }
-	
+
 	private function recordIsEmpty(array $record): bool
 	{
 		foreach($record as $v) {
@@ -728,10 +728,23 @@ th {
 			$cellIterator->setIterateOnlyExistingCells(FALSE); // This loops through all cells,
 			$cells = [];
 			foreach ($cellIterator as $cell) {
-				if(\PhpOffice\PhpSpreadsheet\Shared\Date::isDateTime($cell)) {
-					$v = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($cell->getValue());
-				} else{
-					$v = (string) $cell->getValue();
+				if (\PhpOffice\PhpSpreadsheet\Shared\Date::isDateTime($cell)) {
+					$v = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($cell->getCalculatedValue());
+				} else {
+					try {
+						$value = $cell->getCalculatedValue();
+					} catch (\PhpOffice\PhpSpreadsheet\Calculation\Exception $e) {
+						$value = '#ERROR: ' . $e->getMessage();
+					}
+
+					if (is_string($value) && isset($value[0]) && $value[0] === '#') {
+						ErrorHandler::log(
+							"Formula error in cell " . $cell->getCoordinate() . ": " . $value,
+							E_WARNING
+						);
+					}
+
+					$v = (string)$value;
 				}
 
 				$cells[] = $v;
@@ -758,7 +771,7 @@ th {
 		if(!isset($this->clientParams['mapping'])) {
 			throw new Exception("Mapping is required");
 		}
-		
+
 		if($this->recordIsEmpty($this->record)) {
 			return null;
 		}
@@ -800,7 +813,7 @@ th {
 		}
 		return $entity;
 	}
-	
+
 	protected function importCustomColumns(Entity $entity, $values){
 		foreach($this->customColumns as $c) {
 			if(isset($values[$c['name']])) {
@@ -964,10 +977,10 @@ th {
 
 		return $success;
 	}
-	
+
 	/**
 	 * Get headers from CSV
-	 * 
+	 *
 	 * @param File $file
 	 * @return string[]
 	 * @throws Exception
@@ -980,7 +993,7 @@ th {
 		if(!$headers) {
 			throw new Exception("Could not read CSV file");
 		}
-		
+
 		return $headers;
 	}
 

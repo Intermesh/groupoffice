@@ -193,6 +193,8 @@ class ICalendarHelper {
 			if(!empty($event->privacy) && $event->privacy !== 'public') $vevent->CLASS = self::$privacyMap[$event->privacy];
 			if(!empty($event->modifiedAt)) $vevent->{'LAST-MODIFIED'} = $event->modifiedAt->format('Ymd\THis\Z');
 			$vevent->DTSTAMP = new DateTime();
+
+			if(!empty($event->createdAt)) $vevent->{'CREATED'} = $event->createdAt->format('Ymd\THis\Z');
 		} else {
 			$rId = $vevent->add('RECURRENCE-ID', new DateTime($recurrenceId, $event->timeZone()));
 			if(!empty($event->showWithoutTime)) {
@@ -219,6 +221,8 @@ class ICalendarHelper {
 
 		if(!empty($event->color)) $vevent->COLOR = $event->color;
 		if(!empty($event->categoryIds)) $vevent->CATEGORIES = implode(',',$event->categoryNames());
+
+		if(!empty($event->freeBusyStatus) && $event->freeBusyStatus == CalendarEvent::FREEBUSY_FREE) $vevent->TRANSP = "TRANSPARENT";
 
 		if($event->participants) {
 			foreach ($event->participants as $participant) {
@@ -479,13 +483,32 @@ class ICalendarHelper {
 			$event->setValues((array)$obj); // title, description, start, duration, location, status, privacy
 			$event->prodId = $prodId;
 			$baseEvents[$event->uid] = $event;
-			if($event->isNew() && isset($vevent->{'DTSTAMP'})) {
-				try {$event->createdAt = $vevent->DTSTAMP->getDateTime();}
-				catch(VObject\InvalidDataException $e) {$event->createdAt = new \DateTime();}
+			if (isset($vevent->CREATED)) {
+				try {
+					$event->createdAt = $vevent->CREATED->getDateTime();
+				} catch (VObject\InvalidDataException $e) {
+					$event->createdAt = new \DateTime();
+				}
+			} else if ($event->isNew() && isset($vevent->DTSTAMP)) {
+				try {
+					$event->createdAt = $vevent->DTSTAMP->getDateTime();
+				} catch (VObject\InvalidDataException $e) {
+					$event->createdAt = new \DateTime();
+				}
 			}
-			if(isset($vevent->{'LAST-MODIFIED'})) {
-				try{$event->modifiedAt = $vevent->{'LAST-MODIFIED'}->getDateTime();}
-				catch(VObject\InvalidDataException $e) {$event->modifiedAt = new \DateTime(); }
+
+			if (isset($vevent->{'LAST-MODIFIED'})) {
+				try {
+					$event->modifiedAt = $vevent->{'LAST-MODIFIED'}->getDateTime();
+				} catch (VObject\InvalidDataException $e) {
+					$event->modifiedAt = new \DateTime();
+				}
+			} else if (isset($vevent->DTSTAMP)) {
+				try {
+					$event->modifiedAt = $vevent->DTSTAMP->getDateTime();
+				} catch (VObject\InvalidDataException $e) {
+					$event->modifiedAt = new \DateTime();
+				}
 			}
 			$event->showWithoutTime = !$vevent->DTSTART->hasTime();
 			if(isset($vevent->SEQUENCE))

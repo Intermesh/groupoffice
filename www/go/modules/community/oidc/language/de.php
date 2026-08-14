@@ -1,6 +1,6 @@
 <?php
 return array (
-  'Configuration URL' => 'Configuration URL',
+  'Configuration URL' => 'Konfigurations-URL',
   'The Open ID endpoint that implements the .well-known/openid-configuration path' => 'Open ID Endpoint, für den der .well-known/openid-configuration Pfad konfiguriert ist',
   'Client ID' => 'Client ID',
   'Client secret' => 'Client secret',

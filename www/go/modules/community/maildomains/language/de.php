@@ -93,7 +93,7 @@ return array (
   'Show inactive' => 'Inaktive anzeigen',
   'Login is required on this page' => 'Für diese Seite ist ein Login erforderlich',
   'PTR OK' => 'PTR OK',
-  'PTR error' => 'PTR error',
+  'PTR error' => 'PTR Fehler',
   'Mail hostname' => 'Mail Hostname',
   'The hostname of the mail system. Used for PTR, SPF and MX checks.' => 'Der Hostname des Mailsystems. Wird für PTR, SPF und MX Prüfungen verwendet.',
   'Your SPF record does not allow \'{mailhost}\'' => 'Der SPF Eintrag erlaubt \'{mailhost}\' nicht',

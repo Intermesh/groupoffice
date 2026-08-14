@@ -237,7 +237,7 @@ export class CalendarList extends Component<CalendarListEventMap> {
 						jmapds('Calendar').update(data.id, {isSubscribed: false}).catch(e => Window.error(e))
 					}}),
 					hr({hidden:data.groupId}),
-					btn({icon:'file_save',hidden:data.groupId, text: t('Export','core','core'), handler: _ => { client.getBlobURL('community/calendar/calendar/'+data.id).then(window.open) }}),
+					btn({icon:'file_save',hidden:data.groupId, text: t('Export','core','core'), handler: _ => { window.open(client.downloadUrl('community/calendar/calendar/'+data.id), '_blank') }}),
 					btn({icon:'upload_file',hidden:data.groupId, text:t('Import','core','core')+'…', handler: async ()=> {
 						const files = await browser.pickLocalFiles(false,false,'text/calendar');
 						const blob = await client.upload(files[0]);

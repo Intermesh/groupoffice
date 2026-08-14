@@ -31,4 +31,5 @@ return array (
   'Microsoft Excel' => 'Microsoft Excel',
   'Encrypt' => 'Verschlüsseln',
   'Passwords do not match' => 'Die Kennwörter stimmen nicht überein',
+  'notes' => 'Notizen',
 );

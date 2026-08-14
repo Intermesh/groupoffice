@@ -147,6 +147,12 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 
 			let writtenByUser = (client.user.id == comment.creator.id);
 
+			if (comment.mimeMessageId) {
+				const mimeTypeCmp = comp({tagName: "i", cls: "goui icon icon-comment-below-avatar", title: t("Imported from mail"), html: "email"})
+				const iconCntCls = writtenByUser ? "icon-cnt-below-avatar-creator": "icon-cnt-below-avatar";
+				avatarCnt.items.add(comp({cls: iconCntCls}, mimeTypeCmp));
+			}
+
 			let commentTitle = t("{author} wrote at {date}")
 				.replace("{author}", comment.creator.name)
 				.replace("{date}", Format.dateTime(comment.createdAt));
