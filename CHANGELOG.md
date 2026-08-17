@@ -1,3 +1,5 @@
+- Core: Update FPDI to the latest version in order to work with the commercial PDF parser #1545
+
 10-08-2026: 6.8.176
 - PR/Fix: Tree EntityLoader crashes when a node is destroyed during async load #1536
 - PR/Fix: Custom fields broken for any entity whose clientName differs from its short class name #1534
