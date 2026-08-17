@@ -11,6 +11,7 @@
 - Core: Remove cron output with deleted blob count
 - Core: pin tcpdf to v6.11.3 as 7 breaks
 - Email: Workaround Exchange Online bug.  It occasionally responds with "User is authenticated but not connected". See https://techcommunity.microsoft.com/discussions/outlookgeneral/microsoft-exchange-server-error-user-is-authenticated-but-not-connected-/3747957
+- Calendar: Only load from API if ID is set. Fixes error on opening ICS file from e-mail
 
 10-08-2026: 26.0.41
 - Calendar: default DE translation for 'Event' should be 'Termin'
