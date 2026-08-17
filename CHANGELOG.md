@@ -1,4 +1,5 @@
-- Core: Implemented custom field type "Attachments" in GOUI. 
+17-08-2026: 26.0.42
+- Core: Implemented custom field type "Attachments" in GOUI.
 - Finance: Fixed switching from B2B to B2C in dialog
 - Finance / Contracts / Catalog: Store price incl. and excl. and store price entered by user to solve rounding issues
 - Catalog: Made it easier to show all items again after filtering on category
