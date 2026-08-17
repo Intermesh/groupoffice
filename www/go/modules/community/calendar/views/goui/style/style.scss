@@ -481,6 +481,7 @@ $timeMargin: dp(72);
 		position:absolute;
 		left: $timeMargin;
 		right:0;
+		pointer-events: none;
 		> div {
 			display: flex;
 			align-items: center;
