@@ -1,3 +1,4 @@
+- Calendar: Possible to add full-day event in the all-day top row of the week view
 - Core: Implemented custom field type "Attachments" in GOUI. 
 - Finance: Fixed switching from B2B to B2C in dialog
 - Finance / Contracts / Catalog: Store price incl. and excl. and store price entered by user to solve rounding issues
