@@ -22,7 +22,7 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 	protected wdays = 7
 
 	protected internalRender() {
-		this.makeDraggable(this.el);
+		this.makeDraggableDay(this.el);
 
 		this.el.tabIndex = 0;
 		this.el.on('keydown', (e: KeyboardEvent) => {
@@ -79,91 +79,6 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 		}
 		this.renderView();
 		this.adapter.goto(this.start, endMonth);
-	}
-
-	protected makeDraggable(el: HTMLElement) {
-		let from : HTMLElement,
-			till: HTMLElement,
-			last: HTMLElement,
-			anchor: HTMLElement,
-			currentH = (new DateTime).format('H'),
-			ev: CalendarItem,
-			action: (day:HTMLElement) => void,
-			hasMoved= false;
-
-		const create = (day: HTMLElement) => {
-			[from, till] = (anchor.compareDocumentPosition(day) & 0x02) ? [day,anchor] : [anchor,day];
-
-			ev.data.showWithoutTime = from !== till || !client.user.calendarPreferences.defaultDuration;
-			if(ev.data.showWithoutTime) {
-				ev.start = new DateTime(from.dataset.date!+' 00:00:00.000');
-				ev.end = new DateTime(till.dataset.date!+' 00:00:00.000').addDays(1);
-			} else {
-				const time = ' '+currentH+':00:00.000';
-				ev.start = new DateTime(from.dataset.date!+time);
-				ev.end = new DateTime(till.dataset.date!+time).add(new DateInterval(ev.data.duration));
-			}
-		},
-		move = (day:HTMLElement) => {
-			let [y,m,d] = day.dataset.date!.split('-').map(Number);
-			ev.start.setYear(y).setMonth(m).setDate(d);
-			ev.end = ev.start.clone().add(new DateInterval(ev.data.duration));
-		},
-		mouseMove = (e: MouseEvent & {target: HTMLElement}) => {
-
-			const day = e.target.up('li[data-date]');
-			if(day && day != last) {
-				hasMoved = true;
-				last = day;
-				action(day)
-				Object.values(ev.divs).forEach(d => d.remove());
-				ev.divs = {};
-				this.updateItems();
-			}
-		},
-		mouseUp = (_e: MouseEvent) => {
-			el.un('mousemove', mouseMove);
-			(hasMoved || action === create) && ev.save( () => {
-				this.currentCreation = undefined;
-				this.populateViewModel();
-			});
-		};
-		el.on('mousedown', (e) => {
-			if(e.button !== 0) return;
-			e.preventDefault(); // no text selection
-			const event = e.target.up('div[data-key]');
-			if(event) {
-				ev = this.viewModel.find(m => m.key == event.dataset.key)!;
-				if (ev && ev.mayChange) {
-					action = move;
-					el.on('mousemove', mouseMove);
-					window.addEventListener('mouseup', mouseUp, {once: true});
-				}
-				return;
-			}
-			const day = e.target.up('li[data-date]');
-			if(day) {
-				const dd = client.user.calendarPreferences.defaultDuration,
-					startStr = day.dataset.date! + (dd ? (new DateTime).format(' H:00:00.000') : ' 00:00:00.000');
-				const data = {
-						start: startStr,
-						title: t('New event'),
-						duration: dd ?? 'P1D',
-						calendarId: CalendarView.selectedCalendarId,
-						showWithoutTime: !dd
-					},
-					start = (new DateTime(data.start));
-				this.currentCreation = ev = new CalendarItem({start, data, key: ''});
-				this.viewModel.unshift(ev);
-				this.updateItems();
-				//this.drawEvent(ev, weekStart);
-				//eventsContainer.prepend(ev.divs[0]);
-				anchor = from = till = day;
-				action = create;
-				el.on('mousemove', mouseMove);
-				window.addEventListener('mouseup', mouseUp, {once:true});
-			}
-		});
 	}
 
 	protected clear() {
