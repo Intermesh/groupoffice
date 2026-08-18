@@ -5,7 +5,7 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 	isFormField: true,
 	_isDirty: false,
 	hidden: false,
-
+	hasDisposition: true,
 	hasDescription: false,
 
 	initComponent: function () {
@@ -13,19 +13,22 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 		const fields = [
 			"blobId",
 			"name",
-			{
-				name: "inline",
-				type: "bool"
-			}, {
-				name: "attachment",
-				type: "bool"
-			}
+
 		];
 
 		if(this.hasDescription) {
 			fields.push("description");
 		}
 
+		if(this.hasDisposition) {
+			fields.push({
+				name: "inline",
+					type: "bool"
+			}, {
+				name: "attachment",
+					type: "bool"
+			});
+		}
 		this.store = new go.data.Store({
 			fields
 		});
