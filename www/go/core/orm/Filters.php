@@ -426,6 +426,14 @@ class Filters {
 	 *
 	 * now...2025-01-01 will return [['comparator' => '>=', 'date' => DateTime('now')], ['comparator' => '<', 'date' => new DateTime('2025-01-02')]]
 	 *
+	 * @example
+	 * ```
+	 * $range = Filters::parseDateRange('now..2025-01-01');
+	 * foreach($range as $r) {
+	 *   $query->andWhere('due', $r['comparator'], $r['date']);
+	 * }
+	 *
+	 * ```
 	 * @param string|null $value
 	 * @param bool $convertTimeZone
 	 * @return array<int, array{comparator: string, date: DateTime}>
