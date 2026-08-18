@@ -1,3 +1,5 @@
+- Files: Continue saving file when saving older version fails. Fixes PDFeditor problem.
+
 17-08-2026: 26.0.42
 - Core: Implemented custom field type "Attachments" in GOUI.
 - Calendar: Possible to add full-day event in the all-day top row of the week view
