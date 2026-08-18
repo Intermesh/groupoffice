@@ -1,4 +1,5 @@
 - Files: Continue saving file when saving older version fails. Fixes PDFeditor problem.
+- Finance: Support for extra e-mail attachments in documents
 
 17-08-2026: 26.0.42
 - Core: Implemented custom field type "Attachments" in GOUI.
