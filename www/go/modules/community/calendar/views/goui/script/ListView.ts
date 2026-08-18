@@ -55,7 +55,7 @@ export class ListView extends CalendarView {
 
 	}
 
-	private updateItems() {
+	protected updateItems() {
 		this.listEl.innerHTML = ''; //clear
 		this.continues = [];
 		this.iterator = 0;
