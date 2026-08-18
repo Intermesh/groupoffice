@@ -261,7 +261,7 @@ export class WeekView extends CalendarView {
 			);
 			const dayContainer = E('dd').cls('weekend',day.getDay()%6==0).attr('data-day', day.format('Y-m-d'));
 			this.dayCols[day.format('Ymd')] = dayContainer;
-			fullDays.push(E('li').cls('weekend',day.getDay()%6==0).attr('data-day', day.format('Y-m-d')))
+			fullDays.push(E('li').cls('weekend',day.getDay()%6==0).attr('data-date', day.format('Y-m-d')))
 			days.push(dayContainer);
 			if(now.format('Ymd') === day.format('Ymd')) {
 				showNowBar = true;
