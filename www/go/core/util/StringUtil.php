@@ -1235,12 +1235,12 @@ END;
 	/**
 	 * Format a number by using the user preferences
 	 *
-	 * @param int $number The number
+	 * @param ?float $number The number
 	 * @param int $decimals Number of decimals to display
 	 * @access public
 	 * @return string
 	 */
-	public static function localizeNumber(?int $number = null, int $decimals = 2): string
+	public static function localizeNumber(?float $number = null, int $decimals = 2): string
 	{
 		if ($number === null) {
 			return "";

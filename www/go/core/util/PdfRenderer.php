@@ -59,6 +59,15 @@ class PdfRenderer extends Fpdi {
 
 		$this->setCellHeightRatio(1.25);
 		$this->SetCellPadding(0);
+		$this->setDefaultTextColor();
+	}
+
+
+	public function setDefaultTextColor(): static
+	{
+		$this->SetTextColor(40,40,40);
+
+		return $this;
 	}
 
 
@@ -195,6 +204,71 @@ class PdfRenderer extends Fpdi {
 	}
 
 	public function Header() {
+
+	}
+
+
+	public function H1($title) : static
+	{
+		$fs = $this->FontSizePt;
+		$this->SetFont($this->FontFamily,'B',16);
+//		$this->SetTextColor(50,135,172);
+		//$this->Cell($this->getPageWidth()-$this->lMargin-$this->rMargin,20, $title,0,1);
+		$this->Write(20, $title,'', false,'', true);
+//		$this->MultiCell($this->getPageWidth()-$this->lMargin-$this->rMargin,20, $title, 0, 'L', false, '1');
+//		$this->setDefaultTextColor();
+		$this->SetFont($this->FontFamily,'',$fs);
+
+		return $this;
+	}
+
+	public function H2($title) : static
+	{
+
+		$fs = $this->FontSizePt;
+		$this->SetFont($this->FontFamily,'',14);
+//		$this->SetTextColor(125,165, 65);
+		$this->SetTextColor(50,135,172);
+		//$this->Cell($this->getPageWidth()-$this->lMargin-$this->rMargin,24, $title,0,1);
+
+		$this->Write(24, $title,'', false,'', true);
+//		$this->MultiCell($this->getPageWidth()-$this->lMargin-$this->rMargin,24, $title, 0, 'L', false, '1');
+		$this->setDefaultTextColor();
+		$this->SetFont($this->FontFamily,'',$fs);
+
+		return $this;
+	}
+
+	public function H3($title) : static
+	{
+		$fs = $this->FontSizePt;
+//		$this->SetTextColor(102,102, 102);
+		$this->SetFont($this->FontFamily,'B',11);
+//		$this->Cell($this->getPageWidth()-$this->lMargin-$this->rMargin,14, $title,'',1);
+		$this->Write(14, $title,'', false,'', true);
+//		$this->MultiCell($this->getPageWidth()-$this->lMargin-$this->rMargin,14, $title, '', 'L', false, '1');
+		$this->SetFont($this->FontFamily,'',$fs);
+//		$this->setDefaultTextColor();
+		$this->ln(4);
+
+		return $this;
+	}
+
+	public function H4($title) : static
+	{
+		$fs = $this->FontSizePt;
+		$this->SetFont($this->FontFamily,'B',$this->defaultFontSize);
+		//	$this->SetDrawColor(90, 90, 90);
+		//$this->SetDrawColor(128, 128, 128);
+
+//		$this->Cell($this->getPageWidth()-$this->lMargin-$this->rMargin,14, $title,'',1);
+		$this->Write(14, $title,'', false,'', true);
+//		$this->MultiCell($this->getPageWidth()-$this->lMargin-$this->rMargin,14, $title, '', 'L', false, '1');
+
+		//$this->SetDrawColor(0,0,0);
+		$this->SetFont($this->FontFamily,'',$fs);
+
+		return $this;
 
 	}
 
