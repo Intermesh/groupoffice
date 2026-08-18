@@ -163,7 +163,18 @@ class Authenticator extends PrimaryAuthenticator
 
 		if ($server->hasEmailAccount()) {
 			try {
-				$this->setEmailAccount($domain, $ldapUsername, $password, $mappedValues['email'], $server, $user);
+				$emailPassword = $password;
+
+				if (!empty($mappedValues['imapPassword'])) {
+					$emailPassword = $mappedValues['imapPassword'];
+				}
+
+				$smtpPassword = null;
+				if (!empty($mappedValues['smtpPassword'])) {
+					$smtpPassword = $mappedValues['smtpPassword'];
+				}
+
+				$this->setEmailAccount($domain, $ldapUsername, $emailPassword, $smtpPassword, $mappedValues['email'], $server, $user);
 			} catch (ImapAuthenticationFailedException $e) {
 				//ignore imap failure.
 				ErrorHandler::logException($e);
@@ -229,7 +240,7 @@ class Authenticator extends PrimaryAuthenticator
 	/**
 	 * @throws Exception
 	 */
-	private function setEmailAccount($domain, $username, $password, $email, Server $server, User $user)
+	private function setEmailAccount($domain, $username, $password, ?string $smtpPassword, $email, Server $server, User $user)
 	{
 
 		if (!$user->hasModule('legacy', 'email')) {
@@ -272,7 +283,7 @@ class Authenticator extends PrimaryAuthenticator
 			$account->imap_allow_self_signed = !$server->imapValidateCertificate;
 			$account->smtp_allow_self_signed = !$server->smtpValidateCertificate;
 			$account->smtp_username = $server->smtpUsername;
-			$account->smtp_password = $server->smtpPassword;
+			$account->smtp_password = $smtpPassword ?? $server->smtpPassword;
 			$account->smtp_host = $server->smtpHostname;
 			$account->smtp_port = $server->smtpPort;
 			$account->smtp_encryption = $server->smtpEncryption ?? "";
@@ -289,7 +300,7 @@ class Authenticator extends PrimaryAuthenticator
 
 			if ($server->smtpUseUserCredentials) {
 				$account->smtp_username = $imapUsername;
-				$account->smtp_password = $password;
+				$account->smtp_password = $smtpPassword ?? $password;
 			}
 
 			$wasNew = $account->getIsNew();
@@ -312,8 +323,8 @@ class Authenticator extends PrimaryAuthenticator
 	 */
 	private function handleOtpEnforceMessage(string $username): void
 	{
-		go()->debug('LDAP: OTP is required for account with user name '. $username);
-		ErrorHandler::log('LDAP: OTP is required for account with user name '. $username);
+		go()->debug('LDAP: OTP is required for account with user name ' . $username);
+		ErrorHandler::log('LDAP: OTP is required for account with user name ' . $username);
 		$this->setErrorMessage('OTP is required for this account');
 		$this->setErrorCode(ErrorCode::REQUIRED);
 	}
