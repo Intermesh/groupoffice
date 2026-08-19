@@ -27,7 +27,7 @@ export class WeekView extends CalendarView {
 		}, 60000);
 
 		this.makeDraggable();
-		this.makeDraggableDay(this.el); // full-day item in top bar
+		this.makeDraggableDay(this.el, true); // full-day item in top bar
 		this.el.tabIndex = 0;
 
 		this.el.on('keydown', (e: KeyboardEvent) => {

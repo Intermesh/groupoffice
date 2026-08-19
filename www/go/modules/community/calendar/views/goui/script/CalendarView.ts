@@ -85,7 +85,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 		btn({icon: 'import_export', text: t('Download ICS'), handler: _ => this.current!.downloadIcs() })
 	);
 
-	protected makeDraggableDay(el: HTMLElement) {
+	protected makeDraggableDay(el: HTMLElement, withoutTime = false) {
 		let from : HTMLElement,
 			till: HTMLElement,
 			last: HTMLElement,
@@ -98,7 +98,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 		const create = (day: HTMLElement) => {
 				[from, till] = (anchor.compareDocumentPosition(day) & 0x02) ? [day,anchor] : [anchor,day];
 
-				ev.data.showWithoutTime = from !== till || !client.user.calendarPreferences.defaultDuration;
+				ev.data.showWithoutTime = from !== till || withoutTime || !client.user.calendarPreferences.defaultDuration;
 				if(ev.data.showWithoutTime) {
 					ev.start = new DateTime(from.dataset.date!+' 00:00:00.000');
 					ev.end = new DateTime(till.dataset.date!+' 00:00:00.000').addDays(1);
@@ -148,13 +148,13 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 			const day = e.target.up('li[data-date]');
 			if(day) {
 				const dd = client.user.calendarPreferences.defaultDuration,
-					startStr = day.dataset.date! + (dd ? (new DateTime).format(' H:00:00.000') : ' 00:00:00.000');
+					startStr = day.dataset.date! + ((withoutTime || !dd) ? ' 00:00:00.000' : (new DateTime).format(' H:00:00.000'));
 				const data = {
 						start: startStr,
 						title: t('New event'),
 						duration: dd ?? 'P1D',
 						calendarId: CalendarView.selectedCalendarId,
-						showWithoutTime: !dd
+						showWithoutTime: withoutTime || !dd
 					},
 					start = (new DateTime(data.start));
 				this.currentCreation = ev = new CalendarItem({start, data, key: ''});
