@@ -81,8 +81,8 @@ class Mapping {
 	 *
 	 * @param string $name The table name
 	 * @param string|null $alias The table alias to use in the queries
-	 * @param array|null $keys [thiscol => targetcol] If null then it's assumed the key name is identical in
-	 *   this and the last added table. eg. ['id' => 'id']
+	 * @param array|null $keys [previousTableCol => thisTableCol] If null then it's assumed the key name is identical in
+	 *   this and the last added table. eg. ['last.id' => 'this.id']
 	 * @param array|null $columns Leave this null if you want to automatically build
 	 *   this based on the properties the model has. If you're extending a model
 	 *   then this is not possible and you must supply all columns you do want to
