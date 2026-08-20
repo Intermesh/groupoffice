@@ -130,6 +130,11 @@ class Module extends core\Module implements DomainProvider
 //					//relative path from group-office file_storage_path
 //					return "ldap_homes/" . $record->uid[0] . "/files";
 //				}
+
+//				 example for imap and/or smtp password fields
+//				'imapPassword' => 'imapPassword',
+//				'smtpPassword' => 'smtpPassword'
+
 			];
 		}
 		$mapping = self::map($cfg['ldapMapping'], $record);

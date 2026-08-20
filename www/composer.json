@@ -22,7 +22,7 @@
     "ext-openssl": "*",
     "ext-imagick": "*",
     "michelf/php-markdown": "@stable",
-    "tecnickcom/tcpdf": "@stable",
+    "tecnickcom/tcpdf": "6.11.3",
     "dragonmantank/cron-expression": "@stable",
     "setasign/fpdi": "@stable",
     "matthiasmullie/minify": "@stable",

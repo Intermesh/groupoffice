@@ -6,6 +6,7 @@ use Exception;
 use GO;
 use GO\Base\Fs\File;
 use GO\Base\Mail\Exception\ImapAuthenticationFailedException;
+use go\core\ErrorHandler;
 use go\core\util\DateTime;
 
 class Imap extends ImapBodyStruct
@@ -37,7 +38,7 @@ class Imap extends ImapBodyStruct
 	/**
 	 * @var null|string
 	 */
-	private $token;
+	private $token = null;
 
 	var $selected_mailbox=false;
 
@@ -113,7 +114,7 @@ class Imap extends ImapBodyStruct
 		$this->starttls = $starttls;
 		$this->auth = strtolower($auth);
 
-		if ($token) {
+		if (isset($token)) {
 			$this->token = $token;
 		}
 
@@ -149,6 +150,11 @@ class Imap extends ImapBodyStruct
 			go()->debug('S: ' . $greeting);
 		}
 		return $this->authenticate($username, $password);
+	}
+
+	private function reconnect() {
+		$this->disconnect();
+		return $this->connect($this->server, $this->port, $this->username, $this->password, $this->ssl, $this->starttls, $this->auth, $this->token);
 	}
 
 //	private function handleGreeting($greeting) {
@@ -208,7 +214,6 @@ class Imap extends ImapBodyStruct
 	 * @return bool
 	 * @throws \Exception|ImapAuthenticationFailedException
 	 */
-
 	private function authenticate(string $username, string $pass): bool
 	{
 		if ($this->starttls) {
@@ -282,6 +287,7 @@ class Imap extends ImapBodyStruct
 					$this->banner = $res[0];
 				}
 			}
+
 			if (stristr($response, 'A' . $this->command_count . ' OK')) {
 				$authed = true;
 				$this->state = 'authed';
@@ -289,6 +295,17 @@ class Imap extends ImapBodyStruct
 //				$this->handleGreeting($response);
 			}else
 			{
+				// Azure quirck workaround :(
+				// https://techcommunity.microsoft.com/discussions/outlookgeneral/microsoft-exchange-server-error-user-is-authenticated-but-not-connected-/3747957
+				if(str_contains($response,'User is authenticated but not connected')) {
+					ErrorHandler::log("AZURE QUIRCK");
+					sleep(2);
+					return $this->reconnect();
+				}
+
+				ErrorHandler::log("IMAP AUTHENTICATION FAILED: $response");
+				ErrorHandler::log($this->last_error(false));
+
 				throw new ImapAuthenticationFailedException('Authentication failed for user '.$username.' on IMAP server '.$this->server);
 			}
 		}

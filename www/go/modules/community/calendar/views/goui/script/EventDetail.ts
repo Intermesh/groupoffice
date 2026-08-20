@@ -307,7 +307,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 	 * @param id
 	 */
 	async load(id:EntityID): Promise<this> {
-		const r = await super.load(id);
+		// const r = await super.load(id);
 
 		if(!calendarStore.loaded) await calendarStore.load();
 
@@ -349,7 +349,6 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 			this.statusTbar.show();
 
 		} else {
-			// await super.load(ev.data.id);
 
 			this.toolbar.show();
 
@@ -384,11 +383,13 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 				this.showCalendar.hidden = this.item.mayMove
 				this.selectCalendar.hidden = !this.item.mayMove;
 			});
+
+			await super.load(ev.data.id)
 		}
 		this.scroller.hidden = false;
 		this.disabled = false;
 
-		return await super.load(ev.data.id);
+		return this;
 	}
 
 }

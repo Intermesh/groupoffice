@@ -718,10 +718,16 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		$this->fireEvent('saveversion', array($this));
 		
 		if(\GO::config()->max_file_versions > -1){
-			$version = new Version();
-			$version->file_id = $this->id;
-			$version->size_bytes = $this->size;
-			$version->save();
+			try {
+				$version = new Version();
+				$version->file_id = $this->id;
+				$version->size_bytes = $this->size;
+				$version->save();
+			} catch(\Throwable $e) {
+				$this->version--;
+				ErrorHandler::logException($e, "Failed to save version for file ID: ". $this->id);
+				return $this->fsFile->path();
+			}
 
 			return $version->path;
 		} else {

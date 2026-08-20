@@ -105,8 +105,6 @@ class GarbageCollection extends CronJob {
 			Blob::delete($query);
 			EntityType::push();
 
-			echo Blob::deleteLastCount() ."\n";
-
 			$count += Blob::deleteLastCount();
 		}while(Blob::deleteLastCount());
 
