@@ -127,8 +127,8 @@ class Module extends core\Module implements DomainProvider
 //				}
 
 //				 example for imap and/or smtp password fields
-				'imapPassword' => 'imapPassword',
-				'smtpPassword' => 'smtpPassword'
+//				'imapPassword' => 'imapPassword',
+//				'smtpPassword' => 'smtpPassword'
 
 			];
 		}
