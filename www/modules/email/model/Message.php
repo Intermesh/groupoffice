@@ -153,6 +153,7 @@ abstract class Message extends \GO\Base\Model
 		$this->attributes['reply_to'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8($this->attributes['reply_to']));
 
 		$this->attributes['x_priority']= isset($this->attributes['x_priority']) ? strtolower($this->attributes['x_priority']) : 3;
+		$this->attributes['auto_submitted']= !empty($this->attributes['auto_submitted']) ? strtolower($this->attributes['auto_submitted']) : "no";
 		
 		switch($this->attributes['x_priority']){
 			case 'high':

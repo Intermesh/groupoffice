@@ -1553,7 +1553,7 @@ class Imap extends ImapBodyStruct
 						"DATE CONTENT-TYPE X-PRIORITY TO CC";
 
 		if($full_data) {
-			$command .= " BCC REPLY-TO DISPOSITION-NOTIFICATION-TO CONTENT-TRANSFER-ENCODING MESSAGE-ID REFERENCES IN-REPLY-TO";
+			$command .= " BCC REPLY-TO DISPOSITION-NOTIFICATION-TO CONTENT-TRANSFER-ENCODING MESSAGE-ID REFERENCES IN-REPLY-TO AUTO-SUBMITTED";
 		}
 
 		if(!empty($extraHeaders)) {
@@ -1567,7 +1567,7 @@ class Imap extends ImapBodyStruct
 		$res = $this->get_response(false, true);
 
 		$tags = array('UID' => 'uid', 'FLAGS' => 'flags', 'X-GM-LABELS' => 'flags', 'RFC822.SIZE' => 'size', 'INTERNALDATE' => 'internal_date');
-		$junk = array_merge(array('SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', 'CC','BCC', '(', ')', ']', 'X-PRIORITY', 'DATE','REPLY-TO','DISPOSITION-NOTIFICATION-TO','CONTENT-TRANSFER-ENCODING', 'MESSAGE-ID', 'REFERENCES', 'IN-REPLY-TO'), $extraHeaders);
+		$junk = array_merge(array('SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', 'CC','BCC', '(', ')', ']', 'X-PRIORITY', 'DATE','REPLY-TO','DISPOSITION-NOTIFICATION-TO','CONTENT-TRANSFER-ENCODING', 'MESSAGE-ID', 'REFERENCES', 'IN-REPLY-TO', 'AUTO-SUBMITTED'), $extraHeaders);
 
 		$headers = array();
 		foreach ($res as $n => $vals) {
@@ -1589,6 +1589,7 @@ class Imap extends ImapBodyStruct
 					'message_id'=>'',
 					'references'=>'',
 					'in_reply_to'=>'',
+					'auto_submitted'=>'no',
 					'content_type'=>'',
 					'content_type_attributes'=>array(),
 					'disposition_notification_to'=>'',
