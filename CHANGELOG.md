@@ -3,8 +3,9 @@
 - Projects3: When invoicing projects, a single line item will be created for time entries and a detailed specification 
   will be attached to the invoice
 - ldapauthenticator: new mapping fields to retrieve imap and smtp password from LDAP
-- support: Notification settings for auto reply, agent notification and agent assigned
-- support: Status icon if a message was imported, sent or sending failed
+- Support: Notification settings for auto reply, agent notification and agent assigned
+- Support: Status icon if a message was imported, sent or sending failed
+- Support: Don't import auto submitted e-mail messages
 
 17-08-2026: 26.0.42
 - Core: Implemented custom field type "Attachments" in GOUI.
