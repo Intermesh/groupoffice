@@ -1,42 +1,13 @@
 import {BaseEntity, t} from "@intermesh/goui";
 import {UserSettingsPanel} from "./UserSettingsPanel.js";
-import {client, extjswrapper, JmapDataSource, modules, moduleSettings} from "@intermesh/groupoffice-core";
+import {JmapDataSource, modules} from "@intermesh/groupoffice-core";
 
 modules.register({
 	package: "legacy",
 	name: "email",
 	mainPanel: "GO.email.EmailClient",
 	title: t("E-mail"),
-	async init() {
-		client.on("authenticated", ({session}) => {
-			if (!session.capabilities['go:legacy:email']) {
-				return;
-			}
-
-			moduleSettings.addPanel(UserSettingsPanel);
-			// const id = (m.package ?? "legacy") + "/" + m.moduleName;
-			//
-			// this.mainPanels[id] = {
-			// 	package: m.package,
-			// 	module: m.moduleName,
-			// 	id: id,
-			// 	title: m.title,
-			// 	callback: () => {
-			//
-			// 		const pnl = GO.moduleManager.getPanel(m.moduleName);
-			// 		pnl.header = false;
-			//
-			// 		return extjswrapper({
-			// 			cls: "fit",
-			// 			title: m.title,
-			// 			comp: Ext.create(pnl)
-			// 		});
-			// 	}
-			// };
-
-
-		});
-	}
+	userSettingsPanels:[UserSettingsPanel]
 });
 
 export interface Template extends BaseEntity {
