@@ -228,7 +228,29 @@ class Sync extends Controller
 			}
 		}
 
-		$mailDomain = isset($record->mail[0]) ? explode('@', $record->mail[0])[1] : null;
+		// Determine email using LDAP mapping if available
+		$config = go()->getConfig();
+		$mapping = $config['ldapMapping'] ?? null;
+
+		$mail = null;
+
+		if (isset($mapping['email'])) {
+        		if (is_callable($mapping['email'])) {
+                		$mail = $mapping['email']($record);
+        		} else {
+                		$attr = strtolower($mapping['email']);
+                		$mail = $record->{$attr}[0] ?? null;
+        		}
+		}
+
+		// Fallback to default LDAP mail attribute
+		if (!$mail) {
+        		$mail = $record->mail[0] ?? null;
+		}
+
+		$mailDomain = $mail && str_contains($mail, '@')
+        		? explode('@', $mail, 2)[1]
+        		: null;
 
 		if (empty($domain) || !in_array($domain, $this->domains)) {
 			go()->info("Using domain from mail property for " . $username);
