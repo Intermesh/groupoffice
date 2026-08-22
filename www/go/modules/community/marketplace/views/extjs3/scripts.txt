@@ -1,0 +1,7 @@
+RegisterWindow.js
+LoginWindow.js
+RepositoryDialog.js
+CatalogGrid.js
+RepositorySection.js
+SystemSettingsPanel.js
+Module.js
