@@ -201,4 +201,9 @@ class Principal extends AclOwnerEntity
 		return [];
 	}
 
+
+	protected static function defaultSort(): array
+	{
+		return ['name' => 'ASC'];
+	}
 }
