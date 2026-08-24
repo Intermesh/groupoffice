@@ -2,8 +2,9 @@
   "type": "module",
   "name": "otp",
   "devDependencies": {
+    "@types/qrcode": "^1.5.6",
     "concurrently": "latest",
-    "esbuild": "latest",
+    "esbuild": "^0.28.2",
     "sass": "latest",
     "typescript": "5.9.*"
   },
@@ -19,6 +20,8 @@
     "prepare": "npm run build"
   },
   "dependencies": {
-    "copyfiles": "^2.4.1"
+    "copyfiles": "^2.4.1",
+    "otplib": "^13.5.0",
+    "qrcode": "^1.5.4"
   }
 }

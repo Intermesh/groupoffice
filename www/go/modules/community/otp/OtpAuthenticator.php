@@ -66,7 +66,7 @@ class OtpAuthenticator extends SecondaryAuthenticator
 			->select(['id', 'expiresAt'])
 			->from('otp_secret', 's')
 			->join('core_user', 'u', 'u.id = s.userId')
-			->where(['username' => $username, 'verified' => true])->single();
+			->where(['username' => $username])->single();
 
 		if (!$otp) {
 			return false;

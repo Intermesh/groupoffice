@@ -3,6 +3,7 @@
 namespace go\modules\community\otp\model;
 
 use DateTime;
+use DateTimeInterface;
 use Exception;
 use go\core\exception\Forbidden;
 use go\core\fs\Blob;
@@ -21,17 +22,10 @@ require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' .
  */
 class OtpAuthenticator extends Property
 {
-
-	public $userId;
-	protected $secret;
-	public ?\DateTimeInterface $createdAt = null;
-
-	protected bool $verified = false;
-
-	private ?string $verify = null;
-	public static bool $requestSecret = false;
-	public ?\DateTimeInterface $expiresAt = null;
-
+	public int $userId;
+	protected ?string $secret;
+	public DateTimeInterface|null $createdAt = null;
+	public DateTimeInterface|null $expiresAt = null;
 	protected int $codeLength = 6;
 
 	protected static function defineMapping(): Mapping
@@ -41,55 +35,17 @@ class OtpAuthenticator extends Property
 
 	public function getSecret()
 	{
-
-		if (!self::$requestSecret) {
-			return null;
-		}
-
-
-		if (!$this->owner->hasPermissionLevel(Acl::LEVEL_WRITE)) {
-			throw new Forbidden();
-		}
-
-		return $this->secret;
+		return null;
 	}
 
-	public function setRequestSecret($value)
-	{
-		if (!$value) {
-			return;
-		}
 
-		if (!$this->owner->hasPermissionLevel(Acl::LEVEL_WRITE)) {
-			throw new Forbidden();
-		}
-		self::$requestSecret = true;
-		$this->secret = $this->createSecret();
-
-	}
-
-	public function setVerify($code)
-	{
-		$this->verify = $code;
-	}
-
-	public function setSecret($secret)
+	public function setSecret(string $secret): void
 	{
 		$this->secret = $secret;
 	}
 
 	protected function internalValidate()
 	{
-
-		// When saving the new secret, the code needs to be verified first
-		if (!empty($this->verify)) {
-
-			if (!$this->verifyCode($this->verify)) {
-				$this->setValidationError('verify', \go\core\validate\ErrorCode::INVALID_INPUT, "The verify code is not correct.");
-			} else {
-				$this->verified = true;
-			}
-		}
 
 		// Temporary secrets need not be validated against currently verified password
 		if (!empty($this->expiresAt)) {
@@ -107,63 +63,6 @@ class OtpAuthenticator extends Property
 		parent::internalValidate();
 	}
 
-	protected function internalSave(): bool
-	{
-		if (empty($this->secret)) {
-			$this->secret = $this->createSecret();
-		}
-
-		// When saving a temporary secret, e,g. from LDAP, the secret is verified by definition
-		if ($this->isNew() && !empty($this->expiresAt)) {
-			$this->verified = true;
-		}
-
-		return parent::internalSave();
-	}
-
-	/**
-	 * Create new secret.
-	 * 16 characters, randomly chosen from the allowed base32 characters.
-	 *
-	 * @param int $secretLength
-	 *
-	 * @return string
-	 * @throws Exception
-	 */
-	private function createSecret(int $secretLength = 32): string
-	{
-		$validChars = $this->_getBase32LookupTable();
-
-		// Valid secret lengths are 80 to 640 bits
-		if ($secretLength < 16 || $secretLength > 128) {
-			throw new Exception('Bad secret length');
-		}
-		$secret = '';
-		$rnd = false;
-		if (function_exists('random_bytes')) {
-			$rnd = random_bytes($secretLength);
-		} elseif (function_exists('openssl_random_pseudo_bytes')) {
-			$rnd = openssl_random_pseudo_bytes($secretLength, $cryptoStrong);
-			if (!$cryptoStrong) {
-				$rnd = false;
-			}
-		}
-		if ($rnd !== false) {
-			for ($i = 0; $i < $secretLength; ++$i) {
-				$secret .= $validChars[ord($rnd[$i]) & 31];
-			}
-		} else {
-			throw new Exception('No source of secure random');
-		}
-
-		return $secret;
-	}
-
-	public function getIsEnabled(): bool
-	{
-		return $this->verified;
-	}
-
 	/**
 	 * Calculate the code, with given secret and point in time.
 	 *
@@ -175,7 +74,6 @@ class OtpAuthenticator extends Property
 	public function getCode($secret, $timeSlice = null): string
 	{
 		return $this->internalGetCode($secret, $timeSlice);
-
 	}
 
 	private function internalGetCode($secret, $timeSlice = null): string
@@ -206,43 +104,6 @@ class OtpAuthenticator extends Property
 		return str_pad($value % $modulo, $this->codeLength, '0', STR_PAD_LEFT);
 	}
 
-	/**
-	 * Get the blob id of the QR code image
-	 *
-	 * @param string|null $name
-	 * @param null $secret
-	 * @param null $title
-	 * @param array $params
-	 */
-	public function outputQr(string|null $name = null, $secret = null, $title = null, array $params = array()): void
-	{
-		$name = empty($name) ? $this->owner->username . '@' . File::stripInvalidChars(go()->getSettings()->title) : $name;
-		$secret = empty($secret) ? $this->secret : $secret;
-
-		$level = QR_ECLEVEL_M;
-
-		if (!empty($params['level']) && array_search($params['level'], array('L', 'M', 'Q', 'H')) !== false) {
-			switch ($params['level']) {
-				case 'L':
-					$level = QR_ECLEVEL_L;
-					break;
-				case 'Q':
-					$level = QR_ECLEVEL_Q;
-					break;
-				case 'H':
-					$level = QR_ECLEVEL_H;
-					break;
-			}
-		}
-
-		$otpUrl = 'otpauth://totp/' . rawurlencode($name) . '?secret=' . $secret . '';
-		if (isset($title)) {
-			$otpUrl .= '&issuer=' . urlencode($title);
-		}
-
-
-		QRcode::png($otpUrl, null, $level, 8);
-	}
 
 	/**
 	 * Check if the code is correct. This will accept codes starting from $discrepancy*30sec ago to $discrepancy*30sec from now.

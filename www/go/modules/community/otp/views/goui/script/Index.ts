@@ -1,6 +1,7 @@
 import {Account, main, modules,} from "@intermesh/groupoffice-core";
 import {Settings} from "./Settings";
 import {fieldset, p, t} from "@intermesh/goui";
+import {OtpSettingsFieldset} from "./OtpSettingsFieldset.js";
 
 
 modules.register({
@@ -10,5 +11,5 @@ modules.register({
 });
 
 Account.patch(function() {
-	this.form!.items.add(fieldset({legend: t("Two Factor Authentication")}, p("TODO")));
+	this.form!.items.insert(-1, new OtpSettingsFieldset());
 })

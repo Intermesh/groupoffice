@@ -22,3 +22,5 @@ $updates['202601161050'][] = "ALTER TABLE `otp_secret` CHANGE COLUMN `secret` `s
 $updates['202601211115'][] = function() {
 	go\modules\community\otp\cron\ClearExpired::install('*/10 * * * *', true);
 };
+
+$updates['202608241611'][] = "alter table otp_secret drop column verified";
