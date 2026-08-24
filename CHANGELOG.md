@@ -1,3 +1,4 @@
+24-08-2026: 26.0.43
 - Files: Continue saving file when saving older version fails. Fixes PDFeditor problem.
 - Finance: Support for extra e-mail attachments in documents
 - Projects3: When invoicing projects, a single line item will be created for time entries and a detailed specification 
