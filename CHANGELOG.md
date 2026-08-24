@@ -9,6 +9,7 @@
 - Core: Fix minor bugs and typos in ExtJS Repsonsive layout (Thanks Jorg)
 - Finance: Handle when user is not found in status history
 - Core: Window to view group members from share panel
+- Core: prevent crash in ExtJs grid trait under specific circumstances
 
 17-08-2026: 26.0.42
 - Core: Implemented custom field type "Attachments" in GOUI.
