@@ -7,6 +7,8 @@
 - Support: Status icon if a message was imported, sent or sending failed
 - Support: Don't import auto submitted e-mail messages
 - Core: Fix minor bugs and typos in ExtJS Repsonsive layout (Thanks Jorg)
+- Finance: Handle when user is not found in status history
+- Core: Window to view group members from share panel
 
 17-08-2026: 26.0.42
 - Core: Implemented custom field type "Attachments" in GOUI.
