@@ -1830,3 +1830,5 @@ $updates['202604131511'][] ="delete from core_entity where clientName in (
 
 $updates['202604221150'][] = "ALTER TABLE core_email_template CHANGE subject subject VARCHAR(255) CHARACTER SET utf8mb4 DEFAULT NULL COLLATE utf8mb4_unicode_ci";
 $updates['202604230937'][] = "delete from core_setting where name='primaryColorTransparent';";
+
+$updates['202608241101'][] = "ALTER TABLE `core_principal` ADD UNIQUE INDEX `entityId` (`entityTypeId` ASC, `entityId` ASC)";
