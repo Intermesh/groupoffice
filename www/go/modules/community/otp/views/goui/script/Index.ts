@@ -1,6 +1,5 @@
-import {Account, main, modules,} from "@intermesh/groupoffice-core";
+import {Account, modules,} from "@intermesh/groupoffice-core";
 import {Settings} from "./Settings";
-import {fieldset, p, t} from "@intermesh/goui";
 import {OtpSettingsFieldset} from "./OtpSettingsFieldset.js";
 
 

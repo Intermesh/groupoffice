@@ -1,5 +1,6 @@
 import {checkbox, Fieldset, HiddenField, hiddenfield, p, t} from "@intermesh/goui";
 import {enableOTP} from "./EnableOTPWindow.js";
+import {Account, client, modules} from "@intermesh/groupoffice-core";
 
 export class OtpSettingsFieldset extends Fieldset {
 	private otpBtn;
@@ -28,6 +29,9 @@ export class OtpSettingsFieldset extends Fieldset {
 				listeners: {
 
 					change: async (ev) =>		{
+
+						const accountPanel = this.findAncestorByType(Account)!
+						accountPanel.currentPasswordRequired = !modules.get("core", "core")!.userRights.mayChangeUsers || accountPanel.form?.currentId == client.user.id;
 
 						if (!ev.newValue) {
 							this.otpField.value = null;
