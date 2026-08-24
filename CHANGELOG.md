@@ -6,6 +6,7 @@
 - Support: Notification settings for auto reply, agent notification and agent assigned
 - Support: Status icon if a message was imported, sent or sending failed
 - Support: Don't import auto submitted e-mail messages
+- Finance: Handle when user is not found in status history
 
 17-08-2026: 26.0.42
 - Core: Implemented custom field type "Attachments" in GOUI.
