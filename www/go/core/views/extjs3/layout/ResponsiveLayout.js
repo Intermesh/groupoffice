@@ -15,8 +15,6 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 	 */
 	triggerWidth: 1200,
 
-	// wideWidth: null,
-	
 	/**
 	 * If narrow width is supplied the container will be resized to it when switching to narrow mode
 	 */
@@ -46,12 +44,6 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 				i.on('show', this.onPanelShow, this);
 				i.wideWidth = i.width;
 			}, this);
-
-			// this causes a lot of extra doLayouts!
-			// ct.on('resize', function() { // when mobile orientation changes
-			// 	console.warn('yo');
-			// 	ct.doLayout();
-			// }, this)
 		}
 
 		var willBeWide = window.innerWidth > this.triggerWidth;
@@ -84,7 +76,7 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 
 	setWideLayout: function (ct, target) {
 
-		if (this.mode != 'wide') {
+		if (this.mode !== 'wide') {
 
 			if(!this.narrowMinWidth) {
 				this.narrowMinWidth = this.minWidth;
@@ -103,12 +95,14 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 				if (i.hidden) {
 					i.show();
 				}
-				// i.stateful = true;
+				if (i.region === "center" && i.collapsed) {
+					i.collapsed = false;
+				}
 			}, this);
 
 			ct.cascade(function(i) {
 
-				if(i.origStateFul) {
+				if(i.origStateful) {
 					i.stateful = i.origStateful;
 				}
 				return true;
@@ -122,12 +116,10 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 	},
 
 	setNarrowLayout: function (ct, target) {
-
-//		console.log(ct.getId(), "narrow");
 		//turn into cards
 		ct.stateful = false;
 
-		if (this.mode != 'narrow') {
+		if (this.mode !== 'narrow') {
 			this.mode = 'narrow';
 
 			if(!this.wideMinWidth) {
@@ -141,7 +133,7 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 			}
 
 			ct.cascade(function(i) {
-				i.origStateFul = i.stateful;
+				i.origStateful = i.stateful;
 				i.stateful = false;
 				return true;
 			}, this);
@@ -153,8 +145,10 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 				if(!i.hidden) {
 					i.hide();
 				}
+				if (i.region === "center" && i.collapsed) {
+					i.collapsed = false;
+				}
 			}, this);
-
 		}
 
 		this.activeItem.show();
@@ -172,7 +166,7 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 
 	onBeforeShow : function (panel) {
 					
-		if(this.mode != 'narrow') {
+		if (this.mode !== 'narrow') {
 			return true;
 		}
 
@@ -200,24 +194,20 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 
 	// private
 	setItemSize: function (item, size) {
-		
-//		console.log(item, item);
-
 		if (item && size.height > 0) { // display none?
 			item.setSize(size);
 			if (item.rendered) {
-//				item.wideLeft = item.getEl().getLeft();
 				item.getEl().setLeft(0);
 			}
 		}
 	},
 
 	isNarrow: function () {
-		return this.mode == 'narrow';
+		return this.mode === 'narrow';
 	},
 
 	isWide : function() {
-		return this.mode == 'wide';
+		return this.mode === 'wide';
 	}
 });
 
