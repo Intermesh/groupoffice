@@ -41,7 +41,6 @@ export class MailboxExportDialog extends Window {
 					columns: cols
 				};
 				client.jmap("MailBox/export", params).then(async (response) => {
-					debugger;
 					if(response.blobId) {
 						await client.downloadBlobId(response.blobId, response.blob.name);
 					} else {
