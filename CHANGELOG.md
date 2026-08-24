@@ -10,6 +10,7 @@
 - Finance: Handle when user is not found in status history
 - Core: Window to view group members from share panel
 - Core: prevent crash in ExtJs grid trait under specific circumstances
+- Time registration: prevent errors when the projects3 or tasks module is not available
 
 17-08-2026: 26.0.42
 - Core: Implemented custom field type "Attachments" in GOUI.

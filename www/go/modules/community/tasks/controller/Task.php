@@ -12,7 +12,9 @@ use go\core\jmap\EntityController;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\model\Acl;
 use go\core\util\ArrayObject;
+use go\modules\business\registration\Module as RegistrationModule;
 use go\modules\community\tasks\model;
+use go\modules\business\license\model\License;
 
 class Task extends EntityController {
 
@@ -116,6 +118,32 @@ class Task extends EntityController {
 		$query->groupBy([]);
 
 		return $query->single();
+	}
+
+	/**
+	 * In case that time registration is available to the end user, but the tasks module is not...
+	 *
+	 * @throws \go\core\http\Exception
+	 * @throws Exception
+	 */
+	protected function authenticate()
+	{
+		if (!go()->getAuthState()->isAuthenticated()) {
+			throw new Exception(401, "Unauthorized");
+		}
+
+		$this->rights = $this->getClassRights();
+		if (!$this->checkModulePermissions()) {
+			$mod = \go\core\model\Module::findByClass(static::class, ['name', 'package']);
+			if (License::has("groupoffice-pro")) {
+				$regClsRights = go()->getAuthState()->getClassRights(RegistrationModule::class);
+				if (!$regClsRights->mayRead) {
+					throw new Exception(403, str_replace('{module}', ($mod->package ?? "legacy") . "/" . $mod->name, go()->t("Forbidden, you don't have access to module '{module}'.")));
+				}
+			} else {
+				throw new Exception(403, str_replace('{module}', ($mod->package ?? "legacy") . "/" . $mod->name, go()->t("Forbidden, you don't have access to module '{module}'.")));
+			}
+		}
 	}
 }
 
