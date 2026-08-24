@@ -83,6 +83,12 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			this.userFieldset.insert(1, this.displayNameField);
 		}
 
+		if (go.Modules.isInstalled("community", "ldapauthenticator")) {
+			if (go.User && go.User.authenticators.indexOf("ldap") > -1) {
+				this.recoveryEmailField.hide();
+			}
+		}
+
 		this.quotaFieldset = new Ext.form.FieldSet({
 			labelWidth:dp(152),		
 			hidden: !go.Modules.get("core", "core").userRights.mayChangeUsers,
