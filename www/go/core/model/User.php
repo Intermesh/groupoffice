@@ -1332,7 +1332,7 @@ public function historyLog(): bool|array
 		if(!$this->contact) {
 			$this->contact = new Contact();
 			$this->contact->addressBookId = go()->getSettings()->userAddressBook()->id;
-			if($this->email) {
+			if(isset($this->email)) {
 				$this->contact->emailAddresses[0] = (new EmailAddress($this->contact))->setValues(['email' => $this->email]);
 			}
 			$nameParts = explode(" ", $this->displayName);
