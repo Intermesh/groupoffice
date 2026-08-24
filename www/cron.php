@@ -3,6 +3,9 @@
 /**
  * CRON script
  * Runs scheduled tasks for the system like garbage collection, sending of newsletters etc. *
+ *
+ * sudo -u www-data php ./cli.php core/System/runCron --module='something' --package='community' --name='GarbageCollection' --debug
+ *
  */
 use GO\Base\Cron\CronJob;
 use GO\Base\Db\FindCriteria;
