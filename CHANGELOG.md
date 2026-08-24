@@ -1,3 +1,4 @@
+24-08-2026: 25.0.112
 - Core: Update FPDI to the latest version in order to work with the commercial PDF parser #1545
 
 10-08-2026: 25.0.111
