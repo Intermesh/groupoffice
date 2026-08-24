@@ -60,8 +60,8 @@ export class NoteDialog extends FormWindow<Note> {
 					encryptBtn
 				),
 				this.encryptTb = tbar({hidden:true},
-					textfield({itemId:'pw',type:'password',label:t('Password')}),
-					textfield({itemId:'pwc',type:'password',label:t('Confirm')}).on('validate', ({target}) => {
+					textfield({itemId:'pw',type:'password',label:t('Password'), autocomplete: 'new-password'}),
+					textfield({itemId:'pwc',type:'password',label:t('Confirm'), autocomplete: 'new-password'}).on('validate', ({target}) => {
 						if(target.value !== (target.previousSibling() as TextField).value) {
 							target.setInvalid(t("Passwords do not match"));
 						}
