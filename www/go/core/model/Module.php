@@ -267,6 +267,14 @@ class Module extends Entity {
 		return static::module()->getLocalizedPackage();
 	}
 
+	public function getCapabilities() : array {
+		$p = $this->getUserRights();
+
+		return $p->mayRead ?
+			static::module()->getCapabilities($this) :
+			[];
+	}
+
 	public function getIcon() : string{
 		return static::module()->getIcon();
 	}

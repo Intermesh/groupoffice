@@ -155,6 +155,10 @@ class Module extends Observable implements ArrayableInterface {
 		return $this->icon();
 	}
 
+	public function getCapabilities(\go\core\model\Module $module): array {
+		return ['go:legacy:'.$module->name => $module->getUserRights()];
+	}
+
 	/**
 	 * Default sort order when installing. If null it will be auto generated.
 	 * @return int|null

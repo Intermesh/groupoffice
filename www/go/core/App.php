@@ -18,6 +18,7 @@ namespace go\core {
 	use go\core\fs\Folder;
 	use go\core\http\PostResponseProcessor;
 	use go\core\http\Response;
+	use go\core\jmap\Capabilities;
 	use go\core\jmap\Request;
 	use go\core\mail\Mailer;
 	use go\core\model\Group;
@@ -194,6 +195,13 @@ namespace go\core {
 				'mayChangeGroups',
 				'mayChangeCustomFields'
 			];
+		}
+
+		public function getCapabilities(model\Module $module): array
+		{
+			$capabilities = parent::getCapabilities($module);
+			$capabilities['urn:ietf:params:jmap:core'] = Capabilities::get();
+			return $capabilities;
 		}
 
 		/**

@@ -551,6 +551,16 @@ abstract class Module extends Singleton implements ArrayableInterface {
 	}
 
 	/**
+	 * Override this to add specific URNs with capabilities other then user rights
+	 *
+	 * @param model\Module $module
+	 * @return array
+	 */
+	public function getCapabilities(\go\core\model\Module $module): array {
+		return ['go:'.$module->package.':'.$module->name => $module->getUserRights()];
+	}
+
+	/**
 	 *
 	 * @param static[]|LegacyModule $module
 	 * @return static[]|LegacyModule[]
