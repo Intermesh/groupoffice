@@ -32,12 +32,13 @@ export class OtpSettingsFieldset extends Fieldset {
 
 						const accountPanel = this.findAncestorByType(Account)!
 						accountPanel.currentPasswordRequired = !modules.get("core", "core")!.userRights.mayChangeUsers || accountPanel.form?.currentId == client.user.id;
+						const username = accountPanel.form!.findField("username")!.value as string;
 
 						if (!ev.newValue) {
 							this.otpField.value = null;
 						} else {
 							try {
-								const secret = await enableOTP("test");
+								const secret = await enableOTP(username);
 								this.otpField.value = {secret};
 							} catch(e) {
 								this.otpBtn.value = false;

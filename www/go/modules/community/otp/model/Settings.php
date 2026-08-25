@@ -13,14 +13,14 @@ class Settings extends core\Settings {
 	public ?int $enforceForGroupId = null;
 
 	/**
-	 * Countdown before user can use Group-Office
+	 * Countdown before user can use GroupOffice
 	 *
 	 * @var int seconds
 	 */
 	public int $countDown = 10;
 
 	/**
-	 * Block Group-Office usage until setup is complete
+	 * Block GroupOffice usage until setup is complete
 	 *
 	 * @var bool
 	 */

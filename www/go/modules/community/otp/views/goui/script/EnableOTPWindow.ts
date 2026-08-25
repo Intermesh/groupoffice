@@ -1,26 +1,74 @@
-import {browser, btn, comp, fieldset, form, img, p, t, tbar, textfield, Window} from "@intermesh/goui";
-import {generateSecret, generateURI, verify} from "otplib/functional";
+import {
+	browser,
+	btn,
+	Button,
+	ButtonEventMap,
+	comp,
+	fieldset,
+	form,
+	img,
+	p, secrets,
+	t,
+	tbar,
+	textfield,
+	Window
+} from "@intermesh/goui";
 import * as QRCode from "qrcode";
+import {client} from "@intermesh/groupoffice-core";
+
+
+
+interface TotpUriOptions {
+	secret: string;      // Base32-encoded secret
+	accountName: string; // e.g. user's email or username
+	issuer: string;      // e.g. your app/company name
+	digits?: number;     // default 6
+	period?: number;     // default 30 (seconds)
+	algorithm?: 'SHA1' | 'SHA256' | 'SHA512'; // default SHA1
+}
+
+function generateTotpURI({
+													 secret,
+													 accountName,
+													 issuer,
+													 digits = 6,
+													 period = 30,
+													 algorithm = 'SHA1',
+												 }: TotpUriOptions): string {
+	const label = encodeURIComponent(`${issuer}:${accountName}`);
+
+	const params = new URLSearchParams({
+		secret,
+		issuer,
+		algorithm,
+		digits: digits.toString(),
+		period: period.toString(),
+	});
+
+	return `otpauth://totp/${label}?${params.toString()}`;
+}
 
 class EnableOTPWindow extends Window {
+	private setupLaterBtn?: Button<ButtonEventMap>;
 	constructor() {
 		super();
 
 		this.title = t("Enable OTP Authenticator");
 		this.modal = true;
 		this.width = 600;
-		this.height = 800
+		this.height = 800;
+		this.closable = false;
 	}
 
-	public async init(username:string) : Promise<string> {
+	public async init(username:string, countDown:number = 0, block = false) : Promise<string> {
 
 		return new Promise(async (resolve, reject) => {
-			const secret = generateSecret();
+			const secret = secrets.otp();
 
 			// Create otpauth:// URI
-			const uri = generateURI({
+			const uri = generateTotpURI({
 				issuer: "GroupOffice",
-				label: username,
+				accountName: username,
 				secret,
 			});
 
@@ -33,10 +81,25 @@ class EnableOTPWindow extends Window {
 			this.items.add(
 				form({
 						cls: "fit vbox",
-						handler: form1 => {
-							resolve(secret);
-							this.un("close", rej);
-							this.close();
+						handler: async (form1) => {
+
+							const tokenField = form1.findField("code")!, code = tokenField.value;
+							try {
+								const result = await client.jmap("community/otp/Secret/verify", {secret, code});
+
+								if (result.valid) {
+									tokenField.clearInvalid();
+
+									resolve(secret);
+									this.un("close", rej);
+									this.close();
+
+								} else {
+									tokenField.setInvalid(t("Invalid code"));
+								}
+							} catch(e:any) {
+								tokenField.setInvalid(e.message);
+							}
 						}
 					},
 
@@ -46,6 +109,8 @@ class EnableOTPWindow extends Window {
 							p(t("Scan the QR code below with the OTP Authenticator app on your mobile device, after that fill in the field below with the code generated in the app.")),
 
 							img({
+								style: {margin: "1.6rem auto"},
+								cls: "frame",
 								width: 200,
 								src: qrDataUrl
 							}),
@@ -67,33 +132,20 @@ class EnableOTPWindow extends Window {
 
 						fieldset({},
 							textfield({
-								label: t("Token"),
+								autocomplete: "one-time-code",
+								label: t("Code"),
 								required: true,
-								name: 'verify',
+								name: 'code',
 								maxLength: 6,
-								minLength: 6,
-								listeners: {
-									validate: async (ev) => {
-
-										try {
-											const result = await verify({secret, token: ev.target.value});
-
-											if (result.valid) {
-												ev.target.clearInvalid();
-											} else {
-												ev.target.setInvalid("Invalid token");
-											}
-										} catch(e:any) {
-											ev.target.setInvalid(e.message);
-										}
-									}
-								}
+								minLength: 6
 							})
 						)
 					),
 
 					tbar({},
-						btn({
+						this.setupLaterBtn = btn({
+							hidden: block,
+							disabled: countDown > 0,
 							text: t("Setup later"),
 							handler: () => {
 								this.close();
@@ -108,15 +160,33 @@ class EnableOTPWindow extends Window {
 				)
 			)
 
+			if(countDown > 0) {
+				let currentCountDown = countDown;
+
+				this.setupLaterBtn.text = t("Setup later") + " (" + currentCountDown-- + ")";
+
+				const interval = setInterval(() => {
+					let text = t("Setup later") + " (" + currentCountDown-- + ")"
+					if (currentCountDown == -1) {
+						text = t("Setup later");
+						this.setupLaterBtn!.disabled = false;
+						clearInterval(interval);
+					}
+					this.setupLaterBtn!.text = text;
+				}, 1000);
+			}
+
 			this.show();
+
 		});
 
 
 	}
 }
 
-export async function enableOTP (username: string) {
+export async function enableOTP (username: string, countDown:number = 0, block = false) {
 	const win = new EnableOTPWindow();
 
-	return win.init(username);
+
+	return win.init(username, countDown, block);
 }

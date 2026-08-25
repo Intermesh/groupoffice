@@ -20,8 +20,6 @@
     "prepare": "npm run build"
   },
   "dependencies": {
-    "copyfiles": "^2.4.1",
-    "otplib": "^13.5.0",
     "qrcode": "^1.5.4"
   }
 }

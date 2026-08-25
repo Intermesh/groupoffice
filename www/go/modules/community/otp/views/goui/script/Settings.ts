@@ -29,7 +29,7 @@ export class Settings extends Fieldset {
 					type: "switch",
 					id: "block",
 					name: "block",
-					label: t("Block Group-Office usage until setup is done", "community", "otp"),
+					label: t("Block GroupOffice usage until setup is done", "community", "otp"),
 					listeners: {
 						setvalue: ({newValue, oldValue}) => {
 							this.countDownFld!.disabled = newValue;
