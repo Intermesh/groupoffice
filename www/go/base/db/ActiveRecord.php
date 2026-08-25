@@ -5369,8 +5369,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		$alert->triggerAt = $triggerAt;
 		$alert->userId = $userId ?? go()->getAuthState()->getUserId();
-		$alert->entityId =  $this->id;
-		$alert->setEntity(static::entityType()->getName());
+		$alert->setEntity($this);
 		$alert->tag = $tag;
 
 		return $alert;
