@@ -17,5 +17,5 @@ return array (
   'Invalid code' => 'Código inválido',
   'Scan the QR code below with the OTP Authenticator app on your mobile device, after that fill in the field below with the code generated in the app.' => 'Faça a leitura do código QR abaixo com o aplicativo autenticador Google em seu dispositivo móvel, em seguida preencha o campo abaixo com o código gerado no aplicativo.',
   'Scan the QR code below with the OTP Authenticator app on your mobile device' => ' after that fill in the field below with the code generated in the app.',
-  'Block Group-Office usage until setup is done' => 'Block {product_name} usage until setup is done',
+  'Block GroupOffice usage until setup is done' => 'Block {product_name} usage until setup is done',
 );

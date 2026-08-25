@@ -14,6 +14,6 @@ return array (
   'OTP Authenticator' => '2-trinns bekreftelse',
   'Enable OTP Authenticator' => 'Slå på 2-trinns bekreftelse',
   'Disable OTP Authenticator' => 'Slå av 2-trinns bekreftelse',
-  'Block Group-Office usage until setup is done' => 'Block {product_name} usage until setup is done',
+  'Block GroupOffice usage until setup is done' => 'Block {product_name} usage until setup is done',
   'Count down' => 'Nedtelling',
 );

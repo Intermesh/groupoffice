@@ -17,7 +17,7 @@ return array (
   'OTP Authenticator' => 'OTP Authentifizierung',
   'Provide your current password before you can enable OTP Authenticator.' => 'Sie müssen Ihr aktuelles Kennwort eingeben, bevor Sie die OTP Authentifizierung aktivieren können.',
   'Enforce two factor authentication for users in a specific group' => 'Zwei-Faktor-Authentifizierung für Benutzer in einer bestimmten Gruppe erzwingen',
-  'Block Group-Office usage until setup is done' => 'Zugriff auf {product_name} blockieren, bis die Einrichtung abgeschlossen ist',
+  'Block GroupOffice usage until setup is done' => 'Zugriff auf {product_name} blockieren, bis die Einrichtung abgeschlossen ist',
   'Count down this number of seconds until the user can cancel the setup' => 'Zählt die Anzahl der Sekunden herunter, bis der Benutzer die Einrichtung abbrechen kann',
   'Your system administrator requires you to setup two factor authentication' => 'Ihr Systemadministrator verlangt von Ihnen die Einrichtung einer Zwei-Faktor-Authentifizierung',
   'Setup later' => 'Später einrichten',

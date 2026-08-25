@@ -13,7 +13,7 @@ return array (
   'Code' => 'Codice',
   'Code is required' => 'E\' richiesto il codice',
   'Invalid code' => 'Codice non valido',
-  'Block Group-Office usage until setup is done' => 'Blocca utilizzo di Group-Office finché la configurazione non è completa',
+  'Block GroupOffice usage until setup is done' => 'Blocca utilizzo di GroupOffice finché la configurazione non è completa',
   'Enforce two factor authentication for users in a specific group' => 'Forza autenticazione a due fattori per utenti in uno specifico gruppo',
   'Count down' => 'Conto alla rovescia',
   'Count down this number of seconds until the user can cancel the setup' => 'Attendi questo numero di secondi prima che l’utente possa annullare la configurazione',

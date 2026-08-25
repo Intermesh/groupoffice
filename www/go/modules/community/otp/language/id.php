@@ -5,7 +5,7 @@ return array (
   'Scan the QR code below to enable OTP Authenticator for your account.' => 'Pindai kode QR di bawah ini untuk mengaktifkan OTP Authenticator pada akun Anda.',
   'Secret key for manual input' => 'Kunci rahasia untuk input manual',
   'No secret available' => 'Tidak tersedia rahasia',
-  'When enabling OTP Authenticator you\'ll need to scan the QR code with the OTP Authenticator app otherwise you cannot login to Group-Office anymore.' => 'Ketika mengaktifkan OTP Authenticator, Anda harus memindai kode QR dengan aplikasi OTP Authenticator. Jika tidak, Anda tidak dapat masuk ke Group-Office lagi.',
+  'When enabling OTP Authenticator you\'ll need to scan the QR code with the OTP Authenticator app otherwise you cannot login to GroupOffice anymore.' => 'Ketika mengaktifkan OTP Authenticator, Anda harus memindai kode QR dengan aplikasi OTP Authenticator. Jika tidak, Anda tidak dapat masuk ke GroupOffice lagi.',
   'Provide your current password to enable OTP Authenticator.' => 'Berikan kata sandi saat ini untuk mengaktifkan OTP Authenticator.',
   'When disabling OTP Authenticator this step will be removed from the login process.' => 'Jika mengaktifkan OTP Authenticator, langkah ini akan dihapuskan dari proses masuk.',
   'Provide your current password to disable OTP Authenticator.' => 'Berikan kata sandi saat ini untuk mengnonaktifkan OTP Authenticator.',

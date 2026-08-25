@@ -9,7 +9,7 @@ return array (
   'Provide your current password before you can enable OTP Authenticator.' => 'OTP認証を有効にするには、現在のパスワードを入力してください。',
   'OTP Authenticator' => 'OTP認証',
   'Enforce two factor authentication for users in a specific group' => '特定のグループのユーザーに二要素認証を強制する',
-  'Block Group-Office usage until setup is done' => '設定が完了するまで、Group-Officeの使用をブロックする',
+  'Block GroupOffice usage until setup is done' => '設定が完了するまで、GroupOfficeの使用をブロックする',
   'Count down' => 'カウントダウン',
   'Count down this number of seconds until the user can cancel the setup' => 'ユーザーが設定をキャンセルできるまでの秒数をカウントダウンします。',
   'Get the code from the OTP Authenticator app on your mobile device and fill it in below' => 'モバイルデバイスのOTP認証アプリからコードを取得し、以下に入力してください。',

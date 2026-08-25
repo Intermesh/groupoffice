@@ -5,7 +5,7 @@ return array (
   'Enable OTP Authenticator' => 'Įgalinti OTP autentifikatorių',
   'OTP Authenticator' => 'OTP autentifikatorius',
   'Enforce two factor authentication for users in a specific group' => 'Vykdykite dviejų faktorių autentifikavimą konkrečios grupės vartotojams',
-  'Block Group-Office usage until setup is done' => 'Blokuoti Group Office naudojimą, kol bus atlikta konfigūracija',
+  'Block GroupOffice usage until setup is done' => 'Blokuoti Group Office naudojimą, kol bus atlikta konfigūracija',
   'Count down' => 'Atgalinis skaičiavimas',
   'Count down this number of seconds until the user can cancel the setup' => 'Skaičiuokite šį sekundžių skaičių, kol vartotojas galės atšaukti sąranką',
   'Setup later' => 'Konfigūruoti vėliau',
