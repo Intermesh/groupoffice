@@ -93,7 +93,8 @@ export class SplitView extends MonthView {
 		this.el.append(headers);
 
 		this.calRows = [];
-		const activeFilter = this.adapter.byType('event').store.queryParams.filter.inCalendars;
+		const f = this.adapter.byType('event').store.getFilter('inCalendars');
+		const activeFilter = f.inCalendars;
 		jmapds('Calendar').get(activeFilter).then((resp) => {
 			this.calendars = resp.list;
 			for (let calendar of this.calendars) {
