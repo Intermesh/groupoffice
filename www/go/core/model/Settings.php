@@ -505,9 +505,8 @@ class Settings extends core\Settings {
 	
 	/**
 	 * The default address book for new users
-	 * @var int 
 	 */
-	public int|null $userAddressBookId = null;
+	public string|null $userAddressBookId = null;
 
 
 	private $userAddressBook;
