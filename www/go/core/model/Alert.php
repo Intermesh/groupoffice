@@ -102,7 +102,7 @@ class Alert extends SingleOwnerEntity
 		if(!($entity instanceof EntityType)) {
 			$entity = EntityType::findByName($entity);
 		}
-		$this->entity = $entity->getName();
+
 		$this->entityTypeId = $entity->getId();
 
 		return $this;

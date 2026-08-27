@@ -223,7 +223,7 @@ class State extends AbstractState {
 	 */
 	public function getSession(): array
 	{
-		$response = [
+		return [
 			'version' => go()->getVersion(),
 			'cacheClearedAt' => go()->getSettings()->cacheClearedAt,
 			// 'username' => $user->username,
@@ -234,9 +234,9 @@ class State extends AbstractState {
 				'hasDataFor' => []
 			]],
 			"auth" => [
-						"domains" => User::getAuthenticationDomains()
+				"domains" => User::getAuthenticationDomains()
 			],
-			'capabilities' => Capabilities::get(),
+			'capabilities' => $this->fetchCapabilities(),
 			'baseUrl' => $this->getBaseUrl(),
 			'apiUrl' => $this->getApiUrl(),
 			'downloadUrl' => $this->getDownloadUrl("{blobId}"),
@@ -244,27 +244,17 @@ class State extends AbstractState {
 			'uploadUrl' => $this->getUploadUrl(),
 			'eventSourceUrl' => $this->getEventSourceUrl(),
 			'userId' => $this->getUserId(),
-			'isAdmin' => $this->isAdmin()
+			'isAdmin' => $this->isAdmin(),
+			'state' => OldState::model()->getFullClientState($this->getUserId()), //todo optimize
+			'CSRFToken' => $this->getToken()->CSRFToken,
 		];
-		$this->addModuleCapabilities($response);
-
-		//todo optimize
-		$response['state'] = OldState::model()->getFullClientState($this->getUserId());
-
-		$response['CSRFToken'] = $this->getToken()->CSRFToken;
-
-		return $response;
 	}
 
-	private function addModuleCapabilities(array $response) {
-		$modules = Module::getInstalled();
-		foreach ($modules as $module) {
-			$p = $module->getUserRights();
-
-			if($p->mayRead) {
-				$response['capabilities']->{'go:' . ($module->package ?? 'legacy') . ':' . $module->name} = $p;
-			}
-		}
+	private function fetchCapabilities() {
+		return array_merge(...array_map(
+			fn($mod) => $mod->getCapabilities(),
+			Module::getInstalled()
+		));
 	}
 
 	/**
