@@ -411,6 +411,15 @@ class Settings extends core\Settings {
 	/** Blob ID for the logo */
 	public string|null $logoId = null;
 
+	protected string|null $defaultPinnedTabs = null;
+
+	public function getDefaultPinnedTabs() {
+		return !empty($this->defaultPinnedTabs) ? json_decode($this->defaultPinnedTabs, true) : [];
+	}
+
+	public function setDefaultPinnedTabs(array $tabs) : void {
+		$this->defaultPinnedTabs = json_encode($tabs);
+	}
 
 	/** Primary color in html notation 000000; */
 	public string|null $primaryDark = null;

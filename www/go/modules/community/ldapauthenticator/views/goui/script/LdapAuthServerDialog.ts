@@ -1,4 +1,4 @@
-import {CustomFieldCheckbox, FormWindow, groupDS} from "@intermesh/groupoffice-core";
+import {CustomFieldCheckbox, FormWindow, groupchips, groupDS} from "@intermesh/groupoffice-core";
 import {
 	ArrayField,
 	arrayfield,
@@ -351,48 +351,7 @@ export class LdapAuthServerDialog extends FormWindow {
 		const userOptionsFs = fieldset({
 				legend: t("User Options", "community", "ldapauthenticator"),
 			},
-			autocompletechips({
-				name: "groups",
-				label: t("Groups"),
-				list: table({
-					fitParent: true,
-					headers: false,
-					store: datasourcestore({
-						dataSource: groupDS,
-						filters:{
-							default: {hideUsers: true, excludeEveryone: true}
-						}
-					}),
-					rowSelectionConfig: {
-						multiSelect: true
-					},
-					columns: [
-						checkboxselectcolumn({
-							id: "id"
-						}),
-						column({
-							header: "Name",
-							id: "name",
-							sortable: true,
-							resizable: true
-						})
-					]
-				}),
-				hint: t("Users will automatically be added to these groups"),
-				chipRenderer: async (chip, value) => {
-					const record = await groupDS.single(value.groupId ? value.groupId : value);
-					chip.text = record.name;
-				},
-				pickerRecordToValue(field, record): any {
-					return record.id;
-				},
-				listeners: {
-					autocomplete: ({target, input}) => {
-						target.list.store.setFilter("search", {text: input});
-						void target.list.store.load();
-					}
-				}
-			})
+			groupchips()
 		);
 		this.syncUsersDelePercFld = numberfield({
 			name: "syncUsersMaxDeletePercentage",
