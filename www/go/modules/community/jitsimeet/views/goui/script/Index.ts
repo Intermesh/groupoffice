@@ -1,9 +1,7 @@
-import {moduleSystemSettings, client, modules} from "@intermesh/groupoffice-core";
-import {Settings} from "./Settings.js";
+import {client, modules} from "@intermesh/groupoffice-core";
 import {SystemSettings} from "./SystemSettings.js";
-import {CalendarEvent, CalendarItem, onlineMeetingServices} from "@intermesh/community-calendar";
+import {onlineMeetingServices} from "@intermesh/community-calendar";
 import {t} from "@intermesh/goui";
-
 
 
 function b64UrlEncode (data:string) {
@@ -14,19 +12,14 @@ function b64UrlEncode (data:string) {
 modules.register({
 	package: "community",
 	name: "jitsimeet",
+	systemSettingsPanels: [SystemSettings],
+	userSettingsPanels: [],
 	init: () => {
 
 		client.on("authenticated",  ({session}) => {
 			if(!session.capabilities["go:community:jitsimeet"]) {
 				// User has no access to this module
 				return;
-			}
-
-			if(session.capabilities["go:community:jitsimeet"].mayManage) {
-				// @deprecated
-				modules.addSystemSettingsPanel("community", "jitsimeet", "jitsimeet", "Jitsi Meet", "video_call", () => {
-					return new SystemSettings();
-				});
 			}
 
 			onlineMeetingServices.register("Jitsi Meet", async (calendarEventForm) => {
@@ -55,12 +48,5 @@ modules.register({
 				calendarEventForm.patch({location: uri, description});
 			});
 		});
-	}
-});
-
-client.on("authenticated",  ({session}) => {
-
-	if (session.isAdmin) {
-		moduleSystemSettings.addPanel("community", "jitsimeet", Settings);
 	}
 });

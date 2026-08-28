@@ -35,7 +35,7 @@ class Module extends core\Module {
 
 	public static function getCategory(): string
 	{
-		return go()->t("Calendar", static::getPackage(), static::getName());
+		return go()->t("Calendar", "community", "calendar");
 	}
 
 	public function getAuthor(): string
