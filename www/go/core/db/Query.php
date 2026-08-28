@@ -2,6 +2,7 @@
 
 namespace go\core\db;
 
+use Closure;
 use Exception;
 use go\core\App;
 use go\core\data\ArrayableInterface;
@@ -725,6 +726,17 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    */
 	public function all() : array {
 		return $this->execute()->fetchAll();
+	}
+
+
+	/**
+	 * Map the ressults to a callable function
+	 *
+	 * @param callable $fn
+	 * @return mixed
+	 */
+	public function map(callable $fn) {
+		return array_map($fn, $this->all());
 	}
 
 	/**
