@@ -7,6 +7,7 @@ use go\core\db\Column;
 use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
 use go\core\exception\Unavailable;
+use go\core\model\AppPassword;
 use go\core\model\AuthAllowGroup;
 use go\core\model\RememberMe;
 use go\core\model\Token;
@@ -256,6 +257,50 @@ class Authenticate {
 
 		return $user;
 
+	}
+
+	public function appPasswordLogin(string $username, string $password, string $protocol): bool|User
+	{
+		go()->debug("App password auth for " . $username . " (protocol: " . $protocol . ")");
+
+		$user = User::find()->where(['username' => $username])->single();
+
+		if (!$user) {
+			// same logic as passwordLogin for timing attacks
+			// nosemgrep: detected-bcrypt-hash
+			password_verify("randomboguspasswordstring", '$2y$10$wkP8uDjY/tt5GNrfJJO9SOknqStW0POBn5Z4zpctuQkMP7pibTz2m');
+
+			User::fireEvent(User::EVENT_BADLOGIN, $username, null);
+			$this->logFailure($username);
+
+			return false;
+		}
+
+		$userAppPasswords = AppPassword::find()->where(['userId' => $user->id, 'revokedAt' => null])->all();
+
+		foreach ($userAppPasswords as $appPassword) {
+
+			if (!$appPassword->verifyPassword($password)) {
+				continue;
+			}
+
+			if ($appPassword->hasMatchingScope($protocol)) {
+				go()->log("App password login success for " . $username);
+
+				$appPassword->updateLastUsed($_SERVER['REMOTE_ADDR']);
+
+				return $user;
+			}
+
+			User::fireEvent(User::EVENT_BADLOGIN, $username, null);
+			$this->logFailure($username);
+			return false;
+		}
+
+		User::fireEvent(User::EVENT_BADLOGIN, $username, null);
+		$this->logFailure($username);
+
+		return false;
 	}
 
 	private $usedPasswordAuthenticator;

@@ -8,6 +8,9 @@ go.Modules.register("core", 'core', {
 			}
 		},
 		{
+			name: 'AppPassword'
+		},
+		{
 			name: 'Group',
 			relations: {
 				users: {store: "Principal", fk: "users"},

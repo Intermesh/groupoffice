@@ -1271,3 +1271,34 @@ CREATE TABLE `core_alert` (
 
 create unique index core_alert_entityTypeId_entityId_tag_userId_uindex
     on core_alert (entityTypeId, entityId, tag, userId);
+
+CREATE TABLE `core_app_password`
+(
+    `id`           INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `userId`       INT(11)      NOT NULL,
+    `label`        VARCHAR(150) NOT NULL,
+    `passwordHash` VARCHAR(255) NOT NULL,
+    `createdAt`    DATETIME     NOT NULL,
+    `lastUsedAt`   DATE         NULL,
+    `lastUsedIp`   VARCHAR(39)  NULL,
+    `revokedAt`    DATETIME     NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `core_app_password_core_user`
+        FOREIGN KEY (`userId`)
+            REFERENCES `core_user` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE NO ACTION
+);
+
+CREATE TABLE `core_app_password_scope`
+(
+    `id`            INT UNSIGNED                                    NOT NULL AUTO_INCREMENT,
+    `appPasswordId` INT UNSIGNED                                    NOT NULL,
+    `protocol`      ENUM ('dav', 'caldav', 'carddav', 'activesync') NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `core_app_password_core_app_password_scope`
+        FOREIGN KEY (`appPasswordId`)
+            REFERENCES `core_app_password` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE NO ACTION
+);

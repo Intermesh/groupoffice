@@ -43,6 +43,13 @@ go.systemsettings.AuthenticationPanel = Ext.extend(go.systemsettings.Panel, {
 							hint: t("You can set an URL to handle lost passwords in an alternative way"),
 							name: "lostPasswordURL",
 							anchor: "100%"
+						},
+						{
+							xtype: "checkbox",
+							fieldLabel: t("Force app passwords"),
+							hint: t("Force external apps like WebDAV and ActiveSync to authenticate with app passwords, these can be created in the user settings."),
+							name: "forceAppPasswords",
+							anchor: "100%"
 						}
 					]
 				},

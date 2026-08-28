@@ -1831,4 +1831,35 @@ $updates['202604131511'][] ="delete from core_entity where clientName in (
 $updates['202604221150'][] = "ALTER TABLE core_email_template CHANGE subject subject VARCHAR(255) CHARACTER SET utf8mb4 DEFAULT NULL COLLATE utf8mb4_unicode_ci";
 $updates['202604230937'][] = "delete from core_setting where name='primaryColorTransparent';";
 
+$updates['202608201106'][] = "CREATE TABLE `core_app_password`
+(
+    `id`           INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `userId`       INT(11)      NOT NULL,
+    `label`        VARCHAR(150) NOT NULL,
+    `passwordHash` VARCHAR(255) NOT NULL,
+    `createdAt`    DATETIME     NOT NULL,
+    `lastUsedAt`   DATE         NULL,
+    `lastUsedIp`   VARCHAR(39)  NULL,
+    `revokedAt`    DATETIME     NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `core_app_password_core_user`
+        FOREIGN KEY (`userId`)
+            REFERENCES `core_user` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE NO ACTION
+);";
+
+$updates['202608201106'][] = "CREATE TABLE `core_app_password_scope`
+(
+    `id`            INT UNSIGNED                                    NOT NULL AUTO_INCREMENT,
+    `appPasswordId` INT UNSIGNED                                    NOT NULL,
+    `protocol`      ENUM ('dav', 'caldav', 'carddav', 'activesync') NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `core_app_password_core_app_password_scope`
+        FOREIGN KEY (`appPasswordId`)
+            REFERENCES `core_app_password` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE NO ACTION
+);";
+
 $updates['202608241101'][] = "ALTER TABLE `core_principal` ADD UNIQUE INDEX `entityId` (`entityTypeId` ASC, `entityId` ASC)";

@@ -144,6 +144,8 @@ usersettings/AccountSettingsPanel.js
 usersettings/LookAndFeelPanel.js
 usersettings/NotificationPanel.js
 usersettings/UserSettingsDialog.js
+usersettings/AppPasswordsPanel.js
+usersettings/AppPasswordDialog.js
 
 systemsettings/Panel.js
 systemsettings/GeneralPanel.js
