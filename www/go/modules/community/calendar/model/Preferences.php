@@ -92,4 +92,51 @@ class Preferences extends Property
 		return parent::defineMapping()->addTable("calendar_preferences", "ccs");
 	}
 
+	public function getSyncCalendarIds() {
+		return Calendar::findFor($this->userId)
+			->where('syncToDevice', '=', true)
+			->selectSingleValue('calendar_calendar.id')
+			->all();
+	}
+
+	public function setSyncCalendarIds(array $calendarIds) {
+
+		$calendars = Calendar::findFor($this->userId)->where('syncToDevice', '=', true)->andWhere('calendar_calendar.id', '!=', $calendarIds);
+		foreach($calendars as $calendar) {
+			$calendar->syncToDevice = false;
+			$calendar->save();
+		}
+
+		$calendars = Calendar::findFor($this->userId)->where('syncToDevice', '=', false)->andWhere('calendar_calendar.id', '=', $calendarIds);
+		foreach($calendars as $calendar) {
+			$calendar->syncToDevice = true;
+			$calendar->save();
+		}
+
+	}
+
+
+	public function getSubscribedCalendarIds() {
+		return Calendar::findFor($this->userId)
+			->where('isSubscribed', '=', true)
+			->selectSingleValue('calendar_calendar.id')
+			->all();
+	}
+
+	public function setSubscribedCalendarIds(array $calendarIds) {
+
+		$calendars = Calendar::findFor($this->userId)->where('isSubscribed', '=', true)->andWhere('calendar_calendar.id', '!=', $calendarIds);
+		foreach($calendars as $calendar) {
+			$calendar->isSubscribed = false;
+			$calendar->save();
+		}
+
+		$calendars = Calendar::findFor($this->userId)->where('isSubscribed', '=', false)->andWhere('calendar_calendar.id', '=', $calendarIds);
+		foreach($calendars as $calendar) {
+			$calendar->isSubscribed = true;
+			$calendar->save();
+		}
+
+	}
+
 }

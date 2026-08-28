@@ -1,4 +1,5 @@
 import {
+	AutocompleteChips,
 	checkbox,
 	containerfield,
 	DataSourceForm,
@@ -12,12 +13,15 @@ import {
 } from "@intermesh/goui";
 import {AppSettingsPanel, client, JmapDataSource, jmapds, User} from "@intermesh/groupoffice-core";
 import {t} from "./Index.js";
+import {calendarchips} from "./CalendarChips.js";
 
 export class PreferencesPanel extends AppSettingsPanel {
 	private form: DataSourceForm<User>;
 	private calendarStore: DataSourceStore<JmapDataSource<DefaultEntity>>;
 	private personalCalendarStore: DataSourceStore<JmapDataSource<DefaultEntity>>;
 	private processFieldSet: Fieldset;
+	private subscribedCalendarsField;
+	private syncCalendarsField;
 
 	constructor() {
 		super();
@@ -49,15 +53,29 @@ export class PreferencesPanel extends AppSettingsPanel {
 			,
 
 			containerfield({name:'calendarPreferences'},
+
 				fieldset({},
-					checkbox({name:'showWeekNumbers', label:t('Show week numbers in calendar')}),
-					checkbox({name:'showTooltips', label:t('Show pop-up info when hovering over appointments')}),
-					checkbox({name:'showDeclined', label: t('Show events that you have declined')}),
-					checkbox({name:'multiLine', label: t('Show multiline event blocks')+' (beta)'}),
 					select({name:'defaultCalendarId', label: t('Default calendar'), store: this.calendarStore, valueField: 'id',
 						hint: t('Start with this calendar selected')}),
 					select({name:'personalCalendarId', label: t('Personal calendar'), store: this.personalCalendarStore, valueField: 'id',
 						hint: t('Invitation to event will be added into this calendar')}),
+
+					this.subscribedCalendarsField = calendarchips({
+						label: t("Subscribed"),
+						name: "subscribedCalendarIds"
+					}),
+
+					this.syncCalendarsField = calendarchips({
+						label: t("Synchronize"),
+						name: "syncCalendarIds"
+					}),
+				),
+				fieldset({legend: t("User interface")},
+					checkbox({name:'showWeekNumbers', label:t('Show week numbers in calendar')}),
+					checkbox({name:'showTooltips', label:t('Show pop-up info when hovering over appointments')}),
+					checkbox({name:'showDeclined', label: t('Show events that you have declined')}),
+					checkbox({name:'multiLine', label: t('Show multiline event blocks')+' (beta)'}),
+
 					select({name:'weekViewGridSnap', label: t('Raster size for day/week view'),
 						hint: t('The duration adjustment when resizing an event'),options: [
 							{value:'5', name: '5 '+t('minutes')},
@@ -90,8 +108,10 @@ export class PreferencesPanel extends AppSettingsPanel {
 							{value:'PT1H',name:  '1 '+t('hour')},
 							{value:'PT2H',name:  '2 '+t('hours')},
 							{value:null, name:  t('All day')}
-						]})
+						]}),
 					//,checkbox({name:'useTimeZones', label: t('Enable multiple time zone support')}),
+
+
 				),
 				this.processFieldSet = fieldset({legend:t('Process e-mail in')+': '+client.user.email},
 
@@ -128,7 +148,10 @@ export class PreferencesPanel extends AppSettingsPanel {
 		this.personalCalendarStore
 			.setFilter('owner', {ownerId: user.id})
 			.setFilter("sub", {isSubscribedFor: user.id})
-			.load().catch(e => Notifier.error(e))
+			.load().catch(e => Notifier.error(e));
+
+		this.subscribedCalendarsField.list.store.setFilter("sub", {permissionLevelUserId: user.id});
+		this.syncCalendarsField.list.store.setFilter("sub", {permissionLevelUserId: user.id});
 
 		this.calendarStore.setFilter("sub", {isSubscribedFor: user.id});
 		this.calendarStore.load().catch(e => Notifier.error(e))
