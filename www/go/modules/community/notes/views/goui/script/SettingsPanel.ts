@@ -1,9 +1,12 @@
-import {Component, containerfield, datasourceform, fieldset, radio, t} from "@intermesh/goui";
+import {AutocompleteChips, Component, containerfield, datasourceform, fieldset, radio, t} from "@intermesh/goui";
 import {notebookcombo} from "./NoteBookCombo";
 import {AppSettingsPanel, User, userDS} from "@intermesh/groupoffice-core";
+import {notebookchips} from "./NoteBookChips.js";
 
 export class SettingsPanel extends AppSettingsPanel {
 	private readonly form;
+	private syncNoteBooksField;
+	private noteBookCombo;
 
 	constructor() {
 		super();
@@ -19,7 +22,7 @@ export class SettingsPanel extends AppSettingsPanel {
 				containerfield({
 						name: "notesSettings"
 					},
-					notebookcombo({
+					this.noteBookCombo = notebookcombo({
 						name: "defaultNoteBookId",
 						label: t("Default note book")
 					}),
@@ -32,7 +35,14 @@ export class SettingsPanel extends AppSettingsPanel {
 							{text: t("Default note book"), value: 0},
 							{text: t("Remember last selected note book"), value: 1}
 						]
-					})
+					}),
+
+
+
+					this.syncNoteBooksField = notebookchips({
+						label: t("Synchronize"),
+						name: "syncNoteBookIds"
+					}),
 				)
 			)
 		)
@@ -47,5 +57,8 @@ export class SettingsPanel extends AppSettingsPanel {
 	async load(user: User) {
 		this.form.currentId = user.id;
 		this.form.value = user;
+
+		this.syncNoteBooksField.list.store.setFilter("permissions", {permissionLevelUserId: user.id});
+		this.noteBookCombo.list.store.setFilter("permissions", {permissionLevelUserId: user.id});
 	}
 }

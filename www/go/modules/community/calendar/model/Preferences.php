@@ -2,6 +2,7 @@
 
 namespace go\modules\community\calendar\model;
 
+use go\core\db\Criteria;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 
@@ -101,13 +102,21 @@ class Preferences extends Property
 
 	public function setSyncCalendarIds(array $calendarIds) {
 
-		$calendars = Calendar::findFor($this->userId)->where('syncToDevice', '=', true)->andWhere('calendar_calendar.id', '!=', $calendarIds);
+		$calendars = Calendar::findFor($this->userId)
+			->where('syncToDevice', '=', true)
+			->andWhere('calendar_calendar.id', '!=', $calendarIds);
 		foreach($calendars as $calendar) {
 			$calendar->syncToDevice = false;
 			$calendar->save();
 		}
 
-		$calendars = Calendar::findFor($this->userId)->where('syncToDevice', '=', false)->andWhere('calendar_calendar.id', '=', $calendarIds);
+		$calendars = Calendar::findFor($this->userId)
+			->where(
+				(new Criteria())
+					->where('syncToDevice', '=', false)
+					->orWhere('syncToDevice', '=', null)
+			)
+			->andWhere('calendar_calendar.id', '=', $calendarIds);
 		foreach($calendars as $calendar) {
 			$calendar->syncToDevice = true;
 			$calendar->save();
@@ -119,19 +128,27 @@ class Preferences extends Property
 	public function getSubscribedCalendarIds() {
 		return Calendar::findFor($this->userId)
 			->where('isSubscribed', '=', true)
-			->selectSingleValue('calendar_calendar.id')
+			->selectSingleValue('CAST(calendar_calendar.id as CHAR)')
 			->all();
 	}
 
 	public function setSubscribedCalendarIds(array $calendarIds) {
 
-		$calendars = Calendar::findFor($this->userId)->where('isSubscribed', '=', true)->andWhere('calendar_calendar.id', '!=', $calendarIds);
+		$calendars = Calendar::findFor($this->userId)
+			->where('isSubscribed', '=', true)
+			->andWhere('calendar_calendar.id', '!=', $calendarIds);
 		foreach($calendars as $calendar) {
 			$calendar->isSubscribed = false;
 			$calendar->save();
 		}
 
-		$calendars = Calendar::findFor($this->userId)->where('isSubscribed', '=', false)->andWhere('calendar_calendar.id', '=', $calendarIds);
+		$calendars = Calendar::findFor($this->userId)
+			->where(
+				(new Criteria())
+					->where('isSubscribed', '=', false)
+					->orWhere('isSubscribed', '=', null)
+			)
+			->andWhere('calendar_calendar.id', '=', $calendarIds);
 		foreach($calendars as $calendar) {
 			$calendar->isSubscribed = true;
 			$calendar->save();

@@ -2,6 +2,7 @@
 
 namespace go\modules\community\notes\model;
 
+use go\core\db\Criteria;
 use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Mapping;
@@ -90,6 +91,43 @@ class UserSettings extends Property {
 	public function setLastNoteBookIds(?array $ids = null)
 	{
 		$this->lastNoteBookIds = JSON::encode($ids);
+
+	}
+
+
+	public function getSyncNoteBookIds() {
+		return NoteBook::findFor($this->userId)
+			->where('syncToDevice', '=', true)
+			->selectSingleValue('CAST(nb.id as CHAR)');
+	}
+
+	public function setSyncNoteBookIds(array $noteBookIds) {
+
+		$notebooks = NoteBook::findFor($this->userId)
+			->where('syncToDevice', '=', true)
+			->andWhere('nb.id', 'NOT IN', $noteBookIds);
+
+		foreach($notebooks as $notebook) {
+			$notebook->syncToDevice = false;
+			if(!$notebook->save()) {
+				throw new SaveException($notebook);
+			}
+		}
+
+		$notebooks = NoteBook::findFor($this->userId)
+			->where(
+				(new Criteria())
+					->where('syncToDevice', '=', false)
+					->orWhere('syncToDevice', '=', null)
+			)
+			->andWhere('nb.id', 'IN', $noteBookIds);
+
+		foreach($notebooks as $notebook) {
+			$notebook->syncToDevice = true;
+			if(!$notebook->save()) {
+				throw new SaveException($notebook);
+			}
+		}
 
 	}
 }

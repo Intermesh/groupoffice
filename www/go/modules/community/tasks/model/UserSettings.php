@@ -3,6 +3,7 @@
 namespace go\modules\community\tasks\model;
 
 use GO\Calendar\Model\Calendar;
+use go\core\db\Criteria;
 use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Mapping;
@@ -119,6 +120,68 @@ class UserSettings extends Property {
 		} else {
 			$this->lastTasklistIds = '';
 		}
+	}
+
+
+	public function getSyncTaskListIds() {
+		return TaskList::findFor($this->userId)
+			->where('syncToDevice', '=', true)
+			->selectSingleValue('CAST(tasklist.id as CHAR)')
+			->all();
+	}
+
+	public function setSyncTaskListIds(array $taskListIds) {
+
+		$tasklists = TaskList::findFor($this->userId)
+			->where('syncToDevice', '=', true)
+			->andWhere('tasklist.id', '!=', $taskListIds);
+
+		foreach($tasklists as $tasklist) {
+			$tasklist->syncToDevice = false;
+			$tasklist->save();
+		}
+
+		$tasklists = TaskList::findFor($this->userId)
+			->where(
+				(new Criteria())
+					->where('syncToDevice', '=', false)
+					->orWhere('syncToDevice', '=', null)
+			)
+			->andWhere('tasklist.id', '=', $taskListIds);
+
+		foreach($tasklists as $tasklist) {
+			$tasklist->syncToDevice = true;
+			$tasklist->save();
+		}
+
+	}
+
+
+	public function getSubscribedTaskListIds() {
+		return TaskList::findFor($this->userId)
+			->where('isSubscribed', '=', true)
+			->selectSingleValue('tasklist.id')
+			->all();
+	}
+
+	public function setSubscribedTaskListIds(array $tasklistIds) {
+
+		$tasklists = TaskList::findFor($this->userId)
+			->where('isSubscribed', '=', true)
+			->andWhere('tasklist.id', '!=', $tasklistIds);
+		foreach($tasklists as $tasklist) {
+			$tasklist->isSubscribed = false;
+			$tasklist->save();
+		}
+
+		$tasklists = TaskList::findFor($this->userId)
+			->where('isSubscribed', '=', false)
+			->andWhere('tasklist.id', '=', $tasklistIds);
+		foreach($tasklists as $tasklist) {
+			$tasklist->isSubscribed = true;
+			$tasklist->save();
+		}
+
 	}
 
 
