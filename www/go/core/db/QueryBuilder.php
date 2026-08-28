@@ -441,16 +441,16 @@ class QueryBuilder {
 	public static function debugBuild(array $build) {
 		$sql = $build['sql'];
 		if(isset($build['params'])) {
-//			foreach ($build['params'] as $p) {
-//				try {
-//					$queryValue = var_export($p['value'], true);
-//				} catch(Exception $e) {
-//					$queryValue = "[FAILED_TO_STRING]";
-//				}
-//				$sql = preg_replace('/\?/', $queryValue, $sql, 1);
-//			}
+			foreach ($build['params'] as $p) {
+				try {
+					$queryValue = var_export($p['value'], true);
+				} catch(Exception $e) {
+					$queryValue = "[FAILED_TO_STRINGIFY]";
+				}
+				$sql = preg_replace('/\?/', $queryValue, $sql, 1);
+			}
 
-			$sql .= ', ' . var_export($build['params'], true);
+//			$sql .= ', ' . var_export($build['params'], true);
 		}
 
 		return $sql;
