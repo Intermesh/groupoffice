@@ -180,8 +180,6 @@ form/NumberField.js
 menu/EmojiMenu.js
 menu/StoreMenu.js
 
-Module.js
-
 cron/Stores.js
 cron/CronDialog.js
 cron/NewCronDialog.js
@@ -289,6 +287,7 @@ filter/variabletypes/date.js
 filter/variabletypes/number.js
 filter/variabletypes/string.js
 filter/variabletypes/select.js
+filter/variabletypes/link.js
 
 import/CsvMappingDialog.js
 import/SpreadSheetExportGrid.js

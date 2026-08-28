@@ -1,0 +1,1 @@
+go.filter.variabletypes.link = go.links.FilterLinkEntityCombo;
