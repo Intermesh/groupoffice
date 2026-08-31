@@ -1,4 +1,5 @@
--Tasks: make subscrition window rezizable, sane default size.
+- Tasks: make subscrition window rezizable, sane default size.
+- Address book: import embedded BASE64 encoded photo 
 
 24-08-2026: 26.0.43
 - Files: Continue saving file when saving older version fails. Fixes PDFeditor problem.
