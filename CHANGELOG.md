@@ -1,3 +1,4 @@
+31-08-2026: 26.0.44
 - Tasks: make subscription window resizable, sane default size.
 - Address book: import embedded BASE64 encoded photo 
 
