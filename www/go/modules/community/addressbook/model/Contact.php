@@ -1304,10 +1304,10 @@ class Contact extends AclItemEntity {
 		return false;
 	}
 
-	public function hasAddress(string $address): bool
+	public function hasAddress(string $value): bool
 	{
 		foreach($this->addresses as $address) {
-			if($address->address == $address) {
+			if($address->address == $value) {
 				return true;
 			}
 		}
