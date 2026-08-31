@@ -117,7 +117,7 @@ class CalendarEvent extends EntityController {
 	 */
 	public function import($params) {
 		set_time_limit(0);
-		return model\CalendarEvent::import(
+		return model\ICalendarHelper::import(
 			$params['blobIds'],
 			$params['calendarId'],
 			!empty($params['ignoreUid']) ? 'new':'check'
