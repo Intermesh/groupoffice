@@ -191,9 +191,12 @@ class Module extends core\Module implements DomainProvider
 			$user->recoveryEmail = $user->email;
 		}
 
-		$contact = $user->getProfile();
-
 		if (CoreModelModule::isInstalled('community', 'addressbook')) {
+
+			if(!$user->isNew())
+				$contact = Contact::findForUser($user->id);
+			if(empty($contact))
+				$contact = $user->getProfile();
 
 			$phoneNbs = [];
 			if (isset($values['homePhone'])) {
