@@ -1,3 +1,5 @@
+- Calendar: Trying to import a calendar failed with undefined method #1557
+
 24-08-2026: 25.0.112
 - Core: Update FPDI to the latest version in order to work with the commercial PDF parser #1545
 
