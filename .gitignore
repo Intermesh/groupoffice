@@ -17,6 +17,7 @@ vendor
 /www/config.ini
 /www/promodules
 /www/duurzaamgebouw
+/www/global2000
 /tests/data
 /www/go/modules/*
 !/www/go/modules/community
