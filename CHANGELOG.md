@@ -1,4 +1,4 @@
-- Tasks: make subscrition window rezizable, sane default size.
+- Tasks: make subscription window resizable, sane default size.
 - Address book: import embedded BASE64 encoded photo 
 
 24-08-2026: 26.0.43
@@ -27,7 +27,7 @@
 - Finance: Autocomplete shipping addresses from address book
 - Finance: CAMT053 2019 payment import support
 - Core: make UX behavior Ext.ux icons consistent with newer Ext and GOUI implementations
-- Comments: Status icon for sent, received, pending and senderror added. Also improves UI because mail send happens in the background
+- Comments: Status icon for sent, received, pending and sendegit rror added. Also improves UI because mail send happens in the background
 - Core: Report error when import fails on init
 - Core: Remove cron output with deleted blob count
 - Core: pin tcpdf to v6.11.3 as 7 breaks
