@@ -1,3 +1,6 @@
+01-09-2026: 26.0.45
+- Finance: New address autocomplete loaded all contacts and made the UI freeze
+
 31-08-2026: 26.0.44
 - Tasks: make subscription window resizable, sane default size.
 - Address book: import embedded BASE64 encoded photo 
