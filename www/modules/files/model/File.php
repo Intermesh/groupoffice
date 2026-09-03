@@ -675,9 +675,15 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 
 		$oldPath = $this->saveVersion();
 
+		if(!$this->folder->fsFolder->exists()) {
+			// weird thing happened with pdf editor occasionally that it failed to save and the file seems to be gone !?
+			ErrorHandler::log("ERROR: " . $this->folder->fsFolder->path(). " does not exist.");
+			$this->folder->fsFolder->create();
+		}
+
 		if(!$fsFile->move($this->folder->fsFolder,$this->name, $isUploadedFile) || !file_exists($this->fsFile->path())){
 
-			ErrorHandler::log("Move of file: ".$this->fsFile->path()." to ".$this->folder->fsFolder->path()." failed.");
+			ErrorHandler::log("Move of file: ".$fsFile->path()." to ".$this->folder->fsFolder->path()." failed.");
 
 			// restore old file
 			if($oldPath != $this->fsFile->path()) {
