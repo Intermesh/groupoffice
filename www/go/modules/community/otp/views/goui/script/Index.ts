@@ -12,7 +12,7 @@ modules.register({
 });
 
 Account.patch(function() {
-	this.form!.items.insert(-1, new OtpSettingsFieldset());
+	this.form!.items.insert(-2, new OtpSettingsFieldset());
 })
 
 client.on("authenticated", async (ev) => {

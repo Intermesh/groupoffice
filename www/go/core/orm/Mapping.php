@@ -241,6 +241,10 @@ class Mapping {
 	/**
 	 * Add a relation
 	 *
+	 * @example
+	 * ```
+	 * $mapping->add('clients', Relation::map(Client::class)->keys(['id' => 'userId']))
+	 * ```
 	 * @param string $name
 	 * @param Relation $relation
 	 * @return $this

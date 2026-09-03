@@ -29,6 +29,7 @@ use go\core\orm\PrincipalTrait;
 use go\core\orm\Query;
 use go\core\exception\Forbidden;
 use go\core\orm\CustomFieldsTrait;
+use go\core\orm\Relation;
 use go\core\util\ClassFinder;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
@@ -349,8 +350,11 @@ class User extends AclItemEntity {
 		return parent::defineMapping()
 			->addTable('core_user', 'u')
 			->addTable('core_auth_password', 'p', ['id' => 'userId'])
-			->addMap('clients', Client::class, ['id' => 'userId'])
-			->addScalar('groups', 'core_user_group', ['id' => 'userId']);
+			->add('clients', Relation::array(Client::class)
+				->keys(['id' => 'userId'])
+				->orderBy(['createdAt' => 'DESC']))
+			->add('groups', Relation::scalar('core_user_group')
+				->keys(['id' => 'userId']));
 	}
 
 public function historyLog(): bool|array

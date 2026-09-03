@@ -523,7 +523,11 @@ abstract class Property extends Model {
 			}
 
 			if (!empty($relation->orderBy)) {
-				$query->orderBy([$relation->orderBy => 'ASC']);
+				if(is_array($relation->orderBy)) {
+					$query->orderBy($relation->orderBy);
+				} else {
+					$query->orderBy([$relation->orderBy => 'ASC']);
+				}
 			}
 
 			$stmt = self::$cachedRelationStmts[$cacheKey] = $query->createStatement();
