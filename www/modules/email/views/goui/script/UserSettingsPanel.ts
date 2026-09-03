@@ -1,5 +1,5 @@
-import {checkbox, comp, containerfield, datasourceform, DataSourceForm, fieldset, t} from "@intermesh/goui";
-import {AppSettingsPanel, User, userDS} from "@intermesh/groupoffice-core";
+import {checkbox, combobox, comp, containerfield, datasourceform, DataSourceForm, fieldset, t} from "@intermesh/goui";
+import {AppSettingsPanel, jmapds, User, userDS} from "@intermesh/groupoffice-core";
 
 export class UserSettingsPanel extends AppSettingsPanel {
 	private readonly form: DataSourceForm<User>
@@ -15,6 +15,7 @@ export class UserSettingsPanel extends AppSettingsPanel {
 			containerfield({
 					name: "emailSettings"
 				},
+
 				fieldset({cls: "vbox gap flow"},
 					comp({flex: 1},
 						checkbox({
@@ -56,7 +57,23 @@ export class UserSettingsPanel extends AppSettingsPanel {
 							label: t("Sort on last contact mail time")
 						})
 					)
+				),
+
+			),
+
+			containerfield({name: "syncSettings"},
+
+				fieldset({legend: t("ActiveSync")},
+					combobox({
+						label: t("E-Mail Account"),
+						flex: 1,
+						name: "account_id",
+						displayProperty: "username",
+						required: true,
+						dataSource: jmapds("Account")
+					})
 				)
+
 			)
 		);
 

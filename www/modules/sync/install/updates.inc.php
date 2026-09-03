@@ -119,3 +119,17 @@ $updates['202106101432'][] = "alter table sync_tasklist_user
 
 $updates['202205191157'][] = "alter table sync_settings
     add allowDeletes boolean default false null;";
+
+
+$updates['202608311638'][] = "drop table sync_addressbook_user;";
+
+$updates['202608311638'][] = "drop table sync_calendar_user;";
+
+$updates['202608311638'][] = "drop table sync_devices;";
+
+$updates['202608311638'][] = "drop table sync_note_categories_user;";
+
+$updates['202608311638'][] = "drop table sync_tasklist_user;";
+
+$updates['202608311638'][] = "drop table sync_user_note_book;";
+
