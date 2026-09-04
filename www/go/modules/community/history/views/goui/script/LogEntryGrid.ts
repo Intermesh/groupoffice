@@ -46,16 +46,17 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 				}),
 				column({
 					id: "description",
-					header: t("Name"),
-					resizable: true,
-					width: 60
+					header: t("Description"),
+					resizable: true
 				}),
 				column({
 					id: "entity",
 					header: t("Entity"),
-					resizable: true
+					resizable: true,
+					width: 120
 				}),
 				column({
+					width: 200,
 					id: "creator",
 					header: t("User"),
 					resizable: true,
@@ -101,6 +102,7 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 					id: "action",
 					header: t("Action"),
 					resizable: true,
+					width: 100,
 					renderer: (v) => {
 						return t(v.charAt(0).toUpperCase() + v.slice(1));
 					}

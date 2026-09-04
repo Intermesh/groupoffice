@@ -13,7 +13,7 @@ import {
 	store,
 	t,
 	tbar,
-	DateRangeField
+	DateRangeField, btn
 } from "@intermesh/goui";
 import {principalcombo} from "@intermesh/groupoffice-core";
 import {LogEntryGrid} from "./LogEntryGrid.js";
@@ -162,6 +162,10 @@ export class Main extends Component {
 							void this.logEntryGrid.store.load();
 						}
 					}
+				}),
+				btn({
+					menu: this.logEntryGrid.getVisibleColumnMenu(),
+					icon: "view_column",
 				})
 			),
 			comp({
