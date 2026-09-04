@@ -71,7 +71,7 @@ export class Main extends Component {
 					}
 				}),
 				principalcombo({
-					entity: "user",
+					entity: "User",
 					label: t("Users"),
 					placeholder: t("All users"),
 					required: false,
