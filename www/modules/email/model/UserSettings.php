@@ -16,7 +16,7 @@ use function GO;
  * replace into go_settings (user_id,name,value) select id,"email_sort_email_addresses_by_time", "1" from core_user;
  */
 class UserSettings extends Property {
-	public $id;
+	public ?int $id;
 	public $use_desktop_composer;
 	public $use_html_markup;
 	public $show_from;

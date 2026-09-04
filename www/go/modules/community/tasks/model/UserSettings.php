@@ -15,32 +15,22 @@ class UserSettings extends Property {
 
 	/**
 	 * Primary key to User id
-	 * 
-	 * @var int
 	 */
-	public $userId;
+	public ?int $userId;
 	
 	/**
 	 * Default Note book ID
-	 * 
-	 * @var int
 	 */
-	protected $defaultTasklistId;
-
-	/**
-	 * @var bool
-	 */
-	public $rememberLastItems = true;
-
-	/** @var string */
-	protected $lastTasklistIds;
+	protected ?int $defaultTasklistId;
+	public bool $rememberLastItems = true;
+	protected ?string $lastTasklistIds;
 
 	/**
 	 * Set due and start to the current time for new tasks
 	 *
 	 * @var bool
 	 */
-	public $defaultDate = false;
+	public bool $defaultDate = false;
 
 	/**
 	 * @return Mapping
