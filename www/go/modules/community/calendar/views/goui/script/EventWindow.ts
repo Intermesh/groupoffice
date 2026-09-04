@@ -306,7 +306,7 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 			this.alertField,
 
 			autocompletechips({
-				list: table({fitParent: true, headers: false, store: this.categoryStore = datasourcestore({
+				list: table({headers: false, store: this.categoryStore = datasourcestore({
 						dataSource:jmapds('CalendarCategory'),
 						sort: [{property:'name'}]
 					}),
@@ -389,7 +389,6 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 				title: t('Exceptions'),
 				height:400,
 			}, table({
-				fitParent:true,
 				store: exceptionStore,
 				columns: [
 					column({id: "recurrenceId",htmlEncode:false, header:t('Start'), renderer(v,record) {

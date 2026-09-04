@@ -128,8 +128,6 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 
 		this.stateId = "history-logentry-grid";
 
-		this.fitParent = true;
-
 		this.scrollLoad = true;
 	}
 }

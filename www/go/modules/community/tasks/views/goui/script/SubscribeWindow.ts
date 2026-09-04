@@ -30,7 +30,6 @@ export class SubscribeWindow extends Window {
 				})
 			),
 			this.tasklistGrid = tasklistgrid({
-				fitParent: true,
 				cls: "bg-lowest",
 				headers: false,
 				columns: [

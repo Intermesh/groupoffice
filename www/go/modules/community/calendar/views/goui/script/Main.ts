@@ -424,7 +424,6 @@ export class Main extends Component {
 		return table({
 			store: viewStore,
 			emptyStateHtml:'',
-			fitParent: true,
 			headers:false,
 			rowSelectionConfig: {
 				multiSelect: false,

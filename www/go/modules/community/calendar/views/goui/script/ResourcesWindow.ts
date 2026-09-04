@@ -105,7 +105,7 @@ export class ResourcesWindow extends Window {
 				btn({icon: 'add', cls: 'filled', handler: _ => (new ResourceGroupWindow()).show()})
 			),
 			comp({cls: "scroll",flex:1},
-				this.resourceGroupTable =table({cls: "no-row-lines", headers: false, fitParent: true,
+				this.resourceGroupTable =table({cls: "no-row-lines", headers: false,
 					store: resourceGroupStore,
 					rowSelectionConfig: {
 						multiSelect: false,
@@ -191,7 +191,6 @@ export class ResourcesWindow extends Window {
 					),
 					comp({cls: "scroll",flex:1},
 					this.resourceTable = table({
-						fitParent: true,
 						store: resourceStore,
 						columns: [column({header: t("ID"), id:"id", sortable: true, hidden:true, width: 60}),
 							column({header: t("Color"), id:"color", width: 40, renderer: v => comp({text:'-',style:{backgroundColor:'#'+v}}) }),

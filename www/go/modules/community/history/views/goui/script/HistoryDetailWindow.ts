@@ -111,7 +111,6 @@ export class HistoryDetailWindow extends Window {
 							})
 						],
 						store: store({data: tableData}),
-						fitParent: true,
 						rowSelectionConfig: {
 							multiSelect: false
 						}
