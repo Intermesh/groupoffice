@@ -280,7 +280,7 @@ class Module extends core\Module implements DomainProvider
 				$contact->photoBlobId = $blob->id;
 			}
 
-			if(!$contact->save()) {
+			if($contact->isModified() && !$contact->save()) {
 				throw new core\orm\exception\SaveException($contact);
 			}
 
