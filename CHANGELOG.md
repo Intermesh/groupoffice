@@ -1,3 +1,9 @@
+- History: Process has one relations to only show the differences within
+- Core: GOUI table columns with large content could grow too large.
+- History: Fixed user selection
+- History: Added column selector for grid
+- LDAP Authenticator: Fixed excessive logging when logging in
+
 01-09-2026: 26.0.45
 - Finance: New address autocomplete loaded all contacts and made the UI freeze
 
