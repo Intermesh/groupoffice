@@ -58,6 +58,7 @@ use setasign\Fpdi\PdfParser\Type\PdfBoolean;
  * @property \GO\Base\Model\User $lockedByUser
  *
  * @property boolean $delete_when_expired
+ * @property int $lock_expires_at
  */
 class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableInterface {
 
@@ -189,13 +190,22 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		parent::init();
 	}
 
+
+	public function lock(string $id, int|null $userId = null) {
+		$this->lock_id = $id;
+		$this->locked_user_id = $userId ?? \GO::user()->id;
+
+		// locks expire in 30 minutes. WOPI requires it: https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/concepts#lock-length
+		$this->lock_expires_at = time() + 1800;
+
+	}
 	/**
 	 * Check if a file is locked by another user.
 	 *
 	 * @return boolean
 	 */
-	public function isLocked(){
-		return !empty($this->locked_user_id) && (!\GO::user() || $this->locked_user_id!=\GO::user()->id);
+	public function isLocked($forYouToo = false){
+		return !empty($this->locked_user_id) && ($forYouToo || !\GO::user() || $this->locked_user_id!=\GO::user()->id) && time() < $this->lock_expires_at;
 	}
 
 	public function unlockAllowed(){

@@ -395,3 +395,10 @@ $updates['202607061104'][] = function() {
 	$folder->readonly=1;
 	$folder->save(true);
 };
+
+
+$updates['202609071447'][] = "alter table fs_files
+    add lock_expires_at bigint null after locked_user_id;";
+
+$updates['202609071447'][] = "update fs_files set lock_expires_at = unix_timestamp() + 1800 where locked_user_id > 0;";
+
