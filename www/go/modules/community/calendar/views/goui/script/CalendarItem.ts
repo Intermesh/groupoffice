@@ -343,9 +343,8 @@ export class CalendarItem {
 		return dlg;
 	}
 
-	async open(onCancel?: Function, forceWrite?: boolean) {
-
-		const internalOpen = () => {
+	async open(onCancel?: Function, forceWrite?: boolean) : Promise<EventWindow| EventDetailWindow | undefined> {
+		const internalOpen = async () => {
 			const dlg = !forceWrite && !this.mayChange  ? new EventDetailWindow() : new EventWindow();
 			if (dlg instanceof EventWindow) {
 				dlg.on('close', () => {
@@ -358,7 +357,7 @@ export class CalendarItem {
 				})
 			}
 			dlg.show();
-			dlg.loadEvent(this);
+			await dlg.loadEvent(this);
 
 			return dlg;
 		}
@@ -366,6 +365,7 @@ export class CalendarItem {
 		if(!writeableCalendarStore.loaded) {
 			await writeableCalendarStore.load();
 		}
+
 		const cals = writeableCalendarStore.all()
 		if(!cals.length) {
 			return new Promise(resolve => {
@@ -925,7 +925,7 @@ export class CalendarItem {
 	copy() {
 		const data: any = {};
 		const copyKeys = ['alerts','categoryIds','duration','description', 'freeBusyStatus','location','participants','privacy',
-			'showWithoutTime','start','status','timeZone','title','useDefaultAlerts'];
+			'showWithoutTime','start','status','timeZone','title','useDefaultAlerts', 'calendarId'];
 		for (const key of copyKeys) { // @ts-ignore
 			data[key] = this.data[key];
 		}
@@ -933,39 +933,51 @@ export class CalendarItem {
 		CalendarItem.clipboard = new CalendarItem({
 			data,
 			key: "",
-			open(this: CalendarItem) { // when opening the copy. just save
-				this.confirmScheduleMessage(data, () => {
-					root.mask();
-					eventDS.create(data).catch(e => {
-						void Window.error(e);
-						throw e;
-					}).then(r => {
-						// to copy again keep the id empty
-						this.data.id = '';
-					}).finally(() => {
-						root.unmask();
-					});
-				});
-			}
+			// open(this: CalendarItem) { // when opening the copy. just save
+			// 	this.confirmScheduleMessage(data, () => {
+			// 		root.mask();
+			// 		eventDS.create(data).catch(e => {
+			// 			void Window.error(e);
+			// 			throw e;
+			// 		}).then(r => {
+			// 			// to copy again keep the id empty
+			// 			this.data.id = '';
+			// 		}).finally(() => {
+			// 			root.unmask();
+			// 		});
+			// 	});
+			// }
 		});
 	}
 
-	static paste(calendarId: string, date: string) {
+	static async paste(calendarId: string, date: string) {
+
 		if (!CalendarItem.clipboard!) return;
-		const withoutTime = date.length === 10;
-		let item = CalendarItem.clipboard;
-		if (withoutTime) { // keep orig time
+		const withoutTime = date.length === 10, item = CalendarItem.clipboard;
+
+		let start = item.start;
+		if(withoutTime) {
 			const [y, m, d] = date.split('-').map(Number);
-			item.start.setYear(y).setMonth(m).setDate(d);
+			start.setYear(y).setMonth(m).setDate(d);
 		} else {
-			item.start = new DateTime(date);
+			start = new DateTime(date);
 		}
-		item.end = item.start.clone().add(new DateInterval(item.data.duration));
+
+		let end = start.clone().add(new DateInterval(item.data.duration));
+		if(withoutTime) {
+			end.add(new DateInterval("-P1D"))
+		}
 		item.data.calendarId = calendarId;
-		item.save();
+		const dlg = await item.open()
+
+		if(dlg instanceof EventWindow) {
+			dlg.form.patch({
+				start: start.format("c"),
+				end: end.format("c"),
+				calendarId
+			});
+		}
 	}
-
-
 
 	remove() {
 		if(!this.mayChange && !this.mayMove) {

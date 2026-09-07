@@ -426,7 +426,7 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 		return data;
 	}
 
-	loadEvent(ev: CalendarItem) {
+	async loadEvent(ev: CalendarItem) {
 
 		//this.title = t(!ev.key ? 'New event' : 'Edit event');
 		if(ev.data.calendarId) {
@@ -436,7 +436,7 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 			this.item = ev;
 			this.form.create(ev.data);
 		} else {
-			this.form.load(ev.data.id!).then(() => {
+			await this.form.load(ev.data.id!).then(() => {
 				if(ev.recurrenceId) {
 					this.startDate.value = ev.start.format(ev.data.showWithoutTime ? 'Y-m-d' : 'Y-m-d\TH:i');
 					this.startDate.trackReset();
