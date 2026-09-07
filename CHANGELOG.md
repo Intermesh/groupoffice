@@ -1,3 +1,6 @@
+- Calendar: copy/cut + paste opens event dialog instead of saving directly
+- Calendar: The server handles the event->replyTo setting better. On owned calendars the calendar owner's e-mail address
+  is used and on shared calendar either the participant with owner = true or the event creator's email address is used.
 - History: Process has one relations to only show the differences within
 - Core: GOUI table columns with large content could grow too large.
 - History: Fixed user selection
