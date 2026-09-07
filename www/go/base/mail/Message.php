@@ -459,8 +459,9 @@ class Message extends \go\core\mail\Message {
 	 */
 	public function handleEmailFormInput(array $params){
 		
-		if(!empty($params['subject']))
-			$this->setSubject($params['subject']);		
+		if(!empty($params['subject'])) {
+			$this->setSubject($params['subject']);
+		}
 		
 		if(!empty($params['to'])){		
 			$to = new AddressList($params['to']);
@@ -479,12 +480,14 @@ class Message extends \go\core\mail\Message {
 			$alias = \GO\Email\Model\Alias::model()->findByPk($params['alias_id']);	
 			$this->setFrom($alias->email, $alias->name);
 			
-			if(!empty($params['notification']))
+			if(!empty($params['notification'])) {
 				$this->setReadReceiptTo(new Address($alias->email, $alias->name));
+			}
 		}
 		
-		if(isset($params['priority']) && $params['priority'] != 3)
-			$this->setPriority ($params['priority']);
+		if(isset($params['priority']) && $params['priority'] != 3) {
+			$this->setPriority($params['priority']);
+		}
 		
 		
 		if(!empty($params['in_reply_to'])){
