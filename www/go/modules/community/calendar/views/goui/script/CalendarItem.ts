@@ -222,9 +222,9 @@ export class CalendarItem {
 					const o = e.recurrenceOverrides[recurrenceId];
 					if(o.excluded) continue;
 					const oStart = new DateTime(o.start ?? recurrenceId);
-					if(oStart.date > from.date) {
+					if(oStart.date < until.date) {
 						const oEnd = oStart.add(new DateInterval(o.duration ?? e.duration));
-						if(oEnd.date < until.date) {
+						if(oEnd.date > from.date) {
 							yield new CalendarItem({key: e.id + '/' + recurrenceId, recurrenceId, override: o, data: e});
 						}
 					}
