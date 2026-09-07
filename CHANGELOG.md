@@ -1,3 +1,5 @@
+- Files / WOPI / DAV / OnlyOffice: Locks expire in 30 minutes and will be refreshed
+
 07-09-2026: 26.0.46
 - Calendar: copy/cut + paste opens event dialog instead of saving directly
 - Calendar: The server handles the event->replyTo setting better. On owned calendars the calendar owner's e-mail address
