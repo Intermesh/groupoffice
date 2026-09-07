@@ -695,10 +695,19 @@ class CalendarEvent extends AclItemEntity {
 				}
 			}
 			if (empty($this->replyTo)) {
-				$owner = $this->organizer();
-				if (!empty($owner)) {
-					$this->replyTo = $owner->email;
+
+				// In calendars without an owner the creator will be the organizer. Otherwise the calendar owner is
+				// the organizer.
+				$calendar = Calendar::findById($this->calendarId, ['ownerId']);
+				if($calendar->isOwned()) {
+					$owner = Principal::findById($calendar->getOwnerId(), ['email']);
+				} else {
+					$owner = $this->organizer();
+					if (empty($owner)) {
+						$owner = go()->getAuthState()->getUser(['email']);
+					}
 				}
+				$this->replyTo = $owner->email;
 			}
 		}
 
