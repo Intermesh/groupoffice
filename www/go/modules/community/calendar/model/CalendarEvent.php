@@ -629,7 +629,7 @@ class CalendarEvent extends AclItemEntity {
 
 		if(!$this->isNew()) {
 			// is modified, but not calendarId, isDraft or modifiedAt, per-user prop, participants
-			if($this->isModified(self::EventProperties) && $this->isOrigin) {
+			if($this->isModified([...self::EventProperties, 'participants', 'recurrenceOverrides']) && $this->isOrigin) {
 				if(!$this->isModified('sequence') || $this->sequence <= $this->getOldValue('sequence'))
 					$this->sequence += 1;
 			}
