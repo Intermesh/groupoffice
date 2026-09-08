@@ -408,12 +408,12 @@ class TemplateParser {
 	 * @param $id
 	 * @param string $entityName
 	 * @param string|null $key
-	 * @param $properties
+	 * @param array|null $properties
 	 * @return array|false|GO\Base\Db\ActiveStatement|null
 	 * @throws Exception
 	 * @example: [assign entries = entity.id|findEntity:TimeEntry:project_id]{{entries | column:units | sum}}
 	 */
-	private function filterFindEntity($id, string $entityName, ?string $key = 'id', $properties = null)
+	private function filterFindEntity($id, string $entityName, ?string $key = 'id', ?array $properties = null): mixed
 	{
 		if (empty($id)) {
 			return null;
@@ -429,7 +429,7 @@ class TemplateParser {
 		if (is_a($cls, ActiveRecord::class, true)) {
 			return $cls::model()->findByAttribute($key, $id);
 		} else {
-			return $cls::find($properties, true)->where([$key => $id])->all();
+			return $cls::find($properties ?? [], true)->where([$key => $id])->all();
 		}
 	}
 
