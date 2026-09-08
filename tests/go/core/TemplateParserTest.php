@@ -2,6 +2,7 @@
 namespace go\core;
 
 use go\core\model\Link;
+use go\core\model\User;
 use go\modules\community\addressbook\model\Address;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\addressbook\model\Contact;
@@ -331,6 +332,43 @@ ID;
 ID;
 
 		$this->assertEquals("7.01", $tplParser->parse($tpl));
+	}
+
+
+
+	public function testFind() {
+		$tplParser = new TemplateParser();
+
+		$firstUser = User::find(['username'])->single();
+
+		$str = "{{|find:User:username|first|prop:username}}";
+
+		$username = $tplParser->parse($str);
+
+		$this->assertEquals($firstUser->username, $username);
+	}
+
+
+	public function testFindSum() {
+		$tplParser = new TemplateParser();
+
+		$totals= User::find()->selectSingleValue('sum(loginCount)')->single();
+
+		$str = '{{|find:User:username|select:"sum(loginCount) as total"|first|prop:total}}';
+
+		$totalTpl = $tplParser->parse($str);
+
+		$this->assertEquals($totals, $totalTpl);
+	}
+
+	public function testFindWhere() {
+		$tplParser = new TemplateParser();
+
+		$tplParser->addModel('username', 'admin');
+		$str = '{{|find:User:username|where:username:$username|first|prop:username}}';
+		$result = $tplParser->parse($str);
+
+		$this->assertEquals("admin", $result);
 	}
 
 
