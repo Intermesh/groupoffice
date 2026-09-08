@@ -2,6 +2,7 @@
 namespace go\core;
 
 use go\core\model\Link;
+use go\core\model\User;
 use go\modules\community\addressbook\model\Address;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\addressbook\model\Contact;
@@ -309,6 +310,65 @@ ID;
 		$this->assertEquals("3", $tplParser->parse('[assign foo = 1 + 2]{{foo}}'));
 
 		$this->assertEquals("5", $tplParser->parse('[assign bar = {{foo}} + 2]{{bar}}'));
+	}
+
+
+	public function testParentInEachLoop()
+	{
+
+		$tplParser = new TemplateParser();
+		$tplParser->addModel('invoices', [
+			['price' => 1.55],
+			['price' => 2.01],
+			['price' => 3.45],
+		]);
+
+		$tpl = <<<ID
+[assign total = 0]
+[each invoice in invoices]
+[assign parent.total = {{parent.total}} + {{invoice.price}}]
+[/each]
+{{total}}
+ID;
+
+		$this->assertEquals("7.01", $tplParser->parse($tpl));
+	}
+
+
+
+	public function testFind() {
+		$tplParser = new TemplateParser();
+
+		$firstUser = User::find(['username'])->single();
+
+		$str = "{{|find:User:username|first|prop:username}}";
+
+		$username = $tplParser->parse($str);
+
+		$this->assertEquals($firstUser->username, $username);
+	}
+
+
+	public function testFindSum() {
+		$tplParser = new TemplateParser();
+
+		$totals= User::find()->selectSingleValue('sum(loginCount)')->single();
+
+		$str = '{{|find:User:username|select:"sum(loginCount) as total"|first|prop:total}}';
+
+		$totalTpl = $tplParser->parse($str);
+
+		$this->assertEquals($totals, $totalTpl);
+	}
+
+	public function testFindWhere() {
+		$tplParser = new TemplateParser();
+
+		$tplParser->addModel('username', 'admin');
+		$str = '{{|find:User:username|where:username:$username|first|prop:username}}';
+		$result = $tplParser->parse($str);
+
+		$this->assertEquals("admin", $result);
 	}
 
 
