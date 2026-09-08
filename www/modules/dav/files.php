@@ -21,7 +21,7 @@ use Sabre\DAV\Auth\Plugin as AuthPlugin;
 use Sabre\DAV\Browser\Plugin;
 use Sabre\DAV\Exception\NotAuthenticated;
 use Sabre\DAV\Exception\NotFound;
-use Sabre\DAV\Locks\Plugin as LockPlugin;
+use \GO\Dav\Locks\Plugin as LockPlugin;
 
 define("GO_NO_SESSION", true);
 
