@@ -446,8 +446,12 @@ class TemplateParser {
 	}
 
 
-	private function filterSelect(\go\core\orm\Query $query, string $select) {
-		return $query->select($select)->fetchMode(\PDO::FETCH_ASSOC);
+	private function filterSelect(\go\core\orm\Query|\GO\Base\DB\ActiveStatement $query, string $select) {
+		if (is_a($query, \go\core\orm\Query::class, true)) {
+			return $query->select($select)->fetchMode(\PDO::FETCH_ASSOC);
+		} else {
+			return $query->fetch(\PDO::FETCH_ASSOC);
+		}
 	}
 
 	private function filterWhere(\go\core\orm\Query $query, string $field, mixed $value, $comparator = '=') {
