@@ -75,8 +75,15 @@ abstract class Entity  extends OrmEntity {
 
 		// Process has one relations to only show the differences within
 		foreach($modified as $k => $changed) {
-			if($changed[0] instanceof Property) {
+			if (isset($changed[0]) && $changed[0] instanceof Property) {
 				$modified[$k] = $changed[0]->getModified();
+//  @TODO: atm some hosOne relations are saved without any changed properties. Chcek below snippet for correctness as intended
+//			} else {
+//				foreach ($changed as $kk => $subChanged) {
+//					if (is_array($subChanged) && isset($subChanged[0]) && $subChanged[0] instanceof Property) {
+//						$modified[$k][$kk] = $subChanged[0]->getModified();
+//					}
+//				}
 			}
 		}
 
