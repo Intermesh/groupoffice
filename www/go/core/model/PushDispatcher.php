@@ -4,6 +4,7 @@ namespace go\core\model;
 
 use go\core\App;
 use go\core\db\Table;
+use go\core\ErrorHandler;
 use go\core\event\EventEmitterTrait;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
@@ -109,21 +110,27 @@ class PushDispatcher
 		$state = [];
 		foreach ($this->entities as $name) {
 
-			$entityType = EntityType::findByName($name);
+			try {
+				$entityType = EntityType::findByName($name);
 
-			if(!isset($this->counters[$name])) {
-				$this->counters[$name] = 0;
-			}
+				if (!isset($this->counters[$name])) {
+					$this->counters[$name] = 0;
+				}
 
-			if($this->shouldCheckDB($name)) {
+				if ($this->shouldCheckDB($name)) {
 
-				go()->debug('PushDispatcher::checkChanges() on DB for '. $name);
-				/** @var Entity $cls */
-				$entityType->clearCache();
-				$cls = $entityType->getClassName();
-				$state[$name] = $cls::getState();
+					go()->debug('PushDispatcher::checkChanges() on DB for ' . $name);
+					/** @var Entity $cls */
+					$entityType->clearCache();
+					$cls = $entityType->getClassName();
+					$state[$name] = $cls::getState();
 
-				$closeDb = true;
+					$closeDb = true;
+				}
+			} catch (\Throwable $e) {
+				ErrorHandler::logException($e);
+
+				$this->entities = array_filter($this->entities, function($e) use ($name) {return $e != $name; });
 			}
 		}
 

@@ -71,7 +71,7 @@ try {
 		->start();
 } catch(Throwable $e) {
 	echo "event: exception\n";
-	echo 'data: ' . get_class($e). "\n\n";
+	echo 'data: ' . json_encode(get_class($e)). "\n\n";
 
 	ErrorHandler::logException($e);
 }
