@@ -171,6 +171,17 @@ use function GO;
  * </tr>
  * ````
  *
+ *
+ * @example Find entities
+ *
+ * ```
+ * {{|find:User:username|select:"sum(loginCount) as total"|first|prop:total}}
+ * ```
+ *
+ * ```
+ * {{|find:User:username|where:username:$username|first|prop:username}}';
+ * ```
+ *
  */
 class TemplateParser {	
 
@@ -226,6 +237,9 @@ class TemplateParser {
 		$this->addFilter('findEntity', [$this, "filterFindEntity"]);
 		$this->addFilter('links', [$this, "filterLinks"]);
 		$this->addFilter('prop', [$this, "filterProp"]);
+		$this->addFilter('find', [$this, "filterFind"]);
+		$this->addFilter('select', [$this, "filterSelect"]);
+		$this->addFilter('where', [$this, "filterWhere"]);
 
 
 		$this->addFilter('entityFiles', [$this, "filterEntityFiles"]);
@@ -394,12 +408,12 @@ class TemplateParser {
 	 * @param $id
 	 * @param string $entityName
 	 * @param string|null $key
-	 * @param $properties
+	 * @param array|null $properties
 	 * @return array|false|GO\Base\Db\ActiveStatement|null
 	 * @throws Exception
 	 * @example: [assign entries = entity.id|findEntity:TimeEntry:project_id]{{entries | column:units | sum}}
 	 */
-	private function filterFindEntity($id, string $entityName, ?string $key = 'id', $properties = null)
+	private function filterFindEntity($id, string $entityName, ?string $key = 'id', ?array $properties = null): mixed
 	{
 		if (empty($id)) {
 			return null;
@@ -415,8 +429,29 @@ class TemplateParser {
 		if (is_a($cls, ActiveRecord::class, true)) {
 			return $cls::model()->findByAttribute($key, $id);
 		} else {
-			return $cls::find()->where([$key => $id])->all();
+			return $cls::find($properties ?? [], true)->where([$key => $id])->all();
 		}
+	}
+
+
+
+	private function filterFind(string $entityName, $properties = "") {
+		$et = EntityType::findByName($entityName);
+
+		$cls = $et->getClassName();
+
+		$props = empty($properties) ? [] : explode(",", $properties);
+
+		return $cls::find($props, true);
+	}
+
+
+	private function filterSelect(\go\core\orm\Query $query, string $select) {
+		return $query->select($select)->fetchMode(\PDO::FETCH_ASSOC);
+	}
+
+	private function filterWhere(\go\core\orm\Query $query, string $field, mixed $value, $comparator = '=') {
+		return $query->where($field, $comparator, $value);
 	}
 
 	/**
@@ -1172,7 +1207,9 @@ class TemplateParser {
 		
 		$varPath = trim(array_shift($filters)); //eg "contact.name";		
 
-		$value = $this->getVar($varPath);
+		$hasVar = !empty($varPath);
+
+		$value = $hasVar ? $this->getVar($varPath) : null;
 
 //		// if the var is enclosed with double quotes then treat it as a sting
 //		if(str_starts_with($varPath, '"') && str_ends_with($varPath, '"')) {
@@ -1183,13 +1220,25 @@ class TemplateParser {
 		foreach($filters as $filter) {
 			
 			$args = array_map('trim', str_getcsv($filter, ':', '"', ""));
+
 			$filterName = strtolower(array_shift($args));
-			array_unshift($args, $value);
+
+			$args = array_map(function($a) {
+				if(substr($a, 0, 1) == '$') {
+					return $this->models[substr($a, 1)] ?? null;
+				}
+				return str_replace('\$', '$', $a);
+			}, $args);
+
+			if($hasVar) {
+				array_unshift($args, $value);
+			}
 
 			if(!isset($this->filters[$filterName])) {
 				throw new Exception("Filter '" . $filterName . "' is undefined");
 			}
 			$value = call_user_func_array($this->filters[$filterName], $args);
+			$hasVar = true;
 
 		}
 		
