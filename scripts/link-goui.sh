@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
-WORKDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1
+
+#WORKDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 sync_repo() {
     local REPO_URL="${1:?sync_repo requires a repo URL}"
