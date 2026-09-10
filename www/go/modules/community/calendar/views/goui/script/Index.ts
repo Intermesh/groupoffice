@@ -389,7 +389,7 @@ modules.register(  {
 			// // END OLD CODE
 
 
-			// TODO: Move to entity register
+			// TODO: Move to entity register?
 			main.notifier.regRenderer('CalendarEvent', (alert, closeFn) => {
 				const entity = alert.entityData,
 					msgs: {[key:string]: string} = {
