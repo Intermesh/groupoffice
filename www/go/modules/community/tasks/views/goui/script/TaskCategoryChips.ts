@@ -12,7 +12,6 @@ export class TaskCategoryChips extends AutocompleteChips<Table<DataSourceStore>>
 		super(
 			table({
 				headers: false,
-				fitParent: true,
 				store: datasourcestore({
 					dataSource: jmapds("TaskCategory"),
 					queryParams: {

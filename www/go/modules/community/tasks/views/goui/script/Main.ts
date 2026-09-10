@@ -175,7 +175,6 @@ export class Main extends MainThreeColumnPanel {
 					cls: "scroll"
 				},
 				this.taskListGrid = tasklistgrid({
-					fitParent: true,
 					cls: "no-row-lines",
 					dropOn: true,
 					sortableGroup: "TaskToList",
@@ -269,7 +268,6 @@ export class Main extends MainThreeColumnPanel {
 				},
 				this.taskCategoryGrid = taskcategorygrid({
 					cls: "no-row-lines",
-					fitParent: true,
 					rowSelectionConfig: {
 						multiSelect: true,
 						listeners: {
@@ -345,7 +343,6 @@ export class Main extends MainThreeColumnPanel {
 
 	protected createCenter() {
 		this.taskGrid = new TaskGrid();
-		this.taskGrid.fitParent = true;
 		this.taskGrid.draggableRows = true;
 		this.taskGrid.sortableGroup = "TaskToList";
 		void this.taskGrid.store.load();

@@ -143,7 +143,6 @@ export class MailboxTable extends Table<DataSourceStore> {
 		];
 
 		super(store, columns );
-		this.fitParent = true;
 		this.rowSelectionConfig =  {
 			multiSelect: true
 		};

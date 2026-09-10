@@ -566,6 +566,16 @@ public function historyLog(): bool|array
 	private function validatePasswordChange(): bool
 	{
 
+		// user entered correct password, OK
+		if($this->passwordVerified) {
+			return true;
+		}
+
+		// User didn't have a password yet, ok
+		if(!$this->isModified(['password']) || $this->getOldValue('password') == null) {
+			return true;
+		}
+
 		// During install we don't verify
 		if(App::get()->getInstaller()->isInProgress()) {
 			return true;
@@ -578,16 +588,6 @@ public function historyLog(): bool|array
 
 		// current user mayChangeUsers and is not changing itself or an admin
 		if(go()->getAuthState() && go()->getModel()->getUserRights()->mayChangeUsers && $this->id != App::get()->getAuthState()->getUserId() && !$this->isAdmin()) {
-			return true;
-		}
-
-		// user entered correct password, OK
-		if($this->passwordVerified) {
-			return true;
-		}
-
-		// User didn't have a password yet, ok
-		if(!$this->isModified(['password']) || $this->getOldValue('password') == null) {
 			return true;
 		}
 
@@ -1336,7 +1336,7 @@ public function historyLog(): bool|array
 		if(!$this->contact) {
 			$this->contact = new Contact();
 			$this->contact->addressBookId = go()->getSettings()->userAddressBook()->id;
-			if($this->email) {
+			if(isset($this->email)) {
 				$this->contact->emailAddresses[0] = (new EmailAddress($this->contact))->setValues(['email' => $this->email]);
 			}
 			$nameParts = explode(" ", $this->displayName);

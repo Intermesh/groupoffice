@@ -56,7 +56,6 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 	protected createWest() {
 		this.noteBookGrid = notebookgrid({
 			headers: false,
-			fitParent: true,
 			stateId: "notes-noteBookGrid",
 			cls: "no-row-lines",
 			rowSelectionConfig: {

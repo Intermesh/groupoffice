@@ -417,17 +417,28 @@ class VCard extends AbstractConverter {
 	/**
 	 * @throws Exception
 	 */
-	private function importPhoto(Contact $entity, VCardComponent $vcardComponent) {
-		$vcardComponent = isset($vcardComponent->PHOTO) ? $vcardComponent->PHOTO->getValue() : null;
-		if ($vcardComponent) {
-			$blob = Blob::fromString($vcardComponent);
-			$blob->type = 'image/jpeg';
-			$blob->name = $entity->getUid() . '.jpg';
+	private function importPhoto(Contact $entity, VCardComponent $vcardComponent)
+	{
+		$p = isset($vcardComponent->PHOTO) ? $vcardComponent->PHOTO : null;
+		$entity->photoBlobId = null;
+		if ($p) {
+			$pparam = $p->parameters();;
+			$uid = $entity->getUid() ?? md5($entity->name);
+			$pv = $p->getValue();
+
+			if (isset($pparam['TYPE']) && $pparam['TYPE']->getValue() === "JPEG") {
+				$blob = Blob::fromString($pv);
+				$blob->type = 'image/jpeg';
+				$blob->name = $uid . '.jpg';
+			} elseif (isset($pparam['ENCODING']) && $pparam['ENCODING']->getValue() === "BASE64") {
+				$blob = Blob::fromString(base64_decode($pv));
+				// We make an educated guess and assume that it is a .png file
+				$blob->type = "image/png";
+				$blob->name = $uid . '.png';
+			}
 			if ($blob->save()) {
 				$entity->photoBlobId = $blob->id;
 			}
-		} else {
-			$entity->photoBlobId = null;
 		}
 	}
 

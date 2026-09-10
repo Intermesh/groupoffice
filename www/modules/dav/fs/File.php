@@ -66,14 +66,16 @@ class File extends \Sabre\DAV\FS\File {
 	}
 
     public function lock($lock_id = "") {
-			$file = $this->getFile();
-			$file->locked_user_id = \GO::user()->id;
 
-			$file->lock_id = $lock_id;
+			\GO::debug("DAVFile:lock( ".$lock_id.")");
+			$file = $this->getFile();
+			$file->lock($lock_id);
 			$file->save(true);
     }
 
     public function unlock() {
+
+			\GO::debug("DAVFile:unlock( )");
         $file = $this->getFile();
         $file->locked_user_id =0;
 				$file->lock_id = "";

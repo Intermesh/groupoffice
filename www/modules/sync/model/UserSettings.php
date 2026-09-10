@@ -29,7 +29,7 @@ use go\core\model\User;
 class UserSettings extends Property
 {
 
-	public $user_id;
+	public ?int $user_id;
 	/**
 	 * Email account
 	 * @var int

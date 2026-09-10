@@ -26,7 +26,6 @@ export class SystemSettings extends AppSettingsPanel {
 			),
 			table({
 				cls: 'bg-lowest',
-				fitParent:true,
 				store,
 				columns: [
 					column({id:'active',width:40, header:' ',htmlEncode:false, renderer: (v, record) => '<i class="icon">'+(record.lastError ? 'warning' : (v?'check':'close'))+'</i>'}),

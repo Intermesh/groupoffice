@@ -41,7 +41,6 @@ export class ScheduleFilter extends Table {
 		);
 
 		this.headers = false;
-		this.fitParent = true;
 		this.cls = "no-row-lines tasks-filter-table";
 	}
 }

@@ -58,7 +58,6 @@ export class AliasDialog extends FormWindow {
 					},
 
 					list: table({
-						fitParent: true,
 						headers: false,
 						store: datasourcestore({
 							dataSource: jmapds("MailBox"),

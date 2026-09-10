@@ -46,7 +46,6 @@ export class ManageCategoriesWindow extends Window {
 
 		this.table = table({
 			cls: "bg-lowest",
-			fitParent: true,
 			rowSelectionConfig: {
 				multiSelect: false,
 				listeners: {

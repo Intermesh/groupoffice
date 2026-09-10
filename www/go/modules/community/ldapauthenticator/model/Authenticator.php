@@ -295,18 +295,23 @@ class Authenticator extends PrimaryAuthenticator
 		}
 
 		foreach ($accounts as $account) {
-
-			$account->password = $password;
+			if($account->decryptPassword() !== $password) {
+				$account->password = $password;
+			}
 
 			if ($server->smtpUseUserCredentials) {
+				$smtpPassword = $smtpPassword ?? $password;
+
 				$account->smtp_username = $imapUsername;
-				$account->smtp_password = $smtpPassword ?? $password;
+				if($account->decryptSmtpPassword() !== $smtpPassword) {
+					$account->smtp_password = $smtpPassword ?? $password;
+				}
 			}
 
 			$wasNew = $account->getIsNew();
 			$account->checkImapConnectionOnSave = $wasNew;
 
-			if (!$account->save(true)) {
+			if ($account->isModified() && !$account->save(true)) {
 				throw new Exception("Could not save e-mail account: " . implode("\n", $account->getValidationErrors()));
 			}
 

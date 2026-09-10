@@ -1232,6 +1232,7 @@ CREATE TABLE `core_principal`(
 	`entityId` INT UNSIGNED NOT NULL,
 	`aclId` INT NOT NULL,
 	PRIMARY KEY (`id`),
+	UNIQUE INDEX `entityId` (`entityTypeId` ASC, `entityId` ASC),
 	INDEX `index_core_entity_id` ( `entityTypeId` ),
 	INDEX `index_core_blob_id` ( `avatarId` ),
 	CONSTRAINT `fk_core_principal_core_acl1`
