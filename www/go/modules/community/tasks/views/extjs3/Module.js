@@ -1,7 +1,7 @@
 go.Modules.register("community", "tasks", {
 	mainPanel: "go.modules.community.tasks.MainPanel",
 	title: t("Tasks"),
-	entities: ["TaskListGrouping", "TaskCategory","PortletTasklist","Settings",{
+	entities: ["TaskListGrouping", "TaskCategory","Settings",{
 		name: "TaskList",
 		relations: {
 			group: {store: "TaskListGrouping", fk: "groupingId"},
