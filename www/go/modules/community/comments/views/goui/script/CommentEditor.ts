@@ -69,7 +69,7 @@ export class CommentEditor extends Component {
 						void Image.replaceImages(target.el);
 					},
 
-					attach: async ({file}) => {
+					attachfile: async ({file}) => {
 						this.mask();
 						const blob = await client.upload(file);
 						this.unmask();
