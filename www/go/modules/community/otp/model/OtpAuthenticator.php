@@ -3,6 +3,7 @@
 namespace go\modules\community\otp\model;
 
 use DateTime;
+use DateTimeInterface;
 use Exception;
 use go\core\exception\Forbidden;
 use go\core\fs\Blob;
@@ -22,15 +23,15 @@ require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' .
 class OtpAuthenticator extends Property
 {
 
-	public $userId;
-	protected $secret;
-	public ?\DateTimeInterface $createdAt = null;
+	protected int $userId;
+	protected ?string $secret;
+	public ?DateTimeInterface $createdAt = null;
 
 	protected bool $verified = false;
 
 	private ?string $verify = null;
 	public static bool $requestSecret = false;
-	public ?\DateTimeInterface $expiresAt = null;
+	public ?DateTimeInterface $expiresAt = null;
 
 	protected int $codeLength = 6;
 
