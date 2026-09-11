@@ -1,3 +1,5 @@
+- Core: Fixed GOUI table column problem where the content would stretch it too wide.
+- Registration: New "Export" permission to restrict exporting time
 - Files / WOPI / DAV / OnlyOffice: Locks expire in 30 minutes and will be refreshed
 - DAV: Handle expired lock token on unlock when file is not locked anymore
 - Support / Tasks: do not display notifications tab in tasklist dialog
