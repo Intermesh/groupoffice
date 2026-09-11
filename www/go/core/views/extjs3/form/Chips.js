@@ -206,7 +206,10 @@ go.form.Chips = Ext.extend(Ext.Container, {
 
 			this.mapValues = values;
 
-			this.entityStore.get(ids, function (entities) {				
+			this.entityStore.get(ids, function (entities) {
+				if(this.isDestroyed) {
+					return;
+				}
 					this.dataView.store.loadData({records: entities}, true);
 					this._isDirty = false;
 			}, this);
