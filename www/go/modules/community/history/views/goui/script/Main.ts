@@ -35,6 +35,7 @@ export class Main extends Component {
 		this.cls = "hbox fit";
 
 		this.logEntryGrid = new LogEntryGrid();
+		this.logEntryGrid.stateId = "history-logentry-grid";
 
 		this.items.add(
 			this.west = this.createWest(),

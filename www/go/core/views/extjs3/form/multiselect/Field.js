@@ -181,6 +181,10 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 		//we must preload the notebooks so notebook select can use it in a renderer
 		this.entityStore.get(ids, function (entities) {
 
+			if(this.isDestroyed) {
+				return;
+			}
+
 			this.entities = {};
 
 			entities.forEach(e => {

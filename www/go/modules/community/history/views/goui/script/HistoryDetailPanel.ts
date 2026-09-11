@@ -11,7 +11,7 @@ export class HistoryDetailPanel extends Component {
 
 		this.stateId = "history-detail";
 
-		this.grid = new LogEntryGrid();
+		this.grid = new LogEntryGrid(true);
 
 		this.style.maxHeight = "40rem";
 		this.cls = "card vbox";
