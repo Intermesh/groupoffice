@@ -1,3 +1,5 @@
+- Core: unset token if CSRF check fails (cherry pick from 26.0)
+
 24-08-2026: 6.8.178
 - Core: reorganize password validation checks in `validatePasswordChange` method to prevent module mayChangeUser check if password not modified
 - LdapAuth: do not put all ldap users that are sync in the history log
