@@ -304,7 +304,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'registrationNumber'
 				},{
 					hidden: this.enabledColumns.indexOf('debtorNumber') == -1,
-					header: t('Debtor number'),
+					header: t('Customer number'),
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'debtorNumber'
