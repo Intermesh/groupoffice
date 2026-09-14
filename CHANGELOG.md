@@ -7,6 +7,7 @@
 - History: Type error when viewing removed users in history log
 - Registration: Added timer button
 - Email: Archive user archives e-mail account too now
+- Core: Infinite principal rebuild fixed
 
 07-09-2026: 26.0.46
 - Calendar: copy/cut + paste opens event dialog instead of saving directly
