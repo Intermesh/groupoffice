@@ -290,10 +290,7 @@ class Authenticator extends PrimaryAuthenticator
 			$account->smtp_port = $server->smtpPort;
 			$account->smtp_encryption = $server->smtpEncryption ?? "";
 
-			//$account->mbroot = ??
-
 			$accounts = [$account];
-
 		}
 
 		go()->debug("LDAPAUTH: " . count($accounts) . " accounts not found");
