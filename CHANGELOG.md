@@ -1,3 +1,4 @@
+- pdfeditor: rename Upload to upload so class finder doesn't try to load it
 - Core: Fixed install error when SourceGuardian was not installed
 - Tasks: Added 'Show in calendar' checkbox per task list to toggle task visibility in calendar
 - Core: Fixed GOUI table column problem where the content would stretch it too wide.
