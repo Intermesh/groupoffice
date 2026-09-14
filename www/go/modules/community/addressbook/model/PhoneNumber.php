@@ -21,6 +21,7 @@ class PhoneNumber extends Property {
 	const TYPE_FAX = "fax";
 	const TYPE_WORK_FAX = "workfax";
 
+	public ?int $id;
 	protected int $contactId;
 	public ?string $type = 'cell';
 	public string $number;

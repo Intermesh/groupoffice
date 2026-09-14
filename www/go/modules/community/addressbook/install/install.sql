@@ -1,4 +1,5 @@
 CREATE TABLE `addressbook_address` (
+  id int auto_increment primary key,
   `contactId` int(11) NOT NULL,
   `type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `address` text null COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -78,12 +79,14 @@ CREATE TABLE `addressbook_contact_star` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
 CREATE TABLE `addressbook_date` (
+   id int auto_increment primary key,
   `contactId` int(11) NOT NULL,
   `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'birthday',
   `date` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `addressbook_email_address` (
+  id int auto_increment primary key,
   `contactId` int(11) NOT NULL,
   `type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `email` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL
@@ -96,12 +99,14 @@ CREATE TABLE `addressbook_group` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
 CREATE TABLE `addressbook_phone_number` (
+  id int auto_increment primary key,
   `contactId` int(11) NOT NULL,
   `type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `number` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
 CREATE TABLE `addressbook_url` (
+   id int auto_increment primary key,
   `contactId` int(11) NOT NULL,
   `type` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
