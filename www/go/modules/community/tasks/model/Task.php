@@ -325,6 +325,11 @@ class Task extends AclItemEntity {
 				$roleID = array_search($value, TaskList::Roles, true);
 
 				$criteria->where(['tasklist.role' => $roleID]);
+			})->add('showInCalendar',  function (Criteria $criteria, $value, Query $query) {
+				if(!$query->isJoined("tasks_tasklist_user", "tlu") ){
+					$query->join("tasks_tasklist_user", "tlu", 'task.tasklistId = tlu.tasklistId AND tlu.userId = '.go()->getAuthState()->getUserId());
+				}
+				$criteria->where(['tlu.showInCalendar' => $value]);
 			})
 			->add('categories', function(Criteria $criteria, $value, Query $query) {
 				if(!empty($value)) {
