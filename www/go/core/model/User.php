@@ -1417,6 +1417,16 @@ public function historyLog(): bool|array
 		// used ArrayObject so it will be passed by reference to event listener
 		$aclIds = new \go\core\util\ArrayObject();
 
+		if(Module::isInstalled("legacy", "email")) {
+			$emailAclIds = go()->getDbConnection()
+				->selectSingleValue("acl_id")
+				->from("em_accounts")
+				->where("user_id", "=", $this->id)
+				->all();
+
+			$aclIds->push(...$emailAclIds);
+		}
+
 		if(Module::isInstalled("community", "addressbook")) {
 
 			$addressBooks = AddressBook::find()->where('createdBy','=', $this->id);
