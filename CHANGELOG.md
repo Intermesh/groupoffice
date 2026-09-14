@@ -6,6 +6,7 @@
 - DAV: Handle expired lock token on unlock when file is not locked anymore
 - Support / Tasks: do not display notifications tab in tasklist dialog
 - History: Type error when viewing removed users in history log
+- Core: unset token if CSRF fails
 - Registration: Added timer button
 - Email: Archive user archives e-mail account too now
 - Core: Infinite principal rebuild fixed
