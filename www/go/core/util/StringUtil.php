@@ -604,7 +604,7 @@ END;
 		//normalize html and remove line breaks
 		$html = StringUtil::normalizeCrlf($html);
 		
-		$html = new Html2Text($html);
+		$html = new Html2Text($html, ['width' => 0]);
 		
 		return trim($html->getText());
 	}

@@ -15,15 +15,6 @@
  * more than one panel is added to the dialog in this way.
  */
 
-//GO.dialog.TabbedFormDialog = function(config) {
-//	
-//	config = config | {};
-//	
-//	if (config.title)
-//		this.baseTitle = config.title;
-//	
-//	GO.dialog.TabbedFormDialog.superclass.constructor(this,config);
-//}
 GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 	
 	/**
@@ -245,19 +236,7 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 			});
 		    
 			this.formPanel.add(this._tabPanel);
-		} else if (this._panels.length==1) {			
-//			this._panels[0].items.each(function(item){
-//				this.formPanel.add(item);
-//			}, this);
-//			
-//			if(this._panels[0].cls)
-//				this.formPanel.cls=this._panels[0].cls;
-//			
-//			if(this._panels[0].bodyStyle)
-//				this.formPanel.bodyStyle=this._panels[0].bodyStyle;
-//			
-//			delete this._panels[0];
-
+		} else if (this._panels.length==1) {
 			delete this._panels[0].title;
 			this._panels[0].header=false;
 			if(this._panels[0].elements)
@@ -268,20 +247,6 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 		
 		this.items=this.formPanel;
 
-		//Add a hidden submit button so the form will submit on enter
-
-		//problem with submit when searching
-
-		// this.formPanel.add(new Ext.Button({
-		// 	hidden: true,
-		// 	hideMode: "offsets",
-		// 	type: "submit",
-		// 	handler: function() {
-		// 		this.submitForm(true);
-		// 	},
-		// 	scope: this
-		// }));
-		
 		GO.dialog.TabbedFormDialog.superclass.initComponent.call(this); 
 		
 		this.addEvents({
@@ -357,7 +322,6 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 		if(go.Entities.get(this.customFieldType).customFields) {
 			var fieldsets = go.customfields.CustomFields.getFormFieldSets(this.customFieldType);
 			fieldsets.forEach(function(fs) {
-				//console.log(fs);
 				if(fs.fieldSet.isTab) {
 					fs.title = null;
 					fs.collapsible = false;
@@ -461,7 +425,6 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 	},
 	
 	jsonSubmit: function(params,hide, config) {
-
 		GO.request({
 			method:'POST',
 			url: this.formControllerUrl + '/' + this.submitAction,
@@ -540,18 +503,18 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 	},
 	
 	submitForm : function(hide, config){
-		
 		//for the fast double clickers
-		if(this.getFooterToolbar().disabled)
+		if(this.getFooterToolbar().disabled) {
 			return;
+		}
 		
 		var params=this.getSubmitParams();
-
-		if(this.beforeSubmit(params)===false)
+		if(this.beforeSubmit(params)===false) {
 			return false;
-		
-		if(!this.formPanel.form.standardSubmit)
+		}
+		if(!this.formPanel.form.standardSubmit) {
 			this.getFooterToolbar().setDisabled(true);
+		}
 		
 		
 		if(this.jsonPost){
@@ -560,26 +523,25 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 			} else {
 				this.getFooterToolbar().setDisabled(false);
 			}
-		}else
-		{
-
-
-			this.formPanel.form.submit(
-			{
+		}else {
+			this.formPanel.form.submit({
 				url:GO.url(this.formControllerUrl+'/'+this.submitAction),
 				params: params,
 				submitEmptyText: this.submitEmptyText,
 				waitMsg:t("Saving..."),
 				success:function(form, action){		
 					this.getFooterToolbar().setDisabled(false);
-					if(action.result[this.remoteModelIdName])
+					if(action.result[this.remoteModelIdName]) {
 						this.setRemoteModelId(action.result[this.remoteModelIdName]);
+					}
 
-					if(action.result.data && action.result.data[this.remoteModelIdName])
+					if(action.result.data && action.result.data[this.remoteModelIdName]) {
 						this.setRemoteModelId(action.result.data[this.remoteModelIdName]);
+					}
 
-					if(this.permissionsPanel && action.result[this.permissionsPanel.fieldName])
+					if(this.permissionsPanel && action.result[this.permissionsPanel.fieldName]) {
 						this.permissionsPanel.setAcl(action.result[this.permissionsPanel.fieldName]);
+					}
 
 					this.afterSubmit(action);
 
@@ -595,17 +557,16 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 					this.fireEvent('submit', this, this.remoteModelId);
 					this.fireEvent('save', this, this.remoteModelId);
 
-					if(hide)
-					{
+					if(hide) {
 						this.hide();
 					}
 
 					this.refreshActiveDisplayPanels();
 
-					if(this.link_config && this.link_config.callback)
-					{	
-						if(!this.link_config.scope)
+					if(this.link_config && this.link_config.callback) {
+						if(!this.link_config.scope) {
 							this.link_config.scope = this;
+						}
 
 						this.link_config.callback.call(this.link_config.scope);						
 					}
@@ -761,17 +722,13 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 			this._tabPanel.items.items[0].show();
 			
 		this.setRemoteModelId(remoteModelId);
-		
-//		//set dialog in new or edit mode
-//		this.checkSubmitMethod();
-		
+
 		if(remoteModelId || this.loadOnNewModel)
 		{
 			
 			if(this.jsonPost){
 				this.jsonLoad(remoteModelId, config);
-			}else
-			{
+			}else {
 				this.formPanel.load({
 					params:config.loadParams,
 					url:GO.url(this.formControllerUrl+'/'+this.loadAction),
@@ -780,11 +737,13 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 					{										
 						this.setRemoteComboTexts(action);
 
-						if(this.permissionsPanel)
+						if(this.permissionsPanel) {
 							this.permissionsPanel.setAcl(action.result.data[this.permissionsPanel.fieldName]);
+						}
 
-						if(config && config.values)
+						if(config && config.values) {
 							this.formPanel.form.setValues(config.values);
+						}
 
 						this.loadData = action.result.data;
 						
@@ -809,8 +768,9 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 				});
 			}
 		} else {
-			if(config && config.values)
+			if(config && config.values) {
 				this.formPanel.form.setValues(config.values);
+			}
 			
 			this.updateTitle();
 			

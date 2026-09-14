@@ -146,7 +146,7 @@ if (!empty($_POST)) {
 
 		User::findById(1)->legacyOnSave();
 
-        if(\go\modules\business\license\model\License::isValid()) {
+        if(go()->getEnvironment()->hasIoncube() && \go\modules\business\license\model\License::isValid()) {
             header("Location: finished.php");
         } else {
             header("Location: license.php?install=true");

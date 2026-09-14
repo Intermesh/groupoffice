@@ -125,6 +125,7 @@ class State extends AbstractState {
 			$this->token = go()->getCache()->get('token-' . $tokenStr);
 			if($this->token) {
 				if(!self::checkCSRF($this->token)) {
+					$this->token = null;
 					return false;
 				}
 				$this->token->activity();

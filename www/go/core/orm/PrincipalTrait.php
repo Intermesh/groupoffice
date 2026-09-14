@@ -38,10 +38,10 @@ trait PrincipalTrait {
 	public bool $savePrincipal = true;
 
 	/**
-	 * Save entity to search cache
+	 * Save principal
 	 *
 	 * @param bool $checkExisting If certain there's no existing record then this can be set to false
-	 * @return bool
+	 * @return bool Returns true if was created and false if it was not needed.
 	 * @throws Exception
 	 */
 	public function savePrincipal(bool $checkExisting = true): bool
