@@ -860,9 +860,10 @@ export class Main extends Component {
 						{start:null,due:null},
 						{start: start.format('Y-m-d')+'..'+end.format('Y-m-d')},
 						{due: start.format('Y-m-d')+'..'+end.format('Y-m-d')},
-						{progressUpdated: start.format('Y-m-d')+'..'+end.format('Y-m-d')},
+						{progressUpdated: start.format('Y-m-d')+'..'+end.format('Y-m-d')}
 					]
 				});
+				this.store.setFilter('showInCalendar' , {showInCalendar: true})
 				return this.store!.load();
 			}
 		});

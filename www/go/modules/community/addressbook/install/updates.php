@@ -249,7 +249,24 @@ $updates['202601130927'][] = "alter table addressbook_contact
     modify gender enum ('M', 'F', 'N', 'P') null comment 'M for Male, F for Female, N for non-binary, P for private or null for unknown';
 ";
 
-$updates['202602171637'][] = "CREATE TABLE IF NOT EXISTS `addressbook_addressbook_user` (
+
+$updates['202609141158'][] = "alter table addressbook_email_address
+    add id int auto_increment primary key first;";
+
+$updates['202609141158'][] = "alter table addressbook_date
+    add id int auto_increment primary key first;";
+
+$updates['202609141158'][] = "alter table addressbook_phone_number
+    add id int auto_increment primary key first;";
+
+$updates['202609141158'][] = "alter table addressbook_url
+    add id int auto_increment primary key first;";
+
+$updates['202609141158'][] = "alter table addressbook_address
+    add id int auto_increment primary key first;";
+
+
+$updates['202609141158'][] = "CREATE TABLE IF NOT EXISTS `addressbook_addressbook_user` (
   								`addressBookId` INT(11) NOT NULL,
   								`userId` INT(11) NOT NULL,
   								`syncToDevice` TINYINT(1) DEFAULT 0 NOT NULL,
@@ -264,6 +281,6 @@ $updates['202602171637'][] = "CREATE TABLE IF NOT EXISTS `addressbook_addressboo
 									ON DELETE CASCADE 
 									ON UPDATE NO ACTION);";
 
-$updates['202602181142'][] = "INSERT IGNORE INTO `addressbook_addressbook_user` (addressBookId, userId, syncToDevice)
+$updates['202609141158'][] = "INSERT IGNORE INTO `addressbook_addressbook_user` (addressBookId, userId, syncToDevice)
 								SELECT addressBookId, userId, 1
 								FROM `sync_addressbook_user`;";

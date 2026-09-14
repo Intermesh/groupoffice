@@ -26,7 +26,7 @@ use GO\Projects2\Model\ProjectEntity;
  */
 class TaskList extends AclOwnerEntity
 {
-	const UserProperties = ['color', 'sortOrder', 'isVisible', 'isSubscribed', 'syncToDevice'];
+	const UserProperties = ['color', 'sortOrder', 'isVisible', 'isSubscribed', 'syncToDevice', 'showInCalendar'];
 
 	const List = 1;
 	const Board = 2;
@@ -60,6 +60,7 @@ class TaskList extends AclOwnerEntity
 	public ?bool $isVisible= null;
 	public ?bool $isSubscribed= null;
 	public ?bool $syncToDevice = null;
+	public ?bool $showInCalendar = null;
 
 	protected $highestItemModSeq;
 
@@ -84,7 +85,6 @@ class TaskList extends AclOwnerEntity
 			->add('projectId', function (Criteria $criteria, $value) {
 				$criteria->where(['projectId' => $value]);
 			});
-
 	}
 
 	/** @var string What kind of list: 'list', 'board' */

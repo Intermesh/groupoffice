@@ -48,9 +48,9 @@ class Acl extends Entity {
 	
 	/**
 	 * The user that owns the ACL
-	 * @var int
+	 * @var ?int
 	 */
-	public int $ownedBy;
+	public ?int $ownedBy;
 	
 	/**
 	 * Modification time
