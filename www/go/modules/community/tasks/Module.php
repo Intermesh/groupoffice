@@ -108,6 +108,7 @@ class Module extends core\Module {
 			$tasklist = TaskList::find()->where(['createdBy' => $user->id, 'name' => $oldName])->single();
 			if ($tasklist) {
 				$tasklist->name = $user->displayName;
+				$tasklist->showInCalendar = true;
 				if(!$tasklist->save()) {
 					throw new SaveException($tasklist);
 				}

@@ -1,6 +1,5 @@
-import {DataSourceStore, datasourcestore, DateTime, DefaultEntity, Observable, t, Window} from "@intermesh/goui";
-import {client, JmapDataSource, jmapds, principalDS} from "@intermesh/groupoffice-core";
-import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
+import {DateTime, DefaultEntity, Observable, Window} from "@intermesh/goui";
+import {CalendarItem} from "./CalendarItem.js";
 
 export interface CalendarProvider {
 	[key:string]:any
