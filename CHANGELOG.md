@@ -4,6 +4,7 @@
 - DAV: Handle expired lock token on unlock when file is not locked anymore
 - Support / Tasks: do not display notifications tab in tasklist dialog
 - History: Type error when viewing removed users in history log
+- Registration: Added timer button
 
 07-09-2026: 26.0.46
 - Calendar: copy/cut + paste opens event dialog instead of saving directly
