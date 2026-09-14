@@ -1,3 +1,4 @@
+14-09-2026: 25.0.113
 - Calendar: Trying to import a calendar failed with undefined method #1557
 - Addressbook: more consistent label of the debtor/customer number field.
 - Core: unset token if CSRF check fails (cherry pick from 26.0)
