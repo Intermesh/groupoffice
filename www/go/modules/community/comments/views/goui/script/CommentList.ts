@@ -224,6 +224,9 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 						});
 					},
 					render: ({target}) => {
+
+						this.makeLinksExternal(target.el);
+
 						target.el.addEventListener("contextmenu", ev => {
 							ev.preventDefault();
 
@@ -267,7 +270,7 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 						text: t("More"),
 						handler: (btn) => {
 							commentComp.html = comment.text;
-
+							this.makeLinksExternal(commentComp.el);
 							Image.replaceImages(commentComp.el);
 							btn.remove();
 						}
@@ -370,6 +373,20 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 			this.fire("listready", {});
 		});
 
+	}
+
+	private makeLinksExternal(el: HTMLElement) {
+		const allLinks = el.querySelectorAll('a');
+
+		allLinks.forEach(link => {
+			const href = link.getAttribute('href');
+			// Skip links without href, mailto:, tel:, etc.
+			if (!href || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+
+			link.target = "_blank";
+			link.rel = "noopener noreferrer";
+
+		});
 	}
 
 	public onRecordRemove(ev: StoreEventMap<any>['remove']) {
