@@ -106,6 +106,8 @@ class Authenticator extends PrimaryAuthenticator
 
 		$mappedValues = Module::mappedValues($record);
 
+		go()->debug($mappedValues);
+
 		if (empty($mappedValues['email'])) {
 			throw new Exception("User '$username' has no 'e-mail' attribute set. Can't create a user");
 		}
@@ -294,7 +296,10 @@ class Authenticator extends PrimaryAuthenticator
 
 		}
 
+		go()->debug("LDAPAUTH: " . count($accounts) . " accounts not found");
+
 		foreach ($accounts as $account) {
+
 			if($account->decryptPassword() !== $password) {
 				$account->password = $password;
 			}
