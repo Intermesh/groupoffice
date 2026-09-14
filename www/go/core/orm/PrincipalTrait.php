@@ -47,7 +47,7 @@ trait PrincipalTrait {
 	public function savePrincipal(bool $checkExisting = true): bool
 	{
 		if(!$this->savePrincipal || !$this->isPrincipal() || !$this->isFetchedComplete()) {
-			return true;
+			return false;
 		}
 		$principal = $checkExisting ?
 			Principal::find()
@@ -73,7 +73,6 @@ trait PrincipalTrait {
 
 		$principal->cutPropertiesToColumnLength();
 
-		$isNew = $principal->isNew();
 		if(!$principal->internalSave()) {
 			throw new Exception("Could not save principal cache: " . var_export($principal->getValidationErrors(), true));
 		}
@@ -107,14 +106,16 @@ trait PrincipalTrait {
 		
 		$limit = 1000;
 
-
 		/* @var $query Query */
 		$query = static::find();
 		$query
-			->join("core_principal", "principal", "principal.entityId = ".$query->getTableAlias() . ".id AND principal.entityTypeId = " . static::entityType()->getId(), "LEFT")
+			->join("core_principal", "principal",
+				"principal.entityId = ".$query->getTableAlias() . ".id AND principal.entityTypeId = " . static::entityType()->getId(), "LEFT")
 			->andWhere('principal.entityId IS NULL')
 			->limit($limit)
 			->offset($offset);
+
+//		echo $query ."\n";
 
 		return $query;
 	}
@@ -122,7 +123,8 @@ trait PrincipalTrait {
 	/**
 	 * @throws Exception
 	 */
-	public static function rebuildPrincipalForEntity() {
+	public static function rebuildPrincipalForEntity(): void
+	{
 		$cls = static::class;
 		echo $cls."\n";
 
@@ -137,7 +139,6 @@ trait PrincipalTrait {
 		);
 
 		$stmt->execute();
-		go()->getDbConnection()->exec("commit");
 		echo "Deleted ". $stmt->rowCount() . " entries\n";
 
 		//In small batches to keep memory low
@@ -155,8 +156,12 @@ trait PrincipalTrait {
 					if(ob_get_level() > 0) ob_flush();
 					flush();
 
-					$m->savePrincipal(false);
-					echo ".";
+					if(!$m->savePrincipal(false)) {
+						echo "S";
+						$offset++;
+					} else {
+						echo ".";
+					}
 
 				} catch (Exception $e) {
 					echo "Error: " . $m->id() . ' '. $m->title() ." : " . $e->getMessage() ."\n";
@@ -166,12 +171,8 @@ trait PrincipalTrait {
 				}
 			}
 			echo "\n";
-			go()->getDbConnection()->exec("commit");
-
 			$stmt = static::queryMissingPrincipals($offset)->execute();
 		}
-
-		go()->getDbConnection()->exec("commit");
 
 	}
 }

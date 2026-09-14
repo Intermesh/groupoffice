@@ -41,6 +41,7 @@ go.modules.community.tasks.TasklistDialog = Ext.extend(go.form.Dialog, {
 				fieldLabel: t('Color')
 			},
 			{xtype:'checkbox', name: 'syncToDevice', boxLabel: t('Sync to device'), hint: t('Make tasklist available in CalDAV and ActiveSync')},
+			{xtype:'checkbox', name: 'showInCalendar', boxLabel: t('Show in calendar'), hint: t('Tasks in this list will be shown in the calendar')},
 
 				this.selectUser = new go.users.UserCombo({
 					disabled: !go.User.isAdmin,

@@ -42,7 +42,18 @@ class Contact extends AclItemEntity {
 	
 	use SearchableTrait;
 
-	use PrincipalTrait;
+	use PrincipalTrait {
+		queryMissingPrincipals as originalQueryMissingPrincipals;
+	}
+
+	protected static function queryMissingPrincipals(int $offset = 0): Query
+	{
+		$query = static::originalQueryMissingPrincipals($offset);
+
+		$query->join("addressbook_email_address", "e", "e.contactId = c.id");
+
+		return $query;
+	}
 
 	/**
 	 * 

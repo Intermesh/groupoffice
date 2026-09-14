@@ -77,9 +77,8 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	},
 
 	onBodyClick : function (e, target) {
-
 		//prevent navigating away.
-		if(target.tagName == "A" && target.attributes.href && target.attributes.href.value && target.attributes.href.value.substring(0,4) == "http") {
+		if(target.tagName == "A" && target.attributes.href && (!target.attributes.target || target.attributes.target.value != "_blank") && target.attributes.href.value && target.attributes.href.value.substring(0,4) == "http") {
 			window.open(target.attributes.href.value);
 			e.preventDefault();
 		}
