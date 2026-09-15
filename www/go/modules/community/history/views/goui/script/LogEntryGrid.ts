@@ -48,7 +48,8 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 				column({
 					id: "description",
 					header: t("Description"),
-					resizable: true
+					resizable: true,
+					minWidth: 60
 				}),
 				column({
 					id: "entity",
@@ -62,6 +63,7 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 					id: "creator",
 					header: t("User"),
 					resizable: true,
+					minWidth: 60,
 					renderer: (v) => {
 						return comp({
 								cls: "hbox"
