@@ -1,26 +1,27 @@
 go.Modules.register("community", 'dokuwiki', {
 
-    title: t("title", 'dokuwiki'),
+	title: t("title", 'dokuwiki'),
 
-    initModule: function () {
-        var module = go.Modules.get('community', 'dokuwiki'),
-            panel,
-            title;
+	initModule: function () {
+		var module = go.Modules.get('community', 'dokuwiki'),
+			panel,
+			title;
 
-        if (module.settings) {
-            title = module.settings.title;
-        }
+		if (module.settings) {
+			title = module.settings.title;
+		}
 
-        if (go.util.empty(title)) {
-            title = t("title", 'dokuwiki', 'community');
-        }
+		if (go.util.empty(title)) {
+			title = t("title", 'dokuwiki', 'community');
+		}
 
-        this.title = title;
+		this.title = title;
 
-        this.addPanel(Ext.extend(go.modules.community.dokuwiki.MainPanel, {title: title}));
-    },
+		go.modules.community.dokuwiki.MainPanel.prototype.title = title;
+		this.addPanel(go.modules.community.dokuwiki.MainPanel);
+	},
 
-    systemSettingsPanels: [
-        "go.modules.community.dokuwiki.SystemSettingsPanel"
-    ],
+	systemSettingsPanels: [
+		"go.modules.community.dokuwiki.SystemSettingsPanel"
+	],
 });
