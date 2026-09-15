@@ -1,17 +1,13 @@
 import {
-	AbstractSettingsPanel,
 	AclLevel,
 	AppSettingsPanel,
-	client, LegacyApi,
+	LegacyApi,
 	userDS,
-	userSettingsPanels
 } from "@intermesh/groupoffice-core";
 import {
 	btn,
 	column,
 	comp,
-	datasourcestore,
-	EntityID,
 	searchbtn,
 	store,
 	t,
@@ -20,23 +16,22 @@ import {
 	tbar,
 	Window
 } from "@intermesh/goui";
-import {templateDS} from "./Index";
-import {EmailTemplateDialog} from "./EmailTemplateDialog";
+import {EmailTemplateGroupsDialog} from "./EmailTemplateGroupsDialog";
 
 export class EmailTemplatesSettingsPanel extends AppSettingsPanel {
 
-	private tbl: Table;
+	private readonly tbl: Table;
 	private legacyApi: LegacyApi;
+	private origData = [];
 
 	constructor() {
 		super();
+		let win:any = undefined;
 
-		this.cls = "fit";
 		this.title = t("E-mail templates");
 		this.legacyApi = new LegacyApi("email", "template");
 
 		this.tbl = table({
-			cls: "fit",
 			store: store({
 				sort: [{property: "name", isAscending: true}]
 			}),
@@ -47,16 +42,18 @@ export class EmailTemplatesSettingsPanel extends AppSettingsPanel {
 				rowdblclick: ({target, storeIndex}) => {
 					const record = target.store.get(storeIndex);
 					if (record) {
-						const win = new EmailTemplateDialog();
-						win.form.on("submit", ({}) => {
+						if (!win) {
+							win = new GO.email.EmailTemplateDialog();
+						}
+						win.on("save", () => {
 							void this.loadTblStore();
 						});
-						win.title = record.name;
-						win.load(record.id);
-						win.show();
+						win.on("hide", () => {win = undefined;});
+						win.show(record.id);
 					}
 				}
 			},
+			groupBy: "group_name",
 			columns: [
 				column({
 					id: "name",
@@ -93,17 +90,18 @@ export class EmailTemplatesSettingsPanel extends AppSettingsPanel {
 			]
 		});
 
-		this.items.add(tbar({
-					cls: "border-bottom"
-				},
+		this.items.add(tbar({},
 				btn({
 					icon: "add",
 					text: t("Add"),
 					handler: () => {
-						const win = new EmailTemplateDialog();
-						win.form.on("submit", ({}) => {
+						if (!win) {
+							win = new GO.email.EmailTemplateDialog();
+						}
+						win.on("save", ({}) => {
 							void this.loadTblStore();
 						});
+						win.on("hide", () => {win = undefined;})
 						win.show();
 					}
 				}),
@@ -121,9 +119,7 @@ export class EmailTemplatesSettingsPanel extends AppSettingsPanel {
 
 						if (yes) {
 							const promises: any[] = [];
-							selectedIds.forEach((id: EntityID) => {
-								promises.push(this.legacyApi.delete(id));
-							});
+							promises.push(this.legacyApi.delete(selectedIds));
 							this.mask();
 							await Promise.all(promises);
 							this.unmask();
@@ -135,11 +131,21 @@ export class EmailTemplatesSettingsPanel extends AppSettingsPanel {
 					icon: "list",
 					text: "Groups",
 					handler: () => {
-
+						const w = new EmailTemplateGroupsDialog()
+						w.show();
 					}
 				}),
 				"->",
-				searchbtn()
+				searchbtn({
+					listeners: {
+						input: ({text}) => {
+							const filtered = this.origData.filter((r: any) => {
+								return !text || r.name.toLowerCase().indexOf(text.toLowerCase()) > -1;
+							});
+							this.tbl.store.loadData(filtered, false)
+						}
+					}
+				})
 			),
 			this.tbl);
 
@@ -149,9 +155,10 @@ export class EmailTemplatesSettingsPanel extends AppSettingsPanel {
 	}
 
 	private async loadTblStore() {
-		const data = await this.legacyApi.store();
+		const data = await this.legacyApi.store(AclLevel.READ, {limit: "0"});
 		if (data.results.length) {
 			this.tbl.store.loadData(data.results, false);
+			this.origData = data.results;
 		}
 	}
 }

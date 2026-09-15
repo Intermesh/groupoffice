@@ -80,6 +80,9 @@ Ext.extend(GO.email.EmailTemplateDialog, go.Window,{
 					GO.dialog.TabbedFormDialog.prototype.setRemoteComboTexts.call(this, action);
 										
 					GO.email.EmailTemplateDialog.superclass.show.call(this);
+					// hack for making it work with goui window
+					this.el.setZIndex(9999999);
+
 				},
 				failure:function(form, action)
 				{
@@ -95,6 +98,9 @@ Ext.extend(GO.email.EmailTemplateDialog, go.Window,{
 			this.readPermissionsTab.setAcl(0);
 
 			GO.email.EmailTemplateDialog.superclass.show.call(this);
+			// hack for making it work with goui window
+			this.el.setZIndex(9999999);
+
 		}
 	},
 	
@@ -107,15 +113,6 @@ Ext.extend(GO.email.EmailTemplateDialog, go.Window,{
 	},
 	
 	submitForm : function(hide){
-
-		//won't toggle if not done twice...
-		// THIS IS ALREADY DONE IN THE EMAILEDITORPANEL 
-//		if(this.htmlEditPanel.getHtmlEditor().sourceEditMode){
-//			this.htmlEditPanel.getHtmlEditor().toggleSourceEdit(false);
-//			this.htmlEditPanel.getHtmlEditor().toggleSourceEdit(false);
-//		}
-		//this.htmlEditPanel.getHtmlEditor().toggleSourceEdit(false);
-
 		this.formPanel.form.submit(
 		{
 			url: GO.url('email/template/submit'),
@@ -151,20 +148,6 @@ Ext.extend(GO.email.EmailTemplateDialog, go.Window,{
 	
 	
 	buildForm : function () {
-		
-//		var imageInsertPlugin = new GO.plugins.HtmlEditorImageInsert();
-//		imageInsertPlugin.on('insert', function(plugin, path, url,temp,id) {
-//
-//
-//			var ia = {
-//				tmp_file : path,
-//				url : url,
-//				temp:temp
-//			};
-//
-//		this.inline_attachments.push(ia);
-//		}, this);
-		
 		var autodata = [			
 		['{date}',t("Date")],
 		['{contact:salutation}',t("Salutation")],

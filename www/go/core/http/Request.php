@@ -369,35 +369,6 @@ class Request extends Singleton{
 		return $this->isHttps() ? 'https:' : 'http:';
 	}
 
-//	/**
-//	 * Get port number of request
-//	 *
-//	 * @return int| false
-//	 */
-//	public function getPort() {
-//		$possibleHostSources = array('HTTP_X_FORWARDED_HOST', 'HTTP_HOST');
-//		$host = '';
-//		foreach ($possibleHostSources as $source)
-//		{
-//			if (!empty($host)) break;
-//			if (empty($_SERVER[$source])) continue;
-//			$host = $_SERVER[$source];
-//			if (array_key_exists($source, $sourceTransformations))
-//			{
-//				$host = $sourceTransformations[$source]($host);
-//			}
-//		}
-//
-//		$pos = strpos($host, ':');
-//
-//		if($pos === false) {
-//			return false;
-//		}
-//
-//		return (int) substr($host, $pos);
-//
-//	}
-
   /**
    * Get the IP address of the user's client
    *

@@ -9,10 +9,9 @@
   },
 
   "scripts": {
-    "start email": "concurrently --kill-others \"npm run start:ts\"",
-    "start:ts": "node ../../../../views/goui/esbuild-module.mjs watch",
+    "start email": "concurrently --kill-others \"npm run start:esbuild\"",
+    "start:esbuild": "node ../../../../views/goui/esbuild-module.mjs watch",
     "start:sass": "npx sass --load-path=$(npm root) --watch style:dist",
-    "start:dts": "npx tsc --emitDeclarationOnly --declaration --watch",
 
     "build": "npm run build:ts",
     "build:clean": "rm -rf ./dist/*",

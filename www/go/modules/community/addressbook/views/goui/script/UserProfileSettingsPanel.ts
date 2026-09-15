@@ -62,7 +62,6 @@ export class UserProfileSettingsPanel extends AppSettingsPanel {
 					label: t("Organizations"),
 					name: "organizationIds",
 					list: table({
-						fitParent: true,
 						headers: false,
 						store: datasourcestore({
 							dataSource: contactDS,
