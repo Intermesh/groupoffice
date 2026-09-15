@@ -275,13 +275,6 @@ function test_system() :array
 
 	$tests[]=$test;
 
-//	$test['name']='URL fopen';
-//	$test['pass']=ini_is_enabled('allow_url_fopen');
-//	$test['feedback']='Warning: allow_url_fopen is disabled in php.ini. RSS feeds on the start page will not work.';
-//	$test['fatal']=false;
-
-//	$tests[]=$test;
-	
 	$test['name']='Register globals';
 	$test['showSuccessFeedback'] = false;
 	$test['pass']=!ini_is_enabled('register_globals');

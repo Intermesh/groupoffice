@@ -491,10 +491,7 @@ abstract class Entity extends Property {
 
 		//See \go\core\orm\PrincipalTrait;
 		if(method_exists($this, 'savePrincipal') && $this->isModified()) {
-			if(!$this->savePrincipal()) {
-				$this->setValidationError("principal", ErrorCode::INVALID_INPUT, "Could not save core_principal entry");
-				return false;
-			}
+			$this->savePrincipal();
 		}
 
 		return true;

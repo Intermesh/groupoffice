@@ -106,6 +106,8 @@ class Authenticator extends PrimaryAuthenticator
 
 		$mappedValues = Module::mappedValues($record);
 
+		go()->debug($mappedValues);
+
 		if (empty($mappedValues['email'])) {
 			throw new Exception("User '$username' has no 'e-mail' attribute set. Can't create a user");
 		}
@@ -288,25 +290,30 @@ class Authenticator extends PrimaryAuthenticator
 			$account->smtp_port = $server->smtpPort;
 			$account->smtp_encryption = $server->smtpEncryption ?? "";
 
-			//$account->mbroot = ??
-
 			$accounts = [$account];
-
 		}
+
+		go()->debug("LDAPAUTH: " . count($accounts) . " accounts not found");
 
 		foreach ($accounts as $account) {
 
-			$account->password = $password;
+			if($account->decryptPassword() !== $password) {
+				$account->password = $password;
+			}
 
 			if ($server->smtpUseUserCredentials) {
+				$smtpPassword = $smtpPassword ?? $password;
+
 				$account->smtp_username = $imapUsername;
-				$account->smtp_password = $smtpPassword ?? $password;
+				if($account->decryptSmtpPassword() !== $smtpPassword) {
+					$account->smtp_password = $smtpPassword ?? $password;
+				}
 			}
 
 			$wasNew = $account->getIsNew();
 			$account->checkImapConnectionOnSave = $wasNew;
 
-			if (!$account->save(true)) {
+			if ($account->isModified() && !$account->save(true)) {
 				throw new Exception("Could not save e-mail account: " . implode("\n", $account->getValidationErrors()));
 			}
 

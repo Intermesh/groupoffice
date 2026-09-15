@@ -373,7 +373,12 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 												{addressBookId: this.addAddressBookId},
 												{
 													// These fields can be selected to update contacts if ID or e-mail matches
-													lookupFields: {'id' : "ID", 'email': 'E-mail'},
+													lookupFields: {
+														'id' : "ID",
+														'email': 'E-mail',
+														'debtorNumber': 'Debtor number',
+														'registrationNumber': "Registration number"
+													},
 
 													// This hash map is used to aid in auto selecting the right mappings. Key is possible header in CSV and value is property name in Group-Office
 													aliases : {

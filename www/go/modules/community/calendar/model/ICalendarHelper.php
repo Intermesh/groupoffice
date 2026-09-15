@@ -659,7 +659,8 @@ class ICalendarHelper {
 			}
 		}
 		if(isset($vevent->ORGANIZER)) {
-			$props->replyTo = str_ireplace('mailto:', '',(string)$vevent->ORGANIZER);
+			// don't set replyto here. Let model handle it.
+//			$props->replyTo = str_ireplace('mailto:', '',(string)$vevent->ORGANIZER);
 
 			list($key,$organizer) = self::parseAttendee($vevent->ORGANIZER);
 

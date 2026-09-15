@@ -147,7 +147,6 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 				},
 				valueToTextField: async () => "",
 				list:table({
-					style:{minWidth:'100%'},
 					headers: false,
 					store: datasourcestore({
 						dataSource: jmapds('Principal'),

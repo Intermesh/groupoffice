@@ -9,6 +9,7 @@ use go\core\App;
 use go\core\ErrorHandler;
 use go\core\model\Alert;
 use go\core\model\Module;
+use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\orm\Entity as OrmEntity;
@@ -59,7 +60,7 @@ abstract class Entity  extends OrmEntity {
 	 */
 	public function historyLog(): bool|array
 	{
-		$modified =  $this->getModified();
+		$modified = $this->getModified();
 		foreach(static::ignorePropertiesForModifiedAt() as $col) {
 			unset($modified[$col]);
 		}
@@ -71,6 +72,18 @@ abstract class Entity  extends OrmEntity {
 		unset($modified['createdAt']);
 		unset($modified['modifiedBy']);
 		unset($modified['permissionLevel']);
+
+		// Process has one relations to only show the differences within
+		foreach($modified as $k => $changed) {
+			if (isset($changed[0]) && $changed[0] instanceof Property) {
+				$mods =  $changed[0]->getModified();
+				$modified[$k] = [[],[]];
+				foreach($mods as $sub => $mod) {
+					$modified[$k][0][$sub] = $mod[0];
+					$modified[$k][1][$sub] = $mod[1];
+				}
+			}
+		}
 
 		return $modified;
 	}

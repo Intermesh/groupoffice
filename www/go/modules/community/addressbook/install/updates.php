@@ -248,3 +248,19 @@ $updates['202508081003'][] = "update `addressbook_phone_number` set type='workce
 $updates['202601130927'][] = "alter table addressbook_contact
     modify gender enum ('M', 'F', 'N', 'P') null comment 'M for Male, F for Female, N for non-binary, P for private or null for unknown';
 ";
+
+
+$updates['202609141158'][] = "alter table addressbook_email_address
+    add id int auto_increment primary key first;";
+
+$updates['202609141158'][] = "alter table addressbook_date
+    add id int auto_increment primary key first;";
+
+$updates['202609141158'][] = "alter table addressbook_phone_number
+    add id int auto_increment primary key first;";
+
+$updates['202609141158'][] = "alter table addressbook_url
+    add id int auto_increment primary key first;";
+
+$updates['202609141158'][] = "alter table addressbook_address
+    add id int auto_increment primary key first;";

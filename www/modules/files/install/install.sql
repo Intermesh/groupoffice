@@ -11,6 +11,7 @@ CREATE TABLE `fs_files` (
   `name` varchar(260) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `locked_user_id` int(11) NOT NULL DEFAULT 0,
    lock_id varchar(192) null,
+  lock_expires_at bigint null,
   `status_id` int(11) NOT NULL DEFAULT 0,
   `ctime` int(11) NOT NULL DEFAULT 0,
   `mtime` int(11) NOT NULL DEFAULT 0,

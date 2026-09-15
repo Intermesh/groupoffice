@@ -90,7 +90,6 @@ export class KeyGrid extends Table<DataSourceStore> {
 			]
 		);
 
-		this.fitParent = true;
 		this.cls = "bg-lowest";
 	}
 }

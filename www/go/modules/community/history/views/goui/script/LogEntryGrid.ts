@@ -14,7 +14,7 @@ import {HistoryDetailWindow} from "./HistoryDetailWindow.js";
 import {logEntryDS} from "./Index.js";
 
 export class LogEntryGrid extends Table<DataSourceStore> {
-	constructor() {
+	constructor(forDetail = false) {
 		super(
 			datasourcestore({
 				dataSource: logEntryDS,
@@ -36,7 +36,8 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 				}
 			}),
 			[
-				column({
+
+				...(forDetail ? [] : [column({
 					id: "entityId",
 					header: t("ID"),
 					hidden: true,
@@ -46,19 +47,23 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 				}),
 				column({
 					id: "description",
-					header: t("Name"),
+					header: t("Description"),
 					resizable: true,
-					width: 60
+					minWidth: 60
 				}),
 				column({
 					id: "entity",
 					header: t("Entity"),
-					resizable: true
-				}),
+					resizable: true,
+					width: 120
+				})
+				]),
 				column({
+					width: forDetail ? undefined : 200,
 					id: "creator",
 					header: t("User"),
 					resizable: true,
+					minWidth: 60,
 					renderer: (v) => {
 						return comp({
 								cls: "hbox"
@@ -101,6 +106,7 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 					id: "action",
 					header: t("Action"),
 					resizable: true,
+					width: 100,
 					renderer: (v) => {
 						return t(v.charAt(0).toUpperCase() + v.slice(1));
 					}
@@ -126,9 +132,7 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 			]
 		);
 
-		this.stateId = "history-logentry-grid";
 
-		this.fitParent = true;
 
 		this.scrollLoad = true;
 	}

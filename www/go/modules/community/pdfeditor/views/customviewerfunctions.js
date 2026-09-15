@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			formData.append('pdf', pdf);
 			formData.append('fileId', fileId);
 
-			const response = await fetch('../../../api/Upload.php', {
+			const response = await fetch('../../../api/upload.php', {
 				method: 'POST',
 				headers: {
 					'X-CSRF-Token': csrfToken

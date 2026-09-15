@@ -306,7 +306,7 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 			this.alertField,
 
 			autocompletechips({
-				list: table({fitParent: true, headers: false, store: this.categoryStore = datasourcestore({
+				list: table({headers: false, store: this.categoryStore = datasourcestore({
 						dataSource:jmapds('CalendarCategory'),
 						sort: [{property:'name'}]
 					}),
@@ -389,7 +389,6 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 				title: t('Exceptions'),
 				height:400,
 			}, table({
-				fitParent:true,
 				store: exceptionStore,
 				columns: [
 					column({id: "recurrenceId",htmlEncode:false, header:t('Start'), renderer(v,record) {
@@ -427,7 +426,7 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 		return data;
 	}
 
-	loadEvent(ev: CalendarItem) {
+	async loadEvent(ev: CalendarItem) {
 
 		//this.title = t(!ev.key ? 'New event' : 'Edit event');
 		if(ev.data.calendarId) {
@@ -437,7 +436,7 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 			this.item = ev;
 			this.form.create(ev.data);
 		} else {
-			this.form.load(ev.data.id!).then(() => {
+			await this.form.load(ev.data.id!).then(() => {
 				if(ev.recurrenceId) {
 					this.startDate.value = ev.start.format(ev.data.showWithoutTime ? 'Y-m-d' : 'Y-m-d\TH:i');
 					this.startDate.trackReset();

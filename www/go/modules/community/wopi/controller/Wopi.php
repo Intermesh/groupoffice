@@ -114,17 +114,17 @@ class Wopi extends Controller
 
 		$file = $this->findFile($fileId);
 
-		go()->debug("File lock: " . $file->locked_user_id ." / ". $file->lock_id);
+		go()->debug("File lock: " . $file->locked_user_id ." / ". $file->lock_id . " / " . date("c", $file->lock_expires_at) . '/ '. date("c",time()));
 
-    if(!$file->locked_user_id) {
-      Response::get()->setHeader("X-WOPI-Lock", "");
-      if(!$requireLock) {
-        return;
-      }       
-      throw new Exception(409);
-    }
-    
-    if($file->lock_id != $lockID) {
+//    if(!$file->locked_user_id || $file->lock_expires_at < time()) {
+//      Response::get()->setHeader("X-WOPI-Lock", "");
+//      if(!$requireLock) {
+//        return;
+//      }
+//      throw new Exception(409);
+//    }
+//
+    if($file->isLocked(true) && $file->lock_id != $lockID) {
       Response::get()->setHeader("X-WOPI-Lock", $file->lock_id);
       throw new Exception(409);
     } else {
@@ -159,7 +159,7 @@ class Wopi extends Controller
       throw new Forbidden();
     }
 
-    $this->checkLock($fileId, $file->size > 0);
+    $this->checkLock($fileId);
 
     $content = fopen('php://input', 'rb');
 
@@ -262,9 +262,11 @@ class Wopi extends Controller
       Response::get()->setHeader("X-WOPI-Lock",$file->lock_id);
       throw new Exception(409, "Already locked");
     }
-		$file->lock_id = $id;
-		$file->locked_user_id = go()->getUserId();
-		$file->save();
+
+		$file->lock($id);
+		if(!$file->save()) {
+			throw new Exception(500, "Failed to save file");
+		}
 
 		go()->debug("WOPI: lock($fileId) = " . $file->lock_id);
 		Response::get()->setHeader("X-WOPI-Lock",$file->lock_id);
@@ -277,7 +279,7 @@ class Wopi extends Controller
 
 		go()->debug("WOPI: getLock($fileId) = " . $file->lock_id);
 
-    if(!$file->lock_id) {
+    if(!$file->isLocked()) {
       Response::get()->setHeader("X-WOPI-Lock", "");   
     } else{
       Response::get()->setHeader("X-WOPI-Lock", $file->lock_id);
@@ -288,27 +290,23 @@ class Wopi extends Controller
   }
 
   public function refreshLock($fileId)
-  { 
-//    $this->findFile($fileId);
-//    $id = Request::get()->getHeader("X-WOPI-Lock");
-//    go()->debug($id);
-//
-//    $lock = Lock::find()->where(['id' => $id])->andWhere('expiresAt', '>', new DateTime())->single();
-//
-//    if(!$lock) {
-//
-//      $existing = Lock::find()->where(['fileId' => $fileId])->andWhere('expiresAt', '>', new DateTime())->single();
-//      if($existing) {
-//        Response::get()->setHeader("X-WOPI-Lock", $existing->id);
-//        throw new Exception(409, "Locked by another");
-//      }
-//
-//      throw new NotFound();
-//    }
-//
-//    if(!$lock->refresh()->save()) {
-//      throw new Exception(500, "Could not save lock");
-//    }
+  {
+		go()->debug("WOPI: refreshLock($fileId)");
+    $file = $this->findFile($fileId);
+    $id = Request::get()->getHeader("X-WOPI-Lock");
+    go()->debug($id);
+
+		if($file->isLocked() && $file->lock_id != $id) {
+			Response::get()->setHeader("X-WOPI-Lock", $file->lock_id);
+			throw new Exception(409, "Locked by another");
+		}
+
+		$file->lock($id);
+		if(!$file->save()) {
+			throw new Exception(500, "Failed to save file");
+		}
+
+		Response::get()->setHeader("X-WOPI-Lock",$file->lock_id);
 
   }
 
@@ -332,7 +330,10 @@ class Wopi extends Controller
 
 		$file->lock_id = "";
 		$file->locked_user_id = 0;
-		$file->save();
+		if(!$file->save()) {
+			throw new Exception(500, "Failed to save file");
+		}
+
   }
 
   public function putRelative($fileId)

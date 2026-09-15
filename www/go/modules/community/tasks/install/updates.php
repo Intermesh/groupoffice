@@ -302,3 +302,6 @@ $updates["202606181402"][] = "create index tasks_tasklist_grouping_role_index
     on tasks_tasklist_grouping (role);";
 
 $updates["202606181402"][] = "update tasks_tasklist_grouping set role=4;";
+
+$updates["202609141208"][] = "ALTER TABLE tasks_tasklist_user ADD COLUMN `showInCalendar` TINYINT(1) NOT NULL DEFAULT 0 AFTER `syncToDevice`";
+$updates["202609141208"][] = "UPDATE `tasks_tasklist_user` SET `showInCalendar` = 1 WHERE `isSubscribed` = 1"; // all subscribed calendar are shown before this feature existed, but it is not the default

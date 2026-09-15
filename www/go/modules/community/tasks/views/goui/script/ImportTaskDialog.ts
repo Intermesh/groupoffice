@@ -55,7 +55,6 @@ export class ImportTaskDialog extends Window {
 				},
 				this.tasklistGrid = tasklistgrid({
 					cls: "bg-lowest",
-					fitParent: true,
 					columns: [
 						column({
 							id: "id",

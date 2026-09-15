@@ -104,7 +104,6 @@ class Task extends EntityController {
 			->filter([
 				"tasklistId" => $defaultListId,
 				"complete" => false,
-				'due' => '< tomorrow'
 			])->filter([
 				"operator" => "OR",
 				"conditions" => [

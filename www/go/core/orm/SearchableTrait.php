@@ -236,9 +236,7 @@ trait SearchableTrait {
 	 */
 	private static function queryMissingSearchCache(int $offset = 0): Statement
 	{
-		
 		$limit = 1000;
-
 
 		$query = static::find(static::neededSearchProperties(), true);
 		/* @var $query OrmQuery */
@@ -273,8 +271,6 @@ trait SearchableTrait {
 
 		$stmt->execute();
 
-		go()->getDbConnection()->exec("commit");
-
 		echo "Deleted ". $stmt->rowCount() . " entries\n";
 		self::$isRebuilding = true;
 		//In small batches to keep memory low
@@ -304,15 +300,9 @@ trait SearchableTrait {
 				}
 			}
 			echo "\n";
-			//echo go()->getDebugger()->debugTiming('another 1000');
-			go()->getDbConnection()->exec("commit");
 
 			$stmt = static::queryMissingSearchCache($offset);
 		}
-
-
-		go()->getDbConnection()->exec("commit");
-
 
 	}
 

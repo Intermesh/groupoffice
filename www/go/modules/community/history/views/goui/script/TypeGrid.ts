@@ -13,7 +13,6 @@ export class TypeGrid extends List {
 		});
 
 		const renderer = (v: any) => {
-			console.log(v);
 			return [comp({}, checkbox(
 				{
 					itemId: v.name,

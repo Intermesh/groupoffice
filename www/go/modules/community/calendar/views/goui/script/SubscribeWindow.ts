@@ -62,7 +62,6 @@ export class SubscribeWindow extends Window {
 			this.scroller = comp({cls:'scroll', flex:1},
 
 			this.grid = table({
-			//fitParent:true,
 			style:{width:'100%'},
 			headers: false,
 			store,

@@ -1,3 +1,37 @@
+- Core: Fixed link loading in link browser
+
+14-09-2026: 26.0.47
+- pdfeditor: rename Upload to upload so class finder doesn't try to load it
+- Core: Fixed install error when SourceGuardian was not installed
+- Tasks: Added 'Show in calendar' checkbox per task list to toggle task visibility in calendar
+- Core: Fixed GOUI table column problem where the content would stretch it too wide.
+- Registration: New "Export" permission to restrict exporting time
+- Files / WOPI / DAV / OnlyOffice: Locks expire in 30 minutes and will be refreshed
+- DAV: Handle expired lock token on unlock when file is not locked anymore
+- Support / Tasks: do not display notifications tab in tasklist dialog
+- History: Type error when viewing removed users in history log
+- Core: unset token if CSRF fails
+- Registration: Added timer button
+- Email: Archive user archives e-mail account too now
+- Core: Infinite principal rebuild fixed
+
+07-09-2026: 26.0.46
+- Calendar: copy/cut + paste opens event dialog instead of saving directly
+- Calendar: The server handles the event->replyTo setting better. On owned calendars the calendar owner's e-mail address
+  is used and on shared calendar either the participant with owner = true or the event creator's email address is used.
+- History: Process has one relations to only show the differences within
+- Core: GOUI table columns with large content could grow too large.
+- History: Fixed user selection
+- History: Added column selector for grid
+- LDAP Authenticator: Fixed excessive logging when logging in
+
+01-09-2026: 26.0.45
+- Finance: New address autocomplete loaded all contacts and made the UI freeze
+
+31-08-2026: 26.0.44
+- Tasks: make subscription window resizable, sane default size.
+- Address book: import embedded BASE64 encoded photo 
+
 24-08-2026: 26.0.43
 - Files: Continue saving file when saving older version fails. Fixes PDFeditor problem.
 - Finance: Support for extra e-mail attachments in documents
@@ -24,7 +58,7 @@
 - Finance: Autocomplete shipping addresses from address book
 - Finance: CAMT053 2019 payment import support
 - Core: make UX behavior Ext.ux icons consistent with newer Ext and GOUI implementations
-- Comments: Status icon for sent, received, pending and senderror added. Also improves UI because mail send happens in the background
+- Comments: Status icon for sent, received, pending and sendegit rror added. Also improves UI because mail send happens in the background
 - Core: Report error when import fails on init
 - Core: Remove cron output with deleted blob count
 - Core: pin tcpdf to v6.11.3 as 7 breaks

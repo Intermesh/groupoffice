@@ -78,6 +78,5 @@ export class NoteGrid extends Table<DataSourceStore> {
 			await noteDS.confirmDestroy(ids);
 		});
 
-		this.fitParent = true;
 	}
 }

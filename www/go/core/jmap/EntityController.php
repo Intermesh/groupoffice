@@ -509,9 +509,12 @@ abstract class EntityController extends Controller {
 					$arr['id'] = $e->id();
 					$unsorted[$arr['id']] = $arr;
 					$foundIds[] = $arr['id'];
-				} catch(\Throwable $e) {
-					ErrorHandler::logException($e);
+				} catch(\Throwable $ex) {
+					ErrorHandler::logException($ex);
 				}
+			} else {
+				go()->debug("not found: ");
+				go()->debug($e);
 			}
 		}
 
