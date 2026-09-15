@@ -1,3 +1,5 @@
+- Core: Fixed link loading in link browser
+
 14-09-2026: 26.0.47
 - pdfeditor: rename Upload to upload so class finder doesn't try to load it
 - Core: Fixed install error when SourceGuardian was not installed
