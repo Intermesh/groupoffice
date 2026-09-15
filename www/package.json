@@ -7,6 +7,9 @@
     "go/modules/community/*/views/goui",
     "go/modules/business/*/views/goui"
   ],
+  "scripts": {
+    "build": "npm run build --workspaces"
+  },
   "dependencies": {
     "@intermesh/goui": "latest",
     "@intermesh/groupoffice-core": "latest",
