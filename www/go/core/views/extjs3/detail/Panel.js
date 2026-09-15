@@ -70,7 +70,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 
 		this.on('afterrender', function() {
 
-			this.internalReset();
+			this.hideItems();
 
 			this.body.on("click", this.onBodyClick, this);
 		}, this);
@@ -142,6 +142,13 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	internalReset: function() {
 		this.data = {};
 		this.currentId = null;
+
+
+
+		this.hideItems();
+	},
+
+	hideItems: function() {
 
 		if(this.getTopToolbar()) {
 			this.getTopToolbar().setDisabled(true);
