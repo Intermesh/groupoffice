@@ -244,8 +244,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	}
 	protected function beforeSave() {
 		if($this->isNew){			
-			$this->version = $this->moduleManager->databaseVersion();		
-			$this->admin_menu = $this->moduleManager->adminModule();
+			$this->version = $this->moduleManager->databaseVersion();
 		}
 
 		if($this->isModified('enabled')) {
@@ -264,7 +263,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	
 	protected function afterSave($wasNew) {
 		
-		if(!$this->admin_menu && $wasNew) {
+		if(!$this->moduleManager->adminModule() && $wasNew) {
 			go()->getDbConnection()->insert('core_permission', ['moduleId' => $this->id, 'groupId' => \go\core\model\Group::ID_INTERNAL])->execute();
 		}
 

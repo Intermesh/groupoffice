@@ -13,10 +13,6 @@ class DefaultsiteModule extends \GO\Base\Module {
 	public function authorEmail() {
 		return 'wsmits@intermesh.nl';
 	}
-
-	public function adminModule() {
-		return false;
-	}
 	
 	public function depends() {
 		return array('site');

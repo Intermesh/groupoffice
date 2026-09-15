@@ -252,15 +252,6 @@ class Module extends Observable implements ArrayableInterface {
 	}
 	
 	/**
-	 * Return true if this module belongs in the admin menu.
-	 * 
-	 * @return boolean 
-	 */
-	public function adminModule(){
-		return false;
-	}
-	
-	/**
 	 * Return true if this module has a GUI
 	 * 
 	 * @return boolean 
