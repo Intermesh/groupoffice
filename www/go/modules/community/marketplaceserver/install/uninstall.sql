@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS `marketplaceserver_entitlement`;
+DROP TABLE IF EXISTS `marketplaceserver_api_token`;
+DROP TABLE IF EXISTS `marketplaceserver_instance_log`;
+DROP TABLE IF EXISTS `marketplaceserver_verification`;
+DROP TABLE IF EXISTS `marketplaceserver_reg_attempt`;
+DROP TABLE IF EXISTS `marketplaceserver_release`;
+DROP TABLE IF EXISTS `marketplaceserver_product_module`;
+DROP TABLE IF EXISTS `marketplaceserver_customer`;
+DROP TABLE IF EXISTS `marketplaceserver_product`;
