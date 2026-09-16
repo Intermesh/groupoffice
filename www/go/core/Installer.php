@@ -516,12 +516,6 @@ class Installer {
 		GO::clearCache(); //legacy framework
 		go()->setCache(new None());
 		
-//		$unavailable = go()->getInstaller()->getUnavailableModules();
-//		if(!empty($unavailable)) {
-//			throw new \Exception("There are unavailable modules: " . var_export($unavailable, true));
-//		}
-
-
 		$this->disableUnavailableModules();
 
 		$lock = new Lock("upgrade", false);
@@ -609,26 +603,22 @@ class Installer {
 	}
 
     private function enableDiskUsage() {
+	    $job = model\CronJobSchedule::findByName("CalculateDiskUsage", "core", "core");
+	    if($job) {
+		    return;
+	    }
 
-        $cron = \GO\Base\Cron\CronJob::model()->findSingleByAttribute('job', 'GO\Base\Cron\CalculateDiskUsage');
-        if(!$cron) {
-            $cron = new \GO\Base\Cron\CronJob();
-            $cron->name = 'Calculate disk usage';
-            $cron->job = 'GO\Base\Cron\CalculateDiskUsage';
-        }
+	    $module = model\Module::findByName("core", "core");
 
-        $cron->active = true;
-        $cron->runonce = false;
-        $cron->minutes = '1';
-        $cron->hours = '1';
-        $cron->monthdays = '*';
-        $cron->months = '*';
-        $cron->weekdays = '*';
+	    $cron = new model\CronJobSchedule();
+	    $cron->moduleId = $module->id;
+	    $cron->name = "CalculateDiskUsage";
+	    $cron->expression = "1 1 * * *";
+	    $cron->description = "Calculate disk usage";
 
-        if(!$cron->save()) {
-            var_dump($cron->getValidationErrors());
-            throw new Exception("Could not save calculate disk usage cron");
-        }
+	    if(!$cron->save()) {
+		    throw new Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
+	    }
     }
 	
 	/**

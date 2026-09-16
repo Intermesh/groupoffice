@@ -12,48 +12,8 @@ use Throwable;
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
-class Folder extends FileSystemObject {
-	
-	
-//	/**
-//	 * Create a new file object. Filesystem file is not created automatically.
-//	 *
-//	 * @param string $relativePath
-//	 * @return File
-//	 */
-//	public function getFolder($relativePath) {		
-//		
-//		$childPath = $this->path . '/' . $relativePath;
-//
-//		$file = new File($childPath);
-//		
-//		if($file->exists()) {
-//			throw new \Exception("File '$relativePath' already exists");
-//		}
-//		
-//		return $file;
-//	}
-//
-//	/**
-//	 * Create a new folder object. Filesystem folder is not created automatically.
-//	 *
-//	 * @param string $relativePath
-//	 * @return Folder
-//	 */
-//	public function getFolder($relativePath) {
-//		$childPath = $this->path . '/' . $relativePath;
-//
-//		$folder = new Folder($childPath);
-//		$folder->createMode = $this->createMode;
-//		
-//		if($folder->exists()) {
-//			throw new \Exception("Folder '$relativePath' already exists");
-//		}
-//		
-//		return $folder;
-//	}
-
-
+class Folder extends FileSystemObject
+{
 	/**
 	 * Check if the file or folder exists
 	 * @return boolean

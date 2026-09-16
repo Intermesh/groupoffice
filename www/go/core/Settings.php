@@ -8,88 +8,90 @@ use go\core\db\Query;
 use go\core\exception\Forbidden;
 
 /**
- * Settings model 
- * 
+ * Settings model
+ *
  * Any module can implement getSettings() and return a model that extends this
  * abstract class to store settings. All properties are automatically saved and
  * loaded from the "core_setting" table.
- * 
+ *
  * @see Module::getSettings()
  */
-abstract class Settings extends Model {
+abstract class Settings extends Model
+{
 
-  private static $instance = [];
+	private static $instance = [];
 
 	/**
-	 * 
+	 *
 	 * @return static
 	 * @noinspection PhpMissingReturnTypeInspection
 	 */
 	public static function get()
 	{
-    $cls = static::class;
+		$cls = static::class;
 
-	  if(!isset(self::$instance[$cls])) {
-      $instance = static::dbIsReady() ? go()->getCache()->get($cls) : null;
-      if ($instance) {
-        self::$instance[$cls] = $instance;
-        return $instance;
-      }
+		if (!isset(self::$instance[$cls])) {
+			$instance = static::dbIsReady() ? go()->getCache()->get($cls) : null;
+			if ($instance) {
+				self::$instance[$cls] = $instance;
+				return $instance;
+			}
 
-      $instance = new static;
+			$instance = new static;
 
-		  if(static::dbIsReady()) {
-			  go()->getCache()->set($cls, $instance);
-		  }
-      self::$instance[$cls] = $instance;
-    }
+			if (static::dbIsReady()) {
+				go()->getCache()->set($cls, $instance);
+			}
+			self::$instance[$cls] = $instance;
+		}
 
 		return self::$instance[$cls];
 	}
 
-	public static function flushCache() {
+	public static function flushCache(): void
+	{
 		self::$instance = [];
 	}
 
 	/**
 	 * @throws Exception
 	 */
-	protected function getModuleId() : int{
+	protected function getModuleId(): int
+	{
 		$moduleId = (new Query)
 			->selectSingleValue('id')
 			->from('core_module')
 			->where([
-					'name' => static::getModuleName(),
-					'package' => static::getModulePackageName()])
+				'name' => static::getModuleName(),
+				'package' => static::getModulePackageName()])
 			->execute()
 			->fetch();
-		
-		if(!$moduleId) {
-			throw new Exception ("Could not find module " .  static::getModuleName() . "/" . static::getModulePackageName());
+
+		if (!$moduleId) {
+			throw new Exception ("Could not find module " . static::getModuleName() . "/" . static::getModulePackageName());
 		}
-		
+
 		return $moduleId;
 	}
 
 
-	
 	private $oldData;
 
 
 	private static function dbIsReady(): bool
 	{
 		$ready = go()->getCache()->get('has_table_core_setting');
-		if($ready) {
+		if ($ready) {
 			return true;
 		}
 
 		try {
 			$ready = go()->getDatabase()->hasTable('core_setting');
-			if($ready) {
+			if ($ready) {
 				go()->getCache()->set('has_table_core_setting', true);
 			}
 			return $ready;
-		}catch(Exception $e) {
+		} catch (Exception $e) {
 			go()->debug($e);
 		}
 
@@ -101,16 +103,17 @@ abstract class Settings extends Model {
 	 *
 	 * @throws Exception
 	 */
-	protected function __construct() {
+	protected function __construct()
+	{
 
 		$config = self::loadPropertiesFromConfigFile();
 		$this->readOnlyKeys = array_keys($config);
 		$this->setValues($config);
 
 
-		if(static::dbIsReady()) {
+		if (static::dbIsReady()) {
 
-			$selectProps = array_filter(static::getApiProperties(), function($p, $propName) {
+			$selectProps = array_filter(static::getApiProperties(), function ($p, $propName) {
 				// only defined props
 				return isset($p['access']) && !in_array($propName, $this->readOnlyKeys);
 			}, ARRAY_FILTER_USE_BOTH);
@@ -131,13 +134,11 @@ abstract class Settings extends Model {
 			}
 
 		}
-		
-		$this->oldData = (array) $this;
-	}
-	
 
-	
-	
+		$this->oldData = (array)$this;
+	}
+
+
 	private $readOnlyKeys;
 
 	/** @noinspection PhpUnused */
@@ -148,7 +149,7 @@ abstract class Settings extends Model {
 
 	private function getSettingProperties(): array
 	{
-		return array_filter(get_object_vars($this), function($key) {
+		return array_filter(get_object_vars($this), function ($key) {
 			return $key !== 'oldData' && $key !== 'readOnlyKeys';
 		}, ARRAY_FILTER_USE_KEY);
 	}
@@ -164,40 +165,41 @@ abstract class Settings extends Model {
 	 */
 	public function save(): bool
 	{
-		foreach($this->getSettingProperties() as $name => $value) {
-			if(!array_key_exists($name, $this->oldData) || $value != $this->oldData[$name]) {
-				if(!in_array($name, $this->readOnlyKeys)) {
+		foreach ($this->getSettingProperties() as $name => $value) {
+			if (!array_key_exists($name, $this->oldData) || $value != $this->oldData[$name]) {
+				if (!in_array($name, $this->readOnlyKeys)) {
 					$this->update($name, $value);
 //					throw new Forbidden(static::class . ':' . $name . " can't be changed because it's defined in the configuration file on the server.");
 				}
-				
+
 
 			}
 		}
 
-		$this->oldData = (array) $this;
+		$this->oldData = (array)$this;
 
 		go()->getCache()->set(static::class, $this);
-		
+
 		return true;
 	}
 
 	/**
 	 * @throws Exception
 	 */
-	private function update(string $name, $value) {
-		
+	private function update(string $name, $value)
+	{
+
 		$moduleId = $this->getModuleId();
 
-		if(!$moduleId) {
-			throw new Exception("Could not find module for settings model ". static::class);
+		if (!$moduleId) {
+			throw new Exception("Could not find module for settings model " . static::class);
 		}
-		
+
 		if (!App::get()->getDbConnection()->replace('core_setting', [
-								'moduleId' => $moduleId,
-								'name' => $name,
-								'value' => $value
-						])->execute()) {
+			'moduleId' => $moduleId,
+			'name' => $name,
+			'value' => $value
+		])->execute()) {
 			throw new Exception("Failed to set setting!");
 		}
 	}

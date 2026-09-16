@@ -14,6 +14,7 @@ use GO;
 use GO\Base\Util\Number;
 use go\core\ErrorHandler;
 use go\core\http\Client;
+use go\core\util\DateTime;
 use go\core\util\JSON;
 
 
@@ -752,7 +753,8 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 	}
 	
 	
-	protected function actionAbout($params){
+	protected function actionAbout($params): array
+	{
 
 		$version = go()->getVersion();
 
@@ -764,11 +766,11 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 			}
 		}
 
-		$about = strtr(GO::t("Version: {version}<br/>Copyright (c) 2003-{current_year}, {company_name}<br/>All rights reserved."),[
+		$about = strtr(go()->t("Version: {version}<br/>Copyright (c) 2003-{current_year}, {company_name}<br/>All rights reserved."),[
 			'{version}' => $version,
 			'{current_year}' => date('Y'),
 			'{company_name}' => 'Group-Office by Intermesh B.V.',
-			'{product_name}' => GO::config()->product_name
+			'{product_name}' => go()->getConfig()['product_name']
 		]);
 
 		if(!go()->getAuthState()->isAdmin()) {
@@ -778,25 +780,26 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 			];
 		}
 
-		$lastRun = go()->getDbConnection()->selectSingleValue('lastrun')
-			->from("go_cron")
-			->where('job', '=', 'GO\\Base\\Cron\\CalculateDiskUsage')
+		$lastRun = go()->getDbConnection()->selectSingleValue('lastRunAt')
+			->from("core_cron_job")
+			->where('name', '=', 'CalculateDiskUsage')
 			->single();
 
-		$fileUsage = (int) GO::config()->get_setting('file_storage_usage');
-		$mailUsage = (int) GO::config()->get_setting('mailbox_usage');
-		$dbUsage = (int) GO::config()->get_setting('database_usage');
+		$fileUsage = (int) go()->getSettings()->fileStorageUsage;
+		$mailUsage = (int) go()->getSettings()->mailboxUsage;
+		$dbUsage = (int) go()->getSettings()->databaseUsage;
 
 		return [
 			'success' => true,
 			'data' => [
 				'about' => $about,
-				'date' => $lastRun ? \GO\Base\Util\Date::get_timestamp($lastRun) : go()->t("Never"),
+				'date' => $lastRun ? $lastRun : go()->t("Never"),
 				'users' => \go\core\model\User::find()->where('enabled=1')->selectSingleValue('count(*)')->single(),
-				'mailbox_usage' => Number::formatSize($mailUsage),
-				'file_storage_usage' => Number::formatSize($fileUsage) .' / '. Number::formatSize(GO::config()->quota * 1024),
-				'database_usage' => Number::formatSize($dbUsage),
-				'total_usage' => Number::formatSize($dbUsage + $fileUsage + $mailUsage),
+				'mailbox_usage' => $mailUsage,
+				'file_storage_usage' => $fileUsage,
+				'quota' => intval(go()->getConfig()['quota']) * 1024,
+				'database_usage' => $dbUsage,
+				'total_usage' => $dbUsage + $fileUsage + $mailUsage,
 				'has_usage' => true
 			]
 		];

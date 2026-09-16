@@ -11,33 +11,25 @@ namespace go\core {
 	use go\core\db\Connection;
 	use go\core\db\Database;
 	use go\core\db\DbException;
-	use go\core\db\Table;
 	use go\core\event\EventEmitterTrait;
 	use go\core\event\Listeners;
 	use go\core\fs\Blob;
 	use go\core\fs\Folder;
 	use go\core\http\PostResponseProcessor;
-	use go\core\http\Response;
 	use go\core\jmap\Capabilities;
-	use go\core\jmap\Request;
 	use go\core\mail\Mailer;
 	use go\core\model\Group;
 	use go\core\model\Module as ModuleModel;
 	use go\core\orm\Entity;
 	use go\core\orm\EntityType;
 	use go\core\orm\exception\SaveException;
-	use go\core\orm\Property;
 	use go\core\orm\SearchableTrait;
-	use go\core\Settings as CoreSettings;
 	use go\core\util\ArrayObject;
 	use go\core\util\ClassFinder;
 	use go\core\webclient\Extjs3;
 	use go\core\model\User;
 	use go\core\model\Settings;
-	use Faker;
-
 	use InvalidArgumentException;
-	use PDOException;
 	use Throwable;
 	use const GO_CONFIG_FILE;
 
@@ -1056,9 +1048,6 @@ namespace go\core {
 				for ($i = 0; $i < 10; $i++) {
 					echo ".";
 					$user = new User();
-//				$blob = Blob::fromTmp(new File($faker->image(null, 640, 480, 'people')));
-//				$blob->save();
-//				$user->avatarId = $blob->id;
 					$user->username = $faker->username;
 					$user->displayName = $faker->name;
 					$user->email = $user->recoveryEmail = $user->username . '@' . $faker->domainName;

@@ -1,12 +1,11 @@
 <?php
-use GO\Base\Cron\CronJob;
 use GO\Base\Model\Module;
 use GO\Base\Observable;
 use go\core\ErrorHandler;
-use go\core\event\EventEmitterTrait;
 use go\core\mail\Util;
 use go\core\App;
 use go\core;
+use go\core\model\CronJobSchedule;
 use go\core\model\User;
 
 require('../vendor/autoload.php');
@@ -107,40 +106,35 @@ if (!empty($_POST)) {
 
 
 		//Insert default cronjob record for email reminders
-		$cron = new CronJob();
+        // TODO? If needed, refactor to JMAP Cronbjob and create here
+//		$cron = new CronJob();
+//
+//		$cron->name = 'Email Reminders';
+//		$cron->active = true;
+//		$cron->runonce = false;
+//		$cron->minutes = '*/5'; // Every 5 minutes
+//		$cron->hours = '*';
+//		$cron->monthdays = '*';
+//		$cron->months = '*';
+//		$cron->weekdays = '*';
+//		$cron->job = 'GO\Base\Cron\EmailReminders';
 
-		$cron->name = 'Email Reminders';
-		$cron->active = true;
-		$cron->runonce = false;
-		$cron->minutes = '*/5'; // Every 5 minutes
-		$cron->hours = '*';
-		$cron->monthdays = '*';
-		$cron->months = '*';
-		$cron->weekdays = '*';
-		$cron->job = 'GO\Base\Cron\EmailReminders';
+//		if(!$cron->save()) {
+//			var_dump($cron->getValidationErrors());
+//			throw new Exception("Could not save email reminders cron");
+//		}
 
-		if(!$cron->save()) {
-			var_dump($cron->getValidationErrors());
-			throw new Exception("Could not save email reminders cron");
-		}
+        $module = core\model\Module::findByName("core", "core");
 
-		$cron = new CronJob();
+        $cron = new CronJobSchedule();
+        $cron->moduleId = $module->id;
+        $cron->name = "CalculateDiskUsage";
+        $cron->expression = "1 1 * * *";
+        $cron->description = "Calculate disk usage";
 
-		$cron->name = 'Calculate disk usage';
-		$cron->active = true;
-		$cron->runonce = false;
-		$cron->minutes = '1';
-		$cron->hours = '1';
-		$cron->monthdays = '*';
-		$cron->months = '*';
-		$cron->weekdays = '*';
-		$cron->job = 'GO\Base\Cron\CalculateDiskUsage';
-
-		if(!$cron->save()) {
-			var_dump($cron->getValidationErrors());
-			throw new Exception("Could not save calculate disk usage cron");
-		}
-
+        if(!$cron->save()) {
+            throw new Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
+        }
 		Observable::cacheListeners();
 
 

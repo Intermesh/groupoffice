@@ -39,7 +39,8 @@ use Throwable;
  * docker compose exec -u www-data groupoffice ./www/cli.php core/System/runCron --name='GarbageCollection' --debug
  * 
  */
-class GarbageCollection extends CronJob {
+class GarbageCollection extends CronJob
+{
 
 	use EventEmitterTrait;
 
@@ -50,8 +51,10 @@ class GarbageCollection extends CronJob {
 
 	/**
 	 * @throws Exception
+	 * @throws Throwable
 	 */
-	public function run(CronJobSchedule $schedule) {
+	public function run(CronJobSchedule $schedule): void
+	{
 		$this->change();
 		$this->blobs();
 		$this->links();

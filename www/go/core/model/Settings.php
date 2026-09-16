@@ -11,7 +11,8 @@ use go\core\util\Crypt;
 use go\modules\business\license\model\License;
 use go\modules\community\addressbook\model\AddressBook;
 
-class Settings extends core\Settings {
+class Settings extends core\Settings
+{
 
 	use core\validate\ValidationTrait;
 
@@ -708,6 +709,26 @@ class Settings extends core\Settings {
 	 * When false administrator has to enable each new device
 	 */
 	public bool  $activeSyncCanConnect = true;
+
+	/**
+	 * @var int database usage in bytes. Refactored from old framework
+	 */
+	public int $databaseUsage = 0;
+
+	/**
+	 * @var int fily storage usage in bytes. Refactored from old framework
+	 */
+	public int $fileStorageUsage = 0;
+
+	/**
+	 * @var int mailbox usage in bytes. Refactored from old framework
+	 */
+	public int $mailboxUsage = 0;
+
+	/**
+	 * @var core\util\DateTime|null Last cron running time (is this still necessary?)
+	 */
+	public core\util\DateTime| null $cronLastRun = null;
 	
 	
 	public function save(): bool

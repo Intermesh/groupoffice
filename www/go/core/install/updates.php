@@ -1855,3 +1855,4 @@ $updates['202608241101'][] = "create table if not exists core_module_user
             on delete cascade
 );";
 
+$updates['202609161040'][] = "UPDATE `go_cron` SET `active`=0 WHERE 1;";
