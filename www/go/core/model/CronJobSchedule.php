@@ -117,12 +117,15 @@ class CronJobSchedule extends Entity
 
 	/**
 	 * @return string
+	 * @throws Exception
 	 */
 	public function getCronClass(): string
 	{
 		$module = Module::findById($this->moduleId);
-		
-		if($module->package == "core" && $module->name == "core") {
+		// As per 26.1 the old ActiveRecard based cron system is gone. Therefore, we need to support the old namespacing
+		if (is_null($module->package)) {
+			return "GO\\".ucfirst($module->name) . "\\Cron\\" .$this->name;
+		} elseif($module->package == "core" && $module->name == "core") {
 			return "go\\core\\cron\\" . $this->name;
 		}
 		
