@@ -13,30 +13,28 @@ modules.register(  {
 	],
 	userSettingsPanels: [PreferencesPanel],
 	async init () {
-		//client.on("authenticated",  ({session}) => {
 
-			// if (!session.capabilities["urn:ietf:params:jmap:webpush-vapid"]) {
-			// 	return;
-			// }
-			if ('serviceWorker' in navigator) {
-				const registration = await navigator.serviceWorker.register('sw.js', {
-					updateViaCache: 'none'
+		if(!window.isSecureContext) {
+			console.warn("Notifications only work in secure context");
+			return;
+		}
+		if ('serviceWorker' in navigator) {
+			const registration = await navigator.serviceWorker.register('sw.js', {
+				updateViaCache: 'none'
+			});
+			registration.addEventListener('updatefound', () => {
+				const worker = registration.installing;
+
+				console.log('New service worker found:', worker);
+
+				worker?.addEventListener('statechange', () => {
+					console.log('New SW state:', worker.state);
 				});
-				registration.addEventListener('updatefound', () => {
-					const worker = registration.installing;
-
-					console.log('New service worker found:', worker);
-
-					worker?.addEventListener('statechange', () => {
-						console.log('New SW state:', worker.state);
-					});
-				})
-				if ( ('PushManager' in window)) {
-					subscribe(registration);
-				}
+			})
+			if ( ('PushManager' in window)) {
+				subscribe(registration);
 			}
-
-		//});
+		}
 	}
 });
 

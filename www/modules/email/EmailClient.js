@@ -1040,14 +1040,12 @@ GO.mainLayout.onReady(function(){
 	GO.email.search_type_default = localStorage && localStorage.email_search_type  ? localStorage.email_search_type : 'any';
 
 	//register a new request to the checker. It will poll unseen tickets every two minutes
-	go.Notifier.addStatusIcon('email', 'ic-email');
 	GO.checker.registerRequest("email/account/checkUnseen",{},function(checker, data){
 
 		if(!data.email_status) {
 			return;
 		}
 
-		//go.Notifier.toggleIcon('email',data.email_status.total_unseen > 0);
 		GO.mainLayout.setNotification('email',data.email_status.total_unseen,'green');
 
 		if(GO.mainLayout.panelIsVisible('email')) {
@@ -1077,18 +1075,11 @@ GO.mainLayout.onReady(function(){
 		var title = t("New email"),
 			text = t("You have %d unread email(s)").replace('%d', data.email_status.total_unseen);
 
-		// go.Notifier.notify({
-		// 	title: title,
-		// 	description: text,
-		// 	iconCls: 'ic-email',
-		// 	icon: 'views/Extjs3/themes/Paper/img/notify/email.png',
-		// 	tag: "email"
-		// }).catch((e) => {
-		// 	console.warn("Notification failed: " + e);
-		// });
-
-		go.Notifier.playSound('message-new-email', 'email');
-
+		window.GOUI.Notifier.notify({
+			title,text,tag:'email',
+			icon: {name:'email',color:'blue',link:'views/Extjs3/themes/Paper/img/notify/email.png'},
+			category:'message',variant:'info'
+		});
 	});
 
 });

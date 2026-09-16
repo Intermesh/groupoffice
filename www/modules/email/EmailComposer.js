@@ -1268,10 +1268,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		this.sendButton.setDisabled(true);
 
 		if(autoSave) {
-			go.Notifier.flyout({
-				description: t("Autosaving e-mail message to drafts (every 2 mins)"),
-				time: 2000
-			});
+			window.GOUI.Notifier.notice(t("Autosaving e-mail message to drafts (every 2 mins)"));
 		}
 
 		var strNoSubjectMsg = draft ?

@@ -140,58 +140,28 @@ go.Modules.register("community", "tasks", {
 
 	}],
 	initModule: function () {
-		go.Alerts.on("beforeshow", function(alerts, alertConfig) {
-			const alert = alertConfig.alert;
-			if(alert.entity == "Task" || alert.entity == "SupportTicket") {
 
-				switch(alert.tag) {
-					case "assigned":
-						//replace panel promise
-						alertConfig.panelPromise = alertConfig.panelPromise.then(async (panelCfg) => {
-							let assigner;
-							try {
-								assigner = await go.Db.store("Principal").single(alert.data.assignedBy);
-							} catch (e) {
+		// bah
+		const renderer = (alert, closeFn) => {
+			debugger;
+			go.Db.store("Principal").single(alert.data.assignedBy ?? alert.data.createdBy).then(principal => {});
+			const msgs = {
+				assigned: t("You were assigned to this task by {assigner}"),
+				createdforyou: t("A new task was created in your list by {creator}")
+			};
+			let text= go.util.Format.dateTime(alert.triggerAt) + ": " +msgs[alert.tag]
+				.replace("{assigner}", principal.name)
+				.replace("{creator}", principal.name)
 
-							}
-
-							if(!assigner) {
-								assigner = {name: t("Unknown user")};
-							}
-
-							const msg = go.util.Format.dateTime(alert.triggerAt) + ": " +t("You were assigned to this task by {assigner}").replace("{assigner}", assigner.name);
-							panelCfg.items = [{html: msg }];
-							panelCfg.notificationBody = msg;
-							return panelCfg;
-						});
-						break;
-
-					case "createdforyou":
-//replace panel promise
-						alertConfig.panelPromise = alertConfig.panelPromise.then(async (panelCfg) => {
-
-							let creator;
-							try {
-								creator = await go.Db.store("Principal").single(alert.data.createdBy);
-							} catch (e) {
-
-							}
-
-							if(!creator) {
-								creator = {name: t("Unknown user")};
-							}
-
-							const msg = go.util.Format.dateTime(alert.triggerAt) + ": " +t("A new task was created in your list by {creator}").replace("{creator}", creator.name);
-							panelCfg.items = [{html: msg}];
-							panelCfg.notificationBody = msg
-							return panelCfg;
-
-						});
-						break;
-				}
-
-			}
-		});
+			return {
+				title: alert.entityData.title,
+				text,
+				icon: {name:'task', color: 'brown'},
+				category: 'event',
+			};
+		};
+		groupofficeCore.main.notifier.regRenderer('Task', renderer);
+		groupofficeCore.main.notifier.regRenderer('SupportTicket', renderer);
 
 
 		async function showBadge() {
