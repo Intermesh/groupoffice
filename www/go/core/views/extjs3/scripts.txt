@@ -83,15 +83,6 @@ layout/ResponsiveLayout.js
 
 AuthenticationManager.js
 ActivityWatcher.js
-login/LanguageCombobox.js
-login/DomainCombo.js
-login/LoginDialog.js
-login/BaseLoginPanel.js
-login/ForgotDialog.js
-login/UsernamePanel.js
-login/ForcePasswordChangePanel.js
-login/LoginPanel.js
-login/RecoveryDialog.js
 
 links/EntityCombo.js
 links/LinkDetailWindow.js
@@ -314,6 +305,5 @@ chart/BarChart.js
 
 license/LicenseDialog.js
 
-Alert.js
 PrincipalCombo.js
 
