@@ -36,26 +36,15 @@ class BasicBackend extends AbstractBasic {
 	}
 	
 	protected function validateUserPass($username, $password) {
-
 		$auth = new Authenticate();
 
-		$path = $_SERVER['REQUEST_URI'];
-
-		if (str_starts_with($path, '/caldav')) {
-			$protocol = 'caldav';
-		} elseif (str_starts_with($path, '/carddav')) {
-			$protocol = 'carddav';
-		} elseif (str_starts_with($path, '/dav')) {
-			$protocol = 'dav';
-		}
-
 		if (go()->getSettings()->forceAppPasswords && isset($protocol)) {
-			$user = $auth->appPasswordLogin($username, $password, $protocol);
+			$user = $auth->appPasswordLogin($username, $password, 'dav');
 		} else {
 			$user = $auth->passwordLogin($username, $password);
 
 			if (!$user && isset($protocol)) {
-				$user = $auth->appPasswordLogin($username, $password, $protocol);
+				$user = $auth->appPasswordLogin($username, $password, 'dav');
 			}
 		}
 

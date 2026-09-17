@@ -25,9 +25,7 @@ go.usersettings.AppPasswordDialog = Ext.extend(go.form.Dialog, {
 			anchor: '100%',
 			comboStore: new Ext.data.JsonStore({
 				data: [
-					{value: 'dav', text: t('File mount (dav)', 'users', 'core')},
-					{value: 'caldav', text: t('CalDAV', 'users', 'core')},
-					{value: 'carddav', text: t('CardDAV', 'users', 'core')},
+					{value: 'dav', text: t('File mount, CalDAV, CardDAV (dav)', 'users', 'core')},
 					{value: 'activesync', text: t('ActiveSync', 'users', 'core')}
 				],
 				id: 'value',
