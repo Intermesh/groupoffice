@@ -142,7 +142,7 @@ class ModuleInfo extends \go\core\Controller {
 						go()->debug(	\go\core\model\Module::$lastDeleteStmt);
 					}
 				} else {
-					$module = Module::model()->findByPk($id);
+					$module = Module::model()->findByName($name);
 					$module->delete();
 				}
 
