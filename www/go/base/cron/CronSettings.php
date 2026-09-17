@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @deprecated - Use JMAP framework
+ */
 
 namespace GO\Base\Cron;
 

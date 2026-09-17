@@ -286,7 +286,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 			$enoughQuota = \GO::user()->disk_usage + $newBytes <= $userQuota;
 		}
 		if ($enoughQuota && \GO::config()->quota > 0) {
-			$currentQuota = (int) \GO::config()->get_setting('file_storage_usage', 0 ,0);
+			$currentQuota = (int) go()->getSettings()->fileStorageUsage;
 			$enoughQuota = $currentQuota + $newBytes <= (\GO::config()->quota * 1024);
 		}
 		
@@ -428,26 +428,27 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		return new \GO\Base\Fs\File(\GO::config()->file_storage_path . $this->path);
 	}
 
-	private function _addQuota(){
+	private function _addQuota(): void
+	{
+		if ($this->isModified('size') || $this->isNew) {
+			$sizeDiff = (int)$this->fsFile->size() - (int)$this->getOldAttributeValue('size');
 
-		if($this->isModified('size') || $this->isNew) {
-			$sizeDiff = (int) $this->fsFile->size() - (int) $this->getOldAttributeValue('size');
-
-//			GO::debug("Adding quota: $sizeDiff for ".$this->folder->quotaUser->getName());
-			if($this->folder->quotaUser){
+			if ($this->folder->quotaUser) {
 				$this->folder->quotaUser->calculatedDiskUsage($sizeDiff)->save(true); //user quota
 			}
-			if(GO::config()->quota>0) {
-				GO::config()->save_setting("file_storage_usage", (int) GO::config()->get_setting('file_storage_usage', 0 ,0) + $sizeDiff); //system quota
+			if (GO::config()->quota > 0) {
+				go()->getSettings()->fileStorageUsage += $sizeDiff;
+				go()->getSettings()->save();
 			}
 		}
-
 	}
 	
-	private function _removeQuota(){
-		if(\GO::config()->quota>0){
+	private function _removeQuota(): void
+	{
+		if ((int) go()->getConfig()['quota'] > 0) {
 			\GO::debug("Removing quota: $this->size");
-			\GO::config()->save_setting("file_storage_usage", (int) GO::config()->get_setting('file_storage_usage', 0 ,0) - $this->size);
+			go()->getSettings()->fileStorageUsage -= $this->size;
+			go()->getSettings()->save();
 		}
 
 		if($this->folder->quotaUser){

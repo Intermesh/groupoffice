@@ -705,7 +705,6 @@ class Instance extends Entity {
 	
 	private function getInstanceDbData(){
 		try {
-
 			//Correct old bug
 			$this->getInstanceDbConnection()->exec("DELETE FROM core_setting WHERE moduleId=0");
 
@@ -733,25 +732,22 @@ class Instance extends Entity {
 			$this->storageUsage = (int) (new \go\core\db\Query())
 						->setDbConnection($this->getInstanceDbConnection())
 						->selectSingleValue('value')
-						->from('go_settings')
-						->where('name', '=', "file_storage_usage")
-						->andWhere('user_id', '=', 0)
+						->from('core_setting')
+						->where('name', '=', "fileStorageUsage")
 						->single();
 
 			$this->storageUsage += (int) (new \go\core\db\Query())
 				->setDbConnection($this->getInstanceDbConnection())
 				->selectSingleValue('value')
-				->from('go_settings')
-				->where('name', '=', "email_usage")
-				->andWhere('user_id', '=', 0)
+				->from('core_setting')
+				->where('name', '=', "emailUsage")
 				->single();
 
 			$this->storageUsage += (int) (new \go\core\db\Query())
 				->setDbConnection($this->getInstanceDbConnection())
 				->selectSingleValue('value')
-				->from('go_settings')
-				->where('name', '=', "database_usage")
-				->andWhere('user_id', '=', 0)
+				->from('core_setting')
+				->where('name', '=', "databaseUsage")
 				->single();
 
 			$this->version = (new \go\core\db\Query())
@@ -768,7 +764,7 @@ class Instance extends Entity {
 		}
 		catch(Exception $e) {
 			//ignore
-      go()->getDebugger()->debug($e);
+            go()->getDebugger()->debug($e);
 		} finally {
 			try {
 				$this->getInstanceDbConnection()->disconnect();

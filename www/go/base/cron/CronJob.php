@@ -33,7 +33,9 @@
  * @property int $completedat // timestamp of the latest run
  * 
  */
-
+/**
+ * @deprecated - Use JMAP cron classes
+ */
 namespace GO\Base\Cron;
 
 use GO;

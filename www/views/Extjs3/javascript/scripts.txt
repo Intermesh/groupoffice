@@ -119,7 +119,6 @@ views/Extjs3/javascript/query/CriteriaFormPanel.js
 
 views/Extjs3/javascript/windows/SummaryDialog.js
 views/Extjs3/javascript/windows/TabbedFormDialog.js
-views/Extjs3/javascript/windows/AboutDialog.js
 
 views/Extjs3/javascript/windows/ExportGridDialog.js
 views/Extjs3/javascript/windows/ExportDialog.js

@@ -17,7 +17,8 @@
  */
 
 /**
- * 
+ * @deprecated Use \go\core\model\CronJob instead
+ * @see \go\core\model\CronJob
  * @package GO.base.cron
  */
 
