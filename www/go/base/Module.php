@@ -250,7 +250,16 @@ class Module extends Observable implements ArrayableInterface {
 	public function getDocumentationURL(): ?string {
 		return null;
 	}
-	
+
+	/**
+	 * Return true if this module belongs in the admin menu.
+	 *
+	 * @return boolean
+	 */
+	public function adminModule(){
+		return false;
+	}
+
 	/**
 	 * Return true if this module has a GUI
 	 * 
