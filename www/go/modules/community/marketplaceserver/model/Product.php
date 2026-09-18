@@ -7,6 +7,7 @@ use go\core\jmap\Entity;
 use go\core\model\Acl;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
+use go\core\orm\Query;
 
 /**
  * A sellable item in the marketplace catalog: a single module or a bundled
@@ -162,6 +163,27 @@ class Product extends Entity
     }
 
     /**
+     * A product that customers hold licenses for is not deleted: that would wipe
+     * their grants (and a paid subscription would keep billing with nothing to
+     * show for it). Deactivate it instead. Its releases are deleted through the
+     * ORM so their package blobs become collectable.
+     *
+     * @param \go\core\orm\Query $query
+     * @return bool
+     * @throws \Exception
+     */
+    protected static function internalDelete(Query $query): bool
+    {
+        if (Entitlement::find(['id'])->where(['productId' => $query])->single()) {
+            throw new \go\core\exception\Forbidden('Customers hold licenses for this product. Deactivate it instead of deleting it.');
+        }
+        if (!Release::delete(['productId' => $query])) {
+            return false;
+        }
+        return parent::internalDelete($query);
+    }
+
+    /**
      * @return \go\core\orm\Mapping
      * @throws \ReflectionException
      */
@@ -246,6 +268,32 @@ class Product extends Entity
         // "moduleName is required" error on the Release instead of the Product.
         if ($this->type === self::TYPE_MODULE && empty($this->moduleName)) {
             $this->setValidationError('moduleName', \go\core\validate\ErrorCode::REQUIRED, 'A module name is required for a module product');
+        }
+        if ($this->type === self::TYPE_COLLECTION) {
+            // A collection ships no module of its own; a moduleName left over from
+            // when it was a module product would make the download path pick it.
+            $this->moduleName = null;
+        }
+        if (!$this->isNew() && $this->isModified(['moduleName'])
+            && Release::find(['id'])->where(['productId' => $this->id])->single()) {
+            // Every release's ZIP is rooted at the module folder it was published
+            // for; renaming the module would make all of them fail to install.
+            $this->setValidationError('moduleName', \go\core\validate\ErrorCode::INVALID_INPUT, 'The module name cannot change once releases exist. Create a new product instead.');
+        }
+        if ($this->type === self::TYPE_MODULE && !empty($this->moduleName) && $this->isModified(['moduleName', 'type'])) {
+            if (!preg_match('/^[a-z0-9_]+$/', (string) $this->moduleName)) {
+                $this->setValidationError('moduleName', \go\core\validate\ErrorCode::INVALID_INPUT, 'Use lowercase letters, digits and underscores only (the module folder name).');
+            } else {
+                // One product per module: the download and license paths look a
+                // module up by name, so a second product would decide its price.
+                $dupe = self::find(['id'])->where(['type' => self::TYPE_MODULE, 'moduleName' => $this->moduleName]);
+                if (!$this->isNew()) {
+                    $dupe->andWhere('p.id', '!=', $this->id);
+                }
+                if ($dupe->single()) {
+                    $this->setValidationError('moduleName', \go\core\validate\ErrorCode::UNIQUE, 'Another product already sells this module.');
+                }
+            }
         }
 
         parent::internalValidate();

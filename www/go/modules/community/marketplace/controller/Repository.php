@@ -21,6 +21,22 @@ class Repository extends EntityController
     }
 
     /**
+     * Adding a repository, signing up and downloading all end up installing code
+     * from a remote server, so they are admin-only (the same bar as
+     * Module/install).
+     *
+     * @return void
+     * @throws \go\core\exception\Forbidden
+     */
+    private function assertAdmin(): void
+    {
+        $state = go()->getAuthState();
+        if (!$state || !$state->isAdmin()) {
+            throw new \go\core\exception\Forbidden();
+        }
+    }
+
+    /**
      * @param $params
      * @return ArrayObject
      * @throws InvalidArguments
@@ -73,12 +89,9 @@ class Repository extends EntityController
     {
         // Controller-level gate (not on an entity): there is no Repository row
         // yet, so this must gate the *user* at the API boundary. Without it a
-        // mayRead-only user could abuse validate() as an SSRF / token-probe
-        // primitive (outbound HTTPS to an attacker-chosen URL + writability stat).
-        $module = \go\core\App::get()->getModule('community', 'marketplace');
-        if (!$module || empty($module->getUserRights()->mayManage)) {
-            throw new \go\core\exception\Forbidden();
-        }
+        // non-admin could abuse validate() as an SSRF / token-probe primitive
+        // (outbound HTTPS to an attacker-chosen URL + writability stat).
+        $this->assertAdmin();
 
         $probe = new model\Repository();
         $probe->url = (string) ($params['url'] ?? '');
@@ -87,13 +100,17 @@ class Repository extends EntityController
         $client = new \go\modules\community\marketplace\lib\ApiClient($probe);
         $info = $client->info();                       // throws on bad token / unreachable
 
-        $package = $info['package'] ?? '';
+        $package = (string) ($info['package'] ?? '');
+        if (!model\Repository::isAllowedPackage($package)) {
+            throw new \Exception(go()->t("This marketplace server publishes into a package that is not allowed", 'community', 'marketplace') . ': "' . $package . '"');
+        }
         $writable = $this->packageDirWritable($package);
 
+        // Preview only: the package, name and signing key are pinned by the
+        // entity itself when the repository is saved (Repository::pinServer()).
         return new \ArrayObject([
             'package' => $package,
             'name' => $info['name'] ?? $package,
-            'publicKey' => $info['publicKey'] ?? '',
             'writable' => $writable,
             'packageDir' => $this->packageDir($package),
         ]);
@@ -111,10 +128,7 @@ class Repository extends EntityController
      */
     public function register($params)
     {
-        $module = \go\core\App::get()->getModule('community', 'marketplace');
-        if (!$module || empty($module->getUserRights()->mayManage)) {
-            throw new \go\core\exception\Forbidden();
-        }
+        $this->assertAdmin();
 
         $probe = new model\Repository();
         $probe->url = (string) ($params['url'] ?? '');
@@ -135,7 +149,7 @@ class Repository extends EntityController
 
     /**
      * Password login for an EXISTING account, returning a fresh API token to
-     * auto-fill. Same manager-only boundary + outbound-POST shape as register().
+     * auto-fill. Same admin-only boundary + outbound-POST shape as register().
      * On an unverified account the server answers with code 'verifyRequired' —
      * surfaced as {verifyRequired:true} so the dialog can offer "resend" rather
      * than a dead-end error. Other failures carry the server's generic message.
@@ -146,10 +160,7 @@ class Repository extends EntityController
      */
     public function login($params)
     {
-        $module = \go\core\App::get()->getModule('community', 'marketplace');
-        if (!$module || empty($module->getUserRights()->mayManage)) {
-            throw new \go\core\exception\Forbidden();
-        }
+        $this->assertAdmin();
 
         $probe = new model\Repository();
         $probe->url = (string) ($params['url'] ?? '');
@@ -181,10 +192,7 @@ class Repository extends EntityController
      */
     public function resendVerification($params)
     {
-        $module = \go\core\App::get()->getModule('community', 'marketplace');
-        if (!$module || empty($module->getUserRights()->mayManage)) {
-            throw new \go\core\exception\Forbidden();
-        }
+        $this->assertAdmin();
 
         $probe = new model\Repository();
         $probe->url = (string) ($params['url'] ?? '');
@@ -241,6 +249,11 @@ class Repository extends EntityController
             throw new \Exception('productId is required');
         }
         $url = (new \go\modules\community\marketplace\lib\ApiClient($repo))->checkout($productId);
+        if (!self::isHttpsUrl($url)) {
+            // The browser navigates to this URL, so a javascript:/data: URL from a
+            // hostile server would run in Group-Office's origin.
+            throw new \Exception(go()->t("The marketplace server returned an invalid payment address", 'community', 'marketplace'));
+        }
         return new \ArrayObject(['url' => $url]);
     }
 
@@ -259,15 +272,6 @@ class Repository extends EntityController
         $client = new \go\modules\community\marketplace\lib\ApiClient($repo);
         $catalog = $client->catalog();
 
-        // Self-heal the package for repositories added before it was tracked, so
-        // downloads work without a manual re-save (the catalog response carries
-        // the server's package).
-        $catalogPackage = (string) ($catalog['package'] ?? '');
-        if (empty($repo->package) && $catalogPackage !== '') {
-            $repo->package = $catalogPackage;
-            $repo->save();
-        }
-
         $downloaded = [];
         foreach ($repo->downloadedModules as $dm) {
             $downloaded[$dm->moduleName] = $dm->version;
@@ -276,7 +280,8 @@ class Repository extends EntityController
         // Which of the catalogue's modules already exist in THIS Group-Office
         // (core_module row) — so the client can offer an "Install" action for
         // downloaded-but-not-yet-installed modules and hide it once installed.
-        $package = $catalog['package'] ?? $repo->package ?? $repo->name;
+        // Always the pinned package: that is where downloads go.
+        $package = (string) $repo->getPackage();
         $installed = [];
         foreach (($catalog['products'] ?? []) as $p) {
             $mn = (string) ($p['moduleName'] ?? '');
@@ -330,33 +335,19 @@ class Repository extends EntityController
     public function download($params)
     {
         $repo = model\Repository::findById((string) $params['repositoryId']);
-        if (!$repo || !$repo->getPermissionLevel()) {
+        if (!$repo || !$repo->hasPermissionLevel(\go\core\model\Acl::LEVEL_MANAGE)) {
             throw new \go\core\exception\Forbidden();
         }
         $module = (string) $params['module'];
         $version = (string) ($params['version'] ?? '');
 
-        // The install target is the SERVER's package (e.g. "sf"), captured from
-        // /info at validate time — NOT the human-readable repository name.
-        $package = (string) $repo->package;
+        // The install target is the package pinned from the server's /info when
+        // the repository was saved — NOT the human-readable repository name.
+        $package = (string) $repo->getPackage();
         if ($package === '') {
-            // Backfill from the server's /info for repositories added before the
-            // package was tracked, instead of forcing a manual re-save.
-            try {
-                $info = (new \go\modules\community\marketplace\lib\ApiClient($repo))->info();
-                $package = (string) ($info['package'] ?? '');
-                if ($package !== '') {
-                    $repo->package = $package;
-                    $repo->save();
-                }
-            } catch (\Throwable $e) {
-                // fall through to the guard below with an empty package
-            }
+            throw new \Exception('Could not determine this repository\'s package. Re-enter the API token and save the repository, then try again.');
         }
-        if ($package === '') {
-            throw new \Exception('Could not determine this repository\'s package from the server. Re-enter the API token and save the repository, then try again.');
-        }
-        if (!preg_match('/^[a-z0-9_]+$/i', $module) || !preg_match('/^[a-z0-9_]+$/i', $package)) {
+        if (!preg_match('/^[a-z0-9_]+$/', $module) || !model\Repository::isAllowedPackage($package)) {
             throw new \Exception('Unsafe module/package name');
         }
         $packageDir = go()->getEnvironment()->getInstallPath() . '/go/modules/' . $package;
@@ -367,14 +358,43 @@ class Repository extends EntityController
             throw new \Exception('Package directory not writable: ' . $packageDir);
         }
 
-        // 1. download to a temp zip. try/finally guarantees the temp ZIP and
-        // the scratch extract dir are removed on EVERY exit (there is no
-        // framework tmp GC here — the tmp GC cron is disabled), including when
-        // ApiClient::download() throws mid-transfer leaving a partial file.
+        $moduleDir = $packageDir . '/' . $module;
+        if (is_dir($moduleDir) && !$this->isDownloadedFrom($repo, $module)) {
+            // Only a module this repository put there may be replaced. Anything
+            // else (a hand-installed copy, a module from another repository) is
+            // left alone.
+            throw new \Exception(sprintf(go()->t("The module \"%s\" already exists in go/modules/%s and was not installed from this repository. Remove it first if you want to replace it.", 'community', 'marketplace'), $module, $package));
+        }
+        if (empty($repo->pinnedPublicKey())) {
+            throw new \Exception('Cannot verify this package: the repository has no pinned signing key. Open the repository and save its API token again to re-pin it, then retry.');
+        }
+
+        // One download per module at a time: two concurrent runs would race on
+        // the backup/rename swap of the same directory.
+        $lock = @fopen($packageDir . '/.marketplace_' . $module . '.lock', 'c');
+        if ($lock === false || !flock($lock, LOCK_EX | LOCK_NB)) {
+            throw new \Exception(go()->t("This module is already being downloaded. Try again in a moment.", 'community', 'marketplace'));
+        }
+
+        // try/finally guarantees the temp ZIP and the scratch extract dir are
+        // removed on EVERY exit (there is no framework tmp GC here — the tmp GC
+        // cron is disabled), including when ApiClient::download() throws
+        // mid-transfer leaving a partial file.
         $tmpZip = \go\core\fs\File::tempFile('zip');
         $extractDir = null;
         try {
-            (new \go\modules\community\marketplace\lib\ApiClient($repo))->download($module, $version, $tmpZip);
+            $client = new \go\modules\community\marketplace\lib\ApiClient($repo);
+
+            // 1. resolve the release and fetch its signature first, then download
+            // exactly that version — so a release published in between cannot
+            // make the bytes and the signature belong to different versions, and
+            // the version recorded below is the concrete one, not ''.
+            $sig = $client->signature($module, $version);
+            if ($sig['version'] === '') {
+                throw new \Exception('The marketplace server did not say which version it is serving.');
+            }
+            $version = $sig['version'];
+            $client->download($module, $version, $tmpZip);
 
             // http\Client::download() doesn't inspect HTTP status (see ApiClient::download),
             // so a 403/404 JSON error body is written verbatim into $tmpZip. Detect a
@@ -389,14 +409,11 @@ class Repository extends EntityController
             // are not enough: a spoofed/compromised server (or broken TLS) must not
             // be able to deliver arbitrary code. Only a package signed by the key
             // that matches the pinned public key is extracted.
-            if (empty($repo->publicKey)) {
-                throw new \Exception('Cannot verify this package: the repository has no pinned signing key. Open the repository and save its API token again to re-pin it, then retry.');
-            }
-            $signature = (new \go\modules\community\marketplace\lib\ApiClient($repo))->signature($module, $version);
             $bytes = (string) file_get_contents($tmpZip->getPath());
-            if (!\go\modules\community\marketplace\lib\PackageSigner::verify($bytes, $signature, (string) $repo->publicKey)) {
+            if (!\go\modules\community\marketplace\lib\PackageSigner::verify($bytes, $sig['signature'], $repo->pinnedPublicKey())) {
                 throw new \Exception('Package signature verification failed — this download was not signed by the repository\'s trusted key and was rejected. Your modules were not modified.');
             }
+            unset($bytes);
 
             // 3. validate entries before extracting
             $zip = new \ZipArchive();
@@ -418,8 +435,8 @@ class Repository extends EntityController
             // final rename() is a same-device move — a temp dir on /tmp is often
             // a different mount (e.g. in Docker), where rename() falls back to a
             // copy() that cannot handle directories ("first argument to copy()
-            // cannot be a directory").
-            $moduleDir = $packageDir . '/' . $module;
+            // cannot be a directory"). Dot-prefixed, like the backup, so a
+            // leftover is never taken for a module.
             $extractDir = $packageDir . '/.marketplace_tmp_' . $module . '_' . uniqid();
             if (!$zip->extractTo($extractDir)) {
                 $zip->close();
@@ -429,7 +446,7 @@ class Repository extends EntityController
 
             $backup = null;
             if (is_dir($moduleDir)) {
-                $backup = $moduleDir . '.bak-' . time();
+                $backup = $packageDir . '/.' . $module . '.bak-' . time();
                 if (!rename($moduleDir, $backup)) {
                     throw new \Exception('Could not back up existing module');
                 }
@@ -444,20 +461,49 @@ class Repository extends EntityController
                 }
                 throw new \Exception('Could not move new module into place' . ($backup ? ' (previous version restored)' : ''));
             }
-            if ($backup) {
-                $this->rrmdir($backup);
-            }
 
             // 5. record downloaded version
             $this->recordDownloaded($repo, $module, $version);
 
-            return new \ArrayObject(['success' => true, 'module' => $module, 'version' => $version]);
+            $result = ['success' => true, 'module' => $module, 'version' => $version];
+            if ($backup && !$this->rrmdir($backup)) {
+                // The new version is in place; only the old copy could not be
+                // removed completely (e.g. files owned by another user).
+                $result['warning'] = sprintf(go()->t("The previous version could not be removed completely. Delete %s by hand.", 'community', 'marketplace'), $backup);
+            }
+            return new \ArrayObject($result);
         } finally {
             $tmpZip->delete();                       // no-op if already gone
             if ($extractDir !== null) {
                 $this->rrmdir($extractDir);          // no-op if already removed
             }
+            flock($lock, LOCK_UN);
+            fclose($lock);
         }
+    }
+
+    /**
+     * @param model\Repository $repo
+     * @param string $module
+     * @return bool
+     */
+    private function isDownloadedFrom(model\Repository $repo, string $module): bool
+    {
+        foreach ($repo->downloadedModules as $dm) {
+            if ($dm->moduleName === $module) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param string $url
+     * @return bool
+     */
+    private static function isHttpsUrl(string $url): bool
+    {
+        return stripos($url, 'https://') === 0 && filter_var($url, FILTER_VALIDATE_URL) !== false;
     }
 
     /**
@@ -506,7 +552,7 @@ class Repository extends EntityController
     public function refresh($params)
     {
         $repo = model\Repository::findById((string) $params['repositoryId']);
-        if (!$repo || !$repo->getPermissionLevel()) {
+        if (!$repo || !$repo->hasPermissionLevel(\go\core\model\Acl::LEVEL_MANAGE)) {
             throw new \go\core\exception\Forbidden();
         }
 
@@ -514,19 +560,17 @@ class Repository extends EntityController
 
         // detect signing-key rotation
         $info = $client->info();
-        if (!empty($repo->publicKey) && ($info['publicKey'] ?? '') !== $repo->publicKey) {
-            $repo->keyMismatch = true;
-            $repo->lastError = 'Signing key changed';
+        if (($info['publicKey'] ?? '') !== $repo->pinnedPublicKey()) {
+            $repo->flagKeyMismatch();
             $repo->save();
             throw new \Exception("This marketplace server's security key changed (for example the server was reinstalled). To reconnect, open this repository and save its API token again.");
         }
 
-        $host = \go\core\http\Request::get()->getHost();
-        $repo->licenseJwt = $client->license($host);
-        $repo->lastSyncAt = new \go\core\util\DateTime();
-        $repo->lastError = null;
-        $repo->keyMismatch = false;
-        $repo->save();
+        $host = \go\modules\community\marketplace\lib\LicenseHost::current();
+        $repo->storeLicense($client->license($host), $host);
+        if (!$repo->save()) {
+            throw new \Exception($repo->getValidationErrorsAsString());
+        }
 
         return new \ArrayObject(['success' => true]);
     }
@@ -561,29 +605,30 @@ class Repository extends EntityController
      * Recursively remove a directory tree.
      *
      * @param string $dir
-     * @return void
+     * @return bool false when something could not be removed
      */
-    private function rrmdir(string $dir): void
+    private function rrmdir(string $dir): bool
     {
         if (!is_dir($dir)) {
-            return;
+            return true;
         }
         $items = scandir($dir);
         if ($items === false) {
-            return;
+            return false;
         }
+        $ok = true;
         foreach ($items as $item) {
             if ($item === '.' || $item === '..') {
                 continue;
             }
             $path = $dir . '/' . $item;
             if (is_dir($path) && !is_link($path)) {
-                $this->rrmdir($path);
-            } else {
-                unlink($path);
+                $ok = $this->rrmdir($path) && $ok;
+            } elseif (!@unlink($path)) {
+                $ok = false;
             }
         }
-        rmdir($dir);
+        return @rmdir($dir) && $ok;
     }
 
     /**
@@ -616,6 +661,8 @@ class Repository extends EntityController
         $entry->version = $version;
         $entry->downloadedAt = new \go\core\util\DateTime();
 
-        $repo->save();
+        if (!$repo->save()) {
+            throw new \Exception('Could not record the downloaded version: ' . $repo->getValidationErrorsAsString());
+        }
     }
 }

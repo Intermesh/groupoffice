@@ -76,7 +76,7 @@ go.modules.community.marketplace.LoginWindow = Ext.extend(go.Window, {
         var v = form.getFieldValues();
 
         me.el.mask(t("Please wait...") || 'Please wait...');
-        go.Jmap.request({
+        go.modules.community.marketplace.request({
             method: "MarketplaceRepository/login",
             params: {url: me.url, email: v.email, password: v.password},
             callback: function (options, success, response) {
@@ -119,7 +119,7 @@ go.modules.community.marketplace.LoginWindow = Ext.extend(go.Window, {
         }
 
         me.el.mask(t("Please wait...") || 'Please wait...');
-        go.Jmap.request({
+        go.modules.community.marketplace.request({
             method: "MarketplaceRepository/resendVerification",
             params: {url: me.url, email: email},
             callback: function (options, success, response) {

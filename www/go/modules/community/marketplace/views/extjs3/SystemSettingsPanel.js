@@ -19,6 +19,8 @@ go.modules.community.marketplace.SystemSettingsPanel = Ext.extend(go.systemsetti
 
     iconCls: 'ic-shopping-cart',
     itemId: "marketplace",
+    package: "community",
+    module: "marketplace",
     layout: "fit",
     title: t('Marketplace', 'marketplace', 'community'),
 
@@ -468,6 +470,10 @@ go.modules.community.marketplace.SystemSettingsPanel = Ext.extend(go.systemsetti
         var me = this,
             jobs = [];
 
+        if (me.updating) {
+            return;     // a run is in progress; a second one would race on the same module dirs
+        }
+
         me.eachSection(function (s) {
             Ext.each(s.catalogGrid.getUpdatable(), function (u) {
                 jobs.push({section: s, repositoryId: s.repo.id, module: u.module, version: u.version});
@@ -486,7 +492,7 @@ go.modules.community.marketplace.SystemSettingsPanel = Ext.extend(go.systemsetti
             t("Update all", "marketplace", "community"),
             t("Download {n} available updates now?", "marketplace", "community").replace("{n}", jobs.length),
             function (btn) {
-                if (btn === 'yes') {
+                if (btn === 'yes' && !me.updating) {
                     me.runUpdateJobs(jobs);
                 }
             }
@@ -506,7 +512,10 @@ go.modules.community.marketplace.SystemSettingsPanel = Ext.extend(go.systemsetti
             failed = 0,
             affected = {};
 
+        me.updating = true;
+
         function finish() {
+            me.updating = false;
             Ext.iterate(affected, function (id, section) { section.loadCatalog(); });
             me.loadingItem.setText('');
             go.Notifier.flyout({
@@ -526,7 +535,7 @@ go.modules.community.marketplace.SystemSettingsPanel = Ext.extend(go.systemsetti
             me.loadingItem.setText(Ext.util.Format.htmlEncode(
                 t("Updating {n}…", "marketplace", "community").replace("{n}", i + '/' + jobs.length)
             ));
-            go.Jmap.request({
+            go.modules.community.marketplace.request({
                 method: "MarketplaceRepository/download",
                 params: {repositoryId: j.repositoryId, module: j.module, version: j.version},
                 callback: function (o, success) {

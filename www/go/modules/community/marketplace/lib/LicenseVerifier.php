@@ -14,13 +14,13 @@ use Firebase\JWT\Key;
 class LicenseVerifier
 {
     /**
-     * Clock-skew tolerance (seconds) applied ONLY to firebase/php-jwt's
-     * informational `iat` guard. The license JWT carries no `exp`/`nbf`, and the
-     * real per-module expiry is enforced separately in {@see unexpired()} — so a
-     * generous leeway here can never extend a license past its expiry; it only
-     * stops a marketplace server whose wall clock runs ahead of this client from
-     * making a freshly-issued token look "not yet valid" (a future `iat`), which
-     * would otherwise flip every paid module to unlicensed until the clocks align.
+     * Clock-skew tolerance (seconds) applied to firebase/php-jwt's own time
+     * checks. It stops a marketplace server whose wall clock runs ahead of this
+     * client from making a freshly-issued token look "not yet valid" (a future
+     * `iat`), which would otherwise flip every paid module to unlicensed until the
+     * clocks align. The library applies the same leeway to `exp`, so the token's
+     * own expiry is re-checked strictly in {@see tokenUnexpired()}; the leeway can
+     * never extend a license.
      */
     private const CLOCK_SKEW_LEEWAY_SECONDS = 86400;
 
@@ -35,19 +35,39 @@ class LicenseVerifier
 
     public function __construct(string $jwt, string $publicKeyPem, string $hostname, ?int $now = null)
     {
-        $this->hostname = $hostname;
+        $this->hostname = LicenseHost::normalize($hostname);
         $this->now = $now ?? time();
         // Widen the iat leeway just for THIS decode, then restore it, so we never
         // change JWT verification tolerance for the rest of GO (OpenID, etc.).
+        // The library's clock is pinned to ours for the same reason.
         $previousLeeway = JWT::$leeway;
+        $previousTimestamp = JWT::$timestamp;
         JWT::$leeway = max($previousLeeway, self::CLOCK_SKEW_LEEWAY_SECONDS);
+        JWT::$timestamp = $this->now;
         try {
             $this->claims = JWT::decode($jwt, new Key($publicKeyPem, 'RS256'));
         } catch (\Throwable $e) {
             $this->claims = null;   // tampered/garbage → unlicensed
         } finally {
             JWT::$leeway = $previousLeeway;
+            JWT::$timestamp = $previousTimestamp;
         }
+    }
+
+    /**
+     * True when the token itself is usable for $package on this host: a valid
+     * signature, the right package, this host, and a token-level `exp` that has
+     * not passed. Checked before a freshly fetched token replaces the cached one.
+     *
+     * @param string $package
+     * @return bool
+     */
+    public function isValidFor(string $package): bool
+    {
+        return $this->claims !== null
+            && isset($this->claims->package) && $this->claims->package === $package
+            && $this->tokenUnexpired()
+            && $this->hostAllowed();
     }
 
     /**
@@ -55,13 +75,7 @@ class LicenseVerifier
      */
     public function has(string $package, string $module): bool
     {
-        if ($this->claims === null) {
-            return false;
-        }
-        if (!isset($this->claims->package) || $this->claims->package !== $package) {
-            return false;
-        }
-        if (!$this->hostAllowed()) {
+        if (!$this->isValidFor($package)) {
             return false;
         }
         $licenses = $this->claims->licenses ?? null;
@@ -76,6 +90,19 @@ class LicenseVerifier
             }
         }
         return false;
+    }
+
+    /**
+     * The token must carry an `exp` and it must not have passed. A token without
+     * one (issued by a server that predates the expiry) is refused, otherwise it
+     * would license its modules forever once the instance stops refreshing.
+     *
+     * @return bool
+     */
+    private function tokenUnexpired(): bool
+    {
+        $exp = $this->claims->exp ?? null;
+        return is_int($exp) && $exp >= $this->now;
     }
 
     private function unexpired(object $entry): bool
@@ -100,7 +127,7 @@ class LicenseVerifier
             return false;
         }
         foreach (explode(',', $licensed) as $allowed) {
-            $allowed = trim($allowed);
+            $allowed = LicenseHost::normalize($allowed);
             if ($allowed === '') {
                 continue;
             }

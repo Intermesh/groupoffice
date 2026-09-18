@@ -53,11 +53,9 @@ class Module extends core\Module
      */
     public static function ensureCustomerGroup(): int
     {
-        $group = Group::find()
-            ->where(['name' => self::CUSTOMER_GROUP_NAME, 'isUserGroupFor' => null])
-            ->single();
-        if ($group) {
-            return (int) $group->id;
+        $id = self::customerGroupId();
+        if ($id !== null) {
+            return $id;
         }
         $group = new Group();
         $group->name = self::CUSTOMER_GROUP_NAME;
@@ -65,6 +63,20 @@ class Module extends core\Module
             throw new \Exception('Could not create the marketplace customer group: ' . $group->getValidationErrorsAsString());
         }
         return (int) $group->id;
+    }
+
+    /**
+     * The customer group's id, or null while it does not exist yet.
+     *
+     * @return int|null
+     * @throws \Exception
+     */
+    public static function customerGroupId(): ?int
+    {
+        $group = Group::find(['id'])
+            ->where(['name' => self::CUSTOMER_GROUP_NAME, 'isUserGroupFor' => null])
+            ->single();
+        return $group ? (int) $group->id : null;
     }
 
     /**
@@ -323,7 +335,9 @@ class Module extends core\Module
         ]);
         foreach ($collections as $col) {
             $free = $col->price === null || (float) $col->price == 0.0;
-            if ($free && in_array($moduleName, $col->modules ?? [], true)) {
+            // A retired collection (past its availability window) no longer hands
+            // out its members to new customers, same as a retired module.
+            if ($free && $col->isAvailable() && in_array($moduleName, $col->modules ?? [], true)) {
                 return $col;
             }
         }
@@ -344,7 +358,7 @@ class Module extends core\Module
         $this->jsonOut([
             'package' => $settings->packageName,
             'name' => go()->getSettings()->title,
-            'publicKey' => $settings->publicKey,
+            'publicKey' => $settings->getPublicKey(),
         ]);
     }
 
@@ -507,6 +521,14 @@ class Module extends core\Module
             http_response_code(404);
             return;
         }
+        // Served from this server's origin: only raster images inline. An SVG (or
+        // anything else) could carry script.
+        if (!in_array(strtolower((string) $blob->type), ['image/png', 'image/jpeg', 'image/gif', 'image/webp'], true)) {
+            http_response_code(404);
+            return;
+        }
+        header('X-Content-Type-Options: nosniff');
+        header("Content-Security-Policy: default-src 'none'; sandbox");
         $blob->output(true); // inline image
     }
 
@@ -537,7 +559,9 @@ class Module extends core\Module
         // empty: the client sends its own running host, and a value like "*" would
         // yield a JWT the verifier treats as valid on EVERY host — one paid
         // entitlement redistributable to unlimited instances.
-        $hostname = trim((string) ($_GET['hostname'] ?? ''));
+        // Host names are case-insensitive; normalise so "Example.com" and
+        // "example.com" are one instance (one seat, one pin), not two.
+        $hostname = rtrim(strtolower(trim((string) ($_GET['hostname'] ?? ''))), '.');
         if (!lib\HostnameValidator::isValid($hostname)) {
             $this->jsonOut(['error' => 'A single valid hostname is required'], 400);
             return;
@@ -546,30 +570,48 @@ class Module extends core\Module
         $settings = model\Settings::get();
         $settings->ensureKeyPair();
 
-        // Apply per-entitlement instance binding for THIS host: seat-mode grants
-        // obey the customer's seat pool, hostname-mode grants their own pin.
-        [$rows, $seatGranted] = $this->bindingRowsForHost($customer, $hostname);
-        $licenses = lib\LicenseBuilder::resolveLicenses($settings->packageName, $rows);
-        $jwt = lib\LicenseBuilder::build(
-            go()->getSettings()->URL ?? '',
-            (int) $customer->id,
-            $hostname,
-            $settings->packageName,
-            $licenses,
-            $settings->decryptPrivateKey()
-        );
-
-        $log = model\InstanceLog::find()->where(['customerId' => $customer->id, 'hostname' => $hostname])->single();
-        if (!$log) {
-            $log = new model\InstanceLog();
-            $log->customerId = $customer->id;
-            $log->hostname = $hostname;
+        // Counting the seats in use and recording this host's seat must be one
+        // step, or two new hosts asking at the same moment both see a free seat.
+        // A named lock per customer serialises exactly that (and the InstanceLog
+        // upsert, whose unique key would otherwise make the loser fail).
+        $pdo = go()->getDbConnection()->getPDO();
+        $lockName = 'marketplaceserver_seat_' . (int) $customer->id;
+        $lock = $pdo->prepare('SELECT GET_LOCK(?, 10)');
+        $lock->execute([$lockName]);
+        if ((int) $lock->fetchColumn() !== 1) {
+            $this->jsonOut(['error' => 'The license server is busy. Please try again.'], 503);
+            return;
         }
-        $log->lastSeenAt = new \go\core\util\DateTime();
-        // Mark whether this host holds a seat, so it counts toward the seat pool
-        // (a host with only hostname-mode licenses is logged but consumes none).
-        $log->consumesSeat = $seatGranted;
-        $log->save();
+        try {
+            // Apply per-entitlement instance binding for THIS host: seat-mode grants
+            // obey the customer's seat pool, hostname-mode grants their own pin.
+            [$rows, $seatGranted] = $this->bindingRowsForHost($customer, $hostname);
+            $licenses = lib\LicenseBuilder::resolveLicenses($settings->packageName, $rows);
+            $jwt = lib\LicenseBuilder::build(
+                go()->getSettings()->URL ?? '',
+                (int) $customer->id,
+                $hostname,
+                $settings->packageName,
+                $licenses,
+                $settings->decryptPrivateKey()
+            );
+
+            $log = model\InstanceLog::find()->where(['customerId' => $customer->id, 'hostname' => $hostname])->single();
+            if (!$log) {
+                $log = new model\InstanceLog();
+                $log->customerId = $customer->id;
+                $log->hostname = $hostname;
+            }
+            $log->lastSeenAt = new \go\core\util\DateTime();
+            // Mark whether this host holds a seat, so it counts toward the seat pool
+            // (a host with only hostname-mode licenses is logged but consumes none).
+            $log->consumesSeat = $seatGranted;
+            if (!$log->save()) {
+                throw new \Exception('Could not record the instance: ' . $log->getValidationErrorsAsString());
+            }
+        } finally {
+            $pdo->prepare('SELECT RELEASE_LOCK(?)')->execute([$lockName]);
+        }
 
         $this->jsonOut(['license' => $jwt]);
     }
@@ -608,7 +650,7 @@ class Module extends core\Module
                 || $log->lastSeenAt->getTimestamp() < $cutoff) {
                 continue;
             }
-            if ($log->hostname === $host) {
+            if (strtolower((string) $log->hostname) === $host) {
                 $hostHoldsSeat = true;
             } else {
                 $activeOtherSeats++;      // InstanceLog is unique per (customer, host) → already distinct
@@ -640,7 +682,7 @@ class Module extends core\Module
                 $bound = ($e->boundHostname === null || $e->boundHostname === '')
                     ? model\Entitlement::pinHostname((int) $e->id, $host)   // trust on first use
                     : $e->boundHostname;
-                $permitted = ($bound === $host);
+                $permitted = (strtolower((string) $bound) === $host);
             } else {
                 $permitted = $seatAllowed;
                 if ($permitted) {
@@ -1030,14 +1072,35 @@ class Module extends core\Module
     }
 
     /**
-     * GET /verify?token=... — activate an account from the e-mail link.
+     * GET /verify?token=... shows a confirm button; POST /verify activates the
+     * account the e-mail link was sent for.
      *
      * @return void
      * @throws \Exception
      */
     public function pageVerify(): void
     {
-        $user = model\EmailVerification::redeem((string) ($_GET['token'] ?? ''));
+        $token = (string) ($_POST['token'] ?? $_GET['token'] ?? '');
+        header('Content-Type: text/html;charset=utf-8');
+        header('X-Content-Type-Options: nosniff');
+        $page = function (string $title, string $body): void {
+            echo '<!doctype html><meta charset="utf-8"><title>' . htmlspecialchars($title) . '</title>'
+                . '<body style="font-family:sans-serif;max-width:32rem;margin:4rem auto;text-align:center">'
+                . $body . '</body>';
+        };
+
+        // Opening the link only shows a button. Mail scanners and link previews
+        // fetch every URL in a message; a GET that verified the account would let
+        // anyone register an address they don't read and have the scanner
+        // confirm it for them.
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+            $page('Verify your account', '<h1>Verify your marketplace account</h1>'
+                . '<form method="post"><input type="hidden" name="token" value="' . htmlspecialchars($token) . '">'
+                . '<button type="submit" style="font-size:1rem;padding:.6rem 1.4rem">Verify my account</button></form>');
+            return;
+        }
+
+        $user = model\EmailVerification::redeem($token);
         if ($user) {
             // Customer is ACL-scoped; this endpoint is unauthenticated, so read it
             // under a system state (as pageResend does) to attribute the log entry.
@@ -1051,18 +1114,11 @@ class Module extends core\Module
             model\Activity::record(model\Activity::TYPE_VERIFY, [
                 'customerId' => $customer ? (int) $customer->id : null,
             ]);
-        }
-        header('Content-Type: text/html;charset=utf-8');
-        if ($user) {
-            echo '<!doctype html><meta charset="utf-8"><title>Account verified</title>'
-                . '<body style="font-family:sans-serif;max-width:32rem;margin:4rem auto;text-align:center">'
-                . '<h1>Account verified ✓</h1><p>Your marketplace account is active. '
-                . 'You can now sign in from the marketplace client.</p></body>';
+            $page('Account verified', '<h1>Account verified ✓</h1><p>Your marketplace account is active. '
+                . 'You can now sign in from the marketplace client.</p>');
         } else {
             http_response_code(400);
-            echo '<!doctype html><meta charset="utf-8"><title>Invalid link</title>'
-                . '<body style="font-family:sans-serif;max-width:32rem;margin:4rem auto;text-align:center">'
-                . '<h1>Invalid or expired link</h1><p>Please request a new verification e-mail.</p></body>';
+            $page('Invalid link', '<h1>Invalid or expired link</h1><p>Please request a new verification e-mail.</p>');
         }
     }
 
@@ -1135,6 +1191,13 @@ class Module extends core\Module
             $this->jsonOut(['error' => 'This product is free'], 400);
             return;
         }
+        // Buying it again would charge twice for one grant, and the second payment
+        // would replace the first one's refund link.
+        $owned = model\Entitlement::find()->where(['customerId' => $customer->id, 'productId' => $product->id])->single();
+        if ($owned && $owned->isActive()) {
+            $this->jsonOut(['error' => 'You already own this product.', 'code' => 'alreadyOwned'], 409);
+            return;
+        }
 
         $settings = model\Settings::get();
         $gateway = lib\payment\PaymentGateways::active($settings);
@@ -1188,8 +1251,9 @@ class Module extends core\Module
      * UNAUTHENTICATED but signature-verified inside the gateway driver: a payload
      * whose signature does not verify is refused (400) and grants nothing. On a
      * verified purchase the entitlement is granted; on a subscription end it is
-     * revoked. Always 200 on a verified payload (even if already processed) so the
-     * gateway stops retrying.
+     * revoked. Each event is applied at most once (by the gateway's event id). A
+     * verified event that fails to apply answers 500 so the gateway retries it —
+     * acknowledging it would lose a paid purchase for good.
      *
      * @param string $gatewayId
      * @return void
@@ -1214,6 +1278,15 @@ class Module extends core\Module
             return;
         }
 
+        $eventId = $event->externalRef !== null && $event->externalRef !== '' ? $event->externalRef : null;
+        $db = go()->getDbConnection();
+        if ($eventId !== null && $db->selectSingleValue('eventId')->from('marketplaceserver_payment_event')
+                ->where(['eventId' => $eventId])->single()) {
+            $this->jsonOut(['received' => true, 'duplicate' => true]);
+            return;
+        }
+
+        $db->beginTransaction();
         try {
             switch ($event->type) {
                 case lib\payment\PaymentEvent::PURCHASE_COMPLETED:
@@ -1261,11 +1334,29 @@ class Module extends core\Module
                     break;
                 // IGNORED → acknowledged, no action.
             }
+
+            if ($eventId !== null) {
+                // Recorded in the same transaction as its effect: either both
+                // happen or the gateway's retry applies the event again.
+                $db->insert('marketplaceserver_payment_event', [
+                    'eventId' => $eventId,
+                    'gateway' => $gatewayId,
+                    'processedAt' => new \DateTime(),
+                ])->execute();
+            }
+            $db->commit();
         } catch (\Throwable $e) {
-            // Log but still 200: the payment is real and verified; a transient DB
-            // error must not make the gateway retry forever against a poisoned row.
-            // (Reconciliation is handled out of band.)
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            if ($e instanceof \PDOException && $e->getCode() === '23000') {
+                // A concurrent delivery of the same event got there first.
+                $this->jsonOut(['received' => true, 'duplicate' => true]);
+                return;
+            }
             \go\core\ErrorHandler::logException($e);
+            $this->jsonOut(['error' => 'Processing failed'], 500);
+            return;
         }
 
         $this->jsonOut(['received' => true]);

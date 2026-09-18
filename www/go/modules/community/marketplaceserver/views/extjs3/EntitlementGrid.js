@@ -111,7 +111,8 @@ go.modules.community.marketplaceserver.EntitlementGrid = Ext.extend(go.grid.Grid
 				header: t("Source", "marketplaceserver", "community"),
 				dataIndex: 'source',
 				width: dp(120),
-				sortable: true
+				sortable: true,
+				renderer: Ext.util.Format.htmlEncode
 			},
 			{
 				header: t("Status", "marketplaceserver", "community"),
@@ -120,7 +121,7 @@ go.modules.community.marketplaceserver.EntitlementGrid = Ext.extend(go.grid.Grid
 				sortable: true,
 				renderer: function (v) {
 					return v
-						? '<span style="color:var(--go-color-error,#c00)">' + t("Revoked", "marketplaceserver", "community") + '</span>'
+						? '<span style="color:var(--hue-red)">' + t("Revoked", "marketplaceserver", "community") + '</span>'
 						: t("Active", "marketplaceserver", "community");
 				}
 			},
@@ -299,7 +300,7 @@ go.modules.community.marketplaceserver.EntitlementGrid = Ext.extend(go.grid.Grid
 							t("Are you sure you want to delete this item?"),
 							function (btn) {
 								if (btn !== "yes") return;
-								go.Db.store("MarketplaceServerEntitlement").set({destroy: [rec.id]});
+								go.modules.community.marketplaceserver.storeSet("MarketplaceServerEntitlement", {destroy: [rec.id]});
 							},
 							me
 						);
@@ -324,6 +325,6 @@ go.modules.community.marketplaceserver.EntitlementGrid = Ext.extend(go.grid.Grid
 	setRevoked: function (id, revoke) {
 		var update = {};
 		update[id] = {revokedAt: revoke ? (new Date()) : null};
-		go.Db.store("MarketplaceServerEntitlement").set({update: update});
+		go.modules.community.marketplaceserver.storeSet("MarketplaceServerEntitlement", {update: update});
 	}
 });

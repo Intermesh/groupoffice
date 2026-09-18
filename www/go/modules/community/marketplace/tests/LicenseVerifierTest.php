@@ -121,4 +121,45 @@ final class LicenseVerifierTest extends TestCase
         $v = new LicenseVerifier('not-a-jwt', $pub, 'client.example.com', self::NOW);
         $this->assertFalse($v->has('sf', 'chat'));
     }
+
+    public function testTokenWithoutExpIsRefused(): void
+    {
+        $pair = KeyPair::generate();
+        $jwt = JWT::encode([
+            'iss' => 'https://m.example.com', 'sub' => 1, 'hostname' => 'client.example.com',
+            'package' => 'sf', 'iat' => self::NOW, 'licenses' => ['sf/chat' => ['expiresAt' => null]],
+        ], $pair['private'], 'RS256');
+        $v = new LicenseVerifier($jwt, $pair['public'], 'client.example.com', self::NOW);
+        $this->assertFalse($v->isValidFor('sf'));
+        $this->assertFalse($v->has('sf', 'chat'));
+    }
+
+    /**
+     * A perpetual module stops working once the token itself is older than its
+     * 14-day lifetime: an instance that stops refreshing cannot keep it forever.
+     */
+    public function testExpiredTokenRevokesEvenPerpetualModules(): void
+    {
+        [$jwt, $pub] = $this->signed(['sf/chat' => ['expiresAt' => null]]);
+        $ttl = LicenseBuilder::TTL_SECONDS;
+        $this->assertTrue((new LicenseVerifier($jwt, $pub, 'client.example.com', self::NOW + $ttl))->has('sf', 'chat'));
+        $this->assertFalse((new LicenseVerifier($jwt, $pub, 'client.example.com', self::NOW + $ttl + 1))->has('sf', 'chat'));
+    }
+
+    public function testHostnameComparisonIgnoresCaseTrailingDotAndPort(): void
+    {
+        [$jwt, $pub] = $this->signed(['sf/chat' => ['expiresAt' => null]], 'Client.Example.com');
+        foreach (['client.example.com', 'CLIENT.example.com.', 'client.example.com:8080'] as $host) {
+            $v = new LicenseVerifier($jwt, $pub, $host, self::NOW);
+            $this->assertTrue($v->has('sf', 'chat'), "host '$host'");
+        }
+    }
+
+    public function testIsValidForChecksPackageAndHost(): void
+    {
+        [$jwt, $pub] = $this->signed([]);
+        $this->assertTrue((new LicenseVerifier($jwt, $pub, 'client.example.com', self::NOW))->isValidFor('sf'));
+        $this->assertFalse((new LicenseVerifier($jwt, $pub, 'client.example.com', self::NOW))->isValidFor('amd'));
+        $this->assertFalse((new LicenseVerifier($jwt, $pub, 'other.example.com', self::NOW))->isValidFor('sf'));
+    }
 }

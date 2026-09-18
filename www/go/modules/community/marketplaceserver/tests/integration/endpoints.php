@@ -91,14 +91,15 @@ ok('created user is disabled (locked)', $u && !$u->enabled);
 // --- verify: issue a token, redeem via endpoint ---
 if ($u) {
     $plain = EmailVerification::issue((int) $u->id);
-    [$vcode, $vhtml] = call([$mod, 'pageVerify'], [], ['REQUEST_METHOD' => 'GET']);
-    // note: token comes from $_GET, set it directly
+    // GET only shows a confirm button (link scanners must not verify)
     $_GET['token'] = $plain;
-    [$vcode, $vhtml] = call([$mod, 'pageVerify']);
-    ok('verify with good token -> 200', $vcode === 200);
+    [$vcode, $vhtml] = call([$mod, 'pageVerify'], [], ['REQUEST_METHOD' => 'GET']);
+    ok('verify GET -> 200 confirm page', $vcode === 200 && strpos((string) $vhtml, '<form method="post">') !== false);
+    ok('verify GET did not enable the user', !User::findById((int) $u->id)->enabled);
+    [$vcode] = call([$mod, 'pageVerify'], ['token' => $plain], ['REQUEST_METHOD' => 'POST']);
+    ok('verify POST with good token -> 200', $vcode === 200);
     ok('verify enabled the user', User::findById((int) $u->id)->enabled);
-    $_GET['token'] = 'bogus';
-    [$vcode2] = call([$mod, 'pageVerify']);
+    [$vcode2] = call([$mod, 'pageVerify'], ['token' => 'bogus'], ['REQUEST_METHOD' => 'POST']);
     ok('verify with bad token -> 400', $vcode2 === 400);
     unset($_GET['token']);
 }

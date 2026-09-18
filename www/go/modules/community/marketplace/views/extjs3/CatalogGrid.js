@@ -181,8 +181,7 @@ go.modules.community.marketplace.CatalogGrid = Ext.extend(Ext.Panel, {
                     renderer: function (v, meta, rec) {
                         var d = rec.get('description');
                         if (d) {
-                            meta.attr = 'ext:qtip="' +
-                                Ext.util.Format.htmlEncode(d).replace(/"/g, '&quot;') + '"';
+                            meta.attr = go.modules.community.marketplace.qtipAttr(d);
                         }
                         return Ext.util.Format.htmlEncode(v || '');
                     }
@@ -280,7 +279,7 @@ go.modules.community.marketplace.CatalogGrid = Ext.extend(Ext.Panel, {
                 '<div class="mp-card" style="display:flex; flex-direction:column; box-sizing:border-box; min-height:200px; padding:12px; border:1px solid var(--fg-border); border-radius:8px; background:var(--bg-box);">',
                     '<div style="display:flex; align-items:flex-start;">',
                         '<tpl if="values.logoUrl">',
-                            '<img src="{logoUrl}" style="width:36px; height:36px; object-fit:contain; margin-right:10px;" onerror="this.style.display=\'none\';"/>',
+                            '<img src="{logoUrl:htmlEncode}" style="width:36px; height:36px; object-fit:contain; margin-right:10px;" onerror="this.style.display=\'none\';"/>',
                         '</tpl>',
                         '<tpl if="!values.logoUrl">',
                             '<i class="icon {[this.typeIconCls(values)]}" style="font-size:32px; color:var(--c-primary); margin-right:10px; line-height:1;"></i>',
@@ -591,7 +590,7 @@ go.modules.community.marketplace.CatalogGrid = Ext.extend(Ext.Panel, {
             );
         }
 
-        go.Jmap.request({
+        go.modules.community.marketplace.request({
             method: "Module/install",
             params: {name: moduleName, package: me.package},
             callback: function (options, success, response) {
@@ -631,7 +630,7 @@ go.modules.community.marketplace.CatalogGrid = Ext.extend(Ext.Panel, {
      */
     showModulePermissions: function (moduleId, moduleName) {
         var me = this;
-        go.Jmap.request({
+        go.modules.community.marketplace.request({
             method: "MarketplaceRepository/moduleRights",
             params: {name: moduleName, package: me.package},
             callback: function (options, success, response) {
@@ -775,12 +774,12 @@ go.modules.community.marketplace.CatalogGrid = Ext.extend(Ext.Panel, {
             var ver = av[b],
                 current = me.isCurrentBranch(b) ? ' box-shadow:0 0 0 1px var(--c-primary);' : '';
             if (ver) {
-                return '<span style="' + base + current + ' background:var(--hue-green); color:#fff;" ext:qtip="' +
-                    Ext.util.Format.htmlEncode(b + ' – ' + ver) + '">' +
+                return '<span style="' + base + current + ' background:var(--hue-green); color:#fff;" ' +
+                    go.modules.community.marketplace.qtipAttr(b + ' – ' + ver) + '>' +
                     Ext.util.Format.htmlEncode(b) + '</span>';
             }
-            return '<span style="' + base + current + ' background:var(--bg-box); color:var(--fg-secondary-text); border:1px solid var(--fg-border); text-decoration:line-through;" ext:qtip="' +
-                Ext.util.Format.htmlEncode(t("No build for Group-Office {branch} yet", "marketplace", "community").replace("{branch}", b)) + '">' +
+            return '<span style="' + base + current + ' background:var(--bg-box); color:var(--fg-secondary-text); border:1px solid var(--fg-border); text-decoration:line-through;" ' +
+                go.modules.community.marketplace.qtipAttr(t("No build for Group-Office {branch} yet", "marketplace", "community").replace("{branch}", b)) + '>' +
                 Ext.util.Format.htmlEncode(b) + '</span>';
         }).join('');
     },
@@ -880,7 +879,8 @@ go.modules.community.marketplace.CatalogGrid = Ext.extend(Ext.Panel, {
                 title: p.title,
                 type: p.type,
                 description: p.description,
-                logoUrl: p.logoUrl || null,
+                // Loaded by the admin's browser: only an https URL from the server.
+                logoUrl: go.modules.community.marketplace.isHttpsUrl(p.logoUrl) ? p.logoUrl : null,
                 latestVersion: latestVersion,
                 installedVersion: installedVersion,
                 goVersion: release ? release.goVersion : null,
@@ -946,7 +946,7 @@ go.modules.community.marketplace.CatalogGrid = Ext.extend(Ext.Panel, {
             );
         }
 
-        go.Jmap.request({
+        go.modules.community.marketplace.request({
             method: "MarketplaceRepository/download",
             params: {
                 repositoryId: me.repositoryId,
@@ -971,6 +971,9 @@ go.modules.community.marketplace.CatalogGrid = Ext.extend(Ext.Panel, {
                     description: msg.replace("{name}", name),
                     time: 6000
                 });
+                if (response && response.warning) {
+                    GO.errorDialog.show(response.warning);
+                }
                 if (me.onReload) {
                     me.onReload();
                 }
@@ -1044,7 +1047,7 @@ go.modules.community.marketplace.CatalogGrid = Ext.extend(Ext.Panel, {
                 return;
             }
             var moduleName = modules[i++];
-            go.Jmap.request({
+            go.modules.community.marketplace.request({
                 method: "MarketplaceRepository/download",
                 params: {repositoryId: me.repositoryId, module: moduleName, version: ''},
                 callback: function (options, success, response) {
@@ -1087,20 +1090,23 @@ go.modules.community.marketplace.CatalogGrid = Ext.extend(Ext.Panel, {
         // does not treat it as a blocked popup, then point it at the gateway URL.
         var win = window.open('', '_blank');
 
-        go.Jmap.request({
+        go.modules.community.marketplace.request({
             method: "MarketplaceRepository/checkout",
             params: {repositoryId: me.repositoryId, productId: productId},
             callback: function (options, success, response) {
-                if (!success || !response || !response.url) {
+                if (!success || !response || !go.modules.community.marketplace.isHttpsUrl(response.url)) {
                     if (win) { win.close(); }
                     GO.errorDialog.show((response && response.message) ||
                         t("Purchasing isn't available. Please contact the vendor to buy this module.", "marketplace", "community"));
                     return;
                 }
+                // The blank tab shares Group-Office's origin: cut its link back to
+                // this window before sending it to the payment page.
                 if (win) {
-                    win.location = response.url;
+                    win.opener = null;
+                    win.location.href = response.url;
                 } else {
-                    window.open(response.url, '_blank');
+                    window.open(response.url, '_blank', 'noopener');
                 }
                 go.Notifier.flyout({
                     description: t("Complete your purchase of {name} in the opened tab, then press Refresh to download it.", "marketplace", "community")

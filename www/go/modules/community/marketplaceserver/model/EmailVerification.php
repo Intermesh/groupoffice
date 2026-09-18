@@ -62,17 +62,27 @@ class EmailVerification extends Entity
      * the e-mail link). Any prior unused tokens for the user are invalidated so
      * only the newest link works.
      *
+     * Only issued for an account awaiting its first verification
+     * ({@see pendingCustomer()}): redeeming a token enables the account, so a
+     * token for anything else would be a way to switch on a disabled login.
+     *
      * @param int $userId
      * @param int $ttlHours
-     * @return string the plaintext token (store nowhere; email it)
+     * @return string|null the plaintext token (store nowhere; email it), or null
+     *   when the account is not awaiting verification
      * @throws \Exception
      */
-    public static function issue(int $userId, int $ttlHours = 48): string
+    public static function issue(int $userId, int $ttlHours = 48): ?string
     {
         // issue() runs from the UNAUTHENTICATED register endpoint (fresh + duplicate
         // re-send paths). Saving entities under a null auth state trips core code
         // that dereferences the current user, so run under an elevated system state.
         return self::withSystemState(function () use ($userId, $ttlHours) {
+            $user = User::findById($userId);
+            if (!$user || !self::pendingCustomer($user)) {
+                return null;
+            }
+
             // invalidate previous outstanding tokens for this user
             foreach (self::find()->where(['userId' => $userId, 'usedAt' => null]) as $old) {
                 $old->usedAt = new DateTime();
@@ -91,6 +101,24 @@ class EmailVerification extends Entity
             }
             return $plain;
         });
+    }
+
+    /**
+     * The customer row of $user when the account is awaiting its first
+     * verification: a self-registered customer account (customer group, not an
+     * admin) whose customer row was never verified. Null otherwise.
+     *
+     * @param \go\core\model\User $user
+     * @return \go\modules\community\marketplaceserver\model\Customer|null
+     * @throws \Exception
+     */
+    public static function pendingCustomer(User $user): ?Customer
+    {
+        if (!Customer::isCustomerAccount($user)) {
+            return null;
+        }
+        $customer = Customer::find()->where(['userId' => (int) $user->id])->single();
+        return $customer && $customer->verifiedAt === null ? $customer : null;
     }
 
     /**
@@ -143,33 +171,30 @@ class EmailVerification extends Entity
                 return null;
             }
 
-            $user = User::findById((int) $v->userId);
-            if (!$user) {
-                return null;
-            }
-
             $v->usedAt = new DateTime();
             $v->save();
 
-            $customer = Customer::find()->where(['userId' => (int) $user->id])->single();
-            $firstVerification = !$customer || $customer->verifiedAt === null;
+            // Enable ONLY a customer account on its first verification. A
+            // previously-verified account that an admin later disabled, and any
+            // account that is not a self-registered customer (staff, admins, a user
+            // that merely has a customer row), must NOT be switched on by a link.
+            $user = User::findById((int) $v->userId);
+            $customer = $user ? self::pendingCustomer($user) : null;
+            if (!$user || !$customer) {
+                return null;
+            }
 
-            // Auto-enable ONLY on the first verification. A previously-verified
-            // account that an admin later disabled must NOT be reactivated by
-            // re-verifying (that would be a disable-bypass).
-            if (!$user->enabled && $firstVerification) {
+            if (!$user->enabled) {
                 $user->enabled = true;
                 if (!$user->save()) {
                     throw new \Exception('Could not enable user: ' . $user->getValidationErrorsAsString());
                 }
             }
 
-            // Stamp the account as verified (first time only) so the API can tell
-            // "never verified" apart from "verified but later disabled".
-            if ($customer && $customer->verifiedAt === null) {
-                $customer->verifiedAt = new DateTime();
-                $customer->save();
-            }
+            // Stamp the account as verified so the API can tell "never verified"
+            // apart from "verified but later disabled".
+            $customer->verifiedAt = new DateTime();
+            $customer->save();
 
             return $user;
         });

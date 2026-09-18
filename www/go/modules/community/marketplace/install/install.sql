@@ -14,7 +14,7 @@ CREATE TABLE `marketplace_repository` (
   `modifiedBy` int(11) DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
+  UNIQUE KEY `package` (`package`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `marketplace_repository_module` (

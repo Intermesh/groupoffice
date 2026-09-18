@@ -5,31 +5,15 @@
  *
  * `token` is write-only (Repository::setToken() no-ops on an empty string,
  * see model/Repository.php) — it is never populated on load/edit, blank means
- * "keep the stored token". `publicKey` is a hidden field that round-trips
- * with the entity; it is never hand-edited, only ever set from the server's
- * `validate` response. `keyMismatch` is a hidden (visually) xcheckbox so a
- * successful re-validate can clear it on save — NOT an Ext.form.Hidden, which
- * would round-trip a boolean as the DOM string "false" (truthy in PHP).
+ * "keep the stored token".
  *
- * Pre-save validate round trip: go.form.Dialog's onBeforeSubmit() hook is called
- * SYNCHRONOUSLY right before submit() checks its return value, so it cannot await
- * an async go.Jmap.request(). Instead this dialog overrides the Save button's
- * handler (initButtons() with Ext.applyIf): it calls the custom
- * `MarketplaceRepository/validate` method FIRST, and only calls the base
- * `this.submit()` once validate() resolves successfully and has populated the
- * name/publicKey (and cleared keyMismatch) form fields. This is required:
- *
- *   - On CREATE: there is nothing to save yet without the server confirming
- *     the URL/token are reachable+valid and handing back the repository's
- *     name + pinned public key.
- *   - On EDIT, only when the user typed a new token (rotating credentials,
- *     or re-confirming after a keyMismatch signing-key rotation — the ONLY
- *     way the client can prove a signing key change is legitimate is by
- *     asking the operator to re-enter a working API token, since the stored
- *     token is encrypted + never sent to the browser).
- *
- * Plain edits (name/url tweaks, no new token) submit directly — no need to
- * re-validate a connection that already works.
+ * The server's package, name and signing key are pinned by the entity itself
+ * when it is saved with a new URL or token (Repository::pinServer()); the
+ * browser never sends them. Before such a save this dialog calls
+ * `MarketplaceRepository/validate` so a bad URL/token is reported up front and
+ * the operator is warned when go/modules is not writable. Every other save path
+ * (for example pressing Enter) still goes through the entity's own pinning, so
+ * skipping the preview never skips a check.
  */
 go.modules.community.marketplace.RepositoryDialog = Ext.extend(go.form.Dialog, {
     entityStore: "MarketplaceRepository",
@@ -74,20 +58,6 @@ go.modules.community.marketplace.RepositoryDialog = Ext.extend(go.form.Dialog, {
                     emptyText: t("Leave blank to keep unchanged", "marketplace", "community"),
                     allowBlank: true
                 }),
-                new Ext.form.Hidden({name: 'publicKey'}),
-                new Ext.form.Hidden({name: 'package'}),
-                {
-                    // NOTE: a boolean is carried here as an xcheckbox, NOT an
-                    // Ext.form.Hidden — Hidden fields round-trip through a DOM
-                    // text value, so setValue(false) would submit the STRING
-                    // "false", which PHP treats as truthy. xcheckbox is GO's
-                    // established boolean field (see ProductDialog.js's
-                    // `active`); it just stays hidden from the user.
-                    xtype: 'xcheckbox',
-                    name: 'keyMismatch',
-                    hidden: true,
-                    checked: false
-                }
             ]
         }];
     },
@@ -210,8 +180,8 @@ go.modules.community.marketplace.RepositoryDialog = Ext.extend(go.form.Dialog, {
 
     /**
      * Call the custom validate() controller method with the current url/token
-     * form values; on success populate name/publicKey/keyMismatch from the
-     * response and proceed to the normal entity submit.
+     * form values; on success show the server's name and proceed to the normal
+     * entity submit, which pins the server.
      *
      * @return {void}
      */
@@ -221,7 +191,7 @@ go.modules.community.marketplace.RepositoryDialog = Ext.extend(go.form.Dialog, {
             token = me.tokenField.getValue();
 
         me.actionStart();
-        go.Jmap.request({
+        go.modules.community.marketplace.request({
             method: "MarketplaceRepository/validate",
             params: {url: url, token: token},
             callback: function (options, success, response) {
@@ -244,12 +214,6 @@ go.modules.community.marketplace.RepositoryDialog = Ext.extend(go.form.Dialog, {
                 }
 
                 me.formPanel.getForm().findField('name').setValue(response.name);
-                me.formPanel.getForm().findField('publicKey').setValue(response.publicKey);
-                me.formPanel.getForm().findField('package').setValue(response.package);
-                me.formPanel.getForm().findField('keyMismatch').setValue(false);
-                if (me.keyMismatchBox) {
-                    me.keyMismatchBox.hide();
-                }
 
                 me.doSubmit();
             },

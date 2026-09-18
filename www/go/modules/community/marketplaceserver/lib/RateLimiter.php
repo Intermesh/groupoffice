@@ -11,7 +11,35 @@ namespace go\modules\community\marketplaceserver\lib;
 class RateLimiter
 {
     /**
-     * Record this attempt and report whether it is still within the limit.
+     * How many times the per-IP limit an e-mail address may be tried from all
+     * addresses together. A per-e-mail cap equal to the per-IP one would let
+     * anyone lock a customer out by sending a few bad logins for their address;
+     * this one only bounds a guessing attack spread over many addresses.
+     */
+    const EMAIL_FACTOR = 10;
+
+    /**
+     * The address an attempt is counted under. An IPv6 client usually controls a
+     * whole /64, so counting single IPv6 addresses would not limit anything.
+     *
+     * @param string $ip
+     * @return string
+     */
+    public static function ipBucket(string $ip): string
+    {
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            $bin = inet_pton($ip);
+            if ($bin !== false) {
+                return inet_ntop(substr($bin, 0, 8) . str_repeat("\0", 8)) . '/64';
+            }
+        }
+        return $ip;
+    }
+
+    /**
+     * Record this attempt and report whether it is still within the limit: at
+     * most $maxPerWindow per address, and EMAIL_FACTOR times that for one e-mail
+     * from all addresses together.
      *
      * @param string $ip
      * @param string|null $email
@@ -24,7 +52,7 @@ class RateLimiter
     {
         $pdo = go()->getDbConnection()->getPDO();
 
-        $ip = substr($ip, 0, 45);
+        $ip = substr(self::ipBucket($ip), 0, 45);
         $email = $email !== null && $email !== '' ? substr($email, 0, 190) : null;
 
         $ins = $pdo->prepare('INSERT INTO `marketplaceserver_reg_attempt` (`ip`, `email`, `createdAt`) VALUES (?, ?, NOW())');
@@ -36,14 +64,16 @@ class RateLimiter
         $byIpStmt->execute([$ip, $since]);
         $byIp = (int) $byIpStmt->fetchColumn();
 
-        $byEmail = 0;
-        if ($email !== null) {
-            $byEmailStmt = $pdo->prepare('SELECT COUNT(*) FROM `marketplaceserver_reg_attempt` WHERE `email` = ? AND `createdAt` >= ?');
-            $byEmailStmt->execute([$email, $since]);
-            $byEmail = (int) $byEmailStmt->fetchColumn();
+        if ($byIp > $maxPerWindow) {
+            return false;
+        }
+        if ($email === null) {
+            return true;
         }
 
-        return $byIp <= $maxPerWindow && $byEmail <= $maxPerWindow;
+        $byEmailStmt = $pdo->prepare('SELECT COUNT(*) FROM `marketplaceserver_reg_attempt` WHERE `email` = ? AND `createdAt` >= ?');
+        $byEmailStmt->execute([$email, $since]);
+        return (int) $byEmailStmt->fetchColumn() <= $maxPerWindow * self::EMAIL_FACTOR;
     }
 
     /**

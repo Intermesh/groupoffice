@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS `marketplaceserver_payment_event`;
+DROP TABLE IF EXISTS `marketplaceserver_activity`;
 DROP TABLE IF EXISTS `marketplaceserver_entitlement`;
 DROP TABLE IF EXISTS `marketplaceserver_api_token`;
 DROP TABLE IF EXISTS `marketplaceserver_instance_log`;

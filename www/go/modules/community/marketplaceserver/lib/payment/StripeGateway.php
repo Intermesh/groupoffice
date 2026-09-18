@@ -136,6 +136,8 @@ class StripeGateway implements PaymentGateway
      * signature/Settings/HTTP) so it is unit-testable — parseWebhook verifies the
      * signature first, then delegates here. Handled events:
      *   - checkout.session.completed (paid)  → PURCHASE_COMPLETED (+ paymentRef)
+     *   - checkout.session.async_payment_succeeded → PURCHASE_COMPLETED (a delayed
+     *     method such as SEPA debit: the session completed unpaid, money came later)
      *   - charge.refunded (FULLY refunded)   → ACCESS_REVOKED (by paymentRef)
      *   - customer.subscription.deleted      → ACCESS_REVOKED (by subscriptionId)
      * Anything else (incl. a partial refund) → IGNORED.
@@ -149,9 +151,11 @@ class StripeGateway implements PaymentGateway
         $object = is_array($event['data']['object'] ?? null) ? $event['data']['object'] : [];
         $externalRef = isset($event['id']) ? (string) $event['id'] : null;
 
-        if ($type === 'checkout.session.completed') {
-            // Only act once the session is actually paid (async payment methods can
-            // complete later; for card it is 'paid' immediately).
+        if ($type === 'checkout.session.completed' || $type === 'checkout.session.async_payment_succeeded') {
+            // Only act once the session is actually paid. A delayed payment method
+            // completes the session 'unpaid' and follows up with
+            // async_payment_succeeded once the money arrives; a card is 'paid'
+            // immediately.
             if (($object['payment_status'] ?? '') !== 'paid') {
                 return PaymentEvent::ignored();
             }

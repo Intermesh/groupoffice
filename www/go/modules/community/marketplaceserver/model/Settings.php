@@ -39,7 +39,7 @@ class Settings extends core\Settings
      *
      * @var bool
      */
-    public $registrationEnabled = true;
+    public $registrationEnabled = false;
 
     /**
      * Days without a check-in after which a seat-holding instance is considered
@@ -206,11 +206,21 @@ class Settings extends core\Settings
     }
 
     /**
-     * RS256 public key (PEM). Safe to expose; served by /info.
+     * RS256 public key (PEM). Safe to expose (served by /info), but read-only:
+     * it must always match the private key, so only {@see ensureKeyPair()} sets
+     * it.
      *
      * @var string|null
      */
-    public $publicKey;
+    protected $publicKey;
+
+    /**
+     * @return string|null
+     */
+    public function getPublicKey(): ?string
+    {
+        return $this->publicKey;
+    }
 
     /**
      * Encrypted RS256 private key. Protected + no getX() getter so it is never
@@ -222,11 +232,15 @@ class Settings extends core\Settings
     protected $privateKey;
 
     /**
+     * Deliberately NOT setPrivateKey(): a setX() method is writable through the
+     * settings API, and a pasted key would break every license and package
+     * signature (or no longer match the public key clients have pinned).
+     *
      * @param string|null $value PEM private key; blank = keep existing
      * @return void
      * @throws \Defuse\Crypto\Exception\EnvironmentIsBrokenException
      */
-    public function setPrivateKey(?string $value): void
+    private function assignPrivateKey(?string $value): void
     {
         if ($value === null || $value === '') {
             return;
@@ -258,7 +272,7 @@ class Settings extends core\Settings
             return;
         }
         $pair = KeyPair::generate();
-        $this->setPrivateKey($pair['private']);
+        $this->assignPrivateKey($pair['private']);
         $this->publicKey = $pair['public'];
         $this->save();
     }

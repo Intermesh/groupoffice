@@ -102,7 +102,7 @@ CREATE TABLE `marketplaceserver_entitlement` (
   KEY `stripePaymentIntentId` (`stripePaymentIntentId`),
   KEY `stripeSubscriptionId` (`stripeSubscriptionId`),
   CONSTRAINT `marketplaceserver_entitlement_ibfk_1` FOREIGN KEY (`customerId`) REFERENCES `marketplaceserver_customer` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `marketplaceserver_entitlement_ibfk_2` FOREIGN KEY (`productId`) REFERENCES `marketplaceserver_product` (`id`) ON DELETE CASCADE
+  CONSTRAINT `marketplaceserver_entitlement_ibfk_2` FOREIGN KEY (`productId`) REFERENCES `marketplaceserver_product` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
 CREATE TABLE `marketplaceserver_instance_log` (
@@ -162,4 +162,14 @@ CREATE TABLE `marketplaceserver_activity` (
   KEY `customerId` (`customerId`),
   KEY `createdAt` (`createdAt`),
   CONSTRAINT `marketplaceserver_activity_ibfk_1` FOREIGN KEY (`customerId`) REFERENCES `marketplaceserver_customer` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- Payment gateway webhook events already processed, by the gateway's event id.
+-- A gateway re-delivers an event it did not see acknowledged (and may deliver
+-- events out of order), so each one is applied at most once.
+CREATE TABLE `marketplaceserver_payment_event` (
+  `eventId` varchar(190) NOT NULL,
+  `gateway` varchar(32) NOT NULL,
+  `processedAt` datetime NOT NULL,
+  PRIMARY KEY (`eventId`)
 ) ENGINE=InnoDB;

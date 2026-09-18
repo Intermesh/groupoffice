@@ -26,12 +26,18 @@ class ApiClient
         return rtrim($this->repo->url, '/') . '/api/page.php/community/marketplaceserver';
     }
 
-    private function newClient(): Client
+    /**
+     * Largest module package accepted. The whole ZIP is read into memory to
+     * verify its signature, so this also bounds that.
+     */
+    const MAX_PACKAGE_BYTES = 100 * 1024 * 1024;
+
+    private function newClient(int $timeout = 60): Client
     {
         $c = new Client();
         $c->setOption(CURLOPT_FOLLOWLOCATION, false);       // no redirects (SSRF hygiene)
         $c->setOption(CURLOPT_CONNECTTIMEOUT, 10);
-        $c->setOption(CURLOPT_TIMEOUT, 60);
+        $c->setOption(CURLOPT_TIMEOUT, $timeout);
         $token = $this->repo->decryptToken();
         if ($token !== null) {
             $c->setHeader('Authorization', 'Bearer ' . $token);
@@ -123,7 +129,11 @@ class ApiClient
         $this->assertHttps();
         $res = $this->newClient()->get($this->base() . '/license?hostname=' . urlencode($hostname));
         $data = $this->decode($res);
-        return $data['license'] ?? '';
+        $license = (string) ($data['license'] ?? '');
+        if ($license === '') {
+            throw new ApiException(go()->t("The marketplace server returned no license", 'community', 'marketplace'), 200, null);
+        }
+        return $license;
     }
 
     /**
@@ -143,7 +153,9 @@ class ApiClient
         $this->assertHttps();
         $url = $this->base() . '/download/' . rawurlencode($module) . '/' . rawurlencode($version)
             . '?goVersion=' . urlencode(go()->getVersion());
-        $this->newClient()->download($url, $target);   // throws CoreException on transport failure
+        $c = $this->newClient(600);
+        $c->setOption(CURLOPT_MAXFILESIZE, self::MAX_PACKAGE_BYTES);
+        $c->download($url, $target);   // throws CoreException on transport failure
     }
 
     /**
@@ -155,28 +167,33 @@ class ApiClient
      *
      * @param string $module
      * @param string $version pinned version, or '' for the latest matching branch
-     * @return string base64 signature ('' if the server returned none)
+     * @return array{signature:string,version:string} base64 signature ('' if the
+     *   server returned none) and the concrete version it belongs to
      * @throws \Exception on 403/404/etc (message from the server body)
      */
-    public function signature(string $module, string $version): string
+    public function signature(string $module, string $version): array
     {
         $this->assertHttps();
         $url = $this->base() . '/signature/' . rawurlencode($module) . '/' . rawurlencode($version)
             . '?goVersion=' . urlencode(go()->getVersion());
         $data = $this->decode($this->newClient()->get($url));
-        return (string) ($data['signature'] ?? '');
+        return [
+            'signature' => (string) ($data['signature'] ?? ''),
+            'version' => (string) ($data['version'] ?? ''),
+        ];
     }
 
     /**
      * Self-register a customer account on the server. Sends the static
      * X-Marketplace-Client header (no Bearer — there is no token yet). Returns
-     * the server response, which on success carries {token, verifyRequired}.
+     * the server response, which on success carries {verifyRequired}; the token
+     * is obtained by logging in once the e-mail address is verified.
      *
      * @param string $email
      * @param string $name
      * @param string $password
      * @param string|null $company
-     * @return array{token?:string,verifyRequired?:bool}
+     * @return array{verifyRequired?:bool}
      * @throws \Exception on 403/429/422 (message from the server body)
      */
     public function register(string $email, string $name, string $password, ?string $company = null): array

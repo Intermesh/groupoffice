@@ -83,7 +83,8 @@ go.modules.community.marketplaceserver.ProductGrid = Ext.extend(go.grid.GridPane
 				id: 'title',
 				header: t("Title"),
 				dataIndex: 'title',
-				sortable: true
+				sortable: true,
+				renderer: Ext.util.Format.htmlEncode
 			},
 			{
 				header: t("Type", "marketplaceserver", "community"),
@@ -98,7 +99,8 @@ go.modules.community.marketplaceserver.ProductGrid = Ext.extend(go.grid.GridPane
 				header: t("Module name", "marketplaceserver", "community"),
 				dataIndex: 'moduleName',
 				width: dp(160),
-				sortable: true
+				sortable: true,
+				renderer: Ext.util.Format.htmlEncode
 			},
 			{
 				header: t("Price", "marketplaceserver", "community"),
@@ -226,7 +228,7 @@ go.modules.community.marketplaceserver.ProductGrid = Ext.extend(go.grid.GridPane
 								t("Are you sure you want to delete this item?"),
 								function (btn) {
 									if (btn !== "yes") return;
-									go.Db.store("MarketplaceServerProduct").set({destroy: [rec.id]});
+									go.modules.community.marketplaceserver.storeSet("MarketplaceServerProduct", {destroy: [rec.id]});
 								},
 								me
 							);

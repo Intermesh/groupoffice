@@ -17,12 +17,18 @@ class VerificationMailer
     /**
      * Issue a fresh verification token for the user and e-mail the link.
      *
+     * Nothing is sent when the account is not awaiting its first verification.
+     *
      * @param \go\core\model\User $user
-     * @return void
+     * @return bool whether a link was issued
+     * @throws \Exception
      */
-    public static function send(User $user): void
+    public static function send(User $user): bool
     {
         $plain = EmailVerification::issue((int) $user->id);
+        if ($plain === null) {
+            return false;
+        }
         $base = rtrim((string) (go()->getSettings()->URL ?? ''), '/');
         $url = $base . '/api/page.php/community/marketplaceserver/verify?token=' . urlencode($plain);
 
@@ -39,5 +45,6 @@ class VerificationMailer
         } catch (\Throwable $e) {
             ErrorHandler::logException($e);
         }
+        return true;
     }
 }

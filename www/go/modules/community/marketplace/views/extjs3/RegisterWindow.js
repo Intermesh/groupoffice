@@ -68,7 +68,7 @@ go.modules.community.marketplace.RegisterWindow = Ext.extend(go.Window, {
         var v = form.getFieldValues();
 
         me.el.mask(t("Please wait...") || 'Please wait...');
-        go.Jmap.request({
+        go.modules.community.marketplace.request({
             method: "MarketplaceRepository/register",
             params: {
                 url: me.url,

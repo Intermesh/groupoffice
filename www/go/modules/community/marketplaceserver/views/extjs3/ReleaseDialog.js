@@ -56,6 +56,7 @@ go.modules.community.marketplaceserver.ReleaseDialog = Ext.extend(go.form.Dialog
 
 		me.branchCombo = new Ext.form.ComboBox({
 			hiddenName: 'goVersion',
+			enableKeyEvents: true,
 			fieldLabel: t("Group-Office branch", "marketplaceserver", "community"),
 			store: new Ext.data.ArrayStore({fields: ['branch'], data: me.branchData()}),
 			valueField: 'branch',
@@ -70,6 +71,7 @@ go.modules.community.marketplaceserver.ReleaseDialog = Ext.extend(go.form.Dialog
 		me.versionField = new Ext.form.TextField({
 			name: 'version',
 			fieldLabel: t("Version", "marketplaceserver", "community"),
+			enableKeyEvents: true,
 			allowBlank: false
 		});
 

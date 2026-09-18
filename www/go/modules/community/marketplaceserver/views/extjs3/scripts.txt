@@ -1,3 +1,4 @@
+Util.js
 ProductGrid.js
 ProductDialog.js
 ReleaseGrid.js

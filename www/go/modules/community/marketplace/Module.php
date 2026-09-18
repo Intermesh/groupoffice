@@ -37,9 +37,7 @@ class Module extends core\Module
     }
 
     /**
-     * Register the daily license-refresh cron on fresh installs. Existing
-     * installs pick this up via install/updates.php (afterInstall only runs
-     * once, at install time).
+     * Register the daily license-refresh cron.
      *
      * @param model\Module $model
      * @return bool
@@ -50,11 +48,11 @@ class Module extends core\Module
         $cron = new model\CronJobSchedule();
         $cron->moduleId = $model->id;
         $cron->name = "RefreshLicenses";
-        // Every 4 hours: a server-side revocation (an entitlement's revokedAt, or a
-        // lapsed expiry) then reaches this client within hours instead of a full
-        // day, while the runtime license gate stays 100% offline. On a network
-        // failure the cached JWT keeps modules licensed until their own expiry.
-        $cron->expression = "0 */4 * * *";
+        // Once a day, at a random time per instance so clients don't all hit the
+        // server at once. The license JWT is valid for 14 days, so a server-side
+        // revocation reaches this client within a day while the runtime gate
+        // stays fully offline, and a network outage is survived for two weeks.
+        $cron->expression = random_int(0, 59) . ' ' . random_int(0, 23) . ' * * *';
         $cron->description = go()->t("Refresh marketplace licenses", 'community', 'marketplace');
         $cron->enabled = true;
         if (!$cron->save()) {

@@ -194,15 +194,20 @@ class Release extends Entity
         }
         if (empty($this->goVersion)) {
             $this->setValidationError('goVersion', \go\core\validate\ErrorCode::INVALID_INPUT, 'A Group-Office version branch is required');
+        } elseif ($this->isModified(['goVersion'])) {
+            $branches = Settings::get()->getGoBranches();
+            if ($branches && !in_array($this->goVersion, $branches, true)) {
+                $this->setValidationError('goVersion', \go\core\validate\ErrorCode::INVALID_INPUT, 'Choose one of the Group-Office branches set in the marketplace settings: ' . implode(', ', $branches));
+            }
         }
         // Validate the uploaded package ZIP at publish time (server-side), so a
         // broken / mis-rooted / path-traversing archive is refused here instead
         // of only failing on the customer's machine during extraction. Only when
-        // the blob is new or changed and the module name is known (a bad product
+        // the blob or the product is new or changed and the module name is known (a bad product
         // is already flagged above) — validating an unchanged blob on every save
         // would needlessly re-open the ZIP.
         if (!empty($this->blobId) && !empty($this->moduleName)
-            && ($this->isNew() || $this->isModified(['blobId']))) {
+            && ($this->isNew() || $this->isModified(['blobId', 'productId']))) {
             $blob = Blob::findById($this->blobId);
             if (!$blob) {
                 $this->setValidationError('blobId', \go\core\validate\ErrorCode::INVALID_INPUT, 'The uploaded package file could not be found');

@@ -2,7 +2,6 @@
 
 namespace go\modules\community\marketplace\lib;
 
-use go\core\http\Request;
 use go\modules\community\marketplace\model\Repository;
 
 /**
@@ -36,14 +35,11 @@ class MarketplaceLicense
         }
         $verifier = null;
         try {
-            $repo = Repository::find()->where(['name' => $package])->single();
-            if ($repo && !empty($repo->licenseJwt) && !empty($repo->publicKey)) {
-                // Request::get()->getHost() works under CLI too — it detects
-                // isCli() and parses go()->getSettings()->URL (falling back to
-                // "localhost.localdomain"), so it NEVER returns empty. No CLI
-                // special-casing needed; the same host the license was issued
-                // for is what we pass.
-                $verifier = new LicenseVerifier($repo->licenseJwt, $repo->publicKey, Request::get()->getHost());
+            // Looked up by the server's package (the install target), never by the
+            // repository's display name.
+            $repo = Repository::find()->where(['package' => $package])->single();
+            if ($repo && $repo->hasLicense()) {
+                $verifier = $repo->licenseVerifier(LicenseHost::current());
             }
         } catch (\Throwable $e) {
             $verifier = null;

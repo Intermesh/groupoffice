@@ -178,6 +178,11 @@ class Customer extends Entity
             // record, so it needs every field loaded — mirrors controller setEnabled.
             $user = \go\core\model\User::findById((string) $this->userId);
             if ($user && (bool) $user->enabled !== $this->enabled) {
+                if (!self::isCustomerAccount($user)) {
+                    $this->setValidationError('enabled', \go\core\validate\ErrorCode::FORBIDDEN,
+                        'Only marketplace customer accounts can be enabled or disabled here.');
+                    return false;
+                }
                 $user->enabled = $this->enabled;
                 if (!$user->save()) {
                     $this->setValidationError('enabled', \go\core\validate\ErrorCode::INVALID_INPUT,
@@ -282,27 +287,56 @@ class Customer extends Entity
     }
 
     /**
-     * A non-manager may only provision a customer row for THEMSELVES — the
-     * standard JMAP create path applies client-submitted `userId` before this
-     * runs, so without the ownership check a user could squat another user's
-     * row (unique userId + findOrCreateForUser reuse = billing hijack).
-     * Managers may legitimately provision any user's row (e.g. via
-     * Entitlement::setUserId).
+     * True when $user is a self-registered marketplace customer: a member of the
+     * customer group and not an administrator. Only such accounts may be enabled
+     * or disabled from the marketplace (by a manager, or by verifying the e-mail
+     * address) — never a staff or admin account that merely has a customer row.
+     *
+     * @param \go\core\model\User $user
+     * @return bool
+     * @throws \Exception
+     */
+    public static function isCustomerAccount(\go\core\model\User $user): bool
+    {
+        if ($user->isAdmin()) {
+            return false;
+        }
+        $groupId = \go\modules\community\marketplaceserver\Module::customerGroupId();
+        return $groupId !== null && in_array($groupId, array_map('intval', (array) $user->groups), true);
+    }
+
+    /**
+     * Customer rows are provisioned by the Registrar and by managers only; the
+     * seat limit, verification stamp and billing ids on them are theirs to set.
      *
      * @return bool
      * @throws \Exception
      */
     protected function canCreate(): bool
     {
-        $uid = go()->getUserId();
-        if ($uid === null) {
-            return false;
-        }
         $module = \go\core\App::get()->getModule('community', 'marketplaceserver');
-        if ($module && !empty($module->getUserRights()->mayManage)) {
-            return true;
+        return $module && !empty($module->getUserRights()->mayManage);
+    }
+
+    /**
+     * @return void
+     * @throws \Exception
+     */
+    protected function internalValidate()
+    {
+        // An emptied number field submits null; the column is NOT NULL.
+        if ($this->maxInstances === null || $this->maxInstances === '') {
+            $this->maxInstances = 1;
         }
-        return $this->userId === $uid;
+        if ((int) $this->maxInstances < 0) {
+            $this->setValidationError('maxInstances', \go\core\validate\ErrorCode::INVALID_INPUT, 'Use 0 for unlimited or a positive number.');
+        }
+        if (!$this->isNew() && $this->isModified(['userId'])) {
+            // Re-pointing a customer (its entitlements, tokens and the `enabled`
+            // switch) at another account is never legitimate.
+            $this->setValidationError('userId', \go\core\validate\ErrorCode::FORBIDDEN, 'The account of a customer cannot be changed.');
+        }
+        parent::internalValidate();
     }
 
     /**

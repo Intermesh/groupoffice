@@ -198,7 +198,7 @@ go.modules.community.marketplace.RepositorySection = Ext.extend(Ext.Panel, {
         var me = this;
         me.setActiveCard(me.CARD_LOADING);
 
-        go.Jmap.request({
+        go.modules.community.marketplace.request({
             method: "MarketplaceRepository/catalog",
             params: {repositoryId: me.repo.id},
             callback: function (options, success, response) {
@@ -346,7 +346,7 @@ go.modules.community.marketplace.RepositorySection = Ext.extend(Ext.Panel, {
      */
     onRefreshLicenses: function () {
         var me = this;
-        go.Jmap.request({
+        go.modules.community.marketplace.request({
             method: "MarketplaceRepository/refresh",
             params: {repositoryId: me.repo.id},
             callback: function (options, success, response) {
@@ -355,10 +355,12 @@ go.modules.community.marketplace.RepositorySection = Ext.extend(Ext.Panel, {
                     // (e.g. the server was reinstalled) — the fix is to re-enter
                     // the API token, so offer to open the dialog directly instead
                     // of a dead-end error message.
+                    // Both the message and the name come from the remote server.
+                    var enc = Ext.util.Format.htmlEncode;
                     Ext.MessageBox.confirm(
-                        me.repo.name || t("Repository", "marketplace", "community"),
-                        ((response && response.message) || t("Could not refresh this repository.", "marketplace", "community")) + '<br><br>' +
-                            t("Open it to re-enter the API token and re-confirm?", "marketplace", "community"),
+                        enc(me.repo.name || t("Repository", "marketplace", "community")),
+                        enc((response && response.message) || t("Could not refresh this repository.", "marketplace", "community")) + '<br><br>' +
+                            enc(t("Open it to re-enter the API token and re-confirm?", "marketplace", "community")),
                         function (btn) {
                             if (btn === 'yes') { me.onEdit(); }
                         }
@@ -400,7 +402,7 @@ go.modules.community.marketplace.RepositorySection = Ext.extend(Ext.Panel, {
      */
     onMyAccount: function () {
         var me = this;
-        go.Jmap.request({
+        go.modules.community.marketplace.request({
             method: "MarketplaceRepository/account",
             params: {repositoryId: me.repo.id},
             callback: function (options, success, response) {
@@ -424,7 +426,7 @@ go.modules.community.marketplace.RepositorySection = Ext.extend(Ext.Panel, {
                                     Ext.util.Format.htmlEncode(t("License expired", "marketplace", "community")) + '</td></tr>';
                             }
                             return '<tr><td style="padding:2px 12px 2px 0">' + product +
-                                '</td><td style="padding:2px 0;color:var(--text-muted)">' + Ext.util.Format.htmlEncode(exp) + '</td></tr>';
+                                '</td><td style="padding:2px 0;color:var(--fg-secondary-text)">' + Ext.util.Format.htmlEncode(exp) + '</td></tr>';
                         }).join('')
                         : '<tr><td>' + t("No records to display") + '</td></tr>';
 

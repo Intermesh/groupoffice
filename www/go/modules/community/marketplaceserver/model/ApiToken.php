@@ -122,34 +122,23 @@ class ApiToken extends Entity
     }
 
     /**
-     * A non-manager may only create a token tied to THEIR OWN customer row —
-     * the standard JMAP create path applies the client-submitted `customerId`
-     * before this runs, so without the ownership check a user could mint a
-     * token against another customer's row. Managers may create for anyone.
+     * Tokens are minted by the Registrar, the login endpoint and a manager's
+     * "issue" action — never through a plain JMAP create (the hash could not be
+     * set that way anyway).
      *
      * @return bool
      * @throws \Exception
      */
     protected function canCreate(): bool
     {
-        $uid = go()->getUserId();
-        if ($uid === null) {
-            return false;
-        }
         $module = \go\core\App::get()->getModule('community', 'marketplaceserver');
-        if ($module && !empty($module->getUserRights()->mayManage)) {
-            return true;
-        }
-        if (empty($this->customerId)) {
-            return false;
-        }
-        $customer = Customer::findById((string) $this->customerId);
-        return $customer && $customer->userId === $uid;
+        return $module && !empty($module->getUserRights()->mayManage);
     }
 
     /**
-     * Owner-scoped via the parent customer's userId; managers get MANAGE on
-     * every row.
+     * Owner-scoped via the parent customer's userId: the owner may see their own
+     * tokens but not change them (un-revoking a token a manager revoked, say);
+     * managers get MANAGE on every row.
      *
      * @return int
      * @throws \Exception
@@ -167,7 +156,7 @@ class ApiToken extends Entity
         if ($uid !== null && !empty($this->customerId)) {
             $customer = Customer::findById((string) $this->customerId);
             if ($customer && $customer->userId === $uid) {
-                return Acl::LEVEL_MANAGE;
+                return Acl::LEVEL_READ;
             }
         }
         return 0;

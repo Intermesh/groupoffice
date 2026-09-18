@@ -26,6 +26,20 @@ try {
 
     ok('user starts DISABLED', !User::findById($uid)->enabled);
 
+    // issuing invalidates prior unused tokens (while the account is still pending)
+    $a = EmailVerification::issue($uid);
+    $b = EmailVerification::issue($uid);
+    $rowA = EmailVerification::find()->where(['tokenHash' => \go\modules\community\marketplaceserver\lib\TokenAuth::hash($a)])->single();
+    ok('older token was invalidated on re-issue', $rowA && $rowA->usedAt !== null);
+    ok('invalidated token -> null', EmailVerification::redeem($a) === null);
+
+    // expired token
+    $plain2 = EmailVerification::issue($uid);
+    $v = EmailVerification::find()->where(['tokenHash' => \go\modules\community\marketplaceserver\lib\TokenAuth::hash($plain2)])->single();
+    $past = new DateTime(); $past->sub(new \DateInterval('PT1H'));
+    $v->expiresAt = $past; $v->save();
+    ok('expired token -> null', EmailVerification::redeem($plain2) === null);
+
     $plain = EmailVerification::issue($uid);
     ok('issue returns a plaintext token', is_string($plain) && strlen($plain) > 20);
     ok('user still disabled before redeem', !User::findById($uid)->enabled);
@@ -39,20 +53,9 @@ try {
 
     ok('redeem again (used) -> null', EmailVerification::redeem($plain) === null);
 
-    // expired token
-    $plain2 = EmailVerification::issue($uid);
-    $v = EmailVerification::find()->where(['tokenHash' => \go\modules\community\marketplaceserver\lib\TokenAuth::hash($plain2)])->single();
-    $past = new DateTime(); $past->sub(new \DateInterval('PT1H'));
-    $v->expiresAt = $past; $v->save();
-    ok('expired token -> null', EmailVerification::redeem($plain2) === null);
-
-    // issuing invalidates prior unused tokens
-    $a = EmailVerification::issue($uid);
-    $b = EmailVerification::issue($uid);
-    ok('newest token works', EmailVerification::redeem($b) !== null);
-    // a was invalidated by issuing b -> but user already enabled; check token row used
-    $rowA = EmailVerification::find()->where(['tokenHash' => \go\modules\community\marketplaceserver\lib\TokenAuth::hash($a)])->single();
-    ok('older token was invalidated on re-issue', $rowA && $rowA->usedAt !== null);
+    // once verified, no further links are issued (a link would re-enable an
+    // account an admin disabled later)
+    ok('no token issued for a verified account', EmailVerification::issue($uid) === null);
 
 } catch (\Throwable $e) {
     ok('verify ran without unexpected error', false, get_class($e).': '.$e->getMessage());

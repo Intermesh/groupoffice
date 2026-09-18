@@ -83,6 +83,11 @@ class Entitlement extends Entity
     public $boundHostname;
 
     /**
+     * @var int|null user picked in the dialog, resolved to customerId on save
+     */
+    private ?int $pendingUserId = null;
+
+    /**
      * @var string|null
      */
     public $stripeSubscriptionId;
@@ -128,6 +133,17 @@ class Entitlement extends Entity
     public function isRevoked(): bool
     {
         return $this->revokedAt !== null;
+    }
+
+    /**
+     * Not revoked and not expired.
+     *
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return !$this->isRevoked()
+            && ($this->expiresAt === null || $this->expiresAt->getTimestamp() >= time());
     }
 
     /**
@@ -187,6 +203,17 @@ class Entitlement extends Entity
     }
 
     /**
+     * The grid's search box finds a grant by its pinned host or its Stripe
+     * subscription / payment reference.
+     *
+     * @return array<int,string>
+     */
+    protected static function textFilterColumns(): array
+    {
+        return ['e.boundHostname', 'e.stripeSubscriptionId', 'e.stripePaymentIntentId'];
+    }
+
+    /**
      * Enable grid sorting on the RELATED product and customer columns (they are
      * relations, not columns of this table), by joining them and mapping the
      * client sort key to the joined column — the framework's documented pattern
@@ -212,15 +239,48 @@ class Entitlement extends Entity
     }
 
     /**
-     * Dialog convenience: admin picks a user; find-or-create the customer.
+     * Dialog convenience: admin picks a user; the customer row is found or
+     * created in {@see internalValidate()}, i.e. only after the save passed the
+     * permission check. setValues() runs before that check, so creating it here
+     * would let anyone provision a customer row for any user.
      *
      * @param int $userId
      * @return void
-     * @throws \Exception
      */
     public function setUserId(int $userId): void
     {
-        $this->customerId = Customer::findOrCreateForUser($userId)->id;
+        $this->pendingUserId = $userId;
+    }
+
+    /**
+     * @return void
+     * @throws \Exception
+     */
+    protected function internalValidate()
+    {
+        if ($this->pendingUserId !== null) {
+            $this->customerId = Customer::findOrCreateForUser($this->pendingUserId)->id;
+            $this->pendingUserId = null;
+        }
+
+        if ($this->isModified(['customerId', 'productId']) && !empty($this->customerId) && !empty($this->productId)) {
+            $dupe = self::find(['id'])->where(['customerId' => $this->customerId, 'productId' => $this->productId]);
+            if (!$this->isNew()) {
+                $dupe->andWhere('e.id', '!=', $this->id);
+            }
+            if ($dupe->single()) {
+                $this->setValidationError('productId', \go\core\validate\ErrorCode::UNIQUE, 'This customer already has an entitlement for this product.');
+            }
+        }
+
+        if ($this->isModified(['boundHostname']) && $this->boundHostname !== null && $this->boundHostname !== '') {
+            $this->boundHostname = strtolower(trim((string) $this->boundHostname));
+            if (!\go\modules\community\marketplaceserver\lib\HostnameValidator::isValid($this->boundHostname)) {
+                $this->setValidationError('boundHostname', \go\core\validate\ErrorCode::INVALID_INPUT, 'Enter a single host name, e.g. groupoffice.example.com.');
+            }
+        }
+
+        parent::internalValidate();
     }
 
     /**
@@ -236,7 +296,8 @@ class Entitlement extends Entity
      * If a grant already exists: leave an active one as-is, but REVIVE a lapsed
      * one to perpetual free — re-acquiring a free product (e.g. via a newly-free
      * collection) must actually re-license it, not silently no-op on the old
-     * expired row.
+     * expired row. A REVOKED grant stays revoked: that is a manager's decision,
+     * which downloading the product again must not undo.
      *
      * @param int $customerId
      * @param int $productId
@@ -254,14 +315,12 @@ class Entitlement extends Entity
             ->where(['customerId' => $customerId, 'productId' => $productId])
             ->single();
         if ($exists) {
-            // Revive a lapsed OR revoked grant to perpetual free — re-acquiring a
-            // free product must actually re-license it (and lift a prior revoke),
-            // not silently no-op on the old dead row.
+            // Revive a lapsed grant to perpetual free — re-acquiring a free product
+            // must actually re-license it, not silently no-op on the old dead row.
             $lapsed = $exists->expiresAt !== null && $exists->expiresAt->getTimestamp() < time();
-            if ($lapsed || $exists->revokedAt !== null) {
+            if ($lapsed && $exists->revokedAt === null) {
                 go()->getDbConnection()->update('marketplaceserver_entitlement', [
                     'expiresAt' => null,
-                    'revokedAt' => null,
                     'source' => self::SOURCE_FREE,
                     'modifiedAt' => $now,
                 ], ['id' => $exists->id])->execute();
@@ -322,6 +381,11 @@ class Entitlement extends Entity
             ->where(['customerId' => $customerId, 'productId' => $productId])
             ->single();
         if ($exists) {
+            if ($exists->revokedAt !== null && $paymentRef !== null && $exists->stripePaymentIntentId === $paymentRef) {
+                // This very payment was already refunded (the refund arrived first,
+                // or the purchase event is a late re-delivery): never re-grant it.
+                return;
+            }
             go()->getDbConnection()->update('marketplaceserver_entitlement', $fields, ['id' => $exists->id])->execute();
             return;
         }

@@ -34,6 +34,23 @@ final class StripeMapEventTest extends TestCase
         $this->assertNull($e->expiresAt);
     }
 
+    public function testAsyncPaymentSucceededGrants(): void
+    {
+        $e = StripeGateway::mapEvent([
+            'id' => 'evt_2',
+            'type' => 'checkout.session.async_payment_succeeded',
+            'data' => ['object' => [
+                'payment_status' => 'paid',
+                'payment_intent' => 'pi_sepa',
+                'metadata' => ['customerId' => '7', 'productId' => '42'],
+            ]],
+        ]);
+        $this->assertSame(PaymentEvent::PURCHASE_COMPLETED, $e->type);
+        $this->assertSame(42, $e->productId);
+        $this->assertSame('pi_sepa', $e->paymentRef);
+        $this->assertSame('evt_2', $e->externalRef);
+    }
+
     public function testUnpaidCheckoutIsIgnored(): void
     {
         $e = StripeGateway::mapEvent([

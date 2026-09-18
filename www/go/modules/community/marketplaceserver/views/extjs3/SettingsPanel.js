@@ -221,6 +221,45 @@ go.modules.community.marketplaceserver.SettingsPanel = Ext.extend(go.systemsetti
         this.syncGatewayFields();
     },
 
+    /**
+     * Same as go.systemsettings.Panel#onSubmit, but a save the server refused
+     * (a validation error, a setting pinned in config.php) is reported as a
+     * failure. The base class passes `success` for any JMAP response, so the
+     * panel said "Saved" and kept the rejected values.
+     *
+     * @param {Function} cb called with (panel, success)
+     * @param {Object} scope
+     * @return {void}
+     */
+    onSubmit: function (cb, scope) {
+        var me = this,
+            module = go.Modules.get(me.package, me.module),
+            values = me.getForm().getFieldValues(true),
+            p = {update: {}};
+
+        if (Object.keys(values).length === 0) {
+            setTimeout(function () { cb.call(scope, me, true); }, 0);
+            return;
+        }
+
+        p.update[module.id] = {settings: values};
+        go.Db.store("Module").set(p).then(function (response) {
+            var failed = response.notUpdated && response.notUpdated[module.id];
+            if (failed) {
+                var errors = failed.validationErrors ? Object.values(failed.validationErrors).map(function (e) {
+                    return e.description;
+                }) : [];
+                GO.errorDialog.show(errors.length ? errors.join("\n") : (failed.description || t("Error")));
+                cb.call(scope, me, false);
+                return;
+            }
+            cb.call(scope, me, true);
+        }).catch(function (error) {
+            GO.errorDialog.show(error);
+            cb.call(scope, me, false);
+        });
+    },
+
     onSave: function () {
         var me = this;
         me.onSubmit(function (panel, success) {

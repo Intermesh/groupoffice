@@ -87,13 +87,15 @@ go.modules.community.marketplaceserver.ReleaseGrid = Ext.extend(go.grid.GridPane
 				header: t("Version", "marketplaceserver", "community"),
 				dataIndex: 'version',
 				width: dp(110),
-				sortable: true
+				sortable: true,
+				renderer: Ext.util.Format.htmlEncode
 			},
 			{
 				header: t("Group-Office branch", "marketplaceserver", "community"),
 				dataIndex: 'goVersion',
 				width: dp(130),
-				sortable: true
+				sortable: true,
+				renderer: Ext.util.Format.htmlEncode
 			},
 			{
 				xtype: 'datecolumn',
@@ -202,7 +204,7 @@ go.modules.community.marketplaceserver.ReleaseGrid = Ext.extend(go.grid.GridPane
 								t("Are you sure you want to delete this item?"),
 								function (btn) {
 									if (btn !== "yes") return;
-									go.Db.store("MarketplaceServerRelease").set({destroy: [rec.id]});
+									go.modules.community.marketplaceserver.storeSet("MarketplaceServerRelease", {destroy: [rec.id]});
 								},
 								me
 							);

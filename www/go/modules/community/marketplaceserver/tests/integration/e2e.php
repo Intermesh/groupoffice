@@ -102,7 +102,8 @@ try {
     }
     check('both modules installed', $installed('marketplaceserver') && $installed('marketplace'));
 
-    $host = Request::get()->getHost();
+    // The host MarketplaceLicense::has() checks against.
+    $host = \go\modules\community\marketplace\lib\LicenseHost::current();
     echo "  host = $host\n";
 
     // -----------------------------------------------------------------------
@@ -224,15 +225,15 @@ try {
     echo "\n== Full license round-trip: server signs -> client verifies ==\n";
     $settings = S\Settings::get();
     $settings->ensureKeyPair();
-    check('server has a keypair', !empty($settings->publicKey) && !empty($settings->decryptPrivateKey()));
+    check('server has a keypair', !empty($settings->getPublicKey()) && !empty($settings->decryptPrivateKey()));
 
     $jwt = LicenseBuilder::build('https://itest.local', (int)$c1->id, $host, 'sf', $licenses, $settings->decryptPrivateKey());
-    $v = new LicenseVerifier($jwt, $settings->publicKey, $host);
+    $v = new LicenseVerifier($jwt, $settings->getPublicKey(), $host);
     check('client verifies sf/chat licensed', $v->has('sf', 'chat'));
     check('client rejects sf/other (not entitled)', !$v->has('sf', 'other'));
     check('client rejects wrong package', !$v->has('amd', 'chat'));
 
-    $vWrongHost = new LicenseVerifier($jwt, $settings->publicKey, 'attacker.example.com');
+    $vWrongHost = new LicenseVerifier($jwt, $settings->getPublicKey(), 'attacker.example.com');
     check('client rejects wrong hostname', !$vWrongHost->has('sf', 'chat'));
 
     $vTampered = new LicenseVerifier($jwt, \go\modules\community\marketplaceserver\lib\KeyPair::generate()['public'], $host);
@@ -245,18 +246,23 @@ try {
     // subscription wildcard
     $subLic = LicenseBuilder::resolveLicenses('sf', [['type' => 'subscription', 'modules' => [], 'expiresAt' => time() + 3600]]);
     $subJwt = LicenseBuilder::build('https://itest.local', 1, $host, 'sf', $subLic, $settings->decryptPrivateKey());
-    $subV = new LicenseVerifier($subJwt, $settings->publicKey, $host);
+    $subV = new LicenseVerifier($subJwt, $settings->getPublicKey(), $host);
     check('subscription wildcard licenses any module', $subV->has('sf', 'anything') && $subV->has('sf', 'chat'));
 
     // -----------------------------------------------------------------------
     echo "\n== Client Repository: encrypted token + MarketplaceLicense.has() from DB ==\n";
-    $repo = new C\Repository();
-    $repo->name = 'sf';
-    $repo->url = 'https://itest.local';
-    $repo->setToken('marketplaceserver_secretplaintext');
-    $repo->publicKey = $settings->publicKey;
-    $repo->licenseJwt = $jwt;
-    $repo->save();
+    // Saving through the entity pins the server over HTTP (Repository::pinServer),
+    // so the row is written directly. The display name deliberately differs from
+    // the package: licenses are looked up by package, never by name.
+    go()->getDbConnection()->insert('marketplace_repository', [
+        'name' => 'Integration server',
+        'url' => 'https://itest.local',
+        'package' => 'sf',
+        'publicKey' => $settings->getPublicKey(),
+        'licenseJwt' => $jwt,
+        'token' => \go\core\util\Crypt::encrypt('marketplaceserver_secretplaintext'),
+    ])->execute();
+    $repo = C\Repository::findById((string) go()->getDbConnection()->getPDO()->lastInsertId());
     if ($repo->id) { $created['repo'][] = $repo->id; }
     check('repository saves', (bool)$repo->id, json_encode($repo->getValidationErrors()));
     $repoArr = $repo->toArray();

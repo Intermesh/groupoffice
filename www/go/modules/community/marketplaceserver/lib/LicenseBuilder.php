@@ -11,6 +11,15 @@ use Firebase\JWT\JWT;
 class LicenseBuilder
 {
     /**
+     * Lifetime of a signed license JWT. The client refreshes it once a day, so a
+     * running instance never gets near this; an instance that stops refreshing
+     * (offline, blocked, trial) keeps its modules for at most this long. That
+     * bounds how long a revoke, refund, disabled account or released seat can go
+     * unnoticed, and doubles as the trial window.
+     */
+    const TTL_SECONDS = 14 * 86400;
+
+    /**
      * @param string $package e.g. "sf"
      * @param array<array{type: string, modules: array<string>, expiresAt: int|null, permitted?: bool}> $entitlements
      *   expiresAt as unix timestamp or null = perpetual. Optional `permitted`
@@ -63,12 +72,14 @@ class LicenseBuilder
         string $privateKeyPem,
         ?int $now = null
     ): string {
+        $iat = $now ?? time();
         return JWT::encode([
             'iss' => $issuer,
             'sub' => $customerId,
             'hostname' => $hostname,
             'package' => $package,
-            'iat' => $now ?? time(),
+            'iat' => $iat,
+            'exp' => $iat + self::TTL_SECONDS,
             'licenses' => $licenses,
         ], $privateKeyPem, 'RS256');
     }

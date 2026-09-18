@@ -116,6 +116,7 @@ final class LicenseBuilderTest extends TestCase
         $this->assertSame('client.example.com', $claims->hostname);
         $this->assertSame('sf', $claims->package);
         $this->assertSame(self::NOW, $claims->iat);
+        $this->assertSame(self::NOW + 14 * 86400, $claims->exp);
         $this->assertNull($claims->licenses->{'sf/chat'}->expiresAt);
     }
 }

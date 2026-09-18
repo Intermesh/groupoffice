@@ -78,7 +78,8 @@ go.modules.community.marketplaceserver.CustomerGrid = Ext.extend(go.grid.GridPan
 			{
 				header: t("Stripe customer ID", "marketplaceserver", "community"),
 				dataIndex: 'stripeCustomerId',
-				width: dp(220)
+				width: dp(220),
+				renderer: Ext.util.Format.htmlEncode
 			},
 			{
 				xtype: 'datecolumn',
@@ -208,7 +209,7 @@ go.modules.community.marketplaceserver.CustomerGrid = Ext.extend(go.grid.GridPan
 					t("Are you sure you want to delete this item?"),
 					function (btn) {
 						if (btn !== "yes") return;
-						go.Db.store("MarketplaceServerCustomer").set({destroy: [record.id]});
+						go.modules.community.marketplaceserver.storeSet("MarketplaceServerCustomer", {destroy: [record.id]});
 					},
 					me
 				);
@@ -308,7 +309,7 @@ go.modules.community.marketplaceserver.CustomerGrid = Ext.extend(go.grid.GridPan
 					modal: true,
 					bodyStyle: 'padding:' + dp(12) + 'px',
 					html: '<p>' + Ext.util.Format.htmlEncode(t("Copy this token now. It will not be shown again.", "marketplaceserver", "community")) + '</p>' +
-						'<code style="display:block;word-break:break-all;padding:8px;background:var(--surface-variant,#eee);border-radius:4px">' +
+						'<code style="display:block;word-break:break-all;padding:8px;background:var(--bg-layer);border-radius:4px">' +
 						Ext.util.Format.htmlEncode(response.token) + '</code>',
 					buttons: [{text: t("Close"), handler: function () { this.ownerCt.ownerCt.close(); }}]
 				}).show();

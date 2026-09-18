@@ -1,6 +1,17 @@
 # Changelog
 
 
+## 2026-09-19
+- SECURITY: only admins add repositories, download modules or refresh licenses (module manage right now only reads catalog/account)
+- SECURITY: pin the server's package, name and signing key server-side on save; `publicKey`, `licenseJwt`, `keyMismatch`, `package` are no longer writable over JMAP
+- SECURITY: never install into core packages (`core`, `community`, `business`, `legacy`) and never overwrite a module this repository did not download
+- SECURITY: accept only https checkout URLs and cut the payment tab's opener; escape server-supplied logo URL, tooltips and error texts (XSS)
+- Fix paid modules always reported unlicensed: `MarketplaceLicense::has()` looks the repository up by package, not display name; unique key moved from `name` to `package`
+- Enforce the license token's 14-day `exp`; normalise hostnames (case, trailing dot, port) and take the host from the configured URL in web, cron and runtime gate alike
+- Keep the cached license unless a refreshed one verifies against the pinned key; refresh daily at a random time; one failing repository no longer stops the cron
+- Download: resolve the version via the signature first and download exactly that one, per-module lock, 100 MB cap, report a backup that could not be removed
+- UI: masks and "Update all" no longer hang on a request timeout; "Update all" cannot run twice; add missing translations
+
 ## 2026-07-17
 - Rebuild module from a single username/password setting into a full marketplace client: add `marketplace_repository` + `marketplace_repository_module` tables, Repository entity/controller and a System Settings UI (repository list, per-repository module catalog with owned/installed/downloadable states)
 - Add offline license enforcement: per-repository RS256-signed license JWT verified against the pinned server key (signature, single-concrete-hostname binding, per-module expiry), `MarketplaceLicense::has()` for paid modules' `isLicensed()`, daily `RefreshLicenses` cron to pick up renewals/revocations

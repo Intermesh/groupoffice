@@ -83,6 +83,11 @@ class Customer extends EntityController
         if (!$user) {
             throw new \go\core\exception\NotFound();
         }
+        if (!model\Customer::isCustomerAccount($user)) {
+            // A customer row can point at any account; the switch must never
+            // reach a staff or admin login.
+            throw new \go\core\exception\Forbidden('Only marketplace customer accounts can be enabled or disabled here.');
+        }
 
         $enabled = !empty($params['enabled']);
         $user->enabled = $enabled;
@@ -126,7 +131,10 @@ class Customer extends EntityController
             return new ArrayObject(['success' => true, 'skipped' => true]);
         }
 
-        \go\modules\community\marketplaceserver\lib\VerificationMailer::send($user);
+        if (!\go\modules\community\marketplaceserver\lib\VerificationMailer::send($user)) {
+            // Not a customer account awaiting verification: nothing was sent.
+            return new ArrayObject(['success' => true, 'skipped' => true]);
+        }
 
         return new ArrayObject(['success' => true]);
     }
