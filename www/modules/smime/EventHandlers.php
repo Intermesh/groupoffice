@@ -181,12 +181,18 @@ class EventHandlers {
 
 		$message = \GO\Email\Model\SavedMessage::model()->createFromMimeData($outfile->getContents());
 		$newResponse = $message->toOutputArray($html);
-		unset($newResponse['to']);
-		unset($newResponse['to_string']);
-		unset($newResponse['cc']);
-		unset($newResponse['from']);
-		unset($newResponse['full_from']);
-		unset($newResponse['sender']);
+		unset($newResponse['sender'],
+			$newResponse['from'],
+			$newResponse['full_from'],
+			$newResponse['size'],
+			$newResponse['reply_to'],
+			$newResponse['to'],
+			$newResponse['cc'],
+			$newResponse['date'],
+			$newResponse['udate'],
+			$newResponse['labels']
+		);
+
 
 		foreach ($newResponse as $key => $value) {
 			if (!empty($value) || $key == 'attachments')

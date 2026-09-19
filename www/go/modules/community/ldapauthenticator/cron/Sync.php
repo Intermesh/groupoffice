@@ -11,6 +11,9 @@ class Sync extends CronJob
 
 	public function run(CronJobSchedule $schedule): void
 	{
+		\go\modules\community\history\Module::$enabled = false;
+
+
 		$records = go()->getDbConnection()
 			->select('id,syncGroups,syncUsers,syncUsersDelete,syncGroupsDelete,syncUsersMaxDeletePercentage,syncGroupsMaxDeletePercentage')
 			->from('ldapauth_server')

@@ -1,3 +1,16 @@
+- Core: unset token if CSRF check fails (cherry pick from 26.0)
+
+24-08-2026: 6.8.178
+- Core: reorganize password validation checks in `validatePasswordChange` method to prevent module mayChangeUser check if password not modified
+- LdapAuth: do not put all ldap users that are sync in the history log
+
+17-08-2026: 6.8.177
+- Core: Update FPDI to the latest version in order to work with the commercial PDF parser #1545
+
+10-08-2026: 6.8.176
+- PR/Fix: Tree EntityLoader crashes when a node is destroyed during async load #1536
+- PR/Fix: Custom fields broken for any entity whose clientName differs from its short class name #1534
+
 06-07-2026: 6.8.175
 - LDAP authenticator: hide secondary email field in account settings when logged in via LDAP
 - Calendar: morkaround for event store when no calendars in search paramaeters
