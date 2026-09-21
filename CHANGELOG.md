@@ -2,6 +2,7 @@
 - Newsletters: fix template upload
 - LDAP Auth: prevent error message when certain mappings are not set
 - Core: updated DE translations, thanks Jörg
+- Core: display foreground and background colors in custom fieldsets details if set
 
 14-09-2026: 26.0.47
 - pdfeditor: rename Upload to upload so class finder doesn't try to load it
