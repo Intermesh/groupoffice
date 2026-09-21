@@ -1,6 +1,6 @@
 <?php
 return array (
-  'DAV Accounts' => 'DAV Accounts',
+  'DAV Accounts' => 'DAV-Konten',
   'Last Sync' => 'Letzter Sync',
   'Keep calendar data?' => 'Kalenderdaten behalten?',
   'Do you want to keep the synchronised calendars or delete those as well?' => 'Möchten Sie die synchronisierten Kalender behalten oder diese ebenfalls löschen?',

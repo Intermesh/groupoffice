@@ -1,5 +1,7 @@
 - Core: Fixed link loading in link browser
 - Newsletters: fix template upload
+- LDAP Auth: prevent error message when certain mappings are not set
+- Core: updated DE translations, thanks Jörg
 
 14-09-2026: 26.0.47
 - pdfeditor: rename Upload to upload so class finder doesn't try to load it
