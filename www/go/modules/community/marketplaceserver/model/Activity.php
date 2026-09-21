@@ -20,6 +20,8 @@ class Activity extends Entity
     const TYPE_DOWNLOAD = 'download';
     const TYPE_PURCHASE = 'purchase';
     const TYPE_REFUND = 'refund';
+    /** A lost dispute: the money was pulled back by the card network, not by us. */
+    const TYPE_CHARGEBACK = 'chargeback';
     const TYPE_SUBSCRIPTION_CANCELED = 'subscription_canceled';
     const TYPE_REGISTER = 'register';
     const TYPE_VERIFY = 'verify';
@@ -185,7 +187,7 @@ class Activity extends Entity
      * @return int
      * @throws \Exception
      */
-    public function getPermissionLevel(): int
+    protected function internalGetPermissionLevel(): int
     {
         $module = \go\core\App::get()->getModule('community', 'marketplaceserver');
         if (!$module) {

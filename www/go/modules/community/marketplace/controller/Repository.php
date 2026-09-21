@@ -37,7 +37,7 @@ class Repository extends EntityController
     }
 
     /**
-     * @param $params
+     * @param array<string, mixed> $params
      * @return ArrayObject
      * @throws InvalidArguments
      */
@@ -47,7 +47,7 @@ class Repository extends EntityController
     }
 
     /**
-     * @param $params
+     * @param array<string, mixed> $params
      * @return ArrayObject
      * @throws \Exception
      */
@@ -57,7 +57,7 @@ class Repository extends EntityController
     }
 
     /**
-     * @param $params
+     * @param array<string, mixed> $params
      * @return ArrayObject
      * @throws InvalidArguments
      * @throws StateMismatch
@@ -68,7 +68,7 @@ class Repository extends EntityController
     }
 
     /**
-     * @param $params
+     * @param array<string, mixed> $params
      * @return array|ArrayObject
      * @throws InvalidArguments
      */
@@ -312,7 +312,9 @@ class Repository extends EntityController
      */
     public function moduleRights($params)
     {
-        if (!go()->getAuthState()->isAdmin()) {
+        // No auth state at all (CLI, a broken session) is not an admin either.
+        $state = go()->getAuthState();
+        if (!$state || !$state->isAdmin()) {
             throw new \go\core\exception\Forbidden();
         }
         $name = (string) ($params['name'] ?? '');
@@ -422,7 +424,14 @@ class Repository extends EntityController
             }
             $names = [];
             for ($i = 0; $i < $zip->numFiles; $i++) {
-                $names[] = $zip->getNameIndex($i);
+                $name = $zip->getNameIndex($i);
+                if ($name === false) {
+                    // An entry whose name cannot be read would reach the validator
+                    // as an empty string and pass every path check unexamined.
+                    $zip->close();
+                    throw new \Exception('Downloaded file has an unreadable ZIP entry');
+                }
+                $names[] = $name;
             }
             $err = \go\modules\community\marketplace\lib\PackageValidator::validateEntries($names, $module);
             if ($err !== null) {

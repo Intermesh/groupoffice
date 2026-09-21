@@ -70,6 +70,19 @@ class PaymentEvent
     public $currency;
 
     /**
+     * @var string|null why access is being revoked ('refund', 'chargeback',
+     *   'subscription_ended'), for the activity log. Set on the ACCESS_REVOKED
+     *   events that can tell the difference; null when it does not matter.
+     */
+    public $reason;
+
+    /** A full refund was issued by the merchant. */
+    const REASON_REFUND = 'refund';
+
+    /** A dispute was lost — the money was taken back by the card network. */
+    const REASON_CHARGEBACK = 'chargeback';
+
+    /**
      * @param string $type
      * @param int|null $customerId
      * @param int|null $productId

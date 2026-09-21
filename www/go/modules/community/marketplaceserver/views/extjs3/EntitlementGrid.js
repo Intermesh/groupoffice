@@ -180,6 +180,28 @@ go.modules.community.marketplaceserver.EntitlementGrid = Ext.extend(go.grid.Grid
 	},
 
 	/**
+	 * Drop the customer scope (panel mode): the selection is gone, so Add must not
+	 * stay armed for a customer nobody is looking at any more, and the grid must
+	 * not keep showing that customer's licenses.
+	 *
+	 * @return {void}
+	 */
+	clearCustomer: function () {
+		this.customerId = null;
+		this.customerLabel = null;
+		this.addBtn.setDisabled(true);
+		if (this.rendered) {
+			this.getView().emptyText = '<i class="icon ic-store"></i><p>' +
+				t("Select a customer to see their licenses.", "marketplaceserver", "community") + '</p>';
+		}
+		this.store.setFilter('customer', null);
+		// removeAll() rather than load(): with no customer filter the query would
+		// return every entitlement in the system, which is exactly what this grid
+		// must not show in panel mode.
+		this.store.removeAll();
+	},
+
+	/**
 	 * Open the Add dialog, pre-seeding the customer in panel mode.
 	 *
 	 * @return {void}
@@ -300,7 +322,9 @@ go.modules.community.marketplaceserver.EntitlementGrid = Ext.extend(go.grid.Grid
 							t("Are you sure you want to delete this item?"),
 							function (btn) {
 								if (btn !== "yes") return;
-								go.modules.community.marketplaceserver.storeSet("MarketplaceServerEntitlement", {destroy: [rec.id]});
+								go.Db.store("MarketplaceServerEntitlement").destroy(rec.id).catch(function (r) {
+									GO.errorDialog.show(r.message || r.description || t("Failed to delete"));
+								});
 							},
 							me
 						);
@@ -325,6 +349,12 @@ go.modules.community.marketplaceserver.EntitlementGrid = Ext.extend(go.grid.Grid
 	setRevoked: function (id, revoke) {
 		var update = {};
 		update[id] = {revokedAt: revoke ? (new Date()) : null};
-		go.modules.community.marketplaceserver.storeSet("MarketplaceServerEntitlement", {update: update});
+		go.Db.store("MarketplaceServerEntitlement").set({update: update}).then(function (response) {
+			if (response.notUpdated && id in response.notUpdated) {
+				GO.errorDialog.show(response.notUpdated[id].description || t("Failed to save"));
+			}
+		}).catch(function (r) {
+			GO.errorDialog.show(r.message || r.description || t("Failed to save"));
+		});
 	}
 });

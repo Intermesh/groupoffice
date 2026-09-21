@@ -1,4 +1,4 @@
-/* global Ext, go, dp, t */
+/* global Ext, go, GO, dp, t */
 
 /**
  * Marketplace server configuration — the package this marketplace serves and
@@ -88,10 +88,13 @@ go.modules.community.marketplaceserver.SettingsPanel = Ext.extend(go.systemsetti
                     xtype: 'box',
                     style: 'padding:4px 0 0',
                     html: '<small>' + Ext.util.Format.htmlEncode(
-                        t("Set the Stripe webhook endpoint to this URL, subscribing to checkout.session.completed and charge.refunded:", "marketplaceserver", "community")
-                    ) + '<br><code>' + Ext.util.Format.htmlEncode(
-                        window.location.origin + '/api/page.php/community/marketplaceserver/paymentWebhook/stripe'
-                    ) + '</code></small>'
+                        t("Set the Stripe webhook endpoint to this URL:", "marketplaceserver", "community")
+                    ) + '<br><code>' + Ext.util.Format.htmlEncode(me.webhookUrl()) + '</code><br>' +
+                        Ext.util.Format.htmlEncode(
+                            t("Subscribe it to these events:", "marketplaceserver", "community")
+                        ) + '<br><code>' + me.stripeEvents().map(function (ev) {
+                            return Ext.util.Format.htmlEncode(ev);
+                        }).join('<br>') + '</code></small>'
                 }
             ]
         });
@@ -211,6 +214,39 @@ go.modules.community.marketplaceserver.SettingsPanel = Ext.extend(go.systemsetti
     },
 
     /**
+     * The public webhook endpoint of THIS install. Built from the configured
+     * full_url (which includes any subdirectory the install is mounted under);
+     * window.location.origin would drop that subpath and hand the admin a URL
+     * that 404s.
+     *
+     * @return {String}
+     */
+    webhookUrl: function () {
+        var base = (GO.settings && GO.settings.config && GO.settings.config.full_url)
+            || (window.location.origin + '/');
+        if (base.substr(-1) !== '/') {
+            base += '/';
+        }
+        return base + 'api/page.php/community/marketplaceserver/paymentWebhook/stripe';
+    },
+
+    /**
+     * Every Stripe event StripeGateway::mapEvent() acts on. Keep in sync with it —
+     * an event the admin does not subscribe to is silently never delivered.
+     *
+     * @return {Array}
+     */
+    stripeEvents: function () {
+        return [
+            'checkout.session.completed',
+            'checkout.session.async_payment_succeeded',
+            'charge.refunded',
+            'charge.dispute.closed',
+            'customer.subscription.deleted'
+        ];
+    },
+
+    /**
      * After the base populates the form from stored settings, reveal the gateway
      * fields matching the loaded selection.
      *
@@ -269,10 +305,26 @@ go.modules.community.marketplaceserver.SettingsPanel = Ext.extend(go.systemsetti
             // Keep the in-memory settings fresh so the Release dialog's branch
             // list (and any other consumer of module.settings) reflects the
             // change without a full page reload.
-            var mod = go.Modules.get('community', 'marketplaceserver');
+            var values = me.getForm().getFieldValues(),
+                // A blank secret field means "keep the stored one" (the setters
+                // return early on ''), so it must not be applied over anything —
+                // and a filled one must not be cached in the browser at all: the
+                // server never sends these back, only the *Configured booleans.
+                storedSecret = !!values.stripeSecretKey,
+                storedWebhook = !!values.stripeWebhookSecret,
+                mod = go.Modules.get('community', 'marketplaceserver');
+            delete values.stripeSecretKey;
+            delete values.stripeWebhookSecret;
             if (mod && mod.settings) {
-                Ext.apply(mod.settings, me.getForm().getFieldValues());
+                Ext.apply(mod.settings, values);
+                if (storedSecret) {
+                    mod.settings.stripeSecretConfigured = true;
+                }
+                if (storedWebhook) {
+                    mod.settings.stripeWebhookConfigured = true;
+                }
             }
+            me.afterSecretsSaved(storedSecret, storedWebhook);
             go.Notifier.msg({
                 iconCls: 'ic-check',
                 title: t("Marketplace server", "marketplaceserver", "community"),
@@ -280,5 +332,40 @@ go.modules.community.marketplaceserver.SettingsPanel = Ext.extend(go.systemsetti
                 removeAfter: 3000
             });
         }, me);
+    },
+
+    /**
+     * Clear the secret inputs after a successful save and flip their hint to
+     * "Configured", so the panel shows the same state a reload would: the value
+     * is stored server-side, the browser is not holding on to it.
+     *
+     * @param {Boolean} storedSecret a new secret key was submitted
+     * @param {Boolean} storedWebhook a new webhook signing secret was submitted
+     * @return {void}
+     */
+    afterSecretsSaved: function (storedSecret, storedWebhook) {
+        var me = this,
+            configured = t("Configured — leave blank to keep", "marketplaceserver", "community");
+
+        [['stripeSecretKey', storedSecret], ['stripeWebhookSecret', storedWebhook]].forEach(function (pair) {
+            if (!pair[1]) {
+                return;
+            }
+            var field = me.getForm().findField(pair[0]);
+            if (field) {
+                field.setValue('');
+                field.emptyText = configured;
+                if (field.rendered) {
+                    field.applyEmptyText();
+                }
+            }
+        });
+
+        if (storedSecret) {
+            me.stripeSecretConfigured = true;
+        }
+        if (storedWebhook) {
+            me.stripeWebhookConfigured = true;
+        }
     }
 });

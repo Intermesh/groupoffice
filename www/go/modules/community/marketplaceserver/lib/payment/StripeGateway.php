@@ -23,6 +23,13 @@ class StripeGateway implements PaymentGateway
     const API_BASE = 'https://api.stripe.com/v1';
 
     /**
+     * Pinned on every API call so a Stripe-side account upgrade cannot silently
+     * change the response shape under us. Bump deliberately, after checking the
+     * changelog for the fields this driver reads.
+     */
+    const API_VERSION = '2025-03-31.basil';
+
+    /**
      * @var \go\modules\community\marketplaceserver\model\Settings
      */
     private $settings;
@@ -94,6 +101,7 @@ class StripeGateway implements PaymentGateway
         $client->setOption(CURLOPT_FOLLOWLOCATION, false);
         $client->setHeader('Authorization', 'Bearer ' . $secret);
         $client->setHeader('Content-Type', 'application/x-www-form-urlencoded');
+        $client->setHeader('Stripe-Version', self::API_VERSION);
         // Pass a STRING body so curl sends x-www-form-urlencoded (an array would be
         // multipart, which the Stripe API rejects).
         $res = $client->post(self::API_BASE . '/checkout/sessions', http_build_query($params));
@@ -118,6 +126,14 @@ class StripeGateway implements PaymentGateway
     {
         $secret = $this->settings->decryptStripeWebhookSecret();
         if ($secret === null) {
+            // Same 400 to the caller as a bad signature (never tell an unauthenticated
+            // client how we are configured), but the two are very different for us:
+            // this one means every webhook is being dropped until an admin pastes the
+            // whsec into settings. Say so in the log, or it looks like an attack.
+            \go\core\ErrorHandler::log(
+                'marketplaceserver: Stripe webhook received but no signing secret is configured '
+                . '- the event was dropped. Set the webhook signing secret in the module settings.'
+            );
             return null;
         }
         if (!StripeSignature::verify($payload, $signatureHeader, $secret, time())) {
@@ -139,8 +155,9 @@ class StripeGateway implements PaymentGateway
      *   - checkout.session.async_payment_succeeded → PURCHASE_COMPLETED (a delayed
      *     method such as SEPA debit: the session completed unpaid, money came later)
      *   - charge.refunded (FULLY refunded)   → ACCESS_REVOKED (by paymentRef)
+     *   - charge.dispute.closed (status=lost)→ ACCESS_REVOKED (by paymentRef)
      *   - customer.subscription.deleted      → ACCESS_REVOKED (by subscriptionId)
-     * Anything else (incl. a partial refund) → IGNORED.
+     * Anything else (incl. a partial refund, a won dispute) → IGNORED.
      *
      * @param array<string, mixed> $event a decoded Stripe event
      * @return \go\modules\community\marketplaceserver\lib\payment\PaymentEvent
@@ -202,8 +219,39 @@ class StripeGateway implements PaymentGateway
                 $paymentRef,
                 $externalRef
             );
+            $e->reason = PaymentEvent::REASON_REFUND;
             if (isset($object['amount_refunded'])) {
                 $e->amount = (int) $object['amount_refunded'];
+            }
+            if (!empty($object['currency'])) {
+                $e->currency = strtoupper((string) $object['currency']);
+            }
+            return $e;
+        }
+
+        if ($type === 'charge.dispute.closed') {
+            // A LOST chargeback takes the money back without ever firing
+            // charge.refunded — the charge's `refunded` flag stays false — so
+            // without this branch the buyer keeps the entitlement for free.
+            // 'won' and 'warning_closed' close in our favour and change nothing.
+            if (($object['status'] ?? '') !== 'lost') {
+                return PaymentEvent::ignored();
+            }
+            // The dispute object carries payment_intent directly, so a lost dispute
+            // revokes through exactly the same key as a refund.
+            $paymentRef = !empty($object['payment_intent']) ? (string) $object['payment_intent'] : null;
+            if ($paymentRef === null) {
+                return PaymentEvent::ignored();
+            }
+            $e = new PaymentEvent(
+                PaymentEvent::ACCESS_REVOKED,
+                null, null, null, null,
+                $paymentRef,
+                $externalRef
+            );
+            $e->reason = PaymentEvent::REASON_CHARGEBACK;
+            if (isset($object['amount'])) {
+                $e->amount = (int) $object['amount'];
             }
             if (!empty($object['currency'])) {
                 $e->currency = strtoupper((string) $object['currency']);

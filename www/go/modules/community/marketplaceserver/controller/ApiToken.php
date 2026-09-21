@@ -22,7 +22,7 @@ class ApiToken extends EntityController
     }
 
     /**
-     * @param $params
+     * @param array<string, mixed> $params
      * @return ArrayObject
      * @throws InvalidArguments
      */
@@ -32,7 +32,7 @@ class ApiToken extends EntityController
     }
 
     /**
-     * @param $params
+     * @param array<string, mixed> $params
      * @return ArrayObject
      * @throws \Exception
      */
@@ -42,7 +42,7 @@ class ApiToken extends EntityController
     }
 
     /**
-     * @param $params
+     * @param array<string, mixed> $params
      * @return ArrayObject
      * @throws InvalidArguments
      * @throws StateMismatch
@@ -53,7 +53,7 @@ class ApiToken extends EntityController
     }
 
     /**
-     * @param $params
+     * @param array<string, mixed> $params
      * @return array|ArrayObject
      * @throws InvalidArguments
      */

@@ -9,6 +9,7 @@ use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\util\ArrayObject;
+use go\modules\community\marketplaceserver\lib\ExpiryDate;
 
 /**
  * Grants a customer the right to use a product — either created manually by
@@ -142,8 +143,19 @@ class Entitlement extends Entity
      */
     public function isActive(): bool
     {
-        return !$this->isRevoked()
-            && ($this->expiresAt === null || $this->expiresAt->getTimestamp() >= time());
+        return !$this->isRevoked() && !ExpiryDate::hasLapsed($this->expiresAt);
+    }
+
+    /**
+     * The expiry to publish and to compare against: the moment the grant stops
+     * being valid. A date-only value (what the dialog stores) runs through the END
+     * of that day — see {@see \go\modules\community\marketplaceserver\lib\ExpiryDate}.
+     *
+     * @return int|null unix timestamp, null = perpetual
+     */
+    public function expiryCutoff(): ?int
+    {
+        return ExpiryDate::cutoff($this->expiresAt);
     }
 
     /**
@@ -317,7 +329,7 @@ class Entitlement extends Entity
         if ($exists) {
             // Revive a lapsed grant to perpetual free — re-acquiring a free product
             // must actually re-license it, not silently no-op on the old dead row.
-            $lapsed = $exists->expiresAt !== null && $exists->expiresAt->getTimestamp() < time();
+            $lapsed = ExpiryDate::hasLapsed($exists->expiresAt);
             if ($lapsed && $exists->revokedAt === null) {
                 go()->getDbConnection()->update('marketplaceserver_entitlement', [
                     'expiresAt' => null,

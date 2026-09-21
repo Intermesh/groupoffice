@@ -21,7 +21,7 @@ class Customer extends EntityController
     }
 
     /**
-     * @param $params
+     * @param array<string, mixed> $params
      * @return ArrayObject
      * @throws InvalidArguments
      */
@@ -31,7 +31,7 @@ class Customer extends EntityController
     }
 
     /**
-     * @param $params
+     * @param array<string, mixed> $params
      * @return ArrayObject
      * @throws \Exception
      */
@@ -41,7 +41,7 @@ class Customer extends EntityController
     }
 
     /**
-     * @param $params
+     * @param array<string, mixed> $params
      * @return ArrayObject
      * @throws InvalidArguments
      * @throws StateMismatch
@@ -52,7 +52,7 @@ class Customer extends EntityController
     }
 
     /**
-     * @param $params
+     * @param array<string, mixed> $params
      * @return array|ArrayObject
      * @throws InvalidArguments
      */
@@ -96,7 +96,12 @@ class Customer extends EntityController
         }
         if ($enabled && $customer->verifiedAt === null) {
             $customer->verifiedAt = new \go\core\util\DateTime();
-            $customer->save();
+            if (!$customer->save()) {
+                // The account IS enabled by now (saved above), but the grid
+                // optimistically shows verifiedAt from this response — reporting
+                // success here would leave the UI claiming a stamp the row never got.
+                throw new \Exception('Could not update customer: ' . $customer->getValidationErrorsAsString());
+            }
         }
 
         return new ArrayObject(['success' => true, 'enabled' => $enabled]);
@@ -131,9 +136,19 @@ class Customer extends EntityController
             return new ArrayObject(['success' => true, 'skipped' => true]);
         }
 
-        if (!\go\modules\community\marketplaceserver\lib\VerificationMailer::send($user)) {
+        $sent = \go\modules\community\marketplaceserver\lib\VerificationMailer::send($user);
+        if ($sent === null) {
             // Not a customer account awaiting verification: nothing was sent.
             return new ArrayObject(['success' => true, 'skipped' => true]);
+        }
+        if ($sent === false) {
+            // Mail delivery failed. The manager is standing in front of this
+            // button — say so instead of reporting a send that did not happen.
+            throw new \Exception(go()->t(
+                'The verification e-mail could not be sent. Check the e-mail settings and the server log.',
+                'community',
+                'marketplaceserver'
+            ));
         }
 
         return new ArrayObject(['success' => true]);

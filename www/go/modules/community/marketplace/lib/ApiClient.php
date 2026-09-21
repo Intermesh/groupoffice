@@ -98,7 +98,11 @@ class ApiClient
     }
 
     /**
-     * @return array{package:string,name:string,publicKey:string}
+     * The server's identity: package, name and RS256 public key. The shape is
+     * what OUR server sends, not a guarantee — this is a remote response, so
+     * callers read every key defensively (see Repository::pinServer()).
+     *
+     * @return array<string, mixed>
      * @throws \Exception
      */
     public function info(): array
@@ -109,7 +113,9 @@ class ApiClient
     }
 
     /**
-     * @return array{package:string,products:array<mixed>}
+     * The catalog as the remote server reports it; read its keys defensively.
+     *
+     * @return array<string, mixed>
      * @throws \Exception
      */
     public function catalog(): array
@@ -264,7 +270,7 @@ class ApiClient
     /**
      * The authenticated customer's own account: companyName + entitlements.
      *
-     * @return array{companyName:?string,entitlements:array<mixed>}
+     * @return array<string, mixed>
      * @throws \Exception
      */
     public function account(): array

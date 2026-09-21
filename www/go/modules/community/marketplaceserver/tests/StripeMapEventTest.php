@@ -111,6 +111,52 @@ final class StripeMapEventTest extends TestCase
         $this->assertSame(PaymentEvent::IGNORED, $e->type);
     }
 
+    public function testLostDisputeRevokesByPaymentRef(): void
+    {
+        $e = StripeGateway::mapEvent([
+            'id' => 'evt_d1',
+            'type' => 'charge.dispute.closed',
+            'data' => ['object' => [
+                'status' => 'lost',
+                'payment_intent' => 'pi_999',
+                'amount' => 4900,
+                'currency' => 'eur',
+            ]],
+        ]);
+        $this->assertSame(PaymentEvent::ACCESS_REVOKED, $e->type);
+        $this->assertSame('pi_999', $e->paymentRef);
+        $this->assertSame(PaymentEvent::REASON_CHARGEBACK, $e->reason);
+        $this->assertSame(4900, $e->amount);
+        $this->assertSame('EUR', $e->currency);
+    }
+
+    public function testWonDisputeIsIgnored(): void
+    {
+        $e = StripeGateway::mapEvent([
+            'type' => 'charge.dispute.closed',
+            'data' => ['object' => ['status' => 'won', 'payment_intent' => 'pi_999']],
+        ]);
+        $this->assertSame(PaymentEvent::IGNORED, $e->type);
+    }
+
+    public function testDisputeWithoutPaymentIntentIsIgnored(): void
+    {
+        $e = StripeGateway::mapEvent([
+            'type' => 'charge.dispute.closed',
+            'data' => ['object' => ['status' => 'lost']],
+        ]);
+        $this->assertSame(PaymentEvent::IGNORED, $e->type);
+    }
+
+    public function testFullRefundCarriesRefundReason(): void
+    {
+        $e = StripeGateway::mapEvent([
+            'type' => 'charge.refunded',
+            'data' => ['object' => ['refunded' => true, 'payment_intent' => 'pi_1']],
+        ]);
+        $this->assertSame(PaymentEvent::REASON_REFUND, $e->reason);
+    }
+
     public function testSubscriptionDeletedRevokesBySubscriptionId(): void
     {
         $e = StripeGateway::mapEvent([

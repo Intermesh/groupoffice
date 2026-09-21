@@ -149,13 +149,35 @@ class Release extends Entity
      * @return int
      * @throws \Exception
      */
-    public function getPermissionLevel(): int
+    protected function internalGetPermissionLevel(): int
     {
         $module = \go\core\App::get()->getModule('community', 'marketplaceserver');
         if (!$module) {
             return 0;
         }
         return !empty($module->getUserRights()->mayManage) ? Acl::LEVEL_MANAGE : 0;
+    }
+
+    /**
+     * Manager-only, in queries too. Overriding the permission level without this
+     * is the classic half of the pair (core docblock on Entity::getPermissionLevel):
+     * the level gates get/set, but `query` runs the bare mapping, so a user with
+     * nothing but plain read on the module would still get every id and the total.
+     *
+     * @param \go\core\orm\Query $query
+     * @param int $level
+     * @param int|null $userId
+     * @param int[]|null $groups
+     * @return \go\core\orm\Query
+     * @throws \Exception
+     */
+    public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
+    {
+        $module = \go\core\App::get()->getModule('community', 'marketplaceserver');
+        if ($module && !empty($module->getUserRights()->mayManage)) {
+            return $query;
+        }
+        return $query->andWhere('1 = 0');
     }
 
     /**

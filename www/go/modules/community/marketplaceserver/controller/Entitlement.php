@@ -21,7 +21,7 @@ class Entitlement extends EntityController
     }
 
     /**
-     * @param $params
+     * @param array<string, mixed> $params
      * @return ArrayObject
      * @throws InvalidArguments
      */
@@ -31,7 +31,7 @@ class Entitlement extends EntityController
     }
 
     /**
-     * @param $params
+     * @param array<string, mixed> $params
      * @return ArrayObject
      * @throws \Exception
      */
@@ -41,7 +41,7 @@ class Entitlement extends EntityController
     }
 
     /**
-     * @param $params
+     * @param array<string, mixed> $params
      * @return ArrayObject
      * @throws InvalidArguments
      * @throws StateMismatch
@@ -52,7 +52,7 @@ class Entitlement extends EntityController
     }
 
     /**
-     * @param $params
+     * @param array<string, mixed> $params
      * @return array|ArrayObject
      * @throws InvalidArguments
      */

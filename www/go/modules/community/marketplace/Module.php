@@ -4,7 +4,6 @@ namespace go\modules\community\marketplace;
 
 use go\core;
 use go\core\model;
-use go\modules\community\marketplace\model\Settings;
 
 class Module extends core\Module
 {
@@ -13,7 +12,8 @@ class Module extends core\Module
      * when self-registering against a marketplace server. It is NOT a secret
      * (it ships in every client) — it only lets the server reject requests that
      * did not come from a genuine client build. The server accepts this value
-     * (see Settings::DEFAULT_CLIENT_TOKEN), so an admin only has to tick
+     * (see marketplaceserver's Settings::DEFAULT_CLIENT_TOKEN, which this value
+     * must stay in sync with), so an admin only has to tick
      * "Allow self-registration".
      */
     const CLIENT_TOKEN = 'groupoffice-marketplace-client';
@@ -26,14 +26,6 @@ class Module extends core\Module
     public function getAuthor(): string
     {
         return 'Michal Charvat <info@michalcharvat.cz>';
-    }
-
-    /**
-     * @return core\Settings|Settings|null
-     */
-    public function getSettings(): ?\go\core\Settings
-    {
-        return Settings::get();
     }
 
     /**

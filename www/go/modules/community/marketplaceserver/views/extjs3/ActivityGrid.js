@@ -2,7 +2,7 @@
 
 /**
  * Read-only audit log of marketplace activity (downloads, purchases, refunds,
- * subscription cancels, registrations, verifications, grants/revokes). Rows are
+ * chargebacks, subscription cancels, registrations, verifications, grants/revokes). Rows are
  * written only by the system (model\Activity::record); there is no add/edit/
  * delete here. A type filter + free-text search narrow the list.
  */
@@ -10,6 +10,7 @@ go.modules.community.marketplaceserver.ActivityGrid = Ext.extend(go.grid.GridPan
 
     entityStore: "MarketplaceServerActivity",
     stateId: 'community-marketplaceserver-activity-grid',
+    autoExpandColumn: 'item',
 
     initComponent: function () {
         var me = this;
@@ -104,12 +105,19 @@ go.modules.community.marketplaceserver.ActivityGrid = Ext.extend(go.grid.GridPan
 
         me.viewConfig = {
             emptyText: '<i class="icon ic-history"></i><p>' +
-                t("No activity for the selected filters. Widen the date range or clear the filters.", "marketplaceserver", "community") + '</p>'
+                t("No activity for the selected filters. Widen the date range or clear the filters.", "marketplaceserver", "community") + '</p>',
+            // Ext only applies emptyText after a load-driven refresh when this is
+            // true; an empty response that beats the render then leaves the grid
+            // blank instead of explaining itself.
+            deferEmptyText: false
         };
 
         go.modules.community.marketplaceserver.ActivityGrid.superclass.initComponent.call(me);
 
-        me.on('render', function () { me.store.load(); }, me);
+        // No load on 'render': ActivityPanel (the only instantiator) defaults the
+        // period on 'viewready', and that change already loads the grid. Loading
+        // here too would spend a round-trip on an unfiltered, immediately
+        // discarded result set.
     },
 
     /**
@@ -123,6 +131,7 @@ go.modules.community.marketplaceserver.ActivityGrid = Ext.extend(go.grid.GridPan
             download: t("Download", "marketplaceserver", "community"),
             purchase: t("Purchase", "marketplaceserver", "community"),
             refund: t("Refund", "marketplaceserver", "community"),
+            chargeback: t("Chargeback", "marketplaceserver", "community"),
             subscription_canceled: t("Subscription canceled", "marketplaceserver", "community"),
             register: t("Registration", "marketplaceserver", "community"),
             verify: t("Verification", "marketplaceserver", "community"),

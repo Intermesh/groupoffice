@@ -58,7 +58,10 @@ go.modules.community.marketplaceserver.BranchChips = Ext.extend(Ext.Container, {
         var added = false;
         raw.split(',').forEach(function (part) {
             var v = part.trim();
-            if (v && this.dataView.store.find('value', v) === -1) {
+            // findExact, not find: find() goes through createValueMatcher, which
+            // with anyMatch undefined does a case-insensitive SUBSTRING match — so
+            // adding '6.8' would be swallowed by an existing '16.8.1'.
+            if (v && this.dataView.store.findExact('value', v) === -1) {
                 this.dataView.store.add([new this.dataView.store.recordType({value: v, display: v})]);
                 added = true;
             }

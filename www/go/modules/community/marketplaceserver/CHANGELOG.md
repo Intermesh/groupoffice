@@ -1,6 +1,25 @@
 # Changelog
 
 
+## 2026-09-21
+- Stripe: a LOST dispute (`charge.dispute.closed`, status `lost`) now revokes the entitlement — Stripe never fires `charge.refunded` for a chargeback, so the money was gone while access stayed; logged as its own `chargeback` activity type, not as a refund
+- Stripe: pin the API version on outgoing calls; a webhook arriving while no signing secret is configured is logged as a configuration problem instead of being indistinguishable from a forged signature
+- Bearer API works behind Apache + FastCGI again: the `Authorization` header is read through `Request`, with an explicit `REDIRECT_HTTP_AUTHORIZATION` fallback (GO's own fallback is unreachable under PHP-FPM, which defines `apache_request_headers()`)
+- `/signature` refuses a release whose package file is missing from disk instead of handing out a valid signature over zero bytes; `/download` 404s in the same case
+- Rate-limiter table indexed for the queries it actually runs (`(ip, createdAt)`, `(email, createdAt)`) — the per-e-mail check had no index at all
+- Settings: the webhook URL shown to the admin respects an install in a subdirectory and lists all five events the server handles; saving no longer caches the Stripe secrets in the browser nor wipes them, and the "Configured" hints refresh after a save
+- An entitlement with a date-only expiry now lasts through the END of that day (new `lib/ExpiryDate`): "expires 31 Dec" used to drop the module out of the license JWT from 00:00 on 31 Dec, a full day before the date the dialog shows. A gateway's exact period end is still used verbatim, so a subscription gains no free day
+- Resending a verification e-mail reports what actually happened: a failed send is an error instead of "Verification e-mail sent.", and an account that is not awaiting verification says so
+- SECURITY: releases and instance logs are manager-only in queries too, not just on get/set — a user with plain read on the module could list their ids and total through `query` (the permission override had no matching `applyAclToQuery`); the catalog's query rule is now spelled out as well
+- Product, release, instance-log and activity permissions moved to `internalGetPermissionLevel()`, so `Entity::EVENT_PERMISSION_LEVEL` fires for them and another module can extend these rights like it already can for customers, entitlements and tokens
+- `/download` and `/signature` refuse a request that doesn't say which GO version it runs, instead of serving the highest version across all branches — a 6.8 instance could be handed a build made for 26. `/catalog` already offered nothing in that case; the endpoints now agree
+- The rate-limiter ledger is pruned by the daily cron. Every `/license`, `/download`, `/signature` and `/checkout` writes a row, while the only pruning ran opportunistically from `/register` and `/login` — which a closed registration never reaches, so the table grew forever
+- Enabling a customer account reports a failure to stamp `verifiedAt` instead of discarding the save result and letting the grid show a date the row never got
+- A license or package signature is refused with a 500 instead of being built from an empty key when the stored signing key cannot be decrypted — a changed installation crypt key used to yield a signature no client could verify
+- PHPStan level 8 now passes clean (`phpstan.neon` added): typed the JMAP controller `$params`, gave the catalog and seat loops their entity types, and dropped `?? ''` fallbacks that could never fire
+- Release branches: adding a branch no longer swallows e.g. "6.8" when "16.8.1" exists (substring match)
+- Entitlements: picking a customer that later disappears from the reloaded list no longer leaves Add armed for them; activity grid drops a redundant unfiltered load and expands its Item column
+
 ## 2026-09-19
 - SECURITY: e-mail verification only issues and redeems links for self-registered customer accounts awaiting verification (could re-enable any disabled user, incl. admins)
 - SECURITY: managers can enable/disable only customer-group, non-admin accounts; customer rows are created only after the permission check; customer account cannot be re-pointed

@@ -143,10 +143,19 @@ class Module extends core\Module
      */
     private function apiCustomer(): model\Customer
     {
-        $header = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
-        if ($header === null && function_exists('apache_request_headers')) {
-            $headers = apache_request_headers();
-            $header = $headers['Authorization'] ?? ($headers['authorization'] ?? null);
+        // Apache does not pass Authorization to a CGI/FastCGI child unless
+        // CGIPassAuth is on, so installs work around it with a rewrite that
+        // re-exports the header — and an .htaccess rewrite lands it in
+        // REDIRECT_HTTP_AUTHORIZATION, not HTTP_AUTHORIZATION.
+        //
+        // Request::getNonApacheHeaders() knows about that, but it is only reached
+        // when apache_request_headers() does NOT exist (Request.php:128) — and the
+        // FPM SAPI has defined that function since PHP 7.3 (as an alias of
+        // getallheaders(), which maps only HTTP_-prefixed keys). So on exactly the
+        // deployment that needs the fallback, GO never runs it: read it here.
+        $header = $this->requestHeader('Authorization');
+        if ($header === null && !empty($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+            $header = (string) $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
         }
         $plain = lib\TokenAuth::parseBearer($header);
         if ($plain !== null) {
@@ -281,7 +290,7 @@ class Module extends core\Module
             $rows[] = [
                 'type' => $product->type,
                 'modules' => $modules,
-                'expiresAt' => $e->expiresAt ? $e->expiresAt->getTimestamp() : null,
+                'expiresAt' => $e->expiryCutoff(),
             ];
         }
         return $rows;
@@ -379,6 +388,9 @@ class Module extends core\Module
         // Modules are branch-specific. The client sends its running GO version
         // (e.g. "6.8.175"); we match releases by branch on a dot boundary (see
         // Release::branchMatches) so both "6.8" and year-based schemes work.
+        // Empty = the caller didn't say what it runs; every product then reports
+        // release: null (nothing offered for download). authorizeRelease() refuses
+        // the download in the same situation, so the two endpoints agree.
         $goVersion = trim((string) ($_GET['goVersion'] ?? ''));
 
         $latest = [];          // moduleName => latest release matching the client's branch
@@ -408,7 +420,7 @@ class Module extends core\Module
 
         // Absolute base URL to THIS server, so the client browser (on another
         // instance) can load product logos directly via <img src>.
-        $base = rtrim((string) (go()->getSettings()->URL ?? ''), '/');
+        $base = rtrim((string) go()->getSettings()->URL, '/');
 
         // License expiry per PRODUCT the customer actually holds an entitlement for
         // (INCLUDING expired ones — LicenseBuilder drops expired grants, but the
@@ -423,7 +435,7 @@ class Module extends core\Module
             if ($e->isRevoked()) {
                 continue;   // a revoked grant is neither owned nor an expiry nudge
             }
-            $exp = $e->expiresAt ? $e->expiresAt->getTimestamp() : null;
+            $exp = $e->expiryCutoff();
             if (!array_key_exists($e->productId, $entExpiryByProduct)) {
                 $entExpiryByProduct[$e->productId] = $exp;
             } elseif ($entExpiryByProduct[$e->productId] !== null && ($exp === null || $exp > $entExpiryByProduct[$e->productId])) {
@@ -432,6 +444,7 @@ class Module extends core\Module
         }
 
         $products = [];
+        /** @var \go\modules\community\marketplaceserver\model\Product $p */
         foreach (model\Product::find()->where(['active' => true])->orderBy(['sortOrder' => 'ASC']) as $p) {
             $owned = ($p->type === model\Product::TYPE_MODULE && array_key_exists($package . '/' . $p->moduleName, $licenses))
                 || ($p->type === model\Product::TYPE_COLLECTION && $p->modules
@@ -568,7 +581,6 @@ class Module extends core\Module
         }
 
         $settings = model\Settings::get();
-        $settings->ensureKeyPair();
 
         // Counting the seats in use and recording this host's seat must be one
         // step, or two new hosts asking at the same moment both see a free seat.
@@ -587,13 +599,19 @@ class Module extends core\Module
             // obey the customer's seat pool, hostname-mode grants their own pin.
             [$rows, $seatGranted] = $this->bindingRowsForHost($customer, $hostname);
             $licenses = lib\LicenseBuilder::resolveLicenses($settings->packageName, $rows);
+            $pem = $this->signingKey($settings);
+            if ($pem === null) {
+                \go\core\ErrorHandler::log('marketplaceserver: signing key unavailable, cannot issue a license for customer ' . $customer->id);
+                $this->jsonOut(['error' => 'Server signing key unavailable'], 500);
+                return;
+            }
             $jwt = lib\LicenseBuilder::build(
-                go()->getSettings()->URL ?? '',
+                (string) go()->getSettings()->URL,
                 (int) $customer->id,
                 $hostname,
                 $settings->packageName,
                 $licenses,
-                $settings->decryptPrivateKey()
+                $pem
             );
 
             $log = model\InstanceLog::find()->where(['customerId' => $customer->id, 'hostname' => $hostname])->single();
@@ -645,6 +663,7 @@ class Module extends core\Module
         $cutoff = (new \DateTime())->sub(new \DateInterval('P' . $activityDays . 'D'))->getTimestamp();
         $activeOtherSeats = 0;
         $hostHoldsSeat = false;
+        /** @var \go\modules\community\marketplaceserver\model\InstanceLog $log */
         foreach (model\InstanceLog::find()->where(['customerId' => $customer->id]) as $log) {
             if (empty($log->consumesSeat) || $log->lastSeenAt === null
                 || $log->lastSeenAt->getTimestamp() < $cutoff) {
@@ -672,7 +691,7 @@ class Module extends core\Module
             if ($product->type === model\Product::TYPE_MODULE && $product->moduleName) {
                 $modules = [$product->moduleName];
             } elseif ($product->type === model\Product::TYPE_COLLECTION) {
-                $modules = $product->modules ?? [];
+                $modules = $product->modules;
             }
             if (empty($modules)) {
                 continue;
@@ -693,7 +712,7 @@ class Module extends core\Module
             $rows[] = [
                 'type' => $product->type,
                 'modules' => $modules,
-                'expiresAt' => $e->expiresAt ? $e->expiresAt->getTimestamp() : null,
+                'expiresAt' => $e->expiryCutoff(),
                 'permitted' => $permitted,
             ];
         }
@@ -728,7 +747,7 @@ class Module extends core\Module
         }
 
         $blob = \go\core\fs\Blob::findById($release->blobId);
-        if (!$blob) {
+        if (!$blob || !$blob->getFile()->exists()) {
             $this->jsonOut(['error' => 'Package blob missing'], 404);
             return;
         }
@@ -749,6 +768,24 @@ class Module extends core\Module
             'Content-Type' => 'application/zip',
             'Content-Disposition' => 'attachment; filename="' . $moduleName . '-' . $release->version . '.zip"',
         ]);
+    }
+
+    /**
+     * The RS256 private key to sign with, or null when it cannot be produced.
+     * {@see model\Settings::ensureKeyPair()} generates one on first use, so null
+     * means the STORED key failed to decrypt — a changed or lost installation
+     * Crypt key. That must fail loudly: signing with an empty key would hand
+     * clients a signature their pinned public key can never verify, and a license
+     * JWT nobody can validate.
+     *
+     * @param \go\modules\community\marketplaceserver\model\Settings $settings
+     * @return string|null
+     * @throws \Exception
+     */
+    private function signingKey(model\Settings $settings): ?string
+    {
+        $settings->ensureKeyPair();
+        return $settings->decryptPrivateKey();
     }
 
     /**
@@ -780,12 +817,32 @@ class Module extends core\Module
             return;
         }
 
+        // The blob row can outlive its file on disk. file_get_contents() would then
+        // return false and (string) false is '' — we'd hand out a valid signature
+        // over zero bytes, which a client cannot tell from a real one. /download
+        // 404s in the same situation (see the exists() check there); so do we.
+        $file = $blob->getFile();
+        if (!$file->exists()) {
+            $this->jsonOut(['error' => 'Package blob missing'], 404);
+            return;
+        }
+        $bytes = file_get_contents($file->getPath());
+        if ($bytes === false) {
+            \go\core\ErrorHandler::log('marketplaceserver: cannot read package blob ' . $blob->id . ' for signing');
+            $this->jsonOut(['error' => 'Package blob missing'], 404);
+            return;
+        }
+
         $settings = model\Settings::get();
-        $settings->ensureKeyPair();
-        $bytes = (string) file_get_contents($blob->getFile()->getPath());
+        $pem = $this->signingKey($settings);
+        if ($pem === null) {
+            \go\core\ErrorHandler::log('marketplaceserver: signing key unavailable, cannot sign ' . $moduleName . ' ' . $release->version);
+            $this->jsonOut(['error' => 'Server signing key unavailable'], 500);
+            return;
+        }
 
         $this->jsonOut([
-            'signature' => lib\PackageSigner::sign($bytes, $settings->decryptPrivateKey()),
+            'signature' => lib\PackageSigner::sign($bytes, $pem),
             'algorithm' => lib\PackageSigner::ALGORITHM,
             'version' => $release->version,
         ]);
@@ -858,11 +915,21 @@ class Module extends core\Module
             $query->andWhere(['version' => $version]);
         }
         // Serve only a release matching the client's GO branch (dot-boundary match
-        // — see Release::branchMatches). The client sends its own running version.
+        // — see Release::branchMatches). The client sends its own running version
+        // (lib/ApiClient appends it to /catalog, /download and /signature alike).
+        //
+        // Without it we do NOT fall back to "highest version across branches":
+        // that would hand a 6.8 instance a build made for 26 and break its
+        // install, and it contradicts /catalog, which offers no release at all
+        // when it doesn't know the caller's branch. No branch, no release.
         $goVersion = trim((string) ($_GET['goVersion'] ?? ''));
+        if ($goVersion === '') {
+            $this->jsonOut(['error' => 'goVersion is required so the right branch can be served'], 400);
+            exit;
+        }
         $release = null;
         foreach ($query as $r) {
-            if ($goVersion !== '' && !model\Release::branchMatches($r->goVersion, $goVersion)) {
+            if (!model\Release::branchMatches($r->goVersion, $goVersion)) {
                 continue;
             }
             if ($release === null || version_compare($r->version, $release->version) > 0) {
@@ -916,8 +983,10 @@ class Module extends core\Module
             $this->jsonOut(['error' => 'Too many attempts. Please try again later.'], 429);
             return;
         }
-        // Opportunistic housekeeping so the attempt ledger can't grow unbounded
-        // (no dedicated cron needed for a low-volume endpoint).
+        // Opportunistic housekeeping, on top of the daily cron: this path is the
+        // one that still prunes on an install whose cron is disabled. It cannot
+        // be the only one — a closed registration returns 403 above, and the
+        // token-gated endpoints never come through here at all.
         if (random_int(1, 50) === 1) {
             try { lib\RateLimiter::prune(24); } catch (\Throwable $e) { /* best effort */ }
         }
@@ -1139,12 +1208,12 @@ class Module extends core\Module
             if (!$product) {
                 continue;
             }
-            $exp = $e->expiresAt ? $e->expiresAt->getTimestamp() : null;
+            $exp = $e->expiryCutoff();
             $rows[] = [
                 'product' => $product->title,
                 'type' => $product->type,
                 'expiresAt' => $exp,
-                'expired' => $exp !== null && $exp < $now,
+                'expired' => $exp !== null && $exp <= $now,
                 'revoked' => $e->isRevoked(),
             ];
         }
@@ -1206,7 +1275,7 @@ class Module extends core\Module
             return;
         }
 
-        $base = rtrim((string) (go()->getSettings()->URL ?? ''), '/')
+        $base = rtrim((string) go()->getSettings()->URL, '/')
             . '/api/page.php/community/marketplaceserver/checkoutReturn';
         try {
             $url = $gateway->createCheckoutSession(
@@ -1309,12 +1378,18 @@ class Module extends core\Module
                     }
                     break;
                 case lib\payment\PaymentEvent::ACCESS_REVOKED:
-                    // A subscription end revokes by subscription id; a full refund
-                    // of a one-off purchase revokes by its payment-intent id.
+                    // A subscription end revokes by subscription id; a full refund or a
+                    // lost dispute on a one-off purchase revokes by its payment-intent id.
                     if ($event->paymentRef) {
                         $enrich = model\Entitlement::find()->where(['stripePaymentIntentId' => $event->paymentRef])->single();
                         model\Entitlement::revokeByPaymentRef($event->paymentRef);
-                        model\Activity::record(model\Activity::TYPE_REFUND, [
+                        // A lost chargeback revokes exactly like a refund, but it is not
+                        // one: we did not choose to give the money back. Keep them apart
+                        // in the audit trail.
+                        $revokeType = $event->reason === lib\payment\PaymentEvent::REASON_CHARGEBACK
+                            ? model\Activity::TYPE_CHARGEBACK
+                            : model\Activity::TYPE_REFUND;
+                        model\Activity::record($revokeType, [
                             'customerId' => $enrich ? (int) $enrich->customerId : null,
                             'productId' => $enrich ? (int) $enrich->productId : null,
                             'amount' => $event->amount,

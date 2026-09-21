@@ -200,7 +200,7 @@ class Product extends Entity
      * @return int
      * @throws \Exception
      */
-    public function getPermissionLevel(): int
+    protected function internalGetPermissionLevel(): int
     {
         $module = \go\core\App::get()->getModule('community', 'marketplaceserver');
         if (!$module) {
@@ -210,6 +210,25 @@ class Product extends Entity
             return Acl::LEVEL_MANAGE;
         }
         return go()->getUserId() !== null ? Acl::LEVEL_READ : 0;
+    }
+
+    /**
+     * Mirrors the level above: every authenticated user may list the catalog
+     * (that is the point of this entity), nobody else may. Spelled out rather
+     * than left to the no-op base, because overriding the permission level
+     * without the matching query rule is how a list silently leaks — see
+     * Release/InstanceLog, which are manager-only in both halves.
+     *
+     * @param \go\core\orm\Query $query
+     * @param int $level
+     * @param int|null $userId
+     * @param int[]|null $groups
+     * @return \go\core\orm\Query
+     */
+    public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
+    {
+        $uid = $userId ?? go()->getUserId();
+        return $uid === null ? $query->andWhere('1 = 0') : $query;
     }
 
     /**

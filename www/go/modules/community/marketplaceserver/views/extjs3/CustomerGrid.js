@@ -209,7 +209,9 @@ go.modules.community.marketplaceserver.CustomerGrid = Ext.extend(go.grid.GridPan
 					t("Are you sure you want to delete this item?"),
 					function (btn) {
 						if (btn !== "yes") return;
-						go.modules.community.marketplaceserver.storeSet("MarketplaceServerCustomer", {destroy: [record.id]});
+						go.Db.store("MarketplaceServerCustomer").destroy(record.id).catch(function (r) {
+							GO.errorDialog.show(r.message || r.description || t("Failed to delete"));
+						});
 					},
 					me
 				);
@@ -279,7 +281,11 @@ go.modules.community.marketplaceserver.CustomerGrid = Ext.extend(go.grid.GridPan
 				}
 				go.Notifier.flyout({
 					title: t("Customers", "marketplaceserver", "community"),
-					description: t("Verification e-mail sent.", "marketplaceserver", "community"),
+					// The server skips accounts that are not awaiting a first
+					// verification — don't report a mail it did not send.
+					description: (response && response.skipped)
+						? t("This account is not awaiting verification — no e-mail was sent.", "marketplaceserver", "community")
+						: t("Verification e-mail sent.", "marketplaceserver", "community"),
 					time: 5000
 				});
 			}

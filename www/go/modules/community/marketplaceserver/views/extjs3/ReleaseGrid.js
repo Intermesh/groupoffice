@@ -204,7 +204,9 @@ go.modules.community.marketplaceserver.ReleaseGrid = Ext.extend(go.grid.GridPane
 								t("Are you sure you want to delete this item?"),
 								function (btn) {
 									if (btn !== "yes") return;
-									go.modules.community.marketplaceserver.storeSet("MarketplaceServerRelease", {destroy: [rec.id]});
+									go.Db.store("MarketplaceServerRelease").destroy(rec.id).catch(function (r) {
+										GO.errorDialog.show(r.message || r.description || t("Failed to delete"));
+									});
 								},
 								me
 							);

@@ -135,7 +135,10 @@ CREATE TABLE `marketplaceserver_reg_attempt` (
   `email` varchar(190) DEFAULT NULL,
   `createdAt` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `ip` (`ip`),
+  -- The limiter counts hits per bucket within a sliding window, so both lookups
+  -- are (bucket, createdAt); the lone createdAt key stays for prune().
+  KEY `ip` (`ip`,`createdAt`),
+  KEY `email` (`email`,`createdAt`),
   KEY `createdAt` (`createdAt`)
 ) ENGINE=InnoDB;
 

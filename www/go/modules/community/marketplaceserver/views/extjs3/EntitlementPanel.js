@@ -33,6 +33,17 @@ go.modules.community.marketplaceserver.EntitlementPanel = Ext.extend(Ext.Panel, 
 				me.entitlementGrid.setCustomer(rec.id, me.customerLabel(rec));
 			}
 		}, me);
+
+		// The left list reloads on search and on entity changes, which drops the
+		// selection without telling the centre grid. Without this the scope
+		// survives the row it came from: Add stays enabled for a customer that is
+		// no longer listed, and grants land on them.
+		me.customerGrid.store.on('datachanged', function (store) {
+			var id = me.entitlementGrid.customerId;
+			if (id && !store.getById(id)) {
+				me.entitlementGrid.clearCustomer();
+			}
+		}, me);
 	},
 
 	/**

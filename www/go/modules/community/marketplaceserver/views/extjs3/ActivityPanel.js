@@ -83,6 +83,7 @@ go.modules.community.marketplaceserver.ActivityPanel = Ext.extend(Ext.Panel, {
                         {activityType: 'download', boxLabel: me.grid.typeLabel('download')},
                         {activityType: 'purchase', boxLabel: me.grid.typeLabel('purchase')},
                         {activityType: 'refund', boxLabel: me.grid.typeLabel('refund')},
+                        {activityType: 'chargeback', boxLabel: me.grid.typeLabel('chargeback')},
                         {activityType: 'subscription_canceled', boxLabel: me.grid.typeLabel('subscription_canceled')},
                         {activityType: 'register', boxLabel: me.grid.typeLabel('register')},
                         {activityType: 'verify', boxLabel: me.grid.typeLabel('verify')},

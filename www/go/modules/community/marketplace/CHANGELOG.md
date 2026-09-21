@@ -1,6 +1,13 @@
 # Changelog
 
 
+## 2026-09-21
+- A downloaded ZIP with an unreadable entry name is rejected instead of passing that entry to the path validator as an empty string
+- `moduleRights` treats a missing auth state as "not an admin" rather than calling a method on it
+- PHPStan level 8 now passes clean (`phpstan.neon` added); the API client no longer promises response shapes it cannot guarantee — those come from a remote server and every caller already reads them defensively
+- Drop the empty `model/Settings.php` and its `getSettings()` override: the client keeps its configuration in `Repository` entities and in the panel's own saved state, and its settings panel has no settings-bound field at all — the class only made the module look configurable
+- Fix the `CLIENT_TOKEN` docblock pointing at `Settings::DEFAULT_CLIENT_TOKEN` as if it lived in this module; the constant it must stay in sync with belongs to marketplaceserver
+
 ## 2026-09-19
 - SECURITY: only admins add repositories, download modules or refresh licenses (module manage right now only reads catalog/account)
 - SECURITY: pin the server's package, name and signing key server-side on save; `publicKey`, `licenseJwt`, `keyMismatch`, `package` are no longer writable over JMAP
