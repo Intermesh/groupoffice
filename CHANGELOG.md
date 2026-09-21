@@ -1,3 +1,4 @@
+21-09-2026: 26.0.48
 - Core: Fixed link loading in link browser
 - Newsletters: fix template upload
 - LDAP Auth: prevent error message when certain mappings are not set
