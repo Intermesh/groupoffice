@@ -948,8 +948,12 @@ class Module extends core\Module
      * POST /register — public self-registration. Gated by a static
      * `X-Marketplace-Client` header (shipped in the client build) + a per-IP /
      * per-e-mail rate limit. Creates a LOCKED account (disabled until verified,
-     * in the zero-access customer group), issues a verification e-mail, and
-     * returns an API token so the client can start immediately.
+     * in the zero-access customer group) and issues a verification e-mail.
+     *
+     * It deliberately returns NO API token: the duplicate-registration path
+     * cannot return one without revealing that the account already exists, so
+     * neither path does. The customer verifies the e-mail and then signs in —
+     * /login is what issues the token.
      *
      * @return void
      * @throws \Exception

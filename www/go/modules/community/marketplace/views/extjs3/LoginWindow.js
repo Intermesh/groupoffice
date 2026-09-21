@@ -114,7 +114,7 @@ go.modules.community.marketplace.LoginWindow = Ext.extend(go.Window, {
             email = me.formPanel.getForm().findField('email').getValue();
 
         if (!email) {
-            GO.errorDialog.show(t("E-mail", "marketplace", "community"));
+            GO.errorDialog.show(t("Enter your e-mail address first.", "marketplace", "community"));
             return;
         }
 

@@ -141,8 +141,11 @@ class Repository extends EntityController
             ($params['companyName'] ?? '') !== '' ? (string) $params['companyName'] : null
         );
 
+        // No token: /register never issues one (returning it on the "new
+        // account" path but not on the duplicate path would tell a caller which
+        // it hit). The customer verifies the e-mail and signs in; login() below
+        // is what returns a token. RegisterWindow.js says exactly that to them.
         return new \ArrayObject([
-            'token' => $result['token'] ?? null,
             'verifyRequired' => !empty($result['verifyRequired']),
         ]);
     }
@@ -373,8 +376,12 @@ class Repository extends EntityController
 
         // One download per module at a time: two concurrent runs would race on
         // the backup/rename swap of the same directory.
-        $lock = @fopen($packageDir . '/.marketplace_' . $module . '.lock', 'c');
+        $lockPath = $packageDir . '/.marketplace_' . $module . '.lock';
+        $lock = @fopen($lockPath, 'c');
         if ($lock === false || !flock($lock, LOCK_EX | LOCK_NB)) {
+            if ($lock !== false) {
+                fclose($lock);          // the throw is before the try/finally below
+            }
             throw new \Exception(go()->t("This module is already being downloaded. Try again in a moment.", 'community', 'marketplace'));
         }
 
@@ -460,6 +467,12 @@ class Repository extends EntityController
                     throw new \Exception('Could not back up existing module');
                 }
             }
+            if (!is_dir($extractDir . '/' . $module)) {
+                // validateEntries() lets through an archive whose only entry is a
+                // FILE named exactly {module}; renaming that over the module dir
+                // would leave a file where GO expects a package folder.
+                throw new \Exception('The package does not contain a "' . $module . '" folder');
+            }
             if (!rename($extractDir . '/' . $module, $moduleDir)) {
                 // final swap failed. Try to restore the backup; if THAT also
                 // fails the module dir is now missing — surface a distinct,
@@ -488,6 +501,10 @@ class Repository extends EntityController
             }
             flock($lock, LOCK_UN);
             fclose($lock);
+            // Unlink last: another worker holding the lock keeps ITS open handle,
+            // so removing the name never breaks a concurrent download — it only
+            // stops one dotfile per module accumulating in the package dir.
+            @unlink($lockPath);
         }
     }
 
@@ -571,7 +588,12 @@ class Repository extends EntityController
         $info = $client->info();
         if (($info['publicKey'] ?? '') !== $repo->pinnedPublicKey()) {
             $repo->flagKeyMismatch();
-            $repo->save();
+            if (!$repo->save()) {
+                // The flag is what makes the UI offer "re-save the token"; losing
+                // it would leave the repository looking healthy after this error.
+                \go\core\ErrorHandler::log('Marketplace: could not flag the key mismatch on repository '
+                    . $repo->id . ': ' . $repo->getValidationErrorsAsString());
+            }
             throw new \Exception("This marketplace server's security key changed (for example the server was reinstalled). To reconnect, open this repository and save its API token again.");
         }
 

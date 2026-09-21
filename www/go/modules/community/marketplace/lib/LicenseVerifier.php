@@ -105,10 +105,24 @@ class LicenseVerifier
         return is_int($exp) && $exp >= $this->now;
     }
 
+    /**
+     * A grant is live while it has no expiry, or an INTEGER one that has not
+     * passed. The int check matters: PHP 8 compares a non-numeric string against
+     * an int as strings, so a malformed `expiresAt` would read as "greater than
+     * now" and license the module forever. Only a holder of the server's private
+     * key could produce one, so this is defence in depth — but it is the same
+     * rule tokenUnexpired() already applies to the token's own `exp`.
+     *
+     * @param object $entry
+     * @return bool
+     */
     private function unexpired(object $entry): bool
     {
         $exp = $entry->expiresAt ?? null;
-        return $exp === null || $exp >= $this->now;
+        if ($exp === null) {
+            return true;
+        }
+        return is_int($exp) && $exp >= $this->now;
     }
 
     /**

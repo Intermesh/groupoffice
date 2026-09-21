@@ -135,8 +135,13 @@ go.modules.community.marketplace.SystemSettingsPanel = Ext.extend(go.systemsetti
             enableOverflow: true,
             items: [
                 {
+                    // Adding a repository and bulk-downloading both install code
+                    // from a remote server; the controller gates them on isAdmin.
+                    // Hide rather than disable — a module manager can still read
+                    // every catalogue, which is the point of their access.
                     text: t("Add repository", "marketplace", "community"),
                     iconCls: 'ic-add',
+                    hidden: !go.User.isAdmin,
                     handler: me.onAddRepository,
                     scope: me
                 },
@@ -157,6 +162,7 @@ go.modules.community.marketplace.SystemSettingsPanel = Ext.extend(go.systemsetti
                 me.ownedToggle,
                 {
                     iconCls: 'ic-get-app',
+                    hidden: !go.User.isAdmin,
                     text: t("Update all", "marketplace", "community"),
                     tooltip: t("Download every available update across all repositories.", "marketplace", "community"),
                     handler: me.onUpdateAll,

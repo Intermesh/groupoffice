@@ -48,4 +48,25 @@ final class PackageValidatorTest extends TestCase
         $this->assertNotNull(PackageValidator::validateEntries(['x/'], '../x'));
         $this->assertNotNull(PackageValidator::validateEntries(['x/'], 'a/b'));
     }
+
+    /**
+     * The entry-prefix test is case-sensitive, so tolerating an uppercase module
+     * name here would only half-accept a package built for a different folder.
+     * The server and the download controller both require lowercase.
+     */
+    public function testModuleNameMustBeLowercase(): void
+    {
+        $this->assertNotNull(PackageValidator::validateEntries(['Chat/', 'Chat/Module.php'], 'Chat'));
+    }
+
+    /**
+     * A bare entry named exactly like the module is a FILE, not the expected
+     * folder. The validator lets it through on purpose (a directory entry may be
+     * absent from the archive listing), so download() re-checks with is_dir()
+     * before the swap — this test pins the validator half of that contract.
+     */
+    public function testBareModuleEntryIsAcceptedAndMustBeReCheckedOnDisk(): void
+    {
+        $this->assertNull(PackageValidator::validateEntries(['chat'], 'chat'));
+    }
 }

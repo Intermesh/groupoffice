@@ -2,6 +2,16 @@
 
 
 ## 2026-09-21
+- SECURITY: repository rows are manager-gated in queries too — the permission override had no matching `applyAclToQuery`, so `query` handed every repository's id, name and URL to a user who only had the module (the token, signing key and license never leaked: they have no getter)
+- The settings panel hides what the server would refuse: a non-admin with the module's manage right saw Add repository, Update all, Edit, Delete, Refresh licenses and Download, and got a 403 from every one of them. It already fetched `permissionLevel` and never used it
+- A package whose only entry is a file named like the module is rejected instead of being renamed over the module directory
+- A license entry with a non-integer `expiresAt` no longer reads as "still valid" (PHP compares a non-numeric string with an int as strings, so it would have licensed the module forever)
+- An IPv6 host keeps its address but loses its port when normalised, so the web refresh, the cron and the runtime gate agree on one hostname
+- The package validator requires a lowercase module name, like the server and the download controller already did
+- `/register` returns no API token, and neither module's code claims otherwise any more — issuing one only for a new account would reveal that the account did not exist yet
+- Three error dialogs said just "Repository URL" or "E-mail"; they now say what to do
+- Added the `mayManage` label, so the Permissions dialog no longer shows the raw right name
+- New `tests/e2e/`: two disposable instances that run the whole vendor/customer exchange over real HTTP — registration, verification, bearer auth, catalogue, package signature, install, license refresh, revocation and signing-key rotation. Its helper scripts refuse to run over HTTP: they ship inside the module, and Group-Office serves its own tree without an .htaccess
 - A downloaded ZIP with an unreadable entry name is rejected instead of passing that entry to the path validator as an empty string
 - `moduleRights` treats a missing auth state as "not an admin" rather than calling a method on it
 - PHPStan level 8 now passes clean (`phpstan.neon` added); the API client no longer promises response shapes it cannot guarantee — those come from a remote server and every caller already reads them defensively

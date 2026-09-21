@@ -72,6 +72,7 @@ go.modules.community.marketplace.RepositorySection = Ext.extend(Ext.Panel, {
                 {
                     text: t("Edit"),
                     iconCls: 'ic-edit',
+                    hidden: !me.canManage(),
                     handler: function () { me.onEdit(); }
                 },
                 '->'
@@ -85,6 +86,7 @@ go.modules.community.marketplace.RepositorySection = Ext.extend(Ext.Panel, {
             viewMode: me.viewMode || 'table',
             ownedOnly: !!me.ownedOnly,
             typeFilter: me.typeFilter || 'all',
+            canManage: me.canManage(),
             onReload: function () { me.loadCatalog(); }
         });
 
@@ -283,6 +285,20 @@ go.modules.community.marketplace.RepositorySection = Ext.extend(Ext.Panel, {
     },
 
     /**
+     * Whether this user may CHANGE this repository, as opposed to reading its
+     * catalogue. Mirrors the server: Repository::internalGetPermissionLevel()
+     * gives MANAGE to admins only, READ to a holder of the module's manage
+     * right — and download/refresh/set/destroy all demand MANAGE. Without this
+     * a module manager saw Edit, Delete and Refresh licenses and got a 403 from
+     * every one of them.
+     *
+     * @return {Boolean}
+     */
+    canManage: function () {
+        return !!(this.repo && this.repo.permissionLevel >= go.permissionLevels.manage);
+    },
+
+    /**
      * Build (once) and show the per-repository gear menu at the click point.
      *
      * @param {Ext.EventObject} e
@@ -312,6 +328,7 @@ go.modules.community.marketplace.RepositorySection = Ext.extend(Ext.Panel, {
                         // licenses.
                         iconCls: 'ic-verified-user',
                         text: t("Refresh licenses", "marketplace", "community"),
+                        hidden: !me.canManage(),
                         handler: function () { me.onRefreshLicenses(); }
                     },
                     {
@@ -322,11 +339,13 @@ go.modules.community.marketplace.RepositorySection = Ext.extend(Ext.Panel, {
                     {
                         iconCls: 'ic-edit',
                         text: t("Edit"),
+                        hidden: !me.canManage(),
                         handler: function () { me.onEdit(); }
                     },
                     {
                         iconCls: 'ic-delete',
                         text: t("Delete"),
+                        hidden: !me.canManage(),
                         handler: function () { me.onDelete(); }
                     }
                 ]

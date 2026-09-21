@@ -5,6 +5,7 @@ namespace go\modules\community\marketplace\model;
 use go\core\jmap\Entity;
 use go\core\model\Acl;
 use go\core\orm\Mapping;
+use go\core\orm\Query;
 use go\core\util\Crypt;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
@@ -335,7 +336,7 @@ class Repository extends Entity
      * @return int
      * @throws \Exception
      */
-    public function getPermissionLevel(): int
+    protected function internalGetPermissionLevel(): int
     {
         if (go()->getAuthState() && go()->getAuthState()->isAdmin()) {
             return Acl::LEVEL_MANAGE;
@@ -345,6 +346,32 @@ class Repository extends Entity
             return 0;
         }
         return !empty($module->getUserRights()->mayManage) ? Acl::LEVEL_READ : 0;
+    }
+
+    /**
+     * The other half of the pair above. For a jmap\Entity the base
+     * applyAclToQuery() is a no-op, so without this `query` would hand a user
+     * who has the module but not its manage right every repository's id, name
+     * and URL — the level only gates get/set.
+     *
+     * @param \go\core\orm\Query $query
+     * @param int $level
+     * @param int|null $userId
+     * @param int[]|null $groups
+     * @return \go\core\orm\Query
+     * @throws \Exception
+     */
+    public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int $userId = null, array $groups = null): Query
+    {
+        $state = go()->getAuthState();
+        if ($state && $state->isAdmin()) {
+            return $query;
+        }
+        $module = \go\core\App::get()->getModule('community', 'marketplace');
+        if ($module && !empty($module->getUserRights()->mayManage)) {
+            return $query;
+        }
+        return $query->andWhere('1 = 0');
     }
 
     /**

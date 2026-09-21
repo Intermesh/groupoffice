@@ -17,6 +17,7 @@
 - Enabling a customer account reports a failure to stamp `verifiedAt` instead of discarding the save result and letting the grid show a date the row never got
 - A license or package signature is refused with a 500 instead of being built from an empty key when the stored signing key cannot be decrypted — a changed installation crypt key used to yield a signature no client could verify
 - PHPStan level 8 now passes clean (`phpstan.neon` added): typed the JMAP controller `$params`, gave the catalog and seat loops their entity types, and dropped `?? ''` fallbacks that could never fire
+- The `/register` docblock no longer claims the endpoint returns an API token; it deliberately returns none, because issuing one only for a new account would reveal that the account did not exist yet
 - Release branches: adding a branch no longer swallows e.g. "6.8" when "16.8.1" exists (substring match)
 - Entitlements: picking a customer that later disappears from the reloaded list no longer leaves Add armed for them; activity grid drops a redundant unfiltered load and expands its Item column
 

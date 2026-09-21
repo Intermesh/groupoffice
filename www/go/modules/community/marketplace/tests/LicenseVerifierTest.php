@@ -146,6 +146,18 @@ final class LicenseVerifierTest extends TestCase
         $this->assertFalse((new LicenseVerifier($jwt, $pub, 'client.example.com', self::NOW + $ttl + 1))->has('sf', 'chat'));
     }
 
+    /**
+     * A non-integer expiresAt must not read as "still valid". PHP 8 compares a
+     * non-numeric string with an int as strings, so "never" >= 1800000000 is
+     * true — which would license the module forever.
+     */
+    public function testNonIntegerExpiresAtIsNotLicensed(): void
+    {
+        [$jwt, $pub] = $this->signed(['sf/chat' => ['expiresAt' => 'never']]);
+        $v = new LicenseVerifier($jwt, $pub, 'client.example.com', self::NOW);
+        $this->assertFalse($v->has('sf', 'chat'));
+    }
+
     public function testHostnameComparisonIgnoresCaseTrailingDotAndPort(): void
     {
         [$jwt, $pub] = $this->signed(['sf/chat' => ['expiresAt' => null]], 'Client.Example.com');

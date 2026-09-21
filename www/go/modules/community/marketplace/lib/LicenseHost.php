@@ -19,7 +19,11 @@ final class LicenseHost
     public static function normalize(string $host): string
     {
         $host = strtolower(trim($host));
-        if ($host !== '' && $host[0] !== '[') {
+        if ($host !== '' && $host[0] === '[') {
+            // Bracketed IPv6: the colons are part of the address, so only a port
+            // that follows the closing bracket may be cut.
+            $host = (string) preg_replace('/^(\[[0-9a-f:.]*\]):\d+$/', '$1', $host);
+        } elseif ($host !== '') {
             $host = (string) preg_replace('/:\d+$/', '', $host);
         }
         return rtrim($host, '.');

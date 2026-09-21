@@ -42,6 +42,12 @@ go.modules.community.marketplace.CatalogGrid = Ext.extend(Ext.Panel, {
     repositoryId: null,
     repositoryUrl: null,
     goVersion: null,
+
+    /**
+     * @cfg {Boolean} canManage set by RepositorySection from the repository's own
+     *      permissionLevel; false hides the actions the server would refuse.
+     */
+    canManage: false,
     // All GO branches the server publishes for (e.g. ["6.8","25","26"]) — drives
     // the availability chips. Set from the catalog response via setData().
     branches: null,
@@ -170,7 +176,11 @@ go.modules.community.marketplace.CatalogGrid = Ext.extend(Ext.Panel, {
             plugins: [actions],
             selModel: new Ext.grid.RowSelectionModel(),
             viewConfig: {
-                emptyText: '<i class="icon ic-store"></i><p>' + t("No records to display") + '</p>'
+                emptyText: '<i class="icon ic-store"></i><p>' + t("No records to display") + '</p>',
+                // Without this the text only appears after a load-driven refresh;
+                // this store is filled with setData(), so on a fast reply the
+                // refresh can beat the render and the grid stays blank-looking.
+                deferEmptyText: false
             },
             columns: [
                 {
@@ -352,6 +362,7 @@ go.modules.community.marketplace.CatalogGrid = Ext.extend(Ext.Panel, {
             tpl: tpl,
             itemSelector: 'div.mp-card',
             autoHeight: true,
+            deferEmptyText: false,      // see the table view's note
             // CSS grid: auto-fill columns of equal width, and — crucially — each
             // grid row stretches its cards to the same height (align-items:stretch
             // is the grid default), so cards line up in a tidy matrix instead of
@@ -479,6 +490,25 @@ go.modules.community.marketplace.CatalogGrid = Ext.extend(Ext.Panel, {
      * @return {Array} [{key, iconCls, text}]
      */
     moduleActionList: function (d) {
+        var acts = this.moduleActionListAll(d);
+        if (this.canManage) {
+            return acts;
+        }
+        // Downloading and installing write code into go/modules and are
+        // admin-only on the server (Repository::download requires MANAGE,
+        // Module/install is admin). Buying and reading a changelog are not.
+        return acts.filter(function (a) {
+            return a.key !== 'download' && a.key !== 'downloadCollection' && a.key !== 'install';
+        });
+    },
+
+    /**
+     * Every action the product's state allows, before the permission filter.
+     *
+     * @param {Object} d record data
+     * @return {Array}
+     */
+    moduleActionListAll: function (d) {
         var acts = [],
             installedInGo = !!(this.installed && this.installed[d.moduleName]),
             downloaded = d.state === 'update' || d.state === 'installed'; // files present locally

@@ -17,7 +17,12 @@ class PackageValidator
      */
     public static function validateEntries(array $entryNames, string $module): ?string
     {
-        if (!preg_match('/^[a-z0-9_]+$/i', $module)) {
+        // Lowercase only, exactly like the server's Product::internalValidate()
+        // and the download controller. Accepting uppercase here would only hide a
+        // mismatch: the entry-prefix test below is case-SENSITIVE, so a package
+        // built for "Chat" against a module called "chat" must be rejected, not
+        // half-accepted.
+        if (!preg_match('/^[a-z0-9_]+$/', $module)) {
             return 'Unsafe module name';
         }
         if (count($entryNames) === 0) {

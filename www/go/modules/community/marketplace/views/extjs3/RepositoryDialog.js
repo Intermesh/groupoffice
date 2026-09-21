@@ -100,7 +100,7 @@ go.modules.community.marketplace.RepositoryDialog = Ext.extend(go.form.Dialog, {
             url = me.formPanel.getForm().findField('url').getValue();
 
         if (!url) {
-            GO.errorDialog.show(t("Repository URL", "marketplace", "community"));
+            GO.errorDialog.show(t("Enter the repository URL first.", "marketplace", "community"));
             return;
         }
 
@@ -126,7 +126,7 @@ go.modules.community.marketplace.RepositoryDialog = Ext.extend(go.form.Dialog, {
             url = me.formPanel.getForm().findField('url').getValue();
 
         if (!url) {
-            GO.errorDialog.show(t("Repository URL", "marketplace", "community"));
+            GO.errorDialog.show(t("Enter the repository URL first.", "marketplace", "community"));
             return;
         }
 
