@@ -172,8 +172,9 @@ class EmailTemplate extends Entity
 	}
 
 	/**
-	 * @todo Template permissions should be connected to an entity just like a comment.
 	 * @return int
+	 * @throws Exception
+	 * @todo Template permissions should be connected to an entity just like a comment.
 	 */
 	protected function internalGetPermissionLevel(): int
 	{

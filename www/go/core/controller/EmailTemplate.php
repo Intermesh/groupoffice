@@ -31,6 +31,8 @@ class EmailTemplate extends EntityController {
 	 * @param array $params
 	 * @return false|model\EmailTemplate
 	 * @throws InvalidArguments
+	 * @throws Forbidden
+	 * @throws \Exception
 	 */
 	public function fromZip(array $params)
 	{
@@ -44,15 +46,15 @@ class EmailTemplate extends EntityController {
 		$package = $params['package'];
 
 		if (!empty($blob)) {
+			$module = model\Module::findByName($package, $modName);
 			$tpl = model\EmailTemplate::fromBlob($blob);
+			$tpl->moduleId = $module->id;
 			if(!$this->canCreate($tpl)) {
 				throw new Forbidden();
 			}
 			if (!empty($params['subject'])) {
 				$tpl->subject = $params['subject'];
 			}
-			$module = model\Module::findByName($package, $modName);
-			$tpl->moduleId = $module->id;
 			return $tpl;
 		}
 		return false;

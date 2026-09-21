@@ -1,4 +1,5 @@
 - Core: Fixed link loading in link browser
+- Newsletters: fix template upload
 
 14-09-2026: 26.0.47
 - pdfeditor: rename Upload to upload so class finder doesn't try to load it
