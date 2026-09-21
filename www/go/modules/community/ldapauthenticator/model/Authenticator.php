@@ -165,15 +165,15 @@ class Authenticator extends PrimaryAuthenticator
 
 		if ($server->hasEmailAccount()) {
 			try {
-				$emailPassword = $password;
+				$emailPassword = $password ?? "";
 
 				if (!empty($mappedValues['imapPassword'])) {
-					$emailPassword = $mappedValues['imapPassword'];
+					$emailPassword = $mappedValues['imapPassword'] ?? "";
 				}
 
 				$smtpPassword = null;
 				if (!empty($mappedValues['smtpPassword'])) {
-					$smtpPassword = $mappedValues['smtpPassword'];
+					$smtpPassword = $mappedValues['smtpPassword'] ?? "";
 				}
 
 				$this->setEmailAccount($domain, $ldapUsername, $emailPassword, $smtpPassword, $mappedValues['email'], $server, $user);
