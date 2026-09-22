@@ -5,6 +5,7 @@ namespace go\modules\community\otp;
 use go\core\ErrorHandler;
 use go\core\http\Request;
 use go\core\model\Token;
+use go\core\model\User;
 use go\core\auth\SecondaryAuthenticator;
 use go\core\db\Query;
 use go\core\util\DateTime;
@@ -12,6 +13,16 @@ use go\core\validate\ErrorCode;
 
 class OtpAuthenticator extends SecondaryAuthenticator
 {
+	/**
+	 * How many wrong codes we allow within LOCKOUT_SECONDS before locking out
+	 * further attempts for this user/IP combination.
+	 */
+	private const MAX_ATTEMPTS = 5;
+
+	/**
+	 * The lockout/counting window in seconds. Resets on a correct code.
+	 */
+	private const LOCKOUT_SECONDS = 300;
 
 	public function authenticate(Token $token, array $data): bool
 	{
@@ -24,6 +35,15 @@ class OtpAuthenticator extends SecondaryAuthenticator
 		/** @phpstan-ignore-next-line */
 		$otp = $token->getUser()->otp;
 		$user = $token->getUser();
+
+		$cacheKey = $this->getAttemptsCacheKey($user);
+		$attempts = (int)(go()->getCache()->get($cacheKey) ?? 0);
+
+		if ($attempts >= self::MAX_ATTEMPTS) {
+			$this->setValidationError('otp_code', ErrorCode::INVALID_INPUT);
+			ErrorHandler::log("Token authentication blocked (too many attempts) for user ". $user->username . " from IP: '" . Request::get()->getRemoteIpAddress() . "'");
+			return false;
+		}
 
 		if (!$otp) {
 			$this->setValidationError('otp_code', ErrorCode::NOT_FOUND);
@@ -41,12 +61,20 @@ class OtpAuthenticator extends SecondaryAuthenticator
 
 
 		if (!$otp->verifyCode($data['otp_code'])) {
+			go()->getCache()->set($cacheKey, $attempts + 1, true, self::LOCKOUT_SECONDS);
 			$this->setValidationError('otp_code', ErrorCode::INVALID_INPUT);
 			ErrorHandler::log("Token authentication failed for user ". $user->username . " from IP: '" . Request::get()->getRemoteIpAddress() . "'");
 			return false;
 		}
 
+		go()->getCache()->delete($cacheKey);
+
 		return true;
+	}
+
+	private function getAttemptsCacheKey(User $user): string
+	{
+		return 'otp-attempts-' . $user->id . '-' . Request::get()->getRemoteIpAddress();
 	}
 
 	/**
