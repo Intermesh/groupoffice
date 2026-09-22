@@ -1,3 +1,5 @@
+- Catalog: Allow users with manage permissions on the catalog module to alter the catalog.
+
 21-09-2026: 26.0.48
 - Core: Fixed link loading in link browser
 - Newsletters: fix template upload
