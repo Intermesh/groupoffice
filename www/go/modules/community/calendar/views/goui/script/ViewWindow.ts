@@ -1,11 +1,12 @@
-import {client, FormWindow, jmapds, SelectOption} from "@intermesh/groupoffice-core";
+import {client, FormWindow, jmapds} from "@intermesh/groupoffice-core";
 import {
 	btn,
 	CheckboxField, checkboxselectcolumn, column,
 	comp, datasourcestore,
 	List, menu,
 	select, table,
-	textfield
+	textfield,
+	SelectOption
 } from "@intermesh/goui";
 import {t} from "./Index.js";
 
