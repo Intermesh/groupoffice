@@ -25,7 +25,8 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		this.downloadUrl = session.downloadUrl;
 		this.uploadUrl = session.uploadUrl;
 		this.pageUrl = session.pageUrl;
-		this.eventSourceUrl = session.eventSourceUrl;		
+		this.eventSourceUrl = session.eventSourceUrl;
+		this.eventSourceSubscribe = session.eventSourceSubscribe === true;
 		this.loaded = true;
 		this.apiVersion = session.version + "-" + session.cacheClearedAt;
 

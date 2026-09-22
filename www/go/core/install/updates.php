@@ -1684,3 +1684,8 @@ $updates['202503201426'][] = "drop index core_change_user_modSeq_userId_entityTy
 
 $updates['202503201426'][] = "create index core_change_user_modSeq_userId_entityTypeId_entityId_index
     on core_change_user (modSeq, userId, entityTypeId);";
+
+// The SSE client used to pass every entity name in the sse.php query string, which grew with
+// every registered entity until it hit the web server's request line limit. It now registers
+// them once with a POST and they are stored here for the lifetime of the session.
+$updates['202609221200'][] = "ALTER TABLE core_auth_token ADD sseTypes TEXT NULL";

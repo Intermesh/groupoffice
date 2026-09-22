@@ -1,3 +1,4 @@
+- Core: SSE clients register their entity types with a POST to sse.php instead of passing every name in the query string, which grew past the web server's request line limit on installs with many entities
 - Core: unset token if CSRF check fails (cherry pick from 26.0)
 
 24-08-2026: 6.8.178

@@ -243,6 +243,8 @@ class State extends AbstractState {
 			'pageUrl' => $this->getPageUrl(),
 			'uploadUrl' => $this->getUploadUrl(),
 			'eventSourceUrl' => $this->getEventSourceUrl(),
+			//tells the client it can register its entity types with a POST to the event source
+			'eventSourceSubscribe' => true,
 			'userId' => $this->getUserId(),
 		];
 		$this->addModuleCapabilities($response);
