@@ -1185,6 +1185,8 @@ abstract class Property extends Model {
 			return $forIsModified ? false : [];
 		}
 
+		$modified = [];
+
 		if(!is_array($properties)) {
 			$properties = [$properties];
 		}
@@ -1192,27 +1194,43 @@ abstract class Property extends Model {
 		if(empty($properties)) {
 			$properties = array_keys($this->oldProps);
 
-			if(method_exists($this, 'getCustomFields') && $this->getCustomFields()->isModified()) {
-				if ($forIsModified) {
-					return true;
-				}
-				$modified['customFields'] = $this->getCustomFields()->getModified();
+			if(method_exists($this, 'getCustomFields')) {
+				$properties[] = 'customFields';
 			}
 		}
 
-		$modified = [];
-
 		foreach($properties as $key) {
 
-			$oldValue = $this->oldProps[$key] ?? null;
-			$newValue = $this->{$key} ?? null;
+			if($key == 'customFields') {
+				/** @var CustomFieldsModel $cf */
+				$cf = $this->getCustomFields();
 
-			$propModified = $this->internalIsModified($newValue, $oldValue, static::isScalarRelation($key));
-			if ($propModified) {
-				if ($forIsModified) {
-						return true;
+				if ($forIsModified && $cf->isModified()) {
+					return true;
 				}
-				$modified[$key] = [$newValue, $oldValue];
+
+				$cfModfications = $cf->getModified();
+
+				$current = [];
+				$old = [];
+
+				foreach($cfModfications as $key => $cfModfication) {
+					$current[$key] = $cfModfication[0];
+					$old[$key] = $cfModfication[1];
+				}
+				$modified['customFields'] = [$current, $old];
+
+			} else {
+				$oldValue = $this->oldProps[$key] ?? null;
+				$newValue = $this->{$key} ?? null;
+
+				$propModified = $this->internalIsModified($newValue, $oldValue, static::isScalarRelation($key));
+				if ($propModified) {
+					if ($forIsModified) {
+						return true;
+					}
+					$modified[$key] = [$newValue, $oldValue];
+				}
 			}
 		}
 

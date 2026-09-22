@@ -160,11 +160,6 @@ class Module extends core\Module
 		if($action !== 'delete') {
 			$changes = $entity->historyLog();
 
-			$cfChanges = self::getCustomFieldChanges($entity);
-			if(!empty($cfChanges)) {
-				$changes['customFields'] = $cfChanges;
-			}
-
 			if($action == 'create') {
 				$changes = self::mapForCreate($changes);
 			}
