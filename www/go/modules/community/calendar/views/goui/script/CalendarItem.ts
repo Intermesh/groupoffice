@@ -176,7 +176,7 @@ export class CalendarItem {
 		if(obj.key && obj.key[0] === 'L') {
 			this.extraIcons.push('logout');
 			this.readOnly = true; //no dragging
-			this.open = async (_c)=>{};
+			this.open = async (_c, forceWrite=false)=>undefined;
 		}
 		this.divs = {};
 	}
