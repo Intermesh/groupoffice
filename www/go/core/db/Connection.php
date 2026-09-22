@@ -397,10 +397,10 @@ class Connection {
 		$sql = "LOCK TABLES ";
 
 		foreach ($locks as $tableName => $lockInfo) {
-			$sql .= $tableName . " ";
+			$sql .= Utils::quoteTableName($tableName) . " ";
 
 			if (isset($lockInfo[1])) {
-				$sql .= ' AS ' . $lockInfo[1] . ' ';
+				$sql .= ' AS ' . Utils::quoteTableName($lockInfo[1]) . ' ';
 			}
 			$sql .= empty($lockInfo[0]) ? 'READ' : 'WRITE';
 
