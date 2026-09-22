@@ -67,6 +67,13 @@ class Debugger {
 	 */
 	public $logPath;
 
+
+	/**
+	 * When enabled the ellapsed time since the start of the process will be logged too
+	 * @var bool
+	 */
+	public bool $logTimers = false;
+
 	private $logFp;
 	/**
 	 * The debug entries as strings
@@ -274,6 +281,10 @@ class Debugger {
 			$line .= '[' . $cls .':'. $lineNo.']';
 		}
 
+		if($this->logTimers) {
+			$line .= '['.$this->getTimeStamp().'ms]';
+		}
+
 		$line .=  ' ';
 
 		if(strstr($print, "\n")) {
@@ -287,7 +298,7 @@ class Debugger {
 		}
 
 		 if($this->output) {
-		 	echo getmypid() . " " .$line;
+			 echo $line;
 		 }
 
 		if(is_resource($this->logFp)) {
@@ -307,6 +318,41 @@ class Debugger {
 		$this->debug((int) ($this->getTimeStamp()) . "ms ". $message);
 	}
 
+	private array $timers = [];
+
+
+	/**
+	 * Start timer to measure duration of an operation
+	 *
+	 * @param string $name
+	 * @return void
+	 */
+	public function timerStart(string $name) : void {
+		if(!$this->enabled) {
+			return;
+		}
+
+		$this->timers[$name] = microtime(true);
+	}
+
+	/**
+	 * End and print timer duration for an operation
+	 * First call timerStart()
+	 *
+	 * This function also calls timerStart so you can run it multiple times for more measurements
+	 *
+	 * @param string $name
+	 * @return void
+	 */
+	public function timerEnd(string $name) : void {
+		if(!$this->enabled) {
+			return;
+		}
+
+		$this->debug("TIMER: '". $name ."' took " . (microtime(true) * 1000) - ($this->timers[$name] * 1000) . " ms");
+		$this->timerStart($name);
+	}
+
 	/**
 	 * Get the elapsed time since the start of the request in milliseconds
 	 * 
@@ -316,8 +362,15 @@ class Debugger {
 		if(!$this->enabled) {
 			return 0;
 		}
-		return ($this->getMicroTime() * 1000) - ($_SERVER["REQUEST_TIME_FLOAT"] * 1000);
+		return number_format(($this->getMicroTime() * 1000) - ($this->timeStampTimer ?? $_SERVER["REQUEST_TIME_FLOAT"]) * 1000, 2, ".", "");
 	}
+
+	public function startTimeStampTimer(): void
+	{
+		$this->timeStampTimer = $this->getMicroTime();
+	}
+
+	private float|null $timeStampTimer = null;
 
 	public function debugCalledFrom($limit = 10) {
 		if(!$this->enabled) {

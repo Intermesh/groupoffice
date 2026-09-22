@@ -72,6 +72,67 @@ class Sync extends Controller
 	}
 
 
+	public function testUsers(array $params) {
+		extract($this->checkParams($params, ['id', 'dryRun' => false, 'delete' => false, 'maxDeletePercentage' => 5]));
+		//objectClass	inetOrgPerson)
+		$server = Server::findById($id);
+		if (!$server) {
+			throw new NotFound("No LDAP config found with id = " . $id);
+		}
+
+		$this->serverId = $id;
+
+		go()->getDebugger()->logTimers = true;
+		go()->getDbConnection()->debug = true;
+
+		$connection = $server->connect();
+
+		if (!empty($xserver->username)) {
+			if (!$connection->bind($server->username, $server->getPassword())) {
+				throw new Exception("Invalid password given for '" . $server->username . "'");
+			} else {
+				go()->debug("Authenticated with user '" . $server->username . '"');
+			}
+		}
+
+		$usersInLDAP = [];
+
+		$this->domains = array_map(function ($d) {
+			return $d->name;
+		}, $server->domains);
+
+		$records = Record::find($connection, $server->peopleDN, $server->syncUsersQuery);
+
+		$i = 0;
+		foreach ($records as $record) {
+			$i++;
+
+			go()->debug(" ---   User start   --- ");
+			go()->getDebugger()->startTimeStampTimer();
+			$user = $this->ldapRecordToUser($record, $server, $dryRun);
+			if ($user) {
+				$usersInLDAP[] = $user->id;
+			}
+
+			//push changes after each user
+			EntityType::push();
+
+
+			go()->debug(" ---   User end   --- ");
+
+			if($i == 10) {
+				exit();
+			}
+		}
+
+		if ($delete) {
+			$this->deleteUsers($usersInLDAP, $maxDeletePercentage, $dryRun);
+		}
+
+		$this->output("Done\n\n");
+	}
+
+
 	/**
 	 * docker compose exec --user www-data groupoffice php /usr/local/share/src/www/cli.php community/ldapauthenticator/Sync/users --id=1 --dryRun=1 --delete=1 --maxDeletePercentage=50
 	 *

@@ -257,5 +257,5 @@ return array (
   'Write / Delete' => 'Schreiben / Löschen',
   'Display as' => 'Anzeigen als',
   'Change organizer' => 'Organisator ändern',
-  'Show multiline event blocks' => 'Show multiline event blocks',
+  'Show multiline event blocks' => 'Mehrzeilige Terminblöcke anzeigen',
 );
