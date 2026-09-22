@@ -3,6 +3,7 @@
 - Core: Escape table name and alias in Connection::lock()
 - Core: more robust path traversal check
 - Otp: rate limiting on otp authentication
+- Core: Fixed: getModified() discards the customFields entry it just built #1574
 
 21-09-2026: 26.0.48
 - Core: Fixed link loading in link browser
