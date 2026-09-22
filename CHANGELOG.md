@@ -1,6 +1,7 @@
 - Catalog: Allow users with manage permissions on the catalog module to alter the catalog.
 - Core: escape background progress param names
 - Core: Escape table name and alias in Connection::lock()
+- Core: more robust path traversal check
 
 21-09-2026: 26.0.48
 - Core: Fixed link loading in link browser
