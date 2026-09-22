@@ -249,8 +249,8 @@ abstract class FileSystemObject {
 	 * @return boolean
 	 */
 	private function checkPathInput(string $path) : bool {
-		$path = '/' . str_replace('\\', '/', $path);
-		return strpos($path, '/../') === false;
+		$path = str_replace('\\', '/', $path);
+		return !in_array('..', explode('/', $path), true);
 	}
 
 
