@@ -309,6 +309,7 @@ create table core_auth_token
     expiresAt            datetime                       null,
     passedAuthenticators varchar(190)                   null,
     clientId             int unsigned                   not null,
+    sseTypes             text                           null,
     constraint core_auth_token_pk
         unique (accessToken),
     constraint fk_core_auth_token_core_client1

@@ -52,6 +52,15 @@ class Token extends Entity {
 	public $userId;
 
 	/**
+	 * The entity names this session subscribed to for server sent events.
+	 *
+	 * Registered with a POST to sse.php. See {@see \go\core\model\PushDispatcher}.
+	 *
+	 * @var ?string JSON encoded array of entity names
+	 */
+	public $sseTypes;
+
+	/**
 	 * Time this token expires. Defaults to one day after the token was created {@see LIFETIME}
 	 * @var ?DateTime
 	 */							

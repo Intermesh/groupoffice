@@ -271,52 +271,93 @@ go.Jmap = {
 				return e.package != "legacy"  && e.name != "Search" && e.name != "User";
 			});
 			
-			var url = go.User.eventSourceUrl + '?types=' + 
-							entities.column("name").join(',');
-			
-			this.eventSource = new EventSource(url), me = this;
+			var me = this, names = entities.column("name");
 
-			this.eventSource.addEventListener('msg', function(e) {
-				go.Notifier.flyout({title:"New message",description: event.data, time: 5000});
+			if(!go.User.eventSourceSubscribe) {
+				//server predates the POST registration, pass the entity names in the query string
+				this.openEventSource(go.User.eventSourceUrl + '?types=' + names.join(','));
+				return;
+			}
+
+			this.registerSse(names, function() {
+				me.openEventSource(go.User.eventSourceUrl);
 			});
-
-			this.eventSource.addEventListener('exception', function(e) {
-				console.error(e);
-			});
-
-			this.eventSource.addEventListener('state', function(e) {
-
-				var data = JSON.parse(e.data);
-
-				for(var entity in data) {
-					var store = go.Db.store(entity);
-					if(store) {
-						(function(store) {
-							store.getState().then(function(state) {
-								// console.warn(store.entity.name, state);
-								if(!state || state == data[store.entity.name]) {
-									//don't fetch updates if there's no state yet because it never was used in that case.
-									return;
-								}
-								
-								store.getUpdates().catch((e) => {
-									console.warn(e);
-									//ignore changes error, sync will reset on error
-								});
-							});
-						})(store);
-					}
-				}
-			}, false);
-
-
-
 		}
 		catch(e) {
 			console.error("Failed to start Server Sent Events. Perhaps the API URL in the system settings is invalid?", e);
 		}
 	},
 
+
+	/**
+	 * Register the entity types this client wants push notifications for.
+	 *
+	 * Passing them in the query string made the event source URL grow with every registered
+	 * entity until it hit the web server's request line limit. The server keeps the list on the
+	 * auth token, so reconnects need no registration of their own.
+	 *
+	 * Ext.Ajax.defaultHeaders carries the X-CSRF-Token, see go/core/views/extjs3/User.js
+	 *
+	 * @param {string[]} names
+	 * @param {function} cb Called once the server stored the subscription.
+	 * @returns {undefined}
+	 */
+	registerSse: function(names, cb) {
+		Ext.Ajax.request({
+			url: go.User.eventSourceUrl,
+			method: "POST",
+			jsonData: names,
+			success: cb,
+			failure: function(response) {
+				console.error("Failed to register for Server Sent Events, falling back to polling", response);
+				go.Jmap.poll();
+			}
+		});
+	},
+
+	/**
+	 * Open the event source and attach the handlers.
+	 *
+	 * @param {string} url
+	 * @returns {undefined}
+	 */
+	openEventSource: function(url) {
+
+		this.eventSource = new EventSource(url);
+
+		this.eventSource.addEventListener('msg', function(e) {
+			go.Notifier.flyout({title:"New message",description: event.data, time: 5000});
+		});
+
+		this.eventSource.addEventListener('exception', function(e) {
+			console.error(e);
+		});
+
+		this.eventSource.addEventListener('state', function(e) {
+
+			var data = JSON.parse(e.data);
+
+			for(var entity in data) {
+				var store = go.Db.store(entity);
+				if(store) {
+					(function(store) {
+						store.getState().then(function(state) {
+							// console.warn(store.entity.name, state);
+							if(!state || state == data[store.entity.name]) {
+								//don't fetch updates if there's no state yet because it never was used in that case.
+								return;
+							}
+							
+							store.getUpdates().catch((e) => {
+								console.warn(e);
+								//ignore changes error, sync will reset on error
+							});
+						});
+					})(store);
+				}
+			}
+		}, false);
+	},
 
 	registerSSEEvents: function() {
 

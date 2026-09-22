@@ -47,14 +47,6 @@ class PushDispatcher
 
 		$query = new Query();
 
-		// Search and user get lots of updates. We only update them when needed,
-		// On large systems getting the user updates caused very high load becuase it constantly changes.
-		// this lead to lots of User/changes calls per second while we almost never need the user entity to be up to date.
-		// only your own user when checking your account settings.
-		$types = array_filter($types, function($name) {
-			return $name != "User" && $name != "Search";
-		});
-
 		if(!empty($types)) {
 			$query->where('e.clientName', 'IN', $types);
 		}
@@ -65,6 +57,58 @@ class PushDispatcher
 				$this->map[$e->getName()] = $e;
 			}
 		}
+
+		// Search and user get lots of updates. We only update them when needed,
+		// On large systems getting the user updates caused very high load becuase it constantly changes.
+		// this lead to lots of User/changes calls per second while we almost never need the user entity to be up to date.
+		// only your own user when checking your account settings.
+		//
+		// This is applied to the map and not to $types because the client may also pass the list
+		// through the subscription below, and because filtering $types first made an empty result
+		// fall through to watching every entity type on the system.
+		unset($this->map['User'], $this->map['Search']);
+	}
+
+	/**
+	 * Store the entity types this client wants to be notified about.
+	 *
+	 * They are kept on the auth token so they last exactly as long as the session, survive the
+	 * cache rebuild that every module install triggers, and are shared between web servers.
+	 *
+	 * @param Token $token
+	 * @param string[] $types Entity names, eg. ["Note", "Contact"]
+	 * @return bool
+	 */
+	public static function storeSubscription(Token $token, array $types): bool
+	{
+		$token->sseTypes = json_encode(array_values(array_filter($types, 'is_string')));
+
+		if(!$token->save()) {
+			return false;
+		}
+
+		// go\core\jmap\State::getToken() caches the token and nothing invalidates that entry,
+		// so without this the event source request would read a snapshot without the types.
+		go()->getCache()->set('token-' . $token->accessToken, $token);
+
+		return true;
+	}
+
+	/**
+	 * Read the entity types this client registered for.
+	 *
+	 * @param Token $token
+	 * @return string[]|null null when this client never registered
+	 */
+	public static function loadSubscription(Token $token): ?array
+	{
+		if(!isset($token->sseTypes)) {
+			return null;
+		}
+
+		$types = json_decode($token->sseTypes, true);
+
+		return is_array($types) ? $types : null;
 	}
 
 	/**
