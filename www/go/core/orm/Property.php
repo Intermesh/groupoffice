@@ -1211,14 +1211,16 @@ abstract class Property extends Model {
 
 				$cfModfications = $cf->getModified();
 
-				$current = [];
-				$old = [];
+				if(!empty($cfModfications)) {
+					$current = [];
+					$old = [];
 
-				foreach($cfModfications as $key => $cfModfication) {
-					$current[$key] = $cfModfication[0];
-					$old[$key] = $cfModfication[1];
+					foreach ($cfModfications as $key => $cfModfication) {
+						$current[$key] = $cfModfication[0];
+						$old[$key] = $cfModfication[1];
+					}
+					$modified['customFields'] = [$current, $old];
 				}
-				$modified['customFields'] = [$current, $old];
 
 			} else {
 				$oldValue = $this->oldProps[$key] ?? null;
