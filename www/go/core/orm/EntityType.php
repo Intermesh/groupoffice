@@ -25,6 +25,7 @@ use GO\Files\Model\Folder;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
+use Throwable;
 
 /**
  * The EntityType class
@@ -555,10 +556,56 @@ class EntityType implements ArrayableInterface {
 
 	private static array $changes = [];
 
+	private static ?array $changesSnapshot = null;
+
 
 	public function undoChanges() : void {
 		$id = $this->getId();
 		self::$changes[$id] = [];
+	}
+
+	/**
+	 * Remembers the currently queued changes so they can be restored with
+	 * {@see rollbackChanges()} if the database transaction that is about to
+	 * start gets rolled back.
+	 *
+	 * Only one snapshot is kept because {@see \go\core\db\Connection} only
+	 * takes it when a top level (non-nested) transaction starts. Nested
+	 * transactions don't have real savepoints so they can't roll back
+	 * independently anyway.
+	 *
+	 * @return void
+	 */
+	public static function snapshotChanges() : void {
+		self::$changesSnapshot = self::$changes;
+	}
+
+	/**
+	 * Discards changes queued since the last {@see snapshotChanges()} call.
+	 *
+	 * Called when a top level database transaction is rolled back. At that
+	 * point nothing that happened during that transaction is persisted, so
+	 * any queued JMAP change from it (including ones queued by nested
+	 * entities that appeared to "commit" at an inner transaction level) is
+	 * no longer valid and must not be written to core_change.
+	 *
+	 * @return void
+	 */
+	public static function rollbackChanges() : void {
+		if(self::$changesSnapshot !== null) {
+			self::$changes = self::$changesSnapshot;
+			self::$changesSnapshot = null;
+		}
+	}
+
+	/**
+	 * Discards the snapshot taken by {@see snapshotChanges()} without
+	 * restoring it. Called when a top level transaction commits successfully.
+	 *
+	 * @return void
+	 */
+	public static function discardChangesSnapshot() : void {
+		self::$changesSnapshot = null;
 	}
 
 
@@ -611,34 +658,45 @@ class EntityType implements ArrayableInterface {
 
 		$changedEntities = [];
 		$now = new DateTime();
-		$allChanges = [];
+
 		foreach(self::$changes as $entityTypeId => $changes) {
 			if(empty($changes)) {
 				continue;
 			}
-			$type = self::findById($entityTypeId);
 
-			$changedEntities[] =$type->getName();
+			// Insert per entity type, and keep everything for this type -
+			// including nextModSeq() - inside the try, so a bad row (eg. an
+			// aclId that no longer exists) for one entity type can't abort
+			// the loop and discard the sync log of unrelated entity types
+			// that are batched in the same push. This assumes a failed insert
+			// (eg. a FK violation) doesn't invalidate the whole transaction,
+			// which holds for InnoDB/MariaDB but not for a deadlock/lock
+			// timeout, which aborts the whole transaction server side.
+			try {
+				$type = self::findById($entityTypeId);
 
-			$modSeq = $type->nextModSeq();
+				$modSeq = $type->nextModSeq();
 
-			$allChanges = array_merge($allChanges, array_map(function($change) use($modSeq, $now, $entityTypeId) {
-				$change['createdAt'] = $now;
-				$change['modSeq'] = $modSeq;
-				$change['entityTypeId'] = $entityTypeId;
-				return $change;
-			}, $changes));
+				$typeChanges = array_values(array_map(function($change) use($modSeq, $now, $entityTypeId) {
+					$change['createdAt'] = $now;
+					$change['modSeq'] = $modSeq;
+					$change['entityTypeId'] = $entityTypeId;
+					return $change;
+				}, $changes));
+
+				go()->debug("Pushing " . count($typeChanges). " JMAP sync changes for " . $type->getName());
+
+				foreach(self::splitRecords($typeChanges) as $chunk) {
+					$stmt = go()->getDbConnection()->insert('core_change', $chunk);
+					$stmt->execute();
+				}
+				$changedEntities[] = $type->getName();
+			} catch(Throwable $e) {
+				ErrorHandler::logException($e);
+				go()->warn("Failed to push JMAP sync changes for entity type " . $entityTypeId . ": " . $e->getMessage());
+			}
 
 			//Notify SSE that there's a change
-		}
-
-		$allChanges = array_values($allChanges);
-
-		go()->debug("Pushing " . count($allChanges). " JMAP sync changes");
-
-		foreach(self::splitRecords($allChanges) as $chunk) {
-			$stmt = go()->getDbConnection()->insert('core_change', $chunk);
-			$stmt->execute();
 		}
 
 		self::$changes = [];
