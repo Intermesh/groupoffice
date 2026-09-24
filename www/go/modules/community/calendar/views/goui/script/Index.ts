@@ -1,6 +1,6 @@
 import {AclLevel, client, jmapds, main, modules, principalDS, userSettingsPanels} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
-import {datasourcestore, DateTime, E, router, t as coreT, translate, Window} from "@intermesh/goui";
+import {datasourcestore, DateTime, E, INotification, router, t as coreT, translate, Window} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {EventDetail, EventDetailWindow} from "./EventDetail.js";
 import {PreferencesPanel} from "./PreferencesPanel";
@@ -391,32 +391,31 @@ modules.register(  {
 
 			// TODO: Move to entity register?
 			main.notifier.regRenderer('CalendarEvent', (alert, closeFn) => {
-				const entity = alert.entityData,
-					msgs: {[key:string]: string} = {
-						request: t('New invitation from {from}'),
-						reply: t("Invitation updated by {from}"),
-						created: t("New event created by {creator}")
-					};
-				let text= msgs[alert.tag] || go.util.Format.shortDateTime(alert.recurrenceId || entity.start, true);
-				const actions: any = {};
-				if(alert.tag === 'created')
-					text = text.replace('{creator}', alert.data.creator);
-
-				if(alert.tag === 'reply' || alert.tag === 'request')
-					text = text.replace('{from}', alert.data.from?.personal ?? t("Unknown"));
-
-				if(alert.tag === 'request') {
-					const item = new CalendarItem({key: alert.entityId + "", data: entity});
-					actions.primary = {run:() => { item.updateParticipation("accepted", () => closeFn()); }};
-					actions.secondary =  {run:() => { item.updateParticipation("declined", () => closeFn()); } };
-				}
-				return {
+				const entity = alert.entityData
+				const msg = {
 					title: entity.title,
-					text,
 					icon: {name:'event', color: 'red'},
-					category: 'event',
-					actions
-				};
+					category: 'event'
+				} as any;
+				switch(alert.tag) {
+					case 'created':
+						msg.text = t("New event created by {creator}").replace('{creator}', alert.data.creator);
+						break;
+					case 'reply':
+						msg.text = t("Invitation updated by {from}").replace('{from}', alert.data.from?.personal ?? t("Unknown"));
+						break;
+					case 'request':
+						msg.text = t('New invitation from {from}').replace('{from}', alert.data.from?.personal ?? t("Unknown"));
+						const item = new CalendarItem({key: alert.entityId + "", data: entity});
+						msg.actions = {
+							primary: {run:() => { item.updateParticipation("accepted", () => closeFn()); }},
+							secondary: {run:() => { item.updateParticipation("declined", () => closeFn()); }}
+						};
+						break;
+					default: // normal Event alert
+						msg.text = go.util.Format.shortDateTime(alert.recurrenceId || entity.start, true);
+				}
+				return msg as INotification;
 			});
 
 		});
