@@ -212,12 +212,17 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 	getModulePanel: function (moduleName, unhide = true) {
 
-		this.initModule(moduleName, unhide);
-		var panelId = 'go-module-panel-' + moduleName;
-		if (this.tabPanel.items.map[panelId]) {
-			return this.tabPanel.items.map[panelId];
-		}
+		try {
+			this.initModule(moduleName, unhide);
+			var panelId = 'go-module-panel-' + moduleName;
+			if (this.tabPanel.items.map[panelId]) {
+				return this.tabPanel.items.map[panelId];
+			}
 
+		}catch (e) {
+
+			console.error(e);
+		}
 		return false;
 	},
 
