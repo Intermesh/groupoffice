@@ -4,6 +4,7 @@ namespace go\core\db;
 
 use Exception;
 use go\core\App;
+use go\core\orm\EntityType;
 use go\core\orm\Property;
 use LogicException;
 use PDO;
@@ -271,12 +272,13 @@ class Connection {
 	{
 		if($this->transactionSavePointLevel == 0) {
 			$ret = $this->getPdo()->beginTransaction();
+			EntityType::snapshotChanges();
 
 		}else
 		{
-			$ret = true;		
-		}		
-		
+			$ret = true;
+		}
+
 		$this->transactionSavePointLevel++;
 
 		if($this->debug) {
@@ -337,7 +339,8 @@ class Connection {
 			go()->warn("ROLLBACK DB TRANSACTION " . $this->transactionSavePointLevel, 1);
 		}
 
-		if($this->transactionSavePointLevel == 0) {			
+		if($this->transactionSavePointLevel == 0) {
+			EntityType::rollbackChanges();
 			return $this->getPdo()->rollBack();
 		}else
 		{
@@ -365,6 +368,7 @@ class Connection {
 
 
 		if($this->transactionSavePointLevel == 0) {
+			EntityType::discardChangesSnapshot();
 			return $this->getPdo()->commit();
 		}else
 		{
