@@ -5,6 +5,7 @@ namespace go\modules\community\history;
 
 use Exception;
 use GO\Base\Db\ActiveRecord;
+use GO\Base\Model\Acl;
 use go\core;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\cron\GarbageCollection;
@@ -17,6 +18,8 @@ use go\core\model\Group;
 use go\core\model\Search;
 use go\core\model\User;
 use go\core\orm\Query;
+use GO\Files\Model\File;
+use GO\Files\Model\Folder;
 use go\modules\community\history\model\LogEntry;
 use go\modules\community\history\model\Settings;
 use GO\Projects2\Model\TimeEntry;
@@ -65,6 +68,17 @@ class Module extends core\Module
 		//hacky but works for old code
 		if(!$record->aclField() && !($record instanceof TimeEntry)) {
 			return;
+		}
+
+		if ($record instanceof File || $record instanceof Folder) {
+			$aclId = $record->findAclId();
+			if(!$aclId) {
+				return;
+			}
+			$aclRecord = Acl::load($aclId);
+			if (!$aclRecord) {
+				return;
+			}
 		}
 
 		$log = new LogEntry();
