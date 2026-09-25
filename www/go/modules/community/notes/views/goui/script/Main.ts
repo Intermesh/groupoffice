@@ -161,7 +161,8 @@ export class Main extends MainThreeColumnPanel {
 						dlg.show();
 					}
 				}),
-				this.showCenterButton()
+				this.hideWestButton(),
+				this.closeWestButton()
 			),
 			comp({
 					flex: 1
@@ -218,6 +219,7 @@ export class Main extends MainThreeColumnPanel {
 					cls: "bg-mid border-bottom"
 				},
 				this.showWestButton(),
+				this.openWestButton(),
 
 				this.tblTitle = tabletitle({
 					store: this.noteGrid.store,
@@ -326,7 +328,7 @@ export class Main extends MainThreeColumnPanel {
 
 	protected createEast() {
 		const detail = new NoteDetail();
-		detail.toolbar.items.insert(0, this.showCenterButton());
+		detail.toolbar.items.insert(0, this.hideEastButton());
 		return detail;
 	}
 
