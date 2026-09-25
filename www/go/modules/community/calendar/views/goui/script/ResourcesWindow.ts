@@ -9,7 +9,7 @@ import {
 	h3,
 	hiddenfield,
 	hr,
-	menu,
+	menu, menucolumn,
 	searchbtn,
 	select,
 	splitter,
@@ -105,7 +105,9 @@ export class ResourcesWindow extends Window {
 				btn({icon: 'add', cls: 'filled', handler: _ => (new ResourceGroupWindow()).show()})
 			),
 			comp({cls: "scroll",flex:1},
-				this.resourceGroupTable =table({cls: "no-row-lines", headers: false,
+				this.resourceGroupTable = table({
+					cls: "no-row-lines",
+					headers: false,
 					store: resourceGroupStore,
 					rowSelectionConfig: {
 						multiSelect: false,
@@ -119,41 +121,39 @@ export class ResourcesWindow extends Window {
 					},
 					columns:[
 						column({id:'name', header:t('Name') }),
-						column({id: "btn", width: 48,renderer: (columnValue: any, record, td, table, rowIndex) =>
+
+						menucolumn({
+							menu: menu({},
 								btn({
-									icon: "more_vert",
-									menu: menu({},
-										btn({
-											icon: "edit",
-											text: t("Edit"),
-											handler: async (_btn) => {
-												const g = table.store.get(rowIndex)!;
-												const d = new ResourceGroupWindow();
-												await d.load(g.id);
-												d.show();
-											}
-										}),
-										hr(),
-										btn({
-											icon: "delete",
-											text: t("Delete"),
-											handler: async (_btn) => {
+									icon: "edit",
+									text: t("Edit"),
+									handler: async (b) => {
+										const tbl = b.parent!.dataSet.table;
+										const group = tbl.store.get(b.parent!.dataSet.rowIndex)!;
+										const d = new ResourceGroupWindow();
+										d.show();
+										void d.load(group.id);
+									}
+								}),
+								hr(),
+								btn({
+									icon: "delete",
+									text: t("Delete"),
+									handler: async (b) => {
+										const tbl = b.parent!.dataSet.table;
+										const group = tbl.store.get(b.parent!.dataSet.rowIndex)!;
 
-												await jmapds("ResourceGroup").confirmDestroy([table.store.get(rowIndex)!.id]).catch((e:any) => {
-													console.log(e);
-													if(e.type=='dbException') {
-														Window.error(t('Could not delete non-empty resource group'));
-													} else
-														Window.error(e);
-												});
-
-
-											}
-										})
-
-									)
+										await jmapds("ResourceGroup").confirmDestroy([group]).catch((e:any) => {
+											console.log(e);
+											if(e.type=='dbException') {
+												Window.error(t('Could not delete non-empty resource group'));
+											} else
+												Window.error(e);
+										});
+									}
 								})
 
+							)
 						})
 					]
 				})
@@ -189,39 +189,41 @@ export class ResourcesWindow extends Window {
 							}
 						}),
 					),
-					comp({cls: "scroll",flex:1},
+					comp({cls: "scroll bg-lowest", flex:1},
 					this.resourceTable = table({
+						fit: true,
 						store: resourceStore,
-						columns: [column({header: t("ID"), id:"id", sortable: true, hidden:true, width: 60}),
-							column({header: t("Color"), id:"color", width: 40, renderer: v => comp({text:'-',style:{backgroundColor:'#'+v}}) }),
-							column({header: t("Name"), id:"name", resizable: true, sortable: true, width: 180}),
-							column({id: "btn", width: 48,renderer: (columnValue: any, record, td, table, rowIndex) =>
+						columns: [
+							column({header: t("ID"), id:"id", sortable: true, hidden:true, width: 60}),
+							column({header: t("Color"), id:"color", width: 60, renderer: v => comp({html: '&nbsp;',style:{backgroundColor:'#'+v}}) }),
+							column({header: t("Name"), id:"name", resizable: true, sortable: true}),
+							menucolumn({
+								menu: menu({},
 									btn({
-										icon: "more_vert",
-										menu: menu({},
-											btn({
-												icon: "edit",
-												text: t("Edit"),
-												handler: async (_btn) => {
-													const g = table.store.get(rowIndex)!;
-													const d = new ResourceWindow();
-													d.show();
-													void d.load(g.id);
-												}
-											}),
-											hr(),
-											btn({
-												icon: "delete",
-												text: t("Delete"),
-												handler: async (_btn) => {
-													const resource = table.store.get(rowIndex)!;
-													jmapds("Calendar").confirmDestroy([resource.id]);
-												}
-											})
-
-										)
+										icon: "edit",
+										text: t("Edit"),
+										handler: async (b) => {
+											const tbl = b.parent!.dataSet.table;
+											const cal = tbl.store.get(b.parent!.dataSet.rowIndex)!;
+											const d = new ResourceWindow();
+											d.show();
+											void d.load(cal.id);
+										}
+									}),
+									hr(),
+									btn({
+										icon: "delete",
+										text: t("Delete"),
+										handler: async (b) => {
+											const tbl = b.parent!.dataSet.table;
+											const cal = tbl.store.get(b.parent!.dataSet.rowIndex)!;
+											jmapds("Calendar").confirmDestroy([cal.id]);
+										}
 									})
+
+								)
 							})
+
 						],
 						listeners: {
 							rowdblclick:( {target, storeIndex}) => {
