@@ -328,7 +328,7 @@ export class Main extends MainThreeColumnPanel {
 
 	protected createEast() {
 		const detail = new NoteDetail();
-		detail.toolbar.items.insert(0, this.hideEastButton());
+		detail.toolbar.items.insert(0, this.hideEastButton(), this.closeEastButton());
 		return detail;
 	}
 
