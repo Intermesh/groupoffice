@@ -5,6 +5,7 @@
 - Otp: rate limiting on otp authentication
 - Core: Fixed: getModified() discards the customFields entry it just built #1574
 - Files: do not create global search for trashed files or folders
+- Comments: make sure text doesn't run through status icon
 
 21-09-2026: 26.0.48
 - Core: Fixed link loading in link browser
