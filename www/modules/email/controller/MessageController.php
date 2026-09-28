@@ -1603,7 +1603,22 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	{
 		if (empty($params['unblock'])){// && !\GO\Addressbook\Model\Contact::model()->findSingleByEmail($response['sender'])) {
 			$blockUrl = 'about:blank';
-			$response['htmlbody'] = preg_replace("/<([^a]{1})([^>]*)(https?:[^>'\"]*)/iu", "<$1$2" . $blockUrl, $response['htmlbody'], -1, $response['blocked_images']);
+			$blocked = 0;
+			$response['htmlbody'] = preg_replace_callback(
+				'/<(?!a[\s>\/])[a-z][^>]*+>/iu',
+				function ($m) use ($blockUrl, &$blocked) {
+					// skip tags that can't contain a URL; cheap check avoids regex on big data: blobs
+					if (stripos($m[0], 'http') === false) {
+						return $m[0];
+					}
+					$count = 0;
+					$out = preg_replace('/https?:[^\s>\'"]*+/i', $blockUrl, $m[0], -1, $count);
+					$blocked += $count;
+					return $out;
+				},
+				$response['htmlbody']
+			);
+			$response['blocked_images'] = $blocked;
 			if($response['htmlbody'] === null) {
 				$response['htmlbody'] ="Could not block images: ". preg_last_error_msg() . " you can only view without blocking external resources";
 			}
