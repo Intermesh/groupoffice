@@ -9,6 +9,7 @@
 - Comments: make sure text doesn't run through status icon
 - Core: apcu didn't keep values in memory on CLI. This speeds up CLI operations like LDAP sync.
 - Ldapauthenticator: OTP provisioning from LDAP was broken
+- Finance: Fixed "Add from catalog" causeing UI to freeze
 
 21-09-2026: 26.0.48
 - Core: Fixed link loading in link browser
