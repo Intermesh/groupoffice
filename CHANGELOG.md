@@ -1,3 +1,4 @@
+- Email: fixed backtrack limit exhausted error in emails external resource blocker
 - Core: unset token if CSRF check fails (cherry pick from 26.0)
 
 24-08-2026: 6.8.178
