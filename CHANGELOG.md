@@ -1,3 +1,5 @@
+- Finance: When duplicating choose type
+
 28-09-2026: 26.0.49
 - Oauth2Client: Don't overwrite IMAP username with the email that authenticates becasue it might be a shared mailbox
 - Catalog: Allow users with manage permissions on the catalog module to alter the catalog.
