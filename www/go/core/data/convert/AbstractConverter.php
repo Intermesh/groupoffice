@@ -215,7 +215,8 @@ abstract class AbstractConverter {
 
 			$this->alert->setData([
 					'title' =>  go()->t("Export finished"),
-					'body' =>   "<a class=\"normal-link\" href=\"" . $url . "\">" . go()->t("Download ") . $blob->name . "</a>",
+					'link' => $url,
+					'body' => $blob->name,
 					'persistent' => false
 				]
 			);
