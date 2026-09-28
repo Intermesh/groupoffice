@@ -1,0 +1,80 @@
+# Two Group-Office instances that talk to each other over the marketplace API:
+# mpserver runs community/marketplaceserver (the vendor), mpclient runs
+# community/marketplace (the customer). One MariaDB holds both databases.
+#
+# This is the only way to exercise the pair as a pair — the unit tests cover the
+# pure rules, but registration, token auth, /catalog, the signature check and
+# the license JWT only prove themselves across a real network hop between two
+# separate installations.
+#
+# Both apps serve the SAME live www/ checkout, so an edit here is served without
+# a rebuild. The one thing that must NOT touch the checkout is the download:
+# mpclient writes modules into go/modules/${MP_PACKAGE}, so that single path is
+# bind-mounted over a scratch dir. Nothing the test does can reach the working
+# tree.
+#
+# Started by ./run.sh up; removed for good by ./run.sh down (which also drops
+# the volume). Variables come from lib/env.sh.
+name: mp-e2e
+
+services:
+  mpserver:
+    build:
+      context: ${HOME}/Projects/go-docker
+      args:
+        PHP_VERSION: "8.3"
+    container_name: mpserver
+    volumes:
+      - ${MP_WWW}:/var/www/html
+      - ./container/config.server.php:/var/www/html/config.php:ro
+      - ./container/vhost.conf:/etc/apache2/sites-enabled/000-default.conf:ro
+      - ${HOME}/Projects/go-docker/config/php.dev.ini:/usr/local/etc/php/conf.d/zz-dev.ini:ro
+      - ${MP_DATA_ROOT}/server/data:/var/lib/groupoffice
+      - ${MP_DATA_ROOT}/server/tmp:/tmp/groupoffice
+      - ${MP_DATA_ROOT}/server/log:/var/log/php
+    ports:
+      - "8081:80"
+    depends_on:
+      - mpdb
+
+  mpclient:
+    build:
+      context: ${HOME}/Projects/go-docker
+      args:
+        PHP_VERSION: "8.3"
+    container_name: mpclient
+    volumes:
+      - ${MP_WWW}:/var/www/html
+      # The download target, overlaid so an installed package lands in a scratch
+      # directory instead of the checkout. Docker creates the destination if it
+      # is missing, so starting the pair leaves an empty go/modules/mpe2e in the
+      # checkout; ./run.sh down rmdirs it.
+      - ${MP_DATA_ROOT}/client/modules:/var/www/html/go/modules/mpe2e
+      - ./container/config.client.php:/var/www/html/config.php:ro
+      - ./container/vhost.conf:/etc/apache2/sites-enabled/000-default.conf:ro
+      - ${HOME}/Projects/go-docker/config/php.dev.ini:/usr/local/etc/php/conf.d/zz-dev.ini:ro
+      - ${MP_DATA_ROOT}/client/data:/var/lib/groupoffice
+      - ${MP_DATA_ROOT}/client/tmp:/tmp/groupoffice
+      - ${MP_DATA_ROOT}/client/log:/var/log/php
+    ports:
+      - "8082:80"
+    depends_on:
+      - mpdb
+      - mpserver
+
+  mpdb:
+    image: mariadb:10.11
+    container_name: mpdb
+    environment:
+      MARIADB_DATABASE: mpserver
+      MARIADB_USER: groupoffice
+      MARIADB_PASSWORD: groupoffice
+      MARIADB_ROOT_PASSWORD: root
+    command: --innodb-buffer-pool-size=256M --max-allowed-packet=64M
+    volumes:
+      - mp-e2e-db:/var/lib/mysql
+    ports:
+      - "33081:3306"
+
+volumes:
+  mp-e2e-db:

@@ -1,0 +1,34 @@
+parameters:
+    level: 8
+    paths:
+        - .
+    scanDirectories:
+        - %currentWorkingDirectory%/api
+        - %currentWorkingDirectory%/controller
+        - %currentWorkingDirectory%/go
+        - %currentWorkingDirectory%/modules
+    excludePaths:
+        analyse:
+            - views/
+            - vendor/
+            - */vendor/*
+            - %currentWorkingDirectory%/go/core/util/QRcode.php
+        analyseAndScan:
+            - */tests/*
+    reportUnmatchedIgnoredErrors: false
+    treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+            - identifier: staticMethod.private
+            - identifier: staticProperty.private
+            - identifier: missingType.iterableValue
+            - identifier: missingType.generics
+            - identifier: missingType.parameter
+            - identifier: missingType.return
+            - identifier: missingType.property
+            - '#Class .* referenced with incorrect case: .*#'
+            - '#Variable .* in empty\(\) always exists and is always falsy.#'
+            - '#Variable .* in empty\(\) always exists and is not falsy.#'
+            - '#Variable .* in isset\(\) always exists and is always null.#'
+            - '#Unsafe usage of new static\(\).#'
+            - '#Unsafe access to private property .*#'
+            - '#Unsafe call to private method .*#'
