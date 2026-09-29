@@ -1,0 +1,3 @@
+lib/openpgp.min.js
+EmailComposerOverrides.js
+ContactDialogOverrides.js
