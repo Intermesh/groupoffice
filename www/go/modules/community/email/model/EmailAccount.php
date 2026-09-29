@@ -157,7 +157,7 @@ class EmailAccount extends AclOwnerEntity {
 		try {
 			return ImapBackend::connect($data, $this);
 		} catch(\ErrorException $e) {
-			throw new \Exception('No connection to IMAP host '.$data->host);
+			throw new \Exception('No connection to IMAP host '.$data->host.':'.$e->getMessage());
 		}
 	}
 }

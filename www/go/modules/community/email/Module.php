@@ -2,14 +2,7 @@
 namespace go\modules\community\email;
 
 use go\core;
-
-use go\core\orm\Mapping;
-use go\core\orm\Query;
-use go\core\model;
-use go\modules\community\calendar\model\Calendar;
-use go\modules\community\calendar\model\CalendarEvent;
-use go\modules\community\davclient\cron;
-use go\modules\community\davclient\model\DavAccount;
+use go\core\http\Response;
 
 class Module extends core\Module
 {
@@ -32,4 +25,39 @@ class Module extends core\Module
 		];
 	}
 
+	public function downloadAttachment($id, $partId)
+	{
+		$email = model\Email::find()->select('e.uid, f.name, e.accountId')
+			->join('email_map','m', 'm.fk = e.id', 'left')
+			->join('email_mailbox','f', 'm.mailboxId = f.id', 'left')
+			->where(['e.id' => $id])
+			->fetchMode(\PDO::FETCH_OBJ)->single();
+
+		$account = model\EmailAccount::findById($email->accountId);
+		$imap = $account->connect();
+		$imap->imap->examine($email->name);
+
+
+		$imap->imap->downloadFile($email->uid, $partId);
+	}
+	public function downloadSrc($id)
+	{
+		$email = model\Email::find()->select('e.uid, f.name, e.accountId')
+			->join('email_map','m', 'm.fk = e.id', 'left')
+			->join('email_mailbox','f', 'm.mailboxId = f.id', 'left')
+			->where(['e.id' => $id])
+			->fetchMode(\PDO::FETCH_OBJ)->single();
+
+		$account = model\EmailAccount::findById($email->accountId);
+		$imap = $account->connect();
+		$imap->imap->examine($email->name);
+		$mime = $imap->fetch($email->uid)['RFC822'];
+
+		Response::get()
+			->setHeader('Content-Type', 'text/plain;charset=utf-8')
+			->setHeader("Content-Length", strlen($mime))
+			->sendHeaders();
+
+		echo $mime;
+	}
 }

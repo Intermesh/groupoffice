@@ -36,19 +36,8 @@ class Imap {
 
 	private float $mstime;
 
-	/**
-	 * Public constructor
-	 *
-	 * @param  string   $host  hostname or IP address of IMAP server, if given connect() is called
-	 * @param  int|null $port  port of IMAP server, null for default (143 or 993 for ssl)
-	 * @param  bool     $ssl   use ssl? 'SSL', 'TLS' or false
-	 */
-	public function __construct($host = '', $port = null, $ssl = false) {
-		$this->mstime = microtime(true);
-		if ($host) {
-			$this->connect($host, $port, $ssl);
-		}
-	}
+	private string $lastNoResponse = '';
+
 
 	/**
 	 * Public destructor
@@ -66,55 +55,57 @@ class Imap {
 	 * @throws \RuntimeException
 	 * @return string|void welcome message
 	 */
-	public function connect($host, $port = null, $ssl = false) {
-		$isTls = false;
+	static function connect($dsn): static {
 
-		if ($ssl) {
-			$ssl = strtolower($ssl);
-		}
+		$isSSL = $dsn->encryption==='ssl';
 
-		switch ($ssl) {
-			case 'ssl':
-				$host = 'ssl://' . $host;
-				if (!$port) {
-					$port = 993;
-				}
-				break;
-			case 'tls':
-				$isTls = true;
-			// break intentionally omitted
-			default:
-				if (!$port) {
-					$port = 143;
-				}
-		}
-		go()->log('TIME start: '.round((microtime(true) - $this->mstime) * 1000, 2) . "ms");
+		$proto = $isSSL ? 'ssl://': '';
+		$dsn->port ??= $isSSL ? 993 : 143;
+
+
+		$imap = new self();
+		$imap->mstime = microtime(true);
+		go()->log('TIME start: '.round((microtime(true) - $imap->mstime) * 1000, 2) . "ms");
 		//$this->socket = @fsockopen($host, $port, $errno, $errstr, self::TIMEOUT_CONNECTION);
-		$context = stream_context_create();
-//		stream_context_set_option($context, 'ssl', 'verify_host', false);
-//		stream_context_set_option($context, 'ssl', 'verify_peer', false);
-//		stream_context_set_option($context, 'ssl', 'verify_peer_name', false);
 
-		$this->socket = stream_socket_client("$host:$port", $errno, $errstr, self::TIMEOUT_CONNECTION, STREAM_CLIENT_CONNECT, $context);
-		go()->log('TIME socket: '.round((microtime(true) - $this->mstime) * 1000, 2) . "ms");
-		if (!$this->socket) {
+
+
+		$ctx = ["socket" => [
+			"tcp_nodelay" => true
+		]];
+		if(isset($dsn->selfSigned)) {
+			$ctx["ssl"] = [
+				'verify_host' => false,
+				'verify_peer' => false,
+				'verify_peer_name' => false
+			];
+		}
+		$context = stream_context_create($ctx);
+		$imap->socket = stream_socket_client($proto."$dsn->host:$dsn->port", $errno, $errstr, self::TIMEOUT_CONNECTION, STREAM_CLIENT_CONNECT, $context);
+		go()->log('TIME socket: '.round((microtime(true) - $imap->mstime) * 1000, 2) . "ms");
+		if (!$imap->socket) {
 			throw new \RuntimeException(sprintf(
 				'cannot connect to host %s', ($errstr ? sprintf('; error = %s (errno = %d )', $errstr, $errno) : '')
 			), 0);
 		}
-		stream_set_timeout($this->socket, 600); // 10 min timeout?
+		stream_set_timeout($imap->socket, 60); // 10 min timeout?
 
-		if (!$this->assumedNextLine('* OK')) {
+		if (!$imap->assumedNextLine('* OK')) {
 			throw new \RuntimeException('host doesn\'t allow connection');
 		}
 
-		if ($isTls) {
-			$result = $this->requestAndResponse('STARTTLS');
-			$result = $result && stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+		if ($dsn->encryption==='tls') {
+			$result = $imap->requestAndResponse('STARTTLS');
+			$result = $result && stream_socket_enable_crypto($imap->socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
 			if (!$result) {
 				throw new \RuntimeException('cannot enable TLS');
 			}
 		}
+		if(!$imap->login($dsn->user, $dsn->pass)){
+			throw new \RuntimeException($imap->lastNoResponse);
+		}
+
+		return $imap;
 	}
 
 	/**
@@ -319,17 +310,19 @@ class Imap {
 		while (!$this->readLine($tokens, $tag, $dontParse)) {
 			$lines[] = $tokens;
 		}
-
+		$lines[] = $tokens;
 		if ($dontParse) {
 			// last to chars are still needed for response code
 			$tokens = [substr($tokens, 0, 2)];
-		} else {
-			$lines[] = $tokens;
 		}
 		// last line has response code
 		if ($tokens[0] == 'OK') {
 			return $lines ?: true;
 		} elseif ($tokens[0] == 'NO') {
+			$this->lastNoResponse = '';
+			foreach((array)$lines as $line) {
+				$this->lastNoResponse .= implode('',$line);
+			}
 			return false;
 		}
 	}
@@ -353,7 +346,7 @@ class Imap {
 
 		foreach ($tokens as $token) {
 			if (is_array($token)) {
-				//go()->log('C: '.$line. ' ' . $token[0], 'imap');
+				go()->log('C: '.$line. ' ' . $token[0], 'imap');
 				if (fwrite($this->socket, $line . ' ' . $token[0] . "\r\n") === false) {
 					throw new \RuntimeException('cannot write - connection closed?');
 				}
@@ -638,6 +631,28 @@ class Imap {
 		return $result;
 	}
 
+	public function downloadFile($uid, $partId) {
+
+		$bufferSize = 65536;
+
+		$out = fopen('php://output', 'wb');
+		stream_filter_append($out, 'convert.base64-decode', STREAM_FILTER_WRITE);
+		stream_set_read_buffer($this->socket, $bufferSize);
+
+		$this->sendRequest('UID FETCH', [$uid, "BODY.PEEK[$partId]"]);
+
+		$line = fgets($this->socket);
+		if (!preg_match('/\{(\d+)\}\r\n$/', $line, $m)) {
+			fclose($out);
+			return;
+		}
+		stream_copy_to_stream($this->socket, $out, (int)$m[1]);
+
+		fgets($this->socket); // ")\r\n"
+		fgets($this->socket); // "Axxx OK"
+		fclose($out);
+	}
+
 	/**
 	 * get mailbox list
 	 *
@@ -648,9 +663,11 @@ class Imap {
 	 * @return array mailboxes that matched $mailbox as array(globalName => array('delim' => .., 'flags' => ..))
 	 * @throws \RuntimeException
 	 */
-	public function listMailbox($reference = '', $mailbox = '*') {
+	public function listMailbox($reference = '', $mailbox = '*', $return = 'SPECIAL-USE') {
 		$result = [];
-		$list = $this->requestAndResponse('LIST', $this->escapeString($reference, $mailbox));
+		$tokens = $this->escapeString($reference, $mailbox);
+		$tokens[] = "RETURN ($return)";
+		$list = $this->requestAndResponse('LIST', $tokens);
 		if (!$list || $list === true) {
 			return $result;
 		}
@@ -763,6 +780,9 @@ class Imap {
 		$tokens[] = $this->escapeString($message);
 
 		$response = $this->requestAndResponse('APPEND', $tokens);
+		if($response === false) {
+			return $this->lastNoResponse;
+		}
 		if($response[0][0] !== 'OK') {
 			return false;
 		}

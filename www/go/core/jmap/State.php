@@ -223,18 +223,19 @@ class State extends AbstractState {
 	 */
 	public function getSession(): array
 	{
+		$accounts = [];
+		$stmt = Account::find();
+		foreach($stmt as $account) {
+			$accounts[$account->id()] = $account;
+		}
+
 		$response = [
 			'version' => go()->getVersion(),
 			'cacheClearedAt' => go()->getSettings()->cacheClearedAt,
 			// 'username' => $user->username,
-			'accounts' => ['1'=> [
-				'name'=>'Virtual',
-				'isPrimary' => true,
-				'isReadOnly' => false,
-				'hasDataFor' => []
-			]],
+			'accounts' => $accounts,
 			"auth" => [
-						"domains" => User::getAuthenticationDomains()
+				"domains" => User::getAuthenticationDomains()
 			],
 			'capabilities' => Capabilities::get(),
 			'apiUrl' => $this->getApiUrl(),

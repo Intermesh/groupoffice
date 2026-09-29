@@ -5,59 +5,38 @@ import {
 	datasourceform, datasourcestore,
 	htmlfield,
 	list,
-	t,E,
+	t, E,
 	tbar,
 	textarea,
 	textfield,
-	Window
+	Window, fieldset
 } from "@intermesh/goui";
-import {jmapds} from "@intermesh/groupoffice-core";
+import {FormWindow, jmapds} from "@intermesh/groupoffice-core";
 
-export class IdentityWindow extends Window {
+export class IdentityWindow extends FormWindow {
 
-	form: DataSourceForm
-
-	constructor(){
-		super();
+	protected accountId?: string
+	constructor(forAccountId: string){
+		super('Identity');
 		this.width = 880;
-		this.height = 570;
-		this.title = t('Identities');
+		this.height = 810;
+		this.title = t('Identitiy');
+		this.accountId = forAccountId;
 
-		this.items.add(
-			comp({cls:'hbox'},
-				comp({tagName: 'aside'},
-					comp({tagName:'nav'},
-						comp({tagName:'h5', html: t('Identities')},
-							comp({tagName:'span', cls: 'hover buttons'},
-								btn({title: t('Add Identity'),cls:'small', icon: 'add',handler: (btn) => this.form.value = {}})
-							)
-						),
-						list({
-							store: datasourcestore({dataSource:jmapds('Identity')}),
-							renderer: (d) => E('a').html(`<i class="icon">person</i><em>${d.name}</em>`),
-							listeners: {'selectionchange': (me,items) => {this.form.load(items[0].id)}}
-						}),
-					),
-
-					btn({tagName:'li',icon:'add', text: t('Add Identity'), handler: () => this.form.value = {}})
-
-				),
-				this.form = datasourceform({dataSource: jmapds('Identity'),flex:1},
-					tbar({},
-						textfield({cls: 'c6',placeholder:t('Display name'), name:'name'}),
-						comp({tagName:'span', flex:1}),
-						btn({icon:'delete'}),
-						btn({text: t('Save'), cls: 'primary', icon:'save', type:'submit'}),
-					),
-					comp({cls: 'ff pad'},
-						textfield({label: t('Email'), name: 'email'}),
-						textfield({label:t('Reply to'), name: 'replyTo'}),
-						textfield({label: t('Bcc'), name: 'bcc'}),
-						textarea({label: t('Text signature'), name: 'textSignature', height: 200}),
-						htmlfield({label: t('HTML Signature'), name: 'htmlSignature',height: 200})
-					)
-				)
+		this.generalTab.items.add(
+			fieldset({cls: 'flow', flex:'1 0'},
+				textfield({placeholder:t('Display name'), name:'name'}),
+				textfield({flex:'.5',label: t('From email'), name: 'email'}),
+				textfield({flex:'.5',label:t('Reply to'), name: 'replyTo'}),
+				textfield({flex:'.5',label: t('Bcc'), name: 'bcc'}),
+				textarea({ label: t('Text signature'), name: 'textSignature', height: 200}),
+				htmlfield({label: t('HTML Signature'), name: 'htmlSignature', height: 300})
 			)
 		);
+
+		this.form.on('beforesave', ({data}) => {
+			jmapds('Identity').setParams.accountId = this.accountId;
+		});
 	}
+
 }

@@ -79,7 +79,7 @@ class Email extends AclItemEntity {
 	/** @var EmailBodyPart[] list of `text/plain`,`text/html`,images/*` */
 	private $_htmlBody;
 
-	/** @var string only if not in textBody or textHtml and not `multipart/*` */
+	/** @var EmailBodyPart[] only if not in textBody or textHtml and not `multipart/*` */
 	public $attachments;
 
 	/** @var boolean true if there is 1 attachment that is not inline or embedded */
@@ -182,7 +182,7 @@ class Email extends AclItemEntity {
 				$success &= $this->backend()->copy('test', $this->uid);
 			}
 		}
-		foreach($this->mailboxIds as $mailboxId) {
+		foreach($this->mailboxIds as $mailboxId => $bool) {
 			$success &= $this->backend()->fetchChanges($mailboxId)['success'];
 		}
 		return $success;
@@ -235,9 +235,97 @@ class Email extends AclItemEntity {
 		$this->uid = $uid;
 	}
 
+//	private function generateBodyStructure()
+//	{
+//		$this->_bodyValues = [];
+//		$bodyParts = [];
+//		$partCounter = 1;
+//
+//		// Build alternative part if we have both text and html
+//		if (!empty($this->_textBody) && !empty($this->_htmlBody)) {
+//			$alternative = new EmailBodyPart();
+//			$alternative->type = 'multipart/alternative';
+//			$alternative->subParts = [];
+//
+//			// Add text body parts
+//			foreach ($this->_textBody as $part) {
+//				$part->partId = (string)$partCounter++;
+//				if ($part->isInlineText()) {
+//					$this->_bodyValues[$part->partId] = ['value' => $part->getContent()];
+//				}
+//				$alternative->subParts[] = $part;
+//			}
+//
+//			// Add html body parts
+//			foreach ($this->_htmlBody as $part) {
+//				$part->partId = (string)$partCounter++;
+//				if ($part->isInlineText()) {
+//					$this->_bodyValues[$part->partId] = ['value' => $part->getContent()];
+//				}
+//				$alternative->subParts[] = $part;
+//			}
+//
+//			$bodyParts[] = $alternative;
+//		} else {
+//			// Add text body parts if only text
+//			if (!empty($this->_textBody)) {
+//				foreach ($this->_textBody as $part) {
+//					$part->partId = (string)$partCounter++;
+//					if ($part->isInlineText()) {
+//						$this->_bodyValues[$part->partId] = ['value' => $part->getContent()];
+//					}
+//					$bodyParts[] = $part;
+//				}
+//			}
+//
+//			// Add html body parts if only html
+//			if (!empty($this->_htmlBody)) {
+//				foreach ($this->_htmlBody as $part) {
+//					$part->partId = (string)$partCounter++;
+//					if ($part->isInlineText()) {
+//						$this->_bodyValues[$part->partId] = ['value' => $part->getContent()];
+//					}
+//					$bodyParts[] = $part;
+//				}
+//			}
+//		}
+//
+//		// Add attachments
+//		if (!empty($this->attachments)) {
+//			foreach ($this->attachments as $attachment) {
+//				$attachment->partId = (string)$partCounter++;
+//				$bodyParts[] = $attachment;
+//			}
+//		}
+//
+//		// Build the final structure
+//		if (count($bodyParts) === 1 && !($bodyParts[0] instanceof EmailBodyPart && $bodyParts[0]->isMultipart())) {
+//			// Single non-multipart part, use it directly
+//			$this->_bodyStructure = $bodyParts[0];
+//		} else if (count($bodyParts) > 0) {
+//			// Multiple parts, wrap in multipart/mixed
+//			$this->_bodyStructure = new EmailBodyPart();
+//			$this->_bodyStructure->type = 'multipart/mixed';
+//			$this->_bodyStructure->subParts = $bodyParts;
+//		} else {
+//			// No parts, create empty text/plain
+//			$this->_bodyStructure = new EmailBodyPart();
+//			$this->_bodyStructure->type = 'text/plain';
+//			$this->_bodyStructure->partId = '1';
+//			$this->_bodyValues['1'] = ['value' => ''];
+//		}
+//	}
+
 	public function getBodyStructure()
 	{
 		$this->loadBody();
+		if(empty($this->_bodyStructure)) {
+			$p = new EmailBodyPart();
+			$p->type = 'text/html';
+			$p->partId = '1';
+			$this->_bodyStructure  [$p];
+			//$this->generateBodyStructure();
+		}
 		return $this->_bodyStructure;
 	}
 	public function setBodyStructure($val)
@@ -267,6 +355,16 @@ class Email extends AclItemEntity {
 	{
 		$this->loadBody();
 		return $this->_htmlBody;
+	}
+
+	public function setHtmlBody($val) {
+		$this->bodyLoaded = true;
+		$this->_htmlBody = $val;
+	}
+
+	public function setTextBody($val) {
+		$this->bodyLoaded = true;
+		$this->_textBody = $val;
 	}
 
 	public function __isset($name) {
@@ -341,7 +439,7 @@ class Email extends AclItemEntity {
 		try {
 			list($this->_bodyStructure, $this->_bodyValues) = $this->backend()
 				->select($this->firstMailbox()->name)
-				->fetchBody($this->uid);
+				->fetchBody($this);
 
 			$this->_htmlBody = [];
 			$this->_textBody = [];

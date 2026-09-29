@@ -7,6 +7,8 @@
 namespace go\modules\community\email\model;
 
 
+use go\core\fs\Blob;
+
 class MimeHelper
 {
 	/** @var int The maximum line length allowed by RFC 2822 section 2.1.1. */
@@ -24,11 +26,11 @@ class MimeHelper
 	public $hasAttachments = false;
 	public $uid;
 
-	public function __construct(Email $mail) {
-		$this->mail = $mail;
-		$d = $mail->date();
-		$this->date = !isset($d) ? date(self::DATE_FORMAT) : date(self::DATE_FORMAT, $d);
-	}
+//	public function __construct(Email $mail) {
+//		$this->mail = $mail;
+//		$d = $mail->date();
+//		$this->date = !isset($d) ? date(self::DATE_FORMAT) : date(self::DATE_FORMAT, $d);
+//	}
 
 	/**
 	 * To RFC882 string
@@ -36,17 +38,19 @@ class MimeHelper
 	static function encode(Email $mail)
 	{
 		$d = $mail->date();
+		$structure = (object)$mail->getBodyStructure();
 		$headerStr = self::encodeHeaders((object)[
-			'From' => $mail->getFrom(),
-			'To' => $mail->getTo(),
-			'Cc' => $mail->getCc(),
+			'From' => $mail->from,
+			'To' => $mail->to,
+			'Cc' => $mail->cc,
 			'MessageID' => $mail->messageId[0],
 			'Subject' => $mail->subject,
-			'Date' => !isset($d) ? date(self::DATE_FORMAT) : date(self::DATE_FORMAT, $d),
-			'ContentType' => $mail->getBodyStructure()->type
+			'Date' => !isset($d) ? date(self::DATE_FORMAT) : $d->format(self::DATE_FORMAT),
+			'ContentType' => $structure->type
 		]);
-		$body = new EmailBodyPart($mail->getBodyStructure());
-		return $headerStr . self::encodeBody($body);
+		$body = new EmailBodyPart($structure);
+		$bvalues = $mail->getBodyValues();
+		return $headerStr . self::encodeBody($body, $bvalues);
 	}
 
 	private static function headerLine($name, $value)
@@ -191,7 +195,7 @@ class MimeHelper
 		return (bool) preg_match('/^(.{' . (self::MAX_LINE_LENGTH + strlen(self::EOL)) . ',})/m', $str);
 	}
 
-	public static function encodeBody(EmailBodyPart $part)
+	public static function encodeBody(EmailBodyPart $part, &$bvalues)
 	{
 		$body = '';
 
@@ -201,7 +205,7 @@ class MimeHelper
 
 		$encoding = $part->encoding();
 		if($part->isInline()) {
-			$content = $this->mail->getBodyValues()->{$part->partId}->value;
+			$content = $bvalues[$part->partId]['value'];
 			if ($encoding === '8bit' && !self::has8bitChars($content)) { // Can we do a 7-bit downgrade?
 				$encoding  = '7bit';
 				$part->charset = 'us-ascii'; // ISO 8859, Windows codepage and UTF-8 charsets are ascii compatible up to 7-bit
@@ -215,9 +219,9 @@ class MimeHelper
 			if(!$part->isA('text')) {
 				$encoding = 'base64';
 			}
-			$this->hasAttachments = true;
-			$file = server()->blob()->fetch($part->blobId);
-			$content = stream_get_contents($file->content()); // todo: stream reader
+			//$this->hasAttachments = true;
+			$blob = Blob::findById($part->blobId);
+			$content = stream_get_contents($blob->path()); // todo: stream reader
 		} elseif(!$part->isMultipart()) {
 			throw new \Exception('part is missing content '. $part->partId);
 		}
@@ -228,7 +232,7 @@ class MimeHelper
 			$body .= 'This is a multi-part message in MIME format.' .self::EOL;
 			foreach($part->subParts as $subpart) {
 				$body .= self::EOL.'--'.$part->boundary() .self::EOL;
-				$body .= $this->encodeBody($subpart) .self::EOL;
+				$body .= self::encodeBody($subpart, $bvalues) .self::EOL;
 			}
 			$body .= '--'.$part->boundary() .'--' .self::EOL;
 		} else {

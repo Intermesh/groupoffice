@@ -13,7 +13,7 @@ class EmailBodyPart extends Model {
 	public $partId = null;
 
 	/** @var string sha1 hash of decoded value */
-	public $blobId = null;
+	//public $blobId = null;
 
 	/** @var int size in bytes of decoded value or null if multipart */
 	public $size = 0;
@@ -55,6 +55,11 @@ class EmailBodyPart extends Model {
 
 	/** @var int uniqueness for boundary */
 	protected static $makeUnique = 0;
+
+	private $owner;
+	public function setOwner(Email $email) {
+		$this->owner = $email;
+	}
 
 	public function __construct($config = []) {
 		foreach ($config as $key => $val) {
@@ -120,8 +125,7 @@ class EmailBodyPart extends Model {
 	}
 
 	public function getBlobId() {
-		return null;
-		//return 'mail.'.$this->owner->id.'-'.$this->partId;
+		return 'community/email/attachment/'.$this->owner->id.'/'.$this->partId;
 	}
 
 	public function setContent($content) {

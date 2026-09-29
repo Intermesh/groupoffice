@@ -10,16 +10,15 @@ import {
 	DateTime,
 	ListEventMap, Store, StoreRecord
 } from "@intermesh/goui";
-import {client, jmapds} from "@intermesh/groupoffice-core";
+import {client, fileView, jmapds} from "@intermesh/groupoffice-core";
 import {MailCtlr} from "./MailCtlr";
 import {ThreadView} from "./ThreadView";
 
 const listitem = function(mail: any) {
 	const abbr =  comp({tagName:'abbr'}),
 		text = comp({tagName:'div', cls:'line'});
-	const tr = {emailIds:[]}; //fake thread
 	abbr.el.append(
-		!mail.keywords?.$seen ?  E('b', '•').cls('large'):'',
+		!mail.keywords?.$seen ?  E('b').cls('dot'):'',
 		mail.keywords?.$answered ? E('i', 'reply').cls('small icon').css({color:'green'}):'',
 		mail.keywords?.$forwarded ? E('i', 'forward').cls('small icon').css({color:'purple'}):'',
 		mail.keywords?.$flagged ? E('i', 'flag').cls('small icon').css({color:'red'}):'',
@@ -30,7 +29,7 @@ const listitem = function(mail: any) {
 		E('h4', DateTime.createFromFormat(mail.receivedAt)!.format('d-m-Y')).cls('right').css({float:'right'}),
 		E('h3', mail.from.length ? (mail.from[0].name || mail.from[0].email) : ''),
 		E('div', mail.subject || '('+t('No subject')+')',
-			tr.emailIds.length > 1 ? E('div', tr.emailIds.length+' »').cls('badge primary right') :''
+			mail.thread.emailIds.length > 1 ? E('div', mail.thread.emailIds.length+' »').cls('badge primary right') :''
 		).cls('subject'),
 		E('sub', mail.preview).cls('clamp')
 	);
@@ -45,12 +44,20 @@ export class ListView extends List<Store, ListViewEventMap> {
 
 	constructor() {
 		super(
-			datasourcestore({dataSource:jmapds('Email'), sort:[{property:'receivedAt',isAscending:false}]}),
+			datasourcestore({
+				dataSource:jmapds('Email'),
+				relations: {
+					thread: {
+						dataSource: jmapds("Thread"),
+						path: "threadId"
+					}
+				},
+				sort:[{property:'receivedAt',isAscending:false}]}),
 			function (record,row,list,storeIndex) {
 				return listitem(record);
 			}
 		);
-		this.cls = 'email-list';
+		this.cls = 'list email-list';
 		this.rowSelectionConfig = {
 			multiSelect:false,
 			listeners: {
@@ -78,7 +85,9 @@ export class ListView extends List<Store, ListViewEventMap> {
 			btn({icon: 'folder_open', text: t('Move')+'...', disabled: true}),
 			btn({icon: 'folder_open', text: t('Copy')+'...', disabled: true}),
 			hr(),
-			btn({icon: 'code', text: t('View source'), handler: () => {window.open(client.downloadUrl('mail.src.todo'))}})
+			btn({icon: 'code', text: t('View source'), handler: () => {
+				fileView.open({blobId:'community/email/src/'+clickedItem!.id, type: 'text/plain', name: 'mailsrc.eml'}).show();
+			}})
 		);
 
 		this.on('rowcontextmenu',({ev, storeIndex}) =>{
@@ -91,10 +100,8 @@ export class ListView extends List<Store, ListViewEventMap> {
 
 
 	goto(accountId:string, mailboxId:string) {
-		Object.assign(this.store.queryParams.filter ||= {}, {
-			accountId,
-			mailboxId
-		});
+		this.store.queryParams.accountId = accountId;
+		Object.assign(this.store.queryParams.filter ||= {}, {mailboxId});
 		return this.store!.load();
 	}
 }

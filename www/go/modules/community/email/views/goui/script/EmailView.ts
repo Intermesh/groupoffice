@@ -11,7 +11,7 @@ import {
 	avatar, hr, Avatar
 } from "@intermesh/goui";
 import {MailCtlr} from "./MailCtlr";
-import {client, jmapds} from "@intermesh/groupoffice-core";
+import {client, fileView, jmapds} from "@intermesh/groupoffice-core";
 
 const emailChips = (emailAddresses: any[]) => {
 	if(!emailAddresses.length)
@@ -60,11 +60,11 @@ export class EmailView extends DataSourceForm {
 						this.body.el.print({title: data.sentAt + " - " + " - " + data.subject});
 					}}),
 					'-',
-					btn({icon:'folder_open', text: t('Move')+'...'}),
+					btn({icon:'folder_open', text: t('Move')+'…'}),
 					btn({icon: 'report', text: t('Report spam')}),
 					'-',
 					btn({icon: 'code', text: t('View source'),handler: () => {
-						//openBlob({blobId:'mail.src.'+this.value.id, type: 'text/plain', name: 'mailtje.eml'});
+						fileView.open({blobId:'community/email/src/'+this.value.id, type: 'text/plain', name: 'mailsrc.eml'}).show();
 					}})
 				)})
 			),
@@ -128,7 +128,7 @@ export class EmailView extends DataSourceForm {
 							tagName: 'a', listeners: {
 								'render': ({target}) => {
 									target.el.on('click', _e => {
-										//openFile(attachment);
+										fileView.open(attachment).show();
 									})
 								}
 							}
@@ -147,7 +147,7 @@ export class EmailView extends DataSourceForm {
 					//if(this.pk === data.id && !this.busy) {
 					//	MailCltr.markSeen(true, [data.id]);
 					//}
-				}, 4000); // mark read on 4 seconds
+				}, 3000); // mark read on 3 seconds
 			}
 		});
 	}

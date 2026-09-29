@@ -33,8 +33,23 @@ class Email extends EntityController {
 	}
 
 	public function set($params) {
+		// check account id.
+		if(empty($params['accountId'])) {
+			throw new \Exception("Missing accountId");
+		}
+		// fetch account object
+		$account = model\EmailAccount::findById($params['accountId']);
+		if(empty($account)) {
+			throw new \Exception("Account not found");
+		}
+		// connect to account dsn
+		$backend = $account->connect();
+		// perform create / update / destroy on account
+		$result = $backend->setEmail((object)$params);
 
-		return $this->defaultSet($params);
+		// update local index
+		return $result;
+		//return $this->defaultSet($params);
 	}
 
 	public function changes($params) {

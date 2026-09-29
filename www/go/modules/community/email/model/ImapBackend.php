@@ -3,7 +3,10 @@
 namespace go\modules\community\email\model;
 
 use go\core\db\Query;
+use go\core\jmap\SetError;
 use go\core\mail;
+use go\core\util\ArrayObject;
+use go\core\util\UUID;
 
 class ImapBackend {
 	const HeaderFields = 'FROM TO SUBJECT DATE CC BCC REPLY-TO IN-REPLY-TO SENDER REFERENCES MESSAGE-ID';
@@ -72,7 +75,7 @@ class ImapBackend {
 	private $config;
 
 	private $currentMailbox;
-
+	private $currentEmail;
 	/**
 	 * When the adapter is fetching mail do not syncback to the server. we are in reading mode
 	 */
@@ -97,8 +100,7 @@ class ImapBackend {
 		//none numeric?
 		if (!isset(self::$instance)) {
 			//mb_regex_encoding("UTF-8");
-			$imap = new mail\Imap($dsn->host, $dsn->port, $dsn->encryption);
-			if ($imap->login($dsn->user, $dsn->pass)) {
+			if ($imap = mail\Imap::connect($dsn)) {
 				self::$instance = new self($imap);
 				self::$instance->account = $account;
 				//$imap->sendRequest('ENABLE QRESYNC');
@@ -110,10 +112,6 @@ class ImapBackend {
 //			return false; // dont sync back
 //		}
 		return self::$instance;
-	}
-
-	function cmd() {
-		return new ImapCommand($this);
 	}
 
 	public function select($box = 'INBOX', $params = []) {
@@ -165,7 +163,8 @@ class ImapBackend {
 	}
 
 
-	private function setEmail($json) {
+	public function setEmail($json)
+	{
 
 		// https://www.ietf.org/rfc/rfc9051.html#name-store-command
 		// Creating a draft
@@ -177,72 +176,99 @@ class ImapBackend {
 		// check account
 		// sync email to minimise the race time
 		// update email on imap server
-		$conn = self::connect()->cmd();
+		//$conn = self::connect()->cmd();
+		$result = new ArrayObject([
+			'accountId' => $this->account->id,
+			'created' => null,
+			'updated' => null,
+			'destroyed' => null,
+			'notCreated' => null,
+			'notUpdated' => null,
+			'notDestroyed' => null,
+		]);
 
 		// destroy
-		$groupedUids = Email::find()->select('mailboxId, uid')->innerJoin('email_map', 'fk = id')->andWhereIn('id', $json->destroy)->fetchGrouped();
-		foreach($groupedUids as $mailboxId => $uids) {
-			$conn->open($mailboxId)->store($uids)->flags('+\\Deleted')->exec();
+		if (!empty($json->destroy)){
+			$groupedUids = Email::find()->select('mailboxId, uid')
+				->join('email_map', 'm', 'fk = id', 'inner')
+				->andWhere('id', '=', $json->destroy)
+				->fetchMode(\PDO::FETCH_GROUP | \PDO::FETCH_COLUMN,1)->all();
+			foreach ($groupedUids as $mailboxId => $uids) {
+				$mailbox = Mailbox::findById($mailboxId);
+				$this->imap->select($mailbox->name); // TODO we require the full mailbox path here
+				foreach ($uids as $uid) {
+					$this->imap->uidStore('\\Deleted', $uid, '+');
+				}
+			}
 		}
+
 		// update (flags or move)
 		if(!empty($json->update)) {
-			$uidMailbox = Email::find()->select('id, uid, GROUP_CONCAT(mailboxId)')->innerJoin('email_map', 'fk = id')
-				->andWhereIn('id', array_keys($json->update))
-				->groupBy('id')
-				->fetchGrouped(\PDO::FETCH_UNIQUE);
+			$uidMailbox = Email::find()->select('id, uid, GROUP_CONCAT(mailboxId)')->join('email_map', 'm', 'fk = id', 'inner')
+				->andWhere('id','=', array_keys($json->update))
+				->groupBy(['id'])
+				->fetchMode(\PDO::FETCH_GROUP| \PDO::FETCH_UNIQUE)
+				->all();
+
 			foreach($json->update as $id => $patch) {
 				$uid = $uidMailbox[$id]['uid'];
 				$mailboxIds = explode(',',$uidMailbox[$id]['mailboxIds']);
-				$email = Email::query();
-				$conn->select($mailboxIds[0])->for($uid);
+				// todo fetch mailbox path an call move or store methods
+				//$email = Email::query();
+				//$conn->select($mailboxIds[0])->for($uid);
 				if(isset($patch->mailboxIds)) {
 					// move
-					$conn->move($patch->mailboxIds[0]);
+					//$conn->move($patch->mailboxIds[0]);
 
 				}
 				if(isset($patch->keywords)) {
-					$conn->flags($patch->keywords);
+					//$conn->flags($patch->keywords);
 					// store -> flags
 				}
 			}
 		}
 		if(!empty($json->create)) {
 			//$names[$email->mailboxIds[0]]
-			$conn->open('drafts');
-			foreach($json->create as $values) {
-				$email = self::emailAppend(function($mail) use($conn) {
-					return $conn
-						->append(new MimeHelper($mail))
-						->flags(self::parseFlags($mail))
-						->exec();
-				}, $values);
-				// $email->save();
+			//$this->imap->select('drafts');
+			foreach($json->create as $clientId => $properties) {
+				$properties['accountId'] = $this->account->id;
+				$email = $this->emailAppend($properties);
+
+				if(is_string($email)) {
+					$result['notCreated'][$clientId] = new SetError("invalidProperties", $email);
+				}else if($email->save()) {
+					$entityProps = new ArrayObject($email->toArray());
+					$diff = $entityProps->diff($properties);
+					$diff['id'] = $email->id();
+
+					$result['created'][$clientId] = empty($diff) ? null : $diff;
+				} else {
+					// if we are here we appended a draft but could save it locally
+					$result['notCreated'][$clientId] = new SetError("invalidProperties");
+					$result['notCreated'][$clientId]->properties = array_keys($email->getValidationErrors());
+					$result['notCreated'][$clientId]->validationErrors = $email->getValidationErrors();
+				}
 			}
 		}
-
-		$result = Api::set(Email::class, $json);
-
-		// todo
 
 		return $result;
 	}
 
-
-
-	static function emailAppend($maker, $values) {
-		$service = server()->account()->service('mail');
-		$me = Email::create($values);
-		$uuid = Crypto::UUIDv4();
+	private function emailAppend($values) {
+		$me = new Email;
+		$me->setValues($values);
 		$me->threadId = Thread::byMessage($me); // slow on full fetch, can build threads later
-		$me->messageId = (object)[sprintf('<%s@%s>', $uuid, $service->host)];
+		$me->messageId = [sprintf('<%s@%s>', UUID::v4(), $this->account->getMda()->host)];
 
 		//build RFC_882 for adapter
-		$mime = $maker($me);
-		$me->uid = $mime->uid;
-		$me->hasAttachment = $mime->hasAttachments;
-		$me->size = mb_strlen($mime->encoded, '8bit');
-		$me->blobId = 'mail.'.$uuid;
-		return $me;
+		$mime = MimeHelper::encode($me);
+		$uid = $this->imap->append('Drafts', $mime, self::parseFlags($me));
+		if(is_numeric($uid)) {
+			$me->setUid($uid);
+			$me->size = mb_strlen($mime, '8bit');
+			return $me;
+		}
+		return $mime; // error
 	}
 
 	static private function mailboxMap($entities) {
@@ -250,7 +276,7 @@ class ImapBackend {
 		foreach($entities as $entity) {
 			$mailboxIds = array_merge($mailboxIds, $entity->mailboxIds);
 		}
-		$return = Mailbox::find()->andWhereIn('id', $mailboxIds)->fetchKeyPair('id', 'name');
+		$return = Mailbox::find()->andWhere('id','in', $mailboxIds)->fetchKeyPair('id', 'name');
 	}
 
 	private static function parseFlags($email) {
@@ -341,9 +367,19 @@ class ImapBackend {
 	 * slow resync (but check for condstore)
 	 * enhance: send both command (dont wait for response)
 	 */
-	public function fetchChanges($mailboxId) {
+	public function fetchChanges($mailboxId = null) {
 		$this->isFetching = true;
-		$mailbox = Mailbox::findById($mailboxId);
+		if($mailboxId === null) {
+			$mailbox = Mailbox::findInbox($this->account->id);
+		} else {
+			$mailbox = Mailbox::findById($mailboxId);
+		}
+
+		$capabilities = $this->account->mdaCapabilities();
+
+		if(in_array('QRESYNC', $capabilities)) {
+			$this->imap->sendRequest('ENABLE QRESYNC');
+		}
 		$imailbox = $this->imap->examine($mailbox->name);
 
 		// TODO: imailbox could be deleted
@@ -356,7 +392,7 @@ class ImapBackend {
 		} else { // full refetch of mailbox
 			// delete all mail that is in this mailbox
 			go()->getDbConnection()->delete('email_email',(new Query)
-				->join('email_map', 'fk = id', 'LEFT')
+				->join('email_map', 'map', 'fk = id', 'LEFT')
 				->where("mailboxId = $mailbox->id")
 			)->execute();
 			$newMails = $this->imap->fetch(self::IndexedFields, 1, INF, true); // all
@@ -364,21 +400,24 @@ class ImapBackend {
 		}
 
 		// If CONDSTORE extension, only fetch new flags
-		$capabilities = $this->account->mdaCapabilities();
+
 		$vanished = [];
 		if(in_array('CONDSTORE', $capabilities)) {
-			$this->imap->sendRequest('ENABLE QRESYNC'); // CHUCK NORRIS
+
 			$response = $this->imap->fetch(['FLAGS', 'UID'], 1, $mailbox->uidnext(), true, ['CHANGEDSINCE '.$mailbox->highestModSeq(). ' VANISHED']); // new
 			$existingFlags = [];
 			foreach($response as $k => $v) {
 				if($v === null) {
-					if(strpos($k, ':')) {
-						list($from, $till) = explode(':',$k);
-						for($i = $from; $i <= $till; $i++) {
-							$vanished[] = $i;
+					$vanishedIds = explode(',', $k);
+					foreach($vanishedIds as $id) {
+						if (strpos($id, ':')) {
+							list($from, $till) = explode(':', $id);
+							for ($i = $from; $i <= $till; $i++) {
+								$vanished[] = (string)$i;
+							}
+						} else {
+							$vanished[] = $id;
 						}
-					} else {
-						$vanished[] = $k;
 					}
 				} else {
 					$existingFlags[$k] = $v;
@@ -388,7 +427,7 @@ class ImapBackend {
 			// delete all mail not in UIDs
 			if(!empty($vanished)) {
 				go()->getDbConnection()->delete('email_email', (new Query)
-					->join('email_map', 'fk = id', 'left')
+					->join('email_map', 'map','fk = id', 'LEFT')
 					->where("mailboxId = $mailbox->id")
 					->andWhere('uid', 'IN', $vanished))
 					->execute();
@@ -421,7 +460,7 @@ class ImapBackend {
 		}
 
 		// update mailbox highestmodseq
-		$mailbox->imapSyncProps($imailbox['uidnext'], $imailbox['highestmodseq'])->save();
+		$mailbox->imapSyncProps($imailbox['uidnext'], $imailbox['highestmodseq'] ?? null)->save();
 		return ['success'=>true, 'new'=>count($newMails), 'flags'=>count($existingFlags), 'vanished'=>count($vanished)];
 	}
 
@@ -487,6 +526,8 @@ class ImapBackend {
 				$parts = explode($params['delim'], $name);
 				$mailbox->name = array_pop($parts);
 				if(!empty($parts)) {
+					if(!isset($parentMap[array_pop($parts)]))
+						continue; // skip folder that is a path without any parents.
 					$mailbox->parentId = $parentMap[array_pop($parts)];
 				}
 				$mailbox->role = $this->parseMailboxFlags($mailbox->name,$params['flags']);
@@ -686,7 +727,7 @@ class ImapBackend {
 				$part->size = $size;
 				$dispositionAttachment = array_shift($disposition);
 				$params = array_shift($disposition);
-				$part->blobId = 'mail.'.$this->currentEmail->uid().'-'.$partId;
+				$part->setOwner($this->currentEmail);// = 'community/email/attachment/'.$this->currentEmail->uid().'/'.$partId;
 				if (is_array($params)) {
 					while ($key = array_shift($params)) {
 						switch ($key) {
@@ -728,9 +769,10 @@ class ImapBackend {
 		return trim($value);
 	}
 
+	public function fetchBody($email, $withTextValues = true) {
+		$this->currentEmail = $email;
 
-	public function fetchBody($uid, $withTextValues = true) {
-		$response = $this->imap->fetch(['BODYSTRUCTURE'], $uid, null, true);
+		$response = $this->imap->fetch(['BODYSTRUCTURE'], $email->uid(), null, true);
 
 		$structure = $this->parseBodyStructure($response['BODYSTRUCTURE'], 'message/rfc822');
 
@@ -739,7 +781,7 @@ class ImapBackend {
 			foreach ($this->textParts as $nb => $enc) {
 				$parts[] = 'BODY.PEEK[' . $nb . ']';
 			}
-			$response = $this->imap->fetch($parts, $uid, null, true);
+			$response = $this->imap->fetch($parts, $email->uid(), null, true);
 			$values = [];
 			foreach ($this->textParts as $nb => $enc) {
 				$values[$nb] = ['value' => self::decodeBody($response["BODY[$nb]"], $enc[0], $enc[1])];
@@ -753,7 +795,7 @@ class ImapBackend {
 	private function parseBodyStructure($structure, $parentType, $partId = '1') {
 
 		$bodyPart = new EmailBodyPart();
-
+		$bodyPart->setOwner($this->currentEmail);
 		if (is_array($structure[0])) { // multipart
 			$i = 0;
 			$type = $structure[count($structure)-5];
@@ -851,8 +893,6 @@ class ImapBackend {
 		return $bodyPart;
 	}
 
-	private $currentEmail;
-
 	private $textParts = [];
 
 
@@ -904,20 +944,6 @@ class ImapBackend {
 //		}
 //	}
 
-
-
-	public function downloadAttachment($uid, $partId) {
-		$data = $this->imap->fetch(["BODY[$partId]", "BODY[$partId.MIME]"], $uid, null, true);
-
-		$decoder = new \Mail_mimeDecode($data["BODY[$partId.MIME]"].$data["BODY[$partId]"]);
-		$decoded = $decoder->decode(['include_bodies'=>true, 'decode_bodies'=>true]);
-		return (object)[
-			'type' => $decoded->ctype_primary.'/'.$decoded->ctype_secondary,
-			'body' => $decoded->body,
-			'disposition' => $decoded->disposition,
-			'filename' => $decoded->d_parameters['filename']
-		];
-	}
 
 //	private function syncMailbox($mailbox, $modseq) {
 //		$data = [];

@@ -48,8 +48,6 @@ class Mailbox extends AclItemEntity {
 		return parent::defineFilters()
 			->add('parentId', function(Criteria $criteria, $value) {
 				$criteria->where('parentId', '=', $value);
-			})->add('accountId', function(Criteria $criteria, $value) {
-				$criteria->where('accountId', '=', $value);
 			});
 	}
 
@@ -105,6 +103,10 @@ class Mailbox extends AclItemEntity {
 	}
 	public function uid() {
 		return $this->uid;
+	}
+
+	static function findInbox($accountId) {
+		return self::find()->where(['accountId'=> $accountId, 'role' => 'inbox'])->single();
 	}
 
 	public function getTotalEmails() {

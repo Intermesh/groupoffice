@@ -16,10 +16,6 @@ class Identity extends EntityController {
 	protected function entityClass(): string
 	{
 		return model\Identity::class;
-	}	
-
-	public function query($params) {
-		return $this->defaultQuery($params);
 	}
 
 	public function get($params) {

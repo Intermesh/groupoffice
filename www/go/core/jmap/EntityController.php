@@ -132,6 +132,8 @@ abstract class EntityController extends Controller {
 		$query = $cls::find($cls::getPrimaryKey(false), false)
 						->limit($params['limit'])
 						->offset($params['position']);
+		if(isset($params['accountId']))
+			$query->where('accountId', '=', $params['accountId']);
 
 		/* @var $query Query */
 
@@ -460,6 +462,9 @@ abstract class EntityController extends Controller {
 		{
 			$query = $cls::findByIds($params['ids'], $params['properties'], static::$getReadOnly);
 		}
+		if(!empty($params['accountId'])){
+			$query->where(['accountId' => $params['accountId']]);
+		}
 
 		return $query;	
 	}
@@ -704,9 +709,11 @@ abstract class EntityController extends Controller {
    */
 	private function createEntitites(array $create, ArrayObject $result) {
 		foreach ($create as $clientId => $properties) {
+			if(!empty($result['accountId']))
+				$properties['accountId'] = $result['accountId'];
 
 			$entity = $this->create($properties);
-			
+
 			if(!$this->canCreate($entity)) {
 				$result['notCreated'][$clientId] = new SetError("forbidden", go()->t("Permission denied"));
 				continue;

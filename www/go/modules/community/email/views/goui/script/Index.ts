@@ -1,5 +1,5 @@
 import {client, jmapds, modules, router} from "@intermesh/groupoffice-core";
-import {datasourcestore, t as coreT, translate} from "@intermesh/goui";
+import {datasourcestore, store, t as coreT, translate} from "@intermesh/goui";
 import {Main} from "./Main";
 import {EmailView} from "./EmailView";
 import {PreferencesPanel} from "./PreferencesPanel";
@@ -7,9 +7,11 @@ import {PreferencesPanel} from "./PreferencesPanel";
 
 export const t = (key:string,p='community',m='email') => coreT(key, p,m);
 
-export const accountStore = datasourcestore({
+export const emailAccountStore = datasourcestore({
 	dataSource:jmapds('EmailAccount')
 });
+
+export const accountStore = store();
 
 modules.register(  {
 	package: "community",
@@ -40,6 +42,13 @@ modules.register(  {
 		translate.load(GO.lang.community.email, "community", "email");
 
 		client.on("authenticated",  ({session}) => {
+
+			accountStore.clear()
+			for(const id in session.accounts) {
+				const account = session.accounts[id];
+				account.id = id;
+				accountStore.add(account);
+			}
 
 			const ui = new Main(),
 				nav = (accountId:string, mailboxId: string, threadId: string = '') => {

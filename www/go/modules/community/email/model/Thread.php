@@ -42,17 +42,17 @@ class Thread extends Entity {
 	 * @throws \Exception
 	 */
 	static public function byMessage(Email $message) {
-		$in = (array)$message->messageId +
-			(array)$message->references +
-			(array)$message->inReplyTo;
+		$in = array_values(array_unique(array_merge($message->messageId,
+			$message->references,
+			$message->inReplyTo)));
 		$subjectHash = sha1(self::normalizeSubject($message->subject));
 		if (!empty($in)) {
 			$thread = Email::find()
-				->select(['id' => 'threadId'])->distinct()
+				->select('thr.id')->distinct()
 				->join('email_id','ids', 'ids.fk = e.id')
 				->join('email_thread', 'thr', 'threadId = thr.id','LEFT')
 				->where(['thr.subjectHash' => $subjectHash])
-				->andWhere('ids.messageId', '=', array_keys($in))->single();
+				->andWhere('ids.messageId', '=', $in)->single();
 		}
 		if (empty($thread)) {
 			$thread = new self();

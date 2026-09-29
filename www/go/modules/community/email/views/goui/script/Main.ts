@@ -4,8 +4,6 @@ import {
 } from "@intermesh/goui";
 import {AccountList} from "./AccountList";
 import {ListView} from "./ListView";
-import {IdentityWindow} from "./IdentityWindow";
-import {SettingsWindow} from "./SettingsWindow";
 import {ThreadView} from "./ThreadView";
 import {MailCtlr} from "./MailCtlr";
 import {Composer} from "./Composer";
@@ -48,6 +46,7 @@ export class Main extends Component {
 			jmapds('Thread').single(threadId).then(thread => {
 				const ds = jmapds('Email');
 				client.jmap('Email/get', {
+					accountId: accountId,
 					ids: thread!.emailIds,
 					properties: ["threadId","accountId", "mailboxIds", "from", "subject","to","cc","bcc","receivedAt", "htmlBody", "attachments", "bodyStructure", "bodyValues"],
 					bodyProperties: ["partId", "blobId", "size", "type","disposition","name"],

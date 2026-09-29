@@ -31,6 +31,11 @@ class Mailbox extends EntityController {
 	}
 
 	public function changes($params) {
+		$account = model\EmailAccount::findById($params['accountId']);
+		$backend = $account->connect();
+		if ($backend) {
+			$backend->fetchChanges();
+		}
 		return $this->defaultChanges($params);
 	}
 

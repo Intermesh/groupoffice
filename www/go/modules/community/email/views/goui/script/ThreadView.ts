@@ -12,6 +12,7 @@ export class ThreadView extends Component {
 		this.flex = '1';
 
 		this.items.add(this.mailList = list({
+			flex:'1',cls:'scroll',
 			store: store({}),
 			renderer: item => {
 				const mailView = new EmailView();

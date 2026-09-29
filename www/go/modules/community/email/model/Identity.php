@@ -4,9 +4,12 @@ namespace go\modules\community\email\model;
 
 
 use go\core\acl\model\AclItemEntity;
+use go\core\orm\Mapping;
 
 class Identity extends AclItemEntity {
 
+	public ?string $id;
+	public ?string $accountId;
 	/** @var string The 'From' name when composing new mail */
 	public ?string $name;
 
@@ -25,6 +28,11 @@ class Identity extends AclItemEntity {
 	/** @var string signature to use for new html mail to insert in <body> */
 	public ?string $htmlSignature;
 
+	protected static function defineMapping(): Mapping
+	{
+		return parent::defineMapping()
+			->addTable('email_identity', 'id');
+	}
 
 	/** @return EmailAddress[]|null */
 	public function getBcc() {

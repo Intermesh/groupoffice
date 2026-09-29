@@ -1,8 +1,8 @@
 import {client, jmapds} from "@intermesh/groupoffice-core";
 import {Composer} from "./Composer";
 import {DateTime} from "@intermesh/goui";
+import DOMPurify from 'dompurify';
 
-declare var DOMPurify: any;
 
 export class MailCtlr {
 	static resend(item: any) {
@@ -22,6 +22,12 @@ export class MailCtlr {
 		return cmp;
 	}
 
+	static destroy(item: any) {
+		const s = jmapds('Email');
+		s.setParams.accountId = item.accountId;
+		s.destroy(item.id);
+	}
+
 	static reply(item :any, all?:boolean) {
 
 		const cmp = new Composer();
@@ -29,7 +35,7 @@ export class MailCtlr {
 			const txt = MailCtlr.emailText(email),
 				at = new DateTime(email.sentAt || email.receivedAt);
 
-			let htmlBody = "<br><br>Op "+at.format('j M Y')+ ' om '+ at.format('H:i')+" heeft "+email.from[0].name+' het volgende geschreven:<br><blockquote>'+txt+'</blockquote>',
+			let htmlBody = "<br><br>Op "+at.format('j M Y')+ ' om '+ at.format('H:i')+" heeft "+email.from[0].name+' het volgende geschreven:<br>'+MailCtlr.prepareQuoted(txt)+'',
 				to = email.from,
 				cc = [];
 
@@ -40,7 +46,7 @@ export class MailCtlr {
 			cmp.form.create({
 				identityId: 1,
 				htmlBody,
-				inReplyTo: email.messageId,
+				inReplyTo: email.msageId,
 				subject: 'Re: '+email.subject,
 				to,
 				cc
@@ -66,7 +72,7 @@ export class MailCtlr {
 				htmlBody,
 				inReplyTo: email.messageId,
 				subject: 'Fwd: '+email.subject,
-				to: email.from[0]
+				to: [email.from[0]]
 			});
 		});
 		return cmp;
@@ -90,6 +96,46 @@ export class MailCtlr {
 		return texts.join(', ');
 	}
 
+	private static prepareQuoted(html:string) {
+		const scope = "q-" + crypto.randomUUID().slice(0, 8);
+
+		// 1. Find style blocks using Regex
+		const processedHtml = html.replace(/<style\b[^>]*>([\s\S]*?)<\/style>/gi, (_, cssContent) => {
+
+			const scopedCss = cssContent
+				.replace(/\/\*[\s\S]*?\*\//g, "") // remove comments
+				.replace(/@font-face\s*\{[\s\S]*?\}/gi, "") // remove font loading
+				.replace(/@keyframes\s+[^{]+\{[\s\S]*?\}\s*\}/gi, "") // remove keyframes
+				.replace(/([^\r\n,{}]+)(?=[^{}]*{)/g, (match) => {
+					const trimmed = match.trim();
+					if (trimmed.startsWith('@') || trimmed === '') return trimmed;
+					return trimmed.split(",")
+						.map(selector => {
+							const s = selector.trim();
+							if (!s) return "";
+							// Normalize root-level tags
+							const ls = s.toLowerCase()
+							if (ls === 'body' || ls === 'html' || ls === ':root') {
+								return `#${scope}`;
+							}
+
+							// Handle cases like 'body.classname'
+							if (ls.startsWith('body') || ls.startsWith('html')) {
+								return s.replace(/^(body|html)/i, `#${scope}`);
+							}
+
+							return `#${scope} ${s}`;
+						})
+						.join(",");
+				}
+			);
+
+			return `<style>${scopedCss}</style>`;
+		});
+
+		return `<blockquote id="${scope}">${processedHtml}</blockquote>`;
+	}
+
 	static emailText(data: any) {
 		if(data.htmlBody) {
 			for(let html,type,i=0; i < data.htmlBody.length; i++) {
@@ -98,15 +144,13 @@ export class MailCtlr {
 					continue;
 				}
 				html = data.bodyValues[data.htmlBody[i].partId].value;
-				if('DOMPurify' in window) {
-					html = DOMPurify.sanitize(html, {FORCE_BODY: true});
-				}
+
 				if(type == 'text/plain') {
 					html = html.replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1<br>$2')
 						.replace(/((http|ftp)+(s)?:\/\/[^<>\s]+)/ig, "<a href=\"$1\" target=\"_blank\">$1</a>");
 				}
 				if(type == 'text/html') {
-					// if block sender is untrusted
+					// block if sender is untrusted
 					html = html.replace(/(https?|ftp):\/\/[^"\s]+/ig,'').replace(/href=/ig, 'xref=');
 					html = html.replace(/src="cid:(.*?)"/g, function(_:string, p1:string) {
 						for(const a of data.attachments) {
@@ -118,7 +162,7 @@ export class MailCtlr {
 						return 'src="'+p1+'"';
 					});
 				}
-				return html;
+				return DOMPurify.sanitize(html, {FORCE_BODY: true});
 			}
 		} else {
 			return 'Email not found on server';

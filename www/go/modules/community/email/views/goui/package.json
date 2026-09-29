@@ -1,5 +1,6 @@
 {
   "type": "module",
+  "name": "email",
   "devDependencies": {
     "concurrently": "latest",
     "esbuild": "latest",
@@ -18,5 +19,8 @@
     "build:dts": "npx tsc --declaration --emitDeclarationOnly",
 
     "test": "npx tsc --noEmit"
+  },
+  "dependencies": {
+    "dompurify": "^3.3.1"
   }
 }

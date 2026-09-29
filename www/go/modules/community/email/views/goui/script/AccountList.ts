@@ -7,7 +7,7 @@ import {
 	List,
 	menu,
 	tbar,
-	t,
+	t,Window,
 	tree,
 	treecolumn,
 	TreeRecord, ComponentEventMap, Tree
@@ -41,10 +41,6 @@ export class AccountList extends Component<AccountListEventMap> {
 
 		const mailboxDS = jmapds('Mailbox');
 
-		const identityDialog = new IdentityWindow(),
-			accountMenu = menu({cls:'dropdown'},
-
-			);
 
 		this.items.add(tbar({cls: 'dense'},
 			comp({tagName: 'h3', html: t('Accounts')}),
@@ -69,16 +65,17 @@ export class AccountList extends Component<AccountListEventMap> {
 			})
 		), this.list = list({
 			tagName: 'div',
+			baseCls:'meg',
 			store: accountStore,
 			cls: 'check-list',
-			rowSelectionConfig: {
-				multiSelect: false,
-				listeners: {
-					'selectionchange': (tableRowSelect) => {
-						//todo
-					}
-				}
-			},
+			// rowSelectionConfig: {
+			// 	multiSelect: false,
+			// 	listeners: {
+			// 		'selectionchange': (tableRowSelect) => {
+			// 			//todo
+			// 		}
+			// 	}
+			// },
 			listeners: {'render': ({target}) => {
 					target.store.load();
 				}},
@@ -114,7 +111,8 @@ export class AccountList extends Component<AccountListEventMap> {
 						} else {
 							// When there's no record we're fetching the root of the tree
 							const q = await mailboxDS.query({
-								filter: {accountId: account.id, parentId: null},
+								filter: {parentId: null},
+								accountId: account.id
 								//sort: store.sort
 							});
 
@@ -125,7 +123,7 @@ export class AccountList extends Component<AccountListEventMap> {
 						//at the root of the tree record is undefined
 						return Promise.all(getResponse.list.map(async (e) => {
 							// prefetch child id's so the Tree component knows if this node has children
-							const childIds = (await mailboxDS.query({filter: {accountId: account.id, parentId: e.id}})).ids;
+							const childIds = (await mailboxDS.query({accountId: account.id,filter: {parentId: e.id}})).ids;
 							/** @ts-ignore */
 							const r: any[]|undefined = AccountList.mailboxRoles[e.role];
 							return {
@@ -149,24 +147,21 @@ export class AccountList extends Component<AccountListEventMap> {
 					//style: 'padding: 0 8px',
 					text: account.name,
 					menu: menu({},
-						btn({icon: 'badge', 	text: t('Identities'), handler: function() {identityDialog.show();}}),
-						btn({icon: 'refresh', text: 'Refetch all', handler: () => { this.imapFill(account.id, mboxTree) }}),
-						'-',
-						btn({icon:'edit', text: t('Edit')+'…', disabled:!account.myRights.mayAdmin, handler: async _ => {
+						btn({icon:'edit', text: t('Edit')+'…', disabled:account.isReadOnly, handler: async _ => {
 								const dlg = new AccountWindow();
 								await dlg.load(account.id);
 								dlg.show();
 							}}),
-						btn({icon:'delete', text: t('Delete','core','core')+'…', disabled:!account.myRights.mayAdmin, handler: async _ => {
-								jmapds("Mailbox").confirmDestroy([account.id]);
-							}}),
+						btn({icon:'delete', text: t('Delete','core','core')+'…', disabled:account.isReadOnly, handler: async _ => {
+							jmapds("Mailbox").confirmDestroy([account.id]);
+						}}),
 						hr(),
 						btn({icon: 'remove_circle', text: t('Unsubscribe'), handler() {
-								jmapds('Mailbox').update(account.id, {isSubscribed: false});
-							}}),
-						hr(),
-						btn({icon:'file_save',hidden:account.groupId, text: t('Share','core','core'), handler: _ => {  }}),
-
+							jmapds('Mailbox').update(account.id, {isSubscribed: false});
+						}}),
+						btn({icon:'file_save',hidden:account.isReadOnly, text: t('Share','core','core'), handler: _ => {  }}),
+						'-',
+						btn({icon: 'refresh', text: 'Refetch all', handler: () => { this.imapFill(account.id, mboxTree) }}),
 					)
 
 				}),mboxTree];
@@ -177,7 +172,7 @@ export class AccountList extends Component<AccountListEventMap> {
 	private imapFill(accountId: number, mboxTree: Tree) {
 		client.jmap('EmailAccount/fill',{accountId}).then(r => {
 			mboxTree.store.reload();
-		})
+		}).catch(e => Window.error(e))
 	}
 
 }
