@@ -1,6 +1,7 @@
 - Finance: When duplicating choose type
 - Finance: Margin rounding issue
 - Finance: Don't link original when duplicating
+- Finance: Fixed error where status couldn't be changed
 
 28-09-2026: 26.0.49
 - Oauth2Client: Don't overwrite IMAP username with the email that authenticates becasue it might be a shared mailbox
