@@ -71,7 +71,7 @@ class AlertDispatcher extends CronJob {
 			foreach ($subscriptions as $subscription) {
 				$payload = json_encode([
 					'title' => $searchRecord->title,
-					'body' => $searchRecord->description,
+					'body' => $searchRecord->description, // todo: use Format.shortDateTime($row['recurrenceId'] || event.start); if available
 					//'url' => $this->getUrl($row),
 					'recurrenceId' => $row['recurrenceId'],
 				]);
