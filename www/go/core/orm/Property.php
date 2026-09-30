@@ -613,6 +613,25 @@ abstract class Property extends Model {
 			return $ret;
 		}
 
+		$p = $this->internalWatchProperties();
+
+		App::get()->getCache()->set($cacheKey, $p);
+
+		return $p;
+	}
+
+
+	/**
+	 * These properties are used to check if a model is modified.
+	 * override to exclude or include properties.
+	 *
+	 * By default, all non-static public and protected properties + dynamically mapped properties.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	protected function internalWatchProperties(): array
+	{
 		$p = array_keys(static::getMapping()->getProperties());
 
 		$reflectionObject = new ReflectionClass(static::class);
@@ -634,11 +653,7 @@ abstract class Property extends Model {
 			'permissionLevel',
 			'readOnly'
 		];
-		$p = array_unique(array_diff($p, $exclude));
-
-		App::get()->getCache()->set($cacheKey, $p);
-
-		return $p;
+		return array_unique(array_diff($p, $exclude));
 	}
 
 	/**
@@ -734,6 +749,8 @@ abstract class Property extends Model {
 
 		return $map;
 	}
+
+
 
 	/**
 	 * Get ID which is are the primary keys combined with a "-".
