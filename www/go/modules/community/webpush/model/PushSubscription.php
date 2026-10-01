@@ -20,9 +20,6 @@ class PushSubscription extends Entity {
 	public ?string $url;
 
 	public ?\DateTime $expires;
-
-	public ?string $createdBy;
-
 	protected ?string $p256dh; // public key
 	protected ?string $auth; // auth token
 	protected ?string $verificationCode;

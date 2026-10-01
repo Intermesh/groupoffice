@@ -44,9 +44,12 @@ class Module extends core\Module {
 			$newKeys = Vapid::createVapidKeys();
 			$settings->vapidPublicKey = $newKeys['pub'];
 			$settings->vapidPrivateKey = $newKeys['priv'];
-			return $settings->save();
+			if(!$settings->save()) {
+				return false;
+			}
 		}
 		$this->createAlertDispatcherCron();
+
 		return true;
 	}
 

@@ -1,0 +1,1 @@
+drop table if exists core_push_subscription;

@@ -11,6 +11,9 @@ use go\modules\community\webpush\model\PushSubscription;
 use go\modules\community\webpush\model\Settings;
 use go\modules\community\webpush\model\WebPush;
 
+/**
+ * docker compose exec -u www-data groupoffice-develop ./www/cli.php core/System/runCron --name='AlertDispatcher' --module='webpush' --package='community' --debug
+ */
 class AlertDispatcher extends CronJob {
 
 	public function getLabel(){
@@ -62,11 +65,12 @@ class AlertDispatcher extends CronJob {
 			->andWhere('isSent','=',0);
 			//->andWhere(['tag'=>'1']); // the first alert of the array
 
+		go()->debug($alerts);
 
 		$toMarkSent = [];
 		// find active push subscription.
 		foreach ($alerts as $row) {
-			$searchRecord  = Search::find()->where(['entityType'=>$row->entityType, 'entityId'=>$row->entityId])->single();
+			$searchRecord  = $row->getModified();
 			$subscriptions = PushSubscription::find()->where(['userId'=>$row->userId])->all();
 			foreach ($subscriptions as $subscription) {
 				$payload = json_encode([
@@ -88,12 +92,16 @@ class AlertDispatcher extends CronJob {
 			if (!$result['success'] && $result['status'] === 410) {
 				// TODO: CHANGE update so client knows it is unsubscribed
 				// Subscription gone — delete it
-				go()->getDbConnection()->delete('core_push_subscription', ['endpoint' => $result['endpoint']]);
+				go()->getDbConnection()
+					->delete('core_push_subscription', ['endpoint' => $result['endpoint']])
+					->execute();
 			}
 		}
 
 		if ($toMarkSent) {
-			go()->getDbConnection()->update('core_alert', ['sentAt' => $now], ['id' => $toMarkSent]);
+			go()->getDbConnection()
+				->update('core_alert', ['isSent' => 1], ['id' => $toMarkSent])
+				->execute();
 		}
 
 	}

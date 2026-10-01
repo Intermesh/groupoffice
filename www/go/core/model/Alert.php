@@ -83,6 +83,11 @@ class Alert extends SingleOwnerEntity
 	}
 
 
+	public function getSearch() : Search {
+		return Search::find()->where(['entityTypeId'=>$this->entityTypeId, 'entityId'=>$this->entityId])->single();
+	}
+
+
 	/**
 	 * Set the entity type
 	 *

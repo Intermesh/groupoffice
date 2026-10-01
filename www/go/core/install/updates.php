@@ -1856,3 +1856,6 @@ $updates['202608241101'][] = "create table if not exists core_module_user
 );";
 
 $updates['202609161040'][] = "UPDATE `go_cron` SET `active`=0 WHERE 1;";
+
+$updates['202610011520'][] = "alter table core_alert
+    add isSent boolean default false not null;";
