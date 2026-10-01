@@ -1,6 +1,16 @@
 import {AclLevel, client, jmapds, main, modules, principalDS, userSettingsPanels} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
-import {datasourcestore, DateTime, E, INotification, router, t as coreT, translate, Window} from "@intermesh/goui";
+import {
+	datasourcestore,
+	DateTime,
+	E,
+	Format,
+	INotification,
+	router,
+	t as coreT,
+	translate,
+	Window
+} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {EventDetail, EventDetailWindow} from "./EventDetail.js";
 import {PreferencesPanel} from "./PreferencesPanel";
@@ -413,7 +423,19 @@ modules.register(  {
 						};
 						break;
 					default: // normal Event alert
-						msg.text = go.util.Format.shortDateTime(alert.recurrenceId || entity.start, true);
+
+						const startTime = new DateTime(alert.recurrenceId || entity.start),
+							diff = (new DateTime()).diff(startTime);
+
+						diff.seconds = 0;
+
+						msg.text = t(`Starts {diff} ({startTime})`)
+							.replace("{diff}", diff.format("T"))
+							.replace("{startTime}", Format.smartDateTime(startTime));
+
+						if(entity.location) {
+							msg.text += ", " + (entity.location.indexOf('http') === 0 ? "Online" : entity.location);
+						}
 				}
 				return msg as INotification;
 			});
