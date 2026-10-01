@@ -657,6 +657,9 @@ class CalendarEvent extends AclItemEntity {
 		}
 		if(!empty($this->alerts)) {
 			$this->useDefaultAlerts = false;
+
+			$this->checkAlertOwner();
+
 		}
 		if(empty($this->prodId) || $this->prodId === 'Unknown') {
 			$this->prodId = self::prodId();
@@ -719,7 +722,7 @@ class CalendarEvent extends AclItemEntity {
 
 		if($success) {
 			$this->addToKnownCalendars();
-			$this->updateAlerts(go()->getUserId());
+			$this->updateAlerts($this->forUserId());
 			$this->changeEventsWithSameUID();
 			$this->incrementCalendarModSeq();
 		}
@@ -830,7 +833,7 @@ class CalendarEvent extends AclItemEntity {
 			}
 		}
 	}
-	private function updateAlerts($userId) {
+	private function updateAlerts(int $userId) : void {
 		if(!CoreAlert::$enabled) {
 			return;
 		}
@@ -854,7 +857,7 @@ class CalendarEvent extends AclItemEntity {
 				}
 
 				foreach ($alerts as $alert) {
-					$alert->schedule($this);
+					$alert->schedule($this, $subscriber);
 				}
 			}
 
@@ -1209,4 +1212,23 @@ class CalendarEvent extends AclItemEntity {
 		}
 
 	}
+
+//	/**
+//	 * When a secretary makes an appointment on behalf of the calendar owner. We need to change the alerts
+//	 * to the calendar owner.
+//	 *
+//	 * @return void
+//	 * @throws Exception
+//	 */
+//	private function checkAlertOwner() : void
+//	{
+//		$calendar = Calendar::findById($this->calendarId, ['ownerId', 'groupId']);
+//		$calendarOwnerId = $calendar->getOwnerId();
+//
+//		if($calendarOwnerId && $this->forUserId() != $calendarOwnerId) {
+//			foreach($this->alerts as $alert) {
+//				$alert->changeUserId($calendarOwnerId);
+//			}
+//		}
+//	}
 }
