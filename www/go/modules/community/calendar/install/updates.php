@@ -96,6 +96,11 @@ $updates['202402221543'][] = function(){ // insert event overrides
 			$patch->participants = (object) $participants;
 		}
 
+		// in some rare cases the recurrence_id is null.
+		if(empty($row['recurrence_id'])) {
+			continue;
+		}
+
 		// add patch to calendar_recurrence_override
 		$recurrenceId = tz_convert($row['recurrence_id'],$event['timezone'])->format('Y-m-d H:i:s');
 		$insertPatchStmt->execute([$event['id'],$recurrenceId, json_encode($patch)]);
