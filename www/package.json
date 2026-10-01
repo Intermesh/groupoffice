@@ -10,7 +10,7 @@
     "go/modules/business/*/views/goui"
   ],
   "dependencies": {
-    "pdfjs-dist": "5.6.205"
+    "pdfjs-dist": "latest"
   },
   "allowScripts": {
     "esbuild@0.28.0": true,
