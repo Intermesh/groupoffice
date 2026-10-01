@@ -22,7 +22,7 @@ class UserProperty extends Property {
 		parent::init();
 
 		if($this->isNew()) {
-			$this->userId = $this->owner->getUserId();
+			$this->userId = $this->owner->forUserId();
 		}
 	}
 
