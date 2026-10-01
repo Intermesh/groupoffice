@@ -1,3 +1,4 @@
+- Core: Added Login throttling to improve security
 - Catalog: non-US centric money icon for cost fields
 - Finance: When duplicating choose type
 - Finance: Margin rounding issue
