@@ -617,6 +617,8 @@ class CalendarEvent extends AclItemEntity {
 			$this->uri = strtr($this->uid, '+/=', '-_.') . '.ics';
 		}
 
+		$this->checkScheduleFor();
+
 		if($this->isNew() || $this->isModified(['start','duration','recurrenceRule','recurrenceOverrides'])) {
 			$this->updateOccurrenceSpan();
 		}
@@ -657,9 +659,7 @@ class CalendarEvent extends AclItemEntity {
 		}
 		if(!empty($this->alerts)) {
 			$this->useDefaultAlerts = false;
-
-			$this->checkAlertOwner();
-
+//			$this->checkAlertOwner();
 		}
 		if(empty($this->prodId) || $this->prodId === 'Unknown') {
 			$this->prodId = self::prodId();
@@ -1213,22 +1213,34 @@ class CalendarEvent extends AclItemEntity {
 
 	}
 
-//	/**
-//	 * When a secretary makes an appointment on behalf of the calendar owner. We need to change the alerts
-//	 * to the calendar owner.
-//	 *
-//	 * @return void
-//	 * @throws Exception
-//	 */
-//	private function checkAlertOwner() : void
-//	{
-//		$calendar = Calendar::findById($this->calendarId, ['ownerId', 'groupId']);
-//		$calendarOwnerId = $calendar->getOwnerId();
-//
-//		if($calendarOwnerId && $this->forUserId() != $calendarOwnerId) {
-//			foreach($this->alerts as $alert) {
-//				$alert->changeUserId($calendarOwnerId);
-//			}
-//		}
-//	}
+	/**
+	 * When a secretary makes an appointment on behalf of the calendar owner. We need to change the alerts
+	 * to the calendar owner.
+	 *
+	 * This is not according to JMAP standards but it makes sense for users. The downside this only happens when
+	 * creating the event. It can't be changed afterwards.
+	 *
+	 * It also only happens for non-default alerts. So only when a user explicitly sets an alert.
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	private function checkScheduleFor() : void
+	{
+		if(!$this->isNew()) {
+			return;
+		}
+
+		$calendar = Calendar::findById($this->calendarId, ['ownerId', 'groupId']);
+		$calendarOwnerId = $calendar->getOwnerId();
+		if(!$calendarOwnerId || $this->forUserId() == $calendarOwnerId) {
+			return;
+		}
+
+		$this->forUserId($calendarOwnerId);
+		foreach($this->alerts as $alert) {
+			$alert->forUserId($calendarOwnerId);
+		}
+
+	}
 }

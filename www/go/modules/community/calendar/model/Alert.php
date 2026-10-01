@@ -159,8 +159,4 @@ class Alert extends UserProperty {
 		return $coreAlert;
 	}
 
-	public function changeUserId(int $userId) : void {
-		$this->userId = $userId;
-	}
-
 }
