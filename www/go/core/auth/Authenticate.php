@@ -30,6 +30,26 @@ class Authenticate {
 	 */
 	const CACHE_PASSWORD_LOGIN = 60;
 
+	/**
+	 * Failed attempts per username+IP before throttling starts
+	 */
+	const THROTTLE_MAX_USER_FAILURES = 5;
+
+	/**
+	 * Failed attempts per IP (any username) before throttling starts
+	 */
+	const THROTTLE_MAX_IP_FAILURES = 25;
+
+	/**
+	 * Seconds after which the failure counters are forgotten when no new failure occurs
+	 */
+	const THROTTLE_WINDOW = 900;
+
+	/**
+	 * Maximum back-off in seconds
+	 */
+	const THROTTLE_MAX_DELAY = 900;
+
 	private array $primaryAuthenticators;
 	private array $secondaryAuthenticators;
 
@@ -168,8 +188,60 @@ class Authenticate {
 	}
 
 
+	private function throttleKeys(string $username, string $scope): array
+	{
+		if(go()->getEnvironment()->isCli()) {
+			return [];
+		}
+		$ip = Request::get()->getRemoteIpAddress();
+		return [
+			'login-throttle-' . $scope . '-u-' . md5(strtolower($username) . '|' . $ip) => self::THROTTLE_MAX_USER_FAILURES,
+			'login-throttle-' . $scope . '-ip-' . md5($ip) => self::THROTTLE_MAX_IP_FAILURES
+		];
+	}
+
+	/**
+	 * Throws when too many failed logins occurred recently for this username/IP.
+	 * @throws Forbidden
+	 */
+	public function checkThrottle(string $username, string $scope = 'password'): void
+	{
+		foreach($this->throttleKeys($username, $scope) as $key => $max) {
+			$state = go()->getCache()->get($key);
+			if($state && $state['lockedUntil'] > time()) {
+				throw new Forbidden(go()->t("Too many failed login attempts. Please try again later."));
+			}
+		}
+	}
+
+	/**
+	 * Count a failed login and apply exponential back-off: delay doubles for every failure past the limit.
+	 */
+	public function registerFailure(string $username, string $scope = 'password'): void
+	{
+		foreach($this->throttleKeys($username, $scope) as $key => $max) {
+			$state = go()->getCache()->get($key) ?: ['count' => 0, 'lockedUntil' => 0];
+			$state['count']++;
+			if($state['count'] >= $max) {
+				$delay = min(self::THROTTLE_MAX_DELAY, 30 * (2 ** min(20, $state['count'] - $max)));
+				$state['lockedUntil'] = time() + $delay;
+			}
+			go()->getCache()->set($key, $state, true, self::THROTTLE_WINDOW + self::THROTTLE_MAX_DELAY);
+		}
+	}
+
+	public function clearThrottle(string $username, string $scope = 'password'): void
+	{
+		// Only the username+IP counter is reset, so a valid login can't be used to reset the IP counter.
+		$keys = array_keys($this->throttleKeys($username, $scope));
+		if($keys) {
+			go()->getCache()->delete($keys[0]);
+		}
+	}
+
 	private function logFailure(string $username): void
 	{
+		$this->registerFailure($username);
 		// Don't change log message as fail2ban relies on it
 		ErrorHandler::log("Password authentication failed for '" . $username . "' from IP: '" . Request::get()->getRemoteIpAddress() . "'");
 	}
@@ -197,9 +269,12 @@ class Authenticate {
 
 		go()->debug("Authenticating " . $username);
 
+		$this->checkThrottle($username);
+
 		$cacheKey = 'login-' . md5($username. '|' . $password);
 
 		if(!go()->getSettings()->maintenanceMode && $cache = go()->getCache()->get($cacheKey)) {
+			$this->clearThrottle($username);
 			$this->usedPasswordAuthenticator = $cache[1];
 			return $cache[0];
 		}
@@ -234,6 +309,8 @@ class Authenticate {
 		}
 
 		go()->log("success");
+
+		$this->clearThrottle($username);
 
 		if(!$user->enabled) {
 			throw new Forbidden(go()->t("Your account has been disabled."));

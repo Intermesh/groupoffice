@@ -251,6 +251,11 @@ try {
 				$data['authenticators'] = $data['methods'];
 			}
 
+			$throttleUsername = $token->getUser()->username;
+			if(!empty($data['authenticators'])) {
+				$auth->checkThrottle($throttleUsername, 'secondary');
+			}
+
 			$testedAuthenticators = $token->validateSecondaryAuthenticators($data['authenticators'] ?? []);
 
 			$authenticators = array_map(function ($o) {
@@ -260,6 +265,8 @@ try {
 			$authenticated = empty($authenticators);
 
 			if ($authenticated) {
+
+				$auth->clearThrottle($throttleUsername, 'secondary');
 
 				$rememberMeToken = null;
 				if(!empty($data['rememberLogin'])) {
@@ -294,6 +301,7 @@ try {
 
 			if (!empty($validationErrors)) {
 				$user = $token->getUser();
+				$auth->registerFailure($user->username, 'secondary');
 				User::fireEvent(User::EVENT_BADLOGIN, $user->username, $user);
 
 				$response['errors'] = $validationErrors;
