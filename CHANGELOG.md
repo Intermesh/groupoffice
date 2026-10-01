@@ -1,3 +1,4 @@
+- Catalog: non-US centric money icon for cost fields
 - Finance: When duplicating choose type
 - Finance: Margin rounding issue
 - Finance: Don't link original when duplicating
