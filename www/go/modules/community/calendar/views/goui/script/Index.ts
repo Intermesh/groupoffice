@@ -357,12 +357,12 @@ modules.register(  {
 					this.show();
 					this.goto(new DateTime(ymd)).setSpan(span as ValidTimeSpan, Math.min(parseInt(amount),373));
 				},
-				async '^calendarevent/(\d+)$' (id)  {
+				async '^calendarevent/(\\d+)$' (id)  {
 					// for notification clicks
 					this.show();
 					const event = await jmapds('CalendarEvent').single(id);
 					if(event)
-						(new CalendarItem({data: event, key: id})).open();
+						(new CalendarItem({data: event, key: id})).info();
 
 				}
 			}
