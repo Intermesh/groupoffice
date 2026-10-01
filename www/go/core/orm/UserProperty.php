@@ -21,8 +21,8 @@ class UserProperty extends Property {
 	{
 		parent::init();
 
-		if($this->isNew() && go()->getAuthState()) {
-			$this->userId = go()->getAuthState()->getUserId();
+		if($this->isNew()) {
+			$this->userId = $this->owner->getUserId();
 		}
 	}
 
