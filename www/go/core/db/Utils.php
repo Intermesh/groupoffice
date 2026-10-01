@@ -206,9 +206,15 @@ class Utils {
         'options' => $options
     ];
   }
-	
-	
-	public static function quoteTableName($name): string
+
+
+	/**
+	 * Quotes the table name for safe injection in an SQL string
+	 *
+	 * @param string $name
+	 * @return string
+	 */
+	public static function quoteTableName(string $name): string
 	{
 		//disallow \ ` and \00  : http://stackoverflow.com/questions/1542627/escaping-field-names-in-pdo-statements
 		// if (preg_match("/[`\\\\\\000,]/", $name)) {
@@ -217,13 +223,21 @@ class Utils {
 
 		return '`' . str_replace('`', '``', $name) . '`';
 	}
-	
-	public static function quoteColumnName($name): string
+
+	/**
+	 * Quotes the column name for safe injection in an SQL string
+	 *
+	 * @param string $name
+	 * @return string
+	 */
+	public static function quoteColumnName(string $name): string
 	{
 		return self::quoteTableName($name);
 	}
 
 	/**
+	 * Create a column object with name and table name from a string
+	 *
 	 * @param string $tableAndCol
 	 * @return Col
 	 */

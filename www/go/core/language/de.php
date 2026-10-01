@@ -1438,7 +1438,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'loading...' => 'Laden…',
   'Use $config' => 
   array (
-    '\'debug\'' => 'Verwenden Sie $config[\'debug\']=true; nur für die Entwicklung oder zur Problemlösung. Es verlangsamt " + t(\'product_name',
+    '\'debug\'' => 'Use $config[\'debug\']=true; only with development and problem solving. It slows " + t(\'product_name',
   ),
   'Is organization' => 'Ist eine Organisation',
   'Registration number' => 'Register-Nummer',

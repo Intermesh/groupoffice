@@ -132,7 +132,6 @@ class Authenticator extends PrimaryAuthenticator
 				$dt->setTimezone(new \DateTimeZone(go()->getSettings()->defaultTimezone));
 				$dt->add(new DateInterval('PT10M'));
 				$o->expiresAt = $dt;
-				$o->userId = $user->id;
 				$user->otp = $o;
 			} else {
 				go()->debug("No OTP secret found for " . $username . ". Checking for OTP blocking.");
@@ -165,15 +164,15 @@ class Authenticator extends PrimaryAuthenticator
 
 		if ($server->hasEmailAccount()) {
 			try {
-				$emailPassword = $password;
+				$emailPassword = $password ?? "";
 
 				if (!empty($mappedValues['imapPassword'])) {
-					$emailPassword = $mappedValues['imapPassword'];
+					$emailPassword = $mappedValues['imapPassword'] ?? "";
 				}
 
 				$smtpPassword = null;
 				if (!empty($mappedValues['smtpPassword'])) {
-					$smtpPassword = $mappedValues['smtpPassword'];
+					$smtpPassword = $mappedValues['smtpPassword'] ?? "";
 				}
 
 				$this->setEmailAccount($domain, $ldapUsername, $emailPassword, $smtpPassword, $mappedValues['email'], $server, $user);

@@ -73,9 +73,9 @@ class Alert extends UserProperty {
 		}
 	}
 
-	public function schedule(CalendarEvent $item) : ?\go\core\model\Alert {
+	public function schedule(CalendarEvent $item, ?int $userId = null) : ?\go\core\model\Alert {
 
-		$alert = $this->buildCoreAlert($item);
+		$alert = $this->buildCoreAlert($item, $userId);
 		if(!$alert) {
 			return null;
 		}
@@ -91,17 +91,18 @@ class Alert extends UserProperty {
 	 * Generate a Group-Office alert based on the calendar alert
 	 *
 	 * @param CalendarEvent|null $event
+	 * @param int|null $userId
 	 * @return \go\core\model\Alert|null
-	 * @throws \DateMalformedIntervalStringException
+	 * @throws \DateMalformedStringException
 	 */
-	public function buildCoreAlert(?CalendarEvent $event = null) : ?\go\core\model\Alert
+	public function buildCoreAlert(?CalendarEvent $event = null, ?int $userId = null) : ?\go\core\model\Alert
 	{
 		if(!isset($event)) {
 			$event = $this->owner;
 		}
 		$coreAlert = new \go\core\model\Alert();
 		$coreAlert->setEntity($event);
-		$coreAlert->userId = go()->getUserId();
+		$coreAlert->userId = $userId ?? $event->forUserId();
 		$coreAlert->tag = $this->id;
 
 		if (isset($this->offset)) {

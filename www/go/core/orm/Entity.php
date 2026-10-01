@@ -682,6 +682,25 @@ abstract class Entity extends Property {
 		return $this->internalGetPermissionLevel();
 	}
 
+	/**
+	 * Override to implement custom permission logic.
+	 *
+	 * Example on how to use the module's manage permission flag:
+	 * ```
+	 * public function internalGetPermissionLevel(): int
+	 * {
+	 * 	if(Module::findByName('business', 'catalog')
+	 * 		->getUserRights()
+	 * 		->mayManage) {
+	 * 		return ACL::LEVEL_MANAGE;
+	 * 	}
+	 *
+	 * 	return parent::internalGetPermissionLevel();
+	 * }
+	 *
+	 * ```
+	 * @return int
+	 */
 	protected function internalGetPermissionLevel(): int
 	{
 		if(go()->getAuthState() && go()->getAuthState()->isAdmin()) {

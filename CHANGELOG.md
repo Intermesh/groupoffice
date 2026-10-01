@@ -1,4 +1,32 @@
+- Catalog: non-US centric money icon for cost fields
+- Finance: When duplicating choose type
+- Finance: Margin rounding issue
+- Finance: Don't link original when duplicating
+- Finance: Fixed error where status couldn't be changed
+- Calendar: view jumped to zoom .8 on full hd screens
+- Core / Calendar: User properties were not fetched for the alternative user when Entity::findFor() was used. This 
+  caused that all users subscribed to a calendar got the default notifications of the user creating the event
+- 
+28-09-2026: 26.0.49
+- Oauth2Client: Don't overwrite IMAP username with the email that authenticates becasue it might be a shared mailbox
+- Catalog: Allow users with manage permissions on the catalog module to alter the catalog.
+- Core: escape background progress param names
+- Core: Escape table name and alias in Connection::lock()
+- Core: more robust path traversal check
+- Otp: rate limiting on otp authentication
+- Core: Fixed: getModified() discards the customFields entry it just built #1574
+- Files: do not create global search for trashed files or folders
+- Comments: make sure text doesn't run through status icon
+- Core: apcu didn't keep values in memory on CLI. This speeds up CLI operations like LDAP sync.
+- Ldapauthenticator: OTP provisioning from LDAP was broken
+- Finance: Fixed "Add from catalog" causeing UI to freeze
+
+21-09-2026: 26.0.48
 - Core: Fixed link loading in link browser
+- Newsletters: fix template upload
+- LDAP Auth: prevent error message when certain mappings are not set
+- Core: updated DE translations, thanks Jörg
+- Core: display foreground and background colors in custom fieldsets details if set
 
 14-09-2026: 26.0.47
 - pdfeditor: rename Upload to upload so class finder doesn't try to load it

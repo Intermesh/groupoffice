@@ -180,13 +180,18 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, Iter
 			if(go()->getDbConnection()->debug && isset($this->build) && go()->getDebugger()->enabled) {
 				$sql = QueryBuilder::debugBuild($this->build);
 				go()->debug(str_replace(["\n","\t"], [" ", ""], $sql) , 5);
+
+				if(!isset($this->build['start'])) {
+					$this->build['start'] = go()->getDebugger()->getMicroTime();
+				}
 			}
 
 			$this->pdoStmt->execute($params);
 
 			if(go()->getDbConnection()->debug && isset($this->build) && go()->getDebugger()->enabled) {
-				$duration = number_format((go()->getDebugger()->getMicrotime() * 1000) - ($this->build['start'] * 1000), 2);
+				$duration = number_format((go()->getDebugger()->getMicrotime() * 1000) - ($this->build['start'] * 1000), 2, ".", "");
 				go()->debug("Query took " . $duration . "ms");
+				unset($this->build['start']);
 			}
 
 			return true;
@@ -311,12 +316,11 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, Iter
 				return false;
 			}
 
-			//todo correct constuctor args
 			$model = new $this->modelClassName(...$this->modelConstructorArgs);
-			$model->populate($arr);
 			if(isset($this->forUserId)) {
 				$model->forUserId($this->forUserId);
 			}
+			$model->populate($arr);
 
 			return $model;
 		}

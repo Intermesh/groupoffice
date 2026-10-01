@@ -835,7 +835,7 @@ $timeMargin: dp(72);
 //	}
 //}
 
-@media only screen and ((max-device-width: $breakpointMedium) or (max-device-height: $breakpointMedium)) {
+@media only screen and ((max-device-width: $breakpointMedium)) {
 	//.cal.week > ul:first-child em {
 	//	display:inline-block !important;
 	//}

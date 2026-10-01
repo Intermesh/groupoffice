@@ -3620,7 +3620,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 *
 	 * @return boolean
 	 */
-	public function cacheSearchRecord(){
+	public function cacheSearchRecord(): bool
+	{
 
 		//don't do this on datbase checks.
 		if(!self::$updateSearch)

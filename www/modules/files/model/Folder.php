@@ -21,7 +21,7 @@ use go\core\fs\FileSystemObject;
 use go\core\fs\Folder as GoFolder;
 use go\core\model\Acl;
 use go\core\model\Module;
-use modules\files\model\TrashedItem;
+//use modules\files\model\TrashedItem;
 
 /**
  * The Folder model
@@ -100,27 +100,30 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	}
 
 
-	protected function getCacheAttributes() {
-
+	protected function getCacheAttributes()
+	{
 		//	Otherwise it would break 3.7 to 4.X upgrade
-		if (\GO::router()->getControllerRoute()=='maintenance/upgrade') {
+		if (\GO::router()->getControllerRoute() == 'maintenance/upgrade') {
 			return false;
 		}
 
-
-
 		// Don't search these folders because it may show too much
-		if($this->parent_id == 0 || $this->visible=0) {
+		if ($this->parent_id == 0 || $this->visible = 0) {
 			return false;
 		}
 
 		$path = $this->path;
 		//Don't cache tickets files because there are permissions issues. Everyone has read access to the types but may not see other peoples files.
-		if(strpos($path, 'tickets/')===0){
+		if (str_starts_with($path, 'tickets/')) {
 			return false;
 		}
 
-		return array('name'=>$this->name, 'description'=>$path);
+		// Trashed items should not be cached either. You should NOT be able to use global search for Trash items.
+		if (str_starts_with($path, 'trash/')) {
+			return false;
+		}
+
+		return array('name' => $this->name, 'description' => $path);
 	}
 
 	/**
@@ -130,15 +133,15 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		return 'acl_id';
 	}
 
-	public function findAclId() {
-		//folder may have an acl ID if they don't have one we must recurse up the tree
-		//to find the acl.
-		if ($this->acl_id > 0){
+	public function findAclId()
+	{
+		//folder may have an acl ID if they don't have one we must recurse up the tree to find the acl.
+		if ($this->acl_id > 0) {
 			return $this->acl_id;
-		}elseif($this->parent)
+		} elseif($this->parent) {
 			return $this->parent->findAclId();
-		else
-			return false;
+		}
+		return false;
 	}
 
 	public function hasLinks() {

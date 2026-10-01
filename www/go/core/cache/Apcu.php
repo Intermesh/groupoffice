@@ -105,7 +105,12 @@ class Apcu implements CacheInterface {
 		}
 
 		if(!$this->apcuEnabled) {
-			return $this->getDiskCache()->get($key);
+			$value = $this->getDiskCache()->get($key);
+
+			if($this->keepInMemory) {
+				$this->cache[$key] = $value;
+			}
+			return $value;
 		}
 
 		$success = false;
