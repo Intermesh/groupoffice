@@ -56,37 +56,5 @@ if(!$lock->lock()) {
 }
 
 
-//new framework
 CronJobSchedule::runNext();
-
-$date = new DateTime();
-
-//old framework
-require('GO.php');
-GO::session()->runAsRoot();
-
-/**
- * @return mixed
- * @throws Exception
- */
-function findNextCron(){
-	$currentTime = new DateTimeAlias("now", new DateTimeZone("UTC"));
-
-		$findParams = FindParams::newInstance()
-			->single()
-			->criteria(FindCriteria::newInstance()
-				->addCondition('nextrun', $currentTime->getTimestamp(),'<')
-				->addCondition('active',true)
-			);
-		
-		return CronJob::model()->find($findParams);
-}
-
-$jobAvailable = false;
-while($cronToHandle = findNextCron()){
-	$jobAvailable = true;
-	GO::debug('CRONJOB FOUND');
-	$cronToHandle->run();
-}
-
 
