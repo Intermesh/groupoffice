@@ -118,7 +118,6 @@ trait SearchableTrait {
 		$search->filter = $this->getSearchFilter();
 		$search->modifiedAt = $this->getSearchModifiedAt();
 		$search->rebuild = false;
-//		$search->createdAt = $this->createdAt;
 
 		if($this->includeInSearch()) {
 			$keywords = $this->getSearchKeywords();
@@ -127,8 +126,6 @@ trait SearchableTrait {
 				$keywords = [$search->name, $search->description];
 			}
 
-//		$keywords = $this->getCommentKeywords($keywords);
-
 			$links = (new Query())
 				->select('description')
 				->distinct()
@@ -136,7 +133,6 @@ trait SearchableTrait {
 				->where('(toEntityTypeId = :e1 AND toId = :e2)')
 				//->orWhere('(fromEntityTypeId = :e3 AND fromId = :e4)')
 				->bind([':e1' => static::entityType()->getId(), ':e2' => $this->id]);
-			//':e3' => static::entityType()->getId(), ':e4' => $this->id ]);
 			foreach ($links->all() as $link) {
 				if (!empty($link['description']) && is_string($link['description'])) {
 					$keywords[] = $link['description'];
@@ -184,18 +180,6 @@ trait SearchableTrait {
 		)->execute();
 
 	}
-
-//	private function getCommentKeywords(array $keywords) : array {
-//		if(Module::isInstalled("community", "comments")) {
-//			$comments = Comment::findForEntity($this, ['text']);
-//			foreach($comments as $comment) {
-//				$plain = strip_tags($comment->text);
-//				$keywords = array_merge($keywords, StringUtil::splitTextKeywords($plain));
-//			}
-//		}
-//
-//		return $keywords;
-//	}
 
 
 	/**

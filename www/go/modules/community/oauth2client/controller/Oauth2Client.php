@@ -221,7 +221,8 @@ final class Oauth2Client extends EntityController
 			$account = \GO\Email\Model\Account::model()->findByPk($accountId);
 
 
-			if(method_exists($token, "getIdTokenClaims") && !empty($token->getIdTokenClaims()['email']) && $account->username != $token->getIdTokenClaims()['email']) {
+			// Don't overwrite: shared-mailbox tokens may belong to a different user.
+			if(empty($account->username) && method_exists($token, "getIdTokenClaims") && !empty($token->getIdTokenClaims()['email'])) {
 				$account->username = $token->getIdTokenClaims()['email'];
 				$account->save();
 			}

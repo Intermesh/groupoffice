@@ -265,7 +265,7 @@ abstract class Base{
 	 */	
 	public static function checkPathInput($path){
 		$path = '/'.str_replace('\\','/', $path);
-		return strpos($path, '/../') === false;
+		return !in_array('..', explode('/', $path), true);
 	}
 	
 	

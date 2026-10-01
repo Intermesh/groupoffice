@@ -617,6 +617,25 @@ abstract class Property extends Model {
 			return $ret;
 		}
 
+		$p = $this->internalWatchProperties();
+
+		App::get()->getCache()->set($cacheKey, $p);
+
+		return $p;
+	}
+
+
+	/**
+	 * These properties are used to check if a model is modified.
+	 * override to exclude or include properties.
+	 *
+	 * By default, all non-static public and protected properties + dynamically mapped properties.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	protected function internalWatchProperties(): array
+	{
 		$p = array_keys(static::getMapping()->getProperties());
 
 		$reflectionObject = new ReflectionClass(static::class);
@@ -638,11 +657,7 @@ abstract class Property extends Model {
 			'permissionLevel',
 			'readOnly'
 		];
-		$p = array_unique(array_diff($p, $exclude));
-
-		App::get()->getCache()->set($cacheKey, $p);
-
-		return $p;
+		return array_unique(array_diff($p, $exclude));
 	}
 
 	/**
@@ -738,6 +753,8 @@ abstract class Property extends Model {
 
 		return $map;
 	}
+
+
 
 	/**
 	 * Get ID which is are the primary keys combined with a "-".
@@ -1189,6 +1206,8 @@ abstract class Property extends Model {
 			return $forIsModified ? false : [];
 		}
 
+		$modified = [];
+
 		if(!is_array($properties)) {
 			$properties = [$properties];
 		}
@@ -1196,27 +1215,45 @@ abstract class Property extends Model {
 		if(empty($properties)) {
 			$properties = array_keys($this->oldProps);
 
-			if(method_exists($this, 'getCustomFields') && $this->getCustomFields()->isModified()) {
-				if ($forIsModified) {
-					return true;
-				}
-				$modified['customFields'] = $this->getCustomFields()->getModified();
+			if(method_exists($this, 'getCustomFields')) {
+				$properties[] = 'customFields';
 			}
 		}
 
-		$modified = [];
-
 		foreach($properties as $key) {
 
-			$oldValue = $this->oldProps[$key] ?? null;
-			$newValue = $this->{$key} ?? null;
+			if($key == 'customFields') {
+				/** @var CustomFieldsModel $cf */
+				$cf = $this->getCustomFields();
 
-			$propModified = $this->internalIsModified($newValue, $oldValue, static::isScalarRelation($key));
-			if ($propModified) {
-				if ($forIsModified) {
-						return true;
+				if ($forIsModified && $cf->isModified()) {
+					return true;
 				}
-				$modified[$key] = [$newValue, $oldValue];
+
+				$cfModfications = $cf->getModified();
+
+				if(!empty($cfModfications)) {
+					$current = [];
+					$old = [];
+
+					foreach ($cfModfications as $key => $cfModfication) {
+						$current[$key] = $cfModfication[0];
+						$old[$key] = $cfModfication[1];
+					}
+					$modified['customFields'] = [$current, $old];
+				}
+
+			} else {
+				$oldValue = $this->oldProps[$key] ?? null;
+				$newValue = $this->{$key} ?? null;
+
+				$propModified = $this->internalIsModified($newValue, $oldValue, static::isScalarRelation($key));
+				if ($propModified) {
+					if ($forIsModified) {
+						return true;
+					}
+					$modified[$key] = [$newValue, $oldValue];
+				}
 			}
 		}
 

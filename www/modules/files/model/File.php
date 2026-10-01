@@ -111,20 +111,25 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		return true;
 	}
 
-	protected function getCacheAttributes() {
-
+	protected function getCacheAttributes()
+	{
 		$path = $this->path;
 
 		//Don't cache tickets files because there are permissions issues. Everyone has read access to the types but may not see other peoples files.
-		if(strpos($path, 'tickets/')===0){
+		if (str_starts_with($path, 'tickets/')) {
 			return false;
 		}
 
-		if(!$this->folder) {
+		// Trashed items should not be cached either. You should NOT be able to use global search for Trash items.
+		if (str_starts_with($path, 'trash/')) {
 			return false;
 		}
 
-		return array('name'=>$this->name, 'description'=>$path, 'filter' => $this->folder->getIdPath() . "/");
+		if (!$this->folder) {
+			return false;
+		}
+
+		return array('name' => $this->name, 'description' => $path, 'filter' => $this->folder->getIdPath() . "/");
 	}
 
 	public function getLogMessage($action){

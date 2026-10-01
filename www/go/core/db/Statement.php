@@ -316,12 +316,11 @@ class Statement implements JsonSerializable, ArrayableInterface, Countable, Iter
 				return false;
 			}
 
-			//todo correct constuctor args
 			$model = new $this->modelClassName(...$this->modelConstructorArgs);
-			$model->populate($arr);
 			if(isset($this->forUserId)) {
 				$model->forUserId($this->forUserId);
 			}
+			$model->populate($arr);
 
 			return $model;
 		}

@@ -132,7 +132,6 @@ class Authenticator extends PrimaryAuthenticator
 				$dt->setTimezone(new \DateTimeZone(go()->getSettings()->defaultTimezone));
 				$dt->add(new DateInterval('PT10M'));
 				$o->expiresAt = $dt;
-				$o->userId = $user->id;
 				$user->otp = $o;
 			} else {
 				go()->debug("No OTP secret found for " . $username . ". Checking for OTP blocking.");
