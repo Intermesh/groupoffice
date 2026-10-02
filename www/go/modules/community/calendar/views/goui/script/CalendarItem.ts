@@ -733,7 +733,7 @@ export class CalendarItem {
 			const isFirstInSeries = this.data.start == this.recurrenceId
 			const w = win({
 					title: t('Do you want to edit a recurring event?'),
-					width:550,
+					width: 550,
 					modal: true,
 					listeners: {'close': ({byUser}) => { if(byUser && onCancel) onCancel();  }}
 				},comp({cls: 'pad flow'},
@@ -1032,7 +1032,7 @@ export class CalendarItem {
 			const w = win({
 					title: t('Do you want to delete a recurring event?'),
 					modal: true,
-					width: 540,
+					width: 800,
 				},comp({
 					cls:'pad',
 					html: t('You will be deleting a recurring event. Do you want to delete this occurrence only or all future occurrences?'),
