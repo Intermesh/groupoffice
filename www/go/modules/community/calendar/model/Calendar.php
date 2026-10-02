@@ -123,6 +123,15 @@ class Calendar extends AclOwnerEntity {
 		$this->ownerId = $v;
 	}
 
+	/**
+	 * The calendar owner is a principal:
+	 *
+	 * 1. A user if it's a private calendar
+	 * 2. "Calendar::$id" if it's a resource
+	 * 3. null if it's a shared calendar where any user with permission can be the organizer.
+	 *
+	 * @return int|string|null
+	 */
 	public function getOwnerId() {
 		return !empty($this->groupId) ? ('Calendar:'.$this->id) : $this->ownerId;
 	}
