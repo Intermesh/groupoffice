@@ -4,6 +4,7 @@ namespace go\core\auth;
 
 use Exception;
 use go\core\db\Column;
+use go\core\db\Criteria;
 use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
 use go\core\exception\Unavailable;
@@ -14,6 +15,7 @@ use go\core\model\AuthAllowGroup;
 use go\core\model\RememberMe;
 use go\core\model\Token;
 use go\core\model\User;
+use go\core\orm\Query;
 use go\core\util\DateTime;
 
 /**
@@ -294,8 +296,6 @@ class Authenticate
 			if ($appPassword->hasMatchingScope($protocol)) {
 				go()->log("App password login success for " . $username);
 
-				$appPassword->updateLastUsed($_SERVER['REMOTE_ADDR']);
-
 				go()->getCache()->set($cacheKey, $user, true, self::CACHE_PASSWORD_LOGIN);
 
 				if (!$user->enabled) {
@@ -312,6 +312,8 @@ class Authenticate
 					throw new Unavailable(go()->t("Service unavailable. Maintenance mode is enabled."));
 				}
 
+				$this->touchAppPassword($appPassword->id);
+
 				return $user;
 			}
 
@@ -323,6 +325,26 @@ class Authenticate
 		$this->logFailure($username);
 
 		return false;
+	}
+
+	private function touchAppPassword(int $appPasswordId): void
+	{
+		$today = (new DateTime())->format('Y-m-d');
+
+		go()->getDbConnection()->update(
+			'core_app_password',
+			[
+				'lastUsedAt' => $today,
+				'lastUsedIp' => Request::get()->getRemoteIpAddress()
+			],
+			(new Query())
+				->where('id', '=', $appPasswordId)
+				->andWhere(
+					(new Criteria())
+						->where('lastUsedAt', 'IS', null)
+						->orWhere('lastUsedAt', '<', $today)
+				)
+		)->execute();
 	}
 
 	private $usedPasswordAuthenticator;

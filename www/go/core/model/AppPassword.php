@@ -88,27 +88,4 @@ class AppPassword extends Entity
 		return password_verify($password, $this->passwordHash);
 	}
 
-	public function updateLastUsed(string $ipAddress)
-	{
-		$saveChanges = false;
-
-		if ($ipAddress !== $this->lastUsedIp) {
-			$this->lastUsedIp = $ipAddress;
-
-			$saveChanges = true;
-		}
-
-		// only update lastUsedAt once per day
-		$now = new DateTime();
-		if (!$this->lastUsedAt || $this->lastUsedAt->format('Y-m-d') !== $now->format('Y-m-d')) {
-			$this->lastUsedAt = $now;
-
-			$saveChanges = true;
-		}
-
-		if ($saveChanges) {
-			$this->save();
-		}
-	}
-
 }
