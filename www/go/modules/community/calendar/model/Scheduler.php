@@ -15,6 +15,9 @@ use GO\Email\Model\ImapMessage;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Component\VEvent;
 
+/**
+ * Handles imip scheduling
+ */
 class Scheduler {
 
 	const EssentialScheduleProps = ['start', 'duration', 'location', 'title', 'description', 'showWithoutTime', 'recurrenceRule'];
