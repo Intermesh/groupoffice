@@ -4,20 +4,19 @@ import {
 	comp,
 	DateInterval,
 	DateTime,
-	E, EntityID, Format, MaterialIcon, ObjectUtil, root,
-	tbar, Timezone,
-	win, Window
+	E,
+	EntityID,
+	Format,
+	MaterialIcon,
+	ObjectUtil,
+	root,
+	tbar,
+	Timezone,
+	win,
+	Window
 } from "@intermesh/goui";
-import {
-	calendarStore,
-	CalendarView,
-	categoryStore,
-	getParticipantStatusIcon,
-	statusIcons,
-	t,
-	writeableCalendarStore
-} from "./Index.js";
-import {client, jmapds, Principal, Recurrence, RecurrenceField} from "@intermesh/groupoffice-core";
+import {calendarStore, categoryStore, getParticipantStatusIcon, t, writeableCalendarStore} from "./Index.js";
+import {client, jmapds, Recurrence, RecurrenceField} from "@intermesh/groupoffice-core";
 import {EventWindow} from "./EventWindow.js";
 import {EventDetailWindow} from "./EventDetail.js";
 import {SubscribeWindow} from "./SubscribeWindow";
@@ -550,11 +549,16 @@ export class CalendarItem {
 	get quickText(): string {
 		const cal = this.cal ? ('<sup style="color:#'+this.cal.color+';">'+this.cal.name+'</sup>') : '';
 		const lines = [
-			'<h2 style="padding:0;margin:0;">' + this.title.htmlEncode() + '</h2>' + cal,
-			...this.humanReadableDate(),
+			'<h2 style="padding:0;margin:0;">' + this.title.htmlEncode() + '</h2>' + cal + "<br />",
+			...this.humanReadableDate(), "<br />"
 		];
+
+		if(this.patched.location) {
+			lines.push('<div style="white-space: pre">' + t('Location')+ ': ' + this.formatLocation(this.patched.location)) + '</div>';
+		}
+
 		if(this.isRecurring) {
-			lines.push(RecurrenceField.toText(this.data.recurrenceRule,this.start));
+			lines.push(RecurrenceField.toText(this.data.recurrenceRule,this.start) + "<br />");
 		}
 		if(this.participants) {
 			lines.push('<hr>'+t('Participants'));
@@ -563,25 +567,34 @@ export class CalendarItem {
 					icon = getParticipantStatusIcon(p);
 
 				const i = '<i class="icon '+icon[2]+'" title="'+icon[1]+'">'+icon[0]+'</i>' ;
-				lines.push(i+' '+(p.name || p.email).htmlEncode());
+				lines.push(i+' '+(p.name || p.email).htmlEncode() + "<br />");
 			}
 
 		}
-		if(this.patched.creator && this.patched.modifier) {
-			lines.push(
-				'<hr>' + t('Created at') + ': ' + Format.smartDateTime(this.data.createdAt) + ' ' + t('by') + ' ' + this.data.creator.name.htmlEncode(),
-				t('Modified at') + ': ' + Format.smartDateTime(this.data.modifiedAt) + ' ' + t('by') + ' ' + this.data.modifier.name.htmlEncode()
-			);
-		}
 
-		if(this.patched.location) {
-			lines.push('<div style="white-space: pre">' + t('Location')+ ': ' + this.formatLocation(this.patched.location)) + '</div>';
+
+		if(this.categories.length) {
+			const cats = [];
+			for (const cat of this.categories) {
+				cats.push(`<span><i class="cat" style="color: #${cat.color};"></i> ${cat.name.htmlEncode()}</span>`);
+			}
+
+			lines.push('<div class="categories">' + cats.join("") + '</div>');
 		}
 
 		if(this.patched.description)
 			lines.push('<p style="max-width:360px;">'+Format.textToHtml(this.patched.description)+'</p>');
 
-		return lines.join('<br>');
+
+		if(this.patched.creator && this.patched.modifier) {
+			lines.push(
+				'<hr>' + t('Created at') + ': ' + Format.smartDateTime(this.data.createdAt) + ' ' + t('by') + ' ' + this.data.creator.name.htmlEncode(),
+				"<br>",
+				t('Modified at') + ': ' + Format.smartDateTime(this.data.modifiedAt) + ' ' + t('by') + ' ' + this.data.modifier.name.htmlEncode()
+			);
+		}
+
+		return lines.join('');
 	}
 
 	private formatLocation(l:string) {
