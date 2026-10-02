@@ -1,16 +1,23 @@
 import {
 	browser,
 	btn,
-	checkbox, CheckboxField,
+	checkbox,
+	CheckboxField,
 	comp,
-	Component, ComponentEventMap,
-	displayfield, fieldset, Format,
+	Component,
+	ComponentEventMap,
+	displayfield,
+	fieldset,
+	Format,
 	FunctionUtil,
-	hr, List,
+	hr,
+	List,
 	list,
 	menu,
-	select, selectallcheckboxfield,
-	tbar, win, Window
+	select,
+	tbar,
+	win,
+	Window
 } from "@intermesh/goui";
 import {calendarStore, Main, t} from "./Index.js";
 import {CalendarView} from "./CalendarView.js";
@@ -167,10 +174,12 @@ export class CalendarList extends Component<CalendarListEventMap> {
 
 		const rights = modules.get("community", "calendar")!.userRights;
 		const icon = data.webcalUri ? ' <i class="icon">web</i>' : '';
+		_row.title = data.description;
 		return [checkbox({
 			color: '#' + data.color,
 			value: data.isVisible,
 			label: data.name + icon,
+
 			listeners: {
 				'render': ({target}) => {
 					target.input.addEventListener("mousedown", (ev) => {
