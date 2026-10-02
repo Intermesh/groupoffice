@@ -78,6 +78,14 @@ class Calendar extends AclOwnerEntity {
 	 * @var DefaultAlertWT[]
 	 */
 	public ?array $defaultAlertsWithoutTime;
+
+
+	/**
+	 * Calendar owner id
+	 *
+	 * Is null for shared calendars and resources. {@see getOwnerId()}
+	 * @var int|null
+	 */
 	protected ?int $ownerId = null;
 	public ?string $createdBy;
 	public ?string $webcalUri = null;
@@ -241,23 +249,28 @@ class Calendar extends AclOwnerEntity {
 			$this->syncToDevice = true;
 			$this->isVisible = true;
 			$this->defaultColor = $this->color;
+
+			if(!empty($this->groupId)) {
+				// Make sure resource owner can manage resource calendars.
+				// This doesn't handle permissions when the resource calendar admin changes though.
+				$adminId = ResourceGroup::find()
+					->selectSingleValue('defaultOwnerId')
+					->where('id', '=', $this->groupId)
+					->single();
+				$groupId = Group::findPersonalGroupID($adminId);
+				if($groupId) {
+					$this->createAcl();
+					$this->findAcl()->addGroup($groupId, Acl::LEVEL_MANAGE);
+				}
+			}
+
 		} else if($this->ownerId === go()->getUserId() && !empty($this->color)) {
 			$this->defaultColor = $this->color;
 		}
 		if(empty($this->color)) {
 			$this->color = $this->defaultColor;
 		}
-		if(!empty($this->groupId) && empty($this->ownerId)) {
-			$this->ownerId = ResourceGroup::find()
-				->selectSingleValue('defaultOwnerId')
-				->where('id', '=', $this->groupId)
-				->single();
-			$groupId = Group::findPersonalGroupID($this->ownerId);
-			if($groupId) {
-				$this->createAcl();
-				$this->findAcl()->addGroup($groupId, Acl::LEVEL_MANAGE);
-			}
-		}
+
 		if($this->isModified('defaultAlertsWithTime')) {
 			$this->updateEventAlerts($this->defaultAlertsWithTime);
 		}

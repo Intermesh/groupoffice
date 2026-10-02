@@ -14,8 +14,8 @@ import {
 } from "@intermesh/goui";
 import {client, jmapds, modules} from "@intermesh/groupoffice-core";
 import {t} from "./Index.js";
-import {ResourceWindow} from "./ResourcesWindow";
 import {CalendarWindow} from "./CalendarWindow";
+import {ResourceWindow} from "./ResourceWindow.js";
 
 export class SubscribeWindow extends Window {
 

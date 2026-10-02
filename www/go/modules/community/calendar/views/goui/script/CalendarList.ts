@@ -14,12 +14,12 @@ import {
 } from "@intermesh/goui";
 import {calendarStore, Main, t} from "./Index.js";
 import {CalendarView} from "./CalendarView.js";
-import {ResourceWindow} from "./ResourcesWindow.js";
 import {CalendarWindow} from "./CalendarWindow.js";
 import {client, jmapds, modules} from "@intermesh/groupoffice-core";
 import {SubscribeWindow} from "./SubscribeWindow.js";
 import {SubscribeWebCalWindow} from "./SubscribeWebCalWindow";
 import {ViewWindow} from "./ViewWindow";
+import {ResourceWindow} from "./ResourceWindow.js";
 
 export interface CalendarListEventMap extends ComponentEventMap {
 	changevisible: {ids: string[]}
