@@ -66,7 +66,7 @@ class PushDispatcher
 		// this lead to lots of User/changes calls per second while we almost never need the user entity to be up to date.
 		// only your own user when checking your account settings.
 		$this->entities = array_filter($entities, function($name) {
-			return $name != "User" && $name != "Search" && $name != 'LogEntry';
+			return $name != "User" && $name != "Search" && $name != 'LogEntry' && EntityType::existsByName($name);
 		});
 
 	}

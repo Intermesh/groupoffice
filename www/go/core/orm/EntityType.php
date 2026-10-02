@@ -383,6 +383,18 @@ class EntityType implements ArrayableInterface {
 	}
 
 	/**
+	 * Check if entity exists
+	 *
+	 * @param string $name
+	 * @return bool
+	 */
+	public static function existsByName(string $name) : bool {
+		$c = self::getCache();
+
+		return isset($c['name'][$name]) && isset($c['models'][$c['name'][$name]]);
+	}
+
+	/**
 	 * Convert array of entity names to ids
 	 *
 	 * @param string[] $names eg ['Contact', 'Note']
