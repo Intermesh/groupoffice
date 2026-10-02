@@ -451,7 +451,12 @@ class Calendar extends AclOwnerEntity {
 
 	protected function isPrincipal() : bool
 	{
-		return isset($this->groupId) && isset($this->ownerId);
+		if(!isset($this->groupId)) {
+			return false;
+		}
+
+		$group = ResourceGroup::findById($this->groupId);
+		return !empty($group->defaultOwnerId);
 	}
 
 	protected static function queryMissingPrincipals(int $offset = 0): Query {
