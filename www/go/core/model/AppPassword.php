@@ -6,6 +6,7 @@ use go\core\db\Criteria;
 use go\core\jmap\Entity;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
+use go\core\orm\Query;
 use go\core\orm\Relation;
 use go\core\util\DateTime;
 
@@ -50,6 +51,15 @@ class AppPassword extends Entity
 					$criteria->andWhere('revokedAt', '=', null);
 				}
 			});
+	}
+
+	protected function internalGetPermissionLevel(): int
+	{
+		if ($this->userId == go()->getUserId() || go()->getAuthState()->isAdmin()) {
+			return Acl::LEVEL_MANAGE;
+		} else {
+			return 0;
+		}
 	}
 
 	public function getPasswordHash()

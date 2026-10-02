@@ -7,15 +7,14 @@ use go\core\db\Column;
 use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
 use go\core\exception\Unavailable;
+use go\core\jmap\Request;
+use go\core\jmap\State as JmapState;
 use go\core\model\AppPassword;
 use go\core\model\AuthAllowGroup;
 use go\core\model\RememberMe;
 use go\core\model\Token;
 use go\core\model\User;
-use go\core\jmap\Request;
 use go\core\util\DateTime;
-use go\core\jmap\State as JmapState;
-use go\modules\community\addressbook\model\Contact;
 
 /**
  * Class Authenticate
@@ -23,7 +22,8 @@ use go\modules\community\addressbook\model\Contact;
  * This is a helper class that should always be used to authenticate a user
  * It will be used for webclient, sync client, webdav client
  */
-class Authenticate {
+class Authenticate
+{
 
 	/**
 	 * Cache password logins for this number of seconds to
@@ -42,7 +42,8 @@ class Authenticate {
 	 *
 	 * @return PrimaryAuthenticator|false
 	 */
-	public function getPrimaryAuthenticatorForUser($username) {
+	public function getPrimaryAuthenticatorForUser($username)
+	{
 		$this->populateAuthenticators();
 		foreach ($this->getPrimaryAuthenticators() as $authenticator) {
 			if ($authenticator->isAvailableFor($username)) {
@@ -114,8 +115,9 @@ class Authenticate {
 		return $this->externalAuthenticators;
 	}
 
-	private function populateAuthenticators() {
-		if(!isset($this->primaryAuthenticators)) {
+	private function populateAuthenticators()
+	{
+		if (!isset($this->primaryAuthenticators)) {
 			$authMethods = Method::find()->orderBy(['sortOrder' => 'DESC'])->all();
 			$this->secondaryAuthenticators = [];
 			$this->primaryAuthenticators = [];
@@ -144,11 +146,11 @@ class Authenticate {
 	private function isLocalUser($username): bool
 	{
 		return go()->getDbConnection()
-			->selectSingleValue('id')
-			->from('core_auth_password', 'p')
-			->join('core_user', 'u', 'u.id=p.userId')
-			->where('username', '=', explode('@', $username)[0])
-			->single() != null;
+				->selectSingleValue('id')
+				->from('core_auth_password', 'p')
+				->join('core_user', 'u', 'u.id=p.userId')
+				->where('username', '=', explode('@', $username)[0])
+				->single() != null;
 	}
 
 	/**
@@ -190,24 +192,24 @@ class Authenticate {
 	{
 		$isLocalUser = $this->isLocalUser($username);
 
-		go()->debug("Auth ". $username . " is " . ($isLocalUser ? "local" : "not local"));
+		go()->debug("Auth " . $username . " is " . ($isLocalUser ? "local" : "not local"));
 		// When the user is local don't use
-		if(!$isLocalUser && !str_contains($username, '@') && go()->getSettings()->defaultAuthenticationDomain) {
+		if (!$isLocalUser && !str_contains($username, '@') && go()->getSettings()->defaultAuthenticationDomain) {
 			$username .= '@' . go()->getSettings()->defaultAuthenticationDomain;
 		}
 
 		go()->debug("Authenticating " . $username);
 
-		$cacheKey = 'login-' . md5($username. '|' . $password);
+		$cacheKey = 'login-' . md5($username . '|' . $password);
 
-		if(!go()->getSettings()->maintenanceMode && $cache = go()->getCache()->get($cacheKey)) {
+		if (!go()->getSettings()->maintenanceMode && $cache = go()->getCache()->get($cacheKey)) {
 			$this->usedPasswordAuthenticator = $cache[1];
 			return $cache[0];
 		}
 
 		$authenticator = $this->getPrimaryAuthenticatorForUser($username);
 
-		if(!$authenticator) {
+		if (!$authenticator) {
 
 			// If we get here then the given username doesn't exist.
 			// Do a password_verify for timing attacks as this would be done for a
@@ -236,18 +238,18 @@ class Authenticate {
 
 		go()->log("success");
 
-		if(!$user->enabled) {
+		if (!$user->enabled) {
 			throw new Forbidden(go()->t("Your account has been disabled."));
 		}
 
-		if(!go()->getEnvironment()->isCli()) {
+		if (!go()->getEnvironment()->isCli()) {
 			$ip = Request::get()->getRemoteIpAddress();
 			if (!AuthAllowGroup::isAllowed($user, $ip)) {
 				throw new Forbidden(str_replace('{ip}', $ip, go()->t("You are not allowed to login from IP address {ip}.")));
 			}
 		}
 
-		if(go()->getSettings()->maintenanceMode && !$user->isAdmin()) {
+		if (go()->getSettings()->maintenanceMode && !$user->isAdmin()) {
 			throw new Unavailable(go()->t("Service unavailable. Maintenance mode is enabled."));
 		}
 
@@ -263,6 +265,12 @@ class Authenticate {
 	{
 		go()->debug("App password auth for " . $username . " (protocol: " . $protocol . ")");
 
+		$cacheKey = 'apppw-' . hash('sha256', $username . '|' . $protocol . '|' . $password);
+
+		if (!go()->getSettings()->maintenanceMode && $cached = go()->getCache()->get($cacheKey)) {
+			return $cached;
+		}
+
 		$user = User::find()->where(['username' => $username])->single();
 
 		if (!$user) {
@@ -270,8 +278,7 @@ class Authenticate {
 			// nosemgrep: detected-bcrypt-hash
 			password_verify("randomboguspasswordstring", '$2y$10$wkP8uDjY/tt5GNrfJJO9SOknqStW0POBn5Z4zpctuQkMP7pibTz2m');
 
-			User::fireEvent(User::EVENT_BADLOGIN, $username, null);
-			$this->logFailure($username);
+			go()->log("App password for '$username' rejected: not valid for protocol '$protocol'");
 
 			return false;
 		}
@@ -289,11 +296,26 @@ class Authenticate {
 
 				$appPassword->updateLastUsed($_SERVER['REMOTE_ADDR']);
 
+				go()->getCache()->set($cacheKey, $user, true, self::CACHE_PASSWORD_LOGIN);
+
+				if (!$user->enabled) {
+					throw new Forbidden(go()->t("Your account has been disabled."));
+				}
+
+				$ip = Request::get()->getRemoteIpAddress();
+
+				if (!go()->getEnvironment()->isCli() && !AuthAllowGroup::isAllowed($user, $ip)) {
+					throw new Forbidden(str_replace('{ip}', $ip, go()->t("You are not allowed to login from IP address {ip}.")));
+				}
+
+				if (go()->getSettings()->maintenanceMode && !$user->isAdmin()) {
+					throw new Unavailable(go()->t("Service unavailable. Maintenance mode is enabled."));
+				}
+
 				return $user;
 			}
 
 			User::fireEvent(User::EVENT_BADLOGIN, $username, null);
-			$this->logFailure($username);
 			return false;
 		}
 
@@ -332,7 +354,7 @@ class Authenticate {
 
 		$primary = $this->getPrimaryAuthenticatorForUser($user->username);
 		// if no primary authenticator was found then also allow password recovery to create a password
-		if($primary && !($primary instanceof Password)) {
+		if ($primary && !($primary instanceof Password)) {
 			go()->debug("Authenticator doesn't support recovery");
 			return false;
 		}
@@ -340,8 +362,9 @@ class Authenticate {
 		return true;
 	}
 
-	public function recovery($hash) {
-		if(empty($hash)) {
+	public function recovery($hash)
+	{
+		if (empty($hash)) {
 			return false;
 		}
 		$oneHourAgo = new DateTime('-1 hour');
@@ -365,7 +388,7 @@ class Authenticate {
 		RememberMe::unsetCookie();
 		$state = new JmapState();
 		$token = $state->getToken();
-		if(!$token) {
+		if (!$token) {
 			return false;
 		}
 
@@ -380,7 +403,8 @@ class Authenticate {
 		return true;
 	}
 
-	public function refreshToken($accessToken) {
+	public function refreshToken($accessToken)
+	{
 		$token = Token::find()->where(['accessToken' => $accessToken])->single();
 		if ($token && $token->isAuthenticated()) {
 			$token->refresh();

@@ -1863,3 +1863,7 @@ $updates['202608201106'][] = "CREATE TABLE `core_app_password_scope`
 );";
 
 $updates['202608241101'][] = "ALTER TABLE `core_principal` ADD UNIQUE INDEX `entityId` (`entityTypeId` ASC, `entityId` ASC)";
+
+$updates['202610021153'][] = "ALTER TABLE `core_app_password` MODIFY `lastUsedIp` VARCHAR(45) NULL;";
+
+$updates['202610021331'][] = "ALTER TABLE `core_app_password_scope` ADD UNIQUE KEY `appPasswordId_protocol` (`appPasswordId`, `protocol`);";

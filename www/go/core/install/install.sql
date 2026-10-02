@@ -1280,7 +1280,7 @@ CREATE TABLE `core_app_password`
     `passwordHash` VARCHAR(255) NOT NULL,
     `createdAt`    DATETIME     NOT NULL,
     `lastUsedAt`   DATE         NULL,
-    `lastUsedIp`   VARCHAR(39)  NULL,
+    `lastUsedIp`   VARCHAR(45)  NULL,
     `revokedAt`    DATETIME     NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT `core_app_password_core_user`
@@ -1296,6 +1296,7 @@ CREATE TABLE `core_app_password_scope`
     `appPasswordId` INT UNSIGNED                                    NOT NULL,
     `protocol`      ENUM ('dav', 'caldav', 'carddav', 'activesync') NOT NULL,
     PRIMARY KEY (`id`),
+    UNIQUE KEY `appPasswordId_protocol` (`appPasswordId`, `protocol`),
     CONSTRAINT `core_app_password_core_app_password_scope`
         FOREIGN KEY (`appPasswordId`)
             REFERENCES `core_app_password` (`id`)
