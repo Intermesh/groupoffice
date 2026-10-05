@@ -1,5 +1,5 @@
 import {client, modules} from "@intermesh/groupoffice-core";
-import {t} from "@intermesh/goui";
+import {t, translate} from "@intermesh/goui";
 import {SystemSettingsPanel} from "./SystemSettingsPanel.js";
 
 modules.register({
@@ -10,6 +10,8 @@ modules.register({
 			if (!session.capabilities["go:community:apikeys"]) {
 				return;
 			}
+
+			translate.setDefaultModule("community", "apikeys");
 
 			modules.addSystemSettingsPanel("community", "apikeys", "apikeys", t("API Keys"), "lock", () => {
 				return new SystemSettingsPanel();
