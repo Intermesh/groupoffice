@@ -158,6 +158,12 @@ class Authenticator extends PrimaryAuthenticator
 		}
 		if ($user->isModified()) {
 			if (!$user->save()) {
+				if(!go()->getDebugger()->enabled) {
+					go()->getDebugger()->enable();
+					go()->debug($user->getValidationError('otp'));
+					go()->getDebugger()->enabled = false;
+				}
+
 				throw new Exception("Could not save user: " . $user->getValidationErrorsAsString());
 			}
 		}
