@@ -40,16 +40,15 @@ class Week extends Calendar {
 		$this->Rect($this->leftMargin, 10, $width, 30,'DF', $this->thickBorder, $this->greyFill);
 		$this->SetFont(null, 'B',$this->fSizeLarge);
 		$this->Cell(100, 12, $this->day->format('d. ').$this->months_long[$this->day->format('n')].$this->day->format(' Y').' -', 0, 1);
-		
-		//$this->SetLin
+
 		
 		$this->setX(12);
-		$this->SetFont(null, 'B', $this->fSizeLarge);
-		//$end = $this->day+($this->dayCount-1)*24*3600;
 		$this->Cell(100, 12, $this->end->format('d. ').$this->months_long[$this->end->format('n')].$this->end->format(' Y'), 0, 1);
-		
-		$this->drawCalendar($this->day, 110, 12);
-		$this->drawCalendar((clone $this->day)->modify('next month'), 160, 12);
+
+
+		$this->drawCalendar($this->day->format("n"), $this->day->format("Y"), 110, 12);
+		$nextMonth = (clone $this->day)->modify('next month');
+		$this->drawCalendar($nextMonth->format("n"), $nextMonth->format("Y"), 160, 12);
 		
 		$this->setXY($this->leftMargin,41);
 		

@@ -99,7 +99,7 @@ class Disk implements CacheInterface {
 		$serialized = $file->getContents();
 
 		try {
-			$v = unserialize($serialized, ['allowed_classes' => false]);
+			$v = unserialize($serialized, ['allowed_classes' => true]); // classes must be allowed because we use this in our ORM
 			if(is_array($v) && isset($v['e'])) {
 				if($v['e'] < time()) {
 					$this->delete($key);

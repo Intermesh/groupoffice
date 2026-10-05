@@ -9,6 +9,8 @@
   caused that all users subscribed to a calendar got the default notifications of the user creating the event
 - Calendar: Add categories to tooltip
 - Calendar: Show calendar description when you hover it
+- Calendar: Fixed printing months
+- ldapauthenticator: Retry when error 1020 record has been changed is thrown by mysql during ldap sync
 
 28-09-2026: 26.0.49
 - Oauth2Client: Don't overwrite IMAP username with the email that authenticates becasue it might be a shared mailbox
