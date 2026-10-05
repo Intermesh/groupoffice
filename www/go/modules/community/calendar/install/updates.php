@@ -490,3 +490,5 @@ $updates['202605281632'][] = "ALTER TABLE `calendar_preferences` ADD COLUMN mult
 
 
 $updates['202610051128'][] = "update calendar_calendar set ownerId = null where groupId is not null;";
+
+$updates['202610051128'][] = "update calendar_event set replyTo = replace(lower(replyTo), 'mailto:', '')";
