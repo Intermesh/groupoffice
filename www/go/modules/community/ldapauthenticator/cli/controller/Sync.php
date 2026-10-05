@@ -13,6 +13,7 @@ use go\core\ldap\Connection;
 use go\core\ldap\Record;
 use go\core\model\Group;
 use go\core\model\User;
+use go\core\orm\Entity;
 use go\core\orm\EntityType;
 use go\modules\community\ldapauthenticator\model\Server;
 use go\modules\community\ldapauthenticator\Module;
@@ -233,7 +234,7 @@ class Sync extends Controller
 
 		if (!$dryRun) {
 			try {
-				if ($user->isModified() && !$user->save()) {
+				if ($user->isModified() && !$this->saveWithRetry($user)) {
 					echo "Error saving user: " . var_export($user->getValidationErrors(), true);
 					return false;
 				}
@@ -248,6 +249,27 @@ class Sync extends Controller
 		$this->output("Synced " . $username);
 
 		return $user;
+	}
+
+	/**
+	 * Save an entity and retry when the record was changed by another transaction since the snapshot was taken
+	 * (MariaDB error 1020).
+	 *
+	 * @throws DbException
+	 */
+	private function saveWithRetry(Entity $entity, int $attempts = 3): bool
+	{
+		for ($i = 1; ; $i++) {
+			try {
+				return $entity->save();
+			} catch (DbException $e) {
+				if (!$e->isRecordChanged() || $i >= $attempts) {
+					throw $e;
+				}
+				$this->output("Record changed during save, retrying (" . $i . "/" . $attempts . ")");
+				usleep(100000 * $i);
+			}
+		}
 	}
 
 	private function getGOUserName(Record $record, Server $server): bool|string
@@ -442,7 +464,7 @@ class Sync extends Controller
 
 			if (!$dryRun) {
 				try {
-					if (!$group->save()) {
+					if (!$this->saveWithRetry($group)) {
 						echo "Error saving group: " . var_export($group->getValidationErrors(), true);
 					}
 				} catch(DbException $e) {
