@@ -1,3 +1,4 @@
+05-10-2026: 26.0.50
 - Calender: fix client side error when opening calendar view
 - Calendar: display 'unknown' calender name in event hover when not subscribed to said calendar
 - Core: Added Login throttling to improve security
