@@ -234,7 +234,6 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 
 	protected eventHtml(item: CalendarItem, div?:HTMLElement, withIcons = true) {
 		const e = item.data;
-
 		if(!div) { // default
 			const timeAndIcons = E('span',
 				...item.categoryDots,

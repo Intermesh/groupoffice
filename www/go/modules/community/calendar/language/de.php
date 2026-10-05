@@ -52,7 +52,7 @@ return array (
   'Maybe' => 'Vielleicht',
   'Decline' => 'Ablehnen',
   'Event page' => 'Terminseite',
-  'Invite not send yet' => 'Einladung noch nicht versendet',
+  'Invite not sent yet' => 'Einladung noch nicht versendet',
   'Participants' => 'Teilnehmer',
   'You' => 'Du',
   'This' => 'Dieser',

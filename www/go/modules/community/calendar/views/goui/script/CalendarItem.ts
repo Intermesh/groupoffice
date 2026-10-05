@@ -547,7 +547,7 @@ export class CalendarItem {
 	}
 
 	get quickText(): string {
-		const cal = this.cal ? ('<sup style="color:#'+this.cal.color+';">'+this.cal.name+'</sup>') : '';
+		const cal = this.cal ? ('<sup style="color:#'+this.cal.color+';">'+(this.cal.name || t("Unknown"))+'</sup>') : '';
 		const lines = [
 			'<h2 style="padding:0;margin:0;">' + this.title.htmlEncode() + '</h2>' + cal + "<br />",
 			this.humanReadableDate().join("<br>"), "<br />"

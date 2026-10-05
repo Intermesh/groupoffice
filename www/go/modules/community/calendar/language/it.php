@@ -22,7 +22,7 @@ return array (
   'Accepted' => 'Accettato',
   'Declined' => 'Rifiutato',
   'Awaiting reply' => 'In attesa di risposta',
-  'Invite not send yet' => 'Invito non ancora inviato',
+  'Invite not sent yet' => 'Invito non ancora inviato',
   'Cancellation' => 'Cancellatione',
   'Invitation' => 'Invito',
   'Reply' => 'Rispondi',

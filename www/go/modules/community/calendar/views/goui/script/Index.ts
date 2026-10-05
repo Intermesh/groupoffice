@@ -120,7 +120,7 @@ export function getParticipantStatusIcon(p:any): string[] {
 	// error sending mail
 	if(p.scheduleStatus) {
 		if(p.scheduleStatus == "1.0") {
-			return ['pending', t("Invite not send yet"), 'orange'];
+			return ['pending', t("Invite not sent yet"), 'orange'];
 		}
 
 		if(p.scheduleStatus.substring(0, 1) != "1") {
