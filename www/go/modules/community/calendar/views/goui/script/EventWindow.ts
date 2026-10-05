@@ -198,7 +198,10 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 				'focus':()=> { this.titleField.input!.select();}
 			}}),
 			select({
-				label: t('Calendar'), name: 'calendarId', required: true, flex: '1 30%',
+				label: t('Calendar'),
+				name: 'calendarId',
+				required: true,
+				flex: '1 30%',
 				store: writeableCalendarStore,
 				valueField: 'id',
 				textRenderer: (r: any) => r.name,
@@ -228,6 +231,20 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 								}).catch(e => {
 									void Window.error(t("Could not add organizer because the calendar principal could not be read from the server. Do you have permissions?"));
 								})
+							}
+
+
+
+							if(!this.form.currentId && r.groupId != null) {
+								// Direct resource booking. We'll add the resource as participant.
+
+								principalDS.single("Calendar:" + r.id).then(p => {
+									this.participantFld.addParticipant(p);
+								}).catch(e => {
+									void Window.error(t("Could not add organizer because the calendar principal could not be read from the server. Do you have permissions?"));
+								})
+
+
 							}
 						}
 
@@ -367,7 +384,10 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 		);
 
 		this.addCustomFields();
+
 	}
+
+
 
 	public addLinkOnSave(entityName:string, entityId:string) {
 		// Add name from linked entity to the title field when creating event with AddButton
