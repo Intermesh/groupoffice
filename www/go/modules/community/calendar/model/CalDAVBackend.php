@@ -356,7 +356,7 @@ class CalDAVBackend extends AbstractBackend implements
 			$event = CalendarEvent::findById(go()->getDbConnection()->getPDO()->lastInsertId());
 		} else {
 			$event = new CalendarEvent();
-			$organizerEmail = str_replace('mailto:', '',(string)$vcalendar->VEVENT[0]->{'ORGANIZER'});
+			$organizerEmail = str_replace('mailto:', '',strtolower((string)$vcalendar->VEVENT[0]->{'ORGANIZER'}));
 			$event->isOrigin = true;//go()->getAuthState()->getUser(['email'])->email === $organizerEmail; // if you created this event by yourself.
 			$event->replyTo = $organizerEmail;
 			$event->calendarId = $calendarId;

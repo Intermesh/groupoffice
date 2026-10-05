@@ -420,7 +420,7 @@ class Scheduler {
 		$event = new CalendarEvent();
 		$event->calendarId = $calendarId;
 		$event->isOrigin = false;
-		$event->replyTo = str_replace('mailto:', '',(string)$vcalendar->VEVENT[0]->{'ORGANIZER'});
+		$event->replyTo = str_replace('mailto:', '', strtolower((string)$vcalendar->VEVENT[0]->{'ORGANIZER'}));
 
 		return $event;
 	}

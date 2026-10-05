@@ -798,7 +798,7 @@ export class CalendarItem {
 			if(!original) return; // why could this be undefined?
 			this.confirmScheduleMessage(modified, () => {
 
-				for(const name of ['start', 'duration', 'title', 'freeBusyStatus', 'location','status', 'description']) {
+				for(const name of ['start', 'duration', 'title', 'freeBusyStatus', 'location','status', 'description', 'categoryIds']) {
 					if((name in modified) && modified[name] != original[name])
 						patch[name] = modified[name]; // remove properties that are the same as original
 				}
