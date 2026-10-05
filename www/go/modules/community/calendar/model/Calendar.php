@@ -133,7 +133,7 @@ class Calendar extends AclOwnerEntity {
 	 * @return int|string|null
 	 */
 	public function getOwnerId() {
-		return !empty($this->groupId) ? ('Calendar:'.$this->id) : $this->ownerId;
+		return $this->ownerId; //!empty($this->groupId) ? ('Calendar:'.$this->id) : $this->ownerId;
 	}
 
 

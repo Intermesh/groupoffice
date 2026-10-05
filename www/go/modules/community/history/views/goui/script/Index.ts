@@ -14,13 +14,13 @@ modules.register({
 				return;
 			}
 
-			translate.load(GO.lang.community.history, "community", "History");
+			translate.setDefaultModule("community", "history");
 
 			router.add(/^history\/(\d+)$/, () => {
 				modules.openMainPanel("history");
 			});
 
-			modules.addMainPanel("community", "history", "history", "History", () => {
+			modules.addMainPanel("community", "history", "history", t("History"), () => {
 				return new Main();
 			});
 
