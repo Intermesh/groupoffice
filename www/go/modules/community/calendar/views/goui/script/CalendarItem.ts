@@ -550,7 +550,7 @@ export class CalendarItem {
 		const cal = this.cal ? ('<sup style="color:#'+this.cal.color+';">'+this.cal.name+'</sup>') : '';
 		const lines = [
 			'<h2 style="padding:0;margin:0;">' + this.title.htmlEncode() + '</h2>' + cal + "<br />",
-			...this.humanReadableDate(), "<br />"
+			this.humanReadableDate().join("<br>"), "<br />"
 		];
 
 		if(this.patched.location) {
@@ -561,7 +561,7 @@ export class CalendarItem {
 			lines.push(RecurrenceField.toText(this.data.recurrenceRule,this.start) + "<br />");
 		}
 		if(this.participants) {
-			lines.push('<hr>'+t('Participants'));
+			lines.push('<hr>'+t('Participants') + "<br>");
 			for(const key in this.participants) {
 				const p = this.participants[key],
 					icon = getParticipantStatusIcon(p);
