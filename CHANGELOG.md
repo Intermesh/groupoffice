@@ -11,6 +11,7 @@
 - Calendar: Show calendar description when you hover it
 - Calendar: Fixed printing months
 - ldapauthenticator: Retry when error 1020 record has been changed is thrown by mysql during ldap sync
+- WebDAV: throw exception when not having proper delete permissions
 
 28-09-2026: 26.0.49
 - Oauth2Client: Don't overwrite IMAP username with the email that authenticates becasue it might be a shared mailbox
