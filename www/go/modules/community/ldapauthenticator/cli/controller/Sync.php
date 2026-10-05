@@ -252,16 +252,19 @@ class Sync extends Controller
 	}
 
 	/**
-	 * Save an entity and retry when the record was changed by another transaction since the snapshot was taken
-	 * (MariaDB error 1020).
+	 * Run a database operation and retry it when the record was changed by another transaction since the
+	 * snapshot was taken (MariaDB error 1020).
 	 *
+	 * @template T
+	 * @param callable():T $fn
+	 * @return T
 	 * @throws DbException
 	 */
-	private function saveWithRetry(Entity $entity, int $attempts = 3): bool
+	private function retryOnRecordChanged(callable $fn, int $attempts = 3): mixed
 	{
 		for ($i = 1; ; $i++) {
 			try {
-				return $entity->save();
+				return $fn();
 			} catch (DbException $e) {
 				if (!$e->isRecordChanged() || $i >= $attempts) {
 					throw $e;
@@ -270,6 +273,11 @@ class Sync extends Controller
 				usleep(100000 * $i);
 			}
 		}
+	}
+
+	private function saveWithRetry(Entity $entity): bool
+	{
+		return $this->retryOnRecordChanged(fn() => $entity->save());
 	}
 
 	private function getGOUserName(Record $record, Server $server): bool|string
@@ -362,7 +370,7 @@ class Sync extends Controller
 			foreach ($deleteUsers as $u) {
 				$this->output("Deleting: " . $u[1]);
 				if (!$dryRun) {
-					User::delete(['id' => $u[0]]);
+					$this->retryOnRecordChanged(fn() => User::delete(['id' => $u[0]]));
 
 					//push changes after each user
 					EntityType::push();
@@ -522,7 +530,7 @@ class Sync extends Controller
 				$this->output("Deleting: " . $g[1]);
 
 				if (!$dryRun) {
-					Group::delete(['id' => $g['id']]);
+					$this->retryOnRecordChanged(fn() => Group::delete(['id' => $g[0]]));
 
 					//push changes after each user
 					EntityType::push();
