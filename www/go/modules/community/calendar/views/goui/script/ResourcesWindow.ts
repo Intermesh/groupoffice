@@ -121,7 +121,7 @@ export class ResourcesWindow extends Window {
 										const tbl = b.parent!.dataSet.table;
 										const group = tbl.store.get(b.parent!.dataSet.rowIndex)!;
 
-										await jmapds("ResourceGroup").confirmDestroy([group]).catch((e:any) => {
+										await jmapds("ResourceGroup").confirmDestroy([group.id]).catch((e:any) => {
 											console.log(e);
 											if(e.type=='dbException') {
 												Window.error(t('Could not delete non-empty resource group'));
