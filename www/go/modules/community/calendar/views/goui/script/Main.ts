@@ -432,7 +432,7 @@ export class Main extends Component {
 						if(selected[0]) {
 							const calIds = selected[0].record.calendarIds;
 							if(calIds) {
-								for(const id in calIds) {
+								for(const id of calIds) {
 									jmapds('Calendar').update(id, {isVisible: true});
 								}
 								this.applyInCalendarFilter(calIds);
