@@ -314,6 +314,11 @@ export class CalendarItem {
 		return icons.map(i=>E('i',i).cls('icon'));
 	}
 
+	/**
+	 * Save the calendar item.
+	 *
+	 * @param onCancel
+	 */
 	save(onCancel?: () => void) {
 		const f = this.data.showWithoutTime ? 'Y-m-d' : 'Y-m-dTH:i:s';
 		const start = this.start.format(f),
@@ -342,6 +347,12 @@ export class CalendarItem {
 		return dlg;
 	}
 
+	/**
+	 * Opens the calendar event window or read only EventDetailWindow depending on the users' permissions
+	 *
+	 * @param onCancel
+	 * @param forceWrite
+	 */
 	async open(onCancel?: Function, forceWrite?: boolean) : Promise<EventWindow| EventDetailWindow | undefined> {
 		const internalOpen = async () => {
 			const dlg = !forceWrite && !this.mayChange  ? new EventDetailWindow() : new EventWindow();
@@ -701,6 +712,16 @@ export class CalendarItem {
 		}
 	}
 
+	/**
+	 * Saves the event.
+	 *
+	 * Handles recurrences in series too
+	 *
+	 * @param modified
+	 * @param onFinish
+	 * @param onCancel
+	 * @param skipAsk
+	 */
 	patch(modified: any, onFinish?: () => void, onCancel?: () => void, skipAsk = false) {
 		if(!this.isRecurring) {
 			this.confirmScheduleMessage(modified, () => {

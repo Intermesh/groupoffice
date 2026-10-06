@@ -152,11 +152,12 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 				const data = {
 						start: startStr,
 						title: t('New event'),
-						duration: dd ?? 'P1D',
+						duration: withoutTime || !dd ? 'P1D' : dd,
 						calendarId: CalendarView.selectedCalendarId,
 						showWithoutTime: withoutTime || !dd
 					},
 					start = (new DateTime(data.start));
+
 				this.currentCreation = ev = new CalendarItem({start, data, key: ''});
 				this.viewModel.unshift(ev);
 				this.updateItems();

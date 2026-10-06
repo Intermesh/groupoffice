@@ -446,6 +446,13 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 		return data;
 	}
 
+	/**
+	 * Loads a calendar item into the event window.
+	 *
+	 * This can be a new or existing item.
+	 *
+	 * @param ev
+	 */
 	async loadEvent(ev: CalendarItem) {
 
 		//this.title = t(!ev.key ? 'New event' : 'Edit event');
