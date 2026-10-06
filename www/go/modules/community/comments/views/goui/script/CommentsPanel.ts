@@ -190,6 +190,8 @@ export class CommentsPanel extends Component {
 			entityId: id
 		});
 
+		this.commentEditor.editor.clearInvalid();
+
 		await this.commentList.store.load();
 		this.countBadge.text = this.commentList.store.count().toString();
 		this.disabled = false;
