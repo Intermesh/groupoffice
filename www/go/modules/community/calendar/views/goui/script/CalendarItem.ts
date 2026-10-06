@@ -998,12 +998,20 @@ export class CalendarItem {
 		return start;
 	}
 
-	static async paste(calendarId: string, date: string) {
+	static async paste(calendarId: string, date: string, viewSupportsTime: boolean) {
 
 		if (!CalendarItem.clipboard!) return;
 		const item = CalendarItem.clipboard;
 
 		let start = this.pasteGetStart(date);
+
+		if(viewSupportsTime) {
+			const newShowWithoutTime = date.length === 10;
+			if(newShowWithoutTime && !item.data.showWithoutTime) {
+				item.data.duration = "P1D";
+			}
+			item.data.showWithoutTime = newShowWithoutTime;
+		}
 
 		let end = start.clone().add(new DateInterval(item.data.duration));
 		if(item.data.showWithoutTime) {

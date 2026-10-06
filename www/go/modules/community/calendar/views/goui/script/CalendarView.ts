@@ -177,8 +177,12 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 			if(btn) {
 				if(CalendarItem.clipboard) {
 
+					const dateHasTime = this.contextMenuEmpty.dataSet.date.length > 10;
+
+					const withTime = dateHasTime || (!this.contextMenuEmpty.dataSet.viewSupportsTime && !CalendarItem.clipboard.data.showWithoutTime);
+
 					const start = CalendarItem.pasteGetStart(this.contextMenuEmpty.dataSet.date),
-						dateStr = CalendarItem.clipboard.data.showWithoutTime ? Format.date(start) : Format.dateTime(start);
+						dateStr = withTime ? Format.dateTime(start) : Format.date(start);
 
 					btn.disabled = false;
 					btn.text = t('Paste {title} at {date}').replace('{date}', dateStr).replace('{title}', CalendarItem.clipboard.title)
@@ -193,18 +197,24 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 			text: t('Appointment'),
 			handler: _ => {
 				const date = this.contextMenuEmpty.dataSet.date;
-				let start;
+				let start, showWithoutTime = client.user.calendarPreferences?.defaultDuration == null;
 				if (date.length > 10) {
 					start = new DateTime(date);
+					if(this.contextMenuEmpty.dataSet.viewSupportsTime) {
+						showWithoutTime = false;
+					}
 				} else {
 					const [y, m, d] = date.split('-').map(Number);
 					start = new DateTime(); // time = now
 					start.setYear(y).setMonth(m).setDate(d);
+					if(this.contextMenuEmpty.dataSet.viewSupportsTime) {
+						showWithoutTime = true;
+					}
 				}
 				(new CalendarItem({key:'',data:{
 					start:start.format('Y-m-d\TH:00:00.000'),
 					title: t('New event'),
-					showWithoutTime: client.user.calendarPreferences?.defaultDuration == null,
+					showWithoutTime: showWithoutTime,
 					duration: client.user.calendarPreferences?.defaultDuration ?? "P1D",
 					calendarId: CalendarView.selectedCalendarId
 				}})).save()
@@ -213,7 +223,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 		// btn({icon:'add', text: t('Reminder'), handler: _ => { console.warn('todo:reminder'); }}),
 		hr(),
 		btn({itemId:'paste',icon:'content_paste', text: t('Paste ','core'), handler: _ => {
-			CalendarItem.paste(CalendarView.selectedCalendarId, this.contextMenuEmpty.dataSet.date)
+			CalendarItem.paste(CalendarView.selectedCalendarId, this.contextMenuEmpty.dataSet.date, this.contextMenuEmpty.dataSet.viewSupportsTime)
 		}})
 	);
 
