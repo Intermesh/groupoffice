@@ -1,5 +1,6 @@
 - Calendar: Fixed all day event creation from day or week view where end date was a day before start date.
 - Caldav: When client deletes a calendar or tasklist, it's not deleted anymore but excluded from sync
+- Calendar: Show time when pasting event, fix wrong end date when pasting all day event in week or day view
 
 05-10-2026: 26.0.50
 - Calender: fix client side error when opening calendar view
