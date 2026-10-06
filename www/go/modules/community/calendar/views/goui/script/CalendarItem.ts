@@ -984,10 +984,8 @@ export class CalendarItem {
 		});
 	}
 
-	static async paste(calendarId: string, date: string) {
-
-		if (!CalendarItem.clipboard!) return;
-		const withoutTime = date.length === 10, item = CalendarItem.clipboard;
+	static pasteGetStart(date: string) {
+		const withoutTime = date.length === 10, item = CalendarItem.clipboard!;
 
 		let start = item.start;
 		if(withoutTime) {
@@ -997,8 +995,18 @@ export class CalendarItem {
 			start = new DateTime(date);
 		}
 
+		return start;
+	}
+
+	static async paste(calendarId: string, date: string) {
+
+		if (!CalendarItem.clipboard!) return;
+		const item = CalendarItem.clipboard;
+
+		let start = this.pasteGetStart(date);
+
 		let end = start.clone().add(new DateInterval(item.data.duration));
-		if(withoutTime) {
+		if(item.data.showWithoutTime) {
 			end.add(new DateInterval("-P1D"))
 		}
 		item.data.calendarId = calendarId;

@@ -175,28 +175,41 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 		beforeshow: ({target}) => {
 			const btn = target.items.find(item => item.itemId === 'paste');
 			if(btn) {
-				btn.disabled = !CalendarItem.clipboard;
-				btn.text = CalendarItem.clipboard ? t('Paste ','core') + ' '+CalendarItem.clipboard.title : t('Paste ','core');
+				if(CalendarItem.clipboard) {
+
+					const start = CalendarItem.pasteGetStart(this.contextMenuEmpty.dataSet.date),
+						dateStr = CalendarItem.clipboard.data.showWithoutTime ? Format.date(start) : Format.dateTime(start);
+
+					btn.disabled = false;
+					btn.text = t('Paste {title} at {date}').replace('{date}', dateStr).replace('{title}', CalendarItem.clipboard.title)
+				} else {
+					btn.disabled = true;
+					btn.text = t('Paste');
+				}
 			}
 		}}},
-		btn({icon:'add', text: t('Appointment'), handler: _ => {
-			const date = this.contextMenuEmpty.dataSet.date;
-			let start;
-			if (date.length > 10) {
-				start = new DateTime(date);
-			} else {
-				const [y, m, d] = date.split('-').map(Number);
-				start = new DateTime(); // time = now
-				start.setYear(y).setMonth(m).setDate(d);
+		btn({
+			icon:'add',
+			text: t('Appointment'),
+			handler: _ => {
+				const date = this.contextMenuEmpty.dataSet.date;
+				let start;
+				if (date.length > 10) {
+					start = new DateTime(date);
+				} else {
+					const [y, m, d] = date.split('-').map(Number);
+					start = new DateTime(); // time = now
+					start.setYear(y).setMonth(m).setDate(d);
+				}
+				(new CalendarItem({key:'',data:{
+					start:start.format('Y-m-d\TH:00:00.000'),
+					title: t('New event'),
+					showWithoutTime: client.user.calendarPreferences?.defaultDuration == null,
+					duration: client.user.calendarPreferences?.defaultDuration ?? "P1D",
+					calendarId: CalendarView.selectedCalendarId
+				}})).save()
 			}
-			(new CalendarItem({key:'',data:{
-				start:start.format('Y-m-d\TH:00:00.000'),
-				title: t('New event'),
-				showWithoutTime: client.user.calendarPreferences?.defaultDuration == null,
-				duration: client.user.calendarPreferences?.defaultDuration ?? "P1D",
-				calendarId: CalendarView.selectedCalendarId
-			}})).save()
-		}}),
+		}),
 		// btn({icon:'add', text: t('Reminder'), handler: _ => { console.warn('todo:reminder'); }}),
 		hr(),
 		btn({itemId:'paste',icon:'content_paste', text: t('Paste ','core'), handler: _ => {
