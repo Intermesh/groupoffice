@@ -185,7 +185,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 						dateStr = withTime ? Format.dateTime(start) : Format.date(start);
 
 					btn.disabled = false;
-					btn.text = t('Paste {title} at {date}').replace('{date}', dateStr).replace('{title}', CalendarItem.clipboard.title)
+					btn.text = t("Paste '{title}' at {date}").replace('{date}', dateStr).replace('{title}', CalendarItem.clipboard.title)
 				} else {
 					btn.disabled = true;
 					btn.text = t('Paste');
