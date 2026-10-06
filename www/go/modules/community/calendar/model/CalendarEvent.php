@@ -807,6 +807,7 @@ class CalendarEvent extends AclItemEntity {
 			$arr['title'] = '';
 			$arr['description'] = '';
 			$arr['location'] = '';
+			$arr['categoryIds'] = [];
 		}
 		unset($arr['recurrenceId'], $arr['excluded']);
 		return $arr;
