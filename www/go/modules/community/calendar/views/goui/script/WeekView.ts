@@ -54,6 +54,11 @@ export class WeekView extends CalendarView {
 
 				this.contextMenuEmpty.dataSet.date = (new DateTime(e.target.dataset.day!)).setHours(0, minute).format('c');
 				this.contextMenuEmpty.showAt(e);
+			} else if(e.target.isA('li') && e.target.dataset.date) {
+				// all day event
+
+				this.contextMenuEmpty.dataSet.date = e.target.dataset.date;
+				this.contextMenuEmpty.showAt(e);
 			}
 		});
 
