@@ -492,3 +492,11 @@ $updates['202605281632'][] = "ALTER TABLE `calendar_preferences` ADD COLUMN mult
 $updates['202610051128'][] = "update calendar_calendar set ownerId = null where groupId is not null;";
 
 $updates['202610051128'][] = "update calendar_event set replyTo = replace(lower(replyTo), 'mailto:', '')";
+
+$updates['202610061549'][] = "alter table calendar_view
+    drop foreign key calendar_View_ownerId;";
+
+$updates['202610061549'][] = "alter table calendar_view
+    add constraint calendar_View_ownerId
+        foreign key (ownerId) references core_user (id)
+            on delete cascade;";
