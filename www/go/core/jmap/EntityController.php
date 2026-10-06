@@ -752,7 +752,10 @@ abstract class EntityController extends Controller {
 	}
 
   /**
-   * Override this if you want to implement permissions for creating entities
+   * Checks if a model may be created.
+	 *
+	 * You probably don't want to override this. Override {@see \go\core\orm\Entity::canCreate()} instead.
+	 *
    * New properties have already been set so you can validate per property too if needed.
    *
    * @param Entity $entity
