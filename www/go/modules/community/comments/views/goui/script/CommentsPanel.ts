@@ -111,7 +111,7 @@ export class CommentsPanel extends Component {
 				}),
 			),
 			comp({},
-				comp({cls: "pad"}, this.commentList),
+				this.commentList,
 				form({
 						flex: 1,
 						handler: (form) => {

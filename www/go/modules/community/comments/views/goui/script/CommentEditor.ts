@@ -1,5 +1,5 @@
 import {
-	arrayfield,
+	arrayfield, browser,
 	btn,
 	Button,
 	comp,
@@ -165,6 +165,34 @@ export class CommentEditor extends Component {
 				tabIndex: -1, // Skip toolbar in tabbing through forms
 			}),
 			hr()
+		);
+
+
+		this.editor.getToolbar().items.insert(0,
+			 btn({
+				type: "button",
+				title: t("Attach files"),
+				icon: "attach_file",
+				tabIndex: -1,
+				handler: async () => {
+
+					const files = await browser.pickLocalFiles(true);
+					this.mask();
+					const blobs = await client.uploadMultiple(files);
+					this.unmask();
+
+
+					const atts = this.attachments.value;
+					for (let blob of blobs) {
+						atts.push({
+							name: blob.name,
+							blobId: blob.id
+						});
+					}
+					this.attachments.value = atts;
+
+				}
+			}),
 		);
 
 		this.store = datasourcestore({

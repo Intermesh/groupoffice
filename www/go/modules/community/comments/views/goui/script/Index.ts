@@ -1,4 +1,5 @@
 export * from "./CommentsPanel.js";
+export * from "./CommentEditor.js";
 
 import {client, entities, JmapDataSource, modules, router} from "@intermesh/groupoffice-core";
 import {t, Window} from "@intermesh/goui";

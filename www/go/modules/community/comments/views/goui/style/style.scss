@@ -1,6 +1,9 @@
 @use '../../../../../../../views/goui/goui/style/_util.scss'  as *;
 @use '../../../../../../../views/goui/goui/style/_config.scss' as *;
 
+.goui .comments-list {
+  padding: 0 1.8rem;
+}
 .goui .comment-comment {
   border-radius: 0.8rem;
   padding: 0.8rem 1.6rem;
