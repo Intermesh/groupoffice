@@ -1,0 +1,33 @@
+{
+  "type": "module",
+  "name": "@intermesh/community-multi_instance",
+
+  "exports": {
+    ".": {
+      "types": "./script/Index.ts",
+      "default": "./dist/Index.js"
+    }
+  },
+
+  "devDependencies": {
+    "concurrently": "latest",
+    "esbuild": "latest",
+    "sass": "latest",
+    "typescript": "5.9.*"
+  },
+
+  "scripts": {
+    "start multi_instance": "concurrently --kill-others \"npm run start:esbuild\"  \"npm run start:sass\"",
+    "start:esbuild": "node ../../../../../../views/goui/esbuild-module.mjs watch",
+    "start:sass": "npx sass --load-path=$(npm root) --watch style:dist",
+
+    "build": "npm run build:sass && npm run build:ts",
+    "build:clean": "rm -rf ./dist/*",
+    "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
+    "build:sass": "npx sass --update --load-path=$(npm root) --style=compressed style:dist",
+    "build:dts": "npx tsc -b --declaration --emitDeclarationOnly --verbose",
+
+    "test": "npx tsc --noEmit",
+    "prepare": "npm run build"
+  }
+}
