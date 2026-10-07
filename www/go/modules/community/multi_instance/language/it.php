@@ -22,5 +22,5 @@ return array (
   'Modules' => 'Moduli',
   'Show trials' => 'Mostra dimostrativi',
   'Trial' => 'Dimostrativo',
-  'Is trial' => 'Is trial',
+  'Is trial' => 'E’ una prova',
 );
