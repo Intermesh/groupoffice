@@ -5,6 +5,7 @@
 - Projects3: NaN bug in resource budget
 - Projects3: Add first comment when creating project
 - Projects3: Migrate projects2 description to first comment
+- Support: set configured email account for support list as outgoing account as well.
 
 05-10-2026: 26.0.50
 - Calender: fix client side error when opening calendar view
