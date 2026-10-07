@@ -7,7 +7,7 @@ return array (
   'Maximum days old' => 'Maximum days old',
   'Address books' => 'Rubriche',
   'Notebooks' => 'Blocchi note',
-  'Allow delete via synchronization' => 'Allow delete via synchronization',
-  'By default devices are not allowed to delete items. This was added due to a bug in Android 12 that deleted contacts after an update.' => 'By default devices are not allowed to delete items. This was added due to a bug in Android 12 that deleted contacts after an update.',
+  'Allow delete via synchronization' => 'Permetti eliminazione via sincronizzazione',
+  'By default devices are not allowed to delete items. This was added due to a bug in Android 12 that deleted contacts after an update.' => 'Per comportamento predefinito i dispositivi non hanno il permesso di eliminare elementi. Questa funzionalità è stata aggiunta a causa di un bug in Android 12 che cancellava i contatti dopo un aggiornamento.',
   'Tasklists' => 'Tasklists',
 );

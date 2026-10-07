@@ -27,5 +27,11 @@ return array (
 <p>Ecco un link per aiutarti a iniziare: {{link}}</p>
 <p>Speriamo che ti piaccia Group-Office!</p>',
   'webfeeds' => 'webfeeds',
-  'All users' => 'All users',
+  'All users' => 'Tutti gli utenti',
+  'Calendar' => 'Calendario',
+  'No appointments to display' => 'Nussun appuntamento da visualizzare',
+  'Timespan' => 'Lasso di tempo',
+  'statuses' => 'Stati',
+  'Visible calendars' => 'Calendari visibili',
+  'Visible' => 'Visibile',
 );
