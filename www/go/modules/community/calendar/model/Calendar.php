@@ -110,6 +110,11 @@ class Calendar extends AclOwnerEntity {
 		return ['name'];
 	}
 
+	protected function canCreate(): bool
+	{
+		return \go\modules\community\calendar\Module::get()->getModel()->getUserRights()->mayChangeCalendars;
+	}
+
 	private function generateSecret() {
 		$bits = openssl_random_pseudo_bytes(15); // 6bits per char, 120bits = 20 chars
 		return strtr(base64_encode($bits), '+/', '-_'); // translate to make url-safe

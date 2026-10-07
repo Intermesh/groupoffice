@@ -314,6 +314,11 @@ export class CalendarItem {
 		return icons.map(i=>E('i',i).cls('icon'));
 	}
 
+	/**
+	 * Save the calendar item.
+	 *
+	 * @param onCancel
+	 */
 	save(onCancel?: () => void) {
 		const f = this.data.showWithoutTime ? 'Y-m-d' : 'Y-m-dTH:i:s';
 		const start = this.start.format(f),
@@ -342,6 +347,12 @@ export class CalendarItem {
 		return dlg;
 	}
 
+	/**
+	 * Opens the calendar event window or read only EventDetailWindow depending on the users' permissions
+	 *
+	 * @param onCancel
+	 * @param forceWrite
+	 */
 	async open(onCancel?: Function, forceWrite?: boolean) : Promise<EventWindow| EventDetailWindow | undefined> {
 		const internalOpen = async () => {
 			const dlg = !forceWrite && !this.mayChange  ? new EventDetailWindow() : new EventWindow();
@@ -701,6 +712,16 @@ export class CalendarItem {
 		}
 	}
 
+	/**
+	 * Saves the event.
+	 *
+	 * Handles recurrences in series too
+	 *
+	 * @param modified
+	 * @param onFinish
+	 * @param onCancel
+	 * @param skipAsk
+	 */
 	patch(modified: any, onFinish?: () => void, onCancel?: () => void, skipAsk = false) {
 		if(!this.isRecurring) {
 			this.confirmScheduleMessage(modified, () => {
@@ -963,10 +984,8 @@ export class CalendarItem {
 		});
 	}
 
-	static async paste(calendarId: string, date: string) {
-
-		if (!CalendarItem.clipboard!) return;
-		const withoutTime = date.length === 10, item = CalendarItem.clipboard;
+	static pasteGetStart(date: string) {
+		const withoutTime = date.length === 10, item = CalendarItem.clipboard!;
 
 		let start = item.start;
 		if(withoutTime) {
@@ -976,8 +995,26 @@ export class CalendarItem {
 			start = new DateTime(date);
 		}
 
+		return start;
+	}
+
+	static async paste(calendarId: string, date: string, viewSupportsTime: boolean) {
+
+		if (!CalendarItem.clipboard!) return;
+		const item = CalendarItem.clipboard;
+
+		let start = this.pasteGetStart(date);
+
+		if(viewSupportsTime) {
+			const newShowWithoutTime = date.length === 10;
+			if(newShowWithoutTime && !item.data.showWithoutTime) {
+				item.data.duration = "P1D";
+			}
+			item.data.showWithoutTime = newShowWithoutTime;
+		}
+
 		let end = start.clone().add(new DateInterval(item.data.duration));
-		if(withoutTime) {
+		if(item.data.showWithoutTime) {
 			end.add(new DateInterval("-P1D"))
 		}
 		item.data.calendarId = calendarId;

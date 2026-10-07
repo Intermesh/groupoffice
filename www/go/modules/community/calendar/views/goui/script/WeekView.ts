@@ -52,7 +52,14 @@ export class WeekView extends CalendarView {
 					pxPerSnap = liRect.height / (1440 / SNAP), // 96 quarter-hours in a day
 					minute = Math.round((e.clientY - liRect.top) / pxPerSnap) * SNAP;
 
+				this.contextMenuEmpty.dataSet.viewSupportsTime = true;
 				this.contextMenuEmpty.dataSet.date = (new DateTime(e.target.dataset.day!)).setHours(0, minute).format('c');
+				this.contextMenuEmpty.showAt(e);
+			} else if(e.target.isA('li') && e.target.dataset.date) {
+				// all day event
+
+				this.contextMenuEmpty.dataSet.date = e.target.dataset.date;
+				this.contextMenuEmpty.dataSet.viewSupportsTime = true;
 				this.contextMenuEmpty.showAt(e);
 			}
 		});

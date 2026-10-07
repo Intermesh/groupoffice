@@ -444,7 +444,7 @@ CREATE TABLE  IF NOT EXISTS `calendar_view` (
 	CONSTRAINT `calendar_View_ownerId`
 		FOREIGN KEY (`ownerId`)
 		REFERENCES `core_user` (`id`)
-		ON DELETE RESTRICT
+		ON DELETE CASCADE
 		ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

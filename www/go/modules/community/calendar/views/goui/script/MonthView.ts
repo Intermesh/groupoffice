@@ -38,6 +38,7 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 			e.preventDefault();
 			const day = e.target.up('li[data-date]');
 			if(day) {
+				this.contextMenuEmpty.dataSet.viewSupportsTime = false;
 				this.contextMenuEmpty.dataSet.date = day.dataset.date;
 				this.contextMenuEmpty.showAt(e);
 			}
