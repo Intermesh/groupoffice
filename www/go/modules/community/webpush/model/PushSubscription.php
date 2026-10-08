@@ -9,7 +9,8 @@ use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\util\DateTime;
 
-class PushSubscription extends Entity {
+class PushSubscription extends Entity
+{
 
 	public ?string $id;
 
@@ -30,24 +31,30 @@ class PushSubscription extends Entity {
 			->addTable("core_push_subscription");
 	}
 
-	public function getKeys() {
+	public function getKeys()
+	{
 		return ['p256dh' => $this->p256dh, 'auth' => $this->auth];
 	}
 
-	public function publicKey() {
+	public function publicKey()
+	{
 		return $this->p256dh;
 	}
-	public function authToken() {
+
+	public function authToken()
+	{
 		return $this->auth;
 	}
 
-	public function setKeys($keys){
+	public function setKeys($keys)
+	{
 		$this->p256dh = $keys['p256dh'];
 		$this->auth = $keys['auth'];
 	}
 
-	public function setVerificationCode($code) {
-		if($this->verificationCode === $code){
+	public function setVerificationCode($code)
+	{
+		if ($this->verificationCode === $code) {
 			$this->verificationCode = null;
 			$this->expires = (new DateTime())->add(new \DateInterval('P7D'));
 		} else {
@@ -55,7 +62,8 @@ class PushSubscription extends Entity {
 		}
 	}
 
-	public function isVerified() {
+	public function isVerified()
+	{
 		return $this->verificationCode === null;
 	}
 
@@ -63,32 +71,35 @@ class PushSubscription extends Entity {
 	{
 		return parent::defineFilters()->add('default', function (Criteria $criteria, $value, Query $query) {
 			$query->andWhere('createdBy', '=', go()->getAuthState()->getUserId())
-			->andWhere('expires', '>', new DateTime());
+				->andWhere('expires', '>', new DateTime());
 		}, 'alwaysUsed');
 	}
 
-	public function internalSave() : bool {
-		if($this->isNew()) {
+	public function internalSave(): bool
+	{
+		if ($this->isNew()) {
 			$this->verificationCode = $this->generateVerificationCode();
 			$this->expires = (new DateTime())->add(new \DateInterval('PT1H'));
 			$wasNew = true;
 		}
 		$success = parent::internalSave();
-		if($success && !empty($wasNew)) {
+		if ($success && !empty($wasNew)) {
 			$this->sendVerificationCode();
 		}
 		return $success;
 	}
 
-	public function sendVerificationCode() {
-		if($this->verificationCode !== null)
-		(new WebPush())->queue($this, json_encode([
-			"pushSubscriptionId" => $this->id,
-			"verificationCode" => $this->verificationCode
-		]))->flush();
+	public function sendVerificationCode()
+	{
+		if ($this->verificationCode !== null)
+			(new WebPush())->queue($this, json_encode([
+				"pushSubscriptionId" => $this->id,
+				"verificationCode" => $this->verificationCode
+			]))->flush();
 	}
 
-	private function generateVerificationCode() {
+	private function generateVerificationCode()
+	{
 		return base64_encode(random_bytes(15));
 	}
 }

@@ -2,7 +2,8 @@
 
 namespace go\modules\community\webpush\model;
 
-class WebPush {
+class WebPush
+{
 
 	const TTL = 2419200;
 	const BatchSize = 1000;
@@ -14,7 +15,8 @@ class WebPush {
 	private string $publicKey;
 	private string $privateKey;
 
-	public function __construct() {
+	public function __construct()
+	{
 		$settings = Settings::get();
 		$this->subject = 'mailto:' . go()->getSettings()->systemEmail;
 		$this->publicKey = $settings->vapidPublicKey;
@@ -99,8 +101,8 @@ class WebPush {
 		$audience = parse_url($subscription->url, PHP_URL_SCHEME) . '://' . parse_url($subscription->url, PHP_URL_HOST);
 
 		$headers = array_merge($encrypted['headers'], [
-			'Authorization: vapid t='.JWT::create($audience, $this->subject, base64_decode($this->privateKey)).', k='.$this->publicKey,
-			'TTL: '.$ttl,
+			'Authorization: vapid t=' . JWT::create($audience, $this->subject, base64_decode($this->privateKey)) . ', k=' . $this->publicKey,
+			'TTL: ' . $ttl,
 		]);
 		go()->debug($headers);
 

@@ -2,12 +2,13 @@
 
 namespace go\modules\community\webpush\model;
 
-class Vapid {
+class Vapid
+{
 
 	public static function createVapidKeys(): array
 	{
 		$key = openssl_pkey_new([
-			'curve_name'       => 'prime256v1',
+			'curve_name' => 'prime256v1',
 			'private_key_type' => OPENSSL_KEYTYPE_EC,
 		]);
 		if (!$key) {
@@ -27,7 +28,7 @@ class Vapid {
 		$privateKey = str_pad($details['ec']['d'], 32, "\0", STR_PAD_LEFT);
 
 		return [
-			'pub'  => Encryption::base64UrlEncode($publicKey), // always used like this
+			'pub' => Encryption::base64UrlEncode($publicKey), // always used like this
 			'priv' => base64_encode($privateKey), // needs decoding for jwt
 		];
 	}

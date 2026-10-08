@@ -2,10 +2,11 @@
 
 namespace go\modules\community\webpush\model;
 
-class JWT {
+class JWT
+{
 	static function create(string $audience, string $subject, string $privateKey): string
 	{
-		$header  = Encryption::base64UrlEncode('{"typ":"JWT","alg":"ES256"}');
+		$header = Encryption::base64UrlEncode('{"typ":"JWT","alg":"ES256"}');
 		$payload = Encryption::base64UrlEncode(json_encode([
 			'aud' => $audience,
 			'exp' => time() + 43200, // equal margin of error between 0 and 24h
@@ -22,7 +23,7 @@ class JWT {
 			throw new \RuntimeException('Failed to sign VAPID JWT');
 		}
 
-		return "$input.".Encryption::base64UrlEncode(self::derToRaw($signature));
+		return "$input." . Encryption::base64UrlEncode(self::derToRaw($signature));
 	}
 
 	// Convert DER-encoded ECDSA signature to raw 64-byte r||s
@@ -32,11 +33,11 @@ class JWT {
 		$offset = 2; // skip SEQUENCE header
 		$offset++; // skip 0x02
 		$rLen = ord($der[$offset++]);
-		$r    = substr($der, $offset, $rLen);
+		$r = substr($der, $offset, $rLen);
 		$offset += $rLen;
 		$offset++; // skip 0x02
 		$sLen = ord($der[$offset++]);
-		$s    = substr($der, $offset, $sLen);
+		$s = substr($der, $offset, $sLen);
 
 		// r and s may have a leading 0x00 (DER positive integer padding) — strip it, then pad to 32
 		return str_pad(ltrim($r, "\x00"), 32, "\x00", STR_PAD_LEFT)

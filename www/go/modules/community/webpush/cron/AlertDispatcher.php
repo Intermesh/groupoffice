@@ -1,26 +1,27 @@
 <?php
 
 namespace go\modules\community\webpush\cron;
+
 use go\core\model\Alert;
 use go\core\model\CronJob;
 use go\core\model\CronJobSchedule;
-use go\core\model\Search;
-use go\core\orm\EntityType;
 use go\core\util\DateTime;
 use go\modules\community\webpush\model\PushSubscription;
-use go\modules\community\webpush\model\Settings;
 use go\modules\community\webpush\model\WebPush;
 
 /**
  * docker compose exec -u www-data groupoffice-develop ./www/cli.php core/System/runCron --name='AlertDispatcher' --module='webpush' --package='community' --debug
  */
-class AlertDispatcher extends CronJob {
+class AlertDispatcher extends CronJob
+{
 
-	public function getLabel(){
+	public function getLabel()
+	{
 		return go()->t("Alert Dispatcher", 'webpush', 'community');
 	}
 
-	public function getDescription(){
+	public function getDescription()
+	{
 		return go()->t("Dispatch GroupOffice Alerts to web push subscription", 'webpush', 'community');
 	}
 
@@ -34,7 +35,8 @@ class AlertDispatcher extends CronJob {
 		$this->webPush = new WebPush();
 	}
 
-	public function run(CronJobSchedule $schedule) {
+	public function run(CronJobSchedule $schedule)
+	{
 
 		$now = new DateTime();
 		$now->setTimezone(new \DateTimeZone("UTC"));
@@ -62,16 +64,16 @@ class AlertDispatcher extends CronJob {
 		$alerts = Alert::find()
 			->where('triggerAt', '<=', $now->format('Y-m-d H:i'))
 			->andWhere('staleAt', '>', $now->format('Y-m-d H:i')) // it must be stale at some point
-			->andWhere('isSent','=',0);
-			//->andWhere(['tag'=>'1']); // the first alert of the array
+			->andWhere('isSent', '=', 0);
+		//->andWhere(['tag'=>'1']); // the first alert of the array
 
 		go()->debug($alerts);
 
 		$toMarkSent = [];
 		// find active push subscription.
 		foreach ($alerts as $row) {
-			$searchRecord  = $row->getModified();
-			$subscriptions = PushSubscription::find()->where(['userId'=>$row->userId])->all();
+			$searchRecord = $row->getModified();
+			$subscriptions = PushSubscription::find()->where(['userId' => $row->userId])->all();
 			foreach ($subscriptions as $subscription) {
 				$payload = json_encode([
 					'title' => $searchRecord->title,

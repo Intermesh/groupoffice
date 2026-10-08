@@ -2,15 +2,16 @@
 
 namespace go\modules\community\webpush\model;
 
-class Encryption {
+class Encryption
+{
 	public static function encrypt(string $payload, string $userPublicKey, string $userAuthToken): array
 	{
-		$userPublicKey  = self::base64UrlDecode($userPublicKey);  // 65 bytes: 0x04 || x || y
-		$userAuthToken  = self::base64UrlDecode($userAuthToken);  // 16 bytes
-		$salt           = random_bytes(16);
+		$userPublicKey = self::base64UrlDecode($userPublicKey);  // 65 bytes: 0x04 || x || y
+		$userAuthToken = self::base64UrlDecode($userAuthToken);  // 16 bytes
+		$salt = random_bytes(16);
 
 		// Generate ephemeral local key pair
-		$localKey     = openssl_pkey_new(['curve_name' => 'prime256v1', 'private_key_type' => OPENSSL_KEYTYPE_EC]);
+		$localKey = openssl_pkey_new(['curve_name' => 'prime256v1', 'private_key_type' => OPENSSL_KEYTYPE_EC]);
 		$localDetails = openssl_pkey_get_details($localKey);
 		if (!$localDetails || $localDetails['type'] !== OPENSSL_KEYTYPE_EC) {
 			throw new \RuntimeException('Failed to generate EC key');
@@ -48,7 +49,7 @@ class Encryption {
 		$header = $salt . pack('N', 4096) . pack('C', strlen($localPublicKey)) . $localPublicKey;
 
 		return [
-			'body'    => $header . $cipherText . $tag,
+			'body' => $header . $cipherText . $tag,
 			'headers' => [
 				'Content-Encoding: aes128gcm',
 				'Content-Type: application/octet-stream',
@@ -65,9 +66,9 @@ class Encryption {
 
 	private static function buildPublicKeyPem(string $publicKey): string
 	{
-		$oid       = "\x30\x13\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x08\x2a\x86\x48\xce\x3d\x03\x01\x07";
+		$oid = "\x30\x13\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x08\x2a\x86\x48\xce\x3d\x03\x01\x07";
 		$bitString = "\x03" . chr(strlen($publicKey) + 1) . "\0" . $publicKey;
-		$spki      = "\x30" . chr(strlen($oid) + strlen($bitString)) . $oid . $bitString;
+		$spki = "\x30" . chr(strlen($oid) + strlen($bitString)) . $oid . $bitString;
 		return "-----BEGIN PUBLIC KEY-----\n" . base64_encode($spki) . "\n-----END PUBLIC KEY-----\n";
 	}
 

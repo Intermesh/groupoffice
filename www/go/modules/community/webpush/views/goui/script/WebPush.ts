@@ -8,10 +8,9 @@ function base64encode(v: ArrayBuffer) {
 }
 
 
-
 export async function subscribe(registration: ServiceWorkerRegistration) {
 	const applicationServerKey = client.session?.capabilities['urn:ietf:params:jmap:webpush-vapid'].applicationServerKey;
-	if(!applicationServerKey)
+	if (!applicationServerKey)
 		return false;
 
 	let subscriptionChanged = false;
@@ -50,9 +49,9 @@ export async function subscribe(registration: ServiceWorkerRegistration) {
 	const result = await jmapds('PushSubscription').get();
 	const existing = result.list.find(s => s.deviceClientId === deviceClientId);
 
-	if(subscriptionChanged || !existing) { // then update server entity
+	if (subscriptionChanged || !existing) { // then update server entity
 
-		if(existing) {
+		if (existing) {
 			jmapds('PushSubscription').destroy(existing.id);
 		}
 		jmapds('PushSubscription').create({
@@ -83,7 +82,7 @@ async function requestPermission(): Promise<boolean> {
 export async function unsubscribe(subscription: PushSubscription): Promise<void> {
 
 	await jmapds('PushSubscription').query({
-		filter: { deviceClientId: localStorage.getItem('deviceClientId') }
+		filter: {deviceClientId: localStorage.getItem('deviceClientId')}
 	}).then(async (result: any) => {
 		const ids = result.ids;
 		if (ids.length) {
