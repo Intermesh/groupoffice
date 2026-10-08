@@ -4,6 +4,7 @@ namespace go\core;
 
 use ErrorException;
 use Exception;
+use go\core\exception\UserSafeException;
 use go\core\util\DateTime;
 use Throwable;
 
@@ -59,6 +60,8 @@ class ErrorHandler {
 		} else {
 			$errorString = "";
 		}
+
+		$errorString .= "[ref " . self::errorId($e) . "] ";
 		
 		$errorString .= $cls . " in " . $e->getFile() ." at line ". $e->getLine().': '.$e->getMessage();
 
@@ -85,6 +88,34 @@ class ErrorHandler {
 		}
 		
 		return $errorString;
+	}
+
+	/**
+	 * Short reference ID for an exception. It's stable per exception object so the ID shown to the
+	 * user matches the one in the server log.
+	 */
+	public static function errorId(Throwable $e): string
+	{
+		return substr(sha1(spl_object_id($e) . $e->getFile() . $e->getLine() . $e->getMessage() . ($_SERVER['REQUEST_TIME_FLOAT'] ?? '')), 0, 8);
+	}
+
+	/**
+	 * Get the message that may be sent to the client.
+	 *
+	 * In debug mode this includes the class, file and line. Otherwise it's the message of a {@see UserSafeException}
+	 * or a generic message with a reference ID that can be found in the server log.
+	 */
+	public static function clientMessage(Throwable $e): string
+	{
+		if(go()->getDebugger()->enabled) {
+			return get_class($e) . " in " . $e->getFile() . " at line " . $e->getLine() . ': ' . $e->getMessage();
+		}
+
+		if($e instanceof UserSafeException) {
+			return $e->getMessage();
+		}
+
+		return go()->t("An unexpected error occurred. Please contact your administrator.") . " (ref: " . self::errorId($e) . ")";
 	}
 
 	/**
