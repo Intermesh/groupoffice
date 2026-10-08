@@ -1,7 +1,9 @@
 <?php
 namespace GO\Base\Exception;
 
-class NoCron extends \Exception{
+use go\core\exception\UserSafeException;
+
+class NoCron extends \Exception  implements UserSafeException{
 	
 	public function __construct($message=null,$code=0,$errorInfo=null) {
 		

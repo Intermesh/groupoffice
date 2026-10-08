@@ -23,7 +23,9 @@
 namespace GO\Base\Exception;
 
 
-class AccessDenied extends \Exception
+use go\core\exception\UserSafeException;
+
+class AccessDenied extends \Exception implements UserSafeException
 {
 
 	public function __construct($message='') {

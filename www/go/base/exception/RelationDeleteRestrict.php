@@ -23,7 +23,9 @@
 namespace GO\Base\Exception;
 
 
-class RelationDeleteRestrict extends \Exception
+use go\core\exception\UserSafeException;
+
+class RelationDeleteRestrict extends \Exception implements UserSafeException
 {
 
 	public function __construct($model, $relation) {

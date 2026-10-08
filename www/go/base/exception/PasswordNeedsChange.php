@@ -23,7 +23,9 @@
 namespace GO\Base\Exception;
 
 
-class PasswordNeedsChange extends \Exception
+use go\core\exception\UserSafeException;
+
+class PasswordNeedsChange extends \Exception implements UserSafeException
 {
 
 	public function __construct($message='') {
