@@ -4,7 +4,7 @@ import {
 	DateTime,
 	E,
 	tooltip,
-	menu, Format, hr, ComponentEventMap, radio, Radiofield, DateInterval
+	menu, Format, hr, ComponentEventMap, radio, Radiofield, DateInterval, h4
 } from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
@@ -173,24 +173,40 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 
 	protected contextMenuEmpty = menu({removeOnClose:false, isDropdown: true, listeners: {
 		beforeshow: ({target}) => {
-			const btn = target.items.find(item => item.itemId === 'paste');
-			if(btn) {
-				if(CalendarItem.clipboard) {
 
-					const dateHasTime = this.contextMenuEmpty.dataSet.date.length > 10;
+			const btnOrig = target.items.find(item => item.itemId === 'paste-original-time')!;
+			const btn = target.items.find(item => item.itemId === 'paste')!;
 
-					const withTime = dateHasTime || (!this.contextMenuEmpty.dataSet.viewSupportsTime && !CalendarItem.clipboard.data.showWithoutTime);
+			if(!CalendarItem.clipboard) {
+				btn.disabled = true;
+				btn.text = t('Paste');
 
-					const start = CalendarItem.pasteGetStart(this.contextMenuEmpty.dataSet.date),
-						dateStr = withTime ? Format.dateTime(start) : Format.date(start);
-
-					btn.disabled = false;
-					btn.text = t("Paste '{title}' at {date}").replace('{date}', dateStr).replace('{title}', CalendarItem.clipboard.title)
-				} else {
-					btn.disabled = true;
-					btn.text = t('Paste');
-				}
+				btnOrig.hidden = true;
+				return;
 			}
+
+			const dateHasTime = this.contextMenuEmpty.dataSet.date.length > 10;
+
+			const withTime = dateHasTime || (!this.contextMenuEmpty.dataSet.viewSupportsTime && !CalendarItem.clipboard.data.showWithoutTime);
+
+			const start = CalendarItem.pasteGetStart(this.contextMenuEmpty.dataSet.date),
+				dateStr = withTime ? Format.dateTime(start) : Format.date(start);
+
+
+			btn.disabled = false;
+			btn.text = t("Paste '{title}' at {date}").replace('{date}', dateStr).replace('{title}', CalendarItem.clipboard.title)
+
+
+
+			const origWithTime = dateHasTime || !CalendarItem.clipboard.data.showWithoutTime;
+
+
+			const origStart = CalendarItem.pasteGetStart(this.contextMenuEmpty.dataSet.date.substring(0, 10)),
+				origDateStr = origWithTime ? Format.dateTime(origStart) : Format.date(origStart);
+
+			btnOrig.hidden = origDateStr === dateStr;
+			btnOrig.text = t("Paste at original time ({time})").replace('{time}', Format.time(origStart)).replace('{title}', CalendarItem.clipboard.title)
+
 		}}},
 		btn({
 			icon:'add',
@@ -222,9 +238,24 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 		}),
 		// btn({icon:'add', text: t('Reminder'), handler: _ => { console.warn('todo:reminder'); }}),
 		hr(),
-		btn({itemId:'paste',icon:'content_paste', text: t('Paste ','core'), handler: _ => {
-			CalendarItem.paste(CalendarView.selectedCalendarId, this.contextMenuEmpty.dataSet.date, this.contextMenuEmpty.dataSet.viewSupportsTime)
-		}})
+
+		btn({
+			itemId:'paste',
+			icon:'content_paste',
+			text: t('Paste'),
+			handler: _ => {
+				CalendarItem.paste(CalendarView.selectedCalendarId, this.contextMenuEmpty.dataSet.date, this.contextMenuEmpty.dataSet.viewSupportsTime)
+			}
+		}),
+
+		btn({
+			itemId:'paste-original-time',
+			icon:'content_paste',
+			text: t('Paste at original time'),
+			handler: _ => {
+				CalendarItem.paste(CalendarView.selectedCalendarId, this.contextMenuEmpty.dataSet.date.substring(0, 10), false)
+			}
+		})
 	);
 
 	protected selected: CalendarItem[] = []
