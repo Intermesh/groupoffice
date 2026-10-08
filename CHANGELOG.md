@@ -1,3 +1,5 @@
+- Core: Give users a better error message
+
 05-10-2026: 26.0.51
 - Core: Updated Italian translations. Grazie Mille, Luca P!
 - Calendar: Fixed all day event creation from day or week view where end date was a day before start date.
