@@ -33,7 +33,7 @@ class PushDispatcher
 	/**
 	 * Interval in seconds between every check for changes to push
 	 */
-	private int $CHECK_INTERVAL = 20;
+	private int $CHECK_INTERVAL;
 
 
 	/**
@@ -54,7 +54,9 @@ class PushDispatcher
 	{
 		if(function_exists("apcu_fetch")) {
 			$this->apcuEnabled = true;
-			$this->CHECK_INTERVAL = 1;
+			$this->CHECK_INTERVAL = go()->getConfig()['sseCheckInterval'] ?? 1;
+		} else {
+			$this->CHECK_INTERVAL = go()->getConfig()['sseCheckInterval'] ?? 20;
 		}
 
 		// disable default disconnect checks

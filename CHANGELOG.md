@@ -7,6 +7,7 @@
 - Projects3: Migrate projects2 description to first comment
 - Support: set configured email account for support list as outgoing account as well.
 - LDAPAuthenticator: Only try to save OTP data when it is not already available.
+- Core: SSE polling interval is configurable
 
 05-10-2026: 26.0.50
 - Calender: fix client side error when opening calendar view
