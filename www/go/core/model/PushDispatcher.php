@@ -52,13 +52,13 @@ class PushDispatcher
 
 	public function __construct(array $entities = [])
 	{
+		if(function_exists('apcu_enabled')) {
+			$this->apcuEnabled = true;
+		}
 		if (!empty(go()->getConfig()['sseCheckInterval']) && (int)go()->getConfig()['sseCheckInterval'] > 0) {
 			$this->CHECK_INTERVAL = (int)go()->getConfig()['sseCheckInterval'];
-		} elseif(function_exists("apcu_fetch")) {
-			$this->apcuEnabled = true;
-			$this->CHECK_INTERVAL = 1;
 		} else {
-			$this->CHECK_INTERVAL = 20;
+			$this->CHECK_INTERVAL = $this->apcuEnabled ? 1 : 20;
 		}
 
 
