@@ -12,6 +12,7 @@
   work fine. This also avoids the old HTTP/2 + ALPN 404 bug that curl's CURLOPT_SSL_ENABLE_ALPN workaround targeted, 
   which newer Guzzle versions no longer allow in the "curl" option.
 - Files / Finance: PDF preview no longer working because of pdf.js lib update
+- Core: User modseq was not recorded correctly causing resyncs
 
 
 05-10-2026: 26.0.50
