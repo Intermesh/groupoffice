@@ -290,7 +290,14 @@ export class Main extends Component {
 								btn({icon: 'view_module', text: t('Month'), handler:() => { this.openPDF('month'); }})
 							)
 						}),
-						btn({icon:'meeting_room',hidden: !rights.mayChangeResources, text:t('Resources')+'…', handler: _ => { (new ResourcesWindow()).show()}}),
+
+						btn({
+							icon:'meeting_room',
+							//hidden: !rights.mayChangeResources,
+							text:t('Resources')+'…',
+							handler: _ => { (new ResourcesWindow()).show()}
+						}),
+
 						checkbox({
 							name:'showDeclined',
 							label: t('Show declined events'),

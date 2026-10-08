@@ -274,7 +274,7 @@ class Calendar extends AclOwnerEntity {
 				$groupId = Group::findPersonalGroupID($adminId);
 				if($groupId) {
 					$this->createAcl();
-					$this->findAcl()->addGroup($groupId, Acl::LEVEL_MANAGE);
+					$this->findAcl()->addGroup($groupId, 35); // Write all
 				}
 			}
 

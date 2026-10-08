@@ -1,6 +1,6 @@
-import {FormWindow, principalDS} from "@intermesh/groupoffice-core";
+import {FormWindow} from "@intermesh/groupoffice-core";
 import {t} from "./Index.js";
-import {colorfield, combobox, hiddenfield, select, textarea, textfield} from "@intermesh/goui";
+import {colorfield, hiddenfield, select, textarea, textfield} from "@intermesh/goui";
 import {resourceGroupStore} from "./ResourcesWindow.js";
 
 export class ResourceWindow extends FormWindow {
