@@ -52,12 +52,15 @@ class PushDispatcher
 
 	public function __construct(array $entities = [])
 	{
-		if(function_exists("apcu_fetch")) {
+		if (!empty(go()->getConfig()['sseCheckInterval']) && (int)go()->getConfig()['sseCheckInterval'] > 0) {
+			$this->CHECK_INTERVAL = (int)go()->getConfig()['sseCheckInterval'];
+		} elseif(function_exists("apcu_fetch")) {
 			$this->apcuEnabled = true;
-			$this->CHECK_INTERVAL = go()->getConfig()['sseCheckInterval'] ?? 1;
+			$this->CHECK_INTERVAL = 1;
 		} else {
-			$this->CHECK_INTERVAL = go()->getConfig()['sseCheckInterval'] ?? 20;
+			$this->CHECK_INTERVAL = 20;
 		}
+
 
 		// disable default disconnect checks
 		ignore_user_abort(true);
