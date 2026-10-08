@@ -14,7 +14,7 @@
 - Files / Finance: PDF preview no longer working because of pdf.js lib update
 - Core: User modseq was not recorded correctly causing resyncs
 - Core: GOUI DataSourceStores avoid unneeded reloads. When the change originates from the bound component, it won't reload but patches the records client side.
-
+- Calendar: Users without 'mayChangeResources' permissions, may change resources where they have manage permissions and are admin of the group.
 
 05-10-2026: 26.0.50
 - Calender: fix client side error when opening calendar view
