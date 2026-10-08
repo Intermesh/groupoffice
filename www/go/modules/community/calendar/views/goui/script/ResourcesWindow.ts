@@ -19,7 +19,7 @@ import {
 	textfield,
 	Window
 } from "@intermesh/goui";
-import {AclLevel, FormWindow, jmapds, principalDS} from "@intermesh/groupoffice-core";
+import {AclLevel, FormWindow, jmapds, modules, principalDS} from "@intermesh/groupoffice-core";
 import {t} from "./Index.js";
 import {ResourceWindow} from "./ResourceWindow.js";
 
@@ -77,10 +77,17 @@ export class ResourcesWindow extends Window {
 			}
 		})
 
+		const rights = modules.get("community", "calendar")!.userRights;
+
 		const aside = comp({tagName:'aside', cls:'vbox', width: 300},
 			tbar({},
 				h3({html:t('Group')}),'->',
-				btn({icon: 'add', cls: 'filled', handler: _ => (new ResourceGroupWindow()).show()})
+				btn({
+					icon: 'add',
+					cls: 'filled',
+					hidden: !rights.mayChangeResources,
+					handler: _ => (new ResourceGroupWindow()).show()
+				})
 			),
 			comp({cls: "scroll",flex:1},
 				this.resourceGroupTable = table({
@@ -101,6 +108,7 @@ export class ResourcesWindow extends Window {
 						column({id:'name', header:t('Name') }),
 
 						menucolumn({
+							hidden: !rights.mayChangeResources,
 							menu: menu({},
 								btn({
 									icon: "edit",
@@ -158,6 +166,7 @@ export class ResourcesWindow extends Window {
 							//text: t("Add"),
 							cls: "filled primary",
 							icon: "add",
+							hidden: !rights.mayChangeResources,
 							handler: () => {
 								const d = new ResourceWindow();
 								d.form.value = {
@@ -169,6 +178,7 @@ export class ResourcesWindow extends Window {
 					),
 					comp({cls: "scroll bg-lowest", flex:1},
 					this.resourceTable = table({
+						rowSelectionConfig: {multiSelect: false},
 						fit: true,
 						store: resourceStore,
 						columns: [
@@ -190,12 +200,13 @@ export class ResourcesWindow extends Window {
 									}),
 									hr(),
 									btn({
+										disabled: !rights.mayChangeResources,
 										icon: "delete",
 										text: t("Delete"),
 										handler: async (b) => {
 											const tbl = b.parent!.dataSet.table;
 											const cal = tbl.store.get(b.parent!.dataSet.rowIndex)!;
-											jmapds("Calendar").confirmDestroy([cal.id]);
+											jmapds("Calendar").confirmDestroy([cal.id]).catch(e => Window.error(e))
 										}
 									})
 
@@ -211,9 +222,12 @@ export class ResourcesWindow extends Window {
 							},
 
 							delete: async (_tbl) => {
+								if(!rights.mayChangeResources) {
+									return;
+								}
 								const ids = this.resourceTable!.rowSelection!.getSelected().map(row => row.record.id);
 								await jmapds("Calendar")
-									.confirmDestroy(ids);
+									.confirmDestroy(ids).catch(e => Window.error(e))
 							}
 						}
 					})

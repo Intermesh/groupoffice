@@ -8,6 +8,14 @@
 - Support: set configured email account for support list as outgoing account as well.
 - LDAPAuthenticator: Only try to save OTP data when it is not already available.
 - Core: SSE polling interval is configurable
+- oauth2: workaround MS bug where it returns 404 if http2 is used with alpn Use PHP's stream handler instead of libcurl. 
+  Microsoft returns an empty 404 for some libcurl/OpenSSL builds (curl 8.14 + OpenSSL 3.5) while wget and PHP streams 
+  work fine. This also avoids the old HTTP/2 + ALPN 404 bug that curl's CURLOPT_SSL_ENABLE_ALPN workaround targeted, 
+  which newer Guzzle versions no longer allow in the "curl" option.
+- Files / Finance: PDF preview no longer working because of pdf.js lib update
+- Core: User modseq was not recorded correctly causing resyncs
+- Core: GOUI DataSourceStores avoid unneeded reloads. When the change originates from the bound component, it won't reload but patches the records client side.
+- Calendar: Users without 'mayChangeResources' permissions, may change resources where they have manage permissions and are admin of the group.
 
 05-10-2026: 26.0.50
 - Calender: fix client side error when opening calendar view

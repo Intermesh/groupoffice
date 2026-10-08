@@ -261,7 +261,8 @@ export class CalendarList extends Component<CalendarListEventMap> {
 	private saveSelectionChanges = FunctionUtil.buffer(2000, () => {
 		//save isVisible
 		for(const id in this.visibleChanges) {
-			jmapds('Calendar').update(id, {isVisible:this.visibleChanges[id]});
+			// origin: this list already shows the new value so it doesn't need to reload
+			jmapds('Calendar').update(id, {isVisible:this.visibleChanges[id]}, this);
 		}
 		this.visibleChanges = {};
 	})
