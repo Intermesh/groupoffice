@@ -504,3 +504,11 @@ $updates['202610061549'][] = "alter table calendar_view
 $updates['202610090902'][] = "update calendar_event set createdBy = null where createdBy not in (select id from core_user);";
 
 $updates['202610090902'][] = "update calendar_event set modifiedBy = createdBy where modifiedBy='0';";
+
+//ALTER TABLE calendar_event
+//    ADD INDEX calendar_event_range_idx (firstOccurrence, lastOccurrence, status, privacy);
+
+$updates['202610091000'][] = "ALTER TABLE `calendar_calendar_event`
+    ADD INDEX `calendar_calendar_event_calendar_event_idx` (`calendarId` ASC, `eventId` ASC),
+    DROP INDEX `fk_calendar_calendar_event_calendar_calendar1_idx`,
+    DROP INDEX `fk_calendar_calendar_event_calendar_event1_idx`;";
