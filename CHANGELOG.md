@@ -1,5 +1,6 @@
 - Core: Give users a better error message
 - Calendar: Correct invalid createdBy and modifiedBy in calendar
+- Calendar: optimized performance with new index
 
 05-10-2026: 26.0.51
 - Core: Updated Italian translations. Grazie Mille, Luca P!
