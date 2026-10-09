@@ -1,4 +1,7 @@
-go.usersettings.AppPasswordsPanel = Ext.extend(Ext.Panel, {
+/**
+ * Fieldset in the account settings panel to manage the app passwords of the user.
+ */
+go.usersettings.AppPasswordsFieldset = Ext.extend(Ext.form.FieldSet, {
 	initComponent: function () {
 		this.store = new go.data.Store({
 			fields: [
@@ -14,15 +17,14 @@ go.usersettings.AppPasswordsPanel = Ext.extend(Ext.Panel, {
 				field: "createdAt",
 				direction: "DESC"
 			},
-			filters: {
-				user: {user: go.User.id},
-			},
 		});
 
 
 		this.grid = new go.grid.GridPanel({
 			store: this.store,
-			border: false,
+			autoHeight: true,
+			anchor: "100%",
+			border: true,
 			autoExpandColumn: 'label',
 			columns: [
 				{
@@ -72,28 +74,32 @@ go.usersettings.AppPasswordsPanel = Ext.extend(Ext.Panel, {
 
 		Ext.apply(this, {
 			title: t('App passwords'),
-			iconCls: 'ic-vpn-key',
-			layout: 'fit',
-			tbar: [
+			// Hidden until it's known whose settings these are.
+			hidden: true,
+			items: [
 				{
+					xtype: "box",
+					autoEl: "p",
+					html: t("Use app passwords to let apps like WebDAV, CalDAV, CardDAV and ActiveSync log in without your regular password.")
+				},
+				this.newButton = new Ext.Button({
 					text: t('New app password'),
 					iconCls: 'ic-add',
+					style: "margin-bottom: " + dp(8) + "px",
 					handler: function () {
-						let dlg = new go.usersettings.AppPasswordDialog();
+						const dlg = new go.usersettings.AppPasswordDialog();
 
 						dlg.setValues({userId: this.userId});
 
 						dlg.show();
 					},
 					scope: this
-				}
-			],
-			items: [this.grid]
+				}),
+				this.grid
+			]
 		});
 
-		this.store.load();
-
-		go.usersettings.AppPasswordsPanel.superclass.initComponent.call(this);
+		go.usersettings.AppPasswordsFieldset.superclass.initComponent.call(this);
 	},
 	initMoreMenu: function () {
 		this.moreMenu = new Ext.menu.Menu({
@@ -117,7 +123,21 @@ go.usersettings.AppPasswordsPanel = Ext.extend(Ext.Panel, {
 
 		return this.moreMenu;
 	},
-	onLoadStart: function (userId) {
-		this.userId = userId;
+	/**
+	 * Called by the AccountSettingsPanel
+	 */
+	onLoadComplete: function (data) {
+		this.userId = data.id;
+
+		// Only the user itself can create an app password as the secret is shown once to the creator.
+		// Admins can see and delete the app passwords of other users.
+		const own = data.id == go.User.id;
+		this.newButton.setVisible(own);
+		this.setVisible(own || go.User.isAdmin);
+
+		if (own || go.User.isAdmin) {
+			this.store.setFilter("user", {user: data.id});
+			this.store.load();
+		}
 	}
 });

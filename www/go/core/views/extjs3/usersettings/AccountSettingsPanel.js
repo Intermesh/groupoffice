@@ -298,6 +298,8 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				this.userFieldset,
 				this.quotaFieldset,
 				this.passwordFieldset,
+				// The OTP module inserts the 2FA fieldset at index 3, so this ends up directly below it.
+				this.appPasswordsFieldset = new go.usersettings.AppPasswordsFieldset(),
 				this.convertToLocalFieldset,
 				this.authorizedClientsFieldSet
 			].concat(go.customfields.CustomFields.getFormFieldSets("User").filter(function(fs){return !fs.fieldSet.isTab;}))
