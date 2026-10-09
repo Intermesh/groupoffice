@@ -1831,7 +1831,10 @@ $updates['202604131511'][] ="delete from core_entity where clientName in (
 $updates['202604221150'][] = "ALTER TABLE core_email_template CHANGE subject subject VARCHAR(255) CHARACTER SET utf8mb4 DEFAULT NULL COLLATE utf8mb4_unicode_ci";
 $updates['202604230937'][] = "delete from core_setting where name='primaryColorTransparent';";
 
-$updates['202608201106'][] = "CREATE TABLE `core_app_password`
+$updates['202608241101'][] = "ALTER TABLE `core_principal` ADD UNIQUE INDEX `entityId` (`entityTypeId` ASC, `entityId` ASC)";
+
+
+$updates['202610021331'][] = "CREATE TABLE `core_app_password`
 (
     `id`           INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `userId`       INT(11)      NOT NULL,
@@ -1849,7 +1852,7 @@ $updates['202608201106'][] = "CREATE TABLE `core_app_password`
             ON UPDATE NO ACTION
 );";
 
-$updates['202608201106'][] = "CREATE TABLE `core_app_password_scope`
+$updates['202610021331'][] = "CREATE TABLE `core_app_password_scope`
 (
     `id`            INT UNSIGNED                                    NOT NULL AUTO_INCREMENT,
     `appPasswordId` INT UNSIGNED                                    NOT NULL,
@@ -1862,8 +1865,7 @@ $updates['202608201106'][] = "CREATE TABLE `core_app_password_scope`
             ON UPDATE NO ACTION
 );";
 
-$updates['202608241101'][] = "ALTER TABLE `core_principal` ADD UNIQUE INDEX `entityId` (`entityTypeId` ASC, `entityId` ASC)";
 
-$updates['202610021153'][] = "ALTER TABLE `core_app_password` MODIFY `lastUsedIp` VARCHAR(45) NULL;";
+$updates['202610021331'][] = "ALTER TABLE `core_app_password` MODIFY `lastUsedIp` VARCHAR(45) NULL;";
 
 $updates['202610021331'][] = "ALTER TABLE `core_app_password_scope` ADD UNIQUE KEY `appPasswordId_protocol` (`appPasswordId`, `protocol`);";
