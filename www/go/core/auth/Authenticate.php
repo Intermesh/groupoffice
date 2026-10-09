@@ -244,9 +244,9 @@ class Authenticate
 		}
 	}
 
-	private function logFailure(string $username): void
+	private function logFailure(string $username, string $scope = 'password'): void
 	{
-		$this->registerFailure($username);
+		$this->registerFailure($username, $scope);
 		// Don't change log message as fail2ban relies on it
 		ErrorHandler::log("Password authentication failed for '" . $username . "' from IP: '" . Request::get()->getRemoteIpAddress() . "'");
 	}
@@ -340,66 +340,140 @@ class Authenticate
 
 	}
 
-	public function appPasswordLogin(string $username, string $password, string $protocol): bool|User
+	/**
+	 * Throws when the user may not login at all (disabled, IP not allowed, maintenance).
+	 *
+	 * @throws Forbidden|Unavailable
+	 */
+	private function assertUserMayLogin(User $user): void
+	{
+		if (!$user->enabled) {
+			throw new Forbidden(go()->t("Your account has been disabled."));
+		}
+
+		if (!go()->getEnvironment()->isCli()) {
+			$ip = Request::get()->getRemoteIpAddress();
+			if (!AuthAllowGroup::isAllowed($user, $ip)) {
+				throw new Forbidden(str_replace('{ip}', $ip, go()->t("You are not allowed to login from IP address {ip}.")));
+			}
+		}
+
+		if (go()->getSettings()->maintenanceMode && !$user->isAdmin()) {
+			throw new Unavailable(go()->t("Service unavailable. Maintenance mode is enabled."));
+		}
+	}
+
+	/**
+	 * Login for protocols that don't support a second factor (DAV, ActiveSync).
+	 *
+	 * App passwords are tried first because that is cheap (indexed lookup + fast hash) and must not count as a
+	 * failed regular login. When "forceAppPasswords" is enabled only app passwords are accepted.
+	 *
+	 * @param string $protocol The app password scope: 'dav' or 'activesync'
+	 * @return false|User
+	 * @throws Forbidden|Unavailable
+	 */
+	public function appLogin(string $username, string $password, string $protocol): bool|User
+	{
+		$force = go()->getSettings()->forceAppPasswords;
+
+		if (AppPassword::looksLikeSecret($password)) {
+			// When not forced a miss is no failure yet, it might be a regular password.
+			$user = $this->appPasswordLogin($username, $password, $protocol, $force);
+			if ($user || $force) {
+				return $user;
+			}
+		} else if ($force) {
+			// Can't be an app password, don't bother the database.
+			User::fireEvent(User::EVENT_BADLOGIN, $username, null);
+			$this->logFailure($username, 'apppassword');
+			return false;
+		}
+
+		return $this->passwordLogin($username, $password);
+	}
+
+	/**
+	 * Authenticate with an app password.
+	 *
+	 * @param string $protocol 'dav' (WebDAV, CalDAV and CardDAV) or 'activesync'
+	 * @param bool $countFailure Register a failed attempt for throttling and fail2ban. Disable when a regular
+	 *  password login follows that will do this itself.
+	 * @return false|User
+	 * @throws Forbidden|Unavailable
+	 */
+	public function appPasswordLogin(string $username, string $password, string $protocol, bool $countFailure = true): bool|User
 	{
 		go()->debug("App password auth for " . $username . " (protocol: " . $protocol . ")");
 
-		$cacheKey = 'apppw-' . hash('sha256', $username . '|' . $protocol . '|' . $password);
+		$this->checkThrottle($username, 'apppassword');
 
-		if (!go()->getSettings()->maintenanceMode && $cached = go()->getCache()->get($cacheKey)) {
-			return $cached;
+		// Only ids are cached, never the user entity. The app password is re-checked on every request so a
+		// revocation takes effect immediately, and the user checks below are always executed.
+		$cacheKey = 'apppw-' . hash('sha256', $username . '|' . $protocol . '|' . $password);
+		$cached = !go()->getSettings()->maintenanceMode ? go()->getCache()->get($cacheKey) : null;
+
+		if (is_array($cached)) {
+			[$userId, $appPasswordId] = $cached;
+			$stillValid = go()->getDbConnection()
+				->selectSingleValue('p.id')
+				->from('core_app_password', 'p')
+				->join('core_app_password_scope', 's', 's.appPasswordId = p.id')
+				->where(['p.id' => $appPasswordId, 'p.userId' => $userId, 'p.revokedAt' => null, 's.protocol' => $protocol])
+				->single();
+
+			$user = $stillValid ? User::findById($userId) : null;
+			if ($user && strcasecmp($user->username, $username) === 0) {
+				$this->clearThrottle($username, 'apppassword');
+				$this->assertUserMayLogin($user);
+				$this->touchAppPassword($appPasswordId);
+				return $user;
+			}
+			go()->getCache()->delete($cacheKey);
 		}
 
 		$user = User::find()->where(['username' => $username])->single();
 
 		if (!$user) {
-			// same logic as passwordLogin for timing attacks
-			// nosemgrep: detected-bcrypt-hash
-			password_verify("randomboguspasswordstring", '$2y$10$wkP8uDjY/tt5GNrfJJO9SOknqStW0POBn5Z4zpctuQkMP7pibTz2m');
-
-			go()->log("App password for '$username' rejected: not valid for protocol '$protocol'");
-
+			// No dummy hash needed: verifying is a cheap sha256, so unknown and known users take equally long.
+			go()->log("App password for '$username' rejected: unknown user");
+			if ($countFailure) {
+				$this->logFailure($username, 'apppassword');
+			}
 			return false;
 		}
 
-		$userAppPasswords = AppPassword::find()->where(['userId' => $user->id, 'revokedAt' => null])->all();
+		// Only fetch the non revoked app passwords that are valid for this protocol, so we never spend a
+		// (costly) password_verify on a password that can't be used here anyway.
+		$ids = go()->getDbConnection()
+			->select('DISTINCT p.id')
+			->from('core_app_password', 'p')
+			->join('core_app_password_scope', 's', 's.appPasswordId = p.id')
+			->where('p.userId', '=', $user->id)
+			->andWhere('p.revokedAt', 'IS', null)
+			->andWhere('s.protocol', '=', $protocol)
+			->fetchMode(\PDO::FETCH_COLUMN, 0)
+			->all();
 
-		foreach ($userAppPasswords as $appPassword) {
-
+		foreach ($ids ? AppPassword::findByIds($ids) : [] as $appPassword) {
 			if (!$appPassword->verifyPassword($password)) {
 				continue;
 			}
 
-			if ($appPassword->hasMatchingScope($protocol)) {
-				go()->log("App password login success for " . $username);
+			go()->log("App password login success for " . $username);
+			$this->clearThrottle($username, 'apppassword');
+			$this->assertUserMayLogin($user);
 
-				go()->getCache()->set($cacheKey, $user, true, self::CACHE_PASSWORD_LOGIN);
+			go()->getCache()->set($cacheKey, [$user->id, $appPassword->id], true, self::CACHE_PASSWORD_LOGIN);
+			$this->touchAppPassword($appPassword->id);
 
-				if (!$user->enabled) {
-					throw new Forbidden(go()->t("Your account has been disabled."));
-				}
-
-				$ip = Request::get()->getRemoteIpAddress();
-
-				if (!go()->getEnvironment()->isCli() && !AuthAllowGroup::isAllowed($user, $ip)) {
-					throw new Forbidden(str_replace('{ip}', $ip, go()->t("You are not allowed to login from IP address {ip}.")));
-				}
-
-				if (go()->getSettings()->maintenanceMode && !$user->isAdmin()) {
-					throw new Unavailable(go()->t("Service unavailable. Maintenance mode is enabled."));
-				}
-
-				$this->touchAppPassword($appPassword->id);
-
-				return $user;
-			}
-
-			User::fireEvent(User::EVENT_BADLOGIN, $username, null);
-			return false;
+			return $user;
 		}
 
-		User::fireEvent(User::EVENT_BADLOGIN, $username, null);
-		$this->logFailure($username);
+		if ($countFailure) {
+			User::fireEvent(User::EVENT_BADLOGIN, $username, null);
+			$this->logFailure($username, 'apppassword');
+		}
 
 		return false;
 	}

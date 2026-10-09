@@ -94,15 +94,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 		try {
 			$auth = new Authenticate();
 
-			if (go()->getSettings()->forceAppPasswords) {
-				$user = $auth->appPasswordLogin($username, $password, 'activesync');
-			} else {
-				$user = $auth->passwordLogin($username, $password);
-
-				if (!$user) {
-					$user = $auth->appPasswordLogin($username, $password, 'activesync');
-				}
-			}
+			$user = $auth->appLogin($username, $password, 'activesync');
 
 			if (!$user) {
 				return false;
