@@ -500,3 +500,7 @@ $updates['202610061549'][] = "alter table calendar_view
     add constraint calendar_View_ownerId
         foreign key (ownerId) references core_user (id)
             on delete cascade;";
+
+$updates['202610090902'][] = "update calendar_event set createdBy = null where createdBy not in (select id from core_user);";
+
+$updates['202610090902'][] = "update calendar_event set modifiedBy = createdBy where modifiedBy='0';";
