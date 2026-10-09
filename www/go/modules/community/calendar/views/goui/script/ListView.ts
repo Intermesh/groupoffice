@@ -98,7 +98,7 @@ export class ListView extends CalendarView {
 		}
 
 		const time = E('span', e.data.showWithoutTime ? t('Full day') :
-			Format.time(e.start) + ' - ' + Format.time(e.end)),
+			Format.time(e.start, true) + ' - ' + Format.time(e.end, true)),
 			title = E('span', e.title);
 		e.divs[0] = super.eventHtml(e,E('div',
 			E('i','fiber_manual_record').cls('icon'),

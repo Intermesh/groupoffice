@@ -696,6 +696,9 @@ $timeMargin: dp(72);
 				margin-left:dp(8);
 				width: dp(198);
 			}
+			span:last-of-type {
+				flex: 1;
+			}
 		}
 	}
 }
