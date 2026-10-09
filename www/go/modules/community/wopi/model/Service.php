@@ -127,7 +127,11 @@ class Service extends AclOwnerEntity
   private function discover(): void
 	{
     $c = new Client();
+    // The URL is user controlled: refuse loopback/private/link-local targets unless "wopiAllowInternal" is set
+    // in config.php, and don't follow redirects to them.
+    $c->globalRangeOnly = !go()->getConfig()['wopiAllowInternal'];
 		$c->setOption(CURLOPT_TIMEOUT, 10);
+    $c->setOption(CURLOPT_FOLLOWLOCATION, false);
 
     $result = $c->get($this->url . '/hosting/discovery');
 
@@ -157,8 +161,8 @@ class Service extends AclOwnerEntity
 
         if($appName == 'Capabilities' && $record['name'] == 'getinfo') {
           $capabilitiesResult = $c->get($record['url']);
-          $c = json_decode($capabilitiesResult['body']);
-          $this->name = $c->productName;
+          $capabilities = json_decode($capabilitiesResult['body']);
+          $this->name = $capabilities->productName;
           $this->type = self::TYPE_COLLABORA;
         } else
         {

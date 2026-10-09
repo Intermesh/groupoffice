@@ -467,6 +467,7 @@ namespace go\core {
 			//defaults
 			$config = new ArrayObject([
 				"frameAncestors" => "",
+				"wopiAllowInternal" => false, // Allow WOPI service URLs that resolve to private/loopback addresses
 				"theme" => "Paper",
 				"allow_themes" => true,
 				"file_storage_path" => '/var/lib/groupoffice',
