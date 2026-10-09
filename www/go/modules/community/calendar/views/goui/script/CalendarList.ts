@@ -1,25 +1,32 @@
 import {
 	browser,
 	btn,
-	checkbox, CheckboxField,
+	checkbox,
+	CheckboxField,
 	comp,
-	Component, ComponentEventMap,
-	displayfield, fieldset, Format,
+	Component,
+	ComponentEventMap,
+	displayfield,
+	fieldset,
+	Format,
 	FunctionUtil,
-	hr, List,
+	hr,
+	List,
 	list,
 	menu,
-	select, selectallcheckboxfield,
-	tbar, win, Window
+	select,
+	tbar,
+	win,
+	Window
 } from "@intermesh/goui";
 import {calendarStore, Main, t} from "./Index.js";
 import {CalendarView} from "./CalendarView.js";
-import {ResourceWindow} from "./ResourcesWindow.js";
 import {CalendarWindow} from "./CalendarWindow.js";
 import {client, jmapds, modules} from "@intermesh/groupoffice-core";
 import {SubscribeWindow} from "./SubscribeWindow.js";
 import {SubscribeWebCalWindow} from "./SubscribeWebCalWindow";
 import {ViewWindow} from "./ViewWindow";
+import {ResourceWindow} from "./ResourceWindow.js";
 
 export interface CalendarListEventMap extends ComponentEventMap {
 	changevisible: {ids: string[]}
@@ -167,10 +174,12 @@ export class CalendarList extends Component<CalendarListEventMap> {
 
 		const rights = modules.get("community", "calendar")!.userRights;
 		const icon = data.webcalUri ? ' <i class="icon">web</i>' : '';
+		_row.title = data.description;
 		return [checkbox({
 			color: '#' + data.color,
 			value: data.isVisible,
 			label: data.name + icon,
+
 			listeners: {
 				'render': ({target}) => {
 					target.input.addEventListener("mousedown", (ev) => {
@@ -252,7 +261,8 @@ export class CalendarList extends Component<CalendarListEventMap> {
 	private saveSelectionChanges = FunctionUtil.buffer(2000, () => {
 		//save isVisible
 		for(const id in this.visibleChanges) {
-			jmapds('Calendar').update(id, {isVisible:this.visibleChanges[id]});
+			// origin: this list already shows the new value so it doesn't need to reload
+			jmapds('Calendar').update(id, {isVisible:this.visibleChanges[id]}, this);
 		}
 		this.visibleChanges = {};
 	})

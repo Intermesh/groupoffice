@@ -4,20 +4,19 @@ import {
 	comp,
 	DateInterval,
 	DateTime,
-	E, EntityID, Format, MaterialIcon, ObjectUtil, root,
-	tbar, Timezone,
-	win, Window
+	E,
+	EntityID,
+	Format,
+	MaterialIcon,
+	ObjectUtil,
+	root,
+	tbar,
+	Timezone,
+	win,
+	Window
 } from "@intermesh/goui";
-import {
-	calendarStore,
-	CalendarView,
-	categoryStore,
-	getParticipantStatusIcon,
-	statusIcons,
-	t,
-	writeableCalendarStore
-} from "./Index.js";
-import {client, jmapds, Principal, Recurrence, RecurrenceField} from "@intermesh/groupoffice-core";
+import {calendarStore, categoryStore, getParticipantStatusIcon, t, writeableCalendarStore} from "./Index.js";
+import {client, jmapds, Recurrence, RecurrenceField} from "@intermesh/groupoffice-core";
 import {EventWindow} from "./EventWindow.js";
 import {EventDetailWindow} from "./EventDetail.js";
 import {SubscribeWindow} from "./SubscribeWindow";
@@ -305,7 +304,7 @@ export class CalendarItem {
 	get icons() {
 		const e = this.data;
 		const icons = [...this.extraIcons];
-		//if(e.recurrenceRule) icons.push('refresh');
+		if(e.recurrenceRule) icons.push('refresh');
 		if(e.links) icons.push('attachment');
 		if(e.alerts) icons.push('notifications');
 		if(this.isTentative) icons.push('question_mark');
@@ -315,6 +314,11 @@ export class CalendarItem {
 		return icons.map(i=>E('i',i).cls('icon'));
 	}
 
+	/**
+	 * Save the calendar item.
+	 *
+	 * @param onCancel
+	 */
 	save(onCancel?: () => void) {
 		const f = this.data.showWithoutTime ? 'Y-m-d' : 'Y-m-dTH:i:s';
 		const start = this.start.format(f),
@@ -343,6 +347,12 @@ export class CalendarItem {
 		return dlg;
 	}
 
+	/**
+	 * Opens the calendar event window or read only EventDetailWindow depending on the users' permissions
+	 *
+	 * @param onCancel
+	 * @param forceWrite
+	 */
 	async open(onCancel?: Function, forceWrite?: boolean) : Promise<EventWindow| EventDetailWindow | undefined> {
 		const internalOpen = async () => {
 			const dlg = !forceWrite && !this.mayChange  ? new EventDetailWindow() : new EventWindow();
@@ -548,40 +558,54 @@ export class CalendarItem {
 	}
 
 	get quickText(): string {
-		const cal = this.cal ? ('<sup style="color:#'+this.cal.color+';">'+this.cal.name+'</sup>') : '';
+		const cal = this.cal ? ('<sup style="color:#'+this.cal.color+';">'+(this.cal.name || t("Unknown"))+'</sup>') : '';
 		const lines = [
-			'<h2 style="padding:0;margin:0;">' + this.title.htmlEncode() + '</h2>' + cal,
-			...this.humanReadableDate(),
+			'<h2 style="padding:0;margin:0;">' + this.title.htmlEncode() + '</h2>' + cal + "<br />",
+			this.humanReadableDate().join("<br>"), "<br />"
 		];
-		if(this.isRecurring) {
-			lines.push(RecurrenceField.toText(this.data.recurrenceRule,this.start));
-		}
-		if(this.participants) {
-			lines.push('<hr>'+t('Participants'));
-			for(const key in this.participants) {
-				const p = this.participants[key],
-					icon = getParticipantStatusIcon(p);
-
-				const i = '<i class="icon '+icon[2]+'" title="'+icon[1]+'">'+icon[0]+'</i>' ;
-				lines.push(i+' '+(p.name || p.email).htmlEncode());
-			}
-
-		}
-		if(this.patched.creator && this.patched.modifier) {
-			lines.push(
-				'<hr>' + t('Created at') + ': ' + Format.smartDateTime(this.data.createdAt) + ' ' + t('by') + ' ' + this.data.creator.name.htmlEncode(),
-				t('Modified at') + ': ' + Format.smartDateTime(this.data.modifiedAt) + ' ' + t('by') + ' ' + this.data.modifier.name.htmlEncode()
-			);
-		}
 
 		if(this.patched.location) {
 			lines.push('<div style="white-space: pre">' + t('Location')+ ': ' + this.formatLocation(this.patched.location)) + '</div>';
 		}
 
+		if(this.isRecurring) {
+			lines.push(RecurrenceField.toText(this.data.recurrenceRule,this.start) + "<br />");
+		}
+		if(this.participants) {
+			lines.push('<hr>'+t('Participants') + "<br>");
+			for(const key in this.participants) {
+				const p = this.participants[key],
+					icon = getParticipantStatusIcon(p);
+
+				const i = '<i class="icon '+icon[2]+'" title="'+icon[1]+'">'+icon[0]+'</i>' ;
+				lines.push(i+' '+(p.name || p.email).htmlEncode() + "<br />");
+			}
+
+		}
+
+
+		if(this.categories.length) {
+			const cats = [];
+			for (const cat of this.categories) {
+				cats.push(`<span><i class="cat" style="color: #${cat.color};"></i> ${cat.name.htmlEncode()}</span>`);
+			}
+
+			lines.push('<div class="categories">' + cats.join("") + '</div>');
+		}
+
 		if(this.patched.description)
 			lines.push('<p style="max-width:360px;">'+Format.textToHtml(this.patched.description)+'</p>');
 
-		return lines.join('<br>');
+
+		if(this.patched.creator && this.patched.modifier) {
+			lines.push(
+				'<hr>' + t('Created at') + ': ' + Format.smartDateTime(this.data.createdAt) + ' ' + t('by') + ' ' + this.data.creator.name.htmlEncode(),
+				"<br>",
+				t('Modified at') + ': ' + Format.smartDateTime(this.data.modifiedAt) + ' ' + t('by') + ' ' + this.data.modifier.name.htmlEncode()
+			);
+		}
+
+		return lines.join('');
 	}
 
 	private formatLocation(l:string) {
@@ -688,6 +712,16 @@ export class CalendarItem {
 		}
 	}
 
+	/**
+	 * Saves the event.
+	 *
+	 * Handles recurrences in series too
+	 *
+	 * @param modified
+	 * @param onFinish
+	 * @param onCancel
+	 * @param skipAsk
+	 */
 	patch(modified: any, onFinish?: () => void, onCancel?: () => void, skipAsk = false) {
 		if(!this.isRecurring) {
 			this.confirmScheduleMessage(modified, () => {
@@ -720,7 +754,7 @@ export class CalendarItem {
 			const isFirstInSeries = this.data.start == this.recurrenceId
 			const w = win({
 					title: t('Do you want to edit a recurring event?'),
-					width:550,
+					width: 550,
 					modal: true,
 					listeners: {'close': ({byUser}) => { if(byUser && onCancel) onCancel();  }}
 				},comp({cls: 'pad flow'},
@@ -785,7 +819,7 @@ export class CalendarItem {
 			if(!original) return; // why could this be undefined?
 			this.confirmScheduleMessage(modified, () => {
 
-				for(const name of ['start', 'duration', 'title', 'freeBusyStatus', 'location','status', 'description']) {
+				for(const name of ['start', 'duration', 'title', 'freeBusyStatus', 'location','status', 'description', 'categoryIds']) {
 					if((name in modified) && modified[name] != original[name])
 						patch[name] = modified[name]; // remove properties that are the same as original
 				}
@@ -950,10 +984,8 @@ export class CalendarItem {
 		});
 	}
 
-	static async paste(calendarId: string, date: string) {
-
-		if (!CalendarItem.clipboard!) return;
-		const withoutTime = date.length === 10, item = CalendarItem.clipboard;
+	static pasteGetStart(date: string) {
+		const withoutTime = date.length === 10, item = CalendarItem.clipboard!;
 
 		let start = item.start;
 		if(withoutTime) {
@@ -963,8 +995,26 @@ export class CalendarItem {
 			start = new DateTime(date);
 		}
 
+		return start;
+	}
+
+	static async paste(calendarId: string, date: string, viewSupportsTime: boolean) {
+
+		if (!CalendarItem.clipboard!) return;
+		const item = CalendarItem.clipboard;
+
+		let start = this.pasteGetStart(date);
+
+		if(viewSupportsTime) {
+			const newShowWithoutTime = date.length === 10;
+			if(newShowWithoutTime && !item.data.showWithoutTime) {
+				item.data.duration = "P1D";
+			}
+			item.data.showWithoutTime = newShowWithoutTime;
+		}
+
 		let end = start.clone().add(new DateInterval(item.data.duration));
-		if(withoutTime) {
+		if(item.data.showWithoutTime) {
 			end.add(new DateInterval("-P1D"))
 		}
 		item.data.calendarId = calendarId;
@@ -1019,7 +1069,7 @@ export class CalendarItem {
 			const w = win({
 					title: t('Do you want to delete a recurring event?'),
 					modal: true,
-					width: 540,
+					width: 800,
 				},comp({
 					cls:'pad',
 					html: t('You will be deleting a recurring event. Do you want to delete this occurrence only or all future occurrences?'),

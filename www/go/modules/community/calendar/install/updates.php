@@ -96,6 +96,11 @@ $updates['202402221543'][] = function(){ // insert event overrides
 			$patch->participants = (object) $participants;
 		}
 
+		// in some rare cases the recurrence_id is null.
+		if(empty($row['recurrence_id'])) {
+			continue;
+		}
+
 		// add patch to calendar_recurrence_override
 		$recurrenceId = tz_convert($row['recurrence_id'],$event['timezone'])->format('Y-m-d H:i:s');
 		$insertPatchStmt->execute([$event['id'],$recurrenceId, json_encode($patch)]);
@@ -482,3 +487,28 @@ $updates['202602160945'][] = "ALTER TABLE `calendar_resource_group` ADD COLUMN `
 $updates['202604211050'][] = "ALTER TABLE `calendar_calendar` ADD COLUMN `webcalHash` CHAR(40) COLLATE ascii_bin NULL DEFAULT NULL AFTER `webcalUri`;";
 
 $updates['202605281632'][] = "ALTER TABLE `calendar_preferences` ADD COLUMN multiLine TINYINT(1) DEFAULT 0 NOT NULL AFTER `showDeclined`;";
+
+
+$updates['202610051128'][] = "update calendar_calendar set ownerId = null where groupId is not null;";
+
+$updates['202610051128'][] = "update calendar_event set replyTo = replace(lower(replyTo), 'mailto:', '')";
+
+$updates['202610061549'][] = "alter table calendar_view
+    drop foreign key calendar_View_ownerId;";
+
+$updates['202610061549'][] = "alter table calendar_view
+    add constraint calendar_View_ownerId
+        foreign key (ownerId) references core_user (id)
+            on delete cascade;";
+
+$updates['202610090902'][] = "update calendar_event set createdBy = null where createdBy not in (select id from core_user);";
+
+$updates['202610090902'][] = "update calendar_event set modifiedBy = createdBy where modifiedBy='0';";
+
+//ALTER TABLE calendar_event
+//    ADD INDEX calendar_event_range_idx (firstOccurrence, lastOccurrence, status, privacy);
+
+$updates['202610091000'][] = "ALTER TABLE `calendar_calendar_event`
+    ADD INDEX `calendar_calendar_event_calendar_event_idx` (`calendarId` ASC, `eventId` ASC),
+    DROP INDEX `fk_calendar_calendar_event_calendar_calendar1_idx`,
+    DROP INDEX `fk_calendar_calendar_event_calendar_event1_idx`;";

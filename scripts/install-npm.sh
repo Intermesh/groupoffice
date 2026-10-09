@@ -18,6 +18,7 @@ cd $DIR/../;
 DIR="$(pwd)";
 
 cd "$DIR/www"
+#npm up
 npm ci --prefer-offline --audit=false --progress=false --fund=false
 
 echo "Building SASS"

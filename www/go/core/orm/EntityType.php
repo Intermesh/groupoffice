@@ -10,6 +10,7 @@ use go\core\App;
 use go\core\auth\Method;
 use go\core\data\ArrayableInterface;
 use go\core\db\DbException;
+use go\core\db\Expression;
 use go\core\db\Query;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
@@ -380,6 +381,18 @@ class EntityType implements ArrayableInterface {
 			throw new Exception("Entity type with name $name not found");
 		}
 		return $c['models'][$c['name'][$name]];
+	}
+
+	/**
+	 * Check if entity exists
+	 *
+	 * @param string $name
+	 * @return bool
+	 */
+	public static function existsByName(string $name) : bool {
+		$c = self::getCache();
+
+		return isset($c['name'][$name]) && isset($c['models'][$c['name'][$name]]);
 	}
 
 	/**
@@ -860,6 +873,8 @@ class EntityType implements ArrayableInterface {
 			->query("SELECT LAST_INSERT_ID()")
 			->fetch(PDO::FETCH_COLUMN, 0);
 
+		go()->debug($this->name . " New modseq increased to $modSeq");
+
 		$this->highestModSeq = $modSeq;
 
 		return $modSeq;
@@ -873,15 +888,18 @@ class EntityType implements ArrayableInterface {
 	 */
 	public function nextUserModSeq() : int {
 
-		$stmt = go()->getDbConnection()
-			->update(
-				"core_change_user_modseq",
-				'highestModSeq = LAST_INSERT_ID(highestModSeq  +  1)',
-				Query::normalize([
-					"entityTypeId" => $this->id,
-					"userId" => go()->getUserId()
-				])->tableAlias('entity')
-			);
+		// Upsert: the row may not exist yet. LAST_INSERT_ID(expr) must be evaluated on both paths,
+		// otherwise LAST_INSERT_ID() returns a stale value from earlier on the connection.
+		$stmt = go()->getDbConnection()->insert(
+			"core_change_user_modseq",
+			[
+				"userId" => go()->getUserId(),
+				"entityTypeId" => $this->id,
+				"highestModSeq" => new Expression("LAST_INSERT_ID(1)")
+			],
+			[],
+			["highestModSeq" => new Expression("LAST_INSERT_ID(highestModSeq + 1)")]
+		);
 
 		// on deadlocks retry 10 times
 		for($i = 10; $i > -1; $i--) {
@@ -900,6 +918,8 @@ class EntityType implements ArrayableInterface {
 		$modSeq = go()->getDbConnection()
 			->query("SELECT LAST_INSERT_ID()")
 			->fetch(PDO::FETCH_COLUMN, 0);
+
+		go()->debug($this->name . " New user modseq increased to $modSeq");
 
 		$this->highestUserModSeq = $modSeq;
 

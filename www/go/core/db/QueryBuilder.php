@@ -133,9 +133,10 @@ class QueryBuilder {
    * @param $data
    * @param array $columns
    * @param string $command
+   * @param array|string|Expression|null $onDuplicateKey Optional "ON DUPLICATE KEY UPDATE" assignments. See {@see buildSet()}
    * @return array
    */
-	public function buildInsert($tableName, $data, array $columns = [], string $command = "INSERT"): array
+	public function buildInsert($tableName, $data, array $columns = [], string $command = "INSERT", array|string|Expression|null $onDuplicateKey = null): array
 	{
 
 		$this->reset();
@@ -195,9 +196,48 @@ class QueryBuilder {
 			$sql = substr($sql, 0, -2); //strip off last ', '
 		}
 
+		if (isset($onDuplicateKey)) {
+			$sql .= "\nON DUPLICATE KEY UPDATE\n\t" . $this->buildSet($onDuplicateKey);
+		}
+
 		$sql = $this->insertNamedParams($sql);
 		
 		return ['sql' => $sql, 'params' => $this->buildBindParameters, 'paramMap' => $this->namedParamMap];
+	}
+
+	/**
+	 * Build the "col = value, ..." list used by UPDATE ... SET and INSERT ... ON DUPLICATE KEY UPDATE
+	 *
+	 * @param array|string|Expression $data Key value array or a raw SQL string / Expression
+	 * @return string
+	 */
+	private function buildSet(array|string|Expression $data): string
+	{
+		if (!is_array($data)) {
+			return (string) $data;
+		}
+
+		$updates = [];
+		foreach ($data as $colName => $value) {
+
+			$tableAndCol = $this->splitTableAndColumn($colName);
+			$colName = '`' . $tableAndCol[0] .'`.`'.$tableAndCol[1].'`';
+			if($value instanceof Expression) {
+				$updates[] = $colName . ' = ' . $value;
+			} elseif($value instanceof Query) {
+				$build = $value->build();
+
+				$updates[] = $colName . ' = (' . $build['sql'] .')';
+
+				$this->buildBindParameters = array_merge($this->buildBindParameters, $build['params']);
+			} else
+			{
+				$paramTag = $this->getParamTag();
+				$updates[] = $colName . ' = ' . $paramTag;
+				$this->addBuildBindParameter($paramTag, $value, $tableAndCol[0], $tableAndCol[1]);
+			}
+		}
+		return implode(",\n\t", $updates);
 	}
 
 	public function buildUpdate($tableName, $data, Query $query, $command = "UPDATE"): array
@@ -213,31 +253,7 @@ class QueryBuilder {
 		$this->tableAlias = $this->query->getTableAlias();
 		$this->aliasMap[$this->tableAlias] = $this->tableName;
 
-		if (is_array($data)) {
-			$updates = [];
-			foreach ($data as $colName => $value) {
-
-				$tableAndCol = $this->splitTableAndColumn($colName);
-				$colName = '`' . $tableAndCol[0] .'`.`'.$tableAndCol[1].'`';
-				if($value instanceof Expression) {
-					$updates[] = $colName . ' = ' . $value;
-				} elseif($value instanceof Query) {
-					$build = $value->build();
-
-					$updates[] = $colName . ' = (' . $build['sql'] .')';
-					
-					$this->buildBindParameters = array_merge($this->buildBindParameters, $build['params']);
-				} else
-				{				
-					$paramTag = $this->getParamTag();
-					$updates[] = $colName . ' = ' . $paramTag;
-					$this->addBuildBindParameter($paramTag, $value, $tableAndCol[0], $tableAndCol[1]);
-				}
-			}
-			$set = implode(",\n\t", $updates);
-		} else {
-			$set = (string) $data;
-		}
+		$set = $this->buildSet($data);
 		
 		$sql = $command . " `$this->tableName` `" . $this->tableAlias . "`";
 		
@@ -441,16 +457,16 @@ class QueryBuilder {
 	public static function debugBuild(array $build) {
 		$sql = $build['sql'];
 		if(isset($build['params'])) {
-//			foreach ($build['params'] as $p) {
-//				try {
-//					$queryValue = var_export($p['value'], true);
-//				} catch(Exception $e) {
-//					$queryValue = "[FAILED_TO_STRING]";
-//				}
-//				$sql = preg_replace('/\?/', $queryValue, $sql, 1);
-//			}
+			foreach ($build['params'] as $p) {
+				try {
+					$queryValue = var_export($p['value'], true);
+				} catch(Exception $e) {
+					$queryValue = "[FAILED_TO_STRING]";
+				}
+				$sql = preg_replace('/\?/', $queryValue, $sql, 1);
+			}
 
-			$sql .= ', ' . var_export($build['params'], true);
+//			$sql .= ', ' . var_export($build['params'], true);
 		}
 
 		return $sql;

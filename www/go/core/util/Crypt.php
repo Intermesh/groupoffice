@@ -32,14 +32,14 @@ class Crypt {
 
 	/** Decryption Procedure
 	 *
-	 * @param string   $ciphertext      output from encrypt()
-	 * @param string   $password        encryption key
+	 * @param string $ciphertext output from encrypt()
+	 * @param string|null $password encryption key
 	 *
 	 * @return  string   original message/data or
 	 *           boolean  false on error
 	 * @throws Exception
 	 */
-	public static function decrypt(string $ciphertext, $password = null) : string {
+	public static function decrypt(string $ciphertext, ?string $password = null) : string {
 
 		if (empty($ciphertext)) {
 			return "";

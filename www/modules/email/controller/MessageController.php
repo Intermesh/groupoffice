@@ -648,7 +648,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$mailer->send($message);
 		} catch(\Throwable $e) {
 			$msg = GO::t("Sorry, an error occurred") . ': '. $mailer->lastError(). ' - '. $e->getMessage();
-			throw new Exception($msg);
+			\go\core\ErrorHandler::logException($e, "Failed to send message");
+			throw new \go\core\exception\UserMessage($msg, 0, $e);
 		}
 
 

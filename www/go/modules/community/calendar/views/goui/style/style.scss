@@ -869,3 +869,36 @@ $timeMargin: dp(72);
 		margin: 0 auto;
 	}
 }
+
+.tooltip {
+
+	.categories {
+
+		margin-top: dp(8);
+
+		>* {
+			&:after {
+				content: ", ";
+			}
+
+			&:last-child {
+				&:after {
+					content: "";
+				}
+			}
+		}
+	}
+	i.cat {
+		display:inline-block;
+		font-size: inherit !important;
+		color: inherit;
+		min-height: dp(16);
+		height: dp(16);
+		width: dp(16);
+		min-width: dp(16);
+		background-color: currentColor;
+		border-radius: dp(3);
+		margin:dp(2);
+		vertical-align: middle;
+	}
+}

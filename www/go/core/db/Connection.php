@@ -440,68 +440,77 @@ class Connection {
 		return $this->createStatement($build);
 	}
 
-  /**
-   * Create an insert statement
-   *
-   * @param string $tableName
-   * @param array|Query $data Key value array, a numeric array with key value arrays or select query
-   * @param string[] $columns If $data is a query object then you can supply the
-   *  selected columns with this parameter. If not given all columns must be
-   *  selected in the correct order.
-   *
-   * @return Statement
-   * @throws PDOException
-   * @example Single record
-   * ```
-   * $data = [
-   *    "propA" => "string 1",
-   *    "createdAt" => new \DateTime(),
-   *    "modifiedAt" => new \DateTime()
-   * ];
-   *
-   * $result = App::get()
-   *        ->getDbConnection()
-   *        ->insert("test_a", $data)
-   *        ->execute();
-   * ```
-   *
-   * Get the ID if it has an auto increment column:
-   * ```
-   * $id = App::get()->getDbConnection()->getPDO()->lastInsertId();
-   * ```
-   *
-   *
-   * @example Multiple records
-   * ```
-   * $data = [[
-   *    "propA" => "string 1",
-   *    "createdAt" => new \DateTime(),
-   *    "modifiedAt" => new \DateTime()
-   * ],[
-   *    "propA" => "string 2",
-   *    "createdAt" => new \DateTime(),
-   *    "modifiedAt" => new \DateTime()
-   * ]];
-   *
-   * $result = App::get()
-   *        ->getDbConnection()
-   *        ->insert("test_a", $data)
-   *        ->execute();
-   * ```
-   *
-   * Or with an expression:
-   *
-   * ```
-   * App::get()->getDbConnection()
-   *  ->update("core_state", new \go\core\db\Expression("highestModSeq = highestModSeq + 1"), $query);
-   * ```
-   *
-   */
-	public function insert(string $tableName, $data, array $columns = []): Statement
+	/**
+	 * Create an insert statement
+	 *
+	 * @param string $tableName
+	 * @param array|Query $data Key value array, a numeric array with key value arrays or select query
+	 * @param string[] $columns If $data is a query object then you can supply the
+	 *  selected columns with this parameter. If not given all columns must be
+	 *  selected in the correct order.
+	 * @param array|string|Expression|null $onDuplicateKey
+	 * @return Statement
+	 * @throws Exception
+	 * @example Single record
+	 * ```
+	 * $data = [
+	 *    "propA" => "string 1",
+	 *    "createdAt" => new \DateTime(),
+	 *    "modifiedAt" => new \DateTime()
+	 * ];
+	 *
+	 * $result = App::get()
+	 *        ->getDbConnection()
+	 *        ->insert("test_a", $data)
+	 *        ->execute();
+	 * ```
+	 *
+	 * Get the ID if it has an auto increment column:
+	 * ```
+	 * $id = App::get()->getDbConnection()->getPDO()->lastInsertId();
+	 * ```
+	 *
+	 *
+	 * @example On duplicate key. $onDuplicateKey takes the same format as the data of update()
+	 * ```
+	 * go()->getDbConnection()->insert(
+	 *   "core_change_user_modseq",
+	 *   ["userId" => 1, "entityTypeId" => 2, "highestModSeq" => new Expression("LAST_INSERT_ID(1)")],
+	 *   [],
+	 *   ["highestModSeq" => new Expression("LAST_INSERT_ID(highestModSeq + 1)")]
+	 * )->execute();
+	 * ```
+	 *
+	 * @example Multiple records
+	 * ```
+	 * $data = [[
+	 *    "propA" => "string 1",
+	 *    "createdAt" => new \DateTime(),
+	 *    "modifiedAt" => new \DateTime()
+	 * ],[
+	 *    "propA" => "string 2",
+	 *    "createdAt" => new \DateTime(),
+	 *    "modifiedAt" => new \DateTime()
+	 * ]];
+	 *
+	 * $result = App::get()
+	 *        ->getDbConnection()
+	 *        ->insert("test_a", $data)
+	 *        ->execute();
+	 * ```
+	 *
+	 * Or with an expression:
+	 *
+	 * ```
+	 * App::get()->getDbConnection()
+	 *  ->update("core_state", new \go\core\db\Expression("highestModSeq = highestModSeq + 1"), $query);
+	 * ```
+	 */
+	public function insert(string $tableName, $data, array $columns = [], array|string|Expression|null $onDuplicateKey = null): Statement
 	{
 
 		$queryBuilder = new QueryBuilder($this);
-		$build = $queryBuilder->buildInsert($tableName, $data, $columns);
+		$build = $queryBuilder->buildInsert($tableName, $data, $columns, "INSERT", $onDuplicateKey);
 
 		return $this->createStatement($build);
 	}

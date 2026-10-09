@@ -78,6 +78,14 @@ class Calendar extends AclOwnerEntity {
 	 * @var DefaultAlertWT[]
 	 */
 	public ?array $defaultAlertsWithoutTime;
+
+
+	/**
+	 * Calendar owner id
+	 *
+	 * Is null for shared calendars and resources. {@see getOwnerId()}
+	 * @var int|null
+	 */
 	protected ?int $ownerId = null;
 	public ?string $createdBy;
 	public ?string $webcalUri = null;
@@ -102,6 +110,11 @@ class Calendar extends AclOwnerEntity {
 		return ['name'];
 	}
 
+	protected function canCreate(): bool
+	{
+		return \go\modules\community\calendar\Module::get()->getModel()->getUserRights()->mayChangeCalendars;
+	}
+
 	private function generateSecret() {
 		$bits = openssl_random_pseudo_bytes(15); // 6bits per char, 120bits = 20 chars
 		return strtr(base64_encode($bits), '+/', '-_'); // translate to make url-safe
@@ -115,8 +128,17 @@ class Calendar extends AclOwnerEntity {
 		$this->ownerId = $v;
 	}
 
+	/**
+	 * The calendar owner is a principal:
+	 *
+	 * 1. A user if it's a private calendar
+	 * 2. "Calendar::$id" if it's a resource
+	 * 3. null if it's a shared calendar where any user with permission can be the organizer.
+	 *
+	 * @return int|string|null
+	 */
 	public function getOwnerId() {
-		return !empty($this->groupId) ? ('Calendar:'.$this->id) : $this->ownerId;
+		return $this->ownerId; //!empty($this->groupId) ? ('Calendar:'.$this->id) : $this->ownerId;
 	}
 
 
@@ -241,23 +263,28 @@ class Calendar extends AclOwnerEntity {
 			$this->syncToDevice = true;
 			$this->isVisible = true;
 			$this->defaultColor = $this->color;
+
+			if(!empty($this->groupId)) {
+				// Make sure resource owner can manage resource calendars.
+				// This doesn't handle permissions when the resource calendar admin changes though.
+				$adminId = ResourceGroup::find()
+					->selectSingleValue('defaultOwnerId')
+					->where('id', '=', $this->groupId)
+					->single();
+				$groupId = Group::findPersonalGroupID($adminId);
+				if($groupId) {
+					$this->createAcl();
+					$this->findAcl()->addGroup($groupId, 35); // Write all
+				}
+			}
+
 		} else if($this->ownerId === go()->getUserId() && !empty($this->color)) {
 			$this->defaultColor = $this->color;
 		}
 		if(empty($this->color)) {
 			$this->color = $this->defaultColor;
 		}
-		if(!empty($this->groupId) && empty($this->ownerId)) {
-			$this->ownerId = ResourceGroup::find()
-				->selectSingleValue('defaultOwnerId')
-				->where('id', '=', $this->groupId)
-				->single();
-			$groupId = Group::findPersonalGroupID($this->ownerId);
-			if($groupId) {
-				$this->createAcl();
-				$this->findAcl()->addGroup($groupId, Acl::LEVEL_MANAGE);
-			}
-		}
+
 		if($this->isModified('defaultAlertsWithTime')) {
 			$this->updateEventAlerts($this->defaultAlertsWithTime);
 		}
@@ -429,7 +456,12 @@ class Calendar extends AclOwnerEntity {
 
 	protected function isPrincipal() : bool
 	{
-		return isset($this->groupId) && isset($this->ownerId);
+		if(!isset($this->groupId)) {
+			return false;
+		}
+
+		$group = ResourceGroup::findById($this->groupId);
+		return !empty($group->defaultOwnerId);
 	}
 
 	protected static function queryMissingPrincipals(int $offset = 0): Query {

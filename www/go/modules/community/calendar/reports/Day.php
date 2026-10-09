@@ -37,8 +37,9 @@ class Day extends Week {
 		$this->SetFont(null, '', $this->fSizeMedium+3);
 		$this->Cell(100, 5, $this->days_long[$this->day->format('N')-1], 0, 1);
 
-		$this->drawCalendar($this->day, 110, 12);
-		$this->drawCalendar((clone $this->day)->modify('next month'), 160, 12);
+		$this->drawCalendar($this->day->format("n"), $this->day->format("Y"), 110, 12);
+		$nextMonth = (clone $this->day)->modify('next month');
+		$this->drawCalendar($nextMonth->format("n"), $nextMonth->format("Y"), 160, 12);
 		
 		$this->setXY(10,41);
 	}

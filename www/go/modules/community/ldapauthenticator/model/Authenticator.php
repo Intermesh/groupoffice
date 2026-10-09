@@ -125,14 +125,15 @@ class Authenticator extends PrimaryAuthenticator
 		if (go()->getModule('community', 'otp')) {
 			if (isset($mappedValues['otpSecret'])) {
 				go()->debug("OTP secret found for " . $username . ".");
-
-				$o = new OtpAuthenticator($user);
-				$o->setSecret($mappedValues['otpSecret']);
-				$dt = new DateTime();
-				$dt->setTimezone(new \DateTimeZone(go()->getSettings()->defaultTimezone));
-				$dt->add(new DateInterval('PT10M'));
-				$o->expiresAt = $dt;
-				$user->otp = $o;
+				if (!$user->otp) {
+					$o = new OtpAuthenticator($user);
+					$o->setSecret($mappedValues['otpSecret']);
+					$dt = new DateTime();
+					$dt->setTimezone(new \DateTimeZone(go()->getSettings()->defaultTimezone));
+					$dt->add(new DateInterval('PT10M'));
+					$o->expiresAt = $dt;
+					$user->otp = $o;
+				}
 			} else {
 				go()->debug("No OTP secret found for " . $username . ". Checking for OTP blocking.");
 				$otpSettings = \go\modules\community\otp\model\Settings::get();
@@ -158,6 +159,12 @@ class Authenticator extends PrimaryAuthenticator
 		}
 		if ($user->isModified()) {
 			if (!$user->save()) {
+				if(!go()->getDebugger()->enabled) {
+					go()->getDebugger()->enable();
+					go()->debug($user->getValidationError('otp'));
+					go()->getDebugger()->enabled = false;
+				}
+
 				throw new Exception("Could not save user: " . $user->getValidationErrorsAsString());
 			}
 		}

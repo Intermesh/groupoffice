@@ -1,7 +1,7 @@
 import {client, modules} from "@intermesh/groupoffice-core";
 import {Settings} from "./Settings.js";
 import {CalendarEvent, CalendarItem, onlineMeetingServices} from "@intermesh/community-calendar";
-import {t} from "@intermesh/goui";
+import {t, translate} from "@intermesh/goui";
 
 
 
@@ -28,6 +28,9 @@ modules.register({
 			}
 
 			onlineMeetingServices.register("Jitsi Meet", async (calendarEventForm) => {
+
+				translate.setDefaultModule("community", "jitsimeet");
+
 				const m = modules.get('community', 'jitsimeet')!;
 
 				const room = b64UrlEncode(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(8))));

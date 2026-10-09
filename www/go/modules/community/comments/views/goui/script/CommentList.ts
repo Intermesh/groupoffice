@@ -63,6 +63,8 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 
 		this.store.bindComponent(this);
 
+		this.cls = "comments-list";
+
 		this.scroller = comp({
 			flex: 1,
 			cls: "scroll"

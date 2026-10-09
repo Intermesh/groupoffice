@@ -15,6 +15,9 @@ use GO\Email\Model\ImapMessage;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Component\VEvent;
 
+/**
+ * Handles imip scheduling
+ */
 class Scheduler {
 
 	const EssentialScheduleProps = ['start', 'duration', 'location', 'title', 'description', 'showWithoutTime', 'recurrenceRule'];
@@ -417,7 +420,7 @@ class Scheduler {
 		$event = new CalendarEvent();
 		$event->calendarId = $calendarId;
 		$event->isOrigin = false;
-		$event->replyTo = str_replace('mailto:', '',(string)$vcalendar->VEVENT[0]->{'ORGANIZER'});
+		$event->replyTo = str_replace('mailto:', '', strtolower((string)$vcalendar->VEVENT[0]->{'ORGANIZER'}));
 
 		return $event;
 	}

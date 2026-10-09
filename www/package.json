@@ -10,11 +10,11 @@
     "go/modules/business/*/views/goui"
   ],
   "dependencies": {
-    "pdfjs-dist": "5.6.205"
+    "pdfjs-dist": "latest"
   },
   "allowScripts": {
-    "esbuild@0.28.0": true,
-    "@parcel/watcher@2.5.6": true,
-    "fsevents@2.3.3": true
+    "fsevents@2.3.3": true,
+    "esbuild@0.28.2": true,
+    "@parcel/watcher@2.6.0": true
   }
 }

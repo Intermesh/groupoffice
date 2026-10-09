@@ -17,6 +17,10 @@ class PostResponseProcessor extends Singleton {
 		$this->tasks[] = $callable;
 	}
 
+	/**
+	 * Runs all scheduled tasks from {@see App::__destruct()}
+	 * @return void
+	 */
 	public function runTasks() : void
 	{
 		if (empty($this->tasks)) {

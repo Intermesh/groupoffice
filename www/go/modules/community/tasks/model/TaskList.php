@@ -70,6 +70,7 @@ class TaskList extends AclOwnerEntity
 
 	public $groupingId = null;
 
+
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()->add('isSubscribed', function(Criteria $criteria, $value, Query $query) {

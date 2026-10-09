@@ -28,7 +28,9 @@
 namespace GO\Base\Exception;
 
 
-class Save extends \Exception
+use go\core\exception\UserSafeException;
+
+class Save extends \Exception implements UserSafeException
 {
 
 	public function __construct($message='') {

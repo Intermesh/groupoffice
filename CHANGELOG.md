@@ -1,3 +1,32 @@
+- Core: Give users a better error message
+- Calendar: Correct invalid createdBy and modifiedBy in calendar
+- Calendar: optimized performance with new index
+
+05-10-2026: 26.0.51
+- Core: Updated Italian translations. Grazie Mille, Luca P!
+- Calendar: Fixed all day event creation from day or week view where end date was a day before start date.
+- Caldav: When client deletes a calendar or tasklist, it's not deleted anymore but excluded from sync
+- Calendar: Show time when pasting event, fix wrong end date when pasting all day event in week or day view
+- Projects3: NaN bug in resource budget
+- Projects3: Add first comment when creating project
+- Projects3: Migrate projects2 description to first comment
+- Support: set configured email account for support list as outgoing account as well.
+- LDAPAuthenticator: Only try to save OTP data when it is not already available.
+- Core: SSE polling interval is configurable
+- oauth2: workaround MS bug where it returns 404 if http2 is used with alpn Use PHP's stream handler instead of libcurl. 
+  Microsoft returns an empty 404 for some libcurl/OpenSSL builds (curl 8.14 + OpenSSL 3.5) while wget and PHP streams 
+  work fine. This also avoids the old HTTP/2 + ALPN 404 bug that curl's CURLOPT_SSL_ENABLE_ALPN workaround targeted, 
+  which newer Guzzle versions no longer allow in the "curl" option.
+- Files / Finance: PDF preview no longer working because of pdf.js lib update
+- Core: User modseq was not recorded correctly causing resyncs
+- Core: GOUI DataSourceStores avoid unneeded reloads. When the change originates from the bound component, it won't reload but patches the records client side.
+- Calendar: Users without 'mayChangeResources' permissions, may change resources where they have manage permissions and are admin of the group.
+- Calendar: Paste at original time option
+
+05-10-2026: 26.0.50
+- Calender: fix client side error when opening calendar view
+- Calendar: display 'unknown' calender name in event hover when not subscribed to said calendar
+- Core: Added Login throttling to improve security
 - Catalog: non-US centric money icon for cost fields
 - Finance: When duplicating choose type
 - Finance: Margin rounding issue
@@ -6,7 +35,15 @@
 - Calendar: view jumped to zoom .8 on full hd screens
 - Core / Calendar: User properties were not fetched for the alternative user when Entity::findFor() was used. This 
   caused that all users subscribed to a calendar got the default notifications of the user creating the event
-- 
+- Calendar: Add categories to tooltip
+- Calendar: Show calendar description when you hover it
+- Calendar: Fixed printing months
+- ldapauthenticator: Retry when error 1020 record has been changed is thrown by mysql during ldap sync
+- WebDAV: throw exception when not having proper delete permissions
+- Calendar: strip out MAILTO: in replyTo mail
+- Calendar: categories can be in a recurrence override too.
+- Calendar: Delete resource group fixed
+
 28-09-2026: 26.0.49
 - Oauth2Client: Don't overwrite IMAP username with the email that authenticates becasue it might be a shared mailbox
 - Catalog: Allow users with manage permissions on the catalog module to alter the catalog.

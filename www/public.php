@@ -32,8 +32,9 @@ $file = go()->getDataFolder()->getFile(rawurldecode($_SERVER['REQUEST_URI']));
 
 if (!$file->exists()) {
 	header('HTTP/1.0 404 Not found');
+	header('Content-Type: text/plain');
 
-	echo 'Not found: ' . $_SERVER['REQUEST_URI'];
+	echo 'Not found: ' . htmlspecialchars($_SERVER['REQUEST_URI']);
 	exit();
 }
 

@@ -33,7 +33,7 @@ class PushDispatcher
 	/**
 	 * Interval in seconds between every check for changes to push
 	 */
-	private int $CHECK_INTERVAL = 20;
+	private int $CHECK_INTERVAL;
 
 
 	/**
@@ -52,10 +52,15 @@ class PushDispatcher
 
 	public function __construct(array $entities = [])
 	{
-		if(function_exists("apcu_fetch")) {
+		if(function_exists('apcu_enabled')) {
 			$this->apcuEnabled = true;
-			$this->CHECK_INTERVAL = 1;
 		}
+		if (!empty(go()->getConfig()['sseCheckInterval']) && (int)go()->getConfig()['sseCheckInterval'] > 0) {
+			$this->CHECK_INTERVAL = (int)go()->getConfig()['sseCheckInterval'];
+		} else {
+			$this->CHECK_INTERVAL = $this->apcuEnabled ? 1 : 20;
+		}
+
 
 		// disable default disconnect checks
 		ignore_user_abort(true);
@@ -66,7 +71,7 @@ class PushDispatcher
 		// this lead to lots of User/changes calls per second while we almost never need the user entity to be up to date.
 		// only your own user when checking your account settings.
 		$this->entities = array_filter($entities, function($name) {
-			return $name != "User" && $name != "Search" && $name != 'LogEntry';
+			return $name != "User" && $name != "Search" && $name != 'LogEntry' && EntityType::existsByName($name);
 		});
 
 	}

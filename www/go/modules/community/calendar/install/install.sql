@@ -162,8 +162,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_event` (
      `eventId` INT UNSIGNED NOT NULL,
      `calendarId` INT UNSIGNED NOT NULL,
      PRIMARY KEY (`id`),
-    INDEX `fk_calendar_calendar_event_calendar_event1_idx` (`eventId` ASC),
-    INDEX `fk_calendar_calendar_event_calendar_calendar1_idx` (`calendarId` ASC),
+    INDEX `calendar_calendar_event_calendar_event_idx` (`calendarId` ASC, `eventId` ASC),
 		 UNIQUE INDEX `event_once_per_calendar` (`eventId` ASC, `calendarId` ASC),
     CONSTRAINT `fk_calendar_calendar_event_calendar_event1`
     FOREIGN KEY (`eventId`)
@@ -444,7 +443,7 @@ CREATE TABLE  IF NOT EXISTS `calendar_view` (
 	CONSTRAINT `calendar_View_ownerId`
 		FOREIGN KEY (`ownerId`)
 		REFERENCES `core_user` (`id`)
-		ON DELETE RESTRICT
+		ON DELETE CASCADE
 		ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

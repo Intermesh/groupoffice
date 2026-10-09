@@ -4,7 +4,7 @@ import {
 	DateTime,
 	E,
 	tooltip,
-	menu, Format, hr, ComponentEventMap, radio, Radiofield, DateInterval
+	menu, Format, hr, ComponentEventMap, radio, Radiofield, DateInterval, h4
 } from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
@@ -152,11 +152,12 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 				const data = {
 						start: startStr,
 						title: t('New event'),
-						duration: dd ?? 'P1D',
+						duration: withoutTime || !dd ? 'P1D' : dd,
 						calendarId: CalendarView.selectedCalendarId,
 						showWithoutTime: withoutTime || !dd
 					},
 					start = (new DateTime(data.start));
+
 				this.currentCreation = ev = new CalendarItem({start, data, key: ''});
 				this.viewModel.unshift(ev);
 				this.updateItems();
@@ -172,35 +173,89 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 
 	protected contextMenuEmpty = menu({removeOnClose:false, isDropdown: true, listeners: {
 		beforeshow: ({target}) => {
-			const btn = target.items.find(item => item.itemId === 'paste');
-			if(btn) {
-				btn.disabled = !CalendarItem.clipboard;
-				btn.text = CalendarItem.clipboard ? t('Paste ','core') + ' '+CalendarItem.clipboard.title : t('Paste ','core');
+
+			const btnOrig = target.items.find(item => item.itemId === 'paste-original-time')!;
+			const btn = target.items.find(item => item.itemId === 'paste')!;
+
+			if(!CalendarItem.clipboard) {
+				btn.disabled = true;
+				btn.text = t('Paste');
+
+				btnOrig.hidden = true;
+				return;
 			}
+
+			const dateHasTime = this.contextMenuEmpty.dataSet.date.length > 10;
+
+			const withTime = dateHasTime || (!this.contextMenuEmpty.dataSet.viewSupportsTime && !CalendarItem.clipboard.data.showWithoutTime);
+
+			const start = CalendarItem.pasteGetStart(this.contextMenuEmpty.dataSet.date),
+				dateStr = withTime ? Format.dateTime(start) : Format.date(start);
+
+
+			btn.disabled = false;
+			btn.text = t("Paste '{title}' at {date}").replace('{date}', dateStr).replace('{title}', CalendarItem.clipboard.title)
+
+
+
+			const origWithTime = dateHasTime || !CalendarItem.clipboard.data.showWithoutTime;
+
+
+			const origStart = CalendarItem.pasteGetStart(this.contextMenuEmpty.dataSet.date.substring(0, 10)),
+				origDateStr = origWithTime ? Format.dateTime(origStart) : Format.date(origStart);
+
+			btnOrig.hidden = origDateStr === dateStr;
+			btnOrig.text = t("Paste at original time ({time})").replace('{time}', Format.time(origStart)).replace('{title}', CalendarItem.clipboard.title)
+
 		}}},
-		btn({icon:'add', text: t('Appointment'), handler: _ => {
-			const date = this.contextMenuEmpty.dataSet.date;
-			let start;
-			if (date.length > 10) {
-				start = new DateTime(date);
-			} else {
-				const [y, m, d] = date.split('-').map(Number);
-				start = new DateTime(); // time = now
-				start.setYear(y).setMonth(m).setDate(d);
+		btn({
+			icon:'add',
+			text: t('Appointment'),
+			handler: _ => {
+				const date = this.contextMenuEmpty.dataSet.date;
+				let start, showWithoutTime = client.user.calendarPreferences?.defaultDuration == null;
+				if (date.length > 10) {
+					start = new DateTime(date);
+					if(this.contextMenuEmpty.dataSet.viewSupportsTime) {
+						showWithoutTime = false;
+					}
+				} else {
+					const [y, m, d] = date.split('-').map(Number);
+					start = new DateTime(); // time = now
+					start.setYear(y).setMonth(m).setDate(d);
+					if(this.contextMenuEmpty.dataSet.viewSupportsTime) {
+						showWithoutTime = true;
+					}
+				}
+				(new CalendarItem({key:'',data:{
+					start:start.format('Y-m-d\TH:00:00.000'),
+					title: t('New event'),
+					showWithoutTime: showWithoutTime,
+					duration: client.user.calendarPreferences?.defaultDuration ?? "P1D",
+					calendarId: CalendarView.selectedCalendarId
+				}})).save()
 			}
-			(new CalendarItem({key:'',data:{
-				start:start.format('Y-m-d\TH:00:00.000'),
-				title: t('New event'),
-				showWithoutTime: client.user.calendarPreferences?.defaultDuration == null,
-				duration: client.user.calendarPreferences?.defaultDuration ?? "P1D",
-				calendarId: CalendarView.selectedCalendarId
-			}})).save()
-		}}),
+		}),
 		// btn({icon:'add', text: t('Reminder'), handler: _ => { console.warn('todo:reminder'); }}),
 		hr(),
-		btn({itemId:'paste',icon:'content_paste', text: t('Paste ','core'), handler: _ => {
-			CalendarItem.paste(CalendarView.selectedCalendarId, this.contextMenuEmpty.dataSet.date)
-		}})
+
+		btn({
+			itemId:'paste',
+			icon:'content_paste',
+			text: t('Paste'),
+			handler: _ => {
+				CalendarItem.paste(CalendarView.selectedCalendarId, this.contextMenuEmpty.dataSet.date, this.contextMenuEmpty.dataSet.viewSupportsTime)
+			}
+		}),
+
+		btn({
+			itemId:'paste-original-time',
+			icon:'content_paste',
+			text: t('Paste at original time'),
+			handler: _ => {
+				CalendarItem.paste(CalendarView.selectedCalendarId, this.contextMenuEmpty.dataSet.date.substring(0, 10), false)
+			}
+		})
 	);
 
 	protected selected: CalendarItem[] = []
@@ -234,7 +289,6 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 
 	protected eventHtml(item: CalendarItem, div?:HTMLElement, withIcons = true) {
 		const e = item.data;
-
 		if(!div) { // default
 			const timeAndIcons = E('span',
 				...item.categoryDots,
