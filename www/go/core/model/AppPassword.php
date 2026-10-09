@@ -27,8 +27,6 @@ class AppPassword extends Entity
 
 	public ?string $lastUsedIp;
 
-	public ?DateTime $revokedAt;
-
 	/** @var AppPasswordScope[] */
 	public array $scopes;
 
@@ -44,13 +42,6 @@ class AppPassword extends Entity
 		return parent::defineFilters()
 			->add('user', function (Criteria $criteria, $value) {
 				$criteria->where('userId', '=', $value);
-			})
-			->add('isRevoked', function (Criteria $criteria, $value) {
-				if ($value) {
-					$criteria->andWhere('revokedAt', '!=', null);
-				} else {
-					$criteria->andWhere('revokedAt', '=', null);
-				}
 			});
 	}
 
@@ -119,12 +110,6 @@ class AppPassword extends Entity
 
 		if ($this->isModified('userId') && $this->userId != go()->getUserId() && !go()->getAuthState()->isAdmin()) {
 			$this->setValidationError('userId', ErrorCode::FORBIDDEN, 'You can only create app passwords for yourself');
-		}
-
-		// A revoked password can't be reactivated.
-		$revoked = $this->getModified(['revokedAt']);
-		if (isset($revoked['revokedAt']) && $revoked['revokedAt'][1] !== null) {
-			$this->setValidationError('revokedAt', ErrorCode::FORBIDDEN, 'A revoked app password can\'t be reactivated');
 		}
 
 		parent::internalValidate();

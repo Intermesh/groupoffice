@@ -16,7 +16,6 @@ go.usersettings.AppPasswordsPanel = Ext.extend(Ext.Panel, {
 			},
 			filters: {
 				user: {user: go.User.id},
-				isRevoked: {isRevoked: false}
 			},
 		});
 
@@ -73,7 +72,7 @@ go.usersettings.AppPasswordsPanel = Ext.extend(Ext.Panel, {
 
 		Ext.apply(this, {
 			title: t('App passwords'),
-			iconCls: 'ic-password',
+			iconCls: 'ic-vpn-key',
 			layout: 'fit',
 			tbar: [
 				{
@@ -100,17 +99,15 @@ go.usersettings.AppPasswordsPanel = Ext.extend(Ext.Panel, {
 		this.moreMenu = new Ext.menu.Menu({
 			items: [
 				{
-					itemId: "revoke",
+					itemId: "delete",
 					iconCls: "ic-delete",
-					text: t("Revoke"),
+					text: t("Delete"),
 					handler: (item) => {
 						const record = this.store.getAt(item.parentMenu.rowIndex);
 
-						Ext.MessageBox.confirm(t("Confirm"), t("Are you sure you want to revoke this password? This cannot be undone."), (btn) => {
+						Ext.MessageBox.confirm(t("Confirm"), t("Are you sure you want to delete this password? This cannot be undone."), (btn) => {
 							if (btn === "yes") {
-								let now = new Date().format('Y-m-d H:i:s')
-
-								go.Db.store("AppPassword").save({revokedAt: now}, record.data.id);
+								go.Db.store("AppPassword").destroy(record.data.id);
 							}
 						});
 					}

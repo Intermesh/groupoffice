@@ -25,8 +25,8 @@ go.usersettings.AppPasswordDialog = Ext.extend(go.form.Dialog, {
 			anchor: '100%',
 			comboStore: new Ext.data.JsonStore({
 				data: [
-					{value: 'dav', text: t('File mount, CalDAV, CardDAV (dav)', 'users', 'core')},
-					{value: 'activesync', text: t('ActiveSync', 'users', 'core')}
+					{value: 'dav', text: 'WebDAV, CalDAV, CardDAV'},
+					{value: 'activesync', text: 'Microsoft ActiveSync'}
 				],
 				id: 'value',
 				fields: ['value', 'text']
@@ -119,7 +119,13 @@ go.usersettings.AppPasswordSecretWindow = Ext.extend(Ext.Window, {
 				this.secretField
 			],
 			buttons: [
-				{text: t('Copy', 'users', 'core'), handler: this.onCopyClick, scope: this},
+				{
+					text: t('Copy', 'users', 'core'),
+					iconCls: 'ic-content-copy',
+					itemId: 'copyBtn',
+					handler: this.onCopyClick,
+					scope: this
+				},
 				{text: t('Close'), cls: 'x-btn-primary', handler: this.close, scope: this}
 			]
 		});
@@ -127,8 +133,17 @@ go.usersettings.AppPasswordSecretWindow = Ext.extend(Ext.Window, {
 		go.usersettings.AppPasswordSecretWindow.superclass.initComponent.call(this);
 	},
 
-	onCopyClick: function () {
-		this.secretField.selectText();
-		navigator.clipboard.writeText(this.secret);
+	onCopyClick: function (btn) {
+		this.secretField.focus(true);
+
+		// Falls back to execCommand when the clipboard API isn't available (non secure context).
+		go.util.copyTextToClipboard(this.secret);
+
+		btn.setText(t('Copied!', 'users', 'core'));
+		setTimeout(function () {
+			if (!btn.isDestroyed) {
+				btn.setText(t('Copy', 'users', 'core'));
+			}
+		}, 2000);
 	}
 });

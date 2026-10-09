@@ -1281,7 +1281,6 @@ CREATE TABLE `core_app_password`
     `createdAt`    DATETIME     NOT NULL,
     `lastUsedAt`   DATE         NULL,
     `lastUsedIp`   VARCHAR(45)  NULL,
-    `revokedAt`    DATETIME     NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT `core_app_password_core_user`
         FOREIGN KEY (`userId`)

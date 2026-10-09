@@ -409,7 +409,7 @@ class Authenticate
 		$this->checkThrottle($username, 'apppassword');
 
 		// Only ids are cached, never the user entity. The app password is re-checked on every request so a
-		// revocation takes effect immediately, and the user checks below are always executed.
+		// deletion takes effect immediately, and the user checks below are always executed.
 		$cacheKey = 'apppw-' . hash('sha256', $username . '|' . $protocol . '|' . $password);
 		$cached = !go()->getSettings()->maintenanceMode ? go()->getCache()->get($cacheKey) : null;
 
@@ -419,7 +419,7 @@ class Authenticate
 				->selectSingleValue('p.id')
 				->from('core_app_password', 'p')
 				->join('core_app_password_scope', 's', 's.appPasswordId = p.id')
-				->where(['p.id' => $appPasswordId, 'p.userId' => $userId, 'p.revokedAt' => null, 's.protocol' => $protocol])
+				->where(['p.id' => $appPasswordId, 'p.userId' => $userId, 's.protocol' => $protocol])
 				->single();
 
 			$user = $stillValid ? User::findById($userId) : null;
@@ -443,14 +443,13 @@ class Authenticate
 			return false;
 		}
 
-		// Only fetch the non revoked app passwords that are valid for this protocol, so we never spend a
+		// Only fetch the app passwords that are valid for this protocol, so we never spend a
 		// (costly) password_verify on a password that can't be used here anyway.
 		$ids = go()->getDbConnection()
 			->select('DISTINCT p.id')
 			->from('core_app_password', 'p')
 			->join('core_app_password_scope', 's', 's.appPasswordId = p.id')
 			->where('p.userId', '=', $user->id)
-			->andWhere('p.revokedAt', 'IS', null)
 			->andWhere('s.protocol', '=', $protocol)
 			->fetchMode(\PDO::FETCH_COLUMN, 0)
 			->all();
