@@ -1843,7 +1843,6 @@ $updates['202610021331'][] = "CREATE TABLE `core_app_password`
     `createdAt`    DATETIME     NOT NULL,
     `lastUsedAt`   DATE         NULL,
     `lastUsedIp`   VARCHAR(39)  NULL,
-    `revokedAt`    DATETIME     NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT `core_app_password_core_user`
         FOREIGN KEY (`userId`)
