@@ -27,7 +27,7 @@ export class LabelDialog extends Window {
 		this.resizable = true;
 
 		this.height = 600;
-		this.width = 300;
+		this.width = 600;
 
 		this.store = datasourcestore({dataSource: commentLabelDS});
 
@@ -36,10 +36,10 @@ export class LabelDialog extends Window {
 			rowSelectionConfig: {
 				multiSelect: false
 			},
+			fit: true,
 			columns: [
 				column({
 					id: "name",
-					width: 175,
 					header: t("Name"),
 					resizable: true,
 					sortable: true,
@@ -57,7 +57,7 @@ export class LabelDialog extends Window {
 				}),
 				column({
 					id: "color",
-					width: 80,
+					width: 120,
 					header: t("Color"),
 					resizable: true,
 					renderer: (value, record) => {
