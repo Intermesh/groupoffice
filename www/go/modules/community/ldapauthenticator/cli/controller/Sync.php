@@ -240,6 +240,8 @@ class Sync extends Controller
 				}
 			} catch(DbException $e) {
 				echo 'DbException while saving user: "' . $user->username .'":'. $e->getMessage() ."\n";
+
+				return false;
 			}
 
 			go()->getDbConnection()
@@ -275,6 +277,9 @@ class Sync extends Controller
 		}
 	}
 
+	/**
+	 * @throws DbException
+	 */
 	private function saveWithRetry(Entity $entity): bool
 	{
 		return $this->retryOnRecordChanged(fn() => $entity->save());
@@ -477,6 +482,8 @@ class Sync extends Controller
 					}
 				} catch(DbException $e) {
 					echo 'DbException while saving group: "' . $group->name .'":'. $e->getMessage() ."\n";
+					//The user was not saved, so it can't be linked to the server (the foreign key would fail).
+					return false;
 				}
 
 				go()->getDbConnection()
