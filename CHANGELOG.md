@@ -5,6 +5,7 @@
 - projects3: hide finance when no data is there
 - Calendar: Category list didn't update when changing the visible calendars
 - Email: New setting to enable desktop notifications for new e-mail
+- Calendar: Correct resource admin and update resource admin principals on change
 
 05-10-2026: 26.0.51
 - Core: Updated Italian translations. Grazie Mille, Luca P!
