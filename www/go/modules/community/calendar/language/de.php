@@ -258,4 +258,7 @@ return array (
   'Display as' => 'Anzeigen als',
   'Change organizer' => 'Organisator ändern',
   'Show multiline event blocks' => 'Mehrzeilige Terminblöcke anzeigen',
+  'Paste \'{title}\' at {date}' => '{title}\' einfügen um {date}',
+  'Paste at original time ({time})' => 'Mit der Originalzeit ({time}) einfügen',
+  'Paste at original time' => 'Paste at original time',
 );

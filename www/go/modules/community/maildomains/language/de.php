@@ -97,4 +97,5 @@ return array (
   'Mail hostname' => 'Mail Hostname',
   'The hostname of the mail system. Used for PTR, SPF and MX checks.' => 'Der Hostname des Mailsystems. Wird für PTR, SPF und MX Prüfungen verwendet.',
   'Your SPF record does not allow \'{mailhost}\'' => 'Der SPF Eintrag erlaubt \'{mailhost}\' nicht',
+  'Close sidebar' => 'Sidebar schließen',
 );
