@@ -324,16 +324,14 @@ export class Main extends Component {
 		// NOPE:router will call setSpan and render
 		// calendar store load will call first view update
 		this.calendarList.on('changevisible', ({ids}) => {
-			if(!this.initialized) {
-				// after initial load. check for changed
-				calendarStore.on('load', () => {
-					categoryStore.reload();
-					this.view.update();
-				});
-				this.initialized = true;
-			}
 			this.applyInCalendarFilter(ids);
 			this.updateView();
+
+			// isVisible is saved to the server with a delay, so pass the visible calendars explicitly
+			// instead of letting the server use the stored (stale) isVisible values.
+			categoryStore.setFilter('inCalendars', {operator: "OR", conditions: [{inCalendars: ids}, {mine: true}]});
+			void categoryStore.load();
+
 		});
 		this.on('render', () => {
 			this.cards.cls = client.user.calendarPreferences.multiLine ? 'multiline':'';

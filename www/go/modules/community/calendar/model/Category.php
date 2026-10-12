@@ -97,7 +97,9 @@ class Category extends Entity {
 						->where(['ucal.isVisible' => true])
 						->orWhere('category.calendarId', 'IS', null);
 				} else if(!empty($value)) {
-					$criteria->andWhere(['category.calendarId' => $value]);
+					// explicit calendar ids (the client knows the unsaved visibility). Global categories are always included.
+					$criteria->where(['category.calendarId' => $value])
+						->orWhere('category.calendarId', 'IS', null);
 				}
 			}, 'visibleOnly')
 			->add('ownerId', function(Criteria $criteria, $value) {
@@ -115,7 +117,7 @@ class Category extends Entity {
 						->where('ownerId', 'IS', null)
 						->orWhere('ownerId','=', go()->getUserId())
 					);
-			},'1');
+			});
 	}
 
 }
