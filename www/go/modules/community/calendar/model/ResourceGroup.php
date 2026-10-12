@@ -29,7 +29,7 @@ class ResourceGroup extends Entity
 	 * 3. This user will be granted manage permissions when new resource calendars are created
 	 *
 	 * @todo rename because the name is misleading. It's not a default for the calendar->ownerId. This will be null.
-	 * Calendar::getOwner() will return Calendar::$id as principal/owner. Also the principals will be out of date when it changes.
+	 * Calendar::getOwner() will return Calendar::$id as principal/owner.
 	 * @var ?string
 	 */
 	public ?string $defaultOwnerId;
@@ -38,6 +38,29 @@ class ResourceGroup extends Entity
 	{
 		return parent::defineMapping()
 			->addTable('calendar_resource_group', "rg");
+	}
+
+	protected function internalSave(): bool
+	{
+		$ownerChanged = !$this->isNew() && $this->isModified('defaultOwnerId');
+
+		if(!parent::internalSave()) {
+			return false;
+		}
+
+		if($ownerChanged) {
+			// The principals of the resource calendars derive their email and description from the group admin.
+			$calendars = Calendar::find()->where('groupId', '=', $this->id);
+			if(empty($this->defaultOwnerId)) {
+				Calendar::deletePrincipal(Calendar::find()->selectSingleValue('id')->where('groupId', '=', $this->id));
+			} else {
+				foreach ($calendars as $calendar) {
+					$calendar->refreshPrincipal();
+				}
+			}
+		}
+
+		return true;
 	}
 
 	protected function internalGetPermissionLevel(): int
