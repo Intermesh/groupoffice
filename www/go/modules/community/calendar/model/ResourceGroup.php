@@ -8,6 +8,7 @@ use go\core\model\User;
 use go\core\orm\Mapping;
 use go\core\jmap\Entity;
 use go\core\model\Module;
+use go\core\db\Criteria;
 use go\core\orm\Query;
 
 class ResourceGroup extends Entity
@@ -74,8 +75,19 @@ class ResourceGroup extends Entity
 
 	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, ?int $userId = null, ?array $groups = null): Query
 	{
-		if($level > Acl::LEVEL_READ && !User::isAdminById($userId ?? go()->getUserId())) {
-			$query->where('defaultOwnerId', '=', $userId ?? go()->getUserId());
+		$userId = $userId ?? go()->getUserId();
+		if($level > Acl::LEVEL_READ && !User::isAdminById($userId)) {
+			// The group admin, or anyone with manage permission on a resource calendar in the group, so they
+			// can edit those resources without the "mayChangeResources" module permission.
+			$managedCalendars = (new Query)
+				->select('c.groupId')
+				->from('calendar_calendar', 'c')
+				->where('c.groupId', 'IS NOT', null);
+			Acl::applyToQuery($managedCalendars, 'c.aclId', Acl::LEVEL_MANAGE, $userId, $groups);
+
+			$query->andWhere((new Criteria())
+				->where('defaultOwnerId', '=', $userId)
+				->orWhere('rg.id', 'IN', $managedCalendars));
 		}
 		return $query;
 	}
