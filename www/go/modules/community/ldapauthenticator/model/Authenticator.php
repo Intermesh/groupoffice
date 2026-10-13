@@ -246,6 +246,48 @@ class Authenticator extends PrimaryAuthenticator
 	}
 
 	/**
+	 * Update the passwords of the user's existing e-mail accounts from the mapped LDAP "imapPassword" and
+	 * "smtpPassword" values. Used by the sync, which doesn't know the user's login password. Accounts are
+	 * never created here.
+	 *
+	 * @param array $mappedValues Result of Module::mappedValues()
+	 * @throws Exception
+	 */
+	public function syncEmailPasswords(Server $server, User $user, array $mappedValues): void
+	{
+		if (!$server->hasEmailAccount() || !$user->id || !$user->hasModule('legacy', 'email')) {
+			return;
+		}
+
+		$imapPassword = $mappedValues['imapPassword'] ?? null;
+		$smtpPassword = $mappedValues['smtpPassword'] ?? null;
+		if (empty($imapPassword) && empty($smtpPassword)) {
+			return;
+		}
+
+		$accounts = Account::model()->findByAttributes([
+			'host' => $server->imapHostname,
+			'user_id' => $user->id
+		]);
+
+		foreach ($accounts as $account) {
+			/** @var Account $account */
+			if (!empty($imapPassword) && $account->decryptPassword() !== $imapPassword) {
+				$account->password = $imapPassword;
+			}
+
+			if (!empty($smtpPassword) && $account->decryptSmtpPassword() !== $smtpPassword) {
+				$account->smtp_password = $smtpPassword;
+			}
+
+			$account->checkImapConnectionOnSave = false;
+			if ($account->isModified() && !$account->save(true)) {
+				throw new Exception("Could not save e-mail account: " . implode("\n", $account->getValidationErrors()));
+			}
+		}
+	}
+
+	/**
 	 * @throws Exception
 	 */
 	private function setEmailAccount($domain, $username, $password, ?string $smtpPassword, $email, Server $server, User $user)
