@@ -43,7 +43,7 @@ class ResourceGroupWindow extends FormWindow {
 }
 const resourceStore = datasourcestore({
 	dataSource:jmapds('Calendar'),
-	filters:{isResource:{isResource:true}},
+	filters:{isResource:{isResource:true}, permission:{permissionLevel: AclLevel.MANAGE}},
 	//properties: ['id', 'name', 'description'],
 	sort: [{property:'sortOrder'}]
 })

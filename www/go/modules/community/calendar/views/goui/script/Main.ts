@@ -55,14 +55,6 @@ export class Main extends Component {
 	private calendarList: CalendarList
 	private categoryList: List
 
-	/**
-	 * Used to check if we're ready to populate the view. When initial render is done and a route is given the
-	 * view will be loaded twice if we don't have this check.
-	 *
-	 * @private
-	 */
-	private initialized: boolean = false;
-
 	constructor() {
 		super();
 		this.cls = 'hbox fit tablet-cards';
@@ -324,16 +316,14 @@ export class Main extends Component {
 		// NOPE:router will call setSpan and render
 		// calendar store load will call first view update
 		this.calendarList.on('changevisible', ({ids}) => {
-			if(!this.initialized) {
-				// after initial load. check for changed
-				calendarStore.on('load', () => {
-					categoryStore.reload();
-					this.view.update();
-				});
-				this.initialized = true;
-			}
 			this.applyInCalendarFilter(ids);
 			this.updateView();
+
+			// isVisible is saved to the server with a delay, so pass the visible calendars explicitly
+			// instead of letting the server use the stored (stale) isVisible values.
+			categoryStore.setFilter('inCalendars', {operator: "OR", conditions: [{inCalendars: ids}, {mine: true}]});
+			void categoryStore.load();
+
 		});
 		this.on('render', () => {
 			this.cards.cls = client.user.calendarPreferences.multiLine ? 'multiline':'';
@@ -524,7 +514,7 @@ export class Main extends Component {
 			renderer: (data) => {
 				return [checkbox({
 					color: '#' + data.color,
-					label: data.name,
+					label: data.name.htmlEncode(),
 					listeners: {
 						'change': ({newValue}) => {
 							if (newValue) {
@@ -605,13 +595,16 @@ export class Main extends Component {
 	}
 
 
+	/**
+	 * Sets the time span that the calendar displays and refreshes the view.
+	 *
+	 * @param value The type of time span to display (e.g. day, week, month)
+	 * @param amount The number of days the span covers, used for variable length spans (e.g. 2-7, 14, 21, 28)
+	 */
 	setSpan(value: ValidTimeSpan, amount: number) {
 		this.timeSpan = value;
-		//this.printCurrentBtn.disabled = !['day', 'week', 'month'].includes(value);
 		this.spanAmount = amount;
-
-		if(this.initialized)
-			this.updateView();
+		this.updateView();
 	}
 
 	updateView(buffered?:boolean) {

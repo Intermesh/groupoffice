@@ -1,5 +1,20 @@
+- Core: App passwords use same default domain logic as normal login and last used date and IP properly sync to client
+- ldapauthenticator: Sync imapPassword and smtpPassword from ldap mapping
+- Calendar: Categories of other users where shown in calendar
+
+12-10-2026: 26.0.53
+- Calendar: Navigating was broken
+
+12-10-2026: 26.0.52
 - Core: Give users a better error message
 - Calendar: Correct invalid createdBy and modifiedBy in calendar
+- Calendar: optimized performance with new index
+- Core: App passwords
+- projects3: hide finance when no data is there
+- Calendar: Category list didn't update when changing the visible calendars
+- Email: New setting to enable desktop notifications for new e-mail
+- Calendar: Correct resource admin and update resource admin principals on change
+- Calendar: Allow resource management on resources you have manage permission for even without 'mayChangeResources'
 
 05-10-2026: 26.0.51
 - Core: Updated Italian translations. Grazie Mille, Luca P!

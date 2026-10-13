@@ -311,8 +311,15 @@ class Settings extends core\Settings {
 	 * @var string
 	 */
 	public $lostPasswordURL;
-	
-	
+
+
+	/**
+	 * Force apps like WebDAV to authenticate with app passwords created by the user
+	 *
+	 * @var bool
+	 */
+	public $forceAppPasswords = false;
+
 	/**
 	 * The full URL to Group-Office. With trailing /.
 	 * 

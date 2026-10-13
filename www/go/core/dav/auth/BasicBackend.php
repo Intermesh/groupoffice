@@ -34,12 +34,13 @@ class BasicBackend extends AbstractBasic {
 	public function __construct() {
 		$this->setRealm("Group-Office");
 	}
-	
-	protected function validateUserPass($username, $password) {
 
+	protected function validateUserPass($username, $password) {
 		$auth = new Authenticate();
-		$user = $auth->passwordLogin($username, $password);
-		if(!$user) {
+
+		$user = $auth->appLogin($username, $password, 'dav');
+
+		if (!$user) {
 			return false;
 		}
 		

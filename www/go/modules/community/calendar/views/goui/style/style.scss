@@ -3,7 +3,7 @@
 %font-caption {
 	//text-transform: uppercase;
 	font-weight: 600;
-	font-size: 1.2em;
+	font-size: 1.1em;
 	color: $colorTextSecondary;
 }
 
@@ -219,7 +219,7 @@
 		&.today {
 			em {
 				font-weight: 600;
-				border-radius: 999px;
+				border-radius: 50%;
 				display:inline-block;
 				text-align: center;
 				min-width: dp(36);
@@ -450,9 +450,9 @@ $timeMargin: dp(72);
 		> em { // date number
 			font-style: normal;
 			display: inline-block;
-			margin-left: dp(8);
-			padding: dp(8);
-			font-size: 1.1em;
+			margin: dp(6);
+			padding: dp(6);
+			font-size: 1em;
 			color: $colorText;
 			//border: 1px solid currentColor;
 		}
@@ -695,6 +695,9 @@ $timeMargin: dp(72);
 			span:first-of-type { // time
 				margin-left:dp(8);
 				width: dp(198);
+			}
+			span:last-of-type {
+				flex: 1;
 			}
 		}
 	}

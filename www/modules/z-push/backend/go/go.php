@@ -92,10 +92,11 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 		ZLog::Write(LOGLEVEL_INFO, 'ZPUSH2::Logon(GO version: ' . \GO::config()->version . ', backend version: ' . self::VERSION . ', user: ' . $username . ', domain: ' . $domain . ')');
 
 		try {
-
 			$auth = new Authenticate();
-			$user = $auth->passwordLogin($username, $password);
-			if(!$user) {
+
+			$user = $auth->appLogin($username, $password, 'activesync');
+
+			if (!$user) {
 				return false;
 			}
 

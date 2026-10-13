@@ -504,3 +504,20 @@ $updates['202610061549'][] = "alter table calendar_view
 $updates['202610090902'][] = "update calendar_event set createdBy = null where createdBy not in (select id from core_user);";
 
 $updates['202610090902'][] = "update calendar_event set modifiedBy = createdBy where modifiedBy='0';";
+
+//ALTER TABLE calendar_event
+//    ADD INDEX calendar_event_range_idx (firstOccurrence, lastOccurrence, status, privacy);
+
+$updates['202610091000'][] = "ALTER TABLE `calendar_calendar_event`
+    ADD INDEX `calendar_calendar_event_calendar_event_idx` (`calendarId` ASC, `eventId` ASC),
+    DROP INDEX `fk_calendar_calendar_event_calendar_calendar1_idx`,
+    DROP INDEX `fk_calendar_calendar_event_calendar_event1_idx`;";
+
+// Resource principals were not updated when the admin of the resource group changed.
+$updates['202610121000'][] = "UPDATE core_principal p
+	JOIN core_entity et ON et.id = p.entityTypeId AND et.name = 'Calendar'
+	JOIN calendar_calendar c ON c.id = p.entityId
+	JOIN calendar_resource_group rg ON rg.id = c.groupId
+	JOIN core_user u ON u.id = rg.defaultOwnerId
+	SET p.email = u.email, p.description = IFNULL(c.description, u.displayName)
+	WHERE c.groupId IS NOT NULL;";

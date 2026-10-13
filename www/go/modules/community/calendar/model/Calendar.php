@@ -468,8 +468,27 @@ class Calendar extends AclOwnerEntity {
 		return self::traitMissingPrincipals($offset)->andWhere('groupId', 'IS NOT', NULL);
 	}
 
+	private bool $forcePrincipalUpdate = false;
+
+	/**
+	 * Rebuild the principal from the current resource group. Needed when the group's admin
+	 * (defaultOwnerId) changes as the principal's email and description are derived from it.
+	 */
+	public function refreshPrincipal(): void
+	{
+		$this->forcePrincipalUpdate = true;
+		try {
+			$this->savePrincipal();
+		} finally {
+			$this->forcePrincipalUpdate = false;
+		}
+	}
+
 	protected function isPrincipalModified() : bool
 	{
+		if($this->forcePrincipalUpdate) {
+			return true;
+		}
 		return $this->isModified(['name', 'description', 'timeZone', 'ownerId','groupId']);
 	}
 

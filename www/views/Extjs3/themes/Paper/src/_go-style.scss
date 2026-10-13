@@ -17,6 +17,8 @@ input[type="time"]::-webkit-clear-button {
     display: none;
 }
 
+
+
 html {
 	font-size: var(--density);
 	letter-spacing: normal;
@@ -2574,6 +2576,7 @@ table[id^="comments-ext"] b {
 
 	pre {
 		@extend code;
+		white-space: pre-wrap;
 	}
 
 	*[disabled] {
