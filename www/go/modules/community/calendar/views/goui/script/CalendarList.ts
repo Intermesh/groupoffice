@@ -1,20 +1,22 @@
 import {
 	browser,
 	btn,
-	checkbox,
-	CheckboxField,
+	checkbox, CheckboxField,
+	checkboxselectcolumn, checkboxSelectColumnRenderer,
+	column,
 	comp,
 	Component,
 	ComponentEventMap,
 	displayfield,
 	fieldset,
 	Format,
-	FunctionUtil,
 	hr,
-	List,
-	list,
 	menu,
+	menucolumn,
 	select,
+	selectallcheckboxfield,
+	table,
+	Table,
 	tbar,
 	win,
 	Window
@@ -32,12 +34,15 @@ export interface CalendarListEventMap extends ComponentEventMap {
 	changevisible: {ids: string[]}
 }
 
+/**
+ * Calendar selection. Works like the notebook grid in notes: the checkboxes are the row selection and the
+ * selected calendars are the visible ones. The selection is saved as "isVisible" on the calendars.
+ */
 export class CalendarList extends Component<CalendarListEventMap> {
 
 	private inCalendars: {[key:string]:boolean} = {}
-	private visibleChanges: {[id:number]:boolean} = {};
 
-	list?: List
+	list: Table
 	store
 
 	constructor(store = calendarStore){
@@ -45,85 +50,71 @@ export class CalendarList extends Component<CalendarListEventMap> {
 		this.store = store;
 		const rights = modules.get("community", "calendar")!.userRights;
 
-
-		this.list = list({
-			tagName: 'div',
+		this.list = table({
+			headers: false,
+			cls: 'no-row-lines',
+			store,
 			groupBy: "group",
 			groupByCollapsible: false,
-			groupByRenderer: (groupBy) => groupBy ? `<h3>${groupBy.name.htmlEncode()}</h3>`:'',
-			store,
-			cls: 'check-list',
+			groupByRenderer: (groupBy) => groupBy ? `<h4>${groupBy.name.htmlEncode()}</h4>` : '',
 			rowSelectionConfig: {
-				multiSelect: false,
+				multiSelect: true,
 				listeners: {
 					'selectionchange': ({selected}) => {
-						if (selected[0] && selected[0].record.myRights.mayWriteAll) {
-							CalendarView.selectedCalendarId = selected[0].id;
-						} else if(selected.map(s => s.id).indexOf(CalendarView.selectedCalendarId) === -1) {
-							// CalendarView.selectedCalendarId = is no longer in selected list so fall back on users' default
-							CalendarView.selectedCalendarId = client.user.calendarPreferences?.defaultCalendarId;
-						}
+						this.onSelectionChange(selected.map(s => s.record));
 					}
 				}
 			},
-			listeners: {'render': ({target}) => {
-					const list = target;
-					this.localGroup = document.createElement('ul');
-					list.el.append(this.localGroup);
+			columns: [
+				checkboxselectcolumn({
+					renderer: (columnValue, record, td, table1, storeIndex, column1) =>
+					{
+						const cb = checkboxSelectColumnRenderer(columnValue, record, td, table1, storeIndex, column1) as CheckboxField;
+						cb.color = "#" + record.color;
+						return cb;
+					}
+				}),
+				column({
+					id: 'name',
+					resizable: false,
+					renderer: (_v, record, td) => {
 
-					list.store.on('load', ({target, records})=> {
 
-						if(!list.rowSelection?.getSelected().length) {
-							let record = target.find(c => c.id == CalendarView.selectedCalendarId);
-							if (!record) {
-								record = target.first();
-							}
-							if (record) {
-								list.rowSelection!.add(record);
-							}
-						}
-						const oldLength = Object.values(this.inCalendars).filter(Boolean).length;
-						this.inCalendars = records.reduce((obj, item) => ({ ...obj, [item.id!]: item.isVisible }), {} as any);
-						const ids = Object.keys(this.inCalendars).filter(key => this.inCalendars[key]);
-						if(oldLength !== ids.length || oldLength === 0) {
-							this.fire('changevisible', {ids});
-						}
+						const icon = record.webcalUri ? ' <i class="icon">web</i>' : '';
+						return comp({
+							tagName: 'span',
+							title: record.description,
+							html: String(record.name ?? '').htmlEncode() + icon
+						});
+					}
+				}),
+				menucolumn({
+					menu: this.createRowMenu(rights)
+				})
+			],
+			listeners: {
+				'render': ({target}) => {
+					target.store.on('load', ({records}) => {
+						this.syncSelection(records);
 					});
-					target.store.load()
+					void target.store.load();
 				}
-			},
-			renderer: this.checkboxRenderer.bind(this)
-		})
+			}
+		});
 
+		this.items.add(store !== calendarStore ? comp() : tbar({},
+			selectallcheckboxfield({list: this.list}),
 
-		this.items.add(store !== calendarStore ? comp() :tbar({cls: 'dense'},
-			checkbox({
-				listeners: {
-					render: ({target}) => {
-						this.on("changevisible", ({ids}) => {
-							target.value = ids.length == store.count();
-						})
-					},
-					change: ( {newValue}) => {
-						this.select(-1,newValue);
-					}
-				}
-			}),
-			comp({tagName: 'h3', html: t('Calendars')}),
-			//btn({icon: 'done_all', handler: () => { this.calendarList.rowSelection!.selectAll();}}),
+			comp({tagName: 'h4', html: t('Calendars')}),
+			"->",
 			btn({
 				icon: "home",
 				handler:() => {
 					const defaultId = client.user.calendarPreferences?.defaultCalendarId;
 					if(defaultId) {
-
-						const defaultCal = this.list!.store.findById(defaultId);
-
+						const defaultCal = this.list.store.findById(defaultId);
 						if(defaultCal) {
-							this.list!.rowSelection!.replace(defaultCal);
-							const i = this.list!.store.findIndexById(defaultId);
-							this.select(i);
-
+							this.select(this.list.store.findIndexById(defaultId));
 						}
 					}
 				}
@@ -168,117 +159,146 @@ export class CalendarList extends Component<CalendarListEventMap> {
 		), this.list);
 	}
 
-	private localGroup!: HTMLElement;
-
-	checkboxRenderer(data: any, _row: HTMLElement, list: List, storeIndex: number) {
-
-		const rights = modules.get("community", "calendar")!.userRights;
-		const icon = data.webcalUri ? ' <i class="icon">web</i>' : '';
-		_row.title = data.description;
-		return [checkbox({
-			color: '#' + data.color,
-			value: data.isVisible,
-			label: data.name + icon,
-
-			listeners: {
-				'render': ({target}) => {
-					target.input.addEventListener("mousedown", (ev) => {
-						ev.stopPropagation(); // stop lists row selector event
-					});
-					target.input.addEventListener('contextmenu', (ev) => {
-						ev.preventDefault();
-						const m = menu({isDropdown:true},
-							btn({text:t('Select all'),handler:()=>{this.select(-1,true)}}),
-							btn({text:t('Select none'),handler:()=>{this.select(-1)}}),
-							btn({text:t('Deselect others'),handler:()=>{this.select(storeIndex)}})
-						);
-						m.showAt(ev);
-					})
-				},
-				'change': ( {newValue}) => {
-					this.inCalendars[data.id] = newValue; // update to make sure it doesn't fire changevisible twice
-					this.fire('changevisible', {ids:Object.keys(this.inCalendars).filter(key => this.inCalendars[key])});
-
-					this.visibleChanges[data.id] = newValue;
-					this.saveSelectionChanges();
-				}
-			},
-			buttons: [btn({
-				icon: 'more_horiz', menu: menu({},
-					btn({icon:'sync', text: t('Synchronize'), hidden: !data.davaccountId, handler: (me) => {
-						const cb = me.findAncestor((cmp) => cmp instanceof CheckboxField);
-						if(cb) {
-							cb.mask();
-							client.requestTimeout = 300000;
-							client.jmap('DavAccount/sync', {accountId:data.davaccountId,collectionId:data.id}).then(() => {
-								this.fire('changevisible', {ids: Object.keys(this.inCalendars).filter(key => this.inCalendars[key])});
-							}).catch((err) => {
-								Window.error(err);
-							}).finally(() => {
-								cb.unmask();
-								client.requestTimeout = 30000;
-							});
-						}
-					}}),
-					btn({icon:'sync', text: t('Reload'), hidden: !data.webcalUri, handler: (me) => {
-						const cb = me.findAncestor((cmp) => cmp instanceof CheckboxField);
-						if(cb) {
-							cb.mask();
-							client.requestTimeout = 300000;
-							client.jmap('Calendar/reload', {calendarId:data.id}).catch((err) => {
-								Window.error(err);
-							}).finally(() => {
-								cb.unmask();
-								client.requestTimeout = 30000;
-							});
-						}
-					}}),
-					btn({icon:'edit', text: t('Edit')+'…', hidden: data.davaccountId || (data.groupId && !rights.mayChangeResources && !data.myRights.mayAdmin), disabled:!data.myRights.mayReadItems, handler: async _ => {
-							const dlg = data.groupId ? new ResourceWindow() : new CalendarWindow();
-							await dlg.load(data.id);
-							dlg.show();
-						}}),
-					btn({icon:'delete', text: t('Delete','core','core')+'…', hidden: data.davaccountId || !rights.mayChangeCalendars, disabled:!data.myRights.mayAdmin, handler: async _ => {
-						jmapds("Calendar").confirmDestroy([data.id]);
-					}}),
-					hr({hidden: !rights.mayChangeCalendars}),
-					btn({icon: 'remove_circle', hidden: data.id === client.user.calendarPreferences?.personalCalendarId, text: t('Unsubscribe'), handler() {
-						jmapds('Calendar').update(data.id, {isSubscribed: false}).catch(e => Window.error(e))
-					}}),
-					hr({hidden:data.groupId}),
-					btn({icon:'file_save',hidden:data.groupId, text: t('Export','core','core'), handler: _ => { window.open(client.downloadUrl('community/calendar/calendar/'+data.id), '_blank') }}),
-					btn({icon:'upload_file',hidden:data.groupId, text:t('Import','core','core')+'…', handler: async ()=> {
-						const files = await browser.pickLocalFiles(false,false,'text/calendar');
-						const blob = await client.upload(files[0]);
-
-						this.importIcs(blob, data);
-					}})
-				)
-			})]
-		})];
+	private visibleIds() {
+		return Object.keys(this.inCalendars).filter(key => this.inCalendars[key]);
 	}
 
-	private saveSelectionChanges = FunctionUtil.buffer(2000, () => {
-		//save isVisible
-		for(const id in this.visibleChanges) {
-			// origin: this list already shows the new value so it doesn't need to reload
-			jmapds('Calendar').update(id, {isVisible:this.visibleChanges[id]}, this);
-		}
-		this.visibleChanges = {};
-	})
+	/**
+	 * Set the selection from the "isVisible" property of the loaded calendars
+	 */
+	private syncSelection(records: any[]) {
+		const oldLength = this.visibleIds().length;
+		this.inCalendars = records.reduce((obj, item) => ({...obj, [item.id!]: !!item.isVisible}), {} as any);
 
-	private select(index:number, all:boolean = false) {
-		const rows = this.list!.el.querySelectorAll('li.data');
-		this.list!.store.forEach((rec, rowIndex) => {
-			const cb = rows[rowIndex].querySelector<HTMLInputElement>('input')!,
-				on = (index == rowIndex || all);
-			cb.checked = on;
-			this.visibleChanges[rec.id] = on;
+		// inCalendars is already up to date so the resulting selectionchange doesn't save anything
+		this.list.rowSelection!.replace(...records.filter(r => r.isVisible));
+
+		this.updateSelectedCalendarId(records.filter(r => r.isVisible));
+
+		const ids = this.visibleIds();
+		if(oldLength !== ids.length || oldLength === 0) {
+			this.fire('changevisible', {ids});
+		}
+	}
+
+	private onSelectionChange(selected: any[]) {
+		const changed: {[id:string]: boolean} = {};
+		this.store.forEach(rec => {
+			const on = selected.some(s => s.id == rec.id);
+			if (!!this.inCalendars[rec.id] !== on) {
+				changed[rec.id] = on;
+			}
 			this.inCalendars[rec.id] = on;
 		});
 
-		this.saveSelectionChanges();
-		this.fire('changevisible', {ids: Object.keys(this.inCalendars).filter(key => this.inCalendars[key])});
+		if (!Object.keys(changed).length) {
+			// selection was set from the loaded isVisible values
+			return;
+		}
+
+		this.updateSelectedCalendarId(selected);
+		this.fire('changevisible', {ids: this.visibleIds()});
+
+		for (const id in changed) {
+			// origin: this list already shows the new value so it doesn't need to reload
+			void jmapds('Calendar').update(id, {isVisible: changed[id]}, this).catch(e => Window.error(e));
+		}
+	}
+
+	/**
+	 * The calendar new events are added to must be one of the selected calendars that can be written to.
+	 */
+	private updateSelectedCalendarId(selected: any[]) {
+		if (selected.some(s => s.id == CalendarView.selectedCalendarId && s.myRights?.mayWriteAll)) {
+			return;
+		}
+		const writable = selected.find(s => s.myRights?.mayWriteAll);
+		CalendarView.selectedCalendarId = writable ? writable.id : client.user.calendarPreferences?.defaultCalendarId;
+	}
+
+	private createRowMenu(rights: any) {
+		const record = (target: Component) => this.list.store.get(target.dataSet.rowIndex)!;
+
+		return menu({
+				listeners: {
+					show: ({target}) => {
+						const data = record(target);
+						target.findChild("sync")!.hidden = !data.davaccountId;
+						target.findChild("reload")!.hidden = !data.webcalUri;
+
+						const edit = target.findChild("edit")!;
+						edit.hidden = !!data.davaccountId || !!(data.groupId && !rights.mayChangeResources && !data.myRights.mayAdmin);
+						edit.disabled = !data.myRights.mayReadItems;
+
+						const del = target.findChild("delete")!;
+						del.hidden = !!data.davaccountId || !rights.mayChangeCalendars;
+						del.disabled = !data.myRights.mayAdmin;
+
+						target.findChild("sep-subscription")!.hidden = !rights.mayChangeCalendars;
+						target.findChild("unsubscribe")!.hidden = data.id === client.user.calendarPreferences?.personalCalendarId;
+
+						target.findChild("sep-file")!.hidden = !!data.groupId;
+						target.findChild("export")!.hidden = !!data.groupId;
+						target.findChild("import")!.hidden = !!data.groupId;
+					}
+				}
+			},
+			btn({itemId: "sync", icon: 'sync', text: t('Synchronize'), handler: (me) => {
+				const data = record(me.parent!);
+				this.list.mask();
+				client.requestTimeout = 300000;
+				client.jmap('DavAccount/sync', {accountId: data.davaccountId, collectionId: data.id}).then(() => {
+					this.fire('changevisible', {ids: this.visibleIds()});
+				}).catch((err) => {
+					Window.error(err);
+				}).finally(() => {
+					this.list.unmask();
+					client.requestTimeout = 30000;
+				});
+			}}),
+			btn({itemId: "reload", icon: 'sync', text: t('Reload'), handler: (me) => {
+				const data = record(me.parent!);
+				this.list.mask();
+				client.requestTimeout = 300000;
+				client.jmap('Calendar/reload', {calendarId: data.id}).catch((err) => {
+					Window.error(err);
+				}).finally(() => {
+					this.list.unmask();
+					client.requestTimeout = 30000;
+				});
+			}}),
+			btn({itemId: "edit", icon: 'edit', text: t('Edit') + '…', handler: async (me) => {
+				const data = record(me.parent!);
+				const dlg = data.groupId ? new ResourceWindow() : new CalendarWindow();
+				await dlg.load(data.id);
+				dlg.show();
+			}}),
+			btn({itemId: "delete", icon: 'delete', text: t('Delete', 'core', 'core') + '…', handler: _ => {
+				void jmapds("Calendar").confirmDestroy([record(_.parent!).id]);
+			}}),
+			hr({itemId: "sep-subscription"}),
+			btn({itemId: "unsubscribe", icon: 'remove_circle', text: t('Unsubscribe'), handler: (me) => {
+				jmapds('Calendar').update(record(me.parent!).id, {isSubscribed: false}).catch(e => Window.error(e));
+			}}),
+			hr({itemId: "sep-file"}),
+			btn({itemId: "export", icon: 'file_save', text: t('Export', 'core', 'core'), handler: (me) => {
+				window.open(client.downloadUrl('community/calendar/calendar/' + record(me.parent!).id), '_blank');
+			}}),
+			btn({itemId: "import", icon: 'upload_file', text: t('Import', 'core', 'core') + '…', handler: async (me) => {
+				const data = record(me.parent!);
+				const files = await browser.pickLocalFiles(false, false, 'text/calendar');
+				const blob = await client.upload(files[0]);
+
+				this.importIcs(blob, data);
+			}})
+		);
+	}
+
+	/**
+	 * Show only the calendar at the given store index
+	 */
+	private select(index: number) {
+		this.list.rowSelection!.replace(this.list.store.get(index)!);
 	}
 
 	private importIcs(blob: any, data:any) {
