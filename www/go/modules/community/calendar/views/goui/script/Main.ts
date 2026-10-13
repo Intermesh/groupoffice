@@ -514,7 +514,7 @@ export class Main extends Component {
 			renderer: (data) => {
 				return [checkbox({
 					color: '#' + data.color,
-					label: data.name,
+					label: data.name.htmlEncode(),
 					listeners: {
 						'change': ({newValue}) => {
 							if (newValue) {
