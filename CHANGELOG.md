@@ -1,3 +1,5 @@
+- Core: App passwords use same default domain logic as normal login and last used date and IP properly sync to client
+ 
 12-10-2026: 26.0.53
 - Calendar: Navigating was broken
 
