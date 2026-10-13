@@ -4,7 +4,6 @@ namespace go\core\auth;
 
 use Exception;
 use go\core\db\Column;
-use go\core\db\Criteria;
 use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
 use go\core\exception\Unavailable;
@@ -176,6 +175,22 @@ class Authenticate
 	}
 
 	/**
+	 * Appends the default authentication domain to a username without a domain.
+	 *
+	 * Local users (created in the database, not by an authenticator like LDAP) are left untouched.
+	 */
+	private function applyDefaultDomain(string $username): string
+	{
+		$domain = go()->getSettings()->defaultAuthenticationDomain;
+
+		if (!$domain || str_contains($username, '@') || $this->isLocalUser($username)) {
+			return $username;
+		}
+
+		return $username . '@' . $domain;
+	}
+
+	/**
 	 * Danger: Set's a user to authenticated state
 	 * @param User $user
 	 * @return Token
@@ -264,13 +279,7 @@ class Authenticate
 	 */
 	public function passwordLogin(string $username, string $password): bool|User
 	{
-		$isLocalUser = $this->isLocalUser($username);
-
-		go()->debug("Auth " . $username . " is " . ($isLocalUser ? "local" : "not local"));
-		// When the user is local don't use
-		if (!$isLocalUser && !str_contains($username, '@') && go()->getSettings()->defaultAuthenticationDomain) {
-			$username .= '@' . go()->getSettings()->defaultAuthenticationDomain;
-		}
+		$username = $this->applyDefaultDomain($username);
 
 		go()->debug("Authenticating " . $username);
 
@@ -404,6 +413,8 @@ class Authenticate
 	 */
 	public function appPasswordLogin(string $username, string $password, string $protocol, bool $countFailure = true): bool|User
 	{
+		$username = $this->applyDefaultDomain($username);
+
 		go()->debug("App password auth for " . $username . " (protocol: " . $protocol . ")");
 
 		$this->checkThrottle($username, 'apppassword');
@@ -415,18 +426,15 @@ class Authenticate
 
 		if (is_array($cached)) {
 			[$userId, $appPasswordId] = $cached;
-			$stillValid = go()->getDbConnection()
-				->selectSingleValue('p.id')
-				->from('core_app_password', 'p')
-				->join('core_app_password_scope', 's', 's.appPasswordId = p.id')
-				->where(['p.id' => $appPasswordId, 'p.userId' => $userId, 's.protocol' => $protocol])
+			$appPassword = $this->findAppPasswords($userId, $protocol)
+				->andWhere('cap.id', '=', $appPasswordId)
 				->single();
 
-			$user = $stillValid ? User::findById($userId) : null;
+			$user = $appPassword ? User::findById($userId) : null;
 			if ($user && strcasecmp($user->username, $username) === 0) {
 				$this->clearThrottle($username, 'apppassword');
 				$this->assertUserMayLogin($user);
-				$this->touchAppPassword($appPasswordId);
+				$this->touchAppPassword($appPassword);
 				return $user;
 			}
 			go()->getCache()->delete($cacheKey);
@@ -443,18 +451,9 @@ class Authenticate
 			return false;
 		}
 
-		// Only fetch the app passwords that are valid for this protocol, so we never spend a
-		// (costly) password_verify on a password that can't be used here anyway.
-		$ids = go()->getDbConnection()
-			->select('DISTINCT p.id')
-			->from('core_app_password', 'p')
-			->join('core_app_password_scope', 's', 's.appPasswordId = p.id')
-			->where('p.userId', '=', $user->id)
-			->andWhere('s.protocol', '=', $protocol)
-			->fetchMode(\PDO::FETCH_COLUMN, 0)
-			->all();
-
-		foreach ($ids ? AppPassword::findByIds($ids) : [] as $appPassword) {
+		// Only fetch the app passwords that are valid for this protocol, so we never verify a
+		// password that can't be used here anyway.
+		foreach ($this->findAppPasswords($user->id, $protocol) as $appPassword) {
 			if (!$appPassword->verifyPassword($password)) {
 				continue;
 			}
@@ -464,7 +463,7 @@ class Authenticate
 			$this->assertUserMayLogin($user);
 
 			go()->getCache()->set($cacheKey, [$user->id, $appPassword->id], true, self::CACHE_PASSWORD_LOGIN);
-			$this->touchAppPassword($appPassword->id);
+			$this->touchAppPassword($appPassword);
 
 			return $user;
 		}
@@ -477,24 +476,41 @@ class Authenticate
 		return false;
 	}
 
-	private function touchAppPassword(int $appPasswordId): void
+	/**
+	 * Find the app passwords of a user that are valid for the given protocol
+	 *
+	 * Only the properties needed for authentication are loaded.
+	 *
+	 * @return Query<AppPassword>
+	 */
+	private function findAppPasswords(int|string $userId, string $protocol): Query
 	{
-		$today = (new DateTime())->format('Y-m-d');
+		return AppPassword::find(['id', 'userId', 'passwordHash', 'lastUsedAt', 'lastUsedIp'])
+			->join('core_app_password_scope', 's', 's.appPasswordId = cap.id')
+			->where(['cap.userId' => $userId, 's.protocol' => $protocol]);
+	}
 
-		go()->getDbConnection()->update(
-			'core_app_password',
-			[
-				'lastUsedAt' => $today,
-				'lastUsedIp' => Request::get()->getRemoteIpAddress()
-			],
-			(new Query())
-				->where('id', '=', $appPasswordId)
-				->andWhere(
-					(new Criteria())
-						->where('lastUsedAt', 'IS', null)
-						->orWhere('lastUsedAt', '<', $today)
-				)
-		)->execute();
+	/**
+	 * Registers the use of an app password.
+	 *
+	 * To keep frequent DAV/ActiveSync requests cheap it only saves when the day or the IP changed.
+	 */
+	private function touchAppPassword(AppPassword $appPassword): void
+	{
+		$today = new DateTime();
+		$ip = Request::get()->getRemoteIpAddress();
+
+		if (isset($appPassword->lastUsedAt) && $appPassword->lastUsedAt->format('Y-m-d') === $today->format('Y-m-d')
+			&& ($appPassword->lastUsedIp ?? null) === $ip) {
+			return;
+		}
+
+		$appPassword->lastUsedAt = $today;
+		$appPassword->lastUsedIp = $ip;
+
+		if (!$appPassword->save()) {
+			go()->warn("Could not save last usage of app password " . $appPassword->id);
+		}
 	}
 
 	private $usedPasswordAuthenticator;
