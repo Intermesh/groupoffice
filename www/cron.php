@@ -45,8 +45,10 @@ if(go()->getSettings()->databaseVersion != go()->getVersion()) {
     echo "Aborting CRON because an update is needed: " . go()->getSettings()->databaseVersion . " -> " . go()->getVersion() . "\n";
 	exit();
 }
+$date = new go\core\util\DateTime();
 
-GO::config()->save_setting('cron_last_run', time());
+go()->getSettings()->cronLastRun = $date;
+go()->getSettings()->save();
 
 $lock = new Lock("cron", false);
 
