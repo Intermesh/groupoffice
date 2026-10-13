@@ -9,6 +9,8 @@ import {CalendarAdapter} from "./CalendarAdapter";
 
 export * from "./Main.js";
 export * from "./CalendarList.js";
+export * from "./CategoryList.js";
+export * from "./ProviderList.js";
 export * from "./CalendarView.js";
 export * from "./CalendarItem.js";
 export * from "./MonthView.js";
