@@ -1,3 +1,6 @@
+12-10-2026: 26.0.53
+- Calendar: Navigating was broken
+
 12-10-2026: 26.0.52
 - Core: Give users a better error message
 - Calendar: Correct invalid createdBy and modifiedBy in calendar
