@@ -55,14 +55,6 @@ export class Main extends Component {
 	private calendarList: CalendarList
 	private categoryList: List
 
-	/**
-	 * Used to check if we're ready to populate the view. When initial render is done and a route is given the
-	 * view will be loaded twice if we don't have this check.
-	 *
-	 * @private
-	 */
-	private initialized: boolean = false;
-
 	constructor() {
 		super();
 		this.cls = 'hbox fit tablet-cards';
@@ -603,13 +595,16 @@ export class Main extends Component {
 	}
 
 
+	/**
+	 * Sets the time span that the calendar displays and refreshes the view.
+	 *
+	 * @param value The type of time span to display (e.g. day, week, month)
+	 * @param amount The number of days the span covers, used for variable length spans (e.g. 2-7, 14, 21, 28)
+	 */
 	setSpan(value: ValidTimeSpan, amount: number) {
 		this.timeSpan = value;
-		//this.printCurrentBtn.disabled = !['day', 'week', 'month'].includes(value);
 		this.spanAmount = amount;
-
-		if(this.initialized)
-			this.updateView();
+		this.updateView();
 	}
 
 	updateView(buffered?:boolean) {
