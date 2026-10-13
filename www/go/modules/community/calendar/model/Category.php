@@ -110,6 +110,10 @@ class Category extends Entity {
 				$criteria->where('name', 'LIKE', '%'.$value.'%');
 			})
 			->add('mine', function(Criteria $criteria, $value) {
+
+				//mine is a bit of a misleading name. Because this returns categories owned by the user plus the global ones.
+				//only not the calendar specific categories.
+
 				$criteria->where('calendarId', 'IS', null)
 					->andWhere((new Criteria())
 						->where('ownerId', 'IS', null)
