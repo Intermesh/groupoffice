@@ -1,7 +1,11 @@
+- Core: update cleanup script
 - Core: App passwords use same default domain logic as normal login and last used date and IP properly sync to client
 - ldapauthenticator: Sync imapPassword and smtpPassword from ldap mapping
 - Calendar: Categories of other users where shown in calendar
 - Calendar: Make calendar / category / other selection consistent with other modules
+- Support: add column defaultAddressbookId to settings table as this field was not saved
+- Core: Updated DE translations. Danke, Daniel!
+- Calendar: cosmetic fix in quickHTML hover text for an event
 
 12-10-2026: 26.0.53
 - Calendar: Navigating was broken
@@ -41,7 +45,7 @@
 05-10-2026: 26.0.50
 - Calender: fix client side error when opening calendar view
 - Calendar: display 'unknown' calender name in event hover when not subscribed to said calendar
-- Core: Added Login throttling to improve security
+- Core: Added Login throttling to improve securitygit 
 - Catalog: non-US centric money icon for cost fields
 - Finance: When duplicating choose type
 - Finance: Margin rounding issue

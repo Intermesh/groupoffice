@@ -98,6 +98,11 @@ DELETE FROM smi_certs WHERE user_id NOT IN (SELECT id FROM core_user);
 -- ??
 DELETE FROM bl_ips WHERE userid NOT IN (SELECT id FROM core_user);
 
+-- Favourites module < 25.0
+DROP TABLE IF EXISTS `fav_calendar`;
+DROP TABLE IF EXISTS `fav_tasklist`;
+DROP TABLE IF EXISTS `fav_addressbook`;
+
 -- old core tables
 DELETE FROM go_reminders_users WHERE user_id NOT IN (SELECT id FROM core_user);
 DELETE FROM go_settings WHERE user_id > 0 && user_id NOT IN (SELECT id FROM core_user);
@@ -105,6 +110,10 @@ DELETE FROM go_state WHERE user_id NOT IN (SELECT id FROM core_user);
 DELETE FROM core_user_group WHERE userId NOT IN (SELECT id FROM core_user);
 DELETE FROM core_user_group WHERE groupId NOT IN (SELECT id FROM core_group);
 
+-- Old DAV tables
+DROP TABLE IF EXISTS dav_calendar_changes;
+DROP TABLE IF EXISTS dav_contacts;
+DROP TABLE IF EXISTS dav_events;
 
 DROP TABLE IF EXISTS go_log;
 

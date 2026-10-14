@@ -179,7 +179,7 @@ export class CommentsPanel extends Component {
 	}
 
 	public onLoad(entity: DefaultEntity) {
-		this.load(entity.id);
+		void this.load(entity.id);
 	}
 
 	public async load(id: EntityID) {
