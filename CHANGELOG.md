@@ -1,3 +1,5 @@
+- Core: update cleanup script
+
 12-10-2026: 26.0.53
 - Calendar: Navigating was broken
 
