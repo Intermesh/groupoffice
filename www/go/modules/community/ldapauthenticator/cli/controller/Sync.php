@@ -15,6 +15,7 @@ use go\core\model\Group;
 use go\core\model\User;
 use go\core\orm\Entity;
 use go\core\orm\EntityType;
+use go\modules\community\ldapauthenticator\model\Authenticator;
 use go\modules\community\ldapauthenticator\model\Server;
 use go\modules\community\ldapauthenticator\Module;
 
@@ -242,6 +243,12 @@ class Sync extends Controller
 				echo 'DbException while saving user: "' . $user->username .'":'. $e->getMessage() ."\n";
 
 				return false;
+			}
+
+			try {
+				(new Authenticator())->syncEmailPasswords($server, $user, Module::mappedValues($record));
+			} catch (Exception $e) {
+				$this->output("Could not sync e-mail account password for '" . $username . "': " . $e->getMessage());
 			}
 
 			go()->getDbConnection()

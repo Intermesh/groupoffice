@@ -1001,13 +1001,17 @@ hr {
 			display: inline-block;
 		}
 	}
+
+	&.right {
+		float: right;
+	}
 }
 
-//.right {
-//	float: right;
-//}
+
 
 .status {
+
+
 
 	.x-grid3-cell-inner & {
 		float: left; //to avoid ellipsis
@@ -1028,6 +1032,10 @@ hr {
 
 	.x-panel-header-text & {
 		margin: utils.dp(8);
+	}
+
+	&.right {
+		float: right;
 	}
 }
 

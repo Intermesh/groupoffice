@@ -10,7 +10,7 @@ import {
 	DateTime, Format,
 	FunctionUtil, h3, hr, List,
 	list,
-	menu, router,
+	menu, router, selectallcheckboxfield,
 	splitter, table,
 	tbar,
 } from "@intermesh/goui";
@@ -27,6 +27,8 @@ import {CalendarAdapter} from "./CalendarAdapter.js";
 import {ListView} from "./ListView.js";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarList} from "./CalendarList.js";
+import {CategoryList} from "./CategoryList.js";
+import {ProviderList} from "./ProviderList.js";
 import {ViewWindow} from "./ViewWindow";
 
 export class Main extends Component {
@@ -53,7 +55,7 @@ export class Main extends Component {
 	declare adapter
 
 	private calendarList: CalendarList
-	private categoryList: List
+	private categoryList: CategoryList
 
 	constructor() {
 		super();
@@ -97,6 +99,12 @@ export class Main extends Component {
 		});
 		const rights = modules.get("community", "calendar")!.userRights;
 
+		const providerList = new ProviderList(this.adapter).on('change', () => this.updateView());
+		this.categoryList = new CategoryList().on('change', ({ids}) => {
+			this.adapter.byType('event').store.setFilter('inCategories', ids.length ? {inCategories: ids} : undefined);
+			this.updateView();
+		});
+
 		this.items.add(
 			this.west = comp({tagName: 'aside', width: 274, cls:'scroll', style: {paddingTop:'1.2rem', minWidth: '27.4rem'}},
 				tbar({cls: "for-medium-device"},
@@ -137,10 +145,15 @@ export class Main extends Component {
 				comp({cls:'scroll'},
 					this.renderViews(),
 					this.calendarList = new CalendarList(),
-					tbar({cls: 'dense'},comp({tagName: 'h3', html: t('Other')})),
-					comp({tagName:'ul', cls:'goui check-list'}, ...this.renderAdapterBoxes()),
-					tbar({cls: 'dense'},
-						comp({tagName: 'h3', html: t('Categories','core','core')}),
+					tbar({},
+						selectallcheckboxfield({list: providerList.list}),
+						comp({tagName: 'h4', text: t('Other')})
+					),
+					providerList,
+					tbar({},
+						selectallcheckboxfield({list: this.categoryList.list}),
+						comp({tagName: 'h4', text: t('Categories','core','core')}),
+						"->",
 						btn({
 							hidden: !rights.mayChangeCategories,
 							icon: 'add', menu: menu({},
@@ -155,7 +168,7 @@ export class Main extends Component {
 							)
 						})
 					),
-					this.categoryList = this.buildCategoryFilter(),
+					this.categoryList,
 					filterpanel({
 						entityName: "CalendarEvent",
 						store: this.adapter!.byType('event').store
@@ -494,55 +507,6 @@ export class Main extends Component {
 		this.west.hidden = state.westHidden;
 	}
 
-	private buildCategoryFilter() {
-		const rights = modules.get("community", "calendar")!.userRights;
-		const selected: any = {},
-			selectionChange = () => {
-				const store = this.adapter.byType('event').store;
-				const categoryIds = Object.keys(selected);
-
-				store.setFilter('inCategories', categoryIds.length ? {
-					inCategories: categoryIds
-				} : undefined)
-
-				this.updateView();
-			};
-		return list({
-			store: categoryStore,
-			cls: 'check-list',
-			listeners: {'render': ({target}) => { void target.store.load() }},
-			renderer: (data) => {
-				return [checkbox({
-					color: '#' + data.color,
-					label: data.name,
-					listeners: {
-						'change': ({newValue}) => {
-							if (newValue) {
-								selected[data.id] = true;
-							} else {
-								delete selected[data.id];
-							}
-							selectionChange();
-						}
-					},
-					buttons: [btn({
-						hidden: !rights.mayChangeCategories,
-						icon: 'more_horiz', menu: menu({},
-							btn({icon:'edit', text: t('Edit'), disabled:!data.myRights.mayAdmin, handler: async _ => {
-								const dlg = new CategoryWindow();
-								await dlg.load(data.id);
-								dlg.show();
-							}}),
-							btn({icon:'delete', text: t('Delete'), disabled:!data.myRights.mayAdmin, handler: async _ => {
-									jmapds("CalendarCategory").confirmDestroy([data.id]);
-							}})
-						)
-					})]
-				})];
-			}
-		})
-	}
-
 	routeTo(view:string, date: DateTime) {
 		router.goto("calendar/" + view + "/" + date.format('Y-m-d'));
 	}
@@ -677,29 +641,6 @@ export class Main extends Component {
 	private bufferedUpdate = FunctionUtil.buffer(200, (start: DateTime)=> {
 		this.view.goto(start, this.spanAmount!);
 	})
-
-	private renderAdapterBoxes() {
-		const boxes: Component[] = [];
-
-		for(const name in this.adapter.providers) {
-			const p = this.adapter.providers[name];
-			if(p.checkbox) {
-				boxes.push(comp({tagName:'li'}, checkbox({
-					color: p.checkbox.color,
-					label: p.checkbox.label,
-					value: p.enabled,
-					listeners: {
-						'change': (e => {
-							p.checkbox!.onChange?.(e.newValue, name);
-							this.updateView();
-						})
-					}
-				})));
-			}
-		}
-
-		return boxes;
-	}
 
 	private registerProviders(adapter: CalendarAdapter){
 

@@ -94,12 +94,10 @@ class Category extends Entity {
 				if($value === 'visibleOnly') {
 					$query->join('calendar_calendar_user', 'ucal', 'ucal.id = category.calendarId AND ucal.userId = '.go()->getAuthState()->getUserId(), 'LEFT');
 						$criteria
-						->where(['ucal.isVisible' => true])
-						->orWhere('category.calendarId', 'IS', null);
+						->where(['ucal.isVisible' => true]);
 				} else if(!empty($value)) {
 					// explicit calendar ids (the client knows the unsaved visibility). Global categories are always included.
-					$criteria->where(['category.calendarId' => $value])
-						->orWhere('category.calendarId', 'IS', null);
+					$criteria->where(['category.calendarId' => $value]);
 				}
 			}, 'visibleOnly')
 			->add('ownerId', function(Criteria $criteria, $value) {
@@ -112,6 +110,10 @@ class Category extends Entity {
 				$criteria->where('name', 'LIKE', '%'.$value.'%');
 			})
 			->add('mine', function(Criteria $criteria, $value) {
+
+				//mine is a bit of a misleading name. Because this returns categories owned by the user plus the global ones.
+				//only not the calendar specific categories.
+
 				$criteria->where('calendarId', 'IS', null)
 					->andWhere((new Criteria())
 						->where('ownerId', 'IS', null)
