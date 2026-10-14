@@ -10,7 +10,7 @@ import {
 	DateTime, Format,
 	FunctionUtil, h3, hr, List,
 	list,
-	menu, router, selectallcheckboxfield,
+	menu, menucolumn, router, selectallcheckboxfield,
 	splitter, table,
 	tbar,
 } from "@intermesh/goui";
@@ -472,24 +472,27 @@ export class Main extends Component {
 					renderer: (value, record) => comp({tagName: "i", cls: "icon", text:'group'})
 				}),
 				column({id:'name'}),
-				column({ width: 50,
-					id: '-', renderer: (v, data) => btn({
-						//hidden: !rights.mayChangeViews,
-						icon: 'more_horiz', menu: menu({},
-							btn({
-								icon: 'edit', text: t('Edit'), disabled: !data.myRights.mayAdmin, handler: async _ => {
-									const dlg = new ViewWindow();
-									await dlg.load(data.id);
-									dlg.show();
+				menucolumn({
+					menu: menu({
+							listeners: {
+								show: ({target}) => {
+									const record = viewStore.get(target.dataSet.rowIndex)!;
+									target.findChild("edit")!.disabled = !record.myRights.mayAdmin;
+									target.findChild("delete")!.disabled = !record.myRights.mayAdmin;
 								}
-							}),
-							btn({
-								icon: 'delete', text: t('Delete'), disabled: !data.myRights.mayAdmin, handler: async _ => {
-									viewStore.dataSource.confirmDestroy([data.id]);
-								}
-							})
-						)
-					})
+							}
+						},
+						btn({itemId: "edit", icon: 'edit', text: t('Edit'), handler: async (me) => {
+							const record = viewStore.get(me.parent!.dataSet.rowIndex)!;
+							const dlg = new ViewWindow();
+							await dlg.load(record.id);
+							dlg.show();
+						}}),
+						btn({itemId: "delete", icon: 'delete', text: t('Delete'), handler: (me) => {
+							const record = viewStore.get(me.parent!.dataSet.rowIndex)!;
+							void viewStore.dataSource.confirmDestroy([record.id]);
+						}})
+					)
 				})]
 		});
 	}
