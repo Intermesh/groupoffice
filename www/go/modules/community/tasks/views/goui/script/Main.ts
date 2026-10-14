@@ -125,7 +125,7 @@ export class Main extends MainThreeColumnPanel {
 				})
 			),
 			tbar({
-					cls: "border-bottom"
+					cls: "border-bottom table-aligned"
 				},
 				h3({
 					text: t("Lists")
@@ -239,7 +239,7 @@ export class Main extends MainThreeColumnPanel {
 			),
 
 			tbar({
-					cls: "border-bottom"
+					cls: "border-bottom table-aligned"
 				},
 				h3({
 					text: t("Categories")
@@ -357,7 +357,7 @@ export class Main extends MainThreeColumnPanel {
 				flex: 1
 			},
 			this.taskGridToolbar = tbar({
-					cls: "bg-mid border-bottom"
+					cls: "bg-mid border-bottom table-aligned"
 				},
 				this.showWestButton(),
 				"->",

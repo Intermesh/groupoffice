@@ -102,7 +102,9 @@ export class CalendarList extends Component<CalendarListEventMap> {
 			}
 		});
 
-		this.items.add(store !== calendarStore ? comp() : tbar({},
+		this.items.add(store !== calendarStore ? comp() : tbar({
+				cls: "table-aligned compact"
+			},
 			selectallcheckboxfield({list: this.list}),
 
 			comp({tagName: 'h4', html: t('Calendars')}),

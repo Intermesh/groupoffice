@@ -57,7 +57,7 @@ export class MainPanel extends MainThreeColumnPanel {
 			    cls: 'vbox active' //for mobile view this is active
 		    },
 
-		    tbar({},
+		    tbar({cls: "table-aligned"},
 
 
 
