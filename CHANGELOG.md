@@ -5,6 +5,7 @@
 - Calendar: Make calendar / category / other selection consistent with other modules
 - Support: add column defaultAddressbookId to settings table as this field was not saved
 - Core: Updated DE translations. Danke, Daniel!
+- Calendar: cosmetic fix in quickHTML hover text for an event
 
 12-10-2026: 26.0.53
 - Calendar: Navigating was broken

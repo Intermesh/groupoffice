@@ -565,7 +565,7 @@ export class CalendarItem {
 		];
 
 		if(this.patched.location) {
-			lines.push('<div style="white-space: pre">' + t('Location')+ ': ' + this.formatLocation(this.patched.location)) + '</div>';
+			lines.push('<div style="white-space: pre;">' + t('Location')+ ': ' + this.formatLocation(this.patched.location)) + '</div>';
 		}
 
 		if(this.isRecurring) {
@@ -593,8 +593,9 @@ export class CalendarItem {
 			lines.push('<div class="categories">' + cats.join("") + '</div>');
 		}
 
-		if(this.patched.description)
-			lines.push('<p style="max-width:360px;">'+Format.textToHtml(this.patched.description)+'</p>');
+		if(this.patched.description) {
+			lines.push(`<p style="max-width:360px;white-space: normal;">${Format.textToHtml(this.patched.description)}</p>`);
+		}
 
 
 		if(this.patched.creator && this.patched.modifier) {
