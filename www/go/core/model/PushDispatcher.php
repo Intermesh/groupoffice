@@ -67,6 +67,9 @@ class PushDispatcher
 		go()->getDbConnection()->debug = true;
 
 
+		// spread the checks of all connections
+		$this->recheckDelay = self::MIN_RECHECK_INTERVAL + mt_rand(0, 1000) / 1000;
+
 		// disable default disconnect checks
 		ignore_user_abort(true);
 
@@ -98,6 +101,25 @@ class PushDispatcher
 		flush();
 	}
 
+	/**
+	 * Minimum time in seconds between two state checks of the same entity type per connection. A random jitter is added
+	 * per connection. Bulk operations (imports, sync) increment the state counter many times per second. Without
+	 * debouncing every connection would recompute its state on each increment.
+	 */
+	const MIN_RECHECK_INTERVAL = 2;
+
+	/**
+	 * Time of the last state check per entity name
+	 *
+	 * @var float[]
+	 */
+	private array $lastCheck = [];
+
+	/**
+	 * Debounce time for this connection including jitter
+	 */
+	private float $recheckDelay;
+
 	private function shouldCheckDB(string $name): bool
 	{
 		if(!$this->apcuEnabled) {
@@ -106,11 +128,21 @@ class PushDispatcher
 
 		$current = $this->getStateCounter($name);
 
-		$check =  $current !== $this->counters[$name];
+		if($current === $this->counters[$name]) {
+			return false;
+		}
+
+		// Leading edge: the first change is handled immediately. Changes following too soon are postponed. The counter
+		// is not stored when postponing so the check is done on a later tick, which also covers the trailing edge.
+		$now = microtime(true);
+		if($now - ($this->lastCheck[$name] ?? 0) < $this->recheckDelay) {
+			return false;
+		}
 
 		$this->counters[$name] = $current;
+		$this->lastCheck[$name] = $now;
 
-		return $check;
+		return true;
 	}
 
 	private function checkChanges(): array
