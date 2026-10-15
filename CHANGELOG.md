@@ -1,3 +1,4 @@
+15-10-2026: 26.0.54
 - Core: update cleanup script
 - Core: App passwords use same default domain logic as normal login and last used date and IP properly sync to client
 - ldapauthenticator: Sync imapPassword and smtpPassword from ldap mapping
