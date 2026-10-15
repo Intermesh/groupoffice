@@ -51,6 +51,7 @@ go.usersettings.AppPasswordsFieldset = Ext.extend(Ext.form.FieldSet, {
 				},
 				{
 					xtype: 'datecolumn',
+					dateOnly: true,
 					header: t('Last used'),
 					dataIndex: 'lastUsedAt',
 					sortable: true,
