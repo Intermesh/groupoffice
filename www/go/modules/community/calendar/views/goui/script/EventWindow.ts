@@ -218,7 +218,13 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 							if(this.item)
 								this.item.cal = r;
 
-							this.categoryStore.setFilter("calendar",  {calendarId: newValue});
+							this.categoryStore.setFilter("calendar",  {
+								operator: "OR",
+								conditions: [
+									{mine: true},
+									{inCalendars: newValue}
+								]
+						});
 
 							const d = this.form.value.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
 							this.alertField.setDefaultLabel(d);
@@ -323,7 +329,9 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 			this.alertField,
 
 			autocompletechips({
-				list: table({headers: false, store: this.categoryStore = datasourcestore({
+				list: table({
+					headers: false,
+					store: this.categoryStore = datasourcestore({
 						dataSource:jmapds('CalendarCategory'),
 						sort: [{property:'name'}]
 					}),
@@ -335,6 +343,7 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 						}),
 						column({id: "name"})
 					]
+
 				}),
 				label: t("Categories",'core','core'),
 				name: "categoryIds",

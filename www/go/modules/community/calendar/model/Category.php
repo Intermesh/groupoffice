@@ -103,9 +103,6 @@ class Category extends Entity {
 			->add('ownerId', function(Criteria $criteria, $value) {
 				$criteria->where('ownerId', '=', $value)
 					->andWhere('calendarId' , '=', null);
-			})
-			->add('calendarId', function(Criteria $criteria, $value) {
-				$criteria->where('calendarId', '=', $value)->orWhere('calendarId', 'IS', null);
 			})->add('name', function(Criteria $criteria, $value) {
 				$criteria->where('name', 'LIKE', '%'.$value.'%');
 			})
