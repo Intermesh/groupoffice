@@ -52,14 +52,19 @@ class PushDispatcher
 
 	public function __construct(array $entities = [])
 	{
-		if(function_exists('apcu_enabled')) {
+		// the extension may be loaded but disabled (apc.enabled=0, CLI without apc.enable_cli)
+		if(function_exists('apcu_enabled') && apcu_enabled()) {
 			$this->apcuEnabled = true;
+			// share the modseqs between all SSE connections
+			EntityType::$sharedModSeqCache = true;
 		}
 		if (!empty(go()->getConfig()['sseCheckInterval']) && (int)go()->getConfig()['sseCheckInterval'] > 0) {
 			$this->CHECK_INTERVAL = (int)go()->getConfig()['sseCheckInterval'];
 		} else {
 			$this->CHECK_INTERVAL = $this->apcuEnabled ? 1 : 20;
 		}
+
+		go()->getDbConnection()->debug = true;
 
 
 		// disable default disconnect checks
@@ -110,7 +115,7 @@ class PushDispatcher
 
 	private function checkChanges(): array
 	{
-		$closeDb = false;
+		$queriesBefore = EntityType::$modSeqQueries;
 		$state = [];
 		foreach ($this->entities as $name) {
 
@@ -121,16 +126,16 @@ class PushDispatcher
 			}
 
 			if($this->shouldCheckDB($name)) {
-
-				go()->debug('PushDispatcher::checkChanges() on DB for '. $name);
+//				go()->debug('PushDispatcher::checkChanges() on DB for '. $name);
 				/** @var Entity $cls */
 				$entityType->clearCache();
 				$cls = $entityType->getClassName();
 				$state[$name] = $cls::getState();
-
-				$closeDb = true;
 			}
 		}
+
+		// With the shared modseq cache the DB is only used on a cache miss. Don't reconnect when it wasn't.
+		$closeDb = EntityType::$modSeqQueries !== $queriesBefore;
 
 		if($closeDb) {
 			//disconnect and free up memory
@@ -146,8 +151,8 @@ class PushDispatcher
 		return $state;
 	}
 
-	private function getStateCounter(string $name) : int {
-		$cnt =  apcu_fetch(go()->getConfig()['db_name'] . '_state_sse_'. $name);
+	public static function getStateCounter(string $name) : int {
+		$cnt = apcu_fetch(go()->getConfig()['db_name'] . '_state_sse_'. $name);
 		if($cnt === false) {
 			return self::incStateCounter($name);
 		}

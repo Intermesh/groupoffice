@@ -57,6 +57,24 @@ class EntityType implements ArrayableInterface {
 
 	private ?int $highestUserModSeq;
 
+	/**
+	 * When true the highest modseqs are cached in APCu and shared between requests. Only used by the SSE
+	 * {@see PushDispatcher} so that it doesn't need DB queries for each connection on each change.
+	 */
+	public static bool $sharedModSeqCache = false;
+
+	/**
+	 * Number of modseq DB queries done. Used by the PushDispatcher to find out if the DB was used.
+	 */
+	public static int $modSeqQueries = 0;
+
+	/**
+	 * Keys of the user modseq cache entries modified in this request. They are invalidated after the commit in {@see push()}
+	 *
+	 * @var string[]
+	 */
+	private static array $dirtyUserModSeqs = [];
+
 	private bool $enabled;
 
 
@@ -194,6 +212,19 @@ class EntityType implements ArrayableInterface {
 			return $this->highestModSeq;
 		}
 
+		// The state counter is incremented after each commit of changes to this entity type. By including it in the
+		// key the cached value is never older than the counter.
+		$cacheKey = null;
+		if(self::$sharedModSeqCache) {
+			$cacheKey = go()->getConfig()['db_name'] . '_sse_modseq_' . $this->id . '_' . PushDispatcher::getStateCounter($this->getName());
+			$cached = apcu_fetch($cacheKey, $success);
+			if($success) {
+				return $this->highestModSeq = $cached;
+			}
+		}
+
+		self::$modSeqQueries++;
+
 		$stmt = go()->getDbConnection()->getCachedStatment("highestModSeq");
 
 		// create reusable statement
@@ -212,6 +243,10 @@ class EntityType implements ArrayableInterface {
 		$this->highestModSeq = $stmt->fetch();
 
 		$stmt->closeCursor();
+
+		if($cacheKey !== null) {
+			apcu_store($cacheKey, $this->highestModSeq ?? 0, 3600);
+		}
 
 		return $this->highestModSeq ?? 0;
 	}
@@ -638,6 +673,8 @@ class EntityType implements ArrayableInterface {
 	public static function push(int $minChanges = 1) {
 
 		if(count(self::$changes) < $minChanges) {
+			// the user modseq was written and committed already
+			self::invalidateUserModSeqs();
 			return;
 		}
 
@@ -652,6 +689,8 @@ class EntityType implements ArrayableInterface {
 		go()->getDbConnection()->beginTransaction();
 		$changedEntities = self::pushRecords();
 		go()->getDbConnection()->commit();
+
+		self::invalidateUserModSeqs();
 
 		foreach($changedEntities as $changedEntity) {
 			PushDispatcher::incStateCounter($changedEntity);
@@ -809,6 +848,19 @@ class EntityType implements ArrayableInterface {
 		$stmt->execute();
 	}
 
+	private function userModSeqCacheKey(): string
+	{
+		return go()->getConfig()['db_name'] . '_sse_usermodseq_' . $this->id . '_' . go()->getUserId();
+	}
+
+	private static function invalidateUserModSeqs(): void
+	{
+		foreach(self::$dirtyUserModSeqs as $key) {
+			apcu_inc($key . '_g');
+		}
+		self::$dirtyUserModSeqs = [];
+	}
+
 	/**
 	 * Get the modSeq for the user specific properties.
 	 *
@@ -817,6 +869,21 @@ class EntityType implements ArrayableInterface {
 	 */
 	public function getHighestUserModSeq() : int {
 		if(!isset($this->highestUserModSeq)) {
+
+			// Cached value is only valid when it was stored with the current generation. The generation is incremented
+			// when the user modseq is changed (see nextUserModSeq() and push()).
+			$valueKey = null;
+			if(self::$sharedModSeqCache) {
+				$base = $this->userModSeqCacheKey();
+				$valueKey = $base . '_v';
+				$generation = (int) apcu_fetch($base . '_g');
+				$cached = apcu_fetch($valueKey, $success);
+				if($success && $cached[0] === $generation) {
+					return $this->highestUserModSeq = $cached[1];
+				}
+			}
+
+			self::$modSeqQueries++;
 
 			// create reusable statement
 			$stmt = go()->getDbConnection()->getCachedStatment("highestUserModSeqStmt");
@@ -835,7 +902,13 @@ class EntityType implements ArrayableInterface {
 			$stmt->bindValue(':userId', go()->getUserId());
 			$stmt->execute();
 
-			$this->highestUserModSeq = $stmt->fetch() ?? 0;
+			go()->debug("Modseqquery for ". go()->getUserId());
+
+			$this->highestUserModSeq = $stmt->fetch() ?: 0;
+
+			if($valueKey !== null) {
+				apcu_store($valueKey, [$generation, $this->highestUserModSeq], 3600);
+			}
 		}
 		return $this->highestUserModSeq;
 	}
@@ -922,6 +995,13 @@ class EntityType implements ArrayableInterface {
 		go()->debug($this->name . " New user modseq increased to $modSeq");
 
 		$this->highestUserModSeq = $modSeq;
+
+		if(function_exists('apcu_inc') && apcu_enabled()) {
+			// invalidate now and again after the commit in push()
+			$key = $this->userModSeqCacheKey();
+			self::$dirtyUserModSeqs[$key] = $key;
+			apcu_inc($key . '_g');
+		}
 
 		return $modSeq;
 	}
