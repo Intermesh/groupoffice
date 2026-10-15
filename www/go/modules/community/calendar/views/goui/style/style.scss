@@ -47,10 +47,6 @@
 		color:$colorTextSecondary;
 		padding-left: .4rem;
 		padding-right: .4rem;
-
-	}
-	&::first-letter {
-		text-transform: capitalize;
 	}
 	&.new {
 		background-color: white !important;
