@@ -6,6 +6,7 @@
 - Support: add column defaultAddressbookId to settings table as this field was not saved
 - Core: Updated DE translations. Danke, Daniel!
 - Calendar: cosmetic fix in quickHTML hover text for an event
+- Calendar: Improved navigating back from views to calendars with "Close views" button.
 
 12-10-2026: 26.0.53
 - Calendar: Navigating was broken
