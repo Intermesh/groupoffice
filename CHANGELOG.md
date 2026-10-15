@@ -7,6 +7,7 @@
 - Core: Updated DE translations. Danke, Daniel!
 - Calendar: cosmetic fix in quickHTML hover text for an event
 - Calendar: Improved navigating back from views to calendars with "Close views" button.
+- Calendar: Loaded all event shortly
 
 12-10-2026: 26.0.53
 - Calendar: Navigating was broken
