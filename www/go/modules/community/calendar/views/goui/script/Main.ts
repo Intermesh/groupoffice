@@ -57,6 +57,9 @@ export class Main extends Component {
 	private calendarList: CalendarList
 	private categoryList: CategoryList
 
+	/** Set once the inCalendars filter is applied. Events are not loaded before, to avoid flashing all calendars. */
+	private calendarsApplied = false
+
 	/** The view that is currently shown. While set, the calendar list is disabled */
 	private activeView?: any
 	/** The route (e.g. 'month' or 'days-5') that was shown before the view was entered */
@@ -373,6 +376,7 @@ export class Main extends Component {
 
 
 	private applyCalendars(ids: string[]) {
+		this.calendarsApplied = true;
 		this.applyInCalendarFilter(ids);
 		this.updateView();
 
@@ -682,6 +686,11 @@ export class Main extends Component {
 				break;
 		}
 		this.picker.setValue(start, end);
+
+		if(!this.calendarsApplied) {
+			// applyCalendars() calls updateView() again when the calendar list has loaded
+			return;
+		}
 
 		if(buffered) {
 			// for the fast previous/forward clickers
