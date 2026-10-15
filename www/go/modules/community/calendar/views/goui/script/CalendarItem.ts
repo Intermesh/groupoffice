@@ -565,7 +565,7 @@ export class CalendarItem {
 		];
 
 		if(this.patched.location) {
-			lines.push('<div style="white-space: pre;">' + t('Location')+ ': ' + this.formatLocation(this.patched.location)) + '</div>';
+			lines.push('<div style="white-space: pre;">' + t('Location')+ ': ' + this.formatLocation(this.patched.location) + '</div>');
 		}
 
 		if(this.isRecurring) {
@@ -594,7 +594,7 @@ export class CalendarItem {
 		}
 
 		if(this.patched.description) {
-			lines.push(`<p style="max-width:360px;white-space: normal;">${Format.textToHtml(this.patched.description)}</p>`);
+			lines.push(`<p>${Format.textToHtml(this.patched.description)}</p>`);
 		}
 
 
@@ -605,6 +605,8 @@ export class CalendarItem {
 				t('Modified at') + ': ' + Format.smartDateTime(this.data.modifiedAt) + ' ' + t('by') + ' ' + this.data.modifier.name.htmlEncode()
 			);
 		}
+
+		console.log(lines);
 
 		return lines.join('');
 	}
