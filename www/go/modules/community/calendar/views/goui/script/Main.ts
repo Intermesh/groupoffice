@@ -57,6 +57,12 @@ export class Main extends Component {
 	private calendarList: CalendarList
 	private categoryList: CategoryList
 
+	/** The view that is currently shown. While set, the calendar list is disabled */
+	private activeView?: any
+	/** The route (e.g. 'month' or 'days-5') that was shown before the view was entered */
+	private routeBeforeView?: string
+	private viewBar!: Component
+
 	constructor() {
 		super();
 		this.cls = 'hbox fit tablet-cards';
@@ -329,14 +335,11 @@ export class Main extends Component {
 		// NOPE:router will call setSpan and render
 		// calendar store load will call first view update
 		this.calendarList.on('changevisible', ({ids}) => {
-			this.applyInCalendarFilter(ids);
-			this.updateView();
-
-			// isVisible is saved to the server with a delay, so pass the visible calendars explicitly
-			// instead of letting the server use the stored (stale) isVisible values.
-			categoryStore.setFilter('inCalendars', {operator: "OR", conditions: [{inCalendars: ids}, {mine: true}]});
-			void categoryStore.load();
-
+			// A view has its own set of calendars. Ignore the calendar list until the view is left.
+			if(this.activeView) {
+				return;
+			}
+			this.applyCalendars(ids);
 		});
 		this.on('render', () => {
 			this.cards.cls = client.user.calendarPreferences.multiLine ? 'multiline':'';
@@ -368,6 +371,58 @@ export class Main extends Component {
 		})
 	}
 
+
+	private applyCalendars(ids: string[]) {
+		this.applyInCalendarFilter(ids);
+		this.updateView();
+
+		// isVisible is saved to the server with a delay, so pass the visible calendars explicitly
+		// instead of letting the server use the stored (stale) isVisible values.
+		categoryStore.setFilter('inCalendars', {operator: "OR", conditions: [{inCalendars: ids}, {mine: true}]});
+		void categoryStore.load();
+	}
+
+	private enterView(view: any) {
+		// when switching from one view to another, keep the route from before the first view
+		if(!this.activeView) {
+			this.routeBeforeView = this.spanRoute();
+		}
+		this.activeView = view;
+		this.calendarList.disabled = true;
+		this.viewBar.items.get(0)!.text = view.name;
+		this.viewBar.hidden = false;
+
+		// A view may contain calendars that are not in the calendar list. isVisible is left untouched.
+		this.applyCalendars(view.calendarIds ?? []);
+
+		if(view.defaultView) {
+			this.routeTo(view.defaultView, this.date);
+		}
+	}
+
+	private leaveView() {
+		if(!this.activeView) {
+			return;
+		}
+		this.activeView = undefined;
+		this.calendarList.disabled = false;
+		this.viewBar.hidden = true;
+
+		this.applyCalendars(this.calendarList.visibleIds());
+
+		if(this.routeBeforeView && this.routeBeforeView !== this.spanRoute()) {
+			this.routeTo(this.routeBeforeView, this.date);
+		}
+		this.routeBeforeView = undefined;
+	}
+
+	/**
+	 * The current time span as used in the route. Spans with a variable length have their amount appended.
+	 */
+	private spanRoute() {
+		const fixed = ['day', 'week', 'month', 'list', 'year'];
+		return fixed.includes(this.timeSpan) ? this.timeSpan : this.timeSpan + '-' + this.spanAmount;
+	}
 
 	private applyInCalendarFilter(calendarIds: string[]) {
 		const store = this.adapter.byType('event').store;
@@ -413,7 +468,6 @@ export class Main extends Component {
 					break;
 			}
 
-
 			window.open(client.pageUrl('community/calendar/printList/' + start.format('Y-m-d') + "/" + end.format('Y-m-d')));
 		} else if(['day', 'month', 'list'].includes(type)) {
 			window.open(client.pageUrl('community/calendar/print/' + type + '/'+ this.date.format('Y-m-d')));
@@ -431,7 +485,7 @@ export class Main extends Component {
 
 	private renderViews() {
 
-		return table({
+		const viewsTable = table({
 			store: viewStore,
 			emptyStateHtml:'',
 			headers:false,
@@ -440,21 +494,7 @@ export class Main extends Component {
 				listeners: {
 					'selectionchange': ({selected}) => {
 						if(selected[0]) {
-							const calIds = selected[0].record.calendarIds;
-							if(calIds) {
-								for(const id of calIds) {
-									jmapds('Calendar').update(id, {isVisible: true});
-								}
-								this.applyInCalendarFilter(calIds);
-							}
-
-							if(selected[0].record.defaultView) {
-								this.routeTo(selected[0].record.defaultView, this.date);
-								// const parts = selected[0].record.defaultView.split('-');
-								// if(!parts[1]) parts[1] = 0;
-								// this.setSpan(parts[0], parseInt(parts[1] ?? 0));
-							}
-							this.updateView();
+							this.enterView(selected[0].record);
 						}
 					}
 				}
@@ -462,7 +502,6 @@ export class Main extends Component {
 			listeners: {
 				'render': ({target}) => {
 					void target.store.load();
-					this.calendarList.on('changevisible', () => { target.rowSelection?.clear() })
 				},
 			},
 			columns:[
@@ -495,6 +534,17 @@ export class Main extends Component {
 					)
 				})]
 		});
+
+		this.viewBar = tbar({cls: 'compact table-aligned', hidden: true},
+			comp({tagName: 'h4'}),
+			'->',
+			btn({icon: 'close', text: t('Close views'), handler: () => {
+				viewsTable.rowSelection?.clear();
+				this.leaveView();
+			}})
+		);
+
+		return comp({}, this.viewBar, viewsTable);
 	}
 
 	protected buildState(): ComponentState {

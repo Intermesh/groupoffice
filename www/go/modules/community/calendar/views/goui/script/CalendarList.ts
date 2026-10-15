@@ -161,7 +161,7 @@ export class CalendarList extends Component<CalendarListEventMap> {
 		), this.list);
 	}
 
-	private visibleIds() {
+	visibleIds() {
 		return Object.keys(this.inCalendars).filter(key => this.inCalendars[key]);
 	}
 
