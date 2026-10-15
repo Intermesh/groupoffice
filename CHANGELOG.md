@@ -1,4 +1,5 @@
 - Core: Optimized SSE Push with more apcu caching
+- Core: Debounce pushing more than once every 2seconds per entity
 
 15-10-2026: 26.0.54
 - Core: update cleanup script
