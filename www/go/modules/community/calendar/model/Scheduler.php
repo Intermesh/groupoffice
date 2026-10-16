@@ -40,9 +40,17 @@ class Scheduler {
 				$newOnly = !$willDelete && $event->isModified('participants') && !$event->isModified(self::EssentialScheduleProps);
 				$method = $willDelete ? 'CANCEL' : 'REQUEST';
 				self::organizeImip($event, $current, $method, $newOnly);
-			} else if (!empty($event->replyTo) && $current->isModified('participationStatus')) {
+
+				if(!$willDelete && $event->isModified('participants')) {
+					$removed = $event->removedParticipants();
+					if(!empty($removed)) {
+						self::organizeImip($event, $current, 'CANCEL', false, $removed);
+					}
+				}
+			} else if (!empty($event->replyTo) && ($willDelete || $current->isModified('participationStatus'))) {
 
 				if($willDelete) {
+					// Deleting the event from your own (or resource) calendar declines it
 					$current->participationStatus  = Participant::Declined;
 				}
 				self::replyImip($event, $current);
@@ -131,9 +139,10 @@ class Scheduler {
 	 * @param $event CalendarEvent an instance that needs scheduling
 	 * @param $method string 'REQUEST' or 'CANCEL' depending on what is happing to the event
 	 * @param $newOnly boolean Only send if participant was added
+	 * @param Participant[]|null $participants Only send to (and list in the ics) these participants instead of all
 	 * @return boolean
 	 */
-	private static function organizeImip(CalendarEvent $event, $organizer, $method, $newOnly = false): bool
+	private static function organizeImip(CalendarEvent $event, $organizer, $method, $newOnly = false, ?array $participants = null): bool
 	{
 		$success=true;
 
@@ -144,9 +153,19 @@ class Scheduler {
 		// participant could have been added as well.
 		$ics = ICalendarHelper::toInvite($method,$event);
 
+		if($participants !== null) {
+			// Only addressed participants may be listed (RFC 5546 3.2.5), e.g. the removed ones in a CANCEL
+			foreach($ics->vevent as $vevent) {
+				$vevent->remove('ATTENDEE');
+				foreach($participants as $participant) {
+					$vevent->add(...ICalendarHelper::toAttendee($participant));
+				}
+			}
+		}
+
 		$mailer = go()->getMailer($organizer->email, $organizer->name);
 
-		foreach($event->participants as $participant) {
+		foreach($participants ?? $event->participants as $participant) {
 			/** @var $participant Participant */
 			if(($newOnly && !$participant->isNew()) || $participant->isOwner())
 				continue;
@@ -352,9 +371,10 @@ class Scheduler {
 		}
 
 		$method = $vcalendar->method->getValue();
-		$event = self::eventByVEvent($vcalendar, $userId);
+		// A CANCEL for an event that's not in the user's calendar (anymore) must not pull in and cancel someone else's copy
+		$event = self::eventByVEvent($vcalendar, $userId, $method === 'REQUEST');
 
-		if($event->isNew() && $method !== 'REQUEST')
+		if(!$event || ($event->isNew() && $method !== 'REQUEST'))
 			return null;
 		switch($method){
 			case 'REQUEST': return self::processRequest($vcalendar,$event, $alreadyProcessed);
@@ -365,7 +385,7 @@ class Scheduler {
 		return null;
 	}
 
-	private static function eventByVEvent($vcalendar, $userId) {
+	private static function eventByVEvent($vcalendar, $userId, bool $addIfMissing = true) {
 		$vevent = $vcalendar->VEVENT[0];
 		$uid = (string)$vevent->uid;
 		$recurId = !empty($vevent->{'RECURRENCE-ID'}) ? $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s') : null;
@@ -386,6 +406,9 @@ class Scheduler {
 		}
 
 		go()->debug("NOT Found");
+		if(!$addIfMissing) {
+			return null;
+		}
 
 		// still not found. See if an event with the same UID exists in someone else its calendar and add it to ours
 		$eventCalendars = go()->getDbConnection()->select(['t.eventId, GROUP_CONCAT(calendarId) as calendarIds'])
@@ -453,6 +476,13 @@ class Scheduler {
 	}
 
 	private static function processCancel(VCalendar $vcalendar, CalendarEvent $existingEvent, bool &$alreadyProcessed) : CalendarEvent {
+
+		if($existingEvent->isOrigin) {
+			// This is the organizer's own event shared with a local participant that was removed. Cancelling it
+			// would cancel the event for everyone.
+			$alreadyProcessed = true;
+			return $existingEvent;
+		}
 
 		if ($existingEvent->isRecurring()) {
 			foreach($vcalendar->VEVENT as $vevent) {
