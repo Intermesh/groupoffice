@@ -1,3 +1,4 @@
+- Core: Update DE translations
 - Core: Optimized SSE Push with more apcu caching
 - Core: Debounce pushing more than once every 2seconds per entity
 - Core: Optimized startup request by closing session writing so they won't wait on eachother
