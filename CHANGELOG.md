@@ -5,6 +5,7 @@
 - ActiveSync: Optimized Z-push push connection with apcu caching
 - Calendar: On initial load wrong categories were displayed
 - Calendar: Calendar is clearable on category edit dialog now
+- Calendar: global category fix
 
 15-10-2026: 26.0.54
 - Core: update cleanup script
