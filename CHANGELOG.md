@@ -7,6 +7,7 @@
 - Calendar: Calendar is clearable on category edit dialog now
 - Calendar: global category fix
 - Calendar: Month, year and list view also merge events that appear in multiple calendars in the selection
+- Calendar: Fixed "Item not found" error when importing a recurring event via an e-mail
 
 15-10-2026: 26.0.54
 - Core: update cleanup script
