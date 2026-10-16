@@ -11,16 +11,32 @@ use Throwable;
 class InstanceCron extends CronJob {
 
 	/**
+	 * The request only spawns a background process on the instance, so it should return almost instantly.
+	 */
+	const CONNECT_TIMEOUT = 10;
+	const TIMEOUT = 30;
+
+	/**
+	 * Pause between instances in microseconds, so the background cron processes don't all start at once.
+	 */
+	const STAGGER_US = 200000;
+
+	/**
 	 * docker compose exec -u www-data groupoffice ./www/cli.php core/System/runCron --name=InstanceCron --module=multi_instance --package=community
 	 */
 	public function run(CronJobSchedule $schedule) {
 		//The server manager calls cron via HTTP because it doesn't know the document root when running
 		//multiple versions of GO.v It passes ?exec=1 to make it run on the command line.
 		$c = new Client();
-		$c->setOption(CURLOPT_CONNECTTIMEOUT, 360);
-		$c->setOption(CURLOPT_TIMEOUT, 360);
+		$c->setOption(CURLOPT_CONNECTTIMEOUT, self::CONNECT_TIMEOUT);
+		$c->setOption(CURLOPT_TIMEOUT, self::TIMEOUT);
 
-		foreach(Instance::find() as $instance) {
+		$instances = Instance::find()->all();
+
+		// Random order so the same instances aren't always last when something is slow
+		shuffle($instances);
+
+		foreach($instances as $instance) {
 			try {
 				if (!$instance->isInstalled()) {
 					go()->debug("NOT INSTALLED: " . $instance->hostname);
@@ -37,6 +53,8 @@ class InstanceCron extends CronJob {
 			} catch(Throwable $e)  {
 				ErrorHandler::log("Failed to run cron on instance " . $instance->hostname . ". Error: " . $e->getMessage() );
 			}
+
+			usleep(self::STAGGER_US);
 		}
 	}
 }
