@@ -54,7 +54,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	}
 
 	public function GetBackend($folderid) {
-		ZLog::Write(LOGLEVEL_DEBUG, "BackendGO->GetBackend($folderid)");
+//		ZLog::Write(LOGLEVEL_DEBUG, "BackendGO->GetBackend($folderid)");
 		$root = strtok($folderid, '/');
 		if (isset($this->backends[$root])){
 			return $this->backends[$root];
@@ -606,16 +606,137 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 
 		ZLog::Write(LOGLEVEL_DEBUG, "ChangesSink($timeout)");
 
+		if(!function_exists('apcu_enabled') || !apcu_enabled()) {
+			// No cheap change detection available: query the database for every folder, then sleep.
+			$notifications = $this->checkSinkFolders($this->sinkfolders);
+			if (empty($notifications)) {
+				ZLog::Write(LOGLEVEL_DEBUG, "Sleeping ".$timeout." seconds");
+				sleep($timeout);
+			}
+			return $notifications;
+		}
+
+		// With APCu the entity state counters tell us for free (no DB connection) if something changed. The
+		// database is only queried for the folders of an entity of which the counter moved. Mail has no counter and is
+		// polled every SINK_POLL_INTERVAL seconds. All folders are verified every SINK_FALLBACK_INTERVAL seconds
+		// because changes made by another process pool (CLI, cron) don't increment the counter in this one.
+		$deadline = time() + $timeout;
+		do {
+			$now = time();
+			$counters = [];
+			$checkedEntities = [];
+			$toCheck = [];
+
+			foreach ($this->sinkfolders as $folder) {
+				$b = $this->GetBackend($folder);
+				if (!$b) {
+					continue;
+				}
+
+				$entity = method_exists($b, 'getSinkEntityName') ? $b->getSinkEntityName() : null;
+				$last = $this->sinkLastCheck[$folder] ?? 0;
+				$age = $now - $last;
+
+				if ($entity === null) {
+					$due = $age >= self::SINK_POLL_INTERVAL;
+				} else {
+					if (!isset($counters[$entity])) {
+						$counters[$entity] = \go\core\model\PushDispatcher::getStateCounter($entity);
+					}
+					$changed = isset($this->sinkCounters[$entity]) && $this->sinkCounters[$entity] !== $counters[$entity];
+					// Debounce: bulk operations increment the counter many times per second.
+					$due = $last === 0
+						|| $age >= self::SINK_FALLBACK_INTERVAL
+						|| ($changed && $age >= self::SINK_MIN_RECHECK_INTERVAL);
+
+					if ($due) {
+						$checkedEntities[$entity] = $counters[$entity];
+					} elseif (!isset($this->sinkCounters[$entity])) {
+						$checkedEntities[$entity] = $counters[$entity];
+					}
+				}
+
+				if ($due) {
+					$toCheck[] = $folder;
+				}
+			}
+
+			// Applied after the loop so all folders of an entity see the same previous counter
+			foreach ($checkedEntities as $entity => $counter) {
+				$this->sinkCounters[$entity] = $counter;
+			}
+
+			if (!empty($toCheck)) {
+				foreach ($toCheck as $folder) {
+					$this->sinkLastCheck[$folder] = $now;
+				}
+
+				$notifications = $this->checkSinkFolders($toCheck);
+				if (!empty($notifications)) {
+					return $notifications;
+				}
+			}
+
+			$sleep = min(self::SINK_TICK, $deadline - time());
+			if ($sleep > 0) {
+				sleep($sleep);
+			}
+		} while (time() < $deadline);
+
+		return [];
+	}
+
+	/**
+	 * Seconds between two checks of the entity state counters
+	 */
+	const SINK_TICK = 2;
+
+	/**
+	 * Seconds between polls of folders that have no state counter (mail)
+	 */
+	const SINK_POLL_INTERVAL = 30;
+
+	/**
+	 * Minimum seconds between two database checks of a folder that are triggered by a state counter change
+	 */
+	const SINK_MIN_RECHECK_INTERVAL = 5;
+
+	/**
+	 * Maximum seconds before a folder is verified in the database even when its state counter didn't change
+	 */
+	const SINK_FALLBACK_INTERVAL = 90;
+
+	/**
+	 * Last seen state counter per entity name
+	 *
+	 * @var int[]
+	 */
+	protected $sinkCounters = [];
+
+	/**
+	 * Time of the last database check per folder
+	 *
+	 * @var int[]
+	 */
+	protected $sinkLastCheck = [];
+
+	/**
+	 * Compare the current state of the folders with the last known state
+	 *
+	 * @param string[] $folders
+	 * @return string[] The folders that changed
+	 */
+	private function checkSinkFolders(array $folders): array
+	{
 		$notifications = array();
-//		$stopat = time() + $timeout - 1;
-		foreach ($this->sinkfolders as $folder) {
+		foreach ($folders as $folder) {
 
 			$f = $this->GetBackendFolder($folder);
 			$b = $this->GetBackend($folder);
 			if(!$b) {
-                  ZLog::Write(LOGLEVEL_DEBUG, "Backend not found for $folder");
-                  continue;
-              }
+				ZLog::Write(LOGLEVEL_DEBUG, "Backend not found for $folder");
+				continue;
+			}
 			$newstate = $b->getNotification($f);
 
 			ZLog::Write(LOGLEVEL_DEBUG, $folder.': '.$newstate);
@@ -630,7 +751,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 			}
 		}
 
-		ZLog::Write(LOGLEVEL_DEBUG, "All sink folders checked");
+		ZLog::Write(LOGLEVEL_DEBUG, "Sink folders checked");
 
 		// don't use db connection constantly on push connection
 		ZLog::Write(LOGLEVEL_DEBUG, "Closing DB connection: " . go()->getDbConnection()->getId());
@@ -644,11 +765,6 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 
 		ZLog::Write(LOGLEVEL_DEBUG, "Memory: " . memory_get_usage());
 
-		if (empty($notifications)){
-
-			ZLog::Write(LOGLEVEL_DEBUG, "Sleeping ".$timeout." seconds");
-			sleep($timeout);
-		}
 		return $notifications;
 	}
 }

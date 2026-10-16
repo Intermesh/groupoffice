@@ -372,6 +372,10 @@ class TaskStore extends Store {
 	}
 
 
+	public function getSinkEntityName(): ?string {
+		return 'Task';
+	}
+
 	public function getNotification($folder = null) {
 
 		$stmt = Task::find()

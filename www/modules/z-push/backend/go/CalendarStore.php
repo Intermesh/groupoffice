@@ -253,6 +253,10 @@ class CalendarStore extends Store {
 		return !$event->save() ? false : $event->id;
 	}
 
+	public function getSinkEntityName(): ?string {
+		return 'CalendarEvent';
+	}
+
 	public function getNotification($folder=null) {
 
 		$newstate = CalendarEvent::find()
