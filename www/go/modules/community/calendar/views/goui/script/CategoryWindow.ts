@@ -52,7 +52,7 @@ export class CategoryWindow extends FormWindow {
 
 				checkbox({
 					hidden: !client.user.isAdmin,
-					name:'isGlobal',
+					name: 'isGlobal',
 					label: t('Global category')
 				})
 			)
