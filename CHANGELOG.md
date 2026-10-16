@@ -2,6 +2,7 @@
 - Core: Debounce pushing more than once every 2seconds per entity
 - ActiveSync: Optimized Z-push push connection with apcu caching
 - Calendar: On initial load wrong categories were displayed
+- Calendar: Calendar is clearable on category edit dialog now
 
 15-10-2026: 26.0.54
 - Core: update cleanup script

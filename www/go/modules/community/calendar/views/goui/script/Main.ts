@@ -164,19 +164,17 @@ export class Main extends Component {
 						selectallcheckboxfield({list: this.categoryList.list}),
 						comp({tagName: 'h4', text: t('Categories','core','core')}),
 						"->",
-						btn({
-							hidden: !rights.mayChangeCategories,
-							icon: 'add', menu: menu({},
-								btn({
-									text: t('Create category') + '…', handler: () => {
-										const dlg = new CategoryWindow();
-										dlg.show();
-										dlg.form.create({});
 
-									}
-								})
-							)
+						btn({
+							icon: "add",
+							hidden: !rights.mayChangeCategories,
+							title: t('Create category'), handler: () => {
+								const dlg = new CategoryWindow();
+								dlg.show();
+								dlg.form.create({});
+							}
 						})
+
 					),
 					this.categoryList,
 					filterpanel({
