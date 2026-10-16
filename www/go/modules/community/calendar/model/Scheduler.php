@@ -87,7 +87,8 @@ class Scheduler {
 		foreach($ics->vevent as $vevent) {
 			if(isset($vevent->attendee)) {
 				foreach($vevent->attendee as $a) {
-					if('mailto:'.strtolower($participant->email) !== (string) $a) {
+					// The same email can be used by an individual and a resource, so match on the type too
+					if('mailto:'.strtolower($participant->email) !== (string) $a || self::attendeeKind($a) !== $participant->kind) {
 						$vevent->remove($a);
 					}
 				}
@@ -524,34 +525,40 @@ class Scheduler {
 	private static function processReply(VCalendar $vcalendar, CalendarEvent $existingEvent, $sender, bool &$alreadyProcessed) : CalendarEvent {
 
 		foreach($vcalendar->VEVENT as $vevent) {
-			if(!isset($vevent->ATTENDEE['PARTSTAT'])) {
+			if(!isset($vevent->ATTENDEE)) {
 				continue;
 			}
-			$status = strtolower($vevent->ATTENDEE['PARTSTAT']->getValue());
-
 			$replyStamp = $vevent->DTSTAMP->getDateTime();
 
-			// MAKE PATCH
-			if(isset($vevent->{'RECURRENCE-ID'})) {// occurrence
-
-				Scheduler::fixRecurrenceId($existingEvent, $vevent);
-				$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
-
-				$alreadyProcessed = !self::updateRecurrenceStatus($existingEvent, $recurId, $sender->email, $status, $replyStamp);
-				if($alreadyProcessed) {
-					return $existingEvent;
+			foreach($vevent->ATTENDEE as $attendee) {
+				if(!isset($attendee['PARTSTAT'])) {
+					continue;
 				}
+				$status = strtolower($attendee['PARTSTAT']->getValue());
+				$kind = self::attendeeKind($attendee);
 
-			} else {
-				// APPLY EVENT
-				$p = $existingEvent->participantByScheduleId($sender->email);
-				if (!$p) continue; // no party crashers
-				if (empty($p->scheduleUpdated) || $p->scheduleUpdated < $replyStamp) {
-					$p->participationStatus = $status;
-					$p->scheduleUpdated = new DateTime($replyStamp->format("Y-m-d H:i:s"), $replyStamp->getTimezone());
+				// MAKE PATCH
+				if(isset($vevent->{'RECURRENCE-ID'})) {// occurrence
+
+					Scheduler::fixRecurrenceId($existingEvent, $vevent);
+					$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
+
+					$alreadyProcessed = !self::updateRecurrenceStatus($existingEvent, $recurId, $sender->email, $status, $replyStamp, $kind);
+					if($alreadyProcessed) {
+						return $existingEvent;
+					}
+
 				} else {
-					$alreadyProcessed = true;
-					return $existingEvent;
+					// APPLY EVENT
+					$p = $existingEvent->participantByScheduleId($sender->email, $kind);
+					if (!$p) continue; // no party crashers
+					if (empty($p->scheduleUpdated) || $p->scheduleUpdated < $replyStamp) {
+						$p->participationStatus = $status;
+						$p->scheduleUpdated = new DateTime($replyStamp->format("Y-m-d H:i:s"), $replyStamp->getTimezone());
+					} else {
+						$alreadyProcessed = true;
+						return $existingEvent;
+					}
 				}
 			}
 		}
@@ -562,6 +569,14 @@ class Scheduler {
 		return $existingEvent;
 	}
 
+
+	/**
+	 * The participant kind of an ATTENDEE property (CUTYPE)
+	 */
+	private static function attendeeKind($attendee): string {
+		$k = isset($attendee['CUTYPE']) ? strtolower((string) $attendee['CUTYPE']) : 'individual';
+		return $k == 'room' ? 'location' : $k;
+	}
 
 	public static function fixRecurrenceId(CalendarEvent $existingEvent, VEvent $vevent) {
 
@@ -610,7 +625,7 @@ class Scheduler {
 	 * @return bool True if a modification was made. False if already up to date.
 	 * @throws JsonPointerException
 	 */
-	public static function updateRecurrenceStatus(CalendarEvent $existingEvent, string $recurId, string $email, string $status, \DateTimeInterface $replyStamp): bool
+	public static function updateRecurrenceStatus(CalendarEvent $existingEvent, string $recurId, string $email, string $status, \DateTimeInterface $replyStamp, ?string $kind = null): bool
 	{
 
 		if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
@@ -625,7 +640,7 @@ class Scheduler {
 			$modifiedParticipants = $exEvent->participants;
 			$modified = false;
 			foreach ($modifiedParticipants as &$p) {
-				if ($p->email != $email) {
+				if ($p->email != $email || ($kind !== null && $p->kind !== $kind)) {
 					continue;
 				}
 				if (empty($p->scheduleUpdated) || $p->scheduleUpdated < $replyStamp) {

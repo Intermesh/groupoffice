@@ -991,7 +991,7 @@ class CalendarEvent extends AclItemEntity {
 	 * @param $email string the scheduleId
 	 * @return false|Participant
 	 */
-	public function participantByScheduleId(string $email): bool|Participant
+	public function participantByScheduleId(string $email, ?string $kind = null): bool|Participant
 	{
 		if(empty($this->participants))
 			return false;
@@ -999,7 +999,7 @@ class CalendarEvent extends AclItemEntity {
 		$email = strtolower($email);
 
 		foreach($this->participants as $participant) {
-			if(strtolower($participant->email) === $email) {
+			if(strtolower($participant->email) === $email && ($kind === null || $participant->kind === $kind)) {
 				return $participant;
 			}
 		}
