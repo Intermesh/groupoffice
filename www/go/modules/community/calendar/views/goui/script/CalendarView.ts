@@ -9,7 +9,7 @@ import {
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 import {client,Recurrence} from "@intermesh/groupoffice-core";
-import {t} from "./Index.js";
+import {calendarStore, t} from "./Index.js";
 
 export abstract class CalendarView<EventMap extends ComponentEventMap = ComponentEventMap> extends Component<EventMap> {
 
@@ -347,6 +347,34 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 			});
 	}
 
+	/**
+	 * Merge items of the same event (uid and start) that are present in multiple selected calendars into one item.
+	 * The calendars are collected in item.calendarIds so they can be shown with stackedCalendars()
+	 */
+	protected mergeDuplicates(allItems: Iterable<CalendarItem>) {
+		const items = [...allItems], seen: {[key:string]: CalendarItem} = {}, result: CalendarItem[] = [];
+		for(const item of items) {
+			item.calendarIds = {};
+			if(item.patched?.calendarId) item.calendarIds[item.patched.calendarId] = true;
+		}
+		for(const item of items) {
+			const uid = item.data?.uid;
+			if(!uid) {
+				result.push(item);
+				continue;
+			}
+			const key = uid + '|' + item.start.getTime() + '|' + item.end.getTime();
+			const first = seen[key];
+			if(first) {
+				Object.assign(first.calendarIds, item.calendarIds);
+			} else {
+				seen[key] = item;
+				result.push(item);
+			}
+		}
+		return result;
+	}
+
 	protected clear() {
 		this.viewModel.forEach(ev => {
 			Object.values(ev.divs).forEach(d => d.remove());
@@ -378,6 +406,47 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 
 	protected ROWHEIGHT = 2.6
 
+	/**
+	 * Colored stripes, one for each calendar the (merged) item is in, joined together as one pill.
+	 * Returns nothing when the item is in a single calendar and includeOwn is false.
+	 *
+	 * @param includeOwn also add a stripe for the calendar of the item itself
+	 */
+	protected calendarStripes(e: CalendarItem, includeOwn: boolean) {
+		const stripes: HTMLElement[] = [];
+		for(const key in e.calendarIds) {
+			const own = key === e.data.calendarId;
+			const color = own ? e.color : calendarStore.findById(key)?.color;
+			if(color) {
+				const stripe = E('i');
+				stripe.style.color = '#' + color;
+				own ? stripes.unshift(stripe) : stripes.push(stripe);
+			}
+		}
+		if(!includeOwn && stripes.length < 2) {
+			return [];
+		}
+		return [E('div', ...stripes).cls('stripes')];
+	}
+
+	protected stackedCalendars(e: CalendarItem) {
+		let backgroundImage = 'linear-gradient(to right, ',
+			padding = 0;
+
+		for(const key in e.calendarIds) {
+			if(key !== e.data.calendarId) {
+				const cal = calendarStore.findById(key);
+				if(cal) {
+					backgroundImage += '#'+cal.color+' '+(padding/10)+'rem '+((padding+=6)/10)+'rem, ';
+				}
+			}
+		}
+
+		padding += 6;
+		backgroundImage += 'currentColor '+((padding-6)/10)+'rem '+(padding/10)+'rem, transparent '+(padding/10)+'rem 100%)';
+		return [backgroundImage, ((padding+6)/10)+'rem'];
+	}
+
 	// for full day view
 	protected makestyle(e: CalendarItem, weekstart: DateTime, row?: number): Partial<CSSStyleDeclaration> {
 		const dayDiff = weekstart.diff(e.start),
@@ -390,17 +459,27 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 		const width = Math.min(21, dwidth) * (100 / this.slots.length),
 			left = pos * (100 / this.slots.length),
 			top = row * this.ROWHEIGHT;
-		return {
+		const style: Partial<CSSStyleDeclaration> = {
 			width: (width-.2).toFixed(2)+'%',
 			left : (left).toFixed(2)+'%',
 			top: top.toFixed(2)+'rem',
 			color: '#'+e.color
 		};
+		if(e.data.showWithoutTime && Object.keys(e.calendarIds).length > 1) {
+			[style.backgroundImage, style.paddingLeft] = this.stackedCalendars(e);
+		}
+		return style;
 	}
 
 	protected drawEventLine(e: CalendarItem, weekstart: DateTime, withIcons = true) {
 		if(!e.divs[weekstart.format('YW')]) {
-			e.divs[weekstart.format('YW')] = this.eventHtml(e, undefined, withIcons);
+			const div = this.eventHtml(e, undefined, withIcons);
+			if(!e.data.showWithoutTime) {
+				// replaces the ::before stripe of the event when it is in multiple calendars
+				const stripes = this.calendarStripes(e, false);
+				div.cls("merged", stripes.length > 0).prepend(...stripes);
+			}
+			e.divs[weekstart.format('YW')] = div;
 		}
 		return e.divs[weekstart.format('YW')]
 			.css(this.makestyle(e, weekstart))

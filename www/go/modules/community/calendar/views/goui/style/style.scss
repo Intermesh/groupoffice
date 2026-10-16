@@ -201,6 +201,25 @@
 }
 
 .cal {
+	.stripes {
+		display: inline-flex;
+		flex: none;
+		align-self: center;
+		height: dp(16);
+		margin: dp(5);
+		border-radius: 999px;
+		overflow: hidden;
+		> i {
+			flex: none;
+			display: block;
+			width: dp(4) !important;
+			min-width: dp(4) !important;
+			height: 100% !important;
+			min-height: 0 !important;
+			margin: 0 !important;
+			background-color: currentColor;
+		}
+	}
 	i.cat {
 		background-color: currentColor;
 		border-radius: dp(3);
@@ -407,6 +426,9 @@
 					&:not(.allday) {
 						padding-left: 0;
 						padding-right: 0;
+						&.merged::before {
+							display: none;
+						}
 						&::before {
 							content: '';
 							border-radius: 999px;

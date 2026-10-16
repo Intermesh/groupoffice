@@ -6,6 +6,7 @@
 - Calendar: On initial load wrong categories were displayed
 - Calendar: Calendar is clearable on category edit dialog now
 - Calendar: global category fix
+- Calendar: Month, year and list view also merge events that appear in multiple calendars in the selection
 
 15-10-2026: 26.0.54
 - Core: update cleanup script
