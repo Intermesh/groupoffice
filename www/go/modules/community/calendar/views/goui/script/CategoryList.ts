@@ -56,8 +56,7 @@ export class CategoryList extends Component<CategoryListEventMap> {
 				}),
 				column({
 					id: 'name',
-					resizable: false,
-					renderer: (_v, record) => String(record.name ?? '').htmlEncode()
+					resizable: false
 				}),
 				...(rights.mayChangeCategories ? [menucolumn({
 					menu: menu({
