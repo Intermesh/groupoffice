@@ -1,5 +1,6 @@
 - Core: Optimized SSE Push with more apcu caching
 - Core: Debounce pushing more than once every 2seconds per entity
+- ActiveSync: Optimized Z-push push connection with apcu caching
 
 15-10-2026: 26.0.54
 - Core: update cleanup script
