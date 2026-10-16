@@ -497,6 +497,7 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 	}
 
 	private onBeforeSubmit() {
+
 		if(this.confirmedScheduleMessage) {
 			return;
 		}
@@ -504,8 +505,10 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 			this.close();
 			return false;
 		}
-		if(this.item!.isRecurring) {
 
+		if(this.form.currentId && this.item!.isRecurring) {
+
+			// patching only works on existing events
 			this.item!.patch(this.parseSavedData(this.form.modified), () => {
 				this.close();
 			});
