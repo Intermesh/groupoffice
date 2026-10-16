@@ -1,5 +1,6 @@
 - Core: Optimized SSE Push with more apcu caching
 - Core: Debounce pushing more than once every 2seconds per entity
+- Core: Optimized startup request by closing session writing so they won't wait on eachother
 - ActiveSync: Optimized Z-push push connection with apcu caching
 - Calendar: On initial load wrong categories were displayed
 - Calendar: Calendar is clearable on category edit dialog now
