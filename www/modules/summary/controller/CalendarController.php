@@ -59,6 +59,8 @@ class CalendarController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 	 */
 	protected function actionPortletGrid($params) {
 
+		\GO::session()->closeWriting();
+
 //		$local_time = time();
 //		$year = date("Y", $local_time);
 //		$month = date("m", $local_time);

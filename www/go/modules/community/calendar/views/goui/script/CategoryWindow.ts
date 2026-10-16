@@ -25,18 +25,36 @@ export class CategoryWindow extends FormWindow {
 
 		this.generalTab.items.add(
 			comp({cls:'flow pad'},
-				textfield({name: 'name', label: t('Name'), required:true, flex:1}),
-				colorfield({name: 'color', label: t('Color'), width: 100}),
+				textfield({
+					name: 'name',
+					label: t('Name'),
+					required:true,
+					flex:1
+				}),
+
+				colorfield({
+					name: 'color',
+					label: t('Color'),
+					width: 100
+				}),
+
 				combobox({
-					label: t('Calendar'), name: 'calendarId',
+					label: t('Calendar'),
+					name: 'calendarId',
 					placeholder:t("All"),
+					clearable: true,
 					dataSource: jmapds("Calendar"),
 					displayProperty: 'name',
 					storeConfig: {
 						filters: {manageOnly: {permissionLevel: go.permissionLevels.manage}}
 					}
 				}),
-				checkbox({hidden: !client.user.isAdmin,name:'isGlobal', label: t('Global category')})
+
+				checkbox({
+					hidden: !client.user.isAdmin,
+					name:'isGlobal',
+					label: t('Global category')
+				})
 			)
 		);
 

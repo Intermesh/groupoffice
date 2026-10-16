@@ -217,7 +217,10 @@ class ContactStore extends Store implements ISearchProvider {
 		return $folders;
 	}
 
-	
+	public function getSinkEntityName(): ?string {
+		return 'Contact';
+	}
+
 	public function getNotification($folder = null) {
 
 		$stmt = Contact::find()

@@ -95,7 +95,8 @@ export class CategoryList extends Component<CategoryListEventMap> {
 						});
 						target.rowSelection!.replace(...records);
 					});
-					void target.store.load();
+					// Don't load here. The owner loads the store once the visible calendars are known. An early load
+					// without the calendar filter could finish after the filtered one and show all categories.
 				}
 			}
 		});

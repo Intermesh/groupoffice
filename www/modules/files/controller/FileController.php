@@ -597,6 +597,8 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	
 	
 	public function actionRecent($params){
+
+		\GO::session()->closeWriting();
 		
 		$start = !empty($params['start']) ? $params['start'] : 0;
 		$limit = !empty($params['limit']) ? $params['limit'] : 20;

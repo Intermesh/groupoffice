@@ -59,6 +59,7 @@ export class Main extends Component {
 
 	/** Set once the inCalendars filter is applied. Events are not loaded before, to avoid flashing all calendars. */
 	private calendarsApplied = false
+	private categoryLoad: Promise<void> = Promise.resolve()
 
 	/** The view that is currently shown. While set, the calendar list is disabled */
 	private activeView?: any
@@ -163,19 +164,17 @@ export class Main extends Component {
 						selectallcheckboxfield({list: this.categoryList.list}),
 						comp({tagName: 'h4', text: t('Categories','core','core')}),
 						"->",
-						btn({
-							hidden: !rights.mayChangeCategories,
-							icon: 'add', menu: menu({},
-								btn({
-									text: t('Create category') + '…', handler: () => {
-										const dlg = new CategoryWindow();
-										dlg.show();
-										dlg.form.create({});
 
-									}
-								})
-							)
+						btn({
+							icon: "add",
+							hidden: !rights.mayChangeCategories,
+							title: t('Create category'), handler: () => {
+								const dlg = new CategoryWindow();
+								dlg.show();
+								dlg.form.create({});
+							}
 						})
+
 					),
 					this.categoryList,
 					filterpanel({
@@ -383,7 +382,8 @@ export class Main extends Component {
 		// isVisible is saved to the server with a delay, so pass the visible calendars explicitly
 		// instead of letting the server use the stored (stale) isVisible values.
 		categoryStore.setFilter('inCalendars', {operator: "OR", conditions: [{inCalendars: ids}, {mine: true}]});
-		void categoryStore.load();
+		// Never run two loads at once. A slow, older response could otherwise replace the newer filtered one.
+		this.categoryLoad = this.categoryLoad.catch(() => {}).then(() => categoryStore.load()).then(() => {});
 	}
 
 	private enterView(view: any) {

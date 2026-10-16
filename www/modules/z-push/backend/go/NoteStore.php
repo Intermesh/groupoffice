@@ -261,6 +261,10 @@ class NoteStore extends Store {
 		return $folders;
 	}
 	
+	public function getSinkEntityName(): ?string {
+		return 'Note';
+	}
+
 	public function getNotification($folder=null) {
 		ZLog::Write(LOGLEVEL_DEBUG,'goNote->getNotification('.$folder.')');
 		$stmt = Note::find()
