@@ -260,5 +260,6 @@ return array (
   'Show multiline event blocks' => 'Mehrzeilige Terminblöcke anzeigen',
   'Paste \'{title}\' at {date}' => '{title}\' einfügen um {date}',
   'Paste at original time ({time})' => 'Mit der Originalzeit ({time}) einfügen',
-  'Paste at original time' => 'Paste at original time',
+  'Paste at original time' => 'Mit der Originalzeit einfügen',
+  'Close views' => 'Ansichten schließen',
 );

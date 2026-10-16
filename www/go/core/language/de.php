@@ -258,7 +258,7 @@ Password: {password}' => 'Ein {product_name} Konto wurde für Sie auf {url} erst
   'The file you tried to upload was larger then the maximum allowed size of %s.' => 'Die Datei, die Sie hochladen möchten, ist größer als das Limit von %s.',
   'Select at least one item' => 'Wählen Sie mindestens einen Eintrag aus!',
   'You didn\'t select anything' => 'Nichts ausgewählt!',
-  'Label' => 'Etiketten',
+  'Label' => 'Bezeichnung',
   'Couldn\'t save %s:' => 'Konnte %s nicht speichern:',
   'Attach files' => 'Dateien anhängen',
   'Please let the {product_name} administrator that the window you just attempted to use contains a grid that expected the following paramaters, but did not receive them' => 'Bitte benachrichtigen Sie den {product_name} Administrator, dass das Fenster, das Sie verwenden wollten, ein Raster verwendet, welches den folgenden Parameter benötigt, jedoch nicht erhalten hat',
@@ -1438,7 +1438,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'loading...' => 'Laden…',
   'Use $config' => 
   array (
-    '\'debug\'' => 'Verwenden Sie $config[\'debug\']=true; nur für die Entwicklung und um Problemlösungen zu finden, da das System stark verlangsamt wird.',
+    '\'debug\'' => 'Use $config[\'debug\']=true; only with development and problem solving. It slows " + t(\'product_name',
   ),
   'Is organization' => 'Ist eine Organisation',
   'Registration number' => 'Register-Nummer',
