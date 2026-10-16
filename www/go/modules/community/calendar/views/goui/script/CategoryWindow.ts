@@ -3,6 +3,7 @@ import {checkbox, colorfield, combobox, comp, hiddenfield, textfield} from "@int
 import {t} from "./Index.js";
 
 export class CategoryWindow extends FormWindow {
+	private calendarIdFld;
 
 	constructor() {
 		super('CalendarCategory');
@@ -15,7 +16,10 @@ export class CategoryWindow extends FormWindow {
 		});
 
 		this.form.on('beforesave', ( {data}) => {
-			data.ownerId = data.isGlobal ? null : client.user.id;
+			if(data.isGlobal) {
+				data.ownerId = null;
+				data.calendarId = null;
+			}
 			delete data.isGlobal;
 			return data;
 		});
@@ -38,7 +42,7 @@ export class CategoryWindow extends FormWindow {
 					width: 100
 				}),
 
-				combobox({
+				this.calendarIdFld = combobox({
 					label: t('Calendar'),
 					name: 'calendarId',
 					placeholder:t("All"),
@@ -53,7 +57,12 @@ export class CategoryWindow extends FormWindow {
 				checkbox({
 					hidden: !client.user.isAdmin,
 					name: 'isGlobal',
-					label: t('Global category')
+					label: t('Global category'),
+					listeners: {
+						setvalue: ({newValue}) => {
+							this.calendarIdFld.disabled = newValue;
+						}
+					}
 				})
 			)
 		);
