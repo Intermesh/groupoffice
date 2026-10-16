@@ -108,7 +108,58 @@ function test_system() :array
 	$test['feedback']="It's recommended to install the PHP apcu extension for Group-Office to improve performance.";
 	$test['fatal']=false;
 	$tests[]=$test;
-	
+
+	if(extension_loaded('apcu')) {
+		// apc.enabled is off for the CLI by default (apc.enable_cli), so only judge it when it makes sense.
+		if(PHP_SAPI !== 'cli' || ini_is_enabled('apc.enable_cli')) {
+			$test['name'] = 'PHP apcu enabled';
+			$test['showSuccessFeedback'] = false;
+			$test['pass'] = function_exists('apcu_enabled') && apcu_enabled();
+			$test['feedback'] = "APCu is installed but not enabled (apc.enabled). Enable it to improve performance.";
+			$test['fatal'] = false;
+			$tests[] = $test;
+		}
+
+		$minShm = 64 * 1024 * 1024;
+		$shmIni = trim((string) ini_get('apc.shm_size'));
+		// A bare number is interpreted as megabytes by APCu
+		$shmSize = is_numeric($shmIni) ? (int) $shmIni * 1024 * 1024 : ini_return_bytes($shmIni);
+		$test['name'] = 'PHP apcu shared memory size';
+		$test['showSuccessFeedback'] = false;
+		$test['pass'] = $shmSize >= $minShm;
+		$test['feedback'] = "Warning: apc.shm_size is " . ini_get('apc.shm_size') . ". We recommend at least 64M, and more when running many instances on one server. When the cache is full, APCu evicts entries and performance drops.";
+		$test['fatal'] = false;
+		$tests[] = $test;
+
+		// Only meaningful when APCu is active in this SAPI.
+		if(function_exists('apcu_enabled') && apcu_enabled() && function_exists('apcu_sma_info')) {
+			$sma = apcu_sma_info(true);
+			$total = $sma['num_seg'] * $sma['seg_size'];
+			if($total > 0) {
+				$freePct = round($sma['avail_mem'] / $total * 100);
+				$test['name'] = 'PHP apcu free memory';
+				$test['showSuccessFeedback'] = false;
+				$test['pass'] = $freePct >= 10;
+				$test['feedback'] = "Warning: only " . $freePct . "% of the APCu shared memory (" . format_size($total) . ") is free. Increase apc.shm_size.";
+				$test['fatal'] = false;
+				$tests[] = $test;
+			}
+		}
+
+		// An expunge means the cache was full and got wiped. Free memory can look fine right afterwards.
+		if(function_exists('apcu_enabled') && apcu_enabled() && function_exists('apcu_cache_info')) {
+			$info = apcu_cache_info(true);
+			if(isset($info['expunges'])) {
+				$test['name'] = 'PHP apcu expunges';
+				$test['showSuccessFeedback'] = false;
+				$test['pass'] = (int) $info['expunges'] === 0;
+				$test['feedback'] = "Warning: the APCu cache was full and has been expunged " . (int) $info['expunges'] . " time(s) since the last restart. Increase apc.shm_size.";
+				$test['fatal'] = false;
+				$tests[] = $test;
+			}
+		}
+	}
+
 	$test['name']='Operating System';
 	$test['showSuccessFeedback'] = false;
 	$test['pass']=strtolower(PHP_OS) === 'linux';
