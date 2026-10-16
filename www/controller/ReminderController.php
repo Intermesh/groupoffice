@@ -31,6 +31,7 @@ class ReminderController extends \GO\Base\Controller\AbstractController {
 	}
 	
 	protected function actionStore($params){
+		\GO::session()->closeWriting();
 		$params = \GO\Base\Db\FindParams::newInstance()
 						->order('vtime', 'DESC')
 						->select('t.*')
