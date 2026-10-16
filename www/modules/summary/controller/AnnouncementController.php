@@ -51,7 +51,9 @@ class AnnouncementController extends \GO\Base\Controller\AbstractModelController
 	}
 	
 	protected function actionCheckLatestRead($params) {
-		
+
+		\GO::session()->closeWriting();
+
 		$response = array(
 			'has_unread' => \GO\Summary\Model\LatestReadAnnouncementRecord::userHasUnreadAnnouncement(\GO::user()->id),
 			'success' => true
