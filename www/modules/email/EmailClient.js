@@ -1083,6 +1083,7 @@ GO.mainLayout.onReady(function(){
 				category:'message',variant:'info'
 			});
 		}
+	});
 
 });
 
