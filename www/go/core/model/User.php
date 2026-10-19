@@ -114,7 +114,11 @@ class User extends AclItemEntity {
 	 */
 	const EVENT_ARCHIVE = 'archive';
 
-	const USERNAME_REGEX = '/[A-Za-z0-9_\-\.@]+/';
+	/**
+	 * The whole username must match. Without the anchors one valid character was enough to accept a name.
+	 * The D modifier makes "$" mean the end of the string, not also before a final new line.
+	 */
+	const USERNAME_REGEX = '/^[A-Za-z0-9_\-\.@]+$/D';
 	
 	private bool $validatePassword = true;
 
