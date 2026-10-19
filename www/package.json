@@ -17,9 +17,9 @@
     "pdfjs-dist": "latest"
   },
   "allowScripts": {
-    "esbuild@0.28.0": true,
-    "@parcel/watcher@2.5.6": true,
-    "fsevents@2.3.3": true,
+    "esbuild@*": true,
+    "@parcel/watcher@*": true,
+    "fsevents@*": true,
     "file:../../../links/goui": true,
     "file:../../../goui": true,
     "file:../../../links/groupoffice-core": true

@@ -3,12 +3,6 @@
   "compilerOptions": {
     "baseUrl": ".",
     "outDir": "./dist",
-    //needed to be inside dist because it must be cleaned up before building
-    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo"
-  },
-  "references": [
-
-    { "path": "../../../comments/views/goui"},
-    { "path": "../../../history/views/goui"}
-  ]
+    "noEmit": true
+  }
 }
