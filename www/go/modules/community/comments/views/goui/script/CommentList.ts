@@ -37,12 +37,13 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 		this.store = datasourcestore({
 			dataSource: commentDS,
 			sort: [{property: "date", isAscending: true}],
-
-			queryParams: {
-				limit: 0,
-				filter: {
+			filters: {
+				permissions: {
 					permissionLevel: AclLevel.READ
 				}
+			},
+			queryParams: {
+				limit: 0
 			},
 			relations: {
 				creator: {
