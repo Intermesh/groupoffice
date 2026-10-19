@@ -9,6 +9,9 @@ use go\core\jmap\Response;
 use go\core\util\ArrayObject;
 use PHPMailer\PHPMailer\Exception;
 
+/**
+ * @extends EntityController<\go\core\model\SmtpAccount>
+ */
 class SmtpAccount extends EntityController
 {
 

@@ -32,6 +32,9 @@ use PDO;
 use PDOException;
 use ReflectionException;
 
+/**
+ * @template T of Entity
+ */
 abstract class EntityController extends Controller {
 
 	use EventEmitterTrait;
@@ -66,7 +69,7 @@ abstract class EntityController extends Controller {
 	/**
 	 * The class name of the entity this controller is for.
 	 * 
-	 * @return class-string<Entity>
+	 * @return class-string<T>
 	 */
 	abstract protected function entityClass(): string;
 
@@ -383,7 +386,7 @@ abstract class EntityController extends Controller {
    *
    * @param string $id
    * @param array $properties
-   * @return boolean|Entity
+   * @return T|false
    * @throws Exception
    */
 	protected function getEntity(string $id, array $properties = []) {

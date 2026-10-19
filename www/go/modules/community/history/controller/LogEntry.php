@@ -8,6 +8,9 @@ use go\core\orm\Query;
 use go\core\util\ArrayObject;
 use go\modules\community\history\model;
 
+/**
+ * @extends EntityController<\go\modules\community\history\model\LogEntry>
+ */
 class LogEntry extends jmap\EntityController
 {
 	protected function entityClass(): string

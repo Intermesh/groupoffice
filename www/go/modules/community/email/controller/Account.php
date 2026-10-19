@@ -9,6 +9,9 @@ use go\core\util\ArrayObject;
 use go\modules\community\email\model;
 
 
+/**
+ * @extends EntityController<\go\modules\community\email\model\Account>
+ */
 class Account extends EntityController
 {
 

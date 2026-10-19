@@ -10,6 +10,9 @@ use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\StateMismatch;
 use go\core\model;
 
+/**
+ * @extends EntityController<\go\core\model\EmailTemplate>
+ */
 class EmailTemplate extends EntityController {
 
 	protected function entityClass(): string

@@ -6,6 +6,9 @@ use go\core\jmap\EntityController;
 use go\core\model;
 
 
+/**
+ * @extends EntityController<\go\core\model\Alert>
+ */
 class Alert extends EntityController {
 	
 	/**

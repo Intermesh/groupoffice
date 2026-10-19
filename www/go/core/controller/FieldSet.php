@@ -11,6 +11,9 @@ use go\core\model;
 use go\core\orm\Query;
 use go\core\util\ArrayObject;
 
+/**
+ * @extends EntityController<\go\core\model\FieldSet>
+ */
 class FieldSet extends EntityController {
 
 	protected function canUpdate(Entity $entity): bool

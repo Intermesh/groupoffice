@@ -6,6 +6,9 @@ use go\core\jmap\EntityController;
 use go\core\model;
 
 
+/**
+ * @extends EntityController<\go\core\model\CronJobSchedule>
+ */
 class CronJobSchedule extends EntityController {
 	
 	/**
