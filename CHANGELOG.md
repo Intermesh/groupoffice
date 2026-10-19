@@ -1,6 +1,6 @@
 - Core: Update DE translations
 - Core: Optimized SSE Push with more apcu caching
-- Core: Debounce pushing more than once every 2seconds per entity
+- Core: Debounce pushing more than once every 2 seconds per entity
 - Core: Optimized startup request by closing session writing so they won't wait on eachother
 - ActiveSync: Optimized Z-push push connection with apcu caching
 - Calendar: On initial load wrong categories were displayed
@@ -8,7 +8,7 @@
 - Calendar: global category fix
 - Calendar: Month, year and list view also merge events that appear in multiple calendars in the selection
 - Calendar: Fixed "Item not found" error when importing a recurring event via an e-mail
-- Projects3: Fixed severak translation issues
+- Projects3: Fixed several translation issues
 - Calendar: Send cancellation to removed participants (resource and individual), also remove events from local calendars immediately
 - Core: New "background" parameter to export in the background. This way CLI exports can still work like before.
 - DAVaccounts: ownerId field because the accounts are personal and not system wide.
