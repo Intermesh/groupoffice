@@ -485,6 +485,7 @@ go.util =  (function () {
 
 			let params = {
 				extension: extension,
+				background: true,
 				"#ids": {
 					resultOf: promise.callId,
 					path: "/ids"

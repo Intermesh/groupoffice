@@ -1177,11 +1177,19 @@ abstract class EntityController extends Controller {
 		
 		$convertor = $cls::findConverter($params['extension']);
 
-		PostResponseProcessor::get()->addTask(function() use ($convertor, $params) {
-			$convertor->exportToBlob($params['ids'], $params->getArray());
-		});
+		$response = new ArrayObject(['success' => true]);
+
+		if(!empty($params['background'])) {
+			PostResponseProcessor::get()->addTask(function () use ($convertor, $params) {
+				$convertor->exportToBlob($params['ids'], $params->getArray());
+			});
+		} else {
+			$blob = $convertor->exportToBlob($params['ids'], $params->getArray(), false);
+
+			$response['blob'] = $blob->toArray();
+		}
 		
-		return new ArrayObject(['success' => true]);
+		return $response;
 	}
 
   /**
