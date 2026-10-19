@@ -3,7 +3,7 @@ go.modules.community.oauth2client.ClientGrid = Ext.extend(go.grid.GridPanel, {
 		let actions = this.initRowActions();
 
 		this.store = new go.data.Store({
-			fields: ['name','id', 'clientId', 'clientSecret', 'projectId', 'defaultClientId'],
+			fields: ['name','id', 'clientId', 'projectId', 'defaultClientId'],
 			sort: [{property: "name"}],
 			entityStore: "Oauth2Client"
 		});
@@ -34,10 +34,6 @@ go.modules.community.oauth2client.ClientGrid = Ext.extend(go.grid.GridPanel, {
 				header: t('Client ID'),
 				dataIndex: 'clientId',
 				id: 'clientId'
-			},{
-				header: t('Client Secret'),
-				dataIndex: 'clientSecret',
-				id: 'clientSecret'
 			},{
 				header: t('Project ID'),
 				dataIndex: 'projectId',

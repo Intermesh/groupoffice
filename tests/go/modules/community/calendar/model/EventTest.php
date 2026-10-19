@@ -3,6 +3,7 @@
 namespace go\modules\community\calendar\model;
 
 use go\core\auth\TemporaryState;
+use go\core\model\User;
 use go\core\util\DateTime;
 use PHPUnit\Framework\TestCase;
 
@@ -44,29 +45,47 @@ class EventTest extends TestCase {
 		$this->assertEquals("13:00", $event->end()->format("H:i"));
 
 
-		go()->setAuthState(new TemporaryState(2));
+		// Another user. Don't assume a user with a certain ID exists: it depends on which tests ran before this one.
+		$otherUser = $this->createUser();
+
+		try {
+			go()->setAuthState(new TemporaryState($otherUser->id));
+
+			// find for another user
+			$e2 = CalendarEvent::findFor($otherUser->id)->where(['id' => $event->id])->single();
+			$this->assertEquals(null, 	$e2->freeBusyStatus);
+
+			$this->assertEquals("1", 	$e2->modifiedBy);
+
+			// this should not update modifiedBy
+			$e2->icsBlob();
+
+			$this->assertEquals("1", 	$e2->modifiedBy);
 
 
-		// find for another user
-		$e2 = CalendarEvent::findFor(2)->where(['id' => $event->id])->single();
-		$this->assertEquals(null, 	$e2->freeBusyStatus);
+			$e2->title = "Test 2";
+			$e2->save();
 
-		$this->assertEquals("1", 	$e2->modifiedBy);
-
-		// this should not update modifiedBy
-		$e2->icsBlob();
-
-		$this->assertEquals("1", 	$e2->modifiedBy);
-
-
-		$e2->title = "Test 2";
-		$e2->save();
-
-		$this->assertEquals("2", 	$e2->modifiedBy);
-
-
-		go()->setAuthState(new TemporaryState(1));
-
+			$this->assertEquals((string) $otherUser->id, 	$e2->modifiedBy);
+		} finally {
+			go()->setAuthState(new TemporaryState(1));
+			User::delete(['id' => $otherUser->id]);
+		}
   }
+
+	private function createUser(): User
+	{
+		$name = uniqid('caltest');
+		$user = new User();
+		$user->setValues([
+			'username' => $name,
+			'displayName' => $name,
+			'email' => $name . '@example.com',
+			'password' => 'Pa55word!!xyz'
+		]);
+		$this->assertTrue($user->save(), var_export($user->getValidationErrors(), true));
+
+		return $user;
+	}
 
 }

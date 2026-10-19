@@ -40,7 +40,9 @@ go.modules.community.oauth2client.ClientDialog = Ext.extend(go.form.Dialog, {
 					name: 'clientSecret',
 					fieldLabel: t("Client Secret"),
 					anchor: '100%',
-					allowBlank: false
+					// The secret is never sent to the browser. When editing, leaving it empty keeps the current secret.
+					// The server requires it when creating a new connection.
+					allowBlank: true
 				},
 				this.projectIdFld = new Ext.form.TextField({
 					xtype: 'textfield',

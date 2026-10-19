@@ -6,20 +6,50 @@ use go\core\exception\NotFound;
 use go\core\http\Exception;
 use go\core\jmap\Entity;
 use go\core\orm\Mapping;
+use go\core\validate\ErrorCode;
 use go\modules\community\email\model\Account;
 use go\modules\community\oauth2client\provider\Azure;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Google;
-use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
 
 final class Oauth2Client extends Entity
 {
 	public ?string $id;
 	public string $name;
 	public ?string $defaultClientId;
-	public string $clientSecret;
+	protected string $clientSecret;
 	public string $clientId;
 	public ?string $projectId;
+
+	/**
+	 * The secret is write only. It's never sent to a client because everybody who can read this entity (the controller
+	 * is accessible without logging in for the login page) could use it to impersonate the application.
+	 */
+	public function getClientSecret(): ?string
+	{
+		return null;
+	}
+
+	/**
+	 * As the secret is never returned, a client can't send it back unchanged. So an empty value keeps the current secret.
+	 */
+	public function setClientSecret(string $secret): void
+	{
+		if ($secret === '' && !$this->isNew()) {
+			return;
+		}
+
+		$this->clientSecret = $secret;
+	}
+
+	protected function internalValidate()
+	{
+		if ($this->isNew() && empty($this->clientSecret)) {
+			$this->setValidationError('clientSecret', ErrorCode::REQUIRED);
+		}
+
+		parent::internalValidate();
+	}
 
 
 	/**
