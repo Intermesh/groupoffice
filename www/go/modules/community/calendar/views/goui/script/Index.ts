@@ -72,7 +72,13 @@ export interface Calendar extends BaseEntity {
 export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list' | 'custom';
 export const calendarStore = datasourcestore({
 	dataSource: jmapds<Calendar>('Calendar'),
-	queryParams:{filter:{isSubscribed: true, davaccountId : null}},
+
+	filters: {
+		default: {
+			isSubscribed: true,
+			davaccountId : null
+		}
+	},
 	sort: [{property:'groupId'},{property:'sortOrder'},{property:'name'}],
 	relations: {
 		owner: {
@@ -88,7 +94,13 @@ export const calendarStore = datasourcestore({
 
 export const writeableCalendarStore = datasourcestore({
 	dataSource:jmapds<Calendar>('Calendar'),
-	queryParams:{filter:{isSubscribed: true, davaccountId : null, permissionLevel:30/*writeOwn*/}},
+	filters: {
+		default: {
+			isSubscribed: true,
+			davaccountId : null,
+			permissionLevel:30/*writeOwn*/
+		}
+	},
 	sort: [{property:'sortOrder'},{property:'name'}],
 	relations: {
 		owner: {
