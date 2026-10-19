@@ -25,6 +25,7 @@
 - Core: Requests for a password recovery message are throttled per e-mail address and per IP address, so the lost password form can't be used to flood a mailbox.
 - Dev: The debugger (Debugger/get) is only available to users who are logged in.
 - Core: The OAuth2 / OpenID Connect server uses a random encryption key for each installation instead of a fixed key in the source, authorization codes can only be used once, and refresh tokens are stored, replaced every time they are used and revoked when the user is disabled or changes the password. Applications that use GroupOffice as login provider have to log in again after this update because tokens that were issued before it are no longer valid.
+- Core: removed debugger output for anonymous users
 
 15-10-2026: 26.0.54
 - Core: update cleanup script
