@@ -217,14 +217,26 @@ class Authenticate
 			return [];
 		}
 		$ip = Request::get()->getRemoteIpAddress();
-		return [
+		$keys = [
 			'login-throttle-' . $scope . '-u-' . md5(strtolower($username) . '|' . $ip) => self::THROTTLE_MAX_USER_FAILURES,
 			'login-throttle-' . $scope . '-ip-' . md5($ip) => self::THROTTLE_MAX_IP_FAILURES
 		];
+
+		if($scope === 'recovery') {
+			// A recovery request sends a message to the address. That must be limited for all IP addresses together,
+			// otherwise somebody can flood a mailbox by using many addresses.
+			$keys['login-throttle-recovery-e-' . md5(strtolower($username))] = self::THROTTLE_MAX_USER_FAILURES;
+		}
+
+		return $keys;
 	}
 
 	/**
 	 * Throws when too many failed logins occurred recently for this username/IP.
+	 *
+	 * Also used with scope "recovery" for requests to send a password recovery message. Then $username is the e-mail
+	 * address and every request is counted with {@see registerFailure()}.
+	 *
 	 * @throws Forbidden
 	 */
 	public function checkThrottle(string $username, string $scope = 'password'): void
@@ -232,7 +244,9 @@ class Authenticate
 		foreach($this->throttleKeys($username, $scope) as $key => $max) {
 			$state = go()->getCache()->get($key);
 			if($state && $state['lockedUntil'] > time()) {
-				throw new Forbidden(go()->t("Too many failed login attempts. Please try again later."));
+				throw new Forbidden($scope === 'recovery' ?
+					go()->t("Too many password recovery requests. Please try again later.") :
+					go()->t("Too many failed login attempts. Please try again later."));
 			}
 		}
 	}

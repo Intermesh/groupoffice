@@ -47,7 +47,10 @@ go.Jmap = {
 			method: 'community/dev/Debugger/get',
 			params: {},
 			callback: function(options, success, response, clientCallId) {
-				this.processDebugResponse(response, clientCallId);
+				// Not available when not logged in. The server only returns debug entries to logged in users.
+				if(success) {
+					this.processDebugResponse(response, clientCallId);
+				}
 			},
 			scope: this
 		}).catch(function() {

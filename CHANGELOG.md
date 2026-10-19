@@ -22,6 +22,8 @@
 - Core: Set secure flag on remember me cookie
 - Core: Remember me, refreshing a token and OpenID Connect / OAuth2 logins now also apply the rules of a password login: disabled users, IP address restrictions of groups and maintenance mode.
 - Core: The client secret of OAuth2 connections is no longer sent to the browser. Leave it empty when editing a connection to keep the current secret.
+- Core: Requests for a password recovery message are throttled per e-mail address and per IP address, so the lost password form can't be used to flood a mailbox.
+- Dev: The debugger (Debugger/get) is only available to users who are logged in.
 
 15-10-2026: 26.0.54
 - Core: update cleanup script
