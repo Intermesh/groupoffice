@@ -16,6 +16,7 @@ export class SystemSettings extends Component {
 
 		const store = datasourcestore({
 			dataSource: jmapds('DavAccount'),
+			filters: {owner: {ownerId: client.user.id}}
 		});
 
 		this.items.add(comp({cls:'fit'},

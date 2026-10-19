@@ -4,6 +4,8 @@ namespace go\modules\community\davclient\model;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\model\Module;
 use go\core\orm\exception\SaveException;
+use go\core\db\Criteria;
+use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\util\Crypt;
@@ -31,6 +33,11 @@ class DavAccount extends AclOwnerEntity {
 	const Card = 'card';
 
 	public ?string $id;
+
+	/**
+	 * The user this account belongs to. Accounts are personal. Synchronised calendars get the same owner.
+	 */
+	public ?int $ownerId = null;
 	public $active;
 	public $host;
 	public $username;
@@ -65,8 +72,26 @@ class DavAccount extends AclOwnerEntity {
 			->addMap('collections', Calendar::class, ['id' => 'davaccountId']);
 	}
 
+	protected static function defineFilters(): Filters
+	{
+		return parent::defineFilters()
+			->add('ownerId', function(Criteria $criteria, $value, Query $query) {
+				$criteria->where('ownerId', '=', $value);
+			});
+	}
+
+	protected function getDefaultCreatedBy(): ?int
+	{
+		// the ACL of a personal account is owned by the owner
+		return $this->ownerId ?? parent::getDefaultCreatedBy();
+	}
+
 	protected function internalSave(): bool
 	{
+		if(empty($this->ownerId)) {
+			$this->ownerId = parent::getDefaultCreatedBy();
+		}
+
 		if(!$this->active || $this->isModified(['active', 'password', 'host', 'username'])) {
 			// when account is new or reactivated. Trigger discovery and resync homeset.
 			if(!$this->isModified('lastSync')) {
@@ -372,7 +397,7 @@ class DavAccount extends AclOwnerEntity {
 			$model->color = !empty($color) ? $color : \go\modules\community\calendar\model\Calendar::randomColor($model->name);
 			$model->timeZone = $tz;
 			$model->syncToDevice = false;
-			$model->setOwnerId(go()->getAuthState()->getUserId());
+			$model->setOwnerId($this->ownerId);
 
 			if ($model->save()) {
 				$cal = new Calendar($this);
