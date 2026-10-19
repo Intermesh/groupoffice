@@ -30,11 +30,15 @@ class File extends FileSystemObject {
 	/**
 	 * Get a temporary file
 	 * 
-	 * @param string $extension
+	 * @param string $extension May be user input (eg. an uploaded filename). Path separators are stripped so the
+	 *  file can never be created outside the tmp folder.
 	 * @return static
 	 */
 	public static function tempFile(string $extension): File
 	{
+		 if($extension !== '') {
+			 $extension = static::stripInvalidChars($extension);
+		 }
 		 return go()->getTmpFolder()->getFile(uniqid(time()) . '.' . $extension);
 	}
 
