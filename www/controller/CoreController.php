@@ -902,63 +902,6 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		
 		echo $response;
 	}
-	
-	/**
-	 * Send an email
-	 * 
-	 * @param string $email
-	 * @param string $subject
-	 * @param string $body
-	 * @param array $attachments Array like this: (The given className needs to implement the GO\Base\Mail\AttachableInterface)
-	 *	array(
-	 *		array(
-	 *			'className'=>'GO\Files\Model\File',
-	 *			'pk'=>3',
-	 *			'altName'=>'New attachment name'
-	 *		),
-	 *		array(
-	 *			'className'=>'GO\Files\Model\File',
-	 *			'pk'=>4',
-	 *			'altName'=>'New attachment name2'
-	 *		)
-	 *	)
-	 */
-	public function actionSendSystemEmail($email, $subject, $body, $attachments=array()){
-		
-		$response = array('success'=>false);
-		
-		//Build system email and mail with the given files
-		$systemMessage = new GO\Base\Mail\SystemMessage($subject,$body);
-		
-		foreach($attachments as $attachmentSpec) {
-			
-			if(!empty($attachmentSpec['className']) &&  !empty($attachmentSpec['pk'])){
-				
-				$className = $attachmentSpec['className'];
-				$record = $className::model()->findByPk($attachmentSpec['pk']);
-				
-				if($record){
-					
-					$altName = null;
-					if(!empty($attachmentSpec['altName'])){
-						$altName = $attachmentSpec['altName'];
-					}
 
-					$attachment = $record->getAttachment($altName);
-					
-					if($attachment !== false){
-						$systemMessage->attach($attachment);
-					}
-				}
-			}			
-		}
-
-		$systemMessage->send();
-
-		$response['success'] = true;
-
-		echo new \GO\Base\Data\JsonResponse($response);
-	}
-	
 	
 }
