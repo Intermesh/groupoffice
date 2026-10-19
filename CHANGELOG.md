@@ -19,6 +19,7 @@
 - Core: The client IP address is read from $_SERVER['REMOTE_ADDR']. The X-Forwarded-For header is only used for the proxies in the new "trustedProxies" config option, so it can't be faked to get around login throttling and IP restrictions. When using a reverse proxy, set $config['trustedProxies'] or the real IP in your web server. See the "HTTP Proxy" page in the manual.
 - Core: Registration (when "Allow registration" is enabled) only accepts username, displayName, email, password, recoveryEmail, language and timezone. Other properties, like groups, are ignored.
 - Core: Controllers in a "cli" namespace, like core/cli/System, can no longer be called through the JMAP API. They are only available on the command line.
+- Core: Set secure flag on remember me cookie
 
 15-10-2026: 26.0.54
 - Core: update cleanup script
