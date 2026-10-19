@@ -193,6 +193,7 @@ try {
 			if (isset($data['accessToken'])) {
 				$token = Token::find()->where(['accessToken' => $data['accessToken']])->single();
 				if ($token && $token->isAuthenticated()) {
+					$auth->assertUserIdMayLogin($token->userId);
 					$token->refresh();
 				}
 			} else if(isset($data['rememberMeToken'])) {

@@ -55,6 +55,18 @@ function errorHander($e) {
   }
 }
 
+/**
+ * Logging in with a token must follow the same rules as a password login: disabled users, IP restrictions and maintenance mode
+ */
+function userMayLogin($userId): bool {
+	try {
+		(new \go\core\auth\Authenticate())->assertUserIdMayLogin($userId);
+		return true;
+	} catch(\go\core\exception\Forbidden | \go\core\exception\Unavailable $e) {
+		return false;
+	}
+}
+
 
 try {
   //initialize autoloading of library
@@ -95,7 +107,7 @@ try {
 			//this token is used in Extjs3.clientSettings() too
 			$token = Token::find()->where('accessToken', '=', $_POST['accessToken'])->single();
 			// isAuthenticated() also checks the expiry. An expired token must not be revived.
-			if($token && $token->isAuthenticated()) {
+			if($token && $token->isAuthenticated() && userMayLogin($token->userId)) {
 
                 go()->getAuthState()->setToken($token);
 				$token->setAuthenticated();
@@ -110,7 +122,17 @@ try {
 		}
 
         // Process remember me persistent cookie
-        if($_SERVER['REQUEST_METHOD'] == "GET" && !go()->getAuthState()->isAuthenticated() && ($rememberMe = \go\core\model\RememberMe::verify())) {
+        $rememberMe = false;
+        if($_SERVER['REQUEST_METHOD'] == "GET" && !go()->getAuthState()->isAuthenticated()) {
+            try {
+                $rememberMe = \go\core\model\RememberMe::verify();
+            } catch(\go\core\exception\Forbidden | \go\core\exception\Unavailable $e) {
+                // Not allowed to login (now). Show the login page instead of an error. It tells why after logging in.
+                $rememberMe = false;
+            }
+        }
+
+        if($rememberMe) {
             $rememberMe->setCookie();
 
             $token = new Token();

@@ -20,6 +20,7 @@
 - Core: Registration (when "Allow registration" is enabled) only accepts username, displayName, email, password, recoveryEmail, language and timezone. Other properties, like groups, are ignored.
 - Core: Controllers in a "cli" namespace, like core/cli/System, can no longer be called through the JMAP API. They are only available on the command line.
 - Core: Set secure flag on remember me cookie
+- Core: Remember me, refreshing a token and OpenID Connect / OAuth2 logins now also apply the rules of a password login: disabled users, IP address restrictions of groups and maintenance mode.
 
 15-10-2026: 26.0.54
 - Core: update cleanup script

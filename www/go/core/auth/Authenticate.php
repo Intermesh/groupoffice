@@ -198,6 +198,9 @@ class Authenticate
 	 */
 	public function setAuthenticated(User $user): Token
 	{
+		// Used by external logins (OpenID Connect, OAuth2) that bypass passwordLogin(), so the same rules must apply.
+		$this->assertUserIdMayLogin($user->id);
+
 		$token = new Token();
 		$token->userId = $user->id;
 		$token->setAuthenticated(true);
@@ -347,6 +350,23 @@ class Authenticate
 
 		return $user;
 
+	}
+
+	/**
+	 * Throws when the user may not login at all (disabled, IP not allowed, maintenance).
+	 *
+	 * Must be used by every way of logging in that doesn't use passwordLogin(), like remember me and refreshing a token.
+	 *
+	 * @throws Forbidden|Unavailable
+	 */
+	public function assertUserIdMayLogin(int|string $userId): void
+	{
+		$user = User::find(['id', 'enabled'], true)->where(['id' => $userId])->single();
+		if (!$user) {
+			throw new Forbidden(go()->t("Your account has been disabled."));
+		}
+
+		$this->assertUserMayLogin($user);
 	}
 
 	/**
@@ -595,6 +615,7 @@ class Authenticate
 	{
 		$token = Token::find()->where(['accessToken' => $accessToken])->single();
 		if ($token && $token->isAuthenticated()) {
+			$this->assertUserIdMayLogin($token->userId);
 			$token->refresh();
 		}
 		return $token;
