@@ -11,6 +11,7 @@
 - Projects3: Fixed severak translation issues
 - Calendar: Send cancellation to removed participants (resource and individual), also remove events from local calendars immediately
 - Core: New "background" parameter to export in the background. This way CLI exports can still work like before.
+- DAVaccounts: ownerId field because the accounts are personal and not system wide.
 
 15-10-2026: 26.0.54
 - Core: update cleanup script
