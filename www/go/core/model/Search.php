@@ -64,11 +64,13 @@ class Search extends AclOwnerEntity {
 		$words = array_unique($words);
 
 		foreach ($words as $word) {
-			$query->join(
-				"core_search_word",
-				'w' . $i, 'w' . $i . '.searchId = search.id',
-				'INNER'
-			);
+			if (!$query->isJoined('core_search_word', 'w' . $i)) {
+				$query->join(
+					"core_search_word",
+					'w' . $i, 'w' . $i . '.searchId = search.id',
+					'INNER'
+				);
+			}
 
 			$criteria->where('w' . $i . '.word', 'LIKE', $word . '%');
 

@@ -891,16 +891,16 @@ abstract class Entity extends Property {
 			})
 
 			->add('text', function (Criteria $criteria, $value, Query $query) {
-			if (!is_array($value)) {
-				$value = [$value];
-			}
-
-			foreach ($value as $q) {
-				if (!empty($q)) {
-					static::search($criteria, $q, $query);
+				if (!is_array($value)) {
+					$value = [$value];
 				}
-			}
-		})
+
+				foreach ($value as $q) {
+					if (!empty($q)) {
+						static::search($criteria, $q, $query);
+					}
+				}
+			})
 			->add('exclude', function (Criteria $criteria, $value) {
 				if (!empty($value)) {
 					$criteria->andWhere('id', 'NOT IN', $value);
@@ -997,18 +997,6 @@ abstract class Entity extends Property {
 			$criteria->where('comment.text ', $comparator, $value);
 		});
 
-
-		/*
-			find all items with link to:
-
-		link : {
-			entity: "Contact",
-			id: 1
-		}
-
-		or leave id empty to find items that link to any contact
-
-		*/
 		$filters->add("link", function (Criteria $criteria, $value, Query $query) {
 
 			if(!isset($value['entity']) || (count($value) > 1 && !isset($value['id']))) {
@@ -1172,9 +1160,9 @@ abstract class Entity extends Property {
 			return $criteria;
 		}
 
-    $columns = static::textFilterColumns();
+        $columns = static::textFilterColumns();
 
-    if(empty($columns)) {
+        if(empty($columns)) {
 			go()->warn(static::class . ' entity has no textFilterColumns() defined. The "text" filter will not work.');
 		}
 		

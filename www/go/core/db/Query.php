@@ -687,19 +687,6 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 		}
 		return $stmt;
 	}
-//
-//	private $debug = false;
-//
-//	/**
-//	 * Output query to debugger
-//	 *
-//	 * @return $this
-//	 */
-//	public function debug() {
-//		$this->debug = true;
-//
-//		return $this;
-//	}
 
   /**
    * Executes the query and returns a single object
