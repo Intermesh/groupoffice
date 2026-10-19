@@ -227,6 +227,11 @@ class Router
 			$controllerClass = 'go\\modules\\' . implode('\\', $parts);
 		}
 
+		// Controllers in a "cli" namespace are for the command line only and are run by the CLI router. Never route to them here.
+		if (stripos('\\' . $controllerClass . '\\', '\\cli\\') !== false) {
+			throw new Exception(400, 'Bad request. Controller "' . $controllerClass . '"  not found');
+		}
+
 		if (!class_exists($controllerClass)) {
 			throw new Exception(400, 'Bad request. Controller "' . $controllerClass . '"  not found');
 		}
