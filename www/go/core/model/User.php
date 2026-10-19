@@ -61,7 +61,7 @@ class User extends AclItemEntity {
 	 *
 	 * @see filterRegistrationValues()
 	 */
-	const REGISTRATION_PROPERTIES = ['username', 'disp§layName', 'email', 'password', 'recoveryEmail', 'language', 'timezone'];
+	const REGISTRATION_PROPERTIES = ['username', 'displayName', 'email', 'password', 'recoveryEmail', 'language', 'timezone'];
 
 	/**
 	 * Strip everything that a user who registers themselves may not choose, like "groups" and "enabled".
