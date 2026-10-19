@@ -168,24 +168,27 @@ class RememberMe extends Entity {
 	 */
 	public function setCookie(): void
 	{
-		Response::get()->setCookie('goRememberMe', $this->getToken(), [
-			'expires' => $this->expiresAt->format("U"),
-			"path" => "/",
-			"samesite" => "Lax",
-			"domain" => Request::get()->getHost(),
-			"httpOnly" => true
-		]);
+		Response::get()->setCookie('goRememberMe', $this->getToken(), self::cookieOptions((int) $this->expiresAt->format("U")));
 	}
 
 	public static function unsetCookie(): void
 	{
-		Response::get()->setCookie('goRememberMe', "", [
-			'expires' => time() - 3600,
+		Response::get()->setCookie('goRememberMe', "", self::cookieOptions(time() - 3600));
+	}
+
+	/**
+	 * The cookie logs the user in for a week, so it must never be sent over an unencrypted connection.
+	 */
+	private static function cookieOptions(int $expires): array
+	{
+		return [
+			'expires' => $expires,
 			"path" => "/",
 			"samesite" => "Lax",
+			"secure" => Request::get()->isHttps(),
 			"domain" => Request::get()->getHost(),
 			"httpOnly" => true
-		]);
+		];
 	}
 
 
