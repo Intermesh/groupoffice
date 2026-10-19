@@ -1,11 +1,4 @@
-import {
-	btn,
-	column, datasourcestore, DataSourceStore,
-	datecolumn, DefaultEntity,
-	Format, hr, menu,
-	t,
-	Table
-} from "@intermesh/goui";
+import {btn, column, datasourcestore, DataSourceStore, datecolumn, Format, hr, menu, t, Table} from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
 import {MailboxDialog} from "./MailboxDialog.js";
 
@@ -14,9 +7,7 @@ export class MailboxTable extends Table<DataSourceStore> {
 		const store = datasourcestore({
 			dataSource: jmapds("MailBox"),
 			queryParams: {
-				limit: 50,
-				filter: {
-				}
+				limit: 50
 			},
 			sort: [{property: "username", isAscending: true}]
 		});

@@ -1,13 +1,5 @@
-import {
-	btn,
-	column, DataSourceStore, datasourcestore,
-	datecolumn, DefaultEntity, hr, menu,
-	Notifier, store,
-	t,
-	Table
-} from "@intermesh/goui";
+import {btn, column, DataSourceStore, datasourcestore, datecolumn, hr, menu, t, Table} from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
-import {MailboxDialog} from "./MailboxDialog";
 import {AliasDialog} from "./AliasDialog";
 
 export class AliasTable extends Table<DataSourceStore> {
@@ -16,9 +8,7 @@ export class AliasTable extends Table<DataSourceStore> {
 		const store = datasourcestore({
 			dataSource: jmapds("MailAlias"),
 			queryParams: {
-				limit: 50,
-				filter: {
-				}
+				limit: 50
 			},
 			sort: [{property: "address", isAscending: true}]
 		});

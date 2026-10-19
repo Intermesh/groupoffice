@@ -17,10 +17,7 @@ export class Main extends Component {
 			dataSource: bookmarkDS,
 			sort: [{property: "category", isAscending: true}, {property: "name"}],
 			queryParams: {
-				limit: 0,
-				filter: {
-					permissionLevel: 5
-				}
+				limit: 0
 			},
 			relations: {
 				category: {
