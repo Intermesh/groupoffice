@@ -28,12 +28,6 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 						path: "createdBy"
 					}
 				},
-				queryParams: {
-					filter: {
-						actions: {}
-					},
-					permissionLevel: 5
-				}
 			}),
 			[
 

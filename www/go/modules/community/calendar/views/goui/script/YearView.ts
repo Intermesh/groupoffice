@@ -29,7 +29,7 @@ export class YearView extends CalendarView<YearViewEventMap> {
 
 	protected populateViewModel() {
 		this.clear()
-		for (const item of this.adapter.items) {
+		for (const item of this.mergeDuplicates(this.adapter.items)) {
 			this.viewModel.push(item);
 		}
 		this.renderView()
@@ -123,7 +123,8 @@ export class YearView extends CalendarView<YearViewEventMap> {
 		if (e.start.format('Ymd') > day.format('Ymd')) {
 			return false; // event is in future
 		}
-		if (e.end.date < day.date) {
+		// end is exclusive: an all-day event ending at 00:00 must not be drawn on that day
+		if (e.end.date < day.date || (e.end.date.getTime() === day.date.getTime() && e.end.date > e.start.date)) {
 			return; // ff
 		}
 		container.append(E('p')

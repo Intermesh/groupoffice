@@ -9,6 +9,9 @@ use go\core\util\ArrayObject;
 use go\modules\community\maildomains\model;
 use go\modules\community\maildomains\util;
 
+/**
+ * @extends EntityController<\go\modules\community\maildomains\model\Domain>
+ */
 final class Domain extends EntityController
 {
 	protected function entityClass(): string

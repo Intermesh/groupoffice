@@ -23,7 +23,9 @@
 namespace GO\Base\Exception;
 
 
-class OtherLoginLocation extends \Exception
+use go\core\exception\UserSafeException;
+
+class OtherLoginLocation extends \Exception implements UserSafeException
 {
 
 	public function __construct($message='') {

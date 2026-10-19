@@ -3,6 +3,7 @@ namespace go\modules\community\multi_instance;
 
 use go\core\App;
 use go\core\ErrorHandler;
+use go\core\exception\Forbidden;
 use go\core\http\Request;
 use go\core\http\Response;
 use go\core\Installer;
@@ -129,6 +130,10 @@ class Module extends \go\core\Module {
 
 
 	public function downloadSiteConfig() {
+
+		if(!$this->getModel()->hasPermissionLevel()) {
+			throw new Forbidden();
+		}
 
 		Response::get()->setContentType('text/plain');
 		Response::get()->sendHeaders();

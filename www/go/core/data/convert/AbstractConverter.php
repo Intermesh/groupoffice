@@ -15,6 +15,7 @@ use go\core\orm\exception\SaveException;
 use go\core\orm\Query;
 use go\core\util\DateTime;
 use go\modules\business\support\Module;
+use JsonException;
 use Throwable;
 
 /**
@@ -99,7 +100,7 @@ abstract class AbstractConverter {
 	 */
 	protected $extension;
 
-	protected Alert $alert;
+	protected ?Alert $alert = null;
 	private string $exportId;
 
 
@@ -245,11 +246,15 @@ abstract class AbstractConverter {
 	 * @param string $error
 	 * @return void
 	 * @throws SaveException
-	 * @throws \JsonException
+	 * @throws JsonException
 	 * @throws Exception
 	 */
 	protected function notifyError(bool $import, string $error)
 	{
+		if(!isset($this->alert)) {
+			//notify is off
+			return;
+		}
 		$this->alert->setData([
 				'title' => $import ? go()->t("Import error") : go()->t("Export error"),
 				'body' => $error,
@@ -436,16 +441,18 @@ abstract class AbstractConverter {
 	 *
 	 * @param string[] $entityIds
 	 * @param array $params
-	 * @return Blob
-	 * @throws DbException
+	 * @param bool $notify
+	 * @return Blob|null
+	 * @throws JsonException
 	 * @throws SaveException
-	 * @throws Exception
 	 */
-	public function exportToBlob(array $entityIds, array $params = []): ?Blob
+	public function exportToBlob(array $entityIds, array $params = [], bool $notify = true): ?Blob
 	{
 		$this->total = count($entityIds);
 
-		$this->notifyStart(false);
+		if($notify) {
+			$this->notifyStart(false);
+		}
 
 		$this->clientParams = $params;
 		$this->exportEntityIds = $entityIds;
@@ -470,17 +477,24 @@ abstract class AbstractConverter {
 
 				$this->index++;
 
-				$this->notifyCount(false, $this->index, $errorCount);
+				if($notify) {
+					$this->notifyCount(false, $this->index, $errorCount);
+				}
 			}
 
 			$blob = $this->finishExport();
 
-			$this->notifyEnd(false, $this->index, 0, $blob);
+			if($notify) {
+				$this->notifyEnd(false, $this->index, 0, $blob);
+			}
 
 			return $blob;
 		} catch (Throwable $e) {
 			ErrorHandler::logException($e);
-			$this->notifyError(false, $e->getMessage());
+
+			if($notify) {
+				$this->notifyError(false, $e->getMessage());
+			}
 		}
 
 		return null;

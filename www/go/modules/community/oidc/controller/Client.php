@@ -6,6 +6,9 @@ namespace go\modules\community\oidc\controller;
 use go\core\jmap\EntityController;
 use go\modules\community\oidc\model;
 
+/**
+ * @extends EntityController<\go\modules\community\oidc\model\Client>
+ */
 final class Client extends EntityController
 {
 

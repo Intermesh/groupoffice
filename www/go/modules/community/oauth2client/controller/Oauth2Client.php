@@ -17,6 +17,9 @@ use League\OAuth2\Client\Token\AccessTokenInterface;
 
 use TheNetworg\OAuth2\Client\Token\AccessToken;
 
+/**
+ * @extends EntityController<\go\modules\community\oauth2client\model\Oauth2Client>
+ */
 final class Oauth2Client extends EntityController
 {
 

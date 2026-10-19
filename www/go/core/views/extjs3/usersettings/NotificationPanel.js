@@ -18,8 +18,18 @@ go.usersettings.NoticiationPanel = Ext.extend(Ext.Panel, {
 			title: t('Notifications','users','core'),
 			items:[{
 				xtype:'xcheckbox',
-				boxLabel: t("Mail reminders", "users", "core"),
+				boxLabel: t("Send reminders by e-mail", "users", "core"),
 				name: 'mail_reminders'
+			},{
+				xtype: "formcontainer",
+				name: "emailSettings",
+				items: [
+					{
+						xtype: "xcheckbox",
+						boxLabel: t("Create desktop notification for new e-mails"),
+						name: "notify_new_email"
+					}
+				]
 			}]
 		});
 

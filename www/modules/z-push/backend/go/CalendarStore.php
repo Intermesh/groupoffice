@@ -189,6 +189,9 @@ class CalendarStore extends Store {
 
 		$event = CalendarEvent::findById($requestid);
 
+		// Send the reply to the organizer
+		CalendarEvent::$sendSchedulingMessages = true;
+
 		if($event->isRecurring() && isset($instanceId)) {
 
 			$recurId = (new \go\core\util\DateTime($instanceId))->setTimezone($event->timeZone())->format('Y-m-d\TH:i:s');
@@ -251,6 +254,10 @@ class CalendarStore extends Store {
 
 		$event->calendarId = $newfolderid;
 		return !$event->save() ? false : $event->id;
+	}
+
+	public function getSinkEntityName(): ?string {
+		return 'CalendarEvent';
 	}
 
 	public function getNotification($folder=null) {

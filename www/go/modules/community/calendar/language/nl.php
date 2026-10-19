@@ -236,7 +236,7 @@ return array (
   'Write all' => 'Alles schrijven',
   'Accepted' => 'Goedgekeurd',
   'Declined' => 'Afgewezen',
-  'Invite not send yet' => 'Uitnodigen nog niet verzonden',
+  'Invite not sent yet' => 'Uitnodiging nog niet verzonden',
   'Open Calendar' => 'Agenda openen',
   'Unexisting event' => 'Onbestaande gebeurtenis',
   'New invitation from {from}' => 'Nieuwe uitnodiging van {van}',

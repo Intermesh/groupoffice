@@ -3,9 +3,13 @@
 
 namespace go\modules\community\calendar\model;
 
+use go\core\model\Acl;
+use go\core\model\User;
 use go\core\orm\Mapping;
 use go\core\jmap\Entity;
-use go\modules\business\projects3\model\ProjectResource;
+use go\core\model\Module;
+use go\core\db\Criteria;
+use go\core\orm\Query;
 
 class ResourceGroup extends Entity
 {
@@ -16,13 +20,76 @@ class ResourceGroup extends Entity
 	public ?string $description;
 	/* @var bool If true, all resources in this resource group will be automatically accepted if free. */
 	public ?bool $autoAccept;
-	/** @var ?string Will be set to any resource calendar that is created without owner.*/
+
+	/**
+	 *
+	 * This user will be used for 3 things:
+	 *
+	 * 1. This user may manage the group
+	 * 2. The principal built from the resource calendar will get the e-mail of this user.
+	 * 3. This user will be granted manage permissions when new resource calendars are created
+	 *
+	 * @todo rename because the name is misleading. It's not a default for the calendar->ownerId. This will be null.
+	 * Calendar::getOwner() will return Calendar::$id as principal/owner.
+	 * @var ?string
+	 */
 	public ?string $defaultOwnerId;
 
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
 			->addTable('calendar_resource_group', "rg");
+	}
+
+	protected function internalSave(): bool
+	{
+		$ownerChanged = !$this->isNew() && $this->isModified('defaultOwnerId');
+
+		if(!parent::internalSave()) {
+			return false;
+		}
+
+		if($ownerChanged) {
+			// The principals of the resource calendars derive their email and description from the group admin.
+			$calendars = Calendar::find()->where('groupId', '=', $this->id);
+			if(empty($this->defaultOwnerId)) {
+				Calendar::deletePrincipal(Calendar::find()->selectSingleValue('id')->where('groupId', '=', $this->id));
+			} else {
+				foreach ($calendars as $calendar) {
+					$calendar->refreshPrincipal();
+				}
+			}
+		}
+
+		return true;
+	}
+
+	protected function internalGetPermissionLevel(): int
+	{
+		if(go()->getUserId() == $this->defaultOwnerId && Module::findByName('community', 'calendar')
+			->getUserRights()->mayChangeResources) {
+			return Acl::LEVEL_MANAGE;
+		}
+		return parent::internalGetPermissionLevel();
+	}
+
+	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, ?int $userId = null, ?array $groups = null): Query
+	{
+		$userId = $userId ?? go()->getUserId();
+		if($level > Acl::LEVEL_READ && !User::isAdminById($userId)) {
+			// The group admin, or anyone with manage permission on a resource calendar in the group, so they
+			// can edit those resources without the "mayChangeResources" module permission.
+			$managedCalendars = (new Query)
+				->select('c.groupId')
+				->from('calendar_calendar', 'c')
+				->where('c.groupId', 'IS NOT', null);
+			Acl::applyToQuery($managedCalendars, 'c.aclId', Acl::LEVEL_MANAGE, $userId, $groups);
+
+			$query->andWhere((new Criteria())
+				->where('defaultOwnerId', '=', $userId)
+				->orWhere('rg.id', 'IN', $managedCalendars));
+		}
+		return $query;
 	}
 
 }

@@ -33,6 +33,8 @@ class Month extends Calendar {
 		$this->SetAutoPageBreak(true, 10);
 		
 	}
+
+	public bool $printMonth = true;
 	
 	public function Header() {
 		//A4 = 21 x 29.7
@@ -40,12 +42,21 @@ class Month extends Calendar {
 		
 		$this->right = $this->getPageWidth()-$this->leftMargin*2;
 		
-		$this->Rect(10, 10, $this->right, 25,'DF', array(), array(240));
+		$this->Rect(10, 10, $this->right, 26,'DF', array(), array(240));
 		$this->SetFont(null, 'B',$this->fSizeLarge);
-		$this->Cell(100, 12, $this->months_long[$this->day->format('n')].$this->day->format(' Y'), 0, 1);
 
-		$this->drawCalendar($this->day, $this->right-100, 11, 45, 22);
-		$this->drawCalendar((clone $this->day)->modify('next month'), $this->right-40, 11, 45, 22);
+		if($this->printMonth) {
+			$titleDate = (clone $this->day)->modify("+7 days");
+			$this->Cell(100, 12, $this->months_long[$titleDate->format('n')] . $titleDate->format(' Y'), 0, 1);
+		} else {
+			$this->SetFont(null, 'B',$this->fSizeMedium + 3);
+			$this->Cell(100, 12, $this->day->format('d ').$this->months_long[$this->day->format('n')].$this->day->format(' Y').' - ' . $this->end->format('d ').$this->months_long[$this->end->format('n')].$this->end->format(' Y'), 0, 1);
+			$titleDate = (clone $this->day);
+		}
+
+		$this->drawCalendar($titleDate->format("n"), $titleDate->format("Y"), $this->right-100, 11, 45, 20);
+		$nextMonth = (clone $titleDate)->modify('next month');
+		$this->drawCalendar($nextMonth->format("n"), $nextMonth->format("Y"), $this->right-40, 11, 45, 20);
 
 //		$this->drawCalendar($this->day, $this->right-100, 11, 45, 22);
 //		$this->drawCalendar($this->day+(32*24*3600), $this->right-40, 11, 45, 22);

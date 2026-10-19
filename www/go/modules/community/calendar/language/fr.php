@@ -222,7 +222,7 @@ return [
     'Imported %s events successful.' => 'Importation de %s événements réussie.',
     'Invalid date' => 'Date invalide',
     'Invitation updated by {from}' => 'Invitation mise à jour par {from}',
-    'Invite not send yet' => 'Invitation pas encore envoyée',
+    'Invite not sent yet' => 'Invitation pas encore envoyée',
     'Mark invitation as read and archive' => 'Marquer l\'invitation comme lue et archiver',
     'Mark updates as read and archive' => 'Marquer les mises à jour d\'invitations comme lues et archiver',
     'Needs approval' => 'Nécessite une approbation',

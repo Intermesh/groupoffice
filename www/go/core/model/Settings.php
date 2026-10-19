@@ -333,8 +333,15 @@ class Settings extends core\Settings
 	 * @var string
 	 */
 	public string|null $lostPasswordURL = null;
-	
-	
+
+
+	/**
+	 * Force apps like WebDAV to authenticate with app passwords created by the user
+	 *
+	 * @var bool
+	 */
+	public $forceAppPasswords = false;
+
 	/**
 	 * The full URL to Group-Office. With trailing /.
 	 * 
@@ -396,7 +403,7 @@ class Settings extends core\Settings
 	/** @var int Time the db cache was cleared. The client will invalidate it's indexeddb cache when this changes.
 	 */
 	public int|null $cacheClearedAt = null;
-	
+
 	/** Primary color in html notation 000000; */
 	public string|null $primaryColor = null;
 
@@ -408,7 +415,7 @@ class Settings extends core\Settings
 
 	/**  Secondary color in html notation 000000; */
 	public string|null $accentColor = null;
-	
+
 	/** Blob ID for the logo */
 	public string|null $logoId = null;
 

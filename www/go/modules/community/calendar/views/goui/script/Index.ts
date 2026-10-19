@@ -19,6 +19,8 @@ import {CalendarAdapter} from "./CalendarAdapter";
 
 export * from "./Main.js";
 export * from "./CalendarList.js";
+export * from "./CategoryList.js";
+export * from "./ProviderList.js";
 export * from "./CalendarView.js";
 export * from "./CalendarItem.js";
 export * from "./MonthView.js";
@@ -31,10 +33,62 @@ export * from "./OnlineMeetingService.js";
 translate.load(GO.lang.core.core, "core", "core");
 translate.load(GO.lang.community.calendar, "community", "calendar");
 
+export interface CalendarDefaultAlert {
+	/** {offset, relativeTo} | {when} */
+	trigger: any
+	acknowledged?: string
+	action?: 'display' | 'email'
+}
+
+export interface Calendar extends BaseEntity {
+	/** The user-visible name of the calendar */
+	name: string
+	description?: string | null
+	/** Any valid CSS color value used to display events of this calendar */
+	color: string | null
+	/** Sort order of calendars in the client UI */
+	sortOrder: number
+	/** User wishes to see this calendar in their client (per user) */
+	isSubscribed: boolean | null
+	/** Should the calendar's events be displayed at the moment (per user) */
+	isVisible: boolean | null
+	/** Should the calendar's events be used for availability calculation (per user) */
+	includeInAvailability: 'all' | 'attending' | 'none' | null
+	/** Default time zone for events. If null the user's time zone is used */
+	timeZone: string | null
+	syncToDevice: boolean | null
+	defaultAlertsWithTime?: Record<string, CalendarDefaultAlert>
+	defaultAlertsWithoutTime?: Record<string, CalendarDefaultAlert>
+	/** Calendar owner id. Null for shared calendars and resources */
+	ownerId: string | null
+	createdBy: string
+	webcalUri: string | null
+	/** Resource group id. Set when the calendar is a resource */
+	groupId: string | null
+	publishKey: string | null
+	/** Rights of the current user */
+	myRights: {
+		mayReadFreeBusy: boolean
+		mayReadItems: boolean
+		mayUpdatePrivate: boolean
+		mayRSVP: boolean
+		mayWriteOwn: boolean
+		mayWriteAll: boolean
+		mayAdmin: boolean
+		mayDelete: boolean
+	}
+}
+
 export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list' | 'custom';
 export const calendarStore = datasourcestore({
-	dataSource: jmapds<any>('Calendar'),
-	queryParams:{filter:{isSubscribed: true, davaccountId : null}},
+	dataSource: jmapds<Calendar>('Calendar'),
+
+	filters: {
+		default: {
+			isSubscribed: true,
+			davaccountId : null
+		}
+	},
 	sort: [{property:'groupId'},{property:'sortOrder'},{property:'name'}],
 	relations: {
 		owner: {
@@ -49,8 +103,14 @@ export const calendarStore = datasourcestore({
 });
 
 export const writeableCalendarStore = datasourcestore({
-	dataSource:jmapds('Calendar'),
-	queryParams:{filter:{isSubscribed: true, davaccountId : null, permissionLevel:30/*writeOwn*/}},
+	dataSource:jmapds<Calendar>('Calendar'),
+	filters: {
+		default: {
+			isSubscribed: true,
+			davaccountId : null,
+			permissionLevel:30/*writeOwn*/
+		}
+	},
 	sort: [{property:'sortOrder'},{property:'name'}],
 	relations: {
 		owner: {
@@ -84,7 +144,7 @@ export function getParticipantStatusIcon(p:any): string[] {
 	// error sending mail
 	if(p.scheduleStatus) {
 		if(p.scheduleStatus == "1.0") {
-			return ['pending', t("Invite not send yet"), 'orange'];
+			return ['pending', t("Invite not sent yet"), 'orange'];
 		}
 
 		if(p.scheduleStatus.substring(0, 1) != "1") {

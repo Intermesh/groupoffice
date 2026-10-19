@@ -8,8 +8,10 @@ use go\core\model;
 use go\core\util\ArrayObject;
 
 
-class CronJobSchedule extends EntityController
-{
+/**
+ * @extends EntityController<\go\core\model\CronJobSchedule>
+ */
+class CronJobSchedule extends EntityController {
 
 	/**
 	 * The class name of the entity this controller is for.

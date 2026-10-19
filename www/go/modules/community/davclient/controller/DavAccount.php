@@ -7,6 +7,9 @@ use go\core\jmap\EntityController;
 use go\modules\community\davclient\model;
 
 
+/**
+ * @extends EntityController<\go\modules\community\davclient\model\DavAccount>
+ */
 class DavAccount extends EntityController {
 
 	protected function entityClass(): string {
@@ -46,7 +49,7 @@ class DavAccount extends EntityController {
 				$success = $account->sync(true); // full sync, incl homeset
 			}
 		}
-		return ['accountId'=>$params['accountId'], 'collection'=>$collection, 'success' => $success];
+		return ['accountId'=>$params['accountId'], 'collection'=>$collection, 'success' => $success, 'error' => $account->lastError];
 	}
 
 	protected function canCreate(Entity $entity): bool

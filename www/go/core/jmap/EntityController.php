@@ -32,6 +32,9 @@ use PDO;
 use PDOException;
 use ReflectionException;
 
+/**
+ * @template T of Entity
+ */
 abstract class EntityController extends Controller {
 
 	use EventEmitterTrait;
@@ -66,7 +69,7 @@ abstract class EntityController extends Controller {
 	/**
 	 * The class name of the entity this controller is for.
 	 * 
-	 * @return class-string<Entity>
+	 * @return class-string<T>
 	 */
 	abstract protected function entityClass(): string;
 
@@ -383,7 +386,7 @@ abstract class EntityController extends Controller {
    *
    * @param string $id
    * @param array $properties
-   * @return boolean|Entity
+   * @return T|false
    * @throws Exception
    */
 	protected function getEntity(string $id, array $properties = []) {
@@ -752,7 +755,10 @@ abstract class EntityController extends Controller {
 	}
 
   /**
-   * Override this if you want to implement permissions for creating entities
+   * Checks if a model may be created.
+	 *
+	 * You probably don't want to override this. Override {@see \go\core\orm\Entity::canCreate()} instead.
+	 *
    * New properties have already been set so you can validate per property too if needed.
    *
    * @param Entity $entity
@@ -1174,11 +1180,19 @@ abstract class EntityController extends Controller {
 		
 		$convertor = $cls::findConverter($params['extension']);
 
-		PostResponseProcessor::get()->addTask(function() use ($convertor, $params) {
-			$convertor->exportToBlob($params['ids'], $params->getArray());
-		});
+		$response = new ArrayObject(['success' => true]);
+
+		if(!empty($params['background'])) {
+			PostResponseProcessor::get()->addTask(function () use ($convertor, $params) {
+				$convertor->exportToBlob($params['ids'], $params->getArray());
+			});
+		} else {
+			$blob = $convertor->exportToBlob($params['ids'], $params->getArray(), false);
+
+			$response['blob'] = $blob->toArray();
+		}
 		
-		return new ArrayObject(['success' => true]);
+		return $response;
 	}
 
   /**

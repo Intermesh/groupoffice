@@ -129,18 +129,40 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 		$this->events[$key] = $instance;
 	}
 
-	public function drawCalendar($date=null, $x=100, $y=null, $w=35, $h=28) {
-		if($date===null)
-			$date=new \DateTime();
+
+	/**
+	 * @param int $year
+	 * @param int $month
+	 * @return void
+	 */
+	public function getStartEndOfMonth(int $month, int $year): array
+	{
+
+
+		$first = (new DateTime())->setDate($year, $month, 1)->setTime(0, 0, 0);
+		$last = (clone $first)->modify('last day of this month')->setTime(23, 59, 59);
+
+		// Expand to complete weeks, based on the user's first day of the week (0 = Sunday, 1 = Monday)
+		$lastWeekday = ($this->firstWeekday + 6) % 7;
+		$daysBack = ((int)$first->format('w') - $this->firstWeekday + 7) % 7;
+		$daysForward = ($lastWeekday - (int)$last->format('w') + 7) % 7;
+
+		return [$first->modify("-$daysBack days"), $last->modify("+$daysForward days")];
+	}
+
+	public function drawCalendar(int $month, int $year, $x=100, $y=null, $w=35, $h=27) {
+
 		if($y)
 			$this->SetY($y);
+
+		$dates = $this->getStartEndOfMonth($month, $year);
 		
-		$firstDay = strtotime($date->format('Y-m-01'));
-		$lastDay = strtotime($date->format('Y-m-t'));
+		$firstDay = $dates[0];
+		$lastDay = $dates[1];
 		
 		$this->SetFont(null,'',7);
 		$this->SetLeftMargin($x);
-		$this->Cell($w,$h/8, $this->months_long[$date->format('n')].$date->format(' Y'),0,1, 'C');
+		$this->Cell($w,$h/8, $this->months_long[$month] . " " . $year,0,1, 'C');
 
 		for($d=0;$d<7;$d++) {
 			$this->Cell($w/7,$h/8,$this->days_short[$d], 0,0,'R');
@@ -149,20 +171,38 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 		$this->Ln();
 		$this->Line($this->GetX(), $this->GetY(), $this->GetX()+$w, $this->GetY(),['width'=>0.1]);
 
-		$firstWeekDay = $this->wd(date('w',$firstDay));
-		$day='';
-		for($r=0;$r<6;$r++){
-			for($c=0;$c<7;$c++){ //toggle weekday
-				if($firstWeekDay == $c && $day==='')
-					$day=1;
-				$this->Cell($w/7,$h/8,$day , 0,0,'R');
-				if(!empty($day))
-					$day++;
-				if($day>date('d',$lastDay))
-					$day=null;
+		$firstWeekDay = $this->wd($firstDay->format('w'));
+		$date = clone $firstDay;
+		$weekDay = 0;
+		while($date < $lastDay) {
+
+			if($date->format('m') != $month) {
+				$this->setTextColor(180);
+			} else {
+				$this->setDefaultTextColor();
 			}
-			$this->Ln();
+
+			$this->Cell($w/7,$h/8,$date->format('j') , 0,0,'R');
+			$date->modify('+1 day');
+			$weekDay++;
+			if($weekDay== 7) {
+				$this->Ln();
+				$weekDay = 0;
+			}
 		}
+		$this->setDefaultTextColor();
+//		for($r=0;$r<6;$r++){
+//			for($c=0;$c<7;$c++){ //toggle weekday
+////				if($firstWeekDay == $c && $day==='')
+////					$day=1;
+//				$this->Cell($w/7,$h/8,$day , 0,0,'R');
+////				if(!empty($day))
+////					$day++;
+////				if($day > $lastDay->format('d'))
+////					$day=null;
+//			}
+//			$this->Ln();
+//		}
 		$this->SetLeftMargin($this->leftMargin);
 	}
 	

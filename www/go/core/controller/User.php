@@ -13,6 +13,9 @@ use go\core\model;
 use go\core\util\ArrayObject;
 
 
+/**
+ * @extends EntityController<\go\core\model\User>
+ */
 class User extends EntityController {
 
 	protected function getDefaultQueryFilter() : array

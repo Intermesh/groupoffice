@@ -143,11 +143,11 @@ class CalDAVBackend extends AbstractBackend implements
 			$values['color'] = substr($values['color'], 1); // remove #
 		}
 		switch($type[0]) {
-			case 'VEVENT': //
+			case 'VEVENT':
 				$prefix = 'c-';
 				$cal = new Calendar();
 				break;
-			case 'VTODO': // task
+			case 'VTODO':
 				$prefix = 't-';
 				$values['ownerId'] = go()->getUserId(); //required
 				$cal = new TaskList();
@@ -212,16 +212,24 @@ class CalDAVBackend extends AbstractBackend implements
 		list($type, $id) = explode('-', $calendarId,2);
 		switch($type) {
 			case 'c':
+
 				$e = Calendar::findById($id, []);
-				if($e && $e->hasPermissionLevel(Acl::LEVEL_DELETE)){
-					Calendar::delete(['id' => $id]);
+				if(!$e) {
+					throw new DAV\Exception\NotFound("Calendar not found");
 				}
+
+				// don't delete it but exclude it from sync
+				$e->syncToDevice = 0;
+				$e->save();
 				break;
 			case 't':
 				$e = TaskList::findById($id, []);
-				if($e && $e->hasPermissionLevel(Acl::LEVEL_DELETE)) {
-					TaskList::delete(['id' => $id]);
+				if(!$e) {
+					throw new DAV\Exception\NotFound("Task list not found");
 				}
+				// don't delete it but exclude it from sync
+				$e->syncToDevice = 0;
+				$e->save();
 				break;
 		}
 	}
@@ -356,7 +364,7 @@ class CalDAVBackend extends AbstractBackend implements
 			$event = CalendarEvent::findById(go()->getDbConnection()->getPDO()->lastInsertId());
 		} else {
 			$event = new CalendarEvent();
-			$organizerEmail = str_replace('mailto:', '',(string)$vcalendar->VEVENT[0]->{'ORGANIZER'});
+			$organizerEmail = str_replace('mailto:', '',strtolower((string)$vcalendar->VEVENT[0]->{'ORGANIZER'}));
 			$event->isOrigin = true;//go()->getAuthState()->getUser(['email'])->email === $organizerEmail; // if you created this event by yourself.
 			$event->replyTo = $organizerEmail;
 			$event->calendarId = $calendarId;

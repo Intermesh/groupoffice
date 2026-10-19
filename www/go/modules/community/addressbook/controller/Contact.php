@@ -17,7 +17,8 @@ use go\modules\community\addressbook\model;
  * @copyright (c) 2018, Intermesh BV http://www.intermesh.nl
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
- */ 
+ * @extends EntityController<\go\modules\community\addressbook\model\Contact>
+ */
 class Contact extends EntityController {
 	
 	/**

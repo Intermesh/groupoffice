@@ -138,7 +138,7 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 		url = url.replace(/&amp;/g, '&');
 
 		const renderPdf = function () {
-			window.pdfjsLib.getDocument(url).promise.then(function (pdf) {
+			window.pdfjsLib.getDocument({url: url}).promise.then(function (pdf) {
 				pdf.getPage(1).then(function (page) {
 					let viewport = page.getViewport({scale: 1});
 					let containerWidth = (canvas.parentNode ? canvas.parentNode.clientWidth : canvas.offsetWidth) - 32;

@@ -4,12 +4,12 @@ import {
 	DateTime,
 	E,
 	tooltip,
-	menu, Format, hr, ComponentEventMap, radio, Radiofield, DateInterval
+	menu, Format, hr, ComponentEventMap, radio, Radiofield, DateInterval, h4
 } from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 import {client,Recurrence} from "@intermesh/groupoffice-core";
-import {t} from "./Index.js";
+import {calendarStore, t} from "./Index.js";
 
 export abstract class CalendarView<EventMap extends ComponentEventMap = ComponentEventMap> extends Component<EventMap> {
 
@@ -152,11 +152,12 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 				const data = {
 						start: startStr,
 						title: t('New event'),
-						duration: dd ?? 'P1D',
+						duration: withoutTime || !dd ? 'P1D' : dd,
 						calendarId: CalendarView.selectedCalendarId,
 						showWithoutTime: withoutTime || !dd
 					},
 					start = (new DateTime(data.start));
+
 				this.currentCreation = ev = new CalendarItem({start, data, key: ''});
 				this.viewModel.unshift(ev);
 				this.updateItems();
@@ -172,35 +173,89 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 
 	protected contextMenuEmpty = menu({removeOnClose:false, isDropdown: true, listeners: {
 		beforeshow: ({target}) => {
-			const btn = target.items.find(item => item.itemId === 'paste');
-			if(btn) {
-				btn.disabled = !CalendarItem.clipboard;
-				btn.text = CalendarItem.clipboard ? t('Paste ','core') + ' '+CalendarItem.clipboard.title : t('Paste ','core');
+
+			const btnOrig = target.items.find(item => item.itemId === 'paste-original-time')!;
+			const btn = target.items.find(item => item.itemId === 'paste')!;
+
+			if(!CalendarItem.clipboard) {
+				btn.disabled = true;
+				btn.text = t('Paste');
+
+				btnOrig.hidden = true;
+				return;
 			}
+
+			const dateHasTime = this.contextMenuEmpty.dataSet.date.length > 10;
+
+			const withTime = dateHasTime || (!this.contextMenuEmpty.dataSet.viewSupportsTime && !CalendarItem.clipboard.data.showWithoutTime);
+
+			const start = CalendarItem.pasteGetStart(this.contextMenuEmpty.dataSet.date),
+				dateStr = withTime ? Format.dateTime(start) : Format.date(start);
+
+
+			btn.disabled = false;
+			btn.text = t("Paste '{title}' at {date}").replace('{date}', dateStr).replace('{title}', CalendarItem.clipboard.title)
+
+
+
+			const origWithTime = dateHasTime || !CalendarItem.clipboard.data.showWithoutTime;
+
+
+			const origStart = CalendarItem.pasteGetStart(this.contextMenuEmpty.dataSet.date.substring(0, 10)),
+				origDateStr = origWithTime ? Format.dateTime(origStart) : Format.date(origStart);
+
+			btnOrig.hidden = origDateStr === dateStr;
+			btnOrig.text = t("Paste at original time ({time})").replace('{time}', Format.time(origStart)).replace('{title}', CalendarItem.clipboard.title)
+
 		}}},
-		btn({icon:'add', text: t('Appointment'), handler: _ => {
-			const date = this.contextMenuEmpty.dataSet.date;
-			let start;
-			if (date.length > 10) {
-				start = new DateTime(date);
-			} else {
-				const [y, m, d] = date.split('-').map(Number);
-				start = new DateTime(); // time = now
-				start.setYear(y).setMonth(m).setDate(d);
+		btn({
+			icon:'add',
+			text: t('Appointment'),
+			handler: _ => {
+				const date = this.contextMenuEmpty.dataSet.date;
+				let start, showWithoutTime = client.user.calendarPreferences?.defaultDuration == null;
+				if (date.length > 10) {
+					start = new DateTime(date);
+					if(this.contextMenuEmpty.dataSet.viewSupportsTime) {
+						showWithoutTime = false;
+					}
+				} else {
+					const [y, m, d] = date.split('-').map(Number);
+					start = new DateTime(); // time = now
+					start.setYear(y).setMonth(m).setDate(d);
+					if(this.contextMenuEmpty.dataSet.viewSupportsTime) {
+						showWithoutTime = true;
+					}
+				}
+				(new CalendarItem({key:'',data:{
+					start:start.format('Y-m-d\TH:00:00.000'),
+					title: t('New event'),
+					showWithoutTime: showWithoutTime,
+					duration: client.user.calendarPreferences?.defaultDuration ?? "P1D",
+					calendarId: CalendarView.selectedCalendarId
+				}})).save()
 			}
-			(new CalendarItem({key:'',data:{
-				start:start.format('Y-m-d\TH:00:00.000'),
-				title: t('New event'),
-				showWithoutTime: client.user.calendarPreferences?.defaultDuration == null,
-				duration: client.user.calendarPreferences?.defaultDuration ?? "P1D",
-				calendarId: CalendarView.selectedCalendarId
-			}})).save()
-		}}),
+		}),
 		// btn({icon:'add', text: t('Reminder'), handler: _ => { console.warn('todo:reminder'); }}),
 		hr(),
-		btn({itemId:'paste',icon:'content_paste', text: t('Paste ','core'), handler: _ => {
-			CalendarItem.paste(CalendarView.selectedCalendarId, this.contextMenuEmpty.dataSet.date)
-		}})
+
+		btn({
+			itemId:'paste',
+			icon:'content_paste',
+			text: t('Paste'),
+			handler: _ => {
+				CalendarItem.paste(CalendarView.selectedCalendarId, this.contextMenuEmpty.dataSet.date, this.contextMenuEmpty.dataSet.viewSupportsTime)
+			}
+		}),
+
+		btn({
+			itemId:'paste-original-time',
+			icon:'content_paste',
+			text: t('Paste at original time'),
+			handler: _ => {
+				CalendarItem.paste(CalendarView.selectedCalendarId, this.contextMenuEmpty.dataSet.date.substring(0, 10), false)
+			}
+		})
 	);
 
 	protected selected: CalendarItem[] = []
@@ -234,7 +289,6 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 
 	protected eventHtml(item: CalendarItem, div?:HTMLElement, withIcons = true) {
 		const e = item.data;
-
 		if(!div) { // default
 			const timeAndIcons = E('span',
 				...item.categoryDots,
@@ -293,6 +347,34 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 			});
 	}
 
+	/**
+	 * Merge items of the same event (uid and start) that are present in multiple selected calendars into one item.
+	 * The calendars are collected in item.calendarIds so they can be shown with stackedCalendars()
+	 */
+	protected mergeDuplicates(allItems: Iterable<CalendarItem>) {
+		const items = [...allItems], seen: {[key:string]: CalendarItem} = {}, result: CalendarItem[] = [];
+		for(const item of items) {
+			item.calendarIds = {};
+			if(item.patched?.calendarId) item.calendarIds[item.patched.calendarId] = true;
+		}
+		for(const item of items) {
+			const uid = item.data?.uid;
+			if(!uid) {
+				result.push(item);
+				continue;
+			}
+			const key = uid + '|' + item.start.getTime() + '|' + item.end.getTime();
+			const first = seen[key];
+			if(first) {
+				Object.assign(first.calendarIds, item.calendarIds);
+			} else {
+				seen[key] = item;
+				result.push(item);
+			}
+		}
+		return result;
+	}
+
 	protected clear() {
 		this.viewModel.forEach(ev => {
 			Object.values(ev.divs).forEach(d => d.remove());
@@ -324,6 +406,47 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 
 	protected ROWHEIGHT = 2.6
 
+	/**
+	 * Colored stripes, one for each calendar the (merged) item is in, joined together as one pill.
+	 * Returns nothing when the item is in a single calendar and includeOwn is false.
+	 *
+	 * @param includeOwn also add a stripe for the calendar of the item itself
+	 */
+	protected calendarStripes(e: CalendarItem, includeOwn: boolean) {
+		const stripes: HTMLElement[] = [];
+		for(const key in e.calendarIds) {
+			const own = key === e.data.calendarId;
+			const color = own ? e.color : calendarStore.findById(key)?.color;
+			if(color) {
+				const stripe = E('i');
+				stripe.style.color = '#' + color;
+				own ? stripes.unshift(stripe) : stripes.push(stripe);
+			}
+		}
+		if(!includeOwn && stripes.length < 2) {
+			return [];
+		}
+		return [E('div', ...stripes).cls('stripes')];
+	}
+
+	protected stackedCalendars(e: CalendarItem) {
+		let backgroundImage = 'linear-gradient(to right, ',
+			padding = 0;
+
+		for(const key in e.calendarIds) {
+			if(key !== e.data.calendarId) {
+				const cal = calendarStore.findById(key);
+				if(cal) {
+					backgroundImage += '#'+cal.color+' '+(padding/10)+'rem '+((padding+=6)/10)+'rem, ';
+				}
+			}
+		}
+
+		padding += 6;
+		backgroundImage += 'currentColor '+((padding-6)/10)+'rem '+(padding/10)+'rem, transparent '+(padding/10)+'rem 100%)';
+		return [backgroundImage, ((padding+6)/10)+'rem'];
+	}
+
 	// for full day view
 	protected makestyle(e: CalendarItem, weekstart: DateTime, row?: number): Partial<CSSStyleDeclaration> {
 		const dayDiff = weekstart.diff(e.start),
@@ -336,17 +459,27 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 		const width = Math.min(21, dwidth) * (100 / this.slots.length),
 			left = pos * (100 / this.slots.length),
 			top = row * this.ROWHEIGHT;
-		return {
+		const style: Partial<CSSStyleDeclaration> = {
 			width: (width-.2).toFixed(2)+'%',
 			left : (left).toFixed(2)+'%',
 			top: top.toFixed(2)+'rem',
 			color: '#'+e.color
 		};
+		if(e.data.showWithoutTime && Object.keys(e.calendarIds).length > 1) {
+			[style.backgroundImage, style.paddingLeft] = this.stackedCalendars(e);
+		}
+		return style;
 	}
 
 	protected drawEventLine(e: CalendarItem, weekstart: DateTime, withIcons = true) {
 		if(!e.divs[weekstart.format('YW')]) {
-			e.divs[weekstart.format('YW')] = this.eventHtml(e, undefined, withIcons);
+			const div = this.eventHtml(e, undefined, withIcons);
+			if(!e.data.showWithoutTime) {
+				// replaces the ::before stripe of the event when it is in multiple calendars
+				const stripes = this.calendarStripes(e, false);
+				div.cls("merged", stripes.length > 0).prepend(...stripes);
+			}
+			e.divs[weekstart.format('YW')] = div;
 		}
 		return e.divs[weekstart.format('YW')]
 			.css(this.makestyle(e, weekstart))

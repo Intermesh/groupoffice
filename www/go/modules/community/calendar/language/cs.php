@@ -130,7 +130,7 @@ return array (
   'Accepted' => 'Přijato',
   'Declined' => 'Odmítnuto',
   'Awaiting reply' => 'Očekávající odpověď',
-  'Invite not send yet' => 'Pozvánka zatím nebyla odeslána',
+  'Invite not sent yet' => 'Pozvánka zatím nebyla odeslána',
   'Cancellation' => 'Zrušení',
   'Invitation' => 'Pozvání',
   'Reply' => 'Odpověď',

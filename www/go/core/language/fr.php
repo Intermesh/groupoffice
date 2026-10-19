@@ -1144,6 +1144,18 @@ return array (
   'Are you sure you want to close this window and discard your changes?' => 'Êtes-vous sûr de vouloir fermer cette fenêtre et annuler vos modifications ?',
   'Input field' => 'Champ de saisie',
   'Calendars' => 'Calendriers',
-  'Subscribe' => 'S\'abonner'
-
+  'Subscribe' => 'S\'abonner',
+  'App passwords' => 'Mots de passe d\'application',
+  'New app password' => 'Nouveau mot de passe d\'application',
+  'App password created' => 'Mot de passe d\'application créé',
+  'Protocols' => 'Protocoles',
+  'Last used' => 'Dernière utilisation',
+  'Last used IP' => 'Dernière adresse IP utilisée',
+  'Copied!' => 'Copié !',
+  'Copy this password now. You won\'t be able to see it again.' => 'Copiez ce mot de passe maintenant. Vous ne pourrez plus l\'afficher par la suite.',
+  'Are you sure you want to delete this password? This cannot be undone.' => 'Voulez-vous vraiment supprimer ce mot de passe ? Cette action est irréversible.',
+  'Use app passwords to let apps like WebDAV, CalDAV, CardDAV and ActiveSync log in without your regular password.' => 'Utilisez des mots de passe d\'application pour permettre à des applications comme WebDAV, CalDAV, CardDAV et ActiveSync de se connecter sans votre mot de passe habituel.',
+  'Force app passwords' => 'Imposer les mots de passe d\'application',
+  'Force external apps like WebDAV and ActiveSync to authenticate with app passwords, these can be created in the user settings.' => 'Obliger les applications externes comme WebDAV et ActiveSync à s\'authentifier avec des mots de passe d\'application, qui peuvent être créés dans les paramètres utilisateur.',
+  'Too many failed login attempts. Please try again later.' => 'Trop de tentatives de connexion échouées. Veuillez réessayer plus tard.',
 );

@@ -84,7 +84,11 @@ class Date {
 
 		if(!isset($region)) {
 			$user = go()->getAuthState()->getUser();
-			$region = $user->holidayset ?? \GO::config()->language;
+			$region = $user->holidayset;
+
+			if(!isset($region)) {
+				return false;
+			}
 		}
 
 		$year = date('Y', $time);

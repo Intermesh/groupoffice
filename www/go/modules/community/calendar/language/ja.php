@@ -101,7 +101,7 @@ return array (
   'Accepted' => '承認済み',
   'Declined' => '辞退済み',
   'Awaiting reply' => '返信待ち',
-  'Invite not send yet' => '招待がまだ送信されていません',
+  'Invite not sent yet' => '招待がまだ送信されていません',
   'Cancellation' => 'キャンセル',
   'Invitation' => '招待',
   'Reply' => '返信',

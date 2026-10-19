@@ -108,7 +108,7 @@ export class CalendarWindow extends FormWindow {
 			ownerIdField.hidden = !editable;
 			descriptionFld.hidden = !editable;
 			publishField.hidden = !editable || !data.id; // no publish button for new calendars
-			nameFld.readOnly = !editable;
+			nameFld.readOnly = !editable || !!data.davaccountId;
 		})
 	}
 }

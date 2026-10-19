@@ -13,7 +13,9 @@ use go\core\ldap\Connection;
 use go\core\ldap\Record;
 use go\core\model\Group;
 use go\core\model\User;
+use go\core\orm\Entity;
 use go\core\orm\EntityType;
+use go\modules\community\ldapauthenticator\model\Authenticator;
 use go\modules\community\ldapauthenticator\model\Server;
 use go\modules\community\ldapauthenticator\Module;
 
@@ -233,12 +235,20 @@ class Sync extends Controller
 
 		if (!$dryRun) {
 			try {
-				if ($user->isModified() && !$user->save()) {
+				if ($user->isModified() && !$this->saveWithRetry($user)) {
 					echo "Error saving user: " . var_export($user->getValidationErrors(), true);
 					return false;
 				}
 			} catch(DbException $e) {
 				echo 'DbException while saving user: "' . $user->username .'":'. $e->getMessage() ."\n";
+
+				return false;
+			}
+
+			try {
+				(new Authenticator())->syncEmailPasswords($server, $user, Module::mappedValues($record));
+			} catch (Exception $e) {
+				$this->output("Could not sync e-mail account password for '" . $username . "': " . $e->getMessage());
 			}
 
 			go()->getDbConnection()
@@ -248,6 +258,38 @@ class Sync extends Controller
 		$this->output("Synced " . $username);
 
 		return $user;
+	}
+
+	/**
+	 * Run a database operation and retry it when the record was changed by another transaction since the
+	 * snapshot was taken (MariaDB error 1020).
+	 *
+	 * @template T
+	 * @param callable():T $fn
+	 * @return T
+	 * @throws DbException
+	 */
+	private function retryOnRecordChanged(callable $fn, int $attempts = 3): mixed
+	{
+		for ($i = 1; ; $i++) {
+			try {
+				return $fn();
+			} catch (DbException $e) {
+				if (!$e->isRecordChanged() || $i >= $attempts) {
+					throw $e;
+				}
+				$this->output("Record changed during save, retrying (" . $i . "/" . $attempts . ")");
+				usleep(100000 * $i);
+			}
+		}
+	}
+
+	/**
+	 * @throws DbException
+	 */
+	private function saveWithRetry(Entity $entity): bool
+	{
+		return $this->retryOnRecordChanged(fn() => $entity->save());
 	}
 
 	private function getGOUserName(Record $record, Server $server): bool|string
@@ -340,7 +382,7 @@ class Sync extends Controller
 			foreach ($deleteUsers as $u) {
 				$this->output("Deleting: " . $u[1]);
 				if (!$dryRun) {
-					User::delete(['id' => $u[0]]);
+					$this->retryOnRecordChanged(fn() => User::delete(['id' => $u[0]]));
 
 					//push changes after each user
 					EntityType::push();
@@ -442,11 +484,13 @@ class Sync extends Controller
 
 			if (!$dryRun) {
 				try {
-					if (!$group->save()) {
+					if (!$this->saveWithRetry($group)) {
 						echo "Error saving group: " . var_export($group->getValidationErrors(), true);
 					}
 				} catch(DbException $e) {
 					echo 'DbException while saving group: "' . $group->name .'":'. $e->getMessage() ."\n";
+					//The user was not saved, so it can't be linked to the server (the foreign key would fail).
+					return false;
 				}
 
 				go()->getDbConnection()
@@ -500,7 +544,7 @@ class Sync extends Controller
 				$this->output("Deleting: " . $g[1]);
 
 				if (!$dryRun) {
-					Group::delete(['id' => $g['id']]);
+					$this->retryOnRecordChanged(fn() => Group::delete(['id' => $g[0]]));
 
 					//push changes after each user
 					EntityType::push();

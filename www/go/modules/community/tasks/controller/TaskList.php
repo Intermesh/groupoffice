@@ -13,6 +13,9 @@ use go\core\jmap\EntityController;
 use go\core\model\Module as CoreModule;
 use go\modules\community\tasks\model;
 
+/**
+ * @extends EntityController<\go\modules\community\tasks\model\TaskList>
+ */
 class TaskList extends EntityController
 {
 

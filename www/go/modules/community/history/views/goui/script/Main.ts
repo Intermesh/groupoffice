@@ -153,7 +153,7 @@ export class Main extends Component {
 				flex: 1
 			},
 			tbar({
-					cls: "border-bottom"
+					cls: "border-bottom table-aligned"
 				},
 				"->",
 				searchbtn({

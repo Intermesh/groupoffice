@@ -23,6 +23,9 @@ modules.register({
 			}
 
 			onlineMeetingServices.register("Jitsi Meet", async (calendarEventForm) => {
+
+				translate.setDefaultModule("community", "jitsimeet");
+
 				const m = modules.get('community', 'jitsimeet')!;
 
 				const room = b64UrlEncode(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(8))));

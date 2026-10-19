@@ -3,7 +3,7 @@
 %font-caption {
 	//text-transform: uppercase;
 	font-weight: 600;
-	font-size: 1.2em;
+	font-size: 1.1em;
 	color: $colorTextSecondary;
 }
 
@@ -47,10 +47,6 @@
 		color:$colorTextSecondary;
 		padding-left: .4rem;
 		padding-right: .4rem;
-
-	}
-	&::first-letter {
-		text-transform: capitalize;
 	}
 	&.new {
 		background-color: white !important;
@@ -205,6 +201,25 @@
 }
 
 .cal {
+	.stripes {
+		display: inline-flex;
+		flex: none;
+		align-self: center;
+		height: dp(16);
+		margin: dp(5);
+		border-radius: 999px;
+		overflow: hidden;
+		> i {
+			flex: none;
+			display: block;
+			width: dp(4) !important;
+			min-width: dp(4) !important;
+			height: 100% !important;
+			min-height: 0 !important;
+			margin: 0 !important;
+			background-color: currentColor;
+		}
+	}
 	i.cat {
 		background-color: currentColor;
 		border-radius: dp(3);
@@ -219,7 +234,7 @@
 		&.today {
 			em {
 				font-weight: 600;
-				border-radius: 999px;
+				border-radius: 50%;
 				display:inline-block;
 				text-align: center;
 				min-width: dp(36);
@@ -411,6 +426,9 @@
 					&:not(.allday) {
 						padding-left: 0;
 						padding-right: 0;
+						&.merged::before {
+							display: none;
+						}
 						&::before {
 							content: '';
 							border-radius: 999px;
@@ -450,9 +468,9 @@ $timeMargin: dp(72);
 		> em { // date number
 			font-style: normal;
 			display: inline-block;
-			margin-left: dp(8);
-			padding: dp(8);
-			font-size: 1.1em;
+			margin: dp(6);
+			padding: dp(6);
+			font-size: 1em;
 			color: $colorText;
 			//border: 1px solid currentColor;
 		}
@@ -696,6 +714,9 @@ $timeMargin: dp(72);
 				margin-left:dp(8);
 				width: dp(198);
 			}
+			span:last-of-type {
+				flex: 1;
+			}
 		}
 	}
 }
@@ -811,18 +832,18 @@ $timeMargin: dp(72);
 		border-left:0;
 	}
 }
-.goui.goui-toolbar.dense {
-	padding: 7px 3.5px 7px 11px !important;
-	> h3 {
-		flex: 1 !important;
-		color: $colorTextSecondary;
-		font-size:.9em;
-		~ button {
-			padding: 5.25px;
-			margin-right: 0;
-		}
-	}
-}
+//.goui.goui-toolbar.dense {
+//	padding: 7px 3.5px 7px 11px !important;
+//	> h3 {
+//		flex: 1 !important;
+//		color: $colorTextSecondary;
+//		font-size:.9em;
+//		~ button {
+//			padding: 5.25px;
+//			margin-right: 0;
+//		}
+//	}
+//}
 
 //.participant-field {
 //	.goui-pit {
@@ -867,5 +888,38 @@ $timeMargin: dp(72);
 #go-module-panel-calendar {
 	.datepicker {
 		margin: 0 auto;
+	}
+}
+
+.tooltip {
+
+	.categories {
+
+		margin-top: dp(8);
+
+		>* {
+			&:after {
+				content: ", ";
+			}
+
+			&:last-child {
+				&:after {
+					content: "";
+				}
+			}
+		}
+	}
+	i.cat {
+		display:inline-block;
+		font-size: inherit !important;
+		color: inherit;
+		min-height: dp(16);
+		height: dp(16);
+		width: dp(16);
+		min-width: dp(16);
+		background-color: currentColor;
+		border-radius: dp(3);
+		margin:dp(2);
+		vertical-align: middle;
 	}
 }

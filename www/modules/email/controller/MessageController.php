@@ -648,7 +648,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$mailer->send($message);
 		} catch(\Throwable $e) {
 			$msg = GO::t("Sorry, an error occurred") . ': '. $mailer->lastError(). ' - '. $e->getMessage();
-			throw new Exception($msg);
+			\go\core\ErrorHandler::logException($e, "Failed to send message");
+			throw new \go\core\exception\UserMessage($msg, 0, $e);
 		}
 
 
@@ -961,6 +962,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	 */
 	protected function actionReply(array $params)
 	{
+		GO::session()->closeWriting();
 		if(!empty($params['uid'])){
 			$account = Account::model()->findByPk($params['account_id']);
 			if(!$account) {
@@ -1210,6 +1212,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	 */
 	protected function actionForward(array $params)
 	{
+		GO::session()->closeWriting();
 		if (!empty($params['uid'])) {
 			$account = Account::model()->findByPk($params['account_id']);
 			$message = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
@@ -1313,6 +1316,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	 */
 	public function actionView(array $params): array
 	{
+		GO::session()->closeWriting();
 		$params['no_max_body_size'] = !empty($params['no_max_body_size']) && $params['no_max_body_size']!=='false';
 
 		$account = Account::model()->findByPk($params['account_id']);

@@ -2,7 +2,7 @@ import {CalendarView} from "./CalendarView.js";
 import {DateInterval, DateTime, E, Format} from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {client} from "@intermesh/groupoffice-core";
-import {calendarStore, t} from "./Index.js";
+import {t} from "./Index.js";
 
 class CalendarDayItem extends CalendarItem {
 	pos!: number
@@ -52,7 +52,14 @@ export class WeekView extends CalendarView {
 					pxPerSnap = liRect.height / (1440 / SNAP), // 96 quarter-hours in a day
 					minute = Math.round((e.clientY - liRect.top) / pxPerSnap) * SNAP;
 
+				this.contextMenuEmpty.dataSet.viewSupportsTime = true;
 				this.contextMenuEmpty.dataSet.date = (new DateTime(e.target.dataset.day!)).setHours(0, minute).format('c');
+				this.contextMenuEmpty.showAt(e);
+			} else if(e.target.isA('li') && e.target.dataset.date) {
+				// all day event
+
+				this.contextMenuEmpty.dataSet.date = e.target.dataset.date;
+				this.contextMenuEmpty.dataSet.viewSupportsTime = true;
 				this.contextMenuEmpty.showAt(e);
 			}
 		});
@@ -218,7 +225,7 @@ export class WeekView extends CalendarView {
 			}
 		}
 
-		this.viewModel = allDay.sort((a,b) => Math.sign(+a.start.date - +b.start.date));
+		this.viewModel = this.mergeDuplicates(allDay).sort((a,b) => Math.sign(+a.start.date - +b.start.date));
 		this.dayItems = withTime;
 		this.updateItems();
 		this.updateDayItems();
@@ -406,24 +413,6 @@ export class WeekView extends CalendarView {
 			height: 'calc('+(100 / 1440 * (e.endM - e.startM))+'% - 1px)',
 			backgroundImage, paddingLeft, borderLeft:'0'
 		});
-	}
-
-	private stackedCalendars(e: CalendarDayItem) {
-		let backgroundImage = 'linear-gradient(to right, ',
-			padding = 0;
-
-		for(const key in e.calendarIds) {
-			if(key !== e.data.calendarId) {
-				const cal = calendarStore.findById(key);
-				if(cal) {
-					backgroundImage += '#'+cal.color+' '+(padding/10)+'rem '+((padding+=6)/10)+'rem, ';
-				}
-			}
-		}
-
-		padding += 6;
-		backgroundImage += 'currentColor '+((padding-6)/10)+'rem '+(padding/10)+'rem, transparent '+(padding/10)+'rem 100%)';
-		return [backgroundImage, ((padding+6)/10)+'rem'];
 	}
 
 }

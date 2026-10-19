@@ -23,4 +23,10 @@ return array (
   'Remember last selected note book' => 'Ricorda ultimo notebook selezionato ',
   'Web page' => 'Pagina Web',
   'Content' => 'Contenuto',
+  'notes' => 'notes',
+  'Microsoft Excel' => 'Microsoft Excel',
+  'Wrong password' => 'Password sbagliata',
+  'Cannot decrypt' => 'Non riesco a decifrare',
+  'Encrypt' => 'Cifra',
+  'Passwords do not match' => 'le password non corrispondono',
 );

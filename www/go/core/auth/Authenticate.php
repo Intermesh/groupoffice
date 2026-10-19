@@ -7,14 +7,15 @@ use go\core\db\Column;
 use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
 use go\core\exception\Unavailable;
+use go\core\jmap\Request;
+use go\core\jmap\State as JmapState;
+use go\core\model\AppPassword;
 use go\core\model\AuthAllowGroup;
 use go\core\model\RememberMe;
 use go\core\model\Token;
 use go\core\model\User;
-use go\core\jmap\Request;
+use go\core\orm\Query;
 use go\core\util\DateTime;
-use go\core\jmap\State as JmapState;
-use go\modules\community\addressbook\model\Contact;
 
 /**
  * Class Authenticate
@@ -22,13 +23,34 @@ use go\modules\community\addressbook\model\Contact;
  * This is a helper class that should always be used to authenticate a user
  * It will be used for webclient, sync client, webdav client
  */
-class Authenticate {
+class Authenticate
+{
 
 	/**
 	 * Cache password logins for this number of seconds to
 	 * (JH: I hate it when people don't finish their)
 	 */
 	const CACHE_PASSWORD_LOGIN = 60;
+
+	/**
+	 * Failed attempts per username+IP before throttling starts
+	 */
+	const THROTTLE_MAX_USER_FAILURES = 5;
+
+	/**
+	 * Failed attempts per IP (any username) before throttling starts
+	 */
+	const THROTTLE_MAX_IP_FAILURES = 25;
+
+	/**
+	 * Seconds after which the failure counters are forgotten when no new failure occurs
+	 */
+	const THROTTLE_WINDOW = 900;
+
+	/**
+	 * Maximum back-off in seconds
+	 */
+	const THROTTLE_MAX_DELAY = 900;
 
 	private array $primaryAuthenticators;
 	private array $secondaryAuthenticators;
@@ -41,7 +63,8 @@ class Authenticate {
 	 *
 	 * @return PrimaryAuthenticator|false
 	 */
-	public function getPrimaryAuthenticatorForUser($username) {
+	public function getPrimaryAuthenticatorForUser($username)
+	{
 		$this->populateAuthenticators();
 		foreach ($this->getPrimaryAuthenticators() as $authenticator) {
 			if ($authenticator->isAvailableFor($username)) {
@@ -113,8 +136,9 @@ class Authenticate {
 		return $this->externalAuthenticators;
 	}
 
-	private function populateAuthenticators() {
-		if(!isset($this->primaryAuthenticators)) {
+	private function populateAuthenticators()
+	{
+		if (!isset($this->primaryAuthenticators)) {
 			$authMethods = Method::find()->orderBy(['sortOrder' => 'DESC'])->all();
 			$this->secondaryAuthenticators = [];
 			$this->primaryAuthenticators = [];
@@ -143,11 +167,27 @@ class Authenticate {
 	private function isLocalUser($username): bool
 	{
 		return go()->getDbConnection()
-			->selectSingleValue('id')
-			->from('core_auth_password', 'p')
-			->join('core_user', 'u', 'u.id=p.userId')
-			->where('username', '=', explode('@', $username)[0])
-			->single() != null;
+				->selectSingleValue('id')
+				->from('core_auth_password', 'p')
+				->join('core_user', 'u', 'u.id=p.userId')
+				->where('username', '=', explode('@', $username)[0])
+				->single() != null;
+	}
+
+	/**
+	 * Appends the default authentication domain to a username without a domain.
+	 *
+	 * Local users (created in the database, not by an authenticator like LDAP) are left untouched.
+	 */
+	private function applyDefaultDomain(string $username): string
+	{
+		$domain = go()->getSettings()->defaultAuthenticationDomain;
+
+		if (!$domain || str_contains($username, '@') || $this->isLocalUser($username)) {
+			return $username;
+		}
+
+		return $username . '@' . $domain;
 	}
 
 	/**
@@ -168,8 +208,60 @@ class Authenticate {
 	}
 
 
-	private function logFailure(string $username): void
+	private function throttleKeys(string $username, string $scope): array
 	{
+		if(go()->getEnvironment()->isCli()) {
+			return [];
+		}
+		$ip = Request::get()->getRemoteIpAddress();
+		return [
+			'login-throttle-' . $scope . '-u-' . md5(strtolower($username) . '|' . $ip) => self::THROTTLE_MAX_USER_FAILURES,
+			'login-throttle-' . $scope . '-ip-' . md5($ip) => self::THROTTLE_MAX_IP_FAILURES
+		];
+	}
+
+	/**
+	 * Throws when too many failed logins occurred recently for this username/IP.
+	 * @throws Forbidden
+	 */
+	public function checkThrottle(string $username, string $scope = 'password'): void
+	{
+		foreach($this->throttleKeys($username, $scope) as $key => $max) {
+			$state = go()->getCache()->get($key);
+			if($state && $state['lockedUntil'] > time()) {
+				throw new Forbidden(go()->t("Too many failed login attempts. Please try again later."));
+			}
+		}
+	}
+
+	/**
+	 * Count a failed login and apply exponential back-off: delay doubles for every failure past the limit.
+	 */
+	public function registerFailure(string $username, string $scope = 'password'): void
+	{
+		foreach($this->throttleKeys($username, $scope) as $key => $max) {
+			$state = go()->getCache()->get($key) ?: ['count' => 0, 'lockedUntil' => 0];
+			$state['count']++;
+			if($state['count'] >= $max) {
+				$delay = min(self::THROTTLE_MAX_DELAY, 30 * (2 ** min(20, $state['count'] - $max)));
+				$state['lockedUntil'] = time() + $delay;
+			}
+			go()->getCache()->set($key, $state, true, self::THROTTLE_WINDOW + self::THROTTLE_MAX_DELAY);
+		}
+	}
+
+	public function clearThrottle(string $username, string $scope = 'password'): void
+	{
+		// Only the username+IP counter is reset, so a valid login can't be used to reset the IP counter.
+		$keys = array_keys($this->throttleKeys($username, $scope));
+		if($keys) {
+			go()->getCache()->delete($keys[0]);
+		}
+	}
+
+	private function logFailure(string $username, string $scope = 'password'): void
+	{
+		$this->registerFailure($username, $scope);
 		// Don't change log message as fail2ban relies on it
 		ErrorHandler::log("Password authentication failed for '" . $username . "' from IP: '" . Request::get()->getRemoteIpAddress() . "'");
 	}
@@ -187,26 +279,23 @@ class Authenticate {
 	 */
 	public function passwordLogin(string $username, string $password): bool|User
 	{
-		$isLocalUser = $this->isLocalUser($username);
-
-		go()->debug("Auth ". $username . " is " . ($isLocalUser ? "local" : "not local"));
-		// When the user is local don't use
-		if(!$isLocalUser && !str_contains($username, '@') && go()->getSettings()->defaultAuthenticationDomain) {
-			$username .= '@' . go()->getSettings()->defaultAuthenticationDomain;
-		}
+		$username = $this->applyDefaultDomain($username);
 
 		go()->debug("Authenticating " . $username);
 
-		$cacheKey = 'login-' . md5($username. '|' . $password);
+		$this->checkThrottle($username);
 
-		if(!go()->getSettings()->maintenanceMode && $cache = go()->getCache()->get($cacheKey)) {
+		$cacheKey = 'login-' . md5($username . '|' . $password);
+
+		if (!go()->getSettings()->maintenanceMode && $cache = go()->getCache()->get($cacheKey)) {
+			$this->clearThrottle($username);
 			$this->usedPasswordAuthenticator = $cache[1];
 			return $cache[0];
 		}
 
 		$authenticator = $this->getPrimaryAuthenticatorForUser($username);
 
-		if(!$authenticator) {
+		if (!$authenticator) {
 
 			// If we get here then the given username doesn't exist.
 			// Do a password_verify for timing attacks as this would be done for a
@@ -235,18 +324,20 @@ class Authenticate {
 
 		go()->log("success");
 
-		if(!$user->enabled) {
+		$this->clearThrottle($username);
+
+		if (!$user->enabled) {
 			throw new Forbidden(go()->t("Your account has been disabled."));
 		}
 
-		if(!go()->getEnvironment()->isCli()) {
+		if (!go()->getEnvironment()->isCli()) {
 			$ip = Request::get()->getRemoteIpAddress();
 			if (!AuthAllowGroup::isAllowed($user, $ip)) {
 				throw new Forbidden(str_replace('{ip}', $ip, go()->t("You are not allowed to login from IP address {ip}.")));
 			}
 		}
 
-		if(go()->getSettings()->maintenanceMode && !$user->isAdmin()) {
+		if (go()->getSettings()->maintenanceMode && !$user->isAdmin()) {
 			throw new Unavailable(go()->t("Service unavailable. Maintenance mode is enabled."));
 		}
 
@@ -256,6 +347,170 @@ class Authenticate {
 
 		return $user;
 
+	}
+
+	/**
+	 * Throws when the user may not login at all (disabled, IP not allowed, maintenance).
+	 *
+	 * @throws Forbidden|Unavailable
+	 */
+	private function assertUserMayLogin(User $user): void
+	{
+		if (!$user->enabled) {
+			throw new Forbidden(go()->t("Your account has been disabled."));
+		}
+
+		if (!go()->getEnvironment()->isCli()) {
+			$ip = Request::get()->getRemoteIpAddress();
+			if (!AuthAllowGroup::isAllowed($user, $ip)) {
+				throw new Forbidden(str_replace('{ip}', $ip, go()->t("You are not allowed to login from IP address {ip}.")));
+			}
+		}
+
+		if (go()->getSettings()->maintenanceMode && !$user->isAdmin()) {
+			throw new Unavailable(go()->t("Service unavailable. Maintenance mode is enabled."));
+		}
+	}
+
+	/**
+	 * Login for protocols that don't support a second factor (DAV, ActiveSync).
+	 *
+	 * App passwords are tried first because that is cheap (indexed lookup + fast hash) and must not count as a
+	 * failed regular login. When "forceAppPasswords" is enabled only app passwords are accepted.
+	 *
+	 * @param string $protocol The app password scope: 'dav' or 'activesync'
+	 * @return false|User
+	 * @throws Forbidden|Unavailable
+	 */
+	public function appLogin(string $username, string $password, string $protocol): bool|User
+	{
+		$force = go()->getSettings()->forceAppPasswords;
+
+		if (AppPassword::looksLikeSecret($password)) {
+			// When not forced a miss is no failure yet, it might be a regular password.
+			$user = $this->appPasswordLogin($username, $password, $protocol, $force);
+			if ($user || $force) {
+				return $user;
+			}
+		} else if ($force) {
+			// Can't be an app password, don't bother the database.
+			User::fireEvent(User::EVENT_BADLOGIN, $username, null);
+			$this->logFailure($username, 'apppassword');
+			return false;
+		}
+
+		return $this->passwordLogin($username, $password);
+	}
+
+	/**
+	 * Authenticate with an app password.
+	 *
+	 * @param string $protocol 'dav' (WebDAV, CalDAV and CardDAV) or 'activesync'
+	 * @param bool $countFailure Register a failed attempt for throttling and fail2ban. Disable when a regular
+	 *  password login follows that will do this itself.
+	 * @return false|User
+	 * @throws Forbidden|Unavailable
+	 */
+	public function appPasswordLogin(string $username, string $password, string $protocol, bool $countFailure = true): bool|User
+	{
+		$username = $this->applyDefaultDomain($username);
+
+		go()->debug("App password auth for " . $username . " (protocol: " . $protocol . ")");
+
+		$this->checkThrottle($username, 'apppassword');
+
+		// Only ids are cached, never the user entity. The app password is re-checked on every request so a
+		// deletion takes effect immediately, and the user checks below are always executed.
+		$cacheKey = 'apppw-' . hash('sha256', $username . '|' . $protocol . '|' . $password);
+		$cached = !go()->getSettings()->maintenanceMode ? go()->getCache()->get($cacheKey) : null;
+
+		if (is_array($cached)) {
+			[$userId, $appPasswordId] = $cached;
+			$appPassword = $this->findAppPasswords($userId, $protocol)
+				->andWhere('cap.id', '=', $appPasswordId)
+				->single();
+
+			$user = $appPassword ? User::findById($userId) : null;
+			if ($user && strcasecmp($user->username, $username) === 0) {
+				$this->clearThrottle($username, 'apppassword');
+				$this->assertUserMayLogin($user);
+				$this->touchAppPassword($appPassword);
+				return $user;
+			}
+			go()->getCache()->delete($cacheKey);
+		}
+
+		$user = User::find()->where(['username' => $username])->single();
+
+		if (!$user) {
+			// No dummy hash needed: verifying is a cheap sha256, so unknown and known users take equally long.
+			go()->log("App password for '$username' rejected: unknown user");
+			if ($countFailure) {
+				$this->logFailure($username, 'apppassword');
+			}
+			return false;
+		}
+
+		// Only fetch the app passwords that are valid for this protocol, so we never verify a
+		// password that can't be used here anyway.
+		foreach ($this->findAppPasswords($user->id, $protocol) as $appPassword) {
+			if (!$appPassword->verifyPassword($password)) {
+				continue;
+			}
+
+			go()->log("App password login success for " . $username);
+			$this->clearThrottle($username, 'apppassword');
+			$this->assertUserMayLogin($user);
+
+			go()->getCache()->set($cacheKey, [$user->id, $appPassword->id], true, self::CACHE_PASSWORD_LOGIN);
+			$this->touchAppPassword($appPassword);
+
+			return $user;
+		}
+
+		if ($countFailure) {
+			User::fireEvent(User::EVENT_BADLOGIN, $username, null);
+			$this->logFailure($username, 'apppassword');
+		}
+
+		return false;
+	}
+
+	/**
+	 * Find the app passwords of a user that are valid for the given protocol
+	 *
+	 * Only the properties needed for authentication are loaded.
+	 *
+	 * @return Query<AppPassword>
+	 */
+	private function findAppPasswords(int|string $userId, string $protocol): Query
+	{
+		return AppPassword::find(['id', 'userId', 'passwordHash', 'lastUsedAt', 'lastUsedIp'])
+			->join('core_app_password_scope', 's', 's.appPasswordId = cap.id')
+			->where(['cap.userId' => $userId, 's.protocol' => $protocol]);
+	}
+
+	/**
+	 * Registers the use of an app password.
+	 *
+	 * To keep frequent DAV/ActiveSync requests cheap it only saves when the day or the IP changed.
+	 */
+	private function touchAppPassword(AppPassword $appPassword): void
+	{
+		$today = new DateTime();
+		$ip = Request::get()->getRemoteIpAddress();
+
+		if (isset($appPassword->lastUsedAt) && $appPassword->lastUsedAt->format('Y-m-d') === $today->format('Y-m-d')
+			&& ($appPassword->lastUsedIp ?? null) === $ip) {
+			return;
+		}
+
+		$appPassword->lastUsedAt = $today;
+		$appPassword->lastUsedIp = $ip;
+
+		if (!$appPassword->save()) {
+			go()->warn("Could not save last usage of app password " . $appPassword->id);
+		}
 	}
 
 	private $usedPasswordAuthenticator;
@@ -287,7 +542,7 @@ class Authenticate {
 
 		$primary = $this->getPrimaryAuthenticatorForUser($user->username);
 		// if no primary authenticator was found then also allow password recovery to create a password
-		if($primary && !($primary instanceof Password)) {
+		if ($primary && !($primary instanceof Password)) {
 			go()->debug("Authenticator doesn't support recovery");
 			return false;
 		}
@@ -295,8 +550,9 @@ class Authenticate {
 		return true;
 	}
 
-	public function recovery($hash) {
-		if(empty($hash)) {
+	public function recovery($hash)
+	{
+		if (empty($hash)) {
 			return false;
 		}
 		$oneHourAgo = new DateTime('-1 hour');
@@ -320,7 +576,7 @@ class Authenticate {
 		RememberMe::unsetCookie();
 		$state = new JmapState();
 		$token = $state->getToken();
-		if(!$token) {
+		if (!$token) {
 			return false;
 		}
 
@@ -335,7 +591,8 @@ class Authenticate {
 		return true;
 	}
 
-	public function refreshToken($accessToken) {
+	public function refreshToken($accessToken)
+	{
 		$token = Token::find()->where(['accessToken' => $accessToken])->single();
 		if ($token && $token->isAuthenticated()) {
 			$token->refresh();

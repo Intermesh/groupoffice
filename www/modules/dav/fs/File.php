@@ -14,7 +14,10 @@
  */
 
 namespace GO\Dav\Fs;
+
+use GO\Base\Model\Acl;
 use Sabre;
+use Sabre\DAV\Exception\Forbidden;
 
 class File extends \Sabre\DAV\FS\File {
 
@@ -30,13 +33,20 @@ class File extends \Sabre\DAV\FS\File {
 		parent::__construct($path);
 	}
 
-	public function checkWritePermission($delete=false) {
-
+	/**
+	 * @param bool $delete : toggle between delete or write mode
+	 * @throws Forbidden
+	 */
+	public function checkWritePermission(?bool $delete = false): void
+	{
 		$fsFile = new \GO\Base\Fs\File($this->path);
 
 		$this->folder = \GO\Files\Model\Folder::model()->findByPath($fsFile->parent()->stripFileStoragePath());
-		if (!\GO\Base\Model\Acl::hasPermission($this->folder->getPermissionLevel(), \GO\Base\Model\Acl::WRITE_PERMISSION)){
-			throw new Sabre\DAV\Exception\Forbidden("DAV: User ".\GO::user()->username." doesn't have write permission for file '".$this->relpath.'"');
+		$requiredPermissionLevel = $delete ? Acl::DELETE_PERMISSION : Acl::READ_PERMISSION;
+		$permissionString = $delete ? "delete" : "write";
+		if (!Acl::hasPermission($this->folder->getPermissionLevel(), $requiredPermissionLevel)) {
+			throw new Sabre\DAV\Exception\Forbidden("DAV: User " . \GO::user()->username . " doesn't have " .
+				$permissionString . " permission for file '" . $this->relpath . '"');
 		}
 	}
 
@@ -51,18 +61,8 @@ class File extends \Sabre\DAV\FS\File {
 		\GO::debug("DAVFile:put( ".$this->relpath.")");
 		$this->checkWritePermission();
 		
-//		$file = $this->getFile()
-//		$file->saveVersion();
-//		$file->putContents($data);
-		
-
 		$file = $this->getFile();
 		$file->putContents($data);
-
-//		file_put_contents($this->path, $data);
-//		$this->getFile()
-
-		//\GO::debug('ADDED FILE WITH WEBDAV -> FILE_ID: ' . $file_id);
 	}
 
     public function lock($lock_id = "") {
@@ -73,9 +73,9 @@ class File extends \Sabre\DAV\FS\File {
 			$file->save(true);
     }
 
-    public function unlock() {
-
-			\GO::debug("DAVFile:unlock( )");
+    public function unlock()
+    {
+		\GO::debug("DAVFile:unlock( )");
         $file = $this->getFile();
         $file->locked_user_id =0;
 				$file->lock_id = "";
@@ -87,8 +87,10 @@ class File extends \Sabre\DAV\FS\File {
 	 *
 	 * @param string $name The new name
 	 * @return void
+	 * @throws Forbidden
 	 */
-	public function setName($name) {
+	public function setName($name): void
+	{
 		
 		\GO::debug("DAVFile::setName($name)");
 		$this->checkWritePermission();
@@ -108,12 +110,12 @@ class File extends \Sabre\DAV\FS\File {
 	}
 
 	/**
-	 * Movesthe node
+	 * Move sthe node
 	 *
-	 * @param string $name The new name
 	 * @return void
 	 */
-	public function move($newPath) {
+	public function move($newPath): void
+	{
 		$this->checkWritePermission();
 
 		\GO::debug('DAVFile::move(' . $this->path . ' -> ' . $newPath . ')');
@@ -183,10 +185,11 @@ class File extends \Sabre\DAV\FS\File {
 	 *
 	 * @return void
 	 */
-	public function delete() {
+	public function delete(): void
+	{
 		$this->checkWritePermission(true);
 		$file = $this->getFile();
-		if($file) {
+		if ($file) {
 			$file->delete();
 		}
 	}

@@ -27,7 +27,14 @@ class NoteController extends \GO\Base\Controller\AbstractModelController{
 		
 		return $model;
 	}
-	
-	
+
+	protected function actionLoad($params)
+	{
+		\GO::session()->closeWriting();
+
+		return parent::actionLoad($params);
+	}
+
+
 }
 

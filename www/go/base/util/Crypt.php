@@ -76,7 +76,7 @@ class Crypt {
 	 *           boolean  false on error
 	 */
 	public static function decrypt($ciphertext, $password = null) {
-		return \go\core\util\Crypt::decrypt($ciphertext, $password);
+		return \go\core\util\Crypt::decrypt($ciphertext ?? "", $password);
 	}
 
 	/**

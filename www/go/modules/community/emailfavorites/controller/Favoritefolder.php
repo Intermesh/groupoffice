@@ -5,6 +5,9 @@ namespace go\modules\community\emailfavorites\controller;
 use go\core\jmap\EntityController;
 use go\core\util\ArrayObject;
 
+/**
+ * @extends EntityController<\go\modules\community\emailfavorites\model\Favoritefolder>
+ */
 class Favoritefolder extends EntityController
 {
 	public function query(array $params): ArrayObject

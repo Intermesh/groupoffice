@@ -17,6 +17,8 @@ input[type="time"]::-webkit-clear-button {
     display: none;
 }
 
+
+
 html {
 	font-size: var(--density);
 	letter-spacing: normal;
@@ -887,13 +889,17 @@ hr {
 			display: inline-block;
 		}
 	}
+
+	&.right {
+		float: right;
+	}
 }
 
-//.right {
-//	float: right;
-//}
+
 
 .status {
+
+
 
 	.x-grid3-cell-inner & {
 		float: left; //to avoid ellipsis
@@ -914,6 +920,10 @@ hr {
 
 	.x-panel-header-text & {
 		margin: utils.dp(8);
+	}
+
+	&.right {
+		float: right;
 	}
 }
 
@@ -2462,6 +2472,7 @@ table[id^="comments-ext"] b {
 
 	pre {
 		@extend code;
+		white-space: pre-wrap;
 	}
 
 	*[disabled] {

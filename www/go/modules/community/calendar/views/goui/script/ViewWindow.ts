@@ -12,7 +12,6 @@ import {t} from "./Index.js";
 
 const allCalendarStore = datasourcestore({
 	dataSource:jmapds('Calendar'),
-	queryParams:{filter:{}},
 	sort: [{property:'sortOrder'},{property:'name'}]
 });
 

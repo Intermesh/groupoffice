@@ -113,7 +113,7 @@ export class CommentsPanel extends Component {
 				}),
 			),
 			comp({},
-				comp({cls: "pad"}, this.commentList),
+				this.commentList,
 				form({
 						flex: 1,
 						handler: (form) => {
@@ -181,7 +181,7 @@ export class CommentsPanel extends Component {
 	}
 
 	public onLoad(entity: DefaultEntity) {
-		this.load(entity.id);
+		void this.load(entity.id);
 	}
 
 	public async load(id: EntityID) {
@@ -191,6 +191,8 @@ export class CommentsPanel extends Component {
 			entity: this.entityName,
 			entityId: id
 		});
+
+		this.commentEditor.editor.clearInvalid();
 
 		await this.commentList.store.load();
 		this.countBadge.text = this.commentList.store.count().toString();

@@ -38,6 +38,7 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 			e.preventDefault();
 			const day = e.target.up('li[data-date]');
 			if(day) {
+				this.contextMenuEmpty.dataSet.viewSupportsTime = false;
 				this.contextMenuEmpty.dataSet.date = day.dataset.date;
 				this.contextMenuEmpty.showAt(e);
 			}
@@ -91,7 +92,7 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 	protected populateViewModel() {
 		this.clear()
 
-		for(const item of this.adapter.items) {
+		for(const item of this.mergeDuplicates(this.adapter.items)) {
 			this.viewModel.push(item);
 		}
 		if(this.currentCreation)

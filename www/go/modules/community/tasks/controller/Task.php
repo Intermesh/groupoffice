@@ -16,6 +16,9 @@ use go\modules\business\registration\Module as RegistrationModule;
 use go\modules\community\tasks\model;
 use go\modules\business\license\model\License;
 
+/**
+ * @extends EntityController<\go\modules\community\tasks\model\Task>
+ */
 class Task extends EntityController {
 
 	protected function entityClass(): string

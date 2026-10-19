@@ -198,7 +198,10 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 				'focus':()=> { this.titleField.input!.select();}
 			}}),
 			select({
-				label: t('Calendar'), name: 'calendarId', required: true, flex: '1 30%',
+				label: t('Calendar'),
+				name: 'calendarId',
+				required: true,
+				flex: '1 30%',
 				store: writeableCalendarStore,
 				valueField: 'id',
 				textRenderer: (r: any) => r.name,
@@ -215,7 +218,13 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 							if(this.item)
 								this.item.cal = r;
 
-							this.categoryStore.setFilter("calendar",  {calendarId: newValue});
+							this.categoryStore.setFilter("calendar",  {
+								operator: "OR",
+								conditions: [
+									{mine: true},
+									{inCalendars: newValue}
+								]
+						});
 
 							const d = this.form.value.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
 							this.alertField.setDefaultLabel(d);
@@ -228,6 +237,20 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 								}).catch(e => {
 									void Window.error(t("Could not add organizer because the calendar principal could not be read from the server. Do you have permissions?"));
 								})
+							}
+
+
+
+							if(!this.form.currentId && r.groupId != null) {
+								// Direct resource booking. We'll add the resource as participant.
+
+								principalDS.single("Calendar:" + r.id).then(p => {
+									this.participantFld.addParticipant(p);
+								}).catch(e => {
+									void Window.error(t("Could not add organizer because the calendar principal could not be read from the server. Do you have permissions?"));
+								})
+
+
 							}
 						}
 
@@ -306,7 +329,9 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 			this.alertField,
 
 			autocompletechips({
-				list: table({headers: false, store: this.categoryStore = datasourcestore({
+				list: table({
+					headers: false,
+					store: this.categoryStore = datasourcestore({
 						dataSource:jmapds('CalendarCategory'),
 						sort: [{property:'name'}]
 					}),
@@ -318,6 +343,7 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 						}),
 						column({id: "name"})
 					]
+
 				}),
 				label: t("Categories",'core','core'),
 				name: "categoryIds",
@@ -367,7 +393,10 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 		);
 
 		this.addCustomFields();
+
 	}
+
+
 
 	public addLinkOnSave(entityName:string, entityId:string) {
 		// Add name from linked entity to the title field when creating event with AddButton
@@ -426,6 +455,13 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 		return data;
 	}
 
+	/**
+	 * Loads a calendar item into the event window.
+	 *
+	 * This can be a new or existing item.
+	 *
+	 * @param ev
+	 */
 	async loadEvent(ev: CalendarItem) {
 
 		//this.title = t(!ev.key ? 'New event' : 'Edit event');
@@ -461,6 +497,7 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 	}
 
 	private onBeforeSubmit() {
+
 		if(this.confirmedScheduleMessage) {
 			return;
 		}
@@ -468,8 +505,10 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 			this.close();
 			return false;
 		}
-		if(this.item!.isRecurring) {
 
+		if(this.form.currentId && this.item!.isRecurring) {
+
+			// patching only works on existing events
 			this.item!.patch(this.parseSavedData(this.form.modified), () => {
 				this.close();
 			});

@@ -18,6 +18,8 @@ use go\modules\community\calendar\Module;
 /**
  * CalendarEvent controller.
  * NOTE: The extra get and set parameter in the docblocks are according to RFC and might not (yet) be implemented
+ *
+ * @extends EntityController<\go\modules\community\calendar\model\CalendarEvent>
  */
 class CalendarEvent extends EntityController {
 	

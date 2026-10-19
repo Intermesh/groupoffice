@@ -142,7 +142,7 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 				cls: "scroll",
 				width: 300,
 			},
-			tbar({},
+			tbar({cls: "table-aligned compact"},
 				selectallcheckboxfield({list: this.noteBookGrid}),
 
 				h4(t("Notebooks")),
@@ -219,7 +219,7 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 				cls: "vbox bg-lowest"
 			},
 			this.noteGridToolbar = tbar({
-					cls: "bg-mid border-bottom"
+					cls: "bg-mid border-bottom table-aligned"
 				},
 				this.showWestButton(),
 				this.openWestButton(),

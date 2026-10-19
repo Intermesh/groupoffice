@@ -1,7 +1,7 @@
 <?php
 return array (
   'User options' => 'Opzioni utente',
-  'Enter the domains this ldap server should be used to authenticate. Users must login with their e-mail address and if the domain matches this profile it will be used.' => 'Inserisci i domini che questo server LDAP deve usare per l’autenticazione. Gli utenti devono accedere con la loro email, se il dominio coincide verrà usato questo profilo.',
+  'Enter the domains this ldap server should be used to authenticate. Users must login with their e-mail address and if the domain matches this profile it will be used.' => 'Inserisci i domini che questo server LDAP deve usare per l\'autenticazione. Gli utenti devono accedere con la loro email, se il dominio coincide verrà usato questo profilo.',
   'Verify SSL certicate' => 'Verifica certificato SSL',
   'Enable this if the LDAP server requires autentication to lookup users or groups' => 'Selezionare se il server LDAP richiede autenticazione per ricercare utenti o gruppi',
   'Follow referrals' => 'Segui referrals',

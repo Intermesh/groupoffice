@@ -7,6 +7,9 @@ use go\core\jmap\EntityController;
 use go\modules\community\notes\model;
 
 
+/**
+ * @extends EntityController<\go\modules\community\notes\model\NoteBook>
+ */
 class NoteBook extends EntityController {
 	
 	/**

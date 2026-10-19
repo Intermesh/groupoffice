@@ -25,9 +25,6 @@ import {CommentsPanel} from "@intermesh/community-comments";
 
 export class EventDetail extends DetailPanel<CalendarEvent> {
 
-	// title = t('New Event')
-	// width = 800
-	// height = 650
 	form: DataSourceForm
 
 	item?: CalendarItem

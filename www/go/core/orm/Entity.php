@@ -17,6 +17,7 @@ use go\core\App;
 use go\core\db\Criteria;
 use go\core\model\Link;
 use go\core\model\Search;
+use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\db\DbException;
 use go\core\util\DateTime;
@@ -689,10 +690,10 @@ abstract class Entity extends Property {
 	 * ```
 	 * public function internalGetPermissionLevel(): int
 	 * {
-	 * 	if(Module::findByName('business', 'catalog')
+	 * 	if(\go\core\model\Module::findByName('business', 'catalog')
 	 * 		->getUserRights()
 	 * 		->mayManage) {
-	 * 		return ACL::LEVEL_MANAGE;
+	 * 		return Acl::LEVEL_MANAGE;
 	 * 	}
 	 *
 	 * 	return parent::internalGetPermissionLevel();
@@ -728,7 +729,15 @@ abstract class Entity extends Property {
 
 	/**
 	 * Applies conditions to the query so that only entities with the given permission level are fetched.
-	 * 
+	 *
+	 * This is also applied for admins so in overrides it might be useful to:
+	 *
+	 * ```
+	 * if(User::isAdminById($userId ?? go()->getAuthState()->getUserId())) {
+	 * 	return $query;
+	 * }
+	 * ```
+	 *
 	 * @param Query $query
 	 * @param int $level
 	 * @param int|null $userId Leave to null for the current user

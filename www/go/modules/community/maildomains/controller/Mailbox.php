@@ -8,6 +8,9 @@ use go\core\jmap\exception\StateMismatch;
 use go\core\util\ArrayObject;
 use go\modules\community\maildomains\model;
 
+/**
+ * @extends EntityController<\go\modules\community\maildomains\model\Mailbox>
+ */
 final class Mailbox extends EntityController
 {
 	protected function entityClass(): string

@@ -53,7 +53,7 @@ return array (
   'Use \'*\' for a catch all alias (not recommended).' => 'Verwenden Sie \'*\' als Catch-All Alias (nicht empfohlen).',
   'Are you sure you wan to reset all the passwords?' => 'Sind Sie sicher, dass Sie alle Passwörter zurücksetzen wollen?',
   'Export domain' => 'Domäne exportieren',
-  'Reset passwords' => 'Passwörter zurücksetzen',
+  'Reset passwords' => 'Kennwörter zurücksetzen',
   'Allow external SMTP usage' => 'Externe SMTP-Nutzung zulassen',
   'If you enable reset passwords then a new password will be generated and exported for each account. Warning! Existing client configuration will need to be updated after this action.' => 'Wenn Sie Passwort zurücksetzen aktivieren, wird ein neues Passwort generiert und für jeden Account exportiert. Achtung! Vorhandene Clients müssen danach aktualisiert werden!',
   'DKIM keys' => 'DKIM-Schlüssel',
@@ -97,4 +97,5 @@ return array (
   'Mail hostname' => 'Mail Hostname',
   'The hostname of the mail system. Used for PTR, SPF and MX checks.' => 'Der Hostname des Mailsystems. Wird für PTR, SPF und MX Prüfungen verwendet.',
   'Your SPF record does not allow \'{mailhost}\'' => 'Der SPF Eintrag erlaubt \'{mailhost}\' nicht',
+  'Close sidebar' => 'Sidebar schließen',
 );

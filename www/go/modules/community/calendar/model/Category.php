@@ -55,9 +55,7 @@ class Category extends Entity {
 	protected function internalGetPermissionLevel(): int
 	{
 		if(empty($this->calendarId) && empty($this->ownerId)) {
-			return Module::findByName('community', 'calendar')
-				->getUserRights()
-				->mayChangeCategories ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
+			return go()->getAuthState()->isAdmin() ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
 		}
 
 		if(isset($this->calendarId)) {
@@ -94,28 +92,29 @@ class Category extends Entity {
 				if($value === 'visibleOnly') {
 					$query->join('calendar_calendar_user', 'ucal', 'ucal.id = category.calendarId AND ucal.userId = '.go()->getAuthState()->getUserId(), 'LEFT');
 						$criteria
-						->where(['ucal.isVisible' => true])
-						->orWhere('category.calendarId', 'IS', null);
+						->where(['ucal.isVisible' => true]);
 				} else if(!empty($value)) {
-					$criteria->andWhere(['category.calendarId' => $value]);
+					// explicit calendar ids (the client knows the unsaved visibility). Global categories are always included.
+					$criteria->where(['category.calendarId' => $value]);
 				}
 			}, 'visibleOnly')
 			->add('ownerId', function(Criteria $criteria, $value) {
 				$criteria->where('ownerId', '=', $value)
 					->andWhere('calendarId' , '=', null);
-			})
-			->add('calendarId', function(Criteria $criteria, $value) {
-				$criteria->where('calendarId', '=', $value)->orWhere('calendarId', 'IS', null);
 			})->add('name', function(Criteria $criteria, $value) {
 				$criteria->where('name', 'LIKE', '%'.$value.'%');
 			})
 			->add('mine', function(Criteria $criteria, $value) {
+
+				//mine is a bit of a misleading name. Because this returns categories owned by the user plus the global ones.
+				//only not the calendar specific categories.
+
 				$criteria->where('calendarId', 'IS', null)
 					->andWhere((new Criteria())
 						->where('ownerId', 'IS', null)
 						->orWhere('ownerId','=', go()->getUserId())
 					);
-			},'1');
+			});
 	}
 
 }

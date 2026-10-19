@@ -2,7 +2,7 @@
 return array (
   'Add users' => 'Aggiungi utenti',
   'Add user groups' => 'Aggiungi gruppi',
-  'Popup reminder' => 'Popup reminder',
+  'Popup reminder' => 'Popup di promemoria',
   'Snooze time' => 'Snooze time',
-  'Popup reminders' => 'Popup reminders',
+  'Popup reminders' => 'Popup di promemoria',
 );

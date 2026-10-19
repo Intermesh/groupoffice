@@ -19,6 +19,19 @@ class DbException extends Exception {
 	}
 
 	/**
+	 * Check if the row was changed by another transaction since this transaction's snapshot was taken.
+	 *
+	 * MariaDB >= 11.6 raises error 1020 "Record has changed since last read" for this when
+	 * innodb_snapshot_isolation is on (default). Retrying the transaction usually solves it.
+	 *
+	 * @return bool
+	 */
+	public function isRecordChanged(): bool
+	{
+		return ($this->getPrevious()->errorInfo[1] ?? null) == 1020;
+	}
+
+	/**
 	 * Check if this was a unique key exception
 	 *
 	 * @return bool|string The unique key name

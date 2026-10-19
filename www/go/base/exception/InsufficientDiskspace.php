@@ -23,7 +23,9 @@
 namespace GO\Base\Exception;
 
 
-class InsufficientDiskspace extends \Exception
+use go\core\exception\UserSafeException;
+
+class InsufficientDiskspace extends \Exception implements UserSafeException
 {
 	private $_total_file_storage;
 	

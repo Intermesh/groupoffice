@@ -1833,15 +1833,51 @@ $updates['202604230937'][] = "delete from core_setting where name='primaryColorT
 
 $updates['202608241101'][] = "ALTER TABLE `core_principal` ADD UNIQUE INDEX `entityId` (`entityTypeId` ASC, `entityId` ASC)";
 
+
+$updates['202610021331'][] = "CREATE TABLE `core_app_password`
+(
+    `id`           INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `userId`       INT(11)      NOT NULL,
+    `label`        VARCHAR(150) NOT NULL,
+    `passwordHash` VARCHAR(255) NOT NULL,
+    `createdAt`    DATETIME     NOT NULL,
+    `lastUsedAt`   DATE         NULL,
+    `lastUsedIp`   VARCHAR(39)  NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `core_app_password_core_user`
+        FOREIGN KEY (`userId`)
+            REFERENCES `core_user` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE NO ACTION
+);";
+
+$updates['202610021331'][] = "CREATE TABLE `core_app_password_scope`
+(
+    `id`            INT UNSIGNED                                    NOT NULL AUTO_INCREMENT,
+    `appPasswordId` INT UNSIGNED                                    NOT NULL,
+    `protocol`      ENUM ('dav', 'caldav', 'carddav', 'activesync') NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `core_app_password_core_app_password_scope`
+        FOREIGN KEY (`appPasswordId`)
+            REFERENCES `core_app_password` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE NO ACTION
+);";
+
+
+$updates['202610021331'][] = "ALTER TABLE `core_app_password` MODIFY `lastUsedIp` VARCHAR(45) NULL;";
+
+$updates['202610021331'][] = "ALTER TABLE `core_app_password_scope` ADD UNIQUE KEY `appPasswordId_protocol` (`appPasswordId`, `protocol`);";
+
 // 26.1
-$updates['202608241101'][] = "alter table core_module
+$updates['202610191331'][] = "alter table core_module
     drop column sort_order;";
 
-$updates['202608241101'][] = "alter table core_module
+$updates['202610191331'][] = "alter table core_module
     drop column admin_menu;";
 
 
-$updates['202608241101'][] = "create table if not exists core_module_user
+$updates['202610191331'][] = "create table if not exists core_module_user
 (
 	userId   int          not null,
     moduleId int          not null,
@@ -1855,7 +1891,7 @@ $updates['202608241101'][] = "create table if not exists core_module_user
             on delete cascade
 );";
 
-$updates['202609161040'][] = "UPDATE `go_cron` SET `active`=0 WHERE 1;";
+$updates['202610191331'][] = "UPDATE `go_cron` SET `active`=0 WHERE 1;";
 
-$updates['202610011520'][] = "alter table core_alert
+$updates['202610191331'][] = "alter table core_alert
     add isSent boolean default false not null;";

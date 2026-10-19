@@ -104,4 +104,6 @@ return array (
   'Percent Complete' => '% abgeschlossen',
   'Message' => 'Nachricht',
   'List: None' => 'Liste: Keine',
+  'Show in calendar' => 'Im Kalender anzeigen',
+  'Tasks in this list will be shown in the calendar' => 'Aufgaben aus dieser Liste werden im Kalender angezeigt',
 );

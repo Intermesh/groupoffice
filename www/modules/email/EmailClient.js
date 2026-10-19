@@ -1072,15 +1072,17 @@ GO.mainLayout.onReady(function(){
 			return;
 		}
 		countEmailShown = data.email_status.total_unseen;
-		var title = t("New email"),
-			text = t("You have %d unread email(s)").replace('%d', data.email_status.total_unseen);
 
-		window.GOUI.Notifier.notify({
-			title,text,tag:'email',
-			icon: {name:'email',color:'blue',link:'views/Extjs3/themes/Paper/img/notify/email.png'},
-			category:'message',variant:'info'
-		});
-	});
+		if(go.User.emailSettings.notify_new_email) {
+			var title = t("New email"),
+				text = t("You have %d unread email(s)").replace('%d', data.email_status.total_unseen);
+
+			window.GOUI.Notifier.notify({
+				title,text,tag:'email',
+				icon: {name:'email',color:'blue',link:'views/Extjs3/themes/Paper/img/notify/email.png'},
+				category:'message',variant:'info'
+			});
+		}
 
 });
 
