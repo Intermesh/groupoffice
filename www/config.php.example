@@ -10,3 +10,10 @@ $config['debug'] = false;
 
 // Some servers don't support simultanous connections. Then SSE has to be disabled.
 $config['sseEnabled'] = true;
+
+// When Group-Office runs behind a reverse proxy or load balancer (Traefik, HAProxy, Docker ingress, Cloudflare...) the
+// connection comes from that proxy. List its IP address or CIDR range here so the client IP is taken from the
+// "X-Forwarded-For" header it sets. The header is ignored for connections from anywhere else because clients can fake it.
+// The client IP is used to throttle failed logins and for the IP address restrictions of user groups.
+// Not needed when nginx "set_real_ip_from" or Apache mod_remoteip already sets the real IP, or without a proxy.
+// $config['trustedProxies'] = ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'];

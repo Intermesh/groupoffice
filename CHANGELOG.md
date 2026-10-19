@@ -16,6 +16,7 @@
 - Core: several bug fixes in Active Record export
 - Core: Check if tokens are expired and if users were disabled when using them from cache.
 - Core: Fix query filters with two or more possible search strings
+- Core: The client IP address is read from $_SERVER['REMOTE_ADDR']. The X-Forwarded-For header is only used for the proxies in the new "trustedProxies" config option, so it can't be faked to get around login throttling and IP restrictions. When using a reverse proxy, set $config['trustedProxies'] or the real IP in your web server. See the "HTTP Proxy" page in the manual.
 
 15-10-2026: 26.0.54
 - Core: update cleanup script

@@ -467,6 +467,8 @@ namespace go\core {
 			//defaults
 			$config = new ArrayObject([
 				"frameAncestors" => "",
+				// IP addresses or CIDR ranges of reverse proxies / load balancers that set "X-Forwarded-For"
+				"trustedProxies" => [],
 				"wopiAllowInternal" => false, // Allow WOPI service URLs that resolve to private/loopback addresses
 				"theme" => "Paper",
 				"allow_themes" => true,
