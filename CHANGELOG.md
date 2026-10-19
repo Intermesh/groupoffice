@@ -13,7 +13,8 @@
 - Core: New "background" parameter to export in the background. This way CLI exports can still work like before.
 - DAVaccounts: ownerId field because the accounts are personal and not system wide.
 - Core: Sanitize uploaded file names and temp file names, safer Content-Disposition headers for downloads, nosniff on blob downloads, size limits on thumbnails
-
+- Core: several bug fixes in Active Record export 
+ 
 15-10-2026: 26.0.54
 - Core: update cleanup script
 - Core: App passwords use same default domain logic as normal login and last used date and IP properly sync to client
