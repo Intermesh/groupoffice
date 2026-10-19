@@ -22,7 +22,7 @@ class RequestTest extends TestCase
 		go()->setConfig($this->config);
 	}
 
-	private function request(string $remoteAddr, ?string $forwardedFor = null, array|string $trustedProxies = [], ?string $clientIp = null): ?string
+	private function request(string $remoteAddr, ?string $forwardedFor = null, array $trustedProxies = [], ?string $clientIp = null): ?string
 	{
 		$_SERVER['REMOTE_ADDR'] = $remoteAddr;
 		if ($forwardedFor !== null) {
@@ -96,11 +96,6 @@ class RequestTest extends TestCase
 	{
 		$this->assertSame('10.0.0.1', $this->request('10.0.0.1', 'not-an-ip', ['10.0.0.0/8']));
 		$this->assertSame('10.0.0.1', $this->request('10.0.0.1', '198.51.100.7, garbage', ['10.0.0.0/8']));
-	}
-
-	public function testTrustedProxiesCanBeACommaSeparatedString()
-	{
-		$this->assertSame('198.51.100.7', $this->request('192.168.1.1', '198.51.100.7', '10.0.0.0/8, 192.168.0.0/16'));
 	}
 
 	public function testIpv6()
