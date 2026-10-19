@@ -371,6 +371,9 @@ class DavAccount extends AclOwnerEntity {
 			$model->sortOrder = is_numeric($order) ? (int)$order : 1;
 			$model->color = !empty($color) ? $color : \go\modules\community\calendar\model\Calendar::randomColor($model->name);
 			$model->timeZone = $tz;
+			$model->syncToDevice = false;
+			$model->setOwnerId(go()->getAuthState()->getUserId());
+
 			if ($model->save()) {
 				$cal = new Calendar($this);
 				$cal->id = $model->id;

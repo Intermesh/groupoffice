@@ -229,7 +229,7 @@ export class CalendarList extends Component<CalendarListEventMap> {
 						target.findChild("reload")!.hidden = !data.webcalUri;
 
 						const edit = target.findChild("edit")!;
-						edit.hidden = !!data.davaccountId || !!(data.groupId && !rights.mayChangeResources && !data.myRights.mayAdmin);
+						edit.hidden = !!(data.groupId && !rights.mayChangeResources && !data.myRights.mayAdmin);
 						edit.disabled = !data.myRights.mayReadItems;
 
 						const del = target.findChild("delete")!;
