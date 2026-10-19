@@ -947,6 +947,10 @@ public function historyLog(): bool|array
 			Token::destroyOtherSessons($this->id);
 		}
 
+		if($this->isModified(['enabled']) && !$this->enabled) {
+			Token::destroyAllSessions($this->id);
+		}
+
 		return true;
 	}
 

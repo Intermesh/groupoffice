@@ -206,6 +206,10 @@ try {
 				}
 			} elseif (isset($data['loginToken'])) {
 				$token = Token::find()->where(['loginToken' => $data['loginToken']])->single();
+				// The login token is only valid for Token::LOGIN_LIFETIME. Expired ones stay in the database until garbage collection.
+				if ($token && $token->isExpired()) {
+					$token = null;
+				}
 			} else {
 
 				if (empty($data['username']) || empty($data['password'])) {

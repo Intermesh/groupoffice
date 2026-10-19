@@ -94,7 +94,8 @@ try {
 			//used for direct token login from multi_instance module
 			//this token is used in Extjs3.clientSettings() too
 			$token = Token::find()->where('accessToken', '=', $_POST['accessToken'])->single();
-			if($token) {
+			// isAuthenticated() also checks the expiry. An expired token must not be revived.
+			if($token && $token->isAuthenticated()) {
 
                 go()->getAuthState()->setToken($token);
 				$token->setAuthenticated();
