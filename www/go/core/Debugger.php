@@ -407,8 +407,29 @@ class Debugger {
 	}
 	
 	/**
+	 * Whether the entries may be sent to the browser of the current request.
+	 *
+	 * They contain queries, parameters and stack traces. Endpoints that anybody can call, like api/page.php, must
+	 * not show them to anonymous users. Only to administrators, and only when debugging is enabled.
+	 */
+	public function mayOutputToClient(): bool
+	{
+		if(!$this->enabled) {
+			return false;
+		}
+
+		try {
+			$state = new jmap\State();
+			return $state->isAuthenticated() && $state->isAdmin();
+		} catch (\Throwable $e) {
+			// used while handling errors: never fail here
+			return false;
+		}
+	}
+
+	/**
 	 * Get the debugger entries
-	 * 
+	 *
 	 * @return array
 	 */
 	public function getEntries(): array
