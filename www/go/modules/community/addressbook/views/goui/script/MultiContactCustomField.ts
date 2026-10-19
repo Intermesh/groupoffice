@@ -86,7 +86,6 @@ export class MultiContactCustomField extends CustomFieldType {
 			})],
 
 			list: table({
-				fitParent: true,
 				headers: false,
 				store: store,
 				columns: [

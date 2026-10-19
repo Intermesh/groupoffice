@@ -94,8 +94,6 @@ export class Oauth2ClientTable extends Table {
 		];
 		super(store, columns);
 
-		this.fitParent = true;
-
 		this.on("rowdblclick", async ({storeIndex}) => {
 			const dlg = new Oauth2ClientDialog();
 			dlg.show();

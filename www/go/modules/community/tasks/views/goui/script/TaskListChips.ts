@@ -15,7 +15,6 @@ export function tasklistchips(config?: Partial<AutoCompleteChipsConfig<Table<Dat
 	return autocompletechips({
 		label: t("Tasklist"),
 		list: table({
-			fitParent: true,
 			headers: false,
 			store: datasourcestore({
 				dataSource: jmapds("TaskList"),

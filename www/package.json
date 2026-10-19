@@ -8,7 +8,8 @@
     "go/modules/business/*/views/goui"
   ],
   "scripts": {
-    "build": "npm run build --workspaces"
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces"
   },
   "dependencies": {
     "@intermesh/goui": "latest",

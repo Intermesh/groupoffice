@@ -1,14 +1,14 @@
 import {
-	a,
 	autocompletechips,
-	checkbox, checkboxselectcolumn, column,
-	containerfield, datasourcestore,
-	displayfield,
+	checkbox,
+	checkboxselectcolumn,
+	column,
+	containerfield,
+	datasourcestore,
 	Fieldset,
-	h3,
 	radio,
-	t, table,
-	textfield
+	t,
+	table
 } from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
 
@@ -49,7 +49,6 @@ export class Settings extends Fieldset {
 			autocompletechips({
 				disabled: true,
 				list: table({
-					fitParent: true,
 					headers: false,
 					store: datasourcestore({
 						dataSource: jmapds("AddressBook"),

@@ -15,7 +15,6 @@ export function calendarchips(config?: Partial<AutoCompleteChipsConfig<Table<Dat
 	return autocompletechips({
 		label: t("Calendars"),
 		list: table({
-			fitParent: true,
 			headers: false,
 			store: datasourcestore({
 				dataSource: jmapds("Calendar"),

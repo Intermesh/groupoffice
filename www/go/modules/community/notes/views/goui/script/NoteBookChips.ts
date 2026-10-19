@@ -15,7 +15,6 @@ export function notebookchips(config?: Partial<AutoCompleteChipsConfig<Table<Dat
 	return autocompletechips({
 		label: t("Note book"),
 		list: table({
-			fitParent: true,
 			headers: false,
 			store: datasourcestore({
 				dataSource: jmapds("NoteBook"),

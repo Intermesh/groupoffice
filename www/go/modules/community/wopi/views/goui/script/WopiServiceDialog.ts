@@ -41,11 +41,7 @@ export class WopiServiceDialog extends FormWindow {
 				}),
 			)
 		);
-		this.addSharePanel([
-			{value: "", name: ""},
-			{value: 10, name: t("Read")},
-			{value: 30, name: t("Write")},
-		]);
+		this.addSharePanel();
 
 		this.form.on("beforesave", ({data}) => {
 			if (data.useAltWopiClientUri === false) {

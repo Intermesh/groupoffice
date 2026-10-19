@@ -33,7 +33,6 @@ export class AddressBookTable extends Table<DataSourceStore<JmapDataSource<Addre
 
 		super(store, columns);
 		this.headers = false;
-		this.fitParent = true;
 	}
 }
 

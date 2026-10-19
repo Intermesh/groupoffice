@@ -1,4 +1,4 @@
-import {entities, JmapDataSource, modules} from "@intermesh/groupoffice-core";
+import {JmapDataSource, modules} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {t} from "@intermesh/goui";
 import {Settings} from "./Settings.js";
@@ -21,20 +21,20 @@ modules.register({
 		relations: {
 			creator: {store: 'Principal', fk:'createdBy'}
 		},
-		filters: [
-			{
+		filters: {
+			text: {
 				wildcards: false,
-				name: 'text',
 				type: "string",
 				multiple: false,
 				title: t("Query")
 			},
-			{
+			entityId: {
 				title: t("Entity ID"),
-				name: 'entityId',
+
 				multiple: true,
 				type: 'number'
-			}]
+			}
+		}
 	}],
 });
 

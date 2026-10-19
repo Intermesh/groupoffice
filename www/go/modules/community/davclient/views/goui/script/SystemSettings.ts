@@ -1,12 +1,23 @@
 import {
-	btn, Format,
-	column, comp,
-	Component, datasourcestore,
+	btn,
+	column,
+	comp,
+	datasourcestore,
+	EntityID,
+	Format,
 	h3,
-	t, table, tbar, Window, win, hr, menu, menucolumn, EntityID
+	hr,
+	menu,
+	menucolumn,
+	t,
+	table,
+	tbar,
+	win,
+	Window
 } from "@intermesh/goui";
 import {AppSettingsPanel, client, jmapds} from "@intermesh/groupoffice-core";
 import {AccountWindow} from "./AccountWindow.js";
+
 // @deprecated - to be replaced by app settings
 export class SystemSettings extends AppSettingsPanel {
 

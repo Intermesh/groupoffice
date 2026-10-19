@@ -31,7 +31,6 @@ export class Settings extends Fieldset {
 			),
 			table({
 				cls: 'bg-lowest',
-				fitParent: true,
 				store,
 				columns: [
 					column({

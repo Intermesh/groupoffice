@@ -1,6 +1,7 @@
 import {AclLevel, client, jmapds, main, modules, principalDS, userSettingsPanels} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {
+	BaseEntity,
 	datasourcestore,
 	DateTime,
 	E,

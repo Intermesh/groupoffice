@@ -1,7 +1,7 @@
 import {client, modules} from "@intermesh/groupoffice-core";
 import {SystemSettings} from "./SystemSettings.js";
 import {onlineMeetingServices} from "@intermesh/community-calendar";
-import {t} from "@intermesh/goui";
+import {t, translate} from "@intermesh/goui";
 
 
 function b64UrlEncode (data:string) {

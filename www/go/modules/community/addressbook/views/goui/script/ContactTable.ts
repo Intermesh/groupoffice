@@ -51,6 +51,5 @@ export class ContactTable extends Table<DataSourceStore<JmapDataSource<Contact>,
 
 		super(store, columns);
 		this.headers = false;
-		this.fitParent = true;
 	}
 }
