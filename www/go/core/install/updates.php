@@ -1868,3 +1868,17 @@ $updates['202610021331'][] = "CREATE TABLE `core_app_password_scope`
 $updates['202610021331'][] = "ALTER TABLE `core_app_password` MODIFY `lastUsedIp` VARCHAR(45) NULL;";
 
 $updates['202610021331'][] = "ALTER TABLE `core_app_password_scope` ADD UNIQUE KEY `appPasswordId_protocol` (`appPasswordId`, `protocol`);";
+
+// Refresh tokens of the OAuth2 server can be revoked now. Refresh tokens that were issued before this update are not in
+// this table so they are no longer valid. The clients have to log in again.
+$updates['202610191400'][] = "CREATE TABLE `core_oauth_refresh_token` (
+  `identifier` varchar(128) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `expiryDateTime` datetime NOT NULL,
+  `userIdentifier` int(11) NOT NULL,
+  `clientId` int(11) NOT NULL,
+  PRIMARY KEY (`identifier`),
+  KEY `userIdentifier` (`userIdentifier`),
+  KEY `clientId` (`clientId`),
+  CONSTRAINT `core_oauth_refresh_token_core_user` FOREIGN KEY (`userIdentifier`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `core_oauth_refresh_token_core_oauth_client` FOREIGN KEY (`clientId`) REFERENCES `core_oauth_client` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";

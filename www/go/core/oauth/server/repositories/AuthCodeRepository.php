@@ -38,15 +38,38 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
      */
     public function revokeAuthCode(string $codeId): void
 		{
-        // Some logic to revoke the auth code in a database
+        go()->getDbConnection()->delete('core_oauth_auth_codes', ['identifier' => $codeId])->execute();
     }
 
     /**
+     * An authorization code can be used once. A code that is not in the database is revoked: it was already used, it
+     * expired or it was never issued by this server.
+     *
+     * The server calls this when a code is exchanged for tokens. The code is consumed here by deleting it, which is
+     * atomic. If two requests exchange the same code at the same time only one of them succeeds.
+     *
      * {@inheritdoc}
      */
     public function isAuthCodeRevoked(string $codeId): bool
 		{
-        return false; // The auth code has not been revoked
+        $userId = go()->getDbConnection()
+            ->selectSingleValue('userIdentifier')
+            ->from('core_oauth_auth_codes')
+            ->where(['identifier' => $codeId])
+            ->single();
+
+        if($userId === null) {
+            return true;
+        }
+
+        $delete = go()->getDbConnection()->delete('core_oauth_auth_codes', ['identifier' => $codeId]);
+        $delete->execute();
+        if($delete->rowCount() !== 1) {
+            // somebody else used it in the meantime
+            return true;
+        }
+
+        return !UserRepository::isEnabled($userId);
     }
 
     /**

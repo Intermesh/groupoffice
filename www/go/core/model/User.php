@@ -972,6 +972,11 @@ public function historyLog(): bool|array
 			Token::destroyAllSessions($this->id);
 		}
 
+		// Applications that were authorized with this account (OAuth2 / OpenID Connect server) must authorize again
+		if($this->isModified(['password']) || ($this->isModified(['enabled']) && !$this->enabled)) {
+			OauthRefreshToken::revokeAllForUser($this->id);
+		}
+
 		return true;
 	}
 
