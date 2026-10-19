@@ -718,10 +718,12 @@ class CalendarEvent extends AclItemEntity {
 			Scheduler::handle($this);
 		}
 
+		$removedParticipants = $this->removedParticipants();
 		$success = parent::internalSave();
 
 		if($success) {
 			$this->addToKnownCalendars();
+			$this->removeFromKnownCalendars($removedParticipants);
 			$this->updateAlerts($this->forUserId());
 			$this->changeEventsWithSameUID();
 			$this->incrementCalendarModSeq();
@@ -816,24 +818,64 @@ class CalendarEvent extends AclItemEntity {
 	private function addToKnownCalendars() {
 		if(empty($this->participants)) return;
 		foreach($this->participants as $pid => $participant) {
-			if($participant->kind == 'resource') {
-				$resourceCalendar = Calendar::findById(str_replace('Calendar:', '', $pid));
-				if(!empty($resourceCalendar)) {
-					 go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
-						['calendarId'=>$resourceCalendar->id, 'eventId'=>$this->eventId]
-					])->execute();
-				}
-			}
-			if($participant->isNew() && $participant->kind == 'individual' && is_numeric($pid)) {
-				$personalCalendarId = Calendar::fetchPersonal($pid);
-				if ($personalCalendarId) {
-					go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
-						['calendarId'=>$personalCalendarId, 'eventId'=>$this->eventId]
-					])->execute();
-				}
+			// Don't re-add a resource when its admin removed the event from the resource calendar
+			$isNew = $participant->kind == 'resource' ? ($participant->isNew() || $participant->isModified('participationStatus')) : $participant->isNew();
+			$calendarId = $isNew ? self::participantCalendarId($pid, $participant) : null;
+			if($calendarId) {
+				go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
+					['calendarId'=>$calendarId, 'eventId'=>$this->eventId]
+				])->execute();
 			}
 		}
 	}
+
+	/**
+	 * Participants (not the organizer) that were removed from the event in this save
+	 *
+	 * @return Participant[] by participant id
+	 */
+	public function removedParticipants(): array {
+		if($this->isNew() || !$this->isModified('participants')) return [];
+		$removed = [];
+		foreach($this->getOldValue('participants') ?? [] as $pid => $participant) {
+			if(!isset($this->participants[$pid]) && !$participant->isOwner()) {
+				$removed[$pid] = $participant;
+			}
+		}
+		return $removed;
+	}
+
+	/**
+	 * The calendar an event is shown in for a resource or local user participant
+	 */
+	private static function participantCalendarId(string|int $pid, Participant $participant): ?int {
+		if($participant->kind == 'resource') {
+			$calendar = Calendar::findById(str_replace('Calendar:', '', $pid));
+			return $calendar ? (int) $calendar->id : null;
+		}
+		if($participant->kind == 'individual' && is_numeric($pid)) {
+			return Calendar::fetchPersonal($pid) ?: null;
+		}
+		return null;
+	}
+
+	/**
+	 * Take the event out of the calendars of removed participants
+	 *
+	 * @param Participant[] $removed
+	 */
+	private function removeFromKnownCalendars(array $removed): void {
+		foreach($removed as $pid => $participant) {
+			$calendarId = self::participantCalendarId($pid, $participant);
+			if($calendarId && $calendarId != $this->calendarId) {
+				go()->getDbConnection()->delete('calendar_calendar_event', [
+					'calendarId' => $calendarId,
+					'eventId' => $this->eventId
+				])->execute();
+			}
+		}
+	}
+
 	private function updateAlerts(int $userId) : void {
 		if(!CoreAlert::$enabled) {
 			return;
@@ -949,7 +991,7 @@ class CalendarEvent extends AclItemEntity {
 	 * @param $email string the scheduleId
 	 * @return false|Participant
 	 */
-	public function participantByScheduleId(string $email): bool|Participant
+	public function participantByScheduleId(string $email, ?string $kind = null): bool|Participant
 	{
 		if(empty($this->participants))
 			return false;
@@ -957,7 +999,7 @@ class CalendarEvent extends AclItemEntity {
 		$email = strtolower($email);
 
 		foreach($this->participants as $participant) {
-			if(strtolower($participant->email) === $email) {
+			if(strtolower($participant->email) === $email && ($kind === null || $participant->kind === $kind)) {
 				return $participant;
 			}
 		}

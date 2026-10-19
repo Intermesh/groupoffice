@@ -11,12 +11,16 @@ CREATE TABLE IF NOT EXISTS `davclient_davaccount` (
 	`lastError` TEXT NULL,
 	`active` TINYINT(1) DEFAULT 1 NOT NULL,
 	`aclId` INT NOT NULL,
+	`ownerId` INT NOT NULL,
     verifySSL bool default true not null,
 	PRIMARY KEY (`id`),
 	INDEX `fk_davclient_davaccount_core_acl_idx` (`aclId` ASC),
 	CONSTRAINT `fk_davclient_davaccount_core_acl`
 		FOREIGN KEY (`aclId`)
-		REFERENCES `core_acl` (`id`)
+		REFERENCES `core_acl` (`id`),
+	CONSTRAINT `fk_davclient_davaccount_core_user`
+		FOREIGN KEY (`ownerId`)
+		REFERENCES `core_user` (`id`)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS `davclient_calendar` (

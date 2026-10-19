@@ -6,6 +6,9 @@ use go\core\jmap\EntityController;
 use go\core\util\ArrayObject;
 use go\modules\community\ldapauthenticator\model;
 
+/**
+ * @extends EntityController<\go\modules\community\ldapauthenticator\model\Server>
+ */
 class Server extends EntityController {
 	
 	protected function entityClass(): string

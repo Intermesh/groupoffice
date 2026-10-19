@@ -29,7 +29,7 @@ export class YearView extends CalendarView<YearViewEventMap> {
 
 	protected populateViewModel() {
 		this.clear()
-		for (const item of this.adapter.items) {
+		for (const item of this.mergeDuplicates(this.adapter.items)) {
 			this.viewModel.push(item);
 		}
 		this.renderView()

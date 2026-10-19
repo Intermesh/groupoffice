@@ -28,7 +28,7 @@ abstract class FileSystemObject {
 	/**
 	 * Disallow these chars for files and folders.
 	 */
-	const INVALID_CHARS = '/[\/:*\?"<>|\\\]/';
+	const INVALID_CHARS = '/[\/:*\?"<>|\\\\\x00-\x1f\x7f]/';
 
 	/**
 	 * Constructor of a file or folder

@@ -7,15 +7,12 @@ export class Settings extends Component {
 	constructor() {
 		super();
 
-
 		this.cls = "vbox";
 
 		const store = datasourcestore({
 			dataSource: OIDConnectClientDS,
 			queryParams: {
-				limit: 50,
-				filter: {
-				}
+				limit: 50
 			},
 			sort: [{property: "name", isAscending: true}]
 		});

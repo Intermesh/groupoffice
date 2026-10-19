@@ -15,6 +15,9 @@ use go\core\util\Crypt;
 use go\modules\community\notes\model;
 
 
+/**
+ * @extends EntityController<\go\modules\community\notes\model\Note>
+ */
 class Note extends EntityController {
 	
 	/**

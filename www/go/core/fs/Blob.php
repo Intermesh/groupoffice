@@ -4,6 +4,7 @@ namespace go\core\fs;
 
 use Exception;
 use go\core\db\Table;
+use go\core\http\Response;
 use go\core\jmap\Request;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Mapping;
@@ -507,7 +508,7 @@ class Blob extends orm\Entity {
 			'ETag' => $this->id,
 			'Content-Type' => $this->type, 
 			"Expires" => (new DateTime("1 year"))->format("D, j M Y H:i:s"),
-			'Content-Disposition' => $disp . ';filename="' . $this->name . '"'
+			'Content-Disposition' => Response::contentDisposition($disp, (string) $this->name)
 					]);
 	}
 

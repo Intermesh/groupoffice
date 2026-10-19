@@ -55,9 +55,7 @@ class Category extends Entity {
 	protected function internalGetPermissionLevel(): int
 	{
 		if(empty($this->calendarId) && empty($this->ownerId)) {
-			return Module::findByName('community', 'calendar')
-				->getUserRights()
-				->mayChangeCategories ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
+			return go()->getAuthState()->isAdmin() ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
 		}
 
 		if(isset($this->calendarId)) {

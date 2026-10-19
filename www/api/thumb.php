@@ -30,28 +30,31 @@ if (!isset($_GET['blob'])) {
 
 $blob = Blob::findById($_GET['blob']);
 if (!$blob) {
-	echo "Not found";
 	http_response_code(404);
-	exit();
+	exit("Not found");
 }
 
 if ($blob->size > 10 * 1024 * 1024) {
-	throw new \Exception("Image may not be larger than 10MB");
+	http_response_code(413);
+	exit("Image may not be larger than 10MB");
 }
 
+// Requested sizes are user input and determine memory usage: keep them within sane bounds
+const MAX_DIMENSION = 4096;
+$dimension = fn(string $name): int => isset($_GET[$name]) ? max(0, min(MAX_DIMENSION, intval($_GET[$name]))) : 0;
 
-$w = isset($_GET['w']) ? intval($_GET['w']) : 0;
-$h = isset($_GET['h']) ? intval($_GET['h']) : 0;
+$w = $dimension('w');
+$h = $dimension('h');
 $zc = !empty($_GET['zc']) && !empty($w) && !empty($h);
 
-$lw = isset($_GET['lw']) ? intval($_GET['lw']) : 0;
-$lh = isset($_GET['lh']) ? intval($_GET['lh']) : 0;
+$lw = $dimension('lw');
+$lh = $dimension('lh');
 
-$pw = isset($_GET['pw']) ? intval($_GET['pw']) : 0;
-$ph = isset($_GET['ph']) ? intval($_GET['ph']) : 0;
+$pw = $dimension('pw');
+$ph = $dimension('ph');
 
 
-$cacheFilename = $blob->id . '_' . $w . '_' . $h . '_' . $lw . '_' . $ph . '_' . $pw . '_' . $lw;
+$cacheFilename = $blob->id . '_' . $w . '_' . $h . '_' . $lw . '_' . $lh . '_' . $pw . '_' . $ph;
 $cacheDir = go()->getTmpFolder()->getFolder('thumbcache')->create();
 
 if ($zc) {
@@ -67,7 +70,8 @@ if ($cacheFile->exists()) {
 
 $image = new Image($blob->path());
 if (!$image->loadSuccess) {
-	throw new \Exception("Could not load image");
+	http_response_code(415);
+	exit("Could not load image");
 } else {
 	if($image->getImageType() == IMAGETYPE_JPEG) {
 		$image->fixOrientation();
@@ -75,7 +79,7 @@ if (!$image->loadSuccess) {
 	if ($zc) {
 		$image->zoomcrop($w, $h);
 	} else {
-		if ($lw || $lh || $pw || $lw) {
+		if ($lw || $lh || $pw || $ph) {
 			//treat landscape and portrait differently
 			$landscape = $image->landscape();
 			if ($landscape) {

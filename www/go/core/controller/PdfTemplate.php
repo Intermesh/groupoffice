@@ -8,6 +8,9 @@ use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\StateMismatch;
 use go\core\model;
 
+/**
+ * @extends EntityController<\go\core\model\PdfTemplate>
+ */
 class PdfTemplate extends EntityController {
 
   /**

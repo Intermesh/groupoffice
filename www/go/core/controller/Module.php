@@ -14,6 +14,9 @@ use go\core\util\ArrayObject;
 use go\modules\business\license\model\License;
 
 
+/**
+ * @extends EntityController<\go\core\model\Module>
+ */
 class Module extends EntityController {
 	
 	/**

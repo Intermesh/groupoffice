@@ -152,7 +152,7 @@ class Module extends core\Module
 	public function downloadCalendar($id) {
 
 		$calendar = Calendar::findById($id);
-		if($calendar->getPermissionLevel() < Acl::LEVEL_MANAGE) {
+		if(!$calendar || $calendar->getPermissionLevel() < Acl::LEVEL_MANAGE) {
 			throw new Forbidden('You need manage permission to export this calendar');
 		}
 		$this->outputIcs($calendar);
@@ -166,7 +166,7 @@ class Module extends core\Module
 			$events->filter(['after' => $after]);
 		}
 		header('Content-Type: text/calendar; charset=UTF-8; component=vcalendar');
-		header('Content-Disposition: attachment; filename="'.$calendar->name.' ('.$calendar->id.') '.date('Y-m-d').'.ics"');
+		header('Content-Disposition: ' . \go\core\http\Response::contentDisposition('attachment', $calendar->name.' ('.$calendar->id.') '.date('Y-m-d').'.ics'));
 
 		echo "BEGIN:VCALENDAR\r\n";
 		echo "VERSION:2.0\r\n";
@@ -205,7 +205,7 @@ class Module extends core\Module
 
 	public function downloadIcs($key) {
 		$ev = CalendarEvent::findById($key);
-		if (!$ev->getPermissionLevel()) {
+		if (!$ev || !$ev->getPermissionLevel()) {
 			throw new Forbidden();
 		}
 

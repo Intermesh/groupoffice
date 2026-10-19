@@ -3,7 +3,7 @@ import {
 	column, comp,
 	Component, datasourcestore,
 	h3,
-	t, table, tbar, Window, win, hr, menu, EntityID
+	t, table, tbar, Window, win, hr, menu, menucolumn, EntityID
 } from "@intermesh/goui";
 import {client, jmapds} from "@intermesh/groupoffice-core";
 import {AccountWindow} from "./AccountWindow.js";
@@ -16,6 +16,7 @@ export class SystemSettings extends Component {
 
 		const store = datasourcestore({
 			dataSource: jmapds('DavAccount'),
+			filters: {owner: {ownerId: client.user.id}}
 		});
 
 		this.items.add(comp({cls:'fit'},
@@ -30,54 +31,39 @@ export class SystemSettings extends Component {
 					column({id:'name', header: t("Name")}),
 					column({id:'lastSync', header: t('Last Sync'),renderer: (date: string) => Format.smartDateTime(date, true)}),
 					column({id:'collections', header: t('Collections'), renderer: v => v ? Object.keys(v).length+'' : '0'}),
-					column({
-						sticky: true,
-						width: 32,
-						id: "btn",
-						renderer: (columnValue: any, record, td, table, rowIndex) => {
+					menucolumn({
+						menu: menu({},
+							btn({icon: 'sync', text: t('Sync'), handler: (me) => {
+								const acc = store.get(me.parent!.dataSet.rowIndex)!;
 
-							return btn({
-								icon: "more_vert",
-								menu: menu({},
-									btn({icon: 'sync', text:'Sync', handler:(me) => {
-											const acc = table.store.get(rowIndex)!;
+								me.disabled = true;
+								this.mask();
+								client.jmap('DavAccount/sync', {accountId: acc.id}).then((r) => {
+									if(!r.success) {
+										void Window.error(r.error);
+									}
+									store.reload();
+								}).catch((err) => {
 
-											me.disabled = true;
-											this.mask();
-											client.jmap('DavAccount/sync', {accountId:acc.id}).then((response)=> {
-												store.reload();
-											}).catch((err) => {
-												me.disabled = false;
-												Window.error(err);
-											}).finally(() => {
-												this.unmask();
-											})
-										}
-									}),
+									void Window.error(err);
+								}).finally(() => {
+									me.disabled = false;
+									this.unmask();
+								})
+							}}),
 
-									btn({
-										icon: "edit",
-										text: t("Edit"),
-										handler: async (btn) => {
-											const acc = table.store.get(rowIndex)!;
-											const d = new AccountWindow();
-											await d.load(acc.id);
-											d.show();
-										}
-									}),
-									hr(),
-									btn({
-										icon: "delete",
-										text: t("Delete"),
-										handler: async (btn) => {
-											const acc = table.store.get(rowIndex)!;
-											this.deleteAccounts([acc.id]);
-										}
-									})
-
-								)
-							})
-						}
+							btn({icon: "edit", text: t("Edit"), handler: async (me) => {
+								const acc = store.get(me.parent!.dataSet.rowIndex)!;
+								const d = new AccountWindow();
+								await d.load(acc.id);
+								d.show();
+							}}),
+							hr(),
+							btn({icon: "delete", text: t("Delete"), handler: (me) => {
+								const acc = store.get(me.parent!.dataSet.rowIndex)!;
+								this.deleteAccounts([acc.id]);
+							}})
+						)
 					}),
 				],
 				rowSelectionConfig: {

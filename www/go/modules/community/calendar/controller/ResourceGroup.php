@@ -7,6 +7,9 @@ use go\core\jmap\EntityController;
 use go\modules\community\calendar\model;
 
 
+/**
+ * @extends EntityController<\go\modules\community\calendar\model\ResourceGroup>
+ */
 class ResourceGroup extends EntityController {
 	
 	/**

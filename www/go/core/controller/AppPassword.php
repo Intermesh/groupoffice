@@ -6,6 +6,9 @@ use go\core\jmap\EntityController;
 use go\core\model;
 use go\core\util\ArrayObject;
 
+/**
+ * @extends EntityController<\go\core\model\AppPassword>
+ */
 class AppPassword extends EntityController
 {
 

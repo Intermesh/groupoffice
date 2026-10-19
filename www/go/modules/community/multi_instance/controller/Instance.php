@@ -6,6 +6,9 @@ use go\core\jmap\EntityController;
 use go\modules\community\multi_instance\model;
 
 
+/**
+ * @extends EntityController<\go\modules\community\multi_instance\model\Instance>
+ */
 class Instance extends EntityController {
 	
 	/**

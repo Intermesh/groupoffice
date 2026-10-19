@@ -4,6 +4,9 @@ namespace go\modules\community\test\controller;
 use go\core\jmap\EntityController;
 use go\modules\community\test\model;
 
+/**
+ * @extends EntityController<\go\modules\community\test\model\B>
+ */
 class B extends EntityController {
 
 	protected function entityClass(): string

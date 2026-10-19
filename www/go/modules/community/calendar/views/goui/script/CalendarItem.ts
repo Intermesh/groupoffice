@@ -716,7 +716,7 @@ export class CalendarItem {
 	}
 
 	/**
-	 * Saves the event.
+	 * Saves an existing event.
 	 *
 	 * Handles recurrences in series too
 	 *
@@ -794,6 +794,14 @@ export class CalendarItem {
 		}
 	}
 
+	/**
+	 * Saves the main event / whole series and not a specific occurrence
+	 *
+	 * @param modified
+	 * @param onFinish
+	 * @param onCancel
+	 * @private
+	 */
 	private patchSeries(modified: any, onFinish?: () => void, onCancel?: () => void) {
 		this.confirmScheduleMessage(modified, () => {
 
@@ -813,6 +821,14 @@ export class CalendarItem {
 
 	// todo: per-user -per-override properties ['alert']
 
+	/**
+	 * Patches one occurrence in the series creating an override
+	 *
+	 * @param modified
+	 * @param onFinish
+	 * @param onCancel
+	 * @private
+	 */
 	private patchOccurrence(modified: any, onFinish?: () => void,  onCancel?: () => void) {
 		//this.data.recurrenceOverrides ??= {};
 
