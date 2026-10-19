@@ -15,7 +15,8 @@
 - Core: Sanitize uploaded file names and temp file names, safer Content-Disposition headers for downloads, nosniff on blob downloads, size limits on thumbnails
 - Core: several bug fixes in Active Record export
 - Core: Check if tokens are expired and if users were disabled when using them from cache.
- 
+- Core: Fix query filters with two or more possible search strings
+
 15-10-2026: 26.0.54
 - Core: update cleanup script
 - Core: App passwords use same default domain logic as normal login and last used date and IP properly sync to client
