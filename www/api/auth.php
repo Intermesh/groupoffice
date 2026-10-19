@@ -119,8 +119,13 @@ try {
 				exit();
 			}
 
+			if(!isset($data['user']) || !is_array($data['user'])) {
+				output([], 400, "Missing 'user' object");
+			}
+
 			$user = new User();
-			$user->setValues($data['user']);
+			// Only allow the basic profile properties. Otherwise anyone could choose their own groups.
+			$user->setValues(User::filterRegistrationValues($data['user']));
 			if(!$user->save()) {
 				$errors = $user->getValidationErrors();
 				$first = array_shift($errors);
