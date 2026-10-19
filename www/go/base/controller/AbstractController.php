@@ -284,12 +284,12 @@ abstract class AbstractController extends Observable {
 			if(!GO::user()){					
 				return false;	
 			}
+			
+			$this->checkSecurityToken();
 
 			if(GO::user()->isAdmin()) {
 				return true;
 			}
-			
-			$this->checkSecurityToken();
 			
 			//check module permission
 			$allowWithoutModuleAccess = $this->allowWithoutModuleAccess();
