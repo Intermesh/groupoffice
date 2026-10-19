@@ -65,11 +65,6 @@ class ExportHTML extends AbstractExport {
 		$this->_sendHeaders();
 		$this->_renderHead();
 		
-//		$labels = $this->getLabels();
-//		if($this->header) {
-//			$this->header = true;
-//			$this->_write(array_values($labels));
-//		}
 		if($this->header){
 			$this->header = true;
 			if($this->humanHeaders)

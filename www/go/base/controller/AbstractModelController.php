@@ -668,22 +668,23 @@ class AbstractModelController extends AbstractController {
 	protected function actionExport($params) {	
 		
 		\GO::setMaxExecutionTime(0);
-		
-		$orientation = false;
-		
+
+
 		$showHeader = false;
-  	$humanHeaders = true;
+  	    $humanHeaders = true;
 		$includeHidden = false;
 		
-		if(!empty($params['includeHeaders']))
+		if (!empty($params['includeHeaders'])) {
 			$showHeader = true;
+		}
 		
-		if(!empty($params['humanHeaders']))
+		if (!empty($params['humanHeaders'])) {
 			$humanHeaders = false;
+		}
 		
-		if(!empty($params['includeHidden']))
-			$includeHidden = true;		
-		
+		if (!empty($params['includeHidden'])) {
+			$includeHidden = true;
+		}
 		$checkboxSettings = array(
 			'export_include_headers'=>$showHeader,
 			'export_human_headers'=>!$humanHeaders,
@@ -696,16 +697,16 @@ class AbstractModelController extends AbstractController {
 		//define('EXPORTING', true);
 		//used by custom fields to format diffently
 
-		if(!empty($params['exportOrientation']) && ($params['exportOrientation']=="H"))
+		$orientation = 'P';
+		if(!empty($params['exportOrientation']) && ($params['exportOrientation']=="H")) {
 			$orientation = 'L'; // Set the orientation to Landscape
-		else
-			$orientation = 'P'; // Set the orientation to Portrait
+		}
 
-		if(!empty($params['documentTitle']))
+		if(!empty($params['documentTitle'])) {
 			$title = $params['documentTitle'];
-		else
+		} else {
 			$title = \GO::session()->values[$params['name']]['name'];
-			
+		}
 		$findParams = \GO::session()->values[$params['name']]['findParams'];
 		$findParams->limit(0); // Let the export handle all found records without a limit
 		$findParams->getCriteria()->recreateTemporaryTables();
@@ -726,37 +727,58 @@ class AbstractModelController extends AbstractController {
 		$this->afterStore($response, $params, $store, $storeParams);
 		
 		$columnModel = $store->getColumnModel();
-		$this->formatColumns($columnModel);		
-		
-		
+		$this->formatColumns($columnModel);
+
+		$fields = \go\core\model\Field::findByEntity($model->customFieldsEntityType()->getId())
+			->orderBy(['fs.sortOrder' => 'ASC', 'f.sortOrder' => 'ASC']);
+
 		if(!$includeHidden && !empty($params['columns'])) {
 			$includeColumns = explode(',',$params['columns']);
 			
 			foreach($includeColumns as $incColumn){
-				if(!$columnModel->getColumn($incColumn))
-					$columnModel->addColumn (new \GO\Base\Data\Column($incColumn,$incColumn));
+				if(str_starts_with($incColumn, 'customFields.')) {
+					foreach($fields as $field) {
+						if('customFields.'.$field->databaseName === $incColumn) {
+							$column = new \GO\Base\Data\Column($incColumn, $field->name);
+							$databaseName = $field->databaseName;
+							$column->setFormat(function($model) use ($databaseName) {
+								return $model->getCustomFields(true)[$databaseName] ?? "";
+							});
+							$columnModel->addColumn($column);
+							break;
+						}
+					}
+				} else if(!$columnModel->getColumn($incColumn)) {
+					$columnModel->addColumn(new \GO\Base\Data\Column($incColumn, $incColumn));
+				}
 			}
 			
 			$columnModel->sort($includeColumns);
 			
 			foreach($columnModel->getColumns() as $c){
-				if(!in_array($c->getDataIndex(), $includeColumns))
+				if(!in_array($c->getDataIndex(), $includeColumns)) {
 					$columnModel->removeColumn($c->getDataIndex());
+				}
 			}
 		} elseif ($includeHidden) {
 			
-			$columnOrder = array();
-			$colNames = $model->getColumns();
-			if (\GO::modules()->customfields) {
-				$cfRecord = $model->getCustomfieldsRecord(false);
-				if ($cfRecord) {
-					$cfColNames = $cfRecord->getColumns();
-					unset($cfColNames['model_id']);
-					$colNames = array_merge($colNames,$cfColNames);
+			$columnOrder = array_keys($model->getColumns());
+
+			if($model->hasCustomFields()) {
+				// Replace the single "customFields" object column with one column per custom field
+				$columnModel->removeColumn('customFields');
+
+				foreach($fields as $field) {
+					$dataIndex = 'customFields.' . $field->databaseName;
+					$column = new \GO\Base\Data\Column($dataIndex, $field->name);
+					$databaseName = $field->databaseName;
+					$column->setFormat(function($model) use ($databaseName) {
+						return $model->getCustomFields(true)[$databaseName] ?? "";
+					});
+					$columnModel->addColumn($column);
+					$columnOrder[] = $dataIndex;
 				}
 			}
-			foreach ($colNames as $colName=>$record)
-				$columnOrder[] = $colName;
 			$columnModel->sort($columnOrder);
 		}
 		$extraParams = empty($params['params']) ? array() : json_decode($params['params'], true);
@@ -769,12 +791,8 @@ class AbstractModelController extends AbstractController {
 			if (!empty($select) && substr($select,0,1)!=',')
 				$select = ','.$select;
 						
-			if (\GO::modules()->customfields && $cfRecord)
-				$select = 't.*,cf.*'.$select;
-			else
-				$select = 't.*'.$select;
-
-			$findParams->select($select);
+			// Custom field columns are added by joinCustomFields() in ActiveRecord::find()
+			$findParams->select('t.*'.$select);
 		}
 		
 		if(!empty($params['type']))
