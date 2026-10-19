@@ -326,7 +326,7 @@ class File extends FileSystemObject {
 
 			if(!$r->hasHeader('Content-Disposition')) {
 				$disp = $inline ? 'inline' : 'attachment';
-				$r->setHeader('Content-Disposition', $disp . '; filename="' . $this->getName() . '"');
+				$r->setHeader('Content-Disposition', Response::contentDisposition($disp, $this->getName()));
 			}
 			if(!$r->hasHeader('Content-Transfer-Encoding')) {
 				$r->setHeader('Content-Transfer-Encoding', 'binary');

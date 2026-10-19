@@ -61,10 +61,15 @@ try {
 		$inline = !empty($_GET['inline']);
 
 		// prevent html to render on same domain having access to all global JS stuff
-		if(in_array($blob->type, INSECURE_MIME_TYPES)) {
+		// compare the bare media type: "TEXT/HTML; charset=utf-8" is html too
+		$mediaType = strtolower(trim(explode(';', (string) $blob->type)[0]));
+		if(in_array($mediaType, INSECURE_MIME_TYPES)) {
 			$inline = false;
 			$blob->type = 'text/plain';
 		}
+
+		// don't let the browser guess a more dangerous type than we send
+		Response::get()->setHeader('X-Content-Type-Options', 'nosniff');
 
 		try {
 			$ua_info = \donatj\UserAgent\parse_user_agent();
@@ -93,6 +98,13 @@ try {
 	} else {
 		$module = array_shift($parts);
 		$method = "download" . array_shift($parts);
+
+		// package and module end up in a class name: allow identifiers only (no namespace separators)
+		if (!preg_match('/^\w+$/', (string) $package) || !preg_match('/^\w+$/', (string) $module)) {
+			Response::get()->setStatus(400);
+			Response::get()->output("Bad request.");
+			exit();
+		}
 		//left over are params
 
 		$ctrlCls = "go\\modules\\" . $package . "\\" . $module . "\\Module";
