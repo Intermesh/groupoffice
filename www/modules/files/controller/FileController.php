@@ -194,9 +194,10 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		$response['data']['size'] = $model->fsFile->size();
 		$response['data']['extension'] = htmlspecialchars(strtolower($model->fsFile->extension()));
 		$response['data']['type'] = \GO::t($response['data']['extension'], 'base', 'filetypes');
-		
-		$response['data']['locked_user_name']=$model->lockedByUser ? $model->lockedByUser->name : '';
+
 		$response['data']['locked']=$model->isLocked();
+		$response['data']['locked_user_name'] = $response['data']['locked'] && $model->lockedByUser ? $model->lockedByUser->name : '';
+
 		$response['data']['unlock_allowed']=$model->unlockAllowed();
 		
 
