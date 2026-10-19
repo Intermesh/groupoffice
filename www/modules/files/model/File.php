@@ -723,6 +723,11 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 //		if(!File::checkQuota(strlen($data)))
 //			throw new \GO\Base\Exception\InsufficientDiskSpace();
 
+		// Check before writing. save() below checks it too but then the file on disk was already replaced.
+		if(!$this->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)) {
+			throw new AccessDenied();
+		}
+
 		$this->fsFile->putContents($data);
 		$old = $this->mtime;
 		$this->mtime = $this->fsFile->mtime();

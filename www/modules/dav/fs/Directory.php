@@ -52,6 +52,33 @@ class Directory extends \Sabre\DAV\FS\Directory{
 	}
 
 	/**
+	 * Reading a folder, its files and its sub folders takes the read permission.
+	 *
+	 * Folders can have permissions of their own, so this can't be left to the folders above this one. The listing of
+	 * the children hides the folders that can't be read, but they must not be reachable by name either.
+	 *
+	 * A node is checked once. It can be called from several places: when the node is handed out by its parent, and when
+	 * its own children are requested. A directory that the root creates directly was not handed out by a parent.
+	 *
+	 * @throws Sabre\DAV\Exception\Forbidden
+	 * @throws Sabre\DAV\Exception\NotFound
+	 */
+	private function checkReadPermission(): void
+	{
+		if ($this->readPermissionChecked) {
+			return;
+		}
+
+		if (!$this->_getFolder()->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
+			throw new Sabre\DAV\Exception\Forbidden("DAV: User " . \GO::user()->username . " doesn't have read permission for folder '" . $this->relpath . "'");
+		}
+
+		$this->readPermissionChecked = true;
+	}
+
+	private bool $readPermissionChecked = false;
+
+	/**
 	 * Creates a new file in the directory
 	 *
 	 * data is a readable stream resource
@@ -177,12 +204,39 @@ class Directory extends \Sabre\DAV\FS\Directory{
 	 */
 	public function getChild($name) {
 
+		// Sabre calls this with the names from the URL. It doesn't use the listing, which only has what can be read.
+		$this->checkReadPermission();
+
+		return $this->createChild($name, true);
+	}
+
+	/**
+	 * @param string $name
+	 * @param bool $checkRead A folder can have permissions of its own. Check them for a name that came from the outside.
+	 *  Not needed for the items of the listing: that already only has the folders that can be read and files are
+	 *  readable when the folder they are in is.
+	 * @return Directory|File
+	 * @throws Sabre\DAV\Exception\NotFound
+	 */
+	private function createChild(string $name, bool $checkRead): Sabre\DAV\INode
+	{
 		$path = $this->path . '/' .  \go\core\util\StringUtil::normalize($name);
 
 		\GO::debug("FSD:getChild($path)");
 
 		if (is_dir($path)) {
-			return new Directory($this->relpath . '/' . $name);
+			$directory = new Directory($this->relpath . '/' . $name);
+
+			if ($checkRead) {
+				try {
+					$directory->checkReadPermission();
+				} catch (Sabre\DAV\Exception\Forbidden $e) {
+					// same as a folder that doesn't exist, like the listing does
+					throw new Sabre\DAV\Exception\NotFound('File with name ' . $path . ' could not be located');
+				}
+			}
+
+			return $directory;
 		} else if (file_exists($path)) {
 			return new File($this->relpath . '/' . $name);
 		} else {
@@ -203,15 +257,15 @@ class Directory extends \Sabre\DAV\FS\Directory{
 		
 
 		$path = $this->path . '/' . $name;
-		
+
 		\GO::debug("FSD:childExists($path)");
 
 		try {
-			if (!file_exists($path))
-				throw new Sabre\DAV\Exception\NotFound('File with name ' . $path . ' could not be located');
+			// Same rules as getChild(): a node that can't be read doesn't exist for this user.
+			$this->getChild($name);
 
 			return true;
-		} catch (Sabre\DAV\Exception\NotFound $e) {
+		} catch (Sabre\DAV\Exception\NotFound | Sabre\DAV\Exception\Forbidden $e) {
 
 			return false;
 		}
@@ -229,11 +283,14 @@ class Directory extends \Sabre\DAV\FS\Directory{
 		//foreach(scandir($this->path) as $node) if($node!='.' && $node!='..') $nodes[] = $this->getChild($node);
 
 		$f = $this->_getFolder();
-		
+
 		if (!$f) {
 			throw new Sabre\DAV\Exception\NotFound("Folder not found in database");
 		}
-		
+
+		// outside of the try below, which hides errors
+		$this->checkReadPermission();
+
 		try {
 			$stmt = $f->getSubFolders();
 
@@ -242,7 +299,7 @@ class Directory extends \Sabre\DAV\FS\Directory{
 			while ($folder = $stmt->fetch()) {
 				// UTF8 must be form D for mac os
 				$folder->checkNormalization();
-				$nodes[] = $this->getChild($folder->name);
+				$nodes[] = $this->createChild($folder->name, false);
 			}
 
 			$stmt = $f->files();
@@ -252,7 +309,7 @@ class Directory extends \Sabre\DAV\FS\Directory{
 			while ($file = $stmt->fetch()) {
 				// UTF8 must be form D for mac os
 				$file->checkNormalization();
-				$nodes[] = $this->getChild($file->name);
+				$nodes[] = $this->createChild($file->name, false);
 			}
 		}
 		catch(\Exception $e) {
