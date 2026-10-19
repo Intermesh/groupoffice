@@ -67,7 +67,7 @@ class DavAccount extends AclOwnerEntity {
 
 	protected function internalSave(): bool
 	{
-		if($this->isModified(['active', 'password', 'host', 'username']) && $this->active === true) {
+		if(!$this->active || $this->isModified(['active', 'password', 'host', 'username'])) {
 			// when account is new or reactivated. Trigger discovery and resync homeset.
 			if(!$this->isModified('lastSync')) {
 				$this->principalUri = '';

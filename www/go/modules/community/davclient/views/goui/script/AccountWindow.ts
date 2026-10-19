@@ -28,7 +28,7 @@ export class AccountWindow extends FormWindow {
 				textfield({name:'password', label: t('Password'), type:'password'}),
 				//textfield({name:'uri', readOnly:true, label: t('Common name')}),
 				select({name:'refreshInterval', label: t('Refresh calendars'), value:15,options: [
-					{name: t('Every quarter'), value: 15},
+					{name: t('Every 15 minutes'), value: 15},
 					{name: t('Every hour'), value: 60}
 				]}),
 				displayfield({itemId: 'lastError',name:'lastError', cls:'warning'})
