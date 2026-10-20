@@ -127,6 +127,21 @@ class Client extends Property
 			}
 		}
 	}
+	/**
+	 * Tokens of the clients must be deleted through {@see Token::delete()} first. The database foreign key
+	 * would delete them without clearing their cache entries and removed clients would keep working.
+	 */
+	protected static function internalDelete(Query $query): bool
+	{
+		$clientIds = static::internalFind(['id'], true)->mergeWith($query)->selectSingleValue('id')->all();
+
+		if(!empty($clientIds) && !Token::delete((new Query)->where('clientId', 'IN', $clientIds))) {
+			return false;
+		}
+
+		return parent::internalDelete($query);
+	}
+
 	public static function collectGarbage(): bool
 	{
 		go()->debug("GC: Clients");
