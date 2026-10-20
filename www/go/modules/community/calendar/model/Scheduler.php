@@ -152,6 +152,9 @@ class Scheduler {
 
 		// This does not only build the ics file but also changes event to an occurence if an occurence was modified. A
 		// participant could have been added as well.
+		// toInvite() replaces $event by a patched copy of the modified occurrence for the mail body. That copy has no id
+		// and its participants are never saved, so everything that is persisted must use the original event.
+		$origin = $event;
 		$ics = ICalendarHelper::toInvite($method,$event);
 
 		if($participants !== null) {
@@ -166,7 +169,7 @@ class Scheduler {
 
 		$mailer = go()->getMailer($organizer->email, $organizer->name);
 
-		foreach($participants ?? $event->participants as $participant) {
+		foreach($participants ?? $origin->participants as $participant) {
 			/** @var $participant Participant */
 			if(($newOnly && !$participant->isNew()) || $participant->isOwner())
 				continue;
@@ -178,6 +181,11 @@ class Scheduler {
 			$subject = go()->t($method=='REQUEST' ? ($participant->kind == 'resource' ? 'Resource request' : 'Invitation') : 'Cancellation', 'community', 'calendar');
 			if($method==='REQUEST' && $participant->participationStatus !== Participant::NeedsAction) {
 				$subject .= ' ('.go()->t('updated', 'community', 'calendar').')';
+			}
+
+			// An occurrence is a copy that is not saved, so it keeps the secret of the saved participant.
+			if($method === 'REQUEST' && !$origin->isInstance()) {
+				$participant->expectReply(true);
 			}
 
 			try {
@@ -228,9 +236,12 @@ class Scheduler {
 		}
 
 		// register a change because the participants have been updated
-		PostResponseProcessor::get()->addTask(function() use ($event) {
-			CalendarEvent::entityType()->change($event);
-		});
+		// An occurrence is a copy without an id. The saved event registers the change.
+		if($origin->id()) {
+			PostResponseProcessor::get()->addTask(function() use ($origin) {
+				CalendarEvent::entityType()->change($origin);
+			});
+		}
 
 		return $success;
 	}
@@ -242,7 +253,7 @@ class Scheduler {
 		ob_start();
 		$url = '';
 		if($method ==='REQUEST') {
-			$url = go()->getAuthState()->getPageUrl().'/community/calendar/invite/'.$event->uid.'/'.$participant->expectReply(true);
+			$url = go()->getAuthState()->getPageUrl().'/community/calendar/invite/'.$event->uid.'/'.$participant->scheduleSecret();
 		}
 		include __DIR__.'/../views/imip.php';
 		return ob_get_clean();
