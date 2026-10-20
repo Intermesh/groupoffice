@@ -27,6 +27,7 @@
 - Core: The OAuth2 / OpenID Connect server uses a random encryption key for each installation instead of a fixed key in the source, authorization codes can only be used once, and refresh tokens are stored, replaced every time they are used and revoked when the user is disabled or changes the password. Applications that use GroupOffice as login provider have to log in again after this update because tokens that were issued before it are no longer valid.
 - Core: removed debugger output for anonymous users
 - Core: The whole username must consist of the allowed characters (a-z, 0-9, -, _, ., @). Before, one allowed character was enough. This also applies to accounts that are created by OpenID Connect, LDAP or IMAP logins. Existing users are not affected until their username is changed.
+- Core: clear token cache when user deletes clients
 
 15-10-2026: 26.0.54
 - Core: update cleanup script
