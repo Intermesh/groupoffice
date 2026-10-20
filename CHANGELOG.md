@@ -1,3 +1,4 @@
+20-10-2026: 26.0.55
 - Core: Update DE translations
 - Core: Optimized SSE Push with more apcu caching
 - Core: Debounce pushing more than once every 2 seconds per entity
