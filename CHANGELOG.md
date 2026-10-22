@@ -1,4 +1,5 @@
 - Files: Fixed security issue where logged in user could read any contact name
+- Core: permissionLevel filter: the admin-only guard on permissionLevelUserId / permissionLevelGroups never fires #1593
 
 20-10-2026: 26.0.55
 - Calendar: Fixed "Column entityId cannot be null" error and a "forbidden" error on the accept link in the invitation e-mail when moving a single occurrence of a recurring event with participants.
