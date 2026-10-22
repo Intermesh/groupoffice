@@ -1349,6 +1349,12 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$cls = $entityType->getClassName();
 
 		$entity = $cls::findById($params['id']);
+		if(!$entity) {
+			throw new \go\core\exception\NotFound();
+		}
+		if(!$entity->hasPermissionLevel(Acl::LEVEL_READ)) {
+			throw new Forbidden();
+		}
 
 		$folder = Folder::model()->findForEntity($entity);
 		return [
