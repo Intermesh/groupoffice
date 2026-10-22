@@ -872,12 +872,12 @@ abstract class Entity extends Property {
 			->add("permissionLevel", function(Criteria $criteria, $value, Query $query, $filterCondition, $filters) {
 
 				// security check. Only admins may query on behalf of others permissions
-				if(!empty($filter['permissionLevelUserId']) && $filter['permissionLevelUserId'] != go()->getUserId() && !go()->getAuthState()->isAdmin()) {
+				if(!empty($filterCondition['permissionLevelUserId']) && $filterCondition['permissionLevelUserId'] != go()->getUserId() && !go()->getAuthState()->isAdmin()) {
 					throw new Forbidden("Only admins can pass 'permissionLevelUserId'");
 				}
 
 				// security check. Perhaps extend this later to check if the given groups are accessible by the user
-				if(!empty($filter['permissionLevelGroups']) && !go()->getAuthState()->isAdmin()) {
+				if(!empty($filterCondition['permissionLevelGroups']) && !go()->getAuthState()->isAdmin()) {
 					throw new Forbidden("Only admins can pass 'permissionLevelGroups'");
 				}
 
