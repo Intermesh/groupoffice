@@ -101,6 +101,9 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 	}
 	
 	protected function actionDelete($params){
+
+		\GO::session()->closeWriting();
+
 		$msg = '';
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
 
@@ -148,6 +151,8 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 
 
 	protected function actionTruncate($params){
+		\GO::session()->closeWriting();
+
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
 
 		$mailbox = new \GO\Email\Model\ImapMailbox($account, array("name" => $params["mailbox"]));
@@ -177,6 +182,7 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 	}
 	
 	protected function actionMove($params){
+		\GO::session()->closeWriting();
 		
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
 				
@@ -237,6 +243,7 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 	
 	
 	protected function actionAclStore($params) {
+		\GO::session()->closeWriting();
 		
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
 		$imap = $account->openImapConnection($params['mailbox']);
@@ -304,6 +311,7 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 	}
 	
 	protected function actionLoad($params) {
+		\GO::session()->closeWriting();
 		$response = array( 'success'=>true, 'data'=>array() );
 		
 		$mailboxPath = $params['mailboxPath'];
@@ -321,6 +329,7 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 	}
 	
 	protected function actionSubmit($params) {
+		\GO::session()->closeWriting();
 		$response = array( 'success' => true, 'id' => $params['accountId'] );
 		
 		$mailboxPath = $params['mailboxPath'];
