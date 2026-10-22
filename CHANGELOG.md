@@ -1,3 +1,5 @@
+- Files: Fixed security issue where logged in user could read any contact name
+
 14-09-2026: 25.0.113
 - Calendar: Trying to import a calendar failed with undefined method #1557
 - Addressbook: more consistent label of the debtor/customer number field.
