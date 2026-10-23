@@ -58,6 +58,23 @@ go.Jmap = {
 		});
 	},
 
+	/**
+	 * Whether the user may read the debug entries: community/dev/Debugger/get is forbidden without access to the dev
+	 * module, and asking anyway logs a failed JMAP call with every request. The dev module registers no client
+	 * code, so go.Modules.isAvailable() can't be used; its module entity is loaded after login.
+	 *
+	 * @return {boolean}
+	 */
+	mayDebug: function () {
+		const entities = go.Modules.entities || {};
+		for (let id in entities) {
+			if (entities[id].package === "community" && entities[id].name === "dev") {
+				return entities[id].permissionLevel >= go.permissionLevels.read;
+			}
+		}
+		return false;
+	},
+
 	processDebugResponse : function(response, clientCallId) {
 		var r;
 		while(r = response.shift()) {
@@ -307,7 +324,7 @@ go.Jmap = {
 			return;
 		}
 
-		if(GO.debug || GO.settings.config.debug) {
+		if((GO.debug || GO.settings.config.debug) && this.mayDebug()) {
 			this.debug();
 		}
 
