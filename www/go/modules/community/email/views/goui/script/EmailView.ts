@@ -2,13 +2,12 @@ import {
 	btn,
 	comp,
 	Component,
-	tbar,
 	t,
 	E,
 	menu,
 	Format,
 	DataSourceForm,
-	avatar, hr, Avatar, Notifier
+	avatar, hr, Avatar, Button, Notifier
 } from "@intermesh/goui";
 import {MailCtlr} from "./MailCtlr";
 import {client, jmapds} from "@intermesh/groupoffice-core";
@@ -23,7 +22,8 @@ export class EmailView extends DataSourceForm {
 
 	private from: Component
 	private avatar: Avatar
-	private to: Component
+	private recipients: Button
+	private details: Component
 	private received: Component
 	private subject: Component
 	private body: Component
@@ -34,67 +34,75 @@ export class EmailView extends DataSourceForm {
 		super(jmapds('Email'));
 		this.cls = 'vbox';
 		this.flex = '1';
-		this.items.add(
-			tbar({},
-				inThread ?
-					btn({title: t('Collapse'), icon: 'unfold_less', handler: () => { this.onCollapse?.(); } }) :
-					btn({title: t('Close'), icon: 'close', handler: () => { this.clear(); } }),
-				comp({cls: 'group', flex:'1'},
-					btn({icon: 'reply', title: t('Reply'), handler: (target) => { MailCtlr.reply(this.value).show(); } }),
-					btn({icon: 'reply_all', title: t('Reply all'), handler: (target) => { MailCtlr.reply(this.value, true).show(); } }),
-					btn({title:t('Forward'), icon: 'forward', handler: (target) => { MailCtlr.forward(this.value).show(); } })
-				),
-				comp({cls: 'group', flex:'1'},
-					btn({icon: 'archive', title: t('Archive')}),
-					btn({icon: 'delete', title:t('Delete'), handler: () => { MailCtlr.destroy(this.value); }})
-				),
-				btn({icon: 'more_vert', menu: menu({},
-					btn({icon: 'print', text: t('Print'), handler: () => {
-						const data = this.value;
-						this.body.el.print({title: data.sentAt + " - " + " - " + data.subject});
-					}}),
-					'-',
-					btn({icon:'folder_open', text: t('Move')+'…'}),
-					btn({icon: 'report', text: t('Report spam')}),
-					'-',
-					btn({icon: 'code', text: t('View source'),handler: () => {
-						fileView.open({blobId:'community/email/src/'+this.value.id, type: 'text/plain', name: 'mailsrc.eml'}).show();
-					}})
-				)})
-			),
 
+		let header: Component;
+		this.items.add(
 			// in a conversation the thread message is the card already
 			comp({style: inThread ? {} : {padding: '0 1.8rem'}, flex:'1'},
-				comp({cls: inThread ? 'pad' : 'card pad'},
-					comp({cls:'hbox',style:{marginTop:'1.6rem'}},
+				comp({cls: 'email-message' + (inThread ? ' in-thread' : ' card')},
+					// in a conversation the thread header shows the subject once
+					this.subject = comp({tagName: 'h2', cls: 'email-subject', hidden: inThread}),
+					header = comp({tagName: 'header', cls: 'email-header'},
 						this.avatar = avatar({
-							style:{marginRight:'1.6rem'},
-							displayName: 'Name',
+							displayName: '?',
 							backgroundImage: undefined // add later for BIMI support
 						}),
-
-						comp({tagName: 'header', flex:'1'},
-							comp({cls:'hbox'},
-								this.from=comp({cls:'chips', flex:'1'}),
-								comp({itemId:'mailboxes',cls:'badge',text:'Inbox'}),
-								this.received=comp({tagName:'small', text: 'Date'}),
-							),
-							comp({cls:'hbox'},
-								this.subject=comp({tagName:'h2', flex:'1',text: 'Loading'}),
-								comp({text:'icons'})
-							),
-							comp({cls:'hbox'},
-								comp({text:'To'}),
-								this.to=comp({cls:'chips', flex:'1'})
-							)
+						comp({cls: 'email-header-meta'},
+							this.from = comp({cls: 'email-from'}),
+							this.recipients = btn({cls: 'email-recipients', title: t('Show details'),
+								menu: menu({cls: 'email-details'},
+									this.details = comp({})
+								)
+							})
+						),
+						comp({cls: 'email-header-tools'},
+							this.received = comp({tagName: 'small'}),
+							btn({icon: 'reply', title: t('Reply'), handler: () => { MailCtlr.reply(this.value).show(); } }),
+							btn({icon: 'more_vert', title: t('More options'), menu: menu({},
+								btn({icon: 'reply_all', text: t('Reply all'), handler: () => { MailCtlr.reply(this.value, true).show(); } }),
+								btn({icon: 'forward', text: t('Forward'), handler: () => { MailCtlr.forward(this.value).show(); } }),
+								'-',
+								btn({icon: 'archive', text: t('Archive')}),
+								btn({icon: 'delete', text: t('Delete'), handler: () => { MailCtlr.destroy(this.value); }}),
+								'-',
+								btn({icon: 'print', text: t('Print'), handler: () => {
+									const data = this.value;
+									this.body.el.print({title: data.sentAt + " - " + " - " + data.subject});
+								}}),
+								btn({icon:'folder_open', text: t('Move')+'…'}),
+								btn({icon: 'report', text: t('Report spam')}),
+								'-',
+								btn({icon: 'code', text: t('View source'),handler: () => {
+									fileView.open({blobId:'community/email/src/'+this.value.id, type: 'text/plain', name: 'mailsrc.eml'}).show();
+								}})
+							)}),
+							...(inThread ? [] : [btn({icon: 'close', title: t('Close'), handler: () => { this.clear(); } })])
 						)
 					),
-					hr(),
-					this.body = comp({cls: 'textbox email pad', style:{paddingLeft:'59px'}, text: 'email'}),
-					this.attachments = comp({cls: 'attachments pad'})
+					this.body = comp({cls: 'textbox email email-body', text: 'email'}),
+					this.attachments = comp({cls: 'attachments email-attachments'})
 				)
 			)
 		);
+
+		if(inThread) {
+			// like the collapsed summary, a click on the header (not on its buttons) folds the message
+			header.el.title = t('Collapse');
+			header.el.tabIndex = 0;
+			header.el.setAttribute('role', 'button');
+			header.el.setAttribute('aria-expanded', 'true');
+			header.el.addEventListener('click', (e) => {
+				if(!(e.target as HTMLElement).closest('button, a')) {
+					this.onCollapse?.();
+				}
+			});
+			header.el.addEventListener('keydown', (e) => {
+				if(e.target === header.el && (e.key === 'Enter' || e.key === ' ')) {
+					e.preventDefault();
+					this.onCollapse?.();
+				}
+			});
+		}
 
 		this.shadowRoot = this.body.el!.attachShadow({mode:'closed'});
 		this.shadowRoot.innerHTML = `<style>blockquote {
@@ -107,11 +115,12 @@ export class EmailView extends DataSourceForm {
 
 		this.on('setvalue', ({newValue}) => {
 			const record = newValue;
-			this.avatar.displayName = record.from.length ? (record.from[0].name ?? record.from[0].email) : '?';
-			this.subject.text = record.subject ?? t('No subject');
-			this.from.items.replace(...this.emailChips(record.from ?? []));
-			this.to.items.replace(...this.emailChips(record.to ?? []));
-			this.received.text = Format.smartDateTime(record.receivedAt);
+			this.avatar.displayName = record.from?.length ? (record.from[0].name || record.from[0].email) : '?';
+			this.subject.text = record.subject || t('No subject');
+			this.from.items.replace(...this.senders(record.from ?? []));
+			this.renderRecipients(record);
+			this.received.text = record.receivedAt ? Format.smartDateTime(record.receivedAt) : '';
+			this.received.title = record.receivedAt ? Format.dateTime(record.receivedAt) : '';
 
 			this.shadowRoot.lastElementChild!.innerHTML = MailCtlr.emailText(record);
 
@@ -148,12 +157,53 @@ export class EmailView extends DataSourceForm {
 		});
 	}
 
-	private emailChips(emailAddresses: any[]) {
+	/**
+	 * The sender as bold name followed by the address, like the collapsed summary
+	 */
+	private senders(emailAddresses: any[]) {
 		if(!emailAddresses.length)
-			return [btn({cls:'chip', text: t('No sender')})];
+			return [comp({tagName: 'b', text: t('No sender')})];
+		return emailAddresses.map(emailAddress => {
+			const sender = this.emailChips([emailAddress], 'email-sender')[0];
+			return emailAddress.name ?
+				comp({cls: 'email-sender-line'}, sender, comp({tagName: 'small', text: '<' + emailAddress.email + '>'})) :
+				sender;
+		});
+	}
+
+	/**
+	 * Compact "to Alice, Bob" line; its menu lists all headers with an action menu per address
+	 */
+	private renderRecipients(record: any) {
+		const recipients = [...(record.to ?? []), ...(record.cc ?? []), ...(record.bcc ?? [])];
+		this.recipients.text = t('to') + ' ' + (recipients.length ?
+			recipients.map((a: any) => a.name || a.email).join(', ') :
+			t('undisclosed recipients'));
+
+		const rows: [string, Component[]][] = [
+			[t('From'), this.emailChips(record.from ?? [])],
+			[t('Reply-to'), record.replyTo?.length ? this.emailChips(record.replyTo) : []],
+			[t('To'), record.to?.length ? this.emailChips(record.to) : []],
+			[t('Cc'), record.cc?.length ? this.emailChips(record.cc) : []],
+			[t('Bcc'), record.bcc?.length ? this.emailChips(record.bcc) : []],
+			// the Date header of the message, the header line shows when it arrived
+			[t('Date'), record.sentAt || record.receivedAt ? [comp({text: Format.dateTime(record.sentAt || record.receivedAt)})] : []],
+			[t('Subject'), [comp({text: record.subject || t('No subject')})]]
+		];
+		this.details.items.replace(...rows.filter(([, value]) => value.length).map(([label, value]) =>
+			comp({cls: 'email-details-row'},
+				comp({tagName: 'small', text: label}),
+				comp({cls: 'chips'}, ...value)
+			)
+		));
+	}
+
+	private emailChips(emailAddresses: any[], cls = 'chip') {
+		if(!emailAddresses.length)
+			return [btn({cls, text: t('No sender')})];
 		return emailAddresses.map(emailAddress => {
 			const label = emailAddress.name || emailAddress.email;
-			return btn({cls:'chip', text: label, menu:menu({},
+			const actions = menu({},
 				comp({text:emailAddress.email}),
 				hr(),
 				btn({text:t('Copy address'), handler: () => {
@@ -168,7 +218,14 @@ export class EmailView extends DataSourceForm {
 				btn({text: t('Search for')+ " '"+label+"'", hidden: !this.onSearchFrom, handler: () => {
 					this.onSearchFrom?.(emailAddress.email);
 				}})
-			)});
+			);
+			// in the details popup the address sits in a row, so goui doesn't close that popup after an action
+			actions.el.addEventListener('click', (e) => {
+				if((e.target as HTMLElement).closest('button')) {
+					this.recipients.menu?.close();
+				}
+			});
+			return btn({cls, text: label, menu: actions});
 		});
 	}
 

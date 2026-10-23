@@ -79,8 +79,10 @@ export class ThreadView extends Component<ThreadViewEventMap> {
 			this.header = tbar({hidden: true, cls: 'thread-header'},
 				btn({cls: 'not-medium-device', title: t('Close'), icon: 'close', handler: () => this.fire('close', {})}),
 				btn({cls: 'for-medium-device', title: t('Back'), icon: 'arrow_back', handler: () => this.fire('close', {})}),
-				this.subject = comp({tagName: 'h3', flex: '1'}),
-				this.count = comp({cls: 'badge'}),
+				comp({cls: 'thread-title', flex: '1'},
+					this.subject = comp({tagName: 'h3'}),
+					this.count = comp({tagName: 'small'})
+				),
 				this.expandAll = btn({title: t('Expand all'), icon: 'unfold_more', handler: () => this.setAllExpanded(true)}),
 				this.collapseAll = btn({title: t('Collapse all'), icon: 'unfold_less', handler: () => this.setAllExpanded(false)})
 			),
@@ -127,9 +129,8 @@ export class ThreadView extends Component<ThreadViewEventMap> {
 		}
 
 		this.subject.text = emails[0].subject || t('No subject');
-		this.count.text = String(emails.length);
+		this.count.text = emails.length + ' ' + t('messages');
 		this.count.hidden = this.expandAll.hidden = this.collapseAll.hidden = emails.length < 2;
-		this.count.title = emails.length + ' ' + t('messages');
 
 		emails.forEach((email, i) => {
 			const item = new ThreadMessage(email, this);

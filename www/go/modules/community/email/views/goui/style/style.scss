@@ -170,6 +170,15 @@
 	}
 }
 
+.thread-title {
+	min-width: 0;
+
+	small {
+		display: block;
+		color: config.$colorTextSecondary;
+	}
+}
+
 .thread-messages {
 	padding: .8rem 0;
 }
@@ -259,5 +268,154 @@
 		&::-moz-progress-bar {
 			background-color: config.$colorError;
 		}
+	}
+}
+
+// compact message header: avatar | sender + "to …" | time, reply, more. Lines up with .thread-message-summary
+.email-message {
+	// avatar column: header padding + avatar + gap, the body starts under the sender name
+	--email-indent: #{1.6rem + 4.6rem + 1.2rem};
+
+	&.card {
+		padding-top: .6rem;
+	}
+}
+
+.email-subject {
+	margin: 0;
+	padding: 1.6rem 1.6rem .4rem;
+	font-size: 2.2rem;
+	overflow-wrap: anywhere;
+}
+
+.email-header {
+	display: flex;
+	align-items: flex-start;
+	gap: 1.2rem;
+	padding: 1rem 1.6rem;
+
+	.in-thread > & {
+		cursor: pointer;
+	}
+
+	> .goui-avatar {
+		flex: none;
+	}
+}
+
+.email-header-meta {
+	flex: 1;
+	min-width: 0;
+	padding-top: .1rem;
+}
+
+.email-header-tools {
+	display: flex;
+	align-items: center;
+	flex: none;
+	margin: -.4rem -.8rem 0 0;
+
+	small {
+		color: config.$colorTextSecondary;
+		white-space: nowrap;
+		margin-right: .4rem;
+	}
+}
+
+.email-from {
+	display: flex;
+	flex-wrap: wrap;
+	column-gap: 1.2rem;
+	min-width: 0;
+}
+
+.email-sender-line {
+	display: flex;
+	align-items: baseline;
+	gap: .6rem;
+	min-width: 0;
+
+	small {
+		color: config.$colorTextSecondary;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+}
+
+// sender and recipients are buttons for their menus but read as text
+button.goui-button.has-menu.with-text {
+	&.email-sender, &.email-recipients {
+		padding: 0;
+		border: 0;
+		border-radius: .4rem;
+		max-width: 100%;
+	}
+
+	&.email-sender:after {
+		display: none;
+	}
+
+	&.email-recipients {
+		font-size: 1.4rem;
+		font-weight: normal;
+		line-height: 2rem;
+		color: config.$colorTextSecondary;
+
+		&:after {
+			position: static;
+			flex: none;
+			font-size: 1.8rem;
+		}
+	}
+}
+
+.email-details {
+	padding: .8rem 1.2rem;
+	max-width: 44rem;
+}
+
+.email-details-row {
+	display: grid;
+	grid-template-columns: 7.2rem 1fr;
+	align-items: baseline;
+	gap: .8rem;
+	padding: .2rem 0;
+
+	> small {
+		color: config.$colorTextSecondary;
+		text-align: right;
+	}
+
+	> .chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: .4rem;
+		min-width: 0;
+		overflow-wrap: anywhere;
+
+		> .goui-button {
+			padding-top: .4rem;
+			padding-bottom: .4rem;
+		}
+	}
+}
+
+.email-body {
+	display: block;
+	padding: .4rem 1.6rem 1.6rem var(--email-indent);
+}
+
+.email-attachments {
+	padding: 0 1.6rem 1.6rem var(--email-indent);
+
+	&:empty {
+		display: none;
+	}
+}
+
+@media only screen and (max-width: config.$breakpointMedium) {
+	.email-message {
+		--email-indent: 1.6rem;
 	}
 }

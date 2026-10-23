@@ -10,7 +10,7 @@ import {
 	t,Window,
 	tree,
 	treecolumn,
-	TreeRecord, ComponentEventMap, Tree
+	TreeRecord, ComponentEventMap, Tree, Toolbar
 } from "@intermesh/goui";
 import {client, jmapds} from "@intermesh/groupoffice-core";
 import {AccountWindow} from "./AccountWindow";
@@ -25,6 +25,8 @@ export interface AccountListEventMap extends ComponentEventMap {
 export class AccountList extends Component<AccountListEventMap> {
 
 	list:List
+	/** Header with the title and account menu, Main adds the back button for small screens to it */
+	toolbar: Toolbar
 
 
 	private static mailboxRoles = { // key: label, icon, color
@@ -42,8 +44,8 @@ export class AccountList extends Component<AccountListEventMap> {
 		const mailboxDS = jmapds('Mailbox');
 
 
-		this.items.add(tbar({cls: 'dense'},
-			comp({tagName: 'h3', html: t('Accounts')}),
+		this.items.add(this.toolbar = tbar({cls: 'dense'},
+			comp({tagName: 'h3', html: t('Accounts'), flex: '1'}),
 			btn({
 				icon: 'more_vert', menu: menu({},
 					btn({

@@ -213,16 +213,14 @@ export class Main extends Component {
 
 	private westPanel(accountList: AccountList) {
 
-		return comp({tagName: 'aside', width: 274, cls:'vbox',style: {minWidth: '27.4rem'}},
-			tbar({cls: "for-medium-device"},
-				'->',
-				btn({title: t("Back"), icon: "arrow_back",
-					handler: () => {
-						this.activatePanel(this.center);
-					}
-				})
-			),
+		// one header on small screens: the back button goes into the account list's own toolbar
+		accountList.toolbar.items.insert(0, btn({cls: "for-medium-device", title: t("Back"), icon: "arrow_back",
+			handler: () => {
+				this.activatePanel(this.center);
+			}
+		}));
 
+		return comp({tagName: 'aside', width: 274, cls:'vbox',style: {minWidth: '27.4rem'}},
 			comp({cls:'scroll', flex: 1},
 				accountList
 			),
