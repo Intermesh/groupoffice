@@ -68,8 +68,9 @@ modules.register(  {
 				nav(accountId, mailboxId, threadId);
 			}).add(/^email\/a(\d+)\/m(\d+)\/e(\d+)$/, (accountId, mailboxId, emailId) => {
 				nav(accountId, mailboxId, '', emailId);
-			}).add(/^email\/a(\d+)$/, async (accountId) => {
-				nav(accountId, "0");
+			}).add(/^email\/a(\d+)$/, (accountId) => {
+				modules.openMainPanel("email");
+				void ui.openAccount(accountId);
 			});
 
 			modules.addMainPanel("community", "email", 'email', t('Email'), () => ui);

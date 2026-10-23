@@ -51,6 +51,9 @@ export interface ListViewEventMap extends ListEventMap {
 
 export class ListView extends List<Store, ListViewEventMap> {
 
+	/** Set while the row of the opened mail is highlighted, which must not navigate again */
+	private selectingSilently = false;
+
 	constructor() {
 		super(
 			datasourcestore({
@@ -71,7 +74,9 @@ export class ListView extends List<Store, ListViewEventMap> {
 			multiSelect:false,
 			listeners: {
 				'rowselect': ({row})=> {
-					this.fire('selectmail', {row});
+					if(!this.selectingSilently) {
+						this.fire('selectmail', {row});
+					}
 				}
 			}
 		};
@@ -116,6 +121,23 @@ export class ListView extends List<Store, ListViewEventMap> {
 		// one row per conversation (RFC 8621 Email/query collapseThreads)
 		(this.store.queryParams as any).collapseThreads = MailCtlr.conversations();
 		return this.store!.load();
+	}
+
+	/**
+	 * Highlight the row of the given conversation or email, e.g. when it was opened by a link
+	 */
+	selectMail(threadId?: string, emailId?: string) {
+		const index = this.store.findIndex(r => emailId ? r.id == emailId : r.threadId == threadId);
+		if(index === -1) {
+			this.rowSelection!.clear();
+			return;
+		}
+		this.selectingSilently = true;
+		try {
+			this.rowSelection!.add(this.store.get(index)!);
+		} finally {
+			this.selectingSilently = false;
+		}
 	}
 
 	/**

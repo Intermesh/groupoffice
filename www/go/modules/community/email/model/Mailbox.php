@@ -48,6 +48,9 @@ class Mailbox extends AclItemEntity {
 		return parent::defineFilters()
 			->add('parentId', function(Criteria $criteria, $value) {
 				$criteria->where('parentId', '=', $value);
+			})
+			->add('role', function(Criteria $criteria, $value) {
+				$criteria->where('role', '=', $value);
 			});
 	}
 

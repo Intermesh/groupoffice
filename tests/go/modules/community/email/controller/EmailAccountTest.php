@@ -4,21 +4,20 @@ namespace go\modules\community\email\controller;
 
 use go\core\auth\TemporaryState;
 use go\core\exception\Forbidden;
-use go\core\model\Acl;
-use go\core\model\Group;
-use go\core\model\Module as ModuleModel;
-use go\core\model\Permission;
+use go\core\jmap\exception\InvalidArguments;
 use go\core\model\User;
-use go\modules\community\email\model;
+use go\modules\community\email\model\Mailbox;
 use go\modules\community\email\Module;
 use PHPUnit\Framework\TestCase;
 
 class EmailAccountTest extends TestCase {
 
 	private static int $accountId;
+	private static int $otherAccountId;
+	private static int $otherMailboxId;
 	private static int $aclId;
-	private static User $allowed;
-	private static User $denied;
+	private static int $readerAclId;
+	private static int $userId;
 
 	public static function setUpBeforeClass(): void {
 		$module = Module::get();
@@ -26,70 +25,110 @@ class EmailAccountTest extends TestCase {
 			self::assertNotFalse($module->install(), "Could not install email module");
 		}
 
-		self::$allowed = self::createUser('quotaallowed');
-		self::$denied = self::createUser('quotadenied');
+		$user = new User();
+		$user->username = 'emailaccounttest';
+		$user->setPassword('sdfTgs-Dfgg-$#ddg');
+		$user->displayName = 'Email account test';
+		$user->email = $user->recoveryEmail = 'emailaccounttest@intermesh.localhost';
+		self::assertTrue($user->save(), var_export($user->getValidationErrors(), true));
+		self::$userId = (int)$user->id;
 
-		// both may use the module, so only the account ACL decides
-		$moduleModel = ModuleModel::findByName('community', 'email');
-		foreach ([self::$allowed, self::$denied] as $user) {
-			$moduleModel->permissions[Group::findPersonalGroupID($user->id)] = new Permission($moduleModel);
-		}
-		self::assertTrue($moduleModel->save());
-
-		$acl = new Acl();
-		$acl->entityTypeId = model\EmailAccount::entityType()->getId();
-		$acl->addGroup(Group::findPersonalGroupID(self::$allowed->id), Acl::LEVEL_READ);
-		self::assertTrue($acl->save());
-		self::$aclId = $acl->id;
-
-		// raw insert because saving an EmailAccount connects to the IMAP server
 		$db = go()->getDbConnection();
-		$db->insert('email_account', ['name' => 'quota', 'email' => 'quota@intermesh.localhost', 'mtaDsn' => '',
-			'mdaDsn' => '', 'mdaCapabilities' => '["CAPABILITY","IMAP4rev1","IDLE"]', 'createdAt' => '2026-10-01 00:00:00',
-			'aclId' => self::$aclId])->execute();
-		self::$accountId = (int)$db->getPDO()->lastInsertId();
+		// readable by admins only
+		self::$aclId = self::createAcl(1);
+		// readable by the test user too
+		self::$readerAclId = self::createAcl(1);
+		$userGroupId = (int)$db->selectSingleValue('id')->from('core_group')->where(['isUserGroupFor' => self::$userId])->single();
+		$db->insert('core_acl_group', ['aclId' => self::$readerAclId, 'groupId' => $userGroupId, 'level' => 10])->execute();
+
+		self::$accountId = self::createAccount('ctrl@intermesh.localhost', self::$aclId);
+		self::$otherAccountId = self::createAccount('ctrl-other@intermesh.localhost', self::$readerAclId);
+		$db->insert('email_mailbox', ['accountId' => self::$otherAccountId, 'name' => 'INBOX', 'role' => 'inbox'])->execute();
+		self::$otherMailboxId = (int)$db->getPDO()->lastInsertId();
 	}
 
-	private static function createUser(string $username): User {
-		$user = new User();
-		$user->username = $username;
-		$user->setPassword('sdfTgs-Dfgg-$#ddg');
-		$user->displayName = $username;
-		$user->email = $user->recoveryEmail = $username . '@intermesh.localhost';
-		self::assertTrue($user->save());
-		return $user;
+	private static function createAcl(int $adminGroupId): int {
+		$db = go()->getDbConnection();
+		$db->insert('core_acl', ['ownedBy' => 1, 'usedIn' => 'email_account.aclId'])->execute();
+		$aclId = (int)$db->getPDO()->lastInsertId();
+		$db->insert('core_acl_group', ['aclId' => $aclId, 'groupId' => $adminGroupId, 'level' => 50])->execute();
+		return $aclId;
 	}
 
 	public static function tearDownAfterClass(): void {
-		go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
-		go()->getDbConnection()->delete('email_account', ['id' => self::$accountId])->execute();
-		$moduleModel = ModuleModel::findByName('community', 'email');
-		foreach ([self::$allowed, self::$denied] as $user) {
-			unset($moduleModel->permissions[Group::findPersonalGroupID($user->id)]);
-		}
-		$moduleModel->save();
-		User::delete(['id' => [self::$allowed->id, self::$denied->id]]);
-		Acl::delete(['id' => self::$aclId]);
+		go()->setAuthState(new TemporaryState(1));
+		$db = go()->getDbConnection();
+		$db->delete('email_mailbox', ['id' => self::$otherMailboxId])->execute();
+		$db->delete('email_account', ['id' => [self::$accountId, self::$otherAccountId]])->execute();
+		$db->delete('core_acl', ['id' => [self::$aclId, self::$readerAclId]])->execute();
+		User::delete(['id' => self::$userId]);
 	}
 
-	public function testQuotaWithoutAccessIsForbidden() {
-		go()->setAuthState(new TemporaryState(self::$denied->id));
-		try {
-			$this->expectException(Forbidden::class);
-			(new EmailAccount())->quota(['accountId' => (string)self::$accountId]);
-		} finally {
-			go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
-		}
+	protected function tearDown(): void {
+		go()->setAuthState(new TemporaryState(1));
 	}
 
-	public function testQuotaWithoutServerSupportIsEmpty() {
-		go()->setAuthState(new TemporaryState(self::$allowed->id));
-		try {
-			// the stored capabilities have no QUOTA, so the (unconfigured) IMAP server isn't contacted
-			$this->assertSame(['accountId' => (string)self::$accountId, 'list' => []],
-				(new EmailAccount())->quota(['accountId' => (string)self::$accountId]));
-		} finally {
-			go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
-		}
+	/**
+	 * Raw insert because saving an EmailAccount connects to the IMAP server
+	 */
+	private static function createAccount(string $email, int $aclId): int {
+		go()->getDbConnection()->insert('email_account', [
+			'name' => $email,
+			'email' => $email,
+			'mtaDsn' => '',
+			// not IMAP, so connect() fails without a network call
+			'mdaDsn' => 'pop3:host=localhost',
+			'mdaCapabilities' => '[]',
+			'createdAt' => '2026-10-01 00:00:00',
+			'aclId' => $aclId
+		])->execute();
+		return (int)go()->getDbConnection()->getPDO()->lastInsertId();
+	}
+
+	public function testUpdateWithoutAccountId() {
+		$this->expectException(InvalidArguments::class);
+		(new EmailAccount())->update(['mailboxId' => self::$otherMailboxId]);
+	}
+
+	public function testFillWithoutAccountId() {
+		$this->expectException(InvalidArguments::class);
+		(new EmailAccount())->fill([]);
+	}
+
+	public function testUpdateDeniedForUserWithoutAccess() {
+		go()->setAuthState(new TemporaryState(self::$userId));
+		$this->expectException(Forbidden::class);
+		(new EmailAccount())->update(['accountId' => self::$accountId]);
+	}
+
+	public function testFillDeniedForUserWithoutAccess() {
+		go()->setAuthState(new TemporaryState(self::$userId));
+		$this->expectException(Forbidden::class);
+		(new EmailAccount())->fill(['accountId' => self::$accountId]);
+	}
+
+	public function testUpdateRejectsMailboxOfOtherAccount() {
+		$this->expectException(InvalidArguments::class);
+		(new EmailAccount())->update(['accountId' => self::$accountId, 'mailboxId' => self::$otherMailboxId]);
+	}
+
+	public function testUpdateAllowedForReader() {
+		go()->setAuthState(new TemporaryState(self::$userId));
+		// passes the guards and only fails connecting, because the test account has no IMAP backend
+		$this->expectExceptionMessage('Unsupported MDA type');
+		(new EmailAccount())->update(['accountId' => self::$otherAccountId, 'mailboxId' => self::$otherMailboxId]);
+	}
+
+	public function testFillAllowedForReader() {
+		go()->setAuthState(new TemporaryState(self::$userId));
+		$this->expectExceptionMessage('Unsupported MDA type');
+		(new EmailAccount())->fill(['accountId' => self::$otherAccountId]);
+	}
+
+	public function testRoleFilter() {
+		$find = fn(string $role) => array_map('intval', Mailbox::find()->selectSingleValue('box.id')
+			->where('box.accountId', '=', self::$otherAccountId)->filter(['role' => $role])->all());
+		$this->assertSame([self::$otherMailboxId], $find('inbox'));
+		$this->assertSame([], $find('sent'));
 	}
 }
