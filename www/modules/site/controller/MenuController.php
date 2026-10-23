@@ -54,7 +54,7 @@ class MenuController extends \GO\Base\Controller\AbstractJsonController {
 	 * @param int $id
 	 * @param int $site_id
 	 */
-	public function actionLoad($id = false,$site_id){
+	public function actionLoad($id, $site_id){
 		$remoteComboFields = array();
 		
 		$model = $this->_loadModel($site_id,$id);

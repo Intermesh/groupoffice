@@ -122,7 +122,7 @@ if (!class_exists('GOHolidaysJP')) {
 			return self::substitute($date);
 		}
 //
-		private static function substitute(DateTime $date, int $moveDays = null) : ?string {
+		private static function substitute(DateTime $date, ?int $moveDays = null) : ?string {
 			$dayOfWeek = $date->format("w");
 			if($dayOfWeek == 0) {
 				if(!isset($moveDays)) {
@@ -137,7 +137,7 @@ if (!class_exists('GOHolidaysJP')) {
 			return null;
 
 		}
-		private static function substitute2(DateTime $date, int $moveDays = null) : ?string {
+		private static function substitute2(DateTime $date, ?int $moveDays = null) : ?string {
 			$dayOfWeek = $date->format("w");
 			if($dayOfWeek == 0) {
 				if(!isset($moveDays)) {
@@ -152,7 +152,7 @@ if (!class_exists('GOHolidaysJP')) {
 			return null;
 
 		}
-		private static function substitute3(DateTime $date, int $moveDays = null) : ?string {
+		private static function substitute3(DateTime $date, ?int $moveDays = null) : ?string {
 			$dayOfWeek = $date->format("w");
 			if($dayOfWeek == 0) {
 				if(!isset($moveDays)) {
