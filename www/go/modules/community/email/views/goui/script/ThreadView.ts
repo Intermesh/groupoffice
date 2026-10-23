@@ -64,6 +64,8 @@ export class ThreadView extends Component<ThreadViewEventMap> {
 	private header: Component
 	private subject: Component
 	private count: Component
+	private expandAll: Component
+	private collapseAll: Component
 	private messages: Component
 	private empty: Component
 	private loadId = 0
@@ -78,8 +80,8 @@ export class ThreadView extends Component<ThreadViewEventMap> {
 				btn({title: t('Close'), icon: 'close', handler: () => this.fire('close', {})}),
 				this.subject = comp({tagName: 'h3', flex: '1'}),
 				this.count = comp({cls: 'badge'}),
-				btn({title: t('Expand all'), icon: 'unfold_more', handler: () => this.setAllExpanded(true)}),
-				btn({title: t('Collapse all'), icon: 'unfold_less', handler: () => this.setAllExpanded(false)})
+				this.expandAll = btn({title: t('Expand all'), icon: 'unfold_more', handler: () => this.setAllExpanded(true)}),
+				this.collapseAll = btn({title: t('Collapse all'), icon: 'unfold_less', handler: () => this.setAllExpanded(false)})
 			),
 			this.messages = comp({flex: '1', cls: 'scroll thread-messages'}),
 			this.empty = comp({cls: 'thread-empty', flex: '1'},
@@ -125,7 +127,7 @@ export class ThreadView extends Component<ThreadViewEventMap> {
 
 		this.subject.text = emails[0].subject || t('No subject');
 		this.count.text = String(emails.length);
-		this.count.hidden = emails.length < 2;
+		this.count.hidden = this.expandAll.hidden = this.collapseAll.hidden = emails.length < 2;
 		this.count.title = emails.length + ' ' + t('messages');
 
 		emails.forEach((email, i) => {

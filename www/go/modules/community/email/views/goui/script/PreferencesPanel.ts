@@ -24,7 +24,7 @@ export class PreferencesPanel extends Component {
 			dataSource: jmapds('Identity'),
 			filters: {default: {accountId: null}},
 
-			sort: [{property:'sortOrder'},{property:'name'}]
+			sort: [{property:'name'}]
 		});
 
 		this.form = datasourceform<User>({
