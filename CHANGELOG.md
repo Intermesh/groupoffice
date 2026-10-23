@@ -34,6 +34,7 @@
 - Core: removed debugger output for anonymous users
 - Core: The whole username must consist of the allowed characters (a-z, 0-9, -, _, ., @). Before, one allowed character was enough. This also applies to accounts that are created by OpenID Connect, LDAP or IMAP logins. Existing users are not affected until their username is changed.
 - Core: clear token cache when user deletes clients
+- Core: Fixed duplicate update requests when switching back to a tab that had been open for a while
 
 15-10-2026: 26.0.54
 - Core: update cleanup script
