@@ -2,7 +2,9 @@
 
 namespace go\modules\community\email\controller;
 
+use go\core\http\Exception as HttpException;
 use go\core\jmap\EntityController;
+use go\core\model\Acl;
 use go\modules\community\email\model;
 
 
@@ -41,6 +43,10 @@ class Email extends EntityController {
 		$account = model\EmailAccount::findById($params['accountId']);
 		if(empty($account)) {
 			throw new \Exception("Account not found");
+		}
+		// create, update and destroy all write to the mail server
+		if($account->getPermissionLevel() < Acl::LEVEL_WRITE) {
+			throw new HttpException(403, "You don't have write access to this account");
 		}
 		// connect to account dsn
 		$backend = $account->connect();
