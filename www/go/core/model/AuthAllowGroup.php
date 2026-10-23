@@ -4,6 +4,7 @@ namespace go\core\model;
 use Exception;
 use go\core\jmap\Entity;
 use go\core\orm\Mapping;
+use go\core\util\IpAddress;
 
 /**
  * The Acl class
@@ -68,15 +69,24 @@ class AuthAllowGroup extends Entity
   /**
    * Match the pattern with IP address
    *
+   * Supports exact addresses, wildcards (* and ?) and CIDR notation.
+   *
    * @param string $ip
    * @param string $pattern
-   * @return false|int
+   * @return bool
    */
-  private static function match($ip, $pattern) {
-    $pattern = str_replace('.', '\\.', $pattern);
-    $pattern = str_replace('?', '.', $pattern);
-    $pattern = str_replace('*', '.*', $pattern);
+  private static function match(string $ip, string $pattern): bool {
+    $pattern = trim($pattern);
+    if ($pattern === '') {
+      return false;
+    }
 
-    return preg_match('/' . $pattern .'/', $ip);
+    if (str_contains($pattern, '/')) {
+      return IpAddress::matches($ip, $pattern);
+    }
+
+    $regex = str_replace(['\*', '\?'], ['.*', '.'], preg_quote($pattern, '/'));
+
+    return (bool) preg_match('/^' . $regex . '$/Di', $ip);
   }
 }
