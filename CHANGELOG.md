@@ -1,3 +1,4 @@
+- email: Mailbox quota usage is shown at the bottom of the account panel when the IMAP server supports QUOTA
 - calendar: Fixed create link field in event dialog
 
 - 20-01-2026: 26.0.3
