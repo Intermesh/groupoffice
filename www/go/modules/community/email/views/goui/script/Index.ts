@@ -51,7 +51,7 @@ modules.register(  {
 			}
 
 			const ui = new Main(),
-				nav = (accountId:string, mailboxId: string, threadId: string = '') => {
+				nav = (accountId:string, mailboxId: string, threadId: string = '', emailId?: string) => {
 					modules.openMainPanel("email");
 					// client.jmap('Thread/get',{
 					// 	'#ids': {resultOf: 'c1', name: 'Email/get', path: '/list/*/threadId'}
@@ -62,10 +62,12 @@ modules.register(  {
 					// }).then((response) => {
 					// 	todo('update', {ids:response.ids});
 					// })
-					ui.goto(accountId,mailboxId, threadId);
+					ui.goto(accountId,mailboxId, threadId, emailId);
 				};
 			router.add(/^email\/a(\d+)\/m(\d+)(?:\/t(\d+))?$/, (accountId, mailboxId, threadId?: string) => {
 				nav(accountId, mailboxId, threadId);
+			}).add(/^email\/a(\d+)\/m(\d+)\/e(\d+)$/, (accountId, mailboxId, emailId) => {
+				nav(accountId, mailboxId, '', emailId);
 			}).add(/^email\/a(\d+)$/, async (accountId) => {
 				nav(accountId, "0");
 			});

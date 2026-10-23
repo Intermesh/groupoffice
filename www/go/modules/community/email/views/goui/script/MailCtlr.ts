@@ -5,6 +5,11 @@ import DOMPurify from 'dompurify';
 
 
 export class MailCtlr {
+	/** The user preference "Show emails as conversations" */
+	static conversations(): boolean {
+		return !!(client.user as any)?.emailPreferences?.enableConversations;
+	}
+
 	static resend(item: any) {
 		const cmp = new Composer();
 

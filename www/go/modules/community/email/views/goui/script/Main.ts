@@ -25,12 +25,15 @@ export class Main extends Component {
 	private listView: ListView
 	private threadView: ThreadView
 
-	private routeTo(account:string, mailbox?: string, thread?: string) {
+	/**
+	 * @param item 't' + thread id for a conversation or 'e' + email id for a single email
+	 */
+	private routeTo(account:string, mailbox?: string, item?: string) {
 		let path = 'a'+account;
 		if(mailbox) {
 			path += '/m'+mailbox;
-			if(thread) {
-				path += '/t'+thread;
+			if(item) {
+				path += '/'+item;
 			}
 		}
 
@@ -38,14 +41,16 @@ export class Main extends Component {
 	}
 
 
-	goto(accountId:string, mailboxId: string, threadId?:string) {
+	goto(accountId:string, mailboxId: string, threadId?:string, emailId?: string) {
 		this.currentAccount = accountId;
 		if(this.currentMailbox !== mailboxId) {
 			this.currentMailbox = mailboxId;
 			this.listView.goto(accountId, mailboxId);
 		}
 		const navId = ++this.navId;
-		if(!threadId) {
+		if(emailId) {
+			this.loadEmails(accountId, [emailId], navId);
+		} else if(!threadId) {
 			this.threadView.clear();
 		} else {
 			jmapds('Thread').single(threadId).then(thread => {
@@ -57,10 +62,16 @@ export class Main extends Component {
 					this.threadView.clear();
 					return;
 				}
+				this.loadEmails(accountId, thread.emailIds as string[], navId);
+			});
+		}
+	}
+
+	private loadEmails(accountId: string, ids: string[], navId: number) {
 				const ds = jmapds('Email');
 				client.jmap('Email/get', {
 					accountId: accountId,
-					ids: thread.emailIds,
+					ids,
 					properties: ["threadId","accountId", "mailboxIds", "keywords", "from", "subject","to","cc","bcc","replyTo","receivedAt","sentAt","preview",
 						"messageId","inReplyTo","references", "htmlBody", "attachments", "bodyStructure", "bodyValues"],
 					bodyProperties: ["partId", "blobId", "size", "type","disposition","name"],
@@ -73,11 +84,9 @@ export class Main extends Component {
 						ds.add(Object.assign(ds.data[e.id]??{},e));
 					});
 					if(navId === this.navId) {
-						this.threadView.load(thread);
+						this.threadView.load(ids);
 					}
 				});
-			});
-		}
 	}
 
 	constructor() {
@@ -100,7 +109,8 @@ export class Main extends Component {
 		// 	this.routeTo('email', day);
 		// });
 		this.listView.on('selectmail', ({row}) => {
-			this.routeTo(row.record.accountId, this.currentMailbox, row.record.threadId);
+			this.routeTo(row.record.accountId, this.currentMailbox,
+				MailCtlr.conversations() ? 't' + row.record.threadId : 'e' + row.record.id);
 		});
 		accountList.on('selectmailbox', ({account,mailbox}) => {
 			this.routeTo(account.id,mailbox.id);

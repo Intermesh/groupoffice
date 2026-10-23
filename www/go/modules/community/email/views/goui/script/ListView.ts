@@ -30,7 +30,7 @@ const listitem = function(mail: any) {
 		E('h4', DateTime.createFromFormat(mail.receivedAt)!.format('d-m-Y')).cls('right').css({float:'right'}),
 		E('h3', mail.from.length ? (mail.from[0].name || mail.from[0].email) : ''),
 		E('div', mail.subject || '('+t('No subject')+')',
-			mail.thread?.emailIds?.length > 1 ? E('div', mail.thread.emailIds.length+' »').cls('badge primary right') :''
+			MailCtlr.conversations() && mail.thread?.emailIds?.length > 1 ? E('div', String(mail.thread.emailIds.length)).cls('badge primary') :''
 		).cls('subject'),
 		E('sub', mail.preview).cls('clamp')
 	);
@@ -105,6 +105,8 @@ export class ListView extends List<Store, ListViewEventMap> {
 		const filter = this.store.queryParams.filter ||= {};
 		delete filter.from;
 		Object.assign(filter, {mailboxId});
+		// one row per conversation (RFC 8621 Email/query collapseThreads)
+		(this.store.queryParams as any).collapseThreads = MailCtlr.conversations();
 		return this.store!.load();
 	}
 

@@ -250,6 +250,41 @@ class ThreadTest extends TestCase {
 		$this->assertNotSame($this->threadOf('k1@test'), $this->threadOf('k2@test'));
 	}
 
+	public function testCollapseThreads() {
+		$db = go()->getDbConnection();
+		$db->insert('email_mailbox', ['accountId' => self::$otherAccountId, 'name' => 'Collapse'])->execute();
+		$mailboxId = (int)$db->getPDO()->lastInsertId();
+		$map = fn($id) => $db->insert('email_map', ['fk' => $id, 'mailboxId' => $mailboxId])->execute();
+
+		$map($this->deliver('n1@test', [], [], 'Collapse', '2026-10-01 10:00:00', self::$otherAccountId));
+		$n2 = $this->deliver('n2@test', ['n1@test'], ['n1@test'], 'Re: Collapse', '2026-10-02 10:00:00', self::$otherAccountId);
+		$map($n2);
+		// newest email of the thread is in another mailbox, so n2 represents the thread here
+		$this->deliver('n3@test', ['n1@test', 'n2@test'], ['n2@test'], 'Re: Collapse', '2026-10-03 10:00:00', self::$otherAccountId);
+		$single = $this->deliver('o1@test', [], [], 'Single', '2026-10-01 11:00:00', self::$otherAccountId);
+		$map($single);
+
+		$controller = new \go\modules\community\email\controller\Email();
+		$query = fn(bool $collapse) => array_map('intval', $controller->query([
+			'accountId' => self::$otherAccountId,
+			'filter' => ['mailboxId' => $mailboxId],
+			'sort' => [['property' => 'receivedAt', 'isAscending' => false]],
+			'collapseThreads' => $collapse
+		])['ids']);
+
+		$this->assertCount(3, $query(false));
+		$this->assertSame([$n2, $single], $query(true));
+	}
+
+	public function testPreferencesOnUser() {
+		$user = \go\core\model\User::findById(1);
+		$this->assertNotNull($user->emailPreferences);
+		$user->emailPreferences->enableConversations = true;
+		$this->assertTrue($user->save(), var_export($user->getValidationErrors(), true));
+
+		$this->assertTrue(\go\core\model\User::findById(1)->emailPreferences->enableConversations);
+	}
+
 	public function testDeleteEmpty() {
 		$id = $this->deliver('l1@test', [], [], 'Vanishing');
 		$threadId = $this->threadOf('l1@test');

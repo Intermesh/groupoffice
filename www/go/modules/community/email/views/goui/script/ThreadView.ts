@@ -1,4 +1,4 @@
-import {avatar, btn, comp, Component, ComponentEventMap, DefaultEntity, Format, t, tbar} from "@intermesh/goui";
+import {avatar, btn, comp, Component, ComponentEventMap, Format, t, tbar} from "@intermesh/goui";
 import {EmailView} from "./EmailView";
 import {jmapds} from "@intermesh/groupoffice-core";
 
@@ -57,6 +57,7 @@ class ThreadMessage extends Component {
 
 /**
  * Shows a conversation: read messages collapsed, unread messages and the latest message expanded.
+ * With conversations disabled it shows the single selected email.
  */
 export class ThreadView extends Component<ThreadViewEventMap> {
 
@@ -102,7 +103,7 @@ export class ThreadView extends Component<ThreadViewEventMap> {
 		this.empty.hidden = false;
 	}
 
-	async load(thread: DefaultEntity) {
+	async load(emailIds: string[]) {
 		const loadId = ++this.loadId;
 		this.messages.items.clear();
 		this.empty.hidden = true;
@@ -110,7 +111,7 @@ export class ThreadView extends Component<ThreadViewEventMap> {
 		this.subject.text = t('Loading') + '…';
 		this.count.hidden = true;
 
-		const r = await jmapds('Email').get(thread.emailIds as string[]);
+		const r = await jmapds('Email').get(emailIds);
 		if (loadId !== this.loadId) {
 			return; // another thread was opened in the meantime
 		}
