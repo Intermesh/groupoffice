@@ -237,11 +237,15 @@ class ImapBackend {
 						}
 					}
 				}
+				$addKeywords = array_keys(array_diff_key($new, $old));
+				$removeKeywords = array_keys(array_diff_key($old, $new));
+				// JMAP keywords are IMAP atoms (RFC 8621 4.1.1): they are sent unquoted and may not contain a
+				// backslash, so system flags like \Deleted can only come from the $parseFlags mapping
+				$invalid = array_filter(array_merge($addKeywords, $removeKeywords),
+					fn($k) => !preg_match('/^[\x21\x23\x24\x26\x27\x2B-\x5B\x5E-\x7A\x7C\x7E]+$/', $k));
 				$toFlag = fn($keywords) => array_map(fn($k) => self::$parseFlags[$k] ?? $k, $keywords);
-				$add = $toFlag(array_keys(array_diff_key($new, $old)));
-				$remove = $toFlag(array_keys(array_diff_key($old, $new)));
-				// keywords go into the IMAP command unquoted: only allow atoms (RFC 3501 flag-keyword)
-				$invalid = array_filter(array_merge($add, $remove), fn($f) => !preg_match('/^\\\\?[\x21\x23\x24\x26\x27\x2B-\x5B\x5E-\x7A\x7C\x7E]+$/', $f));
+				$add = $toFlag($addKeywords);
+				$remove = $toFlag($removeKeywords);
 				if(!empty($invalid)) {
 					$result['notUpdated'][$id] = new SetError("invalidProperties", "Invalid keyword");
 					continue;
