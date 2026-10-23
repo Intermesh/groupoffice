@@ -401,6 +401,47 @@ button.goui-button.has-menu.with-text {
 	}
 }
 
+// addresses in the details popup read as plain text like Date and Subject; they open their action menu on click
+button.goui-button.with-text.email-address {
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	min-height: 0;
+	max-width: 100%;
+	font-size: inherit;
+	font-weight: normal;
+	line-height: inherit;
+	color: inherit;
+	text-align: left;
+	background: none;
+
+	> .text {
+		white-space: normal;
+		overflow: visible;
+		overflow-wrap: anywhere;
+	}
+
+	&:after {
+		display: none;
+	}
+
+	&:hover, &:focus-visible, &.pressed {
+		text-decoration: underline;
+		background: none;
+	}
+}
+
+// name and address on top of an address' action menu, aligned with the menu items
+.email-address-head {
+	display: flex;
+	flex-direction: column;
+	padding: .8rem 1.6rem;
+
+	> small {
+		color: config.$colorTextSecondary;
+	}
+}
+
 .email-body {
 	display: block;
 	padding: .4rem 1.6rem 1.6rem var(--email-indent);

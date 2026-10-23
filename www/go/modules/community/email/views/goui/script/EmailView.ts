@@ -181,11 +181,11 @@ export class EmailView extends DataSourceForm {
 			t('undisclosed recipients'));
 
 		const rows: [string, Component[]][] = [
-			[t('From'), this.emailChips(record.from ?? [])],
-			[t('Reply-to'), record.replyTo?.length ? this.emailChips(record.replyTo) : []],
-			[t('To'), record.to?.length ? this.emailChips(record.to) : []],
-			[t('Cc'), record.cc?.length ? this.emailChips(record.cc) : []],
-			[t('Bcc'), record.bcc?.length ? this.emailChips(record.bcc) : []],
+			[t('From'), this.emailChips(record.from ?? [], 'email-address')],
+			[t('Reply-to'), record.replyTo?.length ? this.emailChips(record.replyTo, 'email-address') : []],
+			[t('To'), record.to?.length ? this.emailChips(record.to, 'email-address') : []],
+			[t('Cc'), record.cc?.length ? this.emailChips(record.cc, 'email-address') : []],
+			[t('Bcc'), record.bcc?.length ? this.emailChips(record.bcc, 'email-address') : []],
 			// the Date header of the message, the header line shows when it arrived
 			[t('Date'), record.sentAt || record.receivedAt ? [comp({text: Format.dateTime(record.sentAt || record.receivedAt)})] : []],
 			[t('Subject'), [comp({text: record.subject || t('No subject')})]]
@@ -204,7 +204,10 @@ export class EmailView extends DataSourceForm {
 		return emailAddresses.map(emailAddress => {
 			const label = emailAddress.name || emailAddress.email;
 			const actions = menu({},
-				comp({text:emailAddress.email}),
+				comp({cls: 'email-address-head'},
+					...(emailAddress.name ? [comp({tagName: 'b', text: emailAddress.name})] : []),
+					comp({tagName: 'small', text: emailAddress.email})
+				),
 				hr(),
 				btn({text:t('Copy address'), handler: () => {
 					navigator.clipboard.writeText(emailAddress.email).then(
@@ -225,7 +228,9 @@ export class EmailView extends DataSourceForm {
 					this.recipients.menu?.close();
 				}
 			});
-			return btn({cls, text: label, menu: actions});
+			// the details popup shows the full "Name <address>", every row in the same plain format
+			const text = cls === 'email-address' && emailAddress.name ? `${emailAddress.name} <${emailAddress.email}>` : label;
+			return btn({cls, text, menu: actions});
 		});
 	}
 
