@@ -1,6 +1,7 @@
 <?php
 namespace go\core\util;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class IpAddressTest extends TestCase
@@ -27,9 +28,7 @@ class IpAddressTest extends TestCase
 		];
 	}
 
-	/**
-	 * @dataProvider matching
-	 */
+	#[DataProvider('matching')]
 	public function testMatches(string $ip, string $range)
 	{
 		$this->assertTrue(IpAddress::matches($ip, $range), "$ip should be in $range");
@@ -57,9 +56,7 @@ class IpAddressTest extends TestCase
 		];
 	}
 
-	/**
-	 * @dataProvider notMatching
-	 */
+	#[DataProvider('notMatching')]
 	public function testDoesNotMatch(string $ip, string $range)
 	{
 		$this->assertFalse(IpAddress::matches($ip, $range), "$ip should not be in $range");

@@ -1,6 +1,7 @@
 <?php
 namespace go\core\jmap;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class RouterTest extends TestCase
@@ -42,9 +43,7 @@ class RouterTest extends TestCase
 		];
 	}
 
-	/**
-	 * @dataProvider cliMethods
-	 */
+	#[DataProvider('cliMethods')]
 	public function testCliControllersAreNeverRoutedToByJmap(string $method)
 	{
 		[$output, $response] = $this->callRouter($method);

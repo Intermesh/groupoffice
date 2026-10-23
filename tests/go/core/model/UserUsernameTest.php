@@ -3,6 +3,7 @@
 namespace go\core\model;
 
 use go\core\validate\ErrorCode;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class UserUsernameTest extends TestCase
@@ -29,9 +30,7 @@ class UserUsernameTest extends TestCase
 		];
 	}
 
-	/**
-	 * @dataProvider validNames
-	 */
+	#[DataProvider('validNames')]
 	public function testValidNames(string $name)
 	{
 		$this->assertSame(1, preg_match(User::USERNAME_REGEX, $name), "'$name' should be valid");
@@ -64,9 +63,7 @@ class UserUsernameTest extends TestCase
 		];
 	}
 
-	/**
-	 * @dataProvider invalidNames
-	 */
+	#[DataProvider('invalidNames')]
 	public function testInvalidNames(string $name)
 	{
 		$this->assertSame(0, preg_match(User::USERNAME_REGEX, $name), "'" . addcslashes($name, "\0..\37") . "' should be invalid");

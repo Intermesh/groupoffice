@@ -1,6 +1,7 @@
 <?php
 namespace go\core\fs;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class FileTest extends TestCase
@@ -17,9 +18,7 @@ class FileTest extends TestCase
 		];
 	}
 
-	/**
-	 * @dataProvider hostileNames
-	 */
+	#[DataProvider('hostileNames')]
 	public function testTempFileStaysInTmpFolder(string $name)
 	{
 		$tmp = go()->getTmpFolder()->create();
@@ -34,9 +33,8 @@ class FileTest extends TestCase
 
 	/**
 	 * Reproduces api/upload.php: the file is opened for writing, which creates missing parent folders.
-	 *
-	 * @dataProvider hostileNames
 	 */
+	#[DataProvider('hostileNames')]
 	public function testOpenDoesNotWriteOutsideTmpFolder(string $name)
 	{
 		$tmp = go()->getTmpFolder()->create();
