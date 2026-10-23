@@ -66,8 +66,8 @@ class ImapBackend {
 		'\\drafts' => 'drafts',
 	];
 
-	/** @var self singleton */
-	private static $instance;
+	/** @var array<int, self> one connection per account id */
+	private static $instances = [];
 
 	/** @var mail\Imap */
 	public $imap;
@@ -97,21 +97,25 @@ class ImapBackend {
 	 * @throws \RuntimeException
 	 */
 	static public function connect($dsn, $account) {
-		//none numeric?
-		if (!isset(self::$instance)) {
+		// an account that isn't saved yet (validating its DSN) always gets a fresh connection
+		if (!isset($account->id) || !isset(self::$instances[$account->id])) {
 			//mb_regex_encoding("UTF-8");
 			if ($imap = mail\Imap::connect($dsn)) {
-				self::$instance = new self($imap);
-				self::$instance->account = $account;
+				$instance = new self($imap);
+				$instance->account = $account;
 				//$imap->sendRequest('ENABLE QRESYNC');
 			} else {
 				throw new \RuntimeException('Imap Authentication failed');
 			}
+			if (!isset($account->id)) {
+				return $instance;
+			}
+			self::$instances[$account->id] = $instance;
 		}
 //		if(self::$instance->isFetching) { // todo: remove when imap update goes before local
 //			return false; // dont sync back
 //		}
-		return self::$instance;
+		return self::$instances[$account->id];
 	}
 
 	public function select($box = 'INBOX', $params = []) {
@@ -397,6 +401,46 @@ class ImapBackend {
 	 */
 	public function fetch($uid) {
 		return $this->imap->fetch(['RFC822'], $uid, null, true);
+	}
+
+	/**
+	 * The quotas of the inbox as JMAP Quota objects (RFC 9425)
+	 *
+	 * Empty when no quota root applies. Check the QUOTA capability before calling this.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function getQuotas(): array {
+		$roots = $this->imap->getQuotaRoot('INBOX');
+		if (!$roots) {
+			return [];
+		}
+
+		$quotas = [];
+		foreach ($roots as $root => $resources) {
+			foreach ($resources as $resource => $value) {
+				// STORAGE is counted in units of 1024 octets
+				[$type, $unit] = match ($resource) {
+					'STORAGE' => ['octets', 1024],
+					'MESSAGE' => ['count', 1],
+					default => [null, 0]
+				};
+				// a limit of 0 means nothing may be stored, not unlimited
+				if (!$type) {
+					continue;
+				}
+				$quotas[] = [
+					'id' => $root . ':' . $resource,
+					'resourceType' => $type,
+					'used' => $value['usage'] * $unit,
+					'hardLimit' => $value['limit'] * $unit,
+					'scope' => 'account',
+					'name' => $root !== '' ? $root : $this->account->name,
+					'types' => ['Mail'],
+				];
+			}
+		}
+		return $quotas;
 	}
 
 	//copied from Account

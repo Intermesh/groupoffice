@@ -891,13 +891,34 @@ class Imap {
 	}
 
 	/**
-	 * Retrieve the quota settings per user
-	 * @param string $quota_root
+	 * Retrieve the quota roots of a mailbox with their resource usage and limits (RFC 2087 / RFC 9208 GETQUOTAROOT)
 	 *
-	 * @return array
+	 * Resources are named as the server sends them, e.g. STORAGE (in units of 1024 octets) or MESSAGE.
+	 *
+	 * @param string $mailbox
+	 * @return array<string, array<string, array{usage: int, limit: int}>>|false quota per root name and resource, false if the server refused
 	 */
-	public function getQuotaRoot($quota_root = 'INBOX') {
-		return $this->requestAndResponse("QUOTA", [$quota_root]);
+	public function getQuotaRoot(string $mailbox = 'INBOX'): array|false {
+		$response = $this->requestAndResponse("GETQUOTAROOT", [$this->escapeString($mailbox)]);
+		if (!is_array($response)) {
+			return false;
+		}
+
+		$quota = [];
+		foreach ($response as $tokens) {
+			// QUOTA <root> (<resource> <usage> <limit> ...)
+			if (strtoupper($tokens[0] ?? '') !== 'QUOTA' || !isset($tokens[2]) || !is_array($tokens[2])) {
+				continue;
+			}
+			$resources = [];
+			foreach (array_chunk($tokens[2], 3) as $triple) {
+				if (count($triple) === 3 && ctype_digit($triple[1]) && ctype_digit($triple[2])) {
+					$resources[strtoupper($triple[0])] = ['usage' => (int)$triple[1], 'limit' => (int)$triple[2]];
+				}
+			}
+			$quota[$tokens[1]] = $resources;
+		}
+		return $quota;
 	}
 
 	/**

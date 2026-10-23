@@ -8,6 +8,8 @@ import {ThreadView} from "./ThreadView";
 import {MailCtlr} from "./MailCtlr";
 import {Composer} from "./Composer";
 import {client, jmapds} from "@intermesh/groupoffice-core";
+import {QuotaBar} from "./QuotaBar";
+import {accountStore} from "./Index";
 
 
 export class Main extends Component {
@@ -23,6 +25,7 @@ export class Main extends Component {
 	private currentAccount?: string
 
 	private listView: ListView
+	private quotaBar = new QuotaBar()
 	private threadView: ThreadView
 
 	/**
@@ -42,6 +45,9 @@ export class Main extends Component {
 
 
 	goto(accountId:string, mailboxId: string, threadId?:string, emailId?: string) {
+		if(this.currentAccount !== accountId) {
+			void this.quotaBar.load(accountId);
+		}
 		this.currentAccount = accountId;
 		if(this.currentMailbox !== mailboxId) {
 			this.currentMailbox = mailboxId;
@@ -163,6 +169,7 @@ export class Main extends Component {
 					btn({icon:'refresh',handler: () => {
 						client.jmap('EmailAccount/update',{accountId:this.currentAccount,mailboxId:this.currentMailbox}).then(r => {
 							this.listView.store.reload();
+							void this.quotaBar.load(this.currentAccount!);
 						})
 					}}),
 					btn({icon: 'search', title: t('Search')}),
@@ -195,11 +202,18 @@ export class Main extends Component {
 		);
 
 		//this.on('render', () => { inviteStore.load(); });
+		this.on('render', () => {
+			// before a mailbox is opened show the usage of the first account
+			const first = accountStore.data[0];
+			if(!this.currentAccount && first) {
+				void this.quotaBar.load(first.id);
+			}
+		});
 	}
 
 	private westPanel(accountList: AccountList) {
 
-		return comp({tagName: 'aside', width: 274, cls:'scroll',style: {minWidth: '27.4rem'}},
+		return comp({tagName: 'aside', width: 274, cls:'vbox',style: {minWidth: '27.4rem'}},
 			tbar({cls: "for-medium-device"},
 				'->',
 				btn({title: t("Back"), icon: "arrow_back",
@@ -209,9 +223,10 @@ export class Main extends Component {
 				})
 			),
 
-			comp({cls:'scroll'},
+			comp({cls:'scroll', flex: 1},
 				accountList
-			)
+			),
+			this.quotaBar
 		)
 	}
 

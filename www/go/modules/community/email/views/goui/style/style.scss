@@ -222,3 +222,42 @@
 	white-space: nowrap;
 	text-overflow: ellipsis;
 }
+
+.quota-bar {
+	padding: 1.2rem 1.6rem;
+	border-top: 1px solid config.$colorBorder;
+	font-size: 1.2rem;
+	color: config.$colorTextSecondary;
+
+	progress {
+		display: block;
+		width: 100%;
+		height: .6rem;
+		margin-top: .6rem;
+		appearance: none;
+		border: none;
+		border-radius: .3rem;
+		overflow: hidden;
+		background-color: config.$colorDivider;
+		accent-color: config.$colorPrimary;
+
+		&::-webkit-progress-bar {
+			background-color: config.$colorDivider;
+		}
+		&::-webkit-progress-value {
+			background-color: config.$colorPrimary;
+		}
+		&::-moz-progress-bar {
+			background-color: config.$colorPrimary;
+		}
+	}
+
+	&.full progress {
+		&::-webkit-progress-value {
+			background-color: config.$colorError;
+		}
+		&::-moz-progress-bar {
+			background-color: config.$colorError;
+		}
+	}
+}

@@ -67,6 +67,23 @@ class EmailAccount extends EntityController {
 		}
 	}
 
+	/**
+	 * The mailbox quotas of an account, shaped like a JMAP Quota/get response (RFC 9425)
+	 *
+	 * The list is empty when the IMAP server has no QUOTA support.
+	 *
+	 * @param array{accountId: string} $params
+	 * @return array{accountId: string, list: array}
+	 */
+	public function quota(array $params): array {
+		/** @var model\EmailAccount $account */
+		$account = $this->findEntity(model\EmailAccount::class, (string)($params['accountId'] ?? ''));
+		return [
+			'accountId' => (string)$account->id,
+			'list' => $account->quotas()
+		];
+	}
+
 	public function update($params) {
 
 		$account = model\EmailAccount::findById($params['accountId']);
