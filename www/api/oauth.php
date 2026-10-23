@@ -19,7 +19,7 @@ use League\OAuth2\Server\Grant\AuthCodeGrant;
 use League\OAuth2\Server\Grant\RefreshTokenGrant;
 use League\OAuth2\Server\ResourceServer;
 use OpenIDConnectServer\ClaimExtractor;
-use OpenIDConnectServer\IdTokenResponse;
+use go\core\oauth\server\IdTokenResponse;
 use Psr\Http\Message\ResponseInterface;
 
 App::get();
@@ -256,7 +256,7 @@ class OAuthController {
 		$signing_alg_values_supported = array('HS256', 'RS256');
 
 		$discovery = array(
-			'issuer' => 'https://' . $_SERVER['HTTP_HOST'],
+			'issuer' => IdTokenResponse::issuer(),
 			'authorization_endpoint' => $endpointBase . '/authorize',
 			'token_endpoint' => $endpointBase . '/token',
 			'userinfo_endpoint' => $endpointBase . '/userinfo',
