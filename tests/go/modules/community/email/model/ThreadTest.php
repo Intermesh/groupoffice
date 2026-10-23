@@ -107,6 +107,7 @@ class ThreadTest extends TestCase {
 			['Fwd: Re: Hello', 'hello', true],
 			['Re[2]: Hello', 'hello', true],
 			['Re(3): Hello', 'hello', true],
+			['Re[list]: Hello', 'hello', true],
 			['[list] Re: Hello', 'hello', true],
 			['Re: [list] Hello', 'hello', true],
 			['[list] Hello', 'hello', false],
@@ -232,6 +233,14 @@ class ThreadTest extends TestCase {
 		$this->deliver('j2@test', [], [], 'Re: Old topic', '2026-10-01 10:00:00');
 
 		$this->assertNotSame($this->threadOf('j1@test'), $this->threadOf('j2@test'));
+	}
+
+	public function testSubjectFallbackIgnoresLaterThreads() {
+		// an old reply imported after a newer conversation with the same subject started
+		$this->deliver('m1@test', [], [], 'Planning', '2026-10-01 10:00:00');
+		$this->deliver('m2@test', [], [], 'Re: Planning', '2026-01-05 10:00:00');
+
+		$this->assertNotSame($this->threadOf('m1@test'), $this->threadOf('m2@test'));
 	}
 
 	public function testAccountsAreSeparated() {

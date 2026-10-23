@@ -8,26 +8,17 @@ import {
 	menu,
 	Format,
 	DataSourceForm,
-	avatar, hr, Avatar
+	avatar, hr, Avatar, Notifier
 } from "@intermesh/goui";
 import {MailCtlr} from "./MailCtlr";
 import {client, fileView, jmapds} from "@intermesh/groupoffice-core";
 
-const emailChips = (emailAddresses: any[]) => {
-	if(!emailAddresses.length)
-		return [btn({cls:'chip', text:'No sender'})];
-	return emailAddresses.map(emailAddress => btn({cls:'chip', text: emailAddress.name ?? emailAddress.email, menu:menu({},
-		comp({text:emailAddress.email}),
-		hr(),
-		btn({text:t('Copy address'), handler(){alert('todo')}}),
-		btn({text:t('New E-mail'), handler(){alert('todo')}}),
-		btn({text: t('Show contact'), handler(){alert('todo')}}),
-		hr(),
-		btn({text: t('Search for')+ " '"+emailAddress.name+"'", handler(){alert('todo')}})
-	)}));
-}
-
 export class EmailView extends DataSourceForm {
+
+	/** Set by the conversation view: the close button collapses the message instead of clearing it */
+	public onCollapse?: () => void
+	/** Set by the conversation view to filter the mail list on a sender */
+	public onSearchFrom?: (email: string) => void
 
 	private from: Component
 	private avatar: Avatar
@@ -38,13 +29,15 @@ export class EmailView extends DataSourceForm {
 	private attachments: Component
 	private shadowRoot: ShadowRoot
 
-	constructor() {
+	constructor(inThread = false) {
 		super(jmapds('Email'));
 		this.cls = 'vbox';
 		this.flex = '1';
 		this.items.add(
 			tbar({},
-				btn({title: t('Close'), icon: 'close',handler:() => {this.clear()} }),
+				inThread ?
+					btn({title: t('Collapse'), icon: 'unfold_less', handler: () => { this.onCollapse?.(); } }) :
+					btn({title: t('Close'), icon: 'close', handler: () => { this.clear(); } }),
 				comp({cls: 'group', flex:'1'},
 					btn({icon: 'reply', title: t('Reply'), handler: (target) => { MailCtlr.reply(this.value).show(); } }),
 					btn({icon: 'reply_all', title: t('Reply all'), handler: (target) => { MailCtlr.reply(this.value, true).show(); } }),
@@ -114,13 +107,13 @@ export class EmailView extends DataSourceForm {
 			const record = newValue;
 			this.avatar.displayName = record.from.length ? (record.from[0].name ?? record.from[0].email) : '?';
 			this.subject.text = record.subject ?? t('No subject');
-			this.from.items.add(...emailChips(record.from));
-			this.to.items.add(...emailChips(record.to));
+			this.from.items.replace(...this.emailChips(record.from ?? []));
+			this.to.items.replace(...this.emailChips(record.to ?? []));
 			this.received.text = Format.smartDateTime(record.receivedAt);
 
 			this.shadowRoot.lastElementChild!.innerHTML = MailCtlr.emailText(record);
 
-			//this.attachments.items.clear();
+			this.attachments.items.clear();
 			if(record.attachments) {
 				this.attachments.items.add(...record.attachments.map((attachment: any) => {
 					attachment.name ??= 'unnamed';
@@ -144,11 +137,36 @@ export class EmailView extends DataSourceForm {
 
 			if(record.id && !record.keywords?.$seen) {
 				setTimeout(() => {
-					//if(this.pk === data.id && !this.busy) {
-					//	MailCltr.markSeen(true, [data.id]);
-					//}
+					// only when the message is still shown
+					if(this.value?.id === record.id && this.rendered && this.el.isConnected && !this.hidden) {
+						MailCtlr.markSeen([record], true);
+					}
 				}, 3000); // mark read on 3 seconds
 			}
+		});
+	}
+
+	private emailChips(emailAddresses: any[]) {
+		if(!emailAddresses.length)
+			return [btn({cls:'chip', text: t('No sender')})];
+		return emailAddresses.map(emailAddress => {
+			const label = emailAddress.name || emailAddress.email;
+			return btn({cls:'chip', text: label, menu:menu({},
+				comp({text:emailAddress.email}),
+				hr(),
+				btn({text:t('Copy address'), handler: () => {
+					navigator.clipboard.writeText(emailAddress.email).then(
+						() => Notifier.success(t('Copied to clipboard')),
+						(e) => Notifier.error(e)
+					);
+				}}),
+				btn({text:t('New E-mail'), handler: () => { MailCtlr.compose([emailAddress]).show(); }}),
+				btn({text: t('Show contact'), handler: () => { MailCtlr.showContact(emailAddress.email); }}),
+				hr(),
+				btn({text: t('Search for')+ " '"+label+"'", hidden: !this.onSearchFrom, handler: () => {
+					this.onSearchFrom?.(emailAddress.email);
+				}})
+			)});
 		});
 	}
 

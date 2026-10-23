@@ -126,6 +126,15 @@ class Email extends AclItemEntity {
 				$criteria->where('map.mailboxId', '=', $value);
 			})->add('accountId', function(Criteria $criteria, $value) {
 				$criteria->where('accountId', '=', $value);
+			})->add('from', function(Criteria $criteria, $value, Query $query) {
+				// sender address or name; a subquery so the filter can be used more than once
+				$criteria->where('e.id', 'IN', (new Query)
+					->select('fk')
+					->from('email_address')
+					->where('type', '=', 'from')
+					->andWhere((new Criteria)
+						->where('email', 'LIKE', '%' . $value . '%')
+						->orWhere('name', 'LIKE', '%' . $value . '%')));
 			})->add('inMailboxes', function(Criteria $criteria, $value, $query) {
 				$query->join('email_map', '`id` = `fk`');
 				$criteria->andWhere('email_map.mailboxId', '=', $value);

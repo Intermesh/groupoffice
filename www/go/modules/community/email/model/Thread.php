@@ -2,8 +2,9 @@
 
 namespace go\modules\community\email\model;
 
+use go\core\acl\model\AclItemEntity;
 use go\core\db\Query;
-use go\core\jmap\Entity;
+use go\core\orm\EntityType;
 use go\core\orm\Mapping;
 use go\core\orm\Relation;
 use PDO;
@@ -15,7 +16,7 @@ use PDO;
  * algorithm of RFC 5256 (JWZ threading). The base subject is only used as a fallback for replies that
  * carry no reference headers at all.
  */
-class Thread extends Entity {
+class Thread extends AclItemEntity {
 
 	public ?int $id;
 
@@ -24,7 +25,7 @@ class Thread extends Entity {
 	public ?array $emailIds;
 
 	/** Reply and forward prefixes (RFC 5256 subj-refwd plus common localised variants) */
-	const PREFIX_REGEX = '/^(?:\[[^\[\]]*\][ \t]*)*(?:re|res|rif|r|aw|antw|sv|vs|vl|odp|ynt|ilt|απ|σχετ|fwd?|fs|wg|vb|rv|enc|tr|i|pd|př|doorst|ΠΡΘ|fyi)[ \t]*(?:\[\d+\]|\(\d+\)|\^\d+)?[ \t]*[:：][ \t]*/iu';
+	const PREFIX_REGEX = '/^(?:\[[^\[\]]*\][ \t]*)*(?:re|res|rif|r|aw|antw|sv|vs|vl|odp|ynt|ilt|απ|σχετ|fwd?|fs|wg|vb|rv|enc|tr|i|pd|př|doorst|ΠΡΘ|fyi)[ \t]*(?:\[[^\[\]]*\]|\(\d+\)|\^\d+)?[ \t]*[:：][ \t]*/iu';
 	/** A leading mailing list tag like "[listname]" (RFC 5256 subj-blob) */
 	const BLOB_REGEX = '/^\[[^\[\]]*\][ \t]*(?=\S)/u';
 	/** Trailing "(fwd)" (RFC 5256 subj-trailer) */
@@ -34,7 +35,7 @@ class Thread extends Entity {
 	/** Subject wrapped like "[Fwd: subject]" (RFC 5256 subj-fwd) */
 	const FWD_WRAP_REGEX = '/^\[fwd:[ \t]*(.*)\]$/iu';
 
-	/** Replies without reference headers only join a thread with the same subject that was active this recently */
+	/** Replies without reference headers only join a thread with the same subject that was active within this many days */
 	const SUBJECT_FALLBACK_DAYS = 30;
 
 	static protected function defineMapping(): Mapping {
@@ -146,17 +147,24 @@ class Thread extends Entity {
 			self::mergeThreads($threadId, array_map('intval', $threadIds));
 		} else {
 			// emailIds of the thread will change when the message is saved
-			self::entityType()->changes([$threadId]);
+			self::entityType()->changes([[$threadId, self::accountAclId($message->accountId), false]]);
 		}
 		return $threadId;
 	}
 
+	private static function accountAclId(int $accountId): ?int {
+		$aclId = go()->getDbConnection()->selectSingleValue('aclId')->from('email_account')->where(['id' => $accountId])->single();
+		return $aclId ? (int)$aclId : null;
+	}
+
 	/**
-	 * Find the most recently active thread with the same base subject
+	 * Find the thread with the same base subject that was active closest before the message
 	 */
 	private static function findBySubject(Email $message, string $subjectHash): ?int {
-		$since = self::toDateTime($message->sentAt ?? $message->receivedAt) ?? new \DateTime();
-		$since = (clone $since)->modify('-' . self::SUBJECT_FALLBACK_DAYS . ' days');
+		// receivedAt is set by the server, sentAt by the sender
+		$date = self::toDateTime($message->receivedAt ?? $message->sentAt) ?? new \DateTime();
+		$since = (clone $date)->modify('-' . self::SUBJECT_FALLBACK_DAYS . ' days');
+		$until = (clone $date)->modify('+1 day');
 
 		$threadId = go()->getDbConnection()
 			->selectSingleValue('t.id')
@@ -165,6 +173,7 @@ class Thread extends Entity {
 			->where('t.accountId', '=', $message->accountId)
 			->andWhere('t.subjectHash', '=', $subjectHash)
 			->andWhere('e.receivedAt', '>=', $since->format('Y-m-d H:i:s'))
+			->andWhere('e.receivedAt', '<=', $until->format('Y-m-d H:i:s'))
 			->orderBy(['e.receivedAt' => 'DESC'])
 			->single();
 
@@ -238,13 +247,27 @@ class Thread extends Entity {
 				$emailChanges[] = [$newId, $email['aclId'], false];
 			}
 
+			// submissions follow their email; clients are told they changed
+			$submissions = $db->select('s.id, a.aclId')
+				->from('email_submission', 's')
+				->join('email_account', 'a', 'a.id = s.accountId')
+				->where('s.threadId', 'IN', $sourceIds)
+				->fetchMode(PDO::FETCH_ASSOC)
+				->all();
 			$db->update('email_submission', ['threadId' => $targetId], (new Query)->where('threadId', 'IN', $sourceIds))->execute();
+			if (!empty($submissions)) {
+				// by name: the EmailSubmission model is still work in progress
+				EntityType::findByName('EmailSubmission')
+					?->changes(array_map(fn($s) => [(int)$s['id'], $s['aclId'], false], $submissions));
+			}
 			$db->delete('email_thread', (new Query)->where('id', 'IN', $sourceIds))->execute();
 
 			Email::entityType()->changes($emailChanges);
-			$threadChanges = [[$targetId, null, false]];
+			$aclId = $db->selectSingleValue('a.aclId')->from('email_thread', 't')
+				->join('email_account', 'a', 'a.id = t.accountId')->where(['t.id' => $targetId])->single();
+			$threadChanges = [[$targetId, $aclId, false]];
 			foreach ($sourceIds as $sourceId) {
-				$threadChanges[] = [$sourceId, null, true];
+				$threadChanges[] = [$sourceId, $aclId, true];
 			}
 			self::entityType()->changes($threadChanges);
 
@@ -273,7 +296,15 @@ class Thread extends Entity {
 			return;
 		}
 		$db->delete('email_thread', (new Query)->where('id', 'IN', $ids))->execute();
-		self::entityType()->changes(array_map(fn($id) => [$id, null, true], $ids));
+		$aclId = self::accountAclId($accountId);
+		self::entityType()->changes(array_map(fn($id) => [$id, $aclId, true], $ids));
 	}
 
+	protected static function aclEntityClass(): string {
+		return EmailAccount::class;
+	}
+
+	protected static function aclEntityKeys(): array {
+		return ['accountId' => 'id'];
+	}
 }

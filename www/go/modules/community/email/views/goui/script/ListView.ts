@@ -29,7 +29,7 @@ const listitem = function(mail: any) {
 		E('h4', DateTime.createFromFormat(mail.receivedAt)!.format('d-m-Y')).cls('right').css({float:'right'}),
 		E('h3', mail.from.length ? (mail.from[0].name || mail.from[0].email) : ''),
 		E('div', mail.subject || '('+t('No subject')+')',
-			mail.thread.emailIds.length > 1 ? E('div', mail.thread.emailIds.length+' »').cls('badge primary right') :''
+			mail.thread?.emailIds?.length > 1 ? E('div', mail.thread.emailIds.length+' »').cls('badge primary right') :''
 		).cls('subject'),
 		E('sub', mail.preview).cls('clamp')
 	);
@@ -101,7 +101,17 @@ export class ListView extends List<Store, ListViewEventMap> {
 
 	goto(accountId:string, mailboxId:string) {
 		this.store.queryParams.accountId = accountId;
-		Object.assign(this.store.queryParams.filter ||= {}, {mailboxId});
+		const filter = this.store.queryParams.filter ||= {};
+		delete filter.from;
+		Object.assign(filter, {mailboxId});
+		return this.store!.load();
+	}
+
+	/**
+	 * Show only mail from this sender in the current mailbox
+	 */
+	searchFrom(email: string) {
+		Object.assign(this.store.queryParams.filter ||= {}, {from: email});
 		return this.store!.load();
 	}
 }

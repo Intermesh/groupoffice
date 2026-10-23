@@ -221,7 +221,7 @@ CREATE TABLE IF NOT EXISTS `email_address` (
 	CONSTRAINT `fk_email_address_email1`
 		FOREIGN KEY (`fk`)
 			REFERENCES `email_email` (`id`)
-			ON DELETE NO ACTION
+			ON DELETE CASCADE
 			ON UPDATE NO ACTION)
 	ENGINE = InnoDB;
 

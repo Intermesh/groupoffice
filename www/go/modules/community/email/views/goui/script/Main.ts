@@ -18,6 +18,8 @@ export class Main extends Component {
 	currentText: Component
 
 	private currentMailbox?: string;
+	/** Increased on every navigation so a slow response can't show a thread that is no longer selected */
+	private navId = 0;
 	private currentAccount?: string
 
 	private listView: ListView
@@ -42,13 +44,25 @@ export class Main extends Component {
 			this.currentMailbox = mailboxId;
 			this.listView.goto(accountId, mailboxId);
 		}
-		if(threadId) {
+		const navId = ++this.navId;
+		if(!threadId) {
+			this.threadView.clear();
+		} else {
 			jmapds('Thread').single(threadId).then(thread => {
+				if(navId !== this.navId) {
+					return;
+				}
+				if(!thread) {
+					// threads are destroyed when merged into another conversation
+					this.threadView.clear();
+					return;
+				}
 				const ds = jmapds('Email');
 				client.jmap('Email/get', {
 					accountId: accountId,
-					ids: thread!.emailIds,
-					properties: ["threadId","accountId", "mailboxIds", "from", "subject","to","cc","bcc","receivedAt", "htmlBody", "attachments", "bodyStructure", "bodyValues"],
+					ids: thread.emailIds,
+					properties: ["threadId","accountId", "mailboxIds", "keywords", "from", "subject","to","cc","bcc","replyTo","receivedAt","sentAt","preview",
+						"messageId","inReplyTo","references", "htmlBody", "attachments", "bodyStructure", "bodyValues"],
 					bodyProperties: ["partId", "blobId", "size", "type","disposition","name"],
 					//fetchHTMLBodyValues: true,
 					maxBodyValueBytes: 256 // todo (truncate?)
@@ -58,7 +72,9 @@ export class Main extends Component {
 						/** @ts-ignore */
 						ds.add(Object.assign(ds.data[e.id]??{},e));
 					});
-					this.threadView.load(thread);
+					if(navId === this.navId) {
+						this.threadView.load(thread);
+					}
 				});
 			});
 		}
@@ -69,6 +85,14 @@ export class Main extends Component {
 		this.cls = 'hbox fit tablet-cards';
 		this.threadView = new ThreadView();
 		this.listView = new ListView();
+		this.threadView.on('close', () => {
+			if(this.currentAccount) {
+				this.routeTo(this.currentAccount, this.currentMailbox);
+			}
+		});
+		this.threadView.on('searchfrom', ({email}) => {
+			this.listView.searchFrom(email);
+		});
 		const //tableView= new TableView(),
 			accountList = new AccountList()
 
