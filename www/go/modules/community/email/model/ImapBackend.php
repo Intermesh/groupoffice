@@ -257,8 +257,8 @@ class ImapBackend {
 	private function emailAppend($values) {
 		$me = new Email;
 		$me->setValues($values);
-		$me->threadId = Thread::byMessage($me); // slow on full fetch, can build threads later
-		$me->messageId = [sprintf('<%s@%s>', UUID::v4(), $this->account->getMda()->host)];
+		$me->messageId = [sprintf('%s@%s', UUID::v4(), $this->account->getMda()->host)]; // stored without <>, like parsed headers
+		$me->threadId = Thread::byMessage($me);
 
 		//build RFC_882 for adapter
 		$mime = MimeHelper::encode($me);
@@ -437,15 +437,12 @@ class ImapBackend {
 		}
 
 		// insert new mail
-		$newMailIds = [];
 		foreach($newMails as $item) {
-			$email = $this->parseIndexedFields($item);
-			if($email->save()){
-				$newMailIds[] = [$email->id,$mailbox->id];
-			}
+			$this->saveIndexedFields($item, $mailbox);
 		}
-		if(!empty($newMailIds))
-			go()->getDbConnection()->insert('email_map', $newMailIds, ['fk', 'mailboxId'])->execute();
+		if(!$syncable || !empty($vanished)) {
+			Thread::deleteEmpty($this->account->id);
+		}
 
 
 		// TODO flags and expunged when no CONDSTORE extension available
@@ -536,10 +533,7 @@ class ImapBackend {
 				$mailbox->imapSyncProps($imailbox['uidnext'], isset($imailbox['highestmodseq']) ? $imailbox['highestmodseq'] : 0);
 
 				$mailbox->save();
-				$ids = $this->fillMessages($mailbox);
-
-				if(!empty($ids))
-					go()->getDbConnection()->insert('email_map', $ids, ['fk', 'mailboxId'])->execute();
+				$this->fillMessages($mailbox);
 
 				$parentMap[$mailbox->name] = $mailbox->id;
 			}
@@ -574,15 +568,23 @@ class ImapBackend {
 
 	private function fillMessages($mailbox) {
 		$messages = $this->imap->fetch(self::IndexedFields, 1, INF); // ['RFC822']
-		$ids = [];
 		foreach ($messages as $item) {
-			$email = $this->parseIndexedFields($item);
-			if($email->save()){
-				$ids[] = [$email->id, $mailbox->id];
-			}
+			$this->saveIndexedFields($item, $mailbox);
 		}
 		$mailbox->setHighestUID(isset($item['UID']) ? $item['UID'] : 0);// Highest UID
-		return $ids;
+	}
+
+	/**
+	 * Save a fetched message and map it to the mailbox right away. Threading may merge threads and reinsert
+	 * earlier saved emails with a new id, so ids must not be collected for a batch insert afterwards.
+	 */
+	private function saveIndexedFields($item, Mailbox $mailbox): ?Email {
+		$email = $this->parseIndexedFields($item);
+		if(!$email->save()) {
+			return null;
+		}
+		go()->getDbConnection()->insert('email_map', ['fk' => $email->id, 'mailboxId' => $mailbox->id])->execute();
+		return $email;
 	}
 
 	private function parseIndexedFields($item) {

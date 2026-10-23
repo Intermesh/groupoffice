@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS `email_thread` (
 	`accountId` INT UNSIGNED NOT NULL,
 	PRIMARY KEY (`id`),
 	INDEX `fk_thread_account1_idx` (`accountId` ASC),
+	INDEX `email_thread_subjectHash_idx` (`accountId` ASC, `subjectHash` ASC),
 	CONSTRAINT `fk_thread_account1`
 		FOREIGN KEY (`accountId`)
 			REFERENCES `email_account` (`id`)
@@ -199,6 +200,7 @@ CREATE TABLE IF NOT EXISTS `email_id` (
 	`messageId` VARCHAR(255) NOT NULL,
 	PRIMARY KEY (`fk`, `type`, `messageId`),
 	INDEX `fk_email_id_map_email1_idx` (`fk` ASC),
+	INDEX `email_id_messageId_idx` (`messageId` ASC),
 	CONSTRAINT `fk_email_id_map_email1`
 		FOREIGN KEY (`fk`)
 			REFERENCES `email_email` (`id`)

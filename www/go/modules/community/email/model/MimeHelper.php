@@ -43,7 +43,9 @@ class MimeHelper
 			'From' => $mail->from,
 			'To' => $mail->to,
 			'Cc' => $mail->cc,
-			'MessageID' => $mail->messageId[0],
+			'MessageID' => $mail->messageId[0] ?? null,
+			'InReplyTo' => $mail->inReplyTo ?? [],
+			'References' => $mail->references ?? [],
 			'Subject' => $mail->subject,
 			'Date' => !isset($d) ? date(self::DATE_FORMAT) : $d->format(self::DATE_FORMAT),
 			'ContentType' => $structure->type
@@ -95,16 +97,19 @@ class MimeHelper
 		$result .= self::headerLine('Subject', self::encodeHeader(self::secureHeader($headers->Subject)));
 		$result .= self::headerLine('Date', $headers->Date);
 
-		// in reply to
-
-		// references
+		if (!empty($headers->InReplyTo)) {
+			$result .= self::headerLine('In-Reply-To', self::msgIdList($headers->InReplyTo));
+		}
+		if (!empty($headers->References)) {
+			$result .= self::headerLine('References', self::msgIdList($headers->References));
+		}
 
 		// Only allow a custom message ID if it conforms to RFC 5322 section 3.6.4
 		// https://tools.ietf.org/html/rfc5322#section-3.6.4
-		if (isset($headers->MessageID[0])) {
-			$result .= self::headerLine('Message-ID', $headers->MessageID[0]);
+		if (!empty($headers->MessageID)) {
+			$result .= self::headerLine('Message-ID', self::msgIdList([$headers->MessageID]));
 		} else {
-			throw new \Exception('Need proper MessageID to encode header '. $headers->MessageID[0]);
+			throw new \Exception('Need proper MessageID to encode header');
 			//$lastMessageID = sprintf('<%s@%s>', self::uniqueid, server()->hostname());
 		}
 
@@ -135,6 +140,13 @@ class MimeHelper
 	/**
 	 * Strip newlines to prevent header injection.
 	 */
+	/**
+	 * Format ids (stored without angle brackets) as an RFC 5322 msg-id list
+	 */
+	private static function msgIdList(array $ids): string {
+		return implode(' ', array_map(fn($id) => '<' . trim(self::secureHeader($id), '<> ') . '>', $ids));
+	}
+
 	private static function secureHeader($str) {
 		return trim(str_replace(["\r", "\n"], '', $str));
 	}
