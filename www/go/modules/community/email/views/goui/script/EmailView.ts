@@ -11,7 +11,8 @@ import {
 	avatar, hr, Avatar, Notifier
 } from "@intermesh/goui";
 import {MailCtlr} from "./MailCtlr";
-import {client, fileView, jmapds} from "@intermesh/groupoffice-core";
+import {client, jmapds} from "@intermesh/groupoffice-core";
+import {fileView} from "./FileView";
 
 export class EmailView extends DataSourceForm {
 

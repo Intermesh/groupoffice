@@ -21,14 +21,14 @@ class ThreadMessage extends Component {
 		this.cls = 'thread-message';
 
 		const from = email.from?.length ? (email.from[0].name || email.from[0].email) : t('No sender');
-		this.summary = comp({cls: 'hbox thread-message-summary', style: {cursor: 'pointer', padding: '0.8rem 1.8rem', alignItems: 'center', gap: '1.2rem'}},
+		this.summary = comp({cls: 'thread-message-summary' + (email.keywords?.$seen ? '' : ' unseen')},
 			avatar({displayName: from}),
 			comp({flex: '1', style: {minWidth: '0'}},
 				comp({cls: 'hbox'},
-					comp({tagName: 'h4', flex: '1', text: from, style: {margin: '0', fontWeight: email.keywords?.$seen ? 'normal' : 'bold'}}),
+					comp({tagName: 'h4', flex: '1', text: from}),
 					comp({tagName: 'small', text: email.receivedAt ? Format.smartDateTime(email.receivedAt) : ''})
 				),
-				comp({tagName: 'div', cls: 'clamp', text: email.preview ?? '', style: {opacity: '0.7'}})
+				comp({tagName: 'div', cls: 'clamp', text: email.preview ?? ''})
 			)
 		);
 		this.summary.el.addEventListener('click', () => this.expanded = true);
@@ -73,15 +73,15 @@ export class ThreadView extends Component<ThreadViewEventMap> {
 		this.flex = '1';
 
 		this.items.add(
-			this.header = tbar({hidden: true},
+			this.header = tbar({hidden: true, cls: 'thread-header'},
 				btn({title: t('Close'), icon: 'close', handler: () => this.fire('close', {})}),
-				this.subject = comp({tagName: 'h3', flex: '1', style: {margin: '0'}}),
+				this.subject = comp({tagName: 'h3', flex: '1'}),
 				this.count = comp({cls: 'badge'}),
 				btn({title: t('Expand all'), icon: 'unfold_more', handler: () => this.setAllExpanded(true)}),
 				btn({title: t('Collapse all'), icon: 'unfold_less', handler: () => this.setAllExpanded(false)})
 			),
-			this.messages = comp({flex: '1', cls: 'scroll'}),
-			this.empty = comp({cls: 'empty-state', flex: '1', style: {display: 'flex', alignItems: 'center', justifyContent: 'center'}},
+			this.messages = comp({flex: '1', cls: 'scroll thread-messages'}),
+			this.empty = comp({cls: 'thread-empty', flex: '1'},
 				comp({tagName: 'p', text: t('Select a conversation')})
 			)
 		);

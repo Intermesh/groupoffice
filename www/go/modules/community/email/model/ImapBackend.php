@@ -202,28 +202,63 @@ class ImapBackend {
 			}
 		}
 
-		// update (flags or move)
+		// update (flags; move is not implemented yet)
 		if(!empty($json->update)) {
-			$uidMailbox = Email::find()->select('id, uid, GROUP_CONCAT(mailboxId)')->join('email_map', 'm', 'fk = id', 'inner')
-				->andWhere('id','=', array_keys($json->update))
-				->groupBy(['id'])
-				->fetchMode(\PDO::FETCH_GROUP| \PDO::FETCH_UNIQUE)
+			$mailboxNames = go()->getDbConnection()->select('m.fk, b.name')
+				->from('email_map', 'm')
+				->join('email_mailbox', 'b', 'b.id = m.mailboxId')
+				->where('m.fk', 'IN', array_keys((array)$json->update))
+				->fetchMode(\PDO::FETCH_KEY_PAIR)
 				->all();
 
 			foreach($json->update as $id => $patch) {
-				$uid = $uidMailbox[$id]['uid'];
-				$mailboxIds = explode(',',$uidMailbox[$id]['mailboxIds']);
-				// todo fetch mailbox path an call move or store methods
-				//$email = Email::query();
-				//$conn->select($mailboxIds[0])->for($uid);
-				if(isset($patch->mailboxIds)) {
-					// move
-					//$conn->move($patch->mailboxIds[0]);
-
+				$patch = (array)$patch;
+				$email = isset($mailboxNames[$id]) ? Email::findById($id) : null;
+				if(!$email || $email->accountId != $this->account->id) {
+					$result['notUpdated'][$id] = new SetError("notFound");
+					continue;
 				}
-				if(isset($patch->keywords)) {
-					//$conn->flags($patch->keywords);
-					// store -> flags
+				if(isset($patch['mailboxIds']) || !empty(preg_grep('#^mailboxIds/#', array_keys($patch)))) {
+					$result['notUpdated'][$id] = new SetError("invalidProperties", "Moving email is not supported yet");
+					continue;
+				}
+
+				$old = $email->getKeywords();
+				$new = $old;
+				foreach($patch as $path => $value) {
+					if($path === 'keywords') {
+						$new = array_filter((array)$value);
+					} elseif(str_starts_with($path, 'keywords/')) {
+						$keyword = substr($path, 9);
+						if($value) {
+							$new[$keyword] = true;
+						} else {
+							unset($new[$keyword]);
+						}
+					}
+				}
+				$toFlag = fn($keywords) => array_map(fn($k) => self::$parseFlags[$k] ?? $k, $keywords);
+				$add = $toFlag(array_keys(array_diff_key($new, $old)));
+				$remove = $toFlag(array_keys(array_diff_key($old, $new)));
+
+				$this->imap->select($mailboxNames[$id]); // TODO we require the full mailbox path here
+				$success = (empty($add) || $this->imap->uidStore($add, $email->uid(), '+'))
+					&& (empty($remove) || $this->imap->uidStore($remove, $email->uid(), '-'));
+				if(!$success) {
+					$result['notUpdated'][$id] = new SetError("serverFail", "Could not store flags on the IMAP server");
+					continue;
+				}
+
+				// update the local index without going back to the backend
+				$this->isFetching = true;
+				// indexed keywords must be switched off explicitly
+				$email->setKeywords(array_merge(['$seen' => false, '$flagged' => false, '$answered' => false], $new));
+				$saved = $email->save();
+				$this->isFetching = false;
+				if($saved) {
+					$result['updated'][$id] = null;
+				} else {
+					$result['notUpdated'][$id] = new SetError("invalidProperties");
 				}
 			}
 		}

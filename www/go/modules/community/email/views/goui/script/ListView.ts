@@ -10,7 +10,8 @@ import {
 	DateTime,
 	ListEventMap, Store, StoreRecord
 } from "@intermesh/goui";
-import {client, fileView, jmapds} from "@intermesh/groupoffice-core";
+import {client, jmapds} from "@intermesh/groupoffice-core";
+import {fileView} from "./FileView";
 import {MailCtlr} from "./MailCtlr";
 import {ThreadView} from "./ThreadView";
 
