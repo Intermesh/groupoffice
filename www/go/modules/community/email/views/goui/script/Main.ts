@@ -173,6 +173,12 @@ export class Main extends Component {
 						})
 					}}),
 					btn({icon: 'search', title: t('Search')}),
+					btn({icon: 'edit', text: t('Compose'), cls: 'filled primary',
+						handler: _ => {
+							const c = new Composer();
+							c.show();
+						}
+					}),
 					btn({icon:'more_vert',cls: 'not-small-device', menu:menu({},
 						btn({icon:'move',text:t('Move to')+'…', handler: _ => { }}),
 						btn({icon:'fiber_manual_record',text:t('Mark unread')+'…', handler: _ => { }}),
@@ -181,13 +187,7 @@ export class Main extends Component {
 						btn({icon:'move',text:t('Forward as attachment')+'…', handler: _ => { }}),
 						hr(),
 						btn({icon:'report', text:t('Report spam')+'…', handler: _ => { }})
-					)}),
-					btn({icon: 'edit', text: t('Compose'), cls: 'filled primary',
-						handler: _ => {
-							const c = new Composer();
-							c.show();
-						}
-					})
+					)})
 				),
 				this.cards = cards({flex: 1, activeItem:0, cls:'scroll bg-lowest'},
 					//tableView,
