@@ -63,8 +63,9 @@ export class EmailView extends DataSourceForm {
 				)})
 			),
 
-			comp({style:{padding: '0 1.8rem'},flex:'1'},
-				comp({cls: 'card pad'},
+			// in a conversation the thread message is the card already
+			comp({style: inThread ? {} : {padding: '0 1.8rem'}, flex:'1'},
+				comp({cls: inThread ? 'pad' : 'card pad'},
 					comp({cls:'hbox',style:{marginTop:'1.6rem'}},
 						this.avatar = avatar({
 							style:{marginRight:'1.6rem'},

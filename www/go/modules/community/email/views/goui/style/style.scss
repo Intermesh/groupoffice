@@ -214,3 +214,11 @@
 	justify-content: center;
 	color: config.$colorTextSecondary;
 }
+
+.mailbox-title {
+	margin: 0;
+	min-width: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}

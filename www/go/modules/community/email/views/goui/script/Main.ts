@@ -15,7 +15,6 @@ export class Main extends Component {
 	west: Component
 	center: Component
 	cards: CardContainer
-	quotaPanel!:Component
 	currentText: Component
 
 	private currentMailbox?: string;
@@ -160,14 +159,7 @@ export class Main extends Component {
 					btn({cls: "for-medium-device", icon: "menu", title: t("Show sidebar"),
 						handler: () => this.activatePanel(this.west)
 					}),
-					btn({icon: 'edit', title: t('Compose'),cls:'primary filled',
-						handler: _ => {
-							const c = new Composer();
-							c.show();
-						}
-					}),
-					this.currentText = comp({tagName: 'h3', text: t('Inbox'), flex: '1 1 50%', style: {minWidth: '100px', fontSize: '1.8em'}}),
-					'->',
+					this.currentText = comp({tagName: 'h3', cls: 'mailbox-title', text: t('Inbox'), flex: '1'}),
 					btn({icon:'refresh',handler: () => {
 						client.jmap('EmailAccount/update',{accountId:this.currentAccount,mailboxId:this.currentMailbox}).then(r => {
 							this.listView.store.reload();
@@ -182,9 +174,15 @@ export class Main extends Component {
 						btn({icon:'move',text:t('Forward as attachment')+'…', handler: _ => { }}),
 						hr(),
 						btn({icon:'report', text:t('Report spam')+'…', handler: _ => { }})
-					)})
+					)}),
+					btn({icon: 'edit', text: t('Compose'), cls: 'filled primary',
+						handler: _ => {
+							const c = new Composer();
+							c.show();
+						}
+					})
 				),
-				this.cards = cards({flex: 1, activeItem:0, cls:'scroll'},
+				this.cards = cards({flex: 1, activeItem:0, cls:'scroll bg-lowest'},
 					//tableView,
 					this.listView
 				)
@@ -212,9 +210,7 @@ export class Main extends Component {
 			),
 
 			comp({cls:'scroll'},
-				accountList,
-				this.quotaPanel = comp({text:'quota'})
-
+				accountList
 			)
 		)
 	}

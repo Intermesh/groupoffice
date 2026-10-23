@@ -8,12 +8,20 @@ import {
 	t,
 	E,
 	DateTime,
+	Format,
 	ListEventMap, Store, StoreRecord
 } from "@intermesh/goui";
 import {client, jmapds} from "@intermesh/groupoffice-core";
 import {fileView} from "./FileView";
 import {MailCtlr} from "./MailCtlr";
 import {ThreadView} from "./ThreadView";
+
+/**
+ * Time for mail received today, the date otherwise
+ */
+const receivedText = function(receivedAt: string) {
+	return Format.date(receivedAt) === Format.date(new DateTime()) ? Format.time(receivedAt) : Format.date(receivedAt);
+}
 
 const listitem = function(mail: any) {
 	const abbr =  comp({tagName:'abbr'}),
@@ -27,7 +35,7 @@ const listitem = function(mail: any) {
 		mail.hasAttachment ? E('i', 'attachment').cls('small icon'):''
 	);
 	text.el.append(
-		E('h4', DateTime.createFromFormat(mail.receivedAt)!.format('d-m-Y')).cls('right').css({float:'right'}),
+		E('h4', receivedText(mail.receivedAt)).cls('right'),
 		E('h3', mail.from.length ? (mail.from[0].name || mail.from[0].email) : ''),
 		E('div', mail.subject || '('+t('No subject')+')',
 			MailCtlr.conversations() && mail.thread?.emailIds?.length > 1 ? E('div', String(mail.thread.emailIds.length)).cls('badge primary') :''
