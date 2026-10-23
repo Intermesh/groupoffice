@@ -204,7 +204,7 @@ class ImapBackend {
 
 		// update (flags; move is not implemented yet)
 		if(!empty($json->update)) {
-			$mailboxNames = go()->getDbConnection()->select('m.fk, b.name')
+			$mailboxes = go()->getDbConnection()->select('m.fk, b.id')
 				->from('email_map', 'm')
 				->join('email_mailbox', 'b', 'b.id = m.mailboxId')
 				->where('m.fk', 'IN', array_keys((array)$json->update))
@@ -213,7 +213,7 @@ class ImapBackend {
 
 			foreach($json->update as $id => $patch) {
 				$patch = (array)$patch;
-				$email = isset($mailboxNames[$id]) ? Email::findById($id) : null;
+				$email = isset($mailboxes[$id]) ? Email::findById($id) : null;
 				if(!$email || $email->accountId != $this->account->id) {
 					$result['notUpdated'][$id] = new SetError("notFound");
 					continue;
@@ -240,8 +240,20 @@ class ImapBackend {
 				$toFlag = fn($keywords) => array_map(fn($k) => self::$parseFlags[$k] ?? $k, $keywords);
 				$add = $toFlag(array_keys(array_diff_key($new, $old)));
 				$remove = $toFlag(array_keys(array_diff_key($old, $new)));
+				// keywords go into the IMAP command unquoted: only allow atoms (RFC 3501 flag-keyword)
+				$invalid = array_filter(array_merge($add, $remove), fn($f) => !preg_match('/^\\\\?[\x21\x23\x24\x26\x27\x2B-\x5B\x5E-\x7A\x7C\x7E]+$/', $f));
+				if(!empty($invalid)) {
+					$result['notUpdated'][$id] = new SetError("invalidProperties", "Invalid keyword");
+					continue;
+				}
 
-				$this->imap->select($mailboxNames[$id]); // TODO we require the full mailbox path here
+				// mailbox names are stored without their parent path, so make sure we selected the right one
+				$mailbox = Mailbox::findById($mailboxes[$id]);
+				$selected = $this->imap->select($mailbox->name); // TODO we require the full mailbox path here
+				if(!is_array($selected) || ($selected['uidvalidity'] ?? null) != $mailbox->uid()) {
+					$result['notUpdated'][$id] = new SetError("serverFail", "Mailbox not found on the IMAP server");
+					continue;
+				}
 				$success = (empty($add) || $this->imap->uidStore($add, $email->uid(), '+'))
 					&& (empty($remove) || $this->imap->uidStore($remove, $email->uid(), '-'));
 				if(!$success) {

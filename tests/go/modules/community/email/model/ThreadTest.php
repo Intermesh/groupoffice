@@ -256,24 +256,35 @@ class ThreadTest extends TestCase {
 		$mailboxId = (int)$db->getPDO()->lastInsertId();
 		$map = fn($id) => $db->insert('email_map', ['fk' => $id, 'mailboxId' => $mailboxId])->execute();
 
-		$map($this->deliver('n1@test', [], [], 'Collapse', '2026-10-01 10:00:00', self::$otherAccountId));
+		$n1 = $this->deliver('n1@test', [], [], 'Collapse', '2026-10-01 10:00:00', self::$otherAccountId);
+		$map($n1);
 		$n2 = $this->deliver('n2@test', ['n1@test'], ['n1@test'], 'Re: Collapse', '2026-10-02 10:00:00', self::$otherAccountId);
 		$map($n2);
 		// newest email of the thread is in another mailbox, so n2 represents the thread here
 		$this->deliver('n3@test', ['n1@test', 'n2@test'], ['n2@test'], 'Re: Collapse', '2026-10-03 10:00:00', self::$otherAccountId);
 		$single = $this->deliver('o1@test', [], [], 'Single', '2026-10-01 11:00:00', self::$otherAccountId);
 		$map($single);
+		foreach ([$n1 => 'alice@example.com', $n2 => 'bob@example.com', $single => 'alice@example.com'] as $id => $from) {
+			$db->insert('email_address', ['fk' => $id, 'type' => 'from', 'email' => $from])->execute();
+		}
 
 		$controller = new \go\modules\community\email\controller\Email();
-		$query = fn(bool $collapse) => array_map('intval', $controller->query([
+		$query = fn(bool $collapse, array $filter = [], bool $ascending = false, int $limit = 0) => array_map('intval', $controller->query([
 			'accountId' => self::$otherAccountId,
-			'filter' => ['mailboxId' => $mailboxId],
-			'sort' => [['property' => 'receivedAt', 'isAscending' => false]],
+			'filter' => ['mailboxId' => $mailboxId] + $filter,
+			'sort' => [['property' => 'receivedAt', 'isAscending' => $ascending]],
+			'limit' => $limit,
 			'collapseThreads' => $collapse
 		])['ids']);
 
 		$this->assertCount(3, $query(false));
 		$this->assertSame([$n2, $single], $query(true));
+		// the first email after sorting represents the thread
+		$this->assertSame([$n1, $single], $query(true, [], true));
+		// the thread is found by its matching email even when a newer reply does not match the filter
+		$this->assertSame([$single, $n1], $query(true, ['from' => 'alice']));
+		// position and limit apply to collapsed results
+		$this->assertSame([$n2], $query(true, [], false, 1));
 	}
 
 	public function testPreferencesOnUser() {
