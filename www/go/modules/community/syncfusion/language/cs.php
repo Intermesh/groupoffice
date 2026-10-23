@@ -19,4 +19,7 @@ return [
 	'Setup Instructions' => 'Pokyny k instalaci',
 	'Place ej2.min.js and ej2.min.css in go/modules/community/syncfusion/lib/' => 'Umístěte ej2.min.js a ej2.min.css do go/modules/community/syncfusion/lib/',
 	'Unsaved changes will be lost. Close anyway?' => 'Neuložené změny budou ztraceny. Přesto zavřít?',
+	'Failed to load the Syncfusion library.' => 'Knihovnu Syncfusion se nepodařilo načíst.',
+	'No file or blob specified.' => 'Není zadán soubor ani blob.',
+	'Docker services' => 'Služby Docker',
 ];

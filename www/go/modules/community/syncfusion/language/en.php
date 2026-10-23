@@ -19,4 +19,7 @@ return [
 	'Setup Instructions' => 'Setup Instructions',
 	'Place ej2.min.js and ej2.min.css in go/modules/community/syncfusion/lib/' => 'Place ej2.min.js and ej2.min.css in go/modules/community/syncfusion/lib/',
 	'Unsaved changes will be lost. Close anyway?' => 'Unsaved changes will be lost. Close anyway?',
+	'Failed to load the Syncfusion library.' => 'Failed to load the Syncfusion library.',
+	'No file or blob specified.' => 'No file or blob specified.',
+	'Docker services' => 'Docker services',
 ];
