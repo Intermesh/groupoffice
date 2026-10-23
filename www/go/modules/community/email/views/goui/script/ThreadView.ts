@@ -77,7 +77,8 @@ export class ThreadView extends Component<ThreadViewEventMap> {
 
 		this.items.add(
 			this.header = tbar({hidden: true, cls: 'thread-header'},
-				btn({title: t('Close'), icon: 'close', handler: () => this.fire('close', {})}),
+				btn({cls: 'not-medium-device', title: t('Close'), icon: 'close', handler: () => this.fire('close', {})}),
+				btn({cls: 'for-medium-device', title: t('Back'), icon: 'arrow_back', handler: () => this.fire('close', {})}),
 				this.subject = comp({tagName: 'h3', flex: '1'}),
 				this.count = comp({cls: 'badge'}),
 				this.expandAll = btn({title: t('Expand all'), icon: 'unfold_more', handler: () => this.setAllExpanded(true)}),

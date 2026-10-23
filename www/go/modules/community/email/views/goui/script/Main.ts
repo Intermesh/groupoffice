@@ -13,6 +13,7 @@ import {client, jmapds} from "@intermesh/groupoffice-core";
 export class Main extends Component {
 
 	west: Component
+	center: Component
 	cards: CardContainer
 	quotaPanel!:Component
 	currentText: Component
@@ -48,6 +49,8 @@ export class Main extends Component {
 			this.listView.goto(accountId, mailboxId);
 		}
 		const navId = ++this.navId;
+		// on small screens only the active panel is visible (tablet-cards)
+		this.activatePanel(threadId || emailId ? this.threadView : this.center);
 		if(emailId) {
 			this.loadEmails(accountId, [emailId], navId);
 		} else if(!threadId) {
@@ -59,10 +62,14 @@ export class Main extends Component {
 				}
 				if(!thread) {
 					// threads are destroyed when merged into another conversation
-					this.threadView.clear();
+					this.showList();
 					return;
 				}
 				this.loadEmails(accountId, thread.emailIds as string[], navId);
+			}).catch(() => {
+				if(navId === this.navId) {
+					this.showList();
+				}
 			});
 		}
 	}
@@ -86,7 +93,27 @@ export class Main extends Component {
 					if(navId === this.navId) {
 						this.threadView.load(ids);
 					}
+				}).catch(() => {
+					if(navId === this.navId) {
+						this.showList();
+					}
 				});
+	}
+
+	/**
+	 * Clear the thread view and show the list, so small screens aren't left on an empty thread view without a back button
+	 */
+	private showList() {
+		this.threadView.clear();
+		this.activatePanel(this.center);
+	}
+
+	/**
+	 * Show the given panel. Only has effect on small screens where the tablet-cards layout shows one panel at a time.
+	 */
+	activatePanel(active: Component) {
+		active.parent?.items.forEach(c => c.el.classList.remove("active"));
+		active.el.classList.add("active");
 	}
 
 	constructor() {
@@ -100,6 +127,10 @@ export class Main extends Component {
 			}
 		});
 		this.threadView.on('searchfrom', ({email}) => {
+			// the results show in the list, which is hidden behind the thread on small screens
+			if(this.currentAccount) {
+				this.routeTo(this.currentAccount, this.currentMailbox);
+			}
 			this.listView.searchFrom(email);
 		});
 		const //tableView= new TableView(),
@@ -114,9 +145,9 @@ export class Main extends Component {
 		});
 		accountList.on('selectmailbox', ({account,mailbox}) => {
 			this.routeTo(account.id,mailbox.id);
+			// the route doesn't change when the current mailbox is selected again
+			this.activatePanel(this.center);
 		})
-
-		let center;
 
 		this.items.add(
 			this.west = this.westPanel(accountList),
@@ -124,8 +155,11 @@ export class Main extends Component {
 				stateId: "email-splitter-west",
 				resizeComponent: this.west
 			}),
-			center=comp({cls: 'vbox active' ,width: 400},
+			this.center = comp({cls: 'vbox active' ,width: 400},
 				tbar({},
+					btn({cls: "for-medium-device", icon: "menu", title: t("Show sidebar"),
+						handler: () => this.activatePanel(this.west)
+					}),
 					btn({icon: 'edit', title: t('Compose'),cls:'primary filled',
 						handler: _ => {
 							const c = new Composer();
@@ -157,7 +191,7 @@ export class Main extends Component {
 			),
 			splitter({
 				stateId: "email-splitter-east",
-				resizeComponent: center
+				resizeComponent: this.center
 			}),
 			this.threadView
 		);
@@ -172,7 +206,7 @@ export class Main extends Component {
 				'->',
 				btn({title: t("Back"), icon: "arrow_back",
 					handler: () => {
-						this.west.el.cls('-active');
+						this.activatePanel(this.center);
 					}
 				})
 			),
