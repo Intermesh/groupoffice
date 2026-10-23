@@ -343,20 +343,7 @@ class Authenticate
 
 		$this->clearThrottle($username);
 
-		if (!$user->enabled) {
-			throw new Forbidden(go()->t("Your account has been disabled."));
-		}
-
-		if (!go()->getEnvironment()->isCli()) {
-			$ip = Request::get()->getRemoteIpAddress();
-			if (!AuthAllowGroup::isAllowed($user, $ip)) {
-				throw new Forbidden(str_replace('{ip}', $ip, go()->t("You are not allowed to login from IP address {ip}.")));
-			}
-		}
-
-		if (go()->getSettings()->maintenanceMode && !$user->isAdmin()) {
-			throw new Unavailable(go()->t("Service unavailable. Maintenance mode is enabled."));
-		}
+		$this->assertUserMayLogin($user);
 
 		if ($authenticator->needsCache()) {
 			go()->getCache()->set($cacheKey, [$user, $authenticator], true, self::CACHE_PASSWORD_LOGIN);
