@@ -64,9 +64,6 @@ class PushDispatcher
 			$this->CHECK_INTERVAL = $this->apcuEnabled ? 1 : 20;
 		}
 
-		go()->getDbConnection()->debug = true;
-
-
 		// spread the checks of all connections
 		$this->recheckDelay = self::MIN_RECHECK_INTERVAL + mt_rand(0, 1000) / 1000;
 
