@@ -3,6 +3,7 @@
 namespace go\modules\community\email\controller;
 
 use go\core\jmap\EntityController;
+use go\core\jmap\exception\InvalidArguments;
 use go\modules\community\email\model;
 
 
@@ -60,20 +61,56 @@ class EmailAccount extends EntityController {
 	}
 
 	public function fill($params){
-		$account = model\EmailAccount::findById($params['accountId']);
+		$account = $this->findAccount($params);
 		$backend = $account->connect();
 		if ($backend) {
 			return $backend->fill();
 		}
 	}
 
+	/**
+	 * The mailbox quotas of an account, shaped like a JMAP Quota/get response (RFC 9425)
+	 *
+	 * The list is empty when the IMAP server has no QUOTA support.
+	 *
+	 * @param array{accountId: string} $params
+	 * @return array{accountId: string, list: array}
+	 */
+	public function quota(array $params): array {
+		/** @var model\EmailAccount $account */
+		$account = $this->findEntity(model\EmailAccount::class, (string)($params['accountId'] ?? ''));
+		return [
+			'accountId' => (string)$account->id,
+			'list' => $account->quotas()
+		];
+	}
+
 	public function update($params) {
 
-		$account = model\EmailAccount::findById($params['accountId']);
+		$account = $this->findAccount($params);
+		$mailboxId = $params['mailboxId'] ?? null;
+		if(isset($mailboxId) && model\Mailbox::find()->selectSingleValue('id')
+				->where(['box.id' => $mailboxId, 'box.accountId' => $account->id])->single() === null) {
+			throw new InvalidArguments("Mailbox not in account");
+		}
 		$backend = $account->connect();
 		if ($backend) {
-			return $backend->fetchChanges($params['mailboxId']);
+			return $backend->fetchChanges($mailboxId);
 		}
 		return ['success'=>true, 'feedback'=> 'no backend'];
+	}
+
+	/**
+	 * The account to synchronize, readable by the current user
+	 *
+	 * @throws InvalidArguments when accountId is missing
+	 */
+	private function findAccount(array $params): model\EmailAccount {
+		if(empty($params['accountId'])) {
+			throw new InvalidArguments("Missing accountId");
+		}
+		/** @var model\EmailAccount $account */
+		$account = $this->findEntity(model\EmailAccount::class, (string)$params['accountId']);
+		return $account;
 	}
 }

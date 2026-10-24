@@ -3,6 +3,9 @@ namespace go\modules\community\email;
 
 use go\core;
 use go\core\http\Response;
+use go\core\model\User;
+use go\core\orm\Mapping;
+use go\core\orm\Property;
 
 class Module extends core\Module
 {
@@ -16,6 +19,20 @@ class Module extends core\Module
 	public static function getTitle(): string
 	{
 		return 'E-Mail';
+	}
+
+	public function defineListeners()
+	{
+		parent::defineListeners();
+		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
+	}
+
+	/**
+	 * The preferences are edited in the account settings and read by the client as client.user.emailPreferences
+	 */
+	public static function onMap(Mapping $mapping)
+	{
+		$mapping->addHasOne('emailPreferences', model\Preferences::class, ['id' => 'userId'], true);
 	}
 
 	protected function rights(): array

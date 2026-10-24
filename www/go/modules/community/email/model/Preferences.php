@@ -8,6 +8,8 @@ use go\core\orm\Property;
 
 class Preferences extends Property
 {
+	/** Primary key to User id */
+	public ?int $userId;
 
 	/** Identity to use when composing a new email */
 	public ?string $defaultIdentityId;

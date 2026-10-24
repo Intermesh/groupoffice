@@ -66,8 +66,8 @@ class ImapBackend {
 		'\\drafts' => 'drafts',
 	];
 
-	/** @var self singleton */
-	private static $instance;
+	/** @var array<int, self> one connection per account id */
+	private static $instances = [];
 
 	/** @var mail\Imap */
 	public $imap;
@@ -97,21 +97,25 @@ class ImapBackend {
 	 * @throws \RuntimeException
 	 */
 	static public function connect($dsn, $account) {
-		//none numeric?
-		if (!isset(self::$instance)) {
+		// an account that isn't saved yet (validating its DSN) always gets a fresh connection
+		if (!isset($account->id) || !isset(self::$instances[$account->id])) {
 			//mb_regex_encoding("UTF-8");
 			if ($imap = mail\Imap::connect($dsn)) {
-				self::$instance = new self($imap);
-				self::$instance->account = $account;
+				$instance = new self($imap);
+				$instance->account = $account;
 				//$imap->sendRequest('ENABLE QRESYNC');
 			} else {
 				throw new \RuntimeException('Imap Authentication failed');
 			}
+			if (!isset($account->id)) {
+				return $instance;
+			}
+			self::$instances[$account->id] = $instance;
 		}
 //		if(self::$instance->isFetching) { // todo: remove when imap update goes before local
 //			return false; // dont sync back
 //		}
-		return self::$instance;
+		return self::$instances[$account->id];
 	}
 
 	public function select($box = 'INBOX', $params = []) {
@@ -202,28 +206,79 @@ class ImapBackend {
 			}
 		}
 
-		// update (flags or move)
+		// update (flags; move is not implemented yet)
 		if(!empty($json->update)) {
-			$uidMailbox = Email::find()->select('id, uid, GROUP_CONCAT(mailboxId)')->join('email_map', 'm', 'fk = id', 'inner')
-				->andWhere('id','=', array_keys($json->update))
-				->groupBy(['id'])
-				->fetchMode(\PDO::FETCH_GROUP| \PDO::FETCH_UNIQUE)
+			$mailboxes = go()->getDbConnection()->select('m.fk, b.id')
+				->from('email_map', 'm')
+				->join('email_mailbox', 'b', 'b.id = m.mailboxId')
+				->where('m.fk', 'IN', array_keys((array)$json->update))
+				->fetchMode(\PDO::FETCH_KEY_PAIR)
 				->all();
 
 			foreach($json->update as $id => $patch) {
-				$uid = $uidMailbox[$id]['uid'];
-				$mailboxIds = explode(',',$uidMailbox[$id]['mailboxIds']);
-				// todo fetch mailbox path an call move or store methods
-				//$email = Email::query();
-				//$conn->select($mailboxIds[0])->for($uid);
-				if(isset($patch->mailboxIds)) {
-					// move
-					//$conn->move($patch->mailboxIds[0]);
-
+				$patch = (array)$patch;
+				$email = isset($mailboxes[$id]) ? Email::findById($id) : null;
+				if(!$email || $email->accountId != $this->account->id) {
+					$result['notUpdated'][$id] = new SetError("notFound");
+					continue;
 				}
-				if(isset($patch->keywords)) {
-					//$conn->flags($patch->keywords);
-					// store -> flags
+				if(isset($patch['mailboxIds']) || !empty(preg_grep('#^mailboxIds/#', array_keys($patch)))) {
+					$result['notUpdated'][$id] = new SetError("invalidProperties", "Moving email is not supported yet");
+					continue;
+				}
+
+				$old = $email->getKeywords();
+				$new = $old;
+				foreach($patch as $path => $value) {
+					if($path === 'keywords') {
+						$new = array_filter((array)$value);
+					} elseif(str_starts_with($path, 'keywords/')) {
+						$keyword = substr($path, 9);
+						if($value) {
+							$new[$keyword] = true;
+						} else {
+							unset($new[$keyword]);
+						}
+					}
+				}
+				$addKeywords = array_keys(array_diff_key($new, $old));
+				$removeKeywords = array_keys(array_diff_key($old, $new));
+				// JMAP keywords are IMAP atoms (RFC 8621 4.1.1): they are sent unquoted and may not contain a
+				// backslash, so system flags like \Deleted can only come from the $parseFlags mapping
+				$invalid = array_filter(array_merge($addKeywords, $removeKeywords),
+					fn($k) => !preg_match('/^[\x21\x23\x24\x26\x27\x2B-\x5B\x5E-\x7A\x7C\x7E]+$/', $k));
+				$toFlag = fn($keywords) => array_map(fn($k) => self::$parseFlags[$k] ?? $k, $keywords);
+				$add = $toFlag($addKeywords);
+				$remove = $toFlag($removeKeywords);
+				if(!empty($invalid)) {
+					$result['notUpdated'][$id] = new SetError("invalidProperties", "Invalid keyword");
+					continue;
+				}
+
+				// mailbox names are stored without their parent path, so make sure we selected the right one
+				$mailbox = Mailbox::findById($mailboxes[$id]);
+				$selected = $this->imap->select($mailbox->name); // TODO we require the full mailbox path here
+				if(!is_array($selected) || ($selected['uidvalidity'] ?? null) != $mailbox->uid()) {
+					$result['notUpdated'][$id] = new SetError("serverFail", "Mailbox not found on the IMAP server");
+					continue;
+				}
+				$success = (empty($add) || $this->imap->uidStore($add, $email->uid(), '+'))
+					&& (empty($remove) || $this->imap->uidStore($remove, $email->uid(), '-'));
+				if(!$success) {
+					$result['notUpdated'][$id] = new SetError("serverFail", "Could not store flags on the IMAP server");
+					continue;
+				}
+
+				// update the local index without going back to the backend
+				$this->isFetching = true;
+				// indexed keywords must be switched off explicitly
+				$email->setKeywords(array_merge(['$seen' => false, '$flagged' => false, '$answered' => false], $new));
+				$saved = $email->save();
+				$this->isFetching = false;
+				if($saved) {
+					$result['updated'][$id] = null;
+				} else {
+					$result['notUpdated'][$id] = new SetError("invalidProperties");
 				}
 			}
 		}
@@ -257,8 +312,8 @@ class ImapBackend {
 	private function emailAppend($values) {
 		$me = new Email;
 		$me->setValues($values);
-		$me->threadId = Thread::byMessage($me); // slow on full fetch, can build threads later
-		$me->messageId = [sprintf('<%s@%s>', UUID::v4(), $this->account->getMda()->host)];
+		$me->messageId = [sprintf('%s@%s', UUID::v4(), $this->account->getMda()->host)]; // stored without <>, like parsed headers
+		$me->threadId = Thread::byMessage($me);
 
 		//build RFC_882 for adapter
 		$mime = MimeHelper::encode($me);
@@ -346,6 +401,46 @@ class ImapBackend {
 	 */
 	public function fetch($uid) {
 		return $this->imap->fetch(['RFC822'], $uid, null, true);
+	}
+
+	/**
+	 * The quotas of the inbox as JMAP Quota objects (RFC 9425)
+	 *
+	 * Empty when no quota root applies. Check the QUOTA capability before calling this.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function getQuotas(): array {
+		$roots = $this->imap->getQuotaRoot('INBOX');
+		if (!$roots) {
+			return [];
+		}
+
+		$quotas = [];
+		foreach ($roots as $root => $resources) {
+			foreach ($resources as $resource => $value) {
+				// STORAGE is counted in units of 1024 octets
+				[$type, $unit] = match ($resource) {
+					'STORAGE' => ['octets', 1024],
+					'MESSAGE' => ['count', 1],
+					default => [null, 0]
+				};
+				// a limit of 0 means nothing may be stored, not unlimited
+				if (!$type) {
+					continue;
+				}
+				$quotas[] = [
+					'id' => $root . ':' . $resource,
+					'resourceType' => $type,
+					'used' => $value['usage'] * $unit,
+					'hardLimit' => $value['limit'] * $unit,
+					'scope' => 'account',
+					'name' => $root !== '' ? $root : $this->account->name,
+					'types' => ['Mail'],
+				];
+			}
+		}
+		return $quotas;
 	}
 
 	//copied from Account
@@ -437,15 +532,12 @@ class ImapBackend {
 		}
 
 		// insert new mail
-		$newMailIds = [];
 		foreach($newMails as $item) {
-			$email = $this->parseIndexedFields($item);
-			if($email->save()){
-				$newMailIds[] = [$email->id,$mailbox->id];
-			}
+			$this->saveIndexedFields($item, $mailbox);
 		}
-		if(!empty($newMailIds))
-			go()->getDbConnection()->insert('email_map', $newMailIds, ['fk', 'mailboxId'])->execute();
+		if(!$syncable || !empty($vanished)) {
+			Thread::deleteEmpty($this->account->id);
+		}
 
 
 		// TODO flags and expunged when no CONDSTORE extension available
@@ -536,10 +628,7 @@ class ImapBackend {
 				$mailbox->imapSyncProps($imailbox['uidnext'], isset($imailbox['highestmodseq']) ? $imailbox['highestmodseq'] : 0);
 
 				$mailbox->save();
-				$ids = $this->fillMessages($mailbox);
-
-				if(!empty($ids))
-					go()->getDbConnection()->insert('email_map', $ids, ['fk', 'mailboxId'])->execute();
+				$this->fillMessages($mailbox);
 
 				$parentMap[$mailbox->name] = $mailbox->id;
 			}
@@ -574,15 +663,23 @@ class ImapBackend {
 
 	private function fillMessages($mailbox) {
 		$messages = $this->imap->fetch(self::IndexedFields, 1, INF); // ['RFC822']
-		$ids = [];
 		foreach ($messages as $item) {
-			$email = $this->parseIndexedFields($item);
-			if($email->save()){
-				$ids[] = [$email->id, $mailbox->id];
-			}
+			$this->saveIndexedFields($item, $mailbox);
 		}
 		$mailbox->setHighestUID(isset($item['UID']) ? $item['UID'] : 0);// Highest UID
-		return $ids;
+	}
+
+	/**
+	 * Save a fetched message and map it to the mailbox right away. Threading may merge threads and reinsert
+	 * earlier saved emails with a new id, so ids must not be collected for a batch insert afterwards.
+	 */
+	private function saveIndexedFields($item, Mailbox $mailbox): ?Email {
+		$email = $this->parseIndexedFields($item);
+		if(!$email->save()) {
+			return null;
+		}
+		go()->getDbConnection()->insert('email_map', ['fk' => $email->id, 'mailboxId' => $mailbox->id])->execute();
+		return $email;
 	}
 
 	private function parseIndexedFields($item) {

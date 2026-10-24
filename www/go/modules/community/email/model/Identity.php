@@ -4,6 +4,8 @@ namespace go\modules\community\email\model;
 
 
 use go\core\acl\model\AclItemEntity;
+use go\core\db\Criteria;
+use go\core\orm\Filters;
 use go\core\orm\Mapping;
 
 class Identity extends AclItemEntity {
@@ -50,6 +52,17 @@ class Identity extends AclItemEntity {
 
 	public function setReplyTo($value) {
 		$this->replyTo = json_encode($value);
+	}
+
+	protected static function defineFilters(): Filters
+	{
+		return parent::defineFilters()
+			->add('accountId', function(Criteria $criteria, $value) {
+				// null: identities of all accounts
+				if(isset($value)) {
+					$criteria->where('accountId', '=', $value);
+				}
+			});
 	}
 
 	protected static function aclEntityClass(): string

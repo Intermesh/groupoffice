@@ -8,11 +8,20 @@ import {
 	t,
 	E,
 	DateTime,
+	Format,
 	ListEventMap, Store, StoreRecord
 } from "@intermesh/goui";
-import {client, fileView, jmapds} from "@intermesh/groupoffice-core";
+import {client, jmapds} from "@intermesh/groupoffice-core";
+import {fileView} from "./FileView";
 import {MailCtlr} from "./MailCtlr";
 import {ThreadView} from "./ThreadView";
+
+/**
+ * Time for mail received today, the date otherwise
+ */
+const receivedText = function(receivedAt: string) {
+	return Format.date(receivedAt) === Format.date(new DateTime()) ? Format.time(receivedAt) : Format.date(receivedAt);
+}
 
 const listitem = function(mail: any) {
 	const abbr =  comp({tagName:'abbr'}),
@@ -26,10 +35,10 @@ const listitem = function(mail: any) {
 		mail.hasAttachment ? E('i', 'attachment').cls('small icon'):''
 	);
 	text.el.append(
-		E('h4', DateTime.createFromFormat(mail.receivedAt)!.format('d-m-Y')).cls('right').css({float:'right'}),
+		E('h4', receivedText(mail.receivedAt)).cls('right'),
 		E('h3', mail.from.length ? (mail.from[0].name || mail.from[0].email) : ''),
 		E('div', mail.subject || '('+t('No subject')+')',
-			mail.thread.emailIds.length > 1 ? E('div', mail.thread.emailIds.length+' »').cls('badge primary right') :''
+			MailCtlr.conversations() && mail.thread?.emailIds?.length > 1 ? E('div', String(mail.thread.emailIds.length)).cls('badge primary') :''
 		).cls('subject'),
 		E('sub', mail.preview).cls('clamp')
 	);
@@ -41,6 +50,9 @@ export interface ListViewEventMap extends ListEventMap {
 }
 
 export class ListView extends List<Store, ListViewEventMap> {
+
+	/** Set while the row of the opened mail is highlighted, which must not navigate again */
+	private selectingSilently = false;
 
 	constructor() {
 		super(
@@ -62,7 +74,9 @@ export class ListView extends List<Store, ListViewEventMap> {
 			multiSelect:false,
 			listeners: {
 				'rowselect': ({row})=> {
-					this.fire('selectmail', {row});
+					if(!this.selectingSilently) {
+						this.fire('selectmail', {row});
+					}
 				}
 			}
 		};
@@ -101,7 +115,36 @@ export class ListView extends List<Store, ListViewEventMap> {
 
 	goto(accountId:string, mailboxId:string) {
 		this.store.queryParams.accountId = accountId;
-		Object.assign(this.store.queryParams.filter ||= {}, {mailboxId});
+		const filter = this.store.queryParams.filter ||= {};
+		delete filter.from;
+		Object.assign(filter, {mailboxId});
+		// one row per conversation (RFC 8621 Email/query collapseThreads)
+		(this.store.queryParams as any).collapseThreads = MailCtlr.conversations();
+		return this.store!.load();
+	}
+
+	/**
+	 * Highlight the row of the given conversation or email, e.g. when it was opened by a link
+	 */
+	selectMail(threadId?: string, emailId?: string) {
+		const index = this.store.findIndex(r => emailId ? r.id == emailId : r.threadId == threadId);
+		if(index === -1) {
+			this.rowSelection!.clear();
+			return;
+		}
+		this.selectingSilently = true;
+		try {
+			this.rowSelection!.add(this.store.get(index)!);
+		} finally {
+			this.selectingSilently = false;
+		}
+	}
+
+	/**
+	 * Show only mail from this sender in the current mailbox
+	 */
+	searchFrom(email: string) {
+		Object.assign(this.store.queryParams.filter ||= {}, {from: email});
 		return this.store!.load();
 	}
 }

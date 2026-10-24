@@ -24,7 +24,7 @@ export class PreferencesPanel extends Component {
 			dataSource: jmapds('Identity'),
 			filters: {default: {accountId: null}},
 
-			sort: [{property:'sortOrder'},{property:'name'}]
+			sort: [{property:'name'}]
 		});
 
 		this.form = datasourceform<User>({
@@ -43,10 +43,11 @@ export class PreferencesPanel extends Component {
 					checkbox({name: 'showAvatar', label: t('Show avatars')}),
 					checkbox({name: 'showReadReceipts', label: t('Show read receipt requests')}),
 
-					radio({type: 'button', value: 'readingPane', name: 'readingPane', label:t('Reading pane'),options: [
-							{value: 'right', text: t('Side')},
-							{value: 'bottom', text: t('Bottom')}
-						]}),
+					// readingPane has no backend property yet; posting it makes User/set fail
+					//radio({type: 'button', value: 'readingPane', name: 'readingPane', label:t('Reading pane'),options: [
+					//		{value: 'right', text: t('Side')},
+					//		{value: 'bottom', text: t('Bottom')}
+					//	]}),
 					radio({
 						name: 'delaySentSeconds', label: t('Undo send'), options: [
 							{value: 15, text: t('Delay sending for 15 seconds to undo')},

@@ -127,6 +127,22 @@ class EmailAccount extends AclOwnerEntity {
 		return json_decode($this->mdaCapabilities);
 	}
 
+	/**
+	 * The quotas of the inbox as JMAP Quota objects (RFC 9425)
+	 *
+	 * Empty when the IMAP server has no QUOTA extension. The capabilities stored when the account was saved are
+	 * checked first, so such a server isn't connected to at all.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function quotas(): array {
+		$capabilities = $this->mdaCapabilities() ?: $this->backend()->imap->capability();
+		if (!is_array($capabilities) || !in_array('QUOTA', $capabilities)) {
+			return [];
+		}
+		return $this->backend()->getQuotas();
+	}
+
 	protected function internalValidate()
 	{
 		if($this->isModified('mdaDsn')) {

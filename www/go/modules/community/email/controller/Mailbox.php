@@ -3,6 +3,7 @@
 namespace go\modules\community\email\controller;
 
 use go\core\jmap\EntityController;
+use go\core\model\Acl;
 use go\modules\community\email\model;
 
 
@@ -31,10 +32,15 @@ class Mailbox extends EntityController {
 	}
 
 	public function changes($params) {
-		$account = model\EmailAccount::findById($params['accountId']);
-		$backend = $account->connect();
-		if ($backend) {
-			$backend->fetchChanges();
+		// the client's generic sync calls this without an account; only pull from IMAP for a readable account
+		if(!empty($params['accountId'])) {
+			$account = model\EmailAccount::findById($params['accountId']);
+			if($account && $account->getPermissionLevel() >= Acl::LEVEL_READ) {
+				$backend = $account->connect();
+				if ($backend) {
+					$backend->fetchChanges();
+				}
+			}
 		}
 		return $this->defaultChanges($params);
 	}

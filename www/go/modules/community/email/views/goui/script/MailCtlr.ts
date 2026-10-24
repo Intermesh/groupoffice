@@ -1,14 +1,44 @@
 import {client, jmapds} from "@intermesh/groupoffice-core";
 import {Composer} from "./Composer";
-import {DateTime} from "@intermesh/goui";
+import {DateTime, Notifier, router, t} from "@intermesh/goui";
 import DOMPurify from 'dompurify';
 
 
 export class MailCtlr {
+	/** The user preference "Show emails as conversations" */
+	static conversations(): boolean {
+		return !!(client.user as any)?.emailPreferences?.enableConversations;
+	}
+
+	/**
+	 * Get emails including their bodies.
+	 *
+	 * jmapds('Email').get()/single() can't be used for this: the datasource doesn't send the requested properties
+	 * and the default Email/get properties don't include htmlBody/bodyValues.
+	 */
+	static async getWithBody(accountId: string, ids: string[]): Promise<any[]> {
+		const r = await client.jmap('Email/get', {
+			accountId,
+			ids,
+			properties: ["threadId","accountId", "mailboxIds", "keywords", "from", "subject","to","cc","bcc","replyTo","receivedAt","sentAt","preview",
+				"messageId","inReplyTo","references", "htmlBody", "attachments", "bodyStructure", "bodyValues"],
+			bodyProperties: ["partId", "blobId", "size", "type","disposition","name"],
+			//fetchHTMLBodyValues: true,
+			maxBodyValueBytes: 256 // todo (truncate?)
+		});
+		const ds = jmapds('Email');
+		r.list.forEach((e: any) => {
+			// add() is protected. but there is no other way to save this to the entity store yet.
+			/** @ts-ignore */
+			ds.add(Object.assign(ds.data[e.id]??{},e));
+		});
+		return r.list;
+	}
+
 	static resend(item: any) {
 		const cmp = new Composer();
 
-		jmapds('Email').single(item.id).then(email => {
+		MailCtlr.getWithBody(item.accountId, [item.id]).then(([email]) => {
 			cmp.form.create({
 				identityId: 1,
 				subject: email.subject,
@@ -22,6 +52,32 @@ export class MailCtlr {
 		return cmp;
 	}
 
+	static compose(to: {name?: string, email: string}[]) {
+		const cmp = new Composer();
+		cmp.form.create({
+			identityId: 1,
+			to
+		});
+		return cmp;
+	}
+
+	static async showContact(email: string) {
+		const r = await jmapds('Contact').query({filter: {email}, limit: 1});
+		if(r.ids.length) {
+			router.goto('contact/' + r.ids[0]);
+		} else {
+			Notifier.notice(t('No contact found for') + ' ' + email);
+		}
+	}
+
+	static markSeen(emails: {id: string, accountId: string}[], seen: boolean) {
+		const s = jmapds('Email');
+		for(const email of emails) {
+			s.setParams.accountId = email.accountId;
+			s.update(email.id, {'keywords/$seen': seen ? true : null});
+		}
+	}
+
 	static destroy(item: any) {
 		const s = jmapds('Email');
 		s.setParams.accountId = item.accountId;
@@ -31,7 +87,7 @@ export class MailCtlr {
 	static reply(item :any, all?:boolean) {
 
 		const cmp = new Composer();
-		jmapds('Email').single(item.id).then(email => {
+		MailCtlr.getWithBody(item.accountId, [item.id]).then(([email]) => {
 			const txt = MailCtlr.emailText(email),
 				at = new DateTime(email.sentAt || email.receivedAt);
 
@@ -46,8 +102,9 @@ export class MailCtlr {
 			cmp.form.create({
 				identityId: 1,
 				htmlBody,
-				inReplyTo: email.msageId,
-				subject: 'Re: '+email.subject,
+				inReplyTo: email.messageId,
+				references: MailCtlr.references(email),
+				subject: (/^re:/i.test(email.subject ?? '') ? '' : 'Re: ')+email.subject,
 				to,
 				cc
 			});
@@ -57,7 +114,7 @@ export class MailCtlr {
 
 	static forward(item: any) {
 		const cmp = new Composer();
-		jmapds('Email').single(item.id).then(email => {
+		MailCtlr.getWithBody(item.accountId, [item.id]).then(([email]) => {
 			const txt = MailCtlr.emailText(email),
 				at = new DateTime(email.sentAt || email.receivedAt),
 				htmlBody = "<br><br><blockquote>Begin doorgestuurd bericht:<br>"+
@@ -85,6 +142,11 @@ export class MailCtlr {
 			s.update(row.id, {['keywords/'+name]: on ?? !row.record.keywords[name]});
 		}
 		//s.commit();
+	}
+
+	/** References of a reply: the references of the parent followed by its Message-ID (RFC 5322 section 3.6.4) */
+	static references(email: any): string[] {
+		return [...(email.references ?? (email.inReplyTo ?? [])), ...(email.messageId ?? [])];
 	}
 
 	// actions

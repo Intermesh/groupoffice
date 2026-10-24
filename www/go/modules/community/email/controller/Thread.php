@@ -19,27 +19,33 @@ class Thread extends EntityController {
 	}	
 
 
+	/**
+	 * Thread/get: emailIds sorted by receivedAt (RFC 8621 section 3.1)
+	 */
 	public function get($params) {
+		$ids = array_map('intval', $params['ids'] ?? []);
 
-		//return Api::get(Thread::class, $json);
-		$emails = model\Email::find()
-			->select('id, threadId') //->groupBy('threadId')
-			->andWhere('threadId', '=', $params['ids'] ?? [])
-			->all();
+		$query = model\Email::find()
+			->select('e.id, e.threadId')
+			->andWhere('e.threadId', 'IN', $ids)
+			->orderBy(['e.receivedAt' => 'ASC', 'e.id' => 'ASC']);
+		if (!empty($params['accountId'])) {
+			$query->andWhere('e.accountId', '=', $params['accountId']);
+		}
+		model\Email::applyAclToQuery($query);
 
 		$threads = [];
-		//$emailIds = [];
-		foreach ($emails as $email) {
-			if (!isset($threads[$email->threadId])) {
-				$threads[$email->threadId] = ['id' => $email->threadId, 'emailIds' => []];
-			}
-			$threads[$email->threadId]['emailIds'][] = $email->id;
-			//$emailIds[] = $email->id;
+		foreach ($query->fetchMode(\PDO::FETCH_ASSOC)->all() as $email) {
+			$threads[$email['threadId']] ??= ['id' => (int)$email['threadId'], 'emailIds' => []];
+			$threads[$email['threadId']]['emailIds'][] = (int)$email['id'];
 		}
+		$notFound = array_values(array_diff($ids, array_keys($threads)));
+
 		return [
+			'accountId' => $params['accountId'] ?? null,
 			'state' => model\Thread::getState(),
 			'list' => array_values($threads),
-			'notFound' => null
+			'notFound' => $notFound
 		];
 	}
 
