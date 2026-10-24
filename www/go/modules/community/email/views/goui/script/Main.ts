@@ -1,6 +1,6 @@
 import {
 	btn, CardContainer, cards, comp,
-	Component, DefaultEntity, hr, List, menu, router, splitter, tbar, t
+	Component, hr, List, menu, router, splitter, tbar, t
 } from "@intermesh/goui";
 import {AccountList} from "./AccountList";
 import {ListView} from "./ListView";
@@ -107,29 +107,15 @@ export class Main extends Component {
 	}
 
 	private loadEmails(accountId: string, ids: string[], navId: number) {
-				const ds = jmapds('Email');
-				client.jmap('Email/get', {
-					accountId: accountId,
-					ids,
-					properties: ["threadId","accountId", "mailboxIds", "keywords", "from", "subject","to","cc","bcc","replyTo","receivedAt","sentAt","preview",
-						"messageId","inReplyTo","references", "htmlBody", "attachments", "bodyStructure", "bodyValues"],
-					bodyProperties: ["partId", "blobId", "size", "type","disposition","name"],
-					//fetchHTMLBodyValues: true,
-					maxBodyValueBytes: 256 // todo (truncate?)
-				}).then( (r) => {
-					r.list.forEach((e: DefaultEntity) => {
-						// add() is protected. but there is no other way to save this to the entity store yet.
-						/** @ts-ignore */
-						ds.add(Object.assign(ds.data[e.id]??{},e));
-					});
-					if(navId === this.navId) {
-						this.threadView.load(ids);
-					}
-				}).catch(() => {
-					if(navId === this.navId) {
-						this.showList();
-					}
-				});
+		MailCtlr.getWithBody(accountId, ids).then(list => {
+			if(navId === this.navId) {
+				this.threadView.load(list);
+			}
+		}).catch(() => {
+			if(navId === this.navId) {
+				this.showList();
+			}
+		});
 	}
 
 	/**

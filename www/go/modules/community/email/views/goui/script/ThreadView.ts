@@ -1,6 +1,5 @@
 import {avatar, btn, comp, Component, ComponentEventMap, Format, t, tbar} from "@intermesh/goui";
 import {EmailView} from "./EmailView";
-import {jmapds} from "@intermesh/groupoffice-core";
 
 export interface ThreadViewEventMap extends ComponentEventMap {
 	close: {}
@@ -68,7 +67,6 @@ export class ThreadView extends Component<ThreadViewEventMap> {
 	private collapseAll: Component
 	private messages: Component
 	private empty: Component
-	private loadId = 0
 
 	constructor() {
 		super();
@@ -102,25 +100,24 @@ export class ThreadView extends Component<ThreadViewEventMap> {
 	}
 
 	clear() {
-		this.loadId++;
 		this.messages.items.clear();
 		this.header.hidden = true;
 		this.empty.hidden = false;
 	}
 
-	async load(emailIds: string[]) {
-		const loadId = ++this.loadId;
+	/**
+	 * Show the given emails as one conversation.
+	 *
+	 * Takes the Email/get result itself: re-reading the ids through jmapds('Email') could return a cached copy
+	 * without htmlBody/bodyValues (e.g. when the list's fetch of the same id is merged into the same batch).
+	 */
+	load(list: any[]) {
 		this.messages.items.clear();
 		this.empty.hidden = true;
 		this.header.hidden = false;
-		this.subject.text = t('Loading') + '…';
 		this.count.hidden = true;
 
-		const r = await jmapds('Email').get(emailIds);
-		if (loadId !== this.loadId) {
-			return; // another thread was opened in the meantime
-		}
-		const emails = (r.list as any[]).sort((a, b) =>
+		const emails = [...list].sort((a, b) =>
 			String(a.receivedAt ?? '').localeCompare(String(b.receivedAt ?? '')));
 
 		if (!emails.length) {
