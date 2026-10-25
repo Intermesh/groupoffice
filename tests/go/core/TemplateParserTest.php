@@ -331,7 +331,7 @@ ID;
 {{total}}
 ID;
 
-		$this->assertEquals("7.01", $tplParser->parse($tpl));
+		$this->assertEquals("7.01", trim($tplParser->parse($tpl)));
 	}
 
 

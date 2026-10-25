@@ -129,7 +129,6 @@ use function GO;
  * @example Using [assign] to lookup a Contact entity with id = 1
  *
  * ```
-
  * [assign contact = 1 | entity:Contact]
  * ```
  *
@@ -172,16 +171,36 @@ use function GO;
  * ````
  *
  *
- * @example Find entities
+ * Find entities
+ * -------------
  *
+ * @example find all users
  * ```
- * {{|find:User:username|select:"sum(loginCount) as total"|first|prop:total}}
+ * {{|find:User}}
  * ```
  *
+ * @example find all users but only username, and displayName
+ * ```
+ * {{|find:User:username,displayName}}
+ * ```
+ *
+ * @example select sum
+ * ```
+ * {{|find:User|select:"sum(loginCount) as total"|first|prop:total}}
+ * ```
+ *
+ * @example Use variable
  * ```
  * {{|find:User:username|where:username:$username|first|prop:username}}';
  * ```
  *
+ *
+ * Select from sql table
+ * ---------------------
+ * @example
+ * ```
+ * {{|selectTable:pr2_income:"sum(amount) as amount"|where:project_id:$entity.id|first|prop:amount}}
+ * ```
  */
 class TemplateParser {	
 
@@ -238,6 +257,7 @@ class TemplateParser {
 		$this->addFilter('links', [$this, "filterLinks"]);
 		$this->addFilter('prop', [$this, "filterProp"]);
 		$this->addFilter('find', [$this, "filterFind"]);
+		$this->addFilter('selectTable', [$this, "filterSelectTable"]);
 		$this->addFilter('select', [$this, "filterSelect"]);
 		$this->addFilter('where', [$this, "filterWhere"]);
 
@@ -446,11 +466,15 @@ class TemplateParser {
 	}
 
 
-	private function filterSelect(\go\core\orm\Query $query, string $select) {
+	private function filterSelect(\go\core\db\Query $query, string $select) {
 		return $query->select($select)->fetchMode(\PDO::FETCH_ASSOC);
 	}
 
-	private function filterWhere(\go\core\orm\Query $query, string $field, mixed $value, $comparator = '=') {
+	private function filterSelectTable(string $table, string $select = "*") {
+		return go()->getDbConnection()->select($select)->from($table)->fetchMode(\PDO::FETCH_ASSOC);
+	}
+
+	private function filterWhere(\go\core\db\Query $query, string $field, mixed $value, $comparator = '=') {
 		return $query->where($field, $comparator, $value);
 	}
 
@@ -1225,7 +1249,7 @@ class TemplateParser {
 
 			$args = array_map(function($a) {
 				if(substr($a, 0, 1) == '$') {
-					return $this->models[substr($a, 1)] ?? null;
+					return $this->getVar(substr($a, 1));
 				}
 				return str_replace('\$', '$', $a);
 			}, $args);
