@@ -1,3 +1,4 @@
+26-10-2026: 25.0.114
 - Files: Fixed security issue where logged in user could read any contact name
 - Core: permissionLevel filter: the admin-only guard on permissionLevelUserId / permissionLevelGroups never fires #1593
 - Leavedays: rewrite 'getManagers()' method not to use ActiveRecord relations
