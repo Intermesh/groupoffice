@@ -1,5 +1,6 @@
 - Files: Fixed security issue where logged in user could read any contact name
 - Core: permissionLevel filter: the admin-only guard on permissionLevelUserId / permissionLevelGroups never fires #1593
+- Leavedays: rewrite 'getManagers()' method not to use ActiveRecord relations
 
 14-09-2026: 25.0.113
 - Calendar: Trying to import a calendar failed with undefined method #1557
