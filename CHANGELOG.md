@@ -3,6 +3,7 @@
 - Core: permissionLevel filter: the admin-only guard on permissionLevelUserId / permissionLevelGroups never fires #1593
 - Mollie: Fixed deadlock and possible duplicate payment when the webhook and return page run simultaneously
 - Core: SSE connections of closed or hidden browser tabs are released within a few seconds instead of lingering and holding a PHP worker
+- Calendar: Caldav didn't import free or busy status. Causing it always to become busy after a change.
 
 20-10-2026: 26.0.55
 - Calendar: Fixed "Column entityId cannot be null" error and a "forbidden" error on the accept link in the invitation e-mail when moving a single occurrence of a recurring event with participants.
