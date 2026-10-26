@@ -1,4 +1,4 @@
-#!/usr/bin/env php7.4
+#!/usr/bin/env php8.4
 <?php
 
 use Github\Client;
