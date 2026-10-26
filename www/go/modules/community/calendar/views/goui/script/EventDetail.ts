@@ -305,8 +305,13 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 	 */
 	async load(id:EntityID): Promise<this> {
 		// const r = await super.load(id);
+		if (!calendarStore.loaded) {
+			await calendarStore.load();
+		}
 
-		if(!calendarStore.loaded) await calendarStore.load();
+		if (!this.entity) {
+			await super.load(id);
+		}
 
 		const item = (new CalendarItem({
 			key: id + "",
