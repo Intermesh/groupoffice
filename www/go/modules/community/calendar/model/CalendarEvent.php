@@ -876,7 +876,10 @@ class CalendarEvent extends AclItemEntity {
 		}
 	}
 
-	private function updateAlerts(int $userId) : void {
+	/**
+	 * @param int|null $userId null when nobody is logged in. For example when a participant replies on the public invite page.
+	 */
+	private function updateAlerts(?int $userId) : void {
 		if(!CoreAlert::$enabled) {
 			return;
 		}
