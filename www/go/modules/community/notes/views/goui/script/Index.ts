@@ -1,4 +1,4 @@
-import {AclItemEntity, AclOwnerEntity, JmapDataSource, modules} from "@intermesh/groupoffice-core";
+import {AclItemEntity, AclOwnerEntity, JmapDataSource, modules, TextType} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {EntityID, t} from "@intermesh/goui";
 import {SettingsPanel} from "./SettingsPanel.js";
