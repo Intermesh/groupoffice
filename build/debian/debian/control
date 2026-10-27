@@ -27,8 +27,8 @@ Depends:
 	dbconfig-common,
 	dbconfig-mysql,
 	ucf (>= 0.28)
-Recommends: apache2, libapache2-mod-php (>= 8.1.0), default-mysql-server
-Suggests: php-apcu, php-imagick
+Recommends: apache2, libapache2-mod-php (>= 8.1.0), default-mysql-server, php-apcu
+Suggests: php-imagick
 Conflicts: groupoffice-com,
 	groupoffice-pro,
 	groupoffice-billing,
