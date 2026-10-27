@@ -13,7 +13,6 @@ import {
 	StoreComponent,
 	StoreEventMap,
 	t,
-	win,
 	Window
 } from "@intermesh/goui";
 import {AclLevel, client, entities, Image, img, principalDS} from "@intermesh/groupoffice-core";
@@ -190,41 +189,7 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 						imgPromises.push(Image.replaceImages(target.el));
 
 						// Enlarge images when clicked in window
-						target.el.addEventListener("click", (e) => {
-							if (e.target && (e.target as HTMLElement).tagName == "IMG") {
-								const img = e.target as HTMLImageElement
-
-								const imageWin = win({
-										width: window.innerWidth - 50,
-										height: window.innerHeight - 50,
-										maximized: false,
-										maximizable: true,
-										modal: true,
-										title: img.alt ?? "Image",
-									},
-									comp({
-										flex: 1,
-										itemId: "img-cont",
-
-										style: {
-											alignItems: "center",
-											justifyContent: "center"
-										},
-										listeners: {
-											beforerender: ({target}) => {
-												const i = img.cloneNode() as HTMLImageElement;
-												i.style.height = "100%";
-												i.style.width = "100%";
-												i.style.objectFit = "contain";
-												target.el.appendChild(i);
-											}
-										}
-									})
-								);
-
-								imageWin.show();
-							}
-						});
+						Image.enableZoom(target.el);
 					},
 					render: ({target}) => {
 

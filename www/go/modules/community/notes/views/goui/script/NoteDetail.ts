@@ -32,6 +32,9 @@ export class NoteDetail extends DetailPanel<Note> {
 			})
 		);
 
+		// Enlarge images when clicked in window
+		Image.enableZoom(this.content.el);
+
 		this.scroller.items.add(this.form = datasourceform({dataSource: noteDS}, ...customFields.getFieldSets("Note").map(fs => new DetailFieldset(fs))))
 
 		if(modules.isAvailable("community", "comments")) {
