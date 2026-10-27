@@ -51,13 +51,13 @@ class Builder
 
 	private $majorVersion = "26.0";
 
-	private $gitBranch = 'master';
+	private $gitBranch = 'develop';
 
 	/**
 	 *
 	 * @var string sixsix, sixseven etc or testing
 	 */
-	public $distro = "twentysixzero";
+	public $distro = "testing";
 
 
 	public $repreproDir = __DIR__ . "/deploy/reprepro";
