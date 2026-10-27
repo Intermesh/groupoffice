@@ -220,7 +220,7 @@ class Builder
 		cd("../");
 		run("npm ci --prefer-offline --audit=false --progress=false --fund=false");*/
 		cd("views/goui");
-        run("npm run build");
+        run("npm run build --workspaces");
 
 	}
 
@@ -243,21 +243,21 @@ class Builder
 	private function buildNodeModules()
 	{
 
-		cd($this->buildDir . "/" . $this->packageName);
-
-		//$packageFiles = array_reverse(run("find views/goui -name package.json -not -path '*/node_modules/*'"));
-
-		$packageFiles = run("find go/modules -name package.json -not -path '*/node_modules/*'");
-
-		foreach ($packageFiles as $packageFile) {
-			$nodeDir = dirname($packageFile);
-			cd($nodeDir);
-			//run("npm ci --prefer-offline --audit=false --progress=false --fund=false");
-			run("pwd");
-			run("npm run build");
-			//run("npm prune --omit=dev");
-			cd($this->buildDir . "/" . $this->packageName);
-		}
+//		cd($this->buildDir . "/" . $this->packageName);
+//
+//		//$packageFiles = array_reverse(run("find views/goui -name package.json -not -path '*/node_modules/*'"));
+//
+//		$packageFiles = run("find go/modules -name package.json -not -path '*/node_modules/*'");
+//
+//		foreach ($packageFiles as $packageFile) {
+//			$nodeDir = dirname($packageFile);
+//			cd($nodeDir);
+//			//run("npm ci --prefer-offline --audit=false --progress=false --fund=false");
+//			run("pwd");
+//			run("npm run build");
+//			//run("npm prune --omit=dev");
+//			cd($this->buildDir . "/" . $this->packageName);
+//		}
 	}
 
 	private function runEncoder(string $sourcePath, string $targetPath, array $excludes = []) : void
