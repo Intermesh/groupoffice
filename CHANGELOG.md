@@ -1,6 +1,7 @@
 - Finance: require document to be "Sent" (sentAt != null) to be included in statements
 - Finance: Add customer filter to payments
 - Notes: Write notes in Markdown. New notes can switch between the HTML and Markdown editor and the default editor can be set in the notes settings. Existing notes keep their type.
+- Notes: Zoom images when clicked
 
 26-10-2026: 26.0.56
 - Core: Security: CardDAV/CalDAV clients that search the user directory (like eM Client) were shown names and e-mail addresses of all users that are visible to them for any search text, and also of matching users they have no permission to see. eM Client showed these as recipient suggestions.
