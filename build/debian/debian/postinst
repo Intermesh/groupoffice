@@ -15,6 +15,8 @@ dbc_go groupoffice "$@"
 
 if [ -f "/usr/share/apache2/apache2-maintscript-helper" ]; then
   . /usr/share/apache2/apache2-maintscript-helper
+  apache2_invoke enmod proxy_fcgi
+  apache2_invoke enmod setenvif
   apache2_invoke enconf groupoffice
 fi
 

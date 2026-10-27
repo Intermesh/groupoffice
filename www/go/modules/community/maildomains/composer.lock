@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3af7657ec33159db00f39dd328070250",
+    "content-hash": "6bf7fc8f02dc0cee08f33279864931d8",
     "packages": [
         {
             "name": "mlocati/idna",
@@ -244,11 +244,11 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=8.2 < 8.6"
+        "php": ">=8.4 < 8.6"
     },
     "platform-dev": {},
     "platform-overrides": {
-        "php": "8.2"
+        "php": "8.4"
     },
     "plugin-api-version": "2.9.0"
 }

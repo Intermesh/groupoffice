@@ -79,5 +79,5 @@ Every module with a GOUI UI has its own `package.json` in its `views/goui` folde
 
 - Indent with tabs, not spaces. Opening brace placement follows the file you're editing (existing code mixes styles, so don't reformat lines you aren't changing).
 - Use namespaced `go\...` classes with PSR-4 style paths matching the namespace, and `go()` instead of `GO::`.
-- Add parameter and return types to new methods (the minimum supported PHP version is 8.2, so no 8.3+ features such as typed class constants, `json_validate()` or property hooks and asymmetric visibility from 8.4). Write a short docblock for public methods, as in `go\core\util\IpAddress`.
+- Add parameter and return types to new methods (the minimum supported PHP version is 8.4, so no 8.5+ features such as the pipe operator `|>`, `clone()` with properties, `#[\NoDiscard]` or `array_first()`/`array_last()`). Write a short docblock for public methods, as in `go\core\util\IpAddress`.
 - Don't make unrelated formatting changes. They hide the real change in diffs.

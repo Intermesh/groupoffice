@@ -404,7 +404,7 @@ class Builder
 
 		run("cp -r " . $this->buildDir . "/" . $this->packageName . "/* " . $debTarget . "/usr/share/groupoffice");
 		cd($debTarget);
-		run("debuild --no-lintian -b");
+		run("debuild --no-lintian -A");
 	}
 
 	public function addToDebianRepository()

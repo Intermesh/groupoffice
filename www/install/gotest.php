@@ -193,8 +193,8 @@ function test_system() :array
 	
 	$test['name']='PHP version';
 	$test['showSuccessFeedback'] = false;
-	$test['pass']=function_exists('version_compare') && version_compare( phpversion(), "8.1", ">=");
-	$test['feedback']='Fatal error: Your PHP version ('.phpversion().') is not supported. PHP 8.1 or higher is required.';
+	$test['pass']=function_exists('version_compare') && version_compare( phpversion(), "8.4", ">=");
+	$test['feedback']='Fatal error: Your PHP version ('.phpversion().') is not supported. PHP 8.4 or higher is required.';
 	$test['fatal']=true;
 
 	$tests[]=$test;
