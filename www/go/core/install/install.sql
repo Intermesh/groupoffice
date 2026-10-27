@@ -1020,6 +1020,22 @@ ALTER TABLE `core_oauth_access_token`
   ADD CONSTRAINT `core_oauth_access_token_ibfk_2` FOREIGN KEY (`userIdentifier`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_oauth_access_token_ibfk_3` FOREIGN KEY (`clientId`) REFERENCES `core_oauth_client` (`id`) ON DELETE CASCADE;
 
+--
+-- Refresh tokens of the OAuth2 / OpenID Connect server. A refresh token is only valid while it's in this table so
+-- it can be revoked and is replaced every time it's used.
+--
+CREATE TABLE `core_oauth_refresh_token` (
+  `identifier` varchar(128) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `expiryDateTime` datetime NOT NULL,
+  `userIdentifier` int(11) NOT NULL,
+  `clientId` int(11) NOT NULL,
+  PRIMARY KEY (`identifier`),
+  KEY `userIdentifier` (`userIdentifier`),
+  KEY `clientId` (`clientId`),
+  CONSTRAINT `core_oauth_refresh_token_core_user` FOREIGN KEY (`userIdentifier`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `core_oauth_refresh_token_core_oauth_client` FOREIGN KEY (`clientId`) REFERENCES `core_oauth_client` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 CREATE TABLE `core_pdf_block` (
   `id` bigint(20) UNSIGNED NOT NULL,

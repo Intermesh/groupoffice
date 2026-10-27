@@ -872,12 +872,12 @@ abstract class Entity extends Property {
 			->add("permissionLevel", function(Criteria $criteria, $value, Query $query, $filterCondition, $filters) {
 
 				// security check. Only admins may query on behalf of others permissions
-				if(!empty($filter['permissionLevelUserId']) && $filter['permissionLevelUserId'] != go()->getUserId() && !go()->getAuthState()->isAdmin()) {
+				if(!empty($filterCondition['permissionLevelUserId']) && $filterCondition['permissionLevelUserId'] != go()->getUserId() && !go()->getAuthState()->isAdmin()) {
 					throw new Forbidden("Only admins can pass 'permissionLevelUserId'");
 				}
 
 				// security check. Perhaps extend this later to check if the given groups are accessible by the user
-				if(!empty($filter['permissionLevelGroups']) && !go()->getAuthState()->isAdmin()) {
+				if(!empty($filterCondition['permissionLevelGroups']) && !go()->getAuthState()->isAdmin()) {
 					throw new Forbidden("Only admins can pass 'permissionLevelGroups'");
 				}
 
@@ -891,16 +891,16 @@ abstract class Entity extends Property {
 			})
 
 			->add('text', function (Criteria $criteria, $value, Query $query) {
-			if (!is_array($value)) {
-				$value = [$value];
-			}
-
-			foreach ($value as $q) {
-				if (!empty($q)) {
-					static::search($criteria, $q, $query);
+				if (!is_array($value)) {
+					$value = [$value];
 				}
-			}
-		})
+
+				foreach ($value as $q) {
+					if (!empty($q)) {
+						static::search($criteria, $q, $query);
+					}
+				}
+			})
 			->add('exclude', function (Criteria $criteria, $value) {
 				if (!empty($value)) {
 					$criteria->andWhere('id', 'NOT IN', $value);
@@ -997,18 +997,6 @@ abstract class Entity extends Property {
 			$criteria->where('comment.text ', $comparator, $value);
 		});
 
-
-		/*
-			find all items with link to:
-
-		link : {
-			entity: "Contact",
-			id: 1
-		}
-
-		or leave id empty to find items that link to any contact
-
-		*/
 		$filters->add("link", function (Criteria $criteria, $value, Query $query) {
 
 			if(!isset($value['entity'])) {
@@ -1191,9 +1179,9 @@ abstract class Entity extends Property {
 			return $criteria;
 		}
 
-    $columns = static::textFilterColumns();
+        $columns = static::textFilterColumns();
 
-    if(empty($columns)) {
+        if(empty($columns)) {
 			go()->warn(static::class . ' entity has no textFilterColumns() defined. The "text" filter will not work.');
 		}
 		

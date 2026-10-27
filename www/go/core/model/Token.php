@@ -105,7 +105,15 @@ class Token extends Entity {
 	 * @link http://php.net/manual/en/dateinterval.construct.php
 	 */
 	const LOGIN_LIFETIME = 'PT10M';
-	
+
+	/**
+	 * Seconds a token is cached for. Changes to the user (disabled, groups) and tokens that were removed from the
+	 * database without clearing the cache take effect at the latest after this time.
+	 *
+	 * @see State::getToken()
+	 */
+	const CACHE_TTL = 300;
+
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
@@ -145,7 +153,7 @@ class Token extends Entity {
 			}
 			$this->internalSave();
 
-			go()->getCache()->set('token-' . $this->accessToken, $this);
+			go()->getCache()->set('token-' . $this->accessToken, $this, true, self::CACHE_TTL);
 
 			return true;
 		}
@@ -546,6 +554,22 @@ class Token extends Entity {
 		ErrorHandler::log("Logout everyone but admins is used!");
 
 		return self::delete($q) && RememberMe::delete($q);
+	}
+
+	/**
+	 * Destroy all sessions and remember me logins of a user. Used when a user is disabled.
+	 *
+	 * Tokens that never expire (API keys) are left alone. {@see State::getToken()} refuses them while the user is disabled.
+	 *
+	 * @throws Exception
+	 */
+	public static function destroyAllSessions(int|string $userId): bool
+	{
+		$q = (new Query)
+			->where('expiresAt', '!=', null)
+			->andWhere('userId', '=', $userId);
+
+		return RememberMe::delete($q) && self::delete($q);
 	}
 
 	/**

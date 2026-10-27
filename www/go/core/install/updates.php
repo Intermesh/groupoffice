@@ -1869,15 +1869,29 @@ $updates['202610021331'][] = "ALTER TABLE `core_app_password` MODIFY `lastUsedIp
 
 $updates['202610021331'][] = "ALTER TABLE `core_app_password_scope` ADD UNIQUE KEY `appPasswordId_protocol` (`appPasswordId`, `protocol`);";
 
+// Refresh tokens of the OAuth2 server can be revoked now. Refresh tokens that were issued before this update are not in
+// this table so they are no longer valid. The clients have to log in again.
+$updates['202610191400'][] = "CREATE TABLE `core_oauth_refresh_token` (
+  `identifier` varchar(128) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `expiryDateTime` datetime NOT NULL,
+  `userIdentifier` int(11) NOT NULL,
+  `clientId` int(11) NOT NULL,
+  PRIMARY KEY (`identifier`),
+  KEY `userIdentifier` (`userIdentifier`),
+  KEY `clientId` (`clientId`),
+  CONSTRAINT `core_oauth_refresh_token_core_user` FOREIGN KEY (`userIdentifier`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `core_oauth_refresh_token_core_oauth_client` FOREIGN KEY (`clientId`) REFERENCES `core_oauth_client` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
 // 26.1
-$updates['202610191331'][] = "alter table core_module
+$updates['202610271542'][] = "alter table core_module
     drop column sort_order;";
 
-$updates['202610191331'][] = "alter table core_module
+$updates['202610271542'][] = "alter table core_module
     drop column admin_menu;";
 
 
-$updates['202610191331'][] = "create table if not exists core_module_user
+$updates['202610271542'][] = "create table if not exists core_module_user
 (
 	userId   int          not null,
     moduleId int          not null,
@@ -1891,7 +1905,7 @@ $updates['202610191331'][] = "create table if not exists core_module_user
             on delete cascade
 );";
 
-$updates['202610191331'][] = "UPDATE `go_cron` SET `active`=0 WHERE 1;";
+$updates['202610271542'][] = "UPDATE `go_cron` SET `active`=0 WHERE 1;";
 
 $updates['202610191331'][] = "alter table core_alert
     add isSent boolean default false not null;";

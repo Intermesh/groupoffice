@@ -191,7 +191,7 @@ class EmailTemplate extends Entity
 
 	private function parseImages()
 	{
-		$cids = Blob::parseFromHtml($this->body);
+		$cids = Blob::parse($this->body);
 
 		$existing = [];
 		foreach ($this->attachments as $a) {

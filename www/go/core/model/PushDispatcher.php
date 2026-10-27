@@ -65,9 +65,6 @@ class PushDispatcher
 			$this->CHECK_INTERVAL = $this->apcuEnabled ? 1 : 20;
 		}
 
-		go()->getDbConnection()->debug = true;
-
-
 		// spread the checks of all connections
 		$this->recheckDelay = self::MIN_RECHECK_INTERVAL + mt_rand(0, 1000) / 1000;
 
@@ -95,11 +92,42 @@ class PushDispatcher
 		echo "event: $type\n";
 		echo 'data: ' . json_encode($data). "\n\n";
 
+		$this->flushOutput();
+	}
+
+	private function flushOutput(): void
+	{
 		while(ob_get_level() > 0) {
 			ob_end_flush();
 		}
 
 		flush();
+	}
+
+	/**
+	 * Sleeps for the given number of seconds while checking that the client is still connected.
+	 *
+	 * PHP only notices that the client is gone after a write fails, because ignore_user_abort() is on. A comment line
+	 * is written every second so the worker of a closed or hidden tab is released within a few seconds instead of
+	 * after the next check interval. Clients ignore SSE comment lines. Don't add a blank line after it, as that would
+	 * dispatch an empty message to the client.
+	 *
+	 * @return bool False when the client disconnected
+	 */
+	private function sleepWhileConnected(int $seconds): bool
+	{
+		for($i = 0; $i < $seconds; $i++) {
+			sleep(1);
+
+			echo ":\n";
+			$this->flushOutput();
+
+			if(connection_aborted()) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -268,7 +296,10 @@ class PushDispatcher
 
 			$sleeping += $this->CHECK_INTERVAL;
 
-			sleep($this->CHECK_INTERVAL);
+			if(!$this->sleepWhileConnected($this->CHECK_INTERVAL)) {
+				go()->debug("PushDispatcher::SSE connection aborted by client");
+				break;
+			}
 		}
 	}
 }

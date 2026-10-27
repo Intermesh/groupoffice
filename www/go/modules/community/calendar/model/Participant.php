@@ -130,6 +130,13 @@ class Participant extends Property
 		return $this->id;
 	}
 
+	/**
+	 * The secret that gives access to the invite page, as it is saved
+	 */
+	public function scheduleSecret(): ?string {
+		return $this->scheduleSecret;
+	}
+
 	public function expectReply(bool $v) {
 		$this->expectReply = $v;
 		if($v) {

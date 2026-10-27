@@ -102,7 +102,7 @@ class Module extends core\Module
 	public function downloadVCard($contactId)
 	{
 		$contact = Contact::findById($contactId);
-		if (!$contact->getPermissionLevel()) {
+		if (!$contact || !$contact->getPermissionLevel()) {
 			throw new Forbidden();
 		}
 
@@ -112,7 +112,7 @@ class Module extends core\Module
 
 		Response::get()
 			->setHeader('Content-Type', 'text/vcard;charset=utf-8')
-			->setHeader('Content-Disposition', 'attachment; filename="' . $contact->name . '.vcf"')
+			->setHeader('Content-Disposition', Response::contentDisposition('attachment', $contact->name . '.vcf'))
 			->setHeader("Content-Length", strlen($vcard))
 			->sendHeaders();
 

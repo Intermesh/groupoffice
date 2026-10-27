@@ -198,6 +198,9 @@ class Authenticate
 	 */
 	public function setAuthenticated(User $user): Token
 	{
+		// Used by external logins (OpenID Connect, OAuth2) that bypass passwordLogin(), so the same rules must apply.
+		$this->assertUserIdMayLogin($user->id);
+
 		$token = new Token();
 		$token->userId = $user->id;
 		$token->setAuthenticated(true);
@@ -214,14 +217,26 @@ class Authenticate
 			return [];
 		}
 		$ip = Request::get()->getRemoteIpAddress();
-		return [
+		$keys = [
 			'login-throttle-' . $scope . '-u-' . md5(strtolower($username) . '|' . $ip) => self::THROTTLE_MAX_USER_FAILURES,
 			'login-throttle-' . $scope . '-ip-' . md5($ip) => self::THROTTLE_MAX_IP_FAILURES
 		];
+
+		if($scope === 'recovery') {
+			// A recovery request sends a message to the address. That must be limited for all IP addresses together,
+			// otherwise somebody can flood a mailbox by using many addresses.
+			$keys['login-throttle-recovery-e-' . md5(strtolower($username))] = self::THROTTLE_MAX_USER_FAILURES;
+		}
+
+		return $keys;
 	}
 
 	/**
 	 * Throws when too many failed logins occurred recently for this username/IP.
+	 *
+	 * Also used with scope "recovery" for requests to send a password recovery message. Then $username is the e-mail
+	 * address and every request is counted with {@see registerFailure()}.
+	 *
 	 * @throws Forbidden
 	 */
 	public function checkThrottle(string $username, string $scope = 'password'): void
@@ -229,7 +244,9 @@ class Authenticate
 		foreach($this->throttleKeys($username, $scope) as $key => $max) {
 			$state = go()->getCache()->get($key);
 			if($state && $state['lockedUntil'] > time()) {
-				throw new Forbidden(go()->t("Too many failed login attempts. Please try again later."));
+				throw new Forbidden($scope === 'recovery' ?
+					go()->t("Too many password recovery requests. Please try again later.") :
+					go()->t("Too many failed login attempts. Please try again later."));
 			}
 		}
 	}
@@ -326,20 +343,7 @@ class Authenticate
 
 		$this->clearThrottle($username);
 
-		if (!$user->enabled) {
-			throw new Forbidden(go()->t("Your account has been disabled."));
-		}
-
-		if (!go()->getEnvironment()->isCli()) {
-			$ip = Request::get()->getRemoteIpAddress();
-			if (!AuthAllowGroup::isAllowed($user, $ip)) {
-				throw new Forbidden(str_replace('{ip}', $ip, go()->t("You are not allowed to login from IP address {ip}.")));
-			}
-		}
-
-		if (go()->getSettings()->maintenanceMode && !$user->isAdmin()) {
-			throw new Unavailable(go()->t("Service unavailable. Maintenance mode is enabled."));
-		}
+		$this->assertUserMayLogin($user);
 
 		if ($authenticator->needsCache()) {
 			go()->getCache()->set($cacheKey, [$user, $authenticator], true, self::CACHE_PASSWORD_LOGIN);
@@ -347,6 +351,23 @@ class Authenticate
 
 		return $user;
 
+	}
+
+	/**
+	 * Throws when the user may not login at all (disabled, IP not allowed, maintenance).
+	 *
+	 * Must be used by every way of logging in that doesn't use passwordLogin(), like remember me and refreshing a token.
+	 *
+	 * @throws Forbidden|Unavailable
+	 */
+	public function assertUserIdMayLogin(int|string $userId): void
+	{
+		$user = User::find(['id', 'enabled'], true)->where(['id' => $userId])->single();
+		if (!$user) {
+			throw new Forbidden(go()->t("Your account has been disabled."));
+		}
+
+		$this->assertUserMayLogin($user);
 	}
 
 	/**
@@ -595,6 +616,7 @@ class Authenticate
 	{
 		$token = Token::find()->where(['accessToken' => $accessToken])->single();
 		if ($token && $token->isAuthenticated()) {
+			$this->assertUserIdMayLogin($token->userId);
 			$token->refresh();
 		}
 		return $token;

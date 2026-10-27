@@ -25,10 +25,7 @@ class UserRepository implements IdentityProviderInterface
         $grantType,
         ClientEntityInterface $clientEntity
     ) {
-        if ($username === 'alex' && $password === 'whisky') {
-            return new User();
-        }
-
+        // The password grant is not enabled on the server. Users log in on the authorization page.
         return;
     }
 
@@ -39,10 +36,26 @@ class UserRepository implements IdentityProviderInterface
 	 */
 		public function getUserEntityByIdentifier($identifier): bool|UserEntity
 		{
-			$user = User::findById($identifier, ['username', 'displayName', 'id', 'email', 'modifiedAt']);
-			if(!$user) {
+			$user = User::findById($identifier, ['username', 'displayName', 'id', 'email', 'modifiedAt', 'enabled']);
+			if(!$user || !$user->enabled) {
 				return false;
 			}
 			return new UserEntity($user);
 		}
+
+	/**
+	 * Tokens and codes of a user who is disabled or deleted must not be accepted anymore.
+	 *
+	 * @param int|string|null $userId
+	 */
+	public static function isEnabled(int|string|null $userId): bool
+	{
+		if ($userId === null || $userId === '') {
+			return false;
+		}
+
+		$user = User::find(['id', 'enabled'], true)->where(['id' => $userId])->single();
+
+		return $user && $user->enabled;
+	}
 }

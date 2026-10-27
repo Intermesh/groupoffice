@@ -154,8 +154,11 @@ $updates['202104021322'][] = "ALTER TABLE `notes_user_settings` ADD (`rememberLa
 
 $updates['202205101237'][] = "update notes_note set filesFolderId = null where filesFolderId=0;";
 $updates['202308011518'][] = "ALTER TABLE `notes_note` CHANGE COLUMN `content` `content` MEDIUMTEXT NULL DEFAULT NULL ;";
+$updates['202610271200'][] = "ALTER TABLE `notes_note` ADD `type` enum('html','markdown') NOT NULL DEFAULT 'html' AFTER `content`;";
+$updates['202610271200'][] = "ALTER TABLE `notes_user_settings` ADD `defaultType` enum('html','markdown') NOT NULL DEFAULT 'html';";
 
-$updates['202602171204'][] = "CREATE TABLE IF NOT EXISTS `notes_note_book_user` (
+
+$updates['202610271542'][] = "CREATE TABLE IF NOT EXISTS `notes_note_book_user` (
 								`noteBookId` INT(11) NOT NULL,
 								`userId` INT(11) NOT NULL,
 								`syncToDevice` TINYINT(1) DEFAULT 0 NOT NULL,
@@ -170,6 +173,6 @@ $updates['202602171204'][] = "CREATE TABLE IF NOT EXISTS `notes_note_book_user` 
 									ON DELETE CASCADE
                                     ON UPDATE NO ACTION);";
 
-$updates['202602181102'][] = "INSERT IGNORE INTO `notes_note_book_user` (noteBookId, userId, syncToDevice)
+$updates['202610271542'][] = "INSERT IGNORE INTO `notes_note_book_user` (noteBookId, userId, syncToDevice)
 								SELECT noteBookId, userId, 1
 								FROM `sync_user_note_book`;";

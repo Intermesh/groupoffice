@@ -4,6 +4,34 @@ namespace go\core\util;
 class Markdown {
 
 	/**
+	 * Convert markdown to HTML
+	 *
+	 * Uses safe mode so raw HTML in the markdown is escaped and unsafe links are removed.
+	 *
+	 * @param string|null $markdown
+	 * @return string
+	 */
+	public static function toHtml(?string $markdown): string {
+		$pd = new \Parsedown();
+		$pd->setSafeMode(true);
+		$pd->setBreaksEnabled(true);
+		return $pd->text($markdown ?? "");
+	}
+
+	/**
+	 * Convert markdown to plain text. Useful for search indexing.
+	 *
+	 * @param string|null $markdown
+	 * @return string
+	 */
+	public static function toText(?string $markdown): string {
+		// add a space after tags so words don't stick together
+		$text = html_entity_decode(strip_tags(str_replace(">", "> ", self::toHtml($markdown))), ENT_QUOTES | ENT_HTML5);
+		$text = preg_replace('/[ \t]+/', ' ', $text);
+		return trim(implode("\n", array_map('trim', explode("\n", $text))));
+	}
+
+	/**
 	 * Takes an array of associative arrays (rows) and prints a markdown table to the CLI, with column widths auto-sized for alignment:
 	 *
 	 * @example

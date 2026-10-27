@@ -34,7 +34,7 @@ class MenuItemController extends \GO\Base\Controller\AbstractJsonController {
 	 * @param int $id
 	 * @param int $site_id
 	 */
-	public function actionParentStore($id = false, $menu_id){
+	public function actionParentStore($id, $menu_id){
 		
 		$findCriteria = \GO\Base\Db\FindCriteria::newInstance()->addCondition('menu_id', $menu_id);
 		$findCriteria->addCondition('id', $id,'<>');
@@ -52,7 +52,7 @@ class MenuItemController extends \GO\Base\Controller\AbstractJsonController {
 	 * @param int $id
 	 * @param int $site_id
 	 */
-	public function actionLoad($id = false,$menu_id){
+	public function actionLoad($id, $menu_id){
 		$remoteComboFields = array();
 		
 		$model = $this->_loadModel($menu_id,$id);

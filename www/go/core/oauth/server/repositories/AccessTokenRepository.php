@@ -42,8 +42,11 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
      */
     public function isAccessTokenRevoked($tokenId): bool
 		{
+        // findById() returns null for a token that doesn't exist (anymore), like a revoked or expired one that was cleaned up
         $token = OauthAccessToken::findById($tokenId);
-        return $token === false || $token->getExpiryDateTime() < (new \DateTime());
+        return !$token
+            || $token->getExpiryDateTime() < (new \DateTime())
+            || !UserRepository::isEnabled($token->getUserIdentifier());
     }
 
     /**

@@ -75,10 +75,8 @@ class ConnectionTest extends TestCase {
 	 */
 	public function testRollbackDiscardsChangesQueuedDuringTransaction() {
 		$changesProp = new ReflectionProperty(EntityType::class, 'changes');
-		$changesProp->setAccessible(true);
 
 		$snapshotProp = new ReflectionProperty(EntityType::class, 'changesSnapshot');
-		$snapshotProp->setAccessible(true);
 
 		$originalChanges = $changesProp->getValue();
 		$originalSnapshot = $snapshotProp->getValue();
@@ -127,10 +125,8 @@ class ConnectionTest extends TestCase {
 	 */
 	public function testFailedSaveDiscardsChangesQueuedDuringItThroughRealRollback() {
 		$changesProp = new ReflectionProperty(EntityType::class, 'changes');
-		$changesProp->setAccessible(true);
 
 		$snapshotProp = new ReflectionProperty(EntityType::class, 'changesSnapshot');
-		$snapshotProp->setAccessible(true);
 
 		$originalChanges = $changesProp->getValue();
 		$originalSnapshot = $snapshotProp->getValue();
@@ -183,10 +179,8 @@ class ConnectionTest extends TestCase {
 
 	public function testCommitDiscardsChangesSnapshot() {
 		$changesProp = new ReflectionProperty(EntityType::class, 'changes');
-		$changesProp->setAccessible(true);
 
 		$snapshotProp = new ReflectionProperty(EntityType::class, 'changesSnapshot');
-		$snapshotProp->setAccessible(true);
 
 		$originalChanges = $changesProp->getValue();
 		$originalSnapshot = $snapshotProp->getValue();

@@ -239,6 +239,23 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		}
 	}
 
+	/**
+	 * A thumbnail shows the content of the file, so the user must be allowed to read it. The permissions of a file are
+	 * those of the folder it's in. Files that are not in the files module can't be shown either, because there's
+	 * nothing to check their permissions against. It's the same answer for both so it doesn't tell if a path exists.
+	 *
+	 * @param string $relativePath Relative to the file storage path
+	 * @throws \GO\Base\Exception\AccessDenied
+	 */
+	private function checkThumbFilePermission(string $relativePath): void
+	{
+		$fileModel = \GO\Files\Model\File::model()->findByPath($relativePath);
+
+		if (!$fileModel || !$fileModel->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+	}
+
 	protected function actionThumb($params) {
 
 		GO::session()->closeWriting();
@@ -269,6 +286,10 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 				case 'xmind':
 				case 'heic':
 				case 'heif':
+					// This is the only branch that outputs the content of a file from the file storage. The other
+					// branches only use the extension to pick an icon.
+					$this->checkThumbFilePermission($params['src']);
+
 					$src = GO::config()->file_storage_path . $params['src'];
 					break;
 
@@ -905,63 +926,6 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		
 		echo $response;
 	}
-	
-	/**
-	 * Send an email
-	 * 
-	 * @param string $email
-	 * @param string $subject
-	 * @param string $body
-	 * @param array $attachments Array like this: (The given className needs to implement the GO\Base\Mail\AttachableInterface)
-	 *	array(
-	 *		array(
-	 *			'className'=>'GO\Files\Model\File',
-	 *			'pk'=>3',
-	 *			'altName'=>'New attachment name'
-	 *		),
-	 *		array(
-	 *			'className'=>'GO\Files\Model\File',
-	 *			'pk'=>4',
-	 *			'altName'=>'New attachment name2'
-	 *		)
-	 *	)
-	 */
-	public function actionSendSystemEmail($email, $subject, $body, $attachments=array()){
-		
-		$response = array('success'=>false);
-		
-		//Build system email and mail with the given files
-		$systemMessage = new GO\Base\Mail\SystemMessage($subject,$body);
-		
-		foreach($attachments as $attachmentSpec) {
-			
-			if(!empty($attachmentSpec['className']) &&  !empty($attachmentSpec['pk'])){
-				
-				$className = $attachmentSpec['className'];
-				$record = $className::model()->findByPk($attachmentSpec['pk']);
-				
-				if($record){
-					
-					$altName = null;
-					if(!empty($attachmentSpec['altName'])){
-						$altName = $attachmentSpec['altName'];
-					}
 
-					$attachment = $record->getAttachment($altName);
-					
-					if($attachment !== false){
-						$systemMessage->attach($attachment);
-					}
-				}
-			}			
-		}
-
-		$systemMessage->send();
-
-		$response['success'] = true;
-
-		echo new \GO\Base\Data\JsonResponse($response);
-	}
-	
 	
 }

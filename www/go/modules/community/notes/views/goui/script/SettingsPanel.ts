@@ -37,12 +37,23 @@ export class SettingsPanel extends AppSettingsPanel {
 						]
 					}),
 
-
+					radio({
+						name: "defaultType",
+						label: t("Default editor for new notes"),
+						type: "box",
+						value: "html",
+						options: [
+							{text: "HTML", value: "html"},
+							{text: "Markdown", value: "markdown"}
+						]
+					}),
 
 					this.syncNoteBooksField = notebookchips({
 						label: t("Synchronize"),
 						name: "syncNoteBookIds"
-					}),
+					})
+
+
 				)
 			)
 		)

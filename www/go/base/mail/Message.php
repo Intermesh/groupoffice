@@ -415,7 +415,7 @@ class Message extends \go\core\mail\Message {
 			}
 		}
 		
-		$blobIds = Blob::parseFromHtml($body);
+		$blobIds = Blob::parse($body);
 		foreach($blobIds as $blobId) {
 			$blob = Blob::findById($blobId);
 			

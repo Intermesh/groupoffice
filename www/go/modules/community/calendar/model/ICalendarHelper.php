@@ -644,6 +644,10 @@ class ICalendarHelper {
 		}
 		if(!empty($vevent->CLASS)) $props->privacy = array_flip(self::$privacyMap)[(string)$vevent->CLASS] ?? 'public';
 		if(!empty($vevent->COLOR)) $props->color = (string)$vevent->COLOR;
+		if(isset($vevent->TRANSP)) {
+			$props->freeBusyStatus = strtoupper((string)$vevent->TRANSP) === 'TRANSPARENT' ?
+				CalendarEvent::FREEBUSY_FREE : CalendarEvent::FREEBUSY_BUSY;
+		}
 		if(!empty($vevent->DURATION)) {
 			$props->duration = (string)$vevent->DURATION;
 		} else if (!empty($vevent->DTEND) && !empty($props->start)) {

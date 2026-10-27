@@ -3,6 +3,7 @@ namespace go\core\model;
 
 use DateInterval;
 use Exception;
+use go\core\auth\Authenticate;
 use go\core\db\DbException;
 use go\core\ErrorHandler;
 use go\core\exception\RememberMeTheft;
@@ -168,24 +169,27 @@ class RememberMe extends Entity {
 	 */
 	public function setCookie(): void
 	{
-		Response::get()->setCookie('goRememberMe', $this->getToken(), [
-			'expires' => $this->expiresAt->format("U"),
-			"path" => "/",
-			"samesite" => "Lax",
-			"domain" => Request::get()->getHost(),
-			"httpOnly" => true
-		]);
+		Response::get()->setCookie('goRememberMe', $this->getToken(), self::cookieOptions((int) $this->expiresAt->format("U")));
 	}
 
 	public static function unsetCookie(): void
 	{
-		Response::get()->setCookie('goRememberMe', "", [
-			'expires' => time() - 3600,
+		Response::get()->setCookie('goRememberMe', "", self::cookieOptions(time() - 3600));
+	}
+
+	/**
+	 * The cookie logs the user in for a week, so it must never be sent over an unencrypted connection.
+	 */
+	private static function cookieOptions(int $expires): array
+	{
+		return [
+			'expires' => $expires,
 			"path" => "/",
 			"samesite" => "Lax",
+			"secure" => Request::get()->isHttps(),
 			"domain" => Request::get()->getHost(),
 			"httpOnly" => true
-		]);
+		];
 	}
 
 
@@ -240,6 +244,11 @@ class RememberMe extends Entity {
 			self::unsetCookie();
 			throw new RememberMeTheft();
 		}
+
+		// Apply the same rules as a password login (disabled, IP restrictions, maintenance mode). This must be done
+		// before the token is replaced. Otherwise the client keeps a token that no longer matches and the next attempt
+		// would be seen as theft.
+		(new Authenticate())->assertUserIdMayLogin($rememberMe->userId);
 
 		$rememberMe->setNewToken();
 

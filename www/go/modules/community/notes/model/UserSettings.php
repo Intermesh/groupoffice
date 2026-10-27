@@ -9,6 +9,7 @@ use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\model;
 use go\core\util\JSON;
+use go\core\validate\ErrorCode;
 
 class UserSettings extends Property {
 
@@ -31,9 +32,23 @@ class UserSettings extends Property {
 
 	protected ?string $lastNoteBookIds;
 
+	/**
+	 * Default content type for new notes. "html" or "markdown".
+	 */
+	public string $defaultType = Note::TYPE_HTML;
+
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()->addTable("notes_user_settings", "abs");
+	}
+
+	protected function internalValidate()
+	{
+		if(!in_array($this->defaultType, [Note::TYPE_HTML, Note::TYPE_MARKDOWN], true)) {
+			$this->setValidationError('defaultType', ErrorCode::INVALID_INPUT, "Default type must be 'html' or 'markdown'");
+		}
+
+		parent::internalValidate();
 	}
 
 	public function getDefaultNoteBookId() {

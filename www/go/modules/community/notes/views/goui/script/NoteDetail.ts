@@ -8,6 +8,7 @@ import {
 	filesbutton,
 	Image,
 	linkbrowsebutton, LinkDetail,
+	Markdown,
 	modules
 } from "@intermesh/groupoffice-core";
 import {NoteDialog} from "./NoteDialog";
@@ -32,6 +33,8 @@ export class NoteDetail extends DetailPanel<Note> {
 		);
 
 		this.scroller.items.add(this.form = datasourceform({dataSource: noteDS}, ...customFields.getFieldSets("Note").map(fs => new CustomFieldDetailFieldset(fs))))
+		// Enlarge images when clicked in window
+		Image.enableZoom(this.content.el);
 
 		if(modules.isAvailable("community", "comments")) {
 			this.scroller.items.add(new CommentsPanel(this.entityName));
@@ -98,10 +101,10 @@ export class NoteDetail extends DetailPanel<Note> {
 
 			if(Encrypt.isEncrypted(entity.content)) {
 				Encrypt.prompt(entity.content).then(decryptedText => {
-					this.content.items.add(Image.replace(decryptedText));
+					this.content.items.add(Image.replace(Markdown.contentToHtml(decryptedText, entity.type)));
 				})
 			} else{
-				this.content.items.add(Image.replace(entity.content));
+				this.content.items.add(Image.replace(Markdown.contentToHtml(entity.content, entity.type)));
 			}
 
 			void this.form.load(entity.id);

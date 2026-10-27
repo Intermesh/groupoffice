@@ -119,8 +119,13 @@ try {
 				exit();
 			}
 
+			if(!isset($data['user']) || !is_array($data['user'])) {
+				output([], 400, "Missing 'user' object");
+			}
+
 			$user = new User();
-			$user->setValues($data['user']);
+			// Only allow the basic profile properties. Otherwise anyone could choose their own groups.
+			$user->setValues(User::filterRegistrationValues($data['user']));
 			if(!$user->save()) {
 				$errors = $user->getValidationErrors();
 				$first = array_shift($errors);
@@ -144,8 +149,17 @@ try {
 			break;
 		case 'forgotten':
 
+			if(empty($data['email']) || !is_string($data['email'])) {
+				output([], 400, "Missing 'email'");
+			}
+
 			// Don't change log message as fail2ban relies on it
 			ErrorHandler::log("Lost password request from IP: '" . Request::get()->getRemoteIpAddress() . "'");
+
+			// Otherwise this form can be used to flood somebody's mailbox. Every request is counted, also for addresses
+			// that don't exist, so it doesn't reveal if a user exists. Throws Forbidden when there were too many.
+			$auth->checkThrottle(trim($data['email']), 'recovery');
+			$auth->registerFailure(trim($data['email']), 'recovery');
 
 			$start = (int) (microtime(true) * 1000);
 
@@ -188,6 +202,7 @@ try {
 			if (isset($data['accessToken'])) {
 				$token = Token::find()->where(['accessToken' => $data['accessToken']])->single();
 				if ($token && $token->isAuthenticated()) {
+					$auth->assertUserIdMayLogin($token->userId);
 					$token->refresh();
 				}
 			} else if(isset($data['rememberMeToken'])) {
@@ -206,6 +221,10 @@ try {
 				}
 			} elseif (isset($data['loginToken'])) {
 				$token = Token::find()->where(['loginToken' => $data['loginToken']])->single();
+				// The login token is only valid for Token::LOGIN_LIFETIME. Expired ones stay in the database until garbage collection.
+				if ($token && $token->isExpired()) {
+					$token = null;
+				}
 			} else {
 
 				if (empty($data['username']) || empty($data['password'])) {

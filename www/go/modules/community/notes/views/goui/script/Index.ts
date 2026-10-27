@@ -104,6 +104,7 @@ modules.register({
 export interface Note extends AclItemEntity {
 	name: string,
 	content: string
+	type: TextType
 	noteBookId: EntityID
 }
 

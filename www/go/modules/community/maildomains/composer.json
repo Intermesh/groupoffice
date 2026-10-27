@@ -2,7 +2,14 @@
   "name": "groupoffice/maildomains",
   "description": "Group-Office",
   "require": {
+    "php": ">=8.2 < 8.6",
     "mlocati/spf-lib": "^3.1"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "platform": {
+      "php": "8.2"
+    }
   },
   "authors": [
     {

@@ -1,4 +1,4 @@
-#!/usr/bin/env php7.4
+#!/usr/bin/env php8.4
 <?php
 
 use Github\Client;
@@ -73,7 +73,7 @@ class Builder
 	private $packageName;
 
 
-	private $encoder = '/usr/local/share/sourceguardian/bin/sourceguardian --phpversion 8.1+';
+	private $encoder = '/usr/local/share/sourceguardian/bin/sourceguardian --phpversion 8.2+';
 
 	private $encoderOptions = null;
 	private $proRepos = "git@git.intermesh.nl:groupoffice/promodules.git";

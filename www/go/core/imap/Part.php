@@ -190,7 +190,7 @@ abstract class Part extends Model {
 		
 		if($sendHeaders){
 			header('Content-Type: '.$this->type.'/'.$this->subtype);
-			header('Content-Disposition: inline; filename='.$this->getFilename());
+			header('Content-Disposition: ' . \go\core\http\Response::contentDisposition('inline', (string) $this->getFilename()));
 		}		
 		
 		$streamer = new Streamer($filePointer, $this->encoding);

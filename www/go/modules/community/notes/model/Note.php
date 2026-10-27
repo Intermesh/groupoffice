@@ -12,11 +12,15 @@ use go\core\orm\CustomFieldsTrait;
 use go\core\orm\SearchableTrait;
 use go\core\util\ArrayObject;
 use go\core\util\DateTime;
+use go\core\util\Markdown;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\modules\community\notes\convert\Spreadsheet;
 
 class Note extends AclItemEntity {
+
+	const TYPE_HTML = 'html';
+	const TYPE_MARKDOWN = 'markdown';
 
 	/**
 	 * The Entity ID
@@ -25,6 +29,11 @@ class Note extends AclItemEntity {
 
 	public string $name;
 	public string $content;
+
+	/**
+	 * Content type. "html" or "markdown". Markdown is rendered by the client. It can't be changed for existing notes.
+	 */
+	public string $type = self::TYPE_HTML;
 	public string $noteBookId;
 
 	public ?\DateTimeInterface $createdAt;
@@ -63,7 +72,8 @@ class Note extends AclItemEntity {
 
 	protected function getSearchDescription(): string
 	{
-		return preg_replace("/\s+/", " ", strip_tags(str_replace(">", "> ",$this->content)));
+		$text = $this->type == self::TYPE_MARKDOWN ? Markdown::toText($this->content) : strip_tags(str_replace(">", "> ",$this->content));
+		return preg_replace("/\s+/", " ", $text);
 	}
 
 	public function title(): string
@@ -101,7 +111,14 @@ class Note extends AclItemEntity {
 
 	protected function internalValidate()
 	{
-		if($this->isModified(['content'])) {
+		if(!in_array($this->type, [self::TYPE_HTML, self::TYPE_MARKDOWN], true)) {
+			$this->setValidationError('type', ErrorCode::INVALID_INPUT, "Type must be 'html' or 'markdown'");
+		} else if(!$this->isNew() && $this->isModified(['type'])) {
+			$this->setValidationError('type', ErrorCode::INVALID_INPUT, "The type of an existing note can't be changed");
+		}
+
+		// Markdown is rendered and sanitized by the client. Sanitizing it as HTML would break it.
+		if($this->type == self::TYPE_HTML && $this->isModified(['content'])) {
 			$this->content = StringHelper::sanitizeHtml($this->content, false);
 
 			if(StringUtil::detectXSS($this->content, false)) {
@@ -115,7 +132,7 @@ class Note extends AclItemEntity {
 
 	protected function internalSave(): bool
 	{
-		$this->images = Blob::parseFromHtml($this->content);
+		$this->images = Blob::parse($this->content, true);
 		return parent::internalSave();
 	}
 

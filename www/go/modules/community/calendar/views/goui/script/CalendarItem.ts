@@ -129,10 +129,11 @@ export class CalendarItem {
 		Object.assign(this,obj);
 
 		this.patched = ObjectUtil.patch(structuredClone(obj.data), obj.override) as CalendarEvent;
-		 if(obj.recurrenceId && (!obj.override || !obj.override.start))
-		 	this.patched.start = obj.recurrenceId;
+		if(obj.recurrenceId && (!obj.override || !obj.override.start)) {
+			this.patched.start = obj.recurrenceId;
+		}
  		// if(obj.override)
-		 // 	debugger;
+		// debugger;
 		if(!obj.start) {
 			this.start = DateTime.createFromFormat(this.patched.start, this.data.showWithoutTime ? "Y-m-d": "Y-m-dTH:i:s" , this.patched.timeZone)!; // ignore stored timezone
 			if(!this.start) {

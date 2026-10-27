@@ -263,7 +263,7 @@ class Comment extends AclItemEntity {
 	protected function internalSave(): bool
 	{
 		if($this->isModified('text')) {
-			$this->images = Blob::parseFromHtml($this->text, true);
+			$this->images = Blob::parse($this->text, true);
 			$this->findMentions();
 		}
 

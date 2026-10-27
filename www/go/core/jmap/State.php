@@ -72,6 +72,17 @@ class State extends AbstractState {
 	public static $CSRFcheck = true;
 
 	/**
+	 * A disabled user can't use a token. Checked when the token is loaded from the database, so it's cached for
+	 * {@see Token::CACHE_TTL} at most.
+	 */
+	private static function isUserEnabled(Token $token): bool
+	{
+		$user = User::find(['id', 'enabled'], true)->where(['id' => $token->userId])->single();
+
+		return $user && $user->enabled;
+	}
+
+	/**
 	 * @throws Forbidden
 	 */
 	private static function checkCSRF(Token $token) : bool {
@@ -124,14 +135,20 @@ class State extends AbstractState {
 
 			$this->token = go()->getCache()->get('token-' . $tokenStr);
 			if($this->token) {
-				if(!self::checkCSRF($this->token)) {
+				if($this->token->isExpired()) {
+					// The cache can outlive the database record (eg. removed by garbage collection). Never use or extend it.
+					go()->getCache()->delete('token-' . $tokenStr);
 					$this->token = null;
-					return false;
+				} else {
+					if(!self::checkCSRF($this->token)) {
+						$this->token = null;
+						return false;
+					}
+					$this->token->activity();
+					return $this->token;
 				}
-				$this->token->activity();
-				return $this->token;
 			}
-		
+
 			$this->token = Token::find()->where(['accessToken' => $tokenStr])->single();
 			
 			if(!$this->token) {
@@ -146,12 +163,15 @@ class State extends AbstractState {
 					ErrorHandler::logException($e);
 				}
 				$this->token = false;
+			} else if(!self::isUserEnabled($this->token)) {
+				// Not deleted: tokens that never expire (API keys) must work again when the user is enabled again.
+				$this->token = false;
 			} else{
 				if(!self::checkCSRF($this->token)) {
 					$this->token = null;
 					return false;
 				}
-				go()->getCache()->set('token-' . $tokenStr, $this->token);
+				go()->getCache()->set('token-' . $tokenStr, $this->token, true, Token::CACHE_TTL);
 			}
 		}
 		

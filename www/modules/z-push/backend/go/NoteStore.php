@@ -1,6 +1,7 @@
 <?php
 
 use go\core\model\Acl;
+use go\core\util\Markdown;
 use go\core\util\StringUtil;
 use go\modules\community\notes\model\Note;
 
@@ -63,13 +64,16 @@ class NoteStore extends Store {
 			if (Request::GetProtocolVersion() >= 12.0) {
 				$sbBody = new SyncBaseBody();
 
+				$isMarkdown = $note->type == Note::TYPE_MARKDOWN;
+
 				if ($bpReturnType == SYNC_BODYPREFERENCE_HTML) {
 					$sbBody->type = SYNC_BODYPREFERENCE_HTML;
-					$asBodyData = $note->content;
+					$asBodyData = $isMarkdown ? Markdown::toHtml($note->content) : $note->content;
 				} else {
 
 					$sbBody->type = SYNC_BODYPREFERENCE_PLAIN;
-					$asBodyData = StringUtil::htmlToText($note->content);
+					// Markdown is plain text already
+					$asBodyData = $isMarkdown ? $note->content : StringUtil::htmlToText($note->content);
 				}
 				ZLog::Write(LOGLEVEL_DEBUG, $asBodyData);
 
@@ -126,20 +130,25 @@ class NoteStore extends Store {
 
 			$note->content = "";
 
+			// Markdown notes keep their type. The body is stored as plain text which is valid markdown.
+			$isMarkdown = $note->type == Note::TYPE_MARKDOWN;
+
 			if(isset($message->asbody) && isset($message->asbody->type)){
 				switch($message->asbody->type){
 					case SYNC_BODYPREFERENCE_PLAIN:
-						$note->content = StringUtil::textToHtml(stream_get_contents($message->asbody->data));
+						$text = stream_get_contents($message->asbody->data);
+						$note->content = $isMarkdown ? $text : StringUtil::textToHtml($text);
 						break;
 					case SYNC_BODYPREFERENCE_HTML:
-						$note->content = stream_get_contents($message->asbody->data);
+						$html = stream_get_contents($message->asbody->data);
+						$note->content = $isMarkdown ? StringUtil::htmlToText($html) : $html;
 						break;
 					case SYNC_BODYPREFERENCE_RTF:
 						$rtfparser = new z_RTF();
 						$rtfparser->loadrtf(base64_decode(stream_get_contents($message->asbody->data)));
 						$rtfparser->output("html");
 						$rtfparser->parse();
-						$note->content = $rtfparser->out;
+						$note->content = $isMarkdown ? StringUtil::htmlToText($rtfparser->out) : $rtfparser->out;
 						break;
 				}
 			}

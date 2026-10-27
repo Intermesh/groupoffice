@@ -7,6 +7,7 @@ use go\core\fs\File;
 use go\core\http\Router;
 use go\core\jmap\State;
 use go\core\model\OauthUser;
+use go\core\oauth\server\EncryptionKey;
 use go\core\oauth\server\repositories;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
@@ -56,7 +57,9 @@ class OAuthController {
 				$accessTokenRepository,
 				$scopeRepository,
 				$privateKeyPath,
-				'lxZFUEsBCJ2Yb14IF2ygAHI5N4+ZAUXXaSeeJm6+twsUmIen', //Public key
+				// Encrypts the authorization codes and refresh tokens. Random for each installation. Never put a fixed
+				// key in the source: everybody could then create codes and tokens that this server accepts.
+				EncryptionKey::get(),
 				$responseType
 			);
 

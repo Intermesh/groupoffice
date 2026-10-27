@@ -25,7 +25,7 @@ abstract class Base{
 	
 	protected $path;
 	
-	const INVALID_CHARS = '/[!\/:\*\?"<>|\\\]/';
+	const INVALID_CHARS = '/[!\/:\*\?"<>|\\\\\x00-\x1f\x7f]/';
 
 	/**
 	 * Constructor of a file or folder
