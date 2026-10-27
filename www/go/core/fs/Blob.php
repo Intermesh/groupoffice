@@ -407,40 +407,47 @@ class Blob extends orm\Entity {
 	}
 
 	/**
-	 * Parse blob id's inserted as images in HTML content.
+	 * Parse blob id's inserted as images or links in HTML or Markdown content.
 	 *
-	 * @param ?string $html
+	 * Finds blob download URL's and data-blob-id attributes. eg.
+	 *
+	 * ```
+	 * <img src="https://example.com/api/download.php?blob=<blobId>">
+	 * <img data-blob-id="<blobId>" src="...">
+	 * ![image.png](https://example.com/api/download.php?blob=<blobId>)
+	 * ```
+	 *
+	 * @param ?string $content HTML or Markdown
 	 * @param bool $checkIfExists Verify if the blob exists in the database
 	 * @return string[] Array of blob ID's
 	 */
-	public static function parseFromHtml(?string $html, bool $checkIfExists = false): array
+	public static function parse(?string $content, bool $checkIfExists = false): array
 	{
-//		if(!preg_match_all('/<img [^>]*src="[^>]*\?blob=([^>"]*)"[^>]*>/i', $html, $matches)) {
-//			return [];
-//		}
-
-		if(empty($html)) {
+		if(empty($content)) {
 			return [];
 		}
 
-		$matches = [];
-
-		if(preg_match_all('/blob=([^>&"]*)"[^>]*>/i', $html, $urlMatches)) {
-			$matches = $urlMatches[1];
+		// blob ID's are SHA1 hashes. The ";" is for HTML encoded URL's with "&amp;blob=".
+		if(!preg_match_all('/(?:[?&;]blob=|data-blob-id=")([a-f0-9]{40})(?![a-f0-9])/i', $content, $matches)) {
+			return [];
 		}
 
-		if(preg_match_all('/data-blob-id="([^"]*)"/', $html, $dataBlobIdMatches)){
-			$matches = array_merge($matches, $dataBlobIdMatches[1]);
-		}
-
-		$matches =  array_unique($matches);
+		$blobIds = array_values(array_unique(array_map('strtolower', $matches[1])));
 
 		if($checkIfExists) {
-			$matches = array_filter($matches, function($blobId) {
+			$blobIds = array_values(array_filter($blobIds, function($blobId) {
 				return Blob::exists($blobId);
-			});
+			}));
 		}
-		return $matches;
+		return $blobIds;
+	}
+
+	/**
+	 * @deprecated Use {@see parse()}
+	 */
+	public static function parseFromHtml(?string $html, bool $checkIfExists = false): array
+	{
+		return self::parse($html, $checkIfExists);
 	}
 
 	public static function parseTmpFilesFromHtml(?string &$html) {
@@ -473,7 +480,7 @@ class Blob extends orm\Entity {
 	 * Useful when attaching inline images for example:
 	 *
 	 * ````
-	 * $blobIds = \go\core\fs\Blob::parseFromHtml($body);
+	 * $blobIds = \go\core\fs\Blob::parse($body);
 	 * foreach($blobIds as $blobId) {
 	 *  $blob = \go\core\fs\Blob::findById($blobId);
 	 *

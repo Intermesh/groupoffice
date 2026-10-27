@@ -30,6 +30,16 @@ export class SettingsPanel extends Component {
 							{text: t("Default note book"), value: 0},
 							{text: t("Remember last selected note book"), value: 1}
 						]
+					}),
+					radio({
+						name: "defaultType",
+						label: t("Default editor for new notes"),
+						type: "box",
+						value: "html",
+						options: [
+							{text: "HTML", value: "html"},
+							{text: "Markdown", value: "markdown"}
+						]
 					})
 				)
 			)

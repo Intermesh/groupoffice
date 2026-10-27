@@ -95,4 +95,29 @@ class BlobTest extends TestCase
 
 
 
+	public function testParse() {
+		$id1 = sha1("a");
+		$id2 = sha1("b");
+		$id3 = sha1("c");
+		$id4 = sha1("d");
+
+		$html = '<p><img src="https://example.com/api/download.php?blob=' . $id1 . '" alt="a"></p>' .
+			'<img data-blob-id="' . $id2 . '" src="blob:https://example.com/123">' .
+			'<a href="download.php?foo=bar&amp;blob=' . $id3 . '">c</a>' .
+			'<img src="https://example.com/api/download.php?blob=' . $id1 . '">';
+
+		$this->assertEquals([$id1, $id2, $id3], Blob::parse($html));
+
+		$markdown = "![a.png](https://example.com/api/download.php?blob=$id1)\n" .
+			"[d.pdf](../api/download.php?foo=bar&blob=$id4)\n" .
+			"Again ![a](https://example.com/api/download.php?blob=$id1)\n" .
+			"Not a blob: noblob=$id2 and blob=tooshort and blob={$id3}0";
+
+		$this->assertEquals([$id1, $id4], Blob::parse($markdown));
+		$this->assertEquals([], Blob::parse(null));
+		$this->assertEquals([], Blob::parse("No images"));
+
+		// deprecated alias
+		$this->assertEquals([$id1, $id2, $id3], Blob::parseFromHtml($html));
+	}
 }

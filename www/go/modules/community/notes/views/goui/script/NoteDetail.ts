@@ -8,6 +8,7 @@ import {
 	filesbutton,
 	Image,
 	linkbrowsebutton, LinkDetail,
+	Markdown,
 	modules
 } from "@intermesh/groupoffice-core";
 import {NoteDialog} from "./NoteDialog";
@@ -98,10 +99,10 @@ export class NoteDetail extends DetailPanel<Note> {
 
 			if(Encrypt.isEncrypted(entity.content)) {
 				Encrypt.prompt(entity.content).then(decryptedText => {
-					this.content.items.add(Image.replace(decryptedText));
+					this.content.items.add(Image.replace(Markdown.contentToHtml(decryptedText, entity.type)));
 				})
 			} else{
-				this.content.items.add(Image.replace(entity.content));
+				this.content.items.add(Image.replace(Markdown.contentToHtml(entity.content, entity.type)));
 			}
 
 			void this.form.load(entity.id);

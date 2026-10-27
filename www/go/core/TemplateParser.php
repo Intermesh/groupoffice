@@ -12,6 +12,7 @@ use go\core\model\User;
 use go\core\orm\Entity;
 use go\core\orm\EntityType;
 use go\core\util\DateTime;
+use go\core\util\Markdown;
 use GO\Files\Model\Folder;
 use go\modules\community\comments\model\Comment;
 use Throwable;
@@ -497,10 +498,7 @@ class TemplateParser {
 
 	private function filterMarkDown(?string $text): string
 	{
-		$pd = new \Parsedown();
-		$pd->setSafeMode(true);
-		$pd->setBreaksEnabled(true);
-		return $pd->text($text);
+		return Markdown::toHtml($text);
 	}
 
 
