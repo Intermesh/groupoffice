@@ -3086,8 +3086,8 @@ namespace go\core\util;
 				 * Create a QR code in PNG format
 				 * 
 				 * @param string $text	The text to create the QR code for
-				 * @param boolean $outfile
-				 * @param string $level The correctionlevel of the QR code
+				 * @param string|false|null $outfile Path to write the PNG to; false or null prints it
+				 * @param int|string $level The correctionlevel of the QR code: a QR_ECLEVEL_* constant or "L", "M", "Q", "H"
 				 * @param int $size	The size of one square in the QR code (In pixels)
 				 * @param int $margin	The margin around the QR code
 				 * @param boolean $saveandprint
