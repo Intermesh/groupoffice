@@ -46,7 +46,10 @@ class Key extends Entity {
 		return $log;
 	}
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> f1810d362 (Ticket 38262: API keys: mask access token in the history log)
 	protected static function internalDelete(Query $query): bool
 	{
 		$q = clone $query;
