@@ -6,6 +6,7 @@ use Exception;
 use go\core\data\Model;
 use go\core\db\Query;
 use go\core\exception\Forbidden;
+use go\core\util\DateTime;
 
 /**
  * Settings model
@@ -129,7 +130,11 @@ abstract class Settings extends Model
 					->execute();
 
 				while ($record = $stmt->fetch()) {
-					$this->{$record['name']} = $record['value'];
+					if($record['name'] === 'cronLastRun') {
+						$record['value'] = new DateTime($record['value']);
+					} else {
+						$this->{$record['name']} = $record['value'];
+					}
 				}
 			}
 
