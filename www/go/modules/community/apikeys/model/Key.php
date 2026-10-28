@@ -37,6 +37,16 @@ class Key extends Entity {
 		return parent::internalSave();
 	}
 
+	public function historyLog(): bool|array
+	{
+		$log = parent::historyLog();
+		if (isset($log['accessToken'][0])) {
+			$log['accessToken'][0] = 'MASKED';
+		}
+		return $log;
+	}
+
+
 	protected static function internalDelete(Query $query): bool
 	{
 		$q = clone $query;
