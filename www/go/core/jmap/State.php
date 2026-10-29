@@ -92,7 +92,7 @@ class State extends AbstractState {
 		}
 
 		// if cookie is used then we must also check the CSRF token
-		$csrfToken = Request::get()->getHeader('X-CSRF-Token') ?: $_REQUEST['CSRFToken'] ?? null;
+		$csrfToken = self::getRequestCSRFToken();
 		if(!$csrfToken) {
 			go()->debug("'X-CSRF-Token' header or 'CSRFToken' request parameter missing");
 			return false;
@@ -105,10 +105,32 @@ class State extends AbstractState {
 
 		return true;
 	}
-	
-	/**	
+
+	private static function getRequestCSRFToken(): ?string
+	{
+		return Request::get()->getHeader('X-CSRF-Token') ?: $_REQUEST['CSRFToken'] ?? null;
+	}
+
+	/**
+	 * Check if the request carries the CSRF token of the access token as 'X-CSRF-Token' header or 'CSRFToken'
+	 * parameter. Also for GET requests.
 	 *
-	 * @var Token 
+	 * Used by the legacy controllers, which the GOUI client calls without the old session security token.
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function hasValidCSRFToken(): bool
+	{
+		$token = $this->getToken();
+		$csrfToken = self::getRequestCSRFToken();
+
+		return $token && isset($token->CSRFToken) && is_string($csrfToken) && hash_equals($token->CSRFToken, $csrfToken);
+	}
+
+	/**
+	 *
+	 * @var Token
 	 */
 	private $token;
 

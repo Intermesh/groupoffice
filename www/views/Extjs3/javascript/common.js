@@ -204,7 +204,14 @@ GO.url = function(relativeUrl, params){
 	if(!relativeUrl && !params)
 		return BaseHref;
 	
-	var url = BaseHref+'legacy.php?r='+relativeUrl+'&security_token='+GO.securityToken;
+	var url = BaseHref+'legacy.php?r='+relativeUrl;
+
+	// Links can't send the X-CSRF-Token header. The GOUI client has no legacy session token, only the CSRF token.
+	if(GO.securityToken) {
+		url += '&security_token='+GO.securityToken;
+	} else if(window.go && go.User && go.User.session && go.User.session.CSRFToken) {
+		url += '&CSRFToken='+encodeURIComponent(go.User.session.CSRFToken);
+	}
 	if(params){
 		for(var name in params){
 			url += '&'+name+'='+encodeURIComponent(params[name]);

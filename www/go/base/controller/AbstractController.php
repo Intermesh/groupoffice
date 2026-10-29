@@ -182,6 +182,8 @@ abstract class AbstractController extends Observable {
 	 *  1. Not in debug mode
 	 *  2. There's a logged in user.
 	 *  3. A route to a controller has been given. Because we don't want to block the default page when entered manually.
+	 *
+	 * The CSRF token of the JMAP access token is accepted too. The GOUI client doesn't have the session token.
      *
 	 * @throws SecurityTokenMismatch
 	 */
@@ -195,7 +197,8 @@ abstract class AbstractController extends Observable {
 			!GO::config()->debug &&
 			!GO::config()->disable_security_token_check &&
 			!empty($_REQUEST['r']) &&
-			(!isset($_REQUEST['security_token']) || $_REQUEST['security_token'] != GO::session()->values['security_token'])
+			(!isset($_REQUEST['security_token']) || $_REQUEST['security_token'] != GO::session()->values['security_token']) &&
+			!($state instanceof State && $state->hasValidCSRFToken())
 		) {
 			throw new SecurityTokenMismatch();
 		} else {
