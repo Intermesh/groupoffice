@@ -23,7 +23,6 @@ Depends:
 	zip,
 	tnef,
 	${misc:Depends},
-	${perl:Depends},
 	dbconfig-common,
 	dbconfig-mysql,
 	ucf (>= 0.28)
