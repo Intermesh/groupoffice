@@ -16,7 +16,8 @@
 # Requirements on the build server:
 #   git, composer (any PHP version, platform requirements are ignored), npm, debuild, reprepro, gpg, gh (logged in with
 #   "gh auth login" or GH_TOKEN in config.sh), SourceGuardian encoder and docker with buildx for linux/amd64
-#   and linux/arm64 (logged in with "docker login" or DOCKER_TOKEN in config.sh).
+#   and linux/arm64 (logged in with "docker login" or DOCKER_TOKEN in config.sh), mail (bsd-mailx or mailutils
+#   with a working MTA) to send the result to NOTIFY_EMAIL.
 #   To prepare multi platform builds:
 #
 #     docker run --privileged --rm tonistiigi/binfmt --install all
@@ -44,6 +45,7 @@ TEST_IMAGE="intermesh/groupoffice:latest"
 TEST_DB_IMAGE="mariadb:11.8"
 SF_USER="mschering"
 ENCODER=(/usr/local/share/sourceguardian/bin/sourceguardian --phpversion 8.2+)
+NOTIFY_EMAIL="info@intermesh.nl"
 PRO_MODULES=(gota documenttemplates savemailas professional tickets scanbox leavedays projects2 timeregistration2 hoursapproval2 pr2analyzer workflow filesearch assistant billing)
 
 if [[ -f "$BUILD_ROOT/config.sh" ]]; then
@@ -77,6 +79,52 @@ die() {
 	echo "ERROR: $*" >&2
 	exit 1
 }
+
+# Mails the result with the end of the log, so a failure can be seen without the terminal
+notify() {
+	local status=$1 subject
+
+	[[ -n "$NOTIFY_EMAIL" ]] || return 0
+
+	subject="GroupOffice ${VERSION:+$VERSION }$DISTRO build"
+	if [[ $status -eq 0 ]]; then
+		subject="$subject succeeded"
+	else
+		subject="$subject FAILED"
+	fi
+	if [[ "$TEST" == true ]]; then
+		subject="$subject (test)"
+	fi
+
+	{
+		echo "Host: $(hostname)"
+		echo "Branch: $BRANCH"
+		echo "Exit status: $status"
+		echo "Log: $LOG_FILE"
+		echo
+		tail -n 50 "$LOG_FILE"
+	} | mail -s "$subject" "$NOTIFY_EMAIL" || echo "Could not send mail to $NOTIFY_EMAIL" >&2
+}
+
+on_exit() {
+	local status=$?
+
+	cleanup_tests
+
+	# Restore the terminal and wait for tee, so the log is complete before it's mailed
+	exec 1>&3 2>&4
+	wait "$TEE_PID" 2>/dev/null || true
+
+	notify "$status"
+}
+
+# Write all output to a log file too, for the notification mail
+LOG_FILE="$BUILD_ROOT/deploy/build.log"
+mkdir -p "$BUILD_ROOT/deploy"
+exec 3>&1 4>&2
+exec > >(tee "$LOG_FILE") 2>&1
+TEE_PID=$!
+trap on_exit EXIT
 
 # Clone the repository if needed and update it to the latest commit of the branch
 update_repo() {
@@ -128,8 +176,6 @@ run_tests() {
 	# in the test container, not on the build server.
 	"$REPO_DIR/scripts/install-composer.sh" --ignore-platform-reqs "$PACKAGE_DIR"
 
-	trap cleanup_tests EXIT
-
 	docker pull "$TEST_IMAGE"
 	docker network create "$TEST_NETWORK" >/dev/null
 	docker run -d --name "$TEST_NETWORK-db" --network "$TEST_NETWORK" --network-alias db \
@@ -171,7 +217,6 @@ run_tests() {
 	"${phpunit[@]}" --bootstrap=tests/bootstrap-upgrade.php
 
 	cleanup_tests
-	trap - EXIT
 }
 
 # Encode PHP files in $SOURCE_DIR/<parent>/<name> into $PACKAGE_DIR/<target>

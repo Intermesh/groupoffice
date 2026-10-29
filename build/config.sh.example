@@ -13,3 +13,6 @@
 #ENCODER=(/usr/local/share/sourceguardian/bin/sourceguardian --phpversion 8.2+)
 #TEST_IMAGE="intermesh/groupoffice:latest"
 #DOCKER_PLATFORMS="linux/amd64,linux/arm64"
+
+# Mail the result of the build to this address. Empty to disable.
+#NOTIFY_EMAIL="info@intermesh.nl"
