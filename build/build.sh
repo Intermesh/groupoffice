@@ -112,13 +112,11 @@ cleanup_tests() {
 	docker network rm "$TEST_NETWORK" >/dev/null 2>&1 || true
 }
 
-# Runs phpunit on the open source checkout in a throwaway MariaDB and Group-Office container.
+# Runs phpunit on the package in a throwaway MariaDB and Group-Office container. The package must
+# have the composer dev packages installed. The tests come from the checkout as they are not packaged.
 # Runs twice like tools/phpunit: on a new install and on an upgraded database.
 run_tests() {
 	log "Running unit tests"
-
-	# PHP with the required extensions is only in the test container, not on the build server
-	"$REPO_DIR/scripts/install-composer.sh" --ignore-platform-reqs
 
 	trap cleanup_tests EXIT
 
@@ -137,11 +135,12 @@ run_tests() {
 		sleep 1
 	done
 
-	# Apache serves the checkout because tests/go/api requests http://localhost/api/.
+	# Apache serves the package because tests/go/api requests http://localhost/api/.
 	# The image entrypoint writes /etc/groupoffice/docker-config.php from the MYSQL_* variables.
 	docker run -d --name "$TEST_NETWORK-go" --network "$TEST_NETWORK" \
 		-e MYSQL_HOST=db -e MYSQL_USER=root -e MYSQL_PASSWORD=groupoffice -e MYSQL_DATABASE=groupoffice_phpunit \
-		-v "$REPO_DIR:/usr/local/share/src:ro" -v "$REPO_DIR/www:/usr/local/share/groupoffice:ro" \
+		-v "$PACKAGE_DIR:/usr/local/share/src/www:ro" -v "$REPO_DIR/tests:/usr/local/share/src/tests:ro" \
+		-v "$PACKAGE_DIR:/usr/local/share/groupoffice:ro" \
 		"$TEST_IMAGE" >/dev/null
 
 	echo "Waiting for web server..."
@@ -251,7 +250,7 @@ encode_pro_and_business() {
 	cp "$SOURCE_DIR/business/finance/model/RecurringPaymentProviderInterface.php" "$PACKAGE_DIR/go/modules/business/finance/model/"
 }
 
-build_tar() {
+build_package() {
 	log "Building $PACKAGE_NAME"
 
 	cp -r "$REPO_DIR/www/" "$PACKAGE_DIR"
@@ -261,6 +260,15 @@ build_tar() {
 	# npm ci builds the GOUI modules with their "prepare" script
 	"$REPO_DIR/scripts/install-npm.sh" "$PACKAGE_DIR"
 	(cd "$PACKAGE_DIR" && npm prune --omit=dev)
+
+	# Dev packages for the tests, build_tar removes them. PHP with the required extensions is only
+	# in the test container, not on the build server.
+	"$REPO_DIR/scripts/install-composer.sh" --ignore-platform-reqs "$PACKAGE_DIR"
+}
+
+build_tar() {
+	log "Creating $PACKAGE_NAME.tar.gz"
+
 	"$REPO_DIR/scripts/install-composer.sh" --no-dev "$PACKAGE_DIR"
 
 	cd "$PACKAGE_DIR"
@@ -385,12 +393,14 @@ PACKAGE_DIR="$BUILD_DIR/$PACKAGE_NAME"
 
 log "Building Group-Office $VERSION for $DISTRO from $BRANCH"
 
+rm -rf "$BUILD_DIR"
+mkdir -p "$BUILD_DIR"
+
+build_package
+
 if [[ "$SKIP_TESTS" == false ]]; then
 	run_tests
 fi
-
-rm -rf "$BUILD_DIR"
-mkdir -p "$BUILD_DIR"
 
 build_tar
 build_deb
