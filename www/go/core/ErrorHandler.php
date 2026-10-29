@@ -173,23 +173,31 @@ class ErrorHandler {
 	}
 
   /**
-   * Custom error handler that logs to our own error log
+   * Custom error handler that converts PHP errors into ErrorExceptions.
+   *
+   * Deprecations in third party code in a vendor folder are only logged. We can't fix them and they
+   * should not break GroupOffice when a new PHP version deprecates something.
    *
    * @param int $errno
    * @param string $errstr
    * @param string $errfile
    * @param int $errline
-   * @return void
+   * @return bool true when the error was handled without throwing
    * @throws ErrorException
    */
-	public static function errorHandler(int $errno, string $errstr, string $errfile, int $errline) {
+	public static function errorHandler(int $errno, string $errstr, string $errfile, int $errline): bool {
 
 		// do not use debug here because it will lead to a loop when error is thrown inside App::getConfig()
 		//go()->debug("ErrorHandler:errorHandler called $errno");
 
 		// check if error should be reported according to PHP settings
 		if (!(error_reporting() & $errno)) {
-		  return;
+		  return true;
+		}
+
+		if (($errno === E_DEPRECATED || $errno === E_USER_DEPRECATED) && str_contains($errfile, DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR)) {
+			error_log("PHP Deprecated: " . $errstr . " in " . $errfile . " on line " . $errline);
+			return true;
 		}
 
 		throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
