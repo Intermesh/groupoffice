@@ -131,5 +131,5 @@ $updates['202608311638'][] = "drop table sync_note_categories_user;";
 
 $updates['202608311638'][] = "drop table sync_tasklist_user;";
 
-$updates['202608311638'][] = "drop table sync_user_note_book;";
+$updates['202610141158'][] = "drop table sync_user_note_book;";
 
