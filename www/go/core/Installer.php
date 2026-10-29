@@ -515,6 +515,7 @@ class Installer {
 		go()->getCache()->flush(true, false);
 		GO::clearCache(); //legacy framework
 		go()->setCache(new None());
+		\GO\Base\Db\Columns::$forceLoad = true;
 		
 		$this->disableUnavailableModules();
 
