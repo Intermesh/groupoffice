@@ -3,6 +3,7 @@
 namespace go\modules\community\calendar\model;
 
 use go\core\auth\TemporaryState;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -81,9 +82,7 @@ class ICalendarHelperRoundTripTest extends TestCase
 		return array_combine($props, array_map(fn($p) => [$p], $props));
 	}
 
-	/**
-	 * @dataProvider timedProperties
-	 */
+	#[DataProvider('timedProperties')]
 	public function testTimedEventProperty(string $property): void
 	{
 		$original = $this->timedEvent();
@@ -114,9 +113,7 @@ class ICalendarHelperRoundTripTest extends TestCase
 		return array_combine($props, array_map(fn($p) => [$p], $props));
 	}
 
-	/**
-	 * @dataProvider allDayProperties
-	 */
+	#[DataProvider('allDayProperties')]
 	public function testAllDayEventProperty(string $property): void
 	{
 		$original = $this->allDayEvent();
