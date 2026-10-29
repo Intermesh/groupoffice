@@ -416,7 +416,7 @@ push_docker_image() {
 		tags=(-t "$DOCKER_IMAGE:latest" -t "$DOCKER_IMAGE:$MAJOR_VERSION" -t "$DOCKER_IMAGE:$VERSION")
 	fi
 
-	docker buildx build --push --pull --no-cache --platform "$DOCKER_PLATFORMS" \
+	docker buildx build --push --pull --platform "$DOCKER_PLATFORMS" \
 		--build-arg "VERSION=$VERSION" "${tags[@]}" "$docker_dir"
 }
 
