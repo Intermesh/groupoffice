@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Group-Office release script
+# GroupOffice release script
 #
 # Runs the unit tests, builds the tar.gz and Debian package and publishes them to
 # GitHub, the Debian repository, SourceForge and Docker Hub.
@@ -118,7 +118,7 @@ cleanup_tests() {
 	docker network rm "$TEST_NETWORK" >/dev/null 2>&1 || true
 }
 
-# Runs phpunit on the package in a throwaway MariaDB and Group-Office container.
+# Runs phpunit on the package in a throwaway MariaDB and GroupOffice container.
 # The tests come from the checkout as they are not packaged.
 # Runs twice like tools/phpunit: on a new install and on an upgraded database.
 run_tests() {
@@ -352,7 +352,7 @@ send_tar_to_sourceforge() {
 
 	# sftp instead of scp to create the folder on the first release of a major version.
 	# The "-" prefix ignores the error when it already exists.
-	local dir="/home/frs/project/group-office/$MAJOR_VERSION"
+	local dir="/home/frs/project/GroupOffice/$MAJOR_VERSION"
 	printf -- '-mkdir %s\nput %s %s/\n' "$dir" "$BUILD_DIR/$PACKAGE_NAME.tar.gz" "$dir" \
 		| sftp -b - "$SF_USER@frs.sourceforge.net"
 }
@@ -413,7 +413,7 @@ PACKAGE_NAME="groupoffice-$VERSION"
 BUILD_DIR="$BUILD_ROOT/deploy/build/$MAJOR_VERSION/$DISTRO"
 PACKAGE_DIR="$BUILD_DIR/$PACKAGE_NAME"
 
-log "Building Group-Office $VERSION for $DISTRO from $BRANCH"
+log "Building GroupOffice $VERSION for $DISTRO from $BRANCH"
 
 rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
@@ -437,4 +437,4 @@ add_to_debian_repository
 send_tar_to_sourceforge
 push_docker_image
 
-log "Released Group-Office $VERSION"
+log "Released GroupOffice $VERSION"
