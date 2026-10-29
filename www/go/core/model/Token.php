@@ -599,26 +599,46 @@ class Token extends Entity {
 		return self::delete($q);
 	}
 
-	public function setCookie() {
-		Response::get()->setCookie('accessToken', $this->accessToken, [
-			'expires' => 0,
-			"path" => "/",
-			"samesite" => "Lax", // strict not possible or oauth won't work as it will not send cookie on callback page
-			"secure" => Request::get()->isHttps(),
-			"domain" => Request::get()->getHost(),
-			"httpOnly" => true
-		]);
+	/**
+	 * Set the access token as httpOnly cookie
+	 *
+	 * The cookie is host-only (no domain attribute) so the browser only sends it to the host it was set for. A domain
+	 * attribute is rejected by browsers for "localhost" and may differ from the address bar behind a proxy. The
+	 * browser then keeps sending an old cookie, which results in a CSRF token mismatch.
+	 */
+	public function setCookie(): void
+	{
+		self::unsetLegacyDomainCookie();
+		Response::get()->setCookie('accessToken', $this->accessToken, self::cookieOptions(0));
 	}
 
-	public static function unsetCookie() {
-		Response::get()->setCookie('accessToken', "", [
-			'expires' => time() - 3600,
+	/**
+	 * Remove the access token cookie
+	 */
+	public static function unsetCookie(): void
+	{
+		self::unsetLegacyDomainCookie();
+		Response::get()->setCookie('accessToken', "", self::cookieOptions(time() - 3600));
+	}
+
+	/**
+	 * Older versions set the cookie with a domain attribute. The browser stores that as a separate cookie and sends
+	 * both, so it must be removed or it will be used instead of the new one.
+	 */
+	private static function unsetLegacyDomainCookie(): void
+	{
+		Response::get()->setCookie('accessToken', "", ['domain' => Request::get()->getHost()] + self::cookieOptions(time() - 3600));
+	}
+
+	private static function cookieOptions(int $expires): array
+	{
+		return [
+			'expires' => $expires,
 			"path" => "/",
 			"samesite" => "Lax", // strict not possible or oauth won't work as it will not send cookie on callback page
 			"secure" => Request::get()->isHttps(),
-			"domain" => Request::get()->getHost(),
 			"httpOnly" => true
-		]);
+		];
 	}
 	
 }

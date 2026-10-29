@@ -7,20 +7,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
 
-/**
- * Records the cookies instead of sending them
- */
-class CookieRecordingResponse extends Response
-{
-	public array $cookies = [];
-
-	public function setCookie(string $name, string $value, array $options = []): Response
-	{
-		$this->cookies[] = [$name, $value, $options];
-
-		return $this;
-	}
-}
+require_once __DIR__ . '/CookieRecordingResponse.php';
 
 class RememberMeCookieTest extends TestCase
 {
