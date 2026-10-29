@@ -121,15 +121,15 @@ $updates['202205191157'][] = "alter table sync_settings
     add allowDeletes boolean default false null;";
 
 
-$updates['202610141158'][] = "drop table sync_addressbook_user;";
+$updates['202610291332'][] = "drop table sync_addressbook_user;";
 
-$updates['202610141158'][] = "drop table sync_calendar_user;";
+$updates['202610291332'][] = "drop table sync_calendar_user;";
 
-$updates['202610141158'][] = "drop table sync_devices;";
+$updates['202610291332'][] = "drop table sync_devices;";
 
-$updates['202610141158'][] = "drop table sync_note_categories_user;";
+$updates['202610291332'][] = "drop table sync_note_categories_user;";
 
-$updates['202610141158'][] = "drop table sync_tasklist_user;";
+$updates['202610291332'][] = "drop table sync_tasklist_user;";
 
-$updates['202610141158'][] = "drop table sync_user_note_book;";
+$updates['202610291332'][] = "drop table sync_user_note_book;";
 
