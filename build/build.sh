@@ -263,7 +263,8 @@ build_package() {
 
 	# npm ci builds the GOUI modules with their "prepare" script
 	"$REPO_DIR/scripts/install-npm.sh" "$PACKAGE_DIR"
-	(cd "$PACKAGE_DIR" && npm prune --omit=dev)
+	# Without --ignore-scripts npm prune runs the "prepare" script of every workspace and builds all GOUI modules again
+	(cd "$PACKAGE_DIR" && npm prune --omit=dev --ignore-scripts --audit=false --fund=false)
 }
 
 build_tar() {
