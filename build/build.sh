@@ -343,7 +343,8 @@ add_to_debian_repository() {
 		cp "$SOURCE_DIR/debian-groupoffice/reprepro/distributions" "$REPREPRO_DIR/conf"
 	fi
 
-	reprepro -b "$REPREPRO_DIR" include "$DISTRO" "$BUILD_DIR/groupoffice_${VERSION}-${DISTRO}_amd64.changes"
+	# debuild -A builds the architecture independent package, so the changes file is _all, not _amd64
+	reprepro -b "$REPREPRO_DIR" include "$DISTRO" "$BUILD_DIR/groupoffice_${VERSION}-${DISTRO}_all.changes"
 }
 
 send_tar_to_sourceforge() {
