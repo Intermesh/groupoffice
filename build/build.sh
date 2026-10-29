@@ -350,7 +350,11 @@ add_to_debian_repository() {
 send_tar_to_sourceforge() {
 	log "Uploading to SourceForge"
 
-	scp "$BUILD_DIR/$PACKAGE_NAME.tar.gz" "$SF_USER@frs.sourceforge.net:/home/frs/project/group-office/$MAJOR_VERSION/"
+	# sftp instead of scp to create the folder on the first release of a major version.
+	# The "-" prefix ignores the error when it already exists.
+	local dir="/home/frs/project/group-office/$MAJOR_VERSION"
+	printf -- '-mkdir %s\nput %s %s/\n' "$dir" "$BUILD_DIR/$PACKAGE_NAME.tar.gz" "$dir" \
+		| sftp -b - "$SF_USER@frs.sourceforge.net"
 }
 
 # The Dockerfile downloads the tar.gz from the GitHub release, so this must run after github_release
