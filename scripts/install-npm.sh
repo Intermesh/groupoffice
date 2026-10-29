@@ -1,5 +1,9 @@
 #!/bin/bash
-# This script builds SASS, installs composer packages and build's the GOUI modules
+# This script installs the NPM packages, which builds the GOUI modules with their "prepare" script, and builds SASS
+#
+# Usage: install-npm.sh [www dir]
+#
+#   www dir  Directory to build in. Defaults to www of this checkout.
 
 set -e
 
@@ -10,11 +14,11 @@ cd $DIR/../;
 DIR="$(pwd)";
 
 echo Installing NPM packages
-cd "$DIR/www"
+cd "${1:-$DIR/www}"
 #npm up
 npm ci --prefer-offline --audit=false --progress=false --fund=false
 
-echo "Building SASS"
+echo "Building Extjs3 SASS"
 for line in $(find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*' | sort -r );
 do
   replace1=${line/src\/style.scss/style.css};

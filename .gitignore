@@ -3,8 +3,7 @@ forum
 .vscode
 .gitmodules
 /nbproject
-/build/vendor
-/build/config.php
+/build/config.sh
 /build/deploy
 /*-license.txt
 /www/*-license.txt
