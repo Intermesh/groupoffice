@@ -101,6 +101,12 @@ pull_source() {
 	git -C "$REPO_DIR" pull
 	git -C "$REPO_DIR" submodule update --init
 
+	# Remove all untracked and ignored files from www, so leftovers like removed submodules don't end up
+	# in the package. -ff also removes nested git repositories. The build doesn't need anything untracked
+	# there as composer and npm run in the package dir.
+	git -C "$REPO_DIR" clean -ffdx -- www
+	git -C "$REPO_DIR" submodule foreach --recursive git clean -ffdx
+
 	update_repo "$PRO_REPO" "$SOURCE_DIR/promodules" "$BRANCH"
 	update_repo "$BUSINESS_REPO" "$SOURCE_DIR/business" "$BRANCH"
 }
