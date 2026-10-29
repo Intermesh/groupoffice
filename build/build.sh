@@ -112,11 +112,15 @@ cleanup_tests() {
 	docker network rm "$TEST_NETWORK" >/dev/null 2>&1 || true
 }
 
-# Runs phpunit on the package in a throwaway MariaDB and Group-Office container. The package must
-# have the composer dev packages installed. The tests come from the checkout as they are not packaged.
+# Runs phpunit on the package in a throwaway MariaDB and Group-Office container.
+# The tests come from the checkout as they are not packaged.
 # Runs twice like tools/phpunit: on a new install and on an upgraded database.
 run_tests() {
 	log "Running unit tests"
+
+	# Dev packages for phpunit, build_tar removes them. PHP with the required extensions is only
+	# in the test container, not on the build server.
+	"$REPO_DIR/scripts/install-composer.sh" --ignore-platform-reqs "$PACKAGE_DIR"
 
 	trap cleanup_tests EXIT
 
@@ -260,10 +264,6 @@ build_package() {
 	# npm ci builds the GOUI modules with their "prepare" script
 	"$REPO_DIR/scripts/install-npm.sh" "$PACKAGE_DIR"
 	(cd "$PACKAGE_DIR" && npm prune --omit=dev)
-
-	# Dev packages for the tests, build_tar removes them. PHP with the required extensions is only
-	# in the test container, not on the build server.
-	"$REPO_DIR/scripts/install-composer.sh" --ignore-platform-reqs "$PACKAGE_DIR"
 }
 
 build_tar() {
