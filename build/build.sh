@@ -14,7 +14,7 @@
 #   --skip-tests  Skip the unit tests. Only for emergencies.
 #
 # Requirements on the build server:
-#   git, php 8.4, composer, npm, debuild, reprepro, gpg, gh (logged in with
+#   git, composer (any PHP version, platform requirements are ignored), npm, debuild, reprepro, gpg, gh (logged in with
 #   "gh auth login" or GH_TOKEN in config.sh), SourceGuardian encoder and docker with buildx for linux/amd64
 #   and linux/arm64 (logged in with "docker login" or DOCKER_TOKEN in config.sh).
 #   To prepare multi platform builds:
@@ -117,7 +117,8 @@ cleanup_tests() {
 run_tests() {
 	log "Running unit tests"
 
-	"$REPO_DIR/scripts/install-composer.sh"
+	# PHP with the required extensions is only in the test container, not on the build server
+	"$REPO_DIR/scripts/install-composer.sh" --ignore-platform-reqs
 
 	trap cleanup_tests EXIT
 
@@ -374,7 +375,8 @@ fi
 
 pull_source
 
-VERSION="$(php -r 'echo require $argv[1];' "$REPO_DIR/www/version.php")"
+VERSION="$(sed -nE 's/^return "([0-9.]+)";/\1/p' "$REPO_DIR/www/version.php")"
+[[ -n "$VERSION" ]] || die "Could not read the version from www/version.php"
 MAJOR_VERSION="${VERSION%.*}"
 TAG="v$VERSION"
 PACKAGE_NAME="groupoffice-$VERSION"
