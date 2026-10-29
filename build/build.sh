@@ -377,7 +377,8 @@ fi
 
 # fail before the build instead of after it when publishing would fail
 if [[ "$TEST" == false ]]; then
-	if ! gh auth status --hostname github.com >/dev/null 2>&1; then
+	if ! gh_status="$(gh auth status --hostname github.com 2>&1)"; then
+		echo "$gh_status" >&2
 		die "gh is not logged in to GitHub. Run \"gh auth login\" or set GH_TOKEN in config.sh."
 	fi
 
