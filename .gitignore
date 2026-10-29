@@ -4,6 +4,7 @@ forum
 .gitmodules
 /nbproject
 /build/config.sh
+/build/config.php
 /build/deploy
 /*-license.txt
 /www/*-license.txt

@@ -2,7 +2,7 @@
 
 # GitHub token for creating releases, if you don't want to use "gh auth login".
 # Fine-grained token for Intermesh/groupoffice with permission Contents: Read and write.
-#export GH_TOKEN="github_pat_..."
+# export GH_TOKEN=""
 
 # Docker Hub login for pushing the image, if you don't want to use "docker login".
 # Create a personal access token with Read & Write access on hub.docker.com.
