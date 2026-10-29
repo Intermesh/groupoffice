@@ -305,7 +305,14 @@ groupoffice ($VERSION-$DISTRO) $DISTRO; urgency=medium
 EOF
 
 	cp -r "$PACKAGE_DIR"/* "$deb_dir/usr/share/groupoffice"
-	(cd "$deb_dir" && debuild --no-lintian -A)
+	# debuild signs the .changes and .buildinfo files, not the .deb. A test build is never uploaded to the
+	# repository, so it doesn't need signing and can still be installed with apt or dpkg.
+	local sign=()
+	if [[ "$TEST" == true ]]; then
+		sign=(-us -uc)
+	fi
+
+	(cd "$deb_dir" && debuild --no-lintian "${sign[@]}" -A)
 }
 
 github_release() {
@@ -364,7 +371,9 @@ push_docker_image() {
 }
 
 # dummy sign just to enter the GPG password at the start
-gpg --clear-sign -o- /dev/null >/dev/null
+if [[ "$TEST" == false ]]; then
+	gpg --clear-sign -o- /dev/null >/dev/null
+fi
 
 # fail before the build instead of after it when publishing would fail
 if [[ "$TEST" == false ]]; then
