@@ -90,7 +90,7 @@ go.Modules = (function () {
 
 			const module = window.groupofficeCore.modules.get(package, name);
 
-			if(!module) {
+			if(!module || !module.enabled) {
 				return false;
 			}
 
