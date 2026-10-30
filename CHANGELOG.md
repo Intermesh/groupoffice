@@ -1,4 +1,6 @@
+30-10-2026: 6.6.185
 - Core: Don't require security token check in legacy API when not using cookies for authentication
+- Core: fixed upgrade on mysql 8.4
 
 06-05-2024: 6.6.184
 - ActiveSync: Some email messages that were out of the date range specified could be sent
