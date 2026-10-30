@@ -162,7 +162,7 @@ pull_source() {
 TEST_NETWORK="go-build-test-$$"
 
 cleanup_tests() {
-	docker rm -f "$TEST_NETWORK-go" "$TEST_NETWORK-db" >/dev/null 2>&1 || true
+	docker rm -f -v "$TEST_NETWORK-go" "$TEST_NETWORK-db" >/dev/null 2>&1 || true
 	docker network rm "$TEST_NETWORK" >/dev/null 2>&1 || true
 }
 
