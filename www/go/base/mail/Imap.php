@@ -224,7 +224,7 @@ class Imap extends ImapBodyStruct
 			if (!empty($response)) {
 				$end = array_pop($response);
 				if (substr($end, 0, strlen('A' . $this->command_count . ' OK')) == 'A' . $this->command_count . ' OK') {
-					if (!stream_socket_enable_crypto($this->handle, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
+					if (!stream_socket_enable_crypto($this->handle, true, STREAM_CRYPTO_METHOD_ANY_CLIENT)) {
 						throw new \Exception("Failed to enable TLS on socket");
 					}
 				} else {
