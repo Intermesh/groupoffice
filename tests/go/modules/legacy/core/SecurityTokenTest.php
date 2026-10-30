@@ -23,6 +23,7 @@ class SecurityTokenTest extends TestCase
 	private array $cookie;
 	private bool $debug;
 	private bool $disableCheck;
+	private ?string $sessionToken;
 
 	/** @var Token[] */
 	private array $tokens = [];
@@ -35,6 +36,7 @@ class SecurityTokenTest extends TestCase
 		$this->cookie = $_COOKIE;
 		$this->debug = (bool) \GO::config()->debug;
 		$this->disableCheck = (bool) \GO::config()->disable_security_token_check;
+		$this->sessionToken = \GO::session()->values['security_token'] ?? null;
 
 		// the check is skipped in debug mode
 		\GO::config()->debug = false;
@@ -52,6 +54,11 @@ class SecurityTokenTest extends TestCase
 		$_COOKIE = $this->cookie;
 		\GO::config()->debug = $this->debug;
 		\GO::config()->disable_security_token_check = $this->disableCheck;
+		if (isset($this->sessionToken)) {
+			\GO::session()->values['security_token'] = $this->sessionToken;
+		} else {
+			unset(\GO::session()->values['security_token']);
+		}
 		$this->setCookieAccessTokenUsed(false);
 		Request::destroy();
 		go()->setAuthState($this->authState);
@@ -148,7 +155,9 @@ class SecurityTokenTest extends TestCase
 	public function testSessionSecurityTokenIsAccepted()
 	{
 		$this->loginWithCookie($this->createToken(User::ID_SUPER_ADMIN));
-		$_REQUEST['security_token'] = \GO::session()->values['security_token'];
+		// Set it explicitly: other tests may have cleared the session, removing the token Session::start() created
+		\GO::session()->values['security_token'] = 'session-security-token';
+		$_REQUEST['security_token'] = 'session-security-token';
 
 		$this->checkSecurityToken();
 		$this->addToAssertionCount(1);
