@@ -1,7 +1,6 @@
 <?php
 require_once('vendor/autoload.php');
 use go\core\App;
-use go\core\model\Module;
 
 App::get();
 $baseUrl = \go\core\http\Request::get()->getFullUrl()  ;
@@ -19,23 +18,39 @@ $baseUrl = \go\core\http\Request::get()->getFullUrl()  ;
     <script type="importmap">
 		<?php
 
-        $gouiScript = "node_modules/@intermesh/goui/dist/index.js";
-        $coreScript = "node_modules/@intermesh/groupoffice-core/dist/index.js";
-        $importMap = [
-                "@intermesh/goui" => $baseUrl.$gouiScript ."?v=" . filemtime(__DIR__ . '/' . $gouiScript),
-                "@intermesh/groupoffice-core" => $baseUrl.$coreScript . "?v=" . filemtime(__DIR__ . '/' . $coreScript)
-        ];
+        // Relative paths are cached, because the base URL depends on the request. Not cached when debugging, so
+        // rebuilt scripts get a new version straight away. Upgrades and installs flush the cache.
+        $importMap = go()->getDebugger()->enabled ? null : go()->getCache()->get("gouiImportMap");
 
-        $mods = Module::find()->where(['enabled' => true]);
+        if(!$importMap) {
+            $gouiScript = "node_modules/@intermesh/goui/dist/index.js";
+            $coreScript = "node_modules/@intermesh/groupoffice-core/dist/index.js";
+            $importMap = [
+                    "@intermesh/goui" => $gouiScript ."?v=" . filemtime(__DIR__ . '/' . $gouiScript),
+                    "@intermesh/groupoffice-core" => $coreScript . "?v=" . filemtime(__DIR__ . '/' . $coreScript)
+            ];
 
-        foreach($mods as $mod) {
+            // All modules on disk, not only installed ones, because code may import from a module that is not installed.
+            // Legacy modules in "modules/" use the "legacy" package in their specifier, eg. "@intermesh/legacy-email".
+            $scripts = array_merge(
+                    glob(__DIR__ . "/go/modules/*/*/views/goui/dist/Index.js") ?: [],
+                    glob(__DIR__ . "/modules/*/views/goui/dist/Index.js") ?: []
+            );
 
-            $gouiScript = $mod->module()->getFolder()->getFile("views/goui/dist/Index.js");
+            foreach($scripts as $script) {
+                $relativePath = substr($script, strlen(__DIR__) + 1);
+                $parts = explode("/", $relativePath);
+                $specifier = $parts[0] == "go" ? $parts[2] . "-" . $parts[3] : "legacy-" . $parts[1];
 
-            if($gouiScript->exists()) {
-                $importMap["@intermesh/" . ($mod->package ?? "legacy") . "-" . $mod->name] = $baseUrl . $gouiScript->getRelativePath(go()->getEnvironment()->getInstallFolder()) ."?v=" . $gouiScript->getModifiedAt()->format("U");
+                $importMap["@intermesh/" . $specifier] = $relativePath . "?v=" . filemtime($script);
+            }
+
+            if(!go()->getDebugger()->enabled) {
+                go()->getCache()->set("gouiImportMap", $importMap);
             }
         }
+
+        $importMap = array_map(fn($url) => $baseUrl . $url, $importMap);
 
         ?>
         {
