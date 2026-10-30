@@ -165,7 +165,7 @@ class Apcu implements CacheInterface {
 			$http->setOption(CURLOPT_SSL_VERIFYPEER, false);
 
 			try {
-				$http->get(go()->getSettings()->URL . '/install/clearcache.php');
+				$http->get(go()->getSettings()->URL . '/install/clearapcu.php');
 			}catch(\Throwable $e) {
 				ErrorHandler::logException($e, "Failed to clear APCu cache via http request");
 			}
