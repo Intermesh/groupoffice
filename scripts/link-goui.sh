@@ -22,13 +22,13 @@ cd ../
 mkdir -p links
 cd  links
 
-sync_repo "git@github.com:Intermesh/goui.git"
+#sync_repo "git@github.com:Intermesh/goui.git"
 cd goui
 npm install
 npm link
 
 cd ..
-sync_repo "git@github.com:Intermesh/groupoffice-core.git"
+#sync_repo "git@github.com:Intermesh/groupoffice-core.git"
 cd  groupoffice-core
 git checkout develop
 #npm install
