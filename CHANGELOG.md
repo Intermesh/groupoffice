@@ -1,3 +1,4 @@
+- Core: west panel flyout had incorrect background color in dark mode
 - Finance: require document to be "Sent" (sentAt != null) to be included in statements
 - Finance: Add customer filter to payments
 - Notes: Write notes in Markdown. New notes can switch between the HTML and Markdown editor and the default editor can be set in the notes settings. Existing notes keep their type.
