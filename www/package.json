@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@intermesh/goui": "latest",
-    "@intermesh/groupoffice-core": "^2.0.9",
+    "@intermesh/groupoffice-core": "^2.0.10",
     "pdfjs-dist": "latest"
   },
   "allowScripts": {
