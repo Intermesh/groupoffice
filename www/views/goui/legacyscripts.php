@@ -45,9 +45,17 @@ foreach(readScriptsTxt(go()->getEnvironment()->getInstallFolder() . '/views/Extj
 	$scripts[] = new File($s);
 }
 
+foreach(readScriptsTxt(go()->getEnvironment()->getInstallFolder() . '/go/core/views/extjs3/scripts.txt', go()->getEnvironment()->getInstallFolder() . "/go/core/views/extjs3/") as $s) {
+	$scripts[] = new File($s);
+}
+
 $load_modules = GO::modules()->getAllModules(true);
 if (!empty($load_modules))
 foreach ($load_modules as $module) {
+
+	if($module->name === "core") {
+		continue;
+	}
 
 	$pkg = $module->package ? $module->package : "legacy";
 	$scripts[] = 'Ext.ns("'.($module->package ? 'go.modules.' . $module->package . '.' . $module->name : 'GO.' . $module->name).'"); '.
