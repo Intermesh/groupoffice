@@ -126,12 +126,7 @@ $updates['202109301005'][] = "ALTER TABLE `tasks_category`
 ADD COLUMN `tasklistId` INT(11) NULL DEFAULT NULL AFTER `ownerId`,
 ADD INDEX `tasks_category_tasklist_ibfk_9_idx` (`tasklistId` ASC);";
 
-$updates['202109301006'][] = "ALTER TABLE `tasks_category`
-ADD CONSTRAINT `tasks_category_tasklist_ibfk_9`
-  FOREIGN KEY (`tasklistId`)
-  REFERENCES `tasks_tasklist` (`createdBy`)
-  ON DELETE CASCADE;";
-
+$updates['202109301006'][] = "";
 
 $updates['202111251126'][] = "alter table tasks_category drop foreign key tasks_category_ibfk_1;";
 

@@ -231,6 +231,7 @@ CREATE TABLE IF NOT EXISTS `tasks_tasklist_group` (
   `tasklistId` INT(11) UNSIGNED NOT NULL,
   `progressChange` TINYINT(2) NULL,
   PRIMARY KEY (`id`, `tasklistId`),
+  UNIQUE INDEX `tasks_tasklist_group_id_uindex` (`id` ASC),
   INDEX `fk_tasks_column_tasks_tasklist1_idx` (`tasklistId` ASC),
   CONSTRAINT `fk_tasks_column_tasks_tasklist1`
     FOREIGN KEY (`tasklistId`)
