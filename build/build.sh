@@ -183,11 +183,16 @@ run_tests() {
 
 	echo "Waiting for database..."
 	local i
-	for i in $(seq 1 60); do
+	for i in $(seq 1 120); do
 		if docker exec "$TEST_NETWORK-db" healthcheck.sh --connect --innodb_initialized >/dev/null 2>&1; then
 			break
 		fi
-		[[ $i -eq 60 ]] && die "Database did not start"
+		# on_exit removes the container, so show why it failed first
+		if [[ $i -eq 120 || "$(docker inspect -f '{{.State.Running}}' "$TEST_NETWORK-db" 2>/dev/null)" != true ]]; then
+			docker ps -a --filter "name=$TEST_NETWORK-db" --format '{{.Names}}: {{.Status}}'
+			docker logs --tail 50 "$TEST_NETWORK-db" 2>&1
+			die "Database did not start"
+		fi
 		sleep 1
 	done
 
