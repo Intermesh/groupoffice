@@ -396,7 +396,7 @@ send_tar_to_sourceforge() {
 
 	# sftp instead of scp to create the folder on the first release of a major version.
 	# The "-" prefix ignores the error when it already exists.
-	local dir="/home/frs/project/GroupOffice/$MAJOR_VERSION"
+	local dir="/home/frs/project/group-office/$MAJOR_VERSION"
 	printf -- '-mkdir %s\nput %s %s/\n' "$dir" "$BUILD_DIR/$PACKAGE_NAME.tar.gz" "$dir" \
 		| sftp -b - "$SF_USER@frs.sourceforge.net"
 }
