@@ -407,7 +407,7 @@ push_docker_image() {
 	log "Building and pushing Docker image"
 
 	local docker_dir="$SOURCE_DIR/docker-groupoffice"
-	update_repo "$DOCKER_REPO" "$docker_dir" master
+	update_repo "$DOCKER_REPO" "$docker_dir" testing
 
 	local tags=()
 	if [[ "$DISTRO" == "testing" ]]; then
