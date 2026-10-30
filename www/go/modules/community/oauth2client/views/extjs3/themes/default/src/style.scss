@@ -1,0 +1,45 @@
+.oauth2client-login-Azure:before {
+	margin-top: 0 !important;
+	float: left;
+	content: " ";
+	background-image:url('images/microsoft.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+	height: 21px !important;
+	width: 21px !important;
+}
+
+.oauth2client-login-Google:before {
+	content: " ";
+	margin-top: 0 !important;
+	float: left;
+	background-image:url('images/google.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+	height: 21px !important;
+	width: 21px !important;
+}
+
+.go-module-icon-openid {
+	content: " ";
+	margin-top: 0 !important;
+	float: left;
+	background-image:url('images/openid.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+	height: 21px !important;
+	width: 21px !important;
+}
+
+.oauth2client-signin-btn {
+	margin-top: 24px;
+}
+
+.oauth2client-signin-btn + .oauth2client-signin-btn {
+	margin-top: 8px;
+}
+
+.oauth2client-signin-btn + hr {
+	margin-top: 24px;
+	margin-bottom: 24px;
+}
