@@ -53,4 +53,24 @@ class ZipTest extends TestCase
 		sort($entries);
 		$this->assertEquals($names, $entries);
 	}
+
+	public function testHiddenFilesInFoldersAreAdded()
+	{
+		// like an unpacked .docx file, which needs _rels/.rels
+		$files = $this->folder->createChild('docx', false);
+		$files->create();
+		$rels = $files->createChild('_rels', false);
+		$rels->create();
+		$rels->createChild('.rels')->putContents('test');
+		$files->createChild('[Content_Types].xml')->putContents('test');
+
+		$archive = $this->folder->createChild('test.docx');
+		Zip::create($archive, $files, $files->ls());
+
+		$zip = new \ZipArchive();
+		$this->assertTrue($zip->open($archive->path()));
+		$this->assertNotFalse($zip->locateName('_rels/.rels'));
+		$this->assertNotFalse($zip->locateName('[Content_Types].xml'));
+		$zip->close();
+	}
 }
