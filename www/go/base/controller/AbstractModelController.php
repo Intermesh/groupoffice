@@ -79,28 +79,8 @@ class AbstractModelController extends AbstractController {
 					//where 1 is the id of the model
 
 					$linkProps = explode(':', $params['link']);			
-					$linkModel = \GO::getModel($linkProps[0])->findByPk($linkProps[1]);
+					$linkModel = $this->getRequestedModel($linkProps[0])->findByPk($linkProps[1]);
 					$model->link($linkModel);			
-				}
-
-				if(!empty($_FILES['importFiles'])){
-
-					$attachments = $_FILES['importFiles'];
-					$count = count($attachments['name']);
-
-					$params['enclosure'] = $params['importEnclosure'];
-					$params['delimiter'] = $params['importDelimiter'];
-
-					for($i=0;$i<$count;$i++){
-						if(is_uploaded_file($attachments['tmp_name'][$i])) {
-							$params['file']= $attachments['tmp_name'][$i];
-							//$params['model'] = $params['importModel'];
-
-							$controller = new $params['importController'];
-
-							$controller->run("import",$params,false);
-						}
-					}
 				}
 
 
