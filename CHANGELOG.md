@@ -1,6 +1,7 @@
 - Files: Fixed security issue where logged in user could read any contact name
 - Core: permissionLevel filter: the admin-only guard on permissionLevelUserId / permissionLevelGroups never fires #1593
 - API keys: mask the key in the history log
+- Core: Fixed security issue where static methods could be called from the web
 
 28-09-2026: 6.8.179
 - Email: fixed backtrack limit exhausted error in emails external resource blocker
