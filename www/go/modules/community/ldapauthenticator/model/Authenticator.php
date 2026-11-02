@@ -76,6 +76,12 @@ class Authenticator extends PrimaryAuthenticator
 	 */
 	public function authenticate(string $username, string $password): bool|User
 	{
+		// A bind with a valid DN and an empty password is an "unauthenticated bind" (RFC 4513 5.1.2) that succeeds
+		// without checking a password when the server allows it.
+		if ($password === '') {
+			go()->debug("Empty password");
+			return false;
+		}
 
 		list($ldapUsername, $domain) = $this->splitUserName($username);
 
