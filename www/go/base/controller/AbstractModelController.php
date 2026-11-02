@@ -1090,11 +1090,12 @@ class AbstractModelController extends AbstractController {
 		}
 		
 		$mergeModels = json_decode($params['merge_models'], true);
-		
-		$targetModel = \GO::getModel($params['model_name'])->findByPk($params['target_model_id']);
-		
+
+		$model = $this->getRequestedModel($params['model_name']);
+		$targetModel = $model->findByPk($params['target_model_id']);
+
 		foreach($mergeModels as $id){
-			$mergeModel = \GO::getModel($params['model_name'])->findByPk($id);
+			$mergeModel = $model->findByPk($id);
 			$targetModel->mergeWith($mergeModel, !empty($params['merge_attributes']), !empty($params['delete_merge_models']));			
 		}
 		
