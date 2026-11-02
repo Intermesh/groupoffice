@@ -22,8 +22,33 @@
 
 namespace GO\Core\Controller;
 
+use GO\Base\Db\ActiveRecord;
+use GO\Base\Exception\AccessDenied;
 
 class BatchEditController extends \GO\Base\Controller\AbstractController {
+
+	/**
+	 * Get the model for the class name given by the client.
+	 *
+	 * Only models protected by an ACL may be edited. Models without an ACL pass every permission check in
+	 * ActiveRecord, so only admins may edit them.
+	 *
+	 * @param string $modelName
+	 * @return ActiveRecord
+	 * @throws AccessDenied
+	 */
+	private function getModel(string $modelName): ActiveRecord {
+		if(!class_exists($modelName) || !is_subclass_of($modelName, ActiveRecord::class)) {
+			throw new AccessDenied();
+		}
+
+		$model = $modelName::model();
+		if(!$model->aclField() && !\GO::user()->isAdmin()) {
+			throw new AccessDenied();
+		}
+
+		return $model;
+	}
 
 	/**
 	 * Update the given id's with the given data
@@ -44,7 +69,7 @@ class BatchEditController extends \GO\Base\Controller\AbstractController {
 		
 		$keys = json_decode($params['keys'], true);
 
-		$modelClass = $this->getRequestedModel($params['model_name']);
+		$modelClass = $this->getModel($params['model_name']);
 
 		if(is_array($keys)) {
 			foreach($keys as $key) {
@@ -164,7 +189,7 @@ class BatchEditController extends \GO\Base\Controller\AbstractController {
 		
 		$mergeableTypes = array('textfield', 'textarea');
 		
-		$this->getRequestedModel($params['model_name']);
+		$this->getModel($params['model_name']);
 		$tmpModel = new $params['model_name']();
 		$columns = $tmpModel->getColumns();
 		

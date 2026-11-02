@@ -60,7 +60,7 @@ class RequestedModelPermissionTest extends TestCase
 		for ($i = 0; $i < 2; $i++) {
 			$export = new SavedExport();
 			$export->name = 'test ' . $i;
-			$export->class_name = 'test';
+			$export->class_name = RequestedModelTestExport::class;
 			$export->view = 'Csv';
 			$export->export_columns = 'id';
 			$this->assertTrue($export->save(true));
