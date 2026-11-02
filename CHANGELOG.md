@@ -20,6 +20,7 @@
 - Core: Security: templates (labels, e-mail, PDF and newsletter templates) could read any database table, including password hashes, and could show items the user has no permission to see. The "selectTable", "select" and "where" template filters have been removed, so templates that use them must be changed. "find", "entity" and "findEntity" now only return items the user may read.
 - Core: Security: exports and saved exports accepted any PHP class name from the client, so a logged-in user could make the server create objects of any class.
 - Core: Security: legacy forms accepted an unused "importController" option that a logged-in user could use to run other controllers, for example to start a projects migration.
+- Site: Security: removed file uploads on the website ticket pages. The upload address was open to anyone without logging in.
 
 26-10-2026: 26.0.56
 - Core: Security: CardDAV/CalDAV clients that search the user directory (like eM Client) were shown names and e-mail addresses of all users that are visible to them for any search text, and also of matching users they have no permission to see. eM Client showed these as recipient suggestions.
