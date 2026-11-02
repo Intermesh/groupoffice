@@ -48,7 +48,7 @@ class Router
 	 * @throws JsonException
 	 * @throws Exception
 	 */
-	public function run(?array $requests = null) {
+	public function run(?array $requests = null, bool $output = true) {
 
 		if(!isset($requests)) {
 			$requests = Request::get()->getBody();
@@ -58,8 +58,10 @@ class Router
 			$this->callMethod($method);
 		}
 
-		Response::get()->sendHeaders();
-		Response::get()->output();
+		if($output) {
+			Response::get()->sendHeaders();
+			Response::get()->output();
+		}
 	}
 
 	/**
