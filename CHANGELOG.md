@@ -2,7 +2,23 @@
 - Core: Fixed security issue where static methods could be called from the web
 - Core: fix Entity/export with ids exports records the user may not read
 - Core: Security: on installations that log in users with LDAP, anyone who knew a username could log in as that user over CalDAV, CardDAV and WebDAV with an empty password if the LDAP server allows "unauthenticated binds". This gave access to the user's calendars, address books and files, also when the user has two-factor authentication. Active Directory may allow these binds by default; OpenLDAP doesn't unless configured to. The web login and ActiveSync were not affected. Empty passwords are now always rejected. We also recommend disabling unauthenticated binds on your LDAP server. If you can't update right away, enable "Force app passwords" in System settings > Authentication to block this.
-
+- Core: Don't use eval() in export columns
+- Core: Security: a logged-in user could use batch edit, merge and link requests, to change records that have no permissions of their own. Batch edit is now limited to records that are protected by permissions, except for admins.
+- Site: Security: a user with access to the site module could run PHP code on the server by giving site content a crafted title.
+- Pr2analyzer: Security: a user with access to the project time report could run PHP code on the server.
+- Billing: Security: a user with access to billing could run PHP code on the server when adding products as items.
+- Legacy calendar time tracking: Security: a user who can name projects or tasks could run PHP code on the server when time tracking of an event was opened.
+- Savemailas: Security: a logged-in user could download any folder on the server as a zip file, including other users' files, through the "zip of attachments" link of a saved e-mail. Attachment names starting with "-" could also be passed to the zip command as options.
+- Core: Security: file names starting with "-", like e-mail attachment names, could be passed to the zip command as options when PHP's ZipArchive is not installed.
+- Core: Security: templates (labels, e-mail, PDF and newsletter templates) could read any database table, including password hashes, and could show items the user has no permission to see. The "selectTable", "select" and "where" template filters have been removed, so templates that use them must be changed. "find", "entity" and "findEntity" now only return items the user may read.
+- Core: Security: exports and saved exports accepted any PHP class name from the client, so a logged-in user could make the server create objects of any class.
+- Core: Security: legacy forms accepted an unused "importController" option that a logged-in user could use to run other controllers, for example to start a projects migration.
+- Site: Security: removed file uploads on the website ticket pages. The upload address was open to anyone without logging in.
+- Core: Security: legacy imports could read and change any file on the server that the web server may write, for example other users' files. Over the web only uploaded files can be imported now.
+- Core: Security: the JMAP API could call constructors and classes that are not API controllers, in some cases without logging in.
+- Documenttemplates: Security: file names inside an uploaded template could be passed to the zip command as options.
+- Core: zipping a folder left out hidden files in subfolders when PHP's ZipArchive was used.
+- 
 26-10-2026: 25.0.114
 - Files: Fixed security issue where logged in user could read any contact name
 - Core: permissionLevel filter: the admin-only guard on permissionLevelUserId / permissionLevelGroups never fires #1593
