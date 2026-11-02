@@ -4,11 +4,9 @@
 namespace GO\Site\Controller;
 
 
-use GO\Site\Widget\Plupload\Widget;
-
 class FrontController extends \GO\Site\Components\Controller {
 	protected function allowGuests() {
-		return array('content','thumb','search','ajaxwidget', 'sitemap');
+		return array('content','thumb','search', 'sitemap');
 	}
 	
 	protected function actionContent($params){
