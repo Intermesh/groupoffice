@@ -433,4 +433,5 @@ If you did not request a new password please delete this mail.',
   'Table' => 'Table',
   'Preview' => 'Preview',
   'Failed to upload {name}' => 'Failed to upload {name}',
+  'Invalid export type' => 'Invalid export type',
 );
