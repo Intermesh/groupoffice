@@ -8,6 +8,7 @@
 - Calendar: Fixed EXCEPTION: ErrorException: Uninitialized string offset 0 in vendor/sabre/vobject/lib/DateTimeParser.php
 - Core: Fixed security issue where static methods could be called from the web
 - Core: fix Entity/export with ids exports records the user may not read
+- Core: Security: on installations that log in users with LDAP, anyone who knew a username could log in as that user over CalDAV, CardDAV and WebDAV with an empty password if the LDAP server allows "unauthenticated binds". This gave access to the user's calendars, address books and files, also when the user has two-factor authentication. Active Directory may allow these binds by default; OpenLDAP doesn't unless configured to. The web login and ActiveSync were not affected. Empty passwords are now always rejected. We also recommend disabling unauthenticated binds on your LDAP server. If you can't update right away, enable "Force app passwords" in System settings > Authentication to block this.
 
 26-10-2026: 26.0.56
 - Core: Security: CardDAV/CalDAV clients that search the user directory (like eM Client) were shown names and e-mail addresses of all users that are visible to them for any search text, and also of matching users they have no permission to see. eM Client showed these as recipient suggestions.
