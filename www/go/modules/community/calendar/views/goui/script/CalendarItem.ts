@@ -1050,6 +1050,7 @@ export class CalendarItem {
 	}
 
 	remove() {
+
 		if(!this.mayChange && !this.mayMove) {
 			if(this.cal.myRights.mayWriteAll && !this.isOwner) {
 				// this is an invite
@@ -1057,10 +1058,16 @@ export class CalendarItem {
 			}
 			return;
 		}
-		if(!this.isOwner && this.mayMove && this.isRecurring) {
+		if(!this.isOwner && this.calendarPrincipal && !this.isDeclined) {
+			// Removing an invite declines it. The event is kept, so opening the invitation again does not add it back in.
+			// Declined events are hidden unless "Show events that you have declined" is on, where they can be deleted.
+			if(!this.isRecurring) {
+				this.updateParticipation("declined");
+				return;
+			}
 			const w = win({title: t('This event is part of a recurring invite'), modal: true, width: 540,},
 				comp({cls:'pad',
-					html: t('Do you want to decline this occurrence or remove the entire series from your calendar?'),
+					html: t('Do you want to decline this occurrence or the entire series?'),
 				}),tbar({},
 					btn({
 						text: t('Decline this instance'),
@@ -1071,15 +1078,23 @@ export class CalendarItem {
 							w.close();
 						}
 					}),'->',btn({
-						text: t('Remove entire series'), // the series
-						handler: _b => { this.removeSeries(); w.close(); }
+						text: t('Decline entire series'),
+						handler: _b => {
+							this.calendarPrincipal!.participationStatus = 'declined';
+							this.patchSeries({participants: this.participants});
+							w.close();
+						}
 					})
 				)
 			)
 			w.show();
+			return;
 		}
 
-		if(!this.isRecurring) {
+		if(!this.isOwner && this.isRecurring) {
+			// an already declined recurring invite
+			this.removeSeries();
+		} else if(!this.isRecurring) {
 			this.confirmScheduleMessage(false, () => {
 				eventDS.destroy(this.data.id).catch(e => Window.error(e))
 				Object.values(this.divs).forEach(d => d.remove())
