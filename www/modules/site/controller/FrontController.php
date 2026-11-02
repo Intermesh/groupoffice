@@ -4,6 +4,8 @@
 namespace GO\Site\Controller;
 
 
+use GO\Site\Widget\Plupload\Widget;
+
 class FrontController extends \GO\Site\Components\Controller {
 	protected function allowGuests() {
 		return array('content','thumb','search','ajaxwidget', 'sitemap');
@@ -112,23 +114,13 @@ class FrontController extends \GO\Site\Components\Controller {
 	/**
 	 * Post to this action to execute a function inside a widget
 	 * Using an AJAX call this the controller action
-	 * 
-	 * @param array $params
-	 * - string widget_class eg. 'GO\Site\Widget\Plupload\Widget'
-	 * - string widget_method name of the widgets static method eg. 'upload'
-	 * @throws Exception when not all required parameters are supplied
+	 *
+	 *
+	 * @deprecated Only used for the upload page for the tickets module. The site module will be phased out
 	 */
 	protected function actionAjaxWidget($params){
-		if(!isset($params['widget_class']))
-			throw new \Exception ('Widget class not given.');
-		
-		if(!isset($params['widget_method']))
-			throw new \Exception('Widget method not given.');
-			
-		$widgetClassName = $params['widget_class'];
-		$widgetMethod = $params['widget_method'];
-				
-		$response = $widgetClassName::$widgetMethod($params);
+
+		$response = Widget::upload($params);
 
 		echo $response;
 	}
