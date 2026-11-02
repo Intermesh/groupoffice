@@ -1,3 +1,4 @@
+- Core: Security: files and folders created by GroupOffice in the data directory (/var/lib/groupoffice), such as ActiveSync state, cached scripts and user files, could be world-writable (0666/0777) because Group-Office set the umask to 0. Other local accounts on the server could modify them. Group-Office now uses the umask of the web server or PHP-FPM (usually 0022). file_create_mode and folder_create_mode in config.php still apply to the files module. Existing files keep their permissions; fix them with: find /var/lib/groupoffice -xdev -perm -o+w ! -type l -exec chmod o-w {} +
 - Core: west panel flyout had incorrect background color in dark mode
 - Finance: require document to be "Sent" (sentAt != null) to be included in statements
 - Finance: Add customer filter to payments
