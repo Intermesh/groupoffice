@@ -57,7 +57,7 @@ class MenuItemController extends \GO\Base\Controller\AbstractJsonController {
 		$model = $this->_loadModel($menu_id,$id);
 		
 		if(!empty($model->content_id))
-			$remoteComboFields['content_id']=$model->content->title;
+			$remoteComboFields['content_id']=var_export($model->content->title, true);
 		
 		echo $this->renderForm($model,$remoteComboFields);
 	}
@@ -138,7 +138,7 @@ class MenuItemController extends \GO\Base\Controller\AbstractJsonController {
 		$model = $this->_loadModel($menu_id,$id);
 		
 		if(!empty($model->content_id))
-			$remoteComboFields['content_id']=$model->content->title;
+			$remoteComboFields['content_id']=var_export($model->content->title, true);
 		
 		if(\GO\Base\Util\Http::isPostRequest()){
 			$model->setAttributes($_POST);
