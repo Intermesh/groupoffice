@@ -18,7 +18,8 @@
 - Core: Security: the JMAP API could call constructors and classes that are not API controllers, in some cases without logging in.
 - Documenttemplates: Security: file names inside an uploaded template could be passed to the zip command as options.
 - Core: zipping a folder left out hidden files in subfolders when PHP's ZipArchive was used.
-- 
+- Core: Security: files and folders created by GroupOffice in the data directory (/var/lib/groupoffice), such as ActiveSync state, cached scripts and user files, could be world-writable (0666/0777) because Group-Office set the umask to 0. Other local accounts on the server could modify them. Group-Office now uses the umask of the web server or PHP-FPM (usually 0022). file_create_mode and folder_create_mode in config.php still apply to the files module. Existing files keep their permissions; fix them with: find /var/lib/groupoffice -xdev -perm -o+w ! -type l -exec chmod o-w {} +
+ 
 26-10-2026: 25.0.114
 - Files: Fixed security issue where logged in user could read any contact name
 - Core: permissionLevel filter: the admin-only guard on permissionLevelUserId / permissionLevelGroups never fires #1593
