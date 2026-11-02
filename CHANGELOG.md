@@ -1,4 +1,5 @@
 - API keys: mask access token in the history log
+- Core: Fixed security issue where static methods could be called from the web
 
 26-10-2026: 25.0.114
 - Files: Fixed security issue where logged in user could read any contact name
