@@ -21,6 +21,8 @@
 - Core: Security: exports and saved exports accepted any PHP class name from the client, so a logged-in user could make the server create objects of any class.
 - Core: Security: legacy forms accepted an unused "importController" option that a logged-in user could use to run other controllers, for example to start a projects migration.
 - Site: Security: removed file uploads on the website ticket pages. The upload address was open to anyone without logging in.
+- Core: Security: legacy imports could read and change any file on the server that the web server may write, for example other users' files. Over the web only uploaded files can be imported now.
+- Core: Security: the JMAP API could call constructors and classes that are not API controllers, in some cases without logging in.
 
 26-10-2026: 26.0.56
 - Core: Security: CardDAV/CalDAV clients that search the user directory (like eM Client) were shown names and e-mail addresses of all users that are visible to them for any search text, and also of matching users they have no permission to see. eM Client showed these as recipient suggestions.
