@@ -53,10 +53,10 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 
 		foreach ($fromLinks as $fromLink) {
 			
-			$fromModel = GO::getModel($fromLink['model_name'])->findByPk($fromLink['model_id']);
+			$fromModel = $this->getRequestedModel($fromLink['model_name'])->findByPk($fromLink['model_id']);
 
 			foreach ($toLinks as $toLink) {
-				$model = GO::getModel($toLink['model_name'])->findByPk($toLink['model_id']);
+				$model = $this->getRequestedModel($toLink['model_name'])->findByPk($toLink['model_id']);
 				$fromModel->link($model, $params['description'], $from_folder_id, $to_folder_id);
 			}
 		}
@@ -67,16 +67,16 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 	}
 	
 	protected function actionUnlink($params){
-		$linkedModel1 = GO::getModel($params['model_name1'])->findByPk($params['id1']);				
-		$linkedModel2 = GO::getModel($params['model_name2'])->findByPk($params['id2']);			
+		$linkedModel1 = $this->getRequestedModel($params['model_name1'])->findByPk($params['id1']);
+		$linkedModel2 = $this->getRequestedModel($params['model_name2'])->findByPk($params['id2']);
 		$linkedModel1->unlink($linkedModel2);	
 		
 		return array('success'=>true);
 	}
 	
 	protected function actionUpdateLink($params){
-		$model1 = GO::getModel($params['model_name1'])->findByPk($params['model_id1']);
-		$model2 = GO::getModel($params['model_name2'])->findByPk($params['model_id2']);
+		$model1 = $this->getRequestedModel($params['model_name1'])->findByPk($params['model_id1']);
+		$model2 = $this->getRequestedModel($params['model_name2'])->findByPk($params['model_id2']);
 		$model1->updateLink($model2, array('description'=>$params['description']));
 		$model2->updateLink($model1, array('description'=>$params['description']));
 		
@@ -819,7 +819,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 	
 	public function actionPasteUpload($model_id, $model_name, $filename, $filetype){
 		
-		$site = GO::getModel($model_name)->findByPk($model_id);
+		$site = $this->getRequestedModel($model_name)->findByPk($model_id);
 		
 		
 		$type = explode('/', $filetype);
