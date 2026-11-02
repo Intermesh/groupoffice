@@ -154,6 +154,13 @@ class Router
 	{
 		$parts = explode('/', $method);
 
+		// The parts are used for the class name, so a "\" could route to any class
+		foreach ($parts as $part) {
+			if (!preg_match('/^[a-z0-9_]+$/i', $part)) {
+				throw new Exception(400, 'Bad request. Invalid method "' . $method . '"');
+			}
+		}
+
 		if (count($parts) == 2) {
 			//eg. "note/query"
 			$entityType = EntityType::findByName($parts[0]);
@@ -195,11 +202,18 @@ class Router
 			$controllerClass = 'go\\modules\\' . implode('\\', $parts);
 		}
 
-		if (!class_exists($controllerClass)) {
+		// Controllers in a "cli" namespace are for the command line only and are run by the CLI router. Never route to them here.
+		if (stripos('\\' . $controllerClass . '\\', '\\cli\\') !== false) {
 			throw new Exception(400, 'Bad request. Controller "' . $controllerClass . '"  not found');
 		}
 
-		if (!method_exists($controllerClass, $controllerMethod)) {
+		// Only JMAP controllers authenticate the user in their constructor
+		if (!class_exists($controllerClass) || !is_subclass_of($controllerClass, \go\core\Controller::class)) {
+			throw new Exception(400, 'Bad request. Controller "' . $controllerClass . '"  not found');
+		}
+
+		// Magic methods like __construct are public too
+		if (str_starts_with($controllerMethod, '__') || !method_exists($controllerClass, $controllerMethod)) {
 			throw new Exception(400, 'Bad request. Method "' . $controllerMethod . '" not found in controller "' . $controllerClass . '".');
 		}
 
@@ -316,11 +330,11 @@ class Router
 				}
 				return $ret;
 			}
-			
+
 			if(is_object($result)) {
 				$result = $result->jsonSerialize();
 			}
-			
+
 			if (!is_array($result) || !array_key_exists($part, $result)) {
 				throw new InvalidResultReference("Could not resolve path part " . $part);
 			}
