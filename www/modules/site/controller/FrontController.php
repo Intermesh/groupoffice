@@ -110,19 +110,4 @@ class FrontController extends \GO\Site\Components\Controller {
 		$c = new \GO\Core\Controller\CoreController();
 		return $c->run('thumb', $params, true, false);
 	}
-	
-	/**
-	 * Post to this action to execute a function inside a widget
-	 * Using an AJAX call this the controller action
-	 *
-	 *
-	 * @deprecated Only used for the upload page for the tickets module. The site module will be phased out
-	 */
-	protected function actionAjaxWidget($params){
-
-		$response = Widget::upload($params);
-
-		echo $response;
-	}
-	
 }

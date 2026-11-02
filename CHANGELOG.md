@@ -6,6 +6,7 @@
 - API keys: mask access token in the history log
 - Projects3: Only show projects2 migrate button to admin users
 - Calendar: Fixed EXCEPTION: ErrorException: Uninitialized string offset 0 in vendor/sabre/vobject/lib/DateTimeParser.php
+- Core: Fixed security issue where static methods could be called from the web
 
 26-10-2026: 26.0.56
 - Core: Security: CardDAV/CalDAV clients that search the user directory (like eM Client) were shown names and e-mail addresses of all users that are visible to them for any search text, and also of matching users they have no permission to see. eM Client showed these as recipient suggestions.
