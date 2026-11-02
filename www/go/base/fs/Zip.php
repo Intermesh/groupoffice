@@ -90,8 +90,9 @@ class Zip {
 	}
 
 	private static function _zipDir(Folder $dir, \ZipArchive $zip, $relative_path) {
-		
-		$items = $dir->ls();
+
+		// Include hidden files like the zip command does. Office documents need _rels/.rels
+		$items = $dir->ls(true);
 		if(count($items)){
 			foreach($items as $item){
 				if ($item->isFile()) {
