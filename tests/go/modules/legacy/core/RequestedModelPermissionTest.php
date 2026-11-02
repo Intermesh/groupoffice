@@ -12,6 +12,14 @@ use GO\Core\Controller\CoreController;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
+class RequestedModelTestExport extends \GO\Base\Model\AbstractExport
+{
+	public function getSupportedViews()
+	{
+		return [self::VIEW_CSV];
+	}
+}
+
 /**
  * Legacy controllers that take the model class from the request may only use models without an ACL for admins,
  * because those models pass every permission check in ActiveRecord.
@@ -52,7 +60,7 @@ class RequestedModelPermissionTest extends TestCase
 		for ($i = 0; $i < 2; $i++) {
 			$export = new SavedExport();
 			$export->name = 'test ' . $i;
-			$export->class_name = 'test';
+			$export->class_name = RequestedModelTestExport::class;
 			$export->view = 'Csv';
 			$export->export_columns = 'id';
 			$this->assertTrue($export->save(true));
