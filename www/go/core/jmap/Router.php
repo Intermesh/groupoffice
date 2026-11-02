@@ -166,6 +166,13 @@ class Router
 	{
 		$parts = explode('/', $method);
 
+		// The parts are used for the class name, so a "\" could route to any class
+		foreach ($parts as $part) {
+			if (!preg_match('/^[a-z0-9_]+$/i', $part)) {
+				throw new Exception(400, 'Bad request. Invalid method "' . $method . '"');
+			}
+		}
+
 		if (count($parts) == 2) {
 			//eg. "note/query"
 			$entityType = EntityType::findByName($parts[0]);
@@ -232,11 +239,13 @@ class Router
 			throw new Exception(400, 'Bad request. Controller "' . $controllerClass . '"  not found');
 		}
 
-		if (!class_exists($controllerClass)) {
+		// Only JMAP controllers authenticate the user in their constructor
+		if (!class_exists($controllerClass) || !is_subclass_of($controllerClass, \go\core\Controller::class)) {
 			throw new Exception(400, 'Bad request. Controller "' . $controllerClass . '"  not found');
 		}
 
-		if (!method_exists($controllerClass, $controllerMethod)) {
+		// Magic methods like __construct are public too
+		if (str_starts_with($controllerMethod, '__') || !method_exists($controllerClass, $controllerMethod)) {
 			throw new Exception(400, 'Bad request. Method "' . $controllerMethod . '" not found in controller "' . $controllerClass . '".');
 		}
 
