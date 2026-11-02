@@ -25,6 +25,7 @@
 - Core: Security: the JMAP API could call constructors and classes that are not API controllers, in some cases without logging in.
 - Documenttemplates: Security: file names inside an uploaded template could be passed to the zip command as options.
 - Core: zipping a folder left out hidden files in subfolders when PHP's ZipArchive was used.
+- Calendar: Improved month print view
 
 26-10-2026: 26.0.56
 - Core: Security: CardDAV/CalDAV clients that search the user directory (like eM Client) were shown names and e-mail addresses of all users that are visible to them for any search text, and also of matching users they have no permission to see. eM Client showed these as recipient suggestions.
