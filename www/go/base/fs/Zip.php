@@ -73,7 +73,8 @@ class Zip {
 
 			$cmdSources = array();
 			for ($i = 0; $i < count($sources); $i++) {
-				$cmdSources[$i] = escapeshellarg(str_replace($workingFolder->path() . '/', '', $sources[$i]->path()));
+				// "./" so names starting with "-" are not read as options
+				$cmdSources[$i] = escapeshellarg('./' . str_replace($workingFolder->path() . '/', '', $sources[$i]->path()));
 			}
 
 			$cmd = \GO::config()->cmd_zip . ' -r ' . escapeshellarg($archiveFile->path()) . ' ' . implode(' ', $cmdSources);
