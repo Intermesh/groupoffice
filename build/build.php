@@ -210,7 +210,7 @@ class Builder
 	{
 		cd($this->buildDir . "/" . $this->packageName);
 		run("npm ci --prefer-offline --audit=false --progress=false --fund=false");
-		/*
+
 		cd("views/goui/goui");
 		run("npm ci --prefer-offline --audit=false --progress=false --fund=false");
 
@@ -218,9 +218,9 @@ class Builder
 		run("npm ci --prefer-offline --audit=false --progress=false --fund=false");
 
 		cd("../");
-		run("npm ci --prefer-offline --audit=false --progress=false --fund=false");*/
-		cd("views/goui");
-        run("npm run build");
+		run("npm ci --prefer-offline --audit=false --progress=false --fund=false");
+//		cd("views/goui");
+//        run("npm run build");
 
 	}
 
