@@ -44,6 +44,9 @@ DOCKER_PLATFORMS="linux/amd64,linux/arm64"
 TEST_IMAGE="intermesh/groupoffice:latest"
 TEST_DB_IMAGE="mariadb:11.8"
 SF_USER="mschering"
+# SSH key for PRO_REPO, BUSINESS_REPO and DOCKER_REPO (needs write access to DOCKER_REPO). Empty uses
+# the default SSH key or agent.
+GIT_SSH_KEY="/root/.ssh/groupoffice-deploy"
 ENCODER=(/usr/local/share/sourceguardian/bin/sourceguardian --phpversion 8.2+)
 NOTIFY_EMAIL="info@intermesh.nl"
 PRO_MODULES=(gota documenttemplates savemailas professional tickets scanbox leavedays projects2 timeregistration2 hoursapproval2 pr2analyzer workflow filesearch assistant billing)
@@ -126,17 +129,27 @@ exec > >(tee "$LOG_FILE") 2>&1
 TEE_PID=$!
 trap on_exit EXIT
 
+# Run git with GIT_SSH_KEY, so it doesn't depend on a forwarded SSH agent, which is gone when running in
+# a detached screen
+repo_git() {
+	if [[ -n "$GIT_SSH_KEY" ]]; then
+		GIT_SSH_COMMAND="ssh -i $GIT_SSH_KEY -o IdentitiesOnly=yes" git "$@"
+	else
+		git "$@"
+	fi
+}
+
 # Clone the repository if needed and update it to the latest commit of the branch
 update_repo() {
 	local url=$1 dir=$2 branch=$3
 
 	if [[ ! -d "$dir" ]]; then
-		git clone "$url" -b "$branch" "$dir"
+		repo_git clone "$url" -b "$branch" "$dir"
 	fi
 
-	git -C "$dir" fetch
+	repo_git -C "$dir" fetch
 	git -C "$dir" checkout "$branch"
-	git -C "$dir" pull
+	repo_git -C "$dir" pull
 }
 
 pull_source() {
@@ -414,6 +427,15 @@ push_docker_image() {
 
 	local docker_dir="$SOURCE_DIR/docker-groupoffice"
 	update_repo "$DOCKER_REPO" "$docker_dir" testing
+
+	# Set the default version in the Dockerfile so builds from the repository download this release
+	if [[ "$DISTRO" != "testing" ]]; then
+		sed -i "s/^ARG VERSION=.*/ARG VERSION=$VERSION/" "$docker_dir/Dockerfile"
+		if ! git -C "$docker_dir" diff --quiet -- Dockerfile; then
+			git -C "$docker_dir" commit -m "Version $VERSION" -- Dockerfile
+			repo_git -C "$docker_dir" push origin master
+		fi
+	fi
 
 	local tags=()
 	if [[ "$DISTRO" == "testing" ]]; then
