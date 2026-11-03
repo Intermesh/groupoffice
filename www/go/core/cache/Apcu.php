@@ -8,6 +8,7 @@ use Exception;
 use go\core\Environment;
 use go\core\ErrorHandler;
 use go\core\http\Client;
+use go\core\util\Crypt;
 
 /**
  * Cache implementation that uses serialized objects in files on disk.
@@ -165,6 +166,7 @@ class Apcu implements CacheInterface {
 			$http->setOption(CURLOPT_SSL_VERIFYPEER, false);
 
 			try {
+				$http->setHeader('X-GO-Cache-Token', Crypt::createInternalToken('clearapcu'));
 				$http->get(go()->getSettings()->URL . '/install/clearapcu.php');
 			}catch(\Throwable $e) {
 				ErrorHandler::logException($e, "Failed to clear APCu cache via http request");

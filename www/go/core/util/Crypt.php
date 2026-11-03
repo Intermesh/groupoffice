@@ -66,6 +66,49 @@ class Crypt {
 		}
 	}
 
+	/**
+	 * Create a short-lived token signed with the server key. The CLI uses it to authorize internal HTTP
+	 * requests to the web server, such as flushing the web server's cache.
+	 *
+	 * @param string $purpose What the token may be used for. Checked by verifyInternalToken().
+	 * @return string
+	 * @throws EnvironmentIsBrokenException
+	 * @throws BadFormatException
+	 */
+	public static function createInternalToken(string $purpose): string
+	{
+		return Crypto::encrypt($purpose . ':' . time(), self::getKey());
+	}
+
+	/**
+	 * Check a token created by createInternalToken().
+	 *
+	 * @param string $token The token sent by the client
+	 * @param string $purpose Must equal the purpose the token was created for
+	 * @param int $maxAge Maximum age of the token in seconds
+	 * @return bool
+	 */
+	public static function verifyInternalToken(string $token, string $purpose, int $maxAge = 60): bool
+	{
+		if ($token === '') {
+			return false;
+		}
+
+		try {
+			// Don't use decrypt() here. It returns unencrypted input as is.
+			$plaintext = Crypto::decrypt($token, self::getKey());
+		} catch (\Throwable $e) {
+			return false;
+		}
+
+		$parts = explode(':', $plaintext, 2);
+		if (count($parts) !== 2 || $parts[0] !== $purpose || !ctype_digit($parts[1])) {
+			return false;
+		}
+
+		return abs(time() - (int) $parts[1]) <= $maxAge;
+	}
+
 	private static $key;
 
 	/**
