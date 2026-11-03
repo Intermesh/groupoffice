@@ -140,6 +140,9 @@ if (!empty($_POST)) {
 
 		User::findById(1)->legacyOnSave();
 
+		// Log in the new administrator. The license page that follows requires an administrator.
+		(new core\auth\Authenticate())->setAuthenticated(User::findById(1));
+
         if(go()->getEnvironment()->hasIoncube() && \go\modules\business\license\model\License::isValid()) {
             header("Location: finished.php");
         } else {

@@ -7,6 +7,7 @@ use DateTimeZone;
 use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core\db\Query;
+use go\core\model\Acl;
 use go\core\fs\Blob;
 use go\core\model\User;
 use go\core\orm\Entity;
@@ -185,23 +186,7 @@ use function GO;
  * {{|find:User:username,displayName}}
  * ```
  *
- * @example select sum
- * ```
- * {{|find:User|select:"sum(loginCount) as total"|first|prop:total}}
- * ```
- *
- * @example Use variable
- * ```
- * {{|find:User:username|where:username:$username|first|prop:username}}';
- * ```
- *
- *
- * Select from sql table
- * ---------------------
- * @example
- * ```
- * {{|selectTable:pr2_income:"sum(amount) as amount"|where:project_id:$entity.id|first|prop:amount}}
- * ```
+ * Only entities the current user may read are returned.
  */
 class TemplateParser {	
 
@@ -258,9 +243,6 @@ class TemplateParser {
 		$this->addFilter('links', [$this, "filterLinks"]);
 		$this->addFilter('prop', [$this, "filterProp"]);
 		$this->addFilter('find', [$this, "filterFind"]);
-		$this->addFilter('selectTable', [$this, "filterSelectTable"]);
-		$this->addFilter('select', [$this, "filterSelect"]);
-		$this->addFilter('where', [$this, "filterWhere"]);
 
 
 		$this->addFilter('entityFiles', [$this, "filterEntityFiles"]);
@@ -420,7 +402,11 @@ class TemplateParser {
 		if($cls === "GO\Projects2\Model\Project") {
 			$cls .= "Entity";
 		}
-		return $cls::findById($id, !empty($properties) ? explode(",", $properties) : []);
+		$entity = $cls::findById($id, !empty($properties) ? explode(",", $properties) : []);
+		if(!$entity || !$entity->hasPermissionLevel(Acl::LEVEL_READ)) {
+			return null;
+		}
+		return $entity;
 	}
 
 	/**
@@ -450,7 +436,8 @@ class TemplateParser {
 		if (is_a($cls, ActiveRecord::class, true)) {
 			return $cls::model()->findByAttribute($key, $id);
 		} else {
-			return $cls::find($properties ?? [], true)->where([$key => $id])->all();
+			$query = $cls::find($properties ?? [], true)->where([$key => $id]);
+			return $cls::applyAclToQuery($query, Acl::LEVEL_READ)->all();
 		}
 	}
 
@@ -458,25 +445,15 @@ class TemplateParser {
 
 	private function filterFind(string $entityName, $properties = "") {
 		$et = EntityType::findByName($entityName);
+		if(!$et) {
+			return null;
+		}
 
 		$cls = $et->getClassName();
 
 		$props = empty($properties) ? [] : explode(",", $properties);
 
-		return $cls::find($props, true);
-	}
-
-
-	private function filterSelect(\go\core\db\Query $query, string $select) {
-		return $query->select($select)->fetchMode(\PDO::FETCH_ASSOC);
-	}
-
-	private function filterSelectTable(string $table, string $select = "*") {
-		return go()->getDbConnection()->select($select)->from($table)->fetchMode(\PDO::FETCH_ASSOC);
-	}
-
-	private function filterWhere(\go\core\db\Query $query, string $field, mixed $value, $comparator = '=') {
-		return $query->where($field, $comparator, $value);
+		return $cls::applyAclToQuery($cls::find($props, true), Acl::LEVEL_READ);
 	}
 
 	/**

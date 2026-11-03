@@ -520,11 +520,22 @@ class ICalendarHelper {
 				$event->setRecurrenceRule(self::parseRrule($vevent->RRULE, $event));
 				if(!empty($vevent->EXDATE)) {
 					foreach ($vevent->EXDATE as $exdate) {
-						$rId = $exdate->getDateTime()->format('Y-m-d\TH:i:s');
-						if(!isset($event->recurrenceOverrides[$rId])) {
-							$event->recurrenceOverrides[$rId] = new RecurrenceOverride($event);
+						// Some clients send an empty "EXDATE;TZID=Europe/Berlin:" which sabre can't parse
+						if(trim((string)$exdate) === '') {
+							continue;
 						}
-						$event->recurrenceOverrides[$rId]->setValues(['excluded'=>true]);
+						try {
+							$exdates = $exdate->getDateTimes(); // one EXDATE can hold multiple comma separated dates
+						} catch (VObject\InvalidDataException $e) {
+							continue;
+						}
+						foreach($exdates as $dt) {
+							$rId = $dt->format('Y-m-d\TH:i:s');
+							if(!isset($event->recurrenceOverrides[$rId])) {
+								$event->recurrenceOverrides[$rId] = new RecurrenceOverride($event);
+							}
+							$event->recurrenceOverrides[$rId]->setValues(['excluded'=>true]);
+						}
 					}
 				}
 			}

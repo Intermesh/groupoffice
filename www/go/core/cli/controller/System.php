@@ -24,6 +24,7 @@ use go\core\model\User;
 use go\core\orm\EntityType;
 use go\core\orm\exception\SaveException;
 use go\core\util\Cli;
+use go\core\util\Crypt;
 use go\core\util\DateTime;
 use go\core\util\JSON;
 use go\core\util\Markdown;
@@ -218,6 +219,7 @@ JSON;
 			$http->setOption(CURLOPT_SSL_VERIFYHOST, false);
 			$http->setOption(CURLOPT_SSL_VERIFYPEER, false);
 
+			$http->setHeader('X-GO-Cache-Token', Crypt::createInternalToken('clearcache'));
 			$response = $http->get(go()->getSettings()->URL . '/install/clearcache.php');
 			if($response['status'] != 200) {
 				echo "Failed to clear cache. Please run: '" .go()->getSettings()->URL . "install/' in the browser.\n";

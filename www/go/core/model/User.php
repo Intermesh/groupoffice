@@ -1368,9 +1368,14 @@ public function historyLog(): bool|array
 		
 		$this->contact = !$this->isNew() ? Contact::findForUser($this->id) : null;
 		if(!$this->contact) {
+
+			if(!$this->isFetched('email', 'displayName')) {
+				return null;
+			}
+
 			$this->contact = new Contact();
 			$this->contact->addressBookId = go()->getSettings()->userAddressBook()->id;
-			if(isset($this->email)) {
+			if(!empty($this->email)) {
 				$this->contact->emailAddresses[0] = (new EmailAddress($this->contact))->setValues(['email' => $this->email]);
 			}
 			$nameParts = explode(" ", $this->displayName);

@@ -734,8 +734,10 @@ class CalendarEvent extends AclItemEntity {
 	protected static function internalDelete(Query $query): bool
 	{
 
+		$declinedEventIds = [];
 		$events = CalendarEvent::find()->mergeWith(clone $query);
 		foreach ($events as $event) {
+			/** @var CalendarEvent $event */
 			if(!empty($event->participants)) {
 				$current = $event->calendarParticipant();
 				if(!empty($current) && $current->isOwner()) {
@@ -756,6 +758,14 @@ class CalendarEvent extends AclItemEntity {
 							}
 						}
 					}
+				} else if(!empty($current) && $current->participationStatus !== Participant::Declined) {
+					// Deleting the event from your own (or resource) calendar declines it. The participants are shared
+					// with the organizer's event, so store it also when no reply is sent ("Save only").
+					go()->getDbConnection()->update('calendar_participant',
+						['participationStatus' => Participant::Declined],
+						['eventId' => $event->eventId, 'id' => $current->pid()]
+					)->execute();
+					$declinedEventIds[] = $event->eventId;
 				}
 				if(self::$sendSchedulingMessages) {
 					Scheduler::handle($event, true);
@@ -782,6 +792,16 @@ class CalendarEvent extends AclItemEntity {
 		$success =  parent::internalDelete($query); // delete none recurring or complete series
 		if($success && !empty($calIds)) {
 			Calendar::updateHighestModSeq($calIds);
+		}
+		if($success && !empty($declinedEventIds)) {
+			// Let the organizer and other participants sync the declined status
+			foreach(array_unique($declinedEventIds) as $eventId) {
+				$remaining = CalendarEvent::find()->where('cce.eventId', '=', $eventId)->single();
+				if($remaining) {
+					$remaining->changeEventsWithSameUID();
+					$remaining->incrementCalendarModSeq();
+				}
+			}
 		}
 		return $success;
 	}

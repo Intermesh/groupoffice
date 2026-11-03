@@ -349,26 +349,59 @@ ID;
 	}
 
 
-	public function testFindSum() {
+	/**
+	 * Templates can be written by users, so they may not read database tables directly
+	 */
+	public function testSelectTableIsNotAvailable() {
 		$tplParser = new TemplateParser();
 
-		$totals= User::find()->selectSingleValue('sum(loginCount)')->single();
+		try {
+			$result = $tplParser->parse('{{|selectTable:core_auth_password:password|column:password|implode}}');
+		} catch (\Exception $e) {
+			$result = '';
+		}
 
-		$str = '{{|find:User:username|select:"sum(loginCount) as total"|first|prop:total}}';
-
-		$totalTpl = $tplParser->parse($str);
-
-		$this->assertEquals($totals, $totalTpl);
+		$this->assertEquals('', trim($result));
 	}
 
-	public function testFindWhere() {
-		$tplParser = new TemplateParser();
+	public function testFindAndEntityOnlyReturnReadableEntities() {
+		$authState = go()->getAuthState();
 
-		$tplParser->addModel('username', 'admin');
-		$str = '{{|find:User:username|where:username:$username|first|prop:username}}';
-		$result = $tplParser->parse($str);
+		$addressBook = new AddressBook();
+		$addressBook->name = uniqid("private");
+		$this->assertTrue($addressBook->save());
 
-		$this->assertEquals("admin", $result);
+		$name = uniqid('tplparser');
+		$user = new User();
+		$user->setValues([
+			'username' => $name,
+			'displayName' => $name,
+			'email' => $name . '@example.com',
+			'password' => 'Pa55word!!xyz'
+		]);
+		$this->assertTrue($user->save());
+
+		$findTpl = '{{|find:AddressBook:name|column:name|implode}}';
+		$entityTpl = '{{id|entity:AddressBook|prop:name}}';
+
+		try {
+			$tplParser = new TemplateParser();
+			$tplParser->addModel('id', $addressBook->id);
+			$this->assertStringContainsString($addressBook->name, $tplParser->parse($findTpl));
+			$this->assertEquals($addressBook->name, $tplParser->parse($entityTpl));
+
+			go()->setAuthState(new \go\core\auth\TemporaryState($user->id));
+			$this->assertFalse(AddressBook::findById($addressBook->id)->hasPermissionLevel(), 'The user may not read the address book');
+
+			$tplParser = new TemplateParser();
+			$tplParser->addModel('id', $addressBook->id);
+			$this->assertStringNotContainsString($addressBook->name, $tplParser->parse($findTpl));
+			$this->assertEquals('', $tplParser->parse($entityTpl));
+		} finally {
+			go()->setAuthState($authState);
+			AddressBook::delete(['id' => $addressBook->id]);
+			User::delete(['id' => $user->id]);
+		}
 	}
 
 

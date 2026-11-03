@@ -59,4 +59,33 @@ class RouterTest extends TestCase
 
 		$this->assertSame(['foo' => 'bar'], $response[1]);
 	}
+
+	public static function invalidMethods(): array
+	{
+		return [
+			// magic methods
+			['User/__construct'],
+			['community/notes/Note/__construct'],
+			// a "\" in the route could reach classes outside the controller namespace
+			['community/notes/controller\\Note/query'],
+		];
+	}
+
+	#[DataProvider('invalidMethods')]
+	public function testOnlyPublicControllerMethodsAreRouted(string $method)
+	{
+		[$output, $response] = $this->callRouter($method);
+
+		$this->assertSame('', $output, 'The controller method must not have run');
+		$this->assertSame('error', $response[0]);
+		$this->assertStringContainsString('Bad request', $response[1]['message']);
+	}
+
+	public function testControllerAuthenticates()
+	{
+		[, $response] = $this->callRouter('User/get');
+
+		$this->assertSame('error', $response[0]);
+		$this->assertStringContainsString('Unauthorized', $response[1]['message']);
+	}
 }

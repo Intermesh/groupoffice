@@ -2,11 +2,9 @@
 
 use go\core\App;
 use go\core\ErrorHandler;
-use go\core\db\Table;
-use go\core\event\EventEmitterTrait;
-use go\core\model\Module;
+use go\core\http\Response;
+use go\core\jmap\State;
 use go\modules\business\license\model\License;
-use go\modules\business\studio\Module as StudioModule;
 
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
@@ -28,10 +26,6 @@ try {
 
 	go()->setCache(new \go\core\cache\None());
 
-    // needed for invalid studio modules when upgrading for 6.5. They need to be patched before auto loaded by the event
-	// system.
-	go()->disableEvents();
-
 	require("gotest.php");
 	if(!systemIsOk()) {
 		header("Location: test.php");
@@ -43,6 +37,18 @@ try {
 		exit();
 	}
 
+	// When the database is up to date the upgrade may only be run again by an administrator
+	go()->setAuthState(new State());
+	if(!go()->getInstaller()->isUpgradeAllowed()) {
+		Response::get()->setStatus(403);
+		require('header.php');
+		echo "<section><div class=\"card\"><h2>" . go()->t("Upgrade Group-Office") . "</h2><p>" .
+			go()->t("The database is already up to date. Only an administrator can run the upgrade again. Please log in as an administrator first.") .
+			"</p></div></section>";
+		require('footer.php');
+		exit();
+	}
+
 	if(empty($_GET['skip_license'])) {
 		if (go()->getEnvironment()->hasIoncube() && !go()->getSettings()->licenseDenied && (empty(go()->getSettings()->license) || !License::isValid())) {
 			header("Location: license.php");
@@ -50,12 +56,7 @@ try {
 		}
 	}
 
-	if(go()->getDatabase()->hasTable("studio_studio")) {
-		$studioError = StudioModule::patch68to250();
-	}
 
-	// for moving wopi module
-	go()->getDbConnection()->exec("update core_module set package='community' where name='wopi'");
 
 	require('header.php');
 
@@ -75,10 +76,6 @@ try {
 	if (!isset($_GET['confirmed'])) {
 	
 		echo "<h2>". go()->t("Upgrade Group-Office") ."</h2><p>";
-
-		if(isset($studioError)) {
-			echo '<p class="error">'.$studioError.'</p>';
-		}
 
 		echo "Please <b>BACKUP</b> your database and files before proceeding. Your database is going to be upgraded and all caches will be cleared.<br />This operation can only be undone by restoring a backup.<br />";
 		
@@ -102,10 +99,6 @@ try {
 	
 		echo "<h2>". go()->t("Upgrade Group-Office") ."</h2>";
 
-		if(isset($studioError)) {
-			echo '<p class="error">'.$studioError.'</p>';
-		}
-
 		echo "<p>The following modules are not available because they're missing on disk\n"
 		. "or you've got an <b>invalid or missing license file</b>: </p>"
 		. "<ul><li>" . implode("</li><li>", array_map(function($a){return ($a['package'] ?? "legacy") .'/'.$a['name'];}, $unavailable)) . "</li></ul>\n"
@@ -124,18 +117,11 @@ try {
 
 		echo "<h2>". go()->t("Upgrade Group-Office") ."</h2><pre>";
 
-		if(isset($studioError)) {
-			echo '<p class="error">'.$studioError.'</p>';
-		}
-
-		go()->enableEvents();
 		go()->getInstaller()->upgrade();	
 
 		echo "</pre>";
 		echo '<a class="button right primary" href="../" onclick="document.getElementsByClassName(\'card\')[0].classList.add(\'mask\')">' . go()->t('Continue') . '</a>';
-
 		echo "</div>";
-
 
 		if(go()->getDebugger()->enabled) {
 			echo "<div style=\"clear:both;margin-bottom:20px;\"></div><div class=\"card\"><h2>Debugger output</h2><pre style=\"max-height: 600px; overflow:scroll;\">" ;

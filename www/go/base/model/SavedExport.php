@@ -30,5 +30,24 @@ class SavedExport extends ActiveRecord {
 	public function tableName() {
 		return 'go_saved_exports';
 	}
-	
+
+	public function validate() {
+		// The class is instantiated when exporting
+		if(!self::isExportClass($this->class_name)) {
+			$this->setValidationError('class_name', \GO::t("Invalid export type"));
+		}
+
+		return parent::validate();
+	}
+
+	/**
+	 * Check if the class name given by the client is an export class
+	 *
+	 * @param string|null $className
+	 * @return bool
+	 */
+	public static function isExportClass(?string $className): bool {
+		return !empty($className) && class_exists($className) && is_subclass_of($className, AbstractExport::class);
+	}
+
 }
