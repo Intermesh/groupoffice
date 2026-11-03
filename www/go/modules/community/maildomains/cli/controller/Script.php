@@ -149,11 +149,19 @@ final class Script extends Controller
 		}
 	}
 
-	private function exec(string $cmd): int {
+	/**
+	 * Run a shell command and throw an exception when it fails
+	 *
+	 * @param string $cmd
+	 * @param int[] $okCodes Exit codes that don't count as failure
+	 * @return int The exit code
+	 * @throws \Exception
+	 */
+	private function exec(string $cmd, array $okCodes = [0]): int {
 		echo "Running " . $cmd . "\n";
 		system($cmd, $return);
 
-		if ($return > 0) {
+		if (!in_array($return, $okCodes, true)) {
 			throw new \Exception("Command failed with status " . $return);
 		}
 
@@ -177,13 +185,16 @@ final class Script extends Controller
 	 *    .dovecot.sieve, .dovecot.lda-dupes, .dovecot.svbin and .customflags) back to the home directory.
 	 *    Files that don't exist are skipped.
 	 * 4. Sets the mailbox's maildir property to "example.com/user/Maildir/" and saves it.
+	 * 5. Flushes the Dovecot auth cache of the user, so Dovecot uses the new path right away.
 	 *
-	 * When done, the temporary folder is removed and Dovecot is reloaded. Mailboxes without a directory
-	 * on disk, or that were already converted, only get the new maildir path in the database.
+	 * Before a mailbox is moved, its IMAP and POP3 sessions are disconnected with "doveadm kick". Other
+	 * mailboxes stay available, so Dovecot doesn't need to be reloaded. When done, the temporary folder is
+	 * removed. Mailboxes without a directory on disk, or that were already converted, only get the new
+	 * maildir path in the database.
 	 *
-	 * Make a backup of /var/mail/vhosts first and run it at a quiet moment, because mail that is delivered
-	 * or read while a mailbox is being moved can fail. The Dovecot mail_location and home settings must match the
-	 * new layout (e.g. mail_location = maildir:~/Maildir). It must run as root because it moves files
+	 * Dovecot must take the mail location of each user from the maildir column in SQL, not from a global
+	 * mail_location setting. Make a backup of /var/mail/vhosts first. Mail delivered to a mailbox while it is
+	 * being moved can end up in the old location, so run it at a quiet moment. It must run as root because it moves files
 	 * owned by the vmail user. Every move is printed before it runs and the script stops at the first
 	 * one that fails. The error says where the mailbox was left if it is still in the temporary folder.
 	 *
@@ -252,6 +263,9 @@ final class Script extends Controller
 			} else if(!is_dir($home)) {
 				echo "Maildir does not exist\n";
 			} else {
+				// Disconnect the user so no IMAP or POP3 session uses the folder while it's moved.
+				// Exit code 68 means the user wasn't connected.
+				$this->exec("doveadm kick " . escapeshellarg($mailbox->username), [0, 68]);
 				$this->moveToMaildir($home, $maildir, $tmp . $localPart . '@' . $domain, $homeFiles);
 			}
 
@@ -259,13 +273,14 @@ final class Script extends Controller
 			if(!$mailbox->save()) {
 				throw new \Exception("Could not save mailbox " . $mailbox->username);
 			}
+
+			// Dovecot caches the user data from SQL. Flush it so the new path is used right away.
+			$this->exec("doveadm auth cache flush " . escapeshellarg($mailbox->username));
 		}
 
 		if(!rmdir($tmp)) {
 			echo "Warning: could not remove temporary folder " . $tmp . "\n";
 		}
-
-		$this->exec("systemctl reload dovecot");
 
 		echo "Done!\n";
 	}
