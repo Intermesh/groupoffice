@@ -1,4 +1,4 @@
-#!/usr/bin/env php7.4
+#!/usr/bin/env php8.4
 <?php
 
 use Github\Client;
@@ -171,6 +171,9 @@ class Builder
 
 		$this->buildNodeCore();
 		$this->buildNodeModules();
+        $this->cleanupNodeCore();
+
+        cd($this->buildDir . "/" . $this->packageName);
 
         putenv("COMPOSER_ALLOW_SUPERUSER=1");
 
@@ -206,22 +209,35 @@ class Builder
 	private function buildNodeCore()
 	{
 		cd($this->buildDir . "/" . $this->packageName);
+		run("npm ci --prefer-offline --audit=false --progress=false --fund=false");
+		/*
 		cd("views/goui/goui");
-		run("npm ci");
+		run("npm ci --prefer-offline --audit=false --progress=false --fund=false");
 
         cd("../groupoffice-core");
-		run("npm ci");
+		run("npm ci --prefer-offline --audit=false --progress=false --fund=false");
 
 		cd("../");
-		run("npm ci");
-		run("npm run build");
-		run("npm prune --omit=dev");
+		run("npm ci --prefer-offline --audit=false --progress=false --fund=false");*/
+		cd("views/goui");
+        run("npm run build");
 
-		cd("groupoffice-core");
-		run("npm prune --omit=dev");
-		cd("../goui");
-		run("npm prune --omit=dev");
 	}
+
+    private function cleanupNodeCore() {
+        cd($this->buildDir . "/" . $this->packageName);
+	run("npm prune --omit=dev");
+	/*
+        cd("views/goui");
+        run("npm prune --omit=dev");
+
+        cd("groupoffice-core");
+        run("npm prune --omit=dev");
+
+        cd("../goui");
+	run("npm prune --omit=dev");
+	 */
+    }
 
 
 	private function buildNodeModules()
@@ -236,10 +252,10 @@ class Builder
 		foreach ($packageFiles as $packageFile) {
 			$nodeDir = dirname($packageFile);
 			cd($nodeDir);
-			run("npm ci");
+			//run("npm ci --prefer-offline --audit=false --progress=false --fund=false");
 			run("pwd");
 			run("npm run build");
-			run("npm prune --omit=dev");
+			//run("npm prune --omit=dev");
 			cd($this->buildDir . "/" . $this->packageName);
 		}
 	}
@@ -325,10 +341,7 @@ class Builder
 		}
 
 		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/.git*');
-
-
 		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/kanban');
-		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/projects3');
 
 
 		//needs to be open source as it's used by Module files
