@@ -1,3 +1,6 @@
+- Core: The install/clearcache.php and install/clearapcu.php scripts can no longer be called anonymously. Only the CLI can    
+  trigger them.
+
 02-11-2026: 26.0.57
 - Calendar: Deleting an invitation from your calendar now declines it instead of removing it, so opening the invitation again does not add it back in. Declined invitations can still be deleted when "Show events that you have declined" is on.
 - Calendar: When a participant deleted an invitation, for example from a phone via CalDAV or with "Save only", the organizer still saw "needs action" for that participant. Deleting it now sets the participant to declined in the organizer's event.
