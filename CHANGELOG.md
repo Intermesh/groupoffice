@@ -1,3 +1,5 @@
+26-10-2026: 25.0.115
+
 - API keys: mask access token in the history log
 - Core: Fixed security issue where static methods could be called from the web
 - Core: fix Entity/export with ids exports records the user may not read
