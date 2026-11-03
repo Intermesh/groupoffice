@@ -1,4 +1,5 @@
 <?php
+
 namespace go\core\controller;
 
 use GO\Base\Model\Module;
@@ -8,44 +9,51 @@ use go\core\jmap\SetError;
 use go\core\orm\exception\SaveException;
 use go\core\util\ArrayObject;
 
-class ModuleInfo extends \go\core\Controller {
-	public function get($params) {
+class ModuleInfo extends \go\core\Controller
+{
+	public function get(array $params)
+	{
 
 		$col = new \GO\Base\ModuleCollection();
 
 		$mods = $col->getAvailableModules(true);
 
-		$list = array_map(function($m){return $m::get()->toArray();}, $mods);
+		$list = array_map(function ($m) {
+			return $m::get()->toArray();
+		}, $mods);
 
 		$list = array_merge($list, $this->getUnavailable());
 
-		if(!empty($params['ids'])) {
-			$list = array_values(array_filter($list, function($m) use ($params){return in_array($m['id'], $params['ids']);}));
+		if (!empty($params['ids'])) {
+			$list = array_values(array_filter($list, function ($m) use ($params) {
+				return in_array($m['id'], $params['ids']);
+			}));
 		}
 
 		return ["list" => $list];
 	}
 
-	private function getUnavailable() : array {
+	private function getUnavailable(): array
+	{
 		$installer = new Installer();
 
 		$mods = [];
-		foreach($installer->getUnavailableModules(null) as $unavailableModule) {
-			if(empty($unavailableModule['package'])) {
+		foreach ($installer->getUnavailableModules(null) as $unavailableModule) {
+			if (empty($unavailableModule['package'])) {
 				$unavailableModule['package'] = 'legacy';
 			}
 			$mods[] = [
 				'id' => $unavailableModule['package'] . "/" . $unavailableModule['name'],
-				'name'=> $unavailableModule['name'],
-				'package'=>$unavailableModule['package'],
+				'name' => $unavailableModule['name'],
+				'package' => $unavailableModule['package'],
 				'title' => $unavailableModule['name'],
-				'author'=> "Unknown",
-				'description'=> "",
-				'rights'=> [],
+				'author' => "Unknown",
+				'description' => "",
+				'rights' => [],
 				"status" => "unavailable",
-				'packageTitle'=> go()->t("Unavailable"),
+				'packageTitle' => go()->t("Unavailable"),
 
-				'enabled'=>$unavailableModule['enabled'],
+				'enabled' => $unavailableModule['enabled'],
 				'installed' => true,
 				'model' => null,
 				'available' => false,
@@ -58,18 +66,20 @@ class ModuleInfo extends \go\core\Controller {
 		return $mods;
 	}
 
-	public function query($params) {
+	public function query(array $params)
+	{
 		$col = new \GO\Base\ModuleCollection();
 
 		$mods = $col->getAvailableModules(true);
 
-		return ['ids' => array_map(function($m){
+		return ['ids' => array_map(function ($m) {
 			$i = $m::get();
 			return ($i->getPackage()) . "/" . $i->name();
-			}, $mods)];
+		}, $mods)];
 	}
 
-	public function set($params) {
+	public function set(array $params)
+	{
 
 		$result = new ArrayObject([
 			'created' => null,
@@ -80,36 +90,36 @@ class ModuleInfo extends \go\core\Controller {
 			'notDestroyed' => null,
 		]);
 
-		if(!empty($params['update'])) {
+		if (!empty($params['update'])) {
 			$result['updated'] = [];
-			foreach($params['update'] as $id => $props) {
+			foreach ($params['update'] as $id => $props) {
 				list($package, $name) = explode('/', $id);
 
 				$module = \go\core\model\Module::findByName($package, $name, null);
 
-				if(!$module && !empty($props['installed'])) {
+				if (!$module && !empty($props['installed'])) {
 					$module = $this->install($package, $name);
 				}
 
-				if($module && isset($props['installed']) && !$props['installed']) {
+				if ($module && isset($props['installed']) && !$props['installed']) {
 					$module->uninstall();
 					$result['updated'][$id] = null;
 					continue;
 				}
 
-				if(isset($props['enabled'])) {
+				if (isset($props['enabled'])) {
 					$module->enabled = $props['enabled'];
 				}
 
-				if(!empty($props['settings'])) {
+				if (!empty($props['settings'])) {
 					$module->getSettings()->setValues($props['settings']);
 				}
 
-				if(!empty($props['acl'])) {
+				if (!empty($props['acl'])) {
 					$module->setAcl($props['acl']);
 				}
 
-				if(!$module->save()) {
+				if (!$module->save()) {
 					throw new SaveException($module);
 				}
 
@@ -117,13 +127,13 @@ class ModuleInfo extends \go\core\Controller {
 			}
 		}
 
-		if(!empty($params['destroy'])) {
+		if (!empty($params['destroy'])) {
 			$result['destroyed'] = [];
 			foreach ($params['destroy'] as $id) {
 				list($package, $name) = explode('/', $id);
 
 				$module = \go\core\model\Module::findByName($package, $name, null);
-				if(!$module) {
+				if (!$module) {
 					$result['notDestroyed'][$id] = new SetError('notFound', go()->t("Item not found"));
 					continue;
 				}
@@ -133,13 +143,13 @@ class ModuleInfo extends \go\core\Controller {
 					if (class_exists($cls)) {
 
 						$mod = $cls::get();
-						if(!$mod->uninstall()) {
+						if (!$mod->uninstall()) {
 							throw new \Exception("Failed to uninstall module '" . $name . "'");
 						}
 					} else {
 						//remove from modules without uninstall
 						\go\core\model\Module::delete(['package' => $package, 'name' => $name]);
-						go()->debug(	\go\core\model\Module::$lastDeleteStmt);
+						go()->debug(\go\core\model\Module::$lastDeleteStmt);
 					}
 				} else {
 					$module = Module::model()->findByName($name);
@@ -155,9 +165,10 @@ class ModuleInfo extends \go\core\Controller {
 	}
 
 
-	private function install($package, $name) {
+	private function install(string $package, string $name)
+	{
 
-		if($package != "legacy") {
+		if ($package != "legacy") {
 			$cls = "go\\modules\\" . $package . "\\" . $name . "\Module";
 			if (!class_exists($cls)) {
 				throw new NotFound();
@@ -172,7 +183,6 @@ class ModuleInfo extends \go\core\Controller {
 
 
 	}
-
 
 
 }
