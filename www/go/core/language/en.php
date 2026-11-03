@@ -434,4 +434,6 @@ If you did not request a new password please delete this mail.',
   'Preview' => 'Preview',
   'Failed to upload {name}' => 'Failed to upload {name}',
   'Invalid export type' => 'Invalid export type',
+  'The database is already up to date. Only an administrator can run the upgrade again. Please log in as an administrator first.' => 'The database is already up to date. Only an administrator can run the upgrade again. Please log in as an administrator first.',
+  'Only an administrator can change the license. Please log in as an administrator first.' => 'Only an administrator can change the license. Please log in as an administrator first.',
 );

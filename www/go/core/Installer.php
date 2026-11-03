@@ -68,6 +68,25 @@ class Installer {
 	}
 
 	/**
+	 * Check if the web upgrade may run for the current request.
+	 *
+	 * When the database version differs from the code version, Group-Office can't be used until it's upgraded and
+	 * login may not work with the old schema, so anyone may start it. When the database is up to date, only an
+	 * administrator may run it again. Also used to protect install/license.php.
+	 *
+	 * @return bool
+	 */
+	public function isUpgradeAllowed(): bool
+	{
+		if (go()->getSettings()->databaseVersion != go()->getVersion()) {
+			return true;
+		}
+
+		$state = go()->getAuthState();
+		return $state !== null && $state->isAuthenticated() && $state->isAdmin();
+	}
+
+	/**
 	 * @throws Exception
 	 */
 	public function enableGarbageCollection() {
@@ -505,7 +524,6 @@ class Installer {
 
 		go()->disableEvents();
 
-
 		$this->isValidDb();
 		go()->getCache()->flush(true, false);
 		GO::clearCache(); //legacy framework
@@ -537,6 +555,9 @@ class Installer {
 		jmap\Entity::$trackChanges = false;
 
 		ActiveRecord::$log_enabled = false;
+
+		// for moving wopi module. remove later.
+		go()->getDbConnection()->exec("update core_module set package='community' where name='wopi'");
 
 		$database = go()->getDatabase();
 		$database->setUtf8();
