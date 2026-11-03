@@ -66,7 +66,7 @@ export class Main extends MainThreeColumnPanel {
 				cls: "vbox scroll fit",
 				width: 300
 			},
-			this.showCenterButton(),
+			// this.showCenterButton(),
 			schedulefilter({
 				columns: [
 					column({

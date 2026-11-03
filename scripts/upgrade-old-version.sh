@@ -16,6 +16,10 @@ LICENSE=""
 PHP7=/usr/bin/php7.4
 PHP8=/usr/bin/php
 
+wget https://sourceforge.net/projects/group-office/files/6.2/groupoffice-com-6.2.134-php-7.1.tar.gz/download
+tar zxf download
+rm download
+
 wget https://sourceforge.net/projects/group-office/files/6.3/groupoffice-6.3.99-php-71.tar.gz/download
 tar zxf download
 rm download

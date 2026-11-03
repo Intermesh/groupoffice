@@ -12,7 +12,7 @@ Mention in your reply which existing util you found and reused, or that none exi
 
 ## Prefer the new stack
 
-We are migrating away from legacy code. When writing new code or changing existing code, favour the new frameworks:
+We are migrating away from legacy code. When writing new code or changing existing code, favor the new frameworks:
 
 - **Frontend: use GOUI where possible.** ExtJS is the old framework and the goal is to replace it with GOUI. Don't build new UI in ExtJS unless there is no GOUI alternative.
 - **Backend: favour `go\core` over `GO\Base`.** `GO\Base` is the old code base; new code belongs in `go\core`.
