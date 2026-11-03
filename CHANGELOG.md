@@ -1,3 +1,4 @@
+03-11-2026: 6.8.180
 - Files: Fixed security issue where logged in user could read any contact name
 - Core: permissionLevel filter: the admin-only guard on permissionLevelUserId / permissionLevelGroups never fires #1593
 - API keys: mask the key in the history log
