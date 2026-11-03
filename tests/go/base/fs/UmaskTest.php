@@ -23,6 +23,8 @@ class UmaskTest extends TestCase
 	{
 		umask($this->umask);
 		\GO::config()->folder_create_mode = $this->folderMode;
+
+		date_default_timezone_set("UTC");
 	}
 
 	/**
@@ -56,4 +58,5 @@ class UmaskTest extends TestCase
 
 		$this->assertSame(0775, $perms, sprintf('Folder was created with mode %o', $perms));
 	}
+
 }
