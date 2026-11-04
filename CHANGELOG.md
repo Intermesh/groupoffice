@@ -1,3 +1,4 @@
+- Email: Security: a logged in user with access to the e-mail module could write an e-mail message to any path in the data directory (file_storage_path, usually /var/lib/groupoffice), overwriting files of other users and possibly files outside it. This came from an old, unused "save to file" function in the e-mail composer, which has been removed. No configuration changes are needed.
 03-11-2026: 6.8.180
 - Files: Fixed security issue where logged in user could read any contact name
 - Core: permissionLevel filter: the admin-only guard on permissionLevelUserId / permissionLevelGroups never fires #1593
