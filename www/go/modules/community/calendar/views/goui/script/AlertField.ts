@@ -43,6 +43,7 @@ export class AlertField extends SelectField {
 			{value: '-PT5M', name: '5 '+ t('minutes')+' '+t('before')},
 			{value: '-PT10M', name: '10 '+ t('minutes')+' '+t('before')},
 			{value: '-PT15M', name: '15 '+ t('minutes')+' '+t('before')},
+			{value: '-PT30M', name: '30 '+ t('minutes')+' '+t('before')},
 			{value: '-PT1H', name: '1 '+ t('hour')+' '+t('before')},
 			{value: '-PT2H', name: '2 '+ t('hours')+' '+t('before')},
 			{value: '-P1D', name: '1 '+ t('day')+' '+t('before')},
