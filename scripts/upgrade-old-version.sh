@@ -16,6 +16,7 @@ LICENSE=""
 PHP7=/usr/bin/php7.4
 PHP8=/usr/bin/php
 
+# Do NOT, I repeat, NOT download .135! That version will not play nice with either PHP7.0 or ionCube, depending on which version you use
 wget https://sourceforge.net/projects/group-office/files/6.2/groupoffice-com-6.2.134-php-7.1.tar.gz/download
 tar zxf download
 rm download

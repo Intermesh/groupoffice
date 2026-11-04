@@ -63,4 +63,29 @@ https://github.com/Intermesh/docker-groupoffice-development
      
 7. Launch it in the web browser and follow the installer's instructions.
 
+## Helper shell scripts
+
+In the `scripts` subdirectory, there is a number of shell scripts available to help developers and system administrators
+alike:
+
+- `build.sh`: builds a single environment from source; installs composer dependencies, npm dependencies and will 
+compile typescript.
+- `cleanup.sql`: Cleans out deprecated database tables. To be run using your favourite MySQL or MariadDB client.
+- `deploy.php`: used in a multisite setting, will allow the administrator to roll out all sites of a certain GO version 
+in one go.
+- `install-composer.sh`; downloads and installs the latest [composer](https://getcomposer.org) version. Composer manages 
+third party package dependencies
+- `install-ioncube.sh`: Only needed when you upgrade from very old versions to versions up to 6.7 . Will download and 
+install the ioncube loader.
+- `install-npm.sh`: (re-)installs NPM dependencies, compiles typescript and sass
+- `link-goui.sh`: to be run after updating either the goui or the groupoffice-core pacakges: recreates symlinks to the
+source of both packages, 
+- `merge-branch.sh`: Merges feature branches in current code. Shortcut for CLI users and GUI users alinke
+- `update-git.sh`: Pulls the latest version of the current branch for Group-Office, its submodules and (if available)
+promodules and business modules
+- `upgrade-old-versions.sh`: A Wile E. Coyote style shell script that does a mass upgrade from 6.1 and earlier right up
+to 26.0 . Be sure to comment out all the versions before the one you are currently running (so 6.4 users should only run 
+th 6.5 upgrade and further).
+- `watch.sh`: launches file watchers for typescript and SASS files and compile updated files accordingly.
+
 Happy coding!
