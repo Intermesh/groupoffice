@@ -1,5 +1,6 @@
 - Email: Security: a logged in user with access to the e-mail module could write an e-mail message to any path in the data directory (file_storage_path, usually /var/lib/groupoffice), overwriting files of other users and possibly files outside it. This came from an old, unused "save to file" function in the e-mail composer, which has been removed. No configuration changes are needed.
 - Files: Security: Check read permission when reading file meta data
+- Calendar: Security: Check write permissions before reloading an external calendar
 
 26-10-2026: 25.0.115
 - API keys: mask access token in the history log
