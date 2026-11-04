@@ -1,8 +1,12 @@
+- Email: Security: a logged in user with access to the e-mail module could write an e-mail message to any path in the data directory (file_storage_path, usually /var/lib/groupoffice), overwriting files of other users and possibly files outside it. This came from an old, unused "save to file" function in the e-mail composer, which has been removed. No configuration changes are needed.
 - Core: The install/clearcache.php and install/clearapcu.php scripts can no longer be called anonymously. Only the CLI can    
   trigger them.
 - Core: Security: anyone who could reach /install/ could run the database upgrade again, for example to disable modules that are not covered by the license, or change the license setting. When the database is already up to date, install/upgrade.php and install/license.php now require you to be logged in as an administrator. When an upgrade is pending it can still be started without logging in. The installer now logs in the new administrator before showing the license page.
 - Maildomains: Added script to correct Maildir path if they are still in the old way where home and maildir is the same.
 - Calendar: add '30 minutes before' as a reminder option
+- Email: Security: Check write permission when saving file to folder. Only read permission was checked.
+- Files: Security: Check read permission when reading file meta data
+- Calendar: Security: Check write permissions before reloading an external calendar
 
 02-11-2026: 26.0.57
 - Calendar: Deleting an invitation from your calendar now declines it instead of removing it, so opening the invitation again does not add it back in. Declined invitations can still be deleted when "Show events that you have declined" is on.
