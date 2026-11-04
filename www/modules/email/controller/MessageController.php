@@ -15,6 +15,7 @@ use GO\Base\Mail\SmimeMessage;
 use GO\Base\Model\Acl;
 use go\core\db\DbException;
 use go\core\ErrorHandler;
+use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\fs\FileSystemObject;
@@ -1632,6 +1633,10 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if(!$folder){
 			ErrorHandler::log("GO\Email\Controller\Message::actionSaveAttachment(".$params['folder_id'].") folder not found", E_USER_WARNING);
 			throw new NotFound("Specified folder not found");
+		}
+
+		if(!$folder->hasPermissionLevel(Acl::WRITE_PERMISSION)) {
+			throw new Forbidden("You do not have permission to write this folder");
 		}
 
 		$params['filename'] = \GO\Base\Fs\File::stripInvalidChars($params['filename']);		
