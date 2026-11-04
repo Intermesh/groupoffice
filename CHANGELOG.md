@@ -3,6 +3,8 @@
   trigger them.
 - Core: Security: anyone who could reach /install/ could run the database upgrade again, for example to disable modules that are not covered by the license, or change the license setting. When the database is already up to date, install/upgrade.php and install/license.php now require you to be logged in as an administrator. When an upgrade is pending it can still be started without logging in. The installer now logs in the new administrator before showing the license page.
 - Maildomains: Added script to correct Maildir path if they are still in the old way where home and maildir is the same.
+- Email: Security: Check write permission when saving file to folder. Only read permission was checked.
+- Files: Security: Check read permission when reading file meta data
 
 02-11-2026: 26.0.57
 - Calendar: Deleting an invitation from your calendar now declines it instead of removing it, so opening the invitation again does not add it back in. Declined invitations can still be deleted when "Show events that you have declined" is on.
