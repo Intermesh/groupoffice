@@ -9,6 +9,7 @@ use go\core\exception\Forbidden;
 use go\core\http\Client;
 use go\core\http\Request;
 use go\core\http\Response;
+use go\core\model\Acl;
 use go\core\util\StringUtil;
 use GO\Email\Model\Account;
 use GO\Files\Model\File;
@@ -426,6 +427,10 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 
 		if(!$file){
 			throw new \Exception("File not found");
+		}
+
+		if($file->hasPermissionLevel(Acl::LEVEL_READ)) {
+			throw new AccessDenied();
 		}
 		
 		$response = [
