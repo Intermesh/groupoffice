@@ -144,14 +144,15 @@ class Month extends Calendar {
 				$this->SetFont(null, '', $this->fSizeSmall);
 
 				$events = [];
-				$this->SetFillColor($this->day->format('M')===$day->format('M') ? 255: 240);
+				$bgcolor  = $this->day->format('M')===$day->format('M') ? 255: 240;
+				$this->SetFillColor($bgcolor);
 
 				if(isset($this->events[$day->format('Ymd')])) {
 					ksort($this->events[$day->format('Ymd')]);
 					$events = $this->events[$day->format('Ymd')];
 				}
 
-				$this->DayCell($events, $colw, $rowh-$dateh, $coord[0], $coord[1]+$dateh);
+				$this->DayCell($events, $colw, $rowh-$dateh, $coord[0], $coord[1]+$dateh, $bgcolor);
 				
 				$this->SetXY($coord[0]+$colw,$coord[1]);
 				$day->modify('+1 day');
@@ -164,7 +165,7 @@ class Month extends Calendar {
 
 	}
 	
-	protected function DayCell($events, $width, $h, $x=null, $y=null) {
+	protected function DayCell($events, $width, $h, $x=null, $y=null, $bgcolor = 240) {
 		$tz = go()->getAuthState()->getUser()->timezone;
 		if($x===null)
 			$x=$this->GetX();
@@ -175,6 +176,8 @@ class Month extends Calendar {
 		$this->StartTransform(); //will clip text in the Rectangle on the next line
 		$this->Rect($x, $y, $width-1, $h, 'CEO');
 		$currentY = $y+0.3;
+
+
 		foreach ($events as $event) {
 
 			list($r, $g, $b) = sscanf($this->calendars[$event->calendarId]['color'], "%02x%02x%02x");
@@ -193,15 +196,16 @@ class Month extends Calendar {
 
 			if (!$event->showWithoutTime) {
 				$start = $event->start(false, $tz)->format('G:i');
-				$timeWidth = 5.5;//$this->GetStringWidth($start);
+				$timeWidth = 7;//$this->GetStringWidth($start);
 				$this->SetTextColor(0, 0, 0);
 				$this->Cell($width - $timeWidth - 4, 4, $title, 0, 0);
 				$catX = $this->GetX();
 
-				$this->SetFillColor(255, 255, 255);
+				$this->SetFillColor($bgcolor);
+
 				$this->Rect($x + $width - $timeWidth - 1.5, $currentY+1, $timeWidth + 1.5, 4, 'F');
 
-				$this->SetTextColor(150, 150, 150);
+				$this->SetTextColor(80);
 				$this->SetXY($x + $width - $timeWidth-1, $currentY);
 				$this->Cell($timeWidth, 4, $start, 0, 0, 'R');
 

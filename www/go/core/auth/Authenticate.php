@@ -276,6 +276,23 @@ class Authenticate
 		}
 	}
 
+	/**
+	 * Fail a password login that is rejected before an authenticator checks it.
+	 *
+	 * Does a password_verify for timing attacks as this would be done for a valid user.
+	 */
+	private function failWithoutAuthenticator(string $username): false
+	{
+		// nosemgrep: detected-bcrypt-hash
+		password_verify("randomboguspasswordstring", '$2y$10$wkP8uDjY/tt5GNrfJJO9SOknqStW0POBn5Z4zpctuQkMP7pibTz2m');
+
+		User::fireEvent(User::EVENT_BADLOGIN, $username, null);
+
+		$this->logFailure($username);
+
+		return false;
+	}
+
 	private function logFailure(string $username, string $scope = 'password'): void
 	{
 		$this->registerFailure($username, $scope);
@@ -302,6 +319,12 @@ class Authenticate
 
 		$this->checkThrottle($username);
 
+		if ($password === '') {
+			// An LDAP server may accept a bind with a valid DN and an empty password as an "unauthenticated bind"
+			// (RFC 4513 5.1.2). Never pass an empty password to an authenticator.
+			return $this->failWithoutAuthenticator($username);
+		}
+
 		$cacheKey = 'login-' . md5($username . '|' . $password);
 
 		if (!go()->getSettings()->maintenanceMode && $cache = go()->getCache()->get($cacheKey)) {
@@ -313,19 +336,8 @@ class Authenticate
 		$authenticator = $this->getPrimaryAuthenticatorForUser($username);
 
 		if (!$authenticator) {
-
 			// If we get here then the given username doesn't exist.
-			// Do a password_verify for timing attacks as this would be done for a
-			// valid user.
-
-			// nosemgrep: detected-bcrypt-hash
-			password_verify("randomboguspasswordstring", '$2y$10$wkP8uDjY/tt5GNrfJJO9SOknqStW0POBn5Z4zpctuQkMP7pibTz2m');
-
-			User::fireEvent(User::EVENT_BADLOGIN, $username, null);
-
-			$this->logFailure($username);
-
-			return false;
+			return $this->failWithoutAuthenticator($username);
 		}
 
 		$this->usedPasswordAuthenticator = $authenticator;

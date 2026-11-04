@@ -40,6 +40,7 @@ namespace GO\Base\Controller;
 use Exception;
 use GO;
 use GO\Base\Data\JsonResponse;
+use GO\Base\Db\ActiveRecord;
 use GO\Base\Exception\AccessDenied;
 use GO\Base\Exception\CliOnly;
 use GO\Base\Exception\MissingParameter;
@@ -267,8 +268,37 @@ abstract class AbstractController extends Observable {
 	}
 	
 	
-	
-	
+
+	/**
+	 * Get the model for a class name given by the client.
+	 *
+	 * Only models protected by an ACL may be used. Models without an ACL pass every permission check in
+	 * ActiveRecord, so only admins may use them.
+	 *
+	 * @param string $modelName Class name or entity name
+	 * @return ActiveRecord
+	 * @throws AccessDenied
+	 */
+	protected function getRequestedModel(string $modelName): ActiveRecord {
+		if(!class_exists($modelName)) {
+			$entityType = \go\core\orm\EntityType::findByName($modelName);
+			if($entityType) {
+				$modelName = $entityType->getClassName();
+			}
+		}
+
+		if(!class_exists($modelName) || !is_subclass_of($modelName, ActiveRecord::class)) {
+			throw new AccessDenied();
+		}
+
+		$model = $modelName::model();
+		if(!$model->aclField() && !GO::user()->isAdmin()) {
+			throw new AccessDenied();
+		}
+
+		return $model;
+	}
+
 	/**
 	 * Checks if a user is logged in, if the user has permission to the module and if the user has access to a specific action.
 	 * 

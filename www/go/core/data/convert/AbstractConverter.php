@@ -4,6 +4,7 @@ namespace go\core\data\convert;
 use Exception;
 use go\core\db\DbException;
 use go\core\ErrorHandler;
+use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\jmap\EntityController;
@@ -465,6 +466,10 @@ abstract class AbstractConverter {
 
 				try {
 					$entity = $this->entityClass::findById($entityId);
+
+					if(!$entity->hasPermissionLevel(Acl::LEVEL_READ)) {
+						throw new Forbidden();
+					}
 
 					$this->exportEntity($entity);
 

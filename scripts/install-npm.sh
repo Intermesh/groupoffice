@@ -28,7 +28,12 @@ DIR="$(pwd)";
 WWW="$( cd "${1:-$DIR/www}" && pwd )"
 cd "$WWW"
 #npm up
-npm ci --prefer-offline --audit=false --progress=false --fund=false
+if [ "$IS_DEV" == "true" ]; then
+  # Dev checkouts may have modules on other branches that aren't in the lock file yet
+  npm install --prefer-offline --audit=false --progress=false --fund=false
+else
+  npm ci --prefer-offline --audit=false --progress=false --fund=false
+fi
 
 echo "Building SASS"
 

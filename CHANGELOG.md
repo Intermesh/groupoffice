@@ -1,3 +1,12 @@
+- Core: The install/clearcache.php and install/clearapcu.php scripts can no longer be called anonymously. Only the CLI can    
+  trigger them.
+- Core: Security: anyone who could reach /install/ could run the database upgrade again, for example to disable modules that are not covered by the license, or change the license setting. When the database is already up to date, install/upgrade.php and install/license.php now require you to be logged in as an administrator. When an upgrade is pending it can still be started without logging in. The installer now logs in the new administrator before showing the license page.
+- Maildomains: Added script to correct Maildir path if they are still in the old way where home and maildir is the same.
+
+02-11-2026: 26.0.57
+- Calendar: Deleting an invitation from your calendar now declines it instead of removing it, so opening the invitation again does not add it back in. Declined invitations can still be deleted when "Show events that you have declined" is on.
+- Calendar: When a participant deleted an invitation, for example from a phone via CalDAV or with "Save only", the organizer still saw "needs action" for that participant. Deleting it now sets the participant to declined in the organizer's event.
+- Core: Security: files and folders created by GroupOffice in the data directory (/var/lib/groupoffice), such as ActiveSync state, cached scripts and user files, could be world-writable (0666/0777) because Group-Office set the umask to 0. Other local accounts on the server could modify them. Group-Office now uses the umask of the web server or PHP-FPM (usually 0022). file_create_mode and folder_create_mode in config.php still apply to the files module. Existing files keep their permissions; fix them with: find /var/lib/groupoffice -xdev -perm -o+w ! -type l -exec chmod o-w {} +
 - Core: west panel flyout had incorrect background color in dark mode
 - Finance: require document to be "Sent" (sentAt != null) to be included in statements
 - Finance: Add customer filter to payments
@@ -5,6 +14,27 @@
 - Notes: Zoom images when clicked
 - API keys: mask access token in the history log
 - Projects3: Only show projects2 migrate button to admin users
+- Calendar: Fixed EXCEPTION: ErrorException: Uninitialized string offset 0 in vendor/sabre/vobject/lib/DateTimeParser.php
+- Core: Fixed security issue where static methods could be called from the web
+- Core: fix Entity/export with ids exports records the user may not read
+- Core: Security: on installations that log in users with LDAP, anyone who knew a username could log in as that user over CalDAV, CardDAV and WebDAV with an empty password if the LDAP server allows "unauthenticated binds". This gave access to the user's calendars, address books and files, also when the user has two-factor authentication. Active Directory may allow these binds by default; OpenLDAP doesn't unless configured to. The web login and ActiveSync were not affected. Empty passwords are now always rejected. We also recommend disabling unauthenticated binds on your LDAP server. If you can't update right away, enable "Force app passwords" in System settings > Authentication to block this.
+- Core: Don't use eval() in export columns
+- Core: Security: a logged-in user could use batch edit, merge and link requests, to change records that have no permissions of their own. Batch edit is now limited to records that are protected by permissions, except for admins.
+- Site: Security: a user with access to the site module could run PHP code on the server by giving site content a crafted title.
+- Pr2analyzer: Security: a user with access to the project time report could run PHP code on the server.
+- Billing: Security: a user with access to billing could run PHP code on the server when adding products as items.
+- Legacy calendar time tracking: Security: a user who can name projects or tasks could run PHP code on the server when time tracking of an event was opened.
+- Savemailas: Security: a logged-in user could download any folder on the server as a zip file, including other users' files, through the "zip of attachments" link of a saved e-mail. Attachment names starting with "-" could also be passed to the zip command as options.
+- Core: Security: file names starting with "-", like e-mail attachment names, could be passed to the zip command as options when PHP's ZipArchive is not installed.
+- Core: Security: templates (labels, e-mail, PDF and newsletter templates) could read any database table, including password hashes, and could show items the user has no permission to see. The "selectTable", "select" and "where" template filters have been removed, so templates that use them must be changed. "find", "entity" and "findEntity" now only return items the user may read.
+- Core: Security: exports and saved exports accepted any PHP class name from the client, so a logged-in user could make the server create objects of any class.
+- Core: Security: legacy forms accepted an unused "importController" option that a logged-in user could use to run other controllers, for example to start a projects migration.
+- Site: Security: removed file uploads on the website ticket pages. The upload address was open to anyone without logging in.
+- Core: Security: legacy imports could read and change any file on the server that the web server may write, for example other users' files. Over the web only uploaded files can be imported now.
+- Core: Security: the JMAP API could call constructors and classes that are not API controllers, in some cases without logging in.
+- Documenttemplates: Security: file names inside an uploaded template could be passed to the zip command as options.
+- Core: zipping a folder left out hidden files in subfolders when PHP's ZipArchive was used.
+- Calendar: Improved month print view
 
 26-10-2026: 26.0.56
 - Core: Security: CardDAV/CalDAV clients that search the user directory (like eM Client) were shown names and e-mail addresses of all users that are visible to them for any search text, and also of matching users they have no permission to see. eM Client showed these as recipient suggestions.

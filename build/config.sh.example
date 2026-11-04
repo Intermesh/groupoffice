@@ -9,6 +9,14 @@
 #DOCKER_USERNAME="intermesh"
 #DOCKER_TOKEN="dckr_pat_..."
 
+# Deploy key for the promodules, business and docker-groupoffice repositories, so the build doesn't need
+# a forwarded SSH agent (which is gone in a detached screen). Create it without a passphrase:
+#   ssh-keygen -t ed25519 -N "" -f ~/.ssh/groupoffice-build
+# Add the public key as a deploy key to promodules and business on git.intermesh.nl (read only) and to
+# Intermesh/docker-groupoffice on GitHub (Settings > Deploy keys) with "Allow write access", because the
+# build commits the new version in the Dockerfile and pushes it.
+#GIT_SSH_KEY="$HOME/.ssh/groupoffice-build"
+
 #SF_USER="mschering"
 #ENCODER=(/usr/local/share/sourceguardian/bin/sourceguardian --phpversion 8.2+)
 #TEST_IMAGE="intermesh/groupoffice:latest"

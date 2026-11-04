@@ -79,28 +79,8 @@ class AbstractModelController extends AbstractController {
 					//where 1 is the id of the model
 
 					$linkProps = explode(':', $params['link']);			
-					$linkModel = \GO::getModel($linkProps[0])->findByPk($linkProps[1]);
+					$linkModel = $this->getRequestedModel($linkProps[0])->findByPk($linkProps[1]);
 					$model->link($linkModel);			
-				}
-
-				if(!empty($_FILES['importFiles'])){
-
-					$attachments = $_FILES['importFiles'];
-					$count = count($attachments['name']);
-
-					$params['enclosure'] = $params['importEnclosure'];
-					$params['delimiter'] = $params['importDelimiter'];
-
-					for($i=0;$i<$count;$i++){
-						if(is_uploaded_file($attachments['tmp_name'][$i])) {
-							$params['file']= $attachments['tmp_name'][$i];
-							//$params['model'] = $params['importModel'];
-
-							$controller = new $params['importController'];
-
-							$controller->run("import",$params,false);
-						}
-					}
 				}
 
 
@@ -806,6 +786,15 @@ class AbstractModelController extends AbstractController {
 	protected function beforeExport(&$store, &$columnModel,&$model, &$findParams, &$showHeader, &$humanHeaders, &$title, &$orientation, &$extraParams){
 		
 	}
+
+	/**
+	 * Only the command line may import a file that is on the server, otherwise it must be uploaded
+	 *
+	 * @return bool
+	 */
+	protected function mayImportServerFile(): bool {
+		return \GO::environment()->isCli();
+	}
 	
 	/**
 	 *
@@ -832,15 +821,24 @@ class AbstractModelController extends AbstractController {
 		$attributeIndexMap = isset($params['attributeIndexMap'])
 			? $attributeIndexMap = json_decode($params['attributeIndexMap'],true)
 			: array();
-		
+
+		// The file is converted and its records are imported, so over the web it must be a file the user uploaded
+		if(!$this->mayImportServerFile() && !is_uploaded_file($params['file'] ?? '')) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
+		if (!isset($params['importType']))
+			$params['importType'] = 'Csv';
+
+		if(!in_array($params['importType'], ['Csv', 'Xls'], true)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
 		if(is_file($params['file'])){
-						
-			if (!isset($params['importType']))
-				$params['importType'] = 'Csv';
-			
+
 			$fileClassName = 'GO\\Base\\Fs\\'.$params['importType'].'File';
 			if ($params['importType']=='Xls' && !empty($params['maxColumnNr']))
-				$importFile = new $fileClassName($params['file'],$params['maxColumnNr']);
+				$importFile = new \GO\Base\Fs\XlsFile($params['file'],$params['maxColumnNr']);
 			else
 				$importFile = new $fileClassName($params['file']);
 		
@@ -1108,11 +1106,12 @@ class AbstractModelController extends AbstractController {
 		}
 		
 		$mergeModels = json_decode($params['merge_models'], true);
-		
-		$targetModel = \GO::getModel($params['model_name'])->findByPk($params['target_model_id']);
-		
+
+		$model = $this->getRequestedModel($params['model_name']);
+		$targetModel = $model->findByPk($params['target_model_id']);
+
 		foreach($mergeModels as $id){
-			$mergeModel = \GO::getModel($params['model_name'])->findByPk($id);
+			$mergeModel = $model->findByPk($id);
 			$targetModel->mergeWith($mergeModel, !empty($params['merge_attributes']), !empty($params['delete_merge_models']));			
 		}
 		

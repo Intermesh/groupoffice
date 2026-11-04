@@ -279,6 +279,8 @@ class Folder extends Base {
 		}		
 		try {
 			if (mkdir($this->path, $permissionsMode, true)) {
+				// mkdir() applies the system umask, so set the mode explicitly
+				chmod($this->path, $permissionsMode);
 				if (\GO::config()->file_change_group)
 					chgrp($this->path, \GO::config()->file_change_group);
 

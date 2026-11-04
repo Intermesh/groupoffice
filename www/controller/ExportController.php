@@ -33,6 +33,8 @@ use GO\Base\Db\FindParams;
 use GO\Base\Db\FindCriteria;
 use GO\Base\Data\ColumnModel;
 use GO\Base\Data\DbStore;
+use GO\Base\Exception\AccessDenied;
+use GO\Base\Model\AbstractExport;
 
 class ExportController extends AbstractController { 
 
@@ -40,6 +42,20 @@ class ExportController extends AbstractController {
 		
 		$this->view = new JsonView();
 		parent::init();
+	}
+
+	/**
+	 * Create the export for a class name given by the client
+	 *
+	 * @param string $className
+	 * @return AbstractExport
+	 * @throws AccessDenied
+	 */
+	private function createExport(string $className): AbstractExport {
+		if(!SavedExport::isExportClass($className)) {
+			throw new AccessDenied();
+		}
+		return new $className();
 	}
 	
 	/**
@@ -65,7 +81,7 @@ class ExportController extends AbstractController {
 			$use_db_column_names=false;
 		}
 				
-		$currentGrid = new $class_name();
+		$currentGrid = $this->createExport($class_name);
 		
 		if(!in_array($view, $currentGrid->getSupportedViews())){
 			Throw new Exception('No supported view');
@@ -77,6 +93,9 @@ class ExportController extends AbstractController {
 		$savedExportModel = null;
 		if(isset($id)){
 			$savedExportModel = SavedExport::model()->findByPk($id);
+			if($savedExportModel && !SavedExport::isExportClass($savedExportModel->class_name)) {
+				throw new AccessDenied();
+			}
 		}
 		
 		// If there is no savedExportModel found then create a temporary one for this export
@@ -115,7 +134,7 @@ class ExportController extends AbstractController {
 
 		$model = SavedExport::model()->findByPk($id);
 		
-		$currentGrid = new $className;
+		$currentGrid = $this->createExport($className);
 		
 		$sViews = $currentGrid->getSupportedViews();
 		$supportedViews = array();
@@ -130,6 +149,8 @@ class ExportController extends AbstractController {
 		
 		if(GO::request()->isPost()){
 			$savedExport = GO::request()->post['savedExport'];
+			// The export class can't be changed
+			unset($savedExport['class_name']);
 
 			$model->setAttributes($savedExport);
 			$model->save();
@@ -148,7 +169,7 @@ class ExportController extends AbstractController {
 
 		$model = new SavedExport();
 		
-		$currentGrid = new $className;
+		$currentGrid = $this->createExport($className);
 		
 		// Which columns need to be exported
 		if(!empty($exportColumns)){
@@ -167,6 +188,7 @@ class ExportController extends AbstractController {
 			$savedExport = GO::request()->post['savedExport'];
 
 			$model->setAttributes($savedExport);
+			$model->class_name = $className;
 			$model->save();
 
 			echo $this->render('submit',array('savedExport'=>$model,'supportedViews'=>$supportedViews,'columns'=>$availableColumns));
