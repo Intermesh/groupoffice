@@ -506,22 +506,6 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	}
 
 
-	protected function actionSaveToFile(array $params)
-	{
-		$message = new \GO\Base\Mail\Message();
-		$alias = Alias::model()->findByPk($params['alias_id']);
-		$message->handleEmailFormInput($params);
-		$message->setFrom($alias->email, $alias->name);
-
-		$file = new \GO\Base\Fs\File(GO::config()->file_storage_path.$params['save_to_path']);
-
-		$file->putContents($message->toStream());
-
-		$response['success']=$file->exists();
-
-		return $response;
-	}
-
 	private function _createAutoLinkTagFromParams(array $params, $account)
 	{
 		$tag = '';
