@@ -1526,8 +1526,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 	private function processPaths($paths, Folder $currentFolder, $overwrite, &$response) {
 
-		$removeBlobs = [];
-
 		while ($tmpfile = array_shift($paths)){
 			if(!is_string($tmpfile)) {
 				// its a json object with blob data
@@ -1536,6 +1534,11 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				$tmpfile = Blob::buildPath($blob->id);
 			} else{
 				unset($blob);
+
+				// A path may only point to the user's own temporary files. It could be any file on the server otherwise.
+				if(!(new \GO\Base\Fs\File($tmpfile))->isTempFile()) {
+					throw new \GO\Base\Exception\AccessDenied();
+				}
 			}
 
 			$destinationFolder = $currentFolder;
