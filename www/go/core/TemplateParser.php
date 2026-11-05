@@ -352,7 +352,7 @@ class TemplateParser {
 			$format = $this->config['dateFormat'];
 		}
 
-		$date->setTimezone(new DateTimeZone($this->_currentUser()->timezone));
+		$date->setTimezone(new DateTimeZone($this->_currentUser() ? $this->_currentUser()->timezone : go()->getSettings()->defaultTimezone));
 
 		return $date->format($format);
 	}
