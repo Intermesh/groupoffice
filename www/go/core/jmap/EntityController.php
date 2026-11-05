@@ -784,7 +784,9 @@ abstract class EntityController extends Controller {
 	 */
 	protected function canUpdate(Entity $entity): bool
 	{
-		if($ret = self::fireEvent(self::EVENT_BEFORE_CAN_UPDATE, $entity)) {
+		$ret = self::fireEvent(self::EVENT_BEFORE_CAN_UPDATE, $entity);
+
+		if(isset($ret)) {
 			return $ret;
 		}
 		return $entity->hasPermissionLevel(Acl::LEVEL_WRITE) && $this->checkAclChange($entity);
