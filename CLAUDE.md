@@ -53,7 +53,7 @@ Never hardcode UI text. Use `go()->t("Text")` in PHP. Strings live in the module
 - Mirror the source namespace: `go\core\util\IpAddress` is tested in `tests/go/core/util/IpAddressTest.php`. Module tests go in `tests/go/modules/<package>/<module>/`.
 - Classes extend `PHPUnit\Framework\TestCase`, are named `<Class>Test`, and use `testSomething` methods. Use data providers for many inputs (see `IpAddressTest`). A leading underscore (`_testFoo`) disables a test, so don't use it for new ones.
 - For ORM and JMAP behaviour, follow `tests/go/core/orm/EntityTest.php` and `tests/go/core/jmap/`. Test entities live in the `community/test` module.
-- Every bug fix and every new security guard gets a test that fails without the fix. For permissions, test both the allowed and the denied user.
+- Suggest creating tests when they will benefit security and stability of the system
 - Leave the database as you found it: delete the entities you create.
 - Run a single test: `tools/phpunit groupoffice <path>` (see "Running tests").
 
