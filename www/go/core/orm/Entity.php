@@ -1259,10 +1259,21 @@ abstract class Entity extends Property {
 		}
 		
 		//Enable sorting on customfields with ['customFields.fieldName' => 'DESC']
+		$cfJoined = false;
 		foreach($sort as $field => $dir) {
+			if(substr($field, 0, 13) == "customFields/") {
+				$sort->renameKey($field, str_replace("/", ".", $field));
+				if(!$cfJoined) {
+					$query->joinCustomFields();
+					$cfJoined = true;
+				}
+			}
+
 			if(substr($field, 0, 13) == "customFields.") {
-				$query->joinCustomFields();				
-				break;
+				if(!$cfJoined) {
+					$query->joinCustomFields();
+					$cfJoined = true;
+				}
 			}
 		}
 
