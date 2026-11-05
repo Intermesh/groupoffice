@@ -5,8 +5,10 @@ namespace go\modules\community\oauth2client\controller;
 
 use go\core\auth\Authenticate;
 use go\core\ErrorHandler;
+use go\core\exception\Forbidden;
 use go\core\http\Exception;
 use go\core\jmap\EntityController;
+use go\core\model\Acl;
 use go\core\model\User;
 use go\core\webclient\Extjs3;
 use go\modules\community\email\model\Account;
@@ -263,6 +265,9 @@ final class Oauth2Client extends EntityController
 
 		$provider = false;
 		$acct = Account::findById($accountId);
+		if(!$acct->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+			throw new Forbidden();
+		}
 		if ($acctSettings = $acct->oauth2_account) {
 			$client = model\Oauth2Client::findById($acctSettings->oauth2ClientId);
 
