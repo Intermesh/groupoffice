@@ -28,12 +28,6 @@ class Language extends Controller {
 	private bool $translate = false;
 	private bool $missingOnly = false;
 
-	protected function authenticate() {
-    if (!go()->getAuthState()->isAuthenticated()) {			
-      throw new Exception(401, "Unauthorized");
-		}  	
-	}
-
 	public function __construct()
 	{
 		//for checking arrays() in english translation
