@@ -206,18 +206,7 @@ class Module extends Entity {
 
 	private function userRights($userId): object
 	{
-		$query = go()->getDbConnection()->selectSingleValue("MAX(rights)")
-			->from("core_permission")
-			->where('moduleId', '=', $this->id)
-			->where("groupId", "IN",
-				go()->getDbConnection()
-					->select("groupId")
-					->from("core_user_group")
-					->where(['userId' => $userId])
-			);
-
-
-		$r = $query->single();
+		$r = Permission::findUserRights($this->id, $userId);
 
 		if($r === null) {
 			$rights = ["mayRead" => false];
@@ -226,8 +215,6 @@ class Module extends Entity {
 			}
 			return (object) $rights;
 		}
-
-		$r = (int)$r;
 
 		$rights = ["mayRead" => true];
 
