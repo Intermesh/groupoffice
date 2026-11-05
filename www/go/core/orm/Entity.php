@@ -674,7 +674,11 @@ abstract class Entity extends Property {
 
 	protected function internalGetPermissionLevel(): int
 	{
-		if(go()->getAuthState() && go()->getAuthState()->isAdmin()) {
+		if(!go()->getAuthState() || !go()->getAuthState()->isAuthenticated()) {
+			return 0;
+		}
+
+		if(go()->getAuthState()->isAdmin()) {
 			return Acl::LEVEL_MANAGE;
 		}
 		if($this->isNew()) {
