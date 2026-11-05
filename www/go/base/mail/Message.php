@@ -401,6 +401,26 @@ class Message extends \go\core\mail\Message {
 		return str_replace('href="?r=','href="'.\GO::config()->full_url, $body);
 	}
 	
+	/**
+	 * Get the full path of a file in the file storage that the client wants to attach.
+	 *
+	 * The path comes from the client, so it must be a file in the files module that the current user may read.
+	 *
+	 * @param string $relativePath Relative to the file storage path
+	 * @return string
+	 * @throws \GO\Base\Exception\AccessDenied
+	 */
+	private function readableFileStoragePath(string $relativePath): string
+	{
+		$file = GO::modules()->isInstalled('files') ? \GO\Files\Model\File::model()->findByPath($relativePath) : false;
+
+		if (!$file || !$file->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
+		return $file->fsFile->path();
+	}
+
 	private function _embedPastedImages($body){
 		$regex = '/src="data:image\/([^;]+);([^,]+),([^"]+)/';
 			
@@ -520,7 +540,7 @@ class Message extends \go\core\mail\Message {
 						} elseif($ia->blobId) {
 							$path = Blob::buildPath($ia->blobId);
 						} else {
-							$path = empty($ia->from_file_storage) ? Blob::buildPath($ia->tmp_file) : \GO::config()->file_storage_path . $ia->tmp_file;
+							$path = empty($ia->from_file_storage) ? Blob::buildPath($ia->tmp_file) : $this->readableFileStoragePath($ia->tmp_file);
 						}
 						$tmpFile = new \GO\Base\Fs\File($path);
 
@@ -577,11 +597,10 @@ class Message extends \go\core\mail\Message {
 					continue;
 
 				} else if (!empty($att->tmp_file) && empty($att->from_file_storage)) {
-					$path = \GO::config()->tmpdir . $att->tmp_file;
+					$path = html_entity_decode(\GO::config()->tmpdir . $att->tmp_file);
 				} else {
-					$path = \GO::config()->file_storage_path . $att->tmp_file;
+					$path = $this->readableFileStoragePath(html_entity_decode($att->tmp_file));
 				}
-				$path = html_entity_decode($path);
 				$tmpFile = new \GO\Base\Fs\File($path);
 				if ($tmpFile->exists()) {
 					$file = Attachment::fromPath($tmpFile->path());
