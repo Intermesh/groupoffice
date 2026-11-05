@@ -64,6 +64,12 @@ class User extends AclItemEntity {
 	const ID_SUPER_ADMIN = 1;
 
 	/**
+	 * Properties only admins and users with the "mayChangeUsers" right may change. Users may not change them on their own
+	 * account.
+	 */
+	const MANAGER_PROPERTIES = ['enabled', 'forcePasswordChange', 'disk_quota', 'disk_usage', 'homeDir', 'loginCount', 'lastLogin'];
+
+	/**
 	 * Fires when the password is verified during login via the web only.
 	 * Login might not be complete.
 	 *
@@ -423,7 +429,19 @@ public function historyLog(): bool|array
 	/**
 	 * @throws Exception
 	 */
+	/**
+	 * Only admins may change the personal group. Users with the "mayChangeUsers" right may only change who can see the
+	 * user (the ACL). Members of the personal group get access to everything that is shared with the user.
+	 *
+	 * @throws Forbidden
+	 */
 	public function setPersonalGroup($values) {
+		$state = go()->getAuthState();
+		if($state && !$state->isAdmin()) {
+			if(!go()->getModel()->getUserRights()->mayChangeUsers || !empty(array_diff(array_keys($values), ['acl']))) {
+				throw new Forbidden();
+			}
+		}
 		$this->getPersonalGroup()->setValues($values);
 	}
 	
