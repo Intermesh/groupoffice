@@ -8,6 +8,7 @@
 - Files: Security: Check read permission when reading file meta data
 - Calendar: Security: Check write permissions before reloading an external calendar
 - File: Security: Check write permission in replace() method before overwriting data on disk
+- Reports: "Save layout" now saves the column order, widths, hidden columns, frozen columns and sort to the report without changing the report itself. Users without a personal arrangement get this layout, and users with one can go back to it with "Load default". Only users who may manage reports and have write permission on the report can save the layout.
 
 02-11-2026: 26.0.57
 - Calendar: Deleting an invitation from your calendar now declines it instead of removing it, so opening the invitation again does not add it back in. Declined invitations can still be deleted when "Show events that you have declined" is on.
