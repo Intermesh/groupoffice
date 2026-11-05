@@ -133,7 +133,14 @@ class AclGroupController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 		}
 		return true;
 	}
-	
+
+	protected function beforeUpdateRecord($params, &$record, $linkModel)
+	{
+		if(!$params['currentUserHasManagePermission']) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+	}
+
 	protected function beforeDelete(array $params) {
 		$delKeys = !empty($params['delete_keys']) ? json_decode($params['delete_keys']) : array();
 
