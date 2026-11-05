@@ -38,7 +38,7 @@ class Module extends \go\core\Module
 		Response::get()->noCache();
 
 		go()->setAuthState(new State());
-		go()->getAuthState()->getPageUrl();
+		//go()->getAuthState()->getPageUrl();
 
 		go()->sessionStart();
 
