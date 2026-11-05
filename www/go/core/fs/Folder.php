@@ -14,6 +14,8 @@ use Throwable;
  */
 class Folder extends FileSystemObject
 {
+
+
 	/**
 	 * Check if the file or folder exists
 	 * @return boolean
