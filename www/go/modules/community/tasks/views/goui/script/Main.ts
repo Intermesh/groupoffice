@@ -32,14 +32,6 @@ import {schedulefilter} from "./ScheduleFilter.js";
 import {ImportTaskDialog} from "./ImportTaskDialog.js";
 import {taskCategoryDS, taskDS, tasklistDS} from "./Index.js";
 
-export enum ProgressType {
-	'needs-action' = 'Needs action',
-	'in-progress' = 'In progress',
-	'completed' = 'Completed',
-	'failed' = 'Failed',
-	'cancelled' = 'Cancelled'
-}
-
 export class Main extends MainThreeColumnPanel {
 	private taskListGrid!: TasklistGrid;
 	private taskCategoryGrid!: TaskCategoryGrid;
@@ -65,6 +57,7 @@ export class Main extends MainThreeColumnPanel {
 	protected createWest() {
 		const west = comp({
 				cls: "vbox scroll fit",
+				stateId: 'tasks-west-panel',
 				width: 300
 			},
 			// this.showCenterButton(),
@@ -382,7 +375,6 @@ export class Main extends MainThreeColumnPanel {
 
 		return comp({
 				cls: "vbox bg-lowest",
-				flex: 1
 			},
 			this.taskGridToolbar = tbar({
 					cls: "bg-mid border-bottom table-aligned"
@@ -524,7 +516,10 @@ export class Main extends MainThreeColumnPanel {
 
 	protected createEast() {
 		this.taskDetail = new TaskDetail();
+		this.taskDetail.itemId = "taskDetail";
+		this.taskDetail.stateId = "task-detail";
 
+		this.taskDetail.toolbar.items.insert(0, this.hideEastButton(), this.closeEastButton());
 		return this.taskDetail;
 	}
 

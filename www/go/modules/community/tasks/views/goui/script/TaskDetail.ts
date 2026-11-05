@@ -1,4 +1,4 @@
-import {addbutton, client, DetailPanel, img, principalDS} from "@intermesh/groupoffice-core";
+import {addbutton, client, DetailPanel, img, modules, principalDS} from "@intermesh/groupoffice-core";
 import {
 	avatar,
 	btn, Button,
@@ -11,10 +11,12 @@ import {
 	t,
 	tbar
 } from "@intermesh/goui";
-import {ProgressType} from "./Main.js";
+import {ProgressType} from "./Index.js";
 import {ContinueTaskDialog} from "./ContinueTaskDialog.js";
 import {TaskDialog} from "./TaskDialog.js";
 import {taskCategoryDS, taskDS, tasklistDS} from "./Index.js";
+import {CommentsPanel} from "@intermesh/community-comments";
+import {HistoryDetailPanel} from "@intermesh/community-history";
 
 export class TaskDetail extends DetailPanel {
 	private form: DataSourceForm;
@@ -155,9 +157,15 @@ export class TaskDetail extends DetailPanel {
 		);
 
 		this.addCustomFields();
-		this.addComments();
+		if (modules.isAvailable("community", "comments")) {
+			this.scroller.items.add(new CommentsPanel(this.entityName))
+		}
 		this.addLinks();
-		this.addHistory();
+		this.addFiles();
+
+		if (modules.isAvailable("community", "history")) {
+			this.scroller.items.add(new HistoryDetailPanel(this.entityName));
+		}
 
 		this.items.add(
 			tbar({

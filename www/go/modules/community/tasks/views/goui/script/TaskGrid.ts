@@ -13,7 +13,7 @@ import {
 	Window
 } from "@intermesh/goui";
 import {img, principalDS} from "@intermesh/groupoffice-core";
-import {ProgressType} from "./Main.js";
+import {ProgressType} from "./Index.js";
 import {TaskDialog} from "./TaskDialog.js";
 import {taskCategoryDS, taskDS, tasklistDS} from "./Index.js";
 
@@ -40,7 +40,7 @@ export class TaskGrid extends Table<DataSourceStore> {
 						path: "tasklistId",
 						dataSource: tasklistDS
 					},
-					categories: {
+					taskcategories: {
 						path: "categories",
 						dataSource: taskCategoryDS
 					}
@@ -255,7 +255,7 @@ export class TaskGrid extends Table<DataSourceStore> {
 					resizable: true
 				}),
 				column({
-					id: "categories",
+					id: "taskcategories",
 					header: t("Categories"),
 					width: 160,
 					sortable: true,

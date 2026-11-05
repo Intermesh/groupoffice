@@ -1,151 +1,141 @@
 import {JmapDataSource, modules} from "@intermesh/groupoffice-core";
+import {SettingsPanel} from "./SettingsPanel";
 import {UserSettingsPanel} from "./UserSettingsPanel.js";
 import {t} from "@intermesh/goui";
+import {Main} from "./Main";
+import {TaskDialog} from "./TaskDialog";
+import {TaskDetail} from "./TaskDetail";
+import {TasklistCombo} from "./TasklistCombo";
+import {ProgressCombo} from "./ProgressCombo";
 
 modules.register({
 	name: "tasks",
 	package: "community",
+	systemSettingsPanels: [SettingsPanel],
 	userSettingsPanels: [UserSettingsPanel],
-	mainPanel: "go.modules.community.tasks.MainPanel",
-	title: t("Tasks"),
-	entities: ["TaskListGrouping", "TaskCategory", {
-		name: "TaskList",
-		relations: {
-			group: {store: "TaskListGrouping", fk: "groupingId"},
-			creator: {store: "Principal", fk: "createdBy"}
-		}
-	}, {
-		name: "Task",
-		links: [{
-			iconCls: "entity ic-assignment",
-			linkWindow: function (entity, entityId) {
-				return new go.modules.community.tasks.TaskDialog();
-			},
+	entities: [
+		"TaskListGrouping",
+		"TaskCategory",
+		"TaskList",
+		{
+			name: "Task",
+			links: [{
+				iconCls: "entity ic-assignment",
+				linkWindow: function (_entity, _entityId) {
+					return new TaskDialog();
+				},
 
-			linkDetail: function () {
-				return new go.modules.community.tasks.TaskDetail();
-			},
+				linkDetail: function () {
+					return new TaskDetail();
+				},
 
-			linkDetailCards: function () {
+				linkDetailCards: function () {
+					/*
+					const incomplete = new go.modules.community.tasks.TaskLinkDetail({
+						title: t("Incomplete tasks"),
+						link: {
+							entity: "Task",
+							filter: null
+						}
+					});
 
-				const incomplete = new go.modules.community.tasks.TaskLinkDetail({
-					title: t("Incomplete tasks"),
-					link: {
-						entity: "Task",
-						filter: null
-					}
-				});
+					incomplete.store.setFilter('completed', {complete: false});
 
-				incomplete.store.setFilter('completed', {complete: false});
+					const completed = new go.modules.community.tasks.TaskLinkDetail({
 
-				const completed = new go.modules.community.tasks.TaskLinkDetail({
+						title: t("Completed tasks"),
+						link: {
+							entity: "Task",
+							filter: null
+						}
+					});
+					completed.store.setFilter('completed', {complete: true});
 
-					title: t("Completed tasks"),
-					link: {
-						entity: "Task",
-						filter: null
-					}
-				});
-				completed.store.setFilter('completed', {complete: true});
-
-				return [
-					incomplete,
-
-					completed]
+					return [incomplete, completed];
+					 */
+					// TODO: Refactor TaskLinkDetail
+					return [];
+				}
+			}],
+			filters: {
+				text: {
+					wildcards: false,
+					type: "string",
+					multiple: false,
+					title: t("Query")
+				},
+				commentedat: {
+					title: t("Commented at"),
+					multiple: false,
+					type: 'date'
+				},
+				modifiedat: {
+					title: t("Modified at"),
+					multiple: false,
+					type: 'date'
+				},
+				modifiedBy: {
+					title: t("Modified by"),
+					multiple: true,
+					type: 'go.users.UserCombo',
+					typeConfig: {value: null}
+				},
+				createdat: {
+					title: t("Created at"),
+					multiple: false,
+					type: 'date'
+				},
+				createdby: {
+					title: t("Created by"),
+					multiple: true,
+					type: 'go.users.UserCombo',
+					typeConfig: {value: null}
+				},
+				tasklistid: {
+					title: t("List"),
+					multiple: false,
+					type: TasklistCombo
+				},
+				progress: {
+					title: t("Progress"),
+					multiple: false,
+					type: ProgressCombo
+				},
+				title: {
+					title: t("Title"),
+					type: "string",
+					multiple: true
+				},
+				due: {
+					title: t("Due"),
+					multiple: false,
+					type: 'date'
+				},
+				start: {
+					title: t("Start"),
+					multiple: false,
+					type: 'date'
+				},
+				responsibleUserId: {
+					title: t("Responsible"),
+					multiple: false,
+					type: 'go.users.UserCombo',
+					typeConfig: {value: null}
+				}
 			}
 		}],
-		relations: {
-			creator: {store: "Principal", fk: "createdBy"},
-			modifier: {store: "Principal", fk: "modifiedBy"},
-			responsible: {store: 'Principal', fk: 'responsibleUserId'},
-			tasklist: {store: 'TaskList', fk: 'tasklistId'},
-			categories: {store: "TaskCategory", fk: "categories"},
-			project: {store: "Project3", fk: "projectId"},
-		},
-
-		/**
-		 * Filter definitions
-		 *
-		 * Will be used by query fields where you can use these like:
-		 *
-		 * name: Piet,John age: < 40
-		 *
-		 * Or when adding custom saved filters.
-		 */
-		filters: {
-			text: {
-				wildcards: false,
-				type: "string",
-				multiple: false,
-				title: t("Query")
-			},
-			commentedat: {
-				title: t("Commented at"),
-				multiple: false,
-				type: 'date'
-			},
-			modifiedat: {
-				title: t("Modified at"),
-				multiple: false,
-				type: 'date'
-			},
-			modifiedBy: {
-				title: t("Modified by"),
-				multiple: true,
-				type: 'go.users.UserCombo',
-				typeConfig: {value: null}
-			},
-			createdat: {
-				title: t("Created at"),
-				multiple: false,
-				type: 'date'
-			},
-			createdby: {
-				title: t("Created by"),
-				multiple: true,
-				type: 'go.users.UserCombo',
-				typeConfig: {value: null}
-			},
-			tasklistid: {
-				title: t("List"),
-				multiple: false,
-				type: "go.modules.community.tasks.TasklistCombo"
-			},
-			progress: {
-				title: t("Progress"),
-				multiple: false,
-				type: "go.modules.community.tasks.ProgressCombo"
-			},
-			title: {
-				title: t("Title"),
-				type: "string",
-				multiple: true
-			},
-			due: {
-				title: t("Due"),
-				multiple: false,
-				type: 'date'
-			},
-			start: {
-				title: t("Start"),
-				multiple: false,
-				type: 'date'
-			},
-			responsibleUserId: {
-				title: t("Responsible"),
-				multiple: false,
-				type: 'go.users.UserCombo',
-				typeConfig: {value: null}
+	panels: {
+		tasks: {
+			cmp: Main,
+			title: t("Tasks"),
+			routes: {
+				"^tasks/(\\d+)$"(taskId: string) {
+					this.show();
+					this.showTask(taskId);
+				}
 			}
 		}
-
-
-	}]
-
-
-	// userSettingsPanels: [
-	// 	"go.modules.community.tasks.SettingsPanel"
-	// ]
+	}
 });
 
 export const taskDS = new JmapDataSource("Task");
@@ -154,3 +144,11 @@ export const tasklistGroupingDS = new JmapDataSource("TaskListGrouping");
 export const taskCategoryDS = new JmapDataSource("TaskCategory");
 export const commentDS = new JmapDataSource("Comment");
 export const projectDS = new JmapDataSource("Project3");
+
+export enum ProgressType {
+	'needs-action' = 'Needs action',
+	'in-progress' = 'In progress',
+	'completed' = 'Completed',
+	'failed' = 'Failed',
+	'cancelled' = 'Cancelled'
+}
