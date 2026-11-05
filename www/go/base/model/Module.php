@@ -70,7 +70,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		$groupedRights = "SELECT BIT_OR(rights) as rights FROM core_permission WHERE groupId IN (SELECT groupId from core_user_group WHERE userId = ".$userId.") AND moduleId = ".$moduleId.";";
 
 		$rights = \go()->getDbConnection()->query($groupedRights)->fetch(\PDO::FETCH_COLUMN);
-		if($rights === false) {
+		if(empty($rights)) {
 			return 0;
 		}
 		if($rights & 1) { // we only have mayManage for old modules
